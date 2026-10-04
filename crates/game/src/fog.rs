@@ -10,12 +10,13 @@ use std::collections::BTreeMap;
 use bevy::prelude::*;
 use bevy_ecs_tiled::prelude::{TileColor, TilePos, TiledTile};
 use sim::{
-    Building, CellPos, Definitions, Footprint, Players, Position, Projectiles, SUBCELLS_PER_CELL,
-    SimEvent, SimId, SubPos, Vision,
+    Building, CellPos, Footprint, Players, Position, SUBCELLS_PER_CELL, SimEvent, SimId, SubPos,
+    Vision,
 };
 
 use crate::map::MapView;
 use crate::projection::{TileSize, tile_cell, to_world};
+use crate::sim_host::SimHost;
 use crate::units::{GROUND_OFFSET_PX, HUMAN};
 
 /// Frames an instant shot stays on screen.
@@ -65,18 +66,23 @@ pub fn tint(sight: Sight) -> Color {
     }
 }
 
+/// The human player's vision; `None` before match setup (nothing is visible then).
+pub fn human_vision(players: Option<&Players>) -> Option<&Vision> {
+    players?.get(HUMAN).map(|state| state.vision())
+}
+
 /// Tints every map tile by the human player's vision; a tile's colour is written only when it
 /// changes, so the tilemap re-uploads only changed tiles.
 fn tint_tiles(
     map: Option<Res<MapView>>,
-    players: Res<Players>,
+    host: Res<SimHost>,
     mut tiles: Query<(&TilePos, &mut TileColor), With<TiledTile>>,
 ) {
     let Some(map) = map else {
         return;
     };
     let empty = Vision::default();
-    let vision = players.get(HUMAN).map_or(&empty, |state| state.vision());
+    let vision = human_vision(host.players()).unwrap_or(&empty);
     for (position, mut colour) in &mut tiles {
         let Some(cell) = tile_cell(*position, map.height) else {
             continue;
@@ -97,8 +103,11 @@ pub struct RecentShots(pub Vec<(SimId, SimId, u8)>);
 fn record_shots(
     mut shots: ResMut<RecentShots>,
     mut events: MessageReader<SimEvent>,
-    definitions: Res<Definitions>,
+    host: Res<SimHost>,
 ) {
+    let Some(definitions) = host.definitions() else {
+        return;
+    };
     shots.0.retain_mut(|(.., frames)| {
         *frames = frames.saturating_sub(1);
         *frames > 0
@@ -178,20 +187,23 @@ pub fn shot_view(attacker_seen: bool, target_seen: bool) -> ShotView {
 /// Draws projectiles in flight and recent instant shots, where the human player sees them.
 fn draw_combat(
     map: Option<Res<MapView>>,
-    players: Res<Players>,
-    projectiles: Res<Projectiles>,
+    host: Res<SimHost>,
     shots: Res<RecentShots>,
-    positions: Query<(&SimId, Option<&Position>, Option<&Building>)>,
     mut gizmos: Gizmos,
 ) {
-    let Some(map) = map else {
+    let (Some(map), Some(vision), Some(projectiles)) =
+        (map, human_vision(host.players()), host.projectiles())
+    else {
         return;
     };
-    let Some(vision) = players.get(HUMAN).map(|state| state.vision()) else {
+    let Some(mut positions) = host
+        .world()
+        .try_query::<(&SimId, Option<&Position>, Option<&Building>)>()
+    else {
         return;
     };
     let points: BTreeMap<SimId, SubPos> = positions
-        .iter()
+        .iter(host.world())
         .filter_map(|(id, position, building)| {
             let point = match (position, building) {
                 (Some(position), _) => position.0,

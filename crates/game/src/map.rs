@@ -32,6 +32,7 @@ use crate::checked_assets::CheckedAssets;
 use crate::projection::{
     TileSize, cell_centre, cell_corners, map_bounds, map_origin_offset, pick_cell,
 };
+use crate::sim_host::MatchGrid;
 use crate::tileset_image::check_tileset_image;
 
 /// The map loaded at startup, relative to the asset directory. Map selection arrives in M6.
@@ -73,6 +74,13 @@ pub struct MapStatus {
 /// The map cell under the mouse cursor, if any.
 #[derive(Resource, Debug, Default)]
 pub struct HoveredCell(pub Option<CellPos>);
+
+/// The terrain of the map as its file defines it (passable, buildable, ore at the start), as the
+/// tiles draw it. The interface uses it for what the player knows of a cell: it never shows the
+/// simulation's current ore or occupancy of cells the player does not see (M5; docs/DECISIONS.md
+/// D36).
+#[derive(Resource, Clone, Debug)]
+pub struct MapTerrain(pub Grid);
 
 pub(crate) fn load_map(
     mut commands: Commands,
@@ -123,8 +131,11 @@ pub(crate) fn load_map(
         view.tile,
     ))));
     commands.insert_resource(view);
-    // Match setup: the simulation receives its grid before the first tick.
-    commands.insert_resource::<Grid>(loaded.grid);
+    // Match setup: the simulation receives its grid before the first tick
+    // (`crate::sim_host::start_match`). The game keeps the terrain as the map file defines it,
+    // which is what the player sees of a cell, also under fog (`MapTerrain`).
+    commands.insert_resource(MapTerrain(loaded.grid.clone()));
+    commands.insert_resource(MatchGrid(loaded.grid));
     commands.spawn((
         TiledMap(asset_server.load(MAP_PATH)),
         TilemapAnchor::None,
@@ -205,7 +216,10 @@ pub(crate) fn update_hovered_cell(
 ) {
     let (camera, camera_transform) = *camera;
     hovered.0 = view.and_then(|view| {
-        let cursor = window.cursor_position()?;
+        // The sidebar (M5) covers the map on the right; no cell is under it.
+        let cursor = window
+            .cursor_position()
+            .filter(|&cursor| !crate::sidebar::over_sidebar(cursor, window.width()))?;
         let world = camera.viewport_to_world_2d(camera_transform, cursor).ok()?;
         pick_cell(world, view.tile, view.width, view.height)
     });
@@ -226,14 +240,17 @@ fn draw_hovered_cell(hovered: Res<HoveredCell>, view: Option<Res<MapView>>, mut 
 fn report_clicked_cell(
     buttons: Res<ButtonInput<MouseButton>>,
     hovered: Res<HoveredCell>,
-    grid: Res<Grid>,
+    terrain: Option<Res<MapTerrain>>,
 ) {
     if !buttons.just_pressed(MouseButton::Left) {
         return;
     }
+    let Some(terrain) = terrain else {
+        return;
+    };
     match hovered
         .0
-        .and_then(|pos| grid.cell(pos).map(|cell| (pos, cell)))
+        .and_then(|pos| terrain.0.cell(pos).map(|cell| (pos, cell)))
     {
         Some((pos, cell)) => info!(
             "cell ({}, {}): passable {}, buildable {}, ore {}",

@@ -4,8 +4,9 @@
 //!
 //! As for units (`crate::units`), the game reads simulation state and never writes it: each
 //! building is drawn by a separate view entity, and the only writes into the simulation world
-//! are match setup before the first tick (players, starting buildings) and commands pushed into
-//! `CommandQueue` by the interface (`crate::construction`, `crate::selection`).
+//! are match setup before the first tick (players, starting buildings, run by
+//! `crate::sim_host` with [`setup_economy`]) and the commands of the interface, which
+//! `crate::sim_host` moves into `CommandQueue` (docs/DECISIONS.md D34).
 //!
 //! Every building type named by the economy file has a sprite, which must exist and pass the PNG
 //! subset check at the size its footprint implies before the match starts (cross validation,
@@ -24,6 +25,7 @@ use sim::{
 
 use crate::map::MapView;
 use crate::projection::{TileSize, to_world};
+use crate::sim_host::SimHost;
 use crate::tileset_image::{TilesetImageError, TilesetImageErrorKind, check_png_file};
 use crate::units::{HUMAN, OPPONENT, owner_colour};
 
@@ -61,7 +63,15 @@ impl Plugin for BuildingsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<BuildingViews>()
             .init_resource::<BuildingStatus>()
-            .add_systems(Update, (spawn_building_views, show_status))
+            .add_systems(
+                Update,
+                (
+                    spawn_building_views,
+                    // The title is written to the window that the camera's systems read (M5:
+                    // ordered, so that no two game systems share state unordered).
+                    show_status.before(crate::camera::pan_camera),
+                ),
+            )
             .add_systems(
                 PostUpdate,
                 update_building_views.before(bevy::transform::TransformSystems::Propagate),
@@ -222,17 +232,23 @@ pub fn building_depth(footprint: Footprint) -> f32 {
 
 /// Creates a view for every simulation building that has none. Buildings do not move, so the
 /// view is placed once.
-fn spawn_building_views(
+pub(crate) fn spawn_building_views(
     mut commands: Commands,
     mut views: ResMut<BuildingViews>,
     map: Option<Res<MapView>>,
     sprites: Option<Res<BuildingSprites>>,
-    buildings: Query<(Entity, &SimId, &Owner, &Building)>,
+    host: Res<SimHost>,
 ) {
     let (Some(map), Some(sprites)) = (map, sprites) else {
         return;
     };
-    for (building, id, owner, component) in &buildings {
+    let Some(mut buildings) = host
+        .world()
+        .try_query::<(Entity, &SimId, &Owner, &Building)>()
+    else {
+        return;
+    };
+    for (building, id, owner, component) in buildings.iter(host.world()) {
         if views.0.contains_key(id) {
             continue;
         }
@@ -277,18 +293,24 @@ pub fn building_shown(owner: PlayerId, footprint: Footprint, players: &Players) 
 fn update_building_views(
     mut commands: Commands,
     mut registry: ResMut<BuildingViews>,
-    players: Res<Players>,
+    host: Res<SimHost>,
     // Disjoint from the unit views' query (`crate::units`), which also writes `Visibility`.
     mut views: Query<(Entity, &BuildingView, &mut Visibility), Without<crate::units::UnitView>>,
-    buildings: Query<(&Owner, &Building)>,
 ) {
+    let Some(players) = host.players() else {
+        return;
+    };
+    let world = host.world();
     for (entity, view, mut visibility) in &mut views {
-        let Ok((owner, building)) = buildings.get(view.building) else {
+        let (Some(owner), Some(building)) = (
+            world.get::<Owner>(view.building),
+            world.get::<Building>(view.building),
+        ) else {
             registry.0.remove(&view.id);
             commands.entity(entity).despawn();
             continue;
         };
-        let shown = if building_shown(owner.0, building.footprint, &players) {
+        let shown = if building_shown(owner.0, building.footprint, players) {
             Visibility::Inherited
         } else {
             Visibility::Hidden
@@ -314,8 +336,8 @@ pub fn status_title(state: Option<&PlayerState>) -> String {
 }
 
 /// Shows the player's credits and power in the window title (the sidebar arrives in M5).
-fn show_status(players: Res<Players>, mut window: Single<&mut Window, With<PrimaryWindow>>) {
-    let title = status_title(players.get(HUMAN));
+fn show_status(host: Res<SimHost>, mut window: Single<&mut Window, With<PrimaryWindow>>) {
+    let title = status_title(host.players().and_then(|players| players.get(HUMAN)));
     if window.title != title {
         window.title = title;
     }
