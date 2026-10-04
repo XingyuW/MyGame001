@@ -9,7 +9,7 @@
 | M4: Combat and fog of war | **Reviewed**: review 2 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 1 P2) after review 1 NO-GO; merged into `main`. Awaiting user verification for `m4-approved` | `milestone/m4` | `m4-reviewed` |
 | M5: Interface and audio | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 5 P2); merged into `main`. Awaiting user verification for `m5-approved` | `milestone/m5` | `m5-reviewed` |
 | M6: Skirmish AI and game flow | **Reviewed**: review 2 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 2 P2) after review 1 NO-GO; merged into `main`. Awaiting user verification for `m6-approved` | `milestone/m6` | `m6-reviewed` |
-| M7: Content, balance, performance, and packaging | Implemented, awaiting independent review | `milestone/m7` | |
+| M7: Content, balance, performance, and packaging | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 6 P2); merged into `main`. Awaiting user verification for `m7-approved` | `milestone/m7` | `m7-reviewed` |
 
 ## M0 implementation report (2026-10-03)
 
@@ -2467,3 +2467,175 @@ Not review findings (PLAN.md section 12 item 2); they block only `m7-approved`. 
 12. **Settings file location:** storing the options in `~/Library/Application Support/MyGame001/settings.txt` is acceptable.
 
 The earlier pending items (13 for M6, 16 for M5, 9 for M4, 10 for M3, 7 for M2, and 5 for M1) remain pending. With M7 data the starting setup differs from what they name (each faction now starts with its yard and nine units; M6 item 2's rows have two factions and three maps; the opponent's turret is the gun turret or the rocket tower, by faction).
+
+## M7 review decision (2026-10-04)
+
+One independent review round (`docs/reviews/M7-review-1.md`: GO WITH DOCUMENTED NON-BLOCKING DEBT, 0 P0, 0 P1, 6 P2). Before the review the orchestrator reran all six validation commands of PLAN.md section 9 and the three M7 commands (`cargo run --release -p sim --example m7_benchmark`, `cargo run --release -p sim --example m7_soak`, `sh scripts/package_macos.sh`) on commit `8cdd42e`, all with exit code 0 (414 tests passed). Under PLAN.md section 12 item 1, `milestone/m7` was merged into `main` and tagged `m7-reviewed`. The tag `m7-approved` is created by the user alone after the verification below.
+
+### Debt recorded from review 1 (P2, verbatim from the report)
+
+#### P2-1: The settings file's write path follows a symlink and blocks on a named pipe at `settings.txt.tmp`; the read path rejects both
+* **File and line:**
+  * `crates/game/src/options.rs:353-360` (`write_settings`): `std::fs::write(&temporary, …)` on the fixed name `settings.txt.tmp`, then `rename`.
+  * The read side (`options.rs:312-331`) rejects non-regular files before opening, as D52 item 2 states. It also leaves a check-then-open window between `metadata` and `File::open`.
+* **Evidence (debug and release):**
+  * **Named pipe at `…/mygame001-smoke-<pid>/settings.txt.tmp`:**
+    * The last log line is "no settings file … the defaults are used".
+    * The process then blocks in `save_settings` (schedule `Last`) until the 40 s alarm kills it (exit 142).
+    * There is no error and no smoke result.
+    * In a normal run the same file at `~/Library/Application Support/MyGame001/settings.txt.tmp` would freeze the game the first time the player changes an option.
+  * **Symlink at `settings.txt.tmp` pointing to a scratch `victim.txt`:**
+    * The run passes (exit 0) and logs "settings written to …".
+    * `victim.txt` now holds the settings text, so the file outside the settings directory was overwritten.
+    * `rename` then replaces `settings.txt` with the symlink itself.
+* **Why P2:**
+  * Only a hostile file in the user's own Application Support directory triggers it. A leftover regular `.tmp` file from a crash is simply overwritten.
+  * No privilege boundary is crossed.
+  * It is the same class and severity as M1 review 3 P2-1 (a named pipe at the map path hangs at startup).
+* **Problem with the documentation:** D52 item 3 ("No silent fallback or loss") and the module documentation describe only the read side.
+* **Expected behaviour:**
+  * Create the temporary file with `OpenOptions::new().write(true).create_new(true)` (O_EXCL, which does not follow a final symlink and never opens an existing pipe).
+  * Use a unique name, or remove a stale entry first after checking with `symlink_metadata` that it is a regular file.
+  * Report a failure as the existing typed write error.
+  * Add a test with a named pipe and a symlink at the temporary path.
+
+#### P2-2: The release package's bundle signature does not verify, the executable is arm64 only, and the README's advice for other Macs is unverified
+
+* **File and line:**
+  * `scripts/package_macos.sh:27` copies the linker-signed binary into a bundle and never re-signs it.
+  * `README.md:58`: "on another Mac, open it with a right click and **Open** the first time".
+  * `docs/DECISIONS.md` D54 item 3 says Gatekeeper "asks on first open on another Mac".
+* **Evidence:**
+  * `codesign -dv target/package/MyGame001.app` reports `flags=0x20002(adhoc,linker-signed)`, `Info.plist=not bound`, `Sealed Resources=none`.
+  * `codesign --verify` and `spctl --assess` both report "code has no resources but signature indicates they must be present".
+  * `file` reports `Mach-O 64-bit executable arm64`.
+  * A scratch copy re-signed with `codesign --force --deep -s -` verifies ("valid on disk", "satisfies its Designated Requirement").
+* **Why P2:**
+  * The version 1.0 target is the user's Mac (U1, PLAN.md section 12 item 3). A locally built bundle carries no quarantine attribute and opens.
+  * D54 item 3 and user-verification items 9 and 10 already leave signing and distribution to the user.
+  * The defect is that the package as built has an invalid bundle signature and an unverified claim about other Macs.
+* **Expected behaviour:**
+  * Ad-hoc sign the assembled bundle in the script and have the script fail unless `codesign --verify` passes.
+  * State that the package is arm64 only, or build a universal binary.
+  * Verify the README instruction on a second Mac, or reword it.
+
+#### P2-3: STATUS lists M6 implementation debt item 9 (test time) as resolved ("reduced"), but test time grew
+
+* **File and line:** `docs/STATUS.md:2435` ("M6 implementation debt item 9, test time, reduced (D53)"); D53.
+* **Evidence:**
+  * M6 debt item 9 recorded `m6_production_matches` 52 s, `m6_ai` 40 s, and workspace 153 s (`STATUS.md:2273`).
+  * On M7: `m6_production_matches` 119.3 s, `m6_ai` 39.1 s, and `cargo test --workspace` 212.6 s (this review) or 189 s (implementer).
+  * The time per match fell, but the debt (the time the suite takes) is larger.
+* **Expected behaviour:** carry item 9 as open with the M7 numbers, or say "time per match reduced; total test time 189–213 s".
+
+#### P2-4: The benchmark does not show that 200 units moved, and its headline mean is mostly post-battle ticks
+
+* **File and line:** `crates/sim/examples/m7_benchmark.rs:271-274` (`moved` counts only units that survive the window) and `:431` (the pass criterion is `moved > 0`).
+* **Evidence:**
+  * The fixture scenario reports "28 units moved" out of 200.
+  * Units alive are `[200, 147, 34, 28, 28]`, so about 1,000 of the 2,000 measured ticks run with at most 34 units.
+  * The reported mean (0.078 ms) is about a third of the busy-part mean (0.248 ms).
+  * The plan asks for "200 moving and fighting units".
+* **Why P2:**
+  * The busy-part mean is also held to the budget, and it stays far inside it (0.25 and 0.36 ms against 5 ms, a margin of more than 13×).
+  * The scenarios force movement: the anchors are about 23 cells apart and every weapon range is at most 16 cells.
+  * The budget decision therefore stands; only the evidence is weaker than its description.
+* **Expected behaviour:**
+  * Count units that ever changed position, including destroyed ones, and require that most of the 200 did.
+  * Either end the measured window when the battle ends, or label the headline mean as the window mean.
+
+#### P2-5: The automated end-to-end runs of the real binary start matches only on the first map
+
+* **File and line:** `crates/game/src/smoke.rs:188` onward (`play_flow`): every match of the flow uses `MenuSelection`'s map 0 (`demo`). `MOVE_TARGET` (`smoke.rs:69`) is a demo cell.
+* **Evidence:**
+  * `crossroads` and `riverlands` reach `bevy_ecs_tiled` and the renderer only in manual play. The catalogue checks their files at startup, and `m7_maps` and the simulation tests cover them without rendering.
+  * The reviewer reordered the maps in scratch roots, and `--smoke-test 600` passed on each new map in both profiles. The code path works, but section 9's commands do not cover it.
+* **Expected behaviour:** let the smoke flow's three matches use three different maps (for example, Restart on the next map and the last match on the third), with a move target valid on each.
+
+#### P2-6: The roster-limit boundary is tested at 73 entries, not at the limit
+
+* **File and line:** `crates/sim/tests/m7_factions.rs:254-265`. The case appends 64 entries to a 9-entry list.
+* **Evidence:** the report lists a "64-entry limit" boundary test, but no case loads exactly 64 or rejects exactly 65. A 65-entry list of repeated names reaches `TooManyEntries` before uniqueness, so the exact case needs no extra definitions.
+* **Expected behaviour:** add the exact 65-entry rejection, or correct the report's wording.
+
+#### Observation, not a finding
+
+* The AI file keeps schema version 1 although the meaning of its lists changed: entries are now filtered by roster, and dead entries are rejected.
+* D49 item 3 records and justifies this. The fields are unchanged, and the shipped and fixture files were updated and checked.
+
+### Recorded debt to carry (verbatim from review 1)
+
+**New in this review (P2):**
+
+* **P2-1:** the settings write path follows a symlink and blocks on a named pipe at `settings.txt.tmp` (`options.rs:353-360`). Fix: create the temporary file with `create_new` and a unique name, and add a test.
+* **P2-2:**
+  * The package's bundle signature does not verify (`codesign --verify`: "code has no resources but signature indicates they must be present").
+  * The executable is arm64 only.
+  * The README's right-click advice for other Macs is unverified.
+  * Fix: ad-hoc sign and verify in the script, and document the architecture.
+* **P2-3:** M6 implementation debt item 9 (test time) is not resolved. The workspace now takes 189–213 s (M6: 153 s), and `m6_production_matches` 119 s. Carry it as open.
+* **P2-4:** the benchmark's `moved` counts only survivors, its pass criterion needs one moving unit, and its headline mean is diluted by post-battle ticks. The busy-part mean (0.25 / 0.36 ms) is the meaningful figure.
+* **P2-5:** the smoke flow starts matches only on the first map. The two new maps reach the renderer only in manual play (the reviewer's reordered-root probes pass).
+* **P2-6:** the roster limit is tested at 73 entries, not exactly 65. The report's "64-entry limit" boundary claim overstates the test.
+
+**New in M7, confirmed by this review (from the implementation report's known debt):**
+
+1. The package is not signed or notarised, and the crate licence notices are not shipped (D54 item 3). See also P2-2 and user verification items 2 and 3.
+2. The package is 116 MB; the executable is not stripped.
+3. The art is procedural; its acceptance as final art is the user's (D50 item 3).
+4. Balance is measured only between computer players (D51 item 5). Reproduced exactly by the reviewer's probe. Termination is still measured, not proven.
+5. Dock contention (M3 review 1 P2-2) remains (D57 item 4).
+6. The end rule's speed dependence in jams (M2 review 3 P2-1) remains (D57 item 5).
+7. The benchmark does not measure the rendering side (M5 implementation debt 6). The minimap image of the largest map is 1,024 × 512. A 256 × 256 smoke run passed in both profiles.
+8. The menu shows ids, not display names (M6 debt item 6).
+9. The crate version stays 0.1.0.
+10. `scripts/package_macos.sh` needs a display.
+
+**Resolved by M7 and confirmed:**
+
+* M0 debt item 7 and D1's packaging note: the package smoke test passes without the cargo variables.
+* The OFL note of the M5 review: the OFL text is byte-identical to the pinned source and ships in the package.
+* M5 review 1 P2-2: minimap scale of at least 2, a test, and a 256 × 256 map in the real binary.
+* M5 review 1 P2-4: one file per call.
+* M3 review 1 P2-3: `later_commands_of_a_tick_see_the_buildings_placed_before_them` exists, and the citation is corrected.
+* D38 item 5: the options are stored.
+* M6 implementation debt item 5: the balance pass (D51, reproduced).
+* The measurements deferred to "the M7 benchmark" (M2 round 2 item 3, M3 debt 4, M4 debt 1).
+
+**Not resolved, despite the report:** M6 implementation debt item 9 (P2-3).
+
+**Still open from earlier milestones (unchanged by M7, as listed in the M7 report):**
+
+* M6 review 2 P2-1 and P2-2.
+* M6 remediation debt items 1 to 4.
+* M6 implementation debt items 2, 3, 4, 6, 8, 9 (see P2-3), and 10.
+* M5 review 1 P2-1, P2-3, and P2-5, and M5 implementation debt items 1 to 8.
+* M4 review 2 P2-1, and the M4 remediation and implementation debt.
+* M3 review 1 P2-1 and P2-2, and M3 implementation debt items 1 to 3, 6, and 9.
+* M2 review 3 P2-1 and P2-2, M2 remediation round 2 items 1 to 7, and the M2 implementation debt.
+* M1 review 3 P2-1 (named-pipe hang of the map and `.tsx` reader; P2-1 above is the same class on the settings write side), P2-2, and the rest of P2-3; review 1 P2-3 and P2-5; review 2 P2-B; round 1 item 4; round 2 items 5 and 6.
+* M0 items 1, 2, 5, 8, and 9. The linker warning (M0 item 1) and the `Skipped event Destroyed` warning (M0 item 2) were seen again in this review.
+
+### Requires user verification (blocks only `m7-approved`; verbatim from review 1)
+
+1. The 12 M7 items of the implementation report (STATUS "Requires user verification"):
+   * art and audio as final;
+   * the second faction's sidebar;
+   * new units in play;
+   * the maps on screen (minimap, fords);
+   * options persisting across restarts;
+   * balance feel;
+   * version 1.0 acceptance: lose to and defeat the computer player on each map with either faction, started from the menu;
+   * the `.app` opening by double click;
+   * signing and notarisation;
+   * release notices and version 1.0.0;
+   * the README controls;
+   * the settings file location.
+2. **Third-party crate notices:** the licence notices of the Rust crates compiled into the executable (MIT, Apache-2.0, and others) are not shipped with the package (D54 item 3). Decide whether they must ship before any distribution.
+3. **Distribution to other Macs:** the package is arm64 only, and its bundle signature does not verify as built (P2-2). Decide whether other Macs (including Intel Macs) are targets, and check the README advice there if so.
+4. **Naming (PLAN.md section 3 item 7):**
+   * Several unit and building names are generic military terms that also appear in Electronic Arts' Command & Conquer series: construction yard, war factory, tech center, refinery, harvester, conscript, grenadier, rocket soldier, gun turret.
+   * No EA asset or trademark logo is present, and every sprite is procedural.
+   * Confirm that these generic names are acceptable.
+5. The earlier pending items (13 for M6, 16 for M5, 9 for M4, 10 for M3, 7 for M2, 5 for M1). With M7 data the starting setup differs from what they describe (STATUS M7 report, last paragraph).
+
