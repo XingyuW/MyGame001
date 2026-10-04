@@ -106,6 +106,12 @@ pub enum SimEvent {
         target: SimId,
         reason: AttackEnd,
     },
+    /// The player of the match owns no building any more and is defeated (M6, docs/DECISIONS.md
+    /// D41).
+    PlayerDefeated { player: PlayerId },
+    /// At most one player of the match is left: `winner`, or `None` for a draw. The outcome is
+    /// final; it is written once.
+    MatchEnded { winner: Option<PlayerId> },
 }
 
 /// Why an `Attack` order ended.

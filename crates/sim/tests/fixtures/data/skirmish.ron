@@ -1,0 +1,29 @@
+// M6 fixture: skirmish definitions for the match and AI tests, resolved against units_combat.ron
+// and economy_combat.ron. The values are fixture data, independent of the production balance in
+// assets/data/skirmish.ron (invariant I10). The map is maps/skirmish_40x40.tmx; the second faction
+// starts with a turret beside its yard.
+(
+    schema_version: 1,
+    starting_credits: 1500,
+    factions: [
+        (
+            id: "red",
+            buildings: [(building: "yard", x: 0, y: 0)],
+            units: [
+                (unit: "tank", x: 4, y: 1, count: 2),
+                (unit: "rifleman", x: 1, y: 4, count: 2),
+            ],
+        ),
+        (
+            id: "blue",
+            buildings: [
+                (building: "yard", x: 0, y: 0),
+                (building: "turret", x: -2, y: 1),
+            ],
+            units: [(unit: "rifleman", x: 4, y: 1, count: 3)],
+        ),
+    ],
+    maps: [
+        (id: "skirmish_40x40", starts: [(x: 5, y: 5), (x: 32, y: 32)]),
+    ],
+)
