@@ -4,7 +4,7 @@
 |-----------|--------|--------|--------------|
 | M0: Bootstrap and dependency verification | **Approved** by the user on 2026-10-04 after independent review (decision: GO WITH DOCUMENTED NON-BLOCKING DEBT; no P0 or P1) | `milestone/m0` | `m0-approved` |
 | M1: Map and camera | **Reviewed**: review 3 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 3 P2) after reviews 1 and 2 NO-GO; merged into `main`. Awaiting user verification for `m1-approved` | `milestone/m1` | `m1-reviewed` |
-| M2: Units and movement | **Review 2: NO-GO** (1 P0, 0 P1, 0 P2; `docs/reviews/M2-review-2.md`), in remediation round 2. Review 1: NO-GO (0 P0, 2 P1, 4 P2) | `milestone/m2` | |
+| M2: Units and movement | **Reviewed**: review 3 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 2 P2) after reviews 1 and 2 NO-GO; merged into `main`. Awaiting user verification for `m2-approved` | `milestone/m2` | `m2-reviewed` |
 | M3: Economy and construction | Not started | | |
 | M4: Combat and fog of war | Not started | | |
 | M5: Interface and audio | Not started | | |
@@ -870,3 +870,117 @@ None new. The fix differs from the review's three suggested options. D22 item 7 
 ### Requires user verification
 
 Unchanged: the seven M2 items and the M1 items, as listed in review 2's "Requires user verification". These are not findings and block only `m2-approved` (and `m1-approved`).
+
+## M2 review decision (2026-10-04)
+
+Three independent review rounds (`docs/reviews/M2-review-1.md`: NO-GO, 0 P0, 2 P1, 4 P2; `M2-review-2.md`: NO-GO, 1 P0; `M2-review-3.md`: GO WITH DOCUMENTED NON-BLOCKING DEBT, 0 P0, 0 P1, 2 P2). Before review 3 the orchestrator reran all six validation commands of PLAN.md section 9 on commit `1a165c8` with exit code 0 (186 tests passed). Under PLAN.md section 12 item 1, `milestone/m2` was merged into `main` and tagged `m2-reviewed`. The tag `m2-approved` is created by the user alone after the verification below.
+
+### Debt recorded from review 3 (P2, verbatim from the report)
+
+#### P2-1: The rule that ends an order still depends on unit speed in jams, because a unit waiting behind a slow unit in a step alternates its path every 8 ticks onto a way that counts as stalled. D22's claim that "the rules that end a move order do not depend on unit speed" is too strong.
+**Files and lines:**
+
+* `crates/sim/src/pathfinding.rs:216-221` (`is_waiting`): a unit counts as waiting only while `blocked_ticks > 0` or it is `Requested`. In the tick after its own path is served, a unit that is still stuck is not avoided by other units' path requests.
+* `crates/sim/src/pathfinding.rs:370-372`: a served path that differs from the current one always counts toward `MAX_PATHS_WITHOUT_PROGRESS`, including when `queued`.
+* `crates/sim/src/movement.rs:345-364`: on the alternative path, the wait is for a unit in a wait-for cycle, so it returns `AtCentre::Blocked` and counts as stalled.
+* `crates/sim/src/movement.rs:14-16`: the module documentation says the end rule "never [measures] elapsed time whose length depends on a unit's speed".
+* `docs/DECISIONS.md:310` and `:314` (D22 title and item 1): "the rules that end an order do not depend on unit speed"; "Every rule that ends an order or counts toward its end was checked against that range".
+
+**Evidence:**
+
+* **Trend across speeds.** `probe wave` (above), seeds 0–199, normal code: `Blocked` is 1, 6, 8, 13, and 30 at uniform speeds 128, 32, 7, 2, and 1. Of these, 0, 5, 7, 12, and 25 were ended by `MAX_STALLED_TICKS`. The implementer's own D22 item 8 data shows the same trend: 124 at speed 1 alone and 24 at speed 128 alone.
+* **Which of those orders were premature.** `probe_mod` is the same code with both limits raised to 60,000.
+  * Speed 32: still exactly 6 `Blocked`, each after at least 60,000 stalled ticks, and completions unchanged (6,564). These are permanent deadlocks, so the limits ended nothing at speed 32 that would have resolved.
+  * Speed 1: 0 `Blocked`, and completions rise from 6,540 to 6,564. Three seeds (0, 80, and 147, the path-limit cases) never settle; these are livelocks that `MAX_PATHS_WITHOUT_PROGRESS` rightly ends.
+
+  So at speed 1, about 25 orders per 200 scenarios are ended by the stall limit in jams that resolve, while at speed 32 none is.
+* **Minimal trace** (`probe trace mix s1 81 6`, deterministic). In seed 81, all units have speed 1, and units 6, 7, 9, and 41 end with `MoveFailed { Blocked }` at tick 1116. At speeds 2, 7, 32, and 128, the same seed has no `Blocked`.
+
+  Unit 6 stands at (6, 9) with destination (13, 8). Every 8 ticks its served path alternates between two ways:
+
+  | Path via | Held by | What that unit does | Effect on unit 6 |
+  |----------|---------|---------------------|------------------|
+  | (7, 8) | unit 39 | moving on (from tick 1037 it is in a 256-tick step out of (7, 8)) | not stalled, but each new path counts |
+  | (7, 9) | unit 41 | wants (6, 9): a head-on cycle | about 7 stalled ticks per interval |
+
+  `stalled_ticks` climbs from 49 (tick 821) to 160 (tick 1036) and then to 193 (tick 1109), while unit 39 is stepping out of (7, 8). The order ends at tick 1116, 177 ticks before (7, 8) is free.
+
+  With the limits raised (`probe_mod`), unit 6 completes at its own destination (`retargeted: false`) at tick 4879, and every order of seed 81 ends with no `Blocked`.
+* **Speed dependence.** At speed 32 the step of unit 39 lasts 8 ticks, so unit 6 flips at most once per wait. At speed 1 it flips about 32 times per orthogonal step, gaining about 112 stalled ticks and 32 counted paths per step of the unit ahead. This is the class of review 2 P0-1 (counts that grow with the step time), reached through re-planning instead of through the unit's own step.
+
+**Severity rationale:** P2. Every stalled tick counted is, at that moment, a wait for a unit that is not moving on, as D22 item 2 specifies. Every order still ends, I6 holds, and the event is typed. The effect is limited to jams at the lowest speeds (about 0.4 % of orders at speed 1 in this corpus, and none at the production speeds 24 and 40). The precedent is review 1 P2-2, premature `Blocked` inside crowds, which was rated P2.
+
+**Expected behaviour:**
+
+* Record this residue in docs/STATUS.md as debt, and correct D22's title and item 1, and `movement.rs:14-16`, so that they state the residual speed dependence and its measurement.
+* When the end rules are next revised (at the latest with the M7 benchmark), a wait behind a unit that is moving on should not turn into stalled ticks or counted paths by re-planning onto a way through a wait-for cycle. One option is to make the "waiting" set seen by the pathfinder stable across the tick in which a path is served. Another is not to count a path that returns to a way already followed in the same wait.
+* Add a regression test at speed 1, for example the seed-81 jam, showing that orders that resolve without the limits are not ended as `Blocked`.
+
+#### P2-2: A box selection released outside the window silently becomes a click at the drag's start point
+
+**Files and lines:** `crates/game/src/selection.rs:162`: `let end = window.cursor_position().unwrap_or(start);`.
+
+**Evidence:**
+
+* `bevy_window` 0.19.1 `Window::cursor_position` / `physical_cursor_position` (`window.rs:620-632`) documents "Returns `None` if the cursor is outside the window area".
+* `bevy_winit` 0.19.1 `state.rs:304-306` sets the position to `None` on `CursorLeft`.
+* A left drag released outside the window therefore yields `start.distance(end) = 0 < DRAG_THRESHOLD_PX`. It is handled as a click at the drag's start point: it selects the unit there, or clears the selection, and the box is discarded. Nothing is logged.
+* No test covers it: the pure functions are tested, and the system wiring is M2 debt item 3. Whether macOS reports `CursorLeft` during a drag was not observed; that part is listed under "requires user verification".
+
+**Expected behaviour:** the system keeps the last cursor position seen during the drag, or clamps it to the window, and uses it as the box's end corner. A test of the selection decision covers a release with no cursor position.
+
+### Recorded debt to carry (verbatim from review 3)
+
+* **New in this review:**
+  * P2-1: the residual speed dependence of the stall and path counts in jams, and the overstated D22 claim. The measurements and the expected behaviour are above.
+  * P2-2: box selection released outside the window.
+* **From the M2 remediation round 2 report, confirmed by this review:**
+  1. Round 1 debt item 1, narrowed: path throughput is 16 requests per tick, and a waiting unit asks every 8 ticks. A crowd of 4,000 units in single file on a 256×256 map, measured by this review: mean tick 11.6 ms, worst 73 ms. To be measured against the M7 benchmark.
+  2. Time to end a livelock: about 800 ticks at speed 32, and 17,000–18,000 ticks at speed 1. This review saw a speed-1 livelock end only after 22,143 ticks (seed 0, unit 38).
+  3. Cost of the chain walk (3.25 → 3.34 ms mean for 1,024 units, per the report).
+  4. No overtaking.
+  5. Waiting under continuous orders.
+  6. The smoke test passes even if every ordered unit ends `Blocked`.
+  7. The M2 implementation debt items 1–6:
+     1. holes in group arrival;
+     2. the two-tick `MessageReader` window for the event log and the smoke test's rejection check;
+     3. selection, order, and drawing systems are tested through pure functions only;
+     4. path searches allocate arrays of the map's size;
+     5. `Grid::set_terrain` and `spawn_unit` are public;
+     6. no automated screenshot.
+* **From M2 review 1:** P2-2 remainder, as narrowed in round-2 debt item 1.
+* **Carried from M1 and M0, unchanged by M2:**
+  * M1 review 3: P2-1 for the map and `.tsx` reader in `sim` (FIFO hang, re-confirmed above), P2-2, and the remaining items of P2-3;
+  * M1 review 1: P2-3 and P2-5;
+  * M1 review 2: P2-B;
+  * M1 round 1: item 4;
+  * M1 round 2: items 5 and 6;
+  * M0: items 1, 2 (the `Skipped event Destroyed` warning was seen again in this review's smoke runs), 3, 5, 7, 8, and 9.
+* **Resolved and confirmed:**
+  * M2 review 2 P0-1;
+  * M2 review 1 P1-1, P1-2, P2-1, P2-3, and P2-4, and the pathfinder-queue part of P2-2;
+  * the "followers of a slower unit count their wait as stalled" part of round 1 debt item 1;
+  * M1 review 3 P2-1 for tileset images, sprite sheets, and the units file (FIFO, `/dev/zero`, directory, symlink loop: all rejected without blocking, in both profiles).
+
+### Requires user verification (blocks only `m2-approved`; verbatim from review 3)
+
+These items are not findings (PLAN.md section 12 item 2). They do not affect the decision, and they block only `m2-approved` and `m1-approved`. Run `cargo run --release -p game` and pan to the left of the rock ridge.
+
+1. **Unit rendering:**
+   * 18 blue-tinted player units around cells (10, 28) and (14, 34): 12 light tanks with turret and barrel, and 6 smaller wedge-shaped scouts;
+   * 8 red-tinted opponent units around (50, 30) and (52, 36);
+   * each unit is centred on its tile, and units lower on the screen are drawn in front.
+2. **Facings:** a moving unit faces its direction of travel in all eight directions, and keeps its facing when it stops.
+3. **Smooth movement:** units glide between cells without jumps or jitter at any zoom.
+4. **Click selection:**
+   * a left click on an own unit draws a green diamond under it;
+   * a click on empty ground clears the selection;
+   * opponent units cannot be selected.
+5. **Box selection:** a left drag draws a green rectangle and selects the own units inside it on release. Also check what happens when the drag is released outside the window (see P2-2).
+6. **Additive selection:** Shift adds clicks and boxes to the selection.
+7. **Orders:**
+   * a right click sends the selection to distinct cells around the clicked cell, through the ridge gap and around the lake, without overlap or getting stuck;
+   * a click on rock or water uses the nearest cells around it;
+   * `S` stops the selection at the next cell centre.
+8. **M1 items** (still pending for `m1-approved`): map rendering, picking, panning, zoom, and bounds, as listed in docs/STATUS.md.
+
