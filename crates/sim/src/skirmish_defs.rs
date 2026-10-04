@@ -24,10 +24,15 @@
 //! the asset directory ([`map_asset_path`]). The buildings and units of a faction are placed
 //! relative to the start position of the player who plays it: a building's footprint origin is the
 //! start plus its offset, and a group of units stands on the free cells nearest to the start plus
-//! its offset. Every map has exactly [`MATCH_PLAYERS`] start positions. Whether a faction's
-//! buildings and units fit at a start of a map is checked when a match is set up
-//! (`crate::match_setup`), with a typed error.
+//! its offset. Every map has exactly [`MATCH_PLAYERS`] start positions.
+//!
+//! The file names its maps but does not read them, so the checks against a map are separate: every
+//! loader of a map checks the map's start positions against its grid with [`check_map_starts`]
+//! (each start is a cell of the map with passable terrain; M6 review 1 P1-1), and
+//! `crate::match_setup` checks them again, together with whether a faction's buildings and units
+//! fit at a start, with a typed error.
 
+use std::fmt;
 use std::path::{Path, PathBuf};
 
 use serde::Deserialize;
@@ -35,7 +40,7 @@ use serde::Deserialize;
 use crate::data::{self, DataError, DataErrorKind, MAX_DATA_FILE_BYTES, Shape};
 use crate::definitions::{Definitions, UnitKind, check_name};
 use crate::economy_defs::{BuildingKind, MAX_COST, Problem, invalid, ranged, unknown};
-use crate::map::{CellPos, MAX_MAP_SIDE};
+use crate::map::{CellPos, Grid, MAX_MAP_SIDE};
 
 /// The schema version of the skirmish file this crate reads.
 pub const SKIRMISH_SCHEMA_VERSION: i64 = 1;
@@ -109,6 +114,79 @@ pub struct SkirmishDefinitions {
 /// The path of the map file of map `id`, relative to the asset directory: `maps/<id>/<id>.tmx`.
 pub fn map_asset_path(id: &str) -> PathBuf {
     Path::new("maps").join(id).join(format!("{id}.tmx"))
+}
+
+/// Why a start position cannot be used on its map.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum StartProblem {
+    /// The cell lies outside the map, which has `width` × `height` cells.
+    OutsideMap { width: u32, height: u32 },
+    /// The cell's terrain is not passable.
+    Impassable,
+}
+
+impl fmt::Display for StartProblem {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::OutsideMap { width, height } => {
+                write!(f, "outside the {width} x {height} cells")
+            }
+            Self::Impassable => write!(f, "impassable terrain"),
+        }
+    }
+}
+
+/// Why `cell` cannot be a start position on the map of `grid`, or `None` if it can: a start
+/// position is a cell of the map whose terrain is passable (its own buildings may cover it).
+pub fn start_problem(grid: &Grid, cell: CellPos) -> Option<StartProblem> {
+    match grid.cell(cell) {
+        None => Some(StartProblem::OutsideMap {
+            width: grid.width(),
+            height: grid.height(),
+        }),
+        Some(terrain) if !terrain.passable => Some(StartProblem::Impassable),
+        Some(_) => None,
+    }
+}
+
+/// Checks the start positions of map `index` of the skirmish file at `path` against `grid`, the
+/// grid of that map (cross validation of the skirmish file with its maps; M6 review 1 P1-1): every
+/// start position is a cell of the map with passable terrain. The error names the file, the field
+/// (`maps[i].starts[j]`), the cell, the map, and the reason.
+pub fn check_map_starts(
+    path: impl AsRef<Path>,
+    skirmish: &SkirmishDefinitions,
+    index: usize,
+    grid: &Grid,
+) -> Result<(), DataError> {
+    let error = |field: String, kind: DataErrorKind| DataError {
+        file: path.as_ref().to_owned(),
+        field,
+        kind,
+    };
+    let map = skirmish.maps.get(index).ok_or_else(|| {
+        error(
+            "maps".into(),
+            DataErrorKind::MissingEntry {
+                kind: "map".into(),
+                id: index.to_string(),
+            },
+        )
+    })?;
+    for (position, &cell) in map.starts.iter().enumerate() {
+        if let Some(problem) = start_problem(grid, cell) {
+            let (field, kind) = invalid(
+                format!("maps[{index}].starts[{position}]"),
+                format!(
+                    "({}, {}), which is {problem} of map {:?}",
+                    cell.x, cell.y, map.id
+                ),
+                "a cell of the map with passable terrain",
+            );
+            return Err(error(field, kind));
+        }
+    }
+    Ok(())
 }
 
 // --- Schema ---------------------------------------------------------------------------------

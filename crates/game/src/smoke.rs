@@ -24,7 +24,10 @@
 //! menu after [`FLOW_TICKS`] more and starts again. The checks above apply to the last match, which
 //! has the starting units and buildings of the skirmish file (no more, no fewer views than the
 //! simulation has units and buildings: nothing of the earlier matches is left), and its computer
-//! player must have issued commands once [`AI_CHECK_TICKS`] ticks have run.
+//! player must have issued commands once [`AI_CHECK_TICKS`] ticks have run. No command of the
+//! computer player may be rejected in any match of the run (M6 review 1 P2-4): the smoke matches
+//! are too short for contact between the players, so no loss can explain a rejection (D43
+//! item 5), and a rejected command means the computer player issued an unusable one.
 
 use std::collections::BTreeMap;
 
@@ -92,6 +95,7 @@ impl Plugin for SmokeTestPlugin {
             order: None,
             production: None,
             rejected: false,
+            ai_rejected: 0,
             pause: PauseCheck::default(),
             flow: Flow::default(),
             menu_buttons: None,
@@ -129,6 +133,8 @@ struct SmokeTest {
     /// queue nothing).
     production: Option<(u64, Option<ProductionItem>)>,
     rejected: bool,
+    /// Commands of the computer player rejected in any match of the run (M6 review 1 P2-4).
+    ai_rejected: u64,
     pause: PauseCheck,
     flow: Flow,
     /// Menu buttons found when the menu was first shown (`None` before).
@@ -387,13 +393,15 @@ fn order_move(
 
 fn watch_events(mut smoke: ResMut<SmokeTest>, mut events: MessageReader<SimEvent>) {
     for event in events.read() {
-        // The computer player's rejections are logged by `crate::units`; the smoke test's own
-        // commands are the human player's.
-        if let SimEvent::CommandRejected { player, reason, .. } = event
-            && *player == HUMAN
-        {
-            error!("smoke test failed: a command of the smoke test was rejected: {reason}");
-            smoke.rejected = true;
+        // The smoke test's own commands are the human player's. The computer player's rejections
+        // are logged by `crate::units` and counted (M6 review 1 P2-4).
+        if let SimEvent::CommandRejected { player, reason, .. } = event {
+            if *player == HUMAN {
+                error!("smoke test failed: a command of the smoke test was rejected: {reason}");
+                smoke.rejected = true;
+            } else if *player == OPPONENT {
+                smoke.ai_rejected = smoke.ai_rejected.saturating_add(1);
+            }
         }
     }
 }
@@ -610,7 +618,7 @@ fn count_frames(
          {credits_shown:?}, minimap drawings: {}, minimap pixels lit: {}, sounds: {}, music \
          players: {}, pause: {:?}, menu buttons: {:?}, matches started: {}, flow: {:?}, views: \
          {unit_view_count} of {sim_units} units and {building_view_count} of {sim_buildings} \
-         buildings, computer player's commands: {ai_commands}",
+         buildings, computer player's commands: {ai_commands} ({} rejected)",
         smoke.rendered,
         tick,
         map.map_created,
@@ -623,7 +631,8 @@ fn count_frames(
         smoke.pause,
         smoke.menu_buttons,
         smoke.starts,
-        smoke.flow
+        smoke.flow,
+        smoke.ai_rejected
     );
     let failures = smoke_failures(&SmokeOutcome {
         frames: smoke.frames,
@@ -668,6 +677,7 @@ fn count_frames(
         views: (unit_view_count, building_view_count),
         simulated: (sim_units, sim_buildings),
         ai_commands,
+        ai_rejected: smoke.ai_rejected,
     });
     if failures.is_empty() {
         exit.write(AppExit::Success);
@@ -736,6 +746,8 @@ struct SmokeOutcome {
     simulated: (usize, usize),
     /// Commands the computer player pushed in the last match.
     ai_commands: u64,
+    /// Commands of the computer player rejected in any match of the run.
+    ai_rejected: u64,
 }
 
 /// Buttons of the menu: previous and next for each of its rows, Start, and Quit.
@@ -866,6 +878,14 @@ fn smoke_failures(outcome: &SmokeOutcome) -> Vec<String> {
             outcome.ticks
         ));
     }
+    // A short match without contact between the players explains no rejection (D43 item 5), so
+    // every command the computer player issued must have been accepted.
+    if outcome.ai_rejected > 0 {
+        failures.push(format!(
+            "{} commands of the computer player were rejected",
+            outcome.ai_rejected
+        ));
+    }
     match outcome.pause {
         None => failures.push("the pause did not end within the run".to_string()),
         Some((ticks, _)) if ticks > 0 => {
@@ -917,6 +937,7 @@ mod tests {
         views: (26, 2),
         simulated: (26, 2),
         ai_commands: 4,
+        ai_rejected: 0,
     };
 
     #[test]
@@ -1130,6 +1151,25 @@ mod tests {
             })
             .is_empty()
         );
+        // M6 review 1 P2-4: in the reviewer's run with the computer player's start outside the
+        // map, all but one of its commands were rejected and the run passed, because only pushed
+        // commands were counted. Any rejection of its commands now fails the run, however many
+        // it pushed.
+        assert_eq!(
+            fails(SmokeOutcome {
+                ai_commands: 10,
+                ai_rejected: 9,
+                ..PASSING
+            }),
+            ["9 commands of the computer player were rejected"]
+        );
+        assert_eq!(
+            fails(SmokeOutcome {
+                ai_rejected: 1,
+                ..PASSING
+            }),
+            ["1 commands of the computer player were rejected"]
+        );
     }
 
     #[test]
@@ -1220,6 +1260,7 @@ mod tests {
             order: None,
             production: None,
             rejected: false,
+            ai_rejected: 0,
             pause: PauseCheck::default(),
             flow: Flow::default(),
             menu_buttons: None,

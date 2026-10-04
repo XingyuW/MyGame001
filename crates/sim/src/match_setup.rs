@@ -23,7 +23,7 @@ use bevy_ecs::system::{Query, Res, ResMut};
 use bevy_ecs::world::World;
 
 use crate::ai::{AiController, AiPlayers};
-use crate::ai_defs::AiDefinitions;
+use crate::ai_defs::{AiDefinitions, unobtainable_producer};
 use crate::building::{Building, SpawnBuildingError, spawn_building};
 use crate::command::PlayerId;
 use crate::definitions::Definitions;
@@ -33,7 +33,7 @@ use crate::hash::Fnv1a64;
 use crate::map::{CellPos, Grid};
 use crate::pathfinding::destination_cells;
 use crate::schedule::SimTick;
-use crate::skirmish_defs::{MATCH_PLAYERS, SkirmishDefinitions};
+use crate::skirmish_defs::{MATCH_PLAYERS, SkirmishDefinitions, StartProblem, start_problem};
 use crate::unit::{Owner, SpawnError, spawn_unit};
 
 /// Who gives a player's orders.
@@ -144,6 +144,28 @@ pub enum MatchSetupError {
         player: PlayerId,
         difficulty: usize,
     },
+    /// Start position `start` of the map is not a cell of the map with passable terrain (M6
+    /// review 1 P1-1).
+    InvalidStart {
+        start: usize,
+        cell: CellPos,
+        problem: StartProblem,
+    },
+    /// A computer player's faction does not start with the producer of a building its AI file
+    /// has it build, and the build order does not provide it either (M6 review 1 P2-1).
+    UnobtainableProducer {
+        player: PlayerId,
+        /// The field of the AI file that names the building.
+        field: String,
+        building: String,
+        producer: String,
+    },
+    /// No passable cell free of buildings is reachable from a computer player's start position
+    /// over the map's terrain, so it has no gathering point (M6 review 1 P1-1).
+    NoGatheringPoint {
+        player: PlayerId,
+        start: CellPos,
+    },
     /// A player could not be added.
     AddPlayer(PlayerSetupError),
     /// A starting building does not fit.
@@ -187,6 +209,33 @@ impl fmt::Display for MatchSetupError {
                 f,
                 "player {}: difficulty {difficulty} is not a difficulty of the AI file",
                 player.0
+            ),
+            Self::InvalidStart {
+                start,
+                cell,
+                problem,
+            } => write!(
+                f,
+                "start position {start} at ({}, {}) is {problem} of the map, not a cell of the \
+                 map with passable terrain",
+                cell.x, cell.y
+            ),
+            Self::UnobtainableProducer {
+                player,
+                field,
+                building,
+                producer,
+            } => write!(
+                f,
+                "computer player {}: the AI file's {field} builds {building:?}, whose producer \
+                 {producer:?} its faction does not start with",
+                player.0
+            ),
+            Self::NoGatheringPoint { player, start } => write!(
+                f,
+                "computer player {}: no passable cell free of buildings is reachable from its \
+                 start position ({}, {}), so it has no gathering point",
+                player.0, start.x, start.y
             ),
             Self::AddPlayer(error) => error.fmt(f),
             Self::Building {
@@ -278,12 +327,17 @@ impl MatchState {
 /// D40). The world must have been set up by [`SimPlugin`](crate::SimPlugin), with the map's grid and
 /// the match definitions (units, economy, and combat files) installed, and no players yet.
 ///
+/// The configuration is checked before anything is changed: exactly two players, each with a
+/// faction, a start position, and (for a computer player) a difficulty that exist; every start
+/// position of the map is a cell of the map with passable terrain; and every computer player's
+/// faction starts with the producers its AI file needs (`ai_defs::unobtainable_producer`).
+///
 /// Every player starts with `skirmish.starting_credits`; its faction's buildings are placed with
 /// their footprint origin at its start position plus their offset (the footprint rules apply, the
 /// distance rule does not, as for `spawn_building`), then its faction's units on the free cells
 /// nearest to the start position plus their offsets. Computer players get a controller with their
-/// difficulty. Returns what was placed; on error the world is partly set up and must be
-/// discarded.
+/// difficulty, or the setup fails if one has no gathering point. Returns what was placed; after an
+/// error found once players were added, the world is partly set up and must be discarded.
 pub fn setup_match(
     world: &mut World,
     skirmish: &SkirmishDefinitions,
@@ -336,13 +390,43 @@ pub fn setup_match(
                 setup.start
             )));
         }
-        if let Controller::Ai { difficulty } = setup.controller
-            && difficulty >= ai.difficulties.len()
-        {
-            return Err(MatchSetupError::UnknownDifficulty {
-                player: setup.player,
-                difficulty,
-            });
+        if let Controller::Ai { difficulty } = setup.controller {
+            if difficulty >= ai.difficulties.len() {
+                return Err(MatchSetupError::UnknownDifficulty {
+                    player: setup.player,
+                    difficulty,
+                });
+            }
+            let definitions = world.resource::<Definitions>();
+            if let Some((field, building, producer)) =
+                unobtainable_producer(ai, definitions, &skirmish.factions[setup.faction])
+            {
+                let name = |kind| {
+                    definitions
+                        .building(kind)
+                        .map_or_else(String::new, |def| def.id.clone())
+                };
+                return Err(MatchSetupError::UnobtainableProducer {
+                    player: setup.player,
+                    field,
+                    building: name(building),
+                    producer: name(producer),
+                });
+            }
+        }
+    }
+    // Every start position of the map is a cell of the map with passable terrain, so that the
+    // buildings, units, gathering point, and waypoints derived from it lie on the map.
+    {
+        let grid = world.resource::<Grid>();
+        for (start, &cell) in map_def.starts.iter().enumerate() {
+            if let Some(problem) = start_problem(grid, cell) {
+                return Err(MatchSetupError::InvalidStart {
+                    start,
+                    cell,
+                    problem,
+                });
+            }
         }
     }
 
@@ -425,17 +509,20 @@ pub fn setup_match(
                 .filter(|other| other.player != setup.player)
                 .map(|other| map_def.starts[other.start])
                 .collect();
-            controllers.insert(
-                setup.player,
-                AiController::new(
-                    world.resource::<Grid>(),
-                    &definitions,
-                    ai,
-                    ai.difficulties[difficulty].clone(),
-                    map_def.starts[setup.start],
-                    enemies,
-                ),
-            );
+            let start = map_def.starts[setup.start];
+            let controller = AiController::new(
+                world.resource::<Grid>(),
+                &definitions,
+                ai,
+                ai.difficulties[difficulty].clone(),
+                start,
+                enemies,
+            )
+            .ok_or(MatchSetupError::NoGatheringPoint {
+                player: setup.player,
+                start,
+            })?;
+            controllers.insert(setup.player, controller);
         }
     }
     world.insert_resource(AiPlayers::new(ai.clone(), controllers));

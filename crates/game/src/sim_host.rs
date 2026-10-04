@@ -200,12 +200,21 @@ pub(crate) fn install_match(world: &mut World, plan: &MatchPlan) -> Result<Match
     Ok(start)
 }
 
-/// Ends the match: the simulation is replaced by one without a match, so no tick runs.
+/// Sets up `plan`'s match in a simulation of its own, which is then dropped: whether the match
+/// can be set up, without changing anything in the game (the catalogue's check at startup, M6
+/// review 1 P1-1).
+pub(crate) fn check_match(plan: &MatchPlan) -> Result<MatchStart, String> {
+    SimHost::new(plan.seed).install(plan)
+}
+
+/// Ends the match: the simulation is replaced by one without a match, so no tick runs. The sink
+/// closes, which discards pending commands with a log line (M6 review 1 P2-2), and is unpaused;
+/// the next match reopens it.
 pub(crate) fn uninstall_match(world: &mut World) {
     world.insert_resource(SimHost::new(0));
     let mut sink = world.resource_mut::<CommandSink>();
-    sink.reset();
     sink.close();
+    sink.paused = false;
 }
 
 /// Why the sink did not accept a command.
@@ -245,6 +254,9 @@ pub struct CommandSink {
     accepted: u64,
     /// Commands refused so far (for the interface's error sound).
     refused: u64,
+    /// Accepted commands discarded so far without being issued, each with a log line (M6 review
+    /// 1 P2-2).
+    discarded: u64,
 }
 
 impl CommandSink {
@@ -303,10 +315,11 @@ impl CommandSink {
         std::mem::take(&mut self.pending)
     }
 
-    /// Prepares the sink for a new match: no pending command, not paused. The counters keep
-    /// counting, so the interface's sounds answer only commands issued after them.
+    /// Prepares the sink for a new match: no pending command (each one left is discarded with a
+    /// log line), not paused. The counters keep counting, so the interface's sounds answer only
+    /// commands issued after them.
     fn reset(&mut self) {
-        self.pending.clear();
+        self.discard("a new match starts");
         self.paused = false;
         self.closed = false;
     }
@@ -314,10 +327,20 @@ impl CommandSink {
     /// Refuses every command from now on (the match has ended); pending commands are discarded
     /// with a log line naming them.
     fn close(&mut self) {
-        for command in self.pending.drain(..) {
-            warn!("command not issued: the match is over: {command:?}");
-        }
+        self.discard("the match is over");
         self.closed = true;
+    }
+
+    /// Discards the pending commands, each with a log line naming it and `why`: the only way
+    /// pending commands leave the sink other than [`Self::take`], so none is lost silently.
+    fn discard(&mut self, why: &str) {
+        for command in self.pending.drain(..) {
+            self.discarded = self.discarded.saturating_add(1);
+            warn!(
+                "command not issued: {why}: {command:?} ({} discarded so far)",
+                self.discarded
+            );
+        }
     }
 }
 
@@ -523,7 +546,14 @@ pub(crate) mod tests {
         .unwrap_or_else(|error| panic!("{error}"))
         .grid;
         let tick_before = world.resource::<SimHost>().tick();
-        let error = install_match(&mut world, &plan(small)).expect_err("too small");
+        // The demo map's start positions lie outside the 16x16 map, which match setup reports
+        // first (M6 review 1 P1-1); start positions on it, near its edge, leave the yard sticking
+        // out.
+        let error = install_match(&mut world, &plan(small.clone())).expect_err("too small");
+        assert!(error.contains("start position 0 at (15, 37)"), "{error}");
+        let mut near_edge = plan(small);
+        near_edge.skirmish.maps[selection.map].starts = [CellPos::new(14, 1), CellPos::new(1, 14)];
+        let error = install_match(&mut world, &near_edge).expect_err("too small");
         assert!(error.contains("starting building"), "{error}");
         assert!(world.resource::<SimHost>().running());
         assert_eq!(world.resource::<SimHost>().tick(), tick_before);
@@ -588,6 +618,53 @@ pub(crate) mod tests {
         assert_eq!(sink.push(stop), Ok(()));
         // The counters keep counting across matches (the interface's sounds compare them).
         assert_eq!((sink.accepted(), sink.refused()), (2, 1));
+    }
+
+    #[test]
+    fn commands_pending_when_a_match_is_replaced_are_discarded_with_a_log_line() {
+        // M6 review 1 P2-2: ending a match that is still running (the smoke flow replaces running
+        // matches) reset the sink, which cleared its pending commands silently, before closing it,
+        // which logs what it discards. Every discarded command is now logged and counted.
+        let mut world = World::new();
+        world.init_resource::<CommandSink>();
+        world.insert_resource(demo_host());
+        let stop = Command::Stop {
+            units: vec![SimId(1)],
+        };
+        world
+            .resource_mut::<CommandSink>()
+            .push(stop.clone())
+            .expect("accepted");
+        uninstall_match(&mut world);
+        let sink = world.resource::<CommandSink>();
+        assert!(sink.pending.is_empty());
+        assert_eq!(
+            sink.discarded, 1,
+            "the pending command is discarded with a log line"
+        );
+        assert!(sink.closed);
+        // Installing a match over pending commands discards them with a log line too.
+        let catalogue = crate::skirmish::tests::production_catalogue();
+        let selection = crate::skirmish::MenuSelection::initial(&catalogue);
+        let plan = MatchPlan {
+            grid: catalogue.maps[selection.map].map.grid.clone(),
+            definitions: catalogue.definitions.clone(),
+            skirmish: catalogue.skirmish.clone(),
+            ai: catalogue.ai.clone(),
+            map: selection.map,
+            players: selection.players().to_vec(),
+            seed: 0,
+        };
+        world.resource_mut::<CommandSink>().reset();
+        world
+            .resource_mut::<CommandSink>()
+            .push(stop)
+            .expect("accepted");
+        install_match(&mut world, &plan).expect("the demo match");
+        let sink = world.resource::<CommandSink>();
+        assert!(sink.pending.is_empty());
+        assert_eq!(sink.discarded, 2);
+        assert!(!sink.closed);
     }
 
     #[test]
