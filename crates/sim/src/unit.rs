@@ -157,8 +157,14 @@ impl Mobile {
 pub enum PathState {
     /// Waiting for the pathfinder, which serves requests in order of `since` (the tick of the
     /// request), then of the unit's id. With `avoid_units`, cells held by units that are not
-    /// advancing count as blocked.
-    Requested { since: u64, avoid_units: bool },
+    /// advancing count as blocked. `queued` is set when the unit asked while it waited behind
+    /// units that are moving on (docs/DECISIONS.md D22): a path that only confirms the way it
+    /// already follows is then not a new path.
+    Requested {
+        since: u64,
+        avoid_units: bool,
+        queued: bool,
+    },
     /// Following `MoveOrder::path`.
     Following,
 }
@@ -184,8 +190,11 @@ pub struct MoveOrder {
     pub best: u32,
     /// Paths the unit has taken since its last real progress (a step that lowered `best`).
     pub paths_since_progress: u16,
-    /// Ticks since the unit last started a step along a path to its destination (a step aside
-    /// does not count), not counting ticks spent waiting for the pathfinder.
+    /// Stalled ticks since the unit last started a step along a path to its destination (a step
+    /// aside does not count): ticks in which it waited at a cell centre for cells held by units
+    /// that are not moving on. Ticks in a step, waiting for the pathfinder, or waiting behind
+    /// units that are moving on (in a step, or queued behind one) are not stalled ticks
+    /// (docs/DECISIONS.md D22).
     pub stalled_ticks: u16,
     /// Repaths since the order was given (for diagnostics and tests).
     pub repaths: u32,
@@ -199,6 +208,7 @@ impl MoveOrder {
             state: PathState::Requested {
                 since: tick,
                 avoid_units: false,
+                queued: false,
             },
             blocked_ticks: 0,
             retargets: 0,
@@ -305,8 +315,9 @@ fn write_cell(hasher: &mut Fnv1a64, cell: CellPos) {
 
 /// Appends a unit's components to the hash, in a fixed layout (docs/DECISIONS.md D4, extended in
 /// M2): owner, kind, speed, cell, step (flag, target, progress, length), position, facing, and
-/// the order (flag, destination, state, path length and cells, blocked ticks, retargets, remaining
-/// cost (flag and value), best cost, paths since progress, stalled ticks, repaths).
+/// the order (flag, destination, state (with its flags and tick), path length and cells, blocked
+/// ticks, retargets, remaining cost (flag and value), best cost, paths since progress, stalled
+/// ticks, repaths).
 pub(crate) fn hash_unit(
     hasher: &mut Fnv1a64,
     (owner, unit, mobile, position, facing, orders): (
@@ -340,8 +351,12 @@ pub(crate) fn hash_unit(
             hasher.write(&[1]);
             write_cell(hasher, order.destination);
             match order.state {
-                PathState::Requested { since, avoid_units } => {
-                    hasher.write(&[1, u8::from(avoid_units)]);
+                PathState::Requested {
+                    since,
+                    avoid_units,
+                    queued,
+                } => {
+                    hasher.write(&[1, u8::from(avoid_units), u8::from(queued)]);
                     hasher.write_u64(since);
                 }
                 PathState::Following => hasher.write(&[2]),

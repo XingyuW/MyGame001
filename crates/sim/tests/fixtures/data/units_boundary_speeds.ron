@@ -1,0 +1,18 @@
+// M2 fixture: unit types at the two ends of the speed range the units file admits (1 to
+// MAX_UNIT_SPEED = 128 subcells per tick), for the movement tests of M2 review 2. The values are
+// fixture data, independent of the production balance in assets/data/units.ron (invariant I10).
+(
+    schema_version: 1,
+    units: [
+        (
+            id: "crawler",
+            speed: 1,
+            sprite: "crawler",
+        ),
+        (
+            id: "sprinter",
+            speed: 128,
+            sprite: "sprinter",
+        ),
+    ],
+)
