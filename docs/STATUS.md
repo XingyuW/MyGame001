@@ -1342,3 +1342,169 @@ Not review findings (PLAN.md section 12 item 2); they block only `m4-approved`. 
 8. **Menu keys:** the unit production keys are now `7` light tank, `8` scout, `9` harvester (M3's item 7 named `6`, `7`, `8`).
 
 The ten M3 items, the seven M2 items, and the five M1 items listed in docs/STATUS.md remain pending.
+
+## M4 remediation round 1 report (2026-10-04)
+
+This is the implementer session for remediation round 1 of M4 review 1 (`docs/reviews/M4-review-1.md`, NO-GO: 0 P0, 2 P1, 3 P2).
+
+* **Branch and base:** `milestone/m4`, base `0cb2199`. Code commit `652d180`; this report and the decisions are in the documentation commit that follows it.
+* **Notes:** none accompanied the findings beyond the orchestrator's instruction to close each class of defect (every command whose rejection reason or event could reveal hidden information; every acquisition or order rule that can loop forever on a target it cannot affect). Each finding was treated as a claim and reconciled against the code.
+* **"Fails before" evidence:** the regression tests were written first and run against the reviewed code with only the two new enum variants (`AttackEnd::NoDamage`, `PlacementError::NotVisible`) added, so that they compiled; the game's new decision function was first added with the old rule. The P1-2 leak was also reproduced on a `git archive` of `0cb2199` with a probe test outside the repository (`…/scratchpad/m4-remediation-1/base`), run under a `perl alarm` timeout.
+* **Decisions:** DECISIONS D32 and D33 (new section "M4 remediation round 1"), with amendments in place to D29 items 5, 6, and 7, D30 item 4, D31 item 3, and the restoration of D6 (P2-3). The milestone table above is maintained by the orchestrator.
+
+### Classes of defect
+
+1. **Rules that keep a unit or building engaged with a target it cannot affect, so that the engagement, and any order waiting for it, never ends** (P1-1). Every rule that chooses, keeps, or fires at a target, or that waits for a fight, was checked (D32 item 1): automatic acquisition and keeping (idle units, attack-moving units, defensive structures) were defective and are fixed; the explicit `Attack` on such a target (M4 implementation debt item 4) belonged to the same class and is fixed; the chase limit, projectile flight, low power, move orders, and the harvester cycle are bounded and unaffected.
+2. **Command validation whose decision or reason depends on cells or entities the issuing player does not see** (P1-2). All ten command variants were audited (D33 item 1, with a table): only `PlaceBuilding` read hidden state, and it is fixed. The on-screen member of the same class (P2-1, an instant shot drawn from an unseen attacker) is fixed. The boundary of the claim (outcomes of accepted orders are computed on the true state; the event stream is shared) is stated in D33 item 3 and recorded as debt.
+
+### Findings
+
+#### P1-1: target acquisition engages enemies the warhead cannot damage
+
+**Outcome: confirmed. The class is fixed.**
+
+* **Evidence (code).** `combat.rs` `nearest_enemy_in_range` filtered only by owner, visibility, and range, and `keep_or_acquire` kept any visible enemy in range; neither looked at the warhead's percentage. `act_unit`'s `AttackMove` branch stops the move whenever a target exists and resumes only when none does. The fixture's bullet deals 0 % to concrete (`crates/sim/tests/fixtures/data/combat.ron`).
+* **Evidence (tests before the fix).** Each new test below failed on the reviewed code: the attack move past a fence never wrote `MoveCompleted` within 600 ticks; the idle rifleman did not fire at the enemy rifleman in tick 1 (it fired at the fence); the turret of a variant whose howitzer deals 0 % to concrete never fired at the crawler; an explicit `Attack` on a fence never ended.
+* **Change** (D32; `crates/sim/src/combat.rs`, `event.rs`):
+  1. `Field::damages(weapon, target)`: equation 2 gives more than 0.
+  2. Acquisition and keeping consider only visible enemies in range that the weapon damages, for idle units, attack-moving units, and defensive structures alike.
+  3. An explicit `Attack` on a target the warhead deals 0 to is carried out once: the unit closes in, fires one shot (0 damage), and the order ends in that tick with `AttackEnded { reason: NoDamage }`. D32 item 3 gives the reason for this choice over keeping the documented semantics, rejecting at validation, or ending before the shot (the zero case of equation 2 must stay reachable through `SimPlugin`).
+  4. D29 items 5, 6, and 7 are corrected.
+* **Regression tests** (`crates/sim/tests/m4_combat.rs`; all fail before the fix and pass after it):
+  * `an_attack_move_past_an_enemy_it_cannot_damage_ends_when_its_move_ends`: the reviewer's scenario (rifleman from (4, 16) to (20, 16), enemy fence at (12, 18), which it sees in range on the way). The move completes at (20, 16) with no shot; the fence keeps 50 hit points; order and target are cleared.
+  * `an_idle_unit_fires_at_an_enemy_it_can_damage_and_not_at_a_nearer_one_it_cannot`: the reviewer's scenario (fence at (11, 16), enemy rifleman at (12, 17)). The first shot in tick 1 is at the rifleman; no shot at the fence in 61 ticks; the enemy rifleman is destroyed.
+  * `a_defensive_structure_fires_at_an_enemy_it_can_damage_and_not_at_a_nearer_one_it_cannot`: a variant with the howitzer at 0 % against concrete; the turret fires once at the crawler three cells away (killing it) and never at the adjacent fence, and has no target afterwards.
+  * `an_attack_order_on_a_target_it_cannot_damage_ends_after_one_shot`: in range (from x 10) and out of range (from x 8, it moves first). Exactly one `WeaponFired`, the fence keeps 50 hit points, `AttackEnded { NoDamage }`, no rejection, and in the 100 idle ticks after it no shot and no further `AttackEnded`.
+
+#### P1-2: `PlaceBuilding` rejections reveal the id and cell of unseen enemy units and buildings
+
+**Outcome: confirmed. The class is fixed.**
+
+* **Evidence (code).** `economy_commands.rs` called `check_footprint` without any fog handling, and `PlacementError::{Overlap, Occupied}` carry the blocker's `SimId` and cell.
+* **Evidence (reproduction on `0cb2199`).** The reviewer's setup (human yard at (10, 10), placement distance 3; enemy at (16, 14), not visible to the human player; power plant placed at (15, 13)) gives `Placement(Occupied { cell: (16, 14), unit: SimId(1) })`, "cell (16, 14) is held by unit 1", with a crawler, and `Placement(Overlap { cell: (16, 14), building: SimId(1) })` with a beacon. The new test also failed before the fix: with nothing at (16, 14), the placement over the unseen cells was accepted.
+* **Change** (D33; `crates/sim/src/building.rs`, `economy_commands.rs`): under fog of war (a combat file loaded), `PlaceBuilding` checks after `OutsideMap` and before the terrain, building, and unit checks that the player sees every cell of the footprint (`check_visible`), and otherwise rejects with the new `PlacementError::NotVisible(cell)` for the first unseen cell. Every unit or building in a visible cell is visible (D30 item 3), so `Overlap` and `Occupied` now name only visible entities. Without a combat file nothing changes (M3 tests unchanged). D30 item 4 and its rationale, which did not hold (Chebyshev placement distance against Euclidean sight), are corrected; implementation deviation 4 is corrected by this report (see "Deviations").
+* **Regression tests** (`m4_combat.rs`):
+  * `a_placement_over_cells_the_player_does_not_see_reveals_nothing_about_them`: nothing, an enemy crawler, or an enemy beacon at (16, 14). In all three runs, the rejection is the same `Placement(NotVisible((16, 13)))`, contains no blocker id, and leaves the state hash equal to a control run. The building stays ready and is then placed on visible cells. Fails before the fix (above).
+  * `a_placement_over_a_visible_enemy_still_names_it`: an enemy crawler the player sees in the footprint is still reported as `Occupied { cell, unit }`, as in M3, so hiding is limited to unseen cells. Passes before and after (a guard against over-hiding).
+
+#### P2-1: instant-shot lines are drawn from unseen attackers
+
+**Outcome: confirmed and fixed.**
+
+* **Evidence.** `fog.rs` drew the line when `seen(from) || seen(to)`, so a seen target made the line start at the hidden attacker's exact body point.
+* **Change** (D31 item 3, D33 item 4; `crates/game/src/fog.rs`): the pure function `shot_view(attacker_seen, target_seen)` decides: a line when both ends are seen, a small circle at the end that is seen when only one is, nothing otherwise. `draw_combat` uses it.
+* **Regression test:** `fog::tests::an_instant_shot_shows_only_the_ends_the_human_player_sees` (all four cases). It failed with the old rule (`Line` where `AtTarget` is expected) and passes now. On screen: **requires user verification** (item 4 below).
+
+#### P2-2: `RejectReason::NotTargetable` is unreachable
+
+**Outcome: confirmed and fixed.**
+
+* **Evidence.** Without a combat file no unit has a weapon, so `validate_combat` returns `NotArmed` first. With one, every unit and building type has combat terms (D28 item 4). No test used the variant.
+* **Change:** the variant, its message, and the check are removed (`crates/sim/src/command.rs`; D32 item 5; D30 item 4 corrected). A target without hit points cannot arise; if setup ever created one, the order would end in the next tick with `TargetGone`, because the `Combat` stage considers only entities with hit points.
+* **Test:** none can fail before the fix, because the branch was unreachable. Removing the variant makes any use a compile error, and the existing rejection test still covers every remaining `Attack` reason.
+
+#### P2-3: the D6 sentence of the M3 amendment was moved into the M4 amendment
+
+**Outcome: confirmed and fixed.**
+
+* **Evidence:** `git show m3-reviewed:docs/DECISIONS.md` shows the M3 amendment of D6 ending with "The final log line also reports the buildings spawned and the credits charged."; the M4 commit moved that sentence to the end of the M4 amendment.
+* **Change:** the sentence is restored to the M3 amendment and removed from the M4 amendment.
+* **Test:** documentation only, no test.
+
+#### Implementer's claims named by the review
+
+* **D29 item 7** ("the order ends when a move toward the destination ends"): now true, because an attack-moving unit stops only for an enemy it damages, and such a fight ends (D29 item 7, amended).
+* **D30 item 4** ("commands reveal nothing about unseen enemies"): now true for command validation (D33 item 1); its `NotTargetable` clause is removed.
+* **D31 item 3** (shots drawn "only where the human player sees them"): now true (amended wording).
+
+### Tests changed (none removed, skipped, or weakened)
+
+* `m4_combat.rs` gains 6 tests and the helpers `combat_variant`, `assert_bullet_cannot_damage_concrete`, `placement_scenario`, `place_power`, and the constant `BULLET_CONCRETE`. `fog.rs` gains 1 test.
+* **Three existing tests change their stimulus, not their assertions.** Each relied on an idle rifleman automatically engaging a concrete building (0 %), which is exactly the behaviour P1-1 removes (D32 item 4):
+  * `the_damage_equation_holds_for_every_warhead_and_armour_pair_of_the_fixtures`: for the one pair with a percentage of 0, the attacker is ordered to `Attack` before tick 1. It still fires in tick 1, and the test still asserts 0 damage and the presence of the zero, minimum-one, floor, and exact cases.
+  * `a_building_is_in_range_when_its_nearest_edge_is`: runs on a fixture variant in which the bullet deals 1 % against concrete; the range assertions (640 in range, 896 not) are unchanged.
+  * `the_shortest_range_reaches_every_neighbouring_cell_and_an_adjacent_building`: `extreme_scenario` also raises the bullet to 1 % against concrete; the assertions (a shot at the plant from the ring's corner in each of five ticks) are unchanged.
+* The fixture files are unchanged. No other existing test changed, and all pass with their previously reported numbers.
+* The battle gives the same figures as before in debug and release: tick 665, survivors 6 to 0, 451 shots, 34 destroyed, final hash `05af3b1ac550cf16`.
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `crates/sim/src/combat.rs` | `Field::damages`; acquisition and keeping only of damageable visible enemies in range; `Attack` on an undamageable target ends after its shot; module documentation |
+| `crates/sim/src/event.rs` | `AttackEnd::NoDamage` |
+| `crates/sim/src/building.rs` | `PlacementError::NotVisible`, its message, `check_visible` |
+| `crates/sim/src/economy_commands.rs` | `PlaceBuilding` checks visibility under fog before the footprint checks; module documentation |
+| `crates/sim/src/command.rs` | `RejectReason::NotTargetable` and its check removed; documentation |
+| `crates/game/src/fog.rs` | `ShotView`, `shot_view`, used by `draw_combat`; 1 test |
+| `crates/sim/tests/m4_combat.rs` | 6 new tests and helpers; stimulus of 3 tests (above) |
+| `docs/DECISIONS.md` | D32, D33; amendments to D29 items 5–7, D30 item 4, D31 item 3; D6 restored |
+| `docs/STATUS.md` | This report |
+
+No dependency, manifest, `Cargo.lock`, data file, fixture, or asset changed (I1, I9, I10).
+
+### Validation commands (PLAN.md section 9, with section 12 item 5)
+
+The commands ran from the repository root on macOS (Apple M5, Rust 1.98.1), in this order, in the foreground, after the last code change (`652d180`'s content). A display was available.
+
+| Command | Exit | Result |
+|---------|------|--------|
+| `cargo fmt --all -- --check` | 0 | no diff |
+| `cargo clippy --workspace --all-targets -- -D warnings` | 0 | no warnings |
+| `cargo test --workspace` | 0 | 307 passed, 0 failed, 0 ignored (breakdown below). Peak memory footprint of the run 0.13 GB. Known M0 linker warning only. |
+| `cargo build --release -p game` | 0 | |
+| `cargo run --release -p game -- --smoke-test 600` | 0 | `3 buildings spawned`, `26 units spawned`; `smoke test: 600 frames, 198 simulation ticks, map created: true, units spawned: 26, units moved: 18 in 198 ticks after the order, buildings spawned: 3, production charged 396 credits in 198 ticks, visible cells: 389, enemy views shown: 0, view mismatches: 0` |
+| `cargo run -p game -- --smoke-test 600` | 0 | `smoke test: 600 frames, 203 simulation ticks, map created: true, units spawned: 26, units moved: 18 in 203 ticks after the order, buildings spawned: 3, production charged 406 credits in 203 ticks, visible cells: 399, enemy views shown: 0, view mismatches: 0` |
+
+Test breakdown for `cargo test --workspace`:
+
+* `game`: unit 68 (+1: `fog`); integration `m0_spike` 6, `m1_demo_map` 3, `m1_tileset_image` 6, `m2_unit_sprites` 5, `m3_building_sprites` 3.
+* `sim`: unit 11; integration `m0_bootstrap` 12, `m1_map` 32, `m1_map_subset` 24, `m2_definitions` 14, `m2_movement` 37 (39.3 s), `m3_definitions` 11, `m3_economy` 21, `m3_harvest` 10, `m4_combat` 32 (+6; 1.3 s), `m4_definitions` 12.
+* doc-tests 0.
+
+The `Skipped event Destroyed` warning (M0 debt item 2) appeared in both smoke runs. Additionally, `cargo test --release -p sim --test m4_combat` passed (32 tests).
+
+### Acceptance criteria and required tests (PLAN.md section 7, M4)
+
+Unchanged from the M4 implementation report, with these updates:
+
+| Criterion | Evidence |
+|-----------|----------|
+| Scope: automatic target acquisition | Idle units, attack-moving units, and defensive structures engage only visible enemies in range that their weapon damages: the three new acquisition tests above, and the existing acquisition, range, projectile, and battle tests |
+| Scope: `Attack` and `AttackMove` | As before, plus `an_attack_move_past_an_enemy_it_cannot_damage_ends_when_its_move_ends` and `an_attack_order_on_a_target_it_cannot_damage_ends_after_one_shot` (every order ends) |
+| Scope: hiding of unseen enemies in command validation | As before, plus the audit of D33 item 1 and `a_placement_over_cells_the_player_does_not_see_reveals_nothing_about_them`, `a_placement_over_a_visible_enemy_still_names_it` |
+| Scope: hiding of unseen enemies in rendering | As before, plus `fog::tests::an_instant_shot_shows_only_the_ends_the_human_player_sees`; on screen **requires user verification** |
+| Test: the damage equation for every pair, including the minimum of 1 and the zero case | Unchanged assertions; the zero case is now produced by an ordered attack (D32 item 3), still through `SimPlugin` and `CommandQueue` |
+| Acceptance: two armies fight to a conclusion under fog with no panic and a stable hash | Unchanged figures and hash in debug and release |
+
+### Assumptions verified and how
+
+No new crate API is used. `Gizmos::circle_2d` was already used by `draw_combat` (DECISIONS A1 follow-up of M4). The new rules use `BTreeMap` iteration and `SimId` order as before (I4). Determinism: the battle's per-tick hash trace is identical across runs, and its final hash is identical in debug and release (I3, I12).
+
+### Deviations from PLAN.md
+
+* Implementation deviation 4 ("commands that name cells are not restricted to visible cells") is narrowed. `PlaceBuilding` now requires visible cells under fog (D33). `Move`, `Harvest`, `AttackMove`, and `SetRallyPoint` still accept any cell inside the map, and their validation reads only the map's bounds, so it reveals nothing.
+* Implementation deviation 2 is updated: the rejection reasons added in M4 are `NotArmed`, `OwnTarget`, and `UnknownTarget` (`NotTargetable` is removed). New in this round: the placement error `NotVisible` and the attack end `NoDamage`.
+* No new deviation.
+
+### Known debt (P2)
+
+1. **Outcomes of accepted orders use the true state** (D33 item 3). Group destinations skip cells held by idle units and covered by buildings, seen or not. Paths avoid unseen buildings. A harvester avoids ore cells that unseen harvesters have taken. The movement events report the results. Making these fog-aware would need pathfinding on each player's knowledge, which PLAN.md does not specify.
+2. **The `SimEvent` buffer is one stream for all players.** Only `CommandRejected` is addressed to a player. The M5 interface and the M6 AI must use only events about what their player sees. The game's terminal log (`units::log_sim_events`) writes every event of both players as a diagnostic.
+3. **Placement is limited to cells the player sees** (D33 item 5). With the production data, some footprints within the placement distance include cells beyond sight, and these are rejected with `NotVisible` until something of the player sees them. A placement preview with validity colouring is M5's.
+4. **An ordered attack on an undamageable target fires one harmless shot** before it ends (D32 item 3). This is by design, so that the zero case of equation 2 stays reachable.
+5. **Carried, unchanged, from the M4 implementation report and confirmed by review 1:** items 1, 2, 3, 5, 6, 7, 8, 9, 10, and 11.
+   * Item 4 (an `Attack` on a target its warhead cannot damage lasts while the target stands) is resolved by D32.
+   * Item 6 now also covers `Field::damages`, which treats a missing percentage as 0. That case is unreachable.
+6. **Carried from M3 review 1, unchanged:** P2-1 (narrowed as in M4 item 10), P2-2, P2-3, P2-4, and M3 implementation debt items 1 to 9.
+7. **Carried from M2, M1, and M0, unchanged,** as listed in M4 review 1's "Recorded debt". The linker warning and the `Skipped event Destroyed` warning were seen again in this round.
+
+### Requires user verification
+
+Not review findings (PLAN.md section 12 item 2); they block only `m4-approved`. The eight M4 items listed under "M4 implementation report" remain pending, with these changes:
+
+* **Item 4 (Attack):** scout shots are drawn as short pale lines only when both the scout and its target are on visible cells. When only one end is visible, a small pale circle is drawn there instead.
+* **Item 6 (Automatic fire):** idle units and turrets fire only at enemies their weapon can damage.
+* **New item 9 (Placement under fog):** placing a building with `B` is rejected (logged as "cell (x, y) is not visible to the player") while any cell of its footprint is not currently visible. It succeeds once units or buildings of the player see every cell.
+
+The ten M3 items, the seven M2 items, and the five M1 items listed in docs/STATUS.md remain pending.
