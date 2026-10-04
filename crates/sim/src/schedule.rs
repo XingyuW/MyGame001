@@ -1,4 +1,5 @@
 use bevy_app::{App, Plugin};
+use bevy_ecs::message::Messages;
 use bevy_ecs::resource::Resource;
 use bevy_ecs::schedule::{
     IntoScheduleConfigs, LogLevel, Schedule, ScheduleBuildSettings, ScheduleLabel, SystemSet,
@@ -6,8 +7,12 @@ use bevy_ecs::schedule::{
 use bevy_ecs::system::ResMut;
 
 use crate::command::{CommandQueue, process_commands};
+use crate::definitions::Definitions;
+use crate::event::{SimEvent, advance_events};
 use crate::id::SimIdAllocator;
 use crate::map::Grid;
+use crate::movement::move_units;
+use crate::pathfinding::find_paths;
 use crate::rng::SimRng;
 
 /// Simulation rate. One run of [`SimSchedule`] advances the simulation by one tick (50 ms).
@@ -94,15 +99,23 @@ impl Plugin for SimPlugin {
                 .chain(),
         );
         schedule.add_systems((
-            process_commands.in_set(SimSet::Commands),
+            (advance_events, process_commands)
+                .chain()
+                .in_set(SimSet::Commands),
+            find_paths.in_set(SimSet::Pathfinding),
+            move_units.in_set(SimSet::Movement),
             advance_tick.in_set(SimSet::EndOfTick),
         ));
 
+        // The event buffer is advanced by the simulation itself, once per tick (`event.rs`), so
+        // it is inserted as a plain resource rather than registered for Bevy's per-frame update.
         app.insert_resource(SimTick::default())
             .insert_resource(CommandQueue::default())
             .insert_resource(SimIdAllocator::default())
             .insert_resource(SimRng::new(self.seed))
             .insert_resource(Grid::default())
+            .insert_resource(Definitions::default())
+            .insert_resource(Messages::<SimEvent>::default())
             .add_schedule(schedule);
     }
 }

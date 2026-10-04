@@ -8,20 +8,44 @@
 //! windowing, audio, or input crate (invariant I1).
 
 mod command;
+mod data;
+mod definitions;
+mod event;
 mod hash;
 mod id;
 mod map;
 mod map_subset;
+mod movement;
+mod pathfinding;
 mod rng;
 mod schedule;
+mod unit;
 
-pub use command::{Command, CommandQueue, IssuedCommand, PlayerId};
+pub use command::{
+    Command, CommandQueue, IssuedCommand, MAX_UNITS_PER_COMMAND, PlayerId, RejectReason,
+};
+pub use data::{DataError, DataErrorKind, MAX_DATA_FILE_BYTES, MAX_STRING_BYTES};
+pub use definitions::{
+    Definitions, MAX_NAME_LEN, MAX_UNIT_SPEED, MAX_UNIT_TYPES, UNITS_SCHEMA_VERSION, UnitDef,
+    UnitKind, load_unit_definitions,
+};
+pub use event::{MoveFailure, SimEvent};
 pub use hash::{Fnv1a64, state_hash};
 pub use id::{SimId, SimIdAllocator};
 pub use map::{
     Cell, CellPos, CheckedFile, Grid, LoadedMap, MAP_SCHEMA_VERSION, MAX_MAP_FILE_BYTES,
     MAX_MAP_SIDE, MAX_TILESET_IMAGE_SIDE_PX, MAX_TILESET_TILES, MapError, MapErrorKind,
-    TERRAIN_LAYER, TILE_HEIGHT_PX, TILE_WIDTH_PX, TilesetImage, load_map, load_map_with_files,
+    SUBCELLS_PER_CELL, SubPos, TERRAIN_LAYER, TILE_HEIGHT_PX, TILE_WIDTH_PX, TilesetImage,
+    load_map, load_map_with_files,
+};
+pub use movement::{MAX_STALLED_TICKS, REPATH_AFTER_BLOCKED_TICKS};
+pub use pathfinding::{
+    DIAGONAL_COST, ORTHOGONAL_COST, PATH_REQUESTS_PER_TICK, Path, destination_cells, find_path,
+    nearest_reachable, octile_distance,
 };
 pub use rng::SimRng;
 pub use schedule::{SimPlugin, SimSchedule, SimSet, SimTick, TICKS_PER_SECOND};
+pub use unit::{
+    DIAGONAL_STEP, Direction, Facing, Mobile, MoveOrder, ORTHOGONAL_STEP, Orders, Owner, PathState,
+    Position, SpawnError, Step, Unit, spawn_unit,
+};
