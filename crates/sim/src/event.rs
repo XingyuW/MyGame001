@@ -10,6 +10,7 @@ use bevy_ecs::message::{Message, Messages};
 use bevy_ecs::system::ResMut;
 
 use crate::command::{Command, PlayerId, RejectReason};
+use crate::economy_defs::{BuildingKind, ProductionItem};
 use crate::id::SimId;
 
 /// Something that happened during a tick.
@@ -29,6 +30,62 @@ pub enum SimEvent {
     /// The unit's move order ended without reaching its destination; the unit stops at the next
     /// cell centre.
     MoveFailed { unit: SimId, reason: MoveFailure },
+    /// The item at the head of one of the player's production queues has made its last
+    /// progress, so its cost has been charged in full: a building is now ready to be placed, and
+    /// a unit leaves a producing building as soon as one of its ring cells is free
+    /// ([`SimEvent::UnitSpawned`]).
+    ProductionComplete {
+        player: PlayerId,
+        item: ProductionItem,
+    },
+    /// A queued item was cancelled and the credits charged for it so far were refunded.
+    ProductionCancelled {
+        player: PlayerId,
+        item: ProductionItem,
+        refund: i64,
+    },
+    /// A produced unit, or a free unit of a building placed during the match, left `building`.
+    UnitSpawned {
+        player: PlayerId,
+        unit: SimId,
+        building: SimId,
+    },
+    /// A ready building was placed.
+    BuildingPlaced {
+        player: PlayerId,
+        building: SimId,
+        kind: BuildingKind,
+    },
+    /// The building was sold: it was removed, its cells were freed, and `refund` credits were
+    /// paid.
+    BuildingSold {
+        player: PlayerId,
+        building: SimId,
+        refund: i64,
+    },
+    /// A harvester unloaded `ore` units at a refinery, which paid `credits`.
+    OreDelivered {
+        player: PlayerId,
+        harvester: SimId,
+        refinery: SimId,
+        ore: u32,
+        credits: i64,
+    },
+    /// The harvester stopped its cycle and waits for a `Harvest` command.
+    HarvesterIdle { unit: SimId, reason: HarvestIdle },
+}
+
+/// Why a harvester stopped its cycle.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum HarvestIdle {
+    /// No cell with ore is reachable over passable terrain.
+    NoOre,
+    /// It carries ore, and no refinery of its owner is reachable (or its owner is not a player
+    /// of the match).
+    NoRefinery,
+    /// It set out `MAX_HARVEST_ATTEMPTS` times without harvesting or unloading in between
+    /// (other units kept the way or the cells taken).
+    Blocked,
 }
 
 /// Why a move order ended early.
