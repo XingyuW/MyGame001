@@ -2664,6 +2664,9 @@ dependencies = [
  "bevy",
  "bevy_ecs_tiled",
  "bevy_ecs_tilemap",
+ "crc32fast",
+ "flate2",
+ "image",
  "sim",
 ]
 

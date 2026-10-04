@@ -1,10 +1,12 @@
 //! Desktop client: rendering, input, interface, and audio on top of the `sim` crate.
 
 mod camera;
+mod checked_assets;
 mod cli;
 mod map;
 mod projection;
 mod smoke;
+mod tileset_image;
 
 use bevy::prelude::*;
 use bevy_ecs_tiled::prelude::TiledPlugin;
@@ -25,6 +27,10 @@ fn main() -> AppExit {
     let mut app = App::new();
     app.add_plugins(
         DefaultPlugins
+            .build()
+            // The renderer reads only checked bytes (docs/DECISIONS.md, D16); the default asset
+            // source must be replaced before `AssetPlugin` builds the sources.
+            .add_before::<AssetPlugin>(checked_assets::CheckedAssetsPlugin)
             .set(WindowPlugin {
                 primary_window: Some(Window {
                     title: "MyGame001".into(),

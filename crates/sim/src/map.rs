@@ -35,8 +35,15 @@ pub const TILE_WIDTH_PX: u32 = 64;
 pub const TILE_HEIGHT_PX: u32 = 32;
 
 /// Largest accepted `tilecount` of a tileset. `tiled` allocates an entry per tile id below
-/// `tilecount` before anything else is checked (M1 review 1, P0-3).
-pub const MAX_TILESET_TILES: u32 = 1024;
+/// `tilecount` before anything else is checked (M1 review 1, P0-3), and the renderer copies every
+/// tile into one layer of a texture array, whose layer count every GPU supports only up to 256
+/// (`wgpu::Limits::default().max_texture_array_layers`; M1 review 2, P1-A; docs/DECISIONS.md D16).
+pub const MAX_TILESET_TILES: u32 = 256;
+
+/// Largest accepted width and height of a tileset image in pixels. The renderer uploads the image
+/// as one 2D texture, and every GPU supports a texture side of 8192 pixels
+/// (`wgpu::Limits::default().max_texture_dimension_2d`; M1 review 2, P1-A; D16).
+pub const MAX_TILESET_IMAGE_SIDE_PX: u32 = 8192;
 
 /// Largest accepted size of a map or tileset file in bytes. A 256×256 map whose cells all carry
 /// flip flags needs about 0.75 MB.
@@ -152,9 +159,20 @@ pub struct MapError {
 
 impl fmt::Display for MapError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        // An error inside an external tileset names the `.tsx` file (M1 review 1, P1-3), which is
+        // a tileset file, not a map (M1 review 2, P2-A item 4).
+        let what = if self
+            .file
+            .extension()
+            .is_some_and(|extension| extension == "tsx")
+        {
+            "tileset"
+        } else {
+            "map"
+        };
         write!(
             f,
-            "map {}: {}: {}",
+            "{what} {}: {}: {}",
             self.file.display(),
             self.field,
             self.kind
@@ -234,6 +252,12 @@ pub enum MapErrorKind {
     ExternalReferenceMismatch {
         found: Vec<String>,
         expected: Vec<String>,
+    },
+    /// A required element is missing (D13).
+    MissingElement,
+    /// The element must come before the named element (D13).
+    OutOfOrder {
+        before: String,
     },
 }
 
@@ -317,6 +341,8 @@ impl fmt::Display for MapErrorKind {
                  an external tileset must be referenced as source=\"name.tsx\", and no other \
                  text may contain source=\" or template=\" followed by a .tsx or .tx path"
             ),
+            Self::MissingElement => write!(f, "required element is missing"),
+            Self::OutOfOrder { before } => write!(f, "must come before {before}"),
         }
     }
 }
@@ -330,6 +356,23 @@ impl fmt::Display for MapErrorKind {
 /// `tests/m1_map_subset.rs` covers them, and a seeded mutation test over the demo map checks
 /// that no input it generates panics or exceeds a fixed memory budget.
 pub fn load_map(path: impl AsRef<Path>) -> Result<LoadedMap, MapError> {
+    load_map_with_files(path).map(|(map, _)| map)
+}
+
+/// A file that passed the subset check, and the exact bytes that were checked and parsed.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CheckedFile {
+    /// The path the file was read from: the map file, or its external tileset.
+    pub path: PathBuf,
+    pub bytes: Vec<u8>,
+}
+
+/// [`load_map`], also returning the bytes of every file it checked and parsed (the map first,
+/// then its external tileset if any), so that the renderer can be given exactly those bytes
+/// instead of reading the files again (docs/DECISIONS.md, D16).
+pub fn load_map_with_files(
+    path: impl AsRef<Path>,
+) -> Result<(LoadedMap, Vec<CheckedFile>), MapError> {
     let path = path.as_ref();
     let bytes = map_subset::read_file(path).map_err(|kind| MapError {
         file: path.to_owned(),
@@ -362,7 +405,18 @@ pub fn load_map(path: impl AsRef<Path>) -> Result<LoadedMap, MapError> {
             kind: MapErrorKind::Parse(e.to_string()),
         })?;
 
-    validate(path, &map)
+    let loaded = validate(path, &map)?;
+    let mut files = vec![CheckedFile {
+        path: path.to_owned(),
+        bytes,
+    }];
+    if let Some(tileset) = external {
+        files.push(CheckedFile {
+            path: tileset.path,
+            bytes: tileset.bytes,
+        });
+    }
+    Ok((loaded, files))
 }
 
 type Issue = (String, MapErrorKind);

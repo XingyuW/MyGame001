@@ -107,6 +107,28 @@ impl Plugin for SimPlugin {
     }
 }
 
+/// Invariant I12: the counter wraps at `u64::MAX` in debug and release builds alike (about
+/// 2.9 × 10^10 years at 20 Hz; M1 review 2, P2-D).
 fn advance_tick(mut tick: ResMut<SimTick>) {
-    tick.0 += 1;
+    tick.0 = tick.0.wrapping_add(1);
+}
+
+#[cfg(test)]
+mod tests {
+    use bevy_app::App;
+
+    use super::*;
+
+    #[test]
+    fn tick_counter_wraps_instead_of_overflowing() {
+        // Regression (M1 review 2, P2-D): `+= 1` panicked in debug builds and wrapped in
+        // release builds.
+        let mut app = App::new();
+        app.add_plugins(SimPlugin { seed: 0 });
+        app.world_mut().insert_resource(SimTick(u64::MAX - 1));
+        app.world_mut().run_schedule(SimSchedule);
+        assert_eq!(app.world().resource::<SimTick>().0, u64::MAX);
+        app.world_mut().run_schedule(SimSchedule);
+        assert_eq!(app.world().resource::<SimTick>().0, 0);
+    }
 }

@@ -31,8 +31,8 @@ use quick_xml::Reader;
 use quick_xml::events::{BytesStart, BytesText, Event};
 
 use crate::map::{
-    MAX_MAP_FILE_BYTES, MAX_MAP_SIDE, MAX_TILESET_TILES, MapError, MapErrorKind, TERRAIN_LAYER,
-    TILE_HEIGHT_PX, TILE_WIDTH_PX,
+    MAX_MAP_FILE_BYTES, MAX_MAP_SIDE, MAX_TILESET_IMAGE_SIDE_PX, MAX_TILESET_TILES, MapError,
+    MapErrorKind, TERRAIN_LAYER, TILE_HEIGHT_PX, TILE_WIDTH_PX,
 };
 
 /// An external tileset that passed the check: the path at which `tiled` will request it (the
@@ -269,6 +269,15 @@ impl<'a> Checker<'a> {
         }
     }
 
+    /// [`Self::child`] for an element that may be empty (`<name/>`), which has no children.
+    fn child_unless_empty(
+        &mut self,
+        field: &str,
+        empty: bool,
+    ) -> Result<Option<(BytesStart<'a>, bool)>, MapError> {
+        if empty { Ok(None) } else { self.child(field) }
+    }
+
     /// Rejects any child element of a non-empty element that may have none.
     fn no_children(&mut self, field: &str) -> Result<(), MapError> {
         match self.child(field)? {
@@ -353,11 +362,8 @@ impl<'a> Checker<'a> {
         self.map_header(&attributes)?;
         let mut tileset = None;
         let mut source = Vec::new();
-        if empty {
-            return Ok((tileset, source));
-        }
         let (mut properties, mut tileset_seen, mut layer_seen) = (false, false, false);
-        while let Some((child, child_empty)) = self.child("map")? {
+        while let Some((child, child_empty)) = self.child_unless_empty("map", empty)? {
             match child.name().as_ref() {
                 b"properties" => {
                     self.once(&mut properties, "map", &child)?;
@@ -365,6 +371,17 @@ impl<'a> Checker<'a> {
                 }
                 b"tileset" => {
                     self.once(&mut tileset_seen, "map", &child)?;
+                    // `tiled` resolves the layer's tile ids against the tilesets read before it,
+                    // so a tileset after the layer would leave every cell without a tile (M1
+                    // review 2, P2-A item 2).
+                    if layer_seen {
+                        return Err(self.error(
+                            "map element <tileset>",
+                            MapErrorKind::OutOfOrder {
+                                before: format!("the layer {TERRAIN_LAYER:?}"),
+                            },
+                        ));
+                    }
                     if let Some((checked, name)) = self.tileset_in_map(&child, child_empty)? {
                         tileset = Some(checked);
                         source.push(name);
@@ -387,6 +404,10 @@ impl<'a> Checker<'a> {
                 }
                 _ => return Err(self.unsupported_element("map", &child)),
             }
+        }
+        // Exactly one tileset (D13); without it every cell would be reported as empty.
+        if !tileset_seen {
+            return Err(self.error("map element <tileset>", MapErrorKind::MissingElement));
         }
         Ok((tileset, source))
     }
@@ -561,14 +582,18 @@ impl<'a> Checker<'a> {
             )
         })?;
         let path = directory.join(source);
-        let bytes = read_file(&path).map_err(|kind| {
-            self.error(
-                "file",
-                MapErrorKind::Parse(format!(
-                    "external tileset {} cannot be read: {kind}",
-                    path.display()
-                )),
-            )
+        // A file that cannot be read is a fault of the reference, named by its `source`
+        // attribute (M1 review 2, P2-A item 3); a file that is too large is a fault of the file.
+        let bytes = read_file(&path).map_err(|kind| match kind {
+            MapErrorKind::Read(reason) => self.error(
+                format!("{field} attribute \"source\""),
+                MapErrorKind::Read(format!("{}: {reason}", path.display())),
+            ),
+            kind => MapError {
+                file: path.clone(),
+                field: "file".into(),
+                kind,
+            },
         })?;
         check_tileset_file(&path, &bytes)?;
         Ok(Some((CheckedTileset { path, bytes }, source.to_owned())))
@@ -654,6 +679,19 @@ impl<'a> Checker<'a> {
         let Some((image_width, image_height)) = image else {
             return Err(self.error(field, MapErrorKind::TilesetWithoutImage));
         };
+        // The renderer uploads the image as one texture (M1 review 2, P1-A).
+        for (name, value) in [("width", image_width), ("height", image_height)] {
+            if value > MAX_TILESET_IMAGE_SIDE_PX {
+                return Err(self.invalid(
+                    format!("{field} image attribute {name:?}"),
+                    value,
+                    &format!(
+                        "at most {MAX_TILESET_IMAGE_SIDE_PX} px, the largest texture side every \
+                         GPU supports"
+                    ),
+                ));
+            }
+        }
         let expected_width = u64::from(columns) * u64::from(tile_width);
         if u64::from(image_width) != expected_width {
             return Err(self.invalid(
@@ -849,11 +887,19 @@ impl<'a> Checker<'a> {
 }
 
 fn utf8<'b>(file: &Path, bytes: &'b [u8]) -> Result<&'b str, MapError> {
-    std::str::from_utf8(bytes).map_err(|e| MapError {
+    let error = |reason: String| MapError {
         file: file.to_owned(),
         field: "file".into(),
-        kind: MapErrorKind::Parse(format!("the file is not UTF-8 text: {e}")),
-    })
+        kind: MapErrorKind::Parse(reason),
+    };
+    // `quick-xml` skips a byte order mark silently, which shifts its reported positions; the
+    // mark is rejected first so that it is named as the cause (M1 review 2, P2-A item 1).
+    if bytes.starts_with(b"\xEF\xBB\xBF") {
+        return Err(error(
+            "a UTF-8 byte order mark at the start of the file is not supported".into(),
+        ));
+    }
+    std::str::from_utf8(bytes).map_err(|e| error(format!("the file is not UTF-8 text: {e}")))
 }
 
 /// The external files that `bevy_ecs_tiled` 0.13.4 preloads for a map or tileset, found by its

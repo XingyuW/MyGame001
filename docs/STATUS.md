@@ -282,3 +282,121 @@ Carried from M0 (unchanged unless noted): item 1 (dev-profile linker warning `__
 ### Requires user verification
 
 Unchanged from the M1 implementation report (section 12 item 2; not review findings). Run `cargo run --release -p game` and check map rendering (64×64 green diamond, red top corner (0, 0), magenta right corner (63, 0), white left corner (0, 63), rock ridge with a gap, lake with sand shore, ore fields), picking (outline and dot on the tile under the cursor, click log), panning (arrow keys, screen edge while focused, middle mouse drag), zoom (2× to 0.5×), and bounds (the view stays within the map's bounding rectangle; vertically centred when taller than the map). This round changed no rendering, camera, or picking code; it only rejects more maps before rendering.
+
+## M1 remediation round 2 report (2026-10-04)
+
+Implementer session for remediation round 2 of M1 review 2 (`docs/reviews/M1-review-2.md`, NO-GO: 1 P0, 1 P1, 4 P2), on branch `milestone/m1`, base `efb25df`. Every finding was treated as a claim and reconciled against the code. The reviewed behaviour was reproduced with the reviewed binaries (built from `efb25df`, whose code equals `deb2859`) on scratch asset roots selected with `BEVY_ASSET_ROOT`, under a `perl alarm` timeout, with `/usr/bin/time -l` for memory. "Fails before" evidence comes from a scratch copy of `efb25df` (`git archive`, outside the repository) into which the new tests were copied; where the tests name new API, only that API was added as an inert shim (the new constant and two error variants in `sim`; for the game, a module with the new types whose check is the reviewed 24-byte header check verbatim). The M1 row above is maintained by the orchestrator.
+
+### Class of defect
+
+P0-A and P1-A are one class, the rendering-side half of round 1's class: **external input reaches third party rendering code outside a listed subset (invariant I11)**, so it can make that code allocate without bound (P0-A) or fail without file context (P1-A). Round 1 restricted the map and its tileset but left the tileset image's subset as a header check, and admitted geometry the renderer cannot create. The class was closed by enumerating every external input the renderer receives and restricting each (DECISIONS D16):
+
+| External input | Before | Now |
+|----------------|--------|-----|
+| Map file, external tileset | Checked by `sim` (D13), then read again by Bevy from disk | Checked by `sim`; the renderer receives exactly the checked bytes from memory |
+| Tileset geometry | Up to 1024 tiles, images up to 65,536 px | At most 256 tiles and 8192 px per side, the limits every GPU supports (`wgpu::Limits::default()`) |
+| Tileset image | 24-byte header check, then read and decoded by Bevy without limits | Bounded read (4 MiB), chunk and `IHDR` allow-list, full decode with Bevy's decoder under a 16 MiB limit, RGB8/RGBA8 only; the renderer receives exactly the checked bytes |
+| `<asset>.meta` files | Read whole, without a size limit, for every asset, and allowed to choose the loader and settings | Never read |
+| Any other file through the default asset source | Read from disk | Refused (load failure, exit code 1 by D14) |
+
+Two members of the class that the review did not report were found and fixed with it: a 16-bit greyscale PNG (Bevy makes an `R16Uint` texture, and the reviewed release binary quit with "Texture binding 0 expects sample type Float { filterable: true }, but was given a view with format R16Uint", no file named), and `.meta` files (a 400 MB `demo_tiles.png.meta` made the reviewed release binary peak at 0.65 GB).
+
+### Findings
+
+| Finding | Outcome | Evidence | Change | Regression test (fails before, passes after) |
+|---------|---------|----------|--------|-----------------------------------------------|
+| P0-A PNG with a compressed ancillary chunk allocates gigabytes | **Confirmed** | Reviewed release binary, demo map with a 575,260-byte `demo_tiles.png` (an `iCCP` chunk of 500 MiB of compressed zeros): exit 0, map created, peak memory footprint 0.50 GB. Source: `bevy_image` `image.rs:1602` `no_limits()`, `image` `codecs/png.rs:50-51`, `png` `stream.rs:1726`. | D16 items 2 and 3: `crates/game/src/tileset_image.rs` (bounded read, chunk and `IHDR` allow-list, decode under `image::Limits`), `crates/game/src/checked_assets.rs` (the renderer reads only the checked bytes). After the fix, the same file exits 1 in debug and release with `tileset image …/demo_tiles.png: chunk "iCCP": chunk is not supported`, peak 0.10 GB. | `crates/game/tests/m1_tileset_image.rs` (6 tests, 64 MiB allocator budget, D16 item 5), in particular `compressed_and_other_unlisted_chunks_are_rejected_before_any_decoding` (`iCCP`, `zTXt`, `iTXt` bombs of 256 MiB, plus 8 other chunk types before and after the image data) and `image_files_above_the_size_limit_are_rejected_without_being_read_whole` (4 MiB + 1 and a 1 GiB sparse file). All 6 fail against the reviewed check; with the chunk check removed and `no_limits()` restored, the bomb test aborts on the budget ("memory allocation of 69206016 bytes failed"). Also `map::tests::tileset_images_other_than_the_declared_png_are_rejected` (see "Tests changed"). |
+| P1-A tileset images beyond the renderer's texture limits, failing without context | **Confirmed** | Reviewed release binary: a 257 × 1 tileset (16448×32 image) exits 1 with only `Caught rendering error: Validation Error`; 256 × 1 (16384 px) renders on this Apple M5, which is above the limit wgpu guarantees (8192). Source: `bevy_ecs_tilemap` `texture_array_cache.rs` (one 2D texture of the image, one array layer per tile), `bevy_render` `renderer/mod.rs:299-310` (adapter limits), `wgpu-types` `limits.rs:308-378`. | D16 item 1: `MAX_TILESET_TILES` 1024 → 256, new `MAX_TILESET_IMAGE_SIDE_PX` = 8192, checked in `map_subset.rs` with a typed `MapError` naming the file, the image attribute, and the limit. The texture format is restricted by the image subset (P0-A row). | `m1_map_subset::tileset_images_are_bounded_by_the_texture_limits_every_gpu_supports`: accepted 128×2 (8192×64), 128×1, 1×256 (64×8192), 16×16; rejected 129×1 (8256 px, the smallest rejected width), 256×1, a 1×257-row image with `tilecount` 256 (8224 px high), and `tilecount` 257 and 1024. Against the reviewed code the 129×1 map loads. `game::map::tests::tileset_limits_fit_the_texture_limits_every_gpu_supports` ties both constants to `WgpuLimits::default()` (fails with 1024 tiles). `m1_tileset_image::pixel_formats_other_than_8_bit_rgb_and_rgba_are_rejected` (16-bit greyscale → `R16Uint` in Bevy, rejected) and `images_inside_the_subset_pass_and_their_checked_bytes_are_returned` (the largest images, 8192×64 and 64×8192, pass and become `Rgba8UnormSrgb` in Bevy). Boundary through the binaries, debug and release, `--smoke-test 300`: 128×2, 128×1, 1×256, 16×16 exit 0 with the map created and no error; 129×1, 256×1, 257×1 exit 1 with the typed error. |
+| P2-A.1 byte order mark reported as an unterminated end tag | **Confirmed, fixed** | Reviewed code: `bom.tmx` → "the root element's end tag is not terminated" (scratch run of the new test). | D17 item 1: rejected first, as such. | `m1_map_subset::a_byte_order_mark_is_named_as_the_cause` (map and `.tsx`) |
+| P2-A.2 missing tileset or tileset after the layer reported as an empty cell | **Confirmed, fixed** | Reviewed code: `no_tileset.tmx` → `layer "terrain" cell (0, 0): cell has no tile`. | D17 item 2: exactly one tileset, before the layer (`MissingElement`, `OutOfOrder`); D13 amended. | `m1_map_subset::a_map_has_exactly_one_tileset_before_its_layer` (missing, after the layer, empty `<map/>`) |
+| P2-A.3 missing `.tsx` reported at field `file` | **Confirmed, fixed** | Reviewed code: field `file`, kind `Parse("external tileset … cannot be read")`. | D17 item 3: field `tileset "x.tsx" attribute "source"`, kind `Read` naming the `.tsx` path; an oversized `.tsx` is reported in the `.tsx`. | `m1_map_subset::a_missing_external_tileset_is_a_read_error_of_its_source_attribute`; `m1_map::malformed_xml_and_wrong_root_are_parse_errors` (see "Tests changed") |
+| P2-A.4 `.tsx` errors printed as `map <path>.tsx` | **Confirmed, fixed** | `MapError`'s `Display` (reviewed `map.rs:153-163`). | D17 item 4: `tileset <path>` for a `.tsx`. | `m1_map_subset::errors_in_external_tilesets_are_reported_as_tileset_files` |
+| P2-B `f32` parse in `sim` for `float` properties | **Confirmed as stated; recorded as debt, not narrowed** | `map_subset.rs:503`. The parse result is a `bool` that is discarded, so no simulation state or logic uses a float (I2 is about state and logic). | None. Narrowing the subset to `int` and `bool` would change the required M1 malformed-map tests in `m1_map.rs` (unchanged since review 1), which rely on `string` and `float` values reaching validation so that the error states the wrong type precisely (`m1_map::schema_version_is_required_and_checked` with a `string` value, `missing_and_mistyped_tile_properties_are_rejected` with `float` and `string` values, each asserting `WrongPropertyType` with the type found). Debt item 4 below. | None |
+| P2-C the double read spans three files | **Confirmed, fixed** | Reviewed `game/src/map.rs`: `sim::load_map` and `check_tileset_image` read the files, and the asset server read them again. | D16 item 3: the asset server receives the checked bytes from memory; nothing is read twice. Closes round 1 debt item 1 (P2-1). | `checked_assets::tests::only_registered_bytes_are_served_and_meta_files_are_never_read`, `checked_assets::tests::the_plugin_replaces_the_default_asset_source`; end to end, the smoke runs render the demo map and an external-tileset variant from the checked bytes. |
+| P2-D `tick.0 += 1` and I12 | **Confirmed, fixed** | Panics in debug at `u64::MAX` (scratch run: "attempt to add with overflow" at `schedule.rs:111`). | D17 item 5: `wrapping_add`. Every other integer operation in `crates/sim/src` was reviewed; none can overflow. | `sim::schedule::tests::tick_counter_wraps_instead_of_overflowing` |
+
+### Tests changed (none removed, skipped, or weakened)
+
+1. `m1_map::malformed_xml_and_wrong_root_are_parse_errors`: of its three cases, the missing external tileset asserted field `file` and any `Parse` error, which is the behaviour P2-A.3 reports as wrong. The case is kept and now asserts the exact field (`tileset "nowhere.tsx" attribute "source"`), the file (the map), and a `Read` kind naming the `.tsx` path; the other two cases are unchanged. The assertion is stricter than before.
+2. `game::map::tests::tileset_images_other_than_the_declared_png_are_rejected`: the five rejections are unchanged (the error is now a typed value, compared through its message as before). Its last line asserted that a file holding only a 24-byte PNG header is accepted, which is the header-only behaviour P0-A reports. That file is now asserted to be rejected (`chunk "IHDR": the file ends inside this chunk`), and a complete 512×32 PNG is asserted to be accepted with its bytes returned.
+3. `game::map::tests::demo_tileset_image_matches_its_declared_size` now also asserts that the returned bytes equal the file.
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `crates/sim/src/map.rs` | `MAX_TILESET_TILES` = 256, `MAX_TILESET_IMAGE_SIDE_PX` = 8192; `MapErrorKind::MissingElement`, `OutOfOrder`; `Display` says `tileset` for a `.tsx`; `CheckedFile` and `load_map_with_files` (`load_map` unchanged in behaviour) |
+| `crates/sim/src/map_subset.rs` | Image side limits; exactly one tileset before the layer; byte order mark; missing `.tsx` at its `source` attribute |
+| `crates/sim/src/schedule.rs` | `wrapping_add`; unit test |
+| `crates/sim/src/lib.rs` | Exports |
+| `crates/sim/tests/m1_map_subset.rs` | 5 tests |
+| `crates/sim/tests/m1_map.rs` | One case made stricter (above) |
+| `crates/game/src/tileset_image.rs` (new) | Tileset image subset and bounded decode (D16 item 2) |
+| `crates/game/src/checked_assets.rs` (new) | Default asset source serving only checked bytes, no `.meta` reads (D16 item 3); 2 tests |
+| `crates/game/src/map.rs` | Loads through `load_map_with_files` and `check_tileset_image`, registers the checked bytes; header-only check removed; texture limit test; tests adapted (above) |
+| `crates/game/src/main.rs` | Modules; `CheckedAssetsPlugin` added before `AssetPlugin` |
+| `crates/game/tests/m1_tileset_image.rs` (new) | 6 bounded tests (D16 item 5) |
+| `crates/game/Cargo.toml`, `Cargo.lock` | `image` =0.25.10; dev `flate2` =1.1.10, `crc32fast` =1.5.2; the lock gained no package, only `game`'s dependency list |
+| `docs/DECISIONS.md` | D13 amended; D16, D17 |
+| `docs/STATUS.md` | This report |
+
+### Validation commands (PLAN.md section 9, with section 12 item 5)
+
+Run from the repository root on macOS (Apple M5, Rust 1.98.1), in this order, in the foreground, after the last code change. A display was available.
+
+| Command | Exit | Result |
+|---------|------|--------|
+| `cargo fmt --all -- --check` | 0 | no diff |
+| `cargo clippy --workspace --all-targets -- -D warnings` | 0 | no warnings |
+| `cargo test --workspace` | 0 | 115 passed, 0 failed, 0 ignored: `game` unit 29 (cli 7, projection 7, camera 7, map 6, checked_assets 2), `m0_spike` 6, `m1_demo_map` 3, `m1_tileset_image` 6 (2.8 s), `sim` unit 3, `m0_bootstrap` 12, `m1_map` 32, `m1_map_subset` 24 (5.8 s), doc-tests 0. Known M0 linker warning only. |
+| `cargo build --release -p game` | 0 | |
+| `cargo run --release -p game -- --smoke-test 600` | 0 | `map maps/demo/demo.tmx: 64x64 cells, tile 64x32 px`; `smoke test: 600 frames, 198 simulation ticks, map created: true` |
+| `cargo run -p game -- --smoke-test 600` | 0 | `smoke test: 600 frames, 203 simulation ticks, map created: true` |
+
+Additionally `cargo test --release -p sim -p game` passed (the same 115 tests), and both fixed binaries were run (`--smoke-test 300`) against scratch asset roots: `iCCP` bomb, 16-bit greyscale image, 257×1, 256×1, and 129×1 tilesets exit 1 with a typed error naming the file and field, peak 0.10 GB; 128×2, 128×1, 1×256, 16×16, an external `.tsx` variant of the demo map, the demo map with a 400 MB `demo_tiles.png.meta` and a malformed `demo.tmx.meta`, and an image with 500 MiB of compressed zeros after its pixel data inside `IDAT` exit 0 with the map created and no error, peak 0.11 GB.
+
+### Acceptance criteria (PLAN.md section 7, M1)
+
+| Criterion | Evidence |
+|-----------|----------|
+| Map loading with terrain flags and ore; `Grid` resource | Unchanged positive tests pass; `load_map_with_files` returns the same `LoadedMap` |
+| Map rendering | Smoke runs above (map created in both profiles, from the checked bytes); on-screen result **requires user verification** |
+| Camera panning, zoom with limits, camera bounds | Unchanged tests pass; behaviour in the window **requires user verification** |
+| Cursor to cell picking; zero error in tests | Unchanged tests pass |
+| Required M1 tests | All present and passing; one case of `malformed_xml_and_wrong_root_are_parse_errors` made stricter (above) |
+| I8, I11 | D13, D16, D17; `m1_map_subset` (24), `m1_tileset_image` (6), game unit tests; binary runs above |
+| I12 | `wrapping_add` and its test; review of `crates/sim/src` (D17 item 5) |
+| A 64×64 demo map renders correctly; the user confirms the visual result | **Requires user verification** (below) |
+
+### Assumptions verified and how
+
+| Item | Verification |
+|------|--------------|
+| Bevy reads `<asset>.meta` whole for every asset unless the reader reports it missing, and a missing meta means default settings | `bevy_asset` `server/mod.rs` `get_meta_loader_and_reader`; probe with a 400 MB meta file (0.65 GB before, no effect after) |
+| A pre-registered default source is kept by `AssetPlugin` | `bevy_asset` `io/source.rs:382-385` (`get_or_insert_with`); `checked_assets::tests::the_plugin_replaces_the_default_asset_source` |
+| `bevy_ecs_tiled` requests the `.tsx` and the image through the default source at `maps/demo/<name>` | `bevy_ecs_tiled` `tiled/reader.rs` (`read_asset_bytes`), `tiled/map/loader.rs` (`AssetPath::from(img.source)`); smoke runs of the demo map and of an external-tileset variant |
+| `image::Limits::max_alloc` bounds `png`'s ancillary chunk decompression cumulatively | `image` `codecs/png.rs:47-51`, `png` `decoder/mod.rs:65-87`, `stream.rs:783-791, 1726-1728`; the bounded test with the chunk check removed |
+| Bevy's PNG texture formats | `bevy_image` `image_texture_conversion.rs`; `bevy_texture_format` assertions in `m1_tileset_image` |
+| Texture limits guaranteed on every modern backend | `wgpu-types` 29.0.4 `limits.rs:308-378` (8192, 256); `bevy_render` `settings.rs:91-110`, `renderer/mod.rs:297-310` |
+
+### Deviations from PLAN.md
+
+1. The map format is narrower (D16, D17): at most 256 tiles and 8192 px per image side, exactly one tileset before the layer, no byte order mark. The demo map and all fixtures are inside it and unchanged.
+2. The tileset image format is now an explicit subset (D16): 8-bit RGB or RGBA PNG, no interlacing, listed chunks only, at most 4 MiB.
+3. Public API of `sim`: `CheckedFile`, `load_map_with_files`, `MAX_TILESET_IMAGE_SIDE_PX`, and two `MapErrorKind` variants were added; `MAX_TILESET_TILES` changed from 1024 to 256. No data schema change, so `schema_version` stays 1.
+4. Files not listed in PLAN.md section 4: `crates/game/src/{tileset_image,checked_assets}.rs` and `crates/game/tests/m1_tileset_image.rs`, which contains `unsafe` code (the counting allocator of D15).
+
+### Known debt (P2)
+
+1. Round 1 debt item 1 (P2-1, double read) is **resolved** by D16 item 3, together with P2-C.
+2. Round 1 debt items 2 (P2-3, camera and picking systems tested through pure functions) and 3 (P2-5, `Grid` inserted as match setup) are unchanged.
+3. Round 1 debt item 4 (an asset load failure is logged twice under `--smoke-test`) is unchanged. Items 5 (byte order mark) and 6 (header-only image check) are **resolved** (D17 item 1, D16 item 2).
+4. **New, P2-B:** `map_subset.rs` validates `float` property values with `str::parse::<f32>`, as `tiled` parses them. The result is a discarded `bool`, so no simulation state or logic uses a floating point value (I2). The subset keeps `string` and `float` so that the required malformed-map tests of `m1_map.rs` keep reporting the precise wrong type; narrowing it is possible once those tests' expectations are allowed to change.
+5. **New:** the texture limits are wgpu's guaranteed defaults. A machine forced to WebGL2 limits (`WGPU_SETTINGS_PRIO=webgl2`) could not create an 8192 px texture; this configuration is outside the supported one (D16 item 1).
+6. **New:** every asset must now be registered in `CheckedAssets` after its check before Bevy can load it. Later milestones that add sprites, audio, or data files through the asset server must give each a checked subset and register it, or the load fails with exit code 1 (fail-safe).
+
+Carried from M0 unchanged: items 1, 2 (seen again in this round's smoke runs), 3, 5, 7, 8, and 9, as listed in the round 1 report.
+
+### Requires user verification
+
+Unchanged (section 12 item 2; not review findings). Run `cargo run --release -p game` and check map rendering (64×64 green diamond, red top corner (0, 0), magenta right corner (63, 0), white left corner (0, 63), rock ridge with a gap, lake with sand shore, ore fields), picking (outline and dot on the tile under the cursor, click log), panning (arrow keys, screen edge while focused, middle mouse drag), zoom (2× to 0.5×), and bounds (the view stays within the map's bounding rectangle; vertically centred when taller than the map). This round changed no rendering, camera, or picking code; the renderer now receives the same files from memory instead of from disk.
