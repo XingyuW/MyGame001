@@ -8,6 +8,7 @@
 //! `bevy_ecs_tiled` draw every tile exactly where this projection puts it.
 
 use bevy::math::{Rect, Vec2};
+use bevy_ecs_tilemap::prelude::TilePos;
 use sim::CellPos;
 
 /// Size of one cell's diamond in pixels (world units at zoom 1).
@@ -89,6 +90,17 @@ pub fn map_bounds(width: u32, height: u32, tile: TileSize) -> Rect {
 pub fn map_origin_offset(height: u32, tile: TileSize) -> Vec2 {
     let h = height as f32;
     -Vec2::new((h - 1.0) * tile.width / 2.0, h * tile.height / 2.0)
+}
+
+/// The map cell drawn by the tile at `tile` of the map's tilemap: `bevy_ecs_tiled` places Tiled
+/// cell (x, y) at `TilePos { x, y: height − 1 − y }` (docs/DECISIONS.md D7), so this is the
+/// inverse; `None` for a tile outside a map `height` cells tall.
+pub fn tile_cell(tile: TilePos, height: u32) -> Option<CellPos> {
+    let y = height.checked_sub(1)?.checked_sub(tile.y)?;
+    Some(CellPos::new(
+        i32::try_from(tile.x).ok()?,
+        i32::try_from(y).ok()?,
+    ))
 }
 
 #[cfg(test)]
@@ -284,5 +296,42 @@ mod tests {
                 assert_eq!(picked_by_tilemap, Some(tile_pos), "{ctx}");
             }
         }
+    }
+
+    #[test]
+    fn tile_cell_inverts_the_tilemap_placement_of_every_cell() {
+        // The tile under each cell centre, as the tilemap itself picks it, maps back to the cell
+        // (M4: the fog tints tiles by the cell they draw).
+        let grid = TilemapGridSize {
+            x: TILE.width,
+            y: TILE.height,
+        };
+        let tile = TilemapTileSize {
+            x: TILE.width,
+            y: TILE.height,
+        };
+        let map_type = TilemapType::Isometric(IsoCoordSystem::Diamond);
+        for (width, height) in MAP_SIZES {
+            let size = TilemapSize {
+                x: width,
+                y: height,
+            };
+            let offset = map_origin_offset(height, TILE);
+            for cell in cells(width, height) {
+                let picked = TilePos::from_world_pos(
+                    &(cell_centre(cell, TILE) - offset),
+                    &size,
+                    &grid,
+                    &tile,
+                    &map_type,
+                    &TilemapAnchor::None,
+                )
+                .expect("inside");
+                assert_eq!(tile_cell(picked, height), Some(cell), "{width}x{height}");
+            }
+            assert_eq!(tile_cell(TilePos::new(0, height), height), None);
+        }
+        assert_eq!(tile_cell(TilePos::new(0, 0), 0), None);
+        assert_eq!(tile_cell(TilePos::new(u32::MAX, 0), 1), None);
     }
 }

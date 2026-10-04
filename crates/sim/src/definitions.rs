@@ -21,6 +21,10 @@ use std::path::Path;
 use bevy_ecs::resource::Resource;
 use serde::Deserialize;
 
+use crate::combat_defs::{
+    self, ArmourClass, CombatDefinitions, CombatTerms, WarheadDef, WarheadKind, WeaponDef,
+    WeaponKind,
+};
 use crate::data::{self, DataError, DataErrorKind, MAX_DATA_FILE_BYTES, Shape};
 use crate::economy_defs::{
     self, BuildingDef, BuildingKind, EconomyDefinitions, HarvesterDef, Production, ProductionItem,
@@ -62,6 +66,9 @@ pub struct Definitions {
     units: Vec<UnitDef>,
     /// Empty unless the definitions were loaded with an economy file ([`load_definitions`]).
     economy: EconomyDefinitions,
+    /// Empty unless a combat file was loaded ([`Definitions::with_combat`]); then every unit and
+    /// building type has combat terms.
+    combat: CombatDefinitions,
 }
 
 impl Definitions {
@@ -138,6 +145,81 @@ impl Definitions {
         self.economy.placement_distance
     }
 
+    /// Whether a combat file was loaded, so that every unit and building type has combat terms.
+    pub fn has_combat(&self) -> bool {
+        !self.combat.armour_classes.is_empty()
+    }
+
+    /// The armour class names, indexed by [`ArmourClass`].
+    pub fn armour_classes(&self) -> &[String] {
+        &self.combat.armour_classes
+    }
+
+    /// The warheads, indexed by [`WarheadKind`].
+    pub fn warheads(&self) -> &[WarheadDef] {
+        &self.combat.warheads
+    }
+
+    pub fn warhead(&self, kind: WarheadKind) -> Option<&WarheadDef> {
+        self.combat.warheads.get(usize::from(kind.0))
+    }
+
+    /// The weapons, indexed by [`WeaponKind`].
+    pub fn weapons(&self) -> &[WeaponDef] {
+        &self.combat.weapons
+    }
+
+    pub fn weapon(&self, kind: WeaponKind) -> Option<&WeaponDef> {
+        self.combat.weapons.get(usize::from(kind.0))
+    }
+
+    /// The kind of the weapon with this id.
+    pub fn weapon_kind(&self, id: &str) -> Option<WeaponKind> {
+        self.combat
+            .weapons
+            .iter()
+            .position(|weapon| weapon.id == id)
+            .and_then(|index| u16::try_from(index).ok())
+            .map(WeaponKind)
+    }
+
+    /// The kind of the armour class with this name.
+    pub fn armour_class(&self, name: &str) -> Option<ArmourClass> {
+        self.combat
+            .armour_classes
+            .iter()
+            .position(|class| class == name)
+            .and_then(|index| u16::try_from(index).ok())
+            .map(ArmourClass)
+    }
+
+    /// The percentage `warhead` deals against `armour` (equation 2), or `None` if either is not
+    /// defined.
+    pub fn versus(&self, warhead: WarheadKind, armour: ArmourClass) -> Option<i32> {
+        self.warhead(warhead)?
+            .versus
+            .get(usize::from(armour.0))
+            .copied()
+    }
+
+    /// The combat terms of unit type `kind`, or `None` without a combat file.
+    pub fn unit_combat(&self, kind: UnitKind) -> Option<CombatTerms> {
+        self.combat
+            .units
+            .get(usize::from(kind.0))
+            .copied()
+            .flatten()
+    }
+
+    /// The combat terms of building type `kind`, or `None` without a combat file.
+    pub fn building_combat(&self, kind: BuildingKind) -> Option<CombatTerms> {
+        self.combat
+            .buildings
+            .get(usize::from(kind.0))
+            .copied()
+            .flatten()
+    }
+
     pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
         hasher.write_u64(self.units.len() as u64);
         for unit in &self.units {
@@ -148,6 +230,7 @@ impl Definitions {
             hasher.write(&unit.speed.to_le_bytes());
         }
         self.economy.hash_into(hasher);
+        self.combat.hash_into(hasher);
     }
 }
 
@@ -217,11 +300,42 @@ impl Definitions {
     /// These unit definitions together with the economy file at `economy_file`, whose
     /// references to unit types are resolved against them ([`load_definitions`] in two steps,
     /// for a caller that has loaded the units file already).
+    ///
+    /// Combat definitions refer to the building types of the economy file, so loading an economy
+    /// file removes any combat definitions loaded before; load the combat file afterwards
+    /// ([`Definitions::with_combat`]).
     pub fn with_economy(mut self, economy_file: impl AsRef<Path>) -> Result<Self, DataError> {
         let ids: Vec<String> = self.units.iter().map(|unit| unit.id.clone()).collect();
         self.economy = economy_defs::load(economy_file.as_ref(), &ids)?;
+        self.combat = CombatDefinitions::default();
         Ok(self)
     }
+
+    /// These definitions together with the combat file at `combat_file`, whose references to
+    /// unit and building types are resolved against them, and which must give every unit type
+    /// and every building type combat terms (docs/DECISIONS.md D28). Every problem is a
+    /// [`DataError`] naming the file, the field, and the reason.
+    pub fn with_combat(mut self, combat_file: impl AsRef<Path>) -> Result<Self, DataError> {
+        let units: Vec<String> = self.units.iter().map(|unit| unit.id.clone()).collect();
+        let buildings: Vec<String> = self
+            .economy
+            .buildings
+            .iter()
+            .map(|building| building.id.clone())
+            .collect();
+        self.combat = combat_defs::load(combat_file.as_ref(), &units, &buildings)?;
+        Ok(self)
+    }
+}
+
+/// Loads the units file, the economy file, and the combat file of a match ([`load_definitions`],
+/// then [`Definitions::with_combat`]).
+pub fn load_match_definitions(
+    units_file: impl AsRef<Path>,
+    economy_file: impl AsRef<Path>,
+    combat_file: impl AsRef<Path>,
+) -> Result<Definitions, DataError> {
+    load_definitions(units_file, economy_file)?.with_combat(combat_file)
 }
 
 fn validate(path: &Path, file: UnitsFile) -> Result<Definitions, DataError> {
@@ -277,6 +391,7 @@ fn validate(path: &Path, file: UnitsFile) -> Result<Definitions, DataError> {
     Ok(Definitions {
         units,
         economy: EconomyDefinitions::default(),
+        combat: CombatDefinitions::default(),
     })
 }
 

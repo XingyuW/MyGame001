@@ -10,6 +10,7 @@ use std::fmt;
 use bevy_ecs::component::Component;
 use bevy_ecs::world::World;
 
+use crate::combat::combat_components;
 use crate::command::PlayerId;
 use crate::definitions::{Definitions, UnitKind};
 use crate::harvest::Harvester;
@@ -258,7 +259,8 @@ impl std::error::Error for SpawnError {}
 
 /// Spawns a unit of type `unit_type` owned by `owner`, standing idle in `cell` and facing
 /// south-east (towards the viewer). A harvester starts its harvesting cycle at once
-/// (`HarvestState::Seeking`).
+/// (`HarvestState::Seeking`). With a combat file, the unit gets its hit points, armour, sight,
+/// and weapon (M4).
 ///
 /// Scenario and match setup only (tests, and the game before the first tick); during a match
 /// units are created by production (M3). The world must have been set up by
@@ -269,7 +271,7 @@ pub fn spawn_unit(
     unit_type: &str,
     cell: CellPos,
 ) -> Result<SimId, SpawnError> {
-    let (kind, speed, harvester) = {
+    let (kind, speed, harvester, combat) = {
         let definitions = world.resource::<Definitions>();
         let kind = definitions
             .unit_kind(unit_type)
@@ -278,7 +280,12 @@ pub fn spawn_unit(
             .unit(kind)
             .map(|def| def.speed)
             .ok_or_else(|| SpawnError::UnknownUnitType(unit_type.to_owned()))?;
-        (kind, speed, definitions.harvester(kind).is_some())
+        (
+            kind,
+            speed,
+            definitions.harvester(kind).is_some(),
+            definitions.unit_combat(kind),
+        )
     };
     {
         let grid = world.resource::<Grid>();
@@ -300,6 +307,13 @@ pub fn spawn_unit(
     let mut entity = world.spawn(unit_bundle(id, owner, kind, speed, cell));
     if harvester {
         entity.insert(Harvester::new());
+    }
+    if let Some(terms) = combat {
+        let (components, weapon) = combat_components(terms);
+        entity.insert(components);
+        if let Some(weapon) = weapon {
+            entity.insert(weapon);
+        }
     }
     Ok(id)
 }
