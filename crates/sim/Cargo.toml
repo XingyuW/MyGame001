@@ -1,0 +1,14 @@
+[package]
+name = "sim"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+# Invariant I1: no rendering, windowing, audio, or input dependency.
+# The umbrella `bevy` crate is deliberately not used here: even with
+# `default-features = false` it pulls in `bevy_input` (see docs/DECISIONS.md, A3).
+[dependencies]
+bevy_app = { version = "=0.19.1", default-features = false, features = ["std"] }
+bevy_ecs = { version = "=0.19.1", default-features = false, features = ["std"] }
+rand_chacha = { version = "=0.10.0", default-features = false }
