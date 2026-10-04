@@ -6,7 +6,7 @@
 | M1: Map and camera | **Reviewed**: review 3 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 3 P2) after reviews 1 and 2 NO-GO; merged into `main`. Awaiting user verification for `m1-approved` | `milestone/m1` | `m1-reviewed` |
 | M2: Units and movement | **Reviewed**: review 3 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 2 P2) after reviews 1 and 2 NO-GO; merged into `main`. Awaiting user verification for `m2-approved` | `milestone/m2` | `m2-reviewed` |
 | M3: Economy and construction | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 4 P2); merged into `main`. Awaiting user verification for `m3-approved` | `milestone/m3` | `m3-reviewed` |
-| M4: Combat and fog of war | **Review 1: NO-GO** (0 P0, 2 P1, 3 P2; `docs/reviews/M4-review-1.md`), in remediation round 1 | `milestone/m4` | |
+| M4: Combat and fog of war | **Reviewed**: review 2 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 1 P2) after review 1 NO-GO; merged into `main`. Awaiting user verification for `m4-approved` | `milestone/m4` | `m4-reviewed` |
 | M5: Interface and audio | Not started | | |
 | M6: Skirmish AI and game flow | Not started | | |
 | M7: Content, balance, performance, and packaging | Not started | | |
@@ -1508,3 +1508,113 @@ Not review findings (PLAN.md section 12 item 2); they block only `m4-approved`. 
 * **New item 9 (Placement under fog):** placing a building with `B` is rejected (logged as "cell (x, y) is not visible to the player") while any cell of its footprint is not currently visible. It succeeds once units or buildings of the player see every cell.
 
 The ten M3 items, the seven M2 items, and the five M1 items listed in docs/STATUS.md remain pending.
+
+## M4 review decision (2026-10-04)
+
+Two independent review rounds (`docs/reviews/M4-review-1.md`: NO-GO, 0 P0, 2 P1, 3 P2; `M4-review-2.md`: GO WITH DOCUMENTED NON-BLOCKING DEBT, 0 P0, 0 P1, 1 P2). Before review 2 the orchestrator reran all six validation commands of PLAN.md section 9 on commit `dad9bb0` with exit code 0 (307 tests passed). Review 2 judged that the three test setups changed by remediation round 1 were not weakened. Under PLAN.md section 12 item 1, `milestone/m4` was merged into `main` and tagged `m4-reviewed`. The tag `m4-approved` is created by the user alone after the verification below.
+
+### Debt recorded from review 2 (P2, verbatim from the report)
+
+#### P2-1: Projectiles from an unseen attacker are drawn along their line of flight, which points back to the attacker; D33 claims the screen reveals nothing
+**Files and lines:**
+
+* `crates/game/src/fog.rs:205-215`: every projectile is drawn at `projectile_point(projectile.origin, target, progress)` whenever that point's cell is visible.
+* `crates/game/src/fog.rs:146-150`: `projectile_point`, a linear interpolation from the origin.
+* `crates/sim/src/combat.rs:479`: `origin: from.centre()`, the attacker's exact centre.
+* `docs/DECISIONS.md:499`: the D33 title, "Commands and the screen reveal nothing about what the player does not see".
+* `docs/DECISIONS.md:514`: D33 item 4, "so a shot no longer shows where an unseen attacker stands".
+* `docs/STATUS.md:1358`: "The on-screen member of the same class (P2-1 …) is fixed".
+
+**Evidence:** probe `projectile_from_unseen_attacker` (release, fixture data). It computes, with the same interpolation as `fog.rs`, the points the game draws.
+
+* **Setup:** a human crawler (sight 2) stands at (10, 16). An unseen enemy tank at (14, 16) fires a shell (speed 128) at it.
+* **Points drawn:**
+  * the shell's points at x 3200, 3072, 2944, and 2816 (cells (12, 16) and (11, 16)) are visible and drawn;
+  * the origin cell (14, 16) is not visible.
+* **What the player learns:** the drawn dots move along y = 4224 by exactly 128 subcells per tick, on the straight line from the hidden tank's centre. The player sees the bearing of the unseen attacker, as review 1 P2-1 found for instant shots.
+* **Accuracy of the records:** D31 item 3 ("Projectiles are drawn … only in cells the human player sees") is accurate. D33's general claim, and the report's statement that the class is fixed on screen, are not.
+
+**Severity rationale:** P2.
+
+* This is documentation accuracy, plus a minor information leak that is conventional in the genre.
+* Simulation state, command validation, and invariants are unaffected.
+* The precedent is review 1 P2-1, rated P2.
+
+**Expected behaviour:** either of the following.
+
+* Correct D33 (title and item 4) and the remediation report to state that projectiles in flight are drawn in visible cells, so their line of flight shows the bearing of an unseen attacker, and record it as accepted behaviour.
+* Or draw a projectile only once its attacker has been seen, or not before it is within a bounded distance of a visible target. A unit test of that decision would accompany this option.
+
+### Recorded debt to carry (verbatim from review 2)
+
+**New in this review (P2):**
+
+* **P2-1:** projectiles from unseen attackers show their line of flight, and the D33 title, D33 item 4, and the remediation report's claim are too strong.
+
+**From the M4 remediation round 1 report (known debt), confirmed by this review:**
+
+1. Outcomes of accepted orders use the true state: group destinations, paths, and harvester ore claims (D33 item 3).
+2. The `SimEvent` buffer is one stream for all players. The game's terminal log writes every event of both players.
+3. Placement is limited to cells the player sees (D33 item 5). There is no validity preview until M5.
+4. An ordered attack on an undamageable target fires one harmless shot before it ends (D32 item 3). It is confirmed for instant and projectile weapons.
+
+**From the M4 implementation report, confirmed by review 1 and unchanged except as noted:**
+
+1. **Cost per tick.** Acquisition is O(A × T), a chase runs a Dijkstra, and vision is recomputed in full. Review 1 measured 300 per side at a mean of 1.09 ms and a max of 2.84 ms in release. To be measured against the M7 benchmark.
+2. **Projectile bound.** It allows about 200 MB in the pathological case.
+3. **No chase or return fire beyond range.** Idle and attack-moving units do not chase, and do not return fire against attackers that outrange them.
+4. *Resolved by D32.* (This was the `Attack` on an undamageable target that lasted while the target stood.)
+5. **Second `MoveCompleted`.** An attack-move that fights at its destination writes a second `MoveCompleted`.
+6. **Unreachable missing-entry cases.** A missing weapon or percentage is treated as no damage (now also in `Field::damages`), and a projectile whose weapon is missing as expired.
+7. **`with_economy` order.** `Definitions::with_economy` removes combat definitions loaded before it. This is documented and tested.
+8. **Health bars and shot events.** Health bars are M5's. The two-tick `MessageReader` window also applies to instant shots.
+9. **No combat in the smoke test.** The smoke test does not exercise combat in the real binary, and there is no automated screenshot.
+10. **Pending free units.** M3 review 1 P2-1 is unchanged for selling; destruction reports the lost units.
+11. **Earlier debt.** Everything carried at the M3 review decision, unchanged.
+
+**Carried from M3 review 1, unchanged by M4:**
+
+* P2-1, narrowed as in item 10 above;
+* P2-2: dock contention;
+* P2-3: `docs/DECISIONS.md` still cites the nonexistent `two_placements_in_one_tick_see_each_other`;
+* P2-4: `STARTING_CREDITS` and the starting setup in game code, which M4 extends with the opponent's gun turret;
+* M3 implementation debt items 1 to 9.
+
+**Carried from M2, M1, and M0, unchanged by M4:**
+
+* M2:
+  * review 3: P2-1 and P2-2;
+  * remediation round 2: items 1 to 7;
+  * review 1: P2-2 remainder.
+* M1:
+  * review 3: P2-1 (FIFO hang of the map and `.tsx` reader), P2-2, and the remaining items of P2-3;
+  * review 1: P2-3 and P2-5;
+  * review 2: P2-B (the `f32` in `map_subset.rs:524`);
+  * round 1: item 4;
+  * round 2: items 5 and 6.
+* M0: items 1, 2, 3, 5, 7, 8, and 9. This review saw the linker warning and the `Skipped event Destroyed` warning again.
+
+**Resolved and confirmed in this review:** review 1 P1-1, P1-2, P2-1 (instant shots), P2-2, and P2-3; M4 implementation debt item 4.
+
+### Requires user verification (blocks only `m4-approved`; verbatim from review 2)
+
+These are not findings and do not affect the decision (PLAN.md section 12 item 2); they block only `m4-approved`. Run `cargo run --release -p game` and check the M4 items from docs/STATUS.md, as amended by the remediation report:
+
+1. **Shroud:** at the start, only the area around the player's units and construction yard shows the map; everything else is black.
+2. **Fog:** cells seen before and not now are drawn dark but recognisable; cells seen now are drawn normally; moving units uncover the map.
+3. **Hidden enemies:** the opponent's units, yard, and gun turret at (50, 41) are not drawn until a unit of the player comes close, and they disappear again when no longer seen.
+4. **Attack:**
+   * A right click on a visible enemy makes the selected armed units close in and fire.
+   * Tank shells are drawn as small yellow dots.
+   * Scout shots are drawn as short pale lines only when both the scout and its target are on visible cells; otherwise a small pale circle is drawn at the visible end.
+   * Destroyed units and buildings disappear, and units can walk over a destroyed building's cells.
+5. **Attack-move:** `A` over a cell makes the selection fight enemies in range on the way, then continue.
+6. **Automatic fire:** idle units and turrets fire only at visible enemies in range that their weapon can damage; units on a plain move do not fire.
+7. **Gun turret:**
+   * the opponent's turret fires at the player's units within about six cells;
+   * the player's turret (key `6` after a power plant, placed with `B`) fires while the player has power and holds fire under `(low)`.
+8. **Menu keys:** `7` light tank, `8` scout, `9` harvester.
+9. **Placement under fog:** `B` is rejected ("cell (x, y) is not visible to the player") while any footprint cell is not currently visible, and succeeds once every cell is seen.
+
+The ten M3 items, the seven M2 items, and the five M1 items listed in docs/STATUS.md remain pending.
+
