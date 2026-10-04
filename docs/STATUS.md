@@ -6,7 +6,7 @@
 | M1: Map and camera | **Reviewed**: review 3 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 3 P2) after reviews 1 and 2 NO-GO; merged into `main`. Awaiting user verification for `m1-approved` | `milestone/m1` | `m1-reviewed` |
 | M2: Units and movement | **Reviewed**: review 3 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 2 P2) after reviews 1 and 2 NO-GO; merged into `main`. Awaiting user verification for `m2-approved` | `milestone/m2` | `m2-reviewed` |
 | M3: Economy and construction | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 4 P2); merged into `main`. Awaiting user verification for `m3-approved` | `milestone/m3` | `m3-reviewed` |
-| M4: Combat and fog of war | Not started | | |
+| M4: Combat and fog of war | Implemented, awaiting independent review | `milestone/m4` | |
 | M5: Interface and audio | Not started | | |
 | M6: Skirmish AI and game flow | Not started | | |
 | M7: Content, balance, performance, and packaging | Not started | | |
@@ -1218,3 +1218,127 @@ Run `cargo run --release -p game` and check the ten M3 items listed in docs/STAT
 
 The seven M2 items and the five M1 items listed in docs/STATUS.md remain pending.
 
+## M4 implementation report (2026-10-04)
+
+Branch `milestone/m4`, based on `main` at the merge of M3 (tag `m3-reviewed`). Commits: `9608923` (sim: combat file, combat, projectiles, death and cleanup, visibility, commands, tests and fixtures), `e19677d` (game: combat file, gun turret, fog rendering, hiding, interim controls, smoke test), and the documentation commit that adds this report. Decisions: DECISIONS "M4: combat and fog of war" (A1 follow-up, D28 to D31) and the M4 amendment of D6.
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `crates/sim/src/combat_defs.rs` (new) | Combat file schema 1: armour classes, warheads, weapons, combat terms; limits; subset schema; validation with references, uniqueness, and completeness (D28) |
+| `crates/sim/src/combat.rs` (new) | `Health`, `Armour`, `Sight`, `Weapon`, `AttackOrder`, `Projectile`, `Projectiles`; `applied_damage` (equation 2), `in_range` (equation 1); the `combat` system (projectiles, target choice, `Attack` and `AttackMove`, firing, damage) and `remove_dead` (D29); 3 unit tests |
+| `crates/sim/src/visibility.rs` (new) | `Vision` (visible and explored bits), `sees_unit`, `sees_footprint`, the `update_visibility` system (equation 6, D30); 2 unit tests |
+| `crates/sim/src/definitions.rs` | `Definitions` holds the combat definitions; `with_combat`, `load_match_definitions`, accessors (`has_combat`, `armour_classes`, `warheads`, `weapons`, `weapon_kind`, `armour_class`, `versus`, `unit_combat`, `building_combat`); `with_economy` removes combat definitions loaded before it; hash extended |
+| `crates/sim/src/data.rs` | `DataErrorKind::MissingEntry`; documentation of the six-level schema |
+| `crates/sim/src/command.rs` | `Command::Attack`, `Command::AttackMove`; `RejectReason::{NotArmed, OwnTarget, UnknownTarget, NotTargetable}`; player check for both, `Attack` target checks, unseen foreign units reported as `UnknownUnit` under fog; `Move`/`Stop`/`Harvest` end combat orders; `apply_move` returns the assigned destinations |
+| `crates/sim/src/economy_commands.rs` | Combat components for placed buildings; unseen foreign buildings reported as `UnknownBuilding` under fog; building index lookup |
+| `crates/sim/src/{building,unit,economy}.rs` | Combat components on every spawn path; `PlayerState::vision`, hashed |
+| `crates/sim/src/{event,schedule,hash,lib}.rs` | Events `WeaponFired`, `ProjectileExpired`, `UnitDestroyed`, `BuildingDestroyed`, `AttackEnded` and `AttackEnd`; systems in `Combat`, `Cleanup`, `Visibility`; `Projectiles` resource; hash of combat components, weapons, visions, projectiles; exports |
+| `crates/sim/tests/m4_combat.rs` (new), `tests/fixtures/data/{units_combat,economy_combat,combat}.ron` (new) | 26 tests through `SimPlugin` and `CommandQueue` (below) |
+| `crates/sim/tests/m4_definitions.rs` (new) | 12 tests of the combat file, bounded as in D15 |
+| `crates/game/src/fog.rs` (new) | Tile tint by the human player's vision, recent shots, projectile and shot drawing; 4 tests |
+| `crates/game/src/{units,buildings}.rs` | Combat file loaded (`COMBAT_PATH`); views of unseen enemies hidden (`unit_shown`, `building_shown`); new events logged; opponent's starting gun turret; 1 test |
+| `crates/game/src/selection.rs` | Right click on a visible enemy: `Attack`; `A`: `AttackMove`; 2 tests |
+| `crates/game/src/{projection,smoke,main}.rs` | `tile_cell` (1 test); smoke checks of the fog and of hidden views (1 test); `FogPlugin` |
+| `crates/game/examples/gen_building_sprites.rs`, `assets/sprites/buildings/gun_turret.png` (new) | Gun turret placeholder sprite |
+| `assets/data/combat.ron` (new), `assets/data/economy.ron` | Production combat definitions; gun turret building type |
+| `assets/LICENSES.md`, `docs/DECISIONS.md`, `docs/STATUS.md` | Provenance; decisions; this report |
+
+`Cargo.toml` files and `Cargo.lock` are unchanged (no dependency added, I9), so `sim`'s dependency tree is unchanged (I1). No existing test was removed, skipped, or changed; the M2 and M3 fixtures are unchanged.
+
+### Validation commands (PLAN.md section 9, with section 12 item 5)
+
+Run from the repository root on macOS 27.0.1 (Apple M5, Rust 1.98.1), in this order, in the foreground, after the last code change (`e19677d`'s content). A display was available.
+
+| Command | Exit | Result |
+|---------|------|--------|
+| `cargo fmt --all -- --check` | 0 | no diff |
+| `cargo clippy --workspace --all-targets -- -D warnings` | 0 | no warnings |
+| `cargo test --workspace` | 0 | 300 passed, 0 failed, 0 ignored: `game` unit 67 (M3: 58; + fog 4, selection 2, smoke 1, units 1, projection 1), `m0_spike` 6, `m1_demo_map` 3, `m1_tileset_image` 6, `m2_unit_sprites` 5, `m3_building_sprites` 3, `sim` unit 11 (M3: 6; + combat 3, visibility 2), `m0_bootstrap` 12, `m1_map` 32, `m1_map_subset` 24, `m2_definitions` 14, `m2_movement` 37 (39.5 s), `m3_definitions` 11, `m3_economy` 21, `m3_harvest` 10, `m4_combat` 26 (1.3 s), `m4_definitions` 12 (1.5 s), doc-tests 0. Peak memory footprint of the run 0.13 GB. Known M0 linker warning only. |
+| `cargo build --release -p game` | 0 | |
+| `cargo run --release -p game -- --smoke-test 600` | 0 | `3 buildings spawned`, `26 units spawned`; `smoke test: 600 frames, 198 simulation ticks, map created: true, units spawned: 26, units moved: 18 in 198 ticks after the order, buildings spawned: 3, production charged 396 credits in 198 ticks, visible cells: 389, enemy views shown: 0, view mismatches: 0` |
+| `cargo run -p game -- --smoke-test 600` | 0 | `smoke test: 600 frames, 203 simulation ticks, ..., buildings spawned: 3, production charged 406 credits in 203 ticks, visible cells: 399, enemy views shown: 0, view mismatches: 0` |
+
+The `Skipped event Destroyed` warning (M0 debt item 2) appeared in both smoke runs.
+
+Additionally:
+
+* `cargo test -p sim --release --test m4_combat` passed; the 20 against 20 battle ends at tick 665 with 6 human units left, 451 shots, and 34 units destroyed, and its final hash is `05af3b1ac550cf16` in both debug and release builds (I3, I12).
+* The release binary was run (`--smoke-test 100`, under a 60 s alarm, `/usr/bin/time -l`) against copies of `assets/` selected with `BEVY_ASSET_ROOT`. The unchanged copy exits 0. Each of these exits 1 with a typed error naming the file and field, at a peak of 0.11 GB: no `combat.ron` (`data file …/combat.ron: file: cannot read the file: No such file or directory`); `#![enable(implicit_some)]` prepended (`file: line 1, column 1: expected a value or punctuation of the supported subset, found '#'`); the gun turret's entry removed (`buildings: building "gun_turret" has no entry`); `combat.ron` a named pipe (`file: cannot read the file: not a regular file`, at once); a range of 383 (`weapons[1].range: value 383 is not supported, expected 384 to 4096 subcells`); an unknown warhead (`weapons[1].warhead: warhead "laser" is not defined`); eight nested lists (`units[1].weapons[0]: line 71, column 79: expected a string, found '['`); `gun_turret.png` removed (`data file …/economy.ron: buildings[5].sprite: sprite image …/gun_turret.png: file: cannot be read: …`).
+
+### Acceptance criteria and required tests (PLAN.md section 7, M4)
+
+| Criterion | Evidence |
+|-----------|----------|
+| Scope: weapons, warheads, armour classes | Combat file (D28); `m4_definitions` (12 tests: every field, unknown and duplicate fields, wrong kinds, schema versions, every numeric field at its minimum and maximum and beyond including `i64` extremes and the projectile speed's 0 / 1 / 127 / 128 / 4096 / 4097, list bounds, references, missing entries, duplicates, names, missing / oversized / named-pipe / directory files, truncations, 2,000 seeded mutations); production data: `units::tests::the_production_data_loads_with_the_combat_file` |
+| Scope: instant and travelling projectiles | `a_projectile_hits_after_its_flight_time` (fired in tick 1, 6 ticks of flight, damage exactly in tick 7), the damage test (instant hits at once, projectiles after `ceil(gap / speed)`), `the_longest_range_with_the_slowest_projectile_flies_32_ticks` |
+| Scope: automatic target acquisition | Idle units and buildings fire at visible enemies in range (the damage, range, and projectile tests rely on it); `a_unit_on_a_plain_move_does_not_fire_and_an_attack_move_fights_on_the_way`; `a_turret_fires_beyond_its_own_sight_only_at_enemies_its_owner_sees` |
+| Scope: `Attack` and `AttackMove` | `an_attack_order_closes_in_fires_and_ends_when_the_target_is_gone` (moves into range, fires from within range, `AttackEnded { TargetGone }`, stays), `an_attack_order_ends_when_the_target_leaves_sight` (`TargetHidden`), `an_attack_order_on_a_target_out_of_reach_ends_at_once` (`OutOfReach`), the attack move (stops, fires 3 times, kills, then arrives), `unarmed_units_follow_an_attack_move_as_a_move`; interface: `selection::tests::a_right_click_on_a_visible_enemy_orders_the_armed_units_to_attack_it`, `the_attack_move_key_orders_the_whole_selection` |
+| Scope: death and cleanup | `remove_dead`; every tick of every M4 test asserts that no entity with hit points ≤ 0 survives the tick and that the grid's occupants and buildings match the entities exactly |
+| Scope: building destruction that frees cells | `a_destroyed_building_frees_its_cells`, `a_destroyed_building_reports_the_free_units_lost_with_it` |
+| Scope: defensive structures | Gun turret (production), turret (fixture); `defensive_structures_hold_fire_under_low_power` (fires; stops when the plant is sold; fires again after a new plant is placed through commands) |
+| Scope: shroud and fog | `Vision` (visible and explored); `enemies_are_visible_exactly_within_sight_and_explored_cells_stay_explored`; game: `fog::tests::cells_are_tinted_by_what_the_human_player_sees`; on screen **requires user verification** |
+| Scope: hiding of unseen enemies in rendering and in command validation | Rendering: `fog::tests::enemies_are_shown_exactly_while_the_human_player_sees_them`, and the smoke check (0 mismatches between views and vision in both smoke runs); on screen **requires user verification**. Validation: `attacks_on_own_dead_and_unseen_units_are_rejected_without_changing_state`, `commands_that_name_an_unseen_enemy_report_it_as_unknown` |
+| Test: the damage equation for every armour and warhead pair in the fixtures, including the minimum of 1 and the zero case | `the_damage_equation_holds_for_every_warhead_and_armour_pair_of_the_fixtures`: 3 weapons (all 3 warheads) × 3 targets (all 3 armour classes), each first shot through the production path compared with equation 2 written out independently in the test; it asserts that the cases include the zero case (bullet vs concrete, 0 %), the minimum of 1 (20 × 1 % = 0.2 → 1), rounding down (25 × 30 % = 7.5 → 7), and exact products. Unit test `applied_damage_follows_equation_2_at_the_limits` (maximum damage and percentage, values beyond the format) |
+| Test: range at exactly `range` and at `range + 1` subcell | `a_target_is_in_range_at_exactly_the_range_and_not_one_subcell_beyond`: a crawler (speed 1) walks toward an idle rifleman (range 768) one subcell per tick; the first shot comes in exactly the tick in which the distance falls from 769 to 768. `a_building_is_in_range_when_its_nearest_edge_is` (640 in range, 896 not), `the_longest_range_...` (4,096 fires, 17 cells does not), unit test `in_range_includes_exactly_the_range` |
+| Test: a target that dies while a projectile is in flight | `a_target_that_dies_while_a_projectile_is_in_flight_makes_it_expire`: three riflemen kill the crawler in the tick in which the tank fires; six ticks later the shell expires with `ProjectileExpired`, no damage, no panic, no projectile left |
+| Test: attacks on own units, dead units, and unseen units are rejected | `attacks_on_own_dead_and_unseen_units_are_rejected_without_changing_state`: own unit, own building, the attacker itself (`OwnTarget`); a dead unit, an unseen unit and building, a never existing id, any target before the first tick (`UnknownTarget`); unarmed attacker (`NotArmed`), foreign attacker (`NotOwned`), no units, unknown player, attack-move outside the map (including `i32` extremes); the state hash equals a control run after every rejection; the unseen unit is accepted once seen |
+| Test: a destroyed unit or building releases its cells | `a_destroyed_unit_releases_both_cells_of_its_step` (killed between two cells, both freed, re-entered), `a_destroyed_building_frees_its_cells` (footprint uncovered and passable, power recomputed, a unit walks onto it) |
+| Test: sight radius boundary | `a_unit_sees_exactly_the_cells_within_its_sight_radius` (the visible set equals equation 6 written out independently, in the open and in two corners; the cells at sight and sight + 1 along both axes, 3-4-5 on the diagonal), `a_building_sees_from_the_nearest_cell_of_its_footprint`, `a_destroyed_unit_stops_seeing_in_the_tick_it_dies`, unit test `reveal_follows_equation_6_and_stays_inside_the_map` (sight 0 and 16, `i32` extremes) |
+| Test: determinism of a 20 against 20 battle | `twenty_against_twenty_fight_to_a_conclusion_under_fog_with_a_stable_hash`: identical hash at every tick of two runs, same end; debug and release give the same final hash |
+| Acceptance: two armies fight to a conclusion under fog with no panic and a stable hash across runs | The battle test: two armies of 20 that start out of each other's sight, ordered only through `CommandQueue` toward the enemies they see (else the far side), fight until the enemy army is destroyed at tick 665, without a rejected command, with I6 checked on every tick and the same hash at every tick across runs. In the game, the same is possible with the interim controls; on screen **requires user verification** |
+| Section 8: negative, boundary, integration, end to end | Negative: every rejection with no state change, malformed combat files; boundary: equation 1 at the range, sight at the radius, range 384 and 4,096, projectile speed 128, reload 1, sight 0 and 16, percentages 0 and 1,000, map corners; integration: all `m4_combat` tests; end to end: both smoke runs (fog computed, hiding consistent) |
+| Invariants | I1/I9: no dependency added. I2: no float in `sim`. I3: hash of all new state, determinism tests. I4: `BTreeMap`/`BTreeSet` and `SimId` order everywhere; revealing is a union. I5: the game pushes commands only. I6: checked every tick, including units killed between two cells and destroyed buildings. I7: credits never negative (checked every tick). I8/I11: the combat file passes the RON subset before `ron`; the turret sprite passes the PNG subset. I12: D29 item 11, D30 (saturating vision arithmetic) |
+
+### Assumptions verified and how
+
+| Item | Verification |
+|------|--------------|
+| `bevy_ecs_tilemap` 0.19.0 tints a tile by `TileColor` and re-extracts it on change; `bevy_ecs_tiled` gives every tile a white `TileColor` and the `TiledTile` marker | Source (DECISIONS A1 follow-up of M4); the game compiles and both smoke runs create the map |
+| `Sprite` requires `Visibility`; `Visibility::Hidden` hides an entity | Source; the smoke test reads back every view's `Visibility` and finds it consistent with the vision |
+| `Without` filters make two queries writing the same component disjoint for Bevy's ambiguity check | The PostUpdate conflict test failed with the unit and building view systems unordered and passes with the filters |
+| `u64::isqrt` is stable in Rust 1.98.1 | Toolchain documentation (1.84.0); compiled and tested |
+| Cleanup's despawns are applied before the `Visibility` stage of the same tick | `a_destroyed_unit_stops_seeing_in_the_tick_it_dies` |
+| No new crate | `Cargo.lock` and the manifests unchanged |
+
+### Deviations from PLAN.md
+
+1. The combat terms of units and buildings, armour classes, warheads, and weapons are in a new data file, `assets/data/combat.ron` (schema 1), not in the units or economy file, which keep schema 1 (D28 item 1, as D23 item 1 in M3).
+2. Additional events (`WeaponFired`, `ProjectileExpired`, `UnitDestroyed`, `BuildingDestroyed`, `AttackEnded`) and rejection reasons (`NotArmed`, `OwnTarget`, `UnknownTarget`, `NotTargetable`); an unseen foreign unit or building named by a command is `UnknownUnit` / `UnknownBuilding` under fog (D30 item 4).
+3. `Attack` and `AttackMove` require the issuing player to be a player of the match (`UnknownPlayer`); `Move`, `Stop`, and `Harvest` keep the M2 rule (D30 item 4).
+4. Commands that name cells are not restricted to visible cells (D30 item 4). PLAN.md section 5 says every command is validated for visibility; the restriction applies to the units and buildings commands name.
+5. Fog of war is active when the definitions include a combat file; without one (the M2 and M3 fixtures) nothing has sight and the M2 and M3 command validation is unchanged (D30 item 4).
+6. Projectiles are guided (they always hit their target if it still exists) and kept in a `Projectiles` resource rather than as entities (D29 item 3).
+7. Engagement of attack-moving and idle units uses the weapon's range; units do not chase targets they were not ordered to attack (D29 items 5 and 7).
+8. Interim controls (right click on an enemy, `A`) until M5's hotkeys (D31 item 4); the opponent's starting gun turret is match setup in game code until M6 (D31 item 5). Because the gun turret is the sixth building type, the production menu's unit keys moved by one: `7` light tank, `8` scout, `9` harvester (M3's user verification item 7 named `6`, `7`, `8`).
+9. Files not listed in PLAN.md section 4: `crates/sim/src/{combat,combat_defs,visibility}.rs`, `crates/game/src/fog.rs`, the M4 test files and fixtures. `m4_definitions.rs` contains `unsafe` code (the counting allocator of D15).
+
+### Known debt (P2 proposals for the reviewer)
+
+1. Cost per tick: target acquisition compares every armed entity with every target (O(A × T)), a chase runs a Dijkstra over the map, and every vision is recomputed in full (at most 33 × 33 cells per source). To be measured against the M7 benchmark of 200 units. `m2_movement` took 39.5 s against 36.8 s in the M3 report (the new stages run every tick, with nothing to do there).
+2. The projectile bound of D28 item 5 (32 per weapon) allows about 200 MB in the pathological case of a map filled with armed entities of reload 1 and the slowest projectiles; no real match comes near it.
+3. Attack-moving and idle units do not chase enemies beyond their weapon range, and do not return fire against an attacker that outranges them (for example, a gun turret); an explicit `Attack` order chases.
+4. An `Attack` order on a target its warhead cannot damage (0 %) lasts as long as the target is alive and visible.
+5. An attack-moving unit that fights at its destination writes a second `MoveCompleted` when it resumes its (zero-length) move.
+6. `combat` treats a weapon or percentage missing from the definitions as no damage, and a projectile whose weapon is missing as expired. Both are unreachable: the definitions are validated complete and do not change during a match (they can only be replaced by setup).
+7. `Definitions::with_economy` removes combat definitions loaded before it (documented on both functions and tested); the game loads them in the right order.
+8. Health bars are M5's; until then damage is not visible on screen, only destroyed units and buildings disappearing. Instant shots are drawn from `WeaponFired` events read with a `MessageReader`, so M2 debt item 2 (two-tick window) also applies to them.
+9. The smoke test does not exercise combat in the real binary (the starting armies are 40 cells apart); combat in the game is part of the user verification below. No automated screenshot exists (M2 debt item 6).
+10. M3 review 1 P2-1 (a building's pending free units are lost on sale without an event) is unchanged for selling; destruction now reports them (`BuildingDestroyed::lost_units`).
+11. Carried, unchanged by M4: every item under "Recorded debt to carry (verbatim from review 1)" of the M3 review decision above, with M3 review 1 P2-1 narrowed as in item 10. M1 round 2 item 6 (register every asset in `CheckedAssets`) was followed for the gun turret sprite; the `Skipped event Destroyed` warning of M0 item 2 appeared again in this round's smoke runs.
+
+### Requires user verification
+
+Not review findings (PLAN.md section 12 item 2); they block only `m4-approved`. Run `cargo run --release -p game`. The player's units start around (10, 28) and (14, 34), left of the rock ridge; the opponent's units around (50, 30) and (52, 36), its construction yard at (52..54, 42..44), and its gun turret at (50, 41).
+
+1. **Shroud:** at the start only the area around the player's units and construction yard shows the map; everything else is black.
+2. **Fog:** cells the player's units have seen and no longer see are drawn dark but recognisable; cells they see now are drawn normally. Moving units uncover the map as they go.
+3. **Hidden enemies:** the opponent's units, yard, and turret are not drawn until one of the player's units comes close (light tanks see 6 cells, scouts 8); they disappear again when no unit of the player sees them.
+4. **Attack:** select some light tanks and scouts, move them toward the opponent, and right click on a visible enemy unit or building: the units move until it is in range, then fire. Light tank shells are drawn as small yellow dots flying to the target; scout shots as short pale lines. A unit or building whose hit points run out disappears, and units can then walk over a destroyed building's cells.
+5. **Attack-move:** with units selected, press `A` over a cell: they move there and stop to fight enemies that come into range on the way, then continue.
+6. **Automatic fire:** idle units fire at visible enemies within range without an order; units on a plain move (right click on ground) do not fire.
+7. **Gun turret:** the opponent's turret fires at the player's units that come within six cells; the player can build a turret with `6` (after a power plant), place it with `B`, and it fires at enemies within its range while the player has power (under low power, shown as `(low)` in the title, it does not fire).
+8. **Menu keys:** the unit production keys are now `7` light tank, `8` scout, `9` harvester (M3's item 7 named `6`, `7`, `8`).
+
+The ten M3 items, the seven M2 items, and the five M1 items listed in docs/STATUS.md remain pending.
