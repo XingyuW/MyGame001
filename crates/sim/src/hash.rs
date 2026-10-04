@@ -1,6 +1,7 @@
 use bevy_ecs::world::World;
 
 use crate::id::{SimId, SimIdAllocator};
+use crate::map::Grid;
 use crate::rng::SimRng;
 use crate::schedule::SimTick;
 
@@ -51,8 +52,8 @@ impl Default for Fnv1a64 {
 /// Hash of the complete simulation state (invariant I3).
 ///
 /// Covers, in this order: the tick counter, the [`SimRng`] state, the next [`SimId`] to be
-/// allocated, the number of entities with a [`SimId`], and every such entity in ascending
-/// [`SimId`] order. Components added by later milestones are appended per entity.
+/// allocated, the number of entities with a [`SimId`], every such entity in ascending [`SimId`]
+/// order, and the [`Grid`]. Components added by later milestones are appended per entity.
 ///
 /// # Panics
 ///
@@ -70,6 +71,7 @@ pub fn state_hash(world: &mut World) -> u64 {
     for id in ids {
         hasher.write_u32(id.0);
     }
+    world.resource::<Grid>().hash_into(&mut hasher);
 
     hasher.finish()
 }

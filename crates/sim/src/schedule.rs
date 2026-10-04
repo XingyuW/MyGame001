@@ -7,6 +7,7 @@ use bevy_ecs::system::ResMut;
 
 use crate::command::{CommandQueue, process_commands};
 use crate::id::SimIdAllocator;
+use crate::map::Grid;
 use crate::rng::SimRng;
 
 /// Simulation rate. One run of [`SimSchedule`] advances the simulation by one tick (50 ms).
@@ -101,6 +102,7 @@ impl Plugin for SimPlugin {
             .insert_resource(CommandQueue::default())
             .insert_resource(SimIdAllocator::default())
             .insert_resource(SimRng::new(self.seed))
+            .insert_resource(Grid::default())
             .add_schedule(schedule);
     }
 }
