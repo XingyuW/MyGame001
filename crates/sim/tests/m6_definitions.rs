@@ -567,7 +567,7 @@ fn skirmish_values_outside_their_ranges_are_rejected() {
 
 #[test]
 fn skirmish_references_and_ids_are_checked() {
-    let cases: [(&str, &str, &str, DataErrorKind); 5] = [
+    let cases: [(&str, &str, &str, DataErrorKind); 6] = [
         (
             "(building: \"yard\", x: 0, y: 0)],",
             "(building: \"castle\", x: 0, y: 0)],",
@@ -592,13 +592,24 @@ fn skirmish_references_and_ids_are_checked() {
             "maps[1].id",
             DataErrorKind::DuplicateId("skirmish_40x40".into()),
         ),
+        // Schema version 2 since M7 (faction rosters, docs/DECISIONS.md D48): a file of version
+        // 1 (M6, without rosters) and of any later version is rejected as such.
         (
-            "schema_version: 1,",
             "schema_version: 2,",
+            "schema_version: 3,",
             "schema_version",
             DataErrorKind::UnsupportedSchemaVersion {
-                found: 2,
-                expected: 1,
+                found: 3,
+                expected: 2,
+            },
+        ),
+        (
+            "schema_version: 2,",
+            "schema_version: 1,",
+            "schema_version",
+            DataErrorKind::UnsupportedSchemaVersion {
+                found: 1,
+                expected: 2,
             },
         ),
     ];

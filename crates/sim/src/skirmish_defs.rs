@@ -2,15 +2,17 @@
 //! buildings and units, and the maps with their start positions (PLAN.md section 7, M6;
 //! docs/DECISIONS.md D40).
 //!
-//! Skirmish file, schema version 1:
+//! Skirmish file, schema version 2 (version 1, M6, had no rosters):
 //!
 //! ```ron
 //! (
-//!     schema_version: 1,
+//!     schema_version: 2,
 //!     starting_credits: 5000,
 //!     factions: [
 //!         (
 //!             id: "vanguard",
+//!             roster_buildings: ["power_plant", "refinery", "barracks"],
+//!             roster_units: ["light_tank", "harvester"],
 //!             buildings: [(building: "construction_yard", x: 0, y: 0)],
 //!             units: [(unit: "light_tank", x: 4, y: 1, count: 4)],
 //!         ),
@@ -26,12 +28,19 @@
 //! start plus its offset, and a group of units stands on the free cells nearest to the start plus
 //! its offset. Every map has exactly [`MATCH_PLAYERS`] start positions.
 //!
+//! A faction's roster (M7, PLAN.md section 7: "the second faction, the full roster"; docs/
+//! DECISIONS.md D48) lists the building and unit types a player of the faction may produce:
+//! `QueueProduction` of anything else is rejected (`RejectReason::NotInRoster`). Every entry is a
+//! defined type with production terms, listed once. Starting buildings and units and the free units
+//! of a placed building (a refinery's harvester) need not be in the roster.
+//!
 //! The file names its maps but does not read them, so the checks against a map are separate: every
 //! loader of a map checks the map's start positions against its grid with [`check_map_starts`]
 //! (each start is a cell of the map with passable terrain; M6 review 1 P1-1), and
 //! `crate::match_setup` checks them again, together with whether a faction's buildings and units
 //! fit at a start, with a typed error.
 
+use std::collections::BTreeSet;
 use std::fmt;
 use std::path::{Path, PathBuf};
 
@@ -39,11 +48,13 @@ use serde::Deserialize;
 
 use crate::data::{self, DataError, DataErrorKind, MAX_DATA_FILE_BYTES, Shape};
 use crate::definitions::{Definitions, UnitKind, check_name};
-use crate::economy_defs::{BuildingKind, MAX_COST, Problem, invalid, ranged, unknown};
+use crate::economy_defs::{
+    BuildingKind, MAX_COST, Problem, ProductionItem, invalid, ranged, unknown,
+};
 use crate::map::{CellPos, Grid, MAX_MAP_SIDE};
 
-/// The schema version of the skirmish file this crate reads.
-pub const SKIRMISH_SCHEMA_VERSION: i64 = 1;
+/// The schema version of the skirmish file this crate reads (2 since M7: faction rosters).
+pub const SKIRMISH_SCHEMA_VERSION: i64 = 2;
 
 /// Players of a skirmish match, and start positions of every map.
 pub const MATCH_PLAYERS: usize = 2;
@@ -62,6 +73,9 @@ pub const MAX_STARTING_GROUPS: usize = 16;
 
 /// Largest number of units in one group of starting units.
 pub const MAX_GROUP_UNITS: u32 = 64;
+
+/// Largest number of building types and of unit types in a faction's roster.
+pub const MAX_ROSTER_ENTRIES: usize = 64;
 
 /// Largest offset of a starting building or group from the start position, along each axis.
 pub const MAX_START_OFFSET: i32 = 32;
@@ -86,13 +100,23 @@ pub struct StartingGroup {
     pub count: u32,
 }
 
-/// A faction: what a player who plays it starts with.
+/// A faction: what a player who plays it starts with, and what it may produce.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FactionDef {
     pub id: String,
+    /// The building and unit types a player of the faction may produce (each with production
+    /// terms).
+    pub roster: BTreeSet<ProductionItem>,
     /// At least one building, so that a player does not start defeated.
     pub buildings: Vec<StartingBuilding>,
     pub units: Vec<StartingGroup>,
+}
+
+impl FactionDef {
+    /// Whether a player of the faction may produce `item`.
+    pub fn offers(&self, item: ProductionItem) -> bool {
+        self.roster.contains(&item)
+    }
 }
 
 /// A map of the skirmish: its id and its start positions.
@@ -207,6 +231,20 @@ static GROUP_SHAPE: Shape = Shape::Struct(&[
 static FACTION_SHAPE: Shape = Shape::Struct(&[
     ("id", Shape::Str),
     (
+        "roster_buildings",
+        Shape::List {
+            entry: &Shape::Str,
+            max: MAX_ROSTER_ENTRIES,
+        },
+    ),
+    (
+        "roster_units",
+        Shape::List {
+            entry: &Shape::Str,
+            max: MAX_ROSTER_ENTRIES,
+        },
+    ),
+    (
         "buildings",
         Shape::List {
             entry: &BUILDING_SHAPE,
@@ -272,6 +310,8 @@ struct SkirmishFile {
 #[serde(deny_unknown_fields)]
 struct FactionEntry {
     id: String,
+    roster_buildings: Vec<String>,
+    roster_units: Vec<String>,
     buildings: Vec<BuildingEntry>,
     units: Vec<GroupEntry>,
 }
@@ -348,6 +388,52 @@ fn offset(field: &str, x: i64, y: i64) -> Result<(i32, i32), Problem> {
     ))
 }
 
+/// The roster of the faction at `field`: every entry names a defined type with production terms,
+/// once.
+fn roster(
+    definitions: &Definitions,
+    field: &str,
+    buildings: &[String],
+    units: &[String],
+) -> Result<BTreeSet<ProductionItem>, Problem> {
+    let mut roster = BTreeSet::new();
+    for (position, id) in buildings.iter().enumerate() {
+        let at = format!("{field}.roster_buildings[{position}]");
+        let kind = definitions
+            .building_kind(id)
+            .ok_or_else(|| unknown(at.clone(), "building", id))?;
+        let item = ProductionItem::Building(kind);
+        if definitions.production(item).is_none() {
+            return Err(invalid(
+                at,
+                format!("{id:?}"),
+                "a building type with production terms",
+            ));
+        }
+        if !roster.insert(item) {
+            return Err((at, DataErrorKind::DuplicateId(id.clone())));
+        }
+    }
+    for (position, id) in units.iter().enumerate() {
+        let at = format!("{field}.roster_units[{position}]");
+        let kind = definitions
+            .unit_kind(id)
+            .ok_or_else(|| unknown(at.clone(), "unit", id))?;
+        let item = ProductionItem::Unit(kind);
+        if definitions.production(item).is_none() {
+            return Err(invalid(
+                at,
+                format!("{id:?}"),
+                "a unit type with production terms",
+            ));
+        }
+        if !roster.insert(item) {
+            return Err((at, DataErrorKind::DuplicateId(id.clone())));
+        }
+    }
+    Ok(roster)
+}
+
 fn validate(file: SkirmishFile, definitions: &Definitions) -> Result<SkirmishDefinitions, Problem> {
     if file.schema_version != SKIRMISH_SCHEMA_VERSION {
         return Err((
@@ -379,6 +465,12 @@ fn validate(file: SkirmishFile, definitions: &Definitions) -> Result<SkirmishDef
         if factions.iter().any(|faction| faction.id == entry.id) {
             return Err((format!("{field}.id"), DataErrorKind::DuplicateId(entry.id)));
         }
+        let roster = roster(
+            definitions,
+            &field,
+            &entry.roster_buildings,
+            &entry.roster_units,
+        )?;
         if entry.buildings.is_empty() {
             // A player without buildings is defeated at once (docs/DECISIONS.md D41).
             return Err(invalid(
@@ -418,6 +510,7 @@ fn validate(file: SkirmishFile, definitions: &Definitions) -> Result<SkirmishDef
         }
         factions.push(FactionDef {
             id: entry.id,
+            roster,
             buildings,
             units,
         });

@@ -6,7 +6,9 @@
 //! command is checked in this order, and the first failure is the reason:
 //!
 //! * all: the issuing player is a player of the match (`UnknownPlayer`);
-//! * `QueueProduction`: the item is defined and producible (`UnknownItem`), the player owns a
+//! * `QueueProduction`: the item is defined and producible (`UnknownItem`), the roster of the
+//!   player's faction offers it (`NotInRoster`, M7; a player without a faction may produce every
+//!   item), the player owns a
 //!   building of each prerequisite type (`MissingPrerequisite`, in the order the economy file
 //!   lists them) and of the producing type (`NoProducer`), and the queue is not full
 //!   (`QueueFull`);
@@ -214,6 +216,9 @@ pub(crate) fn apply(
             let terms = definitions
                 .production(item)
                 .ok_or(RejectReason::UnknownItem(item))?;
+            if !state.offers(item) {
+                return Err(RejectReason::NotInRoster(item));
+            }
             if let Some(&prerequisite) = terms
                 .prerequisites
                 .iter()
