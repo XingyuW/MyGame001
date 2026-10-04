@@ -592,7 +592,7 @@ Implementer session for remediation round 1 of M2 review 1 (`docs/reviews/M2-rev
 
 ### Classes of defect
 
-1. **A liveness guarantee measured by activity instead of progress (P1-1, with P2-2).** The guarantee "every order ends" was enforced by a counter that any movement reset, so units that kept moving without getting closer (taking turns stepping aside in a dead end one cell wide) defeated it. The counter also ran while a unit was only waiting for the pathfinder, so it reported `Blocked` for units that no unit blocked (P2-2). Every way an order can stay alive was enumerated: stepping along a path (now only counts if the path leads to the destination), stepping aside (never counts), taking a new path (counted, at most 64 without real progress), retargeting (does not reset the measure), terrain change (resets it, finitely often), and waiting for the pathfinder (not counted, bounded by the queue). D21 item 1 gives the resulting bound.
+1. **A liveness guarantee measured by activity instead of progress (P1-1, with P2-2).** The guarantee "every order ends" was enforced by a counter that any movement reset, so units that kept moving without getting closer (taking turns stepping aside in a dead end one cell wide) defeated it. The counter also ran while a unit was only waiting for the pathfinder, so it reported `Blocked` for units that no unit blocked (P2-2). Every way an order can stay alive was enumerated: stepping along a path (now only counts if the path leads to the destination), stepping aside (never counts), taking a new path (counted, at most 64 without real progress), retargeting (does not reset the measure), terrain change (resets it, finitely often), and waiting for the pathfinder (not counted, bounded by the queue). D21 item 1 gives the resulting bound. (Corrected in M2 remediation round 2: the enumeration missed the time a unit spends inside its own step and waiting behind units that are moving on, both of which grow with 1/speed and were counted as stalled. See M2 review 2 P0-1 and DECISIONS D22.)
 2. **A silent shortfall from a best-effort helper (P1-2).** `destination_cells` returns *up to* `count` cells; match setup used the result without checking it, and the smoke test checked only for more than zero units. The other caller, `apply_move`, already reports each unit without a cell (`MoveFailed { NoDestination }`). Match setup now fails with a typed error, and the smoke test requires the configured total. The game's other silent `continue`s were reviewed: `spawn_unit_views` skips a unit whose type has no sprite sheet, which cannot happen because `load_units` returns a checked sheet for every definition (left unchanged); the rest are documented behaviour (a right click outside the map orders nothing; a view whose unit no longer exists is removed).
 3. **Unordered systems sharing state within a frame (P2-3).** The test added for it checks the whole class for the game's `PostUpdate`: Bevy's recorded list of conflicting, unordered system pairs, which held exactly the reported pair. The game's `Update` and `Last` schedules contain only writer-writer pairs on independent data (two systems that write `AppExit` messages, which Bevy reduces to the first error regardless of order; and the smoke test's `order_move` and `watch_events`, which write different fields of `SmokeTest`), so no reader can see a stale value there.
 
@@ -673,3 +673,200 @@ None new. The M2 deviations above still apply; deviation 3's list of events now 
 ### Requires user verification
 
 Unchanged: the seven M2 items in the M2 implementation report above and the M1 items, as listed in review 1's "Requires user verification". These are not findings and block only `m2-approved` (and `m1-approved`).
+
+## M2 remediation round 2 report (2026-10-04)
+
+This is the implementer session for remediation round 2 of M2 review 2 (`docs/reviews/M2-review-2.md`, NO-GO: 1 P0, 0 P1, 0 P2).
+
+* **Branch and base:** `milestone/m2`, base `4fa123b`.
+* **Notes:** none accompanied the findings. The finding and the review's debt notes were treated as claims and reconciled against the code.
+* **Probes:** reproductions and measurements used a probe crate outside the repository (`…/scratchpad/m2-remediation-2/probe`), with unit types of speeds 1, 2, 3, 7, 24, 32, 100, 127, and 128. It was built once against the fixed `sim` and once against a `git archive` of the reviewed commit `4fa123b` (`probe_base`). Every probe ran under a `perl alarm` timeout. The largest measured peak resident size was 0.02 GB (the 1,024-unit crowd).
+* **"Fails before" evidence:** the new test file and fixture were copied into that archive and run there.
+* **Decisions:** DECISIONS D22, with amendments to D19 items 6 and 9 and D21 item 1. The milestone table above is maintained by the orchestrator.
+
+### Class of defect
+
+**Tick limits applied to waits whose length depends on unit speed.**
+
+The units file admits speeds 1 to 128 subcells per tick, so a step lasts from 2 to 362 ticks. The rules that end a move order measured elapsed ticks. Some of those ticks grow with 1/speed:
+
+* the unit's own steps;
+* waits behind a unit in a step, or behind a queue led by one;
+* the paths a waiting unit asks for every 8 ticks.
+
+So the same situation ended or continued depending on speed. Every rule that ends an order, or counts toward its end, was checked against the whole speed range. D22 item 1 lists them:
+
+* three were defective and are fixed;
+* the others were checked and are unaffected: the repath interval, the path request budget, the movement arithmetic at nine speeds, and the smoke test's movement check.
+
+The round 1 report's claim that "every way an order can stay alive was enumerated" is corrected in place.
+
+### Findings
+
+#### P0-1: a unit of speed 1 fails every move longer than one cell with `Blocked` (regression of round 1)
+
+**Outcome: confirmed. The class is fixed.**
+
+**Evidence:**
+
+* **Lone unit.** `probe_base lone` (one unit alone on the open 16×16 map; nine speeds × 12 orders) gives 10 of 108 orders wrong, all at speed 1. Examples:
+  * (1, 1) → (3, 1): `MoveFailed { Blocked }` at tick 256, where completion at tick 512 is expected.
+  * (1, 1) → (4, 4): `Blocked` at tick 362, where 1,086 is expected.
+
+  This is exactly the review's table.
+* **Cause.** `movement.rs` counted every tick without a step start as stalled, including the 256 or 362 ticks of the unit's own step. At its next centre, with `stalled_ticks` ≥ 200, the order ended.
+* **Further members of the class, reproduced on the reviewed code:**
+  * Followers in a one-cell corridor:
+    * behind a leader of speed 1, all six of a convoy of six end as `Blocked`;
+    * followers of speed 3 behind any leader: 2 of 6 end as `Blocked`.
+  * A follower on the open diagonal behind a speed-1 leader: 6 of 12 scenarios have `Blocked`.
+  * 50-unit groups at speeds 1 to 7: 7 to 50 `Blocked` per group.
+  * Mixed groups of speeds 1 and 128: 41 and 43 `Blocked`.
+* **Third member.** With the stalled-tick rule fixed alone (an intermediate build), the three rearmost units of a speed-1 convoy still ended as `Blocked`, with `paths_since_progress` 64 and `best` still `u32::MAX`. They had asked for a path every 8 ticks for 512 ticks before they could take their first step.
+
+**Change** (D22, in `crates/sim/src/{movement,pathfinding,unit,event}.rs`):
+
+1. A stalled tick is now only a tick in which the unit waits at a cell centre for cells held by units that are not moving on.
+   * "Moving on" means:
+     * the unit is in a step; or
+     * it waits for a cell that is free, or held by a unit that is moving on in turn (the chain of next cells is followed to the head of the queue).
+   * These are not moving on:
+     * a wait-for cycle;
+     * a chain that ends at an idle unit or at an impassable cell.
+   * These are not stalled ticks:
+     * the unit's own steps;
+     * waits for the pathfinder;
+     * waits behind moving units.
+2. A path request made during such a wait is marked `queued`. A path served for it that only confirms the current way does not count toward `MAX_PATHS_WITHOUT_PROGRESS`.
+
+Movement itself is unchanged. Only the decisions that end an order differ. Every probe scenario whose units all have speeds of 24 or more gives the reviewed code's arrival times.
+
+**After the fix (release):**
+
+* Lone units: 0 of 108 wrong. Arrival is exactly at `ceil(length / speed)` at all nine speeds.
+* Convoys, diagonal follow, head-on passages, and single-speed and mixed groups (124 scenarios): 0 `Blocked`.
+* The reviewer's random-map generator:
+  * seeds 0–999: 0 unsettled; slowest settle 1,033 → 996 ticks; `Blocked` 398 → 116;
+  * seeds 0–199, with six speed mixes from 1 to 128 and a 400,000-tick limit: every order ends.
+* The D21 livelocks: they end at speed 32 at 778–816 ticks (previously 778–792) and at speed 1 at 17,146–17,928 ticks (previously both orders failed after the first step).
+* The real binaries (debug and release, `--smoke-test 1300`):
+  * on the reviewer's speed-1 asset root: no `unit N stopped` line (the review saw 18), exit 0;
+  * on the speed-128 root: also no such line, exit 0.
+* Per-tick hash digests of the probe's random-order scenario are identical in debug and release (`f3748c5ee280f84c`).
+
+**Regression tests.** All are in `crates/sim/tests/m2_movement.rs` and use the new fixture `tests/fixtures/data/units_boundary_speeds.ron` (`crawler`, speed 1; `sprinter`, speed `MAX_UNIT_SPEED` = 128). All pass after the fix:
+
+* `a_unit_of_either_boundary_speed_crosses_an_open_map_and_arrives_on_time`: 9 orders × 2 speeds, orthogonal, diagonal, and mixed.
+  * The unit completes with `retargeted: false` exactly at `ceil(length / speed)`, with `stalled_ticks` 0 on every tick.
+  * Along the straight path it moves exactly `speed` subcells per tick.
+  * **Before the fix:** it fails, `stalled_ticks` 1 at tick 2 for the crawler; the probe shows the `Blocked` at tick 256.
+* `units_queued_behind_a_unit_of_the_slowest_speed_follow_it_to_their_destinations`:
+  * The scenarios:
+    * a corridor convoy of six, led by a crawler, with crawler followers;
+    * the same convoy with sprinter followers;
+    * a sprinter behind a crawler on the open diagonal.
+  * Every unit completes at its own cell. `stalled_ticks` stays 0 and `paths_since_progress` stays ≤ 1 on every tick.
+  * **Before the fix:** it fails at tick 1 (`stalled_ticks` 1 for the first follower). With the stalled-tick rule fixed alone, the probe's same convoy ended three units as `Blocked` with 64 paths, which both the test's path assertion and its end-event check reject.
+* `orders_end_at_both_boundary_speeds_when_units_keep_giving_way`: the sealed room and the three dead ends at speeds 1 and 128.
+  * Every order ends, and in the sealed room exactly one ends as `Blocked`.
+  * **Before the fix:** it fails, because both crawlers end as `Blocked` at ticks 228 and 256.
+* `fifty_units_of_the_boundary_speeds_reach_a_clicked_destination`: the acceptance scenario with crawlers and sprinters taking turns, on the arena and the wall map. Every unit arrives (13,559 and 14,695 ticks), with 44 and 43 units at their assigned cells.
+  * **Before the fix:** it fails, `unexpected MoveFailed { unit: SimId(7), reason: Blocked }`.
+* `the_boundary_speed_fixture_holds_the_slowest_and_fastest_speeds`: pins the fixture to speeds 1 and `MAX_UNIT_SPEED`. It passes before and after.
+
+Against the reviewed code, the four behavioural tests fail and the other 33 `m2_movement` tests pass.
+
+#### Review 2 debt notes
+
+* **"A unit following a slower unit through a one-cell corridor waits behind an advancing unit, and that wait counts as stalled"** (part of round 1 debt item 1). **Outcome: confirmed and resolved** by the same change: waits behind units that are moving on are no longer stalled ticks. The convoy test above covers it.
+* **"Orders that cannot get closer end after about 800 ticks"** (round 1 debt item 2). **Outcome: confirmed for speed 32** (778–816 ticks). At other speeds the number of turns is the same and the time scales with the step time (see Known debt).
+* **The review's other carried debt items.** Outside this finding; carried unchanged (Known debt below).
+
+### Tests changed (none removed, skipped, or weakened)
+
+* `m2_movement.rs` gains 5 tests and their helpers (`boundary_scenario`, `termination_limit`, `run_until_each_completes`) and one new fixture file.
+* The only changed existing line is the `use sim::{…}` list, which adds `MAX_UNIT_SPEED`.
+* No assertion of an existing test changed. The existing 32 tests pass with the same reported numbers:
+  * the acceptance scenario: 540, 558, 651, and 945 ticks; 45, 39, 43, and 39 units at their assigned cells;
+  * the termination tests pass within `TERMINATION_LIMIT`.
+* The existing fixture `tests/fixtures/data/units.ron` is unchanged, so `m2_definitions` is unaffected.
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `crates/sim/src/movement.rs` | Stalled ticks count only waits for units that are not moving on (`Activity`, `moving_on`, `AtCentre::Blocked`); `queued` requests; module and constant documentation with the re-derived bound |
+| `crates/sim/src/pathfinding.rs` | A path served for a `queued` request that equals the current path does not count toward `MAX_PATHS_WITHOUT_PROGRESS`; documentation |
+| `crates/sim/src/unit.rs` | `PathState::Requested { since, avoid_units, queued }`; hash layout (`queued` byte); `stalled_ticks` documentation |
+| `crates/sim/src/event.rs` | `MoveFailure::Blocked` documentation |
+| `crates/sim/tests/m2_movement.rs` | 5 new tests (above) |
+| `crates/sim/tests/fixtures/data/units_boundary_speeds.ron` | New fixture: unit types of speed 1 and 128 |
+| `docs/DECISIONS.md`, `docs/STATUS.md` | D22; amendments to D19 items 6 and 9 and to D21 item 1; correction note in the round 1 report; this report |
+
+### Validation commands (PLAN.md section 9, with section 12 item 5)
+
+The commands ran from the repository root on macOS 27.0.1 (Apple M5, Rust 1.98.1), in this order, in the foreground, after the last code change. A display was available.
+
+| Command | Exit | Result |
+|---------|------|--------|
+| `cargo fmt --all -- --check` | 0 | no diff |
+| `cargo clippy --workspace --all-targets -- -D warnings` | 0 | no warnings |
+| `cargo test --workspace` | 0 | 186 passed, 0 failed, 0 ignored (breakdown below). Peak memory footprint of the whole run 0.13 GB. Known M0 linker warning only. |
+| `cargo build --release -p game` | 0 | |
+| `cargo run --release -p game -- --smoke-test 600` | 0 | `26 units spawned`; `smoke test: 600 frames, 198 simulation ticks, map created: true, units spawned: 26, units moved: 18 in 198 ticks after the order` |
+| `cargo run -p game -- --smoke-test 600` | 0 | `smoke test: 600 frames, 203 simulation ticks, map created: true, units spawned: 26, units moved: 18 in 203 ticks after the order` |
+
+Test breakdown for `cargo test --workspace`:
+
+* `game` unit 44.
+* `m0_spike` 6, `m1_demo_map` 3, `m1_tileset_image` 6, `m2_unit_sprites` 5.
+* `sim` unit 3.
+* `m0_bootstrap` 12, `m1_map` 32, `m1_map_subset` 24, `m2_definitions` 14, `m2_movement` 37 (31.5 s).
+* doc-tests 0.
+
+The `Skipped event Destroyed` warning (M0 debt item 2) appeared in both smoke runs.
+
+### Acceptance criteria and required tests (PLAN.md section 7, M2)
+
+Unchanged from the M2 implementation report and the round 1 report above, with these updates:
+
+| Criterion | Evidence |
+|-----------|----------|
+| Acceptance: 50 units move as a group to a clicked destination without overlap or deadlock in the fixture scenarios | `fifty_units_reach_a_clicked_destination_without_overlap_or_deadlock` passes unchanged, with the same times. It now also holds at the boundary speeds (`fifty_units_of_the_boundary_speeds_reach_a_clicked_destination`). On screen: **requires user verification** |
+| Test: an unreachable target ends the order with an event and no panic; and every order ends (D21, D22) | `unreachable_target_ends_the_order_with_an_event_and_no_panic`, the three D21 termination tests, and `orders_end_at_both_boundary_speeds_when_units_keep_giving_way` |
+| Test: I6 on every tick while 50 units cross each other for 2,000 ticks | `invariant_i6_holds_while_fifty_units_cross_each_other_for_2000_ticks` (unchanged). I6 is also checked on every tick of the five new tests and of every probe scenario |
+| Test: determinism of the same scenario | `the_same_scenario_gives_the_same_hash_at_every_tick` (unchanged). The probe's per-tick digests are identical in debug and release |
+| Section 8 boundary category: zero and maximum quantities | Movement at speed 1 and `MAX_UNIT_SPEED` = 128: four behavioural tests, plus the fixture test |
+
+### Assumptions verified and how
+
+No new crate API is used. The activity map and the chain walk use `std::collections::{BTreeMap, BTreeSet}`, which iterate in key order, and units are processed in `SimId` order, as before (I4). Determinism was checked by identical per-tick hash digests in debug and release builds (I3, I12).
+
+### Deviations from PLAN.md
+
+None new. The fix differs from the review's three suggested options. D22 item 7 gives the measurements behind that choice.
+
+### Known debt (P2)
+
+1. **Round 1 debt item 1, narrowed.** Waits behind units that are moving on no longer count as stalled. What remains is path throughput: 16 requests per tick, and a waiting unit still asks for a way around every 8 ticks, which at speed 1 is many requests per cell. This is to be measured against the M7 benchmark. In this round's crowd probe (open 256×256 map, 3,000 ticks, speed 32), the reviewed and the fixed code agree:
+   * 50 units: 0 `Blocked`;
+   * 200 units: 0 `Blocked`;
+   * 400 units: 1 `Blocked`;
+   * 1,024 units: 0 `Blocked`.
+2. **Time to end a livelock.** Orders that cannot get closer end after the same number of turns at every speed. That is about 800 ticks at speed 32, and 17,000 to 18,000 ticks (about 15 minutes of game time) at speed 1, because a turn takes a step (D22 item 8).
+3. **Cost of the chain walk.** A unit waiting at a centre follows the chain of units ahead of it, which costs O(queue length) per waiting unit per tick. With 1,024 units, the mean tick time went from 3.25 to 3.34 ms. To be measured against the M7 benchmark.
+4. **No overtaking.** A unit right behind a slower unit in a step does not overtake it on open ground, because the pathfinder avoids only waiting units. This is behaviour of the reviewed code and is unchanged; it is conspicuous at speed 1.
+5. **Waiting under continuous orders.** While new commands keep units moving through a unit's way, that unit waits and does not fail, because it is not blocked (D22 item 5).
+6. **Weak smoke check.** The smoke test passes even if every ordered unit ends as `Blocked`, because it checks only that some unit moved (noted by review 2). The `sim` defect behind that observation is fixed, and the fixed binaries log no stopped unit at speed 1 or 128.
+7. **Earlier M2 debt.** The M2 implementation debt items 1 to 6 are unchanged, as confirmed by reviews 1 and 2.
+8. **Carried from M1 and M0, unchanged,** as listed in review 2's "Recorded debt":
+   * M1 review 3: P2-1 for the map and `.tsx` reader in `sim`, P2-2, and the remaining items of P2-3;
+   * M1 review 1: P2-3 and P2-5;
+   * M1 review 2: P2-B;
+   * M1 round 1: item 4;
+   * M1 round 2: items 5 and 6;
+   * M0: items 1, 2 (the `Skipped event Destroyed` warning was seen again in this round's smoke runs), 3, 5, 7, 8, and 9.
+
+### Requires user verification
+
+Unchanged: the seven M2 items and the M1 items, as listed in review 2's "Requires user verification". These are not findings and block only `m2-approved` (and `m1-approved`).
