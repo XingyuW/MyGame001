@@ -41,10 +41,11 @@ pub struct ConstructionPlugin;
 impl Plugin for ConstructionPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<InterfaceMode>()
-            // After the exclusive match setup, so that no Startup system runs unordered beside it.
+            // After the exclusive loading of the catalogue, so that no Startup system runs
+            // unordered beside it.
             .add_systems(
                 Startup,
-                spawn_placement_ghost.after(crate::sim_host::start_match),
+                spawn_placement_ghost.after(crate::skirmish::load_catalogue),
             )
             .add_systems(
                 PostUpdate,

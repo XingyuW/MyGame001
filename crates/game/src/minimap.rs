@@ -39,9 +39,13 @@ pub struct MinimapPlugin;
 impl Plugin for MinimapPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<MinimapState>()
-            // After the exclusive match setup (itself after the map), so that no Startup system runs
-            // unordered beside it.
-            .add_systems(Startup, create_minimap.after(crate::sim_host::start_match))
+            // After the exclusive loading of the skirmish catalogue, so that no Startup system runs
+            // unordered beside it. A match replaces the image with one of its map's size
+            // ([`size_minimap`]).
+            .add_systems(
+                Startup,
+                create_minimap.after(crate::skirmish::load_catalogue),
+            )
             .add_systems(
                 Update,
                 (
@@ -313,8 +317,16 @@ pub(crate) fn create_minimap(
     let layout = map.map_or(MinimapLayout::new(1, 1), |map| {
         MinimapLayout::new(map.width, map.height)
     });
+    commands.insert_resource(Minimap {
+        image: images.add(blank_image(layout)),
+        layout,
+    });
+}
+
+/// A black, transparent image of the minimap's size.
+fn blank_image(layout: MinimapLayout) -> Image {
     let (width, height) = layout.size();
-    let image = Image::new_fill(
+    Image::new_fill(
         Extent3d {
             width,
             height,
@@ -324,11 +336,25 @@ pub(crate) fn create_minimap(
         &[0, 0, 0, 0],
         TextureFormat::Rgba8UnormSrgb,
         RenderAssetUsages::default(),
-    );
-    commands.insert_resource(Minimap {
-        image: images.add(image),
-        layout,
-    });
+    )
+}
+
+/// Gives the minimap a new image for a `width` × `height` map (a new match, M6), shown by the
+/// sidebar's minimap node, and forgets the drawings of the previous match.
+pub(crate) fn size_minimap(world: &mut World, width: u32, height: u32) {
+    let layout = MinimapLayout::new(width, height);
+    let image = world
+        .resource_mut::<Assets<Image>>()
+        .add(blank_image(layout));
+    let nodes: Vec<Entity> = world
+        .query_filtered::<Entity, With<MinimapNode>>()
+        .iter(world)
+        .collect();
+    for node in nodes {
+        world.entity_mut(node).insert(ImageNode::new(image.clone()));
+    }
+    world.insert_resource(Minimap { image, layout });
+    world.insert_resource(MinimapState::default());
 }
 
 /// Redraws the minimap after every simulation tick.
@@ -364,7 +390,7 @@ fn draw_minimap(
 }
 
 /// Places the camera's rectangle on the minimap.
-fn place_camera_frame(
+pub(crate) fn place_camera_frame(
     map: Option<Res<MapView>>,
     minimap: Option<Res<Minimap>>,
     camera: Single<(&Camera, &Projection, &Transform), With<Camera2d>>,

@@ -395,7 +395,7 @@ fn button(kind: SidebarButton, width: Val, height: f32) -> impl Bundle {
     )
 }
 
-fn spawn_sidebar(mut commands: Commands, minimap: Option<Res<Minimap>>) {
+pub(crate) fn spawn_sidebar(mut commands: Commands, minimap: Option<Res<Minimap>>) {
     let image = minimap
         .map(|minimap| minimap.image.clone())
         .unwrap_or_default();
@@ -668,7 +668,7 @@ fn sidebar_input(
 
 /// Brings the sidebar's texts, colours, progress bars, and the pause banner up to date.
 #[allow(clippy::type_complexity, clippy::too_many_arguments)]
-fn update_sidebar(
+pub(crate) fn update_sidebar(
     host: Res<SimHost>,
     sink: Res<CommandSink>,
     tab: Res<Tab>,
@@ -1107,12 +1107,13 @@ mod tests {
     fn the_game_systems_share_no_state_without_an_order() {
         // As `selection::tests::no_two_game_systems_share_state_in_post_update_without_an_order`
         // and the fog's test, with every plugin of the game (M5 adds the simulation host, the
-        // sidebar, the minimap, health bars, and audio), for every schedule they add systems to.
+        // sidebar, the minimap, health bars, and audio; M6 the menu and end screen), for every
+        // schedule they add systems to.
         let mut app = App::new();
         app.add_plugins((
             MinimalPlugins,
             bevy::asset::AssetPlugin::default(),
-            crate::sim_host::SimHostPlugin { seed: 0 },
+            crate::sim_host::SimHostPlugin,
             crate::camera::CameraPlugin,
             crate::map::MapPlugin,
             crate::units::UnitsPlugin,
@@ -1124,6 +1125,7 @@ mod tests {
             crate::minimap::MinimapPlugin,
             crate::health::HealthBarsPlugin,
             crate::audio::GameAudioPlugin,
+            crate::skirmish::SkirmishPlugin,
         ));
         let check = |world: &mut World, schedule: &mut Schedule| {
             schedule.initialize(world).expect("schedule builds");

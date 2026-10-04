@@ -220,6 +220,12 @@ impl CommandQueue {
     pub fn is_empty(&self) -> bool {
         self.pending.is_empty()
     }
+
+    /// The pending commands in push order. After a tick these are the commands the computer
+    /// players pushed in its `Ai` stage (M6), since the `Commands` stage drained the queue first.
+    pub fn iter(&self) -> impl Iterator<Item = &IssuedCommand> {
+        self.pending.iter()
+    }
 }
 
 type UnitQuery<'w, 's> = Query<
