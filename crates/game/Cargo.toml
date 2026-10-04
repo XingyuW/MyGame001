@@ -1,0 +1,23 @@
+[package]
+name = "game"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[dependencies]
+sim = { path = "../sim" }
+# "2d", "ui", and "audio" are Bevy 0.19 feature collections; the default set would also
+# build the 3D renderer, which this game does not use.
+bevy = { version = "=0.19.1", default-features = false, features = ["2d", "ui", "audio"] }
+bevy_ecs_tiled = "=0.13.4"
+bevy_ecs_tilemap = "=0.19.0"
+# The tileset image is decoded once before it is handed to the renderer, with the decoder Bevy
+# uses (`bevy_image` 0.19.1 decodes PNG with `image` 0.25.10) but under a memory limit
+# (docs/DECISIONS.md, D16). Already in Cargo.lock through `bevy_image`; no package is added.
+image = { version = "=0.25.10", default-features = false, features = ["png"] }
+
+[dev-dependencies]
+# Writing hostile PNG files in the tests (both already in Cargo.lock through `png`).
+crc32fast = "=1.5.2"
+flate2 = "=1.1.10"
