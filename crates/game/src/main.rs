@@ -1,8 +1,10 @@
 //! Desktop client: rendering, input, interface, and audio on top of the `sim` crate.
 
+mod buildings;
 mod camera;
 mod checked_assets;
 mod cli;
+mod construction;
 mod map;
 mod projection;
 mod selection;
@@ -53,7 +55,9 @@ fn main() -> AppExit {
         camera::CameraPlugin,
         map::MapPlugin,
         units::UnitsPlugin,
+        buildings::BuildingsPlugin,
         selection::SelectionPlugin,
+        construction::ConstructionPlugin,
     ));
 
     if let Some(frames) = options.smoke_test_frames {

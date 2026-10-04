@@ -1,0 +1,125 @@
+// Economy definitions, schema version 1 (PLAN.md sections 5 and 7, M3; docs/DECISIONS.md D23).
+//
+// placement_distance: a new building must lie within this many cells (Chebyshev distance between
+//                     the nearest cells) of a building of its owner
+// buildings:  id and sprite (names as in units.ron; the sprite is
+//             assets/sprites/buildings/<sprite>.png), footprint width and height in cells, cost in
+//             credits, build_time in ticks (20 per second), producer (the building type that
+//             produces it), prerequisites (building types the player must own to queue it),
+//             power produced and consumed, sell_value (credits refunded when sold, at most the
+//             cost), and free_units (units that leave it when it is placed)
+// units:      the production terms of the producible unit types of units.ron
+// harvesters: ore capacity and ore removed per tick of the harvester unit types
+// refineries: credits paid per ore unit by the refinery building types
+(
+    schema_version: 1,
+    placement_distance: 4,
+    buildings: [
+        (
+            id: "construction_yard",
+            sprite: "construction_yard",
+            width: 3,
+            height: 3,
+            cost: 3000,
+            build_time: 1200,
+            producer: "construction_yard",
+            prerequisites: [],
+            power_produced: 20,
+            power_consumed: 0,
+            sell_value: 1500,
+            free_units: [],
+        ),
+        (
+            id: "power_plant",
+            sprite: "power_plant",
+            width: 2,
+            height: 2,
+            cost: 300,
+            build_time: 200,
+            producer: "construction_yard",
+            prerequisites: [],
+            power_produced: 100,
+            power_consumed: 0,
+            sell_value: 150,
+            free_units: [],
+        ),
+        (
+            id: "refinery",
+            sprite: "refinery",
+            width: 3,
+            height: 3,
+            cost: 2000,
+            build_time: 400,
+            producer: "construction_yard",
+            prerequisites: ["power_plant"],
+            power_produced: 0,
+            power_consumed: 40,
+            sell_value: 1000,
+            free_units: ["harvester"],
+        ),
+        (
+            id: "barracks",
+            sprite: "barracks",
+            width: 2,
+            height: 2,
+            cost: 300,
+            build_time: 240,
+            producer: "construction_yard",
+            prerequisites: ["power_plant"],
+            power_produced: 0,
+            power_consumed: 20,
+            sell_value: 150,
+            free_units: [],
+        ),
+        (
+            id: "war_factory",
+            sprite: "war_factory",
+            width: 3,
+            height: 3,
+            cost: 2000,
+            build_time: 500,
+            producer: "construction_yard",
+            prerequisites: ["refinery"],
+            power_produced: 0,
+            power_consumed: 30,
+            sell_value: 1000,
+            free_units: [],
+        ),
+    ],
+    units: [
+        (
+            unit: "scout",
+            cost: 400,
+            build_time: 200,
+            producer: "barracks",
+            prerequisites: [],
+        ),
+        (
+            unit: "light_tank",
+            cost: 700,
+            build_time: 300,
+            producer: "war_factory",
+            prerequisites: [],
+        ),
+        (
+            unit: "harvester",
+            cost: 1400,
+            build_time: 400,
+            producer: "war_factory",
+            prerequisites: ["refinery"],
+        ),
+    ],
+    harvesters: [
+        (
+            unit: "harvester",
+            capacity: 700,
+            harvest_rate: 7,
+        ),
+    ],
+    refineries: [
+        (
+            building: "refinery",
+            credits_per_ore: 1,
+        ),
+    ],
+)
