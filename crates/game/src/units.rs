@@ -5,34 +5,31 @@
 //! The game reads simulation state and never writes it (PLAN.md section 4, invariant I5): each
 //! simulation unit is drawn by a separate view entity that copies what it needs from the unit's
 //! components, read through `crate::sim_host::SimHost`. The only writes into the simulation world
-//! are match setup before the first tick (installing the definitions and spawning the starting
-//! units, like the map's grid, D11) and the commands of the interface, both in
-//! `crate::sim_host` (docs/DECISIONS.md D34).
+//! are match setup before the first tick (`sim::setup_match`, with the starting units of the
+//! skirmish file, D11, D40) and the commands of the interface, both in `crate::sim_host`
+//! (docs/DECISIONS.md D34).
 //!
 //! The unit definitions are loaded by `sim::load_unit_definitions` (the RON subset of D18). Each
 //! definition names a sprite sheet, which must exist and pass the PNG subset check before the
 //! match starts (cross validation, PLAN.md section 5; D20); the renderer receives exactly the
 //! checked bytes (`crate::checked_assets`).
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 use std::fmt;
 use std::path::{Path, PathBuf};
 
-use bevy::asset::io::file::FileAssetReader;
 use bevy::prelude::*;
 use sim::{
-    CellPos, DataError, Definitions, Direction, Facing, Grid, Mobile, Owner, PlayerId, Players,
-    Position, SUBCELLS_PER_CELL, SimEvent, SimId, SubPos, Unit, UnitKind, destination_cells,
+    DataError, Definitions, Direction, Facing, Mobile, Owner, PlayerId, Players, Position,
+    SUBCELLS_PER_CELL, SimEvent, SimId, SubPos, Unit, UnitKind,
 };
 
 use crate::buildings::{
-    BuildingSpriteError, BuildingSprites, CheckedBuildingSprite, ECONOMY_PATH,
-    check_building_sprites,
+    BuildingSpriteError, CheckedBuildingSprite, ECONOMY_PATH, check_building_sprites,
 };
-use crate::checked_assets::CheckedAssets;
 use crate::map::MapView;
 use crate::projection::{TileSize, to_world};
-use crate::sim_host::{MatchDefinitions, SimHost};
+use crate::sim_host::SimHost;
 use crate::tileset_image::{TilesetImageError, TilesetImageErrorKind, check_png_file};
 
 /// The units file, relative to the asset directory.
@@ -56,27 +53,11 @@ pub const GROUND_OFFSET_PX: f32 = 12.0;
 /// The player who uses this interface; the other player's units cannot be selected.
 pub const HUMAN: PlayerId = PlayerId(0);
 
-/// The other player, whose units stand on the map from M2 on and act from M6 on.
+/// The other player: the computer player of a skirmish match (M6).
 pub const OPPONENT: PlayerId = PlayerId(1);
 
 /// Lowest z of a unit sprite. The map's layers lie at z = 0 (`bevy_ecs_tiled`).
 const UNIT_Z: f32 = 1.0;
-
-/// A group of starting units: owner, unit type, the cell they are placed around, and how many.
-pub type StartingGroup = (PlayerId, &'static str, (i32, i32), usize);
-
-/// The starting units of the demo match (M2). Match setup arrives in M6.
-pub(crate) const STARTING_UNITS: [StartingGroup; 4] = [
-    (HUMAN, "light_tank", (10, 28), 12),
-    (HUMAN, "scout", (14, 34), 6),
-    (OPPONENT, "light_tank", (50, 30), 5),
-    (OPPONENT, "scout", (52, 36), 3),
-];
-
-/// The number of starting units of the demo match, all of which match setup must spawn.
-pub fn starting_unit_total() -> usize {
-    STARTING_UNITS.iter().map(|&(.., count)| count).sum()
-}
 
 pub struct UnitsPlugin;
 
@@ -84,7 +65,6 @@ impl Plugin for UnitsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<UnitViews>()
             .init_resource::<UnitStatus>()
-            .add_systems(Startup, load_match_assets.after(crate::map::load_map))
             .add_systems(Update, (spawn_unit_views, log_sim_events))
             .add_systems(
                 PostUpdate,
@@ -101,7 +81,7 @@ pub struct UnitSprites(pub BTreeMap<UnitKind, Handle<Image>>);
 #[derive(Resource, Debug, Default)]
 pub struct UnitViews(pub BTreeMap<SimId, Entity>);
 
-/// What has happened to the units so far; read by the smoke test.
+/// What has happened to the units of the current match so far; read by the smoke test.
 #[derive(Resource, Debug, Default)]
 pub struct UnitStatus {
     /// Units spawned by match setup.
@@ -158,66 +138,6 @@ impl fmt::Display for SpriteError {
 }
 
 impl std::error::Error for SpriteError {}
-
-/// A group of starting units for which the map has too few free cells: fewer than `required`
-/// passable, unoccupied cells are reachable from `anchor` (none if it lies outside the map).
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct StartError {
-    pub owner: PlayerId,
-    pub unit_type: String,
-    pub anchor: CellPos,
-    pub found: usize,
-    pub required: usize,
-}
-
-impl fmt::Display for StartError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "starting units of player {}: {} {:?} units are placed around cell ({}, {}), but \
-             only {} free cells are reachable there",
-            self.owner.0, self.required, self.unit_type, self.anchor.x, self.anchor.y, self.found
-        )?;
-        if self.found == 0 {
-            write!(f, " (the cell is outside the map or walled in)")?;
-        }
-        Ok(())
-    }
-}
-
-impl std::error::Error for StartError {}
-
-/// The cell of every starting unit: for each group in order, the free cells nearest to its
-/// anchor (`sim::destination_cells`), skipping cells occupied in `grid` and cells given to
-/// earlier groups. A group that does not get all of its cells is an error, so match setup never
-/// spawns fewer units than configured (M2 review 1, P1-2).
-pub fn plan_starting_units(
-    grid: &Grid,
-    groups: &[StartingGroup],
-) -> Result<Vec<(PlayerId, &'static str, CellPos)>, StartError> {
-    let mut planned = Vec::new();
-    let mut taken = BTreeSet::new();
-    for &(owner, unit_type, (x, y), count) in groups {
-        let anchor = CellPos::new(x, y);
-        let cells = destination_cells(grid, anchor, count, |cell| {
-            grid.occupant(cell).is_some() || taken.contains(&cell)
-        });
-        if cells.len() < count {
-            return Err(StartError {
-                owner,
-                unit_type: unit_type.to_owned(),
-                anchor,
-                found: cells.len(),
-                required: count,
-            });
-        }
-        for cell in cells {
-            taken.insert(cell);
-            planned.push((owner, unit_type, cell));
-        }
-    }
-    Ok(planned)
-}
 
 /// Why the units could not be set up.
 #[derive(Debug)]
@@ -317,50 +237,6 @@ pub fn load_match_data(
         },
         buildings,
     ))
-}
-
-/// Match setup, game side: loads the definitions and checks and registers the sprite of every
-/// unit and building type. The definitions wait in [`MatchDefinitions`] for
-/// `crate::sim_host::start_match`, which installs them with the starting units and buildings.
-/// Runs after the map is loaded; does nothing if the map failed.
-pub(crate) fn load_match_assets(world: &mut World) {
-    if !world.contains_resource::<MapView>() {
-        return;
-    }
-    let root = FileAssetReader::new(AssetPlugin::default().file_path)
-        .root_path()
-        .clone();
-    let (
-        LoadedUnits {
-            definitions,
-            sheets,
-        },
-        building_sprites,
-    ) = match load_match_data(&root) {
-        Ok(loaded) => loaded,
-        Err(error) => {
-            error!("{error}");
-            world.write_message(AppExit::error());
-            return;
-        }
-    };
-    let checked = world.resource::<CheckedAssets>().clone();
-    let server = world.resource::<AssetServer>().clone();
-    let mut sprites = BuildingSprites::default();
-    for sprite in building_sprites {
-        checked.insert(sprite.asset_path.clone(), sprite.bytes);
-        sprites
-            .0
-            .insert(sprite.kind, server.load(sprite.asset_path));
-    }
-    world.insert_resource(sprites);
-    let mut sprites = UnitSprites::default();
-    for sheet in sheets {
-        checked.insert(sheet.asset_path.clone(), sheet.bytes);
-        sprites.0.insert(sheet.kind, server.load(sheet.asset_path));
-    }
-    world.insert_resource(sprites);
-    world.insert_resource(MatchDefinitions(definitions));
 }
 
 /// Colour that tints the light grey sprites of a player's units.
@@ -645,7 +521,20 @@ mod gen_unit_sprites;
 
 #[cfg(test)]
 mod tests {
+    use std::collections::BTreeSet;
+
+    use sim::{CellPos, Grid, StartError, plan_starting_units};
+
     use super::*;
+
+    /// The starting units of the demo match until M5 (game code until M6, docs/DECISIONS.md D20
+    /// item 4), kept as test input for `plan_starting_units`, which moved to `sim` in M6.
+    const DEMO_GROUPS: [(PlayerId, &str, (i32, i32), usize); 4] = [
+        (HUMAN, "light_tank", (10, 28), 12),
+        (HUMAN, "scout", (14, 34), 6),
+        (OPPONENT, "light_tank", (50, 30), 5),
+        (OPPONENT, "scout", (52, 36), 3),
+    ];
 
     #[test]
     fn the_sprite_layout_matches_the_generator() {
@@ -691,10 +580,18 @@ mod tests {
             let file = std::fs::read(assets_root().join(&sheet.asset_path)).expect("sprite file");
             assert_eq!(sheet.bytes, file);
         }
-        // The starting units name defined unit types.
-        for (_, unit_type, _, count) in STARTING_UNITS {
-            assert!(definitions.unit_kind(unit_type).is_some(), "{unit_type}");
-            assert!(count > 0);
+        // The starting units of every faction of the skirmish file (M6: data, D40) name defined
+        // unit types, in groups of at least one.
+        let catalogue = crate::skirmish::tests::production_catalogue();
+        for faction in &catalogue.skirmish.factions {
+            for group in &faction.units {
+                assert_eq!(
+                    definitions.unit(group.kind),
+                    catalogue.definitions.unit(group.kind)
+                );
+                assert!(definitions.unit(group.kind).is_some(), "{group:?}");
+                assert!(group.count > 0);
+            }
         }
     }
 
@@ -722,11 +619,11 @@ mod tests {
                 .and_then(|terms| terms.weapon)
                 .is_some()
         );
-        assert!(
-            crate::buildings::STARTING_BUILDINGS
-                .iter()
-                .any(|(owner, kind, _)| *owner == OPPONENT && *kind == "gun_turret")
-        );
+        // The computer player of the demo match builds it (M6: the starting buildings are data
+        // of the skirmish file, and the computer player's buildings follow the AI file's build
+        // order, D40, D42).
+        let catalogue = crate::skirmish::tests::production_catalogue();
+        assert!(catalogue.ai.build_order.contains(&turret));
     }
 
     fn fixture_grid(name: &str) -> Grid {
@@ -740,18 +637,46 @@ mod tests {
 
     #[test]
     fn the_demo_map_holds_every_starting_unit_on_its_own_free_cell() {
+        // M6: the starting units are those of the skirmish file's factions at the map's start
+        // positions, placed by `sim::setup_match` (D40). Every one of them gets its own passable
+        // cell, none on a building, and every group is complete.
+        let catalogue = crate::skirmish::tests::production_catalogue();
+        let selection = crate::skirmish::MenuSelection::initial(&catalogue);
+        let host = crate::sim_host::tests::demo_host();
+        let world = host.world();
+        let grid = host.grid().expect("grid");
+        let mut units = world
+            .try_query::<(&Owner, &Unit, &Mobile)>()
+            .expect("registered");
+        let mut cells = BTreeSet::new();
+        let mut placed: BTreeMap<(PlayerId, UnitKind), u32> = BTreeMap::new();
+        for (owner, unit, mobile) in units.iter(world) {
+            assert!(cells.insert(mobile.cell), "cells are distinct");
+            assert!(grid.is_passable(mobile.cell));
+            assert_eq!(grid.building(mobile.cell), None);
+            *placed.entry((owner.0, unit.kind)).or_insert(0) += 1;
+        }
+        let mut expected: BTreeMap<(PlayerId, UnitKind), u32> = BTreeMap::new();
+        for setup in selection.players() {
+            for group in &catalogue.skirmish.factions[setup.faction].units {
+                *expected.entry((setup.player, group.kind)).or_insert(0) += group.count;
+            }
+        }
+        assert!(!expected.is_empty());
+        assert_eq!(placed, expected);
+        // The M2 demo groups still fit the demo map, each unit on its own passable cell.
         let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .join("../../assets")
             .join(crate::map::MAP_PATH);
-        let grid = sim::load_map(&path)
+        let demo: Grid = sim::load_map(&path)
             .unwrap_or_else(|error| panic!("{error}"))
             .grid;
-        let planned = plan_starting_units(&grid, &STARTING_UNITS).expect("demo map");
-        assert_eq!(planned.len(), starting_unit_total());
+        let planned = plan_starting_units(&demo, &DEMO_GROUPS).expect("demo map");
+        assert_eq!(planned.len(), 12 + 6 + 5 + 3);
         let cells: BTreeSet<CellPos> = planned.iter().map(|&(.., cell)| cell).collect();
         assert_eq!(cells.len(), planned.len(), "cells are distinct");
-        assert!(cells.iter().all(|&cell| grid.is_passable(cell)));
-        for (owner, unit_type, _, count) in STARTING_UNITS {
+        assert!(cells.iter().all(|&cell| demo.is_passable(cell)));
+        for (owner, unit_type, _, count) in DEMO_GROUPS {
             let placed = planned
                 .iter()
                 .filter(|&&(o, t, _)| o == owner && t == unit_type)
@@ -766,7 +691,7 @@ mod tests {
         // match lie outside it; before, those 8 units and the 6 scouts were silently dropped.
         let arena = fixture_grid("arena_32x32");
         assert_eq!(
-            plan_starting_units(&arena, &STARTING_UNITS),
+            plan_starting_units(&arena, &DEMO_GROUPS),
             Err(StartError {
                 owner: HUMAN,
                 unit_type: "scout".into(),
