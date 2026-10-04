@@ -8,7 +8,7 @@
 | M3: Economy and construction | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 4 P2); merged into `main`. Awaiting user verification for `m3-approved` | `milestone/m3` | `m3-reviewed` |
 | M4: Combat and fog of war | **Reviewed**: review 2 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 1 P2) after review 1 NO-GO; merged into `main`. Awaiting user verification for `m4-approved` | `milestone/m4` | `m4-reviewed` |
 | M5: Interface and audio | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 5 P2); merged into `main`. Awaiting user verification for `m5-approved` | `milestone/m5` | `m5-reviewed` |
-| M6: Skirmish AI and game flow | **Review 1: NO-GO** (0 P0, 1 P1, 4 P2; `docs/reviews/M6-review-1.md`), in remediation round 1 | `milestone/m6` | |
+| M6: Skirmish AI and game flow | **Reviewed**: review 2 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 2 P2) after review 1 NO-GO; merged into `main`. Awaiting user verification for `m6-approved` | `milestone/m6` | `m6-reviewed` |
 | M7: Content, balance, performance, and packaging | Not started | | |
 
 ## M0 implementation report (2026-10-03)
@@ -2202,3 +2202,112 @@ No new crate API is used. Four-neighbour flood fill connects the same cells as t
 ### Requires user verification
 
 Not review findings (PLAN.md section 12 item 2); they block only `m6-approved`. The 13 M6 items listed under "M6 implementation report" remain pending unchanged (this round changes nothing on screen: the shipped data passes every new check, and the gathering points and courses of matches are unchanged). The earlier items of M5, M4, M3, M2, and M1 remain pending.
+
+## M6 review decision (2026-10-04)
+
+Two independent review rounds (`docs/reviews/M6-review-1.md`: NO-GO, 0 P0, 1 P1, 4 P2; `M6-review-2.md`: GO WITH DOCUMENTED NON-BLOCKING DEBT, 0 P0, 0 P1, 2 P2). Before review 2 the orchestrator reran all six validation commands of PLAN.md section 9 on commit `834efc0` with exit code 0 (394 tests passed). Under PLAN.md section 12 item 1, `milestone/m6` was merged into `main` and tagged `m6-reviewed`. The tag `m6-approved` is created by the user alone after the verification below.
+
+### Debt recorded from review 2 (P2, verbatim from the report)
+
+#### P2-1: The gathering point is searched over terrain only, through the computer player's own starting buildings, so it can be a cell none of its units can reach. The code comment and D45 item 3 claim otherwise.
+
+* **File and line:**
+  * `crates/sim/src/ai.rs:333` defines `terrain` as `grid.cell(cell).is_some_and(|t| t.passable)`, and line 351 uses it as the only traversal test of the flood fill in `gathering_point` (`ai.rs:323-359`). Cells covered by buildings are traversed; they are only excluded as candidates (`grid.building(cell).is_none()`).
+  * `crates/sim/src/match_setup.rs:455` places the starting buildings before `AiController::new` is called (`match_setup.rs:513`). Those buildings are therefore on the grid when the gathering point is chosen. Units cannot enter them: `Grid::is_passable` is false under a building, and `pathfinding::neighbours` uses it as the enterable test.
+  * `ai.rs:321-322` says "Its units can walk there unless buildings placed later block the way". `docs/DECISIONS.md:673` (D45 item 3) says the four-neighbour fill "connects the same cells as the eight-neighbour steps of equation 5".
+  * `m6_match::every_gathering_point_and_waypoint_of_a_computer_player_is_a_passable_cell_of_the_map` (`m6_match.rs:583`) checks passability, not reachability from the computer player's units.
+* **Evidence:**
+  * **Map:** `simprobe2` on the demo map with the shipped data, and the terrain around the computer player's start changed (`rock:45,36,63,50; grass:45,42,51,44; grass:52,42,54,44; grass:55,38,62,48; grass:52,45,62,48`). The yard (52..54, 42..44) is the only link between a corridor that leads west to the rest of the map and an eastern pocket in which all 8 of its starting units stand.
+  * **Checks pass:** setup succeeds. Every start is a passable cell and every check of D45 and D46 passes.
+  * **The gathering point:** it is `(44, 39)`, west of the yard. No unit of the computer player can reach it.
+  * **Human player who gives no orders against normal, 36,000 ticks:**
+    * outcome `None`;
+    * the computer player issues 1,990 commands, mostly one gathering order per turn;
+    * 17,874 `MoveFailed { reason: Unreachable }` events;
+    * 0 rejections.
+  * **Normal against normal:** it ends at tick 13,979, with 5,984 unreachable moves.
+  * **Debug and release:** the first 12,000 ticks give an identical digest (`89a4372ecd92da4d`).
+  * **Real binaries:** the same map as a `.tmx` in scratch root `plugged` passes the catalogue and the smoke test (`--smoke-test 600`, exit 0 in both profiles) with `computer player's commands: 10 (0 rejected)`. The usual count is 2; the extra commands are the futile gathering orders, and no check notices them.
+* **Why P2 and not P1:**
+  * No command is rejected and no invariant is violated.
+  * The data is a contrived map whose own starting buildings partition the start's region. In this case the computer player's army is walled in whatever its gathering point is.
+  * No shipped or fixture map has this shape, and the termination debt is already recorded.
+  * The defect is that the rule and its documentation promise reachability for the computer player's units, which the code does not deliver.
+* **Expected behaviour:**
+  * Flood-fill with the units' rule: passable terrain and no building. Start from the free cells around the starting buildings (or from the cells of the computer player's starting units). If no gathering point can be reached that way, return `NoGatheringPoint`.
+  * Alternatively, correct the comment and D45 item 3 and record the limitation as debt.
+  * In either case, add a test with a start whose starting buildings separate its units from the point toward the centre.
+
+#### P2-2: D47's title says that nothing the computer player issues is lost unnoticed, but its commands queued in the last tick of a match, or pending when a running match is replaced, are dropped without a log line
+
+* **File and line:**
+  * `crates/sim/src/schedule.rs:61-68`: the `Ai` stage runs after `Commands` and before `WinCondition`. A computer player's commands therefore wait in `CommandQueue` until the next tick.
+  * `crates/game/src/sim_host.rs:349-372`: `run_tick` stops ticking once an outcome is set.
+  * `crates/game/src/sim_host.rs:214`: `uninstall_match` replaces `SimHost`, and so its `CommandQueue`.
+  * `docs/DECISIONS.md:687`: the title of D47 is "Nothing a player or the computer player issues is lost or rejected unnoticed". Its item 1 covers only `CommandSink`.
+* **Evidence:**
+  * `simprobe2` printed the queue after the last tick. After 1 tick it held `[(0, "QueueProduction …"), (0, "AttackMove { units: [SimId(7), …")]`, and after 2 ticks the corresponding commands of player 1.
+  * Commands pushed in a tick that ends the match, or in the last tick before the smoke flow or a restart replaces a running match, are never validated. They produce neither a `CommandRejected` event nor a log line.
+  * The effect is benign, because the commands belong to a match that is over or abandoned. The class is the same as review 1 P2-2, on the computer player's side.
+* **Expected behaviour:** narrow D47's title to the interface's sink, or log the commands left in the simulation's `CommandQueue` when a match ends or is uninstalled.
+
+### Recorded debt to carry (verbatim from review 2)
+
+**New in this review (P2):**
+
+* **P2-1:** the gathering point's flood fill traverses the computer player's own starting buildings. On a map where they separate its units from the point toward the centre, the gathering point is unreachable for them: one futile gathering order per turn, and 17,874 unreachable moves in 36,000 ticks in the probe.
+  * The comment at `ai.rs:321-322` and D45 item 3 claim that the units can reach it.
+  * The fix is to flood-fill with the units' rule, or correct the documentation and add a test.
+* **P2-2:** D47's title overclaims. Commands of the computer player that wait in `CommandQueue` when a match ends, or when a running match is replaced, are dropped without a log line. Narrow the title or log them.
+
+**From the M6 remediation round 1 report (known debt), confirmed by this review:**
+
+1. Termination is measured, not proven. A computer player that loses a producer (or its yard, which no build order lists) and cannot pay to rebuild it can stall. P2-1 above is a further data-shaped case.
+2. Start positions require passable terrain (D45), and the yard must stand on buildable terrain (checked by the trial setup). The sand probe confirms that this case is a typed error.
+3. The power building may have no prerequisites (D46).
+4. The catalogue check's startup cost grows with maps × factions².
+   * Measured worst case: 1,024 setups on 256 × 256 maps take 0.8 s in release and 29.5 s in debug.
+   * With 2,048 starting units per setup, they take 1.8 s in release, and the reviewer estimates about 1 minute in debug.
+   * The window shows nothing meanwhile.
+5. Implementation debt item 7 is resolved for catalogue data; `begin_match` keeps its exit-1 path as a second line.
+6. Carried from the M6 review 1 decision: implementation debt items 2 (no randomness), 3 (a ready building waits for a visible spot), 4 (`AttackMove` only), 5 (balance), 6 (ids in the menu; the end screen does not block map clicks), 8 (the terminal log writes the computer player's events), 9 (test time: `m6_production_matches` 52 s, `m6_ai` 40 s, workspace 153 s), and 10 (hotkeys work in the menu).
+
+**Resolved by M6 and confirmed:**
+
+* Review 1 P1-1 and P2-1 to P2-4.
+* M0 debt item 3 (the constant seed).
+* M3 review 1 P2-4, and D20 item 4, D27 item 3, and D31 item 5 (starting setup in game code).
+* M1 review 3 P2-3, first item.
+* M3 implementation debt item 2, for computer players only.
+* M6 implementation debt item 7, for catalogue data.
+
+**Carried unchanged from the M5 review decision:** every item of its "Recorded debt to carry", namely M5 review 1 P2-1 to P2-5 and M5 implementation debt items 1 to 8, the accepted deviations, the OFL note for M7 packaging, and everything carried from M4, M3, M2, M1, and M0. M6 did not make any of them worse:
+
+* M5 P2-2 (the minimap for W + H > 128) still applies. The M6 catalogue accepts such maps (the reviewer's 256 × 256 roots load and play), but none is shipped. It must be resolved before M7 ships such a map.
+* M5 P2-4 (the `m4_combat` temporary-file race) did not occur in this review's debug and release runs.
+
+The linker warning (M0 item 1) appeared again.
+
+### Requires user verification (blocks only `m6-approved`; verbatim from review 2)
+
+Run `cargo run --release -p game` with sound on. These are the 13 M6 items of the implementation report; the remediation changes nothing on screen.
+
+1. **Menu:** dark full-window menu, title, four rows (map `demo`, your faction `vanguard`, opponent `vanguard`, difficulty `normal`) with `<` and `>`, and Start and Quit. All text is legible, and the sidebar is neither visible nor clickable through the menu.
+2. **Selection:** `<` and `>` cycle each row and wrap around (difficulty easy, normal, hard; one map and one faction).
+3. **Start:** the demo map, with the camera on your base: yard at (15, 37), 5 light tanks and 3 scouts, credits 5000. The music keeps playing.
+4. **The computer player builds:** around (52, 42) it builds a power plant, refinery, barracks, war factory, and later gun turrets, a second refinery, and a second power plant. Its harvesters collect ore, and its units gather toward the map's centre.
+5. **It attacks and defends:**
+   * waves from about 3 minutes on normal;
+   * your units near its base are attacked by its units at home and by its turrets;
+   * a building of its that you destroy is rebuilt.
+6. **Difficulty:** on easy the first wave comes later (about 5 minutes) and is smaller; on hard it comes earlier (about 2 minutes) and is larger.
+7. **Defeat:** losing all of your buildings stops the simulation and shows DEFEAT with Restart and Main menu; orders are refused with the error sound.
+8. **Victory:** destroying all of its buildings shows VICTORY.
+9. **Restart:** a new match with the same choices; nothing of the old match is left; credits are 5000 again.
+10. **Main menu:** it returns to the menu, and Start with other choices uses them.
+11. **Quit:** it closes the game.
+12. **Acknowledgement (M1 review 1 P2-5):** match setup installs the grid and places the players, buildings, and units directly before the first tick, not through `CommandQueue` (D11, D40 item 5). During a match, the interface and the computer player change state only through `CommandQueue` (I5). Please confirm this reading of I5.
+13. **Acceptance:** in complete matches started from the menu, you can lose to the computer player and you can defeat it.
+
+The earlier pending items (16 for M5, 9 for M4, 10 for M3, 7 for M2, and 5 for M1) remain, with the M6 starting setup noted in the implementation report.
+
