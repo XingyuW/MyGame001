@@ -1,12 +1,12 @@
 //! `--smoke-test <frames>`: run the real application for a fixed number of frames, then exit.
 //!
-//! Exits with code 0 only if no asset failed to load and the spike map was spawned.
+//! Exits with code 0 only if no asset failed to load and the map was validated and spawned.
 
 use bevy::asset::UntypedAssetLoadFailedEvent;
 use bevy::prelude::*;
 use sim::SimTick;
 
-use crate::spike::SpikeStatus;
+use crate::map::MapStatus;
 
 pub struct SmokeTestPlugin {
     pub frames: u32,
@@ -43,7 +43,7 @@ fn fail_on_asset_load_error(
 
 fn count_frames(
     mut smoke: ResMut<SmokeTest>,
-    spike: Res<SpikeStatus>,
+    map: Res<MapStatus>,
     tick: Res<SimTick>,
     mut exit: MessageWriter<AppExit>,
 ) {
@@ -52,14 +52,14 @@ fn count_frames(
         return;
     }
     info!(
-        "smoke test: {} frames, {} simulation ticks, spike map created: {}",
-        smoke.rendered, tick.0, spike.map_created
+        "smoke test: {} frames, {} simulation ticks, map created: {}",
+        smoke.rendered, tick.0, map.map_created
     );
-    if spike.map_created {
+    if map.map_created {
         exit.write(AppExit::Success);
     } else {
         error!(
-            "smoke test failed: spike map was not created within {} frames",
+            "smoke test failed: the map was not created within {} frames",
             smoke.frames
         );
         exit.write(AppExit::error());

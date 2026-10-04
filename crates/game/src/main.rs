@@ -1,8 +1,10 @@
 //! Desktop client: rendering, input, interface, and audio on top of the `sim` crate.
 
+mod camera;
 mod cli;
+mod map;
+mod projection;
 mod smoke;
-mod spike;
 
 use bevy::prelude::*;
 use bevy_ecs_tiled::prelude::TiledPlugin;
@@ -36,7 +38,7 @@ fn main() -> AppExit {
     .add_plugins(SimPlugin { seed: MATCH_SEED })
     .insert_resource(Time::<Fixed>::from_hz(f64::from(TICKS_PER_SECOND)))
     .add_systems(FixedUpdate, run_sim_tick)
-    .add_plugins(spike::SpikePlugin);
+    .add_plugins((camera::CameraPlugin, map::MapPlugin));
 
     if let Some(frames) = options.smoke_test_frames {
         app.add_plugins(smoke::SmokeTestPlugin { frames });
