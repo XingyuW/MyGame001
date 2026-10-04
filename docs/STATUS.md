@@ -585,3 +585,91 @@ Not review findings (PLAN.md section 12 item 2). Run `cargo run --release -p gam
 7. **Orders:** a right click on a cell sends the selected units there; they spread over distinct cells around it without overlapping or getting stuck, route around the rock ridge through its gap and around the lake, and a click on rock or water sends them to the nearest cells around it. `S` stops the selection at the next cell centre.
 
 The M1 items above (map rendering, picking, panning, zoom, bounds) remain pending for `m1-approved`.
+
+## M2 remediation round 1 report (2026-10-04)
+
+Implementer session for remediation round 1 of M2 review 1 (`docs/reviews/M2-review-1.md`, NO-GO: 0 P0, 2 P1, 4 P2), on branch `milestone/m2`, base `6d9c332`. No notes accompanied the findings. Every finding was treated as a claim and reconciled against the code. Reproductions used the reviewer's probe crate `simprobe` (copied to the scratchpad, `…/scratchpad/m2-remediation-1/`), built once against the reviewed `sim` (a `git archive` of `6d9c332`) and once against the fixed `sim`, and the reviewed and fixed `game` binaries on the reviewer's scratch asset roots (`BEVY_ASSET_ROOT`), all under a `perl alarm` timeout. "Fails before" evidence for the `sim` tests comes from that archive with the new test file copied in and one inert shim (the `retargeted` field of `MoveCompleted`, always `false`, so that the tests compile). The milestone table above is maintained by the orchestrator. Decisions: DECISIONS D21, with amendments to D19 items 3, 6, 7, and 9 and D20 item 4.
+
+### Classes of defect
+
+1. **A liveness guarantee measured by activity instead of progress (P1-1, with P2-2).** The guarantee "every order ends" was enforced by a counter that any movement reset, so units that kept moving without getting closer (taking turns stepping aside in a dead end one cell wide) defeated it. The counter also ran while a unit was only waiting for the pathfinder, so it reported `Blocked` for units that no unit blocked (P2-2). Every way an order can stay alive was enumerated: stepping along a path (now only counts if the path leads to the destination), stepping aside (never counts), taking a new path (counted, at most 64 without real progress), retargeting (does not reset the measure), terrain change (resets it, finitely often), and waiting for the pathfinder (not counted, bounded by the queue). D21 item 1 gives the resulting bound.
+2. **A silent shortfall from a best-effort helper (P1-2).** `destination_cells` returns *up to* `count` cells; match setup used the result without checking it, and the smoke test checked only for more than zero units. The other caller, `apply_move`, already reports each unit without a cell (`MoveFailed { NoDestination }`). Match setup now fails with a typed error, and the smoke test requires the configured total. The game's other silent `continue`s were reviewed: `spawn_unit_views` skips a unit whose type has no sprite sheet, which cannot happen because `load_units` returns a checked sheet for every definition (left unchanged); the rest are documented behaviour (a right click outside the map orders nothing; a view whose unit no longer exists is removed).
+3. **Unordered systems sharing state within a frame (P2-3).** The test added for it checks the whole class for the game's `PostUpdate`: Bevy's recorded list of conflicting, unordered system pairs, which held exactly the reported pair. The game's `Update` and `Last` schedules contain only writer-writer pairs on independent data (two systems that write `AppExit` messages, which Bevy reduces to the first error regardless of order; and the smoke test's `order_move` and `watch_events`, which write different fields of `SmokeTest`), so no reader can see a stale value there.
+
+### Findings
+
+| Finding | Outcome | Evidence | Change | Regression test (fails before, passes after) |
+|---------|---------|----------|--------|-----------------------------------------------|
+| P1-1 move orders can livelock forever | **Confirmed** | `simprobe repro 0` against the reviewed `sim`: after 20,000 ticks both orders live with 1,702 repaths each, no end event. `simprobe livelock 300`: seeds 62 and 154 never settled (as reported); `livelock 1000`: 7 never settled (62, 154, 524, 754, 818, 909, 928). A new probe, `deadend`, reproduced it without a sealed room: a dead end one cell wide closed by three idle units, 2 of 3 placements livelock. | D21 item 1: `MoveOrder` gains `remaining`, `best`, and `paths_since_progress`; `MAX_STALLED_TICKS` counts ticks without a step along a path to the destination (step-asides excluded), and the new `MAX_PATHS_WITHOUT_PROGRESS` = 64 ends an order that takes 65 paths without lowering `best` (`crates/sim/src/{movement,pathfinding,unit}.rs`). After the fix: repro ends at ticks 775/791, dead ends at 753–791, `livelock 1000` has 0 unsettled (slowest 1,032 ticks after the last command); I6 held on every tick of every probe. | `m2_movement`: `an_order_ends_when_two_units_keep_giving_way_to_each_other_in_a_sealed_room` (the reviewer's room); `an_order_ends_when_units_keep_giving_way_in_a_dead_end_closed_by_idle_units` (three placements); `every_order_ends_on_random_maps_under_random_group_orders` (the reviewer's generator, seeds 0–47 and the 7 livelock seeds, I6 every tick, every order ends within 3,000 ticks; about 23 s in a debug build). All three fail against the reviewed code ("orders still live after 3000 ticks", about 255 repaths each; seed 62 for the random test). |
+| P1-2 match setup silently spawns fewer starting units | **Confirmed** | Reviewed release binary, `--smoke-test 150`: the arena fixture as demo map logs `12 units spawned` and exits 0; the 16×16 fixture logs `0 units spawned` and exits 1 only through the "no unit was spawned" check. | D21 item 5: `game::units::plan_starting_units` plans every group's cells before spawning; a shortfall is a `StartError` (owner, unit type, anchor, cells found and required), logged, exit code 1. The smoke test requires `starting_unit_total()` units. After the fix both scratch roots exit 1 in both profiles with, for example, `starting units of player 0: 6 "scout" units are placed around cell (14, 34), but only 0 free cells are reachable there (the cell is outside the map or walled in)`; the normal (non-smoke) release run on the arena root also exits 1 instead of running on. | `game` unit tests `units::tests::starting_units_that_do_not_fit_are_a_setup_error` (anchor outside the map, the exact message, a three-cell pocket with 3 required (accepted) and 4 required (rejected), cells of an earlier group not reused), `units::tests::the_demo_map_holds_every_starting_unit_on_its_own_free_cell`, `smoke::tests::a_run_passes_only_with_every_configured_starting_unit` (0, 12, 25, and 27 of 26 fail), `smoke::tests::the_demo_match_expects_all_of_its_starting_units`. They name new functions, so against the reviewed code they do not compile; the failing behaviour before the fix is the binary evidence in this row. |
+| P2-1 `MoveCompleted` for retargeted orders | **Confirmed, fixed** | `simprobe repro 1` against the reviewed code: B ends in (7, 5), farther from its target than its start, with `MoveCompleted { unit: SimId(1) }` at tick 24. | D21 item 4: `MoveCompleted { unit, retargeted }`. The game's event log says "stopped near its destination" for a retargeted completion. | `a_completion_says_whether_the_unit_stopped_short_of_its_destination` (A `retargeted: false`, B `retargeted: true`); `a_destination_held_by_an_idle_unit_is_replaced_by_the_nearest_reachable_cell` now asserts `retargeted: true`. Both fail against the reviewed code with the inert shim. |
+| P2-2 large group orders end with `Blocked` without moving | **Confirmed; fixed for the pathfinder queue, the rest recorded as debt** | `simprobe budget` against the reviewed code (square blocks of walkers across an open 256×256 map, 3,000 ticks, release): 400 units, 52 `Blocked`, all without moving; 1,024, 831; 4,000, 3,950. | D21 item 2: ticks spent waiting for the pathfinder do not count toward `MAX_STALLED_TICKS`. After: 400 units, 0 `Blocked` (completions 270 → 284); 1,024, 45 (all without moving: they waited inside the crowd behind units that advance; completions 193 → 301); 4,000, 0 (3,245 still waiting for a path after 3,000 ticks). 50 and 200 units: 0 and 0 `Blocked` (before: 0 and 1). | `ticks_spent_waiting_for_the_pathfinder_do_not_count_as_stalled` (50 units; queued units keep `stalled_ticks` 0 for three ticks); fails against the reviewed code (`stalled_ticks: 1` at tick 1). |
+| P2-3 a right click can use the previous frame's hovered cell | **Confirmed, fixed** | `issue_orders` and `update_hovered_cell` were unordered in `PostUpdate`; Bevy's schedule build lists them as the only conflicting pair. | `issue_orders` (with its chain) runs `.after(map::update_hovered_cell)`, which is now `pub(crate)`. | `selection::tests::game_systems_that_share_state_in_a_frame_are_ordered` builds `PostUpdate` from the map, units, and selection plugins and asserts no conflicting unordered pair; before the fix it failed with `[("update_hovered_cell", "issue_orders")]`. |
+| P2-4 D19 item 3 states a validation order the code does not follow | **Confirmed (documentation), fixed** | `command.rs:182-195` checks repetition, existence, and ownership per id in one pass; D19 item 3 listed "no unit twice" as a separate earlier check. | D19 item 3 now describes the per-id order; the code is unchanged. | `validation_checks_each_named_unit_in_turn` (`[unknown, Y, Y]` → `UnknownUnit`, `[Y, Y, unknown]` → `DuplicateUnit`, `[foreign, unknown]` → `NotOwned`, units before the target). It passes before and after: the defect was in the documentation, and the test pins the documented order. |
+
+### Tests changed (none removed, skipped, or weakened)
+
+`SimEvent::MoveCompleted` gained a field, so every existing use in `m2_movement.rs` was updated: the seven assertions that a unit arrived at its ordered cell now also require `retargeted: false` (stricter), the one in `a_destination_held_by_an_idle_unit_is_replaced_by_the_nearest_reachable_cell` requires `retargeted: true` (stricter), and the three `match` patterns that accept any completion use `MoveCompleted { unit, .. }` (unchanged meaning). No other existing test changed; the 26 previous `m2_movement` tests pass with the same reported arrival times (540, 558, 651, 945 ticks; 45, 39, 43, 39 of 50 at the assigned cells; 4 crossings, 199 completed orders).
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `crates/sim/src/unit.rs` | `MoveOrder::{remaining, best, paths_since_progress}`; `stalled_ticks` redefined; hash layout extended (D21 item 3) |
+| `crates/sim/src/movement.rs` | Progress-based end rule, `MAX_PATHS_WITHOUT_PROGRESS`, `start_step`, terrain-change reset, `MoveCompleted::retargeted`; module documentation with the bound |
+| `crates/sim/src/pathfinding.rs` | Records each served path's remaining cost and counts paths without progress |
+| `crates/sim/src/event.rs`, `crates/sim/src/lib.rs` | `MoveCompleted { unit, retargeted }`, `Blocked` documentation; export of `MAX_PATHS_WITHOUT_PROGRESS` |
+| `crates/sim/tests/m2_movement.rs` | 6 new tests (above); `MoveCompleted` uses updated |
+| `crates/game/src/units.rs` | `StartingGroup`, `starting_unit_total`, `StartError`, `plan_starting_units`, setup error; retargeted completions logged as such; 2 new tests |
+| `crates/game/src/smoke.rs` | `SmokeOutcome`, `smoke_failures` (requires the configured total); 2 new tests |
+| `crates/game/src/selection.rs`, `crates/game/src/map.rs` | `issue_orders` after `update_hovered_cell`; 1 new test |
+| `docs/DECISIONS.md`, `docs/STATUS.md` | D21; amendments to D19 and D20; this report |
+
+### Validation commands (PLAN.md section 9, with section 12 item 5)
+
+Run from the repository root on macOS 27.0.1 (Apple M5, Rust 1.98.1), in this order, in the foreground, after the last code change. A display was available.
+
+| Command | Exit | Result |
+|---------|------|--------|
+| `cargo fmt --all -- --check` | 0 | no diff |
+| `cargo clippy --workspace --all-targets -- -D warnings` | 0 | no warnings |
+| `cargo test --workspace` | 0 | 181 passed, 0 failed, 0 ignored: `game` unit 44 (cli 7, projection 7, camera 7, map 6, checked_assets 2, units 8, selection 5, smoke 2), `m0_spike` 6, `m1_demo_map` 3, `m1_tileset_image` 6, `m2_unit_sprites` 5, `sim` unit 3, `m0_bootstrap` 12, `m1_map` 32, `m1_map_subset` 24, `m2_definitions` 14, `m2_movement` 32 (27.9 s), doc-tests 0. Peak memory footprint of the whole run 0.13 GB. Known M0 linker warning only. |
+| `cargo build --release -p game` | 0 | |
+| `cargo run --release -p game -- --smoke-test 600` | 0 | `26 units spawned`; `smoke test: 600 frames, 198 simulation ticks, map created: true, units spawned: 26, units moved: 18 in 198 ticks after the order` |
+| `cargo run -p game -- --smoke-test 600` | 0 | `smoke test: 600 frames, 203 simulation ticks, map created: true, units spawned: 26, units moved: 18 in 203 ticks after the order` |
+
+Additionally: `simprobe hash` (60 units, 3 seeds, 4,000 ticks of random orders) gives identical per-tick hash digests in debug and release builds of the fixed code (I3, I12).
+
+### Acceptance criteria and required tests (PLAN.md section 7, M2)
+
+Unchanged from the M2 implementation report above, with these updates:
+
+| Criterion | Evidence |
+|-----------|----------|
+| Acceptance: 50 units move as a group to a clicked destination without overlap or deadlock in the fixture scenarios | `fifty_units_reach_a_clicked_destination_without_overlap_or_deadlock` passes unchanged with the same times; on screen **requires user verification** |
+| Test: an unreachable target ends the order with an event and no panic; and every order ends (D19 item 6, now D21 item 1) | `unreachable_target_ends_the_order_with_an_event_and_no_panic`, plus the three P1-1 termination tests above |
+| Test: I6 on every tick while 50 units cross each other for 2,000 ticks | `invariant_i6_holds_while_fifty_units_cross_each_other_for_2000_ticks` (unchanged, 199 orders completed); I6 is also checked on every tick of the new random test (55 scenarios) and of the probes (1,000 scenarios) |
+| Test: determinism of the same scenario | `the_same_scenario_gives_the_same_hash_at_every_tick` (unchanged); debug and release digests identical |
+| Scope: spawning (starting units) | All 26 configured starting units are planned before any is spawned, or the game exits 1 (P1-2 row) |
+
+### Assumptions verified and how
+
+| Item | Verification |
+|------|--------------|
+| Bevy 0.19.1 records conflicting unordered system pairs whatever the ambiguity log level, and `Schedule::systems` gives each system's `system_type` after initialization | Source: `bevy_ecs-0.19.1/src/schedule/schedule.rs:1246-1251` (`get_conflicting_systems` always runs), `:693` (`systems`), `system/system.rs:58` (`system_type`); system names need Bevy's `debug` feature, so the test identifies systems by type. Exercised by the new selection test, which failed before the fix with exactly the reported pair. |
+| `App::should_exit` prefers an error among several `AppExit` messages | Relied on only for the statement in "Classes of defect" item 3 that the writer-writer `AppExit` pairs in `Last` are harmless; behaviour unchanged by this round. |
+
+### Deviations from PLAN.md
+
+None new. The M2 deviations above still apply; deviation 3's list of events now reads `MoveCompleted { unit, retargeted }`.
+
+### Known debt (P2)
+
+1. **P2-2 remainder (from review 1):** units deep inside a large crowd (about 1,000 units in one command) can still end with `MoveFailed { Blocked }` without having moved, because waiting behind units that advance counts as stalled (45 of 1,024 in `simprobe budget`); and path throughput (16 requests per tick) makes a 4,000-unit order take thousands of ticks. Excluding waits behind advancing units would make the end of an order depend on other units' movement, which can continue indefinitely, so it was not done; the request budget and crowd behaviour are to be measured against the M7 benchmark of 200 units (D21 item 2).
+2. Units that take turns giving way to each other now end their orders after about 800 ticks (40 s of game time) rather than never; a unit whose legitimate route around other units needs more than 64 new paths without getting closer than before, or that takes no step toward its destination for 200 counted ticks, also ends with `Blocked`. In the fixture scenarios and probes this produced fewer `Blocked` events than the reviewed code (D21 item 1).
+3. The M2 implementation debt items 1 to 6 above are unchanged, as confirmed by review 1 (item 2: the `MessageReader` window of two ticks also affects the new "stopped near its destination" log line).
+4. Carried from M1 and M0, unchanged: as listed in review 1's "Recorded debt" (M1 review 3 P2-1 for the map and `.tsx` reader in `sim`, P2-2, and the remaining items of P2-3; review 1 P2-3 and P2-5; review 2 P2-B; round 1 item 4; round 2 items 5 and 6; M0 items 1, 2 (the `Skipped event Destroyed` warning was seen again in this round's smoke runs), 3, 5, 7, 8, and 9).
+
+### Requires user verification
+
+Unchanged: the seven M2 items in the M2 implementation report above and the M1 items, as listed in review 1's "Requires user verification". These are not findings and block only `m2-approved` (and `m1-approved`).
