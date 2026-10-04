@@ -1,0 +1,28 @@
+// M4 fixture: unit types for the combat tests. The values are fixture data, independent of the
+// production balance in assets/data/units.ron (invariant I10). The crawler (speed 1) moves one
+// subcell per tick, so the range tests can watch it cross a range boundary subcell by subcell.
+(
+    schema_version: 1,
+    units: [
+        (
+            id: "rifleman",
+            speed: 32,
+            sprite: "rifleman",
+        ),
+        (
+            id: "tank",
+            speed: 24,
+            sprite: "tank",
+        ),
+        (
+            id: "crawler",
+            speed: 1,
+            sprite: "crawler",
+        ),
+        (
+            id: "harvester",
+            speed: 64,
+            sprite: "harvester",
+        ),
+    ],
+)

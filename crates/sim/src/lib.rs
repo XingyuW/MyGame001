@@ -8,6 +8,8 @@
 //! windowing, audio, or input crate (invariant I1).
 
 mod building;
+mod combat;
+mod combat_defs;
 mod command;
 mod data;
 mod definitions;
@@ -25,18 +27,29 @@ mod pathfinding;
 mod rng;
 mod schedule;
 mod unit;
+mod visibility;
 
 pub use building::{
     Building, Footprint, PlacementError, Producer, SpawnBuildingError, spawn_building,
 };
 
+pub use combat::{
+    Armour, AttackOrder, Health, MAX_CHASES, Projectile, Projectiles, Sight, Weapon,
+    applied_damage, in_range,
+};
+pub use combat_defs::{
+    ArmourClass, COMBAT_SCHEMA_VERSION, CombatTerms, MAX_ARMOUR_CLASSES, MAX_DAMAGE,
+    MAX_HIT_POINTS, MAX_PROJECTILE_SPEED, MAX_RELOAD, MAX_SIGHT, MAX_VERSUS_PERCENT, MAX_WARHEADS,
+    MAX_WEAPON_RANGE, MAX_WEAPONS, MAX_WEAPONS_PER_TYPE, MIN_PROJECTILE_SPEED, MIN_WEAPON_RANGE,
+    WarheadDef, WarheadKind, WeaponDef, WeaponKind,
+};
 pub use command::{
     Command, CommandQueue, IssuedCommand, MAX_UNITS_PER_COMMAND, PlayerId, RejectReason,
 };
 pub use data::{DataError, DataErrorKind, MAX_DATA_FILE_BYTES, MAX_STRING_BYTES};
 pub use definitions::{
     Definitions, MAX_NAME_LEN, MAX_UNIT_SPEED, MAX_UNIT_TYPES, UNITS_SCHEMA_VERSION, UnitDef,
-    UnitKind, load_definitions, load_unit_definitions,
+    UnitKind, load_definitions, load_match_definitions, load_unit_definitions,
 };
 pub use economy::{MAX_QUEUE_LENGTH, PlayerSetupError, PlayerState, Players, QueueItem};
 pub use economy_defs::{
@@ -45,7 +58,7 @@ pub use economy_defs::{
     MAX_ORE_CAPACITY, MAX_PLACEMENT_DISTANCE, MAX_POWER, MAX_PREREQUISITES, Production,
     ProductionItem,
 };
-pub use event::{HarvestIdle, MoveFailure, SimEvent};
+pub use event::{AttackEnd, HarvestIdle, MoveFailure, SimEvent};
 pub use harvest::{HarvestState, Harvester, MAX_HARVEST_ATTEMPTS};
 pub use hash::{Fnv1a64, state_hash};
 pub use id::{SimId, SimIdAllocator};
@@ -66,3 +79,4 @@ pub use unit::{
     DIAGONAL_STEP, Direction, Facing, Mobile, MoveOrder, ORTHOGONAL_STEP, Orders, Owner, PathState,
     Position, SpawnError, Step, Unit, spawn_unit,
 };
+pub use visibility::Vision;

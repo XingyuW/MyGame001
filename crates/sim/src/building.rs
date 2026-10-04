@@ -13,6 +13,7 @@ use std::fmt;
 use bevy_ecs::component::Component;
 use bevy_ecs::world::World;
 
+use crate::combat::combat_components;
 use crate::command::PlayerId;
 use crate::definitions::{Definitions, UnitKind};
 use crate::economy_defs::BuildingKind;
@@ -280,7 +281,8 @@ pub(crate) fn building_bundle(
 /// [`spawn_unit`](crate::spawn_unit): the footprint must be valid, but the distance rule does
 /// not apply and the building delivers no free units. During a match buildings are produced and
 /// placed with commands. The world must have been set up by [`SimPlugin`](crate::SimPlugin),
-/// with the grid and definitions of the match installed.
+/// with the grid and definitions of the match installed. With a combat file, the building gets
+/// its hit points, armour, sight, and weapon (M4).
 pub fn spawn_building(
     world: &mut World,
     owner: PlayerId,
@@ -315,6 +317,13 @@ pub fn spawn_building(
     let mut entity = world.spawn((id, owner, building));
     if let Some(producer) = producer {
         entity.insert(producer);
+    }
+    if let Some(terms) = definitions.building_combat(kind) {
+        let (components, weapon) = combat_components(terms);
+        entity.insert(components);
+        if let Some(weapon) = weapon {
+            entity.insert(weapon);
+        }
     }
     Ok(id)
 }
