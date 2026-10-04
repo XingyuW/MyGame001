@@ -18,3 +18,8 @@ rand_chacha = { version = "=0.10.0", default-features = false }
 # exactly as `tiled` does.
 quick-xml = "=0.31.0"
 tiled = { version = "=0.16.0", default-features = false }
+# Data files (PLAN.md section 5; docs/DECISIONS.md A5 and D18). Both are pure parsers and already
+# in Cargo.lock through Bevy, so no package is added. A data file reaches `ron` only after it has
+# passed the subset check of `data.rs` (invariant I11).
+ron = "=0.12.2"
+serde = { version = "=1.0.229", features = ["derive"] }
