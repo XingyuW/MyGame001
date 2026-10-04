@@ -57,8 +57,14 @@ Run from the repository root on macOS 27.0.1, Apple M5, Rust 1.98.1, in this ord
 6. `bevy_ecs_tiled` panics on staggered and oblique maps; the M1 loader must validate maps first (DECISIONS A2 caveat, invariant I8).
 7. Packaged builds must ship `assets/` next to the executable (DECISIONS D1, M7).
 
-### Requires user verification
+### User verification
 
-1. Run `cargo run --release -p game` and confirm the spike map: a 16×16 green isometric diamond map centred in the window, with a **red** tile at the **top** corner (cell 0, 0), a **blue** tile at the **right** corner (cell 15, 0), and a 3×3 **gold** ore patch left of and slightly below the centre (cells x 5 to 7, y 9 to 11). Tiles must meet edge to edge without gaps or overlaps.
-2. The window opens and closes cleanly on your machine with `--smoke-test 600` (verified here on one macOS machine only; Windows and Linux are untested).
-3. The rust-toolchain pin (1.98.1 rather than the Bevy minimum 1.95.0) is acceptable.
+| Item | Outcome |
+|------|---------|
+| 1. `cargo run --release -p game` shows the spike map: 16×16 green diamond map, **red** tile at the **top** corner (cell 0, 0), **blue** tile at the **right** corner (cell 15, 0), 3×3 **gold** ore patch left of and slightly below the centre, tiles edge to edge | **Verified by the user, 2026-10-03.** |
+| 2. Platforms | The user decided that running on macOS is sufficient (DECISIONS U1). Verified on macOS only; Windows and Linux were not tested. |
+| 3. Toolchain pin 1.98.1 (Bevy minimum is 1.95.0) | Not explicitly confirmed; the user asked to proceed without objecting. The reviewer may raise it. |
+
+### Next step
+
+M0 is ready for independent review (PLAN.md section 10, step 3) of the cumulative diff `main..milestone/m0`.
