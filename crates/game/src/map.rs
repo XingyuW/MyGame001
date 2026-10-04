@@ -1,21 +1,21 @@
 //! Map loading, rendering, and cursor picking (PLAN.md section 7, M1).
 //!
-//! The map file is validated by `sim::load_map` before anything else touches it: the raw file
-//! and its external tileset are restricted to the supported subset of the Tiled format, which
-//! excludes every input found by M1 review 1 to make `tiled`, `bevy_ecs_tiled`, or `bevy_asset`
-//! panic, recurse without bound, or allocate without bound (docs/DECISIONS.md, D13; invariant
-//! I11). The tileset image is then checked against the size the map declares for it. Only a map
-//! that passed both is handed to `bevy_ecs_tiled`. This is a claim about the inputs those checks
-//! cover, verified by the tests in `crates/sim/tests/m1_map_subset.rs` and below, not a proof
-//! that the third party code cannot fail: an image that passes the header check but cannot be
-//! decoded still fails to load, and any asset load failure ends the game with exit code 1
-//! (`exit_on_asset_load_failure`).
+//! The map file is validated by `sim::load_map_with_files` before anything else touches it: the
+//! raw file and its external tileset are restricted to the supported subset of the Tiled format,
+//! which excludes every input found by M1 reviews 1 and 2 to make `tiled`, `bevy_ecs_tiled`, or
+//! `bevy_asset` panic, recurse without bound, allocate without bound, or exceed the renderer's
+//! texture limits (docs/DECISIONS.md, D13 and D16; invariant I11). The tileset image is then
+//! restricted to its own subset and decoded once under a memory limit
+//! ([`crate::tileset_image`]). Only a map that passed both is handed to `bevy_ecs_tiled`, and the
+//! asset server is given exactly the checked bytes of these files and nothing else
+//! ([`crate::checked_assets`]). This is a claim about the inputs those checks cover, verified by
+//! the tests in `crates/sim/tests/m1_map_subset.rs`, `crates/game/tests/m1_tileset_image.rs`, and
+//! below, not a proof that the third party code cannot fail; any asset load failure ends the game
+//! with exit code 1 (`exit_on_asset_load_failure`).
 //!
 //! The validated grid is installed into the simulation, and the map is rendered through
-//! `bevy_ecs_tiled` at the offset that aligns it with [`crate::projection`]. The asset server
-//! reads the map file a second time (STATUS.md, M1 debt).
+//! `bevy_ecs_tiled` at the offset that aligns it with [`crate::projection`].
 
-use std::io::Read;
 use std::path::Path;
 
 use bevy::asset::UntypedAssetLoadFailedEvent;
@@ -25,12 +25,14 @@ use bevy::prelude::*;
 use bevy::transform::TransformSystems;
 use bevy::window::PrimaryWindow;
 use bevy_ecs_tiled::prelude::*;
-use sim::{CellPos, Grid, TilesetImage};
+use sim::{CellPos, Grid};
 
 use crate::camera::CameraBounds;
+use crate::checked_assets::CheckedAssets;
 use crate::projection::{
     TileSize, cell_centre, cell_corners, map_bounds, map_origin_offset, pick_cell,
 };
+use crate::tileset_image::check_tileset_image;
 
 /// The map loaded at startup, relative to the asset directory. Map selection arrives in M6.
 pub const MAP_PATH: &str = "maps/demo/demo.tmx";
@@ -75,12 +77,13 @@ pub struct HoveredCell(pub Option<CellPos>);
 fn load_map(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    checked: Res<CheckedAssets>,
     mut exit: MessageWriter<AppExit>,
 ) {
     let path = FileAssetReader::new(AssetPlugin::default().file_path)
         .root_path()
         .join(MAP_PATH);
-    let loaded = match sim::load_map(&path) {
+    let (loaded, files) = match sim::load_map_with_files(&path) {
         Ok(loaded) => loaded,
         Err(error) => {
             error!("{error}");
@@ -88,11 +91,23 @@ fn load_map(
             return;
         }
     };
-    if let Err(problem) = check_tileset_image(&path, &loaded.tileset_image) {
-        error!("map {}: {problem}", path.display());
-        exit.write(AppExit::error());
-        return;
+    let image = match check_tileset_image(&path, &loaded.tileset_image) {
+        Ok(image) => image,
+        Err(error) => {
+            error!("{error}");
+            exit.write(AppExit::error());
+            return;
+        }
+    };
+    // The renderer reads exactly the checked bytes (D16). Every checked file lies in the map's
+    // directory (D13), so it has the same asset path as on disk.
+    let directory = Path::new(MAP_PATH).parent().unwrap_or(Path::new(""));
+    for file in files {
+        if let Some(name) = file.path.file_name() {
+            checked.insert(directory.join(name), file.bytes);
+        }
     }
+    checked.insert(directory.join(&loaded.tileset_image.file_name), image);
     let view = MapView {
         width: loaded.grid.width(),
         height: loaded.grid.height(),
@@ -115,38 +130,6 @@ fn load_map(
         TilemapAnchor::None,
         Transform::from_translation(map_origin_offset(view.height, view.tile).extend(0.0)),
     ));
-}
-
-/// The tileset image must be a PNG file whose size is the size the map declares for it: the
-/// renderer slices the image into tiles by the declared size, so a different image would be
-/// drawn wrongly without any error (M1 review 1, P1-1). Only the PNG header is read here; an
-/// image that cannot be decoded fails to load, which [`exit_on_asset_load_failure`] reports.
-pub fn check_tileset_image(map_path: &Path, image: &TilesetImage) -> Result<(), String> {
-    let path = map_path
-        .parent()
-        .unwrap_or(Path::new(""))
-        .join(&image.file_name);
-    let mut header = [0u8; 24];
-    std::fs::File::open(&path)
-        .and_then(|file| file.take(24).read_exact(&mut header))
-        .map_err(|error| format!("tileset image {}: cannot be read: {error}", path.display()))?;
-    const SIGNATURE: &[u8] = b"\x89PNG\r\n\x1a\n";
-    // The first chunk of a PNG file is IHDR, 13 bytes long, starting with the width and height
-    // as big-endian 32-bit integers.
-    if &header[..8] != SIGNATURE || &header[8..16] != b"\0\0\0\x0dIHDR" {
-        return Err(format!("tileset image {}: not a PNG file", path.display()));
-    }
-    let width = u32::from_be_bytes([header[16], header[17], header[18], header[19]]);
-    let height = u32::from_be_bytes([header[20], header[21], header[22], header[23]]);
-    if (width, height) != (image.width, image.height) {
-        return Err(format!(
-            "tileset image {}: the image is {width}x{height} px, but the map declares {}x{} px",
-            path.display(),
-            image.width,
-            image.height
-        ));
-    }
-    Ok(())
 }
 
 /// Any asset that fails to load (the map, its tileset image, or a later asset) ends the game
@@ -266,6 +249,7 @@ mod tests {
 
     use bevy::asset::io::AssetReaderError;
     use bevy::asset::{AssetId, AssetLoadError, AssetPath};
+    use sim::TilesetImage;
 
     use super::*;
 
@@ -339,7 +323,9 @@ mod tests {
     fn demo_tileset_image_matches_its_declared_size() {
         let path = asset_path(MAP_PATH);
         let loaded = sim::load_map(&path).unwrap_or_else(|error| panic!("{error}"));
-        assert_eq!(check_tileset_image(&path, &loaded.tileset_image), Ok(()));
+        // The checked bytes are returned, so that the renderer receives exactly them (D16).
+        let file = std::fs::read(asset_path("maps/demo/demo_tiles.png")).expect("demo image");
+        assert_eq!(check_tileset_image(&path, &loaded.tileset_image), Ok(file));
     }
 
     #[test]
@@ -364,7 +350,9 @@ mod tests {
             if let Some(contents) = contents {
                 std::fs::write(&image, contents).expect("image");
             }
-            let problem = check_tileset_image(&map, &declared).expect_err(expected);
+            let problem = check_tileset_image(&map, &declared)
+                .expect_err(expected)
+                .to_string();
             assert!(problem.contains(expected), "{problem}");
             assert!(problem.contains(&image.display().to_string()), "{problem}");
         };
@@ -382,9 +370,42 @@ mod tests {
             "not a PNG file",
         );
         rejected(Some(&png_header(512, 32)[..20]), "cannot be read");
-        std::fs::write(&image, png_header(512, 32)).expect("image");
-        assert_eq!(check_tileset_image(&map, &declared), Ok(()));
+        // M1 review 2, P0-A: only the header was read, so a file holding nothing but a header of
+        // the right size was accepted. The whole file is now checked and decoded.
+        rejected(
+            Some(&png_header(512, 32)),
+            r#"chunk "IHDR": the file ends inside this chunk"#,
+        );
+        let mut complete = Vec::new();
+        image::RgbaImage::new(512, 32)
+            .write_to(
+                &mut std::io::Cursor::new(&mut complete),
+                image::ImageFormat::Png,
+            )
+            .expect("encoded PNG");
+        std::fs::write(&image, &complete).expect("image");
+        assert_eq!(check_tileset_image(&map, &declared), Ok(complete));
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn tileset_limits_fit_the_texture_limits_every_gpu_supports() {
+        // Regression (M1 review 2, P1-A): `sim` accepted tileset images and tile counts that
+        // exceed the renderer's texture limits. The tileset image is uploaded as one 2D texture,
+        // and `bevy_ecs_tilemap` copies the tiles into a texture array with one layer per tile,
+        // plus one when the count is 1 or a multiple of 6 (`texture_array_cache.rs`).
+        let guaranteed = bevy::render::settings::WgpuLimits::default();
+        assert!(sim::MAX_TILESET_IMAGE_SIDE_PX <= guaranteed.max_texture_dimension_2d);
+        let layers = (1..=sim::MAX_TILESET_TILES)
+            .map(|count| {
+                if count == 1 || count % 6 == 0 {
+                    count + 1
+                } else {
+                    count
+                }
+            })
+            .max();
+        assert!(layers <= Some(guaranteed.max_texture_array_layers));
     }
 
     #[test]

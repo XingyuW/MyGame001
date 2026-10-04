@@ -985,6 +985,188 @@ fn errors_in_external_tilesets_name_the_tileset_file() {
     );
 }
 
+// --- Review 2, P1-A: tileset images the renderer cannot create ------------------------------
+
+/// The valid fixture with a tileset of `columns` × `rows` tiles of 64×32 px, every one defined,
+/// and an image of the matching size (the declared `tilecount` may be overridden).
+fn tileset_variant(name: &str, columns: u32, rows: u32, tilecount: Option<u32>) -> PathBuf {
+    let count = columns * rows;
+    let declared = tilecount.unwrap_or(count);
+    let definitions: String = (3..count.min(declared))
+        .map(|id| {
+            format!(
+                r#"<tile id="{id}"><properties><property name="passable" type="bool" value="true"/><property name="buildable" type="bool" value="true"/><property name="ore" type="int" value="0"/></properties></tile>"#
+            )
+        })
+        .collect();
+    variant(
+        name,
+        &[
+            (
+                r#"tilecount="3" columns="3">"#,
+                &format!(r#"tilecount="{declared}" columns="{columns}">"#),
+            ),
+            (
+                IMAGE,
+                &format!(
+                    r#"<image source="fixture_tiles.png" width="{}" height="{}"/>{definitions}"#,
+                    columns * 64,
+                    rows * 32
+                ),
+            ),
+        ],
+    )
+}
+
+#[test]
+fn tileset_images_are_bounded_by_the_texture_limits_every_gpu_supports() {
+    // Regression (M1 review 2, P1-A): images up to 65536 px wide or 32768 px tall were accepted,
+    // and the renderer then failed to create the texture without naming the file. The bounds
+    // are the guaranteed limits of `wgpu::Limits::default()`: a texture side of 8192 px and 256
+    // texture array layers (one per tile).
+    // The largest accepted images: the widest, the tallest, and a square grid of 256 tiles.
+    for (columns, rows) in [(128, 2), (128, 1), (1, 256), (16, 16)] {
+        let path = tileset_variant(&format!("tileset_{columns}x{rows}"), columns, rows, None);
+        let map = load(&path).unwrap_or_else(|error| panic!("{columns}x{rows}: {error}"));
+        assert_eq!(
+            (map.tileset_image.width, map.tileset_image.height),
+            (columns * 64, rows * 32)
+        );
+    }
+
+    // The smallest rejected images.
+    let width = r#"tileset "fixture" image attribute "width""#;
+    let height = r#"tileset "fixture" image attribute "height""#;
+    let limit = "at most 8192 px, the largest texture side every GPU supports";
+    let path = tileset_variant("tileset_129x1", 129, 1, None);
+    assert_rejected(&path, width, invalid("8256", limit));
+    // The reviewer's 257 x 1 case reaches the width limit only after the tile count limit.
+    let path = tileset_variant("tileset_256x1", 256, 1, None);
+    assert_rejected(&path, width, invalid("16384", limit));
+    let path = tileset_variant("tileset_1x257_count_256", 1, 257, Some(256));
+    assert_rejected(&path, height, invalid("8224", limit));
+    let tilecount = r#"tileset "fixture" attribute "tilecount""#;
+    for (columns, rows) in [(257, 1), (1, 257), (1024, 1)] {
+        let path = tileset_variant(&format!("tileset_{columns}x{rows}"), columns, rows, None);
+        let count = (columns * rows).to_string();
+        assert_rejected(&path, tilecount, invalid(&count, "1 to 256"));
+    }
+    assert_eq!(sim::MAX_TILESET_IMAGE_SIDE_PX, 8192);
+    assert_eq!(MAX_TILESET_TILES, 256);
+}
+
+// --- Review 2, P2-A: rejection reasons name the actual cause --------------------------------
+
+#[test]
+fn a_byte_order_mark_is_named_as_the_cause() {
+    // Before, it was reported as "the root element's end tag is not terminated".
+    let reason = "a UTF-8 byte order mark at the start of the file is not supported";
+    let mut text = b"\xEF\xBB\xBF".to_vec();
+    text.extend(valid_text().into_bytes());
+    let path = temp_file("bom.tmx", &text);
+    assert_rejected(&path, "file", MapErrorKind::Parse(reason.into()));
+
+    let reference = r#"<tileset firstgid="1" source="{source}"/>"#;
+    let (map, tsx) = external_variant("external_bom", &[], reference);
+    let mut text = b"\xEF\xBB\xBF".to_vec();
+    text.extend(std::fs::read(&tsx).expect("tileset"));
+    std::fs::write(&tsx, text).expect("tileset with a byte order mark");
+    assert_rejected_in(&map, &tsx, "file", MapErrorKind::Parse(reason.into()));
+}
+
+#[test]
+fn a_map_has_exactly_one_tileset_before_its_layer() {
+    // Before, a missing tileset and a tileset after the layer were both reported as
+    // "cell (0, 0): cell has no tile".
+    let text = valid_text();
+    let start = text.find(" <tileset").expect("tileset");
+    let end = text.find("</tileset>\n").expect("tileset end") + "</tileset>\n".len();
+    let tileset = &text[start..end];
+    let field = "map element <tileset>";
+
+    let path = temp_file("no_tileset.tmx", text.replacen(tileset, "", 1).as_bytes());
+    assert_rejected(&path, field, MapErrorKind::MissingElement);
+
+    let moved = text
+        .replacen(tileset, "", 1)
+        .replacen(MAP_END, &format!("{tileset}{MAP_END}"), 1);
+    let path = temp_file("tileset_after_layer.tmx", moved.as_bytes());
+    assert_rejected(
+        &path,
+        field,
+        MapErrorKind::OutOfOrder {
+            before: r#"the layer "terrain""#.into(),
+        },
+    );
+
+    let head_end = text.find("nextobjectid=\"1\">").expect("map head") + "nextobjectid=\"1\"".len();
+    let empty = format!("{}/>\n", &text[..head_end]);
+    let path = temp_file("empty_map_element.tmx", empty.as_bytes());
+    assert_rejected(&path, field, MapErrorKind::MissingElement);
+}
+
+#[test]
+fn a_missing_external_tileset_is_a_read_error_of_its_source_attribute() {
+    // Before, the field was "file" and the kind a parse error.
+    let path = variant(
+        "missing_tsx",
+        &[(
+            r#"<tileset firstgid="1" name="fixture" tilewidth="64" tileheight="32" tilecount="3" columns="3">"#,
+            r#"<tileset firstgid="1" source="nowhere.tsx"/><tileset firstgid="1" name="fixture" tilewidth="64" tileheight="32" tilecount="3" columns="3">"#,
+        )],
+    );
+    let error = load(&path).expect_err("missing tileset file");
+    assert_eq!(error.file, path, "{error}");
+    assert_eq!(
+        error.field, r#"tileset "nowhere.tsx" attribute "source""#,
+        "{error}"
+    );
+    let tsx = path.with_file_name("nowhere.tsx");
+    match &error.kind {
+        MapErrorKind::Read(reason) => {
+            assert!(reason.contains(&tsx.display().to_string()), "{error}")
+        }
+        other => panic!("expected a read error, found {other:?}"),
+    }
+
+    // A tileset file above the size limit is a fault of that file.
+    let reference = r#"<tileset firstgid="1" source="{source}"/>"#;
+    let (map, tsx) = external_variant("external_oversized", &[], reference);
+    let limit = usize::try_from(MAX_MAP_FILE_BYTES).expect("limit fits in usize");
+    let mut text = std::fs::read(&tsx).expect("tileset");
+    text.resize(limit + 1, b'\n');
+    std::fs::write(&tsx, text).expect("oversized tileset");
+    assert_rejected_in(
+        &map,
+        &tsx,
+        "file",
+        MapErrorKind::FileTooLarge {
+            max_bytes: MAX_MAP_FILE_BYTES,
+        },
+    );
+}
+
+#[test]
+fn errors_in_external_tilesets_are_reported_as_tileset_files() {
+    // Before, every message began with "map", also for a fault in a `.tsx` file.
+    let reference = r#"<tileset firstgid="1" source="{source}"/>"#;
+    let (map, tsx) = external_variant(
+        "external_reported_as_tileset",
+        &[(r#"columns="3">"#, r#"columns="3" margin="1000">"#)],
+        reference,
+    );
+    let error = load(&map).expect_err("unsupported attribute in the tileset");
+    assert_eq!(error.file, tsx, "{error}");
+    let message = error.to_string();
+    assert!(
+        message.starts_with(&format!("tileset {}: ", tsx.display())),
+        "{message}"
+    );
+    let error = load(&variant("reported_as_map", &[(MAP_END, "<extra/>")]))
+        .expect_err("unsupported element in the map");
+    assert!(error.to_string().starts_with("map "), "{error}");
+}
+
 // --- User notes, item 3: seeded mutation test over the demo map -----------------------------
 
 /// SplitMix64: a small deterministic generator, so the cases do not depend on a crate's

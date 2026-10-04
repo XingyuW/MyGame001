@@ -660,11 +660,25 @@ fn malformed_xml_and_wrong_root_are_parse_errors() {
             r#"<tileset firstgid="1" source="nowhere.tsx"/><tileset firstgid="9" name="fixture""#,
         )],
     );
-    for path in [not_xml, wrong_root, missing_external] {
+    for path in [not_xml, wrong_root] {
         let error = load_map(&path).expect_err("malformed file");
         assert_eq!(error.field, "file", "{error}");
         assert!(matches!(error.kind, MapErrorKind::Parse(_)), "{error}");
     }
+    // M1 review 2, P2-A item 3: a missing external tileset was reported as a parse error of the
+    // field "file"; the fault is the reference's `source` attribute, and the reason is that the
+    // named file cannot be read. This case asserts that exactly.
+    let error = load_map(&missing_external).expect_err("missing external tileset");
+    assert_eq!(error.file, missing_external, "{error}");
+    assert_eq!(
+        error.field, r#"tileset "nowhere.tsx" attribute "source""#,
+        "{error}"
+    );
+    let tsx = missing_external.with_file_name("nowhere.tsx");
+    assert!(
+        matches!(&error.kind, MapErrorKind::Read(reason) if reason.contains(&tsx.display().to_string())),
+        "{error}"
+    );
 }
 
 #[test]
