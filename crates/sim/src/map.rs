@@ -1,8 +1,11 @@
-//! Maps: the [`Grid`] resource and the loader for the Tiled map format of docs/DECISIONS.md (D8).
+//! Maps: the [`Grid`] resource and the loader for the Tiled map format of docs/DECISIONS.md (D8,
+//! D13).
 //!
 //! A map file is validated completely before any of it is used, and every problem is reported as
-//! a [`MapError`] naming the file, the offending field, and the reason (invariant I8). The
-//! `game` crate hands a map to `bevy_ecs_tiled` only after it has passed [`load_map`].
+//! a [`MapError`] naming the file, the offending field, and the reason (invariant I8). Before
+//! `tiled` parses anything, the raw file is checked against the supported subset of the format
+//! (`map_subset`, invariant I11). The `game` crate hands a map to `bevy_ecs_tiled` only after it
+//! has passed [`load_map`] and the game's own check of the tileset image.
 
 use std::collections::BTreeMap;
 use std::fmt;
@@ -10,11 +13,10 @@ use std::io::{Cursor, Read};
 use std::path::{Path, PathBuf};
 
 use bevy_ecs::resource::Resource;
-use quick_xml::Reader;
-use quick_xml::events::{BytesStart, Event};
 use tiled::{Loader, Orientation, Properties, PropertyValue, TileLayer};
 
 use crate::hash::Fnv1a64;
+use crate::map_subset;
 
 /// The map format version this crate reads (map property `schema_version`).
 pub const MAP_SCHEMA_VERSION: i32 = 1;
@@ -24,6 +26,21 @@ pub const MAX_MAP_SIDE: u32 = 256;
 
 /// Name of the one tile layer a map consists of.
 pub const TERRAIN_LAYER: &str = "terrain";
+
+/// Width of a cell's diamond in pixels: the only supported tile width. Exact picking is
+/// established for this tile size (docs/DECISIONS.md, D9 and D13).
+pub const TILE_WIDTH_PX: u32 = 64;
+
+/// Height of a cell's diamond in pixels: the only supported tile height.
+pub const TILE_HEIGHT_PX: u32 = 32;
+
+/// Largest accepted `tilecount` of a tileset. `tiled` allocates an entry per tile id below
+/// `tilecount` before anything else is checked (M1 review 1, P0-3).
+pub const MAX_TILESET_TILES: u32 = 1024;
+
+/// Largest accepted size of a map or tileset file in bytes. A 256×256 map whose cells all carry
+/// flip flags needs about 0.75 MB.
+pub const MAX_MAP_FILE_BYTES: u64 = 4 * 1024 * 1024;
 
 /// A map cell. Cell (0, 0) is the top corner of the isometric diamond; +x runs down-right and +y
 /// runs down-left on screen.
@@ -109,6 +126,19 @@ pub struct LoadedMap {
     pub tile_width: u32,
     /// Height of one cell's diamond in pixels. Presentation data, not used by the simulation.
     pub tile_height: u32,
+    /// The tileset image the renderer will load. Presentation data, not used by the simulation;
+    /// the game checks it against the image file before rendering (docs/DECISIONS.md, D13).
+    pub tileset_image: TilesetImage,
+}
+
+/// A tileset image: its file name, which names a file in the map's directory (D13), and the size
+/// in pixels that the map declares for it. The name is kept relative so that a map loads to the
+/// same value wherever its file lies.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TilesetImage {
+    pub file_name: String,
+    pub width: u32,
+    pub height: u32,
 }
 
 /// Why a map file was rejected. See [`MapErrorKind`] for the reasons.
@@ -183,6 +213,28 @@ pub enum MapErrorKind {
         tileset: String,
         id: u32,
     },
+    /// The file is larger than [`MAX_MAP_FILE_BYTES`].
+    FileTooLarge {
+        max_bytes: u64,
+    },
+    /// The element is not part of the supported subset of the format (D13).
+    UnsupportedElement,
+    /// The attribute is not part of the supported subset of the format (D13).
+    UnsupportedAttribute,
+    MissingAttribute,
+    /// The element, attribute, or property may appear only once.
+    Duplicate,
+    /// The value is outside the supported subset of the format (D13).
+    InvalidValue {
+        found: String,
+        expected: String,
+    },
+    /// `bevy_ecs_tiled`'s own scan for external files would find other files than the ones
+    /// accepted by the check (D13).
+    ExternalReferenceMismatch {
+        found: Vec<String>,
+        expected: Vec<String>,
+    },
 }
 
 impl fmt::Display for MapErrorKind {
@@ -249,204 +301,100 @@ impl fmt::Display for MapErrorKind {
                     "tile {id} of tileset {tileset:?} is not defined (it has no properties)"
                 )
             }
+            Self::FileTooLarge { max_bytes } => {
+                write!(f, "the file is larger than {max_bytes} bytes")
+            }
+            Self::UnsupportedElement => write!(f, "element is not supported"),
+            Self::UnsupportedAttribute => write!(f, "attribute is not supported"),
+            Self::MissingAttribute => write!(f, "required attribute is missing"),
+            Self::Duplicate => write!(f, "defined more than once"),
+            Self::InvalidValue { found, expected } => {
+                write!(f, "value {found:?} is not supported, expected {expected}")
+            }
+            Self::ExternalReferenceMismatch { found, expected } => write!(
+                f,
+                "the renderer's scan for external files finds {found:?}, expected {expected:?}: \
+                 an external tileset must be referenced as source=\"name.tsx\", and no other \
+                 text may contain source=\" or template=\" followed by a .tsx or .tx path"
+            ),
         }
     }
 }
 
 /// Loads and validates the map file at `path`.
 ///
-/// Never panics on malformed input: every problem is returned as a [`MapError`].
+/// The file, and the external tileset it references if any, is first checked against the
+/// supported subset of the Tiled format (`map_subset`, docs/DECISIONS.md D13) on its raw bytes;
+/// only then does `tiled` parse it, from exactly the bytes that were checked. Malformed input,
+/// including the hostile inputs of M1 review 1 (P0-1 to P0-4), is returned as a [`MapError`];
+/// `tests/m1_map_subset.rs` covers them, and a seeded mutation test over the demo map checks
+/// that no input it generates panics or exceeds a fixed memory budget.
 pub fn load_map(path: impl AsRef<Path>) -> Result<LoadedMap, MapError> {
     let path = path.as_ref();
-    let error = |field: String, kind: MapErrorKind| MapError {
+    let bytes = map_subset::read_file(path).map_err(|kind| MapError {
         file: path.to_owned(),
-        field,
+        field: "file".into(),
         kind,
-    };
+    })?;
+    let external = map_subset::check_map(path, &bytes)?;
 
-    let bytes =
-        std::fs::read(path).map_err(|e| error("file".into(), MapErrorKind::Read(e.to_string())))?;
-    precheck(&bytes).map_err(|(field, kind)| error(field, kind))?;
-
-    // `tiled` reads the map through this closure, so it parses exactly the bytes checked above.
-    // Other files (external tilesets) come from the file system.
+    // `tiled` reads only what was checked: the map, and the external tileset at the path the
+    // check resolved for it. Any other request fails.
     let reader = |requested: &Path| -> std::io::Result<Box<dyn Read>> {
         if requested == path {
-            Ok(Box::new(Cursor::new(bytes.clone())))
-        } else {
-            Ok(Box::new(std::io::BufReader::new(std::fs::File::open(
-                requested,
-            )?)))
+            return Ok(Box::new(Cursor::new(bytes.clone())));
         }
+        if let Some(tileset) = &external
+            && requested == tileset.path
+        {
+            return Ok(Box::new(Cursor::new(tileset.bytes.clone())));
+        }
+        Err(std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            format!("{} is not part of the checked map", requested.display()),
+        ))
     };
     let map = Loader::with_reader(reader)
         .load_tmx_map(path)
-        .map_err(|e| error("file".into(), MapErrorKind::Parse(e.to_string())))?;
+        .map_err(|e| MapError {
+            file: path.to_owned(),
+            field: "file".into(),
+            kind: MapErrorKind::Parse(e.to_string()),
+        })?;
 
-    validate(&map).map_err(|(field, kind)| error(field, kind))
+    validate(path, &map)
 }
 
 type Issue = (String, MapErrorKind);
 
-/// Checks done on the raw XML before `tiled` parses it.
-///
-/// The map header is checked here so that a zero sized or oversized map is reported as such
-/// rather than as a data error. The layer data check prevents a panic: `tiled` 0.16.0 indexes a
-/// finite layer's tile vector without a bounds check (`FiniteTileLayerData::get_tile_data`), so
-/// a layer with fewer data entries than `width × height` would panic on access. The entries are
-/// counted exactly as `tiled` decodes CSV data: the first text or CDATA node of `<data>`, split
-/// on commas.
-fn precheck(bytes: &[u8]) -> Result<(), Issue> {
-    let mut reader = Reader::from_reader(Cursor::new(bytes));
-    let mut buf = Vec::new();
-    let mut seen_root = false;
-    // Name and expected entry count of the `<layer>` being read.
-    let mut layer: Option<(String, u64)> = None;
-
-    loop {
-        let event = reader.read_event_into(&mut buf).map_err(xml_issue)?;
-        match &event {
-            Event::Start(element) | Event::Empty(element) => {
-                let is_empty = matches!(event, Event::Empty(_));
-                let name = element.local_name();
-                if !seen_root {
-                    seen_root = true;
-                    if name.as_ref() == b"map" {
-                        check_map_header(element)?;
-                    }
-                } else if name.as_ref() == b"layer" && !is_empty {
-                    layer = Some(layer_header(element)?);
-                } else if name.as_ref() == b"data"
-                    && let Some((layer_name, expected)) = &layer
-                {
-                    let field = format!("layer {layer_name:?} data");
-                    let encoding = attribute(element, "encoding")?;
-                    let compression = attribute(element, "compression")?;
-                    if encoding.as_deref() != Some("csv") || compression.is_some() {
-                        return Err((
-                            field,
-                            MapErrorKind::UnsupportedEncoding {
-                                encoding,
-                                compression,
-                            },
-                        ));
-                    }
-                    let text = if is_empty {
-                        String::new()
-                    } else {
-                        first_text(&mut reader)?
-                    };
-                    let found = text.split(',').count() as u64;
-                    if found != *expected {
-                        return Err((
-                            field,
-                            MapErrorKind::TileCountMismatch {
-                                expected: *expected,
-                                found,
-                            },
-                        ));
-                    }
-                }
-            }
-            Event::End(element) if element.local_name().as_ref() == b"layer" => layer = None,
-            Event::Eof => return Ok(()),
-            _ => {}
-        }
-        buf.clear();
-    }
-}
-
-fn xml_issue(error: quick_xml::Error) -> Issue {
-    (
-        "file".into(),
-        MapErrorKind::Parse(format!("XML error: {error}")),
-    )
-}
-
-fn attribute(element: &BytesStart<'_>, name: &str) -> Result<Option<String>, Issue> {
-    match element.try_get_attribute(name).map_err(xml_issue)? {
-        Some(value) => Ok(Some(
-            value.unescape_value().map_err(xml_issue)?.into_owned(),
-        )),
-        None => Ok(None),
-    }
-}
-
-fn check_map_header(map: &BytesStart<'_>) -> Result<(), Issue> {
-    if let Some(orientation) = attribute(map, "orientation")?
-        && orientation != "isometric"
-    {
-        return Err((
-            "map attribute \"orientation\"".into(),
-            MapErrorKind::UnsupportedOrientation(orientation),
-        ));
-    }
-    if attribute(map, "infinite")?.as_deref() == Some("1") {
-        return Err(("map attribute \"infinite\"".into(), MapErrorKind::Infinite));
-    }
-    // Missing or malformed sizes are left to `tiled`, which reports them.
-    let size = |name| -> Result<Option<u32>, Issue> {
-        Ok(attribute(map, name)?.and_then(|value| value.parse().ok()))
+/// Checks the parsed map against the map format and builds the grid. Errors found in a tileset
+/// name the file that contains it (the map, or the external tileset file).
+fn validate(path: &Path, map: &tiled::Map) -> Result<LoadedMap, MapError> {
+    let in_map = |(field, kind): Issue| MapError {
+        file: path.to_owned(),
+        field,
+        kind,
     };
-    if let (Some(width), Some(height)) = (size("width")?, size("height")?) {
-        let field = "map attributes \"width\" and \"height\"".to_string();
-        if width == 0 || height == 0 {
-            return Err((field, MapErrorKind::ZeroSize { width, height }));
-        }
-        if width > MAX_MAP_SIDE || height > MAX_MAP_SIDE {
-            return Err((field, MapErrorKind::TooLarge { width, height }));
-        }
-    }
-    Ok(())
+    check_header(map).map_err(in_map)?;
+    check_map_properties(&map.properties).map_err(in_map)?;
+    let terrain = tile_terrain(map)?;
+    let layer = terrain_layer(map).map_err(in_map)?;
+    let cells = cells(map, &terrain, &layer).map_err(in_map)?;
+    let tileset_image = tileset_image(map).map_err(in_map)?;
+    Ok(LoadedMap {
+        grid: Grid {
+            width: map.width,
+            height: map.height,
+            cells,
+        },
+        tile_width: map.tile_width,
+        tile_height: map.tile_height,
+        tileset_image,
+    })
 }
 
-fn layer_header(layer: &BytesStart<'_>) -> Result<(String, u64), Issue> {
-    let name = attribute(layer, "name")?.unwrap_or_default();
-    let dimension = |attr| -> Result<u64, Issue> {
-        attribute(layer, attr)?
-            .and_then(|value| value.parse::<u32>().ok())
-            .map(u64::from)
-            .ok_or_else(|| {
-                (
-                    format!("layer {name:?} attribute {attr:?}"),
-                    MapErrorKind::Parse("missing or not an unsigned integer".into()),
-                )
-            })
-    };
-    let expected = dimension("width")? * dimension("height")?;
-    Ok((name, expected))
-}
-
-/// Reads the rest of a `<data>` element and returns its first text or CDATA node, mirroring
-/// `tiled`'s `read_text_or_cdata`.
-fn first_text(reader: &mut Reader<Cursor<&[u8]>>) -> Result<String, Issue> {
-    let mut buf = Vec::new();
-    let mut skip_buf = Vec::new();
-    let mut text = None;
-    loop {
-        match reader.read_event_into(&mut buf).map_err(xml_issue)? {
-            Event::Text(t) if text.is_none() => {
-                text = Some(t.unescape().map_err(xml_issue)?.into_owned());
-            }
-            Event::CData(t) if text.is_none() => {
-                text = Some(String::from_utf8_lossy(t.as_ref()).into_owned());
-            }
-            Event::Start(element) => {
-                let end = element.to_end().into_owned();
-                reader
-                    .read_to_end_into(end.name(), &mut skip_buf)
-                    .map_err(xml_issue)?;
-            }
-            Event::End(_) | Event::Eof => return Ok(text.unwrap_or_default()),
-            _ => {}
-        }
-        buf.clear();
-    }
-}
-
-/// Checks the parsed map against the map format and builds the grid.
-fn validate(map: &tiled::Map) -> Result<LoadedMap, Issue> {
-    // Repeated here because the header check of `precheck` skips anything `tiled` reports itself.
+/// Repeats the header checks of `map_subset` on the parsed result.
+fn check_header(map: &tiled::Map) -> Result<(), Issue> {
     if map.orientation != Orientation::Isometric {
         return Err((
             "map attribute \"orientation\"".into(),
@@ -474,10 +422,16 @@ fn validate(map: &tiled::Map) -> Result<LoadedMap, Issue> {
         ));
     }
 
-    check_map_properties(&map.properties)?;
-    let terrain = tile_terrain(map)?;
-    let layer = terrain_layer(map)?;
+    Ok(())
+}
 
+/// The terrain of every cell, in row-major order.
+fn cells(
+    map: &tiled::Map,
+    terrain: &BTreeMap<(usize, u32), Cell>,
+    layer: &tiled::FiniteTileLayer<'_>,
+) -> Result<Vec<Cell>, Issue> {
+    let (width, height) = (map.width, map.height);
     let mut cells = Vec::with_capacity(width as usize * height as usize);
     for y in 0..height as i32 {
         for x in 0..width as i32 {
@@ -499,15 +453,36 @@ fn validate(map: &tiled::Map) -> Result<LoadedMap, Issue> {
             cells.push(*cell);
         }
     }
+    Ok(cells)
+}
 
-    Ok(LoadedMap {
-        grid: Grid {
-            width,
-            height,
-            cells,
-        },
-        tile_width: map.tile_width,
-        tile_height: map.tile_height,
+/// The image of the map's tileset. `tiled` resolves the image path against the tileset's
+/// directory, which is the map's directory (D13), so its file name identifies it.
+fn tileset_image(map: &tiled::Map) -> Result<TilesetImage, Issue> {
+    let missing = || ("tileset".to_string(), MapErrorKind::TilesetWithoutImage);
+    let tileset = map.tilesets().first().ok_or_else(missing)?;
+    let image = tileset.image.as_ref().ok_or_else(missing)?;
+    let size = |name: &str, value: i32| {
+        u32::try_from(value).map_err(|_| {
+            (
+                format!("tileset {:?} image attribute {name:?}", tileset.name),
+                MapErrorKind::InvalidValue {
+                    found: value.to_string(),
+                    expected: "a positive 32-bit integer".into(),
+                },
+            )
+        })
+    };
+    let file_name = image
+        .source
+        .file_name()
+        .and_then(|name| name.to_str())
+        .ok_or_else(missing)?
+        .to_owned();
+    Ok(TilesetImage {
+        file_name,
+        width: size("width", image.width)?,
+        height: size("height", image.height)?,
     })
 }
 
@@ -550,23 +525,34 @@ fn check_map_properties(properties: &Properties) -> Result<(), Issue> {
 }
 
 /// Terrain of every tile defined in the map's tilesets, keyed by (tileset index, tile id).
-fn tile_terrain(map: &tiled::Map) -> Result<BTreeMap<(usize, u32), Cell>, Issue> {
+/// Errors name the file that holds the tileset (`tiled` records it as the tileset's `source`:
+/// the external tileset file, or the map for an embedded tileset).
+fn tile_terrain(map: &tiled::Map) -> Result<BTreeMap<(usize, u32), Cell>, MapError> {
     let mut terrain = BTreeMap::new();
     for (index, tileset) in map.tilesets().iter().enumerate() {
+        let in_tileset = |(field, kind): Issue| MapError {
+            file: tileset.source.clone(),
+            field,
+            kind,
+        };
         let tileset_field = format!("tileset {:?}", tileset.name);
         if let Some(name) = sorted_names(&tileset.properties).first() {
-            return Err((
+            return Err(in_tileset((
                 format!("{tileset_field} property {name:?}"),
                 MapErrorKind::UnknownProperty,
-            ));
+            )));
         }
         if tileset.image.is_none() {
-            return Err((tileset_field, MapErrorKind::TilesetWithoutImage));
+            return Err(in_tileset((
+                tileset_field,
+                MapErrorKind::TilesetWithoutImage,
+            )));
         }
         let mut tiles: Vec<_> = tileset.tiles().collect();
         tiles.sort_by_key(|(id, _)| *id);
         for (id, tile) in tiles {
-            let cell = parse_tile(&format!("{tileset_field} tile {id}"), &tile.properties)?;
+            let cell = parse_tile(&format!("{tileset_field} tile {id}"), &tile.properties)
+                .map_err(in_tileset)?;
             terrain.insert((index, id), cell);
         }
     }

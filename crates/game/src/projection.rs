@@ -114,6 +114,13 @@ mod tests {
     /// far edges.
     const INSIDE: [f32; 4] = [0.0, 1.0 / 64.0, 0.5, 63.0 / 64.0];
 
+    #[test]
+    fn the_tested_tile_size_is_the_only_one_maps_may_use() {
+        // Exact picking is established for `TILE` only, so `sim::load_map` rejects every other
+        // tile size (docs/DECISIONS.md, D13).
+        assert_eq!(TILE, TileSize::new(sim::TILE_WIDTH_PX, sim::TILE_HEIGHT_PX));
+    }
+
     fn cells(width: u32, height: u32) -> impl Iterator<Item = CellPos> {
         (0..height as i32).flat_map(move |y| (0..width as i32).map(move |x| CellPos::new(x, y)))
     }
