@@ -241,8 +241,12 @@ fn report_clicked_cell(
     buttons: Res<ButtonInput<MouseButton>>,
     hovered: Res<HoveredCell>,
     terrain: Option<Res<MapTerrain>>,
+    window: Single<&Window, With<PrimaryWindow>>,
 ) {
-    if !buttons.just_pressed(MouseButton::Left) {
+    let over_sidebar = window
+        .cursor_position()
+        .is_some_and(|cursor| crate::sidebar::over_sidebar(cursor, window.width()));
+    if !buttons.just_pressed(MouseButton::Left) || over_sidebar {
         return;
     }
     let Some(terrain) = terrain else {

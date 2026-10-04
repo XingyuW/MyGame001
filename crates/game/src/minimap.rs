@@ -404,7 +404,8 @@ fn place_camera_frame(
     }
 }
 
-/// A left click or drag on the minimap centres the visible part of the view on that point.
+/// A left click or drag that starts on the minimap centres the visible part of the view on the
+/// point under the cursor.
 fn click_minimap(
     buttons: Res<ButtonInput<MouseButton>>,
     map: Option<Res<MapView>>,
@@ -412,17 +413,26 @@ fn click_minimap(
     nodes: Query<&RelativeCursorPosition, With<MinimapNode>>,
     camera: Single<(&Projection, &mut Transform), With<Camera2d>>,
     window: Single<&Window, With<PrimaryWindow>>,
+    mut dragging: Local<bool>,
 ) {
     let (Some(map), Some(minimap)) = (map, minimap) else {
         return;
     };
-    if !buttons.pressed(MouseButton::Left) || window.cursor_position().is_none() {
+    let over = nodes.iter().find(|cursor| cursor.cursor_over());
+    if buttons.just_pressed(MouseButton::Left) {
+        *dragging = over.is_some();
+    }
+    if !buttons.pressed(MouseButton::Left) {
+        *dragging = false;
+    }
+    if !*dragging || window.cursor_position().is_none() {
         return;
     }
+    // While dragging, the cursor may leave the minimap; the point is then clamped to its edge.
     let Some(point) = nodes
         .iter()
-        .find(|cursor| cursor.cursor_over())
-        .and_then(|cursor| cursor.normalized)
+        .find_map(|cursor| cursor.normalized)
+        .map(|point| point.clamp(Vec2::splat(-0.5), Vec2::splat(0.5)))
     else {
         return;
     };

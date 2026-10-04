@@ -457,6 +457,50 @@ pub(crate) mod tests {
         assert_eq!(app.world().resource::<SimHost>().tick(), 1);
     }
 
+    #[test]
+    fn match_setup_installs_the_loaded_match_or_ends_the_game_with_an_error() {
+        let setup_app = |grid: Grid| {
+            let mut app = App::new();
+            app.add_plugins((MinimalPlugins, SimHostPlugin { seed: 0 }))
+                .init_resource::<BuildingStatus>()
+                .init_resource::<UnitStatus>();
+            let (loaded, _) = crate::units::load_match_data(&assets_root())
+                .unwrap_or_else(|error| panic!("{error}"));
+            app.world_mut().insert_resource(MatchGrid(grid));
+            app.world_mut()
+                .insert_resource(MatchDefinitions(loaded.definitions));
+            app.world_mut().run_system_once(start_match).expect("runs");
+            app
+        };
+        // The demo map holds the demo match.
+        let demo = sim::load_map(assets_root().join(crate::map::MAP_PATH))
+            .unwrap_or_else(|error| panic!("{error}"))
+            .grid;
+        let app = setup_app(demo);
+        assert_eq!(app.should_exit(), None);
+        assert_eq!(
+            app.world().resource::<UnitStatus>().spawned,
+            crate::units::starting_unit_total()
+        );
+        assert_eq!(
+            app.world().resource::<BuildingStatus>().spawned,
+            crate::buildings::STARTING_BUILDINGS.len()
+        );
+        assert!(!app.world().contains_resource::<MatchGrid>());
+        // A 16x16 map cannot hold the starting buildings: the game ends with exit code 1 and
+        // nothing is reported as spawned.
+        let small = sim::load_map(
+            PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .join("../sim/tests/fixtures/maps/open_16x16.tmx"),
+        )
+        .unwrap_or_else(|error| panic!("{error}"))
+        .grid;
+        let app = setup_app(small);
+        assert_eq!(app.should_exit(), Some(AppExit::error()));
+        assert_eq!(app.world().resource::<UnitStatus>().spawned, 0);
+        assert_eq!(app.world().resource::<BuildingStatus>().spawned, 0);
+    }
+
     /// A host on the 32x32 economy fixture map with the combat fixture data, set up by `setup`
     /// (scenario setup for tests of the interface's reading of the simulation).
     pub(crate) fn fixture_host(setup: impl FnOnce(&mut World)) -> SimHost {
