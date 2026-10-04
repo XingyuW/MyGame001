@@ -21,8 +21,11 @@ pub enum SimEvent {
         command: Command,
         reason: RejectReason,
     },
-    /// The unit reached the destination of its move order.
-    MoveCompleted { unit: SimId },
+    /// The unit reached the destination of its move order. `retargeted` is `false` when that is
+    /// the destination the order assigned, and `true` when units that stand still closed every
+    /// way to it and the unit stopped instead at the reachable cell nearest to it
+    /// (docs/DECISIONS.md D19 item 6, D21).
+    MoveCompleted { unit: SimId, retargeted: bool },
     /// The unit's move order ended without reaching its destination; the unit stops at the next
     /// cell centre.
     MoveFailed { unit: SimId, reason: MoveFailure },
@@ -36,7 +39,9 @@ pub enum MoveFailure {
     NoDestination,
     /// No path over passable terrain leads to the unit's destination.
     Unreachable,
-    /// Other units kept the way blocked: repeated repaths around them found no way.
+    /// Other units kept the way blocked: the unit took no step toward its destination for
+    /// `MAX_STALLED_TICKS` ticks (not counting ticks spent waiting for the pathfinder), or took
+    /// more than `MAX_PATHS_WITHOUT_PROGRESS` paths around them without getting closer than before.
     Blocked,
 }
 

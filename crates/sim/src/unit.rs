@@ -175,7 +175,17 @@ pub struct MoveOrder {
     pub blocked_ticks: u16,
     /// Times the destination was moved because idle units closed every way to it.
     pub retargets: u32,
-    /// Consecutive ticks in which the unit did not advance at all.
+    /// Cost of the rest of `path`, in the step costs of A* (10 orthogonal, 14 diagonal), while
+    /// `path` leads to `destination`; `None` while the unit waits for a path or steps aside.
+    pub remaining: Option<u32>,
+    /// The least `remaining` cost with which the unit has started a step during this order
+    /// (`u32::MAX` before its first step, and again after terrain changed under its path). A
+    /// step that lowers it is real progress toward the destination (docs/DECISIONS.md D21).
+    pub best: u32,
+    /// Paths the unit has taken since its last real progress (a step that lowered `best`).
+    pub paths_since_progress: u16,
+    /// Ticks since the unit last started a step along a path to its destination (a step aside
+    /// does not count), not counting ticks spent waiting for the pathfinder.
     pub stalled_ticks: u16,
     /// Repaths since the order was given (for diagnostics and tests).
     pub repaths: u32,
@@ -192,6 +202,9 @@ impl MoveOrder {
             },
             blocked_ticks: 0,
             retargets: 0,
+            remaining: None,
+            best: u32::MAX,
+            paths_since_progress: 0,
             stalled_ticks: 0,
             repaths: 0,
         }
@@ -292,7 +305,8 @@ fn write_cell(hasher: &mut Fnv1a64, cell: CellPos) {
 
 /// Appends a unit's components to the hash, in a fixed layout (docs/DECISIONS.md D4, extended in
 /// M2): owner, kind, speed, cell, step (flag, target, progress, length), position, facing, and
-/// the order (flag, destination, state, path length and cells, counters).
+/// the order (flag, destination, state, path length and cells, blocked ticks, retargets, remaining
+/// cost (flag and value), best cost, paths since progress, stalled ticks, repaths).
 pub(crate) fn hash_unit(
     hasher: &mut Fnv1a64,
     (owner, unit, mobile, position, facing, orders): (
@@ -338,6 +352,15 @@ pub(crate) fn hash_unit(
             }
             hasher.write(&order.blocked_ticks.to_le_bytes());
             hasher.write_u32(order.retargets);
+            match order.remaining {
+                None => hasher.write(&[0]),
+                Some(remaining) => {
+                    hasher.write(&[1]);
+                    hasher.write_u32(remaining);
+                }
+            }
+            hasher.write_u32(order.best);
+            hasher.write(&order.paths_since_progress.to_le_bytes());
             hasher.write(&order.stalled_ticks.to_le_bytes());
             hasher.write_u32(order.repaths);
         }

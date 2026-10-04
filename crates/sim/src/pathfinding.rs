@@ -241,6 +241,10 @@ fn is_waiting(mobile: &Mobile, orders: &Orders) -> bool {
 ///    members that arrived first surround it, or an idle unit stands on it), the unit takes as
 ///    its new destination the cell nearest to the old one that it can reach around them
 ///    ([`nearest_reachable`]), possibly the cell it stands in.
+///
+/// Every path served counts toward the order's limit of paths without progress
+/// (`movement::MAX_PATHS_WITHOUT_PROGRESS`), and a path that leads to the destination records
+/// its cost as the order's remaining cost (docs/DECISIONS.md D21).
 pub(crate) fn find_paths(
     grid: Res<Grid>,
     mut events: ResMut<Messages<SimEvent>>,
@@ -346,6 +350,11 @@ pub(crate) fn find_paths(
                 }
             },
         };
+        // A step aside leads to a neighbour, not to the destination: following it is no
+        // progress (docs/DECISIONS.md D21).
+        let leads_to_destination = path.cells.last().copied().unwrap_or(start) == order.destination;
+        order.remaining = leads_to_destination.then_some(path.cost);
+        order.paths_since_progress = order.paths_since_progress.saturating_add(1);
         order.path = path.cells;
         order.path.reverse();
         order.state = PathState::Following;

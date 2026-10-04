@@ -348,7 +348,10 @@ fn executed_route_is_optimal_through_the_production_path() {
             visited.push(cell);
         }
         assert_i6(&mut app, "route");
-        if events.contains(&SimEvent::MoveCompleted { unit }) {
+        if events.contains(&SimEvent::MoveCompleted {
+            unit,
+            retargeted: false,
+        }) {
             completed = true;
             break;
         }
@@ -648,7 +651,13 @@ fn a_unit_ordered_to_its_own_cell_stays() {
     let unit = spawn(&mut app, HUMAN, "walker", 5, 5);
     let before = unit_state_after(&mut app, unit);
     move_to(&mut app, &[unit], 5, 5);
-    assert_eq!(tick(&mut app), vec![SimEvent::MoveCompleted { unit }]);
+    assert_eq!(
+        tick(&mut app),
+        vec![SimEvent::MoveCompleted {
+            unit,
+            retargeted: false
+        }]
+    );
     for _ in 0..100 {
         assert!(tick(&mut app).is_empty());
         let now = unit_state_after(&mut app, unit);
@@ -675,7 +684,10 @@ fn units_cover_exactly_their_speed_per_tick() {
     }
     // The remainder of the way, then arrival exactly at the centre.
     let events = ticks(&mut app, 2);
-    assert!(events.contains(&SimEvent::MoveCompleted { unit: runner }));
+    assert!(events.contains(&SimEvent::MoveCompleted {
+        unit: runner,
+        retargeted: false
+    }));
     assert_eq!(
         unit_state_after(&mut app, runner).position,
         SubPos::centre_of(CellPos::new(15, 3))
@@ -708,7 +720,10 @@ fn facing_follows_each_step_direction() {
         assert_eq!(unit_state_after(&mut app, unit).facing, direction);
         let events = ticks(&mut app, 20);
         assert!(
-            events.contains(&SimEvent::MoveCompleted { unit }),
+            events.contains(&SimEvent::MoveCompleted {
+                unit,
+                retargeted: false
+            }),
             "{direction:?}"
         );
         assert_eq!(unit_state_after(&mut app, unit).facing, direction);
@@ -751,7 +766,10 @@ fn a_new_move_replaces_the_current_order() {
     move_to(&mut app, &[unit], 0, 15);
     let mut completed = false;
     for _ in 0..400 {
-        if tick(&mut app).contains(&SimEvent::MoveCompleted { unit }) {
+        if tick(&mut app).contains(&SimEvent::MoveCompleted {
+            unit,
+            retargeted: false,
+        }) {
             completed = true;
             break;
         }
@@ -790,7 +808,10 @@ fn a_newly_placed_obstacle_triggers_a_repath() {
         if let Some(order) = &state.orders.current {
             repathed |= order.repaths > 0;
         }
-        if events.contains(&SimEvent::MoveCompleted { unit }) {
+        if events.contains(&SimEvent::MoveCompleted {
+            unit,
+            retargeted: false,
+        }) {
             completed = true;
             break;
         }
@@ -833,7 +854,10 @@ fn a_unit_standing_in_the_way_is_bypassed() {
         if let Some(order) = unit_state_after(&mut app, mover).orders.current {
             waited = waited.max(order.blocked_ticks);
         }
-        if events.contains(&SimEvent::MoveCompleted { unit: mover }) {
+        if events.contains(&SimEvent::MoveCompleted {
+            unit: mover,
+            retargeted: false,
+        }) {
             completed = true;
             break;
         }
@@ -860,7 +884,10 @@ fn a_destination_held_by_an_idle_unit_is_replaced_by_the_nearest_reachable_cell(
     for _ in 0..1_000 {
         let events = tick(&mut app);
         assert_i6(&mut app, "blocked destination");
-        if events.contains(&SimEvent::MoveCompleted { unit: mover }) {
+        if events.contains(&SimEvent::MoveCompleted {
+            unit: mover,
+            retargeted: true,
+        }) {
             completed = true;
             break;
         }
@@ -902,7 +929,7 @@ fn run_until_completed(
     for _ in 0..limit {
         for event in tick(app) {
             match event {
-                SimEvent::MoveCompleted { unit } => {
+                SimEvent::MoveCompleted { unit, .. } => {
                     done.insert(unit);
                 }
                 other => panic!("{context}: unexpected {other:?}"),
@@ -1078,7 +1105,7 @@ fn run_group_to(app: &mut App, group: &[SimId], target: CellPos, limit: u32, con
     for elapsed in 1..=limit {
         for event in tick(app) {
             match event {
-                SimEvent::MoveCompleted { unit } => {
+                SimEvent::MoveCompleted { unit, .. } => {
                     pending.remove(&unit);
                 }
                 other => panic!("{context}: unexpected {other:?}"),
@@ -1163,7 +1190,7 @@ fn invariant_i6_holds_while_fifty_units_cross_each_other_for_2000_ticks() {
         }
         for event in tick(&mut app) {
             match event {
-                SimEvent::MoveCompleted { unit } => {
+                SimEvent::MoveCompleted { unit, .. } => {
                     assert!(pending.remove(&unit));
                     completed += 1;
                 }
@@ -1290,4 +1317,311 @@ fn the_hash_covers_unit_state() {
     let mut d = scenario("open_16x16");
     spawn(&mut d, HUMAN, "runner", 3, 3);
     assert_ne!(hash(&mut a), hash(&mut d));
+}
+
+// --- Termination and event accuracy (M2 review 1) ---------------------------------------------
+
+/// Runs with no further command until every unit has ended its order and stands at a cell
+/// centre, checking I6 on every tick, and returns each unit's end event and the tick it came in.
+/// Panics if some order is still live after `limit` ticks.
+fn run_until_all_orders_end(
+    app: &mut App,
+    limit: u32,
+    context: &str,
+) -> BTreeMap<SimId, (u32, SimEvent)> {
+    let mut ended = BTreeMap::new();
+    for elapsed in 1..=limit {
+        for event in tick(app) {
+            match event {
+                SimEvent::MoveCompleted { unit, .. } | SimEvent::MoveFailed { unit, .. } => {
+                    let previous = ended.insert(unit, (elapsed, event.clone()));
+                    assert!(previous.is_none(), "{context}: {unit:?} ended twice");
+                }
+                other => panic!("{context}: unexpected {other:?}"),
+            }
+        }
+        assert_i6(app, &format!("{context}, tick {elapsed}"));
+        if units(app)
+            .values()
+            .all(|state| state.orders.current.is_none() && state.mobile.step.is_none())
+        {
+            return ended;
+        }
+    }
+    let live: Vec<(SimId, CellPos, Option<u32>)> = units(app)
+        .into_iter()
+        .filter_map(|(id, state)| {
+            let order = state.orders.current?;
+            Some((id, state.mobile.cell, Some(order.repaths)))
+        })
+        .collect();
+    panic!("{context}: orders still live after {limit} ticks (unit, cell, repaths): {live:?}");
+}
+
+/// Ticks within which every order of the termination scenarios below must have ended. The
+/// orders that cannot reach their destinations end after about 800 ticks (the slowest of 1,000
+/// random scenarios settled 1,032 ticks after its last command); before the fix of M2 review 1
+/// P1-1 they never ended (the reviewer ran 20,000 ticks).
+const TERMINATION_LIMIT: u32 = 3_000;
+
+#[test]
+fn an_order_ends_when_two_units_keep_giving_way_to_each_other_in_a_sealed_room() {
+    // M2 review 1, P1-1: a sealed room of three cells in a column, (7, 3), (7, 4), (7, 5).
+    // Two units at its ends, each ordered to the other's cell, cannot pass each other. They
+    // form a wait-for cycle, the yielder steps aside into the free cell, the other advances one
+    // cell and blocks again, and the roles alternate: both keep moving, but neither gets closer
+    // than it was after its first step.
+    let mut app = scenario("open_16x16");
+    set_rock(
+        &mut app,
+        (6..=8)
+            .flat_map(|x| (2..=6).map(move |y| (x, y)))
+            .filter(|&(x, y)| !(x == 7 && (3..=5).contains(&y))),
+    );
+    let a = spawn(&mut app, HUMAN, "walker", 7, 3);
+    let b = spawn(&mut app, HUMAN, "walker", 7, 5);
+    order_swap(&mut app, a, b);
+    let ended = run_until_all_orders_end(&mut app, TERMINATION_LIMIT, "sealed room of three");
+    assert_eq!(ended.len(), 2, "{ended:?}");
+    // The first to give up fails as blocked; the other then finds its way closed by a unit that
+    // stands still and stops at the reachable cell nearest to its destination.
+    let failed: Vec<SimId> = ended
+        .iter()
+        .filter(|(_, (_, event))| {
+            matches!(
+                event,
+                SimEvent::MoveFailed {
+                    reason: MoveFailure::Blocked,
+                    ..
+                }
+            )
+        })
+        .map(|(&id, _)| id)
+        .collect();
+    assert_eq!(failed.len(), 1, "{ended:?}");
+    for (&id, (_, event)) in &ended {
+        if !failed.contains(&id) {
+            assert_eq!(
+                *event,
+                SimEvent::MoveCompleted {
+                    unit: id,
+                    retargeted: true
+                }
+            );
+        }
+    }
+    // Neither stands in the other's starting cell.
+    assert_ne!(cell_of(&mut app, a), CellPos::new(7, 5));
+    assert_ne!(cell_of(&mut app, b), CellPos::new(7, 3));
+}
+
+#[test]
+fn an_order_ends_when_units_keep_giving_way_in_a_dead_end_closed_by_idle_units() {
+    // M2 review 1, P1-1, without a sealed room: a dead end one cell wide, x = 7 from y = 2 to
+    // y = 6, with rock on both sides and at its end, whose opening at y = 7 is closed by three
+    // idle units of the other player. Two units inside, each ordered to the other's cell.
+    for (a_cell, b_cell) in [((7, 2), (7, 6)), ((7, 4), (7, 6)), ((7, 3), (7, 5))] {
+        let context = format!("dead end, {a_cell:?} <-> {b_cell:?}");
+        let mut app = scenario("open_16x16");
+        set_rock(
+            &mut app,
+            (1..=6).flat_map(|y| [(6, y), (8, y)]).chain([(7, 1)]),
+        );
+        let idle: Vec<SimId> = (6..=8)
+            .map(|x| spawn(&mut app, ENEMY, "walker", x, 7))
+            .collect();
+        let a = spawn(&mut app, HUMAN, "walker", a_cell.0, a_cell.1);
+        let b = spawn(&mut app, HUMAN, "walker", b_cell.0, b_cell.1);
+        order_swap(&mut app, a, b);
+        let ended = run_until_all_orders_end(&mut app, TERMINATION_LIMIT, &context);
+        assert_eq!(ended.len(), 2, "{context}: {ended:?}");
+        // The idle units never moved.
+        for (x, id) in (6..=8).zip(&idle) {
+            assert_eq!(cell_of(&mut app, *id), CellPos::new(x, 7), "{context}");
+        }
+        // Nobody claims to have reached a cell it is not in.
+        for (&id, (_, event)) in &ended {
+            if let SimEvent::MoveCompleted {
+                retargeted: false, ..
+            } = event
+            {
+                let destination = if id == a { b_cell } else { a_cell };
+                assert_eq!(
+                    cell_of(&mut app, id),
+                    CellPos::new(destination.0, destination.1),
+                    "{context}"
+                );
+            }
+        }
+    }
+}
+
+#[test]
+fn every_order_ends_on_random_maps_under_random_group_orders() {
+    // M2 review 1, P1-1: seeded scenarios on the open 16x16 fixture with 0 to 34 % of the cells
+    // turned to rock and 5 to 64 units, which receive random group orders for 1,500 ticks and
+    // then no further command. The generator is the reviewer's (`simprobe livelock`): with the
+    // reviewed code, seeds 62 and 154 (of the reviewer's 300) and 524, 754, 818, 909, and 928
+    // (of 1,000) left two units with orders forever; seeds 0 to 47 are a sweep. All 1,000 were
+    // run in release for the remediation report; in a debug build each takes about 0.4 s. I6
+    // must hold on every tick, and every order must end within `TERMINATION_LIMIT` ticks of the
+    // last command.
+    let kinds = ["walker", "runner"];
+    let mut scenarios = 0;
+    for seed in (0..48_u64).chain([62, 154, 524, 754, 818, 909, 928]) {
+        let mut app = scenario("open_16x16");
+        let mut rng = SplitMix64(seed * 7919 + 1);
+        let density = rng.below(35);
+        for y in 0..16 {
+            for x in 0..16 {
+                if rng.below(100) < density {
+                    set_rock(&mut app, [(x, y)]);
+                }
+            }
+        }
+        let count = 5 + rng.below(60) as usize;
+        let mut ids = Vec::new();
+        for i in 0..count {
+            for _ in 0..50 {
+                let cell = CellPos::new(rng.below(16) as i32, rng.below(16) as i32);
+                if let Ok(id) = spawn_unit(app.world_mut(), HUMAN, kinds[i % kinds.len()], cell) {
+                    ids.push(id);
+                    break;
+                }
+            }
+        }
+        if ids.is_empty() {
+            continue;
+        }
+        scenarios += 1;
+        let context = format!("seed {seed}");
+        for tick_index in 0..1_500 {
+            if tick_index % (5 + seed % 40) == 0 {
+                let k = 1 + rng.below(ids.len() as u64) as usize;
+                let selection: BTreeSet<SimId> = (0..k)
+                    .map(|_| ids[rng.below(ids.len() as u64) as usize])
+                    .collect();
+                let target = CellPos::new(rng.below(16) as i32, rng.below(16) as i32);
+                move_to(
+                    &mut app,
+                    &selection.into_iter().collect::<Vec<_>>(),
+                    target.x,
+                    target.y,
+                );
+            }
+            for event in tick(&mut app) {
+                assert!(
+                    !matches!(event, SimEvent::CommandRejected { .. }),
+                    "{context}: {event:?}"
+                );
+            }
+            assert_i6(&mut app, &format!("{context}, tick {tick_index}"));
+        }
+        run_until_all_orders_end(&mut app, TERMINATION_LIMIT, &context);
+    }
+    assert!(scenarios >= 50, "{scenarios} scenarios");
+}
+
+#[test]
+fn ticks_spent_waiting_for_the_pathfinder_do_not_count_as_stalled() {
+    // M2 review 1, P2-2: a unit whose path request waits in the queue is not blocked by other
+    // units, so its wait must not bring it closer to `MoveFailed { Blocked }`.
+    let mut app = scenario("arena_32x32");
+    let group = spawn_block(&mut app, HUMAN, 50, (1, 1), 10);
+    move_to(&mut app, &group, 25, 25);
+    for round in 1..=3 {
+        tick(&mut app);
+        let states = units(&mut app);
+        let mut waiting = 0;
+        for id in &group {
+            let order = states[id].orders.current.as_ref().expect("order");
+            if matches!(order.state, PathState::Requested { .. }) {
+                waiting += 1;
+                assert_eq!(order.stalled_ticks, 0, "tick {round}: {id:?} {order:?}");
+            }
+        }
+        assert_eq!(waiting, 50 - round * PATH_REQUESTS_PER_TICK, "tick {round}");
+    }
+}
+
+#[test]
+fn a_completion_says_whether_the_unit_stopped_short_of_its_destination() {
+    // M2 review 1, P2-1: the sealed room of three cells, A at (7, 3) ordered to (7, 4) and B at
+    // (7, 4) ordered to (7, 3). B steps aside to (7, 5), A reaches its destination, and B finds
+    // its way closed by A, which now stands still: B stops in (7, 5), farther from its
+    // destination than where it started, and must not report an arrival.
+    let mut app = scenario("open_16x16");
+    set_rock(
+        &mut app,
+        (6..=8)
+            .flat_map(|x| (2..=6).map(move |y| (x, y)))
+            .filter(|&(x, y)| !(x == 7 && (3..=5).contains(&y))),
+    );
+    let a = spawn(&mut app, HUMAN, "walker", 7, 3);
+    let b = spawn(&mut app, HUMAN, "walker", 7, 4);
+    order_swap(&mut app, a, b);
+    let ended = run_until_all_orders_end(&mut app, TERMINATION_LIMIT, "P2-1");
+    assert_eq!(cell_of(&mut app, a), CellPos::new(7, 4));
+    assert_eq!(cell_of(&mut app, b), CellPos::new(7, 5));
+    assert_eq!(
+        ended[&a].1,
+        SimEvent::MoveCompleted {
+            unit: a,
+            retargeted: false
+        }
+    );
+    assert_eq!(
+        ended[&b].1,
+        SimEvent::MoveCompleted {
+            unit: b,
+            retargeted: true
+        }
+    );
+}
+
+#[test]
+fn validation_checks_each_named_unit_in_turn() {
+    // M2 review 1, P2-4 (docs/DECISIONS.md D19 item 3): after the count checks, each named unit
+    // is checked in the order given, for repetition, then existence, then ownership; the first
+    // failure names the command's reason.
+    let target = CellPos::new(8, 8);
+    // An unknown unit named before a repeated one.
+    assert_rejected_without_state_change(
+        two_units_each,
+        HUMAN,
+        |ids| Command::Move {
+            units: vec![SimId(999), ids[0], ids[0]],
+            target,
+        },
+        |_| RejectReason::UnknownUnit(SimId(999)),
+    );
+    // A repeated unit named before an unknown one.
+    assert_rejected_without_state_change(
+        two_units_each,
+        HUMAN,
+        |ids| Command::Move {
+            units: vec![ids[0], ids[0], SimId(999)],
+            target,
+        },
+        |ids| RejectReason::DuplicateUnit(ids[0]),
+    );
+    // A foreign unit named before an unknown one.
+    assert_rejected_without_state_change(
+        two_units_each,
+        HUMAN,
+        |ids| Command::Stop {
+            units: vec![ids[2], SimId(999)],
+        },
+        |ids| RejectReason::NotOwned(ids[2]),
+    );
+    // Units are checked before the target.
+    assert_rejected_without_state_change(
+        two_units_each,
+        HUMAN,
+        |ids| Command::Move {
+            units: vec![ids[2]],
+            target: CellPos::new(-1, 0),
+        },
+        |ids| RejectReason::NotOwned(ids[2]),
+    );
 }
