@@ -3,7 +3,7 @@
 | Milestone | Status | Branch | Approved tag |
 |-----------|--------|--------|--------------|
 | M0: Bootstrap and dependency verification | **Approved** by the user on 2026-10-04 after independent review (decision: GO WITH DOCUMENTED NON-BLOCKING DEBT; no P0 or P1) | `milestone/m0` | `m0-approved` |
-| M1: Map and camera | **Review 1: NO-GO** (4 P0, 3 P1, 6 P2; `docs/reviews/M1-review-1.md`), in remediation round 1 | `milestone/m1` | |
+| M1: Map and camera | **Review 2: NO-GO** (1 P0, 1 P1, 4 P2; `docs/reviews/M1-review-2.md`), in remediation round 2. Review 1: NO-GO (4 P0, 3 P1, 6 P2) | `milestone/m1` | |
 | M2: Units and movement | Not started | | |
 | M3: Economy and construction | Not started | | |
 | M4: Combat and fog of war | Not started | | |
