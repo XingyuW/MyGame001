@@ -23,7 +23,7 @@ use bevy_ecs::system::{Query, Res, ResMut};
 use bevy_ecs::world::World;
 
 use crate::ai::{AiController, AiPlayers};
-use crate::ai_defs::{AiDefinitions, unobtainable_producer};
+use crate::ai_defs::{AiDefinitions, faction_plan_problem, unobtainable_producer};
 use crate::building::{Building, SpawnBuildingError, spawn_building};
 use crate::command::PlayerId;
 use crate::definitions::Definitions;
@@ -160,6 +160,16 @@ pub enum MatchSetupError {
         building: String,
         producer: String,
     },
+    /// The plan the AI file gives a computer player of its faction is incomplete (M7, docs/
+    /// DECISIONS.md D49): the faction does not offer the power building or the harvester, or the
+    /// entries it offers break a rule of the AI file.
+    AiPlan {
+        player: PlayerId,
+        faction: String,
+        /// The field of the AI file.
+        field: String,
+        problem: String,
+    },
     /// No passable cell free of buildings is reachable from a computer player's start position
     /// over the map's terrain, so it has no gathering point (M6 review 1 P1-1).
     NoGatheringPoint {
@@ -229,6 +239,16 @@ impl fmt::Display for MatchSetupError {
                 f,
                 "computer player {}: the AI file's {field} builds {building:?}, whose producer \
                  {producer:?} its faction does not start with",
+                player.0
+            ),
+            Self::AiPlan {
+                player,
+                faction,
+                field,
+                problem,
+            } => write!(
+                f,
+                "computer player {} of faction {faction:?}: the AI file's {field}: {problem}",
                 player.0
             ),
             Self::NoGatheringPoint { player, start } => write!(
@@ -330,7 +350,11 @@ impl MatchState {
 /// The configuration is checked before anything is changed: exactly two players, each with a
 /// faction, a start position, and (for a computer player) a difficulty that exist; every start
 /// position of the map is a cell of the map with passable terrain; and every computer player's
-/// faction starts with the producers its AI file needs (`ai_defs::unobtainable_producer`).
+/// faction starts with the producers its AI file needs (`ai_defs::unobtainable_producer`) and
+/// offers a complete plan (`ai_defs::faction_plan_problem`, M7).
+///
+/// Every player gets the roster of its faction (M7): it may queue only the items its faction
+/// offers.
 ///
 /// Every player starts with `skirmish.starting_credits`; its faction's buildings are placed with
 /// their footprint origin at its start position plus their offset (the footprint rules apply, the
@@ -413,6 +437,15 @@ pub fn setup_match(
                     producer: name(producer),
                 });
             }
+            let faction = &skirmish.factions[setup.faction];
+            if let Err((field, problem)) = faction_plan_problem(ai, definitions, faction) {
+                return Err(MatchSetupError::AiPlan {
+                    player: setup.player,
+                    faction: faction.id.clone(),
+                    field,
+                    problem: problem.to_string(),
+                });
+            }
         }
     }
     // Every start position of the map is a cell of the map with passable terrain, so that the
@@ -436,7 +469,11 @@ pub fn setup_match(
         let mut state = world.resource_mut::<Players>();
         for setup in &sorted {
             state
-                .add(setup.player, skirmish.starting_credits)
+                .add_with_roster(
+                    setup.player,
+                    skirmish.starting_credits,
+                    skirmish.factions[setup.faction].roster.clone(),
+                )
                 .map_err(MatchSetupError::AddPlayer)?;
         }
     }
@@ -513,7 +550,7 @@ pub fn setup_match(
             let controller = AiController::new(
                 world.resource::<Grid>(),
                 &definitions,
-                ai,
+                ai.plan_for(&skirmish.factions[setup.faction]),
                 ai.difficulties[difficulty].clone(),
                 start,
                 enemies,

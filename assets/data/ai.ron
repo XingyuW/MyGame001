@@ -1,5 +1,5 @@
 // The computer player's definitions, schema version 1 (PLAN.md section 7, M6; docs/DECISIONS.md
-// D42).
+// D42, D49).
 //
 // build_order:  building types in the order the computer player builds them; a type listed n
 //               times is kept at n buildings, so lost buildings are rebuilt. A power building is
@@ -15,8 +15,14 @@
 //               harvesters_per_refinery; max_army (armed units it builds up to); wave_size (armed
 //               units at home that start an attack wave); first_wave (the tick from which waves
 //               may start); wave_patience (ticks after first_wave or the last wave after which
-//               the units at home attack even if fewer than wave_size); defence_radius (visible enemies this many cells from its buildings are
-//               attacked by its army at home)
+//               the units at home attack even if fewer than wave_size); defence_radius (visible
+//               enemies this many cells from its buildings are attacked by its army at home)
+//
+// Factions (M7): a computer player builds the entries of build_order and army that its faction's
+// roster in skirmish.ron offers, in this order, and skips the others; power and harvester are
+// offered by every faction. The Vanguard's plan builds gun turrets and an army of light tanks,
+// riflemen, rocket soldiers, artillery, and scouts; the Meridian's rocket towers and heavy tanks,
+// conscripts, grenadiers, raiders, and rocket launchers. Balance data (docs/DECISIONS.md D51).
 (
     schema_version: 1,
     build_order: [
@@ -25,13 +31,33 @@
         "barracks",
         "war_factory",
         "gun_turret",
+        "rocket_tower",
         "power_plant",
+        "tech_center",
         "refinery",
+        "power_plant",
+        "war_factory",
+        "barracks",
         "gun_turret",
+        "rocket_tower",
+        "power_plant",
     ],
     power: "power_plant",
     harvester: "harvester",
-    army: ["light_tank", "light_tank", "scout"],
+    army: [
+        "light_tank",
+        "heavy_tank",
+        "rifleman",
+        "conscript",
+        "rocket_soldier",
+        "grenadier",
+        "light_tank",
+        "heavy_tank",
+        "artillery",
+        "rocket_launcher",
+        "scout",
+        "raider",
+    ],
     difficulties: [
         (
             id: "easy",

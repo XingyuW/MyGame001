@@ -41,6 +41,13 @@
 //! construction yard), which the skirmish file defines, so they are checked against the factions
 //! with [`check_ai_factions`] when both files are loaded, and again by match setup for every
 //! computer player (M6 review 1 P2-1).
+//!
+//! Factions (M7, docs/DECISIONS.md D49): a computer player builds the entries of `build_order`
+//! and `army` that the roster of its faction offers, in the file's order, and skips the others
+//! ([`AiDefinitions::plan_for`]); `power` and `harvester` must be offered by its faction. This is
+//! the specified meaning of the lists, not a fallback: [`check_ai_factions`] rejects an entry that
+//! no faction offers, and checks the plan of every faction with every rule above, so that the
+//! plan a computer player follows is complete for each faction it may play.
 
 use std::path::Path;
 
@@ -115,7 +122,57 @@ pub struct AiDefinitions {
     pub difficulties: Vec<Difficulty>,
 }
 
+/// The plan a computer player of one faction follows: the entries of the AI file that the roster
+/// of its faction offers (M7, docs/DECISIONS.md D49).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct AiPlan {
+    /// The buildings of `build_order` the faction offers, in the file's order.
+    pub build_order: Vec<BuildingKind>,
+    pub power: BuildingKind,
+    pub harvester: UnitKind,
+    /// The unit types of `army` the faction offers, in the file's order.
+    pub army: Vec<UnitKind>,
+}
+
+impl AiPlan {
+    pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
+        hasher.write_u64(self.build_order.len() as u64);
+        for kind in &self.build_order {
+            hasher.write(&kind.0.to_le_bytes());
+        }
+        hasher.write(&self.power.0.to_le_bytes());
+        hasher.write(&self.harvester.0.to_le_bytes());
+        hasher.write_u64(self.army.len() as u64);
+        for kind in &self.army {
+            hasher.write(&kind.0.to_le_bytes());
+        }
+    }
+}
+
 impl AiDefinitions {
+    /// The plan of a computer player of `faction`: the entries of `build_order` and `army` the
+    /// faction's roster offers, in the file's order, with the power building and the harvester.
+    /// [`check_ai_factions`] (and match setup) check that this plan is complete for every faction
+    /// a computer player may play.
+    pub fn plan_for(&self, faction: &FactionDef) -> AiPlan {
+        AiPlan {
+            build_order: self
+                .build_order
+                .iter()
+                .copied()
+                .filter(|&kind| faction.offers(ProductionItem::Building(kind)))
+                .collect(),
+            power: self.power,
+            harvester: self.harvester,
+            army: self
+                .army
+                .iter()
+                .copied()
+                .filter(|&kind| faction.offers(ProductionItem::Unit(kind)))
+                .collect(),
+        }
+    }
+
     pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
         hasher.write_u64(self.build_order.len() as u64);
         for kind in &self.build_order {
@@ -291,74 +348,8 @@ fn validate(file: AiFile, definitions: &Definitions) -> Result<AiDefinitions, Pr
         .enumerate()
         .map(|(index, id)| building(definitions, format!("build_order[{index}]"), id))
         .collect::<Result<Vec<_>, _>>()?;
-    // A prerequisite of a building of the build order comes earlier in it, so that the build
-    // order never waits for a building it would build only later.
-    for (index, &kind) in build_order.iter().enumerate() {
-        let prerequisites = definitions
-            .production(ProductionItem::Building(kind))
-            .map_or(&[][..], |terms| terms.prerequisites.as_slice());
-        if let Some(missing) = prerequisites
-            .iter()
-            .find(|prerequisite| !build_order[..index].contains(prerequisite))
-        {
-            let name = |kind: BuildingKind| {
-                definitions
-                    .building(kind)
-                    .map_or_else(String::new, |def| def.id.clone())
-            };
-            return Err(invalid(
-                format!("build_order[{index}]"),
-                format!(
-                    "{:?}, whose prerequisite {:?} is not listed before it",
-                    name(kind),
-                    name(*missing)
-                ),
-                "a building type whose prerequisites are listed before it",
-            ));
-        }
-    }
     let power = building(definitions, "power".into(), &file.power)?;
-    if definitions
-        .building(power)
-        .is_none_or(|def| def.power_produced <= 0)
-    {
-        return Err(invalid(
-            "power".into(),
-            format!("{:?}, which produces no power", file.power),
-            "a building type that produces power",
-        ));
-    }
-    // The power building is queued whenever the next building would leave the player short of
-    // power, from the first turn on, so nothing but its producer may be needed to queue it.
-    if definitions
-        .production(ProductionItem::Building(power))
-        .is_some_and(|terms| !terms.prerequisites.is_empty())
-    {
-        return Err(invalid(
-            "power".into(),
-            format!("{:?}, which has prerequisites", file.power),
-            "a building type that produces power and has no prerequisites",
-        ));
-    }
     let harvester = unit(definitions, "harvester".into(), &file.harvester)?;
-    if definitions.harvester(harvester).is_none()
-        || definitions
-            .production(ProductionItem::Unit(harvester))
-            .is_none()
-    {
-        return Err(invalid(
-            "harvester".into(),
-            format!("{:?}", file.harvester),
-            "a harvester unit type with production terms",
-        ));
-    }
-    obtainable(
-        definitions,
-        &build_order,
-        "harvester",
-        &file.harvester,
-        harvester,
-    )?;
     if file.army.is_empty() {
         return Err(invalid(
             "army".into(),
@@ -368,48 +359,19 @@ fn validate(file: AiFile, definitions: &Definitions) -> Result<AiDefinitions, Pr
     }
     let mut army = Vec::with_capacity(file.army.len());
     for (index, id) in file.army.iter().enumerate() {
-        let field = format!("army[{index}]");
-        let kind = unit(definitions, field.clone(), id)?;
-        let armed = definitions
-            .unit_combat(kind)
-            .is_some_and(|terms| terms.weapon.is_some());
-        if !armed || definitions.production(ProductionItem::Unit(kind)).is_none() {
-            return Err(invalid(
-                field,
-                format!("{id:?}"),
-                "an armed unit type with production terms",
-            ));
-        }
-        obtainable(definitions, &build_order, &field, id, kind)?;
-        army.push(kind);
+        army.push(unit(definitions, format!("army[{index}]"), id)?);
     }
-    // The army must be able to damage every building type, or a match between computer players
-    // could not end (docs/DECISIONS.md D42).
-    for (index, def) in definitions.buildings().iter().enumerate() {
-        let Some(terms) = u16::try_from(index)
-            .ok()
-            .and_then(|index| definitions.building_combat(BuildingKind(index)))
-        else {
-            continue;
-        };
-        let damaged = army.iter().any(|&kind| {
-            definitions
-                .unit_combat(kind)
-                .and_then(|unit| unit.weapon)
-                .and_then(|weapon| definitions.weapon(weapon))
-                .and_then(|weapon| definitions.versus(weapon.warhead, terms.armour))
-                .is_some_and(|percent| percent > 0)
-        });
-        if !damaged {
-            return Err((
-                "army".into(),
-                DataErrorKind::MissingEntry {
-                    kind: "unit able to damage building".into(),
-                    id: def.id.clone(),
-                },
-            ));
-        }
-    }
+    let build_entries: Vec<(usize, BuildingKind)> =
+        build_order.iter().copied().enumerate().collect();
+    let army_entries: Vec<(usize, UnitKind)> = army.iter().copied().enumerate().collect();
+    check_plan(
+        definitions,
+        &build_entries,
+        power,
+        harvester,
+        &army_entries,
+        None,
+    )?;
     if file.difficulties.is_empty() {
         return Err(invalid(
             "difficulties".into(),
@@ -481,6 +443,177 @@ fn validate(file: AiFile, definitions: &Definitions) -> Result<AiDefinitions, Pr
     })
 }
 
+/// The name of building type `kind`, or an empty string if it is not defined.
+fn building_name(definitions: &Definitions, kind: BuildingKind) -> String {
+    definitions
+        .building(kind)
+        .map_or_else(String::new, |def| def.id.clone())
+}
+
+/// The name of unit type `kind`, or an empty string if it is not defined.
+fn unit_name(definitions: &Definitions, kind: UnitKind) -> String {
+    definitions
+        .unit(kind)
+        .map_or_else(String::new, |def| def.id.clone())
+}
+
+/// The rules of a plan (docs/DECISIONS.md D42, D46): every prerequisite of a building of the build
+/// order is listed before it; the power building produces power and has no prerequisites; the
+/// harvester is a harvester type with production terms whose producer and prerequisites the
+/// build order lists; the army is not empty, and each of its unit types is armed, has production
+/// terms, and has its producer and prerequisites in the build order; and for the armour class of
+/// every building type some army unit's weapon deals damage. The entries carry their index in the
+/// AI file, so that an error names the file's field. `faction` is `None` for the file's own lists
+/// and names the faction for a faction's plan (M7), whose name the error then gives.
+fn check_plan(
+    definitions: &Definitions,
+    build_order: &[(usize, BuildingKind)],
+    power: BuildingKind,
+    harvester: UnitKind,
+    army: &[(usize, UnitKind)],
+    faction: Option<&str>,
+) -> Result<(), Problem> {
+    let of = |found: String| match faction {
+        None => found,
+        Some(faction) => format!("{found} in the plan of faction {faction:?}"),
+    };
+    let kinds: Vec<BuildingKind> = build_order.iter().map(|&(_, kind)| kind).collect();
+    if build_order.is_empty() {
+        return Err(invalid(
+            "build_order".into(),
+            of("no building type".into()),
+            "a build order with at least one building type the faction offers",
+        ));
+    }
+    // A prerequisite of a building of the build order comes earlier in it, so that the build
+    // order never waits for a building it would build only later.
+    for (position, &(index, kind)) in build_order.iter().enumerate() {
+        let prerequisites = definitions
+            .production(ProductionItem::Building(kind))
+            .map_or(&[][..], |terms| terms.prerequisites.as_slice());
+        if let Some(missing) = prerequisites
+            .iter()
+            .find(|prerequisite| !kinds[..position].contains(prerequisite))
+        {
+            return Err(invalid(
+                format!("build_order[{index}]"),
+                of(format!(
+                    "{:?}, whose prerequisite {:?} is not listed before it",
+                    building_name(definitions, kind),
+                    building_name(definitions, *missing)
+                )),
+                "a building type whose prerequisites are listed before it",
+            ));
+        }
+    }
+    let power_name = building_name(definitions, power);
+    if definitions
+        .building(power)
+        .is_none_or(|def| def.power_produced <= 0)
+    {
+        return Err(invalid(
+            "power".into(),
+            of(format!("{power_name:?}, which produces no power")),
+            "a building type that produces power",
+        ));
+    }
+    // The power building is queued whenever the next building would leave the player short of
+    // power, from the first turn on, so nothing but its producer may be needed to queue it.
+    if definitions
+        .production(ProductionItem::Building(power))
+        .is_some_and(|terms| !terms.prerequisites.is_empty())
+    {
+        return Err(invalid(
+            "power".into(),
+            of(format!("{power_name:?}, which has prerequisites")),
+            "a building type that produces power and has no prerequisites",
+        ));
+    }
+    let harvester_name = unit_name(definitions, harvester);
+    if definitions.harvester(harvester).is_none()
+        || definitions
+            .production(ProductionItem::Unit(harvester))
+            .is_none()
+    {
+        return Err(invalid(
+            "harvester".into(),
+            of(format!("{harvester_name:?}")),
+            "a harvester unit type with production terms",
+        ));
+    }
+    obtainable(definitions, &kinds, "harvester", &harvester_name, harvester)
+        .map_err(|(field, kind)| (field, in_plan(kind, faction)))?;
+    if army.is_empty() {
+        return Err(invalid(
+            "army".into(),
+            of("no unit type".into()),
+            "an army with at least one unit type the faction offers",
+        ));
+    }
+    for &(index, kind) in army {
+        let field = format!("army[{index}]");
+        let id = unit_name(definitions, kind);
+        let armed = definitions
+            .unit_combat(kind)
+            .is_some_and(|terms| terms.weapon.is_some());
+        if !armed || definitions.production(ProductionItem::Unit(kind)).is_none() {
+            return Err(invalid(
+                field,
+                of(format!("{id:?}")),
+                "an armed unit type with production terms",
+            ));
+        }
+        obtainable(definitions, &kinds, &field, &id, kind)
+            .map_err(|(field, kind)| (field, in_plan(kind, faction)))?;
+    }
+    // The army must be able to damage every building type, or a match between computer players
+    // could not end (docs/DECISIONS.md D42).
+    for (index, def) in definitions.buildings().iter().enumerate() {
+        let Some(terms) = u16::try_from(index)
+            .ok()
+            .and_then(|index| definitions.building_combat(BuildingKind(index)))
+        else {
+            continue;
+        };
+        let damaged = army.iter().any(|&(_, kind)| {
+            definitions
+                .unit_combat(kind)
+                .and_then(|unit| unit.weapon)
+                .and_then(|weapon| definitions.weapon(weapon))
+                .and_then(|weapon| definitions.versus(weapon.warhead, terms.armour))
+                .is_some_and(|percent| percent > 0)
+        });
+        if !damaged {
+            return Err((
+                "army".into(),
+                DataErrorKind::MissingEntry {
+                    kind: match faction {
+                        None => "unit able to damage building".into(),
+                        Some(faction) => {
+                            format!("unit of faction {faction:?} able to damage building")
+                        }
+                    },
+                    id: def.id.clone(),
+                },
+            ));
+        }
+    }
+    Ok(())
+}
+
+/// `kind` with the faction named in its found value, for a faction's plan.
+fn in_plan(kind: DataErrorKind, faction: Option<&str>) -> DataErrorKind {
+    match (kind, faction) {
+        (DataErrorKind::InvalidValue { found, expected }, Some(faction)) => {
+            DataErrorKind::InvalidValue {
+                found: format!("{found} in the plan of faction {faction:?}"),
+                expected,
+            }
+        }
+        (kind, _) => kind,
+    }
+}
+
 /// Checks that the build order lists the producer and every prerequisite of unit type `kind`
 /// (named `id`, at `field`), so that a computer player can obtain them, and rebuild them when they
 /// are lost; otherwise it could never produce the unit (M6 review 1 P2-1: without its producer,
@@ -524,10 +657,11 @@ fn obtainable(
 
 /// The first building the AI file has a computer player of `faction` build whose producer that
 /// player would never own, as `(field of the AI file, building, producer)`: a building of the
-/// build order whose producer is neither a starting building of the faction nor listed before it
-/// in the build order, or the power building (queued whenever power is short, from the first
-/// turn on) whose producer is not a starting building of the faction. Without its producer the
-/// build order would wait for that building forever (M6 review 1 P2-1).
+/// faction's plan ([`AiDefinitions::plan_for`]) whose producer is neither a starting building of
+/// the faction nor listed before it in the plan's build order, or the power building (queued
+/// whenever power is short, from the first turn on) whose producer is not a starting building of
+/// the faction. Without its producer the build order would wait for that building forever (M6
+/// review 1 P2-1).
 pub(crate) fn unobtainable_producer(
     ai: &AiDefinitions,
     definitions: &Definitions,
@@ -544,10 +678,13 @@ pub(crate) fn unobtainable_producer(
             .production(ProductionItem::Building(kind))
             .map(|terms| terms.producer)
     };
-    for (index, &kind) in ai.build_order.iter().enumerate() {
+    let plan: Vec<(usize, BuildingKind)> = faction_build_order(ai, faction);
+    for (position, &(index, kind)) in plan.iter().enumerate() {
         if let Some(producer) = producer(kind)
             && !starts_with(producer)
-            && !ai.build_order[..index].contains(&producer)
+            && !plan[..position]
+                .iter()
+                .any(|&(_, earlier)| earlier == producer)
         {
             return Some((format!("build_order[{index}]"), kind, producer));
         }
@@ -558,43 +695,134 @@ pub(crate) fn unobtainable_producer(
     }
 }
 
+/// The entries of the build order that `faction` offers, with their index in the AI file.
+fn faction_build_order(ai: &AiDefinitions, faction: &FactionDef) -> Vec<(usize, BuildingKind)> {
+    ai.build_order
+        .iter()
+        .copied()
+        .enumerate()
+        .filter(|&(_, kind)| faction.offers(ProductionItem::Building(kind)))
+        .collect()
+}
+
+/// The entries of the army that `faction` offers, with their index in the AI file.
+fn faction_army(ai: &AiDefinitions, faction: &FactionDef) -> Vec<(usize, UnitKind)> {
+    ai.army
+        .iter()
+        .copied()
+        .enumerate()
+        .filter(|&(_, kind)| faction.offers(ProductionItem::Unit(kind)))
+        .collect()
+}
+
+/// Why the plan of a computer player of `faction` is incomplete (M7, docs/DECISIONS.md D49), as
+/// the field of the AI file and the reason: the faction does not offer the power building or the
+/// harvester, or its plan breaks a rule of the AI file (`check_plan`), for example because the
+/// faction offers no army unit type of the file that can damage some building type.
+pub(crate) fn faction_plan_problem(
+    ai: &AiDefinitions,
+    definitions: &Definitions,
+    faction: &FactionDef,
+) -> Result<(), Problem> {
+    if !faction.offers(ProductionItem::Building(ai.power)) {
+        return Err(invalid(
+            "power".into(),
+            format!(
+                "{:?}, which faction {:?} does not offer",
+                building_name(definitions, ai.power),
+                faction.id
+            ),
+            "a building type the roster of every faction offers",
+        ));
+    }
+    if !faction.offers(ProductionItem::Unit(ai.harvester)) {
+        return Err(invalid(
+            "harvester".into(),
+            format!(
+                "{:?}, which faction {:?} does not offer",
+                unit_name(definitions, ai.harvester),
+                faction.id
+            ),
+            "a unit type the roster of every faction offers",
+        ));
+    }
+    check_plan(
+        definitions,
+        &faction_build_order(ai, faction),
+        ai.power,
+        ai.harvester,
+        &faction_army(ai, faction),
+        Some(&faction.id),
+    )
+}
+
 /// Checks the AI file at `path` against every faction of the skirmish file (cross validation of
-/// the two files; M6 review 1 P2-1): for any faction a computer player may play, the producer of
-/// every building of the build order is a starting building of the faction or is listed before
-/// that building in the build order, and the producer of the power building is a starting building
-/// of the faction. The error names the AI file, the field, the building, its producer, and the
-/// faction.
+/// the two files), so that a computer player can play every faction:
+///
+/// 1. (M6 review 1 P2-1) for every faction, the producer of every building of its plan is a
+///    starting building of the faction or is listed before that building in the plan, and the
+///    producer of the power building is a starting building of the faction;
+/// 2. (M7) every entry of the build order and of the army is offered by some faction, so that no
+///    entry is dead;
+/// 3. (M7) for every faction, its roster offers the power building and the harvester, and its
+///    plan ([`AiDefinitions::plan_for`]) keeps every rule of the AI file.
+///
+/// The error names the AI file, the field, the reason, and the faction.
 pub fn check_ai_factions(
     path: impl AsRef<Path>,
     ai: &AiDefinitions,
     skirmish: &SkirmishDefinitions,
     definitions: &Definitions,
 ) -> Result<(), DataError> {
-    let name = |kind: BuildingKind| {
-        definitions
-            .building(kind)
-            .map_or_else(String::new, |def| def.id.clone())
+    let error = |(field, kind): Problem| DataError {
+        file: path.as_ref().to_owned(),
+        field,
+        kind,
     };
     for faction in &skirmish.factions {
         if let Some((field, building, producer)) = unobtainable_producer(ai, definitions, faction) {
-            let (field, kind) = invalid(
+            return Err(error(invalid(
                 field,
                 format!(
                     "{:?}, whose producer {:?} faction {:?} of the skirmish file does not start \
                      with",
-                    name(building),
-                    name(producer),
+                    building_name(definitions, building),
+                    building_name(definitions, producer),
                     faction.id
                 ),
                 "a building type whose producer every faction starts with, or (in the build \
                  order) one listed before it",
-            );
-            return Err(DataError {
-                file: path.as_ref().to_owned(),
-                field,
-                kind,
-            });
+            )));
         }
+    }
+    let offered =
+        |item: ProductionItem| skirmish.factions.iter().any(|faction| faction.offers(item));
+    for (index, &kind) in ai.build_order.iter().enumerate() {
+        if !offered(ProductionItem::Building(kind)) {
+            return Err(error(invalid(
+                format!("build_order[{index}]"),
+                format!(
+                    "{:?}, which no faction of the skirmish file offers",
+                    building_name(definitions, kind)
+                ),
+                "a building type the roster of some faction offers",
+            )));
+        }
+    }
+    for (index, &kind) in ai.army.iter().enumerate() {
+        if !offered(ProductionItem::Unit(kind)) {
+            return Err(error(invalid(
+                format!("army[{index}]"),
+                format!(
+                    "{:?}, which no faction of the skirmish file offers",
+                    unit_name(definitions, kind)
+                ),
+                "a unit type the roster of some faction offers",
+            )));
+        }
+    }
+    for faction in &skirmish.factions {
+        faction_plan_problem(ai, definitions, faction).map_err(error)?;
     }
     Ok(())
 }

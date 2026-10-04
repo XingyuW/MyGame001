@@ -465,9 +465,14 @@ fn extreme_scenario() -> App {
             "armour: \"plate\", sight: 16,",
             1,
         );
+    // A file of its own for every call (M5 review 1 P2-4): four tests call this function, and the
+    // test harness runs them in parallel, so a shared file could be read while another call
+    // rewrote it.
+    static CALLS: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+    let call = CALLS.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
     let dir = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join("m4_combat");
     std::fs::create_dir_all(&dir).expect("temporary directory");
-    let path = dir.join("extreme_combat.ron");
+    let path = dir.join(format!("extreme_combat_{}_{call}.ron", std::process::id()));
     std::fs::write(&path, text).expect("variant");
     let definitions = sim::load_definitions(
         fixture("data/units_combat.ron"),

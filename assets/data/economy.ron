@@ -11,6 +11,11 @@
 // units:      the production terms of the producible unit types of units.ron
 // harvesters: ore capacity and ore removed per tick of the harvester unit types
 // refineries: credits paid per ore unit by the refinery building types
+//
+// Which faction may produce what is the roster in skirmish.ron (M7): both factions share the
+// construction yard, power plant, refinery, barracks, war factory, and tech center; the gun turret
+// is the Vanguard's defence and the rocket tower the Meridian's. These values are balance data
+// (docs/DECISIONS.md D51), used by no simulation test (invariant I10).
 (
     schema_version: 1,
     placement_distance: 4,
@@ -86,6 +91,20 @@
             free_units: [],
         ),
         (
+            id: "tech_center",
+            sprite: "tech_center",
+            width: 2,
+            height: 2,
+            cost: 1500,
+            build_time: 500,
+            producer: "construction_yard",
+            prerequisites: ["war_factory"],
+            power_produced: 0,
+            power_consumed: 60,
+            sell_value: 750,
+            free_units: [],
+        ),
+        (
             id: "gun_turret",
             sprite: "gun_turret",
             width: 1,
@@ -99,13 +118,62 @@
             sell_value: 300,
             free_units: [],
         ),
+        (
+            id: "rocket_tower",
+            sprite: "rocket_tower",
+            width: 1,
+            height: 1,
+            cost: 700,
+            build_time: 260,
+            producer: "construction_yard",
+            prerequisites: ["barracks"],
+            power_produced: 0,
+            power_consumed: 15,
+            sell_value: 350,
+            free_units: [],
+        ),
     ],
     units: [
+        (
+            unit: "rifleman",
+            cost: 150,
+            build_time: 120,
+            producer: "barracks",
+            prerequisites: [],
+        ),
+        (
+            unit: "rocket_soldier",
+            cost: 300,
+            build_time: 180,
+            producer: "barracks",
+            prerequisites: [],
+        ),
+        (
+            unit: "conscript",
+            cost: 100,
+            build_time: 100,
+            producer: "barracks",
+            prerequisites: [],
+        ),
+        (
+            unit: "grenadier",
+            cost: 250,
+            build_time: 160,
+            producer: "barracks",
+            prerequisites: [],
+        ),
         (
             unit: "scout",
             cost: 400,
             build_time: 200,
-            producer: "barracks",
+            producer: "war_factory",
+            prerequisites: [],
+        ),
+        (
+            unit: "raider",
+            cost: 450,
+            build_time: 200,
+            producer: "war_factory",
             prerequisites: [],
         ),
         (
@@ -114,6 +182,27 @@
             build_time: 300,
             producer: "war_factory",
             prerequisites: [],
+        ),
+        (
+            unit: "heavy_tank",
+            cost: 1200,
+            build_time: 450,
+            producer: "war_factory",
+            prerequisites: [],
+        ),
+        (
+            unit: "artillery",
+            cost: 900,
+            build_time: 400,
+            producer: "war_factory",
+            prerequisites: ["tech_center"],
+        ),
+        (
+            unit: "rocket_launcher",
+            cost: 1000,
+            build_time: 420,
+            producer: "war_factory",
+            prerequisites: ["tech_center"],
         ),
         (
             unit: "harvester",

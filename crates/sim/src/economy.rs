@@ -15,7 +15,7 @@
 //! building is free (`building::exit_cell`), and moves to the building's rally point if one is
 //! set; a harvester starts its harvesting cycle instead.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 
 use bevy_ecs::entity::Entity;
@@ -61,6 +61,10 @@ pub struct PlayerState {
     pub(crate) queues: BTreeMap<BuildingKind, Vec<QueueItem>>,
     /// What the player sees of the grid (M4, `crate::visibility`).
     pub(crate) vision: Vision,
+    /// The items the player's faction may produce (M7, docs/DECISIONS.md D48); `None` for a
+    /// player added without a faction (the scenario setups of the M3 to M6 tests), who may
+    /// produce every item with production terms.
+    pub(crate) roster: Option<BTreeSet<ProductionItem>>,
 }
 
 impl PlayerState {
@@ -95,6 +99,19 @@ impl PlayerState {
         &self.vision
     }
 
+    /// Whether the player's faction may produce `item` (every item for a player without a
+    /// faction).
+    pub fn offers(&self, item: ProductionItem) -> bool {
+        self.roster
+            .as_ref()
+            .is_none_or(|roster| roster.contains(&item))
+    }
+
+    /// The roster of the player's faction, or `None` for a player added without one.
+    pub fn roster(&self) -> Option<&BTreeSet<ProductionItem>> {
+        self.roster.as_ref()
+    }
+
     /// Every non-empty queue, by producing building type.
     pub fn queues(&self) -> impl Iterator<Item = (BuildingKind, &[QueueItem])> {
         self.queues
@@ -123,8 +140,8 @@ impl fmt::Display for PlayerSetupError {
 
 impl std::error::Error for PlayerSetupError {}
 
-/// The players of the match, their economic state, and their visibility grids (PLAN.md section 5).
-/// Factions arrive in M7.
+/// The players of the match, their economic state, their visibility grids, and the rosters of their
+/// factions (PLAN.md section 5).
 #[derive(Resource, Clone, Debug, Default, PartialEq, Eq)]
 pub struct Players {
     players: BTreeMap<PlayerId, PlayerState>,
@@ -136,6 +153,26 @@ impl Players {
     /// Scenario and match setup only, like installing the grid (docs/DECISIONS.md D11): during
     /// a match credits change only through production, refining, selling, and cancelling.
     pub fn add(&mut self, player: PlayerId, credits: i64) -> Result<(), PlayerSetupError> {
+        self.insert(player, credits, None)
+    }
+
+    /// Adds `player` with `credits` starting credits and the roster of its faction: it may queue
+    /// only the items of `roster` (M7). Setup only, like [`Players::add`].
+    pub fn add_with_roster(
+        &mut self,
+        player: PlayerId,
+        credits: i64,
+        roster: BTreeSet<ProductionItem>,
+    ) -> Result<(), PlayerSetupError> {
+        self.insert(player, credits, Some(roster))
+    }
+
+    fn insert(
+        &mut self,
+        player: PlayerId,
+        credits: i64,
+        roster: Option<BTreeSet<ProductionItem>>,
+    ) -> Result<(), PlayerSetupError> {
         if credits < 0 {
             return Err(PlayerSetupError::NegativeCredits(credits));
         }
@@ -146,6 +183,7 @@ impl Players {
             player,
             PlayerState {
                 credits,
+                roster,
                 ..PlayerState::default()
             },
         );
@@ -173,7 +211,8 @@ impl Players {
 
     /// Every player in id order: id, credits, power produced and consumed, then each queue
     /// (producing building type, item count, and per item its kind tag and index, progress,
-    /// and credits charged), then the vision (from M4).
+    /// and credits charged), then the vision (from M4), then the roster (from M7: a flag byte, and
+    /// with a roster its length and each item's kind tag and index).
     pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
         hasher.write_u64(self.players.len() as u64);
         for (player, state) in &self.players {
@@ -186,10 +225,7 @@ impl Players {
                 hasher.write(&producer.0.to_le_bytes());
                 hasher.write_u64(items.len() as u64);
                 for item in items {
-                    let (tag, index) = match item.item {
-                        ProductionItem::Building(kind) => (0, kind.0),
-                        ProductionItem::Unit(kind) => (1, kind.0),
-                    };
+                    let (tag, index) = item_key(item.item);
                     hasher.write(&[tag]);
                     hasher.write(&index.to_le_bytes());
                     hasher.write_u32(item.progress);
@@ -197,7 +233,27 @@ impl Players {
                 }
             }
             state.vision.hash_into(hasher);
+            match &state.roster {
+                None => hasher.write(&[0]),
+                Some(roster) => {
+                    hasher.write(&[1]);
+                    hasher.write_u64(roster.len() as u64);
+                    for item in roster {
+                        let (tag, index) = item_key(*item);
+                        hasher.write(&[tag]);
+                        hasher.write(&index.to_le_bytes());
+                    }
+                }
+            }
         }
+    }
+}
+
+/// The kind tag (0 building, 1 unit) and index of an item, as hashed.
+fn item_key(item: ProductionItem) -> (u8, u16) {
+    match item {
+        ProductionItem::Building(kind) => (0, kind.0),
+        ProductionItem::Unit(kind) => (1, kind.0),
     }
 }
 

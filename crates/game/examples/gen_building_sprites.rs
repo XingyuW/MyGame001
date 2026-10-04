@@ -1,5 +1,5 @@
-//! Generates the placeholder building sprites `assets/sprites/buildings/<sprite>.png` (M3; the gun
-//! turret in M4).
+//! Generates the building sprites `assets/sprites/buildings/<sprite>.png` (M3; the gun turret in
+//! M4; the tech center and the rocket tower in M7).
 //!
 //! Run with `cargo run -p game --example gen_building_sprites`. The output is deterministic (only
 //! IEEE-exact arithmetic), and `crates/game/tests/m3_building_sprites.rs` checks that the
@@ -10,8 +10,9 @@
 //! [`WALL_PX`] pixels as the roof, and the two walls that face the viewer below it. The image is
 //! `(width + height) × 32` pixels wide and `(width + height) × 16 + WALL_PX` pixels high; the
 //! footprint's diamond fills its lower part, so the image's centre lies `WALL_PX / 2` pixels above
-//! the footprint's centre. The roof carries `stripes` bands so that the building types can be told
-//! apart, and the sprites are light grey so that the game can tint them with the owner's colour.
+//! the footprint's centre. The roof carries `stripes` bands, and from M7 `cross` bands at right
+//! angles to them, so that the building types can be told apart, and the sprites are light grey so
+//! that the game can tint them with the owner's colour.
 
 use std::path::PathBuf;
 
@@ -32,44 +33,66 @@ pub struct BuildingSprite {
     pub width: u8,
     pub height: u8,
     stripes: u32,
+    /// Bands along u (M7; 0 for the buildings of M3 and M4, which are drawn as before).
+    cross: u32,
 }
 
-pub const SPRITES: [BuildingSprite; 6] = [
+pub const SPRITES: [BuildingSprite; 8] = [
     BuildingSprite {
         name: "construction_yard",
         width: 3,
         height: 3,
         stripes: 1,
+        cross: 0,
     },
     BuildingSprite {
         name: "power_plant",
         width: 2,
         height: 2,
         stripes: 2,
+        cross: 0,
     },
     BuildingSprite {
         name: "refinery",
         width: 3,
         height: 3,
         stripes: 3,
+        cross: 0,
     },
     BuildingSprite {
         name: "barracks",
         width: 2,
         height: 2,
         stripes: 0,
+        cross: 0,
     },
     BuildingSprite {
         name: "war_factory",
         width: 3,
         height: 3,
         stripes: 4,
+        cross: 0,
     },
     BuildingSprite {
         name: "gun_turret",
         width: 1,
         height: 1,
         stripes: 1,
+        cross: 0,
+    },
+    BuildingSprite {
+        name: "tech_center",
+        width: 2,
+        height: 2,
+        stripes: 1,
+        cross: 1,
+    },
+    BuildingSprite {
+        name: "rocket_tower",
+        width: 1,
+        height: 1,
+        stripes: 0,
+        cross: 2,
     },
 ];
 
@@ -111,6 +134,9 @@ fn pixel(sprite: &BuildingSprite, x: u32, y: u32) -> Option<[u8; 4]> {
         let band = (1..=sprite.stripes).any(|index| {
             let centre = width * f64::from(index) / f64::from(sprite.stripes + 1);
             (u - centre).abs() < 0.12
+        }) || (1..=sprite.cross).any(|index| {
+            let centre = height * f64::from(index) / f64::from(sprite.cross + 1);
+            (v - centre).abs() < 0.12
         });
         return Some(if band {
             [160, 160, 160, 255]
