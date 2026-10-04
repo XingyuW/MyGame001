@@ -1,0 +1,82 @@
+// Combat definitions, schema version 1 (PLAN.md sections 5 and 7, M4; docs/DECISIONS.md D28).
+//
+// armour_classes: the armour classes, names as in units.ron
+// warheads:   the percentage of a weapon's base damage each warhead deals against every armour
+//             class (equation 2: damage = base x percent / 100, rounded down, at least 1 unless
+//             the percentage is 0); every armour class exactly once
+// weapons:    base damage; range in subcells (256 per cell; at least 384); reload in ticks
+//             (20 per second); warhead; projectile_speed in subcells per tick, or 0 for an
+//             instant weapon
+// units:      hit points, armour class, sight radius in cells, and at most one weapon of every
+//             unit type of units.ron
+// buildings:  the same for every building type of economy.ron; a building with a weapon is a
+//             defensive structure, which does not fire under low power
+(
+    schema_version: 1,
+    armour_classes: ["light", "heavy", "structure"],
+    warheads: [
+        (
+            id: "armour_piercing",
+            versus: [
+                (armour: "light", percent: 60),
+                (armour: "heavy", percent: 100),
+                (armour: "structure", percent: 50),
+            ],
+        ),
+        (
+            id: "bullet",
+            versus: [
+                (armour: "light", percent: 100),
+                (armour: "heavy", percent: 15),
+                (armour: "structure", percent: 10),
+            ],
+        ),
+        (
+            id: "high_explosive",
+            versus: [
+                (armour: "light", percent: 100),
+                (armour: "heavy", percent: 75),
+                (armour: "structure", percent: 50),
+            ],
+        ),
+    ],
+    weapons: [
+        (
+            id: "tank_cannon",
+            damage: 40,
+            range: 1280,
+            reload: 30,
+            warhead: "armour_piercing",
+            projectile_speed: 160,
+        ),
+        (
+            id: "scout_gun",
+            damage: 9,
+            range: 1024,
+            reload: 8,
+            warhead: "bullet",
+            projectile_speed: 0,
+        ),
+        (
+            id: "turret_gun",
+            damage: 50,
+            range: 1536,
+            reload: 35,
+            warhead: "high_explosive",
+            projectile_speed: 192,
+        ),
+    ],
+    units: [
+        (unit: "light_tank", hit_points: 300, armour: "heavy", sight: 6, weapons: ["tank_cannon"]),
+        (unit: "scout", hit_points: 120, armour: "light", sight: 8, weapons: ["scout_gun"]),
+        (unit: "harvester", hit_points: 600, armour: "heavy", sight: 4, weapons: []),
+    ],
+    buildings: [
+        (building: "construction_yard", hit_points: 1500, armour: "structure", sight: 5, weapons: []),
+        (building: "power_plant", hit_points: 600, armour: "structure", sight: 4, weapons: []),
+        (building: "refinery", hit_points: 1000, armour: "structure", sight: 4, weapons: []),
+        (building: "barracks", hit_points: 600, armour: "structure", sight: 4, weapons: []),
+        (building: "war_factory", hit_points: 1200, armour: "structure", sight: 4, weapons: []),
+        (building: "gun_turret", hit_points: 500, armour: "structure", sight: 7, weapons: ["turret_gun"]),
+    ],
+)

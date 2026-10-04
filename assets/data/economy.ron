@@ -85,6 +85,20 @@
             sell_value: 1000,
             free_units: [],
         ),
+        (
+            id: "gun_turret",
+            sprite: "gun_turret",
+            width: 1,
+            height: 1,
+            cost: 600,
+            build_time: 240,
+            producer: "construction_yard",
+            prerequisites: ["power_plant"],
+            power_produced: 0,
+            power_consumed: 10,
+            sell_value: 300,
+            free_units: [],
+        ),
     ],
     units: [
         (
