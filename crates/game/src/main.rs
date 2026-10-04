@@ -5,8 +5,10 @@ mod checked_assets;
 mod cli;
 mod map;
 mod projection;
+mod selection;
 mod smoke;
 mod tileset_image;
+mod units;
 
 use bevy::prelude::*;
 use bevy_ecs_tiled::prelude::TiledPlugin;
@@ -43,8 +45,16 @@ fn main() -> AppExit {
     .add_plugins(TiledPlugin::default())
     .add_plugins(SimPlugin { seed: MATCH_SEED })
     .insert_resource(Time::<Fixed>::from_hz(f64::from(TICKS_PER_SECOND)))
-    .add_systems(FixedUpdate, run_sim_tick)
-    .add_plugins((camera::CameraPlugin, map::MapPlugin));
+    .add_systems(
+        FixedUpdate,
+        (units::record_previous_positions, run_sim_tick).chain(),
+    )
+    .add_plugins((
+        camera::CameraPlugin,
+        map::MapPlugin,
+        units::UnitsPlugin,
+        selection::SelectionPlugin,
+    ));
 
     if let Some(frames) = options.smoke_test_frames {
         app.add_plugins(smoke::SmokeTestPlugin { frames });
