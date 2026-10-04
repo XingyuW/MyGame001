@@ -8,7 +8,7 @@
 | M3: Economy and construction | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 4 P2); merged into `main`. Awaiting user verification for `m3-approved` | `milestone/m3` | `m3-reviewed` |
 | M4: Combat and fog of war | **Reviewed**: review 2 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 1 P2) after review 1 NO-GO; merged into `main`. Awaiting user verification for `m4-approved` | `milestone/m4` | `m4-reviewed` |
 | M5: Interface and audio | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 5 P2); merged into `main`. Awaiting user verification for `m5-approved` | `milestone/m5` | `m5-reviewed` |
-| M6: Skirmish AI and game flow | Not started | | |
+| M6: Skirmish AI and game flow | Implemented, awaiting independent review | `milestone/m6` | |
 | M7: Content, balance, performance, and packaging | Not started | | |
 
 ## M0 implementation report (2026-10-03)
@@ -1891,3 +1891,150 @@ These are not findings and do not affect the decision (PLAN.md section 12 item 2
 
 The nine M4 items, the ten M3 items, the seven M2 items, and the five M1 items listed in docs/STATUS.md remain pending.
 
+## M6 implementation report (2026-10-04)
+
+Branch `milestone/m6`, based on `main` at the merge of M5 (tag `m5-reviewed`). Commits: `3279e84` (sim: skirmish and AI files, match setup, win condition, the computer player, tests and fixtures, the shipped data files; the game only gains log lines for the two new events), `30ea562` (game: catalogue, menu, match flow, end screen, restart, smoke test, tests), and the documentation commit that adds this report. Each commit builds. Decisions: DECISIONS "M6: skirmish AI and game flow" (A1 follow-up, D40 to D44, notes on D6, D9, D20, D27, D31, D34).
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `crates/sim/src/skirmish_defs.rs` (new) | Skirmish file schema 1: starting credits, factions (starting buildings and unit groups with offsets), maps (ids, two start positions); limits, schema, validation; `map_asset_path` (D40) |
+| `crates/sim/src/ai_defs.rs` (new) | AI file schema 1: build order, power building, harvester, army, difficulties with seven parameters; limits; cross checks (prerequisites earlier in the build order, power, harvester, armed army that can damage every building) (D42) |
+| `crates/sim/src/match_setup.rs` (new) | `setup_match`, `PlayerSetup`, `Controller`, `MatchStart`, `MatchSetupError`; `plan_starting_units` and `StartError` (moved from `game::units`); `MatchState`, `MatchOutcome`, the `check_win_condition` system (D40, D41) |
+| `crates/sim/src/ai.rs` (new) | `AiPlayers`, `AiController`, the `run_ai` system: what a computer player may see (`View`), placement, build order with power and rebuilding, harvesters, army composition, rally points, defence, waves with search and fall-back, selling when broke (D43) |
+| `crates/sim/src/{lib,schedule,event,hash,command,economy_defs}.rs` | Exports; `run_ai` in `Ai`, `check_win_condition` in `WinCondition`, `MatchState` and `AiPlayers` resources; `SimEvent::{PlayerDefeated, MatchEnded}`; both resources hashed; `CommandQueue::iter` (read only); validation helpers shared with the new data files |
+| `crates/sim/tests/m6_definitions.rs` (new) | 11 tests of both files, bounded as in D15 |
+| `crates/sim/tests/m6_match.rs` (new) | 9 tests of setup and the win condition |
+| `crates/sim/tests/m6_ai.rs` (new) | 11 tests of the computer player, including the plan's four required tests |
+| `crates/sim/tests/fixtures/data/{skirmish,ai}.ron`, `fixtures/maps/skirmish_40x40.tmx` (new) | Fixture data (two factions, two difficulties) and a point-symmetric 40×40 map |
+| `assets/data/skirmish.ron`, `assets/data/ai.ron` (new) | The shipped skirmish (one faction, the demo map with two starts, 5,000 credits) and AI file (three difficulties) |
+| `crates/game/src/skirmish.rs` (new) | Catalogue loading, `MenuSelection`, `menu_effect`, `end_effect`, `end_text`, `begin_match`, `end_match`, the menu and end screen (D44); 6 tests |
+| `crates/game/src/sim_host.rs` | `SimHostPlugin` without a seed; `MatchPlan`, `install_match`, `uninstall_match`; `SimHost::{running, outcome, match_state, ai}`; ticks only while running; the sink closes at the end of a match (`CommandRefused::MatchOver`) and is reset for the next; the startup match setup (`start_match`, `MatchGrid`, `MatchDefinitions`) removed; 2 new tests |
+| `crates/game/src/map.rs` | `check_map` (the checks of D13 and D16 for any map), `spawn_map`, `despawn_map`, `MapRoot`, `MapAsset`; the startup `load_map` removed; `MAP_PATH` kept for the tests |
+| `crates/game/src/{units,buildings}.rs` | The hard-coded starting units, credits, and buildings removed (now data, D40); `load_match_assets` removed (now in `skirmish`); log lines for the new events |
+| `crates/game/src/minimap.rs` | `size_minimap` (a new image per match) |
+| `crates/game/src/smoke.rs` | The game flow (menu start, restart, menu, start), M6 checks, early-exit failure; 2 new tests |
+| `crates/game/src/{main,audio,construction,sidebar}.rs` | Plugins and startup ordering; no sound for the new events; two systems made visible to the crate for ordering |
+| `crates/game/tests/m6_production_matches.rs` (new) | Computer players with the shipped data on every shipped map, every difficulty pairing |
+| `assets/LICENSES.md`, `docs/DECISIONS.md`, `docs/STATUS.md` | Provenance of the two data files; decisions; this report |
+
+`Cargo.toml` files and `Cargo.lock` are unchanged (no dependency added, I9), and `cargo tree -p sim -e normal` contains no rendering, windowing, audio, or input crate (I1).
+
+### Validation commands (PLAN.md section 9, with section 12 item 5)
+
+Run from the repository root on macOS 27.0.1 (Apple M5, Rust 1.98.1), in this order, in the foreground, after the last code change (the tree of `30ea562`). A display and an audio device were available.
+
+| Command | Exit | Result |
+|---------|------|--------|
+| `cargo fmt --all -- --check` | 0 | no diff |
+| `cargo clippy --workspace --all-targets -- -D warnings` | 0 | no warnings |
+| `cargo test --workspace` | 0 | 384 passed, 0 failed, 0 ignored (breakdown below). Peak memory footprint of the run 0.13 GB. Known M0 linker warning only. |
+| `cargo build --release -p game` | 0 | |
+| `cargo run --release -p game -- --smoke-test 600` | 0 | three matches started (`match on map demo (seed 6)`, `(seed 7)`, `(seed 6)`: 2 buildings and 16 units each); `smoke test: 600 frames, 168 simulation ticks, map created: true, units spawned: 16, units moved: 8 in 168 ticks after the order, buildings spawned: 2, production charged 336 credits in 168 ticks, visible cells: 370, enemy views shown: 0, view mismatches: 0, sidebar items: 9 of 9, sidebar buttons outside the window: 0, sidebar credits: Some("Credits  4664"), minimap drawings: 169, minimap pixels lit: 2216, sounds: 9, music players: 1, pause: Done { ticks_while_paused: 0, refused: true }, menu buttons: Some(10), matches started: 3, flow: Last, views: 16 of 16 units and 2 of 2 buildings, computer player's commands: 2` |
+| `cargo run -p game -- --smoke-test 600` | 0 | the same three matches; `smoke test: 600 frames, 179 simulation ticks, ..., units moved: 8 in 179 ticks after the order, ..., production charged 358 credits in 179 ticks, visible cells: 365, ..., minimap drawings: 179, minimap pixels lit: 2232, ..., menu buttons: Some(10), matches started: 3, flow: Last, views: 16 of 16 units and 2 of 2 buildings, computer player's commands: 2` |
+
+Test breakdown:
+
+* `game`: unit 111 (M5: 101; + skirmish 6, sim_host 2, smoke 2); integration `m0_spike` 6, `m1_demo_map` 3, `m1_tileset_image` 6, `m2_unit_sprites` 5, `m3_building_sprites` 3, `m6_production_matches` 1 (52.2 s).
+* `sim`: unit 11; integration `m0_bootstrap` 12, `m1_map` 32, `m1_map_subset` 24, `m2_definitions` 14, `m2_movement` 37 (41.2 s), `m3_definitions` 11, `m3_economy` 21, `m3_harvest` 10, `m4_combat` 32, `m4_definitions` 12, `m5_placement_preview` 2, `m6_ai` 11 (39.9 s), `m6_definitions` 11, `m6_match` 9.
+* doc-tests 0.
+
+The `Skipped event Destroyed` warning (M0 debt item 2) appeared in the smoke runs. An earlier debug smoke run of this session exited with code 0 without its checks: the log showed `Monitor removed` and `No windows are open, exiting` before frame 600, and Bevy's `exit_on_all_closed` exits with success. That run is not counted; the smoke test now fails such a run (D44 item 7, `smoke::tests::an_exit_before_the_last_frame_fails_the_run`), and the debug run above completed all 600 frames.
+
+Additionally, the release binary was run (`--smoke-test 100`, 60 s alarm, `/usr/bin/time -l`) against copies of `assets/` selected with `BEVY_ASSET_ROOT`. The unchanged copy exits 0 (one match, peak memory footprint of the game process 0.41 GB; earlier reports measured the `cargo` process, so the numbers are not comparable). Each of these exits 1 with a typed error naming the file and field, at a peak of 0.14 GB: no `skirmish.ron` (`data file …/skirmish.ron: file: cannot read the file: No such file or directory`); no `ai.ron`; `#![enable(implicit_some)]` prepended to `ai.ron` (`file: line 1, column 1: expected a value or punctuation of the supported subset, found '#'`); `ai.ron` a named pipe (`file: cannot read the file: not a regular file`, at once); `ai.ron` above 64 KiB (`file: the file is larger than 65536 bytes`); a map id without a map (`data file …/skirmish.ron: map "nowhere": map …/maps/nowhere/nowhere.tmx: file: cannot read the file: …`); the map id `../demo` (`maps[0].id: value "../demo" is not supported, expected 1 to 32 characters from a-z, 0-9, and _, starting with a letter`); a group count of 10^20 (`factions[0].units[0].count: value 99999999999999999999 is not supported, expected a 64-bit signed integer`); an army of harvesters (`army[0]: value "harvester" is not supported, expected an armed unit type with production terms`); and a start position at (63, 42), where the yard does not fit (`map demo: starting building "construction_yard" of player 1 at (63, 42): the 3x3 footprint at (63, 42) does not lie inside the map`, when the smoke test starts the match).
+
+Computer players were also measured with probe programs outside the repository (release; D43 item 9): every pairing of the shipped difficulties on the demo map ends with a winner within 23,022 ticks and every difficulty against a passive player within 7,611; every fixture pairing within 5,697 ticks on the fixture map and 20,443 on the demo map; no command of a computer player was rejected except once, explained by the loss of the unit it named in the tick before.
+
+### Acceptance criteria and required tests (PLAN.md section 7, M6)
+
+| Criterion | Evidence |
+|-----------|----------|
+| Scope: an AI player inside `sim` that issues commands only through `CommandQueue` | `sim::ai::run_ai` (D43 item 1) pushes `IssuedCommand`s and changes no other simulation state; the tests read its commands from the queue after each tick; `I5` holds by construction (the system's only writes are its own resource and the queue) |
+| Scope: a data defined build order | `assets/data/ai.ron` `build_order` (D42); `the_ai_completes_its_build_order_within_the_tick_budget` |
+| Scope: harvester management | `harvesters_per_refinery`, harvesters queued per refinery, idle harvesters sent back to work with back-off (D43 item 3); `idle_harvesters_without_ore_are_sent_to_work_at_most_once_per_retry_interval` |
+| Scope: army composition | `army` cyclic composition up to `max_army` (D42, D43 item 3); exercised by every match test |
+| Scope: attack waves | `wave_size`, `first_wave`, `wave_patience`, targets, search, fall-back (D43 item 7); `the_ai_issues_no_rejected_command_in_the_standard_scenario` (the computer player destroys a passive player's base) and the end-to-end matches |
+| Scope: base defence | `defence_radius` (D43 item 6); `the_ai_attacks_a_visible_enemy_near_its_base_with_its_army_at_home`; gun turrets in the build order |
+| Scope: rebuilding | build order counts (D43 item 3); `the_ai_rebuilds_a_building_it_lost` (a power building destroyed by the test's tanks through commands is placed again) |
+| Scope: difficulty set by data parameters | seven parameters per difficulty (D42 item 3); `m6_definitions` tests every limit at both ends; the menu chooses the difficulty |
+| Scope: main menu, map and faction selection | `game::skirmish` (D44 items 1 to 3); `menu_buttons_cycle_through_each_row_and_start_only_a_valid_choice`, `the_human_plays_the_first_start_and_the_computer_the_second`, `row_texts_name_the_chosen_entries`, `the_production_catalogue_loads_every_map_faction_and_difficulty`, `every_shipped_match_can_be_set_up_for_every_faction_pairing`; smoke runs start every match from the menu's effect. On screen **requires user verification** |
+| Scope: win and lose detection when all buildings of a player are destroyed | `sim::match_setup::check_win_condition` (D41); `a_player_without_buildings_is_defeated_and_the_last_player_wins`, `players_who_lose_their_last_buildings_in_the_same_tick_draw`, `a_destroyed_last_building_defeats_its_owner`, `without_a_match_set_up_there_is_no_win_condition`; every end-to-end match ends this way |
+| Scope: end screen, restart | `end_text`, `end_effect`, `begin_match`, `end_match` (D44 items 4 and 5); `the_end_screen_names_the_outcome_and_restarts_the_last_match`, `ticks_run_only_while_a_match_is_running`, `the_sink_refuses_commands_once_the_match_is_over_and_reopens_for_the_next`; the smoke runs restart, return to the menu, and start again, and end with exactly as many views as simulated units and buildings. On screen **requires user verification** |
+| Test: on a fixture map the AI completes its build order within a fixed tick budget | `m6_ai::the_ai_completes_its_build_order_within_the_tick_budget`: both fixture factions (one starts with a turret of the build order), both difficulties, budget 1,000 ticks; every building it did not start with placed; no rejection; I6 and I7 on every tick |
+| Test: the AI issues zero rejected commands in the standard scenario | `m6_ai::the_ai_issues_no_rejected_command_in_the_standard_scenario` (the standard scenario of D43 item 5, both difficulties, until it wins); the end-to-end tests also assert that every rejection is explained (D43 item 5) |
+| Test: an AI with no credits and no harvester neither panics nor floods the queue | `m6_ai::an_ai_with_no_credits_and_no_harvester_neither_panics_nor_floods_the_queue` (two computer players, 0 credits, a yard each, a turn every tick, 3,000 ticks: two commands in all, at most one item queued, no rejection); also `a_broke_ai_without_army_sells_a_building_it_does_not_need_to_fund_units` and the harvester back-off test |
+| Test: end to end AI against AI matches on every shipped map finish with a winner within a fixed tick limit, without panic, and with equal hashes across two runs | `m6_ai::ai_against_ai_matches_on_every_shipped_map_end_with_a_winner` (every shipped map of the production skirmish file, every pairing of the fixture difficulties, each run twice: a winner within 36,000 ticks, identical `state_hash` on every tick, every rejection explained, I6 and I7 every 10 ticks); `ai_against_ai_matches_on_the_fixture_map_end_with_a_winner`; `a_run_with_another_seed_or_difficulty_diverges`; with the shipped data, `game/tests/m6_production_matches.rs` (all nine pairings) |
+| Acceptance: the user can lose to and defeat the AI in a complete match started from the menu | **Requires user verification** (below) |
+| Fog of war (the AI must not use what its player cannot see) | D43 item 2; `the_ai_ignores_what_its_player_does_not_see` (identical commands on all 2,000 ticks with and without an unseen enemy within the defence radius and an unseen enemy building; the building is not remembered) |
+| Section 8: negative, boundary, regression, integration, end to end | Negative: every data rejection with file, field, and reason (`m6_definitions`), setup errors with no state change, refused commands after the match; boundary: every data limit at both ends, a turn every tick, 0 credits, the tick budget and limit, the draw in one tick, the early exit at frame 599 of 600; regression: the early-exit hole of the smoke test; integration: all `m6_ai` and `m6_match` tests through `SimPlugin` and `CommandQueue`; end to end: the AI matches and both smoke runs |
+| Invariants | I1/I9: no dependency added. I2: no float in `sim` (`ai.rs` uses `i64` arithmetic). I3: `MatchState` and `AiPlayers` hashed; equal hashes on every tick of two runs. I4: ordered collections and id order only; `the_game_systems_share_no_state_without_an_order` with `SkirmishPlugin`. I5: D43 item 1; match setup is setup (D40 item 5). I6, I7: checked in the M6 tests. I8, I11: both new files pass the RON subset before `ron`, all limits checked, probes above. I10: the plan's tests use fixture data; starting credits, buildings, and units are now data. I12: `i64` and saturating arithmetic in the new code. |
+
+### Assumptions verified and how
+
+| Item | Verification |
+|------|--------------|
+| Bevy 0.19.1 APIs of the A1 follow-up table in DECISIONS (M6) | Read in the sources (paths in DECISIONS) and exercised by code that compiles and runs in the tests and smoke runs |
+| Despawning the map entity removes the tilemap `bevy_ecs_tiled` spawned under it | `World::despawn` documentation (recursive over `Children`); smoke runs restart twice and end with the views and the map of the last match only; `bevy_ecs_tiled` logs `Map removed` |
+| A restart reads no file again | the catalogue holds the checked grids; the asset reader serves only the bytes registered at startup (D16 item 3) |
+| Bevy's runner reads `AppExit` only when its event loop waits, so one more update may follow the last frame | `bevy_winit-0.19.1/src/state.rs:735`; the smoke checks run exactly once, at the last frame |
+| No dependency change | `git diff 20116fb -- Cargo.lock Cargo.toml crates/*/Cargo.toml` is empty |
+
+### Deviations from PLAN.md
+
+1. **One faction and one map are shipped.** The menu's faction and map rows list the skirmish file's entries; the shipped file has one faction and the demo map, because the second faction and three maps are M7's scope. The selection mechanism is tested with the two fixture factions and the pure menu functions with several entries per row.
+2. **Two players per match** (`MATCH_PLAYERS`): the human player at a map's first start position and one computer player at the second.
+3. **What the AI knows beyond its vision** is a recorded decision (D43 item 2): the static terrain of the map and the start positions of the match, as public match setup.
+4. **Starting setup changed.** Both players start alike (a yard, 5 light tanks, 3 scouts); until M5 the human player had 18 units and the opponent 8 units and a gun turret. Earlier user verification items that name these are restated below.
+5. **The win condition applies only to a match set up by `setup_match`**, so the M0 to M5 tests, whose players often own no building, are unchanged (D41 item 2).
+6. **An additional end-to-end test with the shipped data** (`game/tests/m6_production_matches.rs`) beside the plan's fixture-data test (D43 item 10).
+7. **New public API of `sim`:** `load_skirmish`, `load_ai`, `setup_match` and its types, `MatchState`, `MatchOutcome`, `AiPlayers`, `AiController`, `plan_starting_units` and `StartError` (moved from the game), `SimEvent::{PlayerDefeated, MatchEnded}`, `CommandQueue::iter`. No existing data schema changed (all existing files keep schema version 1).
+8. **Files not listed in PLAN.md section 4:** `crates/sim/src/{ai,ai_defs,match_setup,skirmish_defs}.rs`, `crates/game/src/skirmish.rs`, the M6 test files and fixtures. `m6_definitions.rs` contains `unsafe` code (the counting allocator of D15).
+
+### Tests changed (none removed, skipped, or weakened)
+
+The starting setup moved from game constants to the skirmish file (D40), so the tests that read those constants now read the data. Each keeps its assertion or makes it stronger:
+
+1. `units::tests::the_production_units_load_and_every_sprite_passes_its_check` and `buildings::tests::the_production_buildings_load_and_every_sprite_passes_its_check`: "the starting units (buildings) name defined types" now loops over every faction's groups (buildings) of the skirmish file.
+2. `units::tests::the_production_data_loads_with_the_combat_file`: the last assertion said that the opponent starts with a gun turret. The opponent no longer starts with one (deviation 4); the assertion now requires the gun turret, still a building type with a weapon, to be in the computer player's build order, so the demo match still has a defensive structure that fires. All other assertions are unchanged.
+3. `units::tests::the_demo_map_holds_every_starting_unit_on_its_own_free_cell`: now checks the match that the menu's first choices set up (every unit of every group on its own passable cell, none on a building, every group complete), and keeps its original assertions on the M2 groups, now given as a test constant (`DEMO_GROUPS`, the same values) to `sim::plan_starting_units`.
+4. `units::tests::starting_units_that_do_not_fit_are_a_setup_error`: unchanged assertions; the groups are `DEMO_GROUPS`, and `plan_starting_units` and `StartError` come from `sim`.
+5. `buildings::tests::the_demo_map_holds_the_starting_buildings_and_units`: now checks the match set up from the data (both factions' buildings placed, no unit on a building, both players with the file's starting credits) instead of `setup_economy` and the constants.
+6. `sim_host::tests::demo_host` (helper) installs the match as the menu does; `match_setup_installs_the_loaded_match_or_ends_the_game_with_an_error` checks the same two outcomes through `install_match` and `begin_match` (the demo map holds the match; a 16×16 map ends the game with exit code 1 with nothing reported as spawned), plus that the previous simulation is kept.
+7. `smoke::tests::the_demo_player_can_queue_a_building_with_its_starting_buildings`: the human player's buildings come from its faction. `the_demo_match_expects_all_of_its_starting_units` asserted `starting_unit_total() == 12 + 6 + 5 + 3`, the constant now removed; it now asserts that the expected totals are those of both factions' groups and buildings, and that the set-up match has exactly that many units and buildings.
+8. `smoke::tests::PASSING` gained the M6 fields; `the_game_systems_share_no_state_without_an_order` now also builds `SkirmishPlugin`; `SimHostPlugin { seed: 0 }` became `SimHostPlugin` in three tests.
+
+### Known debt (P2 proposals for the reviewer)
+
+1. Termination of computer-player matches is measured, not proven (D43 item 9): two computer players that both keep armed units they never risk, or have nothing left to sell, could stall. The shipped and fixture data end in every measured pairing.
+2. The computer player uses no randomness (the same play gives the same responses); the match seed changes only `state_hash` until something uses `SimRng`.
+3. A ready building waits while no visible spot satisfies the placement rules (D43 item 4); the computer player does not move units to gain vision for it. With the fixture's small sights this delayed a 3 × 3 building by about 1,000 ticks before the ring rule was relaxed; it is not seen with the shipped data.
+4. Waves use `AttackMove` only (no explicit `Attack`, no chase beyond weapon range, no retreat for repairs); harvesters are not targeted on purpose.
+5. Balance: in the measured pairings easy sometimes beats hard, depending on the start position. The balance pass is M7's.
+6. The menu shows ids (underscores as spaces), not display names; the end screen does not block clicks on the map, which after the end are refused by the closed sink (logged, error sound).
+7. A match setup error (shipped data that does not fit a map) ends the game with exit code 1 instead of returning to the menu with a message; every shipped combination is tested (`every_shipped_match_can_be_set_up_for_every_faction_pairing`).
+8. The terminal event log also writes the computer player's events and rejections (M4 remediation debt item 2).
+9. Test time: `m6_production_matches` takes 52 s and `m6_ai` 40 s in a debug build; `cargo test --workspace` takes about 2.5 minutes.
+10. Hotkeys work in the menu (for example `P` toggles the sink's pause flag); every match starts unpaused.
+
+Debt status: resolved by M6: M0 item 3 (constant seed; D44 item 3); M3 review 1 P2-4 and D20 item 4, D27 item 3, D31 item 5 (starting setup in game code; D40); M1 review 3 P2-3 first item (the `misalignment` documentation); M3 implementation debt item 2 for computer players (their stopped harvesters are sent back to work; the human player's still wait for a command). Awaiting the user: M1 review 1 P2-5 (acknowledgement of match setup as setup, D40 item 5; item 12 below). Unchanged and still relevant: M5 review 1 P2-2 (minimap on maps with W + H > 128: no such map is shipped; it must be resolved before M7's maps), P2-4 (the `m4_combat` temporary file race: it did not make a validation command fail in this session's debug runs, so it was not touched), P2-1, P2-3, P2-5, and every other item of "Recorded debt to carry" of the M5 review decision. The linker warning (M0 item 1) and the `Skipped event Destroyed` warning (M0 item 2) were seen again.
+
+### Requires user verification
+
+Not review findings (PLAN.md section 12 item 2); they block only `m6-approved`. Run `cargo run --release -p game` with sound on. The 13 M6 items:
+
+1. **Menu:** the game opens on a dark full-window menu with the title, four rows (Map `demo`, Your faction `vanguard`, Opponent `vanguard`, Difficulty `normal`), each with `<` and `>`, and Start and Quit; all text legible; the sidebar is not visible or clickable through it.
+2. **Selection:** `<` and `>` cycle each row and wrap around (the difficulty through easy, normal, hard; the map and faction rows have one entry each, deviation 1).
+3. **Start:** Start shows the demo map with the camera on your base: your construction yard at (15, 37) with 5 light tanks and 3 scouts beside it, credits 5000 in the sidebar; the music keeps playing.
+4. **The computer player builds:** where you scout its base (the right half of the map, around (52, 42)), it has a power plant, refinery, barracks, war factory, and later gun turrets and a second refinery and power plant; its harvesters collect ore; its units gather a few cells toward the map's centre.
+5. **It attacks and defends:** from about 3 minutes (normal) its army attacks your base in waves; units of yours that come near its base are attacked by its units at home and its turrets; a building of its that you destroy is built again.
+6. **Difficulty:** on easy the first wave comes later (about 5 minutes) and smaller; on hard earlier (about 2 minutes) and larger.
+7. **Defeat:** letting it destroy all your buildings ends the match: the simulation stops, DEFEAT is shown over the map with Restart and Main menu, and orders are refused with the error sound.
+8. **Victory:** destroying all of its buildings shows VICTORY (its remaining units do not matter).
+9. **Restart:** Restart starts a new match with the same choices: the old map, units, selection, control groups, and minimap content are gone, credits are 5000 again.
+10. **Main menu:** Main menu returns to the menu; Start with other choices starts a match with them.
+11. **Quit:** Quit closes the game.
+12. **Acknowledgement (M1 review 1 P2-5):** match setup installs the map's grid and places the starting players, buildings, and units directly into the simulation before the first tick, not through `CommandQueue` (D11, D40 item 5); during a match the interface and the computer player change state only through `CommandQueue` (I5). Please confirm this reading of I5.
+13. **Acceptance:** in complete matches started from the menu, you can lose to the computer player and you can defeat it.
+
+The earlier items still pending (the 16 M5 items, the 9 M4 items, the 10 M3 items, the 7 M2 items, and the 5 M1 items) apply with the M6 starting setup: each player starts with its yard and 5 light tanks and 3 scouts (M2 item 1 named 18 and 8 units), the human player's title and sidebar show `power 0/20` at the start (unchanged), and the opponent has no gun turret at (50, 41) at the start (M4 items 3 and 7): its turrets appear as it builds them, and yours can be built from the sidebar. The opponent now acts (M5 item 15 said it would not until M6).
