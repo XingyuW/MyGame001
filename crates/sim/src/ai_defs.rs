@@ -29,10 +29,18 @@
 //!
 //! Every field is required, so there are no silent defaults. The file is cross validated against
 //! the match definitions, which must include a combat file: every building of the build order is
-//! defined; the power building produces power; the harvester is a harvester type with production
-//! terms; every army unit type has production terms and a weapon, and for the armour class of
-//! every building type some army unit's weapon deals damage (equation 2 above 0), so that the
-//! army can destroy every building and a match between computer players can end.
+//! defined, and its prerequisites are listed before it; the power building produces power and has
+//! no prerequisites, so that it can be queued whenever power is short; the harvester is a
+//! harvester type with production terms; every army unit type has production terms and a weapon;
+//! the producer and the prerequisites of the harvester and of every army unit type are listed in
+//! the build order, so that a computer player can obtain them and rebuild them; and for the armour
+//! class of every building type some army unit's weapon deals damage (equation 2 above 0), so that
+//! the army can destroy every building and a match between computer players can end.
+//!
+//! The producers of the buildings a computer player builds are usually starting buildings (a
+//! construction yard), which the skirmish file defines, so they are checked against the factions
+//! with [`check_ai_factions`] when both files are loaded, and again by match setup for every
+//! computer player (M6 review 1 P2-1).
 
 use std::path::Path;
 
@@ -42,6 +50,7 @@ use crate::data::{self, DataError, DataErrorKind, MAX_DATA_FILE_BYTES, Shape};
 use crate::definitions::{Definitions, UnitKind, check_name};
 use crate::economy_defs::{BuildingKind, MAX_BUILD_TIME, Problem, ProductionItem, invalid, ranged};
 use crate::hash::Fnv1a64;
+use crate::skirmish_defs::{FactionDef, SkirmishDefinitions};
 
 /// The schema version of the AI file this crate reads.
 pub const AI_SCHEMA_VERSION: i64 = 1;
@@ -319,6 +328,18 @@ fn validate(file: AiFile, definitions: &Definitions) -> Result<AiDefinitions, Pr
             "a building type that produces power",
         ));
     }
+    // The power building is queued whenever the next building would leave the player short of
+    // power, from the first turn on, so nothing but its producer may be needed to queue it.
+    if definitions
+        .production(ProductionItem::Building(power))
+        .is_some_and(|terms| !terms.prerequisites.is_empty())
+    {
+        return Err(invalid(
+            "power".into(),
+            format!("{:?}, which has prerequisites", file.power),
+            "a building type that produces power and has no prerequisites",
+        ));
+    }
     let harvester = unit(definitions, "harvester".into(), &file.harvester)?;
     if definitions.harvester(harvester).is_none()
         || definitions
@@ -331,6 +352,13 @@ fn validate(file: AiFile, definitions: &Definitions) -> Result<AiDefinitions, Pr
             "a harvester unit type with production terms",
         ));
     }
+    obtainable(
+        definitions,
+        &build_order,
+        "harvester",
+        &file.harvester,
+        harvester,
+    )?;
     if file.army.is_empty() {
         return Err(invalid(
             "army".into(),
@@ -352,6 +380,7 @@ fn validate(file: AiFile, definitions: &Definitions) -> Result<AiDefinitions, Pr
                 "an armed unit type with production terms",
             ));
         }
+        obtainable(definitions, &build_order, &field, id, kind)?;
         army.push(kind);
     }
     // The army must be able to damage every building type, or a match between computer players
@@ -450,4 +479,122 @@ fn validate(file: AiFile, definitions: &Definitions) -> Result<AiDefinitions, Pr
         army,
         difficulties,
     })
+}
+
+/// Checks that the build order lists the producer and every prerequisite of unit type `kind`
+/// (named `id`, at `field`), so that a computer player can obtain them, and rebuild them when they
+/// are lost; otherwise it could never produce the unit (M6 review 1 P2-1: without its producer,
+/// a computer player builds no army, never attacks, and the match does not end).
+fn obtainable(
+    definitions: &Definitions,
+    build_order: &[BuildingKind],
+    field: &str,
+    id: &str,
+    kind: UnitKind,
+) -> Result<(), Problem> {
+    let Some(terms) = definitions.production(ProductionItem::Unit(kind)) else {
+        return Err(invalid(
+            field.to_owned(),
+            format!("{id:?}"),
+            "a unit type with production terms",
+        ));
+    };
+    let missing = std::iter::once(("producer", terms.producer))
+        .chain(
+            terms
+                .prerequisites
+                .iter()
+                .map(|&prerequisite| ("prerequisite", prerequisite)),
+        )
+        .find(|(_, building)| !build_order.contains(building));
+    match missing {
+        None => Ok(()),
+        Some((role, building)) => Err(invalid(
+            field.to_owned(),
+            format!(
+                "{id:?}, whose {role} {:?} is not listed in the build order",
+                definitions
+                    .building(building)
+                    .map_or_else(String::new, |def| def.id.clone())
+            ),
+            "a unit type whose producer and prerequisites are listed in the build order",
+        )),
+    }
+}
+
+/// The first building the AI file has a computer player of `faction` build whose producer that
+/// player would never own, as `(field of the AI file, building, producer)`: a building of the
+/// build order whose producer is neither a starting building of the faction nor listed before it
+/// in the build order, or the power building (queued whenever power is short, from the first
+/// turn on) whose producer is not a starting building of the faction. Without its producer the
+/// build order would wait for that building forever (M6 review 1 P2-1).
+pub(crate) fn unobtainable_producer(
+    ai: &AiDefinitions,
+    definitions: &Definitions,
+    faction: &FactionDef,
+) -> Option<(String, BuildingKind, BuildingKind)> {
+    let starts_with = |kind: BuildingKind| {
+        faction
+            .buildings
+            .iter()
+            .any(|building| building.kind == kind)
+    };
+    let producer = |kind: BuildingKind| {
+        definitions
+            .production(ProductionItem::Building(kind))
+            .map(|terms| terms.producer)
+    };
+    for (index, &kind) in ai.build_order.iter().enumerate() {
+        if let Some(producer) = producer(kind)
+            && !starts_with(producer)
+            && !ai.build_order[..index].contains(&producer)
+        {
+            return Some((format!("build_order[{index}]"), kind, producer));
+        }
+    }
+    match producer(ai.power) {
+        Some(producer) if !starts_with(producer) => Some(("power".into(), ai.power, producer)),
+        _ => None,
+    }
+}
+
+/// Checks the AI file at `path` against every faction of the skirmish file (cross validation of
+/// the two files; M6 review 1 P2-1): for any faction a computer player may play, the producer of
+/// every building of the build order is a starting building of the faction or is listed before
+/// that building in the build order, and the producer of the power building is a starting building
+/// of the faction. The error names the AI file, the field, the building, its producer, and the
+/// faction.
+pub fn check_ai_factions(
+    path: impl AsRef<Path>,
+    ai: &AiDefinitions,
+    skirmish: &SkirmishDefinitions,
+    definitions: &Definitions,
+) -> Result<(), DataError> {
+    let name = |kind: BuildingKind| {
+        definitions
+            .building(kind)
+            .map_or_else(String::new, |def| def.id.clone())
+    };
+    for faction in &skirmish.factions {
+        if let Some((field, building, producer)) = unobtainable_producer(ai, definitions, faction) {
+            let (field, kind) = invalid(
+                field,
+                format!(
+                    "{:?}, whose producer {:?} faction {:?} of the skirmish file does not start \
+                     with",
+                    name(building),
+                    name(producer),
+                    faction.id
+                ),
+                "a building type whose producer every faction starts with, or (in the build \
+                 order) one listed before it",
+            );
+            return Err(DataError {
+                file: path.as_ref().to_owned(),
+                field,
+                kind,
+            });
+        }
+    }
+    Ok(())
 }

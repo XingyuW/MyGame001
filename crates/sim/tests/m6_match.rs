@@ -15,8 +15,8 @@ use sim::{
     AiDefinitions, AiPlayers, Building, CellPos, Command, CommandQueue, Controller, Definitions,
     Footprint, IssuedCommand, MatchOutcome, MatchSetupError, MatchStart, MatchState, Mobile, Owner,
     PlayerId, PlayerSetup, Players, SimEvent, SimId, SimPlugin, SimSchedule, SkirmishDefinitions,
-    StartError, StartingBuilding, Unit, load_ai, load_map, load_match_definitions, load_skirmish,
-    plan_starting_units, setup_match, state_hash,
+    StartError, StartProblem, StartingBuilding, StartingGroup, Unit, load_ai, load_map,
+    load_match_definitions, load_skirmish, plan_starting_units, setup_match, state_hash,
 };
 
 const P0: PlayerId = PlayerId(0);
@@ -70,6 +70,15 @@ fn human(player: PlayerId, faction: usize, start: usize) -> PlayerSetup {
         faction,
         start,
         controller: Controller::Human,
+    }
+}
+
+fn computer(player: PlayerId, faction: usize, start: usize, difficulty: usize) -> PlayerSetup {
+    PlayerSetup {
+        player,
+        faction,
+        start,
+        controller: Controller::Ai { difficulty },
     }
 }
 
@@ -374,6 +383,232 @@ fn setup_errors_name_a_building_or_unit_group_that_does_not_fit() {
             required: 2,
         })
     );
+}
+
+/// The fixture skirmish with faction 1's start position moved `shift` cells east of (32, 32) and
+/// its buildings and units moved back by as much, so that they stand where they stand in the
+/// fixture, whatever the start position is.
+fn shifted_start(data: &Data, shift: i32) -> SkirmishDefinitions {
+    let building = |id| data.definitions.building_kind(id).expect("building");
+    let mut skirmish = data.skirmish.clone();
+    skirmish.factions[1].buildings = vec![
+        StartingBuilding {
+            kind: building("yard"),
+            offset: (-shift, 0),
+        },
+        StartingBuilding {
+            kind: building("turret"),
+            offset: (-2 - shift, 1),
+        },
+    ];
+    skirmish.factions[1].units = vec![StartingGroup {
+        kind: data.definitions.unit_kind("rifleman").expect("rifleman"),
+        offset: (4 - shift, 1),
+        count: 3,
+    }];
+    skirmish.maps[0].starts[1] = CellPos::new(32 + shift, 32);
+    skirmish
+}
+
+#[test]
+fn a_start_position_that_is_not_a_passable_cell_of_the_map_is_a_setup_error() {
+    // M6 review 1 P1-1: a start position outside the map, or on impassable terrain, was accepted
+    // whenever the faction's buildings and units, placed at offsets from it, lay on the map; the
+    // computer player then derived its gathering point and waypoints from it, and every command
+    // naming them was rejected as `OutsideMap`. Both are configuration errors now, found before
+    // anything is changed, for the human player and the computer player alike.
+    let data = data();
+    let rock = sim::Cell {
+        passable: false,
+        buildable: false,
+        ore: 0,
+    };
+    // The same buildings and units as the fixture's, from (52, 32) on the 40 x 40 map; on the
+    // reviewed code the setup succeeded and the computer player gathered at (52, 32).
+    let outside = shifted_start(&data, 20);
+    // From (36, 32), a cell of the map turned to rock.
+    let on_rock = shifted_start(&data, 4);
+    let cases = [
+        (
+            outside.clone(),
+            None,
+            MatchSetupError::InvalidStart {
+                start: 1,
+                cell: CellPos::new(52, 32),
+                problem: StartProblem::OutsideMap {
+                    width: 40,
+                    height: 40,
+                },
+            },
+            "start position 1 at (52, 32) is outside the 40 x 40 cells of the map",
+        ),
+        (
+            on_rock.clone(),
+            Some(CellPos::new(36, 32)),
+            MatchSetupError::InvalidStart {
+                start: 1,
+                cell: CellPos::new(36, 32),
+                problem: StartProblem::Impassable,
+            },
+            "start position 1 at (36, 32) is impassable terrain of the map",
+        ),
+    ];
+    for (skirmish, rock_at, expected, message) in cases {
+        for players in [
+            [human(P0, 0, 0), computer(P1, 1, 1, 0)],
+            [human(P0, 0, 0), human(P1, 1, 1)],
+            // The other player's start is checked too.
+            [computer(P0, 0, 0, 1), human(P1, 1, 1)],
+        ] {
+            let mut app = world(&data);
+            if let Some(cell) = rock_at {
+                app.world_mut()
+                    .resource_mut::<sim::Grid>()
+                    .set_terrain(cell, rock);
+            }
+            let before = state_hash(app.world_mut());
+            let error = setup_match(app.world_mut(), &skirmish, &data.ai, 0, &players)
+                .expect_err("a start position off the map's passable cells is rejected");
+            assert_eq!(error, expected, "{players:?}");
+            assert!(error.to_string().contains(message), "{error}");
+            assert_eq!(state_hash(app.world_mut()), before, "{error}");
+        }
+    }
+    // The same buildings and units from a start position on the map are accepted, so only the
+    // start position is at fault above.
+    let mut app = world(&data);
+    setup_match(
+        app.world_mut(),
+        &shifted_start(&data, 2),
+        &data.ai,
+        0,
+        &[human(P0, 0, 0), computer(P1, 1, 1, 0)],
+    )
+    .unwrap_or_else(|error| panic!("{error}"));
+}
+
+#[test]
+fn a_computer_player_whose_faction_lacks_a_producer_of_its_build_order_is_a_setup_error() {
+    // M6 review 1 P2-1, the class of unobtainable buildings: a computer player whose faction
+    // starts without the producer of its build order's buildings (the yard) could never build
+    // anything. A human player may play such a faction.
+    let data = data();
+    let mut skirmish = data.skirmish.clone();
+    skirmish.factions[1].buildings = vec![StartingBuilding {
+        kind: data.definitions.building_kind("power").expect("power"),
+        offset: (0, 0),
+    }];
+    let mut app = world(&data);
+    let before = state_hash(app.world_mut());
+    let error = setup_match(
+        app.world_mut(),
+        &skirmish,
+        &data.ai,
+        0,
+        &[human(P0, 0, 0), computer(P1, 1, 1, 0)],
+    )
+    .expect_err("the computer player could not build");
+    assert_eq!(
+        error,
+        MatchSetupError::UnobtainableProducer {
+            player: P1,
+            field: "build_order[0]".into(),
+            building: "power".into(),
+            producer: "yard".into(),
+        }
+    );
+    assert!(
+        error
+            .to_string()
+            .contains("computer player 1: the AI file's build_order[0] builds \"power\""),
+        "{error}"
+    );
+    assert_eq!(state_hash(app.world_mut()), before);
+    let mut app = world(&data);
+    setup_match(
+        app.world_mut(),
+        &skirmish,
+        &data.ai,
+        0,
+        &[computer(P0, 0, 0, 0), human(P1, 1, 1)],
+    )
+    .unwrap_or_else(|error| panic!("{error}"));
+}
+
+#[test]
+fn a_computer_player_without_a_reachable_gathering_point_is_a_setup_error() {
+    // M6 review 1 P1-1, the class of fallbacks to unusable cells: the gathering point fell back to
+    // the start position when no passable cell was found, here a cell under the computer player's
+    // own yard. Its yard is walled in by rock, so no cell free of buildings is reachable.
+    let data = data();
+    let mut skirmish = data.skirmish.clone();
+    skirmish.factions[1].buildings.truncate(1);
+    skirmish.factions[1].units.clear();
+    let rock = sim::Cell {
+        passable: false,
+        buildable: false,
+        ore: 0,
+    };
+    let mut app = world(&data);
+    {
+        let mut grid = app.world_mut().resource_mut::<sim::Grid>();
+        // The yard covers (32..=34, 32..=34).
+        for y in 31..=35 {
+            for x in 31..=35 {
+                if !(32..=34).contains(&x) || !(32..=34).contains(&y) {
+                    grid.set_terrain(CellPos::new(x, y), rock);
+                }
+            }
+        }
+    }
+    let error = setup_match(
+        app.world_mut(),
+        &skirmish,
+        &data.ai,
+        0,
+        &[human(P0, 0, 0), computer(P1, 1, 1, 0)],
+    )
+    .expect_err("no gathering point");
+    assert_eq!(
+        error,
+        MatchSetupError::NoGatheringPoint {
+            player: P1,
+            start: CellPos::new(32, 32),
+        }
+    );
+    assert!(error.to_string().contains("no gathering point"), "{error}");
+}
+
+#[test]
+fn every_gathering_point_and_waypoint_of_a_computer_player_is_a_passable_cell_of_the_map() {
+    // The cells a computer player orders its units to are derived at setup from the start
+    // positions and the terrain (M6 review 1 P1-1): all of them lie on the map's passable terrain,
+    // and the gathering point is free of buildings.
+    let data = data();
+    for shift in [0, 2] {
+        let mut app = world(&data);
+        setup_match(
+            app.world_mut(),
+            &shifted_start(&data, shift),
+            &data.ai,
+            0,
+            &[computer(P0, 0, 0, 0), computer(P1, 1, 1, 1)],
+        )
+        .unwrap_or_else(|error| panic!("{error}"));
+        let grid = app.world().resource::<sim::Grid>();
+        let ai = app.world().resource::<AiPlayers>();
+        assert_eq!(ai.players().count(), 2);
+        for player in ai.players() {
+            let controller = ai.controller(player).expect("controller");
+            assert!(grid.is_passable(controller.gather()), "{player:?}");
+            for waypoint in controller.waypoints() {
+                assert!(
+                    grid.cell(waypoint.cell).is_some_and(|cell| cell.passable),
+                    "{player:?}: {waypoint:?}"
+                );
+            }
+        }
+    }
 }
 
 #[test]

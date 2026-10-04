@@ -282,6 +282,8 @@ struct Run {
     losses: BTreeMap<u64, BTreeMap<PlayerId, BTreeSet<SimId>>>,
     /// Commands each computer player pushed.
     pushed: BTreeMap<PlayerId, usize>,
+    /// The commands each computer player pushed, with the tick.
+    commands: BTreeMap<PlayerId, Vec<(u64, Command)>>,
 }
 
 /// Runs `app` until the match ends or [`MATCH_TICK_LIMIT`] ticks have run, checking the invariants
@@ -295,6 +297,7 @@ fn run_match(mut app: App) -> Run {
         rejections: Vec::new(),
         losses: BTreeMap::new(),
         pushed: BTreeMap::new(),
+        commands: BTreeMap::new(),
     };
     for at in 0..MATCH_TICK_LIMIT {
         let (events, pushed) = tick(&mut app, Vec::new());
@@ -305,6 +308,10 @@ fn run_match(mut app: App) -> Run {
         for issued in &pushed {
             assert!(computers.contains(&issued.player), "{issued:?}");
             *run.pushed.entry(issued.player).or_insert(0) += 1;
+            run.commands
+                .entry(issued.player)
+                .or_default()
+                .push((at, issued.command.clone()));
         }
         for event in events {
             match event {
@@ -930,9 +937,13 @@ fn ai_against_ai_matches_on_every_shipped_map_end_with_a_winner() {
 }
 
 #[test]
-fn a_run_with_another_seed_or_difficulty_diverges() {
+fn a_run_with_another_difficulty_takes_another_course() {
     // The hashes of the end-to-end test are not trivially equal: a different difficulty changes
-    // them from the first tick (it is part of the state), and the matches differ in their course.
+    // them from the first tick (it is part of the state, so this holds by construction), and the
+    // matches differ in their course: the computer player whose difficulty differs issues other
+    // commands, and the match ends in another tick. (Until M6 review 1 P2-3 the test was named for
+    // a different seed too and asserted only the first hash; the seed is not claimed, because the
+    // computer players use no randomness, implementation debt item 2.)
     let data = data();
     let one = run_match(fixture_match(
         &data,
@@ -946,4 +957,12 @@ fn a_run_with_another_seed_or_difficulty_diverges() {
     assert_ne!(one.ticks, 0);
     let pushed_one: usize = one.pushed.values().sum();
     assert!(pushed_one > 0);
+    // The course differs.
+    assert!(
+        one.commands
+            .get(&P0)
+            .is_some_and(|commands| !commands.is_empty())
+    );
+    assert_ne!(one.commands.get(&P0), other.commands.get(&P0));
+    assert_ne!(one.ticks, other.ticks);
 }

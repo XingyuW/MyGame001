@@ -54,7 +54,7 @@ use crate::hash::Fnv1a64;
 use crate::id::SimId;
 use crate::map::{CellPos, Grid};
 use crate::match_setup::MatchState;
-use crate::pathfinding::{destination_cells, octile_distance};
+use crate::pathfinding::octile_distance;
 use crate::schedule::SimTick;
 use crate::unit::{Mobile, Orders, Owner, Unit};
 use crate::visibility::Vision;
@@ -138,8 +138,12 @@ pub struct AiController {
 }
 
 impl AiController {
-    /// A controller of `difficulty` (one of `ai.difficulties`) for a player starting at `start`, whose enemies start at `enemy_starts`. The gathering point and
-    /// the waypoints come from the static terrain of `grid` (docs/DECISIONS.md D43).
+    /// A controller of `difficulty` (one of `ai.difficulties`) for a player starting at `start`,
+    /// whose enemies start at `enemy_starts`; match setup has checked that every start position is
+    /// a cell of the map with passable terrain. The gathering point and the waypoints come from the
+    /// static terrain of `grid` (docs/DECISIONS.md D43), so they lie on the map. `None` if no
+    /// gathering point exists ([`gathering_point`]), which match setup reports as an error instead
+    /// of falling back to a cell its commands could not use (M6 review 1 P1-1).
     pub(crate) fn new(
         grid: &Grid,
         definitions: &Definitions,
@@ -147,7 +151,7 @@ impl AiController {
         difficulty: Difficulty,
         start: CellPos,
         enemy_starts: Vec<CellPos>,
-    ) -> Self {
+    ) -> Option<Self> {
         let (width, height) = (grid_side(grid.width()), grid_side(grid.height()));
         // In `i64`, so that no start position overflows (invariant I12).
         let centre = (i64::from(width / 2), i64::from(height / 2));
@@ -162,14 +166,12 @@ impl AiController {
                 i64::from(start.y) + dy * reach / length,
             )
         };
+        // Between the start and the centre of the map, so it fits in `i32`.
         let toward = CellPos::new(
             i32::try_from(x).unwrap_or(start.x),
             i32::try_from(y).unwrap_or(start.y),
         );
-        let gather = destination_cells(grid, toward, 1, |_| false)
-            .first()
-            .copied()
-            .unwrap_or(start);
+        let gather = gathering_point(grid, start, toward)?;
         // Waypoints in blocks as wide as the shortest sight of the army, so that a unit near a
         // block's waypoint sees the whole block.
         let spacing = ai
@@ -210,7 +212,7 @@ impl AiController {
             }
             y0 += spacing;
         }
-        Self {
+        Some(Self {
             start,
             gather,
             waypoints,
@@ -226,7 +228,7 @@ impl AiController {
             liquidating: false,
             issued: 0,
             difficulty,
-        }
+        })
     }
 
     pub fn difficulty(&self) -> &Difficulty {
@@ -309,6 +311,51 @@ impl AiController {
         hasher.write(&[u8::from(self.fall_back_exempt), u8::from(self.liquidating)]);
         hasher.write_u64(self.issued);
     }
+}
+
+/// The gathering point of a player starting at `start` (a cell of the map with passable terrain):
+/// of the cells reachable from `start` over passable terrain (four-neighbour connectivity, which
+/// for the eight-neighbour steps of equation 5, with no diagonal step between two blocked
+/// orthogonal neighbours, connects the same cells), those that no building covers, the one nearest
+/// to `toward` (octile distance, then row, then column). `None` if there is none, for example a
+/// start walled in by terrain under its own buildings. Its units can walk there unless buildings
+/// placed later block the way.
+fn gathering_point(grid: &Grid, start: CellPos, toward: CellPos) -> Option<CellPos> {
+    let width = usize::try_from(grid.width()).ok()?;
+    let index = |cell: CellPos| -> Option<usize> {
+        grid.contains(cell).then(|| {
+            usize::try_from(cell.y)
+                .unwrap_or(0)
+                .saturating_mul(width)
+                .saturating_add(usize::try_from(cell.x).unwrap_or(0))
+        })
+    };
+    let terrain = |cell: CellPos| grid.cell(cell).is_some_and(|terrain| terrain.passable);
+    if !terrain(start) {
+        return None;
+    }
+    let mut reached = vec![false; width.saturating_mul(usize::try_from(grid.height()).ok()?)];
+    let mut stack = vec![start];
+    reached[index(start)?] = true;
+    let mut best: Option<(u32, i32, i32)> = None;
+    while let Some(cell) = stack.pop() {
+        if grid.building(cell).is_none() {
+            let key = (octile_distance(cell, toward), cell.y, cell.x);
+            if best.is_none_or(|best| key < best) {
+                best = Some(key);
+            }
+        }
+        for (dx, dy) in [(1, 0), (-1, 0), (0, 1), (0, -1)] {
+            let next = CellPos::new(cell.x.saturating_add(dx), cell.y.saturating_add(dy));
+            if let Some(next_index) = index(next)
+                && terrain(next)
+                && !std::mem::replace(&mut reached[next_index], true)
+            {
+                stack.push(next);
+            }
+        }
+    }
+    best.map(|(_, y, x)| CellPos::new(x, y))
 }
 
 fn grid_side(cells: u32) -> i32 {

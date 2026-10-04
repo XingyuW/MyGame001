@@ -6,9 +6,11 @@
 //! economy, and combat files with every sprite (`crate::units::load_match_data`), the skirmish file
 //! (factions, maps, start positions, starting credits) and the AI file (`sim::load_skirmish`,
 //! `sim::load_ai`), and every map of the skirmish file with its tileset image
-//! (`crate::map::check_map`). The renderer receives only the checked bytes, which are registered
-//! once (D16); nothing is read again when a match starts or restarts. Any error ends the game with
-//! exit code 1, as before M6.
+//! (`crate::map::check_map`). The files are then checked against each other ([`check_catalogue`]):
+//! the start positions against their maps, the AI file against the factions, and every match the
+//! menu can choose is set up once (M6 review 1 P1-1 and P2-1). The renderer receives only the
+//! checked bytes, which are registered once (D16); nothing is read again when a match starts or
+//! restarts. Any error ends the game with exit code 1, as before M6.
 //!
 //! The menu chooses a map, the human player's faction, the computer player's faction, and the
 //! difficulty ([`menu_effect`], pure). Starting a match ([`begin_match`]) ends the current one if
@@ -127,16 +129,79 @@ pub fn load(
             map,
         });
     }
-    Ok((
-        Catalogue {
-            definitions,
-            skirmish,
-            ai,
-            maps,
-        },
-        loaded.sheets,
-        buildings,
-    ))
+    let catalogue = Catalogue {
+        definitions,
+        skirmish,
+        ai,
+        maps,
+    };
+    check_catalogue(&catalogue, root)?;
+    Ok((catalogue, loaded.sheets, buildings))
+}
+
+/// Checks the files of the catalogue against each other, so that every match the menu offers can
+/// start and its computer player can play (M6 review 1 P1-1 and P2-1):
+///
+/// * every start position of every map is a cell of the map with passable terrain
+///   (`sim::check_map_starts`);
+/// * the AI file can be played by every faction: the producers of the buildings it builds are
+///   starting buildings or are built before (`sim::check_ai_factions`);
+/// * every match the menu can choose can be set up: every map with every faction for the human
+///   player and every faction for the computer player (the difficulty does not change the setup),
+///   each in a simulation of its own that is dropped afterwards.
+///
+/// Each error names the file and the field, or the map and the factions, and the reason.
+pub fn check_catalogue(catalogue: &Catalogue, root: &Path) -> Result<(), String> {
+    let skirmish_path = root.join(SKIRMISH_PATH);
+    for map in 0..catalogue.maps.len() {
+        sim::check_map_starts(
+            &skirmish_path,
+            &catalogue.skirmish,
+            map,
+            &catalogue.maps[map].map.grid,
+        )
+        .map_err(|error| error.to_string())?;
+    }
+    sim::check_ai_factions(
+        root.join(AI_PATH),
+        &catalogue.ai,
+        &catalogue.skirmish,
+        &catalogue.definitions,
+    )
+    .map_err(|error| error.to_string())?;
+    let factions = &catalogue.skirmish.factions;
+    for (map, entry) in catalogue.maps.iter().enumerate() {
+        for faction in 0..factions.len() {
+            for opponent in 0..factions.len() {
+                let selection = MenuSelection {
+                    map,
+                    faction,
+                    opponent,
+                    difficulty: 0,
+                };
+                let plan = MatchPlan {
+                    grid: entry.map.grid.clone(),
+                    definitions: catalogue.definitions.clone(),
+                    skirmish: catalogue.skirmish.clone(),
+                    ai: catalogue.ai.clone(),
+                    map,
+                    players: selection.players().to_vec(),
+                    seed: 0,
+                };
+                crate::sim_host::check_match(&plan).map_err(|error| {
+                    format!(
+                        "data file {}: map {:?}: the match of faction {:?} against faction {:?} \
+                         cannot be set up: {error}",
+                        skirmish_path.display(),
+                        entry.id,
+                        factions[faction].id,
+                        factions[opponent].id
+                    )
+                })?;
+            }
+        }
+    }
+    Ok(())
 }
 
 /// Startup: loads the catalogue ([`load`]) and registers the sprites. An error is logged and ends
@@ -823,6 +888,157 @@ pub(crate) mod tests {
                     }
                 }
             }
+        }
+    }
+
+    /// Copies the files of the directory `from` into `to`, recursively.
+    fn copy_dir(from: &Path, to: &Path) {
+        std::fs::create_dir_all(to).expect("directory");
+        for entry in std::fs::read_dir(from).expect("readable") {
+            let entry = entry.expect("entry");
+            let target = to.join(entry.file_name());
+            if entry.file_type().expect("type").is_dir() {
+                copy_dir(&entry.path(), &target);
+            } else {
+                std::fs::copy(entry.path(), &target).expect("copied");
+            }
+        }
+    }
+
+    #[test]
+    fn loading_rejects_a_start_position_outside_its_map() {
+        // M6 review 1 P1-1, the reviewer's scratch root `p1_start_outside`: the demo map (64 x 64)
+        // with starts (27, 37) and (70, 42), and the faction's yard at offset (-12, 0) and groups
+        // at (-8, 1) and (-11, 4), so that every building and unit lies on the map but the
+        // computer player's start does not. The reviewed code loaded it, and the computer player's
+        // commands to (70, 42) were rejected all match long; now the loader rejects it.
+        let root = std::env::temp_dir().join(format!(
+            "mygame001_game_skirmish_tests_{}",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_dir_all(&root);
+        for dir in ["data", "maps", "sprites"] {
+            copy_dir(&assets().join(dir), &root.join(dir));
+        }
+        let path = root.join(SKIRMISH_PATH);
+        let mut text = std::fs::read_to_string(&path).expect("skirmish file");
+        for (from, to) in [
+            (
+                "(building: \"construction_yard\", x: 0, y: 0)",
+                "(building: \"construction_yard\", x: -12, y: 0)",
+            ),
+            (
+                "(unit: \"light_tank\", x: 4, y: 1, count: 5)",
+                "(unit: \"light_tank\", x: -8, y: 1, count: 5)",
+            ),
+            (
+                "(unit: \"scout\", x: 1, y: 4, count: 3)",
+                "(unit: \"scout\", x: -11, y: 4, count: 3)",
+            ),
+            (
+                "starts: [(x: 15, y: 37), (x: 52, y: 42)]",
+                "starts: [(x: 27, y: 37), (x: 70, y: 42)]",
+            ),
+        ] {
+            assert_eq!(text.matches(from).count(), 1, "{from}");
+            text = text.replacen(from, to, 1);
+        }
+        std::fs::write(&path, text).expect("skirmish file");
+        let error = load(&root, &CheckedAssets::default())
+            .map(|_| ())
+            .expect_err("a start position outside the map");
+        for part in [
+            format!("data file {}", path.display()),
+            "maps[0].starts[1]".to_string(),
+            "(70, 42), which is outside the 64 x 64 cells of map \"demo\"".to_string(),
+            "a cell of the map with passable terrain".to_string(),
+        ] {
+            assert!(error.contains(&part), "{error:?} lacks {part:?}");
+        }
+        // The same files with the computer player's start on the map load.
+        std::fs::write(
+            &path,
+            std::fs::read_to_string(&path)
+                .expect("skirmish file")
+                .replacen("(x: 70, y: 42)", "(x: 58, y: 42)", 1),
+        )
+        .expect("skirmish file");
+        load(&root, &CheckedAssets::default()).unwrap_or_else(|error| panic!("{error}"));
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn the_catalogue_rejects_starts_off_their_map_unbuildable_ai_files_and_unplayable_matches() {
+        // M6 review 1 P1-1: a start position outside its map was accepted when the catalogue was
+        // loaded (the reviewer's scratch root: (70, 42) on the 64 x 64 demo map, with the
+        // faction's buildings and units at offsets that lie on the map), and the computer player's
+        // commands to it were rejected all match long. The catalogue's cross checks now reject it,
+        // and the AI file that no faction can play (P2-1), and any match the menu offers that
+        // cannot be set up (implementation debt item 7), when the game starts.
+        let catalogue = production_catalogue();
+        let root = assets();
+        check_catalogue(&catalogue, &root).unwrap_or_else(|error| panic!("{error}"));
+        let skirmish_file = format!("data file {}", root.join(SKIRMISH_PATH).display());
+
+        let mut outside = catalogue.clone();
+        outside.skirmish.maps[0].starts[1] = sim::CellPos::new(70, 42);
+        for building in &mut outside.skirmish.factions[0].buildings {
+            building.offset.0 -= 18;
+        }
+        for group in &mut outside.skirmish.factions[0].units {
+            group.offset.0 -= 18;
+        }
+        let error = check_catalogue(&outside, &root).expect_err("a start outside the map");
+        for part in [
+            skirmish_file.as_str(),
+            "maps[0].starts[1]",
+            "(70, 42), which is outside the 64 x 64 cells of map \"demo\"",
+        ] {
+            assert!(error.contains(part), "{error:?} lacks {part:?}");
+        }
+        // A start on impassable terrain.
+        let mut on_rock = catalogue.clone();
+        let rock = (0..64)
+            .flat_map(|y| (0..64).map(move |x| sim::CellPos::new(x, y)))
+            .find(|&cell| {
+                on_rock.maps[0]
+                    .map
+                    .grid
+                    .cell(cell)
+                    .is_some_and(|terrain| !terrain.passable)
+            })
+            .expect("the demo map has impassable terrain");
+        on_rock.skirmish.maps[0].starts[0] = rock;
+        let error = check_catalogue(&on_rock, &root).expect_err("a start on rock");
+        assert!(error.contains("maps[0].starts[0]"), "{error}");
+        assert!(error.contains("impassable terrain"), "{error}");
+
+        // An AI file whose build order needs a producer that a faction does not start with.
+        let mut no_yard = catalogue.clone();
+        let power_plant = no_yard
+            .definitions
+            .building_kind("power_plant")
+            .expect("power plant");
+        no_yard.skirmish.factions[0].buildings[0].kind = power_plant;
+        let error = check_catalogue(&no_yard, &root).expect_err("no yard");
+        for part in [
+            format!("data file {}", root.join(AI_PATH).display()),
+            "build_order[0]".to_string(),
+            "whose producer \"construction_yard\" faction \"vanguard\"".to_string(),
+        ] {
+            assert!(error.contains(&part), "{error:?} lacks {part:?}");
+        }
+
+        // A faction whose buildings do not fit at a start of a map: the match cannot be set up.
+        let mut too_far = catalogue.clone();
+        too_far.skirmish.factions[0].buildings[0].offset = (32, 0);
+        let error = check_catalogue(&too_far, &root).expect_err("off the map");
+        for part in [
+            skirmish_file.as_str(),
+            "map \"demo\": the match of faction \"vanguard\" against faction \"vanguard\"",
+            "starting building \"construction_yard\"",
+        ] {
+            assert!(error.contains(part), "{error:?} lacks {part:?}");
         }
     }
 

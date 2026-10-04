@@ -24,8 +24,8 @@ use sim::{
     AiDefinitions, BuildingKind, CellPos, DataError, DataErrorKind, Definitions, MAX_AI_ARMY,
     MAX_BUILD_ORDER, MAX_DATA_FILE_BYTES, MAX_DEFENCE_RADIUS, MAX_GROUP_UNITS,
     MAX_HARVESTERS_PER_REFINERY, MAX_START_OFFSET, MAX_STARTING_CREDITS, MAX_THINK_INTERVAL,
-    MapDef, SkirmishDefinitions, StartingBuilding, StartingGroup, UnitKind, load_ai,
-    load_match_definitions, load_skirmish, map_asset_path,
+    MapDef, SkirmishDefinitions, StartingBuilding, StartingGroup, UnitKind, check_ai_factions,
+    check_map_starts, load_ai, load_map, load_match_definitions, load_skirmish, map_asset_path,
 };
 
 /// Upper limit of heap bytes in use by this test process.
@@ -413,9 +413,11 @@ fn limits_are_accepted_at_both_ends() {
     );
     assert_eq!(normal.defence_radius, MAX_DEFENCE_RADIUS);
     // The longest build order.
+    // The army's and the harvester's producers and prerequisites must be in the build order
+    // (M6 review 1 P2-1), so the longest one lists them before its turrets.
     let long = format!(
-        "build_order: [\"power\", {}],",
-        vec!["\"turret\""; MAX_BUILD_ORDER - 1].join(", ")
+        "build_order: [\"power\", \"refinery\", \"barracks\", \"factory\", {}],",
+        vec!["\"turret\""; MAX_BUILD_ORDER - 4].join(", ")
     );
     let path = variant(
         File::Ai,
@@ -746,6 +748,241 @@ fn ai_references_ids_and_the_armys_reach_are_checked() {
     .expect("production definitions");
     let error = load_with(File::Skirmish, &File::Skirmish.fixture(), other).expect_err("unknown");
     assert_eq!(error.kind, unknown("building", "yard"), "{error}");
+}
+
+/// The fixture definitions with each `(from, to)` edit applied to the economy fixture.
+fn definitions_with_economy(name: &str, edits: &[(&str, &str)]) -> Definitions {
+    let mut text =
+        std::fs::read_to_string(fixtures().join("economy_combat.ron")).expect("fixture exists");
+    for (from, to) in edits {
+        assert_eq!(
+            text.matches(from).count(),
+            1,
+            "{name}: economy edit {from:?}"
+        );
+        text = text.replacen(from, to, 1);
+    }
+    let economy = temp_file(&format!("{name}.ron"), text.as_bytes());
+    load_match_definitions(
+        fixtures().join("units_combat.ron"),
+        economy,
+        fixtures().join("combat.ron"),
+    )
+    .unwrap_or_else(|error| panic!("{error}"))
+}
+
+#[test]
+fn the_army_harvester_and_power_building_can_be_obtained_through_the_build_order() {
+    // M6 review 1 P2-1: an AI file whose army or harvester could never be produced (its producer
+    // or a prerequisite is not in the build order) was accepted, and two computer players with it
+    // played 36,000 ticks without an outcome. The reviewer's case on the fixture: the factory, the
+    // producer of the tank and the harvester, removed from the build order.
+    let order =
+        "build_order: [\"power\", \"refinery\", \"barracks\", \"factory\", \"power\", \"turret\"],";
+    let path = variant(
+        File::Ai,
+        "ai_no_factory",
+        &[
+            (
+                order,
+                "build_order: [\"power\", \"refinery\", \"barracks\", \"power\", \"turret\"],",
+            ),
+            (
+                "army: [\"tank\", \"tank\", \"rifleman\"],",
+                "army: [\"tank\"],",
+            ),
+        ],
+    );
+    assert_invalid(
+        File::Ai,
+        &path,
+        "harvester",
+        "\"harvester\", whose producer \"factory\" is not listed in the build order",
+    );
+    // An army unit type whose producer is missing.
+    let path = variant(
+        File::Ai,
+        "ai_no_barracks",
+        &[(
+            order,
+            "build_order: [\"power\", \"refinery\", \"factory\", \"power\", \"turret\"],",
+        )],
+    );
+    assert_invalid(
+        File::Ai,
+        &path,
+        "army[2]",
+        "\"rifleman\", whose producer \"barracks\" is not listed in the build order",
+    );
+    // An army unit type whose prerequisite is missing (the tank needs a fence in this variant of
+    // the economy fixture).
+    let tank = "unit: \"tank\",\n            cost: 200,\n            build_time: 20,\n            producer: \"factory\",\n            prerequisites: [],";
+    let definitions = definitions_with_economy(
+        "economy_tank_needs_fence",
+        &[(
+            tank,
+            &tank.replace("prerequisites: []", "prerequisites: [\"fence\"]"),
+        )],
+    );
+    let error = load_with(File::Ai, &File::Ai.fixture(), definitions).expect_err("fence");
+    assert_eq!(error.field, "army[0]", "{error}");
+    assert_eq!(
+        error.kind,
+        DataErrorKind::InvalidValue {
+            found: "\"tank\", whose prerequisite \"fence\" is not listed in the build order".into(),
+            expected: "a unit type whose producer and prerequisites are listed in the build order"
+                .into(),
+        }
+    );
+    // A power building with prerequisites: it is queued whenever power is short, possibly before
+    // they are built. The build order lists the fence first, so only the power rule fails.
+    let power = "id: \"power\",\n            sprite: \"power\",\n            width: 2,\n            height: 2,\n            cost: 105,\n            build_time: 10,\n            producer: \"yard\",\n            prerequisites: [],";
+    let definitions = definitions_with_economy(
+        "economy_power_needs_fence",
+        &[(
+            power,
+            &power.replace("prerequisites: []", "prerequisites: [\"fence\"]"),
+        )],
+    );
+    let path = variant(
+        File::Ai,
+        "ai_fence_first",
+        &[(
+            "build_order: [\"power\",",
+            "build_order: [\"fence\", \"power\",",
+        )],
+    );
+    let error = load_with(File::Ai, &path, definitions).expect_err("power prerequisites");
+    assert_eq!(error.field, "power", "{error}");
+    assert_eq!(
+        error.kind,
+        DataErrorKind::InvalidValue {
+            found: "\"power\", which has prerequisites".into(),
+            expected: "a building type that produces power and has no prerequisites".into(),
+        }
+    );
+    // The fixture, whose build order lists the factory, the barracks, and the refinery, loads.
+    assert!(matches!(
+        load(File::Ai, &File::Ai.fixture()),
+        Ok(Loaded::Ai(_))
+    ));
+}
+
+#[test]
+fn the_ai_file_is_checked_against_every_faction_of_the_skirmish_file() {
+    // M6 review 1 P2-1: the buildings of the build order and the power building are produced by
+    // a building the factions start with (the yard); a faction without it could never build.
+    let definitions = definitions();
+    let Ok(Loaded::Ai(ai)) = load(File::Ai, &File::Ai.fixture()) else {
+        panic!("the AI fixture loads");
+    };
+    let Ok(Loaded::Skirmish(skirmish)) = load(File::Skirmish, &File::Skirmish.fixture()) else {
+        panic!("the skirmish fixture loads");
+    };
+    let path = File::Ai.fixture();
+    check_ai_factions(&path, &ai, &skirmish, &definitions)
+        .unwrap_or_else(|error| panic!("{error}"));
+    let building = |id| definitions.building_kind(id).expect("building");
+    let mut without_yard = skirmish.clone();
+    without_yard.factions[1].buildings = vec![StartingBuilding {
+        kind: building("power"),
+        offset: (0, 0),
+    }];
+    let error = check_ai_factions(&path, &ai, &without_yard, &definitions).expect_err("no yard");
+    assert_eq!(
+        (error.file.as_path(), error.field.as_str()),
+        (path.as_path(), "build_order[0]")
+    );
+    let message = error.to_string();
+    assert!(
+        message.contains("\"power\", whose producer \"yard\" faction \"blue\" of the skirmish file does not start with"),
+        "{message}"
+    );
+    // A building of the build order may be the producer of a later one.
+    let mut ai_with_yard = ai.clone();
+    ai_with_yard.build_order.insert(0, building("yard"));
+    let mut yard_produces_itself = without_yard.clone();
+    yard_produces_itself.factions[1].buildings[0].kind = building("yard");
+    check_ai_factions(&path, &ai_with_yard, &yard_produces_itself, &definitions)
+        .unwrap_or_else(|error| panic!("{error}"));
+    // The power building's producer must be a starting building (it is queued from the first
+    // turn on whenever power is short).
+    let mut power_only = ai.clone();
+    power_only.build_order.clear();
+    let error =
+        check_ai_factions(&path, &power_only, &without_yard, &definitions).expect_err("power");
+    assert_eq!(error.field, "power", "{error}");
+}
+
+#[test]
+fn start_positions_are_checked_against_their_map() {
+    // M6 review 1 P1-1: the skirmish file is read without its maps, so its start positions are
+    // limited only to the largest map (0 to 255, `limits_are_accepted_at_both_ends`); every loader
+    // of a map checks them against the map's grid. The reviewer's case: (255, 255) on the 40 x 40
+    // fixture map.
+    let grid = load_map(
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/maps/skirmish_40x40.tmx"),
+    )
+    .unwrap_or_else(|error| panic!("{error}"))
+    .grid;
+    let path = File::Skirmish.fixture();
+    let Ok(Loaded::Skirmish(skirmish)) = load(File::Skirmish, &path) else {
+        panic!("the skirmish fixture loads");
+    };
+    check_map_starts(&path, &skirmish, 0, &grid).unwrap_or_else(|error| panic!("{error}"));
+    let cases = [
+        (
+            1,
+            CellPos::new(255, 255),
+            "(255, 255), which is outside the 40 x 40 cells of map \"skirmish_40x40\"",
+        ),
+        (
+            0,
+            CellPos::new(40, 5),
+            "(40, 5), which is outside the 40 x 40 cells of map \"skirmish_40x40\"",
+        ),
+        (
+            1,
+            CellPos::new(-1, 0),
+            "(-1, 0), which is outside the 40 x 40 cells of map \"skirmish_40x40\"",
+        ),
+        // The fixture map has rock at (25..=27, 9).
+        (
+            0,
+            CellPos::new(25, 9),
+            "(25, 9), which is impassable terrain of map \"skirmish_40x40\"",
+        ),
+    ];
+    for (position, cell, found) in cases {
+        let mut bad = skirmish.clone();
+        bad.maps[0].starts[position] = cell;
+        let error = check_map_starts(&path, &bad, 0, &grid).expect_err("a start off the map");
+        assert_eq!(error.file, path);
+        assert_eq!(
+            error.field,
+            format!("maps[0].starts[{position}]"),
+            "{error}"
+        );
+        assert_eq!(
+            error.kind,
+            DataErrorKind::InvalidValue {
+                found: found.into(),
+                expected: "a cell of the map with passable terrain".into(),
+            }
+        );
+        assert!(
+            error
+                .to_string()
+                .contains(&format!("data file {}", path.display()))
+        );
+    }
+    // The corners of the map are cells of it.
+    let mut corners = skirmish.clone();
+    corners.maps[0].starts = [CellPos::new(0, 0), CellPos::new(39, 39)];
+    check_map_starts(&path, &corners, 0, &grid).unwrap_or_else(|error| panic!("{error}"));
+    // A map index outside the file.
+    let error = check_map_starts(&path, &skirmish, 1, &grid).expect_err("no map 1");
+    assert_eq!(error.field, "maps", "{error}");
 }
 
 #[test]
