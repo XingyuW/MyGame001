@@ -149,6 +149,32 @@ pub fn projectile_point(origin: SubPos, target: SubPos, progress: f32) -> SubPos
     SubPos::new(lerp(origin.x, target.x), lerp(origin.y, target.y))
 }
 
+/// How an instant shot is drawn.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ShotView {
+    /// A line from the attacker to the target.
+    Line,
+    /// A flash at the attacker only.
+    AtAttacker,
+    /// An impact at the target only.
+    AtTarget,
+    /// Nothing.
+    Hidden,
+}
+
+/// How an instant shot is drawn, given whether the human player sees the cell of its attacker
+/// and of its target: the line only when both ends are seen, else a mark at the end that is
+/// seen, so that a shot never shows where an unseen unit or building stands (M4 review 1 P2-1;
+/// docs/DECISIONS.md D31 item 3, D33).
+pub fn shot_view(attacker_seen: bool, target_seen: bool) -> ShotView {
+    match (attacker_seen, target_seen) {
+        (true, true) => ShotView::Line,
+        (true, false) => ShotView::AtAttacker,
+        (false, true) => ShotView::AtTarget,
+        (false, false) => ShotView::Hidden,
+    }
+}
+
 /// Draws projectiles in flight and recent instant shots, where the human player sees them.
 fn draw_combat(
     map: Option<Res<MapView>>,
@@ -191,12 +217,18 @@ fn draw_combat(
         let (Some(&from), Some(&to)) = (points.get(&attacker), points.get(&target)) else {
             continue;
         };
-        if seen(from) || seen(to) {
-            gizmos.line_2d(
-                body_point(from, map.tile),
-                body_point(to, map.tile),
-                Color::srgb(1.0, 1.0, 0.6),
-            );
+        let colour = Color::srgb(1.0, 1.0, 0.6);
+        match shot_view(seen(from), seen(to)) {
+            ShotView::Line => {
+                gizmos.line_2d(body_point(from, map.tile), body_point(to, map.tile), colour);
+            }
+            ShotView::AtAttacker => {
+                gizmos.circle_2d(body_point(from, map.tile), 4.0, colour);
+            }
+            ShotView::AtTarget => {
+                gizmos.circle_2d(body_point(to, map.tile), 4.0, colour);
+            }
+            ShotView::Hidden => {}
         }
     }
 }
@@ -366,6 +398,15 @@ mod tests {
         };
         app.world_mut().schedule_scope(PostUpdate, check);
         app.world_mut().schedule_scope(Update, check);
+    }
+
+    #[test]
+    fn an_instant_shot_shows_only_the_ends_the_human_player_sees() {
+        // M4 review 1 P2-1: a line from an unseen attacker would show where it stands.
+        assert_eq!(shot_view(true, true), ShotView::Line);
+        assert_eq!(shot_view(false, true), ShotView::AtTarget);
+        assert_eq!(shot_view(true, false), ShotView::AtAttacker);
+        assert_eq!(shot_view(false, false), ShotView::Hidden);
     }
 
     #[test]

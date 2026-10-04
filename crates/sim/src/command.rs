@@ -141,8 +141,6 @@ pub enum RejectReason {
     /// exist (any more), or it is an enemy the player does not see. The two cases are reported
     /// alike, so that commands reveal nothing about unseen enemies (docs/DECISIONS.md D30).
     UnknownTarget(SimId),
-    /// The target has no hit points (only possible without a combat file).
-    NotTargetable(SimId),
 }
 
 impl fmt::Display for RejectReason {
@@ -190,7 +188,6 @@ impl fmt::Display for RejectReason {
             Self::UnknownTarget(id) => {
                 write!(f, "no unit or building {} is visible to the player", id.0)
             }
-            Self::NotTargetable(id) => write!(f, "{} has no hit points", id.0),
         }
     }
 }
@@ -527,8 +524,10 @@ fn validate_player(issued: &IssuedCommand, economy: &EconomyParams) -> Result<()
 
 /// The checks of `Attack` beyond [`validate`], in this order (docs/DECISIONS.md D29, D30): every
 /// named unit has a weapon (`NotArmed`), and the target is not the player's own (`OwnTarget`),
-/// exists and is visible to the player (`UnknownTarget`, the same reason for both, so that an
-/// unseen enemy is reported like a missing one), and has hit points (`NotTargetable`).
+/// and exists and is visible to the player (`UnknownTarget`, the same reason for both, so that an
+/// unseen enemy is reported like a missing one). Every unit and building has hit points whenever
+/// any unit has a weapon (a combat file gives every type combat terms, docs/DECISIONS.md D28
+/// item 4), so no check for them is needed (M4 review 1 P2-2, D32).
 fn validate_combat(
     issued: &IssuedCommand,
     economy: &EconomyParams,
@@ -554,36 +553,19 @@ fn validate_combat(
             return Err(RejectReason::NotArmed(id));
         }
     }
-    let definitions = economy.definitions();
-    // The target as the player may know it: owner, body, and whether its type has hit points.
+    // The target as the player may know it: owner and body.
     let found = index
         .get(&target)
         .and_then(|&entity| units.get(entity).ok())
-        .map(|(_, _, owner, unit, mobile, ..)| {
-            (
-                owner.0,
-                Body::of(Some(mobile), None),
-                definitions.unit_combat(unit.kind).is_some(),
-            )
-        })
+        .map(|(_, _, owner, _, mobile, ..)| (owner.0, Body::of(Some(mobile), None)))
         .or_else(|| {
-            buildings.get(target).map(|(owner, kind, footprint)| {
-                (
-                    owner,
-                    Some(Body::Building(footprint)),
-                    definitions.building_combat(kind).is_some(),
-                )
-            })
+            buildings
+                .get(target)
+                .map(|(owner, _, footprint)| (owner, Some(Body::Building(footprint))))
         });
     match found {
-        Some((owner, ..)) if owner == issued.player => Err(RejectReason::OwnTarget(target)),
-        Some((_, Some(body), targetable)) if body.seen_by(vision) => {
-            if targetable {
-                Ok(())
-            } else {
-                Err(RejectReason::NotTargetable(target))
-            }
-        }
+        Some((owner, _)) if owner == issued.player => Err(RejectReason::OwnTarget(target)),
+        Some((_, Some(body))) if body.seen_by(vision) => Ok(()),
         _ => Err(RejectReason::UnknownTarget(target)),
     }
 }

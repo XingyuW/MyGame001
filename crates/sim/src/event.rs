@@ -118,6 +118,10 @@ pub enum AttackEnd {
     /// The unit moved toward the target `MAX_CHASES` times without firing in between, or no free
     /// cell from which the target is in range is reachable.
     OutOfReach,
+    /// The unit's warhead deals no damage to the target's armour (equation 2 with a percentage
+    /// of 0): the unit fired once, as ordered, and the order ended with that shot
+    /// (docs/DECISIONS.md D32).
+    NoDamage,
 }
 
 /// Why a harvester stopped its cycle.

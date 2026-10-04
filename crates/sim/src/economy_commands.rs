@@ -12,9 +12,11 @@
 //!   (`QueueFull`);
 //! * `CancelProduction`: the item is defined and producible, and queued (`NotQueued`);
 //! * `PlaceBuilding`: the building type is defined, a complete building of that type is at the
-//!   head of its queue (`NotReady`), the footprint is valid (`Placement`: inside the map,
-//!   buildable, no building, no unit), and it lies within the placement distance of a building
-//!   of the player (`Placement(TooFar)`);
+//!   head of its queue (`NotReady`), the footprint lies inside the map (`Placement(OutsideMap)`),
+//!   under fog of war (M4) the player sees every cell of it (`Placement(NotVisible)`, so that
+//!   the checks that follow name nothing the player does not see), the footprint is valid
+//!   (`Placement`: buildable, no building, no unit), and it lies within the placement distance
+//!   of a building of the player (`Placement(TooFar)`);
 //! * `SellBuilding`: the building exists (`UnknownBuilding`) and belongs to the player
 //!   (`NotOwned`); under fog of war (M4), another player's building the player does not see is
 //!   reported as `UnknownBuilding`;
@@ -28,7 +30,7 @@ use bevy_ecs::message::Messages;
 use bevy_ecs::system::{Commands, Query, Res, ResMut, SystemParam};
 
 use crate::building::{
-    Building, Footprint, Producer, building_bundle, check_distance, check_footprint,
+    Building, Footprint, Producer, building_bundle, check_distance, check_footprint, check_visible,
 };
 use crate::combat::Body;
 use crate::combat::combat_components;
@@ -237,6 +239,9 @@ pub(crate) fn apply(
                 width: def.width,
                 height: def.height,
             };
+            if let Some(vision) = fog(definitions, state) {
+                check_visible(grid, footprint, vision).map_err(RejectReason::Placement)?;
+            }
             check_footprint(grid, footprint).map_err(RejectReason::Placement)?;
             check_distance(
                 footprint,
