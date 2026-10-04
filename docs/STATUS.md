@@ -7,7 +7,7 @@
 | M2: Units and movement | **Reviewed**: review 3 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 2 P2) after reviews 1 and 2 NO-GO; merged into `main`. Awaiting user verification for `m2-approved` | `milestone/m2` | `m2-reviewed` |
 | M3: Economy and construction | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 4 P2); merged into `main`. Awaiting user verification for `m3-approved` | `milestone/m3` | `m3-reviewed` |
 | M4: Combat and fog of war | **Reviewed**: review 2 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 1 P2) after review 1 NO-GO; merged into `main`. Awaiting user verification for `m4-approved` | `milestone/m4` | `m4-reviewed` |
-| M5: Interface and audio | **Implemented, awaiting independent review** | `milestone/m5` | |
+| M5: Interface and audio | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 5 P2); merged into `main`. Awaiting user verification for `m5-approved` | `milestone/m5` | `m5-reviewed` |
 | M6: Skirmish AI and game flow | Not started | | |
 | M7: Content, balance, performance, and packaging | Not started | | |
 
@@ -1744,3 +1744,150 @@ Not review findings (PLAN.md section 12 item 2); they block only `m5-approved`. 
 16. **Window title:** still shows the credits and power, consistent with the sidebar.
 
 The nine M4 items, the ten M3 items, the seven M2 items, and the five M1 items listed in docs/STATUS.md remain pending.
+
+## M5 review decision (2026-10-04)
+
+One independent review round (`docs/reviews/M5-review-1.md`: GO WITH DOCUMENTED NON-BLOCKING DEBT, 0 P0, 0 P1, 5 P2). Before the review the orchestrator reran all six validation commands of PLAN.md section 9 on commit `522f70b` with exit code 0 (342 tests passed). Under PLAN.md section 12 item 1, `milestone/m5` was merged into `main` and tagged `m5-reviewed`. The tag `m5-approved` is created by the user alone after the verification below.
+
+### Debt recorded from review 1 (P2, verbatim from the report)
+
+#### P2-1: A right click on the sidebar or minimap can order an attack on an enemy drawn behind the sidebar
+* **File and line:**
+  * `crates/game/src/selection.rs:353-357`: `issue_orders` gates the right click only on `*mode == InterfaceMode::Normal`. It then computes `cursor_world(&window, …)` from the raw cursor position (`selection.rs:223-224`) and calls `enemy_at(point, &shown_enemy_units(&views), building)`.
+  * There is no `over_sidebar` check. `over_sidebar` is applied only in `map.rs:222`, to the hovered cell; in `map.rs:246-249`, to the picking log; and in `selection.rs:269`, to the left press.
+* **Evidence:**
+  * The camera draws the map under the whole window, and the sidebar is a 0.96-alpha UI overlay. An enemy unit view standing behind the sidebar therefore keeps `Visibility::Inherited` and is in `shown_enemy_units`.
+  * Suppose armed units are selected and the player right-clicks a sidebar item to cancel production (`sidebar.rs:610-616`) or right-clicks the minimap, and that point lies over such an enemy's body. Then `enemy_at` returns the enemy, and `attack_commands(&selection.0, &armed, target, None)` pushes `Command::Attack` into the sink (the acknowledgement sound plays) alongside the `CancelProduction`.
+  * This contradicts D35 item 7 ("clicks on the sidebar never act on the map", `docs/DECISIONS.md:556`) and user verification item 8 ("with the cursor over the sidebar … clicks do not select or order", `docs/STATUS.md:1736`). No test covers right clicks over the sidebar.
+* **Expected behaviour:** a right click whose cursor is over the sidebar issues no map order. Gate `issue_orders` (and `cursor_world`) with `over_sidebar`, or derive the enemy from a cursor point that is `None` over the sidebar. Add a test of that decision, for example a pure function that takes the over-sidebar flag.
+* **Severity rationale:** P2. Simulation state, validation, and the invariants are unaffected: the command passes through `CommandSink` and is a valid, visible-target order. The effect is an unintended user-facing order, and an inaccurate claim in D35 and the report.
+
+#### P2-2: On maps with width + height > 128 the minimap never draws half of all cells, so units and buildings on them are not marked
+
+* **File and line:**
+  * `crates/game/src/minimap.rs:74`: `scale: (MINIMAP_TARGET_WIDTH / sum).max(1)`.
+  * `minimap.rs` `pixel_cell` and `render`: one pixel shows exactly one cell.
+  * `minimap.rs:237`: unit markers are drawn at `mobile.cell`.
+  * `minimap.rs:514`: `every_pixel_shows_the_cell_under_it` asserts that every cell is drawn only `if layout.scale >= 4`.
+* **Evidence:** the probe `minimap_cover.rs` (verbatim copy of the layout code) gave these counts:
+
+  | Map | Scale | Image | Cells drawn |
+  |-----|-------|-------|-------------|
+  | 64×64 | 2 | 256×128 | 4,096 of 4,096 |
+  | 32×32 | 4 | 256×128 | all |
+  | 100×100 | 1 | 200×100 | 5,000 of 10,000 |
+  | 128×128 | 1 | 256×128 | 8,192 of 16,384 |
+  | 200×56 | 1 | 256×128 | 5,600 of 11,200 |
+  | 256×256 | 1 | 512×256 | 32,768 of 65,536 |
+
+  At scale 1 the first missing cells are (1, 0), (3, 0), (5, 0), (7, 0): every cell with odd x + y. A cell's diamond is 2 × 1 pixels there, and pixel centres fall only into the diamonds of one parity.
+  * A unit standing on such a cell, own or a shown enemy, is never marked. A moving unit blinks on and off.
+  * The real release binary on the 256×256 probe map lit 566 minimap pixels for 391 visible cells; scale 1 would give about 782 if every visible cell were drawn.
+  * D8 accepts maps up to 256×256, and D36 item 1 states the layout for "the largest map" (512 × 256). D36 item 2 states that units and buildings are drawn. Neither DECISIONS nor STATUS records this limitation; the test's `scale >= 4` condition hides it.
+* **Expected behaviour:** every cell of every accepted map size is shown by at least one pixel, or markers are drawn at their projected pixel position, independent of the cell sampling. For example, use `k = max(2, …)`, giving at most 1,024 × 512, or draw markers by projection. `every_pixel_shows_the_cell_under_it`, or a new test, asserts full coverage for 1×1 to 256×256, including W + H = 129 and 256×256.
+* **Severity rationale:** P2, because the only shipped map (64×64) is fully covered, and simulation state and invariants are unaffected. It must be resolved before any map with W + H > 128 ships (M6 map selection, M7 maps).
+
+#### P2-3: A placement or rally click made while paused, or refused by a full sink, leaves the mode although nothing was issued
+
+* **File and line:** `crates/game/src/construction.rs:381-391`. `mode_click` returns `InterfaceMode::Normal` for a valid placement or rally click. Line 386 assigns `next = after` before line 391 calls `sink.issue(commands)`, whose result is ignored. `CommandSink::push` refuses every command while paused (`sim_host.rs:222-225`, D39).
+* **Evidence:**
+  * While paused, a left click on a green footprint in placement mode, or on a cell in rally mode, ends the mode. The command is refused and logged with the error sound, but the player must re-enter the mode. The building stays ready, so no state is lost.
+  * D39 says only that commands are refused while paused; it does not say that modes end.
+  * No test covers this interaction, because `mode_click` is tested without the sink.
+* **Expected behaviour:** the mode changes only if the sink accepted the command (use `sink.issue`'s count), or modes are kept while paused. A test of the decision should accompany the fix.
+* **Severity rationale:** P2 (user experience; no data loss).
+
+#### P2-4: Pre-existing M4 test race, found in this review: four `m4_combat` tests write and read the same temporary file concurrently
+
+* **File and line:** `crates/sim/tests/m4_combat.rs:452-471`. `extreme_scenario()` writes `CARGO_TARGET_TMPDIR/m4_combat/extreme_combat.ron` and reads it back. It is called by four tests (lines 499, 519, 544, and 572), which the test harness runs in parallel. The race was introduced in `9608923` (M4) and is unchanged by M5.
+* **Evidence:**
+  * `cargo test --release -p sim --test m4_combat` failed in 3 of 16 runs, each time in one of `the_longest_range_with_the_slowest_projectile_flies_32_ticks` or `the_shortest_range_reaches_every_neighbouring_cell_and_an_adjacent_building`, with `panicked at crates/sim/tests/m4_combat.rs:477:29: data file …/target/tmp/m4_combat/extreme_combat.ron: file: line 1, column 1: expected a struct "(", found the end of the file`. Another test had truncated the file while this one read it.
+  * Debug: 0 of 20 runs failed, and the section 9 command `cargo test --workspace` passed here.
+  * All writers write identical text, so the race can only cause spurious failures, never a false pass.
+* **Expected behaviour:** each call writes its own file, for example named per test (as `combat_variant(name, …)` does) or with a unique suffix, so that `cargo test` is deterministic in both profiles.
+* **Severity rationale:** P2. It concerns test reliability; no assertion is weakened and production behaviour is unaffected. It is reported because it is not in the recorded debt and can make the validation command fail spuriously.
+
+#### P2-5: D34 overstates what a `&World` withholds: the simulation world's entity allocator is reachable through `SimHost::world()`
+
+* **File and line:**
+  * `crates/game/src/sim_host.rs:92-94` (`pub fn world(&self) -> &World`).
+  * `docs/DECISIONS.md:542` (D34 item 2: "For a `&World`, Bevy gives only shared resources and read-only query items").
+  * `bevy_ecs-0.19.1/src/world/mod.rs:222`: `pub fn entity_allocator(&self) -> &EntityAllocator`.
+  * `src/entity/mod.rs`: `pub fn alloc(&self) -> Entity`, `alloc_many(&self, count)`, and `build_remote_allocator(&self)`. The allocator "panics" when no ids remain.
+* **Evidence:** any game system with `Res<SimHost>` can allocate, and so leak, entity ids of the simulation world through `host.world().entity_allocator()`, without `unsafe`. This changes no simulation component, resource, or `state_hash`: `sim` orders everything by `SimId`, never by `Entity` (grep). It is not simulation state under PLAN.md section 5. No game code does it (grep: no `entity_allocator` or `entities()` in `crates/game/src`).
+* **Expected behaviour:**
+  * Either correct D34 to state this residual: the world's entity allocator is concurrently allocatable through `&World`; it is not simulation state, and only deliberate misuse could exhaust it.
+  * Or expose a read-only facade instead of `&World`: query helpers and the accessors already present.
+* **Severity rationale:** P2 (documentation accuracy; the plan's boundary over simulation state holds).
+
+### Recorded debt to carry (verbatim from review 1)
+
+**New in this review (P2):**
+
+* **P2-1:** a right click over the sidebar or minimap can issue `Attack` on a shown enemy drawn behind the sidebar. D35 item 7 and user verification item 8 claim otherwise.
+* **P2-2:** the minimap never draws half of all cells (odd x + y) on maps with W + H > 128, so markers on them are missing. The test asserts full coverage only for scale ≥ 4. This must be resolved before such maps ship.
+* **P2-3:** placement and rally modes end on a click whose command the sink refused (paused or full).
+* **P2-4:** pre-existing M4 test race on `target/tmp/m4_combat/extreme_combat.ron`. It caused spurious failures in 3 of 16 release runs and 0 of 20 debug runs.
+* **P2-5:** D34 overstates `&World`: the simulation world's entity allocator is reachable. It is not simulation state.
+
+**From the M5 implementation report (known debt), confirmed by this review:**
+
+1. Interface wiring in the window is tested through pure functions, the conflict test, and the smoke runs, not by automated input tests. P2-1 and P2-3 are instances of this gap.
+2. Fixed sidebar width (240 px), laid out for 1280 × 720. Lower buttons are clipped in small windows. The smoke check counts only displayed buttons, so the Units tab is not checked.
+3. There is no building selection. Rally mode sets every producer's rally point.
+4. A full queue (16) is not shown as unavailable.
+5. At most 8 effects at once, and one start per effect per 80 ms. Effects volume applies to effects started afterwards.
+6. `QueryState`s are built every frame, and the minimap is redrawn every tick. To be measured against the M7 benchmark. The 256×256 probe ran at 0.28 GB peak.
+7. No "centre on control group" on a double press.
+8. The terminal event log writes both players' events (M4 remediation debt item 2). M2 review 3 P2-2 (a box selection released outside the window).
+
+**Deviations recorded in the report, accepted as documented:**
+
+* The interface terrain is the map file's, so ore depletion is never shown, also in visible cells.
+* Volume settings last for the session only.
+* Pause refuses commands.
+* Audio is synthesised.
+
+**Note for M7 packaging:** OFL 1.1 requires the licence text to accompany redistributed copies of the embedded FiraMono font. The release package must include it.
+
+**Resolved by M5 and confirmed in this review:**
+
+* M2 implementation debt item 2 (the two-tick event window): events are copied per tick into the game's per-frame buffer.
+* M2 implementation debt item 5 and M3 implementation debt item 7, as far as the interface is concerned (D34).
+* M3 implementation debt items 5 and 8.
+* M4 implementation debt item 8 (health bars).
+* The "no validity preview until M5" part of M4 remediation debt item 3.
+
+**Carried unchanged from the M4 review decision:** every item of "Recorded debt to carry" in docs/STATUS.md, including:
+
+* M4 review 2 P2-1 (projectile line of flight);
+* M4 remediation debt items 1 to 4, except the resolved part of item 3;
+* M4 implementation debt items 1 to 11, except the resolved item 8;
+* M3 review 1 P2-1 to P2-4 and M3 implementation debt items 1 to 9, except the resolved items 5, 7, and 8;
+* the M2, M1, and M0 items listed there.
+
+The linker warning (M0 item 1) and the `Skipped event Destroyed` warning (M0 item 2) were seen again.
+
+### Requires user verification (blocks only `m5-approved`; verbatim from review 1)
+
+These are not findings and do not affect the decision (PLAN.md section 12 item 2); they block only `m5-approved`. Run `cargo run --release -p game` with sound on and check the 16 M5 items of docs/STATUS.md, "M5 implementation report", "Requires user verification":
+
+1. Sidebar layout and legibility.
+2. Production from the sidebar (badges, progress bars, `READY`, cancel and refund, `locked`).
+3. Units tab.
+4. Placement preview and ghost (green and red, crossed-out cell, placement thud, right click or `Escape`).
+5. Sell mode and `Delete`/`Backspace`.
+6. Rally mode and `R`.
+7. Minimap: shroud, fog, markers, white frame, click and drag.
+8. Camera beside the sidebar. Note P2-1: a right click over the sidebar can order an attack on an enemy drawn behind it.
+9. Health bars.
+10. Control groups (Ctrl or Cmd + digit, digit, Shift + digit).
+11. Hotkeys.
+12. Pause.
+13. Sound effects follow what is seen.
+14. Music loop and volume controls.
+15. A full match without debug keys (acceptance).
+16. The window title is consistent with the sidebar.
+
+The nine M4 items, the ten M3 items, the seven M2 items, and the five M1 items listed in docs/STATUS.md remain pending.
+
