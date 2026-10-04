@@ -8,7 +8,7 @@
 | M3: Economy and construction | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 4 P2); merged into `main`. Awaiting user verification for `m3-approved` | `milestone/m3` | `m3-reviewed` |
 | M4: Combat and fog of war | **Reviewed**: review 2 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 1 P2) after review 1 NO-GO; merged into `main`. Awaiting user verification for `m4-approved` | `milestone/m4` | `m4-reviewed` |
 | M5: Interface and audio | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 5 P2); merged into `main`. Awaiting user verification for `m5-approved` | `milestone/m5` | `m5-reviewed` |
-| M6: Skirmish AI and game flow | Implemented, awaiting independent review | `milestone/m6` | |
+| M6: Skirmish AI and game flow | **Review 1: NO-GO** (0 P0, 1 P1, 4 P2; `docs/reviews/M6-review-1.md`), in remediation round 1 | `milestone/m6` | |
 | M7: Content, balance, performance, and packaging | Not started | | |
 
 ## M0 implementation report (2026-10-03)
