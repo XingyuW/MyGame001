@@ -18,8 +18,9 @@
 //! * a struct holds exactly the fields its schema lists, each once, in any order, and every
 //!   value has the kind its schema names.
 //!
-//! The schema is at most three levels deep and the checker recurses on the schema, never on the
-//! input, so its stack depth is bounded however deeply a file nests. Errors are typed
+//! The schema is at most five levels deep (the economy file's lists of names inside structs inside
+//! lists inside the file's struct) and the checker recurses on the schema, never on the input, so
+//! its stack depth is bounded however deeply a file nests. Errors are typed
 //! [`DataError`]s naming the file, the field (as a path such as `units[2].speed`), and the
 //! reason.
 
@@ -33,7 +34,7 @@ pub const MAX_DATA_FILE_BYTES: u64 = 64 * 1024;
 /// Longest accepted string value in bytes.
 pub const MAX_STRING_BYTES: usize = 64;
 
-/// The recursion limit given to `ron`. The deepest file the checker accepts nests three levels;
+/// The recursion limit given to `ron`. The deepest file the checker accepts nests five levels;
 /// the limit is a second line of defence.
 pub(crate) const RON_RECURSION_LIMIT: usize = 16;
 
@@ -89,6 +90,10 @@ pub enum DataErrorKind {
     UnsupportedSchemaVersion { found: i64, expected: i64 },
     /// An identifier that must be unique appears twice.
     DuplicateId(String),
+    /// The value names a building or unit type (`kind`) that is not defined.
+    UnknownReference { kind: String, id: String },
+    /// The prerequisites of the buildings form a cycle, listed from a building back to itself.
+    PrerequisiteCycle(Vec<String>),
     /// `ron` rejected a file that the checker accepted (message from `ron`); this indicates a
     /// difference between the checker and `ron` and is reported rather than ignored.
     Parse(String),
@@ -122,6 +127,10 @@ impl fmt::Display for DataErrorKind {
                 "schema version {found} is not supported, expected {expected}"
             ),
             Self::DuplicateId(id) => write!(f, "identifier {id:?} is defined more than once"),
+            Self::UnknownReference { kind, id } => write!(f, "{kind} {id:?} is not defined"),
+            Self::PrerequisiteCycle(cycle) => {
+                write!(f, "the prerequisites form a cycle: {}", cycle.join(" -> "))
+            }
             Self::Parse(error) => write!(f, "cannot be parsed: {error}"),
         }
     }

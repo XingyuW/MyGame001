@@ -124,6 +124,10 @@ pub struct Cell {
 /// The occupant of a cell is the unit that stands in it or has reserved it for entry (invariant
 /// I6: at most one ground unit per cell). Only the simulation's movement and spawning change
 /// occupants.
+///
+/// A cell covered by a building is impassable for units, whatever its terrain, so no unit can
+/// reserve it (invariant I6: no unit occupies a cell covered by a building). Buildings cover only
+/// cells that no unit holds when they are placed (docs/DECISIONS.md D24).
 #[derive(Resource, Clone, Debug, Default, PartialEq, Eq)]
 pub struct Grid {
     width: u32,
@@ -132,6 +136,8 @@ pub struct Grid {
     cells: Vec<Cell>,
     /// Row-major, as `cells`.
     occupants: Vec<Option<SimId>>,
+    /// Row-major, as `cells`: the building covering the cell.
+    buildings: Vec<Option<SimId>>,
 }
 
 impl Grid {
@@ -152,9 +158,54 @@ impl Grid {
         self.index(pos).and_then(|index| self.cells.get(index))
     }
 
-    /// Whether ground units may enter `pos` by terrain; `false` outside the map.
+    /// Whether ground units may enter `pos`: its terrain is passable and no building covers it;
+    /// `false` outside the map.
     pub fn is_passable(&self, pos: CellPos) -> bool {
-        self.cell(pos).is_some_and(|cell| cell.passable)
+        self.cell(pos).is_some_and(|cell| cell.passable) && self.building(pos).is_none()
+    }
+
+    /// The building covering `pos`, if any.
+    pub fn building(&self, pos: CellPos) -> Option<SimId> {
+        self.index(pos)
+            .and_then(|index| self.buildings.get(index))
+            .copied()
+            .flatten()
+    }
+
+    /// Marks `pos` as covered by `building`. The caller has checked that the cell is inside the
+    /// map, free of units, and not covered (`building::check_footprint`).
+    pub(crate) fn cover(&mut self, pos: CellPos, building: SimId) {
+        if let Some(slot) = self
+            .index(pos)
+            .and_then(|index| self.buildings.get_mut(index))
+        {
+            *slot = Some(building);
+        }
+    }
+
+    /// Frees `pos` if `building` covers it.
+    pub(crate) fn uncover(&mut self, pos: CellPos, building: SimId) {
+        if let Some(slot) = self
+            .index(pos)
+            .and_then(|index| self.buildings.get_mut(index))
+            && *slot == Some(building)
+        {
+            *slot = None;
+        }
+    }
+
+    /// Removes up to `max` ore units from `pos` and returns how many were removed: the smaller of
+    /// `max` and the ore in the cell, so the ore never falls below zero (PLAN.md section 5,
+    /// equation 4).
+    pub(crate) fn take_ore(&mut self, pos: CellPos, max: u32) -> u32 {
+        match self.index(pos).and_then(|index| self.cells.get_mut(index)) {
+            Some(cell) => {
+                let taken = cell.ore.min(max);
+                cell.ore -= taken;
+                taken
+            }
+            None => 0,
+        }
     }
 
     /// The unit standing in or entering `pos`, if any.
@@ -168,8 +219,9 @@ impl Grid {
     /// Replaces the terrain of `pos` and returns whether `pos` is inside the map.
     ///
     /// Scenario setup only (tests and match setup), like replacing the whole grid; during a match
-    /// terrain changes only through commands (buildings arrive in M3). A unit standing on a cell
-    /// that becomes impassable may still leave it, and units whose path crosses it repath.
+    /// terrain does not change, and cells become impassable only by being covered by a building
+    /// placed with a command (M3). A unit standing on a cell that becomes impassable may still
+    /// leave it, and units whose path crosses it repath.
     pub fn set_terrain(&mut self, pos: CellPos, cell: Cell) -> bool {
         match self.index(pos).and_then(|index| self.cells.get_mut(index)) {
             Some(slot) => {
@@ -219,18 +271,25 @@ impl Grid {
         usize::try_from(u64::from(y) * u64::from(self.width) + u64::from(x)).ok()
     }
 
-    /// Width, height, then every cell in row-major order as one flag byte (bit 0 passable,
-    /// bit 1 buildable, bit 2 occupied), the ore amount, and, if occupied, the occupant's id
-    /// (docs/DECISIONS.md D11, extended in M2).
+    /// Width, height, then every cell in row-major order as one flag byte (bit 0 passable
+    /// terrain, bit 1 buildable, bit 2 occupied, bit 3 covered by a building), the ore amount,
+    /// and the occupant's and the building's ids where set (docs/DECISIONS.md D11, extended in
+    /// M2 and M3).
     pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
         hasher.write_u32(self.width);
         hasher.write_u32(self.height);
-        for (cell, occupant) in self.cells.iter().zip(&self.occupants) {
+        for ((cell, occupant), building) in
+            self.cells.iter().zip(&self.occupants).zip(&self.buildings)
+        {
             hasher.write(&[u8::from(cell.passable)
                 | (u8::from(cell.buildable) << 1)
-                | (u8::from(occupant.is_some()) << 2)]);
+                | (u8::from(occupant.is_some()) << 2)
+                | (u8::from(building.is_some()) << 3)]);
             hasher.write_u32(cell.ore);
             if let Some(id) = occupant {
+                hasher.write_u32(id.0);
+            }
+            if let Some(id) = building {
                 hasher.write_u32(id.0);
             }
         }
@@ -548,12 +607,14 @@ fn validate(path: &Path, map: &tiled::Map) -> Result<LoadedMap, MapError> {
     let cells = cells(map, &terrain, &layer).map_err(in_map)?;
     let tileset_image = tileset_image(map).map_err(in_map)?;
     let occupants = vec![None; cells.len()];
+    let buildings = vec![None; cells.len()];
     Ok(LoadedMap {
         grid: Grid {
             width: map.width,
             height: map.height,
             cells,
             occupants,
+            buildings,
         },
         tile_width: map.tile_width,
         tile_height: map.tile_height,

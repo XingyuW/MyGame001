@@ -1,0 +1,22 @@
+// M3 fixture: unit types for the economy tests, with a harvester. The values are fixture data,
+// independent of the production balance in assets/data/units.ron (invariant I10).
+(
+    schema_version: 1,
+    units: [
+        (
+            id: "walker",
+            speed: 32,
+            sprite: "walker",
+        ),
+        (
+            id: "runner",
+            speed: 100,
+            sprite: "runner",
+        ),
+        (
+            id: "harvester",
+            speed: 64,
+            sprite: "harvester",
+        ),
+    ],
+)
