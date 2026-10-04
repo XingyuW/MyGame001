@@ -243,8 +243,10 @@ fn is_waiting(mobile: &Mobile, orders: &Orders) -> bool {
 ///    ([`nearest_reachable`]), possibly the cell it stands in.
 ///
 /// Every path served counts toward the order's limit of paths without progress
-/// (`movement::MAX_PATHS_WITHOUT_PROGRESS`), and a path that leads to the destination records
-/// its cost as the order's remaining cost (docs/DECISIONS.md D21).
+/// (`movement::MAX_PATHS_WITHOUT_PROGRESS`), except one asked for while the unit waited behind
+/// units that are moving on that only confirms the way it already follows (docs/DECISIONS.md
+/// D22); a path that leads to the destination records its cost as the order's remaining cost
+/// (docs/DECISIONS.md D21).
 pub(crate) fn find_paths(
     grid: Res<Grid>,
     mut events: ResMut<Messages<SimEvent>>,
@@ -299,7 +301,12 @@ pub(crate) fn find_paths(
         let Some(order) = orders.current.as_mut() else {
             continue;
         };
-        let PathState::Requested { avoid_units, .. } = order.state else {
+        let PathState::Requested {
+            avoid_units,
+            queued,
+            ..
+        } = order.state
+        else {
             continue;
         };
         let held_by = |obstacles: &BTreeSet<SimId>, cell: CellPos| {
@@ -354,9 +361,16 @@ pub(crate) fn find_paths(
         // progress (docs/DECISIONS.md D21).
         let leads_to_destination = path.cells.last().copied().unwrap_or(start) == order.destination;
         order.remaining = leads_to_destination.then_some(path.cost);
-        order.paths_since_progress = order.paths_since_progress.saturating_add(1);
-        order.path = path.cells;
-        order.path.reverse();
+        let mut cells = path.cells;
+        cells.reverse();
+        // A unit that waits behind units that are moving on asks for a way around them every
+        // `REPATH_AFTER_BLOCKED_TICKS` ticks however long the wait lasts (up to 362 ticks for a
+        // step at speed 1). A path that only confirms the way it already follows is then not a
+        // new path, so the wait does not use up its paths (docs/DECISIONS.md D22).
+        if !(queued && cells == order.path) {
+            order.paths_since_progress = order.paths_since_progress.saturating_add(1);
+        }
+        order.path = cells;
         order.state = PathState::Following;
     }
 }

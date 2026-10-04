@@ -15,8 +15,8 @@ use bevy_app::App;
 use bevy_ecs::message::Messages;
 use sim::{
     Cell, CellPos, Command, CommandQueue, DIAGONAL_COST, Definitions, Direction, Facing, Grid,
-    IssuedCommand, MAX_UNITS_PER_COMMAND, Mobile, MoveFailure, ORTHOGONAL_COST, Orders,
-    PATH_REQUESTS_PER_TICK, PathState, PlayerId, Position, REPATH_AFTER_BLOCKED_TICKS,
+    IssuedCommand, MAX_UNIT_SPEED, MAX_UNITS_PER_COMMAND, Mobile, MoveFailure, ORTHOGONAL_COST,
+    Orders, PATH_REQUESTS_PER_TICK, PathState, PlayerId, Position, REPATH_AFTER_BLOCKED_TICKS,
     RejectReason, SimEvent, SimId, SimPlugin, SimSchedule, SpawnError, SubPos, Unit,
     destination_cells, find_path, load_map, load_unit_definitions, spawn_unit, state_hash,
 };
@@ -1624,4 +1624,347 @@ fn validation_checks_each_named_unit_in_turn() {
         },
         |ids| RejectReason::NotOwned(ids[2]),
     );
+}
+
+// --- Boundary speeds (M2 review 2) ------------------------------------------------------------
+
+/// The fixture unit types at the two ends of the speed range the units file admits: "crawler"
+/// (speed 1) and "sprinter" (speed `MAX_UNIT_SPEED`).
+fn boundary_scenario(map: &str) -> App {
+    let mut app = App::new();
+    app.add_plugins(SimPlugin { seed: 0 });
+    app.world_mut().insert_resource(load_grid(map));
+    app.world_mut().insert_resource(
+        load_unit_definitions(fixture("data/units_boundary_speeds.ron"))
+            .unwrap_or_else(|error| panic!("{error}")),
+    );
+    app
+}
+
+const BOUNDARY_KINDS: [(&str, u16); 2] = [("crawler", 1), ("sprinter", MAX_UNIT_SPEED)];
+
+/// Ticks within which the termination scenarios must end at `speed`. The rule that ends an order
+/// counts steps and waits behind units that stand still, not elapsed ticks, so the time it takes
+/// grows with the time a step takes: `TERMINATION_LIMIT` (which holds for the walker, speed 32)
+/// scaled by 32 / speed for slower units.
+fn termination_limit(speed: u16) -> u32 {
+    TERMINATION_LIMIT * (32 / u32::from(speed)).max(1)
+}
+
+#[test]
+fn the_boundary_speed_fixture_holds_the_slowest_and_fastest_speeds() {
+    let app = boundary_scenario("open_16x16");
+    let definitions = app.world().resource::<Definitions>();
+    let speeds: Vec<(&str, u16)> = definitions
+        .units()
+        .iter()
+        .map(|unit| (unit.id.as_str(), unit.speed))
+        .collect();
+    assert_eq!(speeds, BOUNDARY_KINDS);
+    assert_eq!(MAX_UNIT_SPEED, 128);
+}
+
+#[test]
+fn a_unit_of_either_boundary_speed_crosses_an_open_map_and_arrives_on_time() {
+    // M2 review 2, P0-1: a unit of speed 1 failed every move longer than one cell with
+    // `MoveFailed { Blocked }` on an empty map, because the ticks of its own steps (256 and 362
+    // ticks long at speed 1) counted toward `MAX_STALLED_TICKS` = 200. Alone on the open map,
+    // a unit of either boundary speed must arrive at its destination exactly when it has covered
+    // the length of its path at `speed` subcells per tick, with no stalled tick on the way.
+    let orders = [
+        ((1, 1), (15, 1)),
+        ((1, 1), (1, 15)),
+        ((1, 1), (15, 15)),
+        ((1, 1), (11, 8)),
+        ((14, 14), (1, 8)),
+        ((14, 1), (1, 14)),
+        ((8, 8), (8, 0)),
+        ((3, 3), (5, 3)),
+        ((3, 3), (5, 5)),
+    ];
+    for (kind, speed) in BOUNDARY_KINDS {
+        for (from, to) in orders {
+            let context = format!("{kind} {from:?} -> {to:?}");
+            let mut app = boundary_scenario("open_16x16");
+            let unit = spawn(&mut app, HUMAN, kind, from.0, from.1);
+            move_to(&mut app, &[unit], to.0, to.1);
+            let (dx, dy) = (
+                (to.0 - from.0).unsigned_abs(),
+                (to.1 - from.1).unsigned_abs(),
+            );
+            let diagonal = dx.min(dy);
+            let length = 256 * (dx.max(dy) - diagonal) + 362 * diagonal;
+            let arrival = length.div_ceil(u32::from(speed));
+            let start = SubPos::centre_of(CellPos::new(from.0, from.1));
+            for elapsed in 1..=arrival {
+                let events = tick(&mut app);
+                let state = unit_state_after(&mut app, unit);
+                if elapsed < arrival {
+                    assert!(events.is_empty(), "{context}, tick {elapsed}: {events:?}");
+                    let order = state.orders.current.expect("the order is live");
+                    assert_eq!(order.stalled_ticks, 0, "{context}, tick {elapsed}");
+                    if dy == 0 {
+                        // Straight east: exactly `speed` subcells per tick.
+                        let travelled = elapsed * u32::from(speed);
+                        assert_eq!(
+                            state.position,
+                            SubPos::new(start.x + travelled as i32, start.y),
+                            "{context}, tick {elapsed}"
+                        );
+                    }
+                } else {
+                    assert_eq!(
+                        events,
+                        vec![SimEvent::MoveCompleted {
+                            unit,
+                            retargeted: false
+                        }],
+                        "{context}, tick {elapsed}"
+                    );
+                    assert_eq!(state.mobile.cell, CellPos::new(to.0, to.1), "{context}");
+                    assert_eq!(state.mobile.step, None, "{context}");
+                    assert_eq!(
+                        state.position,
+                        SubPos::centre_of(CellPos::new(to.0, to.1)),
+                        "{context}"
+                    );
+                }
+            }
+        }
+    }
+}
+
+/// Runs until every unit of `group` has ended its order, checking I6 and calling `each_tick`
+/// with the units' states on every tick; panics on any event other than a completion and returns
+/// each unit's completion.
+fn run_until_each_completes(
+    app: &mut App,
+    group: &[SimId],
+    limit: u32,
+    context: &str,
+    mut each_tick: impl FnMut(u32, &BTreeMap<SimId, UnitState>),
+) -> BTreeMap<SimId, SimEvent> {
+    let mut ended = BTreeMap::new();
+    for elapsed in 1..=limit {
+        for event in tick(app) {
+            match event {
+                SimEvent::MoveCompleted { unit, .. } => {
+                    ended.insert(unit, event);
+                }
+                other => panic!("{context}, tick {elapsed}: unexpected {other:?}"),
+            }
+        }
+        assert_i6(app, &format!("{context}, tick {elapsed}"));
+        each_tick(elapsed, &units(app));
+        if ended.len() == group.len() {
+            return ended;
+        }
+    }
+    panic!("{context}: only {ended:?} of {group:?} completed within {limit} ticks");
+}
+
+#[test]
+fn units_queued_behind_a_unit_of_the_slowest_speed_follow_it_to_their_destinations() {
+    // M2 review 2, P0-1, the class: a wait behind a unit that is moving on lasts as long as that
+    // unit's step, up to 362 ticks at speed 1. Such waits counted toward `MAX_STALLED_TICKS`, and
+    // the paths a waiting unit asks for every `REPATH_AFTER_BLOCKED_TICKS` ticks, which only
+    // confirmed its way, counted toward `MAX_PATHS_WITHOUT_PROGRESS`, so units queued behind a
+    // slow unit gave up as `Blocked` while the queue advanced. A convoy of six in a corridor one
+    // cell wide (y = 5), led by a crawler, followed by crawlers or by sprinters, each ordered to
+    // its own cell at the far end: every unit must arrive, and no wait counts as stalled.
+    for follower in ["crawler", "sprinter"] {
+        let context = format!("convoy of crawler and {follower}s");
+        let mut app = boundary_scenario("open_16x16");
+        set_rock(&mut app, (0..16).flat_map(|x| [(x, 4), (x, 6)]));
+        let convoy: Vec<SimId> = (0..6)
+            .map(|i| {
+                let kind = if i == 0 { "crawler" } else { follower };
+                spawn(&mut app, HUMAN, kind, 5 - i, 5)
+            })
+            .collect();
+        for (i, &unit) in convoy.iter().enumerate() {
+            move_to(&mut app, &[unit], 15 - i as i32, 5);
+        }
+        let ended = run_until_each_completes(
+            &mut app,
+            &convoy,
+            termination_limit(1),
+            &context,
+            |elapsed, states| {
+                for (id, state) in states {
+                    if let Some(order) = &state.orders.current {
+                        assert_eq!(order.stalled_ticks, 0, "{context}, tick {elapsed}: {id:?}");
+                        assert!(
+                            order.paths_since_progress <= 1,
+                            "{context}, tick {elapsed}: {id:?} {order:?}"
+                        );
+                    }
+                }
+            },
+        );
+        for (i, &unit) in convoy.iter().enumerate() {
+            assert_eq!(
+                ended[&unit],
+                SimEvent::MoveCompleted {
+                    unit,
+                    retargeted: false
+                },
+                "{context}"
+            );
+            assert_eq!(cell_of(&mut app, unit), CellPos::new(15 - i as i32, 5));
+        }
+    }
+
+    // On open ground, a sprinter right behind a crawler on the same diagonal waits behind it
+    // for each of its steps (362 ticks).
+    let mut app = boundary_scenario("open_16x16");
+    let leader = spawn(&mut app, HUMAN, "crawler", 2, 2);
+    let follower = spawn(&mut app, HUMAN, "sprinter", 1, 1);
+    move_to(&mut app, &[leader], 14, 14);
+    move_to(&mut app, &[follower], 13, 13);
+    let ended = run_until_each_completes(
+        &mut app,
+        &[leader, follower],
+        termination_limit(1),
+        "diagonal",
+        |elapsed, states| {
+            for (id, state) in states {
+                if let Some(order) = &state.orders.current {
+                    assert_eq!(order.stalled_ticks, 0, "diagonal, tick {elapsed}: {id:?}");
+                }
+            }
+        },
+    );
+    assert_eq!(ended.len(), 2);
+    assert_eq!(cell_of(&mut app, leader), CellPos::new(14, 14));
+    assert_eq!(cell_of(&mut app, follower), CellPos::new(13, 13));
+}
+
+#[test]
+fn orders_end_at_both_boundary_speeds_when_units_keep_giving_way() {
+    // M2 review 1, P1-1, at the boundary speeds: the sealed room of three cells and the dead
+    // end closed by idle units of `an_order_ends_when_*`. Every order must end, as at speed 32:
+    // in the sealed room one unit gives up as `Blocked` and the other stops short of its
+    // destination. Before the fix of M2 review 2 P0-1, both crawlers of the sealed room ended as
+    // `Blocked` after their first step.
+    for (kind, speed) in BOUNDARY_KINDS {
+        let limit = termination_limit(speed);
+        let context = format!("{kind}: sealed room of three");
+        let mut app = boundary_scenario("open_16x16");
+        set_rock(
+            &mut app,
+            (6..=8)
+                .flat_map(|x| (2..=6).map(move |y| (x, y)))
+                .filter(|&(x, y)| !(x == 7 && (3..=5).contains(&y))),
+        );
+        let a = spawn(&mut app, HUMAN, kind, 7, 3);
+        let b = spawn(&mut app, HUMAN, kind, 7, 5);
+        order_swap(&mut app, a, b);
+        let ended = run_until_all_orders_end(&mut app, limit, &context);
+        assert_eq!(ended.len(), 2, "{context}: {ended:?}");
+        let failed: Vec<SimId> = ended
+            .iter()
+            .filter(|(_, (_, event))| {
+                matches!(
+                    event,
+                    SimEvent::MoveFailed {
+                        reason: MoveFailure::Blocked,
+                        ..
+                    }
+                )
+            })
+            .map(|(&id, _)| id)
+            .collect();
+        assert_eq!(failed.len(), 1, "{context}: {ended:?}");
+        for (&id, (_, event)) in &ended {
+            if !failed.contains(&id) {
+                assert_eq!(
+                    *event,
+                    SimEvent::MoveCompleted {
+                        unit: id,
+                        retargeted: true
+                    },
+                    "{context}"
+                );
+            }
+        }
+
+        for (a_cell, b_cell) in [((7, 2), (7, 6)), ((7, 4), (7, 6)), ((7, 3), (7, 5))] {
+            let context = format!("{kind}: dead end, {a_cell:?} <-> {b_cell:?}");
+            let mut app = boundary_scenario("open_16x16");
+            set_rock(
+                &mut app,
+                (1..=6).flat_map(|y| [(6, y), (8, y)]).chain([(7, 1)]),
+            );
+            for x in 6..=8 {
+                spawn(&mut app, ENEMY, kind, x, 7);
+            }
+            let a = spawn(&mut app, HUMAN, kind, a_cell.0, a_cell.1);
+            let b = spawn(&mut app, HUMAN, kind, b_cell.0, b_cell.1);
+            order_swap(&mut app, a, b);
+            let ended = run_until_all_orders_end(&mut app, limit, &context);
+            assert_eq!(ended.len(), 2, "{context}: {ended:?}");
+            for (&id, (_, event)) in &ended {
+                if let SimEvent::MoveCompleted {
+                    retargeted: false, ..
+                } = event
+                {
+                    let destination = if id == a { b_cell } else { a_cell };
+                    assert_eq!(
+                        cell_of(&mut app, id),
+                        CellPos::new(destination.0, destination.1),
+                        "{context}"
+                    );
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn fifty_units_of_the_boundary_speeds_reach_a_clicked_destination() {
+    // The acceptance scenario (PLAN.md section 7, M2) with crawlers and sprinters taking turns:
+    // every unit must arrive (no `Blocked`), I6 must hold on every tick, and the group must fill
+    // the cells around the target as at speed 32. Before the fix of M2 review 2 P0-1, 41 of the
+    // 50 units ended as `Blocked` on the arena.
+    let cases = [
+        ("arena_32x32", (1, 1), CellPos::new(24, 24)),
+        ("wall_32x32", (1, 10), CellPos::new(24, 16)),
+    ];
+    for (map, origin, target) in cases {
+        let mut app = boundary_scenario(map);
+        let group: Vec<SimId> = (0..50)
+            .map(|i| {
+                let kind = BOUNDARY_KINDS[i % 2].0;
+                let i = i as i32;
+                spawn(&mut app, HUMAN, kind, origin.0 + i % 10, origin.1 + i / 10)
+            })
+            .collect();
+        let context = format!("{map}, {origin:?} -> {target:?}, crawlers and sprinters");
+        let took = run_group_to(&mut app, &group, target, termination_limit(1), &context);
+        let states = units(&mut app);
+        let cells: BTreeSet<CellPos> = group.iter().map(|id| states[id].mobile.cell).collect();
+        assert_eq!(cells.len(), 50, "{context}");
+        let grid = app.world().resource::<Grid>().clone();
+        let expected: BTreeSet<CellPos> = destination_cells(&grid, target, 50, |_| false)
+            .into_iter()
+            .collect();
+        let radius = expected
+            .iter()
+            .map(|&cell| sim::octile_distance(cell, target))
+            .max()
+            .expect("50 cells");
+        for &cell in &cells {
+            assert!(
+                sim::octile_distance(cell, target) <= radius + 2 * ORTHOGONAL_COST,
+                "{context}: {cell:?} is too far from the target"
+            );
+        }
+        let at_assigned = cells.intersection(&expected).count();
+        assert!(
+            at_assigned >= 35,
+            "{context}: only {at_assigned} units at assigned cells"
+        );
+        println!("{context}: {took} ticks, {at_assigned} of 50 at the assigned cells");
+    }
 }

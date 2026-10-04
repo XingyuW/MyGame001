@@ -39,9 +39,11 @@ pub enum MoveFailure {
     NoDestination,
     /// No path over passable terrain leads to the unit's destination.
     Unreachable,
-    /// Other units kept the way blocked: the unit took no step toward its destination for
-    /// `MAX_STALLED_TICKS` ticks (not counting ticks spent waiting for the pathfinder), or took
-    /// more than `MAX_PATHS_WITHOUT_PROGRESS` paths around them without getting closer than before.
+    /// Other units kept the way blocked: the unit waited `MAX_STALLED_TICKS` ticks at a cell
+    /// centre for cells held by units that were not moving on, without a step toward its
+    /// destination in between (its own steps, waits for the pathfinder, and waits behind units
+    /// that were moving on do not count), or took more than `MAX_PATHS_WITHOUT_PROGRESS` new
+    /// paths around them without getting closer than before.
     Blocked,
 }
 

@@ -11,23 +11,34 @@
 //! next cell that has become impassable (or a diagonal step that terrain now cuts) makes it
 //! request a new path at once.
 //!
-//! Every order ends (docs/DECISIONS.md D21), and the rule that ends it measures progress toward
-//! the destination, not movement:
+//! Every order ends (docs/DECISIONS.md D21 and D22), and the rule that ends it measures
+//! progress toward the destination, not movement, and never elapsed time whose length depends
+//! on a unit's speed (a step takes from 2 ticks at speed 128 to 362 ticks at speed 1):
 //!
 //! * A step along a path that leads to the destination brings the unit closer along that path.
-//!   An order whose unit takes no such step for [`MAX_STALLED_TICKS`] ticks, not counting ticks
-//!   spent waiting for the pathfinder, ends with [`MoveFailure::Blocked`]. A step aside does not
-//!   count, so units that keep stepping aside for each other do not keep their orders alive.
+//!   An order ends with [`MoveFailure::Blocked`] when its unit has waited [`MAX_STALLED_TICKS`]
+//!   ticks at a cell centre for cells held by units that are not moving on, without a step
+//!   toward the destination in between. Ticks in a step, ticks spent waiting for the
+//!   pathfinder, and ticks spent waiting behind units that are moving on (a unit in a step, or a
+//!   queue whose head is in one) are not stalled ticks. A step aside does not reset the count,
+//!   so units that keep stepping aside for each other do not keep their orders alive.
 //! * Real progress is a step that starts with less remaining path cost to the destination than
 //!   any earlier step of the order ([`MoveOrder::best`]). A detour around other units can make
 //!   the remaining cost grow again, so a unit may take only [`MAX_PATHS_WITHOUT_PROGRESS`] new
 //!   paths without real progress; then its order ends with [`MoveFailure::Blocked`]. Units that
 //!   take turns giving way to each other, back and forth, therefore stop after a bounded number
-//!   of turns.
+//!   of turns. A path served while the unit waits behind units that are moving on, and that only
+//!   confirms the way it already follows, is not a new path.
 //!
 //! Real progress lowers `best`, which cannot fall below zero; between two real progresses a
-//! unit takes a bounded number of paths, and on each path it either steps toward the destination
-//! or waits a bounded time. So every order ends within a bounded number of ticks.
+//! unit takes a bounded number of new paths and so a bounded number of steps, each of at most
+//! 362 ticks; between two steps toward the destination it waits at most `MAX_STALLED_TICKS`
+//! stalled ticks; a wait for the pathfinder is bounded by the request queue; and a wait behind
+//! units that are moving on lasts only while some unit is in a step, which, with no new command,
+//! happens in a bounded number of ticks because every unit's order takes a bounded number of
+//! steps. So every order ends.
+
+use std::collections::{BTreeMap, BTreeSet};
 
 use bevy_ecs::entity::Entity;
 use bevy_ecs::message::Messages;
@@ -45,13 +56,15 @@ use crate::unit::{
 };
 
 /// Ticks a unit waits for a cell held by another unit before it requests a path around waiting
-/// units.
+/// units (and again after each further such number of ticks).
 pub const REPATH_AFTER_BLOCKED_TICKS: u16 = 8;
 
-/// Ticks without a step toward the destination (see the module documentation), not counting
-/// ticks spent waiting for the pathfinder, after which a move order ends with
-/// [`MoveFailure::Blocked`] (10 seconds). Units that wait for each other with no way around (for
-/// example, head on in a one-cell corridor) therefore never wait forever.
+/// Stalled ticks (see the module documentation: ticks spent waiting at a cell centre for cells
+/// held by units that are not moving on) without a step toward the destination in between,
+/// after which a move order ends with [`MoveFailure::Blocked`] (10 seconds). Units that wait for
+/// each other with no way around (for example, head on in a one-cell corridor) therefore never
+/// wait forever. A unit's own steps and waits behind units that are moving on do not count,
+/// because their length depends on unit speed (docs/DECISIONS.md D22).
 pub const MAX_STALLED_TICKS: u16 = 200;
 
 /// New paths a unit may take since its last real progress (a step that left less path cost to
@@ -79,8 +92,67 @@ type MoveQuery<'w, 's> = Query<
 enum AtCentre {
     /// Stop moving this tick.
     Wait,
+    /// Stop moving this tick because units that are not moving on hold the way: a stalled
+    /// tick.
+    Blocked,
     /// Start a step in this direction.
     Step(Direction, CellPos),
+}
+
+/// What a unit is doing, as far as a unit that waits for a cell it holds needs to know.
+#[derive(Clone, Copy)]
+enum Activity {
+    /// In a step, which it always completes within at most 362 ticks: it is moving on.
+    Stepping,
+    /// At a cell centre, waiting to enter `next`: the next cell of the path it follows, or of
+    /// the path it had while it waits for a new one.
+    Waiting { next: CellPos },
+    /// Idle, ending its order, or without a path: it stays where it is.
+    Standing,
+}
+
+impl Activity {
+    fn of(mobile: &Mobile, orders: &Orders) -> Self {
+        if mobile.step.is_some() {
+            return Activity::Stepping;
+        }
+        orders
+            .current
+            .as_ref()
+            .and_then(|order| order.path.last())
+            .map_or(Activity::Standing, |&next| Activity::Waiting { next })
+    }
+}
+
+/// Whether `blocker`, which holds a cell that `unit` waits for, is moving on: it is in a step,
+/// or it waits at a cell centre for a cell that is free or held by a unit that is moving on in
+/// turn (a queue whose head is in a step). A chain that comes back to a unit already visited is a
+/// wait-for cycle, and a chain that ends at a unit that stands (or wants a cell that has become
+/// impassable) is blocked: neither moves on.
+fn moving_on(
+    grid: &Grid,
+    activity: &BTreeMap<SimId, Activity>,
+    unit: SimId,
+    blocker: SimId,
+) -> bool {
+    let mut visited = BTreeSet::from([unit]);
+    let mut at = blocker;
+    while visited.insert(at) {
+        match activity.get(&at) {
+            Some(Activity::Stepping) => return true,
+            Some(&Activity::Waiting { next }) => {
+                if !grid.is_passable(next) {
+                    return false;
+                }
+                match grid.occupant(next) {
+                    None => return true,
+                    Some(holder) => at = holder,
+                }
+            }
+            Some(Activity::Standing) | None => return false,
+        }
+    }
+    false
 }
 
 pub(crate) fn move_units(
@@ -92,6 +164,11 @@ pub(crate) fn move_units(
     let mut order: Vec<(SimId, Entity)> =
         units.iter().map(|(entity, id, ..)| (*id, entity)).collect();
     order.sort_unstable();
+    // What every unit is doing, kept up to date as the units move in id order.
+    let mut activity: BTreeMap<SimId, Activity> = units
+        .iter()
+        .map(|(_, id, mobile, _, _, orders)| (*id, Activity::of(mobile, orders)))
+        .collect();
     for (id, entity) in order {
         let Ok((_, _, mut mobile, mut position, mut facing, mut orders)) = units.get_mut(entity)
         else {
@@ -99,6 +176,7 @@ pub(crate) fn move_units(
         };
         let mut budget = u32::from(mobile.speed);
         let mut stepped_toward = false;
+        let mut stalled = false;
         loop {
             if let Some(mut step) = mobile.step {
                 let remaining = step.length.saturating_sub(step.progress);
@@ -115,8 +193,21 @@ pub(crate) fn move_units(
                 mobile.step = None;
                 continue;
             }
-            match at_centre(id, &mobile, &mut orders, &grid, tick.0, budget, &mut events) {
+            match at_centre(
+                id,
+                &mobile,
+                &mut orders,
+                &grid,
+                &activity,
+                tick.0,
+                budget,
+                &mut events,
+            ) {
                 AtCentre::Wait => break,
+                AtCentre::Blocked => {
+                    stalled = true;
+                    break;
+                }
                 AtCentre::Step(direction, next) => {
                     // `at_centre` checked that the cell is passable and free.
                     if !grid.claim(next, id) {
@@ -143,9 +234,7 @@ pub(crate) fn move_units(
         if let Some(order) = orders.current.as_mut() {
             if stepped_toward {
                 order.stalled_ticks = 0;
-            } else if order.state == PathState::Following {
-                // Ticks spent waiting for the pathfinder do not count: requests are served
-                // oldest first, so each wait is bounded by the number of units.
+            } else if stalled {
                 order.stalled_ticks = order.stalled_ticks.saturating_add(1);
             }
             let stuck = order.stalled_ticks >= MAX_STALLED_TICKS
@@ -158,6 +247,7 @@ pub(crate) fn move_units(
                 });
             }
         }
+        activity.insert(id, Activity::of(&mobile, &orders));
         let sub = mobile.sub_position();
         if position.0 != sub {
             position.0 = sub;
@@ -189,11 +279,13 @@ fn start_step(order: &mut MoveOrder, direction: Direction) -> bool {
 }
 
 /// The decision of a unit standing at the centre of its cell with `budget` subcells left.
+#[allow(clippy::too_many_arguments)]
 fn at_centre(
     id: SimId,
     mobile: &Mobile,
     orders: &mut Orders,
     grid: &Grid,
+    activity: &BTreeMap<SimId, Activity>,
     tick: u64,
     budget: u32,
     events: &mut Messages<SimEvent>,
@@ -204,10 +296,11 @@ fn at_centre(
     if order.state != PathState::Following {
         return AtCentre::Wait;
     }
-    let request = |order: &mut MoveOrder, avoid_units: bool| {
+    let request = |order: &mut MoveOrder, avoid_units: bool, queued: bool| {
         order.state = PathState::Requested {
             since: tick,
             avoid_units,
+            queued,
         };
         order.remaining = None;
         order.blocked_ticks = 0;
@@ -222,7 +315,7 @@ fn at_centre(
                 retargeted,
             });
         } else {
-            request(order, false);
+            request(order, false, false);
         }
         return AtCentre::Wait;
     };
@@ -233,7 +326,7 @@ fn at_centre(
     let Some(direction) =
         Direction::from_delta(next.x.saturating_sub(cell.x), next.y.saturating_sub(cell.y))
     else {
-        request(order, false);
+        request(order, false, false);
         return AtCentre::Wait;
     };
     let (dx, dy) = direction.delta();
@@ -246,22 +339,29 @@ fn at_centre(
         // The terrain changed under the path, so the cost of every way to the destination may
         // have grown: progress is measured afresh from the new path.
         order.best = u32::MAX;
-        request(order, false);
+        request(order, false, false);
         return AtCentre::Wait;
     }
     // Another unit holds the next cell, or is crossing this diagonal step between the two
     // cells beside it.
-    let held = grid.occupant(next).is_some_and(|holder| holder != id);
-    let crossing = direction.is_diagonal()
-        && grid
-            .occupant(beside_x)
-            .is_some_and(|holder| holder != id && grid.occupant(beside_y) == Some(holder));
-    if held || crossing {
+    let holder = grid.occupant(next).filter(|&holder| holder != id);
+    let crosser = grid.occupant(beside_x).filter(|&holder| {
+        direction.is_diagonal() && holder != id && grid.occupant(beside_y) == Some(holder)
+    });
+    if holder.is_some() || crosser.is_some() {
+        let queued = holder
+            .into_iter()
+            .chain(crosser)
+            .all(|blocker| moving_on(grid, activity, id, blocker));
         order.blocked_ticks = order.blocked_ticks.saturating_add(1);
         if order.blocked_ticks >= REPATH_AFTER_BLOCKED_TICKS {
-            request(order, true);
+            request(order, true, queued);
         }
-        return AtCentre::Wait;
+        return if queued {
+            AtCentre::Wait
+        } else {
+            AtCentre::Blocked
+        };
     }
     AtCentre::Step(direction, next)
 }
