@@ -74,7 +74,7 @@ pub struct MapStatus {
 #[derive(Resource, Debug, Default)]
 pub struct HoveredCell(pub Option<CellPos>);
 
-fn load_map(
+pub(crate) fn load_map(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     checked: Res<CheckedAssets>,
@@ -197,7 +197,7 @@ pub fn misalignment(map: &tiled::Map) -> Option<String> {
     None
 }
 
-fn update_hovered_cell(
+pub(crate) fn update_hovered_cell(
     view: Option<Res<MapView>>,
     window: Single<&Window, With<PrimaryWindow>>,
     camera: Single<(&Camera, &GlobalTransform)>,

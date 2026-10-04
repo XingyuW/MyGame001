@@ -1,9 +1,11 @@
 use bevy_ecs::world::World;
 
+use crate::definitions::Definitions;
 use crate::id::{SimId, SimIdAllocator};
 use crate::map::Grid;
 use crate::rng::SimRng;
 use crate::schedule::SimTick;
+use crate::unit::{Facing, Mobile, Orders, Owner, Position, Unit, hash_unit};
 
 /// 64-bit FNV-1a, implemented here so that the hash never changes with a dependency update.
 ///
@@ -53,7 +55,9 @@ impl Default for Fnv1a64 {
 ///
 /// Covers, in this order: the tick counter, the [`SimRng`] state, the next [`SimId`] to be
 /// allocated, the number of entities with a [`SimId`], every such entity in ascending [`SimId`]
-/// order, and the [`Grid`]. Components added by later milestones are appended per entity.
+/// order (its id, then a flag byte and, for a unit, its components), the [`Grid`], and the
+/// [`Definitions`] (docs/DECISIONS.md D4, D11, extended in M2). Components added by later
+/// milestones are appended per entity.
 ///
 /// # Panics
 ///
@@ -65,13 +69,25 @@ pub fn state_hash(world: &mut World) -> u64 {
     world.resource::<SimRng>().hash_into(&mut hasher);
     hasher.write_u32(world.resource::<SimIdAllocator>().peek_next());
 
-    let mut ids: Vec<SimId> = world.query::<&SimId>().iter(world).copied().collect();
-    ids.sort_unstable();
-    hasher.write_u64(ids.len() as u64);
-    for id in ids {
+    let mut query = world.query::<(
+        &SimId,
+        Option<(&Owner, &Unit, &Mobile, &Position, &Facing, &Orders)>,
+    )>();
+    let mut entities: Vec<_> = query.iter(world).collect();
+    entities.sort_unstable_by_key(|(id, _)| **id);
+    hasher.write_u64(entities.len() as u64);
+    for (id, unit) in entities {
         hasher.write_u32(id.0);
+        match unit {
+            None => hasher.write(&[0]),
+            Some(components) => {
+                hasher.write(&[1]);
+                hash_unit(&mut hasher, components);
+            }
+        }
     }
     world.resource::<Grid>().hash_into(&mut hasher);
+    world.resource::<Definitions>().hash_into(&mut hasher);
 
     hasher.finish()
 }

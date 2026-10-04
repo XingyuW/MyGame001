@@ -1,4 +1,5 @@
-//! The supported subset of the tileset image (docs/DECISIONS.md, D16; invariant I11).
+//! The supported subset of the tileset image and of unit sprite sheets (docs/DECISIONS.md, D16
+//! and D20; invariant I11).
 //!
 //! The renderer decodes the tileset image with `image` 0.25.10 and no memory limit
 //! (`bevy_image` 0.19.1, `Image::from_buffer`), and a PNG of a few megabytes can make that
@@ -135,20 +136,39 @@ pub fn check_tileset_image(
         .parent()
         .unwrap_or(Path::new(""))
         .join(&image.file_name);
+    check_png_file(&path, image.width, image.height)
+}
+
+/// Checks the PNG file at `path` against the supported subset (see the module documentation),
+/// with the declared size `width` × `height`, and returns the bytes that were checked. The same
+/// subset serves tileset images and, since M2, unit sprite sheets (docs/DECISIONS.md D20).
+pub fn check_png_file(path: &Path, width: u32, height: u32) -> Result<Vec<u8>, TilesetImageError> {
+    let declared = TilesetImage {
+        file_name: String::new(),
+        width,
+        height,
+    };
     let error = |field: &str, kind| TilesetImageError {
-        file: path.clone(),
+        file: path.to_owned(),
         field: field.to_owned(),
         kind,
     };
-    let bytes = read_bounded(&path).map_err(|kind| error("file", kind))?;
-    check_header(&bytes, image).map_err(|kind| error("file", kind))?;
+    let bytes = read_bounded(path).map_err(|kind| error("file", kind))?;
+    check_header(&bytes, &declared).map_err(|kind| error("file", kind))?;
     check_chunks(&bytes).map_err(|(field, kind)| error(&field, kind))?;
-    decode(&bytes, image).map_err(|kind| error("image data", kind))?;
+    decode(&bytes, &declared).map_err(|kind| error("image data", kind))?;
     Ok(bytes)
 }
 
-/// Reads the file without reading more than [`MAX_TILESET_IMAGE_BYTES`] + 1 bytes.
+/// Reads the file without reading more than [`MAX_TILESET_IMAGE_BYTES`] + 1 bytes. Anything
+/// that is not a regular file (a directory, a device, or a named pipe, which would block the
+/// reader until a writer appears; M1 review 3, P2-1) is rejected before it is opened.
 fn read_bounded(path: &Path) -> Result<Vec<u8>, TilesetImageErrorKind> {
+    let metadata =
+        std::fs::metadata(path).map_err(|e| TilesetImageErrorKind::Read(e.to_string()))?;
+    if !metadata.is_file() {
+        return Err(TilesetImageErrorKind::Read("not a regular file".into()));
+    }
     let file = std::fs::File::open(path).map_err(|e| TilesetImageErrorKind::Read(e.to_string()))?;
     let mut bytes = Vec::new();
     file.take(MAX_TILESET_IMAGE_BYTES + 1)
