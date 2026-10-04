@@ -532,9 +532,25 @@ pub(crate) fn begin_match(world: &mut World, selection: MenuSelection, seed: u64
             return;
         }
     };
+    let faction = |index: usize| {
+        catalogue
+            .skirmish
+            .factions
+            .get(index)
+            .map_or("?", |faction| faction.id.as_str())
+    };
     info!(
-        "match on map {} (seed {seed}): {} buildings and {} units spawned",
-        entry.id, start.buildings, start.units
+        "match on map {} (seed {seed}): {} against {} ({}): {} buildings and {} units spawned",
+        entry.id,
+        faction(selection.faction),
+        faction(selection.opponent),
+        catalogue
+            .ai
+            .difficulties
+            .get(selection.difficulty)
+            .map_or("?", |difficulty| difficulty.id.as_str()),
+        start.buildings,
+        start.units
     );
     world.resource_mut::<BuildingStatus>().spawned = start.buildings;
     world.resource_mut::<UnitStatus>().spawned = start.units;
