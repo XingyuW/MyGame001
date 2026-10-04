@@ -24,6 +24,7 @@ use bevy_ecs::resource::Resource;
 use bevy_ecs::system::{Commands, Query, Res, ResMut};
 
 use crate::building::{Building, Footprint, Producer, exit_cell};
+use crate::combat::combat_components;
 use crate::command::PlayerId;
 use crate::definitions::{Definitions, UnitKind};
 use crate::economy_defs::{BuildingKind, ProductionItem};
@@ -35,6 +36,7 @@ use crate::map::{CellPos, Grid};
 use crate::pathfinding::destination_cells;
 use crate::schedule::SimTick;
 use crate::unit::{MoveOrder, Owner, unit_bundle};
+use crate::visibility::Vision;
 
 /// Largest number of items in one production queue.
 pub const MAX_QUEUE_LENGTH: usize = 16;
@@ -57,6 +59,8 @@ pub struct PlayerState {
     pub(crate) power_consumed: i32,
     /// One queue per producing building type; queues that become empty are removed.
     pub(crate) queues: BTreeMap<BuildingKind, Vec<QueueItem>>,
+    /// What the player sees of the grid (M4, `crate::visibility`).
+    pub(crate) vision: Vision,
 }
 
 impl PlayerState {
@@ -83,6 +87,12 @@ impl PlayerState {
     /// The queue of items produced by buildings of type `producer`, head first.
     pub fn queue(&self, producer: BuildingKind) -> &[QueueItem] {
         self.queues.get(&producer).map_or(&[], Vec::as_slice)
+    }
+
+    /// The player's visibility grid as of the last `Visibility` stage (shroud and fog,
+    /// docs/DECISIONS.md D30).
+    pub fn vision(&self) -> &Vision {
+        &self.vision
     }
 
     /// Every non-empty queue, by producing building type.
@@ -113,8 +123,8 @@ impl fmt::Display for PlayerSetupError {
 
 impl std::error::Error for PlayerSetupError {}
 
-/// The players of the match and their economic state (PLAN.md section 5). Faction and
-/// visibility arrive with the milestones that use them (M4, M7).
+/// The players of the match, their economic state, and their visibility grids (PLAN.md section 5).
+/// Factions arrive in M7.
 #[derive(Resource, Clone, Debug, Default, PartialEq, Eq)]
 pub struct Players {
     players: BTreeMap<PlayerId, PlayerState>,
@@ -155,9 +165,15 @@ impl Players {
         self.players.iter().map(|(&player, state)| (player, state))
     }
 
+    pub(crate) fn iter_mut(&mut self) -> impl Iterator<Item = (PlayerId, &mut PlayerState)> {
+        self.players
+            .iter_mut()
+            .map(|(&player, state)| (player, state))
+    }
+
     /// Every player in id order: id, credits, power produced and consumed, then each queue
     /// (producing building type, item count, and per item its kind tag and index, progress,
-    /// and credits charged).
+    /// and credits charged), then the vision (from M4).
     pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
         hasher.write_u64(self.players.len() as u64);
         for (player, state) in &self.players {
@@ -180,6 +196,7 @@ impl Players {
                     hasher.write(&item.charged.to_le_bytes());
                 }
             }
+            state.vision.hash_into(hasher);
         }
     }
 }
@@ -264,6 +281,13 @@ impl Spawner<'_, '_, '_> {
         let mut entity = self.commands.spawn(bundle);
         if harvester {
             entity.insert(Harvester::new());
+        }
+        if let Some(terms) = self.definitions.unit_combat(kind) {
+            let (components, weapon) = combat_components(terms);
+            entity.insert(components);
+            if let Some(weapon) = weapon {
+                entity.insert(weapon);
+            }
         }
         self.events.write(SimEvent::UnitSpawned {
             player,

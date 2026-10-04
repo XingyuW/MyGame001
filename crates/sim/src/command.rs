@@ -8,8 +8,9 @@ use bevy_ecs::resource::Resource;
 use bevy_ecs::system::{Query, Res, ResMut};
 
 use crate::building::PlacementError;
+use crate::combat::{AttackOrder, Body, Weapon};
 use crate::definitions::Definitions;
-use crate::economy_commands::{self, EconomyParams};
+use crate::economy_commands::{self, BuildingIndex, EconomyParams};
 use crate::economy_defs::{BuildingKind, ProductionItem};
 use crate::event::{MoveFailure, SimEvent};
 use crate::harvest::{HarvestState, Harvester, claimed_ore, nearest_ore};
@@ -18,6 +19,7 @@ use crate::map::{CellPos, Grid};
 use crate::pathfinding::{destination_cells, octile_distance};
 use crate::schedule::SimTick;
 use crate::unit::{Mobile, MoveOrder, Orders, Owner, Unit};
+use crate::visibility::{NO_VISION, Vision};
 
 /// Identifies a player (human or AI).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -26,8 +28,7 @@ pub struct PlayerId(pub u8);
 /// Largest number of units one command may name.
 pub const MAX_UNITS_PER_COMMAND: usize = 1024;
 
-/// An order issued by a player (PLAN.md section 5). The remaining variants (`Attack`,
-/// `AttackMove`) are added by the milestone that implements them (M4).
+/// An order issued by a player (PLAN.md section 5).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Command {
     /// Move the units to `target`. A group receives distinct destination cells around the
@@ -54,6 +55,14 @@ pub enum Command {
     SellBuilding { building: SimId },
     /// Units produced by the building move to `cell` when they leave it.
     SetRallyPoint { building: SimId, cell: CellPos },
+    /// The armed units attack `target`, a unit or building of another player that the issuing
+    /// player sees, moving into range if needed, until it is destroyed or no longer visible
+    /// (docs/DECISIONS.md D29). Harvesters among them stop their cycle.
+    Attack { units: Vec<SimId>, target: SimId },
+    /// Move the units to `target` as `Move` does; the armed ones stop to fight visible enemies in
+    /// range on the way and then move on (docs/DECISIONS.md D29). Harvesters among them stop
+    /// their cycle.
+    AttackMove { units: Vec<SimId>, target: CellPos },
 }
 
 impl Command {
@@ -62,7 +71,9 @@ impl Command {
         match self {
             Command::Move { units, .. }
             | Command::Stop { units }
-            | Command::Harvest { units, .. } => Some(units),
+            | Command::Harvest { units, .. }
+            | Command::Attack { units, .. }
+            | Command::AttackMove { units, .. } => Some(units),
             Command::QueueProduction { .. }
             | Command::CancelProduction { .. }
             | Command::PlaceBuilding { .. }
@@ -122,6 +133,16 @@ pub enum RejectReason {
     UnknownBuilding(SimId),
     /// The building's type produces no units, so it has no rally point.
     NotAProducer(SimId),
+    /// The unit has no weapon (`Attack`).
+    NotArmed(SimId),
+    /// The target belongs to the issuing player (`Attack`).
+    OwnTarget(SimId),
+    /// No unit or building with this id is visible to the issuing player (`Attack`): it does not
+    /// exist (any more), or it is an enemy the player does not see. The two cases are reported
+    /// alike, so that commands reveal nothing about unseen enemies (docs/DECISIONS.md D30).
+    UnknownTarget(SimId),
+    /// The target has no hit points (only possible without a combat file).
+    NotTargetable(SimId),
 }
 
 impl fmt::Display for RejectReason {
@@ -164,6 +185,12 @@ impl fmt::Display for RejectReason {
             Self::IdsExhausted => write!(f, "no simulation id is left"),
             Self::UnknownBuilding(id) => write!(f, "building {} does not exist", id.0),
             Self::NotAProducer(id) => write!(f, "building {} produces no units", id.0),
+            Self::NotArmed(id) => write!(f, "unit {} has no weapon", id.0),
+            Self::OwnTarget(id) => write!(f, "{} belongs to the player", id.0),
+            Self::UnknownTarget(id) => {
+                write!(f, "no unit or building {} is visible to the player", id.0)
+            }
+            Self::NotTargetable(id) => write!(f, "{} has no hit points", id.0),
         }
     }
 }
@@ -205,9 +232,11 @@ type UnitQuery<'w, 's> = Query<
         Entity,
         &'static SimId,
         &'static Owner,
+        &'static Unit,
         &'static Mobile,
         &'static mut Orders,
-        Option<(&'static Unit, &'static mut Harvester)>,
+        Option<&'static mut Harvester>,
+        Option<&'static mut Weapon>,
     ),
     With<Unit>,
 >;
@@ -235,17 +264,21 @@ pub(crate) fn process_commands(
     let mut buildings = None;
     for issued in queue.pending.drain(..) {
         let result = if issued.command.units().is_some() {
-            validate(&issued, &grid, &index, &units).map(|()| {
-                apply_unit_command(
-                    &issued.command,
-                    tick.0,
-                    &grid,
-                    economy.definitions(),
-                    &index,
-                    &mut units,
-                    &mut events,
-                );
-            })
+            let buildings = buildings.get_or_insert_with(|| economy.building_index());
+            validate_player(&issued, &economy)
+                .and_then(|()| validate(&issued, &grid, &economy, &index, &units))
+                .and_then(|()| validate_combat(&issued, &economy, buildings, &index, &units))
+                .map(|()| {
+                    apply_unit_command(
+                        &issued.command,
+                        tick.0,
+                        &grid,
+                        economy.definitions(),
+                        &index,
+                        &mut units,
+                        &mut events,
+                    );
+                })
         } else {
             let buildings = buildings.get_or_insert_with(|| economy.building_index());
             economy_commands::apply(&issued, &mut economy, buildings, &mut grid, &mut events)
@@ -273,20 +306,52 @@ fn apply_unit_command(
     match command {
         Command::Move { units: ids, target } => {
             stop_harvesting(ids, index, units);
+            stop_fighting(ids, index, units);
             apply_move(ids, *target, tick, grid, index, units, events);
         }
         Command::Stop { units: ids } => {
             stop_harvesting(ids, index, units);
+            stop_fighting(ids, index, units);
             for id in ids {
                 if let Some(&entity) = index.get(id)
-                    && let Ok((.., mut orders, _)) = units.get_mut(entity)
+                    && let Ok((.., mut orders, _, _)) = units.get_mut(entity)
                 {
                     orders.current = None;
                 }
             }
         }
         Command::Harvest { units: ids, target } => {
+            stop_fighting(ids, index, units);
             apply_harvest(ids, *target, tick, grid, definitions, index, units);
+        }
+        Command::Attack { units: ids, target } => {
+            stop_harvesting(ids, index, units);
+            for id in ids {
+                if let Some(&entity) = index.get(id)
+                    && let Ok((.., mut orders, _, Some(mut weapon))) = units.get_mut(entity)
+                {
+                    // The `Combat` stage of this tick moves the unit into range or fires.
+                    orders.current = None;
+                    weapon.target = Some(*target);
+                    weapon.order = Some(AttackOrder::Attack {
+                        target: *target,
+                        chases: 0,
+                    });
+                }
+            }
+        }
+        Command::AttackMove { units: ids, target } => {
+            stop_harvesting(ids, index, units);
+            stop_fighting(ids, index, units);
+            for (entity, destination) in apply_move(ids, *target, tick, grid, index, units, events)
+            {
+                if let Ok((.., Some(mut weapon))) = units.get_mut(entity) {
+                    weapon.order = Some(AttackOrder::AttackMove {
+                        destination,
+                        moving: true,
+                    });
+                }
+            }
         }
         Command::QueueProduction { .. }
         | Command::CancelProduction { .. }
@@ -296,13 +361,26 @@ fn apply_unit_command(
     }
 }
 
-/// `Move` and `Stop` end the harvesting cycle of the harvesters they name.
+/// `Move`, `Stop`, `Attack`, and `AttackMove` end the harvesting cycle of the harvesters they
+/// name.
 fn stop_harvesting(ids: &[SimId], index: &BTreeMap<SimId, Entity>, units: &mut UnitQuery) {
     for id in ids {
         if let Some(&entity) = index.get(id)
-            && let Ok((.., Some((_, mut harvester)))) = units.get_mut(entity)
+            && let Ok((.., Some(mut harvester), _)) = units.get_mut(entity)
         {
             harvester.stop();
+        }
+    }
+}
+
+/// `Move`, `Stop`, `Harvest`, and `AttackMove` end the combat orders of the units they name, and
+/// the units forget their targets.
+fn stop_fighting(ids: &[SimId], index: &BTreeMap<SimId, Entity>, units: &mut UnitQuery) {
+    for id in ids {
+        if let Some(&entity) = index.get(id)
+            && let Ok((.., Some(mut weapon))) = units.get_mut(entity)
+        {
+            weapon.clear();
         }
     }
 }
@@ -324,10 +402,10 @@ fn apply_harvest(
     sorted.sort_unstable();
     let group: BTreeSet<SimId> = sorted.iter().copied().collect();
     let mut claimed = claimed_ore(
-        units.iter().filter_map(|(_, id, .., harvester)| {
+        units.iter().filter_map(|(_, id, .., harvester, _)| {
             harvester
                 .filter(|_| !group.contains(id))
-                .map(|(_, harvester)| (*id, harvester))
+                .map(|harvester| (*id, harvester))
         }),
         None,
     );
@@ -335,7 +413,7 @@ fn apply_harvest(
         let Some(&entity) = index.get(&id) else {
             continue;
         };
-        let Ok((_, _, _, mobile, mut orders, Some((unit, mut harvester)))) = units.get_mut(entity)
+        let Ok((_, _, _, unit, mobile, mut orders, Some(mut harvester), _)) = units.get_mut(entity)
         else {
             continue;
         };
@@ -362,11 +440,13 @@ fn apply_harvest(
     }
 }
 
-/// Ownership, existence, and bounds of a unit command. Visibility is not checked yet: there is
-/// no fog of war before M4, so every cell is visible to every player (docs/DECISIONS.md D19).
+/// Ownership, existence, and bounds of a unit command. Under fog of war a named unit of another
+/// player that the issuing player does not see is `UnknownUnit` rather than `NotOwned`. The
+/// target of `Attack` is checked by [`validate_combat`] (docs/DECISIONS.md D30).
 fn validate(
     issued: &IssuedCommand,
     grid: &Grid,
+    economy: &EconomyParams,
     index: &BTreeMap<SimId, Entity>,
     units: &UnitQuery,
 ) -> Result<(), RejectReason> {
@@ -387,24 +467,125 @@ fn validate(
         if !seen.insert(id) {
             return Err(RejectReason::DuplicateUnit(id));
         }
-        let (owner, harvester) = index
+        let (owner, mobile, harvester) = index
             .get(&id)
             .and_then(|&entity| units.get(entity).ok())
-            .map(|(_, _, owner, .., harvester)| (owner.0, harvester.is_some()))
+            .map(|(_, _, owner, _, mobile, _, harvester, _)| {
+                (owner.0, *mobile, harvester.is_some())
+            })
             .ok_or(RejectReason::UnknownUnit(id))?;
         if owner != issued.player {
-            return Err(RejectReason::NotOwned(id));
+            // Under fog of war, another player's unit the player does not see is reported like
+            // one that does not exist (docs/DECISIONS.md D30).
+            let hidden = player_fog(issued.player, economy).is_some_and(|vision| {
+                !Body::of(Some(&mobile), None).is_some_and(|body| body.seen_by(vision))
+            });
+            return Err(if hidden {
+                RejectReason::UnknownUnit(id)
+            } else {
+                RejectReason::NotOwned(id)
+            });
         }
         if matches!(issued.command, Command::Harvest { .. }) && !harvester {
             return Err(RejectReason::NotAHarvester(id));
         }
     }
-    if let Command::Move { target, .. } | Command::Harvest { target, .. } = issued.command
+    if let Command::Move { target, .. }
+    | Command::Harvest { target, .. }
+    | Command::AttackMove { target, .. } = issued.command
         && !grid.contains(target)
     {
         return Err(RejectReason::OutsideMap(target));
     }
     Ok(())
+}
+
+/// The issuing player's vision while fog of war is active (the definitions include a combat
+/// file); a player who is not a player of the match then sees nothing. `None` without fog.
+fn player_fog<'a>(player: PlayerId, economy: &'a EconomyParams) -> Option<&'a Vision> {
+    economy.definitions().has_combat().then(|| {
+        economy
+            .players()
+            .get(player)
+            .map_or(&NO_VISION, |state| state.vision())
+    })
+}
+
+/// `Attack` and `AttackMove` are issued only by a player of the match (`UnknownPlayer`), checked
+/// first as for the economy commands: only players have a visibility grid (docs/DECISIONS.md
+/// D30). `Move`, `Stop`, and `Harvest` keep the M2 rule that does not require it.
+fn validate_player(issued: &IssuedCommand, economy: &EconomyParams) -> Result<(), RejectReason> {
+    match issued.command {
+        Command::Attack { .. } | Command::AttackMove { .. }
+            if economy.players().get(issued.player).is_none() =>
+        {
+            Err(RejectReason::UnknownPlayer(issued.player))
+        }
+        _ => Ok(()),
+    }
+}
+
+/// The checks of `Attack` beyond [`validate`], in this order (docs/DECISIONS.md D29, D30): every
+/// named unit has a weapon (`NotArmed`), and the target is not the player's own (`OwnTarget`),
+/// exists and is visible to the player (`UnknownTarget`, the same reason for both, so that an
+/// unseen enemy is reported like a missing one), and has hit points (`NotTargetable`).
+fn validate_combat(
+    issued: &IssuedCommand,
+    economy: &EconomyParams,
+    buildings: &BuildingIndex,
+    index: &BTreeMap<SimId, Entity>,
+    units: &UnitQuery,
+) -> Result<(), RejectReason> {
+    let Command::Attack { units: ids, target } = &issued.command else {
+        return Ok(());
+    };
+    let target = *target;
+    let vision = economy
+        .players()
+        .get(issued.player)
+        .ok_or(RejectReason::UnknownPlayer(issued.player))?
+        .vision();
+    for &id in ids {
+        let armed = index
+            .get(&id)
+            .and_then(|&entity| units.get(entity).ok())
+            .is_some_and(|(.., weapon)| weapon.is_some());
+        if !armed {
+            return Err(RejectReason::NotArmed(id));
+        }
+    }
+    let definitions = economy.definitions();
+    // The target as the player may know it: owner, body, and whether its type has hit points.
+    let found = index
+        .get(&target)
+        .and_then(|&entity| units.get(entity).ok())
+        .map(|(_, _, owner, unit, mobile, ..)| {
+            (
+                owner.0,
+                Body::of(Some(mobile), None),
+                definitions.unit_combat(unit.kind).is_some(),
+            )
+        })
+        .or_else(|| {
+            buildings.get(target).map(|(owner, kind, footprint)| {
+                (
+                    owner,
+                    Some(Body::Building(footprint)),
+                    definitions.building_combat(kind).is_some(),
+                )
+            })
+        });
+    match found {
+        Some((owner, ..)) if owner == issued.player => Err(RejectReason::OwnTarget(target)),
+        Some((_, Some(body), targetable)) if body.seen_by(vision) => {
+            if targetable {
+                Ok(())
+            } else {
+                Err(RejectReason::NotTargetable(target))
+            }
+        }
+        _ => Err(RejectReason::UnknownTarget(target)),
+    }
 }
 
 /// Gives every unit of a valid move command its own destination cell (docs/DECISIONS.md D19).
@@ -415,7 +596,7 @@ fn validate(
 /// order, so the units nearest to the target take the cells nearest to it. A unit for which no
 /// cell remains stops, with [`MoveFailure::NoDestination`]. A unit that later finds its cell
 /// closed off by units that arrived first takes the nearest cell it can reach instead
-/// (`pathfinding::find_paths`).
+/// (`pathfinding::find_paths`). Returns each unit that got a destination, with its cell.
 fn apply_move(
     ids: &[SimId],
     target: CellPos,
@@ -424,11 +605,11 @@ fn apply_move(
     index: &BTreeMap<SimId, Entity>,
     units: &mut UnitQuery,
     events: &mut Messages<SimEvent>,
-) {
+) -> Vec<(Entity, CellPos)> {
     let group: BTreeSet<SimId> = ids.iter().copied().collect();
     let idle_outside_group: BTreeSet<SimId> = units
         .iter()
-        .filter(|(_, id, _, mobile, orders, _)| {
+        .filter(|(_, id, _, _, mobile, orders, ..)| {
             !group.contains(id) && mobile.step.is_none() && orders.current.is_none()
         })
         .map(|(_, id, ..)| *id)
@@ -437,7 +618,7 @@ fn apply_move(
         .iter()
         .filter_map(|id| {
             let entity = *index.get(id)?;
-            let (_, _, _, mobile, ..) = units.get(entity).ok()?;
+            let (_, _, _, _, mobile, ..) = units.get(entity).ok()?;
             Some((octile_distance(mobile.next_centre(), target), *id, entity))
         })
         .collect();
@@ -446,12 +627,16 @@ fn apply_move(
         grid.occupant(cell)
             .is_some_and(|holder| idle_outside_group.contains(&holder))
     });
+    let mut assigned = Vec::with_capacity(order.len());
     for (position, (_, id, entity)) in order.into_iter().enumerate() {
-        let Ok((.., mut orders, _)) = units.get_mut(entity) else {
+        let Ok((.., mut orders, _, _)) = units.get_mut(entity) else {
             continue;
         };
         match destinations.get(position) {
-            Some(&destination) => orders.current = Some(MoveOrder::new(destination, tick)),
+            Some(&destination) => {
+                orders.current = Some(MoveOrder::new(destination, tick));
+                assigned.push((entity, destination));
+            }
             None => {
                 orders.current = None;
                 events.write(SimEvent::MoveFailed {
@@ -461,4 +646,5 @@ fn apply_move(
             }
         }
     }
+    assigned
 }
