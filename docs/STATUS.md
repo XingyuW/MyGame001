@@ -2,7 +2,7 @@
 
 | Milestone | Status | Branch | Approved tag |
 |-----------|--------|--------|--------------|
-| M0: Bootstrap and dependency verification | Implemented, awaiting independent review (PLAN.md section 10, step 3). **Not approved.** | `milestone/m0` | none |
+| M0: Bootstrap and dependency verification | **Approved** by the user on 2026-10-04 after independent review (decision: GO WITH DOCUMENTED NON-BLOCKING DEBT; no P0 or P1) | `milestone/m0` | `m0-approved` |
 | M1: Map and camera | Not started | | |
 | M2: Units and movement | Not started | | |
 | M3: Economy and construction | Not started | | |
@@ -47,15 +47,21 @@ Run from the repository root on macOS 27.0.1, Apple M5, Rust 1.98.1, in this ord
 4. Files not listed in PLAN.md section 4: `.cargo/config.toml` (asset root, DECISIONS D1), `crates/game/examples/gen_spike_tileset.rs` (tileset generator), `crates/game/tests/m0_spike.rs` (spike and projection tests).
 5. The `cargo init` stub (`src/main.rs` printing "Hello, world!", and a root `Cargo.toml` package named `MyGame001`, both never committed) was replaced by the workspace layout of section 4.
 
-### Known debt (P2 candidates)
+### Known debt (P2, accepted with the M0 approval)
+
+Items 1 to 7 come from the implementation report and were confirmed by the independent review. Items 8 to 11 were raised by the review ("Milestone 0 code review" session, 2026-10-04).
 
 1. On macOS, dev-profile links of `game` print a linker warning (`__eh_frame section too large ... compact unwind table`). It is a warning only; clippy and release builds are unaffected.
-2. The first smoke run logged one `WARN bevy_winit::state: Skipped event Destroyed for unknown winit Window Id` at shutdown; the final run did not. Exit code was 0 in both.
+2. Shutdown sometimes logs `WARN bevy_winit::state: Skipped event Destroyed for unknown winit Window Id` (seen in some smoke runs, including the reviewer's, not in others). Exit code is unaffected.
 3. `game` uses a constant simulation seed (`MATCH_SEED = 0`) until match setup in M6.
 4. `crates/game/src/spike.rs` is spike code to be replaced by the M1 map loading and rendering.
-5. The smoke test fails if the spike map has not been created by the last frame, so very small frame counts (a few frames) fail by design (DECISIONS D6).
-6. `bevy_ecs_tiled` panics on staggered and oblique maps; the M1 loader must validate maps first (DECISIONS A2 caveat, invariant I8).
-7. Packaged builds must ship `assets/` next to the executable (DECISIONS D1, M7).
+5. The smoke test fails if the spike map has not been created by the last frame. For small frame counts the outcome therefore depends on asset loading speed: the reviewer observed `--smoke-test 1` exit 0 with the map created. (Corrected per review item 10; the earlier wording "fail by design" was wrong.)
+6. `bevy_ecs_tiled` panics on staggered and oblique maps (`helpers.rs`); the M1 loader must validate maps itself before handing them over (DECISIONS A2 caveat, invariant I8).
+7. Asset location: `assets/` is found only when the binary is started through cargo (`.cargo/config.toml` sets `BEVY_ASSET_ROOT`). Run directly, `target/release/game` looks in `target/release/assets/` and the smoke test exits 1, naming the missing path. Packaged builds must ship `assets/` next to the executable (DECISIONS D1, M7).
+8. `SimIdAllocator::allocate` (`crates/sim/src/id.rs`) is documented to return `None` when the id space is exhausted, but no test covers that boundary; `next` is private and there is no constructor to start near `u32::MAX`. Expected: a boundary test using a test-only constructor.
+9. The smoke test's failure path (exit 1 on an asset load failure or a missing map, `crates/game/src/smoke.rs`) is not tested automatically; the reviewer verified it only by hand with a missing asset root. Expected: an automated end-to-end check.
+10. Correction of item 5 (done above).
+11. Platform statement conflict: PLAN.md section 1 names Windows, macOS, and Linux for version 1.0, while the user decided that macOS is sufficient (DECISIONS U1). The user must decide before M7 whether to amend PLAN.md.
 
 ### User verification
 
@@ -65,6 +71,6 @@ Run from the repository root on macOS 27.0.1, Apple M5, Rust 1.98.1, in this ord
 | 2. Platforms | The user decided that running on macOS is sufficient (DECISIONS U1). Verified on macOS only; Windows and Linux were not tested. |
 | 3. Toolchain pin 1.98.1 (Bevy minimum is 1.95.0) | Not explicitly confirmed; the user asked to proceed without objecting. The reviewer may raise it. |
 
-### Next step
+### Approval
 
-M0 is ready for independent review (PLAN.md section 10, step 3) of the cumulative diff `main..milestone/m0`.
+The independent review reran all validation commands with exit code 0 and found no P0 or P1. Its condition, that every P2 item be recorded here, is met by the debt list above. The user approved M0 on 2026-10-04, and the tag `m0-approved` marks the approved state. M1 is reviewed against this tag.
