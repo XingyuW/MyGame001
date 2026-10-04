@@ -1,12 +1,12 @@
 //! Buildings and the economy in the game (PLAN.md section 7, M3; docs/DECISIONS.md D27): the
-//! building sprites, the starting buildings and credits of the demo match, drawing the
-//! simulation's buildings, and the player's credits and power in the window title.
+//! building sprites, drawing the simulation's buildings, and the player's credits and power in the
+//! window title. The starting buildings and credits of a match are data of the skirmish file from
+//! M6 (`sim::setup_match`, D40).
 //!
 //! As for units (`crate::units`), the game reads simulation state and never writes it: each
 //! building is drawn by a separate view entity, and the only writes into the simulation world
-//! are match setup before the first tick (players, starting buildings, run by
-//! `crate::sim_host` with [`setup_economy`]) and the commands of the interface, which
-//! `crate::sim_host` moves into `CommandQueue` (docs/DECISIONS.md D34).
+//! are match setup before the first tick (`crate::sim_host::install_match`) and the commands of
+//! the interface, which `crate::sim_host` moves into `CommandQueue` (docs/DECISIONS.md D34).
 //!
 //! Every building type named by the economy file has a sprite, which must exist and pass the PNG
 //! subset check at the size its footprint implies before the match starts (cross validation,
@@ -27,7 +27,7 @@ use crate::map::MapView;
 use crate::projection::{TileSize, to_world};
 use crate::sim_host::SimHost;
 use crate::tileset_image::{TilesetImageError, TilesetImageErrorKind, check_png_file};
-use crate::units::{HUMAN, OPPONENT, owner_colour};
+use crate::units::{HUMAN, owner_colour};
 
 /// The economy file, relative to the asset directory.
 pub const ECONOMY_PATH: &str = "data/economy.ron";
@@ -37,25 +37,6 @@ pub const SPRITE_DIR: &str = "sprites/buildings";
 
 /// Height of a building sprite's walls in pixels (`examples/gen_building_sprites.rs`).
 pub const WALL_PX: u32 = 32;
-
-/// Starting credits of each player of the demo match. Match setup arrives in M6
-/// (docs/DECISIONS.md D27).
-pub const STARTING_CREDITS: i64 = 5_000;
-
-/// A starting building: owner, building type, and the origin of its footprint.
-pub type StartingBuilding = (PlayerId, &'static str, (i32, i32));
-
-/// The starting buildings of the demo match: a construction yard per player, near its starting
-/// units and an ore field (D27), and from M4 a gun turret guarding the opponent's yard, so that a
-/// defensive structure can be seen in action (docs/DECISIONS.md D31).
-pub const STARTING_BUILDINGS: [StartingBuilding; 3] = [
-    (HUMAN, "construction_yard", (15, 37)),
-    (OPPONENT, "construction_yard", (52, 42)),
-    (OPPONENT, "gun_turret", (50, 41)),
-];
-
-/// The players of the demo match.
-pub const PLAYERS: [PlayerId; 2] = [HUMAN, OPPONENT];
 
 pub struct BuildingsPlugin;
 
@@ -185,30 +166,6 @@ pub fn check_building_sprites(
         });
     }
     Ok(sprites)
-}
-
-/// Match setup: adds the players with their starting credits and spawns the starting
-/// buildings. Errors name what failed.
-pub fn setup_economy(world: &mut World) -> Result<usize, String> {
-    {
-        let mut players = world.resource_mut::<Players>();
-        for player in PLAYERS {
-            players
-                .add(player, STARTING_CREDITS)
-                .map_err(|error| error.to_string())?;
-        }
-    }
-    let mut spawned = 0;
-    for (owner, building_type, (x, y)) in STARTING_BUILDINGS {
-        sim::spawn_building(world, owner, building_type, CellPos::new(x, y)).map_err(|error| {
-            format!(
-                "starting building {building_type:?} of player {} at ({x}, {y}): {error}",
-                owner.0
-            )
-        })?;
-        spawned += 1;
-    }
-    Ok(spawned)
 }
 
 /// World position of a building's sprite: the centre of its footprint's diamond, raised by half
@@ -412,9 +369,21 @@ mod tests {
             let bytes = std::fs::read(assets_root().join(&sprite.asset_path)).expect("sprite");
             assert_eq!(sprite.bytes, bytes);
         }
-        // The starting buildings name defined building types.
-        for (_, building_type, _) in STARTING_BUILDINGS {
-            assert!(definitions.building_kind(building_type).is_some());
+        // The starting buildings of every faction of the skirmish file (M6: data, D40) name
+        // defined building types.
+        let catalogue = crate::skirmish::tests::production_catalogue();
+        for faction in &catalogue.skirmish.factions {
+            assert!(!faction.buildings.is_empty());
+            for building in &faction.buildings {
+                assert_eq!(
+                    definitions.building(building.kind),
+                    catalogue.definitions.building(building.kind)
+                );
+                assert!(
+                    definitions.building(building.kind).is_some(),
+                    "{building:?}"
+                );
+            }
         }
     }
 
@@ -495,29 +464,32 @@ mod tests {
 
     #[test]
     fn the_demo_map_holds_the_starting_buildings_and_units() {
-        // Match setup on the demo map: both yards fit, and every starting unit still finds a
-        // free cell around its anchor.
-        let mut app = App::new();
-        app.add_plugins(sim::SimPlugin { seed: 0 });
-        let map = sim::load_map(assets_root().join(crate::map::MAP_PATH))
-            .unwrap_or_else(|error| panic!("{error}"));
-        app.world_mut().insert_resource(map.grid);
-        app.world_mut().insert_resource(production_definitions());
-        assert_eq!(setup_economy(app.world_mut()), Ok(STARTING_BUILDINGS.len()));
-        let grid = app.world().resource::<Grid>().clone();
-        let planned = crate::units::plan_starting_units(&grid, &crate::units::STARTING_UNITS)
-            .expect("starting units fit");
-        assert_eq!(planned.len(), crate::units::starting_unit_total());
-        for (_, _, cell) in planned {
-            assert_eq!(grid.building(cell), None);
+        // Match setup on the demo map (M6: `sim::setup_match` with the skirmish file, D40): every
+        // starting building of both factions fits, every starting unit still finds a free cell
+        // around its anchor and none stands on a building, and both players start with the
+        // skirmish file's credits.
+        let catalogue = crate::skirmish::tests::production_catalogue();
+        let selection = crate::skirmish::MenuSelection::initial(&catalogue);
+        let host = crate::sim_host::tests::demo_host();
+        let world = host.world();
+        let grid = host.grid().expect("grid");
+        let expected_buildings: usize = selection
+            .players()
+            .iter()
+            .map(|setup| catalogue.skirmish.factions[setup.faction].buildings.len())
+            .sum();
+        let mut buildings = world.try_query::<&Building>().expect("registered");
+        assert_eq!(buildings.iter(world).count(), expected_buildings);
+        let mut units = world.try_query::<&sim::Mobile>().expect("registered");
+        for mobile in units.iter(world) {
+            assert_eq!(grid.building(mobile.cell), None);
         }
-        for player in PLAYERS {
+        for setup in selection.players() {
             assert_eq!(
-                app.world()
-                    .resource::<Players>()
-                    .get(player)
+                host.players()
+                    .and_then(|players| players.get(setup.player))
                     .map(PlayerState::credits),
-                Some(STARTING_CREDITS)
+                Some(catalogue.skirmish.starting_credits)
             );
         }
     }

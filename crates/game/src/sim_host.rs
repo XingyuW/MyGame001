@@ -11,12 +11,14 @@
 //!
 //! The only writes into the simulation world are in this module:
 //!
-//! * match setup before the first tick ([`start_match`]: the map's grid, the definitions, the
-//!   players, and the starting buildings and units, D11, D20, D27);
-//! * one tick per fixed timestep ([`run_tick`]), into whose `CommandQueue` the commands of the
-//!   interface are moved first. The interface pushes commands into [`CommandSink`], which accepts
-//!   commands of the human player only, so the interface changes simulation state only through
-//!   `CommandQueue` (I5).
+//! * match setup before the first tick ([`install_match`]: a new simulation world with the map's
+//!   grid and the definitions, set up by `sim::setup_match` from the skirmish file with the
+//!   players, their starting buildings and units, and the computer player, D11, D40);
+//! * one tick per fixed timestep ([`run_tick`]) while a match is running, into whose `CommandQueue`
+//!   the commands of the interface are moved first. The interface pushes commands into
+//!   [`CommandSink`], which accepts commands of the human player only, so the interface changes
+//!   simulation state only through `CommandQueue` (I5). The computer player pushes its own
+//!   commands inside the simulation (`sim`'s `Ai` stage, M6).
 //!
 //! After every tick, the tick's `SimEvent`s are copied into the game world's message buffer, which
 //! Bevy updates once per frame, so the game's readers see every event even when several ticks run
@@ -26,30 +28,27 @@ use std::fmt;
 
 use bevy::prelude::*;
 use sim::{
-    Armour, Building, Command, CommandQueue, Definitions, Facing, Grid, Harvester, Health,
-    IssuedCommand, Mobile, Orders, Owner, Players, Position, Producer, Projectiles, Sight,
-    SimEvent, SimId, SimPlugin, SimSchedule, SimTick, Unit, Weapon,
+    AiDefinitions, AiPlayers, Armour, Building, Command, CommandQueue, Definitions, Facing, Grid,
+    Harvester, Health, IssuedCommand, MatchOutcome, MatchStart, MatchState, Mobile, Orders, Owner,
+    PlayerSetup, Players, Position, Producer, Projectiles, Sight, SimEvent, SimId, SimPlugin,
+    SimSchedule, SimTick, SkirmishDefinitions, Unit, Weapon,
 };
 
-use crate::buildings::{BuildingStatus, setup_economy};
-use crate::units::{HUMAN, STARTING_UNITS, UnitStatus, plan_starting_units};
+use crate::units::HUMAN;
 
 /// Most commands the sink holds between two ticks. The interface issues a few commands per input
 /// event, and the sink is emptied at every tick (20 per second), so only a fault could reach it;
 /// a command beyond it is refused and logged, never dropped silently.
 pub const MAX_PENDING_COMMANDS: usize = 256;
 
-pub struct SimHostPlugin {
-    /// Seed of the simulation's random number generator.
-    pub seed: u64,
-}
+pub struct SimHostPlugin;
 
 impl Plugin for SimHostPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(SimHost::new(self.seed))
+        // No match until one is started from the menu (`crate::skirmish`).
+        app.insert_resource(SimHost::new(0))
             .init_resource::<CommandSink>()
             .add_message::<SimEvent>()
-            .add_systems(Startup, start_match.after(crate::units::load_match_assets))
             .add_systems(
                 FixedUpdate,
                 (crate::units::record_previous_positions, run_tick).chain(),
@@ -64,7 +63,8 @@ pub struct SimHost {
 }
 
 impl SimHost {
-    /// A simulation with the resources and schedule of `SimPlugin` and no match set up.
+    /// A simulation with the resources and schedule of `SimPlugin`, seeded with `seed`, and no
+    /// match set up.
     fn new(seed: u64) -> Self {
         let mut app = App::empty();
         app.add_plugins(SimPlugin { seed });
@@ -116,30 +116,40 @@ impl SimHost {
         self.world.get_resource::<Projectiles>()
     }
 
-    /// Installs a match: the map's grid, the definitions, and the starting players, buildings,
-    /// and units (match setup before the first tick, D11).
-    fn install(&mut self, grid: Grid, definitions: Definitions) -> Result<MatchStart, String> {
-        self.world.insert_resource(grid);
-        self.world.insert_resource(definitions);
-        let buildings = setup_economy(&mut self.world)?;
-        let planned = {
-            let grid = self
-                .world
-                .get_resource::<Grid>()
-                .ok_or_else(|| "the simulation has no grid".to_string())?;
-            plan_starting_units(grid, &STARTING_UNITS).map_err(|error| error.to_string())?
-        };
-        let mut units = 0;
-        for (owner, unit_type, cell) in planned {
-            sim::spawn_unit(&mut self.world, owner, unit_type, cell).map_err(|error| {
-                format!(
-                    "starting unit {unit_type:?} at ({}, {}): {error}",
-                    cell.x, cell.y
-                )
-            })?;
-            units += 1;
-        }
-        Ok(MatchStart { buildings, units })
+    /// The match's state: its players, who has been defeated, and its outcome (M6).
+    pub fn match_state(&self) -> Option<&MatchState> {
+        self.world.get_resource::<MatchState>()
+    }
+
+    /// The outcome of the match, once it has ended.
+    pub fn outcome(&self) -> Option<MatchOutcome> {
+        self.match_state().and_then(MatchState::outcome)
+    }
+
+    /// The computer players.
+    pub fn ai(&self) -> Option<&AiPlayers> {
+        self.world.get_resource::<AiPlayers>()
+    }
+
+    /// Whether a match is set up and has not ended: only then do ticks run.
+    pub fn running(&self) -> bool {
+        self.match_state()
+            .is_some_and(|state| !state.players().is_empty() && state.outcome().is_none())
+    }
+
+    /// Installs a match into this simulation, which has none yet (match setup before the first
+    /// tick, D11, D40).
+    fn install(&mut self, plan: &MatchPlan) -> Result<MatchStart, String> {
+        self.world.insert_resource(plan.grid.clone());
+        self.world.insert_resource(plan.definitions.clone());
+        sim::setup_match(
+            &mut self.world,
+            &plan.skirmish,
+            &plan.ai,
+            plan.map,
+            &plan.players,
+        )
+        .map_err(|error| error.to_string())
     }
 
     /// Runs one tick after moving `commands` (the human player's) into the simulation's command
@@ -166,27 +176,45 @@ impl SimHost {
     }
 }
 
-/// What match setup spawned.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct MatchStart {
-    pub buildings: usize,
-    pub units: usize,
+/// Everything a match is set up from (`sim::setup_match`).
+#[derive(Clone, Debug)]
+pub struct MatchPlan {
+    pub grid: Grid,
+    pub definitions: Definitions,
+    pub skirmish: SkirmishDefinitions,
+    pub ai: AiDefinitions,
+    /// The map's index in `skirmish.maps`.
+    pub map: usize,
+    pub players: Vec<PlayerSetup>,
+    /// Seed of the simulation's random number generator.
+    pub seed: u64,
 }
 
-/// The grid of the loaded map, waiting for match setup (inserted by `crate::map::load_map`).
-#[derive(Resource, Debug)]
-pub struct MatchGrid(pub Grid);
+/// Replaces the simulation with a new one in which `plan`'s match is set up (D34 item 4, D40).
+/// On error the previous simulation is kept and nothing in `world` changes.
+pub(crate) fn install_match(world: &mut World, plan: &MatchPlan) -> Result<MatchStart, String> {
+    let mut host = SimHost::new(plan.seed);
+    let start = host.install(plan)?;
+    world.insert_resource(host);
+    world.resource_mut::<CommandSink>().reset();
+    Ok(start)
+}
 
-/// The loaded definitions, waiting for match setup (inserted by
-/// `crate::units::load_match_assets`).
-#[derive(Resource, Debug)]
-pub struct MatchDefinitions(pub Definitions);
+/// Ends the match: the simulation is replaced by one without a match, so no tick runs.
+pub(crate) fn uninstall_match(world: &mut World) {
+    world.insert_resource(SimHost::new(0));
+    let mut sink = world.resource_mut::<CommandSink>();
+    sink.reset();
+    sink.close();
+}
 
 /// Why the sink did not accept a command.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum CommandRefused {
     /// The game is paused; no command is accepted until it resumes.
     Paused,
+    /// The match has ended (M6); no command is accepted until the next match.
+    MatchOver,
     /// [`MAX_PENDING_COMMANDS`] commands already wait for the next tick.
     Full,
 }
@@ -195,6 +223,7 @@ impl fmt::Display for CommandRefused {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Paused => write!(f, "the game is paused"),
+            Self::MatchOver => write!(f, "the match is over"),
             Self::Full => write!(
                 f,
                 "{MAX_PENDING_COMMANDS} commands already wait for the next tick"
@@ -210,6 +239,8 @@ impl fmt::Display for CommandRefused {
 pub struct CommandSink {
     pending: Vec<Command>,
     paused: bool,
+    /// Set when the match has ended (M6).
+    closed: bool,
     /// Commands accepted so far (for the interface's acknowledgement sound).
     accepted: u64,
     /// Commands refused so far (for the interface's error sound).
@@ -219,6 +250,10 @@ pub struct CommandSink {
 impl CommandSink {
     /// Accepts `command` for the next tick.
     pub fn push(&mut self, command: Command) -> Result<(), CommandRefused> {
+        if self.closed {
+            self.refused = self.refused.saturating_add(1);
+            return Err(CommandRefused::MatchOver);
+        }
         if self.paused {
             self.refused = self.refused.saturating_add(1);
             return Err(CommandRefused::Paused);
@@ -267,47 +302,44 @@ impl CommandSink {
     fn take(&mut self) -> Vec<Command> {
         std::mem::take(&mut self.pending)
     }
-}
 
-/// Match setup: installs the loaded map and definitions into the simulation and spawns the
-/// starting players, buildings, and units. Does nothing if the map or the data failed to load
-/// (they have already ended the game with exit code 1).
-pub(crate) fn start_match(world: &mut World) {
-    let (Some(MatchGrid(grid)), Some(MatchDefinitions(definitions))) = (
-        world.remove_resource::<MatchGrid>(),
-        world.remove_resource::<MatchDefinitions>(),
-    ) else {
-        return;
-    };
-    let result = world.resource_scope(|_, mut host: Mut<SimHost>| host.install(grid, definitions));
-    match result {
-        Ok(start) => {
-            info!("{} buildings spawned", start.buildings);
-            info!("{} units spawned", start.units);
-            world.resource_mut::<BuildingStatus>().spawned = start.buildings;
-            world.resource_mut::<UnitStatus>().spawned = start.units;
+    /// Prepares the sink for a new match: no pending command, not paused. The counters keep
+    /// counting, so the interface's sounds answer only commands issued after them.
+    fn reset(&mut self) {
+        self.pending.clear();
+        self.paused = false;
+        self.closed = false;
+    }
+
+    /// Refuses every command from now on (the match has ended); pending commands are discarded
+    /// with a log line naming them.
+    fn close(&mut self) {
+        for command in self.pending.drain(..) {
+            warn!("command not issued: the match is over: {command:?}");
         }
-        Err(error) => {
-            error!("{error}");
-            world.write_message(AppExit::error());
-        }
+        self.closed = true;
     }
 }
 
-/// Advances the simulation by exactly one tick per fixed timestep (20 Hz), unless paused.
+/// Advances the simulation by exactly one tick per fixed timestep (20 Hz) while a match is
+/// running (set up, and not ended), unless paused.
 fn run_tick(
     mut host: ResMut<SimHost>,
     mut sink: ResMut<CommandSink>,
     mut events: MessageWriter<SimEvent>,
     mut exit: MessageWriter<AppExit>,
 ) {
-    if sink.paused {
+    if sink.paused || !host.running() {
         return;
     }
     let commands = sink.take();
     match host.step(commands) {
         Ok(tick_events) => {
             events.write_batch(tick_events);
+            if let Some(outcome) = host.outcome() {
+                info!("the match has ended: {outcome:?}");
+                sink.close();
+            }
         }
         Err(error) => {
             error!("{error}");
@@ -324,28 +356,26 @@ pub(crate) mod tests {
 
     use super::*;
 
-    fn assets_root() -> PathBuf {
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets")
-    }
-
-    /// A host with the demo match installed, as `start_match` installs it.
+    /// A host with the demo match installed, as a match started from the menu with its first
+    /// choices installs it (`crate::skirmish::begin_match`, seed 0).
     pub(crate) fn demo_host() -> SimHost {
-        let grid = sim::load_map(assets_root().join(crate::map::MAP_PATH))
-            .unwrap_or_else(|error| panic!("{error}"))
-            .grid;
-        let (loaded, _) =
-            crate::units::load_match_data(&assets_root()).unwrap_or_else(|error| panic!("{error}"));
-        let mut host = SimHost::new(0);
+        let catalogue = crate::skirmish::tests::production_catalogue();
+        let selection = crate::skirmish::MenuSelection::initial(&catalogue);
+        let plan = MatchPlan {
+            grid: catalogue.maps[selection.map].map.grid.clone(),
+            definitions: catalogue.definitions.clone(),
+            skirmish: catalogue.skirmish.clone(),
+            ai: catalogue.ai.clone(),
+            map: selection.map,
+            players: selection.players().to_vec(),
+            seed: 0,
+        };
+        let mut host = SimHost::new(plan.seed);
         let start = host
-            .install(grid, loaded.definitions)
+            .install(&plan)
             .unwrap_or_else(|error| panic!("{error}"));
-        assert_eq!(
-            start,
-            MatchStart {
-                buildings: crate::buildings::STARTING_BUILDINGS.len(),
-                units: crate::units::starting_unit_total(),
-            }
-        );
+        let (units, buildings) = crate::smoke::starting_totals(&catalogue, selection);
+        assert_eq!(start, MatchStart { buildings, units });
         host
     }
 
@@ -417,7 +447,7 @@ pub(crate) mod tests {
         // simulation resource; the simulation's world is reachable only through `SimHost`, whose
         // `world()` is a shared reference.
         let mut app = App::new();
-        app.add_plugins((MinimalPlugins, SimHostPlugin { seed: 0 }));
+        app.add_plugins((MinimalPlugins, SimHostPlugin));
         let world = app.world();
         assert!(world.contains_resource::<SimHost>());
         assert!(!world.contains_resource::<Players>());
@@ -438,7 +468,7 @@ pub(crate) mod tests {
     #[test]
     fn the_tick_system_does_not_tick_while_paused_and_copies_the_events() {
         let mut app = App::new();
-        app.add_plugins((MinimalPlugins, SimHostPlugin { seed: 0 }));
+        app.add_plugins((MinimalPlugins, SimHostPlugin));
         app.world_mut().insert_resource(demo_host());
         app.world_mut()
             .resource_mut::<CommandSink>()
@@ -459,46 +489,117 @@ pub(crate) mod tests {
 
     #[test]
     fn match_setup_installs_the_loaded_match_or_ends_the_game_with_an_error() {
-        let setup_app = |grid: Grid| {
-            let mut app = App::new();
-            app.add_plugins((MinimalPlugins, SimHostPlugin { seed: 0 }))
-                .init_resource::<BuildingStatus>()
-                .init_resource::<UnitStatus>();
-            let (loaded, _) = crate::units::load_match_data(&assets_root())
-                .unwrap_or_else(|error| panic!("{error}"));
-            app.world_mut().insert_resource(MatchGrid(grid));
-            app.world_mut()
-                .insert_resource(MatchDefinitions(loaded.definitions));
-            app.world_mut().run_system_once(start_match).expect("runs");
-            app
+        // M6: matches start from the menu (`crate::skirmish::begin_match`) with the catalogue's
+        // data; the demo map holds the demo match.
+        let catalogue = crate::skirmish::tests::production_catalogue();
+        let selection = crate::skirmish::MenuSelection::initial(&catalogue);
+        let mut world = World::new();
+        world.init_resource::<CommandSink>();
+        world.insert_resource(SimHost::new(0));
+        assert!(
+            !world.resource::<SimHost>().running(),
+            "no match before setup"
+        );
+        let plan = |grid: Grid| MatchPlan {
+            grid,
+            definitions: catalogue.definitions.clone(),
+            skirmish: catalogue.skirmish.clone(),
+            ai: catalogue.ai.clone(),
+            map: selection.map,
+            players: selection.players().to_vec(),
+            seed: 0,
         };
-        // The demo map holds the demo match.
-        let demo = sim::load_map(assets_root().join(crate::map::MAP_PATH))
-            .unwrap_or_else(|error| panic!("{error}"))
-            .grid;
-        let app = setup_app(demo);
-        assert_eq!(app.should_exit(), None);
-        assert_eq!(
-            app.world().resource::<UnitStatus>().spawned,
-            crate::units::starting_unit_total()
-        );
-        assert_eq!(
-            app.world().resource::<BuildingStatus>().spawned,
-            crate::buildings::STARTING_BUILDINGS.len()
-        );
-        assert!(!app.world().contains_resource::<MatchGrid>());
-        // A 16x16 map cannot hold the starting buildings: the game ends with exit code 1 and
-        // nothing is reported as spawned.
+        let demo = catalogue.maps[selection.map].map.grid.clone();
+        let start = install_match(&mut world, &plan(demo)).expect("the demo match");
+        let (units, buildings) = crate::smoke::starting_totals(&catalogue, selection);
+        assert_eq!(start, MatchStart { buildings, units });
+        assert!(world.resource::<SimHost>().running());
+        // A 16x16 map cannot hold the starting buildings at the demo map's start positions: the
+        // setup fails with an error naming the building, and the previous simulation is kept.
         let small = sim::load_map(
             PathBuf::from(env!("CARGO_MANIFEST_DIR"))
                 .join("../sim/tests/fixtures/maps/open_16x16.tmx"),
         )
         .unwrap_or_else(|error| panic!("{error}"))
         .grid;
-        let app = setup_app(small);
+        let tick_before = world.resource::<SimHost>().tick();
+        let error = install_match(&mut world, &plan(small)).expect_err("too small");
+        assert!(error.contains("starting building"), "{error}");
+        assert!(world.resource::<SimHost>().running());
+        assert_eq!(world.resource::<SimHost>().tick(), tick_before);
+        // Through the game flow: the error ends the game with exit code 1 and nothing is reported
+        // as spawned.
+        let mut app = App::new();
+        app.add_plugins((
+            MinimalPlugins,
+            bevy::asset::AssetPlugin::default(),
+            SimHostPlugin,
+        ))
+        .init_asset::<Image>()
+        .init_resource::<crate::buildings::BuildingStatus>()
+        .init_resource::<crate::units::UnitStatus>()
+        .init_resource::<crate::skirmish::Screen>()
+        .init_resource::<crate::map::MapStatus>()
+        .init_resource::<crate::map::HoveredCell>();
+        let mut small_catalogue = catalogue.clone();
+        small_catalogue.maps[selection.map].map.grid = sim::load_map(
+            PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .join("../sim/tests/fixtures/maps/open_16x16.tmx"),
+        )
+        .unwrap_or_else(|error| panic!("{error}"))
+        .grid;
+        app.world_mut().insert_resource(small_catalogue);
+        crate::skirmish::begin_match(app.world_mut(), selection, 0);
         assert_eq!(app.should_exit(), Some(AppExit::error()));
-        assert_eq!(app.world().resource::<UnitStatus>().spawned, 0);
-        assert_eq!(app.world().resource::<BuildingStatus>().spawned, 0);
+        assert_eq!(
+            app.world().resource::<crate::units::UnitStatus>().spawned,
+            0
+        );
+        assert_eq!(
+            app.world()
+                .resource::<crate::buildings::BuildingStatus>()
+                .spawned,
+            0
+        );
+        assert_eq!(
+            *app.world().resource::<crate::skirmish::Screen>(),
+            crate::skirmish::Screen::Menu
+        );
+        assert!(!app.world().resource::<SimHost>().running());
+    }
+
+    #[test]
+    fn the_sink_refuses_commands_once_the_match_is_over_and_reopens_for_the_next() {
+        let mut sink = CommandSink::default();
+        let stop = Command::Stop {
+            units: vec![SimId(1)],
+        };
+        assert_eq!(sink.push(stop.clone()), Ok(()));
+        sink.close();
+        assert!(
+            sink.pending.is_empty(),
+            "pending commands are discarded, logged"
+        );
+        assert_eq!(sink.push(stop.clone()), Err(CommandRefused::MatchOver));
+        assert_eq!(sink.refused(), 1);
+        sink.toggle_pause();
+        sink.reset();
+        assert!(!sink.paused());
+        assert_eq!(sink.push(stop), Ok(()));
+        // The counters keep counting across matches (the interface's sounds compare them).
+        assert_eq!((sink.accepted(), sink.refused()), (2, 1));
+    }
+
+    #[test]
+    fn ticks_run_only_while_a_match_is_running() {
+        let mut app = App::new();
+        app.add_plugins((MinimalPlugins, SimHostPlugin));
+        // No match: the tick system runs no tick.
+        app.world_mut().run_system_once(run_tick).expect("runs");
+        assert_eq!(app.world().resource::<SimHost>().tick(), 0);
+        app.world_mut().insert_resource(demo_host());
+        app.world_mut().run_system_once(run_tick).expect("runs");
+        assert_eq!(app.world().resource::<SimHost>().tick(), 1);
     }
 
     /// A host on the 32x32 economy fixture map with the combat fixture data, set up by `setup`

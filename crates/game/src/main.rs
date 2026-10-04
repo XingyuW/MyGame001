@@ -21,6 +21,7 @@ mod projection;
 mod selection;
 mod sidebar;
 mod sim_host;
+mod skirmish;
 mod smoke;
 mod tileset_image;
 mod units;
@@ -28,9 +29,6 @@ mod units;
 use bevy::prelude::*;
 use bevy_ecs_tiled::prelude::TiledPlugin;
 use sim::TICKS_PER_SECOND;
-
-/// Seed for the simulation RNG until match setup (M6) chooses one.
-const MATCH_SEED: u64 = 0;
 
 fn main() -> AppExit {
     let options = match cli::parse(std::env::args().skip(1)) {
@@ -58,7 +56,7 @@ fn main() -> AppExit {
             .set(ImagePlugin::default_nearest()),
     )
     .add_plugins(TiledPlugin::default())
-    .add_plugins(sim_host::SimHostPlugin { seed: MATCH_SEED })
+    .add_plugins(sim_host::SimHostPlugin)
     .insert_resource(Time::<Fixed>::from_hz(f64::from(TICKS_PER_SECOND)))
     .add_plugins((
         camera::CameraPlugin,
@@ -72,6 +70,7 @@ fn main() -> AppExit {
         minimap::MinimapPlugin,
         health::HealthBarsPlugin,
         audio::GameAudioPlugin,
+        skirmish::SkirmishPlugin,
     ));
 
     if let Some(frames) = options.smoke_test_frames {

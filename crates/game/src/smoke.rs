@@ -16,6 +16,15 @@
 //! player's credits, the minimap to have been drawn, every sound and the music to exist, and,
 //! in runs of at least [`PAUSE_MIN_FRAMES`] frames, that the game pauses for [`PAUSE_FRAMES`]
 //! frames without a tick and refuses a command meanwhile.
+//!
+//! From M6 the game starts in the menu, and the run plays the game flow the menu's and the end
+//! screen's way, with their pure functions (`crate::skirmish::menu_effect`, `end_effect`): it
+//! requires the menu with all of its buttons, starts the match from it, and, in runs of at least
+//! [`FLOW_MIN_FRAMES`] frames, restarts the match after [`FLOW_TICKS`] ticks, then returns to the
+//! menu after [`FLOW_TICKS`] more and starts again. The checks above apply to the last match, which
+//! has the starting units and buildings of the skirmish file (no more, no fewer views than the
+//! simulation has units and buildings: nothing of the earlier matches is left), and its computer
+//! player must have issued commands once [`AI_CHECK_TICKS`] ticks have run.
 
 use std::collections::BTreeMap;
 
@@ -27,7 +36,7 @@ use sim::{
 };
 
 use crate::audio::{MusicPlayer, Sfx, SoundBank};
-use crate::buildings::{BuildingStatus, BuildingView, STARTING_BUILDINGS, building_shown};
+use crate::buildings::{BuildingStatus, BuildingView, building_shown};
 use crate::construction::{InterfaceMode, production_menu};
 use crate::map::MapStatus;
 use crate::minimap::MinimapState;
@@ -35,7 +44,11 @@ use crate::sidebar::{
     SidebarButton, SidebarEffect, SidebarText, button_effect, credits_text, item_status,
 };
 use crate::sim_host::{CommandRefused, CommandSink, SimHost};
-use crate::units::{HUMAN, UnitStatus, UnitView, starting_unit_total, unit_shown};
+use crate::skirmish::{
+    Catalogue, EndButton, EndEffect, LastMatch, MenuButton, MenuCounts, MenuEffect, MenuRoot,
+    MenuSelection, Screen, begin_match, end_effect, end_match, menu_effect,
+};
+use crate::units::{HUMAN, OPPONENT, UnitStatus, UnitView, unit_shown};
 
 /// The cell of the demo map that the smoke test orders the player's units to (grass, across the
 /// open ground from their starting area).
@@ -53,6 +66,20 @@ pub const PAUSE_MIN_FRAMES: u32 = 300;
 /// Frames the pause lasts.
 pub const PAUSE_FRAMES: u32 = 30;
 
+/// Runs of at least this many frames restart the match, return to the menu, and start again
+/// before the checks (M6).
+pub const FLOW_MIN_FRAMES: u32 = 300;
+
+/// Ticks a match of the game flow runs before the next step.
+pub const FLOW_TICKS: u64 = 10;
+
+/// Ticks of the last match after which its computer player must have issued commands (its first
+/// turn comes within its think interval, at most `sim::MAX_THINK_INTERVAL`).
+pub const AI_CHECK_TICKS: u64 = 60;
+
+/// The seed of the smoke test's matches.
+const SMOKE_SEED: u64 = 6;
+
 pub struct SmokeTestPlugin {
     pub frames: u32,
 }
@@ -66,12 +93,29 @@ impl Plugin for SmokeTestPlugin {
             production: None,
             rejected: false,
             pause: PauseCheck::default(),
+            flow: Flow::default(),
+            menu_buttons: None,
+            starts: 0,
         })
         .add_systems(
             Update,
-            (order_move, order_production, watch_events, check_pause).chain(),
+            (
+                play_flow,
+                order_move,
+                order_production,
+                watch_events,
+                check_pause,
+            )
+                .chain(),
         )
-        .add_systems(Last, (fail_on_asset_load_error, count_frames).chain());
+        .add_systems(
+            Last,
+            (fail_on_asset_load_error, count_frames, fail_on_early_exit)
+                .chain()
+                // Bevy's exit when no window is left (`exit_on_all_closed`) runs in `Last`, in
+                // `ExitSystems`; the early-exit check must see its message.
+                .after(bevy::window::ExitSystems),
+        );
     }
 }
 
@@ -86,6 +130,99 @@ struct SmokeTest {
     production: Option<(u64, Option<ProductionItem>)>,
     rejected: bool,
     pause: PauseCheck,
+    flow: Flow,
+    /// Menu buttons found when the menu was first shown (`None` before).
+    menu_buttons: Option<usize>,
+    /// Matches started.
+    starts: u32,
+}
+
+/// The game flow the smoke test plays (M6).
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+enum Flow {
+    /// In the menu; the first match starts.
+    #[default]
+    Menu,
+    /// The first match runs; it is restarted after [`FLOW_TICKS`] ticks.
+    First,
+    /// The restarted match runs; the game returns to the menu after [`FLOW_TICKS`] ticks.
+    Restarted,
+    /// Back in the menu; the last match starts.
+    MenuAgain,
+    /// The last match runs, and the checks of M1 to M5 apply to it.
+    Last,
+}
+
+/// Plays the game flow: starts, restarts, leaves, and starts the match again, as the menu's and
+/// the end screen's buttons do (their effects are computed by the same pure functions).
+#[allow(clippy::too_many_arguments)]
+fn play_flow(
+    mut commands: Commands,
+    mut smoke: ResMut<SmokeTest>,
+    screen: Res<Screen>,
+    catalogue: Option<Res<Catalogue>>,
+    selection: Res<MenuSelection>,
+    last: Res<LastMatch>,
+    map: Res<MapStatus>,
+    host: Res<SimHost>,
+    menu: Query<&MenuButton>,
+    roots: Query<&Node, With<MenuRoot>>,
+) {
+    let Some(catalogue) = catalogue else {
+        return;
+    };
+    let long = smoke.frames >= FLOW_MIN_FRAMES;
+    let start = |smoke: &mut SmokeTest, commands: &mut Commands, next: Flow| match menu_effect(
+        MenuButton::Start,
+        *selection,
+        MenuCounts::of(&catalogue),
+    ) {
+        MenuEffect::Start(choice) => {
+            commands.queue(move |world: &mut World| begin_match(world, choice, SMOKE_SEED));
+            smoke.starts += 1;
+            smoke.flow = next;
+        }
+        effect => {
+            error!("smoke test failed: the menu's Start button did {effect:?}");
+            smoke.rejected = true;
+            smoke.flow = Flow::Last;
+        }
+    };
+    let settled = map.map_created && host.tick() >= FLOW_TICKS;
+    match (smoke.flow, *screen) {
+        (Flow::Menu, Screen::Menu) => {
+            let shown = roots.iter().any(|node| node.display != Display::None);
+            smoke.menu_buttons = Some(if shown { menu.iter().count() } else { 0 });
+            start(
+                &mut smoke,
+                &mut commands,
+                if long { Flow::First } else { Flow::Last },
+            );
+        }
+        (Flow::First, Screen::Match) if settled => {
+            match end_effect(EndButton::Restart, last.0) {
+                EndEffect::Restart(choice) => {
+                    commands.queue(move |world: &mut World| {
+                        begin_match(world, choice, SMOKE_SEED + 1);
+                    });
+                    smoke.starts += 1;
+                }
+                EndEffect::Menu => {
+                    error!("smoke test failed: Restart went to the menu");
+                    smoke.rejected = true;
+                }
+            }
+            smoke.flow = Flow::Restarted;
+        }
+        (Flow::Restarted, Screen::Match) if settled => {
+            if end_effect(EndButton::Menu, last.0) == EndEffect::Menu {
+                commands.queue(end_match);
+            }
+            smoke.flow = Flow::MenuAgain;
+        }
+        (Flow::MenuAgain, Screen::Menu) => start(&mut smoke, &mut commands, Flow::Last),
+        _ => {}
+    }
 }
 
 /// The pause the smoke test makes (M5).
@@ -111,7 +248,7 @@ enum PauseCheck {
 /// Pauses the game in the middle of a long enough run, pushes a command that must be refused,
 /// and resumes after [`PAUSE_FRAMES`] frames.
 fn check_pause(mut smoke: ResMut<SmokeTest>, mut sink: ResMut<CommandSink>, host: Res<SimHost>) {
-    if smoke.frames < PAUSE_MIN_FRAMES {
+    if smoke.frames < PAUSE_MIN_FRAMES || smoke.flow != Flow::Last {
         return;
     }
     let frame = smoke.rendered;
@@ -172,7 +309,7 @@ fn order_production(
     host: Res<SimHost>,
     mut sink: ResMut<CommandSink>,
 ) {
-    if smoke.production.is_some() || status.spawned == 0 {
+    if smoke.production.is_some() || status.spawned == 0 || smoke.flow != Flow::Last {
         return;
     }
     let (Some(definitions), Some(state)) = (
@@ -226,7 +363,7 @@ fn order_move(
     host: Res<SimHost>,
     mut sink: ResMut<CommandSink>,
 ) {
-    if smoke.order.is_some() || status.spawned == 0 {
+    if smoke.order.is_some() || status.spawned == 0 || smoke.flow != Flow::Last {
         return;
     }
     let start: BTreeMap<SimId, SubPos> = host
@@ -250,10 +387,34 @@ fn order_move(
 
 fn watch_events(mut smoke: ResMut<SmokeTest>, mut events: MessageReader<SimEvent>) {
     for event in events.read() {
-        if let SimEvent::CommandRejected { reason, .. } = event {
+        // The computer player's rejections are logged by `crate::units`; the smoke test's own
+        // commands are the human player's.
+        if let SimEvent::CommandRejected { player, reason, .. } = event
+            && *player == HUMAN
+        {
             error!("smoke test failed: a command of the smoke test was rejected: {reason}");
             smoke.rejected = true;
         }
+    }
+}
+
+/// Whether a run that exits after `rendered` of `frames` frames ended before its checks ran (for
+/// example because its window was closed, which makes Bevy exit with success).
+pub fn exits_early(rendered: u32, frames: u32) -> bool {
+    rendered < frames
+}
+
+/// Turns an exit before the last frame (Bevy exits with success when no window is left, for
+/// example when a display is removed) into a failure, so that a run passes only after its checks
+/// (M6; found when a debug smoke run exited with code 0 after a monitor was removed).
+fn fail_on_early_exit(smoke: Res<SmokeTest>, mut exits: ResMut<Messages<AppExit>>) {
+    let exiting = exits.iter_current_update_messages().next().is_some();
+    if exiting && exits_early(smoke.rendered, smoke.frames) {
+        error!(
+            "smoke test failed: the application exited after {} of {} frames",
+            smoke.rendered, smoke.frames
+        );
+        exits.write(AppExit::error());
     }
 }
 
@@ -349,12 +510,21 @@ fn count_frames(
     sounds: Option<Res<SoundBank>>,
     views: ViewQueries,
     interface: InterfaceQueries,
+    flow: (Option<Res<Catalogue>>, Res<LastMatch>),
     mut exit: MessageWriter<AppExit>,
 ) {
-    smoke.rendered += 1;
-    if smoke.rendered < smoke.frames {
+    smoke.rendered = smoke.rendered.saturating_add(1);
+    // The checks run once, at the last frame. The runner exits after it, but may update once more
+    // first (`bevy_winit` checks for `AppExit` only when its event loop is about to wait); the
+    // exit message of the last frame is still read then.
+    if smoke.rendered != smoke.frames {
         return;
     }
+    let (catalogue, last) = flow;
+    let (expected_units, expected_buildings) = match (catalogue.as_deref(), last.0) {
+        (Some(catalogue), Some(selection)) => starting_totals(catalogue, selection),
+        _ => (0, 0),
+    };
     let empty = Players::default();
     let players = host.players().unwrap_or(&empty);
     let tick = host.tick();
@@ -413,6 +583,23 @@ fn count_frames(
         Some((at, item)) => (item.is_some(), tick.saturating_sub(at)),
         None => (false, 0),
     };
+    let count = |world: &World, buildings: bool| {
+        world
+            .try_query::<(&SimId, Option<&Building>)>()
+            .map_or(0, |mut entities| {
+                entities
+                    .iter(world)
+                    .filter(|(_, building)| building.is_some() == buildings)
+                    .count()
+            })
+    };
+    let (sim_units, sim_buildings) = (count(host.world(), false), count(host.world(), true));
+    let (unit_view_count, building_view_count) =
+        (unit_views.iter().count(), building_views.iter().count());
+    let ai_commands = host
+        .ai()
+        .and_then(|ai| ai.controller(OPPONENT))
+        .map_or(0, |controller| controller.commands_issued());
     info!(
         "smoke test: {} frames, {} simulation ticks, map created: {}, units spawned: {}, \
          units moved: {moved} in {ticks_since_order} ticks after the order, buildings spawned: \
@@ -421,7 +608,9 @@ fn count_frames(
          {mismatches}, sidebar items: {sidebar_items} of {expected_items}, sidebar buttons outside the \
          window: {buttons_outside}, sidebar credits: \
          {credits_shown:?}, minimap drawings: {}, minimap pixels lit: {}, sounds: {}, music \
-         players: {}, pause: {:?}",
+         players: {}, pause: {:?}, menu buttons: {:?}, matches started: {}, flow: {:?}, views: \
+         {unit_view_count} of {sim_units} units and {building_view_count} of {sim_buildings} \
+         buildings, computer player's commands: {ai_commands}",
         smoke.rendered,
         tick,
         map.map_created,
@@ -431,18 +620,21 @@ fn count_frames(
         minimap.lit_pixels,
         sounds,
         music.iter().count(),
-        smoke.pause
+        smoke.pause,
+        smoke.menu_buttons,
+        smoke.starts,
+        smoke.flow
     );
     let failures = smoke_failures(&SmokeOutcome {
         frames: smoke.frames,
         map_created: map.map_created,
         spawned: status.spawned,
-        expected_units: starting_unit_total(),
+        expected_units,
         rejected: smoke.rejected,
         ticks_since_order,
         moved,
         buildings: buildings.spawned,
-        expected_buildings: STARTING_BUILDINGS.len(),
+        expected_buildings,
         production_ordered: production_ordered || smoke.production.is_none(),
         ticks_since_production,
         charged,
@@ -465,6 +657,17 @@ fn count_frames(
                 refused,
             } => Some((ticks_while_paused, refused)),
         },
+        menu_buttons: smoke.menu_buttons.unwrap_or(0),
+        flow_done: smoke.flow == Flow::Last,
+        starts: smoke.starts,
+        expected_starts: if smoke.frames >= FLOW_MIN_FRAMES {
+            3
+        } else {
+            1
+        },
+        views: (unit_view_count, building_view_count),
+        simulated: (sim_units, sim_buildings),
+        ai_commands,
     });
     if failures.is_empty() {
         exit.write(AppExit::Success);
@@ -521,6 +724,41 @@ struct SmokeOutcome {
     /// refused; `None` if a run long enough to pause did not complete its pause, and
     /// `Some((0, true))` for a run too short to pause.
     pause: Option<(u64, bool)>,
+    /// Buttons of the menu shown when the run started (M6).
+    menu_buttons: usize,
+    /// Whether the game flow reached the last match.
+    flow_done: bool,
+    /// Matches started, and how many the run's length calls for.
+    starts: u32,
+    expected_starts: u32,
+    /// Unit and building views, and the simulation's units and buildings.
+    views: (usize, usize),
+    simulated: (usize, usize),
+    /// Commands the computer player pushed in the last match.
+    ai_commands: u64,
+}
+
+/// Buttons of the menu: previous and next for each of its rows, Start, and Quit.
+pub const MENU_BUTTONS: usize = crate::skirmish::Row::ALL.len() * 2 + 2;
+
+/// The starting units and buildings of a match with `selection`: those of both players'
+/// factions (the skirmish file, M6).
+pub fn starting_totals(catalogue: &Catalogue, selection: MenuSelection) -> (usize, usize) {
+    selection
+        .players()
+        .iter()
+        .filter_map(|setup| catalogue.skirmish.factions.get(setup.faction))
+        .fold((0, 0), |(units, buildings), faction| {
+            (
+                units
+                    + faction
+                        .units
+                        .iter()
+                        .map(|group| group.count as usize)
+                        .sum::<usize>(),
+                buildings + faction.buildings.len(),
+            )
+        })
 }
 
 /// The reasons a smoke run fails; empty if it passes.
@@ -604,6 +842,30 @@ fn smoke_failures(outcome: &SmokeOutcome) -> Vec<String> {
             outcome.music_players
         ));
     }
+    if outcome.menu_buttons != MENU_BUTTONS {
+        failures.push(format!(
+            "the menu showed {} of {MENU_BUTTONS} buttons",
+            outcome.menu_buttons
+        ));
+    }
+    if !outcome.flow_done || outcome.starts != outcome.expected_starts {
+        failures.push(format!(
+            "{} of {} matches started, the game flow did not reach the last one",
+            outcome.starts, outcome.expected_starts
+        ));
+    }
+    if outcome.ticks > 0 && outcome.views != outcome.simulated {
+        failures.push(format!(
+            "{} unit and {} building views for {} units and {} buildings",
+            outcome.views.0, outcome.views.1, outcome.simulated.0, outcome.simulated.1
+        ));
+    }
+    if outcome.ticks >= AI_CHECK_TICKS && outcome.ai_commands == 0 {
+        failures.push(format!(
+            "the computer player issued no command in {} ticks",
+            outcome.ticks
+        ));
+    }
     match outcome.pause {
         None => failures.push("the pause did not end within the run".to_string()),
         Some((ticks, _)) if ticks > 0 => {
@@ -619,6 +881,8 @@ fn smoke_failures(outcome: &SmokeOutcome) -> Vec<String> {
 
 #[cfg(test)]
 mod tests {
+    use bevy::ecs::system::RunSystemOnce;
+
     use super::*;
 
     const PASSING: SmokeOutcome = SmokeOutcome {
@@ -646,6 +910,13 @@ mod tests {
         sounds_complete: true,
         music_players: 1,
         pause: Some((0, true)),
+        menu_buttons: MENU_BUTTONS,
+        flow_done: true,
+        starts: 3,
+        expected_starts: 3,
+        views: (26, 2),
+        simulated: (26, 2),
+        ai_commands: 4,
     };
 
     #[test]
@@ -716,23 +987,22 @@ mod tests {
 
     #[test]
     fn the_demo_player_can_queue_a_building_with_its_starting_buildings() {
-        let root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets");
-        let definitions = sim::load_definitions(
-            root.join(crate::units::UNITS_PATH),
-            root.join(crate::buildings::ECONOMY_PATH),
-        )
-        .unwrap_or_else(|error| panic!("{error}"));
-        let owned: Vec<BuildingKind> = STARTING_BUILDINGS
+        // M6: the human player's starting buildings are those of its faction in the skirmish file
+        // (the menu's first choice, D40).
+        let catalogue = crate::skirmish::tests::production_catalogue();
+        let selection = MenuSelection::initial(&catalogue);
+        let definitions = &catalogue.definitions;
+        let owned: Vec<BuildingKind> = catalogue.skirmish.factions[selection.faction]
+            .buildings
             .iter()
-            .filter(|(owner, ..)| *owner == HUMAN)
-            .filter_map(|(_, building_type, _)| definitions.building_kind(building_type))
+            .map(|building| building.kind)
             .collect();
-        let item = first_queueable(&definitions, &owned).expect("something to queue");
+        let item = first_queueable(definitions, &owned).expect("something to queue");
         let terms = definitions.production(item).expect("terms");
         assert!(terms.prerequisites.is_empty());
         // At least one credit is charged on the first tick, so the smoke check can see it.
         assert!(terms.cost / i64::from(terms.build_time) > 0 || terms.build_time == 1);
-        assert_eq!(first_queueable(&definitions, &[]), None);
+        assert_eq!(first_queueable(definitions, &[]), None);
     }
 
     #[test]
@@ -764,7 +1034,102 @@ mod tests {
 
     #[test]
     fn the_demo_match_expects_all_of_its_starting_units() {
-        assert_eq!(starting_unit_total(), 12 + 6 + 5 + 3);
+        // M6: the expected starting units and buildings are those of both factions of the menu's
+        // choice (the skirmish file, D40), and match setup spawns exactly them.
+        let catalogue = crate::skirmish::tests::production_catalogue();
+        let selection = MenuSelection::initial(&catalogue);
+        let (units, buildings) = starting_totals(&catalogue, selection);
+        let factions = &catalogue.skirmish.factions;
+        let players = selection.players();
+        let expected: u32 = players
+            .iter()
+            .flat_map(|setup| &factions[setup.faction].units)
+            .map(|group| group.count)
+            .sum();
+        assert_eq!(units, expected as usize);
+        assert_eq!(
+            buildings,
+            players
+                .iter()
+                .map(|setup| factions[setup.faction].buildings.len())
+                .sum::<usize>()
+        );
+        assert!(units > 0 && buildings > 0);
+        let host = crate::sim_host::tests::demo_host();
+        let world = host.world();
+        let mut query = world.try_query::<(&SimId, &Owner)>().expect("registered");
+        assert_eq!(query.iter(world).count(), units + buildings);
+    }
+
+    #[test]
+    fn a_run_passes_only_with_the_menu_the_game_flow_and_the_computer_player() {
+        let fails = |outcome: SmokeOutcome| smoke_failures(&outcome);
+        assert_eq!(
+            fails(SmokeOutcome {
+                menu_buttons: 0,
+                ..PASSING
+            }),
+            [format!("the menu showed 0 of {MENU_BUTTONS} buttons")]
+        );
+        assert_eq!(
+            fails(SmokeOutcome {
+                flow_done: false,
+                starts: 2,
+                ..PASSING
+            }),
+            ["2 of 3 matches started, the game flow did not reach the last one"]
+        );
+        assert_eq!(
+            fails(SmokeOutcome {
+                starts: 1,
+                ..PASSING
+            })
+            .len(),
+            1
+        );
+        // A short run starts one match.
+        assert!(
+            fails(SmokeOutcome {
+                frames: 100,
+                starts: 1,
+                expected_starts: 1,
+                pause: Some((0, true)),
+                ..PASSING
+            })
+            .is_empty()
+        );
+        // Views of an earlier match left behind, or missing.
+        assert_eq!(
+            fails(SmokeOutcome {
+                views: (27, 2),
+                ..PASSING
+            }),
+            ["27 unit and 2 building views for 26 units and 2 buildings"]
+        );
+        assert_eq!(
+            fails(SmokeOutcome {
+                views: (26, 1),
+                ..PASSING
+            })
+            .len(),
+            1
+        );
+        assert_eq!(
+            fails(SmokeOutcome {
+                ai_commands: 0,
+                ..PASSING
+            }),
+            ["the computer player issued no command in 198 ticks"]
+        );
+        // Too few ticks to require the computer player's commands.
+        assert!(
+            fails(SmokeOutcome {
+                ticks: AI_CHECK_TICKS - 1,
+                ai_commands: 0,
+                ..PASSING
+            })
+            .is_empty()
+        );
     }
 
     #[test]
@@ -838,6 +1203,33 @@ mod tests {
             }),
             ["0 entities play the music, expected 1"]
         );
+    }
+
+    #[test]
+    fn an_exit_before_the_last_frame_fails_the_run() {
+        assert!(exits_early(0, 600));
+        assert!(exits_early(599, 600));
+        assert!(!exits_early(600, 600));
+        // An exit message written in the last frame, before or after the checks, fails the run
+        // only if it came early.
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins).add_message::<AppExit>();
+        app.insert_resource(SmokeTest {
+            frames: 10,
+            rendered: 3,
+            order: None,
+            production: None,
+            rejected: false,
+            pause: PauseCheck::default(),
+            flow: Flow::default(),
+            menu_buttons: None,
+            starts: 0,
+        });
+        app.world_mut().write_message(AppExit::Success);
+        app.world_mut()
+            .run_system_once(fail_on_early_exit)
+            .expect("runs");
+        assert_eq!(app.should_exit(), Some(AppExit::error()));
     }
 
     #[test]
