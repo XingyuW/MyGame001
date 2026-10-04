@@ -9,7 +9,7 @@
 | M4: Combat and fog of war | **Reviewed**: review 2 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 1 P2) after review 1 NO-GO; merged into `main`. Awaiting user verification for `m4-approved` | `milestone/m4` | `m4-reviewed` |
 | M5: Interface and audio | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 5 P2); merged into `main`. Awaiting user verification for `m5-approved` | `milestone/m5` | `m5-reviewed` |
 | M6: Skirmish AI and game flow | **Reviewed**: review 2 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 2 P2) after review 1 NO-GO; merged into `main`. Awaiting user verification for `m6-approved` | `milestone/m6` | `m6-reviewed` |
-| M7: Content, balance, performance, and packaging | Not started | | |
+| M7: Content, balance, performance, and packaging | Implemented, awaiting independent review | `milestone/m7` | |
 
 ## M0 implementation report (2026-10-03)
 
@@ -2311,3 +2311,159 @@ Run `cargo run --release -p game` with sound on. These are the 13 M6 items of th
 
 The earlier pending items (16 for M5, 9 for M4, 10 for M3, 7 for M2, and 5 for M1) remain, with the M6 starting setup noted in the implementation report.
 
+## M7 implementation report (2026-10-04)
+
+Branch `milestone/m7`, based on `main` at the merge of M6 (tag `m6-reviewed`, `8f24652`). Commits: `51fab5d` (sim: faction rosters, the computer player's plan per faction, the M7 sim tests, the `m4_combat` file race), `c8e031e` (content and game: the second faction, the full roster, two new maps, generated sprites and tilesets, the balance pass, the roster in the sidebar, options with a settings file, the minimap fix, the smoke test's M7 checks, the M7 game tests), `53d0202` (the benchmark, the soak test, the macOS package script, the dev-profile optimisation of `sim`, the README), `b1e11a2` (the factions and difficulty in the log line of a match start), and the documentation commit that adds this report. Each commit builds; the tests pass on the last. Decisions: DECISIONS "M7: content, balance, performance, and packaging" (A1 follow-up, D48 to D57, notes on D1, D6, D25, D36, D38, D40, D42, D44) and the corrected citation of M3 review 1 P2-3.
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `crates/sim/src/skirmish_defs.rs` | Skirmish file schema version 2: `roster_buildings`, `roster_units` per faction; `FactionDef::roster`, `offers`; `MAX_ROSTER_ENTRIES` (D48) |
+| `crates/sim/src/economy.rs`, `economy_commands.rs`, `command.rs` | `PlayerState` roster (`offers`, `roster`), `Players::add_with_roster`, the roster in the hash; `RejectReason::NotInRoster`, checked in `QueueProduction` after `UnknownItem` (D48) |
+| `crates/sim/src/ai_defs.rs`, `ai.rs`, `match_setup.rs`, `lib.rs` | `AiPlan`, `AiDefinitions::plan_for`; the plan checks factored into `check_plan` and applied to every faction's plan; `check_ai_factions` also rejects dead entries; `faction_plan_problem`; controllers follow and hash their plan; `MatchSetupError::AiPlan`; match setup gives players their rosters; exports (D49) |
+| `crates/sim/tests/fixtures/data/skirmish.ron` | Schema version 2; both fixture factions offer every item |
+| `crates/sim/tests/m7_factions.rs` (new) | 7 tests of rosters and plans |
+| `crates/sim/tests/m6_definitions.rs`, `m4_combat.rs` | The skirmish schema version case (now 2; versions 1 and 3 rejected); a file per call of the extreme scenario (M5 review 1 P2-4) |
+| `crates/sim/examples/m7_benchmark.rs`, `m7_soak.rs` (new) | The benchmark and the soak test (D55, D56) |
+| `assets/data/{units,economy,combat,skirmish,ai}.ron` | The full roster of both factions, the rosters, three maps, the balance pass (D50, D51) |
+| `assets/maps/crossroads/*`, `assets/maps/riverlands/*` (new) | Generated maps and textured tilesets |
+| `assets/sprites/units/*.png` (8 new), `assets/sprites/buildings/{tech_center,rocket_tower}.png` (new) | Generated sprites |
+| `assets/licenses/FiraMono-OFL.txt` (new), `assets/LICENSES.md` | The OFL text of the embedded font; every new file recorded |
+| `crates/game/examples/gen_maps.rs` (new), `gen_unit_sprites.rs`, `gen_building_sprites.rs` | Generators of the new maps and sprites (the earlier sprites are byte-identical) |
+| `crates/game/src/options.rs` (new) | Options, the settings file and its parser, the options screen; 4 tests (D52) |
+| `crates/game/src/sidebar.rs`, `smoke.rs` | Roster-aware item status and display; the smoke test's last match with the second faction, roster, options, and settings checks; 2 tests |
+| `crates/game/src/skirmish.rs` | The Options button; factions in the match log line; the production-data test; the M6 loader test's stimulus |
+| `crates/game/src/{camera,audio,main,minimap}.rs` | Edge scrolling and scroll speed from the options; the options plugin and its smoke path; the minimap's scale of at least 2 and its coverage test |
+| `crates/game/tests/m7_maps.rs` (new), `m6_production_matches.rs` | 5 map tests; every faction pairing (108 matches) |
+| `Cargo.toml` | `[profile.dev.package.sim] opt-level = 3` (D53) |
+| `scripts/package_macos.sh` (new), `README.md` | The release package (D54); building, packaging, and controls |
+| `docs/DECISIONS.md`, `docs/STATUS.md` | Decisions D48 to D57; this report |
+
+`Cargo.lock` and the crates' manifests are unchanged (no dependency added or changed, I9); `cargo tree -p sim -e normal` contains no rendering, windowing, audio, or input crate (I1). `PLAN.md` is unchanged.
+
+### Validation commands (PLAN.md section 9, with section 12 item 5 and the M7 commands)
+
+Run from the repository root on macOS 27.0.1 (Apple M5, Rust 1.98.1), in this order, in the foreground, one after the other, on the tree of `b1e11a2` (the documentation commit changes no code). A display and an audio device were available. Peak memory footprints are those `/usr/bin/time -l` reports for the command (the `cargo` process tree).
+
+| Command | Exit | Result |
+|---------|------|--------|
+| `cargo fmt --all -- --check` | 0 | no diff |
+| `cargo clippy --workspace --all-targets -- -D warnings` | 0 | no warnings |
+| `cargo test --workspace` | 0 | 414 passed, 0 failed, 0 ignored (breakdown below); 189 s; peak footprint 0.13 GB. Known M0 linker warning only. |
+| `cargo build --release -p game` | 0 | |
+| `cargo run --release -p game -- --smoke-test 600` | 0 | three matches (`demo (seed 6): vanguard against vanguard (normal)`, `(seed 7)` the same, `(seed 6): meridian against vanguard (normal)`, 2 buildings and 18 units each); `smoke test: 600 frames, 168 simulation ticks, map created: true, units spawned: 18, units moved: 9 in 168 ticks after the order, buildings spawned: 2, production charged 336 credits in 168 ticks, visible cells: 360, enemy views shown: 0, view mismatches: 0, sidebar items: 19 of 19, sidebar buttons outside the window: 0, sidebar credits: Some("Credits  4664"), minimap drawings: 169, minimap pixels lit: 1892, sounds: 9, music players: 1, pause: Done { ticks_while_paused: 0, refused: true }, menu buttons: Some(11), matches started: 3, flow: Last, views: 18 of 18 units and 2 of 2 buildings, computer player's commands: 2 (0 rejected), items outside the roster shown: 0, options buttons: 11, settings saved: true`; peak 0.17 GB |
+| `cargo run -p game -- --smoke-test 600` | 0 | the same three matches; `smoke test: 600 frames, 180 simulation ticks, …, units moved: 9 in 180 ticks after the order, …, production charged 360 credits in 180 ticks, visible cells: 352, …, sidebar credits: Some("Credits  4640"), minimap drawings: 178, minimap pixels lit: 1892, …, menu buttons: Some(11), matches started: 3, flow: Last, views: 18 of 18 units and 2 of 2 buildings, computer player's commands: 2 (0 rejected), items outside the roster shown: 0, options buttons: 11, settings saved: true`; peak 0.17 GB |
+| `cargo run --release -p sim --example m7_benchmark` | 0 | `fixture: 200 units spawned; mean tick 0.075 ms, longest tick 0.574 ms; mean over the 494 ticks with at least 150 units alive 0.239 ms; units alive every 500 ticks [200, 147, 34, 28, 28]; 28 units moved, 2617 shots, 172 units destroyed`; `shipped: 200 units spawned; mean tick 0.159 ms, longest tick 0.854 ms; mean over the 602 ticks with at least 150 units alive 0.364 ms; units alive every 500 ticks [200, 163, 95, 55, 55]; 55 units moved, 1192 shots, 145 units destroyed`; `peak heap in use: 0.6 MiB`; `m7 benchmark: passed` (budget: mean ≤ 5 ms, longest ≤ 50 ms, D55) |
+| `cargo run --release -p sim --example m7_soak` | 0 | 44 configurations, each 36,000 ticks played twice with equal hashes; `m7 soak: 3168000 ticks in 150.5 s; peak heap in use 1.6 MiB (budget 1024 MiB)`; 223 matches (179 ended within the soak); `m7 soak: passed` (D56) |
+| `sh scripts/package_macos.sh` | 0 | `target/package/MyGame001.app` (116 MB, assets and licences beside the executable) and `MyGame001-macos.zip` (30.5 MB); the packaged executable's smoke test, started from a temporary directory without `BEVY_ASSET_ROOT` and `CARGO_MANIFEST_DIR`, passed with the same checks as above (168 ticks, `settings saved: true`) |
+
+Test breakdown:
+
+* `game`: unit 122 (M6: 114; + options 4, sidebar 1, smoke 1, minimap 1, skirmish 1); integration `m0_spike` 6, `m1_demo_map` 3, `m1_tileset_image` 6, `m2_unit_sprites` 5, `m3_building_sprites` 3, `m6_production_matches` 1 (119.5 s, now 108 matches), `m7_maps` 5 (new).
+* `sim`: unit 11; integration `m0_bootstrap` 12, `m1_map` 32, `m1_map_subset` 24, `m2_definitions` 14, `m2_movement` 37 (14.7 s), `m3_definitions` 11, `m3_economy` 21, `m3_harvest` 10, `m4_combat` 32, `m4_definitions` 12, `m5_placement_preview` 2, `m6_ai` 11 (39.3 s; every shipped map is now three maps), `m6_definitions` 14, `m6_match` 13, `m7_factions` 7 (new).
+* doc-tests 0.
+
+The `Skipped event Destroyed` warning (M0 debt item 2) appeared in the release smoke run. Additional runs: the unpackaged `target/release/game --smoke-test 30` started outside the repository without the cargo variables exits 1 naming `target/release/assets/data/units.ron` (the reason for the package layout); the benchmark with its mean budget set to 1 µs and the soak with its unit limit set to 1 each exit 1 with the reasons (both restored); the release binary with `HOME` pointing to scratch directories whose settings file was a named pipe, 10 MB, or `master_volume = 99` logged the typed warning each time and kept running with the defaults (killed by the 10 s alarm, exit 142), leaving the invalid file unchanged.
+
+### M7 validation commands added to section 9
+
+PLAN.md section 9: "From M7 the benchmark and soak commands defined in that milestone are added." Run from the repository root; each exits with code 0 on success and non-zero when the budget or the soak fails (DECISIONS D55, D56):
+
+```
+cargo run --release -p sim --example m7_benchmark
+cargo run --release -p sim --example m7_soak
+```
+
+The release package of M7's scope is built and checked by a third command, which exits non-zero if the build, the package, or the packaged executable's smoke test fails (D54); it needs a display, like the smoke tests:
+
+```
+sh scripts/package_macos.sh
+```
+
+### Acceptance criteria and required tests (PLAN.md section 7, M7)
+
+| Criterion | Evidence |
+|-----------|----------|
+| Scope: the second faction | The Meridian beside the Vanguard (D50 item 1); rosters in the skirmish file, schema 2 (D48); `NotInRoster` validation; the computer player's plan per faction (D49); `m7_factions` (7 tests); the menu's faction rows offer both; the smoke run's last match is played by the Meridian (`meridian against vanguard`, `items outside the roster shown: 0`). On screen **requires user verification** |
+| Scope: the full roster | 11 unit types and 8 building types (D50 item 1); every one in some roster (`every_production_data_file_loads_passes_cross_validation_and_is_licensed`), with a sprite (catalogue load, `m2_unit_sprites`, `m3_building_sprites`) |
+| Scope: three maps | `demo`, `crossroads`, `riverlands` in the skirmish file; `m7_maps` (5 tests); every map plays in `m6_production_matches`, `m6_ai`, the soak, and the catalogue's trial setups |
+| Scope: final or licensed art and audio with entries in `assets/LICENSES.md` | All art generated by the repository's examples and all audio synthesised (D50 item 3); every file under `assets/` is recorded in `assets/LICENSES.md`, checked by the production-data test; the one third-party file is the OFL licence text with its source. **Whether the generated art and audio count as final requires user verification** (not decidable by a test; no licensed third-party media were added) |
+| Scope: a balance pass | D51: criteria, method, values, and the result over all 108 AI pairings (0 without a winner, longest 29,984 ticks; factions 26 to 28; harder difficulty 57 of 72) |
+| Scope: options | D52; options screen from the menu; settings file with its own bounded parser; `options` tests (4); the smoke test's round trip (`settings saved: true`); hostile-file probes above |
+| Scope: release builds | D54; `scripts/package_macos.sh` exits 0 with the packaged smoke test passing; resolves M0 debt item 7 and the M5 review's OFL note |
+| Scope: a README with controls | `README.md`: factions, maps, building, packaging, controls (camera, units, base and production, game), validation, licences |
+| Test: every production data file loads and passes cross validation | `skirmish::tests::every_production_data_file_loads_passes_cross_validation_and_is_licensed`: the catalogue (every data file through its subset checker, every map with its tileset image, every sprite, `check_catalogue` with the AI file against every roster and a trial setup of every menu match); the data directory holds exactly the five loaded files; every map directory but the M0 spike is a menu map; every sprite is named by a definition; every asset file is in `assets/LICENSES.md` |
+| Test: a headless benchmark with 200 moving and fighting units reports the mean and maximum tick time against the budget recorded in DECISIONS (mean ≤ 5 ms in release) | `m7_benchmark` (D55): two scenarios of 200 units; mean 0.075 / 0.159 ms, longest 0.574 / 0.854 ms; budget mean ≤ 5 ms and longest ≤ 50 ms; exit 0 |
+| Test: a soak test of 36,000 ticks (30 minutes of game time) AI against AI | `m7_soak` (D56): 44 configurations × 36,000 ticks, twice each, with per-tick I6, I7, explained-rejection, and bound checks and equal hashes; exit 0 |
+| Test: the release build passes the smoke test | `cargo run --release -p game -- --smoke-test 600` exit 0, and the packaged release executable's smoke test inside `scripts/package_macos.sh` exit 0 |
+| Acceptance: version 1.0 as defined in section 1 (a desktop executable for macOS that offers skirmish on at least three maps with two factions against an AI opponent, with a clear win and lose condition) | The package above; three maps, two factions, three difficulties; the win condition of D41 and the end screen of D44; the computer players finish every one of the 108 pairings. **Requires user verification** (playing complete matches) |
+| Section 8: positive, negative, boundary, regression, integration, end to end | Positive: roster loading, plans, options round trip, maps; negative: roster entries unknown, unproducible, duplicate, too many, missing, `NotInRoster` without a state change, incomplete plans (7 cases), malformed settings (19 cases), hostile settings files; boundary: an empty roster, 64-entry limit, settings at exactly 4,096 bytes, every option at both ends, the minimap from 1 × 1 to 256 × 256 across W + H = 128/129, the benchmark's and soak's limits; regression: M5 review 1 P2-2 (fails with the old scale) and P2-4; integration: `m7_factions` through `setup_match`, `SimPlugin`, and `CommandQueue`; end to end: the 108 production matches, the soak, the benchmark, three smoke runs |
+| Invariants | I1/I9: no dependency change. I2: no float in `sim` (the plans and rosters are kinds and sets). I3: rosters and plans hashed; equal hashes on every tick of two runs (`m7_factions`, the soak). I4: `BTreeSet` rosters, filtered lists in file order; `the_game_systems_share_no_state_without_an_order` now includes the options and the `Last` schedule. I5: the options and the interface change the simulation only through `CommandSink`; rosters are match setup. I6/I7: checked on every tick of the soak. I8/I11: the skirmish file through the RON subset; the settings file through the game's own bounded parser (no third-party parser); typed errors throughout. I10: the plan's tests and one benchmark scenario use fixture data; the production tests check properties of the shipped game. I12: no new overflow-prone arithmetic in `sim`; dev builds keep overflow checks (D53) |
+
+### Assumptions verified and how
+
+| Item | Verification |
+|------|--------------|
+| Bevy's asset directory for a packaged executable (D1) | `bevy_asset-0.19.1/src/io/file/mod.rs:19-29`; the packaged executable's smoke test passes when started elsewhere without the variables, and the unpackaged one fails naming the path it looked in |
+| A package override of `opt-level` keeps overflow checks | `cargo build -v` flags (`-C opt-level=3 -C debug-assertions=on`); a scratch crate with the override panics on `255u8 + 1` in the dev profile |
+| The FiraMono licence text | `bevy_feathers-0.19.1/src/assets/fonts/FiraMono-LICENSE` (resolved in `Cargo.lock`), copied byte for byte (same SHA-256); `bevy` 0.19.1 `CREDITS.md` names FiraMono under the OFL 1.1 |
+| No dependency change | `git diff 8f24652 -- Cargo.lock crates/*/Cargo.toml` is empty; the root `Cargo.toml` gains only the profile section |
+| The new maps are inside the supported subset (D13, D16) | Loaded by `sim::load_map` and their tilesets by `check_tileset_image` in `m7_maps`; the catalogue registers only their checked bytes |
+
+### Deviations from PLAN.md
+
+1. **Skirmish file schema version 2** (D48), with the fixture and the shipped file updated in the same change, as section 10 requires. The AI file keeps version 1; its lists are filtered per faction (D49).
+2. **Files not listed in PLAN.md section 4:** `scripts/package_macos.sh`, `assets/licenses/FiraMono-OFL.txt`, `crates/sim/examples/m7_benchmark.rs`, `m7_soak.rs`, `crates/game/examples/gen_maps.rs`, `crates/game/src/options.rs`, the M7 tests. The benchmark and soak are examples of `sim` (run with `cargo run --release -p sim --example …`), because their budget applies to release builds and they must not run in `cargo test`'s debug profile.
+3. **A third added validation command** (the package script) beside the benchmark and the soak.
+4. **The dev profile optimises `sim`** (D53); debug assertions and overflow checks stay on.
+5. **New public API of `sim`:** `AiPlan`, `AiDefinitions::plan_for`, `AiController::plan`, `FactionDef::roster`/`offers`, `PlayerState::offers`/`roster`, `Players::add_with_roster`, `MAX_ROSTER_ENTRIES`, `RejectReason::NotInRoster`, `MatchSetupError::AiPlan`.
+6. **The menu has an Options button**, so it shows 11 buttons (D6 amended).
+
+### Tests changed (none removed, skipped, or weakened)
+
+* `m6_definitions::skirmish_references_and_ids_are_checked`: the schema-version case expected version 1; the skirmish file is now version 2 (a schema change, section 10), so it rejects version 3 (expected 2) and, added, version 1 (expected 2). All other cases unchanged.
+* `skirmish::tests::loading_rejects_a_start_position_outside_its_map` (game): the test copies the shipped assets and edits the skirmish file's text; the edits now name the first faction's yard by its following groups (the yard line appears once per faction), the groups' new counts, and the new rifleman group, and leave the two M7 maps out of the copy (the shifted offsets are meant for the demo map). Its assertions are unchanged.
+* `smoke::tests::the_demo_player_can_queue_a_building_with_its_starting_buildings`: `first_queueable` takes the player's state (its roster); the test now checks every faction, that the item is offered, and that an empty roster offers nothing (stronger).
+* `sidebar::tests::the_game_systems_share_no_state_without_an_order`: adds `OptionsPlugin` and the `Last` schedule (stronger).
+* `m6_production_matches`: every faction pairing in addition to every difficulty pairing on every map (27 → 108 matches; stronger).
+* `m4_combat::extreme_scenario` (helper): a file per call; no assertion changed.
+* `skirmish::tests::menu_buttons_cycle_through_each_row_and_start_only_a_valid_choice`: an added assertion for the Options button.
+
+### Known debt
+
+**Resolved by M7:** M0 debt item 7 and D1's packaging note (D54); the OFL note of the M5 review (D54); M5 review 1 P2-2, the minimap on maps with W + H > 128 (D57 item 1); M5 review 1 P2-4, the `m4_combat` file race (D57 item 2); M3 review 1 P2-3, the stale test citation (corrected in the M3 A1 table); D38 item 5, session-only volume (D52); M6 implementation debt item 5, the balance pass (D51); M6 implementation debt item 9, test time, reduced (D53); the measurements "to be measured against the M7 benchmark" (M2 round 2 item 3, M3 implementation debt 4, M4 implementation debt 1): 200 fighting units take 0.075 to 0.159 ms per tick on average and 0.85 ms at most, and the soak's 3.2 million ticks of AI play with harvesters took 47 µs per tick on average (with the soak's own checks). The 4,000-unit crowd of M2 round 2 item 1 was not measured again; that item stays.
+
+**New in M7 (P2 proposals for the reviewer):**
+
+1. The application is not code-signed or notarised; the licence notices of the Rust crates compiled into the executable are not collected into the package (D54 item 3). Both are decisions for a public release.
+2. The package is 116 MB (the release executable is not stripped).
+3. The art is procedural (D50 item 3); its acceptance as final art is the user's.
+4. The balance is measured between computer players only (D51 item 5), and AI-vs-AI termination is still measured, not proven.
+5. Dock contention (M3 review 1 P2-2) remains: claiming docks did not help (D57 item 4).
+6. The end rule's speed dependence in jams (M2 review 3 P2-1) was not revised (D57 item 5).
+7. The headless benchmark does not measure the game's rendering side (the per-frame `QueryState`s and the minimap redraw, M5 implementation debt 6); the release smoke runs show no problem at 600 frames, and the minimap image of the largest map is now 1,024 × 512.
+8. The menu still shows ids (`vanguard`, `meridian`, `crossroads`) with underscores as spaces, not display names (M6 debt item 6).
+9. The crate version stays 0.1.0.
+10. `scripts/package_macos.sh` needs a display (its smoke test opens a window).
+
+**Still open from earlier milestones (unchanged by M7):** M6 review 2 P2-1 (gathering point searched through the computer player's own buildings) and P2-2 (D47's title); M6 remediation debt items 1 to 4 and implementation debt items 2, 3, 4, 6, 8, and 10; M5 review 1 P2-1 (a right click over the sidebar can order an attack), P2-3 (modes end on a refused click), P2-5 (`&World` exposes the entity allocator), and M5 implementation debt items 1 to 8 (item 6 is restated as new item 7 above); M4 review 2 P2-1 (projectile line of flight from unseen attackers) and the M4 remediation and implementation debt as carried; M3 review 1 P2-1 (a free unit lost on sale) and P2-2, and M3 implementation debt items 1 to 3, 6, and 9; M2 review 3 P2-1 and P2-2, M2 remediation round 2 items 1 to 7 and implementation debt items; M1 review 3 P2-1 (FIFO hang of the map and `.tsx` reader), P2-2 and the rest of P2-3, review 1 P2-3 and P2-5, review 2 P2-B, round 1 item 4, round 2 items 5 and 6; M0 items 1, 2, 5, 8, and 9. The linker warning (M0 item 1) and the `Skipped event Destroyed` warning (M0 item 2) were seen again.
+
+### Requires user verification
+
+Not review findings (PLAN.md section 12 item 2); they block only `m7-approved`. Run `cargo run --release -p game` (or open `target/package/MyGame001.app` after `sh scripts/package_macos.sh`) with sound on. The 12 M7 items:
+
+1. **Art (final or not):** the new units (riflemen, rocket soldiers, conscripts, grenadiers as small figures with their weapons; raiders, heavy tanks, artillery, rocket launchers), the tech center and rocket tower, and the textured tiles of `crossroads` and `riverlands` are legible, face their direction of travel, and are tinted with their owner's colour. Decide whether the generated art is acceptable as the final art of version 1.0 (D50 item 3).
+2. **Audio (final or not):** decide whether the synthesised effects and music (M5) are acceptable as the final audio.
+3. **Second faction:** choose `meridian` as your faction: the sidebar shows only its items (Buildings: construction yard, power plant, refinery, barracks, war factory, tech center, rocket tower; Units: conscript, grenadier, raider, heavy tank, rocket launcher, harvester); with `vanguard`, the gun turret and rifleman, rocket soldier, scout, light tank, artillery, harvester.
+4. **New units in play:** artillery and rocket launchers need a tech center and fire far, but only at what you see; rocket soldiers and tanks are strong against vehicles, riflemen and conscripts against infantry.
+5. **Maps:** `crossroads` and `riverlands` load from the menu, the minimap shows them whole, both bases have ore nearby, and the river is crossed only at the three fords.
+6. **Options:** Options in the menu changes master, music, and effects volume, sound on or off, edge scrolling, and scroll speed; Back returns; the values are the same after quitting and starting again (`~/Library/Application Support/MyGame001/settings.txt`).
+7. **Balance:** matches against each faction and on each map feel fair, and easy, normal, and hard feel increasingly difficult.
+8. **Acceptance (version 1.0):** on each of the three maps, starting from the menu, you can lose to and defeat the computer player with either faction.
+9. **Package:** the `.app` opens by double click on this Mac and plays; decide whether an unsigned application is acceptable or signing and notarisation are wanted (D54 item 3).
+10. **Release notices:** decide whether the licence notices of the Rust crates compiled into the executable must ship with the package (D54 item 3), and whether the version should read 1.0.0.
+11. **README:** the controls listed match what the game does.
+12. **Settings file location:** storing the options in `~/Library/Application Support/MyGame001/settings.txt` is acceptable.
+
+The earlier pending items (13 for M6, 16 for M5, 9 for M4, 10 for M3, 7 for M2, and 5 for M1) remain pending. With M7 data the starting setup differs from what they name (each faction now starts with its yard and nine units; M6 item 2's rows have two factions and three maps; the opponent's turret is the gun turret or the rocket tower, by faction).
