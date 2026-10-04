@@ -1,6 +1,7 @@
 use bevy_ecs::world::World;
 
 use crate::building::{Building, Producer, hash_building};
+use crate::combat::{Armour, Health, Projectiles, Sight, Weapon, hash_combat};
 use crate::definitions::Definitions;
 use crate::economy::Players;
 use crate::harvest::Harvester;
@@ -59,9 +60,11 @@ impl Default for Fnv1a64 {
 /// Covers, in this order: the tick counter, the [`SimRng`] state, the next [`SimId`] to be
 /// allocated, the number of entities with a [`SimId`], every such entity in ascending [`SimId`]
 /// order (its id, then a flag byte and, for a unit, its components; then a flag byte and, for a
-/// harvester, its cycle; then a flag byte and, for a building, its owner and components), the
-/// [`Grid`], the [`Definitions`], and the [`Players`] (docs/DECISIONS.md D4, D11, extended in M2
-/// and M3). Components added by later milestones are appended per entity.
+/// harvester, its cycle; then a flag byte and, for a building, its owner and components; then a
+/// flag byte and its health, armour, and sight; then a flag byte and its weapon), the [`Grid`],
+/// the [`Definitions`], the [`Players`] (with their visibility grids), and the projectiles in
+/// flight (docs/DECISIONS.md D4, D11, extended in M2, M3, and M4). Components added by later
+/// milestones are appended per entity.
 ///
 /// # Panics
 ///
@@ -78,11 +81,13 @@ pub fn state_hash(world: &mut World) -> u64 {
         Option<(&Owner, &Unit, &Mobile, &Position, &Facing, &Orders)>,
         Option<&Harvester>,
         Option<(&Owner, &Building, Option<&Producer>)>,
+        Option<(&Health, &Armour, &Sight)>,
+        Option<&Weapon>,
     )>();
     let mut entities: Vec<_> = query.iter(world).collect();
     entities.sort_unstable_by_key(|(id, ..)| **id);
     hasher.write_u64(entities.len() as u64);
-    for (id, unit, harvester, building) in entities {
+    for (id, unit, harvester, building, combat, weapon) in entities {
         hasher.write_u32(id.0);
         match unit {
             None => hasher.write(&[0]),
@@ -105,10 +110,25 @@ pub fn state_hash(world: &mut World) -> u64 {
                 hash_building(&mut hasher, building, producer);
             }
         }
+        match combat {
+            None => hasher.write(&[0]),
+            Some(components) => {
+                hasher.write(&[1]);
+                hash_combat(&mut hasher, components);
+            }
+        }
+        match weapon {
+            None => hasher.write(&[0]),
+            Some(weapon) => {
+                hasher.write(&[1]);
+                weapon.hash_into(&mut hasher);
+            }
+        }
     }
     world.resource::<Grid>().hash_into(&mut hasher);
     world.resource::<Definitions>().hash_into(&mut hasher);
     world.resource::<Players>().hash_into(&mut hasher);
+    world.resource::<Projectiles>().hash_into(&mut hasher);
 
     hasher.finish()
 }

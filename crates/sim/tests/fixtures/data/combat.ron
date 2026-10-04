@@ -1,0 +1,81 @@
+// M4 fixture: combat definitions for the tests, resolved against units_combat.ron and
+// economy_combat.ron. The values are fixture data, independent of the production balance in
+// assets/data/combat.ron (invariant I10). They cover every case of equation 2: the bullet deals
+// 20 x 1 / 100 = 0.2 to plate, raised to 1, and nothing to concrete (versus 0); the armour
+// piercing shell deals 25 x 30 / 100 = 7.5 to soft targets, rounded down to 7; and the high
+// explosive deals more than its base damage to soft targets (150 %). The turret's sight (3 cells)
+// is shorter than its range (6 cells), so it fires beyond its own sight only at enemies other
+// units of its owner see.
+(
+    schema_version: 1,
+    armour_classes: ["soft", "plate", "concrete"],
+    warheads: [
+        (
+            id: "bullet",
+            versus: [
+                (armour: "soft", percent: 100),
+                (armour: "plate", percent: 1),
+                (armour: "concrete", percent: 0),
+            ],
+        ),
+        (
+            id: "ap",
+            versus: [
+                (armour: "plate", percent: 100),
+                (armour: "soft", percent: 30),
+                (armour: "concrete", percent: 50),
+            ],
+        ),
+        (
+            id: "he",
+            versus: [
+                (armour: "soft", percent: 150),
+                (armour: "plate", percent: 40),
+                (armour: "concrete", percent: 75),
+            ],
+        ),
+    ],
+    weapons: [
+        (
+            id: "rifle",
+            damage: 20,
+            range: 768,
+            reload: 10,
+            warhead: "bullet",
+            projectile_speed: 0,
+        ),
+        (
+            id: "cannon",
+            damage: 25,
+            range: 1024,
+            reload: 20,
+            warhead: "ap",
+            projectile_speed: 128,
+        ),
+        (
+            id: "howitzer",
+            damage: 40,
+            range: 1536,
+            reload: 30,
+            warhead: "he",
+            projectile_speed: 256,
+        ),
+    ],
+    units: [
+        (unit: "rifleman", hit_points: 100, armour: "soft", sight: 5, weapons: ["rifle"]),
+        (unit: "tank", hit_points: 300, armour: "plate", sight: 6, weapons: ["cannon"]),
+        (unit: "crawler", hit_points: 50, armour: "soft", sight: 2, weapons: []),
+        (unit: "harvester", hit_points: 200, armour: "plate", sight: 3, weapons: []),
+    ],
+    buildings: [
+        (building: "yard", hit_points: 500, armour: "concrete", sight: 4, weapons: []),
+        (building: "power", hit_points: 200, armour: "concrete", sight: 3, weapons: []),
+        (building: "refinery", hit_points: 300, armour: "concrete", sight: 3, weapons: []),
+        (building: "barracks", hit_points: 200, armour: "concrete", sight: 3, weapons: []),
+        (building: "factory", hit_points: 300, armour: "concrete", sight: 3, weapons: []),
+        (building: "fence", hit_points: 50, armour: "concrete", sight: 0, weapons: []),
+        (building: "turret", hit_points: 400, armour: "concrete", sight: 3, weapons: ["howitzer"]),
+        (building: "beacon", hit_points: 10, armour: "concrete", sight: 1, weapons: []),
+        (building: "flag", hit_points: 1, armour: "concrete", sight: 0, weapons: []),
+    ],
+)

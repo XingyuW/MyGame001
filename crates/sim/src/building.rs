@@ -13,6 +13,7 @@ use std::fmt;
 use bevy_ecs::component::Component;
 use bevy_ecs::world::World;
 
+use crate::combat::combat_components;
 use crate::command::PlayerId;
 use crate::definitions::{Definitions, UnitKind};
 use crate::economy_defs::BuildingKind;
@@ -21,6 +22,7 @@ use crate::id::{SimId, SimIdAllocator};
 use crate::map::{CellPos, Grid};
 use crate::pathfinding::octile_distance;
 use crate::unit::Owner;
+use crate::visibility::Vision;
 
 /// The rectangle of cells a building covers: `width` cells along x and `height` cells along y
 /// from `origin`, its cell with the smallest coordinates (the top corner of the diamond on
@@ -126,6 +128,10 @@ pub enum PlacementError {
     Overlap { cell: CellPos, building: SimId },
     /// A unit stands in or is entering the cell.
     Occupied { cell: CellPos, unit: SimId },
+    /// Under fog of war, the issuing player does not see the cell. Checked before the terrain,
+    /// buildings, and units of the footprint, so that a rejection names nothing the player does
+    /// not see (docs/DECISIONS.md D33).
+    NotVisible(CellPos),
     /// The nearest building of the player is `distance` cells away (`None`: the player owns
     /// none), more than the economy file's `placement_distance` = `max`.
     TooFar { distance: Option<u32>, max: u32 },
@@ -152,6 +158,13 @@ impl fmt::Display for PlacementError {
                     f,
                     "cell ({}, {}) is held by unit {}",
                     cell.x, cell.y, unit.0
+                )
+            }
+            Self::NotVisible(cell) => {
+                write!(
+                    f,
+                    "cell ({}, {}) is not visible to the player",
+                    cell.x, cell.y
                 )
             }
             Self::TooFar {
@@ -191,6 +204,25 @@ pub(crate) fn check_footprint(grid: &Grid, footprint: Footprint) -> Result<(), P
         }
     }
     Ok(())
+}
+
+/// Under fog of war: every cell of a footprint inside the map must be visible to the player
+/// (`vision`); the first unseen cell in row-major order is the error. A footprint outside the
+/// map is left to [`check_footprint`] (`OutsideMap`, which reveals nothing). Checked before
+/// [`check_footprint`], whose errors name the building or unit in a cell, so that a placement
+/// reveals nothing about cells the player does not see (docs/DECISIONS.md D33).
+pub(crate) fn check_visible(
+    grid: &Grid,
+    footprint: Footprint,
+    vision: &Vision,
+) -> Result<(), PlacementError> {
+    if !footprint.inside(grid) {
+        return Ok(());
+    }
+    match footprint.cells().find(|&cell| !vision.is_visible(cell)) {
+        Some(cell) => Err(PlacementError::NotVisible(cell)),
+        None => Ok(()),
+    }
 }
 
 /// The distance rule: the footprint must lie within `max` cells of one of `owned` (the
@@ -280,7 +312,8 @@ pub(crate) fn building_bundle(
 /// [`spawn_unit`](crate::spawn_unit): the footprint must be valid, but the distance rule does
 /// not apply and the building delivers no free units. During a match buildings are produced and
 /// placed with commands. The world must have been set up by [`SimPlugin`](crate::SimPlugin),
-/// with the grid and definitions of the match installed.
+/// with the grid and definitions of the match installed. With a combat file, the building gets
+/// its hit points, armour, sight, and weapon (M4).
 pub fn spawn_building(
     world: &mut World,
     owner: PlayerId,
@@ -315,6 +348,13 @@ pub fn spawn_building(
     let mut entity = world.spawn((id, owner, building));
     if let Some(producer) = producer {
         entity.insert(producer);
+    }
+    if let Some(terms) = definitions.building_combat(kind) {
+        let (components, weapon) = combat_components(terms);
+        entity.insert(components);
+        if let Some(weapon) = weapon {
+            entity.insert(weapon);
+        }
     }
     Ok(id)
 }

@@ -9,7 +9,9 @@
 use bevy_ecs::message::{Message, Messages};
 use bevy_ecs::system::ResMut;
 
+use crate::combat_defs::WeaponKind;
 use crate::command::{Command, PlayerId, RejectReason};
+use crate::definitions::UnitKind;
 use crate::economy_defs::{BuildingKind, ProductionItem};
 use crate::id::SimId;
 
@@ -73,6 +75,53 @@ pub enum SimEvent {
     },
     /// The harvester stopped its cycle and waits for a `Harvest` command.
     HarvesterIdle { unit: SimId, reason: HarvestIdle },
+    /// `attacker` fired `weapon` at `target`. An instant weapon's damage is dealt in this tick, a
+    /// projectile's when it arrives (M4).
+    WeaponFired {
+        attacker: SimId,
+        target: SimId,
+        weapon: WeaponKind,
+    },
+    /// A projectile arrived after its target had been removed (destroyed or sold), so it dealt no
+    /// damage.
+    ProjectileExpired {
+        attacker: SimId,
+        target: SimId,
+        weapon: WeaponKind,
+    },
+    /// The unit's hit points fell to 0 or below: it was removed and its cells were freed.
+    UnitDestroyed { player: PlayerId, unit: SimId },
+    /// The building's hit points fell to 0 or below: it was removed and its cells were freed.
+    /// `lost_units` are the free units that were still waiting to leave it; they are lost with it.
+    BuildingDestroyed {
+        player: PlayerId,
+        building: SimId,
+        kind: BuildingKind,
+        lost_units: Vec<UnitKind>,
+    },
+    /// The unit's `Attack` order on `target` ended without a new command; the unit stops at its
+    /// next cell centre.
+    AttackEnded {
+        unit: SimId,
+        target: SimId,
+        reason: AttackEnd,
+    },
+}
+
+/// Why an `Attack` order ended.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum AttackEnd {
+    /// The target no longer exists (destroyed, or sold by its owner).
+    TargetGone,
+    /// The target is no longer visible to the unit's owner.
+    TargetHidden,
+    /// The unit moved toward the target `MAX_CHASES` times without firing in between, or no free
+    /// cell from which the target is in range is reachable.
+    OutOfReach,
+    /// The unit's warhead deals no damage to the target's armour (equation 2 with a percentage
+    /// of 0): the unit fired once, as ordered, and the order ended with that shot
+    /// (docs/DECISIONS.md D32).
+    NoDamage,
 }
 
 /// Why a harvester stopped its cycle.

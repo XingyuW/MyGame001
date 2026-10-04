@@ -18,9 +18,9 @@
 //! * a struct holds exactly the fields its schema lists, each once, in any order, and every
 //!   value has the kind its schema names.
 //!
-//! The schema is at most five levels deep (the economy file's lists of names inside structs inside
-//! lists inside the file's struct) and the checker recurses on the schema, never on the input, so
-//! its stack depth is bounded however deeply a file nests. Errors are typed
+//! The schema is at most six levels deep (the combat file's integers inside structs inside lists
+//! inside structs inside lists inside the file's struct) and the checker recurses on the schema,
+//! never on the input, so its stack depth is bounded however deeply a file nests. Errors are typed
 //! [`DataError`]s naming the file, the field (as a path such as `units[2].speed`), and the
 //! reason.
 
@@ -34,8 +34,8 @@ pub const MAX_DATA_FILE_BYTES: u64 = 64 * 1024;
 /// Longest accepted string value in bytes.
 pub const MAX_STRING_BYTES: usize = 64;
 
-/// The recursion limit given to `ron`. The deepest file the checker accepts nests five levels;
-/// the limit is a second line of defence.
+/// The recursion limit given to `ron`. The deepest file the checker accepts nests six levels (five
+/// containers); the limit is a second line of defence.
 pub(crate) const RON_RECURSION_LIMIT: usize = 16;
 
 /// Why a data file was rejected.
@@ -94,6 +94,9 @@ pub enum DataErrorKind {
     UnknownReference { kind: String, id: String },
     /// The prerequisites of the buildings form a cycle, listed from a building back to itself.
     PrerequisiteCycle(Vec<String>),
+    /// The list has no entry for the `kind` named `id`, which needs one (for example a unit type
+    /// without combat terms, or an armour class a warhead does not list).
+    MissingEntry { kind: String, id: String },
     /// `ron` rejected a file that the checker accepted (message from `ron`); this indicates a
     /// difference between the checker and `ron` and is reported rather than ignored.
     Parse(String),
@@ -131,6 +134,7 @@ impl fmt::Display for DataErrorKind {
             Self::PrerequisiteCycle(cycle) => {
                 write!(f, "the prerequisites form a cycle: {}", cycle.join(" -> "))
             }
+            Self::MissingEntry { kind, id } => write!(f, "{kind} {id:?} has no entry"),
             Self::Parse(error) => write!(f, "cannot be parsed: {error}"),
         }
     }

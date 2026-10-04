@@ -12,13 +12,16 @@
 //!   (`QueueFull`);
 //! * `CancelProduction`: the item is defined and producible, and queued (`NotQueued`);
 //! * `PlaceBuilding`: the building type is defined, a complete building of that type is at the
-//!   head of its queue (`NotReady`), the footprint is valid (`Placement`: inside the map,
-//!   buildable, no building, no unit), and it lies within the placement distance of a building
-//!   of the player (`Placement(TooFar)`);
+//!   head of its queue (`NotReady`), the footprint lies inside the map (`Placement(OutsideMap)`),
+//!   under fog of war (M4) the player sees every cell of it (`Placement(NotVisible)`, so that
+//!   the checks that follow name nothing the player does not see), the footprint is valid
+//!   (`Placement`: buildable, no building, no unit), and it lies within the placement distance
+//!   of a building of the player (`Placement(TooFar)`);
 //! * `SellBuilding`: the building exists (`UnknownBuilding`) and belongs to the player
-//!   (`NotOwned`);
-//! * `SetRallyPoint`: the building exists and belongs to the player, its type produces units
-//!   (`NotAProducer`), and the cell is inside the map (`OutsideMap`).
+//!   (`NotOwned`); under fog of war (M4), another player's building the player does not see is
+//!   reported as `UnknownBuilding`;
+//! * `SetRallyPoint`: the building exists and belongs to the player (as for `SellBuilding`),
+//!   its type produces units (`NotAProducer`), and the cell is inside the map (`OutsideMap`).
 
 use std::collections::BTreeMap;
 
@@ -27,16 +30,19 @@ use bevy_ecs::message::Messages;
 use bevy_ecs::system::{Commands, Query, Res, ResMut, SystemParam};
 
 use crate::building::{
-    Building, Footprint, Producer, building_bundle, check_distance, check_footprint,
+    Building, Footprint, Producer, building_bundle, check_distance, check_footprint, check_visible,
 };
+use crate::combat::Body;
+use crate::combat::combat_components;
 use crate::command::{Command, IssuedCommand, PlayerId, RejectReason};
 use crate::definitions::Definitions;
-use crate::economy::{MAX_QUEUE_LENGTH, Players, QueueItem};
+use crate::economy::{MAX_QUEUE_LENGTH, PlayerState, Players, QueueItem};
 use crate::economy_defs::{BuildingKind, ProductionItem};
 use crate::event::SimEvent;
 use crate::id::{SimId, SimIdAllocator};
 use crate::map::Grid;
 use crate::unit::Owner;
+use crate::visibility::Vision;
 
 /// The system parameters the economy commands need besides the grid and the event buffer.
 #[derive(SystemParam)]
@@ -77,13 +83,31 @@ impl BuildingIndex {
             .map(|building| building.footprint)
     }
 
-    /// The player's building `id`.
-    fn own(&self, player: PlayerId, id: SimId) -> Result<Indexed, RejectReason> {
+    /// The owner, type, and footprint of building `id`, if it exists as the commands of this tick
+    /// see it.
+    pub(crate) fn get(&self, id: SimId) -> Option<(PlayerId, BuildingKind, Footprint)> {
+        self.by_id
+            .get(&id)
+            .map(|building| (building.owner, building.kind, building.footprint))
+    }
+
+    /// The player's building `id`. Under fog of war (`fog` is the player's vision), another
+    /// player's building that the player does not see is reported as unknown, like one that does
+    /// not exist, so that commands reveal nothing about unseen enemies (docs/DECISIONS.md D30).
+    fn own(
+        &self,
+        player: PlayerId,
+        id: SimId,
+        fog: Option<&Vision>,
+    ) -> Result<Indexed, RejectReason> {
         let building = *self
             .by_id
             .get(&id)
             .ok_or(RejectReason::UnknownBuilding(id))?;
         if building.owner != player {
+            if fog.is_some_and(|vision| !Body::Building(building.footprint).seen_by(vision)) {
+                return Err(RejectReason::UnknownBuilding(id));
+            }
             return Err(RejectReason::NotOwned(id));
         }
         Ok(building)
@@ -93,6 +117,10 @@ impl BuildingIndex {
 impl EconomyParams<'_, '_> {
     pub(crate) fn definitions(&self) -> &Definitions {
         &self.definitions
+    }
+
+    pub(crate) fn players(&self) -> &Players {
+        &self.players
     }
 
     pub(crate) fn building_index(&self) -> BuildingIndex {
@@ -114,6 +142,13 @@ impl EconomyParams<'_, '_> {
                 .collect(),
         }
     }
+}
+
+/// The player's vision while fog of war is active, which it is when the definitions include a
+/// combat file (only then do units and buildings have sight); `None` without one (the M2 and M3
+/// fixtures), in which commands are validated as in M3.
+pub(crate) fn fog<'a>(definitions: &Definitions, state: &'a PlayerState) -> Option<&'a Vision> {
+    definitions.has_combat().then_some(state.vision())
 }
 
 /// Validates and applies an economy command. Unit commands are handled by `command.rs`.
@@ -204,6 +239,9 @@ pub(crate) fn apply(
                 width: def.width,
                 height: def.height,
             };
+            if let Some(vision) = fog(definitions, state) {
+                check_visible(grid, footprint, vision).map_err(RejectReason::Placement)?;
+            }
             check_footprint(grid, footprint).map_err(RejectReason::Placement)?;
             check_distance(
                 footprint,
@@ -234,6 +272,13 @@ pub(crate) fn apply(
             if let Some(rally) = rally {
                 entity.insert(rally);
             }
+            if let Some(terms) = definitions.building_combat(building) {
+                let (components, weapon) = combat_components(terms);
+                entity.insert(components);
+                if let Some(weapon) = weapon {
+                    entity.insert(weapon);
+                }
+            }
             let entity = entity.id();
             index.by_id.insert(
                 id,
@@ -251,7 +296,7 @@ pub(crate) fn apply(
             });
         }
         &Command::SellBuilding { building } => {
-            let target = index.own(player, building)?;
+            let target = index.own(player, building, fog(definitions, state))?;
             // Every indexed building's kind comes from the definitions, which do not change
             // during a match, so the lookup always succeeds.
             let refund = definitions
@@ -270,7 +315,7 @@ pub(crate) fn apply(
             });
         }
         &Command::SetRallyPoint { building, cell } => {
-            let target = index.own(player, building)?;
+            let target = index.own(player, building, fog(definitions, state))?;
             if !definitions.produces_units(target.kind) {
                 return Err(RejectReason::NotAProducer(building));
             }
@@ -282,7 +327,11 @@ pub(crate) fn apply(
                 .entity(target.entity)
                 .insert(Producer { rally: Some(cell) });
         }
-        Command::Move { .. } | Command::Stop { .. } | Command::Harvest { .. } => {}
+        Command::Move { .. }
+        | Command::Stop { .. }
+        | Command::Harvest { .. }
+        | Command::Attack { .. }
+        | Command::AttackMove { .. } => {}
     }
     Ok(())
 }

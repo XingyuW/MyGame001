@@ -5,21 +5,23 @@
 //! issues through `CommandQueue` were accepted and took effect: the move, which must have moved a
 //! unit if at least [`MOVE_CHECK_TICKS`] ticks ran after it, and (M3) the production of the first
 //! building the player can queue, which must have been charged for if at least
-//! [`PRODUCTION_CHECK_TICKS`] ticks ran after it.
+//! [`PRODUCTION_CHECK_TICKS`] ticks ran after it. From M4, once a tick has run the human player
+//! must see some cells (the fog is computed), and every unit and building view must be shown
+//! exactly when the human player sees what it draws (unseen enemies are hidden).
 
 use std::collections::BTreeMap;
 
 use bevy::asset::UntypedAssetLoadFailedEvent;
 use bevy::prelude::*;
 use sim::{
-    Building, BuildingKind, CellPos, Command, CommandQueue, Definitions, IssuedCommand, Owner,
-    Players, Position, ProductionItem, SimEvent, SimId, SimTick, SubPos,
+    Building, BuildingKind, CellPos, Command, CommandQueue, Definitions, IssuedCommand, Mobile,
+    Owner, Players, Position, ProductionItem, SimEvent, SimId, SimTick, SubPos,
 };
 
-use crate::buildings::{BuildingStatus, STARTING_BUILDINGS};
+use crate::buildings::{BuildingStatus, BuildingView, STARTING_BUILDINGS, building_shown};
 use crate::construction::production_menu;
 use crate::map::MapStatus;
-use crate::units::{HUMAN, UnitStatus, starting_unit_total};
+use crate::units::{HUMAN, UnitStatus, UnitView, starting_unit_total, unit_shown};
 
 /// The cell of the demo map that the smoke test orders the player's units to (grass, across the
 /// open ground from their starting area).
@@ -156,6 +158,45 @@ fn fail_on_asset_load_error(
     }
 }
 
+/// The views and the simulation state they draw, for [`view_mismatches`].
+type ViewQueries<'w, 's> = (
+    Query<'w, 's, (&'static UnitView, &'static Visibility)>,
+    Query<'w, 's, (&'static BuildingView, &'static Visibility)>,
+    Query<'w, 's, &'static Mobile>,
+    Query<'w, 's, (&'static Owner, &'static Building)>,
+);
+
+/// The unit and building views whose visibility disagrees with what the human player sees
+/// (`crate::units::unit_shown`, `crate::buildings::building_shown`), and how many views of other
+/// players' units and buildings are shown.
+fn view_mismatches(
+    players: &Players,
+    unit_views: &Query<(&UnitView, &Visibility)>,
+    building_views: &Query<(&BuildingView, &Visibility)>,
+    mobiles: &Query<&Mobile>,
+    buildings: &Query<(&Owner, &Building)>,
+) -> (usize, usize) {
+    let mut mismatches = 0;
+    let mut enemies_shown = 0;
+    for (view, visibility) in unit_views {
+        let Ok(mobile) = mobiles.get(view.unit) else {
+            continue;
+        };
+        let shown = *visibility != Visibility::Hidden;
+        mismatches += usize::from(shown != unit_shown(view.owner, mobile, players));
+        enemies_shown += usize::from(shown && view.owner != HUMAN);
+    }
+    for (view, visibility) in building_views {
+        let Ok((owner, building)) = buildings.get(view.building) else {
+            continue;
+        };
+        let shown = *visibility != Visibility::Hidden;
+        mismatches += usize::from(shown != building_shown(owner.0, building.footprint, players));
+        enemies_shown += usize::from(shown && owner.0 != HUMAN);
+    }
+    (mismatches, enemies_shown)
+}
+
 #[allow(clippy::too_many_arguments)]
 fn count_frames(
     mut smoke: ResMut<SmokeTest>,
@@ -165,12 +206,24 @@ fn count_frames(
     players: Res<Players>,
     tick: Res<SimTick>,
     units: Query<(&SimId, &Position)>,
+    views: ViewQueries,
     mut exit: MessageWriter<AppExit>,
 ) {
     smoke.rendered += 1;
     if smoke.rendered < smoke.frames {
         return;
     }
+    let (unit_views, building_views, mobiles, all_buildings) = views;
+    let (mismatches, enemies_shown) = view_mismatches(
+        &players,
+        &unit_views,
+        &building_views,
+        &mobiles,
+        &all_buildings,
+    );
+    let visible_cells = players
+        .get(HUMAN)
+        .map_or(0, |state| state.vision().visible_cells());
     let (ticks_since_order, moved) = match &smoke.order {
         Some((ordered_at, start)) => (
             tick.0.saturating_sub(*ordered_at),
@@ -195,7 +248,9 @@ fn count_frames(
     info!(
         "smoke test: {} frames, {} simulation ticks, map created: {}, units spawned: {}, \
          units moved: {moved} in {ticks_since_order} ticks after the order, buildings spawned: \
-         {}, production charged {charged} credits in {ticks_since_production} ticks",
+         {}, production charged {charged} credits in {ticks_since_production} ticks, visible \
+         cells: {visible_cells}, enemy views shown: {enemies_shown}, view mismatches: \
+         {mismatches}",
         smoke.rendered, tick.0, map.map_created, status.spawned, buildings.spawned
     );
     let failures = smoke_failures(&SmokeOutcome {
@@ -211,6 +266,9 @@ fn count_frames(
         production_ordered: production_ordered || smoke.production.is_none(),
         ticks_since_production,
         charged,
+        ticks: tick.0,
+        visible_cells,
+        view_mismatches: mismatches,
     });
     if failures.is_empty() {
         exit.write(AppExit::Success);
@@ -241,6 +299,13 @@ struct SmokeOutcome {
     ticks_since_production: u64,
     /// Credits charged so far for the player's queued items.
     charged: i64,
+    /// Simulation ticks run.
+    ticks: u64,
+    /// Cells the human player sees.
+    visible_cells: usize,
+    /// Views shown although the human player does not see what they draw, or hidden although
+    /// it does.
+    view_mismatches: usize,
 }
 
 /// The reasons a smoke run fails; empty if it passes.
@@ -282,6 +347,18 @@ fn smoke_failures(outcome: &SmokeOutcome) -> Vec<String> {
             outcome.ticks_since_order
         ));
     }
+    if outcome.ticks > 0 && outcome.visible_cells == 0 {
+        failures.push(format!(
+            "the human player sees no cell after {} ticks",
+            outcome.ticks
+        ));
+    }
+    if outcome.view_mismatches > 0 {
+        failures.push(format!(
+            "{} views are shown or hidden against what the human player sees",
+            outcome.view_mismatches
+        ));
+    }
     failures
 }
 
@@ -302,6 +379,9 @@ mod tests {
         production_ordered: true,
         ticks_since_production: 198,
         charged: 396,
+        ticks: 198,
+        visible_cells: 400,
+        view_mismatches: 0,
     };
 
     #[test]
@@ -389,6 +469,33 @@ mod tests {
         // At least one credit is charged on the first tick, so the smoke check can see it.
         assert!(terms.cost / i64::from(terms.build_time) > 0 || terms.build_time == 1);
         assert_eq!(first_queueable(&definitions, &[]), None);
+    }
+
+    #[test]
+    fn a_run_passes_only_with_the_fog_computed_and_unseen_enemies_hidden() {
+        assert_eq!(
+            smoke_failures(&SmokeOutcome {
+                visible_cells: 0,
+                ..PASSING
+            }),
+            ["the human player sees no cell after 198 ticks"]
+        );
+        // Before the first tick nothing is visible yet.
+        assert!(
+            smoke_failures(&SmokeOutcome {
+                ticks: 0,
+                visible_cells: 0,
+                ..PASSING
+            })
+            .is_empty()
+        );
+        assert_eq!(
+            smoke_failures(&SmokeOutcome {
+                view_mismatches: 3,
+                ..PASSING
+            }),
+            ["3 views are shown or hidden against what the human player sees"]
+        );
     }
 
     #[test]

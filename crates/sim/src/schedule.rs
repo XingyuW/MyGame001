@@ -6,6 +6,7 @@ use bevy_ecs::schedule::{
 };
 use bevy_ecs::system::ResMut;
 
+use crate::combat::{Projectiles, combat, remove_dead};
 use crate::command::{CommandQueue, process_commands};
 use crate::definitions::Definitions;
 use crate::economy::{Players, advance_production, update_power};
@@ -16,6 +17,7 @@ use crate::map::Grid;
 use crate::movement::move_units;
 use crate::pathfinding::find_paths;
 use crate::rng::SimRng;
+use crate::visibility::update_visibility;
 
 /// Simulation rate. One run of [`SimSchedule`] advances the simulation by one tick (50 ms).
 pub const TICKS_PER_SECOND: u32 = 20;
@@ -37,8 +39,11 @@ pub enum SimSet {
     Economy,
     Pathfinding,
     Movement,
+    /// Projectiles, target acquisition, firing, and damage (M4).
     Combat,
+    /// Removing destroyed units and buildings (M4).
     Cleanup,
+    /// Recomputing every player's visibility grid (M4).
     Visibility,
     WinCondition,
     /// Bookkeeping that closes the tick; advances [`SimTick`].
@@ -110,6 +115,9 @@ impl Plugin for SimPlugin {
                 .in_set(SimSet::Economy),
             find_paths.in_set(SimSet::Pathfinding),
             move_units.in_set(SimSet::Movement),
+            combat.in_set(SimSet::Combat),
+            remove_dead.in_set(SimSet::Cleanup),
+            update_visibility.in_set(SimSet::Visibility),
             advance_tick.in_set(SimSet::EndOfTick),
         ));
 
@@ -122,6 +130,7 @@ impl Plugin for SimPlugin {
             .insert_resource(Grid::default())
             .insert_resource(Definitions::default())
             .insert_resource(Players::default())
+            .insert_resource(Projectiles::default())
             .insert_resource(Messages::<SimEvent>::default())
             .add_schedule(schedule);
     }
