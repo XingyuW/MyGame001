@@ -16,6 +16,7 @@ use bevy_ecs::resource::Resource;
 use tiled::{Loader, Orientation, Properties, PropertyValue, TileLayer};
 
 use crate::hash::Fnv1a64;
+use crate::id::SimId;
 use crate::map_subset;
 
 /// The map format version this crate reads (map property `schema_version`).
@@ -63,6 +64,47 @@ impl CellPos {
     }
 }
 
+/// Subcells per cell along each axis (PLAN.md section 5).
+pub const SUBCELLS_PER_CELL: i32 = 256;
+
+/// A fine position in subcells. Subcell s lies in cell `s.div_euclid(256)`, and the centre of
+/// cell c is at `c * 256 + 128` (PLAN.md section 5).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct SubPos {
+    pub x: i32,
+    pub y: i32,
+}
+
+impl SubPos {
+    pub const fn new(x: i32, y: i32) -> Self {
+        Self { x, y }
+    }
+
+    /// The centre of `cell`. Saturates instead of overflowing for cells far outside any map
+    /// (invariant I12); inside a map (at most 256 cells per side) it is exact.
+    pub const fn centre_of(cell: CellPos) -> Self {
+        const HALF: i32 = SUBCELLS_PER_CELL / 2;
+        Self {
+            x: cell
+                .x
+                .saturating_mul(SUBCELLS_PER_CELL)
+                .saturating_add(HALF),
+            y: cell
+                .y
+                .saturating_mul(SUBCELLS_PER_CELL)
+                .saturating_add(HALF),
+        }
+    }
+
+    /// The cell that contains this position.
+    pub const fn cell(self) -> CellPos {
+        CellPos {
+            x: self.x.div_euclid(SUBCELLS_PER_CELL),
+            y: self.y.div_euclid(SUBCELLS_PER_CELL),
+        }
+    }
+}
+
 /// Terrain of one cell.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Cell {
@@ -74,16 +116,22 @@ pub struct Cell {
     pub ore: u32,
 }
 
-/// Per cell terrain of the current map (PLAN.md section 5).
+/// Per cell terrain and occupant of the current map (PLAN.md section 5).
 ///
 /// [`SimPlugin`](crate::SimPlugin) starts with an empty 0×0 grid; match setup replaces it with
 /// the grid of a [`LoadedMap`] before the first tick.
+///
+/// The occupant of a cell is the unit that stands in it or has reserved it for entry (invariant
+/// I6: at most one ground unit per cell). Only the simulation's movement and spawning change
+/// occupants.
 #[derive(Resource, Clone, Debug, Default, PartialEq, Eq)]
 pub struct Grid {
     width: u32,
     height: u32,
     /// Row-major: the cell (x, y) is at index `y * width + x`.
     cells: Vec<Cell>,
+    /// Row-major, as `cells`.
+    occupants: Vec<Option<SimId>>,
 }
 
 impl Grid {
@@ -104,6 +152,64 @@ impl Grid {
         self.index(pos).and_then(|index| self.cells.get(index))
     }
 
+    /// Whether ground units may enter `pos` by terrain; `false` outside the map.
+    pub fn is_passable(&self, pos: CellPos) -> bool {
+        self.cell(pos).is_some_and(|cell| cell.passable)
+    }
+
+    /// The unit standing in or entering `pos`, if any.
+    pub fn occupant(&self, pos: CellPos) -> Option<SimId> {
+        self.index(pos)
+            .and_then(|index| self.occupants.get(index))
+            .copied()
+            .flatten()
+    }
+
+    /// Replaces the terrain of `pos` and returns whether `pos` is inside the map.
+    ///
+    /// Scenario setup only (tests and match setup), like replacing the whole grid; during a match
+    /// terrain changes only through commands (buildings arrive in M3). A unit standing on a cell
+    /// that becomes impassable may still leave it, and units whose path crosses it repath.
+    pub fn set_terrain(&mut self, pos: CellPos, cell: Cell) -> bool {
+        match self.index(pos).and_then(|index| self.cells.get_mut(index)) {
+            Some(slot) => {
+                *slot = cell;
+                true
+            }
+            None => false,
+        }
+    }
+
+    /// Makes `unit` the occupant of `pos` if the cell is inside the map, passable, and free (or
+    /// already held by `unit`). Returns whether `unit` now holds the cell.
+    pub(crate) fn claim(&mut self, pos: CellPos, unit: SimId) -> bool {
+        if !self.is_passable(pos) {
+            return false;
+        }
+        match self
+            .index(pos)
+            .and_then(|index| self.occupants.get_mut(index))
+        {
+            Some(slot @ None) => {
+                *slot = Some(unit);
+                true
+            }
+            Some(Some(holder)) => *holder == unit,
+            None => false,
+        }
+    }
+
+    /// Frees `pos` if `unit` holds it.
+    pub(crate) fn release(&mut self, pos: CellPos, unit: SimId) {
+        if let Some(slot) = self
+            .index(pos)
+            .and_then(|index| self.occupants.get_mut(index))
+            && *slot == Some(unit)
+        {
+            *slot = None;
+        }
+    }
+
     fn index(&self, pos: CellPos) -> Option<usize> {
         let x = u32::try_from(pos.x).ok()?;
         let y = u32::try_from(pos.y).ok()?;
@@ -114,13 +220,19 @@ impl Grid {
     }
 
     /// Width, height, then every cell in row-major order as one flag byte (bit 0 passable,
-    /// bit 1 buildable) and the ore amount.
+    /// bit 1 buildable, bit 2 occupied), the ore amount, and, if occupied, the occupant's id
+    /// (docs/DECISIONS.md D11, extended in M2).
     pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
         hasher.write_u32(self.width);
         hasher.write_u32(self.height);
-        for cell in &self.cells {
-            hasher.write(&[u8::from(cell.passable) | (u8::from(cell.buildable) << 1)]);
+        for (cell, occupant) in self.cells.iter().zip(&self.occupants) {
+            hasher.write(&[u8::from(cell.passable)
+                | (u8::from(cell.buildable) << 1)
+                | (u8::from(occupant.is_some()) << 2)]);
             hasher.write_u32(cell.ore);
+            if let Some(id) = occupant {
+                hasher.write_u32(id.0);
+            }
         }
     }
 }
@@ -435,11 +547,13 @@ fn validate(path: &Path, map: &tiled::Map) -> Result<LoadedMap, MapError> {
     let layer = terrain_layer(map).map_err(in_map)?;
     let cells = cells(map, &terrain, &layer).map_err(in_map)?;
     let tileset_image = tileset_image(map).map_err(in_map)?;
+    let occupants = vec![None; cells.len()];
     Ok(LoadedMap {
         grid: Grid {
             width: map.width,
             height: map.height,
             cells,
+            occupants,
         },
         tile_width: map.tile_width,
         tile_height: map.tile_height,
