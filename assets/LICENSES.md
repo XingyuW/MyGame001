@@ -28,3 +28,5 @@ None of the files under `assets/` is third-party material.
 | `data/combat.ron` | Combat definitions (armour classes, warheads, weapons, and the combat terms of every unit and building type) authored for this repository in M4. |
 | Sound effects and music | Synthesised in memory by `crates/game/src/audio.rs` (`synthesize`, `music`) each time the game starts, in M5; no audio file exists. `audio::tests::every_sound_is_synthesised_within_bounds_and_the_same_on_every_run` checks that they are bounded and deterministic. |
 | Minimap image | Drawn in memory by `crates/game/src/minimap.rs` from the map and the human player's vision, in M5; no image file exists. |
+| `data/skirmish.ron` | Skirmish definitions (starting credits, the faction's starting buildings and units, the maps of the menu with their start positions) authored for this repository in M6. |
+| `data/ai.ron` | The computer player's definitions (build order, power building, harvester, army composition, difficulties) authored for this repository in M6. |

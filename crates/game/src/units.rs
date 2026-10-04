@@ -626,6 +626,13 @@ fn log_sim_events(mut events: MessageReader<SimEvent>) {
                 target,
                 reason,
             } => info!("unit {} stopped attacking {}: {reason:?}", unit.0, target.0),
+            SimEvent::PlayerDefeated { player } => {
+                info!("player {} is defeated: it owns no building", player.0);
+            }
+            SimEvent::MatchEnded { winner } => match winner {
+                Some(winner) => info!("the match is over: player {} wins", winner.0),
+                None => info!("the match is over: a draw"),
+            },
         }
     }
 }

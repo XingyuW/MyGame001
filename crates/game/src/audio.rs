@@ -568,7 +568,10 @@ pub fn event_sound(event: &SimEvent, context: &SoundContext) -> Option<Sfx> {
         | SimEvent::UnitSpawned { .. }
         | SimEvent::HarvesterIdle { .. }
         | SimEvent::ProjectileExpired { .. }
-        | SimEvent::AttackEnded { .. } => None,
+        | SimEvent::AttackEnded { .. }
+        // The end screen announces the outcome (M6).
+        | SimEvent::PlayerDefeated { .. }
+        | SimEvent::MatchEnded { .. } => None,
     }
 }
 

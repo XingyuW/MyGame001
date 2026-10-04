@@ -6,6 +6,7 @@ use bevy_ecs::schedule::{
 };
 use bevy_ecs::system::ResMut;
 
+use crate::ai::{AiPlayers, run_ai};
 use crate::combat::{Projectiles, combat, remove_dead};
 use crate::command::{CommandQueue, process_commands};
 use crate::definitions::Definitions;
@@ -14,6 +15,7 @@ use crate::event::{SimEvent, advance_events};
 use crate::harvest::harvest;
 use crate::id::SimIdAllocator;
 use crate::map::Grid;
+use crate::match_setup::{MatchState, check_win_condition};
 use crate::movement::move_units;
 use crate::pathfinding::find_paths;
 use crate::rng::SimRng;
@@ -34,6 +36,7 @@ pub struct SimSchedule;
 pub enum SimSet {
     /// Validate and apply the commands in [`CommandQueue`].
     Commands,
+    /// The computer players' decisions (M6).
     Ai,
     /// Power, production, and the harvester cycle (M3).
     Economy,
@@ -45,6 +48,7 @@ pub enum SimSet {
     Cleanup,
     /// Recomputing every player's visibility grid (M4).
     Visibility,
+    /// Defeated players and the end of the match (M6).
     WinCondition,
     /// Bookkeeping that closes the tick; advances [`SimTick`].
     EndOfTick,
@@ -110,6 +114,7 @@ impl Plugin for SimPlugin {
             (advance_events, process_commands)
                 .chain()
                 .in_set(SimSet::Commands),
+            run_ai.in_set(SimSet::Ai),
             (update_power, advance_production, harvest)
                 .chain()
                 .in_set(SimSet::Economy),
@@ -118,6 +123,7 @@ impl Plugin for SimPlugin {
             combat.in_set(SimSet::Combat),
             remove_dead.in_set(SimSet::Cleanup),
             update_visibility.in_set(SimSet::Visibility),
+            check_win_condition.in_set(SimSet::WinCondition),
             advance_tick.in_set(SimSet::EndOfTick),
         ));
 
@@ -131,6 +137,8 @@ impl Plugin for SimPlugin {
             .insert_resource(Definitions::default())
             .insert_resource(Players::default())
             .insert_resource(Projectiles::default())
+            .insert_resource(MatchState::default())
+            .insert_resource(AiPlayers::default())
             .insert_resource(Messages::<SimEvent>::default())
             .add_schedule(schedule);
     }

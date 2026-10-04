@@ -1,5 +1,6 @@
 use bevy_ecs::world::World;
 
+use crate::ai::AiPlayers;
 use crate::building::{Building, Producer, hash_building};
 use crate::combat::{Armour, Health, Projectiles, Sight, Weapon, hash_combat};
 use crate::definitions::Definitions;
@@ -7,6 +8,7 @@ use crate::economy::Players;
 use crate::harvest::Harvester;
 use crate::id::{SimId, SimIdAllocator};
 use crate::map::Grid;
+use crate::match_setup::MatchState;
 use crate::rng::SimRng;
 use crate::schedule::SimTick;
 use crate::unit::{Facing, Mobile, Orders, Owner, Position, Unit, hash_unit};
@@ -62,9 +64,9 @@ impl Default for Fnv1a64 {
 /// order (its id, then a flag byte and, for a unit, its components; then a flag byte and, for a
 /// harvester, its cycle; then a flag byte and, for a building, its owner and components; then a
 /// flag byte and its health, armour, and sight; then a flag byte and its weapon), the [`Grid`],
-/// the [`Definitions`], the [`Players`] (with their visibility grids), and the projectiles in
-/// flight (docs/DECISIONS.md D4, D11, extended in M2, M3, and M4). Components added by later
-/// milestones are appended per entity.
+/// the [`Definitions`], the [`Players`] (with their visibility grids), the projectiles in flight,
+/// the [`MatchState`], and the computer players' [`AiPlayers`] (docs/DECISIONS.md D4, D11,
+/// extended in M2, M3, M4, and M6). Components added by later milestones are appended per entity.
 ///
 /// # Panics
 ///
@@ -129,6 +131,8 @@ pub fn state_hash(world: &mut World) -> u64 {
     world.resource::<Definitions>().hash_into(&mut hasher);
     world.resource::<Players>().hash_into(&mut hasher);
     world.resource::<Projectiles>().hash_into(&mut hasher);
+    world.resource::<MatchState>().hash_into(&mut hasher);
+    world.resource::<AiPlayers>().hash_into(&mut hasher);
 
     hasher.finish()
 }
