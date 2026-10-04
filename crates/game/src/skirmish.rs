@@ -21,7 +21,8 @@
 //! the human player's start. The seed of the simulation is taken from the clock when the match
 //! starts and logged (M0 debt item 3). When the simulation reports the match's outcome, ticks stop
 //! and the end screen shows victory, defeat, or a draw, with Restart (the same choices, a new seed)
-//! and Main menu ([`end_effect`], pure).
+//! and Main menu ([`end_effect`], pure). Since M7 the menu also opens the options screen
+//! (`crate::options`, docs/DECISIONS.md D52).
 
 use std::path::{Path, PathBuf};
 
@@ -377,6 +378,8 @@ pub enum MenuButton {
     /// The next entry of the row (wrapping around).
     Next(Row),
     Start,
+    /// The options screen (M7, `crate::options`).
+    Options,
     Quit,
 }
 
@@ -385,6 +388,8 @@ pub enum MenuButton {
 pub enum MenuEffect {
     Select(MenuSelection),
     Start(MenuSelection),
+    /// Open the options screen.
+    Options,
     Quit,
     Nothing,
 }
@@ -414,6 +419,7 @@ pub fn menu_effect(button: MenuButton, selection: MenuSelection, counts: MenuCou
         MenuButton::Next(row) => step(row, true),
         MenuButton::Start if selection.valid(counts) => MenuEffect::Start(selection),
         MenuButton::Start => MenuEffect::Nothing,
+        MenuButton::Options => MenuEffect::Options,
         MenuButton::Quit => MenuEffect::Quit,
     }
 }
@@ -683,6 +689,8 @@ pub(crate) fn spawn_screens(mut commands: Commands) {
             }
             menu.spawn((MenuButton::Start, screen_button(200.0)))
                 .with_child(screen_text("Start", 20.0));
+            menu.spawn((MenuButton::Options, screen_button(200.0)))
+                .with_child(screen_text("Options", 18.0));
             menu.spawn((MenuButton::Quit, screen_button(200.0)))
                 .with_child(screen_text("Quit", 18.0));
         });
@@ -713,17 +721,20 @@ pub(crate) fn spawn_screens(mut commands: Commands) {
 
 /// Clicks on the menu's and the end screen's buttons.
 #[allow(clippy::too_many_arguments)]
-fn screen_input(
+pub(crate) fn screen_input(
     mut commands: Commands,
     screen: Res<Screen>,
     catalogue: Option<Res<Catalogue>>,
     mut selection: ResMut<MenuSelection>,
     last: Res<LastMatch>,
     host: Res<SimHost>,
+    mut options: ResMut<crate::options::OptionsOpen>,
     menu: Query<(&Interaction, &MenuButton), Changed<Interaction>>,
     end: Query<(&Interaction, &EndButton), Changed<Interaction>>,
 ) {
     match *screen {
+        // While the options screen is open, it takes the clicks (`crate::options`).
+        Screen::Menu if options.0 => {}
         Screen::Menu => {
             let Some(catalogue) = catalogue else {
                 return;
@@ -740,6 +751,7 @@ fn screen_input(
                             begin_match(world, choice, clock_seed());
                         });
                     }
+                    MenuEffect::Options => options.0 = true,
                     MenuEffect::Quit => {
                         commands.queue(|world: &mut World| {
                             world.write_message(AppExit::Success);
@@ -815,6 +827,114 @@ pub(crate) mod tests {
         load(&assets(), &CheckedAssets::default())
             .unwrap_or_else(|error| panic!("{error}"))
             .0
+    }
+
+    /// Every file under `dir`, relative to it, in sorted order.
+    fn files_under(dir: &Path) -> Vec<PathBuf> {
+        let mut files = Vec::new();
+        let mut pending = vec![dir.to_path_buf()];
+        while let Some(next) = pending.pop() {
+            for entry in std::fs::read_dir(&next).expect("directory") {
+                let entry = entry.expect("entry");
+                if entry.file_type().expect("type").is_dir() {
+                    pending.push(entry.path());
+                } else {
+                    files.push(
+                        entry
+                            .path()
+                            .strip_prefix(dir)
+                            .expect("under the directory")
+                            .to_path_buf(),
+                    );
+                }
+            }
+        }
+        files.sort();
+        files
+    }
+
+    #[test]
+    fn every_production_data_file_loads_passes_cross_validation_and_is_licensed() {
+        // PLAN.md section 7, M7: "every production data file loads and passes cross validation".
+        // The catalogue loads every data file through its subset checker, every map with its
+        // tileset image, and every sprite, and checks them against each other (check_catalogue:
+        // start positions, the AI file against every faction's roster, and a trial setup of every
+        // match the menu offers).
+        let root = assets();
+        let catalogue = production_catalogue();
+        check_catalogue(&catalogue, &root).unwrap_or_else(|error| panic!("{error}"));
+        // M7 content: two factions with different rosters, three maps, the full roster.
+        let factions = &catalogue.skirmish.factions;
+        assert_eq!(factions.len(), 2);
+        assert_ne!(factions[0].roster, factions[1].roster);
+        assert!(catalogue.maps.len() >= 3);
+        let offered: std::collections::BTreeSet<sim::ProductionItem> = factions
+            .iter()
+            .flat_map(|faction| faction.roster.iter().copied())
+            .collect();
+        for item in crate::construction::production_menu(&catalogue.definitions) {
+            assert!(offered.contains(&item), "{item:?} is offered by no faction");
+        }
+        // No data file is left unchecked: the data directory holds exactly the files the
+        // catalogue loads.
+        let data: Vec<PathBuf> = files_under(&root.join("data"));
+        let loaded: Vec<PathBuf> = [
+            crate::units::UNITS_PATH,
+            crate::buildings::ECONOMY_PATH,
+            crate::units::COMBAT_PATH,
+            SKIRMISH_PATH,
+            AI_PATH,
+        ]
+        .iter()
+        .map(|path| {
+            Path::new(path)
+                .strip_prefix("data")
+                .expect("data")
+                .to_path_buf()
+        })
+        .collect::<std::collections::BTreeSet<_>>()
+        .into_iter()
+        .collect();
+        assert_eq!(data, loaded);
+        // Every map directory but the M0 spike's is a map of the menu.
+        for entry in std::fs::read_dir(root.join("maps")).expect("maps") {
+            let name = entry
+                .expect("entry")
+                .file_name()
+                .into_string()
+                .expect("name");
+            assert!(
+                name == "spike" || catalogue.maps.iter().any(|map| map.id == name),
+                "maps/{name} is not a map of the skirmish file"
+            );
+        }
+        // Every sprite is named by a definition.
+        let definitions = &catalogue.definitions;
+        for file in files_under(&root.join("sprites")) {
+            let stem = file
+                .file_stem()
+                .and_then(|stem| stem.to_str())
+                .expect("name");
+            let used = definitions.units().iter().any(|unit| unit.sprite == stem)
+                || definitions
+                    .buildings()
+                    .iter()
+                    .any(|building| building.sprite == stem);
+            assert!(used, "sprites/{} is named by no definition", file.display());
+        }
+        // Every file under assets/ is recorded in assets/LICENSES.md (PLAN.md section 3 item 7):
+        // the repository generated or authored it, or it carries a recorded licence.
+        let licences = std::fs::read_to_string(root.join("LICENSES.md")).expect("LICENSES.md");
+        for file in files_under(&root) {
+            let name = file.to_str().expect("name");
+            if name == "LICENSES.md" {
+                continue;
+            }
+            assert!(
+                licences.contains(&format!("`{name}`")),
+                "{name} is not recorded in assets/LICENSES.md"
+            );
+        }
     }
 
     const COUNTS: MenuCounts = MenuCounts {
@@ -922,22 +1042,38 @@ pub(crate) mod tests {
         }
         let path = root.join(SKIRMISH_PATH);
         let mut text = std::fs::read_to_string(&path).expect("skirmish file");
+        // Since M7 the file has two factions; the edits shift the first faction's (the
+        // Vanguard's) yard and groups, as the reviewer's root shifted the only faction's.
         for (from, to) in [
             (
-                "(building: \"construction_yard\", x: 0, y: 0)",
-                "(building: \"construction_yard\", x: -12, y: 0)",
+                "(building: \"construction_yard\", x: 0, y: 0)],\n            units: [\n                (unit: \"light_tank\"",
+                "(building: \"construction_yard\", x: -12, y: 0)],\n            units: [\n                (unit: \"light_tank\"",
             ),
             (
-                "(unit: \"light_tank\", x: 4, y: 1, count: 5)",
-                "(unit: \"light_tank\", x: -8, y: 1, count: 5)",
+                "(unit: \"light_tank\", x: 4, y: 1, count: 3)",
+                "(unit: \"light_tank\", x: -8, y: 1, count: 3)",
             ),
             (
-                "(unit: \"scout\", x: 1, y: 4, count: 3)",
-                "(unit: \"scout\", x: -11, y: 4, count: 3)",
+                "(unit: \"scout\", x: 1, y: 4, count: 2)",
+                "(unit: \"scout\", x: -11, y: 4, count: 2)",
+            ),
+            (
+                "(unit: \"rifleman\", x: 4, y: 4, count: 4)",
+                "(unit: \"rifleman\", x: -8, y: 4, count: 4)",
             ),
             (
                 "starts: [(x: 15, y: 37), (x: 52, y: 42)]",
                 "starts: [(x: 27, y: 37), (x: 70, y: 42)]",
+            ),
+            // The shifted offsets are meant for the demo map only; the maps added in M7 are left
+            // out of the copy.
+            (
+                "        (id: \"crossroads\", starts: [(x: 9, y: 9), (x: 44, y: 44)]),\n",
+                "",
+            ),
+            (
+                "        (id: \"riverlands\", starts: [(x: 8, y: 21), (x: 53, y: 24)]),\n",
+                "",
             ),
         ] {
             assert_eq!(text.matches(from).count(), 1, "{from}");
@@ -1081,6 +1217,11 @@ pub(crate) mod tests {
         assert_eq!(
             menu_effect(MenuButton::Quit, start, COUNTS),
             MenuEffect::Quit
+        );
+        // M7: the options screen opens from the menu, whatever the selection.
+        assert_eq!(
+            menu_effect(MenuButton::Options, start, COUNTS),
+            MenuEffect::Options
         );
         // A selection outside the catalogue starts nothing; an empty row selects nothing.
         let outside = MenuSelection { map: 2, ..start };

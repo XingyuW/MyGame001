@@ -4,18 +4,62 @@
 // speed:  subcells per tick, 1 to 128 (256 subcells per cell, 20 ticks per second;
 //         cells per second = speed x 20 / 256)
 // sprite: name of the sprite sheet assets/sprites/units/<sprite>.png (8 facings of 64x64 px)
+//
+// The roster of each faction is in skirmish.ron (M7): the Vanguard fields riflemen, rocket
+// soldiers, scouts, light tanks, and artillery; the Meridian conscripts, grenadiers, raiders,
+// heavy tanks, and rocket launchers; both use the harvester.
 (
     schema_version: 1,
     units: [
+        (
+            id: "rifleman",
+            speed: 14,
+            sprite: "rifleman",
+        ),
+        (
+            id: "rocket_soldier",
+            speed: 12,
+            sprite: "rocket_soldier",
+        ),
+        (
+            id: "conscript",
+            speed: 14,
+            sprite: "conscript",
+        ),
+        (
+            id: "grenadier",
+            speed: 12,
+            sprite: "grenadier",
+        ),
+        (
+            id: "scout",
+            speed: 40,
+            sprite: "scout",
+        ),
+        (
+            id: "raider",
+            speed: 44,
+            sprite: "raider",
+        ),
         (
             id: "light_tank",
             speed: 24,
             sprite: "light_tank",
         ),
         (
-            id: "scout",
-            speed: 40,
-            sprite: "scout",
+            id: "heavy_tank",
+            speed: 18,
+            sprite: "heavy_tank",
+        ),
+        (
+            id: "artillery",
+            speed: 16,
+            sprite: "artillery",
+        ),
+        (
+            id: "rocket_launcher",
+            speed: 16,
+            sprite: "rocket_launcher",
         ),
         (
             id: "harvester",

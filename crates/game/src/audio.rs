@@ -466,8 +466,8 @@ pub enum Channel {
     Effects,
 }
 
-/// The volume settings of this session, in steps of 0 to [`VOLUME_STEPS`] (they are not stored
-/// between sessions; options are M7's).
+/// The volume settings, in steps of 0 to [`VOLUME_STEPS`]; stored between sessions by
+/// `crate::options` since M7.
 #[derive(Resource, Clone, Copy, Debug, PartialEq, Eq)]
 pub struct VolumeSettings {
     pub master: u8,
@@ -609,7 +609,7 @@ pub struct SfxState {
     pub started: u64,
 }
 
-fn setup_audio(
+pub(crate) fn setup_audio(
     mut commands: Commands,
     mut sounds: ResMut<Assets<Pcm>>,
     volume: Res<VolumeSettings>,
@@ -663,7 +663,7 @@ type ViewVisibility<'w, 's> =
     Query<'w, 's, &'static Visibility, Or<(With<UnitView>, With<BuildingView>)>>;
 
 #[allow(clippy::too_many_arguments)]
-fn play_effects(
+pub(crate) fn play_effects(
     mut commands: Commands,
     mut events: MessageReader<SimEvent>,
     host: Res<SimHost>,

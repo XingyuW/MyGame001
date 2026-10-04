@@ -12,7 +12,10 @@
 //! Layout: continuous cell coordinates (u, v) of a W × H map map to the normalised image point
 //! `((u − v + H) / (W + H), (u + v) / (W + H))`, the main view's projection (equation 7) scaled
 //! so that the map's bounding rectangle fills the image. So the camera's view, an axis-aligned
-//! rectangle in the world, is an axis-aligned rectangle on the minimap.
+//! rectangle in the world, is an axis-aligned rectangle on the minimap. The image has at least two
+//! pixels per unit of `u − v` (M7, resolving M5 review 1 P2-2: with one, the cells with odd
+//! `u + v` of a map with W + H > 128 had no pixel), so every cell of every map size the loader
+//! accepts is drawn by at least one pixel.
 
 use bevy::asset::RenderAssetUsages;
 use bevy::prelude::*;
@@ -75,7 +78,9 @@ impl MinimapLayout {
         Self {
             map_width,
             map_height,
-            scale: (MINIMAP_TARGET_WIDTH / sum).max(1),
+            // At least two, so that every cell's diamond (2 × scale by scale pixels) holds a
+            // pixel centre (M5 review 1 P2-2).
+            scale: (MINIMAP_TARGET_WIDTH / sum).max(2),
         }
     }
 
@@ -514,6 +519,49 @@ mod tests {
         }
         // The demo map: 256 x 128 pixels, two per unit of u - v.
         assert_eq!(MinimapLayout::new(64, 64).size(), (256, 128));
+    }
+
+    #[test]
+    fn every_cell_of_every_accepted_map_size_is_drawn_by_a_pixel() {
+        // M5 review 1 P2-2: at one pixel per unit of u - v (W + H > 128), the cells with odd
+        // u + v had no pixel, so units on them were never marked. The sizes from the smallest to
+        // the largest map the loader accepts (sim::MAX_MAP_SIDE), across W + H = 128 and 129.
+        let largest = sim::MAX_MAP_SIDE;
+        for (width, height) in [
+            (1, 1),
+            (1, largest),
+            (largest, 1),
+            (64, 64),
+            (65, 64),
+            (64, 65),
+            (100, 100),
+            (127, 2),
+            (128, 128),
+            (200, 56),
+            (largest, largest),
+        ] {
+            let layout = MinimapLayout::new(width, height);
+            assert!(layout.scale >= 2, "{width}x{height}");
+            let (pixels_wide, pixels_high) = layout.size();
+            let mut seen = vec![false; (width * height) as usize];
+            for y in 0..pixels_high {
+                for x in 0..pixels_wide {
+                    if let Some(cell) = layout.pixel_cell(x, y) {
+                        seen[(cell.y as u32 * width + cell.x as u32) as usize] = true;
+                    }
+                }
+            }
+            let missing = seen.iter().filter(|drawn| !**drawn).count();
+            assert_eq!(
+                missing, 0,
+                "{width}x{height}: {missing} cells without a pixel"
+            );
+        }
+        // The largest image: 1,024 x 512 pixels.
+        assert_eq!(
+            MinimapLayout::new(largest, largest).size(),
+            (4 * largest, 2 * largest)
+        );
     }
 
     #[test]
