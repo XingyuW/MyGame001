@@ -1,5 +1,7 @@
 //! The 2D camera: panning by arrow keys, screen edge, and middle mouse drag, zoom by mouse wheel
-//! within limits, and clamping to the map (PLAN.md section 7, M1; docs/DECISIONS.md, D10).
+//! within limits, and clamping to the map (PLAN.md section 7, M1; docs/DECISIONS.md, D10). Since
+//! M7 the options (`crate::options::CameraOptions`, D52) switch edge scrolling off and scale the
+//! pan speed.
 //!
 //! The arithmetic lives in pure functions so that it can be unit tested; the systems only read
 //! input and apply the results.
@@ -7,6 +9,8 @@
 use bevy::input::mouse::{AccumulatedMouseScroll, MouseScrollUnit};
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
+
+use crate::options::CameraOptions;
 
 /// Keyboard and edge panning speed in world units per second at zoom scale 1. At other scales
 /// the speed is multiplied by the scale, so the map moves across the screen at the same rate.
@@ -32,6 +36,7 @@ pub struct CameraPlugin;
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<CameraBounds>()
+            .init_resource::<CameraOptions>()
             .init_resource::<MiddleDrag>()
             .add_systems(PostStartup, spawn_camera)
             .add_systems(
@@ -137,6 +142,7 @@ pub(crate) fn pan_camera(
     keys: Res<ButtonInput<KeyCode>>,
     window: Single<&Window, With<PrimaryWindow>>,
     time: Res<Time>,
+    options: Res<CameraOptions>,
     camera: Single<(&mut Transform, &Projection), With<Camera2d>>,
 ) {
     let (mut transform, projection) = camera.into_inner();
@@ -149,13 +155,14 @@ pub(crate) fn pan_camera(
         keys.pressed(KeyCode::ArrowUp),
         keys.pressed(KeyCode::ArrowDown),
     );
-    if window.focused
+    if options.edge_scrolling
+        && window.focused
         && let Some(cursor) = window.cursor_position()
     {
         direction = (direction + edge_direction(cursor, window.size(), EDGE_PAN_MARGIN))
             .normalize_or_zero();
     }
-    let step = direction * PAN_SPEED * scale * time.delta_secs();
+    let step = direction * PAN_SPEED * options.speed_factor() * scale * time.delta_secs();
     transform.translation += step.extend(0.0);
 }
 

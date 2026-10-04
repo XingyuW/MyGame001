@@ -38,9 +38,9 @@ pub use ai::{
     KnownBuilding, MAX_TARGET_FAILURES, WaveTarget, Waypoint,
 };
 pub use ai_defs::{
-    AI_SCHEMA_VERSION, AiDefinitions, Difficulty, MAX_AI_ARMY, MAX_ARMY_ENTRIES, MAX_BUILD_ORDER,
-    MAX_DEFENCE_RADIUS, MAX_DIFFICULTIES, MAX_HARVESTERS_PER_REFINERY, MAX_THINK_INTERVAL,
-    check_ai_factions, load_ai,
+    AI_SCHEMA_VERSION, AiDefinitions, AiPlan, Difficulty, MAX_AI_ARMY, MAX_ARMY_ENTRIES,
+    MAX_BUILD_ORDER, MAX_DEFENCE_RADIUS, MAX_DIFFICULTIES, MAX_HARVESTERS_PER_REFINERY,
+    MAX_THINK_INTERVAL, check_ai_factions, load_ai,
 };
 pub use building::{
     Building, Footprint, PlacementError, Producer, SpawnBuildingError, spawn_building,
@@ -94,8 +94,8 @@ pub use pathfinding::{
 pub use rng::SimRng;
 pub use schedule::{SimPlugin, SimSchedule, SimSet, SimTick, TICKS_PER_SECOND};
 pub use skirmish_defs::{
-    FactionDef, MATCH_PLAYERS, MAX_FACTIONS, MAX_GROUP_UNITS, MAX_MAPS, MAX_START_OFFSET,
-    MAX_STARTING_BUILDINGS, MAX_STARTING_CREDITS, MAX_STARTING_GROUPS, MapDef,
+    FactionDef, MATCH_PLAYERS, MAX_FACTIONS, MAX_GROUP_UNITS, MAX_MAPS, MAX_ROSTER_ENTRIES,
+    MAX_START_OFFSET, MAX_STARTING_BUILDINGS, MAX_STARTING_CREDITS, MAX_STARTING_GROUPS, MapDef,
     SKIRMISH_SCHEMA_VERSION, SkirmishDefinitions, StartProblem, StartingBuilding, StartingGroup,
     check_map_starts, load_skirmish, map_asset_path, start_problem,
 };

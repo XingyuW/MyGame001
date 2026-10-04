@@ -105,6 +105,8 @@ pub enum RejectReason {
     UnknownPlayer(PlayerId),
     /// The item is not defined, or the economy file gives it no production terms.
     UnknownItem(ProductionItem),
+    /// The roster of the player's faction does not offer `item` (M7).
+    NotInRoster(ProductionItem),
     /// The player owns no building of type `prerequisite`, which `item` requires.
     MissingPrerequisite {
         item: ProductionItem,
@@ -164,6 +166,9 @@ impl fmt::Display for RejectReason {
                 write!(f, "player {} is not a player of the match", player.0)
             }
             Self::UnknownItem(item) => write!(f, "{item:?} cannot be produced"),
+            Self::NotInRoster(item) => {
+                write!(f, "{item:?} is not in the roster of the player's faction")
+            }
             Self::MissingPrerequisite { item, prerequisite } => {
                 write!(f, "{item:?} requires a building of type {}", prerequisite.0)
             }

@@ -119,8 +119,8 @@ pub struct PauseOverlay;
 /// The state of a production item for the human player.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct ItemStatus {
-    /// The player owns every prerequisite and a producer, so `QueueProduction` is accepted
-    /// (unless the queue is full).
+    /// The roster of the player's faction offers the item (M7), and the player owns every
+    /// prerequisite and a producer, so `QueueProduction` is accepted (unless the queue is full).
     pub available: bool,
     /// Entries of the item in its queue.
     pub queued: usize,
@@ -130,7 +130,8 @@ pub struct ItemStatus {
     pub ready: bool,
 }
 
-/// The status of `item` for a player with `state` who owns buildings of the types `owned`.
+/// The status of `item` for a player with `state` who owns buildings of the types `owned`. An item
+/// the roster of the player's faction does not offer is never available (M7).
 pub fn item_status(
     item: ProductionItem,
     definitions: &Definitions,
@@ -140,7 +141,8 @@ pub fn item_status(
     let Some(terms) = definitions.production(item) else {
         return ItemStatus::default();
     };
-    let available = owned.contains(&terms.producer)
+    let available = state.offers(item)
+        && owned.contains(&terms.producer)
         && terms
             .prerequisites
             .iter()
@@ -353,6 +355,13 @@ fn owned_kinds(host: &SimHost) -> BTreeSet<BuildingKind> {
         .filter(|(owner, _)| owner.0 == HUMAN)
         .map(|(_, building)| building.kind)
         .collect()
+}
+
+/// Whether the item's button is shown: the item belongs to the shown build tab and the roster of
+/// the human player's faction offers it (M7; the other faction's items are not shown). Without a
+/// match every item of the tab is shown.
+pub fn item_shown(item: ProductionItem, tab: Tab, state: Option<&PlayerState>) -> bool {
+    Tab::of(item) == tab && state.is_none_or(|state| state.offers(item))
 }
 
 /// The status of every production item for the human player.
@@ -755,7 +764,7 @@ pub(crate) fn update_sidebar(
             background.0 = wanted;
         }
         if let SidebarButton::Item(item) = button {
-            let display = if Tab::of(*item) == *tab {
+            let display = if item_shown(*item, *tab, state) {
                 Display::Flex
             } else {
                 Display::None
@@ -1032,6 +1041,61 @@ mod tests {
     }
 
     #[test]
+    fn items_outside_the_roster_of_the_players_faction_are_neither_available_nor_shown() {
+        // M7: the shipped factions offer different items; with every building owned, an item is
+        // available exactly when the player's roster offers it, and its button is shown exactly
+        // then (on its tab).
+        let catalogue = crate::skirmish::tests::production_catalogue();
+        let definitions = &catalogue.definitions;
+        let owned: BTreeSet<BuildingKind> = (0..definitions.buildings().len())
+            .map(|index| BuildingKind(index as u16))
+            .collect();
+        let menu = production_menu(definitions);
+        assert!(catalogue.skirmish.factions.len() >= 2);
+        let mut offered_by_one_only = 0;
+        for faction in &catalogue.skirmish.factions {
+            let mut players = sim::Players::default();
+            players
+                .add_with_roster(HUMAN, 0, faction.roster.clone())
+                .expect("player");
+            let state = players.get(HUMAN).expect("player");
+            for &item in &menu {
+                let offered = faction.offers(item);
+                let status = item_status(item, definitions, &owned, state);
+                assert_eq!(status.available, offered, "{}: {item:?}", faction.id);
+                for tab in [Tab::Buildings, Tab::Units] {
+                    assert_eq!(
+                        item_shown(item, tab, Some(state)),
+                        offered && Tab::of(item) == tab,
+                        "{}: {item:?}",
+                        faction.id
+                    );
+                }
+                if !offered {
+                    offered_by_one_only += 1;
+                    // A left click on a button that is not available does nothing.
+                    assert_eq!(
+                        button_effect(
+                            SidebarButton::Item(item),
+                            MouseButton::Left,
+                            &menu,
+                            status,
+                            InterfaceMode::Normal,
+                        ),
+                        SidebarEffect::Nothing
+                    );
+                }
+            }
+        }
+        assert!(offered_by_one_only > 0, "the factions differ");
+        // Without a match every item of the tab is shown.
+        assert!(
+            menu.iter()
+                .all(|&item| item_shown(item, Tab::of(item), None))
+        );
+    }
+
+    #[test]
     fn texts_and_colours_of_the_sidebar() {
         let definitions = production_definitions();
         let power = ProductionItem::Building(definitions.building_kind("power_plant").expect("pp"));
@@ -1107,8 +1171,8 @@ mod tests {
     fn the_game_systems_share_no_state_without_an_order() {
         // As `selection::tests::no_two_game_systems_share_state_in_post_update_without_an_order`
         // and the fog's test, with every plugin of the game (M5 adds the simulation host, the
-        // sidebar, the minimap, health bars, and audio; M6 the menu and end screen), for every
-        // schedule they add systems to.
+        // sidebar, the minimap, health bars, and audio; M6 the menu and end screen; M7 the
+        // options), for every schedule they add systems to.
         let mut app = App::new();
         app.add_plugins((
             MinimalPlugins,
@@ -1126,7 +1190,8 @@ mod tests {
             crate::health::HealthBarsPlugin,
             crate::audio::GameAudioPlugin,
             crate::skirmish::SkirmishPlugin,
-        ));
+        ))
+        .add_plugins(crate::options::OptionsPlugin { path: None });
         let check = |world: &mut World, schedule: &mut Schedule| {
             schedule.initialize(world).expect("schedule builds");
             assert!(
@@ -1140,5 +1205,6 @@ mod tests {
         app.world_mut().schedule_scope(FixedUpdate, check);
         app.world_mut().schedule_scope(Update, check);
         app.world_mut().schedule_scope(PostUpdate, check);
+        app.world_mut().schedule_scope(Last, check);
     }
 }

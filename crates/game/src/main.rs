@@ -17,6 +17,7 @@ mod health;
 mod hotkeys;
 mod map;
 mod minimap;
+mod options;
 mod projection;
 mod selection;
 mod sidebar;
@@ -71,7 +72,15 @@ fn main() -> AppExit {
         health::HealthBarsPlugin,
         audio::GameAudioPlugin,
         skirmish::SkirmishPlugin,
-    ));
+    ))
+    // A smoke run stores its settings in a file of its own, which it removes, so that it never
+    // reads or changes the player's settings (docs/DECISIONS.md D52).
+    .add_plugins(crate::options::OptionsPlugin {
+        path: match options.smoke_test_frames {
+            Some(_) => Some(smoke::settings_path()),
+            None => crate::options::default_settings_path(),
+        },
+    });
 
     if let Some(frames) = options.smoke_test_frames {
         app.add_plugins(smoke::SmokeTestPlugin { frames });

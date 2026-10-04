@@ -28,28 +28,39 @@
 //! computer player may be rejected in any match of the run (M6 review 1 P2-4): the smoke matches
 //! are too short for contact between the players, so no loss can explain a rejection (D43
 //! item 5), and a rejected command means the computer player issued an unusable one.
+//!
+//! From M7 the last match of a long run is started after the faction row's `>` button, so the
+//! human player plays the second faction; no sidebar button of an item outside the roster of the
+//! human player's faction may be displayed; the menu has its Options button, and the options
+//! screen all of its buttons; and the run changes two options the options screen's way
+//! (`crate::options::options_effect`), which must be written to the run's own settings file
+//! ([`settings_path`], removed at the end) and read back unchanged (docs/DECISIONS.md D52).
 
 use std::collections::BTreeMap;
 
 use bevy::asset::UntypedAssetLoadFailedEvent;
 use bevy::prelude::*;
 use sim::{
-    Building, BuildingKind, CellPos, Command, Definitions, Mobile, Owner, Players, Position,
-    ProductionItem, SimEvent, SimId, SubPos,
+    Building, BuildingKind, CellPos, Command, Definitions, Mobile, Owner, PlayerState, Players,
+    Position, ProductionItem, SimEvent, SimId, SubPos,
 };
 
-use crate::audio::{MusicPlayer, Sfx, SoundBank};
+use crate::audio::{MusicPlayer, Sfx, SoundBank, VolumeSettings};
 use crate::buildings::{BuildingStatus, BuildingView, building_shown};
 use crate::construction::{InterfaceMode, production_menu};
 use crate::map::MapStatus;
 use crate::minimap::MinimapState;
+use crate::options::{
+    CameraOptions, OPTIONS_BUTTONS, OptionRow, OptionsButton, OptionsEffect, Settings,
+    SettingsFile, options_effect, read_settings,
+};
 use crate::sidebar::{
     SidebarButton, SidebarEffect, SidebarText, button_effect, credits_text, item_status,
 };
 use crate::sim_host::{CommandRefused, CommandSink, SimHost};
 use crate::skirmish::{
     Catalogue, EndButton, EndEffect, LastMatch, MenuButton, MenuCounts, MenuEffect, MenuRoot,
-    MenuSelection, Screen, begin_match, end_effect, end_match, menu_effect,
+    MenuSelection, Row, Screen, begin_match, end_effect, end_match, menu_effect,
 };
 use crate::units::{HUMAN, OPPONENT, UnitStatus, UnitView, unit_shown};
 
@@ -83,6 +94,14 @@ pub const AI_CHECK_TICKS: u64 = 60;
 /// The seed of the smoke test's matches.
 const SMOKE_SEED: u64 = 6;
 
+/// The settings file of a smoke run: a file of its own in the temporary directory (removed at the
+/// end of the run), so that a smoke run never reads or changes the player's settings (M7, D52).
+pub fn settings_path() -> std::path::PathBuf {
+    std::env::temp_dir()
+        .join(format!("mygame001-smoke-{}", std::process::id()))
+        .join("settings.txt")
+}
+
 pub struct SmokeTestPlugin {
     pub frames: u32,
 }
@@ -100,11 +119,13 @@ impl Plugin for SmokeTestPlugin {
             flow: Flow::default(),
             menu_buttons: None,
             starts: 0,
+            options_changed: false,
         })
         .add_systems(
             Update,
             (
                 play_flow,
+                change_options,
                 order_move,
                 order_production,
                 watch_events,
@@ -137,6 +158,8 @@ struct SmokeTest {
     ai_rejected: u64,
     pause: PauseCheck,
     flow: Flow,
+    /// Whether the run has changed its options (M7).
+    options_changed: bool,
     /// Menu buttons found when the menu was first shown (`None` before).
     menu_buttons: Option<usize>,
     /// Matches started.
@@ -167,7 +190,7 @@ fn play_flow(
     mut smoke: ResMut<SmokeTest>,
     screen: Res<Screen>,
     catalogue: Option<Res<Catalogue>>,
-    selection: Res<MenuSelection>,
+    mut selection: ResMut<MenuSelection>,
     last: Res<LastMatch>,
     map: Res<MapStatus>,
     host: Res<SimHost>,
@@ -178,22 +201,22 @@ fn play_flow(
         return;
     };
     let long = smoke.frames >= FLOW_MIN_FRAMES;
-    let start = |smoke: &mut SmokeTest, commands: &mut Commands, next: Flow| match menu_effect(
-        MenuButton::Start,
-        *selection,
-        MenuCounts::of(&catalogue),
-    ) {
-        MenuEffect::Start(choice) => {
-            commands.queue(move |world: &mut World| begin_match(world, choice, SMOKE_SEED));
-            smoke.starts += 1;
-            smoke.flow = next;
-        }
-        effect => {
-            error!("smoke test failed: the menu's Start button did {effect:?}");
-            smoke.rejected = true;
-            smoke.flow = Flow::Last;
-        }
-    };
+    let counts = MenuCounts::of(&catalogue);
+    let start =
+        |smoke: &mut SmokeTest, commands: &mut Commands, selection: MenuSelection, next: Flow| {
+            match menu_effect(MenuButton::Start, selection, counts) {
+                MenuEffect::Start(choice) => {
+                    commands.queue(move |world: &mut World| begin_match(world, choice, SMOKE_SEED));
+                    smoke.starts += 1;
+                    smoke.flow = next;
+                }
+                effect => {
+                    error!("smoke test failed: the menu's Start button did {effect:?}");
+                    smoke.rejected = true;
+                    smoke.flow = Flow::Last;
+                }
+            }
+        };
     let settled = map.map_created && host.tick() >= FLOW_TICKS;
     match (smoke.flow, *screen) {
         (Flow::Menu, Screen::Menu) => {
@@ -202,6 +225,7 @@ fn play_flow(
             start(
                 &mut smoke,
                 &mut commands,
+                *selection,
                 if long { Flow::First } else { Flow::Last },
             );
         }
@@ -226,9 +250,53 @@ fn play_flow(
             }
             smoke.flow = Flow::MenuAgain;
         }
-        (Flow::MenuAgain, Screen::Menu) => start(&mut smoke, &mut commands, Flow::Last),
+        (Flow::MenuAgain, Screen::Menu) => {
+            // M7: the last match is started after the faction row's `>` button, so that the human
+            // player plays the next faction (the second, with the shipped data) and the checks
+            // cover it.
+            match menu_effect(MenuButton::Next(Row::Faction), *selection, counts) {
+                MenuEffect::Select(next) => *selection = next,
+                effect => {
+                    error!("smoke test failed: the faction row's next button did {effect:?}");
+                    smoke.rejected = true;
+                }
+            }
+            start(&mut smoke, &mut commands, *selection, Flow::Last);
+        }
         _ => {}
     }
+}
+
+/// Changes two options as the options screen's buttons do, once the catalogue is loaded (M7): the
+/// master volume one step down and edge scrolling off. The settings file must hold them at the end.
+fn change_options(
+    mut smoke: ResMut<SmokeTest>,
+    catalogue: Option<Res<Catalogue>>,
+    mut volume: ResMut<VolumeSettings>,
+    mut camera: ResMut<CameraOptions>,
+) {
+    if smoke.options_changed || catalogue.is_none() {
+        return;
+    }
+    smoke.options_changed = true;
+    let mut settings = Settings {
+        volume: *volume,
+        camera: *camera,
+    };
+    for button in [
+        OptionsButton::Step(OptionRow::Master, false),
+        OptionsButton::Switch(OptionRow::EdgeScrolling),
+    ] {
+        match options_effect(button, settings) {
+            OptionsEffect::Set(next) => settings = next,
+            effect => {
+                error!("smoke test failed: the options button {button:?} did {effect:?}");
+                smoke.rejected = true;
+            }
+        }
+    }
+    *volume = settings.volume;
+    *camera = settings.camera;
 }
 
 /// The pause the smoke test makes (M5).
@@ -293,14 +361,16 @@ fn check_pause(mut smoke: ResMut<SmokeTest>, mut sink: ResMut<CommandSink>, host
 }
 
 /// The first building of the production menu that `owned` (the player's building types) lets
-/// the player queue: it has no prerequisites and the player owns a building of its producing
-/// type.
+/// the player with `state` queue: the roster of its faction offers it (M7), it has no
+/// prerequisites, and the player owns a building of its producing type.
 pub fn first_queueable(
     definitions: &Definitions,
     owned: &[BuildingKind],
+    state: &PlayerState,
 ) -> Option<ProductionItem> {
     production_menu(definitions).into_iter().find(|&item| {
         matches!(item, ProductionItem::Building(_))
+            && state.offers(item)
             && definitions.production(item).is_some_and(|terms| {
                 terms.prerequisites.is_empty() && owned.contains(&terms.producer)
             })
@@ -338,7 +408,7 @@ fn order_production(
     if owned.is_empty() {
         return;
     }
-    let item = first_queueable(definitions, &owned);
+    let item = first_queueable(definitions, &owned, state);
     if let Some(item) = item {
         let menu = production_menu(definitions);
         let item_state = item_status(item, definitions, &owned.iter().copied().collect(), state);
@@ -519,6 +589,7 @@ fn count_frames(
     views: ViewQueries,
     interface: InterfaceQueries,
     flow: (Option<Res<Catalogue>>, Res<LastMatch>),
+    options: OptionQueries,
     mut exit: MessageWriter<AppExit>,
 ) {
     smoke.rendered = smoke.rendered.saturating_add(1);
@@ -574,6 +645,35 @@ fn count_frames(
         .iter()
         .filter(|(_, node, transform)| !node_inside(node, transform, window.size()))
         .count();
+    // M7: displayed item buttons whose item the human player's faction does not offer.
+    let off_roster_shown = players.get(HUMAN).map_or(0, |state| {
+        sidebar_buttons
+            .iter()
+            .filter(|(button, node, _)| {
+                matches!(button, SidebarButton::Item(item) if !state.offers(*item))
+                    && node.size() != Vec2::ZERO
+            })
+            .count()
+    });
+    // M7: the options written to the run's settings file read back unchanged.
+    let (settings_file, volume, camera, options_buttons) = options;
+    let current = Settings {
+        volume: *volume,
+        camera: *camera,
+    };
+    let settings_saved = settings_file.writes > 0
+        && settings_file
+            .path
+            .as_deref()
+            .is_some_and(|path| read_settings(path).ok().flatten() == Some(current));
+    if let Some(dir) = settings_file
+        .path
+        .as_deref()
+        .and_then(std::path::Path::parent)
+    {
+        let _ = std::fs::remove_dir_all(dir);
+    }
+    let options_buttons = options_buttons.iter().count();
     let credits_shown = sidebar_texts
         .iter()
         .find(|(_, kind)| **kind == SidebarText::Credits)
@@ -618,7 +718,9 @@ fn count_frames(
          {credits_shown:?}, minimap drawings: {}, minimap pixels lit: {}, sounds: {}, music \
          players: {}, pause: {:?}, menu buttons: {:?}, matches started: {}, flow: {:?}, views: \
          {unit_view_count} of {sim_units} units and {building_view_count} of {sim_buildings} \
-         buildings, computer player's commands: {ai_commands} ({} rejected)",
+         buildings, computer player's commands: {ai_commands} ({} rejected), items outside the \
+         roster shown: {off_roster_shown}, options buttons: {options_buttons}, settings saved: \
+         {settings_saved}",
         smoke.rendered,
         tick,
         map.map_created,
@@ -678,6 +780,9 @@ fn count_frames(
         simulated: (sim_units, sim_buildings),
         ai_commands,
         ai_rejected: smoke.ai_rejected,
+        off_roster_shown,
+        options_buttons,
+        settings_saved,
     });
     if failures.is_empty() {
         exit.write(AppExit::Success);
@@ -748,10 +853,24 @@ struct SmokeOutcome {
     ai_commands: u64,
     /// Commands of the computer player rejected in any match of the run.
     ai_rejected: u64,
+    /// Displayed sidebar buttons of items outside the human player's roster (M7).
+    off_roster_shown: usize,
+    /// Buttons of the options screen (M7).
+    options_buttons: usize,
+    /// The options the run changed were written and read back unchanged (M7).
+    settings_saved: bool,
 }
 
-/// Buttons of the menu: previous and next for each of its rows, Start, and Quit.
-pub const MENU_BUTTONS: usize = crate::skirmish::Row::ALL.len() * 2 + 2;
+/// Buttons of the menu: previous and next for each of its rows, Start, Options (M7), and Quit.
+pub const MENU_BUTTONS: usize = crate::skirmish::Row::ALL.len() * 2 + 3;
+
+/// What the options screen and the settings file show, for the smoke test's M7 checks.
+type OptionQueries<'w, 's> = (
+    Res<'w, SettingsFile>,
+    Res<'w, VolumeSettings>,
+    Res<'w, CameraOptions>,
+    Query<'w, 's, &'static OptionsButton>,
+);
 
 /// The starting units and buildings of a match with `selection`: those of both players'
 /// factions (the skirmish file, M6).
@@ -886,6 +1005,25 @@ fn smoke_failures(outcome: &SmokeOutcome) -> Vec<String> {
             outcome.ai_rejected
         ));
     }
+    if outcome.off_roster_shown > 0 {
+        failures.push(format!(
+            "{} sidebar buttons of items outside the roster of the human player's faction are \
+             shown",
+            outcome.off_roster_shown
+        ));
+    }
+    if outcome.options_buttons != OPTIONS_BUTTONS {
+        failures.push(format!(
+            "the options screen has {} of {OPTIONS_BUTTONS} buttons",
+            outcome.options_buttons
+        ));
+    }
+    if !outcome.settings_saved {
+        failures.push(
+            "the options the run changed were not written to its settings file and read back"
+                .to_string(),
+        );
+    }
     match outcome.pause {
         None => failures.push("the pause did not end within the run".to_string()),
         Some((ticks, _)) if ticks > 0 => {
@@ -938,7 +1076,50 @@ mod tests {
         simulated: (26, 2),
         ai_commands: 4,
         ai_rejected: 0,
+        off_roster_shown: 0,
+        options_buttons: OPTIONS_BUTTONS,
+        settings_saved: true,
     };
+
+    #[test]
+    fn a_run_passes_only_with_the_roster_shown_and_the_options_stored() {
+        // M7: an item outside the human player's roster shown in the sidebar, an options screen
+        // without all of its buttons, or options that were not written and read back each fail
+        // the run.
+        let fails = |outcome: SmokeOutcome| smoke_failures(&outcome);
+        assert_eq!(
+            fails(SmokeOutcome {
+                off_roster_shown: 1,
+                ..PASSING
+            }),
+            [
+                "1 sidebar buttons of items outside the roster of the human player's faction are \
+                 shown"
+            ]
+        );
+        for options_buttons in [0, OPTIONS_BUTTONS - 1, OPTIONS_BUTTONS + 1] {
+            assert_eq!(
+                fails(SmokeOutcome {
+                    options_buttons,
+                    ..PASSING
+                }),
+                [format!(
+                    "the options screen has {options_buttons} of {OPTIONS_BUTTONS} buttons"
+                )]
+            );
+        }
+        assert_eq!(
+            fails(SmokeOutcome {
+                settings_saved: false,
+                ..PASSING
+            }),
+            ["the options the run changed were not written to its settings file and read back"]
+        );
+        // The run's settings file lies in the temporary directory, never in the player's.
+        let path = settings_path();
+        assert!(path.starts_with(std::env::temp_dir()), "{}", path.display());
+        assert_ne!(Some(path), crate::options::default_settings_path());
+    }
 
     #[test]
     fn a_run_passes_only_with_every_configured_starting_unit() {
@@ -1010,20 +1191,37 @@ mod tests {
     fn the_demo_player_can_queue_a_building_with_its_starting_buildings() {
         // M6: the human player's starting buildings are those of its faction in the skirmish file
         // (the menu's first choice, D40).
+        // M7: for every faction, and only items its roster offers.
         let catalogue = crate::skirmish::tests::production_catalogue();
         let selection = MenuSelection::initial(&catalogue);
         let definitions = &catalogue.definitions;
-        let owned: Vec<BuildingKind> = catalogue.skirmish.factions[selection.faction]
-            .buildings
-            .iter()
-            .map(|building| building.kind)
-            .collect();
-        let item = first_queueable(definitions, &owned).expect("something to queue");
-        let terms = definitions.production(item).expect("terms");
-        assert!(terms.prerequisites.is_empty());
-        // At least one credit is charged on the first tick, so the smoke check can see it.
-        assert!(terms.cost / i64::from(terms.build_time) > 0 || terms.build_time == 1);
-        assert_eq!(first_queueable(definitions, &[]), None);
+        assert!(selection.faction < catalogue.skirmish.factions.len());
+        for (index, faction) in catalogue.skirmish.factions.iter().enumerate() {
+            let owned: Vec<BuildingKind> = faction
+                .buildings
+                .iter()
+                .map(|building| building.kind)
+                .collect();
+            let mut players = Players::default();
+            players
+                .add_with_roster(sim::PlayerId(0), 0, faction.roster.clone())
+                .expect("player");
+            let state = players.get(sim::PlayerId(0)).expect("player");
+            let item = first_queueable(definitions, &owned, state).expect("something to queue");
+            assert!(faction.offers(item), "faction {index}: {item:?}");
+            let terms = definitions.production(item).expect("terms");
+            assert!(terms.prerequisites.is_empty());
+            // At least one credit is charged on the first tick, so the smoke check can see it.
+            assert!(terms.cost / i64::from(terms.build_time) > 0 || terms.build_time == 1);
+            assert_eq!(first_queueable(definitions, &[], state), None);
+            // An empty roster offers nothing.
+            let mut nothing = Players::default();
+            nothing
+                .add_with_roster(sim::PlayerId(0), 0, Default::default())
+                .expect("player");
+            let state = nothing.get(sim::PlayerId(0)).expect("player");
+            assert_eq!(first_queueable(definitions, &owned, state), None);
+        }
     }
 
     #[test]
@@ -1265,6 +1463,7 @@ mod tests {
             flow: Flow::default(),
             menu_buttons: None,
             starts: 0,
+            options_changed: false,
         });
         app.world_mut().write_message(AppExit::Success);
         app.world_mut()
