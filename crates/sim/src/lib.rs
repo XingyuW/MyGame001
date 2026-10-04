@@ -7,6 +7,8 @@
 //! This crate uses no floating point types (invariant I2) and depends on no rendering,
 //! windowing, audio, or input crate (invariant I1).
 
+mod ai;
+mod ai_defs;
 mod building;
 mod combat;
 mod combat_defs;
@@ -22,13 +24,24 @@ mod hash;
 mod id;
 mod map;
 mod map_subset;
+mod match_setup;
 mod movement;
 mod pathfinding;
 mod rng;
 mod schedule;
+mod skirmish_defs;
 mod unit;
 mod visibility;
 
+pub use ai::{
+    AI_UNIT_QUEUE, AiController, AiPlayers, GATHER_DISTANCE, GATHER_RADIUS, HARVEST_RETRY_TICKS,
+    KnownBuilding, MAX_TARGET_FAILURES, WaveTarget, Waypoint,
+};
+pub use ai_defs::{
+    AI_SCHEMA_VERSION, AiDefinitions, Difficulty, MAX_AI_ARMY, MAX_ARMY_ENTRIES, MAX_BUILD_ORDER,
+    MAX_DEFENCE_RADIUS, MAX_DIFFICULTIES, MAX_HARVESTERS_PER_REFINERY, MAX_THINK_INTERVAL,
+    check_ai_factions, load_ai,
+};
 pub use building::{
     Building, Footprint, PlacementError, Producer, SpawnBuildingError, spawn_building,
 };
@@ -69,6 +82,10 @@ pub use map::{
     SUBCELLS_PER_CELL, SubPos, TERRAIN_LAYER, TILE_HEIGHT_PX, TILE_WIDTH_PX, TilesetImage,
     load_map, load_map_with_files,
 };
+pub use match_setup::{
+    Controller, MatchOutcome, MatchSetupError, MatchStart, MatchState, PlayerSetup, StartError,
+    plan_starting_units, setup_match,
+};
 pub use movement::{MAX_PATHS_WITHOUT_PROGRESS, MAX_STALLED_TICKS, REPATH_AFTER_BLOCKED_TICKS};
 pub use pathfinding::{
     DIAGONAL_COST, ORTHOGONAL_COST, PATH_REQUESTS_PER_TICK, Path, destination_cells, find_path,
@@ -76,6 +93,12 @@ pub use pathfinding::{
 };
 pub use rng::SimRng;
 pub use schedule::{SimPlugin, SimSchedule, SimSet, SimTick, TICKS_PER_SECOND};
+pub use skirmish_defs::{
+    FactionDef, MATCH_PLAYERS, MAX_FACTIONS, MAX_GROUP_UNITS, MAX_MAPS, MAX_START_OFFSET,
+    MAX_STARTING_BUILDINGS, MAX_STARTING_CREDITS, MAX_STARTING_GROUPS, MapDef,
+    SKIRMISH_SCHEMA_VERSION, SkirmishDefinitions, StartProblem, StartingBuilding, StartingGroup,
+    check_map_starts, load_skirmish, map_asset_path, start_problem,
+};
 pub use unit::{
     DIAGONAL_STEP, Direction, Facing, Mobile, MoveOrder, ORTHOGONAL_STEP, Orders, Owner, PathState,
     Position, SpawnError, Step, Unit, spawn_unit,

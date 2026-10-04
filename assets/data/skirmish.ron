@@ -1,0 +1,28 @@
+// Skirmish definitions, schema version 1 (PLAN.md section 7, M6; docs/DECISIONS.md D40).
+//
+// starting_credits: credits of every player at the start of a match
+// factions:  what a player who plays the faction starts with, placed relative to its start
+//            position: buildings (type and the offset of the footprint's origin from the start, in
+//            cells; the first is the construction yard at the start itself) and groups of units
+//            (type, the offset of the cell they gather around, and how many). Names as in
+//            units.ron and economy.ron.
+// maps:      the maps of the skirmish menu: id (the map file is maps/<id>/<id>.tmx) and exactly
+//            two start positions; the human player starts at the first, the computer player at
+//            the second
+(
+    schema_version: 1,
+    starting_credits: 5000,
+    factions: [
+        (
+            id: "vanguard",
+            buildings: [(building: "construction_yard", x: 0, y: 0)],
+            units: [
+                (unit: "light_tank", x: 4, y: 1, count: 5),
+                (unit: "scout", x: 1, y: 4, count: 3),
+            ],
+        ),
+    ],
+    maps: [
+        (id: "demo", starts: [(x: 15, y: 37), (x: 52, y: 42)]),
+    ],
+)

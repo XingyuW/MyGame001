@@ -1,0 +1,33 @@
+// M6 fixture: the computer player's definitions for the AI and match tests, resolved against
+// units_combat.ron, economy_combat.ron, and combat.ron. The values are fixture data, independent
+// of the production values in assets/data/ai.ron (invariant I10). The rifleman cannot damage the
+// concrete buildings (bullet against concrete: 0 %); the tank can, as the AI file requires.
+(
+    schema_version: 1,
+    build_order: ["power", "refinery", "barracks", "factory", "power", "turret"],
+    power: "power",
+    harvester: "harvester",
+    army: ["tank", "tank", "rifleman"],
+    difficulties: [
+        (
+            id: "easy",
+            think_interval: 20,
+            harvesters_per_refinery: 1,
+            max_army: 6,
+            wave_size: 4,
+            first_wave: 1200,
+            wave_patience: 1200,
+            defence_radius: 6,
+        ),
+        (
+            id: "normal",
+            think_interval: 10,
+            harvesters_per_refinery: 2,
+            max_army: 12,
+            wave_size: 5,
+            first_wave: 600,
+            wave_patience: 800,
+            defence_radius: 8,
+        ),
+    ],
+)

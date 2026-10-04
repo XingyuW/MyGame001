@@ -51,7 +51,7 @@ impl Plugin for GameAudioPlugin {
         app.add_audio_source::<Pcm>()
             .init_resource::<VolumeSettings>()
             .init_resource::<SfxState>()
-            .add_systems(Startup, setup_audio.after(crate::sim_host::start_match))
+            .add_systems(Startup, setup_audio.after(crate::skirmish::load_catalogue))
             .add_systems(
                 Update,
                 (play_effects, expire_effects, apply_music_volume)
@@ -568,7 +568,10 @@ pub fn event_sound(event: &SimEvent, context: &SoundContext) -> Option<Sfx> {
         | SimEvent::UnitSpawned { .. }
         | SimEvent::HarvesterIdle { .. }
         | SimEvent::ProjectileExpired { .. }
-        | SimEvent::AttackEnded { .. } => None,
+        | SimEvent::AttackEnded { .. }
+        // The end screen announces the outcome (M6).
+        | SimEvent::PlayerDefeated { .. }
+        | SimEvent::MatchEnded { .. } => None,
     }
 }
 

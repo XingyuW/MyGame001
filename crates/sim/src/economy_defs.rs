@@ -360,9 +360,9 @@ pub(crate) fn load(path: &Path, units: &[String]) -> Result<EconomyDefinitions, 
 }
 
 /// A validation problem: the field and the reason.
-type Problem = (String, DataErrorKind);
+pub(crate) type Problem = (String, DataErrorKind);
 
-fn invalid(field: String, found: impl ToString, expected: impl Into<String>) -> Problem {
+pub(crate) fn invalid(field: String, found: impl ToString, expected: impl Into<String>) -> Problem {
     (
         field,
         DataErrorKind::InvalidValue {
@@ -373,7 +373,7 @@ fn invalid(field: String, found: impl ToString, expected: impl Into<String>) -> 
 }
 
 /// `value` as `T` if it lies in `min..=max`.
-fn ranged<T>(field: &str, value: i64, min: T, max: T, unit: &str) -> Result<T, Problem>
+pub(crate) fn ranged<T>(field: &str, value: i64, min: T, max: T, unit: &str) -> Result<T, Problem>
 where
     T: Copy + TryFrom<i64> + Into<i64> + std::fmt::Display,
 {
@@ -383,7 +383,7 @@ where
         .ok_or_else(|| invalid(field.to_owned(), value, format!("{min} to {max}{unit}")))
 }
 
-fn unknown(field: String, kind: &str, id: &str) -> Problem {
+pub(crate) fn unknown(field: String, kind: &str, id: &str) -> Problem {
     (
         field,
         DataErrorKind::UnknownReference {

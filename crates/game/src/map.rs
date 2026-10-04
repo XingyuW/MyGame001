@@ -13,13 +13,14 @@
 //! below, not a proof that the third party code cannot fail; any asset load failure ends the game
 //! with exit code 1 (`exit_on_asset_load_failure`).
 //!
-//! The validated grid is installed into the simulation, and the map is rendered through
-//! `bevy_ecs_tiled` at the offset that aligns it with [`crate::projection`].
+//! Every map of the skirmish file is checked this way once, when the game starts
+//! (`crate::skirmish`); a match installs the checked grid into the simulation, and the map is
+//! rendered through `bevy_ecs_tiled` from the checked bytes at the offset that aligns it with
+//! [`crate::projection`] ([`spawn_map`]).
 
 use std::path::Path;
 
 use bevy::asset::UntypedAssetLoadFailedEvent;
-use bevy::asset::io::file::FileAssetReader;
 use bevy::camera::CameraUpdateSystems;
 use bevy::prelude::*;
 use bevy::transform::TransformSystems;
@@ -27,15 +28,13 @@ use bevy::window::PrimaryWindow;
 use bevy_ecs_tiled::prelude::*;
 use sim::{CellPos, Grid};
 
-use crate::camera::CameraBounds;
 use crate::checked_assets::CheckedAssets;
-use crate::projection::{
-    TileSize, cell_centre, cell_corners, map_bounds, map_origin_offset, pick_cell,
-};
-use crate::sim_host::MatchGrid;
+use crate::projection::{TileSize, cell_centre, cell_corners, map_origin_offset, pick_cell};
 use crate::tileset_image::check_tileset_image;
 
-/// The map loaded at startup, relative to the asset directory. Map selection arrives in M6.
+/// The demo map, relative to the asset directory (the tests' map; the game's maps are those of
+/// the skirmish file, M6).
+#[cfg(test)]
 pub const MAP_PATH: &str = "maps/demo/demo.tmx";
 
 pub struct MapPlugin;
@@ -44,7 +43,6 @@ impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<MapStatus>()
             .init_resource::<HoveredCell>()
-            .add_systems(Startup, load_map)
             .add_systems(Update, on_map_created)
             .add_systems(Last, exit_on_asset_load_failure)
             .add_systems(
@@ -65,11 +63,20 @@ pub struct MapView {
     pub tile: TileSize,
 }
 
-/// What has happened to the map so far; read by the smoke test.
+/// What has happened to the map of the current match so far; read by the smoke test.
 #[derive(Resource, Debug, Default)]
 pub struct MapStatus {
     pub map_created: bool,
 }
+
+/// The map entity of the current match; despawned, with the tiles `bevy_ecs_tiled` spawned under
+/// it, when the match ends.
+#[derive(Component, Debug)]
+pub struct MapRoot;
+
+/// The map file of the current match, relative to the asset directory.
+#[derive(Resource, Clone, Debug)]
+pub struct MapAsset(pub std::path::PathBuf);
 
 /// The map cell under the mouse cursor, if any.
 #[derive(Resource, Debug, Default)]
@@ -82,34 +89,28 @@ pub struct HoveredCell(pub Option<CellPos>);
 #[derive(Resource, Clone, Debug)]
 pub struct MapTerrain(pub Grid);
 
-pub(crate) fn load_map(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    checked: Res<CheckedAssets>,
-    mut exit: MessageWriter<AppExit>,
-) {
-    let path = FileAssetReader::new(AssetPlugin::default().file_path)
-        .root_path()
-        .join(MAP_PATH);
-    let (loaded, files) = match sim::load_map_with_files(&path) {
-        Ok(loaded) => loaded,
-        Err(error) => {
-            error!("{error}");
-            exit.write(AppExit::error());
-            return;
-        }
-    };
-    let image = match check_tileset_image(&path, &loaded.tileset_image) {
-        Ok(image) => image,
-        Err(error) => {
-            error!("{error}");
-            exit.write(AppExit::error());
-            return;
-        }
-    };
+/// A map whose files passed their checks: its grid and the size the renderer needs.
+#[derive(Clone, Debug)]
+pub struct CheckedMap {
+    pub grid: Grid,
+    pub view: MapView,
+}
+
+/// Checks the map at `asset_path` (relative to `root`, the asset directory) and its tileset image
+/// before anything else touches them (D13, D16), and registers exactly the checked bytes for the
+/// renderer under their asset paths. Errors name the file, the field, and the reason.
+pub fn check_map(
+    root: &Path,
+    asset_path: &Path,
+    checked: &CheckedAssets,
+) -> Result<CheckedMap, String> {
+    let path = root.join(asset_path);
+    let (loaded, files) = sim::load_map_with_files(&path).map_err(|error| error.to_string())?;
+    let image =
+        check_tileset_image(&path, &loaded.tileset_image).map_err(|error| error.to_string())?;
     // The renderer reads exactly the checked bytes (D16). Every checked file lies in the map's
     // directory (D13), so it has the same asset path as on disk.
-    let directory = Path::new(MAP_PATH).parent().unwrap_or(Path::new(""));
+    let directory = asset_path.parent().unwrap_or(Path::new(""));
     for file in files {
         if let Some(name) = file.path.file_name() {
             checked.insert(directory.join(name), file.bytes);
@@ -122,25 +123,53 @@ pub(crate) fn load_map(
         tile: TileSize::new(loaded.tile_width, loaded.tile_height),
     };
     info!(
-        "map {MAP_PATH}: {}x{} cells, tile {}x{} px",
-        view.width, view.height, loaded.tile_width, loaded.tile_height
-    );
-    commands.insert_resource(CameraBounds(Some(map_bounds(
+        "map {}: {}x{} cells, tile {}x{} px",
+        asset_path.display(),
         view.width,
         view.height,
-        view.tile,
-    ))));
-    commands.insert_resource(view);
-    // Match setup: the simulation receives its grid before the first tick
-    // (`crate::sim_host::start_match`). The game keeps the terrain as the map file defines it,
-    // which is what the player sees of a cell, also under fog (`MapTerrain`).
-    commands.insert_resource(MapTerrain(loaded.grid.clone()));
-    commands.insert_resource(MatchGrid(loaded.grid));
-    commands.spawn((
-        TiledMap(asset_server.load(MAP_PATH)),
+        loaded.tile_width,
+        loaded.tile_height
+    );
+    Ok(CheckedMap {
+        grid: loaded.grid,
+        view,
+    })
+}
+
+/// Spawns the map of a match from its checked bytes, with the resources that the rendering,
+/// picking, and interface systems read (`MapView`, `MapTerrain`, `MapAsset`). The game keeps the
+/// terrain as the map file defines it, which is what the player sees of a cell, also under fog
+/// (`MapTerrain`).
+pub(crate) fn spawn_map(world: &mut World, asset_path: &Path, map: &CheckedMap) {
+    let handle = world
+        .resource::<AssetServer>()
+        .load(asset_path.to_path_buf());
+    world.insert_resource(map.view);
+    world.insert_resource(MapTerrain(map.grid.clone()));
+    world.insert_resource(MapAsset(asset_path.to_path_buf()));
+    world.insert_resource(MapStatus::default());
+    world.spawn((
+        MapRoot,
+        TiledMap(handle),
         TilemapAnchor::None,
-        Transform::from_translation(map_origin_offset(view.height, view.tile).extend(0.0)),
+        Transform::from_translation(map_origin_offset(map.view.height, map.view.tile).extend(0.0)),
     ));
+}
+
+/// Removes the map of a match: its entity with everything spawned under it, and its resources.
+pub(crate) fn despawn_map(world: &mut World) {
+    let roots: Vec<Entity> = world
+        .query_filtered::<Entity, With<MapRoot>>()
+        .iter(world)
+        .collect();
+    for root in roots {
+        world.despawn(root);
+    }
+    world.remove_resource::<MapView>();
+    world.remove_resource::<MapTerrain>();
+    world.remove_resource::<MapAsset>();
+    world.insert_resource(MapStatus::default());
+    world.insert_resource(HoveredCell::default());
 }
 
 /// Any asset that fails to load (the map, its tileset image, or a later asset) ends the game
@@ -161,17 +190,19 @@ pub fn exit_on_asset_load_failure(
 fn on_map_created(
     mut created: MessageReader<TiledEvent<MapCreated>>,
     maps: Res<Assets<TiledMapAsset>>,
+    asset: Option<Res<MapAsset>>,
     mut status: ResMut<MapStatus>,
     mut exit: MessageWriter<AppExit>,
 ) {
+    let name = asset.map_or_else(String::new, |asset| asset.0.display().to_string());
     for event in created.read() {
         let Some(map) = event.get_map(&maps) else {
-            error!("map {MAP_PATH} was created but its asset is not available");
+            error!("map {name} was created but its asset is not available");
             exit.write(AppExit::error());
             continue;
         };
         if let Some(problem) = misalignment(map) {
-            error!("map {MAP_PATH}: {problem}");
+            error!("map {name}: {problem}");
             exit.write(AppExit::error());
             continue;
         }
@@ -181,7 +212,8 @@ fn on_map_created(
 
 /// `bevy_ecs_tiled` applies layer offsets, layer parallax, and tileset offsets on top of the
 /// tile positions; [`map_origin_offset`] assumes all of them are neutral. Returns a description
-/// of the first one that is not. These are rendering properties, so `sim` does not check them.
+/// of the first one that is not. `sim` rejects them before the hand-off (D13); this is the second
+/// line of defence (D9).
 pub fn misalignment(map: &tiled::Map) -> Option<String> {
     for layer in map.layers() {
         if layer.offset_x != 0.0 || layer.offset_y != 0.0 {
