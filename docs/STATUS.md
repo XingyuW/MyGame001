@@ -7,7 +7,7 @@
 | M2: Units and movement | **Reviewed**: review 3 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 2 P2) after reviews 1 and 2 NO-GO; merged into `main`. Awaiting user verification for `m2-approved` | `milestone/m2` | `m2-reviewed` |
 | M3: Economy and construction | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 4 P2); merged into `main`. Awaiting user verification for `m3-approved` | `milestone/m3` | `m3-reviewed` |
 | M4: Combat and fog of war | **Reviewed**: review 2 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 1 P2) after review 1 NO-GO; merged into `main`. Awaiting user verification for `m4-approved` | `milestone/m4` | `m4-reviewed` |
-| M5: Interface and audio | Not started | | |
+| M5: Interface and audio | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 5 P2); merged into `main`. Awaiting user verification for `m5-approved` | `milestone/m5` | `m5-reviewed` |
 | M6: Skirmish AI and game flow | Not started | | |
 | M7: Content, balance, performance, and packaging | Not started | | |
 
@@ -1617,4 +1617,277 @@ These are not findings and do not affect the decision (PLAN.md section 12 item 2
 9. **Placement under fog:** `B` is rejected ("cell (x, y) is not visible to the player") while any footprint cell is not currently visible, and succeeds once every cell is seen.
 
 The ten M3 items, the seven M2 items, and the five M1 items listed in docs/STATUS.md remain pending.
+
+## M5 implementation report (2026-10-04)
+
+Branch `milestone/m5`, based on `main` at the merge of M4 (tag `m4-reviewed`). Commits: `defa3e0` (sim: `check_placement` and its test), `ac45883` (game: simulation host, sidebar, minimap, health bars, hotkeys, control groups, pause, audio, smoke test), `b55afed` (game: match setup test; sidebar clicks kept out of the picking log; minimap drags), and the documentation commit that adds this report. Decisions: DECISIONS "M5: interface and audio" (A1 follow-up, D34 to D39), the M5 amendment of D6, and notes on D27 item 4 and D31 item 4.
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `crates/sim/src/economy_commands.rs`, `crates/sim/src/lib.rs` | `pub fn check_placement`: the checks of `PlaceBuilding`, which its validation now calls (D35 item 5). No other `sim` change. |
+| `crates/sim/tests/m5_placement_preview.rs` (new) | 2 tests through `SimPlugin` and `CommandQueue` with fixture data |
+| `crates/game/src/sim_host.rs` (new) | `SimHost` (the simulation's own world, read-only to the rest of the game), `CommandSink`, match setup, the tick system, event copying (D34, D39); 5 tests |
+| `crates/game/src/sidebar.rs` (new) | Sidebar UI, build tabs, item status and button effects, pause banner, volume buttons (D35); 6 tests |
+| `crates/game/src/minimap.rs` (new) | Minimap layout, drawing from what the human player may know, camera frame, minimap clicks (D36); 6 tests |
+| `crates/game/src/health.rs` (new) | Health bars (D37); 2 tests |
+| `crates/game/src/hotkeys.rs` (new) | The hotkey table and control groups (D35 items 4 and 6); 3 tests |
+| `crates/game/src/audio.rs` (new) | Synthesised effects and music, the `Pcm` audio source, what plays, volume settings (D38); 5 tests |
+| `crates/game/src/construction.rs` | Interface modes (place, sell, rally), placement preview and ghost sprite, hotkeys at the cursor; the interim keys `1`-`9` removed (D35); 3 new tests |
+| `crates/game/src/selection.rs` | Reads through `SimHost`, pushes through `CommandSink`; control groups; ignores the sidebar and the modes; ore as the map shows it (D36 item 3) |
+| `crates/game/src/{units,buildings,fog,map}.rs` | Read through `SimHost`; match setup split into `load_match_assets` (game side) and `sim_host::start_match`; `MapTerrain`; hovered cell `None` over the sidebar; title ordered before the camera |
+| `crates/game/src/camera.rs` | `clamp_centre_beside`: the view beside the sidebar stays inside the map (D35 item 7); 1 new test |
+| `crates/game/src/smoke.rs` | Orders through the interface's functions and `CommandSink`; checks of the sidebar, minimap, sounds, music, and pause (D6 amended); 2 new tests |
+| `crates/game/src/main.rs` | `#![forbid(unsafe_code)]`; `SimHostPlugin` replaces `SimPlugin` and `run_sim_tick`; the M5 plugins |
+| `assets/LICENSES.md` | The embedded FiraMono font (third-party, OFL 1.1) and the synthesised sounds and minimap |
+| `docs/DECISIONS.md`, `docs/STATUS.md` | M5 decisions; this report |
+
+`Cargo.toml` files and `Cargo.lock` are unchanged (no dependency added, I9), so `sim`'s dependency tree is unchanged (I1). No existing test was removed, skipped, or weakened; no existing assertion changed. The existing construction tests keep their names and assertions although the keys `1`-`9` no longer queue production (they test `menu_command`, which the sidebar uses). One existing test module gained imports only (`construction::tests`: `CommandQueue`, `IssuedCommand`, `Players`, which it used to reach through the module's own imports, now removed with the interim keys).
+
+### Validation commands (PLAN.md section 9, with section 12 item 5)
+
+Run from the repository root on macOS (Apple M5, Rust 1.98.1), in this order, in the foreground, after the last code change (`b55afed`). A display and an audio device were available.
+
+| Command | Exit | Result |
+|---------|------|--------|
+| `cargo fmt --all -- --check` | 0 | no diff |
+| `cargo clippy --workspace --all-targets -- -D warnings` | 0 | no warnings |
+| `cargo test --workspace` | 0 | 342 passed, 0 failed, 0 ignored (breakdown below). Peak memory footprint of the run 0.13 GB. Known M0 linker warning only. |
+| `cargo build --release -p game` | 0 | |
+| `cargo run --release -p game -- --smoke-test 600` | 0 | `3 buildings spawned`, `26 units spawned`; `smoke test: 600 frames, 188 simulation ticks, map created: true, units spawned: 26, units moved: 18 in 188 ticks after the order, buildings spawned: 3, production charged 376 credits in 188 ticks, visible cells: 391, enemy views shown: 0, view mismatches: 0, sidebar items: 9 of 9, sidebar buttons outside the window: 0, sidebar credits: Some("Credits  4624"), minimap drawings: 189, minimap pixels lit: 2260, sounds: 9, music players: 1, pause: Done { ticks_while_paused: 0, refused: true }`; peak memory footprint 0.14 GB |
+| `cargo run -p game -- --smoke-test 600` | 0 | `smoke test: 600 frames, 195 simulation ticks, ..., production charged 390 credits in 195 ticks, visible cells: 391, enemy views shown: 0, view mismatches: 0, sidebar items: 9 of 9, sidebar buttons outside the window: 0, sidebar credits: Some("Credits  4610"), minimap drawings: 192, minimap pixels lit: 2260, sounds: 9, music players: 1, pause: Done { ticks_while_paused: 0, refused: true }`; peak memory footprint 0.14 GB |
+
+Test breakdown for `cargo test --workspace`:
+
+* `game`: unit 101 (M4: 68; + sim_host 5, sidebar 6, minimap 6, audio 5, hotkeys 3, health 2, construction 3, smoke 2, camera 1); integration `m0_spike` 6, `m1_demo_map` 3, `m1_tileset_image` 6, `m2_unit_sprites` 5, `m3_building_sprites` 3.
+* `sim`: unit 11; integration `m0_bootstrap` 12, `m1_map` 32, `m1_map_subset` 24, `m2_definitions` 14, `m2_movement` 37 (39.2 s), `m3_definitions` 11, `m3_economy` 21, `m3_harvest` 10, `m4_combat` 32, `m4_definitions` 12, `m5_placement_preview` 2 (2.0 s).
+* doc-tests 0.
+
+The `Skipped event Destroyed` warning (M0 debt item 2) appeared in both smoke runs. Additionally, the release binary was run (`--smoke-test 100`, 60 s alarm) against copies of `assets/` selected with `BEVY_ASSET_ROOT`, to check the restructured startup: the unchanged copy exits 0; without `combat.ron` it exits 1 with `data file …/combat.ron: file: cannot read the file: No such file or directory`; with a demo map of 9 bytes of text it exits 1 with `map …/demo.tmx: file: not a valid Tiled map: text before the root element is not supported`. M5 adds no external input file (no audio, font, or settings file is read), so there is no new hostile-input surface to probe.
+
+### Acceptance criteria and required tests (PLAN.md section 7, M5)
+
+| Criterion | Evidence |
+|-----------|----------|
+| Scope: sidebar with credits and power | `sidebar` (D35 item 1); `item_status_follows_the_players_buildings_and_queue` (`Credits  4700`, `Power  0 / 20` after a power plant through the simulation), `texts_and_colours_of_the_sidebar`; smoke runs: 9 of 9 item buttons, none outside the window, the credits text equal to the player's credits. On screen **requires user verification** |
+| Scope: build tabs and queue progress | `Tab`, badges and progress bars; `item_status_follows_the_players_buildings_and_queue` (locked items, `50% +1` at half of the head with one more queued, `READY`), `item_buttons_queue_cancel_and_start_placement`, `mode_tab_pause_and_volume_buttons` |
+| Scope: placement preview with validity colouring | `sim::check_placement` (D35 item 5); `m5_placement_preview::the_placement_preview_predicts_the_outcome_of_place_building_at_every_origin` (262 origins: accepted and every placement rejection, including `NotVisible` under fog; preview equals the command's outcome; the state hash unchanged by the preview), `the_preview_of_a_building_that_is_not_ready_is_not_ready`; game: `the_placement_preview_is_the_commands_validation_for_the_human_player`, `modes_follow_keys_clicks_and_the_ready_building` (red footprint: no command, mode kept; problem cell). On screen **requires user verification** |
+| Scope: minimap with fog and camera rectangle | `minimap` (D36); `the_layout_fills_the_image_with_the_maps_bounding_rectangle` (1×1, 1×37, 37×1, 64×64, 256×256), `every_pixel_shows_the_cell_under_it`, `the_minimap_shows_shroud_fog_and_only_shown_units`, `the_demo_match_shows_no_enemy_the_human_player_does_not_see`, `an_enemy_is_marked_exactly_while_the_human_player_sees_it` (edge of sight and one cell beyond), `the_camera_frame_is_the_visible_part_of_the_view`; smoke runs: drawn every tick, 2,260 lit pixels. On screen **requires user verification** |
+| Scope: health bars | `health` (D37); `the_bar_shows_the_fraction_of_hit_points_left`, `bars_are_drawn_only_over_shown_views_of_damaged_or_selected_entities`. On screen **requires user verification** |
+| Scope: control groups | `hotkeys::ControlGroups`; `digit_keys_select_add_and_assign_control_groups`, `control_groups_assign_select_add_and_forget_dead_units` (groups 0 and 9, empty selection, pruning) |
+| Scope: hotkeys | `hotkeys::hotkey`; `every_listed_key_has_one_action` (every listed key, unlisted keys, Ctrl or Cmd with letters) |
+| Scope: pause | D39; `the_sink_accepts_the_human_players_commands_until_paused_or_full`, `the_tick_system_does_not_tick_while_paused_and_copies_the_events`; smoke runs pause 30 frames: 0 ticks, a command refused; `a_run_passes_only_if_the_pause_stops_the_ticks_and_refuses_commands` |
+| Scope: sound effects and music | D38; `every_sound_is_synthesised_within_bounds_and_the_same_on_every_run`, `the_decoder_hands_out_the_samples_unchanged`, `events_play_only_what_the_human_player_may_know` (every `SimEvent` variant, both players, seen and unseen), `effects_are_limited_in_number_and_repetition`; smoke runs: 9 sounds, 1 music player. Audible result **requires user verification** |
+| Scope: volume settings | `VolumeSettings`; `volume_steps_stay_within_their_range` (0 and 10, beyond the range, mute) |
+| Test: the functions that map interface actions to `Command` values are pure and unit tested for every command variant | `construction::tests::every_command_variant_is_built_by_a_pure_interface_function`: all ten variants, each from the function the interface calls (`selection::{right_click_commands, attack_commands, attack_move_command, stop_command}`, `sidebar::button_effect`, `construction::mode_click`), checked with a `match` without wildcard so that a new variant does not compile until it is mapped; plus the earlier per-function tests (`orders_are_commands_for_the_whole_selection`, `a_right_click_on_ore_sends_the_selected_harvesters_to_harvest`, `a_right_click_on_a_visible_enemy_orders_the_armed_units_to_attack_it`, `the_attack_move_key_orders_the_whole_selection`, `menu_keys_queue_and_cancel_the_menu_entries`, `the_ready_building_is_placed_centred_on_the_cursor`, `sell_and_rally_keys_name_the_players_buildings`, `item_buttons_queue_cancel_and_start_placement`, `modes_follow_keys_clicks_and_the_ready_building`) |
+| Test: the interface cannot obtain mutable access to simulation state (enforced by the type or module boundary) | D34: the simulation's `World` is a private field of `SimHost`, reachable only as `&World`; no public constructor or `&mut self` method; `#![forbid(unsafe_code)]`; the game's world holds no simulation state. `sim_host::tests::the_game_world_holds_no_simulation_state` (the game world has no `Players`, `Grid`, `Definitions`, `CommandQueue`, `SimTick`, or `Projectiles`; a `&mut Health` query on the host's `&World` yields read-only items). The enforcement itself is the compiler's (privacy and borrowing); a test cannot show that code which does not compile does not exist. |
+| Test: the smoke test passes with the full interface loaded | Both smoke runs above, with every M5 plugin and the M5 checks of D6 |
+| Acceptance: a full match can be played by a human without debug shortcuts, confirmed by the user | Every action of a match is available from the sidebar and the mouse (production, placement, selling, rally points, orders, attack, pause, volume), with hotkeys as shortcuts; the interim keys of D27 are gone. The opponent stays passive until the AI of M6. **Requires user verification** (below) |
+| Section 8: negative, boundary, integration, end to end | Negative: refused commands (paused, full sink), red footprints, locked items, unknown items; boundary: sink capacity 256 exactly, groups 0 and 9, volume 0 and 10, health fraction at 0, maximum, beyond, `MAX_HIT_POINTS`, minimap of 1×1 and 256×256 maps, the edge of sight on the minimap, placement origins over every edge and at `i32` extremes, the camera inset wider than the view; integration: `m5_placement_preview` and the host tests through `SimSchedule`; end to end: both smoke runs |
+| Invariants | I1/I9: no dependency added. I2: `sim` gained no float (`check_placement` is a moved sequence of integer checks). I3/I4: `sim` behaviour unchanged (all `sim` tests pass unchanged); the game's systems are ordered (`the_game_systems_share_no_state_without_an_order`). I5: enforced by `SimHost` (D34). I8: no new data file; setup errors still end the game with exit code 1 (probes above). I11: no new external file is handed to a parser or decoder (D38). I12: no new simulation arithmetic. |
+
+### Assumptions verified and how
+
+| Item | Verification |
+|------|--------------|
+| Bevy 0.19.1 APIs of the A1 follow-up table in DECISIONS (M5): `World::try_query`, `QueryState::iter(&World)`, `World: Send + Sync + Default`, `App::empty`, `MessageWriter::write_batch`, UI, text, image, and audio APIs | Read in the sources (paths in DECISIONS) and exercised by code that compiles and runs in the tests and the smoke runs |
+| A `&World` cannot hand out mutable state | `World`'s mutable accessors take `&mut self`; `as_unsafe_world_cell_readonly` needs `unsafe` to write, which the game crate forbids; `QueryState::iter` yields `D::ReadOnly` (test above) |
+| Bevy's audio playback accepts a custom `Decodable` | `bevy_audio` `AddAudioSource::add_audio_source`, `play_queued_audio_system::<T>`; the smoke runs spawn the music player and no audio error is logged |
+| No system font is read | `cargo tree -p game -e features -i parley`: `parley` with feature `std` only; `bevy_text`'s `system_font_discovery` is not enabled |
+| `RelativeCursorPosition::normalized` is relative to the node's centre, (−0.5, −0.5) at the top left | `bevy_ui-0.19.1/src/focus.rs:263-271` |
+| No new crate | `git diff 386d8af -- Cargo.lock crates/*/Cargo.toml` is empty |
+
+### Deviations from PLAN.md
+
+1. **Simulation in a world of its own.** The simulation's resources and entities no longer live in the game's `World` but in `SimHost` (D34). PLAN.md section 4 describes the path (the game reads simulation state without mutating it, input pushes commands into `CommandQueue`); this is how M5 enforces it. Tests still run `SimSchedule` directly.
+2. **Audio is synthesised, not stored.** No file is added under `assets/audio/` (PLAN.md section 4 lists the directory for media); the sounds and music are generated in memory at startup (D38).
+3. **Volume settings last for the session only** (options are M7's, D38 item 5).
+4. **Rally points** are set for every unit-producing building of the player at once (there is no building selection); this was already the interim rule of D27 item 4.
+5. **Pause refuses commands** until the game resumes (D39); the plan does not say whether orders may be given while paused.
+6. **The interim keys of D27 item 4 are replaced:** the digits are control groups; production is queued from the sidebar; `B` enters placement mode with a preview instead of placing at once (D35).
+7. **Terrain shown by the interface is the map file's** (D36 item 3), as the tiles draw it; current ore depletion is not shown.
+8. **Files not listed in PLAN.md section 4:** `crates/game/src/{sim_host,sidebar,minimap,health,hotkeys,audio}.rs`, `crates/sim/tests/m5_placement_preview.rs`.
+
+### Known debt (P2 proposals for the reviewer)
+
+1. The interface's wiring in the window (button clicks, right clicks on buttons, the minimap click and drag, the placement ghost, health bar placement, sound) is tested through pure functions, the conflict test, and the smoke runs, not by an automated test of user input in the window (as M1 review 1 P2-3 for the camera); it is part of the user verification below.
+2. The sidebar has a fixed width (240 logical pixels) and is laid out for the default 1280 × 720 window; the smoke test checks that every displayed button lies inside that window, but in a much smaller window the lower buttons would be clipped.
+3. There is no building selection: rally mode sets the rally point of every unit-producing building, and the sidebar shows no per-building information.
+4. Queueing while the queue is full (16) is not shown as unavailable in the sidebar; the simulation rejects it with `QueueFull` (logged, error sound).
+5. Effects are limited to 8 at once and one start per effect per 80 ms, so in large battles most shots are not heard (by design, D38 item 4). A changed effects volume applies to effects started afterwards.
+6. Each frame the game builds a few `QueryState`s on the host's world (`World::try_query`), and the minimap is redrawn every tick (at most 131,072 pixels for the largest map). To be measured against the M7 benchmark.
+7. Control groups have no "centre the camera" on a double press.
+8. Unchanged and still relevant to the interface: the terminal event log writes every event of both players (M4 remediation debt item 2); M2 review 3 P2-2 (a box selection released outside the window becomes a click), which M5 did not touch beyond the sidebar check.
+
+Resolved by M5: M2 implementation debt item 2 (the two-tick `MessageReader` window, D34 item 5); M2 implementation debt item 5 and M3 implementation debt item 7 as far as the interface is concerned (the setup APIs stay public in `sim`, but the game can reach the simulation's world only through `sim_host`, D34); M3 implementation debt items 5 (no validity feedback before a placement) and 8 (the title as the only display of credits and power); M4 implementation debt item 8 (health bars); the "no validity preview until M5" part of M4 remediation debt item 3 (placement itself stays limited to visible cells by design, D33). Carried unchanged: every other item of "Recorded debt to carry" of the M4 review decision above, including M4 review 2 P2-1 (projectile line of flight). The `Skipped event Destroyed` warning (M0 item 2) and the linker warning (M0 item 1) were seen again.
+
+### Requires user verification
+
+Not review findings (PLAN.md section 12 item 2); they block only `m5-approved`. Run `cargo run --release -p game` (with sound on). The 16 M5 items:
+
+1. **Sidebar:** a dark panel on the right, 240 px wide: the minimap at the top, `Credits  5000`, `Power  0 / 20`, two tabs (Buildings, Units), a button per item with its name and cost (e.g. `power plant  $300`), Sell, Rally, and Pause buttons, Master, Music, and Effects volume rows with `-` and `+`, a Mute button, and a hint line at the bottom. All text is legible.
+2. **Production:** a left click on `power plant` starts it: its badge counts up in percent, a green bar fills, and the credits fall; at the end it shows `READY` and a chime plays. A right click on an item with entries queued cancels the most recent one and refunds what was charged. Items whose prerequisites are missing show `locked` and do nothing.
+3. **Units tab:** `Tab` or the Units tab shows scout, light tank, and harvester, locked until a barracks or war factory (and refinery for the harvester) is owned; produced units leave their building.
+4. **Placement preview:** a left click on a `READY` building (or `B`) shows the building's sprite at the cursor, green where it may be placed and red where not (sand, rock, water, ore, units, more than 4 cells from an own building, cells not currently visible), with the offending cell crossed out; a left click on green places it (a thud plays); a right click or `Escape` leaves the mode without cancelling the building.
+5. **Selling:** the Sell button or `X`, then a left click on an own building sells it (refund, jingle); the mode stays until right click or `Escape`. `Delete`/`Backspace` over an own building still sells it at once.
+6. **Rally points:** the Rally button, then a left click on a cell, makes later produced units walk there; `R` over a cell does the same.
+7. **Minimap:** the whole map as a diamond, oriented like the main view; black where never seen, dark where seen before, normal colours where seen now; own units and buildings blue, enemies red only while seen; a white frame shows the part of the map visible beside the sidebar and follows panning and zoom; a left click or drag on the minimap moves the view there.
+8. **Camera beside the sidebar:** panning to the right edge of the map shows its rightmost tiles left of the sidebar; with the cursor over the sidebar no cell outline is drawn and clicks do not select or order.
+9. **Health bars:** a short bar appears above damaged units and buildings (green, yellow below half, red below a quarter) and above selected units; enemies hidden by the fog never show a bar.
+10. **Control groups:** select units, press Ctrl+1 (or Cmd+1); select others; press 1 to select the group again, Shift+1 to add it to the selection; destroyed units leave their group.
+11. **Hotkeys:** `S` stop, `A` attack-move to the cursor, `B`, `X`, `R`, `Delete`/`Backspace`, `Escape`, `P`, `Tab`, `-`/`=` (master volume), `M` (mute) behave as described in items 4 to 14 and in docs/DECISIONS.md D35 item 4.
+12. **Pause:** `P` or the Pause button shows `PAUSED` over the map and freezes the simulation (units, production, combat); orders and sidebar production clicks are refused (an error buzz plays); the camera, selection, and sidebar still work; `P` again resumes.
+13. **Sound effects:** a short click when an order is accepted, a buzz when a command is refused or rejected, a chime when production completes, a thud when a building is placed, a jingle when one is sold, a ding when ore is delivered, gunfire and cannon shots and explosions only where the player's units see the fight; nothing is heard of the opponent's production or of fights in the fog.
+14. **Music:** a calm loop plays from the start and repeats without a gap or click; the Music `-`/`+` buttons change its volume at once, Effects `-`/`+` change later effects, Master and `-`/`=` both, and Mute silences everything.
+15. **Full match (acceptance):** without any debug key, build a power plant, refinery, barracks, and war factory from the sidebar, harvest ore, produce an army, and destroy the opponent's units, gun turret, and construction yard. (The opponent does not act until the AI of M6.)
+16. **Window title:** still shows the credits and power, consistent with the sidebar.
+
+The nine M4 items, the ten M3 items, the seven M2 items, and the five M1 items listed in docs/STATUS.md remain pending.
+
+## M5 review decision (2026-10-04)
+
+One independent review round (`docs/reviews/M5-review-1.md`: GO WITH DOCUMENTED NON-BLOCKING DEBT, 0 P0, 0 P1, 5 P2). Before the review the orchestrator reran all six validation commands of PLAN.md section 9 on commit `522f70b` with exit code 0 (342 tests passed). Under PLAN.md section 12 item 1, `milestone/m5` was merged into `main` and tagged `m5-reviewed`. The tag `m5-approved` is created by the user alone after the verification below.
+
+### Debt recorded from review 1 (P2, verbatim from the report)
+
+#### P2-1: A right click on the sidebar or minimap can order an attack on an enemy drawn behind the sidebar
+* **File and line:**
+  * `crates/game/src/selection.rs:353-357`: `issue_orders` gates the right click only on `*mode == InterfaceMode::Normal`. It then computes `cursor_world(&window, …)` from the raw cursor position (`selection.rs:223-224`) and calls `enemy_at(point, &shown_enemy_units(&views), building)`.
+  * There is no `over_sidebar` check. `over_sidebar` is applied only in `map.rs:222`, to the hovered cell; in `map.rs:246-249`, to the picking log; and in `selection.rs:269`, to the left press.
+* **Evidence:**
+  * The camera draws the map under the whole window, and the sidebar is a 0.96-alpha UI overlay. An enemy unit view standing behind the sidebar therefore keeps `Visibility::Inherited` and is in `shown_enemy_units`.
+  * Suppose armed units are selected and the player right-clicks a sidebar item to cancel production (`sidebar.rs:610-616`) or right-clicks the minimap, and that point lies over such an enemy's body. Then `enemy_at` returns the enemy, and `attack_commands(&selection.0, &armed, target, None)` pushes `Command::Attack` into the sink (the acknowledgement sound plays) alongside the `CancelProduction`.
+  * This contradicts D35 item 7 ("clicks on the sidebar never act on the map", `docs/DECISIONS.md:556`) and user verification item 8 ("with the cursor over the sidebar … clicks do not select or order", `docs/STATUS.md:1736`). No test covers right clicks over the sidebar.
+* **Expected behaviour:** a right click whose cursor is over the sidebar issues no map order. Gate `issue_orders` (and `cursor_world`) with `over_sidebar`, or derive the enemy from a cursor point that is `None` over the sidebar. Add a test of that decision, for example a pure function that takes the over-sidebar flag.
+* **Severity rationale:** P2. Simulation state, validation, and the invariants are unaffected: the command passes through `CommandSink` and is a valid, visible-target order. The effect is an unintended user-facing order, and an inaccurate claim in D35 and the report.
+
+#### P2-2: On maps with width + height > 128 the minimap never draws half of all cells, so units and buildings on them are not marked
+
+* **File and line:**
+  * `crates/game/src/minimap.rs:74`: `scale: (MINIMAP_TARGET_WIDTH / sum).max(1)`.
+  * `minimap.rs` `pixel_cell` and `render`: one pixel shows exactly one cell.
+  * `minimap.rs:237`: unit markers are drawn at `mobile.cell`.
+  * `minimap.rs:514`: `every_pixel_shows_the_cell_under_it` asserts that every cell is drawn only `if layout.scale >= 4`.
+* **Evidence:** the probe `minimap_cover.rs` (verbatim copy of the layout code) gave these counts:
+
+  | Map | Scale | Image | Cells drawn |
+  |-----|-------|-------|-------------|
+  | 64×64 | 2 | 256×128 | 4,096 of 4,096 |
+  | 32×32 | 4 | 256×128 | all |
+  | 100×100 | 1 | 200×100 | 5,000 of 10,000 |
+  | 128×128 | 1 | 256×128 | 8,192 of 16,384 |
+  | 200×56 | 1 | 256×128 | 5,600 of 11,200 |
+  | 256×256 | 1 | 512×256 | 32,768 of 65,536 |
+
+  At scale 1 the first missing cells are (1, 0), (3, 0), (5, 0), (7, 0): every cell with odd x + y. A cell's diamond is 2 × 1 pixels there, and pixel centres fall only into the diamonds of one parity.
+  * A unit standing on such a cell, own or a shown enemy, is never marked. A moving unit blinks on and off.
+  * The real release binary on the 256×256 probe map lit 566 minimap pixels for 391 visible cells; scale 1 would give about 782 if every visible cell were drawn.
+  * D8 accepts maps up to 256×256, and D36 item 1 states the layout for "the largest map" (512 × 256). D36 item 2 states that units and buildings are drawn. Neither DECISIONS nor STATUS records this limitation; the test's `scale >= 4` condition hides it.
+* **Expected behaviour:** every cell of every accepted map size is shown by at least one pixel, or markers are drawn at their projected pixel position, independent of the cell sampling. For example, use `k = max(2, …)`, giving at most 1,024 × 512, or draw markers by projection. `every_pixel_shows_the_cell_under_it`, or a new test, asserts full coverage for 1×1 to 256×256, including W + H = 129 and 256×256.
+* **Severity rationale:** P2, because the only shipped map (64×64) is fully covered, and simulation state and invariants are unaffected. It must be resolved before any map with W + H > 128 ships (M6 map selection, M7 maps).
+
+#### P2-3: A placement or rally click made while paused, or refused by a full sink, leaves the mode although nothing was issued
+
+* **File and line:** `crates/game/src/construction.rs:381-391`. `mode_click` returns `InterfaceMode::Normal` for a valid placement or rally click. Line 386 assigns `next = after` before line 391 calls `sink.issue(commands)`, whose result is ignored. `CommandSink::push` refuses every command while paused (`sim_host.rs:222-225`, D39).
+* **Evidence:**
+  * While paused, a left click on a green footprint in placement mode, or on a cell in rally mode, ends the mode. The command is refused and logged with the error sound, but the player must re-enter the mode. The building stays ready, so no state is lost.
+  * D39 says only that commands are refused while paused; it does not say that modes end.
+  * No test covers this interaction, because `mode_click` is tested without the sink.
+* **Expected behaviour:** the mode changes only if the sink accepted the command (use `sink.issue`'s count), or modes are kept while paused. A test of the decision should accompany the fix.
+* **Severity rationale:** P2 (user experience; no data loss).
+
+#### P2-4: Pre-existing M4 test race, found in this review: four `m4_combat` tests write and read the same temporary file concurrently
+
+* **File and line:** `crates/sim/tests/m4_combat.rs:452-471`. `extreme_scenario()` writes `CARGO_TARGET_TMPDIR/m4_combat/extreme_combat.ron` and reads it back. It is called by four tests (lines 499, 519, 544, and 572), which the test harness runs in parallel. The race was introduced in `9608923` (M4) and is unchanged by M5.
+* **Evidence:**
+  * `cargo test --release -p sim --test m4_combat` failed in 3 of 16 runs, each time in one of `the_longest_range_with_the_slowest_projectile_flies_32_ticks` or `the_shortest_range_reaches_every_neighbouring_cell_and_an_adjacent_building`, with `panicked at crates/sim/tests/m4_combat.rs:477:29: data file …/target/tmp/m4_combat/extreme_combat.ron: file: line 1, column 1: expected a struct "(", found the end of the file`. Another test had truncated the file while this one read it.
+  * Debug: 0 of 20 runs failed, and the section 9 command `cargo test --workspace` passed here.
+  * All writers write identical text, so the race can only cause spurious failures, never a false pass.
+* **Expected behaviour:** each call writes its own file, for example named per test (as `combat_variant(name, …)` does) or with a unique suffix, so that `cargo test` is deterministic in both profiles.
+* **Severity rationale:** P2. It concerns test reliability; no assertion is weakened and production behaviour is unaffected. It is reported because it is not in the recorded debt and can make the validation command fail spuriously.
+
+#### P2-5: D34 overstates what a `&World` withholds: the simulation world's entity allocator is reachable through `SimHost::world()`
+
+* **File and line:**
+  * `crates/game/src/sim_host.rs:92-94` (`pub fn world(&self) -> &World`).
+  * `docs/DECISIONS.md:542` (D34 item 2: "For a `&World`, Bevy gives only shared resources and read-only query items").
+  * `bevy_ecs-0.19.1/src/world/mod.rs:222`: `pub fn entity_allocator(&self) -> &EntityAllocator`.
+  * `src/entity/mod.rs`: `pub fn alloc(&self) -> Entity`, `alloc_many(&self, count)`, and `build_remote_allocator(&self)`. The allocator "panics" when no ids remain.
+* **Evidence:** any game system with `Res<SimHost>` can allocate, and so leak, entity ids of the simulation world through `host.world().entity_allocator()`, without `unsafe`. This changes no simulation component, resource, or `state_hash`: `sim` orders everything by `SimId`, never by `Entity` (grep). It is not simulation state under PLAN.md section 5. No game code does it (grep: no `entity_allocator` or `entities()` in `crates/game/src`).
+* **Expected behaviour:**
+  * Either correct D34 to state this residual: the world's entity allocator is concurrently allocatable through `&World`; it is not simulation state, and only deliberate misuse could exhaust it.
+  * Or expose a read-only facade instead of `&World`: query helpers and the accessors already present.
+* **Severity rationale:** P2 (documentation accuracy; the plan's boundary over simulation state holds).
+
+### Recorded debt to carry (verbatim from review 1)
+
+**New in this review (P2):**
+
+* **P2-1:** a right click over the sidebar or minimap can issue `Attack` on a shown enemy drawn behind the sidebar. D35 item 7 and user verification item 8 claim otherwise.
+* **P2-2:** the minimap never draws half of all cells (odd x + y) on maps with W + H > 128, so markers on them are missing. The test asserts full coverage only for scale ≥ 4. This must be resolved before such maps ship.
+* **P2-3:** placement and rally modes end on a click whose command the sink refused (paused or full).
+* **P2-4:** pre-existing M4 test race on `target/tmp/m4_combat/extreme_combat.ron`. It caused spurious failures in 3 of 16 release runs and 0 of 20 debug runs.
+* **P2-5:** D34 overstates `&World`: the simulation world's entity allocator is reachable. It is not simulation state.
+
+**From the M5 implementation report (known debt), confirmed by this review:**
+
+1. Interface wiring in the window is tested through pure functions, the conflict test, and the smoke runs, not by automated input tests. P2-1 and P2-3 are instances of this gap.
+2. Fixed sidebar width (240 px), laid out for 1280 × 720. Lower buttons are clipped in small windows. The smoke check counts only displayed buttons, so the Units tab is not checked.
+3. There is no building selection. Rally mode sets every producer's rally point.
+4. A full queue (16) is not shown as unavailable.
+5. At most 8 effects at once, and one start per effect per 80 ms. Effects volume applies to effects started afterwards.
+6. `QueryState`s are built every frame, and the minimap is redrawn every tick. To be measured against the M7 benchmark. The 256×256 probe ran at 0.28 GB peak.
+7. No "centre on control group" on a double press.
+8. The terminal event log writes both players' events (M4 remediation debt item 2). M2 review 3 P2-2 (a box selection released outside the window).
+
+**Deviations recorded in the report, accepted as documented:**
+
+* The interface terrain is the map file's, so ore depletion is never shown, also in visible cells.
+* Volume settings last for the session only.
+* Pause refuses commands.
+* Audio is synthesised.
+
+**Note for M7 packaging:** OFL 1.1 requires the licence text to accompany redistributed copies of the embedded FiraMono font. The release package must include it.
+
+**Resolved by M5 and confirmed in this review:**
+
+* M2 implementation debt item 2 (the two-tick event window): events are copied per tick into the game's per-frame buffer.
+* M2 implementation debt item 5 and M3 implementation debt item 7, as far as the interface is concerned (D34).
+* M3 implementation debt items 5 and 8.
+* M4 implementation debt item 8 (health bars).
+* The "no validity preview until M5" part of M4 remediation debt item 3.
+
+**Carried unchanged from the M4 review decision:** every item of "Recorded debt to carry" in docs/STATUS.md, including:
+
+* M4 review 2 P2-1 (projectile line of flight);
+* M4 remediation debt items 1 to 4, except the resolved part of item 3;
+* M4 implementation debt items 1 to 11, except the resolved item 8;
+* M3 review 1 P2-1 to P2-4 and M3 implementation debt items 1 to 9, except the resolved items 5, 7, and 8;
+* the M2, M1, and M0 items listed there.
+
+The linker warning (M0 item 1) and the `Skipped event Destroyed` warning (M0 item 2) were seen again.
+
+### Requires user verification (blocks only `m5-approved`; verbatim from review 1)
+
+These are not findings and do not affect the decision (PLAN.md section 12 item 2); they block only `m5-approved`. Run `cargo run --release -p game` with sound on and check the 16 M5 items of docs/STATUS.md, "M5 implementation report", "Requires user verification":
+
+1. Sidebar layout and legibility.
+2. Production from the sidebar (badges, progress bars, `READY`, cancel and refund, `locked`).
+3. Units tab.
+4. Placement preview and ghost (green and red, crossed-out cell, placement thud, right click or `Escape`).
+5. Sell mode and `Delete`/`Backspace`.
+6. Rally mode and `R`.
+7. Minimap: shroud, fog, markers, white frame, click and drag.
+8. Camera beside the sidebar. Note P2-1: a right click over the sidebar can order an attack on an enemy drawn behind it.
+9. Health bars.
+10. Control groups (Ctrl or Cmd + digit, digit, Shift + digit).
+11. Hotkeys.
+12. Pause.
+13. Sound effects follow what is seen.
+14. Music loop and volume controls.
+15. A full match without debug keys (acceptance).
+16. The window title is consistent with the sidebar.
+
+The nine M4 items, the ten M3 items, the seven M2 items, and the five M1 items listed in docs/STATUS.md remain pending.
 
