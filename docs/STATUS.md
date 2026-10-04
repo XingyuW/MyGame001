@@ -3,7 +3,7 @@
 | Milestone | Status | Branch | Approved tag |
 |-----------|--------|--------|--------------|
 | M0: Bootstrap and dependency verification | **Approved** by the user on 2026-10-04 after independent review (decision: GO WITH DOCUMENTED NON-BLOCKING DEBT; no P0 or P1) | `milestone/m0` | `m0-approved` |
-| M1: Map and camera | **Review 2: NO-GO** (1 P0, 1 P1, 4 P2; `docs/reviews/M1-review-2.md`), in remediation round 2. Review 1: NO-GO (4 P0, 3 P1, 6 P2) | `milestone/m1` | |
+| M1: Map and camera | **Reviewed**: review 3 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 3 P2) after reviews 1 and 2 NO-GO; merged into `main`. Awaiting user verification for `m1-approved` | `milestone/m1` | `m1-reviewed` |
 | M2: Units and movement | Not started | | |
 | M3: Economy and construction | Not started | | |
 | M4: Combat and fog of war | Not started | | |
@@ -400,3 +400,75 @@ Carried from M0 unchanged: items 1, 2 (seen again in this round's smoke runs), 3
 ### Requires user verification
 
 Unchanged (section 12 item 2; not review findings). Run `cargo run --release -p game` and check map rendering (64×64 green diamond, red top corner (0, 0), magenta right corner (63, 0), white left corner (0, 63), rock ridge with a gap, lake with sand shore, ore fields), picking (outline and dot on the tile under the cursor, click log), panning (arrow keys, screen edge while focused, middle mouse drag), zoom (2× to 0.5×), and bounds (the view stays within the map's bounding rectangle; vertically centred when taller than the map). This round changed no rendering, camera, or picking code; the renderer now receives the same files from memory instead of from disk.
+
+## M1 review decision (2026-10-04)
+
+Three independent review rounds (`docs/reviews/M1-review-1.md`: NO-GO, 4 P0, 3 P1, 6 P2; `M1-review-2.md`: NO-GO, 1 P0, 1 P1, 4 P2; `M1-review-3.md`: GO WITH DOCUMENTED NON-BLOCKING DEBT, 0 P0, 0 P1, 3 P2). Before review 3 the orchestrator reran all six validation commands of PLAN.md section 9 on commit `352e526` with exit code 0 (115 tests passed). Under PLAN.md section 12 item 1, `milestone/m1` was merged into `main` and tagged `m1-reviewed`. The tag `m1-approved` is created by the user alone after the verification below.
+
+### Debt recorded from review 3 (P2, verbatim from the report)
+
+#### P2-1: A FIFO (named pipe) at the map, tileset, or image path hangs the game indefinitely at startup, with no message, in both profiles
+
+* **Files and lines:** `crates/sim/src/map_subset.rs:47-48` (`read_file`: `std::fs::File::open(path)`), used for the map and the external `.tsx`; `crates/game/src/tileset_image.rs:151-152` (`read_bounded`: `File::open`).
+* **Evidence:**
+  * A FIFO named `demo_tiles.png` or `demo.tmx` in a scratch asset root, run with `--smoke-test 150`. Debug and release binaries both stay blocked in the `Startup` system `load_map` after `Creating new window`, until the 15 s alarm kills them (exit 142). Nothing is logged and the smoke test never exits.
+  * `simprobe` with a FIFO `ext.tsx` blocks the same way (exit 142 at the 5 s alarm).
+  * On macOS, opening a FIFO for reading blocks until a writer appears.
+  * By contrast, a symlink to `/dev/zero`, a directory, and an unreadable file are all rejected with typed errors.
+* **Severity rationale:** the cause is a non-regular file in the asset directory, not malformed file content. There is no panic, no allocation, and no wrong simulation result, so I rate it P2 robustness debt rather than an I8 violation.
+* **Expected behaviour:** before opening, `read_file` and `read_bounded` require `std::fs::metadata(path)?.is_file()` (or open non-blocking and check the file type). Anything else is a typed `Read` error naming the file. A test covers a FIFO or another special file.
+
+#### P2-2: Non-numeric CSV entries are rejected by `tiled` with field `file` and a bare integer-parse message, without the layer or cell
+
+* **Files and lines:**
+  * `crates/sim/src/map_subset.rs:835-886` (`data`) counts the comma-separated entries but does not check their content. DECISIONS D13 (`data` row) lists only the entry count.
+  * `crates/sim/src/map.rs:400-406` then reports `tiled`'s failure as `field: "file"`, `MapErrorKind::Parse`.
+* **Evidence:** `simprobe` on the demo map with the first CSV entry replaced, debug and release:
+
+  | Entry | Error |
+  |-------|-------|
+  | `x` or `-1` | `map …/demo.tmx: file: not a valid Tiled map: invalid digit found in string` |
+  | empty | `… file: not a valid Tiled map: cannot parse integer from empty string` |
+  | `4294967296` | `… file: not a valid Tiled map: number too large to fit in target type` |
+  | `0` (for comparison) | `layer "terrain" cell (0, 0): cell has no tile` |
+  | `268435457` (for comparison) | `layer "terrain" cell (0, 0): tile 268435456 … is not defined` |
+
+  * The rejections themselves are correct and typed, and there is no panic.
+  * In the fuzz corpus, 109 rejections have this form.
+  * No test covers a non-numeric CSV entry.
+  * PLAN.md section 5 requires a load error to name the field. This one names neither the layer data nor the cell, and the reason is Rust's `ParseIntError` text.
+* **Expected behaviour:**
+  * The checker parses each entry as `tiled` does (`trim()`, then `u32`) and reports `layer "terrain" data` with the entry index or cell and the offending value.
+  * D13 lists the rule.
+  * A test covers `x`, an empty entry, `-1`, and `4294967296`.
+
+  This is the same class as review 2 P2-A (correct rejection, imprecise reason).
+
+#### P2-3: Stale or inaccurate documentation after the remediation rounds
+
+* `crates/game/src/map.rs:173`: the doc comment of `misalignment` says "These are rendering properties, so `sim` does not check them". Since round 1, `sim` rejects offsets and parallax before the hand-off (D13), and D9 describes `misalignment` as a second line of defence.
+* `crates/sim/src/map.rs:268`: `MapErrorKind::Parse` prints "not a valid Tiled map: …" for `.tsx` files and for faults that the subset checker itself finds. Example: `tileset …/ext.tsx: file: not a valid Tiled map: a UTF-8 byte order mark at the start of the file is not supported`.
+* `crates/sim/src/map.rs:136-137`: `LoadedMap::tileset_image` cites D13 for the image check, whose image paragraph is superseded by D16.
+* `docs/DECISIONS.md:89` (D6): the smoke test still exits 0 only if "the spike map was created". Since M1, the condition is that the validated demo map is created, but D6 carries no M1 amendment.
+* **Expected behaviour:** the comments and D6 match the current behaviour. The `Parse` wording is neutral, for example "cannot be parsed".
+
+### Debt carried from earlier rounds (as listed by review 3)
+
+* The new items P2-1, P2-2, and P2-3 above.
+* Still open from earlier rounds and already recorded in STATUS:
+  * review 1 P2-3 and P2-5;
+  * review 2 P2-B;
+  * round 1 item 4 (an asset load failure is logged twice under `--smoke-test`);
+  * round 2 items 5 (WebGL2 limits are unsupported) and 6 (every asset must be registered in `CheckedAssets`);
+  * M0 items 1, 2, 3, 5, 7, 8, and 9.
+
+### Requires user verification (blocks only `m1-approved`; verbatim from review 3)
+
+These items are not findings and do not affect the decision (PLAN.md section 12 item 2). They block only the user's tag `m1-approved`. Run `cargo run --release -p game` and check, as listed in docs/STATUS.md:
+
+1. **Map rendering:** a 64×64 green diamond map, tiles edge to edge with no gaps or overlaps. Red at the top corner (0, 0), magenta at the right corner (63, 0), and white at the left corner (0, 63). A grey rock ridge with a gap, a blue lake with a sand shore right of centre, and gold ore fields.
+2. **Picking:** the white outline and centre dot sit on the tile under the cursor, including along all four edges, and disappear outside the map. A left click logs the cell (for example `cell (0, 0): passable true, buildable true, ore 0`), or `click outside the map`.
+3. **Panning:** the arrow keys pan, and diagonals are not faster. The screen edge pans within 8 px, only while the window has focus. Dragging with the middle mouse button keeps the grabbed point under the cursor.
+4. **Zoom:** the wheel or trackpad zooms, limited to 2× and 0.5× magnification.
+5. **Bounds:** the view never leaves the map's bounding rectangle at any zoom or window size, and stays vertically centred when the view is taller than the map.
+
