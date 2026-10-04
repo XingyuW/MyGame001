@@ -52,6 +52,7 @@ pub use definitions::{
     UnitKind, load_definitions, load_match_definitions, load_unit_definitions,
 };
 pub use economy::{MAX_QUEUE_LENGTH, PlayerSetupError, PlayerState, Players, QueueItem};
+pub use economy_commands::check_placement;
 pub use economy_defs::{
     BuildingDef, BuildingKind, ECONOMY_SCHEMA_VERSION, HarvesterDef, MAX_BUILD_TIME,
     MAX_BUILDING_TYPES, MAX_COST, MAX_CREDITS_PER_ORE, MAX_FOOTPRINT_SIDE, MAX_FREE_UNITS,

@@ -40,7 +40,7 @@ use crate::economy::{MAX_QUEUE_LENGTH, PlayerState, Players, QueueItem};
 use crate::economy_defs::{BuildingKind, ProductionItem};
 use crate::event::SimEvent;
 use crate::id::{SimId, SimIdAllocator};
-use crate::map::Grid;
+use crate::map::{CellPos, Grid};
 use crate::unit::Owner;
 use crate::visibility::Vision;
 
@@ -151,6 +151,50 @@ pub(crate) fn fog<'a>(definitions: &Definitions, state: &'a PlayerState) -> Opti
     definitions.has_combat().then_some(state.vision())
 }
 
+/// The checks of `PlaceBuilding` (docs/DECISIONS.md D24, D33), in the order of the module
+/// documentation: the building type is defined (`UnknownItem`), a complete building of that type
+/// is at the head of its queue in `state` (`NotReady`), the footprint lies inside the map, under
+/// fog of war `state`'s player sees every cell of it, the footprint is valid, and it lies within
+/// the placement distance of one of `owned` (the footprints of the player's buildings). Returns
+/// the footprint the building would cover.
+///
+/// The command's validation calls exactly this function, so the interface's placement preview
+/// (M5) can show the outcome of a `PlaceBuilding` before it is issued. It reads only what the
+/// command's own rejection would reveal: under fog of war an unseen cell is reported as
+/// `NotVisible` before anything in the footprint is looked at.
+pub fn check_placement(
+    grid: &Grid,
+    definitions: &Definitions,
+    state: &PlayerState,
+    owned: impl Iterator<Item = Footprint>,
+    building: BuildingKind,
+    origin: CellPos,
+) -> Result<Footprint, RejectReason> {
+    let item = ProductionItem::Building(building);
+    let def = definitions
+        .building(building)
+        .ok_or(RejectReason::UnknownItem(item))?;
+    let ready = state
+        .queue(def.production.producer)
+        .first()
+        .is_some_and(|head| head.item == item && head.progress >= def.production.build_time);
+    if !ready {
+        return Err(RejectReason::NotReady(building));
+    }
+    let footprint = Footprint {
+        origin,
+        width: def.width,
+        height: def.height,
+    };
+    if let Some(vision) = fog(definitions, state) {
+        check_visible(grid, footprint, vision).map_err(RejectReason::Placement)?;
+    }
+    check_footprint(grid, footprint).map_err(RejectReason::Placement)?;
+    check_distance(footprint, owned, definitions.placement_distance())
+        .map_err(RejectReason::Placement)?;
+    Ok(footprint)
+}
+
 /// Validates and applies an economy command. Unit commands are handled by `command.rs`.
 pub(crate) fn apply(
     issued: &IssuedCommand,
@@ -223,32 +267,21 @@ pub(crate) fn apply(
             });
         }
         &Command::PlaceBuilding { building, origin } => {
-            let item = ProductionItem::Building(building);
-            let def = definitions
-                .building(building)
-                .ok_or(RejectReason::UnknownItem(item))?;
-            let producer = def.production.producer;
-            let ready = state.queue(producer).first().is_some_and(|head| {
-                head.item == item && head.progress >= def.production.build_time
-            });
-            if !ready {
-                return Err(RejectReason::NotReady(building));
-            }
-            let footprint = Footprint {
-                origin,
-                width: def.width,
-                height: def.height,
-            };
-            if let Some(vision) = fog(definitions, state) {
-                check_visible(grid, footprint, vision).map_err(RejectReason::Placement)?;
-            }
-            check_footprint(grid, footprint).map_err(RejectReason::Placement)?;
-            check_distance(
-                footprint,
+            let footprint = check_placement(
+                grid,
+                definitions,
+                state,
                 index.footprints_of(player),
-                definitions.placement_distance(),
-            )
-            .map_err(RejectReason::Placement)?;
+                building,
+                origin,
+            )?;
+            // `check_placement` found the definition.
+            let Some(def) = definitions.building(building) else {
+                return Err(RejectReason::UnknownItem(ProductionItem::Building(
+                    building,
+                )));
+            };
+            let producer = def.production.producer;
             let id = params.ids.allocate().ok_or(RejectReason::IdsExhausted)?;
 
             if let Some(queue) = state.queues.get_mut(&producer) {
