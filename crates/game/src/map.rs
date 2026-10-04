@@ -74,7 +74,7 @@ pub struct MapStatus {
 #[derive(Resource, Debug, Default)]
 pub struct HoveredCell(pub Option<CellPos>);
 
-fn load_map(
+pub(crate) fn load_map(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     checked: Res<CheckedAssets>,
