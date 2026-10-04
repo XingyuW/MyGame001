@@ -102,6 +102,23 @@ pub fn clamp_centre(centre: Vec2, half_view: Vec2, bounds: Rect) -> Vec2 {
     )
 }
 
+/// Camera centre that keeps the part of the view beside the sidebar inside `bounds` (M5): the
+/// view of `viewport` logical pixels at projection `scale` has its right `inset` pixels covered
+/// by the sidebar, so the visible part is narrower and its centre lies left of the camera's
+/// ([`clamp_centre`] applied to the visible part). With `inset` 0 this is [`clamp_centre`].
+pub fn clamp_centre_beside(
+    centre: Vec2,
+    viewport: Vec2,
+    scale: f32,
+    inset: f32,
+    bounds: Rect,
+) -> Vec2 {
+    let inset = inset.clamp(0.0, viewport.x);
+    let shift = Vec2::new(inset * scale / 2.0, 0.0);
+    let visible = Vec2::new(viewport.x - inset, viewport.y) * scale / 2.0;
+    clamp_centre(centre - shift, visible, bounds) + shift
+}
+
 // --- Systems --------------------------------------------------------------------------------
 
 fn spawn_camera(mut commands: Commands, bounds: Res<CameraBounds>) {
@@ -116,7 +133,7 @@ fn orthographic_scale(projection: &Projection) -> Option<f32> {
     }
 }
 
-fn pan_camera(
+pub(crate) fn pan_camera(
     keys: Res<ButtonInput<KeyCode>>,
     window: Single<&Window, With<PrimaryWindow>>,
     time: Res<Time>,
@@ -162,7 +179,7 @@ fn drag_camera(
     drag.last_cursor = cursor;
 }
 
-fn zoom_camera(
+pub(crate) fn zoom_camera(
     scroll: Res<AccumulatedMouseScroll>,
     mut projection: Single<&mut Projection, With<Camera2d>>,
 ) {
@@ -178,7 +195,10 @@ fn zoom_camera(
     }
 }
 
-fn clamp_camera(bounds: Res<CameraBounds>, camera: Single<(&Camera, &Projection, &mut Transform)>) {
+pub(crate) fn clamp_camera(
+    bounds: Res<CameraBounds>,
+    camera: Single<(&Camera, &Projection, &mut Transform)>,
+) {
     let (camera, projection, mut transform) = camera.into_inner();
     let (Some(bounds), Some(viewport), Some(scale)) = (
         bounds.0,
@@ -188,10 +208,12 @@ fn clamp_camera(bounds: Res<CameraBounds>, camera: Single<(&Camera, &Projection,
         return;
     };
     // With `ScalingMode::WindowSize` (the default) the view spans the logical viewport size
-    // times the projection scale in world units.
-    let centre = clamp_centre(
+    // times the projection scale in world units; the sidebar covers its right part (M5).
+    let centre = clamp_centre_beside(
         transform.translation.truncate(),
-        viewport * scale / 2.0,
+        viewport,
+        scale,
+        crate::sidebar::SIDEBAR_WIDTH,
         bounds,
     );
     transform.translation.x = centre.x;
@@ -326,5 +348,33 @@ mod tests {
             let moved = centre + drag_translation(previous, current, scale);
             assert_eq!(world_under(moved, current, scale), grabbed, "scale {scale}");
         }
+    }
+
+    #[test]
+    fn the_part_of_the_view_beside_the_sidebar_stays_inside_the_bounds() {
+        let b = bounds();
+        let viewport = HALF_VIEW * 2.0;
+        // Without an inset this is `clamp_centre`.
+        for point in [
+            Vec2::new(-5000.0, 0.0),
+            Vec2::new(5000.0, 5000.0),
+            Vec2::ZERO,
+        ] {
+            assert_eq!(
+                clamp_centre_beside(point, viewport, 1.0, 0.0, b),
+                clamp_centre(point, HALF_VIEW, b)
+            );
+        }
+        // With the sidebar covering 240 px at scale 2, the visible part's right edge reaches the
+        // right border, and its left edge the left border.
+        let (inset, scale) = (240.0, 2.0);
+        let right = clamp_centre_beside(Vec2::new(5000.0, 0.0), viewport, scale, inset, b);
+        assert_eq!(right.x + viewport.x * scale / 2.0 - inset * scale, b.max.x);
+        let left = clamp_centre_beside(Vec2::new(-5000.0, 0.0), viewport, scale, inset, b);
+        assert_eq!(left.x - viewport.x * scale / 2.0, b.min.x);
+        // An inset wider than the view counts as the whole view: the visible part has width 0
+        // and is clamped like a point.
+        let all = clamp_centre_beside(Vec2::new(5000.0, 0.0), viewport, 1.0, 1.0e6, b);
+        assert_eq!(all.x - viewport.x / 2.0, b.max.x);
     }
 }
