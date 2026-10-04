@@ -27,13 +27,20 @@
 //! * A unit with an `Attack` order fires only at its target. Out of range, it moves to the
 //!   nearest free cell from whose centre the target is in range; it gives up after
 //!   [`MAX_CHASES`] such moves without firing in between, or when the target no longer exists or
-//!   is no longer visible to its owner ([`SimEvent::AttackEnded`]). In range, it stops.
-//! * A unit with an `AttackMove` order moves to its destination; while a visible enemy is in
-//!   range it stops and fires at the nearest one, then moves on. The order ends when the move
-//!   ends (the move's own event reports how).
+//!   is no longer visible to its owner ([`SimEvent::AttackEnded`]). In range, it stops. If its
+//!   warhead deals no damage to the target's armour, the order ends with its first shot
+//!   ([`AttackEnd::NoDamage`]).
+//! * A unit with an `AttackMove` order moves to its destination; while a visible enemy it can
+//!   damage is in range it stops and fires at the nearest one, then moves on. The order ends
+//!   when the move ends (the move's own event reports how).
 //! * A unit without any order, and a building with a weapon, fire at the nearest visible enemy in
-//!   range without moving. A unit with a plain move order does not fire. A building with a
-//!   weapon does not fire while its owner has low power (PLAN.md section 5, equation 3).
+//!   range that they can damage, without moving. A unit with a plain move order does not fire.
+//!   A building with a weapon does not fire while its owner has low power (PLAN.md section 5,
+//!   equation 3).
+//!
+//! No rule engages a target the weapon cannot damage (equation 2 gives 0) for longer than one
+//! ordered shot, so no engagement, and no order waiting for one to end, lasts forever on a
+//! target the unit cannot affect (docs/DECISIONS.md D32).
 //!
 //! Distances (equation 1) are measured in subcells between the nearest points of the two
 //! entities: a unit is its fine position, a building the rectangle of subcells its footprint
@@ -395,15 +402,33 @@ impl Field<'_> {
         (found.owner != owner && found.body.seen_by(vision)).then_some(found)
     }
 
-    /// The visible enemy of `owner` nearest to `from` within `range` (ties by id).
-    fn nearest_enemy_in_range(&self, owner: PlayerId, from: &Extent, range: u32) -> Option<SimId> {
+    /// Whether a shot of `weapon` damages `target`: equation 2 gives more than 0 (its warhead's
+    /// percentage against the target's armour is above 0).
+    fn damages(&self, weapon: &WeaponDef, target: &Target) -> bool {
+        let versus = self
+            .definitions
+            .versus(weapon.warhead, target.armour)
+            .unwrap_or(0);
+        applied_damage(weapon.damage, versus) > 0
+    }
+
+    /// The visible enemy of `owner` that `weapon` damages nearest to `from` within the weapon's
+    /// range (ties by id).
+    fn nearest_enemy_in_range(
+        &self,
+        owner: PlayerId,
+        from: &Extent,
+        weapon: &WeaponDef,
+    ) -> Option<SimId> {
         let vision = self.vision(owner)?;
         self.targets
             .iter()
-            .filter(|(_, target)| target.owner != owner && target.body.seen_by(vision))
+            .filter(|(_, target)| {
+                target.owner != owner && target.body.seen_by(vision) && self.damages(weapon, target)
+            })
             .filter_map(|(&id, target)| {
                 let (dx, dy) = from.gap(&target.extent);
-                in_range(dx, dy, range).then(|| {
+                in_range(dx, dy, weapon.range).then(|| {
                     (
                         i128::from(dx) * i128::from(dx) + i128::from(dy) * i128::from(dy),
                         id,
@@ -570,7 +595,7 @@ pub(crate) fn combat(
                 weapon.target = if low_power {
                     None
                 } else {
-                    keep_or_acquire(&field, owner, &from, weapon.target, def.range)
+                    keep_or_acquire(&field, owner, &from, weapon.target, def)
                 };
                 fire_if_ready(&field, &mut shots, (id, owner, &from), &mut weapon, def);
             }
@@ -594,23 +619,24 @@ pub(crate) fn combat(
     }
 }
 
-/// The current target if it is still a visible enemy in range, else the nearest visible enemy in
-/// range.
+/// The current target if it is still a visible enemy in range that `weapon` damages, else the
+/// nearest such enemy (automatic acquisition: idle and attack-moving units, and defensive
+/// structures).
 fn keep_or_acquire(
     field: &Field<'_>,
     owner: PlayerId,
     from: &Extent,
     current: Option<SimId>,
-    range: u32,
+    weapon: &WeaponDef,
 ) -> Option<SimId> {
     current
         .filter(|&target| {
             field.visible_enemy(owner, target).is_some_and(|found| {
                 let (dx, dy) = from.gap(&found.extent);
-                in_range(dx, dy, range)
+                in_range(dx, dy, weapon.range) && field.damages(weapon, found)
             })
         })
-        .or_else(|| field.nearest_enemy_in_range(owner, from, range))
+        .or_else(|| field.nearest_enemy_in_range(owner, from, weapon))
 }
 
 /// Fires at the weapon's target if it is loaded and the target is a visible enemy in range;
@@ -670,6 +696,10 @@ fn act_unit(
                 // Stop at the next cell centre and fight.
                 orders.current = None;
                 if fire_if_ready(field, shots, (id, owner, from), weapon, def) {
+                    if !field.damages(def, found) {
+                        // The shot, as ordered, did nothing; firing on would never end.
+                        return end(weapon, shots, AttackEnd::NoDamage);
+                    }
                     weapon.order = Some(AttackOrder::Attack { target, chases: 0 });
                 }
                 return;
@@ -713,7 +743,7 @@ fn act_unit(
             destination,
             moving,
         }) => {
-            weapon.target = keep_or_acquire(field, owner, from, weapon.target, def.range);
+            weapon.target = keep_or_acquire(field, owner, from, weapon.target, def);
             if weapon.target.is_some() {
                 // Stop at the next cell centre and fight; the move resumes afterwards.
                 orders.current = None;
@@ -744,7 +774,7 @@ fn act_unit(
                 weapon.target = None;
                 return;
             }
-            weapon.target = keep_or_acquire(field, owner, from, weapon.target, def.range);
+            weapon.target = keep_or_acquire(field, owner, from, weapon.target, def);
             fire_if_ready(field, shots, (id, owner, from), weapon, def);
         }
     }

@@ -314,9 +314,22 @@ fn the_damage_equation_holds_for_every_warhead_and_armour_pair_of_the_fixtures()
             let expected = expected_damage(i64::from(weapon_def.damage), i64::from(versus));
             let full = hit_points(&mut app, target).expect("target");
             // Nothing is visible before the first tick, so the first shot comes in tick 1.
+            // Automatic acquisition engages only targets the weapon damages (docs/DECISIONS.md
+            // D32), so for the zero case the attacker is ordered to attack; the order is
+            // validated in tick 1 and fires in it.
             let mut fired_at = None;
             for _ in 0..5 {
                 let at = next_tick(&app);
+                if versus == 0 && at == 1 {
+                    issue(
+                        &mut app,
+                        HUMAN,
+                        Command::Attack {
+                            units: vec![attacker],
+                            target,
+                        },
+                    );
+                }
                 let events = tick(&mut app);
                 if events.contains(&SimEvent::WeaponFired {
                     attacker,
@@ -408,9 +421,14 @@ fn a_target_is_in_range_at_exactly_the_range_and_not_one_subcell_beyond() {
 fn a_building_is_in_range_when_its_nearest_edge_is() {
     // The rifleman at the centre of (10, 16) (x = 2688); a power plant's footprint starting at
     // x = 13 begins at 3328, 640 subcells away (in range 768); at x = 14, 896 (out of range,
-    // though still visible within the rifleman's sight of 5 cells).
+    // though still visible within the rifleman's sight of 5 cells). The bullet's 0 % against
+    // concrete is raised to 1 %, as automatic acquisition engages only targets the weapon
+    // damages (docs/DECISIONS.md D32).
+    let bullet_damages_concrete = combat_variant("bullet_versus_concrete_1", &[BULLET_CONCRETE]);
     for (origin, fires) in [(13, true), (14, false)] {
         let mut app = scenario();
+        app.world_mut()
+            .insert_resource(bullet_damages_concrete.clone());
         let rifleman = unit(&mut app, HUMAN, "rifleman", 10, 16);
         let plant = building(&mut app, ENEMY, "power", origin, 16);
         let events = ticks(&mut app, 3);
@@ -421,11 +439,21 @@ fn a_building_is_in_range_when_its_nearest_edge_is() {
     }
 }
 
+/// The edit of the fixture's combat file that raises the bullet's 0 % against concrete to 1 %.
+const BULLET_CONCRETE: (&str, &str) = (
+    "(armour: \"concrete\", percent: 0)",
+    "(armour: \"concrete\", percent: 1)",
+);
+
 /// The fixture with the rifle at the shortest range and reload the format admits, and the tank's
-/// cannon at the longest range with the slowest projectile and the widest sight.
+/// cannon at the longest range with the slowest projectile and the widest sight. The bullet deals
+/// 1 % instead of 0 % against concrete, so that idle riflemen engage buildings (automatic
+/// acquisition engages only targets the weapon damages, docs/DECISIONS.md D32).
 fn extreme_scenario() -> App {
     let text = std::fs::read_to_string(fixture("data/combat.ron")).expect("fixture");
+    assert!(text.contains(BULLET_CONCRETE.0));
     let text = text
+        .replacen(BULLET_CONCRETE.0, BULLET_CONCRETE.1, 1)
         .replacen(
             "range: 768,\n            reload: 10,",
             "range: 384,\n            reload: 1,",
@@ -1874,4 +1902,348 @@ fn the_hash_covers_hit_points_weapons_and_vision() {
     assert_ne!(hash(&mut fired), hash(&mut idle));
     let mut units = app.world_mut().query::<&Unit>();
     assert_eq!(units.iter(app.world()).count(), 1);
+}
+
+// --- M4 remediation round 1: regression tests -------------------------------------------------
+
+/// The fixture definitions with `edits` applied to the text of `combat.ron`, each of which must
+/// change it, written to a file of its own under `name`.
+fn combat_variant(name: &str, edits: &[(&str, &str)]) -> Definitions {
+    let mut text = std::fs::read_to_string(fixture("data/combat.ron")).expect("fixture");
+    for (from, to) in edits {
+        let edited = text.replacen(from, to, 1);
+        assert_ne!(edited, text, "{from:?} is not in the fixture");
+        text = edited;
+    }
+    let dir = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join("m4_combat");
+    std::fs::create_dir_all(&dir).expect("temporary directory");
+    let path = dir.join(format!("{name}.ron"));
+    std::fs::write(&path, text).expect("variant");
+    sim::load_definitions(
+        fixture("data/units_combat.ron"),
+        fixture("data/economy_combat.ron"),
+    )
+    .and_then(|definitions| definitions.with_combat(&path))
+    .unwrap_or_else(|error| panic!("{error}"))
+}
+
+/// The fixture's only pair of equation 2 with a percentage of 0: the rifle's bullet against the
+/// concrete of every building.
+fn assert_bullet_cannot_damage_concrete() {
+    let defs = definitions();
+    let rifle = defs
+        .weapon(defs.weapon_kind("rifle").expect("rifle"))
+        .expect("def");
+    let fence = defs
+        .building_combat(defs.building_kind("fence").expect("fence"))
+        .expect("terms");
+    assert_eq!(defs.versus(rifle.warhead, fence.armour), Some(0));
+}
+
+#[test]
+fn an_attack_move_past_an_enemy_it_cannot_damage_ends_when_its_move_ends() {
+    // M4 review 1 P1-1: a fence (concrete, 0 % from the bullet) stands two cells beside the
+    // rifleman's route along y = 16, in its range and sight. It is no target, so the attack move
+    // does not stop for it and ends with its move.
+    assert_bullet_cannot_damage_concrete();
+    let mut app = scenario();
+    let rifleman = unit(&mut app, HUMAN, "rifleman", 4, 16);
+    let fence = building(&mut app, ENEMY, "fence", 12, 18);
+    tick(&mut app);
+    issue(
+        &mut app,
+        HUMAN,
+        Command::AttackMove {
+            units: vec![rifleman],
+            target: CellPos::new(20, 16),
+        },
+    );
+    let mut log = Vec::new();
+    let mut passed_in_range = false;
+    for _ in 0..600 {
+        let events = tick(&mut app);
+        let at = position(&mut app, rifleman);
+        // The fence's footprint begins at y = 18 × 256; the rifle reaches 768 subcells.
+        passed_in_range |= vision(&app, HUMAN).is_visible(CellPos::new(12, 18))
+            && sim::in_range(
+                i64::from(3072 - at.x).max(i64::from(at.x - 3327)).max(0),
+                i64::from(4608 - at.y),
+                768,
+            );
+        let done = events.iter().any(
+            |event| matches!(event, SimEvent::MoveCompleted { unit, .. } if *unit == rifleman),
+        );
+        log.extend(events);
+        if done {
+            break;
+        }
+    }
+    assert!(passed_in_range, "the fence was a visible enemy in range");
+    assert!(
+        log.contains(&SimEvent::MoveCompleted {
+            unit: rifleman,
+            retargeted: false
+        }),
+        "the attack move ended"
+    );
+    assert_eq!(shots_by(&log, rifleman), 0);
+    assert_eq!(hit_points(&mut app, fence), Some(50));
+    assert_eq!(mobile(&mut app, rifleman).cell, CellPos::new(20, 16));
+    let weapon = weapon(&mut app, rifleman);
+    assert_eq!((weapon.order, weapon.target), (None, None));
+}
+
+#[test]
+fn an_idle_unit_fires_at_an_enemy_it_can_damage_and_not_at_a_nearer_one_it_cannot() {
+    // M4 review 1 P1-1: an enemy fence stands next to the idle rifleman and an enemy rifleman a
+    // little farther; both are in range. The rifleman returns fire at the rifleman.
+    assert_bullet_cannot_damage_concrete();
+    let mut app = scenario();
+    let rifleman = unit(&mut app, HUMAN, "rifleman", 10, 16);
+    let fence = building(&mut app, ENEMY, "fence", 11, 16);
+    let enemy = unit(&mut app, ENEMY, "rifleman", 12, 17);
+    let rifle = definitions().weapon_kind("rifle").expect("rifle");
+    tick(&mut app);
+    let events = tick(&mut app);
+    assert!(events.contains(&SimEvent::WeaponFired {
+        attacker: rifleman,
+        target: enemy,
+        weapon: rifle,
+    }));
+    let events = [events, ticks(&mut app, 60)].concat();
+    let at_fence = events
+        .iter()
+        .filter(|event| {
+            matches!(event, SimEvent::WeaponFired { attacker, target, .. }
+                if *attacker == rifleman && *target == fence)
+        })
+        .count();
+    assert_eq!(at_fence, 0, "no shot at the fence");
+    // Five shots of 20 each way: both riflemen fall in the same tick.
+    assert!(events.contains(&SimEvent::UnitDestroyed {
+        player: ENEMY,
+        unit: enemy
+    }));
+    assert_eq!(hit_points(&mut app, fence), Some(50));
+}
+
+#[test]
+fn a_defensive_structure_fires_at_an_enemy_it_can_damage_and_not_at_a_nearer_one_it_cannot() {
+    // M4 review 1 P1-1 for buildings: with the howitzer's warhead at 0 % against concrete, an
+    // enemy fence next to the turret is no target; a crawler three cells away is.
+    let mut app = scenario();
+    app.world_mut().insert_resource(combat_variant(
+        "he_versus_concrete_0",
+        &[(
+            "(armour: \"concrete\", percent: 75)",
+            "(armour: \"concrete\", percent: 0)",
+        )],
+    ));
+    building(&mut app, HUMAN, "power", 2, 2);
+    let turret = building(&mut app, HUMAN, "turret", 10, 16);
+    let fence = building(&mut app, ENEMY, "fence", 11, 16);
+    let crawler = unit(&mut app, ENEMY, "crawler", 13, 16);
+    let howitzer = definitions().weapon_kind("howitzer").expect("howitzer");
+    let events = ticks(&mut app, 120);
+    assert!(events.contains(&SimEvent::WeaponFired {
+        attacker: turret,
+        target: crawler,
+        weapon: howitzer,
+    }));
+    assert!(events.contains(&SimEvent::UnitDestroyed {
+        player: ENEMY,
+        unit: crawler
+    }));
+    assert_eq!(
+        shots_by(&events, turret),
+        1,
+        "one shot (60 against 50) and no more"
+    );
+    assert_eq!(hit_points(&mut app, fence), Some(50));
+    assert_eq!(weapon(&mut app, turret).target, None);
+}
+
+#[test]
+fn an_attack_order_on_a_target_it_cannot_damage_ends_after_one_shot() {
+    // The class of M4 review 1 P1-1 for explicit orders: the rifleman fires once at the fence, as
+    // ordered (equation 2 gives 0), and the order ends with `NoDamage` instead of lasting for as
+    // long as the fence stands. Out of range (from x 8: 896 subcells, though in sight), it first
+    // moves into range.
+    assert_bullet_cannot_damage_concrete();
+    let rifle = definitions().weapon_kind("rifle").expect("rifle");
+    for (start, fence_x) in [(10, 12), (8, 12)] {
+        let mut app = scenario();
+        let rifleman = unit(&mut app, HUMAN, "rifleman", start, 16);
+        let fence = building(&mut app, ENEMY, "fence", fence_x, 16);
+        tick(&mut app);
+        issue(
+            &mut app,
+            HUMAN,
+            Command::Attack {
+                units: vec![rifleman],
+                target: fence,
+            },
+        );
+        let mut log = Vec::new();
+        let mut ended_at = None;
+        for _ in 0..600 {
+            let events = tick(&mut app);
+            let ended = events.contains(&SimEvent::AttackEnded {
+                unit: rifleman,
+                target: fence,
+                reason: AttackEnd::NoDamage,
+            });
+            log.extend(events);
+            if ended {
+                ended_at = Some(log.len());
+                break;
+            }
+        }
+        assert!(ended_at.is_some(), "from x {start}: the order never ended");
+        assert_eq!(rejections(&log), vec![]);
+        let shots: Vec<&SimEvent> = log
+            .iter()
+            .filter(|event| matches!(event, SimEvent::WeaponFired { .. }))
+            .collect();
+        assert_eq!(
+            shots,
+            [&SimEvent::WeaponFired {
+                attacker: rifleman,
+                target: fence,
+                weapon: rifle,
+            }]
+        );
+        assert_eq!(hit_points(&mut app, fence), Some(50));
+        let weapon_now = weapon(&mut app, rifleman);
+        assert_eq!((weapon_now.order, weapon_now.target), (None, None));
+        // Idle afterwards, it does not take the fence as a target either.
+        let events = ticks(&mut app, 100);
+        assert_eq!(shots_by(&events, rifleman), 0);
+        assert!(
+            !events
+                .iter()
+                .any(|event| matches!(event, SimEvent::AttackEnded { .. }))
+        );
+    }
+}
+
+/// The human player's yard at (10, 10) (3 × 3, sight 4) with a ready power plant (2 × 2), and
+/// `enemy` (a unit or building type, if any) at (16, 14) for the ENEMY player.
+fn placement_scenario(enemy: Option<(&str, bool)>) -> (App, Option<SimId>) {
+    let mut app = scenario();
+    building(&mut app, HUMAN, "yard", 10, 10);
+    let blocker = enemy.map(|(kind, is_building)| {
+        if is_building {
+            building(&mut app, ENEMY, kind, 16, 14)
+        } else {
+            unit(&mut app, ENEMY, kind, 16, 14)
+        }
+    });
+    let power = definitions().building_kind("power").expect("power");
+    issue(
+        &mut app,
+        HUMAN,
+        Command::QueueProduction {
+            item: sim::ProductionItem::Building(power),
+        },
+    );
+    let mut ready = false;
+    for _ in 0..40 {
+        let events = tick(&mut app);
+        assert_eq!(rejections(&events), vec![]);
+        ready |= events.contains(&SimEvent::ProductionComplete {
+            player: HUMAN,
+            item: sim::ProductionItem::Building(power),
+        });
+        if ready {
+            break;
+        }
+    }
+    assert!(ready);
+    (app, blocker)
+}
+
+fn place_power(app: &mut App, x: i32, y: i32) -> Vec<SimEvent> {
+    let power = definitions().building_kind("power").expect("power");
+    issue(
+        app,
+        HUMAN,
+        Command::PlaceBuilding {
+            building: power,
+            origin: CellPos::new(x, y),
+        },
+    );
+    tick(app)
+}
+
+#[test]
+fn a_placement_over_cells_the_player_does_not_see_reveals_nothing_about_them() {
+    // M4 review 1 P1-2: the footprint x 15..=16, y 13..=14 lies within the placement distance (3)
+    // of the yard, but (16, 13) and (16, 14) lie beyond the yard's sight. Whether an enemy unit,
+    // an enemy building, or nothing stands at (16, 14), the placement is rejected for the first
+    // unseen cell, the same reason, which names no unit or building.
+    let mut reasons = Vec::new();
+    for enemy in [None, Some(("crawler", false)), Some(("beacon", true))] {
+        let (mut app, blocker) = placement_scenario(enemy);
+        let view = vision(&app, HUMAN);
+        assert!(view.is_visible(CellPos::new(15, 13)) && view.is_visible(CellPos::new(15, 14)));
+        assert!(!view.is_visible(CellPos::new(16, 13)) && !view.is_visible(CellPos::new(16, 14)));
+        let (mut control, _) = placement_scenario(enemy);
+        let events = place_power(&mut app, 15, 13);
+        let found = rejections(&events);
+        assert_eq!(
+            found,
+            [RejectReason::Placement(sim::PlacementError::NotVisible(
+                CellPos::new(16, 13)
+            ))],
+            "{enemy:?}"
+        );
+        tick(&mut control);
+        assert_eq!(
+            hash(&mut app),
+            hash(&mut control),
+            "the rejection changed nothing"
+        );
+        if let Some(blocker) = blocker {
+            assert!(!format!("{found:?}").contains(&format!("SimId({})", blocker.0)));
+        }
+        reasons.push(found);
+        // The building is still ready and is placed where the player sees every cell (x 14..=15,
+        // y 11..=12).
+        let events = place_power(&mut app, 14, 11);
+        assert_eq!(rejections(&events), vec![]);
+        assert!(
+            events
+                .iter()
+                .any(|event| matches!(event, SimEvent::BuildingPlaced { player: HUMAN, .. }))
+        );
+    }
+    assert!(reasons.windows(2).all(|pair| pair[0] == pair[1]));
+}
+
+#[test]
+fn a_placement_over_a_visible_enemy_still_names_it() {
+    // Hiding applies to unseen cells only: an enemy crawler the player sees at (15, 12) blocks
+    // the footprint x 14..=15, y 11..=12 and is named, as in M3.
+    let mut app = scenario();
+    building(&mut app, HUMAN, "yard", 10, 10);
+    let crawler = unit(&mut app, ENEMY, "crawler", 15, 12);
+    let power = definitions().building_kind("power").expect("power");
+    issue(
+        &mut app,
+        HUMAN,
+        Command::QueueProduction {
+            item: sim::ProductionItem::Building(power),
+        },
+    );
+    ticks(&mut app, 12);
+    assert!(vision(&app, HUMAN).is_visible(CellPos::new(15, 12)));
+    let events = place_power(&mut app, 14, 11);
+    assert_eq!(
+        rejections(&events),
+        [RejectReason::Placement(sim::PlacementError::Occupied {
+            cell: CellPos::new(15, 12),
+            unit: crawler,
+        })]
+    );
 }
