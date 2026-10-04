@@ -38,7 +38,7 @@ pub use map::{
     SUBCELLS_PER_CELL, SubPos, TERRAIN_LAYER, TILE_HEIGHT_PX, TILE_WIDTH_PX, TilesetImage,
     load_map, load_map_with_files,
 };
-pub use movement::{MAX_STALLED_TICKS, REPATH_AFTER_BLOCKED_TICKS};
+pub use movement::{MAX_PATHS_WITHOUT_PROGRESS, MAX_STALLED_TICKS, REPATH_AFTER_BLOCKED_TICKS};
 pub use pathfinding::{
     DIAGONAL_COST, ORTHOGONAL_COST, PATH_REQUESTS_PER_TICK, Path, destination_cells, find_path,
     nearest_reachable, octile_distance,

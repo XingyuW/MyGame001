@@ -197,7 +197,7 @@ pub fn misalignment(map: &tiled::Map) -> Option<String> {
     None
 }
 
-fn update_hovered_cell(
+pub(crate) fn update_hovered_cell(
     view: Option<Res<MapView>>,
     window: Single<&Window, With<PrimaryWindow>>,
     camera: Single<(&Camera, &GlobalTransform)>,

@@ -13,7 +13,7 @@
 //! match starts (cross validation, PLAN.md section 5; D20); the renderer receives exactly the
 //! checked bytes (`crate::checked_assets`).
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 use std::path::{Path, PathBuf};
 
@@ -53,14 +53,21 @@ pub const OPPONENT: PlayerId = PlayerId(1);
 /// Lowest z of a unit sprite. The map's layers lie at z = 0 (`bevy_ecs_tiled`).
 const UNIT_Z: f32 = 1.0;
 
-/// The starting units of the demo match (M2): owner, unit type, the cell they are placed around,
-/// and how many. Match setup arrives in M6.
-const STARTING_UNITS: [(PlayerId, &str, (i32, i32), usize); 4] = [
+/// A group of starting units: owner, unit type, the cell they are placed around, and how many.
+pub type StartingGroup = (PlayerId, &'static str, (i32, i32), usize);
+
+/// The starting units of the demo match (M2). Match setup arrives in M6.
+const STARTING_UNITS: [StartingGroup; 4] = [
     (HUMAN, "light_tank", (10, 28), 12),
     (HUMAN, "scout", (14, 34), 6),
     (OPPONENT, "light_tank", (50, 30), 5),
     (OPPONENT, "scout", (52, 36), 3),
 ];
+
+/// The number of starting units of the demo match, all of which match setup must spawn.
+pub fn starting_unit_total() -> usize {
+    STARTING_UNITS.iter().map(|&(.., count)| count).sum()
+}
 
 pub struct UnitsPlugin;
 
@@ -142,6 +149,66 @@ impl fmt::Display for SpriteError {
 }
 
 impl std::error::Error for SpriteError {}
+
+/// A group of starting units for which the map has too few free cells: fewer than `required`
+/// passable, unoccupied cells are reachable from `anchor` (none if it lies outside the map).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct StartError {
+    pub owner: PlayerId,
+    pub unit_type: String,
+    pub anchor: CellPos,
+    pub found: usize,
+    pub required: usize,
+}
+
+impl fmt::Display for StartError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "starting units of player {}: {} {:?} units are placed around cell ({}, {}), but \
+             only {} free cells are reachable there",
+            self.owner.0, self.required, self.unit_type, self.anchor.x, self.anchor.y, self.found
+        )?;
+        if self.found == 0 {
+            write!(f, " (the cell is outside the map or walled in)")?;
+        }
+        Ok(())
+    }
+}
+
+impl std::error::Error for StartError {}
+
+/// The cell of every starting unit: for each group in order, the free cells nearest to its
+/// anchor (`sim::destination_cells`), skipping cells occupied in `grid` and cells given to
+/// earlier groups. A group that does not get all of its cells is an error, so match setup never
+/// spawns fewer units than configured (M2 review 1, P1-2).
+pub fn plan_starting_units(
+    grid: &Grid,
+    groups: &[StartingGroup],
+) -> Result<Vec<(PlayerId, &'static str, CellPos)>, StartError> {
+    let mut planned = Vec::new();
+    let mut taken = BTreeSet::new();
+    for &(owner, unit_type, (x, y), count) in groups {
+        let anchor = CellPos::new(x, y);
+        let cells = destination_cells(grid, anchor, count, |cell| {
+            grid.occupant(cell).is_some() || taken.contains(&cell)
+        });
+        if cells.len() < count {
+            return Err(StartError {
+                owner,
+                unit_type: unit_type.to_owned(),
+                anchor,
+                found: cells.len(),
+                required: count,
+            });
+        }
+        for cell in cells {
+            taken.insert(cell);
+            planned.push((owner, unit_type, cell));
+        }
+    }
+    Ok(planned)
+}
 
 /// Why the units could not be set up.
 #[derive(Debug)]
@@ -236,6 +303,14 @@ fn setup_units(world: &mut World) {
             return;
         }
     };
+    let starting = match plan_starting_units(world.resource::<Grid>(), &STARTING_UNITS) {
+        Ok(starting) => starting,
+        Err(error) => {
+            error!("{error}");
+            world.write_message(AppExit::error());
+            return;
+        }
+    };
     let checked = world.resource::<CheckedAssets>().clone();
     let server = world.resource::<AssetServer>().clone();
     let mut sprites = UnitSprites::default();
@@ -247,24 +322,16 @@ fn setup_units(world: &mut World) {
     world.insert_resource(definitions);
 
     let mut spawned = 0;
-    for (owner, unit_type, (x, y), count) in STARTING_UNITS {
-        let cells = {
-            let grid = world.resource::<Grid>();
-            destination_cells(grid, CellPos::new(x, y), count, |cell| {
-                grid.occupant(cell).is_some()
-            })
-        };
-        for cell in cells {
-            match sim::spawn_unit(world, owner, unit_type, cell) {
-                Ok(_) => spawned += 1,
-                Err(error) => {
-                    error!(
-                        "starting unit {unit_type:?} at ({}, {}): {error}",
-                        cell.x, cell.y
-                    );
-                    world.write_message(AppExit::error());
-                    return;
-                }
+    for (owner, unit_type, cell) in starting {
+        match sim::spawn_unit(world, owner, unit_type, cell) {
+            Ok(_) => spawned += 1,
+            Err(error) => {
+                error!(
+                    "starting unit {unit_type:?} at ({}, {}): {error}",
+                    cell.x, cell.y
+                );
+                world.write_message(AppExit::error());
+                return;
             }
         }
     }
@@ -400,7 +467,13 @@ fn log_sim_events(mut events: MessageReader<SimEvent>) {
                 "command of player {} rejected: {reason}: {command:?}",
                 player.0
             ),
-            SimEvent::MoveCompleted { unit } => debug!("unit {} arrived", unit.0),
+            SimEvent::MoveCompleted { unit, retargeted } => {
+                if *retargeted {
+                    debug!("unit {} stopped near its destination", unit.0);
+                } else {
+                    debug!("unit {} arrived", unit.0);
+                }
+            }
             SimEvent::MoveFailed { unit, reason } => {
                 info!("unit {} stopped: {reason:?}", unit.0);
             }
@@ -467,6 +540,105 @@ mod tests {
             assert!(definitions.unit_kind(unit_type).is_some(), "{unit_type}");
             assert!(count > 0);
         }
+    }
+
+    fn fixture_grid(name: &str) -> Grid {
+        let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../sim/tests/fixtures/maps")
+            .join(format!("{name}.tmx"));
+        sim::load_map(&path)
+            .unwrap_or_else(|error| panic!("{error}"))
+            .grid
+    }
+
+    #[test]
+    fn the_demo_map_holds_every_starting_unit_on_its_own_free_cell() {
+        let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../../assets")
+            .join(crate::map::MAP_PATH);
+        let grid = sim::load_map(&path)
+            .unwrap_or_else(|error| panic!("{error}"))
+            .grid;
+        let planned = plan_starting_units(&grid, &STARTING_UNITS).expect("demo map");
+        assert_eq!(planned.len(), starting_unit_total());
+        let cells: BTreeSet<CellPos> = planned.iter().map(|&(.., cell)| cell).collect();
+        assert_eq!(cells.len(), planned.len(), "cells are distinct");
+        assert!(cells.iter().all(|&cell| grid.is_passable(cell)));
+        for (owner, unit_type, _, count) in STARTING_UNITS {
+            let placed = planned
+                .iter()
+                .filter(|&&(o, t, _)| o == owner && t == unit_type)
+                .count();
+            assert_eq!(placed, count, "{unit_type}");
+        }
+    }
+
+    #[test]
+    fn starting_units_that_do_not_fit_are_a_setup_error() {
+        // M2 review 1, P1-2: the arena fixture is 32x32, so the opponent's anchors of the demo
+        // match lie outside it; before, those 8 units and the 6 scouts were silently dropped.
+        let arena = fixture_grid("arena_32x32");
+        assert_eq!(
+            plan_starting_units(&arena, &STARTING_UNITS),
+            Err(StartError {
+                owner: HUMAN,
+                unit_type: "scout".into(),
+                anchor: CellPos::new(14, 34),
+                found: 0,
+                required: 6,
+            })
+        );
+        let message = plan_starting_units(&arena, &[(OPPONENT, "scout", (-1, 3), 2)])
+            .expect_err("outside")
+            .to_string();
+        assert_eq!(
+            message,
+            "starting units of player 1: 2 \"scout\" units are placed around cell (-1, 3), but \
+             only 0 free cells are reachable there (the cell is outside the map or walled in)"
+        );
+        // An anchor with too few free cells reachable from it: a pocket of three cells in rock.
+        let mut grid = fixture_grid("open_16x16");
+        let rock = sim::Cell {
+            passable: false,
+            buildable: false,
+            ore: 0,
+        };
+        for x in 3..=7 {
+            for y in 3..=5 {
+                if !(y == 4 && (4..=6).contains(&x)) {
+                    grid.set_terrain(CellPos::new(x, y), rock);
+                }
+            }
+        }
+        let pocket = [(HUMAN, "light_tank", (5, 4), 3)];
+        assert_eq!(plan_starting_units(&grid, &pocket).map(|p| p.len()), Ok(3));
+        assert_eq!(
+            plan_starting_units(&grid, &[(HUMAN, "light_tank", (5, 4), 4)]),
+            Err(StartError {
+                owner: HUMAN,
+                unit_type: "light_tank".into(),
+                anchor: CellPos::new(5, 4),
+                found: 3,
+                required: 4,
+            })
+        );
+        // Cells given to an earlier group are not free for a later one.
+        assert_eq!(
+            plan_starting_units(
+                &grid,
+                &[
+                    (HUMAN, "light_tank", (5, 4), 2),
+                    (OPPONENT, "scout", (4, 4), 2)
+                ]
+            ),
+            Err(StartError {
+                owner: OPPONENT,
+                unit_type: "scout".into(),
+                anchor: CellPos::new(4, 4),
+                found: 1,
+                required: 2,
+            })
+        );
     }
 
     #[test]

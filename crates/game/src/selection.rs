@@ -37,7 +37,10 @@ impl Plugin for SelectionPlugin {
                 (prune_selection, select_units, issue_orders, draw_selection)
                     .chain()
                     .after(TransformSystems::Propagate)
-                    .after(CameraUpdateSystems),
+                    .after(CameraUpdateSystems)
+                    // A right click orders the selection to the cell under the cursor in this
+                    // frame (M2 review 1, P2-3).
+                    .after(crate::map::update_hovered_cell),
             );
     }
 }
@@ -293,6 +296,64 @@ mod tests {
         // Clicking empty ground clears the selection, unless Shift is held.
         assert_eq!(apply_selection(&current, ids(&[]), false), ids(&[]));
         assert_eq!(apply_selection(&current, ids(&[]), true), current);
+    }
+
+    #[test]
+    fn game_systems_that_share_state_in_a_frame_are_ordered() {
+        // M2 review 1, P2-3: `issue_orders` reads the hovered cell that `update_hovered_cell`
+        // writes in the same schedule; unordered, a right click could use the previous frame's
+        // cell. Bevy records every pair of systems of a schedule that have conflicting access
+        // and no ordering; the game's own systems in `PostUpdate` must form no such pair.
+        use bevy::ecs::system::IntoSystem;
+        use std::any::TypeId;
+        fn type_of<M>(system: impl IntoSystem<(), (), M>) -> TypeId {
+            IntoSystem::into_system(system).system_type()
+        }
+        // Without Bevy's `debug` feature systems have no names, so they are told apart by type.
+        let known = [
+            (
+                type_of(crate::map::update_hovered_cell),
+                "update_hovered_cell",
+            ),
+            (type_of(issue_orders), "issue_orders"),
+            (type_of(select_units), "select_units"),
+            (type_of(prune_selection), "prune_selection"),
+            (type_of(draw_selection), "draw_selection"),
+        ];
+        let label = |id: TypeId| {
+            known
+                .iter()
+                .find(|(known, _)| *known == id)
+                .map_or("another game system", |(_, name)| name)
+        };
+        let mut app = App::new();
+        app.add_plugins((
+            crate::map::MapPlugin,
+            crate::units::UnitsPlugin,
+            SelectionPlugin,
+        ));
+        app.world_mut()
+            .schedule_scope(PostUpdate, |world, schedule| {
+                schedule.initialize(world).expect("PostUpdate builds");
+                let types: std::collections::BTreeMap<_, TypeId> = schedule
+                    .systems()
+                    .expect("initialized")
+                    .map(|(key, system)| (key, system.system_type()))
+                    .collect();
+                for (_, name) in &known {
+                    assert!(
+                        types.values().any(|&id| label(id) == *name),
+                        "{name} is not in PostUpdate"
+                    );
+                }
+                let conflicts: Vec<(&str, &str)> = schedule
+                    .graph()
+                    .conflicting_systems()
+                    .iter()
+                    .map(|(a, b, _)| (label(types[a]), label(types[b])))
+                    .collect();
+                assert_eq!(conflicts, Vec::<(&str, &str)>::new());
+            });
     }
 
     #[test]
