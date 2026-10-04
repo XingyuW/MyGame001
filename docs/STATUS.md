@@ -4,7 +4,7 @@
 |-----------|--------|--------|--------------|
 | M0: Bootstrap and dependency verification | **Approved** by the user on 2026-10-04 after independent review (decision: GO WITH DOCUMENTED NON-BLOCKING DEBT; no P0 or P1) | `milestone/m0` | `m0-approved` |
 | M1: Map and camera | **Reviewed**: review 3 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 3 P2) after reviews 1 and 2 NO-GO; merged into `main`. Awaiting user verification for `m1-approved` | `milestone/m1` | `m1-reviewed` |
-| M2: Units and movement | Implemented, awaiting independent review | `milestone/m2` | |
+| M2: Units and movement | **Review 1: NO-GO** (0 P0, 2 P1, 4 P2; `docs/reviews/M2-review-1.md`), in remediation round 1 | `milestone/m2` | |
 | M3: Economy and construction | Not started | | |
 | M4: Combat and fog of war | Not started | | |
 | M5: Interface and audio | Not started | | |
