@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- M0 spike map, authored for this repository (no third-party content). 16x16 isometric (diamond) cells.
+     Cell (0,0) carries the red marker tile and cell (15,0) the blue marker tile, so the
+     orientation of the rendered map can be checked by eye. Cells x 5..7, y 9..11 are ore. -->
+<map version="1.10" tiledversion="1.11.2" orientation="isometric" renderorder="right-down" width="16" height="16" tilewidth="64" tileheight="32" infinite="0" nextlayerid="2" nextobjectid="1">
+ <tileset firstgid="1" name="spike_tiles" tilewidth="64" tileheight="32" tilecount="4" columns="4">
+  <image source="spike_tiles.png" width="256" height="32"/>
+  <tile id="0">
+   <properties>
+    <property name="terrain" value="grass"/>
+    <property name="buildable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="terrain" value="ore"/>
+    <property name="buildable" type="bool" value="false"/>
+    <property name="ore" type="int" value="500"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="terrain" value="marker_origin"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="terrain" value="marker_x_end"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer id="1" name="terrain" width="16" height="16">
+  <data encoding="csv">
+3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,2,2,2,1,1,1,1,1,1,1,1,
+1,1,1,1,1,2,2,2,1,1,1,1,1,1,1,1,
+1,1,1,1,1,2,2,2,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+</data>
+ </layer>
+</map>
