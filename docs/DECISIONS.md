@@ -1,6 +1,6 @@
 # Decision log
 
-Every entry records the date, the decision, and the evidence consulted. Changes to `PLAN.md` require the user's explicit approval recorded here; none has been made.
+Every entry records the date, the decision, and the evidence consulted. Changes to `PLAN.md` require the user's explicit approval recorded here; the approved changes are recorded under "User decisions" (U2).
 
 ## M0 (2026-10-03): dependency verification
 
@@ -163,3 +163,13 @@ The game resolves the map path with `FileAssetReader::new(AssetPlugin::default()
 The user stated: "Just make it run on Mac is good enough." Verification on macOS is therefore sufficient, and Windows and Linux are not verified. PLAN.md section 1 still names Windows, macOS, and Linux for version 1.0. If this decision applies to version 1.0 and not only to M0, PLAN.md section 1 must be amended, and only the user may make that change.
 
 The user also verified the M0 spike map on screen with `cargo run --release -p game`.
+
+### U2 (2026-10-04): PLAN.md amendment approved by the user
+
+The user approved the following changes to `PLAN.md`, applied verbatim in one commit on `milestone/m1`:
+
+1. Section 1: version 1.0 is a desktop executable for macOS only (previously Windows, macOS, and Linux). This resolves the open question of U1 and M0 debt item 11.
+2. Section 9 gains the validation command `cargo run -p game -- --smoke-test 600` (debug profile).
+3. New section 12, "Orchestrated workflow and amendments": an orchestrator session may run the cycle of section 10 with a fresh subagent per implementation, review, and remediation step; a GO or GO WITH DOCUMENTED NON-BLOCKING DEBT decision leads to a merge and the tag `mN-reviewed` without waiting for the user; items that only the user can verify are listed in `docs/STATUS.md`, are not review findings, and block only the user's tag `mN-approved`; version 1.0 targets macOS only; new invariants I11 (external files handed to third party parsers or renderers are restricted to an explicitly listed supported subset, with a typed error before the hand off) and I12 (overflow-prone simulation arithmetic uses explicit checked, saturating, or wrapping operations). Section 12 prevails over sections 1 to 11 where they conflict.
+
+No other part of `PLAN.md` was changed.

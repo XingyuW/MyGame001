@@ -6,7 +6,7 @@ This file is the authoritative plan for the repository. Every implementation, re
 
 The goal is an original single player real time strategy game in the tradition of the classic Command & Conquer titles: a 2D isometric view with sprite graphics, base construction, ore harvesting, unit production, combat, fog of war, and skirmish matches against a computer opponent. The project is greenfield, so there is no defect or root cause to fix; the problem is the absence of the game, and the main risks are uncontrolled scope, engine API drift, and simulation logic that cannot be verified automatically. The developer works alone with a coding agent, so the work is divided into eight milestones (M0 to M7), each sized for one implement, review, and approve cycle.
 
-Version 1.0 is a desktop executable for Windows, macOS, and Linux that offers skirmish on at least three maps with two factions against an AI opponent, with a clear win and lose condition.
+Version 1.0 is a desktop executable for macOS that offers skirmish on at least three maps with two factions against an AI opponent, with a clear win and lose condition.
 
 ## 2. Confirmed facts and assumptions
 
@@ -209,6 +209,7 @@ cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
 cargo build --release -p game
 cargo run --release -p game -- --smoke-test 600
+cargo run -p game -- --smoke-test 600
 ```
 
 If the environment has no display, the last command is reported as "not executed, no display" and left for the user. From M7 the benchmark and soak commands defined in that milestone are added.
@@ -234,3 +235,13 @@ Compatibility rules: dependency or toolchain upgrades happen only in a dedicated
 ## 11. Failure conditions
 
 A milestone fails, and work stops for user input, when any of the following holds: a validation command fails; an invariant of section 6 is violated; a test was removed, skipped, or weakened; `sim` gained a forbidden dependency; an assumption of section 2 proved false and no recorded fallback applies; the plan appears wrong or contradictory; or third party material without a recorded licence entered the repository. In these cases the agent reports the evidence and proposes options instead of improvising beyond the plan.
+
+## 12. Orchestrated workflow and amendments
+
+1. An orchestrator session may run the cycle of section 10 automatically, using a separate subagent with a fresh context for each implementation, review, and remediation step. A reviewer subagent must never have implemented or remediated the code it reviews, and its decision is binding on the orchestrator. After GO or GO WITH DOCUMENTED NON-BLOCKING DEBT the orchestrator merges the milestone branch, creates the tag `mN-reviewed`, and proceeds without waiting for the user. The cumulative diff for a review is taken from the most recent `mN-reviewed` or `mN-approved` tag.
+2. Acceptance items that only the user can verify (visual and audio behaviour) are listed in docs/STATUS.md under "requires user verification". They are not review findings, never justify NO-GO, and block only the tag `mN-approved`, which the user alone creates.
+3. Version 1.0 targets macOS only.
+4. Invariant I11: every external file handed to a third party parser or renderer is restricted to an explicitly listed supported subset, and anything outside that subset is rejected with a typed error before the hand off, either by reading the input with the same rules as the third party code or by checking the parsed result. Invariant I12: simulation arithmetic that can overflow uses explicit checked, saturating, or wrapping operations, so that debug and release builds behave identically.
+5. Section 9 gains the command `cargo run -p game -- --smoke-test 600` (debug profile).
+
+Where this section conflicts with sections 1 to 11, this section prevails.
