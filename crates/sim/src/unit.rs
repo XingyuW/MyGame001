@@ -12,6 +12,7 @@ use bevy_ecs::world::World;
 
 use crate::command::PlayerId;
 use crate::definitions::{Definitions, UnitKind};
+use crate::harvest::Harvester;
 use crate::hash::Fnv1a64;
 use crate::id::{SimId, SimIdAllocator};
 use crate::map::{CellPos, Grid, SUBCELLS_PER_CELL, SubPos};
@@ -256,7 +257,8 @@ impl fmt::Display for SpawnError {
 impl std::error::Error for SpawnError {}
 
 /// Spawns a unit of type `unit_type` owned by `owner`, standing idle in `cell` and facing
-/// south-east (towards the viewer).
+/// south-east (towards the viewer). A harvester starts its harvesting cycle at once
+/// (`HarvestState::Seeking`).
 ///
 /// Scenario and match setup only (tests, and the game before the first tick); during a match
 /// units are created by production (M3). The world must have been set up by
@@ -267,13 +269,16 @@ pub fn spawn_unit(
     unit_type: &str,
     cell: CellPos,
 ) -> Result<SimId, SpawnError> {
-    let (kind, speed) = {
+    let (kind, speed, harvester) = {
         let definitions = world.resource::<Definitions>();
         let kind = definitions
             .unit_kind(unit_type)
             .ok_or_else(|| SpawnError::UnknownUnitType(unit_type.to_owned()))?;
-        let speed = definitions.unit(kind).map_or(0, |def| def.speed);
-        (kind, speed)
+        let speed = definitions
+            .unit(kind)
+            .map(|def| def.speed)
+            .ok_or_else(|| SpawnError::UnknownUnitType(unit_type.to_owned()))?;
+        (kind, speed, definitions.harvester(kind).is_some())
     };
     {
         let grid = world.resource::<Grid>();
@@ -292,7 +297,23 @@ pub fn spawn_unit(
         .allocate()
         .ok_or(SpawnError::IdsExhausted)?;
     world.resource_mut::<Grid>().claim(cell, id);
-    world.spawn((
+    let mut entity = world.spawn(unit_bundle(id, owner, kind, speed, cell));
+    if harvester {
+        entity.insert(Harvester::new());
+    }
+    Ok(id)
+}
+
+/// The components of a new unit standing idle in `cell`, facing south-east. A harvester also
+/// gets a [`Harvester`] component.
+pub(crate) fn unit_bundle(
+    id: SimId,
+    owner: PlayerId,
+    kind: UnitKind,
+    speed: u16,
+    cell: CellPos,
+) -> (SimId, Owner, Unit, Mobile, Position, Facing, Orders) {
+    (
         id,
         Owner(owner),
         Unit { kind },
@@ -304,8 +325,7 @@ pub fn spawn_unit(
         Position(SubPos::centre_of(cell)),
         Facing(Direction::SouthEast),
         Orders::default(),
-    ));
-    Ok(id)
+    )
 }
 
 fn write_cell(hasher: &mut Fnv1a64, cell: CellPos) {

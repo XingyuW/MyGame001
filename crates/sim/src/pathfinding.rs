@@ -202,6 +202,19 @@ pub fn destination_cells(
     found
 }
 
+/// The passable cell nearest to `start` by path cost over passable terrain (ties by row, then
+/// column) for which `accept` holds, or `None` if no such cell is reachable. `start` itself is
+/// considered first.
+pub(crate) fn nearest_cell(
+    grid: &Grid,
+    start: CellPos,
+    accept: impl Fn(CellPos) -> bool,
+) -> Option<CellPos> {
+    destination_cells(grid, start, 1, |cell| !accept(cell))
+        .first()
+        .copied()
+}
+
 type PathQuery<'w, 's> =
     Query<'w, 's, (Entity, &'static SimId, &'static Mobile, &'static mut Orders), With<Unit>>;
 
