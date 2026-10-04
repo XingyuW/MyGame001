@@ -12,3 +12,9 @@ publish.workspace = true
 bevy_app = { version = "=0.19.1", default-features = false, features = ["std"] }
 bevy_ecs = { version = "=0.19.1", default-features = false, features = ["std"] }
 rand_chacha = { version = "=0.10.0", default-features = false }
+# Map loading (docs/DECISIONS.md, M1). Both are pure parsers; `tiled` is used without its default
+# `zstd` feature, exactly as `bevy_ecs_tiled` uses it, so no crate is added to Cargo.lock.
+# `quick-xml` must stay at the version `tiled` uses: the layer data pre-check relies on parsing
+# exactly as `tiled` does.
+quick-xml = "=0.31.0"
+tiled = { version = "=0.16.0", default-features = false }

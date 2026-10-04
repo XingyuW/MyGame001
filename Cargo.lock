@@ -4799,7 +4799,9 @@ version = "0.1.0"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
+ "quick-xml 0.31.0",
  "rand_chacha",
+ "tiled",
 ]
 
 [[package]]
