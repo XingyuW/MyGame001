@@ -4,7 +4,8 @@
 //! `crates/sim/tests/m6_ai.rs` runs the plan's end-to-end test on every shipped map with fixture
 //! data (invariant I10), and checks equal hashes across two runs. This test runs the shipped
 //! factions, units, buildings, and AI file, as a match started from the menu sets them up, once
-//! for every pairing of the shipped difficulties: every match must end with a winner within
+//! for every pairing of the shipped difficulties and (since M7, which ships the second faction) of
+//! the shipped factions: every match must end with a winner within
 //! [`MATCH_TICK_LIMIT`] ticks, without panic, and with no rejected command of a computer player
 //! that a loss in the tick before does not explain. It checks a property of the shipped game
 //! (that its computer players finish their matches), so a change of the balance in M7 that breaks
@@ -41,44 +42,62 @@ fn computer_players_finish_matches_with_the_shipped_data_on_every_shipped_map() 
     let skirmish =
         load_skirmish(data.join("skirmish.ron"), &definitions).unwrap_or_else(|e| panic!("{e}"));
     let ai = load_ai(data.join("ai.ron"), &definitions).unwrap_or_else(|e| panic!("{e}"));
+    sim::check_ai_factions(data.join("ai.ron"), &ai, &skirmish, &definitions)
+        .unwrap_or_else(|e| panic!("{e}"));
+    assert!(skirmish.factions.len() >= 2, "M7 ships two factions");
+    let factions: Vec<(usize, usize)> = (0..skirmish.factions.len())
+        .flat_map(|first| (0..skirmish.factions.len()).map(move |second| (first, second)))
+        .collect();
+    let mut matches = 0;
     for (map, def) in skirmish.maps.iter().enumerate() {
         let grid = load_map(assets().join(map_asset_path(&def.id)))
             .unwrap_or_else(|error| panic!("{error}"))
             .grid;
-        for first in 0..ai.difficulties.len() {
-            for second in 0..ai.difficulties.len() {
-                let name = format!(
-                    "{}: {} against {}",
-                    def.id, ai.difficulties[first].id, ai.difficulties[second].id
-                );
-                let mut app = bevy::app::App::new();
-                app.add_plugins(SimPlugin { seed: 0 });
-                app.world_mut().insert_resource(grid.clone());
-                app.world_mut().insert_resource(definitions.clone());
-                let players = [
-                    PlayerSetup {
-                        player: PlayerId(0),
-                        faction: 0,
-                        start: 0,
-                        controller: Controller::Ai { difficulty: first },
-                    },
-                    PlayerSetup {
-                        player: PlayerId(1),
-                        faction: 0,
-                        start: 1,
-                        controller: Controller::Ai { difficulty: second },
-                    },
-                ];
-                setup_match(app.world_mut(), &skirmish, &ai, map, &players)
-                    .unwrap_or_else(|error| panic!("{name}: {error}"));
-                let outcome = run(app.world_mut(), &name);
-                assert!(
-                    matches!(outcome, Some(MatchOutcome::Won { .. })),
-                    "{name}: {outcome:?}"
-                );
+        for &(first_faction, second_faction) in &factions {
+            for first in 0..ai.difficulties.len() {
+                for second in 0..ai.difficulties.len() {
+                    let name = format!(
+                        "{}: {} ({}) against {} ({})",
+                        def.id,
+                        skirmish.factions[first_faction].id,
+                        ai.difficulties[first].id,
+                        skirmish.factions[second_faction].id,
+                        ai.difficulties[second].id
+                    );
+                    let mut app = bevy::app::App::new();
+                    app.add_plugins(SimPlugin { seed: 0 });
+                    app.world_mut().insert_resource(grid.clone());
+                    app.world_mut().insert_resource(definitions.clone());
+                    let players = [
+                        PlayerSetup {
+                            player: PlayerId(0),
+                            faction: first_faction,
+                            start: 0,
+                            controller: Controller::Ai { difficulty: first },
+                        },
+                        PlayerSetup {
+                            player: PlayerId(1),
+                            faction: second_faction,
+                            start: 1,
+                            controller: Controller::Ai { difficulty: second },
+                        },
+                    ];
+                    setup_match(app.world_mut(), &skirmish, &ai, map, &players)
+                        .unwrap_or_else(|error| panic!("{name}: {error}"));
+                    let outcome = run(app.world_mut(), &name);
+                    assert!(
+                        matches!(outcome, Some(MatchOutcome::Won { .. })),
+                        "{name}: {outcome:?}"
+                    );
+                    matches += 1;
+                }
             }
         }
     }
+    assert_eq!(
+        matches,
+        skirmish.maps.len() * factions.len() * ai.difficulties.len() * ai.difficulties.len()
+    );
 }
 
 /// Runs the match until it ends or the tick limit is reached; returns its outcome. Every rejected

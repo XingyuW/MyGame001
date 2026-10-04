@@ -1,28 +1,80 @@
-// Skirmish definitions, schema version 1 (PLAN.md section 7, M6; docs/DECISIONS.md D40).
+// Skirmish definitions, schema version 2 (PLAN.md section 7, M6 and M7; docs/DECISIONS.md D40,
+// D48).
 //
 // starting_credits: credits of every player at the start of a match
-// factions:  what a player who plays the faction starts with, placed relative to its start
-//            position: buildings (type and the offset of the footprint's origin from the start, in
-//            cells; the first is the construction yard at the start itself) and groups of units
-//            (type, the offset of the cell they gather around, and how many). Names as in
-//            units.ron and economy.ron.
+// factions:  roster_buildings and roster_units, the building and unit types a player of the
+//            faction may produce (M7); what a player who plays the faction starts with, placed
+//            relative to its start position: buildings (type and the offset of the footprint's
+//            origin from the start, in cells; the first is the construction yard at the start
+//            itself) and groups of units (type, the offset of the cell they gather around, and how
+//            many). Names as in units.ron and economy.ron.
 // maps:      the maps of the skirmish menu: id (the map file is maps/<id>/<id>.tmx) and exactly
 //            two start positions; the human player starts at the first, the computer player at
 //            the second
+//
+// The Vanguard is quick and versatile (light tanks, artillery, gun turrets); the Meridian is
+// heavy and slow (heavy tanks, rocket launchers, rocket towers). Balance data (docs/DECISIONS.md
+// D51).
 (
-    schema_version: 1,
+    schema_version: 2,
     starting_credits: 5000,
     factions: [
         (
             id: "vanguard",
+            roster_buildings: [
+                "construction_yard",
+                "power_plant",
+                "refinery",
+                "barracks",
+                "war_factory",
+                "tech_center",
+                "gun_turret",
+            ],
+            roster_units: [
+                "rifleman",
+                "rocket_soldier",
+                "scout",
+                "light_tank",
+                "artillery",
+                "harvester",
+            ],
             buildings: [(building: "construction_yard", x: 0, y: 0)],
             units: [
-                (unit: "light_tank", x: 4, y: 1, count: 5),
-                (unit: "scout", x: 1, y: 4, count: 3),
+                (unit: "light_tank", x: 4, y: 1, count: 3),
+                (unit: "scout", x: 1, y: 4, count: 2),
+                (unit: "rifleman", x: 4, y: 4, count: 4),
+            ],
+        ),
+        (
+            id: "meridian",
+            roster_buildings: [
+                "construction_yard",
+                "power_plant",
+                "refinery",
+                "barracks",
+                "war_factory",
+                "tech_center",
+                "rocket_tower",
+            ],
+            roster_units: [
+                "conscript",
+                "grenadier",
+                "raider",
+                "heavy_tank",
+                "rocket_launcher",
+                "harvester",
+            ],
+            buildings: [(building: "construction_yard", x: 0, y: 0)],
+            units: [
+                (unit: "heavy_tank", x: 4, y: 1, count: 2),
+                (unit: "raider", x: 1, y: 4, count: 2),
+                (unit: "conscript", x: 4, y: 4, count: 5),
             ],
         ),
     ],
     maps: [
         (id: "demo", starts: [(x: 15, y: 37), (x: 52, y: 42)]),
+        (id: "crossroads", starts: [(x: 9, y: 9), (x: 44, y: 44)]),
+        (id: "riverlands", starts: [(x: 8, y: 21), (x: 53, y: 24)]),
     ],
 )
