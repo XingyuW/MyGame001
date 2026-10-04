@@ -1,4 +1,5 @@
-//! Generates the placeholder building sprites `assets/sprites/buildings/<sprite>.png` (M3).
+//! Generates the placeholder building sprites `assets/sprites/buildings/<sprite>.png` (M3; the gun
+//! turret in M4).
 //!
 //! Run with `cargo run -p game --example gen_building_sprites`. The output is deterministic (only
 //! IEEE-exact arithmetic), and `crates/game/tests/m3_building_sprites.rs` checks that the
@@ -33,7 +34,7 @@ pub struct BuildingSprite {
     stripes: u32,
 }
 
-pub const SPRITES: [BuildingSprite; 5] = [
+pub const SPRITES: [BuildingSprite; 6] = [
     BuildingSprite {
         name: "construction_yard",
         width: 3,
@@ -63,6 +64,12 @@ pub const SPRITES: [BuildingSprite; 5] = [
         width: 3,
         height: 3,
         stripes: 4,
+    },
+    BuildingSprite {
+        name: "gun_turret",
+        width: 1,
+        height: 1,
+        stripes: 1,
     },
 ];
 

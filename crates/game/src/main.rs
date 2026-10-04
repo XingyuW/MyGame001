@@ -5,6 +5,7 @@ mod camera;
 mod checked_assets;
 mod cli;
 mod construction;
+mod fog;
 mod map;
 mod projection;
 mod selection;
@@ -58,6 +59,7 @@ fn main() -> AppExit {
         buildings::BuildingsPlugin,
         selection::SelectionPlugin,
         construction::ConstructionPlugin,
+        fog::FogPlugin,
     ));
 
     if let Some(frames) = options.smoke_test_frames {

@@ -20,8 +20,8 @@ use std::path::{Path, PathBuf};
 use bevy::asset::io::file::FileAssetReader;
 use bevy::prelude::*;
 use sim::{
-    CellPos, DataError, Definitions, Direction, Facing, Grid, Owner, PlayerId, Position,
-    SUBCELLS_PER_CELL, SimEvent, SimId, SubPos, Unit, UnitKind, destination_cells,
+    CellPos, DataError, Definitions, Direction, Facing, Grid, Mobile, Owner, PlayerId, Players,
+    Position, SUBCELLS_PER_CELL, SimEvent, SimId, SubPos, Unit, UnitKind, destination_cells,
 };
 
 use crate::buildings::{
@@ -35,6 +35,9 @@ use crate::tileset_image::{TilesetImageError, TilesetImageErrorKind, check_png_f
 
 /// The units file, relative to the asset directory.
 pub const UNITS_PATH: &str = "data/units.ron";
+
+/// The combat file, relative to the asset directory (M4).
+pub const COMBAT_PATH: &str = "data/combat.ron";
 
 /// Directory of the unit sprite sheets, relative to the asset directory.
 pub const SPRITE_DIR: &str = "sprites/units";
@@ -289,8 +292,8 @@ pub fn load_units(asset_root: &Path) -> Result<LoadedUnits, SetupError> {
     })
 }
 
-/// Loads the unit definitions with the economy file (`crate::buildings::ECONOMY_PATH`) and checks
-/// the sprite of every unit and building type.
+/// Loads the unit definitions with the economy file (`crate::buildings::ECONOMY_PATH`) and the
+/// combat file ([`COMBAT_PATH`]), and checks the sprite of every unit and building type.
 pub fn load_match_data(
     asset_root: &Path,
 ) -> Result<(LoadedUnits, Vec<CheckedBuildingSprite>), SetupError> {
@@ -301,6 +304,7 @@ pub fn load_match_data(
     let economy_file = asset_root.join(ECONOMY_PATH);
     let definitions = definitions
         .with_economy(&economy_file)
+        .and_then(|definitions| definitions.with_combat(asset_root.join(COMBAT_PATH)))
         .map_err(SetupError::Data)?;
     let buildings = check_building_sprites(asset_root, &economy_file, &definitions)
         .map_err(SetupError::BuildingSprite)?;
@@ -458,6 +462,12 @@ fn spawn_unit_views(
                     ..default()
                 },
                 Transform::default(),
+                // Another player's unit is shown only once `place_unit_views` finds it visible.
+                if owner.0 == HUMAN {
+                    Visibility::Inherited
+                } else {
+                    Visibility::Hidden
+                },
             ))
             .id();
         views.0.insert(*id, view);
@@ -474,26 +484,59 @@ pub fn record_previous_positions(mut views: Query<&mut UnitView>, positions: Que
     }
 }
 
-/// Places every view between its unit's previous and current position, and shows its facing.
+/// Whether the human player is shown a unit of `owner` that moves as `mobile`: its own units
+/// always, other players' units only while the human player sees them (M4, hiding of unseen
+/// enemies; docs/DECISIONS.md D31). Before the first tick, and without a vision, nothing of
+/// another player is shown.
+pub fn unit_shown(owner: PlayerId, mobile: &Mobile, players: &Players) -> bool {
+    owner == HUMAN
+        || players
+            .get(HUMAN)
+            .is_some_and(|state| state.vision().sees_unit(mobile))
+}
+
+/// Places every view between its unit's previous and current position, shows its facing, and
+/// hides it while the human player does not see it.
+#[allow(clippy::type_complexity)]
 fn place_unit_views(
     map: Option<Res<MapView>>,
     time: Res<Time<Fixed>>,
+    players: Res<Players>,
     mut commands: Commands,
     mut registry: ResMut<UnitViews>,
-    mut views: Query<(Entity, &mut UnitView, &mut Sprite, &mut Transform)>,
-    units: Query<(&Position, &Facing)>,
+    // Disjoint from the building views' query (`crate::buildings`), which also writes
+    // `Visibility`.
+    mut views: Query<
+        (
+            Entity,
+            &mut UnitView,
+            &mut Sprite,
+            &mut Transform,
+            &mut Visibility,
+        ),
+        Without<crate::buildings::BuildingView>,
+    >,
+    units: Query<(&Position, &Facing, &Mobile)>,
 ) {
     let Some(map) = map else {
         return;
     };
     let fraction = time.overstep_fraction();
-    for (entity, mut view, mut sprite, mut transform) in &mut views {
-        let Ok((position, facing)) = units.get(view.unit) else {
-            // The unit no longer exists (units die from M4 on).
+    for (entity, mut view, mut sprite, mut transform, mut visibility) in &mut views {
+        let Ok((position, facing, mobile)) = units.get(view.unit) else {
+            // The unit no longer exists (destroyed, M4).
             registry.0.remove(&view.id);
             commands.entity(entity).despawn();
             continue;
         };
+        let shown = if unit_shown(view.owner, mobile, &players) {
+            Visibility::Inherited
+        } else {
+            Visibility::Hidden
+        };
+        if *visibility != shown {
+            *visibility = shown;
+        }
         view.current = position.0;
         let cell = interpolate(view.previous, view.current, fraction);
         let ground = ground_point(cell, map.tile);
@@ -578,6 +621,34 @@ fn log_sim_events(mut events: MessageReader<SimEvent>) {
             SimEvent::HarvesterIdle { unit, reason } => {
                 info!("harvester {} stopped: {reason:?}", unit.0);
             }
+            SimEvent::WeaponFired {
+                attacker, target, ..
+            } => debug!("{} fired at {}", attacker.0, target.0),
+            SimEvent::ProjectileExpired {
+                attacker, target, ..
+            } => debug!(
+                "a projectile of {} found its target {} gone",
+                attacker.0, target.0
+            ),
+            SimEvent::UnitDestroyed { player, unit } => {
+                info!("player {}: unit {} destroyed", player.0, unit.0);
+            }
+            SimEvent::BuildingDestroyed {
+                player,
+                building,
+                lost_units,
+                ..
+            } => info!(
+                "player {}: building {} destroyed, {} waiting units lost with it",
+                player.0,
+                building.0,
+                lost_units.len()
+            ),
+            SimEvent::AttackEnded {
+                unit,
+                target,
+                reason,
+            } => info!("unit {} stopped attacking {}: {reason:?}", unit.0, target.0),
         }
     }
 }
@@ -641,6 +712,37 @@ mod tests {
             assert!(definitions.unit_kind(unit_type).is_some(), "{unit_type}");
             assert!(count > 0);
         }
+    }
+
+    #[test]
+    fn the_production_data_loads_with_the_combat_file() {
+        // Cross validation of the production data (PLAN.md section 5): the combat file gives
+        // every unit and building type of the production files hit points, armour, and sight.
+        let (LoadedUnits { definitions, .. }, buildings) =
+            load_match_data(&assets_root()).unwrap_or_else(|error| panic!("{error}"));
+        assert!(definitions.has_combat());
+        for index in 0..definitions.units().len() {
+            let kind = UnitKind(u16::try_from(index).expect("index"));
+            assert!(definitions.unit_combat(kind).is_some(), "{index}");
+        }
+        assert_eq!(buildings.len(), definitions.buildings().len());
+        for index in 0..definitions.buildings().len() {
+            let kind = sim::BuildingKind(u16::try_from(index).expect("index"));
+            assert!(definitions.building_combat(kind).is_some(), "{index}");
+        }
+        // The demo match has a defensive structure: a building type with a weapon.
+        let turret = definitions.building_kind("gun_turret").expect("turret");
+        assert!(
+            definitions
+                .building_combat(turret)
+                .and_then(|terms| terms.weapon)
+                .is_some()
+        );
+        assert!(
+            crate::buildings::STARTING_BUILDINGS
+                .iter()
+                .any(|(owner, kind, _)| *owner == OPPONENT && *kind == "gun_turret")
+        );
     }
 
     fn fixture_grid(name: &str) -> Grid {

@@ -1,7 +1,9 @@
 //! Selection and orders (PLAN.md section 7, M2): selecting the player's units by click, by
 //! dragging a box, and additively with Shift, and ordering the selection to move (right click on
 //! a cell) or to stop (S). From M3, a right click on ore sends the selected harvesters to
-//! harvest there.
+//! harvest there. From M4, a right click on a visible enemy unit or building orders the selected
+//! armed units to attack it, and `A` orders the selection to attack-move to the cell under the
+//! cursor (interim keys until the hotkeys of M5; docs/DECISIONS.md D31).
 //!
 //! The interface changes the simulation only by pushing commands into `CommandQueue`
 //! (invariant I5). The decisions are pure functions, unit tested below; the systems only read
@@ -13,7 +15,10 @@ use bevy::camera::CameraUpdateSystems;
 use bevy::prelude::*;
 use bevy::transform::TransformSystems;
 use bevy::window::PrimaryWindow;
-use sim::{CellPos, Command, CommandQueue, Grid, Harvester, IssuedCommand, SimId};
+use sim::{
+    Building, CellPos, Command, CommandQueue, Grid, Harvester, IssuedCommand, Owner, Players,
+    SimId, Weapon,
+};
 
 use crate::map::{HoveredCell, MapView};
 use crate::projection::cell_corners;
@@ -133,6 +138,52 @@ pub fn right_click_commands(
     commands
 }
 
+/// The enemy a right click at `point` (world coordinates) is aimed at: the visible enemy unit
+/// whose body is under the cursor (`enemy_units` lists every enemy unit the player sees, with
+/// its ground point), else the visible enemy building covering the cell under the cursor.
+pub fn enemy_at(
+    point: Vec2,
+    enemy_units: &[(SimId, Vec2)],
+    building: Option<SimId>,
+) -> Option<SimId> {
+    unit_at(point, enemy_units).or(building)
+}
+
+/// The commands for a right click on the enemy `target` (M4): the selected units that are armed
+/// (`armed` lists every armed unit of the player) attack it, and the other selected units move
+/// to the cell under the cursor. Nothing for an empty selection.
+pub fn attack_commands(
+    selection: &BTreeSet<SimId>,
+    armed: &BTreeSet<SimId>,
+    target: SimId,
+    hovered: Option<CellPos>,
+) -> Vec<Command> {
+    let (fighters, others): (BTreeSet<SimId>, BTreeSet<SimId>) =
+        selection.iter().partition(|id| armed.contains(id));
+    let mut commands = Vec::new();
+    if !fighters.is_empty() {
+        commands.push(Command::Attack {
+            units: fighters.into_iter().collect(),
+            target,
+        });
+    }
+    commands.extend(move_command(&others, hovered));
+    commands
+}
+
+/// The command for the attack-move key: the selection attack-moves to the cell under the cursor.
+/// Nothing outside the map or for an empty selection.
+pub fn attack_move_command(
+    selection: &BTreeSet<SimId>,
+    target: Option<CellPos>,
+) -> Option<Command> {
+    let target = target?;
+    (!selection.is_empty()).then(|| Command::AttackMove {
+        units: selection.iter().copied().collect(),
+        target,
+    })
+}
+
 /// The command for the stop key: stop the selection. Nothing for an empty selection.
 pub fn stop_command(selection: &BTreeSet<SimId>) -> Option<Command> {
     (!selection.is_empty()).then(|| Command::Stop {
@@ -200,31 +251,78 @@ fn select_units(
     selection.0 = apply_selection(&selection.0, picked, additive);
 }
 
+/// The enemy units the human player is shown (not hidden by the fog), with their ground points.
+fn shown_enemy_units(views: &Query<(&UnitView, &Transform, &Visibility)>) -> Vec<(SimId, Vec2)> {
+    views
+        .iter()
+        .filter(|(view, _, visibility)| view.owner != HUMAN && **visibility != Visibility::Hidden)
+        .map(|(view, transform, _)| {
+            (
+                view.id,
+                transform.translation.truncate() - Vec2::new(0.0, GROUND_OFFSET_PX),
+            )
+        })
+        .collect()
+}
+
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn issue_orders(
     buttons: Res<ButtonInput<MouseButton>>,
     keys: Res<ButtonInput<KeyCode>>,
     hovered: Res<HoveredCell>,
     selection: Res<Selection>,
     grid: Res<Grid>,
+    players: Res<Players>,
+    window: Single<&Window, With<PrimaryWindow>>,
+    camera: Single<(&Camera, &GlobalTransform)>,
     harvesters: Query<&SimId, With<Harvester>>,
+    armed: Query<&SimId, With<Weapon>>,
+    views: Query<(&UnitView, &Transform, &Visibility)>,
+    buildings: Query<(&SimId, &Owner, &Building)>,
     mut queue: ResMut<CommandQueue>,
 ) {
     let mut commands = Vec::new();
     if buttons.just_pressed(MouseButton::Right) {
-        let ore = hovered
+        let (camera, camera_transform) = *camera;
+        // An enemy building the human player sees under the cursor.
+        let building = hovered
             .0
-            .and_then(|cell| grid.cell(cell))
-            .is_some_and(|cell| cell.ore > 0);
-        let harvesters: BTreeSet<SimId> = harvesters.iter().copied().collect();
-        commands.extend(right_click_commands(
-            &selection.0,
-            &harvesters,
-            hovered.0,
-            ore,
-        ));
+            .and_then(|cell| grid.building(cell))
+            .filter(|&id| {
+                buildings.iter().any(|(other, owner, building)| {
+                    *other == id
+                        && owner.0 != HUMAN
+                        && crate::buildings::building_shown(owner.0, building.footprint, &players)
+                })
+            });
+        let enemy = cursor_world(&window, camera, camera_transform)
+            .and_then(|point| enemy_at(point, &shown_enemy_units(&views), building))
+            .or(building);
+        match enemy {
+            Some(target) => {
+                let armed: BTreeSet<SimId> = armed.iter().copied().collect();
+                commands.extend(attack_commands(&selection.0, &armed, target, hovered.0));
+            }
+            None => {
+                let ore = hovered
+                    .0
+                    .and_then(|cell| grid.cell(cell))
+                    .is_some_and(|cell| cell.ore > 0);
+                let harvesters: BTreeSet<SimId> = harvesters.iter().copied().collect();
+                commands.extend(right_click_commands(
+                    &selection.0,
+                    &harvesters,
+                    hovered.0,
+                    ore,
+                ));
+            }
+        }
     }
     if keys.just_pressed(KeyCode::KeyS) {
         commands.extend(stop_command(&selection.0));
+    }
+    if keys.just_pressed(KeyCode::KeyA) {
+        commands.extend(attack_move_command(&selection.0, hovered.0));
     }
     for command in commands {
         queue.push(IssuedCommand {
@@ -456,6 +554,67 @@ mod tests {
                 schedule.initialize(world).expect("PostUpdate builds");
                 assert!(schedule.graph().conflicting_systems().is_empty());
             });
+    }
+
+    #[test]
+    fn a_right_click_on_a_visible_enemy_orders_the_armed_units_to_attack_it() {
+        let selection = ids(&[1, 2, 3]);
+        let armed = ids(&[1, 3, 9]);
+        let target = SimId(40);
+        let cell = Some(CellPos::new(4, 4));
+        assert_eq!(
+            attack_commands(&selection, &armed, target, cell),
+            [
+                Command::Attack {
+                    units: vec![SimId(1), SimId(3)],
+                    target
+                },
+                Command::Move {
+                    units: vec![SimId(2)],
+                    target: CellPos::new(4, 4)
+                }
+            ]
+        );
+        // Only unarmed units selected: they move; outside the map they do nothing.
+        assert_eq!(
+            attack_commands(&ids(&[2]), &armed, target, cell),
+            move_command(&ids(&[2]), cell)
+                .into_iter()
+                .collect::<Vec<_>>()
+        );
+        assert_eq!(
+            attack_commands(&ids(&[1]), &armed, target, None),
+            [Command::Attack {
+                units: vec![SimId(1)],
+                target
+            }]
+        );
+        assert_eq!(attack_commands(&ids(&[]), &armed, target, cell), []);
+        // The enemy under the cursor: a unit body first, else the building under the cursor.
+        let body = Vec2::new(0.0, GROUND_OFFSET_PX);
+        let enemies = [(SimId(40), Vec2::ZERO)];
+        assert_eq!(enemy_at(body, &enemies, Some(SimId(50))), Some(SimId(40)));
+        assert_eq!(
+            enemy_at(Vec2::new(500.0, 0.0), &enemies, Some(SimId(50))),
+            Some(SimId(50))
+        );
+        assert_eq!(enemy_at(Vec2::new(500.0, 0.0), &enemies, None), None);
+        assert_eq!(enemy_at(body, &[], None), None);
+    }
+
+    #[test]
+    fn the_attack_move_key_orders_the_whole_selection() {
+        let selection = ids(&[5, 2]);
+        let target = CellPos::new(9, 1);
+        assert_eq!(
+            attack_move_command(&selection, Some(target)),
+            Some(Command::AttackMove {
+                units: vec![SimId(2), SimId(5)],
+                target
+            })
+        );
+        assert_eq!(attack_move_command(&selection, None), None);
+        assert_eq!(attack_move_command(&ids(&[]), Some(target)), None);
     }
 
     #[test]

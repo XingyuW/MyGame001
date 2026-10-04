@@ -44,10 +44,12 @@ pub const STARTING_CREDITS: i64 = 5_000;
 pub type StartingBuilding = (PlayerId, &'static str, (i32, i32));
 
 /// The starting buildings of the demo match: a construction yard per player, near its starting
-/// units and an ore field (D27).
-pub const STARTING_BUILDINGS: [StartingBuilding; 2] = [
+/// units and an ore field (D27), and from M4 a gun turret guarding the opponent's yard, so that a
+/// defensive structure can be seen in action (docs/DECISIONS.md D31).
+pub const STARTING_BUILDINGS: [StartingBuilding; 3] = [
     (HUMAN, "construction_yard", (15, 37)),
     (OPPONENT, "construction_yard", (52, 42)),
+    (OPPONENT, "gun_turret", (50, 41)),
 ];
 
 /// The players of the demo match.
@@ -62,7 +64,7 @@ impl Plugin for BuildingsPlugin {
             .add_systems(Update, (spawn_building_views, show_status))
             .add_systems(
                 PostUpdate,
-                remove_building_views.before(bevy::transform::TransformSystems::Propagate),
+                update_building_views.before(bevy::transform::TransformSystems::Propagate),
             );
     }
 }
@@ -247,23 +249,52 @@ fn spawn_building_views(
                     ..default()
                 },
                 Transform::from_translation(position.extend(building_depth(component.footprint))),
+                // Another player's building is shown only once `update_building_views` finds it
+                // visible.
+                if owner.0 == HUMAN {
+                    Visibility::Inherited
+                } else {
+                    Visibility::Hidden
+                },
             ))
             .id();
         views.0.insert(*id, view);
     }
 }
 
-/// Removes the views of buildings that no longer exist (sold).
-fn remove_building_views(
+/// Whether the human player is shown a building of `owner` with this footprint: its own
+/// buildings always, other players' buildings only while the human player sees some cell of
+/// them (M4; docs/DECISIONS.md D31).
+pub fn building_shown(owner: PlayerId, footprint: Footprint, players: &Players) -> bool {
+    owner == HUMAN
+        || players
+            .get(HUMAN)
+            .is_some_and(|state| state.vision().sees_footprint(footprint))
+}
+
+/// Removes the views of buildings that no longer exist (sold or destroyed), and hides the views
+/// of other players' buildings while the human player does not see them.
+fn update_building_views(
     mut commands: Commands,
     mut registry: ResMut<BuildingViews>,
-    views: Query<(Entity, &BuildingView)>,
-    buildings: Query<(), With<Building>>,
+    players: Res<Players>,
+    // Disjoint from the unit views' query (`crate::units`), which also writes `Visibility`.
+    mut views: Query<(Entity, &BuildingView, &mut Visibility), Without<crate::units::UnitView>>,
+    buildings: Query<(&Owner, &Building)>,
 ) {
-    for (entity, view) in &views {
-        if buildings.get(view.building).is_err() {
+    for (entity, view, mut visibility) in &mut views {
+        let Ok((owner, building)) = buildings.get(view.building) else {
             registry.0.remove(&view.id);
             commands.entity(entity).despawn();
+            continue;
+        };
+        let shown = if building_shown(owner.0, building.footprint, &players) {
+            Visibility::Inherited
+        } else {
+            Visibility::Hidden
+        };
+        if *visibility != shown {
+            *visibility = shown;
         }
     }
 }
