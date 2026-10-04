@@ -2038,3 +2038,167 @@ Not review findings (PLAN.md section 12 item 2); they block only `m6-approved`. 
 13. **Acceptance:** in complete matches started from the menu, you can lose to the computer player and you can defeat it.
 
 The earlier items still pending (the 16 M5 items, the 9 M4 items, the 10 M3 items, the 7 M2 items, and the 5 M1 items) apply with the M6 starting setup: each player starts with its yard and 5 light tanks and 3 scouts (M2 item 1 named 18 and 8 units), the human player's title and sidebar show `power 0/20` at the start (unchanged), and the opponent has no gun turret at (50, 41) at the start (M4 items 3 and 7): its turrets appear as it builds them, and yours can be built from the sidebar. The opponent now acts (M5 item 15 said it would not until M6).
+
+## M6 remediation round 1 report (2026-10-04)
+
+This is the implementer session for remediation round 1 of M6 review 1 (`docs/reviews/M6-review-1.md`, NO-GO: 0 P0, 1 P1, 4 P2).
+
+* **Branch and base:** `milestone/m6`, base `bdbaa5e`. Code commit `85b310f`; this report and the decisions are in the documentation commit that follows it.
+* **Notes:** none accompanied the findings beyond the orchestrator's instruction to close each class of defect, with two examples: every cross-file reference in the new data files that is not validated at load, and every fallback the computer player takes when its data or state is unusable. Each finding was treated as a claim and reconciled against the code.
+* **"Fails before" evidence:** before any fix, a temporary probe test (`crates/sim/tests/zz_probe_m6r1.rs`, removed again) ran five configurations against the reviewed code through `setup_match` and `load_ai`; all five were accepted (`Ok`): a start position outside the map with every building and unit on it, a start on rock, a computer player whose yard is walled in by rock, a computer player whose faction lacks the yard, and the reviewer's AI file without the factory. The game-level regression tests were run with the fix disabled (the P2-2 test with only the discard counter added, the loader test with the new check commented out) and failed; each passes with the fix.
+* **Decisions:** DECISIONS D45, D46, and D47 (new section "M6 remediation round 1"), with amendments in place to D6 (M6 note), D40 items 2 and 4, D42 item 4, D43 items 5 and 6, and D44 items 1 and 4. The milestone table above is maintained by the orchestrator.
+
+### Classes of defect
+
+1. **Cross-file references of the new data files that were not validated at load** (P1-1, P2-1; D45 item 1 has the full audit table). Defective and fixed: start positions against their map's size and terrain (P1-1); a faction's buildings and units at every start of every map (implementation debt item 7, which the review attached to P1-1); the producers and prerequisites of the harvester and the army, the producers of the build order and of the power building, and the prerequisites of the power building (P2-1). Already checked: building and unit types, map files, build-order prerequisites.
+2. **Fallbacks the computer player takes when its data or state is unusable** (P1-1; D45 item 3). Defective and fixed: the gathering point's fallback to the start position. Closed by the data checks of class 1: off-map enemy start waypoints; a build order, harvester, or army whose producer can never be owned. Unreachable by construction and left as they are (listed in D45 item 3). Remaining in play (not data): a computer player that loses a producer and cannot pay to rebuild it waits (termination debt, below).
+3. **Paths on which commands leave the game without a trace or a failed check** (P2-2, P2-4; D47). Defective and fixed: the sink's silent `reset` (one logging discard path now); the smoke test's count of pushed rather than accepted computer-player commands.
+
+### Findings
+
+#### P1-1: start positions are never checked against their map, and the computer player falls back to a gathering point off the map
+
+**Outcome: confirmed. Both classes are fixed.**
+
+* **Evidence (code).** `skirmish_defs.rs` checked a start only against 0 to 255 and duplicates; `game::skirmish::load` called `check_map` for each map but never compared the starts with its grid; `setup_match` accepted any start at which the faction's offset buildings and groups fit; `AiController::new` took `destination_cells(grid, toward, 1, ..).first().unwrap_or(start)`, which is the off-map start when `toward` lies off the map, and the enemy's start became a priority waypoint. `smoke.rs` counted pushed commands.
+* **Evidence (reproduction).** On the reviewed code, `setup_match` returned `Ok(MatchStart { buildings: 3, units: 7 })` for the fixture with faction 1's start at (52, 32) on the 40 x 40 map (its buildings and units at offsets that put them where the fixture has them), and the same for a start on rock at (36, 32); the computer player's gathering point was (52, 32). The game-level loader test with the reviewer's root (`(70, 42)` on the demo map) loaded the catalogue when the new check was disabled. After the fix, the real binaries (release and debug, `BEVY_ASSET_ROOT` scratch root as the reviewer's `p1_start_outside`) exit 1 at startup with `data file …/skirmish.ron: maps[0].starts[1]: value (70, 42), which is outside the 64 x 64 cells of map "demo" is not supported, expected a cell of the map with passable terrain`, peak footprint 0.14 GB.
+* **Change** (D45; `crates/sim/src/{skirmish_defs,match_setup,ai,lib}.rs`, `crates/game/src/{skirmish,sim_host}.rs`):
+  1. `sim::start_problem` and `sim::check_map_starts`: a start position is a cell of its map with passable terrain; the `DataError` names the file, `maps[i].starts[j]`, the cell, the map's size and id.
+  2. `setup_match` checks every start position of the map before anything changes (`MatchSetupError::InvalidStart { start, cell, problem: StartProblem }`).
+  3. The gathering point is the cell reachable from the start over passable terrain, free of buildings, nearest to the point toward the centre; without one, setup fails with `MatchSetupError::NoGatheringPoint` (no fallback). For the shipped and fixture data it is the same cell as before (a probe compared the two rules for every fixture and shipped pairing), so valid matches and their hashes are unchanged; the 20 against 20 battle still ends at tick 665 with hash `c9401425d786dac6`.
+  4. The game's catalogue (`skirmish::check_catalogue`, called by `load`) checks every map's starts, the AI file against every faction (D46), and sets up every match the menu can choose once in a dropped simulation (`sim_host::check_match`), which also resolves implementation debt item 7 (a faction that does not fit now fails at startup: scratch root `no_fit`, start (62, 42), exit 1 naming the map, the factions, and the building). With eight factions the 64 trial setups take a few milliseconds in release (scratch root `eight_factions`, exit 0).
+  5. The smoke test fails on any rejected computer-player command (P2-4).
+* **Regression tests:**
+  * `m6_match::a_start_position_that_is_not_a_passable_cell_of_the_map_is_a_setup_error`: (52, 32) off the 40 x 40 map and (36, 32) turned to rock, each with a human or computer player at either start; typed error, message, and state hash unchanged; the same buildings and units from a start on the map are accepted. Fails before the fix (setup returned `Ok`).
+  * `m6_match::a_computer_player_without_a_reachable_gathering_point_is_a_setup_error`: the computer player's yard walled in by rock; `NoGatheringPoint { player: 1, start: (32, 32) }`. Fails before (the gathering point fell back to the covered start).
+  * `m6_match::every_gathering_point_and_waypoint_of_a_computer_player_is_a_passable_cell_of_the_map`: guard for the derived cells (passes before and after).
+  * `m6_definitions::start_positions_are_checked_against_their_map`: the reviewer's (255, 255) on the 40 x 40 fixture (still a valid value of the file itself, `limits_are_accepted_at_both_ends`), (40, 5), (−1, 0), and rock at (25, 9), each with file, field, found, and expected; the map's corners are accepted; a map index outside the file is an error.
+  * `skirmish::tests::loading_rejects_a_start_position_outside_its_map`: the reviewer's scratch root built from a copy of `assets/` in a temporary directory, through `load`; then (58, 42) loads. Fails with the check disabled.
+  * `skirmish::tests::the_catalogue_rejects_starts_off_their_map_unbuildable_ai_files_and_unplayable_matches`: off-map and rock starts, a faction without the yard, and a faction whose yard does not fit, each with the file and field or map and factions named; the production catalogue passes.
+
+#### P2-1: the AI file's cross checks do not ensure that the army or the harvester can be produced
+
+**Outcome: confirmed and fixed** (D46; D42 item 4 corrected).
+
+* **Evidence.** `ai_defs.rs` checked only the build order's prerequisites; the army's and harvester's producers and prerequisites, and the producers of the buildings, were not checked. On the reviewed code the fixture AI file with the factory removed from the build order and `army: ["tank"]` loaded (`Ok(AiDefinitions { .. })`).
+* **Change** (`crates/sim/src/{ai_defs,match_setup,lib}.rs`, `assets/data/ai.ron` comment):
+  1. `load_ai`: the producer and every prerequisite of the harvester and of every army unit type must be in the build order; the power building must have no prerequisites (it is queued whenever power is short, from the first turn).
+  2. `sim::check_ai_factions` (the game's catalogue) and `setup_match` (`MatchSetupError::UnobtainableProducer`, computer players only): the producer of every build-order building is a starting building of the faction or listed before it, and the power building's producer is a starting building.
+  3. The shipped and fixture data pass unchanged. The reviewer's scratch root `p2_army_unbuildable` now exits 1 at startup in both profiles (`ai.ron: harvester: value "harvester", whose producer "war_factory" is not listed in the build order …`); a faction without the yard exits 1 naming `build_order[0]`, the producer, and the faction.
+* **Regression tests:**
+  * `m6_definitions::the_army_harvester_and_power_building_can_be_obtained_through_the_build_order`: the reviewer's case (no factory: rejected at `harvester`), no barracks (`army[2]`), a tank that needs a fence (an economy fixture variant, `army[0]`), and a power building with prerequisites (`power`). The first fails before the fix (it loaded).
+  * `m6_definitions::the_ai_file_is_checked_against_every_faction_of_the_skirmish_file`: a faction without the yard (`build_order[0]`, naming the file, building, producer, and faction), a build order that builds the yard first, and the power building's own rule.
+  * `m6_match::a_computer_player_whose_faction_lacks_a_producer_of_its_build_order_is_a_setup_error`: typed error, state unchanged; the same faction for a human player is accepted. Fails before (setup returned `Ok`).
+* **Termination debt (not closed by this fix):** the checks keep the data from making a computer player unable to build; a player that loses a producer in play and cannot pay for it can still stall (recorded below).
+
+#### P2-2: `uninstall_match` clears pending commands silently before `close()` can log them
+
+**Outcome: confirmed and fixed** (D47 item 1).
+
+* **Evidence.** `uninstall_match` called `reset` (`pending.clear()`, no log) and then `close` (which logs). `install_match` also called `reset`.
+* **Change** (`crates/game/src/sim_host.rs`): one discard path, `CommandSink::discard(why)`, logs every dropped command with the reason and a running count (`discarded`); `reset` ("a new match starts") and `close` ("the match is over") use it; `uninstall_match` closes, then unpauses.
+* **Regression test:** `sim_host::tests::commands_pending_when_a_match_is_replaced_are_discarded_with_a_log_line`: a command pending when a running demo match is ended is discarded through the logging path (count 1), and one pending when a match is installed as well (count 2). It failed on the reviewed order (`left: 0, right: 1`) with only the counter added to `close`, and passes with the fix.
+
+#### P2-3: `a_run_with_another_seed_or_difficulty_diverges` tests neither a seed nor a different course
+
+**Outcome: confirmed and fixed** (D47 item 3).
+
+* **Evidence.** Both runs used seed 6 and differed only in player 0's difficulty; the test asserted only the first hash, which differs by construction (the difficulty is hashed).
+* **Change** (`crates/sim/tests/m6_ai.rs`): renamed `a_run_with_another_difficulty_takes_another_course`; `run_match` records each computer player's commands; the test additionally asserts that player 0's command stream and the match length differ. All earlier assertions are kept. The seed claim is dropped (the computer players use no randomness, implementation debt item 2).
+* **Test:** the strengthened test is the fix itself; a test of a test cannot fail before it. It passes (3.3 s).
+
+#### P2-4: the smoke test's computer-player check passes when every command of the computer player is rejected
+
+**Outcome: confirmed and fixed** (D47 item 2).
+
+* **Evidence.** `smoke.rs` reported and checked `commands_issued()`, the pushed count, and failed only the human player's rejections.
+* **Change** (`crates/game/src/smoke.rs`): `watch_events` counts the computer player's `CommandRejected` events in every match of the run, the final line reports `computer player's commands: N (M rejected)`, and any rejection fails the run (no loss can explain one in the short smoke matches).
+* **Regression test:** `smoke::tests::a_run_passes_only_with_the_menu_the_game_flow_and_the_computer_player` gains the reviewer's case (10 pushed, 9 rejected) and a single rejection, both failing with `N commands of the computer player were rejected`. The reviewer's run is the evidence that the old check passed it; with the P1-1 fix the same data no longer reaches a match.
+
+#### Implementer's claims named by the review
+
+* **D42 item 4** ("keep a computer player from getting stuck"): corrected and narrowed to the data (D42 item 4 amended, D46).
+* **D43 item 5** ("a computer player's command can be rejected only because of what happens in the tick between …"): now stated for data that passes D45 and D46, which the game checks at startup and `setup_match` checks for every match.
+* **D44 item 4** ("discards pending ones with a log line, so nothing is lost silently"): now true on every path (D47).
+
+### Tests changed (none removed, skipped, or weakened)
+
+* New: `m6_match` 4 tests (+ helpers `computer`, `shifted_start`), `m6_definitions` 3 tests (+ helper `definitions_with_economy`), `sim_host` 1 test, `skirmish` 2 tests (+ helper `copy_dir`). Extended: `smoke::tests::a_run_passes_only_with_the_menu_the_game_flow_and_the_computer_player` (two cases, field `ai_rejected` in `PASSING`), `m6_ai::run_match` (records commands).
+* Renamed and strengthened: `m6_ai::a_run_with_another_seed_or_difficulty_diverges` → `a_run_with_another_difficulty_takes_another_course` (P2-3; all assertions kept).
+* **Two existing tests change their stimulus, not their assertions:**
+  * `m6_definitions::limits_are_accepted_at_both_ends`: the longest build order was a power building and 31 turrets, which no longer provides the producers of the harvester and the army (D46); it is now the power building, refinery, barracks, factory, and 28 turrets, and still asserts that 32 entries load.
+  * `sim_host::tests::match_setup_installs_the_loaded_match_or_ends_the_game_with_an_error`: the demo starts on a 16 x 16 map are now rejected first as start positions outside the map (asserted in addition); for the unchanged "starting building" assertion the plan uses starts (14, 1) and (1, 14) on the small map, where the yard still does not fit. The game-flow half of the test is unchanged.
+* No fixture or shipped data value changed; `assets/data/ai.ron` gained comment lines stating the rules.
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `crates/sim/src/skirmish_defs.rs` | `StartProblem`, `start_problem`, `check_map_starts`; module documentation |
+| `crates/sim/src/ai_defs.rs` | Power building without prerequisites; harvester and army producers and prerequisites in the build order (`obtainable`); `unobtainable_producer`, `check_ai_factions`; module documentation |
+| `crates/sim/src/match_setup.rs` | `MatchSetupError::{InvalidStart, UnobtainableProducer, NoGatheringPoint}` and messages; the checks before any change; documentation |
+| `crates/sim/src/ai.rs` | `gathering_point` (no fallback); `AiController::new` returns `Option` |
+| `crates/sim/src/lib.rs` | Exports `StartProblem`, `start_problem`, `check_map_starts`, `check_ai_factions` |
+| `crates/sim/tests/m6_match.rs`, `m6_definitions.rs`, `m6_ai.rs` | Tests above |
+| `crates/game/src/skirmish.rs` | `check_catalogue` called by `load`; 2 tests |
+| `crates/game/src/sim_host.rs` | `check_match`; `CommandSink::discard` and `discarded`; `uninstall_match` order; 1 test; stimulus of 1 test |
+| `crates/game/src/smoke.rs` | Computer-player rejections counted, reported, and failing; test cases |
+| `assets/data/ai.ron` | Comment lines only |
+| `docs/DECISIONS.md` | D45, D46, D47; amendments to D6, D40, D42, D43, D44 |
+| `docs/STATUS.md` | This report |
+
+No dependency, manifest, `Cargo.lock`, schema version, fixture, map, or sprite changed (I1, I9, I10). `PLAN.md` is unchanged.
+
+### Validation commands (PLAN.md section 9, with section 12 item 5)
+
+Run from the repository root on macOS 27.0.1 (Apple M5, Rust 1.98.1), in this order, in the foreground, on the tree of `85b310f` (the documentation commit changes no code). A display and an audio device were available.
+
+| Command | Exit | Result |
+|---------|------|--------|
+| `cargo fmt --all -- --check` | 0 | no diff |
+| `cargo clippy --workspace --all-targets -- -D warnings` | 0 | no warnings |
+| `cargo test --workspace` | 0 | 394 passed, 0 failed, 0 ignored (breakdown below); 178 s; peak memory footprint 0.13 GB. Known M0 linker warning only. |
+| `cargo build --release -p game` | 0 | |
+| `cargo run --release -p game -- --smoke-test 600` | 0 | three matches started (`match on map demo (seed 6)`, `(seed 7)`, `(seed 6)`: 2 buildings and 16 units each); `smoke test: 600 frames, 168 simulation ticks, map created: true, units spawned: 16, units moved: 8 in 168 ticks after the order, buildings spawned: 2, production charged 336 credits in 168 ticks, visible cells: 370, enemy views shown: 0, view mismatches: 0, sidebar items: 9 of 9, sidebar buttons outside the window: 0, sidebar credits: Some("Credits  4664"), minimap drawings: 169, minimap pixels lit: 2216, sounds: 9, music players: 1, pause: Done { ticks_while_paused: 0, refused: true }, menu buttons: Some(10), matches started: 3, flow: Last, views: 16 of 16 units and 2 of 2 buildings, computer player's commands: 2 (0 rejected)`; peak 0.41 GB |
+| `cargo run -p game -- --smoke-test 600` | 0 | the same three matches; `smoke test: 600 frames, 180 simulation ticks, …, units moved: 8 in 180 ticks after the order, …, production charged 360 credits in 180 ticks, visible cells: 365, …, minimap drawings: 179, minimap pixels lit: 2232, …, menu buttons: Some(10), matches started: 3, flow: Last, views: 16 of 16 units and 2 of 2 buildings, computer player's commands: 2 (0 rejected)`; peak 0.40 GB |
+
+Test breakdown:
+
+* `game`: unit 114 (+3: `sim_host` 1, `skirmish` 2); integration `m0_spike` 6, `m1_demo_map` 3, `m1_tileset_image` 6, `m2_unit_sprites` 5, `m3_building_sprites` 3, `m6_production_matches` 1 (52.6 s).
+* `sim`: unit 11; integration `m0_bootstrap` 12, `m1_map` 32, `m1_map_subset` 24, `m2_definitions` 14, `m2_movement` 37 (41.9 s), `m3_definitions` 11, `m3_economy` 21, `m3_harvest` 10, `m4_combat` 32, `m4_definitions` 12, `m5_placement_preview` 2, `m6_ai` 11 (40.2 s), `m6_definitions` 14 (+3), `m6_match` 13 (+4).
+* doc-tests 0.
+
+Additionally, both final binaries were run with `--smoke-test 100`, a 60 s alarm, and `/usr/bin/time -l` against scratch copies of `assets/` (`BEVY_ASSET_ROOT`, under `…/scratchpad/m6-remediation-1/roots/`), with identical results in release and debug: `p1_start_outside` (the reviewer's root), `p2_army_unbuildable` (the reviewer's root), `no_yard_faction`, and `no_fit` (start (62, 42)) each exit 1 at startup with a typed error naming the file and field (or the map and factions), peak 0.14 GB; `eight_factions` (eight copies of the faction, 64 trial setups) and the unchanged copy exit 0. The 20 against 20 battle gives the same figures and final hash (`c9401425d786dac6`) as in review 1.
+
+### Acceptance criteria and required tests (PLAN.md section 7, M6)
+
+Unchanged from the M6 implementation report, with these updates:
+
+| Criterion | Evidence |
+|-----------|----------|
+| Test: the AI issues zero rejected commands in the standard scenario | As before; and data whose start positions or producers would make the computer player issue unusable commands is now rejected at load and at setup (D45, D46), so D43 item 5 holds for every match the game can start; the smoke runs now fail on any rejected computer-player command (`0 rejected` in both runs) |
+| Test: end to end AI against AI matches on every shipped map … equal hashes across two runs | As before (unchanged gathering points, so unchanged courses); `a_run_with_another_difficulty_takes_another_course` now shows that the compared runs differ in their course |
+| Scope: main menu, map and faction selection | As before; every match the menu offers is set up once at startup (`check_catalogue`), so choosing one cannot end the game with a setup error |
+| Section 8: negative, boundary, regression | Negative: start positions off the map or on impassable terrain, unobtainable producers and prerequisites, a computer player without a gathering point, each with a typed error; boundary: the map's corners and (−1, 0), (40, 5) on a 40 x 40 map; regression: the tests of the five findings |
+| Invariants | I3/I4: no change of hashed layout; the flood fill and choices are ordered by octile distance, row, and column. I8/I11: the new checks return typed errors; no panic path added. I12: the new arithmetic is saturating or bounded by the map size. I5: unchanged (the trial setups run in dropped simulations). |
+
+### Assumptions verified and how
+
+No new crate API is used. Four-neighbour flood fill connects the same cells as the pathfinder's steps: `pathfinding::neighbours` allows a diagonal step unless both orthogonal neighbours are blocked, so every diagonal step has an orthogonal detour through a passable cell. The gathering points of every fixture and shipped pairing equal those of the reviewed rule (probe test, removed). Bevy's asset root for the scratch runs is `BEVY_ASSET_ROOT`, as in the review.
+
+### Deviations from PLAN.md
+
+* No new deviation. Deviations 1 to 8 of the M6 implementation report stand. Deviation 7 (new public API of `sim`) grows by `check_map_starts`, `start_problem`, `StartProblem`, `check_ai_factions`, and three `MatchSetupError` variants; no data schema changed.
+
+### Known debt (P2)
+
+1. **Termination of computer-player matches** (implementation debt item 1, narrowed): the data cases of M6 review 1 P2-1 are closed (D46). A computer player that loses its army producer or its yard in play and has no credits to rebuild it can still stall, and `broke` does not sell to rebuild a producer; the shipped and fixture data end in every measured pairing.
+2. **Start positions require passable terrain** (D45): a start whose own yard covers it must still be passable terrain, and a faction's yard must stand on buildable terrain, which the trial setup checks.
+3. **The power building may have no prerequisites** (D46): a data restriction chosen over a rule that would order the build order around power.
+4. **Startup cost of the catalogue check** grows with maps × factions² (at most 16 × 64 = 1,024 trial setups on maps up to 256 × 256); 64 setups on the demo map take a few milliseconds in release.
+5. **Implementation debt item 7 resolved for catalogue data**: a setup error can no longer occur for a match the menu offers; `begin_match` keeps its exit-1 path as a second line.
+6. **Carried, unchanged, from the M6 review decision**: implementation debt items 2, 3, 4, 5, 6, 8, 9, and 10; everything carried from M5, M4, M3, M2, M1, and M0. The linker warning (M0 item 1) was seen again; the `Skipped event Destroyed` warning did not appear in this round's smoke runs.
+
+### Requires user verification
+
+Not review findings (PLAN.md section 12 item 2); they block only `m6-approved`. The 13 M6 items listed under "M6 implementation report" remain pending unchanged (this round changes nothing on screen: the shipped data passes every new check, and the gathering points and courses of matches are unchanged). The earlier items of M5, M4, M3, M2, and M1 remain pending.
