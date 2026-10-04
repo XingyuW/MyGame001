@@ -1,6 +1,9 @@
 use bevy_ecs::world::World;
 
+use crate::building::{Building, Producer, hash_building};
 use crate::definitions::Definitions;
+use crate::economy::Players;
+use crate::harvest::Harvester;
 use crate::id::{SimId, SimIdAllocator};
 use crate::map::Grid;
 use crate::rng::SimRng;
@@ -55,9 +58,10 @@ impl Default for Fnv1a64 {
 ///
 /// Covers, in this order: the tick counter, the [`SimRng`] state, the next [`SimId`] to be
 /// allocated, the number of entities with a [`SimId`], every such entity in ascending [`SimId`]
-/// order (its id, then a flag byte and, for a unit, its components), the [`Grid`], and the
-/// [`Definitions`] (docs/DECISIONS.md D4, D11, extended in M2). Components added by later
-/// milestones are appended per entity.
+/// order (its id, then a flag byte and, for a unit, its components; then a flag byte and, for a
+/// harvester, its cycle; then a flag byte and, for a building, its owner and components), the
+/// [`Grid`], the [`Definitions`], and the [`Players`] (docs/DECISIONS.md D4, D11, extended in M2
+/// and M3). Components added by later milestones are appended per entity.
 ///
 /// # Panics
 ///
@@ -72,11 +76,13 @@ pub fn state_hash(world: &mut World) -> u64 {
     let mut query = world.query::<(
         &SimId,
         Option<(&Owner, &Unit, &Mobile, &Position, &Facing, &Orders)>,
+        Option<&Harvester>,
+        Option<(&Owner, &Building, Option<&Producer>)>,
     )>();
     let mut entities: Vec<_> = query.iter(world).collect();
-    entities.sort_unstable_by_key(|(id, _)| **id);
+    entities.sort_unstable_by_key(|(id, ..)| **id);
     hasher.write_u64(entities.len() as u64);
-    for (id, unit) in entities {
+    for (id, unit, harvester, building) in entities {
         hasher.write_u32(id.0);
         match unit {
             None => hasher.write(&[0]),
@@ -85,9 +91,24 @@ pub fn state_hash(world: &mut World) -> u64 {
                 hash_unit(&mut hasher, components);
             }
         }
+        match harvester {
+            None => hasher.write(&[0]),
+            Some(harvester) => {
+                hasher.write(&[1]);
+                harvester.hash_into(&mut hasher);
+            }
+        }
+        match building {
+            None => hasher.write(&[0]),
+            Some((owner, building, producer)) => {
+                hasher.write(&[1, owner.0.0]);
+                hash_building(&mut hasher, building, producer);
+            }
+        }
     }
     world.resource::<Grid>().hash_into(&mut hasher);
     world.resource::<Definitions>().hash_into(&mut hasher);
+    world.resource::<Players>().hash_into(&mut hasher);
 
     hasher.finish()
 }

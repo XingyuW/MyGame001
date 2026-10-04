@@ -24,6 +24,10 @@ use sim::{
     SUBCELLS_PER_CELL, SimEvent, SimId, SubPos, Unit, UnitKind, destination_cells,
 };
 
+use crate::buildings::{
+    BuildingSpriteError, BuildingSprites, BuildingStatus, CheckedBuildingSprite, ECONOMY_PATH,
+    check_building_sprites, setup_economy,
+};
 use crate::checked_assets::CheckedAssets;
 use crate::map::MapView;
 use crate::projection::{TileSize, to_world};
@@ -57,7 +61,7 @@ const UNIT_Z: f32 = 1.0;
 pub type StartingGroup = (PlayerId, &'static str, (i32, i32), usize);
 
 /// The starting units of the demo match (M2). Match setup arrives in M6.
-const STARTING_UNITS: [StartingGroup; 4] = [
+pub(crate) const STARTING_UNITS: [StartingGroup; 4] = [
     (HUMAN, "light_tank", (10, 28), 12),
     (HUMAN, "scout", (14, 34), 6),
     (OPPONENT, "light_tank", (50, 30), 5),
@@ -215,6 +219,7 @@ pub fn plan_starting_units(
 pub enum SetupError {
     Data(DataError),
     Sprite(Box<SpriteError>),
+    BuildingSprite(Box<BuildingSpriteError>),
 }
 
 impl fmt::Display for SetupError {
@@ -222,6 +227,7 @@ impl fmt::Display for SetupError {
         match self {
             SetupError::Data(error) => error.fmt(f),
             SetupError::Sprite(error) => error.fmt(f),
+            SetupError::BuildingSprite(error) => error.fmt(f),
         }
     }
 }
@@ -283,8 +289,33 @@ pub fn load_units(asset_root: &Path) -> Result<LoadedUnits, SetupError> {
     })
 }
 
-/// Match setup: installs the definitions, registers the checked sprite sheets, and spawns the
-/// starting units. Runs after the map is loaded; does nothing if the map failed.
+/// Loads the unit definitions with the economy file (`crate::buildings::ECONOMY_PATH`) and checks
+/// the sprite of every unit and building type.
+pub fn load_match_data(
+    asset_root: &Path,
+) -> Result<(LoadedUnits, Vec<CheckedBuildingSprite>), SetupError> {
+    let LoadedUnits {
+        definitions,
+        sheets,
+    } = load_units(asset_root)?;
+    let economy_file = asset_root.join(ECONOMY_PATH);
+    let definitions = definitions
+        .with_economy(&economy_file)
+        .map_err(SetupError::Data)?;
+    let buildings = check_building_sprites(asset_root, &economy_file, &definitions)
+        .map_err(SetupError::BuildingSprite)?;
+    Ok((
+        LoadedUnits {
+            definitions,
+            sheets,
+        },
+        buildings,
+    ))
+}
+
+/// Match setup: installs the definitions, registers the checked sprites, adds the players and
+/// their starting buildings (`crate::buildings::setup_economy`), and spawns the starting units.
+/// Runs after the map is loaded; does nothing if the map failed.
 fn setup_units(world: &mut World) {
     if !world.contains_resource::<MapView>() {
         return;
@@ -292,19 +323,14 @@ fn setup_units(world: &mut World) {
     let root = FileAssetReader::new(AssetPlugin::default().file_path)
         .root_path()
         .clone();
-    let LoadedUnits {
-        definitions,
-        sheets,
-    } = match load_units(&root) {
+    let (
+        LoadedUnits {
+            definitions,
+            sheets,
+        },
+        building_sprites,
+    ) = match load_match_data(&root) {
         Ok(loaded) => loaded,
-        Err(error) => {
-            error!("{error}");
-            world.write_message(AppExit::error());
-            return;
-        }
-    };
-    let starting = match plan_starting_units(world.resource::<Grid>(), &STARTING_UNITS) {
-        Ok(starting) => starting,
         Err(error) => {
             error!("{error}");
             world.write_message(AppExit::error());
@@ -313,13 +339,40 @@ fn setup_units(world: &mut World) {
     };
     let checked = world.resource::<CheckedAssets>().clone();
     let server = world.resource::<AssetServer>().clone();
+    let mut sprites = BuildingSprites::default();
+    for sprite in building_sprites {
+        checked.insert(sprite.asset_path.clone(), sprite.bytes);
+        sprites
+            .0
+            .insert(sprite.kind, server.load(sprite.asset_path));
+    }
+    world.insert_resource(sprites);
+    world.insert_resource(definitions);
+    match setup_economy(world) {
+        Ok(spawned) => {
+            info!("{spawned} buildings spawned");
+            world.resource_mut::<BuildingStatus>().spawned = spawned;
+        }
+        Err(error) => {
+            error!("{error}");
+            world.write_message(AppExit::error());
+            return;
+        }
+    }
+    let starting = match plan_starting_units(world.resource::<Grid>(), &STARTING_UNITS) {
+        Ok(starting) => starting,
+        Err(error) => {
+            error!("{error}");
+            world.write_message(AppExit::error());
+            return;
+        }
+    };
     let mut sprites = UnitSprites::default();
     for sheet in sheets {
         checked.insert(sheet.asset_path.clone(), sheet.bytes);
         sprites.0.insert(sheet.kind, server.load(sheet.asset_path));
     }
     world.insert_resource(sprites);
-    world.insert_resource(definitions);
 
     let mut spawned = 0;
     for (owner, unit_type, cell) in starting {
@@ -476,6 +529,54 @@ fn log_sim_events(mut events: MessageReader<SimEvent>) {
             }
             SimEvent::MoveFailed { unit, reason } => {
                 info!("unit {} stopped: {reason:?}", unit.0);
+            }
+            SimEvent::ProductionComplete { player, item } => {
+                info!("player {}: {item:?} is complete", player.0);
+            }
+            SimEvent::ProductionCancelled {
+                player,
+                item,
+                refund,
+            } => info!(
+                "player {}: {item:?} cancelled, {refund} credits refunded",
+                player.0
+            ),
+            SimEvent::UnitSpawned {
+                player,
+                unit,
+                building,
+            } => info!(
+                "player {}: unit {} left building {}",
+                player.0, unit.0, building.0
+            ),
+            SimEvent::BuildingPlaced {
+                player,
+                building,
+                kind,
+            } => info!(
+                "player {}: building {} of type {} placed",
+                player.0, building.0, kind.0
+            ),
+            SimEvent::BuildingSold {
+                player,
+                building,
+                refund,
+            } => info!(
+                "player {}: building {} sold for {refund} credits",
+                player.0, building.0
+            ),
+            SimEvent::OreDelivered {
+                player,
+                harvester,
+                ore,
+                credits,
+                ..
+            } => debug!(
+                "player {}: harvester {} delivered {ore} ore for {credits} credits",
+                player.0, harvester.0
+            ),
+            SimEvent::HarvesterIdle { unit, reason } => {
+                info!("harvester {} stopped: {reason:?}", unit.0);
             }
         }
     }

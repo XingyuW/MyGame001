@@ -8,9 +8,9 @@
 //! south-east, south, south-west, west, north-west, north, north-east, where +x is east and +y
 //! is south in cell coordinates). Each frame shows the unit standing on the ground plane of the
 //! isometric projection (PLAN.md section 5, equation 7) and pointing in its facing: a hull
-//! elongated along the facing, darker at the front, with a turret and barrel for the tank and a
-//! wedge for the scout. The sprites are light grey so that the game can tint them with the
-//! owner's colour.
+//! elongated along the facing, darker at the front, with a turret and barrel for the tank, a
+//! wedge for the scout, and a broad box for the harvester (M3). The sprites are light grey so
+//! that the game can tint them with the owner's colour.
 
 use std::path::PathBuf;
 
@@ -46,18 +46,29 @@ pub struct SpriteKind {
     /// Half length and half width of the hull, in cells.
     hull: (f64, f64),
     turret: bool,
+    /// Without a turret: a hull that narrows to a wedge at the front (scout) or a box (M3:
+    /// harvester).
+    wedge: bool,
 }
 
-pub const SPRITES: [SpriteKind; 2] = [
+pub const SPRITES: [SpriteKind; 3] = [
     SpriteKind {
         name: "light_tank",
         hull: (0.34, 0.22),
         turret: true,
+        wedge: false,
     },
     SpriteKind {
         name: "scout",
         hull: (0.28, 0.14),
         turret: false,
+        wedge: true,
+    },
+    SpriteKind {
+        name: "harvester",
+        hull: (0.38, 0.26),
+        turret: false,
+        wedge: false,
     },
 ];
 
@@ -95,10 +106,10 @@ fn frame_pixel(kind: &SpriteKind, facing: (i32, i32), x: u32, y: u32) -> Option<
     let (along, across) = local(ground_point(x, y, 0.0));
     let (half_length, half_width) = kind.hull;
     // The scout's hull narrows to a wedge at the front.
-    let width_here = if kind.turret {
-        half_width
-    } else {
+    let width_here = if kind.wedge {
         half_width * (1.0 - (along / half_length).max(0.0))
+    } else {
+        half_width
     };
     if along.abs() > half_length || across.abs() > width_here {
         return None;

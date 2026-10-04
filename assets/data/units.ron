@@ -17,5 +17,10 @@
             speed: 40,
             sprite: "scout",
         ),
+        (
+            id: "harvester",
+            speed: 16,
+            sprite: "harvester",
+        ),
     ],
 )

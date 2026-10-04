@@ -8,7 +8,9 @@ use bevy_ecs::system::ResMut;
 
 use crate::command::{CommandQueue, process_commands};
 use crate::definitions::Definitions;
+use crate::economy::{Players, advance_production, update_power};
 use crate::event::{SimEvent, advance_events};
+use crate::harvest::harvest;
 use crate::id::SimIdAllocator;
 use crate::map::Grid;
 use crate::movement::move_units;
@@ -31,6 +33,7 @@ pub enum SimSet {
     /// Validate and apply the commands in [`CommandQueue`].
     Commands,
     Ai,
+    /// Power, production, and the harvester cycle (M3).
     Economy,
     Pathfinding,
     Movement,
@@ -102,6 +105,9 @@ impl Plugin for SimPlugin {
             (advance_events, process_commands)
                 .chain()
                 .in_set(SimSet::Commands),
+            (update_power, advance_production, harvest)
+                .chain()
+                .in_set(SimSet::Economy),
             find_paths.in_set(SimSet::Pathfinding),
             move_units.in_set(SimSet::Movement),
             advance_tick.in_set(SimSet::EndOfTick),
@@ -115,6 +121,7 @@ impl Plugin for SimPlugin {
             .insert_resource(SimRng::new(self.seed))
             .insert_resource(Grid::default())
             .insert_resource(Definitions::default())
+            .insert_resource(Players::default())
             .insert_resource(Messages::<SimEvent>::default())
             .add_schedule(schedule);
     }

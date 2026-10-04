@@ -1,6 +1,7 @@
 //! Selection and orders (PLAN.md section 7, M2): selecting the player's units by click, by
 //! dragging a box, and additively with Shift, and ordering the selection to move (right click on
-//! a cell) or to stop (S).
+//! a cell) or to stop (S). From M3, a right click on ore sends the selected harvesters to
+//! harvest there.
 //!
 //! The interface changes the simulation only by pushing commands into `CommandQueue`
 //! (invariant I5). The decisions are pure functions, unit tested below; the systems only read
@@ -12,7 +13,7 @@ use bevy::camera::CameraUpdateSystems;
 use bevy::prelude::*;
 use bevy::transform::TransformSystems;
 use bevy::window::PrimaryWindow;
-use sim::{CellPos, Command, CommandQueue, IssuedCommand, SimId};
+use sim::{CellPos, Command, CommandQueue, Grid, Harvester, IssuedCommand, SimId};
 
 use crate::map::{HoveredCell, MapView};
 use crate::projection::cell_corners;
@@ -107,6 +108,31 @@ pub fn move_command(selection: &BTreeSet<SimId>, target: Option<CellPos>) -> Opt
     })
 }
 
+/// The commands for a right click on `target` (M3): if the cell holds ore, the selected
+/// harvesters (`harvesters` lists every harvester of the player) harvest there and the other
+/// selected units move there; otherwise the whole selection moves ([`move_command`]).
+pub fn right_click_commands(
+    selection: &BTreeSet<SimId>,
+    harvesters: &BTreeSet<SimId>,
+    target: Option<CellPos>,
+    ore_at_target: bool,
+) -> Vec<Command> {
+    let Some(cell) = target else {
+        return Vec::new();
+    };
+    let (gatherers, others): (BTreeSet<SimId>, BTreeSet<SimId>) =
+        selection.iter().partition(|id| harvesters.contains(id));
+    if !ore_at_target || gatherers.is_empty() {
+        return move_command(selection, target).into_iter().collect();
+    }
+    let mut commands = vec![Command::Harvest {
+        units: gatherers.into_iter().collect(),
+        target: cell,
+    }];
+    commands.extend(move_command(&others, target));
+    commands
+}
+
 /// The command for the stop key: stop the selection. Nothing for an empty selection.
 pub fn stop_command(selection: &BTreeSet<SimId>) -> Option<Command> {
     (!selection.is_empty()).then(|| Command::Stop {
@@ -174,16 +200,28 @@ fn select_units(
     selection.0 = apply_selection(&selection.0, picked, additive);
 }
 
-fn issue_orders(
+pub(crate) fn issue_orders(
     buttons: Res<ButtonInput<MouseButton>>,
     keys: Res<ButtonInput<KeyCode>>,
     hovered: Res<HoveredCell>,
     selection: Res<Selection>,
+    grid: Res<Grid>,
+    harvesters: Query<&SimId, With<Harvester>>,
     mut queue: ResMut<CommandQueue>,
 ) {
     let mut commands = Vec::new();
     if buttons.just_pressed(MouseButton::Right) {
-        commands.extend(move_command(&selection.0, hovered.0));
+        let ore = hovered
+            .0
+            .and_then(|cell| grid.cell(cell))
+            .is_some_and(|cell| cell.ore > 0);
+        let harvesters: BTreeSet<SimId> = harvesters.iter().copied().collect();
+        commands.extend(right_click_commands(
+            &selection.0,
+            &harvesters,
+            hovered.0,
+            ore,
+        ));
     }
     if keys.just_pressed(KeyCode::KeyS) {
         commands.extend(stop_command(&selection.0));
@@ -353,6 +391,70 @@ mod tests {
                     .map(|(a, b, _)| (label(types[a]), label(types[b])))
                     .collect();
                 assert_eq!(conflicts, Vec::<(&str, &str)>::new());
+            });
+    }
+
+    #[test]
+    fn a_right_click_on_ore_sends_the_selected_harvesters_to_harvest() {
+        let selection = ids(&[1, 2, 3]);
+        let harvesters = ids(&[2, 3, 8]);
+        let target = CellPos::new(5, 6);
+        assert_eq!(
+            right_click_commands(&selection, &harvesters, Some(target), true),
+            [
+                Command::Harvest {
+                    units: vec![SimId(2), SimId(3)],
+                    target
+                },
+                Command::Move {
+                    units: vec![SimId(1)],
+                    target
+                }
+            ]
+        );
+        // Only harvesters selected: no move.
+        assert_eq!(
+            right_click_commands(&ids(&[3]), &harvesters, Some(target), true),
+            [Command::Harvest {
+                units: vec![SimId(3)],
+                target
+            }]
+        );
+        // No ore there, or no harvester selected: the whole selection moves.
+        for (selection, ore) in [(ids(&[1, 2, 3]), false), (ids(&[1]), true)] {
+            assert_eq!(
+                right_click_commands(&selection, &harvesters, Some(target), ore),
+                move_command(&selection, Some(target))
+                    .into_iter()
+                    .collect::<Vec<_>>()
+            );
+        }
+        assert_eq!(
+            right_click_commands(&selection, &harvesters, None, true),
+            []
+        );
+        assert_eq!(
+            right_click_commands(&ids(&[]), &harvesters, Some(target), true),
+            []
+        );
+    }
+
+    #[test]
+    fn no_two_game_systems_share_state_in_post_update_without_an_order() {
+        // As above, with every game plugin that adds systems to `PostUpdate` (M3 adds the
+        // buildings' views and the economy controls, which push commands like the orders).
+        let mut app = App::new();
+        app.add_plugins((
+            crate::map::MapPlugin,
+            crate::units::UnitsPlugin,
+            crate::buildings::BuildingsPlugin,
+            SelectionPlugin,
+            crate::construction::ConstructionPlugin,
+        ));
+        app.world_mut()
+            .schedule_scope(PostUpdate, |world, schedule| {
+                schedule.initialize(world).expect("PostUpdate builds");
+                assert!(schedule.graph().conflicting_systems().is_empty());
             });
     }
 

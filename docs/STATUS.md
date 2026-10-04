@@ -5,7 +5,7 @@
 | M0: Bootstrap and dependency verification | **Approved** by the user on 2026-10-04 after independent review (decision: GO WITH DOCUMENTED NON-BLOCKING DEBT; no P0 or P1) | `milestone/m0` | `m0-approved` |
 | M1: Map and camera | **Reviewed**: review 3 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 3 P2) after reviews 1 and 2 NO-GO; merged into `main`. Awaiting user verification for `m1-approved` | `milestone/m1` | `m1-reviewed` |
 | M2: Units and movement | **Reviewed**: review 3 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 2 P2) after reviews 1 and 2 NO-GO; merged into `main`. Awaiting user verification for `m2-approved` | `milestone/m2` | `m2-reviewed` |
-| M3: Economy and construction | Not started | | |
+| M3: Economy and construction | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 4 P2); merged into `main`. Awaiting user verification for `m3-approved` | `milestone/m3` | `m3-reviewed` |
 | M4: Combat and fog of war | Not started | | |
 | M5: Interface and audio | Not started | | |
 | M6: Skirmish AI and game flow | Not started | | |
@@ -983,4 +983,238 @@ These items are not findings (PLAN.md section 12 item 2). They do not affect the
    * a click on rock or water uses the nearest cells around it;
    * `S` stops the selection at the next cell centre.
 8. **M1 items** (still pending for `m1-approved`): map rendering, picking, panning, zoom, and bounds, as listed in docs/STATUS.md.
+
+## M3 implementation report (2026-10-04)
+
+Branch `milestone/m3`, based on `main` at the merge of M2 (tag `m2-reviewed`). Commits: `0f9507d` (sim: players, production, buildings, harvesting, tests), `f460221` (game: data, sprites, buildings, interim controls, smoke test), and the documentation commit that adds this report. Decisions: DECISIONS "M3: economy and construction" (A1 follow-up, D23 to D27) and the M3 amendment of D6.
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `crates/sim/src/economy_defs.rs` (new) | Economy file schema 1: `BuildingDef`, `Production`, `HarvesterDef`, `BuildingKind`, `ProductionItem`, limits, subset schema, validation with references, uniqueness, and an acyclic prerequisite check (D23) |
+| `crates/sim/src/definitions.rs` | `Definitions` holds the economy definitions; `load_definitions`, `Definitions::with_economy`, accessors (`buildings`, `building`, `building_kind`, `production`, `harvester`, `produces_units`, `placement_distance`); hash extended |
+| `crates/sim/src/data.rs` | `DataErrorKind::UnknownReference`, `PrerequisiteCycle`; documentation of the deeper schema |
+| `crates/sim/src/building.rs` (new) | `Footprint`, `Building`, `Producer`, `PlacementError`, footprint and distance checks, exit cells, `spawn_building` (setup), hash (D24) |
+| `crates/sim/src/economy.rs` (new) | `Players`, `PlayerState`, `QueueItem`, `charge_for_tick` (equation 3), `update_power`, `advance_production` with unit and free-unit exits; unit test (D25) |
+| `crates/sim/src/economy_commands.rs` (new) | Validation and application of `QueueProduction`, `CancelProduction`, `PlaceBuilding`, `SellBuilding`, `SetRallyPoint`; same-tick building index (D25) |
+| `crates/sim/src/harvest.rs` (new) | `Harvester`, `HarvestState`, `MAX_HARVEST_ATTEMPTS`, the `harvest` system, ore and dock search (D26) |
+| `crates/sim/src/command.rs` | New `Command` variants and `RejectReason`s; unit commands include `Harvest`; `Move`/`Stop` stop harvesting; economy commands dispatched in push order |
+| `crates/sim/src/map.rs` | `Grid` building layer (`building`, `cover`, `uncover`), `is_passable` false under buildings, `take_ore`, hash bit 3 |
+| `crates/sim/src/{event,hash,lib,pathfinding,schedule,unit}.rs` | New events and `HarvestIdle`; hash of harvesters, buildings, and players; exports; `nearest_cell`; `Economy` stage systems and `Players` resource; `unit_bundle`, harvesters spawn with their cycle, `spawn_unit` reports an unknown type instead of speed 0 |
+| `crates/sim/tests/m3_definitions.rs`, `m3_economy.rs`, `m3_harvest.rs` (new) | 11, 21, and 10 tests (below) |
+| `crates/sim/tests/fixtures/data/{economy,units_economy}.ron`, `fixtures/maps/economy_32x32.tmx` (new) | Fixture data and a 32×32 map with ore, sand, rock, and two sealed pockets |
+| `crates/game/src/buildings.rs` (new) | Building sprite checks, starting players, credits, and construction yards, building views, title status; 6 tests |
+| `crates/game/src/construction.rs` (new) | Interim keys for production, placement, selling, and rally points; placement outline; 4 tests |
+| `crates/game/src/{units,selection,smoke,main}.rs` | Match setup with the economy file; harvest by right click on ore (2 tests); smoke test checks buildings and charged production (2 tests); plugins |
+| `crates/game/examples/gen_building_sprites.rs` (new), `gen_unit_sprites.rs` | Building sprite generator; harvester sheet |
+| `crates/game/tests/m3_building_sprites.rs` (new) | 3 tests: generator output, PNG subset, layout |
+| `assets/data/economy.ron` (new), `assets/data/units.ron` | Production economy definitions; harvester unit type (units schema unchanged, version 1) |
+| `assets/sprites/buildings/*.png`, `assets/sprites/units/harvester.png` (new), `assets/LICENSES.md` | Generated placeholders and their provenance |
+| `docs/DECISIONS.md`, `docs/STATUS.md` | M3 decisions, D6 amendment; this report |
+
+### Validation commands (PLAN.md section 9, with section 12 item 5)
+
+Run from the repository root on macOS 27.0.1 (Apple M5, Rust 1.98.1), in this order, in the foreground, after the last code change (`f460221`). A display was available.
+
+| Command | Exit | Result |
+|---------|------|--------|
+| `cargo fmt --all -- --check` | 0 | no diff |
+| `cargo clippy --workspace --all-targets -- -D warnings` | 0 | no warnings |
+| `cargo test --workspace` | 0 | 248 passed, 0 failed, 0 ignored: `game` unit 58 (cli 7, projection 7, camera 7, map 6, checked_assets 2, units 8, selection 7, smoke 4, buildings 6, construction 4), `m0_spike` 6, `m1_demo_map` 3, `m1_tileset_image` 6, `m2_unit_sprites` 5, `m3_building_sprites` 3, `sim` unit 6, `m0_bootstrap` 12, `m1_map` 32, `m1_map_subset` 24, `m2_definitions` 14, `m2_movement` 37 (36.8 s), `m3_definitions` 11, `m3_economy` 21, `m3_harvest` 10, doc-tests 0. Peak memory footprint of the run 0.13 GB. Known M0 linker warning only. |
+| `cargo build --release -p game` | 0 | |
+| `cargo run --release -p game -- --smoke-test 600` | 0 | `2 buildings spawned`, `26 units spawned`; `smoke test: 600 frames, 198 simulation ticks, map created: true, units spawned: 26, units moved: 18 in 198 ticks after the order, buildings spawned: 2, production charged 396 credits in 198 ticks` |
+| `cargo run -p game -- --smoke-test 600` | 0 | `smoke test: 600 frames, 203 simulation ticks, ..., buildings spawned: 2, production charged 406 credits in 203 ticks` |
+
+Additionally: `cargo test --release -p sim --test m3_economy --test m3_harvest --test m3_definitions` passed (21, 10, 11). The release binary, run (`--smoke-test 100`, under a 60 s alarm) against scratch asset roots, exited 1 with typed errors for an economy file with a prerequisite cycle (`data file …/economy.ron: buildings[2].prerequisites: the prerequisites form a cycle: power_plant -> war_factory -> refinery -> power_plant`) and for a missing building sprite (`data file …/economy.ron: buildings[3].sprite: sprite image …/barracks.png: file: cannot be read: …`). The `Skipped event Destroyed` warning (M0 debt item 2) appeared in both smoke runs.
+
+### Acceptance criteria and required tests (PLAN.md section 7, M3)
+
+| Criterion | Evidence |
+|-----------|----------|
+| Scope: players, credits, power | `Players`, `PlayerState`, `update_power` (D25); `power_follows_the_buildings_placed_and_sold`, `low_power_halves_progress` (boundary: consumption equal to production is not low) |
+| Scope: construction yard; building and unit production queues | Production per producing building type, head only (D25); `a_completed_item_is_charged_exactly_its_cost`, `every_item_of_the_fixture_is_charged_exactly_its_cost` (all 10 producible fixture items), `production_needs_a_producer_and_continues_with_another`, `invalid_queue_commands_are_rejected_without_changing_state` (unknown items, missing prerequisite, no producer, unknown player, a full queue of 16) |
+| Scope: placement rules (buildable terrain, free footprint, within a data defined distance of an owned building) | D24; tests below |
+| Scope: ore, the harvester cycle, refinery | D26; `m3_harvest` (below), `harvesters_share_the_field_and_every_unit_of_ore_is_paid_once` (four harvesters, 3,000 ticks: distinct targets, ore removed = ore carried + ore paid, credits = payments) |
+| Scope: rally points | `a_produced_unit_leaves_its_building_and_moves_to_the_rally_point`, `rally_point_commands_are_validated`, `later_commands_of_a_tick_see_the_buildings_placed_before_them` (rally on a building placed in the same tick) |
+| Scope: selling | `selling_refunds_the_sell_value_and_frees_the_cells` (refund, cells freed and walkable, foreign, unknown, and a unit's id rejected), `later_commands_of_a_tick_see_the_buildings_sold_before_them` |
+| Test: I7 for completion | `a_completed_item_is_charged_exactly_its_cost` (charges 10 × 9 + 15 = 105; build time 1; cost below the build time; cost 0), `every_item_of_the_fixture_is_charged_exactly_its_cost`, unit test `the_charges_of_an_item_sum_to_its_cost_at_the_limits` (cost 0 to 10^6, build time 1 to 72,000); every M3 test asserts credits ≥ 0 after every tick |
+| Test: I7 pause on insufficient credits | `progress_pauses_while_credits_are_insufficient` (100 credits: paused at 9 of 10 ticks with 10 credits for 100 ticks, resumed by a sale; 0 credits: no progress; exactly 105 credits: completes at 0) |
+| Test: I7 cancel refund | `cancelling_refunds_exactly_what_was_charged` (in progress: 50; not started: 0; complete: 105; not queued: rejected with no state change) |
+| Test: low power halves progress | `low_power_halves_progress` (10 ticks normally; under low power progress and charges only on even ticks: 19 ticks from an even start, 20 from an odd one; still charged exactly 105) |
+| Test: placement rejections for overlap, off map, non buildable terrain, and excessive distance | `placement_rejections_change_no_state` (12 cases: beyond each edge, `i32` extremes, sand, ore, rock, overlap, 4 cells away; state hash equal to a control run for 10 ticks); `placement_is_rejected_on_cells_held_by_units` (standing and entering); `placement_needs_a_ready_building_and_an_owned_building_nearby` (not ready, other type, unknown type, no own building, another player's building); boundary accepted: `placement_within_the_distance_is_accepted_and_covers_the_cells` (exactly 3 cells, diagonally) |
+| Test: a harvester with no reachable ore idles | `a_harvester_with_no_reachable_ore_idles` (sealed in rock, and on open ground with the only ore sealed: `HarvesterIdle { NoOre }` on the first tick, then 500 ticks without any event; a `Harvest` command idles it again; a loaded harvester without refinery: `NoRefinery`, load kept) |
+| Test: a refinery destroyed during the return trip causes a retarget or idle state without panic | `a_refinery_sold_during_the_return_trip_makes_the_harvester_retarget` (turns to the other refinery and delivers there) and `…_with_no_other_leaves_the_harvester_idle` (idle, load kept, completes its step, resumes by `Harvest` after a new refinery). Buildings are removed by selling in M3; destruction arrives with combat in M4, and the harvester logic checks only that the refinery no longer exists. |
+| Test: an ore cell depletes exactly to zero | `an_ore_cell_depletes_exactly_to_zero` (22 units, rate 3, capacity 20: loads 3…18, 20 (room-limited), cell 19…4, 2; then the last 2 (cell-limited), cell exactly 0, deliveries 20 and 2, credits 44, harvester idles `NoOre`); `harvest_rate_equal_to_the_capacity_fills_in_one_tick` |
+| Test: integration: a scripted command sequence builds a power plant, a refinery, and a barracks, and income becomes positive within a fixed tick budget | `a_base_is_built_and_funded_from_ore_through_commands_alone`: starting credits pay exactly for the power plant and the refinery, so the barracks is paid with ore; within 3,000 ticks all three are placed, ore is delivered after the barracks, final credits exceed those at its placement, and the ledger balances (final = 305 − 455 + payments); the run is repeated with an identical hash at every tick |
+| Acceptance: a base can be built and funded from ore through commands alone | The integration test above (through `SimPlugin` and `CommandQueue` only, after setup of the yard). In the game the same is possible with the interim keys; on screen **requires user verification** |
+| Section 8: negative, boundary, integration, end to end | Negative: every rejection reason with no state change; data: `m3_definitions` (every field required, unknown and duplicate fields, wrong kinds, schema versions, every numeric field at its minimum and maximum and beyond including `i64` extremes, list limits, references, names, duplicates, cycles of 1 to 3, files, truncations, 2,000 seeded mutations, all bounded as D15); boundary: as listed; integration: all `m3_economy` and `m3_harvest` tests; end to end: both smoke runs |
+| Invariants | I3: `the_same_economy_scenario_gives_the_same_hash_at_every_tick`, the integration test's repeated trace, `the_hash_covers_the_economy_state`, `the_hash_covers_the_harvester_cycle`; I6: every M3 test checks after every tick that no unit holds a building cell and the grid's building layer matches the footprints (`m3_harvest` also checks the unit occupancy); I7 above; I8/I11: the economy file passes the RON subset before `ron`, sprites pass the PNG subset before the renderer; I12: D23 item 5, saturating or checked operations in every new computation, footprints in `i64` (`footprints_at_the_extremes_of_i32_do_not_overflow`) |
+
+### Assumptions verified and how
+
+| Item | Verification |
+|------|--------------|
+| Bevy 0.19.1 applies deferred `Commands` at automatic sync points between ordered systems, and those sync points do not count as ambiguities | Source (DECISIONS A1 follow-up of M3); observed by the tests that see a building placed in the `Commands` stage in the `Economy` stage of the same tick, and by `stages_run_once_per_tick_in_plan_order` (unchanged, passes) |
+| Exclusive systems conflict with every unordered system | Source (`schedule/node.rs:608-610`); the reason the M3 systems are ordinary systems |
+| `#[derive(SystemParam)]`, `EntityCommands::id`, `Window::title`, `ButtonInput::any_just_pressed` | Source paths in DECISIONS; compiled and exercised |
+| No dependency added | `Cargo.lock` and the manifests are unchanged by M3 (I9); `cargo tree` of `sim` therefore unchanged (I1) |
+
+### Deviations from PLAN.md
+
+1. The economy terms of units, the buildings, harvesters, and refineries are in a new data file, `assets/data/economy.ron` (schema 1), not in the units file, which keeps schema 1 (D23 item 1).
+2. `Players` holds no faction or visibility grid yet (M7, M4). `Health`, `Armour`, `Weapon`, and `Sight` arrive in M4; buildings are removed only by selling in M3.
+3. New `Command` variants: `Harvest`, `QueueProduction`, `CancelProduction`, `PlaceBuilding`, `SellBuilding`, `SetRallyPoint` (`Attack` and `AttackMove` are M4's). Visibility is still not validated (no fog before M4). New rejection reasons and events are listed in D25 items 7 and 9. Unit commands do not require the issuing player to be a player of the match (as in M2); economy commands do.
+4. Under low power, "defensive structures do not fire" is M4's (there are no weapons in M3).
+5. The game's starting credits and construction yards are match setup in game code until M6 (D27 item 3), like the starting units of M2 (D20 item 4).
+6. Interim keyboard controls for the economy (D27 item 4) until the sidebar of M5, and credits and power in the window title.
+7. Files not listed in PLAN.md section 4: `crates/sim/src/{building,economy,economy_commands,economy_defs,harvest}.rs`, `crates/game/src/{buildings,construction}.rs`, `crates/game/examples/gen_building_sprites.rs`, the M3 test files and fixtures. `m3_definitions.rs` contains `unsafe` code (the counting allocator of D15). `buildings.rs` includes the building sprite generator in its tests with `#[allow(clippy::duplicate_mod)]`, because the unit sprite generator already includes the shared PNG encoder in the same test build.
+8. `spawn_unit` now reports `UnknownUnitType` where it would have used speed 0 for an inconsistent definition (unreachable through `unit_kind`; a change of M2 code made while adding the harvester component).
+
+### Known debt (P2 proposals for the reviewer)
+
+1. Units waiting to leave a building (a complete item, or a free unit) wait as long as every ring cell is held; a free unit of a building that is sold before it leaves is lost. A complete unit can be cancelled with a full refund.
+2. A stopped harvester (`NoOre`, `NoRefinery`, `Blocked`) does not resume by itself when ore or a refinery becomes available; it waits for a `Harvest` command.
+3. `Harvest` chooses the ore cell nearest to the target over terrain without checking that the harvester can reach it; if it cannot, the move ends with `MoveFailed { Unreachable }` and the harvester then looks from where it stands (seen in `a_harvester_with_no_reachable_ore_idles`).
+4. Each ore or dock search is a Dijkstra over the map (at most 65,536 cells) per harvester decision; production builds the list of buildings every tick. To be measured against the M7 benchmark. `m2_movement` took 36.8 s against 31.5 s in the M2 report (same tests; the `Economy` stage now runs every tick).
+5. The interim controls give no validity feedback before a placement; a rejected placement is logged as a warning (the sidebar's placement preview with validity colouring is M5's).
+6. Building draw order uses the footprint's centre; units close to a large building's side may be drawn on the wrong side of it (user verification below).
+7. `Players::add` and `spawn_building` are public setup APIs, like `spawn_unit` and `Grid::set_terrain` (M2 debt item 5).
+8. The window title is the only display of credits and power until M5.
+9. Earlier debt is unchanged: M2 review 3 P2-1 (speed dependence of the end rule in jams) and P2-2 (box selection released outside the window), the M2 remediation round 2 items 1 to 7, M2 review 1 P2-2 remainder, M1 review 3 P2-1 (map and `.tsx` reader), P2-2, P2-3, M1 review 1 P2-3 and P2-5, M1 review 2 P2-B, M1 round 1 item 4, round 2 items 5 and 6 (followed for the building sprites), and M0 items 1, 2 (seen again in this round's smoke runs), 3, 5, 7, 8, and 9.
+
+### Requires user verification
+
+Not review findings (PLAN.md section 12 item 2); they block only `m3-approved`. Run `cargo run --release -p game`. The human's construction yard is at cells (15..17, 37..39), below the human's starting units on screen; the ore field around (22, 44) is right of it.
+
+1. **Buildings:** a blue-tinted grey box (one roof band) stands exactly on the 3×3 footprint of the human's yard (the hovered-cell outline on its base cells matches its base corners), and a red-tinted one on the opponent's yard at (52..54, 42..44). Units walk around buildings, never through them.
+2. **Draw order:** units in front of a building (lower on screen) are drawn over it, and units behind it are hidden by it.
+3. **Title:** the window title reads `MyGame001 - credits 5000 - power 0/20` and updates as credits and power change; `(low)` appears under low power.
+4. **Production:** `2` queues a power plant (cost 300, 200 ticks): the credits fall by 1 per tick for 10 s and by 101 on the last tick (equation 3: 300 / 200 = 1, remainder 100), and the log reports it complete; Shift+`2` cancels it and refunds what was charged.
+5. **Placement:** with a building ready, a yellow outline of its footprint follows the cursor; `B` places it there if the cells are buildable, free, and within 4 cells of an own building (otherwise the log shows the rejection), and the building appears. After a power plant the title shows power 0/120.
+6. **Refinery and harvesting:** `3` queues a refinery (after a power plant); placed near the ore field, a harvester (a broad box) leaves it, drives to the ore, harvests for about 5 s, returns, and the credits rise by 700 per delivery.
+7. **Units and rally points:** `4` barracks and `5` war factory; then `6` light tank, `7` scout (barracks), `8` harvester leave their buildings. `R` over a cell sets the rally point of the player's unit-producing buildings, and later units walk there.
+8. **Selling:** `Delete` or `Backspace` over an own building removes it, the credits rise by its sell value (half its cost), and units can walk over its cells.
+9. **Harvest order:** with a harvester selected, a right click on an ore cell sends it to harvest there; with other units selected too, they move there.
+10. **Low power:** with more power consumed than produced (for example two refineries, a war factory, and a barracks with one power plant: 130 against 120), the title shows `(low)` and production takes about twice as long.
+
+The M2 items (unit rendering, facings, movement, selection, orders) and the M1 items (map rendering, picking, panning, zoom, bounds) remain pending for `m2-approved` and `m1-approved`.
+
+## M3 review decision (2026-10-04)
+
+One independent review round (`docs/reviews/M3-review-1.md`: GO WITH DOCUMENTED NON-BLOCKING DEBT, 0 P0, 0 P1, 4 P2). Before the review the orchestrator reran all six validation commands of PLAN.md section 9 on commit `9aab887` with exit code 0 (248 tests passed). Under PLAN.md section 12 item 1, `milestone/m3` was merged into `main` and tagged `m3-reviewed`. The tag `m3-approved` is created by the user alone after the verification below.
+
+### Debt recorded from review 1 (P2, verbatim from the report)
+
+#### P2-1: A building's pending free unit is silently lost when the building is sold before the unit leaves
+* **Files and lines:**
+  * `crates/sim/src/economy_commands.rs:253-271` (`SellBuilding` despawns the building with its `pending_units`);
+  * `crates/sim/src/economy.rs:389-400` (pending units leave only from buildings that still exist).
+* **Evidence:** `probe pending`, release, fixture data.
+  * A refinery was placed while all 14 passable cells of its ring were held by walkers. The placement tick emitted only `BuildingPlaced`, and the refinery kept `pending [UnitKind(2)]`.
+  * It was then sold. The sale tick emitted only `BuildingSold { refund: 100 }`.
+  * 200 more ticks produced no event, there were 0 harvesters on the map, and the credits were 900. Nothing reports that the harvester was lost.
+* **Context:** the implementer recorded this behaviour as known debt item 1. It needs every ring cell held at placement time, and the state stays consistent (the hash covers `pending_units`). It is therefore not a P1 silent fallback of an error path; it is an undocumented-in-events loss of game state.
+* **Expected behaviour:** either the free units are refunded or delivered, or `BuildingSold` (or a separate event) reports the units that were lost. A test should pin the chosen behaviour.
+
+#### P2-2: Dock cells are not claimed, so crowded refineries make harvesters stop as `Blocked` with ore that is never delivered
+
+* **Files and lines:**
+  * `crates/sim/src/harvest.rs:210-232` (`nearest_dock` picks the nearest free ring cell with no claim, unlike ore cells, which `claimed_ore` reserves);
+  * `crates/sim/src/harvest.rs:194-205` (every set-out counts toward `MAX_HARVEST_ATTEMPTS`).
+* **Evidence:** `probe crowd N 20000`, release. The setup: the production data, one refinery at (18, 39), N harvesters next to the ore field around (22, 44), which holds 35,500 ore.
+
+  | N | Stopped `Blocked` | Ore carried by stopped harvesters, never delivered | Mean / worst tick |
+  |---|-------------------|-----------------------------------------------------|-------------------|
+  | 1 to 12 | 0 | 0 (except N = 2, still working at the end) | ≤ 1.7 µs / 0.73 ms |
+  | 15 | 1 | 100 | 2.0 µs / 0.41 ms |
+  | 20 | 6 | 2,700 | 3.2 µs / 0.49 ms |
+  | 60 | 46 | 24,500 | 14.7 µs / 4.2 ms |
+
+  Under known debt item 2, a stopped harvester never resumes without a `Harvest` command.
+* **Severity rationale:**
+  * The event is typed (`HarvesterIdle { Blocked }`).
+  * Every order ends.
+  * The effect starts only at about 15 harvesters per refinery, far above normal play.
+  * The behaviour matches the documented bounded-attempts rule (D26 item 6).
+* **Expected behaviour:** record the measurement in docs/STATUS.md. When the harvester cycle is next revised (at the latest with the M7 benchmark), claim dock cells as ore cells are claimed, or do not count a set-out that only waits for a dock. Add a test with more harvesters than ring cells.
+
+#### P2-3: DECISIONS cites a test that does not exist
+
+* **File and line:** `docs/DECISIONS.md:358` (A1 follow-up of M3) cites `m3_economy::two_placements_in_one_tick_see_each_other`.
+* **Evidence:** `grep -rn two_placements_in_one_tick_see_each_other crates docs` finds only that line. The test that observes the effect is `later_commands_of_a_tick_see_the_buildings_placed_before_them` (`crates/sim/tests/m3_economy.rs:995`).
+* **Expected behaviour:** the decision cites the existing test.
+
+#### P2-4: A balance value lives in game code
+
+* **File and line:** `crates/game/src/buildings.rs:41` (`STARTING_CREDITS = 5_000`, with the starting yard positions next to it).
+* **Evidence:** invariant I10 says that balance values live only in data files. The implementer records this as deviation 5 and D27 item 3 ("match setup in game code until M6"), following the precedent of M2's starting units (D20 item 4). `sim` and its tests are unaffected.
+* **Expected behaviour:** carry this as debt, and move starting credits (and starting buildings and units) to data with the match setup of M6.
+
+### Recorded debt to carry (verbatim from review 1)
+
+**New in this review:**
+
+* **P2-1:** pending free units are lost on sale without an event.
+* **P2-2:** dock contention. With 15 or more harvesters per refinery, harvesters stop as `Blocked` and keep their ore (measurements above).
+* **P2-3:** the test cited in DECISIONS.md:358 does not exist.
+* **P2-4:** `STARTING_CREDITS` is a balance value in game code until M6.
+
+**From the M3 implementation report (known debt), confirmed by this review:**
+
+1. Units wait to leave while every ring cell is held, and a free unit of a building sold before it leaves is lost (now P2-1).
+2. A stopped harvester (`NoOre`, `NoRefinery`, `Blocked`) does not resume by itself. Its consequence under crowding is P2-2.
+3. `Harvest` chooses the ore cell nearest to the target without checking that the harvester can reach it, so the move then fails with `Unreachable`.
+4. Ore and dock searches each run a full Dijkstra, and production rebuilds the building list every tick. To be measured against the M7 benchmark. This review measured a mean tick of 15 µs and a worst tick of 4.2 ms with 60 harvesters on the demo map. The M2 movement tests are about 5 % slower in release.
+5. The interim controls give no validity feedback before a placement.
+6. Building draw order uses the footprint's centre.
+7. `Players::add` and `spawn_building` are public setup APIs.
+8. The window title is the only display of credits and power until M5.
+9. The earlier debt the report lists as unchanged.
+
+**Carried from M2, unchanged by M3:**
+
+* M2 review 3:
+  * P2-1: the speed dependence of the end rule in jams;
+  * P2-2: a box selection released outside the window.
+* M2 remediation round 2, items 1 to 7:
+  1. path throughput;
+  2. the time to end a livelock;
+  3. the cost of the chain walk;
+  4. no overtaking;
+  5. waiting under continuous orders;
+  6. the weak smoke move check;
+  7. M2 implementation debt items 1 to 6, including the two-tick `MessageReader` window, which now also applies to the smoke test's production rejection check.
+* M2 review 1: the remainder of P2-2.
+
+**Carried from M1 and M0, unchanged by M3:**
+
+* M1 review 3:
+  * P2-1, the FIFO hang of the map and `.tsx` reader in `sim` (the data and sprite readers were confirmed in this review to reject FIFOs);
+  * P2-2;
+  * the remaining items of P2-3.
+* M1 review 1: P2-3 and P2-5.
+* M1 review 2: P2-B.
+* M1 round 1: item 4.
+* M1 round 2: items 5 and 6. Item 6, registering every asset in `CheckedAssets`, was followed for the building and harvester sprites.
+* M0: items 1, 2, 3, 5, 7, 8, and 9. The `Skipped event Destroyed` warning of item 2 appeared again in this review's smoke runs.
+
+### Requires user verification (blocks only `m3-approved`; verbatim from review 1)
+
+These are not findings and do not affect the decision (PLAN.md section 12 item 2). They block only `m3-approved`, and the M2 and M1 items also block `m2-approved` and `m1-approved`.
+
+Run `cargo run --release -p game` and check the ten M3 items listed in docs/STATUS.md under the M3 implementation report:
+
+1. **Building sprites:** each sprite sits on its footprint (blue for the human's yard at (15..17, 37..39), red for the opponent's at (52..54, 42..44)), and units walk around buildings.
+2. **Draw order:** units are drawn correctly against buildings (debt item 6).
+3. **Window title:** it reads `MyGame001 - credits 5000 - power 0/20`, shows `(low)` under low power, and updates.
+4. **Production:** `2` queues a power plant. Credits fall by 1 per tick for 10 s and by 101 on the last tick. Shift+`2` cancels with a refund.
+5. **Placement:** a yellow footprint outline follows the cursor, and `B` places within 4 cells. After a power plant the title shows power 0/120.
+6. **Harvesting:** with a refinery placed near the ore, its harvester harvests for about 5 s, returns, and adds 700 credits per delivery.
+7. **Unit production and rally points:** `4` and `5` build a barracks and a war factory, and `6`, `7`, and `8` build units, which leave their buildings. `R` sets a rally point.
+8. **Selling:** `Delete` or `Backspace` sells and refunds half the cost, and the cells become walkable.
+9. **Harvest order:** a right click on ore with a harvester selected makes it harvest there, and other selected units move there.
+10. **Low power:** at 130 consumed against 120 produced, the title shows `(low)` and production takes about twice as long.
+
+The seven M2 items and the five M1 items listed in docs/STATUS.md remain pending.
 
