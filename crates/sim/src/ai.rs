@@ -41,7 +41,7 @@ use bevy_ecs::query::With;
 use bevy_ecs::resource::Resource;
 use bevy_ecs::system::{Query, Res, ResMut};
 
-use crate::ai_defs::{AiDefinitions, Difficulty};
+use crate::ai_defs::{AiDefinitions, AiPlan, Difficulty};
 use crate::building::{Building, Footprint, Producer};
 use crate::combat::{Sight, Weapon};
 use crate::command::{Command, CommandQueue, IssuedCommand, PlayerId};
@@ -116,6 +116,8 @@ pub enum WaveTarget {
 /// One computer player's state.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct AiController {
+    /// The entries of the AI file its faction offers (M7, docs/DECISIONS.md D49).
+    plan: AiPlan,
     difficulty: Difficulty,
     start: CellPos,
     gather: CellPos,
@@ -138,7 +140,8 @@ pub struct AiController {
 }
 
 impl AiController {
-    /// A controller of `difficulty` (one of `ai.difficulties`) for a player starting at `start`,
+    /// A controller following `plan` (the AI file's plan for its faction, `AiDefinitions::plan_for`)
+    /// with `difficulty` (one of the AI file's difficulties) for a player starting at `start`,
     /// whose enemies start at `enemy_starts`; match setup has checked that every start position is
     /// a cell of the map with passable terrain. The gathering point and the waypoints come from the
     /// static terrain of `grid` (docs/DECISIONS.md D43), so they lie on the map. `None` if no
@@ -147,7 +150,7 @@ impl AiController {
     pub(crate) fn new(
         grid: &Grid,
         definitions: &Definitions,
-        ai: &AiDefinitions,
+        plan: AiPlan,
         difficulty: Difficulty,
         start: CellPos,
         enemy_starts: Vec<CellPos>,
@@ -174,7 +177,7 @@ impl AiController {
         let gather = gathering_point(grid, start, toward)?;
         // Waypoints in blocks as wide as the shortest sight of the army, so that a unit near a
         // block's waypoint sees the whole block.
-        let spacing = ai
+        let spacing = plan
             .army
             .iter()
             .filter_map(|&kind| definitions.unit_combat(kind))
@@ -213,6 +216,7 @@ impl AiController {
             y0 += spacing;
         }
         Some(Self {
+            plan,
             start,
             gather,
             waypoints,
@@ -229,6 +233,11 @@ impl AiController {
             issued: 0,
             difficulty,
         })
+    }
+
+    /// The plan it follows: the entries of the AI file its faction offers.
+    pub fn plan(&self) -> &AiPlan {
+        &self.plan
     }
 
     pub fn difficulty(&self) -> &Difficulty {
@@ -269,6 +278,7 @@ impl AiController {
     }
 
     fn hash_into(&self, hasher: &mut Fnv1a64) {
+        self.plan.hash_into(hasher);
         self.difficulty.hash_into(hasher);
         write_cell(hasher, self.start);
         write_cell(hasher, self.gather);
@@ -466,7 +476,8 @@ struct View<'a> {
     vision: &'a Vision,
     grid: &'a Grid,
     definitions: &'a Definitions,
-    ai: &'a AiDefinitions,
+    /// The computer player's plan (named `ai` as the AI file it is taken from).
+    ai: &'a AiPlan,
     own_units: Vec<&'a UnitSnap>,
     own_buildings: Vec<&'a BuildingSnap>,
     /// Other players' units its player sees.
@@ -483,7 +494,7 @@ impl<'a> View<'a> {
         state: &'a PlayerState,
         grid: &'a Grid,
         definitions: &'a Definitions,
-        ai: &'a AiDefinitions,
+        ai: &'a AiPlan,
         units: &'a [UnitSnap],
         buildings: &'a [BuildingSnap],
     ) -> Self {
@@ -669,7 +680,7 @@ pub(crate) fn run_ai(
     building_snaps.sort_unstable_by_key(|building| building.id);
 
     let AiPlayers {
-        definitions: Some(ai_definitions),
+        definitions: Some(_),
         controllers,
     } = &mut *ai
     else {
@@ -681,13 +692,14 @@ pub(crate) fn run_ai(
         else {
             continue;
         };
+        let plan = controller.plan.clone();
         let view = View::new(
             player,
             tick,
             player_state,
             &grid,
             &definitions,
-            ai_definitions,
+            &plan,
             &unit_snaps,
             &building_snaps,
         );
