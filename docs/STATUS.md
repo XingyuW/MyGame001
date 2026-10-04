@@ -4,7 +4,7 @@
 |-----------|--------|--------|--------------|
 | M0: Bootstrap and dependency verification | **Approved** by the user on 2026-10-04 after independent review (decision: GO WITH DOCUMENTED NON-BLOCKING DEBT; no P0 or P1) | `milestone/m0` | `m0-approved` |
 | M1: Map and camera | **Reviewed**: review 3 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 3 P2) after reviews 1 and 2 NO-GO; merged into `main`. Awaiting user verification for `m1-approved` | `milestone/m1` | `m1-reviewed` |
-| M2: Units and movement | Not started | | |
+| M2: Units and movement | Implemented, awaiting independent review | `milestone/m2` | |
 | M3: Economy and construction | Not started | | |
 | M4: Combat and fog of war | Not started | | |
 | M5: Interface and audio | Not started | | |
@@ -472,3 +472,116 @@ These items are not findings and do not affect the decision (PLAN.md section 12 
 4. **Zoom:** the wheel or trackpad zooms, limited to 2× and 0.5× magnification.
 5. **Bounds:** the view never leaves the map's bounding rectangle at any zoom or window size, and stays vertically centred when the view is taller than the map.
 
+## M2 implementation report (2026-10-04)
+
+Branch `milestone/m2`, based on `main` at the merge of M1 (tag `m1-reviewed`). Commits: `d690d4c` (sim: definitions, units, commands, pathfinding, movement, tests), `7ac87d1` (game: units, selection, sprites, smoke test), and the documentation commit that adds this report. Decisions: DECISIONS A5 follow-up, D18 to D20, and the M2 amendment of D6.
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `crates/sim/Cargo.toml`, `Cargo.lock` | `ron` =0.12.2 and `serde` =1.0.229 (derive); the lock gained no package, only `sim`'s dependency list |
+| `crates/sim/src/data.rs` (new) | RON subset checker driven by the file's schema, bounded reading of regular files only, `DataError` (D18) |
+| `crates/sim/src/definitions.rs` (new) | `Definitions` resource, `UnitDef`, `UnitKind`, `load_unit_definitions` (units file schema 1) |
+| `crates/sim/src/unit.rs` (new) | Unit components (`Owner`, `Unit`, `Mobile`, `Position`, `Facing`, `Orders`), `Direction` (eight facings), `spawn_unit`, hash layout (D19) |
+| `crates/sim/src/pathfinding.rs` (new) | `find_path` (A*), `destination_cells`, `nearest_reachable`, the budgeted `find_paths` system with repath, wait-cycle, and retarget rules |
+| `crates/sim/src/movement.rs` (new) | `move_units`: reservation before entry, exact speed, blocking, stall limit |
+| `crates/sim/src/event.rs` (new) | `SimEvent` (`CommandRejected`, `MoveCompleted`, `MoveFailed`), `MoveFailure`, per-tick event buffer |
+| `crates/sim/src/command.rs` | `Command::Move`/`Stop`, `RejectReason`, validation, group destination assignment; the M0 `#[expect(clippy::never_loop)]` is gone with the first variants (D5) |
+| `crates/sim/src/map.rs` | `SubPos`, `SUBCELLS_PER_CELL`; `Grid` occupancy (`occupant`, `claim`, `release`), `is_passable`, `set_terrain` (setup); occupancy in the hash |
+| `crates/sim/src/{schedule,hash,lib}.rs` | Systems in `Commands`, `Pathfinding`, `Movement`; `Definitions` and `Messages<SimEvent>` resources; units and definitions in `state_hash`; exports |
+| `crates/sim/tests/m2_definitions.rs` (new), `tests/fixtures/data/units.ron` (new) | 14 tests, bounded as in D15 (64 MiB allocator budget, 30 s per load) |
+| `crates/sim/tests/m2_movement.rs` (new), `tests/fixtures/maps/{open_16x16,obstructed_16x16,arena_32x32,wall_32x32}.tmx` (new) | 26 tests through `SimPlugin` and `CommandQueue` |
+| `crates/game/src/units.rs` (new) | Match setup (definitions, sprite checks, starting units), unit views with facings and interpolation, event log; 6 tests |
+| `crates/game/src/selection.rs` (new) | Click, box, and Shift selection; right click `Move`, `S` `Stop`; selection drawing; 4 tests |
+| `crates/game/src/tileset_image.rs` | `check_png_file` (the PNG subset for any declared size); non-regular files rejected before opening |
+| `crates/game/src/{main,map,smoke}.rs` | Plugins and the position recording before each tick; `load_map` visible to the crate; smoke test requires units and orders a move |
+| `crates/game/examples/gen_unit_sprites.rs` (new), `assets/sprites/units/{light_tank,scout}.png` (new) | Placeholder sprite sheet generator and its output |
+| `crates/game/tests/m2_unit_sprites.rs` (new) | 5 tests: generator output, PNG subset, facing order and direction, named pipe |
+| `assets/data/units.ron` (new) | Production unit definitions (light tank speed 24, scout speed 40) |
+| `assets/LICENSES.md`, `docs/DECISIONS.md`, `docs/STATUS.md` | Provenance of the new assets; decisions; this report |
+
+### Validation commands (PLAN.md section 9, with section 12 item 5)
+
+Run from the repository root on macOS 27.0.1 (Apple M5, Rust 1.98.1), in this order, in the foreground, after the last code change (`7ac87d1`). A display was available.
+
+| Command | Exit | Result |
+|---------|------|--------|
+| `cargo fmt --all -- --check` | 0 | no diff |
+| `cargo clippy --workspace --all-targets -- -D warnings` | 0 | no warnings |
+| `cargo test --workspace` | 0 | 170 passed, 0 failed, 0 ignored: `game` unit 39 (cli 7, projection 7, camera 7, map 6, checked_assets 2, units 6, selection 4), `m0_spike` 6, `m1_demo_map` 3, `m1_tileset_image` 6, `m2_unit_sprites` 5, `sim` unit 3, `m0_bootstrap` 12, `m1_map` 32, `m1_map_subset` 24, `m2_definitions` 14, `m2_movement` 26 (1.7 s), doc-tests 0. Known M0 linker warning only. |
+| `cargo build --release -p game` | 0 | |
+| `cargo run --release -p game -- --smoke-test 600` | 0 | `26 units spawned`; `smoke test: 600 frames, 198 simulation ticks, map created: true, units spawned: 26, units moved: 18 in 198 ticks after the order` |
+| `cargo run -p game -- --smoke-test 600` | 0 | `smoke test: 600 frames, 203 simulation ticks, map created: true, units spawned: 26, units moved: 18 in 203 ticks after the order` |
+
+Additionally: `cargo test --release -p sim --test m2_movement --test m2_definitions` passed (26 and 14 tests). The release binary, run (`--smoke-test 300`) against scratch asset roots, exited 1 with typed errors for a units file starting with `#![enable(implicit_some)]` (`data file …/units.ron: file: line 1, column 1: expected a value or punctuation of the supported subset, found '#'`) and for a missing `scout.png` (`data file …/units.ron: units[1].sprite: sprite image …/scout.png: file: cannot be read: …`).
+
+### Acceptance criteria and required tests (PLAN.md section 7, M2)
+
+| Criterion | Evidence |
+|-----------|----------|
+| Scope: unit definitions from RON | `sim::load_unit_definitions`, D18; `m2_definitions` (14 tests: fixture, layout variations, inclusive limits, unknown/missing/duplicate fields, wrong kinds with line and column, schema versions, ranges, list bounds, duplicate ids, 18 RON features outside the subset, non-ASCII bytes and BOM, content after the root and every truncation, 60,000-deep nesting, missing/directory/oversized/1 GiB sparse/named-pipe files, 4,000 seeded mutations); production file and sprite cross validation: `units::tests::the_production_units_load_and_every_sprite_passes_its_check` |
+| Scope: spawning | `spawn_unit`; `spawning_is_checked` (unknown type, outside, impassable, occupied, no state change); game starting units (smoke run: 26 spawned) |
+| Scope: selection by click, drag box, and additive modifier | Pure functions `unit_at`, `units_in_box`, `apply_selection` with tests `a_click_selects_the_unit_whose_body_is_under_the_cursor`, `a_box_selects_the_units_whose_ground_point_lies_inside`, `shift_adds_to_the_selection_and_otherwise_replaces_it`; behaviour in the window **requires user verification** |
+| Scope: `Move` and `Stop` | `orders_are_commands_for_the_whole_selection` (interface); `stop_ends_the_order_at_the_next_cell_centre`, `a_new_move_replaces_the_current_order`, smoke runs (the ordered move moved 18 units) |
+| Scope: A* with a per tick request budget | `path_cost_is_optimal_on_open_and_obstructed_fixture_maps`, `no_diagonal_step_between_two_blocked_orthogonal_neighbours`, `path_requests_are_served_within_the_per_tick_budget_oldest_first` |
+| Scope: cell reservation before entry | `move_units`; the I6 checks below (a reserved cell is held before the unit's position enters it) |
+| Scope: distinct destination cells for group orders | `a_group_order_gives_every_unit_its_own_destination_cell` |
+| Scope: repathing when blocked | `a_newly_placed_obstacle_triggers_a_repath`, `a_unit_standing_in_the_way_is_bypassed`, `a_destination_held_by_an_idle_unit_is_replaced_by_the_nearest_reachable_cell`, `two_units_that_want_each_others_cell_resolve_by_one_stepping_aside` (asserts the step aside), `units_meeting_head_on_in_a_one_cell_corridor_both_pass`, `every_order_ends_even_when_units_are_walled_in_by_waiting_units` |
+| Scope: eight sprite facings | `facing_follows_each_step_direction` (sim, all eight); `every_facing_has_its_own_frame`, `the_facing_order_is_the_order_of_sim_directions`, `every_frame_points_in_the_screen_direction_of_its_facing`; on screen **requires user verification** |
+| Scope: placeholder sprites generated by the repository | `gen_unit_sprites`; `committed_sprite_sheets_match_generator_output`, `sprite_sheets_pass_the_png_subset_with_their_declared_size`, `the_sprite_layout_matches_the_generator` |
+| Test: path cost is optimal on open and obstructed fixture maps | `path_cost_is_optimal_on_open_and_obstructed_fixture_maps` (A* against an independent Dijkstra, every start cell and every third goal of both maps, more than 10,000 compared paths each, path legality and cost re-summed); `executed_route_is_optimal_through_the_production_path` (the cells a unit walks through `CommandQueue` cost exactly the optimum) |
+| Test: an unreachable target ends the order with an event and no panic | `unreachable_target_ends_the_order_with_an_event_and_no_panic` (sealed pocket: `MoveFailed { Unreachable }`; group into the pocket: one `Unreachable`, two `NoDestination`; target in solid rock: `NoDestination`); obstacle on the destination: `Unreachable` |
+| Test: a move outside the map is rejected | `a_move_outside_the_map_is_rejected` (seven targets including `i32` extremes; `CommandRejected { OutsideMap }`, state hash equal to a control run at every tick); further rejections: `commands_for_missing_foreign_or_repeated_units_are_rejected` |
+| Test: a unit ordered to its own cell stays | `a_unit_ordered_to_its_own_cell_stays` (`MoveCompleted` in the first tick, unchanged for 100 ticks) |
+| Test: a newly placed obstacle triggers a repath | `a_newly_placed_obstacle_triggers_a_repath` (a wall placed across the path mid-route; repath counted; arrival without entering rock) |
+| Test: I6 on every tick while 50 units cross each other for 2,000 ticks | `invariant_i6_holds_while_fifty_units_cross_each_other_for_2000_ticks` (two groups of 25 swap sides repeatedly; I6 checked from units and grid independently on every tick; 4 crossings started and 199 orders completed, no failure); also `invariant_i6_holds_and_every_order_ends_under_seeded_random_orders` (3 seeds × 3,000 ticks of random orders, then every order ends) |
+| Test: determinism of the same scenario | `the_same_scenario_gives_the_same_hash_at_every_tick` (50 units, 600 ticks, identical traces; a different command sequence diverges after it); `the_hash_covers_unit_state` |
+| Acceptance: 50 units move as a group to a clicked destination without overlap or deadlock in the fixture scenarios | `fifty_units_reach_a_clicked_destination_without_overlap_or_deadlock`: four scenarios (open arena, both directions; wall with two gaps, both directions); all 50 units complete within 3,000 ticks (540 to 945 ticks), I6 holds on every tick, the final cells are distinct, all lie within one ring of the 50 assigned cells, and 39 to 45 units stand on their assigned cells. In the real game the group order is issued by a right click (smoke runs); on screen **requires user verification** |
+| Section 8: negative, boundary, integration, end to end | Rejections with no state change (above); boundaries: speed 1 and 128, 32-character names, 64 unit types, 64 KiB file, `MAX_UNITS_PER_COMMAND` ± 1, map edges, budget exactly 16 per tick; integration through `SimPlugin` and `CommandQueue` (all `m2_movement` tests); end to end: both smoke runs |
+
+### Assumptions verified and how
+
+| Item | Verification |
+|------|--------------|
+| `ron` 0.12.2 and `serde` 1.0.229 are in the lock and pure Rust | `Cargo.lock` diff (dependency list only), `cargo tree -p sim -e normal` |
+| `ron` API, defaults, whitespace, and extension attribute | Source (`options.rs`, `parse.rs`, `error.rs`, `de/mod.rs`); `m2_definitions` (the mutation test asserts `ron` accepts every file the checker accepts) |
+| Bevy 0.19.1: `Messages::update`/`iter_current_update_messages`, `MessageReader`, `World::write_message`, `Sprite::rect`, `Time<Fixed>::overstep_fraction`, `ButtonInput::{just_released, any_pressed}`, `Rect::{from_corners, contains}` (inclusive), `Camera::viewport_to_world_2d`, `Gizmos::linestrip_2d` | Source (paths in D19, D20) and compiled code exercised by the tests and smoke runs |
+| `bevy_ecs_tiled` places the map's layer at z = 0 | `tiled/map/spawn.rs:48, 145` (accumulated offset starting at −100 per layer, +100 per layer) |
+| `mkfifo` exists on the development machine (used by two tests) | The tests ran |
+
+### Deviations from PLAN.md
+
+1. Command validation checks ownership, existence, and bounds, but not visibility: there is no fog of war before M4, so every cell is visible (D19 item 3). Visibility checks arrive with fog in M4.
+2. A group's destination cells are distinct when assigned. A unit whose cell is later closed off by units that arrived first takes the nearest cell it can reach (D19 item 6), so in the fixture scenarios 5 to 11 of 50 units end next to the assigned cells instead of on them; the final cells are always distinct (I6).
+3. Additional rejection reasons not named in the plan: `NoUnits`, `TooManyUnits` (more than 1,024), and `DuplicateUnit`. Additional events: `MoveCompleted` and `MoveFailed` (`NoDestination`, `Unreachable`, `Blocked`).
+4. `spawn_unit` and `Grid::set_terrain` change state directly; they are scenario and match setup (D19 item 10), as permitted by PLAN.md section 4. The game's starting units are hard-coded until match setup in M6 (D20 item 4).
+5. The units file has only `id`, `speed`, and `sprite`; hit points, armour, sight, and weapons arrive with the milestones that use them, each with a schema version increment.
+6. The stop key is `S` (hotkeys are M5's scope; D20 item 5). Only the player's own units can be selected.
+7. Files not listed in PLAN.md section 4: `crates/sim/src/{data,definitions,unit,pathfinding,movement,event}.rs`, `crates/game/src/{units,selection}.rs`, `crates/game/examples/gen_unit_sprites.rs`, and the M2 test files. `m2_definitions.rs` contains `unsafe` code (the counting allocator of D15).
+8. The image reader now rejects non-regular files (D20 item 2), a behaviour change of M1 code made because the sprite sheets share the reader; it resolves M1 review 3 P2-1 for images. The map reader in `sim` (`map_subset::read_file`) is unchanged.
+
+### Known debt (P2 proposals for the reviewer)
+
+1. Group arrival leaves holes in the cluster when late units find their cells closed off (deviation 2); a smarter assignment (for example, swapping destinations with arrived units) would fill them.
+2. The game's event log and the smoke test read `SimEvent` with a `MessageReader`, which sees the last two ticks; if more than two ticks run between two frames, older events are not seen. Only logging and the smoke test's rejection check are affected.
+3. The selection, order, and unit drawing systems are tested through their pure functions (as M1 review 1 P2-3 for the camera); their wiring in the window is part of the user verification below.
+4. Each path search allocates arrays of the map's size (at most 65,536 cells); performance is measured in M7.
+5. `Grid::set_terrain` and `spawn_unit` are public, so the game could call them during a match; invariant I5 is a discipline until M5 enforces the interface boundary.
+6. A screenshot taken with Bevy's `Screenshot` during a smoke run in this environment was entirely black (checked by decoding the PNG), so no automated image of the running game exists; rendering is verified by the user.
+
+M1 debt status: review 3 P2-1 is resolved for tileset images (D20 item 2) and still open for the map and tileset files read by `sim`; review 3 P2-3 item 4 (D6) is resolved by the D6 amendment; review 3 P2-2 and the other items of P2-3, review 1 P2-3 and P2-5, review 2 P2-B, round 1 item 4, round 2 items 5 and 6, and M0 items 1, 2 (seen again in this round's smoke runs), 3, 5, 7, 8, and 9 are unchanged. Round 2 item 6 (every asset must be registered in `CheckedAssets`) was followed for the sprite sheets.
+
+### Requires user verification
+
+Not review findings (PLAN.md section 12 item 2). Run `cargo run --release -p game`, pan to the left of the rock ridge (the player's units start around cells (10, 28) and (14, 34), left of the map's centre and in its upper half on screen), and check:
+
+1. **Unit rendering:** 18 blue-tinted units of the player (12 light tanks with a turret and barrel, 6 smaller wedge-shaped scouts) and, right of the ridge around cells (50, 30) and (52, 36), 8 red-tinted units of the opponent. Each unit stands on its tile (the hull centred on the cell's diamond), and units lower on the screen are drawn in front of units above them.
+2. **Facings:** a moving unit turns to face its direction of travel in all eight directions (the barrel and the darker front of the hull point the way it moves), and keeps its facing when it stops.
+3. **Smooth movement:** units glide between cells without jumps or jitter at any zoom.
+4. **Click selection:** a left click on one of the player's units draws a green diamond under it; a click on empty ground clears the selection; the opponent's units cannot be selected.
+5. **Box selection:** dragging with the left button draws a green rectangle and selects the player's units inside it when released.
+6. **Additive selection:** with Shift held, clicks and boxes add units to the selection instead of replacing it.
+7. **Orders:** a right click on a cell sends the selected units there; they spread over distinct cells around it without overlapping or getting stuck, route around the rock ridge through its gap and around the lake, and a click on rock or water sends them to the nearest cells around it. `S` stops the selection at the next cell centre.
+
+The M1 items above (map rendering, picking, panning, zoom, bounds) remain pending for `m1-approved`.
