@@ -6,7 +6,7 @@
 | M1: Map and camera | **Reviewed**: review 3 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 3 P2) after reviews 1 and 2 NO-GO; merged into `main`. Awaiting user verification for `m1-approved` | `milestone/m1` | `m1-reviewed` |
 | M2: Units and movement | **Reviewed**: review 3 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 2 P2) after reviews 1 and 2 NO-GO; merged into `main`. Awaiting user verification for `m2-approved` | `milestone/m2` | `m2-reviewed` |
 | M3: Economy and construction | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 4 P2); merged into `main`. Awaiting user verification for `m3-approved` | `milestone/m3` | `m3-reviewed` |
-| M4: Combat and fog of war | Implemented, awaiting independent review | `milestone/m4` | |
+| M4: Combat and fog of war | **Review 1: NO-GO** (0 P0, 2 P1, 3 P2; `docs/reviews/M4-review-1.md`), in remediation round 1 | `milestone/m4` | |
 | M5: Interface and audio | Not started | | |
 | M6: Skirmish AI and game flow | Not started | | |
 | M7: Content, balance, performance, and packaging | Not started | | |
