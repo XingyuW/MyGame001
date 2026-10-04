@@ -4,9 +4,10 @@
 //!
 //! The game reads simulation state and never writes it (PLAN.md section 4, invariant I5): each
 //! simulation unit is drawn by a separate view entity that copies what it needs from the unit's
-//! components. The only writes into the simulation world are match setup before the first tick
-//! (installing the definitions and spawning the starting units, like the map's grid, D11) and
-//! commands pushed into `CommandQueue` by the interface (`crate::selection`).
+//! components, read through `crate::sim_host::SimHost`. The only writes into the simulation world
+//! are match setup before the first tick (installing the definitions and spawning the starting
+//! units, like the map's grid, D11) and the commands of the interface, both in
+//! `crate::sim_host` (docs/DECISIONS.md D34).
 //!
 //! The unit definitions are loaded by `sim::load_unit_definitions` (the RON subset of D18). Each
 //! definition names a sprite sheet, which must exist and pass the PNG subset check before the
@@ -25,12 +26,13 @@ use sim::{
 };
 
 use crate::buildings::{
-    BuildingSpriteError, BuildingSprites, BuildingStatus, CheckedBuildingSprite, ECONOMY_PATH,
-    check_building_sprites, setup_economy,
+    BuildingSpriteError, BuildingSprites, CheckedBuildingSprite, ECONOMY_PATH,
+    check_building_sprites,
 };
 use crate::checked_assets::CheckedAssets;
 use crate::map::MapView;
 use crate::projection::{TileSize, to_world};
+use crate::sim_host::{MatchDefinitions, SimHost};
 use crate::tileset_image::{TilesetImageError, TilesetImageErrorKind, check_png_file};
 
 /// The units file, relative to the asset directory.
@@ -82,7 +84,7 @@ impl Plugin for UnitsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<UnitViews>()
             .init_resource::<UnitStatus>()
-            .add_systems(Startup, setup_units.after(crate::map::load_map))
+            .add_systems(Startup, load_match_assets.after(crate::map::load_map))
             .add_systems(Update, (spawn_unit_views, log_sim_events))
             .add_systems(
                 PostUpdate,
@@ -317,10 +319,11 @@ pub fn load_match_data(
     ))
 }
 
-/// Match setup: installs the definitions, registers the checked sprites, adds the players and
-/// their starting buildings (`crate::buildings::setup_economy`), and spawns the starting units.
+/// Match setup, game side: loads the definitions and checks and registers the sprite of every
+/// unit and building type. The definitions wait in [`MatchDefinitions`] for
+/// `crate::sim_host::start_match`, which installs them with the starting units and buildings.
 /// Runs after the map is loaded; does nothing if the map failed.
-fn setup_units(world: &mut World) {
+pub(crate) fn load_match_assets(world: &mut World) {
     if !world.contains_resource::<MapView>() {
         return;
     }
@@ -351,49 +354,13 @@ fn setup_units(world: &mut World) {
             .insert(sprite.kind, server.load(sprite.asset_path));
     }
     world.insert_resource(sprites);
-    world.insert_resource(definitions);
-    match setup_economy(world) {
-        Ok(spawned) => {
-            info!("{spawned} buildings spawned");
-            world.resource_mut::<BuildingStatus>().spawned = spawned;
-        }
-        Err(error) => {
-            error!("{error}");
-            world.write_message(AppExit::error());
-            return;
-        }
-    }
-    let starting = match plan_starting_units(world.resource::<Grid>(), &STARTING_UNITS) {
-        Ok(starting) => starting,
-        Err(error) => {
-            error!("{error}");
-            world.write_message(AppExit::error());
-            return;
-        }
-    };
     let mut sprites = UnitSprites::default();
     for sheet in sheets {
         checked.insert(sheet.asset_path.clone(), sheet.bytes);
         sprites.0.insert(sheet.kind, server.load(sheet.asset_path));
     }
     world.insert_resource(sprites);
-
-    let mut spawned = 0;
-    for (owner, unit_type, cell) in starting {
-        match sim::spawn_unit(world, owner, unit_type, cell) {
-            Ok(_) => spawned += 1,
-            Err(error) => {
-                error!(
-                    "starting unit {unit_type:?} at ({}, {}): {error}",
-                    cell.x, cell.y
-                );
-                world.write_message(AppExit::error());
-                return;
-            }
-        }
-    }
-    info!("{spawned} units spawned");
-    world.resource_mut::<UnitStatus>().spawned = spawned;
+    world.insert_resource(MatchDefinitions(definitions));
 }
 
 /// Colour that tints the light grey sprites of a player's units.
@@ -430,16 +397,22 @@ pub fn unit_depth(cell: Vec2) -> f32 {
 }
 
 /// Creates a view for every simulation unit that has none.
-fn spawn_unit_views(
+pub(crate) fn spawn_unit_views(
     mut commands: Commands,
     mut views: ResMut<UnitViews>,
     sprites: Option<Res<UnitSprites>>,
-    units: Query<(Entity, &SimId, &Owner, &Unit, &Position, &Facing)>,
+    host: Res<SimHost>,
 ) {
     let Some(sprites) = sprites else {
         return;
     };
-    for (unit, id, owner, kind, position, facing) in &units {
+    let Some(mut units) = host
+        .world()
+        .try_query::<(Entity, &SimId, &Owner, &Unit, &Position, &Facing)>()
+    else {
+        return;
+    };
+    for (unit, id, owner, kind, position, facing) in units.iter(host.world()) {
         if views.0.contains_key(id) {
             continue;
         }
@@ -476,9 +449,9 @@ fn spawn_unit_views(
 
 /// Records every unit's position before a simulation tick (runs in `FixedUpdate` right before
 /// the tick).
-pub fn record_previous_positions(mut views: Query<&mut UnitView>, positions: Query<&Position>) {
+pub fn record_previous_positions(mut views: Query<&mut UnitView>, host: Res<SimHost>) {
     for mut view in &mut views {
-        if let Ok(position) = positions.get(view.unit) {
+        if let Some(position) = host.world().get::<Position>(view.unit) {
             view.previous = position.0;
         }
     }
@@ -501,7 +474,7 @@ pub fn unit_shown(owner: PlayerId, mobile: &Mobile, players: &Players) -> bool {
 fn place_unit_views(
     map: Option<Res<MapView>>,
     time: Res<Time<Fixed>>,
-    players: Res<Players>,
+    host: Res<SimHost>,
     mut commands: Commands,
     mut registry: ResMut<UnitViews>,
     // Disjoint from the building views' query (`crate::buildings`), which also writes
@@ -516,20 +489,24 @@ fn place_unit_views(
         ),
         Without<crate::buildings::BuildingView>,
     >,
-    units: Query<(&Position, &Facing, &Mobile)>,
 ) {
-    let Some(map) = map else {
+    let (Some(map), Some(players)) = (map, host.players()) else {
         return;
     };
+    let world = host.world();
     let fraction = time.overstep_fraction();
     for (entity, mut view, mut sprite, mut transform, mut visibility) in &mut views {
-        let Ok((position, facing, mobile)) = units.get(view.unit) else {
+        let (Some(position), Some(facing), Some(mobile)) = (
+            world.get::<Position>(view.unit),
+            world.get::<Facing>(view.unit),
+            world.get::<Mobile>(view.unit),
+        ) else {
             // The unit no longer exists (destroyed, M4).
             registry.0.remove(&view.id);
             commands.entity(entity).despawn();
             continue;
         };
-        let shown = if unit_shown(view.owner, mobile, &players) {
+        let shown = if unit_shown(view.owner, mobile, players) {
             Visibility::Inherited
         } else {
             Visibility::Hidden
@@ -548,10 +525,10 @@ fn place_unit_views(
     }
 }
 
-/// Logs the simulation's events. The simulation advances its event buffer once per tick, so a
-/// reader sees the events of the last two ticks (`sim::SimEvent`); each event is read once.
-/// Events of earlier ticks are missed if more than two ticks run between two frames, which
-/// only affects this log.
+/// Logs the simulation's events. `crate::sim_host` copies every tick's events into the game's
+/// message buffer, which Bevy advances once per frame, so each event is read once, also when
+/// several ticks run in one frame (M5; before, events of more than two ticks per frame were
+/// missed, M2 implementation debt item 2).
 fn log_sim_events(mut events: MessageReader<SimEvent>) {
     for event in events.read() {
         match event {

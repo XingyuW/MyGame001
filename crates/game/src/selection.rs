@@ -5,9 +5,14 @@
 //! armed units to attack it, and `A` orders the selection to attack-move to the cell under the
 //! cursor (interim keys until the hotkeys of M5; docs/DECISIONS.md D31).
 //!
-//! The interface changes the simulation only by pushing commands into `CommandQueue`
-//! (invariant I5). The decisions are pure functions, unit tested below; the systems only read
-//! input and apply them.
+//! From M5 the keys are those of `crate::hotkeys`, control groups recall and store selections,
+//! and the map ignores the mouse while the cursor is over the sidebar or the interface is in a
+//! mode of `crate::construction` (placing, selling, setting a rally point), whose left and right
+//! clicks belong to that mode.
+//!
+//! The interface changes the simulation only by pushing commands into `CommandQueue`, through
+//! `crate::sim_host::CommandSink` (invariant I5), and reads it through `SimHost` (D34). The
+//! decisions are pure functions, unit tested below; the systems only read input and apply them.
 
 use std::collections::BTreeSet;
 
@@ -15,13 +20,14 @@ use bevy::camera::CameraUpdateSystems;
 use bevy::prelude::*;
 use bevy::transform::TransformSystems;
 use bevy::window::PrimaryWindow;
-use sim::{
-    Building, CellPos, Command, CommandQueue, Grid, Harvester, IssuedCommand, Owner, Players,
-    SimId, Weapon,
-};
+use sim::{Building, CellPos, Command, Harvester, Owner, SimId, Weapon};
 
-use crate::map::{HoveredCell, MapView};
+use crate::construction::InterfaceMode;
+use crate::hotkeys::{ControlGroups, Hotkey, pressed_hotkeys};
+use crate::map::{HoveredCell, MapTerrain, MapView};
 use crate::projection::cell_corners;
+use crate::sidebar::over_sidebar;
+use crate::sim_host::{CommandSink, SimHost};
 use crate::units::{GROUND_OFFSET_PX, HUMAN, UnitView, UnitViews};
 
 /// A press and release of the left button closer together than this (logical pixels) is a
@@ -38,9 +44,16 @@ impl Plugin for SelectionPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<Selection>()
             .init_resource::<DragBox>()
+            .init_resource::<ControlGroups>()
             .add_systems(
                 PostUpdate,
-                (prune_selection, select_units, issue_orders, draw_selection)
+                (
+                    prune_selection,
+                    control_groups,
+                    select_units,
+                    issue_orders,
+                    draw_selection,
+                )
                     .chain()
                     .after(TransformSystems::Propagate)
                     .after(CameraUpdateSystems)
@@ -212,14 +225,35 @@ fn cursor_world(window: &Window, camera: &Camera, transform: &GlobalTransform) -
     camera.viewport_to_world_2d(transform, cursor).ok()
 }
 
-/// Units that no longer exist leave the selection.
-fn prune_selection(registry: Res<UnitViews>, mut selection: ResMut<Selection>) {
+/// Units that no longer exist leave the selection and the control groups.
+pub(crate) fn prune_selection(
+    registry: Res<UnitViews>,
+    mut selection: ResMut<Selection>,
+    mut groups: ResMut<ControlGroups>,
+) {
     selection.0.retain(|id| registry.0.contains_key(id));
+    groups.prune(|id| registry.0.contains_key(&id));
 }
 
+/// Control group keys (`crate::hotkeys`): select, add, or assign a group.
+fn control_groups(
+    keys: Res<ButtonInput<KeyCode>>,
+    mut groups: ResMut<ControlGroups>,
+    mut selection: ResMut<Selection>,
+) {
+    for action in pressed_hotkeys(&keys) {
+        let next = groups.apply(action, &selection.0);
+        if next != selection.0 {
+            selection.0 = next;
+        }
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
 fn select_units(
     buttons: Res<ButtonInput<MouseButton>>,
     keys: Res<ButtonInput<KeyCode>>,
+    mode: Res<InterfaceMode>,
     window: Single<&Window, With<PrimaryWindow>>,
     camera: Single<(&Camera, &GlobalTransform)>,
     mut drag: ResMut<DragBox>,
@@ -228,7 +262,12 @@ fn select_units(
 ) {
     let (camera, camera_transform) = *camera;
     if buttons.just_pressed(MouseButton::Left) {
-        drag.start = window.cursor_position();
+        // A press over the sidebar, or in a mode whose clicks place, sell, or set a rally
+        // point, does not select.
+        drag.start = window
+            .cursor_position()
+            .filter(|&cursor| !over_sidebar(cursor, window.width()))
+            .filter(|_| *mode == InterfaceMode::Normal);
     }
     if !buttons.just_released(MouseButton::Left) {
         return;
@@ -265,50 +304,72 @@ fn shown_enemy_units(views: &Query<(&UnitView, &Transform, &Visibility)>) -> Vec
         .collect()
 }
 
+/// The enemy building covering `cell` that the human player is shown, if any.
+fn shown_enemy_building(host: &SimHost, cell: Option<CellPos>) -> Option<SimId> {
+    let id = host.grid()?.building(cell?)?;
+    let players = host.players()?;
+    let mut buildings = host.world().try_query::<(&SimId, &Owner, &Building)>()?;
+    buildings
+        .iter(host.world())
+        .find(|(other, ..)| **other == id)
+        .filter(|(_, owner, building)| {
+            owner.0 != HUMAN
+                && crate::buildings::building_shown(owner.0, building.footprint, players)
+        })
+        .map(|(id, ..)| *id)
+}
+
+/// The ids of the human player's units that carry component `T`.
+fn own_units_with<T: Component>(host: &SimHost) -> BTreeSet<SimId> {
+    let Some(mut units) = host
+        .world()
+        .try_query_filtered::<(&SimId, &Owner), With<T>>()
+    else {
+        return BTreeSet::new();
+    };
+    units
+        .iter(host.world())
+        .filter(|(_, owner)| owner.0 == HUMAN)
+        .map(|(id, _)| *id)
+        .collect()
+}
+
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn issue_orders(
     buttons: Res<ButtonInput<MouseButton>>,
     keys: Res<ButtonInput<KeyCode>>,
     hovered: Res<HoveredCell>,
     selection: Res<Selection>,
-    grid: Res<Grid>,
-    players: Res<Players>,
+    mode: Res<InterfaceMode>,
+    terrain: Option<Res<MapTerrain>>,
+    host: Res<SimHost>,
     window: Single<&Window, With<PrimaryWindow>>,
     camera: Single<(&Camera, &GlobalTransform)>,
-    harvesters: Query<&SimId, With<Harvester>>,
-    armed: Query<&SimId, With<Weapon>>,
     views: Query<(&UnitView, &Transform, &Visibility)>,
-    buildings: Query<(&SimId, &Owner, &Building)>,
-    mut queue: ResMut<CommandQueue>,
+    mut sink: ResMut<CommandSink>,
 ) {
     let mut commands = Vec::new();
-    if buttons.just_pressed(MouseButton::Right) {
+    // In a mode of `crate::construction`, a right click leaves the mode instead.
+    if buttons.just_pressed(MouseButton::Right) && *mode == InterfaceMode::Normal {
         let (camera, camera_transform) = *camera;
-        // An enemy building the human player sees under the cursor.
-        let building = hovered
-            .0
-            .and_then(|cell| grid.building(cell))
-            .filter(|&id| {
-                buildings.iter().any(|(other, owner, building)| {
-                    *other == id
-                        && owner.0 != HUMAN
-                        && crate::buildings::building_shown(owner.0, building.footprint, &players)
-                })
-            });
+        let building = shown_enemy_building(&host, hovered.0);
         let enemy = cursor_world(&window, camera, camera_transform)
             .and_then(|point| enemy_at(point, &shown_enemy_units(&views), building))
             .or(building);
         match enemy {
             Some(target) => {
-                let armed: BTreeSet<SimId> = armed.iter().copied().collect();
+                let armed = own_units_with::<Weapon>(&host);
                 commands.extend(attack_commands(&selection.0, &armed, target, hovered.0));
             }
             None => {
+                // Ore as the map shows it: the simulation's current ore of a cell the player does
+                // not see is not revealed by the choice between harvesting and moving.
                 let ore = hovered
                     .0
-                    .and_then(|cell| grid.cell(cell))
+                    .zip(terrain.as_deref())
+                    .and_then(|(cell, terrain)| terrain.0.cell(cell))
                     .is_some_and(|cell| cell.ore > 0);
-                let harvesters: BTreeSet<SimId> = harvesters.iter().copied().collect();
+                let harvesters = own_units_with::<Harvester>(&host);
                 commands.extend(right_click_commands(
                     &selection.0,
                     &harvesters,
@@ -318,18 +379,14 @@ pub(crate) fn issue_orders(
             }
         }
     }
-    if keys.just_pressed(KeyCode::KeyS) {
-        commands.extend(stop_command(&selection.0));
+    for action in pressed_hotkeys(&keys) {
+        match action {
+            Hotkey::Stop => commands.extend(stop_command(&selection.0)),
+            Hotkey::AttackMove => commands.extend(attack_move_command(&selection.0, hovered.0)),
+            _ => {}
+        }
     }
-    if keys.just_pressed(KeyCode::KeyA) {
-        commands.extend(attack_move_command(&selection.0, hovered.0));
-    }
-    for command in commands {
-        queue.push(IssuedCommand {
-            player: HUMAN,
-            command,
-        });
-    }
+    sink.issue(commands);
 }
 
 fn draw_selection(
