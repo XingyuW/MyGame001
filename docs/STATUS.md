@@ -10,7 +10,7 @@
 | M5: Interface and audio | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 5 P2); merged into `main`. Awaiting user verification for `m5-approved` | `milestone/m5` | `m5-reviewed` |
 | M6: Skirmish AI and game flow | **Reviewed**: review 2 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 2 P2) after review 1 NO-GO; merged into `main`. Awaiting user verification for `m6-approved` | `milestone/m6` | `m6-reviewed` |
 | M7: Content, balance, performance, and packaging | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 6 P2); merged into `main`. Awaiting user verification for `m7-approved` | `milestone/m7` | `m7-reviewed` |
-| M8: Visual polish first | **Implemented and validated**, independent review pending; visual quality requires user verification | `milestone/m8` | — |
+| M8: Visual polish first | **Review 1 NO-GO**: one P1 ownership-color regression; remediation pending. Visual quality requires user verification | `milestone/m8` | — |
 
 ## M0 implementation report (2026-10-03)
 
@@ -2743,3 +2743,18 @@ logs in `/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/m8` remain use
 review. No substantial artifact was created under `/tmp`; the existing tiny disposable fixture
 and smoke-settings files follow the prior test paths. `docs/HANDOFF.md` remains untouched and
 untracked user material.
+
+## M8 review decision 1 (2026-10-04)
+
+Independent report: `docs/reviews/M8-review-1.md`, preserved verbatim. Decision **NO-GO**
+(0 P0, 1 P1, 0 new P2). The required validation commands passed independently, but five unit
+types have no team-paint pixels in their north-west frame after replacing whole-sprite tint:
+rifleman, conscript, rocket soldier, grenadier and rocket launcher. Four infantry types also have
+only four team-paint pixels in west/north frames. These views lose ownership information on the
+battlefield. All eight buildings retain nonempty team masks.
+
+The orchestrator accepts P1-1 and requests a fresh remediation session: meaningful team-color
+coverage for all 11 units in all eight facings, a regression through the actual production
+palette transform, unchanged existing geometry/facing/material tests, and independent re-review.
+M8 is not merged or tagged. The earlier gameplay/audio/release backlog remains outside this
+visual-first scope; final artistic acceptance remains the user's.
