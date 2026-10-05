@@ -10,7 +10,7 @@
 | M5: Interface and audio | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 5 P2); merged into `main`. Awaiting user verification for `m5-approved` | `milestone/m5` | `m5-reviewed` |
 | M6: Skirmish AI and game flow | **Reviewed**: review 2 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 2 P2) after review 1 NO-GO; merged into `main`. Awaiting user verification for `m6-approved` | `milestone/m6` | `m6-reviewed` |
 | M7: Content, balance, performance, and packaging | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 6 P2); merged into `main`. Awaiting user verification for `m7-approved` | `milestone/m7` | `m7-reviewed` |
-| M8: Visual polish first | **Review 1 NO-GO**: one P1 ownership-color regression; remediation pending. Visual quality requires user verification | `milestone/m8` | — |
+| M8: Visual polish first | Review 1 P1 ownership-color regression remediated; **independent re-review pending**. Visual quality requires user verification | `milestone/m8` | — |
 
 ## M0 implementation report (2026-10-03)
 
@@ -2758,3 +2758,107 @@ coverage for all 11 units in all eight facings, a regression through the actual 
 palette transform, unchanged existing geometry/facing/material tests, and independent re-review.
 M8 is not merged or tagged. The earlier gameplay/audio/release backlog remains outside this
 visual-first scope; final artistic acceptance remains the user's.
+
+## M8 remediation 1 (2026-10-05)
+
+Fresh implementer session against `1a67c58`, addressing only review 1 P1-1 (D61). No merge,
+tag or push was performed. The review's NO-GO is preserved; independent re-review is required.
+
+### Changes and regression evidence
+
+* `gen_unit_sprites.rs` and five unit PNGs: wraparound upper-tunic/shoulder paint, a darker
+  backpack identification panel, and a band across the rocket rack. Existing silhouettes,
+  anchors, shadows, lower uniforms, helmets, skin, weapons, tube seams/mouths and front markers
+  retain their geometry/materials. No runtime palette or whole-sprite tint change.
+* `tests/m8_team_paint.rs`: committed/generated sheet equality, checked loading through the
+  actual production `presentation::sprite_pair`/`team_pixel`, at least ten changed opaque
+  team pixels in all 88 facings, identical alpha, and byte-identical nonpaint materials.
+* `examples/team_paint_review.rs` and `docs/screenshots/m8-team-paint-1x.png`: repeatable
+  native-size friendly/enemy contact sheet. D61 gives its row/column key. All five prior native
+  captures are regenerated to reflect the repaired art.
+* `DECISIONS.md` D61 and this report record the correction, evidence and remaining acceptance.
+
+The new regression was added **before** the art change and exited **101**, detecting the five
+zero-paint NW frames and eight four-pixel infantry W/N frames (`regression-red.log`). It then
+passed along with all five unchanged unit-sheet/facing tests (`regression-green.log`). No
+existing test was removed, skipped or weakened. A comparison with `1a67c58` checks every RGBA
+pixel of all eleven sheets: alpha and front-marker masks are identical, six sheets are entirely
+unchanged, and modifications touch only the intended uniform/pack/rack surface colors
+(`verify-paint-only.py`, `paint-only.log`).
+
+Opaque pixels differing between the production human and enemy textures after remediation:
+
+| Unit | E | SE | S | SW | W | NW | N | NE |
+|------|--:|---:|--:|---:|--:|---:|--:|---:|
+| light tank | 39 | 54 | 39 | 39 | 29 | 50 | 29 | 39 |
+| scout | 23 | 16 | 23 | 10 | 25 | 18 | 25 | 10 |
+| harvester | 70 | 66 | 70 | 72 | 54 | 60 | 54 | 72 |
+| rifleman | 76 | 72 | 77 | 54 | 69 | 64 | 69 | 54 |
+| conscript | 85 | 72 | 86 | 71 | 82 | 72 | 82 | 71 |
+| rocket soldier | 75 | 72 | 77 | 54 | 69 | 64 | 69 | 54 |
+| grenadier | 84 | 72 | 86 | 71 | 82 | 72 | 82 | 71 |
+| raider | 25 | 40 | 27 | 41 | 22 | 40 | 24 | 41 |
+| heavy tank | 61 | 89 | 62 | 61 | 47 | 81 | 48 | 61 |
+| artillery | 29 | 55 | 29 | 48 | 26 | 43 | 26 | 48 |
+| rocket launcher | 68 | 54 | 66 | 88 | 47 | 24 | 45 | 88 |
+
+The 1:1 contact sheet was inspected including all friendly/enemy NW, W and N views. Uniform
+panels and the rocket-rack band visibly distinguish the owners; neutral materials remain
+recognizable. This is implementation inspection, not user artistic approval.
+
+### Final validation
+
+All commands ran from the canonical repository with the configured
+`CARGO_TARGET_DIR=/Users/xingyuwang/Library/Caches/Codex/cargo-target` preserved. Cache writes
+and native Metal/display runs used the required elevated execution. Logs are in
+`/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/m8-remediation-1/`.
+
+The first Clippy attempt exited 101 on `duplicate_mod` in the new contact-sheet utility
+(`clippy-first-attempt.log`). It was corrected by reusing the generator's existing PNG encoder
+module, without suppressions or new dependencies. The final sequence below ran after that fix;
+no source or game asset changed between these gates. Only reports and refreshed screenshots
+were updated afterward.
+
+| Command | Exit | Result/log |
+|---------|-----:|------------|
+| `cargo fmt --all -- --check` | 0 | Clean, 0.25 s; `fmt.log`. |
+| `cargo clippy --workspace --all-targets -- -D warnings` | 0 | Clean, 1.75 s; `clippy.log`. |
+| `cargo test --workspace` | 0 | **419 passed, 0 failed, 0 ignored**, 196.08 s; `workspace-tests.log`. One new all-facing test plus the imported production palette test executes again in the new integration target. |
+| `cargo build --release -p game` | 0 | Apple Silicon release build, 0.25 s; `release-build.log`. |
+| `cargo run --release -p game -- --smoke-test 600` | 0 | 600 frames, 168 ticks, 3 matches; zero view mismatches, out-of-window buttons or rejected AI commands; 11 menu/options buttons, settings saved; 11.58 s, `release-smoke.log`. |
+| `cargo run -p game -- --smoke-test 600` | 0 | Same checks, 600 frames, 181 ticks; 14.18 s, `debug-smoke.log`. |
+| `cargo run --release -p sim --example m7_benchmark` | 0 | Fixture mean/busy/max 0.075/0.238/0.580 ms; shipped 0.158/0.363/0.885 ms; peak heap 0.6 MiB, within budgets; `benchmark.log`. |
+| `cargo run --release -p sim --example m7_soak` | 0 | 3,168,000 ticks, 44 configurations twice, 152.3 s simulation, peak heap 1.6 MiB; all checks pass; `soak.log`. |
+| `sh scripts/package_macos.sh` | 0 | Package smoke600 passed with 169 ticks and all UI/view/options checks; 13.39 s; `package.log`. |
+| `MYGAME_VISUAL_REVIEW=<cache>/captures cargo run -p game` | 0 | Five native 2560 × 1440 captures, 14.10 s; all inspected and copied to `docs/screenshots/` (menu byte-identical); `native-review.log`. |
+
+The known M0 linker `__eh_frame` and winit shutdown `Skipped event Destroyed` warnings recur;
+no new runtime warning was found. The unchanged geometry/facing tests pass; the fixture and
+production match tests, benchmark and soak continue to validate the unchanged simulation.
+
+### Acceptance, scope and remaining verification
+
+| Remediation criterion | Evidence/status |
+|-----------------------|-----------------|
+| Readable owner paint in every unit facing | Production transform regression covers all 11 × 8 frames; minimum ten opaque changed pixels, repaired units at least 24. Normal-scale contact sheet inspected. |
+| Preserve geometry and materials | Existing unit facing/PNG/reproducibility tests unchanged; before/after alpha/front-marker comparison and production neutral-material assertions pass. |
+| Original art, stable runtime contracts | Only the existing native generator's colors and generated sheets change; no dependency, schema, simulation, input, audio or palette-transform changes. |
+| Independent review | Pending fresh reviewer of cumulative M8 diff since `m7-reviewed`; implementer does not approve this milestone. |
+| Artistic and combat readability acceptance | **Requires user verification**, including combat, preferred zoom/window sizes, and the original classic-RTS art direction. |
+
+No scope expansion or new known debt. All inherited M7 debt, later audio/release work and earlier
+user-only acceptance remain as recorded above. Ordinary smoke runs still show zero enemy views;
+their passing result is not used as proof of this defect's correction. That proof comes from the
+actual production-palette regression and all-facing friendly/enemy contact sheet. The user's
+untracked `docs/HANDOFF.md` is untouched.
+
+### Storage
+
+The only new substantial external directory is
+`/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/m8-remediation-1` (6.4 MiB): logs,
+the before/after comparison script, normal-scale contact sheet and native captures. It remains
+useful through independent re-review. Build outputs reuse the pre-existing configured Cargo
+cache; its refreshed `package/` is 146 MiB and remains useful for package validation. No clone,
+worktree, virtual environment, repository `target/` or substantial `/tmp` artifact was created.
+The package script's transient empty working directory and smoke settings follow the existing
+short-lived temporary-file behavior. No Git repository or worktree was deleted.
