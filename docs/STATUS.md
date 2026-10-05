@@ -10,7 +10,7 @@
 | M5: Interface and audio | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 5 P2); merged into `main`. Awaiting user verification for `m5-approved` | `milestone/m5` | `m5-reviewed` |
 | M6: Skirmish AI and game flow | **Reviewed**: review 2 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 2 P2) after review 1 NO-GO; merged into `main`. Awaiting user verification for `m6-approved` | `milestone/m6` | `m6-reviewed` |
 | M7: Content, balance, performance, and packaging | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 6 P2); merged into `main`. Awaiting user verification for `m7-approved` | `milestone/m7` | `m7-reviewed` |
-| M8: Visual polish first | Review 1 P1 ownership-color regression remediated; **independent re-review pending**. Visual quality requires user verification | `milestone/m8` | — |
+| M8: Visual polish first | **Reviewed**: review 2 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 new P0/P1/P2), review 1 ownership-color regression closed; merged into `main`. Visual quality requires user verification for `m8-approved` | `milestone/m8` | `m8-reviewed` |
 
 ## M0 implementation report (2026-10-03)
 
@@ -2862,3 +2862,41 @@ cache; its refreshed `package/` is 146 MiB and remains useful for package valida
 worktree, virtual environment, repository `target/` or substantial `/tmp` artifact was created.
 The package script's transient empty working directory and smoke settings follow the existing
 short-lived temporary-file behavior. No Git repository or worktree was deleted.
+
+## M8 review decision (2026-10-05)
+
+Fresh independent review 2 is preserved verbatim in `docs/reviews/M8-review-2.md` (report commit
+`5e478df`). Decision: **GO WITH DOCUMENTED NON-BLOCKING DEBT**, with no new P0, P1 or P2.
+Review 1 P1-1 is closed: a separate probe using the production palette code reproduced all
+thirteen deficient old frames, then passed all 88 current frames. The repair preserves alpha,
+front markers and neutral materials. The reviewer inspected the complete cumulative M8 diff,
+not only the repair, and reproduced all five native captures and the contact sheet exactly.
+
+All required commands passed independently: formatting, Clippy, **419 tests (0 failed/ignored)**,
+release build, release/debug smoke600, benchmark, **3,168,000-tick soak**, and Apple Silicon
+packaging. The report records exact commands, timings, counts and their limits. In particular,
+ordinary smokes do not show enemy views; the palette regression and contact sheet establish
+the ownership correction. No simulation, balance-data, schema or dependency change occurred.
+
+Under PLAN.md section 12, the orchestrator accepts the review, merges `milestone/m8` into `main`
+and creates `m8-reviewed`. No remote push or user approval tag is made. Earlier documented debt
+remains; audio replacement, gameplay/release hardening and version 1.0 completion are subsequent
+work under the user's visual-first scope.
+
+### Requires user verification
+
+* Whether the original industrial art and terrain meet the requested Red Alert 2-inspired visual
+  direction; this pass does not claim final artistic acceptance.
+* Building/unit readability, team identification during combat, and menu/sidebar comfort at the
+  user's preferred window sizes and zoom levels.
+* Earlier pending human-playability acceptance and final audio acceptance remain outstanding.
+
+### Retained external artifacts
+
+The configured `/Users/xingyuwang/Library/Caches/Codex/cargo-target` holds reusable builds and
+the tested app/zip (about 35 GiB total); the former ignored repository cache was moved there,
+not duplicated. The four evidence directories under
+`/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/` remain useful for reproducibility and
+user verification: `m8` (96 KiB), `m8-review-1` (4.2 MiB), `m8-remediation-1` (6.4 MiB), and
+`m8-review-2` (about 124 MiB, including its independent probe executable). No clone/worktree or
+substantial temporary-directory artifact was created. The user's untracked handoff is untouched.
