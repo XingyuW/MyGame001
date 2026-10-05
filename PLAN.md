@@ -245,3 +245,25 @@ A milestone fails, and work stops for user input, when any of the following hold
 5. Section 9 gains the command `cargo run -p game -- --smoke-test 600` (debug profile).
 
 Where this section conflicts with sections 1 to 11, this section prevails.
+
+## 13. M8: visual polish first (user scope decision, 2026-10-04)
+
+The user requested continuation from `docs/HANDOFF.md`, rejected the current art and audio as final,
+and asked for an attractive original presentation reminiscent of Red Alert 2. When offered a full
+finishing milestone or visual polish first, the user chose **"Focus on visual polish first"**.
+This section authorizes that narrower follow-up milestone; it does not claim version 1.0 complete.
+
+Scope: replace the placeholder presentation with detailed original isometric buildings and units,
+cohesive terrain, and a polished military command interface and skirmish menu. Preserve game rules,
+data schemas, controls, deterministic simulation, checked asset loading, and existing tests. Extend
+the existing repository-native asset generators where practical. Record all asset provenance.
+Audio replacement and the broader handoff defect/packaging backlog are subsequent work, not M8.
+
+Acceptance: all shipped factions and maps use the new presentation; building roles and unit
+facings remain legible; the sidebar and menus remain usable; the real game and its smoke tests run
+with the new assets. Run the existing validation commands and independent review cycle of sections
+9, 10, and 12. Visual quality remains **requires user verification**, never automatic approval.
+
+Platform requirement is Apple Silicon macOS only. The existing generic unit and building names
+are accepted by the user. Collecting Rust-crate notices is not a user-requested release criterion;
+existing asset/font notices remain. These decisions do not change dependency licences.

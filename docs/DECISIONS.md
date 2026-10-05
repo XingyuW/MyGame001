@@ -801,3 +801,20 @@ The user approved the following changes to `PLAN.md`, applied verbatim in one co
 3. New section 12, "Orchestrated workflow and amendments": an orchestrator session may run the cycle of section 10 with a fresh subagent per implementation, review, and remediation step; a GO or GO WITH DOCUMENTED NON-BLOCKING DEBT decision leads to a merge and the tag `mN-reviewed` without waiting for the user; items that only the user can verify are listed in `docs/STATUS.md`, are not review findings, and block only the user's tag `mN-approved`; version 1.0 targets macOS only; new invariants I11 (external files handed to third party parsers or renderers are restricted to an explicitly listed supported subset, with a typed error before the hand off) and I12 (overflow-prone simulation arithmetic uses explicit checked, saturating, or wrapping operations). Section 12 prevails over sections 1 to 11 where they conflict.
 
 No other part of `PLAN.md` was changed.
+
+### U3 (2026-10-04): continuation, visual polish first
+
+The user asked to read the handoff and continue toward completion, specified Apple Silicon Mac
+only, accepted the existing generic names that also occur in Command & Conquer, made collection
+of Rust-crate notices optional as a requested deliverable, and said the existing generated art and
+audio are not final: the game should look visually good and resemble Red Alert 2.
+
+Asked explicitly to approve an M8 amendment covering either the whole finishing backlog or visual
+polish first, the user selected **"Focus on visual polish first"**. PLAN.md section 13 records this
+approved narrower scope. M8 changes presentation; audio, remaining gameplay debt, signing, and
+release completion remain outstanding. Existing asset/font notices are preserved. The requested
+look uses original designs, with no downloaded game media.
+
+The user's question about match setup was answered: D11/D40 initialize the world directly before
+tick 0, while player and AI gameplay actions use CommandQueue. M8 does not change that boundary.
+No milestone approval tag or remote push is implied by this scope decision.
