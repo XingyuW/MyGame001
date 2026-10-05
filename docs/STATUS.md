@@ -10,6 +10,7 @@
 | M5: Interface and audio | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 5 P2); merged into `main`. Awaiting user verification for `m5-approved` | `milestone/m5` | `m5-reviewed` |
 | M6: Skirmish AI and game flow | **Reviewed**: review 2 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 2 P2) after review 1 NO-GO; merged into `main`. Awaiting user verification for `m6-approved` | `milestone/m6` | `m6-reviewed` |
 | M7: Content, balance, performance, and packaging | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 6 P2); merged into `main`. Awaiting user verification for `m7-approved` | `milestone/m7` | `m7-reviewed` |
+| M8: Visual polish first | **Implemented and validated**, independent review pending; visual quality requires user verification | `milestone/m8` | — |
 
 ## M0 implementation report (2026-10-03)
 
@@ -2639,3 +2640,106 @@ One independent review round (`docs/reviews/M7-review-1.md`: GO WITH DOCUMENTED 
    * Confirm that these generic names are acceptable.
 5. The earlier pending items (13 for M6, 16 for M5, 9 for M4, 10 for M3, 7 for M2, 5 for M1). With M7 data the starting setup differs from what they describe (STATUS M7 report, last paragraph).
 
+
+
+## M8 implementation report (2026-10-04)
+
+Scope: PLAN.md section 13 and user decision U3. Implementation commit `3e302c2` replaces the
+placeholder presentation with original industrial pixel art; game rules and production data are
+unchanged. This is the visual-first follow-up, not completion of version 1.0 or user approval.
+
+### Files changed
+
+* Four existing Rust generators plus `examples/art/painter.rs` and `art/terrain.rs`: eight
+  distinct industrial buildings, eleven shaded unit sheets, and the three shipped tilesets.
+  All 22 generated PNGs retain their sizes and existing PNG/geometry/facing contracts.
+* `presentation.rs`, `units.rs`, `buildings.rs`, `skirmish.rs`: checked sprite decoding and
+  material-preserving team paint variants; menu sprite lineup, title hierarchy and DEPLOY label.
+* `sidebar.rs`: compact two-column sprite cards, costs/badges/progress, military colors and borders.
+* `visual_review.rs`, `main.rs`: opt-in native renderer capture mode with ordinary shipped starts
+  and a separately labelled developed-base setup; five captures under `docs/screenshots/`.
+* `scripts/package_macos.sh`: respect the configured Cargo target directory for executable and
+  output paths. README, asset provenance and DECISIONS D58–D60 document these changes.
+
+### Validation
+
+The first mandatory Clippy attempt exited 101 on two style lints: an orphaned generator doc
+comment and `chunks_exact_mut(4)` instead of `as_chunks_mut::<4>().0`. Both were reported, then
+corrected within the authorized scope; the final Clippy rerun exited 0. No lint was suppressed.
+During normal development, the scout facing-marker test caught an occluded back-facing marker;
+the generator was corrected and all original facing assertions pass unchanged. Native menu
+execution caught a duplicate TextColor bundle; an executable ECS spawn regression was added.
+The first developed-base capture also revealed that extending a shared starting faction extended
+the opponent; the isolated review setup now uses different factions and has a valid-match
+regression. These development failures are resolved, not omitted from the record.
+
+The full suite was rerun after adding that last regression. Logs are retained at
+`/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/m8/`.
+
+| Command | Exit | Evidence |
+|---------|------|----------|
+| `cargo fmt --all -- --check` | 0 | Final tree clean. |
+| `cargo clippy --workspace --all-targets -- -D warnings` | 0 | Final rerun clean. |
+| `cargo test --workspace` | 0 | 417 passed, 0 failed, 0 ignored; 186.53 s. `workspace-tests.log`. |
+| `cargo build --release -p game` | 0 | Optimized Apple Silicon build. |
+| `cargo run --release -p game -- --smoke-test 600` | 0 | `release-smoke.log`; native GPU/display available. |
+| `cargo run -p game -- --smoke-test 600` | 0 | `debug-smoke.log`; native GPU/display available. |
+| `cargo run --release -p sim --example m7_benchmark` | 0 | Fixture mean/busy/max 0.081/0.262/0.857 ms; shipped 0.159/0.367/0.908 ms; peak heap 0.6 MiB. `benchmark.log`. |
+| `cargo run --release -p sim --example m7_soak` | 0 | 3,168,000 ticks, 44 configurations twice, 151.5 s, peak heap 1.6 MiB; all checks passed. `soak.log`. |
+| `sh scripts/package_macos.sh` | 0 | `package.log`; packaged binary smoke passed, app and zip in configured target/package. |
+| Native visual review mode | 0 | All five screenshots captured, covering all shipped maps and both factions. |
+
+The known M0 debug linker `__eh_frame` warning and occasional winit `Skipped event Destroyed`
+shutdown warning remain. Default logging is WARN, so successful smoke logs are quiet; exit codes
+are the pass evidence. No existing test was deleted, skipped or weakened. Three focused tests
+were added: team paint preservation, executable menu spawning and diagnostic base validity.
+
+### Acceptance and evidence
+
+| M8 criterion | Evidence/status |
+|--------------|-----------------|
+| All shipped factions/maps use new art | All 11 unit sheets, 8 buildings and 3 tilesets regenerated; unchanged reproducibility and PNG tests. Native captures of demo/Vanguard, Crossroads/Meridian and Riverlands/Vanguard. |
+| Building roles and facings remain legible | Distinct crane, stacks/fans, tanks/pipes, barracks, vehicle bay, radar and defenses; unchanged footprint/facing tests pass. Artistic legibility **requires user verification**. |
+| Sidebar and menu remain usable | Existing button-effect and roster tests retained; menu spawn regression; mandatory smokes check UI bounds and buttons. Default 1280 × 720 logical window inspected in native captures. Other sizes and interaction comfort **require user verification**. |
+| Real game runs with the new assets | Release/debug smoke600 and packaged smoke passed; native renderer captures saved. |
+| Original art and checked loading | assets/LICENSES.md and D58–D59; no third-party game media, dependency changes or schema changes. |
+| Independent review | Pending fresh reviewer against `m7-reviewed`; implementer is not the approver. |
+
+### Deviations, retained debt and remaining work
+
+The packaging change is limited to the configured Cargo output path, needed to run the existing
+mandatory package validation without overriding the user's cache policy. The visual diagnostic
+mode is a review aid and creates its developed base through pre-tick match setup. Both are
+recorded in D60. No audio, gameplay, balance, AI, input semantics or production definitions changed.
+
+All prior gameplay, hostile-file, benchmark-evidence, smoke-map-coverage, documentation and
+packaging debt remains carried from the M7 review decision. The optional review captures do not
+fix the normal smoke flow's map-0-only coverage. Bundle signing/notarisation is still outstanding;
+crate notices are not a user-requested criterion (U3), and asset/font notices still ship. Existing
+generic names and Apple Silicon-only support were accepted in U3. The original synthesised audio
+remains nonfinal. User milestone acceptance tags and remote pushing remain outstanding.
+
+This art pass retains static eight-facing sprites, one texture per terrain type and the fixed
+sprite dimensions. It improves the original placeholder presentation; it does not claim parity
+with any commercial game's artwork. Further art direction and visual/audio final acceptance are
+the user's. Tiny resize behavior outside the default window has not been visually approved.
+
+### Requires user verification
+
+Inspect `docs/screenshots/m8-menu.png`, `m8-match.png`, `m8-base-review.png`,
+`m8-crossroads-meridian.png` and `m8-riverlands-vanguard.png`, then play the release build. The base
+review image is explicitly a diagnostic developed setup; the other match images are shipped starts.
+Confirm the industrial art direction, military vehicles/infantry and terrain suit the requested
+look; blue/red ownership accents remain clear in combat; icons, text, queue progress and placement
+are comfortable at the window sizes and zoom levels you use. Existing earlier playability and
+final audio verification remain pending. No `m8-approved` tag has been created.
+
+### Storage
+
+No repository clone or Git worktree was created. The orchestrator moved the existing ignored
+32 GB target cache to the already configured `/Users/xingyuwang/Library/Caches/Codex/cargo-target`;
+it remains necessary for build reuse and contains the new app/zip under `package/`. Validation
+logs in `/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/m8` remain useful for independent
+review. No substantial artifact was created under `/tmp`; the existing tiny disposable fixture
+and smoke-settings files follow the prior test paths. `docs/HANDOFF.md` remains untouched and
+untracked user material.
