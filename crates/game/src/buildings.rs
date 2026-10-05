@@ -27,7 +27,7 @@ use crate::map::MapView;
 use crate::projection::{TileSize, to_world};
 use crate::sim_host::SimHost;
 use crate::tileset_image::{TilesetImageError, TilesetImageErrorKind, check_png_file};
-use crate::units::{HUMAN, owner_colour};
+use crate::units::HUMAN;
 
 /// The economy file, relative to the asset directory.
 pub const ECONOMY_PATH: &str = "data/economy.ron";
@@ -62,7 +62,10 @@ impl Plugin for BuildingsPlugin {
 
 /// The sprite of each building type.
 #[derive(Resource, Debug, Default)]
-pub struct BuildingSprites(pub BTreeMap<BuildingKind, Handle<Image>>);
+pub struct BuildingSprites(
+    pub BTreeMap<BuildingKind, Handle<Image>>,
+    pub BTreeMap<BuildingKind, Handle<Image>>,
+);
 
 /// The view entity of each simulation building.
 #[derive(Resource, Debug, Default)]
@@ -209,7 +212,12 @@ pub(crate) fn spawn_building_views(
         if views.0.contains_key(id) {
             continue;
         }
-        let Some(image) = sprites.0.get(&component.kind) else {
+        let team = if owner.0 == HUMAN {
+            &sprites.0
+        } else {
+            &sprites.1
+        };
+        let Some(image) = team.get(&component.kind) else {
             continue;
         };
         let position = sprite_position(component.footprint, map.tile);
@@ -218,7 +226,7 @@ pub(crate) fn spawn_building_views(
                 BuildingView { building, id: *id },
                 Sprite {
                     image: image.clone(),
-                    color: owner_colour(owner.0),
+                    color: Color::WHITE,
                     ..default()
                 },
                 Transform::from_translation(position.extend(building_depth(component.footprint))),

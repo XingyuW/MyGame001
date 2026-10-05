@@ -3,7 +3,8 @@
 # M7: "release builds"; docs/DECISIONS.md D54).
 #
 # Run from anywhere: `sh scripts/package_macos.sh [frames]` (frames of the smoke test, default 600).
-# Output: target/package/MyGame001.app and target/package/MyGame001-macos.zip.
+# Output: $CARGO_TARGET_DIR/package/MyGame001.app and MyGame001-macos.zip
+# (target/package when CARGO_TARGET_DIR is unset).
 #
 # The executable finds its assets next to itself: Bevy reads the asset directory from
 # BEVY_ASSET_ROOT, then CARGO_MANIFEST_DIR, then the executable's directory (docs/DECISIONS.md D1),
@@ -20,11 +21,13 @@ cd "$root"
 
 cargo build --release -p game
 
-out="$root/target/package"
+build_target="${CARGO_TARGET_DIR:-$root/target}"
+case "$build_target" in /*) ;; *) build_target="$root/$build_target" ;; esac
+out="$build_target/package"
 app="$out/MyGame001.app"
 rm -rf "$app" "$out/MyGame001-macos.zip"
 mkdir -p "$app/Contents/MacOS"
-cp "$root/target/release/game" "$app/Contents/MacOS/MyGame001"
+cp "$build_target/release/game" "$app/Contents/MacOS/MyGame001"
 cp -R "$root/assets" "$app/Contents/MacOS/assets"
 cp "$root/README.md" "$app/Contents/MacOS/README.md"
 version="$(sed -n 's/^version = "\(.*\)"$/\1/p' "$root/Cargo.toml" | head -n 1)"

@@ -75,7 +75,10 @@ impl Plugin for UnitsPlugin {
 
 /// The sprite sheet of each unit type.
 #[derive(Resource, Debug, Default)]
-pub struct UnitSprites(pub BTreeMap<UnitKind, Handle<Image>>);
+pub struct UnitSprites(
+    pub BTreeMap<UnitKind, Handle<Image>>,
+    pub BTreeMap<UnitKind, Handle<Image>>,
+);
 
 /// The view entity of each simulation unit.
 #[derive(Resource, Debug, Default)]
@@ -239,15 +242,6 @@ pub fn load_match_data(
     ))
 }
 
-/// Colour that tints the light grey sprites of a player's units.
-pub fn owner_colour(owner: PlayerId) -> Color {
-    if owner == HUMAN {
-        Color::srgb(0.55, 0.75, 1.0)
-    } else {
-        Color::srgb(1.0, 0.5, 0.45)
-    }
-}
-
 /// The region of the sprite sheet that shows `facing`.
 pub fn facing_rect(facing: Direction) -> Rect {
     let left = f32::from(facing.index()) * FRAME_SIZE as f32;
@@ -292,7 +286,12 @@ pub(crate) fn spawn_unit_views(
         if views.0.contains_key(id) {
             continue;
         }
-        let Some(image) = sprites.0.get(&kind.kind) else {
+        let team = if owner.0 == HUMAN {
+            &sprites.0
+        } else {
+            &sprites.1
+        };
+        let Some(image) = team.get(&kind.kind) else {
             continue;
         };
         let view = commands
@@ -307,7 +306,7 @@ pub(crate) fn spawn_unit_views(
                 Sprite {
                     image: image.clone(),
                     rect: Some(facing_rect(facing.0)),
-                    color: owner_colour(owner.0),
+                    color: Color::WHITE,
                     ..default()
                 },
                 Transform::default(),
