@@ -22,7 +22,7 @@ use std::path::PathBuf;
 
 #[path = "gen_spike_tileset.rs"]
 #[allow(dead_code)]
-mod spike_tileset;
+pub(crate) mod spike_tileset;
 
 /// Width and height of one frame in pixels.
 pub const FRAME: u32 = 64;
@@ -241,6 +241,10 @@ fn frame_pixel(kind: &SpriteKind, facing: (i32, i32), x: u32, y: u32) -> Option<
                     [70, 70, 70, 255]
                 } else if between {
                     [44, 54, 51, 255]
+                } else if (-0.22..=-0.12).contains(&along) {
+                    // Identification band on the visible rack itself: the rack hides the
+                    // hull panels in rear views. Keep the tube seams and mouths unpainted.
+                    [42, 133, 202, 255]
                 } else {
                     [185, 180, 140, 255]
                 });
@@ -391,7 +395,8 @@ fn infantry_pixel(
             return Some(if lift < 11.0 {
                 [180, 146, 104, 255]
             } else {
-                [107, 119, 78, 255]
+                // Shoulder identification panels wrap around the upper sleeve.
+                [42, 133, 202, 255]
             });
         }
         if (16.0..=20.0).contains(&lift) && disc(0.07, 0.0) {
@@ -402,12 +407,19 @@ fn infantry_pixel(
             });
         }
         if pack && (8.0..=14.0).contains(&lift) && disc(0.06, -0.09) {
-            return Some([91, 89, 60, 255]);
+            return Some(if lift >= 11.0 {
+                // The upper pack panel continues the tunic's rear identification yoke.
+                [28, 119, 188, 255]
+            } else {
+                [91, 89, 60, 255]
+            });
         }
         if (6.0..16.0).contains(&lift) && disc(if lift > 12.0 { 0.10 } else { 0.08 }, 0.0) {
             return Some(if lift < 9.0 {
                 [70, 84, 54, 255]
-            } else if along > 0.025 {
+            } else if along > 0.025 || lift >= 11.0 {
+                // Upper tunic paint wraps over the shoulders and back, where front-only
+                // paint disappeared. The lower olive uniform and equipment stay neutral.
                 [42, 133, 202, 255]
             } else {
                 [104, 121, 79, 255]

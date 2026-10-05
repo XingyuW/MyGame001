@@ -882,3 +882,39 @@ ignored 32 GB repository target cache to `/Users/xingyuwang/Library/Caches/Codex
 which remains the configured target; no clone or worktree was created or removed. Validation
 logs live in `/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/m8`. Both are retained for
 build reuse and independent review. No substantial artifact was created under `/tmp`.
+
+### D61. Team identification survives equipment occlusion in every facing
+
+M8 review 1 P1-1 is confirmed: front-only infantry tunic paint and hull panels hidden beneath
+the rocket rack left five north-west frames with zero ownership pixels, and eight infantry
+west/north frames with only four. The remediation changes only authored colors on existing
+surfaces. Infantry have a wraparound upper tunic and shoulder panels; backpack upper panels
+continue that identification area in a slightly darker blue. Rocket tubes carry a transverse
+paint band, retaining their neutral seams and forward mouths. The production selective palette
+transform and white sprite tint are unchanged; whole-sprite tint is not restored.
+
+`m8_team_paint` passes checked committed PNG bytes through the actual production `sprite_pair`
+(and thus `team_pixel`) and verifies equality with generated pixels. Each of all eleven units'
+eight facings must contain at least ten opaque, changed team pixels: the established minimum
+of the unaffected scout. An explicit authored palette independently checks every nonpaint pixel
+and all alpha values remain identical between teams. The new test first failed on all thirteen
+subthreshold frames before the art change, then passed; existing facing and geometry assertions
+remain unchanged. Repaired infantry have 54–86 team pixels per frame; the rocket launcher's
+minimum is 24. A separate comparison against `1a67c58` confirms every sheet's alpha and front
+markers are unchanged and only uniform, backpack and rocket-tube surface colors were altered.
+
+`cargo run -p game --example team_paint_review -- /existing/output.png` creates a deterministic
+normal-scale contact sheet through the checked production decoder/palette. Rows follow the
+generator roster (light tank, scout, harvester, rifleman, conscript, rocket soldier, grenadier,
+raider, heavy tank, artillery, rocket launcher); columns follow E, SE, S, SW, W, NW, N, NE, with
+friendly left and enemy right in each pair. The committed `docs/screenshots/m8-team-paint-1x.png`
+shows all 88 pairs at their native 64-pixel frame size. Inspection confirms visible rear patches
+with neutral equipment, shadows and silhouettes; the user's judgment of combat readability and
+artistic quality remains required. Existing native captures are refreshed after regeneration.
+
+This bounded correction adds no dependency, schema, simulation, audio or control changes.
+Remediation logs and repeatable comparison evidence are retained in
+`/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/m8-remediation-1`; configured build/package
+outputs remain in the existing Cargo cache. The first Clippy attempt caught a duplicate PNG
+encoder module import in the contact-sheet example; reusing the generator's existing module
+resolved it without a lint suppression. Final validation results are recorded in STATUS.
