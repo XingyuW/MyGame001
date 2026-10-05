@@ -801,3 +801,120 @@ The user approved the following changes to `PLAN.md`, applied verbatim in one co
 3. New section 12, "Orchestrated workflow and amendments": an orchestrator session may run the cycle of section 10 with a fresh subagent per implementation, review, and remediation step; a GO or GO WITH DOCUMENTED NON-BLOCKING DEBT decision leads to a merge and the tag `mN-reviewed` without waiting for the user; items that only the user can verify are listed in `docs/STATUS.md`, are not review findings, and block only the user's tag `mN-approved`; version 1.0 targets macOS only; new invariants I11 (external files handed to third party parsers or renderers are restricted to an explicitly listed supported subset, with a typed error before the hand off) and I12 (overflow-prone simulation arithmetic uses explicit checked, saturating, or wrapping operations). Section 12 prevails over sections 1 to 11 where they conflict.
 
 No other part of `PLAN.md` was changed.
+
+### U3 (2026-10-04): continuation, visual polish first
+
+The user asked to read the handoff and continue toward completion, specified Apple Silicon Mac
+only, accepted the existing generic names that also occur in Command & Conquer, made collection
+of Rust-crate notices optional as a requested deliverable, and said the existing generated art and
+audio are not final: the game should look visually good and resemble Red Alert 2.
+
+Asked explicitly to approve an M8 amendment covering either the whole finishing backlog or visual
+polish first, the user selected **"Focus on visual polish first"**. PLAN.md section 13 records this
+approved narrower scope. M8 changes presentation; audio, remaining gameplay debt, signing, and
+release completion remain outstanding. Existing asset/font notices are preserved. The requested
+look uses original designs, with no downloaded game media.
+
+The user's question about match setup was answered: D11/D40 initialize the world directly before
+tick 0, while player and AI gameplay actions use CommandQueue. M8 does not change that boundary.
+No milestone approval tag or remote push is implied by this scope decision.
+
+## M8 (2026-10-04): visual polish first
+
+### D58. Original industrial art with stable geometry
+
+The existing Rust generators now draw eight distinct industrial buildings: a gantry construction
+yard, twin-stack power plant with cooling fans, tank-and-pipe refinery, barracks with watch post,
+factory with open vehicle bay and roof lights, radar technology center, gun turret and missile
+rack. Shared `examples/art/painter.rs` supplies deterministic raster polygons, cylinders, beams,
+subtle surface grain and isometric blocks. Unit sheets retain 64 × 64 frames and eight facings;
+raised hulls, tracks, turrets, grilles, team panels, infantry equipment and shadows replace the
+old flat grayscale shapes. `examples/art/terrain.rs` gives all three shipped maps the same muted
+temperate palette, mineral clusters, rippled water and faceted stone, without the old heavy grid
+outline. No map cell, terrain flag, definition, balance value, schema or simulation rule changed.
+
+The old geometry tests remain unchanged: footprint corners, 32-pixel wall/image convention,
+64-pixel unit frames and ground anchor, PNG subset, reproducibility, and front-pixel direction
+centroids all pass. North antenna tips preserve the building top anchor. The asset provenance is
+in `assets/LICENSES.md`; no external game media was imported. The user must still judge visual
+quality and whether this first polish pass approaches the requested style sufficiently.
+
+### D59. Team paint and military command interface
+
+Sprites use natural material colors. At startup, only the already checked PNG bytes are decoded
+through the pinned Bevy 0.19.1 `Image::from_buffer`; the human and opponent images are inserted
+into `Assets<Image>` once. The opponent variant recolors the authored blue paint range to red,
+preserving luminance differences and alpha; all other pixels retain their materials. Both views
+use white sprite tint, so concrete and metal no longer wash into the player's color. Decode
+failure names the checked sprite path and exits with an error. The disk file is never reopened,
+so the existing checked-input boundary remains intact. This supersedes D20/D27's whole-sprite
+tint and asset-server registration for sprite PNGs; maps retain the checked asset reader.
+
+The sidebar uses a two-column grid of sprite icons, names, costs, lock/progress badges and queue
+bars. Its 240-pixel width and input bounds remain unchanged. Buttons retain the same effects and
+hotkeys. The menu retains the product name, adds an original sprite lineup and military section
+labels, and labels Start as DEPLOY. The main sidebar and menu were inspected in native renderer
+captures at the default 1280 × 720 logical resolution (2560 × 1440 physical pixels). Usability at
+other user-selected window sizes and visual preferences still require user verification.
+
+API evidence: the local pinned `bevy_image-0.19.1/src/image.rs` (`Image::from_buffer`, `data`),
+`bevy_ui-0.19.1/src/widget/image.rs` (`ImageNode::with_rect`), and
+`bevy_render-0.19.1/src/view/window/screenshot.rs` (`Screenshot::primary_window`, `save_to_disk`).
+No dependency or toolchain changes. Palette regression tests preserve steel/glass/facing-marker
+pixels and alpha; the menu has an executable ECS spawn regression after a duplicate TextColor
+bundle was caught during development.
+
+### D60. Native visual review and configured build directory
+
+`MYGAME_VISUAL_REVIEW=/existing/directory cargo run -p game` is an explicit diagnostic mode,
+ignored during smoke tests. It saves five native renderer captures and exits: menu, ordinary demo
+start, a labelled developed-base setup, Crossroads with Meridian, and Riverlands with Vanguard.
+The developed base is installed through the existing pre-tick match setup using a cloned
+catalogue; the production catalogue is restored immediately afterward. No running simulation is
+mutated. A regression test verifies the developed setup is valid and the opponent's starting
+faction is not extended. It is a visual inspection aid, not proof of gameplay completion.
+
+The packaging script minimally follows `CARGO_TARGET_DIR` for its executable and output package
+instead of hardcoding the repository's target tree; the unset default remains `target/`. This is
+required to validate this milestone with the user's configured external Cargo cache. Signing,
+notarisation and the wider packaging backlog remain outside M8. The orchestrator moved the old
+ignored 32 GB repository target cache to `/Users/xingyuwang/Library/Caches/Codex/cargo-target`,
+which remains the configured target; no clone or worktree was created or removed. Validation
+logs live in `/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/m8`. Both are retained for
+build reuse and independent review. No substantial artifact was created under `/tmp`.
+
+### D61. Team identification survives equipment occlusion in every facing
+
+M8 review 1 P1-1 is confirmed: front-only infantry tunic paint and hull panels hidden beneath
+the rocket rack left five north-west frames with zero ownership pixels, and eight infantry
+west/north frames with only four. The remediation changes only authored colors on existing
+surfaces. Infantry have a wraparound upper tunic and shoulder panels; backpack upper panels
+continue that identification area in a slightly darker blue. Rocket tubes carry a transverse
+paint band, retaining their neutral seams and forward mouths. The production selective palette
+transform and white sprite tint are unchanged; whole-sprite tint is not restored.
+
+`m8_team_paint` passes checked committed PNG bytes through the actual production `sprite_pair`
+(and thus `team_pixel`) and verifies equality with generated pixels. Each of all eleven units'
+eight facings must contain at least ten opaque, changed team pixels: the established minimum
+of the unaffected scout. An explicit authored palette independently checks every nonpaint pixel
+and all alpha values remain identical between teams. The new test first failed on all thirteen
+subthreshold frames before the art change, then passed; existing facing and geometry assertions
+remain unchanged. Repaired infantry have 54–86 team pixels per frame; the rocket launcher's
+minimum is 24. A separate comparison against `1a67c58` confirms every sheet's alpha and front
+markers are unchanged and only uniform, backpack and rocket-tube surface colors were altered.
+
+`cargo run -p game --example team_paint_review -- /existing/output.png` creates a deterministic
+normal-scale contact sheet through the checked production decoder/palette. Rows follow the
+generator roster (light tank, scout, harvester, rifleman, conscript, rocket soldier, grenadier,
+raider, heavy tank, artillery, rocket launcher); columns follow E, SE, S, SW, W, NW, N, NE, with
+friendly left and enemy right in each pair. The committed `docs/screenshots/m8-team-paint-1x.png`
+shows all 88 pairs at their native 64-pixel frame size. Inspection confirms visible rear patches
+with neutral equipment, shadows and silhouettes; the user's judgment of combat readability and
+artistic quality remains required. Existing native captures are refreshed after regeneration.
+
+This bounded correction adds no dependency, schema, simulation, audio or control changes.
+Remediation logs and repeatable comparison evidence are retained in
+`/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/m8-remediation-1`; configured build/package
+outputs remain in the existing Cargo cache. The first Clippy attempt caught a duplicate PNG
+encoder module import in the contact-sheet example; reusing the generator's existing module
+resolved it without a lint suppression. Final validation results are recorded in STATUS.

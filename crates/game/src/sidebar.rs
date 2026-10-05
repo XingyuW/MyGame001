@@ -328,16 +328,16 @@ pub fn button_colour(
     hovered: bool,
 ) -> Color {
     let base: (f32, f32, f32) = match button {
-        SidebarButton::Item(_) if status.ready => (0.55, 0.45, 0.1),
+        SidebarButton::Item(_) if status.ready => (0.39, 0.34, 0.15),
         SidebarButton::Item(_) if status.progress.is_some() || status.queued > 0 => {
-            (0.15, 0.3, 0.5)
+            (0.15, 0.27, 0.28)
         }
-        SidebarButton::Item(_) if !status.available => (0.13, 0.13, 0.15),
-        SidebarButton::Tab(shown) if shown == tab => (0.3, 0.4, 0.55),
+        SidebarButton::Item(_) if !status.available => (0.095, 0.12, 0.12),
+        SidebarButton::Tab(shown) if shown == tab => (0.30, 0.34, 0.24),
         SidebarButton::Sell if mode == InterfaceMode::Sell => (0.55, 0.2, 0.15),
         SidebarButton::Rally if mode == InterfaceMode::Rally => (0.2, 0.5, 0.25),
         SidebarButton::Pause if paused => (0.6, 0.45, 0.1),
-        _ => (0.24, 0.26, 0.3),
+        _ => (0.16, 0.21, 0.20),
     };
     let lift = if hovered { 0.08 } else { 0.0 };
     Color::srgb(base.0 + lift, base.1 + lift, base.2 + lift)
@@ -396,11 +396,13 @@ fn button(kind: SidebarButton, width: Val, height: f32) -> impl Bundle {
         Node {
             width,
             height: Val::Px(height),
+            flex_shrink: 0.0,
+            border: UiRect::all(Val::Px(1.0)),
             justify_content: JustifyContent::Center,
             align_items: AlignItems::Center,
             ..default()
         },
-        BackgroundColor(Color::srgb(0.24, 0.26, 0.3)),
+        BackgroundColor(Color::srgb(0.16, 0.21, 0.20)),
     )
 }
 
@@ -418,12 +420,13 @@ pub(crate) fn spawn_sidebar(mut commands: Commands, minimap: Option<Res<Minimap>
                 width: Val::Px(SIDEBAR_WIDTH),
                 flex_direction: FlexDirection::Column,
                 padding: UiRect::all(Val::Px(8.0)),
-                row_gap: Val::Px(5.0),
+                row_gap: Val::Px(3.0),
                 ..default()
             },
-            BackgroundColor(Color::srgba(0.07, 0.08, 0.1, 0.96)),
+            BackgroundColor(Color::srgb(0.075, 0.10, 0.10)),
         ))
         .with_children(|sidebar| {
+            sidebar.spawn(text("TACTICAL COMMAND / 01", 11.0));
             sidebar
                 .spawn((
                     MinimapNode,
@@ -447,8 +450,8 @@ pub(crate) fn spawn_sidebar(mut commands: Commands, minimap: Option<Res<Minimap>
                         BorderColor::all(Color::WHITE),
                     ));
                 });
-            sidebar.spawn((SidebarText::Credits, text("Credits", 18.0)));
-            sidebar.spawn((SidebarText::Power, text("Power", 14.0)));
+            sidebar.spawn((SidebarText::Credits, text("Credits", 17.0)));
+            sidebar.spawn((SidebarText::Power, text("Power", 12.0)));
             sidebar
                 .spawn(Node {
                     column_gap: Val::Px(4.0),
@@ -456,15 +459,16 @@ pub(crate) fn spawn_sidebar(mut commands: Commands, minimap: Option<Res<Minimap>
                 })
                 .with_children(|row| {
                     for (tab, label) in [(Tab::Buildings, "Buildings"), (Tab::Units, "Units")] {
-                        row.spawn(button(SidebarButton::Tab(tab), Val::Percent(50.0), 24.0))
+                        row.spawn(button(SidebarButton::Tab(tab), Val::Percent(50.0), 22.0))
                             .with_child(text(label, 13.0));
                     }
                 });
             sidebar.spawn((
                 ItemList,
                 Node {
-                    flex_direction: FlexDirection::Column,
-                    row_gap: Val::Px(3.0),
+                    flex_wrap: FlexWrap::Wrap,
+                    column_gap: Val::Px(4.0),
+                    row_gap: Val::Px(4.0),
                     ..default()
                 },
             ));
@@ -474,11 +478,11 @@ pub(crate) fn spawn_sidebar(mut commands: Commands, minimap: Option<Res<Minimap>
                     ..default()
                 })
                 .with_children(|row| {
-                    row.spawn(button(SidebarButton::Sell, Val::Percent(33.0), 24.0))
+                    row.spawn(button(SidebarButton::Sell, Val::Percent(33.0), 22.0))
                         .with_child(text("Sell", 13.0));
-                    row.spawn(button(SidebarButton::Rally, Val::Percent(33.0), 24.0))
+                    row.spawn(button(SidebarButton::Rally, Val::Percent(33.0), 22.0))
                         .with_child(text("Rally", 13.0));
-                    row.spawn(button(SidebarButton::Pause, Val::Percent(33.0), 24.0))
+                    row.spawn(button(SidebarButton::Pause, Val::Percent(33.0), 22.0))
                         .with_child((SidebarText::PauseLabel, text("Pause", 13.0)));
                 });
             for channel in [Channel::Master, Channel::Music, Channel::Effects] {
@@ -492,7 +496,7 @@ pub(crate) fn spawn_sidebar(mut commands: Commands, minimap: Option<Res<Minimap>
                         row.spawn(button(
                             SidebarButton::Volume(channel, false),
                             Val::Px(24.0),
-                            20.0,
+                            16.0,
                         ))
                         .with_child(text("-", 13.0));
                         row.spawn((
@@ -506,15 +510,15 @@ pub(crate) fn spawn_sidebar(mut commands: Commands, minimap: Option<Res<Minimap>
                         row.spawn(button(
                             SidebarButton::Volume(channel, true),
                             Val::Px(24.0),
-                            20.0,
+                            16.0,
                         ))
                         .with_child(text("+", 13.0));
                     });
             }
             sidebar
-                .spawn(button(SidebarButton::Mute, Val::Percent(100.0), 20.0))
+                .spawn(button(SidebarButton::Mute, Val::Percent(100.0), 18.0))
                 .with_child((SidebarText::MuteLabel, text("Mute", 13.0)));
-            sidebar.spawn((SidebarText::Mode, text("", 12.0)));
+            sidebar.spawn((SidebarText::Mode, text("", 10.0)));
         });
     commands
         .spawn((
@@ -536,6 +540,8 @@ pub(crate) fn spawn_sidebar(mut commands: Commands, minimap: Option<Res<Minimap>
 fn populate_items(
     mut commands: Commands,
     host: Res<SimHost>,
+    buildings: Option<Res<crate::buildings::BuildingSprites>>,
+    units: Option<Res<crate::units::UnitSprites>>,
     lists: Query<(Entity, Option<&Children>), With<ItemList>>,
 ) {
     let Some(definitions) = host.definitions() else {
@@ -551,37 +557,80 @@ fn populate_items(
         }
         commands.entity(list).with_children(|list| {
             for &item in &menu {
+                let icon = match item {
+                    ProductionItem::Building(kind) => buildings
+                        .as_ref()
+                        .and_then(|s| s.0.get(&kind))
+                        .cloned()
+                        .map(ImageNode::new),
+                    ProductionItem::Unit(kind) => units
+                        .as_ref()
+                        .and_then(|s| s.0.get(&kind))
+                        .cloned()
+                        .map(|image| {
+                            ImageNode::new(image)
+                                .with_rect(crate::units::facing_rect(sim::Direction::ALL[0]))
+                        }),
+                };
                 list.spawn((
                     SidebarButton::Item(item),
                     Button,
                     Node {
-                        width: Val::Percent(100.0),
-                        height: Val::Px(30.0),
+                        width: Val::Px(110.0),
+                        height: Val::Px(64.0),
+                        flex_shrink: 0.0,
                         flex_direction: FlexDirection::Column,
+                        align_items: AlignItems::Center,
                         justify_content: JustifyContent::SpaceBetween,
-                        padding: UiRect::axes(Val::Px(6.0), Val::Px(3.0)),
+                        border: UiRect::all(Val::Px(1.0)),
+                        padding: UiRect::all(Val::Px(2.0)),
                         ..default()
                     },
-                    BackgroundColor(Color::srgb(0.24, 0.26, 0.3)),
+                    BorderColor::all(Color::srgb(0.27, 0.33, 0.31)),
+                    BackgroundColor(Color::srgb(0.12, 0.16, 0.16)),
                 ))
                 .with_children(|entry| {
+                    if let Some(icon) = icon {
+                        let icon_width = match item {
+                            ProductionItem::Building(kind) => {
+                                definitions.building(kind).map_or(45.0, |def| {
+                                    let (w, h) =
+                                        crate::buildings::sprite_size(def.width, def.height);
+                                    30.0 * w as f32 / h as f32
+                                })
+                            }
+                            ProductionItem::Unit(_) => 32.0,
+                        };
+                        entry.spawn((
+                            icon,
+                            Node {
+                                width: Val::Px(icon_width),
+                                height: Val::Px(30.0),
+                                ..default()
+                            },
+                        ));
+                    }
+                    let label = item_label(item, definitions);
+                    let (name, cost) = label.split_once("  ").unwrap_or((&label, ""));
+                    entry.spawn(text(name, 10.0));
                     entry
                         .spawn(Node {
+                            width: Val::Percent(100.0),
                             justify_content: JustifyContent::SpaceBetween,
                             ..default()
                         })
                         .with_children(|line| {
-                            line.spawn(text(item_label(item, definitions), 13.0));
-                            line.spawn((SidebarText::Badge(item), text("", 13.0)));
+                            line.spawn(text(cost, 10.0));
+                            line.spawn((SidebarText::Badge(item), text("", 10.0)));
                         });
                     entry
                         .spawn((
                             Node {
                                 width: Val::Percent(100.0),
-                                height: Val::Px(3.0),
+                                height: Val::Px(2.0),
                                 ..default()
                             },
-                            BackgroundColor(Color::srgb(0.1, 0.1, 0.12)),
+                            BackgroundColor(Color::srgb(0.05, 0.07, 0.07)),
                         ))
                         .with_child((
                             ItemProgress(item),
@@ -590,7 +639,7 @@ fn populate_items(
                                 height: Val::Percent(100.0),
                                 ..default()
                             },
-                            BackgroundColor(Color::srgb(0.3, 0.85, 0.35)),
+                            BackgroundColor(Color::srgb(0.78, 0.66, 0.28)),
                         ));
                 });
             }

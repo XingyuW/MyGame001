@@ -201,57 +201,8 @@ fn riverlands(x: i32, y: i32) -> u32 {
     GRASS
 }
 
-/// A small integer hash of a pixel, for the texture of the tiles.
-fn noise(tile: u32, x: u32, y: u32) -> u32 {
-    let mut h = tile
-        .wrapping_mul(0x9E37_79B9)
-        .wrapping_add(x.wrapping_mul(0x85EB_CA6B))
-        .wrapping_add(y.wrapping_mul(0xC2B2_AE35));
-    h ^= h >> 15;
-    h = h.wrapping_mul(0x2C1B_3C6D);
-    h ^= h >> 12;
-    h
-}
-
-fn shade(colour: [u8; 3], delta: i32) -> [u8; 3] {
-    colour.map(|c| (i32::from(c) + delta).clamp(0, 255) as u8)
-}
-
-/// The colour of pixel (x, y) of tile `tile`, inside its diamond.
-fn texture(tile: u32, x: u32, y: u32) -> [u8; 3] {
-    let base = TILES[tile as usize].colour;
-    let n = noise(tile, x, y);
-    match tile {
-        // Grass: blades of lighter and darker green.
-        GRASS => shade(base, (n % 21) as i32 - 10),
-        // Ore: dark ground with bright nuggets.
-        ORE => {
-            if n.is_multiple_of(7) {
-                shade(base, 50)
-            } else {
-                shade([120, 96, 52], (n % 15) as i32 - 7)
-            }
-        }
-        // Water: horizontal ripples.
-        WATER => {
-            if (y + (n % 3)).is_multiple_of(8) {
-                shade(base, 35)
-            } else {
-                shade(base, (n % 9) as i32 - 4)
-            }
-        }
-        // Rock: cracks.
-        ROCK => {
-            if n.is_multiple_of(11) {
-                shade(base, -40)
-            } else {
-                shade(base, (n % 25) as i32 - 12)
-            }
-        }
-        // Sand: fine grain.
-        _ => shade(base, (n % 13) as i32 - 6),
-    }
-}
+#[path = "art/terrain.rs"]
+mod terrain;
 
 /// RGBA pixels of the tileset, row-major: one 64×32 textured diamond per tile kind, with a darker
 /// outline.
@@ -273,11 +224,7 @@ pub fn tileset_pixels() -> (u32, u32, Vec<u8>) {
                 pixels.extend_from_slice(&[0, 0, 0, 0]);
                 continue;
             }
-            let colour = if distance > limit - 2 * TILE_WIDTH {
-                shade(TILES[tile as usize].colour, -45)
-            } else {
-                texture(tile, local, y)
-            };
+            let colour = terrain::pixel(tile, local, y);
             pixels.extend_from_slice(&colour);
             pixels.push(255);
         }
