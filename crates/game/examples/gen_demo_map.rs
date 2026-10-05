@@ -16,6 +16,9 @@ use std::path::PathBuf;
 #[allow(dead_code)]
 mod spike_tileset;
 
+#[path = "art/terrain.rs"]
+mod terrain;
+
 pub const SIDE: u32 = 64;
 pub const TILE_WIDTH: u32 = 64;
 pub const TILE_HEIGHT: u32 = 32;
@@ -112,10 +115,13 @@ pub fn tileset_pixels() -> (u32, u32, Vec<u8>) {
             let limit = TILE_WIDTH * TILE_HEIGHT;
             if distance > limit {
                 pixels.extend_from_slice(&[0, 0, 0, 0]);
-            } else if distance > limit - 2 * TILE_WIDTH {
-                pixels.extend(colour.iter().map(|c| c / 2));
-                pixels.push(255);
             } else {
+                let tile = x / TILE_WIDTH;
+                let colour = if tile < 5 {
+                    terrain::pixel(tile, x % TILE_WIDTH, y)
+                } else {
+                    colour
+                };
                 pixels.extend_from_slice(&colour);
                 pixels.push(255);
             }

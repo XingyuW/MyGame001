@@ -60,7 +60,12 @@ impl Plugin for SkirmishPlugin {
             .init_resource::<MenuSelection>()
             .init_resource::<LastMatch>()
             .add_systems(Startup, load_catalogue)
-            .add_systems(Startup, spawn_screens.after(crate::sidebar::spawn_sidebar))
+            .add_systems(
+                Startup,
+                spawn_screens
+                    .after(crate::sidebar::spawn_sidebar)
+                    .after(load_catalogue),
+            )
             .add_systems(
                 Update,
                 (screen_input, update_screens)
@@ -220,19 +225,42 @@ pub(crate) fn load_catalogue(world: &mut World) {
             return;
         }
     };
-    let server = world.resource::<AssetServer>().clone();
     let mut sprites = BuildingSprites::default();
     for sprite in buildings {
-        checked.insert(sprite.asset_path.clone(), sprite.bytes);
-        sprites
-            .0
-            .insert(sprite.kind, server.load(sprite.asset_path));
+        let pair = crate::presentation::sprite_pair(
+            &sprite.bytes,
+            &mut world.resource_mut::<Assets<Image>>(),
+        );
+        match pair {
+            Ok((human, enemy)) => {
+                sprites.0.insert(sprite.kind, human);
+                sprites.1.insert(sprite.kind, enemy);
+            }
+            Err(error) => {
+                error!("checked sprite {}: {error}", sprite.asset_path.display());
+                world.write_message(AppExit::error());
+                return;
+            }
+        }
     }
     world.insert_resource(sprites);
     let mut sprites = UnitSprites::default();
     for sheet in sheets {
-        checked.insert(sheet.asset_path.clone(), sheet.bytes);
-        sprites.0.insert(sheet.kind, server.load(sheet.asset_path));
+        let pair = crate::presentation::sprite_pair(
+            &sheet.bytes,
+            &mut world.resource_mut::<Assets<Image>>(),
+        );
+        match pair {
+            Ok((human, enemy)) => {
+                sprites.0.insert(sheet.kind, human);
+                sprites.1.insert(sheet.kind, enemy);
+            }
+            Err(error) => {
+                error!("checked sprite {}: {error}", sheet.asset_path.display());
+                world.write_message(AppExit::error());
+                return;
+            }
+        }
     }
     world.insert_resource(sprites);
     let selection = MenuSelection::initial(&catalogue);
@@ -643,16 +671,18 @@ fn screen_button(width: f32) -> impl Bundle {
         Node {
             width: Val::Px(width),
             height: Val::Px(32.0),
+            border: UiRect::all(Val::Px(1.0)),
             justify_content: JustifyContent::Center,
             align_items: AlignItems::Center,
             ..default()
         },
-        BackgroundColor(Color::srgb(0.24, 0.26, 0.3)),
+        BorderColor::all(Color::srgb(0.43, 0.46, 0.32)),
+        BackgroundColor(Color::srgb(0.16, 0.21, 0.20)),
     )
 }
 
 /// Spawns the menu (shown at first) and the end screen (hidden), above the sidebar.
-pub(crate) fn spawn_screens(mut commands: Commands) {
+pub(crate) fn spawn_screens(mut commands: Commands, sprites: Option<Res<BuildingSprites>>) {
     commands
         .spawn((
             MenuRoot,
@@ -668,13 +698,44 @@ pub(crate) fn spawn_screens(mut commands: Commands) {
                 row_gap: Val::Px(12.0),
                 ..default()
             },
-            BackgroundColor(Color::srgb(0.05, 0.06, 0.08)),
+            BackgroundColor(Color::srgb(0.055, 0.075, 0.078)),
             GlobalZIndex(10),
             FocusPolicy::Block,
         ))
         .with_children(|menu| {
+            menu.spawn(screen_text("FIELD OPERATIONS", 13.0));
             menu.spawn(screen_text("MyGame001", 44.0));
-            menu.spawn(screen_text("Skirmish against the computer", 18.0));
+            menu.spawn(screen_text("SKIRMISH COMMAND", 13.0));
+            menu.spawn((
+                Node {
+                    width: Val::Px(464.0),
+                    height: Val::Px(2.0),
+                    ..default()
+                },
+                BackgroundColor(Color::srgb(0.55, 0.47, 0.25)),
+            ));
+            if let Some(sprites) = &sprites {
+                menu.spawn(Node {
+                    column_gap: Val::Px(12.0),
+                    align_items: AlignItems::Center,
+                    ..default()
+                })
+                .with_children(|gallery| {
+                    for kind in [0, 1, 4, 5] {
+                        if let Some(image) = sprites.0.get(&sim::BuildingKind(kind)) {
+                            gallery.spawn((
+                                ImageNode::new(image.clone()),
+                                Node {
+                                    width: Val::Px(100.0),
+                                    height: Val::Px(68.0),
+                                    ..default()
+                                },
+                            ));
+                        }
+                    }
+                });
+            }
+            menu.spawn(screen_text("SELECT YOUR THEATER OF OPERATIONS", 11.0));
             for row in Row::ALL {
                 menu.spawn(Node {
                     column_gap: Val::Px(10.0),
@@ -704,7 +765,7 @@ pub(crate) fn spawn_screens(mut commands: Commands) {
                 });
             }
             menu.spawn((MenuButton::Start, screen_button(200.0)))
-                .with_child(screen_text("Start", 20.0));
+                .with_child(screen_text("DEPLOY", 20.0));
             menu.spawn((MenuButton::Options, screen_button(200.0)))
                 .with_child(screen_text("Options", 18.0));
             menu.spawn((MenuButton::Quit, screen_button(200.0)))
@@ -831,6 +892,16 @@ fn update_screens(
 
 #[cfg(test)]
 pub(crate) mod tests {
+    #[test]
+    fn menu_bundles_spawn_without_duplicate_components() {
+        let mut app = bevy::prelude::App::new();
+        app.add_plugins(bevy::prelude::MinimalPlugins)
+            .add_systems(bevy::prelude::Startup, super::spawn_screens);
+        app.update();
+        let mut buttons = app.world_mut().query::<&super::MenuButton>();
+        assert_eq!(buttons.iter(app.world()).count(), 11);
+    }
+
     use sim::PlayerId;
 
     use super::*;
