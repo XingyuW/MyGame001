@@ -18,6 +18,7 @@ mod hotkeys;
 mod map;
 mod minimap;
 mod options;
+mod presentation;
 mod projection;
 mod selection;
 mod sidebar;
@@ -26,6 +27,7 @@ mod skirmish;
 mod smoke;
 mod tileset_image;
 mod units;
+mod visual_review;
 
 use bevy::prelude::*;
 use bevy_ecs_tiled::prelude::TiledPlugin;
@@ -86,5 +88,10 @@ fn main() -> AppExit {
         app.add_plugins(smoke::SmokeTestPlugin { frames });
     }
 
+    if options.smoke_test_frames.is_none()
+        && let Some(directory) = std::env::var_os("MYGAME_VISUAL_REVIEW")
+    {
+        visual_review::enable(&mut app, std::path::PathBuf::from(directory));
+    }
     app.run()
 }

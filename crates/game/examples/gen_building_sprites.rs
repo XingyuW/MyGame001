@@ -5,14 +5,8 @@
 //! IEEE-exact arithmetic), and `crates/game/tests/m3_building_sprites.rs` checks that the
 //! committed files match it byte for byte.
 //!
-//! A building of `width` × `height` cells is drawn as a box standing on its footprint: the
-//! footprint's diamond (PLAN.md section 5, equation 7, with 64×32 pixel tiles) lifted by
-//! [`WALL_PX`] pixels as the roof, and the two walls that face the viewer below it. The image is
-//! `(width + height) × 32` pixels wide and `(width + height) × 16 + WALL_PX` pixels high; the
-//! footprint's diamond fills its lower part, so the image's centre lies `WALL_PX / 2` pixels above
-//! the footprint's centre. The roof carries `stripes` bands, and from M7 `cross` bands at right
-//! angles to them, so that the building types can be told apart, and the sprites are light grey so
-//! that the game can tint them with the owner's colour.
+//! Original industrial miniatures: concrete aprons, metal siding, gantry cranes, tanks,
+//! turbines and radar. Footprints and ground anchors retain the M3 geometry contract.
 
 use std::path::PathBuf;
 
@@ -22,19 +16,11 @@ mod spike_tileset;
 
 /// Height of the walls in pixels.
 pub const WALL_PX: u32 = 32;
-/// Tile size of the projection the sprites are drawn for.
-const HALF_WIDTH: f64 = 32.0;
-const HALF_HEIGHT: f64 = 16.0;
-
-/// A placeholder building sprite: its name (as named by `sprite` in `assets/data/economy.ron`),
-/// its footprint in cells, and the number of bands on its roof.
+/// An industrial building sprite: the name from `assets/data/economy.ron` and its footprint.
 pub struct BuildingSprite {
     pub name: &'static str,
     pub width: u8,
     pub height: u8,
-    stripes: u32,
-    /// Bands along u (M7; 0 for the buildings of M3 and M4, which are drawn as before).
-    cross: u32,
 }
 
 pub const SPRITES: [BuildingSprite; 8] = [
@@ -42,57 +28,41 @@ pub const SPRITES: [BuildingSprite; 8] = [
         name: "construction_yard",
         width: 3,
         height: 3,
-        stripes: 1,
-        cross: 0,
     },
     BuildingSprite {
         name: "power_plant",
         width: 2,
         height: 2,
-        stripes: 2,
-        cross: 0,
     },
     BuildingSprite {
         name: "refinery",
         width: 3,
         height: 3,
-        stripes: 3,
-        cross: 0,
     },
     BuildingSprite {
         name: "barracks",
         width: 2,
         height: 2,
-        stripes: 0,
-        cross: 0,
     },
     BuildingSprite {
         name: "war_factory",
         width: 3,
         height: 3,
-        stripes: 4,
-        cross: 0,
     },
     BuildingSprite {
         name: "gun_turret",
         width: 1,
         height: 1,
-        stripes: 1,
-        cross: 0,
     },
     BuildingSprite {
         name: "tech_center",
         width: 2,
         height: 2,
-        stripes: 1,
-        cross: 1,
     },
     BuildingSprite {
         name: "rocket_tower",
         width: 1,
         height: 1,
-        stripes: 0,
-        cross: 2,
     },
 ];
 
@@ -106,74 +76,238 @@ pub fn output_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets/sprites/buildings")
 }
 
-/// The point (u, v) of the footprint, in cells from its top corner, that the pixel (x, y) shows
-/// when the footprint is lifted by `lift` pixels (inverse of equation 7).
-fn footprint_point(sprite: &BuildingSprite, x: u32, y: u32, lift: f64) -> (f64, f64) {
-    let top_x = f64::from(sprite.height) * HALF_WIDTH;
-    let top_y = f64::from(WALL_PX) - lift;
-    let a = (f64::from(x) + 0.5 - top_x) / HALF_WIDTH;
-    let b = (f64::from(y) + 0.5 - top_y) / HALF_HEIGHT;
-    ((a + b) / 2.0, (b - a) / 2.0)
-}
+#[path = "art/painter.rs"]
+#[allow(dead_code)]
+mod art;
+use art::{Canvas, DARK, LAMP, STEEL, TEAM, TRIM, shade};
 
-fn inside(sprite: &BuildingSprite, (u, v): (f64, f64)) -> bool {
-    (0.0..=f64::from(sprite.width)).contains(&u) && (0.0..=f64::from(sprite.height)).contains(&v)
-}
+/// Corrugated industrial building, with a team fascia, windows and roof ventilators.
+fn hall(c: &mut Canvas, p: (f64, f64), size: (f64, f64), height: f64) {
+    let (u, v) = p;
+    let (w, d) = size;
+    c.block((u, v, 2.0), (w, d, height), STEEL);
+    c.beam((u, v + d, 3.0), (u + w, v + d, 3.0), DARK);
+    c.beam((u + w, v, 3.0), (u + w, v + d, 3.0), DARK);
+    c.beam((u, v + d, 4.0), (u + w, v + d, 4.0), shade(STEEL, -49));
+    // Roof panel joins, cap bolts and small streaks give the metal a worked surface.
 
-/// RGBA colour of pixel (x, y), or `None` if transparent.
-fn pixel(sprite: &BuildingSprite, x: u32, y: u32) -> Option<[u8; 4]> {
-    let (width, height) = (f64::from(sprite.width), f64::from(sprite.height));
-    let roof = footprint_point(sprite, x, y, f64::from(WALL_PX));
-    if inside(sprite, roof) {
-        let (u, v) = roof;
-        let edge = u < 0.06 || v < 0.06 || u > width - 0.06 || v > height - 0.06;
-        if edge {
-            return Some([90, 90, 90, 255]);
-        }
-        // Bands across the roof, evenly spaced along u.
-        let band = (1..=sprite.stripes).any(|index| {
-            let centre = width * f64::from(index) / f64::from(sprite.stripes + 1);
-            (u - centre).abs() < 0.12
-        }) || (1..=sprite.cross).any(|index| {
-            let centre = height * f64::from(index) / f64::from(sprite.cross + 1);
-            (v - centre).abs() < 0.12
-        });
-        return Some(if band {
-            [160, 160, 160, 255]
-        } else {
-            [225, 225, 225, 255]
-        });
+    for i in 1..(w * 9.0) as i32 {
+        let x = u + f64::from(i) / 9.0;
+        c.beam((x, v + d, 3.0), (x, v + d, height), shade(STEEL, -35));
     }
-    // Below the roof, a pixel shows a wall if lowering the roof by some height between 0 and
-    // WALL_PX (sampled every half pixel) brings the footprint under it.
-    let on_wall = (0..2 * WALL_PX).any(|step| {
-        let lift = f64::from(step) / 2.0;
-        inside(sprite, footprint_point(sprite, x, y, lift))
-    });
-    if !on_wall {
-        return None;
+    for i in 1..(d * 9.0) as i32 {
+        let y = v + f64::from(i) / 9.0;
+        c.beam((u + w, y, 3.0), (u + w, y, height), shade(STEEL, -57));
     }
-    // The left wall faces south-west (along the footprint's +v edge) and the right wall faces
-    // south-east (along its +u edge); they meet below the footprint's bottom corner, which lies
-    // `width` half tiles right of the image's left edge.
-    let left = f64::from(x) + 0.5 < width * HALF_WIDTH;
-    Some(if left {
-        [170, 170, 170, 255]
-    } else {
-        [130, 130, 130, 255]
-    })
+    c.block((u, v, height - 2.0), (w, d, 3.0), TEAM);
+    c.block(
+        (u + 0.12, v + 0.12, height + 2.0),
+        (w - 0.24, d - 0.24, 2.0),
+        [79, 91, 94],
+    );
+    for i in 1..(w * 5.0) as i32 {
+        let x = u + f64::from(i) * 0.2;
+        c.beam(
+            (x, v + 0.15, height + 4.0),
+            (x, v + d - 0.15, height + 4.0),
+            [70, 83, 85],
+        );
+        let bolt = c.point((x, v + d, height + 0.5));
+        c.dot(bolt.0 as i32, bolt.1 as i32, [186, 200, 192]);
+    }
+    for i in 0..(w * 3.0) as i32 {
+        let x = u + 0.12 + f64::from(i) * 0.30;
+        c.face(
+            &[
+                (x, v + d, 8.0),
+                (x + 0.17, v + d, 8.0),
+                (x + 0.17, v + d, 12.0),
+                (x, v + d, 12.0),
+            ],
+            LAMP,
+        );
+    }
 }
 
-/// RGBA pixels of a building sprite.
 pub fn sprite_pixels(sprite: &BuildingSprite) -> (u32, u32, Vec<u8>) {
     let (width, height) = image_size(sprite.width, sprite.height);
-    let mut pixels = Vec::with_capacity((width * height * 4) as usize);
-    for y in 0..height {
-        for x in 0..width {
-            pixels.extend_from_slice(&pixel(sprite, x, y).unwrap_or([0, 0, 0, 0]));
-        }
+    let (w, d) = (f64::from(sprite.width), f64::from(sprite.height));
+    let mut c = Canvas::new(width, height, (d * 32.0, 32.0));
+    // The concrete apron reaches the footprint corners; its north antenna is the fixed roof
+    // height marker. Nothing moves the sprite's established ground anchor.
+    c.block((0.0, 0.0, 0.0), (w, d, 2.0), [99, 103, 95]);
+    for i in 1..sprite.width {
+        c.beam(
+            (f64::from(i), 0.0, 2.0),
+            (f64::from(i), d, 2.0),
+            [77, 82, 77],
+        );
     }
-    (width, height, pixels)
+    for i in 1..sprite.height {
+        c.beam(
+            (0.0, f64::from(i), 2.0),
+            (w, f64::from(i), 2.0),
+            [77, 82, 77],
+        );
+    }
+    c.beam((0.0, 0.0, 2.0), (0.0, 0.0, 32.0), STEEL);
+    c.dot((d * 32.0) as i32, 0, LAMP);
+    match sprite.name {
+        "construction_yard" => {
+            hall(&mut c, (0.15, 0.22), (1.60, 1.15), 21.0);
+            c.block((0.4, 0.5, 25.0), (0.7, 0.36, 4.0), [94, 105, 101]);
+            // Crane legs and braced bridge over an open vehicle service apron.
+            for u in [0.3, 2.65] {
+                c.block((u, 1.65, 2.0), (0.16, 0.18, 40.0), TRIM);
+                c.beam((u, 1.65, 4.0), (u + 0.18, 1.83, 40.0), DARK);
+            }
+            c.block((0.25, 1.60, 39.0), (2.6, 0.25, 6.0), [198, 155, 66]);
+            for i in 0..12 {
+                let u = 0.3 + f64::from(i) * 0.21;
+                c.beam((u, 1.85, 40.0), (u + 0.18, 1.85, 45.0), DARK);
+            }
+            c.beam((2.0, 1.74, 39.0), (2.0, 1.74, 12.0), DARK);
+            c.beam((2.0, 1.74, 12.0), (2.15, 1.74, 12.0), TRIM);
+            c.block((0.3, 2.32, 2.0), (0.6, 0.36, 7.0), [137, 103, 61]);
+            c.block((1.1, 2.45, 2.0), (0.4, 0.28, 4.0), STEEL);
+        }
+        "power_plant" => {
+            hall(&mut c, (0.2, 0.2), (1.20, 0.65), 18.0);
+            for u in [0.43, 1.05] {
+                c.cylinder((u, 0.52, 22.0), 0.16, 17.0, [143, 147, 130]);
+                c.cylinder((u, 0.52, 36.0), 0.17, 4.0, TEAM);
+                c.ellipse(c.point((u, 0.52, 40.0)), (4.0, 2.0), DARK);
+            }
+            for u in [0.48, 1.30] {
+                c.cylinder((u, 1.35, 3.0), 0.27, 10.0, [83, 114, 105]);
+                let centre = c.point((u, 1.35, 13.0));
+                c.ellipse(centre, (8.0, 4.0), DARK);
+                c.line(
+                    (centre.0 - 6.0, centre.1),
+                    (centre.0 + 6.0, centre.1),
+                    STEEL,
+                );
+                c.line(
+                    (centre.0, centre.1 - 3.0),
+                    (centre.0, centre.1 + 3.0),
+                    STEEL,
+                );
+            }
+        }
+        "refinery" => {
+            hall(&mut c, (0.16, 0.2), (1.15, 0.75), 23.0);
+            c.cylinder((2.1, 0.8, 3.0), 0.47, 25.0, [167, 172, 157]);
+            c.cylinder((2.1, 0.8, 17.0), 0.48, 5.0, TEAM);
+            c.cylinder((0.7, 1.65, 3.0), 0.35, 16.0, [167, 172, 157]);
+            for v in [1.45, 1.7] {
+                c.block((1.25, v, 4.0), (1.18, 0.09, 3.0), [169, 137, 70]);
+            }
+            // Loading hopper and black/yellow dock chevrons.
+            c.block((1.45, 2.05, 2.0), (1.0, 0.65, 7.0), DARK);
+            c.block((1.55, 2.15, 9.0), (0.8, 0.4, 4.0), [166, 129, 51]);
+            for i in 0..6 {
+                let u = 1.46 + f64::from(i) * 0.16;
+                c.beam((u, 2.76, 2.0), (u + 0.08, 2.56, 2.0), TRIM);
+            }
+        }
+        "barracks" => {
+            hall(&mut c, (0.2, 0.3), (1.1, 1.25), 16.0);
+            c.block((0.4, 0.55, 20.0), (0.72, 0.8, 3.0), [143, 143, 115]);
+            c.block((1.35, 0.30, 2.0), (0.4, 0.4, 28.0), [126, 129, 113]);
+            c.block((1.30, 0.25, 27.0), (0.5, 0.5, 4.0), TEAM);
+            c.face(
+                &[
+                    (0.63, 1.56, 3.0),
+                    (0.99, 1.56, 3.0),
+                    (0.99, 1.56, 13.0),
+                    (0.63, 1.56, 13.0),
+                ],
+                DARK,
+            );
+            c.block((0.52, 1.57, 2.0), (0.59, 0.24, 2.0), TRIM);
+            c.beam((1.7, 1.65, 2.0), (1.7, 1.65, 28.0), STEEL);
+            c.face(
+                &[
+                    (1.7, 1.65, 28.0),
+                    (1.95, 1.65, 26.0),
+                    (1.95, 1.65, 21.0),
+                    (1.7, 1.65, 23.0),
+                ],
+                TEAM,
+            );
+        }
+        "war_factory" => {
+            hall(&mut c, (0.2, 0.2), (2.25, 1.80), 27.0);
+            for v in [0.4, 0.95, 1.5] {
+                c.block((0.4, v, 31.0), (1.6, 0.24, 4.0), [145, 152, 148]);
+                c.face(
+                    &[
+                        (0.5, v + 0.25, 31.0),
+                        (1.9, v + 0.25, 31.0),
+                        (1.9, v + 0.25, 34.0),
+                        (0.5, v + 0.25, 34.0),
+                    ],
+                    LAMP,
+                );
+            }
+            c.face(
+                &[
+                    (0.70, 2.01, 2.0),
+                    (2.05, 2.01, 2.0),
+                    (2.05, 2.01, 24.0),
+                    (0.70, 2.01, 24.0),
+                ],
+                DARK,
+            );
+            c.block((0.65, 2.02, 2.0), (1.48, 0.60, 1.0), [72, 77, 73]);
+            for u in [0.70, 2.05] {
+                c.beam((u, 2.10, 3.0), (u, 2.8, 3.0), TRIM);
+                c.beam((u, 2.02, 3.0), (u, 2.02, 23.0), [204, 157, 65]);
+            }
+            for i in 0..4 {
+                let u = 0.83 + f64::from(i) * 0.29;
+                c.beam((u, 2.02, 22.0), (u + 0.12, 2.02, 25.0), TRIM);
+            }
+        }
+        "tech_center" => {
+            hall(&mut c, (0.25, 0.2), (1.4, 1.3), 20.0);
+            c.block((0.7, 0.7, 24.0), (0.4, 0.4, 7.0), DARK);
+            let centre = c.point((0.9, 0.9, 39.0));
+            c.ellipse(centre, (20.0, 9.0), STEEL);
+            c.ellipse((centre.0, centre.1 - 2.0), (17.0, 6.0), [180, 197, 192]);
+            c.line(
+                (centre.0 - 16.0, centre.1),
+                (centre.0 + 14.0, centre.1 - 2.0),
+                DARK,
+            );
+            c.line((centre.0, centre.1 + 5.0), (centre.0, centre.1 - 7.0), DARK);
+            c.beam((0.9, 0.9, 39.0), (0.64, 0.75, 49.0), TRIM);
+            c.block((0.5, 1.55, 2.0), (0.8, 0.23, 9.0), TEAM);
+        }
+        "gun_turret" => {
+            c.block((0.15, 0.15, 2.0), (0.70, 0.70, 8.0), [113, 121, 105]);
+            c.cylinder((0.5, 0.5, 10.0), 0.23, 9.0, STEEL);
+            c.block((0.3, 0.34, 19.0), (0.40, 0.35, 5.0), TEAM);
+            c.block((0.58, 0.39, 20.0), (0.64, 0.10, 4.0), DARK);
+        }
+        "rocket_tower" => {
+            c.block((0.15, 0.15, 2.0), (0.7, 0.7, 9.0), [113, 121, 105]);
+            c.block((0.36, 0.36, 11.0), (0.28, 0.28, 13.0), STEEL);
+            c.block((0.15, 0.22, 23.0), (0.70, 0.48, 8.0), TEAM);
+            for i in 0..3 {
+                let u = 0.22 + f64::from(i) * 0.2;
+                c.block((u, 0.32, 29.0), (0.10, 0.54, 4.0), TRIM);
+            }
+        }
+        _ => {}
+    }
+    // Outline the exposed front of the apron, keeping exact historical corner coverage.
+    c.beam((0.0, d, 1.0), (w, d, 1.0), [148, 151, 129]);
+    c.beam((w, 0.0, 1.0), (w, d, 1.0), [98, 104, 93]);
+    c.dot(0, (d * 16.0 + 31.0) as i32, [148, 151, 129]);
+    c.dot(width as i32 - 1, (w * 16.0 + 31.0) as i32, [98, 104, 93]);
+    c.dot((w * 32.0) as i32, height as i32 - 1, [98, 104, 93]);
+    (width, height, c.pixels)
 }
 
 pub fn sprite_png(sprite: &BuildingSprite) -> Vec<u8> {
