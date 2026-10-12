@@ -267,3 +267,17 @@ with the new assets. Run the existing validation commands and independent review
 Platform requirement is Apple Silicon macOS only. The existing generic unit and building names
 are accepted by the user. Collecting Rust-crate notices is not a user-requested release criterion;
 existing asset/font notices remain. These decisions do not change dependency licences.
+
+## 14. RA2 parity programme (user request, 2026-10-11)
+
+The user asked for the programme of `docs/prompts/RA2_PARITY_PROMPT.md`: milestones RA0 to RA9 on
+the branch `ra2-parity`, which make the Red Alert 2 ruleset the default skirmish ruleset.
+`docs/RA2_PARITY_PLAN.md` is its plan and **prevails for this programme** where it conflicts with
+sections 7, 10 and 12: milestones are gated by the validation commands only, and one independent
+review of the whole programme takes the place of the review of each milestone. Sections 5, 6, 8, 9
+and 11 stay in force, with two recorded amendments: invariant I6 is amended in RA3 for infantry
+sub cells (`docs/DECISIONS.md` R6), and section 9 gains `git diff --check`, the release test run,
+`m14_duels -- full` and the package script, as listed in the programme's plan, section 6.1. The
+non goals 3 and 4 of section 3 (bridges, naval and air units, superweapons, garrisoning,
+veterancy) no longer apply; network play, a campaign, terrain elevation, a map editor and save
+games remain non goals.
