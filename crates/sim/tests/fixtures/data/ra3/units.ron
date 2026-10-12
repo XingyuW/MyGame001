@@ -1,6 +1,9 @@
 // RA3 fixture: the unit types of the RA2 fixture and ten more for the tests of armour, warheads
 // and weapons (ra3_*.rs): an aircraft, a boat, a submarine, a squid, a flak car, a mortar, a
-// sapper, a martyr, a commando and a seer. Fixture data, independent of the shipped balance (invariant I10).
+// sapper, a martyr, a commando and a seer; and seven more for the tests of infantry sub cells and
+// crushing (ra3_cells.rs, ra3_crush.rs; docs/DECISIONS.md R6): a recruit, a trooper, a hazmat, a
+// jumper, a truck, a roller and a brute. Fixture data, independent of the shipped balance
+// (invariant I10).
 (
     schema_version: 1,
     units: [
@@ -29,5 +32,12 @@
         (id: "martyr", speed: 16, sprite: "martyr"),
         (id: "commando", speed: 16, sprite: "commando"),
         (id: "seer", speed: 16, sprite: "seer"),
+        (id: "recruit", speed: 16, sprite: "recruit"),
+        (id: "trooper", speed: 16, sprite: "trooper"),
+        (id: "hazmat", speed: 16, sprite: "hazmat"),
+        (id: "jumper", speed: 32, sprite: "jumper"),
+        (id: "truck", speed: 32, sprite: "truck"),
+        (id: "roller", speed: 32, sprite: "roller"),
+        (id: "brute", speed: 32, sprite: "brute"),
     ],
 )

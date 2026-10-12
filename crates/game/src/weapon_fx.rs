@@ -145,6 +145,10 @@ pub fn damage_smoke(state: sim::DamageState) -> Option<(f32, [f32; 4])> {
     }
 }
 
+/// The dust a crushed soldier leaves (RA3): how many puffs rise from where it stood, and their
+/// colour, the brown of churned ground.
+pub const CRUSH_DUST: (usize, [f32; 4]) = (3, [0.46, 0.38, 0.28, 0.6]);
+
 /// How large the burst of a warhead with `cell_spread` (subcells) is drawn, in pixels.
 pub fn impact_size(cell_spread: u32) -> f32 {
     (10.0 + cell_spread as f32 / SUBCELLS_PER_CELL as f32 * 14.0).min(90.0)
@@ -445,6 +449,29 @@ impl Painter<'_, '_, '_> {
             cells,
             stroke,
         );
+    }
+
+    /// Where a vehicle drove over a soldier (RA3): a flat ring of dust on the ground and a few
+    /// puffs that drift up from it. No flash and no sparks: nothing exploded.
+    fn crush(&mut self, at: Vec2, cell: CellPos, seed: u32) {
+        let (puffs, color) = CRUSH_DUST;
+        self.ground_ring(at, 10.0, 46.0, [color[0], color[1], color[2], 0.5], cell);
+        let mut dice = Dice::new(seed);
+        for _ in 0..puffs {
+            let aside = Vec2::new(dice.roll() * 7.0, dice.roll() * 3.0);
+            self.smoke(
+                at + aside,
+                9.0,
+                color,
+                [cell; 2],
+                Stroke {
+                    life: 0.5 + 0.2 * dice.unit(),
+                    velocity: Vec2::new(dice.roll() * 5.0, 9.0),
+                    growth: Vec2::splat(22.0),
+                    ..default()
+                },
+            );
+        }
     }
 
     /// A round glow.
@@ -981,6 +1008,8 @@ fn fire(
     // Warheads that went off where no shot's target is (RA3): an inaccurate shot, a bomb, a
     // superweapon.
     let mut bursts: Vec<(sim::WarheadKind, sim::SubPos, bool)> = Vec::new();
+    // Soldiers driven over (RA3), each where it stood.
+    let mut crushed: Vec<(SimId, sim::SubPos)> = Vec::new();
     for event in events.read() {
         match event {
             SimEvent::WeaponFired {
@@ -989,10 +1018,11 @@ fn fire(
                 weapon,
             } => shots.push((*attacker, *target, *weapon)),
             SimEvent::Impact { warhead, at, air } => bursts.push((*warhead, *at, *air)),
+            SimEvent::UnitCrushed { unit, at, .. } => crushed.push((*unit, *at)),
             _ => {}
         }
     }
-    if shots.is_empty() && bursts.is_empty() {
+    if shots.is_empty() && bursts.is_empty() && crushed.is_empty() {
         return;
     }
     let spots = spots(&host, &map, &altitudes);
@@ -1002,6 +1032,16 @@ fn fire(
         mat: &mat,
         left: MAX_FX.saturating_sub(live.iter().count()),
     };
+    for (unit, at) in crushed {
+        let cell = at.cell();
+        if !vision.is_visible(cell) {
+            continue;
+        }
+        let scale = SUBCELLS_PER_CELL as f32;
+        let ground = to_world(at.x as f32 / scale, at.y as f32 / scale, map.tile);
+        let seed = (host.tick() as u32).wrapping_mul(0x9E37) ^ unit.0;
+        painter.crush(ground, cell, seed);
+    }
     for (index, (warhead, at, air)) in bursts.into_iter().enumerate() {
         let cell = at.cell();
         if !vision.is_visible(cell) {

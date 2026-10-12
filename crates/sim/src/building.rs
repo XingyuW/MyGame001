@@ -278,9 +278,10 @@ pub(crate) fn check_distance(
 pub(crate) const EXIT_SEARCH_DEPTH: u32 = 24;
 
 /// The free cell where a unit leaves the building of `footprint`: inside the map, passable, and
-/// held by no unit. A cell of the footprint's ring if one is free: the one nearest to `toward`
-/// (the rally point) if given, otherwise the one lowest on screen (largest x + y); ties are
-/// broken by row, then column.
+/// with room for the unit ([`Grid::has_room`]: held by no unit, or for a unit on foot,
+/// `on_foot`, by no vehicle and by fewer than three infantry). A cell of the footprint's ring if
+/// one is free: the one nearest to `toward` (the rally point) if given, otherwise the one lowest
+/// on screen (largest x + y); ties are broken by row, then column.
 ///
 /// When every ring cell is held, the unit comes out further away instead of waiting inside, so
 /// that a crowd around a factory never stops its production: the search spreads outward from
@@ -291,6 +292,7 @@ pub(crate) fn exit_cell(
     grid: &Grid,
     footprint: Footprint,
     toward: Option<CellPos>,
+    on_foot: bool,
 ) -> Option<CellPos> {
     let preference = |cell: &CellPos| match toward {
         Some(target) => (i64::from(octile_distance(*cell, target)), cell.y, cell.x),
@@ -304,7 +306,7 @@ pub(crate) fn exit_cell(
     for _ in 0..=EXIT_SEARCH_DEPTH {
         let free = frontier
             .iter()
-            .filter(|&&cell| grid.occupant(cell).is_none())
+            .filter(|&&cell| grid.has_room(cell, on_foot))
             .min_by_key(|&cell| preference(cell));
         if let Some(&cell) = free {
             return Some(cell);

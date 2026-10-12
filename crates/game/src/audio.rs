@@ -17,7 +17,8 @@
 //! a machine gun rattles off a burst, a tank gun booms and rolls away, a rocket roars off, the
 //! prism rings like struck glass as it discharges, and a Tesla weapon snaps and buzzes at twice
 //! the mains frequency, as an electric arc does. A shell that the player sees land is heard
-//! landing ([`Sfx::Impact`]).
+//! landing ([`Sfx::Impact`]). A soldier driven over by a vehicle is heard as a dull crunch
+//! ([`Sfx::Crush`], RA3) instead of the bang of a destruction.
 //!
 //! At most [`MAX_ACTIVE_EFFECTS`] effects play at once, the same effect at most once per
 //! [`MIN_REPEAT_SECS`], and every effect entity is removed when its sound has ended, also when
@@ -206,12 +207,14 @@ pub enum Sfx {
     Trigger,
     /// A shell, rocket or bomb landed where the human player sees it.
     Impact,
+    /// A vehicle drove over a soldier (RA3).
+    Crush,
     /// A unit or building the human player was shown was destroyed.
     Explosion,
 }
 
 impl Sfx {
-    pub const ALL: [Sfx; 25] = [
+    pub const ALL: [Sfx; 26] = [
         Sfx::Acknowledge,
         Sfx::Error,
         Sfx::Ready,
@@ -236,6 +239,7 @@ impl Sfx {
         Sfx::Bite,
         Sfx::Trigger,
         Sfx::Impact,
+        Sfx::Crush,
         Sfx::Explosion,
     ];
 
@@ -294,6 +298,7 @@ impl Sfx {
             Sfx::Prism | Sfx::Flak => 0.72,
             Sfx::Shot | Sfx::Burst | Sfx::Grenade | Sfx::BombFall => 0.62,
             Sfx::Radiation | Sfx::Psychic | Sfx::Chrono | Sfx::Sonic | Sfx::Bite => 0.55,
+            Sfx::Crush => 0.6,
             Sfx::Trigger => 0.4,
             _ => 0.8,
         }
@@ -565,6 +570,7 @@ pub fn synthesize(sfx: Sfx) -> Vec<Sample> {
         Sfx::Bite => 0.34,
         Sfx::Trigger => 0.25,
         Sfx::Impact => 0.8,
+        Sfx::Crush => CRUSH_SECS,
         Sfx::Explosion => EXPLOSION_SECS,
     };
     let mut buffer = vec![0.0f32; samples_for(seconds)];
@@ -647,6 +653,7 @@ pub fn synthesize(sfx: Sfx) -> Vec<Sample> {
         Sfx::Bite => bite(&mut buffer),
         Sfx::Trigger => trigger(&mut buffer),
         Sfx::Impact => impact(&mut buffer),
+        Sfx::Crush => crush(&mut buffer),
         Sfx::Explosion => explosion(&mut buffer),
     }
     let length = buffer.len() as f32 / SR;
@@ -1096,6 +1103,32 @@ fn impact(buffer: &mut [f32]) {
             * onset(t)
     });
     high_pass(buffer, 30.0);
+}
+
+const CRUSH_SECS: f32 = 0.4;
+
+/// A vehicle driving over a soldier: a dull thud under the tracks and a short dry crunch, with
+/// no crack and no boom.
+fn crush(buffer: &mut [f32]) {
+    let mut noise = Noise(149);
+    let mut grit_noise = Noise(151);
+    let (mut body, mut grit) = (Svf::default(), Svf::default());
+    let mut thump = Sine::default();
+    render(buffer, |t| {
+        let thud = thump.next(58.0 + 40.0 * (-t / 0.03).exp())
+            * (1.0 - (-t / 0.004).exp())
+            * (-t / 0.09).exp();
+        let squash = body.process(noise.next(), 320.0, 1.2).low * (-t / 0.07).exp() * 1.2;
+        // The crunch: a handful of dry clicks in the first fifth of a second.
+        let chance = 0.03 * (-t / 0.08).exp();
+        let click = if (grit_noise.next() + 1.0) * 0.5 < chance {
+            grit_noise.next() * 4.0
+        } else {
+            0.0
+        };
+        (1.3 * (thud + squash + grit.process(click, 1_900.0, 2.5).band * 0.7)).tanh() * onset(t)
+    });
+    high_pass(buffer, 35.0);
 }
 
 /// A destruction: a crack, a sub-bass boom, a rumble whose brightness falls as it decays, and
@@ -2065,6 +2098,9 @@ pub struct SoundContext<'a> {
     pub class: &'a dyn Fn(WeaponKind) -> WeaponClass,
     /// Whether the human player sees the cell now (scenery has no view of its own).
     pub cell_visible: &'a dyn Fn(sim::CellPos) -> bool,
+    /// Whether the unit was crushed in this batch of events (RA3): its crushing is heard, not
+    /// the bang of its destruction.
+    pub crushed: &'a dyn Fn(SimId) -> bool,
 }
 
 /// The effect a simulation event plays for the human player, if any: see the module
@@ -2084,9 +2120,14 @@ pub fn event_sound(event: &SimEvent, context: &SoundContext) -> Option<Sfx> {
             weapon,
         } => ((context.seen)(*attacker) || (context.seen)(*target))
             .then(|| Sfx::of((context.class)(*weapon))),
-        SimEvent::UnitDestroyed { player, unit } => {
-            (*player == HUMAN || (context.shown)(*unit)).then_some(Sfx::Explosion)
-        }
+        // A soldier under a vehicle: heard by its owner, by the owner of the vehicle, and
+        // by who was shown the soldier.
+        SimEvent::UnitCrushed {
+            player, unit, by, ..
+        } => (*player == HUMAN || *by == HUMAN || (context.shown)(*unit)).then_some(Sfx::Crush),
+        SimEvent::UnitDestroyed { player, unit } => (!(context.crushed)(*unit)
+            && (*player == HUMAN || (context.shown)(*unit)))
+        .then_some(Sfx::Explosion),
         SimEvent::BuildingDestroyed {
             player, building, ..
         } => (*player == HUMAN || (context.shown)(*building)).then_some(Sfx::Explosion),
@@ -2252,11 +2293,21 @@ pub(crate) fn play_effects(
     };
     let vision = crate::fog::human_vision(host.players());
     let cell_visible = |cell: sim::CellPos| vision.is_some_and(|vision| vision.is_visible(cell));
+    // A crushing and the destruction it causes come in the same tick, so in the same batch.
+    let crushed_units: std::collections::BTreeSet<SimId> = events
+        .iter()
+        .filter_map(|event| match event {
+            SimEvent::UnitCrushed { unit, .. } => Some(*unit),
+            _ => None,
+        })
+        .collect();
+    let crushed = |id: SimId| crushed_units.contains(&id);
     let context = SoundContext {
         seen: &seen,
         shown: &shown,
         class: &class,
         cell_visible: &cell_visible,
+        crushed: &crushed,
     };
     wanted.extend(
         events
@@ -2465,6 +2516,33 @@ mod tests {
         }
     }
 
+    /// RA3: a soldier under a vehicle is a short dull crunch, not a bang: shorter and darker
+    /// than a destruction, unlike a shell landing, and it ends in silence.
+    #[test]
+    fn a_crushing_is_a_short_dull_crunch() {
+        let (crush, explosion, impact) = (
+            synthesize(Sfx::Crush),
+            synthesize(Sfx::Explosion),
+            synthesize(Sfx::Impact),
+        );
+        assert!(2 * crush.len() <= explosion.len());
+        assert_ne!(crush, impact[..crush.len().min(impact.len())].to_vec());
+        assert!(
+            brightness(&crush, 1_000.0) < brightness(&impact, 1_000.0),
+            "{} and {}",
+            brightness(&crush, 1_000.0),
+            brightness(&impact, 1_000.0)
+        );
+        assert!(crush.last().is_some_and(|last| last.abs() < 0.01));
+        // Most of it is over in a tenth of a second.
+        let early = crush[..samples_for(0.1)]
+            .iter()
+            .map(|x| x * x)
+            .sum::<Sample>();
+        let all = crush.iter().map(|x| x * x).sum::<Sample>();
+        assert!(early / all > 0.6, "{}", early / all);
+    }
+
     #[test]
     fn weapon_sounds_end_in_silence_and_the_music_loops_without_a_click() {
         for sfx in Sfx::WEAPONS.into_iter().chain([Sfx::Explosion]) {
@@ -2557,13 +2635,39 @@ mod tests {
             _ => WeaponClass::Tesla,
         };
         let cell_visible = |cell: sim::CellPos| cell.x == 0;
+        let crushed_id = SimId(3);
+        let crushed = |id: SimId| id == crushed_id;
         let context = SoundContext {
             seen: &seen,
             shown: &shown,
             class: &class,
             cell_visible: &cell_visible,
+            crushed: &crushed,
         };
         let sound = |event: SimEvent| event_sound(&event, &context);
+        // RA3. A crushing is heard by the soldier's owner, by the owner of the vehicle, and
+        // where the soldier was shown; and the destruction that follows it is silent.
+        let crushing = |player, unit, by| SimEvent::UnitCrushed {
+            player,
+            unit,
+            crusher: SimId(9),
+            by,
+            at: sim::SubPos::new(0, 0),
+        };
+        assert_eq!(sound(crushing(HUMAN, unseen_id, enemy)), Some(Sfx::Crush));
+        assert_eq!(sound(crushing(enemy, unseen_id, HUMAN)), Some(Sfx::Crush));
+        assert_eq!(
+            sound(crushing(enemy, seen_id, PlayerId(2))),
+            Some(Sfx::Crush)
+        );
+        assert_eq!(sound(crushing(enemy, unseen_id, PlayerId(2))), None);
+        assert_eq!(
+            sound(SimEvent::UnitDestroyed {
+                player: HUMAN,
+                unit: crushed_id
+            }),
+            None
+        );
         // Scenery falls with a bang where the player is looking, silently elsewhere.
         let razed = |x| SimEvent::PropDestroyed {
             prop: SimId(sim::PROP_ID_BASE),

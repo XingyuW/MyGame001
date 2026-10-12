@@ -90,10 +90,10 @@ pub use harvest::{HarvestState, Harvester, MAX_HARVEST_ATTEMPTS};
 pub use hash::{Fnv1a64, state_hash};
 pub use id::{SimId, SimIdAllocator};
 pub use map::{
-    Cell, CellPos, CheckedFile, Grid, LoadedMap, MAP_SCHEMA_VERSION, MAX_MAP_FILE_BYTES,
+    CELL_ROOM, Cell, CellPos, CheckedFile, Grid, LoadedMap, MAP_SCHEMA_VERSION, MAX_MAP_FILE_BYTES,
     MAX_MAP_SIDE, MAX_TILESET_IMAGE_SIDE_PX, MAX_TILESET_TILES, MapError, MapErrorKind,
-    SUBCELLS_PER_CELL, SubPos, TERRAIN_LAYER, TILE_HEIGHT_PX, TILE_WIDTH_PX, TilesetImage,
-    load_map, load_map_with_files,
+    SPOT_OFFSETS, SPOTS_PER_CELL, SUBCELLS_PER_CELL, SubPos, TERRAIN_LAYER, TILE_HEIGHT_PX,
+    TILE_WIDTH_PX, TilesetImage, load_map, load_map_with_files,
 };
 pub use map_scale::{
     APRON_RADIUS, CORE_RADIUS, DEFAULT_ORE, EDGE_MARGIN, EnlargedMap, LOOK_FEATURE_BRIDGE,
@@ -131,14 +131,14 @@ pub use skirmish_defs::{
 };
 pub use unit::{
     DIAGONAL_STEP, Direction, Facing, Mobile, MoveOrder, ORTHOGONAL_STEP, Orders, Owner, PathState,
-    Position, SpawnError, Step, Unit, spawn_unit,
+    Position, SpawnError, Step, Unit, cell_invariant_violations, spawn_unit, stray_claims,
 };
 pub use visibility::Vision;
 
 pub mod arsenal;
 pub use arsenal::{
     ARSENAL_SCHEMA_VERSION, Arsenal, ArsenalEntry, Category, Domain, FactoryGroup, MAX_BUILD_LIMIT,
-    Role,
+    MAX_UNIT_SIZE, Role,
 };
 
 pub mod special;

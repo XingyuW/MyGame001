@@ -19,7 +19,9 @@
 // underwater and attacks nothing on land; the squid is underwater and organic, and uses its
 // second weapon against organic targets; the flak car carries the flak shell and the flak burst
 // with an air range bonus of 2 cells; the sniper never attacks what is on water; the wall is a
-// wall.
+// wall. The seven types of the tests of sub cells and crushing: the recruit, the hazmat, the
+// jumper, the truck and the roller are unarmed, the trooper carries the rifle, and the brute
+// the sam, which engages aircraft only.
 (
     schema_version: 2,
     armour_classes: ["flesh", "plate", "concrete", "hull"],
@@ -74,6 +76,13 @@
         (unit: "martyr", hit_points: 100, armour: "flesh", sight: 6, weapons: ["bomb"], elite_weapons: ["bomb"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
         (unit: "commando", hit_points: 100, armour: "flesh", sight: 6, weapons: ["rifle"], elite_weapons: ["rifle"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
         (unit: "seer", hit_points: 100, armour: "flesh", sight: 6, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "recruit", hit_points: 100, armour: "flesh", sight: 6, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "trooper", hit_points: 100, armour: "flesh", sight: 6, weapons: ["rifle"], elite_weapons: ["rifle"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "hazmat", hit_points: 100, armour: "flesh", sight: 6, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "jumper", hit_points: 100, armour: "flesh", sight: 6, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "truck", hit_points: 300, armour: "plate", sight: 6, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "roller", hit_points: 300, armour: "plate", sight: 6, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "brute", hit_points: 400, armour: "plate", sight: 7, weapons: ["sam"], elite_weapons: ["sam"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
     ],
     buildings: [
         (building: "allied_yard", hit_points: 1000, armour: "concrete", sight: 8, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, wall: 0),

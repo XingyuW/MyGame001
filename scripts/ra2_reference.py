@@ -25,6 +25,9 @@
 #   * the global sections of WHOLE_SECTIONS are taken whole, minus the keys listed with them,
 #     and minus every key whose value is not a number, a flag or a list of identifiers.
 # A value with a blank, a colon or any other character outside VALUE_SHAPE is never written.
+# Of the type lists ([InfantryTypes], [VehicleTypes], [AircraftTypes], [BuildingTypes]) only the
+# entries that name a mapped section are written (since RA3: the list a unit belongs to decides
+# whether it is infantry).
 #
 # Usage (standard library only, Python 3):
 #     python3 scripts/ra2_reference.py            regenerate the table
@@ -238,7 +241,7 @@ BUILDING_REGISTRIES = ("BuildingTypes",)
 
 CATEGORIES = (
     "unit", "building", "weapon", "warhead", "projectile", "superweapon", "global",
-    "country", "land", "ore", "art",
+    "country", "land", "ore", "art", "list",
 )
 
 
@@ -316,6 +319,22 @@ class Table:
             else:
                 self.rows[(file, name, key)] = value
                 self._claim(file, name, category)
+
+    def add_registry(self, file, ini, section, wanted):
+        """Write the entries of the type list `section` whose value is in `wanted` (lower-case
+        section names)."""
+        values = ini.section(section)
+        if values is None:
+            raise ExtractionError("the ini has no section [%s]" % section)
+        name = ini.section_name(section)
+        for key in sorted(values):
+            value = normalise(values[key])
+            if value.lower() not in wanted:
+                continue
+            if not VALUE_SHAPE.match(key) or not VALUE_SHAPE.match(value):
+                raise ExtractionError("[%s] %s is not an identifier" % (name, key))
+            self.rows[(file, name, key)] = value
+            self._claim(file, name, "list")
 
     def render(self):
         lines = ["\t".join(TABLE_HEADER)]
@@ -458,6 +477,11 @@ def extract(rules, art, mapping):
             image = rules.get(section, "Image") or section
             if not table.add_listed("art", "art", art, image, ART_KEYS):
                 raise ExtractionError("art.ini has no section [%s] for [%s]" % (image, section))
+
+    # The type lists, as far as they name mapped sections.
+    mapped = {row["section"].lower() for row in mapping}
+    for section in UNIT_REGISTRIES + BUILDING_REGISTRIES:
+        table.add_registry("rules", rules, section, mapped)
 
     for section, excluded in sorted(WHOLE_SECTIONS.items()):
         table.add_whole("global", "rules", rules, section, excluded)

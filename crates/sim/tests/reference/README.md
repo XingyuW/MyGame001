@@ -12,7 +12,9 @@ parity audit compares the shipped `assets/data/*.ron` with these tab separated t
   warheads in the order of the table and fails on one that no type or effect uses, and the
   audit fails on a shipped weapon or warhead that is not mapped.
 * `ra2_reference.tsv`: the values the game uses. Columns `file` (`rules`, `art`), `section`,
-  `key`, `value`, sorted. Generated, never edited by hand.
+  `key`, `value`, sorted. Generated, never edited by hand. Since RA3 it also holds the entries
+  of the type lists (`[InfantryTypes]`, `[VehicleTypes]`, `[AircraftTypes]`, `[BuildingTypes]`)
+  that name a mapped section: the list a unit is in decides whether it is infantry.
 * `ra2_differences.tsv`: intentional differences between the shipped data and the reference.
   Columns `game_id`, `field`, `game_value`, `reference_value`, `reason`. Written by hand. A row
   matches one audited value: the game id (`rules` for a value of `rules.ron`), the field as the
@@ -21,7 +23,8 @@ parity audit compares the shipped `assets/data/*.ron` with these tab separated t
   RA2 `build_time`, `build_limit`, `lane`, `adjacent`, `base_normal`, `radar`, `sellable`,
   `repairable`, `powered`, `is_powered`, `unit_repair`, since RA3 `armour`, `weapons`,
   `elite_weapons` (the game ids of the slots, comma separated), `air_range_bonus`,
-  `land_targeting`, `naval_targeting`, `underwater`, `organic`, `wall`, or `group.field` for
+  `land_targeting`, `naval_targeting`, `underwater`, `organic`, `wall`, `infantry`, `crusher`,
+  `crushable`, `size`, or `group.field` for
   `rules.ron`), the shipped value, and the reference value as the ini writes it. Since RA3 a
   weapon is listed as `weapon.<id>` (fields `damage`, `range`, `min_range`, `reload`, `burst`,
   `warhead`, `projectile_speed`, `anti_air`, `anti_ground`, `scatter`; the reference value of

@@ -18,8 +18,14 @@
 //!   factions at each fixture difficulty (so that the soak does not depend on the shipped balance
 //!   alone, I10).
 //!
-//! On every tick it checks invariant I6 (each unit holds the cells it stands in and steps into, and
-//! none of them is covered by a building), I7 (no player's credits are negative), that every
+//! On every tick it checks invariant I6' (docs/DECISIONS.md R6, the amendment of I6 in RA3: a
+//! surface cell is held by at most one vehicle or at most three infantry and never both, a cell of
+//! the air layer by at most one aircraft, no unit of the surface holds a cell covered by a
+//! building, and the grid records every unit in the cells it stands in and steps into;
+//! `sim::cell_invariant_violations`, whose own test feeds it each kind of violation), every
+//! [`STRAY_CHECK_INTERVAL`] ticks that the grid records no unit in a cell it does not hold
+//! (`sim::stray_claims`, which looks at every cell of the map), I7 (no player's credits are
+//! negative), that every
 //! rejected command is explained by a loss in the tick before (D43 item 5), and that the state stays
 //! bounded: units, buildings, projectiles, and pending commands below fixed limits. Each
 //! configuration is played twice, and the state hash must be the same on every tick (I3). Heap use
@@ -46,8 +52,9 @@ use bevy_ecs::world::World;
 use sim::{
     AiDefinitions, Building, CommandQueue, Controller, Definitions, Grid, MatchOutcome, MatchState,
     Mobile, PlayerId, PlayerSetup, Players, Projectiles, RejectReason, SimEvent, SimId, SimPlugin,
-    SimSchedule, SkirmishDefinitions, check_ai_factions, load_ai, load_map, load_match_definitions,
-    load_ruleset, load_skirmish, map_asset_path, setup_match, state_hash,
+    SimSchedule, SkirmishDefinitions, cell_invariant_violations, check_ai_factions, load_ai,
+    load_map, load_match_definitions, load_ruleset, load_skirmish, map_asset_path, setup_match,
+    state_hash, stray_claims,
 };
 
 /// Ticks played per configuration: 30 minutes of game time.
@@ -58,6 +65,10 @@ const MAX_UNITS: usize = 1_000;
 const MAX_BUILDINGS: usize = 300;
 const MAX_PROJECTILES: usize = 10_000;
 const MAX_PENDING_COMMANDS: usize = 64;
+
+/// Ticks between two looks at every cell of the map for a holder that holds nothing. A claim
+/// that is not released stays, so it is found at the next look.
+const STRAY_CHECK_INTERVAL: u64 = 256;
 
 /// Upper limit of heap bytes in use by the process.
 const MEMORY_BUDGET: usize = 1 << 30;
@@ -294,25 +305,14 @@ fn new_match(set: &DataSet, config: Config) -> Result<App, String> {
     Ok(app)
 }
 
-/// The invariants and limits of the state after a tick; the problems found.
-fn check_state(world: &mut World) -> Vec<String> {
-    let mut problems = Vec::new();
-    let mut units = world.query::<(&SimId, &Mobile)>();
-    let held: Vec<(SimId, Mobile)> = units.iter(world).map(|(id, m)| (*id, *m)).collect();
-    let grid = world.resource::<Grid>();
-    for (id, mobile) in &held {
-        for cell in [mobile.cell, mobile.next_centre()] {
-            if grid.occupant(cell) != Some(*id) {
-                problems.push(format!("I6: unit {} does not hold its cell {cell:?}", id.0));
-            }
-            if grid.building(cell).is_some() {
-                problems.push(format!(
-                    "I6: unit {} stands on a building at {cell:?}",
-                    id.0
-                ));
-            }
-        }
+/// The invariants and limits of the state after tick `at`; the problems found.
+fn check_state(world: &mut World, at: u64) -> Vec<String> {
+    // I6' (docs/DECISIONS.md R6): who holds which cell, from the units and from the grid.
+    let mut problems = cell_invariant_violations(world);
+    if at.is_multiple_of(STRAY_CHECK_INTERVAL) || at + 1 == SOAK_TICKS {
+        problems.extend(stray_claims(world));
     }
+    let units = world.query::<&Mobile>().iter(world).count();
     for (player, state) in world.resource::<Players>().iter() {
         if state.credits() < 0 {
             problems.push(format!(
@@ -325,15 +325,14 @@ fn check_state(world: &mut World) -> Vec<String> {
     let buildings = world.query::<&Building>().iter(world).count();
     let projectiles = world.resource::<Projectiles>().iter().count();
     let pending = world.resource::<CommandQueue>().len();
-    if held.len() > MAX_UNITS
+    if units > MAX_UNITS
         || buildings > MAX_BUILDINGS
         || projectiles > MAX_PROJECTILES
         || pending > MAX_PENDING_COMMANDS
     {
         problems.push(format!(
-            "state beyond its limits: {} units, {buildings} buildings, {projectiles} projectiles, \
-             {pending} pending commands",
-            held.len()
+            "state beyond its limits: {units} units, {buildings} buildings, {projectiles} \
+             projectiles, {pending} pending commands"
         ));
     }
     problems
@@ -411,7 +410,7 @@ fn soak(set: &DataSet, config: Config) -> Played {
                 _ => {}
             }
         }
-        for problem in check_state(app.world_mut()) {
+        for problem in check_state(app.world_mut(), at) {
             played.failures.push(format!("tick {at}: {problem}"));
         }
         if played.failures.len() > 20 {

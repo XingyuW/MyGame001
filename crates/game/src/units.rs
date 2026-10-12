@@ -828,6 +828,16 @@ fn log_sim_events(mut events: MessageReader<SimEvent>) {
             SimEvent::DamageStateChanged { player, id, state } => {
                 debug!("player {}: {} is now {state:?}", player.0, id.0);
             }
+            SimEvent::UnitCrushed {
+                player,
+                unit,
+                crusher,
+                by,
+                ..
+            } => info!(
+                "player {}: unit {} crushed by unit {} of player {}",
+                player.0, unit.0, crusher.0, by.0
+            ),
             SimEvent::UnitDestroyed { player, unit } => {
                 info!("player {}: unit {} destroyed", player.0, unit.0);
             }

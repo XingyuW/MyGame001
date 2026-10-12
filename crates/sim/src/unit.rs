@@ -4,7 +4,14 @@
 //! A unit always stands in one cell (`Mobile::cell`). While it moves to an adjacent cell it has
 //! reserved that cell as well (`Mobile::step`), so the grid's occupant of both cells is the unit
 //! (invariant I6). It releases the cell it left when it reaches the centre of the new one.
+//!
+//! Since RA3 (invariant I6', docs/DECISIONS.md R6) a unit on foot, which is an infantry unit
+//! that does not fly ([`Definitions::on_foot`]), holds one of the three spots of its cell
+//! instead of the cell, and of the cell it steps into; the grid records which
+//! ([`Grid::spot`]). Its [`Position`] is that spot, or while it steps a point on the line from
+//! its spot to the spot it has reserved; a step takes as many ticks as from centre to centre.
 
+use std::collections::BTreeMap;
 use std::fmt;
 
 use bevy_ecs::component::Component;
@@ -37,7 +44,9 @@ pub struct Unit {
 }
 
 /// The unit's fine position: the centre of `Mobile::cell`, or a point on the straight line
-/// from it to the centre of the step's target cell.
+/// from it to the centre of the step's target cell. For a unit on foot: the spot it holds in
+/// `Mobile::cell`, or a point on the straight line from it to the spot it holds in the step's
+/// target cell.
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Position(pub SubPos);
 
@@ -134,7 +143,7 @@ impl Mobile {
     }
 
     /// The fine position for the current step progress (integer interpolation between the two
-    /// centres; exact at both ends).
+    /// centres; exact at both ends) of a unit that is not on foot.
     pub fn sub_position(&self) -> SubPos {
         let from = SubPos::centre_of(self.cell);
         let Some(step) = self.step else {
@@ -151,6 +160,30 @@ impl Mobile {
             from.x.saturating_add(axis(self.cell.x, step.to.x)),
             from.y.saturating_add(axis(self.cell.y, step.to.y)),
         )
+    }
+
+    /// The fine position of the unit `id` with this movement state: of a unit on foot the spot
+    /// it holds in its cell, or while it steps the point on the line from there to the spot it
+    /// holds in the step's target cell that has the step's share of the way behind it (integer
+    /// interpolation, rounded toward the start; exact at both ends); of any other unit
+    /// [`Mobile::sub_position`].
+    pub fn position(&self, grid: &Grid, id: SimId) -> SubPos {
+        let Some(spot) = grid.spot(self.cell, id) else {
+            return self.sub_position();
+        };
+        let from = SubPos::spot_of(self.cell, spot);
+        let Some(step) = self.step else {
+            return from;
+        };
+        let to = grid.standing_point(step.to, id);
+        let length = i32::from(step.length.max(1));
+        let progress = i32::from(step.progress.min(step.length));
+        // Two spots of neighbouring cells are at most 256 + 144 subcells apart on an axis, and
+        // a step is at most 362 long: far below i32::MAX (invariant I12).
+        let axis = |from: i32, to: i32| {
+            from.saturating_add(to.saturating_sub(from).saturating_mul(progress) / length)
+        };
+        SubPos::new(axis(from.x, to.x), axis(from.y, to.y))
     }
 }
 
@@ -200,6 +233,10 @@ pub struct MoveOrder {
     pub stalled_ticks: u16,
     /// Repaths since the order was given (for diagnostics and tests).
     pub repaths: u32,
+    /// Whether the unit may drive over hostile infantry on its way (RA3, docs/DECISIONS.md R6):
+    /// set for the move of a `Move` or `AttackMove` command to a unit of a type with the
+    /// arsenal's `crusher` trait, and for no other order.
+    pub crush: bool,
 }
 
 impl MoveOrder {
@@ -219,6 +256,16 @@ impl MoveOrder {
             paths_since_progress: 0,
             stalled_ticks: 0,
             repaths: 0,
+            crush: false,
+        }
+    }
+
+    /// The move of a `Move` or `AttackMove` command: as [`MoveOrder::new`], and the unit may
+    /// drive over hostile infantry on its way if its type is a `crusher`.
+    pub(crate) fn commanded(destination: CellPos, tick: u64, crusher: bool) -> Self {
+        Self {
+            crush: crusher,
+            ..Self::new(destination, tick)
         }
     }
 }
@@ -288,6 +335,7 @@ pub fn spawn_unit(
         )
     };
     let domain = world.resource::<Definitions>().domain(kind);
+    let on_foot = world.resource::<Definitions>().on_foot(kind);
     {
         let grid = world.resource::<Grid>();
         if !grid.contains(cell) {
@@ -296,7 +344,10 @@ pub fn spawn_unit(
         if !grid.passable_for(cell, domain) {
             return Err(SpawnError::Impassable(cell));
         }
-        if let Some(by) = grid.occupant_for(cell, domain) {
+        // A unit on foot shares a cell with up to two others on foot (invariant I6').
+        if grid.room_in(cell, domain, on_foot, |_| true) < Grid::room_needed(on_foot)
+            && let Some(by) = grid.occupant_for(cell, domain)
+        {
             return Err(SpawnError::Occupied { cell, by });
         }
     }
@@ -304,9 +355,13 @@ pub fn spawn_unit(
         .resource_mut::<SimIdAllocator>()
         .allocate()
         .ok_or(SpawnError::IdsExhausted)?;
-    world.resource_mut::<Grid>().register_domain(id, domain);
-    world.resource_mut::<Grid>().claim(cell, id);
-    let mut entity = world.spawn(unit_bundle(id, owner, kind, speed, cell));
+    let position = {
+        let mut grid = world.resource_mut::<Grid>();
+        grid.register(id, domain, on_foot);
+        grid.claim(cell, id);
+        grid.standing_point(cell, id)
+    };
+    let mut entity = world.spawn(unit_bundle(id, owner, kind, speed, cell, position));
     if harvester {
         entity.insert(Harvester::new());
     }
@@ -320,7 +375,8 @@ pub fn spawn_unit(
     Ok(id)
 }
 
-/// The components of a new unit standing idle in `cell`, facing south-east. A harvester also
+/// The components of a new unit standing idle in `cell` at `position` (where the grid has it
+/// stand once it holds the cell, [`Grid::standing_point`]), facing south-east. A harvester also
 /// gets a [`Harvester`] component.
 pub(crate) fn unit_bundle(
     id: SimId,
@@ -328,6 +384,7 @@ pub(crate) fn unit_bundle(
     kind: UnitKind,
     speed: u16,
     cell: CellPos,
+    position: SubPos,
 ) -> (SimId, Owner, Unit, Mobile, Position, Facing, Orders) {
     (
         id,
@@ -338,10 +395,191 @@ pub(crate) fn unit_bundle(
             cell,
             step: None,
         },
-        Position(SubPos::centre_of(cell)),
+        Position(position),
         Facing(Direction::SouthEast),
         Orders::default(),
     )
+}
+
+/// What the units of a world hold of a cell, by their own state: the units that are not on foot,
+/// and the units on foot.
+#[derive(Default)]
+struct Held {
+    whole: Vec<SimId>,
+    foot: Vec<SimId>,
+}
+
+/// Invariant I6' (docs/DECISIONS.md R6) on the state of `world`, taken from the units' own
+/// state and compared with the grid; the violations found, in words (none: it holds).
+///
+/// A unit holds the cell it stands in and, while it steps, the cell it enters. Checked:
+///
+/// * a surface cell is held by at most one unit that is not on foot, or by at most
+///   [`SPOTS_PER_CELL`](crate::SPOTS_PER_CELL) units on foot, and never by both; a cell of the
+///   air layer by at most one aircraft;
+/// * no unit of the surface holds a cell covered by a building;
+/// * the grid records every unit as a holder of the cells it holds, in the layer of its domain,
+///   a unit on foot at a spot of its own, and knows whether it is on foot;
+/// * every unit is where its cells put it: at the centre of its cell, a unit on foot at its
+///   spot, or while it steps at the step's share of the way to the next.
+///
+/// [`stray_claims`] is the other half: the holders the grid records that hold nothing. The
+/// soak (`examples/m7_soak.rs`) and the tests check both; they are no part of a tick.
+pub fn cell_invariant_violations(world: &mut World) -> Vec<String> {
+    let mut query = world.query::<(&SimId, &Unit, &Mobile, &Position)>();
+    let mut units: Vec<(SimId, UnitKind, Mobile, SubPos)> = query
+        .iter(world)
+        .map(|(id, unit, mobile, position)| (*id, unit.kind, *mobile, position.0))
+        .collect();
+    units.sort_unstable_by_key(|(id, ..)| *id);
+    let definitions = world.resource::<Definitions>();
+    let grid = world.resource::<Grid>();
+    let mut problems = Vec::new();
+    let mut surface: BTreeMap<CellPos, Held> = BTreeMap::new();
+    let mut air: BTreeMap<CellPos, Vec<SimId>> = BTreeMap::new();
+    for &(id, kind, mobile, position) in &units {
+        let domain = definitions.domain(kind);
+        let flies = domain == crate::Domain::Air;
+        let on_foot = definitions.on_foot(kind);
+        if grid.is_on_foot(id) != on_foot || grid.domain_of(id) != domain {
+            problems.push(format!(
+                "I6': the grid takes unit {} for {:?} and on foot {}, its type is {domain:?} and \
+                 on foot {on_foot}",
+                id.0,
+                grid.domain_of(id),
+                grid.is_on_foot(id)
+            ));
+        }
+        let entering = mobile
+            .step
+            .map(|step| step.to)
+            .filter(|to| *to != mobile.cell);
+        for cell in std::iter::once(mobile.cell).chain(entering) {
+            if flies {
+                air.entry(cell).or_default().push(id);
+            } else {
+                let held = surface.entry(cell).or_default();
+                if on_foot {
+                    held.foot.push(id);
+                } else {
+                    held.whole.push(id);
+                }
+                if grid.building(cell).is_some() {
+                    problems.push(format!(
+                        "I6': unit {} holds {cell:?}, which a building covers",
+                        id.0
+                    ));
+                }
+            }
+            if !grid.holders_for(cell, domain).contains(&Some(id)) {
+                problems.push(format!(
+                    "I6': unit {} holds {cell:?}, but the grid does not record it there",
+                    id.0
+                ));
+            }
+            if (on_foot && !flies) != grid.spot(cell, id).is_some() {
+                problems.push(format!(
+                    "I6': unit {} (on foot: {on_foot}) and the spots of {cell:?} disagree",
+                    id.0
+                ));
+            }
+        }
+        let expected = mobile.position(grid, id);
+        if position != expected {
+            problems.push(format!(
+                "I6': unit {} is at {position:?}, its cells put it at {expected:?}",
+                id.0
+            ));
+        }
+    }
+    let ids = |units: &[SimId]| {
+        units
+            .iter()
+            .map(|id| id.0.to_string())
+            .collect::<Vec<_>>()
+            .join(", ")
+    };
+    for (cell, held) in &surface {
+        if held.whole.len() > 1 {
+            problems.push(format!(
+                "I6': {cell:?} is held by the vehicles {}",
+                ids(&held.whole)
+            ));
+        }
+        if held.foot.len() > crate::SPOTS_PER_CELL {
+            problems.push(format!(
+                "I6': {cell:?} is held by {} infantry: {}",
+                held.foot.len(),
+                ids(&held.foot)
+            ));
+        }
+        if !held.whole.is_empty() && !held.foot.is_empty() {
+            problems.push(format!(
+                "I6': {cell:?} is held by the vehicle {} and the infantry {}",
+                ids(&held.whole),
+                ids(&held.foot)
+            ));
+        }
+        let mut spots: Vec<u8> = held
+            .foot
+            .iter()
+            .filter_map(|&id| grid.spot(*cell, id))
+            .collect();
+        spots.sort_unstable();
+        spots.dedup();
+        if spots.len() != held.foot.len() {
+            problems.push(format!(
+                "I6': the infantry {} do not each hold a spot of {cell:?}",
+                ids(&held.foot)
+            ));
+        }
+    }
+    for (cell, aircraft) in &air {
+        if aircraft.len() > 1 {
+            problems.push(format!(
+                "I6': the air above {cell:?} is held by the aircraft {}",
+                ids(aircraft)
+            ));
+        }
+    }
+    problems
+}
+
+/// The holders the grid of `world` records that hold nothing by their own state: a unit that
+/// does not exist, or one that neither stands in the cell nor enters it, in the surface layer
+/// or the air layer. None while every claim is released when its unit moves on or is removed
+/// (the other half of [`cell_invariant_violations`]; it looks at every cell of the map).
+pub fn stray_claims(world: &mut World) -> Vec<String> {
+    let mut query = world.query::<(&SimId, &Mobile)>();
+    let units: BTreeMap<SimId, Mobile> = query
+        .iter(world)
+        .map(|(id, mobile)| (*id, *mobile))
+        .collect();
+    let grid = world.resource::<Grid>();
+    let mut problems = Vec::new();
+    for y in 0..i32::try_from(grid.height()).unwrap_or(i32::MAX) {
+        for x in 0..i32::try_from(grid.width()).unwrap_or(i32::MAX) {
+            let cell = CellPos::new(x, y);
+            for layer in [crate::Domain::Land, crate::Domain::Air] {
+                for holder in grid.holders_for(cell, layer).into_iter().flatten() {
+                    let holds = units.get(&holder).is_some_and(|mobile| {
+                        (grid.domain_of(holder) == crate::Domain::Air)
+                            == (layer == crate::Domain::Air)
+                            && (mobile.cell == cell
+                                || mobile.step.is_some_and(|step| step.to == cell))
+                    });
+                    if !holds {
+                        problems.push(format!(
+                            "I6': the grid records unit {} in {cell:?} ({layer:?} layer), which it \
+                             does not hold",
+                            holder.0
+                        ));
+                    }
+                }
+            }
+        }
+    }
+    problems
 }
 
 fn write_cell(hasher: &mut Fnv1a64, cell: CellPos) {
@@ -353,7 +591,9 @@ fn write_cell(hasher: &mut Fnv1a64, cell: CellPos) {
 /// M2): owner, kind, speed, cell, step (flag, target, progress, length), position, facing, and
 /// the order (flag, destination, state (with its flags and tick), path length and cells, blocked
 /// ticks, retargets, remaining cost (flag and value), best cost, paths since progress, stalled
-/// ticks, repaths).
+/// ticks, repaths). Since RA3 the order's flag is 2 instead of 1 for an order that may crush
+/// (`MoveOrder::crush`), so the hash of every other order is what it was; the spots of a unit
+/// on foot are hashed with the grid, and its position here.
 pub(crate) fn hash_unit(
     hasher: &mut Fnv1a64,
     (owner, unit, mobile, position, facing, orders): (
@@ -384,7 +624,7 @@ pub(crate) fn hash_unit(
     match &orders.current {
         None => hasher.write(&[0]),
         Some(order) => {
-            hasher.write(&[1]);
+            hasher.write(&[if order.crush { 2 } else { 1 }]);
             write_cell(hasher, order.destination);
             match order.state {
                 PathState::Requested {
@@ -415,5 +655,101 @@ pub(crate) fn hash_unit(
             hasher.write(&order.stalled_ticks.to_le_bytes());
             hasher.write_u32(order.repaths);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::map::Cell;
+
+    /// RA3: a unit on foot is at its spot, and while it steps on the straight line to the spot
+    /// it has reserved, exact at both ends; any other unit moves between centres as before.
+    #[test]
+    fn a_unit_on_foot_is_placed_between_its_spots() {
+        let cell = Cell {
+            passable: true,
+            water: false,
+            buildable: true,
+            ore: 0,
+        };
+        let mut grid = Grid::from_cells(4, 4, vec![cell; 16]).expect("a grid");
+        let (soldier, other, truck) = (SimId(1), SimId(2), SimId(3));
+        grid.register(soldier, crate::Domain::Land, true);
+        grid.register(other, crate::Domain::Land, true);
+        grid.register(truck, crate::Domain::Land, false);
+        let (from, to) = (CellPos::new(1, 1), CellPos::new(2, 2));
+        assert!(grid.claim(to, other), "spot 0 of the next cell is taken");
+        assert!(grid.claim(from, soldier));
+        assert!(grid.claim_spot(to, soldier, Some(0)));
+        assert_eq!(
+            (grid.spot(from, soldier), grid.spot(to, soldier)),
+            (Some(0), Some(1))
+        );
+        let mobile = |progress: u16| Mobile {
+            speed: 16,
+            cell: from,
+            step: Some(Step {
+                to,
+                progress,
+                length: DIAGONAL_STEP,
+            }),
+        };
+        let standing = Mobile {
+            speed: 16,
+            cell: from,
+            step: None,
+        };
+        let (a, b) = (SubPos::spot_of(from, 0), SubPos::spot_of(to, 1));
+        assert_eq!(standing.position(&grid, soldier), a);
+        assert_eq!(mobile(0).position(&grid, soldier), a);
+        assert_eq!(mobile(DIAGONAL_STEP).position(&grid, soldier), b);
+        // Half way, rounded toward the start: from (320, 320) by (400, 304) to (720, 624).
+        assert_eq!((a, b), (SubPos::new(320, 320), SubPos::new(720, 624)));
+        assert_eq!(mobile(181).position(&grid, soldier), SubPos::new(520, 472));
+        assert_eq!(mobile(1).position(&grid, soldier), SubPos::new(321, 320));
+        assert_eq!(mobile(361).position(&grid, soldier), SubPos::new(718, 623));
+        // Beyond the step's length it stays at the end (invariant I12).
+        assert_eq!(mobile(u16::MAX).position(&grid, soldier), b);
+        // A unit that is not on foot: between the centres.
+        assert_eq!(standing.position(&grid, truck), SubPos::centre_of(from));
+        assert_eq!(
+            mobile(181).position(&grid, truck),
+            mobile(181).sub_position()
+        );
+        assert_eq!(mobile(181).sub_position(), SubPos::new(512, 512));
+    }
+
+    /// RA3: the hash of a unit covers whether its order may crush, and an order that may not
+    /// is hashed as before (invariant I3; docs/DECISIONS.md R6).
+    #[test]
+    fn the_hash_covers_whether_an_order_may_crush() {
+        let hash = |order: Option<MoveOrder>| {
+            let mut hasher = Fnv1a64::new();
+            hash_unit(
+                &mut hasher,
+                (
+                    &Owner(PlayerId(0)),
+                    &Unit { kind: UnitKind(3) },
+                    &Mobile {
+                        speed: 16,
+                        cell: CellPos::new(1, 1),
+                        step: None,
+                    },
+                    &Position(SubPos::centre_of(CellPos::new(1, 1))),
+                    &Facing(Direction::East),
+                    &Orders { current: order },
+                ),
+            );
+            hasher.finish()
+        };
+        let plain = MoveOrder::new(CellPos::new(5, 5), 7);
+        let commanded = MoveOrder::commanded(CellPos::new(5, 5), 7, false);
+        let crushing = MoveOrder::commanded(CellPos::new(5, 5), 7, true);
+        assert_eq!(plain, commanded);
+        assert!(crushing.crush && !plain.crush);
+        assert_eq!(hash(Some(plain.clone())), hash(Some(commanded)));
+        assert_ne!(hash(Some(plain.clone())), hash(Some(crushing)));
+        assert_ne!(hash(Some(plain)), hash(None));
     }
 }
