@@ -1,0 +1,33 @@
+// RA3 fixture: the unit types of the RA2 fixture and ten more for the tests of armour, warheads
+// and weapons (ra3_*.rs): an aircraft, a boat, a submarine, a squid, a flak car, a mortar, a
+// sapper, a martyr, a commando and a seer. Fixture data, independent of the shipped balance (invariant I10).
+(
+    schema_version: 1,
+    units: [
+        (id: "allied_mcv", speed: 16, sprite: "allied_mcv"),
+        (id: "soviet_mcv", speed: 16, sprite: "soviet_mcv"),
+        (id: "rifleman", speed: 16, sprite: "rifleman"),
+        (id: "conscript", speed: 16, sprite: "conscript"),
+        (id: "engineer", speed: 16, sprite: "engineer"),
+        (id: "sniper", speed: 16, sprite: "sniper"),
+        (id: "raider", speed: 32, sprite: "raider"),
+        (id: "militia", speed: 16, sprite: "militia"),
+        (id: "prototype", speed: 16, sprite: "prototype"),
+        (id: "advanced", speed: 16, sprite: "advanced"),
+        (id: "tank", speed: 32, sprite: "tank"),
+        (id: "heavy", speed: 24, sprite: "heavy"),
+        (id: "miner_a", speed: 32, sprite: "miner"),
+        (id: "miner_s", speed: 32, sprite: "miner"),
+        (id: "hovercraft", speed: 32, sprite: "hovercraft"),
+        (id: "gunship", speed: 32, sprite: "gunship"),
+        (id: "boat", speed: 32, sprite: "boat"),
+        (id: "sub", speed: 32, sprite: "sub"),
+        (id: "squid", speed: 32, sprite: "squid"),
+        (id: "flak_car", speed: 32, sprite: "flak_car"),
+        (id: "mortar", speed: 16, sprite: "mortar"),
+        (id: "sapper", speed: 16, sprite: "sapper"),
+        (id: "martyr", speed: 16, sprite: "martyr"),
+        (id: "commando", speed: 16, sprite: "commando"),
+        (id: "seer", speed: 16, sprite: "seer"),
+    ],
+)
