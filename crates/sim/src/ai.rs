@@ -55,6 +55,7 @@ use bevy_ecs::resource::Resource;
 use bevy_ecs::system::{Query, Res, ResMut};
 
 use crate::ai_defs::{AiDefinitions, AiPlan, Difficulty};
+use crate::arsenal::Role;
 use crate::building::{Building, Footprint, Producer};
 use crate::combat::{Sight, Weapon};
 use crate::command::{Command, CommandQueue, IssuedCommand, PlayerId};
@@ -676,7 +677,10 @@ impl<'a> View<'a> {
     /// unless one of its units or buildings is destroyed first: it lies within the sight of one of
     /// its buildings, or within the sight of one of its units both from the cell the unit stands in
     /// and from the cell it steps into (in one tick a unit's own cell can only become the cell it
-    /// steps into, `crate::movement`) (equation 6).
+    /// steps into, `crate::movement`) (equation 6). A unit that teleports is not counted: a
+    /// Chrono Miner with a full load is at its refinery in the next tick, and a Chrono
+    /// Legionnaire with a move order at its destination (`crate::special`; RA3,
+    /// docs/DECISIONS.md R44).
     fn stays_visible(&self, cell: CellPos) -> bool {
         let within = |footprint: Footprint, sight: u32| {
             let (x0, y0) = (i64::from(footprint.origin.x), i64::from(footprint.origin.y));
@@ -693,10 +697,15 @@ impl<'a> View<'a> {
                 .sight
                 .is_some_and(|sight| within(building.footprint, sight))
         }) || self.own_units.iter().any(|unit| {
-            unit.sight.is_some_and(|sight| {
-                within(cell_footprint(unit.mobile.cell), sight)
-                    && within(cell_footprint(unit.mobile.next_centre()), sight)
-            })
+            let teleports = self
+                .definitions
+                .metadata(ProductionItem::Unit(unit.kind))
+                .is_some_and(|entry| matches!(entry.role, Role::ChronoMiner | Role::Chrono));
+            !teleports
+                && unit.sight.is_some_and(|sight| {
+                    within(cell_footprint(unit.mobile.cell), sight)
+                        && within(cell_footprint(unit.mobile.next_centre()), sight)
+                })
         })
     }
 }
@@ -1774,5 +1783,119 @@ fn target_cell(controller: &AiController, from: CellPos) -> Option<CellPos> {
             .waypoints
             .get(index)
             .map(|waypoint| waypoint.cell),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::path::PathBuf;
+
+    use super::*;
+    use crate::map::Cell;
+
+    /// Regression (RA3, docs/DECISIONS.md R44; found by `m6_production_matches.rs`: Thousand
+    /// Lakes, Iraq against Korea, both brutal, tick 13,622). A computer player placed a
+    /// refinery on cells that only a Chrono Miner standing beside them lit; the miner, full,
+    /// teleported to its refinery in the tick of the command, and the placement was rejected
+    /// as not visible without any loss. A unit that teleports lights nothing a placement may
+    /// rely on; a unit that walks, and a building, do as before.
+    #[test]
+    fn a_cell_lit_only_by_a_unit_that_teleports_is_not_counted_on() {
+        // The legacy ruleset has the Chrono Miner and the Chrono Legionnaire of M9.
+        let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/data/legacy");
+        let definitions = crate::load_match_definitions(
+            dir.join("units.ron"),
+            dir.join("economy.ron"),
+            dir.join("combat.ron"),
+        )
+        .and_then(|definitions| definitions.with_arsenal(dir.join("arsenal.ron")))
+        .unwrap_or_else(|error| panic!("{error}"));
+        let kind = |id: &str| definitions.unit_kind(id).unwrap_or_else(|| panic!("{id}"));
+        let role = |id: &str| {
+            definitions
+                .metadata(ProductionItem::Unit(kind(id)))
+                .map(|entry| entry.role)
+        };
+        assert_eq!(role("chrono_miner"), Some(Role::ChronoMiner));
+        assert_eq!(role("chrono_legionnaire"), Some(Role::Chrono));
+        let cell = Cell {
+            passable: true,
+            water: false,
+            buildable: true,
+            ore: 0,
+        };
+        let grid = Grid::from_cells(32, 32, vec![cell; 32 * 32]).expect("a grid");
+        let player = PlayerId(0);
+        let mut players = Players::default();
+        players.add(player, 0).expect("a new player");
+        let state = players.get(player).expect("the player");
+        let plan = AiPlan {
+            build_order: Vec::new(),
+            power: BuildingKind(0),
+            harvester: kind("harvester"),
+            army: Vec::new(),
+        };
+        // A unit of the type `id` standing at (10, 10) with a sight of 4 cells.
+        let standing = |id: &str| UnitSnap {
+            id: SimId(1),
+            owner: player,
+            kind: kind(id),
+            mobile: Mobile {
+                speed: 16,
+                cell: CellPos::new(10, 10),
+                step: None,
+            },
+            has_order: false,
+            harvest: None,
+            armed: false,
+            attacking: false,
+            sight: Some(4),
+        };
+        let yard = BuildingSnap {
+            id: SimId(2),
+            owner: player,
+            kind: BuildingKind(0),
+            footprint: Footprint {
+                origin: CellPos::new(20, 20),
+                width: 2,
+                height: 2,
+            },
+            producer: None,
+            sight: Some(3),
+            pending: Vec::new(),
+        };
+        let lit = |id: &str, cell: CellPos| {
+            let units = [standing(id)];
+            let buildings = [BuildingSnap {
+                pending: Vec::new(),
+                ..yard
+            }];
+            View::new(
+                player,
+                0,
+                &players,
+                state,
+                &grid,
+                &definitions,
+                &plan,
+                false,
+                &units,
+                &buildings,
+            )
+            .stays_visible(cell)
+        };
+        let beside_the_unit = CellPos::new(12, 12);
+        // A unit that walks stays where it stands for the next tick.
+        assert!(lit("harvester", beside_the_unit));
+        assert!(lit("rifleman", beside_the_unit));
+        // One that teleports may be anywhere.
+        assert!(!lit("chrono_miner", beside_the_unit));
+        assert!(!lit("chrono_legionnaire", beside_the_unit));
+        // A building lights its surroundings whatever stands there, and nothing lights a cell
+        // out of every sight.
+        for id in ["harvester", "chrono_miner"] {
+            assert!(lit(id, CellPos::new(23, 21)), "{id}");
+            assert!(!lit(id, CellPos::new(16, 16)), "{id}");
+        }
     }
 }
