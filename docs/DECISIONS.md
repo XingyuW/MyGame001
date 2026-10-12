@@ -1865,3 +1865,330 @@ New in RA1-C (16 tests, all in the game crate): `skirmish` 9
 (`a_run_passes_only_with_the_menu_laid_out_the_cards_listed_and_the_flow_checked`,
 `the_layout_check_finds_a_menu_that_is_too_large_overlaps_or_cuts_a_text`,
 `the_flows_menu_presses_choose_its_matches_and_restore_the_lobby`).
+
+### R22. RA2: build times, the arsenal file of schema version 3, and the audit
+
+1. **Build times** (plan section 4.2). `scripts/generate_ra2_data.py` no longer holds a build
+   time per item: it writes `max(1, round(cost x 840 / 1000))` ticks, 840 being
+   `[General] BuildSpeed=.7` game minutes per 1000 credits, and for a building with `Wall=yes`
+   that number times `WallBuildSpeedCoefficient=3.0`. A Grizzly (700 credits) takes 588 ticks
+   where it took 233, a Power Plant 672 where it took 200, a wall 252.
+2. **`arsenal.ron`, schema 3.** Nine fields per entry, all required: `build_limit`
+   (`BuildLimit`; 0: none), `adjacent` (`Adjacent`, see R25), and as 1 or 0 `base_normal`
+   (`BaseNormal`, default yes), `radar` (`Radar`), `sellable` (no `Wall` and no `Unsellable`),
+   `repairable` (`Repairable`, default yes), `powered` (`Powered`), `is_powered` (the
+   `IsPowered` of the section its `SuperWeapon` names) and `unit_repair` (`UnitRepair`).
+   Beyond the plan's list: `repairable` and `unit_repair`, which items 8 and 9 need, since the
+   plan's "walls are not repairable" and "the Service Depot repairs" are properties of types
+   in the ini too. They are traits of buildings: on a unit each must be 0, and the loader
+   rejects anything else ("a building trait on a unit type"). Ranges: `build_limit` 0 to 255,
+   `adjacent` 0 to 32 (`MAX_PLACEMENT_DISTANCE`), flags 0 or 1. All are hashed with the
+   definitions.
+3. **The traits are read only with a rules file.** A world without `rules.ron` (the fixtures of
+   M2 to M9, the legacy ruleset) keeps every rule it had: one queue of 16 items per producer,
+   one unit of progress per tick and the even tick rule under low power, `placement_distance`
+   from any own building, `sell_value`, the `REPAIR_*` constants, every building stopped by low
+   power, the free repair around a Service Depot, and a minimap that is always on. This is the
+   arrangement of plan section 3.2, and it is why `m9_arsenal.rs`, `m11_repair.rs` and the
+   fixture tests of M3 to M7 pass unchanged.
+4. **The lane of a building is its category.** `BuildCat=Combat` is the arsenal's category
+   `armory`, which was already the Armory tab; the generator fails if the two disagree, and the
+   audit compares them (`lane`). No field was added for it.
+5. **The build limit of a unit is not ported.** The reference has one, `[YURIPR] BuildLimit=1`
+   (Yuri Prime, which cannot be built before RA6). `check_buildable` counts buildings from what
+   it is given; counting a player's units, also those in transports, belongs to the milestone
+   that makes the unit producible. The data has 0, and `ra2_differences.tsv` lists it.
+6. **The audit** (`ra9_data_parity.rs`) now also recomputes, for every mapped item, the build
+   time from its cost, and compares `build_limit`, and for every building `lane`, `adjacent`
+   and the seven flags; it asserts that a unit has none of them. Differences added: Yuri
+   Prime's build limit, and the `adjacent` of the two shipyards (R25). 21 rows in all.
+7. **Fixtures.** `legacy/arsenal.ron` and `ra1/arsenal.ron` are migrated to schema 3 (the
+   legacy one with neutral values that nothing reads; the RA1 one with `adjacent: 5`, which
+   gives the reach of its `placement_distance` of 6, its radars as radar buildings and its
+   turret and storm device powered). A third fixture, `fixtures/data/ra2/`, is the world of the
+   RA1 fixture with a bunker, a sentry, a wall, a depot and a vault, and rules whose values
+   differ from the shipped ones (a unit queue of 1 + 3, a refund of 40 percent, repair steps of
+   10 hit points every 5 ticks, 4 on a depot, at 20 percent), for the tests of RA2 (I10).
+8. **Debt.** `arsenal.ron` is 60,159 of the 65,536 bytes a data file may have
+   (`MAX_DATA_FILE_BYTES`). The next milestone that adds a trait to every entry must raise
+   the limit or split the file, with a decision record.
+
+### R23. RA2: production by rate, the lanes of the Construction Yard, queue lengths, build limits
+
+1. **Rate.** With a rules file the head of a queue advances by `rate_pm` permille of a unit of
+   progress per tick (`sim::production_rate_pm`), accumulated in `QueueItem::fraction` (0 to
+   999, hashed): `1000 x 1000^(n-1) div multiple_factory_pm^(n-1)` for `n` working factories of
+   the item's group (1000, 1250, 1562, 1953, ...; the plan's `1000 x 5^(n-1) div 4^(n-1)`),
+   times the low power factor in permille div 1000, times 10 with Super Me. Every whole unit
+   is charged by equation 3 as before (`cost div T`, and the remainder with the last), so I7
+   holds for every rate; `advance_item` does this in closed form, and a unit test compares it
+   with the unit by unit definition over 4000 generated cases. A unit the player cannot pay
+   ends the tick's progress; the fraction below one unit is kept, whole units that were not
+   made are not carried over (a player who gets credits again does not catch up at once).
+2. **Which factories count** (single source, YRPP's per category counters): the player's
+   buildings of the item's factory group that a spy has not switched off, of either side, at
+   most `MAX_COUNTED_FACTORIES` = 10. **Assumption** (the plan's): the ini knows no cap; ten
+   bounds the rate at 7.45 units per tick. The rate is also capped at
+   `MAX_PRODUCTION_RATE_PM` whatever a rules file holds (I12).
+3. **Low power** (plan section 4.2; **assumption**: the shortage is `1 - produced / consumed`):
+   `clamp(1000 - penalty_pm x (1000 - produced x 1000 div consumed) div 1000, min, max)`: 800
+   for any shortage up to a fifth, 500 for half or more, with the values of the ini. Nothing
+   else of production waits for power.
+4. **Lanes.** A queue is kept under `QueueKey { producer, lane }`: the producer as before
+   (`Definitions::queue_key`), and `Lane::Defences` for a building of the category `armory`
+   with a rules file, `Lane::Main` for everything else. `PlayerState::queue(producer)` is the
+   main lane, `PlayerState::lane(key)` any; `Definitions::queue_of(item)` names the key of an
+   item. The two lanes of the yards progress in the same tick.
+5. **Queue lengths** (`Definitions::queue_capacity`). With a rules file a lane of buildings
+   holds one item (single source, ModEnc: Red Alert 2 does not queue buildings), a queue of
+   units `1 + max_queued_objects` = 30. A complete building holds its lane until it is placed.
+   `QueueFull` reports that capacity. Without a rules file: `MAX_QUEUE_LENGTH` = 16.
+6. **Build limits.** `check_buildable` ends with a new check, after the country: with a rules
+   file and a `build_limit` above 0, the buildings of the type the player owns and those in
+   its queues together are fewer than the limit, else `BuildLimitReached { item, limit }`.
+   It is the last check on purpose: what the sidebar lists is "what could be queued but for
+   the limit" (R30). "Unlock all" does not waive it.
+7. **Difference from Red Alert 2**, as the plan lists it: the original charges in 54 steps,
+   the game per unit of progress, with the same total.
+
+### R24. RA2: what low power stops, superweapon charging, radar
+
+1. **One criterion** (`PlayerState::powers(definitions, kind)`), replacing "the owner is not
+   low on power" at every place the M9 code asked it for a building: with a rules file a
+   building works unless its owner is low on power **and** the type is `powered` **and**
+   consumes power (single source, ModEnc `Powered`). The mechanisms are unchanged: the fire of
+   armed buildings (`combat.rs`), the Cloning Vats, the Ore Purifier, the Spy Satellite, the Gap
+   Generator, the Psychic Sensor (`special.rs`). So a Pillbox (not `Powered`) and a Sentry Gun
+   (`Powered`, `Power=0`) keep firing, a Prism Tower does not; the Cloning Vats (not
+   `Powered`) keep cloning; the Spy Satellite (`Powered=true`, `Power=-100`) stops revealing,
+   although the plan's appendix D notes one source that says it needs no power: the rule of
+   section 4.2 was followed. A unit's ability (the repair of an IFV with an Engineer) does not
+   depend on the base's power with a rules file.
+2. **Superweapons.** The charge advances unless the owner is low on power and the type
+   `is_powered` (confirmed, the ini's `IsPowered`); all four shipped superweapons are.
+   **Assumption**: a charged superweapon that `is_powered` cannot be fired under low power
+   either (the M9 rule, kept; no source says what the engine does with a ready weapon).
+3. **Radar** (`PlayerState::radar`, hashed, set by `update_power` in the `Economy` stage): with
+   a rules file a player has radar while it owns a `radar` building that a spy has not switched
+   off, is not low on power, and suffers no power outage from a spy in a power plant; a world
+   without a rules file always has it. Following the plan, any low power takes the radar away,
+   also from an Airforce Command, which is not `Powered` in the ini (single source, ModEnc
+   `Radar`). The spy's outage itself is unchanged (600 ticks, the M9 value; RA6 ports
+   `SpyPowerBlackout`).
+4. The computer player does not read the radar.
+
+### R25. RA2: placement by `adjacent` and `base_normal`; the reach of a shipyard
+
+1. **The rule** (`sim::placement_reach`, `sim::extends_base`, used by `check_placement`, the
+   interface's preview and the computer player). With a rules file a new building must lie
+   within its own `adjacent` free cells of a building of its owner whose type is
+   `base_normal`. ModEnc defines `Adjacent=0` as touching and `Adjacent=1` as "at most a 1
+   cell gap", so the reach in the game's measure (`Footprint::distance`: 1 for touching) is
+   `adjacent + 1`: 3 for most buildings, 5 for Pillbox, Sentry Gun and Patriot, 9 for walls.
+   `adjacent` is stored in cells, as the ini writes it, not in subcells as the conversion table
+   of the plan's section 2 says for distances: footprints are measured in cells.
+2. **Assumption**: the rule applies to every player. ModEnc says the engine places the
+   buildings of its own AI by `AIBaseSpacing` instead; the game's computer player issues
+   `PlaceBuilding` like anyone (I5), and its `find_placement` looks for sites within the reach
+   of each building from its base buildings.
+3. `check_placement` now takes the types with the footprints of the player's buildings
+   (`(BuildingKind, Footprint)`), since it must know which are base buildings.
+4. **The shipyard keeps its reach of 32, as a listed difference.** Measured by
+   `ra2_shipped.rs::shipyard_water_lies_farther_from_the_starts_than_the_shipyards_adjacent_distance`
+   over the 176 start positions of the 21 shipped maps: the distance from the Construction
+   Yard at the start to the nearest place for a shipyard (open water of 3 x 3 cells with shore
+   beside it) is at most 13 (`Adjacent=12`) at 28 starts, and at the first start, the human
+   player's, on 2 maps (Frostline 7, Pacific Atoll 8); it is at most 32 at 132 starts, and at
+   the first start on 18 maps (not on Oasis Gulf 48, Red Canyon 41, Steel Harbor 54, where a
+   player builds towards the water). No map has every start within 13, and 13 maps have none.
+   The maps are not reshaped (plan item 7), so the two shipyards have `adjacent: 31` in
+   `arsenal.ron` where the reference has 12, listed in `ra2_differences.tsv`; the special case
+   in code (`SHIPYARD_PLACEMENT_DISTANCE`) remains only for a world without a rules file. A
+   shipyard is no base building (`BaseNormal=no`), as in the ini.
+
+### R26. RA2: selling and repairing
+
+1. **Sale.** With a rules file the refund is `cost x refund_percent div 100`
+   (`Definitions::refund`), which the economy file's `sell_value` already equalled for the
+   shipped data (the audit compares both with the reference); without one, `sell_value`.
+   **Assumption** (appendix D): no scaling with the building's health. A type that is not
+   `sellable` is rejected with the new `NotSellable`: the two walls. The ini makes only the
+   tech buildings `Unsellable`; that walls cannot be sold is the prompt's and the plan's
+   requirement, expressed in the data as "no `Wall`".
+2. **Repair** (section 4.6). With a rules file `RepairBuilding` starts only on a `repairable`
+   type (else the new `NotRepairable`: the walls, `Repairable=false`); every `repair_interval`
+   (19) ticks the building regains `repair_step` (8) hit points, at most what it lacks, for
+   `max(1, (cost div max(strength div repair_step, 1)) x repair_percent div 100)` credits
+   (`sim::repair_step_cost`; 3 credits for the Construction Yard, the plan's example). The last
+   step costs a whole step whatever it restores. A step the player cannot pay is skipped and
+   the repair waits (I7). Super Me pays at most 1 credit a step. The step ticks are the ticks
+   divisible by the interval, for all buildings alike.
+
+### R27. RA2: the Service Depot
+
+1. **The order** is the existing `Command::Interact { unit, target }` (the plan's item 9): for
+   a unit that is neither an Engineer nor a Spy, and a target that is a building with
+   `unit_repair`, it means "go there and be repaired". Checked in this order: the building is
+   the player's own ("Choose your own repair building"), the unit is a vehicle ("Only vehicles
+   are repaired here"), of the building's element (a ship at a shipyard, a ground vehicle
+   elsewhere, an amphibious one at either, no aircraft: "This unit is not repaired here"), and
+   damaged ("This unit is not damaged"); all as `AbilityUnavailable`, with no state change.
+   Another player's unit is `NotOwned`, as for every unit command.
+2. **Docking.** The vehicle drives to a free cell beside the building (the approach of
+   transports and engineers) and is then recorded in `SpecialState::docked` (unit to
+   building, hashed). A building covers its cells, so "onto the depot" is "beside it"; any
+   number of vehicles may be docked at once (**difference**: the original repairs one at a
+   time on the pad). A docked harvester stops its cycle.
+3. **Repair** (`special::repair_docked`, in the `Economy` stage): every
+   `unit_repair_interval` (19) ticks a docked vehicle regains `repair_step` hit points for the
+   step cost of its own price and hit points (2 credits per 8 hit points for a Grizzly). A
+   step the owner cannot pay is skipped; no step while a spy has switched the building off.
+   When it is whole it leaves the dock and moves to the nearest free cell two cells from the
+   building, to make room. The repair also ends when the vehicle gets any order, is no longer
+   beside the building, or either is lost or changes owner.
+4. **The free repair around a Service Depot of M9 is removed** with a rules file. The repair
+   by an IFV that carries an Engineer stays (RA6 owns it). `UnitRepair=yes` on the two
+   shipyards gives ships the same paid repair, which the plan does not name; it follows from
+   the trait.
+5. Not done here: a docked vehicle cannot be sold from the depot, and a Terror Drone is not
+   removed (appendix D lists both; RA6). The computer player does not use the depot (plan).
+
+### R28. RA2: the computer player
+
+1. **Lanes.** `queue_buildings` (was `queue_building`) looks, per lane, for the first building
+   of the build order that the player owns less often than the order lists it, and queues it
+   if its lane is empty; so a defence is built beside the next building. The Allied plan's
+   Pillboxes and the Soviet plan's Sentry Guns are built that way; the build orders in
+   `ai.ron` are unchanged.
+2. **Power.** It still builds a power building first when the next building would leave it
+   short, now counting what the buildings in its queues will produce and consume; a lane
+   whose building must wait for power queues nothing.
+3. **Placement.** `find_placement` searches within `placement_reach` of the building from the
+   player's base buildings (`extends_base`), and `place_ready_building` tries every ready
+   building, not only the first, so that a defence without a site does not hold the other
+   lane back. `sell_for_army` does not try to sell what cannot be sold.
+4. **Queues.** It asks `Definitions::queue_capacity` instead of `MAX_QUEUE_LENGTH`.
+5. Tested on the RA2 fixture (`ra2_ai.rs`: all pairings end with a winner, no rejected command
+   that the fighting does not explain, in particular no `QueueFull` and no
+   `BuildLimitReached`; both lanes used; every placed building within its reach) and with the
+   shipped data (`ra2_shipped.rs`, and the 756 matches).
+
+### R29. RA2: the tick limit of the shipped matches is rescaled by the pacing factor 2
+
+`crates/game/tests/m6_production_matches.rs` requires each of its 756 matches of computer
+players with the shipped data to end with a winner within `MATCH_TICK_LIMIT x span / 128`
+ticks (`span`: the map's width plus height, at least 128). `MATCH_TICK_LIMIT` is now 72,000
+(was 36,000). No other limit was changed: `m6_ai.rs`, `m7_factions.rs`, `m10`, `ra1_match.rs`
+play fixture data, whose build times did not change; `m13_grown_maps.rs` (72,000 for ten
+players) and the soak (36,000 ticks per configuration, with no requirement to end) pass as
+they are; `m14_duels` gives every match 300,000 ticks, as before.
+
+**Derivation.** RA2 gives every item the build time of Red Alert 2, `cost x 21 / 25` ticks
+(R22). Before, a vehicle took `cost / 3` ticks (Grizzly 233 for 700 credits, Rhino 300 for 900,
+the miners 466 for 1400), so vehicles are built 0.84 x 3 = 2.52 times as slowly. The armies of
+both plans are mostly vehicles (the Allied cycle of six units costs 3100 credits, 2700 of them
+vehicles), and both plans build two War Factories, which the multiple factory rule of RA2
+speeds up by 1 / 0.8. The pace at which a computer player's army is built is therefore
+2.52 x 0.8 = 2.016 times slower than before RA2, and the limit, which bounds matches whose
+length is governed by that pace, is rescaled by 2. (Infantry: a GI took 80 ticks and takes
+168, with two Barracks 134, a factor of 1.68; buildings 1.75 to 4.2, once per match.)
+
+**Measured** (`m14_duels -- full`, the same 756 matches as the test; ticks; "old limit" is
+36,000 x span / 128). Before: `docs/validation/ra2-parity/ra1/10-duels.log`. After:
+`docs/validation/ra2-parity/ra2/10-duels.log`, whose numbers the status entry of RA2 repeats.
+
+| | Before RA2 | After RA2 (first run) |
+|---|---|---|
+| Length over the old limit: median, 90th percentile, longest | 0.15, 0.34, 0.86 | 0.22, 0.49, 1.49 |
+| Matches over the old limit | 0 | 5 |
+| Small maps (span up to 128): median of each map | 9,076 to 10,797 | 12,814 to 16,066 |
+| Small maps: longest | 30,979 (demo) | 53,699 (crossroads, Korea against France, both easy) |
+| Large maps: median of each map | 11,419 to 29,058 | 12,920 to 46,123 |
+| Large maps: longest | 103,519 (Liberty Bay) | 161,774 (Oasis Gulf, Germany against Great Britain, both brutal) |
+| Length over the new limit: median, 90th percentile, longest | | 0.11, 0.25, 0.75 |
+
+The five matches over the old limit: three on Crossroads (53,699, 49,468 and 41,022, limit
+36,000), one on Riverlands (38,262) and the one on Oasis Gulf (limit 126,000). All 756 ended
+with a winner. Matches are 1.4 to 1.5 times as long at the median and at the 90th percentile,
+less than the factor of the limit, because moving and fighting did not slow down.
+
+**Not a stall.** `m14_duels -- full trace oasis_gulf` shows the longest match as a war of
+attrition between two equal Allied players, not a standstill: from tick 9,000 to its end both
+keep 10 to 44 units in the field, the armies meet between the bases (unit centres around
+x = 60 to 100 and x = 160 to 210 of 256), and the loser's buildings fall from 13 to 8 over
+100,000 ticks. Its length is debt for RA8, which gives the computer player the rest of the
+arsenal; the limit was not raised to cover it alone (it would fit a factor of 1.3).
+
+### R30. RA2: the interface
+
+1. **Two lanes in the sidebar.** A card shows the progress of its own item, as before; the
+   item's queue is now that of its lane (`ItemStatus` reads `Definitions::queue_of`). Each tab
+   button carries a thin bar with the progress of its lane (`sidebar::tab_progress`: the item
+   of that tab that is in production, the most advanced one for the Vehicles tab, whose
+   ships and aircraft have queues of their own), so the lane of the tab that is not open is
+   seen too. This is the plan's "armoury progress beside building progress".
+2. **A taken lane.** `ItemStatus::full`: the item's queue holds what it can. Its other cards
+   are drawn recessed and say `busy`, the hint says "Busy: the yard builds one of these at a
+   time", and a left click orders nothing (before, the simulation would have rejected it).
+3. **Build limit.** `ItemStatus::limited`: the card says `LIMIT`, the hint "Build limit
+   reached: 1 per player". The card stays listed: `item_listed` and `reachable_buildings`
+   treat `BuildLimitReached` like "can be queued", since the limit says nothing about what
+   the player's buildings can build. (The sidebar knows which building types the player owns,
+   not how many of each, which is exact for the limits of one that the shipped data has; the
+   command itself counts the buildings.)
+4. **Two ready buildings.** `construction::ready_in_mode`: placement mode keeps the building
+   it is placing while that one is ready, whatever else is ready; `B` and the mode's start
+   still take the first ready building. Before, the mode ended whenever the first ready
+   building was another one.
+5. **Hints.** The time of an item is its build time over the production rate
+   (`sidebar::build_ticks`, with the player's factories and power); under low power the hint
+   says "Low power: production at 80%" (the factor of R23). `availability_text` takes the
+   number of factories.
+6. **Radar** (`minimap.rs`). While the human player has no radar the minimap image is the
+   map's diamond in one dark colour, the sidebar shows "RADAR OFFLINE" with "no radar
+   building" or "low power" over it (`SidebarText::Radar`), the camera's rectangle is hidden
+   and a click on the minimap moves nothing. `MinimapState::offline` says which was drawn;
+   the smoke test fails if the drawing of a tick and the player's radar disagree. A default
+   match starts without radar, so the minimap is blank until the player builds an Airforce
+   Command, a Radar Tower or a Spy Satellite: Red Alert 2's behaviour, and a visible change
+   for the user.
+7. **Depot.** No new control: `E` and a click on the Service Depot sends the selected
+   vehicles (`special_controls`, as for transports); the mode's hint names it. A rejected
+   order shows its reason in the action hint, as every rejected command does.
+8. The superweapon buttons say `LOW POWER` only for a superweapon that `is_powered`, and the
+   glow of a working building follows `PlayerState::powers`.
+9. Nothing was drawn or recorded for RA2: no asset, no sound, no entry in
+   `assets/LICENSES.md`.
+
+### R31. RA2: tests adapted (none deleted, ignored or weakened)
+
+**Compile migrations** (the assertions are unchanged):
+
+| Test | What changed |
+|---|---|
+| `m3_economy.rs::a_completed_item_is_charged_exactly_its_cost` | the two `QueueItem` literals gained `fraction: 0` (the new field; 0 in a world without rules) |
+| `m5_placement_preview.rs` (helper `preview`), `m9_arsenal.rs` (catalogue helper), `ra1_shipped.rs` and `ra1_buildability.rs` (helper `build`), game `tests/m10_unlocks_and_enemies.rs` (helper `site`, new helper `anchors`) | `check_placement` takes `(BuildingKind, Footprint)` pairs (R25 item 3) |
+| game `sidebar::tests::cards_follow_the_tech_tree_and_unlock_all_waives_only_prerequisites`, `a_tab_lists_only_what_a_building_of_the_player_could_build` | `availability_text` takes the number of factories (1); an `ItemStatus` literal gained `limited` and `full` |
+
+**Schema migration** (`ra1_definitions.rs`, the arsenal at schema 3): the text edits that
+matched `(schema_version: 2, entries: [` match `3`; `other_schema_versions_are_rejected_in_every_file`
+rejects 2, 1 and 4 against 3 (one case more); `every_field_of_the_arsenal_file_is_required`
+also removes each of the nine new fields in turn (nine cases more).
+
+**Expectation changed because RA2 behaviour is intended:**
+
+| Test | What changed and why |
+|---|---|
+| `ra1_buildability.rs::a_superweapon_building_is_rejected_while_the_option_is_off` | its helper `queued` reads both lanes of the yard: the storm device is a defence and waits in the defence lane (R23 item 4). The assertion (`[device]`) is unchanged |
+| game `sidebar::tests::item_status_follows_the_players_buildings_and_queue` | two Power Plants are ordered as before; the lane of the buildings holds one, so one is queued and the badge at half time says `50%` (before: two queued, `50% +1`). Added: the lane is `full`, another card of the lane says `busy` once it is available, a click on it orders nothing, and the tab bars show 50 percent for Buildings and nothing for Armory and Vehicles |
+| game `tests/m6_production_matches.rs` (all four tests) | `MATCH_TICK_LIMIT` 72,000 instead of 36,000 (R29) |
+
+`m9_arsenal.rs` (24 tests) and `m11_repair.rs` (4 tests) assert the unified arsenal of M9 on
+the legacy fixture, which has no rules file and so keeps the M9 rules (R22 item 3): apart from
+the helper named above they are unchanged, and none of their expectations changed.
+
+New in RA2: `ra2_definitions.rs` (7), `ra2_production.rs` (15), `ra2_power.rs` (6),
+`ra2_placement.rs` (6), `ra2_repair.rs` (12), `ra2_ai.rs` (3), `ra2_shipped.rs` (8), with the
+shared helpers in `tests/ra2_common/mod.rs`; 2 unit tests in `sim::economy`; in the game
+`minimap` 2, `sidebar` 2, `construction` 1, and one more case in
+`smoke::tests::a_run_passes_only_with_the_full_interface_loaded`.

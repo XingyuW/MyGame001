@@ -38,8 +38,53 @@ deployed, the infantry of your side once you own a Barracks, a Conscript once yo
 Soviet Barracks. A card whose prerequisites you can still build is shown **LOCKED**; hover it for
 what it needs. Cards show cost, missing prerequisites, queue progress and ready or blocked
 states. Queues charge as work proceeds; cancellation refunds exactly the credits already charged.
-A completed building waits for valid placement. Low power slows production and stops powered
-defenses and strategic charging.
+A completed building waits for valid placement.
+
+## Production, power and base building
+
+These follow Red Alert 2 since milestone RA2 of the parity programme (times are at game speed
+1×, 20 ticks a second).
+
+* **Build time.** Every item takes `cost × 21 / 25` ticks: 42 seconds per 1000 credits. A Power
+  Plant (800) takes 34 seconds, a Grizzly (700) 29, a War Factory (2000) 84; a wall three times
+  its share (13 seconds for 100 credits). The credits are charged as the work proceeds, and
+  work waits while you cannot pay.
+* **Several factories.** Every further factory of a kind (Construction Yards, Barracks, War
+  Factories, Naval Shipyards, Airforce Commands; either side's count) builds that kind's items
+  1.25 times as fast, up to ten: two War Factories build a Grizzly in 24 seconds.
+* **Lanes and queues.** The Construction Yard builds two things at once: one **building**
+  (Buildings tab) and one **defence** (Armory tab: walls, turrets, the Gap Generator, the Spy
+  Satellite, the Psychic Sensor and the superweapons). Each of these two lanes holds one item:
+  while it is being built, or is READY and waits to be placed, the other cards of its tab say
+  `busy`. Barracks, War Factories, Shipyards and Airforce Commands have a queue each, which
+  holds the unit in production and 29 behind it. A thin bar on each tab shows the progress of
+  its lane, whichever tab is open.
+* **Build limits.** One Ore Purifier, Cloning Vats, Chronosphere, Weather Control Device, Iron
+  Curtain Device and Nuclear Missile Silo per player; the card then says `LIMIT`.
+* **Low power.** A shortage slows all production: to 80 percent for a shortage of up to a fifth
+  of what your buildings consume, down to 50 percent for half or more. Only buildings that are
+  powered **and** consume power stop working: Prism Tower, Tesla Coil, Patriot, Flak Cannon,
+  Grand Cannon, Gap Generator, Spy Satellite, Psychic Sensor and Ore Purifier. A Pillbox, a
+  Sentry Gun and the Cloning Vats keep working. Superweapons stop charging, and cannot be
+  fired, until the power is back.
+* **Radar.** The minimap is your radar: it needs an Airforce Command, a Radar Tower or a Spy
+  Satellite Uplink, and enough power. Without one, under low power, and while an enemy spy has
+  switched your power off, it shows **RADAR OFFLINE** with the reason, and clicks on it do
+  nothing.
+* **Placement.** A building must stand within 2 free cells of one of your base buildings; a
+  Pillbox, a Sentry Gun and a Patriot within 4; a wall within 8. Defences, walls and shipyards
+  are not base buildings: nothing can be placed from them alone. A Naval Shipyard may stand up
+  to 31 free cells from your base (Red Alert 2 allows 12; on most shipped maps the water lies
+  farther from the start than that, and the maps were not reshaped).
+* **Selling and repairing.** A sale refunds half the cost. A repair (`K`, or the Repair
+  button) restores 8 hit points about once a second (every 19 ticks) and charges each step, so
+  that a whole repair costs about 15 percent of the price; it waits while you cannot pay. Walls
+  can be neither sold nor repaired.
+* **Service Depot.** Select damaged vehicles, press `E` and click your Service Depot: they drive
+  up to it and are repaired there step by step for credits, at the rate and price of a building
+  repair (a Grizzly: 2 credits per 8 hit points), then make room. Any new order ends the
+  repair. Ships are repaired the same way at a Naval Shipyard. Nothing is repaired for free by
+  standing near a depot any more.
 
 [Construction system report](docs/CONSTRUCTION_SYSTEM.md) documents the roster, mechanics,
 integration and tests as they were before the Red Alert 2 parity programme, which
@@ -303,7 +348,7 @@ not signed: on another Mac, open it with a right click and **Open** the first ti
 | Cursor near a window edge | scroll the map (can be switched off in Options): a 28-pixel band on every edge, faster towards the edge, diagonal near corners; leaving the window through an edge (title bar, Dock, screen edge) keeps scrolling until the cursor returns or the window loses focus; interface buttons inside a band never scroll |
 | Hold middle mouse, or Space + left mouse, then displace the pointer | continuous camera scrolling; hold still to keep moving, return to the starting point or release to stop |
 | Mouse wheel or trackpad | zoom in and out |
-| Left click or drag on the minimap | centre the view there |
+| Left click or drag on the minimap | centre the view there (while you have radar) |
 
 ### Units
 
@@ -319,7 +364,7 @@ not signed: on another Mac, open it with a right click and **Open** the first ti
 | `A` | attack-move the selection to the cell under the cursor: fight enemies on the way |
 | `S` | stop |
 | `D` | deploy the selected MCV into a Construction Yard where it stands, unload a transport, or contaminate the area with a Desolator |
-| `E`, then left click | engineer repair/capture, spy infiltration, or load selected ground passengers into a friendly transport |
+| `E`, then left click | engineer repair/capture, spy infiltration, load selected ground passengers into a friendly transport, or send selected damaged vehicles to your Service Depot for a paid repair |
 | Ctrl or Cmd + `0` to `9` | make the selection control group n |
 | `0` to `9` | select control group n |
 | Shift + `0` to `9` | add control group n to the selection |
@@ -328,12 +373,13 @@ not signed: on another Mac, open it with a right click and **Open** the first ti
 
 | Input | Action |
 |-------|--------|
-| Left click on an item | queue it (a tab lists what your buildings could build; a LOCKED card explains what it still needs) |
+| Left click on an item | queue it (a tab lists what your buildings could build; a LOCKED card explains what it still needs; the yard builds one building and one defence at a time) |
 | Right click on an item | cancel the last queued entry, with a refund of what was paid |
 | Left click on a building marked READY, or `B` | placement mode: the footprint is green where it can be placed and red where not; left click places it |
 | `Tab` | cycle Buildings, Armory, Infantry and Vehicles |
 | Strategic ability button, then map click | activate a charged superweapon; select vehicles first for Chronosphere |
-| **Sell** button or `X` | sell mode: left click sells your building (refund of half its cost) |
+| **Sell** button or `X` | sell mode: left click sells your building (refund of half its cost; walls cannot be sold) |
+| **Repair** button or `K` | repair mode: left click starts or stops the repair of your building, paid step by step |
 | `Delete` or `Backspace` | sell your building under the cursor |
 | Left click on your War Factory, Barracks, Cloning Vats, Naval Shipyard or Airforce Command | select that building: green brackets mark it and its rally point is shown as an orange flag |
 | Right click on the map with such a building selected | set **that building's** rally point (the cursor shows RALLY POINT): every unit it builds from then on goes there; the Cloning Vats send their copies to their own point, apart from the Barracks' |
@@ -367,12 +413,16 @@ With several enemies every computer player has its own base, economy, AI and col
 AI** they are allied against you: they never fire at each other or march on each other's bases,
 and the match ends when only they are left. With **FREE FOR ALL** they fight each other too.
 
-Buildings need power: under low power production slows down and defences stop firing. Harvesters
-bring ore to a refinery for credits.
-Buildings require visible, unoccupied terrain within four cells of your base. Shipyards require a
-visible water footprint touching shore within 32 cells of your base (scout the water first; every
-shipped map has suitable water within that reach of your start); naval units stay in water, amphibious transports can use either, and
+Buildings need power: under low power production slows down and the powered defences stop
+firing (see "Production, power and base building" above). Harvesters bring ore to a refinery
+for credits.
+Buildings require visible, unoccupied terrain within two free cells of a base building of
+yours (four for the cheap defences, eight for walls). Shipyards require a visible water
+footprint touching shore within 31 free cells of your base (scout the water first; 18 of the 21
+shipped maps have suitable water within that reach of the first start, and on the others you
+build towards it); naval units stay in water, amphibious transports can use either, and
 aircraft can cross land and water. Harriers and Black Eagles return to Airforce Command to rearm.
+The minimap shows the map only once you own a radar building.
 
 Units move as fast as in Red Alert 2 at its nominal 15 frames a second, which is slower than this
 game was before: raise the game speed (`]`) if you prefer the pace of the original at 30 frames
