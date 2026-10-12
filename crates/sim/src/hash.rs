@@ -134,6 +134,10 @@ pub fn state_hash(world: &mut World) -> u64 {
     world.resource::<MatchState>().hash_into(&mut hasher);
     world.resource::<AiPlayers>().hash_into(&mut hasher);
 
+    world
+        .resource::<crate::SpecialState>()
+        .hash_into(&mut hasher);
+    world.resource::<crate::Props>().hash_into(&mut hasher);
     hasher.finish()
 }
 

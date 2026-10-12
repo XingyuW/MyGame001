@@ -31,20 +31,44 @@ pub const MAX_UNITS_PER_COMMAND: usize = 1024;
 /// An order issued by a player (PLAN.md section 5).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Command {
+    Deploy {
+        unit: SimId,
+    },
+    Interact {
+        unit: SimId,
+        target: SimId,
+    },
+    Superweapon {
+        building: SimId,
+        target: CellPos,
+        units: Vec<SimId>,
+    },
     /// Move the units to `target`. A group receives distinct destination cells around the
     /// target (docs/DECISIONS.md D19). Harvesters among them stop their cycle.
-    Move { units: Vec<SimId>, target: CellPos },
+    Move {
+        units: Vec<SimId>,
+        target: CellPos,
+    },
     /// Cancel the units' orders; each stops at its next cell centre. Harvesters among them stop
     /// their cycle.
-    Stop { units: Vec<SimId> },
+    Stop {
+        units: Vec<SimId>,
+    },
     /// Start or resume the harvesting cycle of the harvesters, each at the cell with ore
     /// nearest to `target` that no other harvester has taken (docs/DECISIONS.md D26).
-    Harvest { units: Vec<SimId>, target: CellPos },
+    Harvest {
+        units: Vec<SimId>,
+        target: CellPos,
+    },
     /// Append `item` to the player's queue of its producing building type (docs/DECISIONS.md
     /// D25).
-    QueueProduction { item: ProductionItem },
+    QueueProduction {
+        item: ProductionItem,
+    },
     /// Remove the most recently queued `item` from its queue and refund what was charged for it.
-    CancelProduction { item: ProductionItem },
+    CancelProduction {
+        item: ProductionItem,
+    },
     /// Place the player's ready building of type `building` with its footprint's origin (the
     /// cell with the smallest coordinates) at `origin` (docs/DECISIONS.md D24).
     PlaceBuilding {
@@ -52,17 +76,34 @@ pub enum Command {
         origin: CellPos,
     },
     /// Sell the building: remove it, free its cells, and refund its sell value.
-    SellBuilding { building: SimId },
+    SellBuilding {
+        building: SimId,
+    },
+    /// Start repairing the player's building, or stop if it is being repaired. A repaired
+    /// building regains hit points in steps, each paid for from the player's credits, until it
+    /// is whole (`economy::repair_buildings`).
+    RepairBuilding {
+        building: SimId,
+    },
     /// Units produced by the building move to `cell` when they leave it.
-    SetRallyPoint { building: SimId, cell: CellPos },
+    SetRallyPoint {
+        building: SimId,
+        cell: CellPos,
+    },
     /// The armed units attack `target`, a unit or building of another player that the issuing
     /// player sees, moving into range if needed, until it is destroyed or no longer visible
     /// (docs/DECISIONS.md D29). Harvesters among them stop their cycle.
-    Attack { units: Vec<SimId>, target: SimId },
+    Attack {
+        units: Vec<SimId>,
+        target: SimId,
+    },
     /// Move the units to `target` as `Move` does; the armed ones stop to fight visible enemies in
     /// range on the way and then move on (docs/DECISIONS.md D29). Harvesters among them stop
     /// their cycle.
-    AttackMove { units: Vec<SimId>, target: CellPos },
+    AttackMove {
+        units: Vec<SimId>,
+        target: CellPos,
+    },
 }
 
 impl Command {
@@ -74,10 +115,14 @@ impl Command {
             | Command::Harvest { units, .. }
             | Command::Attack { units, .. }
             | Command::AttackMove { units, .. } => Some(units),
-            Command::QueueProduction { .. }
+            Command::Deploy { .. }
+            | Command::Interact { .. }
+            | Command::Superweapon { .. }
+            | Command::QueueProduction { .. }
             | Command::CancelProduction { .. }
             | Command::PlaceBuilding { .. }
             | Command::SellBuilding { .. }
+            | Command::RepairBuilding { .. }
             | Command::SetRallyPoint { .. } => None,
         }
     }
@@ -86,6 +131,7 @@ impl Command {
 /// Why a command was rejected. A rejected command changes no state.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum RejectReason {
+    AbilityUnavailable(&'static str),
     NoUnits,
     TooManyUnits {
         count: usize,
@@ -148,6 +194,7 @@ pub enum RejectReason {
 impl fmt::Display for RejectReason {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Self::AbilityUnavailable(reason) => write!(f, "{reason}"),
             Self::NoUnits => write!(f, "the command names no unit"),
             Self::TooManyUnits { count, max } => {
                 write!(
@@ -256,13 +303,14 @@ type UnitQuery<'w, 's> = Query<
 /// applies the deferred entity changes at the sync point before the `Economy` stage), but the
 /// grid, credits, and queues change at once, and later commands of the same tick see the
 /// change (docs/DECISIONS.md D25).
-pub(crate) fn process_commands(
+pub(crate) fn process_regular_commands(
     mut queue: ResMut<CommandQueue>,
     mut grid: ResMut<Grid>,
     tick: Res<SimTick>,
     mut events: ResMut<Messages<SimEvent>>,
     mut units: UnitQuery,
     mut economy: EconomyParams,
+    mut special: ResMut<crate::SpecialState>,
 ) {
     if queue.pending.is_empty() {
         return;
@@ -271,12 +319,24 @@ pub(crate) fn process_commands(
         units.iter().map(|(entity, id, ..)| (*id, entity)).collect();
     let mut buildings = None;
     for issued in queue.pending.drain(..) {
-        let result = if issued.command.units().is_some() {
+        let result = if matches!(&issued.command,Command::Attack{target,..} if special.hidden.contains(&(issued.player,*target)))
+        {
+            if let Command::Attack { target, .. } = issued.command {
+                Err(RejectReason::UnknownTarget(target))
+            } else {
+                Ok(())
+            }
+        } else if issued.command.units().is_some() {
             let buildings = buildings.get_or_insert_with(|| economy.building_index());
             validate_player(&issued, &economy)
                 .and_then(|()| validate(&issued, &grid, &economy, &index, &units))
                 .and_then(|()| validate_combat(&issued, &economy, buildings, &index, &units))
                 .map(|()| {
+                    if let Some(ids) = issued.command.units() {
+                        for id in ids {
+                            special.interactions.remove(id);
+                        }
+                    }
                     apply_unit_command(
                         &issued.command,
                         tick.0,
@@ -349,6 +409,25 @@ fn apply_unit_command(
             }
         }
         Command::AttackMove { units: ids, target } => {
+            let miners: Vec<_> = ids
+                .iter()
+                .copied()
+                .filter(|id| {
+                    grid.cell(*target).is_some_and(|c| c.ore > 0)
+                        && index
+                            .get(id)
+                            .and_then(|e| units.get(*e).ok())
+                            .is_some_and(|u| u.6.is_some())
+                })
+                .collect();
+            let fighters: Vec<_> = ids
+                .iter()
+                .copied()
+                .filter(|id| !miners.contains(id))
+                .collect();
+            stop_fighting(&miners, index, units);
+            apply_harvest(&miners, *target, tick, grid, definitions, index, units);
+            let ids = &fighters;
             stop_harvesting(ids, index, units);
             stop_fighting(ids, index, units);
             for (entity, destination) in apply_move(ids, *target, tick, grid, index, units, events)
@@ -361,10 +440,14 @@ fn apply_unit_command(
                 }
             }
         }
-        Command::QueueProduction { .. }
+        Command::Deploy { .. }
+        | Command::Interact { .. }
+        | Command::Superweapon { .. }
+        | Command::QueueProduction { .. }
         | Command::CancelProduction { .. }
         | Command::PlaceBuilding { .. }
         | Command::SellBuilding { .. }
+        | Command::RepairBuilding { .. }
         | Command::SetRallyPoint { .. } => {}
     }
 }
@@ -426,6 +509,10 @@ fn apply_harvest(
             continue;
         };
         harvester.attempts = 0;
+        harvester.field = grid
+            .cell(target)
+            .filter(|c| c.passable && c.ore > 0)
+            .map(|_| target);
         let full = definitions
             .harvester(unit.kind)
             .is_some_and(|terms| harvester.load >= terms.capacity);
@@ -437,6 +524,7 @@ fn apply_harvest(
         match nearest_ore(grid, target, id, &claimed) {
             Some(cell) => {
                 claimed.insert(cell);
+                harvester.field = Some(cell);
                 harvester.state = HarvestState::ToOre(cell);
                 orders.current = (cell != mobile.next_centre()).then(|| MoveOrder::new(cell, tick));
             }
@@ -574,6 +662,16 @@ fn validate_combat(
                 .get(target)
                 .map(|(owner, _, footprint)| (owner, Some(Body::Building(footprint))))
         });
+    // Scenery (`crate::props`) may be attacked once the player has explored its cell.
+    if found.is_none()
+        && let Some((cell, _)) = economy.props().get(target)
+    {
+        return if Body::Prop(cell).seen_by(vision) {
+            Ok(())
+        } else {
+            Err(RejectReason::UnknownTarget(target))
+        };
+    }
     match found {
         Some((owner, _)) if owner == issued.player => Err(RejectReason::OwnTarget(target)),
         Some((_, Some(body))) if body.seen_by(vision) => Ok(()),
@@ -616,17 +714,37 @@ fn apply_move(
         })
         .collect();
     order.sort_unstable();
-    let destinations = destination_cells(grid, target, order.len(), |cell| {
-        grid.occupant(cell)
-            .is_some_and(|holder| idle_outside_group.contains(&holder))
-    });
     let mut assigned = Vec::with_capacity(order.len());
-    for (position, (_, id, entity)) in order.into_iter().enumerate() {
+    let mut reserved = BTreeSet::new();
+    let mut counts: BTreeMap<crate::Domain, usize> = BTreeMap::new();
+    for (_, id, _) in &order {
+        *counts.entry(grid.domain_of(*id)).or_default() += 1;
+    }
+    let mut destinations: BTreeMap<crate::Domain, std::collections::VecDeque<CellPos>> =
+        BTreeMap::new();
+    for (domain, count) in counts {
+        // Aircraft and surface units hold cells in separate layers (`Grid::occupant`), so a
+        // cell handed to one may still be handed to the other.
+        let air = domain == crate::Domain::Air;
+        let view = grid.navigation_for(domain);
+        let cells = destination_cells(&view, target, count, |cell| {
+            reserved.contains(&(air, cell))
+                || view
+                    .occupant(cell)
+                    .is_some_and(|holder| idle_outside_group.contains(&holder))
+        });
+        reserved.extend(cells.iter().map(|&cell| (air, cell)));
+        destinations.insert(domain, cells.into());
+    }
+    for (_, id, entity) in order {
+        let destination = destinations
+            .get_mut(&grid.domain_of(id))
+            .and_then(|cells| cells.pop_front());
         let Ok((.., mut orders, _, _)) = units.get_mut(entity) else {
             continue;
         };
-        match destinations.get(position) {
-            Some(&destination) => {
+        match destination {
+            Some(destination) => {
                 orders.current = Some(MoveOrder::new(destination, tick));
                 assigned.push((entity, destination));
             }
@@ -640,4 +758,38 @@ fn apply_move(
         }
     }
     assigned
+}
+
+/// Flush each contiguous run of ordinary commands before an ability. This keeps ownership,
+/// resource and collision checks atomic even for mixed commands within one tick.
+pub(crate) fn process_commands(world: &mut bevy_ecs::world::World) {
+    let pending = std::mem::take(&mut world.resource_mut::<CommandQueue>().pending);
+    for issued in pending {
+        if matches!(
+            issued.command,
+            Command::Deploy { .. } | Command::Interact { .. } | Command::Superweapon { .. }
+        ) {
+            if !world.resource::<CommandQueue>().pending.is_empty() {
+                world
+                    .run_system_cached(process_regular_commands)
+                    .expect("registered command system");
+            }
+            if let Err(reason) = crate::special::apply(world, &issued) {
+                world
+                    .resource_mut::<Messages<SimEvent>>()
+                    .write(SimEvent::CommandRejected {
+                        player: issued.player,
+                        command: issued.command,
+                        reason,
+                    });
+            }
+        } else {
+            world.resource_mut::<CommandQueue>().pending.push(issued);
+        }
+    }
+    if !world.resource::<CommandQueue>().pending.is_empty() {
+        world
+            .run_system_cached(process_regular_commands)
+            .expect("registered command system");
+    }
 }

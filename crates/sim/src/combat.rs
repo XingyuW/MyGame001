@@ -113,6 +113,14 @@ pub struct Weapon {
 }
 
 impl Weapon {
+    pub(crate) fn new(kind: WeaponKind) -> Self {
+        Self {
+            kind,
+            cooldown: 0,
+            target: None,
+            order: None,
+        }
+    }
     /// Ends the combat order and forgets the target (`Move`, `Stop`, `Harvest`).
     pub(crate) fn clear(&mut self) {
         self.order = None;
@@ -277,6 +285,8 @@ pub(crate) enum Body {
         next: Option<CellPos>,
     },
     Building(Footprint),
+    /// Scenery (`crate::props`): the cell it stands in.
+    Prop(CellPos),
 }
 
 impl Body {
@@ -298,6 +308,8 @@ impl Body {
                 vision.is_visible(cell) || next.is_some_and(|next| vision.is_visible(next))
             }
             Body::Building(footprint) => vision.sees_footprint(footprint),
+            // Scenery does not move or hide: once explored, the player knows it is there.
+            Body::Prop(cell) => vision.is_explored(cell),
         }
     }
 }
@@ -332,9 +344,12 @@ pub(crate) fn hash_combat(
 }
 
 /// A possible target, as seen at the start of the `Combat` stage.
+#[derive(Clone, Copy)]
 struct Target {
-    entity: Entity,
-    owner: PlayerId,
+    /// `None` for scenery, which is not an entity.
+    entity: Option<Entity>,
+    /// `None` for scenery, which belongs to nobody.
+    owner: Option<PlayerId>,
     extent: Extent,
     body: Body,
     armour: ArmourClass,
@@ -372,10 +387,13 @@ type AttackerQuery<'w, 's> = Query<
 /// Everything an attacker needs to know in the tick.
 struct Field<'a> {
     targets: &'a BTreeMap<SimId, Target>,
+    props: &'a crate::Props,
     players: &'a Players,
     definitions: &'a Definitions,
     grid: &'a Grid,
     tick: u64,
+    special: &'a crate::SpecialState,
+    roles: &'a BTreeMap<SimId, crate::Role>,
 }
 
 /// What the tick's shots add up to.
@@ -395,11 +413,36 @@ impl Field<'_> {
         self.players.get(player).map(|state| state.vision())
     }
 
-    /// `target` if it is an enemy of `owner` that `owner` sees.
-    fn visible_enemy(&self, owner: PlayerId, target: SimId) -> Option<&Target> {
-        let found = self.targets.get(&target)?;
+    /// The unit, building, or scenery with the id `target`.
+    fn target(&self, target: SimId) -> Option<Target> {
+        if let Some(found) = self.targets.get(&target) {
+            return Some(*found);
+        }
+        let (cell, _) = self.props.get(target)?;
+        Some(Target {
+            entity: None,
+            owner: None,
+            extent: Extent::footprint(Footprint {
+                origin: cell,
+                width: 1,
+                height: 1,
+            }),
+            body: Body::Prop(cell),
+            armour: self.props.armour(),
+        })
+    }
+
+    /// `target` if `owner` sees it and may fire at it: an enemy (not its own or an ally's, see
+    /// [`Players::hostile`]), or scenery, which only an `Attack` order ever names.
+    fn visible_enemy(&self, owner: PlayerId, target: SimId) -> Option<Target> {
+        let found = self.target(target)?;
         let vision = self.vision(owner)?;
-        (found.owner != owner && found.body.seen_by(vision)).then_some(found)
+        (found
+            .owner
+            .is_none_or(|other| self.players.hostile(owner, other))
+            && found.body.seen_by(vision)
+            && !self.special.hidden.contains(&(owner, target)))
+        .then_some(found)
     }
 
     /// Whether a shot of `weapon` damages `target`: equation 2 gives more than 0 (its warhead's
@@ -423,8 +466,13 @@ impl Field<'_> {
         let vision = self.vision(owner)?;
         self.targets
             .iter()
-            .filter(|(_, target)| {
-                target.owner != owner && target.body.seen_by(vision) && self.damages(weapon, target)
+            .filter(|(id, target)| {
+                !self.special.hidden.contains(&(owner, **id))
+                    && target
+                        .owner
+                        .is_some_and(|other| self.players.hostile(owner, other))
+                    && target.body.seen_by(vision)
+                    && self.damages(weapon, target)
             })
             .filter_map(|(&id, target)| {
                 let (dx, dy) = from.gap(&target.extent);
@@ -448,6 +496,7 @@ impl Field<'_> {
         target_id: SimId,
         target: &Target,
     ) {
+        let target = *target;
         let (id, owner, from) = attacker;
         let (kind, def) = weapon;
         shots.events.push(SimEvent::WeaponFired {
@@ -455,6 +504,9 @@ impl Field<'_> {
             target: target_id,
             weapon: kind,
         });
+        if self.roles.get(&id) == Some(&crate::Role::Carrier) {
+            return;
+        }
         if def.projectile_speed == 0 {
             let versus = self
                 .definitions
@@ -495,6 +547,9 @@ pub(crate) fn combat(
     tick: Res<SimTick>,
     mut targets: TargetQuery,
     mut attackers: AttackerQuery,
+    mut props: ResMut<crate::Props>,
+    special: Res<crate::SpecialState>,
+    identities: Query<(&SimId, Option<&crate::Unit>, Option<&Building>)>,
 ) {
     if attackers.is_empty() && projectiles.is_empty() {
         return;
@@ -511,8 +566,8 @@ pub(crate) fn combat(
                 Some((
                     *id,
                     Target {
-                        entity,
-                        owner: owner.0,
+                        entity: Some(entity),
+                        owner: Some(owner.0),
                         extent,
                         body: Body::of(mobile, building)?,
                         armour: armour.0,
@@ -521,12 +576,24 @@ pub(crate) fn combat(
             },
         )
         .collect();
+    let roles: BTreeMap<_, _> = identities
+        .iter()
+        .filter_map(|(id, u, b)| {
+            let item = u
+                .map(|u| crate::ProductionItem::Unit(u.kind))
+                .or_else(|| b.map(|b| crate::ProductionItem::Building(b.kind)))?;
+            Some((*id, definitions.metadata(item)?.role))
+        })
+        .collect();
     let field = Field {
         targets: &index,
+        props: &props,
         players: &players,
         definitions: &definitions,
         grid: &grid,
         tick: tick.0,
+        special: &special,
+        roles: &roles,
     };
     let mut shots = Shots::default();
 
@@ -538,7 +605,7 @@ pub(crate) fn combat(
             in_flight.push(projectile);
             continue;
         }
-        let hit = index.get(&projectile.target).and_then(|target| {
+        let hit = field.target(projectile.target).and_then(|target| {
             let def = definitions.weapon(projectile.weapon)?;
             let versus = definitions.versus(def.warhead, target.armour)?;
             Some(applied_damage(def.damage, versus))
@@ -559,8 +626,8 @@ pub(crate) fn combat(
     // 2. Armed units and buildings, in id order.
     let mut order: Vec<(SimId, Entity)> = Vec::new();
     for (id, ..) in attackers.iter() {
-        if let Some(target) = index.get(id) {
-            order.push((*id, target.entity));
+        if let Some(entity) = index.get(id).and_then(|target| target.entity) {
+            order.push((*id, entity));
         }
     }
     order.sort_unstable();
@@ -571,6 +638,9 @@ pub(crate) fn combat(
             continue;
         };
         weapon.cooldown = weapon.cooldown.saturating_sub(1);
+        if special.disabled.contains_key(&id) || special.rearming.contains_key(&id) {
+            continue;
+        }
         // Every weapon kind comes from the definitions, which do not change during a match.
         let Some(def) = definitions.weapon(weapon.kind) else {
             continue;
@@ -602,9 +672,16 @@ pub(crate) fn combat(
         }
     }
 
-    // 3. Damage, in target id order.
+    // 3. Damage, in target id order (scenery has the highest ids).
+    let mut prop_damage = Vec::new();
     for (target, damage) in shots.damage {
-        let Some(entity) = index.get(&target).map(|target| target.entity) else {
+        if special.invulnerable(target, tick.0) {
+            continue;
+        }
+        let Some(entity) = index.get(&target).and_then(|target| target.entity) else {
+            if let Some((cell, _)) = props.get(target) {
+                prop_damage.push((cell, damage));
+            }
             continue;
         };
         if let Ok((_, _, _, mut health, ..)) = targets.get_mut(entity) {
@@ -614,7 +691,11 @@ pub(crate) fn combat(
     }
     in_flight.extend(shots.fired);
     projectiles.list = in_flight;
-    for event in shots.events {
+    let shot_events = shots.events;
+    for (cell, damage) in prop_damage {
+        props.hurt(cell, damage);
+    }
+    for event in shot_events {
         events.write(event);
     }
 }
@@ -633,7 +714,7 @@ fn keep_or_acquire(
         .filter(|&target| {
             field.visible_enemy(owner, target).is_some_and(|found| {
                 let (dx, dy) = from.gap(&found.extent);
-                in_range(dx, dy, weapon.range) && field.damages(weapon, found)
+                in_range(dx, dy, weapon.range) && field.damages(weapon, &found)
             })
         })
         .or_else(|| field.nearest_enemy_in_range(owner, from, weapon))
@@ -660,7 +741,7 @@ fn fire_if_ready(
         return false;
     }
     weapon.cooldown = def.reload;
-    field.fire(shots, attacker, (weapon.kind, def), target_id, target);
+    field.fire(shots, attacker, (weapon.kind, def), target_id, &target);
     true
 }
 
@@ -682,10 +763,11 @@ fn act_unit(
                     reason,
                 });
             };
-            let Some(found) = field.targets.get(&target) else {
+            let Some(found) = field.target(target) else {
                 orders.current = None;
                 return end(weapon, shots, AttackEnd::TargetGone);
             };
+            let found = &found;
             if field.visible_enemy(owner, target).is_none() {
                 orders.current = None;
                 return end(weapon, shots, AttackEnd::TargetHidden);
@@ -719,8 +801,9 @@ fn act_unit(
                 orders.current = None;
                 return end(weapon, shots, AttackEnd::OutOfReach);
             }
-            let chase = nearest_cell(field.grid, mobile.next_centre(), |cell| {
-                field.grid.occupant(cell).is_none_or(|holder| holder == id)
+            let view = field.grid.navigation_for(field.grid.domain_of(id));
+            let chase = nearest_cell(&view, mobile.next_centre(), |cell| {
+                view.occupant(cell).is_none_or(|holder| holder == id)
                     && !shots.chase_cells.contains(&cell)
                     && reachable(cell)
             });
@@ -808,6 +891,7 @@ pub(crate) fn remove_dead(
     dead.sort_unstable_by_key(|(_, id, ..)| **id);
     for (entity, &id, owner, _, mobile, building) in dead {
         if let Some(mobile) = mobile {
+            grid.domains.remove(&id);
             grid.release(mobile.cell, id);
             if let Some(step) = mobile.step {
                 grid.release(step.to, id);

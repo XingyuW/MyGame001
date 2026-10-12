@@ -262,8 +262,8 @@ impl std::error::Error for SpawnError {}
 /// (`HarvestState::Seeking`). With a combat file, the unit gets its hit points, armour, sight,
 /// and weapon (M4).
 ///
-/// Scenario and match setup only (tests, and the game before the first tick); during a match
-/// units are created by production (M3). The world must have been set up by
+/// Used by scenario/match setup and carrier sortie launch. Purchased units are created by
+/// the production queue (M3). The world must have been set up by
 /// [`SimPlugin`](crate::SimPlugin), with the grid and definitions of the match installed.
 pub fn spawn_unit(
     world: &mut World,
@@ -287,15 +287,16 @@ pub fn spawn_unit(
             definitions.unit_combat(kind),
         )
     };
+    let domain = world.resource::<Definitions>().domain(kind);
     {
         let grid = world.resource::<Grid>();
         if !grid.contains(cell) {
             return Err(SpawnError::OutsideMap(cell));
         }
-        if !grid.is_passable(cell) {
+        if !grid.passable_for(cell, domain) {
             return Err(SpawnError::Impassable(cell));
         }
-        if let Some(by) = grid.occupant(cell) {
+        if let Some(by) = grid.occupant_for(cell, domain) {
             return Err(SpawnError::Occupied { cell, by });
         }
     }
@@ -303,6 +304,7 @@ pub fn spawn_unit(
         .resource_mut::<SimIdAllocator>()
         .allocate()
         .ok_or(SpawnError::IdsExhausted)?;
+    world.resource_mut::<Grid>().register_domain(id, domain);
     world.resource_mut::<Grid>().claim(cell, id);
     let mut entity = world.spawn(unit_bundle(id, owner, kind, speed, cell));
     if harvester {

@@ -238,7 +238,7 @@ fn setup_errors_are_typed_and_change_nothing_when_the_configuration_is_wrong() {
         (
             0,
             vec![human(P0, 0, 0)],
-            MatchSetupError::Players("1 players, a skirmish match has exactly 2".into()),
+            MatchSetupError::Players("1 players, a skirmish match on this map has 2 to 2".into()),
         ),
         (
             0,
@@ -419,6 +419,7 @@ fn a_start_position_that_is_not_a_passable_cell_of_the_map_is_a_setup_error() {
     // anything is changed, for the human player and the computer player alike.
     let data = data();
     let rock = sim::Cell {
+        water: false,
         passable: false,
         buildable: false,
         ore: 0,
@@ -545,6 +546,7 @@ fn a_computer_player_without_a_reachable_gathering_point_is_a_setup_error() {
     skirmish.factions[1].buildings.truncate(1);
     skirmish.factions[1].units.clear();
     let rock = sim::Cell {
+        water: false,
         passable: false,
         buildable: false,
         ore: 0,
@@ -871,4 +873,98 @@ fn the_hash_covers_the_match_and_the_computer_players() {
     tick(&mut app, sell);
     tick(&mut other, Vec::new());
     assert_ne!(state_hash(app.world_mut()), state_hash(other.world_mut()));
+}
+
+#[test]
+fn super_me_is_human_opt_in_and_part_of_deterministic_state() {
+    let d = data();
+    let players = [human(P0, 0, 0), computer(P1, 1, 1, 1)];
+    let mut normal = world(&d);
+    setup_match(normal.world_mut(), &d.skirmish, &d.ai, 0, &players).unwrap();
+    let mut boosted = world(&d);
+    sim::setup_match_with_super_me(
+        boosted.world_mut(),
+        &d.skirmish,
+        &d.ai,
+        0,
+        &players,
+        &[P0, P1],
+    )
+    .unwrap();
+    let states = boosted.world().resource::<Players>();
+    assert!(states.get(P0).unwrap().super_me());
+    assert!(
+        !states.get(P1).unwrap().super_me(),
+        "AI must reject bonuses even if requested"
+    );
+    assert_ne!(
+        state_hash(normal.world_mut()),
+        state_hash(boosted.world_mut())
+    );
+    for _ in 0..200 {
+        tick(&mut boosted, vec![]);
+    }
+    assert!(
+        boosted
+            .world()
+            .resource::<AiPlayers>()
+            .controller(P1)
+            .is_some()
+    );
+    // A fresh/restarted normal match never inherits bonuses from the preceding game.
+    let restarted = two_humans(&d);
+    assert!(
+        restarted
+            .world()
+            .resource::<Players>()
+            .iter()
+            .all(|(_, s)| !s.super_me())
+    );
+}
+
+#[test]
+fn computer_armies_grow_with_the_map_on_large_maps_only() {
+    let assets = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets");
+    let defs = sim::load_match_definitions(
+        assets.join("data/units.ron"),
+        assets.join("data/economy.ron"),
+        assets.join("data/combat.ron"),
+    )
+    .expect("shipped definitions");
+    let ai = sim::load_ai(assets.join("data/ai.ron"), &defs).expect("shipped AI");
+    let grid = |id: &str| {
+        sim::load_map(assets.join(sim::map_asset_path(id)))
+            .expect("shipped map")
+            .grid
+    };
+    for difficulty in &ai.difficulties {
+        // Up to ARMY_SCALE_SPAN cells (every M7 map), the AI file's values apply unchanged.
+        for id in ["demo", "crossroads", "riverlands"] {
+            assert_eq!(
+                &sim::scaled_for_map(difficulty.clone(), &grid(id)),
+                difficulty
+            );
+        }
+        // 128 + 128 cells and more (every large shipped map, up to 256 + 256): twice the army
+        // and the wave, and no more.
+        let open = |side: u32| {
+            let cell = sim::Cell {
+                passable: true,
+                water: false,
+                buildable: true,
+                ore: 0,
+            };
+            sim::Grid::from_cells(side, side, vec![cell; (side * side) as usize]).expect("a grid")
+        };
+        for big in [open(128), grid("liberty_bay"), grid("red_canyon")] {
+            let big = sim::scaled_for_map(difficulty.clone(), &big);
+            assert_eq!(big.max_army, difficulty.max_army * 2);
+            assert_eq!(big.wave_size, difficulty.wave_size * 2);
+            assert!(big.wave_size <= big.max_army && big.max_army <= sim::MAX_AI_ARMY);
+            assert_eq!(big.think_interval, difficulty.think_interval);
+        }
+        // 112 + 112 cells: in between.
+        let mid = sim::scaled_for_map(difficulty.clone(), &open(112));
+        assert_eq!(mid.max_army, difficulty.max_army * 175 / 100);
+    }
 }

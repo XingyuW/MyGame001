@@ -20,7 +20,7 @@ use crate::id::SimId;
 use crate::map_subset;
 
 /// The map format version this crate reads (map property `schema_version`).
-pub const MAP_SCHEMA_VERSION: i32 = 1;
+pub const MAP_SCHEMA_VERSION: i32 = 2;
 
 /// Largest accepted map width and height, in cells.
 pub const MAX_MAP_SIDE: u32 = 256;
@@ -110,6 +110,8 @@ impl SubPos {
 pub struct Cell {
     /// Ground units may enter the cell.
     pub passable: bool,
+    /// Explicit water terrain; rocks are never navigable by ships.
+    pub water: bool,
     /// Buildings may cover the cell.
     pub buildable: bool,
     /// Ore stored in the cell, in ore units.
@@ -122,8 +124,10 @@ pub struct Cell {
 /// the grid of a [`LoadedMap`] before the first tick.
 ///
 /// The occupant of a cell is the unit that stands in it or has reserved it for entry (invariant
-/// I6: at most one ground unit per cell). Only the simulation's movement and spawning change
-/// occupants.
+/// I6: at most one ground unit per cell). Aircraft hold cells in a separate air layer, so they fly
+/// over ground and naval units (and those drive under them) without either blocking the other;
+/// at most one aircraft holds a cell of the air layer. Only the simulation's movement and
+/// spawning change occupants.
 ///
 /// A cell covered by a building is impassable for units, whatever its terrain, so no unit can
 /// reserve it (invariant I6: no unit occupies a cell covered by a building). Buildings cover only
@@ -132,15 +136,41 @@ pub struct Cell {
 pub struct Grid {
     width: u32,
     height: u32,
+    pub(crate) navigation: crate::Domain,
+    pub(crate) domains: BTreeMap<SimId, crate::Domain>,
     /// Row-major: the cell (x, y) is at index `y * width + x`.
     cells: Vec<Cell>,
-    /// Row-major, as `cells`.
+    /// Row-major, as `cells`: the ground or naval unit holding the cell.
     occupants: Vec<Option<SimId>>,
+    /// Row-major, as `cells`: the aircraft holding the cell.
+    air_occupants: Vec<Option<SimId>>,
     /// Row-major, as `cells`: the building covering the cell.
     buildings: Vec<Option<SimId>>,
 }
 
 impl Grid {
+    /// A grid of `width` × `height` cells with the terrain `cells` (row-major: the cell (x, y) is
+    /// at index `y * width + x`), without units or buildings, for land navigation: what
+    /// [`load_map`] makes of a map file. `None` if a side exceeds [`MAX_MAP_SIDE`] or `cells` does
+    /// not hold exactly one cell per cell of the grid. Scenario setup only, like replacing the
+    /// whole grid (`crate::map_scale` builds the enlarged map of a match with it).
+    pub fn from_cells(width: u32, height: u32, cells: Vec<Cell>) -> Option<Self> {
+        let count = usize::try_from(u64::from(width) * u64::from(height)).ok()?;
+        if width > MAX_MAP_SIDE || height > MAX_MAP_SIDE || cells.len() != count {
+            return None;
+        }
+        Some(Self {
+            width,
+            height,
+            navigation: crate::Domain::Land,
+            domains: BTreeMap::new(),
+            occupants: vec![None; count],
+            air_occupants: vec![None; count],
+            buildings: vec![None; count],
+            cells,
+        })
+    }
+
     pub fn width(&self) -> u32 {
         self.width
     }
@@ -161,7 +191,34 @@ impl Grid {
     /// Whether ground units may enter `pos`: its terrain is passable and no building covers it;
     /// `false` outside the map.
     pub fn is_passable(&self, pos: CellPos) -> bool {
-        self.cell(pos).is_some_and(|cell| cell.passable) && self.building(pos).is_none()
+        self.passable_for(pos, self.navigation)
+    }
+
+    pub fn passable_for(&self, pos: CellPos, domain: crate::Domain) -> bool {
+        self.cell(pos).is_some_and(|cell| match domain {
+            crate::Domain::Land => cell.passable,
+            crate::Domain::Naval => cell.water,
+            crate::Domain::Amphibious => cell.passable || cell.water,
+            crate::Domain::Air => true,
+        }) && (domain == crate::Domain::Air || self.building(pos).is_none())
+    }
+    pub fn domain_of(&self, id: SimId) -> crate::Domain {
+        self.domains.get(&id).copied().unwrap_or_default()
+    }
+    pub(crate) fn register_domain(&mut self, id: SimId, domain: crate::Domain) {
+        if domain != crate::Domain::Land {
+            self.domains.insert(id, domain);
+        }
+    }
+    /// Navigation view reuses the existing deterministic A* and destination allocator.
+    pub fn navigation_for(&self, domain: crate::Domain) -> std::borrow::Cow<'_, Self> {
+        if domain == self.navigation {
+            std::borrow::Cow::Borrowed(self)
+        } else {
+            let mut copy = self.clone();
+            copy.navigation = domain;
+            std::borrow::Cow::Owned(copy)
+        }
     }
 
     /// The building covering `pos`, if any.
@@ -208,12 +265,26 @@ impl Grid {
         }
     }
 
-    /// The unit standing in or entering `pos`, if any.
+    /// The unit standing in or entering `pos`, if any, in the occupancy layer of this view's
+    /// navigation domain: aircraft for an air view, ground and naval units otherwise.
     pub fn occupant(&self, pos: CellPos) -> Option<SimId> {
+        self.occupant_for(pos, self.navigation)
+    }
+
+    /// The unit holding `pos` in the occupancy layer that units of `domain` move in.
+    pub fn occupant_for(&self, pos: CellPos, domain: crate::Domain) -> Option<SimId> {
         self.index(pos)
-            .and_then(|index| self.occupants.get(index))
+            .and_then(|index| self.layer(domain).get(index))
             .copied()
             .flatten()
+    }
+
+    fn layer(&self, domain: crate::Domain) -> &Vec<Option<SimId>> {
+        if domain == crate::Domain::Air {
+            &self.air_occupants
+        } else {
+            &self.occupants
+        }
     }
 
     /// Replaces the terrain of `pos` and returns whether `pos` is inside the map.
@@ -235,13 +306,19 @@ impl Grid {
     /// Makes `unit` the occupant of `pos` if the cell is inside the map, passable, and free (or
     /// already held by `unit`). Returns whether `unit` now holds the cell.
     pub(crate) fn claim(&mut self, pos: CellPos, unit: SimId) -> bool {
-        if !self.is_passable(pos) {
+        let domain = self.domain_of(unit);
+        if !self.passable_for(pos, domain) {
             return false;
         }
-        match self
-            .index(pos)
-            .and_then(|index| self.occupants.get_mut(index))
-        {
+        let Some(index) = self.index(pos) else {
+            return false;
+        };
+        let layer = if domain == crate::Domain::Air {
+            &mut self.air_occupants
+        } else {
+            &mut self.occupants
+        };
+        match layer.get_mut(index) {
             Some(slot @ None) => {
                 *slot = Some(unit);
                 true
@@ -251,14 +328,18 @@ impl Grid {
         }
     }
 
-    /// Frees `pos` if `unit` holds it.
+    /// Frees `pos` if `unit` holds it, in either layer (a unit's domain may already be
+    /// forgotten when it is removed).
     pub(crate) fn release(&mut self, pos: CellPos, unit: SimId) {
-        if let Some(slot) = self
-            .index(pos)
-            .and_then(|index| self.occupants.get_mut(index))
-            && *slot == Some(unit)
-        {
-            *slot = None;
+        let Some(index) = self.index(pos) else {
+            return;
+        };
+        for layer in [&mut self.occupants, &mut self.air_occupants] {
+            if let Some(slot) = layer.get_mut(index)
+                && *slot == Some(unit)
+            {
+                *slot = None;
+            }
         }
     }
 
@@ -276,12 +357,18 @@ impl Grid {
     /// and the occupant's and the building's ids where set (docs/DECISIONS.md D11, extended in
     /// M2 and M3).
     pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
+        hasher.write_u64(self.domains.len() as u64);
+        for (id, domain) in &self.domains {
+            hasher.write_u32(id.0);
+            hasher.write(&[*domain as u8]);
+        }
         hasher.write_u32(self.width);
         hasher.write_u32(self.height);
         for ((cell, occupant), building) in
             self.cells.iter().zip(&self.occupants).zip(&self.buildings)
         {
             hasher.write(&[u8::from(cell.passable)
+                | (u8::from(cell.water) << 4)
                 | (u8::from(cell.buildable) << 1)
                 | (u8::from(occupant.is_some()) << 2)
                 | (u8::from(building.is_some()) << 3)]);
@@ -290,6 +377,12 @@ impl Grid {
                 hasher.write_u32(id.0);
             }
             if let Some(id) = building {
+                hasher.write_u32(id.0);
+            }
+        }
+        for (index, occupant) in self.air_occupants.iter().enumerate() {
+            if let Some(id) = occupant {
+                hasher.write_u64(index as u64);
                 hasher.write_u32(id.0);
             }
         }
@@ -307,6 +400,11 @@ pub struct LoadedMap {
     /// The tileset image the renderer will load. Presentation data, not used by the simulation;
     /// the game checks it against the image file before rendering (docs/DECISIONS.md, D13).
     pub tileset_image: TilesetImage,
+    /// The look of every cell, in row-major order: the optional tile property `look` (0 when the
+    /// tile has none). Presentation data, not used by the simulation: it tells the renderer what
+    /// stands on a cell (a forest, a city block, a bridge) whose terrain is the same to the
+    /// simulation. The game defines and checks the values.
+    pub looks: Vec<u8>,
 }
 
 /// A tileset image: its file name, which names a file in the map's directory (D13), and the size
@@ -592,6 +690,9 @@ pub fn load_map_with_files(
 
 type Issue = (String, MapErrorKind);
 
+/// The terrain and look of each tile, keyed by (tileset index, tile id).
+type TileTerrain = BTreeMap<(usize, u32), (Cell, u8)>;
+
 /// Checks the parsed map against the map format and builds the grid. Errors found in a tileset
 /// name the file that contains it (the map, or the external tileset file).
 fn validate(path: &Path, map: &tiled::Map) -> Result<LoadedMap, MapError> {
@@ -604,21 +705,26 @@ fn validate(path: &Path, map: &tiled::Map) -> Result<LoadedMap, MapError> {
     check_map_properties(&map.properties).map_err(in_map)?;
     let terrain = tile_terrain(map)?;
     let layer = terrain_layer(map).map_err(in_map)?;
-    let cells = cells(map, &terrain, &layer).map_err(in_map)?;
+    let (cells, looks) = cells(map, &terrain, &layer).map_err(in_map)?;
     let tileset_image = tileset_image(map).map_err(in_map)?;
     let occupants = vec![None; cells.len()];
+    let air_occupants = vec![None; cells.len()];
     let buildings = vec![None; cells.len()];
     Ok(LoadedMap {
         grid: Grid {
+            navigation: crate::Domain::Land,
+            domains: BTreeMap::new(),
             width: map.width,
             height: map.height,
             cells,
             occupants,
+            air_occupants,
             buildings,
         },
         tile_width: map.tile_width,
         tile_height: map.tile_height,
         tileset_image,
+        looks,
     })
 }
 
@@ -654,35 +760,38 @@ fn check_header(map: &tiled::Map) -> Result<(), Issue> {
     Ok(())
 }
 
-/// The terrain of every cell, in row-major order.
+/// The terrain and look of every cell, in row-major order.
 fn cells(
     map: &tiled::Map,
-    terrain: &BTreeMap<(usize, u32), Cell>,
+    terrain: &TileTerrain,
     layer: &tiled::FiniteTileLayer<'_>,
-) -> Result<Vec<Cell>, Issue> {
+) -> Result<(Vec<Cell>, Vec<u8>), Issue> {
     let (width, height) = (map.width, map.height);
     let mut cells = Vec::with_capacity(width as usize * height as usize);
+    let mut looks = Vec::with_capacity(width as usize * height as usize);
     for y in 0..height as i32 {
         for x in 0..width as i32 {
             let field = || format!("layer {TERRAIN_LAYER:?} cell ({x}, {y})");
             let tile = layer
                 .get_tile(x, y)
                 .ok_or_else(|| (field(), MapErrorKind::EmptyCell))?;
-            let cell = terrain
-                .get(&(tile.tileset_index(), tile.id()))
-                .ok_or_else(|| {
-                    (
-                        field(),
-                        MapErrorKind::UndefinedTile {
-                            tileset: tile.get_tileset().name.clone(),
-                            id: tile.id(),
-                        },
-                    )
-                })?;
+            let (cell, look) =
+                terrain
+                    .get(&(tile.tileset_index(), tile.id()))
+                    .ok_or_else(|| {
+                        (
+                            field(),
+                            MapErrorKind::UndefinedTile {
+                                tileset: tile.get_tileset().name.clone(),
+                                id: tile.id(),
+                            },
+                        )
+                    })?;
             cells.push(*cell);
+            looks.push(*look);
         }
     }
-    Ok(cells)
+    Ok((cells, looks))
 }
 
 /// The image of the map's tileset. `tiled` resolves the image path against the tileset's
@@ -753,10 +862,11 @@ fn check_map_properties(properties: &Properties) -> Result<(), Issue> {
     }
 }
 
-/// Terrain of every tile defined in the map's tilesets, keyed by (tileset index, tile id).
+/// Terrain and look of every tile defined in the map's tilesets, keyed by (tileset index, tile
+/// id).
 /// Errors name the file that holds the tileset (`tiled` records it as the tileset's `source`:
 /// the external tileset file, or the map for an embedded tileset).
-fn tile_terrain(map: &tiled::Map) -> Result<BTreeMap<(usize, u32), Cell>, MapError> {
+fn tile_terrain(map: &tiled::Map) -> Result<TileTerrain, MapError> {
     let mut terrain = BTreeMap::new();
     for (index, tileset) in map.tilesets().iter().enumerate() {
         let in_tileset = |(field, kind): Issue| MapError {
@@ -788,12 +898,14 @@ fn tile_terrain(map: &tiled::Map) -> Result<BTreeMap<(usize, u32), Cell>, MapErr
     Ok(terrain)
 }
 
-fn parse_tile(tile_field: &str, properties: &Properties) -> Result<Cell, Issue> {
+fn parse_tile(tile_field: &str, properties: &Properties) -> Result<(Cell, u8), Issue> {
     let field = |name: &str| format!("{tile_field} property {name:?}");
-    if let Some(unknown) = sorted_names(properties)
-        .into_iter()
-        .find(|name| !matches!(name.as_str(), "passable" | "buildable" | "ore"))
-    {
+    if let Some(unknown) = sorted_names(properties).into_iter().find(|name| {
+        !matches!(
+            name.as_str(),
+            "passable" | "buildable" | "ore" | "water" | "look"
+        )
+    }) {
         return Err((field(unknown), MapErrorKind::UnknownProperty));
     }
     let get = |name: &str| {
@@ -815,6 +927,11 @@ fn parse_tile(tile_field: &str, properties: &Properties) -> Result<Cell, Issue> 
         other => Err(wrong_type(name, "bool", other)),
     };
 
+    let water = match properties.get("water") {
+        None => false,
+        Some(PropertyValue::BoolValue(v)) => *v,
+        Some(other) => return Err(wrong_type("water", "bool", other)),
+    };
     let passable = bool_property("passable")?;
     let buildable = bool_property("buildable")?;
     let ore = match get("ore")? {
@@ -823,11 +940,29 @@ fn parse_tile(tile_field: &str, properties: &Properties) -> Result<Cell, Issue> 
         }
         other => return Err(wrong_type("ore", "int", other)),
     };
-    Ok(Cell {
-        passable,
-        buildable,
-        ore,
-    })
+    // Optional and presentation only; the game gives the values their meaning.
+    let look = match properties.get("look") {
+        None => 0,
+        Some(PropertyValue::IntValue(value)) => u8::try_from(*value).map_err(|_| {
+            (
+                field("look"),
+                MapErrorKind::InvalidValue {
+                    found: value.to_string(),
+                    expected: "an integer from 0 to 255".into(),
+                },
+            )
+        })?,
+        Some(other) => return Err(wrong_type("look", "int", other)),
+    };
+    Ok((
+        Cell {
+            water,
+            passable,
+            buildable,
+            ore,
+        },
+        look,
+    ))
 }
 
 /// The map's only layer, which must be a finite tile layer named [`TERRAIN_LAYER`] with the

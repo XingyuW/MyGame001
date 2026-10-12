@@ -286,7 +286,7 @@ fn the_skirmish_fixture_loads_with_every_field() {
         skirmish.maps,
         [MapDef {
             id: "skirmish_40x40".into(),
-            starts: [CellPos::new(5, 5), CellPos::new(32, 32)],
+            starts: vec![CellPos::new(5, 5), CellPos::new(32, 32)],
         }]
     );
     assert_eq!(
@@ -548,7 +548,8 @@ fn skirmish_values_outside_their_ranges_are_rejected() {
     let no_maps = format!("{}    maps: [],\n{}", &text[..maps_start], &text[end..]);
     let path = temp_file("skirmish_no_maps.ron", no_maps.as_bytes());
     assert_invalid(File::Skirmish, &path, "maps", "an empty list");
-    // Three starts exceed the schema's list bound.
+    // A map may have more starts, for matches with several computer players (up to
+    // `MAX_MATCH_PLAYERS`); one more exceeds the schema's list bound.
     let path = variant(
         File::Skirmish,
         "skirmish_three_starts",
@@ -557,11 +558,32 @@ fn skirmish_values_outside_their_ranges_are_rejected() {
             "(x: 5, y: 5), (x: 32, y: 32), (x: 20, y: 20)",
         )],
     );
+    load(File::Skirmish, &path).unwrap_or_else(|error| panic!("{error}"));
+    let starts = |count: usize| {
+        (0..count)
+            .map(|k| format!("(x: {}, y: {})", 2 + 4 * (k % 8), 5 + 4 * (k / 8)))
+            .collect::<Vec<_>>()
+            .join(", ")
+    };
+    assert_eq!(sim::MAX_MATCH_PLAYERS, 10);
+    let path = variant(
+        File::Skirmish,
+        "skirmish_ten_starts",
+        &[("(x: 5, y: 5), (x: 32, y: 32)", starts(10).as_str())],
+    );
+    load(File::Skirmish, &path).unwrap_or_else(|error| panic!("{error}"));
+    let path = variant(
+        File::Skirmish,
+        "skirmish_eleven_starts",
+        &[("(x: 5, y: 5), (x: 32, y: 32)", starts(11).as_str())],
+    );
     assert_rejected(
         File::Skirmish,
         &path,
         "maps[0].starts",
-        DataErrorKind::TooManyEntries { max: 2 },
+        DataErrorKind::TooManyEntries {
+            max: sim::MAX_MATCH_PLAYERS,
+        },
     );
 }
 
@@ -989,7 +1011,7 @@ fn start_positions_are_checked_against_their_map() {
     }
     // The corners of the map are cells of it.
     let mut corners = skirmish.clone();
-    corners.maps[0].starts = [CellPos::new(0, 0), CellPos::new(39, 39)];
+    corners.maps[0].starts = vec![CellPos::new(0, 0), CellPos::new(39, 39)];
     check_map_starts(&path, &corners, 0, &grid).unwrap_or_else(|error| panic!("{error}"));
     // A map index outside the file.
     let error = check_map_starts(&path, &skirmish, 1, &grid).expect_err("no map 1");

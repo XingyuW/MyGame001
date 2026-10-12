@@ -22,6 +22,7 @@
 //! * `SellBuilding`: the building exists (`UnknownBuilding`) and belongs to the player
 //!   (`NotOwned`); under fog of war (M4), another player's building the player does not see is
 //!   reported as `UnknownBuilding`;
+//! * `RepairBuilding`: the building exists and belongs to the player (as for `SellBuilding`);
 //! * `SetRallyPoint`: the building exists and belongs to the player (as for `SellBuilding`),
 //!   its type produces units (`NotAProducer`), and the cell is inside the map (`OutsideMap`).
 
@@ -32,7 +33,8 @@ use bevy_ecs::message::Messages;
 use bevy_ecs::system::{Commands, Query, Res, ResMut, SystemParam};
 
 use crate::building::{
-    Building, Footprint, Producer, building_bundle, check_distance, check_footprint, check_visible,
+    Building, Footprint, Producer, building_bundle, check_building_footprint, check_distance,
+    check_visible,
 };
 use crate::combat::Body;
 use crate::combat::combat_components;
@@ -53,6 +55,7 @@ pub(crate) struct EconomyParams<'w, 's> {
     players: ResMut<'w, Players>,
     definitions: Res<'w, Definitions>,
     ids: ResMut<'w, SimIdAllocator>,
+    props: Res<'w, crate::Props>,
     buildings: Query<'w, 's, (Entity, &'static SimId, &'static Owner, &'static Building)>,
 }
 
@@ -125,6 +128,10 @@ impl EconomyParams<'_, '_> {
         &self.players
     }
 
+    pub(crate) fn props(&self) -> &crate::Props {
+        &self.props
+    }
+
     pub(crate) fn building_index(&self) -> BuildingIndex {
         BuildingIndex {
             by_id: self
@@ -191,11 +198,28 @@ pub fn check_placement(
     if let Some(vision) = fog(definitions, state) {
         check_visible(grid, footprint, vision).map_err(RejectReason::Placement)?;
     }
-    check_footprint(grid, footprint).map_err(RejectReason::Placement)?;
-    check_distance(footprint, owned, definitions.placement_distance())
-        .map_err(RejectReason::Placement)?;
+    let shipyard = definitions
+        .metadata(item)
+        .is_some_and(|e| e.role == crate::Role::Shipyard);
+    check_building_footprint(grid, footprint, shipyard).map_err(RejectReason::Placement)?;
+    let reach = if shipyard {
+        definitions
+            .placement_distance()
+            .max(SHIPYARD_PLACEMENT_DISTANCE)
+    } else {
+        definitions.placement_distance()
+    };
+    check_distance(footprint, owned, reach).map_err(RejectReason::Placement)?;
     Ok(footprint)
 }
+
+/// How far (cells, Chebyshev distance between nearest cells) a naval shipyard may lie from one of
+/// its owner's buildings. Ordinary structures use the economy file's `placement_distance`, but a
+/// shipyard needs a 3x3 open-water site touching shore, and the shipped maps' lakes and rivers lie
+/// 18-28 cells from the human player's start; with the ordinary reach naval production was only
+/// reachable by chaining buildings across the map. The site must still be visible (scouted) and
+/// valid water.
+pub const SHIPYARD_PLACEMENT_DISTANCE: u32 = 32;
 
 /// Validates and applies an economy command. Unit commands are handled by `command.rs`.
 pub(crate) fn apply(
@@ -219,11 +243,17 @@ pub(crate) fn apply(
             if !state.offers(item) {
                 return Err(RejectReason::NotInRoster(item));
             }
-            if let Some(&prerequisite) = terms
-                .prerequisites
-                .iter()
-                .find(|&&prerequisite| !index.owns(player, prerequisite))
-            {
+            if let Some(&prerequisite) = terms.prerequisites.iter().find(|&&prerequisite| {
+                !state.unlock_all()
+                    && !definitions.prerequisite_met(
+                        prerequisite,
+                        index
+                            .by_id
+                            .values()
+                            .filter(|b| b.owner == player)
+                            .map(|b| b.kind),
+                    )
+            }) {
                 return Err(RejectReason::MissingPrerequisite { item, prerequisite });
             }
             if !index.owns(player, terms.producer) {
@@ -345,12 +375,19 @@ pub(crate) fn apply(
             }
             params.commands.entity(target.entity).despawn();
             index.by_id.remove(&building);
+            state.repairing.remove(&building);
             state.credits = state.credits.saturating_add(refund);
             events.write(SimEvent::BuildingSold {
                 player,
                 building,
                 refund,
             });
+        }
+        &Command::RepairBuilding { building } => {
+            index.own(player, building, fog(definitions, state))?;
+            if !state.repairing.remove(&building) {
+                state.repairing.insert(building);
+            }
         }
         &Command::SetRallyPoint { building, cell } => {
             let target = index.own(player, building, fog(definitions, state))?;
@@ -365,7 +402,10 @@ pub(crate) fn apply(
                 .entity(target.entity)
                 .insert(Producer { rally: Some(cell) });
         }
-        Command::Move { .. }
+        Command::Deploy { .. }
+        | Command::Interact { .. }
+        | Command::Superweapon { .. }
+        | Command::Move { .. }
         | Command::Stop { .. }
         | Command::Harvest { .. }
         | Command::Attack { .. }

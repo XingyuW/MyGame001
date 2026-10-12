@@ -7,7 +7,7 @@
 //! of its cells, and no unit holds any of them; a building placed during a match must also lie
 //! within the economy file's placement distance of a building of its owner.
 
-use std::cmp::Reverse;
+use std::collections::BTreeSet;
 use std::fmt;
 
 use bevy_ecs::component::Component;
@@ -206,6 +206,39 @@ pub(crate) fn check_footprint(grid: &Grid, footprint: Footprint) -> Result<(), P
     Ok(())
 }
 
+/// Shipyards occupy water and must touch accessible shore; ordinary structures use land.
+pub(crate) fn check_building_footprint(
+    grid: &Grid,
+    footprint: Footprint,
+    shipyard: bool,
+) -> Result<(), PlacementError> {
+    if !shipyard {
+        return check_footprint(grid, footprint);
+    }
+    if !footprint.inside(grid) {
+        return Err(PlacementError::OutsideMap(footprint));
+    }
+    for cell in footprint.cells() {
+        if !grid.cell(cell).is_some_and(|c| c.water) {
+            return Err(PlacementError::NotBuildable(cell));
+        }
+        if let Some(building) = grid.building(cell) {
+            return Err(PlacementError::Overlap { cell, building });
+        }
+        if let Some(unit) = grid.occupant(cell) {
+            return Err(PlacementError::Occupied { cell, unit });
+        }
+    }
+    if !footprint.ring().any(|c| grid.is_passable(c))
+        || !footprint
+            .ring()
+            .any(|c| grid.passable_for(c, crate::Domain::Naval))
+    {
+        return Err(PlacementError::NotBuildable(footprint.origin));
+    }
+    Ok(())
+}
+
 /// Under fog of war: every cell of a footprint inside the map must be visible to the player
 /// (`vision`); the first unseen cell in row-major order is the error. A footprint outside the
 /// map is left to [`check_footprint`] (`OutsideMap`, which reveals nothing). Checked before
@@ -239,28 +272,74 @@ pub(crate) fn check_distance(
     }
 }
 
-/// The free cell of `footprint`'s ring where a unit leaves the building: inside the map,
-/// passable, and held by no unit; the one nearest to `toward` (the rally point) if given,
-/// otherwise the one lowest on screen (largest x + y). Ties are broken by row, then column.
+/// How many cells beyond a building's ring [`exit_cell`] looks for a free cell when the ring is
+/// full. Enough for well over a thousand units around one factory; the bound keeps the search
+/// cheap where a producer is sealed in for good.
+pub(crate) const EXIT_SEARCH_DEPTH: u32 = 24;
+
+/// The free cell where a unit leaves the building of `footprint`: inside the map, passable, and
+/// held by no unit. A cell of the footprint's ring if one is free: the one nearest to `toward`
+/// (the rally point) if given, otherwise the one lowest on screen (largest x + y); ties are
+/// broken by row, then column.
+///
+/// When every ring cell is held, the unit comes out further away instead of waiting inside, so
+/// that a crowd around a factory never stops its production: the search spreads outward from
+/// the ring over passable cells (through the units standing there, never across terrain they
+/// could not cross), one step at a time up to [`EXIT_SEARCH_DEPTH`], and the nearest step with a
+/// free cell supplies it by the same preference as the ring.
 pub(crate) fn exit_cell(
     grid: &Grid,
     footprint: Footprint,
     toward: Option<CellPos>,
 ) -> Option<CellPos> {
-    let free = footprint
+    let preference = |cell: &CellPos| match toward {
+        Some(target) => (i64::from(octile_distance(*cell, target)), cell.y, cell.x),
+        None => (-(i64::from(cell.x) + i64::from(cell.y)), cell.y, cell.x),
+    };
+    let mut frontier: Vec<CellPos> = footprint
         .ring()
-        .filter(|&cell| grid.is_passable(cell) && grid.occupant(cell).is_none());
-    match toward {
-        Some(target) => free.min_by_key(|&cell| (octile_distance(cell, target), cell.y, cell.x)),
-        None => free.min_by_key(|&cell| {
-            (
-                Reverse(i64::from(cell.x) + i64::from(cell.y)),
-                cell.y,
-                cell.x,
-            )
-        }),
+        .filter(|&cell| grid.is_passable(cell))
+        .collect();
+    let mut seen: BTreeSet<CellPos> = frontier.iter().copied().collect();
+    for _ in 0..=EXIT_SEARCH_DEPTH {
+        let free = frontier
+            .iter()
+            .filter(|&&cell| grid.occupant(cell).is_none())
+            .min_by_key(|&cell| preference(cell));
+        if let Some(&cell) = free {
+            return Some(cell);
+        }
+        let mut next = Vec::new();
+        for cell in &frontier {
+            for (dx, dy) in NEIGHBOURS {
+                let (Some(x), Some(y)) = (cell.x.checked_add(dx), cell.y.checked_add(dy)) else {
+                    continue;
+                };
+                let neighbour = CellPos::new(x, y);
+                if grid.is_passable(neighbour) && seen.insert(neighbour) {
+                    next.push(neighbour);
+                }
+            }
+        }
+        if next.is_empty() {
+            break;
+        }
+        frontier = next;
     }
+    None
 }
+
+/// The eight cells around a cell.
+const NEIGHBOURS: [(i32, i32); 8] = [
+    (-1, -1),
+    (0, -1),
+    (1, -1),
+    (-1, 0),
+    (1, 0),
+    (-1, 1),
+    (0, 1),
+    (1, 1),
+];
 
 /// Why a building could not be spawned as scenario setup.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -332,7 +411,14 @@ pub fn spawn_building(
         width: def.width,
         height: def.height,
     };
-    check_footprint(world.resource::<Grid>(), footprint).map_err(SpawnBuildingError::Placement)?;
+    check_building_footprint(
+        world.resource::<Grid>(),
+        footprint,
+        definitions
+            .metadata(crate::ProductionItem::Building(kind))
+            .is_some_and(|e| e.role == crate::Role::Shipyard),
+    )
+    .map_err(SpawnBuildingError::Placement)?;
     let id = world
         .resource_mut::<SimIdAllocator>()
         .allocate()

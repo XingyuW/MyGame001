@@ -22,6 +22,7 @@ const HUMAN: PlayerId = PlayerId(0);
 const ENEMY: PlayerId = PlayerId(1);
 
 const ROCK: Cell = Cell {
+    water: false,
     passable: false,
     buildable: false,
     ore: 0,
@@ -1057,8 +1058,9 @@ fn a_destroyed_building_frees_its_cells() {
 
 #[test]
 fn a_destroyed_building_reports_the_free_units_lost_with_it() {
-    // A refinery placed while every cell of its ring is held keeps its free harvester pending;
-    // destroyed, it reports the harvester as lost (no silent loss, cf. M3 review 1 P2-1).
+    // A refinery placed while every cell of its ring is held, and no ground beyond the ring can
+    // be reached, keeps its free harvester pending; destroyed, it reports the harvester as lost
+    // (no silent loss, cf. M3 review 1 P2-1).
     let mut app = scenario();
     building(&mut app, HUMAN, "yard", 19, 14);
     building(&mut app, HUMAN, "power", 23, 14);
@@ -1069,6 +1071,24 @@ fn a_destroyed_building_reports_the_free_units_lost_with_it() {
         for x in 18..=22 {
             if !((19..=21).contains(&x) && (18..=19).contains(&y)) {
                 unit(&mut app, HUMAN, "crawler", x, y);
+            }
+        }
+    }
+    // Rock around the crawlers (where no building stands), or the harvester would come out
+    // beyond them.
+    let rock = Cell {
+        passable: false,
+        water: false,
+        buildable: false,
+        ore: 0,
+    };
+    for y in 16..=21 {
+        for x in 17..=23 {
+            let cell = CellPos::new(x, y);
+            let edge = [17, 23].contains(&x) || [16, 21].contains(&y);
+            let mut grid = app.world_mut().resource_mut::<sim::Grid>();
+            if edge && grid.building(cell).is_none() {
+                assert!(grid.set_terrain(cell, rock));
             }
         }
     }

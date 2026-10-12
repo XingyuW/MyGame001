@@ -307,6 +307,7 @@ pub(crate) fn find_paths(
         .collect();
 
     for (_, id, entity) in requests {
+        let grid = grid.navigation_for(grid.domain_of(id));
         let Ok((_, _, mobile, mut orders)) = units.get_mut(entity) else {
             continue;
         };

@@ -33,7 +33,9 @@ use crate::hash::Fnv1a64;
 use crate::map::{CellPos, Grid};
 use crate::pathfinding::destination_cells;
 use crate::schedule::SimTick;
-use crate::skirmish_defs::{MATCH_PLAYERS, SkirmishDefinitions, StartProblem, start_problem};
+use crate::skirmish_defs::{
+    MAX_MATCH_PLAYERS, MIN_MATCH_PLAYERS, SkirmishDefinitions, StartProblem, start_problem,
+};
 use crate::unit::{Owner, SpawnError, spawn_unit};
 
 /// Who gives a player's orders.
@@ -130,7 +132,8 @@ pub enum MatchSetupError {
     NotInstalled,
     /// The map index is not a map of the skirmish file.
     UnknownMap(usize),
-    /// Not exactly [`MATCH_PLAYERS`] players, or a player or start position given twice.
+    /// Fewer than [`MIN_MATCH_PLAYERS`] players, more than the map has start positions (at most
+    /// [`MAX_MATCH_PLAYERS`]), or a player or start position given twice.
     Players(String),
     UnknownFaction {
         player: PlayerId,
@@ -347,7 +350,10 @@ impl MatchState {
 /// D40). The world must have been set up by [`SimPlugin`](crate::SimPlugin), with the map's grid and
 /// the match definitions (units, economy, and combat files) installed, and no players yet.
 ///
-/// The configuration is checked before anything is changed: exactly two players, each with a
+/// The configuration is checked before anything is changed: from [`MIN_MATCH_PLAYERS`] players to
+/// as many as the map has start positions (at most [`MAX_MATCH_PLAYERS`]; a match with more
+/// players than the map file lists is set up on the map enlarged for them, `crate::map_scale`,
+/// whose grid and start positions the caller installs), each with a
 /// faction, a start position, and (for a computer player) a difficulty that exist; every start
 /// position of the map is a cell of the map with passable terrain; and every computer player's
 /// faction starts with the producers its AI file needs (`ai_defs::unobtainable_producer`) and
@@ -369,6 +375,89 @@ pub fn setup_match(
     map: usize,
     players: &[PlayerSetup],
 ) -> Result<MatchStart, MatchSetupError> {
+    setup_match_with_super_me(world, skirmish, ai, map, players, &[])
+}
+
+/// Match-local bonuses; only explicitly requested human controllers qualify. AI is never modified.
+pub fn setup_match_with_super_me(
+    world: &mut World,
+    skirmish: &SkirmishDefinitions,
+    ai: &AiDefinitions,
+    map: usize,
+    players: &[PlayerSetup],
+    super_players: &[PlayerId],
+) -> Result<MatchStart, MatchSetupError> {
+    setup_match_with_options(world, skirmish, ai, map, players, super_players, &[])
+}
+
+/// [`setup_match_with_super_me`] with the "unlock all" option for the human controllers listed in
+/// `unlock_players`: their building prerequisites are waived (producers, costs, power and
+/// placement still apply). Computer players are never modified.
+pub fn setup_match_with_options(
+    world: &mut World,
+    skirmish: &SkirmishDefinitions,
+    ai: &AiDefinitions,
+    map: usize,
+    players: &[PlayerSetup],
+    super_players: &[PlayerId],
+    unlock_players: &[PlayerId],
+) -> Result<MatchStart, MatchSetupError> {
+    setup_match_configured(
+        world,
+        skirmish,
+        ai,
+        map,
+        players,
+        &MatchOptions {
+            super_players: super_players.to_vec(),
+            unlock_players: unlock_players.to_vec(),
+            ..MatchOptions::default()
+        },
+    )
+}
+
+/// The team of the computer players of a match with [`MatchOptions::allied_ai`].
+pub const AI_TEAM: u8 = 1;
+
+/// Largest [`MatchOptions::unit_speed_percent`]: four times a unit type's speed.
+pub const MAX_UNIT_SPEED_PERCENT: u16 = 400;
+
+/// The options of a match beyond its players.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct MatchOptions {
+    /// Human controllers with Super Me.
+    pub super_players: Vec<PlayerId>,
+    /// Human controllers whose building prerequisites are waived.
+    pub unlock_players: Vec<PlayerId>,
+    /// The speed of the units of the Super Me players in percent of their type's speed, from
+    /// 100 to [`MAX_UNIT_SPEED_PERCENT`] (values outside are clamped; 0 means 100). Players
+    /// without Super Me are never changed.
+    pub unit_speed_percent: u16,
+    /// In a match with a human player, the computer players form one team: they do not fire at
+    /// each other, do not march on each other's bases, and the match ends once only they are
+    /// left. Without a human player nothing changes.
+    pub allied_ai: bool,
+}
+
+/// [`setup_match`] with every match option.
+pub fn setup_match_configured(
+    world: &mut World,
+    skirmish: &SkirmishDefinitions,
+    ai: &AiDefinitions,
+    map: usize,
+    players: &[PlayerSetup],
+    options: &MatchOptions,
+) -> Result<MatchStart, MatchSetupError> {
+    let super_players = options.super_players.as_slice();
+    let unlock_players = options.unlock_players.as_slice();
+    let allied_ai = options.allied_ai
+        && players
+            .iter()
+            .any(|setup| setup.controller == Controller::Human);
+    let speed_bonus = options
+        .unit_speed_percent
+        .clamp(100, MAX_UNIT_SPEED_PERCENT)
+        - 100;
     let map_def = skirmish
         .maps
         .get(map)
@@ -381,9 +470,10 @@ pub fn setup_match(
         }
     }
     // Check the whole configuration before anything is changed.
-    if players.len() != MATCH_PLAYERS {
+    let most = map_def.starts.len().min(MAX_MATCH_PLAYERS);
+    if !(MIN_MATCH_PLAYERS..=most).contains(&players.len()) {
         return Err(MatchSetupError::Players(format!(
-            "{} players, a skirmish match has exactly {MATCH_PLAYERS}",
+            "{} players, a skirmish match on this map has {MIN_MATCH_PLAYERS} to {most}",
             players.len()
         )));
     }
@@ -463,6 +553,7 @@ pub fn setup_match(
         }
     }
 
+    let definitions = world.resource::<Definitions>().clone();
     let mut sorted: Vec<PlayerSetup> = players.to_vec();
     sorted.sort_unstable_by_key(|setup| setup.player);
     {
@@ -472,9 +563,47 @@ pub fn setup_match(
                 .add_with_roster(
                     setup.player,
                     skirmish.starting_credits,
-                    skirmish.factions[setup.faction].roster.clone(),
+                    // A human with the unified arsenal may produce all of it and every faction's
+                    // original roster (M7 units such as the Meridian's grenadier, raider, heavy
+                    // tank and rocket launcher), which the arsenal-only roster had hidden.
+                    if setup.controller == Controller::Human && !definitions.arsenal().0.is_empty()
+                    {
+                        definitions
+                            .arsenal()
+                            .0
+                            .keys()
+                            .copied()
+                            .chain(
+                                skirmish
+                                    .factions
+                                    .iter()
+                                    .flat_map(|faction| faction.roster.iter().copied()),
+                            )
+                            .collect()
+                    } else {
+                        skirmish.factions[setup.faction].roster.clone()
+                    },
                 )
                 .map_err(MatchSetupError::AddPlayer)?;
+            if setup.controller == Controller::Human
+                && super_players.contains(&setup.player)
+                && let Some(player) = state.get_mut(setup.player)
+            {
+                player.super_me = true;
+                player.unit_speed_bonus = speed_bonus;
+            }
+            if allied_ai
+                && matches!(setup.controller, Controller::Ai { .. })
+                && let Some(player) = state.get_mut(setup.player)
+            {
+                player.team = AI_TEAM;
+            }
+            if setup.controller == Controller::Human
+                && unlock_players.contains(&setup.player)
+                && let Some(player) = state.get_mut(setup.player)
+            {
+                player.unlock_all = true;
+            }
         }
     }
     let definitions = world.resource::<Definitions>().clone();
@@ -543,7 +672,11 @@ pub fn setup_match(
         if let Controller::Ai { difficulty } = setup.controller {
             let enemies: Vec<CellPos> = sorted
                 .iter()
-                .filter(|other| other.player != setup.player)
+                .filter(|other| {
+                    world
+                        .resource::<Players>()
+                        .hostile(setup.player, other.player)
+                })
                 .map(|other| map_def.starts[other.start])
                 .collect();
             let start = map_def.starts[setup.start];
@@ -579,6 +712,7 @@ pub(crate) fn check_win_condition(
     tick: Res<SimTick>,
     mut state: ResMut<MatchState>,
     mut events: ResMut<Messages<SimEvent>>,
+    teams: Res<Players>,
     buildings: Query<&Owner, bevy_ecs::query::With<Building>>,
 ) {
     if state.players.is_empty() || state.outcome.is_some() {
@@ -605,6 +739,14 @@ pub(crate) fn check_win_condition(
             winner: *winner,
             tick: tick.0,
         },
+        // Only allies are left: nobody is going to fight any more. The first of them is
+        // reported as the winner.
+        [winner, rest @ ..] if rest.iter().all(|&other| !teams.hostile(*winner, other)) => {
+            MatchOutcome::Won {
+                winner: *winner,
+                tick: tick.0,
+            }
+        }
         _ => return,
     };
     state.outcome = Some(outcome);
