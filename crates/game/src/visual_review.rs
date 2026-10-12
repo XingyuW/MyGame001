@@ -8,7 +8,7 @@
 //! setup places besides what the country starts with, and starts with the Construction Yards
 //! instead of the base units ([`begin_scene`]), so that the base stands at the start position
 //! from the first frame; the starting units of both players stand around their yards.
-use crate::skirmish::{Catalogue, MenuSelection, begin_match, begin_match_with};
+use crate::skirmish::{Catalogue, MenuSelection, begin_match};
 use bevy::prelude::*;
 use bevy::render::view::screenshot::{Screenshot, save_to_disk};
 use std::path::PathBuf;
@@ -100,7 +100,7 @@ fn tour_maps(world: &mut World) {
     let phase = (frame - 10) % PER_MAP;
     let id = world.resource::<Catalogue>().maps[index].id.clone();
     if phase == 0 {
-        let mut choice = MenuSelection::initial(world.resource::<Catalogue>());
+        let mut choice = MenuSelection::versus(world.resource::<Catalogue>());
         choice.map = index;
         choice.enemies = std::env::var("MYGAME_MAP_REVIEW_ENEMIES")
             .ok()
@@ -182,13 +182,21 @@ fn tour_maps(world: &mut World) {
 }
 
 /// Starts the match of a review scene: as [`begin_match`] with the seed of the review, but with
-/// the players' Construction Yards in place of their base units.
+/// the players' Construction Yards in place of their base units ([`scene`]).
 fn begin_scene(world: &mut World, choice: MenuSelection) {
-    begin_match_with(world, choice, 8, SCENE_MCV_START);
+    begin_match(world, scene(choice), 8);
 }
 
 /// The lobby's "start with an MCV" for the review's scenes: off.
 const SCENE_MCV_START: bool = false;
+
+/// The choices of a review scene as its match starts: with the menu's "MCV start" row off.
+fn scene(choice: MenuSelection) -> MenuSelection {
+    MenuSelection {
+        mcv_start: SCENE_MCV_START,
+        ..choice
+    }
+}
 
 /// MYGAME_FEATURE_REVIEW: a short review of the interface around a developed base with every
 /// aircraft type beside it: aircraft at their flying height over their shadows, a selected war
@@ -207,7 +215,7 @@ pub fn enable_features(app: &mut App, directory: PathBuf) {
 fn feature_review(original: &Catalogue) -> (Catalogue, MenuSelection) {
     let (mut review, mut choice) = base_review(original);
     choice.enemies = 1;
-    let faction = &mut review.skirmish.factions[choice.faction];
+    let faction = &mut review.skirmish.factions[choice.faction()];
     if let Some(kind) = review.definitions.building_kind("airforce_command") {
         faction.buildings.push(sim::StartingBuilding {
             kind,
@@ -363,7 +371,7 @@ fn fx_review(original: &Catalogue) -> (Catalogue, MenuSelection) {
     let (mut review, choice) = base_review(original);
     let starts = review.skirmish.maps[choice.map].starts.clone();
     let (home, away) = (starts[0], starts[1]);
-    let faction = &mut review.skirmish.factions[choice.faction];
+    let faction = &mut review.skirmish.factions[choice.faction()];
     if let Some(kind) = review.definitions.building_kind("cloning_vats") {
         // The first clear two-by-two plot beside the base.
         let grid = &review.maps[choice.map].map.grid;
@@ -413,7 +421,7 @@ fn fx_review(original: &Catalogue) -> (Catalogue, MenuSelection) {
     }
     // The column stands where the review looks, wherever its owner's base is.
     let shift = (home.x - away.x, home.y - away.y);
-    let enemy = &mut review.skirmish.factions[choice.opponent];
+    let enemy = &mut review.skirmish.factions[choice.opponent()];
     enemy.units.clear();
     for (id, offset, count) in [("rhino", (0, -2), 4), ("mcv", (1, 3), 2)] {
         enemy.units.push(sim::StartingGroup {
@@ -556,6 +564,184 @@ fn capture_fx(world: &mut World) {
     }
 }
 
+/// MYGAME_MENU_REVIEW: the menu and the screens of a match (RA1) as a window of the smallest
+/// size the game supports shows them (`crate::skirmish::MENU_FIT`; MYGAME_MENU_REVIEW_SIZE names
+/// another, as `1280x800`), drawn to an image of that size instead of the window, so that they
+/// can be captured while the display is asleep or the session is locked (when captures of the
+/// window are black): the menu as it opens, the menu at its fullest (ten players, the longest
+/// text in every place), a match as it starts, the match paused with the list of its players and
+/// the countries they play, a defeat notice, the Construction Yard deployed and selected with
+/// its cards and the Repack button, and the end screen after the yard was sold.
+pub fn enable_menu(app: &mut App, directory: PathBuf) {
+    app.insert_resource(Review {
+        directory,
+        frame: 0,
+        last_step: 0.0,
+    })
+    .add_systems(Last, capture_menu);
+}
+
+/// The image the menu review draws to.
+#[derive(Resource)]
+struct ReviewTarget(Handle<Image>);
+
+/// The menu with the longest text in every place, for the review: the longest map name at its
+/// largest size, and ten players who all play the country with the longest name.
+fn fullest_menu(catalogue: &Catalogue) -> MenuSelection {
+    let longest = |ids: Vec<String>| {
+        (0..ids.len())
+            .max_by_key(|&index| ids[index].len())
+            .unwrap_or(0)
+    };
+    let map = longest(catalogue.maps.iter().map(|map| map.id.clone()).collect());
+    let country = longest(
+        catalogue
+            .skirmish
+            .factions
+            .iter()
+            .map(|faction| faction.label.clone())
+            .collect(),
+    );
+    MenuSelection {
+        map,
+        enemies: sim::MAX_MATCH_PLAYERS - 2,
+        map_growth: true,
+        free_for_all: true,
+        countries: [Some(country); sim::MAX_MATCH_PLAYERS],
+        unit_speed: 1,
+        unlock_all: true,
+        ..MenuSelection::initial(catalogue)
+    }
+}
+
+fn capture_menu(world: &mut World) {
+    let now = world.resource::<Time<Real>>().elapsed_secs_f64();
+    if now - world.resource::<Review>().last_step < 1.0 / 60.0 {
+        return;
+    }
+    let (frame, dir) = {
+        let mut review = world.resource_mut::<Review>();
+        review.last_step = now;
+        review.frame += 1;
+        (review.frame, review.directory.clone())
+    };
+    let shot = |world: &mut World, name: &str| {
+        let Some(target) = world.get_resource::<ReviewTarget>() else {
+            return;
+        };
+        let target = target.0.clone();
+        world
+            .spawn(Screenshot::image(target))
+            .observe(save_to_disk(dir.join(name)));
+    };
+    match frame {
+        // The camera draws to an image of the smallest window's size, and the interface with it.
+        5 => {
+            use bevy::render::render_resource::{TextureFormat, TextureUsages};
+            let size = std::env::var("MYGAME_MENU_REVIEW_SIZE")
+                .ok()
+                .and_then(|size| {
+                    let (width, height) = size.split_once('x')?;
+                    Some(UVec2::new(width.parse().ok()?, height.parse().ok()?))
+                })
+                .filter(|size| (640..=4096).contains(&size.x) && (480..=4096).contains(&size.y))
+                .unwrap_or(crate::skirmish::MENU_FIT.as_uvec2());
+            let mut image =
+                Image::new_target_texture(size.x, size.y, TextureFormat::Rgba8UnormSrgb, None);
+            image.texture_descriptor.usage |= TextureUsages::COPY_SRC;
+            let handle = world.resource_mut::<Assets<Image>>().add(image);
+            let cameras: Vec<Entity> = world
+                .query_filtered::<Entity, With<Camera2d>>()
+                .iter(world)
+                .collect();
+            for camera in cameras {
+                world.entity_mut(camera).insert((
+                    bevy::camera::RenderTarget::Image(handle.clone().into()),
+                    bevy::ui::IsDefaultUiCamera,
+                ));
+            }
+            world.insert_resource(ReviewTarget(handle));
+        }
+        40 => shot(world, "ra1-menu-opening.png"),
+        50 => {
+            let choice = fullest_menu(world.resource::<Catalogue>());
+            world.insert_resource(choice);
+        }
+        80 => shot(world, "ra1-menu-ten-players.png"),
+        // A match against three computer players with RANDOM countries.
+        90 => {
+            let mut choice = MenuSelection::initial(world.resource::<Catalogue>());
+            choice.enemies = 2;
+            world.insert_resource(choice);
+            begin_match(world, choice, 8);
+        }
+        150 => shot(world, "ra1-match-start.png"),
+        160 => {
+            let mut sink = world.resource_mut::<crate::sim_host::CommandSink>();
+            if !sink.paused() {
+                sink.toggle_pause();
+            }
+        }
+        190 => shot(world, "ra1-paused-players.png"),
+        // The human player's defeat (review only: the notices and the end screen are shown, the
+        // match is not changed).
+        200 => {
+            let mut sink = world.resource_mut::<crate::sim_host::CommandSink>();
+            if sink.paused() {
+                sink.toggle_pause();
+            }
+            world.write_message(sim::SimEvent::PlayerDefeated {
+                player: sim::PlayerId(2),
+            });
+        }
+        230 => shot(world, "ra1-defeat-notice.png"),
+        // The MCV deploys, as D with it selected deploys it; the yard is then selected, as a
+        // left click on it selects it.
+        240 => {
+            let host = world.resource::<crate::sim_host::SimHost>();
+            let rules = host.definitions().and_then(sim::Definitions::rules);
+            let bases: std::collections::BTreeSet<sim::SimId> = host
+                .world()
+                .try_query::<(&sim::SimId, &sim::Owner, &sim::Unit)>()
+                .map(|mut units| {
+                    units
+                        .iter(host.world())
+                        .filter(|(_, owner, unit)| {
+                            owner.0 == crate::units::HUMAN
+                                && rules.is_some_and(|rules| rules.is_base_unit(unit.kind))
+                        })
+                        .map(|(id, ..)| *id)
+                        .collect()
+                })
+                .unwrap_or_default();
+            let commands =
+                crate::special_controls::deploy_commands(&crate::selection::Selection(bases));
+            world
+                .resource_mut::<crate::sim_host::CommandSink>()
+                .issue(commands);
+        }
+        280 | 330 => {
+            let yard = crate::selection::own_yards(world.resource::<crate::sim_host::SimHost>())
+                .first()
+                .copied();
+            if frame == 280 {
+                world.resource_mut::<crate::selection::SelectedBuilding>().0 = yard;
+            } else if let Some(building) = yard {
+                // Sold: in a short game the player has then neither a building nor an MCV.
+                world
+                    .resource_mut::<crate::sim_host::CommandSink>()
+                    .issue([sim::Command::SellBuilding { building }]);
+            }
+        }
+        320 => shot(world, "ra1-yard-cards-repack.png"),
+        390 => shot(world, "ra1-end-screen.png"),
+        410 => {
+            world.write_message(AppExit::Success);
+        }
+        _ => {}
+    }
+}
+
 pub fn enable(app: &mut App, directory: PathBuf) {
     app.insert_resource(Review {
         directory,
@@ -589,6 +775,8 @@ fn capture(world: &mut World) {
         900 => Some("followup-menu-players.png"),
         990 => Some("followup-four-enemies-speed.png"),
         1080 => Some("distinct-roster.png"),
+        1140 => Some("ra1-menu-ten-players.png"),
+        1230 => Some("ra1-paused-players.png"),
         _ => None,
     };
     if let Some(name) = filename {
@@ -621,13 +809,14 @@ fn capture(world: &mut World) {
         ));
     }
     if frame == 240 || frame == 330 {
-        // The menu's first choice (RA1: America against the first Soviet country), and on the
+        // America against the first Soviet country (RA1, `MenuSelection::versus`), and on the
         // second map the two the other way round.
-        let initial = MenuSelection::initial(world.resource::<Catalogue>());
+        let factions = world.resource::<Catalogue>().skirmish.factions.len();
+        let initial = MenuSelection::versus(world.resource::<Catalogue>());
         let mut choice = initial;
         choice.map = if frame == 240 { 1 } else { 2 };
         if frame == 240 {
-            (choice.faction, choice.opponent) = (initial.opponent, initial.faction);
+            choice = choice.with_countries(initial.opponent(), initial.faction(), factions);
         }
         begin_match(world, choice, 8);
         // Remove the setup label with the old match; these are ordinary shipped starts.
@@ -725,7 +914,34 @@ fn capture(world: &mut World) {
             },
         ));
     }
+    // RA1: the menu at its fullest (ten players, the longest texts in every place), then a
+    // match against three computer players with RANDOM countries, paused, which shows the list
+    // of the players with the countries they play.
     if frame == 1110 {
+        crate::skirmish::end_match(world);
+        let labels: Vec<Entity> = world
+            .query_filtered::<Entity, With<ReviewLabel>>()
+            .iter(world)
+            .collect();
+        for entity in labels {
+            world.despawn(entity);
+        }
+        let choice = fullest_menu(world.resource::<Catalogue>());
+        world.insert_resource(choice);
+    }
+    if frame == 1150 {
+        let mut choice = MenuSelection::initial(world.resource::<Catalogue>());
+        choice.enemies = 2;
+        world.insert_resource(choice);
+        begin_match(world, choice, 8);
+    }
+    if frame == 1200 {
+        let mut sink = world.resource_mut::<crate::sim_host::CommandSink>();
+        if !sink.paused() {
+            sink.toggle_pause();
+        }
+    }
+    if frame == 1260 {
         world.write_message(AppExit::Success);
     }
 }
@@ -770,7 +986,7 @@ const LINEUP_VEHICLES: usize = 14;
 
 fn roster_review(original: &Catalogue) -> (Catalogue, MenuSelection) {
     let (mut review, choice) = base_review(original);
-    let faction = &mut review.skirmish.factions[choice.faction];
+    let faction = &mut review.skirmish.factions[choice.faction()];
     faction.units.clear();
     for (i, id) in ROSTER_LINEUP.iter().enumerate() {
         let kind = review.definitions.unit_kind(id).expect("roster unit");
@@ -797,7 +1013,7 @@ fn base_review(original: &Catalogue) -> (Catalogue, MenuSelection) {
     // The human player's country against the first of the other side (RA1), whose start the
     // scene leaves as it is. The yard of the base is the one the scene starts with
     // ([`begin_scene`]), at the start position.
-    let choice = MenuSelection::initial(&review);
+    let choice = MenuSelection::versus(&review);
     for (id, offset) in [
         ("power_plant", (4, -2)),
         ("refinery", (-3, 3)),
@@ -807,7 +1023,7 @@ fn base_review(original: &Catalogue) -> (Catalogue, MenuSelection) {
         ("pillbox", (8, 0)),
     ] {
         if let Some(kind) = review.definitions.building_kind(id) {
-            review.skirmish.factions[choice.faction]
+            review.skirmish.factions[choice.faction()]
                 .buildings
                 .push(sim::StartingBuilding { kind, offset });
         }
@@ -828,7 +1044,7 @@ fn technology_review(original: &Catalogue) -> (Catalogue, MenuSelection) {
             .building_kind(old)
             .expect("base building");
         let new = review.definitions.building_kind(new).expect("HD building");
-        let faction = &mut review.skirmish.factions[choice.faction];
+        let faction = &mut review.skirmish.factions[choice.faction()];
         faction.roster.insert(sim::ProductionItem::Building(new));
         for building in &mut faction.buildings {
             if building.kind == old {
@@ -836,7 +1052,7 @@ fn technology_review(original: &Catalogue) -> (Catalogue, MenuSelection) {
             }
         }
     }
-    let faction = &mut review.skirmish.factions[choice.faction];
+    let faction = &mut review.skirmish.factions[choice.faction()];
     faction.units.clear();
     for (id, offset, count) in [
         ("apocalypse", (4, 1), 2),
@@ -857,7 +1073,7 @@ fn technology_review(original: &Catalogue) -> (Catalogue, MenuSelection) {
 
 fn combat_review(original: &Catalogue) -> (Catalogue, MenuSelection) {
     let (mut review, choice) = technology_review(original);
-    let enemy = &mut review.skirmish.factions[choice.opponent];
+    let enemy = &mut review.skirmish.factions[choice.opponent()];
     enemy.units.clear();
     for (id, offset, count) in [("rhino", (-30, 0), 3), ("conscript", (-31, -2), 4)] {
         enemy.units.push(sim::StartingGroup {
@@ -876,12 +1092,8 @@ mod tests {
     fn the_weapons_scene_is_a_valid_match() {
         let original = crate::skirmish::tests::production_catalogue();
         let (review, choice) = fx_review(&original);
-        let (plan, _) = crate::skirmish::match_plan(&review, choice, 8).expect("plan");
         // As `begin_scene` starts it.
-        let plan = crate::sim_host::MatchPlan {
-            mcv_start: SCENE_MCV_START,
-            ..plan
-        };
+        let (plan, _) = crate::skirmish::match_plan(&review, scene(choice), 8).expect("plan");
         let checked = crate::sim_host::check_match(&plan);
         assert!(checked.is_ok(), "{:?}", checked.err());
     }
@@ -891,10 +1103,7 @@ mod tests {
         let original = crate::skirmish::tests::production_catalogue();
         let (review, choice) = combat_review(&original);
         let plan = crate::sim_host::MatchPlan {
-            super_me: false,
-            unlock_all: false,
-            unit_speed_percent: 100,
-            mcv_start: SCENE_MCV_START,
+            options: scene(choice).options(),
             grid: review.maps[choice.map].map.grid.clone(),
             looks: review.maps[choice.map].map.looks.clone(),
             definitions: review.definitions,
@@ -911,10 +1120,7 @@ mod tests {
         let original = crate::skirmish::tests::production_catalogue();
         let (review, choice) = roster_review(&original);
         let plan = crate::sim_host::MatchPlan {
-            super_me: false,
-            unlock_all: false,
-            unit_speed_percent: 100,
-            mcv_start: SCENE_MCV_START,
+            options: scene(choice).options(),
             grid: review.maps[choice.map].map.grid.clone(),
             looks: review.maps[choice.map].map.looks.clone(),
             definitions: review.definitions,
@@ -927,8 +1133,8 @@ mod tests {
         let start = crate::sim_host::check_match(&plan).expect("valid line-up");
         assert!(start.units >= ROSTER_LINEUP.len(), "{}", start.units);
         // Exactly the line-up besides the starting units of the two countries (RA1).
-        let (starting, yards) =
-            crate::skirmish::starting_totals(&original, choice, SCENE_MCV_START);
+        let (starting, yards) = crate::skirmish::selection_totals(&original, scene(choice))
+            .expect("a scene's players have fixed countries");
         assert_eq!(start.units, ROSTER_LINEUP.len() + starting);
         assert_eq!(start.buildings, 6 + yards);
     }
@@ -936,16 +1142,13 @@ mod tests {
     fn developed_base_is_valid_and_does_not_extend_the_opponents_start() {
         let original = crate::skirmish::tests::production_catalogue();
         let (review, choice) = base_review(&original);
-        assert_ne!(choice.faction, choice.opponent);
+        assert_ne!(choice.faction(), choice.opponent());
         assert_eq!(
-            original.skirmish.factions[choice.opponent],
-            review.skirmish.factions[choice.opponent]
+            original.skirmish.factions[choice.opponent()],
+            review.skirmish.factions[choice.opponent()]
         );
         let plan = crate::sim_host::MatchPlan {
-            super_me: false,
-            unlock_all: false,
-            unit_speed_percent: 100,
-            mcv_start: SCENE_MCV_START,
+            options: scene(choice).options(),
             grid: review.maps[choice.map].map.grid.clone(),
             looks: review.maps[choice.map].map.looks.clone(),
             definitions: review.definitions,
@@ -960,7 +1163,7 @@ mod tests {
         // with (`begin_scene`); the shipped countries have no starting building of their own.
         assert_eq!(start.buildings, 8);
         assert_eq!(
-            original.skirmish.factions[choice.faction].buildings.len(),
+            original.skirmish.factions[choice.faction()].buildings.len(),
             0
         );
     }

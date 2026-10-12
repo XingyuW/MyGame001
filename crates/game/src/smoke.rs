@@ -29,17 +29,17 @@
 //! are too short for contact between the players, so no loss can explain a rejection (D43
 //! item 5), and a rejected command means the computer player issued an unusable one.
 //!
-//! From M7 the last match of a long run is started after the faction row's `>` button, so the
-//! human player plays the second faction; no sidebar button of an item outside the roster of the
+//! From M7 the last match of a long run is started with the human player's country row on the
+//! second faction; no sidebar button of an item outside the roster of the
 //! human player's faction may be displayed; the menu has its Options button, and the options
 //! screen all of its buttons; and the run changes two options the options screen's way
 //! (`crate::options::options_effect`), which must be written to the run's own settings file
 //! ([`settings_path`], removed at the end) and read back unchanged (docs/DECISIONS.md D52).
 //!
-//! Since the multi-enemy follow-up, a long run's matches have [`SMOKE_ENEMIES`] computer players,
-//! chosen with the menu's enemy row; each must be a player of its own (own economy, AI and
-//! colour), "unlock all" (chosen for the first two matches only) and Super Me apply to the human
-//! player alone, and every computer player's rejections count. The last match runs at the
+//! Since the multi-enemy follow-up, a long run's last match has [`SMOKE_ENEMIES`] computer
+//! players, chosen with the menu's enemy row; each must be a player of its own (own economy, AI
+//! and colour), "unlock all" (chosen for the first two matches only) and Super Me apply to the
+//! human player alone, and every computer player's rejections count. The last match runs at the
 //! fastest game speed, which must set the fixed timestep, and must still pause.
 //!
 //! Since RA1 a match starts as Red Alert 2's lobby starts it: every player with the base unit of
@@ -48,6 +48,29 @@
 //! the other units, and queues the first building once the Construction Yard stands, which it
 //! must within [`MOVE_CHECK_TICKS`] ticks of the order. The computer players deploy theirs
 //! themselves.
+//!
+//! With the lobby in the menu (RA1-C) a long run plays four matches, each chosen by the menu's
+//! buttons, and compares every one with its choices once it has run [`FLOW_TICKS`] ticks
+//! ([`match_problems`]: players, countries, credits, starting units and buildings, rules, teams,
+//! colours, the human player's extensions, the size of the map):
+//!
+//! 1. In the menu the run first shows the fullest menu (ten players, the longest text in every
+//!    place) and measures it as it is laid out ([`MenuLayout`]): every button is there, no two
+//!    overlap, every text fits its place, and the menu covers no more than its measures say
+//!    (`crate::skirmish::menu_size`) and than a window of 1280 x 720 holds.
+//! 2. The first match has every row of the lobby away from its default ([`choose_first`]): a
+//!    Soviet country, the lowest credits, unit count 0, the long game, free for all,
+//!    superweapons and crates off, MAP GROWTH on with more players than the map file has start
+//!    positions, a fixed country and another difficulty for two computer players, Super Me and
+//!    ALL UNLOCKED. In it the run plays the MCV drill ([`Drill`]): it deploys the MCV, packs the
+//!    Construction Yard up again with the game's Repack control, and deploys it once more,
+//!    checking the simulation and the cards of the sidebar after each step.
+//! 3. The match is restarted, and must hold the same choices.
+//! 4. The third match starts with the Construction Yards and has MCV repacks off
+//!    ([`choose_yards`]): the yard offers no repack, and the cards are those of the player's side.
+//! 5. The last match has the lobby's defaults again ([`choose_last`]), with RANDOM countries for
+//!    the computer players; the checks of M1 to M7 apply to it. Its cards must be among those
+//!    the sidebar's rule lists (`crate::sidebar::listed_items`).
 
 use std::collections::BTreeMap;
 
@@ -72,8 +95,9 @@ use crate::sidebar::{
 };
 use crate::sim_host::{CommandRefused, CommandSink, SimHost};
 use crate::skirmish::{
-    Catalogue, EndButton, EndEffect, LastMatch, MenuButton, MenuCounts, MenuEffect, MenuRoot,
-    MenuSelection, Row, Screen, begin_match, end_effect, end_match, menu_effect, starting_totals,
+    Catalogue, EndButton, EndEffect, LastMatch, MENU_FIT, MatchPlayers, MenuBlock, MenuButton,
+    MenuCounts, MenuEffect, MenuRoot, MenuSelection, Row, Screen, ScreenText, begin_match,
+    end_effect, end_match, menu_effect, menu_size, starting_totals,
 };
 use crate::units::{HUMAN, UnitStatus, UnitView, unit_shown};
 
@@ -124,39 +148,29 @@ pub struct SmokeTestPlugin {
 
 impl Plugin for SmokeTestPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(SmokeTest {
-            frames: self.frames,
-            rendered: 0,
-            order: None,
-            production: None,
-            rejected: false,
-            ai_rejected: 0,
-            pause: PauseCheck::default(),
-            flow: Flow::default(),
-            menu_buttons: None,
-            starts: 0,
-            options_changed: false,
-        })
-        .add_systems(
-            Update,
-            (
-                play_flow,
-                change_options,
-                order_move,
-                order_production,
-                watch_events,
-                check_pause,
+        app.insert_resource(SmokeTest::new(self.frames))
+            .add_systems(
+                Update,
+                (
+                    measure_menu,
+                    play_flow,
+                    play_drill,
+                    change_options,
+                    order_move,
+                    order_production,
+                    watch_events,
+                    check_pause,
+                )
+                    .chain(),
             )
-                .chain(),
-        )
-        .add_systems(
-            Last,
-            (fail_on_asset_load_error, count_frames, fail_on_early_exit)
-                .chain()
-                // Bevy's exit when no window is left (`exit_on_all_closed`) runs in `Last`, in
-                // `ExitSystems`; the early-exit check must see its message.
-                .after(bevy::window::ExitSystems),
-        );
+            .add_systems(
+                Last,
+                (fail_on_asset_load_error, count_frames, fail_on_early_exit)
+                    .chain()
+                    // Bevy's exit when no window is left (`exit_on_all_closed`) runs in `Last`, in
+                    // `ExitSystems`; the early-exit check must see its message.
+                    .after(bevy::window::ExitSystems),
+            );
     }
 }
 
@@ -180,26 +194,820 @@ struct SmokeTest {
     menu_buttons: Option<usize>,
     /// Matches started.
     starts: u32,
+    /// Frames the flow has stood in the menu it is in (RA1: the layout check waits for them).
+    menu_frames: u32,
+    /// The menu's choices, kept while the run shows the fullest menu for the layout check.
+    saved: Option<MenuSelection>,
+    /// The menu as it was last laid out ([`measure_menu`]).
+    layout: Option<MenuLayout>,
+    /// The problems of the menu's layout, once it has been checked (`None` before; a run too
+    /// short for the game flow does not check it).
+    layout_problems: Option<usize>,
+    /// Checks of the game flow that failed (RA1): a match that does not hold what its menu
+    /// choices say, or a step of the MCV drill that did not happen. Each is logged.
+    flow_problems: usize,
+    /// Whether the running match has been compared with its menu choices.
+    compared: bool,
+    /// The MCV drill of the first match.
+    drill: Drill,
 }
 
-/// The game flow the smoke test plays (M6).
+impl SmokeTest {
+    fn new(frames: u32) -> Self {
+        Self {
+            frames,
+            rendered: 0,
+            order: None,
+            production: None,
+            rejected: false,
+            ai_rejected: 0,
+            pause: PauseCheck::default(),
+            flow: Flow::default(),
+            menu_buttons: None,
+            starts: 0,
+            options_changed: false,
+            menu_frames: 0,
+            saved: None,
+            layout: None,
+            layout_problems: None,
+            flow_problems: 0,
+            compared: false,
+            drill: Drill::default(),
+        }
+    }
+
+    /// Records a failed check of the game flow.
+    fn problem(&mut self, what: impl std::fmt::Display) {
+        error!("smoke test failed: {what}");
+        self.flow_problems += 1;
+    }
+}
+
+/// The game flow the smoke test plays (M6; RA1: with the lobby's options).
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 enum Flow {
-    /// In the menu; the first match starts.
+    /// In the menu; its layout is checked, the options of the first match are chosen, and the
+    /// first match starts.
     #[default]
     Menu,
-    /// The first match runs; it is restarted after [`FLOW_TICKS`] ticks.
+    /// The first match runs, with the options of [`OPTION_PRESSES`]; the MCV drill is played in
+    /// it, and it is restarted after [`FLOW_TICKS`] ticks.
     First,
     /// The restarted match runs; the game returns to the menu after [`FLOW_TICKS`] ticks.
     Restarted,
-    /// Back in the menu; the last match starts.
+    /// Back in the menu; the match that starts with the Construction Yards is chosen and
+    /// starts.
     MenuAgain,
+    /// The match with the yards runs; the game returns to the menu after [`FLOW_TICKS`] ticks.
+    Yards,
+    /// In the menu for the last time; the lobby's defaults are restored and the last match
+    /// starts.
+    MenuLast,
     /// The last match runs, and the checks of M1 to M5 apply to it.
     Last,
 }
 
-/// Plays the game flow: starts, restarts, leaves, and starts the match again, as the menu's and
-/// the end screen's buttons do (their effects are computed by the same pure functions).
+/// The MCV drill of the first match (RA1): the run deploys the human player's base unit, packs
+/// the Construction Yard up again with the game's Repack control, and deploys it once more,
+/// looking at the simulation after each step.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+enum Drill {
+    /// Not begun: the player owns its base unit and no building, and no card is listed.
+    #[default]
+    Start,
+    /// Deploy was ordered; the yard must stand.
+    Deployed,
+    /// Repack was ordered; the base unit must be back.
+    Repacked,
+    /// Deploy was ordered again; the yard must stand again.
+    Redeployed,
+    Done,
+}
+
+/// Ticks of the first match within which its MCV drill must be done.
+pub const DRILL_TICKS: u64 = 60;
+
+/// Frames the flow stands in a menu before its layout is measured: the texts change in the
+/// frame after the choices, and the layout follows them.
+pub const LAYOUT_FRAMES: u32 = 4;
+
+/// The map of the first two matches of a long run: the one whose file lists the fewest start
+/// positions, so that with MAP GROWTH on a match has more players than the file has starts.
+fn growth_map(catalogue: &Catalogue) -> usize {
+    (0..catalogue.skirmish.maps.len())
+        .min_by_key(|&map| catalogue.skirmish.maps[map].starts.len())
+        .unwrap_or(0)
+}
+
+/// The menu with the longest text in every place, for the layout check: the longest map name
+/// at its largest size, ten players who all play the country with the longest name at the
+/// difficulty with the longest, and the longest entry of every other row.
+fn fullest_menu(catalogue: &Catalogue, selection: MenuSelection) -> MenuSelection {
+    let longest = |count: usize, text: &dyn Fn(usize) -> String| {
+        (0..count)
+            .max_by_key(|&index| text(index).len())
+            .unwrap_or(0)
+    };
+    let country = longest(catalogue.skirmish.factions.len(), &|index| {
+        crate::skirmish::country_text(Some(index), catalogue)
+    });
+    let difficulty = longest(catalogue.ai.difficulties.len(), &|index| {
+        crate::skirmish::difficulty_text(index, catalogue)
+    });
+    let lobby = MenuCounts::of(catalogue).lobby;
+    MenuSelection {
+        map: longest(catalogue.maps.len(), &|index| {
+            catalogue.maps[index].id.clone()
+        }),
+        enemies: sim::MAX_MATCH_PLAYERS - 2,
+        map_growth: true,
+        free_for_all: true,
+        color: longest(crate::presentation::TEAM_PALETTE.len(), &|index| {
+            crate::presentation::TEAM_PALETTE[index].0.to_owned()
+        }),
+        countries: [Some(country); sim::MAX_MATCH_PLAYERS],
+        difficulties: [difficulty; sim::MAX_MATCH_PLAYERS],
+        credits: Some(lobby.max_credits),
+        unit_count: Some(lobby.max_unit_count),
+        super_me: false,
+        unit_speed: crate::skirmish::UNIT_SPEEDS.len() - 1,
+        unlock_all: true,
+        ..selection
+    }
+}
+
+/// A node as it is laid out, in logical pixels; `None` for one that is not displayed.
+fn node_rect(node: &ComputedNode, transform: &UiGlobalTransform) -> Option<Rect> {
+    let scale = node.inverse_scale_factor();
+    let size = node.size() * scale;
+    (size != Vec2::ZERO).then(|| Rect::from_center_size(transform.translation * scale, size))
+}
+
+/// The menu as it is laid out: its blocks, its buttons, and its texts that change, each with
+/// the place it stands in.
+#[derive(Debug, Clone, Default, PartialEq)]
+struct MenuLayout {
+    window: Vec2,
+    blocks: Vec<Rect>,
+    buttons: Vec<Rect>,
+    texts: Vec<(Rect, Rect)>,
+}
+
+impl MenuLayout {
+    /// The ground the menu covers.
+    fn extent(&self) -> Option<Rect> {
+        self.blocks
+            .iter()
+            .chain(&self.buttons)
+            .chain(self.texts.iter().map(|(text, _)| text))
+            .copied()
+            .reduce(|all, rect| all.union(rect))
+    }
+
+    /// What is wrong with the layout; empty if the menu shows all `buttons` buttons, covers no
+    /// more ground than its measures say ([`menu_size`]) and than the smallest window holds
+    /// ([`MENU_FIT`]), lies inside the window, and no two buttons overlap and every text fits
+    /// its place.
+    fn problems(&self, buttons: usize) -> Vec<String> {
+        let Some(extent) = self.extent() else {
+            return vec!["the menu is not laid out".to_owned()];
+        };
+        let mut problems = Vec::new();
+        let (size, covered) = (menu_size(), extent.size());
+        if covered.x > size.x + 1.0 || covered.y > size.y + 1.0 {
+            problems.push(format!(
+                "the menu covers {} x {} pixels, more than the {} x {} of its measures",
+                covered.x, covered.y, size.x, size.y
+            ));
+        }
+        if covered.x > MENU_FIT.x || covered.y > MENU_FIT.y {
+            problems.push(format!(
+                "the menu covers {} x {} pixels and does not fit a window of {} x {}",
+                covered.x, covered.y, MENU_FIT.x, MENU_FIT.y
+            ));
+        }
+        if extent.min.x < -0.5
+            || extent.min.y < -0.5
+            || extent.max.x > self.window.x + 0.5
+            || extent.max.y > self.window.y + 0.5
+        {
+            problems.push(format!(
+                "the menu reaches from ({}, {}) to ({}, {}), outside the window of {} x {}",
+                extent.min.x,
+                extent.min.y,
+                extent.max.x,
+                extent.max.y,
+                self.window.x,
+                self.window.y
+            ));
+        }
+        if self.buttons.len() != buttons {
+            problems.push(format!(
+                "{} of {buttons} menu buttons are laid out",
+                self.buttons.len()
+            ));
+        }
+        let overlap = |a: &Rect, b: &Rect| {
+            a.min.x < b.max.x - 0.5
+                && b.min.x < a.max.x - 0.5
+                && a.min.y < b.max.y - 0.5
+                && b.min.y < a.max.y - 0.5
+        };
+        let overlapping = self
+            .buttons
+            .iter()
+            .enumerate()
+            .flat_map(|(index, a)| self.buttons[index + 1..].iter().map(move |b| (a, b)))
+            .filter(|(a, b)| overlap(a, b))
+            .count();
+        if overlapping > 0 {
+            problems.push(format!("{overlapping} pairs of menu buttons overlap"));
+        }
+        let outside = self
+            .texts
+            .iter()
+            .filter(|(text, place)| {
+                text.min.x < place.min.x - 0.5
+                    || text.min.y < place.min.y - 0.5
+                    || text.max.x > place.max.x + 0.5
+                    || text.max.y > place.max.y + 0.5
+            })
+            .count();
+        if outside > 0 {
+            problems.push(format!("{outside} menu texts do not fit their place"));
+        }
+        problems
+    }
+}
+
+/// The nodes of the menu, for [`measure_menu`].
+type MenuNodes<'w, 's> = (
+    Query<'w, 's, (&'static ComputedNode, &'static UiGlobalTransform), With<MenuBlock>>,
+    Query<'w, 's, (&'static ComputedNode, &'static UiGlobalTransform), With<MenuButton>>,
+    Query<
+        'w,
+        's,
+        (
+            &'static ComputedNode,
+            &'static UiGlobalTransform,
+            &'static ChildOf,
+            &'static ScreenText,
+        ),
+    >,
+    Query<'w, 's, (&'static ComputedNode, &'static UiGlobalTransform)>,
+);
+
+/// Measures the menu as the last frame laid it out, while it is shown.
+fn measure_menu(
+    mut smoke: ResMut<SmokeTest>,
+    screen: Res<Screen>,
+    window: Single<&Window, With<bevy::window::PrimaryWindow>>,
+    nodes: MenuNodes,
+) {
+    if *screen != Screen::Menu || smoke.layout_problems.is_some() {
+        return;
+    }
+    let (blocks, buttons, texts, places) = nodes;
+    let rects = |nodes: &Query<(&ComputedNode, &UiGlobalTransform), _>| -> Vec<Rect> {
+        nodes
+            .iter()
+            .filter_map(|(node, transform)| node_rect(node, transform))
+            .collect()
+    };
+    smoke.layout = Some(MenuLayout {
+        window: window.size(),
+        blocks: blocks
+            .iter()
+            .filter_map(|(node, transform)| node_rect(node, transform))
+            .collect(),
+        buttons: rects(&buttons),
+        texts: texts
+            .iter()
+            .filter(|(.., kind)| matches!(kind, ScreenText::Row(_) | ScreenText::Player(_)))
+            .filter_map(|(node, transform, parent, _)| {
+                let (place, at) = places.get(parent.parent()).ok()?;
+                Some((node_rect(node, transform)?, node_rect(place, at)?))
+            })
+            .collect(),
+    });
+}
+
+/// Presses the `>` (`forward`) or `<` button of `row` `times` times, as clicks on it do.
+fn press(
+    smoke: &mut SmokeTest,
+    selection: &mut MenuSelection,
+    counts: MenuCounts,
+    row: Row,
+    forward: bool,
+    times: usize,
+) {
+    let button = if forward {
+        MenuButton::Next(row)
+    } else {
+        MenuButton::Previous(row)
+    };
+    for _ in 0..times {
+        match menu_effect(button, *selection, counts) {
+            MenuEffect::Select(next) => *selection = next,
+            effect => smoke.problem(format!("the menu button {button:?} did {effect:?}")),
+        }
+    }
+}
+
+/// Presses the `>` button of `row` until `reached` holds (at once if it already does); a
+/// problem if no entry of the row makes it hold.
+fn press_until(
+    smoke: &mut SmokeTest,
+    selection: &mut MenuSelection,
+    counts: MenuCounts,
+    row: Row,
+    reached: impl Fn(&MenuSelection) -> bool,
+) {
+    let (_, entries) = selection.position(row, counts);
+    for _ in 0..entries {
+        if reached(selection) {
+            return;
+        }
+        press(smoke, selection, counts, row, true, 1);
+    }
+    if !reached(selection) {
+        smoke.problem(format!(
+            "no entry of the menu row {row:?} is the one wanted"
+        ));
+    }
+}
+
+/// Computer players of the first two matches of a long run: one more than the map of those
+/// matches lists start positions for beyond the human player's ([`growth_map`]; MAP GROWTH on
+/// makes the missing one). Never more than a match may have.
+fn grown_enemies(catalogue: &Catalogue) -> usize {
+    catalogue.skirmish.maps[growth_map(catalogue)]
+        .starts
+        .len()
+        .min(sim::MAX_MATCH_PLAYERS - 1)
+}
+
+/// Chooses the first match of a long run by the menu's buttons, changing the rows from the
+/// lobby's defaults: the map with the fewest start positions with MAP GROWTH on and more
+/// computer players than it lists starts for, FREE FOR ALL, the lowest credits (one step past
+/// the highest wraps around), unit count 0 (likewise), the long game, superweapons and crates
+/// off, a Soviet country for the human player, a fixed country for two computer players and
+/// another difficulty for each, and the extensions Super Me (with the next unit speed and
+/// colour) and ALL UNLOCKED. MCV start and MCV repacks stay on for the MCV drill.
+fn choose_first(
+    smoke: &mut SmokeTest,
+    selection: &mut MenuSelection,
+    catalogue: &Catalogue,
+    counts: MenuCounts,
+) {
+    let map = growth_map(catalogue);
+    press_until(smoke, selection, counts, Row::Map, |choice| {
+        choice.map == map
+    });
+    press(smoke, selection, counts, Row::MapGrowth, true, 1);
+    let enemies = grown_enemies(catalogue);
+    press_until(smoke, selection, counts, Row::Enemies, |choice| {
+        choice.enemy_count() == enemies
+    });
+    for row in [
+        Row::TeamMode,
+        Row::Credits,
+        Row::UnitCount,
+        Row::ShortGame,
+        Row::Superweapons,
+        Row::Crates,
+        Row::SuperMe,
+        Row::UnitSpeed,
+        Row::Color,
+        Row::UnlockAll,
+    ] {
+        press(smoke, selection, counts, row, true, 1);
+    }
+    let soviet = |choice: &MenuSelection| {
+        choice.countries[0]
+            .and_then(|faction| catalogue.skirmish.factions.get(faction))
+            .is_some_and(|faction| faction.side == Some(sim::Side::Soviet))
+    };
+    press_until(smoke, selection, counts, Row::Country(0), soviet);
+    // From RANDOM: the first country one way, the last the other.
+    press(smoke, selection, counts, Row::Country(1), true, 1);
+    press(smoke, selection, counts, Row::Country(2), false, 1);
+    press(smoke, selection, counts, Row::Difficulty(1), true, 1);
+    press(smoke, selection, counts, Row::Difficulty(2), false, 1);
+    let lobby = counts.lobby;
+    let chosen = selection.map_growth
+        && selection.free_for_all
+        && selection.credits == Some(lobby.min_credits)
+        && selection.unit_count == Some(lobby.min_unit_count)
+        && !selection.short_game
+        && !selection.superweapons
+        && !selection.crates
+        && selection.mcv_start
+        && selection.mcv_repacks
+        && selection.super_me
+        && selection.unlock_all
+        && selection.players().len() > catalogue.skirmish.maps[map].starts.len()
+        && selection.countries[1] == Some(0)
+        && selection.countries[2] == Some(counts.factions.saturating_sub(1))
+        && selection.difficulties[1] != selection.difficulties[2];
+    if !chosen {
+        smoke.problem(format!(
+            "the menu's buttons did not choose the first match: {selection:?}"
+        ));
+    }
+}
+
+/// Chooses the match with the Construction Yards: MCV start and MCV repacks off, MAP GROWTH off
+/// (which leaves as many computer players as the map file has start positions for), ALLIED AI
+/// again, the standard tech tree again (so that the cards are those of the player's side), and
+/// the credits and the unit count back at their highest by the `<` button, which wraps around
+/// the other way.
+fn choose_yards(
+    smoke: &mut SmokeTest,
+    selection: &mut MenuSelection,
+    catalogue: &Catalogue,
+    counts: MenuCounts,
+) {
+    for row in [
+        Row::McvStart,
+        Row::McvRepacks,
+        Row::MapGrowth,
+        Row::TeamMode,
+        Row::UnlockAll,
+    ] {
+        press(smoke, selection, counts, row, true, 1);
+    }
+    press(smoke, selection, counts, Row::Credits, false, 1);
+    press(smoke, selection, counts, Row::UnitCount, false, 1);
+    let lobby = counts.lobby;
+    let starts = catalogue.skirmish.maps[selection.map].starts.len();
+    let chosen = !selection.mcv_start
+        && !selection.mcv_repacks
+        && !selection.map_growth
+        && !selection.free_for_all
+        && !selection.unlock_all
+        && selection.players().len() == starts.min(sim::MAX_MATCH_PLAYERS)
+        && selection.credits == Some(lobby.max_credits)
+        && selection.unit_count == Some(lobby.max_unit_count);
+    if !chosen {
+        smoke.problem(format!(
+            "the menu's buttons did not choose the match with the yards: {selection:?}"
+        ));
+    }
+}
+
+/// Chooses the last match: the lobby's defaults again (every option of the lobby back on, the
+/// extensions off, the computer players' countries RANDOM and their difficulties as at first),
+/// on the map the menu opened with (`opening`), with [`SMOKE_ENEMIES`] computer players, the
+/// human player with the second country (M7: the checks cover a country other than the first),
+/// and at the fastest game speed.
+fn choose_last(
+    smoke: &mut SmokeTest,
+    selection: &mut MenuSelection,
+    counts: MenuCounts,
+    opening: MenuSelection,
+) {
+    for row in [
+        Row::McvStart,
+        Row::McvRepacks,
+        Row::ShortGame,
+        Row::Superweapons,
+        Row::Crates,
+        Row::SuperMe,
+        Row::Color,
+    ] {
+        press(smoke, selection, counts, row, true, 1);
+    }
+    press_until(smoke, selection, counts, Row::Map, |choice| {
+        choice.map == opening.map
+    });
+    press_until(smoke, selection, counts, Row::Enemies, |choice| {
+        choice.enemy_count() == SMOKE_ENEMIES
+    });
+    let second = usize::from(counts.factions > 1);
+    press_until(smoke, selection, counts, Row::Country(0), |choice| {
+        choice.countries[0] == Some(second)
+    });
+    // Back to RANDOM the way each came, and to the difficulties of the opening menu.
+    press(smoke, selection, counts, Row::Country(1), false, 1);
+    press(smoke, selection, counts, Row::Country(2), true, 1);
+    press(smoke, selection, counts, Row::Difficulty(1), false, 1);
+    press(smoke, selection, counts, Row::Difficulty(2), true, 1);
+    press_until(smoke, selection, counts, Row::GameSpeed, |choice| {
+        choice.game_speed == crate::game_speed::SPEED_LEVELS.len() - 1
+    });
+    // Everything the simulation is set up from is the lobby's default again, but for the human
+    // player's country.
+    let mut expected = opening;
+    expected.countries[0] = Some(second);
+    expected.enemies = SMOKE_ENEMIES - 1;
+    let lobby = counts.lobby;
+    let defaults = selection.options()
+        == sim::MatchOptions {
+            starting_credits: Some(lobby.credits),
+            unit_count: Some(lobby.unit_count),
+            ..expected.options()
+        }
+        && selection.players() == expected.players()
+        && !selection.map_growth
+        && selection.valid(counts);
+    if !defaults {
+        smoke.problem(format!(
+            "the menu's buttons did not restore the lobby's defaults: {selection:?}"
+        ));
+    }
+}
+
+/// What the match of `host`, started from the menu with `choice`, holds against what the choices
+/// say: one line per difference; empty if the simulation was set up as chosen. `spawned` is what
+/// match setup reported as `(units, buildings)`, `played` the countries the players play, and
+/// `colours` the colour choice the match is painted with and how many different colours its
+/// players have.
+fn match_problems(
+    choice: MenuSelection,
+    catalogue: &Catalogue,
+    host: &SimHost,
+    played: &MatchPlayers,
+    spawned: (usize, usize),
+    colours: Option<(usize, usize)>,
+) -> Vec<String> {
+    let mut problems = Vec::new();
+    let mut check = |holds: bool, what: &str| {
+        if !holds {
+            problems.push(what.to_owned());
+        }
+    };
+    let setups = choice.players();
+    let (Some(players), Some(state), Some(grid)) =
+        (host.players(), host.match_state(), host.grid())
+    else {
+        return vec!["no match is set up".to_owned()];
+    };
+    let computers: Vec<sim::PlayerId> = setups.iter().skip(1).map(|setup| setup.player).collect();
+    check(
+        players.iter().count() == setups.len() && played.0.len() == setups.len(),
+        "the match has other players than the menu chose",
+    );
+    // The extensions are the human player's alone, and every computer player is its own.
+    check(
+        players.get(HUMAN).is_some_and(|human| {
+            human.super_me() == choice.super_me
+                && human.unlock_all() == choice.unlock_all
+                && human.unit_speed_percent() == u32::from(choice.unit_speed_percent())
+        }),
+        "Super Me, its unit speed or ALL UNLOCKED is not as chosen for the human player",
+    );
+    check(
+        computers.iter().all(|&id| {
+            players.get(id).is_some_and(|computer| {
+                !computer.super_me() && !computer.unlock_all() && computer.production_speed() == 1
+            }) && host.ai().is_some_and(|ai| ai.controller(id).is_some())
+        }),
+        "a computer player has the human player's extensions or no controller",
+    );
+    check(
+        colours == Some((choice.color, setups.len())),
+        "the players' colours are not the chosen one and one of their own for each",
+    );
+    // The lobby's rules.
+    let rules = state.rules();
+    check(
+        rules
+            == sim::MatchRules {
+                short_game: choice.short_game,
+                superweapons: choice.superweapons,
+                mcv_repacks: choice.mcv_repacks,
+                crates: choice.crates,
+            },
+        "short game, superweapons, MCV repacks or crates are not as chosen",
+    );
+    // Teams: everyone fights the human player; the computer players each other only in a free
+    // for all.
+    check(
+        computers.iter().all(|&id| players.hostile(HUMAN, id))
+            && computers.iter().all(|&a| {
+                computers
+                    .iter()
+                    .all(|&b| a == b || players.hostile(a, b) == choice.free_for_all)
+            }),
+        "the teams are not as chosen",
+    );
+    // Countries: the chosen one, or for RANDOM some country.
+    check(
+        played
+            .0
+            .iter()
+            .zip(choice.countries)
+            .all(|(entry, country)| match country {
+                Some(faction) => entry.faction == faction,
+                None => entry.side.is_some(),
+            }),
+        "a player does not play the country chosen for it",
+    );
+    // Credits: what the human player has and what its queues were charged make up the chosen
+    // starting credits (the run places no building and sells nothing).
+    let lobby = MenuCounts::of(catalogue).lobby;
+    let credits = choice.credits.unwrap_or(lobby.credits);
+    check(
+        players.get(HUMAN).is_some_and(|human| {
+            let charged: i64 = human
+                .queues()
+                .flat_map(|(_, items)| items.iter().map(|item| item.charged))
+                .sum();
+            human.credits() + charged == credits
+        }),
+        "the human player did not start with the chosen credits",
+    );
+    // What the players started with: by the unit count and the MCV start.
+    let unit_count = choice.unit_count.unwrap_or(lobby.unit_count);
+    check(
+        spawned == starting_totals(catalogue, played.factions(), unit_count, choice.mcv_start),
+        "the players did not start with the units and buildings of the unit count and MCV start",
+    );
+    // The map: as its file defines it, or enlarged for the players.
+    let size =
+        crate::skirmish::match_map_size(catalogue, choice.map, setups.len(), choice.map_growth);
+    let filed = catalogue
+        .maps
+        .get(choice.map)
+        .map(|entry| (entry.map.grid.width(), entry.map.grid.height()));
+    check(
+        size == Some((grid.width(), grid.height())) && (choice.map_growth || size == filed),
+        "the map does not have the size the menu showed",
+    );
+    problems
+}
+
+/// What a match holds, for [`match_problems`].
+type MatchFacts<'w> = (
+    Res<'w, LastMatch>,
+    Res<'w, MapStatus>,
+    Res<'w, SimHost>,
+    Res<'w, UnitStatus>,
+    Res<'w, BuildingStatus>,
+    Option<Res<'w, MatchPlayers>>,
+    Option<Res<'w, crate::presentation::TeamColors>>,
+);
+
+/// The human player's base units and Construction Yards in the match of `host`, and whether it
+/// owns any other building.
+fn human_base(host: &SimHost) -> (Vec<SimId>, Vec<SimId>, bool) {
+    let rules = host.definitions().and_then(Definitions::rules);
+    let world = host.world();
+    let mut bases = Vec::new();
+    if let Some(mut units) = world.try_query::<(&SimId, &Owner, &sim::Unit)>() {
+        bases.extend(
+            units
+                .iter(world)
+                .filter(|(_, owner, unit)| {
+                    owner.0 == HUMAN && rules.is_some_and(|rules| rules.is_base_unit(unit.kind))
+                })
+                .map(|(id, ..)| *id),
+        );
+    }
+    let yards: Vec<SimId> = crate::selection::own_yards(host).into_iter().collect();
+    let others = world
+        .try_query::<(&SimId, &Owner, &Building)>()
+        .is_some_and(|mut buildings| {
+            buildings
+                .iter(world)
+                .any(|(id, owner, _)| owner.0 == HUMAN && !yards.contains(id))
+        });
+    (bases, yards, others)
+}
+
+/// Whether every card the sidebar lists for the human player of `host`'s match is of an item
+/// of the side of its country, and at least one card is listed: an item that the factories of
+/// that side build, and no building that needs the Construction Yard of another side. With ALL
+/// UNLOCKED the player's yard builds the buildings of every side, prerequisites being waived:
+/// then only that some card is listed.
+fn cards_of_own_side(host: &SimHost, played: Option<&MatchPlayers>) -> bool {
+    let Some((definitions, rules)) = host
+        .definitions()
+        .and_then(|definitions| Some((definitions, definitions.rules()?)))
+    else {
+        return false;
+    };
+    let side = played.and_then(|played| played.get(HUMAN)?.side);
+    let other_yards: Vec<BuildingKind> = rules
+        .sides
+        .iter()
+        .filter(|rules| Some(rules.side) != side)
+        .map(|rules| rules.construction_yard)
+        .collect();
+    let listed = crate::sidebar::listed_items(host);
+    let unlocked = host
+        .players()
+        .and_then(|players| players.get(HUMAN))
+        .is_some_and(PlayerState::unlock_all);
+    if unlocked {
+        return !listed.is_empty();
+    }
+    !listed.is_empty()
+        && listed.iter().all(|&item| {
+            definitions.metadata(item).is_none_or(|entry| {
+                entry.owner_sides.is_empty()
+                    || side.is_some_and(|side| entry.owner_sides.contains(&side))
+            }) && definitions.production(item).is_some_and(|terms| {
+                !terms
+                    .prerequisites
+                    .iter()
+                    .any(|kind| other_yards.contains(kind))
+            })
+        })
+}
+
+/// Plays the MCV drill in the first match, one step per frame in which the simulation shows the
+/// outcome of the step before ([`Drill`]). The commands go the interface's way: Deploy as the D
+/// key issues it for the selected base unit, the repack as D or the Repack button issue it for
+/// the selected Construction Yard.
+fn play_drill(
+    mut smoke: ResMut<SmokeTest>,
+    host: Res<SimHost>,
+    played: Option<Res<MatchPlayers>>,
+    mut sink: ResMut<CommandSink>,
+) {
+    if smoke.flow != Flow::First || smoke.drill == Drill::Done {
+        return;
+    }
+    let sees = host
+        .players()
+        .and_then(|players| players.get(HUMAN))
+        .is_some_and(|state| state.vision().visible_cells() > 0);
+    if !sees {
+        return;
+    }
+    let (bases, yards, others) = human_base(&host);
+    let deploy = |sink: &mut CommandSink| {
+        sink.issue(crate::special_controls::deploy_commands(
+            &crate::selection::Selection(bases.iter().copied().collect()),
+        ))
+    };
+    let repacks = host
+        .match_state()
+        .is_some_and(|state| state.rules().mcv_repacks);
+    match (smoke.drill, bases.len(), yards.len()) {
+        (Drill::Start, 1, 0) => {
+            // No building, so no card.
+            if !crate::sidebar::listed_items(&host).is_empty() {
+                smoke.problem("the sidebar lists cards before the Construction Yard stands");
+            }
+            deploy(&mut sink);
+            smoke.drill = Drill::Deployed;
+        }
+        (Drill::Deployed, 0, 1) => {
+            if others || !cards_of_own_side(&host, played.as_deref()) {
+                smoke.problem(
+                    "with its Construction Yard the player owns another building, or the \
+                     sidebar lists no card or a card of the other side",
+                );
+            }
+            // The yard is selected, as a left click on it selects it.
+            let command = crate::special_controls::repack_command(
+                yards.first().copied(),
+                &yards.iter().copied().collect(),
+                0,
+                repacks,
+            );
+            if command.is_none() {
+                smoke.problem("the selected Construction Yard offers no repack");
+            }
+            sink.issue(command);
+            smoke.drill = Drill::Repacked;
+        }
+        (Drill::Repacked, 1, 0) => {
+            if others || !crate::sidebar::listed_items(&host).is_empty() {
+                smoke.problem(
+                    "after the repack the player owns a building or the sidebar lists a card",
+                );
+            }
+            deploy(&mut sink);
+            smoke.drill = Drill::Redeployed;
+        }
+        (Drill::Redeployed, 0, 1) => {
+            info!(
+                "smoke test: the MCV deployed, repacked and deployed again by tick {}",
+                host.tick()
+            );
+            smoke.drill = Drill::Done;
+        }
+        (step, ..) if host.tick() > DRILL_TICKS => {
+            smoke.problem(format!(
+                "the MCV drill stands at {step:?} after {} ticks, with {} base units and {} \
+                 Construction Yards",
+                host.tick(),
+                bases.len(),
+                yards.len()
+            ));
+            smoke.drill = Drill::Done;
+        }
+        _ => {}
+    }
+}
+
+/// Plays the game flow: starts, restarts, leaves, and starts matches again, as the menu's and
+/// the end screen's buttons do (their effects are computed by the same pure functions), and
+/// compares every match with the choices it was started from ([`match_problems`]).
 #[allow(clippy::too_many_arguments)]
 fn play_flow(
     mut commands: Commands,
@@ -207,17 +1015,15 @@ fn play_flow(
     screen: Res<Screen>,
     catalogue: Option<Res<Catalogue>>,
     mut selection: ResMut<MenuSelection>,
-    last: Res<LastMatch>,
-    map: Res<MapStatus>,
-    host: Res<SimHost>,
+    facts: MatchFacts,
     menu: Query<&MenuButton>,
     roots: Query<&Node, With<MenuRoot>>,
-    teams: Option<Res<crate::presentation::TeamColors>>,
     mut speed: ResMut<crate::game_speed::GameSpeed>,
 ) {
     let Some(catalogue) = catalogue else {
         return;
     };
+    let (last, map, host, units, buildings, played, teams) = facts;
     let long = smoke.frames >= FLOW_MIN_FRAMES;
     let counts = MenuCounts::of(&catalogue);
     let start =
@@ -234,68 +1040,96 @@ fn play_flow(
                     smoke.flow = Flow::Last;
                 }
             }
+            smoke.compared = false;
+            smoke.menu_frames = 0;
         };
     let settled = map.map_created && host.tick() >= FLOW_TICKS;
+    // Every match of the run holds what its menu choices say: nothing leaked from the match
+    // before, nothing was lost on a restart.
     if *screen == Screen::Match
         && settled
+        && !smoke.compared
         && let Some(choice) = last.0
     {
-        let players = host.players().expect("installed match has players");
-        let computers: Vec<sim::PlayerId> = choice
-            .players()
-            .iter()
-            .skip(1)
-            .map(|setup| setup.player)
-            .collect();
-        let colours: std::collections::BTreeSet<[u8; 3]> = choice
-            .players()
-            .iter()
-            .filter_map(|setup| teams.as_ref().map(|t| t.rgb_of(setup.player)))
-            .collect();
-        let valid = players.get(HUMAN).is_some_and(|p| {
-            p.super_me() == choice.super_me && p.unlock_all() == choice.unlock_all
-        }) && computers.iter().all(|&id| {
-            players
-                .get(id)
-                .is_some_and(|p| !p.super_me() && !p.unlock_all() && p.production_speed() == 1)
-                && host.ai().is_some_and(|ai| ai.controller(id).is_some())
-        }) && players.iter().count() == choice.players().len()
-            && teams.as_ref().is_some_and(|t| t.0 == choice.color)
-            && colours.len() == choice.players().len();
-        if !valid {
-            error!(
-                "smoke test failed: menu options leaked, were lost on restart, players were not \
-                 independent, or colors collided"
-            );
-            smoke.rejected = true;
+        smoke.compared = true;
+        let colours = teams.as_ref().map(|teams| {
+            let distinct: std::collections::BTreeSet<[u8; 3]> = choice
+                .players()
+                .iter()
+                .map(|setup| teams.rgb_of(setup.player))
+                .collect();
+            (teams.0, distinct.len())
+        });
+        let problems = match_problems(
+            choice,
+            &catalogue,
+            &host,
+            &played.as_deref().cloned().unwrap_or_default(),
+            (units.spawned, buildings.spawned),
+            colours,
+        );
+        let (number, flow) = (smoke.starts, smoke.flow);
+        for problem in problems {
+            smoke.problem(format!("match {number} ({flow:?}): {problem}"));
         }
     }
 
     match (smoke.flow, *screen) {
-        (Flow::Menu, Screen::Menu) => {
+        (Flow::Menu, Screen::Menu) if !long => {
             let shown = roots.iter().any(|node| node.display != Display::None);
             smoke.menu_buttons = Some(if shown { menu.iter().count() } else { 0 });
-            if long {
-                let mut rows = vec![Row::SuperMe, Row::Color, Row::UnlockAll];
-                rows.extend(std::iter::repeat_n(Row::Enemies, SMOKE_ENEMIES - 1));
-                for row in rows {
-                    if let MenuEffect::Select(next) =
-                        menu_effect(MenuButton::Next(row), *selection, counts)
-                    {
-                        *selection = next;
-                    } else {
-                        smoke.rejected = true;
-                    }
-                }
-            }
-            start(
-                &mut smoke,
-                &mut commands,
-                *selection,
-                if long { Flow::First } else { Flow::Last },
-            );
+            start(&mut smoke, &mut commands, *selection, Flow::Last);
         }
-        (Flow::First, Screen::Match) if settled => {
+        (Flow::Menu, Screen::Menu) => {
+            if smoke.menu_frames == 0 {
+                let shown = roots.iter().any(|node| node.display != Display::None);
+                smoke.menu_buttons = Some(if shown { menu.iter().count() } else { 0 });
+                // The fullest menu, for the layout check.
+                smoke.saved = Some(*selection);
+                *selection = fullest_menu(&catalogue, *selection);
+            }
+            smoke.menu_frames += 1;
+            if smoke.menu_frames <= LAYOUT_FRAMES {
+                return;
+            }
+            let problems = smoke.layout.as_ref().map_or_else(
+                || vec!["the menu was not measured".to_owned()],
+                |layout| layout.problems(MENU_BUTTONS),
+            );
+            if let Some(extent) = smoke.layout.as_ref().and_then(MenuLayout::extent) {
+                info!(
+                    "smoke test: the fullest menu covers {} x {} pixels (measures: {} x {}, \
+                     must fit {} x {})",
+                    extent.width(),
+                    extent.height(),
+                    menu_size().x,
+                    menu_size().y,
+                    MENU_FIT.x,
+                    MENU_FIT.y
+                );
+            }
+            smoke.layout_problems = Some(problems.len());
+            for problem in problems {
+                error!("smoke test failed: {problem}");
+            }
+            if let Some(saved) = smoke.saved {
+                *selection = saved;
+            }
+            let mut choice = *selection;
+            choose_first(&mut smoke, &mut choice, &catalogue, counts);
+            *selection = choice;
+            start(&mut smoke, &mut commands, choice, Flow::First);
+        }
+        (Flow::First, Screen::Match) if settled && smoke.compared && smoke.drill == Drill::Done => {
+            // With MAP GROWTH on and more players than the map file lists start positions, the
+            // match is played on a larger map than the file's.
+            let filed = last
+                .0
+                .and_then(|choice| catalogue.maps.get(choice.map))
+                .map_or(0, |entry| entry.map.grid.width());
+            if host.grid().is_none_or(|grid| grid.width() <= filed) {
+                smoke.problem("the map of the first match did not grow with its players");
+            }
             match end_effect(EndButton::Restart, last.0) {
                 EndEffect::Restart(choice) => {
                     commands.queue(move |world: &mut World| {
@@ -308,42 +1142,59 @@ fn play_flow(
                     smoke.rejected = true;
                 }
             }
+            smoke.compared = false;
             smoke.flow = Flow::Restarted;
         }
-        (Flow::Restarted, Screen::Match) if settled => {
+        (Flow::Restarted, Screen::Match) if settled && smoke.compared => {
             if end_effect(EndButton::Menu, last.0) == EndEffect::Menu {
                 commands.queue(end_match);
             }
             smoke.flow = Flow::MenuAgain;
         }
         (Flow::MenuAgain, Screen::Menu) => {
-            // M7: the last match is started after the faction row's `>` button, so that the human
-            // player plays the next faction (the second, with the shipped data) and the checks
-            // cover it.
-            match menu_effect(MenuButton::Next(Row::Faction), *selection, counts) {
-                MenuEffect::Select(next) => *selection = next,
-                effect => {
-                    error!("smoke test failed: the faction row's next button did {effect:?}");
-                    smoke.rejected = true;
-                }
+            let mut choice = *selection;
+            choose_yards(&mut smoke, &mut choice, &catalogue, counts);
+            *selection = choice;
+            start(&mut smoke, &mut commands, choice, Flow::Yards);
+        }
+        (Flow::Yards, Screen::Match) if settled && smoke.compared => {
+            // The players started with their Construction Yards, the cards are listed from the
+            // first tick, and with "MCV repacks" off the yard offers no repack.
+            let (bases, yards, _) = human_base(&host);
+            let repack = crate::special_controls::repack_command(
+                yards.first().copied(),
+                &yards.iter().copied().collect(),
+                0,
+                host.match_state()
+                    .is_some_and(|state| state.rules().mcv_repacks),
+            );
+            if !bases.is_empty()
+                || yards.len() != 1
+                || repack.is_some()
+                || !cards_of_own_side(&host, played.as_deref())
+            {
+                smoke.problem(format!(
+                    "the match with the yards: {} base units, {} Construction Yards, repack \
+                     {repack:?}, or the sidebar lists no card or one of the other side",
+                    bases.len(),
+                    yards.len()
+                ));
             }
-            // Turn the bonus and "unlock all" back off through the menu; ordinary-economy checks
-            // below must still pass after a boosted match and its restart.
-            for row in [Row::SuperMe, Row::Color, Row::UnlockAll] {
-                if let MenuEffect::Select(next) =
-                    menu_effect(MenuButton::Next(row), *selection, counts)
-                {
-                    *selection = next;
-                } else {
-                    smoke.rejected = true;
-                }
+            if end_effect(EndButton::Menu, last.0) == EndEffect::Menu {
+                commands.queue(end_match);
             }
-            // The last match runs at the fastest speed. A match starts at the speed of the menu's
-            // "Game speed" row (`begin_match`), so the row is set as its `>` button would, and
-            // the speed itself as `]` pressed repeatedly sets it.
-            selection.game_speed = crate::game_speed::SPEED_LEVELS.len() - 1;
+            smoke.flow = Flow::MenuLast;
+        }
+        (Flow::MenuLast, Screen::Menu) => {
+            let mut choice = *selection;
+            let opening = smoke.saved.unwrap_or(choice);
+            choose_last(&mut smoke, &mut choice, counts, opening);
+            *selection = choice;
+            // The last match runs at the fastest speed. A match starts at the speed of the
+            // menu's "Game speed" row (`begin_match`); the speed itself is set as `]` pressed
+            // repeatedly sets it.
             while speed.step(true) {}
-            start(&mut smoke, &mut commands, *selection, Flow::Last);
+            start(&mut smoke, &mut commands, choice, Flow::Last);
         }
         _ => {}
     }
@@ -507,7 +1358,14 @@ fn order_production(
     let item = first_queueable(definitions, &owned, state);
     if let Some(item) = item {
         let menu = production_menu(definitions);
-        let item_state = item_status(item, definitions, &owned.iter().copied().collect(), state);
+        let item_state = item_status(
+            item,
+            definitions,
+            &owned.iter().copied().collect(),
+            state,
+            host.match_state()
+                .is_none_or(|state| state.rules().superweapons),
+        );
         match button_effect(
             SidebarButton::Item(item),
             MouseButton::Left,
@@ -709,7 +1567,11 @@ fn count_frames(
     sounds: Option<Res<SoundBank>>,
     views: ViewQueries,
     interface: InterfaceQueries,
-    flow: (Option<Res<Catalogue>>, Res<LastMatch>),
+    flow: (
+        Option<Res<Catalogue>>,
+        Res<LastMatch>,
+        Option<Res<MatchPlayers>>,
+    ),
     options: OptionQueries,
     mut exit: MessageWriter<AppExit>,
 ) {
@@ -720,9 +1582,18 @@ fn count_frames(
     if smoke.rendered != smoke.frames {
         return;
     }
-    let (catalogue, last) = flow;
-    let (expected_units, expected_buildings) = match (catalogue.as_deref(), last.0) {
-        (Some(catalogue), Some(selection)) => starting_totals(catalogue, selection, true),
+    let (catalogue, last, played) = flow;
+    // What the players of the last match started with: by the countries they play (the
+    // simulation has drawn the RANDOM ones), the unit count and the MCV start of its choices.
+    let (expected_units, expected_buildings) = match (catalogue.as_deref(), last.0, &played) {
+        (Some(catalogue), Some(selection), Some(played)) => starting_totals(
+            catalogue,
+            played.factions(),
+            selection
+                .unit_count
+                .unwrap_or(MenuCounts::of(catalogue).lobby.unit_count),
+            selection.mcv_start,
+        ),
         _ => (0, 0),
     };
     let empty = Players::default();
@@ -776,6 +1647,27 @@ fn count_frames(
             })
             .count()
     });
+    // RA1: the cards displayed are among those the sidebar's rule lists (what some building of
+    // the player could build), and some card is displayed once the player owns a building.
+    let listed = crate::sidebar::listed_items(&host);
+    let cards = |wanted: bool| {
+        sidebar_buttons
+            .iter()
+            .filter(|(button, node, _)| {
+                matches!(button, SidebarButton::Item(item) if listed.contains(item) == wanted)
+                    && node.size() != Vec2::ZERO
+            })
+            .count()
+    };
+    let (cards_shown, unlisted_shown) = (cards(true), cards(false));
+    let owns_building =
+        host.world()
+            .try_query::<(&Owner, &Building)>()
+            .is_some_and(|mut buildings| {
+                buildings
+                    .iter(host.world())
+                    .any(|(owner, _)| owner.0 == HUMAN)
+            });
     // M7: the options written to the run's settings file read back unchanged.
     let (settings_file, volume, camera, options_buttons) = options;
     let current = Settings {
@@ -853,8 +1745,9 @@ fn count_frames(
          players: {}, pause: {:?}, menu buttons: {:?}, matches started: {}, flow: {:?}, views: \
          {unit_view_count} of {sim_units} units and {building_view_count} of {sim_buildings} \
          buildings, computer player's commands: {ai_commands} ({} rejected), items outside the \
-         roster shown: {off_roster_shown}, options buttons: {options_buttons}, settings saved: \
-         {settings_saved}",
+         roster shown: {off_roster_shown}, cards shown: {cards_shown} of {} listed \
+         ({unlisted_shown} not listed), options buttons: {options_buttons}, settings saved: \
+         {settings_saved}, menu layout problems: {:?}, game flow problems: {}",
         smoke.rendered,
         tick,
         map.map_created,
@@ -868,7 +1761,10 @@ fn count_frames(
         smoke.menu_buttons,
         smoke.starts,
         smoke.flow,
-        smoke.ai_rejected
+        smoke.ai_rejected,
+        listed.len(),
+        smoke.layout_problems,
+        smoke.flow_problems
     );
     let failures = smoke_failures(&SmokeOutcome {
         frames: smoke.frames,
@@ -911,7 +1807,7 @@ fn count_frames(
         flow_done: smoke.flow == Flow::Last,
         starts: smoke.starts,
         expected_starts: if smoke.frames >= FLOW_MIN_FRAMES {
-            3
+            LONG_RUN_STARTS
         } else {
             1
         },
@@ -920,8 +1816,15 @@ fn count_frames(
         ai_commands,
         ai_rejected: smoke.ai_rejected,
         off_roster_shown,
+        unlisted_shown,
+        cards_missing: owns_building && tick > 0 && cards_shown == 0,
         options_buttons,
         settings_saved,
+        // A run long enough for the game flow must have checked the menu's layout.
+        layout_problems: smoke
+            .layout_problems
+            .or((smoke.frames < FLOW_MIN_FRAMES).then_some(0)),
+        flow_problems: smoke.flow_problems,
     });
     if failures.is_empty() {
         exit.write(AppExit::Success);
@@ -996,14 +1899,30 @@ struct SmokeOutcome {
     ai_rejected: u64,
     /// Displayed sidebar buttons of items outside the human player's roster (M7).
     off_roster_shown: usize,
+    /// Displayed sidebar cards of items that the sidebar's rule does not list: that no building
+    /// of the human player could build (RA1, `crate::sidebar::item_listed`).
+    unlisted_shown: usize,
+    /// The human player owns a building and no card is displayed.
+    cards_missing: bool,
+    /// Problems of the menu's layout with its fullest texts (RA1); `None` if a run long enough
+    /// for the game flow did not check it.
+    layout_problems: Option<usize>,
+    /// Checks of the game flow that failed (RA1): matches that did not hold what their menu
+    /// choices said, steps of the MCV drill that did not happen.
+    flow_problems: usize,
     /// Buttons of the options screen (M7).
     options_buttons: usize,
     /// The options the run changed were written and read back unchanged (M7).
     settings_saved: bool,
 }
 
-/// Buttons of the menu: previous and next for each of its rows, Start, Options (M7), and Quit.
-pub const MENU_BUTTONS: usize = crate::skirmish::Row::ALL.len() * 2 + 3;
+/// Buttons of the menu: previous and next for each of its rows (those of the two columns and of
+/// the player list), Start, Options (M7), and Quit.
+pub const MENU_BUTTONS: usize = crate::skirmish::Row::COUNT * 2 + 3;
+
+/// Matches a run long enough for the game flow starts: the first with the options changed, its
+/// restart, the one with the Construction Yards, and the last.
+pub const LONG_RUN_STARTS: u32 = 4;
 
 /// What the options screen and the settings file show, for the smoke test's M7 checks.
 type OptionQueries<'w, 's> = (
@@ -1136,6 +2055,28 @@ fn smoke_failures(outcome: &SmokeOutcome) -> Vec<String> {
             outcome.off_roster_shown
         ));
     }
+    if outcome.unlisted_shown > 0 {
+        failures.push(format!(
+            "{} sidebar cards are shown of items that no building of the player could build",
+            outcome.unlisted_shown
+        ));
+    }
+    if outcome.cards_missing {
+        failures.push("the player owns a building and the sidebar shows no card".to_string());
+    }
+    match outcome.layout_problems {
+        None => failures.push("the layout of the menu was not checked".to_string()),
+        Some(0) => {}
+        Some(problems) => failures.push(format!(
+            "the layout of the menu has {problems} problems (logged above)"
+        )),
+    }
+    if outcome.flow_problems > 0 {
+        failures.push(format!(
+            "{} checks of the game flow failed (logged above)",
+            outcome.flow_problems
+        ));
+    }
     if outcome.options_buttons != OPTIONS_BUTTONS {
         failures.push(format!(
             "the options screen has {} of {OPTIONS_BUTTONS} buttons",
@@ -1194,13 +2135,17 @@ mod tests {
         pause: Some((0, true)),
         menu_buttons: MENU_BUTTONS,
         flow_done: true,
-        starts: 3,
-        expected_starts: 3,
+        starts: LONG_RUN_STARTS,
+        expected_starts: LONG_RUN_STARTS,
         views: (26, 2),
         simulated: (26, 2),
         ai_commands: 4,
         ai_rejected: 0,
         off_roster_shown: 0,
+        unlisted_shown: 0,
+        cards_missing: false,
+        layout_problems: Some(0),
+        flow_problems: 0,
         options_buttons: OPTIONS_BUTTONS,
         settings_saved: true,
     };
@@ -1323,7 +2268,7 @@ mod tests {
         let catalogue = crate::skirmish::tests::production_catalogue();
         let selection = MenuSelection::initial(&catalogue);
         let definitions = &catalogue.definitions;
-        assert!(selection.faction < catalogue.skirmish.factions.len());
+        assert!(selection.faction() < catalogue.skirmish.factions.len());
         let rules = definitions.rules().expect("rules");
         for (index, faction) in catalogue.skirmish.factions.iter().enumerate() {
             let side = faction.side.and_then(|side| rules.side(side));
@@ -1416,10 +2361,13 @@ mod tests {
         // (`sim::starting_units`) and no building; with the lobby's "start with an MCV" off,
         // the yard instead of the base unit.
         let catalogue = crate::skirmish::tests::production_catalogue();
-        let selection = MenuSelection::initial(&catalogue);
-        let (units, buildings) = starting_totals(&catalogue, selection, true);
+        // (RA1-C: with a fixed country for the computer player, `MenuSelection::versus`, which
+        // is what `menu_host` and `demo_host` play; the menu itself opens with a RANDOM one.)
+        let selection = MenuSelection::versus(&catalogue);
+        let (units, buildings) =
+            crate::skirmish::selection_totals(&catalogue, selection).expect("fixed countries");
         let factions = &catalogue.skirmish.factions;
-        let players = crate::skirmish::match_players(&catalogue, selection);
+        let players = selection.players();
         let rules = catalogue.definitions.rules().expect("rules");
         let unit_count = u32::try_from(rules.dialog.unit_count).expect("unit count");
         let expected: usize = players
@@ -1462,7 +2410,14 @@ mod tests {
         let mut built = world.try_query::<&Building>().expect("registered");
         assert_eq!(built.iter(world).count(), 0);
         // With the yards: a building each in place of the base unit.
-        let (yard_units, yards) = starting_totals(&catalogue, selection, false);
+        let (yard_units, yards) = crate::skirmish::selection_totals(
+            &catalogue,
+            MenuSelection {
+                mcv_start: false,
+                ..selection
+            },
+        )
+        .expect("fixed countries");
         assert_eq!((yard_units, yards), (expected, players.len()));
         assert!(yard_units > 0 && yards > 0);
         let host = crate::sim_host::tests::demo_host();
@@ -1487,7 +2442,9 @@ mod tests {
                 starts: 2,
                 ..PASSING
             }),
-            ["2 of 3 matches started, the game flow did not reach the last one"]
+            [format!(
+                "2 of {LONG_RUN_STARTS} matches started, the game flow did not reach the last one"
+            )]
         );
         assert_eq!(
             fails(SmokeOutcome {
@@ -1644,17 +2601,8 @@ mod tests {
         let mut app = App::new();
         app.add_plugins(MinimalPlugins).add_message::<AppExit>();
         app.insert_resource(SmokeTest {
-            frames: 10,
             rendered: 3,
-            order: None,
-            production: None,
-            rejected: false,
-            ai_rejected: 0,
-            pause: PauseCheck::default(),
-            flow: Flow::default(),
-            menu_buttons: None,
-            starts: 0,
-            options_changed: false,
+            ..SmokeTest::new(10)
         });
         app.world_mut().write_message(AppExit::Success);
         app.world_mut()
@@ -1676,5 +2624,338 @@ mod tests {
             ["a command was accepted while the game was paused"]
         );
         assert_eq!(fails(None), ["the pause did not end within the run"]);
+    }
+
+    // --- RA1: the lobby's options in the game flow ----------------------------------------------
+
+    #[test]
+    fn a_run_passes_only_with_the_menu_laid_out_the_cards_listed_and_the_flow_checked() {
+        let fails = |outcome: SmokeOutcome| smoke_failures(&outcome);
+        assert_eq!(
+            fails(SmokeOutcome {
+                unlisted_shown: 2,
+                ..PASSING
+            }),
+            ["2 sidebar cards are shown of items that no building of the player could build"]
+        );
+        assert_eq!(
+            fails(SmokeOutcome {
+                cards_missing: true,
+                ..PASSING
+            }),
+            ["the player owns a building and the sidebar shows no card"]
+        );
+        assert_eq!(
+            fails(SmokeOutcome {
+                layout_problems: None,
+                ..PASSING
+            }),
+            ["the layout of the menu was not checked"]
+        );
+        assert_eq!(
+            fails(SmokeOutcome {
+                layout_problems: Some(3),
+                ..PASSING
+            }),
+            ["the layout of the menu has 3 problems (logged above)"]
+        );
+        assert_eq!(
+            fails(SmokeOutcome {
+                flow_problems: 1,
+                ..PASSING
+            }),
+            ["1 checks of the game flow failed (logged above)"]
+        );
+        // A problem of the flow is counted and logged.
+        let mut smoke = SmokeTest::new(600);
+        smoke.problem("something");
+        smoke.problem(format!("something {}", "else"));
+        assert_eq!(smoke.flow_problems, 2);
+        assert_eq!(
+            MENU_BUTTONS, 73,
+            "16 rows, 10 countries, 9 difficulties, 3 buttons"
+        );
+    }
+
+    #[test]
+    fn the_layout_check_finds_a_menu_that_is_too_large_overlaps_or_cuts_a_text() {
+        let size = menu_size();
+        let window = Vec2::new(1280.0, 800.0);
+        let at = |x: f32, y: f32, w: f32, h: f32| Rect::new(x, y, x + w, y + h);
+        // A menu of the size of its measures, centred, with two buttons side by side and a text
+        // inside its place.
+        let origin = (window - size) / 2.0;
+        let good = MenuLayout {
+            window,
+            blocks: vec![at(origin.x, origin.y, size.x, size.y)],
+            buttons: vec![
+                at(origin.x + 10.0, origin.y + 10.0, 24.0, 26.0),
+                at(origin.x + 34.0, origin.y + 10.0, 24.0, 26.0),
+            ],
+            texts: vec![(
+                at(origin.x + 70.0, origin.y + 14.0, 90.0, 17.0),
+                at(origin.x + 60.0, origin.y + 10.0, 150.0, 26.0),
+            )],
+        };
+        assert_eq!(good.problems(2), Vec::<String>::new());
+        assert_eq!(good.extent().map(|extent| extent.size()), Some(size));
+        assert_eq!(
+            MenuLayout::default().problems(0),
+            ["the menu is not laid out"]
+        );
+        // A button missing.
+        assert_eq!(good.problems(3), ["2 of 3 menu buttons are laid out"]);
+        // Two buttons that overlap by a few pixels; buttons that only touch do not.
+        let mut overlapping = good.clone();
+        overlapping.buttons[1] = at(origin.x + 30.0, origin.y + 10.0, 24.0, 26.0);
+        assert_eq!(overlapping.problems(2), ["1 pairs of menu buttons overlap"]);
+        // A text wider than its place, and one pushed below it.
+        for text in [
+            at(origin.x + 55.0, origin.y + 14.0, 170.0, 17.0),
+            at(origin.x + 70.0, origin.y + 30.0, 90.0, 17.0),
+        ] {
+            let mut cut = good.clone();
+            cut.texts[0].0 = text;
+            assert_eq!(cut.problems(2), ["1 menu texts do not fit their place"]);
+        }
+        // A menu larger than its measures say: a row grew.
+        let mut grown = good.clone();
+        grown
+            .blocks
+            .push(at(origin.x, origin.y, size.x, size.y + 30.0));
+        let problems = grown.problems(2);
+        assert_eq!(problems.len(), 1, "{problems:?}");
+        assert!(problems[0].contains("more than the"), "{problems:?}");
+        // A menu that does not fit the smallest window, and so lies outside this small one.
+        let small = Vec2::new(1024.0, 600.0);
+        let huge = MenuLayout {
+            window: small,
+            blocks: vec![at(-150.0, -80.0, 1324.0, 760.0)],
+            buttons: Vec::new(),
+            texts: Vec::new(),
+        };
+        let problems = huge.problems(0);
+        assert_eq!(problems.len(), 3, "{problems:?}");
+        assert!(problems[1].contains("does not fit a window of 1280 x 720"));
+        assert!(problems[2].contains("outside the window of 1024 x 600"));
+    }
+
+    #[test]
+    fn the_flows_menu_presses_choose_its_matches_and_restore_the_lobby() {
+        // The choices of a long run, made by the menu's pure functions as its buttons make
+        // them: without a window, so that a change of the menu that breaks the flow fails here.
+        let catalogue = crate::skirmish::tests::production_catalogue();
+        let counts = MenuCounts::of(&catalogue);
+        let lobby = counts.lobby;
+        let opening = MenuSelection::opening(&catalogue);
+        let mut smoke = SmokeTest::new(600);
+        // The fullest menu is a menu the buttons could make, with ten players.
+        let fullest = fullest_menu(&catalogue, opening);
+        assert!(fullest.valid(counts));
+        assert_eq!(fullest.players().len(), sim::MAX_MATCH_PLAYERS);
+        assert_eq!(
+            crate::skirmish::row_text(Row::Map, fullest, &catalogue),
+            "continental divide  256 x 256"
+        );
+        assert_eq!(
+            crate::skirmish::row_text(Row::Country(9), fullest, &catalogue),
+            "Great Britain (Allied)"
+        );
+        assert_eq!(
+            crate::skirmish::row_text(Row::UnitSpeed, fullest, &catalogue),
+            "4x - SUPER ME OFF"
+        );
+
+        // The first match: every option of the lobby away from its default.
+        let mut first = opening;
+        choose_first(&mut smoke, &mut first, &catalogue, counts);
+        assert_eq!(smoke.flow_problems, 0);
+        assert!(first.valid(counts));
+        let map = growth_map(&catalogue);
+        assert_eq!(catalogue.maps[map].id, "riverlands");
+        assert_eq!(first.map, map);
+        assert_eq!(first.enemy_count(), grown_enemies(&catalogue));
+        assert_eq!(
+            first.players().len(),
+            5,
+            "more than the four starts of the file"
+        );
+        let soviet = &catalogue.skirmish.factions[first.faction()];
+        assert_eq!(soviet.side, Some(sim::Side::Soviet));
+        let options = first.options();
+        assert_eq!(
+            options,
+            sim::MatchOptions {
+                super_players: vec![HUMAN],
+                unlock_players: vec![HUMAN],
+                unit_speed_percent: crate::skirmish::UNIT_SPEEDS[1],
+                free_for_all: true,
+                // The first two computer players have a country; the others are drawn.
+                random_countries: vec![sim::PlayerId(3), sim::PlayerId(4)],
+                starting_credits: Some(lobby.min_credits),
+                unit_count: Some(lobby.min_unit_count),
+                mcv_start: true,
+                short_game: false,
+                superweapons: false,
+                crates: false,
+                mcv_repacks: true,
+            }
+        );
+        assert_eq!(
+            (lobby.min_credits, lobby.min_unit_count),
+            (5000, 0),
+            "the lowest of the lobby of Red Alert 2"
+        );
+        // The match it starts holds exactly that; another choice does not pass for it.
+        let (host, start) = crate::sim_host::tests::match_host(&catalogue, first, SMOKE_SEED);
+        let played = MatchPlayers::of(&host, &catalogue, &first.players());
+        let spawned = (start.units, start.buildings);
+        assert_eq!(spawned, (5, 0), "an MCV each and nothing else");
+        let colours = Some((first.color, 5));
+        assert_eq!(
+            match_problems(first, &catalogue, &host, &played, spawned, colours),
+            Vec::<String>::new()
+        );
+        let filed = &catalogue.maps[map].map.grid;
+        assert!(host.grid().expect("grid").width() > filed.width());
+        for (other, problem) in [
+            (
+                MenuSelection {
+                    short_game: true,
+                    ..first
+                },
+                "short game, superweapons, MCV repacks or crates are not as chosen",
+            ),
+            (
+                MenuSelection {
+                    free_for_all: false,
+                    ..first
+                },
+                "the teams are not as chosen",
+            ),
+            (
+                MenuSelection {
+                    credits: Some(lobby.max_credits),
+                    ..first
+                },
+                "the human player did not start with the chosen credits",
+            ),
+            (
+                MenuSelection {
+                    unit_count: Some(lobby.max_unit_count),
+                    ..first
+                },
+                "the players did not start with the units and buildings of the unit count and \
+                 MCV start",
+            ),
+            (
+                MenuSelection {
+                    mcv_start: false,
+                    ..first
+                },
+                "the players did not start with the units and buildings of the unit count and \
+                 MCV start",
+            ),
+            (
+                MenuSelection {
+                    map_growth: false,
+                    ..first
+                },
+                "the map does not have the size the menu showed",
+            ),
+            (
+                MenuSelection {
+                    super_me: false,
+                    ..first
+                },
+                "Super Me, its unit speed or ALL UNLOCKED is not as chosen for the human player",
+            ),
+            (
+                MenuSelection {
+                    enemies: first.enemies - 1,
+                    ..first
+                },
+                "the match has other players than the menu chose",
+            ),
+            (
+                first.with_countries(0, 0, counts.factions),
+                "a player does not play the country chosen for it",
+            ),
+        ] {
+            let problems = match_problems(other, &catalogue, &host, &played, spawned, colours);
+            assert!(
+                problems.iter().any(|found| found == problem),
+                "{problems:?} lacks {problem:?}"
+            );
+        }
+        assert_eq!(
+            match_problems(
+                first,
+                &catalogue,
+                &host,
+                &played,
+                spawned,
+                Some((first.color, 4))
+            ),
+            ["the players' colours are not the chosen one and one of their own for each"]
+        );
+
+        // The match with the yards: as many players as the file has starts, without growth.
+        let mut yards = first;
+        choose_yards(&mut smoke, &mut yards, &catalogue, counts);
+        assert_eq!(smoke.flow_problems, 0);
+        assert!(yards.valid(counts));
+        assert_eq!(yards.players().len(), 4);
+        let (host, start) = crate::sim_host::tests::match_host(&catalogue, yards, SMOKE_SEED);
+        let played = MatchPlayers::of(&host, &catalogue, &yards.players());
+        assert_eq!(start.buildings, 4, "a Construction Yard each");
+        assert_eq!(
+            match_problems(
+                yards,
+                &catalogue,
+                &host,
+                &played,
+                (start.units, start.buildings),
+                Some((yards.color, 4))
+            ),
+            Vec::<String>::new()
+        );
+        let (bases, own_yards, others) = human_base(&host);
+        assert_eq!((bases.len(), own_yards.len(), others), (0, 1, false));
+        assert!(cards_of_own_side(&host, Some(&played)));
+
+        // The last match: the lobby's defaults again, on the opening map.
+        let mut last = yards;
+        choose_last(&mut smoke, &mut last, counts, opening);
+        assert_eq!(smoke.flow_problems, 0);
+        assert!(last.valid(counts));
+        assert_eq!(last.map, opening.map);
+        assert_eq!(last.enemy_count(), SMOKE_ENEMIES);
+        assert_eq!(last.countries[0], Some(1), "the second country");
+        assert_eq!(
+            &last.countries[1..],
+            &opening.countries[1..],
+            "RANDOM again"
+        );
+        assert_eq!(last.difficulties, opening.difficulties);
+        assert_eq!(
+            last.options(),
+            sim::MatchOptions {
+                random_countries: (1..=SMOKE_ENEMIES as u8).map(sim::PlayerId).collect(),
+                starting_credits: Some(lobby.credits),
+                unit_count: Some(lobby.unit_count),
+                unit_speed_percent: 100,
+                ..sim::MatchOptions::default()
+            }
+        );
+        // A menu whose buttons do not do what the flow expects is a problem of the flow.
+        let mut broken = opening;
+        choose_first(
+            &mut smoke,
+            &mut broken,
+            &catalogue,
+            MenuCounts { maps: 0, ..counts },
+        );
+        assert!(smoke.flow_problems > 0);
     }
 }

@@ -160,23 +160,13 @@ impl SimHost {
             self.world
                 .insert_resource(sim::Props::from_looks(&plan.grid, &plan.looks, armour));
         }
-        let human = |on: bool| if on { vec![HUMAN] } else { Vec::new() };
         sim::setup_match_configured(
             &mut self.world,
             &plan.skirmish,
             &plan.ai,
             plan.map,
             &plan.players,
-            &sim::MatchOptions {
-                super_players: human(plan.super_me),
-                unlock_players: human(plan.unlock_all),
-                unit_speed_percent: plan.unit_speed_percent,
-                // The computer players fight the human, never each other (the default; the
-                // other options are those of Red Alert 2's lobby until the menu offers them).
-                free_for_all: false,
-                mcv_start: plan.mcv_start,
-                ..sim::MatchOptions::default()
-            },
+            &plan.options,
         )
         .map_err(|error| error.to_string())
     }
@@ -205,18 +195,17 @@ impl SimHost {
     }
 }
 
-/// Everything a match is set up from (`sim::setup_match`). The game makes it from the menu's
-/// choices with `crate::skirmish::match_plan`, which enlarges the map for the match's players.
+/// Everything a match is set up from (`sim::setup_match_configured`). The game makes it from the
+/// menu's choices with `crate::skirmish::match_plan`, which with MAP GROWTH on enlarges the map
+/// for the match's players.
 #[derive(Clone, Debug)]
 pub struct MatchPlan {
-    pub super_me: bool,
-    /// Building prerequisites waived for the human player.
-    pub unlock_all: bool,
-    /// The speed of the human player's units with Super Me, in percent (100: unchanged).
-    pub unit_speed_percent: u16,
-    /// Whether a country's player starts with the base unit of its side (the lobby's default,
-    /// RA1) or with the Construction Yard it deploys into (`sim::MatchOptions::mcv_start`).
-    pub mcv_start: bool,
+    /// The options of the match (`sim::MatchOptions`): the lobby's of Red Alert 2 (starting
+    /// credits, unit count, MCV start, short game, superweapons, crates, MCV repacks, teams, the
+    /// players with a random country) and this game's extensions for the human player (Super
+    /// Me with its unit speed, "unlock all"). `crate::skirmish::MenuSelection::options` makes
+    /// them from the menu's rows.
+    pub options: sim::MatchOptions,
     /// The terrain of the match's map: the map file's, or enlarged for more than two players.
     pub grid: Grid,
     /// The map's cell looks (row-major): where its destructible scenery stands (`sim::Props`).
@@ -439,28 +428,47 @@ pub(crate) mod tests {
         demo_match(true)
     }
 
+    /// A host with the match of `selection` installed as the menu starts it
+    /// (`crate::skirmish::match_plan`, with the seed `seed`), and what its setup placed.
+    pub(crate) fn match_host(
+        catalogue: &crate::skirmish::Catalogue,
+        selection: crate::skirmish::MenuSelection,
+        seed: u64,
+    ) -> (SimHost, MatchStart) {
+        let (plan, _) = crate::skirmish::match_plan(catalogue, selection, seed)
+            .unwrap_or_else(|error| panic!("{selection:?}: {error}"));
+        let mut host = SimHost::new(plan.seed);
+        let start = host
+            .install(&plan)
+            .unwrap_or_else(|error| panic!("{selection:?}: {error}"));
+        (host, start)
+    }
+
     fn demo_match(mcv_start: bool) -> SimHost {
         let catalogue = crate::skirmish::tests::production_catalogue();
-        let selection = crate::skirmish::MenuSelection::initial(&catalogue);
-        let plan = MatchPlan {
-            super_me: false,
-            unlock_all: false,
-            unit_speed_percent: 100,
+        // The menu's first choices with a fixed country for the computer player (RA1-C: the
+        // menu itself opens with a RANDOM one), so that the tests know what the match holds.
+        let selection = crate::skirmish::MenuSelection {
             mcv_start,
+            ..crate::skirmish::MenuSelection::versus(&catalogue)
+        };
+        let plan = MatchPlan {
+            options: selection.options(),
             grid: catalogue.maps[selection.map].map.grid.clone(),
             looks: catalogue.maps[selection.map].map.looks.clone(),
             definitions: catalogue.definitions.clone(),
             skirmish: catalogue.skirmish.clone(),
             ai: catalogue.ai.clone(),
             map: selection.map,
-            players: crate::skirmish::match_players(&catalogue, selection),
+            players: selection.players(),
             seed: 0,
         };
         let mut host = SimHost::new(plan.seed);
         let start = host
             .install(&plan)
             .unwrap_or_else(|error| panic!("{error}"));
-        let (units, buildings) = crate::skirmish::starting_totals(&catalogue, selection, mcv_start);
+        let (units, buildings) =
+            crate::skirmish::selection_totals(&catalogue, selection).expect("fixed countries");
         assert_eq!(start, MatchStart { buildings, units });
         host
     }
@@ -578,7 +586,7 @@ pub(crate) mod tests {
         // M6: matches start from the menu (`crate::skirmish::begin_match`) with the catalogue's
         // data; the demo map holds the demo match.
         let catalogue = crate::skirmish::tests::production_catalogue();
-        let selection = crate::skirmish::MenuSelection::initial(&catalogue);
+        let selection = crate::skirmish::MenuSelection::versus(&catalogue);
         let mut world = World::new();
         world.init_resource::<CommandSink>();
         world.insert_resource(SimHost::new(0));
@@ -589,22 +597,24 @@ pub(crate) mod tests {
         // As the menu starts it (RA1: every player with the base unit of its side), or with the
         // Construction Yards the base units deploy into.
         let plan = |grid: Grid, mcv_start: bool| MatchPlan {
-            super_me: false,
-            unlock_all: false,
-            unit_speed_percent: 100,
-            mcv_start,
+            options: crate::skirmish::MenuSelection {
+                mcv_start,
+                ..selection
+            }
+            .options(),
             grid,
             looks: Vec::new(),
             definitions: catalogue.definitions.clone(),
             skirmish: catalogue.skirmish.clone(),
             ai: catalogue.ai.clone(),
             map: selection.map,
-            players: crate::skirmish::match_players(&catalogue, selection),
+            players: selection.players(),
             seed: 0,
         };
         let demo = catalogue.maps[selection.map].map.grid.clone();
         let start = install_match(&mut world, &plan(demo, true)).expect("the demo match");
-        let (units, buildings) = crate::skirmish::starting_totals(&catalogue, selection, true);
+        let (units, buildings) =
+            crate::skirmish::selection_totals(&catalogue, selection).expect("fixed countries");
         assert_eq!(start, MatchStart { buildings, units });
         assert_eq!(buildings, 0, "the players start with their base units");
         assert!(world.resource::<SimHost>().running());
@@ -720,19 +730,16 @@ pub(crate) mod tests {
         assert!(sink.closed);
         // Installing a match over pending commands discards them with a log line too.
         let catalogue = crate::skirmish::tests::production_catalogue();
-        let selection = crate::skirmish::MenuSelection::initial(&catalogue);
+        let selection = crate::skirmish::MenuSelection::versus(&catalogue);
         let plan = MatchPlan {
-            super_me: false,
-            unlock_all: false,
-            unit_speed_percent: 100,
-            mcv_start: true,
+            options: selection.options(),
             grid: catalogue.maps[selection.map].map.grid.clone(),
             looks: catalogue.maps[selection.map].map.looks.clone(),
             definitions: catalogue.definitions.clone(),
             skirmish: catalogue.skirmish.clone(),
             ai: catalogue.ai.clone(),
             map: selection.map,
-            players: crate::skirmish::match_players(&catalogue, selection),
+            players: selection.players(),
             seed: 0,
         };
         world.resource_mut::<CommandSink>().reset();
@@ -755,9 +762,13 @@ pub(crate) mod tests {
         let catalogue = crate::skirmish::tests::production_catalogue();
         let mut with_scenery = 0;
         for map in 0..catalogue.maps.len() {
+            // (Since RA1 the map grows with the players only with the menu's MAP GROWTH row
+            // on, docs/DECISIONS.md R4; the computer players' countries are RANDOM, as the
+            // menu has them at first.)
             let selection = crate::skirmish::MenuSelection {
                 map,
                 enemies: 1,
+                map_growth: true,
                 super_me: true,
                 unit_speed: 2,
                 ..crate::skirmish::MenuSelection::initial(&catalogue)

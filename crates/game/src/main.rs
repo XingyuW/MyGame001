@@ -121,6 +121,10 @@ fn main() -> AppExit {
         && let Some(directory) = std::env::var_os("MYGAME_FX_REVIEW")
     {
         visual_review::enable_fx(&mut app, std::path::PathBuf::from(directory));
+    } else if options.smoke_test_frames.is_none()
+        && let Some(directory) = std::env::var_os("MYGAME_MENU_REVIEW")
+    {
+        visual_review::enable_menu(&mut app, std::path::PathBuf::from(directory));
     }
     app.run()
 }

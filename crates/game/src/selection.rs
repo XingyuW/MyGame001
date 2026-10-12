@@ -15,6 +15,8 @@
 //! right click on the map then makes the cell under the cursor that building's rally point
 //! (`SetRallyPoint`), where every unit it produces from then on goes. `R` and the sidebar's
 //! Rally button still set the rally point of every producer at once (`crate::construction`).
+//! A left click on the player's Construction Yard selects it too (RA1): it has no rally point,
+//! and with "MCV repacks" on `D` or the Repack button packs it up (`crate::special_controls`).
 //!
 //! The interface changes the simulation only by pushing commands into `CommandQueue`, through
 //! `crate::sim_host::CommandSink` (invariant I5), and reads it through `SimHost` (D34). The
@@ -85,8 +87,9 @@ impl Plugin for SelectionPlugin {
 #[derive(Resource, Debug, Default, Clone, PartialEq, Eq)]
 pub struct Selection(pub BTreeSet<SimId>);
 
-/// The player's selected unit-producing building, if any: the one whose rally point a right
-/// click sets. Selecting units deselects it, and it deselects the units.
+/// The player's selected building, if any: a unit-producing building, whose rally point a right
+/// click sets, or a Construction Yard, which can be packed up (`crate::special_controls`).
+/// Selecting units deselects it, and it deselects the units.
 #[derive(Resource, Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct SelectedBuilding(pub Option<SimId>);
 
@@ -417,9 +420,29 @@ pub(crate) fn prune_selected_building(
     let Some(id) = building.0 else {
         return;
     };
-    if !selection.0.is_empty() || !own_producers(&host).contains(&id) {
+    if !selection.0.is_empty()
+        || !(own_producers(&host).contains(&id) || own_yards(&host).contains(&id))
+    {
         building.0 = None;
     }
+}
+
+/// The human player's Construction Yards: the buildings that the base unit of a side deploys
+/// into and that pack up into it again (the rules file's `sides`). None without a rules file.
+pub(crate) fn own_yards(host: &SimHost) -> BTreeSet<SimId> {
+    let Some(rules) = host.definitions().and_then(sim::Definitions::rules) else {
+        return BTreeSet::new();
+    };
+    let Some(mut buildings) = host.world().try_query::<(&SimId, &Owner, &Building)>() else {
+        return BTreeSet::new();
+    };
+    buildings
+        .iter(host.world())
+        .filter(|(_, owner, building)| {
+            owner.0 == HUMAN && rules.side_of_construction_yard(building.kind).is_some()
+        })
+        .map(|(id, ..)| *id)
+        .collect()
 }
 
 /// The human player's unit-producing buildings.
@@ -508,10 +531,12 @@ fn select_units(
     let mut producer = None;
     let picked = if start.distance(end) < DRAG_THRESHOLD_PX {
         let pick = unit_at(end_world, &units);
-        // No unit under the cursor: a click on a factory selects the factory.
+        // No unit under the cursor: a click on a factory selects the factory, and one on the
+        // Construction Yard the yard.
         producer = click_pick(
             pick,
-            own_building(&host, hovered.0).filter(|id| own_producers(&host).contains(id)),
+            own_building(&host, hovered.0)
+                .filter(|id| own_producers(&host).contains(id) || own_yards(&host).contains(id)),
         )
         .1;
         let double = pick.is_some_and(|id| {
@@ -664,7 +689,12 @@ pub(crate) fn preview_order(
     let mut facts = HoverFacts {
         over_map,
         selected: selection.0.len(),
-        producer: selection.0.is_empty() && building.0.is_some(),
+        // Only a unit-producing building has a rally point: a selected Construction Yard
+        // offers none.
+        producer: selection.0.is_empty()
+            && building
+                .0
+                .is_some_and(|id| own_producers(&host).contains(&id)),
         cell: hovered.0,
         ..default()
     };
@@ -1289,6 +1319,87 @@ mod tests {
         app.world_mut()
             .resource_mut::<ButtonInput<MouseButton>>()
             .reset_all();
+    }
+
+    /// RA1: a left click on the player's Construction Yard selects it (to pack it up,
+    /// `crate::special_controls`); it has no rally point, so the cursor offers none and a right
+    /// click orders nothing.
+    #[test]
+    fn a_click_on_the_construction_yard_selects_it_without_a_rally_point() {
+        let host = crate::sim_host::tests::demo_host();
+        let yards = own_yards(&host);
+        assert_eq!(
+            yards.len(),
+            1,
+            "the human player's yard, not the opponent's"
+        );
+        let yard = *yards.first().expect("a yard");
+        assert!(!own_producers(&host).contains(&yard), "it produces no unit");
+        let origin = {
+            let mut buildings = host.world().try_query::<(&SimId, &Building)>().unwrap();
+            buildings
+                .iter(host.world())
+                .find(|(id, _)| **id == yard)
+                .map(|(_, building)| building.footprint.origin)
+                .expect("the yard")
+        };
+        let (mut app, window, _) = input_app_on(host);
+        app.add_systems(
+            Update,
+            (prune_selected_building, preview_order)
+                .chain()
+                .after(select_units)
+                .before(issue_orders),
+        );
+        // Away from the unit, whose body is at the middle of the window.
+        cursor(&mut app, window, Some(Vec2::new(300.0, 200.0)));
+        app.world_mut().resource_mut::<HoveredCell>().0 = Some(origin);
+        click(&mut app, MouseButton::Left);
+        assert_eq!(
+            *app.world().resource::<SelectedBuilding>(),
+            SelectedBuilding(Some(yard))
+        );
+        assert!(app.world().resource::<Selection>().0.is_empty());
+        // Over open ground: no order is offered, and a right click issues nothing.
+        app.world_mut().resource_mut::<HoveredCell>().0 =
+            Some(CellPos::new(origin.x + 6, origin.y + 5));
+        app.update();
+        assert_eq!(
+            app.world().resource::<OrderPreview>().intent,
+            OrderIntent::None
+        );
+        app.world_mut()
+            .resource_mut::<ButtonInput<MouseButton>>()
+            .press(MouseButton::Right);
+        app.update();
+        app.world_mut()
+            .resource_mut::<ButtonInput<MouseButton>>()
+            .reset_all();
+        assert_eq!(app.world().resource::<CommandSink>().accepted(), 0);
+        assert_eq!(
+            app.world().resource::<SelectedBuilding>().0,
+            Some(yard),
+            "it stays selected"
+        );
+        // A click on open ground deselects it.
+        click(&mut app, MouseButton::Left);
+        assert_eq!(app.world().resource::<SelectedBuilding>().0, None);
+        // The opponent's yard is not the player's to select.
+        let host = app.world().resource::<SimHost>();
+        let other = {
+            let mut buildings = host
+                .world()
+                .try_query::<(&SimId, &Owner, &Building)>()
+                .unwrap();
+            buildings
+                .iter(host.world())
+                .find(|(_, owner, _)| owner.0 != HUMAN)
+                .map(|(_, _, building)| building.footprint.origin)
+                .expect("the opponent's yard")
+        };
+        app.world_mut().resource_mut::<HoveredCell>().0 = Some(other);
+        click(&mut app, MouseButton::Left);
+        assert_eq!(app.world().resource::<SelectedBuilding>().0, None);
     }
 
     /// A left click on a factory selects it, the cursor then offers a rally point, and a right
