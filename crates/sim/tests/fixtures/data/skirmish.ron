@@ -4,11 +4,14 @@
 // starts with a turret beside its yard. Schema version 2 (M7) adds the rosters; both factions offer
 // every item with production terms, so the M6 matches are unchanged.
 (
-    schema_version: 2,
+    schema_version: 3,
     starting_credits: 1500,
+    sides: [],
     factions: [
         (
             id: "red",
+            label: "Red",
+            side: "none",
             roster_buildings: [
                 "yard",
                 "power",
@@ -29,6 +32,8 @@
         ),
         (
             id: "blue",
+            label: "Blue",
+            side: "none",
             roster_buildings: [
                 "yard",
                 "power",

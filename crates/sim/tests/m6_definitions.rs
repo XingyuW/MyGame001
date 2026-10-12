@@ -304,15 +304,15 @@ fn the_ai_fixture_loads_with_every_field() {
     let building = |id| definitions.building_kind(id).expect("building");
     let unit = |id| definitions.unit_kind(id).expect("unit");
     assert_eq!(
-        ai.build_order,
+        ai.plans[0].build_order,
         [
             "power", "refinery", "barracks", "factory", "power", "turret"
         ]
         .map(building)
     );
-    assert_eq!(ai.power, building("power"));
-    assert_eq!(ai.harvester, unit("harvester"));
-    assert_eq!(ai.army, ["tank", "tank", "rifleman"].map(unit));
+    assert_eq!(ai.plans[0].power, building("power"));
+    assert_eq!(ai.plans[0].harvester, unit("harvester"));
+    assert_eq!(ai.plans[0].army, ["tank", "tank", "rifleman"].map(unit));
     assert_eq!(ai.difficulties.len(), 2);
     let normal = &ai.difficulties[1];
     assert_eq!(normal.id, "normal");
@@ -430,7 +430,7 @@ fn limits_are_accepted_at_both_ends() {
     let Ok(Loaded::Ai(loaded)) = load(File::Ai, &path) else {
         panic!("the longest build order loads");
     };
-    assert_eq!(loaded.build_order.len(), MAX_BUILD_ORDER);
+    assert_eq!(loaded.plans[0].build_order.len(), MAX_BUILD_ORDER);
 }
 
 // --- Negative: values -----------------------------------------------------------------------
@@ -589,7 +589,7 @@ fn skirmish_values_outside_their_ranges_are_rejected() {
 
 #[test]
 fn skirmish_references_and_ids_are_checked() {
-    let cases: [(&str, &str, &str, DataErrorKind); 6] = [
+    let cases: [(&str, &str, &str, DataErrorKind); 7] = [
         (
             "(building: \"yard\", x: 0, y: 0)],",
             "(building: \"castle\", x: 0, y: 0)],",
@@ -614,24 +614,34 @@ fn skirmish_references_and_ids_are_checked() {
             "maps[1].id",
             DataErrorKind::DuplicateId("skirmish_40x40".into()),
         ),
-        // Schema version 2 since M7 (faction rosters, docs/DECISIONS.md D48): a file of version
-        // 1 (M6, without rosters) and of any later version is rejected as such.
+        // Schema version 3 since RA1 (sides and countries, docs/DECISIONS.md R13; 2 since M7,
+        // faction rosters, D48): a file of an earlier version (2: M7, without sides; 1: M6,
+        // without rosters) and of any later version is rejected as such.
         (
-            "schema_version: 2,",
             "schema_version: 3,",
+            "schema_version: 4,",
             "schema_version",
             DataErrorKind::UnsupportedSchemaVersion {
-                found: 3,
-                expected: 2,
+                found: 4,
+                expected: 3,
             },
         ),
         (
+            "schema_version: 3,",
             "schema_version: 2,",
+            "schema_version",
+            DataErrorKind::UnsupportedSchemaVersion {
+                found: 2,
+                expected: 3,
+            },
+        ),
+        (
+            "schema_version: 3,",
             "schema_version: 1,",
             "schema_version",
             DataErrorKind::UnsupportedSchemaVersion {
                 found: 1,
-                expected: 2,
+                expected: 3,
             },
         ),
     ];
@@ -680,28 +690,28 @@ fn ai_values_outside_their_ranges_are_rejected() {
         (
             "build_order: [\"power\", \"refinery\", \"barracks\", \"factory\", \"power\", \"turret\"],",
             "build_order: [],",
-            "build_order",
+            "plans[0].build_order",
             "an empty list",
         ),
-        ("army: [\"tank\", \"tank\", \"rifleman\"],", "army: [],", "army", "an empty list"),
+        ("army: [\"tank\", \"tank\", \"rifleman\"],", "army: [],", "plans[0].army", "an empty list"),
         (
             "army: [\"tank\", \"tank\", \"rifleman\"],",
             "army: [\"tank\", \"crawler\"],",
-            "army[1]",
+            "plans[0].army[1]",
             "\"crawler\"",
         ),
         (
             "army: [\"tank\", \"tank\", \"rifleman\"],",
             "army: [\"harvester\"],",
-            "army[0]",
+            "plans[0].army[0]",
             "\"harvester\"",
         ),
-        ("harvester: \"harvester\",", "harvester: \"tank\",", "harvester", "\"tank\""),
-        ("power: \"power\",", "power: \"barracks\",", "power", "\"barracks\", which produces no power"),
+        ("harvester: \"harvester\",", "harvester: \"tank\",", "plans[0].harvester", "\"tank\""),
+        ("power: \"power\",", "power: \"barracks\",", "plans[0].power", "\"barracks\", which produces no power"),
         (
             "build_order: [\"power\", \"refinery\",",
             "build_order: [\"refinery\", \"power\",",
-            "build_order[0]",
+            "plans[0].build_order[0]",
             "\"refinery\", whose prerequisite \"power\" is not listed before it",
         ),
     ]
@@ -719,25 +729,25 @@ fn ai_references_ids_and_the_armys_reach_are_checked() {
         (
             "build_order: [\"power\",",
             "build_order: [\"castle\",",
-            "build_order[0]",
+            "plans[0].build_order[0]",
             unknown("building", "castle"),
         ),
         (
             "power: \"power\",",
             "power: \"castle\",",
-            "power",
+            "plans[0].power",
             unknown("building", "castle"),
         ),
         (
             "harvester: \"harvester\",",
             "harvester: \"dragon\",",
-            "harvester",
+            "plans[0].harvester",
             unknown("unit", "dragon"),
         ),
         (
             "army: [\"tank\",",
             "army: [\"dragon\",",
-            "army[0]",
+            "plans[0].army[0]",
             unknown("unit", "dragon"),
         ),
         (
@@ -751,7 +761,7 @@ fn ai_references_ids_and_the_armys_reach_are_checked() {
         (
             "army: [\"tank\", \"tank\", \"rifleman\"],",
             "army: [\"rifleman\"],",
-            "army",
+            "plans[0].army",
             DataErrorKind::MissingEntry {
                 kind: "unit able to damage building".into(),
                 id: "yard".into(),
@@ -829,7 +839,7 @@ fn the_army_harvester_and_power_building_can_be_obtained_through_the_build_order
     assert_invalid(
         File::Ai,
         &path,
-        "harvester",
+        "plans[0].harvester",
         "\"harvester\", whose producer \"factory\" is not listed in the build order",
     );
     // An army unit type whose producer is missing.
@@ -844,7 +854,7 @@ fn the_army_harvester_and_power_building_can_be_obtained_through_the_build_order
     assert_invalid(
         File::Ai,
         &path,
-        "army[2]",
+        "plans[0].army[2]",
         "\"rifleman\", whose producer \"barracks\" is not listed in the build order",
     );
     // An army unit type whose prerequisite is missing (the tank needs a fence in this variant of
@@ -858,7 +868,7 @@ fn the_army_harvester_and_power_building_can_be_obtained_through_the_build_order
         )],
     );
     let error = load_with(File::Ai, &File::Ai.fixture(), definitions).expect_err("fence");
-    assert_eq!(error.field, "army[0]", "{error}");
+    assert_eq!(error.field, "plans[0].army[0]", "{error}");
     assert_eq!(
         error.kind,
         DataErrorKind::InvalidValue {
@@ -886,7 +896,7 @@ fn the_army_harvester_and_power_building_can_be_obtained_through_the_build_order
         )],
     );
     let error = load_with(File::Ai, &path, definitions).expect_err("power prerequisites");
-    assert_eq!(error.field, "power", "{error}");
+    assert_eq!(error.field, "plans[0].power", "{error}");
     assert_eq!(
         error.kind,
         DataErrorKind::InvalidValue {
@@ -924,7 +934,7 @@ fn the_ai_file_is_checked_against_every_faction_of_the_skirmish_file() {
     let error = check_ai_factions(&path, &ai, &without_yard, &definitions).expect_err("no yard");
     assert_eq!(
         (error.file.as_path(), error.field.as_str()),
-        (path.as_path(), "build_order[0]")
+        (path.as_path(), "plans[0].build_order[0]")
     );
     let message = error.to_string();
     assert!(
@@ -933,7 +943,9 @@ fn the_ai_file_is_checked_against_every_faction_of_the_skirmish_file() {
     );
     // A building of the build order may be the producer of a later one.
     let mut ai_with_yard = ai.clone();
-    ai_with_yard.build_order.insert(0, building("yard"));
+    ai_with_yard.plans[0]
+        .build_order
+        .insert(0, building("yard"));
     let mut yard_produces_itself = without_yard.clone();
     yard_produces_itself.factions[1].buildings[0].kind = building("yard");
     check_ai_factions(&path, &ai_with_yard, &yard_produces_itself, &definitions)
@@ -941,10 +953,10 @@ fn the_ai_file_is_checked_against_every_faction_of_the_skirmish_file() {
     // The power building's producer must be a starting building (it is queued from the first
     // turn on whenever power is short).
     let mut power_only = ai.clone();
-    power_only.build_order.clear();
+    power_only.plans[0].build_order.clear();
     let error =
         check_ai_factions(&path, &power_only, &without_yard, &definitions).expect_err("power");
-    assert_eq!(error.field, "power", "{error}");
+    assert_eq!(error.field, "plans[0].power", "{error}");
 }
 
 #[test]
@@ -1061,8 +1073,11 @@ fn every_field_is_required_and_unknown_fields_are_rejected() {
     assert_rejected(File::Skirmish, &path, "seed", DataErrorKind::UnknownField);
 
     let ai_fields = [
-        ("    power: \"power\",\n", "power"),
-        ("    harvester: \"harvester\",\n", "harvester"),
+        ("            power: \"power\",\n", "plans[0].power"),
+        (
+            "            harvester: \"harvester\",\n",
+            "plans[0].harvester",
+        ),
         (
             "            wave_patience: 1200,\n",
             "difficulties[0].wave_patience",
@@ -1107,10 +1122,10 @@ fn every_field_is_required_and_unknown_fields_are_rejected() {
     let path = variant(
         File::Ai,
         "ai_wrong_kind",
-        &[("    power: \"power\",", "    power: 3,")],
+        &[("            power: \"power\",", "            power: 3,")],
     );
     let error = load(File::Ai, &path).expect_err("kind");
-    assert_eq!(error.field, "power", "{error}");
+    assert_eq!(error.field, "plans[0].power", "{error}");
     assert!(
         matches!(error.kind, DataErrorKind::Syntax { .. }),
         "{error}"
@@ -1130,7 +1145,7 @@ fn every_field_is_required_and_unknown_fields_are_rejected() {
     assert_rejected(
         File::Ai,
         &path,
-        "build_order",
+        "plans[0].build_order",
         DataErrorKind::TooManyEntries {
             max: MAX_BUILD_ORDER,
         },
@@ -1310,13 +1325,16 @@ fn seeded_mutations_of_the_fixtures_load_or_return_a_typed_error() {
                 }
                 Ok(Loaded::Ai(ai)) => {
                     loaded += 1;
-                    assert!(!ai.build_order.is_empty() && ai.build_order.len() <= MAX_BUILD_ORDER);
-                    assert!(ai.army.iter().all(|&kind: &UnitKind| {
+                    assert!(
+                        !ai.plans[0].build_order.is_empty()
+                            && ai.plans[0].build_order.len() <= MAX_BUILD_ORDER
+                    );
+                    assert!(ai.plans[0].army.iter().all(|&kind: &UnitKind| {
                         definitions
                             .unit_combat(kind)
                             .is_some_and(|terms| terms.weapon.is_some())
                     }));
-                    assert!(ai.build_order.iter().all(|&kind: &BuildingKind| {
+                    assert!(ai.plans[0].build_order.iter().all(|&kind: &BuildingKind| {
                         usize::from(kind.0) < definitions.buildings().len()
                     }));
                     for difficulty in &ai.difficulties {

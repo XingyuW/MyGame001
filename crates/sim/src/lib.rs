@@ -30,6 +30,7 @@ mod movement;
 mod pathfinding;
 mod props;
 mod rng;
+mod rules;
 mod schedule;
 mod skirmish_defs;
 mod unit;
@@ -41,8 +42,8 @@ pub use ai::{
 };
 pub use ai_defs::{
     AI_SCHEMA_VERSION, AiDefinitions, AiPlan, Difficulty, MAX_AI_ARMY, MAX_ARMY_ENTRIES,
-    MAX_BUILD_ORDER, MAX_DEFENCE_RADIUS, MAX_DIFFICULTIES, MAX_HARVESTERS_PER_REFINERY,
-    MAX_THINK_INTERVAL, check_ai_factions, load_ai,
+    MAX_BUILD_ORDER, MAX_DEFENCE_RADIUS, MAX_DIFFICULTIES, MAX_HARVESTERS_PER_REFINERY, MAX_PLANS,
+    MAX_THINK_INTERVAL, SidePlan, check_ai_factions, load_ai,
 };
 pub use building::{
     Building, Footprint, PlacementError, Producer, SpawnBuildingError, spawn_building,
@@ -70,7 +71,9 @@ pub use economy::{
     MAX_QUEUE_LENGTH, PlayerSetupError, PlayerState, Players, QueueItem, REPAIR_COST_DIVISOR,
     REPAIR_INTERVAL, REPAIR_STEPS, repair_cost,
 };
-pub use economy_commands::{SHIPYARD_PLACEMENT_DISTANCE, check_placement};
+pub use economy_commands::{
+    SHIPYARD_PLACEMENT_DISTANCE, check_buildable, check_placement, missing_prerequisite, produces,
+};
 pub use economy_defs::{
     BuildingDef, BuildingKind, ECONOMY_SCHEMA_VERSION, HarvesterDef, MAX_BUILD_TIME,
     MAX_BUILDING_TYPES, MAX_COST, MAX_CREDITS_PER_ORE, MAX_FOOTPRINT_SIDE, MAX_FREE_UNITS,
@@ -94,9 +97,10 @@ pub use map_scale::{
     PAD_RADIUS, SCALE_DIVISOR, YARD_CENTRE_OFFSET, axis_map, enlarged_map, enlarged_size,
 };
 pub use match_setup::{
-    AI_TEAM, Controller, MAX_UNIT_SPEED_PERCENT, MatchOptions, MatchOutcome, MatchSetupError,
-    MatchStart, MatchState, PlayerSetup, StartError, plan_starting_units, setup_match,
-    setup_match_configured, setup_match_with_options, setup_match_with_super_me,
+    AI_TEAM, Controller, MAX_UNIT_SPEED_PERCENT, MatchOptions, MatchOutcome, MatchRules,
+    MatchSetupError, MatchStart, MatchState, PlayerSetup, STARTING_UNIT_DISTANCE, StartError,
+    plan_starting_units, setup_match, setup_match_configured, setup_match_with_options,
+    setup_match_with_super_me, starting_units,
 };
 pub use movement::{MAX_PATHS_WITHOUT_PROGRESS, MAX_STALLED_TICKS, REPATH_AFTER_BLOCKED_TICKS};
 pub use pathfinding::{
@@ -105,13 +109,20 @@ pub use pathfinding::{
 };
 pub use props::{PROP_ID_BASE, Prop, PropKind, Props};
 pub use rng::SimRng;
+pub use rules::{
+    CombatRules, Country, CountryId, CrateRules, CrewRules, DialogRules, DifficultyRules,
+    EconomyRules, GroupId, MAX_COUNTRIES, MAX_GROUP_BUILDINGS, MAX_POWERUPS,
+    MAX_PREREQUISITE_GROUPS, MAX_RULES_DIFFICULTIES, MAX_TECH_LEVEL, Powerup, PrerequisiteGroup,
+    PrismRules, ProductionRules, RULES_SCHEMA_VERSION, RadiationRules, Rules, Side, SideRules,
+    SuperweaponRules, VeterancyRules,
+};
 pub use schedule::{SimCoreSet, SimPlugin, SimSchedule, SimSet, SimTick, TICKS_PER_SECOND};
 pub use skirmish_defs::{
-    FactionDef, MATCH_PLAYERS, MAX_FACTIONS, MAX_GROUP_UNITS, MAX_MAPS, MAX_MATCH_PLAYERS,
-    MAX_ROSTER_ENTRIES, MAX_START_OFFSET, MAX_STARTING_BUILDINGS, MAX_STARTING_CREDITS,
-    MAX_STARTING_GROUPS, MIN_MATCH_PLAYERS, MapDef, SKIRMISH_SCHEMA_VERSION, SkirmishDefinitions,
-    StartProblem, StartingBuilding, StartingGroup, check_map_starts, load_skirmish, map_asset_path,
-    start_problem,
+    FactionDef, MATCH_PLAYERS, MAX_FACTIONS, MAX_GROUP_UNITS, MAX_LABEL_LEN, MAX_MAPS,
+    MAX_MATCH_PLAYERS, MAX_ROSTER_ENTRIES, MAX_START_OFFSET, MAX_STARTING_BUILDINGS,
+    MAX_STARTING_CREDITS, MAX_STARTING_GROUPS, MAX_STARTING_TYPES, MIN_MATCH_PLAYERS, MapDef,
+    SKIRMISH_SCHEMA_VERSION, SideStart, SkirmishDefinitions, StartProblem, StartingBuilding,
+    StartingGroup, check_map_starts, country_tree, load_skirmish, map_asset_path, start_problem,
 };
 pub use unit::{
     DIAGONAL_STEP, Direction, Facing, Mobile, MoveOrder, ORTHOGONAL_STEP, Orders, Owner, PathState,
@@ -120,7 +131,9 @@ pub use unit::{
 pub use visibility::Vision;
 
 pub mod arsenal;
-pub use arsenal::{Arsenal, ArsenalEntry, Category, Domain, Role};
+pub use arsenal::{
+    ARSENAL_SCHEMA_VERSION, Arsenal, ArsenalEntry, Category, Domain, FactoryGroup, Role,
+};
 
 pub mod special;
 pub use special::SpecialState;

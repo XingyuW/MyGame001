@@ -827,6 +827,7 @@ mod tests {
         commands.extend(crate::special_controls::interact_commands(
             &selected, barracks,
         ));
+        commands.push(crate::special_controls::undeploy_command(barracks));
         commands.push(crate::special_controls::strategic_command(
             barracks, cell, &selected,
         ));
@@ -834,6 +835,7 @@ mod tests {
         for command in &commands {
             variants.insert(match command {
                 Command::Deploy { .. } => "Deploy",
+                Command::Undeploy { .. } => "Undeploy",
                 Command::Interact { .. } => "Interact",
                 Command::Superweapon { .. } => "Superweapon",
                 Command::Move { .. } => "Move",
@@ -849,7 +851,7 @@ mod tests {
                 Command::AttackMove { .. } => "AttackMove",
             });
         }
-        assert_eq!(variants.len(), 14, "{variants:?}");
+        assert_eq!(variants.len(), 15, "{variants:?}");
         assert!(commands.contains(&Command::PlaceBuilding {
             building: power,
             origin: footprint.origin,

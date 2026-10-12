@@ -6,12 +6,20 @@
 //! command is checked in this order, and the first failure is the reason:
 //!
 //! * all: the issuing player is a player of the match (`UnknownPlayer`);
-//! * `QueueProduction`: the item is defined and producible (`UnknownItem`), the roster of the
-//!   player's faction offers it (`NotInRoster`, M7; a player without a faction may produce every
-//!   item), the player owns a
-//!   building of each prerequisite type (`MissingPrerequisite`, in the order the economy file
-//!   lists them) and of the producing type (`NoProducer`), and the queue is not full
-//!   (`QueueFull`);
+//! * `QueueProduction` ([`check_buildable`], then the queue): the item is defined and producible
+//!   and, with an arsenal entry, its tech level lies between 0 and that of the rules
+//!   (`UnknownItem`); the roster of the player's faction offers it (`NotInRoster`, M7; a player
+//!   without a roster may produce every item); it is not a superweapon building while the match
+//!   has superweapons switched off (`DisabledByOptions`, RA1); the player owns a building of
+//!   each prerequisite type and a member of each prerequisite group (`MissingPrerequisite`, in
+//!   the order the economy file lists them, then the groups of the arsenal, each named by its
+//!   first member), a factory of the item's kind (`NoProducer`), and one of them of a side that
+//!   builds the item (`NoFactoryOfSide`, RA1); the player's country is among the required ones
+//!   if there are any (`CountryRequired`) and is not forbidden (`CountryForbidden`); and the
+//!   queue is not full (`QueueFull`). This is the buildability rule of Red Alert 2
+//!   (docs/RA2_PARITY_PLAN.md section 3.3, docs/DECISIONS.md R10): the first three tests look
+//!   at the player's buildings, so a captured factory opens the other side's items, and the
+//!   country test keeps national specials national;
 //! * `CancelProduction`: the item is defined and producible, and queued (`NotQueued`);
 //! * `PlaceBuilding`: the building type is defined, a complete building of that type is at the
 //!   head of its queue (`NotReady`), the footprint lies inside the map (`Placement(OutsideMap)`),
@@ -25,6 +33,10 @@
 //! * `RepairBuilding`: the building exists and belongs to the player (as for `SellBuilding`);
 //! * `SetRallyPoint`: the building exists and belongs to the player (as for `SellBuilding`),
 //!   its type produces units (`NotAProducer`), and the cell is inside the map (`OutsideMap`).
+//!
+//! A queue is kept per factory group ([`Definitions::queue_key`]): all buildings of one group
+//! (the Allied and the Soviet War Factory) share it, and a building without a group has the
+//! queue of its own type, as in M3.
 
 use std::collections::BTreeMap;
 
@@ -56,6 +68,7 @@ pub(crate) struct EconomyParams<'w, 's> {
     definitions: Res<'w, Definitions>,
     ids: ResMut<'w, SimIdAllocator>,
     props: Res<'w, crate::Props>,
+    match_state: Res<'w, crate::MatchState>,
     buildings: Query<'w, 's, (Entity, &'static SimId, &'static Owner, &'static Building)>,
 }
 
@@ -75,10 +88,13 @@ pub(crate) struct BuildingIndex {
 }
 
 impl BuildingIndex {
-    fn owns(&self, player: PlayerId, kind: BuildingKind) -> bool {
+    /// The types of the buildings `player` owns, one entry per building.
+    fn kinds_of(&self, player: PlayerId) -> Vec<BuildingKind> {
         self.by_id
             .values()
-            .any(|building| building.owner == player && building.kind == kind)
+            .filter(|building| building.owner == player)
+            .map(|building| building.kind)
+            .collect()
     }
 
     fn footprints_of(&self, player: PlayerId) -> impl Iterator<Item = Footprint> + '_ {
@@ -160,6 +176,121 @@ pub(crate) fn fog<'a>(definitions: &Definitions, state: &'a PlayerState) -> Opti
     definitions.has_combat().then_some(state.vision())
 }
 
+/// Whether a building of type `building` produces `item`: it is a factory of the kind of the
+/// item's producer ([`Definitions::same_factory`]), and its side is one of the item's
+/// `owner_sides` if the arsenal lists any (docs/RA2_PARITY_PLAN.md section 3.3, tests 2 and 3;
+/// assumption RA-A3: a factory's side is that of its building type).
+pub fn produces(definitions: &Definitions, building: BuildingKind, item: ProductionItem) -> bool {
+    let Some(terms) = definitions.production(item) else {
+        return false;
+    };
+    if !definitions.same_factory(building, terms.producer) {
+        return false;
+    }
+    match definitions.metadata(item) {
+        Some(entry) if !entry.owner_sides.is_empty() => definitions
+            .metadata(ProductionItem::Building(building))
+            .and_then(|factory| factory.side)
+            .is_some_and(|side| entry.owner_sides.contains(&side)),
+        _ => true,
+    }
+}
+
+/// The first prerequisite of `item` that a player owning buildings of the types `owned` lacks:
+/// a building type of the economy file's list, or the first member of a prerequisite group of
+/// the arsenal of which the player owns no member. Without a rules file the basic power plants
+/// stand in for each other, as since M9 ([`Definitions::prerequisite_met`]); with one, power is
+/// a prerequisite group like any other.
+pub fn missing_prerequisite(
+    definitions: &Definitions,
+    owned: &[BuildingKind],
+    item: ProductionItem,
+) -> Option<BuildingKind> {
+    let terms = definitions.production(item)?;
+    let rules = definitions.rules();
+    let met = |required: BuildingKind| match rules {
+        Some(_) => owned.contains(&required),
+        None => definitions.prerequisite_met(required, owned.iter().copied()),
+    };
+    if let Some(&missing) = terms.prerequisites.iter().find(|&&kind| !met(kind)) {
+        return Some(missing);
+    }
+    let (entry, rules) = (definitions.metadata(item)?, rules?);
+    entry
+        .prerequisite_groups
+        .iter()
+        .filter_map(|&group| rules.group(group))
+        .find(|group| !group.buildings.iter().any(|kind| owned.contains(kind)))
+        .and_then(|group| group.buildings.first().copied())
+}
+
+/// The checks of `QueueProduction` except the length of the queue, in the order of the module
+/// documentation: whether the player with `state`, who owns buildings of the types `owned`, may
+/// queue `item` in a match with superweapons switched on or off.
+///
+/// The command's validation calls exactly this function, so the interface and the computer
+/// player can know the outcome of a `QueueProduction` before it is issued.
+pub fn check_buildable(
+    definitions: &Definitions,
+    state: &PlayerState,
+    superweapons: bool,
+    owned: &[BuildingKind],
+    item: ProductionItem,
+) -> Result<(), RejectReason> {
+    let terms = definitions
+        .production(item)
+        .ok_or(RejectReason::UnknownItem(item))?;
+    let entry = definitions.metadata(item);
+    if let Some(entry) = entry {
+        let highest = definitions
+            .rules()
+            .map_or(crate::rules::MAX_TECH_LEVEL, |rules| {
+                rules.dialog.tech_level
+            });
+        if !(0..=highest).contains(&entry.tech_level) {
+            return Err(RejectReason::UnknownItem(item));
+        }
+    }
+    if !state.offers(item) {
+        return Err(RejectReason::NotInRoster(item));
+    }
+    if !superweapons
+        && matches!(item, ProductionItem::Building(_))
+        && entry.is_some_and(|entry| entry.role.superweapon())
+    {
+        return Err(RejectReason::DisabledByOptions);
+    }
+    if !state.unlock_all()
+        && let Some(prerequisite) = missing_prerequisite(definitions, owned, item)
+    {
+        return Err(RejectReason::MissingPrerequisite { item, prerequisite });
+    }
+    if !owned
+        .iter()
+        .any(|&kind| definitions.same_factory(kind, terms.producer))
+    {
+        return Err(RejectReason::NoProducer {
+            item,
+            producer: terms.producer,
+        });
+    }
+    if !owned.iter().any(|&kind| produces(definitions, kind, item)) {
+        return Err(RejectReason::NoFactoryOfSide(item));
+    }
+    if let Some(entry) = entry {
+        let country = state.country();
+        if !entry.required_countries.is_empty()
+            && !country.is_some_and(|country| entry.required_countries.contains(&country))
+        {
+            return Err(RejectReason::CountryRequired(item));
+        }
+        if country.is_some_and(|country| entry.forbidden_countries.contains(&country)) {
+            return Err(RejectReason::CountryForbidden(item));
+        }
+    }
+    Ok(())
+}
+
 /// The checks of `PlaceBuilding` (docs/DECISIONS.md D24, D33), in the order of the module
 /// documentation: the building type is defined (`UnknownItem`), a complete building of that type
 /// is at the head of its queue in `state` (`NotReady`), the footprint lies inside the map, under
@@ -184,7 +315,7 @@ pub fn check_placement(
         .building(building)
         .ok_or(RejectReason::UnknownItem(item))?;
     let ready = state
-        .queue(def.production.producer)
+        .queue(definitions.queue_key(def.production.producer))
         .first()
         .is_some_and(|head| head.item == item && head.progress >= def.production.build_time);
     if !ready {
@@ -237,54 +368,38 @@ pub(crate) fn apply(
         .ok_or(RejectReason::UnknownPlayer(player))?;
     match &issued.command {
         &Command::QueueProduction { item } => {
-            let terms = definitions
-                .production(item)
-                .ok_or(RejectReason::UnknownItem(item))?;
-            if !state.offers(item) {
-                return Err(RejectReason::NotInRoster(item));
-            }
-            if let Some(&prerequisite) = terms.prerequisites.iter().find(|&&prerequisite| {
-                !state.unlock_all()
-                    && !definitions.prerequisite_met(
-                        prerequisite,
-                        index
-                            .by_id
-                            .values()
-                            .filter(|b| b.owner == player)
-                            .map(|b| b.kind),
-                    )
-            }) {
-                return Err(RejectReason::MissingPrerequisite { item, prerequisite });
-            }
-            if !index.owns(player, terms.producer) {
-                return Err(RejectReason::NoProducer {
-                    item,
-                    producer: terms.producer,
-                });
-            }
-            if state.queue(terms.producer).len() >= MAX_QUEUE_LENGTH {
+            check_buildable(
+                definitions,
+                state,
+                params.match_state.rules().superweapons,
+                &index.kinds_of(player),
+                item,
+            )?;
+            // `check_buildable` found the production terms.
+            let Some(terms) = definitions.production(item) else {
+                return Err(RejectReason::UnknownItem(item));
+            };
+            let key = definitions.queue_key(terms.producer);
+            if state.queue(key).len() >= MAX_QUEUE_LENGTH {
                 return Err(RejectReason::QueueFull {
                     producer: terms.producer,
                     max: MAX_QUEUE_LENGTH,
                 });
             }
-            state
-                .queues
-                .entry(terms.producer)
-                .or_default()
-                .push(QueueItem {
-                    item,
-                    progress: 0,
-                    charged: 0,
-                });
+            state.queues.entry(key).or_default().push(QueueItem {
+                item,
+                progress: 0,
+                charged: 0,
+            });
         }
         &Command::CancelProduction { item } => {
             let terms = definitions
                 .production(item)
                 .ok_or(RejectReason::UnknownItem(item))?;
+            let key = definitions.queue_key(terms.producer);
             let queue = state
                 .queues
-                .get_mut(&terms.producer)
+                .get_mut(&key)
                 .ok_or(RejectReason::NotQueued(item))?;
             let position = queue
                 .iter()
@@ -292,7 +407,7 @@ pub(crate) fn apply(
                 .ok_or(RejectReason::NotQueued(item))?;
             let removed = queue.remove(position);
             if queue.is_empty() {
-                state.queues.remove(&terms.producer);
+                state.queues.remove(&key);
             }
             state.credits = state.credits.saturating_add(removed.charged);
             events.write(SimEvent::ProductionCancelled {
@@ -316,7 +431,7 @@ pub(crate) fn apply(
                     building,
                 )));
             };
-            let producer = def.production.producer;
+            let producer = definitions.queue_key(def.production.producer);
             let id = params.ids.allocate().ok_or(RejectReason::IdsExhausted)?;
 
             if let Some(queue) = state.queues.get_mut(&producer) {
@@ -403,6 +518,7 @@ pub(crate) fn apply(
                 .insert(Producer { rally: Some(cell) });
         }
         Command::Deploy { .. }
+        | Command::Undeploy { .. }
         | Command::Interact { .. }
         | Command::Superweapon { .. }
         | Command::Move { .. }

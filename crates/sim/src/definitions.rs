@@ -70,6 +70,10 @@ pub struct Definitions {
     /// Empty unless a combat file was loaded ([`Definitions::with_combat`]); then every unit and
     /// building type has combat terms.
     combat: CombatDefinitions,
+    /// `None` unless a rules file was loaded ([`Definitions::with_rules`], RA1): the global
+    /// values, sides and countries of the Red Alert 2 ruleset. Without it every rule that reads
+    /// it keeps its behaviour of M2 to M9.
+    rules: Option<crate::rules::Rules>,
 }
 
 impl Definitions {
@@ -131,14 +135,15 @@ impl Definitions {
     }
 
     /// Whether units leave buildings of type `kind`, which therefore have a rally point: some
-    /// unit type is produced by them, or they duplicate trained infantry (the arsenal's cloner,
+    /// unit type is produced by them (or, with factory groups, by a factory of their group:
+    /// `Definitions::same_factory`), or they duplicate trained infantry (the arsenal's cloner,
     /// whose copies would otherwise all stand around it).
     pub fn produces_units(&self, kind: BuildingKind) -> bool {
         self.economy
             .unit_production
             .iter()
             .flatten()
-            .any(|production| production.producer == kind)
+            .any(|production| self.same_factory(kind, production.producer))
             || self
                 .metadata(ProductionItem::Building(kind))
                 .is_some_and(|entry| entry.role == crate::Role::Cloner)
@@ -225,6 +230,11 @@ impl Definitions {
             .flatten()
     }
 
+    /// The rules file, or `None` for definitions loaded without one.
+    pub fn rules(&self) -> Option<&crate::rules::Rules> {
+        self.rules.as_ref()
+    }
+
     pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
         hasher.write_u64(self.units.len() as u64);
         for unit in &self.units {
@@ -237,6 +247,13 @@ impl Definitions {
         self.arsenal.hash_into(hasher);
         self.economy.hash_into(hasher);
         self.combat.hash_into(hasher);
+        match &self.rules {
+            None => hasher.write(&[0]),
+            Some(rules) => {
+                hasher.write(&[1]);
+                rules.hash_into(hasher);
+            }
+        }
     }
 }
 
@@ -309,11 +326,24 @@ impl Definitions {
     ///
     /// Combat definitions refer to the building types of the economy file, so loading an economy
     /// file removes any combat definitions loaded before; load the combat file afterwards
-    /// ([`Definitions::with_combat`]).
+    /// ([`Definitions::with_combat`]). The same holds for the rules and the arsenal.
     pub fn with_economy(mut self, economy_file: impl AsRef<Path>) -> Result<Self, DataError> {
         let ids: Vec<String> = self.units.iter().map(|unit| unit.id.clone()).collect();
         self.economy = economy_defs::load(economy_file.as_ref(), &ids)?;
         self.combat = CombatDefinitions::default();
+        self.rules = None;
+        self.arsenal = crate::arsenal::Arsenal::default();
+        Ok(self)
+    }
+
+    /// These definitions together with the rules file at `rules_file` (RA1, `crate::rules`),
+    /// whose references to unit and building types are resolved against them. The arsenal names
+    /// the countries and prerequisite groups of the rules, so loading a rules file removes an
+    /// arsenal loaded before; load the arsenal afterwards ([`Definitions::with_arsenal`]). Every
+    /// problem is a [`DataError`] naming the file, the field, and the reason.
+    pub fn with_rules(mut self, rules_file: impl AsRef<Path>) -> Result<Self, DataError> {
+        self.rules = Some(crate::rules::load(rules_file.as_ref(), &self)?);
+        self.arsenal = crate::arsenal::Arsenal::default();
         Ok(self)
     }
 
@@ -399,6 +429,7 @@ fn validate(path: &Path, file: UnitsFile) -> Result<Definitions, DataError> {
         economy: EconomyDefinitions::default(),
         combat: CombatDefinitions::default(),
         arsenal: crate::arsenal::Arsenal::default(),
+        rules: None,
     })
 }
 

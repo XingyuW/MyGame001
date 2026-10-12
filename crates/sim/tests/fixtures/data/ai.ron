@@ -3,11 +3,16 @@
 // of the production values in assets/data/ai.ron (invariant I10). The rifleman cannot damage the
 // concrete buildings (bullet against concrete: 0 %); the tank can, as the AI file requires.
 (
-    schema_version: 1,
-    build_order: ["power", "refinery", "barracks", "factory", "power", "turret"],
-    power: "power",
-    harvester: "harvester",
-    army: ["tank", "tank", "rifleman"],
+    schema_version: 2,
+    plans: [
+        (
+            side: "none",
+            build_order: ["power", "refinery", "barracks", "factory", "power", "turret"],
+            power: "power",
+            harvester: "harvester",
+            army: ["tank", "tank", "rifleman"],
+        ),
+    ],
     difficulties: [
         (
             id: "easy",

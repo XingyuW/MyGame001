@@ -66,6 +66,16 @@ pub enum SimEvent {
         building: SimId,
         kind: BuildingKind,
     },
+    /// The Construction Yard `building` of type `kind` was undeployed (`Command::Undeploy`, RA1):
+    /// its cells were freed and it is now the unit `unit` (the same id) of type `into`, standing
+    /// in the cell of the footprint's origin.
+    BuildingUndeployed {
+        player: PlayerId,
+        building: SimId,
+        kind: BuildingKind,
+        unit: SimId,
+        into: crate::UnitKind,
+    },
     /// The building was sold: it was removed, its cells were freed, and `refund` credits were
     /// paid.
     BuildingSold {
@@ -121,8 +131,9 @@ pub enum SimEvent {
         cell: CellPos,
         kind: crate::props::PropKind,
     },
-    /// The player of the match owns no building any more and is defeated (M6, docs/DECISIONS.md
-    /// D41).
+    /// The player of the match is defeated (M6, docs/DECISIONS.md D41): it owns no building any
+    /// more, and with a rules file (RA1) no base unit either in a short game, or no unit at all
+    /// in a long one.
     PlayerDefeated { player: PlayerId },
     /// At most one player of the match is left: `winner`, or `None` for a draw. The outcome is
     /// final; it is written once.

@@ -727,6 +727,12 @@ fn log_sim_events(mut events: MessageReader<SimEvent>) {
                 "player {}: building {} of type {} placed",
                 player.0, building.0, kind.0
             ),
+            SimEvent::BuildingUndeployed {
+                player, building, ..
+            } => info!(
+                "player {}: building {} undeployed into its base unit",
+                player.0, building.0
+            ),
             SimEvent::BuildingSold {
                 player,
                 building,
@@ -952,7 +958,13 @@ mod tests {
         // of the skirmish file, and the computer player's buildings follow the AI file's build
         // order, D40, D42).
         let catalogue = crate::skirmish::tests::production_catalogue();
-        assert!(catalogue.ai.build_order.contains(&turret));
+        assert!(
+            catalogue
+                .ai
+                .plans
+                .iter()
+                .any(|plan| plan.build_order.contains(&turret))
+        );
     }
 
     fn fixture_grid(name: &str) -> Grid {

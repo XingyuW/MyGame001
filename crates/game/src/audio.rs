@@ -2076,6 +2076,7 @@ pub fn event_sound(event: &SimEvent, context: &SoundContext) -> Option<Sfx> {
         SimEvent::ProductionComplete { player, .. } => (*player == HUMAN).then_some(Sfx::Ready),
         SimEvent::BuildingPlaced { player, .. } => (*player == HUMAN).then_some(Sfx::Placed),
         SimEvent::BuildingSold { player, .. } => (*player == HUMAN).then_some(Sfx::Sold),
+        SimEvent::BuildingUndeployed { player, .. } => (*player == HUMAN).then_some(Sfx::Sold),
         SimEvent::OreDelivered { player, .. } => (*player == HUMAN).then_some(Sfx::Credits),
         SimEvent::WeaponFired {
             attacker,

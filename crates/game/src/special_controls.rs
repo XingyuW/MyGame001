@@ -151,6 +151,11 @@ pub fn deploy_commands(selection: &Selection) -> Vec<Command> {
         .map(|&unit| Command::Deploy { unit })
         .collect()
 }
+/// `Undeploy` for the player's Construction Yard `building` (RA1, "MCV repacks"): it becomes the
+/// base unit of its side again. Issued by D with no unit selected and the cursor on a building.
+pub fn undeploy_command(building: SimId) -> Command {
+    Command::Undeploy { building }
+}
 pub fn interact_commands(selection: &Selection, target: SimId) -> Vec<Command> {
     selection
         .0
@@ -188,6 +193,15 @@ fn input(
     }
     if keys.just_pressed(KeyCode::KeyD) {
         sink.issue(deploy_commands(&selection));
+        // With no unit selected, D packs up the building under the cursor (RA1: only the
+        // player's own Construction Yard undeploys; the simulation rejects anything else).
+        if selection.0.is_empty()
+            && let Some(building) = hovered
+                .0
+                .and_then(|cell| host.grid().and_then(|grid| grid.building(cell)))
+        {
+            sink.issue([undeploy_command(building)]);
+        }
     }
     if keys.just_pressed(KeyCode::KeyE) {
         *mode = InterfaceMode::Interact;
