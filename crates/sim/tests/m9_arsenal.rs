@@ -1,4 +1,6 @@
-//! Actual command/schedule production and specialist paths, using the shipped balance data.
+//! Actual command/schedule production and specialist paths, using the legacy ruleset fixture (the
+//! data shipped before the RA2 parity programme, `tests/fixtures/data/legacy`; docs/DECISIONS.md
+//! R9).
 use bevy_app::App;
 use bevy_ecs::{entity::Entity, message::Messages};
 use sim::*;
@@ -6,7 +8,7 @@ use std::path::PathBuf;
 const P: PlayerId = PlayerId(0);
 const E: PlayerId = PlayerId(1);
 fn defs() -> Definitions {
-    let p = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets/data");
+    let p = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/data/legacy");
     load_match_definitions(
         p.join("units.ron"),
         p.join("economy.ron"),
@@ -167,7 +169,7 @@ fn super_me_every_item_costs_one_and_finishes_in_tenth_time() {
 fn verify_catalogue(super_me: bool) {
     let mut a = app();
     if super_me {
-        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets/data");
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/data/legacy");
         let d = a.world().resource::<Definitions>().clone();
         let mut sk = load_skirmish(root.join("skirmish.ron"), &d).unwrap();
         let ai = load_ai(root.join("ai.ron"), &d).unwrap();

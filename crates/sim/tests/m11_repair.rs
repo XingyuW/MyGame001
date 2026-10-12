@@ -1,5 +1,5 @@
 //! Building repair (`Command::RepairBuilding`): hit points restored in paid steps, with the
-//! shipped balance data.
+//! legacy ruleset fixture (`tests/fixtures/data/legacy`; docs/DECISIONS.md R9).
 use bevy_app::App;
 use bevy_ecs::{entity::Entity, message::Messages};
 use sim::*;
@@ -9,7 +9,7 @@ const P: PlayerId = PlayerId(0);
 const E: PlayerId = PlayerId(1);
 
 fn app(credits: i64) -> App {
-    let data = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets/data");
+    let data = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/data/legacy");
     let mut a = App::new();
     a.add_plugins(SimPlugin { seed: 11 });
     let mut grid =
