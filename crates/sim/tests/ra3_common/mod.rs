@@ -6,12 +6,15 @@
 
 use std::path::PathBuf;
 
+use std::collections::BTreeMap;
+
 use bevy_app::App;
 use bevy_ecs::message::Messages;
 use sim::{
-    Cell, CellPos, Command, CommandQueue, Definitions, Grid, Health, IssuedCommand, Mobile,
-    PlayerId, Players, Position, SimEvent, SimId, SimPlugin, SimSchedule, SubPos, Weapon,
-    WeaponKind, load_match_definitions, spawn_building, spawn_unit,
+    Cell, CellPos, Command, CommandQueue, Definitions, Domain, Grid, Health, IssuedCommand, Mobile,
+    PlayerId, Players, Position, SPOT_OFFSETS, SPOTS_PER_CELL, SimEvent, SimId, SimPlugin,
+    SimSchedule, SubPos, Unit, Weapon, WeaponKind, load_match_definitions, spawn_building,
+    spawn_unit,
 };
 
 pub const P0: PlayerId = PlayerId(0);
@@ -153,6 +156,141 @@ pub fn attack(player: PlayerId, unit: SimId, target: SimId) -> IssuedCommand {
             target,
         },
     )
+}
+
+pub fn move_to(player: PlayerId, units: &[SimId], x: i32, y: i32) -> IssuedCommand {
+    issue(
+        player,
+        Command::Move {
+            units: units.to_vec(),
+            target: CellPos::new(x, y),
+        },
+    )
+}
+
+/// Invariant I6' (docs/DECISIONS.md R6) on the state after a tick: the simulation's own check
+/// finds nothing ([`sim::cell_invariant_violations`], [`sim::stray_claims`]), and, worked out
+/// here from the units' components alone and from the grid:
+///
+/// * no surface cell is held by two vehicles, by a vehicle and infantry, or by more than three
+///   infantry, and no cell of the air layer by two aircraft (a unit holds the cell it stands in
+///   and, while it steps, the cell it enters);
+/// * the infantry in a cell hold different spots, and the grid has each unit in every cell it
+///   holds;
+/// * no unit of the surface holds a cell covered by a building or enters an impassable one;
+/// * a unit that stands is at the centre of its cell, a unit on foot at its spot; a unit in a
+///   step is at the step's share of the straight way from there to the centre, or to its spot,
+///   in the next cell;
+/// * no two units that stand are at the same point.
+pub fn assert_cells(app: &mut App, context: &str) {
+    let problems = sim::cell_invariant_violations(app.world_mut());
+    assert!(problems.is_empty(), "{context}: {problems:?}");
+    let stray = sim::stray_claims(app.world_mut());
+    assert!(stray.is_empty(), "{context}: {stray:?}");
+    let definitions = defs(app);
+    let world = app.world_mut();
+    let mut query = world.query::<(&SimId, &Unit, &Mobile, &Position)>();
+    let units: Vec<(SimId, Unit, Mobile, SubPos)> = query
+        .iter(world)
+        .map(|(id, unit, mobile, position)| (*id, *unit, *mobile, position.0))
+        .collect();
+    let grid = world.resource::<Grid>();
+    // Per layer and cell: the vehicles (or aircraft) and the infantry on foot with their spots.
+    type Holders = (Vec<SimId>, Vec<(SimId, u8)>);
+    let mut held: BTreeMap<(bool, CellPos), Holders> = BTreeMap::new();
+    let mut standing: BTreeMap<(bool, SubPos), SimId> = BTreeMap::new();
+    for &(id, unit, mobile, position) in &units {
+        let domain = definitions.domain(unit.kind);
+        let air = domain == Domain::Air;
+        let on_foot = definitions.on_foot(unit.kind);
+        let mut points = Vec::new();
+        for cell in std::iter::once(mobile.cell).chain(mobile.step.map(|step| step.to)) {
+            assert!(
+                grid.holders_for(cell, domain).contains(&Some(id)),
+                "{context}: the grid does not have {id:?} in {cell:?}"
+            );
+            let entry = held.entry((air, cell)).or_default();
+            if on_foot {
+                let spot = grid
+                    .spot(cell, id)
+                    .unwrap_or_else(|| panic!("{context}: {id:?} has no spot in {cell:?}"));
+                entry.1.push((id, spot));
+                let (dx, dy) = SPOT_OFFSETS[usize::from(spot)];
+                let centre = SubPos::centre_of(cell);
+                points.push(SubPos::new(centre.x + dx, centre.y + dy));
+            } else {
+                entry.0.push(id);
+                points.push(SubPos::centre_of(cell));
+            }
+            if !air {
+                assert_eq!(
+                    grid.building(cell),
+                    None,
+                    "{context}: {id:?} holds {cell:?} under a building"
+                );
+            }
+        }
+        let expected = match mobile.step {
+            None => points[0],
+            Some(step) => {
+                assert!(
+                    grid.passable_for(step.to, domain),
+                    "{context}: {id:?} enters an impassable cell"
+                );
+                let (from, to) = (points[0], points[1]);
+                let (progress, length) = (i32::from(step.progress), i32::from(step.length));
+                assert!(
+                    progress <= length && length > 0,
+                    "{context}: {id:?} {step:?}"
+                );
+                if on_foot {
+                    SubPos::new(
+                        from.x + (to.x - from.x) * progress / length,
+                        from.y + (to.y - from.y) * progress / length,
+                    )
+                } else {
+                    // Between centres: 256 subcells along each axis that changes.
+                    let offset = 256 * progress / length;
+                    SubPos::new(
+                        from.x + (to.x - from.x).signum() * offset,
+                        from.y + (to.y - from.y).signum() * offset,
+                    )
+                }
+            }
+        };
+        assert_eq!(position, expected, "{context}: {id:?} with {mobile:?}");
+        if mobile.step.is_none()
+            && let Some(other) = standing.insert((air, position), id)
+        {
+            panic!("{context}: {other:?} and {id:?} both stand at {position:?}");
+        }
+    }
+    for ((air, cell), (whole, foot)) in &held {
+        assert!(
+            whole.len() <= 1,
+            "{context}: {cell:?} (air: {air}) is held by {whole:?}"
+        );
+        assert!(
+            foot.len() <= SPOTS_PER_CELL,
+            "{context}: {cell:?} is held by the infantry {foot:?}"
+        );
+        assert!(
+            whole.is_empty() || foot.is_empty(),
+            "{context}: {cell:?} is held by {whole:?} and the infantry {foot:?}"
+        );
+        assert!(
+            !air || foot.is_empty(),
+            "{context}: infantry on foot in the air"
+        );
+        let mut spots: Vec<u8> = foot.iter().map(|&(_, spot)| spot).collect();
+        spots.sort_unstable();
+        spots.dedup();
+        assert_eq!(
+            spots.len(),
+            foot.len(),
+            "{context}: {cell:?}: two soldiers in one spot, {foot:?}"
+        );
+    }
 }
 
 /// The hit points of the unit or building `id`, or `None` once it is gone.
