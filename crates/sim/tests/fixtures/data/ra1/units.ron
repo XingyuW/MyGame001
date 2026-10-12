@@ -1,0 +1,21 @@
+// RA1 fixture: the unit types of a small world with two sides, for the tests of sides, countries
+// and match setup (ra1_*.rs). Fixture data, independent of the shipped balance (invariant I10).
+(
+    schema_version: 1,
+    units: [
+        (id: "allied_mcv", speed: 16, sprite: "allied_mcv"),
+        (id: "soviet_mcv", speed: 16, sprite: "soviet_mcv"),
+        (id: "rifleman", speed: 16, sprite: "rifleman"),
+        (id: "conscript", speed: 16, sprite: "conscript"),
+        (id: "engineer", speed: 16, sprite: "engineer"),
+        (id: "sniper", speed: 16, sprite: "sniper"),
+        (id: "raider", speed: 32, sprite: "raider"),
+        (id: "militia", speed: 16, sprite: "militia"),
+        (id: "prototype", speed: 16, sprite: "prototype"),
+        (id: "advanced", speed: 16, sprite: "advanced"),
+        (id: "tank", speed: 32, sprite: "tank"),
+        (id: "heavy", speed: 24, sprite: "heavy"),
+        (id: "miner_a", speed: 32, sprite: "miner"),
+        (id: "miner_s", speed: 32, sprite: "miner"),
+    ],
+)

@@ -115,9 +115,18 @@ fn hit_points(app: &mut App, id: SimId) -> Option<i32> {
         .map(|(_, health)| health.hit_points)
 }
 
+/// The computer players allied against the human: the default since RA1 (fixed decision 3).
 fn allied() -> MatchOptions {
     MatchOptions {
-        allied_ai: true,
+        free_for_all: false,
+        ..MatchOptions::default()
+    }
+}
+
+/// Every player for itself, which was the default before RA1.
+fn free() -> MatchOptions {
+    MatchOptions {
+        free_for_all: true,
         ..MatchOptions::default()
     }
 }
@@ -136,7 +145,7 @@ fn allied_computer_players_are_hostile_to_the_human_only() {
     assert!(!players.hostile(P1, P1));
 
     // Without the option, and in a match without a human, everyone fights everyone.
-    let free = three_players(&d, &MatchOptions::default());
+    let free = three_players(&d, &free());
     assert!(free.world().resource::<Players>().hostile(P1, P2));
     let mut spectated = world(&d);
     setup_match_configured(
@@ -166,7 +175,7 @@ fn allied_units_standing_side_by_side_do_not_fire_but_fire_at_the_human() {
             player(P1, 1, 1, Controller::Human),
             player(P2, 1, 2, Controller::Human),
         ],
-        &MatchOptions::default(),
+        &free(),
     )
     .unwrap();
     {
@@ -295,11 +304,11 @@ fn distance_covered(data: &Data, options: &MatchOptions) -> (i32, u64) {
 #[test]
 fn super_me_unit_speed_moves_the_humans_units_faster_and_nobody_elses() {
     let d = data();
-    let (plain, plain_hash) = distance_covered(&d, &MatchOptions::default());
+    let (plain, plain_hash) = distance_covered(&d, &free());
     let boosted = MatchOptions {
         super_players: vec![P0, P1],
         unit_speed_percent: 300,
-        ..MatchOptions::default()
+        ..free()
     };
     let (fast, fast_hash) = distance_covered(&d, &boosted);
     assert!(plain >= 2, "the tank moved {plain} cells");
@@ -312,7 +321,7 @@ fn super_me_unit_speed_moves_the_humans_units_faster_and_nobody_elses() {
     // The option needs Super Me, and never reaches a computer player.
     let no_super = MatchOptions {
         unit_speed_percent: 300,
-        ..MatchOptions::default()
+        ..free()
     };
     assert_eq!(distance_covered(&d, &no_super), (plain, plain_hash));
     let mut app = world(&d);
@@ -325,7 +334,7 @@ fn super_me_unit_speed_moves_the_humans_units_faster_and_nobody_elses() {
         &MatchOptions {
             super_players: vec![P0, P1],
             unit_speed_percent: 9_999,
-            ..MatchOptions::default()
+            ..free()
         },
     )
     .unwrap();
@@ -368,7 +377,7 @@ fn with_scenery(data: &Data) -> (App, CellPos, CellPos) {
             player(P0, 0, 0, Controller::Human),
             player(P1, 1, 1, Controller::Human),
         ],
-        &MatchOptions::default(),
+        &free(),
     )
     .unwrap();
     (app, house, trees)

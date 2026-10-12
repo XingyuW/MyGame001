@@ -33,11 +33,14 @@
 // heavy and slow (heavy tanks, rocket launchers, rocket towers). Balance data (docs/DECISIONS.md
 // D51).
 (
-    schema_version: 2,
+    schema_version: 3,
     starting_credits: 5000,
+    sides: [],
     factions: [
         (
             id: "vanguard",
+            label: "Vanguard",
+            side: "none",
             roster_buildings: [
                 "construction_yard",
                 "power_plant",
@@ -64,6 +67,8 @@
         ),
         (
             id: "meridian",
+            label: "Meridian",
+            side: "none",
             roster_buildings: [
                 "construction_yard",
                 "power_plant",

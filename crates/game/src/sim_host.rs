@@ -171,8 +171,10 @@ impl SimHost {
                 super_players: human(plan.super_me),
                 unlock_players: human(plan.unlock_all),
                 unit_speed_percent: plan.unit_speed_percent,
-                // The computer players fight the human, never each other.
-                allied_ai: true,
+                // The computer players fight the human, never each other (the default; the
+                // other options are those of Red Alert 2's lobby until the menu offers them).
+                free_for_all: false,
+                ..sim::MatchOptions::default()
             },
         )
         .map_err(|error| error.to_string())

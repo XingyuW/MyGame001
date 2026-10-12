@@ -34,6 +34,12 @@ pub enum Command {
     Deploy {
         unit: SimId,
     },
+    /// Turn the player's Construction Yard back into the base unit of its side, standing in the
+    /// cell of the yard's footprint origin (RA1, the lobby's "MCV repacks"; `crate::special`).
+    /// Rejected with `DisabledByOptions` in a match that has the option switched off.
+    Undeploy {
+        building: SimId,
+    },
     Interact {
         unit: SimId,
         target: SimId,
@@ -116,6 +122,7 @@ impl Command {
             | Command::Attack { units, .. }
             | Command::AttackMove { units, .. } => Some(units),
             Command::Deploy { .. }
+            | Command::Undeploy { .. }
             | Command::Interact { .. }
             | Command::Superweapon { .. }
             | Command::QueueProduction { .. }
@@ -163,6 +170,16 @@ pub enum RejectReason {
         item: ProductionItem,
         producer: BuildingKind,
     },
+    /// The player owns factories of the kind that produces `item`, but none of a side that
+    /// builds it (RA1: an Allied Barracks does not train Conscripts).
+    NoFactoryOfSide(ProductionItem),
+    /// Only certain countries build `item`, and the player's is not one of them (RA1).
+    CountryRequired(ProductionItem),
+    /// The player's country may not build `item` (RA1).
+    CountryForbidden(ProductionItem),
+    /// The options of the match switch this off (RA1: a superweapon building with superweapons
+    /// off, `Undeploy` with "MCV repacks" off).
+    DisabledByOptions,
     /// The queue of `producer` already holds `max` items.
     QueueFull {
         producer: BuildingKind,
@@ -224,6 +241,17 @@ impl fmt::Display for RejectReason {
                 "{item:?} is produced by buildings of type {}, and the player owns none",
                 producer.0
             ),
+            Self::NoFactoryOfSide(item) => write!(
+                f,
+                "{item:?} is built by factories of another side, and the player owns none"
+            ),
+            Self::CountryRequired(item) => {
+                write!(f, "{item:?} is built only by other countries")
+            }
+            Self::CountryForbidden(item) => {
+                write!(f, "{item:?} may not be built by the player's country")
+            }
+            Self::DisabledByOptions => write!(f, "the options of the match switch this off"),
             Self::QueueFull { producer, max } => write!(
                 f,
                 "the queue of building type {} already holds {max} items",
@@ -441,6 +469,7 @@ fn apply_unit_command(
             }
         }
         Command::Deploy { .. }
+        | Command::Undeploy { .. }
         | Command::Interact { .. }
         | Command::Superweapon { .. }
         | Command::QueueProduction { .. }
@@ -767,7 +796,10 @@ pub(crate) fn process_commands(world: &mut bevy_ecs::world::World) {
     for issued in pending {
         if matches!(
             issued.command,
-            Command::Deploy { .. } | Command::Interact { .. } | Command::Superweapon { .. }
+            Command::Deploy { .. }
+                | Command::Undeploy { .. }
+                | Command::Interact { .. }
+                | Command::Superweapon { .. }
         ) {
             if !world.resource::<CommandQueue>().pending.is_empty() {
                 world

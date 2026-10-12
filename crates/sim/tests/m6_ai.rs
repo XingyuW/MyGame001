@@ -160,8 +160,12 @@ fn owned_kinds(app: &mut App, player: PlayerId) -> BTreeMap<sim::BuildingKind, u
 /// Whether `player` owns every building of the build order as often as the build order lists it.
 fn build_order_complete(app: &mut App, ai: &AiDefinitions, player: PlayerId) -> bool {
     let owned = owned_kinds(app, player);
-    ai.build_order.iter().all(|kind| {
-        let listed = ai.build_order.iter().filter(|other| *other == kind).count();
+    ai.plans[0].build_order.iter().all(|kind| {
+        let listed = ai.plans[0]
+            .build_order
+            .iter()
+            .filter(|other| *other == kind)
+            .count();
         owned.get(kind).copied().unwrap_or(0) >= listed
     })
 }
@@ -246,9 +250,8 @@ fn the_ai_completes_its_build_order_within_the_tick_budget() {
             // during the match (the power building may come earlier than listed when power runs
             // short).
             let mut expected: Vec<sim::BuildingKind> = Vec::new();
-            for kind in data.ai.build_order.iter().collect::<BTreeSet<_>>() {
-                let listed = data
-                    .ai
+            for kind in data.ai.plans[0].build_order.iter().collect::<BTreeSet<_>>() {
+                let listed = data.ai.plans[0]
                     .build_order
                     .iter()
                     .filter(|other| *other == kind)
@@ -630,7 +633,7 @@ fn the_ai_rebuilds_a_building_it_lost() {
         difficulty.first_wave = 20_000;
     }
     let mut app = fixture_match(&data, &[human(P0, 0, 0), computer(P1, 1, 1, 1)]);
-    let power = data.ai.power;
+    let power = data.ai.plans[0].power;
     for _ in 0..BUILD_ORDER_BUDGET {
         tick(&mut app, Vec::new());
         if build_order_complete(&mut app, &data.ai, P1) {

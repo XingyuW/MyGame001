@@ -513,7 +513,7 @@ fn a_computer_player_whose_faction_lacks_a_producer_of_its_build_order_is_a_setu
         error,
         MatchSetupError::UnobtainableProducer {
             player: P1,
-            field: "build_order[0]".into(),
+            field: "plans[0].build_order[0]".into(),
             building: "power".into(),
             producer: "yard".into(),
         }
@@ -521,7 +521,7 @@ fn a_computer_player_whose_faction_lacks_a_producer_of_its_build_order_is_a_setu
     assert!(
         error
             .to_string()
-            .contains("computer player 1: the AI file's build_order[0] builds \"power\""),
+            .contains("computer player 1: the AI file's plans[0].build_order[0] builds \"power\""),
         "{error}"
     );
     assert_eq!(state_hash(app.world_mut()), before);

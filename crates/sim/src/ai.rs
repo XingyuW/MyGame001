@@ -17,6 +17,10 @@
 //!
 //! What it does at each turn, in this order (each a bounded number of commands):
 //!
+//! 0. (RA1) while it owns the base unit of a side (the MCV it starts with), deploys it where it
+//!    stands and does nothing else in that turn, so that none of its units walks into the
+//!    yard's footprint before the command is applied; in its first turns it waits instead
+//!    until it sees the footprint ([`deploy_base_unit`]);
 //! 1. places a ready building on a free spot near its base ([`find_placement`]);
 //! 2. queues the next building of the build order that it does not own as often as the build
 //!    order lists it (so lost buildings are rebuilt), or a power building first if the power would
@@ -50,7 +54,7 @@ use crate::combat::{Sight, Weapon};
 use crate::command::{Command, CommandQueue, IssuedCommand, PlayerId};
 use crate::definitions::{Definitions, UnitKind};
 use crate::economy::{MAX_QUEUE_LENGTH, PlayerState, Players};
-use crate::economy_commands::check_placement;
+use crate::economy_commands::{check_buildable, check_placement, produces};
 use crate::economy_defs::{BuildingKind, ProductionItem};
 use crate::harvest::{HarvestState, Harvester};
 use crate::hash::Fnv1a64;
@@ -176,6 +180,10 @@ impl AiController {
     /// static terrain of `grid` (docs/DECISIONS.md D43), so they lie on the map. `None` if no
     /// gathering point exists ([`gathering_point`]), which match setup reports as an error instead
     /// of falling back to a cell its commands could not use (M6 review 1 P1-1).
+    ///
+    /// `yard` is the footprint of the Construction Yard the player's base unit will deploy into
+    /// (RA1), if it starts with one: the gathering point keeps clear of it, as it does of the
+    /// buildings a player starts with.
     pub(crate) fn new(
         grid: &Grid,
         definitions: &Definitions,
@@ -183,6 +191,7 @@ impl AiController {
         difficulty: Difficulty,
         start: CellPos,
         enemy_starts: Vec<CellPos>,
+        yard: Option<Footprint>,
     ) -> Option<Self> {
         let difficulty = scaled_for_map(difficulty, grid);
         let (width, height) = (grid_side(grid.width()), grid_side(grid.height()));
@@ -204,7 +213,7 @@ impl AiController {
             i32::try_from(x).unwrap_or(start.x),
             i32::try_from(y).unwrap_or(start.y),
         );
-        let gather = gathering_point(grid, start, toward)?;
+        let gather = gathering_point(grid, start, toward, yard)?;
         // Waypoints in blocks as wide as the shortest sight of the army, so that a unit near a
         // block's waypoint sees the whole block.
         let spacing = plan
@@ -373,8 +382,14 @@ impl AiController {
 /// orthogonal neighbours, connects the same cells), those that no building covers, the one nearest
 /// to `toward` (octile distance, then row, then column). `None` if there is none, for example a
 /// start walled in by terrain under its own buildings. Its units can walk there unless buildings
-/// placed later block the way.
-fn gathering_point(grid: &Grid, start: CellPos, toward: CellPos) -> Option<CellPos> {
+/// placed later block the way. The cells of `reserved` (the yard a base unit will deploy into)
+/// count as covered by a building.
+fn gathering_point(
+    grid: &Grid,
+    start: CellPos,
+    toward: CellPos,
+    reserved: Option<Footprint>,
+) -> Option<CellPos> {
     let width = usize::try_from(grid.width()).ok()?;
     let index = |cell: CellPos| -> Option<usize> {
         grid.contains(cell).then(|| {
@@ -393,7 +408,7 @@ fn gathering_point(grid: &Grid, start: CellPos, toward: CellPos) -> Option<CellP
     reached[index(start)?] = true;
     let mut best: Option<(u32, i32, i32)> = None;
     while let Some(cell) = stack.pop() {
-        if grid.building(cell).is_none() {
+        if grid.building(cell).is_none() && !reserved.is_some_and(|yard| yard.contains(cell)) {
             let key = (octile_distance(cell, toward), cell.y, cell.x);
             if best.is_none_or(|best| key < best) {
                 best = Some(key);
@@ -486,6 +501,7 @@ impl AiPlayers {
 struct UnitSnap {
     id: SimId,
     owner: PlayerId,
+    kind: UnitKind,
     mobile: Mobile,
     has_order: bool,
     harvest: Option<HarvestState>,
@@ -522,6 +538,10 @@ struct View<'a> {
     definitions: &'a Definitions,
     /// The computer player's plan (named `ai` as the AI file it is taken from).
     ai: &'a AiPlan,
+    /// Whether the match has superweapons switched on (`MatchRules`, public match setup).
+    superweapons: bool,
+    /// The types of the player's buildings, one entry per building.
+    own_kinds: Vec<BuildingKind>,
     own_units: Vec<&'a UnitSnap>,
     own_buildings: Vec<&'a BuildingSnap>,
     /// Other players' units its player sees.
@@ -540,6 +560,7 @@ impl<'a> View<'a> {
         grid: &'a Grid,
         definitions: &'a Definitions,
         ai: &'a AiPlan,
+        superweapons: bool,
         units: &'a [UnitSnap],
         buildings: &'a [BuildingSnap],
     ) -> Self {
@@ -553,6 +574,12 @@ impl<'a> View<'a> {
             grid,
             definitions,
             ai,
+            superweapons,
+            own_kinds: buildings
+                .iter()
+                .filter(|building| building.owner == player)
+                .map(|building| building.kind)
+                .collect(),
             own_units: units.iter().filter(|unit| unit.owner == player).collect(),
             own_buildings: buildings
                 .iter()
@@ -571,12 +598,6 @@ impl<'a> View<'a> {
         }
     }
 
-    fn owns(&self, kind: BuildingKind) -> bool {
-        self.own_buildings
-            .iter()
-            .any(|building| building.kind == kind)
-    }
-
     fn owned(&self, kind: BuildingKind) -> usize {
         self.own_buildings
             .iter()
@@ -584,20 +605,35 @@ impl<'a> View<'a> {
             .count()
     }
 
-    /// Whether `QueueProduction` of `item` would pass its validation now: the player owns every
-    /// prerequisite and a producer, and the queue is not full.
+    /// Whether the player could produce `item` now, as far as `QueueProduction` checks it
+    /// before the length of the queue (`check_buildable`).
+    fn buildable(&self, item: ProductionItem) -> bool {
+        check_buildable(
+            self.definitions,
+            self.state,
+            self.superweapons,
+            &self.own_kinds,
+            item,
+        )
+        .is_ok()
+    }
+
+    /// Whether `QueueProduction` of `item` would pass its validation now: the player may build
+    /// it, and the queue is not full.
     fn queueable(&self, item: ProductionItem) -> bool {
-        self.definitions.production(item).is_some_and(|terms| {
-            terms.prerequisites.iter().all(|&kind| self.owns(kind))
-                && self.owns(terms.producer)
-                && self.state.queue(terms.producer).len() < MAX_QUEUE_LENGTH
-        })
+        self.buildable(item) && self.queue_len(item) < MAX_QUEUE_LENGTH
+    }
+
+    /// The building type under which the queue of `item` is kept.
+    fn queue_key(&self, item: ProductionItem) -> Option<BuildingKind> {
+        self.definitions
+            .production(item)
+            .map(|terms| self.definitions.queue_key(terms.producer))
     }
 
     fn queue_len(&self, item: ProductionItem) -> usize {
-        self.definitions
-            .production(item)
-            .map_or(usize::MAX, |terms| self.state.queue(terms.producer).len())
+        self.queue_key(item)
+            .map_or(usize::MAX, |key| self.state.queue(key).len())
     }
 
     /// Items of `item` in the player's queues.
@@ -646,6 +682,7 @@ type UnitQuery<'w, 's> = Query<
     (
         &'static SimId,
         &'static Owner,
+        &'static Unit,
         &'static Mobile,
         &'static Orders,
         Option<&'static Harvester>,
@@ -699,9 +736,10 @@ pub(crate) fn run_ai(
     let mut unit_snaps: Vec<UnitSnap> = units
         .iter()
         .map(
-            |(id, owner, mobile, orders, harvester, weapon, sight)| UnitSnap {
+            |(id, owner, unit, mobile, orders, harvester, weapon, sight)| UnitSnap {
                 id: *id,
                 owner: owner.0,
+                kind: unit.kind,
                 mobile: *mobile,
                 has_order: orders.current.is_some(),
                 harvest: harvester.map(|harvester| harvester.state),
@@ -748,6 +786,7 @@ pub(crate) fn run_ai(
             &grid,
             &definitions,
             &plan,
+            state.rules().superweapons,
             &unit_snaps,
             &building_snaps,
         );
@@ -762,6 +801,11 @@ pub(crate) fn run_ai(
 /// One turn of a computer player: updates its memory and returns its commands.
 fn think(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
     remember(view, controller);
+    match deploy_base_unit(view, controller) {
+        BaseUnit::Deploy(command) => return vec![command],
+        BaseUnit::Wait => return Vec::new(),
+        BaseUnit::None => {}
+    }
     let mut commands = Vec::new();
     if let Some(command) = place_ready_building(view, controller) {
         commands.push(command);
@@ -826,6 +870,86 @@ fn remember(view: &View<'_>, controller: &mut AiController) {
 }
 
 // --- Construction ---------------------------------------------------------------------------
+
+/// What a turn does about the player's base unit.
+enum BaseUnit {
+    /// It owns none, or the one it owns cannot deploy where it stands: the turn goes on as usual.
+    None,
+    /// Deploy it, and do nothing else in this turn.
+    Deploy(Command),
+    /// It cannot see the yard's footprint yet (the first turn of a match comes before the first
+    /// `Visibility` stage): do nothing in this turn, so that its units stay where they are.
+    Wait,
+}
+
+/// `Deploy` for the base unit of a side that the player owns (RA1: the MCV a country starts
+/// with), if deploying where it stands would pass the command's validation now and still in the
+/// next tick: the unit stands still, the yard's footprint (its origin is the unit's cell) lies
+/// on the map on buildable ground that the player sees and keeps seeing, nothing but the unit
+/// itself is in it, and beside it, as far as the player sees, stand at most its own units
+/// without an order (its starting units, which this turn does not move). A base unit that
+/// cannot deploy where it stands is left alone, and the rest of the turn goes on as usual;
+/// except that in its first two turns a player that does not see the footprint yet waits.
+fn deploy_base_unit(view: &View<'_>, controller: &AiController) -> BaseUnit {
+    let Some(rules) = view.definitions.rules() else {
+        return BaseUnit::None;
+    };
+    let early = view.tick < 2 * u64::from(controller.difficulty.think_interval.max(1));
+    for unit in &view.own_units {
+        let Some(def) = rules
+            .side_of_base_unit(unit.kind)
+            .and_then(|side| view.definitions.building(side.construction_yard))
+        else {
+            continue;
+        };
+        if unit.has_order || unit.mobile.step.is_some() {
+            continue;
+        }
+        let footprint = Footprint {
+            origin: unit.mobile.cell,
+            width: def.width,
+            height: def.height,
+        };
+        if !footprint.inside(view.grid) {
+            continue;
+        }
+        if !footprint.cells().all(|cell| view.vision.is_visible(cell)) {
+            if early {
+                return BaseUnit::Wait;
+            }
+            continue;
+        }
+        let clear = |cell: CellPos| {
+            view.grid.building(cell).is_none()
+                && view.grid.occupant(cell).is_none_or(|by| by == unit.id)
+        };
+        // One of the player's own units that stands still without any order: it does not move
+        // before the command is applied, since this turn gives no other command.
+        let stands = |by: SimId| {
+            view.own_units.iter().any(|other| {
+                other.id == by
+                    && other.idle()
+                    && other.mobile.step.is_none()
+                    && other.harvest.is_none()
+            })
+        };
+        let fits = footprint.cells().all(|cell| {
+            view.stays_visible(cell)
+                && view
+                    .grid
+                    .cell(cell)
+                    .is_some_and(|terrain| terrain.buildable)
+                && clear(cell)
+        }) && footprint
+            .ring()
+            .filter(|&cell| view.grid.contains(cell) && view.vision.is_visible(cell))
+            .all(|cell| view.grid.occupant(cell).is_none_or(stands));
+        if fits {
+            return BaseUnit::Deploy(Command::Deploy { unit: unit.id });
+        }
+    }
+    BaseUnit::None
+}
 
 /// `PlaceBuilding` for a building that is ready at the head of one of the player's queues, if a
 /// place is found.
@@ -999,10 +1123,8 @@ fn broke(view: &View<'_>) -> bool {
         .ai
         .army
         .iter()
+        .filter(|&&kind| view.buildable(ProductionItem::Unit(kind)))
         .filter_map(|&kind| view.definitions.production(ProductionItem::Unit(kind)))
-        .filter(|terms| {
-            view.owns(terms.producer) && terms.prerequisites.iter().all(|&kind| view.owns(kind))
-        })
         .map(|terms| terms.cost)
         .collect();
     let Some(&cheapest) = producible.iter().min() else {
@@ -1028,18 +1150,38 @@ fn broke(view: &View<'_>) -> bool {
 /// nothing else is left to sell; otherwise the one with the highest sell value (then the lowest
 /// id). It does not rebuild while broke, so selling does not feed rebuilding.
 fn sell_for_army(view: &View<'_>) -> Option<Command> {
+    // The producers and prerequisites of the army: a building that produces one of its unit
+    // types, a prerequisite of one, or a member of one of its prerequisite groups.
     let mut needed: BTreeSet<BuildingKind> = BTreeSet::new();
     for &kind in &view.ai.army {
-        if let Some(terms) = view.definitions.production(ProductionItem::Unit(kind)) {
+        let item = ProductionItem::Unit(kind);
+        if let Some(terms) = view.definitions.production(item) {
             needed.insert(terms.producer);
             needed.extend(terms.prerequisites.iter().copied());
+        }
+        needed.extend(
+            view.own_kinds
+                .iter()
+                .copied()
+                .filter(|&owned| produces(view.definitions, owned, item)),
+        );
+        if let (Some(entry), Some(rules)) =
+            (view.definitions.metadata(item), view.definitions.rules())
+        {
+            for group in entry
+                .prerequisite_groups
+                .iter()
+                .filter_map(|&group| rules.group(group))
+            {
+                needed.extend(group.buildings.iter().copied());
+            }
         }
     }
     let builds = |kind: BuildingKind| {
         view.definitions
             .buildings()
             .iter()
-            .any(|def| def.production.producer == kind)
+            .any(|def| view.definitions.same_factory(kind, def.production.producer))
     };
     view.own_buildings
         .iter()
@@ -1160,11 +1302,7 @@ fn has_room(
     item: ProductionItem,
     added: &mut BTreeMap<BuildingKind, usize>,
 ) -> bool {
-    let Some(producer) = view
-        .definitions
-        .production(item)
-        .map(|terms| terms.producer)
-    else {
+    let Some(producer) = view.queue_key(item) else {
         return false;
     };
     let extra = added.get(&producer).copied().unwrap_or(0);

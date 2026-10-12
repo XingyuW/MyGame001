@@ -2,8 +2,9 @@
 //! D25).
 //!
 //! Each player has credits, the power its buildings produce and consume, and one production
-//! queue per producing building type. Only the item at the head of a queue progresses, and only
-//! while the player owns a building of the queue's type. On each tick in which it progresses, an
+//! queue per producing building type, or per factory group where the arsenal defines one (RA1,
+//! `Definitions::queue_key`). Only the item at the head of a queue progresses, and only while the
+//! player owns a building that produces it (`economy_commands::produces`) and its prerequisites. On each tick in which it progresses, an
 //! item of cost `C` and build time `T` is charged `C / T` credits, and on its last tick
 //! `C / T + C mod T`, so the total charged is exactly `C` (equation 3, invariant I7). An item
 //! does not progress on a tick in which the player's credits are below that tick's charge, so
@@ -27,6 +28,7 @@ use crate::building::{Building, Footprint, Producer, exit_cell};
 use crate::combat::combat_components;
 use crate::command::PlayerId;
 use crate::definitions::{Definitions, UnitKind};
+use crate::economy_commands::{missing_prerequisite, produces};
 use crate::economy_defs::{BuildingKind, ProductionItem};
 use crate::event::SimEvent;
 use crate::harvest::Harvester;
@@ -77,6 +79,9 @@ pub struct PlayerState {
     pub(crate) roster: Option<BTreeSet<ProductionItem>>,
     /// The player's buildings being repaired (`RepairBuilding`, [`repair_buildings`]).
     pub(crate) repairing: BTreeSet<SimId>,
+    /// The player's country (RA1, an index into the countries of the rules file); `None` for a
+    /// player of a faction without a side and for a player added without a faction.
+    pub(crate) country: Option<crate::rules::CountryId>,
 }
 
 impl PlayerState {
@@ -87,6 +92,10 @@ impl PlayerState {
 
     pub fn super_me(&self) -> bool {
         self.super_me
+    }
+    /// The player's country, an index into the countries of the rules file (RA1).
+    pub fn country(&self) -> Option<crate::rules::CountryId> {
+        self.country
     }
     /// Whether building prerequisites are waived for this player (match option).
     pub fn unlock_all(&self) -> bool {
@@ -127,7 +136,9 @@ impl PlayerState {
         self.power_consumed > self.power_produced
     }
 
-    /// The queue of items produced by buildings of type `producer`, head first.
+    /// The queue kept under building type `producer`, head first. A queue is kept under the
+    /// producer of its items, or under the first building type of the producer's factory group
+    /// where the arsenal defines groups ([`Definitions::queue_key`]).
     pub fn queue(&self, producer: BuildingKind) -> &[QueueItem] {
         self.queues.get(&producer).map_or(&[], Vec::as_slice)
     }
@@ -242,6 +253,19 @@ impl Players {
             .is_some()
     }
 
+    /// Gives `player` the country `country` of the rules file (`None`: no country) and returns
+    /// whether the player exists. Scenario and match setup only, like [`Players::add`].
+    pub fn set_country(
+        &mut self,
+        player: PlayerId,
+        country: Option<crate::rules::CountryId>,
+    ) -> bool {
+        self.players
+            .get_mut(&player)
+            .map(|state| state.country = country)
+            .is_some()
+    }
+
     /// Whether `a` and `b` are enemies: different players that do not share a team. An owner who
     /// is not a player of the match is an enemy of everyone else, as before teams existed.
     pub fn hostile(&self, a: PlayerId, b: PlayerId) -> bool {
@@ -326,6 +350,7 @@ impl Players {
             for id in &state.repairing {
                 hasher.write_u32(id.0);
             }
+            hasher.write(&[state.country.map_or(u8::MAX, |country| country.0)]);
         }
     }
 }
@@ -611,10 +636,13 @@ pub(crate) fn advance_production(
         let super_me = state.super_me;
         let unlock_all = state.unlock_all;
         let producers: Vec<BuildingKind> = state.queues.keys().copied().collect();
+        // The types of the player's buildings that work, one entry per building.
+        let kinds: Vec<BuildingKind> = exits
+            .iter()
+            .filter(|((owner, _), _)| *owner == player)
+            .flat_map(|((_, kind), list)| std::iter::repeat_n(*kind, list.len()))
+            .collect();
         for producer in producers {
-            let owned = exits
-                .get(&(player, producer))
-                .map_or(&[][..], Vec::as_slice);
             let credits = &mut state.credits;
             let Some(queue) = state.queues.get_mut(&producer) else {
                 continue;
@@ -627,15 +655,21 @@ pub(crate) fn advance_production(
             let Some(terms) = definitions.production(head.item) else {
                 continue;
             };
+            // The player's buildings that produce the item, in id order: those of the producer's
+            // type, or with factory groups (RA1) the factories of its group whose side builds
+            // the item.
+            let mut owned: Vec<Exit> = exits
+                .iter()
+                .filter(|((owner, kind), _)| {
+                    *owner == player && produces(&definitions, *kind, head.item)
+                })
+                .flat_map(|(_, list)| list.iter().copied())
+                .collect();
+            owned.sort_unstable_by_key(|exit| exit.building);
             if head.progress < terms.build_time {
                 if owned.is_empty()
                     || !unlock_all
-                        && terms.prerequisites.iter().any(|k| {
-                            !definitions.prerequisite_met(
-                                *k,
-                                exits.keys().filter(|(p, _)| *p == player).map(|(_, k)| *k),
-                            )
-                        })
+                        && missing_prerequisite(&definitions, &kinds, head.item).is_some()
                     || (low_power && !even_tick)
                 {
                     continue;

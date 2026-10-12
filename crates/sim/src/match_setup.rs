@@ -1,18 +1,26 @@
 //! Skirmish match setup and the win condition (PLAN.md section 7, M6; docs/DECISIONS.md D40,
-//! D41).
+//! D41; RA1: docs/RA2_PARITY_PLAN.md sections 3.5 and 4.9, docs/DECISIONS.md R13).
 //!
 //! [`setup_match`] installs a match into a world set up by [`SimPlugin`](crate::SimPlugin) with the
-//! map's grid and the definitions installed: it adds the players with the skirmish file's
-//! starting credits, places every faction's starting buildings and units at the player's start
-//! position, gives every computer player its controller (`crate::ai`), and records the players
-//! in [`MatchState`]. Like installing the grid (docs/DECISIONS.md D11), this is setup before the
+//! map's grid and the definitions installed: it adds the players with their starting credits,
+//! places what every player starts with at its start position, gives every computer player its
+//! controller (`crate::ai`), and records the players and the rules of the match in
+//! [`MatchState`]. Like installing the grid (docs/DECISIONS.md D11), this is setup before the
 //! first tick, not a gameplay change, so it does not go through `CommandQueue`.
 //!
+//! What a player starts with depends on its faction (`crate::skirmish_defs`): a faction without
+//! a side gives its starting buildings and groups of units, as since M6; a country gives the
+//! base unit of its side at the start position (an MCV, or with [`MatchOptions::mcv_start`] off
+//! the Construction Yard it deploys into) and the starting units of [`starting_units`].
+//!
 //! The win condition (the `WinCondition` stage): at the end of every tick, a player of the match
-//! who owns no building is defeated ([`SimEvent::PlayerDefeated`]); once at most one player is
-//! left, the match ends ([`SimEvent::MatchEnded`]) with that player as the winner, or as a draw if
-//! the last players were defeated in the same tick. The outcome is final. A world without a match
-//! set up (no players in [`MatchState`], as in the tests of M0 to M5) has no win condition.
+//! who has lost is defeated ([`SimEvent::PlayerDefeated`]); once at most one player is left, or
+//! only allies, the match ends ([`SimEvent::MatchEnded`]) with that player as the winner, or as a
+//! draw if the last players were defeated in the same tick. The outcome is final. A player has
+//! lost when it owns no building and, in a world with a rules file (RA1), in a short game no
+//! base unit either, in a long game no unit at all; units carried in a transport count for its
+//! owner. A world without a rules file keeps "no building" (D41). A world without a match set up
+//! (no players in [`MatchState`], as in the tests of M0 to M5) has no win condition.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
@@ -26,17 +34,21 @@ use crate::ai::{AiController, AiPlayers};
 use crate::ai_defs::{AiDefinitions, faction_plan_problem, unobtainable_producer};
 use crate::building::{Building, SpawnBuildingError, spawn_building};
 use crate::command::PlayerId;
-use crate::definitions::Definitions;
+use crate::definitions::{Definitions, UnitKind};
 use crate::economy::{PlayerSetupError, Players};
+use crate::economy_defs::ProductionItem;
 use crate::event::SimEvent;
 use crate::hash::Fnv1a64;
 use crate::map::{CellPos, Grid};
 use crate::pathfinding::destination_cells;
+use crate::rng::SimRng;
+use crate::rules::Side;
 use crate::schedule::SimTick;
 use crate::skirmish_defs::{
-    MAX_MATCH_PLAYERS, MIN_MATCH_PLAYERS, SkirmishDefinitions, StartProblem, start_problem,
+    MAX_GROUP_UNITS, MAX_MATCH_PLAYERS, MIN_MATCH_PLAYERS, SkirmishDefinitions, StartProblem,
+    start_problem,
 };
-use crate::unit::{Owner, SpawnError, spawn_unit};
+use crate::unit::{Owner, SpawnError, Unit, spawn_unit};
 
 /// Who gives a player's orders.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -47,8 +59,9 @@ pub enum Controller {
     Ai { difficulty: usize },
 }
 
-/// A player of a match to be set up: its id, the index of its faction in the skirmish file, the
-/// index of its start position on the map, and who controls it.
+/// A player of a match to be set up: its id, the index of its faction in the skirmish file (not
+/// read for a player listed in [`MatchOptions::random_countries`]), the index of its start
+/// position on the map, and who controls it.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct PlayerSetup {
     pub player: PlayerId,
@@ -135,6 +148,9 @@ pub enum MatchSetupError {
     /// Fewer than [`MIN_MATCH_PLAYERS`] players, more than the map has start positions (at most
     /// [`MAX_MATCH_PLAYERS`]), or a player or start position given twice.
     Players(String),
+    /// An option of the match is outside what the rules file allows (RA1): the starting credits
+    /// or the unit count outside their range, or a random country without any country.
+    Options(String),
     UnknownFaction {
         player: PlayerId,
         faction: usize,
@@ -208,6 +224,7 @@ impl fmt::Display for MatchSetupError {
             ),
             Self::UnknownMap(map) => write!(f, "map {map} is not a map of the skirmish file"),
             Self::Players(problem) => write!(f, "players: {problem}"),
+            Self::Options(problem) => write!(f, "options: {problem}"),
             Self::UnknownFaction { player, faction } => write!(
                 f,
                 "player {}: faction {faction} is not a faction of the skirmish file",
@@ -297,16 +314,53 @@ pub enum MatchOutcome {
     Draw { tick: u64 },
 }
 
-/// The players of the match and who has been defeated (docs/DECISIONS.md D41). Without players
-/// (a world set up only by `SimPlugin`) there is no win condition.
+/// The rules of a match that its options set (RA1, docs/RA2_PARITY_PLAN.md section 3.5). The
+/// default is that of Red Alert 2's lobby, which is also what a world without a match has.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct MatchRules {
+    /// A player is defeated without buildings and base unit; off: without buildings and units.
+    /// Read only in a world with a rules file.
+    pub short_game: bool,
+    /// Superweapon buildings may be queued.
+    pub superweapons: bool,
+    /// `Command::Undeploy` is accepted.
+    pub mcv_repacks: bool,
+    /// Crates appear (from RA5).
+    pub crates: bool,
+}
+
+impl Default for MatchRules {
+    fn default() -> Self {
+        Self {
+            short_game: true,
+            superweapons: true,
+            mcv_repacks: true,
+            crates: true,
+        }
+    }
+}
+
+/// The players of the match, its rules, and who has been defeated (docs/DECISIONS.md D41).
+/// Without players (a world set up only by `SimPlugin`) there is no win condition.
 #[derive(Resource, Clone, Debug, Default, PartialEq, Eq)]
 pub struct MatchState {
     players: Vec<PlayerId>,
+    rules: MatchRules,
     defeated: BTreeMap<PlayerId, u64>,
     outcome: Option<MatchOutcome>,
 }
 
 impl MatchState {
+    /// The rules the options of the match set.
+    pub fn rules(&self) -> MatchRules {
+        self.rules
+    }
+
+    /// Sets the rules of the match. Scenario and match setup only, like [`Players::add`].
+    pub fn set_rules(&mut self, rules: MatchRules) {
+        self.rules = rules;
+    }
+
     /// The players of the match in ascending id order.
     pub fn players(&self) -> &[PlayerId] {
         &self.players
@@ -327,6 +381,12 @@ impl MatchState {
         for player in &self.players {
             hasher.write(&[player.0]);
         }
+        hasher.write(&[
+            u8::from(self.rules.short_game),
+            u8::from(self.rules.superweapons),
+            u8::from(self.rules.mcv_repacks),
+            u8::from(self.rules.crates),
+        ]);
         hasher.write_u64(self.defeated.len() as u64);
         for (player, tick) in &self.defeated {
             hasher.write(&[player.0]);
@@ -411,19 +471,31 @@ pub fn setup_match_with_options(
         &MatchOptions {
             super_players: super_players.to_vec(),
             unlock_players: unlock_players.to_vec(),
+            // As before the options existed: no teams.
+            free_for_all: true,
             ..MatchOptions::default()
         },
     )
 }
 
-/// The team of the computer players of a match with [`MatchOptions::allied_ai`].
+/// The team of the computer players of a match without [`MatchOptions::free_for_all`].
 pub const AI_TEAM: u8 = 1;
+
+/// Fewest cells (Chebyshev distance) between a country's start position and its starting units
+/// (docs/RA2_PARITY_PLAN.md section 4.9): the base unit deploys into a Construction Yard whose
+/// footprint begins at the start, and the units stand clear of it.
+pub const STARTING_UNIT_DISTANCE: u32 = 3;
 
 /// Largest [`MatchOptions::unit_speed_percent`]: four times a unit type's speed.
 pub const MAX_UNIT_SPEED_PERCENT: u16 = 400;
 
-/// The options of a match beyond its players.
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+/// The options of a match beyond its players (docs/RA2_PARITY_PLAN.md section 3.5). The default
+/// is that of Red Alert 2's lobby; the extensions of this game default to off.
+///
+/// Whether the map grows with the number of players is not an option of the simulation: the map
+/// is enlarged before the setup (`crate::map_scale::enlarged_map`), by whoever installs the grid
+/// and the start positions (docs/DECISIONS.md R4, R13).
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MatchOptions {
     /// Human controllers with Super Me.
     pub super_players: Vec<PlayerId>,
@@ -433,13 +505,114 @@ pub struct MatchOptions {
     /// 100 to [`MAX_UNIT_SPEED_PERCENT`] (values outside are clamped; 0 means 100). Players
     /// without Super Me are never changed.
     pub unit_speed_percent: u16,
-    /// In a match with a human player, the computer players form one team: they do not fire at
-    /// each other, do not march on each other's bases, and the match ends once only they are
-    /// left. Without a human player nothing changes.
-    pub allied_ai: bool,
+    /// Off (the default, fixed decision 3): in a match with a human player, the computer players
+    /// form one team: they do not fire at each other, do not march on each other's bases, and
+    /// the match ends once only they are left; without a human player nothing changes. On:
+    /// every player for itself.
+    pub free_for_all: bool,
+    /// Players whose faction is drawn from the countries of the skirmish file with `SimRng`
+    /// (the lobby's "random"), in ascending order of their ids; their `PlayerSetup::faction` is
+    /// not read.
+    pub random_countries: Vec<PlayerId>,
+    /// The starting credits of every player; `None` for those of the skirmish file. With a
+    /// rules file they must lie in its range and on its step (`MinMoney`, `MaxMoney`,
+    /// `MoneyIncrement`).
+    pub starting_credits: Option<i64>,
+    /// The lobby's unit count, from which the starting units of a country's players follow
+    /// ([`starting_units`]); `None` for the default of the rules file. It must lie in the
+    /// range of the rules file.
+    pub unit_count: Option<u32>,
+    /// A country's player starts with the base unit of its side; off: with the Construction
+    /// Yard it deploys into, standing at the start position.
+    pub mcv_start: bool,
+    /// See [`MatchRules`].
+    pub short_game: bool,
+    pub superweapons: bool,
+    pub crates: bool,
+    pub mcv_repacks: bool,
 }
 
-/// [`setup_match`] with every match option.
+impl Default for MatchOptions {
+    fn default() -> Self {
+        let rules = MatchRules::default();
+        Self {
+            super_players: Vec::new(),
+            unlock_players: Vec::new(),
+            unit_speed_percent: 0,
+            free_for_all: false,
+            random_countries: Vec::new(),
+            starting_credits: None,
+            unit_count: None,
+            mcv_start: true,
+            short_game: rules.short_game,
+            superweapons: rules.superweapons,
+            crates: rules.crates,
+            mcv_repacks: rules.mcv_repacks,
+        }
+    }
+}
+
+/// The starting units of a player of `side` in a match with the lobby's unit count `unit_count`
+/// (docs/RA2_PARITY_PLAN.md section 4.9; single source, appendix D topic 15):
+///
+/// ```text
+/// average = mean cost of the starting unit types of all sides, rounded down
+/// budget  = (unit_count - 1) x average          (0 for a unit count of 0)
+/// while spent < budget: a vehicle of the side while spent < budget x 2 div 3 (if it has one),
+///                       else an infantry of the side;  spent += its cost
+/// ```
+///
+/// A type is drawn from its list with `rng` when the list has more than one entry (vanilla Red
+/// Alert 2 has one vehicle and one infantry per side, so nothing is drawn). At most
+/// `MAX_GROUP_UNITS` units; none for a side the skirmish file does not list.
+pub fn starting_units(
+    skirmish: &SkirmishDefinitions,
+    definitions: &Definitions,
+    side: Side,
+    unit_count: u32,
+    rng: &mut SimRng,
+) -> Vec<UnitKind> {
+    let mut units = Vec::new();
+    let Some(start) = skirmish.side(side) else {
+        return units;
+    };
+    let budget = i64::from(unit_count.saturating_sub(1))
+        .saturating_mul(skirmish.average_starting_cost(definitions));
+    let mut pick = |list: &[UnitKind]| -> Option<UnitKind> {
+        match list.len() {
+            0 => None,
+            1 => list.first().copied(),
+            // Bounded by `MAX_STARTING_TYPES`, so the remainder is an index.
+            length => list
+                .get(usize::try_from(rng.next_u64() % (length as u64)).unwrap_or(0))
+                .copied(),
+        }
+    };
+    let mut spent = 0_i64;
+    while spent < budget && units.len() < MAX_GROUP_UNITS as usize {
+        let vehicle = (spent < budget.saturating_mul(2) / 3)
+            .then(|| pick(&start.vehicles))
+            .flatten();
+        let Some(kind) = vehicle.or_else(|| pick(&start.infantry)) else {
+            break;
+        };
+        // Every starting unit type has a cost above 0 (`skirmish_defs`).
+        let cost = definitions
+            .production(ProductionItem::Unit(kind))
+            .map_or(0, |terms| terms.cost);
+        if cost <= 0 {
+            break;
+        }
+        spent = spent.saturating_add(cost);
+        units.push(kind);
+    }
+    units
+}
+
+/// [`setup_match`] with every match option (RA1). Beyond the checks of [`setup_match`], the
+/// options are checked against the rules file before anything is changed; then the factions of
+/// the players with a random country are drawn (the only use of `SimRng` here besides
+/// [`starting_units`]).
 pub fn setup_match_configured(
     world: &mut World,
     skirmish: &SkirmishDefinitions,
@@ -450,7 +623,7 @@ pub fn setup_match_configured(
 ) -> Result<MatchStart, MatchSetupError> {
     let super_players = options.super_players.as_slice();
     let unlock_players = options.unlock_players.as_slice();
-    let allied_ai = options.allied_ai
+    let allied_ai = !options.free_for_all
         && players
             .iter()
             .any(|setup| setup.controller == Controller::Human);
@@ -477,6 +650,73 @@ pub fn setup_match_configured(
             players.len()
         )));
     }
+    let definitions = world.resource::<Definitions>().clone();
+    let dialog = definitions.rules().map(|rules| rules.dialog);
+    let starting_credits = options
+        .starting_credits
+        .unwrap_or(skirmish.starting_credits);
+    if let (Some(credits), Some(dialog)) = (options.starting_credits, dialog) {
+        let (low, high, step) = (
+            i64::from(dialog.min_credits),
+            i64::from(dialog.max_credits),
+            i64::from(dialog.credits_step.max(1)),
+        );
+        if !(low..=high).contains(&credits) || (credits - low) % step != 0 {
+            return Err(MatchSetupError::Options(format!(
+                "{credits} starting credits, the rules allow {low} to {high} in steps of {step}"
+            )));
+        }
+    }
+    let unit_count = match (options.unit_count, dialog) {
+        (Some(count), Some(dialog)) => {
+            let (low, high) = (dialog.min_unit_count, dialog.max_unit_count);
+            if !(i64::from(low)..=i64::from(high)).contains(&i64::from(count)) {
+                return Err(MatchSetupError::Options(format!(
+                    "a unit count of {count}, the rules allow {low} to {high}"
+                )));
+            }
+            count
+        }
+        (Some(count), None) => count,
+        (None, Some(dialog)) => u32::try_from(dialog.unit_count).unwrap_or(0),
+        (None, None) => 0,
+    };
+    // The checks of a player's faction: it exists, and a computer player can play it.
+    let check_faction = |setup: &PlayerSetup| -> Result<(), MatchSetupError> {
+        let Some(faction) = skirmish.factions.get(setup.faction) else {
+            return Err(MatchSetupError::UnknownFaction {
+                player: setup.player,
+                faction: setup.faction,
+            });
+        };
+        if matches!(setup.controller, Controller::Ai { .. }) {
+            if let Some((field, building, producer)) =
+                unobtainable_producer(ai, &definitions, faction)
+            {
+                let name = |kind| {
+                    definitions
+                        .building(kind)
+                        .map_or_else(String::new, |def| def.id.clone())
+                };
+                return Err(MatchSetupError::UnobtainableProducer {
+                    player: setup.player,
+                    field,
+                    building: name(building),
+                    producer: name(producer),
+                });
+            }
+            if let Err((field, problem)) = faction_plan_problem(ai, &definitions, faction) {
+                return Err(MatchSetupError::AiPlan {
+                    player: setup.player,
+                    faction: faction.id.clone(),
+                    field,
+                    problem: problem.to_string(),
+                });
+            }
+        }
+        Ok(())
+    };
+    let random = |player: PlayerId| options.random_countries.contains(&player);
     let mut ids = BTreeSet::new();
     let mut starts = BTreeSet::new();
     for setup in players {
@@ -486,7 +726,7 @@ pub fn setup_match_configured(
                 setup.player.0
             )));
         }
-        if setup.faction >= skirmish.factions.len() {
+        if !random(setup.player) && setup.faction >= skirmish.factions.len() {
             return Err(MatchSetupError::UnknownFaction {
                 player: setup.player,
                 faction: setup.faction,
@@ -504,39 +744,29 @@ pub fn setup_match_configured(
                 setup.start
             )));
         }
-        if let Controller::Ai { difficulty } = setup.controller {
-            if difficulty >= ai.difficulties.len() {
-                return Err(MatchSetupError::UnknownDifficulty {
-                    player: setup.player,
-                    difficulty,
-                });
-            }
-            let definitions = world.resource::<Definitions>();
-            if let Some((field, building, producer)) =
-                unobtainable_producer(ai, definitions, &skirmish.factions[setup.faction])
-            {
-                let name = |kind| {
-                    definitions
-                        .building(kind)
-                        .map_or_else(String::new, |def| def.id.clone())
-                };
-                return Err(MatchSetupError::UnobtainableProducer {
-                    player: setup.player,
-                    field,
-                    building: name(building),
-                    producer: name(producer),
-                });
-            }
-            let faction = &skirmish.factions[setup.faction];
-            if let Err((field, problem)) = faction_plan_problem(ai, definitions, faction) {
-                return Err(MatchSetupError::AiPlan {
-                    player: setup.player,
-                    faction: faction.id.clone(),
-                    field,
-                    problem: problem.to_string(),
-                });
-            }
+        if let Controller::Ai { difficulty } = setup.controller
+            && difficulty >= ai.difficulties.len()
+        {
+            return Err(MatchSetupError::UnknownDifficulty {
+                player: setup.player,
+                difficulty,
+            });
         }
+        if !random(setup.player) {
+            check_faction(setup)?;
+        }
+    }
+    let countries = skirmish.countries();
+    if let Some(player) = options
+        .random_countries
+        .iter()
+        .find(|player| !ids.contains(player) || countries.is_empty())
+    {
+        return Err(MatchSetupError::Options(format!(
+            "a random country for player {}, who is not a player of the match or has no \
+             country of the skirmish file to draw from",
+            player.0
+        )));
     }
     // Every start position of the map is a cell of the map with passable terrain, so that the
     // buildings, units, gathering point, and waypoints derived from it lie on the map.
@@ -553,16 +783,31 @@ pub fn setup_match_configured(
         }
     }
 
-    let definitions = world.resource::<Definitions>().clone();
     let mut sorted: Vec<PlayerSetup> = players.to_vec();
     sorted.sort_unstable_by_key(|setup| setup.player);
+    // The random countries, in ascending order of the players' ids.
+    for setup in &mut sorted {
+        if random(setup.player) {
+            let draw = world.resource_mut::<SimRng>().next_u64();
+            // `countries` is not empty (checked above) and far smaller than `u64::MAX`.
+            let index = usize::try_from(draw % (countries.len().max(1) as u64)).unwrap_or(0);
+            setup.faction = countries.get(index).copied().unwrap_or(0);
+        }
+    }
+    for setup in sorted.iter().filter(|setup| random(setup.player)) {
+        check_faction(setup)?;
+    }
+
     {
         let mut state = world.resource_mut::<Players>();
         for setup in &sorted {
-            state
-                .add_with_roster(
+            let faction = &skirmish.factions[setup.faction];
+            match faction.side {
+                // A country's player has no roster: the buildability rule decides (RA1).
+                Some(_) => state.add(setup.player, starting_credits),
+                None => state.add_with_roster(
                     setup.player,
-                    skirmish.starting_credits,
+                    starting_credits,
                     // A human with the unified arsenal may produce all of it and every faction's
                     // original roster (M7 units such as the Meridian's grenadier, raider, heavy
                     // tank and rocket launcher), which the arsenal-only roster had hidden.
@@ -577,14 +822,17 @@ pub fn setup_match_configured(
                                 skirmish
                                     .factions
                                     .iter()
+                                    .filter(|faction| faction.side.is_none())
                                     .flat_map(|faction| faction.roster.iter().copied()),
                             )
                             .collect()
                     } else {
-                        skirmish.factions[setup.faction].roster.clone()
+                        faction.roster.clone()
                     },
-                )
-                .map_err(MatchSetupError::AddPlayer)?;
+                ),
+            }
+            .map_err(MatchSetupError::AddPlayer)?;
+            state.set_country(setup.player, faction.country);
             if setup.controller == Controller::Human
                 && super_players.contains(&setup.player)
                 && let Some(player) = state.get_mut(setup.player)
@@ -606,23 +854,64 @@ pub fn setup_match_configured(
             }
         }
     }
-    let definitions = world.resource::<Definitions>().clone();
     let offset = |start: CellPos, (dx, dy): (i32, i32)| {
         CellPos::new(start.x.saturating_add(dx), start.y.saturating_add(dy))
     };
+    let building_name = |kind| {
+        definitions
+            .building(kind)
+            .map_or_else(String::new, |def| def.id.clone())
+    };
+    let unit_name = |kind| {
+        definitions
+            .unit(kind)
+            .map_or_else(String::new, |def| def.id.clone())
+    };
     let mut buildings = 0;
+    let mut units = 0;
     for setup in &sorted {
         let start = map_def.starts[setup.start];
-        for building in &skirmish.factions[setup.faction].buildings {
-            let name = definitions
-                .building(building.kind)
-                .map_or_else(String::new, |def| def.id.clone());
+        let faction = &skirmish.factions[setup.faction];
+        for building in &faction.buildings {
+            let name = building_name(building.kind);
             let origin = offset(start, building.offset);
             spawn_building(world, setup.player, &name, origin).map_err(|error| {
                 MatchSetupError::Building {
                     player: setup.player,
                     building: name.clone(),
                     origin,
+                    error,
+                }
+            })?;
+            buildings += 1;
+        }
+        // A country: the base unit of its side at the start position, or the Construction Yard
+        // it deploys into with its footprint's origin there, which is where deploying the base
+        // unit in place puts it.
+        let Some(side) = faction
+            .side
+            .and_then(|side| definitions.rules().and_then(|rules| rules.side(side)))
+        else {
+            continue;
+        };
+        if options.mcv_start {
+            let name = unit_name(side.base_unit);
+            spawn_unit(world, setup.player, &name, start).map_err(|error| {
+                MatchSetupError::Unit {
+                    player: setup.player,
+                    unit: name.clone(),
+                    cell: start,
+                    error,
+                }
+            })?;
+            units += 1;
+        } else {
+            let name = building_name(side.construction_yard);
+            spawn_building(world, setup.player, &name, start).map_err(|error| {
+                MatchSetupError::Building {
+                    player: setup.player,
+                    building: name.clone(),
+                    origin: start,
                     error,
                 }
             })?;
@@ -642,9 +931,7 @@ pub fn setup_match_configured(
             let anchor = offset(start, group.offset);
             (
                 setup.player,
-                definitions
-                    .unit(group.kind)
-                    .map_or_else(String::new, |def| def.id.clone()),
+                unit_name(group.kind),
                 (anchor.x, anchor.y),
                 usize::try_from(group.count).unwrap_or(usize::MAX),
             )
@@ -656,7 +943,6 @@ pub fn setup_match_configured(
         .collect();
     let planned =
         plan_starting_units(world.resource::<Grid>(), &groups).map_err(MatchSetupError::Units)?;
-    let mut units = 0;
     for (player, unit, cell) in planned {
         spawn_unit(world, player, unit, cell).map_err(|error| MatchSetupError::Unit {
             player,
@@ -665,6 +951,52 @@ pub fn setup_match_configured(
             error,
         })?;
         units += 1;
+    }
+    // The starting units of the countries' players: on the free cells nearest to the start
+    // position, at least `STARTING_UNIT_DISTANCE` cells from it.
+    for setup in &sorted {
+        let Some(side) = skirmish.factions[setup.faction].side else {
+            continue;
+        };
+        let start = map_def.starts[setup.start];
+        let kinds = starting_units(
+            skirmish,
+            &definitions,
+            side,
+            unit_count,
+            &mut world.resource_mut::<SimRng>(),
+        );
+        let cells = {
+            let grid = world.resource::<Grid>();
+            destination_cells(grid, start, kinds.len(), |cell| {
+                grid.occupant(cell).is_some()
+                    || cell.x.abs_diff(start.x).max(cell.y.abs_diff(start.y))
+                        < STARTING_UNIT_DISTANCE
+            })
+        };
+        if cells.len() < kinds.len() {
+            return Err(MatchSetupError::Units(StartError {
+                owner: setup.player,
+                unit_type: kinds
+                    .first()
+                    .map_or_else(String::new, |&kind| unit_name(kind)),
+                anchor: start,
+                found: cells.len(),
+                required: kinds.len(),
+            }));
+        }
+        for (kind, cell) in kinds.into_iter().zip(cells) {
+            let name = unit_name(kind);
+            spawn_unit(world, setup.player, &name, cell).map_err(|error| {
+                MatchSetupError::Unit {
+                    player: setup.player,
+                    unit: name.clone(),
+                    cell,
+                    error,
+                }
+            })?;
+            units += 1;
+        }
     }
 
     let mut controllers = BTreeMap::new();
@@ -680,13 +1012,35 @@ pub fn setup_match_configured(
                 .map(|other| map_def.starts[other.start])
                 .collect();
             let start = map_def.starts[setup.start];
+            let faction = &skirmish.factions[setup.faction];
+            // `faction_plan_problem` found the plan of the faction's side above.
+            let plan = ai
+                .plan_for(faction)
+                .ok_or_else(|| MatchSetupError::AiPlan {
+                    player: setup.player,
+                    faction: faction.id.clone(),
+                    field: "plans".into(),
+                    problem: "no plan for the side of the faction".into(),
+                })?;
+            // The yard a base unit deploys into, where it stands: the start position.
+            let yard = faction
+                .side
+                .filter(|_| options.mcv_start)
+                .and_then(|side| definitions.rules()?.side(side))
+                .and_then(|side| definitions.building(side.construction_yard))
+                .map(|def| crate::building::Footprint {
+                    origin: start,
+                    width: def.width,
+                    height: def.height,
+                });
             let controller = AiController::new(
                 world.resource::<Grid>(),
                 &definitions,
-                ai.plan_for(&skirmish.factions[setup.faction]),
+                plan,
                 ai.difficulties[difficulty].clone(),
                 start,
                 enemies,
+                yard,
             )
             .ok_or(MatchSetupError::NoGatheringPoint {
                 player: setup.player,
@@ -698,30 +1052,57 @@ pub fn setup_match_configured(
     world.insert_resource(AiPlayers::new(ai.clone(), controllers));
     world.insert_resource(MatchState {
         players: sorted.iter().map(|setup| setup.player).collect(),
+        rules: MatchRules {
+            short_game: options.short_game,
+            superweapons: options.superweapons,
+            mcv_repacks: options.mcv_repacks,
+            crates: options.crates,
+        },
         defeated: BTreeMap::new(),
         outcome: None,
     });
     Ok(MatchStart { buildings, units })
 }
 
-/// The win condition (the `WinCondition` stage, docs/DECISIONS.md D41): players of the match who
-/// own no building are defeated, and the match ends when at most one player is left. Buildings
-/// removed in this tick (destroyed or sold) no longer count: their removal was applied at the sync
-/// points before this stage.
+/// The win condition (the `WinCondition` stage, docs/DECISIONS.md D41, R13): players of the match
+/// who have lost are defeated, and the match ends when at most one player, or only allies, are
+/// left. Without a rules file a player has lost when it owns no building; with one (RA1), when
+/// it owns no building and, in a short game, no base unit of any side, or in a long game no unit
+/// at all (a unit carried by one of its transports counts). Buildings and units removed in this
+/// tick (destroyed or sold) no longer count: their removal was applied at the sync points before
+/// this stage.
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn check_win_condition(
     tick: Res<SimTick>,
     mut state: ResMut<MatchState>,
     mut events: ResMut<Messages<SimEvent>>,
     teams: Res<Players>,
+    definitions: Res<Definitions>,
+    special: Res<crate::SpecialState>,
     buildings: Query<&Owner, bevy_ecs::query::With<Building>>,
+    units: Query<(&crate::SimId, &Owner, &Unit)>,
 ) {
     if state.players.is_empty() || state.outcome.is_some() {
         return;
     }
-    let owners: BTreeSet<PlayerId> = buildings.iter().map(|owner| owner.0).collect();
+    let mut alive: BTreeSet<PlayerId> = buildings.iter().map(|owner| owner.0).collect();
+    if let Some(rules) = definitions.rules() {
+        let short_game = state.rules.short_game;
+        let counts = |kind: UnitKind| !short_game || rules.is_base_unit(kind);
+        for (id, owner, unit) in &units {
+            if counts(unit.kind)
+                || special
+                    .cargo
+                    .get(id)
+                    .is_some_and(|cargo| cargo.iter().any(|passenger| counts(passenger.kind)))
+            {
+                alive.insert(owner.0);
+            }
+        }
+    }
     let players = state.players.clone();
     for player in players {
-        if state.defeated.contains_key(&player) || owners.contains(&player) {
+        if state.defeated.contains_key(&player) || alive.contains(&player) {
             continue;
         }
         state.defeated.insert(player, tick.0);

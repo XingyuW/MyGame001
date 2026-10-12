@@ -282,6 +282,12 @@ fn own(index: &BTreeMap<SimId, Actor>, p: PlayerId, id: SimId) -> Result<&Actor,
 fn unavailable(s: &'static str) -> RejectReason {
     RejectReason::AbilityUnavailable(s)
 }
+/// `hp` of `from` hit points as the same share of `to` hit points, at least 1 and at most `to`
+/// (deploying and undeploying keep the share, rounded down).
+fn share_of(hp: i32, from: i32, to: i32) -> i32 {
+    let share = i64::from(hp.max(0)).saturating_mul(i64::from(to)) / i64::from(from.max(1));
+    i32::try_from(share).unwrap_or(to).clamp(1, to.max(1))
+}
 
 pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), RejectReason> {
     let index = actors(world);
@@ -298,9 +304,16 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
                 .ok_or(unavailable("This unit has no deploy action"))?;
             match meta.role {
                 Role::Mcv => {
-                    let kind = defs
-                        .building_kind("construction_yard")
-                        .ok_or(unavailable("Construction Yard unavailable"))?;
+                    // With a rules file (RA1) the base unit of a side deploys into that side's
+                    // yard; without one, into the only yard of the M9 arsenal.
+                    let kind = match (defs.rules(), a.item) {
+                        (Some(rules), ProductionItem::Unit(unit)) => rules
+                            .side_of_base_unit(unit)
+                            .map(|side| side.construction_yard),
+                        (Some(_), ProductionItem::Building(_)) => None,
+                        (None, _) => defs.building_kind("construction_yard"),
+                    }
+                    .ok_or(unavailable("Construction Yard unavailable"))?;
                     let def = defs
                         .building(kind)
                         .ok_or(unavailable("Construction Yard unavailable"))?;
@@ -342,6 +355,16 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
                         if let Some(w) = w {
                             e.insert(w);
                         }
+                        // With a rules file the yard keeps the share of hit points the unit
+                        // had, so that deploying and undeploying repairs nothing (R12).
+                        if defs.rules().is_some()
+                            && let ProductionItem::Unit(unit) = a.item
+                            && let Some(from) = defs.unit_combat(unit)
+                        {
+                            e.insert(Health {
+                                hit_points: share_of(a.hp, from.hit_points, t.hit_points),
+                            });
+                        }
                     }
                     world
                         .resource_mut::<Messages<SimEvent>>()
@@ -376,6 +399,90 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
                 }
                 _ => return Err(unavailable("This unit has no deploy action")),
             }
+        }
+        Command::Undeploy { building } => {
+            let a = index
+                .get(building)
+                .filter(|a| a.foot.is_some())
+                .ok_or(RejectReason::UnknownBuilding(*building))?;
+            let (ProductionItem::Building(kind), Some(foot)) = (a.item, a.foot) else {
+                return Err(RejectReason::UnknownBuilding(*building));
+            };
+            if a.owner != issued.player {
+                // Another player's building the player does not see is reported like one that
+                // does not exist (docs/DECISIONS.md D30, D33).
+                let seen = !defs.has_combat()
+                    || world
+                        .resource::<Players>()
+                        .get(issued.player)
+                        .is_some_and(|p| p.vision().sees_footprint(foot));
+                return Err(if seen {
+                    RejectReason::NotOwned(*building)
+                } else {
+                    RejectReason::UnknownBuilding(*building)
+                });
+            }
+            if !world.resource::<crate::MatchState>().rules().mcv_repacks {
+                return Err(RejectReason::DisabledByOptions);
+            }
+            let unit = defs
+                .rules()
+                .and_then(|rules| rules.side_of_construction_yard(kind))
+                .map(|side| side.base_unit)
+                .ok_or(unavailable("This building does not undeploy"))?;
+            let speed = defs
+                .unit(unit)
+                .map(|def| def.speed)
+                .ok_or(unavailable("This building does not undeploy"))?;
+            let domain = defs.domain(unit);
+            // The unit stands where the footprint's origin was: once the building is gone the
+            // cell must be ground the unit may stand on, with nothing of its layer in it.
+            let mut grid = world.resource::<Grid>().clone();
+            for c in foot.cells() {
+                grid.uncover(c, a.id);
+            }
+            if !grid.passable_for(foot.origin, domain)
+                || grid.occupant_for(foot.origin, domain).is_some()
+            {
+                return Err(unavailable("No room to undeploy"));
+            }
+            {
+                let mut grid = world.resource_mut::<Grid>();
+                for c in foot.cells() {
+                    grid.uncover(c, a.id);
+                }
+                grid.register_domain(a.id, domain);
+                grid.claim(foot.origin, a.id);
+            }
+            if let Some(p) = world.resource_mut::<Players>().get_mut(a.owner) {
+                p.repairing.remove(&a.id);
+            }
+            world.resource_mut::<SpecialState>().charge.remove(&a.id);
+            let mut e = world.entity_mut(a.entity);
+            e.remove::<(Building, crate::Producer, Weapon)>();
+            e.insert(unit_bundle(a.id, a.owner, unit, speed, foot.origin));
+            if let Some(t) = defs.unit_combat(unit) {
+                let (c, w) = combat_components(t);
+                e.insert(c);
+                if let Some(w) = w {
+                    e.insert(w);
+                }
+                // The unit keeps the share of hit points the yard had (R12).
+                if let Some(from) = defs.building_combat(kind) {
+                    e.insert(Health {
+                        hit_points: share_of(a.hp, from.hit_points, t.hit_points),
+                    });
+                }
+            }
+            world
+                .resource_mut::<Messages<SimEvent>>()
+                .write(SimEvent::BuildingUndeployed {
+                    player: a.owner,
+                    building: a.id,
+                    kind,
+                    unit: a.id,
+                    into: unit,
+                });
         }
         Command::Interact { unit, target } => {
             let a = own(&index, issued.player, *unit)?;
@@ -896,7 +1003,7 @@ pub(crate) fn advance(world: &mut World) {
                 .carrier_flights
                 .get(&a.id)
                 .copied();
-            let base = carrier.and_then(|id| index.get(&id)).or_else(|| index.values().filter(|b|b.owner==a.owner&&matches!(b.item,ProductionItem::Building(k) if defs.production(a.item).is_some_and(|p|p.producer==k))).min_by_key(|b|a.cell.x.abs_diff(b.cell.x)+a.cell.y.abs_diff(b.cell.y)));
+            let base = carrier.and_then(|id| index.get(&id)).or_else(|| index.values().filter(|b|b.owner==a.owner&&matches!(b.item,ProductionItem::Building(k) if defs.production(a.item).is_some_and(|p|defs.same_factory(k,p.producer)))).min_by_key(|b|a.cell.x.abs_diff(b.cell.x)+a.cell.y.abs_diff(b.cell.y)));
             if let Some(base) = base {
                 if distance(a, base) <= 2 {
                     if carrier.is_some() {
