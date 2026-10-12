@@ -1,6 +1,7 @@
 //! Follow-up of 2026-10-05: unlock paths, the "unlock all" match option and several independent
-//! computer players, with the shipped data (arsenal included, as the game loads it) on the
-//! shipped maps.
+//! computer players, with the legacy ruleset fixture (the data shipped before the RA2 parity
+//! programme, arsenal included: `crates/sim/tests/fixtures/data/legacy`, docs/DECISIONS.md R9) on
+//! the shipped maps.
 //!
 //! Every test drives the simulation only through the player's commands (`CommandQueue`), as the
 //! interface does: production is queued, progresses, is placed or leaves its producer, and the
@@ -32,8 +33,13 @@ struct Data {
     ai: AiDefinitions,
 }
 
+/// The legacy ruleset fixture of the `sim` crate.
+fn legacy() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../sim/tests/fixtures/data/legacy")
+}
+
 fn data() -> Data {
-    let dir = assets().join("data");
+    let dir = legacy();
     let definitions = load_match_definitions(
         dir.join("units.ron"),
         dir.join("economy.ron"),

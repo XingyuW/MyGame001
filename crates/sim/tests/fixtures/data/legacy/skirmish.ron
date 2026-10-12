@@ -1,0 +1,115 @@
+// Skirmish definitions, schema version 2 (PLAN.md section 7, M6 and M7; docs/DECISIONS.md D40,
+// D48).
+//
+// starting_credits: credits of every player at the start of a match
+// factions:  roster_buildings and roster_units, the building and unit types a player of the
+//            faction may produce (M7); what a player who plays the faction starts with, placed
+//            relative to its start position: buildings (type and the offset of the footprint's
+//            origin from the start, in cells; the first is the construction yard at the start
+//            itself) and groups of units (type, the offset of the cell they gather around, and how
+//            many). Names as in units.ron and economy.ron.
+// maps:      the maps of the skirmish menu: id (the map file is maps/<id>/<id>.tmx) and 2 to 10
+//            start positions; the human player starts at the first, computer players at the
+//            following ones in order, so a match with fewer players uses the first entries. Every
+//            start has clear building ground, ore within 10 cells and a land path to the others;
+//            on the point-symmetric generated maps they come in mirrored pairs, so bases are equal.
+//            A start is the origin of the 3 x 3 construction yard, as the factions above place it.
+//            On the large maps (192 to 256 cells a side) the first pair is the two bases farthest
+//            apart, so a one-against-one match is fought across the whole map. The list is printed
+//            by `cargo run -p game --example gen_maps -- starts`.
+//
+//            Every map is played by 2 to 10 players, whatever it lists here. Two players play on
+//            the map file as it is. Every further player adds an eighth to the map's width and
+//            height (ten players: twice the size) while it stays within 256 cells a side, the
+//            largest a map may be, so the largest maps are played as their files are; the starts
+//            below move with their ground.
+//            A match with more players than a map lists starts gets the missing ones made on the
+//            enlarged map: on dry ground reachable from the first start, at least 22 cells from
+//            every other start, in mirrored pairs, each with cleared building ground and an ore
+//            field (sim::enlarged_map, crates/sim/src/map_scale.rs). The game checks at startup
+//            that every map sets up for every player count.
+//
+// The Vanguard is quick and versatile (light tanks, artillery, gun turrets); the Meridian is
+// heavy and slow (heavy tanks, rocket launchers, rocket towers). Balance data (docs/DECISIONS.md
+// D51).
+(
+    schema_version: 2,
+    starting_credits: 5000,
+    factions: [
+        (
+            id: "vanguard",
+            roster_buildings: [
+                "construction_yard",
+                "power_plant",
+                "refinery",
+                "barracks",
+                "war_factory",
+                "tech_center",
+                "gun_turret",
+            ],
+            roster_units: [
+                "rifleman",
+                "rocket_soldier",
+                "scout",
+                "light_tank",
+                "artillery",
+                "harvester",
+            ],
+            buildings: [(building: "construction_yard", x: 0, y: 0)],
+            units: [
+                (unit: "light_tank", x: 4, y: 1, count: 3),
+                (unit: "scout", x: 1, y: 4, count: 2),
+                (unit: "rifleman", x: 4, y: 4, count: 4),
+            ],
+        ),
+        (
+            id: "meridian",
+            roster_buildings: [
+                "construction_yard",
+                "power_plant",
+                "refinery",
+                "barracks",
+                "war_factory",
+                "tech_center",
+                "rocket_tower",
+            ],
+            roster_units: [
+                "conscript",
+                "grenadier",
+                "raider",
+                "heavy_tank",
+                "rocket_launcher",
+                "harvester",
+            ],
+            buildings: [(building: "construction_yard", x: 0, y: 0)],
+            units: [
+                (unit: "heavy_tank", x: 4, y: 1, count: 2),
+                (unit: "raider", x: 1, y: 4, count: 2),
+                (unit: "conscript", x: 4, y: 4, count: 5),
+            ],
+        ),
+    ],
+    maps: [
+        (id: "demo", starts: [(x: 15, y: 37), (x: 52, y: 42), (x: 4, y: 1), (x: 1, y: 19), (x: 16, y: 54), (x: 21, y: 2)]),
+        (id: "crossroads", starts: [(x: 9, y: 9), (x: 44, y: 44), (x: 3, y: 34), (x: 50, y: 19), (x: 18, y: 31), (x: 35, y: 22)]),
+        (id: "riverlands", starts: [(x: 8, y: 21), (x: 53, y: 24), (x: 5, y: 3), (x: 56, y: 42)]),
+        (id: "liberty_bay", starts: [(x: 29, y: 29), (x: 224, y: 224), (x: 25, y: 113), (x: 228, y: 140), (x: 113, y: 25), (x: 140, y: 228), (x: 159, y: 59), (x: 94, y: 194), (x: 59, y: 159), (x: 194, y: 94)]),
+        (id: "frostline", starts: [(x: 49, y: 41), (x: 172, y: 180), (x: 41, y: 117), (x: 180, y: 104), (x: 121, y: 29), (x: 100, y: 192), (x: 161, y: 25), (x: 60, y: 196), (x: 31, y: 165), (x: 190, y: 56)]),
+        (id: "oasis_gulf", starts: [(x: 29, y: 89), (x: 224, y: 100), (x: 69, y: 33), (x: 184, y: 156), (x: 121, y: 33), (x: 132, y: 156), (x: 181, y: 33), (x: 72, y: 156), (x: 225, y: 45), (x: 28, y: 144)]),
+        (id: "coral_archipelago", starts: [(x: 41, y: 41), (x: 212, y: 212), (x: 129, y: 25), (x: 124, y: 228), (x: 25, y: 113), (x: 228, y: 140), (x: 193, y: 57), (x: 60, y: 196), (x: 229, y: 17), (x: 24, y: 236)]),
+        (id: "continental_divide", starts: [(x: 33, y: 33), (x: 220, y: 220), (x: 201, y: 33), (x: 52, y: 220), (x: 73, y: 81), (x: 180, y: 172), (x: 125, y: 25), (x: 128, y: 228), (x: 25, y: 125), (x: 228, y: 128)]),
+        (id: "steel_harbor", starts: [(x: 29, y: 29), (x: 224, y: 224), (x: 25, y: 217), (x: 228, y: 36), (x: 125, y: 25), (x: 128, y: 228), (x: 181, y: 25), (x: 72, y: 228), (x: 69, y: 189), (x: 184, y: 64)]),
+        (id: "glacier_pass", starts: [(x: 25, y: 29), (x: 212, y: 208), (x: 21, y: 101), (x: 216, y: 136), (x: 25, y: 197), (x: 212, y: 40), (x: 49, y: 153), (x: 188, y: 84)]),
+        (id: "red_canyon", starts: [(x: 17, y: 17), (x: 172, y: 172), (x: 13, y: 101), (x: 176, y: 88), (x: 101, y: 13), (x: 88, y: 176), (x: 147, y: 41), (x: 42, y: 148)]),
+        (id: "jungle_delta", starts: [(x: 25, y: 33), (x: 228, y: 188), (x: 201, y: 25), (x: 52, y: 196), (x: 129, y: 21), (x: 124, y: 200), (x: 29, y: 153), (x: 224, y: 68)]),
+        (id: "pacific_atoll", starts: [(x: 71, y: 71), (x: 182, y: 182), (x: 45, y: 141), (x: 208, y: 112), (x: 141, y: 45), (x: 112, y: 208)]),
+        (id: "iron_isthmus", starts: [(x: 45, y: 45), (x: 208, y: 176), (x: 109, y: 37), (x: 144, y: 184), (x: 33, y: 109), (x: 220, y: 112)]),
+        (id: "arctic_floes", starts: [(x: 45, y: 45), (x: 192, y: 192), (x: 137, y: 37), (x: 100, y: 200), (x: 37, y: 137), (x: 200, y: 100)]),
+        (id: "ember_caldera", starts: [(x: 95, y: 33), (x: 158, y: 220), (x: 33, y: 95), (x: 220, y: 158), (x: 159, y: 33), (x: 94, y: 220), (x: 33, y: 159), (x: 220, y: 94)]),
+        (id: "frozen_sound", starts: [(x: 29, y: 31), (x: 224, y: 222), (x: 221, y: 31), (x: 32, y: 222), (x: 125, y: 27), (x: 128, y: 226), (x: 77, y: 25), (x: 176, y: 228), (x: 173, y: 25), (x: 80, y: 228)]),
+        (id: "harvest_plains", starts: [(x: 29, y: 29), (x: 224, y: 224), (x: 221, y: 37), (x: 32, y: 216), (x: 125, y: 21), (x: 128, y: 232), (x: 69, y: 81), (x: 184, y: 172), (x: 181, y: 77), (x: 72, y: 176)]),
+        (id: "black_water", starts: [(x: 33, y: 33), (x: 220, y: 220), (x: 215, y: 45), (x: 38, y: 208), (x: 125, y: 25), (x: 128, y: 228), (x: 37, y: 125), (x: 216, y: 128), (x: 120, y: 70), (x: 133, y: 183)]),
+        (id: "thousand_lakes", starts: [(x: 31, y: 31), (x: 222, y: 222), (x: 215, y: 41), (x: 38, y: 212), (x: 125, y: 23), (x: 128, y: 230), (x: 35, y: 121), (x: 218, y: 132), (x: 170, y: 90), (x: 83, y: 163)]),
+        (id: "wheel_of_worlds", starts: [(x: 32, y: 96), (x: 221, y: 157), (x: 186, y: 46), (x: 67, y: 207), (x: 68, y: 46), (x: 185, y: 207), (x: 222, y: 96), (x: 31, y: 157), (x: 127, y: 27), (x: 126, y: 226)]),
+    ],
+)
