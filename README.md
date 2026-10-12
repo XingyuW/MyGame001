@@ -86,6 +86,60 @@ These follow Red Alert 2 since milestone RA2 of the parity programme (times are 
   repair. Ships are repaired the same way at a Naval Shipyard. Nothing is repaired for free by
   standing near a depot any more.
 
+## Armour, warheads and weapons
+
+Since milestone RA3 of the parity programme units and buildings fight with the armour,
+warheads and weapons of Red Alert 2 (a range is in cells; a reload at game speed 1×).
+
+* **Armour.** Every unit and building has one of eleven armour types: none (GI, Engineer,
+  Rocketeer), flak (Conscript, Tanya), plate (Tesla Trooper, Desolator), light (IFV, V3,
+  aircraft), medium (the miners), heavy (tanks, most ships), wood (Power Plant, Refinery, War
+  Factory), steel (Barracks, the defences), concrete (Construction Yard, walls, superweapons)
+  and two special ones (the Terror Drone). Point at a unit or building to read it under its
+  name.
+* **Warheads.** A weapon deals its damage through a warhead, which takes a percentage of it
+  for the target's armour. A GI's bullets (15) deal all of it to unarmoured infantry, a
+  quarter to a tank and to concrete; a Grizzly's shell (65) deals all of it to a tank, 65
+  percent to a Power Plant and a quarter to infantry; a Tesla Trooper's bolt (50) all of it
+  to a tank and half to buildings. What a weapon cannot damage at all it does not fire at:
+  bullets do nothing to walls, an Attack Dog nothing to a vehicle.
+* **Splash.** Most shells, missiles and bombs damage everything within a radius of where they
+  land, less with the distance, **your own units too**: a tank's shell a third of a cell, an
+  IFV's missile half a cell, a Destroyer's shell and a V3 rocket 1 cell, a Kirov's bomb and a
+  Grand Cannon's shell 2 cells, a Demolition Truck 8, a nuclear missile 10. A building takes
+  a hit for every cell of it inside the radius, so wide blasts are worst for large buildings:
+  a nuclear strike destroys a Power Plant and leaves a Construction Yard standing with about
+  three fifths of its strength.
+* **Two weapons.** Some units carry a second weapon and use whichever fits the target: the
+  Apocalypse its guns against the ground and its missiles against aircraft, the Flak Track,
+  the Flak Trooper and the Sea Scorpion a flak gun for each, the Destroyer its gun against
+  ships and depth charges against submarines. An IFV's missiles reach aircraft 4 cells beyond
+  their range of 6.
+* **What can attack what.** Aircraft are hit only by weapons for the air: flak, the Patriot,
+  the Aegis, the IFV, the Apocalypse's missiles, the Rocketeer, the GI's and the tanks' guns
+  not. Submerged units (Typhoon, Dolphin, Giant Squid) are hit only by the Destroyer's depth
+  charges, the Typhoon's torpedoes, the Dolphin and the squid; they in turn attack nothing on
+  land. The Sniper and Tanya shoot at vehicles and buildings only when ordered to (1 percent).
+  An order to attack something a unit can never hit ends at once.
+* **Bursts and minimum range.** The Black Eagle, the Harrier, the IFV and the Apocalypse fire
+  volleys of two shots a quarter of a second apart and then reload. A V3 Launcher cannot fire
+  nearer than 5 cells, a Dreadnought nearer than 8, a Grand Cannon nearer than 3: ordered to
+  attack something closer, a unit backs away first.
+* **Flak is inaccurate.** Its bursts land around the target, wider the farther it is, and
+  damage what is within a cell of them.
+* **Damage states.** At half its strength a unit or building is **yellow** and trails thin
+  grey smoke, at a quarter **red** with thick black smoke. A vehicle or ship that is yellow or
+  red moves at three quarters of its speed; infantry and aircraft do not slow down.
+* **Still the game's own until later milestones.** The V3 Launcher's and the Dreadnought's
+  missiles are shots that cannot be intercepted, the Aircraft Carrier launches two aircraft of
+  the Harrier's kind, and the Destroyer's depth charges are fired from the ship (RA4 makes
+  them the missiles and aircraft of Red Alert 2, with veterancy and the elite weapons). C4,
+  the Chrono Legionnaire's erasing, the dog's and the Terror Drone's instant kills, the Giant
+  Squid, mind control, the deployed GI, Desolator and Yuri, radiation after a nuclear strike,
+  and the timing of the superweapons keep the simpler mechanics they had (RA6).
+  `crates/sim/tests/reference/ra2_differences.tsv` lists every value that differs from Red
+  Alert 2's `rules.ini`, with its reason.
+
 [Construction system report](docs/CONSTRUCTION_SYSTEM.md) documents the roster, mechanics,
 integration and tests as they were before the Red Alert 2 parity programme, which
 `docs/RA2_PARITY_PLAN.md` describes milestone by milestone (`docs/STATUS.md` says how far it is).
