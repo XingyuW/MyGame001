@@ -1696,3 +1696,172 @@ and the smoke tests:
   queues the first buildable building once the yard stands; it fails if nothing was queued 40
   ticks after the deploy order.
 * Maps still grow with the number of players as before; the MAP GROWTH option of R4 is RA1-C's.
+
+### R17. RA1-C: the lobby in the menu
+
+1. **Layout.** The menu is three blocks side by side under the heading lines: the rows of the
+   match (map, enemy players, team mode, map growth, game speed, team colour, credits, unit
+   count), the rows of its rules (MCV start, short game, superweapons, crates, MCV repacks, then
+   the extensions Super Me, unit speed, tech tree) and the PLAYERS panel, with DEPLOY, Options
+   and Quit in one row below. Every piece has a fixed size, so the menu covers the same ground in
+   every window that holds it: 1247 x 566 logical pixels (`skirmish::menu_size`), within the
+   1280 x 720 of the smallest window the brief names (`MENU_FIT`). A unit test adds the measures
+   up and checks every text a row can show against the width of its place (the interface font
+   is FiraMono, 0.6 of the font size per character); the smoke test lays the fullest menu out
+   and measures it (item 4 of R20).
+2. **The PLAYERS panel holds the country and difficulty rows.** One line per player: colour,
+   name (`You - Blue`, `AI 2 - Gold`), country with `<` `>`, and for a computer player its
+   difficulty with `<` `>`. The former rows "Starting force", "Enemy force" and "Difficulty" are
+   gone. A country row lists the factions of the skirmish file in its order, each with its side
+   (`France (Allied)`), and RANDOM as the last entry. The human player starts on the first
+   country (America), every computer player on RANDOM and the middle difficulty (Medium). The
+   panel is as high as ten players need whatever their number, so that the buttons under it do
+   not move with the enemy players row.
+3. **Menu state to match options.** `MenuSelection::players` and `MenuSelection::options` are
+   the pure functions that make `PlayerSetup` and `sim::MatchOptions` from the rows; `MatchPlan`
+   carries the options whole (`options`, in place of its four option fields). The credits and
+   the unit count are `None` until their row is changed, which is the simulation's "the default
+   of the data files" and what the row shows; a row wraps around at both ends, so one press of
+   `>` from 10000 gives 5000. The lobby's switches start from `sim::MatchOptions::default()`,
+   so the game holds no second copy of the lobby defaults. `MenuSelection::initial` is the
+   lobby; `MenuSelection::versus` is the same with a fixed country for every computer player
+   (America against the Soviet countries in turn), which the review scenes and the tests use
+   that must know what a match holds before it is set up.
+4. **MAP GROWTH** (R4) is a row of the game, not an option of the simulation: off, `match_map`
+   returns the map of the file with its start positions, and the enemy players row ends at the
+   start positions the file lists less one (3 to 9 with the shipped maps); switching it off, or
+   moving to a map with fewer starts, keeps as many enemies as fit. The catalogue check at
+   startup sets every map up for 2 to 10 players with growth on, as before, and once more as
+   filed with a player on every start position of the file; it logs how many trial setups each
+   country was a player of.
+5. **RANDOM is drawn by the simulation** (`MatchOptions::random_countries`, from `SimRng`), so a
+   restart draws again. The game reads the countries back after the setup (`MatchPlayers`): a
+   notice says which country the human player plays ("You play France (Allied)"); the notices
+   and the hover label name another player by colour and country ("Blue Player (France) has
+   been defeated"); and a list of the players with country, side, difficulty and "defeated" is
+   shown over the map while the match is paused or over. This list is the "PLAYERS panel once
+   the match starts" of the brief: the menu's own panel is not on screen during a match.
+6. **End screen.** Under VICTORY, DEFEAT or DRAW a line says what decided the match by its
+   rule: "Short game: you have no building and no MCV left", "Long game: no enemy has a
+   building or a unit left", and so on (`skirmish::end_reason`).
+7. **Crates.** The row exists and reaches `MatchRules::crates`; the interface says nothing
+   about when crates arrive.
+
+### R18. RA1-C: what the sidebar lists (the brief's rule, made to fit the data)
+
+The brief asks that the sidebar list "only items that some building the player owns could build
+under the RA2 rule (factory of the item's group and owner side, country not excluded)", with
+items whose prerequisites are missing listed as locked, and that an Allied player see no Soviet
+card. With the ported data the first does not give the second: the ini lets every country own
+every *building* (`Owner` lists all nine), so the owner side of a factory separates the units of
+the sides but not their buildings. What ties a building to a side is a prerequisite: the
+Construction Yard of that side, or (the walls) a barracks that only that yard builds.
+
+The rule implemented (`sidebar::item_listed`, `reachable_buildings`):
+
+1. some building the player owns is a factory of the item's kind and of a side in its owner
+   list (`sim::produces`); and
+2. the player could queue the item if it owned every building it can come to own **by building
+   alone** from what it owns (the closure of `sim::check_buildable` over the building types,
+   which for a player with its yard is the tech tree of its country, `sim::country_tree`).
+
+So a card is locked when its missing prerequisites are within the player's reach, and absent
+when one of them can only be captured. Consequences, each asserted in
+`sidebar::tests::a_tab_lists_only_what_a_building_of_the_player_could_build`: no card before the
+MCV has deployed; no infantry card before a barracks stands (rule 1; Red Alert 2 shows none
+either); an Allied player with its yard sees the Allied buildings and no Soviet one; after
+capturing a Soviet Barracks it sees the Conscript, the Tesla Trooper, the engineer and dog, and
+the Soviet walls, and not Yuri or the Flak Trooper, which need buildings of the Soviet yard; a
+country's special is no card for another country; with superweapons off their four buildings
+are no cards; an item in a queue stays listed whatever became of its factory. With ALL UNLOCKED
+the simulation waives every prerequisite (R10), so a yard builds the buildings of both sides,
+and the sidebar lists what can be queued.
+
+**Difference from Red Alert 2**, kept on purpose ("as today" in the brief): the original shows
+no cameo at all for an item whose prerequisites are missing; this game shows it as LOCKED with
+the reason when the player can build what is missing.
+
+### R19. RA1-C: repacking the Construction Yard (replaces the last item of R12)
+
+A left click on the player's Construction Yard selects it (`selection::own_yards`; it has no
+rally point, so the cursor offers none and a right click orders nothing). While it is selected,
+no unit is selected and the match has "MCV repacks" on, `D` issues `Command::Undeploy` for it,
+and a button "Repack the Construction Yard (D)" stands over the superweapon buttons at the bottom
+left; the hint line says the same. With the option off there is neither button, hint nor command
+(`special_controls::repack_command`). The interim control of RA1-B, D with the cursor over a
+building and nothing selected, is removed: it sent `Undeploy` for any building under the cursor.
+The superweapon buttons moved 18 pixels up, off the hint line they used to cover.
+
+### R20. RA1-C: the smoke flow, the review captures, two labels, the starting credits
+
+1. **Smoke flow.** A long run starts four matches instead of three, each chosen by the menu's
+   pure functions as its buttons choose it, and compares every one with its choices after ten
+   ticks (`smoke::match_problems`): (a) every lobby row away from its default (a Soviet country,
+   5000 credits, unit count 0, long game, free for all, superweapons and crates off, MAP GROWTH
+   on with five players on the four starts of Riverlands, fixed countries and other difficulties
+   for two computer players, Super Me, ALL UNLOCKED), in which the run deploys the MCV, repacks
+   the yard with the game's control and deploys it again, checking the simulation and the cards
+   after each step; (b) its restart; (c) a match that starts with the yards, MCV repacks off and
+   the standard tech tree; (d) the lobby's defaults with RANDOM computer players, to which the
+   checks of M1 to M7 apply. No tick limit of the smoke test was changed.
+2. **Unit tests of the flow.**
+   `smoke::tests::the_flows_menu_presses_choose_its_matches_and_restore_the_lobby` makes the
+   same presses without a window and sets the matches up, so a change of the menu that would
+   break the smoke run fails in `cargo test` first.
+3. **Captures with the display off.** Captures of the window are black while the session is
+   locked, which it was for this work. `MYGAME_MENU_REVIEW=<dir>` draws the interface to an
+   image (1280 x 720, or `MYGAME_MENU_REVIEW_SIZE`) and saves that; `docs/screenshots/ra1/` holds
+   five such captures. They show what the game draws; whether it looks right **requires user
+   verification**.
+4. **Layout check in the smoke run.** In the first menu the run shows the fullest menu (ten
+   players, the longest map, country and option texts) for four frames and measures the laid-out
+   nodes: all 73 buttons, none overlapping, every changing text inside its place, the whole no
+   larger than `menu_size()` and 1280 x 720, and inside the window.
+5. **Two labels shortened** in the generator's own table (`scripts/generate_ra2_data.py`, not
+   ported values): "American Airforce Command" (was "... Headquarters") and "Soviet MCV" (was
+   "Soviet Mobile Construction Vehicle (MCV)"), which did not fit a production card.
+6. **Starting credits** (debt of R9 item 8). The game's catalogue check now rejects a skirmish
+   file whose `starting_credits` the lobby of the rules file does not offer (outside its range
+   or off its step), naming file, field, value and range. It is checked there and not in
+   `sim::load_skirmish`, whose tests load fixtures with credits of 0 to 1,000,000 beside rules
+   files and must keep passing unchanged.
+
+### R21. RA1-C: tests adapted (none deleted, ignored or weakened)
+
+All in `crates/game/src` (the tests of `crates/game/tests/` name no menu row and are unchanged).
+
+| Test | What changed and why |
+|---|---|
+| `skirmish::tests::menu_bundles_spawn_without_duplicate_components` | 73 buttons (`Row::COUNT * 2 + 3`) instead of 23; also asserts one `<` and one `>` per row |
+| `skirmish::tests::the_production_catalogue_loads_every_map_faction_and_difficulty` | the middle difficulty is asserted for every computer player's row |
+| `skirmish::tests::every_shipped_match_can_be_set_up_for_every_faction_pairing` | the selection is made with `with_countries` and a difficulty per slot; same 5103 setups and assertions |
+| `skirmish::tests::the_menu_chooses_several_independent_enemies_with_distinct_colours` | runs with MAP GROWTH on (off is the default, R4) and fixed countries (`versus`); the player names come from `player_tag` (`player_line` held the country too, which now has its own row); assertions unchanged |
+| `skirmish::tests::menu_buttons_cycle_through_each_row_and_start_only_a_valid_choice` | the faction, opponent and difficulty rows are the country and difficulty rows of a player; **expectation changed**: `<` from the first country gives RANDOM (the last entry), then the last country; `>` on a computer player's row goes from RANDOM to the first country; rows that do not exist do nothing |
+| `skirmish::tests::the_human_plays_the_first_start_and_the_computer_the_second`, `the_end_screen_names_the_outcome_and_restarts_the_last_match` | the selection literal (`with_countries`, per slot difficulties); same expected players and effects |
+| `skirmish::tests::row_texts_name_the_chosen_entries` | the difficulty row of computer player 1; **expectation changed**: the id is shown with a capital ("Medium") |
+| `sim_host::tests::demo_host`, `menu_host` and the tests on them; `match_setup_installs_the_loaded_match_or_ends_the_game_with_an_error`, `commands_pending_when_a_match_is_replaced_are_discarded_with_a_log_line` | `MenuSelection::versus` (the menu's own first choice now has a RANDOM opponent) and `MatchPlan::options`; assertions unchanged |
+| `sim_host::tests::menu_matches_ally_the_computer_players_and_install_speed_and_scenery` | the selection has MAP GROWTH on, which the enlarged map it asserts needs since R4 |
+| `units::tests::the_demo_map_holds_every_starting_unit_on_its_own_free_cell`, `buildings::tests::the_demo_map_holds_the_starting_buildings_and_units` | `versus`, `selection.players()`, `selection_totals`; assertions unchanged |
+| `sidebar::tests::items_outside_the_roster_of_the_players_faction_are_neither_available_nor_shown`, `cards_follow_the_tech_tree_and_unlock_all_waives_only_prerequisites` | `item_status` takes whether superweapons are on (true, as before) |
+| `smoke::tests::a_run_passes_only_with_the_menu_the_game_flow_and_the_computer_player` | **expectation changed**: a long run starts 4 matches ("2 of 4 matches started") |
+| `smoke::tests::the_demo_match_expects_all_of_its_starting_units`, `the_demo_player_can_queue_a_building_with_its_starting_buildings`, `an_exit_before_the_last_frame_fails_the_run` | `versus`, `selection_totals`, `selection.faction()`, `SmokeTest::new`; assertions unchanged |
+| `visual_review::tests` (4 tests) | the scene's choices carry the yard start (`scene(choice)`), `selection_totals`; assertions unchanged |
+| `hover_info::tests::labels_name_the_type_owner_and_health`, `notices::tests::a_defeat_is_reported_in_the_colour_name_of_the_defeated_player` | `label_text` and `defeat_text` take the name or country of the player (none: the texts asserted before); assertions with countries added |
+
+New in RA1-C (16 tests, all in the game crate): `skirmish` 9
+(`the_menu_opens_with_the_lobby_of_red_alert_2`,
+`the_credits_and_unit_count_rows_cover_their_ranges_and_reach_the_match`,
+`every_on_off_row_sets_its_option_of_the_match_and_no_other`,
+`country_and_difficulty_rows_set_each_player_of_the_match`,
+`random_countries_are_drawn_by_the_simulation_and_named_once_the_match_starts`,
+`map_growth_is_an_option_and_off_limits_the_enemies_to_the_starts_of_the_file`,
+`the_menu_and_its_longest_texts_fit_the_smallest_window`,
+`the_end_screen_says_what_decided_the_match_by_its_rule`,
+`the_catalogue_rejects_starting_credits_the_lobby_does_not_offer`), `sidebar` 1
+(`a_tab_lists_only_what_a_building_of_the_player_could_build`), `special_controls` 1
+(`a_selected_construction_yard_is_repacked_only_with_the_option_on`), `selection` 1
+(`a_click_on_the_construction_yard_selects_it_without_a_rally_point`), `notices` 1
+(`notices_name_the_country_a_player_plays`), `smoke` 3
+(`a_run_passes_only_with_the_menu_laid_out_the_cards_listed_and_the_flow_checked`,
+`the_layout_check_finds_a_menu_that_is_too_large_overlaps_or_cuts_a_text`,
+`the_flows_menu_presses_choose_its_matches_and_restore_the_lobby`).
