@@ -45,6 +45,17 @@ pub struct Vision {
 }
 
 impl Vision {
+    pub(crate) fn conceal(&mut self, centre: CellPos, radius: u32) {
+        for y in centre.y.saturating_sub(radius as i32)..=centre.y.saturating_add(radius as i32) {
+            for x in centre.x.saturating_sub(radius as i32)..=centre.x.saturating_add(radius as i32)
+            {
+                if let Some(i) = self.index(CellPos::new(x, y)) {
+                    self.cells[i] &= !VISIBLE;
+                }
+            }
+        }
+    }
+
     fn index(&self, cell: CellPos) -> Option<usize> {
         let x = u32::try_from(cell.x).ok()?;
         let y = u32::try_from(cell.y).ok()?;
@@ -119,7 +130,7 @@ impl Vision {
     /// Reveals the cells within `sight` of the rectangle of cells `x0..=x1`, `y0..=y1`
     /// (equation 6, measured to the rectangle's nearest cell). Computed in `i64`, so no source
     /// position overflows (invariant I12).
-    fn reveal(&mut self, (x0, y0, x1, y1): (i64, i64, i64, i64), sight: u32) {
+    pub(crate) fn reveal(&mut self, (x0, y0, x1, y1): (i64, i64, i64, i64), sight: u32) {
         let s = i64::from(sight);
         let (width, height) = (i64::from(self.width), i64::from(self.height));
         // Only cells inside the map and within `sight` of the rectangle are visited, so every

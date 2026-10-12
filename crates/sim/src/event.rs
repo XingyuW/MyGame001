@@ -14,10 +14,18 @@ use crate::command::{Command, PlayerId, RejectReason};
 use crate::definitions::UnitKind;
 use crate::economy_defs::{BuildingKind, ProductionItem};
 use crate::id::SimId;
+use crate::map::CellPos;
 
 /// Something that happened during a tick.
 #[derive(Message, Clone, Debug, PartialEq, Eq)]
 pub enum SimEvent {
+    StrategicActivated {
+        player: PlayerId,
+        building: SimId,
+        target: crate::CellPos,
+        role: crate::Role,
+        radius: u32,
+    },
     /// The command was invalid and changed no state.
     CommandRejected {
         player: PlayerId,
@@ -105,6 +113,13 @@ pub enum SimEvent {
         unit: SimId,
         target: SimId,
         reason: AttackEnd,
+    },
+    /// The scenery in `cell` (`crate::props`) lost its last hit point: it was removed and the
+    /// cell is open ground.
+    PropDestroyed {
+        prop: SimId,
+        cell: CellPos,
+        kind: crate::props::PropKind,
     },
     /// The player of the match owns no building any more and is defeated (M6, docs/DECISIONS.md
     /// D41).

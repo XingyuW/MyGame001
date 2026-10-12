@@ -64,6 +64,7 @@ pub struct UnitDef {
 #[derive(Resource, Clone, Debug, Default, PartialEq, Eq)]
 pub struct Definitions {
     units: Vec<UnitDef>,
+    pub(crate) arsenal: crate::arsenal::Arsenal,
     /// Empty unless the definitions were loaded with an economy file ([`load_definitions`]).
     economy: EconomyDefinitions,
     /// Empty unless a combat file was loaded ([`Definitions::with_combat`]); then every unit and
@@ -129,14 +130,18 @@ impl Definitions {
             .flatten()
     }
 
-    /// Whether some unit type is produced by buildings of type `kind` (such buildings have a
-    /// rally point).
+    /// Whether units leave buildings of type `kind`, which therefore have a rally point: some
+    /// unit type is produced by them, or they duplicate trained infantry (the arsenal's cloner,
+    /// whose copies would otherwise all stand around it).
     pub fn produces_units(&self, kind: BuildingKind) -> bool {
         self.economy
             .unit_production
             .iter()
             .flatten()
             .any(|production| production.producer == kind)
+            || self
+                .metadata(ProductionItem::Building(kind))
+                .is_some_and(|entry| entry.role == crate::Role::Cloner)
     }
 
     /// Largest distance in cells between a new building and a building of its owner
@@ -229,6 +234,7 @@ impl Definitions {
             }
             hasher.write(&unit.speed.to_le_bytes());
         }
+        self.arsenal.hash_into(hasher);
         self.economy.hash_into(hasher);
         self.combat.hash_into(hasher);
     }
@@ -392,6 +398,7 @@ fn validate(path: &Path, file: UnitsFile) -> Result<Definitions, DataError> {
         units,
         economy: EconomyDefinitions::default(),
         combat: CombatDefinitions::default(),
+        arsenal: crate::arsenal::Arsenal::default(),
     })
 }
 

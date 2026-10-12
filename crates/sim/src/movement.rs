@@ -45,13 +45,14 @@ use bevy_ecs::message::Messages;
 use bevy_ecs::query::With;
 use bevy_ecs::system::{Query, Res, ResMut};
 
+use crate::economy::Players;
 use crate::event::{MoveFailure, SimEvent};
 use crate::id::SimId;
 use crate::map::{CellPos, Grid};
 use crate::pathfinding::{DIAGONAL_COST, ORTHOGONAL_COST};
 use crate::schedule::SimTick;
 use crate::unit::{
-    DIAGONAL_STEP, Direction, Facing, Mobile, MoveOrder, ORTHOGONAL_STEP, Orders, PathState,
+    DIAGONAL_STEP, Direction, Facing, Mobile, MoveOrder, ORTHOGONAL_STEP, Orders, Owner, PathState,
     Position, Step, Unit,
 };
 
@@ -84,6 +85,7 @@ type MoveQuery<'w, 's> = Query<
         &'static mut Position,
         &'static mut Facing,
         &'static mut Orders,
+        &'static Owner,
     ),
     With<Unit>,
 >;
@@ -159,6 +161,7 @@ pub(crate) fn move_units(
     mut grid: ResMut<Grid>,
     tick: Res<SimTick>,
     mut events: ResMut<Messages<SimEvent>>,
+    players: Res<Players>,
     mut units: MoveQuery,
 ) {
     let mut order: Vec<(SimId, Entity)> =
@@ -167,14 +170,19 @@ pub(crate) fn move_units(
     // What every unit is doing, kept up to date as the units move in id order.
     let mut activity: BTreeMap<SimId, Activity> = units
         .iter()
-        .map(|(_, id, mobile, _, _, orders)| (*id, Activity::of(mobile, orders)))
+        .map(|(_, id, mobile, _, _, orders, _)| (*id, Activity::of(mobile, orders)))
         .collect();
     for (id, entity) in order {
-        let Ok((_, _, mut mobile, mut position, mut facing, mut orders)) = units.get_mut(entity)
+        grid.navigation = grid.domain_of(id);
+        let Ok((_, _, mut mobile, mut position, mut facing, mut orders, owner)) =
+            units.get_mut(entity)
         else {
             continue;
         };
-        let mut budget = u32::from(mobile.speed);
+        // The owner's unit speed option scales the distance covered per tick; a unit may then
+        // finish more than one step in a tick, which the loop below already allows.
+        let mut budget =
+            u32::from(mobile.speed).saturating_mul(players.unit_speed_percent(owner.0)) / 100;
         let mut stepped_toward = false;
         let mut stalled = false;
         loop {
@@ -248,6 +256,7 @@ pub(crate) fn move_units(
             }
         }
         activity.insert(id, Activity::of(&mobile, &orders));
+        grid.navigation = crate::Domain::Land;
         let sub = mobile.sub_position();
         if position.0 != sub {
             position.0 = sub;

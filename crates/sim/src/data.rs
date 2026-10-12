@@ -32,7 +32,7 @@ use std::path::{Path, PathBuf};
 pub const MAX_DATA_FILE_BYTES: u64 = 64 * 1024;
 
 /// Longest accepted string value in bytes.
-pub const MAX_STRING_BYTES: usize = 64;
+pub const MAX_STRING_BYTES: usize = 256;
 
 /// The recursion limit given to `ron`. The deepest file the checker accepts nests six levels (five
 /// containers); the limit is a second line of defence.

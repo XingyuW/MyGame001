@@ -327,6 +327,9 @@ fn shipped_scenario() -> Result<Report, String> {
         data.join("combat.ron"),
     )
     .map_err(|error| error.to_string())?;
+    let definitions = definitions
+        .with_arsenal(data.join("arsenal.ron"))
+        .map_err(|error| error.to_string())?;
     let skirmish = load_skirmish(data.join("skirmish.ron"), &definitions)
         .map_err(|error| error.to_string())?;
     let demo = skirmish
@@ -367,7 +370,7 @@ fn shipped_scenario() -> Result<Report, String> {
     if first.is_empty() || second.is_empty() {
         return Err("a shipped faction has no armed unit type".into());
     }
-    let [a, b] = demo.starts;
+    let (a, b) = (demo.starts[0], demo.starts[1]);
     run(
         "shipped",
         &definitions,

@@ -25,6 +25,7 @@ const HUMAN: PlayerId = PlayerId(0);
 const ENEMY: PlayerId = PlayerId(1);
 
 const ROCK: Cell = Cell {
+    water: false,
     passable: false,
     buildable: false,
     ore: 0,

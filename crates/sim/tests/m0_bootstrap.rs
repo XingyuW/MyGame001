@@ -174,7 +174,9 @@ fn stages_run_once_per_tick_in_plan_order() {
     for set in SimSet::ORDER.into_iter().rev() {
         app.add_systems(
             SimSchedule,
-            (move |mut log: ResMut<StageLog>| log.0.push(set)).in_set(set),
+            (move |mut log: ResMut<StageLog>| log.0.push(set))
+                .in_set(set)
+                .after(sim::SimCoreSet(set)),
         );
     }
 

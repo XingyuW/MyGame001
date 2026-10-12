@@ -54,6 +54,11 @@ pub enum SimSet {
     EndOfTick,
 }
 
+/// Core work inside a stage. Instrumentation and extensions can run after this set without
+/// racing an exclusive specialist system; the outer SimSet still fixes stage order.
+#[derive(SystemSet, Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct SimCoreSet(pub SimSet);
+
 impl SimSet {
     /// All stages in execution order.
     pub const ORDER: [SimSet; 10] = [
@@ -113,18 +118,43 @@ impl Plugin for SimPlugin {
         schedule.add_systems((
             (advance_events, process_commands)
                 .chain()
+                .in_set(SimCoreSet(SimSet::Commands))
                 .in_set(SimSet::Commands),
-            run_ai.in_set(SimSet::Ai),
-            (update_power, advance_production, harvest)
+            run_ai.in_set(SimCoreSet(SimSet::Ai)).in_set(SimSet::Ai),
+            (
+                update_power,
+                advance_production,
+                crate::economy::repair_buildings,
+                harvest,
+                crate::special::advance,
+            )
                 .chain()
+                .in_set(SimCoreSet(SimSet::Economy))
                 .in_set(SimSet::Economy),
-            find_paths.in_set(SimSet::Pathfinding),
-            move_units.in_set(SimSet::Movement),
-            combat.in_set(SimSet::Combat),
-            remove_dead.in_set(SimSet::Cleanup),
-            update_visibility.in_set(SimSet::Visibility),
-            check_win_condition.in_set(SimSet::WinCondition),
-            advance_tick.in_set(SimSet::EndOfTick),
+            find_paths
+                .in_set(SimCoreSet(SimSet::Pathfinding))
+                .in_set(SimSet::Pathfinding),
+            move_units
+                .in_set(SimCoreSet(SimSet::Movement))
+                .in_set(SimSet::Movement),
+            (combat, crate::special::resolve)
+                .chain()
+                .in_set(SimCoreSet(SimSet::Combat))
+                .in_set(SimSet::Combat),
+            (remove_dead, crate::props::remove_dead_props)
+                .chain()
+                .in_set(SimCoreSet(SimSet::Cleanup))
+                .in_set(SimSet::Cleanup),
+            (update_visibility, crate::special::reconnaissance)
+                .chain()
+                .in_set(SimCoreSet(SimSet::Visibility))
+                .in_set(SimSet::Visibility),
+            check_win_condition
+                .in_set(SimCoreSet(SimSet::WinCondition))
+                .in_set(SimSet::WinCondition),
+            advance_tick
+                .in_set(SimCoreSet(SimSet::EndOfTick))
+                .in_set(SimSet::EndOfTick),
         ));
 
         // The event buffer is advanced by the simulation itself, once per tick (`event.rs`), so
@@ -136,7 +166,9 @@ impl Plugin for SimPlugin {
             .insert_resource(Grid::default())
             .insert_resource(Definitions::default())
             .insert_resource(Players::default())
+            .insert_resource(crate::SpecialState::default())
             .insert_resource(Projectiles::default())
+            .insert_resource(crate::Props::default())
             .insert_resource(MatchState::default())
             .insert_resource(AiPlayers::default())
             .insert_resource(Messages::<SimEvent>::default())

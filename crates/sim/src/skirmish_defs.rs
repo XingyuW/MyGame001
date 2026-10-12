@@ -26,7 +26,11 @@
 //! the asset directory ([`map_asset_path`]). The buildings and units of a faction are placed
 //! relative to the start position of the player who plays it: a building's footprint origin is the
 //! start plus its offset, and a group of units stands on the free cells nearest to the start plus
-//! its offset. Every map has exactly [`MATCH_PLAYERS`] start positions.
+//! its offset. Every map has from [`MIN_MATCH_PLAYERS`] to [`MAX_MATCH_PLAYERS`] start positions,
+//! each a distinct cell; a match uses as many of them, in order, as it has players. A match with
+//! more than two players is played on the map enlarged for them (`crate::map_scale`), with its
+//! start positions moved accordingly and the missing ones made, so a match may have more players
+//! than its map file lists start positions.
 //!
 //! A faction's roster (M7, PLAN.md section 7: "the second faction, the full roster"; docs/
 //! DECISIONS.md D48) lists the building and unit types a player of the faction may produce:
@@ -56,14 +60,22 @@ use crate::map::{CellPos, Grid, MAX_MAP_SIDE};
 /// The schema version of the skirmish file this crate reads (2 since M7: faction rosters).
 pub const SKIRMISH_SCHEMA_VERSION: i64 = 2;
 
-/// Players of a skirmish match, and start positions of every map.
+/// Fewest players of a skirmish match (and start positions of a map).
+pub const MIN_MATCH_PLAYERS: usize = 2;
+
+/// Most players of a skirmish match (and start positions of a map): one human and up to nine
+/// independent computer players. A match with more players than its map file has start positions
+/// is played on the map enlarged for them, which has the missing ones (`crate::map_scale`).
+pub const MAX_MATCH_PLAYERS: usize = 10;
+
+/// Players of the classic one-against-one match (the M6/M7 format, still the default).
 pub const MATCH_PLAYERS: usize = 2;
 
 /// Largest number of factions.
 pub const MAX_FACTIONS: usize = 8;
 
 /// Largest number of maps.
-pub const MAX_MAPS: usize = 16;
+pub const MAX_MAPS: usize = 24;
 
 /// Largest number of starting buildings of a faction.
 pub const MAX_STARTING_BUILDINGS: usize = 16;
@@ -123,7 +135,8 @@ impl FactionDef {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MapDef {
     pub id: String,
-    pub starts: [CellPos; MATCH_PLAYERS],
+    /// [`MIN_MATCH_PLAYERS`] to [`MAX_MATCH_PLAYERS`] distinct start positions.
+    pub starts: Vec<CellPos>,
 }
 
 /// The skirmish definitions (the skirmish file).
@@ -268,7 +281,7 @@ static MAP_SHAPE: Shape = Shape::Struct(&[
         "starts",
         Shape::List {
             entry: &START_SHAPE,
-            max: MATCH_PLAYERS,
+            max: MAX_MATCH_PLAYERS,
         },
     ),
 ]);
@@ -530,14 +543,14 @@ fn validate(file: SkirmishFile, definitions: &Definitions) -> Result<SkirmishDef
         if maps.iter().any(|map| map.id == entry.id) {
             return Err((format!("{field}.id"), DataErrorKind::DuplicateId(entry.id)));
         }
-        if entry.starts.len() != MATCH_PLAYERS {
+        if !(MIN_MATCH_PLAYERS..=MAX_MATCH_PLAYERS).contains(&entry.starts.len()) {
             return Err(invalid(
                 format!("{field}.starts"),
                 format!("{} start positions", entry.starts.len()),
-                format!("exactly {MATCH_PLAYERS} start positions"),
+                format!("{MIN_MATCH_PLAYERS} to {MAX_MATCH_PLAYERS} start positions"),
             ));
         }
-        let mut starts = [CellPos::new(0, 0); MATCH_PLAYERS];
+        let mut starts = vec![CellPos::new(0, 0); entry.starts.len()];
         for (position, start) in entry.starts.iter().enumerate() {
             let at = format!("{field}.starts[{position}]");
             let x: i32 = ranged(&format!("{at}.x"), start.x, 0, largest as i32, " (a cell)")?;

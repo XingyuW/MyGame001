@@ -54,6 +54,16 @@ pub struct QueueItem {
 /// The economic state of one player.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct PlayerState {
+    pub(crate) super_me: bool,
+    /// Match option "unlock all" (human players only, like Super Me): building prerequisites
+    /// are waived. Producers, credits, power, placement and exits still apply.
+    pub(crate) unlock_all: bool,
+    /// The player's team; 0 for none. Players of the same team (other than 0) are allies: their
+    /// units and defences do not fire at each other ([`Players::hostile`]).
+    pub(crate) team: u8,
+    /// Match option (human players with Super Me only): how much faster than their type's speed
+    /// the player's units move, in percent over 100.
+    pub(crate) unit_speed_bonus: u16,
     pub(crate) credits: i64,
     pub(crate) power_produced: i32,
     pub(crate) power_consumed: i32,
@@ -65,9 +75,38 @@ pub struct PlayerState {
     /// player added without a faction (the scenario setups of the M3 to M6 tests), who may
     /// produce every item with production terms.
     pub(crate) roster: Option<BTreeSet<ProductionItem>>,
+    /// The player's buildings being repaired (`RepairBuilding`, [`repair_buildings`]).
+    pub(crate) repairing: BTreeSet<SimId>,
 }
 
 impl PlayerState {
+    /// The player's buildings being repaired.
+    pub fn repairing(&self) -> &BTreeSet<SimId> {
+        &self.repairing
+    }
+
+    pub fn super_me(&self) -> bool {
+        self.super_me
+    }
+    /// Whether building prerequisites are waived for this player (match option).
+    pub fn unlock_all(&self) -> bool {
+        self.unlock_all
+    }
+    /// The player's team, 0 for none.
+    pub fn team(&self) -> u8 {
+        self.team
+    }
+    /// The speed of the player's units in percent of their type's speed (100: unchanged).
+    pub fn unit_speed_percent(&self) -> u32 {
+        100 + u32::from(self.unit_speed_bonus)
+    }
+    pub fn production_cost(&self, base: i64) -> i64 {
+        if self.super_me { 1 } else { base }
+    }
+    pub fn production_speed(&self) -> u32 {
+        if self.super_me { 10 } else { 1 }
+    }
+
     /// Credits, never negative (invariant I7).
     pub fn credits(&self) -> i64 {
         self.credits
@@ -194,6 +233,32 @@ impl Players {
         self.players.get(&player)
     }
 
+    /// Puts `player` in `team` (0: none) and returns whether the player exists. Scenario and
+    /// match setup only, like [`Players::add`].
+    pub fn set_team(&mut self, player: PlayerId, team: u8) -> bool {
+        self.players
+            .get_mut(&player)
+            .map(|state| state.team = team)
+            .is_some()
+    }
+
+    /// Whether `a` and `b` are enemies: different players that do not share a team. An owner who
+    /// is not a player of the match is an enemy of everyone else, as before teams existed.
+    pub fn hostile(&self, a: PlayerId, b: PlayerId) -> bool {
+        if a == b {
+            return false;
+        }
+        let team = |player| self.get(player).map_or(0, |state| state.team);
+        let (a, b) = (team(a), team(b));
+        a == 0 || a != b
+    }
+
+    /// The speed of `player`'s units in percent of their type's speed.
+    pub fn unit_speed_percent(&self, player: PlayerId) -> u32 {
+        self.get(player)
+            .map_or(100, PlayerState::unit_speed_percent)
+    }
+
     pub(crate) fn get_mut(&mut self, player: PlayerId) -> Option<&mut PlayerState> {
         self.players.get_mut(&player)
     }
@@ -216,7 +281,19 @@ impl Players {
     pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
         hasher.write_u64(self.players.len() as u64);
         for (player, state) in &self.players {
-            hasher.write(&[player.0]);
+            // One byte of match options; unchanged from earlier versions when unlock-all is off
+            // and the player has neither a team nor a unit speed bonus.
+            let extended = state.team != 0 || state.unit_speed_bonus != 0;
+            hasher.write(&[
+                player.0,
+                u8::from(state.super_me)
+                    | (u8::from(state.unlock_all) << 1)
+                    | (u8::from(extended) << 2),
+            ]);
+            if extended {
+                hasher.write(&[state.team]);
+                hasher.write(&state.unit_speed_bonus.to_le_bytes());
+            }
             hasher.write(&state.credits.to_le_bytes());
             hasher.write(&state.power_produced.to_le_bytes());
             hasher.write(&state.power_consumed.to_le_bytes());
@@ -245,6 +322,10 @@ impl Players {
                     }
                 }
             }
+            hasher.write_u64(state.repairing.len() as u64);
+            for id in &state.repairing {
+                hasher.write_u32(id.0);
+            }
         }
     }
 }
@@ -271,12 +352,107 @@ pub(crate) fn charge_for_tick(cost: i64, build_time: u32, progress: u32) -> i64 
     }
 }
 
+/// Ticks between two repair steps of a building: four steps a second at 20 ticks a second.
+pub const REPAIR_INTERVAL: u64 = 5;
+/// Repair steps that take a building from no hit points to whole (20 seconds).
+pub const REPAIR_STEPS: i32 = 80;
+/// A complete repair from no hit points costs `1 / REPAIR_COST_DIVISOR` of the building's price.
+pub const REPAIR_COST_DIVISOR: i64 = 4;
+
+/// The credits charged for restoring `heal` of `max` hit points of a building of price `price`:
+/// the proportional share of `price / REPAIR_COST_DIVISOR`, rounded up, and at least 1 credit for
+/// a building with a price. Super Me charges at most 1 credit, as it does for production.
+pub fn repair_cost(price: i64, heal: i32, max: i32, super_me: bool) -> i64 {
+    if price <= 0 || heal <= 0 || max <= 0 {
+        return 0;
+    }
+    let denominator = i64::from(max).saturating_mul(REPAIR_COST_DIVISOR);
+    let cost = price
+        .saturating_mul(i64::from(heal))
+        .saturating_add(denominator - 1)
+        / denominator;
+    let cost = cost.max(1);
+    if super_me { cost.min(1) } else { cost }
+}
+
+/// Repairs the buildings each player has ordered repaired (`RepairBuilding`), in id order: every
+/// [`REPAIR_INTERVAL`] ticks a building regains `max / REPAIR_STEPS` hit points (at least 1, at
+/// most what it lacks) for [`repair_cost`] credits. A step the player cannot pay for is skipped
+/// and the repair waits for credits. A repair ends when the building is whole, destroyed, sold,
+/// or no longer the player's (captured).
+pub(crate) fn repair_buildings(
+    mut players: ResMut<Players>,
+    definitions: Res<Definitions>,
+    tick: Res<SimTick>,
+    mut buildings: Query<(
+        Entity,
+        &SimId,
+        &Owner,
+        &Building,
+        &mut crate::combat::Health,
+    )>,
+) {
+    if players
+        .players
+        .values()
+        .all(|state| state.repairing.is_empty())
+    {
+        return;
+    }
+    let step_now = tick.0.is_multiple_of(REPAIR_INTERVAL);
+    let index: BTreeMap<SimId, Entity> = buildings
+        .iter()
+        .map(|(entity, id, ..)| (*id, entity))
+        .collect();
+    for (&player, state) in &mut players.players {
+        let mut ended = Vec::new();
+        for &id in &state.repairing {
+            let Some(Ok((_, _, owner, building, mut health))) =
+                index.get(&id).map(|&entity| buildings.get_mut(entity))
+            else {
+                ended.push(id);
+                continue;
+            };
+            let max = definitions
+                .building_combat(building.kind)
+                .map_or(0, |terms| terms.hit_points);
+            if owner.0 != player || health.hit_points <= 0 || health.hit_points >= max {
+                ended.push(id);
+                continue;
+            }
+            if !step_now {
+                continue;
+            }
+            let heal = (max / REPAIR_STEPS)
+                .max(1)
+                .min(max.saturating_sub(health.hit_points));
+            let price = definitions
+                .building(building.kind)
+                .map_or(0, |def| def.production.cost);
+            let cost = repair_cost(price, heal, max, state.super_me);
+            if state.credits < cost {
+                continue;
+            }
+            state.credits -= cost;
+            health.hit_points = health.hit_points.saturating_add(heal);
+            if health.hit_points >= max {
+                ended.push(id);
+            }
+        }
+        for id in ended {
+            state.repairing.remove(&id);
+        }
+    }
+}
+
 /// Recomputes every player's power from the buildings it owns (first system of the `Economy`
 /// stage, so buildings placed or sold by this tick's commands count).
 pub(crate) fn update_power(
     mut players: ResMut<Players>,
     definitions: Res<Definitions>,
     buildings: Query<(&Owner, &Building)>,
+    special: Res<crate::SpecialState>,
+    tick: Res<SimTick>,
 ) {
     let mut totals: BTreeMap<PlayerId, (i32, i32)> = BTreeMap::new();
     for (owner, building) in &buildings {
@@ -290,7 +466,11 @@ pub(crate) fn update_power(
     }
     for (player, state) in &mut players.players {
         let (produced, consumed) = totals.get(player).copied().unwrap_or_default();
-        state.power_produced = produced;
+        state.power_produced = if special.outages.get(player).is_some_and(|t| *t > tick.0) {
+            0
+        } else {
+            produced
+        };
         state.power_consumed = consumed;
     }
 }
@@ -319,17 +499,26 @@ impl Spawner<'_, '_, '_> {
     /// nearest to the rally point, if one is set.
     fn leave(&mut self, player: PlayerId, kind: UnitKind, exit: Exit) -> Option<SimId> {
         let speed = self.definitions.unit(kind)?.speed;
-        let cell = exit_cell(self.grid, exit.footprint, exit.rally)?;
+        let domain = self.definitions.domain(kind);
+        let cell = exit_cell(
+            &self.grid.navigation_for(domain),
+            exit.footprint,
+            exit.rally,
+        )?;
         let id = self.ids.allocate()?;
+        self.grid.register_domain(id, domain);
         if !self.grid.claim(cell, id) {
             return None;
         }
         let mut bundle = unit_bundle(id, player, kind, speed, cell);
         let harvester = self.definitions.harvester(kind).is_some();
         if !harvester && let Some(rally) = exit.rally {
-            let destination = destination_cells(self.grid, rally, 1, |other| {
-                self.grid.occupant(other).is_some_and(|holder| holder != id)
-            });
+            let destination =
+                destination_cells(&self.grid.navigation_for(domain), rally, 1, |other| {
+                    self.grid
+                        .occupant_for(other, domain)
+                        .is_some_and(|holder| holder != id)
+                });
             if let Some(&destination) = destination.first() {
                 bundle.6.current = Some(MoveOrder::new(destination, self.tick));
             }
@@ -380,6 +569,7 @@ pub(crate) fn advance_production(
     mut ids: ResMut<SimIdAllocator>,
     mut events: ResMut<Messages<SimEvent>>,
     mut buildings: BuildingQuery,
+    special: Res<crate::SpecialState>,
 ) {
     // The buildings each player owns of each type, in id order.
     let mut exits: BTreeMap<(PlayerId, BuildingKind), Vec<Exit>> = BTreeMap::new();
@@ -401,7 +591,9 @@ pub(crate) fn advance_production(
         .collect();
     sorted.sort_unstable_by_key(|(id, ..)| *id);
     for &(_, _, owner, kind, exit) in &sorted {
-        exits.entry((owner, kind)).or_default().push(exit);
+        if !special.disabled.contains_key(&exit.building) {
+            exits.entry((owner, kind)).or_default().push(exit);
+        }
     }
 
     let even_tick = tick.0.is_multiple_of(2);
@@ -415,6 +607,9 @@ pub(crate) fn advance_production(
     };
     for (&player, state) in &mut players.players {
         let low_power = state.low_power();
+        let speed = state.production_speed();
+        let super_me = state.super_me;
+        let unlock_all = state.unlock_all;
         let producers: Vec<BuildingKind> = state.queues.keys().copied().collect();
         for producer in producers {
             let owned = exits
@@ -433,16 +628,30 @@ pub(crate) fn advance_production(
                 continue;
             };
             if head.progress < terms.build_time {
-                if owned.is_empty() || (low_power && !even_tick) {
+                if owned.is_empty()
+                    || !unlock_all
+                        && terms.prerequisites.iter().any(|k| {
+                            !definitions.prerequisite_met(
+                                *k,
+                                exits.keys().filter(|(p, _)| *p == player).map(|(_, k)| *k),
+                            )
+                        })
+                    || (low_power && !even_tick)
+                {
                     continue;
                 }
-                let charge = charge_for_tick(terms.cost, terms.build_time, head.progress);
+                let next = head.progress.saturating_add(speed).min(terms.build_time);
+                let charge = if super_me {
+                    i64::from(next == terms.build_time)
+                } else {
+                    charge_for_tick(terms.cost, terms.build_time, head.progress)
+                };
                 if *credits < charge {
                     continue;
                 }
                 *credits -= charge;
                 head.charged = head.charged.saturating_add(charge);
-                head.progress += 1;
+                head.progress = next;
                 if head.progress < terms.build_time {
                     continue;
                 }

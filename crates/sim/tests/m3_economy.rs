@@ -23,6 +23,7 @@ const HUMAN: PlayerId = PlayerId(0);
 const ENEMY: PlayerId = PlayerId(1);
 
 const ROCK: Cell = Cell {
+    water: false,
     passable: false,
     buildable: false,
     ore: 0,
@@ -1256,10 +1257,9 @@ fn rally_point_commands_are_validated() {
     }
 }
 
-#[test]
-fn a_unit_waits_inside_while_every_ring_cell_is_held() {
-    let (mut app, barracks) = barracks_scenario(1_000);
-    // The barracks covers x 10..=11, y 10..=11; its ring has 12 cells.
+/// The barracks of `barracks_scenario` covers x 10..=11, y 10..=11; every one of the 12 cells
+/// of its ring is held by a unit.
+fn crowd_the_barracks(app: &mut App) -> Vec<SimId> {
     let ring = Footprint {
         origin: CellPos::new(10, 10),
         width: 2,
@@ -1267,9 +1267,94 @@ fn a_unit_waits_inside_while_every_ring_cell_is_held() {
     };
     let blockers: Vec<SimId> = ring
         .ring()
-        .map(|cell| unit(&mut app, HUMAN, "runner", cell.x, cell.y))
+        .map(|cell| unit(app, HUMAN, "runner", cell.x, cell.y))
         .collect();
     assert_eq!(blockers.len(), 12);
+    blockers
+}
+
+#[test]
+fn a_unit_leaves_beyond_a_ring_whose_every_cell_is_held() {
+    let (mut app, barracks) = barracks_scenario(1_000);
+    crowd_the_barracks(&mut app);
+    let footprint = buildings(&mut app)[&barracks].1.footprint;
+    let walker = u(&app, "walker");
+    let spawned_by = |events: &[SimEvent]| -> Vec<SimId> {
+        events
+            .iter()
+            .filter_map(|event| match event {
+                SimEvent::UnitSpawned { building, unit, .. } if *building == barracks => {
+                    Some(*unit)
+                }
+                _ => None,
+            })
+            .collect()
+    };
+    for _ in 0..3 {
+        issue(&mut app, HUMAN, Command::QueueProduction { item: walker });
+    }
+    let spawned = spawned_by(&ticks(&mut app, 60));
+    assert_eq!(
+        spawned.len(),
+        3,
+        "a crowd around it does not stop production"
+    );
+    assert!(queue(&app, HUMAN, "barracks").is_empty());
+    // They stand in the second ring, lowest on screen first.
+    let all = units(&mut app);
+    assert_eq!(all[&spawned[0]].2.cell, CellPos::new(13, 13));
+    for id in &spawned {
+        assert_eq!(footprint.distance_to_cell(all[id].2.cell), 2);
+    }
+    // With a rally point, the next unit comes out on the side of the rally point.
+    issue(
+        &mut app,
+        HUMAN,
+        Command::SetRallyPoint {
+            building: barracks,
+            cell: CellPos::new(2, 10),
+        },
+    );
+    issue(&mut app, HUMAN, Command::QueueProduction { item: walker });
+    let spawned = spawned_by(&ticks(&mut app, 3 + 7));
+    assert_eq!(spawned.len(), 1);
+    let unit = &units(&mut app)[&spawned[0]];
+    assert_eq!(
+        unit.2.cell,
+        CellPos::new(8, 10),
+        "the west side of ring two"
+    );
+    assert!(unit.3.current.is_some(), "and walks on to the rally point");
+}
+
+#[test]
+fn a_unit_waits_inside_while_no_cell_around_can_be_reached() {
+    let (mut app, barracks) = barracks_scenario(1_000);
+    crowd_the_barracks(&mut app);
+    // Rock all around the crowded ring: the cells at distance 2.
+    let rock = Cell {
+        passable: false,
+        water: false,
+        buildable: false,
+        ore: 0,
+    };
+    let sealed: Vec<CellPos> = (8..=13)
+        .flat_map(|y| (8..=13).map(move |x| CellPos::new(x, y)))
+        .filter(|cell| [8, 13].contains(&cell.x) || [8, 13].contains(&cell.y))
+        .collect();
+    assert_eq!(sealed.len(), 20);
+    let open = *app
+        .world()
+        .resource::<Grid>()
+        .cell(sealed[0])
+        .expect("inside the map");
+    for &cell in &sealed {
+        assert!(
+            app.world_mut()
+                .resource_mut::<Grid>()
+                .set_terrain(cell, rock)
+        );
+    }
     let walker = u(&app, "walker");
     produce(&mut app, HUMAN, walker);
     let events = ticks(&mut app, 50);
@@ -1280,16 +1365,13 @@ fn a_unit_waits_inside_while_every_ring_cell_is_held() {
     );
     assert_eq!(queue(&app, HUMAN, "barracks")[0].progress, 7);
     assert_eq!(credits(&app, HUMAN), 950, "charged once");
-    // One blocker moves away; the walker leaves through the freed cell.
-    issue(
-        &mut app,
-        HUMAN,
-        Command::Move {
-            units: vec![blockers[0]],
-            target: CellPos::new(2, 2),
-        },
+    // A gap opens in the rock; the walker leaves through it.
+    assert!(
+        app.world_mut()
+            .resource_mut::<Grid>()
+            .set_terrain(CellPos::new(13, 13), open)
     );
-    let events = ticks(&mut app, 40);
+    let events = ticks(&mut app, 5);
     let spawned = events
         .iter()
         .filter(|event| {
@@ -1298,6 +1380,8 @@ fn a_unit_waits_inside_while_every_ring_cell_is_held() {
         .count();
     assert_eq!(spawned, 1);
     assert!(queue(&app, HUMAN, "barracks").is_empty());
+    let all = units(&mut app);
+    assert!(all.values().any(|unit| unit.2.cell == CellPos::new(13, 13)));
 }
 
 #[test]

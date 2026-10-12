@@ -143,7 +143,7 @@ fn load(path: &Path) -> Result<LoadedMap, MapError> {
 const IMAGE: &str = r#"<image source="fixture_tiles.png" width="192" height="32"/>"#;
 const MAP_SIZE: &str = r#"width="4" height="3" tilewidth="64" tileheight="32""#;
 const LAYER_HEAD: &str = r#"<layer id="1" name="terrain" width="4" height="3">"#;
-const SCHEMA_PROPERTY: &str = r#"<property name="schema_version" type="int" value="1"/>"#;
+const SCHEMA_PROPERTY: &str = r#"<property name="schema_version" type="int" value="2"/>"#;
 const ORE_PROPERTY: &str = r#"<property name="ore" type="int" value="750"/>"#;
 const DATA_HEAD: &str = r#"<data encoding="csv">"#;
 const VALID_DATA: &str = "1,1,2,3,\n1,2,2,1,\n3,1,1,1\n";
@@ -267,7 +267,8 @@ fn files_inside_the_subset_load() {
     assert_eq!(demo.tileset_image.file_name, "demo_tiles.png");
     assert_eq!(
         (demo.tileset_image.width, demo.tileset_image.height),
-        (512, 32)
+        // Eleven 64 px tiles: terrain, three markers, and road, forest and cottage looks.
+        (704, 32)
     );
     let (map, _) = external_variant(
         "external_ok",

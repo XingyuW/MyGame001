@@ -23,10 +23,12 @@ mod harvest;
 mod hash;
 mod id;
 mod map;
+mod map_scale;
 mod map_subset;
 mod match_setup;
 mod movement;
 mod pathfinding;
+mod props;
 mod rng;
 mod schedule;
 mod skirmish_defs;
@@ -34,8 +36,8 @@ mod unit;
 mod visibility;
 
 pub use ai::{
-    AI_UNIT_QUEUE, AiController, AiPlayers, GATHER_DISTANCE, GATHER_RADIUS, HARVEST_RETRY_TICKS,
-    KnownBuilding, MAX_TARGET_FAILURES, WaveTarget, Waypoint,
+    AI_UNIT_QUEUE, ARMY_SCALE_SPAN, AiController, AiPlayers, GATHER_DISTANCE, GATHER_RADIUS,
+    HARVEST_RETRY_TICKS, KnownBuilding, MAX_TARGET_FAILURES, WaveTarget, Waypoint, scaled_for_map,
 };
 pub use ai_defs::{
     AI_SCHEMA_VERSION, AiDefinitions, AiPlan, Difficulty, MAX_AI_ARMY, MAX_ARMY_ENTRIES,
@@ -64,8 +66,11 @@ pub use definitions::{
     Definitions, MAX_NAME_LEN, MAX_UNIT_SPEED, MAX_UNIT_TYPES, UNITS_SCHEMA_VERSION, UnitDef,
     UnitKind, load_definitions, load_match_definitions, load_unit_definitions,
 };
-pub use economy::{MAX_QUEUE_LENGTH, PlayerSetupError, PlayerState, Players, QueueItem};
-pub use economy_commands::check_placement;
+pub use economy::{
+    MAX_QUEUE_LENGTH, PlayerSetupError, PlayerState, Players, QueueItem, REPAIR_COST_DIVISOR,
+    REPAIR_INTERVAL, REPAIR_STEPS, repair_cost,
+};
+pub use economy_commands::{SHIPYARD_PLACEMENT_DISTANCE, check_placement};
 pub use economy_defs::{
     BuildingDef, BuildingKind, ECONOMY_SCHEMA_VERSION, HarvesterDef, MAX_BUILD_TIME,
     MAX_BUILDING_TYPES, MAX_COST, MAX_CREDITS_PER_ORE, MAX_FOOTPRINT_SIDE, MAX_FREE_UNITS,
@@ -82,25 +87,40 @@ pub use map::{
     SUBCELLS_PER_CELL, SubPos, TERRAIN_LAYER, TILE_HEIGHT_PX, TILE_WIDTH_PX, TilesetImage,
     load_map, load_map_with_files,
 };
+pub use map_scale::{
+    APRON_RADIUS, CORE_RADIUS, DEFAULT_ORE, EDGE_MARGIN, EnlargedMap, LOOK_FEATURE_BRIDGE,
+    LOOK_FEATURE_ORE, LOOK_GROUND_AUTO, LOOK_GROUND_MASK, LOOK_GROUND_WATER, MAX_SITE_ATTEMPTS,
+    MIN_ORE_CELLS, MIN_START_DISTANCE, MapScaleError, ORE_DISTANCE, ORE_RADIUS, PAD_CORNER,
+    PAD_RADIUS, SCALE_DIVISOR, YARD_CENTRE_OFFSET, axis_map, enlarged_map, enlarged_size,
+};
 pub use match_setup::{
-    Controller, MatchOutcome, MatchSetupError, MatchStart, MatchState, PlayerSetup, StartError,
-    plan_starting_units, setup_match,
+    AI_TEAM, Controller, MAX_UNIT_SPEED_PERCENT, MatchOptions, MatchOutcome, MatchSetupError,
+    MatchStart, MatchState, PlayerSetup, StartError, plan_starting_units, setup_match,
+    setup_match_configured, setup_match_with_options, setup_match_with_super_me,
 };
 pub use movement::{MAX_PATHS_WITHOUT_PROGRESS, MAX_STALLED_TICKS, REPATH_AFTER_BLOCKED_TICKS};
 pub use pathfinding::{
     DIAGONAL_COST, ORTHOGONAL_COST, PATH_REQUESTS_PER_TICK, Path, destination_cells, find_path,
     nearest_reachable, octile_distance,
 };
+pub use props::{PROP_ID_BASE, Prop, PropKind, Props};
 pub use rng::SimRng;
-pub use schedule::{SimPlugin, SimSchedule, SimSet, SimTick, TICKS_PER_SECOND};
+pub use schedule::{SimCoreSet, SimPlugin, SimSchedule, SimSet, SimTick, TICKS_PER_SECOND};
 pub use skirmish_defs::{
-    FactionDef, MATCH_PLAYERS, MAX_FACTIONS, MAX_GROUP_UNITS, MAX_MAPS, MAX_ROSTER_ENTRIES,
-    MAX_START_OFFSET, MAX_STARTING_BUILDINGS, MAX_STARTING_CREDITS, MAX_STARTING_GROUPS, MapDef,
-    SKIRMISH_SCHEMA_VERSION, SkirmishDefinitions, StartProblem, StartingBuilding, StartingGroup,
-    check_map_starts, load_skirmish, map_asset_path, start_problem,
+    FactionDef, MATCH_PLAYERS, MAX_FACTIONS, MAX_GROUP_UNITS, MAX_MAPS, MAX_MATCH_PLAYERS,
+    MAX_ROSTER_ENTRIES, MAX_START_OFFSET, MAX_STARTING_BUILDINGS, MAX_STARTING_CREDITS,
+    MAX_STARTING_GROUPS, MIN_MATCH_PLAYERS, MapDef, SKIRMISH_SCHEMA_VERSION, SkirmishDefinitions,
+    StartProblem, StartingBuilding, StartingGroup, check_map_starts, load_skirmish, map_asset_path,
+    start_problem,
 };
 pub use unit::{
     DIAGONAL_STEP, Direction, Facing, Mobile, MoveOrder, ORTHOGONAL_STEP, Orders, Owner, PathState,
     Position, SpawnError, Step, Unit, spawn_unit,
 };
 pub use visibility::Vision;
+
+pub mod arsenal;
+pub use arsenal::{Arsenal, ArsenalEntry, Category, Domain, Role};
+
+pub mod special;
+pub use special::SpecialState;

@@ -33,7 +33,10 @@
 //!    `wave_patience` more ticks, they join the attack wave, which attack-moves to the nearest
 //!    building it remembers, else to an enemy start position it has never seen, else sweeps the
 //!    map's waypoints, the one seen longest ago first; a wave reduced below half the wave size
-//!    falls back to the gathering point and rejoins the units at home.
+//!    falls back to the gathering point and rejoins the units at home. On large maps (more than
+//!    [`ARMY_SCALE_SPAN`] cells wide and high together) a new wave first passes a staging waypoint
+//!    beside the direct route, on alternating sides ([`staging_point`]), so that the waves of two
+//!    players do not always meet head-on halfway.
 
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -137,6 +140,32 @@ pub struct AiController {
     /// Whether it sold a building to fund an army unit and has no armed unit yet ([`broke`]).
     liquidating: bool,
     issued: u64,
+    /// Whether waves flank through a staging point (large maps only).
+    flank: bool,
+    /// The staging point the current wave moves through before its target, and the tick by
+    /// which it gives up on reaching it.
+    staging: Option<(CellPos, u64)>,
+    /// Waves sent so far; its parity picks the side of the next staging point.
+    waves_sent: u64,
+}
+
+/// Width + height of the largest map on which a difficulty's army applies unscaled.
+pub const ARMY_SCALE_SPAN: u32 = 128;
+
+/// `difficulty` for the map of `grid`: on maps wider and higher than [`ARMY_SCALE_SPAN`] cells
+/// together, the army and its waves grow with the distance they cover, up to twice their size
+/// (docs/DECISIONS.md, "Large maps with environments"). Waves of a small-map size meet in the
+/// middle of a large map and fall back before either reaches the other base; bigger armies break
+/// through. Integer arithmetic, so the result is deterministic.
+pub fn scaled_for_map(mut difficulty: Difficulty, grid: &Grid) -> Difficulty {
+    let span = grid.width().saturating_add(grid.height());
+    if span > ARMY_SCALE_SPAN {
+        let percent = (span.saturating_mul(100) / ARMY_SCALE_SPAN).min(200);
+        let scale = |value: u32| value.saturating_mul(percent) / 100;
+        difficulty.max_army = scale(difficulty.max_army).min(crate::ai_defs::MAX_AI_ARMY);
+        difficulty.wave_size = scale(difficulty.wave_size).min(difficulty.max_army);
+    }
+    difficulty
 }
 
 impl AiController {
@@ -155,6 +184,7 @@ impl AiController {
         start: CellPos,
         enemy_starts: Vec<CellPos>,
     ) -> Option<Self> {
+        let difficulty = scaled_for_map(difficulty, grid);
         let (width, height) = (grid_side(grid.width()), grid_side(grid.height()));
         // In `i64`, so that no start position overflows (invariant I12).
         let centre = (i64::from(width / 2), i64::from(height / 2));
@@ -231,6 +261,9 @@ impl AiController {
             fall_back_exempt: false,
             liquidating: false,
             issued: 0,
+            flank: grid.width().saturating_add(grid.height()) > ARMY_SCALE_SPAN,
+            staging: None,
+            waves_sent: 0,
             difficulty,
         })
     }
@@ -320,6 +353,17 @@ impl AiController {
         hasher.write_u64(self.next_harvest);
         hasher.write(&[u8::from(self.fall_back_exempt), u8::from(self.liquidating)]);
         hasher.write_u64(self.issued);
+        hasher.write(&[u8::from(self.flank)]);
+        match self.staging {
+            None => hasher.write(&[0]),
+            Some((cell, until)) => {
+                hasher.write(&[1]);
+                hasher.write_u32(cell.x as u32);
+                hasher.write_u32(cell.y as u32);
+                hasher.write_u64(until);
+            }
+        }
+        hasher.write_u64(self.waves_sent);
     }
 }
 
@@ -491,6 +535,7 @@ impl<'a> View<'a> {
     fn new(
         player: PlayerId,
         tick: u64,
+        players: &Players,
         state: &'a PlayerState,
         grid: &'a Grid,
         definitions: &'a Definitions,
@@ -499,6 +544,8 @@ impl<'a> View<'a> {
         buildings: &'a [BuildingSnap],
     ) -> Self {
         let vision = state.vision();
+        // Allies (a team of computer players against the human) are never targets.
+        let hostile = |owner: PlayerId| players.hostile(player, owner);
         Self {
             tick,
             state,
@@ -513,12 +560,12 @@ impl<'a> View<'a> {
                 .collect(),
             enemy_units: units
                 .iter()
-                .filter(|unit| unit.owner != player && vision.sees_unit(&unit.mobile))
+                .filter(|unit| hostile(unit.owner) && vision.sees_unit(&unit.mobile))
                 .collect(),
             enemy_buildings: buildings
                 .iter()
                 .filter(|building| {
-                    building.owner != player && vision.sees_footprint(building.footprint)
+                    hostile(building.owner) && vision.sees_footprint(building.footprint)
                 })
                 .collect(),
         }
@@ -696,6 +743,7 @@ pub(crate) fn run_ai(
         let view = View::new(
             player,
             tick,
+            &players,
             player_state,
             &grid,
             &definitions,
@@ -1262,9 +1310,11 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
 
     // The attack wave. Units that defend this turn do not join it.
     let mut joined: Vec<SimId> = Vec::new();
+    let mut fresh = false;
     let ready = home.len() >= controller.difficulty.wave_size as usize
         || (!home.is_empty() && view.tick >= controller.patience_until);
     if threat.is_none() && view.tick >= u64::from(controller.difficulty.first_wave) && ready {
+        fresh = controller.wave.is_empty();
         controller.patience_until = view
             .tick
             .saturating_add(u64::from(controller.difficulty.wave_patience));
@@ -1286,12 +1336,51 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
         .filter_map(|id| armed.get(id).copied())
         .collect();
     let at_rest = members.iter().all(|unit| unit.idle()) && joined.is_empty();
+    let centroid = centroid(&members, controller.start);
+    // Large maps: a new wave first moves through a staging point beside the direct route.
+    if controller.flank {
+        if fresh {
+            controller.waves_sent = controller.waves_sent.saturating_add(1);
+            controller.target = choose_target(controller, centroid);
+            let goal = target_cell(controller, centroid);
+            controller.target = None;
+            controller.staging = goal
+                .and_then(|goal| staging_point(controller, centroid, goal))
+                .map(|stage| (stage, view.tick.saturating_add(STAGING_TICKS)));
+            if let Some((stage, _)) = controller.staging {
+                commands.push(Command::AttackMove {
+                    units: members.iter().map(|unit| unit.id).collect(),
+                    target: stage,
+                });
+                return commands;
+            }
+        }
+        if let Some((stage, until)) = controller.staging {
+            // Reinforcements that just joined are idle at home; the wave rests when the rest are.
+            let resting = members
+                .iter()
+                .filter(|unit| !joined.contains(&unit.id))
+                .all(|unit| unit.idle());
+            if resting || view.tick >= until || chebyshev(centroid, stage) <= STAGING_RADIUS {
+                // Arrived (or stuck): on to the target, chosen afresh below.
+                controller.staging = None;
+                controller.target = None;
+            } else {
+                if !joined.is_empty() {
+                    commands.push(Command::AttackMove {
+                        units: joined,
+                        target: stage,
+                    });
+                }
+                return commands;
+            }
+        }
+    }
     let valid = match controller.target {
         Some(WaveTarget::Building(id)) => controller.known.contains_key(&id),
         Some(WaveTarget::Waypoint(_)) => true,
         None => false,
     };
-    let centroid = centroid(&members, controller.start);
     if at_rest || !valid {
         if at_rest {
             match controller.target {
@@ -1324,6 +1413,43 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
         });
     }
     commands
+}
+
+/// How close (Chebyshev, cells) a wave's centre must come to its staging point.
+pub const STAGING_RADIUS: u32 = 6;
+
+/// Ticks a wave may spend reaching its staging point (two minutes) before it attacks directly.
+pub const STAGING_TICKS: u64 = 2400;
+
+/// Waves whose target is nearer than this (octile distance, cells) attack directly.
+pub const STAGING_MIN_DISTANCE: u32 = 40;
+
+/// The staging point of a wave at `from` attacking `goal`: the waypoint nearest to the point
+/// halfway along the route and a third of its length to one side, the side alternating with each
+/// wave. Point-symmetric maps preserve orientation, so two players flanking on the same side take
+/// mirrored routes on opposite sides of the map instead of meeting head-on. `None` for a near
+/// target.
+fn staging_point(controller: &AiController, from: CellPos, goal: CellPos) -> Option<CellPos> {
+    if octile_distance(from, goal) < STAGING_MIN_DISTANCE {
+        return None;
+    }
+    let (dx, dy) = (i64::from(goal.x - from.x), i64::from(goal.y - from.y));
+    let side = if controller.waves_sent.is_multiple_of(2) {
+        1
+    } else {
+        -1
+    };
+    let x = i64::from(from.x) + dx / 2 - side * dy / 3;
+    let y = i64::from(from.y) + dy / 2 + side * dx / 3;
+    let aim = CellPos::new(
+        i32::try_from(x).unwrap_or(from.x),
+        i32::try_from(y).unwrap_or(from.y),
+    );
+    controller
+        .waypoints
+        .iter()
+        .map(|waypoint| waypoint.cell)
+        .min_by_key(|&cell| (octile_distance(cell, aim), cell.y, cell.x))
 }
 
 /// The cell of `footprint` nearest to `cell` (Chebyshev distance, then row, then column).
@@ -1380,20 +1506,47 @@ fn choose_target(controller: &AiController, from: CellPos) -> Option<WaveTarget>
     if unseen_start.is_some() {
         return unseen_start;
     }
+    // On large maps a sweep looks near the enemy starts first, where its remaining buildings
+    // most likely stand, among the waypoints of the same era of last sight; a sweep in order of
+    // distance alone wanders the far corners of the map for a long time.
+    let near_enemy = |cell: CellPos| {
+        controller
+            .waypoints
+            .iter()
+            .filter(|waypoint| waypoint.priority)
+            .map(|waypoint| octile_distance(cell, waypoint.cell))
+            .min()
+            .unwrap_or(0)
+    };
     controller
         .waypoints
         .iter()
         .enumerate()
         .min_by_key(|(_, waypoint)| {
-            (
-                waypoint.seen,
-                octile_distance(from, waypoint.cell),
-                waypoint.cell.y,
-                waypoint.cell.x,
-            )
+            if controller.flank {
+                (
+                    waypoint.seen / SWEEP_ERA_TICKS,
+                    near_enemy(waypoint.cell),
+                    octile_distance(from, waypoint.cell),
+                    waypoint.cell.y,
+                    waypoint.cell.x,
+                )
+            } else {
+                (
+                    waypoint.seen,
+                    0,
+                    octile_distance(from, waypoint.cell),
+                    waypoint.cell.y,
+                    waypoint.cell.x,
+                )
+            }
         })
         .map(|(index, _)| WaveTarget::Waypoint(index))
 }
+
+/// Large maps: waypoints last seen within the same span of ticks (five minutes) count as equally
+/// stale when a wave sweeps for buildings it does not know.
+pub const SWEEP_ERA_TICKS: u64 = 6000;
 
 /// The cell the wave attack-moves to for its target.
 fn target_cell(controller: &AiController, from: CellPos) -> Option<CellPos> {

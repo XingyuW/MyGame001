@@ -59,6 +59,8 @@ pub enum HarvestState {
 /// `harvesters`).
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Harvester {
+    /// Explicitly assigned field, retained across deliveries.
+    pub field: Option<CellPos>,
     /// Ore units carried, from 0 to the capacity.
     pub load: u32,
     pub state: HarvestState,
@@ -70,6 +72,7 @@ impl Harvester {
     /// An empty harvester that starts its cycle.
     pub(crate) fn new() -> Self {
         Self {
+            field: None,
             load: 0,
             state: HarvestState::Seeking,
             attempts: 0,
@@ -78,6 +81,7 @@ impl Harvester {
 
     /// Stops the cycle (a `Move` or `Stop` command); the load is kept.
     pub(crate) fn stop(&mut self) {
+        self.field = None;
         self.state = HarvestState::Idle;
         self.attempts = 0;
     }
@@ -85,6 +89,14 @@ impl Harvester {
     /// Load, then a state tag (0 idle, 1 seeking, 2 to ore with the cell, 3 to a refinery with
     /// its id and the dock cell), then the attempts.
     pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
+        match self.field {
+            Some(cell) => {
+                hasher.write(&[1]);
+                hasher.write(&cell.x.to_le_bytes());
+                hasher.write(&cell.y.to_le_bytes());
+            }
+            None => hasher.write(&[0]),
+        }
         hasher.write_u32(self.load);
         match self.state {
             HarvestState::Idle => hasher.write(&[0]),
@@ -260,7 +272,12 @@ impl Context<'_> {
             self.go_to_refinery(worker);
             return;
         }
-        match nearest_ore(self.grid, worker.cell, worker.id, self.claimed) {
+        match nearest_ore(
+            self.grid,
+            worker.harvester.field.unwrap_or(worker.cell),
+            worker.id,
+            self.claimed,
+        ) {
             Some(cell) => self.set_out(worker, cell, HarvestState::ToOre(cell)),
             None if load > 0 => self.go_to_refinery(worker),
             None => self.idle(worker, HarvestIdle::NoOre),
@@ -274,7 +291,7 @@ impl Context<'_> {
             self.go_to_refinery(worker);
             return;
         };
-        if target.footprint.distance_to_cell(worker.cell) != 1 {
+        if target.owner != worker.owner || target.footprint.distance_to_cell(worker.cell) != 1 {
             self.go_to_refinery(worker);
             return;
         }
@@ -386,6 +403,9 @@ pub(crate) fn harvest(
             HarvestState::Seeking | HarvestState::ToOre(_) => {
                 if let HarvestState::ToOre(cell) = worker.harvester.state {
                     context.claimed.remove(&cell);
+                    if cell != worker.cell {
+                        worker.harvester.field = None;
+                    }
                 }
                 context.work(&mut worker);
             }

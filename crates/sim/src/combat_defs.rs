@@ -56,7 +56,7 @@ pub const MAX_ARMOUR_CLASSES: usize = 16;
 pub const MAX_WARHEADS: usize = 32;
 
 /// Largest number of weapons.
-pub const MAX_WEAPONS: usize = 32;
+pub const MAX_WEAPONS: usize = 64;
 
 /// Largest number of weapons of one unit or building type.
 pub const MAX_WEAPONS_PER_TYPE: usize = 1;
@@ -96,7 +96,7 @@ pub const MAX_PROJECTILE_SPEED: u32 = 4096;
 pub const MAX_SIGHT: u32 = 16;
 
 /// Index of an armour class in [`Definitions`](crate::Definitions).
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ArmourClass(pub u16);
 
 /// Index of a warhead in [`Definitions`](crate::Definitions).
