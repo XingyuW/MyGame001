@@ -27,10 +27,17 @@ use sim::{
     load_skirmish, map_asset_path, setup_match,
 };
 
-/// 30 minutes of game time, on maps up to `sim::ARMY_SCALE_SPAN` cells wide and high together;
+/// 60 minutes of game time, on maps up to `sim::ARMY_SCALE_SPAN` cells wide and high together;
 /// larger maps get proportionally longer, as their armies travel up to twice as far
 /// ([`tick_limit`]).
-const MATCH_TICK_LIMIT: u64 = 36_000;
+///
+/// Before RA2 it was 36,000. RA2 gives every item the build time of Red Alert 2,
+/// `cost x 21 / 25` ticks, where a vehicle took `cost / 3`: 2.52 times as long. The plans of
+/// the computer players build two War Factories, which the multiple factory rule speeds up by
+/// 1 / 0.8, so their armies, mostly vehicles, are built 2.52 x 0.8 = 2.016 times as slowly.
+/// The limit is rescaled by that pacing factor, 2 (docs/DECISIONS.md R29, with the measured
+/// lengths of all 756 matches before and after).
+const MATCH_TICK_LIMIT: u64 = 72_000;
 
 /// The tick limit of a match on `grid`.
 fn tick_limit(grid: &sim::Grid) -> u64 {
