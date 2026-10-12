@@ -22,8 +22,8 @@ use bevy_ecs::resource::Resource;
 use serde::Deserialize;
 
 use crate::combat_defs::{
-    self, ArmourClass, CombatDefinitions, CombatTerms, WarheadDef, WarheadKind, WeaponDef,
-    WeaponKind,
+    self, ArmourClass, CombatDefinitions, CombatTerms, Effect, EffectDef, WarheadDef, WarheadKind,
+    WeaponDef, WeaponKind,
 };
 use crate::data::{self, DataError, DataErrorKind, MAX_DATA_FILE_BYTES, Shape};
 use crate::economy_defs::{
@@ -191,6 +191,24 @@ impl Definitions {
             .position(|weapon| weapon.id == id)
             .and_then(|index| u16::try_from(index).ok())
             .map(WeaponKind)
+    }
+
+    /// The kind of the warhead with this id.
+    pub fn warhead_kind(&self, id: &str) -> Option<WarheadKind> {
+        self.combat
+            .warheads
+            .iter()
+            .position(|warhead| warhead.id == id)
+            .and_then(|index| u16::try_from(index).ok())
+            .map(WarheadKind)
+    }
+
+    /// The impact of the area effect `effect`, if the combat file lists it.
+    pub fn effect(&self, effect: Effect) -> Option<EffectDef> {
+        Effect::ALL
+            .iter()
+            .position(|&listed| listed == effect)
+            .and_then(|index| self.combat.effects.get(index).copied().flatten())
     }
 
     /// The kind of the armour class with this name.

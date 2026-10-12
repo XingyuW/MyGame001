@@ -28,8 +28,10 @@ use std::fmt;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 
-/// Largest accepted data file in bytes.
-pub const MAX_DATA_FILE_BYTES: u64 = 64 * 1024;
+/// Largest accepted data file in bytes. The largest shipped file, the combat file with every
+/// weapon and warhead of the RA2 ruleset and the ini key of every value, has 81 KiB
+/// (docs/DECISIONS.md R32).
+pub const MAX_DATA_FILE_BYTES: u64 = 128 * 1024;
 
 /// Longest accepted string value in bytes.
 pub const MAX_STRING_BYTES: usize = 256;

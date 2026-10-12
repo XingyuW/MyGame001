@@ -513,7 +513,8 @@ struct UnitSnap {
     mobile: Mobile,
     has_order: bool,
     harvest: Option<HarvestState>,
-    /// Whether it has a weapon. Whether it belongs to the army is [`View::fights`].
+    /// Whether it has a weapon against targets on the ground. Whether it belongs to the army is
+    /// [`View::fights`].
     armed: bool,
     attacking: bool,
     sight: Option<u32>,
@@ -769,7 +770,15 @@ pub(crate) fn run_ai(
                 mobile: *mobile,
                 has_order: orders.current.is_some(),
                 harvest: harvester.map(|harvester| harvester.state),
-                armed: weapon.is_some(),
+                // A unit whose weapons engage aircraft only wins no ground: it is no army
+                // unit (RA3).
+                armed: weapon.is_some_and(|weapon| {
+                    [Some(weapon.kind), weapon.secondary]
+                        .into_iter()
+                        .flatten()
+                        .filter_map(|kind| definitions.weapon(kind))
+                        .any(|def| def.anti_ground)
+                }),
                 attacking: weapon.is_some_and(|weapon| weapon.order.is_some()),
                 sight: sight.map(|sight| sight.0),
             },

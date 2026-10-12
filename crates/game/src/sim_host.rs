@@ -155,8 +155,14 @@ impl SimHost {
     fn install(&mut self, plan: &MatchPlan) -> Result<MatchStart, String> {
         self.world.insert_resource(plan.grid.clone());
         self.world.insert_resource(plan.definitions.clone());
-        // Trees, houses and city blocks take damage like structures.
-        if let Some(armour) = plan.definitions.armour_class("structure") {
+        // Trees, houses and city blocks take damage as the armour type `wood` does (RA3, the
+        // armour of the reference's lightest civilian buildings; docs/DECISIONS.md R35), and
+        // with the legacy ruleset like its structures.
+        if let Some(armour) = plan
+            .definitions
+            .armour_class("wood")
+            .or_else(|| plan.definitions.armour_class("structure"))
+        {
             self.world
                 .insert_resource(sim::Props::from_looks(&plan.grid, &plan.looks, armour));
         }

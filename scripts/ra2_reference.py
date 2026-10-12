@@ -196,7 +196,7 @@ WHOLE_SECTIONS = {
 
 # Global sections of which only the listed keys are written.
 PARTIAL_SECTIONS = {
-    "AudioVisual": ("ConditionYellow", "ConditionRed"),
+    "AudioVisual": ("ConditionYellow", "ConditionRed", "Gravity"),
     "Harvest": ("Rate",),
 }
 

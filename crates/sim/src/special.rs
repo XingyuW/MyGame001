@@ -1,9 +1,19 @@
 //! Deterministic specialist actions layered onto the common command, movement and combat paths.
+//!
+//! Area damage (RA3, docs/RA2_PARITY_PLAN.md section 4.3, docs/DECISIONS.md R35): the nuclear
+//! strike, the bolts of the lightning storm, the bomb of a demolition specialist, the charge of
+//! a commando and the pulses of a radiation zone are impacts of the warhead and base damage the
+//! combat file's `effects` name for them (`area`), and a suicide unit's blast is the impact
+//! of its own weapon at its own position, so all of them go through the armour table
+//! (`crate::combat::detonate`). An effect the combat file does not list, and a suicide unit in a
+//! world without a rules file, keep the rule of M9 (`blast`: damage that falls off with the
+//! distance in cells and ignores armour), which is what the fixtures of M9 assert.
 use crate::{
     Building, CellPos, Definitions, Footprint, Grid, ProductionItem, SimId, SimTick, UnitKind,
     arsenal::*,
     building::{building_bundle, check_footprint},
-    combat::{Health, Weapon, combat_components},
+    combat::{Blast, Condition, DamageState, Health, Weapon, combat_components, detonate},
+    combat_defs::Effect,
     command::{Command, IssuedCommand, PlayerId, RejectReason},
     economy::Players,
     event::SimEvent,
@@ -301,6 +311,30 @@ fn hurt(world: &mut World, a: &Actor, damage: i32) {
         h.hit_points = h.hit_points.saturating_sub(damage);
     }
 }
+/// The area effect `effect` at `point`: an impact of the warhead and base damage the combat
+/// file names for it, on the ground (and `direct`, if given, as if hit at the point itself).
+/// Returns whether the combat file lists the effect; if not, nothing happened and the caller
+/// applies the rule of M9.
+fn area(world: &mut World, effect: Effect, point: crate::SubPos, direct: Option<SimId>) -> bool {
+    let Some(def) = world.resource::<Definitions>().effect(effect) else {
+        return false;
+    };
+    detonate(
+        world,
+        Blast {
+            point,
+            air: false,
+            warhead: def.warhead,
+            damage: def.damage,
+            direct,
+        },
+        // A radiation zone pulses on everything in it once a second: no event for each.
+        effect != Effect::Radiation,
+    );
+    true
+}
+/// The area damage of M9, for effects the combat file does not list: `damage` at `cell`, less
+/// with every cell of distance, nothing beyond `radius` cells, whatever the armour.
 fn blast(world: &mut World, cell: CellPos, radius: u32, damage: i32) {
     // Scenery in the area (`crate::props`) is hurt like everything else.
     let hit: Vec<(CellPos, i64)> = world
@@ -333,6 +367,23 @@ fn blast(world: &mut World, cell: CellPos, radius: u32, damage: i32) {
             );
         }
     }
+}
+/// Where the unit `a` is (a building: the centre of its footprint's origin).
+fn position_of(world: &World, a: &Actor) -> crate::SubPos {
+    world
+        .get::<Position>(a.entity)
+        .map_or(crate::SubPos::centre_of(a.cell), |position| position.0)
+}
+/// The cell of `foot` nearest to `from`.
+fn nearest_cell_of(foot: Footprint, from: CellPos) -> CellPos {
+    let clamp = |at: i32, origin: i32, side: u8| {
+        let last = i64::from(origin) + i64::from(side.max(1)) - 1;
+        i32::try_from(i64::from(at).clamp(i64::from(origin), last)).unwrap_or(origin)
+    };
+    CellPos::new(
+        clamp(from.x, foot.origin.x, foot.width),
+        clamp(from.y, foot.origin.y, foot.height),
+    )
 }
 fn clear_orders(world: &mut World, e: Entity) {
     if let Some(mut o) = world.get_mut::<Orders>(e) {
@@ -686,7 +737,7 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
                     damage: meta.strength / 10,
                     remaining: 200,
                 });
-            } else {
+            } else if !area(world, Effect::Nuke, crate::SubPos::centre_of(*target), None) {
                 blast(world, *target, meta.radius, meta.strength);
             }
             world
@@ -1019,8 +1070,22 @@ pub(crate) fn advance(world: &mut World) {
                 .resource::<SpecialState>()
                 .disabled
                 .contains_key(&a.id);
+            // With a rules file a vehicle or ship that is no longer green moves at three
+            // quarters of its speed (RA3, docs/RA2_PARITY_PLAN.md section 4.1).
+            let damaged = defs.rules().is_some()
+                && meta.category == Category::Vehicles
+                && meta.domain != Domain::Air
+                && world
+                    .get::<Condition>(a.entity)
+                    .is_some_and(|c| c.0 != DamageState::Green);
             if let Some(mut m) = world.get_mut::<Mobile>(a.entity) {
-                m.speed = if disabled { 0 } else { u.speed };
+                m.speed = if disabled {
+                    0
+                } else if damaged {
+                    u.speed - u.speed / 4
+                } else {
+                    u.speed
+                };
             }
         }
         if meta.role == Role::Chrono
@@ -1270,7 +1335,9 @@ pub(crate) fn resolve(world: &mut World) {
         .collect();
     for event in events {
         if let SimEvent::WeaponFired {
-            attacker, target, ..
+            attacker,
+            target,
+            weapon,
         } = event
         {
             let (Some(a), Some(b)) = (index.get(&attacker), index.get(&target)) else {
@@ -1304,30 +1371,61 @@ pub(crate) fn resolve(world: &mut World) {
                     clear_orders(world, b.entity);
                 }
                 Role::Demolition => {
+                    // With a rules file the bomb goes off after the ini's `IvanTimedDelay`.
+                    let delay = defs.rules().map_or(u64::from(meta.cooldown), |rules| {
+                        u64::from(rules.combat.ivan_delay.max(1).unsigned_abs())
+                    });
                     world
                         .resource_mut::<SpecialState>()
                         .bombs
                         .entry(b.id)
-                        .or_insert((
-                            tick.saturating_add(u64::from(meta.cooldown)),
-                            meta.strength,
-                            meta.radius,
-                        ));
+                        .or_insert((tick.saturating_add(delay), meta.strength, meta.radius));
                 }
                 Role::Suicide => {
-                    blast(world, a.cell, meta.radius, meta.strength);
+                    // With a rules file the blast is the impact of the unit's own weapon where
+                    // it stands (`combat` deals no other damage for the shot).
+                    let own = defs
+                        .rules()
+                        .and(defs.weapon(weapon))
+                        .map(|def| (def.warhead, def.damage));
+                    match own {
+                        Some((warhead, damage)) => detonate(
+                            world,
+                            Blast {
+                                point: position_of(world, a),
+                                air: false,
+                                warhead,
+                                damage,
+                                direct: None,
+                            },
+                            true,
+                        ),
+                        None => blast(world, a.cell, meta.radius, meta.strength),
+                    }
                     if let Some(mut h) = world.get_mut::<Health>(a.entity) {
                         h.hit_points = 0;
                     }
                 }
-                Role::Splash => {
+                // Without a rules file the shot of a splash unit also blasts the cells around
+                // its target; with one, the spread of its warhead does (`combat`).
+                Role::Splash if defs.rules().is_none() => {
                     blast(world, b.cell, meta.radius, meta.strength);
                 }
                 Role::Commando if b.foot.is_some() => {
-                    hurt(world, b, meta.strength.saturating_mul(10));
+                    let point = b.foot.map_or(crate::SubPos::centre_of(b.cell), |foot| {
+                        crate::SubPos::centre_of(nearest_cell_of(foot, a.cell))
+                    });
+                    if !area(world, Effect::C4, point, Some(b.id)) {
+                        hurt(world, b, meta.strength.saturating_mul(10));
+                    }
                 }
                 Role::Carrier => launch_fighters(world, a, b, &defs, meta.capacity),
-                Role::Strike => {
+                // A strike aircraft turns for home after the last shot of its volley.
+                Role::Strike
+                    if world
+                        .get::<Weapon>(a.entity)
+                        .is_none_or(|w| w.burst_left == 0) =>
+                {
                     clear_orders(world, a.entity);
                     world
                         .resource_mut::<SpecialState>()
@@ -1373,7 +1471,9 @@ pub(crate) fn resolve(world: &mut World) {
     let bombs = world.resource::<SpecialState>().bombs.clone();
     for (id, (due, damage, radius)) in bombs {
         if due <= tick || !index.contains_key(&id) {
-            if let Some(a) = index.get(&id) {
+            if let Some(a) = index.get(&id)
+                && !area(world, Effect::IvanBomb, position_of(world, a), Some(a.id))
+            {
                 blast(world, a.cell, radius, damage);
             }
             world.resource_mut::<SpecialState>().bombs.remove(&id);
@@ -1388,10 +1488,22 @@ pub(crate) fn resolve(world: &mut World) {
                         && !matches!(a.item,ProductionItem::Unit(k) if defs.domain(k)==Domain::Air)
                         && near(a.cell, z.cell, z.radius)
                     {
-                        hurt(world, a, z.damage);
+                        // With the effect listed, a pulse is an impact of the radiation
+                        // warhead on everything in the zone, each where it is.
+                        let point = a.foot.map_or(position_of(world, a), |foot| {
+                            crate::SubPos::centre_of(nearest_cell_of(foot, z.cell))
+                        });
+                        if !area(world, Effect::Radiation, point, Some(a.id)) {
+                            hurt(world, a, z.damage);
+                        }
                     }
                 }
-            } else {
+            } else if !area(
+                world,
+                Effect::Lightning,
+                crate::SubPos::centre_of(z.cell),
+                None,
+            ) {
                 blast(world, z.cell, z.radius, z.damage);
             }
         }

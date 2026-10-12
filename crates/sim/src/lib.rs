@@ -50,14 +50,17 @@ pub use building::{
 };
 
 pub use combat::{
-    Armour, AttackOrder, Health, MAX_CHASES, Projectile, Projectiles, Sight, Weapon,
-    applied_damage, in_range,
+    Armour, AttackOrder, Condition, DamageState, Health, MAX_CHASES, Projectile, Projectiles,
+    Sight, TargetTraits, Weapon, applied_damage, damage_state, in_range, inside_min_range,
+    scattered, splash_damage, versus_against, weapon_against,
 };
 pub use combat_defs::{
-    ArmourClass, COMBAT_SCHEMA_VERSION, CombatTerms, MAX_ARMOUR_CLASSES, MAX_DAMAGE,
-    MAX_HIT_POINTS, MAX_PROJECTILE_SPEED, MAX_RELOAD, MAX_SIGHT, MAX_VERSUS_PERCENT, MAX_WARHEADS,
-    MAX_WEAPON_RANGE, MAX_WEAPONS, MAX_WEAPONS_PER_TYPE, MIN_PROJECTILE_SPEED, MIN_WEAPON_RANGE,
-    WarheadDef, WarheadKind, WeaponDef, WeaponKind,
+    ArmourClass, BURST_GAP, COMBAT_SCHEMA_VERSION, CombatTerms, Effect, EffectDef,
+    MAX_AIR_RANGE_BONUS, MAX_ARMOUR_CLASSES, MAX_BURST, MAX_CELL_SPREAD, MAX_DAMAGE,
+    MAX_HIT_POINTS, MAX_LAND_TARGETING, MAX_NAVAL_TARGETING, MAX_PROJECTILE_SPEED, MAX_RELOAD,
+    MAX_SCATTER, MAX_SIGHT, MAX_VERSUS_PERCENT, MAX_WARHEADS, MAX_WEAPON_RANGE, MAX_WEAPONS,
+    MAX_WEAPONS_PER_TYPE, MIN_PROJECTILE_SPEED, MIN_WEAPON_RANGE, WarheadDef, WarheadKind,
+    WeaponDef, WeaponKind,
 };
 pub use command::{
     Command, CommandQueue, IssuedCommand, MAX_UNITS_PER_COMMAND, PlayerId, RejectReason,

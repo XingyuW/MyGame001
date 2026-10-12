@@ -6,6 +6,11 @@ parity audit compares the shipped `assets/data/*.ron` with these tab separated t
 * `ra2_mapping.tsv`: game id to `rules.ini` section. Columns `game_id`, `kind` (`unit`,
   `building`), `section`, `side` (`allied`, `soviet`, `none`), `note` (`twin`: second section
   of one game item; `-`: none). Written by hand; the script checks every row against the ini.
+* `ra2_combat.tsv`: game id of a weapon or a warhead to its `rules.ini` section (since RA3).
+  Columns `game_id`, `kind` (`weapon`, `warhead`), `section`. Written by hand. Two sections
+  may share a game id (the teeth of the two dogs); the generator writes the weapons and
+  warheads in the order of the table and fails on one that no type or effect uses, and the
+  audit fails on a shipped weapon or warhead that is not mapped.
 * `ra2_reference.tsv`: the values the game uses. Columns `file` (`rules`, `art`), `section`,
   `key`, `value`, sorted. Generated, never edited by hand.
 * `ra2_differences.tsv`: intentional differences between the shipped data and the reference.
@@ -14,8 +19,16 @@ parity audit compares the shipped `assets/data/*.ron` with these tab separated t
   audit names it (`cost`, `strength`, `sight`, `speed`, `prerequisites`, `power`, `sell_value`,
   `owner_sides`, `required_countries`, `forbidden_countries`, `tech_level`, `present`, since
   RA2 `build_time`, `build_limit`, `lane`, `adjacent`, `base_normal`, `radar`, `sellable`,
-  `repairable`, `powered`, `is_powered`, `unit_repair`, or `group.field` for `rules.ron`), the
-  shipped value, and the reference value as the ini writes it. The audit fails on a difference
+  `repairable`, `powered`, `is_powered`, `unit_repair`, since RA3 `armour`, `weapons`,
+  `elite_weapons` (the game ids of the slots, comma separated), `air_range_bonus`,
+  `land_targeting`, `naval_targeting`, `underwater`, `organic`, `wall`, or `group.field` for
+  `rules.ron`), the shipped value, and the reference value as the ini writes it. Since RA3 a
+  weapon is listed as `weapon.<id>` (fields `damage`, `range`, `min_range`, `reload`, `burst`,
+  `warhead`, `projectile_speed`, `anti_air`, `anti_ground`, `scatter`; the reference value of
+  `projectile_speed` is `<Projectile>:instant`, `<Projectile>:arcing:<Range>` or
+  `<Projectile>:<Speed>`), a warhead as `warhead.<id>` (`versus`, `cell_spread`,
+  `percent_at_max`, `wall`, `wood`) and an area effect as `effect.<id>` (`damage`, `warhead`),
+  since a weapon and a unit may share an id. The audit fails on a difference
   without a row and on a row that no longer applies.
 
 The shipped data is generated from these tables, and audited against them:
@@ -26,8 +39,8 @@ python3 scripts/generate_ra2_data.py --check    # exit 1 if a shipped file is st
 cargo test --release -p sim --test ra9_data_parity
 ```
 
-`scripts/generate_ra2_data.py` reads only `ra2_reference.tsv` and `ra2_mapping.tsv` (never the
-ini files) and its own tables of game specific values; `crates/sim/tests/ra9_data_parity.rs`
+`scripts/generate_ra2_data.py` reads only `ra2_reference.tsv`, `ra2_mapping.tsv` and
+`ra2_combat.tsv` (never the ini files) and its own tables of game specific values; `crates/sim/tests/ra9_data_parity.rs`
 recomputes every conversion in Rust and compares the shipped files with the reference.
 
 Regenerating:

@@ -818,6 +818,16 @@ fn log_sim_events(mut events: MessageReader<SimEvent>) {
                 "a projectile of {} found its target {} gone",
                 attacker.0, target.0
             ),
+            SimEvent::Impact { warhead, at, air } => debug!(
+                "warhead {} went off at ({}, {}){}",
+                warhead.0,
+                at.x,
+                at.y,
+                if *air { " in the air" } else { "" }
+            ),
+            SimEvent::DamageStateChanged { player, id, state } => {
+                debug!("player {}: {} is now {state:?}", player.0, id.0);
+            }
             SimEvent::UnitDestroyed { player, unit } => {
                 info!("player {}: unit {} destroyed", player.0, unit.0);
             }

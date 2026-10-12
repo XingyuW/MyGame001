@@ -742,6 +742,23 @@ fn check_plan(
                 "an armed unit type with production terms",
             ));
         }
+        // A unit whose weapons engage aircraft only cannot win a match (RA3): the computer
+        // player does not send it with its waves, so it is no army unit.
+        let ground = definitions.unit_combat(kind).is_some_and(|terms| {
+            terms
+                .weapons(false)
+                .into_iter()
+                .flatten()
+                .filter_map(|weapon| definitions.weapon(weapon))
+                .any(|weapon| weapon.anti_ground)
+        });
+        if !ground {
+            return Err(invalid(
+                field,
+                of(format!("{id:?}, which attacks aircraft only")),
+                "a unit type with a weapon against targets on the ground",
+            ));
+        }
         // An armed harvester (the War Miner) mines: the computer player never sends it to
         // fight (`crate::ai`), so it is no army unit.
         if definitions.harvester(kind).is_some() {
@@ -755,7 +772,11 @@ fn check_plan(
             .map_err(|(field, kind)| (field, in_plan(kind, faction)))?;
     }
     // The army must be able to damage every building type, or a match between computer players
-    // could not end (docs/DECISIONS.md D42).
+    // could not end (docs/DECISIONS.md D42): some unit of it has a weapon that it uses against
+    // the building as it stands on land ([`weapon_against`](crate::weapon_against), RA3) and
+    // that damages it, by more than 1 percent with a rules file (a unit engages no target on
+    // its own that it damages by 1 percent or less).
+    let floor = i32::from(definitions.rules().is_some());
     for (index, def) in definitions.buildings().iter().enumerate() {
         let Some(terms) = u16::try_from(index)
             .ok()
@@ -763,13 +784,18 @@ fn check_plan(
         else {
             continue;
         };
+        let target = crate::TargetTraits {
+            armour: terms.armour,
+            wall: terms.wall,
+            ..crate::TargetTraits::default()
+        };
         let damaged = army.iter().any(|&(_, kind)| {
             definitions
                 .unit_combat(kind)
-                .and_then(|unit| unit.weapon)
-                .and_then(|weapon| definitions.weapon(weapon))
-                .and_then(|weapon| definitions.versus(weapon.warhead, terms.armour))
-                .is_some_and(|percent| percent > 0)
+                .and_then(|unit| {
+                    crate::weapon_against(definitions, &unit, unit.weapons(false), &target)
+                })
+                .is_some_and(|(_, percent)| percent > floor)
         });
         if !damaged {
             return Err((

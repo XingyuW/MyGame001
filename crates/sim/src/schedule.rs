@@ -141,7 +141,11 @@ impl Plugin for SimPlugin {
                 .chain()
                 .in_set(SimCoreSet(SimSet::Combat))
                 .in_set(SimSet::Combat),
-            (remove_dead, crate::props::remove_dead_props)
+            (
+                remove_dead,
+                crate::props::remove_dead_props,
+                crate::combat::update_conditions,
+            )
                 .chain()
                 .in_set(SimCoreSet(SimSet::Cleanup))
                 .in_set(SimSet::Cleanup),
