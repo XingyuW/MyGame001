@@ -1403,7 +1403,12 @@ fn set_rally_points(view: &View<'_>, controller: &AiController) -> Vec<Command> 
 }
 
 /// `Harvest` for the idle harvesters, at the refinery nearest to the start position, at most once
-/// every [`HARVEST_RETRY_TICKS`].
+/// every [`HARVEST_RETRY_TICKS`]. Not for a harvester of the attack wave: an armed harvester
+/// that fights as a last resort ([`View::fights`]) has no order whenever it stands and fires,
+/// and a `Harvest` command then ended its attack and, with no ore to go to, left it idle far
+/// from home, from where it was called back to the gathering point; a player whose only armed
+/// unit it was then took a wave's patience for every few shots at the enemy's last buildings
+/// (RA3, docs/DECISIONS.md R44).
 fn put_harvesters_to_work(view: &View<'_>, controller: &mut AiController) -> Option<Command> {
     if view.tick < controller.next_harvest {
         return None;
@@ -1426,6 +1431,7 @@ fn put_harvesters_to_work(view: &View<'_>, controller: &mut AiController) -> Opt
         .own_units
         .iter()
         .filter(|unit| unit.harvest == Some(HarvestState::Idle) && !unit.has_order)
+        .filter(|unit| !controller.wave.contains(&unit.id))
         .map(|unit| unit.id)
         .collect();
     if idle.is_empty() {
