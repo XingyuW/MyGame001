@@ -287,13 +287,13 @@ NEW_BUILDINGS = {
     "soviet_barracks": ("Soviet Barracks", "barracks"),
     "soviet_war_factory": ("Soviet War Factory", "war_factory"),
     "soviet_naval_shipyard": ("Soviet Naval Shipyard", "naval_shipyard"),
-    "american_airforce_command": ("American Airforce Command Headquarters", "airforce_command"),
+    "american_airforce_command": ("American Airforce Command", "airforce_command"),
     "soviet_service_depot": ("Soviet Service Depot", "service_depot"),
     "soviet_battle_lab": ("Soviet Battle Lab", "tech_center"),
     "soviet_walls": ("Soviet Walls", "fortress_walls"),
 }
 NEW_UNITS = {
-    "soviet_mcv": ("Soviet Mobile Construction Vehicle (MCV)", "mcv"),
+    "soviet_mcv": ("Soviet MCV", "mcv"),
     "soviet_amphibious_transport": ("Soviet Amphibious Transport", "amphibious_transport"),
     "chrono_commando": ("Chrono Commando", "tanya"),
     "psi_commando": ("Psi Commando", "tanya"),
