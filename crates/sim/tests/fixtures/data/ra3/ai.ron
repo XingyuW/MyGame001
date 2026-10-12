@@ -1,0 +1,44 @@
+// RA3 fixture (as the RA2 fixture's): the computer player's plans for the two sides of the small world of the RA1
+// fixture, and two difficulties. The Allied plan lists a defence beside its buildings, so that
+// its computer player uses both lanes of its yard. Fixture data (invariant I10).
+(
+    schema_version: 2,
+    plans: [
+        (
+            side: "allied",
+            build_order: ["allied_power", "bunker", "allied_refinery", "allied_barracks", "bunker", "allied_factory", "allied_power"],
+            power: "allied_power",
+            harvester: "miner_a",
+            army: ["tank", "tank", "rifleman"],
+        ),
+        (
+            side: "soviet",
+            build_order: ["soviet_power", "soviet_refinery", "soviet_barracks", "soviet_factory", "soviet_power"],
+            power: "soviet_power",
+            harvester: "miner_s",
+            army: ["heavy", "conscript", "heavy"],
+        ),
+    ],
+    difficulties: [
+        (
+            id: "easy",
+            think_interval: 20,
+            harvesters_per_refinery: 1,
+            max_army: 6,
+            wave_size: 4,
+            first_wave: 1200,
+            wave_patience: 1200,
+            defence_radius: 6,
+        ),
+        (
+            id: "brutal",
+            think_interval: 10,
+            harvesters_per_refinery: 2,
+            max_army: 12,
+            wave_size: 5,
+            first_wave: 600,
+            wave_patience: 800,
+            defence_radius: 8,
+        ),
+    ],
+)
