@@ -2193,3 +2193,359 @@ New in RA2: `ra2_definitions.rs` (7), `ra2_production.rs` (15), `ra2_power.rs` (
 shared helpers in `tests/ra2_common/mod.rs`; 2 unit tests in `sim::economy`; in the game
 `minimap` 2, `sidebar` 2, `construction` 1, and one more case in
 `smoke::tests::a_run_passes_only_with_the_full_interface_loaded`.
+
+### R32. RA3-A: the combat file of schema version 2, its limits, and the size of a data file
+
+1. **`combat.ron`, schema 2** (`crates/sim/src/combat_defs.rs`; plan item 1). Every field is
+   required. A warhead gains `cell_spread` (subcells, 0 to 2816: the 11 cells the original
+   engine supports), `percent_at_max` (0 to 100) and the flags `wall` and `wood`. A weapon
+   gains `min_range` (below its range), `burst` (1 to 8), `anti_air` and `anti_ground` (at
+   least one), and `scatter` (0 to 2048 subcells: the largest distance between target and
+   impact at the weapon's full range; 0 for an accurate weapon). A type lists up to two
+   `weapons` (primary, secondary) and the `elite_weapons` that take their places at elite
+   rank (none for an unarmed type, at least one for an armed one), and has `air_range_bonus`
+   (0 to 2048 subcells), `land_targeting` (0 to 2) and `naval_targeting` (0 to 6, the ini's
+   codes, R34); a unit type also `underwater` and `organic`, a building type `wall`. A new
+   list `effects` names base damage and warhead of the area effects that are no weapon of a
+   type (`nuke`, `lightning`, `ivan_bomb`, `c4`, `radiation`; each at most once, R35).
+2. **Beyond the plan's list**, each because a rule of the milestone needs the data:
+   `land_targeting`, `naval_targeting`, `underwater` and `organic` (the brief's item 4: which
+   weapons reach submerged units is a property of the attacker's type in the ini, R34);
+   `air_range_bonus` (plan section 4.4); `wall` on a building (a warhead's `wall` flag means
+   nothing without it); `effects` (the plan's item 2 routes the area effects through
+   warheads, which the data must name). **Instead of the plan's "projectile flight kind"**
+   the file keeps `projectile_speed` (0: the shot hits at once) and has `scatter`: no rule of
+   the simulation needs more of the flight than its time and whether it is aimed, and the
+   interface draws a shot by its weapon id.
+3. **Neutral values** (the fixtures of M2 to M9, the legacy ruleset, the RA1 and RA2
+   fixtures): no spread and 100 percent at the edge, `wall` and `wood` 1, no minimum range,
+   burst 1, both layers, no scatter, elite weapons equal to the weapons, no bonus,
+   `land_targeting` 0, `naval_targeting` 5 (every target on water like one on land), nothing
+   underwater, organic or a wall, and no effects. With them every rule of M4 and M9 is what
+   it was, and every fixture test keeps its numbers.
+4. **Limits changed** (they bound what the simulation derives, invariant I12, and are tested as
+   bounds): `MAX_WARHEADS` 64 (was 32) and `MAX_WEAPONS` 128 (was 64) for the 45 warheads and
+   90 weapons of the port; `MAX_WEAPONS_PER_TYPE` 2 (was 1); `MAX_WEAPON_RANGE` 7680 subcells,
+   30 cells (was 16: the ini has ranges of 18, 25 and 30 cells); `MIN_PROJECTILE_SPEED` 16
+   subcells per tick (was 128: the ini's missiles and torpedoes fly at 29 to 191). A
+   projectile therefore flies at most (7680 + 2048) / 16 = 608 ticks instead of 32, which is
+   the new bound of D28 on the projectiles a weapon has in flight; the soak's limit of 10,000
+   projectiles is unchanged. `MIN_WEAPON_RANGE` stays 384 (1.5 cells, D28: a unit reaches
+   every neighbouring cell), so the Demolition Truck's `Range=1` is a listed difference.
+5. **`MAX_DATA_FILE_BYTES` is 128 KiB (was 64 KiB).** The shipped `combat.ron` has 81 KiB:
+   45 warheads with eleven percentages each, 90 weapons, 88 types, and the ini section and key
+   of every value in a comment, which the programme requires. The hand-over note of RA2 asked
+   for this decision rather than shorter data. The tests of the limit use the constant (a
+   file one byte over it is rejected with `FileTooLarge`), so they test the bound as before.
+   `arsenal.ron` (60 KiB) no longer stands at the limit.
+
+### R33. RA3-A: one damage path
+
+1. **Impacts** (`crates/sim/src/combat.rs`: `Blast`, `blast_hits`, `splash_damage`; plan
+   section 4.3). Every shot ends in an impact of its warhead at a point, and `special.rs`
+   detonates its area effects through the same function (`detonate`, R35). With `R` the
+   warhead's spread, `P` its percentage at the edge and `d` the distance of a victim from the
+   point, the damage is `floor(base x (100 R - (100 - P) d) x versus / (100 R x 100))`, at
+   least 1 if `versus > 0` (equation 2's minimum, kept in every world as the brief asks: the
+   research note that a product below 1 stays 0 in the original is not followed), 0 for
+   `versus = 0`, nothing beyond `R` (`dx^2 + dy^2 <= R^2`, exact), and with a rules file at
+   most `max_damage` (10000) per hit. Computed in `i128`. The veterancy and crate
+   multipliers of the plan's `D0` and `D3` come with RA4 and RA5.
+2. **What an impact hits.** The target of an accurate shot is damaged as at the point itself
+   (`d = 0`), wherever its position is. With a spread, everything else of the impact's layer
+   within it is damaged by its distance: units at their position, scenery at its cell
+   centre, and **a building once for every cell of its footprint whose centre lies within
+   the spread** (single source, plan section 4.3; a direct hit counts as the hit of its
+   cell). Without a spread a shot damages only its target, as in M4; an impact without a
+   target and without a spread (no shipped case) damages what stands in its cell.
+   **Friend and foe alike**, the attacker included (Red Alert 2's rule; M9's `blast` already
+   hurt everyone).
+3. **Layers.** An impact is in the air (the shot was fired at an aircraft) or on the ground
+   and at sea (everything else, and every area effect). It damages only its layer, so flak
+   that bursts beside an aircraft leaves the tank below alone and a nuclear strike leaves the
+   aircraft above alone (appendix D: the original measures in three dimensions, with the same
+   outcome at flight height). **Assumption**: an aircraft is always airborne (aircraft do not
+   land before RA4).
+4. **Where a shot is aimed.** At a unit: its position. At a building: the centre of the cell
+   of its footprint nearest to the attacker (**assumption**: the original aims at the
+   building's centre or the clicked cell; range is still measured to the nearest point, the
+   M4 rule the plan keeps). An accurate projectile follows its target and hits where the
+   target is then (the M4 rule; the original's unguided shells can miss a moving target: a
+   listed difference). If the target is gone, the projectile is reported as expired as
+   before, and if its warhead has a spread it still bursts where it was aimed.
+5. **Walls and trees.** A building type that is a `wall` is damaged only by warheads with
+   `wall`, and trees (scenery) only by warheads with `wood`; for every other warhead they
+   are targets at 0 percent (never acquired; an ordered attack ends with its one shot,
+   `AttackEnd::NoDamage`).
+6. **Cost.** `blast_hits` looks only at the cells the spread reaches, through the grid's
+   occupants and building cover, so an impact does not scan the units of the match
+   (`detonate`, used by the rare area effects, builds an index of them once per call).
+7. **`SimEvent::Impact`** reports an impact where no shot's event says it would be: an
+   inaccurate shot, a projectile whose target was gone, a bomb, a suicide unit, a
+   superweapon. The pulses of a radiation zone are not reported.
+
+### R34. RA3-A: weapons, their choice, and what a type may attack
+
+1. **The port** (`scripts/generate_ra2_data.py`, the table `ra2_combat.tsv`, the audit). Every
+   weapon a shipped type names as `Primary`, `Secondary`, `ElitePrimary`, `EliteSecondary`,
+   `Weapon1` or `EliteWeapon1` is in `combat.ron` with its warhead, except the ten of R36;
+   `[SREF]` and `[FV]` name theirs `Weapon1`. Damage is `Damage`; range and minimum range
+   `round(cells x 256)`; reload `max(1, round(ROF x 4 / 3))`; burst `Burst`; the layers are
+   the projectile's `AA` (default no) and `AG` (default yes); `Verses` in the order of the
+   eleven armour types; `CellSpread` in subcells; `PercentAtMax` as percent (default 100);
+   `Wall`, `Wood`. Armour, `AirRangeBonus`, `LandTargeting`, `NavalTargeting`, `Underwater`,
+   `Organic` of every type. The audit recomputes all of it from the reference and found the
+   generator's every value equal; the 37 intentional differences are rows of
+   `ra2_differences.tsv` (R36).
+2. **Projectile speed** (the ini does not define a flight time; **assumptions**). A
+   projectile with `Inviso=yes`, and the leap of a unit that is its own projectile
+   (`LimboLaunch=yes`: the dogs, the Terror Drone, the squid's grab), hit at once. A
+   projectile with `Arcing=yes` flies at `floor(sqrt(1.2 x Gravity x range))` leptons per
+   frame with `[AudioVisual] Gravity=6`, whatever the weapon's `Speed`: this is the
+   original's rule for ballistic shots as the engine research describes it (single weak
+   source, from the engine's `WeaponTypeClass::GetSpeed`; it is what makes the Grand Cannon's
+   `Speed=1` meaningful), taken at the weapon's full range so that the data holds one speed
+   (a nearer shot arrives sooner than in the original, where the speed falls with the
+   distance). Every other projectile flies at the weapon's `Speed` read as a unit's
+   (`min(Speed x 256 div 100, 255)` leptons per frame; documented by ModEnc for projectiles
+   with `ROT`). All times `x 3 / 4` for subcells per tick.
+3. **The choice** (`sim::weapon_against`, used by the combat stage and by the AI file's
+   check): of the weapons the type's targeting allows for where the target is, the first
+   whose projectile may engage the target's layer and whose warhead damages the target.
+   `Weapon` carries the primary and the secondary weapon (the type's, or what a passenger
+   gave an IFV); RA4 puts the elite weapons there on promotion (`CombatTerms::weapons(true)`;
+   an elite weapon takes the place of the weapon of its slot, and a slot without one keeps
+   its weapon, as the Mirage Tank's `EliteSecondary` without an `ElitePrimary` requires).
+   One reload timer serves both weapons, as in the original.
+4. **Land, sea and under water** (the brief's item 4; decided from the ini). The ini says per
+   attacking type what it may attack on water: `NavalTargeting` 0 none that is underwater
+   (the default: every tank and turret), 1 underwater ones with the secondary weapon (the
+   Destroyer), 2 only underwater ones, 3 organic ones with the secondary weapon (the Giant
+   Squid against Dolphins and squids), 4 all with the secondary (Tanya), 5 all like targets
+   on land (Typhoon, Dolphin), 6 none (dogs, the Terror Drone, the Aegis, the Patriot, the
+   Flak Cannon); and `LandTargeting` 0 yes, 1 no (the three submerged types, the Aegis, the
+   Patriot, the Flak Cannon), 2 with the secondary weapon. The game ports both codes and the
+   target's `Underwater` and `Organic`. So until RA4 adds cloaking a submerged unit (Typhoon,
+   Dolphin, Giant Squid) is an ordinary target for exactly: the Typhoon's torpedo, the
+   Dolphin's sonic beam, the squid, and the Destroyer's stand-in for its Osprey (R36).
+   **Assumptions**: a target is "on water" if it is a ship, an amphibious unit over a water
+   cell, or a building whose footprint's origin is water (so tanks may shell a shipyard and
+   submarines may torpedo it); neither code applies to an aircraft (the Aegis attacks
+   aircraft over land and sea).
+5. **Percentages of 0 and 1.** A target none of the type's weapons may be fired at (layer or
+   targeting code) is never acquired, and an `Attack` order on it is accepted and ends at
+   once with `AttackEnd::NoDamage` without a shot or a move. A target the chosen weapon
+   damages by 0 percent is never acquired, and an order ends with its one shot (the meaning
+   `NoDamage` has had since D32). **With a rules file** a target damaged by 1 percent or
+   less is not acquired either, but an order makes the unit fire on (single source, ModEnc
+   `Verses`: the Sniper and Tanya against vehicles and buildings); without a rules file 1
+   percent is engaged as before, which the M4 fixture's bullet against plate relies on.
+6. **Burst.** `BURST_GAP` = 5 ticks between the shots of a volley (**assumption**: the
+   original waits 3 to 5 frames at random), then the reload. A shot of a volley that cannot
+   be fired when it is due (no target, out of range, a target that calls for the other
+   weapon) ends the volley, and the reload starts then. A strike aircraft (M9's role) turns
+   for home after the last shot of its volley.
+7. **Minimum range and air range bonus.** A weapon does not fire at a target nearer than
+   `min_range` and does not acquire it; a unit ordered to attack one moves to the nearest
+   free cell from which it may fire (the M4 chase, which now also keeps its distance). The
+   bonus lengthens the reach of an anti air weapon against an aircraft; a unit approaches to
+   the weapon's plain range and fires as soon as the lengthened one covers the target.
+8. **Scatter** (plan section 4.4; single source). An `Inaccurate` projectile lands on a
+   point in one of 64 fixed integer directions at a distance drawn uniformly from 0 to
+   `scatter x distance / range`, `scatter` being `BallisticScatter` (1 cell) for the flak
+   shell (`[FlakTProj]`) and twice that for the invisible flak (`[FlakProj]`); it has no
+   target, and damages by its warhead's spread alone. Two draws from `SimRng` per shot, in
+   the id order of the attackers; a world without inaccurate weapons draws nothing, so the
+   fixtures' sequences are unchanged. The direction table is rounded toward zero, so no
+   impact lies beyond the radius.
+
+### R35. RA3-A: the area effects of the specialists and superweapons, and the scenery
+
+1. **Through warheads.** The combat file's `effects` give the M9 effects the warhead and base
+   damage Red Alert 2 uses, **with their M9 timing** until RA6:
+   `nuke` 600 through `[NUKE]` (`[NukePayload]`; at once on the command),
+   `lightning` 250 through `[IonWH]` (`LightningDamage`; M9's ten bolts on the target cell, one
+   every 20 ticks), `ivan_bomb` 400 through `[IvanWH]` (`IvanDamage`; the delay is now the
+   rules' `ivan_delay`, 600 ticks, instead of the arsenal's 100), `c4` through `[Super]`
+   (`C4Warhead`) and `radiation` through `[RadSite]`. The damage of `c4` (200 a shot at a
+   building, M9's number) and of `radiation` (20 a pulse, M9's number) is the game's own:
+   the original destroys a building with C4 outright and scales radiation with a level,
+   which RA6 brings. A suicide unit's blast is the impact of its own weapon (`[TerrorBomb]`
+   225 through `[TerrorBombWH]`, `[Demobomb]` 300 through `[DemobombWH]`) at its own
+   position; `combat` deals no other damage for that shot, nor for the shot that plants a
+   bomb or takes a mind over. M9's extra blast of the "splash" role (Prism Tower, Prism
+   Tank, Grand Cannon, Kirov) is gone with a rules file: the warhead's own spread does it.
+2. **A world without the entry keeps M9's rule** (`special::blast`: damage that falls with the
+   distance in cells and ignores armour), as a world without a rules file keeps M9's suicide
+   blast and splash role. This is the arrangement of R22 item 3, and it is why
+   `m9_arsenal.rs` passes unchanged on the legacy fixture; `special::blast` is therefore not
+   deleted, as the plan's wording has it, but no shipped effect reaches it.
+3. **Scenery** (`props.rs`; the brief's item 3). Trees, houses, city blocks and towers take
+   damage as the armour type `wood`, the armour of the lightest civilian buildings of the
+   reference (of its 223 `CA...` buildings 113 are `steel`, 67 `concrete`, 40 `wood`), since
+   all scenery has one armour type in `props.rs`; and trees only from warheads with
+   `Wood=yes`. With the legacy ruleset the game still looks for `structure`. The hit points
+   of scenery stay the game's own (`TreeStrength=200` is in `rules.ron`, unused: the four
+   kinds of scenery are not the original's terrain objects). **Assumption**: `Wood` is the
+   flag for trees (ModEnc describes it for wooden overlays and terrain objects).
+
+### R36. RA3-A: stand-ins, and the differences left for RA4 and RA6
+
+The audit lists each as a row of `ra2_differences.tsv`; the generator's tables `NOT_CARRIED`
+and `WEAPON_VALUES` hold them.
+
+**RA4 removes** (spawned missiles and aircraft):
+
+* V3 Launcher: its shot is a projectile with the rocket's damage (`V3RocketDamage` 200), warhead
+  (`[V3WH]`) and cruise speed (29 subcells a tick), fired every 533 ticks (`SpawnRegenRate`),
+  with the launcher's range (18 cells) and minimum range (5); it cannot be shot down.
+* Dreadnought: the same with `DMislDamage` 300, `[DMISLWH]`, 38 subcells a tick, volleys of 2
+  every 107 ticks, range 25, minimum range 8.
+* Aircraft Carrier: M9's mechanism (its shot launches two recoverable aircraft of the Harrier's
+  type, which attack with their own weapon); the launcher's warhead, which decides what the
+  carrier may attack, is that of the Hornet's bomb.
+* Destroyer against submerged targets: its secondary weapon is the Osprey's depth charge
+  (`[ASWBomb]` 50 through `[APSplash]`) every 200 ticks (`ROF=150`) at the range of its gun.
+* Elite weapons are in the data and unused: no unit has a rank. Aircraft do not land, have no
+  ammunition and need no dock. Submerged units are not cloaked.
+
+**RA6 removes** (specialists):
+
+* Not carried: the GI's deploy (its `Para` is carried, and never chosen: it fires the same
+  targets as the `M60`), the Engineer's `DefuseKit`, the Spy's `MakeupKit`, Tanya's and the
+  Chrono Commando's C4 weapons (`Sapper`, `FakeC4`), the Tesla Trooper's `AssaultBolt`, the
+  Prism Tower's `PrismSupport` (the Tesla Coil's `OPCoilBolt` is carried and never chosen),
+  Yuri's `PsiWave`, the Desolator's `RadEruptionWeapon` (M9's deploy zone stands in), and the
+  dogs', the Engineer's and the Terror Drone's `VirtualScanner` (never fired in the original).
+* M9's mechanism with the ini's range, reload and warhead, and M9's damage where the ini's
+  number is not hit points: the dog's bite (200; the original kills infantry outright), the
+  Chrono Legionnaire's rifle (60 a shot and the target frozen for 100 ticks; the original
+  erases), the Dolphin's sonic beam (100 a shot; the original damages along the wave).
+  With the ini's damage: the Terror Drone (50 every 80 ticks and the vehicle immobile; it
+  does not kill infantry outright or enter the vehicle), the Giant Squid (15 every 132 ticks
+  and the ship held; no destruction at red health), Yuri (one unit, no damage).
+* Crazy Ivan's weapon names `[IvanWH]`, the warhead its bomb goes off with, instead of the
+  ini's `IvanBomb`, which has no `Verses`; the Demolition Truck's range is 1.5 cells, not 1.
+* The effects of R35 with M9's timing; no radiation after a nuclear strike or a Demolition
+  Truck; no death weapons (`[NANRCT]`, `[DTRUCK]`, `[TERROR]`); the IFV takes the primary
+  weapon of its passenger instead of its own table.
+* Not modelled at all (for RA9's list): the shrapnel of the Prism Tank's and the elite Tesla
+  weapons' projectiles (`CometFragment`, `TeslaFragment`), prone infantry (`ProneDamage`),
+  height, walls that stop shots, the 0 to 2 frames of reload jitter, shells that miss a
+  moving target.
+
+### R37. RA3-A: damage states, and the damaged vehicle
+
+`Condition` (a component of every unit and building, hashed) holds green, yellow (hit points
+at or below `condition_yellow_percent`, 50, of the type's) or red (`condition_red_percent`,
+25); `update_conditions` sets it at the end of the `Cleanup` stage, in id order, and reports
+every change with `SimEvent::DamageStateChanged`. Only with a rules file: a fixture world's
+units stay green. A vehicle or ship (the arsenal's category `vehicles`, not an aircraft) that
+is not green moves at `speed - speed div 4` (plan section 4.1; the form of the released
+Red Alert source), set where M9 already sets a unit's speed every tick (`special::advance`),
+so it follows the state of the tick before. Infantry and aircraft are not slowed. Nothing
+else reads the state yet (garrison eviction is RA5's).
+
+### R38. RA3-A: the computer player, and how long matches are now
+
+1. **Nothing was retuned and no limit was changed.** With the weapons and armour of Red Alert 2
+   the plans of `ai.ron` (Grizzlies, GIs and IFVs; Rhinos, Conscripts and Tesla Troopers;
+   Pillboxes and Sentry Guns) still end every match: `m14_duels -- full` plays the 756
+   matches of `m6_production_matches.rs` and all 756 end with a winner within the limits of
+   that test (`72,000 x span / 128`, R29).
+2. **The army checks** (`ai_defs.rs`, `ai.rs`). A unit of an `army` list must have a weapon
+   against targets on the ground: a unit that attacks aircraft only cannot win a match, the
+   AI file rejects it, and a computer player counts only units with such a weapon as armed
+   (`View::fights`). The check that an army can damage every building type now asks
+   `weapon_against` for the weapon a unit would use against the building on land (its
+   targeting codes, the layer, the `wall` flag) and, with a rules file, requires more than 1
+   percent (R34 item 5). Both shipped plans pass: the Grizzly's and the Rhino's shells
+   (`[AP]`, `Wall=yes`) damage every armour type, the walls included, where the GI's and the
+   Conscript's bullets do nothing to walls.
+3. **Measured** (`m14_duels -- full`; ticks; "limit" is the test's). Before: the validation of
+   RA2 (`docs/validation/ra2-parity/ra2/10-duels.log`). After: the run of RA3-A before its
+   validation; the validation's log has the final numbers.
+
+   | | Before RA3-A | After RA3-A |
+   |---|---|---|
+   | Length over the limit: median, 90th percentile, longest | 0.11, 0.24, 0.75 | 0.19, 0.36, 0.76 |
+   | Small maps (span up to 128): median of each map | 12,492 to 15,685 | 20,868 to 25,089 |
+   | Small maps: longest | 53,699 (Crossroads) | 50,108 (Riverlands, Great Britain easy against America brutal) |
+   | Large maps: median of each map | 12,647 to 45,742 | 19,447 to 70,077 |
+   | Large maps: longest | 161,774 (Oasis Gulf) | 206,967 (Ember Caldera, Germany against Great Britain, both brutal) |
+   | Matches over the limit, matches without a winner | 0, 0 | 0, 0 |
+
+   A match is 1.4 times as long at the median and all matches together take 1.5 times the
+   ticks: a Grizzly needs five shells for another Grizzly where the tank of M9 needed eight
+   shots at less than half the reload, bullets deal a quarter to tanks and to concrete, and a
+   Construction Yard's concrete takes 60 percent of a shell. The longest match stands at
+   0.76 of its limit (Iron Isthmus, Libya against Iraq, both medium: 204,250 of 270,000),
+   as the longest did before (0.75). The duels and the end to end tests therefore take about
+   half as long again to run.
+4. **Benchmark** (`m7_benchmark`, budget: mean 5 ms): fixture 0.09 ms, shipped 0.18 ms a tick
+   (0.10 and 0.19 before); an impact looks only at the cells its spread reaches (R33 item 6).
+   In the shipped scenario, which fields every armed land unit, the Demolition Trucks'
+   8 cell blasts now thin both armies in the first ticks, so its "busy" mean covers one tick.
+5. **Debt for RA8.** The plans still use ground units only; a computer player builds nothing
+   against aircraft or ships and no unit of the other tiers.
+
+### R39. RA3-A: the interface
+
+1. **Weapon effects by id** (`crates/game/src/weapon_fx.rs`, the one table the game keys by
+   weapon id; `audio.rs` plays by the class it yields, `fog.rs` names no weapon).
+   `shipped_class` gives every weapon of the shipped combat file its class (rifle, machine
+   gun, sniper, cannon, artillery, rocket, flak, prism, Tesla, radiation, psychic, chrono,
+   sonic, bomb, torpedo, melee, trigger); a test fails on a shipped weapon the table lacks.
+   The ids of the arsenal before RA3 keep their classes, for the legacy ruleset. The ground
+   guns of the flak units are drawn as shells, and a shot with a flight time is drawn in
+   flight only if it is a shell, rocket, bomb or torpedo (`flies`): the sonic beam, which now
+   takes a few ticks, is drawn when it is fired.
+2. **Impacts by warhead.** `SimEvent::Impact` (R33 item 7) draws a burst where the warhead
+   went off, as large as its spread (`impact_size`), if the human player sees the cell: the
+   scattered flak, a bomb, a suicide unit, the nuclear strike, the bolts of the storm. A
+   burst on the ground counts as a heard impact for `audio.rs`.
+3. **Damage smoke by state** (`weapon_fx::smoulder`, `damage_smoke`): a yellow vehicle or
+   building trails thin grey smoke, a red one thick black smoke more often; infantry none.
+4. **Hover text**: a third line names the armour type (`hover_info::armour_line`: "Heavy
+   armour", "No armour").
+5. No asset was added: the effects are drawn from the textures the game already makes at
+   startup, so `assets/LICENSES.md` is unchanged. **Requires user verification**: how the
+   bursts, the smoke and the classes of the new weapons look and sound.
+
+### R40. RA3-A: tests adapted (none deleted, ignored or weakened)
+
+**Schema migration** (the assertions are unchanged; the combat fixture is at schema 2 with the
+neutral values of R32 item 3):
+
+| Test | What changed |
+|---|---|
+| `m4_definitions.rs` (the 12 tests of M4) | the text edits match the fixture's new layout: an entry of `units` or `buildings` continues on a second line, so the fragments that ended it with `)` end with `,`; `weapons: ["rifle"]` and `weapons: ["howitzer"]` are matched with the `sight` before them, since `elite_weapons: [...]` contains the same text; the unknown weapon field is `salvo` (`burst` is a field now); the expected `WeaponDef` and `CombatTerms` literals have the new fields with the neutral values; `generated()` writes schema 2 |
+| `m4_definitions.rs::schema_versions_other_than_1_are_rejected` | renamed `schema_versions_other_than_2_are_rejected`; rejects 0, 1, 3, -1 and the two extremes against 2 (one case more) |
+
+**Expectation changed because RA2 behaviour is intended** (the limits of R32 item 4):
+
+| Test | What changed and why |
+|---|---|
+| `m4_combat.rs` (helper `extreme_scenario`) | writes the cannon's range and projectile speed from `MAX_WEAPON_RANGE` and `MIN_PROJECTILE_SPEED` instead of the literals 4096 and 128; its assertions that the fixture holds exactly these limits are unchanged |
+| `m4_combat.rs::the_longest_range_with_the_slowest_projectile_flies_32_ticks` | renamed `..._flies_480_ticks`: the longest range is 30 cells and the slowest projectile 16 subcells a tick, so the tank stands at x = 0, the target 30 cells away is seen by a crawler of the tank's owner two cells from it (a sight is at most 16 cells), the shell flies 7680 / 16 = 480 ticks and the damage lands exactly then; one cell farther (31, seen) the tank still does not fire. Same assertions on the new numbers, one added (the far target is visible) |
+| game `weapon_fx::tests::every_shipped_weapon_has_the_class_its_name_promises` | every row is kept (the ids are the legacy ruleset's now); 36 rows for the shipped weapons of Red Alert 2, `flies` and `impact_size` and `damage_smoke` are added |
+| game `weapon_fx::tests::the_shipped_combat_file_classifies_light_and_electricity` | the shipped ids it names are Red Alert 2's (`prism_shot`, `comet`, `super_comet` for light; `coil_bolt`, `tank_bolt`, `electric_bolt` for electricity; `gun_105mm`, `m60`) instead of `prism_beam`, `tesla_weapon`, `tank_cannon`, `rifle`; added: no shipped weapon is left to the fallback |
+
+`m9_arsenal.rs` (24 tests) and `m11_repair.rs` run on the legacy fixture, which has no rules
+file and no effects and so keeps M9's damage rules (R35 item 2): unchanged.
+
+**New in RA3-A:** `m4_definitions.rs` 4 tests for the fields of schema 2 and the effects (each
+required, its range, its references, the rules between them); `ra3_damage.rs` (14: the
+equation at its boundaries, splash at 0, half and full spread and one subcell beyond, a
+building's hit per cell, layers, friendly fire, walls and trees, the largest damage, and each
+area effect through its warhead, with M9's rule where the file lists none); `ra3_weapons.rs`
+(16: the choice of the weapon, layers, 1 percent, every targeting code, burst and its
+interruption, minimum range at its boundary, the air range bonus, scatter within its radius
+and its determinism, damage states exactly at 50 and 25 percent, the damaged vehicle's speed,
+a deterministic battle of 20 against 20 mixed types, hashing, the army checks of the AI file)
+on the new fixture `fixtures/data/ra3` with `tests/ra3_common/mod.rs`; `ra3_shipped.rs` (7:
+every shipped weapon against every armour type, 990 pairs, against the reference; 40 shots
+fired through the simulation against numbers worked out from the ini; the nuclear strike on a
+Construction Yard and a Power Plant; the Grizzly's damage states and speed; the shipped
+plans); `ra9_data_parity.rs` one test more and the first extended (R34 item 1); 2 unit tests
+in `sim::combat`; in the game `hover_info` 1.
