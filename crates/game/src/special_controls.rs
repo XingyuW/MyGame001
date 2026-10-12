@@ -1,8 +1,13 @@
 //! Specialist controls use the same command sink, selection and map hit testing as production.
+//!
+//! Since RA1 a selected Construction Yard can be packed up into the base unit of its side
+//! (`Command::Undeploy`) while the match has "MCV repacks" on: with `D`, or with the Repack
+//! button that then stands over the superweapon buttons ([`repack_command`]). With the option
+//! off there is neither the button nor the command.
 use crate::{
     construction::InterfaceMode,
     map::HoveredCell,
-    selection::Selection,
+    selection::{SelectedBuilding, Selection},
     sim_host::{CommandSink, SimHost},
     units::HUMAN,
 };
@@ -17,6 +22,15 @@ struct StrategicButton(SimId);
 struct StrategicText(SimId);
 #[derive(Component)]
 struct ActionHint;
+/// The button that packs up the selected Construction Yard; it exists only while one is
+/// selected and the match has "MCV repacks" on.
+#[derive(Component)]
+struct RepackButton;
+
+/// What the hint line says while nothing else is to be said.
+const HINT: &str = "D: deploy / unload    E: interact";
+/// The hint while a Construction Yard that can be packed up is selected.
+const REPACK_HINT: &str = "D: repack the Construction Yard into its MCV    E: interact";
 impl Plugin for SpecialControlsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<StrategicEffects>()
@@ -42,7 +56,8 @@ fn spawn(mut commands: Commands) {
         Node {
             position_type: PositionType::Absolute,
             left: Val::Px(12.0),
-            bottom: Val::Px(12.0),
+            // Above the hint line, which stands in the corner.
+            bottom: Val::Px(30.0),
             flex_direction: FlexDirection::Column,
             row_gap: Val::Px(4.0),
             ..default()
@@ -50,7 +65,7 @@ fn spawn(mut commands: Commands) {
     ));
     commands.spawn((
         ActionHint,
-        Text::new("D: deploy / unload    E: interact"),
+        Text::new(HINT),
         TextFont::from_font_size(10.0),
         Node {
             position_type: PositionType::Absolute,
@@ -60,11 +75,15 @@ fn spawn(mut commands: Commands) {
         },
     ));
 }
+#[allow(clippy::too_many_arguments)]
 fn panel(
     mut commands: Commands,
     host: Res<SimHost>,
+    selection: Res<Selection>,
+    selected: Res<SelectedBuilding>,
     panels: Query<Entity, With<StrategicPanel>>,
     buttons: Query<(Entity, &StrategicButton)>,
+    repack: Query<Entity, With<RepackButton>>,
     mut texts: Query<(&StrategicText, &mut Text)>,
     mut hints: Query<&mut Visibility, With<ActionHint>>,
 ) {
@@ -74,6 +93,33 @@ fn panel(
         } else {
             Visibility::Hidden
         };
+    }
+    // The Repack button: there exactly while D would pack up the selected Construction Yard.
+    let offered = host.running() && repack_target(&host, &selection, &selected).is_some();
+    match (offered, repack.iter().next()) {
+        (true, None) => {
+            if let Ok(panel) = panels.single() {
+                commands.entity(panel).with_children(|p| {
+                    p.spawn((
+                        RepackButton,
+                        Button,
+                        BackgroundColor(Color::srgb(0.30, 0.24, 0.10)),
+                        Node {
+                            width: Val::Px(290.0),
+                            height: Val::Px(28.0),
+                            padding: UiRect::all(Val::Px(4.0)),
+                            ..default()
+                        },
+                    ))
+                    .with_child((
+                        Text::new("Repack the Construction Yard (D)"),
+                        TextFont::from_font_size(10.0),
+                    ));
+                });
+            }
+        }
+        (false, Some(button)) => commands.entity(button).despawn(),
+        _ => {}
     }
     let Some(defs) = host.definitions() else {
         return;
@@ -152,9 +198,37 @@ pub fn deploy_commands(selection: &Selection) -> Vec<Command> {
         .collect()
 }
 /// `Undeploy` for the player's Construction Yard `building` (RA1, "MCV repacks"): it becomes the
-/// base unit of its side again. Issued by D with no unit selected and the cursor on a building.
+/// base unit of its side again.
 pub fn undeploy_command(building: SimId) -> Command {
     Command::Undeploy { building }
+}
+/// What `D` and the Repack button do with the selected building `selected`: pack it up
+/// ([`undeploy_command`]) if it is one of the player's Construction Yards (`yards`), no unit is
+/// selected (`units`: `D` deploys those instead) and the match has "MCV repacks" on (`repacks`).
+/// Otherwise nothing: with the option off the control does not exist.
+pub fn repack_command(
+    selected: Option<SimId>,
+    yards: &std::collections::BTreeSet<SimId>,
+    units: usize,
+    repacks: bool,
+) -> Option<Command> {
+    selected
+        .filter(|building| repacks && units == 0 && yards.contains(building))
+        .map(undeploy_command)
+}
+/// The Construction Yard that [`repack_command`] would pack up in the match of `host`, if any.
+fn repack_target(
+    host: &SimHost,
+    selection: &Selection,
+    selected: &SelectedBuilding,
+) -> Option<Command> {
+    repack_command(
+        selected.0,
+        &crate::selection::own_yards(host),
+        selection.0.len(),
+        host.match_state()
+            .is_some_and(|state| state.rules().mcv_repacks),
+    )
 }
 pub fn interact_commands(selection: &Selection, target: SimId) -> Vec<Command> {
     selection
@@ -177,12 +251,18 @@ fn input(
     mouse: Res<ButtonInput<MouseButton>>,
     hovered: Res<HoveredCell>,
     selection: Res<Selection>,
+    selected: Res<SelectedBuilding>,
     host: Res<SimHost>,
     mut sink: ResMut<CommandSink>,
     mut mode: ResMut<InterfaceMode>,
     buttons: Query<(&StrategicButton, &Interaction), Changed<Interaction>>,
+    repack: Query<&Interaction, (With<RepackButton>, Changed<Interaction>)>,
 ) {
     if !host.running() || sink.paused() {
+        return;
+    }
+    if repack.iter().any(|i| *i == Interaction::Pressed) {
+        sink.issue(repack_target(&host, &selection, &selected));
         return;
     }
     for (b, i) in &buttons {
@@ -193,15 +273,9 @@ fn input(
     }
     if keys.just_pressed(KeyCode::KeyD) {
         sink.issue(deploy_commands(&selection));
-        // With no unit selected, D packs up the building under the cursor (RA1: only the
-        // player's own Construction Yard undeploys; the simulation rejects anything else).
-        if selection.0.is_empty()
-            && let Some(building) = hovered
-                .0
-                .and_then(|cell| host.grid().and_then(|grid| grid.building(cell)))
-        {
-            sink.issue([undeploy_command(building)]);
-        }
+        // With no unit selected, D packs up the selected Construction Yard (RA1, while the
+        // match has "MCV repacks" on).
+        sink.issue(repack_target(&host, &selection, &selected));
     }
     if keys.just_pressed(KeyCode::KeyE) {
         *mode = InterfaceMode::Interact;
@@ -243,6 +317,8 @@ struct StrategicEffects(Vec<(sim::CellPos, sim::Role, u32, f32)>);
 fn feedback_and_effects(
     mut events: MessageReader<sim::SimEvent>,
     host: Res<SimHost>,
+    selection: Res<Selection>,
+    selected: Res<SelectedBuilding>,
     time: Res<Time>,
     mut effects: ResMut<StrategicEffects>,
     mut hint: Query<&mut Text, With<ActionHint>>,
@@ -279,7 +355,14 @@ fn feedback_and_effects(
     if *remaining == 0.0
         && let Ok(mut t) = hint.single_mut()
     {
-        t.0 = "D: deploy / unload    E: interact".into();
+        let wanted = if repack_target(&host, &selection, &selected).is_some() {
+            REPACK_HINT
+        } else {
+            HINT
+        };
+        if t.0 != wanted {
+            t.0 = wanted.into();
+        }
     }
     effects.0.retain_mut(|(_, _, _, t)| {
         *t -= time.delta_secs();
@@ -337,5 +420,153 @@ fn feedback_and_effects(
                 );
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::BTreeSet;
+
+    use super::*;
+    use crate::skirmish::MenuSelection;
+
+    /// The human player's base units and buildings in `host`, as `(units, buildings)`.
+    fn base(host: &SimHost) -> (Vec<SimId>, Vec<SimId>) {
+        let rules = host.definitions().and_then(sim::Definitions::rules);
+        let world = host.world();
+        let mut units = world
+            .try_query::<(&SimId, &Owner, &sim::Unit)>()
+            .expect("registered");
+        let mut buildings = world
+            .try_query::<(&SimId, &Owner, &Building)>()
+            .expect("registered");
+        (
+            units
+                .iter(world)
+                .filter(|(_, owner, unit)| {
+                    owner.0 == HUMAN && rules.is_some_and(|rules| rules.is_base_unit(unit.kind))
+                })
+                .map(|(id, ..)| *id)
+                .collect(),
+            buildings
+                .iter(world)
+                .filter(|(_, owner, _)| owner.0 == HUMAN)
+                .map(|(id, ..)| *id)
+                .collect(),
+        )
+    }
+
+    #[test]
+    fn a_selected_construction_yard_is_repacked_only_with_the_option_on() {
+        // RA1 item 2: D or the Repack button pack up the selected Construction Yard while the
+        // match has "MCV repacks" on; with it off there is no such control.
+        let yard = SimId(7);
+        let yards = BTreeSet::from([yard]);
+        assert_eq!(
+            repack_command(Some(yard), &yards, 0, true),
+            Some(Command::Undeploy { building: yard })
+        );
+        assert_eq!(
+            repack_command(Some(yard), &yards, 0, false),
+            None,
+            "option off"
+        );
+        assert_eq!(
+            repack_command(Some(yard), &yards, 1, true),
+            None,
+            "D deploys the units"
+        );
+        assert_eq!(
+            repack_command(Some(SimId(8)), &yards, 0, true),
+            None,
+            "a factory"
+        );
+        assert_eq!(
+            repack_command(None, &yards, 0, true),
+            None,
+            "nothing selected"
+        );
+        assert_eq!(repack_command(Some(yard), &BTreeSet::new(), 0, true), None);
+
+        // Through the simulation: the match as the menu starts it, with a fixed opponent.
+        let catalogue = crate::skirmish::tests::production_catalogue();
+        let selection = MenuSelection::versus(&catalogue);
+        let (mut host, _) = crate::sim_host::tests::match_host(&catalogue, selection, 0);
+        let none = Selection::default();
+        let rejected = |events: &[sim::SimEvent]| {
+            events
+                .iter()
+                .any(|event| matches!(event, sim::SimEvent::CommandRejected { .. }))
+        };
+        // The player starts with its MCV: nothing to repack, whatever is "selected".
+        let (units, buildings) = base(&host);
+        assert_eq!((units.len(), buildings.len()), (1, 0));
+        assert!(crate::selection::own_yards(&host).is_empty());
+        assert_eq!(
+            repack_target(&host, &none, &SelectedBuilding(Some(units[0]))),
+            None
+        );
+        // D deploys the selected MCV (the first tick gives the player its sight).
+        crate::sim_host::tests::run(&mut host, Vec::new());
+        let events = crate::sim_host::tests::run(
+            &mut host,
+            deploy_commands(&Selection(units.iter().copied().collect())),
+        );
+        assert!(!rejected(&events), "{events:?}");
+        let (units, buildings) = base(&host);
+        assert_eq!((units.len(), buildings.len()), (0, 1));
+        let yard = buildings[0];
+        assert_eq!(crate::selection::own_yards(&host), BTreeSet::from([yard]));
+        // The yard selected: the control packs it up; not while units are selected, and not
+        // for a building that is not selected.
+        let selected = SelectedBuilding(Some(yard));
+        assert_eq!(
+            repack_target(&host, &Selection(BTreeSet::from([SimId(1)])), &selected),
+            None
+        );
+        assert_eq!(repack_target(&host, &none, &SelectedBuilding(None)), None);
+        let command = repack_target(&host, &none, &selected).expect("a repack");
+        assert_eq!(command, undeploy_command(yard));
+        let events = crate::sim_host::tests::run(&mut host, vec![command]);
+        assert!(!rejected(&events), "{events:?}");
+        assert!(
+            events
+                .iter()
+                .any(|event| matches!(event, sim::SimEvent::BuildingUndeployed { .. })),
+            "{events:?}"
+        );
+        let (units, buildings) = base(&host);
+        assert_eq!((units.len(), buildings.len()), (1, 0), "the MCV is back");
+        // And it deploys again.
+        let events = crate::sim_host::tests::run(
+            &mut host,
+            deploy_commands(&Selection(units.iter().copied().collect())),
+        );
+        assert!(!rejected(&events), "{events:?}");
+        assert_eq!(base(&host).1.len(), 1);
+
+        // With "MCV repacks" off in the menu, the yard the player starts with (MCV start off)
+        // offers no repack.
+        let fixed = MenuSelection {
+            mcv_repacks: false,
+            mcv_start: false,
+            ..selection
+        };
+        let (host, _) = crate::sim_host::tests::match_host(&catalogue, fixed, 0);
+        let yards = crate::selection::own_yards(&host);
+        assert_eq!(yards.len(), 1);
+        let selected = SelectedBuilding(yards.first().copied());
+        assert_eq!(repack_target(&host, &none, &selected), None);
+        // The same match with the option on offers it.
+        let (host, _) = crate::sim_host::tests::match_host(
+            &catalogue,
+            MenuSelection {
+                mcv_repacks: true,
+                ..fixed
+            },
+            0,
+        );
+        let selected = SelectedBuilding(crate::selection::own_yards(&host).first().copied());
+        assert!(repack_target(&host, &none, &selected).is_some());
     }
 }

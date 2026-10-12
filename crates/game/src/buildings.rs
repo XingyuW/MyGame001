@@ -506,12 +506,15 @@ mod tests {
         // base unit), every starting unit still finds a free cell around its anchor and none
         // stands on a building, and both players start with the skirmish file's credits.
         let catalogue = crate::skirmish::tests::production_catalogue();
-        let selection = crate::skirmish::MenuSelection::initial(&catalogue);
+        let selection = crate::skirmish::MenuSelection {
+            mcv_start: false,
+            ..crate::skirmish::MenuSelection::versus(&catalogue)
+        };
         let host = crate::sim_host::tests::demo_host();
         let world = host.world();
         let grid = host.grid().expect("grid");
         let (expected_units, expected_buildings) =
-            crate::skirmish::starting_totals(&catalogue, selection, false);
+            crate::skirmish::selection_totals(&catalogue, selection).expect("fixed countries");
         let mut buildings = world.try_query::<&Building>().expect("registered");
         assert_eq!(buildings.iter(world).count(), expected_buildings);
         let mut units = world.try_query::<&sim::Mobile>().expect("registered");

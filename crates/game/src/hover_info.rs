@@ -1,6 +1,7 @@
 //! The name of what lies under the cursor: hovering a unit or building the human player is
 //! shown (their own or an enemy's) shows a small label above the cursor with its name, owner and
-//! health, so similar-looking miniatures can always be told apart.
+//! health, so similar-looking miniatures can always be told apart. Another player is named by
+//! its team colour and the country it plays, "Gold Player (Iraq)" (RA1).
 //!
 //! Like the health bars (`crate::health`), only shown views are named, so the label reveals
 //! nothing that fog of war hides.
@@ -43,17 +44,8 @@ impl Plugin for HoverInfoPlugin {
 #[derive(Component, Debug)]
 pub struct HoverLabel;
 
-/// The display name of a unit or building type: its arsenal label (e.g. "Grizzly Battle Tank"),
-/// or else its id in words with capitals ("heavy_tank" becomes "Heavy Tank").
-pub fn display_name(definitions: &Definitions, item: ProductionItem) -> String {
-    if let Some(entry) = definitions.metadata(item) {
-        return entry.label.clone();
-    }
-    let id = match item {
-        ProductionItem::Building(kind) => definitions.building(kind).map(|def| def.id.as_str()),
-        ProductionItem::Unit(kind) => definitions.unit(kind).map(|def| def.id.as_str()),
-    }
-    .unwrap_or("?");
+/// An id in words with capitals: `heavy_tank` becomes `Heavy Tank`, `allied` becomes `Allied`.
+pub fn title(id: &str) -> String {
     id.split('_')
         .map(|word| {
             let mut chars = word.chars();
@@ -65,9 +57,34 @@ pub fn display_name(definitions: &Definitions, item: ProductionItem) -> String {
         .join(" ")
 }
 
-/// The label's text: the name, then whose it is and its health in percent.
-pub fn label_text(name: &str, owner: PlayerId, health: Option<(i32, i32)>) -> String {
-    let side = if owner == HUMAN { "Yours" } else { "Enemy" };
+/// The display name of a unit or building type: its arsenal label (e.g. "Grizzly Battle Tank"),
+/// or else its id in words with capitals ("heavy_tank" becomes "Heavy Tank").
+pub fn display_name(definitions: &Definitions, item: ProductionItem) -> String {
+    if let Some(entry) = definitions.metadata(item) {
+        return entry.label.clone();
+    }
+    let id = match item {
+        ProductionItem::Building(kind) => definitions.building(kind).map(|def| def.id.as_str()),
+        ProductionItem::Unit(kind) => definitions.unit(kind).map(|def| def.id.as_str()),
+    }
+    .unwrap_or("?");
+    title(id)
+}
+
+/// The label's text: the name, then whose it is and its health in percent. The human player's
+/// own are `Yours`; another player's are named by `whose`, the player's name with the country
+/// it plays (`Gold Player (Iraq)`, `crate::skirmish::player_name`), or `Enemy` without a name.
+pub fn label_text(
+    name: &str,
+    owner: PlayerId,
+    whose: Option<&str>,
+    health: Option<(i32, i32)>,
+) -> String {
+    let side = match whose {
+        _ if owner == HUMAN => "Yours",
+        Some(whose) => whose,
+        None => "Enemy",
+    };
     match health {
         Some((hit_points, max)) if max > 0 => {
             let percent = (i64::from(hit_points.clamp(0, max)) * 100 / i64::from(max)).max(1);
@@ -144,6 +161,8 @@ pub(crate) fn show_hover_label(
     host: Res<SimHost>,
     hovered: Res<HoveredCell>,
     mode: Res<InterfaceMode>,
+    played: Option<Res<crate::skirmish::MatchPlayers>>,
+    teams: Option<Res<crate::presentation::TeamColors>>,
     window: Single<&Window, With<PrimaryWindow>>,
     camera: Single<(&Camera, &GlobalTransform)>,
     views: Query<(&UnitView, &Transform, &Visibility)>,
@@ -169,8 +188,21 @@ pub(crate) fn show_hover_label(
                 .get::<Health>(entity)
                 .map(|health| health.hit_points)
                 .zip(max);
+            // Another player's are named by its team colour and the country it plays.
+            let whose = (owner != HUMAN).then(|| {
+                let teams = teams.as_deref().copied().unwrap_or_default();
+                crate::skirmish::player_name(
+                    crate::presentation::TEAM_PALETTE[teams.index_of(owner)].0,
+                    played.as_deref().and_then(|played| played.label(owner)),
+                )
+            });
             Some((
-                label_text(&display_name(definitions, item), owner, health),
+                label_text(
+                    &display_name(definitions, item),
+                    owner,
+                    whose.as_deref(),
+                    health,
+                ),
                 if owner == HUMAN {
                     Color::srgb(0.72, 0.9, 1.0)
                 } else {
@@ -230,15 +262,38 @@ mod tests {
     #[test]
     fn labels_name_the_type_owner_and_health() {
         assert_eq!(
-            label_text("Grizzly Battle Tank", HUMAN, Some((150, 300))),
+            label_text("Grizzly Battle Tank", HUMAN, None, Some((150, 300))),
             "Grizzly Battle Tank\nYours  50%"
         );
         assert_eq!(
-            label_text("Rhino Heavy Tank", PlayerId(1), Some((1, 400))),
+            label_text("Rhino Heavy Tank", PlayerId(1), None, Some((1, 400))),
             "Rhino Heavy Tank\nEnemy  1%",
             "a living unit never reads 0%"
         );
-        assert_eq!(label_text("Ore", PlayerId(2), None), "Ore\nEnemy");
+        assert_eq!(label_text("Ore", PlayerId(2), None, None), "Ore\nEnemy");
+        // RA1: another player's are named by its colour and the country it plays; the human
+        // player's own stay "Yours" whatever name is given.
+        let gold = crate::skirmish::player_name("Gold", Some("Iraq"));
+        assert_eq!(gold, "Gold Player (Iraq)");
+        assert_eq!(
+            label_text(
+                "Rhino Heavy Tank",
+                PlayerId(2),
+                Some(&gold),
+                Some((200, 400))
+            ),
+            "Rhino Heavy Tank\nGold Player (Iraq)  50%"
+        );
+        assert_eq!(
+            label_text("War Factory", PlayerId(1), Some("Red Player"), None),
+            "War Factory\nRed Player"
+        );
+        assert_eq!(
+            label_text("Grizzly Battle Tank", HUMAN, Some(&gold), Some((300, 300))),
+            "Grizzly Battle Tank\nYours  100%"
+        );
+        assert_eq!(title("great_britain"), "Great Britain");
+        assert_eq!(title("allied"), "Allied");
     }
 
     #[test]

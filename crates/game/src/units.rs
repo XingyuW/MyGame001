@@ -1065,7 +1065,7 @@ mod tests {
         // count (`sim::starting_units`), and with the base unit of its side as the menu starts
         // the match (`menu_host`) or the yard it deploys into (`demo_host`).
         let catalogue = crate::skirmish::tests::production_catalogue();
-        let selection = crate::skirmish::MenuSelection::initial(&catalogue);
+        let selection = crate::skirmish::MenuSelection::versus(&catalogue);
         let rules = catalogue.definitions.rules().expect("rules");
         let unit_count = u32::try_from(rules.dialog.unit_count).expect("unit count");
         for mcv_start in [false, true] {
@@ -1088,7 +1088,7 @@ mod tests {
                 *placed.entry((owner.0, unit.kind)).or_insert(0) += 1;
             }
             let mut expected: BTreeMap<(PlayerId, UnitKind), u32> = BTreeMap::new();
-            for setup in crate::skirmish::match_players(&catalogue, selection) {
+            for setup in selection.players() {
                 let faction = &catalogue.skirmish.factions[setup.faction];
                 for group in &faction.units {
                     *expected.entry((setup.player, group.kind)).or_insert(0) += group.count;

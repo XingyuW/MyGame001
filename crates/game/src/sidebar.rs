@@ -11,6 +11,14 @@
 //! | Pause, or `P` | pause or resume (`crate::sim_host::CommandSink`) |
 //! | Volume buttons, `-`, `=`, `M` | master, music, and effects volume, mute (`crate::audio`) |
 //!
+//! Since RA1 a tab lists, as Red Alert 2 shows a cameo, only the items that some building the
+//! player owns could build ([`item_listed`]): the player owns a factory of the item's kind and
+//! of a side that builds it, the item is not closed to the player's country, and every
+//! prerequisite is owned or can be built with what the player owns. An item whose prerequisites
+//! are missing but within reach stays listed as locked, with the reason; an Allied player sees
+//! no Soviet card until it has captured a Soviet building, and nobody sees a card before the
+//! MCV has deployed.
+//!
 //! The sidebar shows only the human player's own state. Its decisions are pure functions,
 //! unit tested below; the systems read the simulation through `SimHost` and change it only by
 //! pushing commands into `CommandSink` (invariant I5, D34).
@@ -152,22 +160,24 @@ pub struct ItemStatus {
     pub ready: bool,
 }
 
-/// The status of `item` for a player with `state` who owns buildings of the types `owned`. An item
-/// the roster of the player's faction does not offer is never available (M7).
+/// The status of `item` for a player with `state` who owns buildings of the types `owned`, in a
+/// match with superweapons switched on or off (`superweapons`, the menu's row). An item the
+/// roster of the player's faction does not offer is never available (M7).
 pub fn item_status(
     item: ProductionItem,
     definitions: &Definitions,
     owned: &BTreeSet<BuildingKind>,
     state: &PlayerState,
+    superweapons: bool,
 ) -> ItemStatus {
     let Some(terms) = definitions.production(item) else {
         return ItemStatus::default();
     };
     // Exactly the checks of `QueueProduction` before the length of the queue (RA1: the
-    // buildability rule, `sim::check_buildable`). Superweapons count as switched on, which they
-    // are in every match the game starts until the menu offers the option.
+    // buildability rule, `sim::check_buildable`).
     let owned_kinds: Vec<BuildingKind> = owned.iter().copied().collect();
-    let available = sim::check_buildable(definitions, state, true, &owned_kinds, item).is_ok();
+    let available =
+        sim::check_buildable(definitions, state, superweapons, &owned_kinds, item).is_ok();
     let queue = state.queue(definitions.queue_key(terms.producer));
     let queued = queue.iter().filter(|entry| entry.item == item).count();
     let progress = queue
@@ -478,6 +488,81 @@ pub fn item_shown(
     Tab::of(item, defs) == tab && state.is_none_or(|state| state.offers(item))
 }
 
+/// The building types a player with `state` who owns buildings of the types `owned` can come to
+/// own by building alone: the owned ones, and every building type it could queue with them and
+/// with those found so far (`sim::check_buildable`), until none is added. For a player with the
+/// Construction Yard of its side that is the tech tree of its country
+/// (`sim::country_tree`); a building that only a captured building opens is not in it.
+pub fn reachable_buildings(
+    definitions: &Definitions,
+    owned: &BTreeSet<BuildingKind>,
+    state: &PlayerState,
+    superweapons: bool,
+) -> Vec<BuildingKind> {
+    let mut reached: Vec<BuildingKind> = owned.iter().copied().collect();
+    let kinds = || {
+        (0..definitions.buildings().len())
+            .filter_map(|index| u16::try_from(index).ok())
+            .map(BuildingKind)
+    };
+    loop {
+        let added: Vec<BuildingKind> = kinds()
+            .filter(|kind| !reached.contains(kind))
+            .filter(|&kind| {
+                let item = ProductionItem::Building(kind);
+                sim::check_buildable(definitions, state, superweapons, &reached, item).is_ok()
+            })
+            .collect();
+        if added.is_empty() {
+            return reached;
+        }
+        reached.extend(added);
+    }
+}
+
+/// Whether the card of `item` is listed for a player with `state` who owns buildings of the
+/// types `owned`, can come to own those of `reachable` ([`reachable_buildings`]) and has `queued`
+/// entries of the item in a queue (RA1; Red Alert 2 shows a cameo for what a player's factories
+/// can build):
+///
+/// * some owned building is a factory of the item's kind and of a side that builds it
+///   (`sim::produces`): an Allied player sees no Soviet unit, sees the Conscript once it owns a
+///   captured Soviet Barracks, and sees no infantry at all before it owns a barracks;
+/// * the player could queue the item if it owned every building it can come to own by building
+///   alone (`sim::check_buildable` with `reachable`): the item is not closed to the player's
+///   country, nor outside the tech level of the rules or the roster of a faction without a
+///   side, nor a superweapon building in a match with superweapons off (`superweapons`), and
+///   every prerequisite is owned or can be built. This is what keeps the other side's
+///   buildings away: the ini lets every country own every building (`Owner`) and ties each to
+///   a side by a prerequisite, the Construction Yard of that side or a building that needs it,
+///   which a player of the other side can only capture.
+///
+/// So an item whose prerequisites are missing but within the player's reach is listed, and
+/// shown as locked with the reason ([`availability_text`]). An item that is queued stays listed
+/// whatever became of its factory, so that its progress shows and it can be cancelled.
+pub fn item_listed(
+    item: ProductionItem,
+    definitions: &Definitions,
+    owned: &BTreeSet<BuildingKind>,
+    reachable: &[BuildingKind],
+    state: &PlayerState,
+    superweapons: bool,
+    queued: usize,
+) -> bool {
+    queued > 0
+        || (owned
+            .iter()
+            .any(|&kind| sim::produces(definitions, kind, item))
+            && sim::check_buildable(definitions, state, superweapons, reachable, item).is_ok())
+}
+
+/// Whether superweapons are switched on in the match of `host` (the menu's row; on without a
+/// match).
+fn superweapons(host: &SimHost) -> bool {
+    host.match_state()
+        .is_none_or(|state| state.rules().superweapons)
+}
+
 /// The status of every production item for the human player.
 fn statuses(host: &SimHost) -> Vec<(ProductionItem, ItemStatus)> {
     let (Some(definitions), Some(state)) = (
@@ -487,10 +572,57 @@ fn statuses(host: &SimHost) -> Vec<(ProductionItem, ItemStatus)> {
         return Vec::new();
     };
     let owned = owned_kinds(host);
+    let superweapons = superweapons(host);
     production_menu(definitions)
         .into_iter()
-        .map(|item| (item, item_status(item, definitions, &owned, state)))
+        .map(|item| {
+            (
+                item,
+                item_status(item, definitions, &owned, state, superweapons),
+            )
+        })
         .collect()
+}
+
+/// The production items whose cards the sidebar lists for the human player of `host`'s match
+/// on any tab ([`item_shown`] decides the tab, [`item_listed`] the rest). Every item without a
+/// match.
+pub fn listed_items(host: &SimHost) -> Vec<ProductionItem> {
+    let Some(definitions) = host.definitions() else {
+        return Vec::new();
+    };
+    let menu = production_menu(definitions);
+    let Some(state) = host.players().and_then(|players| players.get(HUMAN)) else {
+        return menu;
+    };
+    let owned = owned_kinds(host);
+    let superweapons = superweapons(host);
+    let reachable = reachable_buildings(definitions, &owned, state, superweapons);
+    menu.into_iter()
+        .filter(|&item| {
+            let queued = item_status(item, definitions, &owned, state, superweapons).queued;
+            state.offers(item)
+                && item_listed(
+                    item,
+                    definitions,
+                    &owned,
+                    &reachable,
+                    state,
+                    superweapons,
+                    queued,
+                )
+        })
+        .collect()
+}
+
+/// What the details line says while no card is hovered: the keys, or, while the player owns no
+/// building and so no card is listed (`base` false), how to get the first.
+pub fn details_hint(base: bool) -> &'static str {
+    if base {
+        "Hover: requirements / role\nSpace + drag: camera | D deploy\nRight click card: cancel / refund"
+    } else {
+        "No Construction Yard: nothing to build.\nSelect your MCV and press D\nto deploy it where it stands."
+    }
 }
 
 // --- Systems --------------------------------------------------------------------------------
@@ -1026,10 +1158,12 @@ pub(crate) fn update_sidebar(
     let paused = sink.paused();
     let defs = host.definitions();
     let owned = owned_kinds(&host);
+    // The cards of the tab that the player's buildings could build (RA1, `item_listed`).
+    let all = listed_items(&host);
     let listed: Vec<_> = defs
         .map(|d| {
-            production_menu(d)
-                .into_iter()
+            all.iter()
+                .copied()
                 .filter(|&i| item_shown(i, *tab, state, d))
                 .collect()
         })
@@ -1054,11 +1188,19 @@ pub(crate) fn update_sidebar(
     });
     for (mut text, mut colour, kind) in &mut texts {
         let value = match kind {
-            SidebarText::PageLabel => format!("{} / {}  |  Tab cycles",page.0+1,pages),
-            SidebarText::Details => hovered.and_then(|i|defs.map(|d| {
-                let description=d.metadata(i).map_or("",|e|e.description.as_str());
-                format!("{}\n{}",availability_text(i,d,&owned,state),description)
-            })).unwrap_or_else(||"Hover: requirements / role\nSpace + drag: camera | D deploy\nRight click card: cancel / refund".into()),
+            SidebarText::PageLabel => format!("{} / {}  |  Tab cycles", page.0 + 1, pages),
+            SidebarText::Details => hovered
+                .and_then(|i| {
+                    defs.map(|d| {
+                        let description = d.metadata(i).map_or("", |e| e.description.as_str());
+                        format!(
+                            "{}\n{}",
+                            availability_text(i, d, &owned, state),
+                            description
+                        )
+                    })
+                })
+                .unwrap_or_else(|| details_hint(state.is_none() || !owned.is_empty()).into()),
             SidebarText::Credits => credits_text(state),
             SidebarText::Power => power_text(state),
             SidebarText::Mode => mode_text(*mode, paused, host.definitions()),
@@ -1430,7 +1572,7 @@ mod tests {
             let state = players.get(HUMAN).expect("player");
             for &item in &menu {
                 let offered = faction.offers(item);
-                let status = item_status(item, definitions, &owned, state);
+                let status = item_status(item, definitions, &owned, state, true);
                 assert_eq!(status.available, offered, "{}: {item:?}", faction.id);
                 for tab in [Tab::Buildings, Tab::Armory, Tab::Infantry, Tab::Vehicles] {
                     assert_eq!(
@@ -1464,6 +1606,271 @@ mod tests {
             None,
             definitions
         )));
+    }
+
+    /// A player of `country` (a faction id of the shipped skirmish file) with nothing but the
+    /// country set.
+    fn player_of(catalogue: &crate::skirmish::Catalogue, country: &str) -> sim::Players {
+        let faction = catalogue
+            .skirmish
+            .factions
+            .iter()
+            .find(|faction| faction.id == country)
+            .expect(country);
+        let mut players = sim::Players::default();
+        players.add(HUMAN, 0).expect("player");
+        assert!(players.set_country(HUMAN, faction.country));
+        players
+    }
+
+    #[test]
+    fn a_tab_lists_only_what_a_building_of_the_player_could_build() {
+        // RA1 item 2: the sidebar lists an item when some building the player owns is a factory
+        // of the item's kind and of a side that builds it, and the item is not closed to the
+        // player's country; a missing prerequisite locks the card and does not hide it.
+        let catalogue = crate::skirmish::tests::production_catalogue();
+        let defs = &catalogue.definitions;
+        let menu = production_menu(defs);
+        let building = |id: &str| defs.building_kind(id).unwrap_or_else(|| panic!("{id}"));
+        let item = |id: &str| match defs.unit_kind(id) {
+            Some(kind) => ProductionItem::Unit(kind),
+            None => ProductionItem::Building(building(id)),
+        };
+        let owned = |ids: &[&str]| -> BTreeSet<BuildingKind> {
+            ids.iter().map(|id| building(id)).collect()
+        };
+        let america = player_of(&catalogue, "america");
+        let america = america.get(HUMAN).expect("player");
+        // Whether the card of `item` is listed for a player who owns `owned`, with
+        // superweapons on or off and `queued` entries of it queued.
+        let card = |state: &PlayerState,
+                    owned: &BTreeSet<BuildingKind>,
+                    item: ProductionItem,
+                    superweapons: bool,
+                    queued: usize| {
+            let reachable = reachable_buildings(defs, owned, state, superweapons);
+            item_listed(item, defs, owned, &reachable, state, superweapons, queued)
+        };
+        let listed = |state: &PlayerState, owned: &BTreeSet<BuildingKind>, id: &str| {
+            card(state, owned, item(id), true, 0)
+        };
+        let sides =
+            |item: ProductionItem| defs.metadata(item).expect("arsenal").owner_sides.clone();
+
+        // Before the MCV has deployed the player owns nothing, and no card is listed.
+        let nothing = BTreeSet::new();
+        assert!(
+            menu.iter()
+                .all(|&item| !card(america, &nothing, item, true, 0))
+        );
+        assert!(reachable_buildings(defs, &nothing, america, true).is_empty());
+        // With the Allied yard: buildings of the Allied side only, no unit, no Soviet card.
+        let yard = owned(&["construction_yard"]);
+        let cards: Vec<ProductionItem> = menu
+            .iter()
+            .copied()
+            .filter(|&item| card(america, &yard, item, true, 0))
+            .collect();
+        // What the yard can come to build is the tech tree of the country: its buildings are
+        // the cards, with the yard itself.
+        let america_tree = sim::country_tree(defs, america.country().expect("country"));
+        let reach: BTreeSet<BuildingKind> = reachable_buildings(defs, &yard, america, true)
+            .into_iter()
+            .collect();
+        assert_eq!(
+            reach,
+            america_tree
+                .iter()
+                .filter_map(|item| match item {
+                    ProductionItem::Building(kind) => Some(*kind),
+                    ProductionItem::Unit(_) => None,
+                })
+                .chain(yard.iter().copied())
+                .collect()
+        );
+        assert_eq!(cards.len() + 1, reach.len());
+        assert!(cards.len() > 5, "{}", cards.len());
+        let soviet_yard = building("soviet_construction_yard");
+        for &card in &cards {
+            assert!(matches!(card, ProductionItem::Building(_)), "{card:?}");
+            // (The ini lets every country own every building; its side is the yard it needs.)
+            assert!(sides(card).contains(&sim::Side::Allied), "{card:?}");
+            let terms = defs.production(card).expect("terms");
+            assert!(!terms.prerequisites.contains(&soviet_yard), "{card:?}");
+        }
+        assert!(listed(america, &yard, "power_plant"));
+        assert!(item_status(item("power_plant"), defs, &yard, america, true).available);
+        // Listed and locked, with the reason: the Refinery needs a power plant.
+        assert!(listed(america, &yard, "refinery"));
+        assert!(!item_status(item("refinery"), defs, &yard, america, true).available);
+        assert_eq!(
+            availability_text(item("refinery"), defs, &yard, Some(america)),
+            "Needs Power Plant"
+        );
+        for soviet in [
+            "tesla_reactor",
+            "soviet_barracks",
+            "soviet_war_factory",
+            "tesla_coil",
+        ] {
+            assert!(!listed(america, &yard, soviet), "{soviet}");
+            let terms = defs.production(item(soviet)).expect("terms");
+            assert!(terms.prerequisites.contains(&soviet_yard), "{soviet}");
+        }
+        // The Soviet walls need the Soviet Barracks and no yard: no card either, the barracks
+        // being out of an Allied player's reach.
+        assert!(!listed(america, &yard, "soviet_walls"));
+        assert!(listed(america, &yard, "fortress_walls"));
+        assert_eq!(sides(item("conscript")), [sim::Side::Soviet]);
+        assert_eq!(sides(item("gi")), [sim::Side::Allied]);
+        for unit in ["gi", "conscript", "grizzly", "rhino", "engineer"] {
+            assert!(!listed(america, &yard, unit), "{unit}: no factory for it");
+        }
+        // National specials: America builds its own Airforce Command and not the common one;
+        // France alone the Grand Cannon.
+        assert!(listed(america, &yard, "american_airforce_command"));
+        assert!(!listed(america, &yard, "airforce_command"));
+        assert!(!listed(america, &yard, "grand_cannon"));
+        let france = player_of(&catalogue, "france");
+        let france = france.get(HUMAN).expect("player");
+        assert!(listed(france, &yard, "grand_cannon"));
+        assert!(listed(france, &yard, "airforce_command"));
+        assert!(!listed(france, &yard, "american_airforce_command"));
+
+        // With its own Barracks the Allied infantry is listed, and still nothing Soviet. The
+        // Rocketeer needs a radar building, which the player can build: listed and locked.
+        let base = owned(&["construction_yard", "power_plant", "barracks"]);
+        assert!(listed(america, &base, "gi"));
+        assert!(listed(america, &base, "engineer"));
+        assert!(listed(america, &base, "rocketeer"));
+        assert!(!item_status(item("rocketeer"), defs, &base, america, true).available);
+        assert!(
+            availability_text(item("rocketeer"), defs, &base, Some(america)).starts_with("Needs ")
+        );
+        assert!(!listed(america, &base, "conscript"));
+        assert!(!listed(america, &base, "tesla_trooper"));
+        // After capturing a Soviet Barracks the player sees the Conscript and what else that
+        // barracks trains by itself, and the Soviet walls, which need nothing but it. The
+        // Soviet infantry that needs a building of the Soviet yard stays away (Yuri: the Battle
+        // Lab), as do the Soviet buildings and the specials of the Soviet countries.
+        let captured = owned(&[
+            "construction_yard",
+            "power_plant",
+            "barracks",
+            "soviet_barracks",
+        ]);
+        assert!(listed(america, &captured, "conscript"));
+        assert!(item_status(item("conscript"), defs, &captured, america, true).available);
+        assert!(listed(america, &captured, "tesla_trooper"));
+        assert!(listed(america, &captured, "soviet_walls"));
+        assert!(
+            listed(america, &captured, "gi"),
+            "its own infantry as before"
+        );
+        for other in [
+            "yuri",
+            "flak_trooper",
+            "tesla_reactor",
+            "soviet_war_factory",
+            "rhino",
+            "terrorist",
+            "desolator",
+        ] {
+            assert!(!listed(america, &captured, other), "{other}");
+        }
+        // A captured Soviet Barracks alone lists the Soviet infantry and no Allied one.
+        let only = owned(&["soviet_barracks"]);
+        assert!(listed(america, &only, "conscript"));
+        assert!(!listed(america, &only, "gi"));
+        assert!(listed(america, &only, "engineer"), "any barracks trains it");
+        // A Soviet player is the mirror image.
+        let cuba = player_of(&catalogue, "cuba");
+        let cuba = cuba.get(HUMAN).expect("player");
+        let soviet_base = owned(&[
+            "soviet_construction_yard",
+            "tesla_reactor",
+            "soviet_barracks",
+        ]);
+        assert!(listed(cuba, &soviet_base, "conscript"));
+        assert!(listed(cuba, &soviet_base, "terrorist"), "Cuba's own");
+        assert!(listed(cuba, &soviet_base, "tesla_reactor"));
+        assert!(!listed(cuba, &soviet_base, "desolator"), "Iraq's");
+        for allied in ["gi", "power_plant", "barracks", "pillbox"] {
+            assert!(!listed(cuba, &soviet_base, allied), "{allied}");
+        }
+
+        // Superweapons off: their buildings are not listed, whatever the player owns.
+        let everything: BTreeSet<BuildingKind> = (0..defs.buildings().len())
+            .map(|index| BuildingKind(index as u16))
+            .collect();
+        let superweapons: Vec<ProductionItem> = menu
+            .iter()
+            .copied()
+            .filter(|&item| {
+                matches!(item, ProductionItem::Building(_))
+                    && defs
+                        .metadata(item)
+                        .is_some_and(|entry| entry.role.superweapon())
+            })
+            .collect();
+        assert!(superweapons.len() >= 4, "{superweapons:?}");
+        for &weapon in &superweapons {
+            assert!(card(america, &everything, weapon, true, 0), "{weapon:?}");
+            assert!(!card(america, &everything, weapon, false, 0), "{weapon:?}");
+            assert!(!item_status(weapon, defs, &everything, america, false).available);
+        }
+        // Nothing else changes with the option.
+        for &other in menu.iter().filter(|item| !superweapons.contains(item)) {
+            assert_eq!(
+                card(america, &everything, other, true, 0),
+                card(america, &everything, other, false, 0),
+                "{other:?}"
+            );
+        }
+        // The Construction Yards and the units a spy unlocks are no cards at all.
+        for never in [
+            "construction_yard",
+            "soviet_construction_yard",
+            "chrono_ivan",
+        ] {
+            assert!(!listed(america, &everything, never), "{never}");
+        }
+        // An item in a queue stays listed when its factory is gone, so that it can be cancelled.
+        assert!(!listed(america, &nothing, "conscript"));
+        assert!(card(america, &nothing, item("conscript"), true, 1));
+
+        // Through the simulation: the match as the menu starts it lists no card (the player
+        // owns its MCV and no building); with the yard it lists the Allied buildings; and a
+        // Soviet Barracks in the player's hands adds the Conscript.
+        let ids = |host: &SimHost| -> BTreeSet<ProductionItem> {
+            listed_items(host).into_iter().collect()
+        };
+        assert!(listed_items(&crate::sim_host::tests::menu_host()).is_empty());
+        assert_eq!(details_hint(false).lines().count(), 3);
+        assert!(details_hint(false).contains("press D"));
+        assert_ne!(details_hint(true), details_hint(false));
+        let host = crate::sim_host::tests::demo_host();
+        assert_eq!(ids(&host), cards.iter().copied().collect());
+        let mut placed = None;
+        let host = crate::sim_host::tests::demo_host_with(|world| {
+            // The first free site beside the human player's base.
+            placed = (30..44)
+                .flat_map(|y| (6..24).map(move |x| CellPos::new(x, y)))
+                .find_map(|cell| sim::spawn_building(world, HUMAN, "soviet_barracks", cell).ok());
+        });
+        placed.expect("a site for the barracks");
+        let with_barracks = ids(&host);
+        assert!(with_barracks.contains(&item("conscript")));
+        assert!(with_barracks.contains(&item("engineer")));
+        assert!(!with_barracks.contains(&item("gi")));
+        assert!(!with_barracks.contains(&item("tesla_reactor")));
+        assert!(with_barracks.is_superset(&cards.iter().copied().collect()));
+        // Without a match every item is listed (the sidebar is not shown then).
+        let empty = crate::sim_host::tests::fixture_host(|_| {});
+        assert_eq!(
+            listed_items(&empty).len(),
+            production_menu(empty.definitions().expect("definitions")).len()
+        );
     }
 
     #[test]
@@ -1588,7 +1995,7 @@ mod tests {
         let mut state = host.players().unwrap().get(HUMAN).unwrap().clone();
         let coil = ProductionItem::Building(defs.building_kind("prism_tower").unwrap());
         let tank = ProductionItem::Unit(defs.unit_kind("prism_tank").unwrap());
-        assert!(!item_status(coil, defs, &owned, &state).available);
+        assert!(!item_status(coil, defs, &owned, &state, true).available);
         assert!(availability_text(coil, defs, &owned, Some(&state)).starts_with("Needs"));
         let unlocked = {
             let mut app = App::new();
@@ -1597,7 +2004,7 @@ mod tests {
                 .insert_resource(catalogue.maps[0].map.grid.clone());
             app.world_mut()
                 .insert_resource(catalogue.definitions.clone());
-            let selection = crate::skirmish::MenuSelection::initial(&catalogue);
+            let selection = crate::skirmish::MenuSelection::versus(&catalogue);
             sim::setup_match_with_options(
                 app.world_mut(),
                 &catalogue.skirmish,
@@ -1616,9 +2023,9 @@ mod tests {
         };
         assert!(unlocked.unlock_all());
         state = unlocked;
-        assert!(item_status(coil, defs, &owned, &state).available);
+        assert!(item_status(coil, defs, &owned, &state, true).available);
         assert!(
-            !item_status(tank, defs, &owned, &state).available,
+            !item_status(tank, defs, &owned, &state, true).available,
             "needs a war factory"
         );
         assert_eq!(

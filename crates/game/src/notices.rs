@@ -1,7 +1,10 @@
 //! Match notices: short lines in the top left corner of the map that report what happened
-//! elsewhere on it. For now a player's defeat (`SimEvent::PlayerDefeated`): "Red Player has been
-//! defeated", written in that player's team colour, so that in a match against several computer
-//! players the human player learns which of them is out without having to watch its base fall.
+//! elsewhere on it. A player's defeat (`SimEvent::PlayerDefeated`): "Red Player (Iraq) has been
+//! defeated", written in that player's team colour and with the country it plays (RA1), so that
+//! in a match against several computer players the human player learns which of them is out
+//! without having to watch its base fall. And, when a match starts, the country the human player
+//! plays ([`announce`], from `crate::skirmish::begin_match`), which is news after a RANDOM
+//! choice.
 //!
 //! A notice stays for [`NOTICE_SECONDS`] of real time (also while the match is paused, when no
 //! new one can arrive) and fades out over its last second. The newest is at the bottom of the
@@ -51,12 +54,16 @@ pub struct Notice {
     pub colour: Color,
 }
 
-/// The line that reports the defeat of `player`, whose team colour is called `colour`.
-pub fn defeat_text(player: PlayerId, colour: &str) -> String {
+/// The line that reports the defeat of `player`, whose team colour is called `colour` and who
+/// plays `country` (`None` when the match does not say: "Red Player has been defeated").
+pub fn defeat_text(player: PlayerId, colour: &str, country: Option<&str>) -> String {
     if player == HUMAN {
         "You have been defeated".to_owned()
     } else {
-        format!("{colour} Player has been defeated")
+        format!(
+            "{} has been defeated",
+            crate::skirmish::player_name(colour, country)
+        )
     }
 }
 
@@ -88,11 +95,47 @@ fn panel_colour(alpha: f32) -> Color {
     Color::srgba(0.03, 0.04, 0.05, 0.84 * alpha)
 }
 
+/// A notice with `text` in `colour`.
+fn notice(text: String, colour: Color) -> impl Bundle {
+    (
+        Notice {
+            left: NOTICE_SECONDS,
+            colour,
+        },
+        Node {
+            padding: UiRect::axes(Val::Px(10.0), Val::Px(5.0)),
+            border: UiRect::left(Val::Px(4.0)),
+            ..default()
+        },
+        BackgroundColor(panel_colour(1.0)),
+        BorderColor::all(colour),
+        Text::new(text),
+        TextFont::from_font_size(17.0),
+        TextColor(colour),
+        bevy::ui::FocusPolicy::Pass,
+        Pickable::IGNORE,
+    )
+}
+
+/// Adds the notice `text` in `colour` to the column, if the game has one (the tests of the game
+/// flow run without the interface).
+pub fn announce(world: &mut World, text: String, colour: Color) {
+    let Some(column) = world
+        .query_filtered::<Entity, With<NoticeColumn>>()
+        .iter(world)
+        .next()
+    else {
+        return;
+    };
+    world.entity_mut(column).with_child(notice(text, colour));
+}
+
 /// Adds a notice for every player defeated in the ticks of this frame.
 fn announce_defeats(
     mut commands: Commands,
     mut events: MessageReader<SimEvent>,
     teams: Option<Res<TeamColors>>,
+    played: Option<Res<crate::skirmish::MatchPlayers>>,
     column: Single<Entity, With<NoticeColumn>>,
     notices: Query<(Entity, &Notice)>,
 ) {
@@ -112,24 +155,10 @@ fn announce_defeats(
             shown -= 1;
         }
         shown += 1;
-        commands.entity(*column).with_child((
-            Notice {
-                left: NOTICE_SECONDS,
-                colour,
-            },
-            Node {
-                padding: UiRect::axes(Val::Px(10.0), Val::Px(5.0)),
-                border: UiRect::left(Val::Px(4.0)),
-                ..default()
-            },
-            BackgroundColor(panel_colour(1.0)),
-            BorderColor::all(colour),
-            Text::new(defeat_text(*player, name)),
-            TextFont::from_font_size(17.0),
-            TextColor(colour),
-            bevy::ui::FocusPolicy::Pass,
-            Pickable::IGNORE,
-        ));
+        let country = played.as_deref().and_then(|played| played.label(*player));
+        commands
+            .entity(*column)
+            .with_child(notice(defeat_text(*player, name, country), colour));
     }
 }
 
@@ -179,14 +208,23 @@ mod tests {
     #[test]
     fn a_defeat_is_reported_in_the_colour_name_of_the_defeated_player() {
         assert_eq!(
-            defeat_text(PlayerId(1), "Red"),
+            defeat_text(PlayerId(1), "Red", None),
             "Red Player has been defeated"
         );
         assert_eq!(
-            defeat_text(PlayerId(4), "Purple"),
+            defeat_text(PlayerId(4), "Purple", None),
             "Purple Player has been defeated"
         );
-        assert_eq!(defeat_text(HUMAN, "Blue"), "You have been defeated");
+        assert_eq!(defeat_text(HUMAN, "Blue", None), "You have been defeated");
+        // RA1: with the country the player plays.
+        assert_eq!(
+            defeat_text(PlayerId(1), "Blue", Some("France")),
+            "Blue Player (France) has been defeated"
+        );
+        assert_eq!(
+            defeat_text(HUMAN, "Blue", Some("America")),
+            "You have been defeated"
+        );
     }
 
     #[test]
@@ -280,5 +318,69 @@ mod tests {
         );
         clear(world);
         assert_eq!(world.query::<&Notice>().iter(world).count(), 0);
+    }
+
+    /// RA1: the notice names the country the defeated player plays, and the start of a match
+    /// is announced the same way.
+    #[test]
+    fn notices_name_the_country_a_player_plays() {
+        let entry = |player: u8, label: &str| crate::skirmish::MatchPlayer {
+            player: PlayerId(player),
+            faction: usize::from(player),
+            country: format!("{label} (Soviet)"),
+            label: label.to_owned(),
+            side: Some(sim::Side::Soviet),
+            difficulty: (player != 0).then(|| "Medium".to_owned()),
+        };
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins)
+            .add_message::<SimEvent>()
+            .insert_resource(TeamColors(0))
+            .insert_resource(crate::skirmish::MatchPlayers(vec![
+                entry(0, "Cuba"),
+                entry(1, "Iraq"),
+            ]))
+            .add_systems(Startup, spawn_notice_column)
+            .add_systems(Update, announce_defeats);
+        // Without a column (the tests of the game flow) an announcement is dropped.
+        announce(
+            app.world_mut(),
+            "nobody reads this".to_owned(),
+            Color::WHITE,
+        );
+        app.update();
+        let blue = Color::srgb_u8(42, 133, 202);
+        announce(
+            app.world_mut(),
+            crate::skirmish::start_text("Cuba (Soviet)"),
+            blue,
+        );
+        for player in [1, 2] {
+            app.world_mut().write_message(SimEvent::PlayerDefeated {
+                player: PlayerId(player),
+            });
+        }
+        app.update();
+        let world = app.world_mut();
+        let lines: Vec<(String, Color)> = world
+            .query::<(&Text, &TextColor, &Notice)>()
+            .iter(world)
+            .map(|(text, colour, _)| (text.0.clone(), colour.0))
+            .collect();
+        assert_eq!(
+            lines,
+            [
+                ("You play Cuba (Soviet)".to_owned(), blue),
+                (
+                    "Red Player (Iraq) has been defeated".to_owned(),
+                    Color::srgb_u8(195, 66, 48)
+                ),
+                // A player the match does not list is named by its colour alone.
+                (
+                    "Gold Player has been defeated".to_owned(),
+                    Color::srgb_u8(212, 175, 52)
+                ),
+            ]
+        );
     }
 }
