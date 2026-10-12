@@ -94,6 +94,23 @@ pub fn label_text(
     }
 }
 
+/// The line of a label that names the armour type of `item` (RA3), e.g. `Heavy armour`; the
+/// type `none` reads `No armour`. `None` without combat terms.
+pub fn armour_line(definitions: &Definitions, item: ProductionItem) -> Option<String> {
+    let terms = match item {
+        ProductionItem::Unit(kind) => definitions.unit_combat(kind),
+        ProductionItem::Building(kind) => definitions.building_combat(kind),
+    }?;
+    let name = definitions
+        .armour_classes()
+        .get(usize::from(terms.armour.0))?;
+    Some(if name == "none" {
+        "No armour".to_owned()
+    } else {
+        format!("{} armour", title(name))
+    })
+}
+
 /// The label of scenery (`sim::Props`): its name, that it can be destroyed, and its health.
 pub fn scenery_text(kind: sim::PropKind, hit_points: i32) -> String {
     let max = kind.hit_points().max(1);
@@ -196,13 +213,18 @@ pub(crate) fn show_hover_label(
                     played.as_deref().and_then(|played| played.label(owner)),
                 )
             });
+            let mut text = label_text(
+                &display_name(definitions, item),
+                owner,
+                whose.as_deref(),
+                health,
+            );
+            if let Some(armour) = armour_line(definitions, item) {
+                text.push('\n');
+                text.push_str(&armour);
+            }
             Some((
-                label_text(
-                    &display_name(definitions, item),
-                    owner,
-                    whose.as_deref(),
-                    health,
-                ),
+                text,
                 if owner == HUMAN {
                     Color::srgb(0.72, 0.9, 1.0)
                 } else {
@@ -316,5 +338,39 @@ mod tests {
             names.insert(name);
         }
         assert!(names.len() > 60, "{} names", names.len());
+    }
+
+    /// RA3: the label names the armour type of what the cursor is on.
+    #[test]
+    fn the_label_names_the_armour_of_every_shipped_type() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../assets");
+        let (loaded, _) = crate::units::load_match_data(&root).expect("match data");
+        let definitions = &loaded.definitions;
+        let line = |id: &str| {
+            let item = definitions
+                .unit_kind(id)
+                .map(ProductionItem::Unit)
+                .or_else(|| definitions.building_kind(id).map(ProductionItem::Building))
+                .unwrap_or_else(|| panic!("{id}"));
+            armour_line(definitions, item).unwrap_or_else(|| panic!("{id} has no armour"))
+        };
+        assert_eq!(line("gi"), "No armour");
+        assert_eq!(line("conscript"), "Flak armour");
+        assert_eq!(line("tesla_trooper"), "Plate armour");
+        assert_eq!(line("ifv"), "Light armour");
+        assert_eq!(line("chrono_miner"), "Medium armour");
+        assert_eq!(line("grizzly"), "Heavy armour");
+        assert_eq!(line("power_plant"), "Wood armour");
+        assert_eq!(line("pillbox"), "Steel armour");
+        assert_eq!(line("construction_yard"), "Concrete armour");
+        assert_eq!(line("terror_drone"), "Special 1 armour");
+        let units =
+            (0..definitions.units().len()).map(|i| ProductionItem::Unit(sim::UnitKind(i as u16)));
+        let buildings = (0..definitions.buildings().len())
+            .map(|i| ProductionItem::Building(sim::BuildingKind(i as u16)));
+        for item in units.chain(buildings) {
+            let text = armour_line(definitions, item).expect("every shipped type has armour");
+            assert!(text.ends_with(" armour") && !text.contains('_'), "{text}");
+        }
     }
 }

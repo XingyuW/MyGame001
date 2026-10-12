@@ -4,6 +4,7 @@
 #
 #     crates/sim/tests/reference/ra2_reference.tsv   (committed: file, section, key, value)
 #     crates/sim/tests/reference/ra2_mapping.tsv     (committed: game id -> ini section)
+#     crates/sim/tests/reference/ra2_combat.tsv      (committed: weapon, warhead id -> section)
 #             |  this script, with its own tables of game specific values below
 #             v
 #     assets/data/{rules,units,economy,combat,arsenal,skirmish,ai}.ron
@@ -11,10 +12,12 @@
 # It reads only the two committed tables: never the ini files. Every value ported from the
 # reference is converted with the conversions of the plan's section 2 and written with a
 # trailing comment `// [Section] Key=value` naming where it comes from. Values that are not
-# ported (labels, descriptions, sprites, footprints, roles, armour, weapons, the computer
-# player's plans, the maps) come from the tables of this script and carry no such comment;
-# weapons, armour and footprints are ported by later milestones. Build times are computed from
-# the cost (RA2, docs/RA2_PARITY_PLAN.md section 4.2).
+# ported (labels, descriptions, sprites, footprints, roles, the computer player's plans, the
+# maps) come from the tables of this script and carry no such comment; footprints are ported by
+# a later milestone. Build times are computed from the cost (RA2, docs/RA2_PARITY_PLAN.md
+# section 4.2). Armour, warheads, weapons and which of them a type carries are ported since RA3
+# (sections 4.3 and 4.4), with the third committed table `ra2_combat.tsv` (game id of a weapon or
+# warhead -> ini section).
 #
 # The data parity audit (crates/sim/tests/ra9_data_parity.rs) recomputes the conversions in Rust
 # from the same tables and fails on any shipped value that differs from its reference and is not
@@ -29,6 +32,7 @@
 import os
 import sys
 from fractions import Fraction
+from math import isqrt
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REFERENCE_DIR = os.path.join(ROOT, "crates", "sim", "tests", "reference")
@@ -68,216 +72,234 @@ FACTORIES = {
 }
 
 # id: (label, description, category, domain, role, cooldown, radius, strength, capacity,
-#      sprite, width, height, armour, weapons)
+#      sprite, width, height)
 BUILDINGS = {
     'construction_yard': ('Construction Yard', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
-        'construction_yard', 3, 3, 'structure', []),
+        'construction_yard', 3, 3),
     'power_plant': ('Power Plant', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
-        'power_plant', 2, 2, 'structure', []),
+        'power_plant', 2, 2),
     'refinery': ('Ore Refinery', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
-        'refinery', 3, 3, 'structure', []),
+        'refinery', 3, 3),
     'barracks': ('Barracks', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
-        'barracks', 2, 2, 'structure', []),
+        'barracks', 2, 2),
     'war_factory': ('War Factory', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
-        'war_factory', 3, 3, 'structure', []),
+        'war_factory', 3, 3),
     'tech_center': ('Battle Lab', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
-        'tech_center', 2, 2, 'structure', []),
+        'tech_center', 2, 2),
     'tesla_reactor': ('Tesla Reactor', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
-        'power_plant', 2, 2, 'structure', []),
+        'power_plant', 2, 2),
     'ore_purifier': ('Ore Purifier', 'Increases ore delivery income by 25 percent while powered.', 'buildings', 'land', 'purifier', 100, 6, 20, 0,
-        'tech_center', 2, 2, 'structure', []),
+        'tech_center', 2, 2),
     'nuclear_reactor': ('Nuclear Reactor', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
-        'power_plant', 2, 2, 'structure', []),
+        'power_plant', 2, 2),
     'naval_shipyard': ('Naval Shipyard', 'Place on water adjacent to shore. Produces naval units.', 'buildings', 'land', 'shipyard', 100, 6, 20, 0,
-        'war_factory', 3, 3, 'structure', []),
+        'war_factory', 3, 3),
     'airforce_command': ('Airforce Command Headquarters', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
-        'war_factory', 3, 3, 'structure', []),
+        'war_factory', 3, 3),
     'service_depot': ('Service Depot', 'Repairs a damaged vehicle sent to it, for credits.', 'buildings', 'land', 'repair', 100, 6, 20, 0,
-        'tech_center', 2, 2, 'structure', []),
+        'tech_center', 2, 2),
     'radar_tower': ('Radar Tower', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
-        'tech_center', 2, 2, 'structure', []),
+        'tech_center', 2, 2),
     'cloning_vats': ('Cloning Vats', 'Duplicates trained infantry.', 'buildings', 'land', 'cloner', 100, 6, 20, 0,
-        'tech_center', 2, 2, 'structure', []),
+        'tech_center', 2, 2),
     'fortress_walls': ('Fortress Walls', 'Blocks ground movement.', 'armory', 'land', 'combat', 100, 6, 20, 0,
-        'gun_turret', 1, 1, 'structure', []),
+        'gun_turret', 1, 1),
     'pillbox': ('Pillbox', 'Automatically engages valid enemy targets.', 'armory', 'land', 'combat', 100, 6, 20, 0,
-        'gun_turret', 1, 1, 'structure', ['rifle']),
+        'gun_turret', 1, 1),
     'sentry_gun': ('Sentry Gun', 'Automatically engages valid enemy targets.', 'armory', 'land', 'combat', 100, 6, 20, 0,
-        'gun_turret', 1, 1, 'structure', ['scout_gun']),
+        'gun_turret', 1, 1),
     'patriot': ('Patriot Missile System', 'Automatically engages valid enemy targets.', 'armory', 'land', 'flak', 100, 6, 20, 0,
-        'gun_turret', 1, 1, 'structure', ['aegis_missile']),
+        'gun_turret', 1, 1),
     'flak_cannon': ('Flak Cannon', 'Automatically engages valid enemy targets.', 'armory', 'land', 'flak', 100, 6, 20, 0,
-        'gun_turret', 1, 1, 'structure', ['aegis_missile']),
+        'gun_turret', 1, 1),
     'prism_tower': ('Prism Tower', 'Automatically engages valid enemy targets.', 'armory', 'land', 'splash', 100, 6, 20, 0,
-        'gun_turret', 1, 1, 'structure', ['prism_beam']),
+        'gun_turret', 1, 1),
     'tesla_coil': ('Tesla Coil', 'Automatically engages valid enemy targets.', 'armory', 'land', 'tesla', 100, 6, 20, 0,
-        'gun_turret', 1, 1, 'structure', ['tesla_weapon']),
+        'gun_turret', 1, 1),
     'grand_cannon': ('Grand Cannon', 'Automatically engages valid enemy targets.', 'armory', 'land', 'splash', 100, 6, 20, 0,
-        'tech_center', 2, 2, 'structure', ['grand_shell']),
+        'tech_center', 2, 2),
     'gap_generator': ('Gap Generator', 'Shrouds this area against enemy vision.', 'armory', 'land', 'gap', 100, 6, 20, 0,
-        'tech_center', 2, 2, 'structure', []),
+        'tech_center', 2, 2),
     'spy_satellite': ('Spy Satellite Uplink', 'Reveals the battlefield while powered.', 'armory', 'land', 'satellite', 100, 6, 20, 0,
-        'tech_center', 2, 2, 'structure', []),
+        'tech_center', 2, 2),
     'psychic_sensor': ('Psychic Sensor', 'Detects concealed units nearby.', 'armory', 'land', 'sensor', 100, 6, 20, 0,
-        'tech_center', 2, 2, 'structure', []),
+        'tech_center', 2, 2),
     'chronosphere': ('Chronosphere', 'Select vehicles, choose ability, then click a visible destination.', 'armory', 'land', 'chronosphere', 3600, 3, 0, 0,
-        'tech_center', 2, 2, 'structure', []),
+        'tech_center', 2, 2),
     'weather_control': ('Weather Control Device', 'Click a visible area for a devastating lightning storm.', 'armory', 'land', 'storm', 6000, 5, 1600, 0,
-        'war_factory', 3, 3, 'structure', []),
+        'war_factory', 3, 3),
     'iron_curtain': ('Iron Curtain Device', 'Click a visible area to protect friendly mechanical units for 10 seconds.', 'armory', 'land', 'curtain', 3600, 3, 200, 0,
-        'tech_center', 2, 2, 'structure', []),
+        'tech_center', 2, 2),
     'nuclear_silo': ('Nuclear Missile Silo', 'Click a visible area for a nuclear strike.', 'armory', 'land', 'nuke', 6000, 6, 2500, 0,
-        'war_factory', 3, 3, 'structure', []),
+        'war_factory', 3, 3),
 }
 # id: (label, description, category, domain, role, cooldown, radius, strength, capacity,
-#      sprite, armour, weapons)
+#      sprite)
 UNITS = {
     'conscript': ('Conscript', 'Specialized ground combat. Select and right click an enemy to attack.', 'infantry', 'land', 'combat', 100, 2, 20, 0,
-        'conscript', 'infantry', ['carbine']),
+        'conscript'),
     'gi': ('GI', 'Specialized ground combat. Select and right click an enemy to attack.', 'infantry', 'land', 'combat', 100, 2, 20, 0,
-        'rifleman', 'infantry', ['rifle']),
+        'rifleman'),
     'engineer': ('Engineer', 'E + click a nearby structure to capture or repair it.', 'infantry', 'land', 'engineer', 100, 2, 20, 0,
-        'rifleman', 'infantry', []),
+        'rifleman'),
     'attack_dog': ('Attack Dog', 'Specialized ground combat. Select and right click an enemy to attack.', 'infantry', 'land', 'dog', 100, 2, 20, 0,
-        'scout', 'infantry', ['dog_bite']),
+        'scout'),
     'rocketeer': ('Rocketeer', 'Specialized air combat. Select and right click an enemy to attack.', 'infantry', 'air', 'combat', 100, 2, 20, 0,
-        'rifleman', 'air', ['air_rifle']),
+        'rifleman'),
     'spy': ('Spy', 'E + click a nearby enemy building to infiltrate. Dogs detect spies.', 'infantry', 'land', 'spy', 100, 2, 20, 0,
-        'rifleman', 'infantry', []),
+        'rifleman'),
     'tanya': ('Tanya', 'Specialized ground combat. Select and right click an enemy to attack.', 'infantry', 'land', 'commando', 100, 2, 20, 0,
-        'rifleman', 'infantry', ['commando_gun']),
+        'rifleman'),
     'chrono_legionnaire': ('Chrono Legionnaire', 'Teleports when given a move order; beam suppresses targets.', 'infantry', 'land', 'chrono', 100, 2, 20, 0,
-        'rifleman', 'infantry', ['chrono_beam']),
+        'rifleman'),
     'sniper': ('Sniper', 'Specialized ground combat. Select and right click an enemy to attack.', 'infantry', 'land', 'combat', 100, 2, 20, 0,
-        'rifleman', 'infantry', ['sniper_rifle']),
+        'rifleman'),
     'flak_trooper': ('Flak Trooper', 'Specialized ground combat. Select and right click an enemy to attack.', 'infantry', 'land', 'flak', 100, 2, 20, 0,
-        'rocket_soldier', 'infantry', ['flak_weapon']),
+        'rocket_soldier'),
     'tesla_trooper': ('Tesla Trooper', 'Specialized ground combat. Select and right click an enemy to attack.', 'infantry', 'land', 'tesla', 100, 2, 20, 0,
-        'rocket_soldier', 'infantry', ['tesla_weapon']),
+        'rocket_soldier'),
     'crazy_ivan': ('Crazy Ivan', 'Attaches a delayed explosive when attacking.', 'infantry', 'land', 'demolition', 100, 2, 800, 0,
-        'grenadier', 'infantry', ['bomb_trigger']),
+        'grenadier'),
     'yuri': ('Yuri', 'Controls one enemy unit; control ends when Yuri dies.', 'infantry', 'land', 'mind_control', 100, 2, 20, 0,
-        'rifleman', 'infantry', ['control_beam']),
+        'rifleman'),
     'desolator': ('Desolator', 'D contaminates surrounding ground.', 'infantry', 'land', 'radiation', 100, 3, 20, 0,
-        'grenadier', 'infantry', ['radiation_weapon']),
+        'grenadier'),
     'terrorist': ('Terrorist', 'Detonates on reaching attack range.', 'infantry', 'land', 'suicide', 100, 3, 500, 0,
-        'conscript', 'infantry', ['suicide_trigger']),
+        'conscript'),
     'chrono_miner': ('Chrono Miner', 'Harvests ore and teleports home to unload.', 'vehicles', 'land', 'chrono_miner', 100, 2, 20, 0,
-        'harvester', 'heavy', []),
+        'harvester'),
     'war_miner': ('War Miner', 'Specialized ground combat. Select and right click an enemy to attack.', 'vehicles', 'land', 'combat', 100, 2, 20, 0,
-        'harvester', 'heavy', ['scout_gun']),
+        'harvester'),
     'grizzly': ('Grizzly Battle Tank', 'Specialized ground combat. Select and right click an enemy to attack.', 'vehicles', 'land', 'combat', 100, 2, 20, 0,
-        'light_tank', 'heavy', ['tank_cannon']),
+        'light_tank'),
     'rhino': ('Rhino Heavy Tank', 'Specialized ground combat. Select and right click an enemy to attack.', 'vehicles', 'land', 'combat', 100, 2, 20, 0,
-        'heavy_tank', 'heavy', ['heavy_cannon']),
+        'heavy_tank'),
     'ifv': ('Infantry Fighting Vehicle (IFV)', 'Carries one infantry; passenger changes its weapon. D unloads.', 'vehicles', 'land', 'ifv', 100, 2, 20, 1,
-        'scout', 'light', ['flak_weapon']),
+        'scout'),
     'flak_track': ('Flak Track', 'Select passengers; E + click this transport to load. D unloads.', 'vehicles', 'land', 'transport', 100, 2, 20, 5,
-        'raider', 'light', ['flak_weapon']),
+        'raider'),
     'terror_drone': ('Terror Drone', 'Immobilizes and damages mechanical targets.', 'vehicles', 'land', 'drone', 100, 2, 20, 0,
-        'scout', 'light', ['drone_claw']),
+        'scout'),
     'v3_launcher': ('V3 Rocket Launcher', 'Specialized ground combat. Select and right click an enemy to attack.', 'vehicles', 'land', 'combat', 100, 2, 20, 0,
-        'rocket_launcher', 'light', ['v3_missile']),
+        'rocket_launcher'),
     'mcv': ('Mobile Construction Vehicle (MCV)', 'D deploys into a Construction Yard on clear ground.', 'vehicles', 'land', 'mcv', 100, 2, 20, 0,
-        'harvester', 'heavy', []),
+        'harvester'),
     'mirage_tank': ('Mirage Tank', 'Concealed while idle; revealed by nearby detectors.', 'vehicles', 'land', 'mirage', 100, 2, 20, 0,
-        'light_tank', 'heavy', ['mirage_gun']),
+        'light_tank'),
     'prism_tank': ('Prism Tank', 'Specialized ground combat. Select and right click an enemy to attack.', 'vehicles', 'land', 'splash', 100, 2, 20, 0,
-        'artillery', 'light', ['prism_beam']),
+        'artillery'),
     'apocalypse': ('Apocalypse Tank', 'Specialized ground combat. Select and right click an enemy to attack.', 'vehicles', 'land', 'combat', 100, 2, 20, 0,
-        'heavy_tank', 'heavy', ['apocalypse_gun']),
+        'heavy_tank'),
     'tank_destroyer': ('Tank Destroyer', 'Specialized ground combat. Select and right click an enemy to attack.', 'vehicles', 'land', 'combat', 100, 2, 20, 0,
-        'artillery', 'heavy', ['destroyer_gun']),
+        'artillery'),
     'tesla_tank': ('Tesla Tank', 'Specialized ground combat. Select and right click an enemy to attack.', 'vehicles', 'land', 'tesla', 100, 2, 20, 0,
-        'heavy_tank', 'heavy', ['tesla_weapon']),
+        'heavy_tank'),
     'demolition_truck': ('Demolition Truck', 'Detonates on reaching attack range.', 'vehicles', 'land', 'suicide', 100, 3, 1600, 0,
-        'harvester', 'light', ['suicide_trigger']),
+        'harvester'),
     'harrier': ('Harrier', 'Fires a strike then returns to an air facility to rearm.', 'vehicles', 'air', 'strike', 100, 2, 20, 0,
-        'scout', 'air', ['air_bomb']),
+        'scout'),
     'black_eagle': ('Black Eagle', 'Fires a strike then returns to an air facility to rearm.', 'vehicles', 'air', 'strike', 100, 2, 20, 0,
-        'scout', 'air', ['eagle_bomb']),
+        'scout'),
     'nighthawk': ('NightHawk Transport', 'Select passengers; E + click this transport to load. D unloads.', 'vehicles', 'air', 'transport', 100, 2, 20, 5,
-        'scout', 'air', ['air_rifle']),
+        'scout'),
     'kirov': ('Kirov Airship', 'Specialized air combat. Select and right click an enemy to attack.', 'vehicles', 'air', 'splash', 100, 2, 20, 0,
-        'heavy_tank', 'air', ['kirov_bomb']),
+        'heavy_tank'),
     'amphibious_transport': ('Amphibious Transport', 'Select passengers; E + click this transport to load. D unloads.', 'vehicles', 'amphibious', 'transport', 100, 2, 20, 12,
-        'harvester', 'naval', []),
+        'harvester'),
     'destroyer': ('Destroyer', 'Specialized naval combat. Select and right click an enemy to attack.', 'vehicles', 'naval', 'combat', 100, 2, 20, 0,
-        'artillery', 'naval', ['naval_gun']),
+        'artillery'),
     'aegis_cruiser': ('Aegis Cruiser', 'Specialized naval combat. Select and right click an enemy to attack.', 'vehicles', 'naval', 'flak', 100, 2, 20, 0,
-        'artillery', 'naval', ['aegis_missile']),
+        'artillery'),
     'dolphin': ('Dolphin', 'Specialized naval combat. Select and right click an enemy to attack.', 'vehicles', 'naval', 'combat', 100, 2, 20, 0,
-        'artillery', 'submerged', ['sonic']),
+        'artillery'),
     'aircraft_carrier': ('Aircraft Carrier', 'Launches recoverable strike aircraft; no airbase required.', 'vehicles', 'naval', 'carrier', 100, 2, 20, 2,
-        'artillery', 'naval', ['carrier_strike']),
+        'artillery'),
     'typhoon': ('Typhoon Attack Submarine', 'Specialized naval combat. Select and right click an enemy to attack.', 'vehicles', 'naval', 'combat', 100, 2, 20, 0,
-        'artillery', 'submerged', ['torpedo']),
+        'artillery'),
     'sea_scorpion': ('Sea Scorpion', 'Specialized naval combat. Select and right click an enemy to attack.', 'vehicles', 'naval', 'flak', 100, 2, 20, 0,
-        'artillery', 'naval', ['flak_weapon']),
-    'giant_squid': ('Giant Squid', 'Immobilizes enemy vessels.', 'vehicles', 'naval', 'squid', 100, 2, 20, 0,
-        'artillery', 'submerged', ['squid_grip']),
+        'artillery'),
+    'giant_squid': ('Giant Squid', 'Immobilizes enemy vessels.', 'vehicles', 'naval', 'squid', 133, 2, 20, 0,
+        'artillery'),
     'dreadnought': ('Dreadnought', 'Specialized naval combat. Select and right click an enemy to attack.', 'vehicles', 'naval', 'combat', 100, 2, 20, 0,
-        'artillery', 'naval', ['dread_missile']),
+        'artillery'),
 }
-ARMOUR_CLASSES = ['infantry', 'light', 'heavy', 'structure', 'air', 'naval', 'submerged']
-WARHEADS = {
-    'bullet': [100, 50, 15, 60, 0, 60, 0],
-    'armour_piercing': [35, 80, 100, 50, 0, 50, 0],
-    'rocket': [30, 100, 100, 70, 0, 70, 0],
-    'high_explosive': [100, 75, 50, 80, 0, 80, 0],
-    'shell': [90, 60, 40, 100, 0, 100, 0],
-    'anti_air': [0, 0, 0, 0, 100, 0, 0],
-    'flak': [50, 30, 15, 15, 100, 40, 0],
-    'anti_infantry': [100, 0, 0, 0, 0, 0, 0],
-    'anti_vehicle': [0, 100, 100, 0, 0, 80, 0],
-    'naval': [25, 50, 50, 50, 0, 100, 100],
-    'torpedo': [0, 0, 0, 0, 0, 100, 100],
-    'omni': [50, 100, 100, 100, 100, 100, 0],
-    'control': [100, 100, 100, 0, 0, 0, 0],
+# The armour types in the order of a warhead's `Verses` (docs/RA2_PARITY_PLAN.md appendix D).
+ARMOURS = (
+    "none", "flak", "plate", "light", "medium", "heavy", "wood", "steel", "concrete",
+    "special_1", "special_2",
+)
+# Weapons of the ini that no type of the game carries yet, with the reason; a slot that names
+# one is empty, and ra2_differences.tsv lists it. Everything else a mapped section names as
+# `Primary`, `Secondary`, `ElitePrimary`, `EliteSecondary`, `Weapon1` or `EliteWeapon1` is
+# carried.
+NOT_CARRIED = {
+    "none": "no weapon",
+    "VirtualScanner": "NeverUse=yes: the engine never fires it",
+    "MakeupKit": "the spy's disguise (RA6)",
+    "DefuseKit": "the engineer's bomb disposal (RA6)",
+    "AssaultBolt": "the charging of Tesla Coils (RA6)",
+    "PsiWave": "the psi wave of a deployed Yuri (RA6)",
+    "RadEruptionWeapon": "the eruption of a deployed Desolator, the game's radiation zone (RA6)",
+    "Sapper": "C4 on ships (RA6)",
+    "FakeC4": "C4 (RA6)",
+    "PrismSupport": "the support beam of the prism chain (RA6)",
 }
-# id: (damage, range, reload, warhead, projectile_speed)
-WEAPONS = {
-    'rifle': (14, 1024, 15, 'bullet', 0),
-    'carbine': (12, 896, 14, 'bullet', 0),
-    'infantry_rocket': (45, 1280, 40, 'rocket', 192),
-    'grenade': (35, 1024, 35, 'high_explosive', 128),
-    'scout_gun': (9, 1024, 8, 'bullet', 0),
-    'raider_gun': (10, 1024, 8, 'bullet', 0),
-    'tank_cannon': (40, 1280, 30, 'armour_piercing', 160),
-    'heavy_cannon': (60, 1280, 36, 'armour_piercing', 160),
-    'artillery_shell': (80, 2560, 75, 'shell', 128),
-    'rocket_salvo': (70, 2304, 70, 'rocket', 192),
-    'turret_gun': (50, 1536, 35, 'high_explosive', 192),
-    'tower_rocket': (45, 1792, 40, 'high_explosive', 224),
-    'dog_bite': (200, 384, 12, 'anti_infantry', 0),
-    'air_rifle': (25, 1280, 15, 'bullet', 0),
-    'commando_gun': (150, 1536, 12, 'bullet', 0),
-    'chrono_beam': (60, 1280, 30, 'control', 0),
-    'sniper_rifle': (250, 3072, 70, 'anti_infantry', 0),
-    'flak_weapon': (30, 1536, 20, 'flak', 0),
-    'tesla_weapon': (100, 1280, 40, 'high_explosive', 0),
-    'bomb_trigger': (1, 384, 120, 'high_explosive', 0),
-    'control_beam': (1, 1536, 100, 'control', 0),
-    'radiation_weapon': (50, 1024, 30, 'high_explosive', 0),
-    'suicide_trigger': (1, 384, 100, 'high_explosive', 0),
-    'drone_claw': (30, 384, 20, 'anti_vehicle', 0),
-    'v3_missile': (160, 3840, 140, 'shell', 128),
-    'mirage_gun': (100, 1792, 35, 'high_explosive', 0),
-    'prism_beam': (100, 2560, 65, 'shell', 0),
-    'apocalypse_gun': (120, 1792, 45, 'omni', 160),
-    'destroyer_gun': (140, 1536, 40, 'anti_vehicle', 160),
-    'air_bomb': (180, 1536, 60, 'shell', 0),
-    'eagle_bomb': (260, 1536, 60, 'shell', 0),
-    'kirov_bomb': (400, 512, 55, 'shell', 0),
-    'naval_gun': (80, 1792, 40, 'naval', 160),
-    'aegis_missile': (100, 2560, 20, 'anti_air', 192),
-    'sonic': (100, 1536, 30, 'torpedo', 0),
-    'carrier_strike': (250, 3840, 160, 'shell', 128),
-    'torpedo': (120, 1792, 50, 'torpedo', 128),
-    'squid_grip': (50, 384, 30, 'torpedo', 0),
-    'dread_missile': (300, 4096, 180, 'shell', 128),
-    'grand_shell': (200, 3584, 80, 'shell', 128),
+# Values of a weapon that are the game's own instead of the ini's, each a row of
+# ra2_differences.tsv: stand-ins for mechanics of a later milestone (docs/DECISIONS.md R36).
+# A value is a number, or (section, key, conversion) of the reference it is taken from; a
+# warhead is the ini name of a mapped warhead.
+#
+# * The launchers spawn missiles and aircraft from RA4. Until then the V3 Launcher and the
+#   Dreadnought fire a projectile with the missile's damage, warhead and speed at the pace at
+#   which the missile regenerates, the destroyer's secondary weapon is the depth charge of its
+#   Osprey with the range of its gun, and the carrier's weapon names the warhead of its
+#   Hornets (its shot launches aircraft and deals nothing).
+# * The mechanics of RA6: a dog's bite and the neutron rifle keep the damage of M9 (the ini's
+#   number is not hit points: a bite kills, a rifle erases), the sonic beam keeps M9's damage
+#   per shot (the ini's is per frame of the wave), the bomb of Crazy Ivan names the warhead it
+#   goes off with, and the Demolition Truck needs the smallest range the combat file admits.
+WEAPON_VALUES = {
+    "V3Launcher": {
+        "damage": ("General", "V3RocketDamage", "int"),
+        "warhead": "V3WH",
+        "reload": ("V3", "SpawnRegenRate", "frames"),
+        "projectile_speed": ("V3ROCKET", "Speed", "speed"),
+    },
+    "DredLauncher": {
+        "damage": ("General", "DMislDamage", "int"),
+        "warhead": "DMISLWH",
+        "reload": ("DRED", "SpawnRegenRate", "frames"),
+        "projectile_speed": ("DMISL", "Speed", "speed"),
+    },
+    "HornetLauncher": {"warhead": "ORCAAP"},
+    "ASWLauncher": {
+        "damage": ("ASWBomb", "Damage", "int"),
+        "warhead": "APSplash",
+        "range": ("155mm", "Range", "cells"),
+        "anti_ground": 1,
+    },
+    "GoodTeeth": {"damage": 200},
+    "NeutronRifle": {"damage": 60},
+    "NeutronRifleE": {"damage": 60},
+    "SonicZap": {"damage": 100},
+    "SonicZapE": {"damage": 100},
+    "IvanBomber": {"warhead": "IvanWH"},
+    "IvanBomberE": {"warhead": "IvanWH"},
+    "Demobomb": {"range": 384},
 }
+# The area effects that are no weapon of a type (crates/sim/src/combat_defs.rs, `Effect`):
+# id, base damage and warhead, each a number or the (section, key) of the reference.
+# The charge of a commando and the pulse of a radiation zone are mechanics of M9 that RA6
+# replaces: their damage is the game's own.
+EFFECTS = (
+    ("nuke", ("NukePayload", "Damage"), ("NukePayload", "Warhead")),
+    ("lightning", ("General", "LightningDamage"), ("General", "LightningWarhead")),
+    ("ivan_bomb", ("CombatDamage", "IvanDamage"), ("CombatDamage", "IvanWarhead")),
+    ("c4", 200, ("CombatDamage", "C4Warhead")),
+    ("radiation", 20, ("Radiation", "RadSiteWarhead")),
+)
+# The limits of the combat file (crates/sim/src/combat_defs.rs).
+MIN_PROJECTILE_SPEED = 16
 HARVESTERS = {'chrono_miner': (500, 7), 'war_miner': (1000, 7)}
 
 # The ids RA1 adds (docs/RA2_PARITY_PLAN.md section 3.3): id: (label, the id whose game specific
@@ -573,7 +595,12 @@ def speed(section):
         key, leptons = "Speed", min(int(section["Speed"]) * 256 // 100, 255)
         if section.get("Category") == "Soldier":
             leptons = leptons * 3 // 2
-    return max(1, rounded(Fraction(leptons * 3, 4))), key
+    return leptons_per_tick(leptons), key
+
+
+def leptons_per_tick(leptons):
+    """Leptons per frame as subcells per tick (section 2: 15 frames are 20 ticks), at least 1."""
+    return max(1, rounded(Fraction(leptons * 3, 4)))
 
 
 # --- The tables --------------------------------------------------------------------------------
@@ -622,6 +649,18 @@ class Tables:
             for house in self.value("Sides", ini_side).split(","):
                 self.house_side[house] = game_side
         self.house_country = {house: country for house, country, _ in COUNTRIES}
+        # Weapons and warheads: the game id of every ini section (two sections may share
+        # one, as the teeth of the two dogs do), and the ids in the order of the table.
+        self.weapon_id, self.warhead_id = {}, {}
+        self.weapons, self.warheads = [], []
+        for game_id, kind, section in read_tsv("ra2_combat.tsv", ("game_id", "kind", "section")):
+            ids, order = {
+                "weapon": (self.weapon_id, self.weapons),
+                "warhead": (self.warhead_id, self.warheads),
+            }[kind]
+            ids[section] = game_id
+            if game_id not in [known for known, _ in order]:
+                order.append((game_id, section))
 
     def section(self, name):
         if name not in self.rules:
@@ -893,58 +932,221 @@ class Data:
 
     # --- combat.ron --------------------------------------------------------------------------
 
+    def carried(self, item):
+        """The ini weapons of an item's slots, (primary, secondary) below and at elite rank;
+        `None` for an empty slot (section 4.4: an elite weapon takes the place of the weapon
+        of its slot, and a slot without one keeps its weapon)."""
+        ini = item.ini
+        slot = lambda *keys: next(
+            (ini[key] for key in keys if ini.get(key) and ini[key] not in NOT_CARRIED), None
+        )
+        primary, secondary = slot("Primary", "Weapon1"), slot("Secondary")
+        elite = (
+            slot("ElitePrimary", "EliteWeapon1") or primary,
+            slot("EliteSecondary") or secondary,
+        )
+        for pair in ((primary, secondary), elite):
+            if pair[0] is None and pair[1] is not None:
+                raise Failure(f"{item.id}: a secondary weapon without a primary one")
+        return (primary, secondary), elite
+
+    def weapon_entry(self, game_id, section_name):
+        """The line of a weapon (sections 2 and 4.4) and what it names."""
+        tables = self.tables
+        weapon = tables.section(section_name)
+        own = WEAPON_VALUES.get(section_name, {})
+        sources = []
+
+        def value(field, ported):
+            """The ported value, or the game's own."""
+            if field not in own:
+                return ported()
+            chosen = own[field]
+            if isinstance(chosen, tuple):
+                section, key, kind = chosen
+                text = tables.value(section, key)
+                sources.append(f"{field}: {cite(section, key, tables.section(section))}")
+                if kind == "speed":
+                    # The cruise speed of the missile unit, read as every unit's `Speed`.
+                    return leptons_per_tick(min(int(text) * 256 // 100, 255))
+                return convert(kind, text)
+            sources.append(f"{field}: the game's own")
+            return chosen
+
+        projectile = tables.section(weapon["Projectile"])
+        flag = lambda values, key, default: convert("flag", values.get(key, default))
+        reach = value("range", lambda: convert("cells", weapon["Range"]))
+        gravity = int(tables.value("AudioVisual", "Gravity"))
+
+        def flight():
+            # An invisible projectile, and the leap of a unit that is its own projectile,
+            # arrive at once. An arcing shell flies at sqrt(1.2 x Gravity x range) leptons per
+            # frame, whatever the weapon's `Speed` (an assumption, docs/DECISIONS.md R34);
+            # every other projectile at the weapon's `Speed`, read as a unit's is.
+            if flag(projectile, "Inviso", "no") or flag(weapon, "LimboLaunch", "no"):
+                return 0
+            if flag(projectile, "Arcing", "no"):
+                return leptons_per_tick(isqrt(reach * gravity * 6 // 5))
+            return leptons_per_tick(min(int(weapon["Speed"]) * 256 // 100, 255))
+
+        warhead_section = own.get("warhead", weapon["Warhead"])
+        if "warhead" in own:
+            sources.append(f"warhead: [{warhead_section}], the game's own")
+        scatter = 0
+        if flag(projectile, "Inaccurate", "no"):
+            # Section 4.4: twice `BallisticScatter` for the invisible flak, once for the shell.
+            scatter = convert("cells", tables.value("CombatDamage", "BallisticScatter")) * (
+                2 if flag(projectile, "Inviso", "no") else 1
+            )
+        fields = (
+            f'id: "{game_id}", '
+            f"damage: {value('damage', lambda: int(weapon['Damage']))}, "
+            f"range: {reach}, "
+            f"min_range: {convert('cells', weapon.get('MinimumRange', '0'))}, "
+            f"reload: {value('reload', lambda: convert('frames', weapon['ROF']))}, "
+            f"burst: {int(weapon.get('Burst', '1'))}, "
+            f'warhead: "{self.tables.warhead_id[warhead_section]}", '
+            f"projectile_speed: {value('projectile_speed', flight)}, "
+            f"anti_air: {flag(projectile, 'AA', 'no')}, "
+            f"anti_ground: {value('anti_ground', lambda: flag(projectile, 'AG', 'yes'))}, "
+            f"scatter: {scatter}"
+        )
+        keys = ("Damage", "Range", "MinimumRange", "ROF", "Burst", "Warhead", "Projectile", "Speed")
+        keys += ("LimboLaunch",)
+        comment = f"[{section_name}] " + ", ".join(
+            f"{key}={weapon[key]}" for key in keys if key in weapon
+        )
+        flags = ", ".join(
+            f"{key}={projectile[key]}"
+            for key in ("AA", "AG", "Inviso", "Arcing", "Inaccurate", "ROT")
+            if key in projectile
+        )
+        if flags:
+            comment += f"; [{weapon['Projectile']}] {flags}"
+        if sources:
+            comment += "; " + "; ".join(sources) + " (ra2_differences.tsv)"
+        return f"        ({fields}), // {comment}", warhead_section
+
     def combat_file(self):
+        tables = self.tables
         lines = [
-            "// Combat definitions, schema version 1 (PLAN.md sections 5 and 7, M4; docs/DECISIONS.md D28).",
+            "// Combat definitions, schema version 2 (crates/sim/src/combat_defs.rs; PLAN.md sections 5 and",
+            "// 7, M4; docs/RA2_PARITY_PLAN.md sections 4.3 and 4.4; docs/DECISIONS.md D28, R32 to R36).",
             "//",
-            "// armour_classes: the armour classes",
+            "// armour_classes: the eleven armour types, in the order of a warhead's `Verses`",
             "// warheads:   the percentage of a weapon's base damage each warhead deals against every armour",
-            "//             class (equation 2: damage = base x percent / 100, rounded down, at least 1 unless",
-            "//             the percentage is 0); every armour class exactly once",
-            "// weapons:    base damage; range in subcells (256 per cell; at least 384); reload in ticks",
-            "//             (20 per second); warhead; projectile_speed in subcells per tick, or 0 for an",
-            "//             instant weapon",
-            "// units:      hit points, armour class, sight radius in cells, and at most one weapon of every",
-            "//             unit type of units.ron",
-            "// buildings:  the same for every building type of economy.ron; a building with a weapon is a",
-            "//             defensive structure, which does not fire under low power if it is `powered`",
-            "//             and consumes power (arsenal.ron, economy.ron)",
+            "//             type (`Verses`; equation 2: damage = base x percent / 100, rounded down, at least",
+            "//             1 unless the percentage is 0); cell_spread (`CellSpread` in subcells, 256 per",
+            "//             cell: everything of the impact's layer within it is damaged) and percent_at_max",
+            "//             (`PercentAtMax`: the percentage dealt at that distance, falling linearly from",
+            "//             100); wall and wood (1 or 0: it damages walls, trees)",
+            "// weapons:    base damage; range and min_range in subcells (`Range`, `MinimumRange`); reload in",
+            "//             ticks (20 per second; `ROF` frames x 4 / 3); burst (shots of a volley, 5 ticks",
+            "//             apart); warhead; projectile_speed in subcells per tick, or 0 for a weapon that",
+            "//             hits at once (`Inviso`, `LimboLaunch`); anti_air and anti_ground (the",
+            "//             projectile's `AA`, `AG`); scatter (subcells at full range between the target and",
+            "//             the impact of an `Inaccurate` projectile, from `BallisticScatter`)",
+            "// units:      hit points, armour type, sight radius in cells, the weapons (primary, secondary)",
+            "//             and the elite weapons in their places of every unit type of units.ron;",
+            "//             air_range_bonus (`AirRangeBonus` in subcells); land_targeting and",
+            "//             naval_targeting (the ini's codes for which targets on land and on water the",
+            "//             type attacks, and with which weapon); underwater and organic (1 or 0)",
+            "// buildings:  the same for every building type of economy.ron, with wall (1 or 0) instead of",
+            "//             underwater and organic; a building with a weapon is a defensive structure, which",
+            "//             does not fire under low power if it is `powered` and consumes power",
+            "//             (arsenal.ron, economy.ron)",
+            "// effects:    base damage and warhead of the area effects that are no weapon of a type",
             "//",
-            "// Hit points and sight are ported from the ini; armour classes, warheads and weapons are the",
-            "// game's own until RA3.",
+            "// Everything is ported from the ini, except what a comment calls the game's own: stand-ins for",
+            "// the spawned missiles and aircraft of RA4 and the specialists of RA6, each listed with its",
+            "// reason in crates/sim/tests/reference/ra2_differences.tsv.",
             "//",
             GENERATED,
             "(",
-            "    schema_version: 1,",
-            f"    armour_classes: {quoted(ARMOUR_CLASSES)},",
+            "    schema_version: 2,",
+            f"    armour_classes: {quoted(ARMOURS)},",
             "    warheads: [",
         ]
-        for warhead, versus in WARHEADS.items():
+        weapons, used = [], set()
+        for game_id, section_name in tables.weapons:
+            line, warhead = self.weapon_entry(game_id, section_name)
+            weapons.append(line)
+            used.add(warhead)
+        effects = []
+        for effect, damage, (section, key) in EFFECTS:
+            warhead = tables.value(section, key)
+            used.add(warhead)
+            source = cite(section, key, tables.section(section))
+            if isinstance(damage, tuple):
+                source = f"{cite(damage[0], damage[1], tables.section(damage[0]))}; {source}"
+                damage = int(tables.value(*damage))
+            else:
+                source = f"{source}; the damage is the game's own"
+            effects.append(
+                f'        (id: "{effect}", damage: {damage}, '
+                f'warhead: "{tables.warhead_id[warhead]}"), // {source}'
+            )
+        for game_id, section_name in tables.warheads:
+            if section_name not in used:
+                raise Failure(f"no weapon or effect uses the mapped warhead [{section_name}]")
+            warhead = tables.section(section_name)
+            percents = [rounded(number(text)) for text in warhead["Verses"].split(",")]
+            if len(percents) != len(ARMOURS):
+                raise Failure(f"[{section_name}] Verses has {len(percents)} entries")
             entries = ", ".join(
                 f'(armour: "{armour}", percent: {percent})'
-                for armour, percent in zip(ARMOUR_CLASSES, versus)
+                for armour, percent in zip(ARMOURS, percents)
             )
-            lines.append(f'        (id: "{warhead}", versus: [{entries}]),')
-        lines += ["    ],", "    weapons: ["]
-        for weapon, (damage, reach, reload, warhead, projectile) in WEAPONS.items():
+            keys = ("CellSpread", "PercentAtMax", "Wall", "Wood", "Verses")
+            comment = f"[{section_name}] " + ", ".join(
+                f"{key}={warhead[key]}" for key in keys if key in warhead
+            )
             lines.append(
-                f'        (id: "{weapon}", damage: {damage}, range: {reach}, reload: {reload}, '
-                f'warhead: "{warhead}", projectile_speed: {projectile}),'
+                f'        (id: "{game_id}", '
+                f"cell_spread: {convert('cells', warhead.get('CellSpread', '0'))}, "
+                f"percent_at_max: {convert('percent', warhead.get('PercentAtMax', '1'))}, "
+                f"wall: {convert('flag', warhead.get('Wall', 'no'))}, "
+                f"wood: {convert('flag', warhead.get('Wood', 'no'))}, "
+                f"versus: [{entries}]), // {comment}"
             )
-        for name, key, table, armour, weapons in (
-            ("units", "unit", self.units, 10, 11),
-            ("buildings", "building", self.buildings, 12, 13),
+        lines += ["    ],", "    weapons: ["] + weapons
+        fired = set()
+        for name, key, table in (
+            ("units", "unit", self.units),
+            ("buildings", "building", self.buildings),
         ):
             lines += ["    ],", f"    {name}: ["]
-            for game_id, values in table.items():
+            for game_id in table:
                 item = self.items[game_id]
+                ini = item.ini
+                slots, elite = self.carried(item)
+                fired.update(weapon for weapon in slots + elite if weapon)
+                ids = lambda pair: quoted(
+                    [tables.weapon_id[weapon] for weapon in pair if weapon]
+                )
+                traits = (
+                    f"underwater: {convert('flag', ini.get('Underwater', 'no'))}, "
+                    f"organic: {convert('flag', ini.get('Organic', 'no'))}"
+                    if key == "unit"
+                    else f"wall: {int(item.wall)}"
+                )
+                keys = ("Strength", "Armor", "Sight", "Primary", "Weapon1", "Secondary")
+                keys += ("ElitePrimary", "EliteWeapon1", "EliteSecondary", "AirRangeBonus")
+                keys += ("LandTargeting", "NavalTargeting", "Underwater", "Organic", "Wall")
                 lines.append(
                     f'        ({key}: "{game_id}", hit_points: {item.hit_points}, '
-                    f'armour: "{values[armour]}", sight: {item.sight}, '
-                    f"weapons: {quoted(values[weapons])}),"
-                    f" // {item.comment('Strength', 'Sight')}"
+                    f'armour: "{ini["Armor"].lower()}", sight: {item.sight}, '
+                    f"weapons: {ids(slots)}, elite_weapons: {ids(elite)}, "
+                    f"air_range_bonus: {convert('cells', ini.get('AirRangeBonus', '0'))}, "
+                    f"land_targeting: {int(ini.get('LandTargeting', '0'))}, "
+                    f"naval_targeting: {int(ini.get('NavalTargeting', '0'))}, "
+                    f"{traits}), // {item.comment(*keys)}"
                 )
-        lines += ["    ],", ")"]
+        for game_id, section_name in tables.weapons:
+            twins = [name for name, known in tables.weapon_id.items() if known == game_id]
+            if not fired.intersection(twins):
+                raise Failure(f"no type carries the mapped weapon [{section_name}]")
+        lines += ["    ],", "    effects: ["] + effects + ["    ],", ")"]
         return "\n".join(lines) + "\n"
 
     # --- arsenal.ron -------------------------------------------------------------------------

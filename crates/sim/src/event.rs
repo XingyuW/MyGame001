@@ -9,12 +9,13 @@
 use bevy_ecs::message::{Message, Messages};
 use bevy_ecs::system::ResMut;
 
-use crate::combat_defs::WeaponKind;
+use crate::combat::DamageState;
+use crate::combat_defs::{WarheadKind, WeaponKind};
 use crate::command::{Command, PlayerId, RejectReason};
 use crate::definitions::UnitKind;
 use crate::economy_defs::{BuildingKind, ProductionItem};
 use crate::id::SimId;
-use crate::map::CellPos;
+use crate::map::{CellPos, SubPos};
 
 /// Something that happened during a tick.
 #[derive(Message, Clone, Debug, PartialEq, Eq)]
@@ -106,6 +107,22 @@ pub enum SimEvent {
         attacker: SimId,
         target: SimId,
         weapon: WeaponKind,
+    },
+    /// A warhead went off at `at`, in the air or on the ground, where no shot's event says it
+    /// would (RA3): the impact of an inaccurate shot, of a projectile whose target was gone, of
+    /// a bomb, a suicide unit or a superweapon. The impact of every other shot is where the
+    /// target of its [`SimEvent::WeaponFired`] is, and is not reported.
+    Impact {
+        warhead: WarheadKind,
+        at: SubPos,
+        air: bool,
+    },
+    /// The damage state of `player`'s unit or building `id` changed (RA3, with a rules file):
+    /// it fell to or below, or rose above, the yellow or the red share of its hit points.
+    DamageStateChanged {
+        player: PlayerId,
+        id: SimId,
+        state: DamageState,
     },
     /// The unit's hit points fell to 0 or below: it was removed and its cells were freed.
     UnitDestroyed { player: PlayerId, unit: SimId },

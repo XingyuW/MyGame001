@@ -2,7 +2,7 @@ use bevy_ecs::world::World;
 
 use crate::ai::AiPlayers;
 use crate::building::{Building, Producer, hash_building};
-use crate::combat::{Armour, Health, Projectiles, Sight, Weapon, hash_combat};
+use crate::combat::{Armour, Condition, Health, Projectiles, Sight, Weapon, hash_combat};
 use crate::definitions::Definitions;
 use crate::economy::Players;
 use crate::harvest::Harvester;
@@ -63,7 +63,7 @@ impl Default for Fnv1a64 {
 /// allocated, the number of entities with a [`SimId`], every such entity in ascending [`SimId`]
 /// order (its id, then a flag byte and, for a unit, its components; then a flag byte and, for a
 /// harvester, its cycle; then a flag byte and, for a building, its owner and components; then a
-/// flag byte and its health, armour, and sight; then a flag byte and its weapon), the [`Grid`],
+/// flag byte and its health, armour, sight, and damage state; then a flag byte and its weapon), the [`Grid`],
 /// the [`Definitions`], the [`Players`] (with their visibility grids), the projectiles in flight,
 /// the [`MatchState`], and the computer players' [`AiPlayers`] (docs/DECISIONS.md D4, D11,
 /// extended in M2, M3, M4, and M6). Components added by later milestones are appended per entity.
@@ -83,7 +83,7 @@ pub fn state_hash(world: &mut World) -> u64 {
         Option<(&Owner, &Unit, &Mobile, &Position, &Facing, &Orders)>,
         Option<&Harvester>,
         Option<(&Owner, &Building, Option<&Producer>)>,
-        Option<(&Health, &Armour, &Sight)>,
+        Option<(&Health, &Armour, &Sight, Option<&Condition>)>,
         Option<&Weapon>,
     )>();
     let mut entities: Vec<_> = query.iter(world).collect();
@@ -114,9 +114,11 @@ pub fn state_hash(world: &mut World) -> u64 {
         }
         match combat {
             None => hasher.write(&[0]),
-            Some(components) => {
+            Some((health, armour, sight, condition)) => {
                 hasher.write(&[1]);
-                hash_combat(&mut hasher, components);
+                hash_combat(&mut hasher, (health, armour, sight));
+                // The damage state as of the last `Cleanup` stage (RA3).
+                hasher.write(&[condition.map_or(0, |condition| condition.0 as u8)]);
             }
         }
         match weapon {

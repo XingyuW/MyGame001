@@ -548,6 +548,7 @@ rules	AssaultBolt	Speed	100
 rules	AssaultBolt	Warhead	ElectricAssault
 rules	AudioVisual	ConditionRed	25%
 rules	AudioVisual	ConditionYellow	50%
+rules	AudioVisual	Gravity	6
 rules	BEAG	AirportBound	yes
 rules	BEAG	AllowedToStartInMultiplayer	no
 rules	BEAG	Ammo	1

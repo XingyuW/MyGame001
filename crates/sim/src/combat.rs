@@ -22,6 +22,32 @@
 //! and building whose hit points are ≤ 0 is removed and its cells are freed
 //! ([`SimEvent::UnitDestroyed`], [`SimEvent::BuildingDestroyed`]).
 //!
+//! Since RA3 (docs/RA2_PARITY_PLAN.md sections 4.3 and 4.4, docs/DECISIONS.md R33 to R35):
+//!
+//! * **Weapons.** A unit or building carries a primary and perhaps a secondary weapon. Against
+//!   a target it uses the first of the two that its type's `land_targeting` and
+//!   `naval_targeting` allow for where the target is, whose projectile may engage the target's
+//!   layer (`anti_air` for an aircraft, `anti_ground` for everything else), and whose warhead
+//!   damages the target's armour ([`weapon_against`]). A target that none of them may engage is
+//!   never acquired, and an `Attack` order on it ends with [`AttackEnd::NoDamage`].
+//! * **Range.** A weapon fires at a target between its `min_range` and its `range`, the latter
+//!   lengthened by the type's `air_range_bonus` for an anti air weapon against an aircraft. A
+//!   unit ordered to attack a target inside the minimum range moves away to a cell from which
+//!   it may fire.
+//! * **Burst.** A weapon with a burst of n fires n shots [`BURST_GAP`] ticks apart and then
+//!   reloads. A shot of a volley that cannot be fired when it is due ends the volley.
+//! * **Impacts.** Every shot ends in an impact (`Blast`) of its warhead at a point: the
+//!   target's position, or for an inaccurate weapon (`scatter`) a point drawn from
+//!   [`SimRng`](crate::SimRng) around it. The impact damages its target and, if the warhead has
+//!   a `cell_spread`, everything of the same layer (the air, or the ground and the sea) within
+//!   that distance of the point, friend and foe alike, by [`splash_damage`]; a building takes
+//!   one hit for every cell of its footprint whose centre lies within the spread. Bombs,
+//!   superweapons and the other area effects of `crate::special` are impacts too
+//!   (`detonate`), so no area damage ignores armour.
+//! * **Damage states.** With a rules file every unit and building is green, yellow (at or
+//!   below `condition_yellow_percent` of its hit points) or red ([`Condition`],
+//!   [`SimEvent::DamageStateChanged`]).
+//!
 //! Targets (docs/DECISIONS.md D29):
 //!
 //! * A unit with an `Attack` order fires only at its target. Out of range, it moves to the
@@ -56,7 +82,9 @@ use bevy_ecs::resource::Resource;
 use bevy_ecs::system::{Commands, Query, Res, ResMut};
 
 use crate::building::{Building, Footprint};
-use crate::combat_defs::{ArmourClass, CombatTerms, WeaponDef, WeaponKind};
+use crate::combat_defs::{
+    ArmourClass, BURST_GAP, CombatTerms, WarheadDef, WarheadKind, WeaponDef, WeaponKind,
+};
 use crate::command::PlayerId;
 use crate::definitions::Definitions;
 use crate::economy::Players;
@@ -81,6 +109,42 @@ pub struct Health {
     pub hit_points: i32,
 }
 
+/// How damaged a unit or building is (RA3; the ini's `ConditionYellow` and `ConditionRed`).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum DamageState {
+    /// Above `condition_yellow_percent` of its hit points.
+    #[default]
+    Green,
+    /// At or below `condition_yellow_percent`, above `condition_red_percent`.
+    Yellow,
+    /// At or below `condition_red_percent`.
+    Red,
+}
+
+/// The damage state of a unit or building as of the last `Cleanup` stage. Always green in a
+/// world without a rules file.
+#[derive(Component, Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct Condition(pub DamageState);
+
+/// The damage state of `hit_points` of `full`: yellow at or below `yellow_percent` of `full`,
+/// red at or below `red_percent`. Computed in `i64` (invariant I12).
+pub fn damage_state(
+    hit_points: i32,
+    full: i32,
+    yellow_percent: i32,
+    red_percent: i32,
+) -> DamageState {
+    let scaled = i64::from(hit_points).saturating_mul(100);
+    let at_or_below = |percent: i32| scaled <= i64::from(full).saturating_mul(i64::from(percent));
+    if at_or_below(red_percent) {
+        DamageState::Red
+    } else if at_or_below(yellow_percent) {
+        DamageState::Yellow
+    } else {
+        DamageState::Green
+    }
+}
+
 /// The armour class of a unit or building (equation 2).
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Armour(pub ArmourClass);
@@ -100,12 +164,19 @@ pub enum AttackOrder {
     AttackMove { destination: CellPos, moving: bool },
 }
 
-/// The weapon of a unit or building, and what it does with it.
+/// The weapons of a unit or building, and what it does with them.
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Weapon {
+    /// The primary weapon.
     pub kind: WeaponKind,
-    /// Ticks until the weapon can fire again (0: loaded).
+    /// The secondary weapon, if it has one.
+    pub secondary: Option<WeaponKind>,
+    /// Ticks until it can fire again (0: loaded). One timer serves both weapons.
     pub cooldown: u32,
+    /// Shots of the volley under way that are still to be fired (0: none is under way).
+    pub burst_left: u32,
+    /// The weapon of the shot it fired last.
+    pub volley: WeaponKind,
     /// The entity it aims at, if any.
     pub target: Option<SimId>,
     /// The unit's combat order; always `None` for a building.
@@ -114,9 +185,16 @@ pub struct Weapon {
 
 impl Weapon {
     pub(crate) fn new(kind: WeaponKind) -> Self {
+        Self::with(kind, None)
+    }
+
+    pub(crate) fn with(kind: WeaponKind, secondary: Option<WeaponKind>) -> Self {
         Self {
             kind,
+            secondary,
             cooldown: 0,
+            burst_left: 0,
+            volley: kind,
             target: None,
             order: None,
         }
@@ -129,7 +207,16 @@ impl Weapon {
 
     pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
         hasher.write(&self.kind.0.to_le_bytes());
+        match self.secondary {
+            None => hasher.write(&[0]),
+            Some(secondary) => {
+                hasher.write(&[1]);
+                hasher.write(&secondary.0.to_le_bytes());
+            }
+        }
         hasher.write_u32(self.cooldown);
+        hasher.write_u32(self.burst_left);
+        hasher.write(&self.volley.0.to_le_bytes());
         match self.target {
             None => hasher.write(&[0]),
             Some(target) => {
@@ -166,6 +253,15 @@ pub struct Projectile {
     pub weapon: WeaponKind,
     /// Where it was fired from (for drawing).
     pub origin: SubPos,
+    /// Where it was aimed when it was fired: the target's position then (for a building, the
+    /// centre of the cell of its footprint nearest to the attacker), or for an inaccurate
+    /// weapon the point drawn around it.
+    pub aim: SubPos,
+    /// Whether it lands on `aim` whatever its target does (an inaccurate weapon). Otherwise it
+    /// hits its target where that then is.
+    pub scattered: bool,
+    /// Whether it was fired at an aircraft, so that its impact is in the air.
+    pub air: bool,
     /// Ticks of flight in all, at least 1.
     pub flight: u32,
     /// Ticks of flight left.
@@ -200,6 +296,9 @@ impl Projectiles {
             hasher.write(&projectile.weapon.0.to_le_bytes());
             hasher.write(&projectile.origin.x.to_le_bytes());
             hasher.write(&projectile.origin.y.to_le_bytes());
+            hasher.write(&projectile.aim.x.to_le_bytes());
+            hasher.write(&projectile.aim.y.to_le_bytes());
+            hasher.write(&[u8::from(projectile.scattered), u8::from(projectile.air)]);
             hasher.write_u32(projectile.flight);
             hasher.write_u32(projectile.remaining);
         }
@@ -218,11 +317,164 @@ pub fn applied_damage(base: i32, versus: i32) -> i32 {
     i32::try_from(applied).unwrap_or(i32::MAX)
 }
 
+/// The damage of an impact on something `distance` subcells from its point
+/// (docs/RA2_PARITY_PLAN.md section 4.3), for a shot of base damage `base` through a warhead
+/// with percentage `versus` against the target's armour, spread `cell_spread` (subcells) and
+/// `percent_at_max` percent at that distance:
+///
+/// ```text
+/// floor(base × (100 R − (100 − percent_at_max) d) × versus / (100 R × 100))
+/// ```
+///
+/// at least 1 if `versus > 0` (equation 2), 0 if `versus = 0`, and 0 beyond the spread. Without
+/// a spread (`cell_spread` 0) it is equation 2 whatever the distance: the caller decides what
+/// such an impact hits. Computed in `i128` and clamped to `i32`, so no input overflows
+/// (invariant I12).
+pub fn splash_damage(
+    base: i32,
+    versus: i32,
+    cell_spread: u32,
+    percent_at_max: u32,
+    distance: u64,
+) -> i32 {
+    if versus <= 0 {
+        return 0;
+    }
+    if cell_spread == 0 {
+        return applied_damage(base, versus);
+    }
+    let spread = i128::from(cell_spread);
+    let distance = i128::from(distance);
+    if distance > spread {
+        return 0;
+    }
+    let lost = i128::from(100u32.saturating_sub(percent_at_max));
+    let share = 100 * spread - lost * distance;
+    let applied = (i128::from(base) * share * i128::from(versus))
+        .div_euclid(100 * spread * 100)
+        .max(1);
+    i32::try_from(applied).unwrap_or(i32::MAX)
+}
+
 /// Equation 1 of PLAN.md section 5: whether a target at offset (`dx`, `dy`) subcells is within
 /// `range` subcells, `dx² + dy² ≤ range²`. Computed in `i128`, exact for every input.
 pub fn in_range(dx: i64, dy: i64, range: u32) -> bool {
     let (dx, dy, range) = (i128::from(dx), i128::from(dy), i128::from(range));
     dx * dx + dy * dy <= range * range
+}
+
+/// Whether a target at offset (`dx`, `dy`) subcells is nearer than `min_range` subcells, where
+/// a weapon with that minimum range does not fire: `dx² + dy² < min_range²`.
+pub fn inside_min_range(dx: i64, dy: i64, min_range: u32) -> bool {
+    let (dx, dy, min) = (i128::from(dx), i128::from(dy), i128::from(min_range));
+    dx * dx + dy * dy < min * min
+}
+
+/// The distance in subcells of the offset (`dx`, `dy`), rounded down.
+fn distance(dx: i64, dy: i64) -> u64 {
+    let (dx, dy) = (dx.unsigned_abs(), dy.unsigned_abs());
+    dx.saturating_mul(dx)
+        .saturating_add(dy.saturating_mul(dy))
+        .isqrt()
+}
+
+/// What a weapon needs to know of a target to decide whether it may engage it.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct TargetTraits {
+    pub armour: ArmourClass,
+    /// An aircraft (a unit of the air layer).
+    pub airborne: bool,
+    /// On water: a ship, an amphibious unit over water, or a building standing in water.
+    pub on_water: bool,
+    /// A unit that moves under water.
+    pub underwater: bool,
+    /// A living thing.
+    pub organic: bool,
+    /// A building that is a wall: only warheads with `wall` damage it.
+    pub wall: bool,
+    /// Trees: only warheads with `wood` damage them.
+    pub tree: bool,
+}
+
+/// The percentage `warhead` deals to a target with `traits`: its percentage against the armour,
+/// or 0 for a wall or trees that it does not damage at all.
+pub fn versus_against(warhead: &WarheadDef, traits: &TargetTraits) -> i32 {
+    if (traits.wall && !warhead.wall) || (traits.tree && !warhead.wood) {
+        return 0;
+    }
+    warhead
+        .versus
+        .get(usize::from(traits.armour.0))
+        .copied()
+        .unwrap_or(0)
+}
+
+/// The weapon that a type with the combat terms `terms`, carrying `weapons` (primary,
+/// secondary), uses against a target with `traits`, and the percentage its warhead deals
+/// (docs/RA2_PARITY_PLAN.md section 4.4):
+///
+/// 1. the weapons its `land_targeting` (for a target on land) or `naval_targeting` (for a
+///    target on water) allows; neither applies to an aircraft;
+/// 2. of these, those whose projectile may engage the target's layer (`anti_air` for an
+///    aircraft, `anti_ground` otherwise);
+/// 3. of these, the first whose warhead damages the target (a percentage above 0).
+///
+/// If step 3 leaves none, the first weapon of step 2 is returned with the percentage 0: a shot
+/// that does nothing, which only an order makes a unit fire, once. `None`: no weapon may be
+/// fired at the target at all.
+pub fn weapon_against(
+    definitions: &Definitions,
+    terms: &CombatTerms,
+    weapons: [Option<WeaponKind>; 2],
+    traits: &TargetTraits,
+) -> Option<(WeaponKind, i32)> {
+    let both = [true, true];
+    let secondary = [false, true];
+    let none = [false, false];
+    let allowed = if traits.airborne {
+        both
+    } else if traits.on_water {
+        match terms.naval_targeting {
+            0 if traits.underwater => none,
+            1 if traits.underwater => secondary,
+            2 if !traits.underwater => none,
+            3 if traits.organic => secondary,
+            4 => secondary,
+            6 => none,
+            _ => both,
+        }
+    } else {
+        match terms.land_targeting {
+            0 => both,
+            1 => none,
+            _ => secondary,
+        }
+    };
+    let mut harmless = None;
+    for (kind, allowed) in weapons.into_iter().zip(allowed) {
+        let Some(kind) = kind.filter(|_| allowed) else {
+            continue;
+        };
+        let Some(def) = definitions.weapon(kind) else {
+            continue;
+        };
+        let layer = if traits.airborne {
+            def.anti_air
+        } else {
+            def.anti_ground
+        };
+        if !layer {
+            continue;
+        }
+        let versus = definitions
+            .warhead(def.warhead)
+            .map_or(0, |warhead| versus_against(warhead, traits));
+        if versus > 0 {
+            return Some((kind, versus));
+        }
+        harmless.get_or_insert((kind, 0));
+    }
+    harmless
 }
 
 /// The subcells an entity covers, inclusive, for distances (equation 1): a unit's fine position,
@@ -274,6 +526,26 @@ impl Extent {
         let mid = |a: i64, b: i64| i32::try_from((a + b + 1).div_euclid(2)).unwrap_or(i32::MAX);
         SubPos::new(mid(self.x0, self.x1), mid(self.y0, self.y1))
     }
+
+    /// Where a shot fired from `from` at this extent is aimed: a unit's position, or the centre
+    /// of the cell of a footprint nearest to the centre of `from`.
+    fn aim_from(&self, from: &Extent) -> SubPos {
+        if self.x0 == self.x1 && self.y0 == self.y1 {
+            return self.centre();
+        }
+        let cells = i64::from(SUBCELLS_PER_CELL);
+        let centre = from.centre();
+        let nearest = |at: i32, low: i64, high: i64| {
+            let cell = i64::from(at)
+                .div_euclid(cells)
+                .clamp(low.div_euclid(cells), high.div_euclid(cells));
+            i32::try_from(cell).unwrap_or(i32::MAX)
+        };
+        SubPos::centre_of(CellPos::new(
+            nearest(centre.x, self.x0, self.x1),
+            nearest(centre.y, self.y0, self.y1),
+        ))
+    }
 }
 
 /// What a target looks like to the units that see it.
@@ -315,7 +587,9 @@ impl Body {
 }
 
 /// The components of a unit or building with the combat terms `terms`.
-pub(crate) fn combat_components(terms: CombatTerms) -> ((Health, Armour, Sight), Option<Weapon>) {
+pub(crate) fn combat_components(
+    terms: CombatTerms,
+) -> ((Health, Armour, Sight, Condition), Option<Weapon>) {
     (
         (
             Health {
@@ -323,13 +597,9 @@ pub(crate) fn combat_components(terms: CombatTerms) -> ((Health, Armour, Sight),
             },
             Armour(terms.armour),
             Sight(terms.sight),
+            Condition::default(),
         ),
-        terms.weapon.map(|kind| Weapon {
-            kind,
-            cooldown: 0,
-            target: None,
-            order: None,
-        }),
+        terms.weapon.map(|kind| Weapon::with(kind, terms.secondary)),
     )
 }
 
@@ -352,7 +622,37 @@ struct Target {
     owner: Option<PlayerId>,
     extent: Extent,
     body: Body,
+    traits: TargetTraits,
+}
+
+/// The traits of a unit or building as a target. `terms` are the combat terms of its type.
+fn traits_of(
+    grid: &Grid,
+    id: SimId,
     armour: ArmourClass,
+    body: &Body,
+    terms: Option<&CombatTerms>,
+) -> TargetTraits {
+    let water = |cell: CellPos| grid.cell(cell).is_some_and(|cell| cell.water);
+    let (airborne, on_water) = match *body {
+        Body::Unit { cell, .. } => match grid.domain_of(id) {
+            crate::Domain::Air => (true, false),
+            crate::Domain::Naval => (false, true),
+            crate::Domain::Amphibious => (false, water(cell)),
+            crate::Domain::Land => (false, false),
+        },
+        Body::Building(footprint) => (false, water(footprint.origin)),
+        Body::Prop(_) => (false, false),
+    };
+    TargetTraits {
+        armour,
+        airborne,
+        on_water,
+        underwater: terms.is_some_and(|terms| terms.underwater),
+        organic: terms.is_some_and(|terms| terms.organic),
+        wall: terms.is_some_and(|terms| terms.wall),
+        tree: false,
+    }
 }
 
 type TargetQuery<'w, 's> = Query<
@@ -367,6 +667,7 @@ type TargetQuery<'w, 's> = Query<
         Option<&'static Position>,
         Option<&'static Mobile>,
         Option<&'static Building>,
+        Option<&'static crate::Unit>,
     ),
 >;
 
@@ -384,6 +685,248 @@ type AttackerQuery<'w, 's> = Query<
     ),
 >;
 
+/// An impact of a warhead at a point (docs/RA2_PARITY_PLAN.md section 4.3).
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct Blast {
+    pub(crate) point: SubPos,
+    /// In the air: it damages aircraft only. Otherwise it damages what is on the ground and at
+    /// sea.
+    pub(crate) air: bool,
+    pub(crate) warhead: WarheadKind,
+    /// The base damage.
+    pub(crate) damage: i32,
+    /// The unit, building or scenery it hit: damaged as at the point itself, wherever its
+    /// position is.
+    pub(crate) direct: Option<SimId>,
+}
+
+/// The damage of every hit of `blast`, by the id of what is hit, in the order the hits are
+/// found; an entity may be hit more than once (a building, once per cell of its footprint
+/// within the spread). `traits` gives the position (of a unit) and the traits of an entity.
+///
+/// Only the cells the spread reaches are looked at, through the grid's occupants, so the cost
+/// of an impact does not grow with the number of units of the match.
+fn blast_hits(
+    definitions: &Definitions,
+    grid: &Grid,
+    props: &crate::Props,
+    traits: &dyn Fn(SimId) -> Option<(Option<SubPos>, TargetTraits)>,
+    blast: &Blast,
+    hits: &mut Vec<(SimId, i32)>,
+) {
+    let Some(warhead) = definitions.warhead(blast.warhead) else {
+        return;
+    };
+    let most = definitions
+        .rules()
+        .map_or(i32::MAX, |rules| rules.combat.max_damage);
+    let spread = warhead.cell_spread;
+    let mut hit = |id: SimId, traits: &TargetTraits, distance: u64| {
+        let damage = splash_damage(
+            blast.damage,
+            versus_against(warhead, traits),
+            spread,
+            warhead.percent_at_max,
+            distance,
+        )
+        .min(most);
+        if damage > 0 {
+            hits.push((id, damage));
+        }
+    };
+    let prop_traits = |kind: crate::PropKind| TargetTraits {
+        armour: props.armour(),
+        tree: kind == crate::PropKind::Trees,
+        ..TargetTraits::default()
+    };
+    if let Some(direct) = blast.direct {
+        if let Some((_, found)) = traits(direct) {
+            hit(direct, &found, 0);
+        } else if let Some((_, prop)) = props.get(direct) {
+            hit(direct, &prop_traits(prop.kind), 0);
+        }
+        if spread == 0 {
+            return;
+        }
+    }
+    // The cells whose centre, or a unit in which, may lie within the spread.
+    let cells = i64::from(SUBCELLS_PER_CELL);
+    let (px, py) = (i64::from(blast.point.x), i64::from(blast.point.y));
+    let reach = i64::from(spread);
+    let cell_of = |at: i64| i32::try_from(at.div_euclid(cells)).unwrap_or(i32::MAX);
+    let (x0, x1) = (cell_of(px - reach), cell_of(px + reach));
+    let (y0, y1) = (cell_of(py - reach), cell_of(py + reach));
+    let home = blast.point.cell();
+    // Whether something at `at` is hit, and how far it is: within the spread, or for a
+    // warhead without one in the cell of the impact.
+    let within = |at: SubPos| {
+        let (dx, dy) = (i64::from(at.x) - px, i64::from(at.y) - py);
+        if spread == 0 {
+            (at.cell() == home).then_some(0)
+        } else {
+            in_range(dx, dy, spread).then(|| distance(dx, dy))
+        }
+    };
+    let layer = if blast.air {
+        crate::Domain::Air
+    } else {
+        crate::Domain::Land
+    };
+    let mut seen: Vec<SimId> = Vec::new();
+    for y in y0..=y1 {
+        for x in x0..=x1 {
+            let cell = CellPos::new(x, y);
+            let centre = SubPos::centre_of(cell);
+            if !blast.air {
+                // A building: one hit for every cell of its footprint that is reached. The
+                // cell a direct hit struck has been counted.
+                if let Some(building) = grid.building(cell)
+                    && !(blast.direct == Some(building) && cell == home)
+                    && let Some(distance) = within(centre)
+                    && let Some((_, found)) = traits(building)
+                {
+                    hit(building, &found, distance);
+                }
+                if let Some(prop) = props.at(cell)
+                    && let Some(id) = props.id_at(cell)
+                    && blast.direct != Some(id)
+                    && let Some(distance) = within(centre)
+                {
+                    hit(id, &prop_traits(prop.kind), distance);
+                }
+            }
+            // A unit holds the cell it stands in and the one it is entering: once is enough.
+            if let Some(unit) = grid.occupant_for(cell, layer)
+                && blast.direct != Some(unit)
+                && !seen.contains(&unit)
+            {
+                seen.push(unit);
+                if let Some((Some(position), found)) = traits(unit)
+                    && found.airborne == blast.air
+                    && let Some(distance) = within(position)
+                {
+                    hit(unit, &found, distance);
+                }
+            }
+        }
+    }
+}
+
+/// Sixty-four directions as (cos, sin) × 1024, rounded toward zero so that none is longer than
+/// 1024 (scatter, docs/RA2_PARITY_PLAN.md section 4.4).
+const DIRECTIONS: [(i32, i32); 64] = [
+    (1024, 0),
+    (1019, 100),
+    (1004, 199),
+    (979, 297),
+    (946, 391),
+    (903, 482),
+    (851, 568),
+    (791, 649),
+    (724, 724),
+    (649, 791),
+    (568, 851),
+    (482, 903),
+    (391, 946),
+    (297, 979),
+    (199, 1004),
+    (100, 1019),
+    (0, 1024),
+    (-100, 1019),
+    (-199, 1004),
+    (-297, 979),
+    (-391, 946),
+    (-482, 903),
+    (-568, 851),
+    (-649, 791),
+    (-724, 724),
+    (-791, 649),
+    (-851, 568),
+    (-903, 482),
+    (-946, 391),
+    (-979, 297),
+    (-1004, 199),
+    (-1019, 100),
+    (-1024, 0),
+    (-1019, -100),
+    (-1004, -199),
+    (-979, -297),
+    (-946, -391),
+    (-903, -482),
+    (-851, -568),
+    (-791, -649),
+    (-724, -724),
+    (-649, -791),
+    (-568, -851),
+    (-482, -903),
+    (-391, -946),
+    (-297, -979),
+    (-199, -1004),
+    (-100, -1019),
+    (0, -1024),
+    (100, -1019),
+    (199, -1004),
+    (297, -979),
+    (391, -946),
+    (482, -903),
+    (568, -851),
+    (649, -791),
+    (724, -724),
+    (791, -649),
+    (851, -568),
+    (903, -482),
+    (946, -391),
+    (979, -297),
+    (1004, -199),
+    (1019, -100),
+];
+
+/// The point a shot of a weapon with `scatter` lands on when it is aimed at `aim` from
+/// `distance` subcells away: in one of [`DIRECTIONS`], at a distance drawn uniformly from 0 to
+/// `scatter × distance / range` (at most `scatter`). Two draws from `rng`.
+pub fn scattered(
+    rng: &mut crate::SimRng,
+    aim: SubPos,
+    scatter: u32,
+    distance: u64,
+    range: u32,
+) -> SubPos {
+    let radius =
+        u64::from(scatter).saturating_mul(distance.min(u64::from(range))) / u64::from(range.max(1));
+    let (cos, sin) = DIRECTIONS[(rng.next_u32() % 64) as usize];
+    let length = i64::try_from(u64::from(rng.next_u32()) % (radius + 1)).unwrap_or(0);
+    let shift = |at: i32, part: i32| {
+        let moved = i64::from(at) + length * i64::from(part) / 1024;
+        i32::try_from(moved).unwrap_or(at)
+    };
+    SubPos::new(shift(aim.x, cos), shift(aim.y, sin))
+}
+
+/// What an attacker fires with: the weapons it carries and the combat terms of its type.
+#[derive(Clone, Copy)]
+struct Arms {
+    weapons: [Option<WeaponKind>; 2],
+    terms: CombatTerms,
+}
+
+/// The weapon chosen against a target.
+#[derive(Clone, Copy)]
+struct Choice<'a> {
+    kind: WeaponKind,
+    def: &'a WeaponDef,
+    /// The percentage its warhead deals to the target; 0: the shot does nothing.
+    versus: i32,
+    /// Its range against the target, with the air range bonus.
+    reach: u32,
+}
+
+impl Choice<'_> {
+    /// Whether a target at the offset (`dx`, `dy`) is where the weapon may fire at it.
+    fn covers(&self, dx: i64, dy: i64) -> bool {
+        in_range(dx, dy, self.reach) && !inside_min_range(dx, dy, self.def.min_range)
+    }
+}
+
 /// Everything an attacker needs to know in the tick.
 struct Field<'a> {
     targets: &'a BTreeMap<SimId, Target>,
@@ -394,13 +937,16 @@ struct Field<'a> {
     tick: u64,
     special: &'a crate::SpecialState,
     roles: &'a BTreeMap<SimId, crate::Role>,
+    /// The percentage a warhead must exceed for its weapon to engage a target on its own: 0,
+    /// and with a rules file 1 (RA2: a target at 1 percent is attacked only on order).
+    floor: i32,
 }
 
 /// What the tick's shots add up to.
 #[derive(Default)]
 struct Shots {
-    /// Damage per target, summed in `i64` (invariant I12).
-    damage: BTreeMap<SimId, i64>,
+    /// The impacts of the tick, in the order they happen.
+    blasts: Vec<Blast>,
     fired: Vec<Projectile>,
     events: Vec<SimEvent>,
     /// Cells chosen this tick as destinations of units moving toward their targets, so that
@@ -418,7 +964,7 @@ impl Field<'_> {
         if let Some(found) = self.targets.get(&target) {
             return Some(*found);
         }
-        let (cell, _) = self.props.get(target)?;
+        let (cell, prop) = self.props.get(target)?;
         Some(Target {
             entity: None,
             owner: None,
@@ -428,7 +974,11 @@ impl Field<'_> {
                 height: 1,
             }),
             body: Body::Prop(cell),
-            armour: self.props.armour(),
+            traits: TargetTraits {
+                armour: self.props.armour(),
+                tree: prop.kind == crate::PropKind::Trees,
+                ..TargetTraits::default()
+            },
         })
     }
 
@@ -445,81 +995,122 @@ impl Field<'_> {
         .then_some(found)
     }
 
-    /// Whether a shot of `weapon` damages `target`: equation 2 gives more than 0 (its warhead's
-    /// percentage against the target's armour is above 0).
-    fn damages(&self, weapon: &WeaponDef, target: &Target) -> bool {
-        let versus = self
-            .definitions
-            .versus(weapon.warhead, target.armour)
-            .unwrap_or(0);
-        applied_damage(weapon.damage, versus) > 0
+    /// The weapon `arms` uses against a target with `traits` ([`weapon_against`]).
+    fn choose(&self, arms: &Arms, traits: &TargetTraits) -> Option<Choice<'_>> {
+        let (kind, versus) = weapon_against(self.definitions, &arms.terms, arms.weapons, traits)?;
+        let def = self.definitions.weapon(kind)?;
+        let bonus = if traits.airborne && def.anti_air {
+            arms.terms.air_range_bonus
+        } else {
+            0
+        };
+        Some(Choice {
+            kind,
+            def,
+            versus,
+            reach: def.range.saturating_add(bonus),
+        })
     }
 
-    /// The visible enemy of `owner` that `weapon` damages nearest to `from` within the weapon's
-    /// range (ties by id).
-    fn nearest_enemy_in_range(
-        &self,
-        owner: PlayerId,
-        from: &Extent,
-        weapon: &WeaponDef,
-    ) -> Option<SimId> {
+    /// The weapon `arms` engages a target with `traits` with on its own: one that damages it by
+    /// more than the floor.
+    fn engages(&self, arms: &Arms, traits: &TargetTraits) -> Option<Choice<'_>> {
+        self.choose(arms, traits)
+            .filter(|choice| choice.versus > self.floor)
+    }
+
+    /// The farthest any weapon of `arms` reaches against any target.
+    fn longest_reach(&self, arms: &Arms) -> u32 {
+        arms.weapons
+            .into_iter()
+            .flatten()
+            .filter_map(|kind| self.definitions.weapon(kind))
+            .map(|def| def.range.saturating_add(arms.terms.air_range_bonus))
+            .max()
+            .unwrap_or(0)
+    }
+
+    /// The visible enemy of `owner` that `arms` engages on its own nearest to `from` within the
+    /// range of the weapon used against it (ties by id).
+    fn nearest_enemy_in_range(&self, owner: PlayerId, from: &Extent, arms: &Arms) -> Option<SimId> {
         let vision = self.vision(owner)?;
+        let longest = self.longest_reach(arms);
         self.targets
             .iter()
-            .filter(|(id, target)| {
-                !self.special.hidden.contains(&(owner, **id))
-                    && target
-                        .owner
-                        .is_some_and(|other| self.players.hostile(owner, other))
-                    && target.body.seen_by(vision)
-                    && self.damages(weapon, target)
-            })
             .filter_map(|(&id, target)| {
                 let (dx, dy) = from.gap(&target.extent);
-                in_range(dx, dy, weapon.range).then(|| {
-                    (
-                        i128::from(dx) * i128::from(dx) + i128::from(dy) * i128::from(dy),
-                        id,
-                    )
-                })
+                // The cheapest test first: most targets are out of every weapon's range.
+                if !in_range(dx, dy, longest)
+                    || self.special.hidden.contains(&(owner, id))
+                    || !target
+                        .owner
+                        .is_some_and(|other| self.players.hostile(owner, other))
+                    || !target.body.seen_by(vision)
+                {
+                    return None;
+                }
+                self.engages(arms, &target.traits)
+                    .filter(|choice| choice.covers(dx, dy))
+                    .map(|_| {
+                        (
+                            i128::from(dx) * i128::from(dx) + i128::from(dy) * i128::from(dy),
+                            id,
+                        )
+                    })
             })
             .min()
             .map(|(_, id)| id)
     }
 
-    /// Fires `weapon` at `target`.
+    /// Fires the weapon of `choice` at `target`.
     fn fire(
         &self,
         shots: &mut Shots,
+        rng: &mut crate::SimRng,
         attacker: (SimId, PlayerId, &Extent),
-        weapon: (WeaponKind, &WeaponDef),
+        choice: &Choice<'_>,
         target_id: SimId,
         target: &Target,
     ) {
         let target = *target;
         let (id, owner, from) = attacker;
-        let (kind, def) = weapon;
+        let def = choice.def;
         shots.events.push(SimEvent::WeaponFired {
             attacker: id,
             target: target_id,
-            weapon: kind,
+            weapon: choice.kind,
         });
-        if self.roles.get(&id) == Some(&crate::Role::Carrier) {
-            return;
-        }
-        if def.projectile_speed == 0 {
-            let versus = self
-                .definitions
-                .versus(def.warhead, target.armour)
-                .unwrap_or(0);
-            let total = shots.damage.entry(target_id).or_default();
-            *total = total.saturating_add(i64::from(applied_damage(def.damage, versus)));
-            return;
+        // The shot of some specialists is not an impact of its own: `crate::special` acts on
+        // the event (a carrier launches aircraft; with a rules file a mind controller takes
+        // its target over, a bomber plants its bomb, and a suicide unit blows itself up).
+        match self.roles.get(&id) {
+            Some(crate::Role::Carrier) => return,
+            Some(crate::Role::MindControl | crate::Role::Demolition | crate::Role::Suicide)
+                if self.definitions.rules().is_some() =>
+            {
+                return;
+            }
+            _ => {}
         }
         let (dx, dy) = from.gap(&target.extent);
-        let distance = (dx.unsigned_abs().saturating_mul(dx.unsigned_abs()))
-            .saturating_add(dy.unsigned_abs().saturating_mul(dy.unsigned_abs()))
-            .isqrt();
+        let distance = distance(dx, dy);
+        let aim = target.extent.aim_from(from);
+        let (aim, scattered) = if def.scatter > 0 {
+            (scattered(rng, aim, def.scatter, distance, def.range), true)
+        } else {
+            (aim, false)
+        };
+        let air = target.traits.airborne;
+        if def.projectile_speed == 0 {
+            shots.blasts.push(Blast {
+                point: aim,
+                air,
+                warhead: def.warhead,
+                damage: def.damage,
+                direct: (!scattered).then_some(target_id),
+            });
+            return;
+        }
         let flight = u32::try_from(distance.div_ceil(u64::from(def.projectile_speed)))
             .unwrap_or(u32::MAX)
             .max(1);
@@ -527,8 +1118,11 @@ impl Field<'_> {
             owner,
             attacker: id,
             target: target_id,
-            weapon: kind,
+            weapon: choice.kind,
             origin: from.centre(),
+            aim,
+            scattered,
+            air,
             flight,
             remaining: flight,
         });
@@ -545,45 +1139,57 @@ pub(crate) fn combat(
     definitions: Res<Definitions>,
     grid: Res<Grid>,
     tick: Res<SimTick>,
+    mut rng: ResMut<crate::SimRng>,
     mut targets: TargetQuery,
     mut attackers: AttackerQuery,
     mut props: ResMut<crate::Props>,
     special: Res<crate::SpecialState>,
-    identities: Query<(&SimId, Option<&crate::Unit>, Option<&Building>)>,
 ) {
     if attackers.is_empty() && projectiles.is_empty() {
         return;
     }
+    let mut roles: BTreeMap<SimId, crate::Role> = BTreeMap::new();
+    let mut terms: BTreeMap<SimId, CombatTerms> = BTreeMap::new();
     let index: BTreeMap<SimId, Target> = targets
         .iter()
         .filter_map(
-            |(entity, id, owner, _, armour, position, mobile, building)| {
+            |(entity, id, owner, _, armour, position, mobile, building, unit)| {
                 let extent = match (position, building) {
                     (Some(position), _) => Extent::point(position.0),
                     (None, Some(building)) => Extent::footprint(building.footprint),
                     (None, None) => return None,
                 };
+                let body = Body::of(mobile, building)?;
+                let item = unit
+                    .map(|unit| crate::ProductionItem::Unit(unit.kind))
+                    .or_else(|| {
+                        building.map(|building| crate::ProductionItem::Building(building.kind))
+                    });
+                let of_type = match item {
+                    Some(crate::ProductionItem::Unit(kind)) => definitions.unit_combat(kind),
+                    Some(crate::ProductionItem::Building(kind)) => {
+                        definitions.building_combat(kind)
+                    }
+                    None => None,
+                };
+                if let Some(role) = item.and_then(|item| definitions.metadata(item)) {
+                    roles.insert(*id, role.role);
+                }
+                if let Some(of_type) = of_type {
+                    terms.insert(*id, of_type);
+                }
                 Some((
                     *id,
                     Target {
                         entity: Some(entity),
                         owner: Some(owner.0),
                         extent,
-                        body: Body::of(mobile, building)?,
-                        armour: armour.0,
+                        body,
+                        traits: traits_of(&grid, *id, armour.0, &body, of_type.as_ref()),
                     },
                 ))
             },
         )
-        .collect();
-    let roles: BTreeMap<_, _> = identities
-        .iter()
-        .filter_map(|(id, u, b)| {
-            let item = u
-                .map(|u| crate::ProductionItem::Unit(u.kind))
-                .or_else(|| b.map(|b| crate::ProductionItem::Building(b.kind)))?;
-            Some((*id, definitions.metadata(item)?.role))
-        })
         .collect();
     let field = Field {
         targets: &index,
@@ -594,6 +1200,7 @@ pub(crate) fn combat(
         tick: tick.0,
         special: &special,
         roles: &roles,
+        floor: i32::from(definitions.rules().is_some()),
     };
     let mut shots = Shots::default();
 
@@ -605,22 +1212,44 @@ pub(crate) fn combat(
             in_flight.push(projectile);
             continue;
         }
-        let hit = field.target(projectile.target).and_then(|target| {
-            let def = definitions.weapon(projectile.weapon)?;
-            let versus = definitions.versus(def.warhead, target.armour)?;
-            Some(applied_damage(def.damage, versus))
-        });
-        match hit {
-            Some(damage) => {
-                let total = shots.damage.entry(projectile.target).or_default();
-                *total = total.saturating_add(i64::from(damage));
-            }
-            None => shots.events.push(SimEvent::ProjectileExpired {
+        let Some(def) = definitions.weapon(projectile.weapon) else {
+            continue;
+        };
+        let spread = definitions
+            .warhead(def.warhead)
+            .map_or(0, |warhead| warhead.cell_spread);
+        let target = field.target(projectile.target);
+        if target.is_none() {
+            shots.events.push(SimEvent::ProjectileExpired {
                 attacker: projectile.attacker,
                 target: projectile.target,
                 weapon: projectile.weapon,
-            }),
+            });
         }
+        // An accurate projectile hits its target where that now is; without its target it
+        // still bursts where it was aimed if its warhead has a spread. An inaccurate one lands
+        // where it was aimed.
+        let blast = match target {
+            Some(target) if !projectile.scattered => Some(Blast {
+                point: match target.body {
+                    Body::Unit { .. } => target.extent.centre(),
+                    Body::Building(_) | Body::Prop(_) => projectile.aim,
+                },
+                air: target.traits.airborne,
+                warhead: def.warhead,
+                damage: def.damage,
+                direct: Some(projectile.target),
+            }),
+            _ if projectile.scattered || spread > 0 => Some(Blast {
+                point: projectile.aim,
+                air: projectile.air,
+                warhead: def.warhead,
+                damage: def.damage,
+                direct: None,
+            }),
+            _ => None,
+        };
+        shots.blasts.extend(blast);
     }
 
     // 2. Armed units and buildings, in id order.
@@ -641,9 +1270,14 @@ pub(crate) fn combat(
         if special.disabled.contains_key(&id) || special.rearming.contains_key(&id) {
             continue;
         }
-        // Every weapon kind comes from the definitions, which do not change during a match.
-        let Some(def) = definitions.weapon(weapon.kind) else {
+        // Every weapon kind comes from the definitions, which do not change during a match,
+        // and every armed unit and building is of a type with combat terms.
+        let Some(&of_type) = terms.get(&id) else {
             continue;
+        };
+        let arms = Arms {
+            weapons: [Some(weapon.kind), weapon.secondary],
+            terms: of_type,
         };
         let from = match (position, building) {
             (Some(position), _) => Extent::point(position.0),
@@ -651,12 +1285,15 @@ pub(crate) fn combat(
             (None, None) => continue,
         };
         let owner = owner.0;
+        // A shot of a volley is due now: if it is not fired, the volley ends.
+        let due = weapon.cooldown == 0 && weapon.burst_left > 0;
         match (mobile, orders) {
             (Some(mobile), Some(mut orders)) => act_unit(
                 &field,
                 &mut shots,
+                &mut rng,
                 (id, owner, &from, mobile),
-                (&mut weapon, def),
+                (&mut weapon, &arms),
                 &mut orders,
             ),
             _ => {
@@ -670,16 +1307,48 @@ pub(crate) fn combat(
                 weapon.target = if low_power {
                     None
                 } else {
-                    keep_or_acquire(&field, owner, &from, weapon.target, def)
+                    keep_or_acquire(&field, owner, &from, weapon.target, &arms)
                 };
-                fire_if_ready(&field, &mut shots, (id, owner, &from), &mut weapon, def);
+                fire_at_target(
+                    &field,
+                    &mut shots,
+                    &mut rng,
+                    (id, owner, &from),
+                    &mut weapon,
+                    &arms,
+                );
             }
+        }
+        if due && weapon.cooldown == 0 {
+            weapon.burst_left = 0;
+            weapon.cooldown = definitions
+                .weapon(weapon.volley)
+                .map_or(0, |def| def.reload);
         }
     }
 
-    // 3. Damage, in target id order (scenery has the highest ids).
+    // 3. Damage: every impact's hits, summed per target in `i64` (invariant I12), then applied
+    // in target id order (scenery has the highest ids).
+    let mut hits = Vec::new();
+    {
+        let traits = |id: SimId| {
+            index.get(&id).map(|target| {
+                let position =
+                    matches!(target.body, Body::Unit { .. }).then(|| target.extent.centre());
+                (position, target.traits)
+            })
+        };
+        for blast in &shots.blasts {
+            blast_hits(&definitions, &grid, &props, &traits, blast, &mut hits);
+        }
+    }
+    let mut damage: BTreeMap<SimId, i64> = BTreeMap::new();
+    for (target, hit) in hits {
+        let total = damage.entry(target).or_default();
+        *total = total.saturating_add(i64::from(hit));
+    }
     let mut prop_damage = Vec::new();
-    for (target, damage) in shots.damage {
+    for (target, damage) in damage {
         if special.invulnerable(target, tick.0) {
             continue;
         }
@@ -697,56 +1366,196 @@ pub(crate) fn combat(
     in_flight.extend(shots.fired);
     projectiles.list = in_flight;
     let shot_events = shots.events;
+    let area = shots.blasts;
     for (cell, damage) in prop_damage {
         props.hurt(cell, damage);
     }
     for event in shot_events {
         events.write(event);
     }
+    // An impact that struck no target of a shot is reported on its own: the interface cannot
+    // tell where it is from the shot's event.
+    for blast in area.iter().filter(|blast| blast.direct.is_none()) {
+        events.write(impact_event(blast));
+    }
 }
 
-/// The current target if it is still a visible enemy in range that `weapon` damages, else the
-/// nearest such enemy (automatic acquisition: idle and attack-moving units, and defensive
-/// structures).
+/// The event that reports `blast` to the interface.
+fn impact_event(blast: &Blast) -> SimEvent {
+    SimEvent::Impact {
+        warhead: blast.warhead,
+        at: blast.point,
+        air: blast.air,
+    }
+}
+
+/// An impact outside the `Combat` stage's own shots: a bomb, a superweapon, a suicide unit, a
+/// radiation zone (`crate::special`). Its damage is applied at once, and if `report` it is
+/// reported with [`SimEvent::Impact`].
+pub(crate) fn detonate(world: &mut bevy_ecs::world::World, blast: Blast, report: bool) {
+    let definitions = world.resource::<Definitions>().clone();
+    let tick = world.resource::<SimTick>().0;
+    let mut found: BTreeMap<SimId, (Entity, Option<SubPos>, TargetTraits)> = BTreeMap::new();
+    {
+        let mut query = world.query::<(
+            Entity,
+            &SimId,
+            &Armour,
+            Option<&Position>,
+            Option<&Mobile>,
+            Option<&Building>,
+            Option<&crate::Unit>,
+        )>();
+        let grid = world.resource::<Grid>();
+        for (entity, id, armour, position, mobile, building, unit) in query.iter(world) {
+            let Some(body) = Body::of(mobile, building) else {
+                continue;
+            };
+            let of_type = match (unit, building) {
+                (Some(unit), _) => definitions.unit_combat(unit.kind),
+                (None, Some(building)) => definitions.building_combat(building.kind),
+                (None, None) => None,
+            };
+            found.insert(
+                *id,
+                (
+                    entity,
+                    position.map(|position| position.0),
+                    traits_of(grid, *id, armour.0, &body, of_type.as_ref()),
+                ),
+            );
+        }
+    }
+    let mut hits = Vec::new();
+    {
+        let traits = |id: SimId| {
+            found
+                .get(&id)
+                .map(|&(_, position, traits)| (position, traits))
+        };
+        blast_hits(
+            &definitions,
+            world.resource::<Grid>(),
+            world.resource::<crate::Props>(),
+            &traits,
+            &blast,
+            &mut hits,
+        );
+    }
+    for (id, damage) in hits {
+        if world
+            .resource::<crate::SpecialState>()
+            .invulnerable(id, tick)
+        {
+            continue;
+        }
+        match found.get(&id) {
+            Some(&(entity, ..)) => {
+                if let Some(mut health) = world.get_mut::<Health>(entity) {
+                    health.hit_points = health.hit_points.saturating_sub(damage);
+                }
+            }
+            None => {
+                let cell = world
+                    .resource::<crate::Props>()
+                    .get(id)
+                    .map(|(cell, _)| cell);
+                if let Some(cell) = cell {
+                    world
+                        .resource_mut::<crate::Props>()
+                        .hurt(cell, i64::from(damage));
+                }
+            }
+        }
+    }
+    if report {
+        world
+            .resource_mut::<Messages<SimEvent>>()
+            .write(impact_event(&blast));
+    }
+}
+
+/// The current target if it is still a visible enemy that `arms` engages on its own and may
+/// fire at from `from`, else the nearest such enemy (automatic acquisition: idle and
+/// attack-moving units, and defensive structures).
 fn keep_or_acquire(
     field: &Field<'_>,
     owner: PlayerId,
     from: &Extent,
     current: Option<SimId>,
-    weapon: &WeaponDef,
+    arms: &Arms,
 ) -> Option<SimId> {
     current
         .filter(|&target| {
             field.visible_enemy(owner, target).is_some_and(|found| {
                 let (dx, dy) = from.gap(&found.extent);
-                in_range(dx, dy, weapon.range) && field.damages(weapon, &found)
+                field
+                    .engages(arms, &found.traits)
+                    .is_some_and(|choice| choice.covers(dx, dy))
             })
         })
-        .or_else(|| field.nearest_enemy_in_range(owner, from, weapon))
+        .or_else(|| field.nearest_enemy_in_range(owner, from, arms))
 }
 
-/// Fires at the weapon's target if it is loaded and the target is a visible enemy in range;
-/// returns whether it fired.
+/// Fires at the weapon's target if it is a visible enemy that a weapon of `arms` may be fired
+/// at; returns the weapon's choice if it fired.
+fn fire_at_target<'a>(
+    field: &'a Field<'_>,
+    shots: &mut Shots,
+    rng: &mut crate::SimRng,
+    attacker: (SimId, PlayerId, &Extent),
+    weapon: &mut Weapon,
+    arms: &Arms,
+) -> Option<Choice<'a>> {
+    let (_, owner, _) = attacker;
+    let target_id = weapon.target?;
+    let target = field.visible_enemy(owner, target_id)?;
+    let choice = field.choose(arms, &target.traits)?;
+    fire_if_ready(
+        field, shots, rng, attacker, weapon, &choice, target_id, &target,
+    )
+    .then_some(choice)
+}
+
+/// Fires the weapon of `choice` at `target` if it is loaded and the target is where the weapon
+/// may fire at it; returns whether it fired. A volley under way belongs to the weapon that
+/// began it: if another weapon is called for, the volley ends and its weapon reloads.
+#[allow(clippy::too_many_arguments)]
 fn fire_if_ready(
     field: &Field<'_>,
     shots: &mut Shots,
+    rng: &mut crate::SimRng,
     attacker: (SimId, PlayerId, &Extent),
     weapon: &mut Weapon,
-    def: &WeaponDef,
+    choice: &Choice<'_>,
+    target_id: SimId,
+    target: &Target,
 ) -> bool {
-    let (_, owner, from) = attacker;
-    let Some(target_id) = weapon.target else {
-        return false;
-    };
-    let Some(target) = field.visible_enemy(owner, target_id) else {
-        return false;
-    };
+    let (_, _, from) = attacker;
     let (dx, dy) = from.gap(&target.extent);
-    if weapon.cooldown > 0 || !in_range(dx, dy, def.range) {
+    if weapon.cooldown > 0 || !choice.covers(dx, dy) {
         return false;
     }
-    weapon.cooldown = def.reload;
-    field.fire(shots, attacker, (weapon.kind, def), target_id, &target);
+    if weapon.burst_left > 0 && weapon.volley != choice.kind {
+        weapon.burst_left = 0;
+        weapon.cooldown = field
+            .definitions
+            .weapon(weapon.volley)
+            .map_or(1, |def| def.reload);
+        return false;
+    }
+    weapon.burst_left = if weapon.burst_left > 0 {
+        weapon.burst_left - 1
+    } else {
+        choice.def.burst.saturating_sub(1)
+    };
+    weapon.volley = choice.kind;
+    weapon.cooldown = if weapon.burst_left > 0 {
+        BURST_GAP
+    } else {
+        choice.def.reload
+    };
+    field.fire(shots, rng, attacker, choice, target_id, target);
     true
 }
 
@@ -754,8 +1563,9 @@ fn fire_if_ready(
 fn act_unit(
     field: &Field<'_>,
     shots: &mut Shots,
+    rng: &mut crate::SimRng,
     (id, owner, from, mobile): (SimId, PlayerId, &Extent, &Mobile),
-    (weapon, def): (&mut Weapon, &WeaponDef),
+    (weapon, arms): (&mut Weapon, &Arms),
     orders: &mut Orders,
 ) {
     match weapon.order {
@@ -778,12 +1588,26 @@ fn act_unit(
                 return end(weapon, shots, AttackEnd::TargetHidden);
             }
             weapon.target = Some(target);
+            let Some(choice) = field.choose(arms, &found.traits) else {
+                // No weapon of the unit may be fired at it at all.
+                orders.current = None;
+                return end(weapon, shots, AttackEnd::NoDamage);
+            };
             let (dx, dy) = from.gap(&found.extent);
-            if in_range(dx, dy, def.range) {
+            if choice.covers(dx, dy) {
                 // Stop at the next cell centre and fight.
                 orders.current = None;
-                if fire_if_ready(field, shots, (id, owner, from), weapon, def) {
-                    if !field.damages(def, found) {
+                if fire_if_ready(
+                    field,
+                    shots,
+                    rng,
+                    (id, owner, from),
+                    weapon,
+                    &choice,
+                    target,
+                    found,
+                ) {
+                    if choice.versus <= 0 {
                         // The shot, as ordered, did nothing; firing on would never end.
                         return end(weapon, shots, AttackEnd::NoDamage);
                     }
@@ -791,9 +1615,12 @@ fn act_unit(
                 }
                 return;
             }
+            // A unit approaches to the weapon's plain range (the air range bonus lengthens
+            // only the shot), and keeps outside its minimum range.
             let reachable = |cell: CellPos| {
                 let (dx, dy) = Extent::point(SubPos::centre_of(cell)).gap(&found.extent);
-                in_range(dx, dy, def.range)
+                in_range(dx, dy, choice.def.range)
+                    && !inside_min_range(dx, dy, choice.def.min_range)
             };
             let heading_in_range = orders
                 .current
@@ -831,7 +1658,7 @@ fn act_unit(
             destination,
             moving,
         }) => {
-            weapon.target = keep_or_acquire(field, owner, from, weapon.target, def);
+            weapon.target = keep_or_acquire(field, owner, from, weapon.target, arms);
             if weapon.target.is_some() {
                 // Stop at the next cell centre and fight; the move resumes afterwards.
                 orders.current = None;
@@ -839,7 +1666,7 @@ fn act_unit(
                     destination,
                     moving: false,
                 });
-                fire_if_ready(field, shots, (id, owner, from), weapon, def);
+                fire_at_target(field, shots, rng, (id, owner, from), weapon, arms);
                 return;
             }
             if orders.current.is_some() {
@@ -862,9 +1689,63 @@ fn act_unit(
                 weapon.target = None;
                 return;
             }
-            weapon.target = keep_or_acquire(field, owner, from, weapon.target, def);
-            fire_if_ready(field, shots, (id, owner, from), weapon, def);
+            weapon.target = keep_or_acquire(field, owner, from, weapon.target, arms);
+            fire_at_target(field, shots, rng, (id, owner, from), weapon, arms);
         }
+    }
+}
+
+type ConditionQuery<'w, 's> = Query<
+    'w,
+    's,
+    (
+        &'static SimId,
+        &'static Owner,
+        &'static Health,
+        &'static mut Condition,
+        Option<&'static crate::Unit>,
+        Option<&'static Building>,
+    ),
+>;
+
+/// Sets the damage state of every unit and building from its hit points, in id order, and
+/// reports every change (the `Cleanup` stage, with a rules file; RA3).
+pub(crate) fn update_conditions(
+    definitions: Res<Definitions>,
+    mut events: ResMut<Messages<SimEvent>>,
+    mut entities: ConditionQuery,
+) {
+    let Some(rules) = definitions.rules().map(|rules| rules.combat) else {
+        return;
+    };
+    let mut changed = Vec::new();
+    for (id, owner, health, mut condition, unit, building) in &mut entities {
+        let full = match (unit, building) {
+            (Some(unit), _) => definitions.unit_combat(unit.kind),
+            (None, Some(building)) => definitions.building_combat(building.kind),
+            (None, None) => None,
+        }
+        .map(|terms| terms.hit_points);
+        let Some(full) = full else {
+            continue;
+        };
+        if health.hit_points <= 0 {
+            continue;
+        }
+        let state = damage_state(
+            health.hit_points,
+            full,
+            rules.condition_yellow_percent,
+            rules.condition_red_percent,
+        );
+        if condition.0 != state {
+            condition.0 = state;
+            changed.push((*id, owner.0, state));
+        }
+    }
+    changed.sort_unstable();
+    for (id, player, state) in changed {
+        events.write(SimEvent::DamageStateChanged { player, id, state });
     }
 }
 
@@ -957,6 +1838,73 @@ mod tests {
         assert!(in_range(max, 0, MAX_WEAPON_RANGE));
         assert!(!in_range(max + 1, 0, MAX_WEAPON_RANGE));
         assert!(!in_range(i64::MAX, i64::MIN, u32::MAX), "no overflow");
+    }
+
+    /// RA3: the hash of a projectile covers where it was aimed, whether it scatters, and its
+    /// layer (invariant I3).
+    #[test]
+    fn the_hash_of_the_projectiles_covers_aim_scatter_and_layer() {
+        let shell = Projectile {
+            owner: PlayerId(0),
+            attacker: SimId(1),
+            target: SimId(2),
+            weapon: WeaponKind(0),
+            origin: SubPos::new(10, 20),
+            aim: SubPos::new(300, 400),
+            scattered: false,
+            air: false,
+            flight: 5,
+            remaining: 3,
+        };
+        let hash = |projectile: Projectile| {
+            let mut hasher = Fnv1a64::new();
+            Projectiles {
+                list: vec![projectile],
+            }
+            .hash_into(&mut hasher);
+            hasher.finish()
+        };
+        let base = hash(shell);
+        assert_eq!(base, hash(shell));
+        for changed in [
+            Projectile {
+                aim: SubPos::new(301, 400),
+                ..shell
+            },
+            Projectile {
+                aim: SubPos::new(300, 401),
+                ..shell
+            },
+            Projectile {
+                scattered: true,
+                ..shell
+            },
+            Projectile { air: true, ..shell },
+        ] {
+            assert_ne!(hash(changed), base, "{changed:?}");
+        }
+    }
+
+    /// RA3: a shot at a building is aimed at the centre of the cell of its footprint nearest
+    /// to the attacker, and a shot at a unit at the unit.
+    #[test]
+    fn a_shot_at_a_building_is_aimed_at_its_nearest_cell() {
+        let building = Extent::footprint(Footprint {
+            origin: CellPos::new(5, 4),
+            width: 2,
+            height: 3,
+        });
+        let from = |x, y| Extent::point(SubPos::centre_of(CellPos::new(x, y)));
+        let aim = |x, y| building.aim_from(&from(x, y)).cell();
+        assert_eq!(aim(2, 5), CellPos::new(5, 5), "from the west, in its rows");
+        assert_eq!(aim(9, 9), CellPos::new(6, 6), "from the south east");
+        assert_eq!(aim(5, 0), CellPos::new(5, 4), "from the north");
+        assert_eq!(aim(6, 5), CellPos::new(6, 5), "from above it (an aircraft)");
+        let unit = from(3, 3);
+        assert_eq!(
+            unit.aim_from(&from(0, 0)),
+            SubPos::centre_of(CellPos::new(3, 3))
+        );
     }
 
     #[test]

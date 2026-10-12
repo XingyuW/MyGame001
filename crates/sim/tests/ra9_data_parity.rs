@@ -18,7 +18,13 @@
 //! every item (the formula of the plan's section 4.2 from its cost, times the wall coefficient
 //! for a wall), and for every building its production lane (`BuildCat`), build limit, `Adjacent`
 //! distance and the flags `BaseNormal`, `Radar`, `Powered`, `UnitRepair`, `Repairable`, whether
-//! it can be sold (`Wall`, `Unsellable`) and the `IsPowered` of its superweapon. Later
+//! it can be sold (`Wall`, `Unsellable`) and the `IsPowered` of its superweapon. RA3 adds, for
+//! every unit and building, its armour type, the weapons it carries (primary and secondary, and
+//! those at elite rank), `AirRangeBonus`, `LandTargeting`, `NavalTargeting`, `Underwater`,
+//! `Organic` and `Wall`; and, with the third table `ra2_combat.tsv` (game id of a weapon or
+//! warhead to its ini section), every weapon (damage, range, minimum range, reload, burst,
+//! warhead, projectile speed, the layers its projectile engages, scatter), every warhead
+//! (`Verses`, `CellSpread`, `PercentAtMax`, `Wall`, `Wood`) and the area effects. Later
 //! milestones extend it.
 
 use std::collections::{BTreeMap, BTreeSet};
@@ -118,6 +124,42 @@ fn mapping() -> Vec<Mapped> {
     })
     .collect()
 }
+
+/// The game ids of the weapons and of the warheads by ini section (`ra2_combat.tsv`), and the
+/// rows of each kind in the order of the table: (game id, section).
+struct CombatMapping {
+    weapon_id: BTreeMap<String, String>,
+    warhead_id: BTreeMap<String, String>,
+    weapons: Vec<(String, String)>,
+    warheads: Vec<(String, String)>,
+}
+
+fn combat_mapping() -> CombatMapping {
+    let mut mapping = CombatMapping {
+        weapon_id: BTreeMap::new(),
+        warhead_id: BTreeMap::new(),
+        weapons: Vec::new(),
+        warheads: Vec::new(),
+    };
+    for row in table("ra2_combat.tsv", &["game_id", "kind", "section"]) {
+        let (ids, rows) = match row[1].as_str() {
+            "weapon" => (&mut mapping.weapon_id, &mut mapping.weapons),
+            "warhead" => (&mut mapping.warhead_id, &mut mapping.warheads),
+            other => panic!("ra2_combat.tsv: unknown kind {other:?}"),
+        };
+        assert!(
+            ids.insert(row[2].clone(), row[0].clone()).is_none(),
+            "ra2_combat.tsv: [{}] is mapped twice",
+            row[2]
+        );
+        rows.push((row[0].clone(), row[2].clone()));
+    }
+    mapping
+}
+
+/// The prefixes of the game ids under which `ra2_differences.tsv` lists weapons, warheads and
+/// area effects (a weapon and a unit may share an id).
+const COMBAT_PREFIXES: [&str; 3] = ["weapon.", "warhead.", "effect."];
 
 /// The notes of mapped sections whose items enter the game in a later milestone.
 const LATER: [&str; 3] = ["spawned", "tech_building", "support"];
@@ -384,6 +426,21 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
     let definitions = shipped();
     let rules = definitions.rules().expect("shipped rules");
     let mut differences = Differences::load();
+    // The test of the weapons and warheads meets their differences.
+    let foreign: Vec<usize> = differences
+        .rows
+        .iter()
+        .enumerate()
+        .filter(|(_, (id, ..))| COMBAT_PREFIXES.iter().any(|prefix| id.starts_with(prefix)))
+        .map(|(index, _)| index)
+        .collect();
+    differences.used.extend(foreign);
+    let combat_ids = combat_mapping();
+    let armour_types = definitions.armour_classes();
+    let weapon_name = |kind: Option<sim::WeaponKind>| {
+        kind.and_then(|kind| definitions.weapon(kind))
+            .map(|weapon| weapon.id.clone())
+    };
 
     // The game id of every mapped section that is in the game by now.
     let game_id_of: BTreeMap<&str, &str> = mapping
@@ -466,6 +523,134 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
             i128::from(entry.tech_level),
             Conversion::Int,
             "TechLevel",
+        );
+
+        // RA3. The armour type, and the weapons of the two slots below and at elite rank: the
+        // ini's `Primary` (or `Weapon1`) and `Secondary`, and `ElitePrimary` (or
+        // `EliteWeapon1`) and `EliteSecondary`, each in the place of the weapon of its slot. A
+        // weapon of the ini that the game does not carry reads `?Name` and needs a row.
+        let armour = required("Armor");
+        differences.check(
+            id,
+            "armour",
+            &armour_types[usize::from(combat.armour.0)],
+            &armour.to_ascii_lowercase(),
+            armour,
+        );
+        let slot = |keys: &[&str]| {
+            keys.iter()
+                .filter_map(|key| value(key))
+                .find(|name| *name != "none")
+        };
+        let primary = slot(&["Primary", "Weapon1"]);
+        let secondary = slot(&["Secondary"]);
+        let elite = [
+            slot(&["ElitePrimary", "EliteWeapon1"]).or(primary),
+            slot(&["EliteSecondary"]).or(secondary),
+        ];
+        let listed = |slots: [Option<&str>; 2]| {
+            let expected: Vec<String> = slots
+                .iter()
+                .flatten()
+                .map(|name| {
+                    combat_ids
+                        .weapon_id
+                        .get(*name)
+                        .cloned()
+                        .unwrap_or_else(|| format!("?{name}"))
+                })
+                .collect();
+            let reference: Vec<&str> = slots.iter().flatten().copied().collect();
+            (expected.join(","), reference.join(","))
+        };
+        let carried = |slots: [Option<sim::WeaponKind>; 2]| {
+            slots
+                .into_iter()
+                .filter_map(weapon_name)
+                .collect::<Vec<_>>()
+                .join(",")
+        };
+        let (expected, source) = listed([primary, secondary]);
+        differences.check(
+            id,
+            "weapons",
+            &carried(combat.weapons(false)),
+            &expected,
+            &source,
+        );
+        let has_elite = ["ElitePrimary", "EliteWeapon1", "EliteSecondary"]
+            .iter()
+            .any(|key| value(key).is_some());
+        if has_elite {
+            let (expected, source) = listed(elite);
+            differences.check(
+                id,
+                "elite_weapons",
+                &carried(combat.weapons(true)),
+                &expected,
+                &source,
+            );
+        } else {
+            assert_eq!(
+                combat.weapons(true),
+                combat.weapons(false),
+                "{id}: without elite weapons in the ini a type keeps its weapons at elite rank"
+            );
+        }
+        for (field, game, key, conversion) in [
+            (
+                "air_range_bonus",
+                i128::from(combat.air_range_bonus),
+                "AirRangeBonus",
+                Conversion::Cells,
+            ),
+            (
+                "land_targeting",
+                i128::from(combat.land_targeting),
+                "LandTargeting",
+                Conversion::Int,
+            ),
+            (
+                "naval_targeting",
+                i128::from(combat.naval_targeting),
+                "NavalTargeting",
+                Conversion::Int,
+            ),
+        ] {
+            let text = value(key).unwrap_or("0");
+            differences.check(
+                id,
+                field,
+                &game.to_string(),
+                &convert(conversion, text).to_string(),
+                text,
+            );
+        }
+        let traits: &[(&str, bool, &str)] = if row.building {
+            &[("wall", combat.wall, "Wall")]
+        } else {
+            &[
+                ("underwater", combat.underwater, "Underwater"),
+                ("organic", combat.organic, "Organic"),
+            ]
+        };
+        for &(field, game, key) in traits {
+            let text = value(key).unwrap_or("no");
+            differences.check(
+                id,
+                field,
+                &i128::from(game).to_string(),
+                &convert(Conversion::Flag, text).to_string(),
+                text,
+            );
+        }
+        assert!(
+            if row.building {
+                !combat.underwater && !combat.organic
+            } else {
+                !combat.wall
+            },
+            "{id}: a trait of the other kind"
         );
 
         match item {
@@ -696,6 +881,318 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
         assert!(
             mapped.contains(id),
             "{id} is shipped but not mapped to an ini section"
+        );
+    }
+    differences.finish();
+}
+
+// --- The audit of the weapons, the warheads and the area effects (RA3) -----------------------------
+
+/// The armour types in the order of a warhead's `Verses` (docs/RA2_PARITY_PLAN.md appendix D).
+const ARMOURS: [&str; 11] = [
+    "none",
+    "flak",
+    "plate",
+    "light",
+    "medium",
+    "heavy",
+    "wood",
+    "steel",
+    "concrete",
+    "special_1",
+    "special_2",
+];
+
+/// Leptons per frame as subcells per tick: `round(leptons x 3 / 4)`, at least 1.
+fn leptons_per_tick(leptons: i128) -> i128 {
+    ((2 * leptons * 3 + 4).div_euclid(8)).max(1)
+}
+
+/// The largest integer whose square is at most `value`.
+fn floor_sqrt(value: i128) -> i128 {
+    let mut root = 0_i128;
+    while (root + 1) * (root + 1) <= value {
+        root += 1;
+    }
+    root
+}
+
+#[test]
+fn every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_difference() {
+    let reference = Reference::load();
+    let definitions = shipped();
+    let combat = combat_mapping();
+    let mut differences = Differences::load();
+    // The other tests of this file meet the differences of units, buildings and rules.
+    let foreign: Vec<usize> = differences
+        .rows
+        .iter()
+        .enumerate()
+        .filter(|(_, (id, ..))| !COMBAT_PREFIXES.iter().any(|prefix| id.starts_with(prefix)))
+        .map(|(index, _)| index)
+        .collect();
+    differences.used.extend(foreign);
+    assert_eq!(definitions.armour_classes(), ARMOURS);
+    let flag = |section: &str, key: &str, default: &'static str| {
+        let text = reference.get(section, key).unwrap_or(default);
+        (convert(Conversion::Flag, text), text.to_owned())
+    };
+
+    // Warheads: `Verses` in the order of the armour types, `CellSpread` in subcells,
+    // `PercentAtMax` as percent (1 without the key), and the flags `Wall` and `Wood`.
+    let mut mapped: BTreeSet<&str> = BTreeSet::new();
+    for (game_id, section) in &combat.warheads {
+        mapped.insert(game_id.as_str());
+        let id = format!("warhead.{game_id}");
+        let warhead = definitions
+            .warhead_kind(game_id)
+            .and_then(|kind| definitions.warhead(kind))
+            .unwrap_or_else(|| panic!("{game_id} is mapped but not shipped"));
+        let verses = reference.value(section, "Verses");
+        let expected: Vec<String> = verses
+            .split(',')
+            .map(|text| convert(Conversion::Int, text.trim_end_matches('%')).to_string())
+            .collect();
+        assert_eq!(expected.len(), ARMOURS.len(), "[{section}] Verses");
+        let game: Vec<String> = warhead.versus.iter().map(i32::to_string).collect();
+        differences.check(&id, "versus", &game.join(","), &expected.join(","), verses);
+        let spread = reference.get(section, "CellSpread").unwrap_or("0");
+        differences.check(
+            &id,
+            "cell_spread",
+            &warhead.cell_spread.to_string(),
+            &convert(Conversion::Cells, spread).to_string(),
+            spread,
+        );
+        let at_max = reference.get(section, "PercentAtMax").unwrap_or("1");
+        differences.check(
+            &id,
+            "percent_at_max",
+            &warhead.percent_at_max.to_string(),
+            &convert(Conversion::Percent, at_max).to_string(),
+            at_max,
+        );
+        for (field, game, key) in [
+            ("wall", warhead.wall, "Wall"),
+            ("wood", warhead.wood, "Wood"),
+        ] {
+            let (expected, text) = flag(section, key, "no");
+            differences.check(
+                &id,
+                field,
+                &i128::from(game).to_string(),
+                &expected.to_string(),
+                &text,
+            );
+        }
+    }
+    for warhead in definitions.warheads() {
+        assert!(
+            mapped.contains(warhead.id.as_str()),
+            "the warhead {} is shipped but not mapped to an ini section",
+            warhead.id
+        );
+    }
+
+    // Weapons (docs/RA2_PARITY_PLAN.md sections 2 and 4.4).
+    let gravity = convert(Conversion::Int, reference.value("AudioVisual", "Gravity"));
+    let ballistic_scatter = convert(
+        Conversion::Cells,
+        reference.value("CombatDamage", "BallisticScatter"),
+    );
+    let mut mapped: BTreeSet<&str> = BTreeSet::new();
+    for (game_id, section) in &combat.weapons {
+        mapped.insert(game_id.as_str());
+        let id = format!("weapon.{game_id}");
+        let weapon = definitions
+            .weapon_kind(game_id)
+            .and_then(|kind| definitions.weapon(kind))
+            .unwrap_or_else(|| panic!("{game_id} is mapped but not shipped"));
+        let mut number = |field: &str, game: i128, key: &str, default: Option<&'static str>, c| {
+            let text = match (reference.get(section, key), default) {
+                (Some(text), _) => text,
+                (None, Some(default)) => default,
+                (None, None) => panic!("the reference has no [{section}] {key}"),
+            };
+            differences.check(
+                &id,
+                field,
+                &game.to_string(),
+                &convert(c, text).to_string(),
+                text,
+            );
+        };
+        number(
+            "damage",
+            i128::from(weapon.damage),
+            "Damage",
+            None,
+            Conversion::Int,
+        );
+        number(
+            "range",
+            i128::from(weapon.range),
+            "Range",
+            None,
+            Conversion::Cells,
+        );
+        number(
+            "min_range",
+            i128::from(weapon.min_range),
+            "MinimumRange",
+            Some("0"),
+            Conversion::Cells,
+        );
+        number(
+            "reload",
+            i128::from(weapon.reload),
+            "ROF",
+            None,
+            Conversion::Frames,
+        );
+        number(
+            "burst",
+            i128::from(weapon.burst),
+            "Burst",
+            Some("1"),
+            Conversion::Int,
+        );
+        // The warhead: the game id of the ini's, or `?Name` for one the game does not have.
+        let warhead = reference.value(section, "Warhead");
+        differences.check(
+            &id,
+            "warhead",
+            &definitions
+                .warhead(weapon.warhead)
+                .map_or(String::new(), |warhead| warhead.id.clone()),
+            &combat
+                .warhead_id
+                .get(warhead)
+                .cloned()
+                .unwrap_or_else(|| format!("?{warhead}")),
+            warhead,
+        );
+        // The projectile: an invisible one, and the leap of a unit that is its own projectile
+        // (`LimboLaunch`), arrive at once; an arcing shell flies at
+        // floor(sqrt(1.2 x Gravity x range)) leptons per frame, whatever the weapon's `Speed`
+        // (an assumption, docs/DECISIONS.md R34); every other one at the weapon's `Speed`,
+        // read as a unit's (`min(Speed x 256 div 100, 255)` leptons per frame).
+        let projectile = reference.value(section, "Projectile");
+        let (inviso, _) = flag(projectile, "Inviso", "no");
+        let (limbo, _) = flag(section, "LimboLaunch", "no");
+        let (arcing, _) = flag(projectile, "Arcing", "no");
+        let (expected, source) = if inviso == 1 || limbo == 1 {
+            (0, format!("{projectile}:instant"))
+        } else if arcing == 1 {
+            let range = reference.value(section, "Range");
+            let reach = convert(Conversion::Cells, range);
+            (
+                leptons_per_tick(floor_sqrt((reach * gravity * 6).div_euclid(5))),
+                format!("{projectile}:arcing:{range}"),
+            )
+        } else {
+            let speed = reference.value(section, "Speed");
+            let leptons = (convert(Conversion::Int, speed) * 256)
+                .div_euclid(100)
+                .min(255);
+            (leptons_per_tick(leptons), format!("{projectile}:{speed}"))
+        };
+        differences.check(
+            &id,
+            "projectile_speed",
+            &weapon.projectile_speed.to_string(),
+            &expected.to_string(),
+            &source,
+        );
+        for (field, game, key, default) in [
+            ("anti_air", weapon.anti_air, "AA", "no"),
+            ("anti_ground", weapon.anti_ground, "AG", "yes"),
+        ] {
+            let (expected, text) = flag(projectile, key, default);
+            differences.check(
+                &id,
+                field,
+                &i128::from(game).to_string(),
+                &expected.to_string(),
+                &text,
+            );
+        }
+        // Scatter (section 4.4): an `Inaccurate` projectile lands up to `BallisticScatter`
+        // from its target at full range, an invisible one (the flak in the air) up to twice
+        // that.
+        let (inaccurate, text) = flag(projectile, "Inaccurate", "no");
+        differences.check(
+            &id,
+            "scatter",
+            &weapon.scatter.to_string(),
+            &(inaccurate * ballistic_scatter * (1 + inviso)).to_string(),
+            &text,
+        );
+    }
+    for weapon in definitions.weapons() {
+        assert!(
+            mapped.contains(weapon.id.as_str()),
+            "the weapon {} is shipped but not mapped to an ini section",
+            weapon.id
+        );
+    }
+
+    // The area effects: damage and warhead of the ini where it names them. The charge of a
+    // commando and the pulse of a radiation zone are mechanics of M9 with a damage of the
+    // game's own until RA6; their warheads are the ini's.
+    type Key = (&'static str, &'static str);
+    let effects: [(sim::Effect, Option<Key>, Key); 5] = [
+        (
+            sim::Effect::Nuke,
+            Some(("NukePayload", "Damage")),
+            ("NukePayload", "Warhead"),
+        ),
+        (
+            sim::Effect::Lightning,
+            Some(("General", "LightningDamage")),
+            ("General", "LightningWarhead"),
+        ),
+        (
+            sim::Effect::IvanBomb,
+            Some(("CombatDamage", "IvanDamage")),
+            ("CombatDamage", "IvanWarhead"),
+        ),
+        (sim::Effect::C4, None, ("CombatDamage", "C4Warhead")),
+        (
+            sim::Effect::Radiation,
+            None,
+            ("Radiation", "RadSiteWarhead"),
+        ),
+    ];
+    assert_eq!(effects.map(|(effect, ..)| effect), sim::Effect::ALL);
+    for (effect, damage, (section, key)) in effects {
+        let id = format!("effect.{}", effect.id());
+        let game = definitions
+            .effect(effect)
+            .unwrap_or_else(|| panic!("the effect {} is not shipped", effect.id()));
+        if let Some((section, key)) = damage {
+            let text = reference.value(section, key);
+            differences.check(
+                &id,
+                "damage",
+                &game.damage.to_string(),
+                &convert(Conversion::Int, text).to_string(),
+                text,
+            );
+        }
+        let warhead = reference.value(section, key);
+        differences.check(
+            &id,
+            "warhead",
+            &definitions
+                .warhead(game.warhead)
+                .map_or(String::new(), |warhead| warhead.id.clone()),
+            &combat
+                .warhead_id
+                .get(warhead)
+                .cloned()
+                .unwrap_or_else(|| format!("?{warhead}")),
+            warhead,
         );
     }
     differences.finish();

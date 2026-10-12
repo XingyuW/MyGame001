@@ -48,7 +48,10 @@ impl Plugin for WeaponFxPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<ImpactSounds>()
             .add_systems(Startup, make_art)
-            .add_systems(Update, (fire, fly_shells, crackle, animate).chain());
+            .add_systems(
+                Update,
+                (fire, fly_shells, crackle, smoulder, animate).chain(),
+            );
     }
 }
 
@@ -75,10 +78,87 @@ pub enum WeaponClass {
     Trigger,
 }
 
-/// The class of the weapon `id` (`assets/data/combat.ron`); `instant` is whether it has no
-/// projectile. A weapon this does not know is a rifle if instant and a cannon otherwise.
+/// The class of a weapon of the shipped combat file (`assets/data/combat.ron`, the weapons of
+/// Red Alert 2 since RA3), by its id; `None` for any other weapon.
+pub fn shipped_class(id: &str) -> Option<WeaponClass> {
+    use WeaponClass::*;
+    Some(match id {
+        "m60" | "m60_e" | "para" | "para_e" | "m1_carbine" | "m1_carbine_e" | "double_pistols"
+        | "double_pistols_e" | "chrono_mp5" | "chrono_mp5_e" => Rifle,
+        "vulcan"
+        | "vulcan2"
+        | "gun_20mm"
+        | "gun_20mm_e"
+        | "gun_20mm_rapid"
+        | "black_hawk_cannon"
+        | "black_hawk_cannon_e" => MachineGun,
+        "awp" | "awp_e" => Sniper,
+        // The flak guns against the ground fire a shell that bursts where it lands.
+        "gun_105mm" | "gun_105mm_e" | "gun_120mm" | "gun_120mm_e" | "gun_120mmx"
+        | "gun_120mmx_e" | "sabot" | "sabot_e" | "gun_20mm_rapid_e" | "mirage_gun"
+        | "mirage_gun_e" | "flak_track_gun" | "flak_track_gun_e" | "flak_guy_gun"
+        | "flak_guy_gun_e" => Cannon,
+        "gun_155mm" | "gun_155mm_e" | "grand_cannon_weapon" => Artillery,
+        "hover_missile" | "hover_missile_e" | "mammoth_tusk" | "maverick" | "maverick_e"
+        | "maverick2" | "maverick2_e" | "medusa" | "medusa_e" | "red_eye2" | "v3_launcher"
+        | "dred_launcher" | "hornet_launcher" => Rocket,
+        "flak_weapon"
+        | "flak_weapon_e"
+        | "flak_track_aa_gun"
+        | "flak_track_aa_gun_e"
+        | "flak_guy_aa_gun"
+        | "flak_guy_aa_gun_e" => Flak,
+        "prism_shot" | "comet" | "super_comet" => Prism,
+        "coil_bolt" | "op_coil_bolt" | "tank_bolt" | "tank_bolt_e" | "electric_bolt"
+        | "electric_bolt_e" => Tesla,
+        "rad_beam_weapon" | "rad_beam_weapon_e" => Radiation,
+        "mind_control" | "mind_control_e" | "super_mind_control" => Psychic,
+        "neutron_rifle" | "neutron_rifle_e" => Chrono,
+        "sonic_zap" | "sonic_zap_e" => Sonic,
+        "blimp_bomb" | "blimp_bomb_e" => Bomb,
+        "sub_torpedo" | "sub_torpedo_e" | "asw_launcher" => Torpedo,
+        "good_teeth" | "drone_jump" | "squid_grab" | "squid_grab_e" | "squid_punch"
+        | "squid_punch_e" => Melee,
+        "ivan_bomber" | "ivan_bomber_e" | "terror_bomb" | "demobomb" => Trigger,
+        _ => return None,
+    })
+}
+
+/// Whether a shot of `class` with a projectile is drawn as a shell in flight. The others (a
+/// sonic wave, a leap) are drawn when they are fired, as the weapons without a projectile are.
+pub fn flies(class: WeaponClass) -> bool {
+    use WeaponClass::*;
+    matches!(
+        class,
+        Cannon | Artillery | Rocket | Grenade | Bomb | Torpedo
+    )
+}
+
+/// The smoke of a damaged vehicle or building (RA3): seconds between two puffs and their colour,
+/// by its damage state; none while it is green. A yellow one trails thin grey smoke, a red one
+/// thick black smoke.
+pub fn damage_smoke(state: sim::DamageState) -> Option<(f32, [f32; 4])> {
+    match state {
+        sim::DamageState::Green => None,
+        sim::DamageState::Yellow => Some((0.55, [0.66, 0.66, 0.64, 0.4])),
+        sim::DamageState::Red => Some((0.22, [0.13, 0.12, 0.12, 0.7])),
+    }
+}
+
+/// How large the burst of a warhead with `cell_spread` (subcells) is drawn, in pixels.
+pub fn impact_size(cell_spread: u32) -> f32 {
+    (10.0 + cell_spread as f32 / SUBCELLS_PER_CELL as f32 * 14.0).min(90.0)
+}
+
+/// The class of the weapon `id`; `instant` is whether it has no projectile. A weapon of the
+/// shipped combat file has the class of [`shipped_class`]; the ids below are those of the
+/// arsenal before RA3 (the legacy ruleset). A weapon this does not know is a rifle if instant
+/// and a cannon otherwise.
 pub fn classify(id: &str, instant: bool) -> WeaponClass {
     use WeaponClass::*;
+    if let Some(class) = shipped_class(id) {
+        return class;
+    }
     match id {
         "prism_beam" => Prism,
         "tesla_weapon" => Tesla,
@@ -881,6 +961,7 @@ fn fire(
     mat: Option<Res<Materials>>,
     altitudes: Res<Altitudes>,
     live: Query<(), With<Fx>>,
+    mut sounds: ResMut<ImpactSounds>,
 ) {
     let (Some(map), Some(art), Some(mat), Some(vision), Some(definitions)) = (
         map,
@@ -896,18 +977,22 @@ fn fire(
         events.clear();
         return;
     }
-    let shots: Vec<(SimId, SimId, WeaponKind)> = events
-        .read()
-        .filter_map(|event| match event {
+    let mut shots: Vec<(SimId, SimId, WeaponKind)> = Vec::new();
+    // Warheads that went off where no shot's target is (RA3): an inaccurate shot, a bomb, a
+    // superweapon.
+    let mut bursts: Vec<(sim::WarheadKind, sim::SubPos, bool)> = Vec::new();
+    for event in events.read() {
+        match event {
             SimEvent::WeaponFired {
                 attacker,
                 target,
                 weapon,
-            } => Some((*attacker, *target, *weapon)),
-            _ => None,
-        })
-        .collect();
-    if shots.is_empty() {
+            } => shots.push((*attacker, *target, *weapon)),
+            SimEvent::Impact { warhead, at, air } => bursts.push((*warhead, *at, *air)),
+            _ => {}
+        }
+    }
+    if shots.is_empty() && bursts.is_empty() {
         return;
     }
     let spots = spots(&host, &map, &altitudes);
@@ -917,6 +1002,29 @@ fn fire(
         mat: &mat,
         left: MAX_FX.saturating_sub(live.iter().count()),
     };
+    for (index, (warhead, at, air)) in bursts.into_iter().enumerate() {
+        let cell = at.cell();
+        if !vision.is_visible(cell) {
+            continue;
+        }
+        let scale = SUBCELLS_PER_CELL as f32;
+        let ground = to_world(at.x as f32 / scale, at.y as f32 / scale, map.tile);
+        let lift = GROUND_OFFSET_PX
+            + if air {
+                crate::units::flight_altitude(false, false)
+            } else {
+                0.0
+            };
+        let spread = definitions
+            .warhead(warhead)
+            .map_or(0, |warhead| warhead.cell_spread);
+        let seed = (host.tick() as u32).wrapping_mul(0x9E37) ^ (index as u32) ^ at.x as u32;
+        painter.explosion(ground + Vec2::Y * lift, impact_size(spread), cell, seed);
+        // A burst on the ground is heard (`crate::audio`); flak in the air has its own sound.
+        if !air {
+            sounds.0 = sounds.0.saturating_add(1);
+        }
+    }
     for (attacker, target, weapon) in shots {
         let (Some(from), Some(to)) = (
             spots.get(&attacker).copied(),
@@ -942,7 +1050,7 @@ fn fire(
             view != ShotView::AtAttacker,
             view == ShotView::Line,
         );
-        if def.projectile_speed > 0 || class == WeaponClass::Bomb {
+        if (def.projectile_speed > 0 && flies(class)) || class == WeaponClass::Bomb {
             if at_muzzle {
                 match class {
                     WeaponClass::Cannon => painter.muzzle_blast(muzzle, dir, 1.0, from.cell, seed),
@@ -1418,6 +1526,92 @@ fn fire(
     }
 }
 
+/// Lets the damaged vehicles and buildings the human player sees smoke, by their damage state
+/// ([`damage_smoke`]); infantry does not. `clock` holds the time of the effects and when each
+/// smoked last.
+#[allow(clippy::too_many_arguments)]
+fn smoulder(
+    mut commands: Commands,
+    speed: Res<crate::game_speed::GameClock>,
+    sink: Res<CommandSink>,
+    host: Res<SimHost>,
+    map: Option<Res<MapView>>,
+    art: Option<Res<FxArt>>,
+    mat: Option<Res<Materials>>,
+    altitudes: Res<Altitudes>,
+    live: Query<(), With<Fx>>,
+    mut clock: Local<(f32, BTreeMap<SimId, f32>)>,
+) {
+    let (Some(map), Some(art), Some(mat)) = (map, art, mat) else {
+        return;
+    };
+    let (Some(vision), Some(definitions)) = (human_vision(host.players()), host.definitions())
+    else {
+        clock.1.clear();
+        return;
+    };
+    if !host.running() || sink.paused() {
+        return;
+    }
+    let (now, last) = &mut *clock;
+    *now += speed.delta();
+    let Some(mut damaged) = host
+        .world()
+        .try_query::<(&SimId, &sim::Condition, Option<&Unit>, Option<&Building>)>()
+    else {
+        return;
+    };
+    let smoking: Vec<(SimId, f32, [f32; 4], f32)> = damaged
+        .iter(host.world())
+        .filter_map(|(id, condition, unit, building)| {
+            let (interval, colour) = damage_smoke(condition.0)?;
+            let infantry = unit.is_some_and(|unit| {
+                definitions.category(sim::ProductionItem::Unit(unit.kind))
+                    == sim::Category::Infantry
+            });
+            // A building smokes over its whole roof, a vehicle from its hull.
+            let width = building.map_or(6.0, |building| {
+                8.0 * f32::from(building.footprint.width.max(building.footprint.height))
+            });
+            (!infantry).then_some((*id, interval, colour, width))
+        })
+        .collect();
+    last.retain(|id, _| smoking.iter().any(|(smoker, ..)| smoker == id));
+    if smoking.is_empty() {
+        return;
+    }
+    let spots = spots(&host, &map, &altitudes);
+    let mut painter = Painter {
+        commands: &mut commands,
+        art: &art,
+        mat: &mat,
+        left: MAX_FX.saturating_sub(live.iter().count()),
+    };
+    for (id, interval, colour, width) in smoking {
+        let Some(spot) = spots.get(&id) else {
+            continue;
+        };
+        if !vision.is_visible(spot.cell) || last.get(&id).is_some_and(|at| *now - *at < interval) {
+            continue;
+        }
+        last.insert(id, *now);
+        let mut dice = Dice::new(id.0 ^ (*now * 16.0) as u32);
+        let at = spot.ground + Vec2::new(dice.roll() * width, spot.lift + dice.roll() * 3.0);
+        painter.smoke(
+            at,
+            9.0,
+            colour,
+            [spot.cell; 2],
+            Stroke {
+                life: 1.4,
+                velocity: Vec2::new(4.0 + dice.roll() * 3.0, 20.0),
+                growth: Vec2::splat(14.0),
+                ..default()
+            },
+        );
+    }
+}
+
 /// Moves the shells in flight, leaves their trails, and bursts them where they land.
 #[allow(clippy::too_many_arguments, clippy::type_complexity)]
 fn fly_shells(
@@ -1749,6 +1943,73 @@ mod tests {
         // Weapons of other data files fall back on whether they have a projectile.
         assert_eq!(classify("pea_shooter", true), Rifle);
         assert_eq!(classify("pea_shooter", false), Cannon);
+        // The weapons of Red Alert 2 (RA3): the shipped ids, each with the class of what it is.
+        for (id, instant, class) in [
+            ("m60", true, Rifle),
+            ("m1_carbine_e", true, Rifle),
+            ("double_pistols", true, Rifle),
+            ("vulcan2", true, MachineGun),
+            ("gun_20mm_rapid", true, MachineGun),
+            ("black_hawk_cannon", true, MachineGun),
+            ("awp", true, Sniper),
+            ("gun_105mm", false, Cannon),
+            ("gun_120mmx_e", false, Cannon),
+            ("sabot", false, Cannon),
+            ("mirage_gun", true, Cannon),
+            ("flak_track_gun", false, Cannon),
+            ("gun_155mm", false, Artillery),
+            ("grand_cannon_weapon", false, Artillery),
+            ("hover_missile", false, Rocket),
+            ("maverick2", false, Rocket),
+            ("red_eye2", false, Rocket),
+            ("v3_launcher", false, Rocket),
+            ("dred_launcher", false, Rocket),
+            ("sub_torpedo", false, Torpedo),
+            ("flak_weapon", true, Flak),
+            ("flak_guy_aa_gun_e", true, Flak),
+            ("prism_shot", true, Prism),
+            ("comet", true, Prism),
+            ("coil_bolt", true, Tesla),
+            ("electric_bolt", true, Tesla),
+            ("tank_bolt_e", true, Tesla),
+            ("rad_beam_weapon", true, Radiation),
+            ("mind_control", true, Psychic),
+            ("neutron_rifle", true, Chrono),
+            ("sonic_zap", false, Sonic),
+            ("blimp_bomb", false, Bomb),
+            ("good_teeth", true, Melee),
+            ("squid_grab", true, Melee),
+            ("terror_bomb", true, Trigger),
+            ("ivan_bomber", true, Trigger),
+        ] {
+            assert_eq!(classify(id, instant), class, "{id}");
+            assert_eq!(shipped_class(id), Some(class), "{id}");
+        }
+        assert_eq!(
+            shipped_class("tank_cannon"),
+            None,
+            "an id of the legacy ruleset"
+        );
+        // Only shells, rockets, bombs and torpedoes are drawn in flight: a sonic wave with a
+        // flight time is drawn when it is fired.
+        assert!(flies(Cannon) && flies(Rocket) && flies(Bomb) && flies(Torpedo));
+        assert!(!flies(Sonic) && !flies(Melee) && !flies(Flak) && !flies(Prism));
+        // Damage smoke (RA3): none while green, thicker and darker when red than when yellow.
+        assert_eq!(damage_smoke(sim::DamageState::Green), None);
+        let (yellow, red) = (
+            damage_smoke(sim::DamageState::Yellow).expect("yellow"),
+            damage_smoke(sim::DamageState::Red).expect("red"),
+        );
+        assert!(red.0 < yellow.0, "a red one puffs more often");
+        assert!(
+            red.1[0] < yellow.1[0] && red.1[3] > yellow.1[3],
+            "and darker"
+        );
+        // A burst grows with the spread of its warhead, up to a limit.
+        assert_eq!(impact_size(0), 10.0);
+        assert_eq!(impact_size(256), 24.0);
+        assert!(impact_size(512) > impact_size(256));
+        assert_eq!(impact_size(2560), 90.0);
     }
 
     /// Every weapon of the shipped combat file is classified from its own terms, and the two
@@ -1761,11 +2022,20 @@ mod tests {
             let kind = loaded.definitions.weapon_kind(id).expect(id);
             class_of(&loaded.definitions, kind)
         };
-        assert_eq!(class("prism_beam"), WeaponClass::Prism);
-        assert_eq!(class("tesla_weapon"), WeaponClass::Tesla);
-        assert_eq!(class("tank_cannon"), WeaponClass::Cannon);
-        assert_eq!(class("rifle"), WeaponClass::Rifle);
+        // Since RA3 the shipped weapons are those of Red Alert 2: the Prism Tower's and the
+        // Prism Tank's light, the Tesla Coil's, the Tesla Tank's and the Tesla Trooper's
+        // lightning, the Grizzly's gun and the GI's.
+        for id in ["prism_shot", "comet", "super_comet"] {
+            assert_eq!(class(id), WeaponClass::Prism, "{id}");
+        }
+        for id in ["coil_bolt", "tank_bolt", "electric_bolt"] {
+            assert_eq!(class(id), WeaponClass::Tesla, "{id}");
+        }
+        assert_eq!(class("gun_105mm"), WeaponClass::Cannon);
+        assert_eq!(class("m60"), WeaponClass::Rifle);
         for weapon in loaded.definitions.weapons() {
+            // No shipped weapon is left to the fallback.
+            assert!(shipped_class(&weapon.id).is_some(), "{}", weapon.id);
             let class = classify(&weapon.id, weapon.projectile_speed == 0);
             // A weapon with a projectile is never drawn as an instant ray, and the reverse.
             let ray = matches!(

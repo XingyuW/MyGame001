@@ -6,8 +6,14 @@
 // explosive deals more than its base damage to soft targets (150 %). The turret's sight (3 cells)
 // is shorter than its range (6 cells), so it fires beyond its own sight only at enemies other
 // units of its owner see.
+//
+// Schema version 2 (RA3) with the values that leave every rule of M4 as it was: warheads without
+// a spread that damage walls and trees, weapons without a minimum range, with a burst of 1, for
+// both layers and without scatter, the elite weapons equal to the weapons, no air range bonus,
+// every target on land and on water attacked alike, nothing underwater, organic or a wall, and
+// no effects.
 (
-    schema_version: 1,
+    schema_version: 2,
     armour_classes: ["soft", "plate", "concrete"],
     warheads: [
         (
@@ -17,6 +23,10 @@
                 (armour: "plate", percent: 1),
                 (armour: "concrete", percent: 0),
             ],
+            cell_spread: 0,
+            percent_at_max: 100,
+            wall: 1,
+            wood: 1,
         ),
         (
             id: "ap",
@@ -25,6 +35,10 @@
                 (armour: "soft", percent: 30),
                 (armour: "concrete", percent: 50),
             ],
+            cell_spread: 0,
+            percent_at_max: 100,
+            wall: 1,
+            wood: 1,
         ),
         (
             id: "he",
@@ -33,6 +47,10 @@
                 (armour: "plate", percent: 40),
                 (armour: "concrete", percent: 75),
             ],
+            cell_spread: 0,
+            percent_at_max: 100,
+            wall: 1,
+            wood: 1,
         ),
     ],
     weapons: [
@@ -43,6 +61,11 @@
             reload: 10,
             warhead: "bullet",
             projectile_speed: 0,
+            min_range: 0,
+            burst: 1,
+            anti_air: 1,
+            anti_ground: 1,
+            scatter: 0,
         ),
         (
             id: "cannon",
@@ -51,6 +74,11 @@
             reload: 20,
             warhead: "ap",
             projectile_speed: 128,
+            min_range: 0,
+            burst: 1,
+            anti_air: 1,
+            anti_ground: 1,
+            scatter: 0,
         ),
         (
             id: "howitzer",
@@ -59,23 +87,42 @@
             reload: 30,
             warhead: "he",
             projectile_speed: 256,
+            min_range: 0,
+            burst: 1,
+            anti_air: 1,
+            anti_ground: 1,
+            scatter: 0,
         ),
     ],
     units: [
-        (unit: "rifleman", hit_points: 100, armour: "soft", sight: 5, weapons: ["rifle"]),
-        (unit: "tank", hit_points: 300, armour: "plate", sight: 6, weapons: ["cannon"]),
-        (unit: "crawler", hit_points: 50, armour: "soft", sight: 2, weapons: []),
-        (unit: "harvester", hit_points: 200, armour: "plate", sight: 3, weapons: []),
+        (unit: "rifleman", hit_points: 100, armour: "soft", sight: 5, weapons: ["rifle"],
+         elite_weapons: ["rifle"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 5, underwater: 0, organic: 0),
+        (unit: "tank", hit_points: 300, armour: "plate", sight: 6, weapons: ["cannon"],
+         elite_weapons: ["cannon"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 5, underwater: 0, organic: 0),
+        (unit: "crawler", hit_points: 50, armour: "soft", sight: 2, weapons: [],
+         elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 5, underwater: 0, organic: 0),
+        (unit: "harvester", hit_points: 200, armour: "plate", sight: 3, weapons: [],
+         elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 5, underwater: 0, organic: 0),
     ],
     buildings: [
-        (building: "yard", hit_points: 500, armour: "concrete", sight: 4, weapons: []),
-        (building: "power", hit_points: 200, armour: "concrete", sight: 3, weapons: []),
-        (building: "refinery", hit_points: 300, armour: "concrete", sight: 3, weapons: []),
-        (building: "barracks", hit_points: 200, armour: "concrete", sight: 3, weapons: []),
-        (building: "factory", hit_points: 300, armour: "concrete", sight: 3, weapons: []),
-        (building: "fence", hit_points: 50, armour: "concrete", sight: 0, weapons: []),
-        (building: "turret", hit_points: 400, armour: "concrete", sight: 3, weapons: ["howitzer"]),
-        (building: "beacon", hit_points: 10, armour: "concrete", sight: 1, weapons: []),
-        (building: "flag", hit_points: 1, armour: "concrete", sight: 0, weapons: []),
+        (building: "yard", hit_points: 500, armour: "concrete", sight: 4, weapons: [],
+         elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 5, wall: 0),
+        (building: "power", hit_points: 200, armour: "concrete", sight: 3, weapons: [],
+         elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 5, wall: 0),
+        (building: "refinery", hit_points: 300, armour: "concrete", sight: 3, weapons: [],
+         elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 5, wall: 0),
+        (building: "barracks", hit_points: 200, armour: "concrete", sight: 3, weapons: [],
+         elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 5, wall: 0),
+        (building: "factory", hit_points: 300, armour: "concrete", sight: 3, weapons: [],
+         elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 5, wall: 0),
+        (building: "fence", hit_points: 50, armour: "concrete", sight: 0, weapons: [],
+         elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 5, wall: 0),
+        (building: "turret", hit_points: 400, armour: "concrete", sight: 3, weapons: ["howitzer"],
+         elite_weapons: ["howitzer"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 5, wall: 0),
+        (building: "beacon", hit_points: 10, armour: "concrete", sight: 1, weapons: [],
+         elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 5, wall: 0),
+        (building: "flag", hit_points: 1, armour: "concrete", sight: 0, weapons: [],
+         elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 5, wall: 0),
     ],
+    effects: [],
 )

@@ -1,30 +1,35 @@
 //! Immutable combat definitions loaded from RON (PLAN.md sections 5 and 7, M4; docs/DECISIONS.md
-//! D28).
+//! D28; schema version 2: docs/RA2_PARITY_PLAN.md sections 4.3 and 4.4, docs/DECISIONS.md R32).
 //!
-//! Combat file, schema version 1:
+//! Combat file, schema version 2:
 //!
 //! ```ron
 //! (
-//!     schema_version: 1,
+//!     schema_version: 2,
 //!     armour_classes: ["light", "heavy", "structure"],
 //!     warheads: [
-//!         (id: "ap", versus: [
+//!         (id: "ap", cell_spread: 77, percent_at_max: 50, wall: 1, wood: 1, versus: [
 //!             (armour: "light", percent: 50),
 //!             (armour: "heavy", percent: 100),
 //!             (armour: "structure", percent: 60),
 //!         ]),
 //!     ],
 //!     weapons: [
-//!         (id: "cannon", damage: 40, range: 1280, reload: 30, warhead: "ap",
-//!          projectile_speed: 160),
+//!         (id: "cannon", damage: 40, range: 1280, min_range: 0, reload: 30, burst: 1,
+//!          warhead: "ap", projectile_speed: 160, anti_air: 0, anti_ground: 1, scatter: 0),
 //!     ],
 //!     units: [
 //!         (unit: "light_tank", hit_points: 300, armour: "heavy", sight: 6,
-//!          weapons: ["cannon"]),
+//!          weapons: ["cannon"], elite_weapons: ["cannon"], air_range_bonus: 0,
+//!          land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
 //!     ],
 //!     buildings: [
 //!         (building: "construction_yard", hit_points: 1500, armour: "structure", sight: 5,
-//!          weapons: []),
+//!          weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0,
+//!          naval_targeting: 0, wall: 0),
+//!     ],
+//!     effects: [
+//!         (id: "nuke", damage: 600, warhead: "ap"),
 //!     ],
 //! )
 //! ```
@@ -36,6 +41,35 @@
 //! entry, so no unit or building is silently left without hit points, armour, or sight. Ranges are
 //! checked on the parsed values; the limits below keep every quantity the simulation derives from
 //! them inside its integer types (invariant I12) and bound the number of projectiles in flight.
+//!
+//! Since schema version 2 (RA3):
+//!
+//! * a warhead has `cell_spread` (the radius in subcells around its impact point within which it
+//!   damages; 0: only what it hits), `percent_at_max` (the percentage of its damage dealt at
+//!   that radius, falling linearly from 100 at the impact point), and as 1 or 0 `wall` (it
+//!   damages buildings that are walls) and `wood` (it damages trees);
+//! * a weapon has `min_range` (subcells; it does not fire at a target nearer than this),
+//!   `burst` (shots of one volley, [`BURST_GAP`] ticks apart, before it reloads), `anti_air` and
+//!   `anti_ground` (the layers its projectile may engage: aircraft, and everything on the ground
+//!   and at sea), and `scatter` (0 for an accurate weapon; otherwise the largest distance in
+//!   subcells, at the weapon's full range, between its target and the point its shot lands on);
+//! * a type lists up to two `weapons` (primary, secondary) and the `elite_weapons` that take
+//!   their places at elite rank, and has `air_range_bonus` (subcells added to the range of an
+//!   anti air weapon against aircraft), `land_targeting` (0: it attacks targets on land; 1: it
+//!   does not; 2: with its secondary weapon only) and `naval_targeting` (how it treats targets
+//!   on water: 0 none that are underwater; 1 underwater ones with its secondary; 2 only
+//!   underwater ones; 3 organic ones with its secondary; 4 all with its secondary; 5 all like
+//!   targets on land; 6 none);
+//! * a unit type is `underwater` and `organic` or not (1 or 0), and a building type is a `wall`
+//!   or not;
+//! * `effects` names the base damage and the warhead of area effects that are no weapon of a
+//!   type ([`Effect`]): each at most once. An effect that is not listed keeps the rule it had
+//!   before RA3 (damage that falls off with the distance in cells and ignores armour).
+//!
+//! Values that leave every rule of M4 as it was (the fixtures of M2 to M9): no spread and 100
+//! percent at the edge, `wall` and `wood` 1, no minimum range, a burst of 1, both layers, no
+//! scatter, the elite weapons equal to the weapons, no bonus, `land_targeting` 0,
+//! `naval_targeting` 5, 0 for `underwater`, `organic` and `wall`, and no effects.
 
 use std::path::Path;
 
@@ -47,19 +81,20 @@ use crate::economy_defs::MAX_BUILDING_TYPES;
 use crate::hash::Fnv1a64;
 
 /// The schema version of the combat file this crate reads.
-pub const COMBAT_SCHEMA_VERSION: i64 = 1;
+pub const COMBAT_SCHEMA_VERSION: i64 = 2;
 
 /// Largest number of armour classes.
 pub const MAX_ARMOUR_CLASSES: usize = 16;
 
 /// Largest number of warheads.
-pub const MAX_WARHEADS: usize = 32;
+pub const MAX_WARHEADS: usize = 64;
 
 /// Largest number of weapons.
-pub const MAX_WEAPONS: usize = 64;
+pub const MAX_WEAPONS: usize = 128;
 
-/// Largest number of weapons of one unit or building type.
-pub const MAX_WEAPONS_PER_TYPE: usize = 1;
+/// Largest number of weapons of one unit or building type: a primary and a secondary one, and as
+/// many elite weapons.
+pub const MAX_WEAPONS_PER_TYPE: usize = 2;
 
 /// Largest hit points of a unit or building type.
 pub const MAX_HIT_POINTS: i32 = 1_000_000;
@@ -78,22 +113,96 @@ pub const MAX_VERSUS_PERCENT: i32 = 1_000;
 /// to.
 pub const MIN_WEAPON_RANGE: u32 = 384;
 
-/// Largest weapon range in subcells: 16 cells.
-pub const MAX_WEAPON_RANGE: u32 = 4096;
+/// Largest weapon range in subcells: 30 cells.
+pub const MAX_WEAPON_RANGE: u32 = 7680;
 
 /// Longest reload time of a weapon in ticks (one minute).
 pub const MAX_RELOAD: u32 = 1200;
 
 /// Smallest speed of a travelling projectile in subcells per tick. A shot is fired only at a
-/// target within range, so a projectile flies at most `MAX_WEAPON_RANGE / MIN_PROJECTILE_SPEED`
-/// = 32 ticks, and a weapon has at most 32 projectiles in flight (docs/DECISIONS.md D28).
-pub const MIN_PROJECTILE_SPEED: u32 = 128;
+/// target within range (and the largest air range bonus), so a projectile flies at most
+/// `(MAX_WEAPON_RANGE + MAX_AIR_RANGE_BONUS) / MIN_PROJECTILE_SPEED` = 608 ticks, which bounds
+/// the projectiles a weapon has in flight (docs/DECISIONS.md D28, R32).
+pub const MIN_PROJECTILE_SPEED: u32 = 16;
 
 /// Largest speed of a travelling projectile in subcells per tick.
 pub const MAX_PROJECTILE_SPEED: u32 = 4096;
 
 /// Largest sight radius in cells.
 pub const MAX_SIGHT: u32 = 16;
+
+/// Largest spread of a warhead in subcells: 11 cells, the largest the original engine supports.
+pub const MAX_CELL_SPREAD: u32 = 2816;
+
+/// Largest number of shots in one volley of a weapon.
+pub const MAX_BURST: u32 = 8;
+
+/// Ticks between two shots of a volley (docs/RA2_PARITY_PLAN.md section 4.4; an assumption: the
+/// original waits 3 to 5 frames at random).
+pub const BURST_GAP: u32 = 5;
+
+/// Largest scatter of a weapon in subcells: 8 cells.
+pub const MAX_SCATTER: u32 = 2048;
+
+/// Largest air range bonus of a type in subcells: 8 cells.
+pub const MAX_AIR_RANGE_BONUS: u32 = 2048;
+
+/// Largest value of `land_targeting`.
+pub const MAX_LAND_TARGETING: u8 = 2;
+
+/// Largest value of `naval_targeting`.
+pub const MAX_NAVAL_TARGETING: u8 = 6;
+
+/// An area effect of `crate::special` that is no weapon of a unit or building type. With an entry
+/// in the combat file it is an impact of that entry's warhead and base damage
+/// (docs/RA2_PARITY_PLAN.md section 4.3).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum Effect {
+    /// The strike of the nuclear missile.
+    Nuke,
+    /// A bolt of the lightning storm.
+    Lightning,
+    /// The bomb a demolition specialist plants.
+    IvanBomb,
+    /// The charge a commando sets on a building.
+    C4,
+    /// A pulse of a radiation zone.
+    Radiation,
+}
+
+impl Effect {
+    /// Every effect, in the order of their hashes.
+    pub const ALL: [Effect; 5] = [
+        Effect::Nuke,
+        Effect::Lightning,
+        Effect::IvanBomb,
+        Effect::C4,
+        Effect::Radiation,
+    ];
+
+    /// The id of the effect in the combat file.
+    pub fn id(self) -> &'static str {
+        match self {
+            Effect::Nuke => "nuke",
+            Effect::Lightning => "lightning",
+            Effect::IvanBomb => "ivan_bomb",
+            Effect::C4 => "c4",
+            Effect::Radiation => "radiation",
+        }
+    }
+
+    fn index(self) -> usize {
+        self as usize
+    }
+}
+
+/// The impact of an [`Effect`].
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct EffectDef {
+    /// Base damage, from 1 to [`MAX_DAMAGE`].
+    pub damage: i32,
+    pub warhead: WarheadKind,
+}
 
 /// Index of an armour class in [`Definitions`](crate::Definitions).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -108,13 +217,23 @@ pub struct WarheadKind(pub u16);
 pub struct WeaponKind(pub u16);
 
 /// A warhead: the percentage of a weapon's base damage it deals against each armour class
-/// (PLAN.md section 5, equation 2).
+/// (PLAN.md section 5, equation 2), and how far around its impact point it damages
+/// (docs/RA2_PARITY_PLAN.md section 4.3).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct WarheadDef {
     pub id: String,
     /// Indexed by [`ArmourClass`]; one entry per armour class, each from 0 to
     /// [`MAX_VERSUS_PERCENT`].
     pub versus: Vec<i32>,
+    /// The radius in subcells around the impact point within which it damages, from 0 (only
+    /// what it hits) to [`MAX_CELL_SPREAD`].
+    pub cell_spread: u32,
+    /// The percentage of the damage dealt at `cell_spread` from the impact point, from 0 to 100.
+    pub percent_at_max: u32,
+    /// It damages buildings that are walls.
+    pub wall: bool,
+    /// It damages trees.
+    pub wood: bool,
 }
 
 /// A weapon.
@@ -125,13 +244,25 @@ pub struct WeaponDef {
     pub damage: i32,
     /// Range in subcells, from [`MIN_WEAPON_RANGE`] to [`MAX_WEAPON_RANGE`] (equation 1).
     pub range: u32,
-    /// Ticks between two shots, from 1 to [`MAX_RELOAD`].
+    /// It does not fire at a target nearer than this many subcells; below `range`.
+    pub min_range: u32,
+    /// Ticks between the last shot of a volley and the next volley, from 1 to [`MAX_RELOAD`].
     pub reload: u32,
+    /// Shots of one volley, [`BURST_GAP`] ticks apart, from 1 to [`MAX_BURST`].
+    pub burst: u32,
     pub warhead: WarheadKind,
     /// 0 for an instant weapon, whose damage is dealt in the tick it fires; otherwise the speed of
     /// its projectile in subcells per tick, from [`MIN_PROJECTILE_SPEED`] to
     /// [`MAX_PROJECTILE_SPEED`].
     pub projectile_speed: u32,
+    /// Its projectile may engage aircraft.
+    pub anti_air: bool,
+    /// Its projectile may engage what is on the ground or at sea. At least one of the two holds.
+    pub anti_ground: bool,
+    /// 0 for an accurate weapon. Otherwise its shot lands on a point up to
+    /// `scatter × distance / range` subcells from its target, and damages by the spread of its
+    /// warhead alone; at most [`MAX_SCATTER`].
+    pub scatter: u32,
 }
 
 /// The combat terms of a unit or building type.
@@ -142,8 +273,39 @@ pub struct CombatTerms {
     pub armour: ArmourClass,
     /// Sight radius in cells, from 0 (its own cells only) to [`MAX_SIGHT`] (equation 6).
     pub sight: u32,
-    /// At most one weapon ([`MAX_WEAPONS_PER_TYPE`]).
+    /// The primary weapon. A type without one has no weapon at all.
     pub weapon: Option<WeaponKind>,
+    /// The secondary weapon.
+    pub secondary: Option<WeaponKind>,
+    /// The weapons in the places of the primary and the secondary one at elite rank.
+    pub elite: [Option<WeaponKind>; 2],
+    /// Subcells added to the range of an anti air weapon against aircraft, at most
+    /// [`MAX_AIR_RANGE_BONUS`].
+    pub air_range_bonus: u32,
+    /// 0: it attacks targets on land; 1: it does not; 2: with its secondary weapon only.
+    pub land_targeting: u8,
+    /// How it treats targets on water: 0 none that are underwater; 1 underwater ones with its
+    /// secondary weapon; 2 only underwater ones; 3 organic ones with its secondary weapon; 4 all
+    /// with its secondary weapon; 5 all like targets on land; 6 none.
+    pub naval_targeting: u8,
+    /// A unit type that moves under water. Always false for a building type.
+    pub underwater: bool,
+    /// A unit type that is a living thing. Always false for a building type.
+    pub organic: bool,
+    /// A building type that is a wall: only warheads with `wall` damage it. Always false for a
+    /// unit type.
+    pub wall: bool,
+}
+
+impl CombatTerms {
+    /// The weapons in the places of the primary and the secondary one, at elite rank or below.
+    pub fn weapons(&self, elite: bool) -> [Option<WeaponKind>; 2] {
+        if elite {
+            self.elite
+        } else {
+            [self.weapon, self.secondary]
+        }
+    }
 }
 
 /// The combat part of [`Definitions`](crate::Definitions). Empty until match setup installs a
@@ -157,6 +319,8 @@ pub struct CombatDefinitions {
     pub(crate) units: Vec<Option<CombatTerms>>,
     /// Indexed by [`BuildingKind`](crate::BuildingKind).
     pub(crate) buildings: Vec<Option<CombatTerms>>,
+    /// Indexed as [`Effect::ALL`].
+    pub(crate) effects: [Option<EffectDef>; 5],
 }
 
 impl CombatDefinitions {
@@ -173,13 +337,28 @@ impl CombatDefinitions {
                     hasher.write(&terms.hit_points.to_le_bytes());
                     hasher.write(&terms.armour.0.to_le_bytes());
                     hasher.write_u32(terms.sight);
-                    match terms.weapon {
-                        None => hasher.write(&[0]),
-                        Some(weapon) => {
-                            hasher.write(&[1]);
-                            hasher.write(&weapon.0.to_le_bytes());
+                    for weapon in [
+                        terms.weapon,
+                        terms.secondary,
+                        terms.elite[0],
+                        terms.elite[1],
+                    ] {
+                        match weapon {
+                            None => hasher.write(&[0]),
+                            Some(weapon) => {
+                                hasher.write(&[1]);
+                                hasher.write(&weapon.0.to_le_bytes());
+                            }
                         }
                     }
+                    hasher.write_u32(terms.air_range_bonus);
+                    hasher.write(&[
+                        terms.land_targeting,
+                        terms.naval_targeting,
+                        u8::from(terms.underwater),
+                        u8::from(terms.organic),
+                        u8::from(terms.wall),
+                    ]);
                 }
             }
         }
@@ -194,20 +373,37 @@ impl CombatDefinitions {
             for percent in &warhead.versus {
                 hasher.write(&percent.to_le_bytes());
             }
+            hasher.write_u32(warhead.cell_spread);
+            hasher.write_u32(warhead.percent_at_max);
+            hasher.write(&[u8::from(warhead.wall), u8::from(warhead.wood)]);
         }
         hasher.write_u64(self.weapons.len() as u64);
         for weapon in &self.weapons {
             text(hasher, &weapon.id);
             hasher.write(&weapon.damage.to_le_bytes());
             hasher.write_u32(weapon.range);
+            hasher.write_u32(weapon.min_range);
             hasher.write_u32(weapon.reload);
+            hasher.write_u32(weapon.burst);
             hasher.write(&weapon.warhead.0.to_le_bytes());
             hasher.write_u32(weapon.projectile_speed);
+            hasher.write(&[u8::from(weapon.anti_air), u8::from(weapon.anti_ground)]);
+            hasher.write_u32(weapon.scatter);
         }
         for list in [&self.units, &self.buildings] {
             hasher.write_u64(list.len() as u64);
             for entry in list {
                 terms(hasher, entry);
+            }
+        }
+        for effect in &self.effects {
+            match effect {
+                None => hasher.write(&[0]),
+                Some(effect) => {
+                    hasher.write(&[1]);
+                    hasher.write(&effect.damage.to_le_bytes());
+                    hasher.write(&effect.warhead.0.to_le_bytes());
+                }
             }
         }
     }
@@ -219,6 +415,10 @@ static VERSUS_SHAPE: Shape = Shape::Struct(&[("armour", Shape::Str), ("percent",
 
 static WARHEAD_SHAPE: Shape = Shape::Struct(&[
     ("id", Shape::Str),
+    ("cell_spread", Shape::Int),
+    ("percent_at_max", Shape::Int),
+    ("wall", Shape::Int),
+    ("wood", Shape::Int),
     (
         "versus",
         Shape::List {
@@ -232,9 +432,14 @@ static WEAPON_SHAPE: Shape = Shape::Struct(&[
     ("id", Shape::Str),
     ("damage", Shape::Int),
     ("range", Shape::Int),
+    ("min_range", Shape::Int),
     ("reload", Shape::Int),
+    ("burst", Shape::Int),
     ("warhead", Shape::Str),
     ("projectile_speed", Shape::Int),
+    ("anti_air", Shape::Int),
+    ("anti_ground", Shape::Int),
+    ("scatter", Shape::Int),
 ]);
 
 const WEAPON_LIST_SHAPE: Shape = Shape::List {
@@ -248,6 +453,12 @@ static UNIT_TERMS_SHAPE: Shape = Shape::Struct(&[
     ("armour", Shape::Str),
     ("sight", Shape::Int),
     ("weapons", WEAPON_LIST_SHAPE),
+    ("elite_weapons", WEAPON_LIST_SHAPE),
+    ("air_range_bonus", Shape::Int),
+    ("land_targeting", Shape::Int),
+    ("naval_targeting", Shape::Int),
+    ("underwater", Shape::Int),
+    ("organic", Shape::Int),
 ]);
 
 static BUILDING_TERMS_SHAPE: Shape = Shape::Struct(&[
@@ -256,6 +467,17 @@ static BUILDING_TERMS_SHAPE: Shape = Shape::Struct(&[
     ("armour", Shape::Str),
     ("sight", Shape::Int),
     ("weapons", WEAPON_LIST_SHAPE),
+    ("elite_weapons", WEAPON_LIST_SHAPE),
+    ("air_range_bonus", Shape::Int),
+    ("land_targeting", Shape::Int),
+    ("naval_targeting", Shape::Int),
+    ("wall", Shape::Int),
+]);
+
+static EFFECT_SHAPE: Shape = Shape::Struct(&[
+    ("id", Shape::Str),
+    ("damage", Shape::Int),
+    ("warhead", Shape::Str),
 ]);
 
 static COMBAT_FILE_SHAPE: Shape = Shape::Struct(&[
@@ -298,6 +520,13 @@ static COMBAT_FILE_SHAPE: Shape = Shape::Struct(&[
             max: MAX_BUILDING_TYPES,
         },
     ),
+    (
+        "effects",
+        Shape::List {
+            entry: &EFFECT_SHAPE,
+            max: Effect::ALL.len(),
+        },
+    ),
 ]);
 
 /// The combat file as `ron` reads it. Integers are read as `i64`, the widest type the checker
@@ -311,12 +540,25 @@ struct CombatFile {
     weapons: Vec<WeaponEntry>,
     units: Vec<UnitTermsEntry>,
     buildings: Vec<BuildingTermsEntry>,
+    effects: Vec<EffectEntry>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct EffectEntry {
+    id: String,
+    damage: i64,
+    warhead: String,
 }
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct WarheadEntry {
     id: String,
+    cell_spread: i64,
+    percent_at_max: i64,
+    wall: i64,
+    wood: i64,
     versus: Vec<VersusEntry>,
 }
 
@@ -333,9 +575,14 @@ struct WeaponEntry {
     id: String,
     damage: i64,
     range: i64,
+    min_range: i64,
     reload: i64,
+    burst: i64,
     warhead: String,
     projectile_speed: i64,
+    anti_air: i64,
+    anti_ground: i64,
+    scatter: i64,
 }
 
 #[derive(Deserialize)]
@@ -346,6 +593,12 @@ struct UnitTermsEntry {
     armour: String,
     sight: i64,
     weapons: Vec<String>,
+    elite_weapons: Vec<String>,
+    air_range_bonus: i64,
+    land_targeting: i64,
+    naval_targeting: i64,
+    underwater: i64,
+    organic: i64,
 }
 
 #[derive(Deserialize)]
@@ -356,6 +609,11 @@ struct BuildingTermsEntry {
     armour: String,
     sight: i64,
     weapons: Vec<String>,
+    elite_weapons: Vec<String>,
+    air_range_bonus: i64,
+    land_targeting: i64,
+    naval_targeting: i64,
+    wall: i64,
 }
 
 /// Loads and validates the combat file at `path` against the unit types `units` and the building
@@ -443,40 +701,115 @@ fn unique_names<'a>(
     Ok(seen)
 }
 
+/// `value` as a flag: 1 or 0.
+fn flag(field: &str, value: i64) -> Result<bool, Problem> {
+    match value {
+        0 => Ok(false),
+        1 => Ok(true),
+        _ => Err(invalid(field.to_owned(), value, "0 or 1")),
+    }
+}
+
+/// The fields of an entry of `units` or `buildings` that both have.
+struct TermsEntry<'a> {
+    hit_points: i64,
+    armour: &'a str,
+    sight: i64,
+    weapons: &'a [String],
+    elite_weapons: &'a [String],
+    air_range_bonus: i64,
+    land_targeting: i64,
+    naval_targeting: i64,
+    /// `underwater`, `organic` and `wall`, each with its field name; a unit entry has the first
+    /// two and a building entry the third.
+    underwater: Option<i64>,
+    organic: Option<i64>,
+    wall: Option<i64>,
+}
+
 /// Validates one entry of `units` or `buildings`.
 fn terms(
     field: &str,
-    hit_points: i64,
-    armour: &str,
-    sight: i64,
-    weapons: &[String],
+    entry: &TermsEntry<'_>,
     armour_classes: &[String],
     weapon_ids: &[String],
 ) -> Result<CombatTerms, Problem> {
     let at = |name: &str| format!("{field}.{name}");
-    let hit_points = ranged(&at("hit_points"), hit_points, 1, MAX_HIT_POINTS, "")?;
+    let hit_points = ranged(&at("hit_points"), entry.hit_points, 1, MAX_HIT_POINTS, "")?;
     let armour = ArmourClass(reference(
         at("armour"),
         "armour class",
         armour_classes,
-        armour,
+        entry.armour,
     )?);
-    let sight = ranged(&at("sight"), sight, 0, MAX_SIGHT, " cells")?;
-    // The schema admits at most `MAX_WEAPONS_PER_TYPE` = 1 entry.
-    let weapon = match weapons.first() {
-        None => None,
-        Some(id) => Some(WeaponKind(reference(
-            format!("{field}.weapons[0]"),
-            "weapon",
-            weapon_ids,
-            id,
-        )?)),
+    let sight = ranged(&at("sight"), entry.sight, 0, MAX_SIGHT, " cells")?;
+    // The schema admits at most `MAX_WEAPONS_PER_TYPE` = 2 entries per list.
+    let slots = |list: &str, ids: &[String]| -> Result<[Option<WeaponKind>; 2], Problem> {
+        let mut slots = [None; 2];
+        for (index, (slot, id)) in slots.iter_mut().zip(ids).enumerate() {
+            *slot = Some(WeaponKind(reference(
+                format!("{field}.{list}[{index}]"),
+                "weapon",
+                weapon_ids,
+                id,
+            )?));
+        }
+        Ok(slots)
+    };
+    let [weapon, secondary] = slots("weapons", entry.weapons)?;
+    let elite = slots("elite_weapons", entry.elite_weapons)?;
+    if weapon.is_none() && elite[0].is_some() {
+        return Err(invalid(
+            at("elite_weapons"),
+            format!("{} weapons", entry.elite_weapons.len()),
+            "no elite weapon for a type without a weapon",
+        ));
+    }
+    if weapon.is_some() && elite[0].is_none() {
+        return Err(invalid(
+            at("elite_weapons"),
+            "an empty list",
+            "the weapons of an armed type at elite rank",
+        ));
+    }
+    let air_range_bonus = ranged(
+        &at("air_range_bonus"),
+        entry.air_range_bonus,
+        0,
+        MAX_AIR_RANGE_BONUS,
+        " subcells",
+    )?;
+    let land_targeting = ranged(
+        &at("land_targeting"),
+        entry.land_targeting,
+        0,
+        MAX_LAND_TARGETING,
+        "",
+    )?;
+    let naval_targeting = ranged(
+        &at("naval_targeting"),
+        entry.naval_targeting,
+        0,
+        MAX_NAVAL_TARGETING,
+        "",
+    )?;
+    let optional = |name: &str, value: Option<i64>| match value {
+        Some(value) => flag(&at(name), value),
+        None => Ok(false),
     };
     Ok(CombatTerms {
         hit_points,
         armour,
         sight,
         weapon,
+        secondary,
+        elite,
+        air_range_bonus,
+        land_targeting,
+        naval_targeting,
+        underwater: optional("underwater", entry.underwater)?,
+        organic: optional("organic", entry.organic)?,
+        wall: optional("wall", entry.wall)?,
     })
 }
 
@@ -554,9 +887,20 @@ fn validate(
                 })
             })
             .collect::<Result<Vec<i32>, Problem>>()?;
+        let at = |name: &str| format!("warheads[{index}].{name}");
         warheads.push(WarheadDef {
             id: entry.id.clone(),
             versus,
+            cell_spread: ranged(
+                &at("cell_spread"),
+                entry.cell_spread,
+                0,
+                MAX_CELL_SPREAD,
+                " subcells",
+            )?,
+            percent_at_max: ranged(&at("percent_at_max"), entry.percent_at_max, 0, 100u32, " %")?,
+            wall: flag(&at("wall"), entry.wall)?,
+            wood: flag(&at("wood"), entry.wood)?,
         });
     }
 
@@ -572,7 +916,18 @@ fn validate(
             MAX_WEAPON_RANGE,
             " subcells",
         )?;
+        let min_range = ranged(&at("min_range"), entry.min_range, 0, MAX_WEAPON_RANGE, "")
+            .ok()
+            .filter(|&min| min < range)
+            .ok_or_else(|| {
+                invalid(
+                    at("min_range"),
+                    entry.min_range,
+                    format!("0 to {} subcells, below the range", range - 1),
+                )
+            })?;
         let reload = ranged(&at("reload"), entry.reload, 1, MAX_RELOAD, " ticks")?;
+        let burst = ranged(&at("burst"), entry.burst, 1, MAX_BURST, " shots")?;
         let warhead = WarheadKind(reference(
             at("warhead"),
             "warhead",
@@ -590,13 +945,28 @@ fn validate(
                 " subcells per tick, or 0 for an instant weapon",
             )?
         };
+        let anti_air = flag(&at("anti_air"), entry.anti_air)?;
+        let anti_ground = flag(&at("anti_ground"), entry.anti_ground)?;
+        if !anti_air && !anti_ground {
+            return Err(invalid(
+                at("anti_ground"),
+                entry.anti_ground,
+                "1 for a weapon whose anti_air is 0: a weapon engages aircraft, the ground, or both",
+            ));
+        }
+        let scatter = ranged(&at("scatter"), entry.scatter, 0, MAX_SCATTER, " subcells")?;
         weapons.push(WeaponDef {
             id: entry.id.clone(),
             damage,
             range,
+            min_range,
             reload,
+            burst,
             warhead,
             projectile_speed,
+            anti_air,
+            anti_ground,
+            scatter,
         });
     }
 
@@ -617,10 +987,19 @@ fn validate(
         }
         unit_terms[kind] = Some(terms(
             &field,
-            entry.hit_points,
-            &entry.armour,
-            entry.sight,
-            &entry.weapons,
+            &TermsEntry {
+                hit_points: entry.hit_points,
+                armour: &entry.armour,
+                sight: entry.sight,
+                weapons: &entry.weapons,
+                elite_weapons: &entry.elite_weapons,
+                air_range_bonus: entry.air_range_bonus,
+                land_targeting: entry.land_targeting,
+                naval_targeting: entry.naval_targeting,
+                underwater: Some(entry.underwater),
+                organic: Some(entry.organic),
+                wall: None,
+            },
             &armour_classes,
             &weapon_ids,
         )?);
@@ -642,10 +1021,19 @@ fn validate(
         }
         building_terms[kind] = Some(terms(
             &field,
-            entry.hit_points,
-            &entry.armour,
-            entry.sight,
-            &entry.weapons,
+            &TermsEntry {
+                hit_points: entry.hit_points,
+                armour: &entry.armour,
+                sight: entry.sight,
+                weapons: &entry.weapons,
+                elite_weapons: &entry.elite_weapons,
+                air_range_bonus: entry.air_range_bonus,
+                land_targeting: entry.land_targeting,
+                naval_targeting: entry.naval_targeting,
+                underwater: None,
+                organic: None,
+                wall: Some(entry.wall),
+            },
             &armour_classes,
             &weapon_ids,
         )?);
@@ -666,11 +1054,41 @@ fn validate(
         }
     }
 
+    let mut effects = [None; 5];
+    for (index, entry) in file.effects.iter().enumerate() {
+        let at = |name: &str| format!("effects[{index}].{name}");
+        let Some(effect) = Effect::ALL
+            .into_iter()
+            .find(|effect| effect.id() == entry.id)
+        else {
+            let known: Vec<&str> = Effect::ALL.iter().map(|effect| effect.id()).collect();
+            return Err(invalid(
+                at("id"),
+                format!("{:?}", entry.id),
+                format!("one of {}", known.join(", ")),
+            ));
+        };
+        let slot = &mut effects[effect.index()];
+        if slot.is_some() {
+            return Err((at("id"), DataErrorKind::DuplicateId(entry.id.clone())));
+        }
+        *slot = Some(EffectDef {
+            damage: ranged(&at("damage"), entry.damage, 1, MAX_DAMAGE, "")?,
+            warhead: WarheadKind(reference(
+                at("warhead"),
+                "warhead",
+                &warhead_ids,
+                &entry.warhead,
+            )?),
+        });
+    }
+
     Ok(CombatDefinitions {
         armour_classes,
         warheads,
         weapons,
         units: unit_terms,
         buildings: building_terms,
+        effects,
     })
 }
