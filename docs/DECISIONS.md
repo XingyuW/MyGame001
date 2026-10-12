@@ -2095,9 +2095,10 @@ length is governed by that pace, is rescaled by 2. (Infantry: a GI took 80 ticks
 
 **Measured** (`m14_duels -- full`, the same 756 matches as the test; ticks; "old limit" is
 36,000 x span / 128). Before: `docs/validation/ra2-parity/ra1/10-duels.log`. After:
-`docs/validation/ra2-parity/ra2/10-duels.log`, whose numbers the status entry of RA2 repeats.
+`docs/validation/ra2-parity/ra2/10-duels.log` (the run is deterministic: a run before the
+validation gave the same ticks).
 
-| | Before RA2 | After RA2 (first run) |
+| | Before RA2 | After RA2 |
 |---|---|---|
 | Length over the old limit: median, 90th percentile, longest | 0.15, 0.34, 0.86 | 0.22, 0.49, 1.49 |
 | Matches over the old limit | 0 | 5 |
