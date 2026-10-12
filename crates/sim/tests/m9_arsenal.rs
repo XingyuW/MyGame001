@@ -1,6 +1,6 @@
 //! Actual command/schedule production and specialist paths, using the legacy ruleset fixture (the
 //! data shipped before the RA2 parity programme, `tests/fixtures/data/legacy`; docs/DECISIONS.md
-//! R9).
+//! R15).
 use bevy_app::App;
 use bevy_ecs::{entity::Entity, message::Messages};
 use sim::*;

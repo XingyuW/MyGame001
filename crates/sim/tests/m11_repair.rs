@@ -1,5 +1,5 @@
 //! Building repair (`Command::RepairBuilding`): hit points restored in paid steps, with the
-//! legacy ruleset fixture (`tests/fixtures/data/legacy`; docs/DECISIONS.md R9).
+//! legacy ruleset fixture (`tests/fixtures/data/legacy`; docs/DECISIONS.md R15).
 use bevy_app::App;
 use bevy_ecs::{entity::Entity, message::Messages};
 use sim::*;
