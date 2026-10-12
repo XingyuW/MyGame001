@@ -12,6 +12,181 @@
 | M7: Content, balance, performance, and packaging | **Reviewed**: review 1 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 P0, 0 P1, 6 P2); merged into `main`. Awaiting user verification for `m7-approved` | `milestone/m7` | `m7-reviewed` |
 | M8: Visual polish first | **Reviewed**: review 2 GO WITH DOCUMENTED NON-BLOCKING DEBT (0 new P0/P1/P2), review 1 ownership-color regression closed; merged into `main`. Visual quality requires user verification for `m8-approved` | `milestone/m8` | `m8-reviewed` |
 
+## RA2 parity programme (from 2026-10-11; `docs/prompts/RA2_PARITY_PROMPT.md`)
+
+One run on the branch `ra2-parity`, milestones RA0 to RA9, gated by the validation commands, with
+one independent review at the end. Plan: `docs/RA2_PARITY_PLAN.md`. Decisions: `docs/DECISIONS.md`
+from R1. Validation logs: `docs/validation/ra2-parity/<milestone>/`. Entries are in order of
+completion. No milestone below is reviewed or approved until the final review says so.
+
+### RA0: baseline and plan (2026-10-12)
+
+**What was done.**
+- Branch `ra2-parity` created from `main` at `8230a95`; the uncommitted work found there (81
+  modified and 79 untracked paths: the unified arsenal, HD art, controls, several enemies, game
+  speed, 21 maps, documents, screenshots) was validated and committed unchanged in the commits
+  `RA0 baseline: ...`. Nothing was discarded, reset or stashed.
+- Reference `rules.ini` and `art.ini` obtained outside the repository; provenance and hashes in
+  DECISIONS R2.
+- Every row of sections 2 to 12 of the gap analysis reconciled against the code and the ini
+  (plan section 7 and appendices A to C): 135 of 139 claims about this game confirmed, 4 already
+  different; all 72 table rows of sections 7 and 8 confirmed on both sides; 3 of 27 prose claims
+  of those sections already different and 1 not verifiable. The RA2 side needed corrections that
+  the plan adopts (per building `Adjacent`, `Powered`, no `Firepower` key in the difficulty
+  sections, only MCVs are `Crewed`, `GrowthRate` unused, buildings are not queued).
+- Engine rules that the ini does not define researched with sources and confidence labels (plan
+  appendix D); equations in plan section 4.
+- The plan (`docs/RA2_PARITY_PLAN.md`) and PLAN.md section 14.
+
+**Baseline fixes** (needed for the validation commands to exit 0 before any change to the game):
+1. `docs/DECISIONS.md` ended with a blank line, which `git diff --check` rejects; removed.
+2. `m7_soak` failed on two of 260 configurations with a rejected placement that D43 allows and
+   the end to end tests accept; its rule now accepts it (R8 item 3).
+3. `m7_soak` took about three hours since the maps were doubled; it now plays its configurations
+   on all cores, with per thread accounting in its budget allocator (R8 items 1 and 2).
+No game rule, data file or test was changed.
+
+**Validation** (`docs/validation/ra2-parity/ra0-baseline/`; `first-run/` holds the logs of the
+first attempt, in which commands 1 and 3 to 8 passed, 2 failed on the blank line and 9 was
+stopped):
+
+| # | Command | Exit | Result |
+|---|---|---|---|
+| 1 | `cargo fmt --all -- --check` | 0 | |
+| 2 | `git diff --check` | 0 | after baseline fix 1 |
+| 3 | `cargo clippy --workspace --all-targets -- -D warnings` | 0 | |
+| 4 | `cargo test --workspace --release` | 0 | **529 passed, 0 failed, 0 ignored** (1,420 s) |
+| 5 | `cargo build --release -p game` | 0 | |
+| 6 | `cargo run --release -p game -- --smoke-test 600` | 0 | 600 frames |
+| 7 | `cargo run -p game -- --smoke-test 600` | 0 | 600 frames |
+| 8 | `cargo run --release -p sim --example m7_benchmark` | 0 | mean tick 0.210 ms, longest 0.961 ms (budget 5 ms mean) |
+| 9 | `cargo run --release -p sim --example m7_soak` | 0 | 260 configurations, 18,720,000 ticks, 1,894 s, peak heap 207 MiB of 1,024, after baseline fixes 2 and 3 |
+| 10 | `cargo run --release -p sim --example m14_duels -- full` | 0 | 756 matches, 756 ended, the slowest in tick 126,125 (547 s) |
+| 11 | `sh scripts/package_macos.sh` | 0 | second attempt; the first failed when the display was removed after 206 frames ("Monitor removed"), so the validation script now keeps the display awake |
+
+The commands ran on one unchanged tree in three invocations (9 alone; 1 to 8 and 10; 11 again).
+
+**Assumptions.** The reference rules.ini is that of patch 1.006 (not proven, R2). Assumptions of
+the rules research are labelled in plan section 4 and appendix D.
+
+**Decisions.** R1 fixed decisions; R2 provenance; R3 build directory; R4 map growth becomes an
+option, default off; R5 end to end matches pair sides; R7 speed conversion; R8 soak.
+
+**Debt.** The soak's reported peak heap is now that of ten matches at once, so it no longer shows
+the heap of one match. `docs/screenshots/` (477 MB of captures) is committed as found.
+
+**Requires user verification.** Nothing new in RA0. Decision R4 (map growth off by default) and
+R7 (units move at RA2's nominal speed, slower than before) change what the user asked for or was
+used to and are repeated in the final report.
+
+## Repair, aircraft overflight, new music and distinct silhouettes (2026-10-06)
+
+Working-tree follow-up (decisions: "Building repair, aircraft overflight, readable silhouettes"
+and "Battle music and weapon sounds" in `DECISIONS.md`):
+- building repair: `RepairBuilding` toggles a paid repair (a full repair costs a quarter of the
+  price, 20 s from ruin), sidebar Repair button and `K` repair mode, a wrench over buildings under
+  repair; the computer players do not repair yet;
+- aircraft hold cells in their own occupancy layer, so they fly over ground and naval units and
+  are never blocked by them (nor block them);
+- a new original 35 s battle track and punchier gun, cannon and explosion sounds;
+- every ground vehicle has its own silhouette and every infantry type its own uniform and props
+  (Blender re-render of 38 units), cameos are cropped to the miniature, and hovering a unit or
+  building names it with its owner and health.
+
+Validation: formatting and strict workspace Clippy pass; `cargo test --workspace --release
+--no-fail-fast` gives **485 passed, 0 failed, 0 ignored** (16 minutes, log in
+`docs/validation/distinct/`), including new repair, overflight, cameo, hover-label and line-up
+tests, the HD team-paint check of every facing, and 432 AI matches on 12 maps. Sprite evidence:
+`docs/screenshots/distinct/` (before/after sheets, game-scale line-up composed offline). The
+native capture run produced only black frames because the Mac's display was asleep or locked, so
+the new visual-review scene (`distinct-roster.png`) still needs a native run. Sound, art and the
+feel of repair require user verification. Nothing is committed or tagged.
+
+## Four more skirmish maps (2026-10-06)
+
+Working-tree follow-up (decisions: "Four more painted maps" in `DECISIONS.md`): `steel_harbor`
+(128 × 128, whole-map city and harbour), `glacier_pass` (120 × 120, valleys and a snowy massif
+with passes and a glacial lake), `red_canyon` (96 × 96, desert canyons around a ruined town) and
+`jungle_delta` (128 × 112, tropical delta around a lagoon), six starts each; the menu now offers
+12 maps. Top-down previews and native captures are in `docs/screenshots/new-maps/`.
+
+Validation: `tests/m7_maps.rs` 5/5; `sim` `m6_match` 15/15 and `m6_ai` 11/11 (release, every
+shipped map); every faction and difficulty pairing on the new maps (144 matches) ends with a
+winner, and six-player free-for-alls end on each new map. Full release runs: `m6_production_matches`
+2/2 (432 matches on 12 maps, 725 s), `m10_unlocks_and_enemies` 5/5, `m7_maps` 5/5; strict
+workspace Clippy passes. Feel and balance of the new maps require user verification.
+
+## RA2 faction architecture and large environment maps (2026-10-05)
+
+Working-tree follow-up on top of the items below (decisions: "Large maps with environments and
+RA2 faction architecture" in `DECISIONS.md`):
+- buildings remodelled with RA2-inspired landmark silhouettes and Allied/Soviet material sets;
+  ships, aircraft and signature tanks remodelled;
+- an optional presentation-only `look` tile property drives terrain rendering (snow, desert,
+  pavement, city blocks, towers, bridges, palms, snowy pines, mesas, adobe), replacing the
+  dimension-keyed layout guess;
+- five large mixed-environment maps (112 to 128 cells a side, six starts each);
+- computer armies scale with map size and flank on large maps; the AI match test's tick limit
+  scales with the map.
+
+Validation: formatting and strict workspace Clippy pass; `cargo test --workspace --release
+--no-fail-fast` gives **475 passed, 0 failed, 0 ignored** (10.5 minutes; the shipped-AI match test
+now plays 288 matches on 8 maps and dominates the time); the HD team-paint test passes for every
+unit facing and building; the release 600-frame smoke run passes (84/84 sidebar items, only the
+documented shutdown Window Id warning). Native captures of bases, combat and a revealed tour of each
+large map are in `docs/screenshots/environments/`. Benchmark, soak and packaging were not rerun.
+Visual fidelity and the feel of the large maps require user verification. Nothing is committed or
+tagged.
+
+## Camera, unlocks, targeting, game speed and multiple enemies (2026-10-05)
+
+Working-tree follow-up on top of the items below:
+- edge scrolling that works at the top and bottom on macOS;
+- the restored faction units, with every unlock path reachable and an "unlock all" option;
+- a red attack preview before the click;
+- game speed from 0.5× to 4×;
+- skirmish against up to 5 independent AI enemies with per-player colours.
+
+See [the report](SKIRMISH_FOLLOWUP.md) for root causes, changed systems and limitations.
+Validation:
+- formatting and strict Clippy pass;
+- `cargo test --workspace --release --no-fail-fast` gives **473 passed, 0 failed**, including the
+  108 shipped AI matches and new 4–6 player free-for-alls on every map;
+- debug and release 600-frame native smoke runs pass, with 3 AI enemies, unlock-all and a 4×
+  match with pause.
+
+Hands-on macOS feel and balance with many enemies require user verification. Nothing is committed
+or tagged.
+
+## RTS controls and battlefield follow-up (2026-10-05)
+
+Working-tree improvements cover continuous anchored camera scrolling, visible-body selection,
+compact command UI, remembered mining fields, human-only Super Me, selectable team colors and
+shared visual/navigation terrain layouts. Existing M9/HD changes are preserved.
+
+See [the implementation and validation report](RTS_IMPROVEMENTS.md) for scope, production-path
+coverage, screenshots, retained artifacts and manual verification limits. The complete workspace
+suite passed 451 tests, including 108 AI matches; the additional all-HD ownership check also
+passed. Final native package and debug smoke runs pass with menu/restart bonus-isolation checks.
+No approval milestone, commit or tag is claimed.
+
+## M9 unified construction and production (2026-10-05)
+
+Implemented in the working tree: 72 combined Allied/Soviet RA2 entries under the four persistent
+Buildings, Armory, Infantry and Vehicles tabs. Reuses the existing queues, commands, economy,
+combat, navigation, fog and AI architecture. Adds terrain domains, specialist actions, carriers,
+transport/MCV deployment and four charged strategic abilities.
+
+The [implementation and validation report](CONSTRUCTION_SYSTEM.md) contains the exact catalogue,
+costs, producers, prerequisites, changed systems, acceptance evidence and simplified RA2 mechanics.
+Validation: **439 tests passed**, formatting and clippy passed, release build and both 600-frame
+smoke tests passed. With arsenal enabled, the benchmark measured 0.263 ms mean / 1.225 ms maximum
+ticks; the deterministic soak passed 3,168,000 ticks with 1.8 MiB peak heap.
+
+Native renderer captures: `docs/screenshots/m9`. Visual quality, audio and game balance require
+user verification. This work has not been independently reviewed, committed or tagged.
+
+
 ## M0 implementation report (2026-10-03)
 
 ### Validation commands (PLAN.md section 9)

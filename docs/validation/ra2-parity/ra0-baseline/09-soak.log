@@ -1,0 +1,525 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 2.04s
+     Running `target/release/examples/m7_soak`
+played 7 of 260: shipped demo: meridian against vanguard, both easy
+played 1 of 260: shipped demo: vanguard against vanguard, both easy
+played 10 of 260: shipped demo: meridian against meridian, both easy
+played 4 of 260: shipped demo: vanguard against meridian, both easy
+played 9 of 260: shipped demo: meridian against vanguard, both hard
+played 8 of 260: shipped demo: meridian against vanguard, both normal
+played 2 of 260: shipped demo: vanguard against vanguard, both normal
+played 6 of 260: shipped demo: vanguard against meridian, both hard
+played 3 of 260: shipped demo: vanguard against vanguard, both hard
+played 5 of 260: shipped demo: vanguard against meridian, both normal
+played 13 of 260: shipped crossroads: vanguard against vanguard, both easy
+played 16 of 260: shipped crossroads: vanguard against meridian, both easy
+played 11 of 260: shipped demo: meridian against meridian, both normal
+played 19 of 260: shipped crossroads: meridian against vanguard, both easy
+played 14 of 260: shipped crossroads: vanguard against vanguard, both normal
+played 15 of 260: shipped crossroads: vanguard against vanguard, both hard
+played 12 of 260: shipped demo: meridian against meridian, both hard
+played 17 of 260: shipped crossroads: vanguard against meridian, both normal
+played 18 of 260: shipped crossroads: vanguard against meridian, both hard
+played 20 of 260: shipped crossroads: meridian against vanguard, both normal
+played 21 of 260: shipped crossroads: meridian against vanguard, both hard
+played 25 of 260: shipped riverlands: vanguard against vanguard, both easy
+played 22 of 260: shipped crossroads: meridian against meridian, both easy
+played 28 of 260: shipped riverlands: vanguard against meridian, both easy
+played 27 of 260: shipped riverlands: vanguard against vanguard, both hard
+played 24 of 260: shipped crossroads: meridian against meridian, both hard
+played 26 of 260: shipped riverlands: vanguard against vanguard, both normal
+played 23 of 260: shipped crossroads: meridian against meridian, both normal
+played 30 of 260: shipped riverlands: vanguard against meridian, both hard
+played 29 of 260: shipped riverlands: vanguard against meridian, both normal
+played 31 of 260: shipped riverlands: meridian against vanguard, both easy
+played 33 of 260: shipped riverlands: meridian against vanguard, both hard
+played 34 of 260: shipped riverlands: meridian against meridian, both easy
+played 32 of 260: shipped riverlands: meridian against vanguard, both normal
+played 36 of 260: shipped riverlands: meridian against meridian, both hard
+played 35 of 260: shipped riverlands: meridian against meridian, both normal
+played 40 of 260: shipped liberty_bay: vanguard against meridian, both easy
+played 37 of 260: shipped liberty_bay: vanguard against vanguard, both easy
+played 43 of 260: shipped liberty_bay: meridian against vanguard, both easy
+played 46 of 260: shipped liberty_bay: meridian against meridian, both easy
+played 38 of 260: shipped liberty_bay: vanguard against vanguard, both normal
+played 39 of 260: shipped liberty_bay: vanguard against vanguard, both hard
+played 41 of 260: shipped liberty_bay: vanguard against meridian, both normal
+played 44 of 260: shipped liberty_bay: meridian against vanguard, both normal
+played 45 of 260: shipped liberty_bay: meridian against vanguard, both hard
+played 42 of 260: shipped liberty_bay: vanguard against meridian, both hard
+played 49 of 260: shipped frostline: vanguard against vanguard, both easy
+played 50 of 260: shipped frostline: vanguard against vanguard, both normal
+played 52 of 260: shipped frostline: vanguard against meridian, both easy
+played 55 of 260: shipped frostline: meridian against vanguard, both easy
+played 47 of 260: shipped liberty_bay: meridian against meridian, both normal
+played 48 of 260: shipped liberty_bay: meridian against meridian, both hard
+played 53 of 260: shipped frostline: vanguard against meridian, both normal
+played 56 of 260: shipped frostline: meridian against vanguard, both normal
+played 51 of 260: shipped frostline: vanguard against vanguard, both hard
+played 54 of 260: shipped frostline: vanguard against meridian, both hard
+played 58 of 260: shipped frostline: meridian against meridian, both easy
+played 59 of 260: shipped frostline: meridian against meridian, both normal
+played 61 of 260: shipped oasis_gulf: vanguard against vanguard, both easy
+played 57 of 260: shipped frostline: meridian against vanguard, both hard
+played 62 of 260: shipped oasis_gulf: vanguard against vanguard, both normal
+played 64 of 260: shipped oasis_gulf: vanguard against meridian, both easy
+played 63 of 260: shipped oasis_gulf: vanguard against vanguard, both hard
+played 60 of 260: shipped frostline: meridian against meridian, both hard
+played 65 of 260: shipped oasis_gulf: vanguard against meridian, both normal
+played 66 of 260: shipped oasis_gulf: vanguard against meridian, both hard
+played 67 of 260: shipped oasis_gulf: meridian against vanguard, both easy
+played 70 of 260: shipped oasis_gulf: meridian against meridian, both easy
+played 68 of 260: shipped oasis_gulf: meridian against vanguard, both normal
+played 71 of 260: shipped oasis_gulf: meridian against meridian, both normal
+played 69 of 260: shipped oasis_gulf: meridian against vanguard, both hard
+played 72 of 260: shipped oasis_gulf: meridian against meridian, both hard
+played 73 of 260: shipped coral_archipelago: vanguard against vanguard, both easy
+played 76 of 260: shipped coral_archipelago: vanguard against meridian, both easy
+played 74 of 260: shipped coral_archipelago: vanguard against vanguard, both normal
+played 77 of 260: shipped coral_archipelago: vanguard against meridian, both normal
+played 79 of 260: shipped coral_archipelago: meridian against vanguard, both easy
+played 75 of 260: shipped coral_archipelago: vanguard against vanguard, both hard
+played 82 of 260: shipped coral_archipelago: meridian against meridian, both easy
+played 80 of 260: shipped coral_archipelago: meridian against vanguard, both normal
+played 78 of 260: shipped coral_archipelago: vanguard against meridian, both hard
+played 83 of 260: shipped coral_archipelago: meridian against meridian, both normal
+played 81 of 260: shipped coral_archipelago: meridian against vanguard, both hard
+played 85 of 260: shipped continental_divide: vanguard against vanguard, both easy
+played 86 of 260: shipped continental_divide: vanguard against vanguard, both normal
+played 88 of 260: shipped continental_divide: vanguard against meridian, both easy
+played 84 of 260: shipped coral_archipelago: meridian against meridian, both hard
+played 89 of 260: shipped continental_divide: vanguard against meridian, both normal
+played 87 of 260: shipped continental_divide: vanguard against vanguard, both hard
+played 91 of 260: shipped continental_divide: meridian against vanguard, both easy
+played 94 of 260: shipped continental_divide: meridian against meridian, both easy
+played 90 of 260: shipped continental_divide: vanguard against meridian, both hard
+played 92 of 260: shipped continental_divide: meridian against vanguard, both normal
+played 93 of 260: shipped continental_divide: meridian against vanguard, both hard
+played 95 of 260: shipped continental_divide: meridian against meridian, both normal
+played 97 of 260: shipped steel_harbor: vanguard against vanguard, both easy
+played 96 of 260: shipped continental_divide: meridian against meridian, both hard
+played 100 of 260: shipped steel_harbor: vanguard against meridian, both easy
+played 98 of 260: shipped steel_harbor: vanguard against vanguard, both normal
+played 99 of 260: shipped steel_harbor: vanguard against vanguard, both hard
+played 103 of 260: shipped steel_harbor: meridian against vanguard, both easy
+played 101 of 260: shipped steel_harbor: vanguard against meridian, both normal
+played 102 of 260: shipped steel_harbor: vanguard against meridian, both hard
+played 106 of 260: shipped steel_harbor: meridian against meridian, both easy
+played 104 of 260: shipped steel_harbor: meridian against vanguard, both normal
+played 109 of 260: shipped glacier_pass: vanguard against vanguard, both easy
+played 105 of 260: shipped steel_harbor: meridian against vanguard, both hard
+played 107 of 260: shipped steel_harbor: meridian against meridian, both normal
+played 108 of 260: shipped steel_harbor: meridian against meridian, both hard
+played 112 of 260: shipped glacier_pass: vanguard against meridian, both easy
+played 110 of 260: shipped glacier_pass: vanguard against vanguard, both normal
+played 113 of 260: shipped glacier_pass: vanguard against meridian, both normal
+played 115 of 260: shipped glacier_pass: meridian against vanguard, both easy
+played 111 of 260: shipped glacier_pass: vanguard against vanguard, both hard
+played 116 of 260: shipped glacier_pass: meridian against vanguard, both normal
+played 118 of 260: shipped glacier_pass: meridian against meridian, both easy
+played 121 of 260: shipped red_canyon: vanguard against vanguard, both easy
+played 122 of 260: shipped red_canyon: vanguard against vanguard, both normal
+played 114 of 260: shipped glacier_pass: vanguard against meridian, both hard
+played 123 of 260: shipped red_canyon: vanguard against vanguard, both hard
+played 124 of 260: shipped red_canyon: vanguard against meridian, both easy
+played 119 of 260: shipped glacier_pass: meridian against meridian, both normal
+played 117 of 260: shipped glacier_pass: meridian against vanguard, both hard
+played 125 of 260: shipped red_canyon: vanguard against meridian, both normal
+played 127 of 260: shipped red_canyon: meridian against vanguard, both easy
+played 126 of 260: shipped red_canyon: vanguard against meridian, both hard
+played 120 of 260: shipped glacier_pass: meridian against meridian, both hard
+played 128 of 260: shipped red_canyon: meridian against vanguard, both normal
+played 130 of 260: shipped red_canyon: meridian against meridian, both easy
+played 129 of 260: shipped red_canyon: meridian against vanguard, both hard
+played 131 of 260: shipped red_canyon: meridian against meridian, both normal
+played 132 of 260: shipped red_canyon: meridian against meridian, both hard
+played 133 of 260: shipped jungle_delta: vanguard against vanguard, both easy
+played 134 of 260: shipped jungle_delta: vanguard against vanguard, both normal
+played 136 of 260: shipped jungle_delta: vanguard against meridian, both easy
+played 139 of 260: shipped jungle_delta: meridian against vanguard, both easy
+played 137 of 260: shipped jungle_delta: vanguard against meridian, both normal
+played 135 of 260: shipped jungle_delta: vanguard against vanguard, both hard
+played 140 of 260: shipped jungle_delta: meridian against vanguard, both normal
+played 138 of 260: shipped jungle_delta: vanguard against meridian, both hard
+played 142 of 260: shipped jungle_delta: meridian against meridian, both easy
+played 141 of 260: shipped jungle_delta: meridian against vanguard, both hard
+played 143 of 260: shipped jungle_delta: meridian against meridian, both normal
+played 145 of 260: shipped pacific_atoll: vanguard against vanguard, both easy
+played 144 of 260: shipped jungle_delta: meridian against meridian, both hard
+played 148 of 260: shipped pacific_atoll: vanguard against meridian, both easy
+played 151 of 260: shipped pacific_atoll: meridian against vanguard, both easy
+played 146 of 260: shipped pacific_atoll: vanguard against vanguard, both normal
+played 149 of 260: shipped pacific_atoll: vanguard against meridian, both normal
+played 147 of 260: shipped pacific_atoll: vanguard against vanguard, both hard
+played 154 of 260: shipped pacific_atoll: meridian against meridian, both easy
+played 150 of 260: shipped pacific_atoll: vanguard against meridian, both hard
+played 152 of 260: shipped pacific_atoll: meridian against vanguard, both normal
+played 157 of 260: shipped iron_isthmus: vanguard against vanguard, both easy
+played 155 of 260: shipped pacific_atoll: meridian against meridian, both normal
+played 158 of 260: shipped iron_isthmus: vanguard against vanguard, both normal
+played 160 of 260: shipped iron_isthmus: vanguard against meridian, both easy
+played 153 of 260: shipped pacific_atoll: meridian against vanguard, both hard
+played 159 of 260: shipped iron_isthmus: vanguard against vanguard, both hard
+played 161 of 260: shipped iron_isthmus: vanguard against meridian, both normal
+played 163 of 260: shipped iron_isthmus: meridian against vanguard, both easy
+played 156 of 260: shipped pacific_atoll: meridian against meridian, both hard
+played 162 of 260: shipped iron_isthmus: vanguard against meridian, both hard
+played 164 of 260: shipped iron_isthmus: meridian against vanguard, both normal
+played 166 of 260: shipped iron_isthmus: meridian against meridian, both easy
+played 165 of 260: shipped iron_isthmus: meridian against vanguard, both hard
+played 169 of 260: shipped arctic_floes: vanguard against vanguard, both easy
+played 167 of 260: shipped iron_isthmus: meridian against meridian, both normal
+played 168 of 260: shipped iron_isthmus: meridian against meridian, both hard
+played 171 of 260: shipped arctic_floes: vanguard against vanguard, both hard
+played 172 of 260: shipped arctic_floes: vanguard against meridian, both easy
+played 175 of 260: shipped arctic_floes: meridian against vanguard, both easy
+played 170 of 260: shipped arctic_floes: vanguard against vanguard, both normal
+played 174 of 260: shipped arctic_floes: vanguard against meridian, both hard
+played 173 of 260: shipped arctic_floes: vanguard against meridian, both normal
+played 178 of 260: shipped arctic_floes: meridian against meridian, both easy
+played 176 of 260: shipped arctic_floes: meridian against vanguard, both normal
+played 177 of 260: shipped arctic_floes: meridian against vanguard, both hard
+played 179 of 260: shipped arctic_floes: meridian against meridian, both normal
+played 181 of 260: shipped ember_caldera: vanguard against vanguard, both easy
+played 180 of 260: shipped arctic_floes: meridian against meridian, both hard
+played 182 of 260: shipped ember_caldera: vanguard against vanguard, both normal
+played 184 of 260: shipped ember_caldera: vanguard against meridian, both easy
+played 183 of 260: shipped ember_caldera: vanguard against vanguard, both hard
+played 187 of 260: shipped ember_caldera: meridian against vanguard, both easy
+played 185 of 260: shipped ember_caldera: vanguard against meridian, both normal
+played 188 of 260: shipped ember_caldera: meridian against vanguard, both normal
+played 186 of 260: shipped ember_caldera: vanguard against meridian, both hard
+played 190 of 260: shipped ember_caldera: meridian against meridian, both easy
+played 193 of 260: shipped frozen_sound: vanguard against vanguard, both easy
+played 191 of 260: shipped ember_caldera: meridian against meridian, both normal
+played 194 of 260: shipped frozen_sound: vanguard against vanguard, both normal
+played 189 of 260: shipped ember_caldera: meridian against vanguard, both hard
+played 192 of 260: shipped ember_caldera: meridian against meridian, both hard
+played 196 of 260: shipped frozen_sound: vanguard against meridian, both easy
+played 197 of 260: shipped frozen_sound: vanguard against meridian, both normal
+played 195 of 260: shipped frozen_sound: vanguard against vanguard, both hard
+played 199 of 260: shipped frozen_sound: meridian against vanguard, both easy
+played 198 of 260: shipped frozen_sound: vanguard against meridian, both hard
+played 200 of 260: shipped frozen_sound: meridian against vanguard, both normal
+played 202 of 260: shipped frozen_sound: meridian against meridian, both easy
+played 203 of 260: shipped frozen_sound: meridian against meridian, both normal
+played 201 of 260: shipped frozen_sound: meridian against vanguard, both hard
+played 205 of 260: shipped harvest_plains: vanguard against vanguard, both easy
+played 204 of 260: shipped frozen_sound: meridian against meridian, both hard
+played 208 of 260: shipped harvest_plains: vanguard against meridian, both easy
+played 206 of 260: shipped harvest_plains: vanguard against vanguard, both normal
+played 209 of 260: shipped harvest_plains: vanguard against meridian, both normal
+played 207 of 260: shipped harvest_plains: vanguard against vanguard, both hard
+played 211 of 260: shipped harvest_plains: meridian against vanguard, both easy
+played 210 of 260: shipped harvest_plains: vanguard against meridian, both hard
+played 214 of 260: shipped harvest_plains: meridian against meridian, both easy
+played 212 of 260: shipped harvest_plains: meridian against vanguard, both normal
+played 215 of 260: shipped harvest_plains: meridian against meridian, both normal
+played 217 of 260: shipped black_water: vanguard against vanguard, both easy
+played 213 of 260: shipped harvest_plains: meridian against vanguard, both hard
+played 216 of 260: shipped harvest_plains: meridian against meridian, both hard
+played 218 of 260: shipped black_water: vanguard against vanguard, both normal
+played 220 of 260: shipped black_water: vanguard against meridian, both easy
+played 219 of 260: shipped black_water: vanguard against vanguard, both hard
+played 221 of 260: shipped black_water: vanguard against meridian, both normal
+played 223 of 260: shipped black_water: meridian against vanguard, both easy
+played 222 of 260: shipped black_water: vanguard against meridian, both hard
+played 224 of 260: shipped black_water: meridian against vanguard, both normal
+played 226 of 260: shipped black_water: meridian against meridian, both easy
+played 225 of 260: shipped black_water: meridian against vanguard, both hard
+played 227 of 260: shipped black_water: meridian against meridian, both normal
+played 229 of 260: shipped thousand_lakes: vanguard against vanguard, both easy
+played 228 of 260: shipped black_water: meridian against meridian, both hard
+played 232 of 260: shipped thousand_lakes: vanguard against meridian, both easy
+played 233 of 260: shipped thousand_lakes: vanguard against meridian, both normal
+played 230 of 260: shipped thousand_lakes: vanguard against vanguard, both normal
+played 235 of 260: shipped thousand_lakes: meridian against vanguard, both easy
+played 231 of 260: shipped thousand_lakes: vanguard against vanguard, both hard
+played 238 of 260: shipped thousand_lakes: meridian against meridian, both easy
+played 234 of 260: shipped thousand_lakes: vanguard against meridian, both hard
+played 236 of 260: shipped thousand_lakes: meridian against vanguard, both normal
+played 241 of 260: shipped wheel_of_worlds: vanguard against vanguard, both easy
+played 239 of 260: shipped thousand_lakes: meridian against meridian, both normal
+played 237 of 260: shipped thousand_lakes: meridian against vanguard, both hard
+played 242 of 260: shipped wheel_of_worlds: vanguard against vanguard, both normal
+played 244 of 260: shipped wheel_of_worlds: vanguard against meridian, both easy
+played 240 of 260: shipped thousand_lakes: meridian against meridian, both hard
+played 253 of 260: fixture skirmish_40x40: red against red, both easy
+played 254 of 260: fixture skirmish_40x40: red against red, both normal
+played 243 of 260: shipped wheel_of_worlds: vanguard against vanguard, both hard
+played 255 of 260: fixture skirmish_40x40: red against blue, both easy
+played 256 of 260: fixture skirmish_40x40: red against blue, both normal
+played 257 of 260: fixture skirmish_40x40: blue against red, both easy
+played 259 of 260: fixture skirmish_40x40: blue against blue, both easy
+played 258 of 260: fixture skirmish_40x40: blue against red, both normal
+played 260 of 260: fixture skirmish_40x40: blue against blue, both normal
+played 247 of 260: shipped wheel_of_worlds: meridian against vanguard, both easy
+played 245 of 260: shipped wheel_of_worlds: vanguard against meridian, both normal
+played 246 of 260: shipped wheel_of_worlds: vanguard against meridian, both hard
+played 250 of 260: shipped wheel_of_worlds: meridian against meridian, both easy
+played 248 of 260: shipped wheel_of_worlds: meridian against vanguard, both normal
+played 251 of 260: shipped wheel_of_worlds: meridian against meridian, both normal
+played 249 of 260: shipped wheel_of_worlds: meridian against vanguard, both hard
+played 252 of 260: shipped wheel_of_worlds: meridian against meridian, both hard
+shipped demo: vanguard against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 12.93 s for both runs
+shipped demo: vanguard against vanguard, both normal: 36000 ticks, 5 matches (4 ended, the last still running), 13.98 s for both runs
+shipped demo: vanguard against vanguard, both hard: 36000 ticks, 7 matches (6 ended, the last still running), 14.07 s for both runs
+shipped demo: vanguard against meridian, both easy: 36000 ticks, 4 matches (3 ended, the last still running), 13.36 s for both runs
+shipped demo: vanguard against meridian, both normal: 36000 ticks, 5 matches (4 ended, the last still running), 14.10 s for both runs
+shipped demo: vanguard against meridian, both hard: 36000 ticks, 7 matches (6 ended, the last still running), 14.03 s for both runs
+shipped demo: meridian against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 12.57 s for both runs
+shipped demo: meridian against vanguard, both normal: 36000 ticks, 6 matches (5 ended, the last still running), 13.89 s for both runs
+shipped demo: meridian against vanguard, both hard: 36000 ticks, 8 matches (7 ended, the last still running), 13.77 s for both runs
+shipped demo: meridian against meridian, both easy: 36000 ticks, 3 matches (2 ended, the last still running), 13.34 s for both runs
+shipped demo: meridian against meridian, both normal: 36000 ticks, 5 matches (4 ended, the last still running), 14.83 s for both runs
+shipped demo: meridian against meridian, both hard: 36000 ticks, 7 matches (6 ended, the last still running), 14.95 s for both runs
+shipped crossroads: vanguard against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 12.55 s for both runs
+shipped crossroads: vanguard against vanguard, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 14.18 s for both runs
+shipped crossroads: vanguard against vanguard, both hard: 36000 ticks, 6 matches (5 ended, the last still running), 13.94 s for both runs
+shipped crossroads: vanguard against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 13.15 s for both runs
+shipped crossroads: vanguard against meridian, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 14.29 s for both runs
+shipped crossroads: vanguard against meridian, both hard: 36000 ticks, 4 matches (3 ended, the last still running), 14.36 s for both runs
+shipped crossroads: meridian against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 13.44 s for both runs
+shipped crossroads: meridian against vanguard, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 14.43 s for both runs
+shipped crossroads: meridian against vanguard, both hard: 36000 ticks, 3 matches (2 ended, the last still running), 14.28 s for both runs
+shipped crossroads: meridian against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 13.23 s for both runs
+shipped crossroads: meridian against meridian, both normal: 36000 ticks, 3 matches (2 ended, the last still running), 14.59 s for both runs
+shipped crossroads: meridian against meridian, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 13.87 s for both runs
+shipped riverlands: vanguard against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 12.72 s for both runs
+shipped riverlands: vanguard against vanguard, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 13.79 s for both runs
+shipped riverlands: vanguard against vanguard, both hard: 36000 ticks, 7 matches (6 ended, the last still running), 13.45 s for both runs
+shipped riverlands: vanguard against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 12.58 s for both runs
+shipped riverlands: vanguard against meridian, both normal: 36000 ticks, 6 matches (5 ended, the last still running), 14.18 s for both runs
+shipped riverlands: vanguard against meridian, both hard: 36000 ticks, 6 matches (5 ended, the last still running), 13.58 s for both runs
+shipped riverlands: meridian against vanguard, both easy: 36000 ticks, 3 matches (2 ended, the last still running), 12.83 s for both runs
+shipped riverlands: meridian against vanguard, both normal: 36000 ticks, 5 matches (4 ended, the last still running), 13.61 s for both runs
+shipped riverlands: meridian against vanguard, both hard: 36000 ticks, 6 matches (5 ended, the last still running), 12.95 s for both runs
+shipped riverlands: meridian against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 12.61 s for both runs
+shipped riverlands: meridian against meridian, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 13.34 s for both runs
+shipped riverlands: meridian against meridian, both hard: 36000 ticks, 5 matches (4 ended, the last still running), 13.03 s for both runs
+shipped liberty_bay: vanguard against vanguard, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 71.98 s for both runs
+shipped liberty_bay: vanguard against vanguard, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 89.13 s for both runs
+shipped liberty_bay: vanguard against vanguard, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 93.65 s for both runs
+shipped liberty_bay: vanguard against meridian, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 70.59 s for both runs
+shipped liberty_bay: vanguard against meridian, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 89.66 s for both runs
+shipped liberty_bay: vanguard against meridian, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 93.78 s for both runs
+shipped liberty_bay: meridian against vanguard, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 72.52 s for both runs
+shipped liberty_bay: meridian against vanguard, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 92.08 s for both runs
+shipped liberty_bay: meridian against vanguard, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 92.41 s for both runs
+shipped liberty_bay: meridian against meridian, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 72.51 s for both runs
+shipped liberty_bay: meridian against meridian, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 93.31 s for both runs
+shipped liberty_bay: meridian against meridian, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 95.12 s for both runs
+shipped frostline: vanguard against vanguard, both easy: 36000 ticks, 4 matches (3 ended, the last still running), 56.88 s for both runs
+shipped frostline: vanguard against vanguard, both normal: 36000 ticks, 5 matches (4 ended, the last still running), 66.51 s for both runs
+shipped frostline: vanguard against vanguard, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 99.79 s for both runs
+shipped frostline: vanguard against meridian, both easy: 36000 ticks, 4 matches (3 ended, the last still running), 58.18 s for both runs
+shipped frostline: vanguard against meridian, both normal: 36000 ticks, 5 matches (4 ended, the last still running), 71.17 s for both runs
+shipped frostline: vanguard against meridian, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 92.40 s for both runs
+shipped frostline: meridian against vanguard, both easy: 36000 ticks, 4 matches (3 ended, the last still running), 57.26 s for both runs
+shipped frostline: meridian against vanguard, both normal: 36000 ticks, 5 matches (4 ended, the last still running), 67.29 s for both runs
+shipped frostline: meridian against vanguard, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 85.60 s for both runs
+shipped frostline: meridian against meridian, both easy: 36000 ticks, 4 matches (3 ended, the last still running), 59.82 s for both runs
+shipped frostline: meridian against meridian, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 71.10 s for both runs
+shipped frostline: meridian against meridian, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 87.45 s for both runs
+shipped oasis_gulf: vanguard against vanguard, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 58.84 s for both runs
+shipped oasis_gulf: vanguard against vanguard, both normal: 36000 ticks, 2 matches (1 ended, the last still running), 63.19 s for both runs
+shipped oasis_gulf: vanguard against vanguard, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 72.54 s for both runs
+shipped oasis_gulf: vanguard against meridian, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 59.04 s for both runs
+shipped oasis_gulf: vanguard against meridian, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 62.06 s for both runs
+shipped oasis_gulf: vanguard against meridian, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 69.14 s for both runs
+shipped oasis_gulf: meridian against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 56.21 s for both runs
+shipped oasis_gulf: meridian against vanguard, both normal: 36000 ticks, 3 matches (2 ended, the last still running), 61.00 s for both runs
+shipped oasis_gulf: meridian against vanguard, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 71.15 s for both runs
+shipped oasis_gulf: meridian against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 56.55 s for both runs
+shipped oasis_gulf: meridian against meridian, both normal: 36000 ticks, 3 matches (2 ended, the last still running), 60.57 s for both runs
+shipped oasis_gulf: meridian against meridian, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 70.37 s for both runs
+shipped coral_archipelago: vanguard against vanguard, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 75.17 s for both runs
+shipped coral_archipelago: vanguard against vanguard, both normal: 36000 ticks, 2 matches (1 ended, the last still running), 94.46 s for both runs
+shipped coral_archipelago: vanguard against vanguard, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 118.47 s for both runs
+shipped coral_archipelago: vanguard against meridian, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 78.49 s for both runs
+shipped coral_archipelago: vanguard against meridian, both normal: 36000 ticks, 3 matches (2 ended, the last still running), 84.79 s for both runs
+shipped coral_archipelago: vanguard against meridian, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 118.13 s for both runs
+shipped coral_archipelago: meridian against vanguard, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 79.40 s for both runs
+shipped coral_archipelago: meridian against vanguard, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 103.60 s for both runs
+shipped coral_archipelago: meridian against vanguard, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 119.61 s for both runs
+shipped coral_archipelago: meridian against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 75.32 s for both runs
+shipped coral_archipelago: meridian against meridian, both normal: 36000 ticks, 2 matches (1 ended, the last still running), 89.12 s for both runs
+shipped coral_archipelago: meridian against meridian, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 110.31 s for both runs
+shipped continental_divide: vanguard against vanguard, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 77.43 s for both runs
+shipped continental_divide: vanguard against vanguard, both normal: 36000 ticks, 2 matches (1 ended, the last still running), 90.60 s for both runs
+shipped continental_divide: vanguard against vanguard, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 106.26 s for both runs
+shipped continental_divide: vanguard against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 75.94 s for both runs
+shipped continental_divide: vanguard against meridian, both normal: 36000 ticks, 3 matches (2 ended, the last still running), 86.99 s for both runs
+shipped continental_divide: vanguard against meridian, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 106.65 s for both runs
+shipped continental_divide: meridian against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 76.12 s for both runs
+shipped continental_divide: meridian against vanguard, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 99.29 s for both runs
+shipped continental_divide: meridian against vanguard, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 100.99 s for both runs
+shipped continental_divide: meridian against meridian, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 78.53 s for both runs
+shipped continental_divide: meridian against meridian, both normal: 36000 ticks, 2 matches (1 ended, the last still running), 88.08 s for both runs
+shipped continental_divide: meridian against meridian, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 100.07 s for both runs
+shipped steel_harbor: vanguard against vanguard, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 77.43 s for both runs
+shipped steel_harbor: vanguard against vanguard, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 100.16 s for both runs
+shipped steel_harbor: vanguard against vanguard, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 106.51 s for both runs
+shipped steel_harbor: vanguard against meridian, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 76.72 s for both runs
+shipped steel_harbor: vanguard against meridian, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 99.09 s for both runs
+shipped steel_harbor: vanguard against meridian, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 104.88 s for both runs
+shipped steel_harbor: meridian against vanguard, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 78.71 s for both runs
+shipped steel_harbor: meridian against vanguard, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 99.29 s for both runs
+shipped steel_harbor: meridian against vanguard, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 106.00 s for both runs
+shipped steel_harbor: meridian against meridian, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 80.22 s for both runs
+shipped steel_harbor: meridian against meridian, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 96.37 s for both runs
+shipped steel_harbor: meridian against meridian, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 102.25 s for both runs
+shipped glacier_pass: vanguard against vanguard, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 70.45 s for both runs
+shipped glacier_pass: vanguard against vanguard, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 98.65 s for both runs
+shipped glacier_pass: vanguard against vanguard, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 111.91 s for both runs
+shipped glacier_pass: vanguard against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 67.21 s for both runs
+shipped glacier_pass: vanguard against meridian, both normal: 36000 ticks, 2 matches (1 ended, the last still running), 71.20 s for both runs
+shipped glacier_pass: vanguard against meridian, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 116.45 s for both runs
+shipped glacier_pass: meridian against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 67.09 s for both runs
+shipped glacier_pass: meridian against vanguard, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 75.68 s for both runs
+shipped glacier_pass: meridian against vanguard, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 118.08 s for both runs
+shipped glacier_pass: meridian against meridian, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 68.48 s for both runs
+shipped glacier_pass: meridian against meridian, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 95.14 s for both runs
+shipped glacier_pass: meridian against meridian, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 112.63 s for both runs
+shipped red_canyon: vanguard against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 46.16 s for both runs
+shipped red_canyon: vanguard against vanguard, both normal: 36000 ticks, 3 matches (2 ended, the last still running), 51.17 s for both runs
+shipped red_canyon: vanguard against vanguard, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 56.64 s for both runs
+shipped red_canyon: vanguard against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 45.18 s for both runs
+shipped red_canyon: vanguard against meridian, both normal: 36000 ticks, 3 matches (2 ended, the last still running), 49.08 s for both runs
+shipped red_canyon: vanguard against meridian, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 60.79 s for both runs
+shipped red_canyon: meridian against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 46.53 s for both runs
+shipped red_canyon: meridian against vanguard, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 52.78 s for both runs
+shipped red_canyon: meridian against vanguard, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 62.25 s for both runs
+shipped red_canyon: meridian against meridian, both easy: 36000 ticks, 3 matches (2 ended, the last still running), 44.83 s for both runs
+shipped red_canyon: meridian against meridian, both normal: 36000 ticks, 3 matches (2 ended, the last still running), 54.13 s for both runs
+shipped red_canyon: meridian against meridian, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 58.43 s for both runs
+shipped jungle_delta: vanguard against vanguard, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 64.81 s for both runs
+shipped jungle_delta: vanguard against vanguard, both normal: 36000 ticks, 3 matches (2 ended, the last still running), 73.62 s for both runs
+shipped jungle_delta: vanguard against vanguard, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 93.11 s for both runs
+shipped jungle_delta: vanguard against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 63.01 s for both runs
+shipped jungle_delta: vanguard against meridian, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 71.56 s for both runs
+shipped jungle_delta: vanguard against meridian, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 88.13 s for both runs
+shipped jungle_delta: meridian against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 62.74 s for both runs
+shipped jungle_delta: meridian against vanguard, both normal: 36000 ticks, 2 matches (1 ended, the last still running), 73.05 s for both runs
+shipped jungle_delta: meridian against vanguard, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 90.36 s for both runs
+shipped jungle_delta: meridian against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 62.09 s for both runs
+shipped jungle_delta: meridian against meridian, both normal: 36000 ticks, 3 matches (2 ended, the last still running), 73.06 s for both runs
+shipped jungle_delta: meridian against meridian, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 82.12 s for both runs
+shipped pacific_atoll: vanguard against vanguard, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 77.00 s for both runs
+shipped pacific_atoll: vanguard against vanguard, both normal: 36000 ticks, 2 matches (1 ended, the last still running), 104.46 s for both runs
+shipped pacific_atoll: vanguard against vanguard, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 134.70 s for both runs
+shipped pacific_atoll: vanguard against meridian, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 80.25 s for both runs
+shipped pacific_atoll: vanguard against meridian, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 110.57 s for both runs
+shipped pacific_atoll: vanguard against meridian, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 134.16 s for both runs
+shipped pacific_atoll: meridian against vanguard, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 76.23 s for both runs
+shipped pacific_atoll: meridian against vanguard, both normal: 36000 ticks, 2 matches (1 ended, the last still running), 121.56 s for both runs
+shipped pacific_atoll: meridian against vanguard, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 157.13 s for both runs
+shipped pacific_atoll: meridian against meridian, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 79.98 s for both runs
+shipped pacific_atoll: meridian against meridian, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 108.70 s for both runs
+shipped pacific_atoll: meridian against meridian, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 146.31 s for both runs
+shipped iron_isthmus: vanguard against vanguard, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 64.70 s for both runs
+shipped iron_isthmus: vanguard against vanguard, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 77.42 s for both runs
+shipped iron_isthmus: vanguard against vanguard, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 84.85 s for both runs
+shipped iron_isthmus: vanguard against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 61.43 s for both runs
+shipped iron_isthmus: vanguard against meridian, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 77.47 s for both runs
+shipped iron_isthmus: vanguard against meridian, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 85.22 s for both runs
+shipped iron_isthmus: meridian against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 61.94 s for both runs
+shipped iron_isthmus: meridian against vanguard, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 77.02 s for both runs
+shipped iron_isthmus: meridian against vanguard, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 85.36 s for both runs
+shipped iron_isthmus: meridian against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 62.35 s for both runs
+shipped iron_isthmus: meridian against meridian, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 76.43 s for both runs
+shipped iron_isthmus: meridian against meridian, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 83.96 s for both runs
+shipped arctic_floes: vanguard against vanguard, both easy: 36000 ticks, 3 matches (2 ended, the last still running), 62.75 s for both runs
+shipped arctic_floes: vanguard against vanguard, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 87.63 s for both runs
+shipped arctic_floes: vanguard against vanguard, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 75.93 s for both runs
+shipped arctic_floes: vanguard against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 63.59 s for both runs
+shipped arctic_floes: vanguard against meridian, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 86.99 s for both runs
+shipped arctic_floes: vanguard against meridian, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 75.96 s for both runs
+shipped arctic_floes: meridian against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 63.59 s for both runs
+shipped arctic_floes: meridian against vanguard, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 84.32 s for both runs
+shipped arctic_floes: meridian against vanguard, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 78.82 s for both runs
+shipped arctic_floes: meridian against meridian, both easy: 36000 ticks, 3 matches (2 ended, the last still running), 63.02 s for both runs
+shipped arctic_floes: meridian against meridian, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 85.68 s for both runs
+shipped arctic_floes: meridian against meridian, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 81.20 s for both runs
+shipped ember_caldera: vanguard against vanguard, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 73.61 s for both runs
+shipped ember_caldera: vanguard against vanguard, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 80.76 s for both runs
+shipped ember_caldera: vanguard against vanguard, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 97.64 s for both runs
+shipped ember_caldera: vanguard against meridian, both easy: 36000 ticks, 3 matches (2 ended, the last still running), 70.38 s for both runs
+shipped ember_caldera: vanguard against meridian, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 91.96 s for both runs
+shipped ember_caldera: vanguard against meridian, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 98.60 s for both runs
+shipped ember_caldera: meridian against vanguard, both easy: 36000 ticks, 4 matches (3 ended, the last still running), 70.22 s for both runs
+shipped ember_caldera: meridian against vanguard, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 82.25 s for both runs
+shipped ember_caldera: meridian against vanguard, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 108.18 s for both runs
+shipped ember_caldera: meridian against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 68.94 s for both runs
+shipped ember_caldera: meridian against meridian, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 81.61 s for both runs
+shipped ember_caldera: meridian against meridian, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 95.27 s for both runs
+shipped frozen_sound: vanguard against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 70.04 s for both runs
+shipped frozen_sound: vanguard against vanguard, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 73.75 s for both runs
+shipped frozen_sound: vanguard against vanguard, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 98.62 s for both runs
+shipped frozen_sound: vanguard against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 69.25 s for both runs
+shipped frozen_sound: vanguard against meridian, both normal: 36000 ticks, 3 matches (2 ended, the last still running), 75.21 s for both runs
+shipped frozen_sound: vanguard against meridian, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 95.63 s for both runs
+shipped frozen_sound: meridian against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 69.01 s for both runs
+shipped frozen_sound: meridian against vanguard, both normal: 36000 ticks, 3 matches (2 ended, the last still running), 75.67 s for both runs
+shipped frozen_sound: meridian against vanguard, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 96.41 s for both runs
+shipped frozen_sound: meridian against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 69.05 s for both runs
+shipped frozen_sound: meridian against meridian, both normal: 36000 ticks, 2 matches (1 ended, the last still running), 77.66 s for both runs
+shipped frozen_sound: meridian against meridian, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 92.56 s for both runs
+shipped harvest_plains: vanguard against vanguard, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 71.14 s for both runs
+shipped harvest_plains: vanguard against vanguard, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 78.30 s for both runs
+shipped harvest_plains: vanguard against vanguard, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 95.97 s for both runs
+shipped harvest_plains: vanguard against meridian, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 73.14 s for both runs
+shipped harvest_plains: vanguard against meridian, both normal: 36000 ticks, 2 matches (1 ended, the last still running), 76.38 s for both runs
+shipped harvest_plains: vanguard against meridian, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 97.08 s for both runs
+shipped harvest_plains: meridian against vanguard, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 75.85 s for both runs
+shipped harvest_plains: meridian against vanguard, both normal: 36000 ticks, 3 matches (2 ended, the last still running), 85.36 s for both runs
+shipped harvest_plains: meridian against vanguard, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 109.62 s for both runs
+shipped harvest_plains: meridian against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 74.46 s for both runs
+shipped harvest_plains: meridian against meridian, both normal: 36000 ticks, 2 matches (1 ended, the last still running), 80.20 s for both runs
+shipped harvest_plains: meridian against meridian, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 101.27 s for both runs
+shipped black_water: vanguard against vanguard, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 76.12 s for both runs
+shipped black_water: vanguard against vanguard, both normal: 36000 ticks, 2 matches (1 ended, the last still running), 82.62 s for both runs
+shipped black_water: vanguard against vanguard, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 101.66 s for both runs
+shipped black_water: vanguard against meridian, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 77.13 s for both runs
+shipped black_water: vanguard against meridian, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 86.61 s for both runs
+shipped black_water: vanguard against meridian, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 98.65 s for both runs
+shipped black_water: meridian against vanguard, both easy: 36000 ticks, 3 matches (2 ended, the last still running), 75.33 s for both runs
+shipped black_water: meridian against vanguard, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 88.84 s for both runs
+shipped black_water: meridian against vanguard, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 100.13 s for both runs
+shipped black_water: meridian against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 77.83 s for both runs
+shipped black_water: meridian against meridian, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 90.40 s for both runs
+shipped black_water: meridian against meridian, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 106.08 s for both runs
+shipped thousand_lakes: vanguard against vanguard, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 81.98 s for both runs
+shipped thousand_lakes: vanguard against vanguard, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 108.11 s for both runs
+shipped thousand_lakes: vanguard against vanguard, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 122.20 s for both runs
+shipped thousand_lakes: vanguard against meridian, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 79.98 s for both runs
+shipped thousand_lakes: vanguard against meridian, both normal: 36000 ticks, 2 matches (1 ended, the last still running), 87.10 s for both runs
+shipped thousand_lakes: vanguard against meridian, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 126.51 s for both runs
+shipped thousand_lakes: meridian against vanguard, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 81.62 s for both runs
+shipped thousand_lakes: meridian against vanguard, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 110.00 s for both runs
+shipped thousand_lakes: meridian against vanguard, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 125.48 s for both runs
+shipped thousand_lakes: meridian against meridian, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 83.02 s for both runs
+shipped thousand_lakes: meridian against meridian, both normal: 36000 ticks, 1 matches (0 ended, the last still running), 104.84 s for both runs
+shipped thousand_lakes: meridian against meridian, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 124.16 s for both runs
+shipped wheel_of_worlds: vanguard against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 76.05 s for both runs
+shipped wheel_of_worlds: vanguard against vanguard, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 87.68 s for both runs
+shipped wheel_of_worlds: vanguard against vanguard, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 105.93 s for both runs
+shipped wheel_of_worlds: vanguard against meridian, both easy: 36000 ticks, 3 matches (2 ended, the last still running), 75.24 s for both runs
+shipped wheel_of_worlds: vanguard against meridian, both normal: 36000 ticks, 2 matches (1 ended, the last still running), 85.35 s for both runs
+shipped wheel_of_worlds: vanguard against meridian, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 105.08 s for both runs
+shipped wheel_of_worlds: meridian against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 75.66 s for both runs
+shipped wheel_of_worlds: meridian against vanguard, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 84.09 s for both runs
+shipped wheel_of_worlds: meridian against vanguard, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 94.20 s for both runs
+shipped wheel_of_worlds: meridian against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 72.52 s for both runs
+shipped wheel_of_worlds: meridian against meridian, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 80.48 s for both runs
+shipped wheel_of_worlds: meridian against meridian, both hard: 36000 ticks, 1 matches (0 ended, the last still running), 88.63 s for both runs
+fixture skirmish_40x40: red against red, both easy: 36000 ticks, 7 matches (6 ended, the last still running), 3.78 s for both runs
+fixture skirmish_40x40: red against red, both normal: 36000 ticks, 14 matches (13 ended, the last still running), 4.96 s for both runs
+fixture skirmish_40x40: red against blue, both easy: 36000 ticks, 7 matches (6 ended, the last still running), 3.81 s for both runs
+fixture skirmish_40x40: red against blue, both normal: 36000 ticks, 10 matches (9 ended, the last still running), 4.58 s for both runs
+fixture skirmish_40x40: blue against red, both easy: 36000 ticks, 7 matches (6 ended, the last still running), 3.80 s for both runs
+fixture skirmish_40x40: blue against red, both normal: 36000 ticks, 10 matches (9 ended, the last still running), 4.44 s for both runs
+fixture skirmish_40x40: blue against blue, both easy: 36000 ticks, 8 matches (7 ended, the last still running), 3.85 s for both runs
+fixture skirmish_40x40: blue against blue, both normal: 36000 ticks, 13 matches (12 ended, the last still running), 4.55 s for both runs
+m7 soak: 18720000 ticks in 1893.7 s; peak heap in use 207.4 MiB (budget 1024 MiB)
+m7 soak: passed

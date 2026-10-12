@@ -918,3 +918,511 @@ Remediation logs and repeatable comparison evidence are retained in
 outputs remain in the existing Cargo cache. The first Clippy attempt caught a duplicate PNG
 encoder module import in the contact-sheet example; reusing the generator's existing module
 resolved it without a lint suppression. Final validation results are recorded in STATUS.
+
+## M9 scope — unified RA2 production (2026-10-05)
+
+The user's detailed construction/production request authorizes extending the M8 game rules,
+roster and interface. Preserve the deterministic simulation and existing legacy AI/scenarios.
+Use a separately versioned, bounded and cross-validated arsenal metadata file for shared
+categories, mobility and specialist behavior. Allied/Soviet content is unified for the human
+player; Yuri means the original RA2 infantry, not the expansion faction. Existing art is reused
+as functional role icons; no third-party assets are introduced.
+
+
+## RTS controls and battlefield follow-up (2026-10-05)
+
+The user's seven-part request authorizes improvements to camera/selection, classic RTS interface,
+mining, a human-only Super Me option, ownership colors, and map terrain while retaining existing
+architecture. This follow-up is uncommitted work on top of the existing M9/HD working tree.
+Super Me is match-local PlayerState (included in state hashing), installed only for explicitly
+selected human controllers. Production retains its existing progress units and advances ten units
+per eligible tick; rounding is upward to a whole simulation tick. Global definitions are unchanged.
+Team colors remain presentation state because the supported match format has exactly two players.
+The six-choice palette assigns distinct colors, repaints from retained source pixels on restart,
+and remaps both authored faction paint ranges without tinting whole sprites.
+Rate scrolling (middle or Space+left) replaces absolute dragging; arrow/minimap controls remain.
+The shared terrain layout preserves base aprons, original resources, map symmetry and navigation.
+New forest/civilian collisions use the existing blocked-terrain representation. This is not a new
+height, bridge, civilian combat or save-file system. Existing settings schema is unchanged.
+
+## Camera, unlocks, targeting, game speed and multiple enemies (2026-10-05)
+
+The user's five-part request authorizes the following, uncommitted on top of the RTS controls
+follow-up; existing architecture, determinism and the AI are retained.
+
+1. Edge scrolling uses 28-pixel bands on every edge with a speed ramp, corner reach for
+   diagonals, an eased velocity, and an exit latch: when the cursor leaves the window through a
+   band (macOS title bar, menu bar reveal, Dock, resize region, another screen) the camera keeps
+   panning that way until the cursor returns or focus is lost. macOS cannot confine the cursor
+   (winit supports only locking there), so the latch replaces confinement. Hovering an interface
+   button never edge-scrolls.
+2. The human roster is the arsenal plus every faction's original roster: the arsenal-only roster
+   of M9 had hidden the M7 Meridian/Vanguard units. Basic generators remain interchangeable, but
+   an advanced generator with prerequisites (Nuclear Reactor) is a real requirement. Shipyards may
+   lie 32 cells (Chebyshev) from a building of their owner instead of 4, still on visible water
+   touching shore. Sidebar cards are ordered by tech tier. "Unlock all" is a human-only match
+   option (PlayerState flag, hashed in the Super Me byte so existing hashes are unchanged) that
+   waives prerequisites only; producers, cost, power, placement and exits still apply.
+3. A right click's order is classified before the click (move, attack, harvest, friendly,
+   invalid) by the same inputs as the order itself. Attack is shown in red; "invalid" (off the
+   map, or explored terrain none of the selection can enter) issues no order.
+4. Game speed (0.5× to 4×) sets the fixed timestep, i.e. ticks per real second. All gameplay is
+   per tick, so nothing in the simulation changes; presentation animations showing gameplay use a
+   separate game clock. The interface keeps real time. The speed is not saved in settings.
+5. Maps have 2 to 8 start positions (`MAX_MATCH_PLAYERS`); a match uses the first n. Computer
+   players are independent and hostile to everyone (free-for-all); alliances are not implemented.
+   The human's defeat ends the match for the human even while computer players remain. Team
+   colours are per player (8 colours); copies for computer players beyond the first are painted
+   on first use rather than for every sprite.
+
+## Large maps with environments and RA2 faction architecture (2026-10-05)
+
+The user asked for units and buildings that look more like Red Alert 2, and for more, larger and
+more complicated maps with nature, cities, ocean and different environments. Uncommitted, on top of
+the follow-ups above.
+
+1. **Cell looks.** Tiles may carry an optional integer property `look` (0 to 255), loaded into
+   `sim::LoadedMap::looks` as presentation data beside the tile size; `Cell`, `Grid` and the
+   state hash are unchanged, so a look can never change gameplay. Map schema version 2 is kept:
+   the property is optional and every existing map and fixture stays valid; a reader without it
+   rejects a map that uses it with the existing "unknown property" error. The game defines the
+   values (`crates/game/examples/art/looks.rs`, shared by generators and renderer): ground in the
+   low four bits (grass, dirt, sand, snow, pavement, water), feature in the high four (ore,
+   cliff, road, forest, house, city block, tower, bridge). Look 0 derives both from the terrain,
+   as before, and the game rejects unknown values when it checks a map. The renderer no longer
+   guesses roads and villages from the map's dimensions (`battlefield_layout::detail` is now only
+   used by the M1/M7 generators).
+2. **Rendering.** Sand and snow are overlays with ragged edges like soil, pavement is a base;
+   cliffs, forests and houses take the variant of their ground (snowy mountains, mesas; snowy
+   pines, palms; snowy cottages, adobe). City blocks and towers are 64 × 128 px tops that sort
+   with units and buildings (`units::unit_depth`) and take the least-revealed sight of the cells
+   they cover. Open water darkens with distance to shore. Ground sprites other than water are
+   updated only on a new simulation tick.
+3. **Bridges** are passable, non-water, non-buildable tiles drawn over water: land units cross,
+   ships cannot pass under them. No new navigation domain was added.
+4. **Maps.** Five painted maps, 112 to 128 cells a side, each mixing a dominant environment with a
+   city, coast or sea and nature (`world_maps.rs`): Liberty Bay, Frostline, Oasis Gulf, Coral
+   Archipelago, Continental Divide. Each has six starts in mirrored pairs. Recipes paint shapes
+   whose placing tools also paint their point mirror, with symmetrised integer noise; shared passes
+   add beaches, clear base sites and fill unreachable pockets, and a final mirror guarantees exact
+   point symmetry. The M7 checks apply unchanged (byte-identical regeneration, starts, ore within
+   10 cells, connectivity, symmetry), extended to compare looks and water.
+5. **Computer players on large maps.** On maps wider and higher than `ARMY_SCALE_SPAN` (128) cells
+   together, `sim::scaled_for_map` scales a difficulty's `max_army` and `wave_size` with the span,
+   up to twice; and a new wave first attack-moves through a staging waypoint beside the direct
+   route, alternating sides (`staging_point`), giving up after `STAGING_TICKS` or once it rests.
+   Without both, waves of small-map size met head-on halfway on these maps, wore each other below
+   half strength and fell back for over 70,000 ticks. Point symmetry preserves orientation, so
+   two players flanking on the same side take mirrored routes on opposite sides of the map. A
+   wave sweeping for buildings it has not seen looks near the enemy starts first, among
+   waypoints last seen in the same five-minute era (`SWEEP_ERA_TICKS`); sweeping by distance
+   alone left the winner of one match wandering far corners for 40,000 ticks. All
+   M7 maps keep their exact previous AI behaviour. The shipped-AI match test scales its tick limit
+   by the same span (30 minutes up to 128 cells, up to an hour at 256).
+6. **Art.** Buildings are remodelled with original RA2-inspired silhouettes and two material sets:
+   Allied (white concrete, blue-grey cladding, glass, domes) for the shared core and Allied
+   structures, Soviet (heavy concrete, brick, rust, copper) for Soviet structures. Team paint
+   stays on the authored ramp, so `presentation.rs` is unchanged. Ships have hulls with bows,
+   decks and superstructures, aircraft have airframes, and tanks carry team paint on their decks.
+   This is original geometry, not RA2 media.
+
+## Battle music and weapon sounds (2026-10-06; amends D38 item 1)
+
+The music and the three weapon effects are re-synthesised, still in code with no audio file, mono at 22,050 Hz and deterministic (fixed-seed noise). The music is an original 20-bar loop (34.8 s) in E minor at about 138 beats per minute (2,400 samples per sixteenth): an opening hit, an eight-bar A section (bass riff, drums, palm-muted power chords, a brass counter-line), an eight-bar B section (brass lead over sustained power chords, march beat), and a two-bar breakdown with a snare roll and riser back into the hit. Its sources are PolyBLEP saws and sines through state-variable filters with envelopes, saturated with `tanh`, with a dotted-eighth echo and a small Schroeder reverb; two extra bars are rendered and folded onto the start so that the loop has no seam, and the mix is soft-clipped and normalised to a peak of 0.5 (about -17 dBFS RMS). `Shot`, `Cannon` (which also covers rockets) and `Explosion` are layered (transient, band-passed noise crack, pitched low body, decaying filtered tail; a whoosh for projectiles; debris for explosions) and stay at most 1.4 s. Synthesis takes about 0.5 s at startup in a debug build.
+
+## Building repair, aircraft overflight, readable silhouettes (2026-10-06)
+
+1. **Repair** (`Command::RepairBuilding`, amends D25). The command toggles the repair of one of the
+   issuing player's buildings (validated like `SellBuilding`: `UnknownBuilding`, `NotOwned`, and
+   unseen foreign buildings reported as unknown). Repaired buildings are a per-player set in
+   `PlayerState::repairing`, hashed with the player. `economy::repair_buildings` runs in the
+   `Economy` stage after production: every `REPAIR_INTERVAL` (5) ticks a building regains
+   `max / REPAIR_STEPS` (80) hit points, so a ruin is whole in 20 s, for `repair_cost` credits — a
+   complete repair costs a quarter of the building's price, each step rounded up, at most 1 credit
+   under Super Me. A step the player cannot pay is skipped and the repair waits, so credits never
+   go negative (I7). A repair ends when the building is whole, destroyed, sold or captured. The
+   interface adds a Repair sidebar button and the `K` key (repair mode: left clicks toggle, as sell
+   mode sells), and a pulsing wrench beside the health bar of every shown building under repair.
+   The computer players do not repair yet, so the shipped AI matches are unchanged.
+2. **Aircraft fly over ground and naval units.** The grid keeps two occupancy layers: surface
+   units (land, naval, amphibious) and aircraft. `Grid::occupant` answers for the layer of the
+   view's navigation domain (`navigation_for`), so movement, pathfinding, wait cycles and
+   destination allocation are domain-correct without change; `occupant_for(cell, domain)` serves
+   callers holding the main grid. Aircraft still do not share a cell with other aircraft
+   (invariant I6 now holds per layer). `release` clears both layers, because `remove_dead`
+   forgets a unit's domain before releasing its cells. The air layer is hashed.
+3. **Distinct silhouettes.** `generate_hd_art.ground_vehicle` no longer derives every vehicle from
+   one template: each has its own size, running gear (jeep, four- and six-wheelers, half-track,
+   tracks, the Apocalypse's double tracks), turret and signature feature (Mirage tree, Tesla coil
+   tower, Prism crystal, V3 missile, Katyusha rack, twin flak guns, raised howitzer, hazard
+   tanker, MCV crane). Team paint moved from the whole deck to the turret or cab and a hull band.
+   Infantry have per-type uniform colour, headgear, pose and oversized props
+   (`generate_hd_art.INFANTRY`). Production cameos are cropped to the miniature's solid pixels
+   (`hd_art::content_rect`), and hovering any shown unit or building names it with its owner and
+   health (`hover_info.rs`); like the health bars, only shown views are named.
+
+## Four more painted maps (2026-10-06; extends "Large maps with environments")
+
+The user asked for more maps; their stated taste is many large, complex maps mixing nature, city,
+ocean and environments. Four recipes were added to `world_maps.rs`, each built around one idea not
+used by the first five, and registered in `gen_maps.rs` and `skirmish.ron` (six starts each):
+
+| Map | Size | Identity |
+|---|---|---|
+| `steel_harbor` | 128 × 128 | A whole-map city grid (period 7); a winding river between two harbour basins with piers splits around a downtown island of towers; five avenue bridges, promenades, industrial lots for the bases, parks with ponds and contested ore. |
+| `glacier_pass` | 120 × 120 | Temperate valleys with farms, woods and a fjord each, divided by a snowy massif; crossings are a winding pass north and south, a three-cell goat trail on each side and a central pass around a glacial lake with a causeway and a mining hamlet. |
+| `red_canyon` | 96 × 96 | A sandstone plateau (mesa) carved into a basin per base, spokes to a central basin with a ruined adobe town around an oasis pool, and rim canyons past palm oases that join neighbouring bases (the long flanking routes). The first medium-size painted map. |
+| `jungle_delta` | 128 × 112 | A lagoon with jungle islets at the centre; distributaries to the northern and southern sea and to the west and east coasts cut the jungle into six islands joined by sand bars and timber bridges; two river ports, fishing villages. |
+
+1. **No new tiles or looks.** A new tile kind would change every map's tileset and TMX, so the
+   existing maps' byte-for-byte output would change. The glacial lake is open water (its "ice" is
+   the causeway, a bridge); ruins are rubble (plaza), sand and adobe houses replacing blocks.
+2. **New painting helpers** (`Painter::meander`, `stroke`, `near_start`) are additions only; the
+   five earlier recipes are untouched and regenerate identically. `meander` is an odd function
+   about the map's centre line, so a river along it is its own point mirror and still winds.
+3. **Fairness and reachability** are enforced by the existing checks (`tests/m7_maps.rs`):
+   point symmetry, buildable yards, ore within 10 cells, every passable cell reachable. Unreachable
+   ore is turned into forest by `fill_pockets`, so ore was placed on reachable ground (one field on
+   Glacier Pass moved for this). Jungle Delta keeps the jungle thinner within 13 cells of a base so
+   that bases have room to build.
+4. **Computer players** finish every pairing on the new maps without changes to the AI or the tick
+   limits: the slowest of the 144 new matches ended at tick 48,651 (Glacier Pass; limit 67,500).
+
+## Ten players on maps that grow with them (2026-10-10; amends item 5 of "Camera, unlocks, targeting, game speed and multiple enemies")
+
+The user asked for up to ten players (one human, nine computer players) on every map, and for the
+map to grow with the number of players. Uncommitted, on top of the follow-ups above.
+
+1. **Ten players.** `MAX_MATCH_PLAYERS` is 10. A map file still lists 2 to `MAX_MATCH_PLAYERS`
+   start positions (the shipped files list four or six and are unchanged, byte for byte), but the
+   menu offers 1 to 9 enemies on every map (`MenuCounts::enemies`). `TEAM_PALETTE` has ten
+   colours: the eight of before in their order, then Lime (168, 220, 48) and Ivory (240, 230,
+   196), the two candidates farthest from the eight and from each other (CIE76 in L\*a\*b\*: 42
+   and 50 from their nearest colour, where Red and Orange are 30 apart). Ivory rather than white,
+   which would vanish on the minimap's snow. Because the palette index is the choice plus the
+   player number modulo the palette's length, the third and later colours of a match whose human
+   chose Orange or Pink differ from before (Lime now follows Pink, not Blue).
+2. **The map of a match is enlarged before match setup** by `sim::enlarged_map`
+   (`crates/sim/src/map_scale.rs`), a pure integer function of the checked map file and the
+   number of players. Map files cannot be regenerated larger (their recipes use absolute
+   coordinates), and they stay the unit that is checked and compared byte for byte. Two players
+   get the file's own grid, looks and start positions, cell for cell, so every one-against-one
+   match, hash and AI test is as before.
+3. **Size.** Every player beyond the second adds an eighth of the file's width and height; the
+   cells added to a side are rounded up to an even number, half on either side of the middle
+   (`enlarged_size`: 56 becomes 64, 70, 78, 84, 92, 98, 106, 112; 128 becomes 144 … 256; 128 × 96
+   becomes 144 × 108 … 256 × 192). Rounding to an even number keeps the middle of the map its
+   middle: with an odd number of added cells no column-wise enlargement of a point-symmetric map
+   is point-symmetric. Where a step would exceed `MAX_MAP_SIDE` on either side, both sides stop
+   at the last step that fits, so the map keeps its proportions (a 256-cell map is not enlarged).
+4. **Terrain** is repeated, not interpolated: each column and row of the file is shown one or
+   more times, in order (`axis_map`: the lower half samples cell centres, the upper half mirrors
+   it). So every separate piece of land and of water stays one piece (`m13_grown_maps.rs` counts
+   them), aprons around yards only grow, ore fields grow with their cells, and a point-symmetric
+   file gives a point-symmetric map with mirrored starts. A start position moves with the ground
+   under its yard's centre (the start plus (1, 1): the shipped factions place their 3 × 3 yard at
+   the start, which `map_scale` assumes and the catalogue check enforces, below).
+5. **Missing start positions are made** when the match has more players than the file lists
+   starts. Candidates are cells reachable over land from the first start, 8 cells from the edge,
+   whose 13 × 13 surroundings are at most a third water and at least half open ground, with no
+   water or ore under the yard and the ring around it and no bridge nearby. They are chosen
+   farthest first (the largest squared distance to the nearest start, ties by row and column)
+   and, while two or more are missing, as a cell together with its point mirror, so that made
+   bases are as fair as the map. A made start is at least 22 cells from every other
+   (`MIN_START_DISTANCE`), so pads and ore fields never touch. Its pad (the 13 × 13 square less
+   its corners) becomes open building ground that keeps each cell's ground look and drops its
+   feature; water, existing ore and bridges beside the yard stay, and only ground joined to the
+   yard is cleared. An ore field (a disc of radius 3, as the generators paint it, with the
+   amount per cell of the map's own ore, at least 20 cells) is planted 9 to 10 cells from the
+   yard where most of it fits on land a harvester can walk to, never within 5 cells of any yard.
+   Cells only ever become passable, so no land route is cut. If no such site is left, a relaxed
+   tier fills in water under the yard; no shipped map needs it at any player count, so no water
+   is filled in on any of them. A map without room is an error (`MapScaleError::NoStartSite`),
+   never fewer starts than players.
+6. **The simulation knows three look values** (`LOOK_FEATURE_ORE`, `LOOK_FEATURE_BRIDGE`,
+   `LOOK_GROUND_WATER`, and the ground mask), as `props.rs` already knew the scenery features;
+   it still does not depend on the game crate (I1). A game test checks that they agree with
+   `battlefield::looks`. Looks stay presentation data: the grid alone decides gameplay, and the
+   made cells' looks are derived from it.
+7. **Game integration.** `skirmish::match_plan` is the one place that turns the menu's choices
+   into a `MatchPlan`: the enlarged grid and looks, and a copy of the skirmish definitions whose
+   start positions for the chosen map are the enlarged ones, so match setup and the computer
+   players use the cells the bases stand on. `MapView`, `MapTerrain`, `MapLooks`, the camera
+   bounds, the minimap and the fog all read the enlarged map through the resources `spawn_map`
+   inserts; `MapStarts` holds the match's start positions. The `bevy_ecs_tiled` layer still shows
+   the file, which over an enlarged map would be the wrong terrain in the wrong place: it is
+   spawned hidden (`HiddenTiles`; its creation still reports that the checked file loaded and is
+   aligned) and not tinted, and the battlefield renderer, which already draws every cell on top
+   of it, draws the map alone. A restart replays the same choices, hence the same map. The map
+   row of the menu shows the size, `liberty bay  176 x 176`.
+8. **The catalogue check** sets up every map for every player count from 2 to 10 at startup:
+   every faction pairing for 2 and for 10 players, one pairing (changing with the count) for the
+   counts between. A skirmish file whose factions do not fit at made start positions (a yard far
+   from the start) is rejected there, as a file whose start lies off its map is.
+9. **Computer players** are unchanged. Enlarged small maps cross `ARMY_SCALE_SPAN`, so their
+   armies scale and flank as on the large maps; that is intended.
+10. **Measured** (Apple M5; `cargo run --release -p sim --example m13_ten_players`, optionally
+    `-- to-the-end all`). Enlarging a 128 × 128 map for ten players takes 2 to 5 ms. Ten computer
+    players on 256 × 256 cells: mean tick 0.42 to 0.45 ms over 24,000 ticks, 99th centile 1.9 to
+    3.2 ms, longest tick 13 to 20 ms (budget: mean 5 ms, D55), with at most 277 units and 97
+    buildings. The catalogue check now sets up 225 matches instead of 120 and takes 0.45 s
+    instead of 0.06 s in a release build (0.60 s instead of 0.12 s in a debug build); a ten-player
+    setup on 256 × 256 cells takes about 8.5 ms, a two-player one 0.6 ms. The battlefield draws one to four sprites per cell (four
+    times as many on a doubled map) and the minimap image of a 256 × 256 map is 1024 × 512
+    pixels, redrawn every tick; a tour of seven ten-player maps with all terrain drawn
+    (`MYGAME_MAP_REVIEW` with `MYGAME_MAP_REVIEW_ENEMIES=9`, release build) ran at 16.6 to 16.7 ms
+    a frame, the 60 Hz of the display, with a longest frame of 22 to 42 ms (the captures), as
+    the tour of the two-player maps does, so no cap on the scale was needed. With the display's
+    rate as the floor this shows no loss, not how much headroom is left.
+11. **Known limits.** All-against-all matches of ten computer players (a test format; the menu's
+    computer players are allied against the human) end on 13 of the 15 maps within 15,577
+    (Crossroads) to 58,622 ticks (Steel Harbor). Pacific Atoll takes 152,818 ticks: its last
+    three players wear each other down around the hub of the atoll with their credits at zero. Coral
+    Archipelago does not end within 400,000 ticks: the last two players are left with one or two
+    buildings each, no construction yard, no unit and no way to produce one, and neither ever
+    attacks. That is the win condition and the computer player of D41 and D43 (a player lives
+    while it owns a building; `broke` only helps a player that can still produce an army unit),
+    not the enlargement, but the more players a match has, the likelier such a remnant survives
+    its conqueror. Enlargement repeats cells, so roads, bridges and rivers become wider rather
+    than more detailed, and a made start position is plain cleared ground. `map_scale` assumes
+    the yard at the start position (item 4).
+
+## Maps at the engine's largest size (2026-10-11; extends "Large maps with environments" and "Ten players on maps that grow with them")
+
+The user asked for three things: maps "much much larger, so that the distances between each team
+can be very far", more diversity in them, and more maps that meet both. Uncommitted, on top of the
+follow-ups above.
+
+1. **How large.** `sim::MAX_MAP_SIDE` stays 256. The battlefield draws one to four sprites per
+   cell and re-tints them every tick (65,536 cells is 60 Hz with headroom unmeasured, see item 10
+   of "Ten players"); 512 a side would be four times that and needs a renderer that draws only
+   what the camera sees, which is a rewrite of `battlefield.rs`, not a map change. So the large
+   map files are now painted at or near that limit instead of at half of it: the twelve painted
+   maps doubled (128 to 256 a side, 112 to 224, 120 to 240, 96 to 192: four times the area), and
+   the six new ones are 256 x 256. The first pair of start positions is the pair farthest apart,
+   so a one-against-one match is fought across 186 to 276 cells (255 or more on eleven of the
+   eighteen large maps; 157 on Pacific Atoll, whose bases stand on a ring) where it was 78 to
+   137. The three M1/M7 maps (`demo`, `crossroads`, `riverlands`) are unchanged: hundreds of
+   tests place units on them by coordinate, and they remain as quick small matches. The menu
+   opens on the first of the largest maps (`MenuSelection::opening`) instead of on `demo`.
+2. **Repainted, not repeated.** Enlarging by `sim::enlarged_map` repeats cells (wider roads and
+   rivers, no new detail). The recipes in `world_maps.rs` were instead rewritten in the
+   coordinates of the larger map: positions and radii doubled, noise scales about doubled or
+   less (so woods and fields are more numerous rather than merely bigger), roads and city blocks
+   keep their width, so a doubled town has four times the blocks. Because a doubled noise scale
+   samples the same lattice, the coasts and ridges keep their old outline, drawn smoothly.
+3. **Growth with players** (`enlarged_size`) is unchanged, and so is its cap: a 256-cell file is
+   played as it is by any number of players, a 240-cell one too (the first step would pass 256),
+   224 grows once, 192 twice. Ten players on a 256 x 256 map have the room ten players had before
+   on a doubled 128 x 128 one. The large maps now list six to ten authored starts, so fewer are
+   made at run time.
+4. **New grounds and one feature** (`looks.rs`; the simulation still only knows passable, water,
+   buildable and ore): `Ice` and `Marsh` are passable and not buildable (the properties of the
+   beach), `Crops` and `Ash` are building ground, and the feature `Lava` is impassable and not
+   water, so neither armies nor ships cross it. Each ground is a world-periodic overlay like snow
+   (`terrain/20.png` to `24.png`, `scripts/generate_hd_terrain.py`); lava is drawn as an overlay
+   over its ash with an uneven glow that hides the texture's four-cell period, and the rock
+   terrace on ash is darkened to basalt (`Ground::stain`) rather than rendered anew. Existing
+   tops are reused on new grounds without new art: orchards and farm tracks on earth, farmhouses
+   in crop, city blocks and towers on snow and sand (`Biome::block`, `tower`), mangroves on
+   marsh, icebergs on ice. The tileset grew from 26 to 46 kinds, so every generated TMX changed
+   (the terrain of `crossroads` and `riverlands` did not).
+5. **Diversity by tool, not by hand.** `Painter::landmarks` places a landmark on a jittered grid
+   over the open country (never within about 15 cells of a base), chosen by a hash and by the
+   environment at that cell: copses, crags, hamlets, small ore fields and ruins everywhere;
+   ponds in their marsh, farms in their fields and orchards in green country; frozen ponds in
+   snow; oases and dry washes in desert; vents and hot springs on ash. Landmarks only take open
+   ground (`Painter::patch`), so no road, river, town or ore field is touched, and roads are
+   painted after them, so every road stays whole. `Painter::home_ore` gives every base two ore
+   fields nine cells from its yard, on the two sides with the most room, so a start position can
+   be moved or added without placing its ore by hand (the tests still require ore within ten
+   cells of every start).
+6. **The six new maps** (`frontier_maps.rs`) are each built on one of the new grounds or on a
+   topology the others lack: `ember_caldera` (lava rivers quarter a volcanic island; fords where
+   the flow has cooled), `frozen_sound` (a sheet of sea ice between two shores: the middle third
+   of the map is unbuildable manoeuvre ground), `harvest_plains` (a patchwork of fields and
+   hedgerows: open country, one river), `black_water` (marsh everywhere, building ground only on
+   hummocks), `thousand_lakes` (a web of necks between lakes; frozen lakes on the fells) and
+   `wheel_of_worlds` (ten sectors of five environments, whose borders wander by a displacement
+   that is odd about the centre, so that opposite sectors mirror). `MAX_MAPS` is 24.
+7. **Computer players are unchanged** (`ai.rs` untouched). Their army scaling was already capped
+   at twice the file's values from 128 + 128 cells up, and that is enough: with the shipped data
+   all 756 one-against-one matches (21 maps, every pairing of two factions and three
+   difficulties; `cargo run --release -p sim --example m14_duels -- full`) end with a winner,
+   the slowest on each large map between tick 47,310 (Frostline) and 126,125 (Glacier Pass), within the
+   limits of `m6_production_matches.rs` (36,000 ticks times the map's width plus height over
+   128; 144,000 on a 256 x 256 map, 135,000 on Glacier Pass). One map needed a change for it:
+   Coral Archipelago's three-cell causeways, twice as long as before, let an easy-against-easy
+   match run to tick 172,302; at five and six cells its slowest match ends at 86,587. That is the
+   narrow-link stalemate recorded under "Large maps" again: a link's width has to grow with its
+   length.
+8. **Tests.** `m7_maps.rs` checks the 20 generated maps as before (byte-identical regeneration,
+   symmetry, base sites, ore, every passable cell reachable) and no longer caps a file at
+   128 x 128. The end-to-end AI tests (`m6_production_matches.rs`, and `m6_ai.rs` on the shipped
+   maps) play their matches on all cores, and `m6_ai.rs` scales its tick limit with the map as
+   the production test does (its fixed 36,000 ticks were set when no map was larger than 64
+   cells). `m6_match.rs` checks the army scaling on grids made for the purpose instead of on two
+   map files of a particular size. The production test now accepts what D43 and `find_placement`
+   always allowed and `m6_ai.rs` already accepted: a placement rejected because another player's
+   unit, unseen beside the footprint, stepped into it. Four of the 756 matches show it (an army
+   reaching a base that is still building); none of the 540 on the smaller maps did. The
+   several-player test of `m10_unlocks_and_enemies.rs` plays at most six players per map, as
+   before the files listed more, scales its limit with the map and uses all cores; the growth
+   test of `m13_grown_maps.rs` knows that a map stops growing at the last eighth that fits. `MapSpec` lists each mirrored pair's first start (`homes`) and
+   derives the rest.
+9. **Known limits.** 256 cells a side is the ceiling until the terrain renderer culls. On the
+   largest maps a lava lake or an ice sheet of dozens of cells shows the overlay's four-cell
+   period at close zoom (the lava's glow variation hides most of it). A made start position on
+   ice or marsh keeps that ground's look although its pad is building ground (`map_scale` keeps
+   each cell's ground look); the large maps list enough starts that this needs eight or more
+   players on a map of six. Pacific Atoll and the other ocean maps leave much of their 256 x 256
+   cells to open sea, which is their point, but a land-only player sees less of the map's size.
+10. **Evidence.** `docs/screenshots/largest-maps/layouts/` holds the generator's picture of every
+    map (`gen_maps preview`, three pixels a cell), and `docs/screenshots/largest-maps/` native
+    captures of the new maps and grounds (`MYGAME_MAP_REVIEW`, release build, scaled to 1600
+    pixels wide). That tour drew every 256 x 256 map at 16.67 ms a frame, the display's 60 Hz,
+    with a longest frame of 18 to 19 ms.
+11. **Ten players** (`cargo run --release -p sim --example m13_ten_players -- to-the-end all`,
+    which now also takes map ids). All-against-all matches of ten computer players end on all 21
+    maps, between tick 15,577 (Crossroads) and 96,367 (Ember Caldera); Coral Archipelago (49,881)
+    and Pacific Atoll (51,699), which did not end or took 152,818 ticks on their doubled 128-cell
+    files, end like the others now that every base has its two ore fields and the causeways are
+    broad. Tick times on an idle machine over 24,000 ticks, at most 360 units and 138 buildings:
+    mean 0.39 to 0.71 ms and longest 8 to 22 ms on Liberty Bay, Continental Divide, Pacific Atoll
+    and Glacier Pass (budget: mean 5 ms). Frostline is the exception: mean 1.5 ms, 99th centile
+    12 ms, and 8 ticks of 24,000 over the 50 ms of a tick period (longest 89 ms). The time is
+    path searches (`find_path` and its heap; then `combat::keep_or_acquire`): a unit that waits
+    behind others asks for a way around them, and when there is none the search visits every
+    cell it can reach before the next fallback starts, which on a map of 63,504 cells of mostly
+    connected land costs four times what it did on 12,544. Wider passes and boulevards through
+    the town changed nothing measurable (tried and reverted), so it is not one bottleneck of the
+    map; it is the cost of the existing pathfinder on a large open map with ten armies, and is
+    left as it is: results would have to stay identical cell for cell for the hashes the tests
+    compare. One-against-one matches do not show it (756 matches in about 25 minutes of ten
+    cores).
+12. **Verified** on 2026-10-11: `cargo fmt --all -- --check`, `cargo clippy --workspace
+    --all-targets -- -D warnings`, `cargo test --workspace` (529 passed, 0 failed, 0 ignored;
+    about 35 minutes, of which the 756 production matches take 26 and the fixture-AI matches 6)
+    and the same in release (about 25 minutes), the release and debug smoke tests of 600 frames, the M7
+    benchmark, and the two sweeps above.
+
+## RA2 parity programme (2026-10-11; `docs/prompts/RA2_PARITY_PROMPT.md`)
+
+The user asked for the prompt in `docs/prompts/RA2_PARITY_PROMPT.md` to be carried out in one run on
+the branch `ra2-parity`: milestones RA0 to RA9, gated only by the validation commands, with one
+independent review of the whole programme at the end. `docs/RA2_PARITY_PLAN.md` is the plan and
+prevails for this programme (PLAN.md section 14). The decisions below are numbered R1, R2, ... and
+continue per milestone.
+
+### R1. Fixed decisions of the prompt (recorded, not chosen here)
+
+1. The RA2 ruleset is the default skirmish ruleset. Super Me, ALL UNLOCKED, the Super Me unit
+   speed, fog of war, the global rally key and maps that grow with the player count stay as menu
+   options or extensions; where one conflicts with RA2 behaviour, RA2 behaviour is the default.
+2. The Vanguard and Meridian rosters and their twelve original items leave the default skirmish.
+   Tests that rely on them move to fixture data with the same assertions (invariant I10).
+3. Computer players are allied against the human by default; a free for all option is added.
+4. RA2 reference files are obtained into `~/Library/Caches/MyGame001/ra2-reference/` and are never
+   committed, nor is any other RA2 file. Ported values carry a comment naming the ini section and
+   key.
+5. New visuals and sounds are original and come from the repository's generators.
+6. Invariants I1 to I12 stay in force; only I6 may be amended (infantry sub cells, RA3).
+7. One branch, one or more commits per milestone, existing M tags and test file names unchanged;
+   the per milestone review cycle of PLAN.md sections 10 and 12 is replaced, for this programme
+   only, by the single final review of the prompt's section 7.
+
+### R2. Reference data provenance (confirmed facts)
+
+| Item | Value |
+|---|---|
+| Repository | `https://github.com/otherdeniz/CnC_RulesEditor` |
+| Commit | `b7278f2e1dab098c5a2f05d4784fffe70a4e5f9c` (the remote's `HEAD` on 2026-10-11) |
+| `Deniz.TiberiumSunEditor.Gui/Resources/RA2rules.ini` | saved as `rules.ini`, 518,789 bytes, 23,126 lines, SHA-256 `adc869ca037db5141f562f18092d022045e194de0d1204a46b9ec8372b2b826f` |
+| `Deniz.TiberiumSunEditor.Gui/Resources/RA2art.ini` | saved as `art.ini`, 231,105 bytes, 14,720 lines, SHA-256 `d732bfc8ffb6d52908342254c22731acb730ae6d2bbfb41983ef109e48a8f061` |
+| Location | `~/Library/Caches/MyGame001/ra2-reference/` (outside the repository) |
+
+Assumption, not proven: the file is the rules.ini of patch 1.006. It carries no version number;
+its `[General]` name is "Red Alert 2 -- Official Rules of Engagement" and it has no Yuri's Revenge
+sections. What the repository commits instead of the files is a table of the numbers and ini keys
+the game uses (`crates/sim/tests/reference/`, written by `scripts/ra2_reference.py` from the
+cached files), which the data parity audit of RA9 compares the shipped data with.
+
+### R3. Build directory
+
+The prompt says to use the configured `CARGO_TARGET_DIR`. None is configured in this environment
+(the variable is unset and neither `.cargo/config.toml` nor `~/.cargo/config.toml` sets a build
+directory; the `~/Library/Caches/Codex/cargo-target` of earlier reports no longer exists), so
+Cargo's default `target/` in the repository is used, which `.gitignore` excludes. Validation logs
+are kept under `docs/validation/ra2-parity/<milestone>/` by `scripts/validate_ra2_parity.sh`, which
+runs the eleven commands of the prompt's section 9 in order and records each exit status.
+
+### R4. Maps that grow with the players become an option, default off
+
+Fixed decision 1 names "maps that grow with the player count" among the features kept "as menu
+options or extensions, with RA2 behaviour as the default wherever the two conflict". RA2 plays a
+map at its own size with at most as many players as it has start positions, so the two conflict.
+From RA1 the menu has a row MAP GROWTH (OFF, ON), default OFF: the map is played as its file
+defines it, and the number of enemies is limited to the start positions the file lists less one
+(3 to 9). With ON the behaviour of "Ten players on maps that grow with them" is unchanged
+(`sim::enlarged_map`, made start positions, up to ten players). The catalogue check and the
+grown map tests keep covering both. This reverses a default the user asked for on 2026-10-10, on
+the strength of the later prompt; it is listed for the user in the final report.
+
+### R5. End to end matches pair sides, with rotating countries
+
+`m6_production_matches`, `m14_duels -- full`, `m7_soak`, `m13_ten_players` and the game's
+catalogue check played every pairing of the two factions. With nine countries every pairing
+would be 81 instead of 4 (15,309 one against one matches instead of 756). From RA1 they play
+every pairing of the two sides, and the country of each side rotates with the map and the pairing
+so that every country is played on several maps; the number of matches (756) and of soak
+configurations is unchanged. The tests' assertions are unchanged: every match ends with a winner
+within its tick limit, without a rejected command the test does not allow, and with equal hashes
+where the test compares them.
+
+### R6 is reserved for the amendment of invariant I6 in RA3.
+
+### R7. Speed is converted with the time base of the other rates, not anchored on the GI
+
+The prompt's section 3 proposed `subcells per tick = round(Speed x 14 / 4)`, which keeps the GI at
+its present 14, and required the plan to confirm that anchor or justify another. ModEnc and EA's
+released Red Alert source agree that the engine reads `Speed` as leptons per frame,
+`min(Speed x 256 div 100, 255)`, and ModEnc adds a factor of 3/2 for infantry on foot. The plan
+therefore converts speed like every other rate, with 15 frames to 20 ticks:
+`round(leptons per frame x 3 / 4)`. Confirmed fact: the definition of `Speed`. Single source: the
+infantry factor. Assumption: `JumpjetSpeed` is leptons per frame (undocumented). Consequence: at
+1x game speed units move as in RA2 at its nominal 15 frames per second, slower than before RA1
+(GI 11 instead of 14 subcells per tick, Grizzly 13 instead of 28); the ratio of movement to rate
+of fire, build time and recharge is RA2's at every game speed, which the proposed anchor would
+have distorted by a factor of 1.2 for infantry and 1.9 for vehicles. The game speed setting is
+unchanged (2x corresponds to RA2 at 30 frames per second).
+
+### R8. The soak plays its configurations on all cores and accepts the documented placement rejection (amends D56)
+
+Found by the baseline validation of RA0, before any change to the game; both changes are in
+`crates/sim/examples/m7_soak.rs` only.
+
+1. **Time.** With the 18 large maps painted at 192 to 256 cells a side (2026-10-11) a
+   configuration takes 45 to 60 seconds for its two runs instead of about one, and the 260
+   configurations, played one after the other, about three hours; the first baseline run was
+   stopped after 47 (`docs/validation/ra2-parity/ra0-baseline/09-soak-sequential-partial.log`).
+   The soak is a validation command of every milestone, so it now plays its configurations on
+   all cores, as the end to end tests and `m14_duels` already do. Nothing it checks changed: the
+   same configurations, 36,000 ticks each, played twice on one thread with the state hash
+   compared on every tick, I6, I7, the rejected command rule and the state limits on every tick,
+   and a report in the same order. The 47 lines of the sequential run and the first 47 of the
+   parallel one are identical apart from the seconds.
+2. **The allocator.** The first parallel run took 9,578 seconds, no faster than one thread: the
+   soak's budget allocator updated two shared counters on every allocation, and ten threads
+   waited for each other's cache line. Each thread now keeps a credit of bytes it has already
+   counted (`CREDIT_CHUNK`, 256 KiB), so the shared counter is touched once per chunk. The budget
+   (1 GiB) is unchanged and is enforced at most 512 KiB per thread early, never late; it and the
+   reported peak now cover all configurations that run at once (207 MiB for ten at a time, where
+   one match used 1.8 MiB on the small maps). The parallel run takes 1,894 seconds.
+3. **A rejected placement that the tests already accept.** The soak had not been run since the
+   maps were doubled, and failed on two of the 260 configurations (Liberty Bay and Steel Harbor,
+   Vanguard against Meridian, both easy): a `PlaceBuilding` of the computer player was rejected
+   because a unit of the other player, which it could not see beside the footprint, had stepped
+   into it. D43 and item 8 of "Maps at the engine's largest size" allow exactly this, and
+   `m6_production_matches.rs` and `m6_ai.rs` accept it; the soak's rule now accepts it too (a
+   placement rejected as occupied by a unit of another player), and still fails on any other
+   unexplained rejection, including a footprint occupied by the player's own unit.
