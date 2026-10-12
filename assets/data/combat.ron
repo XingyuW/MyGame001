@@ -10,7 +10,8 @@
 // units:      hit points, armour class, sight radius in cells, and at most one weapon of every
 //             unit type of units.ron
 // buildings:  the same for every building type of economy.ron; a building with a weapon is a
-//             defensive structure, which does not fire under low power
+//             defensive structure, which does not fire under low power if it is `powered`
+//             and consumes power (arsenal.ron, economy.ron)
 //
 // Hit points and sight are ported from the ini; armour classes, warheads and weapons are the
 // game's own until RA3.

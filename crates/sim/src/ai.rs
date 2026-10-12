@@ -24,7 +24,9 @@
 //! 1. places a ready building on a free spot near its base ([`find_placement`]);
 //! 2. queues the next building of the build order that it does not own as often as the build
 //!    order lists it (so lost buildings are rebuilt), or a power building first if the power would
-//!    not suffice; but when it has no armed unit, no working harvester, and too few credits for the
+//!    not suffice; with a rules file (RA2) it does so in each lane of the Construction Yard, so
+//!    that a building and a defence are built side by side ([`queue_buildings`]); but when it
+//!    has no armed unit, no working harvester, and too few credits for the
 //!    army unit it can produce, it sells a building its army does not need instead, and queues no
 //!    building until it has an armed unit again ([`broke`]);
 //! 3. queues harvesters up to `harvesters_per_refinery` per refinery, and armed units of the army
@@ -57,8 +59,10 @@ use crate::building::{Building, Footprint, Producer};
 use crate::combat::{Sight, Weapon};
 use crate::command::{Command, CommandQueue, IssuedCommand, PlayerId};
 use crate::definitions::{Definitions, UnitKind};
-use crate::economy::{MAX_QUEUE_LENGTH, PlayerState, Players};
-use crate::economy_commands::{check_buildable, check_placement, produces};
+use crate::economy::{Lane, PlayerState, Players, QueueKey};
+use crate::economy_commands::{
+    check_buildable, check_placement, extends_base, placement_reach, produces,
+};
 use crate::economy_defs::{BuildingKind, ProductionItem};
 use crate::harvest::{HarvestState, Harvester};
 use crate::hash::Fnv1a64;
@@ -645,19 +649,17 @@ impl<'a> View<'a> {
     /// Whether `QueueProduction` of `item` would pass its validation now: the player may build
     /// it, and the queue is not full.
     fn queueable(&self, item: ProductionItem) -> bool {
-        self.buildable(item) && self.queue_len(item) < MAX_QUEUE_LENGTH
+        self.buildable(item) && self.queue_len(item) < self.definitions.queue_capacity(item)
     }
 
-    /// The building type under which the queue of `item` is kept.
-    fn queue_key(&self, item: ProductionItem) -> Option<BuildingKind> {
-        self.definitions
-            .production(item)
-            .map(|terms| self.definitions.queue_key(terms.producer))
+    /// The building type and lane under which the queue of `item` is kept.
+    fn queue_key(&self, item: ProductionItem) -> Option<QueueKey> {
+        self.definitions.queue_of(item)
     }
 
     fn queue_len(&self, item: ProductionItem) -> usize {
         self.queue_key(item)
-            .map_or(usize::MAX, |key| self.state.queue(key).len())
+            .map_or(usize::MAX, |key| self.state.lane(key).len())
     }
 
     /// Items of `item` in the player's queues.
@@ -844,10 +846,8 @@ fn think(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
             controller.liquidating = true;
             commands.push(command);
         }
-    } else if !controller.liquidating
-        && let Some(command) = queue_building(view)
-    {
-        commands.push(command);
+    } else if !controller.liquidating {
+        commands.extend(queue_buildings(view));
     }
     commands.extend(queue_units(view, controller));
     commands.extend(set_rally_points(view, controller));
@@ -976,21 +976,26 @@ fn deploy_base_unit(view: &View<'_>, controller: &AiController) -> BaseUnit {
 }
 
 /// `PlaceBuilding` for a building that is ready at the head of one of the player's queues, if a
-/// place is found.
+/// place is found: the first ready building, in the order of the queues, that has one (with the
+/// two lanes of RA2 a building and a defence may be ready at once; one is placed per turn).
 fn place_ready_building(view: &View<'_>, controller: &AiController) -> Option<Command> {
-    let ready = view.state.queues().find_map(|(_, items)| {
-        let head = items.first()?;
-        let ProductionItem::Building(kind) = head.item else {
-            return None;
-        };
-        let terms = view.definitions.production(head.item)?;
-        (head.progress >= terms.build_time).then_some(kind)
-    })?;
-    let origin = find_placement(view, controller, ready)?;
-    Some(Command::PlaceBuilding {
-        building: ready,
-        origin,
-    })
+    view.state
+        .queues()
+        .filter_map(|(_, items)| {
+            let head = items.first()?;
+            let ProductionItem::Building(kind) = head.item else {
+                return None;
+            };
+            let terms = view.definitions.production(head.item)?;
+            (head.progress >= terms.build_time).then_some(kind)
+        })
+        .find_map(|ready| {
+            let origin = find_placement(view, controller, ready)?;
+            Some(Command::PlaceBuilding {
+                building: ready,
+                origin,
+            })
+        })
 }
 
 /// A footprint origin for a building of type `kind` near the player's base that passes the
@@ -1017,9 +1022,15 @@ fn find_placement(
 ) -> Option<CellPos> {
     let def = view.definitions.building(kind)?;
     let (width, height) = (i32::from(def.width.max(1)), i32::from(def.height.max(1)));
-    let reach = i32::try_from(view.definitions.placement_distance()).unwrap_or(0);
+    // The building's own reach, from the buildings beside which one may be placed (RA2:
+    // `adjacent` and `base_normal`; without a rules file the economy file's distance from any).
+    let reach = i32::try_from(placement_reach(view.definitions, kind)).unwrap_or(0);
     let mut origins: BTreeSet<CellPos> = BTreeSet::new();
-    for building in &view.own_buildings {
+    for building in view
+        .own_buildings
+        .iter()
+        .filter(|building| extends_base(view.definitions, building.kind))
+    {
         let footprint = building.footprint;
         let (x0, y0) = (footprint.origin.x, footprint.origin.y);
         let (x1, y1) = (
@@ -1070,10 +1081,10 @@ fn find_placement(
         .collect();
     candidates
         .sort_unstable_by_key(|&(to_ore, distance, origin)| (to_ore, distance, origin.y, origin.x));
-    let owned: Vec<Footprint> = view
+    let owned: Vec<(BuildingKind, Footprint)> = view
         .own_buildings
         .iter()
-        .map(|building| building.footprint)
+        .map(|building| (building.kind, building.footprint))
         .collect();
     let own_cells: BTreeSet<CellPos> = view
         .own_units
@@ -1207,14 +1218,19 @@ fn sell_for_army(view: &View<'_>) -> Option<Command> {
             .iter()
             .any(|def| view.definitions.same_factory(kind, def.production.producer))
     };
+    // What cannot be sold stays (RA2: walls).
+    let sellable = |kind: BuildingKind| {
+        view.definitions.rules().is_none()
+            || view
+                .definitions
+                .metadata(ProductionItem::Building(kind))
+                .is_none_or(|entry| entry.sellable)
+    };
     view.own_buildings
         .iter()
-        .filter(|building| !needed.contains(&building.kind))
+        .filter(|building| !needed.contains(&building.kind) && sellable(building.kind))
         .max_by_key(|building| {
-            let value = view
-                .definitions
-                .building(building.kind)
-                .map_or(0, |def| def.sell_value);
+            let value = view.definitions.refund(building.kind);
             (
                 !builds(building.kind),
                 value,
@@ -1226,47 +1242,75 @@ fn sell_for_army(view: &View<'_>) -> Option<Command> {
         })
 }
 
-/// The next building of the build order that the player does not own as often as the build order
-/// lists it up to that entry, queued if its producer's queue is empty; a power building instead if
-/// that building would leave the player without enough power, or if the build order is complete
-/// and the player has low power.
-fn queue_building(view: &View<'_>) -> Option<Command> {
+/// For each lane of buildings (one without a rules file; with one the buildings and the
+/// defences of the Construction Yard, RA2): the next building of the build order in that lane
+/// that the player does not own as often as the build order lists it up to that entry, queued if
+/// its lane is empty. A power building is queued instead if that building would leave the
+/// player without enough power, counting what the buildings in its queues will produce and
+/// consume, or if the build order is complete and the player has low power; a lane whose
+/// building must wait for power queues nothing.
+fn queue_buildings(view: &View<'_>) -> Vec<Command> {
     let order = &view.ai.build_order;
-    let needed = order.iter().enumerate().find_map(|(index, &kind)| {
+    let lane = |kind: BuildingKind| view.definitions.lane(ProductionItem::Building(kind));
+    let mut needed: BTreeMap<Lane, BuildingKind> = BTreeMap::new();
+    for (index, &kind) in order.iter().enumerate() {
         let listed = order[..=index]
             .iter()
             .filter(|&&other| other == kind)
             .count();
-        (view.owned(kind) < listed).then_some(kind)
-    });
-    let spare = view
-        .state
-        .power_produced()
-        .saturating_sub(view.state.power_consumed());
-    let kind = match needed {
-        Some(kind) => {
-            let consumed = view
-                .definitions
-                .building(kind)
-                .map_or(0, |def| def.power_consumed);
-            if kind != view.ai.power && spare < consumed {
-                view.ai.power
-            } else {
-                kind
-            }
+        if view.owned(kind) < listed {
+            needed.entry(lane(kind)).or_insert(kind);
         }
-        None if view.state.low_power() => view.ai.power,
-        None => return None,
+    }
+    let power_of = |kind: BuildingKind| {
+        view.definitions.building(kind).map_or(0, |def| {
+            def.power_produced.saturating_sub(def.power_consumed)
+        })
     };
-    let item = ProductionItem::Building(kind);
-    (view.queue_len(item) == 0 && view.queueable(item)).then_some(Command::QueueProduction { item })
+    // The power to spare once every building in the queues stands.
+    let mut spare = view
+        .state
+        .queues()
+        .flat_map(|(_, items)| items.iter())
+        .filter_map(|queued| match queued.item {
+            ProductionItem::Building(kind) => Some(power_of(kind)),
+            ProductionItem::Unit(_) => None,
+        })
+        .fold(
+            view.state
+                .power_produced()
+                .saturating_sub(view.state.power_consumed()),
+            i32::saturating_add,
+        );
+    let mut commands = Vec::new();
+    let mut taken: BTreeSet<Lane> = BTreeSet::new();
+    let mut queue = |kind: BuildingKind, spare: &mut i32, taken: &mut BTreeSet<Lane>| {
+        let item = ProductionItem::Building(kind);
+        if !taken.contains(&lane(kind)) && view.queue_len(item) == 0 && view.queueable(item) {
+            taken.insert(lane(kind));
+            *spare = spare.saturating_add(power_of(kind));
+            commands.push(Command::QueueProduction { item });
+        }
+    };
+    let mut power = needed.is_empty() && view.state.low_power();
+    for &kind in needed.values() {
+        if kind != view.ai.power && spare.saturating_add(power_of(kind)) < 0 {
+            power = true;
+        } else {
+            queue(kind, &mut spare, &mut taken);
+        }
+    }
+    if power {
+        queue(view.ai.power, &mut spare, &mut taken);
+    }
+    commands
 }
 
 /// Harvesters up to the difficulty's number per refinery, then armed units of the army
 /// composition up to its army size, at most [`AI_UNIT_QUEUE`] items per producing building type.
 fn queue_units(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
     let mut commands = Vec::new();
-    let mut added: BTreeMap<BuildingKind, usize> = BTreeMap::new();
+    let mut added: BTreeMap<QueueKey, usize> = BTreeMap::new();
     let harvester = ProductionItem::Unit(view.ai.harvester);
     let refineries = view
         .own_buildings
@@ -1325,11 +1369,7 @@ fn queue_units(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
 /// Whether one more `item` may be queued this turn: its producing building type holds fewer than
 /// [`AI_UNIT_QUEUE`] items, counting those `added` this turn, and the command would be accepted.
 /// Records the item in `added` if so.
-fn has_room(
-    view: &View<'_>,
-    item: ProductionItem,
-    added: &mut BTreeMap<BuildingKind, usize>,
-) -> bool {
+fn has_room(view: &View<'_>, item: ProductionItem, added: &mut BTreeMap<QueueKey, usize>) -> bool {
     let Some(producer) = view.queue_key(item) else {
         return false;
     };

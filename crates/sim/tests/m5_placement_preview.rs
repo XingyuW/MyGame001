@@ -112,14 +112,18 @@ fn preview(app: &App, origin: CellPos) -> Result<Footprint, RejectReason> {
         .resource::<Players>()
         .get(HUMAN)
         .expect("human player");
-    let owned: Vec<Footprint> = world
+    let owned: Vec<(sim::BuildingKind, Footprint)> = world
         .iter_entities()
         .filter(|entity| {
             entity
                 .get::<sim::Owner>()
                 .is_some_and(|owner| owner.0 == HUMAN)
         })
-        .filter_map(|entity| entity.get::<Building>().map(|building| building.footprint))
+        .filter_map(|entity| {
+            entity
+                .get::<Building>()
+                .map(|building| (building.kind, building.footprint))
+        })
         .collect();
     check_placement(
         world.resource::<sim::Grid>(),

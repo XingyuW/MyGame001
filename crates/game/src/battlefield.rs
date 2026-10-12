@@ -861,11 +861,13 @@ fn effects(
                     .and_then(|d| d.building_combat(b.kind))
                     .is_some_and(|c| h.hit_points < c.hit_points / 2)
             });
+        // Whether power lets the building work (RA2: `sim::PlayerState::powers`).
         let powered = host
             .world()
             .get::<sim::Owner>(view.building)
             .and_then(|o| host.players()?.get(o.0))
-            .is_some_and(|p| !p.low_power());
+            .zip(host.definitions())
+            .is_some_and(|(p, d)| p.powers(d, b.kind));
         if damaged
             || matches!(
                 def.id.as_str(),

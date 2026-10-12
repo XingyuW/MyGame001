@@ -21,10 +21,30 @@
 //! * `prerequisite_groups`: groups of the rules file of which the player must own one member
 //!   (the ini's `POWER`, `RADAR`, ... tokens), besides the buildings the economy file lists.
 //!
+//! Schema version 3 (RA2, docs/RA2_PARITY_PLAN.md sections 4.2 and 4.6; docs/DECISIONS.md R22)
+//! adds the traits of a building that production, power, placement, selling and repair read. A
+//! unit has 0 in every one of them:
+//!
+//! * `build_limit`: how many buildings of the type a player may own and have queued together
+//!   (the ini's `BuildLimit`); 0: any number;
+//! * `adjacent`: the free cells allowed between a new building of the type and a base building
+//!   of its owner (the ini's `Adjacent`: 0 means touching), 0 to [`MAX_PLACEMENT_DISTANCE`];
+//! * and as 1 or 0: `base_normal` (other buildings may be placed beside it, `BaseNormal`),
+//!   `radar` (`Radar`), `sellable` (no `Wall`, no `Unsellable`), `repairable` (`Repairable`),
+//!   `powered` (`Powered`: under low power it stops working if it consumes power),
+//!   `is_powered` (the `IsPowered` of its superweapon: the charge waits under low power), and
+//!   `unit_repair` (`UnitRepair`: a damaged vehicle sent to it is repaired for credits).
+//!
+//! The traits are read only by a world with a rules file; without one the rules of M3 to M9
+//! apply unchanged (docs/RA2_PARITY_PLAN.md section 3.2). The category of a building is also its
+//! production lane there: `"armory"` (the ini's `BuildCat=Combat`) is the defence lane of the
+//! Construction Yard ([`Definitions::lane`]).
+//!
 //! Countries and prerequisite groups are those of the rules file, so the rules are loaded first
 //! ([`Definitions::with_rules`]); an entry that names one without rules is rejected. With rules,
 //! the base unit of every side must have the role `mcv`, since that role is what deploys.
 use crate::data::{self, DataError, DataErrorKind, MAX_DATA_FILE_BYTES, Shape};
+use crate::economy_defs::MAX_PLACEMENT_DISTANCE;
 use crate::hash::Fnv1a64;
 use crate::rules::{
     CountryId, GroupId, MAX_COUNTRIES, MAX_PREREQUISITE_GROUPS, MAX_TECH_LEVEL, Side,
@@ -33,8 +53,11 @@ use crate::{BuildingKind, Definitions, ProductionItem, UnitKind};
 use serde::Deserialize;
 use std::{collections::BTreeMap, path::Path};
 
-/// The schema version of the arsenal file this crate reads (2 since RA1).
-pub const ARSENAL_SCHEMA_VERSION: i64 = 2;
+/// The schema version of the arsenal file this crate reads (2 since RA1, 3 since RA2).
+pub const ARSENAL_SCHEMA_VERSION: i64 = 3;
+
+/// Largest `build_limit` of an arsenal entry.
+pub const MAX_BUILD_LIMIT: u32 = 255;
 
 /// The kind of factory a building is (docs/RA2_PARITY_PLAN.md section 3.3): buildings of one
 /// group produce the same items and share a queue.
@@ -131,6 +154,22 @@ pub struct ArsenalEntry {
     /// -1 to [`MAX_TECH_LEVEL`].
     pub tech_level: i32,
     pub prerequisite_groups: Vec<GroupId>,
+    /// Buildings of the type a player may own and have queued together; 0: any number.
+    pub build_limit: u32,
+    /// Free cells allowed between a new building of the type and a base building of its owner.
+    pub adjacent: u32,
+    /// Other buildings of its owner may be placed beside it.
+    pub base_normal: bool,
+    /// A radar building: its owner has the minimap while it works.
+    pub radar: bool,
+    pub sellable: bool,
+    pub repairable: bool,
+    /// Under low power the building stops working if it consumes power.
+    pub powered: bool,
+    /// The charge of its superweapon waits while its owner is low on power.
+    pub is_powered: bool,
+    /// A damaged vehicle of its owner sent to it is repaired for credits.
+    pub unit_repair: bool,
 }
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Arsenal(pub BTreeMap<ProductionItem, ArsenalEntry>);
@@ -161,6 +200,15 @@ struct Entry {
     forbidden_countries: Vec<String>,
     tech_level: i64,
     prerequisite_groups: Vec<String>,
+    build_limit: i64,
+    adjacent: i64,
+    base_normal: i64,
+    radar: i64,
+    sellable: i64,
+    repairable: i64,
+    powered: i64,
+    is_powered: i64,
+    unit_repair: i64,
 }
 static ENTRY: Shape = Shape::Struct(&[
     ("id", Shape::Str),
@@ -205,6 +253,15 @@ static ENTRY: Shape = Shape::Struct(&[
             max: MAX_PREREQUISITE_GROUPS,
         },
     ),
+    ("build_limit", Shape::Int),
+    ("adjacent", Shape::Int),
+    ("base_normal", Shape::Int),
+    ("radar", Shape::Int),
+    ("sellable", Shape::Int),
+    ("repairable", Shape::Int),
+    ("powered", Shape::Int),
+    ("is_powered", Shape::Int),
+    ("unit_repair", Shape::Int),
 ]);
 static FILE: Shape = Shape::Struct(&[
     (
@@ -428,6 +485,28 @@ impl Arsenal {
                 }
                 prerequisite_groups.push(group);
             }
+            // The traits of a building (schema version 3): numbers within their ranges, flags
+            // 1 or 0, and all of them 0 on a unit.
+            let building = matches!(item, ProductionItem::Building(_));
+            let traits = [
+                ("build_limit", e.build_limit, i64::from(MAX_BUILD_LIMIT)),
+                ("adjacent", e.adjacent, i64::from(MAX_PLACEMENT_DISTANCE)),
+                ("base_normal", e.base_normal, 1),
+                ("radar", e.radar, 1),
+                ("sellable", e.sellable, 1),
+                ("repairable", e.repairable, 1),
+                ("powered", e.powered, 1),
+                ("is_powered", e.is_powered, 1),
+                ("unit_repair", e.unit_repair, 1),
+            ];
+            for (name, value, max) in traits {
+                if !(0..=max).contains(&value) {
+                    return Err(bad(name, &value.to_string()));
+                }
+                if !building && value != 0 {
+                    return Err(bad(name, "a building trait on a unit type"));
+                }
+            }
             result.insert(
                 item,
                 ArsenalEntry {
@@ -448,6 +527,15 @@ impl Arsenal {
                     forbidden_countries,
                     tech_level: e.tech_level as i32,
                     prerequisite_groups,
+                    build_limit: e.build_limit as u32,
+                    adjacent: e.adjacent as u32,
+                    base_normal: e.base_normal == 1,
+                    radar: e.radar == 1,
+                    sellable: e.sellable == 1,
+                    repairable: e.repairable == 1,
+                    powered: e.powered == 1,
+                    is_powered: e.is_powered == 1,
+                    unit_repair: e.unit_repair == 1,
                 },
             );
         }
@@ -513,6 +601,17 @@ impl Arsenal {
             for group in &e.prerequisite_groups {
                 h.write(&[group.0]);
             }
+            h.write_u32(e.build_limit);
+            h.write_u32(e.adjacent);
+            h.write(&[
+                u8::from(e.base_normal),
+                u8::from(e.radar),
+                u8::from(e.sellable),
+                u8::from(e.repairable),
+                u8::from(e.powered),
+                u8::from(e.is_powered),
+                u8::from(e.unit_repair),
+            ]);
         }
     }
 }
@@ -575,6 +674,62 @@ impl Definitions {
                 _ => None,
             })
             .unwrap_or(producer)
+    }
+    /// The lane in which `item` is produced (RA2): with a rules file a building of the
+    /// arsenal's category `armory` (the ini's `BuildCat=Combat`) is in the defence lane; every
+    /// other item, and every item of a world without a rules file, in the main lane.
+    pub fn lane(&self, item: ProductionItem) -> crate::Lane {
+        let defence = self.rules().is_some()
+            && matches!(item, ProductionItem::Building(_))
+            && self
+                .metadata(item)
+                .is_some_and(|entry| entry.category == Category::Armory);
+        if defence {
+            crate::Lane::Defences
+        } else {
+            crate::Lane::Main
+        }
+    }
+    /// What a player's queue of `item` is kept under ([`Definitions::queue_key`] of its
+    /// producer, and its [`Definitions::lane`]), or `None` for an item without production
+    /// terms.
+    pub fn queue_of(&self, item: ProductionItem) -> Option<crate::QueueKey> {
+        self.production(item).map(|terms| crate::QueueKey {
+            producer: self.queue_key(terms.producer),
+            lane: self.lane(item),
+        })
+    }
+    /// How many items the queue of `item` holds. Without a rules file
+    /// [`MAX_QUEUE_LENGTH`](crate::MAX_QUEUE_LENGTH). With one (RA2): a lane of buildings holds
+    /// one item, since Red Alert 2 does not queue buildings; a queue of units the one in
+    /// production and `max_queued_objects` behind it.
+    pub fn queue_capacity(&self, item: ProductionItem) -> usize {
+        match (self.rules(), item) {
+            (None, _) => crate::MAX_QUEUE_LENGTH,
+            (Some(_), ProductionItem::Building(_)) => 1,
+            (Some(rules), ProductionItem::Unit(_)) => {
+                usize::try_from(rules.production.max_queued_objects)
+                    .unwrap_or(0)
+                    .saturating_add(1)
+            }
+        }
+    }
+    /// The credits a player gets for selling a building of type `kind`: with a rules file the
+    /// cost times `refund_percent` (RA2, docs/RA2_PARITY_PLAN.md section 4.6), without one the
+    /// economy file's `sell_value`.
+    pub fn refund(&self, kind: BuildingKind) -> i64 {
+        let Some(def) = self.building(kind) else {
+            return 0;
+        };
+        match self.rules() {
+            Some(rules) => {
+                def.production
+                    .cost
+                    .saturating_mul(i64::from(rules.economy.refund_percent))
+                    / 100
+            }
+            None => def.sell_value,
+        }
     }
     /// The id of the item whose art the game draws for `item`: the arsenal's `art`, or the
     /// item's own id without an arsenal entry.

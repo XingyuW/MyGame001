@@ -660,8 +660,13 @@ pub(crate) fn combat(
                 &mut orders,
             ),
             _ => {
-                // A building: a defensive structure, which does not fire under low power.
-                let low_power = players.get(owner).is_some_and(|state| state.low_power());
+                // A building: a defensive structure, which does not fire while power does not
+                // let it work (`PlayerState::powers`: without a rules file under low power;
+                // with one, RA2, under low power if it is `powered` and consumes power).
+                let low_power = players.get(owner).is_some_and(|state| match building {
+                    Some(building) => !state.powers(&definitions, building.kind),
+                    None => state.low_power(),
+                });
                 weapon.target = if low_power {
                     None
                 } else {

@@ -42,6 +42,10 @@ pub struct SpecialState {
     pub interactions: BTreeMap<SimId, SimId>,
     pub hidden: BTreeSet<(PlayerId, SimId)>,
     pub outages: BTreeMap<PlayerId, u64>,
+    /// Vehicles docked at a building that repairs units, by vehicle (RA2: `unit_repair`, the
+    /// Service Depot). A docked vehicle stands beside the building and is repaired in steps
+    /// for credits until it is whole, is ordered elsewhere, or the building is lost.
+    pub docked: BTreeMap<SimId, SimId>,
 }
 impl SpecialState {
     pub fn invulnerable(&self, id: SimId, tick: u64) -> bool {
@@ -121,6 +125,11 @@ impl SpecialState {
             h.write(&[p.0]);
             h.write_u64(*t);
         }
+        h.write_u64(self.docked.len() as u64);
+        for (unit, building) in &self.docked {
+            h.write_u32(unit.0);
+            h.write_u32(building.0);
+        }
     }
 }
 #[derive(Clone)]
@@ -183,6 +192,67 @@ fn distance(a: &Actor, b: &Actor) -> u32 {
 }
 fn role(defs: &Definitions, a: &Actor) -> Role {
     defs.metadata(a.item).map_or(Role::Combat, |e| e.role)
+}
+/// Whether power lets `a` work. A building: [`PlayerState::powers`](crate::PlayerState::powers)
+/// (RA2: unless its owner is low on power and it is `powered` and consumes power; without a
+/// rules file: while its owner is not low on power). A unit: always with a rules file, and as a
+/// building without one (the rule of M9).
+fn powered(world: &World, defs: &Definitions, a: &Actor) -> bool {
+    let Some(state) = world.resource::<Players>().get(a.owner) else {
+        return false;
+    };
+    match a.item {
+        ProductionItem::Building(kind) => state.powers(defs, kind),
+        ProductionItem::Unit(_) => defs.rules().is_some() || !state.low_power(),
+    }
+}
+/// Whether the superweapon of building `a` charges and may be used as far as power goes: with a
+/// rules file unless its owner is low on power and the arsenal marks it `is_powered` (RA2, the
+/// ini's `IsPowered`); without one while its owner is not low on power.
+fn charges(world: &World, defs: &Definitions, a: &Actor) -> bool {
+    let Some(state) = world.resource::<Players>().get(a.owner) else {
+        return false;
+    };
+    !state.low_power()
+        || (defs.rules().is_some() && defs.metadata(a.item).is_none_or(|m| !m.is_powered))
+}
+/// Whether `b` is a building that repairs the vehicles sent to it (RA2: the arsenal's
+/// `unit_repair`, read with a rules file).
+fn repairs_units(defs: &Definitions, b: &Actor) -> bool {
+    defs.rules().is_some()
+        && b.foot.is_some()
+        && defs.metadata(b.item).is_some_and(|m| m.unit_repair)
+}
+/// The checks of sending unit `a` to the repair building `b` (RA2): `b` is the player's own, `a`
+/// is a vehicle of the building's element (a ship at a shipyard, a ground vehicle elsewhere; no
+/// aircraft), and `a` is damaged.
+fn validate_docking(a: &Actor, b: &Actor, defs: &Definitions) -> Result<(), RejectReason> {
+    if a.owner != b.owner {
+        return Err(unavailable("Choose your own repair building"));
+    }
+    let ProductionItem::Unit(kind) = a.item else {
+        return Err(unavailable("Only vehicles are repaired here"));
+    };
+    if defs.category(a.item) != Category::Vehicles {
+        return Err(unavailable("Only vehicles are repaired here"));
+    }
+    let shipyard = role(defs, b) == Role::Shipyard;
+    let fits = match defs.domain(kind) {
+        Domain::Air => false,
+        Domain::Amphibious => true,
+        Domain::Naval => shipyard,
+        Domain::Land => !shipyard,
+    };
+    if !fits {
+        return Err(unavailable("This unit is not repaired here"));
+    }
+    if defs
+        .unit_combat(kind)
+        .is_none_or(|terms| a.hp >= terms.hit_points)
+    {
+        return Err(unavailable("This unit is not damaged"));
+    }
+    Ok(())
 }
 fn release(world: &mut World, a: &Actor) {
     let mobile = world.get::<Mobile>(a.entity).copied();
@@ -502,6 +572,8 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
                 return Err(RejectReason::UnknownTarget(*target));
             }
             validate_interaction(world, a, b, &defs)?;
+            // A new order ends a repair at a dock.
+            world.resource_mut::<SpecialState>().docked.remove(&a.id);
             if distance(a, b) <= 1 {
                 interact(world, a, b, &defs)?;
             } else {
@@ -534,7 +606,7 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
             if !state.vision().is_visible(*target) {
                 return Err(unavailable("Strategic target must be visible"));
             }
-            if state.low_power()
+            if !charges(world, &defs, a)
                 || world
                     .resource::<SpecialState>()
                     .charge
@@ -647,6 +719,7 @@ fn validate_interaction(
     match role(defs, a) {
         Role::Engineer if b.foot.is_some() => Ok(()),
         Role::Spy if b.foot.is_some() && b.owner != a.owner => Ok(()),
+        _ if repairs_units(defs, b) => validate_docking(a, b, defs),
         _ => {
             if world
                 .resource::<SpecialState>()
@@ -746,6 +819,17 @@ fn interact(
             }
             release(world, a);
             world.despawn(a.entity);
+        }
+        _ if repairs_units(defs, b) => {
+            // The vehicle docks: it stays beside the building and `advance` repairs it.
+            clear_orders(world, a.entity);
+            if let Some(mut harvester) = world.get_mut::<crate::Harvester>(a.entity) {
+                harvester.stop();
+            }
+            world
+                .resource_mut::<SpecialState>()
+                .docked
+                .insert(a.id, b.id);
         }
         _ => {
             let ProductionItem::Unit(kind) = a.item else {
@@ -868,6 +952,9 @@ pub(crate) fn advance(world: &mut World) {
             .interactions
             .retain(|a, b| index.contains_key(a) && index.contains_key(b));
         state.outages.retain(|_, t| *t > tick);
+        state
+            .docked
+            .retain(|a, b| index.contains_key(a) && index.contains_key(b));
     }
     let flights = world.resource::<SpecialState>().carrier_flights.clone();
     for (fighter, carrier) in flights {
@@ -913,12 +1000,9 @@ pub(crate) fn advance(world: &mut World) {
         let Some(meta) = defs.metadata(a.item) else {
             continue;
         };
-        let powered = world
-            .resource::<Players>()
-            .get(a.owner)
-            .is_some_and(|p| !p.low_power());
+        let works = powered(world, &defs, a);
         if meta.role.superweapon()
-            && powered
+            && charges(world, &defs, a)
             && !world
                 .resource::<SpecialState>()
                 .disabled
@@ -979,7 +1063,10 @@ pub(crate) fn advance(world: &mut World) {
                             .is_some_and(|m| m.role == Role::Engineer)
                     })
                 });
-        if (meta.role == Role::Repair || repair_ifv) && powered && tick.is_multiple_of(20) {
+        // The free repair of everything around a Service Depot (M9) is the rule of a world
+        // without a rules file; with one a vehicle docks and pays (RA2, `repair_docked`).
+        let aura = (meta.role == Role::Repair && defs.rules().is_none()) || repair_ifv;
+        if aura && works && tick.is_multiple_of(20) {
             for u in index.values().filter(|u| {
                 u.owner == a.owner
                     && defs.category(u.item) == Category::Vehicles
@@ -1090,6 +1177,81 @@ pub(crate) fn advance(world: &mut World) {
             }
         }
     }
+    repair_docked(world, &defs, &index, tick);
+}
+
+/// Repairs the vehicles docked at a building that repairs units (RA2, docs/RA2_PARITY_PLAN.md
+/// section 4.6), in id order: every `unit_repair_interval` ticks a docked vehicle regains
+/// `repair_step` hit points (at most what it lacks) for the step cost of its own price and hit
+/// points ([`repair_step_cost`](crate::repair_step_cost)). A step its owner cannot pay for is
+/// skipped (invariant I7), as is every step while a spy has switched the building off. The
+/// vehicle leaves the dock when it is whole (it then moves a cell away, to make room), when it
+/// is no longer beside the building or has an order to move, and when the vehicle or the
+/// building is lost or changes owner.
+fn repair_docked(world: &mut World, defs: &Definitions, index: &BTreeMap<SimId, Actor>, tick: u64) {
+    let Some(rules) = defs.rules().map(|rules| rules.economy) else {
+        return;
+    };
+    let docked = world.resource::<SpecialState>().docked.clone();
+    let step_now = tick.is_multiple_of(u64::from(rules.unit_repair_interval.max(1).unsigned_abs()));
+    for (id, building) in docked {
+        let stays = (|| {
+            let (a, b) = (index.get(&id)?, index.get(&building)?);
+            let ProductionItem::Unit(kind) = a.item else {
+                return None;
+            };
+            let max = defs.unit_combat(kind)?.hit_points;
+            let moving = world
+                .get::<Orders>(a.entity)
+                .is_none_or(|o| o.current.is_some());
+            if a.owner != b.owner
+                || !repairs_units(defs, b)
+                || distance(a, b) > 1
+                || moving
+                || a.hp <= 0
+            {
+                return None;
+            }
+            if a.hp >= max {
+                // Whole: it makes room for the next vehicle.
+                let dest = {
+                    let g = world.resource::<Grid>();
+                    let view = g.navigation_for(g.domain_of(id));
+                    crate::pathfinding::nearest_cell(&view, a.cell, |c| {
+                        view.occupant(c).is_none()
+                            && b.foot.is_some_and(|f| f.distance_to_cell(c) >= 2)
+                    })
+                };
+                if let Some(c) = dest
+                    && let Some(mut o) = world.get_mut::<Orders>(a.entity)
+                {
+                    o.current = Some(MoveOrder::new(c, tick));
+                }
+                return None;
+            }
+            let off = world
+                .resource::<SpecialState>()
+                .disabled
+                .contains_key(&building);
+            if step_now && !off {
+                let price = defs.production(a.item).map_or(0, |terms| terms.cost);
+                let mut players = world.resource_mut::<Players>();
+                let state = players.get_mut(a.owner)?;
+                let cost = crate::repair_step_cost(&rules, price, max, state.super_me);
+                if state.credits >= cost {
+                    state.credits -= cost;
+                    let heal = rules.repair_step.max(1).min(max.saturating_sub(a.hp));
+                    if let Some(mut h) = world.get_mut::<Health>(a.entity) {
+                        h.hit_points = h.hit_points.saturating_add(heal).min(max);
+                    }
+                }
+            }
+            Some(())
+        })();
+        if stays.is_none() {
+            world.resource_mut::<SpecialState>().docked.remove(&id);
+        }
+    }
 }
 
 /// Specialist weapons share target selection and reload with ordinary weapons. Effects are
@@ -1187,12 +1349,7 @@ pub(crate) fn resolve(world: &mut World) {
                 .is_none_or(|b| role(&defs, b) != Role::Cloner)
         {
             let cloner = index.values().find(|b| {
-                b.owner == player
-                    && role(&defs, b) == Role::Cloner
-                    && world
-                        .resource::<Players>()
-                        .get(player)
-                        .is_some_and(|p| !p.low_power())
+                b.owner == player && role(&defs, b) == Role::Cloner && powered(world, &defs, b)
             });
             if let Some(b) = cloner
                 && let ProductionItem::Unit(k) = a.item
@@ -1205,13 +1362,9 @@ pub(crate) fn resolve(world: &mut World) {
         if let SimEvent::OreDelivered {
             player, credits, ..
         } = event
-            && index
-                .values()
-                .any(|b| b.owner == player && role(&defs, b) == Role::Purifier)
-            && world
-                .resource::<Players>()
-                .get(player)
-                .is_some_and(|p| !p.low_power())
+            && index.values().any(|b| {
+                b.owner == player && role(&defs, b) == Role::Purifier && powered(world, &defs, b)
+            })
             && let Some(p) = world.resource_mut::<Players>().get_mut(player)
         {
             p.credits = p.credits.saturating_add(credits / 4);
@@ -1264,11 +1417,7 @@ pub(crate) fn reconnaissance(world: &mut World) {
         let Some(m) = defs.metadata(a.item) else {
             continue;
         };
-        let powered = world
-            .resource::<Players>()
-            .get(a.owner)
-            .is_some_and(|p| !p.low_power());
-        if m.role == Role::Satellite && powered {
+        if m.role == Role::Satellite && powered(world, &defs, a) {
             let (gw, gh) = {
                 let g = world.resource::<Grid>();
                 (g.width(), g.height())
@@ -1282,11 +1431,7 @@ pub(crate) fn reconnaissance(world: &mut World) {
         let Some(m) = defs.metadata(a.item) else {
             continue;
         };
-        let powered = world
-            .resource::<Players>()
-            .get(a.owner)
-            .is_some_and(|p| !p.low_power());
-        if m.role == Role::Gap && powered {
+        if m.role == Role::Gap && powered(world, &defs, a) {
             for &p in &players {
                 if p != a.owner
                     && let Some(p) = world.resource_mut::<Players>().get_mut(p)
@@ -1314,11 +1459,7 @@ pub(crate) fn reconnaissance(world: &mut World) {
                             a.cell,
                             b.cell,
                             if role(&defs, b) == Role::Dog
-                                || (role(&defs, b) == Role::Sensor
-                                    && world
-                                        .resource::<Players>()
-                                        .get(b.owner)
-                                        .is_some_and(|player| !player.low_power()))
+                                || (role(&defs, b) == Role::Sensor && powered(world, &defs, b))
                             {
                                 6
                             } else {

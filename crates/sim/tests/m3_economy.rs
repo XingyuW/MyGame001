@@ -263,6 +263,7 @@ fn a_completed_item_is_charged_exactly_its_cost() {
             item: power,
             progress: 10,
             charged: 105,
+            fraction: 0,
         }]
     );
     // A complete building waits for placement and is never charged again.
@@ -350,6 +351,7 @@ fn progress_pauses_while_credits_are_insufficient() {
                 item: power,
                 progress: 9,
                 charged: 90,
+                fraction: 0,
             }]
         );
     }

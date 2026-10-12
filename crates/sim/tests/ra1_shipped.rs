@@ -711,7 +711,7 @@ fn build(app: &mut App, data: &Data, id: &str) {
         query
             .iter(app.world())
             .filter(|(owner, _)| owner.0 == P0)
-            .map(|(_, b)| b.footprint)
+            .map(|(_, b)| (b.kind, b.footprint))
             .collect()
     };
     let origin = {

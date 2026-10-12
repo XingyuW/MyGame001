@@ -14,13 +14,18 @@
 //!
 //! RA1 audits, for every mapped unit and building: cost, strength, sight, speed, prerequisites,
 //! power, sell value, owner sides, required and forbidden countries, and tech level; and every
-//! value of `rules.ron` and the ported values of `skirmish.ron`. Later milestones extend it.
+//! value of `rules.ron` and the ported values of `skirmish.ron`. RA2 adds the build time of
+//! every item (the formula of the plan's section 4.2 from its cost, times the wall coefficient
+//! for a wall), and for every building its production lane (`BuildCat`), build limit, `Adjacent`
+//! distance and the flags `BaseNormal`, `Radar`, `Powered`, `UnitRepair`, `Repairable`, whether
+//! it can be sold (`Wall`, `Unsellable`) and the `IsPowered` of its superweapon. Later
+//! milestones extend it.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::PathBuf;
 
 use sim::{
-    Definitions, MatchOptions, ProductionItem, Rules, Side, SkirmishDefinitions,
+    Category, Definitions, MatchOptions, ProductionItem, Rules, Side, SkirmishDefinitions,
     load_match_definitions, load_skirmish,
 };
 
@@ -390,6 +395,15 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
         Conversion::Percent,
         reference.value("General", "RefundPercent"),
     );
+    // RA2: ticks of build time per 1000 credits, and the factor of a wall in permille.
+    let build_speed = convert(
+        Conversion::Minutes,
+        reference.value("General", "BuildSpeed"),
+    );
+    let wall_factor = convert(
+        Conversion::Permille,
+        reference.value("General", "WallBuildSpeedCoefficient"),
+    );
 
     for row in &mapping {
         let section = reference.section(&row.section);
@@ -488,6 +502,105 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
                         .to_string(),
                     cost,
                 );
+            }
+        }
+
+        // RA2. The build time: the cost times `BuildSpeed` game minutes per 1000 credits, in
+        // ticks, at least 1, and for a wall times `WallBuildSpeedCoefficient` (plan section 4.2).
+        let flag = |key: &str, default: &'static str| {
+            let text = value(key).unwrap_or(default);
+            (convert(Conversion::Flag, text), text)
+        };
+        let (wall, _) = flag("Wall", "no");
+        let cost = required("Cost");
+        let mut expected =
+            ((2 * convert(Conversion::Int, cost) * build_speed + 1000).div_euclid(2000)).max(1);
+        if row.building && wall == 1 {
+            expected = ((2 * expected * wall_factor + 1000).div_euclid(2000)).max(1);
+        }
+        differences.check(
+            id,
+            "build_time",
+            &terms.build_time.to_string(),
+            &expected.to_string(),
+            cost,
+        );
+        // The build limit of every item; the other traits of schema version 3 are a building's,
+        // and 0 on every unit.
+        let limit = value("BuildLimit").unwrap_or("0");
+        differences.check(
+            id,
+            "build_limit",
+            &entry.build_limit.to_string(),
+            &convert(Conversion::Int, limit).to_string(),
+            limit,
+        );
+        let traits = [
+            ("base_normal", entry.base_normal),
+            ("radar", entry.radar),
+            ("sellable", entry.sellable),
+            ("repairable", entry.repairable),
+            ("powered", entry.powered),
+            ("is_powered", entry.is_powered),
+            ("unit_repair", entry.unit_repair),
+        ];
+        if row.building {
+            // The lane: the defences are `BuildCat=Combat`, and the arsenal's category `armory`.
+            let build_cat = value("BuildCat").unwrap_or("");
+            differences.check(
+                id,
+                "lane",
+                if entry.category == Category::Armory {
+                    "defences"
+                } else {
+                    "buildings"
+                },
+                if build_cat == "Combat" {
+                    "defences"
+                } else {
+                    "buildings"
+                },
+                build_cat,
+            );
+            let adjacent = required("Adjacent");
+            differences.check(
+                id,
+                "adjacent",
+                &entry.adjacent.to_string(),
+                &convert(Conversion::Int, adjacent).to_string(),
+                adjacent,
+            );
+            let (unsellable, unsellable_text) = flag("Unsellable", "no");
+            // The `IsPowered` of the superweapon the building gives, if it gives one.
+            let is_powered = value("SuperWeapon").map_or((0, ""), |special| {
+                let text = reference.value(special, "IsPowered");
+                (convert(Conversion::Flag, text), text)
+            });
+            let expected = [
+                flag("BaseNormal", "yes"),
+                flag("Radar", "no"),
+                (
+                    i128::from(wall == 0 && unsellable == 0),
+                    if wall == 1 { "Wall" } else { unsellable_text },
+                ),
+                flag("Repairable", "yes"),
+                flag("Powered", "no"),
+                is_powered,
+                flag("UnitRepair", "no"),
+            ];
+            for ((field, game), (expected, text)) in traits.into_iter().zip(expected) {
+                differences.check(
+                    id,
+                    field,
+                    &u8::from(game).to_string(),
+                    &expected.to_string(),
+                    text,
+                );
+            }
+        } else {
+            assert_eq!(entry.adjacent, 0, "{id}: a unit has no adjacent distance");
+            for (field, game) in traits {
+                assert!(!game, "{id}: a unit has no {field}");
             }
         }
 

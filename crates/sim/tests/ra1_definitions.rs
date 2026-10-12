@@ -3,7 +3,7 @@
 //! dangling reference; invariants I8, I10, I11; docs/DECISIONS.md D15, D18).
 //!
 //! Four loaders are covered: the rules file (schema version 1, `Definitions::with_rules`), the
-//! arsenal (schema version 2, `Definitions::with_arsenal`), the skirmish file (schema version 3,
+//! arsenal (schema version 3 since RA2, `Definitions::with_arsenal`), the skirmish file (schema version 3,
 //! `load_skirmish`) and the AI file (schema version 2, `load_ai` and `check_ai_factions`). Each is
 //! checked against the supported subset of RON and its schema before `ron` sees it, then validated:
 //! ranges at both ends, references to unit and building types, to countries, prerequisite groups
@@ -803,7 +803,7 @@ const BRUTAL_DIFFICULTY: (&str, &str) = ("        (\n            id: \"brutal\",
 /// An arsenal file with the entries of the fixture for the items `ids` only, in this order.
 fn arsenal_of(name: &str, ids: &[&str]) -> PathBuf {
     let fixture = File::Arsenal.text();
-    let mut text = String::from("(schema_version: 2, entries: [\n");
+    let mut text = String::from("(schema_version: 3, entries: [\n");
     for id in ids {
         let entry = format!("(id: {id:?},");
         let lines: Vec<&str> = fixture
@@ -1826,7 +1826,7 @@ fn every_field_of_the_arsenal_file_is_required() {
     let path = variant(
         File::Arsenal,
         "arsenal_missing_schema_version",
-        &[("(schema_version: 2, entries: [", "(entries: [")],
+        &[("(schema_version: 3, entries: [", "(entries: [")],
     );
     assert_rejected(
         File::Arsenal,
@@ -1834,9 +1834,10 @@ fn every_field_of_the_arsenal_file_is_required() {
         "schema_version",
         DataErrorKind::MissingField,
     );
-    let path = temp_file("arsenal_missing_entries.ron", b"(schema_version: 2)\n");
+    let path = temp_file("arsenal_missing_entries.ron", b"(schema_version: 3)\n");
     assert_rejected(File::Arsenal, &path, "entries", DataErrorKind::MissingField);
-    // Every field of an entry: those of schema version 1 and the eight of version 2.
+    // Every field of an entry: those of schema version 1, the eight of version 2 and the nine
+    // of version 3 (RA2).
     let fields = [
         ("id", r#"id: "sniper", "#),
         ("label", r#"label: "Sniper", "#),
@@ -1856,6 +1857,15 @@ fn every_field_of_the_arsenal_file_is_required() {
         ("forbidden_countries", "forbidden_countries: [], "),
         ("tech_level", "tech_level: 1, "),
         ("prerequisite_groups", r#", prerequisite_groups: ["radar"]"#),
+        ("build_limit", "build_limit: 0, "),
+        ("adjacent", "adjacent: 0, "),
+        ("base_normal", "base_normal: 0, "),
+        ("radar", "radar: 0, "),
+        ("sellable", "sellable: 0, "),
+        ("repairable", "repairable: 0, "),
+        ("powered", ", powered: 0"),
+        ("is_powered", "is_powered: 0, "),
+        ("unit_repair", ", unit_repair: 0"),
     ];
     for (field, from) in fields {
         let path = line_variant(
@@ -2108,8 +2118,8 @@ fn unknown_and_duplicate_fields_are_rejected_in_every_file() {
         // The arsenal.
         (
             File::Arsenal,
-            "(schema_version: 2, entries: [",
-            "(schema_version: 2, mods: 1, entries: [",
+            "(schema_version: 3, entries: [",
+            "(schema_version: 3, mods: 1, entries: [",
             "mods",
             DataErrorKind::UnknownField,
         ),
@@ -2129,8 +2139,8 @@ fn unknown_and_duplicate_fields_are_rejected_in_every_file() {
         ),
         (
             File::Arsenal,
-            "(schema_version: 2, entries: [",
-            "(schema_version: 2, schema_version: 2, entries: [",
+            "(schema_version: 3, entries: [",
+            "(schema_version: 3, schema_version: 3, entries: [",
             "schema_version",
             DataErrorKind::DuplicateField,
         ),
@@ -2339,15 +2349,17 @@ fn values_of_the_wrong_kind_are_syntax_errors_in_every_file() {
 
 #[test]
 fn other_schema_versions_are_rejected_in_every_file() {
-    // The rules file is new at version 1. The arsenal is at 2 since RA1 (1: M9, without sides,
-    // countries and tech levels), the skirmish file at 3 (2: M7, without sides; 1: M6, without
+    // The rules file is new at version 1. The arsenal is at 3 since RA2 (2: RA1, without the
+    // traits of buildings; 1: M9, without sides, countries and tech levels), the skirmish file
+    // at 3 (2: M7, without sides; 1: M6, without
     // rosters), the AI file at 2 (1: one plan at the top level); a file of an earlier version
     // and of any later version is rejected as such.
     let cases = [
         (File::Rules, "schema_version: 1,", 0, 1),
         (File::Rules, "schema_version: 1,", 2, 1),
-        (File::Arsenal, "schema_version: 2,", 1, 2),
-        (File::Arsenal, "schema_version: 2,", 3, 2),
+        (File::Arsenal, "schema_version: 3,", 2, 3),
+        (File::Arsenal, "schema_version: 3,", 1, 3),
+        (File::Arsenal, "schema_version: 3,", 4, 3),
         (File::Skirmish, "schema_version: 3,", 2, 3),
         (File::Skirmish, "schema_version: 3,", 1, 3),
         (File::Skirmish, "schema_version: 3,", 4, 3),

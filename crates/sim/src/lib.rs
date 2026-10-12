@@ -68,11 +68,13 @@ pub use definitions::{
     UnitKind, load_definitions, load_match_definitions, load_ruleset, load_unit_definitions,
 };
 pub use economy::{
-    MAX_QUEUE_LENGTH, PlayerSetupError, PlayerState, Players, QueueItem, REPAIR_COST_DIVISOR,
-    REPAIR_INTERVAL, REPAIR_STEPS, repair_cost,
+    Lane, MAX_COUNTED_FACTORIES, MAX_PRODUCTION_RATE_PM, MAX_QUEUE_LENGTH, PlayerSetupError,
+    PlayerState, Players, QueueItem, QueueKey, REPAIR_COST_DIVISOR, REPAIR_INTERVAL, REPAIR_STEPS,
+    factory_rate_pm, power_rate_pm, production_rate_pm, repair_cost, repair_step_cost,
 };
 pub use economy_commands::{
-    SHIPYARD_PLACEMENT_DISTANCE, check_buildable, check_placement, missing_prerequisite, produces,
+    SHIPYARD_PLACEMENT_DISTANCE, check_buildable, check_placement, extends_base,
+    missing_prerequisite, placement_reach, produces,
 };
 pub use economy_defs::{
     BuildingDef, BuildingKind, ECONOMY_SCHEMA_VERSION, HarvesterDef, MAX_BUILD_TIME,
@@ -132,7 +134,8 @@ pub use visibility::Vision;
 
 pub mod arsenal;
 pub use arsenal::{
-    ARSENAL_SCHEMA_VERSION, Arsenal, ArsenalEntry, Category, Domain, FactoryGroup, Role,
+    ARSENAL_SCHEMA_VERSION, Arsenal, ArsenalEntry, Category, Domain, FactoryGroup, MAX_BUILD_LIMIT,
+    Role,
 };
 
 pub mod special;

@@ -9,6 +9,12 @@
 //! while `crate::units::unit_shown` and `crate::buildings::building_shown` show them. It never
 //! reads the simulation's current terrain or the position of an enemy the player does not see.
 //!
+//! Since RA2 the minimap is the player's radar: it is drawn only while the human player has radar
+//! (`sim::PlayerState::radar`: a working radar building, enough power, and no power outage from
+//! a spy). Otherwise the map's diamond is blank, a "RADAR OFFLINE" panel says why
+//! ([`offline_text`], shown by the sidebar), the camera's rectangle is hidden, and a click on
+//! it moves nothing. A world without a rules file always has radar.
+//!
 //! Layout: continuous cell coordinates (u, v) of a W × H map map to the normalised image point
 //! `((u − v + H) / (W + H), (u + v) / (W + H))`, the main view's projection (equation 7) scaled
 //! so that the map's bounding rectangle fills the image. So the camera's view, an axis-aligned
@@ -36,6 +42,10 @@ pub const MINIMAP_TARGET_WIDTH: u32 = 256;
 
 /// Size of the minimap on screen, in logical pixels (the image's aspect ratio is 2:1).
 pub const MINIMAP_SIZE: Vec2 = Vec2::new(224.0, 112.0);
+
+/// The colour of the map's diamond while the radar is offline: a dark screen, not the black of
+/// the shroud.
+pub const OFFLINE_COLOUR: [u8; 4] = [14, 20, 24, 255];
 
 pub struct MinimapPlugin;
 
@@ -358,6 +368,46 @@ pub fn visible_view(centre: Vec2, viewport: Vec2, scale: f32, inset: f32) -> Rec
     )
 }
 
+/// Whether the human player of `host`'s match has radar (RA2, `sim::PlayerState::radar`), so
+/// that the minimap is drawn; also without a match.
+pub fn radar_online(host: &SimHost) -> bool {
+    host.players()
+        .and_then(|players| players.get(HUMAN))
+        .is_none_or(sim::PlayerState::radar)
+}
+
+/// What the panel over the blank minimap says while the human player has no radar, or `None`
+/// while it has: that a radar building is missing, or, with one, that the base is short of
+/// power (which a spy in a power plant also causes).
+pub fn offline_text(host: &SimHost) -> Option<&'static str> {
+    if radar_online(host) {
+        return None;
+    }
+    let definitions = host.definitions()?;
+    let owns_radar =
+        host.world()
+            .try_query::<(&Owner, &Building)>()
+            .is_some_and(|mut buildings| {
+                buildings.iter(host.world()).any(|(owner, building)| {
+                    owner.0 == HUMAN
+                        && definitions
+                            .metadata(sim::ProductionItem::Building(building.kind))
+                            .is_some_and(|entry| entry.radar)
+                })
+            });
+    Some(if owns_radar {
+        "RADAR OFFLINE\nlow power"
+    } else {
+        "RADAR OFFLINE\nno radar building"
+    })
+}
+
+/// The image of a minimap without radar: the map's diamond in [`OFFLINE_COLOUR`].
+pub fn offline_pixels(layout: &MinimapLayout) -> Vec<u8> {
+    let cells = (layout.map_width as usize).saturating_mul(layout.map_height as usize);
+    render(layout, &vec![OFFLINE_COLOUR; cells])
+}
+
 // --- Systems --------------------------------------------------------------------------------
 
 /// The minimap image and its layout.
@@ -384,6 +434,8 @@ pub struct MinimapState {
     pub drawings: u64,
     /// Pixels on the map in the last drawing that are not black.
     pub lit_pixels: usize,
+    /// Whether the last drawing was that of a minimap without radar (RA2).
+    pub offline: bool,
 }
 
 pub(crate) fn create_minimap(
@@ -451,29 +503,36 @@ pub(crate) fn draw_minimap(
     if state.drawn_tick == Some(tick) {
         return;
     }
-    let owned = owned_markers(&host);
-    let marked: Vec<_> = owned
-        .iter()
-        .map(|&(cell, marker, _)| (cell, marker))
-        .collect();
-    let mut colours = cell_colours_with_looks(
-        &terrain.0,
-        looks.as_deref().map_or(&[], |l| l.0.as_slice()),
-        human_vision(host.players()),
-        &marked,
-    );
-    for &(cell, _, owner) in &owned {
-        let rgb = teams
-            .as_deref()
-            .unwrap_or(&crate::presentation::TeamColors(0))
-            .rgb_of(owner);
-        if let Some(pixel) =
-            colours.get_mut((cell.y as u32 * terrain.0.width() + cell.x as u32) as usize)
-        {
-            *pixel = [rgb[0], rgb[1], rgb[2], 255];
+    // Without radar nothing of the map is drawn (RA2).
+    let online = radar_online(&host);
+    let pixels = if online {
+        let owned = owned_markers(&host);
+        let marked: Vec<_> = owned
+            .iter()
+            .map(|&(cell, marker, _)| (cell, marker))
+            .collect();
+        let mut colours = cell_colours_with_looks(
+            &terrain.0,
+            looks.as_deref().map_or(&[], |l| l.0.as_slice()),
+            human_vision(host.players()),
+            &marked,
+        );
+        for &(cell, _, owner) in &owned {
+            let rgb = teams
+                .as_deref()
+                .unwrap_or(&crate::presentation::TeamColors(0))
+                .rgb_of(owner);
+            if let Some(pixel) =
+                colours.get_mut((cell.y as u32 * terrain.0.width() + cell.x as u32) as usize)
+            {
+                *pixel = [rgb[0], rgb[1], rgb[2], 255];
+            }
         }
-    }
-    let pixels = render(&minimap.layout, &colours);
+        render(&minimap.layout, &colours)
+    } else {
+        offline_pixels(&minimap.layout)
+    };
+    state.offline = !online;
     state.lit_pixels = pixels
         .as_chunks::<4>()
         .0
@@ -494,11 +553,23 @@ pub(crate) fn place_camera_frame(
     map: Option<Res<MapView>>,
     minimap: Option<Res<Minimap>>,
     camera: Single<(&Camera, &Projection, &Transform), With<Camera2d>>,
+    state: Res<MinimapState>,
     mut frames: Query<&mut Node, With<MinimapFrame>>,
 ) {
     let (Some(map), Some(minimap)) = (map, minimap) else {
         return;
     };
+    // No rectangle on a minimap without radar.
+    let display = if state.offline {
+        Display::None
+    } else {
+        Display::Flex
+    };
+    for mut node in &mut frames {
+        if node.display != display {
+            node.display = display;
+        }
+    }
     let (camera, projection, transform) = *camera;
     let (Some(viewport), Projection::Orthographic(ortho)) =
         (camera.logical_viewport_size(), projection)
@@ -531,9 +602,11 @@ pub(crate) fn place_camera_frame(
 }
 
 /// A left click or drag that starts on the minimap centres the visible part of the view on the
-/// point under the cursor.
+/// point under the cursor. Not while the radar is offline (RA2).
+#[allow(clippy::too_many_arguments)]
 fn click_minimap(
     buttons: Res<ButtonInput<MouseButton>>,
+    state: Res<MinimapState>,
     map: Option<Res<MapView>>,
     minimap: Option<Res<Minimap>>,
     nodes: Query<&RelativeCursorPosition, With<MinimapNode>>,
@@ -551,7 +624,7 @@ fn click_minimap(
     if !buttons.pressed(MouseButton::Left) {
         *dragging = false;
     }
-    if !*dragging || window.cursor_position().is_none() {
+    if !*dragging || window.cursor_position().is_none() || state.offline {
         return;
     }
     // While dragging, the cursor may leave the minimap; the point is then clamped to its edge.
@@ -780,6 +853,80 @@ mod tests {
         let terrain = host.grid().expect("grid").clone();
         let colours = cell_colours(&terrain, human_vision(host.players()), &marked);
         assert_eq!(colours[16 * 32 + 16], colours[16 * 32 + 17]);
+    }
+
+    /// Spawns a building of type `id` for the human player on the first free ground of the
+    /// demo map, row by row from (20, 30).
+    fn build(world: &mut World, id: &str) {
+        for y in 30..60 {
+            for x in 20..60 {
+                if sim::spawn_building(world, HUMAN, id, CellPos::new(x, y)).is_ok() {
+                    return;
+                }
+            }
+        }
+        panic!("no ground for {id}");
+    }
+
+    #[test]
+    fn the_minimap_is_drawn_only_while_the_human_player_has_radar() {
+        // RA2. The demo match with the shipped data: the human player owns its Construction
+        // Yard and no radar building, so the screen is blank and says why.
+        let mut host = crate::sim_host::tests::demo_host();
+        crate::sim_host::tests::run(&mut host, Vec::new());
+        assert!(!radar_online(&host));
+        assert_eq!(
+            offline_text(&host),
+            Some("RADAR OFFLINE\nno radar building")
+        );
+        // With a power plant and an Airforce Command the map is drawn.
+        let mut host = crate::sim_host::tests::demo_host_with(|world| {
+            build(world, "power_plant");
+            build(world, "american_airforce_command");
+        });
+        crate::sim_host::tests::run(&mut host, Vec::new());
+        assert!(radar_online(&host));
+        assert_eq!(offline_text(&host), None);
+        // Three Prism Towers more than the power plant feeds: low power, no radar.
+        let mut host = crate::sim_host::tests::demo_host_with(|world| {
+            build(world, "power_plant");
+            build(world, "american_airforce_command");
+            for _ in 0..3 {
+                build(world, "prism_tower");
+            }
+        });
+        crate::sim_host::tests::run(&mut host, Vec::new());
+        let state = host.players().and_then(|players| players.get(HUMAN));
+        assert!(state.is_some_and(sim::PlayerState::low_power));
+        assert!(!radar_online(&host));
+        assert_eq!(offline_text(&host), Some("RADAR OFFLINE\nlow power"));
+        // Without a human player there is nothing to switch off.
+        let empty = crate::sim_host::tests::fixture_host(|_| {});
+        assert!(radar_online(&empty));
+        assert_eq!(offline_text(&empty), None);
+    }
+
+    #[test]
+    fn the_offline_screen_fills_the_maps_diamond_and_shows_nothing_of_it() {
+        let layout = MinimapLayout::new(64, 64);
+        let pixels = offline_pixels(&layout);
+        let (width, height) = layout.size();
+        assert_eq!(pixels.len(), (width * height * 4) as usize);
+        let (mut lit, mut clear) = (0, 0);
+        for pixel in pixels.as_chunks::<4>().0 {
+            if pixel[3] == 0 {
+                clear += 1;
+            } else {
+                assert_eq!(*pixel, OFFLINE_COLOUR);
+                lit += 1;
+            }
+        }
+        // As many pixels as the map drawn with radar covers, none of them black.
+        let drawn = render(&layout, &vec![[9, 9, 9, 255]; 64 * 64]);
+        let covered = drawn.as_chunks::<4>().0.iter().filter(|p| p[3] > 0).count();
+        assert_eq!(lit, covered);
+        assert!(lit > 0 && clear > 0);
+        assert_ne!(OFFLINE_COLOUR[..3], [0, 0, 0]);
     }
 
     #[test]

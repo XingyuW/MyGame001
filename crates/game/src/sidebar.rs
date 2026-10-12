@@ -19,6 +19,12 @@
 //! no Soviet card until it has captured a Soviet building, and nobody sees a card before the
 //! MCV has deployed.
 //!
+//! Since RA2 the Construction Yard builds in two lanes, the buildings and the defences (the
+//! Armory tab), one item each, and every factory group has a queue of its own. Each card shows
+//! the progress of its own item, and each tab carries a bar with the progress of its lane
+//! ([`tab_progress`]), so that the lane of the tab that is not shown is seen too. A card whose
+//! lane is taken says `busy`, one whose build limit is reached `LIMIT`.
+//!
 //! The sidebar shows only the human player's own state. Its decisions are pure functions,
 //! unit tested below; the systems read the simulation through `SimHost` and change it only by
 //! pushing commands into `CommandSink` (invariant I5, D34).
@@ -130,11 +136,17 @@ pub enum SidebarText {
     PauseLabel,
     MuteLabel,
     Speed,
+    /// The "RADAR OFFLINE" panel over the minimap; empty while the player has radar (RA2).
+    Radar,
 }
 
-/// The filled part of an item's progress bar.
+/// The filled part of a progress bar: that of an item's card, or that on a tab's button, which
+/// shows the lane of the tab (RA2, [`tab_progress`]).
 #[derive(Component, Debug)]
-pub struct ItemProgress(pub ProductionItem);
+pub enum ItemProgress {
+    Item(ProductionItem),
+    Tab(Tab),
+}
 
 /// The node that holds the item buttons.
 #[derive(Component, Debug)]
@@ -158,6 +170,11 @@ pub struct ItemStatus {
     pub progress: Option<(u32, u32)>,
     /// A building that is complete and waits for placement.
     pub ready: bool,
+    /// The player owns or has queued as many as the item's build limit allows (RA2).
+    pub limited: bool,
+    /// The queue of the item holds as many items as it can (RA2: a lane of the Construction
+    /// Yard holds one building), so `QueueProduction` would be rejected as `QueueFull`.
+    pub full: bool,
 }
 
 /// The status of `item` for a player with `state` who owns buildings of the types `owned`, in a
@@ -176,9 +193,14 @@ pub fn item_status(
     // Exactly the checks of `QueueProduction` before the length of the queue (RA1: the
     // buildability rule, `sim::check_buildable`).
     let owned_kinds: Vec<BuildingKind> = owned.iter().copied().collect();
-    let available =
-        sim::check_buildable(definitions, state, superweapons, &owned_kinds, item).is_ok();
-    let queue = state.queue(definitions.queue_key(terms.producer));
+    let check = sim::check_buildable(definitions, state, superweapons, &owned_kinds, item);
+    let available = check.is_ok();
+    let limited = matches!(check, Err(sim::RejectReason::BuildLimitReached { .. }));
+    // The queue of the item: of its factory group and, for a building, of its lane (RA2).
+    let queue = definitions
+        .queue_of(item)
+        .map_or(&[][..], |key| state.lane(key));
+    let full = queue.len() >= definitions.queue_capacity(item);
     let queued = queue.iter().filter(|entry| entry.item == item).count();
     let progress = queue
         .first()
@@ -191,6 +213,8 @@ pub fn item_status(
         queued,
         progress,
         ready,
+        limited,
+        full,
     }
 }
 
@@ -230,7 +254,8 @@ pub fn button_effect(
             {
                 return SidebarEffect::Mode(InterfaceMode::Place(kind));
             }
-            let command = if left && status.available {
+            // A full queue takes nothing (RA2: the lane of a building in production).
+            let command = if left && status.available && !status.full {
                 menu_command(menu, index, false)
             } else if right && status.queued > 0 {
                 menu_command(menu, index, true)
@@ -266,12 +291,16 @@ pub fn button_effect(
     }
 }
 
-/// The name of an item and its cost, e.g. `power plant  $300`.
+/// What keeps the item from being queued (`Needs ...`, a reached build limit, a full queue, no
+/// credits), or how long it takes with `factories` working factories of its kind and the
+/// player's power: under low power the rate of the rules (RA2), or half speed without a rules
+/// file.
 pub fn availability_text(
     item: ProductionItem,
     defs: &Definitions,
     owned: &BTreeSet<BuildingKind>,
     state: Option<&PlayerState>,
+    factories: usize,
 ) -> String {
     let Some(p) = defs.production(item) else {
         return "Unavailable".into();
@@ -315,23 +344,68 @@ pub fn availability_text(
     if !missing.is_empty() {
         return format!("Needs {}", missing.join(", "));
     }
+    let rates = defs.rules().map(|rules| rules.production);
     if let Some(s) = state {
-        if s.queue(defs.queue_key(p.producer)).len() >= sim::MAX_QUEUE_LENGTH {
-            return "Queue full".into();
+        let kinds: Vec<BuildingKind> = owned.iter().copied().collect();
+        if let Err(sim::RejectReason::BuildLimitReached { limit, .. }) =
+            sim::check_buildable(defs, s, true, &kinds, item)
+        {
+            return format!("Build limit reached: {limit} per player");
+        }
+        let queue = defs.queue_of(item).map_or(&[][..], |key| s.lane(key));
+        if queue.len() >= defs.queue_capacity(item) {
+            return match (item, rates) {
+                (ProductionItem::Building(_), Some(_)) => {
+                    "Busy: the yard builds one of these at a time".into()
+                }
+                _ => "Queue full".into(),
+            };
         }
         if s.credits() == 0 {
             return "Waiting for credits".into();
         }
         if s.low_power() {
-            return "Low power: half speed".into();
+            return match &rates {
+                Some(rates) => format!(
+                    "Low power: production at {}%",
+                    sim::power_rate_pm(rates, s.power_produced(), s.power_consumed()) / 10
+                ),
+                None => "Low power: half speed".into(),
+            };
         }
     }
     format!(
         "{} seconds • ready to queue",
-        p.build_time
-            .div_ceil(state.map_or(1, PlayerState::production_speed))
-            .div_ceil(20)
+        build_ticks(p.build_time, defs, state, factories).div_ceil(20)
     )
+}
+
+/// Ticks an item of `build_time` takes for a player with `state` and `factories` working
+/// factories of its kind: with a rules file the build time over the production rate
+/// (`sim::production_rate_pm`, RA2), rounded up; without one the build time over the Super Me
+/// speed.
+pub fn build_ticks(
+    build_time: u32,
+    defs: &Definitions,
+    state: Option<&PlayerState>,
+    factories: usize,
+) -> u32 {
+    match defs.rules() {
+        Some(rules) => {
+            let (produced, consumed, super_me) = state.map_or((0, 0, false), |state| {
+                (
+                    state.power_produced(),
+                    state.power_consumed(),
+                    state.super_me(),
+                )
+            });
+            let rate =
+                sim::production_rate_pm(&rules.production, factories, produced, consumed, super_me)
+                    .max(1);
+            u32::try_from((u64::from(build_time) * 1000).div_ceil(rate)).unwrap_or(u32::MAX)
+        }
+        None => build_time.div_ceil(state.map_or(1, PlayerState::production_speed)),
+    }
 }
 
 pub fn item_label(item: ProductionItem, definitions: &Definitions) -> String {
@@ -347,7 +421,8 @@ pub fn item_label(item: ProductionItem, definitions: &Definitions) -> String {
     }
 }
 
-/// The badge of an item: `READY`, its progress in percent, how many are queued, or `locked`.
+/// The badge of an item: `READY`, its progress in percent, how many are queued, `LIMIT` (its
+/// build limit is reached), `locked`, or `busy` (its queue is full with something else).
 pub fn badge_text(status: ItemStatus) -> String {
     if status.ready {
         return "READY".into();
@@ -363,8 +438,14 @@ pub fn badge_text(status: ItemStatus) -> String {
     if waiting > 0 {
         parts.push(format!("+{waiting}"));
     }
-    if parts.is_empty() && !status.available {
-        parts.push("locked".into());
+    if parts.is_empty() {
+        if status.limited {
+            parts.push("LIMIT".into());
+        } else if !status.available {
+            parts.push("locked".into());
+        } else if status.full {
+            parts.push("busy".into());
+        }
     }
     parts.join(" ")
 }
@@ -374,6 +455,23 @@ pub fn progress_percent(status: ItemStatus) -> f32 {
     status.progress.map_or(0.0, |(done, total)| {
         (done.min(total) as f32 / total.max(1) as f32) * 100.0
     })
+}
+
+/// The progress of the lane of `tab` in percent, for the bar on the tab's button (RA2: the
+/// buildings and the defences of the Construction Yard progress side by side, and so do the
+/// queues of the factories): the progress of the item of that tab that is in production, the
+/// most advanced one if several queues belong to the tab (vehicles, ships and aircraft);
+/// `None` while nothing of the tab is in production.
+pub fn tab_progress(
+    tab: Tab,
+    statuses: &[(ProductionItem, ItemStatus)],
+    defs: &Definitions,
+) -> Option<f32> {
+    statuses
+        .iter()
+        .filter(|(item, status)| status.progress.is_some() && Tab::of(*item, defs) == tab)
+        .map(|(_, status)| progress_percent(*status))
+        .reduce(f32::max)
 }
 
 pub fn credits_text(state: Option<&PlayerState>) -> String {
@@ -400,7 +498,8 @@ pub fn mode_text(mode: InterfaceMode, paused: bool, definitions: Option<&Definit
     }
     match mode {
         InterfaceMode::Interact => {
-            "Interact: click a structure or friendly transport. Esc cancels.".into()
+            "Interact: click a structure, a friendly transport,\nor your depot with a damaged vehicle. Esc cancels."
+                .into()
         }
         InterfaceMode::Strategic(_) => {
             "Strategic ability: click a visible target. Esc cancels.".into()
@@ -449,7 +548,7 @@ pub fn button_colour(
         SidebarButton::Item(_) if status.progress.is_some() || status.queued > 0 => {
             (0.13, 0.22, 0.20)
         }
-        SidebarButton::Item(_) if !status.available => (0.055, 0.06, 0.065),
+        SidebarButton::Item(_) if !status.available || status.full => (0.055, 0.06, 0.065),
         SidebarButton::Item(_) => (0.12, 0.13, 0.135),
         SidebarButton::Tab(shown) if shown == tab => (0.50, 0.34, 0.09),
         SidebarButton::Sell if mode == InterfaceMode::Sell => (0.55, 0.16, 0.10),
@@ -474,6 +573,26 @@ fn owned_kinds(host: &SimHost) -> BTreeSet<BuildingKind> {
         .filter(|(owner, _)| owner.0 == HUMAN)
         .map(|(_, building)| building.kind)
         .collect()
+}
+
+/// The number of the human player's buildings that are factories of the kind that produces `item`
+/// (the number the production rate of RA2 counts, `sim::production_rate_pm`).
+fn factories_of(host: &SimHost, item: ProductionItem) -> usize {
+    let (Some(definitions), Some(mut buildings)) = (
+        host.definitions(),
+        host.world().try_query::<(&Owner, &Building)>(),
+    ) else {
+        return 1;
+    };
+    let Some(terms) = definitions.production(item) else {
+        return 1;
+    };
+    buildings
+        .iter(host.world())
+        .filter(|(owner, building)| {
+            owner.0 == HUMAN && definitions.same_factory(building.kind, terms.producer)
+        })
+        .count()
 }
 
 /// Whether the item's button is shown: the item belongs to the shown build tab and the roster of
@@ -510,7 +629,13 @@ pub fn reachable_buildings(
             .filter(|kind| !reached.contains(kind))
             .filter(|&kind| {
                 let item = ProductionItem::Building(kind);
-                sim::check_buildable(definitions, state, superweapons, &reached, item).is_ok()
+                within_reach(sim::check_buildable(
+                    definitions,
+                    state,
+                    superweapons,
+                    &reached,
+                    item,
+                ))
             })
             .collect();
         if added.is_empty() {
@@ -518,6 +643,16 @@ pub fn reachable_buildings(
         }
         reached.extend(added);
     }
+}
+
+/// Whether the outcome `check` of `sim::check_buildable` means that the item belongs to what the
+/// player can build: it may be queued, or only its build limit keeps it from being queued again
+/// (RA2: the card of a building the player owns as often as it may stays listed).
+fn within_reach(check: Result<(), sim::RejectReason>) -> bool {
+    matches!(
+        check,
+        Ok(()) | Err(sim::RejectReason::BuildLimitReached { .. })
+    )
 }
 
 /// Whether the card of `item` is listed for a player with `state` who owns buildings of the
@@ -553,7 +688,13 @@ pub fn item_listed(
         || (owned
             .iter()
             .any(|&kind| sim::produces(definitions, kind, item))
-            && sim::check_buildable(definitions, state, superweapons, reachable, item).is_ok())
+            && within_reach(sim::check_buildable(
+                definitions,
+                state,
+                superweapons,
+                reachable,
+                item,
+            )))
 }
 
 /// Whether superweapons are switched on in the match of `host` (the menu's row; on without a
@@ -726,6 +867,21 @@ pub(crate) fn spawn_sidebar(mut commands: Commands, minimap: Option<Res<Minimap>
                         },
                         BorderColor::all(Color::WHITE),
                     ));
+                    // The panel of a minimap without radar (RA2, `crate::minimap`): empty
+                    // while the player has radar.
+                    minimap.spawn((
+                        SidebarText::Radar,
+                        text("", 13.0),
+                        TextLayout::justify(Justify::Center),
+                        Node {
+                            position_type: PositionType::Absolute,
+                            left: Val::Px(0.0),
+                            right: Val::Px(0.0),
+                            top: Val::Px(38.0),
+                            justify_content: JustifyContent::Center,
+                            ..default()
+                        },
+                    ));
                 });
             sidebar.spawn((SidebarText::Credits, text("Credits", 17.0)));
             sidebar.spawn((SidebarText::Power, text("Power", 12.0)));
@@ -742,7 +898,22 @@ pub(crate) fn spawn_sidebar(mut commands: Commands, minimap: Option<Res<Minimap>
                         (Tab::Vehicles, "Vehicles"),
                     ] {
                         row.spawn(button(SidebarButton::Tab(tab), Val::Percent(24.0), 25.0))
-                            .with_child(text(label, 11.0));
+                            .with_children(|tab_button| {
+                                tab_button.spawn(text(label, 11.0));
+                                // The progress of the tab's lane, along the button's lower edge.
+                                tab_button.spawn((
+                                    ItemProgress::Tab(tab),
+                                    Node {
+                                        position_type: PositionType::Absolute,
+                                        left: Val::Px(0.0),
+                                        bottom: Val::Px(0.0),
+                                        width: Val::Percent(0.0),
+                                        height: Val::Px(3.0),
+                                        ..default()
+                                    },
+                                    BackgroundColor(Color::srgb(0.95, 0.72, 0.22)),
+                                ));
+                            });
                     }
                 });
             sidebar.spawn((
@@ -994,7 +1165,7 @@ fn populate_items(
                             BackgroundColor(Color::srgb(0.05, 0.07, 0.07)),
                         ))
                         .with_child((
-                            ItemProgress(item),
+                            ItemProgress::Item(item),
                             Node {
                                 width: Val::Percent(0.0),
                                 height: Val::Percent(100.0),
@@ -1195,7 +1366,7 @@ pub(crate) fn update_sidebar(
                         let description = d.metadata(i).map_or("", |e| e.description.as_str());
                         format!(
                             "{}\n{}",
-                            availability_text(i, d, &owned, state),
+                            availability_text(i, d, &owned, state, factories_of(&host, i)),
                             description
                         )
                     })
@@ -1207,7 +1378,7 @@ pub(crate) fn update_sidebar(
             // Queued progress stays visible even if a prerequisite was lost meanwhile.
             SidebarText::Badge(item) => {
                 let status = status_of(*item);
-                if status.available || status.ready || status.queued > 0 {
+                if status.available || status.ready || status.queued > 0 || status.limited {
                     badge_text(status)
                 } else {
                     "LOCKED".into()
@@ -1217,6 +1388,7 @@ pub(crate) fn update_sidebar(
             SidebarText::PauseLabel => if paused { "Resume" } else { "Pause" }.into(),
             SidebarText::MuteLabel => if volume.muted { "Unmute" } else { "Mute" }.into(),
             SidebarText::Speed => format!("Speed {}", speed.label()),
+            SidebarText::Radar => crate::minimap::offline_text(&host).unwrap_or("").into(),
         };
         if text.0 != value {
             text.0 = value;
@@ -1226,7 +1398,7 @@ pub(crate) fn update_sidebar(
                 Color::srgb(1.0, 0.36, 0.26)
             }
             SidebarText::Power => Color::srgb(0.55, 0.92, 0.42),
-            SidebarText::Credits => Color::srgb(1.0, 0.80, 0.32),
+            SidebarText::Credits | SidebarText::Radar => Color::srgb(1.0, 0.80, 0.32),
             SidebarText::Speed if speed.factor() != 1.0 => Color::srgb(1.0, 0.80, 0.32),
             _ => Color::srgb(0.86, 0.88, 0.86),
         };
@@ -1262,7 +1434,13 @@ pub(crate) fn update_sidebar(
         }
     }
     for (bar, mut node) in &mut progress {
-        let width = Val::Percent(progress_percent(status_of(bar.0)));
+        let percent = match bar {
+            ItemProgress::Item(item) => progress_percent(status_of(*item)),
+            ItemProgress::Tab(tab) => defs
+                .and_then(|defs| tab_progress(*tab, &statuses, defs))
+                .unwrap_or(0.0),
+        };
+        let width = Val::Percent(percent);
         if node.width != width {
             node.width = width;
         }
@@ -1515,7 +1693,9 @@ mod tests {
         assert!(!status(&host, refinery).available);
         assert!(!status(&host, tank).available);
         assert_eq!(badge_text(status(&host, refinery)), "locked");
-        // Two power plants queued through the sink's path: the head progresses.
+        // Two power plants ordered through the sink's path: the head progresses. Since RA2 the
+        // lane of the buildings holds one item, so the second order is rejected and one is
+        // queued (before: both, and the badge said "50% +1").
         crate::sim_host::tests::run(
             &mut host,
             vec![
@@ -1527,11 +1707,41 @@ mod tests {
             crate::sim_host::tests::run(&mut host, Vec::new());
         }
         let half = status(&host, power);
-        assert_eq!(half.queued, 2);
+        assert_eq!(half.queued, 1);
         assert_eq!(half.progress, Some((total / 2, total)));
         assert!(!half.ready);
-        assert_eq!(badge_text(half), "50% +1");
+        assert_eq!(badge_text(half), "50%");
         assert_eq!(progress_percent(half), 50.0);
+        // The lane is taken: its other cards say so and a click on one orders nothing; the
+        // tab's bar shows the lane's progress, and the lane of the defences is free.
+        assert!(half.full);
+        let barracks =
+            ProductionItem::Building(definitions.building_kind("barracks").expect("barracks"));
+        // (The barracks still needs the power plant; a card that is available but for the
+        // taken lane says "busy".)
+        let locked = status(&host, barracks);
+        assert!(!locked.available && locked.full && locked.queued == 0);
+        assert_eq!(badge_text(locked), "locked");
+        let busy = ItemStatus {
+            available: true,
+            ..locked
+        };
+        assert_eq!(badge_text(busy), "busy");
+        let menu = production_menu(&definitions);
+        assert_eq!(
+            button_effect(
+                SidebarButton::Item(barracks),
+                MouseButton::Left,
+                &menu,
+                busy,
+                InterfaceMode::Normal
+            ),
+            SidebarEffect::Nothing
+        );
+        let all = statuses(&host);
+        assert_eq!(tab_progress(Tab::Buildings, &all, &definitions), Some(50.0));
+        assert_eq!(tab_progress(Tab::Armory, &all, &definitions), None);
+        assert_eq!(tab_progress(Tab::Vehicles, &all, &definitions), None);
         for _ in 0..total / 2 {
             crate::sim_host::tests::run(&mut host, Vec::new());
         }
@@ -1547,6 +1757,77 @@ mod tests {
         assert_eq!(power_text(state), format!("Power  0 / {supplied}"));
         assert_eq!(credits_text(None), "Credits  0");
         let _ = CellPos::new(0, 0);
+    }
+
+    #[test]
+    fn a_card_at_its_build_limit_stays_listed_and_says_so() {
+        // RA2: one Ore Purifier per player. The human player of the demo match owns its yard;
+        // here also a Battle Lab and a refinery (the purifier's prerequisites) and, in the
+        // second host, the purifier itself.
+        let spawn = |ids: &'static [&'static str]| {
+            crate::sim_host::tests::demo_host_with(move |world| {
+                for id in ids {
+                    let spot = (30..60)
+                        .flat_map(|y| (20..60).map(move |x| CellPos::new(x, y)))
+                        .find(|&cell| sim::spawn_building(world, HUMAN, id, cell).is_ok());
+                    assert!(spot.is_some(), "ground for {id}");
+                }
+            })
+        };
+        let status = |host: &SimHost, item| {
+            statuses(host)
+                .into_iter()
+                .find(|(entry, _)| *entry == item)
+                .map(|(_, status)| status)
+                .expect("on the menu")
+        };
+        let free = spawn(&["tech_center", "refinery"]);
+        let definitions = free.definitions().expect("definitions").clone();
+        let purifier = ProductionItem::Building(
+            definitions
+                .building_kind("ore_purifier")
+                .expect("ore purifier"),
+        );
+        let before = status(&free, purifier);
+        assert!(before.available && !before.limited);
+        assert!(listed_items(&free).contains(&purifier));
+        // Owned: not available, at its limit, still listed, and a click orders nothing.
+        let owned = spawn(&["tech_center", "refinery", "ore_purifier"]);
+        let limited = status(&owned, purifier);
+        assert!(!limited.available && limited.limited && limited.queued == 0);
+        assert_eq!(badge_text(limited), "LIMIT");
+        assert!(listed_items(&owned).contains(&purifier));
+        let state = owned.players().and_then(|players| players.get(HUMAN));
+        assert_eq!(
+            availability_text(purifier, &definitions, &owned_kinds(&owned), state, 1),
+            "Build limit reached: 1 per player"
+        );
+        let menu = production_menu(&definitions);
+        assert_eq!(
+            button_effect(
+                SidebarButton::Item(purifier),
+                MouseButton::Left,
+                &menu,
+                limited,
+                InterfaceMode::Normal
+            ),
+            SidebarEffect::Nothing
+        );
+    }
+
+    #[test]
+    fn the_time_of_an_item_follows_the_factories_and_the_power() {
+        // RA2: a Grizzly of 588 ticks takes 30 seconds at one War Factory and 24 at two; a
+        // world without a rules file keeps its build time.
+        let host = crate::sim_host::tests::demo_host();
+        let definitions = host.definitions().expect("definitions");
+        let state = host.players().and_then(|players| players.get(HUMAN));
+        assert_eq!(build_ticks(588, definitions, state, 1), 588);
+        assert_eq!(build_ticks(588, definitions, state, 2), 471);
+        assert_eq!(build_ticks(588, definitions, state, 0), 588);
+        assert_eq!(build_ticks(588, definitions, None, 3), 377);
+        let legacy = crate::skirmish::tests::legacy_catalogue();
+        assert_eq!(build_ticks(588, &legacy.definitions, None, 3), 588);
     }
 
     #[test]
@@ -1704,7 +1985,7 @@ mod tests {
         assert!(listed(america, &yard, "refinery"));
         assert!(!item_status(item("refinery"), defs, &yard, america, true).available);
         assert_eq!(
-            availability_text(item("refinery"), defs, &yard, Some(america)),
+            availability_text(item("refinery"), defs, &yard, Some(america), 1),
             "Needs Power Plant"
         );
         for soviet in [
@@ -1745,7 +2026,8 @@ mod tests {
         assert!(listed(america, &base, "rocketeer"));
         assert!(!item_status(item("rocketeer"), defs, &base, america, true).available);
         assert!(
-            availability_text(item("rocketeer"), defs, &base, Some(america)).starts_with("Needs ")
+            availability_text(item("rocketeer"), defs, &base, Some(america), 1)
+                .starts_with("Needs ")
         );
         assert!(!listed(america, &base, "conscript"));
         assert!(!listed(america, &base, "tesla_trooper"));
@@ -1996,7 +2278,7 @@ mod tests {
         let coil = ProductionItem::Building(defs.building_kind("prism_tower").unwrap());
         let tank = ProductionItem::Unit(defs.unit_kind("prism_tank").unwrap());
         assert!(!item_status(coil, defs, &owned, &state, true).available);
-        assert!(availability_text(coil, defs, &owned, Some(&state)).starts_with("Needs"));
+        assert!(availability_text(coil, defs, &owned, Some(&state), 1).starts_with("Needs"));
         let unlocked = {
             let mut app = App::new();
             app.add_plugins(sim::SimPlugin { seed: 0 });
@@ -2029,7 +2311,7 @@ mod tests {
             "needs a war factory"
         );
         assert_eq!(
-            availability_text(tank, defs, &owned, Some(&state)),
+            availability_text(tank, defs, &owned, Some(&state), 1),
             "Needs War Factory"
         );
         // Progress of a queued item stays visible even while it is not available.
@@ -2038,6 +2320,8 @@ mod tests {
             queued: 1,
             progress: Some((5, 10)),
             ready: false,
+            limited: false,
+            full: false,
         };
         assert_eq!(badge_text(queued), "50%");
     }

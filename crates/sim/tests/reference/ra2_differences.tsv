@@ -10,10 +10,13 @@ engineer	forbidden_countries		British,French,Germans,Americans,Alliance	Engineer
 engineer	forbidden_countries		Russians,Confederation,Africans,Arabs	Engineers and attack dogs of the two sides differ only in ForbiddenHouses in the ini; the game keeps one type that any barracks trains (docs/RA2_PARITY_PLAN.md section 3.3)
 hornet	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA4 (carrier aircraft)
 hospital	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA5 (tech building)
+naval_shipyard	adjacent	31	12	Water for a shipyard lies within 12 free cells of the Construction Yard at 28 of the 176 start positions of the shipped maps (the first start of 2 of 21 maps) and within 31 at 132 (18 of 21); the maps are not reshaped, so a shipyard may stand up to 31 free cells from a base building (docs/DECISIONS.md R25)
 oil_derrick	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA5 (tech building)
 osprey	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA4 (destroyer aircraft)
 paradrop_plane	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA6 (paradrop)
 psi_commando	tech_level	-1	9	The ini gates the unit with RequiresStolenAlliedTech or RequiresStolenSovietTech; until spy infiltration unlocks it in RA6 it is in the data with tech level -1, which cannot be queued
+soviet_naval_shipyard	adjacent	31	12	Water for a shipyard lies within 12 free cells of the Construction Yard at 28 of the 176 start positions of the shipped maps (the first start of 2 of 21 maps) and within 31 at 132 (18 of 21); the maps are not reshaped, so a shipyard may stand up to 31 free cells from a base building (docs/DECISIONS.md R25)
 tech_outpost	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA5 (tech building)
 v3_rocket	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA4 (spawned missile)
+yuri_prime	build_limit	0	1	The build limit is ported for buildings in RA2; Yuri Prime cannot be built before spy infiltration unlocks it in RA6, which then counts the units of a player for its limit of one
 yuri_prime	tech_level	-1	9	The ini gates the unit with RequiresStolenAlliedTech or RequiresStolenSovietTech; until spy infiltration unlocks it in RA6 it is in the data with tech level -1, which cannot be queued

@@ -180,11 +180,22 @@ pub enum RejectReason {
     /// The options of the match switch this off (RA1: a superweapon building with superweapons
     /// off, `Undeploy` with "MCV repacks" off).
     DisabledByOptions,
-    /// The queue of `producer` already holds `max` items.
+    /// The queue of `producer` already holds `max` items (with a rules file, RA2: the lane of
+    /// the item's producer, which holds one building, or one unit and those queued behind it).
     QueueFull {
         producer: BuildingKind,
         max: usize,
     },
+    /// The player already owns or has queued `limit` buildings of this type, the most its type
+    /// allows (RA2, the ini's `BuildLimit`).
+    BuildLimitReached {
+        item: ProductionItem,
+        limit: u32,
+    },
+    /// The building's type cannot be sold (RA2: a wall).
+    NotSellable(SimId),
+    /// The building's type cannot be repaired (RA2: a wall).
+    NotRepairable(SimId),
     /// No such item is in the player's queues (`CancelProduction`).
     NotQueued(ProductionItem),
     /// The player has no complete building of this type at the head of its queue
@@ -257,6 +268,12 @@ impl fmt::Display for RejectReason {
                 "the queue of building type {} already holds {max} items",
                 producer.0
             ),
+            Self::BuildLimitReached { item, limit } => write!(
+                f,
+                "the player may have {limit} of {item:?}, and has or has queued as many"
+            ),
+            Self::NotSellable(id) => write!(f, "building {} cannot be sold", id.0),
+            Self::NotRepairable(id) => write!(f, "building {} cannot be repaired", id.0),
             Self::NotQueued(item) => write!(f, "{item:?} is not queued"),
             Self::NotReady(kind) => write!(f, "no building of type {} is ready", kind.0),
             Self::Placement(error) => error.fmt(f),
@@ -363,6 +380,7 @@ pub(crate) fn process_regular_commands(
                     if let Some(ids) = issued.command.units() {
                         for id in ids {
                             special.interactions.remove(id);
+                            special.docked.remove(id);
                         }
                     }
                     apply_unit_command(

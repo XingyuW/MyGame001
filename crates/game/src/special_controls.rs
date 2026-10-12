@@ -172,10 +172,13 @@ fn panel(
             && let Some(m) = defs.metadata(ProductionItem::Building(*k))
         {
             let charge = state.and_then(|s| s.charge.get(&t.0)).copied().unwrap_or(0);
-            let low = host
-                .players()
-                .and_then(|p| p.get(HUMAN))
-                .is_some_and(|p| p.low_power());
+            // The charge waits for power: without a rules file always, with one for a
+            // superweapon that `is_powered` (RA2).
+            let low = (defs.rules().is_none() || m.is_powered)
+                && host
+                    .players()
+                    .and_then(|p| p.get(HUMAN))
+                    .is_some_and(|p| p.low_power());
             text.0 = format!(
                 "{} · {}",
                 m.label,
