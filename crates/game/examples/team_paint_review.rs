@@ -6,6 +6,7 @@
 #[allow(dead_code)]
 mod gen_unit_sprites;
 #[path = "../src/presentation.rs"]
+#[allow(dead_code)]
 mod presentation;
 #[path = "../src/tileset_image.rs"]
 #[allow(dead_code)]

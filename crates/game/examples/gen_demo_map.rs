@@ -9,6 +9,12 @@
 //! orientation of the rendered map can be checked by eye: red at cell (0, 0), magenta at
 //! (63, 0), and white at (0, 63).
 
+#[path = "art/battlefield_layout.rs"]
+mod battlefield_layout;
+#[path = "art/looks.rs"]
+#[allow(dead_code)]
+mod looks;
+use looks::{Feature as F, Ground as G, look};
 use std::fmt::Write as _;
 use std::path::PathBuf;
 
@@ -31,6 +37,8 @@ pub struct TileKind {
     pub passable: bool,
     pub buildable: bool,
     pub ore: i32,
+    /// The presentation-only look (`art/looks.rs`).
+    pub look: u8,
 }
 
 const fn kind(
@@ -39,6 +47,7 @@ const fn kind(
     passable: bool,
     buildable: bool,
     ore: i32,
+    look: u8,
 ) -> TileKind {
     TileKind {
         name,
@@ -46,19 +55,100 @@ const fn kind(
         passable,
         buildable,
         ore,
+        look,
     }
 }
 
 /// The tileset, indexed by tile id.
-pub const TILES: [TileKind; 8] = [
-    kind("grass", [76, 140, 60], true, true, 0),
-    kind("ore", [200, 160, 40], true, false, 500),
-    kind("water", [40, 90, 170], false, false, 0),
-    kind("rock", [110, 105, 100], false, false, 0),
-    kind("sand", [190, 175, 120], true, false, 0),
-    kind("marker (0, 0)", [210, 50, 50], true, true, 0),
-    kind("marker (63, 0)", [200, 60, 200], true, true, 0),
-    kind("marker (0, 63)", [235, 235, 235], true, true, 0),
+pub const TILES: [TileKind; 11] = [
+    kind(
+        "grass",
+        [76, 140, 60],
+        true,
+        true,
+        0,
+        look(G::Grass, F::None),
+    ),
+    kind(
+        "ore",
+        [200, 160, 40],
+        true,
+        false,
+        500,
+        look(G::Grass, F::Ore),
+    ),
+    kind(
+        "water",
+        [40, 90, 170],
+        false,
+        false,
+        0,
+        look(G::Water, F::None),
+    ),
+    kind(
+        "rock",
+        [110, 105, 100],
+        false,
+        false,
+        0,
+        look(G::Grass, F::Cliff),
+    ),
+    kind(
+        "sand",
+        [190, 175, 120],
+        true,
+        false,
+        0,
+        look(G::Sand, F::None),
+    ),
+    kind(
+        "marker (0, 0)",
+        [210, 50, 50],
+        true,
+        true,
+        0,
+        look(G::Grass, F::None),
+    ),
+    kind(
+        "marker (63, 0)",
+        [200, 60, 200],
+        true,
+        true,
+        0,
+        look(G::Grass, F::None),
+    ),
+    kind(
+        "marker (0, 63)",
+        [235, 235, 235],
+        true,
+        true,
+        0,
+        look(G::Grass, F::None),
+    ),
+    kind(
+        "road",
+        [86, 86, 84],
+        true,
+        false,
+        0,
+        look(G::Grass, F::Road),
+    ),
+    kind(
+        "forest",
+        [40, 84, 40],
+        false,
+        false,
+        0,
+        look(G::Grass, F::Forest),
+    ),
+    kind(
+        "cottage",
+        [150, 104, 84],
+        false,
+        false,
+        0,
+        look(G::Grass, F::House),
+    ),
 ];
 
 pub const GRASS: u32 = 0;
@@ -69,6 +159,9 @@ pub const SAND: u32 = 4;
 pub const MARKER_ORIGIN: u32 = 5;
 pub const MARKER_X_END: u32 = 6;
 pub const MARKER_Y_END: u32 = 7;
+pub const ROAD: u32 = 8;
+pub const FOREST: u32 = 9;
+pub const COTTAGE: u32 = 10;
 
 pub fn output_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets/maps/demo")
@@ -94,7 +187,12 @@ pub fn tile_at(x: u32, y: u32) -> u32 {
     } else if distance2(12, 12) <= 8 || distance2(51, 51) <= 8 || distance2(22, 44) <= 5 {
         ORE
     } else {
-        GRASS
+        match battlefield_layout::detail(SIDE, SIDE, x as u32, y as u32) {
+            battlefield_layout::Detail::Road => ROAD,
+            battlefield_layout::Detail::Grove => FOREST,
+            battlefield_layout::Detail::Village => COTTAGE,
+            _ => GRASS,
+        }
     }
 }
 
@@ -151,7 +249,7 @@ pub fn map_tmx() -> String {
     let _ = writeln!(tmx, " <properties>");
     let _ = writeln!(
         tmx,
-        r#"  <property name="schema_version" type="int" value="1"/>"#
+        r#"  <property name="schema_version" type="int" value="2"/>"#
     );
     let _ = writeln!(tmx, " </properties>");
     let _ = writeln!(
@@ -166,6 +264,12 @@ pub fn map_tmx() -> String {
         let _ = writeln!(tmx, "  <!-- {} -->", tile.name);
         let _ = writeln!(tmx, r#"  <tile id="{id}">"#);
         let _ = writeln!(tmx, "   <properties>");
+        if tile.name == "water" {
+            let _ = writeln!(
+                tmx,
+                r#"    <property name="water" type="bool" value="true"/>"#
+            );
+        }
         let _ = writeln!(
             tmx,
             r#"    <property name="passable" type="bool" value="{}"/>"#,
@@ -180,6 +284,11 @@ pub fn map_tmx() -> String {
             tmx,
             r#"    <property name="ore" type="int" value="{}"/>"#,
             tile.ore
+        );
+        let _ = writeln!(
+            tmx,
+            r#"    <property name="look" type="int" value="{}"/>"#,
+            tile.look
         );
         let _ = writeln!(tmx, "   </properties>");
         let _ = writeln!(tmx, "  </tile>");
