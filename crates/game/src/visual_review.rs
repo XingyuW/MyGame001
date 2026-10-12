@@ -2,7 +2,13 @@
 //! directory. This is separate from smoke tests and ordinary play; screenshots include a
 //! labelled developed-base setup, installed through the same pre-tick match setup as skirmish.
 //! Never changes a running simulation. The production catalogue is restored after setup.
-use crate::skirmish::{Catalogue, MenuSelection, begin_match};
+//!
+//! Since RA1 the factions are countries, which start with the base unit of their side. A scene
+//! adds its buildings and units to the starting lists of the human player's country, which match
+//! setup places besides what the country starts with, and starts with the Construction Yards
+//! instead of the base units ([`begin_scene`]), so that the base stands at the start position
+//! from the first frame; the starting units of both players stand around their yards.
+use crate::skirmish::{Catalogue, MenuSelection, begin_match, begin_match_with};
 use bevy::prelude::*;
 use bevy::render::view::screenshot::{Screenshot, save_to_disk};
 use std::path::PathBuf;
@@ -175,6 +181,15 @@ fn tour_maps(world: &mut World) {
     }
 }
 
+/// Starts the match of a review scene: as [`begin_match`] with the seed of the review, but with
+/// the players' Construction Yards in place of their base units.
+fn begin_scene(world: &mut World, choice: MenuSelection) {
+    begin_match_with(world, choice, 8, SCENE_MCV_START);
+}
+
+/// The lobby's "start with an MCV" for the review's scenes: off.
+const SCENE_MCV_START: bool = false;
+
 /// MYGAME_FEATURE_REVIEW: a short review of the interface around a developed base with every
 /// aircraft type beside it: aircraft at their flying height over their shadows, a selected war
 /// factory with its rally point, and the notices of defeated players in their team colours.
@@ -201,7 +216,7 @@ fn feature_review(original: &Catalogue) -> (Catalogue, MenuSelection) {
     }
     faction.units.clear();
     for (id, offset, count) in [
-        ("light_tank", (13, 6), 3),
+        ("grizzly", (13, 6), 3),
         ("harrier", (14, -5), 2),
         ("black_eagle", (15, 1), 2),
         ("kirov", (10, 3), 1),
@@ -263,7 +278,7 @@ fn capture_features(world: &mut World) {
             let (review, choice) = feature_review(&original);
             world.insert_resource(review);
             world.insert_resource(choice);
-            begin_match(world, choice, 8);
+            begin_scene(world, choice);
             world.insert_resource(original);
         }
         // The war factory is selected and given a rally point, as a right click would.
@@ -330,7 +345,7 @@ fn capture_features(world: &mut World) {
 }
 
 /// MYGAME_FX_REVIEW: weapons at work beside a developed base. Prism tanks, Tesla tanks and
-/// troopers, battle tanks, riflemen and a rocket launcher engage an armoured column, then the
+/// troopers, battle tanks, GIs and a V3 launcher engage an armoured column, then the
 /// infantry walks back past the cloning vats, which are selected and given a rally point.
 pub fn enable_fx(app: &mut App, directory: PathBuf) {
     app.insert_resource(Review {
@@ -384,7 +399,7 @@ fn fx_review(original: &Catalogue) -> (Catalogue, MenuSelection) {
         ("grizzly", (13, 8), 2),
         ("gi", (12, -1), 4),
         ("tesla_trooper", (14, 10), 2),
-        ("rocket_launcher", (10, 6), 1),
+        ("v3_launcher", (10, 6), 1),
         ("conscript", (11, 11), 3),
         ("attack_dog", (11, 0), 1),
     ] {
@@ -400,7 +415,7 @@ fn fx_review(original: &Catalogue) -> (Catalogue, MenuSelection) {
     let shift = (home.x - away.x, home.y - away.y);
     let enemy = &mut review.skirmish.factions[choice.opponent];
     enemy.units.clear();
-    for (id, offset, count) in [("heavy_tank", (0, -2), 4), ("mcv", (1, 3), 2)] {
+    for (id, offset, count) in [("rhino", (0, -2), 4), ("mcv", (1, 3), 2)] {
         enemy.units.push(sim::StartingGroup {
             kind: review.definitions.unit_kind(id).expect("enemy"),
             offset: (
@@ -482,7 +497,7 @@ fn capture_fx(world: &mut World) {
             let (review, choice) = fx_review(&original);
             world.insert_resource(review);
             world.insert_resource(choice);
-            begin_match(world, choice, 8);
+            begin_scene(world, choice);
             world.insert_resource(original);
         }
         30 => {
@@ -589,7 +604,7 @@ fn capture(world: &mut World) {
         let original = world.resource::<Catalogue>().clone();
         let (review, choice) = base_review(&original);
         world.insert_resource(review);
-        begin_match(world, choice, 8);
+        begin_scene(world, choice);
         world.insert_resource(original);
         world.spawn((
             ReviewLabel,
@@ -606,10 +621,14 @@ fn capture(world: &mut World) {
         ));
     }
     if frame == 240 || frame == 330 {
-        let mut choice = MenuSelection::initial(world.resource::<Catalogue>());
+        // The menu's first choice (RA1: America against the first Soviet country), and on the
+        // second map the two the other way round.
+        let initial = MenuSelection::initial(world.resource::<Catalogue>());
+        let mut choice = initial;
         choice.map = if frame == 240 { 1 } else { 2 };
-        choice.faction = if frame == 240 { 1 } else { 0 };
-        choice.opponent = 1 - choice.faction;
+        if frame == 240 {
+            (choice.faction, choice.opponent) = (initial.opponent, initial.faction);
+        }
         begin_match(world, choice, 8);
         // Remove the setup label with the old match; these are ordinary shipped starts.
         let labels: Vec<Entity> = world
@@ -633,7 +652,7 @@ fn capture(world: &mut World) {
         let original = world.resource::<Catalogue>().clone();
         let (review, choice) = technology_review(&original);
         world.insert_resource(review);
-        begin_match(world, choice, 8);
+        begin_scene(world, choice);
         world.insert_resource(original);
         world.insert_resource(crate::sidebar::Tab::Vehicles);
         world.insert_resource(crate::sidebar::BuildPage(4));
@@ -654,7 +673,7 @@ fn capture(world: &mut World) {
         let original = world.resource::<Catalogue>().clone();
         let (review, choice) = combat_review(&original);
         world.insert_resource(review);
-        begin_match(world, choice, 8);
+        begin_scene(world, choice);
         world.insert_resource(original);
         let mut labels = world.query_filtered::<&mut Text, With<ReviewLabel>>();
         for mut label in labels.iter_mut(world) {
@@ -691,7 +710,7 @@ fn capture(world: &mut World) {
         let original = world.resource::<Catalogue>().clone();
         let (review, choice) = roster_review(&original);
         world.insert_resource(review);
-        begin_match(world, choice, 8);
+        begin_scene(world, choice);
         world.insert_resource(original);
         world.spawn((
             ReviewLabel,
@@ -711,34 +730,27 @@ fn capture(world: &mut World) {
     }
 }
 
-/// Vehicles in three rows, then infantry in two, each type once, beside the developed base.
-pub(crate) const ROSTER_LINEUP: [&str; 38] = [
-    "scout",
-    "raider",
-    "light_tank",
+/// Vehicles in two rows, then infantry in two, each type once, beside the developed base. (The
+/// ten types of the armies before RA1, which the shipped data no longer defines, have left the
+/// line-up: scout, raider, light tank, artillery, heavy tank, rocket launcher, harvester,
+/// rifleman, rocket soldier and grenadier.)
+pub(crate) const ROSTER_LINEUP: [&str; 28] = [
     "ifv",
     "flak_track",
-    "artillery",
     "grizzly",
     "rhino",
-    "heavy_tank",
     "tank_destroyer",
     "mirage_tank",
     "prism_tank",
     "tesla_tank",
     "apocalypse",
-    "rocket_launcher",
     "v3_launcher",
     "demolition_truck",
     "mcv",
-    "harvester",
     "war_miner",
     "chrono_miner",
-    "rifleman",
     "gi",
     "conscript",
-    "rocket_soldier",
-    "grenadier",
     "engineer",
     "rocketeer",
     "spy",
@@ -753,16 +765,22 @@ pub(crate) const ROSTER_LINEUP: [&str; 38] = [
     "terrorist",
 ];
 
+/// How many entries of [`ROSTER_LINEUP`] are vehicles, which come first.
+const LINEUP_VEHICLES: usize = 14;
+
 fn roster_review(original: &Catalogue) -> (Catalogue, MenuSelection) {
     let (mut review, choice) = base_review(original);
     let faction = &mut review.skirmish.factions[choice.faction];
     faction.units.clear();
     for (i, id) in ROSTER_LINEUP.iter().enumerate() {
         let kind = review.definitions.unit_kind(id).expect("roster unit");
-        let (row, column) = if i < 21 {
+        let (row, column) = if i < LINEUP_VEHICLES {
             (i / 7, i % 7)
         } else {
-            (3 + (i - 21) / 9, (i - 21) % 9)
+            (
+                LINEUP_VEHICLES / 7 + (i - LINEUP_VEHICLES) / 9,
+                (i - LINEUP_VEHICLES) % 9,
+            )
         };
         faction.roster.insert(sim::ProductionItem::Unit(kind));
         faction.units.push(sim::StartingGroup {
@@ -776,15 +794,17 @@ fn roster_review(original: &Catalogue) -> (Catalogue, MenuSelection) {
 
 fn base_review(original: &Catalogue) -> (Catalogue, MenuSelection) {
     let mut review = original.clone();
-    let mut choice = MenuSelection::initial(&review);
-    choice.opponent = 1;
+    // The human player's country against the first of the other side (RA1), whose start the
+    // scene leaves as it is. The yard of the base is the one the scene starts with
+    // ([`begin_scene`]), at the start position.
+    let choice = MenuSelection::initial(&review);
     for (id, offset) in [
         ("power_plant", (4, -2)),
         ("refinery", (-3, 3)),
         ("barracks", (4, 3)),
         ("war_factory", (0, 7)),
         ("tech_center", (-3, -1)),
-        ("gun_turret", (8, 0)),
+        ("pillbox", (8, 0)),
     ] {
         if let Some(kind) = review.definitions.building_kind(id) {
             review.skirmish.factions[choice.faction]
@@ -801,12 +821,12 @@ fn technology_review(original: &Catalogue) -> (Catalogue, MenuSelection) {
         ("power_plant", "tesla_reactor"),
         ("tech_center", "nuclear_reactor"),
         ("barracks", "chronosphere"),
-        ("gun_turret", "tesla_coil"),
+        ("pillbox", "tesla_coil"),
     ] {
         let old = review
             .definitions
             .building_kind(old)
-            .expect("legacy building");
+            .expect("base building");
         let new = review.definitions.building_kind(new).expect("HD building");
         let faction = &mut review.skirmish.factions[choice.faction];
         faction.roster.insert(sim::ProductionItem::Building(new));
@@ -839,7 +859,7 @@ fn combat_review(original: &Catalogue) -> (Catalogue, MenuSelection) {
     let (mut review, choice) = technology_review(original);
     let enemy = &mut review.skirmish.factions[choice.opponent];
     enemy.units.clear();
-    for (id, offset, count) in [("heavy_tank", (-30, 0), 3), ("conscript", (-31, -2), 4)] {
+    for (id, offset, count) in [("rhino", (-30, 0), 3), ("conscript", (-31, -2), 4)] {
         enemy.units.push(sim::StartingGroup {
             kind: review.definitions.unit_kind(id).expect("enemy"),
             offset,
@@ -857,6 +877,11 @@ mod tests {
         let original = crate::skirmish::tests::production_catalogue();
         let (review, choice) = fx_review(&original);
         let (plan, _) = crate::skirmish::match_plan(&review, choice, 8).expect("plan");
+        // As `begin_scene` starts it.
+        let plan = crate::sim_host::MatchPlan {
+            mcv_start: SCENE_MCV_START,
+            ..plan
+        };
         let checked = crate::sim_host::check_match(&plan);
         assert!(checked.is_ok(), "{:?}", checked.err());
     }
@@ -869,6 +894,7 @@ mod tests {
             super_me: false,
             unlock_all: false,
             unit_speed_percent: 100,
+            mcv_start: SCENE_MCV_START,
             grid: review.maps[choice.map].map.grid.clone(),
             looks: review.maps[choice.map].map.looks.clone(),
             definitions: review.definitions,
@@ -888,6 +914,7 @@ mod tests {
             super_me: false,
             unlock_all: false,
             unit_speed_percent: 100,
+            mcv_start: SCENE_MCV_START,
             grid: review.maps[choice.map].map.grid.clone(),
             looks: review.maps[choice.map].map.looks.clone(),
             definitions: review.definitions,
@@ -899,6 +926,11 @@ mod tests {
         };
         let start = crate::sim_host::check_match(&plan).expect("valid line-up");
         assert!(start.units >= ROSTER_LINEUP.len(), "{}", start.units);
+        // Exactly the line-up besides the starting units of the two countries (RA1).
+        let (starting, yards) =
+            crate::skirmish::starting_totals(&original, choice, SCENE_MCV_START);
+        assert_eq!(start.units, ROSTER_LINEUP.len() + starting);
+        assert_eq!(start.buildings, 6 + yards);
     }
     #[test]
     fn developed_base_is_valid_and_does_not_extend_the_opponents_start() {
@@ -913,6 +945,7 @@ mod tests {
             super_me: false,
             unlock_all: false,
             unit_speed_percent: 100,
+            mcv_start: SCENE_MCV_START,
             grid: review.maps[choice.map].map.grid.clone(),
             looks: review.maps[choice.map].map.looks.clone(),
             definitions: review.definitions,
@@ -923,10 +956,12 @@ mod tests {
             seed: 8,
         };
         let start = crate::sim_host::check_match(&plan).expect("valid developed base");
+        // The six buildings of the scene and the yard of either player, which a scene starts
+        // with (`begin_scene`); the shipped countries have no starting building of their own.
         assert_eq!(start.buildings, 8);
         assert_eq!(
             original.skirmish.factions[choice.faction].buildings.len(),
-            1
+            0
         );
     }
 }

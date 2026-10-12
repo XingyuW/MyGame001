@@ -36,6 +36,7 @@
         (unit: "heavy", cost: 650, build_time: 20, producer: "soviet_factory", prerequisites: ["soviet_factory"]),
         (unit: "miner_a", cost: 500, build_time: 20, producer: "allied_factory", prerequisites: ["allied_factory"]),
         (unit: "miner_s", cost: 500, build_time: 20, producer: "soviet_factory", prerequisites: ["soviet_factory"]),
+        (unit: "hovercraft", cost: 450, build_time: 20, producer: "allied_factory", prerequisites: ["allied_factory"]),
     ],
     harvesters: [
         (unit: "miner_a", capacity: 200, harvest_rate: 10),

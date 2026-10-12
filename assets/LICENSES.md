@@ -62,8 +62,14 @@ requires user verification. Synthesised audio is unchanged and remains nonfinal.
 ### M9 production extension
 
 `data/arsenal.ron` and the additions to `data/units.ron`, `data/economy.ron`, and
-`data/combat.ron` are original data authored in `scripts/generate_arsenal.py` for this
-repository. Requested RA2 unit names identify gameplay roles; no third-party sprites,
+`data/combat.ron` were original data authored in `scripts/generate_arsenal.py` for this
+repository. Since RA1 of the RA2 parity programme every file in `data/` is written by
+`scripts/generate_ra2_data.py` from the committed reference tables in
+`crates/sim/tests/reference/` (numbers, flags and identifiers taken from the vanilla Red Alert
+2 `rules.ini`; provenance in `docs/DECISIONS.md` R2 and R9) and from that script's own tables of
+game specific values (labels, descriptions, roles, build times, weapons, the computer
+player's plans). `data/rules.ron` is new in RA1. No ini file and no text of one is
+distributed. Requested RA2 unit names identify gameplay roles; no third-party sprites,
 audio, logos, or game data files are distributed. Existing repository-generated sprites
 are reused as role illustrations. Map schema 2 adds explicit water terrain through the
 existing repository map generators.

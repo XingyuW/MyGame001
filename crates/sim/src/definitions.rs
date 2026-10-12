@@ -374,6 +374,21 @@ pub fn load_match_definitions(
     load_definitions(units_file, economy_file)?.with_combat(combat_file)
 }
 
+/// Loads the definitions of the ruleset in the directory `dir` (RA1): its `units.ron`,
+/// `economy.ron` and `combat.ron` ([`load_match_definitions`]), then its `rules.ron`
+/// ([`Definitions::with_rules`]) and its `arsenal.ron` ([`Definitions::with_arsenal`]), which is
+/// how the shipped data in `assets/data` is loaded.
+pub fn load_ruleset(dir: impl AsRef<Path>) -> Result<Definitions, DataError> {
+    let dir = dir.as_ref();
+    load_match_definitions(
+        dir.join("units.ron"),
+        dir.join("economy.ron"),
+        dir.join("combat.ron"),
+    )?
+    .with_rules(dir.join("rules.ron"))?
+    .with_arsenal(dir.join("arsenal.ron"))
+}
+
 fn validate(path: &Path, file: UnitsFile) -> Result<Definitions, DataError> {
     let error = |field: String, kind| DataError {
         file: path.to_owned(),

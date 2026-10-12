@@ -4,7 +4,8 @@
 // Harrier is to Korea); the militia is a Soviet unit without prerequisites, so that only the
 // side of the barracks decides; the prototype cannot be queued (tech level -1) and the advanced
 // trooper lies above the fixture's tech level 5; the turret has no owner sides and needs any
-// barracks; the storm device is a superweapon. Fixture data (invariant I10).
+// barracks; the storm device is a superweapon; the hovercraft is a transport that carries two
+// units, vehicles included. Fixture data (invariant I10).
 (schema_version: 2, entries: [
     (id: "allied_yard", label: "Allied Yard", description: "Fixture item.", category: "buildings", domain: "land", role: "combat", cooldown: 100, radius: 2, strength: 20, capacity: 0, art: "allied_yard", side: "allied", factory: "buildings", owner_sides: ["allied"], required_countries: [], forbidden_countries: [], tech_level: -1, prerequisite_groups: []),
     (id: "soviet_yard", label: "Soviet Yard", description: "Fixture item.", category: "buildings", domain: "land", role: "combat", cooldown: 100, radius: 2, strength: 20, capacity: 0, art: "soviet_yard", side: "soviet", factory: "buildings", owner_sides: ["soviet"], required_countries: [], forbidden_countries: [], tech_level: -1, prerequisite_groups: []),
@@ -34,4 +35,5 @@
     (id: "heavy", label: "Heavy Tank", description: "Fixture item.", category: "vehicles", domain: "land", role: "combat", cooldown: 100, radius: 2, strength: 20, capacity: 0, art: "heavy", side: "soviet", factory: "none", owner_sides: ["soviet"], required_countries: [], forbidden_countries: [], tech_level: 2, prerequisite_groups: []),
     (id: "miner_a", label: "Allied Miner", description: "Fixture item.", category: "vehicles", domain: "land", role: "combat", cooldown: 100, radius: 2, strength: 20, capacity: 0, art: "miner_a", side: "allied", factory: "none", owner_sides: ["allied"], required_countries: [], forbidden_countries: [], tech_level: 1, prerequisite_groups: []),
     (id: "miner_s", label: "Soviet Miner", description: "Fixture item.", category: "vehicles", domain: "land", role: "combat", cooldown: 100, radius: 2, strength: 20, capacity: 0, art: "miner_s", side: "soviet", factory: "none", owner_sides: ["soviet"], required_countries: [], forbidden_countries: [], tech_level: 1, prerequisite_groups: []),
+    (id: "hovercraft", label: "Hovercraft", description: "Fixture item.", category: "vehicles", domain: "amphibious", role: "transport", cooldown: 100, radius: 2, strength: 20, capacity: 2, art: "hovercraft", side: "allied", factory: "none", owner_sides: ["allied"], required_countries: [], forbidden_countries: [], tech_level: 2, prerequisite_groups: []),
 ])

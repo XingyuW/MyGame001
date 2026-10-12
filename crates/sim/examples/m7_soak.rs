@@ -12,8 +12,8 @@
 //! configuration starts in a new simulation, as the game's Restart does, so that all of the ticks
 //! are played. The configurations:
 //!
-//! * the shipped data: every shipped map, every pairing of the shipped factions, and each shipped
-//!   difficulty for both players;
+//! * the shipped data: every shipped map, every pairing of the two sides (each played by its
+//!   countries in turn, docs/DECISIONS.md R5), and each shipped difficulty for both players;
 //! * the fixture data of the simulation's tests on the fixture map: every pairing of the fixture
 //!   factions at each fixture difficulty (so that the soak does not depend on the shipped balance
 //!   alone, I10).
@@ -47,7 +47,7 @@ use sim::{
     AiDefinitions, Building, CommandQueue, Controller, Definitions, Grid, MatchOutcome, MatchState,
     Mobile, PlayerId, PlayerSetup, Players, Projectiles, RejectReason, SimEvent, SimId, SimPlugin,
     SimSchedule, SkirmishDefinitions, check_ai_factions, load_ai, load_map, load_match_definitions,
-    load_skirmish, map_asset_path, setup_match, state_hash,
+    load_ruleset, load_skirmish, map_asset_path, setup_match, state_hash,
 };
 
 /// Ticks played per configuration: 30 minutes of game time.
@@ -209,19 +209,17 @@ fn load(
     files: [&str; 5],
     maps: impl Fn(&str) -> PathBuf,
 ) -> Result<DataSet, String> {
-    let definitions = load_match_definitions(
-        data.join(files[0]),
-        data.join(files[1]),
-        data.join(files[2]),
-    )
-    .map_err(|error| error.to_string())?;
+    // The shipped ruleset has a rules file and an arsenal (RA1); the fixture has neither.
     let definitions = if name == "shipped" {
-        definitions
-            .with_arsenal(data.join("arsenal.ron"))
-            .map_err(|error| error.to_string())?
+        load_ruleset(&data)
     } else {
-        definitions
-    };
+        load_match_definitions(
+            data.join(files[0]),
+            data.join(files[1]),
+            data.join(files[2]),
+        )
+    }
+    .map_err(|error| error.to_string())?;
     let skirmish =
         load_skirmish(data.join(files[3]), &definitions).map_err(|error| error.to_string())?;
     let ai = load_ai(data.join(files[4]), &definitions).map_err(|error| error.to_string())?;
@@ -485,10 +483,22 @@ fn main() -> ExitCode {
     // The configurations in the order they are reported in.
     let mut jobs = Vec::new();
     for (index, set) in sets.iter().enumerate() {
-        let factions = set.skirmish.factions.len();
+        // Every pairing of the sides, each side played by its countries in turn, or without
+        // countries every pairing of the factions (docs/DECISIONS.md R5).
+        let groups = set.skirmish.pairing_groups();
         for map in 0..set.skirmish.maps.len() {
-            for first in 0..factions {
-                for second in 0..factions {
+            for (pairing, (first, second)) in (0..groups.len())
+                .flat_map(|first| (0..groups.len()).map(move |second| (first, second)))
+                .enumerate()
+            {
+                let turn = map + pairing;
+                let (Some(first), Some(second)) = (
+                    SkirmishDefinitions::rotating(&groups[first], turn),
+                    SkirmishDefinitions::rotating(&groups[second], turn + 1),
+                ) else {
+                    continue;
+                };
+                {
                     for difficulty in 0..set.ai.difficulties.len() {
                         let config = Config {
                             map,

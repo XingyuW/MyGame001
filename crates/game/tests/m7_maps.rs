@@ -16,7 +16,7 @@ use std::collections::VecDeque;
 use std::path::PathBuf;
 
 use gen_maps::{MAPS, MapSpec, TILES};
-use sim::{CellPos, Grid, LoadedMap, load_map, load_match_definitions, load_skirmish};
+use sim::{CellPos, Grid, LoadedMap, load_map, load_ruleset, load_skirmish};
 
 fn load(spec: &MapSpec) -> LoadedMap {
     let path = spec.output_dir().join(format!("{}.tmx", spec.id));
@@ -210,12 +210,9 @@ fn each_start_has_a_base_site_ore_nearby_and_a_way_to_the_other_start() {
 #[test]
 fn the_shipped_skirmish_file_lists_every_generated_map_with_its_starts() {
     let data = assets().join("data");
-    let definitions = load_match_definitions(
-        data.join("units.ron"),
-        data.join("economy.ron"),
-        data.join("combat.ron"),
-    )
-    .unwrap_or_else(|error| panic!("{error}"));
+    // The skirmish file names countries of the shipped rules (RA1), so it is loaded against
+    // the whole shipped ruleset.
+    let definitions = load_ruleset(&data).unwrap_or_else(|error| panic!("{error}"));
     let skirmish = load_skirmish(data.join("skirmish.ron"), &definitions)
         .unwrap_or_else(|error| panic!("{error}"));
     // The demo map of M1 and the two maps of M7: three maps (PLAN.md section 1).

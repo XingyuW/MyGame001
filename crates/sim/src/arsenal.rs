@@ -5,7 +5,8 @@
 //! to every entry what Red Alert 2 needs to decide who may build it, and whose art it shows:
 //!
 //! * `art`: the id of the item whose miniature and sprites the game draws for it (its own id, or
-//!   that of its twin of the other side until it has art of its own);
+//!   that of its twin of the other side until it has art of its own): a defined item of the
+//!   same kind, a building for a building and a unit for a unit;
 //! * `side`: `"allied"`, `"soviet"` or `"none"`, the side of the type itself; for a factory it
 //!   is the side the `Owner` rule looks at (assumption RA-A3);
 //! * `factory`: for a building, the kind of factory it is (`"buildings"`, `"infantry"`,
@@ -319,6 +320,21 @@ impl Arsenal {
             }
             crate::definitions::check_name(&e.art)
                 .map_err(|kind| err(format!("entries[{i}].art"), kind))?;
+            // The art is that of an item of the same kind: the game draws a building with a
+            // building's sheet and a unit with a unit's.
+            let (kind, known) = match item {
+                ProductionItem::Building(_) => ("building", defs.building_kind(&e.art).is_some()),
+                ProductionItem::Unit(_) => ("unit", defs.unit_kind(&e.art).is_some()),
+            };
+            if !known {
+                return Err(err(
+                    format!("entries[{i}].art"),
+                    DataErrorKind::UnknownReference {
+                        kind: kind.into(),
+                        id: e.art.clone(),
+                    },
+                ));
+            }
             let side = match e.side.as_str() {
                 "none" => None,
                 other => Some(Side::parse(other).ok_or_else(|| bad("side", &e.side))?),

@@ -296,6 +296,35 @@ impl SkirmishDefinitions {
             .collect()
     }
 
+    /// The groups of factions that the end to end matches pair (docs/DECISIONS.md R5): with
+    /// countries, one group per side that has any, holding its countries in the file's order
+    /// (the factions without a side are then not paired); without countries, one group per
+    /// faction. A match that plays "every pairing" plays every pairing of the groups and takes
+    /// a faction of each group by [`SkirmishDefinitions::rotating`].
+    pub fn pairing_groups(&self) -> Vec<Vec<usize>> {
+        let by_side: Vec<Vec<usize>> = Side::ALL
+            .into_iter()
+            .map(|side| {
+                (0..self.factions.len())
+                    .filter(|&index| self.factions[index].side == Some(side))
+                    .collect::<Vec<usize>>()
+            })
+            .filter(|group| !group.is_empty())
+            .collect();
+        if by_side.is_empty() {
+            (0..self.factions.len()).map(|index| vec![index]).collect()
+        } else {
+            by_side
+        }
+    }
+
+    /// The faction of `group` (one of [`SkirmishDefinitions::pairing_groups`]) for turn `turn`:
+    /// its members in order, starting over after the last, so that matches numbered in a row
+    /// play every country of a side. `None` for an empty group.
+    pub fn rotating(group: &[usize], turn: usize) -> Option<usize> {
+        group.get(turn.checked_rem(group.len())?).copied()
+    }
+
     /// The mean cost of the starting unit types of all sides together, rounded down (0 without
     /// any): the unit of the starting units' budget (docs/RA2_PARITY_PLAN.md section 4.9).
     pub fn average_starting_cost(&self, definitions: &Definitions) -> i64 {

@@ -3,9 +3,12 @@
 //!
 //! `crates/sim/tests/m6_ai.rs` runs the plan's end-to-end test on every shipped map with fixture
 //! data (invariant I10), and checks equal hashes across two runs. This test runs the shipped
-//! factions, units, buildings, and AI file, as a match started from the menu sets them up, once
-//! for every pairing of the shipped difficulties and (since M7, which ships the second faction) of
-//! the shipped factions: every match must end with a winner within [`MATCH_TICK_LIMIT`] ticks
+//! countries, units, buildings, and AI file, as a match started from the menu sets them up (each
+//! player with the base unit of its side and its starting units), once for every pairing of the
+//! shipped difficulties and of the two sides; the country that plays a side rotates with the map
+//! and the pairing, so that every country is played on several maps (RA1, docs/DECISIONS.md R5:
+//! every pairing of the nine countries would be 15,309 matches instead of 756). Every match must
+//! end with a winner within [`MATCH_TICK_LIMIT`] ticks
 //! (scaled up on large maps, [`tick_limit`]), without panic, and with no rejected command of a
 //! computer player that a loss in the tick before, or another player's unit stepping into a
 //! footprint, does not explain. It checks a property of the shipped game
@@ -20,7 +23,7 @@ use bevy::ecs::message::Messages;
 use bevy::ecs::world::World;
 use sim::{
     CommandQueue, Controller, MatchOutcome, MatchState, PlayerId, PlayerSetup, RejectReason,
-    SimEvent, SimId, SimPlugin, SimSchedule, load_ai, load_map, load_match_definitions,
+    SimEvent, SimId, SimPlugin, SimSchedule, SkirmishDefinitions, load_ai, load_map, load_ruleset,
     load_skirmish, map_asset_path, setup_match,
 };
 
@@ -42,21 +45,23 @@ fn assets() -> PathBuf {
 #[test]
 fn computer_players_finish_matches_with_the_shipped_data_on_every_shipped_map() {
     let data = assets().join("data");
-    let definitions = load_match_definitions(
-        data.join("units.ron"),
-        data.join("economy.ron"),
-        data.join("combat.ron"),
-    )
-    .unwrap_or_else(|error| panic!("{error}"));
+    let definitions = load_ruleset(&data).unwrap_or_else(|error| panic!("{error}"));
     let skirmish =
         load_skirmish(data.join("skirmish.ron"), &definitions).unwrap_or_else(|e| panic!("{e}"));
     let ai = load_ai(data.join("ai.ron"), &definitions).unwrap_or_else(|e| panic!("{e}"));
     sim::check_ai_factions(data.join("ai.ron"), &ai, &skirmish, &definitions)
         .unwrap_or_else(|e| panic!("{e}"));
-    assert!(skirmish.factions.len() >= 2, "M7 ships two factions");
-    let factions: Vec<(usize, usize)> = (0..skirmish.factions.len())
-        .flat_map(|first| (0..skirmish.factions.len()).map(move |second| (first, second)))
+    // RA1 ships two sides of five and four countries (before: the two factions of M7).
+    let groups = skirmish.pairing_groups();
+    assert_eq!(groups.len(), 2, "two sides");
+    assert_eq!(
+        groups.iter().map(Vec::len).sum::<usize>(),
+        skirmish.factions.len()
+    );
+    let factions: Vec<(usize, usize)> = (0..groups.len())
+        .flat_map(|first| (0..groups.len()).map(move |second| (first, second)))
         .collect();
+    let difficulties = ai.difficulties.len();
     // The matches are independent of each other, so they are played on all cores; a failed
     // assertion of any of them fails the test when the workers are joined.
     let mut jobs = Vec::new();
@@ -64,17 +69,35 @@ fn computer_players_finish_matches_with_the_shipped_data_on_every_shipped_map() 
         let grid = load_map(assets().join(map_asset_path(&def.id)))
             .unwrap_or_else(|error| panic!("{error}"))
             .grid;
-        for &(first_faction, second_faction) in &factions {
-            for first in 0..ai.difficulties.len() {
-                for second in 0..ai.difficulties.len() {
+        for &(first_side, second_side) in &factions {
+            for first in 0..difficulties {
+                for second in 0..difficulties {
+                    // The number of the pairing among all pairings of sides and difficulties
+                    // (`m14_duels -- full` counts them the same way and plays the same matches).
+                    let pairing = ((first_side * groups.len() + second_side) * difficulties
+                        + first)
+                        * difficulties
+                        + second;
+                    let country = |side: usize, slot: usize| {
+                        SkirmishDefinitions::rotating(&groups[side], map + pairing + slot)
+                            .expect("a country of the side")
+                    };
                     jobs.push((
                         map,
                         grid.clone(),
-                        [(first_faction, first), (second_faction, second)],
+                        [
+                            (country(first_side, 0), first),
+                            (country(second_side, 1), second),
+                        ],
                     ));
                 }
             }
         }
+    }
+    // Every country is played, as the first and as the second player.
+    for slot in 0..2 {
+        let played: BTreeSet<usize> = jobs.iter().map(|(_, _, sides)| sides[slot].0).collect();
+        assert_eq!(played.len(), skirmish.factions.len(), "slot {slot}");
     }
     assert_eq!(
         jobs.len(),
@@ -221,12 +244,7 @@ fn run(world: &mut World, name: &str, limit: u64) -> Option<MatchOutcome> {
 #[test]
 fn crossroads_armies_finish_after_new_terrain_changes() {
     let data = assets().join("data");
-    let d = load_match_definitions(
-        data.join("units.ron"),
-        data.join("economy.ron"),
-        data.join("combat.ron"),
-    )
-    .unwrap();
+    let d = load_ruleset(&data).unwrap();
     let sk = load_skirmish(data.join("skirmish.ron"), &d).unwrap();
     let ai = load_ai(data.join("ai.ron"), &d).unwrap();
     let mut app = bevy::app::App::new();
@@ -237,16 +255,19 @@ fn crossroads_armies_finish_after_new_terrain_changes() {
             .grid,
     );
     app.world_mut().insert_resource(d);
+    // The second faction against itself, both easy: before RA1 the Meridian, now the first
+    // country of the second (the Soviet) side.
+    let faction = sk.pairing_groups()[1][0];
     let players = [
         PlayerSetup {
             player: PlayerId(0),
-            faction: 1,
+            faction,
             start: 0,
             controller: Controller::Ai { difficulty: 0 },
         },
         PlayerSetup {
             player: PlayerId(1),
-            faction: 1,
+            faction,
             start: 1,
             controller: Controller::Ai { difficulty: 0 },
         },

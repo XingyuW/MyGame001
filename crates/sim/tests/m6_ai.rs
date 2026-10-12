@@ -934,12 +934,10 @@ fn ai_against_ai_matches_on_the_fixture_map_end_with_a_winner() {
 fn ai_against_ai_matches_on_every_shipped_map_end_with_a_winner() {
     // The shipped maps are those of the production skirmish file, with its start positions; the
     // factions, units, buildings, and AI are fixture data (invariant I10).
-    let production = load_match_definitions(
-        assets().join("data/units.ron"),
-        assets().join("data/economy.ron"),
-        assets().join("data/combat.ron"),
-    )
-    .unwrap_or_else(|error| panic!("{error}"));
+    // The shipped skirmish file names countries of the shipped rules (RA1), so it is loaded
+    // against the whole shipped ruleset.
+    let production =
+        sim::load_ruleset(assets().join("data")).unwrap_or_else(|error| panic!("{error}"));
     let shipped = load_skirmish(assets().join("data/skirmish.ron"), &production)
         .unwrap_or_else(|error| panic!("{error}"));
     assert!(!shipped.maps.is_empty());

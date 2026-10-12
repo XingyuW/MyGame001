@@ -163,13 +163,12 @@ pub fn item_status(
     let Some(terms) = definitions.production(item) else {
         return ItemStatus::default();
     };
-    let available = state.offers(item)
-        && owned.contains(&terms.producer)
-        && (state.unlock_all()
-            || terms.prerequisites.iter().all(|prerequisite| {
-                definitions.prerequisite_met(*prerequisite, owned.iter().copied())
-            }));
-    let queue = state.queue(terms.producer);
+    // Exactly the checks of `QueueProduction` before the length of the queue (RA1: the
+    // buildability rule, `sim::check_buildable`). Superweapons count as switched on, which they
+    // are in every match the game starts until the menu offers the option.
+    let owned_kinds: Vec<BuildingKind> = owned.iter().copied().collect();
+    let available = sim::check_buildable(definitions, state, true, &owned_kinds, item).is_ok();
+    let queue = state.queue(definitions.queue_key(terms.producer));
     let queued = queue.iter().filter(|entry| entry.item == item).count();
     let progress = queue
         .first()
@@ -267,15 +266,32 @@ pub fn availability_text(
     let Some(p) = defs.production(item) else {
         return "Unavailable".into();
     };
-    // The producer is always needed (units leave it); with "unlock all" nothing else is.
+    // The producer is always needed (units leave it): a building that produces the item, or
+    // with factory groups (RA1) a factory of its group and of a side that builds it. With
+    // "unlock all" nothing else is needed; otherwise every prerequisite of the economy file and
+    // a member of every prerequisite group of the arsenal (named by its first member).
     let waived = state.is_some_and(PlayerState::unlock_all);
-    let missing: Vec<_> = std::iter::once(&p.producer)
-        .filter(|k| !owned.contains(*k))
-        .chain(
-            p.prerequisites
+    let unmet = |k: &BuildingKind| match defs.rules() {
+        Some(_) => !owned.contains(k),
+        None => !defs.prerequisite_met(*k, owned.iter().copied()),
+    };
+    let groups: Vec<BuildingKind> = defs
+        .metadata(item)
+        .zip(defs.rules())
+        .map(|(entry, rules)| {
+            entry
+                .prerequisite_groups
                 .iter()
-                .filter(|k| !waived && !defs.prerequisite_met(**k, owned.iter().copied())),
-        )
+                .filter_map(|&group| rules.group(group))
+                .filter(|group| !group.buildings.iter().any(|k| owned.contains(k)))
+                .filter_map(|group| group.buildings.first().copied())
+                .collect()
+        })
+        .unwrap_or_default();
+    let missing: Vec<_> = std::iter::once(&p.producer)
+        .filter(|_| !owned.iter().any(|&k| sim::produces(defs, k, item)))
+        .chain(p.prerequisites.iter().filter(|k| !waived && unmet(k)))
+        .chain(groups.iter().filter(|_| !waived))
         .map(|k| {
             defs.metadata(ProductionItem::Building(*k)).map_or_else(
                 || {
@@ -290,7 +306,7 @@ pub fn availability_text(
         return format!("Needs {}", missing.join(", "));
     }
     if let Some(s) = state {
-        if s.queue(p.producer).len() >= sim::MAX_QUEUE_LENGTH {
+        if s.queue(defs.queue_key(p.producer)).len() >= sim::MAX_QUEUE_LENGTH {
             return "Queue full".into();
         }
         if s.credits() == 0 {
@@ -1235,7 +1251,7 @@ mod tests {
             SidebarEffect::Commands(vec![Command::CancelProduction { item }])
         );
         // Units are queued the same way.
-        let tank = ProductionItem::Unit(definitions.unit_kind("light_tank").expect("tank"));
+        let tank = ProductionItem::Unit(definitions.unit_kind("grizzly").expect("tank"));
         assert_eq!(
             button_effect(
                 SidebarButton::Item(tank),
@@ -1319,13 +1335,26 @@ mod tests {
 
     #[test]
     fn item_status_follows_the_players_buildings_and_queue() {
-        // Through the simulation: the demo match, whose human player owns a construction yard.
+        // Through the simulation: the demo match, whose human player owns a construction yard
+        // (RA1: `demo_host` starts the players with the yards their base units deploy into).
         let mut host = crate::sim_host::tests::demo_host();
         let definitions = host.definitions().expect("definitions").clone();
         let power = ProductionItem::Building(definitions.building_kind("power_plant").expect("pp"));
         let refinery =
             ProductionItem::Building(definitions.building_kind("refinery").expect("refinery"));
-        let tank = ProductionItem::Unit(definitions.unit_kind("light_tank").expect("tank"));
+        let tank = ProductionItem::Unit(definitions.unit_kind("grizzly").expect("tank"));
+        // The cost and build time of the power plant are data (Red Alert 2's since RA1), as are
+        // the starting credits and the power the yard supplies.
+        let terms = definitions.production(power).expect("terms").clone();
+        let (cost, total) = (terms.cost, terms.build_time);
+        assert!(total >= 2 && total % 2 == 0, "{total}");
+        let credits = host.players().and_then(|players| players.get(HUMAN));
+        let credits = credits.map_or(0, PlayerState::credits);
+        let supplied: i32 = owned_kinds(&host)
+            .iter()
+            .filter_map(|&kind| definitions.building(kind))
+            .map(|def| def.power_produced)
+            .sum();
         let status = |host: &SimHost, item| {
             statuses(host)
                 .into_iter()
@@ -1352,16 +1381,16 @@ mod tests {
                 Command::QueueProduction { item: power },
             ],
         );
-        for _ in 0..99 {
+        for _ in 1..total / 2 {
             crate::sim_host::tests::run(&mut host, Vec::new());
         }
         let half = status(&host, power);
         assert_eq!(half.queued, 2);
-        assert_eq!(half.progress, Some((100, 200)));
+        assert_eq!(half.progress, Some((total / 2, total)));
         assert!(!half.ready);
         assert_eq!(badge_text(half), "50% +1");
         assert_eq!(progress_percent(half), 50.0);
-        for _ in 0..100 {
+        for _ in 0..total / 2 {
             crate::sim_host::tests::run(&mut host, Vec::new());
         }
         let ready = status(&host, power);
@@ -1371,18 +1400,21 @@ mod tests {
         // The texts of the player's credits and power.
         let players = host.players().expect("players");
         let state = players.get(HUMAN);
-        assert_eq!(credits_text(state), "Credits  4700");
-        assert_eq!(power_text(state), "Power  0 / 20");
+        assert!(cost > 0 && cost < credits, "{cost} of {credits}");
+        assert_eq!(credits_text(state), format!("Credits  {}", credits - cost));
+        assert_eq!(power_text(state), format!("Power  0 / {supplied}"));
         assert_eq!(credits_text(None), "Credits  0");
         let _ = CellPos::new(0, 0);
     }
 
     #[test]
     fn items_outside_the_roster_of_the_players_faction_are_neither_available_nor_shown() {
-        // M7: the shipped factions offer different items; with every building owned, an item is
+        // M7: the factions offer different items; with every building owned, an item is
         // available exactly when the player's roster offers it, and its button is shown exactly
-        // then (on its tab).
-        let catalogue = crate::skirmish::tests::production_catalogue();
+        // then (on its tab). Since RA1 the shipped factions are countries, whose players have no
+        // roster (the buildability rule decides), so this runs on the legacy ruleset fixture: the
+        // Vanguard and the Meridian with their rosters.
+        let catalogue = crate::skirmish::tests::legacy_catalogue();
         let definitions = &catalogue.definitions;
         let owned: BTreeSet<BuildingKind> = (0..definitions.buildings().len())
             .map(|index| BuildingKind(index as u16))
@@ -1438,9 +1470,18 @@ mod tests {
     fn texts_and_colours_of_the_sidebar() {
         let definitions = production_definitions();
         let power = ProductionItem::Building(definitions.building_kind("power_plant").expect("pp"));
-        assert_eq!(item_label(power, &definitions), "power plant  $300");
-        let tank = ProductionItem::Unit(definitions.unit_kind("light_tank").expect("tank"));
-        assert_eq!(item_label(tank, &definitions), "light tank  $700");
+        // The costs are data (Red Alert 2's since RA1).
+        let cost = |item| definitions.production(item).expect("terms").cost;
+        assert_eq!(
+            item_label(power, &definitions),
+            format!("power plant  ${}", cost(power))
+        );
+        let tank = ProductionItem::Unit(definitions.unit_kind("prism_tank").expect("tank"));
+        assert_eq!(
+            item_label(tank, &definitions),
+            format!("prism tank  ${}", cost(tank))
+        );
+        assert!(cost(power) > 0 && cost(tank) > 0);
         assert_eq!(badge_text(ItemStatus::default()), "locked");
         assert_eq!(
             badge_text(ItemStatus {
@@ -1528,24 +1569,25 @@ mod tests {
         assert!(at(&buildings, "power_plant") < at(&buildings, "refinery"));
         assert!(at(&buildings, "refinery") < at(&buildings, "radar_tower"));
         assert!(at(&buildings, "radar_tower") < at(&buildings, "tech_center"));
-        assert!(
-            at(&buildings, "radar_tower") < 2 * PAGE_SIZE,
-            "{buildings:?}"
-        );
-        // The factions' armed towers are listed with the other defences.
+        // (Since RA1 the tab lists the buildings of both sides, on four pages.)
+        let last_page = (buildings.len() - 1) / PAGE_SIZE * PAGE_SIZE;
+        assert!(at(&buildings, "radar_tower") < last_page, "{buildings:?}");
+        // The sides' armed towers are listed with the other defences.
         let armory = tab_order(Tab::Armory);
-        at(&armory, "gun_turret");
-        at(&armory, "rocket_tower");
+        at(&armory, "pillbox");
+        at(&armory, "sentry_gun");
         let infantry = tab_order(Tab::Infantry);
         assert!(at(&infantry, "conscript") < at(&infantry, "tesla_trooper"));
         assert!(at(&infantry, "tesla_trooper") < at(&infantry, "yuri"));
 
         // The status of an item: prerequisites waived with "unlock all", never the producer.
+        // The human player of the demo match plays America (RA1) and owns its yard: the items
+        // are the Allied counterparts of the Tesla Coil and the Apocalypse.
         let host = crate::sim_host::tests::demo_host();
         let owned = owned_kinds(&host);
         let mut state = host.players().unwrap().get(HUMAN).unwrap().clone();
-        let coil = ProductionItem::Building(defs.building_kind("tesla_coil").unwrap());
-        let tank = ProductionItem::Unit(defs.unit_kind("apocalypse").unwrap());
+        let coil = ProductionItem::Building(defs.building_kind("prism_tower").unwrap());
+        let tank = ProductionItem::Unit(defs.unit_kind("prism_tank").unwrap());
         assert!(!item_status(coil, defs, &owned, &state).available);
         assert!(availability_text(coil, defs, &owned, Some(&state)).starts_with("Needs"));
         let unlocked = {

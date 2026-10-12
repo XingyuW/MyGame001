@@ -41,6 +41,13 @@
 //! colour), "unlock all" (chosen for the first two matches only) and Super Me apply to the human
 //! player alone, and every computer player's rejections count. The last match runs at the
 //! fastest game speed, which must set the fixed timestep, and must still pause.
+//!
+//! Since RA1 a match starts as Red Alert 2's lobby starts it: every player with the base unit of
+//! its side (an MCV) and its starting units, and no building (`crate::skirmish::starting_totals`).
+//! The run deploys the human player's base unit after the first tick, as the D key does, moves
+//! the other units, and queues the first building once the Construction Yard stands, which it
+//! must within [`MOVE_CHECK_TICKS`] ticks of the order. The computer players deploy theirs
+//! themselves.
 
 use std::collections::BTreeMap;
 
@@ -66,7 +73,7 @@ use crate::sidebar::{
 use crate::sim_host::{CommandRefused, CommandSink, SimHost};
 use crate::skirmish::{
     Catalogue, EndButton, EndEffect, LastMatch, MenuButton, MenuCounts, MenuEffect, MenuRoot,
-    MenuSelection, Row, Screen, begin_match, end_effect, end_match, menu_effect,
+    MenuSelection, Row, Screen, begin_match, end_effect, end_match, menu_effect, starting_totals,
 };
 use crate::units::{HUMAN, UnitStatus, UnitView, unit_shown};
 
@@ -453,8 +460,8 @@ fn check_pause(
 }
 
 /// The first building of the production menu that `owned` (the player's building types) lets
-/// the player with `state` queue: the roster of its faction offers it (M7), it has no
-/// prerequisites, and the player owns a building of its producing type.
+/// the player with `state` queue: `QueueProduction` of it passes the buildability rule
+/// (`sim::check_buildable`: roster, prerequisites, factory, side and country; RA1).
 pub fn first_queueable(
     definitions: &Definitions,
     owned: &[BuildingKind],
@@ -462,22 +469,19 @@ pub fn first_queueable(
 ) -> Option<ProductionItem> {
     production_menu(definitions).into_iter().find(|&item| {
         matches!(item, ProductionItem::Building(_))
-            && state.offers(item)
-            && definitions.production(item).is_some_and(|terms| {
-                terms.prerequisites.is_empty() && owned.contains(&terms.producer)
-            })
+            && sim::check_buildable(definitions, state, true, owned, item).is_ok()
     })
 }
 
-/// Queues the first building the player can produce once its starting buildings exist, as a
-/// left click on its sidebar button does.
+/// Queues the first building the player can produce once it owns a building (its Construction
+/// Yard: a starting building, or since RA1 the base unit the run has deployed, [`order_move`]),
+/// as a left click on its sidebar button does.
 fn order_production(
     mut smoke: ResMut<SmokeTest>,
-    status: Res<BuildingStatus>,
     host: Res<SimHost>,
     mut sink: ResMut<CommandSink>,
 ) {
-    if smoke.production.is_some() || status.spawned == 0 || smoke.flow != Flow::Last {
+    if smoke.production.is_some() || smoke.flow != Flow::Last {
         return;
     }
     let (Some(definitions), Some(state)) = (
@@ -524,7 +528,10 @@ fn order_production(
 }
 
 /// Orders all of the player's units to [`MOVE_TARGET`] once they exist, as a right click with
-/// all of them selected does.
+/// all of them selected does. Since RA1 the player starts with the base unit of its side (an
+/// MCV) instead of a Construction Yard: the run deploys it first, as the D key does with it
+/// selected, and moves the others. Both wait for the first tick, after which the player sees
+/// the ground the yard will stand on, which `Deploy` requires.
 fn order_move(
     mut smoke: ResMut<SmokeTest>,
     status: Res<UnitStatus>,
@@ -534,17 +541,38 @@ fn order_move(
     if smoke.order.is_some() || status.spawned == 0 || smoke.flow != Flow::Last {
         return;
     }
-    let start: BTreeMap<SimId, SubPos> = host
+    let sees = host
+        .players()
+        .and_then(|players| players.get(HUMAN))
+        .is_some_and(|state| state.vision().visible_cells() > 0);
+    if !sees {
+        return;
+    }
+    let base_unit = |kind: sim::UnitKind| {
+        host.definitions()
+            .and_then(Definitions::rules)
+            .is_some_and(|rules| rules.is_base_unit(kind))
+    };
+    let mut bases = std::collections::BTreeSet::new();
+    let mut start: BTreeMap<SimId, SubPos> = BTreeMap::new();
+    if let Some(mut units) = host
         .world()
-        .try_query::<(&SimId, &Owner, &Position)>()
-        .map(|mut units| {
-            units
-                .iter(host.world())
-                .filter(|(_, owner, _)| owner.0 == HUMAN)
-                .map(|(id, _, position)| (*id, position.0))
-                .collect()
-        })
-        .unwrap_or_default();
+        .try_query::<(&SimId, &Owner, &sim::Unit, &Position)>()
+    {
+        for (id, owner, unit, position) in units.iter(host.world()) {
+            if owner.0 != HUMAN {
+                continue;
+            }
+            if base_unit(unit.kind) {
+                bases.insert(*id);
+            } else {
+                start.insert(*id, position.0);
+            }
+        }
+    }
+    sink.issue(crate::special_controls::deploy_commands(
+        &crate::selection::Selection(bases),
+    ));
     let selection = start.keys().copied().collect();
     sink.issue(crate::selection::move_command(
         &selection,
@@ -694,7 +722,7 @@ fn count_frames(
     }
     let (catalogue, last) = flow;
     let (expected_units, expected_buildings) = match (catalogue.as_deref(), last.0) {
-        (Some(catalogue), Some(selection)) => starting_totals(catalogue, selection),
+        (Some(catalogue), Some(selection)) => starting_totals(catalogue, selection, true),
         _ => (0, 0),
     };
     let empty = Players::default();
@@ -852,7 +880,12 @@ fn count_frames(
         moved,
         buildings: buildings.spawned,
         expected_buildings,
-        production_ordered: production_ordered || smoke.production.is_none(),
+        // Nothing is queued before the player owns a building: its base unit must have deployed
+        // into the Construction Yard by the time a unit must have moved.
+        production_ordered: match smoke.production {
+            Some(_) => production_ordered,
+            None => ticks_since_order < MOVE_CHECK_TICKS,
+        },
         ticks_since_production,
         charged,
         ticks: tick,
@@ -914,7 +947,9 @@ struct SmokeOutcome {
     buildings: usize,
     /// The configured number of starting buildings.
     expected_buildings: usize,
-    /// `false` if the player's starting buildings let it queue nothing.
+    /// `false` if the player's buildings let it queue nothing, or if it still owns none
+    /// [`MOVE_CHECK_TICKS`] ticks after the order that deploys its base unit (RA1: it starts
+    /// without buildings).
     production_ordered: bool,
     ticks_since_production: u64,
     /// Credits charged so far for the player's queued items.
@@ -978,26 +1013,6 @@ type OptionQueries<'w, 's> = (
     Query<'w, 's, &'static OptionsButton>,
 );
 
-/// The starting units and buildings of a match with `selection`: those of both players'
-/// factions (the skirmish file, M6).
-pub fn starting_totals(catalogue: &Catalogue, selection: MenuSelection) -> (usize, usize) {
-    selection
-        .players()
-        .iter()
-        .filter_map(|setup| catalogue.skirmish.factions.get(setup.faction))
-        .fold((0, 0), |(units, buildings), faction| {
-            (
-                units
-                    + faction
-                        .units
-                        .iter()
-                        .map(|group| group.count as usize)
-                        .sum::<usize>(),
-                buildings + faction.buildings.len(),
-            )
-        })
-}
-
 /// The reasons a smoke run fails; empty if it passes.
 fn smoke_failures(outcome: &SmokeOutcome) -> Vec<String> {
     let mut failures = Vec::new();
@@ -1023,7 +1038,10 @@ fn smoke_failures(outcome: &SmokeOutcome) -> Vec<String> {
         failures.push("a command of the smoke test was rejected".to_string());
     }
     if !outcome.production_ordered {
-        failures.push("the player's starting buildings let it queue nothing".to_string());
+        failures.push(
+            "the player's base unit did not deploy, or its buildings let it queue nothing"
+                .to_string(),
+        );
     }
     if outcome.ticks_since_production >= PRODUCTION_CHECK_TICKS && outcome.charged == 0 {
         failures.push(format!(
@@ -1273,7 +1291,7 @@ mod tests {
                 production_ordered: false,
                 ..PASSING
             }),
-            ["the player's starting buildings let it queue nothing"]
+            ["the player's base unit did not deploy, or its buildings let it queue nothing"]
         );
         assert_eq!(
             smoke_failures(&SmokeOutcome {
@@ -1298,11 +1316,43 @@ mod tests {
         // M6: the human player's starting buildings are those of its faction in the skirmish file
         // (the menu's first choice, D40).
         // M7: for every faction, and only items its roster offers.
+        // RA1: the shipped factions are countries. A country's player has no roster and starts
+        // with the base unit of its side: what it owns once the run has deployed it is the yard,
+        // which every building of its side names as a prerequisite. The factions with rosters
+        // and starting buildings are those of the legacy ruleset fixture.
         let catalogue = crate::skirmish::tests::production_catalogue();
         let selection = MenuSelection::initial(&catalogue);
         let definitions = &catalogue.definitions;
         assert!(selection.faction < catalogue.skirmish.factions.len());
+        let rules = definitions.rules().expect("rules");
         for (index, faction) in catalogue.skirmish.factions.iter().enumerate() {
+            let side = faction.side.and_then(|side| rules.side(side));
+            let owned = vec![side.expect("a country").construction_yard];
+            let mut players = Players::default();
+            players.add(sim::PlayerId(0), 0).expect("player");
+            assert!(players.set_country(sim::PlayerId(0), faction.country));
+            let state = players.get(sim::PlayerId(0)).expect("player");
+            assert_eq!(state.country(), faction.country);
+            let item = first_queueable(definitions, &owned, state).expect("something to queue");
+            assert!(faction.offers(item), "faction {index}: {item:?}");
+            let terms = definitions.production(item).expect("terms");
+            assert!(terms.prerequisites.iter().all(|kind| owned.contains(kind)));
+            assert_eq!(sim::missing_prerequisite(definitions, &owned, item), None);
+            // At least one credit is charged on the first tick, so the smoke check can see it.
+            assert!(terms.cost / i64::from(terms.build_time) > 0 || terms.build_time == 1);
+            assert_eq!(first_queueable(definitions, &[], state), None);
+            // An empty roster offers nothing.
+            let mut nothing = Players::default();
+            nothing
+                .add_with_roster(sim::PlayerId(0), 0, Default::default())
+                .expect("player");
+            let state = nothing.get(sim::PlayerId(0)).expect("player");
+            assert_eq!(first_queueable(definitions, &owned, state), None);
+        }
+        let legacy = crate::skirmish::tests::legacy_catalogue();
+        let definitions = &legacy.definitions;
+        assert_eq!(legacy.skirmish.factions.len(), 2);
+        for (index, faction) in legacy.skirmish.factions.iter().enumerate() {
             let owned: Vec<BuildingKind> = faction
                 .buildings
                 .iter()
@@ -1361,17 +1411,35 @@ mod tests {
     fn the_demo_match_expects_all_of_its_starting_units() {
         // M6: the expected starting units and buildings are those of both factions of the menu's
         // choice (the skirmish file, D40), and match setup spawns exactly them.
+        // RA1: the factions are countries. As the menu starts the match, each player has the
+        // base unit of its side and the starting units of the lobby's unit count
+        // (`sim::starting_units`) and no building; with the lobby's "start with an MCV" off,
+        // the yard instead of the base unit.
         let catalogue = crate::skirmish::tests::production_catalogue();
         let selection = MenuSelection::initial(&catalogue);
-        let (units, buildings) = starting_totals(&catalogue, selection);
+        let (units, buildings) = starting_totals(&catalogue, selection, true);
         let factions = &catalogue.skirmish.factions;
-        let players = selection.players();
-        let expected: u32 = players
+        let players = crate::skirmish::match_players(&catalogue, selection);
+        let rules = catalogue.definitions.rules().expect("rules");
+        let unit_count = u32::try_from(rules.dialog.unit_count).expect("unit count");
+        let expected: usize = players
             .iter()
-            .flat_map(|setup| &factions[setup.faction].units)
-            .map(|group| group.count)
+            .map(|setup| {
+                let faction = &factions[setup.faction];
+                let groups: u32 = faction.units.iter().map(|group| group.count).sum();
+                groups as usize
+                    + sim::starting_units(
+                        &catalogue.skirmish,
+                        &catalogue.definitions,
+                        faction.side.expect("a country"),
+                        unit_count,
+                        &mut sim::SimRng::new(0),
+                    )
+                    .len()
+            })
             .sum();
-        assert_eq!(units, expected as usize);
+        assert!(expected > 0);
+        assert_eq!(units, expected + players.len(), "a base unit each");
         assert_eq!(
             buildings,
             players
@@ -1379,11 +1447,28 @@ mod tests {
                 .map(|setup| factions[setup.faction].buildings.len())
                 .sum::<usize>()
         );
-        assert!(units > 0 && buildings > 0);
-        let host = crate::sim_host::tests::demo_host();
+        assert!(units > 0 && buildings == 0);
+        let host = crate::sim_host::tests::menu_host();
         let world = host.world();
         let mut query = world.try_query::<(&SimId, &Owner)>().expect("registered");
         assert_eq!(query.iter(world).count(), units + buildings);
+        // Before the first tick the human player owns its base unit and no building.
+        let base = |kind: sim::UnitKind| rules.is_base_unit(kind);
+        let mut own = world.try_query::<(&Owner, &sim::Unit)>().expect("units");
+        let bases = own
+            .iter(world)
+            .filter(|(owner, unit)| owner.0 == HUMAN && base(unit.kind));
+        assert_eq!(bases.count(), 1);
+        let mut built = world.try_query::<&Building>().expect("registered");
+        assert_eq!(built.iter(world).count(), 0);
+        // With the yards: a building each in place of the base unit.
+        let (yard_units, yards) = starting_totals(&catalogue, selection, false);
+        assert_eq!((yard_units, yards), (expected, players.len()));
+        assert!(yard_units > 0 && yards > 0);
+        let host = crate::sim_host::tests::demo_host();
+        let world = host.world();
+        let mut query = world.try_query::<(&SimId, &Owner)>().expect("registered");
+        assert_eq!(query.iter(world).count(), yard_units + yards);
     }
 
     #[test]

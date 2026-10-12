@@ -65,7 +65,7 @@ pub use command::{
 pub use data::{DataError, DataErrorKind, MAX_DATA_FILE_BYTES, MAX_STRING_BYTES};
 pub use definitions::{
     Definitions, MAX_NAME_LEN, MAX_UNIT_SPEED, MAX_UNIT_TYPES, UNITS_SCHEMA_VERSION, UnitDef,
-    UnitKind, load_definitions, load_match_definitions, load_unit_definitions,
+    UnitKind, load_definitions, load_match_definitions, load_ruleset, load_unit_definitions,
 };
 pub use economy::{
     MAX_QUEUE_LENGTH, PlayerSetupError, PlayerState, Players, QueueItem, REPAIR_COST_DIVISOR,
