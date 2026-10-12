@@ -10,7 +10,8 @@ each wing, a band round the fuselage, in the owner's colour (`TEAM`).
 from math import sin, cos, pi, radians, degrees, sqrt
 from hd_kit import *
 
-SCALE = {'harrier': .096, 'black_eagle': .0745, 'nighthawk': .092, 'kirov': .0154}
+SCALE = {'harrier': .096, 'black_eagle': .0745, 'nighthawk': .092, 'kirov': .0154,
+         'v3_rocket': .074, 'dred_missile': .066}
 
 # --- Vector helpers ----------------------------------------------------------------------------
 def _mix(a, b, f): return tuple(a[i] + (b[i] - a[i]) * f for i in range(3))
@@ -400,7 +401,28 @@ def kirov(k):
             k.strut(tip, foot, .16, DARK)
     k.ball(59.9, 0, zc, .3, RED_LAMP, n=6, k=3)
 
-MODELS = {f.__name__: f for f in [harrier, black_eagle, nighthawk, kirov]}
+# --- Missiles in flight (RA4: spawned air units that anti air can shoot down) ---------------------
+def v3_rocket(k):
+    # Soviet artillery rocket in flight, after the 9M21 of the Luna-M (FROG-7): 9.4 m long,
+    # 0.54 m in diameter, four fins of 1.7 m span; its owner's band round the body.
+    c = SOV_GREEN; z = 1.7
+    store(k, 0, 0, z, 9.4, .30, c, nose=tint(c, .72), fins=.95, n=12)
+    k.rev((.9, 0, z), 'x', [(0, .315), (1.1, .315)], TEAM, n=12)
+    k.rev((-2.3, 0, z), 'x', [(0, .31), (.22, .31)], BLACK, n=12)
+    k.rev((-5.0, 0, z), 'x', [(0, .1), (.32, .24)], HOT, n=10)
+
+def dred_missile(k):
+    # Soviet ship-launched cruise missile in flight, after the P-500 Bazalt: 11.7 m long, 0.88 m
+    # in diameter, swept wings of 2.6 m span, an air intake under the belly; its owner's band.
+    c = NAVY_GREY; z = 1.9
+    store(k, 0, 0, z, 11.7, .44, c, nose=WHITE, fins=1.0, n=14)
+    k.rev((1.6, 0, z), 'x', [(0, .46), (1.3, .46)], TEAM, n=14)
+    for s_ in (-1, 1):
+        k.plate([(1.2, s_ * .4, z), (-1.9, s_ * 1.3, z), (-2.6, s_ * 1.3, z), (-1.6, s_ * .4, z)], tint(c, .86))
+    k.box(-1.6, -.26, z - .78, 2.4, .52, .4, tint(c, .7))
+    k.rev((-6.2, 0, z), 'x', [(0, .16), (.4, .34)], HOT, n=10)
+
+MODELS = {f.__name__: f for f in [harrier, black_eagle, nighthawk, kirov, v3_rocket, dred_missile]}
 
 def build(m, ident):
     MODELS[ident](Kit(m, SCALE[ident]))

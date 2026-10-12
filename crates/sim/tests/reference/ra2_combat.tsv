@@ -44,6 +44,8 @@ nuke	warhead	NUKE
 ion_wh	warhead	IonWH
 super	warhead	Super
 rad_site	warhead	RadSite
+v3_ewh	warhead	V3EWH
+dmislewh	warhead	DMISLEWH
 medusa	weapon	Medusa
 medusa_e	weapon	MedusaE
 hornet_launcher	weapon	HornetLauncher
@@ -134,3 +136,6 @@ v3_launcher	weapon	V3Launcher
 gun_20mm_rapid	weapon	20mmRapid
 gun_20mm_rapid_e	weapon	20mmRapidE
 super_mind_control	weapon	SuperMindControl
+hornet_bomb	weapon	HornetBomb
+hornet_bomb_e	weapon	HornetBombE
+asw_bomb	weapon	ASWBomb

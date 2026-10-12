@@ -86,7 +86,7 @@ fn assert_rejected(name: &str, id: &str, edits: &[(&str, &str)], field: &str, fo
 
 #[test]
 fn the_fixture_loads_with_the_traits_of_schema_version_4() {
-    assert_eq!(ARSENAL_SCHEMA_VERSION, 4);
+    assert_eq!(ARSENAL_SCHEMA_VERSION, 5);
     let definitions = definitions();
     let kind = |id: &str| definitions.unit_kind(id).unwrap_or_else(|| panic!("{id}"));
     let entry = |id: &str| {

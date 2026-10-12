@@ -23,7 +23,7 @@
 // jumper, the truck and the roller are unarmed, the trooper carries the rifle, and the brute
 // the sam, which engages aircraft only.
 (
-    schema_version: 2,
+    schema_version: 3,
     armour_classes: ["flesh", "plate", "concrete", "hull"],
     warheads: [
         (id: "bullet", cell_spread: 0, percent_at_max: 100, wall: 0, wood: 0, versus: [(armour: "flesh", percent: 100), (armour: "plate", percent: 20), (armour: "concrete", percent: 10), (armour: "hull", percent: 20)]),

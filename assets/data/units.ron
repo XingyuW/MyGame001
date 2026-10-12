@@ -53,6 +53,10 @@
         (id: "sea_scorpion", speed: 15, sprite: "artillery"), // [HYD] Speed=8, Category=AFV
         (id: "giant_squid", speed: 15, sprite: "artillery"), // [SQD] Speed=8, Category=AFV
         (id: "dreadnought", speed: 8, sprite: "artillery"), // [DRED] Speed=4, Category=Support
+        (id: "hornet", speed: 23, sprite: "scout"), // [HORNET] Speed=12, Category=AirPower
+        (id: "osprey", speed: 23, sprite: "scout"), // [ASW] Speed=12, Category=AirPower
+        (id: "v3_rocket", speed: 29, sprite: "rocket_launcher"), // [V3ROCKET] Speed=15, Category=AirPower
+        (id: "dred_missile", speed: 38, sprite: "rocket_launcher"), // [DMISL] Speed=20, Category=AirPower
         (id: "soviet_mcv", speed: 8, sprite: "harvester"), // [SMCV] Speed=4, Category=Support
         (id: "soviet_amphibious_transport", speed: 11, sprite: "harvester"), // [SAPC] Speed=6, Category=Transport
         (id: "chrono_commando", speed: 14, sprite: "rifleman"), // [CCOMAND] Speed=5, Category=Soldier
