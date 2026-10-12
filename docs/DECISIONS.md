@@ -1591,6 +1591,27 @@ shortcoming, and is debt for the milestones that add art.
   footprint (the first turn of player 0 comes before the first `Visibility` stage), so that its
   starting units do not walk into the footprint. Its own idle units beside the footprint do not
   hold the deployment back. The gathering point keeps clear of the future yard.
+* **An armed harvester is no army unit** (a defect found by `m13_grown_maps` with the shipped
+  data, fixed in `ai.rs` with the regression test
+  `ra1_match.rs::an_armed_miner_of_a_computer_player_mines_and_is_not_drafted_into_its_army`):
+  the computer player took every unit with a weapon for its army, so it called the Soviet War
+  Miner, which has one, to the gathering point and sent it with the waves, and a Soviet
+  computer player earned nothing. The army is now the armed units that do not harvest, and the
+  AI file rejects a harvester in an `army` list.
+  Only as a last resort does an armed harvester fight: while its player has no other armed
+  unit and the harvester's cycle has stopped (`View::fights`). Without that, on riverlands
+  France (brutal) and Cuba (easy) wore each other down until neither had an army, a producer
+  or income, and the match did not end in 300,000 ticks; regression test
+  `m6_production_matches.rs::a_soviet_player_left_with_an_armed_miner_still_finishes_the_match`.
+  **Debt** (M6 behaviour, not met in any match): two players that are both left without army,
+  producers, income and armed harvester would still never finish.
+* **A sweep starts near the enemy's start on every map.** A wave that knows no building swept
+  the waypoints seen longest ago, nearest to itself first, on maps up to 128 cells of span, and
+  near the enemy starts first only on larger ones. A wave formed at its own base therefore
+  searched its own half of the map first. With the slower units of R7 that cost 13,000 ticks
+  on crossroads (Libya against Iraq, both easy: 39,983 ticks against a limit of 36,000). The
+  ordering of the large maps now applies everywhere (`choose_target`); regression test
+  `m6_production_matches.rs::the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first`.
 * No tick limit was changed. `m14_duels -- full` with the RA1 data: all 756 matches end with a
   winner; the validation log of RA1-B has the slowest per map.
 
@@ -1653,7 +1674,7 @@ of the AI file are now `plans[0]....`):
 | game `visual_review::tests` (4 tests) | scenes start with the yards and RA2 ids; the developed base still has 8 buildings (6 of the scene and the 2 yards); the line-up is 28 types (the ten legacy unit types left it) and gives 48 units and 8 buildings |
 
 No test was deleted, ignored or weakened. New in RA1-B: `ra1_buildability.rs` (11), `ra1_match.rs`
-(19), `ra1_definitions.rs` (36), `ra1_shipped.rs` (8), `ra9_data_parity.rs` (4).
+(20), `ra1_definitions.rs` (36), `ra1_shipped.rs` (8), `ra9_data_parity.rs` (4).
 
 ### R16. RA1-B: the state of the game until RA1-C
 

@@ -1278,6 +1278,61 @@ fn a_computer_player_deploys_its_base_unit_at_once_and_builds_its_plan() {
 }
 
 #[test]
+fn an_armed_miner_of_a_computer_player_mines_and_is_not_drafted_into_its_army() {
+    // Regression (RA1, found by `m13_grown_maps` with the shipped data): the Soviet miner has
+    // a weapon, and the computer player took every armed unit for its army, called its miners
+    // to the gathering point and sent them with the waves, so that a Soviet computer player
+    // earned nothing. An armed harvester mines: it brings in ore, and never joins a wave.
+    let data = data();
+    let miner = unit_kind(&data, "miner_s");
+    assert!(
+        data.definitions
+            .unit_combat(miner)
+            .is_some_and(|terms| terms.weapon.is_some())
+            && data.definitions.harvester(miner).is_some(),
+        "the fixture's Soviet miner is an armed harvester"
+    );
+    let (mut app, _) = setup(
+        &data,
+        &[computer(P0, GAMMA, 0, 1), computer(P1, GAMMA, 1, 0)],
+        &MatchOptions::default(),
+        7,
+    )
+    .unwrap_or_else(|error| panic!("{error}"));
+    let mut earned: BTreeMap<PlayerId, i64> = BTreeMap::new();
+    for _ in 0..3000 {
+        for event in tick(&mut app, Vec::new()) {
+            if let SimEvent::OreDelivered {
+                player, credits, ..
+            } = event
+            {
+                *earned.entry(player).or_insert(0) += credits;
+            }
+        }
+        let miners: Vec<SimId> = [P0, P1]
+            .into_iter()
+            .flat_map(|player| units(&mut app, player))
+            .filter(|(_, id, _)| id == "miner_s")
+            .map(|(id, ..)| id)
+            .collect();
+        let ai = app.world().resource::<AiPlayers>();
+        for player in [P0, P1] {
+            let wave = ai.controller(player).expect("a controller").wave();
+            assert!(miners.iter().all(|id| !wave.contains(id)), "{player:?}");
+        }
+        if app.world().resource::<MatchState>().outcome().is_some() {
+            break;
+        }
+    }
+    for player in [P0, P1] {
+        assert!(
+            earned.get(&player).copied().unwrap_or(0) > 0,
+            "{player:?} earned {earned:?}"
+        );
+    }
+}
+
+#[test]
 fn computer_players_of_every_pairing_of_sides_finish_the_fixture_match() {
     // End to end on fixture data: every pairing of the two sides (with both Allied countries)
     // and of the two difficulties ends with a winner, without a rejected command that the
