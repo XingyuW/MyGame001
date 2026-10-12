@@ -421,7 +421,7 @@ fn apply_unit_command(
         Command::Move { units: ids, target } => {
             stop_harvesting(ids, index, units);
             stop_fighting(ids, index, units);
-            apply_move(ids, *target, tick, grid, index, units, events);
+            apply_move(ids, *target, tick, grid, definitions, index, units, events);
         }
         Command::Stop { units: ids } => {
             stop_harvesting(ids, index, units);
@@ -476,7 +476,8 @@ fn apply_unit_command(
             let ids = &fighters;
             stop_harvesting(ids, index, units);
             stop_fighting(ids, index, units);
-            for (entity, destination) in apply_move(ids, *target, tick, grid, index, units, events)
+            for (entity, destination) in
+                apply_move(ids, *target, tick, grid, definitions, index, units, events)
             {
                 if let Ok((.., Some(mut weapon))) = units.get_mut(entity) {
                     weapon.order = Some(AttackOrder::AttackMove {
@@ -735,11 +736,18 @@ fn validate_combat(
 /// cell remains stops, with [`MoveFailure::NoDestination`]. A unit that later finds its cell
 /// closed off by units that arrived first takes the nearest cell it can reach instead
 /// (`pathfinding::find_paths`). Returns each unit that got a destination, with its cell.
+///
+/// Since RA3 (invariant I6', docs/DECISIONS.md R6) a cell is handed to one vehicle or to as many
+/// units on foot as it has spots left beside the idle infantry outside the group that stands in
+/// it, at most three; the vehicles of a domain get their cells first, then its infantry. The
+/// move of a crusher may crush ([`MoveOrder::commanded`]).
+#[allow(clippy::too_many_arguments)]
 fn apply_move(
     ids: &[SimId],
     target: CellPos,
     tick: u64,
     grid: &Grid,
+    definitions: &Definitions,
     index: &BTreeMap<SimId, Entity>,
     units: &mut UnitQuery,
     events: &mut Messages<SimEvent>,
@@ -762,37 +770,58 @@ fn apply_move(
         .collect();
     order.sort_unstable();
     let mut assigned = Vec::with_capacity(order.len());
-    let mut reserved = BTreeSet::new();
-    let mut counts: BTreeMap<crate::Domain, usize> = BTreeMap::new();
+    // The room of each cell that is promised to units of the group, in spots, per layer.
+    let mut reserved: BTreeMap<(bool, CellPos), u8> = BTreeMap::new();
+    // The units of the group by what they need of a cell: their domain, and whether they are on
+    // foot (the vehicles of a domain come first).
+    let class = |id: SimId| (grid.domain_of(id), grid.is_on_foot(id));
+    let mut counts: BTreeMap<(crate::Domain, bool), usize> = BTreeMap::new();
     for (_, id, _) in &order {
-        *counts.entry(grid.domain_of(*id)).or_default() += 1;
+        *counts.entry(class(*id)).or_default() += 1;
     }
-    let mut destinations: BTreeMap<crate::Domain, std::collections::VecDeque<CellPos>> =
+    let mut destinations: BTreeMap<(crate::Domain, bool), std::collections::VecDeque<CellPos>> =
         BTreeMap::new();
-    for (domain, count) in counts {
+    for ((domain, on_foot), count) in counts {
         // Aircraft and surface units hold cells in separate layers (`Grid::occupant`), so a
         // cell handed to one may still be handed to the other.
         let air = domain == crate::Domain::Air;
         let view = grid.navigation_for(domain);
-        let cells = destination_cells(&view, target, count, |cell| {
-            reserved.contains(&(air, cell))
-                || view
-                    .occupant(cell)
-                    .is_some_and(|holder| idle_outside_group.contains(&holder))
-        });
-        reserved.extend(cells.iter().map(|&cell| (air, cell)));
-        destinations.insert(domain, cells.into());
+        let needed = Grid::room_needed(on_foot);
+        // The room a cell has left for units of this class: what the idle units outside the
+        // group leave of it, less what is promised to the group.
+        let room = |reserved: &BTreeMap<(bool, CellPos), u8>, cell: CellPos| {
+            view.room(cell, on_foot, |holder| idle_outside_group.contains(&holder))
+                .saturating_sub(reserved.get(&(air, cell)).copied().unwrap_or(0))
+        };
+        let cells = destination_cells(&view, target, count, |cell| room(&reserved, cell) < needed);
+        let mut handed = std::collections::VecDeque::with_capacity(count);
+        for cell in cells {
+            // A cell is handed out as often as it has room: once to a vehicle, up to three
+            // times to units on foot.
+            let places = usize::from(room(&reserved, cell) / needed).min(count - handed.len());
+            if places == 0 {
+                break;
+            }
+            handed.extend(std::iter::repeat_n(cell, places));
+            let promised = u8::try_from(places)
+                .unwrap_or(u8::MAX)
+                .saturating_mul(needed);
+            let total = reserved.entry((air, cell)).or_default();
+            *total = total.saturating_add(promised);
+        }
+        destinations.insert((domain, on_foot), handed);
     }
     for (_, id, entity) in order {
         let destination = destinations
-            .get_mut(&grid.domain_of(id))
+            .get_mut(&class(id))
             .and_then(|cells| cells.pop_front());
-        let Ok((.., mut orders, _, _)) = units.get_mut(entity) else {
+        let Ok((_, _, _, unit, _, mut orders, _, _)) = units.get_mut(entity) else {
             continue;
         };
         match destination {
             Some(destination) => {
-                orders.current = Some(MoveOrder::new(destination, tick));
+                let crusher = definitions.crusher(unit.kind);
+                orders.current = Some(MoveOrder::commanded(destination, tick, crusher));
                 assigned.push((entity, destination));
             }
             None => {

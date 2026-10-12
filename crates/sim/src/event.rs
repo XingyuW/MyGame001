@@ -124,7 +124,19 @@ pub enum SimEvent {
         id: SimId,
         state: DamageState,
     },
-    /// The unit's hit points fell to 0 or below: it was removed and its cells were freed.
+    /// `player`'s infantry unit `unit` was crushed by the vehicle `crusher` of the player `by`,
+    /// which drove into its cell (RA3, docs/DECISIONS.md R6); `at` is where it stood in that
+    /// cell. The unit is gone at once: [`SimEvent::UnitDestroyed`] follows in the same tick.
+    /// `by` is its killer (for the experience of RA4).
+    UnitCrushed {
+        player: PlayerId,
+        unit: SimId,
+        crusher: SimId,
+        by: PlayerId,
+        at: SubPos,
+    },
+    /// The unit's hit points fell to 0 or below, or it was crushed: it was removed and its cells
+    /// were freed.
     UnitDestroyed { player: PlayerId, unit: SimId },
     /// The building's hit points fell to 0 or below: it was removed and its cells were freed.
     /// `lost_units` are the free units that were still waiting to leave it; they are lost with it.

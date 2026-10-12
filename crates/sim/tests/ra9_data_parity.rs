@@ -789,6 +789,55 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
             }
         }
 
+        // RA3. The traits of a unit (schema version 4): whether `[InfantryTypes]` lists it,
+        // `Crusher` (no without the key), `Crushable` (without the key yes for infantry and no
+        // for every other unit) and `Size` (1 without the key). A building has none of them.
+        if row.building {
+            assert!(
+                !entry.infantry && !entry.crusher && !entry.crushable && entry.size == 0,
+                "{id}: a building has no trait of a unit"
+            );
+        } else {
+            let listed = reference
+                .section("InfantryTypes")
+                .iter()
+                .find(|(_, section)| **section == row.section);
+            let infantry = listed.is_some();
+            differences.check(
+                id,
+                "infantry",
+                &u8::from(entry.infantry).to_string(),
+                &u8::from(infantry).to_string(),
+                &listed.map_or_else(String::new, |(key, section)| {
+                    format!("[InfantryTypes] {key}={section}")
+                }),
+            );
+            let (crusher, text) = flag("Crusher", "no");
+            differences.check(
+                id,
+                "crusher",
+                &u8::from(entry.crusher).to_string(),
+                &crusher.to_string(),
+                text,
+            );
+            let (crushable, text) = flag("Crushable", if infantry { "yes" } else { "no" });
+            differences.check(
+                id,
+                "crushable",
+                &u8::from(entry.crushable).to_string(),
+                &crushable.to_string(),
+                text,
+            );
+            let size = value("Size").unwrap_or("1");
+            differences.check(
+                id,
+                "size",
+                &entry.size.to_string(),
+                &convert(Conversion::Int, size).to_string(),
+                size,
+            );
+        }
+
         // Prerequisites: the buildings of the economy file and the groups of the arsenal against
         // the tokens of `Prerequisite`, a group token being one of `[General] Prerequisite...`.
         let game: Vec<String> = terms

@@ -7,7 +7,7 @@
 //! (`map_subset`, invariant I11). The `game` crate hands a map to `bevy_ecs_tiled` only after it
 //! has passed [`load_map`] and the game's own check of the tileset image.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 use std::io::{Cursor, Read};
 use std::path::{Path, PathBuf};
@@ -96,6 +96,17 @@ impl SubPos {
         }
     }
 
+    /// Where an infantry unit in spot `spot` of `cell` stands: the centre of the cell moved by
+    /// [`SPOT_OFFSETS`] (a spot beyond the last counts from the first again).
+    pub const fn spot_of(cell: CellPos, spot: u8) -> Self {
+        let centre = Self::centre_of(cell);
+        let (dx, dy) = SPOT_OFFSETS[spot as usize % SPOTS_PER_CELL];
+        Self {
+            x: centre.x.saturating_add(dx),
+            y: centre.y.saturating_add(dy),
+        }
+    }
+
     /// The cell that contains this position.
     pub const fn cell(self) -> CellPos {
         CellPos {
@@ -104,6 +115,23 @@ impl SubPos {
         }
     }
 }
+
+/// How many infantry a surface cell holds at most, each in a spot of its own (RA3,
+/// docs/DECISIONS.md R6).
+pub const SPOTS_PER_CELL: usize = 3;
+
+/// The offset of each infantry spot from the centre of its cell, in subcells. On screen (+x runs
+/// down-right, +y down-left) spot 0 lies above the centre and spots 1 and 2 below it to the
+/// right and to the left, mirror images of each other; the three offsets add up to nothing, so
+/// three soldiers stand around the centre, and every spot lies well inside its cell.
+pub const SPOT_OFFSETS: [(i32, i32); SPOTS_PER_CELL] = [(-64, -64), (80, -16), (-16, 80)];
+
+/// The room of a free cell, counted in spots ([`Grid::room`]): a vehicle, ship or aircraft needs
+/// the whole cell, an infantry unit one spot.
+pub const CELL_ROOM: u8 = SPOTS_PER_CELL as u8;
+
+/// No unit, in [`Grid`]'s table of spots: the id the allocator never hands out.
+const NO_UNIT: u32 = u32::MAX;
 
 /// Terrain of one cell.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -129,6 +157,14 @@ pub struct Cell {
 /// at most one aircraft holds a cell of the air layer. Only the simulation's movement and
 /// spawning change occupants.
 ///
+/// Since RA3 the invariant is I6' (docs/DECISIONS.md R6): a surface cell holds at most one
+/// vehicle (or ship) or at most [`SPOTS_PER_CELL`] infantry, and never both. A unit registered
+/// as on foot ([`Grid::is_on_foot`]: a unit of a type with the arsenal's `infantry` trait that
+/// does not fly) holds one spot of each cell it holds, and stands at that spot
+/// ([`SubPos::spot_of`]); every other unit holds the whole cell, as before. The grid is the one
+/// place that decides whether a unit may enter a cell ([`Grid::claim`], [`Grid::room`]): a
+/// world without units on foot, which is every world without that trait, has no spots at all.
+///
 /// A cell covered by a building is impassable for units, whatever its terrain, so no unit can
 /// reserve it (invariant I6: no unit occupies a cell covered by a building). Buildings cover only
 /// cells that no unit holds when they are placed (docs/DECISIONS.md D24).
@@ -140,8 +176,14 @@ pub struct Grid {
     pub(crate) domains: BTreeMap<SimId, crate::Domain>,
     /// Row-major: the cell (x, y) is at index `y * width + x`.
     cells: Vec<Cell>,
-    /// Row-major, as `cells`: the ground or naval unit holding the cell.
+    /// Row-major, as `cells`: the vehicle or ship holding the cell.
     occupants: Vec<Option<SimId>>,
+    /// Row-major, as `cells`: the id of the infantry unit holding each spot of the cell
+    /// (`NO_UNIT`: none). Empty until the first unit on foot is registered, so a world without
+    /// infantry on foot pays nothing for it.
+    spots: Vec<[u32; SPOTS_PER_CELL]>,
+    /// The units on foot: those that hold a spot of a cell instead of the cell.
+    foot: BTreeSet<SimId>,
     /// Row-major, as `cells`: the aircraft holding the cell.
     air_occupants: Vec<Option<SimId>>,
     /// Row-major, as `cells`: the building covering the cell.
@@ -165,6 +207,8 @@ impl Grid {
             navigation: crate::Domain::Land,
             domains: BTreeMap::new(),
             occupants: vec![None; count],
+            spots: Vec::new(),
+            foot: BTreeSet::new(),
             air_occupants: vec![None; count],
             buildings: vec![None; count],
             cells,
@@ -205,10 +249,27 @@ impl Grid {
     pub fn domain_of(&self, id: SimId) -> crate::Domain {
         self.domains.get(&id).copied().unwrap_or_default()
     }
-    pub(crate) fn register_domain(&mut self, id: SimId, domain: crate::Domain) {
+    /// Whether `id` is a unit on foot: it holds one spot of a surface cell, not the cell.
+    pub fn is_on_foot(&self, id: SimId) -> bool {
+        self.foot.contains(&id)
+    }
+    /// Records the domain of the new unit `id` and whether it is on foot (an infantry unit that
+    /// does not fly), before it claims its first cell.
+    pub(crate) fn register(&mut self, id: SimId, domain: crate::Domain, on_foot: bool) {
         if domain != crate::Domain::Land {
             self.domains.insert(id, domain);
         }
+        if on_foot && domain != crate::Domain::Air {
+            self.foot.insert(id);
+            if self.spots.is_empty() {
+                self.spots = vec![[NO_UNIT; SPOTS_PER_CELL]; self.cells.len()];
+            }
+        }
+    }
+    /// Forgets the unit `id`, which is gone; its cells are released separately.
+    pub(crate) fn unregister(&mut self, id: SimId) {
+        self.domains.remove(&id);
+        self.foot.remove(&id);
     }
     /// Navigation view reuses the existing deterministic A* and destination allocator.
     pub fn navigation_for(&self, domain: crate::Domain) -> std::borrow::Cow<'_, Self> {
@@ -265,26 +326,160 @@ impl Grid {
         }
     }
 
-    /// The unit standing in or entering `pos`, if any, in the occupancy layer of this view's
-    /// navigation domain: aircraft for an air view, ground and naval units otherwise.
+    /// A unit standing in or entering `pos`, if any, in the occupancy layer of this view's
+    /// navigation domain: the aircraft for an air view; otherwise the vehicle or ship, or of the
+    /// infantry in the cell the one in the first held spot. `None` means that nothing holds the
+    /// cell; whether a particular unit may enter a held cell is answered by [`Grid::room`].
     pub fn occupant(&self, pos: CellPos) -> Option<SimId> {
         self.occupant_for(pos, self.navigation)
     }
 
-    /// The unit holding `pos` in the occupancy layer that units of `domain` move in.
+    /// A unit holding `pos` in the occupancy layer that units of `domain` move in (see
+    /// [`Grid::occupant`]).
     pub fn occupant_for(&self, pos: CellPos, domain: crate::Domain) -> Option<SimId> {
-        self.index(pos)
-            .and_then(|index| self.layer(domain).get(index))
-            .copied()
-            .flatten()
+        self.holders_for(pos, domain).into_iter().flatten().next()
     }
 
-    fn layer(&self, domain: crate::Domain) -> &Vec<Option<SimId>> {
+    /// Every unit standing in or entering `pos` in the occupancy layer of this view's navigation
+    /// domain: the aircraft; or the vehicle or ship; or the infantry, each at the index of its
+    /// spot.
+    pub fn holders(&self, pos: CellPos) -> [Option<SimId>; SPOTS_PER_CELL] {
+        self.holders_for(pos, self.navigation)
+    }
+
+    /// Every unit holding `pos` in the occupancy layer that units of `domain` move in (see
+    /// [`Grid::holders`]).
+    pub fn holders_for(
+        &self,
+        pos: CellPos,
+        domain: crate::Domain,
+    ) -> [Option<SimId>; SPOTS_PER_CELL] {
+        let mut holders = [None; SPOTS_PER_CELL];
+        let Some(index) = self.index(pos) else {
+            return holders;
+        };
         if domain == crate::Domain::Air {
-            &self.air_occupants
-        } else {
-            &self.occupants
+            holders[0] = self.air_occupants.get(index).copied().flatten();
+        } else if let Some(vehicle) = self.occupants.get(index).copied().flatten() {
+            holders[0] = Some(vehicle);
+        } else if let Some(spots) = self.spots.get(index) {
+            for (holder, &spot) in holders.iter_mut().zip(spots) {
+                *holder = (spot != NO_UNIT).then_some(SimId(spot));
+            }
         }
+        holders
+    }
+
+    /// The spot of the surface cell `pos` that the unit on foot `unit` holds, if it holds one.
+    pub fn spot(&self, pos: CellPos, unit: SimId) -> Option<u8> {
+        let spots = self.spots.get(self.index(pos)?)?;
+        let spot = spots.iter().position(|&holder| holder == unit.0)?;
+        u8::try_from(spot).ok()
+    }
+
+    /// Where `unit` stands when it is in `pos`: at the spot it holds there, or at the centre of
+    /// the cell if it holds none (a vehicle, a ship, an aircraft).
+    pub fn standing_point(&self, pos: CellPos, unit: SimId) -> SubPos {
+        match self.spot(pos, unit) {
+            Some(spot) => SubPos::spot_of(pos, spot),
+            None => SubPos::centre_of(pos),
+        }
+    }
+
+    /// The room a unit needs, in spots: one spot on foot, else the whole cell ([`CELL_ROOM`]).
+    pub const fn room_needed(on_foot: bool) -> u8 {
+        if on_foot { 1 } else { CELL_ROOM }
+    }
+
+    /// How much room `pos` has, in spots, for a unit on foot (`on_foot`) or any other unit, in
+    /// the occupancy layer of this view's navigation domain, if of the units that hold the cell
+    /// only those for which `stays` holds remained (invariant I6'): for a unit on foot nothing
+    /// beside a vehicle or ship that stays, else a spot for every spot that no infantry unit
+    /// that stays holds; for any other unit the whole cell ([`CELL_ROOM`]) if no holder stays,
+    /// else nothing. Nothing outside the map. Terrain and buildings are not looked at
+    /// ([`Grid::passable_for`]).
+    pub fn room(&self, pos: CellPos, on_foot: bool, stays: impl Fn(SimId) -> bool) -> u8 {
+        self.room_in(pos, self.navigation, on_foot, stays)
+    }
+
+    /// [`Grid::room`] in the occupancy layer that units of `domain` move in.
+    pub fn room_in(
+        &self,
+        pos: CellPos,
+        domain: crate::Domain,
+        on_foot: bool,
+        stays: impl Fn(SimId) -> bool,
+    ) -> u8 {
+        let Some(index) = self.index(pos) else {
+            return 0;
+        };
+        let held = |holder: &Option<SimId>| holder.is_some_and(&stays);
+        if domain == crate::Domain::Air {
+            return if self.air_occupants.get(index).is_some_and(held) {
+                0
+            } else {
+                CELL_ROOM
+            };
+        }
+        if self.occupants.get(index).is_some_and(held) {
+            return 0;
+        }
+        let taken = self.spots.get(index).map_or(0, |spots| {
+            spots
+                .iter()
+                .filter(|&&spot| spot != NO_UNIT && stays(SimId(spot)))
+                .count()
+        });
+        match (on_foot, u8::try_from(taken)) {
+            (true, Ok(taken)) => CELL_ROOM.saturating_sub(taken),
+            (false, Ok(0)) => CELL_ROOM,
+            _ => 0,
+        }
+    }
+
+    /// Whether `pos` has room for one more unit on foot (`on_foot`) or of any other kind, in the
+    /// occupancy layer of this view's navigation domain: nothing holds it, or for a unit on foot
+    /// no vehicle holds it and one of its spots is free.
+    pub fn has_room(&self, pos: CellPos, on_foot: bool) -> bool {
+        self.room(pos, on_foot, |_| true) >= Self::room_needed(on_foot)
+    }
+
+    /// Whether the units for which `stays` holds leave no room in `pos` for `unit`, which is on
+    /// foot or not (`on_foot`), in the occupancy layer of this view's navigation domain. `unit`
+    /// itself never keeps `unit` out.
+    pub fn blocked(
+        &self,
+        pos: CellPos,
+        unit: SimId,
+        on_foot: bool,
+        stays: impl Fn(SimId) -> bool,
+    ) -> bool {
+        self.room(pos, on_foot, |holder| holder != unit && stays(holder))
+            < Self::room_needed(on_foot)
+    }
+
+    /// The units that keep `unit` (on foot or not) out of `pos`, in the occupancy layer of this
+    /// view's navigation domain: none if it has room there or holds it already, else every
+    /// other unit that holds the cell.
+    pub fn blockers(
+        &self,
+        pos: CellPos,
+        unit: SimId,
+        on_foot: bool,
+    ) -> [Option<SimId>; SPOTS_PER_CELL] {
+        if !self.blocked(pos, unit, on_foot, |_| true) {
+            return [None; SPOTS_PER_CELL];
+        }
+        self.holders(pos)
+            .map(|holder| holder.filter(|&holder| holder != unit))
+    }
+
+    /// Whether `unit` may hold `pos` as far as other units go, in the occupancy layer of its own
+    /// domain: it holds the cell already, or the cell has room for it.
+    pub fn room_for(&self, pos: CellPos, unit: SimId) -> bool {
+        let on_foot = self.is_on_foot(unit);
+        self.room_in(pos, self.domain_of(unit), on_foot, |holder| holder != unit)
+            >= Self::room_needed(on_foot)
     }
 
     /// Replaces the terrain of `pos` and returns whether `pos` is inside the map.
@@ -303,9 +498,17 @@ impl Grid {
         }
     }
 
-    /// Makes `unit` the occupant of `pos` if the cell is inside the map, passable, and free (or
-    /// already held by `unit`). Returns whether `unit` now holds the cell.
+    /// Makes `unit` a holder of `pos` if the cell is inside the map, passable, and has room for
+    /// it (or is already held by it). Returns whether `unit` now holds the cell. A unit on foot
+    /// takes the first free spot.
     pub(crate) fn claim(&mut self, pos: CellPos, unit: SimId) -> bool {
+        self.claim_spot(pos, unit, None)
+    }
+
+    /// [`Grid::claim`]; a unit on foot takes the spot `preferred` if that is free, else the
+    /// first free one (a unit that walks from cell to cell keeps the spot it had, so that a
+    /// group keeps its formation).
+    pub(crate) fn claim_spot(&mut self, pos: CellPos, unit: SimId, preferred: Option<u8>) -> bool {
         let domain = self.domain_of(unit);
         if !self.passable_for(pos, domain) {
             return false;
@@ -313,17 +516,38 @@ impl Grid {
         let Some(index) = self.index(pos) else {
             return false;
         };
+        let on_foot = self.is_on_foot(unit);
+        if !self.room_for(pos, unit) {
+            return false;
+        }
+        if on_foot {
+            let Some(spots) = self.spots.get_mut(index) else {
+                return false;
+            };
+            if spots.contains(&unit.0) {
+                return true;
+            }
+            let free = |spot: usize| spots.get(spot).is_some_and(|&holder| holder == NO_UNIT);
+            let Some(spot) = preferred
+                .map(usize::from)
+                .filter(|&spot| free(spot))
+                .or_else(|| (0..SPOTS_PER_CELL).find(|&spot| free(spot)))
+            else {
+                return false;
+            };
+            spots[spot] = unit.0;
+            return true;
+        }
         let layer = if domain == crate::Domain::Air {
             &mut self.air_occupants
         } else {
             &mut self.occupants
         };
         match layer.get_mut(index) {
-            Some(slot @ None) => {
+            Some(slot) => {
                 *slot = Some(unit);
                 true
             }
-            Some(Some(holder)) => *holder == unit,
             None => false,
         }
     }
@@ -341,6 +565,24 @@ impl Grid {
                 *slot = None;
             }
         }
+        if let Some(spots) = self.spots.get_mut(index) {
+            for spot in spots.iter_mut().filter(|spot| **spot == unit.0) {
+                *spot = NO_UNIT;
+            }
+        }
+    }
+
+    /// Frees every cell `unit` holds, given that it holds `pos`: a unit holds the cell it stands
+    /// in and at most one neighbour of it, the one it enters or leaves.
+    pub(crate) fn release_around(&mut self, pos: CellPos, unit: SimId) {
+        for dy in -1..=1_i32 {
+            for dx in -1..=1_i32 {
+                self.release(
+                    CellPos::new(pos.x.saturating_add(dx), pos.y.saturating_add(dy)),
+                    unit,
+                );
+            }
+        }
     }
 
     fn index(&self, pos: CellPos) -> Option<usize> {
@@ -353,9 +595,11 @@ impl Grid {
     }
 
     /// Width, height, then every cell in row-major order as one flag byte (bit 0 passable
-    /// terrain, bit 1 buildable, bit 2 occupied, bit 3 covered by a building), the ore amount,
-    /// and the occupant's and the building's ids where set (docs/DECISIONS.md D11, extended in
-    /// M2 and M3).
+    /// terrain, bit 1 buildable, bit 2 occupied, bit 3 covered by a building, bit 4 water, and
+    /// since RA3 bits 5 to 7 for the infantry spots 0 to 2 that are held), the ore amount, and
+    /// the occupant's and the building's ids where set, then the ids of the infantry in the held
+    /// spots (docs/DECISIONS.md D11, extended in M2 and M3, and R6); then the aircraft of the
+    /// air layer and the units on foot. A grid without units on foot is hashed as before RA3.
     pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
         hasher.write_u64(self.domains.len() as u64);
         for (id, domain) in &self.domains {
@@ -364,14 +608,24 @@ impl Grid {
         }
         hasher.write_u32(self.width);
         hasher.write_u32(self.height);
-        for ((cell, occupant), building) in
-            self.cells.iter().zip(&self.occupants).zip(&self.buildings)
+        const NO_SPOTS: [u32; SPOTS_PER_CELL] = [NO_UNIT; SPOTS_PER_CELL];
+        for (index, ((cell, occupant), building)) in self
+            .cells
+            .iter()
+            .zip(&self.occupants)
+            .zip(&self.buildings)
+            .enumerate()
         {
+            let spots = self.spots.get(index).unwrap_or(&NO_SPOTS);
+            let held = |spot: usize| u8::from(spots[spot] != NO_UNIT);
             hasher.write(&[u8::from(cell.passable)
                 | (u8::from(cell.water) << 4)
                 | (u8::from(cell.buildable) << 1)
                 | (u8::from(occupant.is_some()) << 2)
-                | (u8::from(building.is_some()) << 3)]);
+                | (u8::from(building.is_some()) << 3)
+                | (held(0) << 5)
+                | (held(1) << 6)
+                | (held(2) << 7)]);
             hasher.write_u32(cell.ore);
             if let Some(id) = occupant {
                 hasher.write_u32(id.0);
@@ -379,12 +633,18 @@ impl Grid {
             if let Some(id) = building {
                 hasher.write_u32(id.0);
             }
+            for &spot in spots.iter().filter(|&&spot| spot != NO_UNIT) {
+                hasher.write_u32(spot);
+            }
         }
         for (index, occupant) in self.air_occupants.iter().enumerate() {
             if let Some(id) = occupant {
                 hasher.write_u64(index as u64);
                 hasher.write_u32(id.0);
             }
+        }
+        for id in &self.foot {
+            hasher.write_u32(id.0);
         }
     }
 }
@@ -708,6 +968,8 @@ fn validate(path: &Path, map: &tiled::Map) -> Result<LoadedMap, MapError> {
     let (cells, looks) = cells(map, &terrain, &layer).map_err(in_map)?;
     let tileset_image = tileset_image(map).map_err(in_map)?;
     let occupants = vec![None; cells.len()];
+    let spots = Vec::new();
+    let foot = BTreeSet::new();
     let air_occupants = vec![None; cells.len()];
     let buildings = vec![None; cells.len()];
     Ok(LoadedMap {
@@ -718,6 +980,8 @@ fn validate(path: &Path, map: &tiled::Map) -> Result<LoadedMap, MapError> {
             height: map.height,
             cells,
             occupants,
+            spots,
+            foot,
             air_occupants,
             buildings,
         },
@@ -1013,5 +1277,224 @@ fn type_name(value: &PropertyValue) -> &'static str {
         PropertyValue::ObjectValue(_) => "object",
         PropertyValue::ListValue(_) => "list",
         PropertyValue::ClassValue { .. } => "class",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::Domain;
+
+    fn open(width: u32, height: u32) -> Grid {
+        let cell = Cell {
+            passable: true,
+            water: false,
+            buildable: true,
+            ore: 0,
+        };
+        Grid::from_cells(width, height, vec![cell; (width * height) as usize]).expect("a grid")
+    }
+
+    fn hash(grid: &Grid) -> u64 {
+        let mut hasher = Fnv1a64::new();
+        grid.hash_into(&mut hasher);
+        hasher.finish()
+    }
+
+    /// The hash of a grid as it was computed before RA3 (docs/DECISIONS.md D11, M2, M3, M9).
+    fn hash_before_ra3(grid: &Grid) -> u64 {
+        let mut hasher = Fnv1a64::new();
+        hasher.write_u64(grid.domains.len() as u64);
+        for (id, domain) in &grid.domains {
+            hasher.write_u32(id.0);
+            hasher.write(&[*domain as u8]);
+        }
+        hasher.write_u32(grid.width);
+        hasher.write_u32(grid.height);
+        for ((cell, occupant), building) in
+            grid.cells.iter().zip(&grid.occupants).zip(&grid.buildings)
+        {
+            hasher.write(&[u8::from(cell.passable)
+                | (u8::from(cell.water) << 4)
+                | (u8::from(cell.buildable) << 1)
+                | (u8::from(occupant.is_some()) << 2)
+                | (u8::from(building.is_some()) << 3)]);
+            hasher.write_u32(cell.ore);
+            if let Some(id) = occupant {
+                hasher.write_u32(id.0);
+            }
+            if let Some(id) = building {
+                hasher.write_u32(id.0);
+            }
+        }
+        for (index, occupant) in grid.air_occupants.iter().enumerate() {
+            if let Some(id) = occupant {
+                hasher.write_u64(index as u64);
+                hasher.write_u32(id.0);
+            }
+        }
+        hasher.finish()
+    }
+
+    /// RA3, invariant I6': the grid gives a surface cell to one vehicle or to three units on
+    /// foot and never to both, and the air above it to one aircraft.
+    #[test]
+    fn a_cell_takes_one_vehicle_or_three_units_on_foot_and_never_both() {
+        let mut grid = open(4, 4);
+        let at = CellPos::new(1, 1);
+        let (tank, truck) = (SimId(1), SimId(2));
+        let soldiers = [SimId(10), SimId(11), SimId(12), SimId(13)];
+        let plane = SimId(20);
+        grid.register(tank, Domain::Land, false);
+        grid.register(truck, Domain::Land, false);
+        for soldier in soldiers {
+            grid.register(soldier, Domain::Land, true);
+        }
+        grid.register(plane, Domain::Air, true);
+        assert!(!grid.is_on_foot(plane), "what flies is not on foot");
+        assert!(grid.is_on_foot(soldiers[0]) && !grid.is_on_foot(tank));
+
+        // Free: room for a vehicle, or for three on foot.
+        assert_eq!(grid.room(at, false, |_| true), CELL_ROOM);
+        assert_eq!(grid.room(at, true, |_| true), CELL_ROOM);
+        assert_eq!(Grid::room_needed(false), CELL_ROOM);
+        assert_eq!(Grid::room_needed(true), 1);
+
+        // A vehicle holds it whole.
+        assert!(grid.claim(at, tank));
+        assert!(grid.claim(at, tank), "claiming again changes nothing");
+        assert_eq!(grid.holders(at), [Some(tank), None, None]);
+        assert!(!grid.claim(at, truck));
+        assert!(!grid.claim(at, soldiers[0]));
+        assert!(!grid.has_room(at, true) && !grid.has_room(at, false));
+        assert!(grid.room_for(at, tank) && !grid.room_for(at, truck));
+        assert!(!grid.room_for(at, soldiers[0]));
+        assert_eq!(
+            grid.blockers(at, soldiers[0], true),
+            [Some(tank), None, None]
+        );
+        assert_eq!(grid.blockers(at, tank, false), [None; 3]);
+        assert_eq!(grid.spot(at, tank), None);
+        assert_eq!(grid.standing_point(at, tank), SubPos::centre_of(at));
+        // The aircraft above it is in another layer.
+        assert!(grid.claim(at, plane));
+        assert_eq!(grid.holders_for(at, Domain::Air), [Some(plane), None, None]);
+        assert_eq!(grid.occupant_for(at, Domain::Air), Some(plane));
+        assert_eq!(grid.standing_point(at, plane), SubPos::centre_of(at));
+        grid.release(at, tank);
+        assert_eq!(grid.holders(at), [None; 3]);
+
+        // Three on foot, each at the first free spot.
+        for (index, soldier) in soldiers[..3].iter().enumerate() {
+            assert!(grid.claim(at, *soldier));
+            assert_eq!(grid.spot(at, *soldier), Some(index as u8));
+            assert_eq!(
+                grid.standing_point(at, *soldier),
+                SubPos::spot_of(at, index as u8)
+            );
+            assert_eq!(grid.room(at, true, |_| true), 2 - index as u8);
+            assert!(!grid.claim(at, truck), "a vehicle beside infantry");
+            assert!(!grid.has_room(at, false));
+        }
+        assert!(
+            grid.claim(at, soldiers[1]),
+            "claiming again changes nothing"
+        );
+        assert_eq!(grid.spot(at, soldiers[1]), Some(1));
+        assert!(!grid.claim(at, soldiers[3]), "a fourth");
+        assert_eq!(
+            grid.holders(at),
+            [Some(SimId(10)), Some(SimId(11)), Some(SimId(12))]
+        );
+        assert_eq!(grid.occupant(at), Some(SimId(10)));
+        assert_eq!(
+            grid.blockers(at, soldiers[3], true),
+            [Some(SimId(10)), Some(SimId(11)), Some(SimId(12))]
+        );
+        assert_eq!(grid.blockers(at, soldiers[2], true), [None; 3]);
+        assert_eq!(
+            grid.blockers(at, truck, false),
+            [Some(SimId(10)), Some(SimId(11)), Some(SimId(12))]
+        );
+        // What would be left if only some of them stayed.
+        let stays = |id: SimId| id != soldiers[1];
+        assert_eq!(grid.room(at, true, stays), 1);
+        assert_eq!(grid.room(at, false, stays), 0);
+        assert_eq!(grid.room(at, false, |_| false), CELL_ROOM);
+        assert!(!grid.blocked(at, soldiers[3], true, stays));
+        assert!(grid.blocked(at, soldiers[3], true, |_| true));
+        assert!(grid.blocked(at, truck, false, stays));
+        assert!(!grid.blocked(at, truck, false, |_| false));
+
+        // A freed spot is taken again, and a preferred spot only while it is free.
+        grid.release(at, soldiers[1]);
+        assert_eq!(grid.holders(at), [Some(SimId(10)), None, Some(SimId(12))]);
+        assert!(grid.claim_spot(at, soldiers[3], Some(2)));
+        assert_eq!(grid.spot(at, soldiers[3]), Some(1), "spot 2 is taken");
+        let next = CellPos::new(2, 1);
+        assert!(grid.claim_spot(next, soldiers[3], Some(2)));
+        assert_eq!(grid.spot(next, soldiers[3]), Some(2));
+        assert!(grid.claim_spot(next, soldiers[1], Some(9)), "no such spot");
+        assert_eq!(grid.spot(next, soldiers[1]), Some(0));
+
+        // A unit is released from the cell it holds and from the neighbour it enters.
+        grid.release_around(at, soldiers[3]);
+        assert_eq!(grid.spot(at, soldiers[3]), None);
+        assert_eq!(grid.spot(next, soldiers[3]), None);
+        grid.unregister(soldiers[3]);
+        assert!(!grid.is_on_foot(soldiers[3]));
+
+        // Outside the map, and under a building, nothing is claimed.
+        assert!(!grid.claim(CellPos::new(4, 0), tank));
+        assert_eq!(grid.room(CellPos::new(-1, 0), true, |_| true), 0);
+        assert_eq!(grid.holders(CellPos::new(9, 9)), [None; 3]);
+        grid.cover(CellPos::new(3, 3), SimId(99));
+        assert!(!grid.claim(CellPos::new(3, 3), tank));
+        assert!(!grid.claim(CellPos::new(3, 3), soldiers[0]));
+        assert!(
+            grid.claim(CellPos::new(3, 3), plane),
+            "an aircraft flies over it"
+        );
+    }
+
+    /// RA3: the hash of a grid covers who holds which spot (invariant I3), and the hash of a
+    /// grid without units on foot is what it was before RA3 (docs/DECISIONS.md R6).
+    #[test]
+    fn the_hash_covers_the_spots_and_is_unchanged_without_units_on_foot() {
+        let mut plain = open(5, 3);
+        plain.register(SimId(1), Domain::Land, false);
+        plain.register(SimId(2), Domain::Naval, false);
+        plain.register(SimId(3), Domain::Air, false);
+        assert!(plain.claim(CellPos::new(0, 0), SimId(1)));
+        assert!(plain.claim(CellPos::new(4, 2), SimId(3)));
+        plain.cover(CellPos::new(2, 2), SimId(7));
+        assert!(plain.spots.is_empty(), "no spots without units on foot");
+        assert_eq!(hash(&plain), hash_before_ra3(&plain));
+        assert_eq!(hash(&open(5, 3)), hash_before_ra3(&open(5, 3)));
+
+        let at = CellPos::new(1, 1);
+        let with = |claims: &[(u32, Option<u8>)]| {
+            let mut grid = plain.clone();
+            for &(id, spot) in claims {
+                grid.register(SimId(id), Domain::Land, true);
+                assert!(grid.claim_spot(at, SimId(id), spot));
+            }
+            hash(&grid)
+        };
+        let one = with(&[(10, None)]);
+        assert_ne!(one, hash(&plain));
+        assert_eq!(one, with(&[(10, Some(0))]));
+        // Another spot, another unit, another unit beside it, and the two the other way round.
+        assert_ne!(one, with(&[(10, Some(1))]));
+        assert_ne!(one, with(&[(11, None)]));
+        assert_ne!(one, with(&[(10, None), (11, None)]));
+        assert_ne!(
+            with(&[(10, Some(0)), (11, Some(1))]),
+            with(&[(10, Some(1)), (11, Some(0))])
+        );
+        // A unit on foot that holds no cell yet is part of the state too.
+        let mut registered = plain.clone();
+        registered.register(SimId(10), Domain::Land, true);
+        assert_ne!(hash(&registered), hash(&plain));
     }
 }

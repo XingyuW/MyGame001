@@ -40,6 +40,25 @@
 //! production lane there: `"armory"` (the ini's `BuildCat=Combat`) is the defence lane of the
 //! Construction Yard ([`Definitions::lane`]).
 //!
+//! Schema version 4 (RA3, docs/RA2_PARITY_PLAN.md section 5, RA3 items 6 and 8;
+//! docs/DECISIONS.md R6) adds the traits of a unit that movement reads. A building has 0 in
+//! every one of them:
+//!
+//! * `infantry` (1 or 0): the unit is of the ini's infantry type list. An infantry unit that does
+//!   not fly is on foot ([`Definitions::on_foot`]): it holds one of the three spots of a cell
+//!   instead of the cell (invariant I6'). Only an item of the category `"infantry"` may have it;
+//! * `crushable` (1 or 0, the ini's `Crushable`): a crusher of an enemy may drive over the unit
+//!   while it is on foot. Only an `infantry` unit may have it;
+//! * `crusher` (1 or 0, the ini's `Crusher`): on a `Move` or `AttackMove` command the unit
+//!   drives over hostile crushable infantry in its way, which die. Only a unit of the category
+//!   `"vehicles"` that does not fly may have it;
+//! * `size`: the room the unit takes in a transport (the ini's `Size`), 0 to [`MAX_UNIT_SIZE`].
+//!   Nothing reads it yet; it is ported with the other three for the transports of RA4.
+//!
+//! Unlike the traits of schema version 3 these are read in every world, with or without a rules
+//! file: a world whose arsenal gives no unit the `infantry` trait, like a world without an
+//! arsenal, has one unit to a cell as before RA3.
+//!
 //! Countries and prerequisite groups are those of the rules file, so the rules are loaded first
 //! ([`Definitions::with_rules`]); an entry that names one without rules is rejected. With rules,
 //! the base unit of every side must have the role `mcv`, since that role is what deploys.
@@ -53,11 +72,15 @@ use crate::{BuildingKind, Definitions, ProductionItem, UnitKind};
 use serde::Deserialize;
 use std::{collections::BTreeMap, path::Path};
 
-/// The schema version of the arsenal file this crate reads (2 since RA1, 3 since RA2).
-pub const ARSENAL_SCHEMA_VERSION: i64 = 3;
+/// The schema version of the arsenal file this crate reads (2 since RA1, 3 since RA2, 4 since
+/// RA3).
+pub const ARSENAL_SCHEMA_VERSION: i64 = 4;
 
 /// Largest `build_limit` of an arsenal entry.
 pub const MAX_BUILD_LIMIT: u32 = 255;
+
+/// Largest `size` of an arsenal entry.
+pub const MAX_UNIT_SIZE: u32 = 255;
 
 /// The kind of factory a building is (docs/RA2_PARITY_PLAN.md section 3.3): buildings of one
 /// group produce the same items and share a queue.
@@ -170,6 +193,14 @@ pub struct ArsenalEntry {
     pub is_powered: bool,
     /// A damaged vehicle of its owner sent to it is repaired for credits.
     pub unit_repair: bool,
+    /// The unit drives over hostile crushable infantry on a `Move` or `AttackMove` command.
+    pub crusher: bool,
+    /// A crusher of an enemy may drive over the unit while it is on foot.
+    pub crushable: bool,
+    /// The room the unit takes in a transport.
+    pub size: u32,
+    /// The unit is of the infantry type list: on foot unless it flies.
+    pub infantry: bool,
 }
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Arsenal(pub BTreeMap<ProductionItem, ArsenalEntry>);
@@ -209,6 +240,10 @@ struct Entry {
     powered: i64,
     is_powered: i64,
     unit_repair: i64,
+    crusher: i64,
+    crushable: i64,
+    size: i64,
+    infantry: i64,
 }
 static ENTRY: Shape = Shape::Struct(&[
     ("id", Shape::Str),
@@ -262,6 +297,10 @@ static ENTRY: Shape = Shape::Struct(&[
     ("powered", Shape::Int),
     ("is_powered", Shape::Int),
     ("unit_repair", Shape::Int),
+    ("crusher", Shape::Int),
+    ("crushable", Shape::Int),
+    ("size", Shape::Int),
+    ("infantry", Shape::Int),
 ]);
 static FILE: Shape = Shape::Struct(&[
     (
@@ -507,6 +546,38 @@ impl Arsenal {
                     return Err(bad(name, "a building trait on a unit type"));
                 }
             }
+            // The traits of a unit (schema version 4): flags 1 or 0, the size within its
+            // range, all of them 0 on a building, and each only on the kind of unit that
+            // movement can give it to.
+            let traits = [
+                ("crusher", e.crusher, 1),
+                ("crushable", e.crushable, 1),
+                ("size", e.size, i64::from(MAX_UNIT_SIZE)),
+                ("infantry", e.infantry, 1),
+            ];
+            for (name, value, max) in traits {
+                if !(0..=max).contains(&value) {
+                    return Err(bad(name, &value.to_string()));
+                }
+                if building && value != 0 {
+                    return Err(bad(name, "a unit trait on a building type"));
+                }
+            }
+            if e.infantry == 1 && category != Category::Infantry {
+                return Err(bad(
+                    "infantry",
+                    "the infantry trait outside the category infantry",
+                ));
+            }
+            if e.crushable == 1 && e.infantry != 1 {
+                return Err(bad("crushable", "a crushable unit that is not infantry"));
+            }
+            if e.crusher == 1 && (category != Category::Vehicles || domain == Domain::Air) {
+                return Err(bad(
+                    "crusher",
+                    "a crusher that is not a vehicle on the surface",
+                ));
+            }
             result.insert(
                 item,
                 ArsenalEntry {
@@ -536,6 +607,10 @@ impl Arsenal {
                     powered: e.powered == 1,
                     is_powered: e.is_powered == 1,
                     unit_repair: e.unit_repair == 1,
+                    crusher: e.crusher == 1,
+                    crushable: e.crushable == 1,
+                    size: e.size as u32,
+                    infantry: e.infantry == 1,
                 },
             );
         }
@@ -612,6 +687,12 @@ impl Arsenal {
                 u8::from(e.is_powered),
                 u8::from(e.unit_repair),
             ]);
+            h.write(&[
+                u8::from(e.crusher),
+                u8::from(e.crushable),
+                u8::from(e.infantry),
+            ]);
+            h.write_u32(e.size);
         }
     }
 }
@@ -748,6 +829,31 @@ impl Definitions {
     pub fn domain(&self, kind: UnitKind) -> Domain {
         self.metadata(ProductionItem::Unit(kind))
             .map_or(Domain::Land, |e| e.domain)
+    }
+    /// Whether units of type `kind` are on foot (RA3, invariant I6'): infantry that does not
+    /// fly, which holds one of the three spots of a cell instead of the cell. No unit of a
+    /// world without an arsenal is.
+    pub fn on_foot(&self, kind: UnitKind) -> bool {
+        self.metadata(ProductionItem::Unit(kind))
+            .is_some_and(|e| e.infantry && e.domain != Domain::Air)
+    }
+    /// Whether units of type `kind` drive over hostile crushable infantry when they are
+    /// commanded to move (the arsenal's `crusher`).
+    pub fn crusher(&self, kind: UnitKind) -> bool {
+        self.metadata(ProductionItem::Unit(kind))
+            .is_some_and(|e| e.crusher)
+    }
+    /// Whether a crusher of an enemy may drive over units of type `kind` (the arsenal's
+    /// `crushable`, for a unit on foot).
+    pub fn crushable(&self, kind: UnitKind) -> bool {
+        self.on_foot(kind)
+            && self
+                .metadata(ProductionItem::Unit(kind))
+                .is_some_and(|e| e.crushable)
+    }
+    /// Whether any unit type is a crusher: without one nothing is ever crushed.
+    pub fn has_crushers(&self) -> bool {
+        self.arsenal.0.values().any(|e| e.crusher)
     }
     pub fn category(&self, item: ProductionItem) -> Category {
         self.metadata(item).map_or(

@@ -55,6 +55,13 @@
         (unit: "martyr", cost: 300, build_time: 10, producer: "soviet_barracks", prerequisites: []),
         (unit: "commando", cost: 300, build_time: 10, producer: "allied_barracks", prerequisites: []),
         (unit: "seer", cost: 300, build_time: 10, producer: "soviet_barracks", prerequisites: []),
+        (unit: "recruit", cost: 100, build_time: 10, producer: "allied_barracks", prerequisites: []),
+        (unit: "trooper", cost: 100, build_time: 10, producer: "allied_barracks", prerequisites: []),
+        (unit: "hazmat", cost: 100, build_time: 10, producer: "allied_barracks", prerequisites: []),
+        (unit: "jumper", cost: 100, build_time: 10, producer: "allied_barracks", prerequisites: []),
+        (unit: "truck", cost: 100, build_time: 10, producer: "allied_factory", prerequisites: []),
+        (unit: "roller", cost: 100, build_time: 10, producer: "allied_factory", prerequisites: []),
+        (unit: "brute", cost: 100, build_time: 10, producer: "allied_factory", prerequisites: []),
     ],
     harvesters: [
         (unit: "miner_a", capacity: 200, harvest_rate: 10),

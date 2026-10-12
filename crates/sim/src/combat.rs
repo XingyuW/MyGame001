@@ -51,7 +51,8 @@
 //! Targets (docs/DECISIONS.md D29):
 //!
 //! * A unit with an `Attack` order fires only at its target. Out of range, it moves to the
-//!   nearest free cell from whose centre the target is in range; it gives up after
+//!   nearest free cell from whose centre the target is in range (a unit on foot, RA3: the
+//!   nearest cell with a spot left from each of whose three spots it is); it gives up after
 //!   [`MAX_CHASES`] such moves without firing in between, or when the target no longer exists or
 //!   is no longer visible to its owner ([`SimEvent::AttackEnded`]). In range, it stops. If its
 //!   warhead deals no damage to the target's armour, the order ends with its first shot
@@ -69,8 +70,8 @@
 //! target the unit cannot affect (docs/DECISIONS.md D32).
 //!
 //! Distances (equation 1) are measured in subcells between the nearest points of the two
-//! entities: a unit is its fine position, a building the rectangle of subcells its footprint
-//! covers. "Visible" means visible to the attacker's owner as of the last `Visibility` stage
+//! entities: a unit is its fine position (for a unit on foot its spot in the cell, RA3,
+//! docs/DECISIONS.md R6), a building the rectangle of subcells its footprint covers. "Visible" means visible to the attacker's owner as of the last `Visibility` stage
 //! (`crate::visibility`); a player who is not a player of the match sees nothing.
 
 use std::collections::{BTreeMap, BTreeSet};
@@ -91,7 +92,7 @@ use crate::economy::Players;
 use crate::event::{AttackEnd, SimEvent};
 use crate::hash::Fnv1a64;
 use crate::id::SimId;
-use crate::map::{CellPos, Grid, SUBCELLS_PER_CELL, SubPos};
+use crate::map::{CellPos, Grid, SPOTS_PER_CELL, SUBCELLS_PER_CELL, SubPos};
 use crate::pathfinding::nearest_cell;
 use crate::schedule::SimTick;
 use crate::unit::{Mobile, MoveOrder, Orders, Owner, Position};
@@ -704,8 +705,9 @@ pub(crate) struct Blast {
 /// found; an entity may be hit more than once (a building, once per cell of its footprint
 /// within the spread). `traits` gives the position (of a unit) and the traits of an entity.
 ///
-/// Only the cells the spread reaches are looked at, through the grid's occupants, so the cost
-/// of an impact does not grow with the number of units of the match.
+/// Only the cells the spread reaches are looked at, through the grid's occupants (every unit
+/// that holds a cell: a vehicle, or each of the infantry in its spots, by its own distance), so
+/// the cost of an impact does not grow with the number of units of the match.
 fn blast_hits(
     definitions: &Definitions,
     grid: &Grid,
@@ -796,10 +798,10 @@ fn blast_hits(
                 }
             }
             // A unit holds the cell it stands in and the one it is entering: once is enough.
-            if let Some(unit) = grid.occupant_for(cell, layer)
-                && blast.direct != Some(unit)
-                && !seen.contains(&unit)
-            {
+            for unit in grid.holders_for(cell, layer).into_iter().flatten() {
+                if blast.direct == Some(unit) || seen.contains(&unit) {
+                    continue;
+                }
                 seen.push(unit);
                 if let Some((Some(position), found)) = traits(unit)
                     && found.airborne == blast.air
@@ -940,6 +942,8 @@ struct Field<'a> {
     /// The percentage a warhead must exceed for its weapon to engage a target on its own: 0,
     /// and with a rules file 1 (RA2: a target at 1 percent is attacked only on order).
     floor: i32,
+    /// The units of a type with the arsenal's `crusher` trait: their attack moves may crush.
+    crushers: &'a BTreeSet<SimId>,
 }
 
 /// What the tick's shots add up to.
@@ -949,9 +953,11 @@ struct Shots {
     blasts: Vec<Blast>,
     fired: Vec<Projectile>,
     events: Vec<SimEvent>,
-    /// Cells chosen this tick as destinations of units moving toward their targets, so that
-    /// units attacking the same target spread over different cells.
-    chase_cells: BTreeSet<CellPos>,
+    /// Cells chosen this tick as destinations of units moving toward their targets, each with
+    /// the room that was promised in it (in spots, [`Grid::room_needed`]), so that units
+    /// attacking the same target spread over different cells, the infantry on foot three to a
+    /// cell.
+    chase_cells: BTreeMap<CellPos, u8>,
 }
 
 impl Field<'_> {
@@ -1150,6 +1156,7 @@ pub(crate) fn combat(
     }
     let mut roles: BTreeMap<SimId, crate::Role> = BTreeMap::new();
     let mut terms: BTreeMap<SimId, CombatTerms> = BTreeMap::new();
+    let mut crushers: BTreeSet<SimId> = BTreeSet::new();
     let index: BTreeMap<SimId, Target> = targets
         .iter()
         .filter_map(
@@ -1174,6 +1181,9 @@ pub(crate) fn combat(
                 };
                 if let Some(role) = item.and_then(|item| definitions.metadata(item)) {
                     roles.insert(*id, role.role);
+                    if role.crusher {
+                        crushers.insert(*id);
+                    }
                 }
                 if let Some(of_type) = of_type {
                     terms.insert(*id, of_type);
@@ -1201,6 +1211,7 @@ pub(crate) fn combat(
         special: &special,
         roles: &roles,
         floor: i32::from(definitions.rules().is_some()),
+        crushers: &crushers,
     };
     let mut shots = Shots::default();
 
@@ -1616,11 +1627,21 @@ fn act_unit(
                 return;
             }
             // A unit approaches to the weapon's plain range (the air range bonus lengthens
-            // only the shot), and keeps outside its minimum range.
-            let reachable = |cell: CellPos| {
-                let (dx, dy) = Extent::point(SubPos::centre_of(cell)).gap(&found.extent);
+            // only the shot), and keeps outside its minimum range. A unit on foot will stand
+            // at one of the three spots of the cell, whichever is free when it arrives: the
+            // target must be in range from each of them.
+            let on_foot = field.grid.is_on_foot(id);
+            let fires_from = |point: SubPos| {
+                let (dx, dy) = Extent::point(point).gap(&found.extent);
                 in_range(dx, dy, choice.def.range)
                     && !inside_min_range(dx, dy, choice.def.min_range)
+            };
+            let reachable = |cell: CellPos| {
+                if on_foot {
+                    (0..SPOTS_PER_CELL as u8).all(|spot| fires_from(SubPos::spot_of(cell, spot)))
+                } else {
+                    fires_from(SubPos::centre_of(cell))
+                }
             };
             let heading_in_range = orders
                 .current
@@ -1634,14 +1655,19 @@ fn act_unit(
                 return end(weapon, shots, AttackEnd::OutOfReach);
             }
             let view = field.grid.navigation_for(field.grid.domain_of(id));
+            // The cell must have room for the unit beside the units that hold it and those
+            // that chose it in this tick.
+            let needed = Grid::room_needed(on_foot);
             let chase = nearest_cell(&view, mobile.next_centre(), |cell| {
-                view.occupant(cell).is_none_or(|holder| holder == id)
-                    && !shots.chase_cells.contains(&cell)
+                view.room(cell, on_foot, |holder| holder != id)
+                    .saturating_sub(shots.chase_cells.get(&cell).copied().unwrap_or(0))
+                    >= needed
                     && reachable(cell)
             });
             match chase {
                 Some(cell) => {
-                    shots.chase_cells.insert(cell);
+                    let promised = shots.chase_cells.entry(cell).or_default();
+                    *promised = promised.saturating_add(needed);
                     orders.current = Some(MoveOrder::new(cell, field.tick));
                     weapon.order = Some(AttackOrder::Attack {
                         target,
@@ -1677,7 +1703,12 @@ fn act_unit(
                 weapon.clear();
                 return;
             }
-            orders.current = Some(MoveOrder::new(destination, field.tick));
+            // The move of an `AttackMove` command: a crusher may crush on its way.
+            orders.current = Some(MoveOrder::commanded(
+                destination,
+                field.tick,
+                field.crushers.contains(&id),
+            ));
             weapon.order = Some(AttackOrder::AttackMove {
                 destination,
                 moving: true,
@@ -1777,7 +1808,7 @@ pub(crate) fn remove_dead(
     dead.sort_unstable_by_key(|(_, id, ..)| **id);
     for (entity, &id, owner, _, mobile, building) in dead {
         if let Some(mobile) = mobile {
-            grid.domains.remove(&id);
+            grid.unregister(id);
             grid.release(mobile.cell, id);
             if let Some(step) = mobile.step {
                 grid.release(step.to, id);

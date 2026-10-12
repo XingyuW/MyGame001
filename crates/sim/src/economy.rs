@@ -775,24 +775,26 @@ impl Spawner<'_, '_, '_> {
     fn leave(&mut self, player: PlayerId, kind: UnitKind, exit: Exit) -> Option<SimId> {
         let speed = self.definitions.unit(kind)?.speed;
         let domain = self.definitions.domain(kind);
+        let on_foot = self.definitions.on_foot(kind);
         let cell = exit_cell(
             &self.grid.navigation_for(domain),
             exit.footprint,
             exit.rally,
+            on_foot,
         )?;
         let id = self.ids.allocate()?;
-        self.grid.register_domain(id, domain);
+        self.grid.register(id, domain, on_foot);
         if !self.grid.claim(cell, id) {
+            self.grid.unregister(id);
             return None;
         }
-        let mut bundle = unit_bundle(id, player, kind, speed, cell);
+        let position = self.grid.standing_point(cell, id);
+        let mut bundle = unit_bundle(id, player, kind, speed, cell, position);
         let harvester = self.definitions.harvester(kind).is_some();
         if !harvester && let Some(rally) = exit.rally {
             let destination =
                 destination_cells(&self.grid.navigation_for(domain), rally, 1, |other| {
-                    self.grid
-                        .occupant_for(other, domain)
-                        .is_some_and(|holder| holder != id)
+                    !self.grid.room_for(other, id)
                 });
             if let Some(&destination) = destination.first() {
                 bundle.6.current = Some(MoveOrder::new(destination, self.tick));

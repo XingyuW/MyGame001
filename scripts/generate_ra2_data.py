@@ -682,6 +682,13 @@ class Tables:
         """Whether the game item stands for a section of each side (the engineer, the dog)."""
         return len(self.sections[game_id]) > 1
 
+    def listed(self, registry, section):
+        """The entry `key=section` of the type list `registry`, or None if it has none."""
+        for key, value in sorted(self.section(registry).items()):
+            if value == section:
+                return f"[{registry}] {key}={value}"
+        return None
+
 
 def cite(section, key, values):
     return f"[{section}] {key}={values[key]}"
@@ -756,6 +763,17 @@ class Item:
         self.is_powered = (
             convert("flag", tables.value(self.special, "IsPowered")) if self.special else 0
         )
+        # The traits of RA3 (docs/DECISIONS.md R6), units only: the type list the unit is in,
+        # `Crusher` (default no), `Crushable` (default yes for infantry, no otherwise) and
+        # `Size` (default 1).
+        unit = self.kind == "unit"
+        self.infantry_list = tables.listed("InfantryTypes", self.section_name) if unit else None
+        self.infantry = int(self.infantry_list is not None)
+        self.crusher = flag("Crusher", "no") if unit else 0
+        self.crushable = (
+            flag("Crushable", "yes" if self.infantry else "no") if unit else 0
+        )
+        self.size = int(section.get("Size", "1")) if unit else 0
 
     def build_time(self, tables):
         """Ticks of build time (section 4.2): the cost times `BuildSpeed` game minutes per 1000
@@ -1153,7 +1171,7 @@ class Data:
 
     def arsenal_file(self):
         lines = [
-            "// The arsenal, schema version 3 (crates/sim/src/arsenal.rs; docs/DECISIONS.md R10, R11, R22): per",
+            "// The arsenal, schema version 4 (crates/sim/src/arsenal.rs; docs/DECISIONS.md R10, R11, R22, R6): per",
             "// item its label, description, category, domain and role with the role's terms (durations in ticks,",
             "// 20 per second), the id of the item whose art it shows, its side, the factory group of a",
             "// building, and the terms of the ini's buildability rule: the sides whose factories build it",
@@ -1173,8 +1191,16 @@ class Data:
             "// building is its production lane: \"armory\" is `BuildCat=Combat`, the defences. A unit",
             "// has 0 in all of them.",
             "//",
+            "// Since schema version 4 (RA3, docs/DECISIONS.md R6) a unit also has, as 1 or 0: infantry (it",
+            "// is in `[InfantryTypes]`: unless it flies it holds one of the three spots of a cell",
+            "// instead of the cell), crushable (`Crushable`; without the key 1 for infantry and 0 for",
+            "// every other unit: a crusher of an enemy may drive over it) and crusher (`Crusher`: on a",
+            "// move or attack move it drives over hostile crushable infantry in its way); and size",
+            "// (`Size`; 1 without the key: the room it takes in a transport, not read yet). A building",
+            "// has 0 in all of them.",
+            "//",
             GENERATED,
-            "(schema_version: 3, entries: [",
+            "(schema_version: 4, entries: [",
         ]
         for table in (self.buildings, self.units):
             for game_id, values in table.items():
@@ -1184,12 +1210,22 @@ class Data:
                 )
                 keys = ["Owner", "RequiredHouses", "ForbiddenHouses", "TechLevel", "Prerequisite"]
                 keys += ["Factory", "Naval"] + list(STOLEN)
+                if item.kind == "unit":
+                    keys += ["Crusher", "Crushable", "Size"]
+                    # The game's categories and domains are its own tables: they must agree
+                    # with the type list, and a crusher must be a vehicle on the surface.
+                    if (category == "infantry") != bool(item.infantry):
+                        raise Failure(f"{game_id}: the category {category} is not its type list")
+                    if item.crusher and (category != "vehicles" or domain == "air"):
+                        raise Failure(f"{game_id}: a crusher that is not a surface vehicle")
                 if item.kind == "building":
                     if (category == "armory") != item.defence:
                         raise Failure(f"{game_id}: the category {category} is not its BuildCat")
                     keys += ["BuildCat", "BuildLimit", "Adjacent", "BaseNormal", "Radar", "Wall"]
                     keys += ["Unsellable", "Repairable", "Powered", "UnitRepair", "SuperWeapon"]
                 source = item.comment(*keys)
+                if item.infantry_list:
+                    source += f"; {item.infantry_list}"
                 if item.kind == "building":
                     if item.special:
                         special = self.tables.section(item.special)
@@ -1213,7 +1249,9 @@ class Data:
                     f"base_normal: {item.base_normal}, radar: {item.radar}, "
                     f"sellable: {item.sellable}, repairable: {item.repairable}, "
                     f"powered: {item.powered}, is_powered: {item.is_powered}, "
-                    f"unit_repair: {item.unit_repair}),"
+                    f"unit_repair: {item.unit_repair}, crusher: {item.crusher}, "
+                    f"crushable: {item.crushable}, size: {item.size}, "
+                    f"infantry: {item.infantry}),"
                     f" // {source}"
                 )
         lines.append("])")

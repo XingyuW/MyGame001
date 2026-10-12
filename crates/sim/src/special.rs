@@ -8,6 +8,12 @@
 //! (`crate::combat::detonate`). An effect the combat file does not list, and a suicide unit in a
 //! world without a rules file, keep the rule of M9 (`blast`: damage that falls off with the
 //! distance in cells and ignores armour), which is what the fixtures of M9 assert.
+//!
+//! Cells (RA3, invariant I6', docs/DECISIONS.md R6): every action here that puts a unit into a
+//! cell (a teleport, an unloaded passenger, an undeployed base unit, a launched aircraft) asks
+//! the grid whether the cell has room for that unit ([`Grid::has_room`], [`Grid::room_for`]),
+//! so infantry on foot share a cell three to a cell and stand at their spots, and nothing else
+//! shares one.
 use crate::{
     Building, CellPos, Definitions, Footprint, Grid, ProductionItem, SimId, SimTick, UnitKind,
     arsenal::*,
@@ -264,7 +270,8 @@ fn validate_docking(a: &Actor, b: &Actor, defs: &Definitions) -> Result<(), Reje
     }
     Ok(())
 }
-fn release(world: &mut World, a: &Actor) {
+/// Frees the cells the unit `a` holds.
+fn vacate(world: &mut World, a: &Actor) {
     let mobile = world.get::<Mobile>(a.entity).copied();
     if let Some(m) = mobile {
         let mut g = world.resource_mut::<Grid>();
@@ -272,31 +279,34 @@ fn release(world: &mut World, a: &Actor) {
         if let Some(s) = m.step {
             g.release(s.to, a.id);
         }
-        g.domains.remove(&a.id);
+    }
+}
+/// Frees the cells the unit `a` holds and forgets it: it leaves the map.
+fn release(world: &mut World, a: &Actor) {
+    vacate(world, a);
+    if world.get::<Mobile>(a.entity).is_some() {
+        world.resource_mut::<Grid>().unregister(a.id);
     }
 }
 fn teleport(world: &mut World, a: &Actor, cell: CellPos) -> bool {
     let domain = world.resource::<Grid>().domain_of(a.id);
     if !world.resource::<Grid>().passable_for(cell, domain)
-        || world
-            .resource::<Grid>()
-            .occupant_for(cell, domain)
-            .is_some_and(|id| id != a.id)
+        || !world.resource::<Grid>().room_for(cell, a.id)
     {
         return false;
     }
-    release(world, a);
-    {
+    vacate(world, a);
+    let point = {
         let mut g = world.resource_mut::<Grid>();
-        g.register_domain(a.id, domain);
         g.claim(cell, a.id);
-    }
+        g.standing_point(cell, a.id)
+    };
     if let Some(mut m) = world.get_mut::<Mobile>(a.entity) {
         m.cell = cell;
         m.step = None;
     }
     if let Some(mut p) = world.get_mut::<Position>(a.entity) {
-        p.0 = crate::SubPos::centre_of(cell);
+        p.0 = point;
     }
     if let Some(mut o) = world.get_mut::<Orders>(a.entity) {
         o.current = None;
@@ -556,6 +566,7 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
                 .map(|def| def.speed)
                 .ok_or(unavailable("This building does not undeploy"))?;
             let domain = defs.domain(unit);
+            let on_foot = defs.on_foot(unit);
             // The unit stands where the footprint's origin was: once the building is gone the
             // cell must be ground the unit may stand on, with nothing of its layer in it.
             let mut grid = world.resource::<Grid>().clone();
@@ -567,21 +578,22 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
             {
                 return Err(unavailable("No room to undeploy"));
             }
-            {
+            let point = {
                 let mut grid = world.resource_mut::<Grid>();
                 for c in foot.cells() {
                     grid.uncover(c, a.id);
                 }
-                grid.register_domain(a.id, domain);
+                grid.register(a.id, domain, on_foot);
                 grid.claim(foot.origin, a.id);
-            }
+                grid.standing_point(foot.origin, a.id)
+            };
             if let Some(p) = world.resource_mut::<Players>().get_mut(a.owner) {
                 p.repairing.remove(&a.id);
             }
             world.resource_mut::<SpecialState>().charge.remove(&a.id);
             let mut e = world.entity_mut(a.entity);
             e.remove::<(Building, crate::Producer, Weapon)>();
-            e.insert(unit_bundle(a.id, a.owner, unit, speed, foot.origin));
+            e.insert(unit_bundle(a.id, a.owner, unit, speed, foot.origin, point));
             if let Some(t) = defs.unit_combat(unit) {
                 let (c, w) = combat_components(t);
                 e.insert(c);
@@ -927,13 +939,14 @@ fn unload(world: &mut World, a: &Actor, defs: &Definitions) -> Result<(), Reject
     for p in ps {
         let g = world.resource::<Grid>();
         let view = g.navigation_for(defs.domain(p.kind));
+        let on_foot = defs.on_foot(p.kind);
         let dest = Footprint {
             origin: a.cell,
             width: 1,
             height: 1,
         }
         .ring()
-        .find(|&c| view.is_passable(c) && view.occupant(c).is_none());
+        .find(|&c| view.is_passable(c) && view.has_room(c, on_foot));
         let Some(c) = dest else {
             left.push(p);
             continue;
@@ -942,12 +955,13 @@ fn unload(world: &mut World, a: &Actor, defs: &Definitions) -> Result<(), Reject
             left.push(p);
             continue;
         };
-        {
+        let point = {
             let mut g = world.resource_mut::<Grid>();
-            g.register_domain(p.id, defs.domain(p.kind));
+            g.register(p.id, defs.domain(p.kind), on_foot);
             g.claim(c, p.id);
-        }
-        let mut e = world.spawn(unit_bundle(p.id, a.owner, p.kind, u.speed, c));
+            g.standing_point(c, p.id)
+        };
+        let mut e = world.spawn(unit_bundle(p.id, a.owner, p.kind, u.speed, c, point));
         if let Some(t) = defs.unit_combat(p.kind) {
             let (c, w) = combat_components(t);
             e.insert(c);
@@ -1188,6 +1202,7 @@ pub(crate) fn advance(world: &mut World) {
                                 height: 1,
                             }),
                             None,
+                            false,
                         )
                     };
                     if let Some(c) = dest
@@ -1224,8 +1239,9 @@ pub(crate) fn advance(world: &mut World) {
             let dest = {
                 let g = world.resource::<Grid>();
                 let view = g.navigation_for(g.domain_of(id));
+                let on_foot = g.is_on_foot(id);
                 crate::pathfinding::nearest_cell(&view, a.cell, |c| {
-                    view.occupant(c).is_none()
+                    view.has_room(c, on_foot)
                         && b.foot
                             .map_or(near(c, b.cell, 1), |f| f.distance_to_cell(c) == 1)
                 })
@@ -1282,8 +1298,9 @@ fn repair_docked(world: &mut World, defs: &Definitions, index: &BTreeMap<SimId, 
                 let dest = {
                     let g = world.resource::<Grid>();
                     let view = g.navigation_for(g.domain_of(id));
+                    let on_foot = g.is_on_foot(id);
                     crate::pathfinding::nearest_cell(&view, a.cell, |c| {
-                        view.occupant(c).is_none()
+                        view.has_room(c, on_foot)
                             && b.foot.is_some_and(|f| f.distance_to_cell(c) >= 2)
                     })
                 };
@@ -1650,6 +1667,7 @@ fn launch_fighters(
                     height: 1,
                 },
                 None,
+                false,
             )
         };
         let Some(cell) = cell else {

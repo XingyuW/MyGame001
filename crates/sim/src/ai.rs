@@ -976,7 +976,7 @@ fn deploy_base_unit(view: &View<'_>, controller: &AiController) -> BaseUnit {
         }) && footprint
             .ring()
             .filter(|&cell| view.grid.contains(cell) && view.vision.is_visible(cell))
-            .all(|cell| view.grid.occupant(cell).is_none_or(stands));
+            .all(|cell| view.grid.holders(cell).into_iter().flatten().all(stands));
         if fits {
             return BaseUnit::Deploy(Command::Deploy { unit: unit.id });
         }

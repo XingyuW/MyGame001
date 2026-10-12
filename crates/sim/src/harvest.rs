@@ -126,7 +126,7 @@ struct Refinery {
 }
 
 /// The cell with ore nearest to `start` (by path cost over passable terrain; `start` itself
-/// counts) that is not in `claimed` and not held by a unit other than `unit`.
+/// counts) that is not in `claimed` and has room for `unit` (it is held by no other unit).
 pub(crate) fn nearest_ore(
     grid: &Grid,
     start: CellPos,
@@ -137,7 +137,7 @@ pub(crate) fn nearest_ore(
         grid.cell(cell).is_some_and(|terrain| terrain.ore > 0)
             && grid.is_passable(cell)
             && !claimed.contains(&cell)
-            && grid.occupant(cell).is_none_or(|holder| holder == unit)
+            && grid.room_for(cell, unit)
     })
 }
 
@@ -235,7 +235,7 @@ impl Context<'_> {
                 .map(|&(id, _)| id)
         };
         let grid = &*self.grid;
-        let free = |cell: CellPos| grid.occupant(cell).is_none_or(|holder| holder == worker.id);
+        let free = |cell: CellPos| grid.room_for(cell, worker.id);
         let dock = nearest_cell(grid, worker.cell, |cell| {
             refinery_at(cell).is_some() && free(cell)
         })

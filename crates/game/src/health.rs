@@ -6,6 +6,10 @@
 //!
 //! A bar is drawn only over a view that is shown, so the hit points of an enemy the human player
 //! does not see are never drawn (as its view, D31).
+//!
+//! Infantry on foot stand three to a cell, each at a spot of its own (RA3, docs/DECISIONS.md
+//! R6), so a soldier's bar is half as long as a vehicle's: the bars of the soldiers of a cell
+//! do not overlap.
 
 use bevy::prelude::*;
 use sim::{Building, Definitions, Health, Unit};
@@ -17,6 +21,18 @@ use crate::units::{FRAME_SIZE, GROUND_OFFSET_PX, UnitView};
 
 /// Length of a unit's bar in world units; a building's bar is as wide as half its sprite.
 pub const UNIT_BAR_LENGTH: f32 = 32.0;
+
+/// Length of the bar of a unit on foot, which shares its cell with two others.
+pub const INFANTRY_BAR_LENGTH: f32 = 16.0;
+
+/// The length of a unit's bar: shorter for a unit on foot (`sim::Definitions::on_foot`).
+pub fn unit_bar_length(on_foot: bool) -> f32 {
+    if on_foot {
+        INFANTRY_BAR_LENGTH
+    } else {
+        UNIT_BAR_LENGTH
+    }
+}
 
 pub struct HealthBarsPlugin;
 
@@ -155,10 +171,13 @@ fn draw_health_bars(
         // Above the sprite's frame; the sprite's centre lies `GROUND_OFFSET_PX` above the ground.
         let centre = transform.translation.truncate()
             + Vec2::new(0.0, FRAME_SIZE as f32 / 2.0 - GROUND_OFFSET_PX);
+        let on_foot = world
+            .get::<Unit>(view.unit)
+            .is_some_and(|unit| definitions.on_foot(unit.kind));
         draw_bar(
             &mut gizmos,
             centre,
-            UNIT_BAR_LENGTH,
+            unit_bar_length(on_foot),
             health_fraction(hit_points, max),
         );
     }
@@ -217,6 +236,60 @@ mod tests {
         assert_eq!(bar_colour(1.0), bar_colour(0.51));
         assert_ne!(bar_colour(0.5), bar_colour(0.51));
         assert_ne!(bar_colour(0.25), bar_colour(0.26));
+    }
+
+    /// RA3: three soldiers stand in one cell, each at its spot; their bars, each drawn the same
+    /// distance above its soldier, do not overlap, and a click or the cursor finds the soldier
+    /// it is on (`crate::selection::unit_at`, which the hover label uses too).
+    #[test]
+    fn the_bars_of_three_soldiers_in_a_cell_do_not_overlap_and_each_can_be_picked() {
+        use crate::projection::{TileSize, to_world};
+        let tile = TileSize::new(sim::TILE_WIDTH_PX, sim::TILE_HEIGHT_PX);
+        let cell = sim::CellPos::new(7, 9);
+        let scale = sim::SUBCELLS_PER_CELL as f32;
+        let ground: Vec<Vec2> = (0..sim::SPOTS_PER_CELL as u8)
+            .map(|spot| {
+                let at = sim::SubPos::spot_of(cell, spot);
+                to_world(at.x as f32 / scale, at.y as f32 / scale, tile)
+            })
+            .collect();
+        assert_eq!(unit_bar_length(true), INFANTRY_BAR_LENGTH);
+        assert_eq!(unit_bar_length(false), UNIT_BAR_LENGTH);
+        let bar = |at: Vec2| bar_fill(at, unit_bar_length(true), 1.0);
+        for (index, &a) in ground.iter().enumerate() {
+            for &b in &ground[index + 1..] {
+                // Bars are horizontal lines: two overlap if they are at one height (within the
+                // two pixels a line may cover) and their spans meet.
+                let ((a0, a1), (b0, b1)) = (bar(a), bar(b));
+                let level = (a.y - b.y).abs() < 2.0;
+                let apart = a1.x + 2.0 <= b0.x || b1.x + 2.0 <= a0.x;
+                assert!(!level || apart, "bars at {a} and {b} overlap");
+                // The soldiers themselves are far enough apart to tell them from each other.
+                assert!(a.distance(b) >= 12.0, "{a} and {b}");
+            }
+        }
+        // A vehicle's bar would not fit: the two soldiers that stand side by side are closer
+        // together than it is long.
+        assert!((ground[1].x - ground[2].x).abs() < UNIT_BAR_LENGTH);
+        // On screen the first stands above the centre and the other two below it, left and
+        // right of it.
+        let centre = crate::projection::cell_centre(cell, tile);
+        assert!(ground[0].y > centre.y && (ground[0].x - centre.x).abs() < 0.01);
+        assert!(ground[1].x > centre.x && ground[2].x < centre.x);
+        assert!((ground[1].y - ground[2].y).abs() < 0.01 && ground[1].y < centre.y);
+        // Picking: the cursor on the body of each soldier picks that soldier.
+        let units: Vec<(sim::SimId, Vec2)> = ground
+            .iter()
+            .enumerate()
+            .map(|(index, &at)| (sim::SimId(index as u32 + 1), at))
+            .collect();
+        for &(id, at) in &units {
+            let body = at + Vec2::new(0.0, GROUND_OFFSET_PX);
+            assert_eq!(crate::selection::unit_at(body, &units), Some(id));
+            // A little off its centre, on the side away from the others, too.
+            let away = (at - centre).normalize_or_zero() * 4.0;
+            assert_eq!(crate::selection::unit_at(body + away, &units), Some(id));
+        }
     }
 
     #[test]
