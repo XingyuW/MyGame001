@@ -1,11 +1,12 @@
 //! Immutable combat definitions loaded from RON (PLAN.md sections 5 and 7, M4; docs/DECISIONS.md
-//! D28; schema version 2: docs/RA2_PARITY_PLAN.md sections 4.3 and 4.4, docs/DECISIONS.md R32).
+//! D28; schema version 2: docs/RA2_PARITY_PLAN.md sections 4.3 and 4.4, docs/DECISIONS.md R32;
+//! schema version 3: section 4.8, docs/DECISIONS.md R46).
 //!
-//! Combat file, schema version 2:
+//! Combat file, schema version 3:
 //!
 //! ```ron
 //! (
-//!     schema_version: 2,
+//!     schema_version: 3,
 //!     armour_classes: ["light", "heavy", "structure"],
 //!     warheads: [
 //!         (id: "ap", cell_spread: 77, percent_at_max: 50, wall: 1, wood: 1, versus: [
@@ -66,6 +67,10 @@
 //!   type ([`Effect`]): each at most once. An effect that is not listed keeps the rule it had
 //!   before RA3 (damage that falls off with the distance in cells and ignores armour).
 //!
+//! Since schema version 3 (RA4) `effects` may also name the impact of the two spawned missiles
+//! and of each when its launcher is elite (`v3_rocket`, `v3_rocket_elite`, `dmisl`,
+//! `dmisl_elite`); nothing else changed. A missile whose effect is not listed deals nothing.
+//!
 //! Values that leave every rule of M4 as it was (the fixtures of M2 to M9): no spread and 100
 //! percent at the edge, `wall` and `wood` 1, no minimum range, a burst of 1, both layers, no
 //! scatter, the elite weapons equal to the weapons, no bonus, `land_targeting` 0,
@@ -81,7 +86,7 @@ use crate::economy_defs::MAX_BUILDING_TYPES;
 use crate::hash::Fnv1a64;
 
 /// The schema version of the combat file this crate reads.
-pub const COMBAT_SCHEMA_VERSION: i64 = 2;
+pub const COMBAT_SCHEMA_VERSION: i64 = 3;
 
 /// Largest number of armour classes.
 pub const MAX_ARMOUR_CLASSES: usize = 16;
@@ -168,16 +173,28 @@ pub enum Effect {
     C4,
     /// A pulse of a radiation zone.
     Radiation,
+    /// The impact of a V3 rocket (RA4: a spawned missile, `crate::flight`).
+    V3Rocket,
+    /// The impact of the V3 rocket of an elite launcher.
+    V3RocketElite,
+    /// The impact of a Dreadnought's missile.
+    DMisl,
+    /// The impact of the missile of an elite Dreadnought.
+    DMislElite,
 }
 
 impl Effect {
     /// Every effect, in the order of their hashes.
-    pub const ALL: [Effect; 5] = [
+    pub const ALL: [Effect; 9] = [
         Effect::Nuke,
         Effect::Lightning,
         Effect::IvanBomb,
         Effect::C4,
         Effect::Radiation,
+        Effect::V3Rocket,
+        Effect::V3RocketElite,
+        Effect::DMisl,
+        Effect::DMislElite,
     ];
 
     /// The id of the effect in the combat file.
@@ -188,6 +205,10 @@ impl Effect {
             Effect::IvanBomb => "ivan_bomb",
             Effect::C4 => "c4",
             Effect::Radiation => "radiation",
+            Effect::V3Rocket => "v3_rocket",
+            Effect::V3RocketElite => "v3_rocket_elite",
+            Effect::DMisl => "dmisl",
+            Effect::DMislElite => "dmisl_elite",
         }
     }
 
@@ -320,7 +341,7 @@ pub struct CombatDefinitions {
     /// Indexed by [`BuildingKind`](crate::BuildingKind).
     pub(crate) buildings: Vec<Option<CombatTerms>>,
     /// Indexed as [`Effect::ALL`].
-    pub(crate) effects: [Option<EffectDef>; 5],
+    pub(crate) effects: [Option<EffectDef>; 9],
 }
 
 impl CombatDefinitions {
@@ -1054,7 +1075,7 @@ fn validate(
         }
     }
 
-    let mut effects = [None; 5];
+    let mut effects = [None; 9];
     for (index, entry) in file.effects.iter().enumerate() {
         let at = |name: &str| format!("effects[{index}].{name}");
         let Some(effect) = Effect::ALL

@@ -803,7 +803,7 @@ const BRUTAL_DIFFICULTY: (&str, &str) = ("        (\n            id: \"brutal\",
 /// An arsenal file with the entries of the fixture for the items `ids` only, in this order.
 fn arsenal_of(name: &str, ids: &[&str]) -> PathBuf {
     let fixture = File::Arsenal.text();
-    let mut text = String::from("(schema_version: 4, entries: [\n");
+    let mut text = String::from("(schema_version: 5, entries: [\n");
     for id in ids {
         let entry = format!("(id: {id:?},");
         let lines: Vec<&str> = fixture
@@ -1826,7 +1826,7 @@ fn every_field_of_the_arsenal_file_is_required() {
     let path = variant(
         File::Arsenal,
         "arsenal_missing_schema_version",
-        &[("(schema_version: 4, entries: [", "(entries: [")],
+        &[("(schema_version: 5, entries: [", "(entries: [")],
     );
     assert_rejected(
         File::Arsenal,
@@ -1834,10 +1834,10 @@ fn every_field_of_the_arsenal_file_is_required() {
         "schema_version",
         DataErrorKind::MissingField,
     );
-    let path = temp_file("arsenal_missing_entries.ron", b"(schema_version: 4)\n");
+    let path = temp_file("arsenal_missing_entries.ron", b"(schema_version: 5)\n");
     assert_rejected(File::Arsenal, &path, "entries", DataErrorKind::MissingField);
     // Every field of an entry: those of schema version 1, the eight of version 2, the nine of
-    // version 3 (RA2) and the four of version 4 (RA3).
+    // version 3 (RA2), the four of version 4 (RA3) and the sixteen of version 5 (RA4).
     let fields = [
         ("id", r#"id: "sniper", "#),
         ("label", r#"label: "Sniper", "#),
@@ -1869,7 +1869,23 @@ fn every_field_of_the_arsenal_file_is_required() {
         ("crusher", "crusher: 0, "),
         ("crushable", "crushable: 0, "),
         ("size", "size: 0, "),
-        ("infantry", ", infantry: 0"),
+        ("infantry", "infantry: 0, "),
+        ("trainable", "trainable: 0, "),
+        ("veteran_abilities", "veteran_abilities: [], "),
+        ("elite_abilities", "elite_abilities: [], "),
+        ("crewed", "crewed: 0, "),
+        ("self_healing", "self_healing: 0, "),
+        ("ammo", "ammo: 0, "),
+        ("airport_bound", "airport_bound: 0, "),
+        ("docks", "docks: 0, "),
+        ("spawns", r#"spawns: "none", "#),
+        ("spawns_number", "spawns_number: 0, "),
+        ("spawn_regen", "spawn_regen: 0, "),
+        ("spawn_reload", "spawn_reload: 0, "),
+        ("launcher", r#"launcher: "none", "#),
+        ("missile", r#"missile: "none", "#),
+        ("cloakable", "cloakable: 0, "),
+        ("sensors_sight", ", sensors_sight: 0"),
     ];
     for (field, from) in fields {
         let path = line_variant(
@@ -2122,8 +2138,8 @@ fn unknown_and_duplicate_fields_are_rejected_in_every_file() {
         // The arsenal.
         (
             File::Arsenal,
-            "(schema_version: 4, entries: [",
-            "(schema_version: 4, mods: 1, entries: [",
+            "(schema_version: 5, entries: [",
+            "(schema_version: 5, mods: 1, entries: [",
             "mods",
             DataErrorKind::UnknownField,
         ),
@@ -2143,8 +2159,8 @@ fn unknown_and_duplicate_fields_are_rejected_in_every_file() {
         ),
         (
             File::Arsenal,
-            "(schema_version: 4, entries: [",
-            "(schema_version: 4, schema_version: 4, entries: [",
+            "(schema_version: 5, entries: [",
+            "(schema_version: 5, schema_version: 5, entries: [",
             "schema_version",
             DataErrorKind::DuplicateField,
         ),
@@ -2361,10 +2377,11 @@ fn other_schema_versions_are_rejected_in_every_file() {
     let cases = [
         (File::Rules, "schema_version: 1,", 0, 1),
         (File::Rules, "schema_version: 1,", 2, 1),
-        (File::Arsenal, "schema_version: 4,", 3, 4),
-        (File::Arsenal, "schema_version: 4,", 2, 4),
-        (File::Arsenal, "schema_version: 4,", 1, 4),
-        (File::Arsenal, "schema_version: 4,", 5, 4),
+        (File::Arsenal, "schema_version: 5,", 4, 5),
+        (File::Arsenal, "schema_version: 5,", 3, 5),
+        (File::Arsenal, "schema_version: 5,", 2, 5),
+        (File::Arsenal, "schema_version: 5,", 1, 5),
+        (File::Arsenal, "schema_version: 5,", 6, 5),
         (File::Skirmish, "schema_version: 3,", 2, 3),
         (File::Skirmish, "schema_version: 3,", 1, 3),
         (File::Skirmish, "schema_version: 3,", 4, 3),

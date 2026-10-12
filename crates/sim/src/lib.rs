@@ -137,8 +137,9 @@ pub use visibility::Vision;
 
 pub mod arsenal;
 pub use arsenal::{
-    ARSENAL_SCHEMA_VERSION, Arsenal, ArsenalEntry, Category, Domain, FactoryGroup, MAX_BUILD_LIMIT,
-    MAX_UNIT_SIZE, Role,
+    ARSENAL_SCHEMA_VERSION, Ability, Arsenal, ArsenalEntry, Category, Domain, FactoryGroup,
+    Launcher, MAX_AMMO, MAX_BUILD_LIMIT, MAX_DOCKS, MAX_SPAWN_TICKS, MAX_SPAWNS, MAX_UNIT_SIZE,
+    Missile, Role,
 };
 
 pub mod special;

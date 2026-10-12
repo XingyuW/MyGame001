@@ -107,6 +107,10 @@
         (unit: "sea_scorpion", cost: 600, build_time: 504, producer: "soviet_naval_shipyard", prerequisites: ["soviet_naval_shipyard", "radar_tower"]), // [HYD] Cost=600, Prerequisite=NAYARD,NARADR
         (unit: "giant_squid", cost: 1000, build_time: 840, producer: "soviet_naval_shipyard", prerequisites: ["soviet_naval_shipyard", "soviet_battle_lab"]), // [SQD] Cost=1000, Prerequisite=NAYARD,NATECH
         (unit: "dreadnought", cost: 2000, build_time: 1680, producer: "soviet_naval_shipyard", prerequisites: ["soviet_naval_shipyard", "soviet_battle_lab"]), // [DRED] Cost=2000, Prerequisite=NAYARD,NATECH
+        (unit: "hornet", cost: 50, build_time: 42, producer: "war_factory", prerequisites: []), // [HORNET] Cost=50
+        (unit: "osprey", cost: 50, build_time: 42, producer: "war_factory", prerequisites: []), // [ASW] Cost=50
+        (unit: "v3_rocket", cost: 50, build_time: 42, producer: "soviet_war_factory", prerequisites: []), // [V3ROCKET] Cost=50
+        (unit: "dred_missile", cost: 50, build_time: 42, producer: "soviet_war_factory", prerequisites: []), // [DMISL] Cost=50
         (unit: "soviet_mcv", cost: 3000, build_time: 2520, producer: "soviet_war_factory", prerequisites: ["soviet_war_factory", "soviet_service_depot"]), // [SMCV] Cost=3000, Prerequisite=NAWEAP,NADEPT
         (unit: "soviet_amphibious_transport", cost: 900, build_time: 756, producer: "soviet_naval_shipyard", prerequisites: ["soviet_naval_shipyard"]), // [SAPC] Cost=900, Prerequisite=NAYARD
         (unit: "chrono_commando", cost: 2000, build_time: 1680, producer: "barracks", prerequisites: ["barracks"]), // [CCOMAND] Cost=2000, Prerequisite=GAPILE

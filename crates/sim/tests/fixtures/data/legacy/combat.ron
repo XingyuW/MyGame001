@@ -16,7 +16,7 @@
 // a small force can still finish a base), armour-piercing shells and rockets for vehicles,
 // explosives for both, and artillery shells for buildings.
 (
-    schema_version: 2,
+    schema_version: 3,
     armour_classes: ["infantry", "light", "heavy", "structure", "air", "naval", "submerged"],
     warheads: [
         (

@@ -13,7 +13,7 @@
 // every target on land and on water attacked alike, nothing underwater, organic or a wall, and
 // no effects.
 (
-    schema_version: 2,
+    schema_version: 3,
     armour_classes: ["soft", "plate", "concrete"],
     warheads: [
         (

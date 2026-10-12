@@ -59,6 +59,39 @@
 //! file: a world whose arsenal gives no unit the `infantry` trait, like a world without an
 //! arsenal, has one unit to a cell as before RA3.
 //!
+//! Schema version 5 (RA4, docs/RA2_PARITY_PLAN.md sections 4.5, 4.7 and 4.8; docs/DECISIONS.md
+//! R46) adds the traits of veterancy, crews, aircraft, spawned units and submerged units:
+//!
+//! * `trainable` (1 or 0, the ini's `Trainable`): units of the type gain experience and ranks.
+//!   `veteran_abilities` and `elite_abilities` list what a rank grants (`VeteranAbilities`,
+//!   `EliteAbilities`): `"stronger"`, `"firepower"`, `"rof"`, `"sight"`, `"faster"`,
+//!   `"self_heal"`, `"scatter"`, each at most once in a list. Units only;
+//! * `crewed` (1 or 0, `Crewed`): a destroyed vehicle may release one crew member, a destroyed
+//!   or sold building releases survivors;
+//! * `self_healing` (1 or 0, `SelfHealing`): the unit regains hit points on its own;
+//! * `ammo` (`Ammo`, 0 to [`MAX_AMMO`]; 0: unlimited): the volleys an aircraft fires before it
+//!   must reload, and `airport_bound` (1 or 0, `AirportBound`): it needs a dock of a building
+//!   with `docks` to be produced, lands there to reload, and is lost without one. Only an
+//!   aircraft with `ammo` may be `airport_bound`;
+//! * `docks` (`NumberOfDocks` of a building that an `AirportBound` aircraft names as its
+//!   `Dock`, 0 to [`MAX_DOCKS`] and at most the cells of its footprint): the aircraft it holds;
+//! * `spawns` (the id of a unit type or `"none"`, `Spawns`), `spawns_number`
+//!   (`SpawnsNumber`, 1 to [`MAX_SPAWNS`]), `spawn_regen` and `spawn_reload` (ticks,
+//!   `SpawnRegenRate` and `SpawnReloadRate`) and `launcher` (`"primary"`, `"secondary"` or
+//!   `"none"`: which of the type's weapons has `Spawner=yes`): the unit launches units of the
+//!   type `spawns`, which fly and may be shot down, with that weapon. The spawned type is an
+//!   aircraft with an entry of its own that spawns nothing;
+//! * `missile` (`"v3"`, `"dmisl"` or `"none"`: the type is the ini's `V3RocketType` or
+//!   `DMislType`): a spawned unit of the type flies to its target and goes off there with the
+//!   combat file's effect of that name, or its elite effect if its launcher is elite;
+//! * `cloakable` (1 or 0, `Cloakable`): a player sees the unit only while one of its units or
+//!   buildings with sensors is near enough, or shortly after the unit fired;
+//! * `sensors_sight` (cells, `SensorsSight` of a type with `Sensors=yes`; 0: no sensors, at
+//!   most [`MAX_SIGHT`](crate::MAX_SIGHT)).
+//!
+//! They are read only by a world with a rules file. A type without any of them, like every type
+//! of the fixtures of M2 to RA3, is as before RA4.
+//!
 //! Countries and prerequisite groups are those of the rules file, so the rules are loaded first
 //! ([`Definitions::with_rules`]); an entry that names one without rules is rejected. With rules,
 //! the base unit of every side must have the role `mcv`, since that role is what deploys.
@@ -73,14 +106,105 @@ use serde::Deserialize;
 use std::{collections::BTreeMap, path::Path};
 
 /// The schema version of the arsenal file this crate reads (2 since RA1, 3 since RA2, 4 since
-/// RA3).
-pub const ARSENAL_SCHEMA_VERSION: i64 = 4;
+/// RA3, 5 since RA4).
+pub const ARSENAL_SCHEMA_VERSION: i64 = 5;
 
 /// Largest `build_limit` of an arsenal entry.
 pub const MAX_BUILD_LIMIT: u32 = 255;
 
 /// Largest `size` of an arsenal entry.
 pub const MAX_UNIT_SIZE: u32 = 255;
+
+/// Largest `ammo` of an arsenal entry.
+pub const MAX_AMMO: u32 = 255;
+
+/// Largest `docks` of an arsenal entry.
+pub const MAX_DOCKS: u32 = 16;
+
+/// Largest `spawns_number` of an arsenal entry.
+pub const MAX_SPAWNS: u32 = 8;
+
+/// Longest `spawn_regen` and `spawn_reload` of an arsenal entry, in ticks (one hour).
+pub const MAX_SPAWN_TICKS: u32 = 72_000;
+
+/// What a rank grants a unit (RA4, docs/RA2_PARITY_PLAN.md section 4.5): a token of the ini's
+/// `VeteranAbilities` and `EliteAbilities`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum Ability {
+    /// Incoming damage is divided by the rules' `armor_pm`.
+    Stronger,
+    /// Weapon damage is multiplied by the rules' `combat_pm`.
+    Firepower,
+    /// The reload of the weapons is multiplied by the rules' `rof_pm`.
+    Rof,
+    /// Sight times the rules' `sight_pm`: nothing with the ini's 0.0 (an assumption).
+    Sight,
+    /// Speed is multiplied by the rules' `speed_pm`.
+    Faster,
+    /// The unit regains hit points on its own.
+    SelfHeal,
+    /// The unit scatters from threats: not modelled.
+    Scatter,
+}
+
+impl Ability {
+    /// Every ability, in the order of their bits.
+    pub const ALL: [Ability; 7] = [
+        Ability::Stronger,
+        Ability::Firepower,
+        Ability::Rof,
+        Ability::Sight,
+        Ability::Faster,
+        Ability::SelfHeal,
+        Ability::Scatter,
+    ];
+
+    /// The id of the ability in the arsenal file.
+    pub fn id(self) -> &'static str {
+        match self {
+            Ability::Stronger => "stronger",
+            Ability::Firepower => "firepower",
+            Ability::Rof => "rof",
+            Ability::Sight => "sight",
+            Ability::Faster => "faster",
+            Ability::SelfHeal => "self_heal",
+            Ability::Scatter => "scatter",
+        }
+    }
+
+    fn parse(id: &str) -> Option<Self> {
+        Self::ALL.into_iter().find(|ability| ability.id() == id)
+    }
+}
+
+/// Which weapon of a type launches the units it spawns (the one with the ini's `Spawner=yes`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum Launcher {
+    Primary,
+    Secondary,
+}
+
+/// The missile a spawned unit type is (RA4, docs/RA2_PARITY_PLAN.md section 4.8): it flies to
+/// its target and goes off there with an area effect of the combat file.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum Missile {
+    /// The ini's `V3RocketType`.
+    V3,
+    /// The ini's `DMislType`.
+    DMisl,
+}
+
+impl Missile {
+    /// The effect the missile goes off with: of an elite launcher, or of any other.
+    pub fn effect(self, elite: bool) -> crate::Effect {
+        match (self, elite) {
+            (Missile::V3, false) => crate::Effect::V3Rocket,
+            (Missile::V3, true) => crate::Effect::V3RocketElite,
+            (Missile::DMisl, false) => crate::Effect::DMisl,
+            (Missile::DMisl, true) => crate::Effect::DMislElite,
+        }
+    }
+}
 
 /// The kind of factory a building is (docs/RA2_PARITY_PLAN.md section 3.3): buildings of one
 /// group produce the same items and share a queue.
@@ -201,6 +325,38 @@ pub struct ArsenalEntry {
     pub size: u32,
     /// The unit is of the infantry type list: on foot unless it flies.
     pub infantry: bool,
+    /// Units of the type gain experience and ranks (RA4).
+    pub trainable: bool,
+    /// What the veteran rank grants.
+    pub veteran_abilities: Vec<Ability>,
+    /// What the elite rank adds.
+    pub elite_abilities: Vec<Ability>,
+    /// A destroyed vehicle may release a crew member; a destroyed or sold building survivors.
+    pub crewed: bool,
+    /// The unit regains hit points on its own.
+    pub self_healing: bool,
+    /// The volleys an aircraft fires before it must reload; 0: unlimited.
+    pub ammo: u32,
+    /// The aircraft needs a dock: to be produced, to reload, and to exist at all.
+    pub airport_bound: bool,
+    /// The aircraft the building holds.
+    pub docks: u32,
+    /// The unit type the unit launches.
+    pub spawns: Option<UnitKind>,
+    /// How many units of the type `spawns` it has.
+    pub spawns_number: u32,
+    /// Ticks until a lost one is replaced.
+    pub spawn_regen: u32,
+    /// Ticks until a returned one is ready again.
+    pub spawn_reload: u32,
+    /// Which of the type's weapons launches them.
+    pub launcher: Option<Launcher>,
+    /// The missile a spawned unit of the type is.
+    pub missile: Option<Missile>,
+    /// A player sees the unit only with sensors near it or shortly after it fired.
+    pub cloakable: bool,
+    /// The radius in cells within which the type detects cloaked units; 0: no sensors.
+    pub sensors_sight: u32,
 }
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Arsenal(pub BTreeMap<ProductionItem, ArsenalEntry>);
@@ -244,6 +400,22 @@ struct Entry {
     crushable: i64,
     size: i64,
     infantry: i64,
+    trainable: i64,
+    veteran_abilities: Vec<String>,
+    elite_abilities: Vec<String>,
+    crewed: i64,
+    self_healing: i64,
+    ammo: i64,
+    airport_bound: i64,
+    docks: i64,
+    spawns: String,
+    spawns_number: i64,
+    spawn_regen: i64,
+    spawn_reload: i64,
+    launcher: String,
+    missile: String,
+    cloakable: i64,
+    sensors_sight: i64,
 }
 static ENTRY: Shape = Shape::Struct(&[
     ("id", Shape::Str),
@@ -301,6 +473,34 @@ static ENTRY: Shape = Shape::Struct(&[
     ("crushable", Shape::Int),
     ("size", Shape::Int),
     ("infantry", Shape::Int),
+    ("trainable", Shape::Int),
+    (
+        "veteran_abilities",
+        Shape::List {
+            entry: &Shape::Str,
+            max: Ability::ALL.len(),
+        },
+    ),
+    (
+        "elite_abilities",
+        Shape::List {
+            entry: &Shape::Str,
+            max: Ability::ALL.len(),
+        },
+    ),
+    ("crewed", Shape::Int),
+    ("self_healing", Shape::Int),
+    ("ammo", Shape::Int),
+    ("airport_bound", Shape::Int),
+    ("docks", Shape::Int),
+    ("spawns", Shape::Str),
+    ("spawns_number", Shape::Int),
+    ("spawn_regen", Shape::Int),
+    ("spawn_reload", Shape::Int),
+    ("launcher", Shape::Str),
+    ("missile", Shape::Str),
+    ("cloakable", Shape::Int),
+    ("sensors_sight", Shape::Int),
 ]);
 static FILE: Shape = Shape::Struct(&[
     (
@@ -578,6 +778,153 @@ impl Arsenal {
                     "a crusher that is not a vehicle on the surface",
                 ));
             }
+            // The traits of RA4 (schema version 5): flags 1 or 0, numbers within their ranges,
+            // and each only on the kind of item that the rules can give it to.
+            let flags = [
+                ("trainable", e.trainable, false),
+                ("crewed", e.crewed, true),
+                ("self_healing", e.self_healing, false),
+                ("airport_bound", e.airport_bound, false),
+                ("cloakable", e.cloakable, false),
+            ];
+            for (name, value, on_buildings) in flags {
+                if !(0..=1).contains(&value) {
+                    return Err(bad(name, &value.to_string()));
+                }
+                if building && !on_buildings && value != 0 {
+                    return Err(bad(name, "a unit trait on a building type"));
+                }
+            }
+            let abilities = |name: &str, ids: &[String]| -> Result<Vec<Ability>, DataError> {
+                let mut found = Vec::with_capacity(ids.len());
+                for (n, id) in ids.iter().enumerate() {
+                    let at = format!("entries[{i}].{name}[{n}]");
+                    let ability = Ability::parse(id).ok_or_else(|| {
+                        err(
+                            at.clone(),
+                            DataErrorKind::InvalidValue {
+                                found: format!("{id:?}"),
+                                expected: "a veteran ability".into(),
+                            },
+                        )
+                    })?;
+                    if found.contains(&ability) {
+                        return Err(err(at, DataErrorKind::DuplicateId(id.clone())));
+                    }
+                    found.push(ability);
+                }
+                if building && !found.is_empty() {
+                    return Err(bad(name, "a unit trait on a building type"));
+                }
+                Ok(found)
+            };
+            let veteran_abilities = abilities("veteran_abilities", &e.veteran_abilities)?;
+            let elite_abilities = abilities("elite_abilities", &e.elite_abilities)?;
+            let numbers = [
+                ("ammo", e.ammo, i64::from(MAX_AMMO), false),
+                ("docks", e.docks, i64::from(MAX_DOCKS), true),
+                (
+                    "spawns_number",
+                    e.spawns_number,
+                    i64::from(MAX_SPAWNS),
+                    false,
+                ),
+                (
+                    "spawn_regen",
+                    e.spawn_regen,
+                    i64::from(MAX_SPAWN_TICKS),
+                    false,
+                ),
+                (
+                    "spawn_reload",
+                    e.spawn_reload,
+                    i64::from(MAX_SPAWN_TICKS),
+                    false,
+                ),
+                (
+                    "sensors_sight",
+                    e.sensors_sight,
+                    i64::from(crate::MAX_SIGHT),
+                    true,
+                ),
+            ];
+            for (name, value, max, on_buildings) in numbers {
+                if !(0..=max).contains(&value) {
+                    return Err(bad(name, &value.to_string()));
+                }
+                if building && !on_buildings && value != 0 {
+                    return Err(bad(name, "a unit trait on a building type"));
+                }
+            }
+            if !building && e.docks != 0 {
+                return Err(bad("docks", "a building trait on a unit type"));
+            }
+            if let ProductionItem::Building(kind) = item
+                && let Some(def) = defs.building(kind)
+                && e.docks > i64::from(def.width) * i64::from(def.height)
+            {
+                return Err(bad("docks", "more docks than cells of the footprint"));
+            }
+            if e.airport_bound == 1 && (domain != Domain::Air || e.ammo == 0) {
+                return Err(bad(
+                    "airport_bound",
+                    "an airport bound unit that is no aircraft with ammunition",
+                ));
+            }
+            let spawns = match e.spawns.as_str() {
+                "none" => None,
+                id => Some(defs.unit_kind(id).ok_or_else(|| {
+                    err(
+                        format!("entries[{i}].spawns"),
+                        DataErrorKind::UnknownReference {
+                            kind: "unit".into(),
+                            id: id.into(),
+                        },
+                    )
+                })?),
+            };
+            let launcher = match e.launcher.as_str() {
+                "none" => None,
+                "primary" => Some(Launcher::Primary),
+                "secondary" => Some(Launcher::Secondary),
+                _ => return Err(bad("launcher", &e.launcher)),
+            };
+            let missile = match e.missile.as_str() {
+                "none" => None,
+                "v3" => Some(Missile::V3),
+                "dmisl" => Some(Missile::DMisl),
+                _ => return Err(bad("missile", &e.missile)),
+            };
+            if building && (spawns.is_some() || launcher.is_some() || missile.is_some()) {
+                return Err(bad("spawns", "a unit trait on a building type"));
+            }
+            match spawns {
+                Some(spawned) => {
+                    if item == ProductionItem::Unit(spawned) {
+                        return Err(bad("spawns", "a unit that spawns its own type"));
+                    }
+                    if e.spawns_number == 0 {
+                        return Err(bad("spawns_number", "a spawner of no units"));
+                    }
+                    if e.spawn_regen == 0 {
+                        return Err(bad("spawn_regen", "a spawner that never replaces a unit"));
+                    }
+                    if launcher.is_none() {
+                        return Err(bad("launcher", "a spawner without a launcher"));
+                    }
+                }
+                None => {
+                    if e.spawns_number != 0 || e.spawn_regen != 0 || e.spawn_reload != 0 {
+                        return Err(bad("spawns", "spawn terms without a spawned type"));
+                    }
+                    if launcher.is_some() {
+                        return Err(bad("launcher", "a launcher that spawns nothing"));
+                    }
+                }
+            }
+            if missile.is_some() && domain != Domain::Air {
+                return Err(bad("missile", "a missile that does not fly"));
+            }
             result.insert(
                 item,
                 ArsenalEntry {
@@ -611,8 +958,53 @@ impl Arsenal {
                     crushable: e.crushable == 1,
                     size: e.size as u32,
                     infantry: e.infantry == 1,
+                    trainable: e.trainable == 1,
+                    veteran_abilities,
+                    elite_abilities,
+                    crewed: e.crewed == 1,
+                    self_healing: e.self_healing == 1,
+                    ammo: e.ammo as u32,
+                    airport_bound: e.airport_bound == 1,
+                    docks: e.docks as u32,
+                    spawns,
+                    spawns_number: e.spawns_number as u32,
+                    spawn_regen: e.spawn_regen as u32,
+                    spawn_reload: e.spawn_reload as u32,
+                    launcher,
+                    missile,
+                    cloakable: e.cloakable == 1,
+                    sensors_sight: e.sensors_sight as u32,
                 },
             );
+        }
+        // A spawned type is an aircraft with an entry of its own, and spawns nothing itself.
+        for (item, entry) in &result {
+            let Some(spawned) = entry.spawns else {
+                continue;
+            };
+            let fits = result
+                .get(&ProductionItem::Unit(spawned))
+                .is_some_and(|other| other.domain == Domain::Air && other.spawns.is_none());
+            if !fits {
+                let id = match item {
+                    ProductionItem::Unit(kind) => defs.unit(*kind).map(|def| def.id.clone()),
+                    ProductionItem::Building(_) => None,
+                };
+                return Err(err(
+                    "entries".into(),
+                    DataErrorKind::InvalidValue {
+                        found: format!(
+                            "{:?} spawns {:?}",
+                            id.unwrap_or_default(),
+                            defs.unit(spawned)
+                                .map_or_else(String::new, |def| def.id.clone())
+                        ),
+                        expected:
+                            "a spawned type that is an aircraft of the arsenal and spawns nothing"
+                                .into(),
+                    },
+                ));
+            }
         }
         // The base unit of a side deploys into its construction yard through the role `mcv`
         // (`crate::special`), so the rules' base units must have it.
@@ -693,6 +1085,34 @@ impl Arsenal {
                 u8::from(e.infantry),
             ]);
             h.write_u32(e.size);
+            // RA4: the traits of schema version 5.
+            let bits = |abilities: &[Ability]| {
+                abilities
+                    .iter()
+                    .fold(0u8, |bits, &ability| bits | (1 << ability as u8))
+            };
+            h.write(&[
+                u8::from(e.trainable),
+                bits(&e.veteran_abilities),
+                bits(&e.elite_abilities),
+                u8::from(e.crewed),
+                u8::from(e.self_healing),
+                u8::from(e.airport_bound),
+                e.launcher.map_or(u8::MAX, |launcher| launcher as u8),
+                e.missile.map_or(u8::MAX, |missile| missile as u8),
+                u8::from(e.cloakable),
+            ]);
+            h.write(&e.spawns.map_or(u16::MAX, |kind| kind.0).to_le_bytes());
+            for value in [
+                e.ammo,
+                e.docks,
+                e.spawns_number,
+                e.spawn_regen,
+                e.spawn_reload,
+                e.sensors_sight,
+            ] {
+                h.write_u32(value);
+            }
         }
     }
 }
@@ -854,6 +1274,31 @@ impl Definitions {
     /// Whether any unit type is a crusher: without one nothing is ever crushed.
     pub fn has_crushers(&self) -> bool {
         self.arsenal.0.values().any(|e| e.crusher)
+    }
+    /// Whether units of type `kind` gain experience and ranks (RA4: the arsenal's `trainable`,
+    /// with a rules file).
+    pub fn trainable(&self, kind: UnitKind) -> bool {
+        self.rules().is_some()
+            && self
+                .metadata(ProductionItem::Unit(kind))
+                .is_some_and(|e| e.trainable)
+    }
+    /// What a unit of type `kind` has of `ability` at `rank` (0 none, 1 veteran, 2 elite): a
+    /// veteran has the type's `veteran_abilities`, an elite unit those and its
+    /// `elite_abilities`, each once (docs/RA2_PARITY_PLAN.md section 4.5).
+    pub fn has_ability(&self, kind: UnitKind, rank: u8, ability: Ability) -> bool {
+        self.metadata(ProductionItem::Unit(kind)).is_some_and(|e| {
+            (rank >= 1 && e.veteran_abilities.contains(&ability))
+                || (rank >= 2 && e.elite_abilities.contains(&ability))
+        })
+    }
+    /// The unit types that some type of the arsenal spawns (RA4, with a rules file): missiles
+    /// and carried aircraft, which belong to the unit that launched them.
+    pub fn spawned_kinds(&self) -> std::collections::BTreeSet<UnitKind> {
+        if self.rules().is_none() {
+            return std::collections::BTreeSet::new();
+        }
+        self.arsenal.0.values().filter_map(|e| e.spawns).collect()
     }
     pub fn category(&self, item: ProductionItem) -> Category {
         self.metadata(item).map_or(

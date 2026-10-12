@@ -222,7 +222,28 @@ UNITS = {
         'artillery'),
     'dreadnought': ('Dreadnought', 'Specialized naval combat. Select and right click an enemy to attack.', 'vehicles', 'naval', 'combat', 100, 2, 20, 0,
         'artillery'),
+    # The spawned units of RA4 (docs/DECISIONS.md R50): launched by their carrier or launcher,
+    # never produced and never commanded.
+    'hornet': ('Hornet', 'Carrier aircraft: launched by its Aircraft Carrier, it bombs the target and returns.', 'vehicles', 'air', 'combat', 100, 2, 20, 0,
+        'scout'),
+    'osprey': ('Osprey', 'Destroyer aircraft: launched against submerged targets, it returns to its Destroyer.', 'vehicles', 'air', 'combat', 100, 2, 20, 0,
+        'scout'),
+    'v3_rocket': ('V3 Rocket', 'A rocket in flight. Anti air fire can shoot it down.', 'vehicles', 'air', 'combat', 100, 2, 20, 0,
+        'rocket_launcher'),
+    'dred_missile': ('Dreadnought Missile', 'A missile in flight. Anti air fire can shoot it down.', 'vehicles', 'air', 'combat', 100, 2, 20, 0,
+        'rocket_launcher'),
 }
+# Items that show the art of another item (arsenal.ron `art`) instead of their own: the id whose
+# miniature the game draws (docs/DECISIONS.md R52).
+ART = {
+    'hornet': 'harrier',
+    'osprey': 'nighthawk',
+}
+# The tokens of `VeteranAbilities` and `EliteAbilities` the arsenal file knows
+# (crates/sim/src/arsenal.rs, `Ability`).
+ABILITIES = ("STRONGER", "FIREPOWER", "ROF", "SIGHT", "FASTER", "SELF_HEAL", "SCATTER")
+# The missiles: the arsenal's `missile` by the key of [General] that names the type.
+MISSILES = (("v3", "V3RocketType"), ("dmisl", "DMislType"))
 # The armour types in the order of a warhead's `Verses` (docs/RA2_PARITY_PLAN.md appendix D).
 ARMOURS = (
     "none", "flak", "plate", "light", "medium", "heavy", "wood", "steel", "concrete",
@@ -243,6 +264,8 @@ NOT_CARRIED = {
     "Sapper": "C4 on ships (RA6)",
     "FakeC4": "C4 (RA6)",
     "PrismSupport": "the support beam of the prism chain (RA6)",
+    "HornetCollision": "a spawned aircraft attacks only what its carrier fires at, never an aircraft",
+    "ASWCollision": "a spawned aircraft attacks only what its destroyer fires at, never an aircraft",
 }
 # Values of a weapon that are the game's own instead of the ini's, each a row of
 # ra2_differences.tsv: stand-ins for mechanics of a later milestone (docs/DECISIONS.md R36).
@@ -297,6 +320,11 @@ EFFECTS = (
     ("ivan_bomb", ("CombatDamage", "IvanDamage"), ("CombatDamage", "IvanWarhead")),
     ("c4", 200, ("CombatDamage", "C4Warhead")),
     ("radiation", 20, ("Radiation", "RadSiteWarhead")),
+    # RA4: the impact of the spawned missiles, and of each when its launcher is elite.
+    ("v3_rocket", ("General", "V3RocketDamage"), ("CombatDamage", "V3Warhead")),
+    ("v3_rocket_elite", ("General", "V3RocketEliteDamage"), ("CombatDamage", "V3EliteWarhead")),
+    ("dmisl", ("General", "DMislDamage"), ("CombatDamage", "DMislWarhead")),
+    ("dmisl_elite", ("General", "DMislEliteDamage"), ("CombatDamage", "DMislEliteWarhead")),
 )
 # The limits of the combat file (crates/sim/src/combat_defs.rs).
 MIN_PROJECTILE_SPEED = 16
@@ -330,7 +358,7 @@ NEW_UNITS = {
 # difference listed in ra2_differences.tsv).
 SHIPYARD_ADJACENT = 31
 # Mapped ids that enter the game in a later milestone, by the note of ra2_mapping.tsv.
-LATER = ("spawned", "tech_building", "support")
+LATER = ("tech_building", "support")
 # Units the ini produces only with stolen technology: in the data, not producible until RA6.
 STOLEN = ("RequiresStolenAlliedTech", "RequiresStolenSovietTech")
 
@@ -774,6 +802,47 @@ class Item:
             flag("Crushable", "yes" if self.infantry else "no") if unit else 0
         )
         self.size = int(section.get("Size", "1")) if unit else 0
+        # The traits of RA4 (docs/DECISIONS.md R46). `Trainable` is yes for a unit and no for
+        # a building without the key (ModEnc); the abilities are the tokens of the two lists.
+        self.trainable = flag("Trainable", "yes") if unit else 0
+        self.abilities = {}
+        for key in ("VeteranAbilities", "EliteAbilities"):
+            tokens = [token.upper() for token in section.get(key, "").split(",") if token]
+            for token in tokens:
+                if token not in ABILITIES:
+                    raise Failure(f"{game_id}: the arsenal has no ability {token}")
+            self.abilities[key] = [token.lower() for token in tokens] if unit else []
+        self.crewed = flag("Crewed", "no")
+        self.self_healing = flag("SelfHealing", "no") if unit else 0
+        # `Ammo=-1` (the default) is unlimited, which the arsenal writes as 0.
+        self.ammo = max(0, int(section.get("Ammo", "-1"))) if unit else 0
+        self.airport_bound = flag("AirportBound", "no") if unit else 0
+        self.cloakable = flag("Cloakable", "no") if unit else 0
+        self.sensors_sight = (
+            int(section.get("SensorsSight", "0")) if flag("Sensors", "no") else 0
+        )
+        self.spawns = tables.game_id(section["Spawns"]) if unit and "Spawns" in section else None
+        self.spawns_number = int(section["SpawnsNumber"]) if self.spawns else 0
+        # A rate of 0 frames stays 0 (the missiles never return to be reloaded).
+        ticks = lambda key: (
+            convert("frames", section[key]) if number(section.get(key, "0")) > 0 else 0
+        )
+        self.spawn_regen = ticks("SpawnRegenRate") if self.spawns else 0
+        self.spawn_reload = ticks("SpawnReloadRate") if self.spawns else 0
+        # The launcher is the weapon with `Spawner=yes`.
+        self.launcher = "none"
+        for slot, key in (("primary", "Primary"), ("secondary", "Secondary")):
+            weapon = section.get(key)
+            if self.spawns and weapon and weapon in tables.rules:
+                if convert("flag", tables.rules[weapon].get("Spawner", "no")):
+                    self.launcher = slot
+        if self.spawns and self.launcher == "none":
+            raise Failure(f"{game_id}: it spawns units and has no weapon with Spawner=yes")
+        self.missile = "none"
+        self.missile_key = None
+        for missile, key in MISSILES:
+            if unit and tables.value("General", key) == self.section_name:
+                self.missile, self.missile_key = missile, key
 
     def build_time(self, tables):
         """Ticks of build time (section 4.2): the cost times `BuildSpeed` game minutes per 1000
@@ -800,7 +869,7 @@ def game_tables(tables):
     for game_id, (label, twin) in NEW_BUILDINGS.items():
         buildings[game_id] = (label,) + BUILDINGS[twin][1:] + (twin,)
     for game_id, values in UNITS.items():
-        units[game_id] = values + (game_id,)
+        units[game_id] = values + (ART.get(game_id, game_id),)
     for game_id, (label, twin) in NEW_UNITS.items():
         units[game_id] = (label,) + UNITS[twin][1:] + (twin,)
     for game_id, (kind, _, _, _) in tables.primary.items():
@@ -822,6 +891,26 @@ class Data:
             self.tables.game_id(section)
             for section in self.tables.value("General", "PadAircraft").split(",")
         ]
+        # RA4: a building has the docks of its `NumberOfDocks` if an `AirportBound` aircraft
+        # names it as its `Dock`; every such aircraft must name the same buildings, since the
+        # arsenal lets an airport bound aircraft land on every building with docks.
+        docks = None
+        for item in self.items.values():
+            item.docks = 0
+            if item.airport_bound:
+                named = sorted(
+                    self.tables.game_id(section) for section in item.ini["Dock"].split(",")
+                )
+                if docks is not None and docks != named:
+                    raise Failure(f"{item.id}: its docks are not those of the other aircraft")
+                docks = named
+        for game_id in docks or []:
+            self.items[game_id].docks = int(self.items[game_id].ini["NumberOfDocks"])
+            self.items[game_id].dock_users = ", ".join(
+                f"[{item.section_name}] Dock={item.ini['Dock']}"
+                for item in self.items.values()
+                if item.airport_bound
+            )
 
     # The factory of a side that produces the items of a factory group.
     def factory(self, group, side):
@@ -1048,8 +1137,9 @@ class Data:
     def combat_file(self):
         tables = self.tables
         lines = [
-            "// Combat definitions, schema version 2 (crates/sim/src/combat_defs.rs; PLAN.md sections 5 and",
-            "// 7, M4; docs/RA2_PARITY_PLAN.md sections 4.3 and 4.4; docs/DECISIONS.md D28, R32 to R36).",
+            "// Combat definitions, schema version 3 (crates/sim/src/combat_defs.rs; PLAN.md sections 5 and",
+            "// 7, M4; docs/RA2_PARITY_PLAN.md sections 4.3, 4.4 and 4.8; docs/DECISIONS.md D28, R32 to R36,",
+            "// R46).",
             "//",
             "// armour_classes: the eleven armour types, in the order of a warhead's `Verses`",
             "// warheads:   the percentage of a weapon's base damage each warhead deals against every armour",
@@ -1073,7 +1163,9 @@ class Data:
             "//             underwater and organic; a building with a weapon is a defensive structure, which",
             "//             does not fire under low power if it is `powered` and consumes power",
             "//             (arsenal.ron, economy.ron)",
-            "// effects:    base damage and warhead of the area effects that are no weapon of a type",
+            "// effects:    base damage and warhead of the area effects that are no weapon of a type; since",
+            "//             schema version 3 (RA4) also of the two spawned missiles, and of each when its",
+            "//             launcher is elite",
             "//",
             "// Everything is ported from the ini, except what a comment calls the game's own: stand-ins for",
             "// the spawned missiles and aircraft of RA4 and the specialists of RA6, each listed with its",
@@ -1081,7 +1173,7 @@ class Data:
             "//",
             GENERATED,
             "(",
-            "    schema_version: 2,",
+            "    schema_version: 3,",
             f"    armour_classes: {quoted(ARMOURS)},",
             "    warheads: [",
         ]
@@ -1171,7 +1263,7 @@ class Data:
 
     def arsenal_file(self):
         lines = [
-            "// The arsenal, schema version 4 (crates/sim/src/arsenal.rs; docs/DECISIONS.md R10, R11, R22, R6): per",
+            "// The arsenal, schema version 5 (crates/sim/src/arsenal.rs; docs/DECISIONS.md R10, R11, R22, R6, R46): per",
             "// item its label, description, category, domain and role with the role's terms (durations in ticks,",
             "// 20 per second), the id of the item whose art it shows, its side, the factory group of a",
             "// building, and the terms of the ini's buildability rule: the sides whose factories build it",
@@ -1199,8 +1291,19 @@ class Data:
             "// (`Size`; 1 without the key: the room it takes in a transport, not read yet). A building",
             "// has 0 in all of them.",
             "//",
+            "// Since schema version 5 (RA4, docs/DECISIONS.md R46): trainable (`Trainable`; 1 for a unit",
+            "// without the key) with veteran_abilities and elite_abilities (the tokens of",
+            "// `VeteranAbilities` and `EliteAbilities`); crewed (`Crewed`); self_healing",
+            "// (`SelfHealing`); ammo (`Ammo`; 0: unlimited) and airport_bound (`AirportBound`) of an",
+            "// aircraft, and docks of a building (`NumberOfDocks`, if an airport bound aircraft names",
+            "// it as its `Dock`); spawns, spawns_number, spawn_regen and spawn_reload (`Spawns`,",
+            "// `SpawnsNumber`, and `SpawnRegenRate` and `SpawnReloadRate` frames x 4 / 3 in ticks) with",
+            "// launcher (which weapon has `Spawner=yes`); missile (the type is [General]",
+            "// `V3RocketType` or `DMislType`); cloakable (`Cloakable`) and sensors_sight",
+            "// (`SensorsSight` in cells of a type with `Sensors=yes`).",
+            "//",
             GENERATED,
-            "(schema_version: 4, entries: [",
+            "(schema_version: 5, entries: [",
         ]
         for table in (self.buildings, self.units):
             for game_id, values in table.items():
@@ -1210,8 +1313,11 @@ class Data:
                 )
                 keys = ["Owner", "RequiredHouses", "ForbiddenHouses", "TechLevel", "Prerequisite"]
                 keys += ["Factory", "Naval"] + list(STOLEN)
+                keys += ["Crewed", "Sensors", "SensorsSight"]
                 if item.kind == "unit":
-                    keys += ["Crusher", "Crushable", "Size"]
+                    keys += ["Crusher", "Crushable", "Size", "Trainable", "VeteranAbilities"]
+                    keys += ["EliteAbilities", "SelfHealing", "Ammo", "AirportBound", "Spawns"]
+                    keys += ["SpawnsNumber", "SpawnRegenRate", "SpawnReloadRate", "Cloakable"]
                     # The game's categories and domains are its own tables: they must agree
                     # with the type list, and a crusher must be a vehicle on the surface.
                     if (category == "infantry") != bool(item.infantry):
@@ -1232,6 +1338,13 @@ class Data:
                         source += f"; {cite(item.special, 'IsPowered', special)}"
                     if item.far_shipyard:
                         source += "; adjacent is the game's own (ra2_differences.tsv)"
+                    if item.docks:
+                        source += f"; NumberOfDocks={item.ini['NumberOfDocks']}; {item.dock_users}"
+                if item.launcher != "none":
+                    weapon = item.ini["Primary" if item.launcher == "primary" else "Secondary"]
+                    source += f"; [{weapon}] Spawner=yes"
+                if item.missile_key:
+                    source += f"; {cite('General', item.missile_key, self.tables.section('General'))}"
                 # A unit's `BuildLimit` (Yuri Prime) is not ported until the unit can be built
                 # (RA6); ra2_differences.tsv lists it.
                 limit = item.build_limit if item.kind == "building" else 0
@@ -1251,7 +1364,17 @@ class Data:
                     f"powered: {item.powered}, is_powered: {item.is_powered}, "
                     f"unit_repair: {item.unit_repair}, crusher: {item.crusher}, "
                     f"crushable: {item.crushable}, size: {item.size}, "
-                    f"infantry: {item.infantry}),"
+                    f"infantry: {item.infantry}, trainable: {item.trainable}, "
+                    f"veteran_abilities: {quoted(item.abilities['VeteranAbilities'])}, "
+                    f"elite_abilities: {quoted(item.abilities['EliteAbilities'])}, "
+                    f"crewed: {item.crewed}, self_healing: {item.self_healing}, "
+                    f"ammo: {item.ammo}, airport_bound: {item.airport_bound}, "
+                    f"docks: {item.docks}, "
+                    f'spawns: "{item.spawns or "none"}", '
+                    f"spawns_number: {item.spawns_number}, "
+                    f"spawn_regen: {item.spawn_regen}, spawn_reload: {item.spawn_reload}, "
+                    f'launcher: "{item.launcher}", missile: "{item.missile}", '
+                    f"cloakable: {item.cloakable}, sensors_sight: {item.sensors_sight}),"
                     f" // {source}"
                 )
         lines.append("])")

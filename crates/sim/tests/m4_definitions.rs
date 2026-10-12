@@ -491,17 +491,17 @@ fn every_field_is_required_and_unknown_fields_are_rejected() {
 }
 
 #[test]
-fn schema_versions_other_than_2_are_rejected() {
-    for version in [0, 1, 3, -1, i64::MIN, i64::MAX] {
+fn schema_versions_other_than_3_are_rejected() {
+    for version in [0, 1, 2, 4, -1, i64::MIN, i64::MAX] {
         assert_rejected(
             &variant(
                 &format!("version_{version}"),
-                &[("schema_version: 2,", &format!("schema_version: {version},"))],
+                &[("schema_version: 3,", &format!("schema_version: {version},"))],
             ),
             "schema_version",
             DataErrorKind::UnsupportedSchemaVersion {
                 found: version,
-                expected: 2,
+                expected: 3,
             },
         );
     }
@@ -692,7 +692,7 @@ fn generated(
     })
     .collect();
     let text = format!(
-        "(schema_version: 2, armour_classes: [{}], warheads: [{}], weapons: [{}], units: [{}], \
+        "(schema_version: 3, armour_classes: [{}], warheads: [{}], weapons: [{}], units: [{}], \
          buildings: [{}], effects: [])",
         class_names.join(", "),
         warhead_list.join(",\n"),

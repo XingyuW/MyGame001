@@ -3,7 +3,7 @@
 // buildings; shells harm everything. The Soviet miner is armed, as the War Miner is. Fixture
 // data (invariant I10).
 (
-    schema_version: 2,
+    schema_version: 3,
     armour_classes: ["flesh", "plate", "concrete"],
     warheads: [
         (id: "bullet", cell_spread: 0, percent_at_max: 100, wall: 1, wood: 1, versus: [(armour: "flesh", percent: 100), (armour: "plate", percent: 20), (armour: "concrete", percent: 10)]),

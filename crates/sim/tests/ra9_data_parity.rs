@@ -162,7 +162,7 @@ fn combat_mapping() -> CombatMapping {
 const COMBAT_PREFIXES: [&str; 3] = ["weapon.", "warhead.", "effect."];
 
 /// The notes of mapped sections whose items enter the game in a later milestone.
-const LATER: [&str; 3] = ["spawned", "tech_building", "support"];
+const LATER: [&str; 2] = ["tech_building", "support"];
 
 /// The intentional differences, and which of them the audit met.
 struct Differences {
@@ -838,6 +838,197 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
             );
         }
 
+        // RA4. The traits of schema version 5 (docs/DECISIONS.md R46): `Crewed` (no without
+        // the key) and `SensorsSight` of a type with `Sensors=yes` for every item; for a unit
+        // `Trainable` (yes without the key), the tokens of `VeteranAbilities` and
+        // `EliteAbilities`, `SelfHealing`, `Ammo` (unlimited without the key: 0),
+        // `AirportBound`, `Cloakable`, the spawned type with its number and its two rates in
+        // ticks (0 frames stay 0), the weapon with `Spawner=yes`, and whether the type is
+        // `[General] V3RocketType` or `DMislType`; for a building `NumberOfDocks` if a
+        // mapped `AirportBound` aircraft names it as its `Dock`.
+        {
+            let (crewed, text) = flag("Crewed", "no");
+            differences.check(
+                id,
+                "crewed",
+                &u8::from(entry.crewed).to_string(),
+                &crewed.to_string(),
+                text,
+            );
+            let (sensors, _) = flag("Sensors", "no");
+            let sight = value("SensorsSight").unwrap_or("0");
+            differences.check(
+                id,
+                "sensors_sight",
+                &entry.sensors_sight.to_string(),
+                &(sensors * convert(Conversion::Int, sight)).to_string(),
+                sight,
+            );
+            let users: Vec<&Mapped> = mapping
+                .iter()
+                .filter(|other| {
+                    !other.building
+                        && !LATER.contains(&other.note.as_str())
+                        && reference
+                            .get(&other.section, "AirportBound")
+                            .is_some_and(|text| convert(Conversion::Flag, text) == 1)
+                        && list(reference.get(&other.section, "Dock"))
+                            .contains(&row.section.as_str())
+                })
+                .collect();
+            let docks = value("NumberOfDocks").unwrap_or("0");
+            let expected = if row.building && !users.is_empty() {
+                convert(Conversion::Int, docks)
+            } else {
+                0
+            };
+            differences.check(
+                id,
+                "docks",
+                &entry.docks.to_string(),
+                &expected.to_string(),
+                docks,
+            );
+        }
+        if row.building {
+            assert!(
+                !entry.trainable
+                    && entry.veteran_abilities.is_empty()
+                    && entry.elite_abilities.is_empty()
+                    && !entry.self_healing
+                    && entry.ammo == 0
+                    && !entry.airport_bound
+                    && !entry.cloakable
+                    && entry.spawns.is_none()
+                    && entry.launcher.is_none()
+                    && entry.missile.is_none(),
+                "{id}: a building has no trait of a unit"
+            );
+        } else {
+            for (field, game, key, default) in [
+                ("trainable", entry.trainable, "Trainable", "yes"),
+                ("self_healing", entry.self_healing, "SelfHealing", "no"),
+                ("airport_bound", entry.airport_bound, "AirportBound", "no"),
+                ("cloakable", entry.cloakable, "Cloakable", "no"),
+            ] {
+                let (expected, text) = flag(key, default);
+                differences.check(
+                    id,
+                    field,
+                    &u8::from(game).to_string(),
+                    &expected.to_string(),
+                    text,
+                );
+            }
+            for (field, game, key) in [
+                (
+                    "veteran_abilities",
+                    &entry.veteran_abilities,
+                    "VeteranAbilities",
+                ),
+                ("elite_abilities", &entry.elite_abilities, "EliteAbilities"),
+            ] {
+                let tokens = value(key).unwrap_or("");
+                let expected = list(Some(tokens))
+                    .into_iter()
+                    .map(str::to_ascii_lowercase)
+                    .collect();
+                let game = game.iter().map(|ability| ability.id().to_owned()).collect();
+                differences.check(id, field, &joined(game), &joined(expected), tokens);
+            }
+            let ammo = value("Ammo").unwrap_or("-1");
+            differences.check(
+                id,
+                "ammo",
+                &entry.ammo.to_string(),
+                &convert(Conversion::Int, ammo).max(0).to_string(),
+                ammo,
+            );
+            let spawns = value("Spawns");
+            differences.check(
+                id,
+                "spawns",
+                &entry
+                    .spawns
+                    .and_then(|kind| definitions.unit(kind))
+                    .map_or("none".to_owned(), |unit| unit.id.clone()),
+                spawns.map_or("none", |section| {
+                    game_id_of
+                        .get(section)
+                        .unwrap_or_else(|| panic!("[{}] spawns unmapped {section}", row.section))
+                }),
+                spawns.unwrap_or(""),
+            );
+            let ticks = |key: &str| {
+                let text = value(key).filter(|_| spawns.is_some()).unwrap_or("0");
+                let frames = decimal(text);
+                (
+                    if frames.0 == 0 {
+                        0
+                    } else {
+                        convert(Conversion::Frames, text)
+                    },
+                    text,
+                )
+            };
+            let number = value("SpawnsNumber")
+                .filter(|_| spawns.is_some())
+                .unwrap_or("0");
+            for (field, game, (expected, text)) in [
+                (
+                    "spawns_number",
+                    entry.spawns_number,
+                    (convert(Conversion::Int, number), number),
+                ),
+                ("spawn_regen", entry.spawn_regen, ticks("SpawnRegenRate")),
+                ("spawn_reload", entry.spawn_reload, ticks("SpawnReloadRate")),
+            ] {
+                differences.check(id, field, &game.to_string(), &expected.to_string(), text);
+            }
+            let spawner = |key: &str| {
+                value(key).is_some_and(|weapon| {
+                    reference
+                        .0
+                        .get(weapon)
+                        .and_then(|section| section.get("Spawner"))
+                        .is_some_and(|text| convert(Conversion::Flag, text) == 1)
+                })
+            };
+            let expected = match (spawns.is_some(), spawner("Primary"), spawner("Secondary")) {
+                (true, _, true) => "secondary",
+                (true, true, false) => "primary",
+                _ => "none",
+            };
+            differences.check(
+                id,
+                "launcher",
+                match entry.launcher {
+                    None => "none",
+                    Some(sim::Launcher::Primary) => "primary",
+                    Some(sim::Launcher::Secondary) => "secondary",
+                },
+                expected,
+                value("Spawns").unwrap_or(""),
+            );
+            let named = |key: &str| reference.value("General", key) == row.section;
+            let expected = match (named("V3RocketType"), named("DMislType")) {
+                (true, _) => "v3",
+                (_, true) => "dmisl",
+                _ => "none",
+            };
+            differences.check(
+                id,
+                "missile",
+                match entry.missile {
+                    None => "none",
+                    Some(sim::Missile::V3) => "v3",
+                    Some(sim::Missile::DMisl) => "dmisl",
+                },
+                expected,
+                &row.section,
+            );
+        }
+
         // Prerequisites: the buildings of the economy file and the groups of the arsenal against
         // the tokens of `Prerequisite`, a group token being one of `[General] Prerequisite...`.
         let game: Vec<String> = terms
@@ -1190,7 +1381,7 @@ fn every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_d
     // commando and the pulse of a radiation zone are mechanics of M9 with a damage of the
     // game's own until RA6; their warheads are the ini's.
     type Key = (&'static str, &'static str);
-    let effects: [(sim::Effect, Option<Key>, Key); 5] = [
+    let effects: [(sim::Effect, Option<Key>, Key); 9] = [
         (
             sim::Effect::Nuke,
             Some(("NukePayload", "Damage")),
@@ -1211,6 +1402,27 @@ fn every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_d
             sim::Effect::Radiation,
             None,
             ("Radiation", "RadSiteWarhead"),
+        ),
+        // RA4: the spawned missiles, and each of an elite launcher.
+        (
+            sim::Effect::V3Rocket,
+            Some(("General", "V3RocketDamage")),
+            ("CombatDamage", "V3Warhead"),
+        ),
+        (
+            sim::Effect::V3RocketElite,
+            Some(("General", "V3RocketEliteDamage")),
+            ("CombatDamage", "V3EliteWarhead"),
+        ),
+        (
+            sim::Effect::DMisl,
+            Some(("General", "DMislDamage")),
+            ("CombatDamage", "DMislWarhead"),
+        ),
+        (
+            sim::Effect::DMislElite,
+            Some(("General", "DMislEliteDamage")),
+            ("CombatDamage", "DMislEliteWarhead"),
         ),
     ];
     assert_eq!(effects.map(|(effect, ..)| effect), sim::Effect::ALL);
