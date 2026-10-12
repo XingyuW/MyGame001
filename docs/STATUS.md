@@ -374,6 +374,211 @@ where the original greys the cameo. The build limit of Yuri Prime is not in the 
 - No art or sound was added; none of the above was seen on a display (the session was
   locked).
 
+### RA3: armour, warheads and weapons; infantry sub cells and crushing (2026-10-12)
+
+Carried out by two implementers: RA3-A (the plan's items 1 to 5, 7 and the first half of 9;
+commits `1160c41` to `d43169b`) and RA3-B (items 6, 8 and the rest of 9; commits `f03aecd` to
+`6241416` and the commit of this entry).
+
+**The one amendment of an invariant: I6 is I6' now, flagged for the final reviewer.** *A
+surface cell holds at most one vehicle or at most three infantry and never both; an air cell
+holds at most one aircraft; no unit occupies a cell covered by a building.* Decision R6 has the
+spot layout, the grid's rule, every caller that was reviewed, what changed in the hash, the
+soak's check, the tests, and the measurement that no fixture scenario moved; PLAN.md section 6
+has a note under its table. R6 item 11 lists what the reviewer should check.
+
+**What was done** (the numbers are those of the plan entry's "Change" list).
+1. *`combat.ron`, schema 2 (R32).* Eleven armour types; warheads with `cell_spread`,
+   `percent_at_max`, `wall`, `wood`; weapons with `min_range`, `burst`, `anti_air`,
+   `anti_ground`, `scatter`; a type has up to two weapons, elite weapons, `air_range_bonus`,
+   `land_targeting`, `naval_targeting`, `underwater`, `organic`, `wall`; a list of `effects`.
+   45 warheads and 90 weapons ported and audited; 37 intentional differences listed.
+   `MAX_DATA_FILE_BYTES` is 128 KiB.
+2. *One damage path (R33, R35).* Every shot, bomb, suicide unit, superweapon and radiation
+   pulse is an impact of a warhead at a point: the target in full, everything of the layer
+   within the spread by the linear falloff, a building once per footprint cell inside it,
+   friend and foe alike, at most `max_damage`. `special::blast` remains only for worlds
+   without an `effects` entry (the legacy fixture).
+3. *Weapon selection (R34).* Primary or secondary by the target's layer, the type's targeting
+   codes and what the warhead damages; 1 percent is attacked only on order; bursts; minimum
+   range; the air range bonus.
+4. *Scatter (R34).* The two flak projectiles land around their target, drawn from `SimRng`.
+5. *Air and ground (R34).* `anti_air` and `anti_ground` with the target's layer replace the
+   armour classes `air`, `naval` and `submerged`.
+6. *Crushing (R41, R42).* `arsenal.ron` schema 4: `crusher`, `crushable`, `size`, `infantry`,
+   generated from the reference (which gains the entries of the type lists that name mapped
+   sections), audited without a difference row. A crusher commanded to move or attack move
+   drives over hostile crushable infantry on foot; they are removed as the step starts
+   (`SimEvent::UnitCrushed` with the crusher's owner as the killer, then `UnitDestroyed`).
+   Never its own, an ally's, what is not crushable, a mixed cell, a vehicle or what flies;
+   never on an attack's approach, a harvester's trip or any other order. 14 shipped crushers,
+   11 shipped infantry types that can be crushed.
+7. *Damage states (R37).* `Condition` (hashed): yellow at 50 percent, red at 25;
+   `SimEvent::DamageStateChanged`; a yellow or red vehicle or ship moves at three quarters of
+   its speed.
+8. *Infantry sub cells (R6).* 18 shipped infantry types are on foot (the Rocketeer flies):
+   three to a cell, each at a spot of its own, of any owners; a vehicle and infantry never in
+   one cell. `Grid::room` is the one answer to "may this unit enter"; a soldier walks from
+   spot to spot in the ticks of a step between centres; ranges and splash are measured to the
+   spot; group moves, exit cells, unloading, teleports and attack approaches place three
+   soldiers to a cell. A world without the `infantry` trait (every fixture before RA3-B) has
+   no spots and runs, and is hashed, as before.
+9. *Game (R39, R43) and README.* Weapon effects and sounds by weapon id, bursts where
+   warheads go off, smoke by damage state, the armour type in the hover text (RA3-A);
+   soldiers drawn at their spots, a click picks the soldier under the cursor, health bars of
+   infantry half as long, a dust ring and a synthesised crunch for a crushed soldier (RA3-B).
+   README: the section "Armour, warheads and weapons" with "Three soldiers to a cell" and
+   "Crushing".
+
+*The computer player (R38, R44).* `ai.ron` is unchanged in both parts. RA3-A: an army unit
+must have a weapon against the ground, and the army check asks the weapon a unit would use.
+RA3-B: two defects of RA1 that the changed battles exposed, each fixed with a regression test:
+an armed harvester that fights as its owner's last armed unit was sent back to harvesting
+whenever it stood and fired (`ra3_ai.rs`); and a building was placed on cells that only a
+Chrono Miner lit, which teleported before the placement was applied (a unit test in `ai.rs`).
+
+**Validation** (`docs/validation/ra2-parity/ra3/`, all eleven commands in one run of
+`sh scripts/validate_ra2_parity.sh ra3` on commit `6241416`, with a clean tree):
+
+| # | Command | Exit | Result |
+|---|---|---|---|
+| 1 | `cargo fmt --all -- --check` | 0 | |
+| 2 | `git diff --check` | 0 | |
+| 3 | `cargo clippy --workspace --all-targets -- -D warnings` | 0 | |
+| 4 | `cargo test --workspace --release` | 0 | **787 passed, 0 failed, 0 ignored** (2,954 s); 735 after RA3-A, 690 after RA2 |
+| 5 | `cargo build --release -p game` | 0 | |
+| 6 | `cargo run --release -p game -- --smoke-test 600` | 0 | 600 frames, 4 matches, 0 layout and 0 flow problems, 715 ticks of the last match, 26 sounds synthesised, the computer player's 4 commands accepted |
+| 7 | `cargo run -p game -- --smoke-test 600` | 0 | 600 frames, 4 matches, 0 layout and 0 flow problems, 5,579 ticks of the last match |
+| 8 | `cargo run --release -p sim --example m7_benchmark` | 0 | shipped data: mean tick 0.209 ms, longest 5.749 ms (budget 5 ms mean, 50 ms longest); fixture 0.098 ms and 0.802 ms |
+| 9 | `cargo run --release -p sim --example m7_soak` | 0 | 260 configurations, 18,720,000 ticks, 2,677 s, I6' on every tick, peak heap 215 MiB of 1,024 |
+| 10 | `cargo run --release -p sim --example m14_duels -- full` | 0 | 756 matches, 756 ended, the slowest in tick 167,856 (1,489 s) |
+| 11 | `sh scripts/package_macos.sh` | 0 | the packaged smoke test passed |
+
+This was the second run. The first (`first-run/`, on `d582539`) failed in command 4: one of
+the 756 matches of `m6_production_matches.rs` had a placement rejected without a loss, the
+second defect named above; it was stopped during command 7, the defect fixed (`69783cc`), and
+the simulation's tests, the soak and the small maps' duels run again before this run.
+
+The session's display was locked, as the brief for this part says: the smoke tests ran
+without a visible window, and passed. Of the 97 new tests of RA3, 45 are RA3-A's (735 after
+it) and 52 RA3-B's: in the simulation `ra3_cells` 22, `ra3_crush` 13, `ra3_definitions` 6,
+`ra3_ai` 1, `ra3_shipped` 3 and 5 unit tests; in the game 2.
+
+**Match lengths (R38, R44).** No limit was changed in RA3; `MATCH_TICK_LIMIT` is 72,000.
+Over the 756 duels the length over the test's limit was 0.11 (median), 0.24 (90th percentile)
+and 0.75 (longest) after RA2; 0.19, 0.36 and 0.76 after RA3-A (bullets deal a quarter to
+tanks and to concrete); 0.16, 0.33 and 0.96 after RA3-B (three soldiers to a cell shorten
+the matches of the large maps by a quarter to a third). Slowest duel per map class after
+RA3: small maps (span up to 128) 69,221 ticks on Riverlands (64 x 48), America against Korea,
+both brutal (limit 72,000; 50,108 on Riverlands after RA3-A); large maps 167,856 on Iron
+Isthmus (256 x 224), Russia brutal against Libya medium (limit 270,000; 206,967 on Ember
+Caldera after RA3-A); the large match nearest its limit stands at 0.62. The match at 0.96
+was traced and is not a stall: one GI, the last unit of the match, fires without a pause at
+four idle Chrono Miners and three buildings from tick 30,000 on (R44 item 5). Before the fix
+of R44 item 2 one match stood at 1.50 (Riverlands, Libya against Great Britain, 108,205
+ticks): that was the defect, not the limit. The duels play the pairings of
+`m6_production_matches.rs` with another seed; that test's own 756 matches all end within
+their limits (command 4).
+
+**Whether a fixture hash or expectation changed.** No expectation changed. The state hash of
+a world without an arsenal (the fixtures of M2 to M8) is the same number as before. The state
+hash of a world with an arsenal is another number only because the definitions hash four more
+fields per arsenal entry; everything else of such a world is what it was, tick for tick, in
+every test of the simulation before RA3-B (R6 items 7 and 9: 254 of 267 test threads have the
+same fold of hashes; 11 are tests of the shipped data, 2 are matches of computer players on
+the RA1 and RA2 fixtures that R44's fix changed).
+
+**Assumptions** (each in the decision named). RA3-A: the flight time of projectiles and the
+speed of arcing shots, the burst gap of 5 ticks, where a shot at a building is aimed, an
+aircraft is always airborne, "on water", `Wood` is the flag for trees (R33 to R35). RA3-B:
+the spot offsets are the game's own (R6 item 3); a unit of `[InfantryTypes]` without the key
+is `Crushable=yes` (R41 item 4: the ini's comment and ModEnc give "no" as the default for all
+objects; the plan, the infantry types that the ini marks `no` one by one, and the original's
+play say otherwise); a soldier is crushed when the crusher starts into its cell (R42 item 3);
+why the benchmark's longest tick grew (R44 item 6).
+
+**Decisions.** R6 the amendment of I6. R32 the combat file; R33 one damage path; R34 weapons;
+R35 area effects and scenery; R36 stand-ins and differences; R37 damage states; R38 the
+computer player after RA3-A; R39 the interface of RA3-A; R40 tests adapted by RA3-A. R41 the
+arsenal file of schema 4; R42 crushing; R43 the interface of RA3-B; R44 the computer player
+and match lengths; R45 tests adapted by RA3-B.
+
+**Differences from the plan or the brief.**
+- RA3-A: `special::blast` is kept for worlds without `effects` instead of replaced; the file
+  has `projectile_speed` and `scatter` instead of a "projectile flight kind"; nine fields
+  beyond the plan's list (R32 item 2).
+- RA3-B: a unit's spot is recorded by the grid alone, not in `Mobile`: the position follows
+  from it, and the unit's hash layout did not have to change (R6 item 5). Two functions that
+  check I6' are public in `sim` (`cell_invariant_violations`, `stray_claims`) so that the
+  soak and the tests share one check, which has its own negative test (R6 item 8). The brief
+  names "crew and spawn sites": crews come with RA4; every site that spawns a unit today was
+  reviewed (R6 item 6). `size` is in the data and read by nothing yet (R41 item 2). The RA3
+  fixture was extended with seven unit types instead of changing its existing ones, so that
+  the tests of RA3-A keep their geometry (R41 item 6).
+
+**Differences from Red Alert 2 that remain in this milestone's scope.** RA3-A's are R36 and
+the 37 rows of `ra2_differences.tsv`. RA3-B: the spot offsets are not the original's; miners
+do not crush on their trips (`AutoCrush`) and the computer player does not drive at infantry
+to crush it (`[CombatDamage] Crush`); starting units get a cell each.
+
+**Debt.**
+- From RA3-A (R32 to R39): shells never miss a moving target; prone infantry (`ProneDamage`)
+  and the shrapnel of the Prism Tank and the elite Tesla weapons are not modelled; ten
+  specialist weapons wait for RA6; the V3 Launcher's and the Dreadnought's missiles, the
+  Aircraft Carrier's aircraft, the Destroyer's Osprey and the elite weapons wait for RA4.
+- The slowest small-map duel stands at 0.96 of its limit: a wave fires at the nearest target,
+  and a single rifle needs 33,000 ticks for four idle miners. A wave that sees no armed enemy
+  should go for the buildings (RA8), and RA5's growing ore changes the endgame of the small
+  maps; either may move this match over the limit or far below it (R44 item 5).
+- A harvester that fights as a last resort stays in the wave until its owner has another
+  armed unit; with ore that grows back (RA5) it should be allowed to go back to work (R44
+  item 2).
+- The `E` mode's click takes the first holder of a cell: fine while its targets are
+  transports and buildings (R43 item 5).
+- Two soldiers that pass each other can be at one point for a tick (R6 item 5).
+- The benchmark's longest tick is 5.7 ms where it was 1.1 (budget 50), in the ticks in which
+  the blocked units of two packed groups ask for paths (the cause is an assumption, R44 item
+  6); and the soak takes a fifth longer. A path request of a ship or an aircraft copies the
+  grid, now 12 bytes a cell larger while infantry is on foot.
+- The test command takes 49 minutes, the soak 45, the duels 25; the validation 122.
+- A comment line of `combat.rs`'s header is longer than 100 columns (rustfmt leaves comments).
+- The debt of RA1 and RA2 stands.
+
+**Requires user verification.**
+- RA3-A (R39): how the bursts, the smoke by damage state and the classes of the new weapons
+  look and sound.
+- That three soldiers in a cell read as three and are easy to click one by one; that the
+  shorter health bars of infantry are legible.
+- The dust and the crunch of a crushed soldier, and the feel of crushing: a tank ordered to
+  move drives through enemy infantry without stopping, and goes round your own.
+- Fights look and end differently: infantry stands and walks in threes, and three times the
+  rifles reach a target.
+
+**For RA4** (veterancy, crews, air and naval mechanics).
+- `SimEvent::UnitCrushed::by` is the killer of a crushed unit; `UnitDestroyed` alone does
+  not say who killed. The damage path knows the attacker of a shot (`Projectile::attacker`,
+  `WeaponFired`), not yet who gets the credit for a kill.
+- Put a unit into a cell only through the grid: `Grid::room`, `has_room`, `room_for` answer
+  whether it fits, `register(id, domain, on_foot)` before the first `claim`, and
+  `standing_point` is where it stands. A crew that leaves a destroyed vehicle is infantry on
+  foot: three fit a cell, and none fits a cell a vehicle holds. Run
+  `sim::cell_invariant_violations` in a test of anything that spawns or moves units.
+- Aircraft do not land yet: the air layer holds one aircraft per cell and no spots. An
+  aircraft that lands will have to take a surface cell by the rule for a vehicle. The
+  Rocketeer is `infantry` and not on foot.
+- Elite weapons are in `combat.ron` and unused (`CombatTerms::weapons(true)`); `size` is in
+  `arsenal.ron` for the transports; the veteran ability `CRUSHER` would set a unit's crusher
+  trait, which today is read from the type (`Definitions::crusher`).
+- The fixtures with rules are `tests/fixtures/data/ra2` and `ra3` (`ra2_common`,
+  `ra3_common` with `assert_cells`); the RA3 fixture's last seven unit types have the traits
+  of schema 4.
+- Validation takes about 122 minutes. One duel is at 0.96 of its limit (see Debt): if a
+  change moves it over, look at the play first (`m14_duels -- full trace riverlands`). The
+  computer player places and attacks by what it sees one tick earlier: anything that moves a
+  unit without a step (a teleport, a paradrop, an aircraft that lands) belongs in
+  `View::stays_visible`, or `m6_production_matches.rs` and the soak will find a placement
+  rejected without a loss.
+
 ## Repair, aircraft overflight, new music and distinct silhouettes (2026-10-06)
 
 Working-tree follow-up (decisions: "Building repair, aircraft overflight, readable silhouettes"
