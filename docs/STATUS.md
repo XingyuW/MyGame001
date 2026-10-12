@@ -212,6 +212,168 @@ labels, starting credits; R21 the tests RA1-C adapted.
 - That selecting the Construction Yard and repacking it feels right with the mouse: the smoke
   test issues the same command, but no test clicks the button.
 
+### RA2: production, power and base building (2026-10-12)
+
+Carried out by one implementer. Commits `a3e5471` to `7109f11` and the commit of this entry.
+
+**What was done** (the numbers are those of the plan entry's "Change" list).
+1. *Build time data (R22).* `scripts/generate_ra2_data.py` computes every build time from the
+   cost: `round(cost x 21 / 25)` ticks, walls times 3 (Grizzly 588, Power Plant 672, War
+   Factory 1680, wall 252). The audit recomputes it for every mapped item; no difference row.
+2. *Rate based progress (R23).* With a rules file the head of a queue advances by a rate in
+   permille per tick, accumulated in `QueueItem::fraction` (hashed): 1000, 1250, 1562, ... for
+   one, two, three factories of the item's group (at most ten are counted), times the low
+   power factor (800 for a shortage of up to a fifth, down to 500 for half or more), times 10
+   with Super Me. Every unit of progress is charged by equation 3 as before; a unit test
+   compares the closed form with the unit by unit definition over 4000 cases. A world without
+   a rules file keeps one unit per tick and the even tick rule, by the code it had.
+3. *Lanes and queues (R23).* Queues are keyed by factory group and lane. The Construction
+   Yards have two lanes, buildings and defences (the arsenal's category `armory`, which the
+   audit compares with `BuildCat=Combat`), which progress side by side and hold one item
+   each; a unit queue holds one item and `max_queued_objects` (29) behind it.
+4. *`arsenal.ron`, schema 3 (R22).* `build_limit`, `adjacent`, `base_normal`, `radar`,
+   `sellable`, `repairable`, `powered`, `is_powered`, `unit_repair`; generated from the
+   reference, audited, range checked, rejected on a unit, hashed. `BuildLimitReached` when the
+   buildings owned and queued reach the limit (Ore Purifier, Cloning Vats, the four
+   superweapons).
+5. *Power (R24).* The power values were ported in RA1 and are audited (Construction Yard 0).
+   One criterion, `PlayerState::powers`, replaces "not low on power" wherever the M9 code asked
+   it for a building: a building stops only if it is `powered` and consumes power. A Pillbox
+   and a Sentry Gun fire under low power, a Prism Tower does not; the Cloning Vats keep
+   cloning. Superweapons that are `is_powered` stop charging and cannot be fired.
+6. *Radar (R24, R30).* `PlayerState::radar` (hashed): a working radar building, no low power,
+   no spy outage. The game draws the minimap only then; otherwise a blank screen with "RADAR
+   OFFLINE" and the reason, no camera rectangle, and no click.
+7. *Placement (R25).* A building must lie within its own `adjacent` free cells of a base
+   building of its owner (`base_normal`): a reach of 3, 5 for Pillbox, Sentry Gun and Patriot,
+   9 for walls. The shipyards keep a reach of 32 as a listed difference: water for a shipyard
+   lies within `Adjacent=12` of the Construction Yard at 28 of the 176 start positions of the
+   shipped maps, and at the first start on 2 of the 21 maps; within the game's reach at 132,
+   and at the first start on 18.
+8. *Sell and repair (R26).* The refund is `cost x RefundPercent`; a repair step restores 8 hit
+   points every 19 ticks for `max(1, (cost div (strength div 8)) x 15 div 100)` credits (3 for
+   the Construction Yard); walls are neither sold (`NotSellable`) nor repaired
+   (`NotRepairable`). The `REPAIR_*` constants remain the rule of a world without rules.
+9. *Service Depot (R27).* A damaged vehicle sent to a building with `unit_repair`
+   (`Command::Interact`) drives beside it, docks (`SpecialState::docked`, hashed) and is
+   repaired step by step for credits, then makes room; any order ends it. The free repair
+   around a depot is gone with a rules file. Ships are repaired the same way at a shipyard.
+10. *Game (R30) and README.* Each card reads the queue of its lane; each tab carries a bar
+    with the progress of its lane; a taken lane says `busy`, a reached build limit `LIMIT`;
+    placement mode keeps its building while another is ready; hints give the time by the
+    production rate and the low power percentage. README: a section "Production, power and
+    base building", and the controls.
+
+*The computer player (R28)* builds in both lanes, one building at a time in each, counts the
+power of what it has queued, places every building within its own reach of a base building,
+and asks the queue capacity. `ai.ron` is unchanged.
+
+**Validation** (`docs/validation/ra2-parity/ra2/`, all eleven commands in one run of
+`sh scripts/validate_ra2_parity.sh ra2` on commit `7109f11`, with a clean tree):
+
+| # | Command | Exit | Result |
+|---|---|---|---|
+| 1 | `cargo fmt --all -- --check` | 0 | |
+| 2 | `git diff --check` | 0 | |
+| 3 | `cargo clippy --workspace --all-targets -- -D warnings` | 0 | |
+| 4 | `cargo test --workspace --release` | 0 | **690 passed, 0 failed, 0 ignored** (2,286 s); 626 after RA1 |
+| 5 | `cargo build --release -p game` | 0 | |
+| 6 | `cargo run --release -p game -- --smoke-test 600` | 0 | 600 frames, 4 matches, 0 layout and 0 flow problems, 702 ticks of the last match, the Power Plant charged its 800 credits in 679 ticks, the minimap drawn 509 times and following the radar |
+| 7 | `cargo run -p game -- --smoke-test 600` | 0 | 600 frames, 4 matches, 0 layout and 0 flow problems, 4,806 ticks of the last match |
+| 8 | `cargo run --release -p sim --example m7_benchmark` | 0 | shipped data: mean tick 0.185 ms, longest 1.266 ms (budget 5 ms mean) |
+| 9 | `cargo run --release -p sim --example m7_soak` | 0 | 260 configurations, 18,720,000 ticks, 1,950 s, peak heap 207 MiB of 1,024 |
+| 10 | `cargo run --release -p sim --example m14_duels -- full` | 0 | 756 matches, 756 ended, the slowest in tick 161,774 (1,018 s) |
+| 11 | `sh scripts/package_macos.sh` | 0 | the packaged smoke test passed |
+
+The session was locked during the run: the smoke tests ran without a visible window, and
+passed. Of the 64 new tests 59 are in the simulation (`ra2_definitions` 7, `ra2_production`
+15, `ra2_power` 6, `ra2_placement` 6, `ra2_repair` 12, `ra2_ai` 3, `ra2_shipped` 8, two unit
+tests) and 5 in the game.
+
+**Tick limit (R29).** One limit changed: `MATCH_TICK_LIMIT` of
+`crates/game/tests/m6_production_matches.rs` is 72,000 instead of 36,000 (times the map's span
+over 128, as before). The factor 2 follows from the build time conversion: vehicles take
+`cost x 21 / 25` ticks instead of `cost / 3` (2.52 times as long), and the two War Factories of
+the plans divide that by 1.25. Measured over the 756 duels: before RA2 the lengths were 0.15
+(median), 0.34 (90th percentile) and 0.86 (longest) of the old limit; after, 0.22, 0.49 and
+1.49, with 5 matches over it (3 on Crossroads, 1 on Riverlands, 1 on Oasis Gulf); of the new
+limit 0.11, 0.25 and 0.75. Slowest duel per map class: small maps (span up to 128) 53,699
+ticks on Crossroads, Korea against France, both easy (new limit 72,000; before RA2 30,979 on
+the demo map); large maps 161,774 on Oasis Gulf (256 x 192), Germany against Great Britain,
+both brutal (new limit 252,000; before RA2 103,519 on Liberty Bay); the second slowest large
+duel is 111,206 on Pacific Atoll. The Oasis Gulf match is a war of attrition between equal
+players (traced: both keep fighting units in the field and the loser's buildings fall one by
+one), not a standstill.
+
+**Assumptions** (each in the decision named). The shortage of power is `1 - produced /
+consumed`; at most ten factories of a kind speed production up (R23). A charged superweapon
+that is powered cannot be fired under low power; any low power takes the radar away, also from
+an Airforce Command (R24). The reach of `Adjacent=n` is `n` free cells, and the rule applies
+to the computer player as to everyone (R25). A sale does not scale with the building's health
+(R26). Any number of vehicles may dock at one depot, beside it (R27).
+
+**Decisions.** R22 build times, arsenal schema 3 and the audit; R23 production by rate, lanes,
+queue lengths, build limits; R24 low power, superweapon charging, radar; R25 placement and the
+shipyard's reach; R26 selling and repairing; R27 the Service Depot; R28 the computer player;
+R29 the tick limit; R30 the interface; R31 the tests adapted.
+
+**Differences from the plan or the brief.**
+- `arsenal.ron` has two fields more than the plan lists, `repairable` and `unit_repair`
+  (items 8 and 9 need them as traits of types); the lane of a building is its category, not a
+  field (R22).
+- `adjacent` is stored in cells, not subcells, and means free cells: the reach is one more
+  (R25).
+- The shipyards' reach is expressed in the data (`adjacent: 31`, a row each in
+  `ra2_differences.tsv`), not as a special case in code (R25).
+- `check_placement` takes the building types with the footprints; `availability_text` takes
+  the number of factories (R31 lists the call sites migrated).
+- Ships are repaired at a shipyard as vehicles are at a depot, because the ini gives both the
+  same trait (R27).
+- The plan's item 8 also names buildings captured from the neutral player, which RA5 adds.
+
+**Differences from Red Alert 2 that remain in this milestone's scope.** Production is charged
+per unit of progress, not in 54 steps (same total). The shipyards' reach of 31 free cells
+instead of 12. Any number of vehicles docks beside a depot instead of one on its pad; a docked
+vehicle cannot be sold there, and a depot does not remove a Terror Drone (RA6). A card whose
+prerequisites are missing is shown as locked (R18), and a card of a taken lane as `busy`,
+where the original greys the cameo. The build limit of Yuri Prime is not in the data (RA6).
+
+**Debt.**
+- `arsenal.ron` is 60,159 of the 65,536 bytes a data file may have: RA3 must raise
+  `MAX_DATA_FILE_BYTES` or split the file before it adds a trait to every entry (R22 item 8).
+- The longest duel is 1.5 times as long as the longest before RA2 on a map of its class, an
+  attrition match of two brutal Allied players; RA8, which completes the computer player,
+  should look at it (R29).
+- The test command takes 38 minutes (27 before): the 756 matches of
+  `m6_production_matches.rs` alone take 27, because matches are longer.
+- A harvester repaired at a depot stays idle until it is sent to work again; the computer
+  player uses neither repair nor the depot (plan: RA8).
+- The spy's power outage is still 600 ticks and the Ore Purifier's bonus a quarter in code
+  (`rules.ron` has `spy_power_blackout` and `purifier_bonus_percent`; RA6 and RA5).
+- The sidebar knows which building types the player owns, not how many, which is exact for
+  the build limits of one that the data has (R30 item 3).
+- The debt of RA1 stands, except that the size of `arsenal.ron` grew: two computer players
+  without army, producers and income would never finish; the Allied computer player builds no
+  radar building (which it does not need); the sidebar does not fit 1280 x 720.
+
+**Requires user verification.**
+- The feel of Red Alert 2's pace: everything is built 2 to 4 times as slowly as before (a
+  Power Plant in 34 seconds, a War Factory in 84 at 1x), and the Construction Yard builds one
+  building and one defence at a time.
+- The minimap is blank at the start of every match and until a radar building stands: that
+  the "RADAR OFFLINE" panel with its reason is legible over the blank screen, and that the
+  change is acceptable.
+- The thin progress bars on the four tab buttons, the `busy` and `LIMIT` badges and the
+  recessed cards of a taken lane; the hints "Busy: the yard builds one of these at a time",
+  "Build limit reached: 1 per player" and "Low power: production at 80%".
+- Sending vehicles to the Service Depot with `E` and a click, and how they stand around it
+  while they are repaired (nothing marks a docked vehicle, and no sound or notice says when
+  it is whole).
+- Placing two ready buildings one after the other, and that the smaller placement distance
+  (two free cells) feels right with the green and red footprint.
+- No art or sound was added; none of the above was seen on a display (the session was
+  locked).
+
 ## Repair, aircraft overflight, new music and distinct silhouettes (2026-10-06)
 
 Working-tree follow-up (decisions: "Building repair, aircraft overflight, readable silhouettes"
