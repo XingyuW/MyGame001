@@ -15,8 +15,10 @@
 //!   the order the economy file lists them, then the groups of the arsenal, each named by its
 //!   first member), a factory of the item's kind (`NoProducer`), and one of them of a side that
 //!   builds the item (`NoFactoryOfSide`, RA1); the player's country is among the required ones
-//!   if there are any (`CountryRequired`) and is not forbidden (`CountryForbidden`); and the
-//!   queue is not full (`QueueFull`). This is the buildability rule of Red Alert 2
+//!   if there are any (`CountryRequired`) and is not forbidden (`CountryForbidden`); with a
+//!   rules file the player owns and has queued fewer buildings of the type than its
+//!   `build_limit`, if it has one (`BuildLimitReached`, RA2); and the queue is not full
+//!   (`QueueFull`: [`Definitions::queue_capacity`]). This is the buildability rule of Red Alert 2
 //!   (docs/RA2_PARITY_PLAN.md section 3.3, docs/DECISIONS.md R10): the first three tests look
 //!   at the player's buildings, so a captured factory opens the other side's items, and the
 //!   country test keeps national specials national;
@@ -26,17 +28,22 @@
 //!   under fog of war (M4) the player sees every cell of it (`Placement(NotVisible)`, so that
 //!   the checks that follow name nothing the player does not see), the footprint is valid
 //!   (`Placement`: buildable, no building, no unit), and it lies within the placement distance
-//!   of a building of the player (`Placement(TooFar)`);
+//!   of a building of the player (`Placement(TooFar)`): the economy file's distance, or with a
+//!   rules file (RA2) the building's own reach from a base building ([`placement_reach`],
+//!   [`extends_base`]);
 //! * `SellBuilding`: the building exists (`UnknownBuilding`) and belongs to the player
 //!   (`NotOwned`); under fog of war (M4), another player's building the player does not see is
-//!   reported as `UnknownBuilding`;
-//! * `RepairBuilding`: the building exists and belongs to the player (as for `SellBuilding`);
+//!   reported as `UnknownBuilding`; with a rules file its type is `sellable` (`NotSellable`,
+//!   RA2: walls are not). The refund is [`Definitions::refund`];
+//! * `RepairBuilding`: the building exists and belongs to the player (as for `SellBuilding`),
+//!   and with a rules file a repair starts only on a `repairable` type (`NotRepairable`, RA2);
 //! * `SetRallyPoint`: the building exists and belongs to the player (as for `SellBuilding`),
 //!   its type produces units (`NotAProducer`), and the cell is inside the map (`OutsideMap`).
 //!
 //! A queue is kept per factory group ([`Definitions::queue_key`]): all buildings of one group
 //! (the Allied and the Soviet War Factory) share it, and a building without a group has the
-//! queue of its own type, as in M3.
+//! queue of its own type, as in M3. With a rules file the Construction Yards have two queues,
+//! the lanes of buildings and of defences ([`Definitions::queue_of`], RA2).
 
 use std::collections::BTreeMap;
 
@@ -52,7 +59,7 @@ use crate::combat::Body;
 use crate::combat::combat_components;
 use crate::command::{Command, IssuedCommand, PlayerId, RejectReason};
 use crate::definitions::Definitions;
-use crate::economy::{MAX_QUEUE_LENGTH, PlayerState, Players, QueueItem};
+use crate::economy::{PlayerState, Players, QueueItem, QueueKey};
 use crate::economy_defs::{BuildingKind, ProductionItem};
 use crate::event::SimEvent;
 use crate::id::{SimId, SimIdAllocator};
@@ -97,11 +104,12 @@ impl BuildingIndex {
             .collect()
     }
 
-    fn footprints_of(&self, player: PlayerId) -> impl Iterator<Item = Footprint> + '_ {
+    /// The types and footprints of the buildings `player` owns.
+    fn anchors_of(&self, player: PlayerId) -> impl Iterator<Item = (BuildingKind, Footprint)> + '_ {
         self.by_id
             .values()
             .filter(move |building| building.owner == player)
-            .map(|building| building.footprint)
+            .map(|building| (building.kind, building.footprint))
     }
 
     /// The owner, type, and footprint of building `id`, if it exists as the commands of this tick
@@ -287,16 +295,62 @@ pub fn check_buildable(
         if country.is_some_and(|country| entry.forbidden_countries.contains(&country)) {
             return Err(RejectReason::CountryForbidden(item));
         }
+        // RA2, the ini's `BuildLimit`: the buildings of the type the player owns and those in
+        // its queues together.
+        if let ProductionItem::Building(kind) = item
+            && definitions.rules().is_some()
+            && entry.build_limit > 0
+        {
+            let have = owned.iter().filter(|&&other| other == kind).count()
+                + state
+                    .queues()
+                    .flat_map(|(_, items)| items.iter())
+                    .filter(|queued| queued.item == item)
+                    .count();
+            if have >= entry.build_limit as usize {
+                return Err(RejectReason::BuildLimitReached {
+                    item,
+                    limit: entry.build_limit,
+                });
+            }
+        }
     }
     Ok(())
+}
+
+/// How far a new building of type `building` may lie from a building of its owner, as
+/// [`Footprint::distance`] measures it (1: touching). Without a rules file the economy file's
+/// `placement_distance`, and for a shipyard at least [`SHIPYARD_PLACEMENT_DISTANCE`]. With one
+/// (RA2, docs/RA2_PARITY_PLAN.md section 4.2) the building's own `adjacent` free cells, so one
+/// more; a building without an arsenal entry keeps the economy file's distance.
+pub fn placement_reach(definitions: &Definitions, building: BuildingKind) -> u32 {
+    let entry = definitions.metadata(ProductionItem::Building(building));
+    match (definitions.rules(), entry) {
+        (Some(_), Some(entry)) => entry.adjacent.saturating_add(1),
+        (None, Some(entry)) if entry.role == crate::Role::Shipyard => definitions
+            .placement_distance()
+            .max(SHIPYARD_PLACEMENT_DISTANCE),
+        _ => definitions.placement_distance(),
+    }
+}
+
+/// Whether a new building may be placed beside a building of type `kind` of its owner: always
+/// without a rules file; with one (RA2) unless the arsenal says the type is no base building
+/// (`base_normal`, the ini's `BaseNormal=no` of defences, walls and shipyards).
+pub fn extends_base(definitions: &Definitions, kind: BuildingKind) -> bool {
+    definitions.rules().is_none()
+        || definitions
+            .metadata(ProductionItem::Building(kind))
+            .is_none_or(|entry| entry.base_normal)
 }
 
 /// The checks of `PlaceBuilding` (docs/DECISIONS.md D24, D33), in the order of the module
 /// documentation: the building type is defined (`UnknownItem`), a complete building of that type
 /// is at the head of its queue in `state` (`NotReady`), the footprint lies inside the map, under
 /// fog of war `state`'s player sees every cell of it, the footprint is valid, and it lies within
-/// the placement distance of one of `owned` (the footprints of the player's buildings). Returns
-/// the footprint the building would cover.
+/// its reach ([`placement_reach`]) of one of `owned` (the types and footprints of the player's
+/// buildings) beside which a building may be placed ([`extends_base`]). Returns the footprint
+/// the building would cover.
 ///
 /// The command's validation calls exactly this function, so the interface's placement preview
 /// (M5) can show the outcome of a `PlaceBuilding` before it is issued. It reads only what the
@@ -306,7 +360,7 @@ pub fn check_placement(
     grid: &Grid,
     definitions: &Definitions,
     state: &PlayerState,
-    owned: impl Iterator<Item = Footprint>,
+    owned: impl Iterator<Item = (BuildingKind, Footprint)>,
     building: BuildingKind,
     origin: CellPos,
 ) -> Result<Footprint, RejectReason> {
@@ -314,9 +368,9 @@ pub fn check_placement(
     let def = definitions
         .building(building)
         .ok_or(RejectReason::UnknownItem(item))?;
-    let ready = state
-        .queue(definitions.queue_key(def.production.producer))
-        .first()
+    let ready = definitions
+        .queue_of(item)
+        .and_then(|key| state.lane(key).first())
         .is_some_and(|head| head.item == item && head.progress >= def.production.build_time);
     if !ready {
         return Err(RejectReason::NotReady(building));
@@ -333,19 +387,19 @@ pub fn check_placement(
         .metadata(item)
         .is_some_and(|e| e.role == crate::Role::Shipyard);
     check_building_footprint(grid, footprint, shipyard).map_err(RejectReason::Placement)?;
-    let reach = if shipyard {
-        definitions
-            .placement_distance()
-            .max(SHIPYARD_PLACEMENT_DISTANCE)
-    } else {
-        definitions.placement_distance()
-    };
-    check_distance(footprint, owned, reach).map_err(RejectReason::Placement)?;
+    let anchors = owned
+        .filter(|&(kind, _)| extends_base(definitions, kind))
+        .map(|(_, footprint)| footprint);
+    check_distance(footprint, anchors, placement_reach(definitions, building))
+        .map_err(RejectReason::Placement)?;
     Ok(footprint)
 }
 
 /// How far (cells, Chebyshev distance between nearest cells) a naval shipyard may lie from one of
-/// its owner's buildings. Ordinary structures use the economy file's `placement_distance`, but a
+/// its owner's buildings in a world without a rules file. (With one every building has its own
+/// `adjacent` distance, [`placement_reach`]; the shipped shipyards keep this reach there by
+/// their data, an intentional difference from Red Alert 2, docs/DECISIONS.md R25.) Ordinary
+/// structures use the economy file's `placement_distance`, but a
 /// shipyard needs a 3x3 open-water site touching shore, and the shipped maps' lakes and rivers lie
 /// 18-28 cells from the human player's start; with the ordinary reach naval production was only
 /// reachable by chaining buildings across the map. The site must still be visible (scouted) and
@@ -379,24 +433,27 @@ pub(crate) fn apply(
             let Some(terms) = definitions.production(item) else {
                 return Err(RejectReason::UnknownItem(item));
             };
-            let key = definitions.queue_key(terms.producer);
-            if state.queue(key).len() >= MAX_QUEUE_LENGTH {
+            let key = QueueKey {
+                producer: definitions.queue_key(terms.producer),
+                lane: definitions.lane(item),
+            };
+            let max = definitions.queue_capacity(item);
+            if state.lane(key).len() >= max {
                 return Err(RejectReason::QueueFull {
                     producer: terms.producer,
-                    max: MAX_QUEUE_LENGTH,
+                    max,
                 });
             }
-            state.queues.entry(key).or_default().push(QueueItem {
-                item,
-                progress: 0,
-                charged: 0,
-            });
+            state
+                .queues
+                .entry(key)
+                .or_default()
+                .push(QueueItem::new(item));
         }
         &Command::CancelProduction { item } => {
-            let terms = definitions
-                .production(item)
+            let key = definitions
+                .queue_of(item)
                 .ok_or(RejectReason::UnknownItem(item))?;
-            let key = definitions.queue_key(terms.producer);
             let queue = state
                 .queues
                 .get_mut(&key)
@@ -421,7 +478,7 @@ pub(crate) fn apply(
                 grid,
                 definitions,
                 state,
-                index.footprints_of(player),
+                index.anchors_of(player),
                 building,
                 origin,
             )?;
@@ -431,7 +488,10 @@ pub(crate) fn apply(
                     building,
                 )));
             };
-            let producer = definitions.queue_key(def.production.producer);
+            let producer = QueueKey {
+                producer: definitions.queue_key(def.production.producer),
+                lane: definitions.lane(ProductionItem::Building(building)),
+            };
             let id = params.ids.allocate().ok_or(RejectReason::IdsExhausted)?;
 
             if let Some(queue) = state.queues.get_mut(&producer) {
@@ -480,11 +540,11 @@ pub(crate) fn apply(
         }
         &Command::SellBuilding { building } => {
             let target = index.own(player, building, fog(definitions, state))?;
-            // Every indexed building's kind comes from the definitions, which do not change
-            // during a match, so the lookup always succeeds.
-            let refund = definitions
-                .building(target.kind)
-                .map_or(0, |def| def.sell_value);
+            let entry = definitions.metadata(ProductionItem::Building(target.kind));
+            if definitions.rules().is_some() && entry.is_some_and(|entry| !entry.sellable) {
+                return Err(RejectReason::NotSellable(building));
+            }
+            let refund = definitions.refund(target.kind);
             for cell in target.footprint.cells() {
                 grid.uncover(cell, building);
             }
@@ -499,8 +559,12 @@ pub(crate) fn apply(
             });
         }
         &Command::RepairBuilding { building } => {
-            index.own(player, building, fog(definitions, state))?;
+            let target = index.own(player, building, fog(definitions, state))?;
             if !state.repairing.remove(&building) {
+                let entry = definitions.metadata(ProductionItem::Building(target.kind));
+                if definitions.rules().is_some() && entry.is_some_and(|entry| !entry.repairable) {
+                    return Err(RejectReason::NotRepairable(building));
+                }
                 state.repairing.insert(building);
             }
         }

@@ -162,11 +162,19 @@ fn unit_item(data: &Data, id: &str) -> ProductionItem {
 }
 
 fn footprints(world: &mut World, player: PlayerId) -> Vec<Footprint> {
+    anchors(world, player)
+        .into_iter()
+        .map(|(_, footprint)| footprint)
+        .collect()
+}
+
+/// The types and footprints of the buildings of `player`, as `check_placement` takes them.
+fn anchors(world: &mut World, player: PlayerId) -> Vec<(BuildingKind, Footprint)> {
     world
         .query::<(&Owner, &Building)>()
         .iter(world)
         .filter(|(owner, _)| owner.0 == player)
-        .map(|(_, building)| building.footprint)
+        .map(|(_, building)| (building.kind, building.footprint))
         .collect()
 }
 
@@ -191,7 +199,7 @@ fn units_of(world: &mut World, player: PlayerId) -> BTreeMap<SimId, (sim::UnitKi
 /// The free origin nearest to `near` (by Chebyshev distance, then row and column) where the
 /// player may place `kind` now, as the interface's placement preview finds it.
 fn site(world: &mut World, kind: BuildingKind, near: CellPos, reach: i32) -> Option<CellPos> {
-    let owned = footprints(world, HUMAN);
+    let owned = anchors(world, HUMAN);
     let grid = world.resource::<Grid>();
     let definitions = world.resource::<Definitions>();
     let state = world.resource::<Players>().get(HUMAN)?;

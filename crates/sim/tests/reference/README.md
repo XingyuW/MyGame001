@@ -12,9 +12,11 @@ parity audit compares the shipped `assets/data/*.ron` with these tab separated t
   Columns `game_id`, `field`, `game_value`, `reference_value`, `reason`. Written by hand. A row
   matches one audited value: the game id (`rules` for a value of `rules.ron`), the field as the
   audit names it (`cost`, `strength`, `sight`, `speed`, `prerequisites`, `power`, `sell_value`,
-  `owner_sides`, `required_countries`, `forbidden_countries`, `tech_level`, `present`, or
-  `group.field` for `rules.ron`), the shipped value, and the reference value as the ini writes
-  it. The audit fails on a difference without a row and on a row that no longer applies.
+  `owner_sides`, `required_countries`, `forbidden_countries`, `tech_level`, `present`, since
+  RA2 `build_time`, `build_limit`, `lane`, `adjacent`, `base_normal`, `radar`, `sellable`,
+  `repairable`, `powered`, `is_powered`, `unit_repair`, or `group.field` for `rules.ron`), the
+  shipped value, and the reference value as the ini writes it. The audit fails on a difference
+  without a row and on a row that no longer applies.
 
 The shipped data is generated from these tables, and audited against them:
 

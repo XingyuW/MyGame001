@@ -291,7 +291,7 @@ fn verify_catalogue(super_me: bool) {
                     .query::<(&Owner, &Building)>()
                     .iter(a.world())
                     .filter(|(o, _)| o.0 == P)
-                    .map(|(_, b)| b.footprint)
+                    .map(|(_, b)| (b.kind, b.footprint))
                     .collect();
                 let g = a.world().resource::<Grid>();
                 let state = a.world().resource::<Players>().get(P).unwrap();

@@ -1793,6 +1793,9 @@ fn count_frames(
         credits_text_shown: credits_shown.as_deref() == Some(credits_expected.as_str()),
         minimap_drawings: minimap.drawings,
         minimap_lit_pixels: minimap.lit_pixels,
+        // RA2: the drawing of this tick shows the map exactly if the player has radar.
+        minimap_follows_radar: minimap.drawn_tick != Some(tick)
+            || minimap.offline != crate::minimap::radar_online(&host),
         sounds_complete: sounds == Sfx::ALL.len(),
         music_players: music.iter().count(),
         pause: match smoke.pause {
@@ -1875,6 +1878,9 @@ struct SmokeOutcome {
     /// Drawings of the minimap, and its pixels that are not black in the last one.
     minimap_drawings: u64,
     minimap_lit_pixels: usize,
+    /// The minimap shows the map while the human player has radar and the "radar offline"
+    /// screen while it has none (RA2).
+    minimap_follows_radar: bool,
     /// Every sound effect was synthesised.
     sounds_complete: bool,
     /// Entities playing the music.
@@ -2007,6 +2013,9 @@ fn smoke_failures(outcome: &SmokeOutcome) -> Vec<String> {
             outcome.minimap_drawings, outcome.minimap_lit_pixels
         ));
     }
+    if !outcome.minimap_follows_radar {
+        failures.push("the minimap does not follow the player's radar".to_string());
+    }
     if !outcome.sounds_complete {
         failures.push("not every sound effect was synthesised".to_string());
     }
@@ -2130,6 +2139,7 @@ mod tests {
         credits_text_shown: true,
         minimap_drawings: 198,
         minimap_lit_pixels: 1000,
+        minimap_follows_radar: true,
         sounds_complete: true,
         music_players: 1,
         pause: Some((0, true)),
@@ -2574,6 +2584,14 @@ mod tests {
                 ..PASSING
             })
             .is_empty()
+        );
+        // RA2: a map drawn without radar, or a blank screen with it.
+        assert_eq!(
+            fails(SmokeOutcome {
+                minimap_follows_radar: false,
+                ..PASSING
+            }),
+            ["the minimap does not follow the player's radar"]
         );
         assert_eq!(
             fails(SmokeOutcome {

@@ -11,9 +11,10 @@
 # It reads only the two committed tables: never the ini files. Every value ported from the
 # reference is converted with the conversions of the plan's section 2 and written with a
 # trailing comment `// [Section] Key=value` naming where it comes from. Values that are not
-# ported (labels, descriptions, sprites, footprints, roles, build times, armour, weapons, the
-# computer player's plans, the maps) come from the tables of this script and carry no such
-# comment; weapons, armour, build times and footprints are ported by later milestones.
+# ported (labels, descriptions, sprites, footprints, roles, armour, weapons, the computer
+# player's plans, the maps) come from the tables of this script and carry no such comment;
+# weapons, armour and footprints are ported by later milestones. Build times are computed from
+# the cost (RA2, docs/RA2_PARITY_PLAN.md section 4.2).
 #
 # The data parity audit (crates/sim/tests/ra9_data_parity.rs) recomputes the conversions in Rust
 # from the same tables and fails on any shipped value that differs from its reference and is not
@@ -67,156 +68,156 @@ FACTORIES = {
 }
 
 # id: (label, description, category, domain, role, cooldown, radius, strength, capacity,
-#      sprite, width, height, build_time, armour, weapons)
+#      sprite, width, height, armour, weapons)
 BUILDINGS = {
     'construction_yard': ('Construction Yard', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
-        'construction_yard', 3, 3, 1200, 'structure', []),
+        'construction_yard', 3, 3, 'structure', []),
     'power_plant': ('Power Plant', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
-        'power_plant', 2, 2, 200, 'structure', []),
+        'power_plant', 2, 2, 'structure', []),
     'refinery': ('Ore Refinery', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
-        'refinery', 3, 3, 400, 'structure', []),
+        'refinery', 3, 3, 'structure', []),
     'barracks': ('Barracks', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
-        'barracks', 2, 2, 240, 'structure', []),
+        'barracks', 2, 2, 'structure', []),
     'war_factory': ('War Factory', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
-        'war_factory', 3, 3, 500, 'structure', []),
+        'war_factory', 3, 3, 'structure', []),
     'tech_center': ('Battle Lab', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
-        'tech_center', 2, 2, 500, 'structure', []),
+        'tech_center', 2, 2, 'structure', []),
     'tesla_reactor': ('Tesla Reactor', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
-        'power_plant', 2, 2, 180, 'structure', []),
+        'power_plant', 2, 2, 'structure', []),
     'ore_purifier': ('Ore Purifier', 'Increases ore delivery income by 25 percent while powered.', 'buildings', 'land', 'purifier', 100, 6, 20, 0,
-        'tech_center', 2, 2, 700, 'structure', []),
+        'tech_center', 2, 2, 'structure', []),
     'nuclear_reactor': ('Nuclear Reactor', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
-        'power_plant', 2, 2, 700, 'structure', []),
+        'power_plant', 2, 2, 'structure', []),
     'naval_shipyard': ('Naval Shipyard', 'Place on water adjacent to shore. Produces naval units.', 'buildings', 'land', 'shipyard', 100, 6, 20, 0,
-        'war_factory', 3, 3, 400, 'structure', []),
+        'war_factory', 3, 3, 'structure', []),
     'airforce_command': ('Airforce Command Headquarters', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
-        'war_factory', 3, 3, 400, 'structure', []),
-    'service_depot': ('Service Depot', 'Repairs nearby friendly vehicles while powered.', 'buildings', 'land', 'repair', 100, 6, 20, 0,
-        'tech_center', 2, 2, 300, 'structure', []),
+        'war_factory', 3, 3, 'structure', []),
+    'service_depot': ('Service Depot', 'Repairs a damaged vehicle sent to it, for credits.', 'buildings', 'land', 'repair', 100, 6, 20, 0,
+        'tech_center', 2, 2, 'structure', []),
     'radar_tower': ('Radar Tower', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
-        'tech_center', 2, 2, 350, 'structure', []),
-    'cloning_vats': ('Cloning Vats', 'Duplicates trained infantry while powered.', 'buildings', 'land', 'cloner', 100, 6, 20, 0,
-        'tech_center', 2, 2, 800, 'structure', []),
+        'tech_center', 2, 2, 'structure', []),
+    'cloning_vats': ('Cloning Vats', 'Duplicates trained infantry.', 'buildings', 'land', 'cloner', 100, 6, 20, 0,
+        'tech_center', 2, 2, 'structure', []),
     'fortress_walls': ('Fortress Walls', 'Blocks ground movement.', 'armory', 'land', 'combat', 100, 6, 20, 0,
-        'gun_turret', 1, 1, 40, 'structure', []),
+        'gun_turret', 1, 1, 'structure', []),
     'pillbox': ('Pillbox', 'Automatically engages valid enemy targets.', 'armory', 'land', 'combat', 100, 6, 20, 0,
-        'gun_turret', 1, 1, 180, 'structure', ['rifle']),
+        'gun_turret', 1, 1, 'structure', ['rifle']),
     'sentry_gun': ('Sentry Gun', 'Automatically engages valid enemy targets.', 'armory', 'land', 'combat', 100, 6, 20, 0,
-        'gun_turret', 1, 1, 180, 'structure', ['scout_gun']),
+        'gun_turret', 1, 1, 'structure', ['scout_gun']),
     'patriot': ('Patriot Missile System', 'Automatically engages valid enemy targets.', 'armory', 'land', 'flak', 100, 6, 20, 0,
-        'gun_turret', 1, 1, 300, 'structure', ['aegis_missile']),
+        'gun_turret', 1, 1, 'structure', ['aegis_missile']),
     'flak_cannon': ('Flak Cannon', 'Automatically engages valid enemy targets.', 'armory', 'land', 'flak', 100, 6, 20, 0,
-        'gun_turret', 1, 1, 300, 'structure', ['aegis_missile']),
+        'gun_turret', 1, 1, 'structure', ['aegis_missile']),
     'prism_tower': ('Prism Tower', 'Automatically engages valid enemy targets.', 'armory', 'land', 'splash', 100, 6, 20, 0,
-        'gun_turret', 1, 1, 450, 'structure', ['prism_beam']),
+        'gun_turret', 1, 1, 'structure', ['prism_beam']),
     'tesla_coil': ('Tesla Coil', 'Automatically engages valid enemy targets.', 'armory', 'land', 'tesla', 100, 6, 20, 0,
-        'gun_turret', 1, 1, 450, 'structure', ['tesla_weapon']),
+        'gun_turret', 1, 1, 'structure', ['tesla_weapon']),
     'grand_cannon': ('Grand Cannon', 'Automatically engages valid enemy targets.', 'armory', 'land', 'splash', 100, 6, 20, 0,
-        'tech_center', 2, 2, 650, 'structure', ['grand_shell']),
+        'tech_center', 2, 2, 'structure', ['grand_shell']),
     'gap_generator': ('Gap Generator', 'Shrouds this area against enemy vision.', 'armory', 'land', 'gap', 100, 6, 20, 0,
-        'tech_center', 2, 2, 400, 'structure', []),
+        'tech_center', 2, 2, 'structure', []),
     'spy_satellite': ('Spy Satellite Uplink', 'Reveals the battlefield while powered.', 'armory', 'land', 'satellite', 100, 6, 20, 0,
-        'tech_center', 2, 2, 500, 'structure', []),
+        'tech_center', 2, 2, 'structure', []),
     'psychic_sensor': ('Psychic Sensor', 'Detects concealed units nearby.', 'armory', 'land', 'sensor', 100, 6, 20, 0,
-        'tech_center', 2, 2, 350, 'structure', []),
+        'tech_center', 2, 2, 'structure', []),
     'chronosphere': ('Chronosphere', 'Select vehicles, choose ability, then click a visible destination.', 'armory', 'land', 'chronosphere', 3600, 3, 0, 0,
-        'tech_center', 2, 2, 1600, 'structure', []),
+        'tech_center', 2, 2, 'structure', []),
     'weather_control': ('Weather Control Device', 'Click a visible area for a devastating lightning storm.', 'armory', 'land', 'storm', 6000, 5, 1600, 0,
-        'war_factory', 3, 3, 2000, 'structure', []),
+        'war_factory', 3, 3, 'structure', []),
     'iron_curtain': ('Iron Curtain Device', 'Click a visible area to protect friendly mechanical units for 10 seconds.', 'armory', 'land', 'curtain', 3600, 3, 200, 0,
-        'tech_center', 2, 2, 1600, 'structure', []),
+        'tech_center', 2, 2, 'structure', []),
     'nuclear_silo': ('Nuclear Missile Silo', 'Click a visible area for a nuclear strike.', 'armory', 'land', 'nuke', 6000, 6, 2500, 0,
-        'war_factory', 3, 3, 2000, 'structure', []),
+        'war_factory', 3, 3, 'structure', []),
 }
 # id: (label, description, category, domain, role, cooldown, radius, strength, capacity,
-#      sprite, build_time, armour, weapons)
+#      sprite, armour, weapons)
 UNITS = {
     'conscript': ('Conscript', 'Specialized ground combat. Select and right click an enemy to attack.', 'infantry', 'land', 'combat', 100, 2, 20, 0,
-        'conscript', 100, 'infantry', ['carbine']),
+        'conscript', 'infantry', ['carbine']),
     'gi': ('GI', 'Specialized ground combat. Select and right click an enemy to attack.', 'infantry', 'land', 'combat', 100, 2, 20, 0,
-        'rifleman', 80, 'infantry', ['rifle']),
+        'rifleman', 'infantry', ['rifle']),
     'engineer': ('Engineer', 'E + click a nearby structure to capture or repair it.', 'infantry', 'land', 'engineer', 100, 2, 20, 0,
-        'rifleman', 166, 'infantry', []),
+        'rifleman', 'infantry', []),
     'attack_dog': ('Attack Dog', 'Specialized ground combat. Select and right click an enemy to attack.', 'infantry', 'land', 'dog', 100, 2, 20, 0,
-        'scout', 80, 'infantry', ['dog_bite']),
+        'scout', 'infantry', ['dog_bite']),
     'rocketeer': ('Rocketeer', 'Specialized air combat. Select and right click an enemy to attack.', 'infantry', 'air', 'combat', 100, 2, 20, 0,
-        'rifleman', 200, 'air', ['air_rifle']),
+        'rifleman', 'air', ['air_rifle']),
     'spy': ('Spy', 'E + click a nearby enemy building to infiltrate. Dogs detect spies.', 'infantry', 'land', 'spy', 100, 2, 20, 0,
-        'rifleman', 333, 'infantry', []),
+        'rifleman', 'infantry', []),
     'tanya': ('Tanya', 'Specialized ground combat. Select and right click an enemy to attack.', 'infantry', 'land', 'commando', 100, 2, 20, 0,
-        'rifleman', 333, 'infantry', ['commando_gun']),
+        'rifleman', 'infantry', ['commando_gun']),
     'chrono_legionnaire': ('Chrono Legionnaire', 'Teleports when given a move order; beam suppresses targets.', 'infantry', 'land', 'chrono', 100, 2, 20, 0,
-        'rifleman', 500, 'infantry', ['chrono_beam']),
+        'rifleman', 'infantry', ['chrono_beam']),
     'sniper': ('Sniper', 'Specialized ground combat. Select and right click an enemy to attack.', 'infantry', 'land', 'combat', 100, 2, 20, 0,
-        'rifleman', 200, 'infantry', ['sniper_rifle']),
+        'rifleman', 'infantry', ['sniper_rifle']),
     'flak_trooper': ('Flak Trooper', 'Specialized ground combat. Select and right click an enemy to attack.', 'infantry', 'land', 'flak', 100, 2, 20, 0,
-        'rocket_soldier', 100, 'infantry', ['flak_weapon']),
+        'rocket_soldier', 'infantry', ['flak_weapon']),
     'tesla_trooper': ('Tesla Trooper', 'Specialized ground combat. Select and right click an enemy to attack.', 'infantry', 'land', 'tesla', 100, 2, 20, 0,
-        'rocket_soldier', 166, 'infantry', ['tesla_weapon']),
+        'rocket_soldier', 'infantry', ['tesla_weapon']),
     'crazy_ivan': ('Crazy Ivan', 'Attaches a delayed explosive when attacking.', 'infantry', 'land', 'demolition', 100, 2, 800, 0,
-        'grenadier', 200, 'infantry', ['bomb_trigger']),
+        'grenadier', 'infantry', ['bomb_trigger']),
     'yuri': ('Yuri', 'Controls one enemy unit; control ends when Yuri dies.', 'infantry', 'land', 'mind_control', 100, 2, 20, 0,
-        'rifleman', 400, 'infantry', ['control_beam']),
+        'rifleman', 'infantry', ['control_beam']),
     'desolator': ('Desolator', 'D contaminates surrounding ground.', 'infantry', 'land', 'radiation', 100, 3, 20, 0,
-        'grenadier', 200, 'infantry', ['radiation_weapon']),
+        'grenadier', 'infantry', ['radiation_weapon']),
     'terrorist': ('Terrorist', 'Detonates on reaching attack range.', 'infantry', 'land', 'suicide', 100, 3, 500, 0,
-        'conscript', 80, 'infantry', ['suicide_trigger']),
+        'conscript', 'infantry', ['suicide_trigger']),
     'chrono_miner': ('Chrono Miner', 'Harvests ore and teleports home to unload.', 'vehicles', 'land', 'chrono_miner', 100, 2, 20, 0,
-        'harvester', 466, 'heavy', []),
+        'harvester', 'heavy', []),
     'war_miner': ('War Miner', 'Specialized ground combat. Select and right click an enemy to attack.', 'vehicles', 'land', 'combat', 100, 2, 20, 0,
-        'harvester', 466, 'heavy', ['scout_gun']),
+        'harvester', 'heavy', ['scout_gun']),
     'grizzly': ('Grizzly Battle Tank', 'Specialized ground combat. Select and right click an enemy to attack.', 'vehicles', 'land', 'combat', 100, 2, 20, 0,
-        'light_tank', 233, 'heavy', ['tank_cannon']),
+        'light_tank', 'heavy', ['tank_cannon']),
     'rhino': ('Rhino Heavy Tank', 'Specialized ground combat. Select and right click an enemy to attack.', 'vehicles', 'land', 'combat', 100, 2, 20, 0,
-        'heavy_tank', 300, 'heavy', ['heavy_cannon']),
+        'heavy_tank', 'heavy', ['heavy_cannon']),
     'ifv': ('Infantry Fighting Vehicle (IFV)', 'Carries one infantry; passenger changes its weapon. D unloads.', 'vehicles', 'land', 'ifv', 100, 2, 20, 1,
-        'scout', 200, 'light', ['flak_weapon']),
+        'scout', 'light', ['flak_weapon']),
     'flak_track': ('Flak Track', 'Select passengers; E + click this transport to load. D unloads.', 'vehicles', 'land', 'transport', 100, 2, 20, 5,
-        'raider', 166, 'light', ['flak_weapon']),
+        'raider', 'light', ['flak_weapon']),
     'terror_drone': ('Terror Drone', 'Immobilizes and damages mechanical targets.', 'vehicles', 'land', 'drone', 100, 2, 20, 0,
-        'scout', 166, 'light', ['drone_claw']),
+        'scout', 'light', ['drone_claw']),
     'v3_launcher': ('V3 Rocket Launcher', 'Specialized ground combat. Select and right click an enemy to attack.', 'vehicles', 'land', 'combat', 100, 2, 20, 0,
-        'rocket_launcher', 266, 'light', ['v3_missile']),
+        'rocket_launcher', 'light', ['v3_missile']),
     'mcv': ('Mobile Construction Vehicle (MCV)', 'D deploys into a Construction Yard on clear ground.', 'vehicles', 'land', 'mcv', 100, 2, 20, 0,
-        'harvester', 1000, 'heavy', []),
+        'harvester', 'heavy', []),
     'mirage_tank': ('Mirage Tank', 'Concealed while idle; revealed by nearby detectors.', 'vehicles', 'land', 'mirage', 100, 2, 20, 0,
-        'light_tank', 333, 'heavy', ['mirage_gun']),
+        'light_tank', 'heavy', ['mirage_gun']),
     'prism_tank': ('Prism Tank', 'Specialized ground combat. Select and right click an enemy to attack.', 'vehicles', 'land', 'splash', 100, 2, 20, 0,
-        'artillery', 400, 'light', ['prism_beam']),
+        'artillery', 'light', ['prism_beam']),
     'apocalypse': ('Apocalypse Tank', 'Specialized ground combat. Select and right click an enemy to attack.', 'vehicles', 'land', 'combat', 100, 2, 20, 0,
-        'heavy_tank', 583, 'heavy', ['apocalypse_gun']),
+        'heavy_tank', 'heavy', ['apocalypse_gun']),
     'tank_destroyer': ('Tank Destroyer', 'Specialized ground combat. Select and right click an enemy to attack.', 'vehicles', 'land', 'combat', 100, 2, 20, 0,
-        'artillery', 300, 'heavy', ['destroyer_gun']),
+        'artillery', 'heavy', ['destroyer_gun']),
     'tesla_tank': ('Tesla Tank', 'Specialized ground combat. Select and right click an enemy to attack.', 'vehicles', 'land', 'tesla', 100, 2, 20, 0,
-        'heavy_tank', 400, 'heavy', ['tesla_weapon']),
+        'heavy_tank', 'heavy', ['tesla_weapon']),
     'demolition_truck': ('Demolition Truck', 'Detonates on reaching attack range.', 'vehicles', 'land', 'suicide', 100, 3, 1600, 0,
-        'harvester', 500, 'light', ['suicide_trigger']),
+        'harvester', 'light', ['suicide_trigger']),
     'harrier': ('Harrier', 'Fires a strike then returns to an air facility to rearm.', 'vehicles', 'air', 'strike', 100, 2, 20, 0,
-        'scout', 400, 'air', ['air_bomb']),
+        'scout', 'air', ['air_bomb']),
     'black_eagle': ('Black Eagle', 'Fires a strike then returns to an air facility to rearm.', 'vehicles', 'air', 'strike', 100, 2, 20, 0,
-        'scout', 466, 'air', ['eagle_bomb']),
+        'scout', 'air', ['eagle_bomb']),
     'nighthawk': ('NightHawk Transport', 'Select passengers; E + click this transport to load. D unloads.', 'vehicles', 'air', 'transport', 100, 2, 20, 5,
-        'scout', 333, 'air', ['air_rifle']),
+        'scout', 'air', ['air_rifle']),
     'kirov': ('Kirov Airship', 'Specialized air combat. Select and right click an enemy to attack.', 'vehicles', 'air', 'splash', 100, 2, 20, 0,
-        'heavy_tank', 666, 'air', ['kirov_bomb']),
+        'heavy_tank', 'air', ['kirov_bomb']),
     'amphibious_transport': ('Amphibious Transport', 'Select passengers; E + click this transport to load. D unloads.', 'vehicles', 'amphibious', 'transport', 100, 2, 20, 12,
-        'harvester', 300, 'naval', []),
+        'harvester', 'naval', []),
     'destroyer': ('Destroyer', 'Specialized naval combat. Select and right click an enemy to attack.', 'vehicles', 'naval', 'combat', 100, 2, 20, 0,
-        'artillery', 333, 'naval', ['naval_gun']),
+        'artillery', 'naval', ['naval_gun']),
     'aegis_cruiser': ('Aegis Cruiser', 'Specialized naval combat. Select and right click an enemy to attack.', 'vehicles', 'naval', 'flak', 100, 2, 20, 0,
-        'artillery', 400, 'naval', ['aegis_missile']),
+        'artillery', 'naval', ['aegis_missile']),
     'dolphin': ('Dolphin', 'Specialized naval combat. Select and right click an enemy to attack.', 'vehicles', 'naval', 'combat', 100, 2, 20, 0,
-        'artillery', 166, 'submerged', ['sonic']),
+        'artillery', 'submerged', ['sonic']),
     'aircraft_carrier': ('Aircraft Carrier', 'Launches recoverable strike aircraft; no airbase required.', 'vehicles', 'naval', 'carrier', 100, 2, 20, 2,
-        'artillery', 666, 'naval', ['carrier_strike']),
+        'artillery', 'naval', ['carrier_strike']),
     'typhoon': ('Typhoon Attack Submarine', 'Specialized naval combat. Select and right click an enemy to attack.', 'vehicles', 'naval', 'combat', 100, 2, 20, 0,
-        'artillery', 333, 'submerged', ['torpedo']),
+        'artillery', 'submerged', ['torpedo']),
     'sea_scorpion': ('Sea Scorpion', 'Specialized naval combat. Select and right click an enemy to attack.', 'vehicles', 'naval', 'flak', 100, 2, 20, 0,
-        'artillery', 200, 'naval', ['flak_weapon']),
+        'artillery', 'naval', ['flak_weapon']),
     'giant_squid': ('Giant Squid', 'Immobilizes enemy vessels.', 'vehicles', 'naval', 'squid', 100, 2, 20, 0,
-        'artillery', 333, 'submerged', ['squid_grip']),
+        'artillery', 'submerged', ['squid_grip']),
     'dreadnought': ('Dreadnought', 'Specialized naval combat. Select and right click an enemy to attack.', 'vehicles', 'naval', 'combat', 100, 2, 20, 0,
-        'artillery', 666, 'naval', ['dread_missile']),
+        'artillery', 'naval', ['dread_missile']),
 }
 ARMOUR_CLASSES = ['infantry', 'light', 'heavy', 'structure', 'air', 'naval', 'submerged']
 WARHEADS = {
@@ -300,6 +301,12 @@ NEW_UNITS = {
     "chrono_ivan": ("Chrono Ivan", "crazy_ivan"),
     "yuri_prime": ("Yuri Prime", "yuri"),
 }
+# The free cells allowed between a shipyard and a base building of its owner, instead of the
+# ini's `Adjacent=12`: on the shipped maps water for a shipyard lies within 12 free cells of the
+# Construction Yard at 28 of 176 start positions (the first start of 2 of 21 maps), within 31 at
+# 132 (18 of 21); the maps are not reshaped for it (docs/DECISIONS.md R25, an intentional
+# difference listed in ra2_differences.tsv).
+SHIPYARD_ADJACENT = 31
 # Mapped ids that enter the game in a later milestone, by the note of ra2_mapping.tsv.
 LATER = ("spawned", "tech_building", "support")
 # Units the ini produces only with stolen technology: in the data, not producible until RA6.
@@ -689,6 +696,37 @@ class Item:
         if "Factory" in section:
             self.factory = FACTORIES[(section["Factory"], section.get("Naval") == "yes")]
         self.naval = section.get("Naval") == "yes"
+        # The traits of RA2 (docs/RA2_PARITY_PLAN.md sections 4.2 and 4.6), buildings only.
+        flag = lambda key, default: convert("flag", section.get(key, default))
+        building = self.kind == "building"
+        self.wall = building and flag("Wall", "no") == 1
+        self.defence = building and section.get("BuildCat") == "Combat"
+        self.build_limit = int(section.get("BuildLimit", "0"))
+        self.adjacent = int(section["Adjacent"]) if building else 0
+        # A shipyard reaches farther than the ini lets it (SHIPYARD_ADJACENT).
+        self.far_shipyard = building and self.naval and "Factory" in section
+        if self.far_shipyard:
+            self.adjacent = SHIPYARD_ADJACENT
+        self.base_normal = flag("BaseNormal", "yes") if building else 0
+        self.radar = flag("Radar", "no") if building else 0
+        self.sellable = int(building and not self.wall and flag("Unsellable", "no") == 0)
+        self.repairable = flag("Repairable", "yes") if building else 0
+        self.powered = flag("Powered", "no") if building else 0
+        self.unit_repair = flag("UnitRepair", "no") if building else 0
+        self.special = section.get("SuperWeapon") if building else None
+        self.is_powered = (
+            convert("flag", tables.value(self.special, "IsPowered")) if self.special else 0
+        )
+
+    def build_time(self, tables):
+        """Ticks of build time (section 4.2): the cost times `BuildSpeed` game minutes per 1000
+        credits, at least 1, and for a wall times `WallBuildSpeedCoefficient`."""
+        per_1000 = convert("minutes", tables.value("General", "BuildSpeed"))
+        ticks = max(1, rounded(Fraction(self.cost * per_1000, 1000)))
+        if self.wall:
+            wall = convert("pm", tables.value("General", "WallBuildSpeedCoefficient"))
+            ticks = max(1, rounded(Fraction(ticks * wall, 1000)))
+        return ticks
 
     def comment(self, *keys):
         """The ported keys of the item's section as `[Section] Key=value, Key=value`."""
@@ -787,6 +825,8 @@ class Data:
 
     def economy_file(self):
         refund = cite("General", "RefundPercent", self.tables.section("General"))
+        speed = cite("General", "BuildSpeed", self.tables.section("General"))
+        wall = cite("General", "WallBuildSpeedCoefficient", self.tables.section("General"))
         lines = [
             "// Economy definitions, schema version 1 (PLAN.md sections 5 and 7, M3; docs/DECISIONS.md D23).",
             "//",
@@ -803,8 +843,11 @@ class Data:
             "// harvesters: ore capacity and ore removed per tick of the harvester unit types",
             "// refineries: credits paid per ore unit by the refinery building types",
             "//",
-            "// Cost, prerequisites, power, sell value and free units are ported from the ini; footprints,",
-            "// build times, harvesters and refineries are the game's own until RA2 and RA5.",
+            "// Cost, prerequisites, power, sell value and free units are ported from the ini. The build",
+            f"// time is the cost times {speed} game minutes per 1000 credits, in ticks",
+            f"// (round(cost x 21 / 25), at least 1), and for a wall times {wall}",
+            "// (docs/RA2_PARITY_PLAN.md section 4.2). Footprints, harvesters and refineries are the",
+            "// game's own (the latter two until RA5).",
             "//",
             GENERATED,
             "(",
@@ -816,19 +859,21 @@ class Data:
             item = self.items[game_id]
             lines.append(
                 f'        (id: "{game_id}", sprite: "{values[9]}", width: {values[10]}, '
-                f"height: {values[11]}, cost: {item.cost}, build_time: {values[12]}, "
+                f"height: {values[11]}, cost: {item.cost}, "
+                f"build_time: {item.build_time(self.tables)}, "
                 f'producer: "{self.producer(game_id)}", '
                 f"prerequisites: {quoted(item.prerequisites)}, "
                 f"power_produced: {item.power_produced}, power_consumed: {item.power_consumed}, "
                 f"sell_value: {item.cost * self.refund // 100}, "
                 f"free_units: {quoted(item.free_units)}),"
-                f" // {item.comment('Cost', 'Prerequisite', 'Power', 'FreeUnit')}"
+                f" // {item.comment('Cost', 'Wall', 'Prerequisite', 'Power', 'FreeUnit')}"
             )
         lines += ["    ],", "    units: ["]
         for game_id, values in self.units.items():
             item = self.items[game_id]
             lines.append(
-                f'        (unit: "{game_id}", cost: {item.cost}, build_time: {values[10]}, '
+                f'        (unit: "{game_id}", cost: {item.cost}, '
+                f"build_time: {item.build_time(self.tables)}, "
                 f'producer: "{self.producer(game_id)}", '
                 f"prerequisites: {quoted(item.prerequisites)}),"
                 f" // {item.comment('Cost', 'Prerequisite')}"
@@ -862,7 +907,8 @@ class Data:
             "// units:      hit points, armour class, sight radius in cells, and at most one weapon of every",
             "//             unit type of units.ron",
             "// buildings:  the same for every building type of economy.ron; a building with a weapon is a",
-            "//             defensive structure, which does not fire under low power",
+            "//             defensive structure, which does not fire under low power if it is `powered`",
+            "//             and consumes power (arsenal.ron, economy.ron)",
             "//",
             "// Hit points and sight are ported from the ini; armour classes, warheads and weapons are the",
             "// game's own until RA3.",
@@ -886,8 +932,8 @@ class Data:
                 f'warhead: "{warhead}", projectile_speed: {projectile}),'
             )
         for name, key, table, armour, weapons in (
-            ("units", "unit", self.units, 11, 12),
-            ("buildings", "building", self.buildings, 13, 14),
+            ("units", "unit", self.units, 10, 11),
+            ("buildings", "building", self.buildings, 12, 13),
         ):
             lines += ["    ],", f"    {name}: ["]
             for game_id, values in table.items():
@@ -905,8 +951,8 @@ class Data:
 
     def arsenal_file(self):
         lines = [
-            "// The arsenal, schema version 2 (crates/sim/src/arsenal.rs; docs/DECISIONS.md R10, R11): per item",
-            "// its label, description, category, domain and role with the role's terms (durations in ticks,",
+            "// The arsenal, schema version 3 (crates/sim/src/arsenal.rs; docs/DECISIONS.md R10, R11, R22): per",
+            "// item its label, description, category, domain and role with the role's terms (durations in ticks,",
             "// 20 per second), the id of the item whose art it shows, its side, the factory group of a",
             "// building, and the terms of the ini's buildability rule: the sides whose factories build it",
             "// (`Owner`), the countries that alone may or may not build it (`RequiredHouses`,",
@@ -914,8 +960,19 @@ class Data:
             "// groups of rules.ron of which the player must own a member (the group tokens of",
             "// `Prerequisite`; the single buildings of that key are in economy.ron).",
             "//",
+            "// Since schema version 3 (RA2) a building also has: build_limit (`BuildLimit`: how many a",
+            "// player may own and have queued together; 0: any number), adjacent (`Adjacent`: the free",
+            "// cells allowed between it and a base building of its owner when it is placed), and as 1",
+            "// or 0: base_normal (`BaseNormal`: other buildings may be placed beside it), radar",
+            "// (`Radar`), sellable (no `Wall`, no `Unsellable`), repairable (`Repairable`), powered",
+            "// (`Powered`: it stops working under low power if it consumes power), is_powered (the",
+            "// `IsPowered` of its `SuperWeapon`: the charge waits under low power) and unit_repair",
+            "// (`UnitRepair`: a damaged vehicle sent to it is repaired for credits). The category of a",
+            "// building is its production lane: \"armory\" is `BuildCat=Combat`, the defences. A unit",
+            "// has 0 in all of them.",
+            "//",
             GENERATED,
-            "(schema_version: 2, entries: [",
+            "(schema_version: 3, entries: [",
         ]
         for table in (self.buildings, self.units):
             for game_id, values in table.items():
@@ -925,6 +982,21 @@ class Data:
                 )
                 keys = ["Owner", "RequiredHouses", "ForbiddenHouses", "TechLevel", "Prerequisite"]
                 keys += ["Factory", "Naval"] + list(STOLEN)
+                if item.kind == "building":
+                    if (category == "armory") != item.defence:
+                        raise Failure(f"{game_id}: the category {category} is not its BuildCat")
+                    keys += ["BuildCat", "BuildLimit", "Adjacent", "BaseNormal", "Radar", "Wall"]
+                    keys += ["Unsellable", "Repairable", "Powered", "UnitRepair", "SuperWeapon"]
+                source = item.comment(*keys)
+                if item.kind == "building":
+                    if item.special:
+                        special = self.tables.section(item.special)
+                        source += f"; {cite(item.special, 'IsPowered', special)}"
+                    if item.far_shipyard:
+                        source += "; adjacent is the game's own (ra2_differences.tsv)"
+                # A unit's `BuildLimit` (Yuri Prime) is not ported until the unit can be built
+                # (RA6); ra2_differences.tsv lists it.
+                limit = item.build_limit if item.kind == "building" else 0
                 lines.append(
                     f'    (id: "{game_id}", label: "{label}", description: "{description}", '
                     f'category: "{category}", domain: "{domain}", role: "{role}", '
@@ -934,8 +1006,13 @@ class Data:
                     f"required_countries: {quoted(item.required)}, "
                     f"forbidden_countries: {quoted(item.forbidden)}, "
                     f"tech_level: {item.tech_level}, "
-                    f"prerequisite_groups: {quoted(item.groups)}),"
-                    f" // {item.comment(*keys)}"
+                    f"prerequisite_groups: {quoted(item.groups)}, "
+                    f"build_limit: {limit}, adjacent: {item.adjacent}, "
+                    f"base_normal: {item.base_normal}, radar: {item.radar}, "
+                    f"sellable: {item.sellable}, repairable: {item.repairable}, "
+                    f"powered: {item.powered}, is_powered: {item.is_powered}, "
+                    f"unit_repair: {item.unit_repair}),"
+                    f" // {source}"
                 )
         lines.append("])")
         return "\n".join(lines) + "\n"

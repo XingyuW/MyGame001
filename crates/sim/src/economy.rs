@@ -12,6 +12,20 @@
 //! credits never fall below zero, and under low power (consumed > produced) it progresses only on
 //! even ticks. Cancelling refunds exactly what was charged.
 //!
+//! With a rules file (RA2, docs/RA2_PARITY_PLAN.md section 4.2; docs/DECISIONS.md R22) the head
+//! of a queue advances by a rate instead of one unit per tick: 1000 permille of a unit per tick,
+//! times 1000 / `multiple_factory_pm` for every further working factory of the item's group up
+//! to [`MAX_COUNTED_FACTORIES`] ([`factory_rate_pm`]), times the low power factor
+//! ([`power_rate_pm`]: between `min_low_power_speed_pm` and `max_low_power_speed_pm` while the
+//! player is short of power), times 10 with Super Me. The rate is added to the item's
+//! [`QueueItem::fraction`] every tick; each whole unit is one unit of progress, charged as
+//! above, so equation 3 and invariant I7 hold with every rate; a unit the player cannot pay
+//! ends the tick's progress, and the fraction below one unit is kept. The Construction Yard has
+//! two lanes there, buildings and defences ([`Lane`]), which progress side by side and hold one
+//! item each; a queue of units holds one item in production and `max_queued_objects` behind it
+//! (`Definitions::queue_capacity`). Without a rules file a queue holds [`MAX_QUEUE_LENGTH`]
+//! items, a producer has one queue, and low power halves production by the even tick rule.
+//!
 //! A complete building waits at the head of its queue until it is placed with `PlaceBuilding`.
 //! A complete unit leaves a producing building of its owner as soon as a cell around the
 //! building is free (`building::exit_cell`), and moves to the building's rally point if one is
@@ -41,8 +55,36 @@ use crate::schedule::SimTick;
 use crate::unit::{MoveOrder, Owner, unit_bundle};
 use crate::visibility::Vision;
 
-/// Largest number of items in one production queue.
+/// Largest number of items in one production queue of a world without a rules file (with one:
+/// `Definitions::queue_capacity`).
 pub const MAX_QUEUE_LENGTH: usize = 16;
+
+/// Largest number of factories of one group that speed its production up (RA2). The ini knows
+/// no cap; the game counts at most this many so that the rate is bounded (assumption,
+/// docs/RA2_PARITY_PLAN.md section 4.2).
+pub const MAX_COUNTED_FACTORIES: usize = 10;
+
+/// Largest production rate in permille of a progress unit per tick, whatever the rules file
+/// holds (invariant I12).
+pub const MAX_PRODUCTION_RATE_PM: u64 = 1_000_000_000;
+
+/// The lane of a queue (RA2, docs/RA2_PARITY_PLAN.md section 5, RA2 item 3). With a rules file
+/// the buildings of the Construction Yard are produced in two lanes that progress side by side:
+/// the defences (the arsenal's category `armory`, the ini's `BuildCat=Combat`) and everything
+/// else. Units, and every item of a world without a rules file, are in the main lane.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum Lane {
+    Main,
+    Defences,
+}
+
+/// What a player's queue is kept under: the building type of its producer, or the first
+/// building type of the producer's factory group ([`Definitions::queue_key`]), and the lane.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct QueueKey {
+    pub producer: BuildingKind,
+    pub lane: Lane,
+}
 
 /// An item in a production queue.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -52,6 +94,21 @@ pub struct QueueItem {
     pub progress: u32,
     /// Credits charged so far, from 0 to the item's cost.
     pub charged: i64,
+    /// Permille of a unit of progress carried over to the next tick, from 0 to 999 (RA2: the
+    /// production rate is a permille per tick). Always 0 in a world without a rules file.
+    pub fraction: u32,
+}
+
+impl QueueItem {
+    /// `item` as it enters a queue: no progress, nothing charged.
+    pub fn new(item: ProductionItem) -> Self {
+        Self {
+            item,
+            progress: 0,
+            charged: 0,
+            fraction: 0,
+        }
+    }
 }
 
 /// The economic state of one player.
@@ -70,8 +127,10 @@ pub struct PlayerState {
     pub(crate) credits: i64,
     pub(crate) power_produced: i32,
     pub(crate) power_consumed: i32,
-    /// One queue per producing building type; queues that become empty are removed.
-    pub(crate) queues: BTreeMap<BuildingKind, Vec<QueueItem>>,
+    /// One queue per producing building type and lane; queues that become empty are removed.
+    pub(crate) queues: BTreeMap<QueueKey, Vec<QueueItem>>,
+    /// Whether the player has radar, as of the last `Economy` stage ([`PlayerState::radar`]).
+    pub(crate) radar: bool,
     /// What the player sees of the grid (M4, `crate::visibility`).
     pub(crate) vision: Vision,
     /// The items the player's faction may produce (M7, docs/DECISIONS.md D48); `None` for a
@@ -137,11 +196,48 @@ impl PlayerState {
         self.power_consumed > self.power_produced
     }
 
-    /// The queue kept under building type `producer`, head first. A queue is kept under the
-    /// producer of its items, or under the first building type of the producer's factory group
-    /// where the arsenal defines groups ([`Definitions::queue_key`]).
+    /// Whether the player has radar (RA2, the minimap of the game): with a rules file, while it
+    /// owns a working radar building (the arsenal's `radar`), is not low on power and suffers no
+    /// power outage from a spy; always in a world without a rules file. As of the last
+    /// `Economy` stage ([`update_power`]).
+    pub fn radar(&self) -> bool {
+        self.radar
+    }
+
+    /// Whether power lets a building of type `kind` of this player work. Without a rules file:
+    /// while the player is not low on power (the rule of M3 to M9). With one (RA2): always,
+    /// unless the player is low on power and the building is `powered` and consumes power
+    /// (docs/RA2_PARITY_PLAN.md section 4.2: a Pillbox and a Sentry Gun keep firing).
+    pub fn powers(&self, definitions: &Definitions, kind: BuildingKind) -> bool {
+        if !self.low_power() {
+            return true;
+        }
+        if definitions.rules().is_none() {
+            return false;
+        }
+        let drains = definitions
+            .building(kind)
+            .is_some_and(|def| def.power_consumed > 0);
+        let powered = definitions
+            .metadata(ProductionItem::Building(kind))
+            .is_some_and(|entry| entry.powered);
+        !(powered && drains)
+    }
+
+    /// The main lane of the queue kept under building type `producer`, head first. A queue is
+    /// kept under the producer of its items, or under the first building type of the producer's
+    /// factory group where the arsenal defines groups ([`Definitions::queue_key`]), and under
+    /// the lane of its items ([`PlayerState::lane`], [`Definitions::queue_of`]).
     pub fn queue(&self, producer: BuildingKind) -> &[QueueItem] {
-        self.queues.get(&producer).map_or(&[], Vec::as_slice)
+        self.lane(QueueKey {
+            producer,
+            lane: Lane::Main,
+        })
+    }
+
+    /// The queue kept under `key`, head first.
+    pub fn lane(&self, key: QueueKey) -> &[QueueItem] {
+        self.queues.get(&key).map_or(&[], Vec::as_slice)
     }
 
     /// The player's visibility grid as of the last `Visibility` stage (shroud and fog,
@@ -163,11 +259,11 @@ impl PlayerState {
         self.roster.as_ref()
     }
 
-    /// Every non-empty queue, by producing building type.
-    pub fn queues(&self) -> impl Iterator<Item = (BuildingKind, &[QueueItem])> {
+    /// Every non-empty queue, by producing building type and lane.
+    pub fn queues(&self) -> impl Iterator<Item = (QueueKey, &[QueueItem])> {
         self.queues
             .iter()
-            .map(|(&producer, items)| (producer, items.as_slice()))
+            .map(|(&key, items)| (key, items.as_slice()))
     }
 }
 
@@ -300,10 +396,10 @@ impl Players {
     }
 
     /// Every player in id order: id, credits, power produced and consumed, then each queue
-    /// (producing building type, item count, and per item its kind tag and index, progress,
-    /// and credits charged), then the vision (from M4), then the roster (from M7: a flag byte, and
-    /// with a roster its length and each item's kind tag and index), the buildings being
-    /// repaired, and the country (from RA1: its index, or 255 for none).
+    /// (producing building type, lane, item count, and per item its kind tag and index, progress,
+    /// credits charged and fraction), then the vision (from M4), then the roster (from M7: a flag
+    /// byte, and with a roster its length and each item's kind tag and index), the buildings
+    /// being repaired, the country (from RA1: its index, or 255 for none), and the radar (RA2).
     pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
         hasher.write_u64(self.players.len() as u64);
         for (player, state) in &self.players {
@@ -324,8 +420,9 @@ impl Players {
             hasher.write(&state.power_produced.to_le_bytes());
             hasher.write(&state.power_consumed.to_le_bytes());
             hasher.write_u64(state.queues.len() as u64);
-            for (producer, items) in &state.queues {
-                hasher.write(&producer.0.to_le_bytes());
+            for (key, items) in &state.queues {
+                hasher.write(&key.producer.0.to_le_bytes());
+                hasher.write(&[key.lane as u8]);
                 hasher.write_u64(items.len() as u64);
                 for item in items {
                     let (tag, index) = item_key(item.item);
@@ -333,6 +430,7 @@ impl Players {
                     hasher.write(&index.to_le_bytes());
                     hasher.write_u32(item.progress);
                     hasher.write(&item.charged.to_le_bytes());
+                    hasher.write_u32(item.fraction);
                 }
             }
             state.vision.hash_into(hasher);
@@ -352,7 +450,10 @@ impl Players {
             for id in &state.repairing {
                 hasher.write_u32(id.0);
             }
-            hasher.write(&[state.country.map_or(u8::MAX, |country| country.0)]);
+            hasher.write(&[
+                state.country.map_or(u8::MAX, |country| country.0),
+                u8::from(state.radar),
+            ]);
         }
     }
 }
@@ -379,6 +480,111 @@ pub(crate) fn charge_for_tick(cost: i64, build_time: u32, progress: u32) -> i64 
     }
 }
 
+/// The production rate of `factories` working factories of one group, in permille of a unit of
+/// progress per tick (RA2, docs/RA2_PARITY_PLAN.md section 4.2): 1000 with one factory, and for
+/// every further one, up to [`MAX_COUNTED_FACTORIES`], times 1000 / `multiple_factory_pm` (the
+/// ini's `MultipleFactory=0.8` is a build time factor), rounded down once:
+/// `1000 x 1000^(n-1) div multiple_factory_pm^(n-1)`, which is `1000 x 5^(n-1) div 4^(n-1)` for
+/// the value of Red Alert 2. At most [`MAX_PRODUCTION_RATE_PM`].
+pub fn factory_rate_pm(rules: &crate::rules::ProductionRules, factories: usize) -> u64 {
+    let factor = u128::from(rules.multiple_factory_pm.clamp(1, 1000).unsigned_abs());
+    let (mut numerator, mut denominator) = (1000_u128, 1_u128);
+    // At most 1000^10 and 1000^9, far below `u128::MAX`.
+    for _ in 1..factories.clamp(1, MAX_COUNTED_FACTORIES) {
+        numerator *= 1000;
+        denominator *= factor;
+    }
+    u64::try_from(numerator / denominator)
+        .unwrap_or(MAX_PRODUCTION_RATE_PM)
+        .min(MAX_PRODUCTION_RATE_PM)
+}
+
+/// The factor of the production rate of a player whose buildings produce `produced` and consume
+/// `consumed` power, in permille (RA2, section 4.2): 1000 while the power suffices; otherwise
+/// `1000 - low_power_penalty_pm x shortage`, where the shortage is `1 - produced / consumed`
+/// (assumption: the ini does not define it), clamped to `min_low_power_speed_pm` and
+/// `max_low_power_speed_pm`: with the values of Red Alert 2, 800 for a shortage of up to a
+/// fifth, 500 for a half or more.
+pub fn power_rate_pm(rules: &crate::rules::ProductionRules, produced: i32, consumed: i32) -> u64 {
+    if consumed <= produced {
+        return 1000;
+    }
+    // `consumed` is above `produced`, so above 0 unless `produced` is negative, which no
+    // building's power is.
+    let ratio = (i64::from(produced.max(0)) * 1000 / i64::from(consumed.max(1))).min(1000);
+    let penalty = i64::from(rules.low_power_penalty_pm) * (1000 - ratio) / 1000;
+    let (min, max) = (
+        i64::from(rules.min_low_power_speed_pm),
+        i64::from(rules.max_low_power_speed_pm),
+    );
+    u64::try_from((1000 - penalty).clamp(min, max.max(min))).unwrap_or(0)
+}
+
+/// The production rate of a player in permille of a unit of progress per tick (RA2, section
+/// 4.2): [`factory_rate_pm`] times [`power_rate_pm`], rounded down, times 10 with Super Me.
+pub fn production_rate_pm(
+    rules: &crate::rules::ProductionRules,
+    factories: usize,
+    produced: i32,
+    consumed: i32,
+    super_me: bool,
+) -> u64 {
+    let rate = factory_rate_pm(rules, factories) * power_rate_pm(rules, produced, consumed) / 1000;
+    let rate = if super_me {
+        rate.saturating_mul(10)
+    } else {
+        rate
+    };
+    rate.min(MAX_PRODUCTION_RATE_PM)
+}
+
+/// Advances `head`, an item of cost `cost` and build time `build_time` that is not complete, by
+/// one tick at `rate_pm` permille of a unit per tick, paying from `credits` (RA2, section 4.2).
+/// The rate is added to the item's fraction; every whole unit is one unit of progress, charged
+/// as [`charge_for_tick`] charges it (with Super Me: nothing, and 1 credit for the last unit).
+/// Progress ends at the first unit the credits do not pay for; the fraction below one unit is
+/// kept either way, and whole units that were not made are not carried over.
+pub(crate) fn advance_item(
+    head: &mut QueueItem,
+    cost: i64,
+    build_time: u32,
+    rate_pm: u64,
+    super_me: bool,
+    credits: &mut i64,
+) {
+    let total = u64::from(head.fraction).saturating_add(rate_pm);
+    // Below 1000.
+    head.fraction = (total % 1000) as u32;
+    let left = build_time.saturating_sub(head.progress);
+    let wanted = u32::try_from(total / 1000).unwrap_or(u32::MAX).min(left);
+    if wanted == 0 {
+        return;
+    }
+    let time = i64::from(build_time.max(1));
+    let (step, last) = if super_me {
+        (0, 1)
+    } else {
+        (cost / time, cost / time + cost % time)
+    };
+    // Every unit but the last of the item costs `step`; the last one `last`.
+    let finishes = wanted == left;
+    let plain = wanted - u32::from(finishes);
+    let paid = if step <= 0 {
+        plain
+    } else {
+        plain.min(u32::try_from((*credits).max(0) / step).unwrap_or(u32::MAX))
+    };
+    let charge = step.max(0).saturating_mul(i64::from(paid));
+    *credits -= charge;
+    head.charged = head.charged.saturating_add(charge);
+    head.progress = head.progress.saturating_add(paid);
+    if finishes && paid == plain && *credits >= last {
+        *credits -= last;
+        head.charged = head.charged.saturating_add(last);
+        head.progress = head.progress.saturating_add(1);
+    }
+}
+
 /// Ticks between two repair steps of a building: four steps a second at 20 ticks a second.
 pub const REPAIR_INTERVAL: u64 = 5;
 /// Repair steps that take a building from no hit points to whole (20 seconds).
@@ -402,11 +608,30 @@ pub fn repair_cost(price: i64, heal: i32, max: i32, super_me: bool) -> i64 {
     if super_me { cost.min(1) } else { cost }
 }
 
+/// The credits one repair step costs with a rules file (RA2, docs/RA2_PARITY_PLAN.md section
+/// 4.6), for a building or a vehicle of price `price` and `strength` hit points when whole:
+/// `max(1, (price div max(strength div repair_step, 1)) x repair_percent div 100)`, so that a
+/// repair from nothing costs about `repair_percent` of the price. Super Me charges at most 1
+/// credit, as it does for production.
+pub fn repair_step_cost(
+    rules: &crate::rules::EconomyRules,
+    price: i64,
+    strength: i32,
+    super_me: bool,
+) -> i64 {
+    let steps = i64::from((strength / rules.repair_step.max(1)).max(1));
+    let cost = (price.max(0) / steps).saturating_mul(i64::from(rules.repair_percent)) / 100;
+    let cost = cost.max(1);
+    if super_me { cost.min(1) } else { cost }
+}
+
 /// Repairs the buildings each player has ordered repaired (`RepairBuilding`), in id order: every
 /// [`REPAIR_INTERVAL`] ticks a building regains `max / REPAIR_STEPS` hit points (at least 1, at
-/// most what it lacks) for [`repair_cost`] credits. A step the player cannot pay for is skipped
-/// and the repair waits for credits. A repair ends when the building is whole, destroyed, sold,
-/// or no longer the player's (captured).
+/// most what it lacks) for [`repair_cost`] credits. With a rules file (RA2): every
+/// `repair_interval` ticks it regains `repair_step` hit points (at most what it lacks) for
+/// [`repair_step_cost`] credits. A step the player cannot pay for is skipped and the repair
+/// waits for credits. A repair ends when the building is whole, destroyed, sold, or no longer
+/// the player's (captured).
 pub(crate) fn repair_buildings(
     mut players: ResMut<Players>,
     definitions: Res<Definitions>,
@@ -426,7 +651,11 @@ pub(crate) fn repair_buildings(
     {
         return;
     }
-    let step_now = tick.0.is_multiple_of(REPAIR_INTERVAL);
+    let rules = definitions.rules().map(|rules| rules.economy);
+    let interval = rules.map_or(REPAIR_INTERVAL, |rules| {
+        u64::from(rules.repair_interval.max(1).unsigned_abs())
+    });
+    let step_now = tick.0.is_multiple_of(interval);
     let index: BTreeMap<SimId, Entity> = buildings
         .iter()
         .map(|(entity, id, ..)| (*id, entity))
@@ -450,13 +679,20 @@ pub(crate) fn repair_buildings(
             if !step_now {
                 continue;
             }
-            let heal = (max / REPAIR_STEPS)
-                .max(1)
-                .min(max.saturating_sub(health.hit_points));
+            let lacking = max.saturating_sub(health.hit_points);
             let price = definitions
                 .building(building.kind)
                 .map_or(0, |def| def.production.cost);
-            let cost = repair_cost(price, heal, max, state.super_me);
+            let (heal, cost) = match &rules {
+                Some(rules) => (
+                    rules.repair_step.max(1).min(lacking),
+                    repair_step_cost(rules, price, max, state.super_me),
+                ),
+                None => {
+                    let heal = (max / REPAIR_STEPS).max(1).min(lacking);
+                    (heal, repair_cost(price, heal, max, state.super_me))
+                }
+            };
             if state.credits < cost {
                 continue;
             }
@@ -473,19 +709,32 @@ pub(crate) fn repair_buildings(
 }
 
 /// Recomputes every player's power from the buildings it owns (first system of the `Economy`
-/// stage, so buildings placed or sold by this tick's commands count).
+/// stage, so buildings placed or sold by this tick's commands count), and from it the player's
+/// radar ([`PlayerState::radar`]): with a rules file a player has radar while it owns a radar
+/// building that a spy has not switched off, is not low on power, and suffers no power outage.
 pub(crate) fn update_power(
     mut players: ResMut<Players>,
     definitions: Res<Definitions>,
-    buildings: Query<(&Owner, &Building)>,
+    buildings: Query<(&SimId, &Owner, &Building)>,
     special: Res<crate::SpecialState>,
     tick: Res<SimTick>,
 ) {
     let mut totals: BTreeMap<PlayerId, (i32, i32)> = BTreeMap::new();
-    for (owner, building) in &buildings {
+    let mut radars: BTreeSet<PlayerId> = BTreeSet::new();
+    for (id, owner, building) in &buildings {
         let Some(def) = definitions.building(building.kind) else {
             continue;
         };
+        if definitions
+            .metadata(ProductionItem::Building(building.kind))
+            .is_some_and(|entry| entry.radar)
+            && !special
+                .disabled
+                .get(id)
+                .is_some_and(|until| *until > tick.0)
+        {
+            radars.insert(owner.0);
+        }
         let total = totals.entry(owner.0).or_default();
         // Bounded far below `i32::MAX` (economy_defs::MAX_POWER); saturating for invariant I12.
         total.0 = total.0.saturating_add(def.power_produced);
@@ -493,12 +742,11 @@ pub(crate) fn update_power(
     }
     for (player, state) in &mut players.players {
         let (produced, consumed) = totals.get(player).copied().unwrap_or_default();
-        state.power_produced = if special.outages.get(player).is_some_and(|t| *t > tick.0) {
-            0
-        } else {
-            produced
-        };
+        let outage = special.outages.get(player).is_some_and(|t| *t > tick.0);
+        state.power_produced = if outage { 0 } else { produced };
         state.power_consumed = consumed;
+        state.radar = definitions.rules().is_none()
+            || (radars.contains(player) && !outage && !state.low_power());
     }
 }
 
@@ -582,10 +830,11 @@ type BuildingQuery<'w, 's> = Query<
     ),
 >;
 
-/// Advances the head of every production queue by one tick (equation 3), lets complete units
-/// leave their producing buildings, and lets the free units of newly placed buildings leave
-/// them. Players are processed in id order and queues in order of their building type, so the
-/// result is deterministic (invariant I4).
+/// Advances the head of every production queue by one tick (equation 3; with a rules file by
+/// the player's production rate, [`production_rate_pm`]), lets complete units leave their
+/// producing buildings, and lets the free units of newly placed buildings leave them. Players
+/// are processed in id order and queues in order of their building type and lane, so the result
+/// is deterministic (invariant I4).
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn advance_production(
     mut commands: Commands,
@@ -632,12 +881,14 @@ pub(crate) fn advance_production(
         events: &mut events,
         tick: tick.0,
     };
+    let rates = definitions.rules().map(|rules| rules.production);
     for (&player, state) in &mut players.players {
         let low_power = state.low_power();
         let speed = state.production_speed();
         let super_me = state.super_me;
         let unlock_all = state.unlock_all;
-        let producers: Vec<BuildingKind> = state.queues.keys().copied().collect();
+        let (produced, consumed) = (state.power_produced, state.power_consumed);
+        let producers: Vec<QueueKey> = state.queues.keys().copied().collect();
         // The types of the player's buildings that work, one entry per building.
         let kinds: Vec<BuildingKind> = exits
             .iter()
@@ -672,22 +923,40 @@ pub(crate) fn advance_production(
                 if owned.is_empty()
                     || !unlock_all
                         && missing_prerequisite(&definitions, &kinds, head.item).is_some()
-                    || (low_power && !even_tick)
                 {
                     continue;
                 }
-                let next = head.progress.saturating_add(speed).min(terms.build_time);
-                let charge = if super_me {
-                    i64::from(next == terms.build_time)
-                } else {
-                    charge_for_tick(terms.cost, terms.build_time, head.progress)
-                };
-                if *credits < charge {
-                    continue;
+                match &rates {
+                    // RA2: by the rate of the working factories of the item's group and of the
+                    // player's power.
+                    Some(rates) => {
+                        let factories = kinds
+                            .iter()
+                            .filter(|&&kind| definitions.same_factory(kind, terms.producer))
+                            .count();
+                        let rate =
+                            production_rate_pm(rates, factories, produced, consumed, super_me);
+                        advance_item(head, terms.cost, terms.build_time, rate, super_me, credits);
+                    }
+                    // Without a rules file: one unit per tick, on even ticks under low power.
+                    None => {
+                        if low_power && !even_tick {
+                            continue;
+                        }
+                        let next = head.progress.saturating_add(speed).min(terms.build_time);
+                        let charge = if super_me {
+                            i64::from(next == terms.build_time)
+                        } else {
+                            charge_for_tick(terms.cost, terms.build_time, head.progress)
+                        };
+                        if *credits < charge {
+                            continue;
+                        }
+                        *credits -= charge;
+                        head.charged = head.charged.saturating_add(charge);
+                        head.progress = next;
+                    }
                 }
-                *credits -= charge;
-                head.charged = head.charged.saturating_add(charge);
-                head.progress = next;
                 if head.progress < terms.build_time {
                     continue;
                 }
@@ -751,6 +1020,174 @@ mod tests {
             assert!(charges.iter().all(|&charge| charge >= 0));
             let per_tick = cost / i64::from(time);
             assert!(charges[..charges.len() - 1].iter().all(|&c| c == per_tick));
+        }
+    }
+
+    /// A small deterministic generator for the property test below (splitmix64).
+    struct Random(u64);
+
+    impl Random {
+        fn next(&mut self) -> u64 {
+            self.0 = self.0.wrapping_add(0x9e37_79b9_7f4a_7c15);
+            let mut z = self.0;
+            z = (z ^ (z >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+            z = (z ^ (z >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
+            z ^ (z >> 31)
+        }
+
+        fn below(&mut self, bound: u64) -> u64 {
+            self.next() % bound.max(1)
+        }
+    }
+
+    /// One tick of an item at a rate, unit by unit: the definition that [`advance_item`]
+    /// computes in closed form.
+    fn advance_by_units(
+        head: &mut QueueItem,
+        cost: i64,
+        build_time: u32,
+        rate_pm: u64,
+        super_me: bool,
+        credits: &mut i64,
+    ) {
+        let total = u64::from(head.fraction) + rate_pm;
+        head.fraction = (total % 1000) as u32;
+        for _ in 0..total / 1000 {
+            if head.progress >= build_time {
+                break;
+            }
+            let charge = if super_me {
+                i64::from(head.progress + 1 == build_time)
+            } else {
+                charge_for_tick(cost, build_time, head.progress)
+            };
+            if *credits < charge {
+                break;
+            }
+            *credits -= charge;
+            head.charged += charge;
+            head.progress += 1;
+        }
+    }
+
+    /// Invariant I7 with every rate (RA2): whatever the cost, the build time, the rate and the
+    /// credits a player has from tick to tick, the credits never fall below zero, every tick
+    /// charges what the units of progress it made cost by equation 3, and a complete item has
+    /// been charged exactly its cost (1 credit with Super Me).
+    #[test]
+    fn an_item_is_charged_unit_by_unit_and_exactly_its_cost_at_every_rate() {
+        let item = ProductionItem::Unit(UnitKind(0));
+        let mut random = Random(2);
+        let rates = [
+            0,
+            1,
+            499,
+            500,
+            666,
+            800,
+            999,
+            1000,
+            1001,
+            1250,
+            1562,
+            7450,
+            10_000,
+            74_500,
+            MAX_PRODUCTION_RATE_PM,
+        ];
+        for case in 0..4000 {
+            let cost = match case % 4 {
+                0 => random.below(50) as i64,
+                1 => random.below(5000) as i64,
+                2 => MAX_COST - random.below(3) as i64,
+                _ => random.below(MAX_COST as u64 + 1) as i64,
+            };
+            let build_time = match case % 3 {
+                0 => 1 + random.below(40) as u32,
+                1 => 1 + random.below(3000) as u32,
+                _ => MAX_BUILD_TIME - random.below(3) as u32,
+            };
+            let super_me = case % 7 == 0;
+            let rate = rates[random.below(rates.len() as u64) as usize];
+            let rate = if case % 5 == 0 {
+                1 + random.below(20_000)
+            } else {
+                rate
+            };
+            let (mut fast, mut slow) = (QueueItem::new(item), QueueItem::new(item));
+            // Sometimes plenty of credits, sometimes a trickle.
+            let mut credits = if case % 2 == 0 { MAX_COST * 2 } else { 0 };
+            let price = if super_me { 1 } else { cost };
+            for _ in 0..200 {
+                if fast.progress >= build_time {
+                    break;
+                }
+                if case % 2 == 1 {
+                    credits += random.below((cost as u64 / 20).max(2)) as i64;
+                }
+                let (before, mut reference) = (credits, credits);
+                let charged = fast.charged;
+                advance_item(&mut fast, cost, build_time, rate, super_me, &mut credits);
+                advance_by_units(&mut slow, cost, build_time, rate, super_me, &mut reference);
+                assert_eq!(
+                    fast, slow,
+                    "case {case}: {cost} over {build_time} at {rate}"
+                );
+                assert_eq!(credits, reference, "case {case}");
+                assert!(credits >= 0 && credits <= before, "case {case}");
+                assert_eq!(fast.charged - charged, before - credits, "case {case}");
+                assert!(fast.fraction < 1000 && fast.progress <= build_time);
+                assert!(fast.charged <= price, "case {case}");
+            }
+            if fast.progress >= build_time {
+                assert_eq!(fast.charged, price, "case {case}: {cost} over {build_time}");
+            }
+        }
+    }
+
+    /// The new state of RA2 is hashed (invariant I3): the fraction of a queued item, the lane
+    /// of a queue, and the radar.
+    #[test]
+    fn fractions_lanes_and_radar_are_hashed() {
+        let hash = |change: &dyn Fn(&mut PlayerState)| {
+            let mut players = Players::default();
+            players.add(PlayerId(0), 100).expect("a player");
+            let state = players.get_mut(PlayerId(0)).expect("the player");
+            state.queues.insert(
+                QueueKey {
+                    producer: BuildingKind(1),
+                    lane: Lane::Main,
+                },
+                vec![QueueItem::new(ProductionItem::Building(BuildingKind(2)))],
+            );
+            change(state);
+            let mut hasher = Fnv1a64::new();
+            players.hash_into(&mut hasher);
+            hasher.finish()
+        };
+        let plain = hash(&|_| {});
+        assert_eq!(plain, hash(&|_| {}));
+        let fraction = hash(&|state| {
+            for items in state.queues.values_mut() {
+                items[0].fraction = 250;
+            }
+        });
+        let lane = hash(&|state| {
+            let items = state.queues.pop_first().expect("a queue").1;
+            state.queues.insert(
+                QueueKey {
+                    producer: BuildingKind(1),
+                    lane: Lane::Defences,
+                },
+                items,
+            );
+        });
+        let radar = hash(&|state| state.radar = true);
+        let all = [plain, fraction, lane, radar];
+        for (index, a) in all.iter().enumerate() {
+            for b in &all[index + 1..] {
+                assert_ne!(a, b);
+            }
         }
     }
 }

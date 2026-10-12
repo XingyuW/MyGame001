@@ -158,6 +158,37 @@ pub fn ready_building(state: &PlayerState, definitions: &Definitions) -> Option<
     })
 }
 
+/// Every building type of `state` that is complete and waits for placement, in the order of the
+/// queues (RA2: the two lanes of the Construction Yard may each hold one).
+pub fn ready_buildings(state: &PlayerState, definitions: &Definitions) -> Vec<BuildingKind> {
+    state
+        .queues()
+        .filter_map(|(_, items)| {
+            let head = items.first()?;
+            let ProductionItem::Building(kind) = head.item else {
+                return None;
+            };
+            let terms = definitions.production(head.item)?;
+            (head.progress >= terms.build_time).then_some(kind)
+        })
+        .collect()
+}
+
+/// The ready building of `state` the interface deals with in `mode`: the one that placement
+/// mode is placing, if it is ready; otherwise the first ready one ([`ready_building`]).
+pub fn ready_in_mode(
+    mode: InterfaceMode,
+    state: &PlayerState,
+    definitions: &Definitions,
+) -> Option<BuildingKind> {
+    match mode {
+        InterfaceMode::Place(kind) if ready_buildings(state, definitions).contains(&kind) => {
+            Some(kind)
+        }
+        _ => ready_building(state, definitions),
+    }
+}
+
 /// The footprint of a building of `width` × `height` cells centred on `cell` (for an even side,
 /// the cell is the one just above and left of the centre).
 pub fn footprint_at(cell: CellPos, width: u8, height: u8) -> Footprint {
@@ -371,7 +402,7 @@ pub fn placement_preview(
             buildings
                 .iter(host.world())
                 .filter(|(owner, _)| owner.0 == HUMAN)
-                .map(|(_, building)| building.footprint),
+                .map(|(_, building)| (building.kind, building.footprint)),
         );
     }
     let check = sim::check_placement(
@@ -385,10 +416,10 @@ pub fn placement_preview(
     Some((footprint, check))
 }
 
-/// The human player's ready building.
-fn human_ready_building(host: &SimHost) -> Option<BuildingKind> {
+/// The human player's ready building that `mode` deals with ([`ready_in_mode`]).
+fn human_ready_building(host: &SimHost, mode: InterfaceMode) -> Option<BuildingKind> {
     let definitions = host.definitions()?;
-    ready_building(host.players()?.get(HUMAN)?, definitions)
+    ready_in_mode(mode, host.players()?.get(HUMAN)?, definitions)
 }
 
 // --- Systems --------------------------------------------------------------------------------
@@ -404,7 +435,7 @@ fn issue_economy_commands(
     let Some(definitions) = host.definitions() else {
         return;
     };
-    let ready = human_ready_building(&host);
+    let ready = human_ready_building(&host, *mode);
     let mut next = mode_while_ready(*mode, ready);
     let mut commands = Vec::new();
     let (owners, producers) = building_owners(&host, definitions);
@@ -862,6 +893,61 @@ mod tests {
             building: barracks,
             cell,
         }));
+    }
+
+    #[test]
+    fn two_ready_buildings_of_the_two_lanes_are_each_placed_in_their_own_mode() {
+        // RA2: a Power Plant in the lane of the buildings and a Pillbox in the lane of the
+        // defences (it needs a Barracks) are built side by side and are ready together.
+        // (The second Power Plant feeds the Barracks, so that nothing is slowed down.)
+        let mut host = crate::sim_host::tests::demo_host_with(|world| {
+            for id in ["power_plant", "barracks"] {
+                let spot = (30..60)
+                    .flat_map(|y| (20..60).map(move |x| sim::CellPos::new(x, y)))
+                    .find(|&cell| sim::spawn_building(world, HUMAN, id, cell).is_ok());
+                assert!(spot.is_some(), "ground for {id}");
+            }
+        });
+        let definitions = host.definitions().expect("definitions").clone();
+        let kind = |id: &str| definitions.building_kind(id).expect("building");
+        let (power, pillbox) = (kind("power_plant"), kind("pillbox"));
+        let time = |kind| {
+            definitions
+                .production(ProductionItem::Building(kind))
+                .expect("terms")
+                .build_time
+        };
+        crate::sim_host::tests::run(
+            &mut host,
+            [power, pillbox]
+                .map(|kind| Command::QueueProduction {
+                    item: ProductionItem::Building(kind),
+                })
+                .to_vec(),
+        );
+        for _ in 1..time(power).max(time(pillbox)) {
+            crate::sim_host::tests::run(&mut host, Vec::new());
+        }
+        let state = host.players().and_then(|p| p.get(HUMAN)).expect("human");
+        assert_eq!(ready_buildings(state, &definitions), [power, pillbox]);
+        assert_eq!(ready_building(state, &definitions), Some(power));
+        // The mode keeps the building it is placing; any other mode deals with the first.
+        let place = InterfaceMode::Place(pillbox);
+        assert_eq!(ready_in_mode(place, state, &definitions), Some(pillbox));
+        assert_eq!(
+            mode_while_ready(place, ready_in_mode(place, state, &definitions)),
+            place
+        );
+        assert_eq!(
+            ready_in_mode(InterfaceMode::Normal, state, &definitions),
+            Some(power)
+        );
+        // A building that is not ready cannot be the one in placement.
+        let barracks = InterfaceMode::Place(kind("barracks"));
+        assert_eq!(
+            mode_while_ready(barracks, ready_in_mode(barracks, state, &definitions)),
+            InterfaceMode::Normal
+        );
     }
 
     #[test]

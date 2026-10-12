@@ -126,15 +126,23 @@ fn rejections(events: &[SimEvent]) -> Vec<RejectReason> {
         .collect()
 }
 
-/// The queue of `player` kept under the factory group of `producer`, as item list.
+/// The queues of `player` kept under the factory group of `producer`, as item list: its main
+/// lane and then, for a yard, its lane of defences (RA2).
 fn queued(app: &App, player: PlayerId, producer: &str) -> Vec<ProductionItem> {
     let key = defs(app).queue_key(kind(app, producer));
-    app.world()
+    let state = app
+        .world()
         .resource::<Players>()
         .get(player)
-        .expect("player")
-        .queue(key)
-        .iter()
+        .expect("player");
+    [sim::Lane::Main, sim::Lane::Defences]
+        .into_iter()
+        .flat_map(|lane| {
+            state.lane(sim::QueueKey {
+                producer: key,
+                lane,
+            })
+        })
         .map(|queued| queued.item)
         .collect()
 }
@@ -175,7 +183,7 @@ fn build(app: &mut App, player: PlayerId, id: &str) {
         query
             .iter(app.world())
             .filter(|(owner, _)| owner.0 == player)
-            .map(|(_, building)| building.footprint)
+            .map(|(_, building)| (building.kind, building.footprint))
             .collect()
     };
     let origin = {
