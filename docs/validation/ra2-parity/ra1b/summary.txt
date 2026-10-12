@@ -1,0 +1,12 @@
+01 exit 0  0 s  cargo fmt --all -- --check
+02 exit 0  0 s  git diff --check
+03 exit 0  0 s  cargo clippy --workspace --all-targets -- -D warnings
+04 exit 0  1871 s  cargo test --workspace --release  [610 passed, 0 failed, 0 ignored]
+05 exit 0  0 s  cargo build --release -p game
+06 exit 0  15 s  cargo run --release -p game -- --smoke-test 600
+07 exit 0  113 s  cargo run -p game -- --smoke-test 600
+08 exit 0  1 s  cargo run --release -p sim --example m7_benchmark
+09 exit 0  2068 s  cargo run --release -p sim --example m7_soak
+10 exit 0  749 s  cargo run --release -p sim --example m14_duels -- full
+validation ra1b: PASSED
+Commands 1 to 10 on commit f4d0918 (the package step, 11, was not run: the brief of RA1-B allows it to be skipped).

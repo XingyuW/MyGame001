@@ -1,0 +1,7 @@
+    Finished `release` profile [optimized] target(s) in 0.17s
+     Running `target/release/examples/m7_benchmark`
+m7 benchmark (release build): 100 armed units per player, 2000 measured ticks per scenario; budget: mean <= 5ms, longest tick <= 50ms
+fixture: 200 units spawned; mean tick 0.091 ms, longest tick 0.857 ms; mean over the 494 ticks with at least 150 units alive 0.297 ms; units alive every 500 ticks [200, 147, 34, 28, 28]; 28 units moved, 2617 shots, 172 units destroyed
+shipped: 200 units spawned; mean tick 0.181 ms, longest tick 1.212 ms; mean over the 41 ticks with at least 150 units alive 0.556 ms; units alive every 500 ticks [200, 124, 67, 57, 57]; 57 units moved, 735 shots, 143 units destroyed
+peak heap in use: 0.8 MiB (budget 1024 MiB)
+m7 benchmark: passed
