@@ -2810,8 +2810,9 @@ in `sim::combat`; in the game `hover_info` 1.
    and fires, and the computer player then gave it the `Harvest` command it gives every idle
    harvester every 200 ticks: that ended its attack, and with no ore left it was idle at the
    enemy's base, was called home to the gathering point, and set out again a wave's patience
-   later: a few hundred ticks of fire for every several thousand ticks. With three soldiers to a cell one of
-   the 756 matches of `m14_duels -- full` ended in exactly this state: Riverlands, Libya
+   later: a few hundred ticks of fire for every several thousand ticks. With three soldiers
+   to a cell one of the 756 matches of `m14_duels -- full` ended in exactly this state:
+   Riverlands, Libya
    against Great Britain, both brutal, 108,205 ticks against a limit of 72,000 (traced: from
    tick 27,000 on one War Miner against four buildings). A harvester of the wave is no longer
    sent to harvest; it leaves the wave, and is sent to work again, when its owner has another
@@ -2837,8 +2838,7 @@ in `sim::combat`; in the game `hover_info` 1.
    plays them with another seed and so along other courses; ticks; "limit" is that test's,
    `72,000 x span / 128`). Before: the validation of RA3-A
    (`docs/validation/ra2-parity/ra3a/10-duels.log`). After: the validation of RA3
-   (`docs/validation/ra2-parity/ra3/10-duels.log`; the run is deterministic, and a run before
-   the validation gave these numbers).
+   (`docs/validation/ra2-parity/ra3/10-duels.log`).
 
    | | Before RA3-B | After RA3-B |
    |---|---|---|
@@ -2847,7 +2847,7 @@ in `sim::combat`; in the game `hover_info` 1.
    | Small maps: longest | 50,108 (Riverlands) | 69,221 (Riverlands, America against Korea, both brutal) |
    | Large maps: median of each map | 19,447 to 70,077 | 13,096 to 51,825 |
    | Large maps: longest | 206,967 (Ember Caldera) | 167,856 (Iron Isthmus, Russia brutal against Libya medium; limit 270,000) |
-   | All 756 matches together | 34.6 million ticks | 30.2 million ticks |
+   | All 756 matches together | 34.6 million ticks | 30.3 million ticks |
    | Matches over the limit, matches without a winner | 0, 0 | 0, 0 |
 
    Matches are shorter: three soldiers to a cell bring three times the rifles to a fight, and
@@ -2855,19 +2855,30 @@ in `sim::combat`; in the game `hover_info` 1.
    to a third). The small maps are as they were at the median.
 5. **The one match near its limit is not a stall.** Riverlands (64 x 48, the smallest map),
    America against Korea, both brutal, ends in tick 69,221 of 72,000 (0.96; before RA3-B the
-   nearest was 0.76). Traced: the ore within the miners' reach is used up by tick 12,000 (every
-   miner stands idle from then on); both armies are spent by tick 30,000, when Korea has one GI left and America four Chrono
-   Miners that stand idle and three buildings. The GI fires without a pause from then on: at
-   the miners first, which are the nearest targets (1,000 hit points each, of which a rifle
-   takes about 3 a shot: 33,000 ticks for the four), then at the buildings (6,000 ticks). Nothing is
-   stuck and nobody waits; the match is long because a rifle is weak against a miner, and
-   because a wave fires at what is nearest and not at what ends the match. **Debt for RA8**
-   (and less likely once RA5 lets ore grow back): a wave that sees no armed enemy should go
-   for the buildings. The limit was not raised, and the test passes with the margin above.
-6. **Benchmark** (`m7_benchmark`, budget: mean 5 ms a tick): fixture 0.09 ms, shipped 0.19 ms
-   (0.09 and 0.18 before); the longest tick of the shipped scenario is 5 ms against a budget
-   of 50. A grid with infantry on foot is 12 bytes a cell larger; a path request of a ship or
-   an aircraft copies it with the grid, as before.
+   nearest was 0.76). Traced: the ore within the miners' reach is used up by tick 12,000
+   (every miner stands idle from then on); both armies are spent by tick 30,000, when Korea
+   has one GI left and America four Chrono Miners that stand idle and three buildings. The GI
+   fires without a pause from then on: at the miners first, which are the nearest targets
+   (1,000 hit points each, of which a rifle takes about 3 a shot: 33,000 ticks for the four),
+   then at the buildings (6,000 ticks). Nothing is stuck and nobody waits; the match is long
+   because a rifle is weak against a miner, and because a wave fires at what is nearest and
+   not at what ends the match. **Debt for RA8** (and less likely once RA5 lets ore grow
+   back): a wave that sees no armed enemy should go for the buildings. The limit was not
+   raised; the matches of `m6_production_matches.rs` itself, which have another seed, all
+   end within it.
+6. **Benchmark, soak** (`docs/validation/ra2-parity/ra3/`; budget: mean 5 ms a tick, longest
+   tick 50 ms). Mean tick: fixture 0.10 ms, shipped 0.21 ms (0.09 and 0.18 in the validation
+   of RA3-A). The longest tick of the shipped scenario is 5.7 ms (1.1 before).
+   Measured: the ticks above 1.5 ms are ticks 10, 12, 20 and 28 after the order, with 188 to
+   191 units alive. Not measured further; the likely cause (**assumption**) is that the units
+   of the two packed groups that have waited eight ticks for a cell then ask for paths
+   around each other, that with three soldiers to a cell more of them wait for the same
+   cells, and that a search no longer stops at a cell that holds one or two soldiers. A
+   tenth of the budget. The soak takes 2,677 s for its 18.72 million ticks (2,208 s before);
+   the difference was not broken down (its check of I6' now reads every unit on every tick,
+   and the matches are other matches). A grid with infantry
+   on foot is 12 bytes a cell larger; a path request of a ship or an aircraft copies it with
+   the grid, as before.
 
 ### R45. RA3-B: tests adapted (none deleted, ignored or weakened)
 
