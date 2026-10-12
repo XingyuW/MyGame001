@@ -7,6 +7,7 @@
 //! |-------|--------|
 //! | Sidebar: a ready building, or `B` | placement mode: a preview of the building follows the cursor, green where `PlaceBuilding` would be accepted and red where it would be rejected; a left click on a green footprint places it (`PlaceBuilding`) |
 //! | Sidebar: Sell, or `X` | sell mode: a left click on one of the player's buildings sells it (`SellBuilding`); the mode stays until it is left |
+//! | Sidebar: Repair, or `K` | repair mode: a left click on one of the player's buildings starts repairing it, or stops (`RepairBuilding`); the mode stays until it is left |
 //! | Sidebar: Rally | rally mode: a left click on a cell makes it the rally point of every unit-producing building of the player (`SetRallyPoint`) |
 //! | Right click or `Escape` in a mode | leaves the mode |
 //! | `Delete` or `Backspace` | `SellBuilding` of the player's building under the cursor |
@@ -29,7 +30,7 @@ use sim::{
     PlayerId, PlayerState, ProductionItem, RejectReason, SimId,
 };
 
-use crate::buildings::{BuildingSprites, BuildingView, own_building_at, sprite_position};
+use crate::buildings::{BuildingSprites, BuildingView, own_building_at};
 use crate::hotkeys::{Hotkey, pressed_hotkeys};
 use crate::map::{HoveredCell, MapView};
 use crate::projection::{cell_corners, to_world};
@@ -70,10 +71,14 @@ pub enum InterfaceMode {
     /// Select units (`crate::selection`).
     #[default]
     Normal,
+    Interact,
+    Strategic(SimId),
     /// Place the ready building of this type.
     Place(BuildingKind),
     /// Sell the player's building under the cursor.
     Sell,
+    /// Start or stop repairing the player's building under the cursor.
+    Repair,
     /// Set the rally point of the player's unit-producing buildings.
     Rally,
 }
@@ -94,7 +99,39 @@ pub fn production_menu(definitions: &Definitions) -> Vec<ProductionItem> {
         .filter_map(|index| u16::try_from(index).ok())
         .map(|index| ProductionItem::Unit(sim::UnitKind(index)))
         .filter(|&item| definitions.production(item).is_some());
-    buildings.chain(units).collect()
+    let mut menu: Vec<ProductionItem> = buildings.chain(units).collect();
+    // Within each tab, the cards follow the tech tree: what is buildable from the start first,
+    // then what each completed structure unlocks (file order within a tier). Before this, the
+    // Radar Tower that five Soviet-style units need sat on the last page of the Buildings tab.
+    menu.sort_by_key(|&item| {
+        (
+            matches!(item, ProductionItem::Unit(_)),
+            tech_tier(definitions, item),
+        )
+    });
+    menu
+}
+
+/// How many structures deep `item` lies in the tech tree: 0 for what the construction yard
+/// builds without prerequisites, otherwise one more than its deepest producer or prerequisite
+/// (a building that produces itself does not count as its own requirement).
+pub fn tech_tier(definitions: &Definitions, item: ProductionItem) -> u32 {
+    fn tier(definitions: &Definitions, item: ProductionItem, depth: u32) -> u32 {
+        let Some(terms) = definitions.production(item) else {
+            return 0;
+        };
+        if depth > 32 {
+            return depth;
+        }
+        std::iter::once(terms.producer)
+            .chain(terms.prerequisites.iter().copied())
+            .filter(|&kind| item != ProductionItem::Building(kind))
+            .map(|kind| tier(definitions, ProductionItem::Building(kind), depth + 1) + 1)
+            .max()
+            .unwrap_or(0)
+    }
+    // The construction yard itself is the root every other tier counts from.
+    tier(definitions, item, 0).saturating_sub(1)
 }
 
 /// The command for menu entry `index` (0 for the first): queue the entry, or cancel it with
@@ -163,6 +200,18 @@ pub fn sell_command(
     Some(Command::SellBuilding { building })
 }
 
+/// The command for starting or stopping the repair of the player's building under the cursor,
+/// if any.
+pub fn repair_command(
+    grid: &Grid,
+    owners: &BTreeMap<SimId, PlayerId>,
+    player: PlayerId,
+    hovered: Option<CellPos>,
+) -> Option<Command> {
+    let building = own_building_at(grid, owners, player, hovered?)?;
+    Some(Command::RepairBuilding { building })
+}
+
 /// The commands for setting a rally point: every building of `producers` (the player's buildings
 /// whose type produces units) gets the hovered cell as its rally point.
 pub fn rally_commands(producers: &[SimId], hovered: Option<CellPos>) -> Vec<Command> {
@@ -187,6 +236,8 @@ pub fn mode_after_key(
         Hotkey::PlaceReady => ready.map_or(mode, InterfaceMode::Place),
         Hotkey::SellMode if mode == InterfaceMode::Sell => InterfaceMode::Normal,
         Hotkey::SellMode => InterfaceMode::Sell,
+        Hotkey::RepairMode if mode == InterfaceMode::Repair => InterfaceMode::Normal,
+        Hotkey::RepairMode => InterfaceMode::Repair,
         Hotkey::Cancel => InterfaceMode::Normal,
         _ => mode,
     }
@@ -218,6 +269,7 @@ pub struct ClickContext<'a> {
 /// * placement: `PlaceBuilding` where the preview is valid, and the mode ends; a click on a red
 ///   footprint issues nothing and stays in the mode;
 /// * sell: `SellBuilding` of the player's building under the cursor; the mode stays;
+/// * repair: `RepairBuilding` of the player's building under the cursor; the mode stays;
 /// * rally: `SetRallyPoint` of every unit-producing building; the mode ends;
 /// * normal: nothing (clicks select units, `crate::selection`).
 pub fn mode_click(
@@ -226,7 +278,9 @@ pub fn mode_click(
     context: &ClickContext,
 ) -> (Vec<Command>, InterfaceMode) {
     match mode {
-        InterfaceMode::Normal => (Vec::new(), mode),
+        InterfaceMode::Normal | InterfaceMode::Interact | InterfaceMode::Strategic(_) => {
+            (Vec::new(), mode)
+        }
         InterfaceMode::Place(kind) => match context.placement {
             Some(Ok(_)) => match place_command(Some(kind), hovered, context.definitions) {
                 Some(command) => (vec![command], InterfaceMode::Normal),
@@ -236,6 +290,12 @@ pub fn mode_click(
         },
         InterfaceMode::Sell => (
             sell_command(context.grid, context.owners, HUMAN, hovered)
+                .into_iter()
+                .collect(),
+            mode,
+        ),
+        InterfaceMode::Repair => (
+            repair_command(context.grid, context.owners, HUMAN, hovered)
                 .into_iter()
                 .collect(),
             mode,
@@ -444,7 +504,7 @@ fn spawn_placement_ghost(mut commands: Commands) {
 
 /// Shows the ready building's sprite at the cursor in placement mode, tinted by validity.
 #[allow(clippy::type_complexity)]
-fn update_placement_ghost(
+pub(crate) fn update_placement_ghost(
     hovered: Res<HoveredCell>,
     view: Option<Res<MapView>>,
     mode: Res<InterfaceMode>,
@@ -480,7 +540,11 @@ fn update_placement_ghost(
         }
         sprite.color = preview_colour(valid);
         // Above every unit and building (their depths lie below 2, `crate::units::unit_depth`).
-        transform.translation = sprite_position(footprint, tile).extend(3.0);
+        sprite.custom_size = Some(crate::hd_art::building_size(
+            footprint.width,
+            footprint.height,
+        ));
+        transform.translation = crate::hd_art::building_position(footprint, tile).extend(3.0);
         if *visibility != Visibility::Inherited {
             *visibility = Visibility::Inherited;
         }
@@ -620,6 +684,15 @@ mod tests {
             sell_command(&grid, &owners, HUMAN, Some(CellPos::new(9, 9))),
             None
         );
+        // Repair, like sell, names only the player's own building under the cursor.
+        assert_eq!(
+            repair_command(&grid, &owners, HUMAN, Some(CellPos::new(6, 6))),
+            Some(Command::RepairBuilding { building: own })
+        );
+        assert_eq!(
+            repair_command(&grid, &owners, HUMAN, Some(CellPos::new(9, 9))),
+            None
+        );
         assert_eq!(
             sell_command(&grid, &owners, HUMAN, Some(CellPos::new(1, 1))),
             None
@@ -738,13 +811,31 @@ mod tests {
         );
         assert_eq!(after, InterfaceMode::Sell);
         commands.extend(sold);
+        let (repaired, after) = mode_click(
+            InterfaceMode::Repair,
+            Some(CellPos::new(6, 6)),
+            &context(None),
+        );
+        assert_eq!(after, InterfaceMode::Repair);
+        commands.extend(repaired);
         let (rallied, after) = mode_click(InterfaceMode::Rally, Some(cell), &context(None));
         assert_eq!(after, InterfaceMode::Normal);
         commands.extend(rallied);
 
+        let selected = crate::selection::Selection(selection.clone());
+        commands.extend(crate::special_controls::deploy_commands(&selected));
+        commands.extend(crate::special_controls::interact_commands(
+            &selected, barracks,
+        ));
+        commands.push(crate::special_controls::strategic_command(
+            barracks, cell, &selected,
+        ));
         let mut variants = BTreeSet::new();
         for command in &commands {
             variants.insert(match command {
+                Command::Deploy { .. } => "Deploy",
+                Command::Interact { .. } => "Interact",
+                Command::Superweapon { .. } => "Superweapon",
                 Command::Move { .. } => "Move",
                 Command::Stop { .. } => "Stop",
                 Command::Harvest { .. } => "Harvest",
@@ -752,17 +843,19 @@ mod tests {
                 Command::CancelProduction { .. } => "CancelProduction",
                 Command::PlaceBuilding { .. } => "PlaceBuilding",
                 Command::SellBuilding { .. } => "SellBuilding",
+                Command::RepairBuilding { .. } => "RepairBuilding",
                 Command::SetRallyPoint { .. } => "SetRallyPoint",
                 Command::Attack { .. } => "Attack",
                 Command::AttackMove { .. } => "AttackMove",
             });
         }
-        assert_eq!(variants.len(), 10, "{variants:?}");
+        assert_eq!(variants.len(), 14, "{variants:?}");
         assert!(commands.contains(&Command::PlaceBuilding {
             building: power,
             origin: footprint.origin,
         }));
         assert!(commands.contains(&Command::SellBuilding { building: barracks }));
+        assert!(commands.contains(&Command::RepairBuilding { building: barracks }));
         assert!(commands.contains(&Command::SetRallyPoint {
             building: barracks,
             cell,
@@ -790,6 +883,15 @@ mod tests {
         );
         assert_eq!(
             mode_after_key(InterfaceMode::Sell, Hotkey::SellMode, None),
+            InterfaceMode::Normal
+        );
+        // `K` toggles repair mode, from any mode.
+        assert_eq!(
+            mode_after_key(InterfaceMode::Sell, Hotkey::RepairMode, None),
+            InterfaceMode::Repair
+        );
+        assert_eq!(
+            mode_after_key(InterfaceMode::Repair, Hotkey::RepairMode, None),
             InterfaceMode::Normal
         );
         for mode in [

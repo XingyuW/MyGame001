@@ -35,6 +35,12 @@
 //! screen all of its buttons; and the run changes two options the options screen's way
 //! (`crate::options::options_effect`), which must be written to the run's own settings file
 //! ([`settings_path`], removed at the end) and read back unchanged (docs/DECISIONS.md D52).
+//!
+//! Since the multi-enemy follow-up, a long run's matches have [`SMOKE_ENEMIES`] computer players,
+//! chosen with the menu's enemy row; each must be a player of its own (own economy, AI and
+//! colour), "unlock all" (chosen for the first two matches only) and Super Me apply to the human
+//! player alone, and every computer player's rejections count. The last match runs at the
+//! fastest game speed, which must set the fixed timestep, and must still pause.
 
 use std::collections::BTreeMap;
 
@@ -62,7 +68,7 @@ use crate::skirmish::{
     Catalogue, EndButton, EndEffect, LastMatch, MenuButton, MenuCounts, MenuEffect, MenuRoot,
     MenuSelection, Row, Screen, begin_match, end_effect, end_match, menu_effect,
 };
-use crate::units::{HUMAN, OPPONENT, UnitStatus, UnitView, unit_shown};
+use crate::units::{HUMAN, UnitStatus, UnitView, unit_shown};
 
 /// The cell of the demo map that the smoke test orders the player's units to (grass, across the
 /// open ground from their starting area).
@@ -93,6 +99,9 @@ pub const AI_CHECK_TICKS: u64 = 60;
 
 /// The seed of the smoke test's matches.
 const SMOKE_SEED: u64 = 6;
+
+/// Computer players of a long run's matches.
+pub const SMOKE_ENEMIES: usize = 3;
 
 /// The settings file of a smoke run: a file of its own in the temporary directory (removed at the
 /// end of the run), so that a smoke run never reads or changes the player's settings (M7, D52).
@@ -196,6 +205,8 @@ fn play_flow(
     host: Res<SimHost>,
     menu: Query<&MenuButton>,
     roots: Query<&Node, With<MenuRoot>>,
+    teams: Option<Res<crate::presentation::TeamColors>>,
+    mut speed: ResMut<crate::game_speed::GameSpeed>,
 ) {
     let Some(catalogue) = catalogue else {
         return;
@@ -218,10 +229,58 @@ fn play_flow(
             }
         };
     let settled = map.map_created && host.tick() >= FLOW_TICKS;
+    if *screen == Screen::Match
+        && settled
+        && let Some(choice) = last.0
+    {
+        let players = host.players().expect("installed match has players");
+        let computers: Vec<sim::PlayerId> = choice
+            .players()
+            .iter()
+            .skip(1)
+            .map(|setup| setup.player)
+            .collect();
+        let colours: std::collections::BTreeSet<[u8; 3]> = choice
+            .players()
+            .iter()
+            .filter_map(|setup| teams.as_ref().map(|t| t.rgb_of(setup.player)))
+            .collect();
+        let valid = players.get(HUMAN).is_some_and(|p| {
+            p.super_me() == choice.super_me && p.unlock_all() == choice.unlock_all
+        }) && computers.iter().all(|&id| {
+            players
+                .get(id)
+                .is_some_and(|p| !p.super_me() && !p.unlock_all() && p.production_speed() == 1)
+                && host.ai().is_some_and(|ai| ai.controller(id).is_some())
+        }) && players.iter().count() == choice.players().len()
+            && teams.as_ref().is_some_and(|t| t.0 == choice.color)
+            && colours.len() == choice.players().len();
+        if !valid {
+            error!(
+                "smoke test failed: menu options leaked, were lost on restart, players were not \
+                 independent, or colors collided"
+            );
+            smoke.rejected = true;
+        }
+    }
+
     match (smoke.flow, *screen) {
         (Flow::Menu, Screen::Menu) => {
             let shown = roots.iter().any(|node| node.display != Display::None);
             smoke.menu_buttons = Some(if shown { menu.iter().count() } else { 0 });
+            if long {
+                let mut rows = vec![Row::SuperMe, Row::Color, Row::UnlockAll];
+                rows.extend(std::iter::repeat_n(Row::Enemies, SMOKE_ENEMIES - 1));
+                for row in rows {
+                    if let MenuEffect::Select(next) =
+                        menu_effect(MenuButton::Next(row), *selection, counts)
+                    {
+                        *selection = next;
+                    } else {
+                        smoke.rejected = true;
+                    }
+                }
+            }
             start(
                 &mut smoke,
                 &mut commands,
@@ -261,6 +320,22 @@ fn play_flow(
                     smoke.rejected = true;
                 }
             }
+            // Turn the bonus and "unlock all" back off through the menu; ordinary-economy checks
+            // below must still pass after a boosted match and its restart.
+            for row in [Row::SuperMe, Row::Color, Row::UnlockAll] {
+                if let MenuEffect::Select(next) =
+                    menu_effect(MenuButton::Next(row), *selection, counts)
+                {
+                    *selection = next;
+                } else {
+                    smoke.rejected = true;
+                }
+            }
+            // The last match runs at the fastest speed. A match starts at the speed of the menu's
+            // "Game speed" row (`begin_match`), so the row is set as its `>` button would, and
+            // the speed itself as `]` pressed repeatedly sets it.
+            selection.game_speed = crate::game_speed::SPEED_LEVELS.len() - 1;
+            while speed.step(true) {}
             start(&mut smoke, &mut commands, *selection, Flow::Last);
         }
         _ => {}
@@ -321,13 +396,30 @@ enum PauseCheck {
 
 /// Pauses the game in the middle of a long enough run, pushes a command that must be refused,
 /// and resumes after [`PAUSE_FRAMES`] frames.
-fn check_pause(mut smoke: ResMut<SmokeTest>, mut sink: ResMut<CommandSink>, host: Res<SimHost>) {
+fn check_pause(
+    mut smoke: ResMut<SmokeTest>,
+    mut sink: ResMut<CommandSink>,
+    host: Res<SimHost>,
+    speed: Res<crate::game_speed::GameSpeed>,
+    fixed: Res<Time<Fixed>>,
+) {
     if smoke.frames < PAUSE_MIN_FRAMES || smoke.flow != Flow::Last {
         return;
     }
     let frame = smoke.rendered;
     match smoke.pause {
         PauseCheck::NotYet if frame >= smoke.frames / 2 => {
+            // The game speed drives the simulation's fixed timestep (the pause must still hold
+            // at it).
+            let expected = std::time::Duration::from_secs_f64(1.0 / speed.ticks_per_second());
+            if speed.factor() != 4.0 || fixed.timestep() != expected {
+                error!(
+                    "smoke test failed: game speed {} with a fixed timestep of {:?}",
+                    speed.label(),
+                    fixed.timestep()
+                );
+                smoke.rejected = true;
+            }
             if !sink.paused() {
                 sink.toggle_pause();
             }
@@ -469,7 +561,8 @@ fn watch_events(mut smoke: ResMut<SmokeTest>, mut events: MessageReader<SimEvent
             if *player == HUMAN {
                 error!("smoke test failed: a command of the smoke test was rejected: {reason}");
                 smoke.rejected = true;
-            } else if *player == OPPONENT {
+            } else {
+                // Every computer player of the match, not only the first.
                 smoke.ai_rejected = smoke.ai_rejected.saturating_add(1);
             }
         }
@@ -704,10 +797,23 @@ fn count_frames(
     let (sim_units, sim_buildings) = (count(host.world(), false), count(host.world(), true));
     let (unit_view_count, building_view_count) =
         (unit_views.iter().count(), building_views.iter().count());
+    // The least active computer player: every one of them must have issued commands.
     let ai_commands = host
-        .ai()
-        .and_then(|ai| ai.controller(OPPONENT))
-        .map_or(0, |controller| controller.commands_issued());
+        .match_state()
+        .map(|state| {
+            state
+                .players()
+                .iter()
+                .filter(|&&id| id != HUMAN)
+                .map(|&id| {
+                    host.ai()
+                        .and_then(|ai| ai.controller(id))
+                        .map_or(0, |controller| controller.commands_issued())
+                })
+                .min()
+                .unwrap_or(0)
+        })
+        .unwrap_or(0);
     info!(
         "smoke test: {} frames, {} simulation ticks, map created: {}, units spawned: {}, \
          units moved: {moved} in {ticks_since_order} ticks after the order, buildings spawned: \

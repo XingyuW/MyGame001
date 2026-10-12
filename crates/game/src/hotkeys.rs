@@ -37,6 +37,8 @@ pub enum Hotkey {
     AttackMove,
     PlaceReady,
     SellMode,
+    /// Enter or leave repair mode (`crate::construction`).
+    RepairMode,
     RallyAtCursor,
     SellAtCursor,
     Cancel,
@@ -48,6 +50,9 @@ pub enum Hotkey {
     VolumeDown,
     VolumeUp,
     Mute,
+    /// Slower or faster game speed (`crate::game_speed`).
+    SpeedDown,
+    SpeedUp,
 }
 
 /// The digit of a digit key, `0` to `9`.
@@ -87,6 +92,7 @@ pub fn hotkey(key: KeyCode, command: bool, shift: bool) -> Option<Hotkey> {
         KeyCode::KeyA => Hotkey::AttackMove,
         KeyCode::KeyB => Hotkey::PlaceReady,
         KeyCode::KeyX => Hotkey::SellMode,
+        KeyCode::KeyK => Hotkey::RepairMode,
         KeyCode::KeyR => Hotkey::RallyAtCursor,
         KeyCode::Delete | KeyCode::Backspace => Hotkey::SellAtCursor,
         KeyCode::Escape => Hotkey::Cancel,
@@ -95,6 +101,8 @@ pub fn hotkey(key: KeyCode, command: bool, shift: bool) -> Option<Hotkey> {
         KeyCode::Minus => Hotkey::VolumeDown,
         KeyCode::Equal => Hotkey::VolumeUp,
         KeyCode::KeyM => Hotkey::Mute,
+        KeyCode::BracketLeft => Hotkey::SpeedDown,
+        KeyCode::BracketRight => Hotkey::SpeedUp,
         _ => return None,
     })
 }
@@ -163,6 +171,10 @@ mod tests {
         );
         assert_eq!(hotkey(KeyCode::KeyX, false, false), Some(Hotkey::SellMode));
         assert_eq!(
+            hotkey(KeyCode::KeyK, false, false),
+            Some(Hotkey::RepairMode)
+        );
+        assert_eq!(
             hotkey(KeyCode::KeyR, false, false),
             Some(Hotkey::RallyAtCursor)
         );
@@ -180,6 +192,14 @@ mod tests {
         );
         assert_eq!(hotkey(KeyCode::Equal, false, false), Some(Hotkey::VolumeUp));
         assert_eq!(hotkey(KeyCode::KeyM, false, false), Some(Hotkey::Mute));
+        assert_eq!(
+            hotkey(KeyCode::BracketLeft, false, false),
+            Some(Hotkey::SpeedDown)
+        );
+        assert_eq!(
+            hotkey(KeyCode::BracketRight, false, false),
+            Some(Hotkey::SpeedUp)
+        );
         // Shift does not change letter keys; the camera's arrow keys and unlisted keys are not
         // hotkeys; Ctrl or Cmd with a letter is left to the system.
         assert_eq!(hotkey(KeyCode::KeyS, false, true), Some(Hotkey::Stop));
