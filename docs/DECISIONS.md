@@ -1426,3 +1426,252 @@ Found by the baseline validation of RA0, before any change to the game; both cha
    `m6_production_matches.rs` and `m6_ai.rs` accept it; the soak's rule now accepts it too (a
    placement rejected as occupied by a unit of another player), and still fails on any other
    unexplained rejection, including a footprint occupied by the player's own unit.
+
+### R9. RA1: the data pipeline, the generated data files and their schemas
+
+1. **Pipeline** (plan section 3.1). `scripts/generate_ra2_data.py` replaces
+   `scripts/generate_arsenal.py` and writes all seven files of `assets/data/` from the committed
+   tables `crates/sim/tests/reference/ra2_reference.tsv` and `ra2_mapping.tsv` and from its own
+   tables of game specific values (labels, descriptions, categories, roles, sprites, footprints,
+   build times, armour, weapons, harvesters, the computer player's plans, the maps). It never
+   reads the ini files. Every ported value carries a comment naming its ini section and key; the
+   files say that they are generated. `--check` fails on a stale file.
+2. **What RA1 ports**: cost, hit points (`Strength`), sight, speed (R7), prerequisites, power,
+   sell value (`Cost x RefundPercent`), the free unit of a refinery, owner sides, required and
+   forbidden countries, tech level, factory kind, and every global value of `rules.ron`. Build
+   times, footprints, armour, warheads and weapons are unchanged from before RA1 (the seven
+   weapons that only the legacy armies used stay in `combat.ron` until RA3 replaces the table).
+   The eleven new ids of plan section 3.3 and the four stolen technology units take the game
+   specific values of an existing item (their Allied twin; Tanya, Crazy Ivan and Yuri for the
+   four). The Kirov and the NightHawk are built at the War Factory.
+3. **`rules.ron`, schema 1** (`crates/sim/src/rules.rs`, `Definitions::with_rules`): groups
+   `production`, `economy`, `veterancy`, `crew`, `combat`, `radiation`, `superweapons`, `prism`,
+   `crates`, `powerups`, `dialog`, `difficulty`, `prerequisite_groups`, `sides`, `countries`;
+   100 scalar values in game units, yes and no as 1 and 0. It is an extension file: a world
+   without it keeps the behaviour of M2 to M9. RA1 consumes `sides`, `countries`,
+   `prerequisite_groups` and of `dialog` the tech level and the ranges of credits and unit
+   count; the rest is loaded, range checked, hashed and audited for the later milestones.
+   **The base unit of a side lives here** (`sides[].base_unit`, with the yard it deploys into),
+   not in `skirmish.ron` as the plan's item 6 words it: `Deploy`, `Undeploy` and the win
+   condition read it from the world's definitions, where the skirmish file is not.
+4. **`arsenal.ron`, schema 2**: `art`, `side`, `factory`, `owner_sides`, `required_countries`,
+   `forbidden_countries`, `tech_level`, and, beyond the plan's list, `prerequisite_groups`: the
+   group tokens of the ini's `Prerequisite` (`POWER`, `RADAR`, ...). The single buildings of that
+   key stay in `economy.ron`, whose schema the plan leaves at 1; a group cannot be named there.
+   The rules are loaded before the arsenal, which names their countries and groups.
+5. **`skirmish.ron`, schema 3**: `sides` (the starting unit types per side) and per faction
+   `label` and `side`. A faction with a side is a country: a country of the rules file, with
+   empty roster and starting lists; its `FactionDef::roster` holds its own tech tree
+   (`sim::country_tree`) for callers that ask what a faction offers. `MAX_FACTIONS` is 16 (was 8).
+6. **`ai.ron`, schema 2**: `plans`, one per side (`"none"` for the factions without a side);
+   error field paths are now `plans[i].build_order[j]` and so on.
+7. **The audit** (`crates/sim/tests/ra9_data_parity.rs`) recomputes the conversions in integer
+   arithmetic and compares, for every mapped unit and building, cost, strength, sight, speed,
+   prerequisites, power, sell value, owner sides, required and forbidden countries and tech
+   level, every value of `rules.ron`, and the ported values of `skirmish.ron`. It fails on an
+   unexplained difference, on a stale row of `ra2_differences.tsv`, on a mapped section or key
+   the reference lacks, on a scalar of `rules.ron` without an audit row, and on a shipped item
+   that is not mapped. The differences of RA1 (18 rows): the single engineer and attack dog
+   (four rows of `forbidden_countries`), the four stolen technology units (tech level -1
+   instead of 9 until RA6), and ten mapped ids that enter the game in RA4 to RA6 (`present`).
+8. **Debt.** `arsenal.ron` is 46 KiB of the 64 KiB a data file may have
+   (`MAX_DATA_FILE_BYTES`); a later milestone that adds traits must shorten its comments or
+   raise the limit. The default `starting_credits` of a skirmish file is not checked against
+   the lobby range of the rules file by the loader (the audit checks the shipped value).
+
+### R10. RA1: who may build what (assumption RA-A3)
+
+`QueueProduction` is validated by `sim::check_buildable`, which the interface and the computer
+player call too. In this order, the first failure being the reason:
+
+1. `UnknownItem`: no production terms, or an arsenal tech level below 0 or above that of the
+   rules (`[MultiplayerDialogSettings] TechLevel=10`). This is how the Construction Yards
+   (`TechLevel=-1`) and the stolen technology units stay out of the queue; no new reason was
+   added for it, since `UnknownItem` already means "cannot be produced".
+2. `NotInRoster`: the roster of a faction without a side, as since M7. A country's player has
+   no roster.
+3. `DisabledByOptions`: a superweapon building while the match has superweapons off.
+4. `MissingPrerequisite`: a building of the economy file's list, then a prerequisite group of
+   the arsenal of which the player owns no member (reported with the group's first member).
+   "Unlock all" waives this step only.
+5. `NoProducer`: no factory of the item's kind. `NoFactoryOfSide` (new): factories of the kind,
+   but none of a side in the item's `owner_sides`.
+6. `CountryRequired`, `CountryForbidden` (new): the player's country.
+
+A **factory group** (`buildings`, `infantry`, `vehicles`, `naval`, `aircraft`) is a trait of a
+building; an item's `producer` means "a building of the producer's group", and a queue is kept
+per group (`Definitions::queue_key`: the first building type of the group), so the Allied and
+the Soviet War Factory share the vehicle queue, as do the two Airforce Commands. A building
+without the trait is its own group, which is the rule of M3. The head of a queue progresses
+while the player owns a factory that produces it (`sim::produces`: of the group and of an owner
+side) and its prerequisites; a unit leaves such a factory.
+
+**Assumption RA-A3** (the plan's): a factory's side is the side of its building type. An
+Allied player who captures a Soviet Barracks trains Conscripts there; a country's special stays
+that country's, whoever owns the factory. Because almost every ini `Prerequisite` names the
+item's own factory, the reason a player usually sees for an item of the other side is
+`MissingPrerequisite`; `NoFactoryOfSide` appears for items without such a prerequisite and with
+"unlock all".
+
+Without a rules file the basic power plants still stand in for each other as since M9
+(`Definitions::prerequisite_met`); with one, power is a prerequisite group like the others.
+The engineer and the attack dog are one type each, trained by any barracks (owner sides both,
+group `barracks`; listed differences).
+
+### R11. RA1: art for the new ids
+
+`arsenal.ron` names per item the id whose art the game draws (`art`, a defined item of the same
+kind). The nine new buildings and `soviet_mcv`, `soviet_amphibious_transport` show the art of
+their Allied twins, the four stolen technology units that of Tanya, Crazy Ivan and Yuri; every
+other item its own. The game looks HD sheets and walk cycles up through `Definitions::art`; the
+legacy sprite sheet of a type is still named by `sprite` in `units.ron` and `economy.ron`. No
+asset was added in RA1-B, so `assets/LICENSES.md` gained no file. That the two sides' buildings
+look alike until they have art of their own **requires user verification** as a visual
+shortcoming, and is debt for the milestones that add art.
+
+### R12. RA1: deploying and undeploying
+
+* `Deploy` of a base unit turns it into the Construction Yard of its side (the rules file's
+  `sides[].construction_yard`) with the footprint's origin in the unit's cell; without a rules
+  file, into `construction_yard` as since M9.
+* `Command::Undeploy { building }` (new) turns a Construction Yard into the base unit of the
+  yard's side, with the same id, standing in the cell of the footprint's origin; a yard of the
+  other side in a player's hands undeploys into that side's base unit. Rejections:
+  `UnknownBuilding` (no such building, or another player's that the player does not see, D30),
+  `NotOwned`, `DisabledByOptions` ("MCV repacks" off), `AbilityUnavailable` (not a yard, or no
+  room). Free units still waiting in the building are lost, a repair ends, and the queue of the
+  buildings group waits like for any lost producer. `SimEvent::BuildingUndeployed` reports it.
+* **Assumption** (no source states the engine's rule): with a rules file the yard and the unit
+  keep the share of hit points across both changes, rounded down, at least 1, so that neither
+  repairs anything. Without a rules file `Deploy` gives a whole yard, as before.
+* In the game D with no unit selected and the cursor on a building issues `Undeploy`
+  (`special_controls`); RA1-C or RA7 may rebind it.
+
+### R13. RA1: match options, the start of a match and the win conditions
+
+* `MatchOptions` (default: Red Alert 2's lobby): `free_for_all` replaces `allied_ai` with the
+  opposite sense (fixed decision 3: computer players are allied against the human unless the
+  match is free for all); `random_countries` lists the players whose faction is drawn from the
+  countries of the skirmish file with `SimRng`, in ascending player id, after the checks that
+  do not depend on the draw; `starting_credits` and `unit_count` are optional and default to the
+  skirmish file's credits and the rules file's unit count, and are checked against the ranges
+  of the rules file (`MatchSetupError::Options`); `mcv_start`, `short_game`, `superweapons`,
+  `crates`, `mcv_repacks` default to on (the audit compares them with
+  `[MultiplayerDialogSettings]`). `short_game`, `superweapons`, `mcv_repacks` and `crates` are
+  kept in `MatchState` (`MatchRules`) and hashed. `crates` has no effect before RA5.
+* **`grow_map` is not an option of the simulation.** The map is enlarged before the setup by
+  whoever installs the grid and the start positions (`sim::enlarged_map`), which is the game;
+  the option belongs to the game's menu (RA1-C, R4).
+* The entry points `setup_match`, `setup_match_with_super_me` and `setup_match_with_options`
+  behave as before for fixture data: they pass `free_for_all: true` (no teams, their old
+  behaviour), and a faction without a side still starts with its lists and its roster.
+* A country's player starts with the base unit of its side on the start position (or, with
+  `mcv_start` off, the yard with its footprint's origin there, which is where deploying the base
+  unit in place puts it) and the starting units of plan section 4.9 (`sim::starting_units`) on
+  the free cells nearest to the start, 3 or more cells from it. A type is drawn with `SimRng`
+  only when a side lists several; vanilla lists one vehicle and one infantry type per side.
+* Win condition with a rules file: in a short game a player is defeated without buildings and
+  without a base unit of any side; in a long game without buildings and without units
+  (**assumption**, appendix D topic 15: "every remaining object"). A unit carried by one of the
+  player's transports counts. Without a rules file: no building (D41). A defeated player's
+  remaining units stay on the map, as before.
+
+### R14. RA1: the computer player per side
+
+* `ai.ron` has a plan for the Allied and one for the Soviet side, from ground units and base
+  defences that every country of the side can build on its own (the loader checks each entry
+  against `country_tree` of every country of the side): no national special and, because
+  America may not build the common Airforce Command, no radar building on the Allied side yet.
+  RA8 extends the plans. The difficulties are `easy`, `medium`, `brutal` with the values the
+  former `easy`, `normal`, `hard` had.
+* A plan of a side starts from the yard its base unit deploys into: the yard counts as listed
+  before every entry, and the power building may need it.
+* In its turn a computer player that owns a base unit deploys it where it stands and gives no
+  other command in that turn; in its first two turns it waits while it does not see the yard's
+  footprint (the first turn of player 0 comes before the first `Visibility` stage), so that its
+  starting units do not walk into the footprint. Its own idle units beside the footprint do not
+  hold the deployment back. The gathering point keeps clear of the future yard.
+* No tick limit was changed. `m14_duels -- full` with the RA1 data: all 756 matches end with a
+  winner; the validation log of RA1-B has the slowest per map.
+
+### R15. RA1: the legacy ruleset fixture and every test that was migrated or adapted
+
+**The fixture.** `crates/sim/tests/fixtures/data/legacy/` holds the six data files shipped before
+RA1 (commit `13ebadc`), migrated only as the schema changes require (`arsenal.ron` schema 2 with
+`art` = own id, no side, no factory group, no owner or country lists, tech level 1; `skirmish.ron`
+schema 3 with `sides: []` and per faction a label and `side: "none"`; `ai.ron` schema 2 with one
+plan of side `"none"`). It has no `rules.ron`, so it behaves exactly as the game did before RA1.
+A second fixture, `fixtures/data/ra1/`, is a small world with two sides and three countries for
+the balance independent tests of RA1 (I10).
+
+**Moved to the legacy fixture, assertions unchanged** (they assert the unified M9 arsenal, the
+Vanguard and Meridian armies, or the roster of a faction):
+
+| Test | Note |
+|---|---|
+| `crates/sim/tests/m9_arsenal.rs` (all 24 tests) | loads `fixtures/data/legacy` instead of `assets/data` |
+| `crates/sim/tests/m11_repair.rs` (all tests) | the same; repair keeps the pre RA1 constants |
+| `crates/game/tests/m10_unlocks_and_enemies.rs` (all 5 tests) | the same, on the shipped maps |
+| game `skirmish::tests::loading_rejects_a_start_position_outside_its_map` | scratch asset root with the legacy data |
+| game `sidebar::tests::items_outside_the_roster_of_the_players_faction_are_neither_available_nor_shown` | a roster only limits a faction without a side |
+| game `skirmish::tests::the_catalogue_rejects_starts_off_their_map_unbuildable_ai_files_and_unplayable_matches` | the parts that edit a faction's starting buildings run on the legacy catalogue; the start checks run on both; two cases on the shipped data were added (an AI file without the Soviet plan, a country with an extra yard off the map) |
+| game `smoke::tests::the_demo_player_can_queue_a_building_with_its_starting_buildings` | the original loop also runs on the two legacy factions; on the shipped data see below |
+
+**Schema migration only** (the same assertions on the migrated fixture files; error field paths
+of the AI file are now `plans[0]....`):
+
+| Test | What changed |
+|---|---|
+| `m6_definitions.rs` | AI field paths and the texts its edits match; the schema version cases of the skirmish file are 4, 2 and 1 against 3 (one case more); `ai.plans[0]` |
+| `m6_match.rs::a_computer_player_whose_faction_lacks_a_producer_of_its_build_order_is_a_setup_error` | field `plans[0].build_order[0]` in the error and its message |
+| `m7_factions.rs` | AI field paths; the anchor text of its roster edits; `plan_for` returns an `Option` |
+| `m6_ai.rs` | `ai.plans[0]`; the shipped skirmish file is loaded against the whole shipped ruleset |
+| `m12_match_options.rs` | `allied()` is `free_for_all: false` and every use of the default options is `free()` (`free_for_all: true`), because the default changed sense (R13); what each test asserts is unchanged |
+| game `sim_host::tests::commands_pending_when_a_match_is_replaced_are_discarded_with_a_log_line` | the plan literal gained `mcv_start` |
+| game `construction` test of the command variants | 15 variants: `Undeploy` is mapped by `special_controls::undeploy_command` |
+
+**Adapted to the countries** (tests of the shipped data as such; RA2 behaviour is intended):
+
+| Test | What changed and why |
+|---|---|
+| `m6_match.rs::computer_armies_grow_with_the_map_on_large_maps_only` | loads the shipped ruleset (`sim::load_ruleset`); assertions unchanged |
+| `m6_ai.rs::ai_against_ai_matches_on_every_shipped_map_end_with_a_winner` | the same loading; the matches still use fixture data |
+| `crates/game/tests/m6_production_matches.rs` (both tests) | pairings of the two sides with rotating countries (R5), 756 matches, each player with its MCV; asserts that every country is played in both slots; the crossroads regression plays the first Soviet country against itself (before: the Meridian) |
+| `crates/game/tests/m7_maps.rs::the_shipped_skirmish_file_lists_every_generated_map_with_its_starts` | loads the shipped ruleset |
+| `crates/game/tests/m13_grown_maps.rs::every_shipped_map_grows_with_every_player_count` | sides alternate with rotating countries, for either order of the sides; "every yard at its start" is now: every base unit stands on its start, and every computer player's yard stands there once it has deployed (within 100 ticks); the expected units are the starting units of plan section 4.9 |
+| `m13_grown_maps.rs::ten_computer_players_build_bases_and_bring_in_ore_on_enlarged_maps`, `a_ten_player_match_on_the_smallest_map_is_played_to_its_end` | a player must have placed 3 buildings instead of 2: the deployed yard is a placed building now, and the power plant and the refinery are still required |
+| game `hd_art::tests::every_roster_identity_has_distinct_valid_hd_art`, `every_foot_soldier_has_a_walk_cycle` | art is looked up through the arsenal's `art`; a type that names another's art must name a type with art of its own, every other building still has distinct artwork (R11) |
+| game `buildings::tests::the_production_buildings_load_and_every_sprite_passes_its_check`, `the_demo_map_holds_the_starting_buildings_and_units` | a country's starting building is the yard of its side; expected counts from `skirmish::starting_totals` |
+| game `skirmish::tests::every_production_data_file_loads_passes_cross_validation_and_is_licensed` | nine countries with pairwise different trees instead of two factions with different rosters; `data/rules.ron` is among the loaded files; the two `rocket_tower` sprites are named only by the legacy fixture now, and the test pins exactly those two |
+| game `skirmish::tests::every_shipped_match_can_be_set_up_for_every_faction_pairing` | every pairing of the nine countries (5103 setups); expected units from the MCV start |
+| game `skirmish::tests::the_menu_chooses_several_independent_enemies_with_distinct_colours` | 0 starting buildings with the MCV start; a yard each with `mcv_start: false` |
+| game `sim_host::tests::match_setup_installs_the_loaded_match_or_ends_the_game_with_an_error` | the menu's match has no starting building; the "starting building sticks out" case uses the yard start |
+| game `sim_host::tests::a_tick_applies_the_sinks_commands_as_the_human_players_and_returns_its_events`, `minimap::tests::the_demo_match_shows_no_enemy_the_human_player_does_not_see` | unchanged assertions on `demo_host()`, which is now the demo match with the yards (`mcv_start: false`); `menu_host()` is the match as the menu starts it |
+| game `sidebar::tests::item_buttons_queue_cancel_and_start_placement`, `item_status_follows_the_players_buildings_and_queue`, `texts_and_colours_of_the_sidebar`, `cards_follow_the_tech_tree_and_unlock_all_waives_only_prerequisites` | legacy ids replaced by RA2 ids in the same role (`light_tank` by `grizzly` or `prism_tank`, the turrets by `pillbox` and `sentry_gun`, the Soviet examples by their Allied counterparts for the American player); costs, build times and power read from the data instead of the legacy numbers; "the Radar Tower is no longer on the last page" is asserted against the first index of the last page (22 buildings on 4 pages) |
+| game `units::tests::the_production_units_load_and_every_sprite_passes_its_check`, `the_production_data_loads_with_the_combat_file`, `the_demo_map_holds_every_starting_unit_on_its_own_free_cell` | the base unit and starting unit types per country; `pillbox` as the armed building and an armed building in every side's plan; starting units by plan section 4.9, on both starts |
+| game `smoke::tests::the_demo_match_expects_all_of_its_starting_units`, `a_run_passes_only_with_its_buildings_and_charged_production`, and the shipped half of `the_demo_player_can_queue_a_building_with_its_starting_buildings` | the MCV start (22 units, no building, one human base unit); "every prerequisite is owned" instead of "no prerequisite", since every RA2 building lists its yard; the failure text names the deploy |
+| game `visual_review::tests` (4 tests) | scenes start with the yards and RA2 ids; the developed base still has 8 buildings (6 of the scene and the 2 yards); the line-up is 28 types (the ten legacy unit types left it) and gives 48 units and 8 buildings |
+
+No test was deleted, ignored or weakened. New in RA1-B: `ra1_buildability.rs` (11), `ra1_match.rs`
+(19), `ra1_definitions.rs` (36), `ra1_shipped.rs` (8), `ra9_data_parity.rs` (4).
+
+### R16. RA1-B: the state of the game until RA1-C
+
+RA1-B changed in the game only what keeps it compiling, starting matches and passing its tests
+and the smoke tests:
+
+* It loads `data/rules.ron` before the arsenal and looks art up through `Definitions::art`.
+* The menu rows are unchanged; "Starting force" and "Enemy force" now choose among the nine
+  countries. The menu opens with America against the first Soviet country, and the computer
+  players take the countries in turn from the chosen one (`skirmish::match_players`), so that
+  several enemies field several countries. Every match uses `MatchOptions::default()` (10000
+  credits, MCV start, unit count 10, short game, superweapons, MCV repacks, computer players
+  allied); `MatchPlan::mcv_start` exists for the tests and the review scenes.
+* The catalogue check at startup pairs sides with rotating countries (R5).
+* The sidebar's availability is `sim::check_buildable` (superweapons counted as on); it still
+  shows every item of a tab, also those of the other side, as locked. Filtering is RA1-C's.
+* D with no unit selected and the cursor on a building issues `Undeploy`.
+* The smoke test deploys the human's base unit after the first tick, moves the other units, and
+  queues the first buildable building once the yard stands; it fails if nothing was queued 40
+  ticks after the deploy order.
+* Maps still grow with the number of players as before; the MAP GROWTH option of R4 is RA1-C's.
