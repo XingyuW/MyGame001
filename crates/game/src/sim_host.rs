@@ -112,6 +112,11 @@ impl SimHost {
         self.world.get_resource::<Definitions>()
     }
 
+    /// The destructible scenery still standing.
+    pub fn props(&self) -> Option<&sim::Props> {
+        self.world.get_resource::<sim::Props>()
+    }
+
     pub fn projectiles(&self) -> Option<&Projectiles> {
         self.world.get_resource::<Projectiles>()
     }
@@ -131,10 +136,18 @@ impl SimHost {
         self.world.get_resource::<AiPlayers>()
     }
 
-    /// Whether a match is set up and has not ended: only then do ticks run.
-    pub fn running(&self) -> bool {
+    /// Whether the human player has been defeated. With several computer players the
+    /// simulation's outcome waits for the last one standing, but for the human the match is over.
+    pub fn human_defeated(&self) -> bool {
         self.match_state()
-            .is_some_and(|state| !state.players().is_empty() && state.outcome().is_none())
+            .is_some_and(|state| state.defeated(HUMAN).is_some())
+    }
+
+    /// Whether a match is set up and has not ended for the human player: only then do ticks run.
+    pub fn running(&self) -> bool {
+        self.match_state().is_some_and(|state| {
+            !state.players().is_empty() && state.outcome().is_none() && !self.human_defeated()
+        })
     }
 
     /// Installs a match into this simulation, which has none yet (match setup before the first
@@ -142,12 +155,25 @@ impl SimHost {
     fn install(&mut self, plan: &MatchPlan) -> Result<MatchStart, String> {
         self.world.insert_resource(plan.grid.clone());
         self.world.insert_resource(plan.definitions.clone());
-        sim::setup_match(
+        // Trees, houses and city blocks take damage like structures.
+        if let Some(armour) = plan.definitions.armour_class("structure") {
+            self.world
+                .insert_resource(sim::Props::from_looks(&plan.grid, &plan.looks, armour));
+        }
+        let human = |on: bool| if on { vec![HUMAN] } else { Vec::new() };
+        sim::setup_match_configured(
             &mut self.world,
             &plan.skirmish,
             &plan.ai,
             plan.map,
             &plan.players,
+            &sim::MatchOptions {
+                super_players: human(plan.super_me),
+                unlock_players: human(plan.unlock_all),
+                unit_speed_percent: plan.unit_speed_percent,
+                // The computer players fight the human, never each other.
+                allied_ai: true,
+            },
         )
         .map_err(|error| error.to_string())
     }
@@ -176,11 +202,21 @@ impl SimHost {
     }
 }
 
-/// Everything a match is set up from (`sim::setup_match`).
+/// Everything a match is set up from (`sim::setup_match`). The game makes it from the menu's
+/// choices with `crate::skirmish::match_plan`, which enlarges the map for the match's players.
 #[derive(Clone, Debug)]
 pub struct MatchPlan {
+    pub super_me: bool,
+    /// Building prerequisites waived for the human player.
+    pub unlock_all: bool,
+    /// The speed of the human player's units with Super Me, in percent (100: unchanged).
+    pub unit_speed_percent: u16,
+    /// The terrain of the match's map: the map file's, or enlarged for more than two players.
     pub grid: Grid,
+    /// The map's cell looks (row-major): where its destructible scenery stands (`sim::Props`).
+    pub looks: Vec<u8>,
     pub definitions: Definitions,
+    /// The skirmish file; the start positions of map `map` are those on `grid`.
     pub skirmish: SkirmishDefinitions,
     pub ai: AiDefinitions,
     /// The map's index in `skirmish.maps`.
@@ -362,6 +398,9 @@ fn run_tick(
             if let Some(outcome) = host.outcome() {
                 info!("the match has ended: {outcome:?}");
                 sink.close();
+            } else if host.human_defeated() {
+                info!("the human player has been defeated; computer players remain");
+                sink.close();
             }
         }
         Err(error) => {
@@ -385,7 +424,11 @@ pub(crate) mod tests {
         let catalogue = crate::skirmish::tests::production_catalogue();
         let selection = crate::skirmish::MenuSelection::initial(&catalogue);
         let plan = MatchPlan {
+            super_me: false,
+            unlock_all: false,
+            unit_speed_percent: 100,
             grid: catalogue.maps[selection.map].map.grid.clone(),
+            looks: catalogue.maps[selection.map].map.looks.clone(),
             definitions: catalogue.definitions.clone(),
             skirmish: catalogue.skirmish.clone(),
             ai: catalogue.ai.clone(),
@@ -524,7 +567,11 @@ pub(crate) mod tests {
             "no match before setup"
         );
         let plan = |grid: Grid| MatchPlan {
+            super_me: false,
+            unlock_all: false,
+            unit_speed_percent: 100,
             grid,
+            looks: Vec::new(),
             definitions: catalogue.definitions.clone(),
             skirmish: catalogue.skirmish.clone(),
             ai: catalogue.ai.clone(),
@@ -552,7 +599,8 @@ pub(crate) mod tests {
         let error = install_match(&mut world, &plan(small.clone())).expect_err("too small");
         assert!(error.contains("start position 0 at (15, 37)"), "{error}");
         let mut near_edge = plan(small);
-        near_edge.skirmish.maps[selection.map].starts = [CellPos::new(14, 1), CellPos::new(1, 14)];
+        near_edge.skirmish.maps[selection.map].starts =
+            vec![CellPos::new(14, 1), CellPos::new(1, 14)];
         let error = install_match(&mut world, &near_edge).expect_err("too small");
         assert!(error.contains("starting building"), "{error}");
         assert!(world.resource::<SimHost>().running());
@@ -647,7 +695,11 @@ pub(crate) mod tests {
         let catalogue = crate::skirmish::tests::production_catalogue();
         let selection = crate::skirmish::MenuSelection::initial(&catalogue);
         let plan = MatchPlan {
+            super_me: false,
+            unlock_all: false,
+            unit_speed_percent: 100,
             grid: catalogue.maps[selection.map].map.grid.clone(),
+            looks: catalogue.maps[selection.map].map.looks.clone(),
             definitions: catalogue.definitions.clone(),
             skirmish: catalogue.skirmish.clone(),
             ai: catalogue.ai.clone(),
@@ -665,6 +717,72 @@ pub(crate) mod tests {
         assert!(sink.pending.is_empty());
         assert_eq!(sink.discarded, 2);
         assert!(!sink.closed);
+    }
+
+    /// What the player asked of every match from the menu: the computer players fight the
+    /// human and never each other, Super Me carries its unit speed, and the map's trees and
+    /// houses are scenery that can be destroyed.
+    #[test]
+    fn menu_matches_ally_the_computer_players_and_install_speed_and_scenery() {
+        let catalogue = crate::skirmish::tests::production_catalogue();
+        let mut with_scenery = 0;
+        for map in 0..catalogue.maps.len() {
+            let selection = crate::skirmish::MenuSelection {
+                map,
+                enemies: 1,
+                super_me: true,
+                unit_speed: 2,
+                ..crate::skirmish::MenuSelection::initial(&catalogue)
+            };
+            // As the menu starts it: on the map enlarged for its three players.
+            let id = &catalogue.maps[map].id;
+            let (plan, _) = crate::skirmish::match_plan(&catalogue, selection, 0)
+                .unwrap_or_else(|error| panic!("{id}: {error}"));
+            // (A map file so large that the next step would pass the largest size is played
+            // as it is.)
+            let filed = &catalogue.maps[map].map.grid;
+            assert_eq!(
+                (plan.grid.width(), plan.grid.height()),
+                sim::enlarged_size(filed.width(), filed.height(), 3),
+                "{id}"
+            );
+            assert!(
+                plan.grid.width() > filed.width() || filed.width() > 224,
+                "{id}"
+            );
+            let mut host = SimHost::new(plan.seed);
+            host.install(&plan)
+                .unwrap_or_else(|error| panic!("{id}: {error}"));
+            let players = host.players().expect("players");
+            let (first, second) = (PlayerId(1), PlayerId(2));
+            assert!(players.hostile(HUMAN, first) && players.hostile(second, HUMAN));
+            assert!(
+                !players.hostile(first, second),
+                "{id}: the enemies are allies"
+            );
+            assert_eq!(players.unit_speed_percent(HUMAN), 200);
+            assert_eq!(players.unit_speed_percent(first), 100);
+            let (props, grid) = (host.props().expect("props"), host.grid().expect("grid"));
+            for (cell, prop) in props.iter() {
+                assert!(
+                    !grid.is_passable(cell),
+                    "{id}: scenery stands on blocked ground"
+                );
+                assert_eq!(prop.hit_points, prop.kind.hit_points());
+                assert_eq!(props.get(props.id_at(cell).unwrap()).unwrap().0, cell);
+            }
+            with_scenery += usize::from(!props.is_empty());
+        }
+        assert!(
+            with_scenery >= 9,
+            "{with_scenery} maps have destructible scenery"
+        );
+        // Without Super Me the unit speed option does nothing.
+        let plain = crate::skirmish::MenuSelection {
+            unit_speed: 4,
+            ..crate::skirmish::MenuSelection::initial(&catalogue)
+        };
+        assert_eq!(plain.unit_speed_percent(), 100);
     }
 
     #[test]
@@ -698,6 +816,14 @@ pub(crate) mod tests {
             )
             .unwrap_or_else(|error| panic!("{error}")),
         );
+        setup(&mut host.world);
+        host
+    }
+
+    /// The demo match of [`demo_host`] with scenario setup on top (`setup` may spawn what a
+    /// test needs, as `sim`'s own scenario tests do).
+    pub(crate) fn demo_host_with(setup: impl FnOnce(&mut World)) -> SimHost {
+        let mut host = demo_host();
         setup(&mut host.world);
         host
     }

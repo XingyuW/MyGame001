@@ -16,7 +16,10 @@
 //! Every map of the skirmish file is checked this way once, when the game starts
 //! (`crate::skirmish`); a match installs the checked grid into the simulation, and the map is
 //! rendered through `bevy_ecs_tiled` from the checked bytes at the offset that aligns it with
-//! [`crate::projection`] ([`spawn_map`]).
+//! [`crate::projection`] ([`spawn_map`]). A match with more than two players is played on the
+//! map enlarged for them (`sim::enlarged_map`, `crate::skirmish::match_map`): everything the game
+//! draws and picks reads the enlarged terrain ([`MapView`], [`MapTerrain`], [`MapLooks`]), and the
+//! tile layer of the map file, which has the file's size, is spawned hidden.
 
 use std::path::Path;
 
@@ -74,6 +77,11 @@ pub struct MapStatus {
 #[derive(Component, Debug)]
 pub struct MapRoot;
 
+/// Marks the [`MapRoot`] of a match whose tile layer is hidden: the match is played on the map
+/// enlarged for its players, which the tiles of the map file do not show ([`spawn_map`]).
+#[derive(Component, Debug)]
+pub struct HiddenTiles;
+
 /// The map file of the current match, relative to the asset directory.
 #[derive(Resource, Clone, Debug)]
 pub struct MapAsset(pub std::path::PathBuf);
@@ -89,11 +97,24 @@ pub struct HoveredCell(pub Option<CellPos>);
 #[derive(Resource, Clone, Debug)]
 pub struct MapTerrain(pub Grid);
 
+/// The look of every cell (row-major), from the map file's presentation-only `look` tile
+/// property: what the renderer and minimap draw on a cell (`battlefield::looks`). Every value was
+/// checked when the map was.
+#[derive(Resource, Clone, Debug, Default)]
+pub struct MapLooks(pub Vec<u8>);
+
+/// The start positions of the current match's map, the human player's first: those of the
+/// skirmish file moved onto the enlarged map, then the ones made for it (`sim::enlarged_map`).
+#[derive(Resource, Clone, Debug, Default)]
+pub struct MapStarts(pub Vec<CellPos>);
+
 /// A map whose files passed their checks: its grid and the size the renderer needs.
 #[derive(Clone, Debug)]
 pub struct CheckedMap {
     pub grid: Grid,
     pub view: MapView,
+    /// One known look per cell (`battlefield::looks::decode`).
+    pub looks: Vec<u8>,
 }
 
 /// Checks the map at `asset_path` (relative to `root`, the asset directory) and its tileset image
@@ -108,6 +129,21 @@ pub fn check_map(
     let (loaded, files) = sim::load_map_with_files(&path).map_err(|error| error.to_string())?;
     let image =
         check_tileset_image(&path, &loaded.tileset_image).map_err(|error| error.to_string())?;
+    // The simulation accepts any look; the game knows which ones it can draw.
+    let width = loaded.grid.width() as usize;
+    if let Some((index, look)) = loaded
+        .looks
+        .iter()
+        .enumerate()
+        .find(|(_, look)| crate::battlefield::looks::decode(**look).is_none())
+    {
+        return Err(format!(
+            "{}: cell ({}, {}): unknown look {look}",
+            path.display(),
+            index % width,
+            index / width
+        ));
+    }
     // The renderer reads exactly the checked bytes (D16). Every checked file lies in the map's
     // directory (D13), so it has the same asset path as on disk.
     let directory = asset_path.parent().unwrap_or(Path::new(""));
@@ -133,27 +169,52 @@ pub fn check_map(
     Ok(CheckedMap {
         grid: loaded.grid,
         view,
+        looks: loaded.looks,
     })
 }
 
 /// Spawns the map of a match from its checked bytes, with the resources that the rendering,
-/// picking, and interface systems read (`MapView`, `MapTerrain`, `MapAsset`). The game keeps the
-/// terrain as the map file defines it, which is what the player sees of a cell, also under fog
-/// (`MapTerrain`).
-pub(crate) fn spawn_map(world: &mut World, asset_path: &Path, map: &CheckedMap) {
+/// picking, and interface systems read (`MapView`, `MapTerrain`, `MapLooks`, `MapStarts`,
+/// `MapAsset`). The game keeps the terrain as the match starts with it, which is what the player
+/// sees of a cell, also under fog (`MapTerrain`).
+///
+/// `map` and `starts` are the map of the match: the checked map file at `asset_path`, or that map
+/// enlarged for the match's players (`as_filed` false). The tile layer `bevy_ecs_tiled` spawns
+/// always shows the file, cell for cell; over an enlarged map it would show the wrong terrain in
+/// the wrong place, so it is then spawned hidden (its creation still reports that the checked
+/// file loaded and is aligned, [`MapStatus`]), and the battlefield renderer alone draws the
+/// ground, as it does on top of the tile layer otherwise.
+pub(crate) fn spawn_map(
+    world: &mut World,
+    asset_path: &Path,
+    map: &CheckedMap,
+    starts: &[CellPos],
+    as_filed: bool,
+) {
     let handle = world
         .resource::<AssetServer>()
         .load(asset_path.to_path_buf());
     world.insert_resource(map.view);
     world.insert_resource(MapTerrain(map.grid.clone()));
+    world.insert_resource(MapLooks(map.looks.clone()));
+    world.insert_resource(MapStarts(starts.to_vec()));
     world.insert_resource(MapAsset(asset_path.to_path_buf()));
     world.insert_resource(MapStatus::default());
-    world.spawn((
-        MapRoot,
-        TiledMap(handle),
-        TilemapAnchor::None,
-        Transform::from_translation(map_origin_offset(map.view.height, map.view.tile).extend(0.0)),
-    ));
+    let root = world
+        .spawn((
+            MapRoot,
+            TiledMap(handle),
+            TilemapAnchor::None,
+            Transform::from_translation(
+                map_origin_offset(map.view.height, map.view.tile).extend(0.0),
+            ),
+        ))
+        .id();
+    if !as_filed {
+        world
+            .entity_mut(root)
+            .insert((Visibility::Hidden, HiddenTiles));
+    }
 }
 
 /// Removes the map of a match: its entity with everything spawned under it, and its resources.
@@ -167,6 +228,8 @@ pub(crate) fn despawn_map(world: &mut World) {
     }
     world.remove_resource::<MapView>();
     world.remove_resource::<MapTerrain>();
+    world.remove_resource::<MapLooks>();
+    world.remove_resource::<MapStarts>();
     world.remove_resource::<MapAsset>();
     world.insert_resource(MapStatus::default());
     world.insert_resource(HoveredCell::default());
@@ -328,6 +391,31 @@ mod tests {
         tiled::Loader::new()
             .load_tmx_map(path)
             .unwrap_or_else(|error| panic!("{}: {error}", path.display()))
+    }
+
+    #[test]
+    fn the_simulation_reads_looks_as_the_renderer_does() {
+        // `sim::enlarged_map` keeps the ground of a look and sets or clears its feature when it
+        // makes a start position; the values are the renderer's (`battlefield::looks`), which the
+        // simulation cannot name (I1).
+        use crate::battlefield::looks::{FEATURES, Feature, GROUNDS, Ground, decode, look};
+        assert!(GROUNDS.len() <= usize::from(sim::LOOK_GROUND_MASK) + 1);
+        assert_eq!(sim::LOOK_GROUND_AUTO, Ground::Auto as u8);
+        assert_eq!(sim::LOOK_GROUND_WATER, Ground::Water as u8);
+        assert_eq!(sim::LOOK_FEATURE_ORE, Feature::Ore as u8);
+        assert_eq!(sim::LOOK_FEATURE_BRIDGE, Feature::Bridge as u8);
+        for ground in GROUNDS {
+            for feature in FEATURES {
+                let value = look(ground, feature);
+                assert_eq!(value & sim::LOOK_GROUND_MASK, ground as u8);
+                assert_eq!(value >> 4, feature as u8);
+                assert_eq!(decode(value), Some((ground, feature)));
+            }
+            // What a made start position writes is a look the renderer knows.
+            let ore = ground as u8 | sim::LOOK_FEATURE_ORE << 4;
+            assert_eq!(decode(ore), Some((ground, Feature::Ore)));
+            assert_eq!(decode(ground as u8), Some((ground, Feature::None)));
+        }
     }
 
     #[test]

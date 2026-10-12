@@ -85,7 +85,7 @@ pub struct CameraOptions {
 impl Default for CameraOptions {
     fn default() -> Self {
         Self {
-            edge_scrolling: true,
+            edge_scrolling: false,
             scroll_speed: DEFAULT_SCROLL_SPEED,
         }
     }
@@ -805,7 +805,7 @@ mod tests {
             assert_eq!(parse_settings(text.as_bytes()), Ok(settings), "{text}");
         }
         // Comments, blank lines, CRLF line ends, and spaces around `=` are accepted.
-        let text = "# hello\r\n\r\nversion=1\r\nmaster_volume =8\nmusic_volume= 5\n  effects_volume = 7  \nmuted = false\nedge_scrolling = true\nscroll_speed = 5";
+        let text = "# hello\r\n\r\nversion=1\r\nmaster_volume =8\nmusic_volume= 5\n  effects_volume = 7  \nmuted = false\nedge_scrolling = false\nscroll_speed = 5";
         assert_eq!(parse_settings(text.as_bytes()), Ok(defaults()));
     }
 
@@ -1052,7 +1052,7 @@ mod tests {
                 .muted
         );
         assert!(
-            !set(OptionsButton::Switch(OptionRow::EdgeScrolling), start)
+            set(OptionsButton::Switch(OptionRow::EdgeScrolling), start)
                 .camera
                 .edge_scrolling
         );
@@ -1096,7 +1096,7 @@ mod tests {
         // The texts and the speed factor.
         assert_eq!(option_text(OptionRow::Master, &start), "8 / 10");
         assert_eq!(option_text(OptionRow::Sound, &start), "On");
-        assert_eq!(option_text(OptionRow::EdgeScrolling, &start), "On");
+        assert_eq!(option_text(OptionRow::EdgeScrolling, &start), "Off");
         assert_eq!(option_text(OptionRow::ScrollSpeed, &start), "5 / 10");
         assert_eq!(start.camera.speed_factor(), 1.0);
         assert_eq!(low.camera.speed_factor(), 0.2);

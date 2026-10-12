@@ -18,7 +18,16 @@
 //! removed or reset), sets up a new simulation with `sim::setup_match` through
 //! `crate::sim_host::install_match` (human player 0 at the map's first start position, the
 //! computer player 1 at the second), spawns the map, sizes the minimap, and centres the camera on
-//! the human player's start. The seed of the simulation is taken from the clock when the match
+//! the human player's start.
+//!
+//! Every map can be played by 2 to `sim::MAX_MATCH_PLAYERS` players. The map of a match grows
+//! with them ([`match_map`], `sim::enlarged_map`): two players play on the map file as it is,
+//! every further player adds an eighth to its width and height, and the start positions the file
+//! lacks are made on the enlarged map. The enlargement depends only on the map and the number of
+//! players, so a restart plays on the same map. [`match_plan`] is the one place that turns the
+//! menu's choices into what the simulation is set up from.
+//!
+//! The seed of the simulation is taken from the clock when the match
 //! starts and logged (M0 debt item 3). When the simulation reports the match's outcome, ticks stop
 //! and the end screen shows victory, defeat, or a draw, with Restart (the same choices, a new seed)
 //! and Main menu ([`end_effect`], pure). Since M7 the menu also opens the options screen
@@ -38,13 +47,12 @@ use crate::buildings::{BuildingSprites, BuildingStatus, BuildingView, BuildingVi
 use crate::camera::CameraBounds;
 use crate::checked_assets::CheckedAssets;
 use crate::construction::InterfaceMode;
-use crate::fog::RecentShots;
 use crate::hotkeys::ControlGroups;
-use crate::map::{CheckedMap, check_map};
+use crate::map::{CheckedMap, MapView, check_map};
 use crate::projection::{cell_centre, map_bounds};
 use crate::selection::{DragBox, Selection};
 use crate::sim_host::{MatchPlan, SimHost};
-use crate::units::{HUMAN, OPPONENT, UnitSprites, UnitStatus, UnitView, UnitViews};
+use crate::units::{HUMAN, UnitSprites, UnitStatus, UnitView, UnitViews};
 
 /// The skirmish file, relative to the asset directory.
 pub const SKIRMISH_PATH: &str = "data/skirmish.ron";
@@ -68,7 +76,7 @@ impl Plugin for SkirmishPlugin {
             )
             .add_systems(
                 Update,
-                (screen_input, update_screens)
+                (screen_input, update_screens, update_player_roster)
                     .chain()
                     // Both write texts and nodes of the interface.
                     .after(crate::sidebar::update_sidebar)
@@ -152,9 +160,12 @@ pub fn load(
 ///   (`sim::check_map_starts`);
 /// * the AI file can be played by every faction: the producers of the buildings it builds are
 ///   starting buildings or are built before (`sim::check_ai_factions`);
-/// * every match the menu can choose can be set up: every map with every faction for the human
-///   player and every faction for the computer player (the difficulty does not change the setup),
-///   each in a simulation of its own that is dropped afterwards.
+/// * every match the menu can choose can be set up: every map, enlarged for 2 to
+///   `sim::MAX_MATCH_PLAYERS` players ([`match_map`]), each in a simulation of its own that is
+///   dropped afterwards. The fewest and the most players are set up with every faction for the
+///   human player and every faction for the computer players; the player counts between them with
+///   one pairing each, which changes with the count, so that the game still starts quickly (the
+///   difficulty does not change the setup).
 ///
 /// Each error names the file and the field, or the map and the factions, and the reason.
 pub fn check_catalogue(catalogue: &Catalogue, root: &Path) -> Result<(), String> {
@@ -176,38 +187,137 @@ pub fn check_catalogue(catalogue: &Catalogue, root: &Path) -> Result<(), String>
     )
     .map_err(|error| error.to_string())?;
     let factions = &catalogue.skirmish.factions;
+    let counts = MenuCounts::of(catalogue);
     for (map, entry) in catalogue.maps.iter().enumerate() {
-        for faction in 0..factions.len() {
-            for opponent in 0..factions.len() {
+        let most = counts.of_row(Row::Enemies, map).saturating_sub(1);
+        for enemies in 0..=most {
+            let cannot = |faction: usize, opponent: usize, error: String| {
+                format!(
+                    "data file {}: map {:?}: the match of faction {:?} against faction {:?} \
+                     with {} computer players cannot be set up: {error}",
+                    skirmish_path.display(),
+                    entry.id,
+                    factions
+                        .get(faction)
+                        .map_or("?", |faction| faction.id.as_str()),
+                    factions
+                        .get(opponent)
+                        .map_or("?", |faction| faction.id.as_str()),
+                    enemies + 1,
+                )
+            };
+            // The map for this many players is the same for every pairing: enlarged once.
+            let played =
+                match_map(catalogue, map, enemies + 2).map_err(|error| cannot(0, 0, error))?;
+            // Every pairing with one opponent and with the most; one in between.
+            let pairings: Vec<(usize, usize)> = if enemies == 0 || enemies == most {
+                (0..factions.len())
+                    .flat_map(|faction| (0..factions.len()).map(move |other| (faction, other)))
+                    .collect()
+            } else {
+                let count = factions.len().max(1);
+                vec![(enemies % count, (enemies / count) % count)]
+            };
+            for (faction, opponent) in pairings {
                 let selection = MenuSelection {
                     map,
                     faction,
                     opponent,
-                    difficulty: 0,
+                    enemies,
+                    ..MenuSelection::default()
                 };
-                let plan = MatchPlan {
-                    grid: entry.map.grid.clone(),
-                    definitions: catalogue.definitions.clone(),
-                    skirmish: catalogue.skirmish.clone(),
-                    ai: catalogue.ai.clone(),
-                    map,
-                    players: selection.players().to_vec(),
-                    seed: 0,
-                };
-                crate::sim_host::check_match(&plan).map_err(|error| {
-                    format!(
-                        "data file {}: map {:?}: the match of faction {:?} against faction {:?} \
-                         cannot be set up: {error}",
-                        skirmish_path.display(),
-                        entry.id,
-                        factions[faction].id,
-                        factions[opponent].id
-                    )
-                })?;
+                crate::sim_host::check_match(&plan_on(catalogue, selection, 0, &played))
+                    .map_err(|error| cannot(faction, opponent, error))?;
             }
         }
     }
     Ok(())
+}
+
+/// The map of a match: a map of the catalogue as its file defines it, or enlarged for the
+/// match's players.
+#[derive(Clone, Debug)]
+pub struct MatchMap {
+    /// The terrain, looks and size the match is played and drawn with.
+    pub map: CheckedMap,
+    /// The start positions on it, the human player's first: at least one per player.
+    pub starts: Vec<sim::CellPos>,
+    /// Whether it is the map file's own map, cell for cell (a match of two players).
+    pub as_filed: bool,
+}
+
+/// The size in cells of map `map` of the catalogue in a match with `players` players
+/// (`sim::enlarged_size`), for the menu.
+pub fn match_map_size(catalogue: &Catalogue, map: usize, players: usize) -> Option<(u32, u32)> {
+    let view = catalogue.maps.get(map)?.map.view;
+    Some(sim::enlarged_size(view.width, view.height, players))
+}
+
+/// Map `map` of the catalogue for a match with `players` players (`sim::enlarged_map`): the map
+/// file's own for two, and one an eighth wider and higher for every further player, with the
+/// file's start positions moved along and the missing ones made. A pure function of the map and
+/// the player count, so every match with these choices, and every restart, has the same map.
+pub fn match_map(catalogue: &Catalogue, map: usize, players: usize) -> Result<MatchMap, String> {
+    let (Some(entry), Some(def)) = (catalogue.maps.get(map), catalogue.skirmish.maps.get(map))
+    else {
+        return Err(format!("map {map} is not in the catalogue"));
+    };
+    let enlarged = sim::enlarged_map(&entry.map.grid, &entry.map.looks, &def.starts, players)
+        .map_err(|error| error.to_string())?;
+    let as_filed = enlarged.grid == entry.map.grid && enlarged.looks == entry.map.looks;
+    Ok(MatchMap {
+        map: CheckedMap {
+            view: MapView {
+                width: enlarged.grid.width(),
+                height: enlarged.grid.height(),
+                tile: entry.map.view.tile,
+            },
+            grid: enlarged.grid,
+            looks: enlarged.looks,
+        },
+        starts: enlarged.starts,
+        as_filed,
+    })
+}
+
+/// Everything the match of `selection` is set up from, with the seed `seed`: the menu's players
+/// on the map enlarged for them ([`match_map`]), and the skirmish file with that map's start
+/// positions in place of the file's, so that match setup and the computer players use the cells
+/// the bases really stand on. Also returns the map, for drawing it.
+pub fn match_plan(
+    catalogue: &Catalogue,
+    selection: MenuSelection,
+    seed: u64,
+) -> Result<(MatchPlan, MatchMap), String> {
+    let map = match_map(catalogue, selection.map, selection.players().len())?;
+    Ok((plan_on(catalogue, selection, seed, &map), map))
+}
+
+/// [`match_plan`] on `map`, the map of `selection`'s map for its number of players
+/// ([`match_map`]).
+fn plan_on(
+    catalogue: &Catalogue,
+    selection: MenuSelection,
+    seed: u64,
+    map: &MatchMap,
+) -> MatchPlan {
+    let mut skirmish = catalogue.skirmish.clone();
+    if let Some(def) = skirmish.maps.get_mut(selection.map) {
+        def.starts.clone_from(&map.starts);
+    }
+    MatchPlan {
+        super_me: selection.super_me,
+        unlock_all: selection.unlock_all,
+        unit_speed_percent: selection.unit_speed_percent(),
+        grid: map.map.grid.clone(),
+        looks: map.map.looks.clone(),
+        definitions: catalogue.definitions.clone(),
+        skirmish,
+        ai: catalogue.ai.clone(),
+        map: selection.map,
+        players: selection.players(),
+        seed,
+    }
 }
 
 /// Startup: loads the catalogue ([`load`]) and registers the sprites. An error is logged and ends
@@ -227,10 +337,26 @@ pub(crate) fn load_catalogue(world: &mut World) {
     };
     let mut sprites = BuildingSprites::default();
     for sprite in buildings {
-        let pair = crate::presentation::sprite_pair(
-            &sprite.bytes,
-            &mut world.resource_mut::<Assets<Image>>(),
-        );
+        debug_assert!(!sprite.bytes.is_empty());
+        let def = catalogue
+            .definitions
+            .building(sprite.kind)
+            .expect("checked building kind");
+        let bytes = match crate::hd_art::checked(
+            &root,
+            "buildings",
+            &def.id,
+            crate::hd_art::building_size(def.width, def.height),
+        ) {
+            Ok(bytes) => bytes,
+            Err(error) => {
+                error!("{error}");
+                world.write_message(AppExit::error());
+                return;
+            }
+        };
+        let pair =
+            crate::presentation::sprite_pair(&bytes, &mut world.resource_mut::<Assets<Image>>());
         match pair {
             Ok((human, enemy)) => {
                 sprites.0.insert(sprite.kind, human);
@@ -246,10 +372,26 @@ pub(crate) fn load_catalogue(world: &mut World) {
     world.insert_resource(sprites);
     let mut sprites = UnitSprites::default();
     for sheet in sheets {
-        let pair = crate::presentation::sprite_pair(
-            &sheet.bytes,
-            &mut world.resource_mut::<Assets<Image>>(),
-        );
+        debug_assert!(!sheet.bytes.is_empty());
+        let def = catalogue
+            .definitions
+            .unit(sheet.kind)
+            .expect("checked unit kind");
+        let bytes = match crate::hd_art::checked(
+            &root,
+            "units",
+            &def.id,
+            Vec2::new(crate::hd_art::UNIT_SIZE * 8.0, crate::hd_art::UNIT_SIZE),
+        ) {
+            Ok(bytes) => bytes,
+            Err(error) => {
+                error!("{error}");
+                world.write_message(AppExit::error());
+                return;
+            }
+        };
+        let pair =
+            crate::presentation::sprite_pair(&bytes, &mut world.resource_mut::<Assets<Image>>());
         match pair {
             Ok((human, enemy)) => {
                 sprites.0.insert(sheet.kind, human);
@@ -263,7 +405,39 @@ pub(crate) fn load_catalogue(world: &mut World) {
         }
     }
     world.insert_resource(sprites);
-    let selection = MenuSelection::initial(&catalogue);
+    // Walk cycles: only the types that go on foot have one.
+    let mut walks = crate::units::WalkSprites::default();
+    for def in catalogue.definitions.units() {
+        let Some(kind) = catalogue.definitions.unit_kind(&def.id) else {
+            continue;
+        };
+        if !root
+            .join("sprites/hd/walk")
+            .join(format!("{}.png", def.id))
+            .is_file()
+        {
+            continue;
+        }
+        let size = Vec2::new(
+            crate::hd_art::WALK_SIZE * 8.0,
+            crate::hd_art::WALK_SIZE * crate::hd_art::WALK_FRAMES as f32,
+        );
+        let pair = crate::hd_art::checked(&root, "walk", &def.id, size).and_then(|bytes| {
+            crate::presentation::sprite_pair(&bytes, &mut world.resource_mut::<Assets<Image>>())
+        });
+        match pair {
+            Ok(pair) => {
+                walks.0.insert(kind, pair);
+            }
+            Err(error) => {
+                error!("walk cycle of {}: {error}", def.id);
+                world.write_message(AppExit::error());
+                return;
+            }
+        }
+    }
+    world.insert_resource(walks);
+    let selection = MenuSelection::opening(&catalogue);
     info!(
         "catalogue: {} maps, {} factions, {} difficulties",
         catalogue.maps.len(),
@@ -289,30 +463,89 @@ pub enum Screen {
 pub enum Row {
     Map,
     Faction,
+    /// How many computer players (1 to `sim::MAX_MATCH_PLAYERS` minus one, on every map: the map
+    /// grows with its players).
+    Enemies,
     Opponent,
     Difficulty,
+    SuperMe,
+    /// Standard tech tree, or every prerequisite waived for the human player.
+    UnlockAll,
+    Color,
+    /// How fast the match runs ([`crate::game_speed::SPEED_LEVELS`]); `[` and `]` and the
+    /// sidebar change it during the match.
+    GameSpeed,
+    /// How fast the human player's units move with Super Me ([`UNIT_SPEEDS`]).
+    UnitSpeed,
 }
 
+/// The unit speeds the Super Me player may choose, in percent of every unit type's speed.
+pub const UNIT_SPEEDS: [u16; 5] = [100, 150, 200, 300, 400];
+
 impl Row {
-    pub const ALL: [Row; 4] = [Row::Map, Row::Faction, Row::Opponent, Row::Difficulty];
+    pub const ALL: [Row; 10] = [
+        Row::Map,
+        Row::Faction,
+        Row::Enemies,
+        Row::Opponent,
+        Row::Difficulty,
+        Row::GameSpeed,
+        Row::SuperMe,
+        Row::UnitSpeed,
+        Row::UnlockAll,
+        Row::Color,
+    ];
 
     pub fn label(self) -> &'static str {
         match self {
             Row::Map => "Map",
-            Row::Faction => "Your faction",
-            Row::Opponent => "Opponent",
+            Row::Faction => "Starting force",
+            Row::Enemies => "Enemy players",
+            Row::Opponent => "Enemy force",
             Row::Difficulty => "Difficulty",
+            Row::SuperMe => "Super Me",
+            Row::UnlockAll => "Tech tree",
+            Row::Color => "Team color",
+            Row::GameSpeed => "Game speed",
+            Row::UnitSpeed => "Unit speed",
         }
     }
 }
 
 /// The choices of a match: indices into the catalogue's maps, factions, and difficulties.
-#[derive(Resource, Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[derive(Resource, Clone, Copy, Debug, PartialEq, Eq)]
 pub struct MenuSelection {
+    pub super_me: bool,
+    /// Every building prerequisite waived for the human player (match option, like Super Me).
+    pub unlock_all: bool,
+    /// Computer players minus one (0: the classic one-against-one).
+    pub enemies: usize,
+    pub color: usize,
     pub map: usize,
     pub faction: usize,
     pub opponent: usize,
     pub difficulty: usize,
+    /// Index into [`crate::game_speed::SPEED_LEVELS`].
+    pub game_speed: usize,
+    /// Index into [`UNIT_SPEEDS`]; it takes effect with Super Me only.
+    pub unit_speed: usize,
+}
+
+impl Default for MenuSelection {
+    fn default() -> Self {
+        Self {
+            super_me: false,
+            unlock_all: false,
+            enemies: 0,
+            color: 0,
+            map: 0,
+            faction: 0,
+            opponent: 0,
+            difficulty: 0,
+            game_speed: crate::game_speed::NORMAL_SPEED,
+            unit_speed: 0,
+        }
+    }
 }
 
 /// How many entries each row has.
@@ -321,22 +554,37 @@ pub struct MenuCounts {
     pub maps: usize,
     pub factions: usize,
     pub difficulties: usize,
+    /// Per map, the most computer players a match on it may have: `sim::MAX_MATCH_PLAYERS`
+    /// minus one on every map of the catalogue, however many start positions its file lists (the
+    /// map of a match is enlarged for its players and gets the missing ones, [`match_map`]).
+    pub enemies: [usize; sim::MAX_MAPS],
 }
 
 impl MenuCounts {
     pub fn of(catalogue: &Catalogue) -> Self {
+        let mut enemies = [0; sim::MAX_MAPS];
+        for slot in enemies.iter_mut().take(catalogue.maps.len()) {
+            *slot = sim::MAX_MATCH_PLAYERS - 1;
+        }
         Self {
             maps: catalogue.maps.len(),
             factions: catalogue.skirmish.factions.len(),
             difficulties: catalogue.ai.difficulties.len(),
+            enemies,
         }
     }
 
-    fn of_row(self, row: Row) -> usize {
+    /// How many entries `row` has with map `map` chosen.
+    pub fn of_row(self, row: Row, map: usize) -> usize {
         match row {
             Row::Map => self.maps,
             Row::Faction | Row::Opponent => self.factions,
+            Row::Enemies => self.enemies.get(map).copied().unwrap_or(0),
             Row::Difficulty => self.difficulties,
+            Row::SuperMe | Row::UnlockAll => 2,
+            Row::Color => crate::presentation::TEAM_PALETTE.len(),
+            Row::GameSpeed => crate::game_speed::SPEED_LEVELS.len(),
+            Row::UnitSpeed => UNIT_SPEEDS.len(),
         }
     }
 }
@@ -351,12 +599,45 @@ impl MenuSelection {
         }
     }
 
+    /// What the menu shows when the game starts: [`MenuSelection::initial`] on the first of the
+    /// largest maps of the catalogue, where bases lie farthest apart.
+    pub fn opening(catalogue: &Catalogue) -> Self {
+        let cells = |entry: &CatalogueMap| {
+            u64::from(entry.map.grid.width()) * u64::from(entry.map.grid.height())
+        };
+        let largest = catalogue.maps.iter().map(cells).max().unwrap_or(0);
+        Self {
+            map: catalogue
+                .maps
+                .iter()
+                .position(|entry| cells(entry) == largest)
+                .unwrap_or(0),
+            ..Self::initial(catalogue)
+        }
+    }
+
     fn get(self, row: Row) -> usize {
         match row {
             Row::Map => self.map,
             Row::Faction => self.faction,
+            Row::Enemies => self.enemies,
             Row::Opponent => self.opponent,
             Row::Difficulty => self.difficulty,
+            Row::SuperMe => usize::from(self.super_me),
+            Row::UnlockAll => usize::from(self.unlock_all),
+            Row::Color => self.color,
+            Row::GameSpeed => self.game_speed,
+            Row::UnitSpeed => self.unit_speed,
+        }
+    }
+
+    /// The speed of the human player's units in percent: the chosen unit speed with Super Me,
+    /// else 100.
+    pub fn unit_speed_percent(self) -> u16 {
+        if self.super_me {
+            UNIT_SPEEDS.get(self.unit_speed).copied().unwrap_or(100)
+        } else {
+            100
         }
     }
 
@@ -364,8 +645,14 @@ impl MenuSelection {
         match row {
             Row::Map => self.map = value,
             Row::Faction => self.faction = value,
+            Row::Enemies => self.enemies = value,
             Row::Opponent => self.opponent = value,
             Row::Difficulty => self.difficulty = value,
+            Row::SuperMe => self.super_me = value != 0,
+            Row::UnlockAll => self.unlock_all = value != 0,
+            Row::Color => self.color = value,
+            Row::GameSpeed => self.game_speed = value,
+            Row::UnitSpeed => self.unit_speed = value,
         }
     }
 
@@ -373,28 +660,34 @@ impl MenuSelection {
     pub fn valid(self, counts: MenuCounts) -> bool {
         Row::ALL
             .into_iter()
-            .all(|row| self.get(row) < counts.of_row(row))
+            .all(|row| self.get(row) < counts.of_row(row, self.map))
     }
 
-    /// The players of the match: the human player at the map's first start position, the
-    /// computer player at the second.
-    pub fn players(self) -> [PlayerSetup; 2] {
-        [
-            PlayerSetup {
-                player: HUMAN,
-                faction: self.faction,
-                start: 0,
-                controller: Controller::Human,
+    /// How many computer players the match has.
+    pub fn enemy_count(self) -> usize {
+        self.enemies + 1
+    }
+
+    /// The players of the match: the human player at the first start position of the match's
+    /// map ([`match_map`]), computer player k (`PlayerId(k)`, from 1) at start position k. Each computer player is independent:
+    /// its own id, base, credits, queues, AI state and colour; all of them are hostile to every
+    /// other player.
+    pub fn players(self) -> Vec<PlayerSetup> {
+        let mut players = vec![PlayerSetup {
+            player: HUMAN,
+            faction: self.faction,
+            start: 0,
+            controller: Controller::Human,
+        }];
+        players.extend((1..=self.enemy_count()).map(|k| PlayerSetup {
+            player: sim::PlayerId(u8::try_from(k).unwrap_or(u8::MAX)),
+            faction: self.opponent,
+            start: k,
+            controller: Controller::Ai {
+                difficulty: self.difficulty,
             },
-            PlayerSetup {
-                player: OPPONENT,
-                faction: self.opponent,
-                start: 1,
-                controller: Controller::Ai {
-                    difficulty: self.difficulty,
-                },
-            },
-        ]
+        }));
+        players
     }
 }
 
@@ -426,7 +719,7 @@ pub enum MenuEffect {
 /// selection outside the catalogue (which the buttons cannot make) starts nothing.
 pub fn menu_effect(button: MenuButton, selection: MenuSelection, counts: MenuCounts) -> MenuEffect {
     let step = |row: Row, forward: bool| {
-        let count = counts.of_row(row);
+        let count = counts.of_row(row, selection.map);
         if count == 0 {
             return MenuEffect::Nothing;
         }
@@ -440,6 +733,10 @@ pub fn menu_effect(button: MenuButton, selection: MenuSelection, counts: MenuCou
                 (current + count - 1) % count
             },
         );
+        // A map that admits fewer enemies keeps as many as it can hold.
+        next.enemies = next
+            .enemies
+            .min(counts.of_row(Row::Enemies, next.map).saturating_sub(1));
         MenuEffect::Select(next)
     };
     match button {
@@ -452,10 +749,53 @@ pub fn menu_effect(button: MenuButton, selection: MenuSelection, counts: MenuCou
     }
 }
 
-/// The text of a menu row: the id of the chosen entry, with underscores as spaces.
+/// The text of a menu row: the id of the chosen entry, with underscores as spaces. The map row
+/// adds the size in cells the map has for the chosen number of players, `liberty bay  176 x 176`,
+/// which changes with the enemy players row ([`match_map_size`]).
 pub fn row_text(row: Row, selection: MenuSelection, catalogue: &Catalogue) -> String {
     let id = match row {
-        Row::Map => catalogue.maps.get(selection.map).map(|map| map.id.as_str()),
+        Row::SuperMe => Some(if selection.super_me {
+            "ON / 10x / $1"
+        } else {
+            "OFF"
+        }),
+        Row::UnlockAll => Some(if selection.unlock_all {
+            "ALL UNLOCKED"
+        } else {
+            "STANDARD"
+        }),
+        Row::GameSpeed => {
+            return crate::game_speed::SPEED_LEVELS
+                .get(selection.game_speed)
+                .map_or_else(|| "-".to_string(), |&f| crate::game_speed::speed_label(f));
+        }
+        Row::UnitSpeed => {
+            let Some(&percent) = UNIT_SPEEDS.get(selection.unit_speed) else {
+                return "-".to_string();
+            };
+            let label = crate::game_speed::speed_label(f32::from(percent) / 100.0);
+            return if selection.super_me {
+                label
+            } else {
+                format!("{label} - SUPER ME OFF")
+            };
+        }
+        Row::Enemies => {
+            let most = MenuCounts::of(catalogue).of_row(Row::Enemies, selection.map);
+            return format!("{} of {most}", selection.enemy_count());
+        }
+        Row::Color => crate::presentation::TEAM_PALETTE
+            .get(selection.color)
+            .map(|c| c.0),
+        Row::Map => {
+            let size = match_map_size(catalogue, selection.map, selection.players().len());
+            return match (catalogue.maps.get(selection.map), size) {
+                (Some(map), Some((width, height))) => {
+                    format!("{}  {width} x {height}", map.id.replace('_', " "))
+                }
+                _ => "-".to_string(),
+            };
+        }
         Row::Faction => catalogue
             .skirmish
             .factions
@@ -504,8 +844,13 @@ pub fn end_effect(button: EndButton, last: Option<MenuSelection>) -> EndEffect {
     }
 }
 
-/// The headline of the end screen for the human player, or `None` while the match goes on.
-pub fn end_text(outcome: Option<MatchOutcome>) -> Option<&'static str> {
+/// The headline of the end screen for the human player, or `None` while the match goes on. With
+/// several computer players the simulation's outcome waits for the last one standing; the human
+/// player's defeat (`human_defeated`) ends the match for the human at once.
+pub fn end_text(outcome: Option<MatchOutcome>, human_defeated: bool) -> Option<&'static str> {
+    if outcome.is_none() && human_defeated {
+        return Some("DEFEAT");
+    }
     match outcome? {
         MatchOutcome::Won { winner, .. } if winner == HUMAN => Some("VICTORY"),
         MatchOutcome::Won { .. } => Some("DEFEAT"),
@@ -528,9 +873,10 @@ fn clock_seed() -> u64 {
 // --- Starting and ending matches ------------------------------------------------------------
 
 /// Starts a match with `selection` and the seed `seed`: ends the current match if any
-/// ([`end_match`]), sets up the simulation, spawns the map, sizes the minimap, and centres the
-/// camera on the human player's start. A setup error is logged and ends the game with exit code
-/// 1, as before M6; nothing of a new match is then shown.
+/// ([`end_match`]), sets up the simulation on the map enlarged for the match's players
+/// ([`match_plan`]), spawns that map, sizes the minimap and the camera's bounds for it, and
+/// centres the camera on the human player's start. A setup error is logged and ends the game with
+/// exit code 1, as before M6; nothing of a new match is then shown.
 pub(crate) fn begin_match(world: &mut World, selection: MenuSelection, seed: u64) {
     end_match(world);
     let Some(catalogue) = world.get_resource::<Catalogue>().cloned() else {
@@ -543,14 +889,13 @@ pub(crate) fn begin_match(world: &mut World, selection: MenuSelection, seed: u64
         world.write_message(AppExit::error());
         return;
     };
-    let plan = MatchPlan {
-        grid: entry.map.grid.clone(),
-        definitions: catalogue.definitions.clone(),
-        skirmish: catalogue.skirmish.clone(),
-        ai: catalogue.ai.clone(),
-        map: selection.map,
-        players: selection.players().to_vec(),
-        seed,
+    let (plan, map) = match match_plan(&catalogue, selection, seed) {
+        Ok(planned) => planned,
+        Err(error) => {
+            error!("map {}: {error}", entry.id);
+            world.write_message(AppExit::error());
+            return;
+        }
     };
     let start = match crate::sim_host::install_match(world, &plan) {
         Ok(start) => start,
@@ -560,6 +905,9 @@ pub(crate) fn begin_match(world: &mut World, selection: MenuSelection, seed: u64
             return;
         }
     };
+    if let Some(mut speed) = world.get_resource_mut::<crate::game_speed::GameSpeed>() {
+        speed.set_level(selection.game_speed);
+    }
     let faction = |index: usize| {
         catalogue
             .skirmish
@@ -568,45 +916,74 @@ pub(crate) fn begin_match(world: &mut World, selection: MenuSelection, seed: u64
             .map_or("?", |faction| faction.id.as_str())
     };
     info!(
-        "match on map {} (seed {seed}): {} against {} ({}): {} buildings and {} units spawned",
+        "match on map {} ({} x {} cells, seed {seed}): {} against {} x {} ({}){}{}: {} buildings \
+         and {} units spawned",
         entry.id,
+        map.map.view.width,
+        map.map.view.height,
         faction(selection.faction),
+        selection.enemy_count(),
         faction(selection.opponent),
         catalogue
             .ai
             .difficulties
             .get(selection.difficulty)
             .map_or("?", |difficulty| difficulty.id.as_str()),
+        if selection.super_me { ", Super Me" } else { "" },
+        if selection.unlock_all {
+            ", all unlocked"
+        } else {
+            ""
+        },
         start.buildings,
         start.units
     );
     world.resource_mut::<BuildingStatus>().spawned = start.buildings;
     world.resource_mut::<UnitStatus>().spawned = start.units;
-    let view = entry.map.view;
-    crate::map::spawn_map(world, &entry.asset_path, &entry.map);
+    let view = map.map.view;
+    crate::map::spawn_map(
+        world,
+        &entry.asset_path,
+        &map.map,
+        &map.starts,
+        map.as_filed,
+    );
     world.insert_resource(CameraBounds(Some(map_bounds(
         view.width,
         view.height,
         view.tile,
     ))));
     crate::minimap::size_minimap(world, view.width, view.height);
-    if let Some(start) = catalogue
-        .skirmish
-        .maps
-        .get(selection.map)
-        .map(|map| map.starts[0])
-    {
-        let centre = cell_centre(start, view.tile);
+    if let Some(&start) = map.starts.first() {
+        let centre = cell_centre(sim::CellPos::new(start.x + 3, start.y + 3), view.tile);
         let cameras: Vec<Entity> = world
             .query_filtered::<Entity, With<Camera2d>>()
             .iter(world)
             .collect();
         for camera in cameras {
             if let Some(mut transform) = world.get_mut::<Transform>(camera) {
-                transform.translation = centre.extend(transform.translation.z);
+                transform.translation = (centre + Vec2::X * crate::sidebar::SIDEBAR_WIDTH / 2.0)
+                    .extend(transform.translation.z);
             }
         }
     }
+    let mut pairs = Vec::new();
+    if let Some(walks) = world.get_resource::<crate::units::WalkSprites>() {
+        pairs.extend(walks.0.values().cloned());
+    }
+    if let Some(s) = world.get_resource::<UnitSprites>() {
+        pairs.extend(
+            s.0.iter()
+                .filter_map(|(k, h)| s.1.get(k).map(|e| (h.clone(), e.clone()))),
+        );
+    }
+    if let Some(s) = world.get_resource::<BuildingSprites>() {
+        pairs.extend(
+            s.0.iter()
+                .filter_map(|(k, h)| s.1.get(k).map(|e| (h.clone(), e.clone()))),
+        );
+    }
+    crate::presentation::apply_team_colors(world, selection.color, pairs);
     world.insert_resource(LastMatch(Some(selection)));
     *world.resource_mut::<Screen>() = Screen::Match;
 }
@@ -616,6 +993,8 @@ pub(crate) fn begin_match(world: &mut World, selection: MenuSelection, seed: u64
 /// removed or reset, so that nothing of it reaches the next match.
 pub(crate) fn end_match(world: &mut World) {
     crate::sim_host::uninstall_match(world);
+    crate::battlefield::clear(world);
+    crate::notices::clear(world);
     crate::map::despawn_map(world);
     let views: Vec<Entity> = world
         .query_filtered::<Entity, Or<(With<UnitView>, With<BuildingView>)>>()
@@ -625,14 +1004,15 @@ pub(crate) fn end_match(world: &mut World) {
         world.despawn(view);
     }
     world.insert_resource(UnitViews::default());
+    world.insert_resource(crate::units::Altitudes::default());
     world.insert_resource(BuildingViews::default());
     world.insert_resource(UnitStatus::default());
     world.insert_resource(BuildingStatus::default());
     world.insert_resource(Selection::default());
+    world.insert_resource(crate::selection::SelectedBuilding::default());
     world.insert_resource(DragBox::default());
     world.insert_resource(ControlGroups::default());
     world.insert_resource(InterfaceMode::default());
-    world.insert_resource(RecentShots::default());
     world.insert_resource(CameraBounds::default());
     crate::minimap::size_minimap(world, 1, 1);
     *world.resource_mut::<Screen>() = Screen::Menu;
@@ -655,6 +1035,72 @@ pub enum ScreenText {
     Row(Row),
     /// The end screen's headline.
     Outcome,
+    /// A line of the menu's player list: player `n` of the match (0 the human player).
+    Player(usize),
+}
+
+/// A line of the menu's player list, shown for the players of the chosen match.
+#[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct PlayerLine(pub usize);
+
+/// The colour swatch of a line of the menu's player list.
+#[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct PlayerSwatch(pub usize);
+
+/// The text of line `slot` of the player list: `You - Blue - vanguard` or
+/// `AI 2 - Gold - meridian, normal` (ASCII: the interface font has no middle dot); `None` beyond the match's players.
+pub fn player_line(slot: usize, selection: MenuSelection, catalogue: &Catalogue) -> Option<String> {
+    let setup = selection.players().into_iter().nth(slot)?;
+    let colour = crate::presentation::TEAM_PALETTE
+        [crate::presentation::team_color_index(selection.color, setup.player)]
+    .0;
+    let force = catalogue
+        .skirmish
+        .factions
+        .get(setup.faction)
+        .map_or("-", |faction| faction.id.as_str());
+    Some(match setup.controller {
+        Controller::Human => format!("You - {colour} - {force}"),
+        Controller::Ai { difficulty } => format!(
+            "AI {slot} - {colour} - {force}, {}",
+            catalogue
+                .ai
+                .difficulties
+                .get(difficulty)
+                .map_or("-", |difficulty| difficulty.id.as_str())
+        ),
+    })
+}
+
+/// Shows the menu's player list for the current choices.
+fn update_player_roster(
+    selection: Res<MenuSelection>,
+    catalogue: Option<Res<Catalogue>>,
+    mut lines: Query<(&PlayerLine, &mut Node)>,
+    mut swatches: Query<(&PlayerSwatch, &mut BackgroundColor)>,
+) {
+    if !selection.is_changed() && !catalogue.as_ref().is_some_and(|c| c.is_changed()) {
+        return;
+    }
+    let count = selection.players().len();
+    for (line, mut node) in &mut lines {
+        let display = if line.0 < count {
+            Display::Flex
+        } else {
+            Display::None
+        };
+        if node.display != display {
+            node.display = display;
+        }
+    }
+    for (swatch, mut colour) in &mut swatches {
+        let rgb = crate::presentation::TEAM_PALETTE[crate::presentation::team_color_index(
+            selection.color,
+            sim::PlayerId(u8::try_from(swatch.0).unwrap_or(0)),
+        )]
+        .1;
+        colour.0 = Color::srgb_u8(rgb[0], rgb[1], rgb[2]);
+    }
 }
 
 fn screen_text(value: impl Into<String>, size: f32) -> (Text, TextFont, TextColor) {
@@ -681,7 +1127,15 @@ fn screen_button(width: f32) -> impl Bundle {
     )
 }
 
-/// Spawns the menu (shown at first) and the end screen (hidden), above the sidebar.
+/// Width of the chosen entry of a menu row, in logical pixels.
+const ROW_VALUE_WIDTH: f32 = 320.0;
+
+/// Width of the menu's player list, in logical pixels.
+const PLAYERS_PANEL_WIDTH: f32 = 330.0;
+
+/// Spawns the menu (shown at first) and the end screen (hidden), above the sidebar. The player
+/// list has a line for each of the `sim::MAX_MATCH_PLAYERS` players a match may have; ten lines
+/// are lower than the rows beside them.
 pub(crate) fn spawn_screens(mut commands: Commands, sprites: Option<Res<BuildingSprites>>) {
     commands
         .spawn((
@@ -736,34 +1190,95 @@ pub(crate) fn spawn_screens(mut commands: Commands, sprites: Option<Res<Building
                 });
             }
             menu.spawn(screen_text("SELECT YOUR THEATER OF OPERATIONS", 11.0));
-            for row in Row::ALL {
-                menu.spawn(Node {
-                    column_gap: Val::Px(10.0),
-                    align_items: AlignItems::Center,
-                    ..default()
-                })
-                .with_children(|line| {
-                    line.spawn((
+            menu.spawn(Node {
+                column_gap: Val::Px(28.0),
+                align_items: AlignItems::Start,
+                ..default()
+            })
+            .with_children(|columns| {
+                columns
+                    .spawn(Node {
+                        flex_direction: FlexDirection::Column,
+                        row_gap: Val::Px(6.0),
+                        ..default()
+                    })
+                    .with_children(|rows| {
+                        for row in Row::ALL {
+                            rows.spawn(Node {
+                                column_gap: Val::Px(10.0),
+                                align_items: AlignItems::Center,
+                                ..default()
+                            })
+                            .with_children(|line| {
+                                line.spawn((
+                                    Node {
+                                        width: Val::Px(140.0),
+                                        ..default()
+                                    },
+                                    children![screen_text(row.label(), 18.0)],
+                                ));
+                                line.spawn((MenuButton::Previous(row), screen_button(36.0)))
+                                    .with_child(screen_text("<", 18.0));
+                                // Wide enough for the longest map with its size,
+                                // `continental divide  256 x 256`.
+                                line.spawn((
+                                    Node {
+                                        width: Val::Px(ROW_VALUE_WIDTH),
+                                        justify_content: JustifyContent::Center,
+                                        ..default()
+                                    },
+                                    children![(ScreenText::Row(row), screen_text("", 18.0))],
+                                ));
+                                line.spawn((MenuButton::Next(row), screen_button(36.0)))
+                                    .with_child(screen_text(">", 18.0));
+                            });
+                        }
+                    });
+                // Every player of the match with its colour, so the teams are clear before deploying.
+                columns
+                    .spawn((
                         Node {
-                            width: Val::Px(140.0),
+                            flex_direction: FlexDirection::Column,
+                            row_gap: Val::Px(6.0),
+                            // Wide enough for the longest line on one row of text, so that
+                            // ten players are lower than the rows beside them.
+                            width: Val::Px(PLAYERS_PANEL_WIDTH),
+                            padding: UiRect::all(Val::Px(10.0)),
+                            border: UiRect::all(Val::Px(1.0)),
                             ..default()
                         },
-                        children![screen_text(row.label(), 18.0)],
-                    ));
-                    line.spawn((MenuButton::Previous(row), screen_button(36.0)))
-                        .with_child(screen_text("<", 18.0));
-                    line.spawn((
-                        Node {
-                            width: Val::Px(200.0),
-                            justify_content: JustifyContent::Center,
-                            ..default()
-                        },
-                        children![(ScreenText::Row(row), screen_text("", 18.0))],
-                    ));
-                    line.spawn((MenuButton::Next(row), screen_button(36.0)))
-                        .with_child(screen_text(">", 18.0));
-                });
-            }
+                        BorderColor::all(Color::srgb(0.43, 0.46, 0.32)),
+                        BackgroundColor(Color::srgb(0.08, 0.10, 0.10)),
+                    ))
+                    .with_children(|panel| {
+                        panel.spawn(screen_text("PLAYERS", 13.0));
+                        for slot in 0..sim::MAX_MATCH_PLAYERS {
+                            panel
+                                .spawn((
+                                    PlayerLine(slot),
+                                    Node {
+                                        column_gap: Val::Px(8.0),
+                                        align_items: AlignItems::Center,
+                                        ..default()
+                                    },
+                                ))
+                                .with_children(|line| {
+                                    line.spawn((
+                                        PlayerSwatch(slot),
+                                        Node {
+                                            width: Val::Px(16.0),
+                                            height: Val::Px(16.0),
+                                            border: UiRect::all(Val::Px(1.0)),
+                                            ..default()
+                                        },
+                                        BorderColor::all(Color::srgb(0.9, 0.9, 0.9)),
+                                        BackgroundColor(Color::BLACK),
+                                    ));
+                                    line.spawn((ScreenText::Player(slot), screen_text("", 14.0)));
+                                });
+                        }
+                    });
+            });
             menu.spawn((MenuButton::Start, screen_button(200.0)))
                 .with_child(screen_text("DEPLOY", 20.0));
             menu.spawn((MenuButton::Options, screen_button(200.0)))
@@ -838,7 +1353,7 @@ pub(crate) fn screen_input(
                 }
             }
         }
-        Screen::Match if host.outcome().is_some() => {
+        Screen::Match if host.outcome().is_some() || host.human_defeated() => {
             for (_, &button) in end
                 .iter()
                 .filter(|(interaction, _)| **interaction == Interaction::Pressed)
@@ -857,7 +1372,7 @@ pub(crate) fn screen_input(
 
 /// Shows the menu or the end screen, with their texts.
 #[allow(clippy::type_complexity)]
-fn update_screens(
+pub(crate) fn update_screens(
     screen: Res<Screen>,
     selection: Res<MenuSelection>,
     catalogue: Option<Res<Catalogue>>,
@@ -865,7 +1380,7 @@ fn update_screens(
     mut roots: Query<(&mut Node, Has<MenuRoot>), Or<(With<MenuRoot>, With<EndRoot>)>>,
     mut texts: Query<(&mut Text, &ScreenText)>,
 ) {
-    let outcome = end_text(host.outcome());
+    let outcome = end_text(host.outcome(), host.human_defeated());
     for (mut node, menu) in &mut roots {
         let shown = if menu {
             *screen == Screen::Menu
@@ -883,6 +1398,10 @@ fn update_screens(
                 row_text(*row, *selection, catalogue)
             }),
             ScreenText::Outcome => outcome.unwrap_or_default().to_string(),
+            ScreenText::Player(slot) => catalogue
+                .as_deref()
+                .and_then(|catalogue| player_line(*slot, *selection, catalogue))
+                .unwrap_or_default(),
         };
         if text.0 != value {
             text.0 = value;
@@ -899,12 +1418,15 @@ pub(crate) mod tests {
             .add_systems(bevy::prelude::Startup, super::spawn_screens);
         app.update();
         let mut buttons = app.world_mut().query::<&super::MenuButton>();
-        assert_eq!(buttons.iter(app.world()).count(), 11);
+        assert_eq!(buttons.iter(app.world()).count(), Row::ALL.len() * 2 + 3);
     }
+
+    use std::collections::BTreeSet;
 
     use sim::PlayerId;
 
     use super::*;
+    use crate::units::OPPONENT;
 
     fn assets() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets")
@@ -958,6 +1480,7 @@ pub(crate) mod tests {
         let offered: std::collections::BTreeSet<sim::ProductionItem> = factions
             .iter()
             .flat_map(|faction| faction.roster.iter().copied())
+            .chain(catalogue.definitions.arsenal().0.keys().copied())
             .collect();
         for item in crate::construction::production_menu(&catalogue.definitions) {
             assert!(offered.contains(&item), "{item:?} is offered by no faction");
@@ -969,6 +1492,7 @@ pub(crate) mod tests {
             crate::units::UNITS_PATH,
             crate::buildings::ECONOMY_PATH,
             crate::units::COMBAT_PATH,
+            "data/arsenal.ron",
             SKIRMISH_PATH,
             AI_PATH,
         ]
@@ -1002,7 +1526,21 @@ pub(crate) mod tests {
                 .file_stem()
                 .and_then(|stem| stem.to_str())
                 .expect("name");
-            let used = definitions.units().iter().any(|unit| unit.sprite == stem)
+            let hd_used = if file.starts_with("hd/buildings") {
+                definitions.buildings().iter().any(|d| d.id == stem)
+            } else if file.starts_with("hd/units") || file.starts_with("hd/walk") {
+                // A walk cycle belongs to the unit whose sheet has its name.
+                definitions.units().iter().any(|d| d.id == stem)
+            } else {
+                // The terrain atlases battlefield.rs loads, and the particle textures.
+                (0..crate::battlefield::ATLASES)
+                    .any(|i| file == Path::new(&format!("hd/terrain/{i}.png")))
+                    || ["hd/glow.png", "hd/smoke.png", "hd/ring.png"]
+                        .iter()
+                        .any(|p| file == Path::new(p))
+            };
+            let used = hd_used
+                || definitions.units().iter().any(|unit| unit.sprite == stem)
                 || definitions
                     .buildings()
                     .iter()
@@ -1028,6 +1566,12 @@ pub(crate) mod tests {
         maps: 2,
         factions: 3,
         difficulties: 3,
+        enemies: {
+            let mut enemies = [0; sim::MAX_MAPS];
+            enemies[0] = 1;
+            enemies[1] = 3;
+            enemies
+        },
     };
 
     #[test]
@@ -1039,7 +1583,7 @@ pub(crate) mod tests {
             assert_eq!(entry.id, def.id);
             assert_eq!(entry.asset_path, map_asset_path(&def.id));
             // Both start positions lie on the map.
-            for start in def.starts {
+            for &start in &def.starts {
                 assert!(entry.map.grid.contains(start), "{start:?}");
             }
         }
@@ -1066,18 +1610,16 @@ pub(crate) mod tests {
                             faction,
                             opponent,
                             difficulty,
+                            ..MenuSelection::default()
                         };
                         let mut world = World::new();
                         world.init_resource::<crate::sim_host::CommandSink>();
-                        let plan = MatchPlan {
-                            grid: catalogue.maps[map].map.grid.clone(),
-                            definitions: catalogue.definitions.clone(),
-                            skirmish: catalogue.skirmish.clone(),
-                            ai: catalogue.ai.clone(),
-                            map,
-                            players: selection.players().to_vec(),
-                            seed: 0,
-                        };
+                        let (plan, played) = match_plan(&catalogue, selection, 0)
+                            .unwrap_or_else(|error| panic!("{selection:?}: {error}"));
+                        // One against one: the map file's own map and start positions.
+                        assert!(played.as_filed, "{selection:?}");
+                        assert_eq!(plan.grid, catalogue.maps[map].map.grid);
+                        assert_eq!(plan.skirmish, catalogue.skirmish);
                         let start = crate::sim_host::install_match(&mut world, &plan)
                             .unwrap_or_else(|error| panic!("{selection:?}: {error}"));
                         let expected_units: u32 = [faction, opponent]
@@ -1119,10 +1661,9 @@ pub(crate) mod tests {
         // at (-8, 1) and (-11, 4), so that every building and unit lies on the map but the
         // computer player's start does not. The reviewed code loaded it, and the computer player's
         // commands to (70, 42) were rejected all match long; now the loader rejects it.
-        let root = std::env::temp_dir().join(format!(
-            "mygame001_game_skirmish_tests_{}",
-            std::process::id()
-        ));
+        let root = PathBuf::from(std::env::var_os("HOME").expect("HOME for review fixtures"))
+            .join("Library/Caches/Codex/reviews/MyGame001/rts-controls")
+            .join(format!("skirmish-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&root);
         for dir in ["data", "maps", "sprites"] {
             copy_dir(&assets().join(dir), &root.join(dir));
@@ -1148,24 +1689,38 @@ pub(crate) mod tests {
                 "(unit: \"rifleman\", x: 4, y: 4, count: 4)",
                 "(unit: \"rifleman\", x: -8, y: 4, count: 4)",
             ),
+            // The reviewer's root had the two starts of the M6 format; the demo map's later
+            // start positions are left out of the copy, like the maps added in M7.
             (
-                "starts: [(x: 15, y: 37), (x: 52, y: 42)]",
+                "starts: [(x: 15, y: 37), (x: 52, y: 42), (x: 4, y: 1), (x: 1, y: 19), \
+                 (x: 16, y: 54), (x: 21, y: 2)]",
                 "starts: [(x: 27, y: 37), (x: 70, y: 42)]",
             ),
             // The shifted offsets are meant for the demo map only; the maps added in M7 are left
             // out of the copy.
             (
-                "        (id: \"crossroads\", starts: [(x: 9, y: 9), (x: 44, y: 44)]),\n",
+                "        (id: \"crossroads\", starts: [(x: 9, y: 9), (x: 44, y: 44), (x: 3, y: 34), \
+                 (x: 50, y: 19), (x: 18, y: 31), (x: 35, y: 22)]),\n",
                 "",
             ),
             (
-                "        (id: \"riverlands\", starts: [(x: 8, y: 21), (x: 53, y: 24)]),\n",
+                "        (id: \"riverlands\", starts: [(x: 8, y: 21), (x: 53, y: 24), (x: 5, y: 3), \
+                 (x: 56, y: 42)]),\n",
                 "",
             ),
         ] {
             assert_eq!(text.matches(from).count(), 1, "{from}");
             text = text.replacen(from, to, 1);
         }
+        // Likewise every later map: only the demo map remains in the copy.
+        let mut text: String = text
+            .lines()
+            .filter(|line| {
+                !(line.trim_start().starts_with("(id: \"") && !line.contains("(id: \"demo\""))
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
+        text.push('\n');
         std::fs::write(&path, text).expect("skirmish file");
         let error = load(&root, &CheckedAssets::default())
             .map(|_| ())
@@ -1178,14 +1733,37 @@ pub(crate) mod tests {
         ] {
             assert!(error.contains(&part), "{error:?} lacks {part:?}");
         }
-        // The same files with the computer player's start on the map load.
-        std::fs::write(
-            &path,
-            std::fs::read_to_string(&path)
-                .expect("skirmish file")
-                .replacen("(x: 70, y: 42)", "(x: 58, y: 42)", 1),
-        )
-        .expect("skirmish file");
+        // With the computer player's start on the map, the start positions pass. Since maps
+        // grow with their players the file is still rejected, by the trial setup of the matches
+        // with more players than it lists start positions: a made start position has its clear
+        // ground around the start itself (`sim::enlarged_map`), where a faction's yard stands
+        // in the shipped data, not twelve cells beside it.
+        let shifted = std::fs::read_to_string(&path)
+            .expect("skirmish file")
+            .replacen("(x: 70, y: 42)", "(x: 58, y: 42)", 1);
+        std::fs::write(&path, &shifted).expect("skirmish file");
+        let error = load(&root, &CheckedAssets::default())
+            .map(|_| ())
+            .expect_err("a yard far from a made start");
+        for part in [
+            "map \"demo\": the match of faction",
+            "computer players cannot be set up",
+            "starting building \"construction_yard\"",
+        ] {
+            assert!(error.contains(part), "{error:?} lacks {part:?}");
+        }
+        // The same files with the yard and the groups back at the start load.
+        let mut unshifted = shifted;
+        for (from, to) in [
+            ("x: -12, y: 0)],", "x: 0, y: 0)],"),
+            ("x: -8, y: 1, count: 3)", "x: 4, y: 1, count: 3)"),
+            ("x: -11, y: 4, count: 2)", "x: 1, y: 4, count: 2)"),
+            ("x: -8, y: 4, count: 4)", "x: 4, y: 4, count: 4)"),
+        ] {
+            assert_eq!(unshifted.matches(from).count(), 1, "{from}");
+            unshifted = unshifted.replacen(from, to, 1);
+        }
+        std::fs::write(&path, unshifted).expect("skirmish file");
         load(&root, &CheckedAssets::default()).unwrap_or_else(|error| panic!("{error}"));
         let _ = std::fs::remove_dir_all(&root);
     }
@@ -1266,6 +1844,151 @@ pub(crate) mod tests {
     }
 
     #[test]
+    fn the_menu_chooses_several_independent_enemies_with_distinct_colours() {
+        let catalogue = production_catalogue();
+        let counts = MenuCounts::of(&catalogue);
+        let map = |id: &str| {
+            catalogue
+                .skirmish
+                .maps
+                .iter()
+                .position(|m| m.id == id)
+                .expect(id)
+        };
+        let (demo, riverlands) = (map("demo"), map("riverlands"));
+        // Nine enemies on every map, also on one whose file lists four start positions: the map
+        // of a match grows with its players and gets the start positions it lacks.
+        assert_eq!(catalogue.skirmish.maps[riverlands].starts.len(), 4);
+        for map in 0..counts.maps {
+            assert_eq!(counts.of_row(Row::Enemies, map), sim::MAX_MATCH_PLAYERS - 1);
+        }
+        assert_eq!(counts.of_row(Row::Enemies, counts.maps), 0, "no such map");
+        // Next on the row: 1, 2, ... 9, then back to 1.
+        let mut selection = MenuSelection {
+            map: demo,
+            ..MenuSelection::initial(&catalogue)
+        };
+        assert_eq!(selection.enemy_count(), 1, "one-against-one by default");
+        let mut seen = Vec::new();
+        for _ in 0..10 {
+            seen.push(selection.enemy_count());
+            match menu_effect(MenuButton::Next(Row::Enemies), selection, counts) {
+                MenuEffect::Select(next) => selection = next,
+                other => panic!("{other:?}"),
+            }
+        }
+        assert_eq!(seen, [1, 2, 3, 4, 5, 6, 7, 8, 9, 1]);
+        // Nine enemies stay nine on every map the map row passes.
+        selection.enemies = 8;
+        assert!(selection.valid(counts));
+        let mut next = selection;
+        while next.map != riverlands {
+            next = match menu_effect(MenuButton::Next(Row::Map), next, counts) {
+                MenuEffect::Select(next) => next,
+                other => panic!("{other:?}"),
+            };
+            assert!(next.valid(counts), "{next:?}");
+        }
+        assert_eq!(next.enemy_count(), 9);
+        // The map row shows how large the map is for the chosen players, and the match is
+        // played on a map of that size with a start position for everyone.
+        let demo_side = catalogue.maps[demo].map.view.width;
+        assert_eq!(demo_side, 64);
+        for (enemies, side) in [(0, 64), (1, 72), (4, 96), (8, 128)] {
+            let choice = MenuSelection {
+                map: demo,
+                enemies,
+                ..selection
+            };
+            assert_eq!(
+                row_text(Row::Map, choice, &catalogue),
+                format!("demo  {side} x {side}")
+            );
+            let (plan, played) = match_plan(&catalogue, choice, 0).expect("a plan");
+            assert_eq!((plan.grid.width(), plan.grid.height()), (side, side));
+            assert_eq!(
+                (played.map.view.width, played.map.view.height),
+                (side, side)
+            );
+            assert_eq!(played.map.looks.len(), (side * side) as usize);
+            assert_eq!(played.as_filed, enemies == 0);
+            assert_eq!(plan.players.len(), enemies + 2);
+            assert!(played.starts.len() >= plan.players.len());
+            assert_eq!(plan.skirmish.maps[demo].starts, played.starts);
+            // The other maps keep the start positions of the file.
+            assert_eq!(
+                plan.skirmish.maps[riverlands],
+                catalogue.skirmish.maps[riverlands]
+            );
+            // The same choices give the same map: a restart plays on it again.
+            let (again, _) = match_plan(&catalogue, choice, 1).expect("a plan");
+            assert_eq!((&again.grid, &again.looks), (&plan.grid, &plan.looks));
+            let start = crate::sim_host::check_match(&plan).expect("the match sets up");
+            assert_eq!(start.buildings, enemies + 2, "a yard each");
+        }
+        let longest = MenuSelection {
+            map: map("continental_divide"),
+            enemies: 8,
+            ..selection
+        };
+        assert_eq!(
+            row_text(Row::Map, longest, &catalogue),
+            "continental divide  256 x 256"
+        );
+        // Four computer players: their own ids, start positions, and AI controllers.
+        selection.enemies = 3;
+        selection.color = 6;
+        let players = selection.players();
+        assert_eq!(players.len(), 5);
+        for (k, setup) in players.iter().enumerate() {
+            assert_eq!(setup.player, PlayerId(k as u8));
+            assert_eq!(setup.start, k);
+            assert_eq!(setup.controller == Controller::Human, k == 0);
+        }
+        // Every player has its own colour, the human's being the chosen one; the list shows them.
+        let lines: Vec<String> = (0..sim::MAX_MATCH_PLAYERS)
+            .filter_map(|slot| player_line(slot, selection, &catalogue))
+            .collect();
+        assert_eq!(lines.len(), 5);
+        assert!(lines[0].starts_with("You - Orange"), "{lines:?}");
+        assert!(lines[1].starts_with("AI 1 - Pink"), "{lines:?}");
+        assert!(lines[2].starts_with("AI 2 - Lime"), "{lines:?}");
+        let colours: BTreeSet<&str> = lines
+            .iter()
+            .map(|line| line.split(" - ").nth(1).expect("colour"))
+            .collect();
+        assert_eq!(colours.len(), 5);
+        assert_eq!(row_text(Row::Enemies, selection, &catalogue), "4 of 9");
+        // Ten players: a line and a colour of its own for each, whatever the human chose.
+        for color in 0..crate::presentation::TEAM_PALETTE.len() {
+            let full = MenuSelection {
+                enemies: 8,
+                color,
+                ..selection
+            };
+            assert_eq!(full.players().len(), sim::MAX_MATCH_PLAYERS);
+            let lines: Vec<String> = (0..sim::MAX_MATCH_PLAYERS + 1)
+                .filter_map(|slot| player_line(slot, full, &catalogue))
+                .collect();
+            let colours: BTreeSet<&str> = lines
+                .iter()
+                .map(|line| line.split(" - ").nth(1).expect("colour"))
+                .collect();
+            assert_eq!((lines.len(), colours.len()), (10, 10), "{lines:?}");
+            assert!(lines[9].starts_with("AI 9 - "), "{lines:?}");
+        }
+        // Unlock all is a separate, human-only choice.
+        selection.unlock_all = true;
+        assert_eq!(
+            row_text(Row::UnlockAll, selection, &catalogue),
+            "ALL UNLOCKED"
+        );
+        // With several enemies the human's defeat ends the match for the human at once.
+        assert_eq!(end_text(None, true), Some("DEFEAT"));
+        assert_eq!(end_text(None, false), None);
+    }
+
+    #[test]
     fn menu_buttons_cycle_through_each_row_and_start_only_a_valid_choice() {
         let start = MenuSelection::default();
         // Next and previous wrap around, row by row.
@@ -1337,6 +2060,7 @@ pub(crate) mod tests {
             faction: 1,
             opponent: 2,
             difficulty: 1,
+            ..MenuSelection::default()
         };
         assert_eq!(
             selection.players(),
@@ -1359,27 +2083,37 @@ pub(crate) mod tests {
 
     #[test]
     fn the_end_screen_names_the_outcome_and_restarts_the_last_match() {
-        assert_eq!(end_text(None), None);
+        assert_eq!(end_text(None, false), None);
         assert_eq!(
-            end_text(Some(MatchOutcome::Won {
-                winner: HUMAN,
-                tick: 5
-            })),
+            end_text(
+                Some(MatchOutcome::Won {
+                    winner: HUMAN,
+                    tick: 5
+                }),
+                false
+            ),
             Some("VICTORY")
         );
         assert_eq!(
-            end_text(Some(MatchOutcome::Won {
-                winner: OPPONENT,
-                tick: 5
-            })),
+            end_text(
+                Some(MatchOutcome::Won {
+                    winner: OPPONENT,
+                    tick: 5
+                }),
+                false
+            ),
             Some("DEFEAT")
         );
-        assert_eq!(end_text(Some(MatchOutcome::Draw { tick: 5 })), Some("DRAW"));
+        assert_eq!(
+            end_text(Some(MatchOutcome::Draw { tick: 5 }), false),
+            Some("DRAW")
+        );
         let last = MenuSelection {
             map: 1,
             faction: 0,
             opponent: 1,
             difficulty: 2,
+            ..MenuSelection::default()
         };
         assert_eq!(
             end_effect(EndButton::Restart, Some(last)),
@@ -1393,9 +2127,15 @@ pub(crate) mod tests {
     fn row_texts_name_the_chosen_entries() {
         let catalogue = production_catalogue();
         let selection = MenuSelection::initial(&catalogue);
+        let view = catalogue.maps[0].map.view;
         assert_eq!(
             row_text(Row::Map, selection, &catalogue),
-            catalogue.maps[0].id.replace('_', " ")
+            format!(
+                "{}  {} x {}",
+                catalogue.maps[0].id.replace('_', " "),
+                view.width,
+                view.height
+            )
         );
         assert_eq!(
             row_text(Row::Difficulty, selection, &catalogue),
@@ -1404,6 +2144,8 @@ pub(crate) mod tests {
                 .replace('_', " ")
         );
         let outside = MenuSelection {
+            super_me: false,
+            color: 0,
             map: catalogue.maps.len(),
             ..selection
         };

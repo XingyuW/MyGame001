@@ -7,7 +7,7 @@
 //! | Left click on an item | `QueueProduction` of the item (if its prerequisites and producer are owned); on a building that is ready, placement mode (`crate::construction`) |
 //! | Right click on an item | `CancelProduction` of the item (if one is queued) |
 //! | Tabs, or `Tab` | show the buildings or the units |
-//! | Sell, Rally | sell mode, rally mode (`crate::construction`) |
+//! | Sell, Repair, Rally | sell mode, repair mode, rally mode (`crate::construction`) |
 //! | Pause, or `P` | pause or resume (`crate::sim_host::CommandSink`) |
 //! | Volume buttons, `-`, `=`, `M` | master, music, and effects volume, mute (`crate::audio`) |
 //!
@@ -28,15 +28,24 @@ use crate::sim_host::{CommandSink, SimHost};
 use crate::units::HUMAN;
 
 /// Width of the sidebar on the right of the window, in logical pixels.
-pub const SIDEBAR_WIDTH: f32 = 240.0;
+pub const SIDEBAR_WIDTH: f32 = 264.0;
 
 pub struct SidebarPlugin;
 
 impl Plugin for SidebarPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<Tab>()
+            .init_resource::<BuildPage>()
             .add_systems(Startup, spawn_sidebar.after(crate::minimap::create_minimap))
-            .add_systems(Update, (populate_items, update_sidebar).chain())
+            // Cameo cropping reads the sprite images that the minimap's drawing writes.
+            .add_systems(
+                Update,
+                (
+                    populate_items.before(crate::minimap::draw_minimap),
+                    update_sidebar,
+                )
+                    .chain(),
+            )
             .add_systems(
                 PostUpdate,
                 sidebar_input
@@ -57,22 +66,28 @@ pub fn over_sidebar(cursor: Vec2, window_width: f32) -> bool {
 pub enum Tab {
     #[default]
     Buildings,
-    Units,
+    Armory,
+    Infantry,
+    Vehicles,
 }
-
+#[derive(Resource, Default)]
+pub struct BuildPage(pub usize);
+const PAGE_SIZE: usize = 6;
 impl Tab {
-    /// The tab an item is listed in.
-    pub fn of(item: ProductionItem) -> Tab {
-        match item {
-            ProductionItem::Building(_) => Tab::Buildings,
-            ProductionItem::Unit(_) => Tab::Units,
+    pub fn of(item: ProductionItem, defs: &Definitions) -> Self {
+        match defs.category(item) {
+            sim::Category::Buildings => Self::Buildings,
+            sim::Category::Armory => Self::Armory,
+            sim::Category::Infantry => Self::Infantry,
+            sim::Category::Vehicles => Self::Vehicles,
         }
     }
-
-    pub fn next(self) -> Tab {
+    pub fn next(self) -> Self {
         match self {
-            Tab::Buildings => Tab::Units,
-            Tab::Units => Tab::Buildings,
+            Self::Buildings => Self::Armory,
+            Self::Armory => Self::Infantry,
+            Self::Infantry => Self::Vehicles,
+            Self::Vehicles => Self::Buildings,
         }
     }
 }
@@ -81,25 +96,32 @@ impl Tab {
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum SidebarButton {
     Item(ProductionItem),
+    Page(bool),
     Tab(Tab),
     Sell,
+    Repair,
     Rally,
     Pause,
     /// Lowers (`false`) or raises (`true`) a volume channel.
     Volume(Channel, bool),
     Mute,
+    /// Slower (`false`) or faster (`true`) game speed (`crate::game_speed`).
+    Speed(bool),
 }
 
 /// A text of the sidebar that changes during the match.
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum SidebarText {
     Credits,
+    Details,
+    PageLabel,
     Power,
     Mode,
     Badge(ProductionItem),
     Volume(Channel),
     PauseLabel,
     MuteLabel,
+    Speed,
 }
 
 /// The filled part of an item's progress bar.
@@ -143,10 +165,10 @@ pub fn item_status(
     };
     let available = state.offers(item)
         && owned.contains(&terms.producer)
-        && terms
-            .prerequisites
-            .iter()
-            .all(|prerequisite| owned.contains(prerequisite));
+        && (state.unlock_all()
+            || terms.prerequisites.iter().all(|prerequisite| {
+                definitions.prerequisite_met(*prerequisite, owned.iter().copied())
+            }));
     let queue = state.queue(terms.producer);
     let queued = queue.iter().filter(|entry| entry.item == item).count();
     let progress = queue
@@ -167,12 +189,14 @@ pub fn item_status(
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum SidebarEffect {
     Nothing,
+    Page(bool),
     Commands(Vec<Command>),
     Mode(InterfaceMode),
     Tab(Tab),
     TogglePause,
     Volume(Channel, bool),
     ToggleMute,
+    Speed(bool),
 }
 
 /// The effect of clicking `button` with `mouse` (left or right). `menu` is the production menu
@@ -209,11 +233,17 @@ pub fn button_effect(
             })
         }
         _ if !left => SidebarEffect::Nothing,
+        SidebarButton::Page(next) => SidebarEffect::Page(next),
         SidebarButton::Tab(tab) => SidebarEffect::Tab(tab),
         SidebarButton::Sell => SidebarEffect::Mode(if mode == InterfaceMode::Sell {
             InterfaceMode::Normal
         } else {
             InterfaceMode::Sell
+        }),
+        SidebarButton::Repair => SidebarEffect::Mode(if mode == InterfaceMode::Repair {
+            InterfaceMode::Normal
+        } else {
+            InterfaceMode::Repair
         }),
         SidebarButton::Rally => SidebarEffect::Mode(if mode == InterfaceMode::Rally {
             InterfaceMode::Normal
@@ -223,10 +253,61 @@ pub fn button_effect(
         SidebarButton::Pause => SidebarEffect::TogglePause,
         SidebarButton::Volume(channel, up) => SidebarEffect::Volume(channel, up),
         SidebarButton::Mute => SidebarEffect::ToggleMute,
+        SidebarButton::Speed(up) => SidebarEffect::Speed(up),
     }
 }
 
 /// The name of an item and its cost, e.g. `power plant  $300`.
+pub fn availability_text(
+    item: ProductionItem,
+    defs: &Definitions,
+    owned: &BTreeSet<BuildingKind>,
+    state: Option<&PlayerState>,
+) -> String {
+    let Some(p) = defs.production(item) else {
+        return "Unavailable".into();
+    };
+    // The producer is always needed (units leave it); with "unlock all" nothing else is.
+    let waived = state.is_some_and(PlayerState::unlock_all);
+    let missing: Vec<_> = std::iter::once(&p.producer)
+        .filter(|k| !owned.contains(*k))
+        .chain(
+            p.prerequisites
+                .iter()
+                .filter(|k| !waived && !defs.prerequisite_met(**k, owned.iter().copied())),
+        )
+        .map(|k| {
+            defs.metadata(ProductionItem::Building(*k)).map_or_else(
+                || {
+                    defs.building(*k)
+                        .map_or("?".into(), |d| d.id.replace('_', " "))
+                },
+                |m| m.label.clone(),
+            )
+        })
+        .collect();
+    if !missing.is_empty() {
+        return format!("Needs {}", missing.join(", "));
+    }
+    if let Some(s) = state {
+        if s.queue(p.producer).len() >= sim::MAX_QUEUE_LENGTH {
+            return "Queue full".into();
+        }
+        if s.credits() == 0 {
+            return "Waiting for credits".into();
+        }
+        if s.low_power() {
+            return "Low power: half speed".into();
+        }
+    }
+    format!(
+        "{} seconds • ready to queue",
+        p.build_time
+            .div_ceil(state.map_or(1, PlayerState::production_speed))
+            .div_ceil(20)
+    )
+}
+
 pub fn item_label(item: ProductionItem, definitions: &Definitions) -> String {
     let name = match item {
         ProductionItem::Building(kind) => definitions.building(kind).map(|def| def.id.as_str()),
@@ -292,6 +373,12 @@ pub fn mode_text(mode: InterfaceMode, paused: bool, definitions: Option<&Definit
         return "Paused: press P or Pause to resume".into();
     }
     match mode {
+        InterfaceMode::Interact => {
+            "Interact: click a structure or friendly transport. Esc cancels.".into()
+        }
+        InterfaceMode::Strategic(_) => {
+            "Strategic ability: click a visible target. Esc cancels.".into()
+        }
         InterfaceMode::Normal => {
             "Left: select   Right: order\nS stop  A attack-move  Ctrl+0-9 group".into()
         }
@@ -302,6 +389,9 @@ pub fn mode_text(mode: InterfaceMode, paused: bool, definitions: Option<&Definit
             format!("Place {name}: left click on green\nRight click or Esc: cancel")
         }
         InterfaceMode::Sell => "Sell: left click on a building\nRight click or Esc: done".into(),
+        InterfaceMode::Repair => {
+            "Repair (K): click a building to start or stop\nRight click or Esc: done".into()
+        }
         InterfaceMode::Rally => {
             "Rally point: left click on a cell\nRight click or Esc: cancel".into()
         }
@@ -327,19 +417,22 @@ pub fn button_colour(
     paused: bool,
     hovered: bool,
 ) -> Color {
+    // RA2-style gunmetal: lit amber for selection/readiness, dark recessed cameos when locked.
     let base: (f32, f32, f32) = match button {
-        SidebarButton::Item(_) if status.ready => (0.39, 0.34, 0.15),
+        SidebarButton::Item(_) if status.ready => (0.42, 0.33, 0.10),
         SidebarButton::Item(_) if status.progress.is_some() || status.queued > 0 => {
-            (0.15, 0.27, 0.28)
+            (0.13, 0.22, 0.20)
         }
-        SidebarButton::Item(_) if !status.available => (0.095, 0.12, 0.12),
-        SidebarButton::Tab(shown) if shown == tab => (0.30, 0.34, 0.24),
-        SidebarButton::Sell if mode == InterfaceMode::Sell => (0.55, 0.2, 0.15),
-        SidebarButton::Rally if mode == InterfaceMode::Rally => (0.2, 0.5, 0.25),
-        SidebarButton::Pause if paused => (0.6, 0.45, 0.1),
-        _ => (0.16, 0.21, 0.20),
+        SidebarButton::Item(_) if !status.available => (0.055, 0.06, 0.065),
+        SidebarButton::Item(_) => (0.12, 0.13, 0.135),
+        SidebarButton::Tab(shown) if shown == tab => (0.50, 0.34, 0.09),
+        SidebarButton::Sell if mode == InterfaceMode::Sell => (0.55, 0.16, 0.10),
+        SidebarButton::Repair if mode == InterfaceMode::Repair => (0.14, 0.30, 0.52),
+        SidebarButton::Rally if mode == InterfaceMode::Rally => (0.18, 0.42, 0.18),
+        SidebarButton::Pause if paused => (0.58, 0.42, 0.08),
+        _ => (0.21, 0.225, 0.235),
     };
-    let lift = if hovered { 0.08 } else { 0.0 };
+    let lift = if hovered { 0.07 } else { 0.0 };
     Color::srgb(base.0 + lift, base.1 + lift, base.2 + lift)
 }
 
@@ -360,8 +453,13 @@ fn owned_kinds(host: &SimHost) -> BTreeSet<BuildingKind> {
 /// Whether the item's button is shown: the item belongs to the shown build tab and the roster of
 /// the human player's faction offers it (M7; the other faction's items are not shown). Without a
 /// match every item of the tab is shown.
-pub fn item_shown(item: ProductionItem, tab: Tab, state: Option<&PlayerState>) -> bool {
-    Tab::of(item) == tab && state.is_none_or(|state| state.offers(item))
+pub fn item_shown(
+    item: ProductionItem,
+    tab: Tab,
+    state: Option<&PlayerState>,
+    defs: &Definitions,
+) -> bool {
+    Tab::of(item, defs) == tab && state.is_none_or(|state| state.offers(item))
 }
 
 /// The status of every production item for the human player.
@@ -397,13 +495,29 @@ fn button(kind: SidebarButton, width: Val, height: f32) -> impl Bundle {
             width,
             height: Val::Px(height),
             flex_shrink: 0.0,
-            border: UiRect::all(Val::Px(1.0)),
+            border: UiRect::all(Val::Px(2.0)),
             justify_content: JustifyContent::Center,
             align_items: AlignItems::Center,
             ..default()
         },
-        BackgroundColor(Color::srgb(0.16, 0.21, 0.20)),
+        bevel(true),
+        BackgroundColor(Color::srgb(0.21, 0.225, 0.235)),
     )
+}
+
+/// Machined-metal edge: light from the upper left, like the battlefield's sun.
+fn bevel(raised: bool) -> BorderColor {
+    let (light, dark) = (
+        Color::srgb(0.55, 0.57, 0.58),
+        Color::srgb(0.03, 0.035, 0.04),
+    );
+    let (a, b) = if raised { (light, dark) } else { (dark, light) };
+    BorderColor {
+        top: a,
+        left: a,
+        bottom: b,
+        right: b,
+    }
 }
 
 pub(crate) fn spawn_sidebar(mut commands: Commands, minimap: Option<Res<Minimap>>) {
@@ -420,13 +534,28 @@ pub(crate) fn spawn_sidebar(mut commands: Commands, minimap: Option<Res<Minimap>
                 width: Val::Px(SIDEBAR_WIDTH),
                 flex_direction: FlexDirection::Column,
                 padding: UiRect::all(Val::Px(8.0)),
-                row_gap: Val::Px(3.0),
+                row_gap: Val::Px(2.0),
+                border: UiRect::left(Val::Px(4.0)),
                 ..default()
             },
-            BackgroundColor(Color::srgb(0.075, 0.10, 0.10)),
+            bevel(true),
+            BackgroundColor(Color::srgb(0.135, 0.145, 0.15)),
         ))
         .with_children(|sidebar| {
-            sidebar.spawn(text("TACTICAL COMMAND / 01", 11.0));
+            sidebar
+                .spawn(text("BATTLE CONTROL", 15.0))
+                .insert(TextColor(Color::srgb(0.95, 0.74, 0.30)));
+            sidebar.spawn((
+                Node {
+                    width: Val::Percent(100.0),
+                    height: Val::Px(4.0),
+                    flex_shrink: 0.0,
+                    border: UiRect::vertical(Val::Px(1.0)),
+                    ..default()
+                },
+                bevel(false),
+                BackgroundColor(Color::srgb(0.06, 0.065, 0.07)),
+            ));
             sidebar
                 .spawn((
                     MinimapNode,
@@ -458,17 +587,55 @@ pub(crate) fn spawn_sidebar(mut commands: Commands, minimap: Option<Res<Minimap>
                     ..default()
                 })
                 .with_children(|row| {
-                    for (tab, label) in [(Tab::Buildings, "Buildings"), (Tab::Units, "Units")] {
-                        row.spawn(button(SidebarButton::Tab(tab), Val::Percent(50.0), 22.0))
-                            .with_child(text(label, 13.0));
+                    for (tab, label) in [
+                        (Tab::Buildings, "Buildings"),
+                        (Tab::Armory, "Armory"),
+                        (Tab::Infantry, "Infantry"),
+                        (Tab::Vehicles, "Vehicles"),
+                    ] {
+                        row.spawn(button(SidebarButton::Tab(tab), Val::Percent(24.0), 25.0))
+                            .with_child(text(label, 11.0));
                     }
                 });
             sidebar.spawn((
                 ItemList,
                 Node {
                     flex_wrap: FlexWrap::Wrap,
+                    height: Val::Px(308.0),
+                    flex_shrink: 0.0,
+                    align_content: AlignContent::Start,
                     column_gap: Val::Px(4.0),
                     row_gap: Val::Px(4.0),
+                    ..default()
+                },
+            ));
+            sidebar
+                .spawn(Node {
+                    column_gap: Val::Px(6.0),
+                    ..default()
+                })
+                .with_children(|row| {
+                    row.spawn(button(SidebarButton::Page(false), Val::Px(44.0), 20.0))
+                        .with_child(text("<", 12.0));
+                    row.spawn((
+                        SidebarText::PageLabel,
+                        text("", 11.0),
+                        Node {
+                            width: Val::Px(140.0),
+                            ..default()
+                        },
+                    ));
+                    row.spawn(button(SidebarButton::Page(true), Val::Px(44.0), 20.0))
+                        .with_child(text(">", 12.0));
+                });
+            sidebar.spawn((
+                SidebarText::Details,
+                text(
+                    "Hover an item for prerequisites and role. D deploy / unload. E interact.",
+                    10.0,
+                ),
+                Node {
+                    height: Val::Px(36.0),
                     ..default()
                 },
             ));
@@ -478,11 +645,13 @@ pub(crate) fn spawn_sidebar(mut commands: Commands, minimap: Option<Res<Minimap>
                     ..default()
                 })
                 .with_children(|row| {
-                    row.spawn(button(SidebarButton::Sell, Val::Percent(33.0), 22.0))
-                        .with_child(text("Sell", 13.0));
-                    row.spawn(button(SidebarButton::Rally, Val::Percent(33.0), 22.0))
-                        .with_child(text("Rally", 13.0));
-                    row.spawn(button(SidebarButton::Pause, Val::Percent(33.0), 22.0))
+                    row.spawn(button(SidebarButton::Sell, Val::Percent(24.0), 22.0))
+                        .with_child(text("Sell", 12.0));
+                    row.spawn(button(SidebarButton::Repair, Val::Percent(24.0), 22.0))
+                        .with_child(text("Repair", 12.0));
+                    row.spawn(button(SidebarButton::Rally, Val::Percent(24.0), 22.0))
+                        .with_child(text("Rally", 12.0));
+                    row.spawn(button(SidebarButton::Pause, Val::Percent(24.0), 22.0))
                         .with_child((SidebarText::PauseLabel, text("Pause", 13.0)));
                 });
             for channel in [Channel::Master, Channel::Music, Channel::Effects] {
@@ -516,8 +685,28 @@ pub(crate) fn spawn_sidebar(mut commands: Commands, minimap: Option<Res<Minimap>
                     });
             }
             sidebar
-                .spawn(button(SidebarButton::Mute, Val::Percent(100.0), 18.0))
-                .with_child((SidebarText::MuteLabel, text("Mute", 13.0)));
+                .spawn(Node {
+                    column_gap: Val::Px(4.0),
+                    align_items: AlignItems::Center,
+                    ..default()
+                })
+                .with_children(|row| {
+                    row.spawn(button(SidebarButton::Mute, Val::Px(64.0), 18.0))
+                        .with_child((SidebarText::MuteLabel, text("Mute", 13.0)));
+                    row.spawn(button(SidebarButton::Speed(false), Val::Px(24.0), 18.0))
+                        .with_child(text("-", 13.0));
+                    row.spawn((
+                        SidebarText::Speed,
+                        text("Speed 1x", 13.0),
+                        Node {
+                            width: Val::Px(96.0),
+                            justify_content: JustifyContent::Center,
+                            ..default()
+                        },
+                    ));
+                    row.spawn(button(SidebarButton::Speed(true), Val::Px(24.0), 18.0))
+                        .with_child(text("+", 13.0));
+                });
             sidebar.spawn((SidebarText::Mode, text("", 10.0)));
         });
     commands
@@ -536,12 +725,17 @@ pub(crate) fn spawn_sidebar(mut commands: Commands, minimap: Option<Res<Minimap>
         .with_child(text("PAUSED", 48.0));
 }
 
+/// Largest cameo on a production card, in logical pixels.
+const CAMEO_MAX_WIDTH: f32 = 108.0;
+const CAMEO_HEIGHT: f32 = 50.0;
+
 /// Adds a button per production item once the match is set up.
 fn populate_items(
     mut commands: Commands,
     host: Res<SimHost>,
     buildings: Option<Res<crate::buildings::BuildingSprites>>,
     units: Option<Res<crate::units::UnitSprites>>,
+    images: Res<Assets<Image>>,
     lists: Query<(Entity, Option<&Children>), With<ItemList>>,
 ) {
     let Some(definitions) = host.definitions() else {
@@ -557,70 +751,89 @@ fn populate_items(
         }
         commands.entity(list).with_children(|list| {
             for &item in &menu {
-                let icon = match item {
-                    ProductionItem::Building(kind) => buildings
-                        .as_ref()
-                        .and_then(|s| s.0.get(&kind))
-                        .cloned()
-                        .map(ImageNode::new),
-                    ProductionItem::Unit(kind) => units
-                        .as_ref()
-                        .and_then(|s| s.0.get(&kind))
-                        .cloned()
-                        .map(|image| {
-                            ImageNode::new(image)
-                                .with_rect(crate::units::facing_rect(sim::Direction::ALL[0]))
-                        }),
+                // The cameo shows the miniature cropped to its solid pixels, as large as the card
+                // allows, so similar-sized items are told apart by shape at a glance.
+                let image = match item {
+                    ProductionItem::Building(kind) => {
+                        buildings.as_ref().and_then(|s| s.0.get(&kind)).cloned()
+                    }
+                    ProductionItem::Unit(kind) => {
+                        units.as_ref().and_then(|s| s.0.get(&kind)).cloned()
+                    }
                 };
+                let icon = image.map(|handle| {
+                    let full = match item {
+                        ProductionItem::Unit(_) => {
+                            crate::hd_art::facing_rect(sim::Direction::ALL[0])
+                        }
+                        ProductionItem::Building(_) => {
+                            images
+                                .get(&handle)
+                                .map_or(Rect::new(0.0, 0.0, 1.0, 1.0), |image| {
+                                    Rect::new(0.0, 0.0, image.width() as f32, image.height() as f32)
+                                })
+                        }
+                    };
+                    let crop = images
+                        .get(&handle)
+                        .map_or(full, |image| crate::hd_art::content_rect(image, full));
+                    let size = crate::hd_art::fit(crop, Vec2::new(CAMEO_MAX_WIDTH, CAMEO_HEIGHT));
+                    (ImageNode::new(handle).with_rect(crop), size)
+                });
                 list.spawn((
                     SidebarButton::Item(item),
                     Button,
                     Node {
-                        width: Val::Px(110.0),
-                        height: Val::Px(64.0),
+                        width: Val::Px(118.0),
+                        height: Val::Px(100.0),
                         flex_shrink: 0.0,
                         flex_direction: FlexDirection::Column,
                         align_items: AlignItems::Center,
                         justify_content: JustifyContent::SpaceBetween,
-                        border: UiRect::all(Val::Px(1.0)),
+                        border: UiRect::all(Val::Px(2.0)),
                         padding: UiRect::all(Val::Px(2.0)),
                         ..default()
                     },
-                    BorderColor::all(Color::srgb(0.27, 0.33, 0.31)),
-                    BackgroundColor(Color::srgb(0.12, 0.16, 0.16)),
+                    bevel(true),
+                    BackgroundColor(Color::srgb(0.12, 0.13, 0.135)),
                 ))
                 .with_children(|entry| {
-                    if let Some(icon) = icon {
-                        let icon_width = match item {
-                            ProductionItem::Building(kind) => {
-                                definitions.building(kind).map_or(45.0, |def| {
-                                    let (w, h) =
-                                        crate::buildings::sprite_size(def.width, def.height);
-                                    30.0 * w as f32 / h as f32
-                                })
-                            }
-                            ProductionItem::Unit(_) => 32.0,
-                        };
+                    if let Some((icon, size)) = icon {
                         entry.spawn((
                             icon,
                             Node {
-                                width: Val::Px(icon_width),
-                                height: Val::Px(30.0),
+                                width: Val::Px(size.x),
+                                height: Val::Px(size.y),
                                 ..default()
                             },
                         ));
                     }
-                    let label = item_label(item, definitions);
+                    let label = definitions.metadata(item).map_or_else(
+                        || item_label(item, definitions),
+                        |e| {
+                            format!(
+                                "{}  ${}",
+                                e.label,
+                                definitions.production(item).map_or(0, |p| host
+                                    .players()
+                                    .and_then(|p| p.get(HUMAN))
+                                    .map_or(p.cost, |state| state.production_cost(p.cost)))
+                            )
+                        },
+                    );
                     let (name, cost) = label.split_once("  ").unwrap_or((&label, ""));
-                    entry.spawn(text(name, 10.0));
+                    entry.spawn(text(name, 11.0));
                     entry
                         .spawn(Node {
                             width: Val::Percent(100.0),
                             justify_content: JustifyContent::SpaceBetween,
+                            flex_direction: FlexDirection::Column,
+                            align_items: AlignItems::Center,
                             ..default()
                         })
                         .with_children(|line| {
-                            line.spawn(text(cost, 10.0));
+                            line.spawn(text(cost, 11.0))
+                                .insert(TextColor(Color::srgb(0.89, 0.78, 0.51)));
                             line.spawn((SidebarText::Badge(item), text("", 10.0)));
                         });
                     entry
@@ -639,7 +852,7 @@ fn populate_items(
                                 height: Val::Percent(100.0),
                                 ..default()
                             },
-                            BackgroundColor(Color::srgb(0.78, 0.66, 0.28)),
+                            BackgroundColor(Color::srgb(0.95, 0.72, 0.22)),
                         ));
                 });
             }
@@ -656,9 +869,11 @@ fn sidebar_input(
     pressed: Query<(&Interaction, &SidebarButton), Changed<Interaction>>,
     buttons: Query<(&Interaction, &SidebarButton)>,
     mut tab: ResMut<Tab>,
+    mut page: ResMut<BuildPage>,
     mut mode: ResMut<InterfaceMode>,
     mut sink: ResMut<CommandSink>,
     mut volume: ResMut<VolumeSettings>,
+    mut speed: ResMut<crate::game_speed::GameSpeed>,
 ) {
     let mut clicks: Vec<(SidebarButton, MouseButton)> = pressed
         .iter()
@@ -696,17 +911,29 @@ fn sidebar_input(
             Hotkey::VolumeDown => SidebarEffect::Volume(Channel::Master, false),
             Hotkey::VolumeUp => SidebarEffect::Volume(Channel::Master, true),
             Hotkey::Mute => SidebarEffect::ToggleMute,
+            Hotkey::SpeedDown => SidebarEffect::Speed(false),
+            Hotkey::SpeedUp => SidebarEffect::Speed(true),
             _ => SidebarEffect::Nothing,
         });
     }
     for effect in effects {
         match effect {
             SidebarEffect::Nothing => {}
+            SidebarEffect::Page(next) => {
+                if next {
+                    page.0 = page.0.saturating_add(1);
+                } else {
+                    page.0 = page.0.saturating_sub(1);
+                }
+            }
             SidebarEffect::Commands(commands) => {
                 sink.issue(commands);
             }
             SidebarEffect::Mode(next) => *mode = next,
-            SidebarEffect::Tab(next) => *tab = next,
+            SidebarEffect::Tab(next) => {
+                *tab = next;
+                page.0 = 0;
+            }
             SidebarEffect::TogglePause => {
                 let paused = sink.toggle_pause();
                 info!(
@@ -720,6 +947,11 @@ fn sidebar_input(
             }
             SidebarEffect::Volume(channel, up) => volume.step(channel, up),
             SidebarEffect::ToggleMute => volume.muted = !volume.muted,
+            SidebarEffect::Speed(up) => {
+                if speed.step(up) {
+                    info!("game speed {}", speed.label());
+                }
+            }
         }
     }
 }
@@ -730,8 +962,10 @@ pub(crate) fn update_sidebar(
     host: Res<SimHost>,
     sink: Res<CommandSink>,
     tab: Res<Tab>,
+    mut page: ResMut<BuildPage>,
     mode: Res<InterfaceMode>,
     volume: Res<VolumeSettings>,
+    speed: Res<crate::game_speed::GameSpeed>,
     mut texts: Query<(&mut Text, &mut TextColor, &SidebarText)>,
     mut buttons: Query<
         (
@@ -774,23 +1008,69 @@ pub(crate) fn update_sidebar(
     };
     let state = host.players().and_then(|players| players.get(HUMAN));
     let paused = sink.paused();
+    let defs = host.definitions();
+    let owned = owned_kinds(&host);
+    let listed: Vec<_> = defs
+        .map(|d| {
+            production_menu(d)
+                .into_iter()
+                .filter(|&i| item_shown(i, *tab, state, d))
+                .collect()
+        })
+        .unwrap_or_default();
+    let pages = listed.len().div_ceil(PAGE_SIZE).max(1);
+    page.0 = page.0.min(pages - 1);
+    let shown: Vec<_> = listed
+        .into_iter()
+        .skip(page.0 * PAGE_SIZE)
+        .take(PAGE_SIZE)
+        .collect();
+    let hovered = buttons.iter().find_map(|(b, i, _, n)| {
+        if *i != Interaction::None && n.display != Display::None {
+            if let SidebarButton::Item(item) = b {
+                Some(*item)
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    });
     for (mut text, mut colour, kind) in &mut texts {
         let value = match kind {
+            SidebarText::PageLabel => format!("{} / {}  |  Tab cycles",page.0+1,pages),
+            SidebarText::Details => hovered.and_then(|i|defs.map(|d| {
+                let description=d.metadata(i).map_or("",|e|e.description.as_str());
+                format!("{}\n{}",availability_text(i,d,&owned,state),description)
+            })).unwrap_or_else(||"Hover: requirements / role\nSpace + drag: camera | D deploy\nRight click card: cancel / refund".into()),
             SidebarText::Credits => credits_text(state),
             SidebarText::Power => power_text(state),
             SidebarText::Mode => mode_text(*mode, paused, host.definitions()),
-            SidebarText::Badge(item) => badge_text(status_of(*item)),
+            // Queued progress stays visible even if a prerequisite was lost meanwhile.
+            SidebarText::Badge(item) => {
+                let status = status_of(*item);
+                if status.available || status.ready || status.queued > 0 {
+                    badge_text(status)
+                } else {
+                    "LOCKED".into()
+                }
+            }
             SidebarText::Volume(channel) => volume_text(&volume, *channel),
             SidebarText::PauseLabel => if paused { "Resume" } else { "Pause" }.into(),
             SidebarText::MuteLabel => if volume.muted { "Unmute" } else { "Mute" }.into(),
+            SidebarText::Speed => format!("Speed {}", speed.label()),
         };
         if text.0 != value {
             text.0 = value;
         }
-        let wanted = if *kind == SidebarText::Power && state.is_some_and(PlayerState::low_power) {
-            Color::srgb(1.0, 0.4, 0.3)
-        } else {
-            Color::srgb(0.9, 0.92, 0.95)
+        let wanted = match kind {
+            SidebarText::Power if state.is_some_and(PlayerState::low_power) => {
+                Color::srgb(1.0, 0.36, 0.26)
+            }
+            SidebarText::Power => Color::srgb(0.55, 0.92, 0.42),
+            SidebarText::Credits => Color::srgb(1.0, 0.80, 0.32),
+            SidebarText::Speed if speed.factor() != 1.0 => Color::srgb(1.0, 0.80, 0.32),
+            _ => Color::srgb(0.86, 0.88, 0.86),
         };
         if colour.0 != wanted {
             colour.0 = wanted;
@@ -813,7 +1093,7 @@ pub(crate) fn update_sidebar(
             background.0 = wanted;
         }
         if let SidebarButton::Item(item) = button {
-            let display = if item_shown(*item, *tab, state) {
+            let display = if shown.contains(item) {
                 Display::Flex
             } else {
                 Display::None
@@ -855,8 +1135,14 @@ mod tests {
 
     #[test]
     fn the_cursor_is_over_the_sidebar_on_its_whole_width() {
-        assert!(!over_sidebar(Vec2::new(1039.9, 10.0), 1280.0));
-        assert!(over_sidebar(Vec2::new(1040.0, 10.0), 1280.0));
+        assert!(!over_sidebar(
+            Vec2::new(1280.0 - SIDEBAR_WIDTH - 0.1, 10.0),
+            1280.0
+        ));
+        assert!(over_sidebar(
+            Vec2::new(1280.0 - SIDEBAR_WIDTH, 10.0),
+            1280.0
+        ));
         assert!(over_sidebar(Vec2::new(1279.0, 700.0), 1280.0));
         // A window narrower than the sidebar is all sidebar.
         assert!(over_sidebar(Vec2::new(0.0, 0.0), 200.0));
@@ -996,8 +1282,8 @@ mod tests {
             SidebarEffect::Mode(InterfaceMode::Normal)
         );
         assert_eq!(
-            effect(SidebarButton::Tab(Tab::Units), InterfaceMode::Normal),
-            SidebarEffect::Tab(Tab::Units)
+            effect(SidebarButton::Tab(Tab::Infantry), InterfaceMode::Normal),
+            SidebarEffect::Tab(Tab::Infantry)
         );
         assert_eq!(
             effect(SidebarButton::Pause, InterfaceMode::Normal),
@@ -1025,8 +1311,10 @@ mod tests {
             ),
             SidebarEffect::Nothing
         );
-        assert_eq!(Tab::Buildings.next(), Tab::Units);
-        assert_eq!(Tab::Units.next(), Tab::Buildings);
+        assert_eq!(Tab::Buildings.next(), Tab::Armory);
+        assert_eq!(Tab::Armory.next(), Tab::Infantry);
+        assert_eq!(Tab::Infantry.next(), Tab::Vehicles);
+        assert_eq!(Tab::Vehicles.next(), Tab::Buildings);
     }
 
     #[test]
@@ -1112,10 +1400,10 @@ mod tests {
                 let offered = faction.offers(item);
                 let status = item_status(item, definitions, &owned, state);
                 assert_eq!(status.available, offered, "{}: {item:?}", faction.id);
-                for tab in [Tab::Buildings, Tab::Units] {
+                for tab in [Tab::Buildings, Tab::Armory, Tab::Infantry, Tab::Vehicles] {
                     assert_eq!(
-                        item_shown(item, tab, Some(state)),
-                        offered && Tab::of(item) == tab,
+                        item_shown(item, tab, Some(state), definitions),
+                        offered && Tab::of(item, definitions) == tab,
                         "{}: {item:?}",
                         faction.id
                     );
@@ -1138,10 +1426,12 @@ mod tests {
         }
         assert!(offered_by_one_only > 0, "the factions differ");
         // Without a match every item of the tab is shown.
-        assert!(
-            menu.iter()
-                .all(|&item| item_shown(item, Tab::of(item), None))
-        );
+        assert!(menu.iter().all(|&item| item_shown(
+            item,
+            Tab::of(item, definitions),
+            None,
+            definitions
+        )));
     }
 
     #[test]
@@ -1200,7 +1490,7 @@ mod tests {
             button_colour(
                 SidebarButton::Pause,
                 ItemStatus::default(),
-                Tab::Units,
+                Tab::Infantry,
                 InterfaceMode::Normal,
                 true,
                 false
@@ -1208,12 +1498,99 @@ mod tests {
             button_colour(
                 SidebarButton::Pause,
                 ItemStatus::default(),
-                Tab::Units,
+                Tab::Infantry,
                 InterfaceMode::Normal,
                 false,
                 false
             )
         );
+    }
+
+    #[test]
+    fn cards_follow_the_tech_tree_and_unlock_all_waives_only_prerequisites() {
+        let catalogue = crate::skirmish::tests::production_catalogue();
+        let defs = &catalogue.definitions;
+        let tab_order = |tab: Tab| -> Vec<String> {
+            production_menu(defs)
+                .into_iter()
+                .filter(|&item| Tab::of(item, defs) == tab)
+                .map(|item| match item {
+                    ProductionItem::Building(k) => defs.building(k).unwrap().id.clone(),
+                    ProductionItem::Unit(k) => defs.unit(k).unwrap().id.clone(),
+                })
+                .collect()
+        };
+        let buildings = tab_order(Tab::Buildings);
+        let at = |list: &[String], id: &str| list.iter().position(|e| e == id).expect(id);
+        assert_eq!(buildings[0], "construction_yard");
+        // What each structure unlocks comes after it, and the Radar Tower that the Soviet radar
+        // units need is no longer on the last page.
+        assert!(at(&buildings, "power_plant") < at(&buildings, "refinery"));
+        assert!(at(&buildings, "refinery") < at(&buildings, "radar_tower"));
+        assert!(at(&buildings, "radar_tower") < at(&buildings, "tech_center"));
+        assert!(
+            at(&buildings, "radar_tower") < 2 * PAGE_SIZE,
+            "{buildings:?}"
+        );
+        // The factions' armed towers are listed with the other defences.
+        let armory = tab_order(Tab::Armory);
+        at(&armory, "gun_turret");
+        at(&armory, "rocket_tower");
+        let infantry = tab_order(Tab::Infantry);
+        assert!(at(&infantry, "conscript") < at(&infantry, "tesla_trooper"));
+        assert!(at(&infantry, "tesla_trooper") < at(&infantry, "yuri"));
+
+        // The status of an item: prerequisites waived with "unlock all", never the producer.
+        let host = crate::sim_host::tests::demo_host();
+        let owned = owned_kinds(&host);
+        let mut state = host.players().unwrap().get(HUMAN).unwrap().clone();
+        let coil = ProductionItem::Building(defs.building_kind("tesla_coil").unwrap());
+        let tank = ProductionItem::Unit(defs.unit_kind("apocalypse").unwrap());
+        assert!(!item_status(coil, defs, &owned, &state).available);
+        assert!(availability_text(coil, defs, &owned, Some(&state)).starts_with("Needs"));
+        let unlocked = {
+            let mut app = App::new();
+            app.add_plugins(sim::SimPlugin { seed: 0 });
+            app.world_mut()
+                .insert_resource(catalogue.maps[0].map.grid.clone());
+            app.world_mut()
+                .insert_resource(catalogue.definitions.clone());
+            let selection = crate::skirmish::MenuSelection::initial(&catalogue);
+            sim::setup_match_with_options(
+                app.world_mut(),
+                &catalogue.skirmish,
+                &catalogue.ai,
+                0,
+                &selection.players(),
+                &[],
+                &[HUMAN],
+            )
+            .unwrap();
+            app.world()
+                .resource::<sim::Players>()
+                .get(HUMAN)
+                .unwrap()
+                .clone()
+        };
+        assert!(unlocked.unlock_all());
+        state = unlocked;
+        assert!(item_status(coil, defs, &owned, &state).available);
+        assert!(
+            !item_status(tank, defs, &owned, &state).available,
+            "needs a war factory"
+        );
+        assert_eq!(
+            availability_text(tank, defs, &owned, Some(&state)),
+            "Needs War Factory"
+        );
+        // Progress of a queued item stays visible even while it is not available.
+        let queued = ItemStatus {
+            available: false,
+            queued: 1,
+            progress: Some((5, 10)),
+            ready: false,
+        };
+        assert_eq!(badge_text(queued), "50%");
     }
 
     #[test]
@@ -1240,7 +1617,9 @@ mod tests {
             crate::audio::GameAudioPlugin,
             crate::skirmish::SkirmishPlugin,
         ))
-        .add_plugins(crate::options::OptionsPlugin { path: None });
+        .add_plugins(crate::options::OptionsPlugin { path: None })
+        .add_plugins(crate::special_controls::SpecialControlsPlugin)
+        .add_plugins(crate::hover_info::HoverInfoPlugin);
         let check = |world: &mut World, schedule: &mut Schedule| {
             schedule.initialize(world).expect("schedule builds");
             assert!(

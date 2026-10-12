@@ -159,6 +159,47 @@ pub fn terrain_colour(cell: &Cell, sight: Sight) -> [u8; 4] {
     } else {
         [170, 150, 100]
     };
+    shade(base, sight)
+}
+
+/// The colour of a cell with a look (`battlefield::looks`): snow, desert, city and sea read as
+/// such. Look 0 keeps the colour of the cell's terrain.
+pub fn look_colour(cell: &Cell, look: u8, sight: Sight) -> [u8; 4] {
+    use crate::battlefield::looks::{Feature, Ground, decode};
+    let Some((ground, feature)) = decode(look).filter(|(g, _)| *g != Ground::Auto) else {
+        return terrain_colour(cell, sight);
+    };
+    let base: [u8; 3] = match (feature, ground) {
+        (Feature::Ore, _) => [200, 170, 40],
+        (Feature::Lava, _) => [214, 92, 30],
+        (Feature::Cliff, Ground::Snow | Ground::Ice) => [150, 158, 170],
+        (Feature::Cliff, Ground::Sand) => [150, 98, 64],
+        (Feature::Cliff, Ground::Ash) => [58, 54, 54],
+        (Feature::Cliff, _) => [92, 90, 82],
+        (Feature::Forest, Ground::Snow | Ground::Ice) => [64, 92, 84],
+        (Feature::Forest, Ground::Sand) => [96, 128, 58],
+        (Feature::Forest, Ground::Marsh) => [38, 66, 44],
+        (Feature::Forest, _) => [34, 76, 36],
+        (Feature::House, _) => [150, 104, 84],
+        (Feature::City, _) => [118, 118, 126],
+        (Feature::Tower, _) => [170, 172, 184],
+        (Feature::Road, _) => [84, 84, 86],
+        (Feature::Bridge, _) => [128, 112, 92],
+        (Feature::None, Ground::Water) => [38, 78, 128],
+        (Feature::None, Ground::Dirt) => [122, 100, 70],
+        (Feature::None, Ground::Sand) => [196, 176, 124],
+        (Feature::None, Ground::Snow) => [222, 228, 236],
+        (Feature::None, Ground::Pavement) => [148, 148, 150],
+        (Feature::None, Ground::Ice) => [168, 198, 216],
+        (Feature::None, Ground::Crops) => [186, 164, 84],
+        (Feature::None, Ground::Marsh) => [66, 86, 60],
+        (Feature::None, Ground::Ash) => [78, 74, 72],
+        (Feature::None, _) => [60, 120, 50],
+    };
+    shade(base, sight)
+}
+
+fn shade(base: [u8; 3], sight: Sight) -> [u8; 4] {
     match sight {
         Sight::Visible => [base[0], base[1], base[2], 255],
         Sight::Fog => {
@@ -180,8 +221,19 @@ pub fn marker_colour(marker: Marker) -> [u8; 4] {
 
 /// The colour of every cell (row-major): terrain by `vision` (all shroud without one), then the
 /// markers, which only name cells of units and buildings the human player is shown.
+#[cfg(test)]
 pub fn cell_colours(
     terrain: &Grid,
+    vision: Option<&Vision>,
+    markers: &[(CellPos, Marker)],
+) -> Vec<[u8; 4]> {
+    cell_colours_with_looks(terrain, &[], vision, markers)
+}
+
+/// [`cell_colours`] with the map's looks (row-major; cells beyond `looks` use their terrain).
+pub fn cell_colours_with_looks(
+    terrain: &Grid,
+    looks: &[u8],
     vision: Option<&Vision>,
     markers: &[(CellPos, Marker)],
 ) -> Vec<[u8; 4]> {
@@ -191,9 +243,10 @@ pub fn cell_colours(
         for x in 0..width {
             let cell = CellPos::new(x as i32, y as i32);
             let sight = vision.map_or(Sight::Shroud, |vision| sight_of(vision, cell));
+            let look = looks.get((y * width + x) as usize).copied().unwrap_or(0);
             let colour = terrain
                 .cell(cell)
-                .map_or([0, 0, 0, 255], |terrain| terrain_colour(terrain, sight));
+                .map_or([0, 0, 0, 255], |terrain| look_colour(terrain, look, sight));
             colours.push(colour);
         }
     }
@@ -230,20 +283,34 @@ pub fn render(layout: &MinimapLayout, colours: &[[u8; 4]]) -> Vec<u8> {
 }
 
 /// The markers of the units and buildings the human player is shown.
+#[cfg(test)]
 pub fn markers(host: &SimHost) -> Vec<(CellPos, Marker)> {
+    owned_markers(host)
+        .into_iter()
+        .map(|(cell, marker, _)| (cell, marker))
+        .collect()
+}
+
+/// [`markers`] with the owner of each, for drawing every player in its own team colour.
+pub fn owned_markers(host: &SimHost) -> Vec<(CellPos, Marker, sim::PlayerId)> {
     let Some(players) = host.players() else {
         return Vec::new();
     };
     let mut markers = Vec::new();
-    if let Some(mut units) = host.world().try_query::<(&Owner, &Mobile)>() {
-        for (owner, mobile) in units.iter(host.world()) {
-            if crate::units::unit_shown(owner.0, mobile, players) {
+    if let Some(mut units) = host.world().try_query::<(&sim::SimId, &Owner, &Mobile)>() {
+        for (id, owner, mobile) in units.iter(host.world()) {
+            if crate::units::unit_shown(owner.0, mobile, players)
+                && !host
+                    .world()
+                    .get_resource::<sim::SpecialState>()
+                    .is_some_and(|s| s.hidden.contains(&(HUMAN, *id)))
+            {
                 let marker = if owner.0 == HUMAN {
                     Marker::OwnUnit
                 } else {
                     Marker::EnemyUnit
                 };
-                markers.push((mobile.cell, marker));
+                markers.push((mobile.cell, marker, owner.0));
             }
         }
     }
@@ -255,12 +322,17 @@ pub fn markers(host: &SimHost) -> Vec<(CellPos, Marker)> {
                 } else {
                     Marker::EnemyBuilding
                 };
-                markers.extend(building.footprint.cells().map(|cell| (cell, marker)));
+                markers.extend(
+                    building
+                        .footprint
+                        .cells()
+                        .map(|cell| (cell, marker, owner.0)),
+                );
             }
         }
     }
     // Units are drawn over buildings (a unit never stands in a building's cell, I6).
-    markers.sort_by_key(|(_, marker)| matches!(marker, Marker::OwnUnit | Marker::EnemyUnit));
+    markers.sort_by_key(|(_, marker, _)| matches!(marker, Marker::OwnUnit | Marker::EnemyUnit));
     markers
 }
 
@@ -363,9 +435,11 @@ pub(crate) fn size_minimap(world: &mut World, width: u32, height: u32) {
 }
 
 /// Redraws the minimap after every simulation tick.
-fn draw_minimap(
+pub(crate) fn draw_minimap(
+    teams: Option<Res<crate::presentation::TeamColors>>,
     host: Res<SimHost>,
     terrain: Option<Res<MapTerrain>>,
+    looks: Option<Res<crate::map::MapLooks>>,
     minimap: Option<Res<Minimap>>,
     mut state: ResMut<MinimapState>,
     mut images: ResMut<Assets<Image>>,
@@ -377,7 +451,28 @@ fn draw_minimap(
     if state.drawn_tick == Some(tick) {
         return;
     }
-    let colours = cell_colours(&terrain.0, human_vision(host.players()), &markers(&host));
+    let owned = owned_markers(&host);
+    let marked: Vec<_> = owned
+        .iter()
+        .map(|&(cell, marker, _)| (cell, marker))
+        .collect();
+    let mut colours = cell_colours_with_looks(
+        &terrain.0,
+        looks.as_deref().map_or(&[], |l| l.0.as_slice()),
+        human_vision(host.players()),
+        &marked,
+    );
+    for &(cell, _, owner) in &owned {
+        let rgb = teams
+            .as_deref()
+            .unwrap_or(&crate::presentation::TeamColors(0))
+            .rgb_of(owner);
+        if let Some(pixel) =
+            colours.get_mut((cell.y as u32 * terrain.0.width() + cell.x as u32) as usize)
+        {
+            *pixel = [rgb[0], rgb[1], rgb[2], 255];
+        }
+    }
     let pixels = render(&minimap.layout, &colours);
     state.lit_pixels = pixels
         .as_chunks::<4>()

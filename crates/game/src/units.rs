@@ -14,19 +14,22 @@
 //! match starts (cross validation, PLAN.md section 5; D20); the renderer receives exactly the
 //! checked bytes (`crate::checked_assets`).
 
+#[cfg(test)]
+use sim::Direction;
 use std::collections::BTreeMap;
 use std::fmt;
 use std::path::{Path, PathBuf};
 
 use bevy::prelude::*;
 use sim::{
-    DataError, Definitions, Direction, Facing, Mobile, Owner, PlayerId, Players, Position,
-    SUBCELLS_PER_CELL, SimEvent, SimId, SubPos, Unit, UnitKind,
+    DataError, Definitions, Facing, Mobile, Owner, PlayerId, Players, Position, SUBCELLS_PER_CELL,
+    SimEvent, SimId, SubPos, Unit, UnitKind,
 };
 
 use crate::buildings::{
     BuildingSpriteError, CheckedBuildingSprite, ECONOMY_PATH, check_building_sprites,
 };
+use crate::hd_art::UNIT_GROUND_OFFSET;
 use crate::map::MapView;
 use crate::projection::{TileSize, to_world};
 use crate::sim_host::SimHost;
@@ -54,10 +57,40 @@ pub const GROUND_OFFSET_PX: f32 = 12.0;
 pub const HUMAN: PlayerId = PlayerId(0);
 
 /// The other player: the computer player of a skirmish match (M6).
+#[cfg(test)]
 pub const OPPONENT: PlayerId = PlayerId(1);
 
 /// Lowest z of a unit sprite. The map's layers lie at z = 0 (`bevy_ecs_tiled`).
 const UNIT_Z: f32 = 1.0;
+
+/// How high above the ground an aircraft flies, in world pixels: two cell heights, above the
+/// roofs of most buildings.
+pub const FLIGHT_ALTITUDE: f32 = 64.0;
+
+/// How high flying infantry (jet packs) hovers.
+pub const HOVER_ALTITUDE: f32 = 40.0;
+
+/// How high a strike aircraft sits while it rearms on the ground beside its air base.
+pub const LANDED_ALTITUDE: f32 = 3.0;
+
+/// World pixels per second an aircraft climbs or descends.
+const CLIMB_RATE: f32 = 48.0;
+
+/// z of an aircraft's shadow: on the ground, under every unit and building.
+const AIR_SHADOW_Z: f32 = 0.95;
+
+/// How much darker the ground is under an aircraft at cruising height; nearer the ground the
+/// shadow is darker and sharper.
+const AIR_SHADOW_ALPHA: f32 = 0.5;
+
+/// The shadow is the aircraft's silhouette laid on the ground: flattened to this share of its
+/// height.
+const AIR_SHADOW_SQUASH: f32 = 0.62;
+
+/// How far above its frame's ground point an aircraft's body is drawn (its sprite has no baked
+/// shadow, `scripts/render_hd_blender.py`), so that the silhouette's middle lies on the ground
+/// point under the aircraft.
+const AIR_BODY_HEIGHT: f32 = 14.0;
 
 pub struct UnitsPlugin;
 
@@ -65,6 +98,7 @@ impl Plugin for UnitsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<UnitViews>()
             .init_resource::<UnitStatus>()
+            .init_resource::<Altitudes>()
             .add_systems(Update, (spawn_unit_views, log_sim_events))
             .add_systems(
                 PostUpdate,
@@ -80,9 +114,26 @@ pub struct UnitSprites(
     pub BTreeMap<UnitKind, Handle<Image>>,
 );
 
+/// The walk cycle of each infantry type that has one (`sprites/hd/walk`): the human player's
+/// copy and the first opponent's, as [`UnitSprites`].
+#[derive(Resource, Debug, Default)]
+pub struct WalkSprites(pub BTreeMap<UnitKind, (Handle<Image>, Handle<Image>)>);
+
 /// The view entity of each simulation unit.
 #[derive(Resource, Debug, Default)]
 pub struct UnitViews(pub BTreeMap<SimId, Entity>);
+
+/// How high above its ground point every unit of the air domain is drawn now, in world pixels
+/// (units on the ground are not listed). Written by `place_unit_views`; whatever draws something
+/// at a unit read from the simulation (shots and projectiles, `crate::fog`) raises it by this.
+#[derive(Resource, Debug, Default)]
+pub struct Altitudes(pub BTreeMap<SimId, f32>);
+
+impl Altitudes {
+    pub fn of(&self, id: SimId) -> f32 {
+        self.0.get(&id).copied().unwrap_or(0.0)
+    }
+}
 
 /// What has happened to the units of the current match so far; read by the smoke test.
 #[derive(Resource, Debug, Default)]
@@ -102,6 +153,52 @@ pub struct UnitView {
     pub previous: SubPos,
     /// The unit's position after the last tick.
     pub current: SubPos,
+    /// How high above its ground point the view is drawn now (0 for units on the ground). An
+    /// aircraft starts on the ground where it is built and climbs to its flying height.
+    pub altitude: f32,
+    /// Where it was drawn last (in cells), and how far through its walk cycle that has brought
+    /// it (in cycles): a figure's legs move with the ground it covers.
+    pub drawn: Option<Vec2>,
+    pub stride: f32,
+}
+
+/// The shadow an aircraft casts on the ground far below it: a child of its unit view.
+#[derive(Component, Debug)]
+pub struct AirShadow;
+
+/// The height an air unit flies at: `infantry` hovers lower than aircraft, and a strike
+/// aircraft that is rearming at its base (`landed`) sits on the ground.
+pub fn flight_altitude(infantry: bool, landed: bool) -> f32 {
+    if landed {
+        LANDED_ALTITUDE
+    } else if infantry {
+        HOVER_ALTITUDE
+    } else {
+        FLIGHT_ALTITUDE
+    }
+}
+
+/// `altitude` after `seconds` of climbing or descending towards `target`.
+pub fn approach_altitude(altitude: f32, target: f32, seconds: f32) -> f32 {
+    let step = CLIMB_RATE * seconds.max(0.0);
+    if (target - altitude).abs() <= step {
+        target
+    } else {
+        altitude + step.copysign(target - altitude)
+    }
+}
+
+/// Where an aircraft's shadow lies relative to its view (which is drawn `altitude` above the
+/// ground), and how dark it is: straight below on the ground point, fainter the higher the
+/// aircraft flies.
+pub fn air_shadow(altitude: f32) -> (Vec2, f32) {
+    let below =
+        UNIT_GROUND_OFFSET * (1.0 - AIR_SHADOW_SQUASH) + AIR_BODY_HEIGHT * AIR_SHADOW_SQUASH;
+    let height = (altitude / FLIGHT_ALTITUDE).clamp(0.0, 1.0);
+    (
+        Vec2::new(0.0, -altitude - below),
+        AIR_SHADOW_ALPHA * (1.3 - 0.3 * height),
+    )
 }
 
 /// Why a unit sprite sheet named by the definitions was rejected (cross validation).
@@ -230,6 +327,7 @@ pub fn load_match_data(
     let definitions = definitions
         .with_economy(&economy_file)
         .and_then(|definitions| definitions.with_combat(asset_root.join(COMBAT_PATH)))
+        .and_then(|definitions| definitions.with_arsenal(asset_root.join("data/arsenal.ron")))
         .map_err(SetupError::Data)?;
     let buildings = check_building_sprites(asset_root, &economy_file, &definitions)
         .map_err(SetupError::BuildingSprite)?;
@@ -243,6 +341,7 @@ pub fn load_match_data(
 }
 
 /// The region of the sprite sheet that shows `facing`.
+#[cfg(test)]
 pub fn facing_rect(facing: Direction) -> Rect {
     let left = f32::from(facing.index()) * FRAME_SIZE as f32;
     Rect::new(left, 0.0, left + FRAME_SIZE as f32, FRAME_SIZE as f32)
@@ -272,6 +371,7 @@ pub(crate) fn spawn_unit_views(
     mut views: ResMut<UnitViews>,
     sprites: Option<Res<UnitSprites>>,
     host: Res<SimHost>,
+    mut paint: crate::presentation::TeamPaint,
 ) {
     let Some(sprites) = sprites else {
         return;
@@ -286,14 +386,11 @@ pub(crate) fn spawn_unit_views(
         if views.0.contains_key(id) {
             continue;
         }
-        let team = if owner.0 == HUMAN {
-            &sprites.0
-        } else {
-            &sprites.1
-        };
-        let Some(image) = team.get(&kind.kind) else {
+        let (Some(human), Some(enemy)) = (sprites.0.get(&kind.kind), sprites.1.get(&kind.kind))
+        else {
             continue;
         };
+        let image = &paint.sprite(owner.0, human, enemy);
         let view = commands
             .spawn((
                 UnitView {
@@ -302,10 +399,15 @@ pub(crate) fn spawn_unit_views(
                     owner: owner.0,
                     previous: position.0,
                     current: position.0,
+                    altitude: 0.0,
+                    drawn: None,
+                    stride: 0.0,
                 },
+                bevy::sprite::Anchor::CENTER,
                 Sprite {
                     image: image.clone(),
-                    rect: Some(facing_rect(facing.0)),
+                    rect: Some(crate::hd_art::facing_rect(facing.0)),
+                    custom_size: Some(Vec2::splat(crate::hd_art::UNIT_SIZE)),
                     color: Color::WHITE,
                     ..default()
                 },
@@ -318,6 +420,27 @@ pub(crate) fn spawn_unit_views(
                 },
             ))
             .id();
+        if host
+            .grid()
+            .is_some_and(|grid| grid.domain_of(*id) == sim::Domain::Air)
+        {
+            let (offset, alpha) = air_shadow(0.0);
+            commands.spawn((
+                AirShadow,
+                ChildOf(view),
+                Sprite {
+                    // The silhouette only: any copy of the sheet will do.
+                    image: human.clone(),
+                    rect: Some(crate::hd_art::facing_rect(facing.0)),
+                    custom_size: Some(
+                        Vec2::splat(crate::hd_art::UNIT_SIZE) * Vec2::new(1.0, AIR_SHADOW_SQUASH),
+                    ),
+                    color: Color::srgba(0.0, 0.0, 0.0, alpha),
+                    ..default()
+                },
+                Transform::from_translation(offset.extend(0.0)),
+            ));
+        }
         views.0.insert(*id, view);
     }
 }
@@ -345,13 +468,19 @@ pub fn unit_shown(owner: PlayerId, mobile: &Mobile, players: &Players) -> bool {
 
 /// Places every view between its unit's previous and current position, shows its facing, and
 /// hides it while the human player does not see it.
-#[allow(clippy::type_complexity)]
+#[allow(clippy::type_complexity, clippy::too_many_arguments)]
 fn place_unit_views(
+    sprites: Option<Res<UnitSprites>>,
+    walks: Option<Res<WalkSprites>>,
+    mut paint: crate::presentation::TeamPaint,
     map: Option<Res<MapView>>,
     time: Res<Time<Fixed>>,
+    speed: Res<crate::game_speed::GameClock>,
+    sink: Res<crate::sim_host::CommandSink>,
     host: Res<SimHost>,
     mut commands: Commands,
     mut registry: ResMut<UnitViews>,
+    mut altitudes: ResMut<Altitudes>,
     // Disjoint from the building views' query (`crate::buildings`), which also writes
     // `Visibility`.
     mut views: Query<
@@ -359,10 +488,21 @@ fn place_unit_views(
             Entity,
             &mut UnitView,
             &mut Sprite,
+            &mut bevy::sprite::Anchor,
             &mut Transform,
             &mut Visibility,
+            Option<&Children>,
         ),
-        Without<crate::buildings::BuildingView>,
+        (Without<crate::buildings::BuildingView>, Without<AirShadow>),
+    >,
+    // Disjoint from every other view that is placed after the simulation's tick.
+    mut shadows: Query<
+        (&mut Sprite, &mut Transform),
+        (
+            With<AirShadow>,
+            Without<crate::buildings::BuildingView>,
+            Without<crate::construction::PlacementGhost>,
+        ),
     >,
 ) {
     let (Some(map), Some(players)) = (map, host.players()) else {
@@ -370,7 +510,10 @@ fn place_unit_views(
     };
     let world = host.world();
     let fraction = time.overstep_fraction();
-    for (entity, mut view, mut sprite, mut transform, mut visibility) in &mut views {
+    let rearming = world.get_resource::<sim::SpecialState>();
+    for (entity, mut view, mut sprite, mut anchor, mut transform, mut visibility, children) in
+        &mut views
+    {
         let (Some(position), Some(facing), Some(mobile)) = (
             world.get::<Position>(view.unit),
             world.get::<Facing>(view.unit),
@@ -378,10 +521,56 @@ fn place_unit_views(
         ) else {
             // The unit no longer exists (destroyed, M4).
             registry.0.remove(&view.id);
+            altitudes.0.remove(&view.id);
             commands.entity(entity).despawn();
             continue;
         };
-        let shown = if unit_shown(view.owner, mobile, players) {
+        let kind = world.get::<Unit>(view.unit).map(|unit| unit.kind);
+        if let Some(owner) = world.get::<Owner>(view.unit) {
+            view.owner = owner.0;
+        }
+        view.current = position.0;
+        let cell = interpolate(view.previous, view.current, fraction);
+        let walking = view.previous != view.current;
+        // A figure with a walk cycle shows the frame its stride has reached while it moves, and
+        // its standing frame otherwise. The stride follows the ground covered, not the clock.
+        let gait = kind
+            .zip(walks.as_ref())
+            .and_then(|(kind, walks)| walks.0.get(&kind).map(|pair| (kind, pair)))
+            .filter(|_| walking);
+        if let Some((kind, _)) = gait {
+            let step = view.drawn.map_or(0.0, |drawn| drawn.distance(cell));
+            let cycle = if host
+                .definitions()
+                .and_then(|definitions| definitions.unit(kind))
+                .is_some_and(|def| def.speed >= crate::hd_art::RUN_SPEED)
+            {
+                crate::hd_art::RUN_CYCLE_CELLS
+            } else {
+                crate::hd_art::WALK_CYCLE_CELLS
+            };
+            // A jump (a chrono shift, a transport unloading) is not a step.
+            if step < 0.5 {
+                view.stride = (view.stride + step / cycle).rem_euclid(1.0);
+            }
+        }
+        view.drawn = Some(cell);
+        let pair = match gait {
+            Some((_, (human, enemy))) => Some((human, enemy)),
+            None => kind
+                .zip(sprites.as_ref())
+                .and_then(|(kind, sprites)| sprites.0.get(&kind).zip(sprites.1.get(&kind))),
+        };
+        if let Some((human, enemy)) = pair {
+            let image = paint.sprite(view.owner, human, enemy);
+            if sprite.image != image {
+                sprite.image = image;
+            }
+        }
+        let concealed = world
+            .get_resource::<sim::SpecialState>()
+            .is_some_and(|s| s.hidden.contains(&(HUMAN, view.id)));
+        let shown = if unit_shown(view.owner, mobile, players) && !concealed {
             Visibility::Inherited
         } else {
             Visibility::Hidden
@@ -389,15 +578,95 @@ fn place_unit_views(
         if *visibility != shown {
             *visibility = shown;
         }
-        view.current = position.0;
-        let cell = interpolate(view.previous, view.current, fraction);
-        let ground = ground_point(cell, map.tile);
-        transform.translation = Vec3::new(ground.x, ground.y + GROUND_OFFSET_PX, unit_depth(cell));
-        let rect = facing_rect(facing.0);
+        let mut ground = ground_point(cell, map.tile);
+        let infantry = world
+            .get::<Unit>(view.unit)
+            .and_then(|u| {
+                host.definitions()?
+                    .metadata(sim::ProductionItem::Unit(u.kind))
+            })
+            .is_some_and(|m| m.category == sim::Category::Infantry);
+        let phase = speed.clock() * 11.0 + view.id.0 as f32;
+        // A figure without a walk cycle at least bobs as it goes.
+        if walking && infantry && gait.is_none() && !sink.paused() {
+            ground.y += phase.sin().abs() * 1.2;
+        }
+
+        let flying = host
+            .grid()
+            .is_some_and(|g| g.domain_of(view.id) == sim::Domain::Air);
+        let (rect, size, hang) = match gait {
+            Some(_) => (
+                crate::hd_art::walk_rect(facing.0, crate::hd_art::walk_frame(view.stride)),
+                crate::hd_art::WALK_SIZE,
+                crate::hd_art::walk_anchor(),
+            ),
+            None => (
+                crate::hd_art::facing_rect(facing.0),
+                crate::hd_art::UNIT_SIZE,
+                Vec2::ZERO,
+            ),
+        };
+        if sprite.custom_size != Some(Vec2::splat(size)) {
+            sprite.custom_size = Some(Vec2::splat(size));
+        }
+        if anchor.0 != hang {
+            anchor.0 = hang;
+        }
+        let mut depth = unit_depth(cell);
+        if flying {
+            // A strike aircraft that has flown home sits on the ground beside its base while it
+            // rearms; everything else that flies stays up.
+            let landed = !walking
+                && rearming.is_some_and(|state| state.rearming.contains_key(&view.id))
+                && host
+                    .grid()
+                    .is_some_and(|grid| beside_a_building(grid, mobile.cell));
+            // Game time: it stands still while the match is paused.
+            view.altitude = approach_altitude(
+                view.altitude,
+                flight_altitude(infantry, landed),
+                speed.delta(),
+            );
+            altitudes.0.insert(view.id, view.altitude);
+            // Aircraft are drawn over everything on the ground, and drift a little in the air.
+            depth += 1.0;
+            let airborne = (view.altitude / HOVER_ALTITUDE).clamp(0.0, 1.0);
+            ground.y += view.altitude + (phase * 0.16).sin() * 1.6 * airborne;
+            let (offset, alpha) = air_shadow(view.altitude);
+            for child in children.into_iter().flatten() {
+                if let Ok((mut shadow, mut place)) = shadows.get_mut(*child) {
+                    place.translation = offset.extend(AIR_SHADOW_Z - depth);
+                    if shadow.rect != Some(rect) {
+                        shadow.rect = Some(rect);
+                    }
+                    let colour = Color::srgba(0.0, 0.0, 0.0, alpha);
+                    if shadow.color != colour {
+                        shadow.color = colour;
+                    }
+                }
+            }
+        }
+        transform.translation = Vec3::new(
+            ground.x,
+            ground.y + crate::hd_art::UNIT_GROUND_OFFSET,
+            depth,
+        );
         if sprite.rect != Some(rect) {
             sprite.rect = Some(rect);
         }
     }
+}
+
+/// Whether a building covers a cell within two cells of `cell`: where an aircraft that has
+/// flown home to rearm has arrived (`sim` sends it to a cell beside its base).
+fn beside_a_building(grid: &sim::Grid, cell: sim::CellPos) -> bool {
+    (-2..=2).any(|dy| {
+        (-2..=2).any(|dx| {
+            grid.building(sim::CellPos::new(cell.x + dx, cell.y + dy))
+                .is_some()
+        })
+    })
 }
 
 /// Logs the simulation's events. `crate::sim_host` copies every tick's events into the game's
@@ -407,6 +676,12 @@ fn place_unit_views(
 fn log_sim_events(mut events: MessageReader<SimEvent>) {
     for event in events.read() {
         match event {
+            SimEvent::PropDestroyed { cell, kind, .. } => {
+                info!("{} at ({}, {}) destroyed", kind.name(), cell.x, cell.y);
+            }
+            SimEvent::StrategicActivated { player, role, .. } => {
+                info!("player {} activated {role:?}", player.0)
+            }
             SimEvent::CommandRejected {
                 player,
                 command,
@@ -534,6 +809,61 @@ mod tests {
         (OPPONENT, "light_tank", (50, 30), 5),
         (OPPONENT, "scout", (52, 36), 3),
     ];
+
+    #[test]
+    fn aircraft_climb_to_their_flying_height_and_land_to_rearm() {
+        assert_eq!(flight_altitude(false, false), FLIGHT_ALTITUDE);
+        assert_eq!(flight_altitude(true, false), HOVER_ALTITUDE);
+        assert_eq!(flight_altitude(false, true), LANDED_ALTITUDE);
+        // Well above a cell's height on screen, so an aircraft never reads as standing on it.
+        const { assert!(HOVER_ALTITUDE >= 32.0 && FLIGHT_ALTITUDE > HOVER_ALTITUDE) };
+        // A new aircraft starts on the ground and climbs at a steady rate, without overshoot.
+        let mut altitude = 0.0;
+        let mut seconds = 0.0;
+        while altitude < FLIGHT_ALTITUDE {
+            let next = approach_altitude(altitude, FLIGHT_ALTITUDE, 0.1);
+            assert!(next > altitude && next <= FLIGHT_ALTITUDE);
+            altitude = next;
+            seconds += 0.1;
+        }
+        assert!((1.0..3.0).contains(&seconds), "{seconds}");
+        assert_eq!(
+            approach_altitude(FLIGHT_ALTITUDE, FLIGHT_ALTITUDE, 1.0),
+            FLIGHT_ALTITUDE
+        );
+        // It descends as steadily, and a paused match (no time passes) holds it where it is.
+        assert_eq!(approach_altitude(40.0, LANDED_ALTITUDE, 0.25), 28.0);
+        assert_eq!(approach_altitude(40.0, LANDED_ALTITUDE, 0.0), 40.0);
+        assert_eq!(
+            approach_altitude(4.0, LANDED_ALTITUDE, 0.25),
+            LANDED_ALTITUDE
+        );
+    }
+
+    #[test]
+    fn an_aircrafts_shadow_stays_on_the_ground_below_it() {
+        // The view is drawn `altitude` above the ground; the shadow hangs that far below the
+        // view, so on screen it does not move while the aircraft climbs.
+        let (low, dark) = air_shadow(0.0);
+        let (high, faint) = air_shadow(FLIGHT_ALTITUDE);
+        assert_eq!(low.x, 0.0);
+        assert_eq!(high.x, 0.0);
+        assert_eq!(low.y - high.y, FLIGHT_ALTITUDE);
+        assert_eq!(air_shadow(20.0).0.y, low.y - 20.0);
+        // Higher up it is fainter, but always visible and never opaque.
+        assert!(dark > faint && faint >= 0.4 && dark < 1.0, "{dark} {faint}");
+        assert_eq!(air_shadow(FLIGHT_ALTITUDE * 3.0).1, faint);
+        // Under every unit and building, over the terrain.
+        const { assert!(AIR_SHADOW_Z < UNIT_Z && AIR_SHADOW_Z > 0.5) };
+    }
+
+    #[test]
+    fn units_on_the_ground_have_no_altitude() {
+        let mut altitudes = Altitudes::default();
+        altitudes.0.insert(SimId(4), 64.0);
+        assert_eq!(altitudes.of(SimId(4)), 64.0);
+        assert_eq!(altitudes.of(SimId(5)), 0.0);
+    }
 
     #[test]
     fn the_sprite_layout_matches_the_generator() {
@@ -710,6 +1040,7 @@ mod tests {
         // An anchor with too few free cells reachable from it: a pocket of three cells in rock.
         let mut grid = fixture_grid("open_16x16");
         let rock = sim::Cell {
+            water: false,
             passable: false,
             buildable: false,
             ore: 0,
@@ -783,7 +1114,7 @@ mod tests {
         let message = load_units(&dir).expect_err("wrong size").to_string();
         assert!(message.contains("units[1].sprite"), "{message}");
         assert!(
-            message.contains("the image is 512x32 px, but a sprite sheet is 512x64 px"),
+            message.contains("the image is 704x32 px, but a sprite sheet is 512x64 px"),
             "{message}"
         );
         // A malformed units file is reported by the data loader.

@@ -1,13 +1,16 @@
 //! Health bars (PLAN.md section 7, M5; docs/DECISIONS.md D37): a bar above every damaged unit
 //! and building the human player is shown, and above every selected unit.
 //!
+//! A building being repaired (`sim::Command::RepairBuilding`) also shows a pulsing wrench beside
+//! its bar, whichever player repairs it.
+//!
 //! A bar is drawn only over a view that is shown, so the hit points of an enemy the human player
 //! does not see are never drawn (as its view, D31).
 
 use bevy::prelude::*;
 use sim::{Building, Definitions, Health, Unit};
 
-use crate::buildings::{BuildingView, WALL_PX, sprite_size};
+use crate::buildings::BuildingView;
 use crate::selection::Selection;
 use crate::sim_host::SimHost;
 use crate::units::{FRAME_SIZE, GROUND_OFFSET_PX, UnitView};
@@ -71,6 +74,31 @@ fn draw_bar(gizmos: &mut Gizmos, centre: Vec2, length: f32, fraction: f32) {
     }
 }
 
+/// Draws a small wrench centred on `centre`, its colour pulsing with `phase` (seconds).
+fn draw_wrench(gizmos: &mut Gizmos, centre: Vec2, phase: f32) {
+    let glow = 0.75 + 0.25 * (phase * std::f32::consts::TAU * 1.5).sin();
+    let colour = Color::srgb(0.35 * glow, 0.95 * glow, 0.45 * glow);
+    let dark = Color::srgb(0.02, 0.08, 0.03);
+    let axis = Vec2::new(1.0, -1.0).normalize();
+    let head = centre - axis * 4.5;
+    let tail = centre + axis * 6.0;
+    // Dark outline first so the wrench reads over snow and concrete alike.
+    for offset in [Vec2::new(1.0, 0.0), Vec2::new(0.0, -1.0)] {
+        gizmos.line_2d(head + offset, tail + offset, dark);
+        gizmos.circle_2d(head + offset, 3.5, dark);
+    }
+    gizmos.line_2d(head, tail, colour);
+    gizmos.line_2d(
+        head + Vec2::new(0.5, 0.5),
+        tail + Vec2::new(0.5, 0.5),
+        colour,
+    );
+    gizmos.circle_2d(head, 3.5, colour);
+    // The jaw's opening.
+    let jaw = head - axis * 3.5;
+    gizmos.line_2d(jaw + Vec2::new(-1.5, -1.5), jaw + Vec2::new(1.5, 1.5), dark);
+}
+
 /// The hit points of a unit or building type: its combat terms' maximum.
 fn max_hit_points(
     definitions: &Definitions,
@@ -87,6 +115,7 @@ fn max_hit_points(
 
 fn draw_health_bars(
     host: Res<SimHost>,
+    time: Res<Time<Real>>,
     selection: Res<Selection>,
     units: Query<(&UnitView, &Transform, &Visibility)>,
     buildings: Query<(&BuildingView, &Transform, &Visibility)>,
@@ -96,6 +125,16 @@ fn draw_health_bars(
         return;
     };
     let world = host.world();
+    let repairing: std::collections::BTreeSet<sim::SimId> = host
+        .players()
+        .map(|players| {
+            players
+                .iter()
+                .flat_map(|(_, state)| state.repairing().iter().copied())
+                .collect()
+        })
+        .unwrap_or_default();
+    let phase = time.elapsed_secs();
     let health = |entity: Entity| -> Option<(i32, i32)> {
         let hit_points = world.get::<Health>(entity)?.hit_points;
         let max = max_hit_points(
@@ -133,15 +172,23 @@ fn draw_health_bars(
         if !bar_drawn(*visibility != Visibility::Hidden, hit_points, max, false) {
             continue;
         }
-        let (width, height) = sprite_size(building.footprint.width, building.footprint.height);
-        let centre = transform.translation.truncate()
-            + Vec2::new(0.0, height as f32 / 2.0 - WALL_PX as f32 / 2.0);
+        let size =
+            crate::hd_art::building_size(building.footprint.width, building.footprint.height);
+        let (width, height) = (size.x, size.y);
+        let centre = transform.translation.truncate() + Vec2::new(0.0, height / 2.0 - 16.0);
         draw_bar(
             &mut gizmos,
             centre,
-            width as f32 / 2.0,
+            width / 2.0,
             health_fraction(hit_points, max),
         );
+        if repairing.contains(&view.id) {
+            draw_wrench(
+                &mut gizmos,
+                centre + Vec2::new(width / 4.0 + 10.0, 0.0),
+                phase,
+            );
+        }
     }
 }
 

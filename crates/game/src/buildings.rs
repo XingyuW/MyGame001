@@ -198,6 +198,7 @@ pub(crate) fn spawn_building_views(
     map: Option<Res<MapView>>,
     sprites: Option<Res<BuildingSprites>>,
     host: Res<SimHost>,
+    mut paint: crate::presentation::TeamPaint,
 ) {
     let (Some(map), Some(sprites)) = (map, sprites) else {
         return;
@@ -212,20 +213,23 @@ pub(crate) fn spawn_building_views(
         if views.0.contains_key(id) {
             continue;
         }
-        let team = if owner.0 == HUMAN {
-            &sprites.0
-        } else {
-            &sprites.1
-        };
-        let Some(image) = team.get(&component.kind) else {
+        let (Some(human), Some(enemy)) = (
+            sprites.0.get(&component.kind),
+            sprites.1.get(&component.kind),
+        ) else {
             continue;
         };
-        let position = sprite_position(component.footprint, map.tile);
+        let image = &paint.sprite(owner.0, human, enemy);
+        let position = crate::hd_art::building_position(component.footprint, map.tile);
         let view = commands
             .spawn((
                 BuildingView { building, id: *id },
                 Sprite {
                     image: image.clone(),
+                    custom_size: Some(crate::hd_art::building_size(
+                        component.footprint.width,
+                        component.footprint.height,
+                    )),
                     color: Color::WHITE,
                     ..default()
                 },
@@ -256,17 +260,22 @@ pub fn building_shown(owner: PlayerId, footprint: Footprint, players: &Players) 
 /// Removes the views of buildings that no longer exist (sold or destroyed), and hides the views
 /// of other players' buildings while the human player does not see them.
 fn update_building_views(
+    sprites: Option<Res<BuildingSprites>>,
+    mut paint: crate::presentation::TeamPaint,
     mut commands: Commands,
     mut registry: ResMut<BuildingViews>,
     host: Res<SimHost>,
     // Disjoint from the unit views' query (`crate::units`), which also writes `Visibility`.
-    mut views: Query<(Entity, &BuildingView, &mut Visibility), Without<crate::units::UnitView>>,
+    mut views: Query<
+        (Entity, &BuildingView, &mut Visibility, &mut Sprite),
+        Without<crate::units::UnitView>,
+    >,
 ) {
     let Some(players) = host.players() else {
         return;
     };
     let world = host.world();
-    for (entity, view, mut visibility) in &mut views {
+    for (entity, view, mut visibility, mut sprite) in &mut views {
         let (Some(owner), Some(building)) = (
             world.get::<Owner>(view.building),
             world.get::<Building>(view.building),
@@ -275,6 +284,15 @@ fn update_building_views(
             commands.entity(entity).despawn();
             continue;
         };
+        if let Some(sprites) = sprites.as_ref()
+            && let (Some(human), Some(enemy)) =
+                (sprites.0.get(&building.kind), sprites.1.get(&building.kind))
+        {
+            let image = paint.sprite(owner.0, human, enemy);
+            if sprite.image != image {
+                sprite.image = image;
+            }
+        }
         let shown = if building_shown(owner.0, building.footprint, players) {
             Visibility::Inherited
         } else {
