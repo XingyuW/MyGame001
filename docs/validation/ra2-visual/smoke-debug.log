@@ -1,0 +1,26 @@
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `game` (bin "game") generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.15s
+     Running `target/debug/game --smoke-test 600`
+[2m2026-10-05T20:22:36.385135Z[0m [32m INFO[0m [2mbevy_diagnostic::system_information_diagnostics_plugin::internal[0m[2m:[0m SystemInfo { os: "macOS 27.0.1", kernel: "27.0.0", cpu: "Apple M5", core_count: "10", memory: "32.0 GiB" }
+[2m2026-10-05T20:22:36.441151Z[0m [32m INFO[0m [2mbevy_render::renderer[0m[2m:[0m AdapterInfo { name: "Apple M5", vendor: 0, device: 0, device_type: IntegratedGpu, device_pci_bus_id: "", driver: "", driver_info: "", backend: Metal, subgroup_min_size: 4, subgroup_max_size: 64, transient_saves_memory: true }
+[2m2026-10-05T20:22:36.795507Z[0m [32m INFO[0m [2mbevy_winit::system[0m[2m:[0m Creating new window MyGame001 (66v0)
+[2m2026-10-05T20:22:36.933706Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/demo/demo.tmx: 64x64 cells, tile 64x32 px
+[2m2026-10-05T20:22:36.934734Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/crossroads/crossroads.tmx: 56x56 cells, tile 64x32 px
+[2m2026-10-05T20:22:36.935708Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/riverlands/riverlands.tmx: 64x48 cells, tile 64x32 px
+[2m2026-10-05T20:22:43.500110Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m catalogue: 3 maps, 2 factions, 3 difficulties
+[2m2026-10-05T20:22:43.500270Z[0m [32m INFO[0m [2mgame::options[0m[2m:[0m no settings file at /var/folders/vr/n5klx5z92njgzmqc0_v_02vc0000gn/T/mygame001-smoke-31768/settings.txt; the defaults are used
+[2m2026-10-05T20:22:44.421099Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map demo (seed 6): vanguard against vanguard (normal): 2 buildings and 18 units spawned
+[2m2026-10-05T20:22:45.724131Z[0m [32m INFO[0m [2mgame::options[0m[2m:[0m settings written to /var/folders/vr/n5klx5z92njgzmqc0_v_02vc0000gn/T/mygame001-smoke-31768/settings.txt
+[2m2026-10-05T20:22:45.731535Z[0m [32m INFO[0m [2mbevy_render::batching::gpu_preprocessing[0m[2m:[0m GPU preprocessing is fully supported on this device.
+[2m2026-10-05T20:22:46.292216Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map demo (seed 7): vanguard against vanguard (normal): 2 buildings and 18 units spawned
+[2m2026-10-05T20:22:47.870100Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map demo (seed 6): meridian against vanguard (normal): 2 buildings and 18 units spawned
+[2m2026-10-05T20:22:49.040128Z[0m [32m INFO[0m [2mbevy_ecs_tiled::tiled::map[0m[2m:[0m Map removed: AssetId<bevy_ecs_tiled::tiled::map::asset::TiledMapAsset>{ index: 0, generation: 0}
+[2m2026-10-05T20:22:54.497647Z[0m [32m INFO[0m [2mgame::smoke[0m[2m:[0m smoke test: paused at tick 116
+[2m2026-10-05T20:22:54.998893Z[0m [32m INFO[0m [2mgame::smoke[0m[2m:[0m smoke test: resumed at tick 116
+[2m2026-10-05T20:22:59.279978Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Building(BuildingKind(1)) is complete
+[2m2026-10-05T20:23:00.072024Z[0m [32m INFO[0m [2mgame::smoke[0m[2m:[0m smoke test: 600 frames, 217 simulation ticks, map created: true, units spawned: 18, units moved: 9 in 217 ticks after the order, buildings spawned: 2, production charged 434 credits in 217 ticks, visible cells: 347, enemy views shown: 0, view mismatches: 0, sidebar items: 84 of 84, sidebar buttons outside the window: 0, sidebar credits: Some("Credits  4566"), minimap drawings: 211, minimap pixels lit: 1916, sounds: 9, music players: 1, pause: Done { ticks_while_paused: 0, refused: true }, menu buttons: Some(15), matches started: 3, flow: Last, views: 18 of 18 units and 2 of 2 buildings, computer player's commands: 2 (0 rejected), items outside the roster shown: 0, options buttons: 11, settings saved: true
+[2m2026-10-05T20:23:00.074495Z[0m [33m WARN[0m [2mbevy_winit::state[0m[2m:[0m Skipped event Destroyed for unknown winit Window Id WindowId(535956342016)
