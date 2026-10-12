@@ -925,12 +925,9 @@ fn super_me_is_human_opt_in_and_part_of_deterministic_state() {
 #[test]
 fn computer_armies_grow_with_the_map_on_large_maps_only() {
     let assets = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets");
-    let defs = sim::load_match_definitions(
-        assets.join("data/units.ron"),
-        assets.join("data/economy.ron"),
-        assets.join("data/combat.ron"),
-    )
-    .expect("shipped definitions");
+    // The shipped AI file has a plan per side of the shipped rules (RA1), so it is loaded
+    // against the whole shipped ruleset.
+    let defs = sim::load_ruleset(assets.join("data")).expect("shipped definitions");
     let ai = sim::load_ai(assets.join("data/ai.ron"), &defs).expect("shipped AI");
     let grid = |id: &str| {
         sim::load_map(assets.join(sim::map_asset_path(id)))

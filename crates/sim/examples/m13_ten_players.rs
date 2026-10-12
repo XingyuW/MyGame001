@@ -32,8 +32,8 @@ use bevy_app::App;
 use bevy_ecs::message::Messages;
 use sim::{
     Building, Controller, MAX_MATCH_PLAYERS, MatchState, PlayerId, PlayerSetup, SimEvent,
-    SimPlugin, SimSchedule, Unit, enlarged_map, load_ai, load_map, load_match_definitions,
-    load_skirmish, map_asset_path, setup_match,
+    SimPlugin, SimSchedule, Unit, enlarged_map, load_ai, load_map, load_ruleset, load_skirmish,
+    map_asset_path, setup_match,
 };
 
 /// The budget for the mean tick time, as in the M7 benchmark.
@@ -67,12 +67,7 @@ fn repository() -> PathBuf {
 fn main() -> ExitCode {
     let to_the_end = std::env::args().any(|argument| argument == "to-the-end");
     let data = repository().join("assets/data");
-    let loaded = load_match_definitions(
-        data.join("units.ron"),
-        data.join("economy.ron"),
-        data.join("combat.ron"),
-    )
-    .and_then(|definitions| {
+    let loaded = load_ruleset(&data).and_then(|definitions| {
         let skirmish = load_skirmish(data.join("skirmish.ron"), &definitions)?;
         let ai = load_ai(data.join("ai.ron"), &definitions)?;
         Ok((definitions, skirmish, ai))
@@ -128,6 +123,8 @@ fn main() -> ExitCode {
         let players: Vec<PlayerSetup> = (0..MAX_MATCH_PLAYERS)
             .map(|k| PlayerSetup {
                 player: PlayerId(k as u8),
+                // The nine countries in turn (docs/DECISIONS.md R5): five Allied, four Soviet,
+                // and the first again.
                 faction: k % skirmish.factions.len(),
                 start: k,
                 // The middle difficulty, the menu's first choice.

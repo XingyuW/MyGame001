@@ -159,13 +159,15 @@ mod tests {
             let item = sim::ProductionItem::Unit(kind);
             let on_foot = loaded.definitions.category(item) == sim::Category::Infantry
                 && loaded.definitions.domain(kind) != sim::Domain::Air;
-            let path = root.join("sprites/hd/walk").join(format!("{}.png", def.id));
+            // The walk cycle is that of the item whose art the type shows (RA1, arsenal `art`).
+            let art = loaded.definitions.art(item);
+            let path = root.join("sprites/hd/walk").join(format!("{art}.png"));
             assert_eq!(path.is_file(), on_foot, "{}", def.id);
             if !on_foot {
                 continue;
             }
             walkers += 1;
-            let bytes = checked(&root, "walk", &def.id, size).expect(&def.id);
+            let bytes = checked(&root, "walk", art, size).expect(&def.id);
             let image = image::load_from_memory(&bytes).expect(&def.id).to_rgba8();
             let frame = (WALK_SIZE * SCALE as f32) as u32;
             for facing in 0..8 {
@@ -209,22 +211,39 @@ mod tests {
         let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../assets");
         let (loaded, _) = crate::units::load_match_data(&root).expect("match data");
         let mut art = std::collections::BTreeSet::new();
-        for def in loaded.definitions.buildings() {
+        let definitions = &loaded.definitions;
+        for def in definitions.buildings() {
+            let kind = definitions.building_kind(&def.id).expect("kind");
+            let shown = definitions.art(sim::ProductionItem::Building(kind));
             let bytes = checked(
                 &root,
                 "buildings",
-                &def.id,
+                shown,
                 building_size(def.width, def.height),
             )
             .expect(&def.id);
-            assert!(art.insert(bytes), "shared building artwork: {}", def.id);
+            // A type that names another's art (RA1: the Soviet twins of the Allied production
+            // buildings and the American Airforce Command, until they have art of their own,
+            // docs/DECISIONS.md R11) shows that building's artwork; every other type has its own.
+            if shown == def.id {
+                assert!(art.insert(bytes), "shared building artwork: {}", def.id);
+            } else {
+                let twin = definitions.building_kind(shown).expect(shown);
+                assert_eq!(
+                    definitions.art(sim::ProductionItem::Building(twin)),
+                    shown,
+                    "{}",
+                    def.id
+                );
+            }
         }
         art.clear();
-        for def in loaded.definitions.units() {
+        for def in definitions.units() {
+            let kind = definitions.unit_kind(&def.id).expect("kind");
             let bytes = checked(
                 &root,
                 "units",
-                &def.id,
+                definitions.art(sim::ProductionItem::Unit(kind)),
                 Vec2::new(UNIT_SIZE * 8.0, UNIT_SIZE),
             )
             .expect(&def.id);

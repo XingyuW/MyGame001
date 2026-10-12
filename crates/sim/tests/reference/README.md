@@ -9,7 +9,24 @@ parity audit compares the shipped `assets/data/*.ron` with these tab separated t
 * `ra2_reference.tsv`: the values the game uses. Columns `file` (`rules`, `art`), `section`,
   `key`, `value`, sorted. Generated, never edited by hand.
 * `ra2_differences.tsv`: intentional differences between the shipped data and the reference.
-  Columns `game_id`, `field`, `game_value`, `reference_value`, `reason`. Written by hand.
+  Columns `game_id`, `field`, `game_value`, `reference_value`, `reason`. Written by hand. A row
+  matches one audited value: the game id (`rules` for a value of `rules.ron`), the field as the
+  audit names it (`cost`, `strength`, `sight`, `speed`, `prerequisites`, `power`, `sell_value`,
+  `owner_sides`, `required_countries`, `forbidden_countries`, `tech_level`, `present`, or
+  `group.field` for `rules.ron`), the shipped value, and the reference value as the ini writes
+  it. The audit fails on a difference without a row and on a row that no longer applies.
+
+The shipped data is generated from these tables, and audited against them:
+
+```
+python3 scripts/generate_ra2_data.py            # rewrites assets/data/*.ron
+python3 scripts/generate_ra2_data.py --check    # exit 1 if a shipped file is stale
+cargo test --release -p sim --test ra9_data_parity
+```
+
+`scripts/generate_ra2_data.py` reads only `ra2_reference.tsv` and `ra2_mapping.tsv` (never the
+ini files) and its own tables of game specific values; `crates/sim/tests/ra9_data_parity.rs`
+recomputes every conversion in Rust and compares the shipped files with the reference.
 
 Regenerating:
 

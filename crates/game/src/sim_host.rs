@@ -174,6 +174,7 @@ impl SimHost {
                 // The computer players fight the human, never each other (the default; the
                 // other options are those of Red Alert 2's lobby until the menu offers them).
                 free_for_all: false,
+                mcv_start: plan.mcv_start,
                 ..sim::MatchOptions::default()
             },
         )
@@ -213,6 +214,9 @@ pub struct MatchPlan {
     pub unlock_all: bool,
     /// The speed of the human player's units with Super Me, in percent (100: unchanged).
     pub unit_speed_percent: u16,
+    /// Whether a country's player starts with the base unit of its side (the lobby's default,
+    /// RA1) or with the Construction Yard it deploys into (`sim::MatchOptions::mcv_start`).
+    pub mcv_start: bool,
     /// The terrain of the match's map: the map file's, or enlarged for more than two players.
     pub grid: Grid,
     /// The map's cell looks (row-major): where its destructible scenery stands (`sim::Props`).
@@ -421,28 +425,42 @@ pub(crate) mod tests {
     use super::*;
 
     /// A host with the demo match installed, as a match started from the menu with its first
-    /// choices installs it (`crate::skirmish::begin_match`, seed 0).
+    /// choices installs it (`crate::skirmish::begin_match`, seed 0), except that the players
+    /// start with their Construction Yards instead of the base units that deploy into them
+    /// (RA1: the lobby's "start with an MCV" off), so that the interface tests that build on it
+    /// have a base from the first tick. [`menu_host`] is the match as the menu starts it.
     pub(crate) fn demo_host() -> SimHost {
+        demo_match(false)
+    }
+
+    /// A host with the demo match installed exactly as a match started from the menu with its
+    /// first choices installs it: every player with the base unit of its side.
+    pub(crate) fn menu_host() -> SimHost {
+        demo_match(true)
+    }
+
+    fn demo_match(mcv_start: bool) -> SimHost {
         let catalogue = crate::skirmish::tests::production_catalogue();
         let selection = crate::skirmish::MenuSelection::initial(&catalogue);
         let plan = MatchPlan {
             super_me: false,
             unlock_all: false,
             unit_speed_percent: 100,
+            mcv_start,
             grid: catalogue.maps[selection.map].map.grid.clone(),
             looks: catalogue.maps[selection.map].map.looks.clone(),
             definitions: catalogue.definitions.clone(),
             skirmish: catalogue.skirmish.clone(),
             ai: catalogue.ai.clone(),
             map: selection.map,
-            players: selection.players().to_vec(),
+            players: crate::skirmish::match_players(&catalogue, selection),
             seed: 0,
         };
         let mut host = SimHost::new(plan.seed);
         let start = host
             .install(&plan)
             .unwrap_or_else(|error| panic!("{error}"));
-        let (units, buildings) = crate::smoke::starting_totals(&catalogue, selection);
+        let (units, buildings) = crate::skirmish::starting_totals(&catalogue, selection, mcv_start);
         assert_eq!(start, MatchStart { buildings, units });
         host
     }
@@ -568,23 +586,27 @@ pub(crate) mod tests {
             !world.resource::<SimHost>().running(),
             "no match before setup"
         );
-        let plan = |grid: Grid| MatchPlan {
+        // As the menu starts it (RA1: every player with the base unit of its side), or with the
+        // Construction Yards the base units deploy into.
+        let plan = |grid: Grid, mcv_start: bool| MatchPlan {
             super_me: false,
             unlock_all: false,
             unit_speed_percent: 100,
+            mcv_start,
             grid,
             looks: Vec::new(),
             definitions: catalogue.definitions.clone(),
             skirmish: catalogue.skirmish.clone(),
             ai: catalogue.ai.clone(),
             map: selection.map,
-            players: selection.players().to_vec(),
+            players: crate::skirmish::match_players(&catalogue, selection),
             seed: 0,
         };
         let demo = catalogue.maps[selection.map].map.grid.clone();
-        let start = install_match(&mut world, &plan(demo)).expect("the demo match");
-        let (units, buildings) = crate::smoke::starting_totals(&catalogue, selection);
+        let start = install_match(&mut world, &plan(demo, true)).expect("the demo match");
+        let (units, buildings) = crate::skirmish::starting_totals(&catalogue, selection, true);
         assert_eq!(start, MatchStart { buildings, units });
+        assert_eq!(buildings, 0, "the players start with their base units");
         assert!(world.resource::<SimHost>().running());
         // A 16x16 map cannot hold the starting buildings at the demo map's start positions: the
         // setup fails with an error naming the building, and the previous simulation is kept.
@@ -597,10 +619,13 @@ pub(crate) mod tests {
         let tick_before = world.resource::<SimHost>().tick();
         // The demo map's start positions lie outside the 16x16 map, which match setup reports
         // first (M6 review 1 P1-1); start positions on it, near its edge, leave the yard sticking
-        // out.
-        let error = install_match(&mut world, &plan(small.clone())).expect_err("too small");
-        assert!(error.contains("start position 0 at (15, 37)"), "{error}");
-        let mut near_edge = plan(small);
+        // out (the yard a player starts with when the match does not start with base units).
+        for mcv_start in [true, false] {
+            let error =
+                install_match(&mut world, &plan(small.clone(), mcv_start)).expect_err("too small");
+            assert!(error.contains("start position 0 at (15, 37)"), "{error}");
+        }
+        let mut near_edge = plan(small, false);
         near_edge.skirmish.maps[selection.map].starts =
             vec![CellPos::new(14, 1), CellPos::new(1, 14)];
         let error = install_match(&mut world, &near_edge).expect_err("too small");
@@ -700,13 +725,14 @@ pub(crate) mod tests {
             super_me: false,
             unlock_all: false,
             unit_speed_percent: 100,
+            mcv_start: true,
             grid: catalogue.maps[selection.map].map.grid.clone(),
             looks: catalogue.maps[selection.map].map.looks.clone(),
             definitions: catalogue.definitions.clone(),
             skirmish: catalogue.skirmish.clone(),
             ai: catalogue.ai.clone(),
             map: selection.map,
-            players: selection.players().to_vec(),
+            players: crate::skirmish::match_players(&catalogue, selection),
             seed: 0,
         };
         world.resource_mut::<CommandSink>().reset();

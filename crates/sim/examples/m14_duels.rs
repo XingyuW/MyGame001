@@ -10,8 +10,9 @@
 //! For each named map of the skirmish file (all of them if none is named), computer players of
 //! the shipped data play one against one from the first two start positions, to the end or to
 //! [`END_LIMIT`] ticks, and the run reports the tick each match ended in. Without `full` four
-//! pairings of factions and difficulties are played per map, with `full` every one of them (as
-//! `crates/game/tests/m6_production_matches.rs` does). `doubled` plays on the map as a match of
+//! pairings of sides and difficulties are played per map, with `full` every one of them (as
+//! `crates/game/tests/m6_production_matches.rs` does). The country of each side rotates with the
+//! map and the pairing (docs/DECISIONS.md R5), so that every country is played on several maps. `doubled` plays on the map as a match of
 //! ten players enlarges it (`sim::enlarged_map`), still with two players at the first two
 //! starts. `trace` prints, every 3,000 ticks, where each player's units are and what it owns,
 //! which shows a stalled match for what it is.
@@ -28,8 +29,8 @@ use std::time::Instant;
 use bevy_app::App;
 use sim::{
     Building, CellPos, Controller, Grid, MAX_MATCH_PLAYERS, MatchState, Mobile, Owner, PlayerId,
-    PlayerSetup, SimPlugin, SimSchedule, Unit, enlarged_map, load_ai, load_map,
-    load_match_definitions, load_skirmish, map_asset_path, setup_match,
+    PlayerSetup, SimPlugin, SimSchedule, SkirmishDefinitions, Unit, enlarged_map, load_ai,
+    load_map, load_ruleset, load_skirmish, map_asset_path, setup_match,
 };
 
 /// Ticks a match may take before the run gives up on it.
@@ -61,12 +62,7 @@ fn main() -> ExitCode {
         .filter(|argument| !flags.contains(&argument.as_str()))
         .collect();
     let data = repository().join("assets/data");
-    let loaded = load_match_definitions(
-        data.join("units.ron"),
-        data.join("economy.ron"),
-        data.join("combat.ron"),
-    )
-    .and_then(|definitions| {
+    let loaded = load_ruleset(&data).and_then(|definitions| {
         let skirmish = load_skirmish(data.join("skirmish.ron"), &definitions)?;
         let ai = load_ai(data.join("ai.ron"), &definitions)?;
         Ok((definitions, skirmish, ai))
@@ -78,7 +74,10 @@ fn main() -> ExitCode {
             return ExitCode::FAILURE;
         }
     };
-    let (factions, difficulties) = (skirmish.factions.len(), ai.difficulties.len());
+    // The sides, each with its countries (R5); a pairing names a side and a difficulty per
+    // player, and the country follows from the map and the pairing.
+    let groups = skirmish.pairing_groups();
+    let (factions, difficulties) = (groups.len(), ai.difficulties.len());
     let mut jobs = Vec::new();
     for (map, def) in skirmish.maps.iter().enumerate() {
         if !named.is_empty() && !named.iter().any(|id| **id == def.id) {
@@ -122,12 +121,21 @@ fn main() -> ExitCode {
             ]);
         }
         for sides in pairings {
+            // The number of the pairing among all pairings of sides and difficulties, as
+            // `m6_production_matches.rs` counts them, so that both play the same matches.
+            let pairing = ((sides[0].0 * factions + sides[1].0) * difficulties + sides[0].1)
+                * difficulties
+                + sides[1].1;
+            let country = |slot: usize| {
+                SkirmishDefinitions::rotating(&groups[sides[slot].0], map + pairing + slot)
+                    .unwrap_or(0)
+            };
             jobs.push(Job {
                 map,
                 id: def.id.clone(),
                 grid: grid.clone(),
                 starts: starts.clone(),
-                sides,
+                sides: [(country(0), sides[0].1), (country(1), sides[1].1)],
             });
         }
     }

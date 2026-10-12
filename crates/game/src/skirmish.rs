@@ -110,30 +110,43 @@ pub struct Catalogue {
 /// skirmish and AI files, and every map of the skirmish file with its tileset image. The checked
 /// bytes of the sprites and maps are registered for the renderer; the sprite handles are returned
 /// for the views.
-pub fn load(
+pub fn load(root: &Path, checked: &CheckedAssets) -> Result<Loaded, String> {
+    let loaded = crate::units::load_match_data(root).map_err(|error| error.to_string())?;
+    catalogue_of(root, &root.join(crate::units::DATA_DIR), loaded, checked)
+}
+
+/// What [`load`] returns: the catalogue, and the checked sprites of its unit and building types.
+pub type Loaded = (
+    Catalogue,
+    Vec<crate::units::CheckedSheet>,
+    Vec<crate::buildings::CheckedBuildingSprite>,
+);
+
+/// The catalogue of the definitions `loaded` from the data directory `data`: with the skirmish
+/// and AI files of that directory and the maps of the asset directory `root`, checked
+/// ([`check_catalogue`]).
+fn catalogue_of(
     root: &Path,
-    checked: &CheckedAssets,
-) -> Result<
-    (
-        Catalogue,
-        Vec<crate::units::CheckedSheet>,
+    data: &Path,
+    (loaded, buildings): (
+        crate::units::LoadedUnits,
         Vec<crate::buildings::CheckedBuildingSprite>,
     ),
-    String,
-> {
-    let (loaded, buildings) =
-        crate::units::load_match_data(root).map_err(|error| error.to_string())?;
+    checked: &CheckedAssets,
+) -> Result<Loaded, String> {
     let definitions = loaded.definitions;
-    let skirmish = sim::load_skirmish(root.join(SKIRMISH_PATH), &definitions)
-        .map_err(|error| error.to_string())?;
-    let ai = sim::load_ai(root.join(AI_PATH), &definitions).map_err(|error| error.to_string())?;
+    let skirmish_file = crate::units::data_file(data, SKIRMISH_PATH);
+    let ai_file = crate::units::data_file(data, AI_PATH);
+    let skirmish =
+        sim::load_skirmish(&skirmish_file, &definitions).map_err(|error| error.to_string())?;
+    let ai = sim::load_ai(&ai_file, &definitions).map_err(|error| error.to_string())?;
     let mut maps = Vec::with_capacity(skirmish.maps.len());
     for def in &skirmish.maps {
         let asset_path = map_asset_path(&def.id);
         let map = check_map(root, &asset_path, checked).map_err(|error| {
             format!(
                 "data file {}: map {:?}: {error}",
-                root.join(SKIRMISH_PATH).display(),
+                skirmish_file.display(),
                 def.id
             )
         })?;
@@ -149,7 +162,7 @@ pub fn load(
         ai,
         maps,
     };
-    check_catalogue(&catalogue, root)?;
+    check_catalogue(&catalogue, data)?;
     Ok((catalogue, loaded.sheets, buildings))
 }
 
@@ -167,12 +180,14 @@ pub fn load(
 ///   one pairing each, which changes with the count, so that the game still starts quickly (the
 ///   difficulty does not change the setup).
 ///
-/// Each error names the file and the field, or the map and the factions, and the reason.
-pub fn check_catalogue(catalogue: &Catalogue, root: &Path) -> Result<(), String> {
-    let skirmish_path = root.join(SKIRMISH_PATH);
+/// Each error names the file and the field, or the map and the factions, and the reason; `data`
+/// is the directory of the data files the catalogue was loaded from.
+pub fn check_catalogue(catalogue: &Catalogue, data: &Path) -> Result<(), String> {
+    let skirmish_path = &crate::units::data_file(data, SKIRMISH_PATH);
+    let ai_path = &crate::units::data_file(data, AI_PATH);
     for map in 0..catalogue.maps.len() {
         sim::check_map_starts(
-            &skirmish_path,
+            skirmish_path,
             &catalogue.skirmish,
             map,
             &catalogue.maps[map].map.grid,
@@ -180,7 +195,7 @@ pub fn check_catalogue(catalogue: &Catalogue, root: &Path) -> Result<(), String>
         .map_err(|error| error.to_string())?;
     }
     sim::check_ai_factions(
-        root.join(AI_PATH),
+        ai_path,
         &catalogue.ai,
         &catalogue.skirmish,
         &catalogue.definitions,
@@ -209,10 +224,20 @@ pub fn check_catalogue(catalogue: &Catalogue, root: &Path) -> Result<(), String>
             // The map for this many players is the same for every pairing: enlarged once.
             let played =
                 match_map(catalogue, map, enemies + 2).map_err(|error| cannot(0, 0, error))?;
-            // Every pairing with one opponent and with the most; one in between.
+            // Every pairing of the sides with one opponent and with the most, each side played
+            // by its countries in turn (docs/DECISIONS.md R5: every pairing of the nine countries
+            // would be 81 trial setups per map and player count instead of 4); one in between.
+            let groups = catalogue.skirmish.pairing_groups();
             let pairings: Vec<(usize, usize)> = if enemies == 0 || enemies == most {
-                (0..factions.len())
-                    .flat_map(|faction| (0..factions.len()).map(move |other| (faction, other)))
+                (0..groups.len())
+                    .flat_map(|first| (0..groups.len()).map(move |second| (first, second)))
+                    .enumerate()
+                    .filter_map(|(pairing, (first, second))| {
+                        Some((
+                            SkirmishDefinitions::rotating(&groups[first], map + pairing)?,
+                            SkirmishDefinitions::rotating(&groups[second], map + pairing + 1)?,
+                        ))
+                    })
                     .collect()
             } else {
                 let count = factions.len().max(1);
@@ -309,15 +334,80 @@ fn plan_on(
         super_me: selection.super_me,
         unlock_all: selection.unlock_all,
         unit_speed_percent: selection.unit_speed_percent(),
+        // The lobby's default; the menu has no row for it yet.
+        mcv_start: true,
         grid: map.map.grid.clone(),
         looks: map.map.looks.clone(),
         definitions: catalogue.definitions.clone(),
         skirmish,
         ai: catalogue.ai.clone(),
         map: selection.map,
-        players: selection.players(),
+        players: match_players(catalogue, selection),
         seed,
     }
+}
+
+/// The players of a match with `selection` ([`MenuSelection::players`]), with the factions of
+/// the computer players taken in turn from the catalogue's, starting with the chosen one
+/// (RA1, until the menu has a row per computer player: the first plays the "enemy force", the
+/// second the faction after it, and so on, so that a match with several enemies fields several
+/// countries).
+pub fn match_players(catalogue: &Catalogue, selection: MenuSelection) -> Vec<PlayerSetup> {
+    let factions = catalogue.skirmish.factions.len().max(1);
+    let mut players = selection.players();
+    for (turn, setup) in players
+        .iter_mut()
+        .filter(|setup| setup.controller != Controller::Human)
+        .enumerate()
+    {
+        setup.faction = (selection.opponent + turn) % factions;
+    }
+    players
+}
+
+/// What a match with `selection` starts with, as `(units, buildings)`: for a country its base
+/// unit (`mcv_start`, the lobby's default) or the Construction Yard it deploys into, and the
+/// starting units of the lobby's default unit count (the match options the game uses,
+/// `sim::MatchOptions::default()`); for a faction without a side its starting groups and
+/// buildings.
+pub fn starting_totals(
+    catalogue: &Catalogue,
+    selection: MenuSelection,
+    mcv_start: bool,
+) -> (usize, usize) {
+    let definitions = &catalogue.definitions;
+    let unit_count = definitions.rules().map_or(0, |rules| {
+        u32::try_from(rules.dialog.unit_count).unwrap_or(0)
+    });
+    match_players(catalogue, selection)
+        .iter()
+        .filter_map(|setup| catalogue.skirmish.factions.get(setup.faction))
+        .fold((0, 0), |(units, buildings), faction| match faction.side {
+            // No type is drawn while every side lists one vehicle and one infantry type, so
+            // the generator's seed does not matter.
+            Some(side) => (
+                units
+                    + usize::from(mcv_start)
+                    + sim::starting_units(
+                        &catalogue.skirmish,
+                        definitions,
+                        side,
+                        unit_count,
+                        &mut sim::SimRng::new(0),
+                    )
+                    .len(),
+                buildings + usize::from(!mcv_start),
+            ),
+            None => (
+                units
+                    + faction
+                        .units
+                        .iter()
+                        .map(|group| group.count as usize)
+                        .sum::<usize>(),
+                buildings + faction.buildings.len(),
+            ),
+        })
 }
 
 /// Startup: loads the catalogue ([`load`]) and registers the sprites. An error is logged and ends
@@ -342,10 +432,14 @@ pub(crate) fn load_catalogue(world: &mut World) {
             .definitions
             .building(sprite.kind)
             .expect("checked building kind");
+        // The art of the item the arsenal names (RA1): a new type shows that of its twin
+        // until it has its own (docs/DECISIONS.md R11).
         let bytes = match crate::hd_art::checked(
             &root,
             "buildings",
-            &def.id,
+            catalogue
+                .definitions
+                .art(sim::ProductionItem::Building(sprite.kind)),
             crate::hd_art::building_size(def.width, def.height),
         ) {
             Ok(bytes) => bytes,
@@ -373,14 +467,12 @@ pub(crate) fn load_catalogue(world: &mut World) {
     let mut sprites = UnitSprites::default();
     for sheet in sheets {
         debug_assert!(!sheet.bytes.is_empty());
-        let def = catalogue
-            .definitions
-            .unit(sheet.kind)
-            .expect("checked unit kind");
         let bytes = match crate::hd_art::checked(
             &root,
             "units",
-            &def.id,
+            catalogue
+                .definitions
+                .art(sim::ProductionItem::Unit(sheet.kind)),
             Vec2::new(crate::hd_art::UNIT_SIZE * 8.0, crate::hd_art::UNIT_SIZE),
         ) {
             Ok(bytes) => bytes,
@@ -411,9 +503,10 @@ pub(crate) fn load_catalogue(world: &mut World) {
         let Some(kind) = catalogue.definitions.unit_kind(&def.id) else {
             continue;
         };
+        let art = catalogue.definitions.art(sim::ProductionItem::Unit(kind));
         if !root
             .join("sprites/hd/walk")
-            .join(format!("{}.png", def.id))
+            .join(format!("{art}.png"))
             .is_file()
         {
             continue;
@@ -422,7 +515,7 @@ pub(crate) fn load_catalogue(world: &mut World) {
             crate::hd_art::WALK_SIZE * 8.0,
             crate::hd_art::WALK_SIZE * crate::hd_art::WALK_FRAMES as f32,
         );
-        let pair = crate::hd_art::checked(&root, "walk", &def.id, size).and_then(|bytes| {
+        let pair = crate::hd_art::checked(&root, "walk", art, size).and_then(|bytes| {
             crate::presentation::sprite_pair(&bytes, &mut world.resource_mut::<Assets<Image>>())
         });
         match pair {
@@ -590,11 +683,18 @@ impl MenuCounts {
 }
 
 impl MenuSelection {
-    /// The first map and faction for both players, and the middle difficulty (the AI file lists
-    /// them from the easiest).
+    /// The first map, the first faction for the human player (America, with the shipped data),
+    /// for the computer players the first faction of another side (RA1: the default match is
+    /// fought between the two sides), and the middle difficulty (the AI file lists them from
+    /// the easiest).
     pub fn initial(catalogue: &Catalogue) -> Self {
+        let factions = &catalogue.skirmish.factions;
         Self {
             difficulty: catalogue.ai.difficulties.len() / 2,
+            opponent: factions
+                .iter()
+                .position(|faction| Some(faction.side) != factions.first().map(|own| own.side))
+                .unwrap_or(0),
             ..Self::default()
         }
     }
@@ -878,6 +978,19 @@ fn clock_seed() -> u64 {
 /// centres the camera on the human player's start. A setup error is logged and ends the game with
 /// exit code 1, as before M6; nothing of a new match is then shown.
 pub(crate) fn begin_match(world: &mut World, selection: MenuSelection, seed: u64) {
+    begin_match_with(world, selection, seed, true);
+}
+
+/// [`begin_match`] with the lobby's "start with an MCV" as given (`MatchPlan::mcv_start`). The
+/// menu starts every match with it on, having no row for it yet; the scenes of the art review
+/// (`crate::visual_review`) start with the Construction Yards, so that their bases stand from the
+/// first frame.
+pub(crate) fn begin_match_with(
+    world: &mut World,
+    selection: MenuSelection,
+    seed: u64,
+    mcv_start: bool,
+) {
     end_match(world);
     let Some(catalogue) = world.get_resource::<Catalogue>().cloned() else {
         error!("no catalogue is loaded; no match can start");
@@ -890,7 +1003,7 @@ pub(crate) fn begin_match(world: &mut World, selection: MenuSelection, seed: u64
         return;
     };
     let (plan, map) = match match_plan(&catalogue, selection, seed) {
-        Ok(planned) => planned,
+        Ok((plan, map)) => (MatchPlan { mcv_start, ..plan }, map),
         Err(error) => {
             error!("map {}: {error}", entry.id);
             world.write_message(AppExit::error());
@@ -915,15 +1028,21 @@ pub(crate) fn begin_match(world: &mut World, selection: MenuSelection, seed: u64
             .get(index)
             .map_or("?", |faction| faction.id.as_str())
     };
+    // The computer players' factions, as the match has them ([`match_players`]).
+    let opponents: Vec<&str> = plan
+        .players
+        .iter()
+        .filter(|setup| setup.controller != Controller::Human)
+        .map(|setup| faction(setup.faction))
+        .collect();
     info!(
-        "match on map {} ({} x {} cells, seed {seed}): {} against {} x {} ({}){}{}: {} buildings \
+        "match on map {} ({} x {} cells, seed {seed}): {} against {} ({}){}{}: {} buildings \
          and {} units spawned",
         entry.id,
         map.map.view.width,
         map.map.view.height,
         faction(selection.faction),
-        selection.enemy_count(),
-        faction(selection.opponent),
+        opponents.join(", "),
         catalogue
             .ai
             .difficulties
@@ -1047,10 +1166,11 @@ pub struct PlayerLine(pub usize);
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
 pub struct PlayerSwatch(pub usize);
 
-/// The text of line `slot` of the player list: `You - Blue - vanguard` or
-/// `AI 2 - Gold - meridian, normal` (ASCII: the interface font has no middle dot); `None` beyond the match's players.
+/// The text of line `slot` of the player list: `You - Blue - america` or
+/// `AI 2 - Gold - iraq, medium` (ASCII: the interface font has no middle dot), with the faction
+/// the player has in the match ([`match_players`]); `None` beyond the match's players.
 pub fn player_line(slot: usize, selection: MenuSelection, catalogue: &Catalogue) -> Option<String> {
-    let setup = selection.players().into_iter().nth(slot)?;
+    let setup = match_players(catalogue, selection).into_iter().nth(slot)?;
     let colour = crate::presentation::TEAM_PALETTE
         [crate::presentation::team_color_index(selection.color, setup.player)]
     .0;
@@ -1438,6 +1558,31 @@ pub(crate) mod tests {
             .0
     }
 
+    /// The directory of the legacy ruleset fixture: the data files of the game as they were
+    /// before RA1 (the Vanguard and the Meridian, factions without a side that start with their
+    /// buildings and groups and build by their rosters), in the schemas of today. It has no
+    /// rules file.
+    pub(crate) fn legacy_data() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../sim/tests/fixtures/data/legacy")
+    }
+
+    /// The catalogue of the legacy ruleset fixture ([`legacy_data`]) with the sprites and maps
+    /// of the game, for the tests of what only factions without a side have.
+    pub(crate) fn legacy_catalogue() -> Catalogue {
+        load_ruleset(&assets(), &legacy_data(), false)
+            .unwrap_or_else(|error| panic!("{error}"))
+            .0
+    }
+
+    /// [`load`] of a ruleset whose data files lie in the directory `data`, with the sprites and
+    /// maps of the asset directory `root`; `rules` says whether it has a rules file, which the
+    /// legacy ruleset fixture has not (the game itself always loads one).
+    fn load_ruleset(root: &Path, data: &Path, rules: bool) -> Result<Loaded, String> {
+        let loaded = crate::units::load_ruleset_data(root, data, rules)
+            .map_err(|error| error.to_string())?;
+        catalogue_of(root, data, loaded, &CheckedAssets::default())
+    }
+
     /// Every file under `dir`, relative to it, in sorted order.
     fn files_under(dir: &Path) -> Vec<PathBuf> {
         let mut files = Vec::new();
@@ -1471,11 +1616,28 @@ pub(crate) mod tests {
         // match the menu offers).
         let root = assets();
         let catalogue = production_catalogue();
-        check_catalogue(&catalogue, &root).unwrap_or_else(|error| panic!("{error}"));
-        // M7 content: two factions with different rosters, three maps, the full roster.
+        check_catalogue(&catalogue, &root.join(crate::units::DATA_DIR))
+            .unwrap_or_else(|error| panic!("{error}"));
+        // RA1 content: the nine countries of both sides, each a country of the rules file with
+        // a tech tree of its own (its roster), three maps, the full roster.
         let factions = &catalogue.skirmish.factions;
-        assert_eq!(factions.len(), 2);
-        assert_ne!(factions[0].roster, factions[1].roster);
+        assert_eq!(factions.len(), 9);
+        let rules = catalogue.definitions.rules().expect("rules");
+        for faction in factions {
+            let country = faction.country.and_then(|country| rules.country(country));
+            assert_eq!(
+                country.map(|country| (country.id.as_str(), Some(country.side))),
+                Some((faction.id.as_str(), faction.side)),
+                "{}",
+                faction.id
+            );
+        }
+        for side in sim::Side::ALL {
+            assert!(factions.iter().any(|faction| faction.side == Some(side)));
+        }
+        let rosters: BTreeSet<&BTreeSet<sim::ProductionItem>> =
+            factions.iter().map(|faction| &faction.roster).collect();
+        assert_eq!(rosters.len(), factions.len(), "the rosters differ");
         assert!(catalogue.maps.len() >= 3);
         let offered: std::collections::BTreeSet<sim::ProductionItem> = factions
             .iter()
@@ -1492,7 +1654,8 @@ pub(crate) mod tests {
             crate::units::UNITS_PATH,
             crate::buildings::ECONOMY_PATH,
             crate::units::COMBAT_PATH,
-            "data/arsenal.ron",
+            crate::units::RULES_PATH,
+            crate::units::ARSENAL_PATH,
             SKIRMISH_PATH,
             AI_PATH,
         ]
@@ -1519,13 +1682,12 @@ pub(crate) mod tests {
                 "maps/{name} is not a map of the skirmish file"
             );
         }
-        // Every sprite is named by a definition.
-        let definitions = &catalogue.definitions;
-        for file in files_under(&root.join("sprites")) {
-            let stem = file
-                .file_stem()
-                .and_then(|stem| stem.to_str())
-                .expect("name");
+        // Every sprite is named by a definition: of the shipped data, or (RA1) of the legacy
+        // ruleset fixture, which the tests load with the game's sprites (`legacy_catalogue`), so
+        // the sprites of the one type that only it still shows, the rocket tower, stay in the
+        // assets.
+        let legacy = legacy_catalogue();
+        let named = |definitions: &Definitions, file: &Path, stem: &str| {
             let hd_used = if file.starts_with("hd/buildings") {
                 definitions.buildings().iter().any(|d| d.id == stem)
             } else if file.starts_with("hd/units") || file.starts_with("hd/walk") {
@@ -1539,14 +1701,37 @@ pub(crate) mod tests {
                         .iter()
                         .any(|p| file == Path::new(p))
             };
-            let used = hd_used
+            hd_used
                 || definitions.units().iter().any(|unit| unit.sprite == stem)
                 || definitions
                     .buildings()
                     .iter()
-                    .any(|building| building.sprite == stem);
-            assert!(used, "sprites/{} is named by no definition", file.display());
+                    .any(|building| building.sprite == stem)
+        };
+        let mut legacy_only = Vec::new();
+        for file in files_under(&root.join("sprites")) {
+            let stem = file
+                .file_stem()
+                .and_then(|stem| stem.to_str())
+                .expect("name");
+            if named(&catalogue.definitions, &file, stem) {
+                continue;
+            }
+            assert!(
+                named(&legacy.definitions, &file, stem),
+                "sprites/{} is named by no definition",
+                file.display()
+            );
+            legacy_only.push(file);
         }
+        assert_eq!(
+            legacy_only,
+            [
+                "buildings/rocket_tower.png",
+                "hd/buildings/rocket_tower.png"
+            ]
+            .map(PathBuf::from)
+        );
         // Every file under assets/ is recorded in assets/LICENSES.md (PLAN.md section 3 item 7):
         // the repository generated or authored it, or it carries a recorded licence.
         let licences = std::fs::read_to_string(root.join("LICENSES.md")).expect("LICENSES.md");
@@ -1598,7 +1783,9 @@ pub(crate) mod tests {
     #[test]
     fn every_shipped_match_can_be_set_up_for_every_faction_pairing() {
         // Cross validation of the shipped data: every faction fits at both start positions of
-        // every map, against every other faction (both orders) and with every difficulty.
+        // every map, against every other faction (both orders) and with every difficulty. Since
+        // RA1 a faction is a country, which starts with the base unit of its side and its
+        // starting units instead of a yard and groups (`starting_totals`).
         let catalogue = production_catalogue();
         let counts = MenuCounts::of(&catalogue);
         for map in 0..counts.maps {
@@ -1622,12 +1809,11 @@ pub(crate) mod tests {
                         assert_eq!(plan.skirmish, catalogue.skirmish);
                         let start = crate::sim_host::install_match(&mut world, &plan)
                             .unwrap_or_else(|error| panic!("{selection:?}: {error}"));
-                        let expected_units: u32 = [faction, opponent]
-                            .iter()
-                            .flat_map(|&f| &catalogue.skirmish.factions[f].units)
-                            .map(|group| group.count)
-                            .sum();
-                        assert_eq!(start.units, expected_units as usize);
+                        let (expected_units, expected_buildings) =
+                            starting_totals(&catalogue, selection, true);
+                        assert!(expected_units > 2, "{selection:?}");
+                        assert_eq!(start.units, expected_units);
+                        assert_eq!(start.buildings, expected_buildings);
                         let host = world.resource::<SimHost>();
                         assert!(host.running());
                         assert_eq!(
@@ -1661,11 +1847,18 @@ pub(crate) mod tests {
         // at (-8, 1) and (-11, 4), so that every building and unit lies on the map but the
         // computer player's start does not. The reviewed code loaded it, and the computer player's
         // commands to (70, 42) were rejected all match long; now the loader rejects it.
+        //
+        // Since RA1 the shipped factions are countries, which have no yard and no groups in the
+        // skirmish file, so the root holds the legacy ruleset fixture (`legacy_data`: the data
+        // files the edits below were written for, without a rules file) with the game's maps and
+        // sprites.
+        let load = |root: &Path| load_ruleset(root, &root.join(crate::units::DATA_DIR), false);
         let root = PathBuf::from(std::env::var_os("HOME").expect("HOME for review fixtures"))
             .join("Library/Caches/Codex/reviews/MyGame001/rts-controls")
             .join(format!("skirmish-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&root);
-        for dir in ["data", "maps", "sprites"] {
+        copy_dir(&legacy_data(), &root.join(crate::units::DATA_DIR));
+        for dir in ["maps", "sprites"] {
             copy_dir(&assets().join(dir), &root.join(dir));
         }
         let path = root.join(SKIRMISH_PATH);
@@ -1722,7 +1915,7 @@ pub(crate) mod tests {
             .join("\n");
         text.push('\n');
         std::fs::write(&path, text).expect("skirmish file");
-        let error = load(&root, &CheckedAssets::default())
+        let error = load(&root)
             .map(|_| ())
             .expect_err("a start position outside the map");
         for part in [
@@ -1742,7 +1935,7 @@ pub(crate) mod tests {
             .expect("skirmish file")
             .replacen("(x: 70, y: 42)", "(x: 58, y: 42)", 1);
         std::fs::write(&path, &shifted).expect("skirmish file");
-        let error = load(&root, &CheckedAssets::default())
+        let error = load(&root)
             .map(|_| ())
             .expect_err("a yard far from a made start");
         for part in [
@@ -1764,7 +1957,7 @@ pub(crate) mod tests {
             unshifted = unshifted.replacen(from, to, 1);
         }
         std::fs::write(&path, unshifted).expect("skirmish file");
-        load(&root, &CheckedAssets::default()).unwrap_or_else(|error| panic!("{error}"));
+        load(&root).unwrap_or_else(|error| panic!("{error}"));
         let _ = std::fs::remove_dir_all(&root);
     }
 
@@ -1776,67 +1969,117 @@ pub(crate) mod tests {
         // commands to it were rejected all match long. The catalogue's cross checks now reject it,
         // and the AI file that no faction can play (P2-1), and any match the menu offers that
         // cannot be set up (implementation debt item 7), when the game starts.
+        //
+        // The checks of the start positions run on the shipped data (RA1: the nine countries)
+        // and on the legacy ruleset fixture; those of a faction's starting buildings on the
+        // fixture, whose factions have them, and on the shipped data what a country can break.
         let catalogue = production_catalogue();
         let root = assets();
-        check_catalogue(&catalogue, &root).unwrap_or_else(|error| panic!("{error}"));
+        let data = root.join(crate::units::DATA_DIR);
+        check_catalogue(&catalogue, &data).unwrap_or_else(|error| panic!("{error}"));
         let skirmish_file = format!("data file {}", root.join(SKIRMISH_PATH).display());
+        let legacy = legacy_catalogue();
+        let legacy_dir = legacy_data();
+        check_catalogue(&legacy, &legacy_dir).unwrap_or_else(|error| panic!("{error}"));
+        let legacy_file = format!("data file {}", legacy_dir.join("skirmish.ron").display());
 
-        let mut outside = catalogue.clone();
-        outside.skirmish.maps[0].starts[1] = sim::CellPos::new(70, 42);
-        for building in &mut outside.skirmish.factions[0].buildings {
-            building.offset.0 -= 18;
-        }
-        for group in &mut outside.skirmish.factions[0].units {
-            group.offset.0 -= 18;
-        }
-        let error = check_catalogue(&outside, &root).expect_err("a start outside the map");
-        for part in [
-            skirmish_file.as_str(),
-            "maps[0].starts[1]",
-            "(70, 42), which is outside the 64 x 64 cells of map \"demo\"",
+        for (catalogue, data, skirmish_file) in [
+            (&catalogue, &data, &skirmish_file),
+            (&legacy, &legacy_dir, &legacy_file),
         ] {
-            assert!(error.contains(part), "{error:?} lacks {part:?}");
+            let mut outside = catalogue.clone();
+            outside.skirmish.maps[0].starts[1] = sim::CellPos::new(70, 42);
+            for building in &mut outside.skirmish.factions[0].buildings {
+                building.offset.0 -= 18;
+            }
+            for group in &mut outside.skirmish.factions[0].units {
+                group.offset.0 -= 18;
+            }
+            let error = check_catalogue(&outside, data).expect_err("a start outside the map");
+            for part in [
+                skirmish_file.as_str(),
+                "maps[0].starts[1]",
+                "(70, 42), which is outside the 64 x 64 cells of map \"demo\"",
+            ] {
+                assert!(error.contains(part), "{error:?} lacks {part:?}");
+            }
+            // A start on impassable terrain.
+            let mut on_rock = catalogue.clone();
+            let rock = (0..64)
+                .flat_map(|y| (0..64).map(move |x| sim::CellPos::new(x, y)))
+                .find(|&cell| {
+                    on_rock.maps[0]
+                        .map
+                        .grid
+                        .cell(cell)
+                        .is_some_and(|terrain| !terrain.passable)
+                })
+                .expect("the demo map has impassable terrain");
+            on_rock.skirmish.maps[0].starts[0] = rock;
+            let error = check_catalogue(&on_rock, data).expect_err("a start on rock");
+            assert!(error.contains("maps[0].starts[0]"), "{error}");
+            assert!(error.contains("impassable terrain"), "{error}");
         }
-        // A start on impassable terrain.
-        let mut on_rock = catalogue.clone();
-        let rock = (0..64)
-            .flat_map(|y| (0..64).map(move |x| sim::CellPos::new(x, y)))
-            .find(|&cell| {
-                on_rock.maps[0]
-                    .map
-                    .grid
-                    .cell(cell)
-                    .is_some_and(|terrain| !terrain.passable)
-            })
-            .expect("the demo map has impassable terrain");
-        on_rock.skirmish.maps[0].starts[0] = rock;
-        let error = check_catalogue(&on_rock, &root).expect_err("a start on rock");
-        assert!(error.contains("maps[0].starts[0]"), "{error}");
-        assert!(error.contains("impassable terrain"), "{error}");
 
         // An AI file whose build order needs a producer that a faction does not start with.
-        let mut no_yard = catalogue.clone();
+        let mut no_yard = legacy.clone();
         let power_plant = no_yard
             .definitions
             .building_kind("power_plant")
             .expect("power plant");
         no_yard.skirmish.factions[0].buildings[0].kind = power_plant;
-        let error = check_catalogue(&no_yard, &root).expect_err("no yard");
+        let error = check_catalogue(&no_yard, &legacy_dir).expect_err("no yard");
         for part in [
-            format!("data file {}", root.join(AI_PATH).display()),
+            format!("data file {}", legacy_dir.join("ai.ron").display()),
             "build_order[0]".to_string(),
             "whose producer \"construction_yard\" faction \"vanguard\"".to_string(),
         ] {
             assert!(error.contains(&part), "{error:?} lacks {part:?}");
         }
+        // A country always has the yard its base unit deploys into; the AI file fails it
+        // without a plan for its side.
+        let mut no_plan = catalogue.clone();
+        no_plan
+            .ai
+            .plans
+            .retain(|plan| plan.side != Some(sim::Side::Soviet));
+        let error = check_catalogue(&no_plan, &data).expect_err("no plan");
+        for part in [
+            format!("data file {}", root.join(AI_PATH).display()),
+            "plans".to_string(),
+            "plan for the side of faction \"libya\" \"soviet\" has no entry".to_string(),
+        ] {
+            assert!(error.contains(&part), "{error:?} lacks {part:?}");
+        }
 
         // A faction whose buildings do not fit at a start of a map: the match cannot be set up.
-        let mut too_far = catalogue.clone();
+        let mut too_far = legacy.clone();
         too_far.skirmish.factions[0].buildings[0].offset = (32, 0);
-        let error = check_catalogue(&too_far, &root).expect_err("off the map");
+        let error = check_catalogue(&too_far, &legacy_dir).expect_err("off the map");
+        for part in [
+            legacy_file.as_str(),
+            "map \"demo\": the match of faction \"vanguard\" against faction \"vanguard\"",
+            "starting building \"construction_yard\"",
+        ] {
+            assert!(error.contains(part), "{error:?} lacks {part:?}");
+        }
+        // Likewise a country with a starting building (which match setup places besides its
+        // base unit) off the map.
+        let mut too_far = catalogue.clone();
+        let yard = too_far
+            .definitions
+            .building_kind("construction_yard")
+            .expect("yard");
+        too_far.skirmish.factions[0]
+            .buildings
+            .push(sim::StartingBuilding {
+                kind: yard,
+                offset: (64, 0),
+            });
+        let error = check_catalogue(&too_far, &data).expect_err("off the map");
         for part in [
             skirmish_file.as_str(),
-            "map \"demo\": the match of faction \"vanguard\" against faction \"vanguard\"",
+            "map \"demo\": the match of faction \"america\" against faction",
             "starting building \"construction_yard\"",
         ] {
             assert!(error.contains(part), "{error:?} lacks {part:?}");
@@ -1923,7 +2166,19 @@ pub(crate) mod tests {
             // The same choices give the same map: a restart plays on it again.
             let (again, _) = match_plan(&catalogue, choice, 1).expect("a plan");
             assert_eq!((&again.grid, &again.looks), (&plan.grid, &plan.looks));
+            // Since RA1 every player starts with the base unit of its side and its starting
+            // units, and with the lobby's "start with an MCV" off with the yard it deploys into.
             let start = crate::sim_host::check_match(&plan).expect("the match sets up");
+            assert_eq!(
+                (start.units, start.buildings),
+                starting_totals(&catalogue, choice, true)
+            );
+            assert_eq!(start.buildings, 0, "a base unit each, no yard yet");
+            let yards = MatchPlan {
+                mcv_start: false,
+                ..plan.clone()
+            };
+            let start = crate::sim_host::check_match(&yards).expect("the match sets up");
             assert_eq!(start.buildings, enemies + 2, "a yard each");
         }
         let longest = MenuSelection {

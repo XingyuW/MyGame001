@@ -395,20 +395,31 @@ mod tests {
             let bytes = std::fs::read(assets_root().join(&sprite.asset_path)).expect("sprite");
             assert_eq!(sprite.bytes, bytes);
         }
-        // The starting buildings of every faction of the skirmish file (M6: data, D40) name
-        // defined building types.
+        // What every faction of the skirmish file starts with (M6: data, D40) names defined
+        // building types: its starting buildings, or for a country (RA1) the Construction Yard
+        // that the base unit of its side deploys into.
         let catalogue = crate::skirmish::tests::production_catalogue();
+        let rules = catalogue.definitions.rules().expect("rules");
         for faction in &catalogue.skirmish.factions {
-            assert!(!faction.buildings.is_empty());
-            for building in &faction.buildings {
+            let starting: Vec<sim::BuildingKind> = faction
+                .buildings
+                .iter()
+                .map(|building| building.kind)
+                .chain(
+                    faction
+                        .side
+                        .and_then(|side| rules.side(side))
+                        .map(|side| side.construction_yard),
+                )
+                .collect();
+            assert!(!starting.is_empty(), "{}", faction.id);
+            for kind in starting {
                 assert_eq!(
-                    definitions.building(building.kind),
-                    catalogue.definitions.building(building.kind)
+                    definitions.building(kind),
+                    catalogue.definitions.building(kind)
                 );
-                assert!(
-                    definitions.building(building.kind).is_some(),
-                    "{building:?}"
-                );
+                assert!(definitions.building(kind).is_some(), "{kind:?}");
+                assert!(faction.starts_with(&catalogue.definitions, kind));
             }
         }
     }
@@ -491,22 +502,20 @@ mod tests {
     #[test]
     fn the_demo_map_holds_the_starting_buildings_and_units() {
         // Match setup on the demo map (M6: `sim::setup_match` with the skirmish file, D40): every
-        // starting building of both factions fits, every starting unit still finds a free cell
-        // around its anchor and none stands on a building, and both players start with the
-        // skirmish file's credits.
+        // starting building of both factions fits (none since RA1: a country starts with its
+        // base unit), every starting unit still finds a free cell around its anchor and none
+        // stands on a building, and both players start with the skirmish file's credits.
         let catalogue = crate::skirmish::tests::production_catalogue();
         let selection = crate::skirmish::MenuSelection::initial(&catalogue);
         let host = crate::sim_host::tests::demo_host();
         let world = host.world();
         let grid = host.grid().expect("grid");
-        let expected_buildings: usize = selection
-            .players()
-            .iter()
-            .map(|setup| catalogue.skirmish.factions[setup.faction].buildings.len())
-            .sum();
+        let (expected_units, expected_buildings) =
+            crate::skirmish::starting_totals(&catalogue, selection, false);
         let mut buildings = world.try_query::<&Building>().expect("registered");
         assert_eq!(buildings.iter(world).count(), expected_buildings);
         let mut units = world.try_query::<&sim::Mobile>().expect("registered");
+        assert_eq!(units.iter(world).count(), expected_units);
         for mobile in units.iter(world) {
             assert_eq!(grid.building(mobile.cell), None);
         }

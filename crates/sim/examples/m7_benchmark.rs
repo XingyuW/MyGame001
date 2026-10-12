@@ -14,7 +14,8 @@
 //! 1. `fixture`: the fixture data and the 40 x 40 skirmish fixture map of the simulation's tests
 //!    (riflemen and tanks), so that the result does not depend on the shipped balance (I10);
 //! 2. `shipped`: the shipped data on the shipped demo map (64 x 64), each player with the armed
-//!    units of one faction's roster, so that the result is the shipped game's.
+//!    ground units of one side (the own tech tree of its first country), so that the result is
+//!    the shipped game's.
 //!
 //! After one warm-up tick (which builds the schedule), [`MEASURED_TICKS`] ticks are timed one by
 //! one with the clock (the harness reads the clock; the simulation never does, I4). The run fails
@@ -321,15 +322,7 @@ fn fixture_scenario() -> Result<Report, String> {
 
 fn shipped_scenario() -> Result<Report, String> {
     let data = repository().join("assets/data");
-    let definitions = load_match_definitions(
-        data.join("units.ron"),
-        data.join("economy.ron"),
-        data.join("combat.ron"),
-    )
-    .map_err(|error| error.to_string())?;
-    let definitions = definitions
-        .with_arsenal(data.join("arsenal.ron"))
-        .map_err(|error| error.to_string())?;
+    let definitions = sim::load_ruleset(&data).map_err(|error| error.to_string())?;
     let skirmish = load_skirmish(data.join("skirmish.ron"), &definitions)
         .map_err(|error| error.to_string())?;
     let demo = skirmish
@@ -344,7 +337,13 @@ fn shipped_scenario() -> Result<Report, String> {
     )
     .map_err(|error| error.to_string())?
     .grid;
-    // Each player fields the armed units of one faction's roster.
+    // Each player fields the armed ground units of one side: those of the own tech tree of its
+    // first country (RA1; ships and aircraft do not stand on the ground the scenario uses).
+    let groups = skirmish.pairing_groups();
+    let country = |side: usize| groups.get(side).and_then(|group| group.first()).copied();
+    let (Some(allied), Some(soviet)) = (country(0), country(1)) else {
+        return Err("the shipped skirmish file has no two sides".into());
+    };
     let armed = |faction: usize| -> Vec<String> {
         skirmish
             .factions
@@ -358,15 +357,16 @@ fn shipped_scenario() -> Result<Report, String> {
                         ProductionItem::Building(_) => None,
                     })
                     .filter(|&kind| {
-                        definitions
-                            .unit_combat(kind)
-                            .is_some_and(|terms| terms.weapon.is_some())
+                        definitions.domain(kind) == sim::Domain::Land
+                            && definitions
+                                .unit_combat(kind)
+                                .is_some_and(|terms| terms.weapon.is_some())
                     })
                     .filter_map(|kind| definitions.unit(kind).map(|def| def.id.clone()))
                     .collect()
             })
     };
-    let (first, second) = (armed(0), armed(1));
+    let (first, second) = (armed(allied), armed(soviet));
     if first.is_empty() || second.is_empty() {
         return Err("a shipped faction has no armed unit type".into());
     }

@@ -20,7 +20,7 @@ use sim::{
     AiDefinitions, AiPlayers, Building, CellPos, Controller, Definitions, EnlargedMap, Grid,
     MatchOutcome, MatchState, Mobile, Owner, PlayerId, PlayerSetup, Players, SimEvent, SimPlugin,
     SimSchedule, SkirmishDefinitions, axis_map, enlarged_map, enlarged_size, load_ai, load_map,
-    load_match_definitions, load_skirmish, map_asset_path, setup_match, state_hash,
+    load_ruleset, load_skirmish, map_asset_path, setup_match, state_hash,
 };
 
 fn assets() -> PathBuf {
@@ -35,13 +35,7 @@ struct Data {
 
 fn data() -> Data {
     let dir = assets().join("data");
-    let definitions = load_match_definitions(
-        dir.join("units.ron"),
-        dir.join("economy.ron"),
-        dir.join("combat.ron"),
-    )
-    .and_then(|definitions| definitions.with_arsenal(dir.join("arsenal.ron")))
-    .unwrap_or_else(|error| panic!("{error}"));
+    let definitions = load_ruleset(&dir).unwrap_or_else(|error| panic!("{error}"));
     let skirmish =
         load_skirmish(dir.join("skirmish.ron"), &definitions).unwrap_or_else(|e| panic!("{e}"));
     let ai = load_ai(dir.join("ai.ron"), &definitions).unwrap_or_else(|e| panic!("{e}"));
@@ -117,16 +111,44 @@ fn distance_squared(a: CellPos, b: CellPos) -> i64 {
     dx * dx + dy * dy
 }
 
-/// All computer players, one per start position, their factions alternating, at `difficulty`.
-fn computers(data: &Data, count: usize, difficulty: usize) -> Vec<PlayerSetup> {
+/// All computer players, one per start position, at `difficulty`: their sides alternating
+/// (the first of them playing side `shift`), each side played by its countries in turn (RA1,
+/// docs/DECISIONS.md R5; before, the two factions alternated).
+fn computers_from(data: &Data, count: usize, difficulty: usize, shift: usize) -> Vec<PlayerSetup> {
+    let groups = data.skirmish.pairing_groups();
     (0..count)
         .map(|k| PlayerSetup {
             player: PlayerId(k as u8),
-            faction: k % data.skirmish.factions.len(),
+            faction: sim::SkirmishDefinitions::rotating(
+                &groups[(k + shift) % groups.len()],
+                k / groups.len(),
+            )
+            .expect("a country"),
             start: k,
             controller: Controller::Ai { difficulty },
         })
         .collect()
+}
+
+fn computers(data: &Data, count: usize, difficulty: usize) -> Vec<PlayerSetup> {
+    computers_from(data, count, difficulty, 0)
+}
+
+/// How many starting units a player of `setup`'s country has with the lobby's default unit
+/// count (docs/RA2_PARITY_PLAN.md section 4.9), besides its base unit.
+fn starting_units(data: &Data, setup: &PlayerSetup) -> usize {
+    let side = data.skirmish.factions[setup.faction]
+        .side
+        .expect("a country");
+    let rules = data.definitions.rules().expect("rules");
+    sim::starting_units(
+        &data.skirmish,
+        &data.definitions,
+        side,
+        u32::try_from(rules.dialog.unit_count).expect("unit count"),
+        &mut sim::SimRng::new(0),
+    )
+    .len()
 }
 
 /// A match of `players` on map `map` enlarged for them, set up as the game sets it up
@@ -373,19 +395,47 @@ fn every_shipped_map_grows_with_every_player_count() {
                 }
             }
 
-            // The match sets up with every yard at its start, for either order of the factions.
-            for shift in 0..data.skirmish.factions.len() {
-                let mut players = computers(&data, players, 1);
-                for setup in &mut players {
-                    setup.faction = (setup.faction + shift) % data.skirmish.factions.len();
-                }
+            // The match sets up with every base unit at its start, for either order of the
+            // sides, and every computer player deploys it there in its first turns (RA1; before,
+            // the match was set up with the yards): every yard stands at its start.
+            for shift in 0..data.skirmish.pairing_groups().len() {
+                let players = computers_from(&data, players, 1, shift);
                 let (mut app, enlarged) = start(&data, map, &players, 0);
                 let world = app.world_mut();
-                let yards: BTreeMap<PlayerId, CellPos> = world
-                    .query::<(&Owner, &Building)>()
+                let bases: BTreeMap<PlayerId, CellPos> = world
+                    .query::<(&Owner, &sim::Unit, &Mobile)>()
                     .iter(world)
-                    .map(|(owner, building)| (owner.0, building.footprint.origin))
+                    .filter(|(_, unit, _)| {
+                        data.definitions
+                            .rules()
+                            .is_some_and(|rules| rules.is_base_unit(unit.kind))
+                    })
+                    .map(|(owner, _, mobile)| (owner.0, mobile.cell))
                     .collect();
+                for (k, setup) in players.iter().enumerate() {
+                    assert_eq!(
+                        bases.get(&setup.player),
+                        Some(&enlarged.starts[k]),
+                        "{name}"
+                    );
+                }
+                let mut yards: BTreeMap<PlayerId, CellPos> = BTreeMap::new();
+                for _ in 0..100 {
+                    world.run_schedule(SimSchedule);
+                    yards = world
+                        .query::<(&Owner, &Building)>()
+                        .iter(world)
+                        .filter(|(_, building)| {
+                            data.definitions.rules().is_some_and(|rules| {
+                                rules.side_of_construction_yard(building.kind).is_some()
+                            })
+                        })
+                        .map(|(owner, building)| (owner.0, building.footprint.origin))
+                        .collect();
+                    if yards.len() == players.len() {
+                        break;
+                    }
+                }
                 for (k, setup) in players.iter().enumerate() {
                     assert_eq!(
                         yards.get(&setup.player),
@@ -395,8 +445,7 @@ fn every_shipped_map_grows_with_every_player_count() {
                 }
                 let expected: usize = players
                     .iter()
-                    .flat_map(|setup| &data.skirmish.factions[setup.faction].units)
-                    .map(|group| group.count as usize)
+                    .map(|setup| starting_units(&data, setup))
                     .sum();
                 assert_eq!(
                     world.query::<&Mobile>().iter(world).count(),
@@ -518,9 +567,10 @@ fn ten_computer_players_build_bases_and_bring_in_ore_on_enlarged_maps() {
             );
             let placed = course.placed.get(&setup.player).copied().unwrap_or(0);
             let earned = course.earned.get(&setup.player).copied().unwrap_or(0);
-            // A power plant and a refinery at least, and ore from the field beside the base.
+            // The yard its base unit deployed into (RA1), a power plant and a refinery at least,
+            // and ore from the field beside the base.
             assert!(
-                placed >= 2,
+                placed >= 3,
                 "{name}: {placed} buildings placed\n{}",
                 report(world)
             );
@@ -558,9 +608,10 @@ fn a_ten_player_match_on_the_smallest_map_is_played_to_its_end() {
     );
     assert_eq!(course.defeated.len(), 9, "{:?}", course.defeated);
     // Every player at a made start position built a base before it fell or won.
+    // (the yard its base unit deployed into, and two buildings more, as before RA1)
     for setup in &players[data.skirmish.maps[map].starts.len()..] {
         assert!(
-            course.placed.get(&setup.player).copied().unwrap_or(0) >= 2,
+            course.placed.get(&setup.player).copied().unwrap_or(0) >= 3,
             "{:?}: {:?}",
             setup.player,
             course.placed

@@ -41,6 +41,15 @@ pub const UNITS_PATH: &str = "data/units.ron";
 /// The combat file, relative to the asset directory (M4).
 pub const COMBAT_PATH: &str = "data/combat.ron";
 
+/// The rules file, relative to the asset directory (RA1).
+pub const RULES_PATH: &str = "data/rules.ron";
+
+/// The arsenal file, relative to the asset directory.
+pub const ARSENAL_PATH: &str = "data/arsenal.ron";
+
+/// Directory of the data files, relative to the asset directory.
+pub const DATA_DIR: &str = "data";
+
 /// Directory of the unit sprite sheets, relative to the asset directory.
 pub const SPRITE_DIR: &str = "sprites/units";
 
@@ -287,7 +296,11 @@ pub struct LoadedUnits {
 /// Loads the unit definitions at `asset_root`/[`UNITS_PATH`] and checks the sprite sheet of
 /// every definition.
 pub fn load_units(asset_root: &Path) -> Result<LoadedUnits, SetupError> {
-    let units_file = asset_root.join(UNITS_PATH);
+    load_units_file(asset_root, asset_root.join(UNITS_PATH))
+}
+
+/// [`load_units`] of the units file `units_file`, with the sprites of `asset_root`.
+fn load_units_file(asset_root: &Path, units_file: PathBuf) -> Result<LoadedUnits, SetupError> {
     let definitions = sim::load_unit_definitions(&units_file).map_err(SetupError::Data)?;
     let (width, height) = sheet_size();
     let mut sheets = Vec::new();
@@ -314,20 +327,62 @@ pub fn load_units(asset_root: &Path) -> Result<LoadedUnits, SetupError> {
     })
 }
 
-/// Loads the unit definitions with the economy file (`crate::buildings::ECONOMY_PATH`) and the
-/// combat file ([`COMBAT_PATH`]), and checks the sprite of every unit and building type.
+/// Loads the unit definitions with the economy file (`crate::buildings::ECONOMY_PATH`), the
+/// combat file ([`COMBAT_PATH`]), the rules file ([`RULES_PATH`]) and the arsenal
+/// ([`ARSENAL_PATH`]), and checks the sprite of every unit and building type.
 pub fn load_match_data(
     asset_root: &Path,
+) -> Result<(LoadedUnits, Vec<CheckedBuildingSprite>), SetupError> {
+    let units = load_units(asset_root)?;
+    with_match_data(units, asset_root, &asset_root.join(DATA_DIR), true)
+}
+
+/// The file of the data directory `data` that the production path `path` (a file of
+/// [`DATA_DIR`]) names.
+pub(crate) fn data_file(data: &Path, path: &str) -> PathBuf {
+    data.join(Path::new(path).file_name().unwrap_or_default())
+}
+
+/// [`load_match_data`] of a ruleset whose data files lie in the directory `data`, under the file
+/// names of the production files, with the sprites of `asset_root`; `rules` says whether it has
+/// a rules file. For the tests of the legacy ruleset fixture (the data before RA1), which has
+/// none: the game itself always loads one.
+#[cfg(test)]
+pub(crate) fn load_ruleset_data(
+    asset_root: &Path,
+    data: &Path,
+    rules: bool,
+) -> Result<(LoadedUnits, Vec<CheckedBuildingSprite>), SetupError> {
+    let units = load_units_file(asset_root, data_file(data, UNITS_PATH))?;
+    with_match_data(units, asset_root, data, rules)
+}
+
+/// Adds the economy, combat and arsenal files of the data directory `data` to the loaded
+/// `units`, and with `rules` its rules file (without one, a world with the definitions behaves
+/// as before RA1), and checks the sprite of every building type under `asset_root`.
+fn with_match_data(
+    units: LoadedUnits,
+    asset_root: &Path,
+    data: &Path,
+    rules: bool,
 ) -> Result<(LoadedUnits, Vec<CheckedBuildingSprite>), SetupError> {
     let LoadedUnits {
         definitions,
         sheets,
-    } = load_units(asset_root)?;
-    let economy_file = asset_root.join(ECONOMY_PATH);
+    } = units;
+    let economy_file = data_file(data, ECONOMY_PATH);
     let definitions = definitions
         .with_economy(&economy_file)
-        .and_then(|definitions| definitions.with_combat(asset_root.join(COMBAT_PATH)))
-        .and_then(|definitions| definitions.with_arsenal(asset_root.join("data/arsenal.ron")))
+        .and_then(|definitions| definitions.with_combat(data_file(data, COMBAT_PATH)))
+        // The rules before the arsenal, which names their countries and groups (RA1).
+        .and_then(|definitions| {
+            if rules {
+                definitions.with_rules(data_file(data, RULES_PATH))
+            } else {
+                Ok(definitions)
+            }
+        })
+        .and_then(|definitions| definitions.with_arsenal(data_file(data, ARSENAL_PATH)))
         .map_err(SetupError::Data)?;
     let buildings = check_building_sprites(asset_root, &economy_file, &definitions)
         .map_err(SetupError::BuildingSprite)?;
@@ -916,16 +971,32 @@ mod tests {
             assert_eq!(sheet.bytes, file);
         }
         // The starting units of every faction of the skirmish file (M6: data, D40) name defined
-        // unit types, in groups of at least one.
+        // unit types, in groups of at least one; for a country (RA1) they are the base unit of
+        // its side and the starting unit types the skirmish file lists for the side.
         let catalogue = crate::skirmish::tests::production_catalogue();
+        let rules = catalogue.definitions.rules().expect("rules");
         for faction in &catalogue.skirmish.factions {
             for group in &faction.units {
-                assert_eq!(
-                    definitions.unit(group.kind),
-                    catalogue.definitions.unit(group.kind)
-                );
-                assert!(definitions.unit(group.kind).is_some(), "{group:?}");
                 assert!(group.count > 0);
+            }
+            let side = faction.side.and_then(|side| catalogue.skirmish.side(side));
+            let starting: Vec<UnitKind> = faction
+                .units
+                .iter()
+                .map(|group| group.kind)
+                .chain(
+                    faction
+                        .side
+                        .and_then(|side| rules.side(side))
+                        .map(|side| side.base_unit),
+                )
+                .chain(side.iter().flat_map(|side| &side.vehicles).copied())
+                .chain(side.iter().flat_map(|side| &side.infantry).copied())
+                .collect();
+            assert!(starting.len() > 1, "{}", faction.id);
+            for kind in starting {
+                assert_eq!(definitions.unit(kind), catalogue.definitions.unit(kind));
+                assert!(definitions.unit(kind).is_some(), "{kind:?}");
             }
         }
     }
@@ -946,17 +1017,19 @@ mod tests {
             let kind = sim::BuildingKind(u16::try_from(index).expect("index"));
             assert!(definitions.building_combat(kind).is_some(), "{index}");
         }
-        // The demo match has a defensive structure: a building type with a weapon.
-        let turret = definitions.building_kind("gun_turret").expect("turret");
-        assert!(
+        // The demo match has a defensive structure: a building type with a weapon (since RA1
+        // the Allied pillbox).
+        let armed = |kind: sim::BuildingKind| {
             definitions
-                .building_combat(turret)
+                .building_combat(kind)
                 .and_then(|terms| terms.weapon)
                 .is_some()
-        );
+        };
+        let turret = definitions.building_kind("pillbox").expect("turret");
+        assert!(armed(turret));
         // The computer player of the demo match builds it (M6: the starting buildings are data
         // of the skirmish file, and the computer player's buildings follow the AI file's build
-        // order, D40, D42).
+        // order, D40, D42); since RA1 the plan of each side builds an armed structure of its own.
         let catalogue = crate::skirmish::tests::production_catalogue();
         assert!(
             catalogue
@@ -965,6 +1038,13 @@ mod tests {
                 .iter()
                 .any(|plan| plan.build_order.contains(&turret))
         );
+        for plan in &catalogue.ai.plans {
+            assert!(
+                plan.build_order.iter().any(|&kind| armed(kind)),
+                "{:?}",
+                plan.side
+            );
+        }
     }
 
     fn fixture_grid(name: &str) -> Grid {
@@ -980,31 +1060,56 @@ mod tests {
     fn the_demo_map_holds_every_starting_unit_on_its_own_free_cell() {
         // M6: the starting units are those of the skirmish file's factions at the map's start
         // positions, placed by `sim::setup_match` (D40). Every one of them gets its own passable
-        // cell, none on a building, and every group is complete.
+        // cell, none on a building, and every group is complete. Since RA1 the factions are
+        // countries: a player starts with the starting units of its side for the lobby's unit
+        // count (`sim::starting_units`), and with the base unit of its side as the menu starts
+        // the match (`menu_host`) or the yard it deploys into (`demo_host`).
         let catalogue = crate::skirmish::tests::production_catalogue();
         let selection = crate::skirmish::MenuSelection::initial(&catalogue);
-        let host = crate::sim_host::tests::demo_host();
-        let world = host.world();
-        let grid = host.grid().expect("grid");
-        let mut units = world
-            .try_query::<(&Owner, &Unit, &Mobile)>()
-            .expect("registered");
-        let mut cells = BTreeSet::new();
-        let mut placed: BTreeMap<(PlayerId, UnitKind), u32> = BTreeMap::new();
-        for (owner, unit, mobile) in units.iter(world) {
-            assert!(cells.insert(mobile.cell), "cells are distinct");
-            assert!(grid.is_passable(mobile.cell));
-            assert_eq!(grid.building(mobile.cell), None);
-            *placed.entry((owner.0, unit.kind)).or_insert(0) += 1;
-        }
-        let mut expected: BTreeMap<(PlayerId, UnitKind), u32> = BTreeMap::new();
-        for setup in selection.players() {
-            for group in &catalogue.skirmish.factions[setup.faction].units {
-                *expected.entry((setup.player, group.kind)).or_insert(0) += group.count;
+        let rules = catalogue.definitions.rules().expect("rules");
+        let unit_count = u32::try_from(rules.dialog.unit_count).expect("unit count");
+        for mcv_start in [false, true] {
+            let host = if mcv_start {
+                crate::sim_host::tests::menu_host()
+            } else {
+                crate::sim_host::tests::demo_host()
+            };
+            let world = host.world();
+            let grid = host.grid().expect("grid");
+            let mut units = world
+                .try_query::<(&Owner, &Unit, &Mobile)>()
+                .expect("registered");
+            let mut cells = BTreeSet::new();
+            let mut placed: BTreeMap<(PlayerId, UnitKind), u32> = BTreeMap::new();
+            for (owner, unit, mobile) in units.iter(world) {
+                assert!(cells.insert(mobile.cell), "cells are distinct");
+                assert!(grid.is_passable(mobile.cell));
+                assert_eq!(grid.building(mobile.cell), None);
+                *placed.entry((owner.0, unit.kind)).or_insert(0) += 1;
             }
+            let mut expected: BTreeMap<(PlayerId, UnitKind), u32> = BTreeMap::new();
+            for setup in crate::skirmish::match_players(&catalogue, selection) {
+                let faction = &catalogue.skirmish.factions[setup.faction];
+                for group in &faction.units {
+                    *expected.entry((setup.player, group.kind)).or_insert(0) += group.count;
+                }
+                let side = faction.side.expect("a country");
+                let base = rules.side(side).expect("side").base_unit;
+                let starting = sim::starting_units(
+                    &catalogue.skirmish,
+                    &catalogue.definitions,
+                    side,
+                    unit_count,
+                    &mut sim::SimRng::new(0),
+                );
+                assert!(!starting.is_empty(), "{}", faction.id);
+                for kind in starting.into_iter().chain(mcv_start.then_some(base)) {
+                    *expected.entry((setup.player, kind)).or_insert(0) += 1;
+                }
+            }
+            assert!(!expected.is_empty());
+            assert_eq!(placed, expected, "MCV start: {mcv_start}");
         }
-        assert!(!expected.is_empty());
-        assert_eq!(placed, expected);
         // The M2 demo groups still fit the demo map, each unit on its own passable cell.
         let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .join("../../assets")

@@ -26,7 +26,8 @@
 //! of unit ids (`definitions::check_name`) and are unique within their list; every building and
 //! unit named (the members of a prerequisite group, a side's base unit, construction yard, crew,
 //! disguise and paradrop infantry) is defined by the units and economy files; `sides` lists
-//! `allied` and `soviet` at most once each, and every country names a listed side. A load error
+//! `allied` and `soviet` at most once each, no two sides share a base unit or a construction
+//! yard, and every country names a listed side. A load error
 //! names the file, the field, and the reason.
 //!
 //! RA1 consumes `sides` (the base unit and the construction yard it deploys into), `countries`,
@@ -906,13 +907,23 @@ fn validate(file: RulesFile, definitions: &Definitions) -> Result<Rules, Problem
         }
         let base_unit = unit(field("base_unit"), &entry.base_unit)?;
         let construction_yard = building(field("construction_yard"), &entry.construction_yard)?;
-        if sides.iter().any(|known| {
-            known.base_unit == base_unit || known.construction_yard == construction_yard
-        }) {
+        // Deploying and undeploying map a base unit to its yard and back, so neither may
+        // belong to two sides.
+        if sides.iter().any(|known| known.base_unit == base_unit) {
             return Err(invalid(
                 field("base_unit"),
                 format!("{:?}", entry.base_unit),
-                "a base unit and a construction yard no other side has",
+                "a base unit no other side has",
+            ));
+        }
+        if sides
+            .iter()
+            .any(|known| known.construction_yard == construction_yard)
+        {
+            return Err(invalid(
+                field("construction_yard"),
+                format!("{:?}", entry.construction_yard),
+                "a construction yard no other side has",
             ));
         }
         sides.push(SideRules {

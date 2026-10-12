@@ -1,1 +1,19 @@
 game_id	field	game_value	reference_value	reason
+airport	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA5 (tech building)
+attack_dog	forbidden_countries		British,French,Germans,Americans,Alliance	Engineers and attack dogs of the two sides differ only in ForbiddenHouses in the ini; the game keeps one type that any barracks trains (docs/RA2_PARITY_PLAN.md section 3.3)
+attack_dog	forbidden_countries		Russians,Confederation,Africans,Arabs	Engineers and attack dogs of the two sides differ only in ForbiddenHouses in the ini; the game keeps one type that any barracks trains (docs/RA2_PARITY_PLAN.md section 3.3)
+bridge_hut	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA5 (bridge repair hut)
+chrono_commando	tech_level	-1	9	The ini gates the unit with RequiresStolenAlliedTech or RequiresStolenSovietTech; until spy infiltration unlocks it in RA6 it is in the data with tech level -1, which cannot be queued
+chrono_ivan	tech_level	-1	9	The ini gates the unit with RequiresStolenAlliedTech or RequiresStolenSovietTech; until spy infiltration unlocks it in RA6 it is in the data with tech level -1, which cannot be queued
+dred_missile	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA4 (spawned missile)
+engineer	forbidden_countries		British,French,Germans,Americans,Alliance	Engineers and attack dogs of the two sides differ only in ForbiddenHouses in the ini; the game keeps one type that any barracks trains (docs/RA2_PARITY_PLAN.md section 3.3)
+engineer	forbidden_countries		Russians,Confederation,Africans,Arabs	Engineers and attack dogs of the two sides differ only in ForbiddenHouses in the ini; the game keeps one type that any barracks trains (docs/RA2_PARITY_PLAN.md section 3.3)
+hornet	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA4 (carrier aircraft)
+hospital	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA5 (tech building)
+oil_derrick	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA5 (tech building)
+osprey	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA4 (destroyer aircraft)
+paradrop_plane	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA6 (paradrop)
+psi_commando	tech_level	-1	9	The ini gates the unit with RequiresStolenAlliedTech or RequiresStolenSovietTech; until spy infiltration unlocks it in RA6 it is in the data with tech level -1, which cannot be queued
+tech_outpost	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA5 (tech building)
+v3_rocket	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA4 (spawned missile)
+yuri_prime	tech_level	-1	9	The ini gates the unit with RequiresStolenAlliedTech or RequiresStolenSovietTech; until spy infiltration unlocks it in RA6 it is in the data with tech level -1, which cannot be queued

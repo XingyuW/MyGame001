@@ -17,5 +17,6 @@
         (id: "heavy", speed: 24, sprite: "heavy"),
         (id: "miner_a", speed: 32, sprite: "miner"),
         (id: "miner_s", speed: 32, sprite: "miner"),
+        (id: "hovercraft", speed: 32, sprite: "hovercraft"),
     ],
 )

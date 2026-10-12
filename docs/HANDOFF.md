@@ -154,7 +154,7 @@ The ordered stages are Commands → AI → Economy → Pathfinding → Movement 
 | Economy | `economy.rs`, `economy_commands.rs`, `building.rs`, `harvest.rs` in sim |
 | Combat/visibility/AI | `combat.rs`, `combat_defs.rs`, `visibility.rs`, `ai*.rs`, `match_setup.rs` in sim |
 | Arsenal and specialists | `crates/sim/src/arsenal.rs`, `special.rs`; `assets/data/arsenal.ron` |
-| Data and regeneration | `assets/data/*.ron`, `scripts/generate_arsenal.py` |
+| Data and regeneration | `assets/data/*.ron`, `scripts/generate_ra2_data.py` (from `crates/sim/tests/reference/`) |
 | Input and UI | `crates/game/src/camera.rs`, `selection.rs`, `sidebar.rs`, `construction.rs`, `special_controls.rs`, `skirmish.rs` |
 | Rendering | `crates/game/src/hd_art.rs`, `battlefield.rs` (layered terrain), `presentation.rs` (team paint), `units.rs`, `buildings.rs`, `fog.rs`, `minimap.rs` |
 | Art pipeline | `scripts/generate_hd_art.py` (model definitions), `render_hd_blender.py`, `finish_hd_art.py`, `generate_hd_terrain.py` |

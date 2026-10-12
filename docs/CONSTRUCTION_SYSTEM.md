@@ -110,7 +110,7 @@ there are no imported RA2 graphics or bespoke art for each new entity.
 
 | Files | Responsibility |
 |---|---|
-| `assets/data/arsenal.ron`, `scripts/generate_arsenal.py` | Checked category/domain/role metadata and reproducible 72-item balance generation. |
+| `assets/data/arsenal.ron`, `scripts/generate_ra2_data.py` | Checked category/domain/role metadata and, since RA1, the terms of the buildability rule; every shipped data file is generated from the committed RA2 reference tables (`crates/sim/tests/reference/`). |
 | `assets/data/{units,economy,combat}.ron`, `assets/LICENSES.md` | Shared production, prerequisites, health, armor, weapons, economics and provenance. |
 | `crates/sim/src/{arsenal,special}.rs` | Metadata loading; specialist state, abilities, interaction, transport, reconnaissance and carrier sorties. |
 | `crates/sim/src/{definitions,data,combat_defs,lib,hash,schedule,event}.rs` | Bounded validation, public APIs, schedule integration, events and deterministic hashing. |

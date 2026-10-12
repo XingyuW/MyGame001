@@ -867,6 +867,49 @@ fn in_a_long_game_a_player_is_defeated_only_without_buildings_and_units() {
 }
 
 #[test]
+fn a_base_unit_carried_by_a_transport_still_counts_for_its_owner() {
+    // P1 has nothing but its base unit, which boards a transport of its own (scenario setup:
+    // the hovercraft beside it): as a passenger it is no entity of the map, and still its owner
+    // is not defeated. When the transport is destroyed its passenger is lost with it.
+    let data = data();
+    let mut app = duel(
+        &data,
+        &MatchOptions {
+            unit_count: Some(0),
+            ..MatchOptions::default()
+        },
+    );
+    let hovercraft =
+        spawn_unit(app.world_mut(), P1, "hovercraft", CellPos::new(33, 32)).expect("a hovercraft");
+    let tanks = [(34, 31), (34, 32), (34, 33)]
+        .map(|(x, y)| spawn_unit(app.world_mut(), P0, "tank", CellPos::new(x, y)).expect("a tank"))
+        .to_vec();
+    tick(&mut app, Vec::new());
+    let mcv = base_unit(&mut app, P1);
+    let events = tick(
+        &mut app,
+        vec![issued(
+            P1,
+            Command::Interact {
+                unit: mcv,
+                target: hovercraft,
+            },
+        )],
+    );
+    assert_eq!(rejections(&events), NONE);
+    assert_eq!(unit_counts(&mut app, P1), counts(&[("hovercraft", 1)]));
+    for _ in 0..5 {
+        tick(&mut app, Vec::new());
+    }
+    assert_eq!(app.world().resource::<MatchState>().defeated(P1), None);
+    assert_eq!(app.world().resource::<MatchState>().outcome(), None);
+    destroy(&mut app, &tanks, hovercraft);
+    let state = app.world().resource::<MatchState>().clone();
+    assert!(state.defeated(P1).is_some());
+    assert!(matches!(state.outcome(), Some(MatchOutcome::Won { winner, .. }) if winner == P0));
+}
+
+#[test]
 fn a_player_with_buildings_lives_without_any_unit_in_both_games() {
     let data = data();
     for short_game in [true, false] {
