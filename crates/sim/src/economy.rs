@@ -4,7 +4,8 @@
 //! Each player has credits, the power its buildings produce and consume, and one production
 //! queue per producing building type, or per factory group where the arsenal defines one (RA1,
 //! `Definitions::queue_key`). Only the item at the head of a queue progresses, and only while the
-//! player owns a building that produces it (`economy_commands::produces`) and its prerequisites. On each tick in which it progresses, an
+//! player owns a building that produces it (`economy_commands::produces`) and its
+//! prerequisites. On each tick in which it progresses, an
 //! item of cost `C` and build time `T` is charged `C / T` credits, and on its last tick
 //! `C / T + C mod T`, so the total charged is exactly `C` (equation 3, invariant I7). An item
 //! does not progress on a tick in which the player's credits are below that tick's charge, so
@@ -301,7 +302,8 @@ impl Players {
     /// Every player in id order: id, credits, power produced and consumed, then each queue
     /// (producing building type, item count, and per item its kind tag and index, progress,
     /// and credits charged), then the vision (from M4), then the roster (from M7: a flag byte, and
-    /// with a roster its length and each item's kind tag and index).
+    /// with a roster its length and each item's kind tag and index), the buildings being
+    /// repaired, and the country (from RA1: its index, or 255 for none).
     pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
         hasher.write_u64(self.players.len() as u64);
         for (player, state) in &self.players {

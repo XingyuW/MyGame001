@@ -1,7 +1,7 @@
 //! Follow-up of 2026-10-05: unlock paths, the "unlock all" match option and several independent
 //! computer players, with the legacy ruleset fixture (the data shipped before the RA2 parity
-//! programme, arsenal included: `crates/sim/tests/fixtures/data/legacy`, docs/DECISIONS.md R9) on
-//! the shipped maps.
+//! programme, arsenal included: `crates/sim/tests/fixtures/data/legacy`, docs/DECISIONS.md R15)
+//! on the shipped maps.
 //!
 //! Every test drives the simulation only through the player's commands (`CommandQueue`), as the
 //! interface does: production is queued, progresses, is placed or leaves its producer, and the
