@@ -39,7 +39,8 @@
 //! every building of the build order is defined, and its prerequisites are listed before it; the
 //! power building produces power and has no prerequisites, so that it can be queued whenever
 //! power is short; the harvester is a harvester type with production terms; every army unit type
-//! has production terms and a weapon; the producer and the prerequisites of the harvester and of
+//! has production terms and a weapon and is no harvester (an armed harvester mines); the
+//! producer and the prerequisites of the harvester and of
 //! every army unit type are listed in the build order, so that a computer player can obtain them
 //! and rebuild them; and for the armour class of every building type some army unit's weapon
 //! deals damage (equation 2 above 0), so that the army can destroy every building and a match
@@ -739,6 +740,15 @@ fn check_plan(
                 field,
                 of(format!("{id:?}")),
                 "an armed unit type with production terms",
+            ));
+        }
+        // An armed harvester (the War Miner) mines: the computer player never sends it to
+        // fight (`crate::ai`), so it is no army unit.
+        if definitions.harvester(kind).is_some() {
+            return Err(invalid(
+                field,
+                of(format!("{id:?}, which is a harvester")),
+                "an armed unit type that does not harvest",
             ));
         }
         obtainable(definitions, &kinds, &field, &id, kind)

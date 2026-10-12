@@ -276,3 +276,67 @@ fn crossroads_armies_finish_after_new_terrain_changes() {
     let outcome = run(app.world_mut(), "crossroads regression", MATCH_TICK_LIMIT);
     assert!(matches!(outcome, Some(MatchOutcome::Won { .. })));
 }
+
+/// One match of two computer players on a shipped map: the countries `countries` at the
+/// difficulties `difficulties` of the AI file, played to its end within the tick limit.
+fn duel(map: &str, countries: [&str; 2], difficulties: [&str; 2]) -> Option<MatchOutcome> {
+    let data = assets().join("data");
+    let d = load_ruleset(&data).unwrap();
+    let sk = load_skirmish(data.join("skirmish.ron"), &d).unwrap();
+    let ai = load_ai(data.join("ai.ron"), &d).unwrap();
+    let index = sk.maps.iter().position(|def| def.id == map).unwrap();
+    let grid = load_map(assets().join(map_asset_path(map))).unwrap().grid;
+    let limit = tick_limit(&grid);
+    let mut app = bevy::app::App::new();
+    app.add_plugins(SimPlugin { seed: 0 });
+    app.world_mut().insert_resource(grid);
+    app.world_mut().insert_resource(d);
+    let players = [0, 1].map(|k| PlayerSetup {
+        player: PlayerId(k as u8),
+        faction: sk
+            .factions
+            .iter()
+            .position(|faction| faction.id == countries[k])
+            .unwrap(),
+        start: k,
+        controller: Controller::Ai {
+            difficulty: ai
+                .difficulties
+                .iter()
+                .position(|difficulty| difficulty.id == difficulties[k])
+                .unwrap(),
+        },
+    });
+    setup_match(app.world_mut(), &sk, &ai, index, &players).unwrap();
+    let name = format!("{map}: {countries:?} at {difficulties:?}");
+    run(app.world_mut(), &name, limit)
+}
+
+#[test]
+fn a_soviet_player_left_with_an_armed_miner_still_finishes_the_match() {
+    // Regression (RA1, found by `m14_duels -- full`): on riverlands France (brutal) and Cuba
+    // (easy) wore each other down until neither had an army, a producer of one, or income, and
+    // Cuba was left with a War Miner that had nothing to mine. The match never ended (300,000
+    // ticks). An armed harvester whose cycle has stopped fights when its player has no other
+    // armed unit (`crates/sim/src/ai.rs`, `View::fights`; docs/DECISIONS.md R14).
+    let outcome = duel("riverlands", ["france", "cuba"], ["brutal", "easy"]);
+    assert!(
+        matches!(outcome, Some(MatchOutcome::Won { .. })),
+        "{outcome:?}"
+    );
+}
+
+#[test]
+fn the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first() {
+    // Regression (RA1, found by `m14_duels -- full`): on crossroads Libya and Iraq (both easy)
+    // needed 39,983 ticks, more than the limit of 36,000: for the last 13,000 the winner's wave,
+    // formed at its own base, swept the waypoints nearest to itself for three buildings that
+    // stood beside the loser's start. With the slower units of RA1 (docs/DECISIONS.md R7) that
+    // wandering no longer fits the limit, so a sweep starts near the enemy's start on every map
+    // (`crates/sim/src/ai.rs`, `choose_target`; R14).
+    let outcome = duel("crossroads", ["libya", "iraq"], ["easy", "easy"]);
+    assert!(
+        matches!(outcome, Some(MatchOutcome::Won { .. })),
+        "{outcome:?}"
+    );
+}

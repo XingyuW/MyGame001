@@ -4479,10 +4479,17 @@ fn ai_plan_entries_can_be_obtained_through_the_build_order() {
             armed,
         ),
         (
+            &[(ALLIED_ARMY, r#"army: ["miner_a"],"#)],
+            "plans[0].army[0]",
+            r#""miner_a""#,
+            armed,
+        ),
+        // The Soviet miner is armed, and still no army unit: a harvester mines.
+        (
             &[(SOVIET_ARMY, r#"army: ["miner_s"],"#)],
             "plans[1].army[0]",
-            r#""miner_s""#,
-            armed,
+            r#""miner_s", which is a harvester"#,
+            "an armed unit type that does not harvest",
         ),
         (
             &[(ALLIED_ARMY, r#"army: ["tank", "militia", "rifleman"],"#)],

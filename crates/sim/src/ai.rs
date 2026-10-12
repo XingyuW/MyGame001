@@ -33,10 +33,14 @@
 //!    harvesters back to work, at most once every [`HARVEST_RETRY_TICKS`];
 //! 5. defends: visible enemies within `defence_radius` of its buildings are attacked by its army
 //!    at home; otherwise idle units at home gather at the gathering point;
+//!
+//!    Its army is its armed units that are no harvesters: an armed harvester mines, and fights
+//!    only as a last resort ([`View::fights`], RA1).
 //! 6. attacks: from tick `first_wave`, once `wave_size` armed units are at home, or any after
 //!    `wave_patience` more ticks, they join the attack wave, which attack-moves to the nearest
 //!    building it remembers, else to an enemy start position it has never seen, else sweeps the
-//!    map's waypoints, the one seen longest ago first; a wave reduced below half the wave size
+//!    map's waypoints, those seen longest ago first and among them the one nearest to an enemy
+//!    start position ([`choose_target`]); a wave reduced below half the wave size
 //!    falls back to the gathering point and rejoins the units at home. On large maps (more than
 //!    [`ARMY_SCALE_SPAN`] cells wide and high together) a new wave first passes a staging waypoint
 //!    beside the direct route, on alternating sides ([`staging_point`]), so that the waves of two
@@ -505,6 +509,7 @@ struct UnitSnap {
     mobile: Mobile,
     has_order: bool,
     harvest: Option<HarvestState>,
+    /// Whether it has a weapon. Whether it belongs to the army is [`View::fights`].
     armed: bool,
     attacking: bool,
     sight: Option<u32>,
@@ -542,6 +547,8 @@ struct View<'a> {
     superweapons: bool,
     /// The types of the player's buildings, one entry per building.
     own_kinds: Vec<BuildingKind>,
+    /// Whether the player has no armed unit other than harvesters ([`View::fights`]).
+    last_resort: bool,
     own_units: Vec<&'a UnitSnap>,
     own_buildings: Vec<&'a BuildingSnap>,
     /// Other players' units its player sees.
@@ -575,6 +582,9 @@ impl<'a> View<'a> {
             definitions,
             ai,
             superweapons,
+            last_resort: !units
+                .iter()
+                .any(|unit| unit.owner == player && unit.armed && unit.harvest.is_none()),
             own_kinds: buildings
                 .iter()
                 .filter(|building| building.owner == player)
@@ -603,6 +613,20 @@ impl<'a> View<'a> {
             .iter()
             .filter(|building| building.kind == kind)
             .count()
+    }
+
+    /// Whether `unit` (one of the player's) belongs to its army: it has a weapon and is no
+    /// harvester. An armed harvester (the Soviet War Miner) mines: drafted into the army it
+    /// would be called to the gathering point and into the waves, and its player would earn
+    /// nothing. Only as a last resort does it fight: while the player has no other armed unit
+    /// and the harvester's cycle has stopped (no ore or no refinery it can reach), so that a
+    /// player left with nothing else still attacks (RA1, docs/DECISIONS.md R14).
+    fn fights(&self, unit: &UnitSnap) -> bool {
+        unit.armed
+            && match unit.harvest {
+                None => true,
+                Some(state) => self.last_resort && state == HarvestState::Idle,
+            }
     }
 
     /// Whether the player could produce `item` now, as far as `QueueProduction` checks it
@@ -812,7 +836,7 @@ fn think(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
     }
     // While it sells buildings to fund an army unit, and until it has one, it does not queue
     // buildings, which would take the credits first.
-    if view.own_units.iter().any(|unit| unit.armed) {
+    if view.own_units.iter().any(|unit| view.fights(unit)) {
         controller.liquidating = false;
     }
     if broke(view) {
@@ -1111,7 +1135,7 @@ fn visible_ore(view: &View<'_>) -> Vec<CellPos> {
 /// produce). Without income its credits will not grow, so a match between such players would never
 /// end (docs/DECISIONS.md D43).
 fn broke(view: &View<'_>) -> bool {
-    if view.own_units.iter().any(|unit| unit.armed)
+    if view.own_units.iter().any(|unit| view.fights(unit))
         || view.own_units.iter().any(|unit| {
             unit.harvest
                 .is_some_and(|state| state != HarvestState::Idle)
@@ -1271,7 +1295,11 @@ fn queue_units(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
     }
 
     let army = &view.ai.army;
-    let mut total = view.own_units.iter().filter(|unit| unit.armed).count()
+    let mut total = view
+        .own_units
+        .iter()
+        .filter(|unit| view.fights(unit))
+        .count()
         + army
             .iter()
             .collect::<BTreeSet<_>>()
@@ -1369,7 +1397,7 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
     let armed: BTreeMap<SimId, &UnitSnap> = view
         .own_units
         .iter()
-        .filter(|unit| unit.armed)
+        .filter(|unit| view.fights(unit))
         .map(|unit| (unit.id, *unit))
         .collect();
     controller.wave.retain(|id| armed.contains_key(id));
@@ -1617,7 +1645,8 @@ fn centroid(units: &[&UnitSnap], fallback: CellPos) -> CellPos {
 }
 
 /// The nearest remembered building that the wave has not failed to reach too often; else the
-/// nearest enemy start position never seen; else the waypoint seen longest ago, nearest first.
+/// nearest enemy start position never seen; else the waypoint of the era seen longest ago that
+/// is nearest to an enemy start position, then to the wave.
 fn choose_target(controller: &AiController, from: CellPos) -> Option<WaveTarget> {
     let building = controller
         .known
@@ -1644,9 +1673,12 @@ fn choose_target(controller: &AiController, from: CellPos) -> Option<WaveTarget>
     if unseen_start.is_some() {
         return unseen_start;
     }
-    // On large maps a sweep looks near the enemy starts first, where its remaining buildings
-    // most likely stand, among the waypoints of the same era of last sight; a sweep in order of
-    // distance alone wanders the far corners of the map for a long time.
+    // A sweep looks near the enemy starts first, where its remaining buildings most likely
+    // stand, among the waypoints of the same era of last sight; a sweep in order of distance
+    // from the wave alone starts at the wave's own base when the wave forms there, and wanders
+    // the far corners of the map for a long time. (On the large maps since "Large maps with
+    // environments"; on every map since RA1, whose slower units made the wandering of the
+    // small maps cost a third of a match: docs/DECISIONS.md R14.)
     let near_enemy = |cell: CellPos| {
         controller
             .waypoints
@@ -1661,29 +1693,19 @@ fn choose_target(controller: &AiController, from: CellPos) -> Option<WaveTarget>
         .iter()
         .enumerate()
         .min_by_key(|(_, waypoint)| {
-            if controller.flank {
-                (
-                    waypoint.seen / SWEEP_ERA_TICKS,
-                    near_enemy(waypoint.cell),
-                    octile_distance(from, waypoint.cell),
-                    waypoint.cell.y,
-                    waypoint.cell.x,
-                )
-            } else {
-                (
-                    waypoint.seen,
-                    0,
-                    octile_distance(from, waypoint.cell),
-                    waypoint.cell.y,
-                    waypoint.cell.x,
-                )
-            }
+            (
+                waypoint.seen / SWEEP_ERA_TICKS,
+                near_enemy(waypoint.cell),
+                octile_distance(from, waypoint.cell),
+                waypoint.cell.y,
+                waypoint.cell.x,
+            )
         })
         .map(|(index, _)| WaveTarget::Waypoint(index))
 }
 
-/// Large maps: waypoints last seen within the same span of ticks (five minutes) count as equally
-/// stale when a wave sweeps for buildings it does not know.
+/// Waypoints last seen within the same span of ticks (five minutes) count as equally stale when
+/// a wave sweeps for buildings it does not know.
 pub const SWEEP_ERA_TICKS: u64 = 6000;
 
 /// The cell the wave attack-moves to for its target.

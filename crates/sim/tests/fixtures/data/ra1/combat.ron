@@ -1,5 +1,6 @@
 // RA1 fixture: combat terms of the small two sided world. Bullets harm infantry and, a little,
-// buildings; shells harm everything. Fixture data (invariant I10).
+// buildings; shells harm everything. The Soviet miner is armed, as the War Miner is. Fixture
+// data (invariant I10).
 (
     schema_version: 1,
     armour_classes: ["flesh", "plate", "concrete"],
@@ -27,7 +28,7 @@
         (unit: "tank", hit_points: 300, armour: "plate", sight: 7, weapons: ["cannon"]),
         (unit: "heavy", hit_points: 400, armour: "plate", sight: 7, weapons: ["big_cannon"]),
         (unit: "miner_a", hit_points: 400, armour: "plate", sight: 4, weapons: []),
-        (unit: "miner_s", hit_points: 400, armour: "plate", sight: 4, weapons: []),
+        (unit: "miner_s", hit_points: 400, armour: "plate", sight: 4, weapons: ["rifle"]),
         (unit: "hovercraft", hit_points: 200, armour: "plate", sight: 5, weapons: []),
     ],
     buildings: [
