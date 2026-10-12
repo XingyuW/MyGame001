@@ -79,6 +79,139 @@ the heap of one match. `docs/screenshots/` (477 MB of captures) is committed as 
 R7 (units move at RA2's nominal speed, slower than before) change what the user asked for or was
 used to and are repeated in the final report.
 
+### RA1: sides, countries and match setup (2026-10-12)
+
+Carried out in three parts by three implementers: RA1-A (the reference tables), RA1-B (data,
+simulation, tests, examples and the minimum in the game) and RA1-C (the game client). Commits
+`13ebadc` to `617077c` and the commit of this entry.
+
+**What was done.**
+- *Reference and pipeline (RA1-A, RA1-B; R9).* `scripts/ra2_ini.py` and `scripts/ra2_reference.py`
+  extract the numbers, flags and identifiers of the mapped ini sections into
+  `crates/sim/tests/reference/ra2_reference.tsv` (4,788 rows), with `ra2_mapping.tsv` and
+  `ra2_differences.tsv` (18 intentional differences). `scripts/generate_ra2_data.py` (which
+  replaces `generate_arsenal.py`) writes all seven files of `assets/data/` from those tables;
+  it never reads the ini files, and every ported value carries its ini section and key.
+  `crates/sim/tests/ra9_data_parity.rs` recomputes the conversions and fails on any unexplained
+  difference in cost, strength, sight, speed, prerequisites, power, sell value, owner and
+  country rules, tech level, every value of `rules.ron` and the ported values of `skirmish.ron`.
+- *Data.* `rules.ron` (new, schema 1: the global values, prerequisite groups, sides, countries,
+  the lobby); `arsenal.ron` schema 2 (art, side, factory group, owner sides, required and
+  forbidden countries, tech level, prerequisite groups); `skirmish.ron` schema 3 (the nine
+  countries, starting unit types per side, 10000 credits); `ai.ron` schema 2 (a plan per side,
+  difficulties easy, medium, brutal). The eleven side split ids of plan section 3.3 and the
+  four stolen technology units exist; the Vanguard and Meridian armies and their twelve items
+  left the shipped data and live on in `crates/sim/tests/fixtures/data/legacy/`, with the tests
+  that asserted them (R15).
+- *Simulation (RA1-B; R10, R12, R13, R14).* The buildability rule of Red Alert 2
+  (`check_buildable`: prerequisites and groups, a factory of the item's kind and of an owner
+  side, the country) with the reject reasons `NoFactoryOfSide`, `CountryRequired`,
+  `CountryForbidden`, `DisabledByOptions`; a queue per factory group. `MatchOptions` with the
+  lobby's defaults: random countries from `SimRng`, starting credits 5000 to 10000, unit count 0
+  to 10 with the starting units of plan section 4.9, MCV start, short and long game,
+  superweapons, crates (no effect yet), MCV repacks, free for all. `Command::Undeploy` and
+  `SimEvent::BuildingUndeployed`. The computer player has a plan per side, deploys its base
+  unit, keeps armed miners mining and sweeps near the enemy's start first.
+- *Game (RA1-C; R17 to R21).* The menu is the lobby: two columns of rows (map, enemy players,
+  team mode, map growth, game speed, team colour, credits, unit count; MCV start, short game,
+  superweapons, crates, MCV repacks, Super Me, unit speed, tech tree) and the PLAYERS panel with
+  a country for every player (the nine with their side, or RANDOM) and a difficulty for every
+  computer player. MAP GROWTH is off at first (R4): the map is played as filed, with at most as
+  many enemies as the file has further start positions. The countries the simulation drew are
+  read back: a notice names the human player's, the notices and the hover label say "Blue
+  Player (France)", and a list of the players with their countries is shown while the match is
+  paused or over. The end screen says what decided the match by the short or the long game. The
+  sidebar lists only what a building of the player could build, with what is within its reach
+  as locked cards (R18). A selected Construction Yard is packed up with `D` or the Repack button
+  while MCV repacks is on (R19). The catalogue check rejects starting credits the lobby does not
+  offer, and logs the countries of its 336 trial setups. `README.md` describes the sides,
+  countries, lobby, how to win and the changed defaults.
+- *Smoke test (R20).* A long run measures the fullest menu as laid out (73 buttons, none
+  overlapping, every text in its place, 1247 x 566 pixels within 1280 x 720) and plays four
+  matches chosen by the menu's buttons, comparing each with its choices: every lobby row away
+  from its default (Libya, 5000 credits, unit count 0, long game, free for all, map growth with
+  five players on the four starts of Riverlands) with the MCV deployed, repacked and deployed
+  again; its restart; a yard start with MCV repacks off; the defaults with RANDOM opponents.
+
+**Validation** (`docs/validation/ra2-parity/ra1/`, all eleven commands in one run of
+`sh scripts/validate_ra2_parity.sh ra1` on commit `617077c`, with a clean tree; `ra1b/` holds RA1-B's run of commands
+1 to 10 on `f4d0918`):
+
+| # | Command | Exit | Result |
+|---|---|---|---|
+| 1 | `cargo fmt --all -- --check` | 0 | |
+| 2 | `git diff --check` | 0 | |
+| 3 | `cargo clippy --workspace --all-targets -- -D warnings` | 0 | |
+| 4 | `cargo test --workspace --release` | 0 | **626 passed, 0 failed, 0 ignored** (1,643 s); 610 after RA1-B, 529 at the baseline |
+| 5 | `cargo build --release -p game` | 0 | |
+| 6 | `cargo run --release -p game -- --smoke-test 600` | 0 | 600 frames, 4 matches, the fullest menu 1247 x 566 pixels with 0 layout problems, 0 flow problems, the MCV drill done by tick 8, 700 ticks of the last match |
+| 7 | `cargo run -p game -- --smoke-test 600` | 0 | 600 frames, 4 matches, 0 layout and 0 flow problems, 5,105 ticks of the last match |
+| 8 | `cargo run --release -p sim --example m7_benchmark` | 0 | shipped data: mean tick 0.179 ms, longest 1.220 ms (budget 5 ms mean) |
+| 9 | `cargo run --release -p sim --example m7_soak` | 0 | 260 configurations, 18,720,000 ticks, 2,059 s, peak heap 207 MiB of 1,024 |
+| 10 | `cargo run --release -p sim --example m14_duels -- full` | 0 | 756 matches, 756 ended, the slowest in tick 103,519 (749 s) |
+| 11 | `sh scripts/package_macos.sh` | 0 | the packaged smoke test passed |
+
+The session was locked during the run: the smoke tests ran without a visible window, and
+passed.
+
+**Assumptions** (each in the decision named). A factory's side is that of its building type
+(RA-A3, R10). A yard and its base unit keep their share of hit points across deploying and
+undeploying (R12). In a long game a player is defeated without buildings and without units
+(R13). The starting units follow the budget rule of plan section 4.9, which has one source.
+`JumpjetSpeed` is leptons per frame and infantry on foot moves at 3/2 of its `Speed` (R7). The
+reference rules.ini is that of patch 1.006 (R2).
+
+**Decisions.** R9 data pipeline and schemas; R10 who may build what; R11 art of the new ids; R12
+deploying and undeploying; R13 match options, start and win conditions; R14 the computer player
+per side; R15 the legacy fixture and the migrated tests; R16 the interim state of the game; R17
+the lobby in the menu; R18 what the sidebar lists; R19 repacking; R20 smoke flow, captures,
+labels, starting credits; R21 the tests RA1-C adapted.
+
+**Differences from the plan or the briefs.**
+- The base unit of a side is in `rules.ron`, not `skirmish.ron`; `arsenal.ron` also has
+  `prerequisite_groups`; a tech level out of range is rejected as `UnknownItem`; `grow_map` is
+  the game's option, not the simulation's (R9, R10, R13).
+- The sidebar's rule is not only "a factory of the item's group and owner side": the ini lets
+  every country own every building, so that rule alone would list the Soviet buildings for an
+  Allied player. A card is listed when the player owns such a factory and every missing
+  prerequisite can be built with what it owns (R18).
+- The "PLAYERS panel once the match starts" is a list shown while the match is paused or over;
+  the menu's panel is not on screen during a match (R17 item 5).
+- The starting credits are checked against the lobby by the game's catalogue check, not by the
+  simulation's loader (R20 item 6).
+
+**Debt.**
+- `arsenal.ron` is 46 of the 64 KiB a data file may have (R9 item 8).
+- Two computer players that are both left without army, producers, income and armed harvester
+  would never finish a match (M6 behaviour, not met in the 756 duels; R14).
+- The Allied computer player builds no radar building, because America may not build the
+  common Airforce Command and the plan of a side must suit all its countries (R14; RA8).
+- At 1280 x 720 the sidebar of a match does not fit: it needs about 800 pixels of height, and
+  the minimap is squeezed out below that (as before RA1; only the menu was made to fit 720).
+- A production card holds a name of two lines only just: its LOCKED badge then touches the
+  page row below (as before RA1 for "Airforce Command Headquarters"; the Allied MCV's name
+  takes three lines).
+- `docs/CONSTRUCTION_SYSTEM.md` still describes the unified arsenal of M9; RA9 rewrites it.
+- The four matches of a long smoke run leave its last match 700 ticks of the 600 frames in the
+  release build (760 with three matches); a display that draws much faster would leave fewer,
+  as before.
+
+**Requires user verification.**
+- The menu: layout and legibility of the two columns and the PLAYERS panel at 14 and 12 pixel
+  type, with one and with nine computer players (`docs/screenshots/ra1/menu-*.png`, drawn off
+  screen at 1280 x 720 because the session was locked; nobody has looked at it on a display).
+- The new texts: the row labels and values, "You play France (Allied)", "Blue Player (France)
+  has been defeated", the hover label's owner line, the end screen's reason line, the hint and
+  the button for repacking, "No Construction Yard: nothing to build" in the sidebar, and the
+  list of players shown while paused or over (`docs/screenshots/ra1/match-*.png`).
+- The Soviet buildings, the Soviet MCV and transport and the four stolen technology units show
+  the art of their Allied twins (R11); no art was added in RA1.
+- Units move at Red Alert 2's nominal speed at 1x, slower than before (R7), and maps no longer
+  grow with the players unless MAP GROWTH is switched on (R4): both change what the game felt
+  like.
+- That selecting the Construction Yard and repacking it feels right with the mouse: the smoke
+  test issues the same command, but no test clicks the button.
+
 ## Repair, aircraft overflight, new music and distinct silhouettes (2026-10-06)
 
 Working-tree follow-up (decisions: "Building repair, aircraft overflight, readable silhouettes"

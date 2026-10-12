@@ -1,0 +1,74 @@
+    Finished `release` profile [optimized] target(s) in 0.15s
+     Running `target/release/game --smoke-test 600`
+[2m2026-10-12T10:27:48.398097Z[0m [32m INFO[0m [2mbevy_diagnostic::system_information_diagnostics_plugin::internal[0m[2m:[0m SystemInfo { os: "macOS 27.0.1", kernel: "27.0.0", cpu: "Apple M5", core_count: "10", memory: "32.0 GiB" }
+[2m2026-10-12T10:27:48.446141Z[0m [32m INFO[0m [2mbevy_render::renderer[0m[2m:[0m AdapterInfo { name: "Apple M5", vendor: 0, device: 0, device_type: IntegratedGpu, device_pci_bus_id: "", driver: "", driver_info: "", backend: Metal, subgroup_min_size: 4, subgroup_max_size: 64, transient_saves_memory: true }
+[2m2026-10-12T10:27:48.573209Z[0m [32m INFO[0m [2mbevy_winit::system[0m[2m:[0m Creating new window MyGame001 (66v0)
+[2m2026-10-12T10:27:48.611987Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/demo/demo.tmx: 64x64 cells, tile 64x32 px
+[2m2026-10-12T10:27:48.612521Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/crossroads/crossroads.tmx: 56x56 cells, tile 64x32 px
+[2m2026-10-12T10:27:48.612979Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/riverlands/riverlands.tmx: 64x48 cells, tile 64x32 px
+[2m2026-10-12T10:27:48.614604Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/liberty_bay/liberty_bay.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T10:27:48.616133Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/frostline/frostline.tmx: 224x224 cells, tile 64x32 px
+[2m2026-10-12T10:27:48.617640Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/oasis_gulf/oasis_gulf.tmx: 256x192 cells, tile 64x32 px
+[2m2026-10-12T10:27:48.619237Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/coral_archipelago/coral_archipelago.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T10:27:48.620872Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/continental_divide/continental_divide.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T10:27:48.622567Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/steel_harbor/steel_harbor.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T10:27:48.624043Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/glacier_pass/glacier_pass.tmx: 240x240 cells, tile 64x32 px
+[2m2026-10-12T10:27:48.625194Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/red_canyon/red_canyon.tmx: 192x192 cells, tile 64x32 px
+[2m2026-10-12T10:27:48.626598Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/jungle_delta/jungle_delta.tmx: 256x224 cells, tile 64x32 px
+[2m2026-10-12T10:27:48.628147Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/pacific_atoll/pacific_atoll.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T10:27:48.629545Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/iron_isthmus/iron_isthmus.tmx: 256x224 cells, tile 64x32 px
+[2m2026-10-12T10:27:48.631038Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/arctic_floes/arctic_floes.tmx: 240x240 cells, tile 64x32 px
+[2m2026-10-12T10:27:48.632680Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/ember_caldera/ember_caldera.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T10:27:48.634471Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/frozen_sound/frozen_sound.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T10:27:48.636098Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/harvest_plains/harvest_plains.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T10:27:48.637939Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/black_water/black_water.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T10:27:48.639645Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/thousand_lakes/thousand_lakes.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T10:27:48.641354Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/wheel_of_worlds/wheel_of_worlds.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T10:27:49.629911Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m catalogue check: 336 trial setups on 21 maps; players per country: america 275, korea 297, france 278, germany 256, great_britain 234, libya 219, iraq 198, cuba 176, russia 133
+[2m2026-10-12T10:27:50.430924Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m catalogue: 21 maps, 9 factions, 3 difficulties
+[2m2026-10-12T10:27:50.431009Z[0m [32m INFO[0m [2mgame::options[0m[2m:[0m no settings file at /var/folders/vr/n5klx5z92njgzmqc0_v_02vc0000gn/T/mygame001-smoke-87406/settings.txt; the defaults are used
+[2m2026-10-12T10:27:50.853238Z[0m [32m INFO[0m [2mgame::options[0m[2m:[0m settings written to /var/folders/vr/n5klx5z92njgzmqc0_v_02vc0000gn/T/mygame001-smoke-87406/settings.txt
+[2m2026-10-12T10:27:50.854124Z[0m [32m INFO[0m [2mbevy_render::batching::gpu_preprocessing[0m[2m:[0m GPU preprocessing is fully supported on this device.
+[2m2026-10-12T10:27:51.102013Z[0m [32m INFO[0m [2mgame::smoke[0m[2m:[0m smoke test: the fullest menu covers 1247 x 566 pixels (measures: 1247 x 566, must fit 1280 x 720)
+[2m2026-10-12T10:27:51.104256Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map riverlands (88 x 66 cells, map growth, seed 6): Libya (Soviet) against America (Allied) (Brutal) against Russia (Soviet) (Easy) against Russia (Soviet) (Medium) against America (Allied) (Medium); 5000 credits, unit count 0, MCV start, long game, superweapons OFF, crates OFF, MCV repacks ON, free for all, Super Me, all unlocked: 0 buildings and 5 units spawned
+[2m2026-10-12T10:27:51.556952Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: building 1 of type 0 placed
+[2m2026-10-12T10:27:51.556998Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: building 2 of type 29 placed
+[2m2026-10-12T10:27:51.557006Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: building 3 of type 29 placed
+[2m2026-10-12T10:27:51.621867Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 4: building 4 of type 0 placed
+[2m2026-10-12T10:27:51.621890Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 0: building 0 of type 29 placed
+[2m2026-10-12T10:27:51.671865Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 0: building 0 undeployed into its base unit
+[2m2026-10-12T10:27:51.721933Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 0: building 0 of type 29 placed
+[2m2026-10-12T10:27:51.722007Z[0m [32m INFO[0m [2mgame::smoke[0m[2m:[0m smoke test: the MCV deployed, repacked and deployed again by tick 8
+[2m2026-10-12T10:27:51.835482Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map riverlands (88 x 66 cells, map growth, seed 7): Libya (Soviet) against America (Allied) (Brutal) against Russia (Soviet) (Easy) against Germany (Allied) (Medium) against Libya (Soviet) (Medium); 5000 credits, unit count 0, MCV start, long game, superweapons OFF, crates OFF, MCV repacks ON, free for all, Super Me, all unlocked: 0 buildings and 5 units spawned
+[2m2026-10-12T10:27:52.184309Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: building 1 of type 0 placed
+[2m2026-10-12T10:27:52.184366Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: building 2 of type 29 placed
+[2m2026-10-12T10:27:52.184374Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: building 3 of type 0 placed
+[2m2026-10-12T10:27:52.233649Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 4: building 4 of type 29 placed
+[2m2026-10-12T10:27:52.455017Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map riverlands (64 x 48 cells, seed 6): Libya (Soviet) against America (Allied) (Brutal) against Russia (Soviet) (Easy) against Russia (Soviet) (Medium); 10000 credits, unit count 10, yard start, long game, superweapons OFF, crates OFF, MCV repacks OFF, allied computer players, Super Me: 4 buildings and 42 units spawned
+[2m2026-10-12T10:27:52.706717Z[0m [32m INFO[0m [2mbevy_ecs_tiled::tiled::map[0m[2m:[0m Map removed: AssetId<bevy_ecs_tiled::tiled::map::asset::TiledMapAsset>{ index: 0, generation: 0}
+[2m2026-10-12T10:27:53.061263Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map liberty_bay (256 x 256 cells, seed 6): Korea (Allied) against Russia (Soviet) (Medium) against America (Allied) (Medium) against Russia (Soviet) (Medium); 10000 credits, unit count 10, MCV start, short game, superweapons ON, crates ON, MCV repacks ON, allied computer players: 0 buildings and 44 units spawned
+[2m2026-10-12T10:27:53.335661Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: building 1 of type 29 placed
+[2m2026-10-12T10:27:53.374774Z[0m [32m INFO[0m [2mbevy_ecs_tiled::tiled::map[0m[2m:[0m Map removed: AssetId<bevy_ecs_tiled::tiled::map::asset::TiledMapAsset>{ index: 0, generation: 1}
+[2m2026-10-12T10:27:53.481524Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: building 2 of type 0 placed
+[2m2026-10-12T10:27:53.481552Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 0: building 0 of type 0 placed
+[2m2026-10-12T10:27:53.481556Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: building 3 of type 29 placed
+[2m2026-10-12T10:27:55.678360Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Building(BuildingKind(6)) is complete
+[2m2026-10-12T10:27:55.711633Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Building(BuildingKind(6)) is complete
+[2m2026-10-12T10:27:55.945100Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: building 44 of type 6 placed
+[2m2026-10-12T10:27:55.945145Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 0: Building(BuildingKind(1)) is complete
+[2m2026-10-12T10:27:55.945151Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Building(BuildingKind(1)) is complete
+[2m2026-10-12T10:27:55.961903Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: building 45 of type 6 placed
+[2m2026-10-12T10:27:56.211964Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: building 46 of type 1 placed
+[2m2026-10-12T10:27:57.428052Z[0m [32m INFO[0m [2mgame::smoke[0m[2m:[0m smoke test: paused at tick 342
+[2m2026-10-12T10:27:57.928684Z[0m [32m INFO[0m [2mgame::smoke[0m[2m:[0m smoke test: resumed at tick 342
+[2m2026-10-12T10:28:01.678242Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Building(BuildingKind(30)) is complete
+[2m2026-10-12T10:28:01.711784Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Building(BuildingKind(30)) is complete
+[2m2026-10-12T10:28:01.944998Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: building 47 of type 30 placed
+[2m2026-10-12T10:28:01.945033Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Building(BuildingKind(2)) is complete
+[2m2026-10-12T10:28:01.945044Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: unit 48 left building 47
+[2m2026-10-12T10:28:01.961959Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: building 49 of type 30 placed
+[2m2026-10-12T10:28:01.961976Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: unit 50 left building 49
+[2m2026-10-12T10:28:02.211244Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: building 51 of type 2 placed
+[2m2026-10-12T10:28:02.211268Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: unit 52 left building 51
+[2m2026-10-12T10:28:02.416580Z[0m [32m INFO[0m [2mgame::smoke[0m[2m:[0m smoke test: 600 frames, 700 simulation ticks, map created: true, units spawned: 44, units moved: 9 in 697 ticks after the order, buildings spawned: 0, production charged 800 credits in 677 ticks, visible cells: 456, enemy views shown: 0, view mismatches: 0, sidebar items: 87 of 87, sidebar buttons outside the window: 0, sidebar credits: Some("Credits  9200"), minimap drawings: 508, minimap pixels lit: 2064, sounds: 25, music players: 1, pause: Done { ticks_while_paused: 0, refused: true }, menu buttons: Some(73), matches started: 4, flow: Last, views: 43 of 43 units and 10 of 10 buildings, computer player's commands: 6 (0 rejected), items outside the roster shown: 0, cards shown: 6 of 17 listed (0 not listed), options buttons: 11, settings saved: true, menu layout problems: Some(0), game flow problems: 0
+[2m2026-10-12T10:28:02.417410Z[0m [33m WARN[0m [2mbevy_winit::state[0m[2m:[0m Skipped event Destroyed for unknown winit Window Id WindowId(502758163712)
