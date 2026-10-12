@@ -550,3 +550,236 @@ fn the_armies_of_the_shipped_plans_can_destroy_every_shipped_building() {
     assert_eq!(percent(&grizzly), Some(60));
     assert_eq!(percent(&gi), Some(0));
 }
+
+// --- RA3-B: infantry sub cells and crushing with the shipped data (docs/DECISIONS.md R6, R41, R42) ---
+
+/// The positions of the infantry spots of a cell.
+fn spots(x: i32, y: i32) -> [sim::SubPos; 3] {
+    [0, 1, 2].map(|spot| sim::SubPos::spot_of(CellPos::new(x, y), spot))
+}
+
+fn position_of(app: &mut App, id: SimId) -> sim::SubPos {
+    let world = app.world_mut();
+    let mut query = world.query::<(&SimId, &Position)>();
+    query
+        .iter(world)
+        .find(|(other, _)| **other == id)
+        .map(|(_, position)| position.0)
+        .unwrap_or_else(|| panic!("{id:?} is not a unit"))
+}
+
+fn assert_cells(app: &mut App, context: &str) {
+    let problems = sim::cell_invariant_violations(app.world_mut());
+    assert!(problems.is_empty(), "{context}: {problems:?}");
+    let stray = sim::stray_claims(app.world_mut());
+    assert!(stray.is_empty(), "{context}: {stray:?}");
+}
+
+#[test]
+fn the_shipped_infantry_is_on_foot_and_the_shipped_crushers_are_those_of_red_alert_2() {
+    let definitions = shipped();
+    let mut on_foot = Vec::new();
+    let mut flying_infantry = Vec::new();
+    let mut not_crushable = Vec::new();
+    let mut crushers = Vec::new();
+    for (index, unit) in definitions.units().iter().enumerate() {
+        let kind = sim::UnitKind(index as u16);
+        let entry = definitions
+            .metadata(ProductionItem::Unit(kind))
+            .unwrap_or_else(|| panic!("{} has no arsenal entry", unit.id));
+        // Every unit of the category infantry is of the type list, and no other unit is.
+        assert_eq!(
+            entry.infantry,
+            entry.category == sim::Category::Infantry,
+            "{}",
+            unit.id
+        );
+        if definitions.on_foot(kind) {
+            on_foot.push(unit.id.as_str());
+            if !definitions.crushable(kind) {
+                not_crushable.push(unit.id.as_str());
+            }
+        } else if entry.infantry {
+            flying_infantry.push(unit.id.as_str());
+        }
+        if definitions.crusher(kind) {
+            crushers.push(unit.id.as_str());
+            assert_ne!(entry.domain, sim::Domain::Air, "{}", unit.id);
+        }
+        assert!(
+            (1..=50).contains(&entry.size),
+            "{}: size {}",
+            unit.id,
+            entry.size
+        );
+    }
+    assert_eq!(on_foot.len(), 18, "{on_foot:?}");
+    assert_eq!(flying_infantry, ["rocketeer"]);
+    not_crushable.sort_unstable();
+    assert_eq!(
+        not_crushable,
+        [
+            "chrono_commando",
+            "chrono_ivan",
+            "chrono_legionnaire",
+            "desolator",
+            "psi_commando",
+            "tesla_trooper",
+            "yuri_prime"
+        ]
+    );
+    crushers.sort_unstable();
+    assert_eq!(
+        crushers,
+        [
+            "apocalypse",
+            "chrono_miner",
+            "flak_track",
+            "grizzly",
+            "mcv",
+            "mirage_tank",
+            "prism_tank",
+            "rhino",
+            "soviet_amphibious_transport",
+            "soviet_mcv",
+            "tank_destroyer",
+            "tesla_tank",
+            "v3_launcher",
+            "war_miner"
+        ]
+    );
+    // [E1] Size=1, [MTNK] Size=3, [AMCV] Size=6, [CARRIER] Size=50.
+    let size = |id: &str| {
+        let kind = definitions.unit_kind(id).expect(id);
+        definitions
+            .metadata(ProductionItem::Unit(kind))
+            .expect(id)
+            .size
+    };
+    assert_eq!(
+        [
+            size("gi"),
+            size("grizzly"),
+            size("mcv"),
+            size("aircraft_carrier")
+        ],
+        [1, 3, 6, 50]
+    );
+}
+
+#[test]
+fn three_gis_share_a_cell_and_a_fourth_soldier_or_a_tank_does_not_fit() {
+    let mut app = world(48);
+    let gis = [
+        put(&mut app, P0, "gi", 10, 10),
+        put(&mut app, P0, "gi", 10, 10),
+        put(&mut app, P1, "conscript", 10, 10),
+    ];
+    for (soldier, at) in gis.into_iter().zip(spots(10, 10)) {
+        assert_eq!(position_of(&mut app, soldier), at);
+    }
+    for kind in ["gi", "conscript", "attack_dog", "grizzly", "ifv"] {
+        assert_eq!(
+            spawn_unit(app.world_mut(), P0, kind, CellPos::new(10, 10)),
+            Err(sim::SpawnError::Occupied {
+                cell: CellPos::new(10, 10),
+                by: gis[0]
+            }),
+            "{kind}"
+        );
+    }
+    // The Rocketeer flies: the air above the cell is free, and its own.
+    let rocketeer = put(&mut app, P0, "rocketeer", 10, 10);
+    assert_eq!(
+        position_of(&mut app, rocketeer),
+        sim::SubPos::centre_of(CellPos::new(10, 10))
+    );
+    assert_cells(&mut app, "after the spawns");
+}
+
+/// A `mover` of P0 at (5, 20) is commanded to (15, 20) past `soldiers` of P1 that stand in
+/// (10, 20) and are kept from firing; the ids of the crushed, in order, and whether the mover
+/// arrived.
+fn drive_through(mover: &str, soldiers: &[&str]) -> (Vec<SimId>, Vec<SimId>, bool) {
+    let mut app = world(48);
+    let standing: Vec<SimId> = soldiers
+        .iter()
+        .map(|kind| {
+            let id = put(&mut app, P1, kind, 10, 20);
+            silence(&mut app, id);
+            id
+        })
+        .collect();
+    let moving = put(&mut app, P0, mover, 5, 20);
+    let mut commands = vec![IssuedCommand {
+        player: P0,
+        command: Command::Move {
+            units: vec![moving],
+            target: CellPos::new(15, 20),
+        },
+    }];
+    let mut crushed = Vec::new();
+    for index in 0..600 {
+        let events = tick(&mut app, std::mem::take(&mut commands));
+        assert_cells(
+            &mut app,
+            &format!("{mover} through {soldiers:?}, tick {index}"),
+        );
+        let mut arrived = false;
+        for event in events {
+            match event {
+                SimEvent::UnitCrushed {
+                    player,
+                    unit,
+                    crusher,
+                    by,
+                    ..
+                } => {
+                    assert_eq!((player, crusher, by), (P1, moving, P0));
+                    crushed.push(unit);
+                }
+                SimEvent::MoveCompleted { unit, .. } if unit == moving => arrived = true,
+                _ => {}
+            }
+        }
+        if arrived {
+            let at_goal = {
+                let world = app.world_mut();
+                let mut query = world.query::<(&SimId, &sim::Mobile)>();
+                query
+                    .iter(world)
+                    .any(|(id, mobile)| *id == moving && mobile.cell == CellPos::new(15, 20))
+            };
+            return (standing, crushed, at_goal);
+        }
+    }
+    panic!("{mover} through {soldiers:?}: the move did not end");
+}
+
+#[test]
+fn a_tank_crushes_conscripts_and_gis_and_what_is_not_crushable_stays() {
+    // [MTNK] Crusher=yes, [HTNK] Crusher=yes; [E1] Crushable=yes, [E2] in [InfantryTypes].
+    for tank in ["grizzly", "rhino", "war_miner", "mcv"] {
+        let (standing, crushed, arrived) = drive_through(tank, &["conscript", "gi", "engineer"]);
+        assert_eq!(crushed, standing, "{tank}");
+        assert!(arrived, "{tank}");
+    }
+    // [SHK], [DESO], [CLEG] Crushable=no: the tank goes round them, and round a cell that
+    // holds one of them beside a Conscript.
+    for soldiers in [
+        &["tesla_trooper"][..],
+        &["desolator"],
+        &["chrono_legionnaire"],
+        &["conscript", "desolator"],
+    ] {
+        let (_, crushed, arrived) = drive_through("grizzly", soldiers);
+        assert!(crushed.is_empty(), "{soldiers:?}");
+        assert!(arrived, "{soldiers:?}");
+    }
+    // [FV] Crusher=no, [DRON] and [DTRUCK] have no such key: they go round a Conscript.
+    for vehicle in ["ifv", "terror_drone", "demolition_truck"] {
+        let (_, crushed, arrived) = drive_through(vehicle, &["conscript"]);
+        assert!(crushed.is_empty(), "{vehicle}");
+        assert!(arrived, "{vehicle}");
+    }
+}
