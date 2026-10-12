@@ -1379,7 +1379,145 @@ configurations is unchanged. The tests' assertions are unchanged: every match en
 within its tick limit, without a rejected command the test does not allow, and with equal hashes
 where the test compares them.
 
-### R6 is reserved for the amendment of invariant I6 in RA3.
+### R6. RA3-B: invariant I6 becomes I6' (infantry sub cells); crushing
+
+Recorded in RA3-B (2026-10-12) under the number the programme reserved for it. PLAN.md section
+14 authorises the amendment, and the prompt's fixed decision 6 asks for this record, updated
+tests and an explicit check by the final reviewer.
+
+1. **The amendment.** I6 read: *at most one ground unit occupies a cell, and no unit occupies a
+   cell covered by a building.* I6' reads: ***a surface cell holds at most one vehicle or at
+   most three infantry and never both; an air cell holds at most one aircraft; no unit occupies
+   a cell covered by a building.*** "Holds" is what it was: a unit holds the cell it stands in
+   and, while it steps, the cell it enters. "Infantry" is a unit **on foot**: of a type with
+   the arsenal's new trait `infantry` that does not fly (`Definitions::on_foot`; the Rocketeer
+   is infantry and an aircraft to the grid). "Vehicle" is every other unit of the surface
+   (vehicles, ships, and every unit of a type without the trait). Owners do not matter:
+   soldiers of two enemies share a cell, as in Red Alert 2. PLAN.md section 6 has a note under
+   its table that points here.
+2. **A world without the trait is as before, bit for bit.** No unit of a world without an
+   arsenal (the fixtures of M2 to M8), of the legacy ruleset, of the RA1 and RA2 fixtures, or
+   of the types of RA3-A in the RA3 fixture is on foot, so each holds its cell whole and I6
+   holds there as written. Shown in three ways: by the code (a grid without units on foot has
+   no table of spots at all, and every rule below reduces to the old one for a unit that needs
+   the whole cell); by `ra3_cells.rs::no_unit_of_the_older_fixtures_is_on_foot_or_a_crusher`;
+   and by measurement: the state hash without the definitions was folded over every tick of
+   every test of the simulation crate before the change (`d43169b`) and after it (item 9).
+3. **Spots.** `SPOT_OFFSETS` = (-64, -64), (80, -16), (-16, 80) subcells from the centre of the
+   cell (`SubPos::spot_of`). Chosen, not ported (the original's offsets are in no ini;
+   **assumption**): on screen spot 0 lies 8 pixels above the centre and spots 1 and 2 lie 4
+   pixels below it, 12 to the right and to the left, mirror images of each other; the three
+   add up to zero, so a full cell is centred; any two are at least 135 subcells (half a cell)
+   apart; none is nearer than 48 subcells to an edge. A soldier's `Position` is its spot, also
+   when it is alone in the cell (as in the original). It takes the first free spot when it is
+   put into a cell (spawned, trained, unloaded, teleported) and keeps the index of its spot
+   from cell to cell while that one is free in the next cell, else takes the first free one:
+   a group keeps its formation and walks straight lines.
+4. **The grid decides** (`crates/sim/src/map.rs`). `Grid::claim` (with `claim_spot` for the
+   preferred spot), `release` and `occupant*` are still the one place. New beside them:
+   `register(id, domain, on_foot)` (was `register_domain`) and `unregister`; `holders`,
+   `holders_for` (every holder of a cell; `occupant` is the first of them, and `None` still
+   means that nothing holds the cell); `spot`, `standing_point`; and one primitive that
+   answers "may this unit enter", **`room(cell, on_foot, stays)`**: how much room the cell has
+   for a unit of that kind, in spots (a vehicle needs 3, a soldier 1, `room_needed`), if only
+   the holders for which `stays` holds remained. `has_room`, `room_for`, `blocked` and
+   `blockers` are that primitive with a fixed `stays`. The spots are a table beside the old
+   one (12 bytes a cell), allocated when the first unit on foot is registered.
+5. **Movement** (`movement.rs`, `unit.rs`). A soldier reserves a spot of the next cell before
+   it leaves its own and frees its old spot on arrival. Its position on the way is the
+   step's share (`progress / length`, the same 256 or 362 as between centres) of the straight
+   line from spot to spot, rounded toward the start (`Mobile::position`): **a step takes
+   exactly the ticks it takes a vehicle of that speed.** A soldier waits for a cell that a
+   vehicle holds or whose three spots are held; a vehicle for a cell in which any soldier
+   holds a spot. The rules that end orders (D21, D22) are unchanged; where they ask whether
+   the units in the way are moving on, a soldier before a full cell needs one of the three to
+   move on, a vehicle all (`make_room`). The diagonal rule (no step between two cells that one
+   unit holds both of) applies to every holder of the two cells. Two soldiers that pass each
+   other may be at one point for a tick (their lines between spots cross); two that stand
+   never are. A unit's own state has no spot field: the grid's table is the only record, and
+   `Position` follows from it.
+6. **Callers reviewed** (every use of `occupant`, `claim`, `release` in both crates):
+   | Caller | What it asks now |
+   |---|---|
+   | `movement::at_centre`, `moving_on` | `blockers` of the next cell for this unit; every holder of the two cells beside a diagonal |
+   | `pathfinding::find_paths`, `wait_cycle`, `step_aside` | `blocked` by the units that count as obstacles; the first blocker in a wait-for cycle; `has_room` for a step aside |
+   | `command::apply_move` (destinations of a group) | `room` beside the idle units outside the group, less what the group was promised: one vehicle or up to three soldiers to a cell, the vehicles of a domain first |
+   | `building::exit_cell` (trained and free units, carrier aircraft, the cell a rearmed aircraft flies to) | `has_room` for the kind of unit; three soldiers come out into one cell |
+   | `economy::Spawner::leave` (rally point) | `room_for` the new unit |
+   | `unit::spawn_unit` | `room_in` the unit's layer; `Occupied` names the first holder |
+   | `harvest` (ore cells, docks) | `room_for` the harvester (a vehicle: no holder but itself) |
+   | `building::check_footprint`, `check_building_footprint` (placement) | unchanged: `occupant`, any holder blocks |
+   | `special`: teleport (Chrono Legionnaire, Chrono Miner, Chronosphere) | `room_for`; the unit stands at `standing_point`; the Chronosphere moves vehicles and still wants an empty cell |
+   | `special`: unload, undeploy | `has_room` for each passenger's kind (three soldiers to a ring cell); `register` with the kind |
+   | `special`: walking to a transport, a building or a depot, and leaving a depot | `has_room` for the unit's kind |
+   | `special`: deploying an MCV, `release` | unchanged check (any holder blocks); `unregister` |
+   | `special::blast` (the M9 area damage of worlds without an `effects` entry) | unchanged: it goes by the units' cells, and serves worlds without infantry on foot only |
+   | `combat::blast_hits` (splash by cell) | every holder of a cell, each by the distance of its own position |
+   | `combat::act_unit` (the cell an attacker moves to) | `room` less what was promised in the tick (`chase_cells` counts spots); a soldier wants the target in range from each of the three spots of the cell, since it cannot know which it will get |
+   | `combat::remove_dead` | `unregister` |
+   | `ai::deploy_base_unit` (ring of the footprint) | every holder of a ring cell must be an idle unit of the player |
+   | `ai::place_ready_building`, `match_setup` (starting units) | unchanged: `occupant`, an empty cell; starting units get a cell each |
+   | `examples/m7_soak.rs` | item 8 |
+   | game `special_controls` (the unit under a click of the `E` mode) | unchanged: the first holder; its targets are vehicles and buildings |
+   | game selection, hover, health bars | by the drawn body, which is at the spot (R43) |
+7. **Hashing** (invariant I3). New state: the grid's table of spots and its set of units on
+   foot; `MoveOrder::crush` (R42); the four traits in the arsenal's part of the definitions.
+   Layout: the flag byte of a cell gains bits 5 to 7 (spot 0 to 2 held) and the ids of the
+   holders follow the cell's occupant and building; the ids of the units on foot follow the air
+   layer; the flag byte of an order is 2 instead of 1 if it may crush; an arsenal entry ends
+   with three more flag bytes and the size. **What changed for existing worlds:** nothing in
+   the grid, the units or any other state of a world without units on foot
+   (`map::tests::the_hash_covers_the_spots_and_is_unchanged_without_units_on_foot` compares the
+   grid's hash with the layout before RA3 written out in the test;
+   `unit::tests::the_hash_covers_whether_an_order_may_crush`). The state hash of a world
+   **without** an arsenal is therefore the same number as before. The state hash of a world
+   **with** an arsenal (legacy, RA1, RA2, RA3 fixtures; shipped data) is another number,
+   because its definitions hash four more fields per entry; no test holds an expected hash
+   (they compare runs with each other), so no expectation is affected.
+8. **The soak's check** (`examples/m7_soak.rs`, amends R8 and D56). Its I6 check assumed one
+   holder per cell (`grid.occupant(cell) == Some(unit)`). It now calls
+   `sim::cell_invariant_violations` on every tick: from the units' own cells, at most one
+   vehicle or three infantry and never both per surface cell, at most one aircraft per air
+   cell, nothing of the surface on a building, the grid's record of every holder and spot,
+   and every unit's position; and `sim::stray_claims` every 256 ticks and on the last tick: no
+   holder in the grid that holds nothing (it reads every cell of the map; a claim that is not
+   released stays, so it is found at the next look). Both functions are public in `sim` so
+   that the soak and the tests share them, and are no part of a tick.
+   `ra3_cells.rs::the_check_of_the_invariant_reports_every_kind_of_violation` feeds them two
+   vehicles in a cell, a vehicle with infantry, four infantry, a vehicle and a soldier on a
+   building, two aircraft in a cell, a unit off its spot, and two stray claims.
+9. **Measured: the older scenarios did not move.** With a scratch patch (kept as
+   `docs/validation/ra2-parity/ra3/hash-trace.patch`; never part of a commit of the code) a
+   system at the end of every tick folds the state hash without the definitions into a sum
+   per test thread, and writes the sums when the thread ends: a line is the thread's test,
+   its ticks, the fold in order of the ticks, and the plain sum. `cargo test --release -p sim`
+   with it at `d43169b` (`hash-trace-before.tsv` in the same directory) and on the code of
+   RA3-B (`hash-trace-after.tsv`): of the 267 test threads of `d43169b` that run ticks,
+   **254 have the same fold**. The 13 others: 11 are the tests of the shipped data
+   (`ra1_shipped.rs` 5, `ra2_shipped.rs` 2, `ra3_shipped.rs` 4), whose infantry is on foot
+   now; 2 are matches of computer players on the RA1 and RA2 fixtures (`ra1_match.rs`,
+   `ra2_ai.rs`), whose Soviet miner is armed, changed by the fix of R44 item 2 and by nothing
+   else: the same run on the code before that fix (`hash-trace-after-without-r44.tsv`) has
+   256 equal folds and only the 11. The ten worker threads of `m6_ai.rs` draw their matches
+   in an order that varies from run to run, so their lines differ between any two runs; their
+   plain sums add up to the same number in all three files (2,187,194 ticks). So every
+   fixture scenario of the 495 tests the simulation had before RA3-B has, tick for tick, the
+   state it had, but for the two matches in which the computer player now plays better.
+10. **Tests of the amendment** (R45 lists all). `ra3_cells.rs`:
+    `invariant_i6_prime_holds_while_mixed_infantry_and_vehicles_cross_for_2000_ticks` (the form
+    of M2's test: 48 soldiers and 16 vehicles of two enemies cross a field back and forth,
+    `ra3_common::assert_cells` after every tick, which checks I6' from the units' components
+    and the grid independently of the simulation's own check, and also runs that);
+    `the_crossing_gives_the_same_hash_at_every_tick`; three soldiers in a cell and a fourth
+    that waits; a vehicle and a soldier that keep each other out; range and splash from the
+    spot; the group move; leaving a barracks and a transport. `ra3_crush.rs`:
+    `invariant_i6_prime_holds_while_crushers_and_infantry_of_two_players_cross` and
+    determinism with crushing. `m2_movement.rs` (the M2 tests of I6, 50 units for 2,000 ticks
+    and the seeded random orders) is unchanged and passes.
+11. **For the final reviewer.** This is the one amendment of an invariant in the programme.
+    Check: item 2 (no change without the trait), item 6 (no caller left that takes "the
+    occupant" for the only holder), item 7 (the hash), and that I6' is asserted on every tick
+    in the tests of item 10 and in the soak.
 
 ### R7. Speed is converted with the time base of the other rates, not anchored on the GI
 
@@ -2549,3 +2687,212 @@ fired through the simulation against numbers worked out from the ini; the nuclea
 Construction Yard and a Power Plant; the Grizzly's damage states and speed; the shipped
 plans); `ra9_data_parity.rs` one test more and the first extended (R34 item 1); 2 unit tests
 in `sim::combat`; in the game `hover_info` 1.
+
+### R41. RA3-B: the arsenal file of schema version 4, and the type lists in the reference
+
+1. **`arsenal.ron`, schema 4** (`crates/sim/src/arsenal.rs`; the plan's item 6). Every field is
+   required. A unit gains `infantry` (1 or 0: the ini's `[InfantryTypes]` lists it), `crushable`
+   (`Crushable`), `crusher` (`Crusher`) and `size` (`Size`, 0 to 255); a building has 0 in all
+   four. Rejected: a value outside its range; any of the four on a building; `infantry` outside
+   the category `infantry`; `crushable` without `infantry`; `crusher` on a unit that is not of
+   the category `vehicles` or that flies (a ship or an amphibious vehicle may be one: the
+   Soviet Amphibious Transport is). Unlike the traits of schema version 3 they are read in
+   every world, with or without a rules file: movement has no second rule to fall back on, and
+   a world whose arsenal gives no unit the traits is the world before RA3 (R6 item 2).
+2. **Nothing reads `size` yet.** It is the room a unit takes in a transport; the brief asks for
+   it with the other three so that the schema changes once. RA4 or RA6 (transports by
+   `SizeLimit` and `Passengers`) will read it; until then the transports keep M9's capacity.
+3. **The reference table** (`scripts/ra2_reference.py`). It gains the entries of the four type
+   lists (`[InfantryTypes]`, `[VehicleTypes]`, `[AircraftTypes]`, `[BuildingTypes]`) that name
+   a mapped section: 99 rows, index and section id only. The generator
+   (`scripts/generate_ra2_data.py`) reads `[InfantryTypes]` for `infantry`, cites the entry in
+   the comment of the arsenal line, and fails if its own category of a unit disagrees with
+   the list or a crusher is no surface vehicle. The audit (`ra9_data_parity.rs`) recomputes the
+   four fields of every mapped unit from the table; there is no difference row.
+4. **Defaults** where a section has no key. `Crusher`: no (ModEnc, `Crusher`; the ini writes
+   it on every vehicle that has it). `Size`: 1 (the ini's own comment on the key).
+   `Crushable`: **yes for a unit of `[InfantryTypes]`, no for every other unit. Assumption.**
+   The ini writes `Crushable=yes` on four infantry types (GI, Rocketeer, Tanya and the SEAL)
+   and `Crushable=no` on eleven (Tesla Trooper, Desolator, Chrono Legionnaire, the four stolen
+   technology infantry and four animals), and nothing on the Conscript, the Engineers, the dogs,
+   the Sniper, the Flak Trooper, Crazy Ivan, Yuri, the Spy and the Terrorist; its comment on
+   the key says "def=no", and so does ModEnc's page on `Crushable`. But the explicit `no` on
+   those eleven would then say nothing, the plan's research (appendix D, "Crushing")
+   and its test list ("a tank crushes a Conscript") take the Conscript for crushable, and
+   driving tanks over Conscripts is what the original's players do. If the assumption is
+   false, nine shipped infantry types that are crushable here are not in the original.
+5. **Shipped values.** `infantry`: 19 types; on foot all of them but the Rocketeer, which
+   flies. Crushable: 12 of them (GI, Conscript, Engineer, Attack Dog, Spy, Tanya, Sniper,
+   Flak Trooper, Crazy Ivan, Yuri, Terrorist; and the Rocketeer by its data, which is never on
+   foot). Crushers: the two miners, Grizzly, Rhino, Flak Track, V3 Launcher, both MCVs, Mirage
+   Tank, Prism Tank, Apocalypse, Tank Destroyer, Tesla Tank, Soviet Amphibious Transport (14).
+   Not: IFV, Terror Drone, Demolition Truck, the Allied Amphibious Transport, ships, aircraft.
+6. **Fixtures.** The arsenals of the legacy ruleset and of the RA1 and RA2 fixtures are at
+   schema 4 with 0 in the four fields of every entry. The RA3 fixture keeps 0 on every type it
+   had (the tests of RA3-A place their riflemen at cell centres) and gains seven unit types at
+   the end of its files: `recruit` and `trooper` (crushable infantry on foot, the second with
+   the rifle), `hazmat` (infantry on foot that is not crushable), `jumper` (crushable infantry
+   that flies), `truck` (a vehicle), `roller` and `brute` (crushers; the brute carries the sam,
+   which engages aircraft only).
+
+### R42. RA3-B: crushing
+
+1. **The rule** (`movement.rs`, `Crushable`; the plan's item 6). A unit whose move order may
+   crush does not wait for a cell that is held only by crushable infantry on foot of its
+   enemies (`Players::hostile`: another player that is not of its team): it drives in, and
+   every one of them dies. Not crushed, and so in the way like any unit: its own and its
+   allies' soldiers; infantry that is not crushable; a cell that holds any of these beside
+   crushable enemies; vehicles; and whatever flies (it is in another layer).
+2. **Which orders may crush.** `MoveOrder::crush` (hashed) is set for the move of a `Move` or
+   `AttackMove` command to a unit of a `crusher` type (`MoveOrder::commanded`), including the
+   move an attack-moving unit takes up again after a fight, and for no other order: not the
+   approach of an `Attack` order, not a harvester's trips, not the way to a rally point, a
+   transport, a building or a depot. This is the brief's reading of `PlayerAutoCrush=no`: units
+   do not seek infantry to crush, and what the player sends across infantry crushes it. The
+   pathfinder ignores infantry that the unit would crush when it looks for a way around
+   standing units, for such an order only. **Difference from the original**: there the miners
+   (`AutoCrush=yes`) crush on their own trips, and a computer player's unit near a crushable
+   target (`[CombatDamage] Crush=1.8`) drives at it instead of firing; here the computer
+   player crushes only what its attack moves happen to cross (the brief: it "does not use it
+   deliberately").
+3. **When they die.** In the `Movement` stage, at the moment the crusher starts the step into
+   the cell: every soldier that holds a spot there (standing, walking in, or walking out) is
+   removed from the grid before the crusher claims the cell, so that the cell never holds a
+   vehicle and infantry (I6'), and its entity is despawned by the stage's commands, before the
+   `Combat` stage of the tick: a crushed soldier fires no more and is nobody's target. The
+   crusher does not slow down. **Boundary**: a soldier is crushed until the tick in which it
+   has left the cell; in that tick the units move in the order of their ids (D19), so a
+   soldier with a lower id than the crusher has left and lives, one with a higher id still
+   holds its spot and dies (`ra3_crush.rs::a_soldier_is_crushed_until_the_tick_in_which_it_has_left_the_cell`).
+4. **Events.** `SimEvent::UnitCrushed { player, unit, crusher, by, at }` (the victim's owner,
+   the victim, the crusher, **the crusher's owner, who is the killer for the experience of
+   RA4**, and where the victim stood in the crushed cell), followed in the same tick by the
+   `UnitDestroyed` that everything that counts losses already reads (the soak's rule for
+   rejected commands, the game's views).
+5. **Hit points are not involved**: a crushed soldier is removed whatever its health, also an
+   invulnerable one if RA6 ever makes infantry invulnerable (the Iron Curtain kills infantry
+   in the original, so the case should not arise).
+
+### R43. RA3-B: the interface
+
+1. **Soldiers at their spots.** Nothing to draw anew: a unit is drawn at its `Position`
+   between ticks, which is the spot, and the walk cycles follow the ground covered as before.
+2. **Picking and hover.** `selection::unit_at` already picks the unit whose body centre is
+   nearest to the cursor among those whose pick area contains it, and the hover label uses the
+   same function: with three soldiers 17 to 24 pixels apart a click on a soldier's body picks
+   that soldier (`health::tests::the_bars_of_three_soldiers_in_a_cell_do_not_overlap_and_each_can_be_picked`).
+   A box selects every soldier whose ground point lies in it, as before.
+3. **Health bars.** The bar of a unit on foot is 16 pixels long instead of 32
+   (`health::unit_bar_length`): the two soldiers that stand side by side are 24 pixels apart,
+   and the third stands 12 pixels higher, so no two bars meet.
+4. **Crushing.** A ring of dust and three brown puffs where the soldier stood
+   (`weapon_fx::Painter::crush`, from the smoke and ring textures the effects already use),
+   if the human player sees the cell; and a new synthesised sound, `Sfx::Crush` (a dull thud
+   and a short dry crunch, `audio::crush`), heard by the soldier's owner, by the crusher's
+   owner and by who was shown the soldier. The bang that every destroyed unit has is not
+   played for a crushed one. No asset file was added; `assets/LICENSES.md` is unchanged.
+5. **`E` mode.** A click still takes the first holder of the cell under the cursor as its
+   target; its targets are transports, buildings and depots, none of which shares a cell.
+6. **Requires user verification**: that three soldiers in a cell read as three, that the
+   short bars are legible, how the dust and the crunch look and sound, and how crushing feels
+   in play (a tank does not stop for infantry).
+
+### R44. RA3-B: the computer player, and how long matches are now
+
+1. **It does not use sub cells or crushing deliberately.** Its `Move` and `AttackMove` commands
+   crush what they cross, as a player's do (R42 item 2); its group moves fill cells with three
+   soldiers, as everyone's. One check changed: before it deploys a base unit, every holder of
+   a cell around the footprint must be one of its own idle units (was: the occupant).
+   `ai.ron` is unchanged, and no limit of a test was changed.
+2. **A defect of RA1 that the changed battles exposed, fixed** (`ai.rs`,
+   `put_harvesters_to_work`). An armed harvester fights when its owner has no other armed
+   unit and its cycle has stopped (R14). In the wave it has no move order whenever it stands
+   and fires, and the computer player then gave it the `Harvest` command it gives every idle
+   harvester every 200 ticks: that ended its attack, and with no ore left it was idle at the
+   enemy's base, was called home to the gathering point, and set out again a wave's patience
+   later: a few hundred ticks of fire for every several thousand ticks. With three soldiers to a cell one of
+   the 756 matches of `m14_duels -- full` ended in exactly this state: Riverlands, Libya
+   against Great Britain, both brutal, 108,205 ticks against a limit of 72,000 (traced: from
+   tick 27,000 on one War Miner against four buildings). A harvester of the wave is no longer
+   sent to harvest; it leaves the wave, and is sent to work again, when its owner has another
+   armed unit. The match takes 39,902 ticks. Regression test:
+   `ra3_ai.rs::an_armed_harvester_that_fights_as_a_last_resort_is_not_called_back_to_harvest`
+   (on the RA2 fixture, whose Soviet miner is armed; it fails without the fix in the tick of
+   the first `Harvest` command). **To revisit in RA5**, when ore grows back: a harvester in
+   the wave then has something to return to.
+3. **Measured** (`m14_duels -- full`, the 756 matches of `m6_production_matches.rs`; ticks;
+   "limit" is that test's, `72,000 x span / 128`). Before: the validation of RA3-A
+   (`docs/validation/ra2-parity/ra3a/10-duels.log`). After: the validation of RA3
+   (`docs/validation/ra2-parity/ra3/10-duels.log`; the run is deterministic, and a run before
+   the validation gave these numbers).
+
+   | | Before RA3-B | After RA3-B |
+   |---|---|---|
+   | Length over the limit: median, 90th percentile, longest | 0.19, 0.36, 0.76 | 0.16, 0.33, 0.96 |
+   | Small maps (span up to 128): median of each map | 20,868 to 25,089 | 20,855 to 26,320 |
+   | Small maps: longest | 50,108 (Riverlands) | 69,221 (Riverlands, America against Korea, both brutal) |
+   | Large maps: median of each map | 19,447 to 70,077 | 13,096 to 51,825 |
+   | Large maps: longest | 206,967 (Ember Caldera) | 167,856 (Iron Isthmus, Russia brutal against Libya medium; limit 270,000) |
+   | All 756 matches together | 34.6 million ticks | 30.2 million ticks |
+   | Matches over the limit, matches without a winner | 0, 0 | 0, 0 |
+
+   Matches are shorter: three soldiers to a cell bring three times the rifles to a fight, and
+   the large maps, where armies meet in the open, gain most (their medians fall by a quarter
+   to a third). The small maps are as they were at the median.
+4. **The one match near its limit is not a stall.** Riverlands (64 x 48, the smallest map),
+   America against Korea, both brutal, ends in tick 69,221 of 72,000 (0.96; before RA3-B the
+   nearest was 0.76). Traced: the ore within the miners' reach is used up by tick 12,000 (every
+   miner stands idle from then on); both armies are spent by tick 30,000, when Korea has one GI left and America four Chrono
+   Miners that stand idle and three buildings. The GI fires without a pause from then on: at
+   the miners first, which are the nearest targets (1,000 hit points each, of which a rifle
+   takes about 3 a shot: 33,000 ticks for the four), then at the buildings (6,000 ticks). Nothing is
+   stuck and nobody waits; the match is long because a rifle is weak against a miner, and
+   because a wave fires at what is nearest and not at what ends the match. **Debt for RA8**
+   (and less likely once RA5 lets ore grow back): a wave that sees no armed enemy should go
+   for the buildings. The limit was not raised, and the test passes with the margin above.
+5. **Benchmark** (`m7_benchmark`, budget: mean 5 ms a tick): fixture 0.09 ms, shipped 0.19 ms
+   (0.09 and 0.18 before); the longest tick of the shipped scenario is 5 ms against a budget
+   of 50. A grid with infantry on foot is 12 bytes a cell larger; a path request of a ship or
+   an aircraft copies it with the grid, as before.
+
+### R45. RA3-B: tests adapted (none deleted, ignored or weakened)
+
+**Schema migration** (the assertions are unchanged; the arsenals of the fixtures are at schema
+4 with 0 in the four new fields of every older entry):
+
+| Test | What changed |
+|---|---|
+| `ra1_definitions.rs` (helper `arsenal_of` and the text edits of four tests) | the header they match and write is `(schema_version: 4, entries: [` |
+| `ra1_definitions.rs::other_schema_versions_are_rejected_in_every_file` | the arsenal rejects 3, 2, 1 and 5 against 4 (one case more) |
+| `ra1_definitions.rs::every_field_of_the_arsenal_file_is_required` | also removes each of the four new fields in turn (four cases more) |
+| `ra2_definitions.rs::the_fixture_loads_with_the_traits_of_schema_version_3` | asserts `ARSENAL_SCHEMA_VERSION == 4`, which keeps the traits of version 3; the traits asserted are unchanged |
+| `ra9_data_parity.rs::every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_difference` | extended: `infantry`, `crusher`, `crushable` and `size` of every mapped unit against the reference, and none of them on a building |
+
+**Compile migration**: game `audio::tests::events_play_only_what_the_human_player_may_know`:
+the `SoundContext` literal gained `crushed`; five assertions added (who hears a crushing, and
+that the destruction after it is silent); the others are unchanged.
+
+**Expectations changed: none.** The tests of the shipped data (`ra1_shipped.rs`,
+`ra2_shipped.rs`, `ra3_shipped.rs`) pass unchanged, though their infantry now stands at spots
+and some of their scenarios take a few ticks more or less (R6 item 9). `m2_movement.rs` and
+every other test of a fixture without the trait run tick for tick as before.
+
+**The soak** (`examples/m7_soak.rs`): its check of I6 is the check of I6' (R6 item 8); the
+other checks are unchanged.
+
+**New in RA3-B:** `ra3_cells.rs` (22: the spots; three soldiers in a cell and what does not
+fit; a cell holds a vehicle or infantry; walking from spot to spot in the ticks of a step, and
+keeping the spot; a fourth soldier waits, or stops beside a full cell; group moves; a vehicle
+cannot enter a cell with a friendly soldier, a soldier none with a vehicle; a soldier passes a
+soldier and a vehicle follows soldiers; range from the spot; the attack approach; splash on
+three soldiers; leaving a barracks and a transport; I6' for 2,000 ticks; determinism; the hash
+and the spots; the check itself; the older fixtures), `ra3_crush.rs` (13: positive on `Move`
+and `AttackMove` and through the pathfinder, three at once, gone at once; negative for its
+own, an ally's, what is not crushable, mixed cells, vehicles, what flies, units that are no
+crushers, and an attack's approach; the boundary tick both ways and a soldier walking in; I6'
+and determinism under crushing), `ra3_definitions.rs` (6), `ra3_ai.rs` (1, R44),
+`ra3_shipped.rs` 3 more (the shipped traits; three GIs in a cell; tanks over Conscripts, GIs
+and Engineers and round a Tesla Trooper, a Desolator and a Chrono Legionnaire, and an IFV
+round a Conscript); 4 unit tests in `sim::map` and `sim::unit` (the grid's rule, the hash of a
+grid with and without spots against the layout before RA3, a soldier's position between
+spots, the hash of the crush flag); in the game `audio` 1 and `health` 1.

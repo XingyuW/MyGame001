@@ -130,6 +130,22 @@ warheads and weapons of Red Alert 2 (a range is in cells; a reload at game speed
 * **Damage states.** At half its strength a unit or building is **yellow** and trails thin
   grey smoke, at a quarter **red** with thick black smoke. A vehicle or ship that is yellow or
   red moves at three quarters of its speed; infantry and aircraft do not slow down.
+* **Three soldiers to a cell.** Infantry on foot stand up to three to a cell, each at a spot
+  of its own (one above the middle of the cell, two below it left and right), yours and the
+  enemy's alike. A vehicle needs a cell to itself: it does not enter a cell with a soldier in
+  it, and a soldier does not enter a cell with a vehicle. A group of soldiers ordered to a
+  place fills the cells around it three at a time. Ranges and blasts are measured to where a
+  soldier stands, so a shell that lands on one of three soldiers hurts the other two a little
+  less. Click on a soldier to select that one of the three; a soldier's health bar is half as
+  long as a vehicle's. The Rocketeer flies and has the air above a cell to itself.
+* **Crushing.** A tank, a miner, an MCV, a Flak Track, a V3 Launcher or a Soviet Amphibious
+  Transport that you order to **move** or **attack move** drives over enemy infantry in its
+  way, and they die under it; all the soldiers of a cell at once. It never drives over your
+  own or an ally's soldiers (it goes round them, or waits), and it cannot crush a Tesla
+  Trooper, a Desolator, a Chrono Legionnaire or the stolen technology infantry. An IFV, a
+  Terror Drone and a Demolition Truck crush nothing. A unit ordered to **attack** does not
+  crush on its way to its target, and a miner at work does not either: move your tanks through
+  the infantry to crush it, and move your infantry out of the way of theirs.
 * **Still the game's own until later milestones.** The V3 Launcher's and the Dreadnought's
   missiles are shots that cannot be intercepted, the Aircraft Carrier launches two aircraft of
   the Harrier's kind, and the Destroyer's depth charges are fired from the ship (RA4 makes
@@ -411,7 +427,7 @@ not signed: on another Mac, open it with a right click and **Open** the first ti
 | Left click on your unit | select it; double click selects the same type on screen; empty ground clears selection |
 | Left drag | select units by their visible body centers, with live highlighting; the last endpoint is retained if the cursor leaves the window |
 | Shift + click or drag | add to the selection |
-| Right click on ground | move the selection there |
+| Right click on ground | move the selection there; tanks and other crushers drive over enemy infantry in their way |
 | Right click on ore with harvesters selected | assign that field; miners unload at their own refinery and return automatically (other units move) |
 | Right click on a visible enemy | attack it with the selected armed units |
 | Hover before right-clicking | the cursor previews the order: red reticle, red target outline and **ATTACK** over a valid enemy; green **MOVE**; gold **HARVEST** over ore with miners; blue **FRIENDLY** over your own units or buildings; grey **CANNOT GO** (and no order) over terrain none of the selection can enter or off the map |

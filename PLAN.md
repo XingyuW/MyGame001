@@ -116,6 +116,8 @@ Data files carry a `schema_version` field, are parsed with unknown fields denied
 | I9 | All dependency versions are pinned exactly and `Cargo.lock` is committed. |
 | I10 | Balance values live only in data files, and tests use fixture data so that balance changes do not alter test expectations. |
 
+Amended for the RA2 parity programme (section 14): since RA3, I6 reads I6', *a surface cell holds at most one vehicle or at most three infantry and never both; an air cell holds at most one aircraft; no unit occupies a cell covered by a building* (`docs/DECISIONS.md` R6).
+
 ## 7. Milestones
 
 Each milestone ends with a playable or runnable build, the validation commands of section 9 passing, and an independent review under section 10. The test lists are minima; section 8 defines the categories every milestone must cover.
