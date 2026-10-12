@@ -2820,8 +2820,22 @@ in `sim::combat`; in the game `hover_info` 1.
    (on the RA2 fixture, whose Soviet miner is armed; it fails without the fix in the tick of
    the first `Harvest` command). **To revisit in RA5**, when ore grows back: a harvester in
    the wave then has something to return to.
-3. **Measured** (`m14_duels -- full`, the 756 matches of `m6_production_matches.rs`; ticks;
-   "limit" is that test's, `72,000 x span / 128`). Before: the validation of RA3-A
+3. **A second defect of RA1, exposed the same way, fixed** (`ai.rs`, `View::stays_visible`).
+   A placement is applied one tick after the computer player issues it, so it places only on
+   cells that are certain to stay visible: within the sight of one of its buildings, or of one
+   of its units both from where the unit stands and from where it steps (D43). A unit that
+   teleports breaks the "or": a Chrono Miner with a full load is at its refinery in the next
+   tick. In the first validation run of RA3-B one of the 756 matches of
+   `m6_production_matches.rs` (Thousand Lakes, Iraq against Korea, both brutal, tick 13,622)
+   had a refinery placed on cells that only a Chrono Miner parked beside them lit; the miner
+   teleported, and the command was rejected as not visible without any loss, which that test
+   and the soak do not accept (`docs/validation/ra2-parity/ra3/first-run/`). Units of the
+   arsenal's roles `chrono_miner` and `chrono` are no longer counted. Regression test:
+   `ai::tests::a_cell_lit_only_by_a_unit_that_teleports_is_not_counted_on` (a unit test on the
+   legacy fixture, which has both roles; it fails without the fix).
+4. **Measured** (`m14_duels -- full`: the 756 pairings of `m6_production_matches.rs`, which
+   plays them with another seed and so along other courses; ticks; "limit" is that test's,
+   `72,000 x span / 128`). Before: the validation of RA3-A
    (`docs/validation/ra2-parity/ra3a/10-duels.log`). After: the validation of RA3
    (`docs/validation/ra2-parity/ra3/10-duels.log`; the run is deterministic, and a run before
    the validation gave these numbers).
@@ -2839,7 +2853,7 @@ in `sim::combat`; in the game `hover_info` 1.
    Matches are shorter: three soldiers to a cell bring three times the rifles to a fight, and
    the large maps, where armies meet in the open, gain most (their medians fall by a quarter
    to a third). The small maps are as they were at the median.
-4. **The one match near its limit is not a stall.** Riverlands (64 x 48, the smallest map),
+5. **The one match near its limit is not a stall.** Riverlands (64 x 48, the smallest map),
    America against Korea, both brutal, ends in tick 69,221 of 72,000 (0.96; before RA3-B the
    nearest was 0.76). Traced: the ore within the miners' reach is used up by tick 12,000 (every
    miner stands idle from then on); both armies are spent by tick 30,000, when Korea has one GI left and America four Chrono
@@ -2850,7 +2864,7 @@ in `sim::combat`; in the game `hover_info` 1.
    because a wave fires at what is nearest and not at what ends the match. **Debt for RA8**
    (and less likely once RA5 lets ore grow back): a wave that sees no armed enemy should go
    for the buildings. The limit was not raised, and the test passes with the margin above.
-5. **Benchmark** (`m7_benchmark`, budget: mean 5 ms a tick): fixture 0.09 ms, shipped 0.19 ms
+6. **Benchmark** (`m7_benchmark`, budget: mean 5 ms a tick): fixture 0.09 ms, shipped 0.19 ms
    (0.09 and 0.18 before); the longest tick of the shipped scenario is 5 ms against a budget
    of 50. A grid with infantry on foot is 12 bytes a cell larger; a path request of a ship or
    an aircraft copies it with the grid, as before.
