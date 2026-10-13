@@ -782,6 +782,158 @@ infantry as they fall, and computer players that sell out when they are beaten.
   at what comes into range in the first ticks: record events from the first tick.
 - Validation takes about 128 minutes.
 
+### Advisory reviews 1 and 2 (RA1 to RA4) and their remediation (2026-10-13)
+
+Not a milestone. The user asked for the final review to fit in three hours (DECISIONS R55), so
+independent reviewers examined the committed milestones while later ones were implemented:
+advisory review 1 (RA1 to RA3, three slices: `docs/reviews/RA2-parity-advisory-1-sim.md`,
+`-data.md`, `-tests.md`; 1 P0, 9 P1, 24 P2, 7 suspected) and advisory review 2 (RA4, two
+slices: `RA2-parity-advisory-2-sim.md`, `-tests.md`; 1 P0, 8 P1, 14 P2, 5 suspected). They are
+advisory: they gate and approve nothing. One remediation agent, which wrote none of the
+reviewed code and is no reviewer, treated each of the 69 items as a claim, reproduced it, and
+fixed or refuted it. **DECISIONS R56** has the decisions and one table row per item (claim,
+verdict, evidence, test). No approval is claimed: **the fixes and the verdicts have not been
+checked by an independent reviewer.**
+
+**Result:** 46 fixed (both P0; 15 of the 17 P1, one of them in part), 1 P1 settled by a
+recorded decision, 14 deferred (1 P1 as a listed difference for RA5, the others P2 or
+suspected, as debt), 8 refuted, no defect, not a product finding, or not verifiable.
+
+**What changed in the simulation.**
+- **Commands and the destroyed** (review 1 P0): a unit or building whose hit points a command
+  of the tick took (the nuclear strike) is gone for every command after it and for every order
+  waiting to be carried out; before, it could be undeployed or deployed back to life with one
+  hit point, sold for its refund, captured with all its hit points, embarked, moved and fired.
+- **Commands and the unseen** (review 1 P1, review 2 two P1): every command answers for a unit
+  or building of another player that the player does not see, or that is hidden from it (a
+  submerged unit), as for an id that names nothing; `Attack` on a hidden unit meets the checks
+  of an attack on nothing first; `Deploy` asks whether the player sees the footprint first.
+- **Ammunition** (review 2 P0): a round is a volley and is spent with its first shot, whatever
+  the target; shots at scenery and volleys cut short were free. A cloaked unit that fires at
+  scenery is seen; a launcher ordered onto scenery sends its rocket to the cell.
+- **Spawners**: the bay goes aboard a transport with its spawner (it had every missile again
+  when it left); the Chronosphere does not move a launched missile.
+- **Smaller**: a volley ends when its next shot is due while the unit is switched off; a
+  crusher gains nothing for driving over what was destroyed already; an aircraft is not queued
+  for a dock sold earlier in the tick; a missile type whose effect the combat file lacks is a
+  load error; the grid's hash writes the lengths of its two lists when there are units on
+  foot; the four places that put a unit into a cell handle a refusal of the grid.
+- **No match of computer players changed**: the computer player fires no superweapon, flies
+  no aircraft, launches nothing and hides nothing, so none of the changed paths is met in its
+  matches. Measured: all 756 duels of
+  `m14_duels -- full` end in the same tick as in RA4's validation
+  (`docs/validation/ra2-parity/ra4/10-duels.log` against `advisory-1/10-duels.log`: no line
+  differs but in its seconds), and the soak reports the same matches for each of its 260
+  configurations.
+
+**What changed in the data pipeline.** Validation runs `generate_ra2_data.py --check` and
+`ra2_reference.py --check` as commands 12 and 13 (the eleven of the prompt keep their numbers;
+plan section 6.1), and the reference table has its SHA-256 recorded beside it, so a table or a
+data file edited by hand fails. The audit also compares the free unit, the refinery flag, the
+producer, the factory group, side, domain, category and capacity of every item and its power as
+two numbers, and fails on any field of an item's entry that it neither compares nor lists as
+the game's own. Five new
+rows of `ra2_differences.tsv`: the refund of the two refineries (`Soylent=300`, see debt),
+Tanya's domain, the game's own damage of the effects `c4` and `radiation`. No shipped value
+changed (`units.ron` in its comments only).
+
+**What changed in the tests.** 32 new tests (893 to 925). The smoke test's "the minimap follows
+the radar" looks at the drawn image and can fail (it does when the map is drawn without radar),
+and a game test runs the drawing with radar, without and under low power. The 756 shipped
+matches of `m6_production_matches.rs` check I7 on every tick and I6' on every sixteenth and the
+last, since the soak's 36,000 ticks end before most shipped matches do (189 of its 252 shipped
+configurations at RA4 see no match end); they also write their lengths to a file. The RA1
+regression of the sweep order, which the doubled limit of RA2 had left without a failing
+condition, is a unit test that fails without the rule. On the shipped data: every item of
+every country's tree built, charged to the credit, placed or spawned and every building sold
+through commands (`ra1_catalogue.rs`), and every unit at every production rate charged exactly
+and never built for a credit less (`ra2_charging.rs`). Tests whose expectation or scenario
+changed are listed in R56 (nine rows; none deleted or ignored).
+
+**Corrected records.** R27 item 1 (`NotOwned` under fog), R29 (the duels are the test's
+pairings with another seed), R31 (its title; two checks had lost their force), R43 item 2, R50
+item 4, R53 item 2, R6 item 5 and R34 (two additions); the README's sentence on the smoke flow;
+the plan's sections 3.1 and 6.1.
+
+**Validation** (`sh scripts/validate_ra2_parity.sh advisory-1`, one run, on commit `f4a9aa5`:
+all code, data, tests and scripts as committed; only this entry, R56 and the annotations of the
+older records were written afterwards; logs in `docs/validation/ra2-parity/advisory-1/`;
+7,580 s, 126 minutes).
+
+| # | Command | Exit | Result |
+|---|---|---|---|
+| 1 | `cargo fmt --all -- --check` | 0 | |
+| 2 | `git diff --check` | 0 | |
+| 3 | `cargo clippy --workspace --all-targets -- -D warnings` | 0 | |
+| 4 | `cargo test --workspace --release` | 0 | **925 passed, 0 failed, 0 ignored** (893 after RA4); 3,263 s (3,137 s at RA4: the invariants in the 756 matches and the new tests) |
+| 5 | `cargo build --release -p game` | 0 | |
+| 6 | `cargo run --release -p game -- --smoke-test 600` | 0 | 712 ticks, 0 game flow problems, the minimap check on the drawn image |
+| 7 | `cargo run -p game -- --smoke-test 600` | 0 | 5,187 ticks, 0 game flow problems |
+| 8 | `cargo run --release -p sim --example m7_benchmark` | 0 | shipped: mean tick 0.221 ms, longest 5.536 ms; fixture 0.086 and 0.623 (budget 5 and 50) |
+| 9 | `cargo run --release -p sim --example m7_soak` | 0 | 260 configurations, 18,720,000 ticks, 2,587 s, peak heap 215.2 MiB of 1,024 |
+| 10 | `cargo run --release -p sim --example m14_duels -- full` | 0 | 756 of 756 ended with a winner, the slowest in tick 274,692 |
+| 11 | `sh scripts/package_macos.sh` | 0 | |
+| 12 | `python3 scripts/generate_ra2_data.py --check` | 0 | the seven shipped files are what the generator writes |
+| 13 | `python3 scripts/ra2_reference.py --check` | 0 | the table has its recorded hash and matches the cached ini files (4,888 rows) |
+
+**Assumptions** (R56): a volley cut short costs its round; nothing of a bay is reloaded in a
+transport, and what was out when the spawner boarded counts as lost; a shipyard repairs ships
+under low power; a slot without an elite weapon keeps its weapon (labelled now, R34).
+
+**Debt** (each with its reason in R56).
+- **`Soylent`** (review 1 data P1-3): a sold refinery refunds 1000 credits where the reference
+  gives 300. Listed difference; for RA5, with the schema of `economy.ron` it changes anyway
+  (the refund also sets the survivors of a lost building, so applying it changes every match).
+- **In the tick in which something is destroyed before `Cleanup`** (by a command, or in the
+  `Economy` stage by a missile) it still counts for power and production and still moves and
+  fires in that tick; only commands, waiting orders, the IFV's repair and a crusher's credit
+  were closed.
+- **The soak** does not compare two runs' hashes over the late game of the shipped matches, and
+  its state limits are not checked there either (R56 decision 6).
+- **Specialist mechanics on the shipped data** (loading and unloading, cloning, mind control,
+  the spy's effects, bombs, C4): tested on the legacy fixture only until RA6 replaces them.
+- **Rule values no code reads** (`build_ticks_per_1000`, `wall_build_time_pm`, `min_damage`,
+  the two scatter values, `ivan_damage`): applied by the generator, so a fixture's rules file
+  cannot change them.
+- **Game owned values that will be differences** (review 1 data P2-7, as the review counts
+  them): 21 of 38 building footprints against `Foundation`; the superweapons' `cooldown`
+  against `RechargeTime` (RA6); the miners' capacity and rate against `Storage` (RA5). `ITEM_FIELDS` of the audit
+  names each as the game's own.
+- **RA4, from review 2**: an aircraft whose dock cell another aircraft holds never lands and
+  asks for a path every few ticks (sim P2-2); an attack that ends for lack of ammunition has
+  no event (P2-3); the turn of the last stand never comes for think intervals of 512 or 1,024
+  ticks, which the data format admits and the shipped data does not use (P2-4); `rank_of` and
+  `experience_for` disagree for a type that costs nothing (P2-5); loose bounds on the spawn
+  timings in two tests, and the fixture's crew types hold whole cells (tests P2-7, P2-8).
+- **Game client, from review 1**: the smoke flow calls the menu's functions and drives no mouse
+  input, and compares neither game speed nor difficulty (tests P2-12); the sidebar's cost
+  labels are those of the first match of a session (P2-13, not reproduced); the headless
+  matches play without scenery (P2-14); two tests set a "captured" barracks up directly
+  (P2-6); suspected and not probed: yard starts with "MCV start" off on every map and player
+  count, and the sidebar's time hint with a disabled factory.
+- One stale comment stands (`ra1_definitions.rs`, "The arsenal is at 3 since RA2").
+- The debt of RA1 to RA4 stands.
+
+**Requires user verification.** Nothing new to look at or listen to. A behaviour the user may
+notice: a Harrier or Black Eagle that begins its volley has spent its round even if its target
+falls to the first missile, and it now spends rounds on trees and houses too; a V3 or a
+Dreadnought ordered onto scenery fires at it; a V3 that leaves a transport must wait for its
+next rocket.
+
+**For RA5 and later.**
+- A command handler finds units and buildings through the indexes that leave out what has no
+  hit points left (`EconomyParams::alive`, `BuildingIndex`, `special::living`), and answers for
+  another player's unit or building through `special::own` or `command::validate`, which ask
+  the player's vision and `SpecialState::hidden`. A new command should use them, and the test
+  `ra1_commands.rs::naming` should get a row for it.
+- What a shot does for the unit that fired it belongs in `flight::fired`, which runs for every
+  shot, also at scenery; what it does to its target follows in `special::resolve` after the
+  target was found among the actors.
+- A new field of an item in a data file must be added to `ITEM_FIELDS` of the audit, as
+  audited or as the game's own with a reason, or the audit fails.
+- `Soylent`: see R56 decision 7.
+- Validation has thirteen commands; the last two take a second.
+
 ## Repair, aircraft overflight, new music and distinct silhouettes (2026-10-06)
 
 Working-tree follow-up (decisions: "Building repair, aircraft overflight, readable silhouettes"

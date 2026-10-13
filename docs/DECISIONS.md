@@ -1434,7 +1434,12 @@ tests and an explicit check by the final reviewer.
    move on, a vehicle all (`make_room`). The diagonal rule (no step between two cells that one
    unit holds both of) applies to every holder of the two cells. Two soldiers that pass each
    other may be at one point for a tick (their lines between spots cross); two that stand
-   never are. A unit's own state has no spot field: the grid's table is the only record, and
+   never are. (R56, advisory review 1, sim P2-3: a soldier that changes its spot on a
+   diagonal step is likewise, for a part of the step, at a point of a third cell that it does
+   not hold, since its line runs from spot to spot; an impact finds units through the cells
+   they hold and measures to their positions, so with the spreads of the shipped warheads no
+   such soldier is missed, and a warhead without a spread hits only what holds the impact
+   cell.) A unit's own state has no spot field: the grid's table is the only record, and
    `Position` follows from it.
 6. **Callers reviewed** (every use of `occupant`, `claim`, `release` in both crates):
    | Caller | What it asks now |
@@ -2171,7 +2176,10 @@ New in RA1-C (16 tests, all in the game crate): `skirmish` 9
    are repaired here"), of the building's element (a ship at a shipyard, a ground vehicle
    elsewhere, an amphibious one at either, no aircraft: "This unit is not repaired here"), and
    damaged ("This unit is not damaged"); all as `AbilityUnavailable`, with no state change.
-   Another player's unit is `NotOwned`, as for every unit command.
+   Another player's unit is `NotOwned` if the player sees it, and `UnknownUnit` if it does
+   not or the unit is hidden from it, as for every unit command (D30, D33). (Corrected by
+   R56: this sentence said `NotOwned` for every unit of another player, and the code did
+   that; advisory review 1, sim P1-1.)
 2. **Docking.** The vehicle drives to a free cell beside the building (the approach of
    transports and engineers) and is then recorded in `SpecialState::docked` (unit to
    building, hashed). A building covers its cells, so "onto the depot" is "beside it"; any
@@ -2231,8 +2239,10 @@ speeds up by 1 / 0.8. The pace at which a computer player's army is built is the
 length is governed by that pace, is rescaled by 2. (Infantry: a GI took 80 ticks and takes
 168, with two Barracks 134, a factor of 1.68; buildings 1.75 to 4.2, once per match.)
 
-**Measured** (`m14_duels -- full`, the same 756 matches as the test; ticks; "old limit" is
-36,000 x span / 128). Before: `docs/validation/ra2-parity/ra1/10-duels.log`. After:
+**Measured** (`m14_duels -- full`, the 756 pairings of the test, played with another seed
+(14, the test's is 0) and so along other courses; ticks; "old limit" is 36,000 x span / 128.
+Corrected by R56, which has the lengths of the test's own matches: this sentence said "the
+same 756 matches as the test"). Before: `docs/validation/ra2-parity/ra1/10-duels.log`. After:
 `docs/validation/ra2-parity/ra2/10-duels.log` (the run is deterministic: a run before the
 validation gave the same ticks).
 
@@ -2299,7 +2309,15 @@ arsenal; the limit was not raised to cover it alone (it would fit a factor of 1.
 9. Nothing was drawn or recorded for RA2: no asset, no sound, no entry in
    `assets/LICENSES.md`.
 
-### R31. RA2: tests adapted (none deleted, ignored or weakened)
+### R31. RA2: tests adapted (none deleted or ignored; two checks lost their force, see the note)
+
+**Note (R56, advisory review 1, tests P1-1, P1-3 and P1-4).** The limit raised for the four
+tests of `m6_production_matches.rs` (the last row of the third table) left the RA1 regression
+`the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first` without its failing
+condition: without its fix the match takes 53,431 ticks, inside the new limit. And since a
+default match has no radar, the smoke test's "minimap pixels lit" is satisfied by the offline
+screen. Both are made good in R56 (a unit test of the sweep order; the smoke test and a game
+test look at the drawn image), and this title no longer says "none weakened".
 
 **Compile migrations** (the assertions are unchanged):
 
@@ -2453,7 +2471,10 @@ shared helpers in `tests/ra2_common/mod.rs`; 2 unit tests in `sim::economy`; in 
    `Weapon` carries the primary and the secondary weapon (the type's, or what a passenger
    gave an IFV); RA4 puts the elite weapons there on promotion (`CombatTerms::weapons(true)`;
    an elite weapon takes the place of the weapon of its slot, and a slot without one keeps
-   its weapon, as the Mirage Tank's `EliteSecondary` without an `ElitePrimary` requires).
+   its weapon, as the Mirage Tank's `EliteSecondary` without an `ElitePrimary` requires;
+   **assumption**, labelled by R56: no source states the engine's rule for a slot without an
+   elite weapon, the generator and the audit share it, and for a type without any elite key
+   the audit only asserts that its weapons stay the same).
    One reload timer serves both weapons, as in the original.
 4. **Land, sea and under water** (the brief's item 4; decided from the ini). The ini says per
    attacking type what it may attack on water: `NavalTargeting` 0 none that is underwater
@@ -2781,7 +2802,9 @@ in `sim::combat`; in the game `hover_info` 1.
    nearest to the cursor among those whose pick area contains it, and the hover label uses the
    same function: with three soldiers 17 to 24 pixels apart a click on a soldier's body picks
    that soldier (`health::tests::the_bars_of_three_soldiers_in_a_cell_do_not_overlap_and_each_can_be_picked`).
-   A box selects every soldier whose ground point lies in it, as before.
+   A box selects every soldier whose body centre (its ground point raised by
+   `GROUND_OFFSET_PX`, as `selection.rs` and the README say) lies in it, as before.
+   (Corrected by R56: this sentence said "ground point".)
 3. **Health bars.** The bar of a unit on foot is 16 pixels long instead of 32
    (`health::unit_bar_length`): the two soldiers that stand side by side are 24 pixels apart,
    and the third stands 12 pixels higher, so no two bars meet.
@@ -3142,7 +3165,9 @@ spots, the hash of the crush flag); in the game `audio` 1 and `health` 1.
    the rank of their spawner (an elite carrier's Hornets drop `[HornetBombE]`) and are
    destroyed with it. **Not carried**: `[HornetCollision]` and `[ASWCollision]`, their second
    weapons against aircraft (a launched aircraft attacks only what its spawner fires at,
-   which is never an aircraft); listed differences.
+   which is never an aircraft; this holds because a unit with a move order does not fire on
+   its own, `combat.rs`, not by a rule of `flight.rs`: a change to idle fire would have to
+   keep it, R56); listed differences.
 5. **The Destroyer** launches its Osprey with its secondary weapon, which its
    `naval_targeting` 1 chooses against what is underwater (R34): the Osprey's `[ASWBomb]`
    (50 through `[APSplash]`) is what reaches a Typhoon; the ship's gun does not.
@@ -3240,7 +3265,9 @@ spots, the hash of the crush flag); in the game `audio` 1 and `health` 1.
    its army needs, and does nothing for a player that can produce no army unit. Now a player
    that has no unit that fights and no harvester at work, and whose credits, units, buildings
    and queue progress have not changed for `LAST_STAND_PATIENCE` (1,200) ticks, sells its
-   buildings, the dearest first, one a turn, and only in the turn of its player id
+   buildings, the dearest first, one each time it thinks (so with the shipped think
+   intervals of 10 to 40 ticks a whole base goes within one turn; R56 corrects "one a
+   turn"), and only in the turn of its player id
    (`LAST_STAND_TURN`, 256 ticks: two players never sell their last building in one tick,
    which would end a match without a winner). The survivors of crewed buildings are armed
    units that join its next wave; a player without a building is defeated in a short game. It
@@ -3386,3 +3413,273 @@ the user was told and can veto):
 Advisory review 1 (RA1 to RA3, at commit `46e694d`, three slices, about 17 minutes of wall
 time): 1 P0, 9 P1, 24 P2 and 7 suspected items; see the three reports and the remediation's
 decision record.
+
+### R56. Remediation of advisory reviews 1 and 2 (RA1 to RA4)
+
+Advisory review 1 (R55: three slices on the snapshot of `46e694d`, RA1 to RA3: 1 P0, 9 P1, 24 P2
+and 7 suspected items) and advisory review 2 (two slices on the snapshot of `6a41bc3`, RA4: 1 P0,
+8 P1, 14 P2 and 5 suspected items; `docs/reviews/RA2-parity-advisory-2-sim.md` and `-tests.md`)
+were remediated together by one agent that wrote none of the reviewed code and is no reviewer.
+Every finding was treated as a claim: reconciled against the code at `ba26de1`, reproduced
+(the reviewers' probe files, or a new test run against the code before the fix), then fixed or
+refuted. "Fails before" below means that the named test was run against the unfixed source and
+failed; the logs of those runs are not committed. **The fixes and the verdicts of this record
+have not been checked by an independent reviewer**: they are the remediation agent's own.
+Validation: all thirteen commands exit 0 on commit `f4a9aa5`, 925 tests
+(`docs/validation/ra2-parity/advisory-1/`; `docs/STATUS.md`). No match of computer players
+changed: the 756 duels end in the same ticks as in RA4's validation, since the computer player
+meets none of the changed paths (it fires no superweapon, flies no aircraft, launches and hides
+nothing).
+
+**Of the 69 items:** 46 fixed (both P0; 15 of the 17 P1, one of them in part: the shipped
+counterpart of the legacy mechanics tests, whose specialist part waits for RA6); 1 P1 settled
+by a recorded decision (the soak, decision 6); 14 deferred (1 P1, `Soylent`, as a listed
+difference for RA5, decision 7; the others P2 or suspected, as debt); 8 refuted, found to be no
+defect, not a product finding, or not verifiable. The table of each review follows the
+decisions.
+
+#### Decisions
+
+1. **What a command of the tick destroyed is gone for the commands after it** (review 1 sim
+   P0-1, and its suspected item 1). A command can take the last hit points of a unit or
+   building: the nuclear strike lands in the `Commands` stage (the only such command today; the
+   computer player issues none). `Cleanup` removes the dead at the end of the tick, and until
+   then it was an ordinary unit or building for every later command, so it could be deployed,
+   undeployed (both gave it one hit point back and so kept it alive), sold for its refund,
+   moved, embarked, repaired, fired as a superweapon, and counted as a prerequisite, a factory
+   and an anchor of a placement. The fix is at the indexes, not at the three reported symptoms:
+   the units and buildings a command may name or rely on are those with hit points left
+   (`EconomyParams::alive` for the unit index and the `BuildingIndex` of the regular commands;
+   `special::living` for the actors of `Deploy`, `Undeploy`, `Interact` and `Superweapon`). A
+   command that names such a unit or building is rejected as for an id that names nothing
+   (`UnknownUnit`, `UnknownBuilding`, `UnknownTarget`). The same root cause in the `Economy`
+   stage of that tick: an order waiting to be carried out (`SpecialState::interactions`: an
+   engineer that arrives, a unit that reaches its transport or depot) is dropped when either
+   side has no hit points left (before, the capture gave a destroyed building all its hit
+   points and a new owner), and the repair of an IFV that carries an Engineer adds nothing to a
+   vehicle without hit points. Not changed: in the stages between `Commands` and `Cleanup` of
+   that one tick the destroyed building still counts for power and production, and a destroyed
+   unit still moves and fires, as everything that a missile or a radiation zone destroys in the
+   `Economy` stage does (debt, below).
+2. **One rule for what a rejection may tell** (review 1 sim P1-1, P2-4; review 2 sim P1-3,
+   P1-4). The rule since M4 (D30, D33) is that a command naming something of another player
+   that the issuing player does not see is rejected exactly as for something that does not
+   exist. It now holds for every command: `special::own` (used by `Deploy`, `Interact`,
+   `Superweapon` and the unit list of a Chronosphere) and `command::validate` (the unit
+   commands) answer `UnknownUnit` unless the player sees a cell of the unit or building **and**
+   it is not in `SpecialState::hidden` for that player (a submerged unit, RA4); `Attack` on a
+   hidden unit goes through the ordinary checks (`NoUnits`, `NotArmed`, ...) before
+   `UnknownTarget`, so that an attack by no unit no longer tells a hidden unit anywhere on the
+   map from nothing; `Deploy` asks whether the player sees the footprint before it looks at
+   it, as `PlaceBuilding` does. One test walks every command variant that names a unit or
+   building against a missing id, an unseen unit, an unseen building and a hidden unit and
+   compares the answers (`ra1_commands.rs`). R27 item 1 described the old behaviour and is
+   corrected in place.
+3. **Ammunition: a round is a volley, spent when the volley begins** (review 2 sim P0-1;
+   amends R49 item 1). `flight::fired` runs for every shot, whatever it is fired at (it ran
+   only for a shot at a unit or building, so shots at scenery cost nothing, gave a launcher's
+   bay no target and did not surface a cloaked unit). A round is taken with the **first** shot
+   of a volley, and an aircraft whose last round is spent finishes the volley it has paid for
+   and then turns for home. **A volley cut short costs its round** (its target is destroyed by
+   the first shot and nothing else is in reach when the next is due): the reference gives the
+   Harrier `Ammo=1`, one attack run per sortie, and a run that was begun is used up. No source
+   says what the original does with a burst that loses its target; this is the closest reading
+   (**assumption**).
+4. **A launcher reaches scenery; a bay goes aboard with its spawner** (review 2 sim P1-1,
+   P1-2; amends R50 items 2 and 3). A launcher ordered onto scenery launches at the cell the
+   scenery stands in (a missile's aim is a point; a launched aircraft is given the same attack
+   order), instead of firing its launching shot for ever. The bay of a spawner that boards a
+   transport is kept with the passenger (`Passenger::bay`, hashed): what it had out counts as
+   lost from then on, each place to be filled after the type's `spawn_regen`, and the timers
+   stand still aboard (**assumption**: nothing is reloaded in a transport); before, the bay
+   was dropped and the spawner had everything again when it left.
+5. **Smaller rules of RA4** (review 2). The unit list of a Chronosphere refuses a launched
+   missile or aircraft (`NotCommandable`; suspected item 4, confirmed). A crusher gains
+   nothing for driving over a unit whose hit points were gone already (suspected item 1,
+   confirmed with a strike of the same tick). `QueueProduction` of an aircraft counts the
+   docks of the buildings that stand in its tick, not those of the last `Economy` stage (sim
+   P2-1). An arsenal whose `missile` has an effect the combat file lacks, plain or elite, is
+   rejected (`UnknownReference`, kind `effect`, at `entries[n].missile`; tests P1-4; amends
+   R46 item 2). The last stand of a player with credits that stand still (a finished building
+   without a site) is the rule's intent, not a wrongful sale: what counts is that nothing the
+   player has changes (suspected item 2; the unit test of the rule says so now).
+6. **The soak stays at 36,000 ticks, and the late game is checked where matches are played
+   out** (review 1 tests P1-2). PLAN.md section 7 defines the soak as 36,000 ticks, so its
+   length is not a weakened test; what it covers shrank when the pace of the matches halved.
+   Counted from the validation logs, of the 252 shipped configurations those in which no match
+   ended within 36,000 ticks, and the matches ended: RA0 91 and 317; RA1 60 and 339; RA2 110
+   and 243; RA3 177 and 95; RA4 189 and 78. Doubling `SOAK_TICKS` would add about 46 minutes to
+   every validation. Instead the 756 matches of `m6_production_matches.rs`, each played to its
+   end, now assert on every tick that no player's credits are negative (I7) and on every
+   sixteenth tick and the last that `sim::cell_invariant_violations` and `sim::stray_claims`
+   find nothing (I6'), besides the rejection rule they always checked. Not made good: the
+   comparison of two runs' hashes over the late game of the shipped matches (the soak compares
+   it over its 36,000 ticks; `m6_ai.rs` and `ra4_ai.rs` compare whole matches on fixture
+   data), and the state limits. Debt. The test run of the validation took 3,263 s with these
+   checks and the new tests, against 3,137 s at RA4.
+7. **`Soylent` is a listed difference until RA5** (review 1 data P1-3). The reference gives
+   the two refineries `Soylent=300`, and the plan's research (appendix D, topic 9; a single
+   source, ModEnc) says a non-zero value replaces the computed refund, so a sold refinery
+   returns 300 credits in Red Alert 2 and 1000 in the game, which lets a player keep the free
+   miner for 1000 credits net. It is **not applied here**: the refund of a type also sets the
+   number of survivors of every sold or destroyed building of that type (R48), so applying it
+   changes every match of computer players, and it needs a per type value that the rule
+   `refund_percent` of a fixture cannot express (four fixture tests assert the rule with 40
+   percent against a `sell_value` of 50). It belongs with RA5, which changes the schema of
+   `economy.ron` for the miners and refineries. The audit now recomputes the refund with
+   `Soylent` and the two rows are in `ra2_differences.tsv`; the Ore Purifier's `Soylent=1250`
+   equals half its cost. **For RA5:** give the type its refund (`sell_value` as the override
+   of the rule), decide with the research whether survivors follow it, and delete the two rows.
+8. **The pipeline is gated** (review 1 data P1-1, P2-6). `scripts/validate_ra2_parity.sh`
+   runs `generate_ra2_data.py --check` and `ra2_reference.py --check` as commands 12 and 13;
+   the eleven commands of the prompt keep their numbers. The reference script records the
+   SHA-256 of the table it writes (`ra2_reference.tsv.sha256`), and `--check` compares the
+   committed table with it before anything else, so a table edited by hand fails also on a
+   machine without the ini files; there the comparison with the ini files is skipped with a
+   notice and the command passes.
+9. **The audit covers every field of an item** (review 1 data P1-2, P2-1, P2-3). Added: the
+   free unit and `Refinery` of a building, the producer of every item, the arsenal's factory
+   group, side, domain, category and capacity, power as two numbers, the refund with
+   `Soylent`; a row is required for the game's own damage of the effects `c4` and `radiation`
+   (reference value `-`); and `ITEM_FIELDS` lists every field of the entries of units and
+   buildings in the four shipped files as audited (with the field name of the audit, which
+   must have been compared) or as the game's own with a reason: a field that is in a shipped
+   entry and not in the list, or the reverse, fails. Eleven of the twelve mutations of the
+   review fail the audit now, and four more of the same kind; the twelfth changed the ore
+   units of the miners and refineries, which are the game's own until RA5 and are on the list
+   as such. New rows: Tanya's domain (her amphibious movement zone is not
+   modelled), the two effects, the two refunds. "Infantry on foot" is `[InfantryTypes]`
+   everywhere (the generator's and the audit's speed factor used `Category=Soldier`; the two
+   agree for all mapped sections, and `units.ron` changed in its comments only).
+10. **Rule values that no code reads** (review 1 data P2-2): `production.build_ticks_per_1000`
+    and `wall_build_time_pm`, `combat.min_damage`, `ballistic_scatter`, `homing_scatter` and
+    `ivan_damage` of `rules.ron` are the reference's values as the generator has already
+    applied them (to the build times of `economy.ron`, the scatter of each weapon, the effect
+    `ivan_bomb`; the minimum damage of 1 is PLAN.md's equation 2). They are loaded, range
+    checked, hashed and audited, and the simulation reads the applied values: a rules file of a
+    fixture cannot change them. Recorded as it is; debt.
+11. **The Service Depot under low power** (review 1 sim, suspected item 2): `[GADEPT]` and
+    `[NADEPT]` have no `Powered` key in the reference, so by the plan's rule (section 4.2: a
+    building stops working when it is `Powered` and drains power) they keep repairing. The two
+    shipyards are `Powered=true` and repair ships (R27 item 4); a shipyard's production only
+    slows under low power, and no source says that its repair stops, so it does not
+    (**assumption**). No change.
+12. **The tick limit and its justification** (review 1 tests P1-3, P1-4). R29 measured the
+    duels (seed 14), not the test's own matches (seed 0); it is corrected in place, and R31
+    says that the raised limit took the failing condition from the RA1 regression test of the
+    sweep order. Measured with the test's seed at RA4: that match (Crossroads, Libya against
+    Iraq, both easy) takes 45,345 ticks with the rule and 53,431 without, both inside 72,000.
+    The failing condition is restored where the rule is:
+    `sim::ai::tests::a_sweep_starts_at_the_waypoint_nearest_to_an_enemy_start` fails without
+    it. No bound on the match's length was added to the end to end test: such a bound would
+    have to be measured anew with every change of the rules. `m6_production_matches.rs` now
+    writes the length of every match with its limit to
+    `target/tmp/m6_production_matches_lengths.tsv`, so each run measures its own margin.
+    Measured in the validation of this remediation (`advisory-1`; the test's seed 0, all 756
+    matches): length over the limit median 0.17, 90th percentile 0.37, longest 0.95 (Thousand
+    Lakes, France against Germany, both brutal: 274,693 of 288,000 ticks); 32, 9, 2 and 1
+    matches above 0.5, 0.7, 0.8 and 0.9 of their limits; on the small maps the longest takes
+    57,055 of 72,000 (Crossroads, Korea against France, both easy); 32.4 million ticks in all.
+    Against the duels of RA4's validation (seed 14): 691 of the 756 pairings take exactly as
+    long with both seeds, and 65 take another course (the widest apart: Oasis Gulf, Great
+    Britain against Russia, both easy, 66,468 ticks against 40,410). So the tables of R29, R38,
+    R44 and R53 describe the test's matches closely, not exactly, and the match at 0.95 of its
+    limit (debt of R53 item 5) is the test's own as well.
+    `MATCH_TICK_LIMIT` was not changed.
+
+#### Tests adapted (none deleted or ignored)
+
+| Test | What changed and why |
+|---|---|
+| `ra4_aircraft.rs::an_aircraft_fires_its_volleys_returns_and_reloads_a_round_at_a_time` | it waited for the ammunition to drop and then counted two shots; the round now drops with the first shot (decision 3), so it asserts one shot at that moment and waits for the end of the volley for the two. The counts of shots, the damage and the reload are unchanged |
+| `ra4_shipped.rs::a_harrier_fires_one_volley_and_reloads_it_on_its_dock` | the target is taken away before the reload is timed: the reloaded Harrier fires at a target in reach in the tick in which it has its round again, and the round is now spent with that first shot. The 360 ticks and both assertions on the ammunition are unchanged |
+| `ra4_definitions.rs::the_terms_of_a_spawner_must_fit_together` | the arsenal with `missile: "dmisl"` on the rocket was asserted to be accepted with a combat file that lacks the effect; it is now asserted to be rejected (decision 5), accepted with both effects listed, and rejected with one |
+| `ra4_definitions.rs::every_trait_of_schema_version_5_is_hashed` | its `missile` row changes `"v3"` to `"none"` instead of `"dmisl"`, which the fixture's combat file no longer admits; the assertion (another hash) is unchanged |
+| `ra3_shipped.rs` (helper `first_shot`) | for a cloakable target a silent Destroyer of the attacker's player lies in sensor range, and the helper asserts on every tick that the target is not hidden (review 2 tests P1-1); every expectation is unchanged. This is the row R54 lacked: since RA4 the two "never at a submarine" cases had passed because the Typhoon was hidden |
+| `ra4_shipped.rs::only_the_base_units_have_a_crew_and_it_is_of_their_owners_side` | an airport bound aircraft stands on an Airforce Command and is asserted to be destroyed in the tick whose events are read (the Harrier row could not fail: the aircraft was lost a tick earlier); the Black Eagle is added |
+| `ra4_shipped.rs::the_survivors_of_shipped_buildings_follow_the_refund_and_the_divisors`, `a_fifth_harrier_is_refused_and_built_after_a_second_airforce_command_stands` | stricter: two rows with quotients that are not whole (Tesla Reactor 2, Ore Purifier 3); the rejection is asserted with its reason |
+| `ra9_data_parity.rs::the_conversions_round_half_away_from_zero_in_integers` | `speed` takes whether the section is in `[InfantryTypes]` instead of reading `Category`; the five expected speeds are unchanged. The audit's field `power` became `power_produced` and `power_consumed` (no row of the differences used it) |
+| `ra2_production.rs::a_player_id_outside_the_match_changes_nothing`, `sim::ai::tests::a_player_that_can_neither_fight_nor_earn_makes_its_last_stand`, game `tests/m6_production_matches.rs` | assertions added (the unchanged state hash; credits that stand still; I7 and I6' in every match) |
+
+New: `ra1_commands.rs` 16, `ra1_catalogue.rs` 1, `ra2_charging.rs` 2, `ra3_weapons.rs` 1,
+`ra4_aircraft.rs` 4, `ra4_spawns.rs` 2, `ra4_cloak.rs` 1, `ra4_veterancy.rs` 2,
+`ra4_shipped.rs` 1, `sim::ai` 1, game `minimap` 1: 32 tests, 893 before and 925 after.
+
+#### Advisory review 1 (RA1 to RA3)
+
+| Id | Claim | Verdict | Evidence | Test |
+|---|---|---|---|---|
+| sim P0-1 | a yard or base unit destroyed by a command of the tick lives on through `Undeploy` or `Deploy`; a destroyed building is sold | **fixed** (decision 1) | reproduced with the review's probe on `ba26de1` (the yard a unit with 1 hit point, the base unit a yard, the sale paid 800); nine of the new tests fail before, their three controls pass | `ra1_commands.rs`: the eight tests `a_..._destroyed_by_a_strike_...` and `a_destroyed_building_is_no_prerequisite_and_no_anchor_in_the_same_tick` |
+| sim P1-1 | `Deploy`, `Interact`, `Superweapon` tell an unseen enemy from a missing id | **fixed** (decision 2) | reproduced with the probe (`NotOwned` against `UnknownUnit`); fails before | `ra1_commands.rs::every_command_answers_for_an_unseen_enemy_as_for_an_id_that_names_nothing`, `a_seen_enemy_is_reported_as_not_owned`, `the_chronosphere_answers_for_an_unseen_enemy_vehicle_as_for_an_id_that_names_nothing` |
+| sim P2-1 | the results of `Grid::claim` are dropped in four places | **fixed** | teleport, undeploy, unload and `spawn_unit` handle a refusal (the unit keeps its cells, the yard stays, the passenger stays aboard, no unit is spawned) | none possible: the checks before each call are the grid's own, so the refusal cannot be provoked |
+| sim P2-2 | the tail of the grid's hash has no lengths | **fixed** | the two counts are written when there are units on foot; without any the hash is what it was before RA3, which `map::tests::the_hash_covers_the_spots_and_is_unchanged_without_units_on_foot` asserts (an unconditional count failed it) | that test; no two reachable grids collided before |
+| sim P2-3 | a soldier on a diagonal step is for some ticks in a cell it does not hold | **fixed** (record) | R6 item 5 says so now, with why no impact misses it | - |
+| sim P2-4 | `Deploy` looks at the footprint before it asks whether the player sees it | **fixed** | real, but not reachable through a Gap Generator as the review thought (a unit's own sight counters it, `special::reconnaissance`): only with a base unit that sees less than its footprint; fails before | `ra1_commands.rs::deploying_names_nothing_in_a_footprint_the_player_does_not_see` |
+| sim P2-5 | a volley is kept while its unit is disabled or rearming | **fixed** | fails before (`burst_left` 2 after the due tick) | `ra3_weapons.rs::a_volley_whose_next_shot_is_due_while_the_unit_is_switched_off_ends` |
+| sim S1 | embarking in the tick of death | **fixed** with P0-1 (confirmed) | fails before: the soldier went aboard | `ra1_commands.rs::a_unit_destroyed_by_a_strike_does_not_embark_and_a_destroyed_transport_takes_nobody` |
+| sim S2 | Service Depot and low power | **no defect** (decision 11) | `[GADEPT]`, `[NADEPT]` have no `Powered` key (`ra2_reference.tsv`) | - |
+| data P1-1 | nothing in validation checks generator and reference table | **fixed** (decision 8) | a table edited by hand exits 1 with and without the cache; a shipped file left edited by a failed script of this remediation was reported stale by the generator's check | commands 12 and 13 |
+| data P1-2 | the audit misses ported fields and has no completeness guard | **fixed** (decision 9) | the review's mutations rerun: eleven of twelve fail the audit; the twelfth changes values the list names as the game's own | `ra9_data_parity.rs` (`ITEM_FIELDS`) |
+| data P1-3 | `Soylent` of the refineries is not applied | **deferred**, listed as a difference (decision 7) | two rows of `ra2_differences.tsv`; the audit recomputes with `Soylent` (the mutation to 300 fails as a stale row) | `ra9_data_parity.rs` |
+| data P2-1 | two tests of "infantry" in the pipeline | **fixed** | the type list in the generator and the audit; `units.ron` differs in comments only | `ra9_data_parity.rs` |
+| data P2-2 | rule values that no code reads | **deferred** as debt (decision 10) | - | - |
+| data P2-3 | power audited as one net number | **fixed** | the mutation 200/0 to 250/50 fails | `ra9_data_parity.rs` |
+| data P2-4 | a reason in the differences that the data contradicts | **fixed** | no shipped infantry has more than 200 hit points; the warhead deals 100 percent to their three armours | - |
+| data P2-5 | five statements of the pipeline's documents | **fixed** (four), one left | generator header, plan section 3.1, the animation identifiers of `[Powerups]`, the unused constant; the comment "The arsenal is at 3 since RA2" in `ra1_definitions.rs` stands (debt) | - |
+| data P2-6 | `ra2_reference.py --check` passes without the cache | **fixed** (decision 8) | the recorded hash is checked first | command 13 |
+| data P2-7 | game owned values that will be differences (footprints, superweapon recharge, harvesters) | **deferred** as debt for RA5, RA6 and RA9 | `ITEM_FIELDS` names each as the game's own with its milestone; the carrier's capacity is gone since RA4 | - |
+| data P2-8 | the elite fallback is asserted, not audited | **fixed** (record) | labelled an assumption in R34 | - |
+| data S-1 | `JumpjetSpeed` read as leptons per frame | **not verifiable**; stays the labelled assumption of R7 and plan 4.1 | no source gives the unit | - |
+| tests P1-1 | the smoke check "the minimap follows the radar" cannot fail | **fixed** | with the map drawn without radar the new test and the smoke test fail ("the minimap does not follow the player's radar", exit 1) | game `minimap::tests::the_drawing_is_the_map_with_radar_and_the_offline_screen_without`; the smoke test |
+| tests P1-2 | the soak covers less of a match since RA2 | **decided** (decision 6) | the counts of five validation logs | `m6_production_matches.rs` (I7, I6') |
+| tests P1-3 | the RA1 regression test lost its failing condition | **fixed** (decision 12) | confirmed: 53,431 ticks without the rule; the unit test fails without it | `sim::ai::tests::a_sweep_starts_at_the_waypoint_nearest_to_an_enemy_start` |
+| tests P1-4 | R29's limit rests on other matches than the test's | **fixed** (decision 12) | R29 and R31 corrected; the test's own lengths measured | `m6_production_matches_lengths.tsv` |
+| tests P1-5 | the legacy mechanics tests have no shipped counterpart | **fixed** for the catalogue, charging and sale; the rest **deferred** to RA6 | the review's two probes adopted; deferred: loading and unloading transports, cloning, mind control, the spy's effects, bombs and C4 on shipped data, which RA6 replaces by the mechanics of Red Alert 2 and tests then (plan, RA6) | `ra1_catalogue.rs`, `ra2_charging.rs` |
+| tests P2-6 | a "captured" building is set up directly in two tests | **deferred** as debt | the capture itself is tested on fixtures (`ra1_buildability.rs`, and now `ra4_aircraft.rs` and `ra1_commands.rs`) | - |
+| tests P2-7 | the "property test over costs and rates" tests one cost | **fixed** | the probe adopted: every shipped unit, 1 to 4 factories, with and without power | `ra2_charging.rs` |
+| tests P2-8 | the low power test has no positive control | **fixed** | the probe adopted | `ra2_charging.rs::the_prism_tower_fires_with_power_in_the_scenario_of_the_low_power_test` |
+| tests P2-9 | silent fallbacks in the validation examples | **fixed** | `m14_duels` and `m7_soak` fail on a side without a country | - |
+| tests P2-10 | stale comments in `m6_production_matches.rs` | **fixed** | - | - |
+| tests P2-11 | a test name promises more than it asserts | **fixed** | the state hash is compared | `ra2_production.rs::a_player_id_outside_the_match_changes_nothing` |
+| tests P2-12 | the smoke flow drives no input and compares less than the README says | **fixed** for the README; the rest **deferred** as debt | no `Interaction::Pressed` in `smoke.rs`; game speed and difficulty are not compared | - |
+| tests P2-13 | card cost labels are those of the first match of a session | **deferred** as debt (not reproduced: the interface was not driven) | - | - |
+| tests P2-14 | the headless matches play without scenery | **deferred** as debt; the test's header says so | - | - |
+| tests P2-15 | R43 item 2 against the code | **fixed** | R43 corrected in place | - |
+| tests P2-16 | the shared snapshot was changed during the review | **no product finding** | process of the review | - |
+| tests S1 | yard starts with "MCV start" off are not swept over all maps | **deferred** (not probed) | - | - |
+| tests S2 | the sidebar's hint counts disabled factories | **deferred** (not probed) | - | - |
+| tests S3 | `offline_text` says "low power" during a spy's outage | **no defect** | the function's documentation states it (`minimap.rs`: "which a spy in a power plant also causes") | - |
+| tests S4 | whether the unfixed sweep still exceeds the limit | **answered**: it does not (53,431 of 72,000) | measured by removing the rule | see P1-3 |
+
+#### Advisory review 2 (RA4)
+
+| Id | Claim | Verdict | Evidence | Test |
+|---|---|---|---|---|
+| sim P0-1 | ammunition is spent only by the last shot of a volley at a unit or building | **fixed** (decision 3) | reproduced with the review's probe on the code before the fix (50 shots at scenery and six cut volleys with full ammunition) | `ra4_aircraft.rs::an_aircraft_spends_its_rounds_on_scenery_as_on_everything_else`, `a_volley_that_is_cut_short_costs_its_round`; `ra4_cloak.rs::a_submerged_unit_that_fires_at_scenery_is_seen_for_the_cloak_delay` (on a fixture variant: no shipped or fixture cloakable unit fires at anything on land) |
+| sim P1-1 | a launcher ordered onto scenery fires blanks for ever | **fixed** (decision 4) | reproduced (11 shots, no launch in 600 ticks) | `ra4_spawns.rs::a_launcher_ordered_onto_scenery_sends_its_rocket_to_the_cell` |
+| sim P1-2 | a spawner that boards a transport has its missiles back at once | **fixed** (decision 4) | reproduced (launches at ticks 2 and 8) | `ra4_spawns.rs::a_launcher_that_boards_a_transport_and_leaves_it_has_no_rocket_sooner` |
+| sim P1-3 | `Attack` tells a hidden unit from a missing id | **fixed** (decision 2) | fails before (`UnknownTarget` where a missing id gets `NoUnits`, `NotArmed`) | `ra1_commands.rs::every_command_answers_for_a_submerged_enemy_as_for_an_id_that_names_nothing` |
+| sim P1-4 | unit commands that name a submerged enemy answer `NotOwned` | **fixed** (decision 2) | fails before | the same test |
+| sim P2-1 | an aircraft more than the docks can be queued in the tick a dock is sold | **fixed** (decision 5) | reproduced (four accepted for two docks) | `ra4_aircraft.rs::a_dock_sold_earlier_in_the_tick_takes_no_aircraft` |
+| sim P2-2 | an aircraft whose dock cell is held never lands | **deferred** as debt | reproduced by the probe (31 moves in 300 ticks) | - |
+| sim P2-3 | an order that ends for lack of ammunition has no event | **deferred** as debt | a new `AttackEnd` reason changes the interface | - |
+| sim P2-4 | the turn of the last stand never comes for some think intervals | **deferred** as debt | by arithmetic; the shipped intervals (10, 20, 40) meet every turn | - |
+| sim P2-5 | `rank_of` and `experience_for` disagree for a type that costs nothing | **deferred** as debt | no trainable shipped type costs 0 | - |
+| sim P2-6 | three decision texts against the code | **fixed** | R50 item 4 and R53 item 2 annotated; the module documentation of `veterancy.rs` | - |
+| sim S1 | two killers for one victim | **fixed** (confirmed; decision 5) | fails before (the roller gained 100 for a recruit a strike had destroyed) | `ra4_veterancy.rs::a_crusher_gains_nothing_for_driving_over_what_was_destroyed_already` |
+| sim S2 | the last stand of a player stalled on a building it cannot place | **no defect** (decision 5) | the rule's picture is "nothing changes"; pinned | `sim::ai::tests::a_player_that_can_neither_fight_nor_earn_makes_its_last_stand` (credits that stand still) |
+| sim S3 | a missile or aircraft bought with ALL UNLOCKED | **refuted** | `check_buildable` refuses a tech level outside 0 to the rules' level before it asks for the option (`economy_commands.rs`), and the sidebar and the computer player use that function (R18) | - |
+| sim S4 | a launched unit is moved by the Chronosphere | **fixed** (confirmed; decision 5) | fails before (the command was accepted) | `ra4_shipped.rs::the_chronosphere_does_not_move_a_launched_rocket` |
+| tests P1-1 | two targeting assertions pass because the Typhoon is cloaked | **fixed** | the cases run with the Typhoon detected and still hold | `ra3_shipped.rs::shipped_ships_follow_their_naval_targeting` |
+| tests P1-2 | no test loses a dock by capture | **fixed** | the review's mutation M22 now fails | `ra4_aircraft.rs::an_aircraft_whose_airfield_is_captured_takes_a_dock_of_another_or_is_lost` |
+| tests P1-3 | "an elite unit in a long battle" has no test | **fixed** | a tank earns both ranks by its kills and fights three duels over more than 1,500 ticks, twice with equal hashes | `ra4_veterancy.rs::a_unit_that_became_elite_by_its_kills_fights_on_with_all_that_its_rank_gives` |
+| tests P1-4 | a missile type without its effect loads and deals nothing | **fixed** (decision 5) | the test that asserted "accepted" now asserts the typed error | `ra4_definitions.rs::the_terms_of_a_spawner_must_fit_together` |
+| tests P2-5 | the Harrier row of the crew test cannot fail | **fixed** | the aircraft has a dock and is asserted destroyed | `ra4_shipped.rs::only_the_base_units_have_a_crew_and_it_is_of_their_owners_side` |
+| tests P2-6 | the shipped survivors test has only exact quotients | **fixed** | two rows that round up | `ra4_shipped.rs::the_survivors_of_shipped_buildings_follow_the_refund_and_the_divisors` |
+| tests P2-7 | loose bounds on the spawn timings | **deferred** as debt | - | - |
+| tests P2-8 | crew members that hold whole cells in the fixture | **deferred** as debt | - | - |
+| tests P2-9 | destruction is set, not fought, in crew and dock tests | **no change** | the review accepts it as scenario setup | - |
+| tests P2-10 | a rejection asserted without its reason | **fixed** | `MissingPrerequisite` of the Airforce Command | `ra4_shipped.rs::a_fifth_harrier_is_refused_and_built_after_a_second_airforce_command_stands` |
+| tests P2-11 | two range checks tested from above only | **fixed** | rows with `-1` | `ra4_definitions.rs` |
+| tests P2-12 | a comparison that can never decide | **fixed** (comment) | `special::reconnaissance` says where the delay ends | - |
+| tests S | a captured building with docks and the queue check | **fixed** with sim P2-1 | the command counts the buildings that stand and are the player's in its tick; the count of aircraft is one stage old only for the player that lost the docks | `ra4_aircraft.rs` (the capture test asserts both players' docks) |
