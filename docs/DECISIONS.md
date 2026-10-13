@@ -3939,3 +3939,27 @@ crate gives it (its rule of RA1), and never builds on ore (the placement check).
 (a load takes five times as long to gather; an ore cell holds 300 credits instead of 500),
 so matches are decided by smaller armies; how long they take is in the validation of RA5-A
 (`docs/validation/ra2-parity/ra5a/`) and in RA5's status entry.
+
+### R63. The implementation stopped during RA5 (user instruction, 2026-10-13)
+
+The implementer of RA5-A (ore and gems in bails, growth and spread, the free miner, crates, the
+refinery refund) was stopped from the user's side while it was finishing. Asked how to proceed,
+the user answered: "Stop where you are here, and write a comprehensive review requirement for
+later review". So:
+
+1. Nothing further is implemented. RA5 items 5 to 9, RA6, RA7, RA8 and RA9 do not exist; the
+   final review does not exist (R57); the branch is neither merged nor tagged.
+2. RA5-A's three commits (`9f625b3`, `c9e3604`, `212874a`, decisions R58 to R62) stay on the
+   branch as they are. Of the validation commands only `m14_duels -- full` was run for them
+   (756 of 756 matches ended; logs in `docs/validation/ra2-parity/ra5a/`); the orchestrator
+   additionally observed that formatting, `git diff --check`, clippy and the two regeneration
+   checks exit 0 on the tree as left. The test run, the builds, both smoke tests, the
+   benchmark, the soak and the package script were not run on it. The agent's four closing
+   steps (fix a warning, compute the distribution of duel lengths, add it to R62, commit) were
+   not done, and RA5 has no status entry of its own.
+3. An unfinished, uncommitted test module of 150 lines was left in
+   `crates/game/src/battlefield.rs`. It is deliberately not committed: the orchestrator did not
+   write, finish or run it. It remains in the working tree.
+4. `docs/reviews/RA2-parity-review-requirements.md` is the document the user asked for.
+5. `docs/RA2_GAP_ANALYSIS.md` and `docs/CONSTRUCTION_SYSTEM.md` were to be rewritten in RA9 and
+   were not: they describe the game of 2026-10-11 and of M9, not the branch.

@@ -6,9 +6,15 @@ report about what reviews are left for later review work."). This is that report
 by the orchestrator of the run, who is not a reviewer: it lists what has and has not been
 reviewed, and it approves nothing.
 
-**State of this report:** written after RA4, while the fixes for the two advisory reviews were
-being made and before RA5 to RA9 were implemented. Section 6 says what is updated when the
-implementation ends.
+**State of this report:** written after RA4 and updated twice: with the outcome of the
+remediation of the advisory reviews, and on 2026-10-13 when the user also stopped the
+implementation, during RA5 ("Stop where you are here, and write a comprehensive review
+requirement for later review", decision R63). **The comprehensive requirements for the later
+review are in `RA2-parity-review-requirements.md`**, which also states exactly what is
+implemented, what is only partly validated and what was never built; where the two documents
+differ, that one is the later and prevails. In particular, sections 3.2 and 6 below were written
+when RA5 to RA9 were still expected: RA5 items 1 to 4 exist as three commits that are validated
+only in part, and RA5 items 5 to 9, RA6, RA7, RA8 and RA9 were not implemented.
 
 ## 1. Summary
 
