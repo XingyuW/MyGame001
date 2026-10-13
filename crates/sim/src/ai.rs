@@ -1332,11 +1332,12 @@ fn last_stand(view: &View<'_>, controller: &mut AiController) -> Option<Command>
         hasher.write(&view.state.credits().to_le_bytes());
         hasher.write_u64(view.own_units.len() as u64);
         hasher.write_u64(view.own_buildings.len() as u64);
+        // The progress of its queues and what was charged for it; not the fraction of a step
+        // of progress, which a queue that cannot be paid for carries from tick to tick.
         for (_, items) in view.state.queues() {
             for item in items {
                 hasher.write_u32(item.progress);
                 hasher.write(&item.charged.to_le_bytes());
-                hasher.write_u32(item.fraction);
             }
         }
         let had = hasher.finish();
@@ -2010,6 +2011,192 @@ mod tests {
         for id in ["harvester", "chrono_miner"] {
             assert!(lit(id, CellPos::new(23, 21)), "{id}");
             assert!(!lit(id, CellPos::new(16, 16)), "{id}");
+        }
+    }
+
+    /// RA4 regression (docs/DECISIONS.md R53). A player with no unit that fights and no
+    /// harvester at work, whose credits, units, buildings and queues stand still, sells its
+    /// buildings after [`LAST_STAND_PATIENCE`] ticks, the dearest first, one a turn and only in
+    /// the turn of its player id. A queue it cannot pay for carries a fraction of a step from
+    /// tick to tick: that is no change (the defect: with it in the picture a player whose
+    /// barracks had a soldier queued never made its last stand, and a single Conscript took
+    /// 40,000 ticks to wear down its four idle, self healing miners).
+    #[test]
+    fn a_player_that_can_neither_fight_nor_earn_makes_its_last_stand() {
+        let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/data/legacy");
+        let definitions = crate::load_match_definitions(
+            dir.join("units.ron"),
+            dir.join("economy.ron"),
+            dir.join("combat.ron"),
+        )
+        .and_then(|definitions| definitions.with_arsenal(dir.join("arsenal.ron")))
+        .unwrap_or_else(|error| panic!("{error}"));
+        let unit_kind = |id: &str| definitions.unit_kind(id).unwrap_or_else(|| panic!("{id}"));
+        let building_kind = |id: &str| {
+            definitions
+                .building_kind(id)
+                .unwrap_or_else(|| panic!("{id}"))
+        };
+        let cell = Cell {
+            passable: true,
+            water: false,
+            buildable: true,
+            ore: 0,
+        };
+        let grid = Grid::from_cells(32, 32, vec![cell; 32 * 32]).expect("a grid");
+        let plan = AiPlan {
+            build_order: Vec::new(),
+            power: BuildingKind(0),
+            harvester: unit_kind("harvester"),
+            army: Vec::new(),
+        };
+        let difficulty = Difficulty {
+            id: "test".into(),
+            think_interval: 10,
+            harvesters_per_refinery: 1,
+            max_army: 4,
+            wave_size: 2,
+            first_wave: 0,
+            wave_patience: 100,
+            defence_radius: 4,
+        };
+        let controller = |player: PlayerId| {
+            AiController::new(
+                &grid,
+                &definitions,
+                plan.clone(),
+                difficulty.clone(),
+                CellPos::new(5 + i32::from(player.0), 5),
+                vec![CellPos::new(25, 25)],
+                None,
+            )
+            .expect("a controller")
+        };
+        // The yard is worth more than the barracks when sold.
+        let (yard, barracks) = (
+            building_kind("construction_yard"),
+            building_kind("barracks"),
+        );
+        assert!(definitions.refund(yard) > definitions.refund(barracks));
+        let building = |id: u32, kind: BuildingKind, x: i32| BuildingSnap {
+            id: SimId(id),
+            owner: PlayerId(0),
+            kind,
+            footprint: Footprint {
+                origin: CellPos::new(x, 20),
+                width: 2,
+                height: 2,
+            },
+            producer: None,
+            sight: Some(3),
+            pending: Vec::new(),
+        };
+        // An idle harvester (no ore) and, in the last case, a rifleman.
+        let unit = |id: u32, kind: &str, armed: bool| UnitSnap {
+            id: SimId(id),
+            owner: PlayerId(0),
+            kind: unit_kind(kind),
+            mobile: Mobile {
+                speed: 16,
+                cell: CellPos::new(10 + id as i32, 10),
+                step: None,
+            },
+            has_order: false,
+            harvest: (!armed).then_some(HarvestState::Idle),
+            armed,
+            attacking: false,
+            sight: Some(4),
+        };
+        // One turn of player 0 at `tick`, with `credits`, a soldier queued whose step of
+        // progress stands at `fraction`, and the units `units`.
+        let turn = |controller: &mut AiController,
+                    tick: u64,
+                    credits: i64,
+                    fraction: u32,
+                    units: &[UnitSnap]| {
+            let player = PlayerId(0);
+            let mut players = Players::default();
+            players.add(player, credits).expect("a new player");
+            let rifleman = ProductionItem::Unit(unit_kind("rifleman"));
+            let key = definitions.queue_of(rifleman).expect("a queue");
+            let mut queued = crate::economy::QueueItem::new(rifleman);
+            queued.fraction = fraction;
+            players
+                .get_mut(player)
+                .expect("the player")
+                .queues
+                .insert(key, vec![queued]);
+            let state = players.get(player).expect("the player");
+            let buildings = [building(2, yard, 20), building(3, barracks, 24)];
+            let view = View::new(
+                player,
+                tick,
+                &players,
+                state,
+                &grid,
+                &definitions,
+                &plan,
+                false,
+                units,
+                &buildings,
+                &crate::SpecialState::default(),
+            );
+            last_stand(&view, controller)
+        };
+        let idle = [unit(1, "harvester", false)];
+        let sell = |id: u32| {
+            Some(Command::SellBuilding {
+                building: SimId(id),
+            })
+        };
+        let mut own = controller(PlayerId(0));
+        // It waits out its patience, whatever the fraction of the queue does.
+        assert_eq!(turn(&mut own, 4_000, 0, 0, &idle), None);
+        assert_eq!(turn(&mut own, 4_600, 0, 400, &idle), None);
+        assert_eq!(
+            turn(&mut own, 4_000 + LAST_STAND_PATIENCE - 1, 0, 800, &idle),
+            None
+        );
+        // Then it sells in the turn of its id (ticks 8192 to 8447 for player 0), the yard first.
+        assert_eq!(
+            turn(&mut own, 4_000 + LAST_STAND_PATIENCE, 0, 200, &idle),
+            None
+        );
+        assert_eq!(turn(&mut own, 8_191, 0, 200, &idle), None);
+        assert_eq!(turn(&mut own, 8_192, 0, 600, &idle), sell(2));
+        assert_eq!(turn(&mut own, 8_447, 0, 600, &idle), sell(2));
+        assert_eq!(turn(&mut own, 8_448, 0, 600, &idle), None);
+        // A change of what it has starts the patience anew: here its credits.
+        let mut own = controller(PlayerId(0));
+        assert_eq!(turn(&mut own, 4_000, 0, 0, &idle), None);
+        assert_eq!(turn(&mut own, 5_000, 70, 0, &idle), None);
+        assert_eq!(turn(&mut own, 8_192, 70, 0, &idle), sell(2));
+        let mut own = controller(PlayerId(0));
+        assert_eq!(turn(&mut own, 7_500, 0, 0, &idle), None);
+        assert_eq!(
+            turn(&mut own, 8_192, 0, 0, &idle),
+            None,
+            "692 ticks are not enough"
+        );
+        // With a unit that fights there is no last stand, and one under way ends.
+        let armed = [unit(1, "harvester", false), unit(4, "rifleman", true)];
+        let mut own = controller(PlayerId(0));
+        assert_eq!(turn(&mut own, 0, 0, 0, &armed), None);
+        assert_eq!(turn(&mut own, 8_192, 0, 0, &armed), None);
+        assert_eq!(
+            turn(&mut own, 12_288, 0, 0, &idle),
+            None,
+            "the patience starts now"
+        );
+        assert_eq!(turn(&mut own, 16_384, 0, 0, &idle), sell(2));
+        assert_eq!(turn(&mut own, 16_390, 0, 0, &armed), None);
+        assert_eq!(turn(&mut own, 16_400, 0, 0, &idle), None);
+        // Two players never sell in the same tick: the turns of their ids do not overlap.
+        for tick in 0..16 * LAST_STAND_TURN {
+            let turns = (0..10u64)
+                .filter(|player| (tick / LAST_STAND_TURN) % 16 == player % 16)
+                .count();
+            assert!(turns <= 1);
         }
     }
 

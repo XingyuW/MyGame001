@@ -243,30 +243,52 @@ fn main() -> ExitCode {
 
 /// What each player owns and where its units are, on average.
 fn situation(world: &mut bevy_ecs::world::World) -> String {
+    let definitions = world.resource::<sim::Definitions>().clone();
     let mut text = String::new();
     for player in 0..2_u8 {
         let mut units = 0_i64;
         let (mut x, mut y) = (0_i64, 0_i64);
-        let mut query = world.query::<(&Unit, &Owner, &Mobile)>();
-        for (_, owner, mobile) in query.iter(world) {
+        // The units by type, and what the harvesters among them do.
+        let mut kinds: std::collections::BTreeMap<String, usize> = Default::default();
+        let mut harvest = Vec::new();
+        let mut query = world.query::<(&Unit, &Owner, &Mobile, Option<&sim::Harvester>)>();
+        for (unit, owner, mobile, harvester) in query.iter(world) {
             if owner.0 == PlayerId(player) {
                 units += 1;
                 x += i64::from(mobile.cell.x);
                 y += i64::from(mobile.cell.y);
+                let id = definitions
+                    .unit(unit.kind)
+                    .map_or_else(String::new, |def| def.id.clone());
+                *kinds.entry(id).or_default() += 1;
+                if let Some(harvester) = harvester {
+                    harvest.push(format!("{:?}", harvester.state));
+                }
             }
         }
+        let mut owned: std::collections::BTreeMap<String, usize> = Default::default();
         let mut query = world.query::<(&Building, &Owner)>();
-        let buildings = query
-            .iter(world)
-            .filter(|(_, owner)| owner.0 == PlayerId(player))
-            .count();
+        for (building, owner) in query.iter(world) {
+            if owner.0 == PlayerId(player) {
+                let id = definitions
+                    .building(building.kind)
+                    .map_or_else(String::new, |def| def.id.clone());
+                *owned.entry(id).or_default() += 1;
+            }
+        }
+        let buildings: usize = owned.values().sum();
         let centre = if units > 0 {
             format!("around ({}, {})", x / units, y / units)
         } else {
             "-".to_owned()
         };
+        let credits = world
+            .resource::<sim::Players>()
+            .get(PlayerId(player))
+            .map_or(0, |state| state.credits());
         text.push_str(&format!(
-            "player {player}: {buildings} buildings, {units} units {centre}; "
+            "player {player}: {buildings} buildings {owned:?}, {units} units {centre} \
+             {kinds:?}, harvesters {harvest:?}, {credits} credits; "
         ));
     }
     text
