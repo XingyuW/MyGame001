@@ -3352,3 +3352,37 @@ stand of two players who have spent each other, and matches of computer players 
 fixture that end with a winner; R53); unit tests in `sim`: `veterancy` 3, `flight` 2,
 `crew` 1, `ai` 2. Game: `health` 1, `notices` 2, `hover_info` 1, `units` 1, `sidebar` 1.
 Together 106: 787 tests before RA4, 893 after.
+
+### R55. The final review within three hours: a panel, and advisory reviews during the run (user request, 2026-10-12)
+
+While RA4 was being implemented the user asked: "Can you speed up the review process to make sure
+that all the review can be done within 3 hours." The prompt's section 7 describes one reviewer
+who reviews the whole diff and reruns every validation command; the diff was 45,000 lines of code
+and data at RA3 and the validation commands take about two hours, so one reviewer cannot do it in
+that time. The orchestrator therefore arranged the following (its interpretation of the request;
+the user was told and can veto):
+
+1. **The binding review is a panel.** Five independent reviewers with fresh contexts, none of
+   whom implemented or remediated anything, each review one slice of the complete cumulative
+   diff (the simulation of RA1 to RA3; of RA4 to RA7; data, ported values and provenance; test
+   integrity and acceptance criteria; the game client, the computer opponent, documents and
+   regressions) for at most 120 minutes. The orchestrator starts the rerun of every validation
+   command at the same moment. A lead reviewer, also independent, then checks the validation
+   logs, verifies every P0 and P1 of the slices, writes `docs/reviews/RA2-parity-review-N.md` and
+   makes the binding decision by the rules of the prompt's section 7. Everything section 7
+   requires of the reviewer is still done; it is divided among six sessions.
+2. **Advisory reviews during the run.** Independent reviewers examine committed milestones on a
+   read only snapshot while later milestones are implemented, so that defects are found and
+   fixed before the binding review, which is what keeps it to one round. They are advisory: they
+   gate no milestone (the validation commands remain the only gate) and approve nothing; their
+   reports are `docs/reviews/RA2-parity-advisory-<n>-<slice>.md`, and a remediation agent treats
+   each finding as a claim, as section 7 item 2 prescribes for the binding review. This is a
+   departure from the prompt's "without any review between milestones", made on the strength of
+   the user's later request.
+3. **What cannot be promised.** If the binding review says NO-GO, section 7 requires a
+   remediation and a new review of the full diff with the validation rerun: each such round
+   adds the time of the fixes and up to three more hours.
+
+Advisory review 1 (RA1 to RA3, at commit `46e694d`, three slices, about 17 minutes of wall
+time): 1 P0, 9 P1, 24 P2 and 7 suspected items; see the three reports and the remediation's
+decision record.
