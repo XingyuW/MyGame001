@@ -7,11 +7,14 @@
 //! **Where crates come from** (the `Economy` stage, [`appear`]): in a match with players whose
 //! rule `crates` is on, the rules' `crates.minimum` crates appear in the first tick, and every
 //! crate that is taken is replaced after a time drawn between half and twice `crates.regen`,
-//! both inclusive, as long as fewer than `crates.maximum` lie on the map. A crate appears in a
-//! cell drawn from the whole map that is land a ground unit may enter, or water, and holds
-//! nothing: no building, no unit, no ore and no crate. If [`CRATE_PLACE_ATTEMPTS`] draws find
-//! none, the crate is tried again [`CRATE_RETRY_TICKS`] later. A world without a match gets no
-//! crates by itself; a scenario puts them down with [`Crates::place`].
+//! both inclusive, as long as fewer than `crates.maximum` lie on the map. A crate that nobody
+//! takes lies for a time drawn from the same range and is then replaced at once by one
+//! somewhere else, as is a crate a building was placed on. A crate appears in a cell drawn
+//! from the whole map that is land a ground unit may enter, or water, and holds nothing: no
+//! building, no unit, no ore and no crate. If [`CRATE_PLACE_ATTEMPTS`] draws find none, the
+//! crate is tried again [`CRATE_RETRY_TICKS`] later. A world without a match gets no crates by
+//! itself; a scenario puts them down with [`Crates::place`], and those lie until they are
+//! taken.
 //!
 //! **What a crate holds** is drawn when it is taken (the `Movement` stage, [`collect`]), from
 //! the rules' `powerups` by their shares:
@@ -37,9 +40,9 @@
 //! a tick in the order of their cells: the content (unless the free base unit applies), then
 //! what the content draws (the type of the unit; the credits of money, also of money given
 //! instead), then the time until the crate is replaced. A crate that appears draws its cell,
-//! two draws an attempt.
+//! two draws an attempt, and then the time it lies.
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 
 use bevy_ecs::entity::Entity;
 use bevy_ecs::message::Messages;
@@ -129,8 +132,9 @@ impl CrateContent {
 /// The crates of the match.
 #[derive(Resource, Clone, Debug, Default, PartialEq, Eq)]
 pub struct Crates {
-    /// The cells a crate lies in.
-    cells: BTreeSet<CellPos>,
+    /// The cells a crate lies in, each with the tick from which the crate is gone if nobody
+    /// took it (`u64::MAX`: it lies until it is taken).
+    cells: BTreeMap<CellPos, u64>,
     /// The ticks at which a crate is due to appear, ascending.
     due: Vec<u64>,
     /// Whether the first crates of the match have been asked for.
@@ -140,7 +144,7 @@ pub struct Crates {
 impl Crates {
     /// The cells a crate lies in, in ascending order (by x, then y).
     pub fn cells(&self) -> impl Iterator<Item = CellPos> + '_ {
-        self.cells.iter().copied()
+        self.cells.keys().copied()
     }
 
     /// How many crates lie on the map.
@@ -154,7 +158,13 @@ impl Crates {
 
     /// Whether a crate lies in `cell`.
     pub fn contains(&self, cell: CellPos) -> bool {
-        self.cells.contains(&cell)
+        self.cells.contains_key(&cell)
+    }
+
+    /// The tick from which the crate in `cell` is gone if nobody took it: `None` without a
+    /// crate there, `Some(u64::MAX)` for one that lies until it is taken.
+    pub fn expires(&self, cell: CellPos) -> Option<u64> {
+        self.cells.get(&cell).copied()
     }
 
     /// The ticks at which a crate is due to appear, ascending.
@@ -162,10 +172,11 @@ impl Crates {
         &self.due
     }
 
-    /// Puts a crate into `cell` if one may lie there ([`crate_fits`]). Scenario setup only,
-    /// like [`Grid::set_terrain`]; in a match crates appear by themselves.
+    /// Puts a crate into `cell` if one may lie there ([`crate_fits`]); it lies until it is
+    /// taken. Scenario setup only, like [`Grid::set_terrain`]; in a match crates appear by
+    /// themselves.
     pub fn place(&mut self, grid: &Grid, cell: CellPos) -> bool {
-        crate_fits(grid, self, cell) && self.cells.insert(cell)
+        crate_fits(grid, self, cell) && self.cells.insert(cell, u64::MAX).is_none()
     }
 
     /// Nothing for a world that never had a crate, so that it hashes as before RA5.
@@ -176,9 +187,10 @@ impl Crates {
         hasher.write(b"crates");
         hasher.write(&[u8::from(self.started)]);
         hasher.write_u64(self.cells.len() as u64);
-        for cell in &self.cells {
+        for (cell, expires) in &self.cells {
             hasher.write(&cell.x.to_le_bytes());
             hasher.write(&cell.y.to_le_bytes());
+            hasher.write_u64(*expires);
         }
         hasher.write_u64(self.due.len() as u64);
         for tick in &self.due {
@@ -225,8 +237,24 @@ pub(crate) fn appear(
             crates.ask(tick.0);
         }
     }
+    // A crate whose time is up, or on whose cell a building was placed, is gone and replaced
+    // at once.
+    let gone: Vec<CellPos> = crates
+        .cells
+        .iter()
+        .filter(|&(&cell, &expires)| expires <= tick.0 || grid.building(cell).is_some())
+        .map(|(&cell, _)| cell)
+        .collect();
+    for cell in gone {
+        crates.cells.remove(&cell);
+        crates.ask(tick.0);
+        events.write(SimEvent::CrateGone { cell });
+    }
     let maximum = usize::try_from(rules.maximum.max(0)).unwrap_or(0);
     let (width, height) = (grid.width(), grid.height());
+    // Between half and twice the rules' time, both inclusive: one draw.
+    let regen = u64::try_from(rules.regen.max(1)).unwrap_or(1);
+    let (low, high) = (regen / 2, regen.saturating_mul(2));
     while crates.due.first().is_some_and(|&due| due <= tick.0) {
         if crates.cells.len() >= maximum || width == 0 || height == 0 {
             crates.due.remove(0);
@@ -246,7 +274,8 @@ pub(crate) fn appear(
         crates.due.remove(0);
         match found {
             Some(cell) => {
-                crates.cells.insert(cell);
+                let lies = (low + u64::from(rng.next_u32()) % (high - low + 1)).max(1);
+                crates.cells.insert(cell, tick.0.saturating_add(lies));
                 events.write(SimEvent::CrateAppeared { cell });
             }
             None => {

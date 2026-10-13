@@ -413,7 +413,7 @@ The game opens on the main menu, which is the lobby of a skirmish. Every choice 
 | MCV start | **ON**: every player starts with a Mobile Construction Vehicle and deploys it. OFF: with the Construction Yard already standing |
 | Short game | **ON**: a player is defeated when it has no building and no MCV left. OFF (the long game): when it has no building and no unit left |
 | Superweapons | **ON**; OFF: the Nuclear Missile Silo, Iron Curtain, Chronosphere and Weather Control Device cannot be built and are not listed |
-| Crates | **ON**; the option has no effect yet |
+| Crates | **ON**: a crate lies on the map and is replaced a few minutes after a unit drove onto it (money, a free vehicle, a rank, armour, firepower, speed, repairs, or the whole map explored) |
 | MCV repacks | **ON**: a Construction Yard can be packed up into its MCV again. OFF: it cannot |
 | Super Me | **OFF**; ON: you pay 1 credit per item and build 10 times faster (see below) |
 | Unit speed | the speed of your units with Super Me: 1×, 1.5×, 2×, 3× or 4× |
@@ -518,7 +518,12 @@ and the match ends when only they are left. With **FREE FOR ALL** they fight eac
 
 Buildings need power: under low power production slows down and the powered defences stop
 firing (see "Production, power and base building" above). Harvesters bring ore to a refinery
-for credits.
+for credits: a War Miner carries 40 bails and a Chrono Miner 20, a bail of ore pays 25 credits
+and a bail of gems (the blue-green seams at the heart of the large fields of the open country)
+50, and each Ore Purifier adds a quarter. A cell holds at most 12 bails. Ore slowly grows
+denser and spreads onto the free ground beside a dense cell, and back onto ground a miner
+emptied; gems do neither. Nothing can be built on ore. Selling a refinery returns 300 credits,
+not half its price, so its free miner is not a bargain.
 Buildings require visible, unoccupied terrain within two free cells of a base building of
 yours (four for the cheap defences, eight for walls). Shipyards require a visible water
 footprint touching shore within 31 free cells of your base (scout the water first; 18 of the 21

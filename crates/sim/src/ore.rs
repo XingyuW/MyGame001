@@ -1,8 +1,10 @@
 //! Ore that grows and spreads (RA5, docs/RA2_PARITY_PLAN.md section 4.10; docs/DECISIONS.md
 //! R59).
 //!
-//! Only with a rules file, and only while the match's rule `ore_grows` is on. In the `Economy`
-//! stage, after the harvesters:
+//! Only with a rules file, and only while the match's rule `ore_grows` is on. At the end of the
+//! `Commands` stage (so that no ore spreads between the tick in which a player, or a computer
+//! player in the `Ai` stage, decides where to build and the next tick's `Commands` stage, in
+//! which the placement is checked: nothing is built on ore):
 //!
 //! * **Growth.** On every tick whose index is a positive multiple of the rules'
 //!   `ore_growth_interval`, each cell of ore below `ore_max_bails` gains one bail with the

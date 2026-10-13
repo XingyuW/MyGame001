@@ -891,6 +891,9 @@ fn log_sim_events(mut events: MessageReader<SimEvent>) {
             SimEvent::CrateAppeared { cell } => {
                 debug!("a crate appeared at ({}, {})", cell.x, cell.y);
             }
+            SimEvent::CrateGone { cell } => {
+                debug!("the crate at ({}, {}) is gone", cell.x, cell.y);
+            }
             SimEvent::CrateTaken {
                 player,
                 unit,

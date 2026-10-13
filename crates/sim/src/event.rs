@@ -145,6 +145,9 @@ pub enum SimEvent {
     },
     /// A crate appeared in `cell` (RA5, `crate::crates`).
     CrateAppeared { cell: CellPos },
+    /// The crate in `cell` is gone without having been taken (RA5): its time was up, or a
+    /// building was placed on it.
+    CrateGone { cell: CellPos },
     /// `player`'s unit `unit` took the crate in `cell` (RA5): what it held in the end
     /// (`content`: money where another content could not be given), the credits it paid, and
     /// the unit that came out of it.
