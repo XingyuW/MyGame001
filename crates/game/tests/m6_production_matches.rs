@@ -15,6 +15,11 @@
 //! (that its computer players finish their matches), so a change of the balance in M7 that breaks
 //! it is meant to fail it. Every match is bounded in time by the tick limit and in memory by the AI
 //! file's `max_army`.
+//!
+//! One difference from a match of the game: the scenery (`sim::Props`, the trees, houses and
+//! towers of a map's look, which take damage since RA3) is installed by the game's host from
+//! the map's presentation data and is not part of these matches, nor of `m14_duels`, `m7_soak`
+//! and `m13_ten_players` (advisory review 1, tests P2-14; docs/DECISIONS.md R56, debt).
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::PathBuf;
@@ -35,9 +40,14 @@ use sim::{
 /// `cost x 21 / 25` ticks, where a vehicle took `cost / 3`: 2.52 times as long. The plans of
 /// the computer players build two War Factories, which the multiple factory rule speeds up by
 /// 1 / 0.8, so their armies, mostly vehicles, are built 2.52 x 0.8 = 2.016 times as slowly.
-/// The limit is rescaled by that pacing factor, 2 (docs/DECISIONS.md R29, with the measured
-/// lengths of all 756 matches before and after).
+/// The limit is rescaled by that pacing factor, 2 (docs/DECISIONS.md R29, with the lengths of
+/// the 756 pairings as `m14_duels -- full` plays them, with another seed, before and after; the
+/// lengths of this test's own matches are in R56, and every run writes them to
+/// `m6_production_matches_lengths.tsv` in the test's temporary directory).
 const MATCH_TICK_LIMIT: u64 = 72_000;
+
+/// Ticks between two checks of invariant I6' in a match ([`run`]).
+const CELL_CHECK_INTERVAL: u64 = 16;
 
 /// The tick limit of a match on `grid`.
 fn tick_limit(grid: &sim::Grid) -> u64 {
@@ -80,7 +90,8 @@ fn computer_players_finish_matches_with_the_shipped_data_on_every_shipped_map() 
             for first in 0..difficulties {
                 for second in 0..difficulties {
                     // The number of the pairing among all pairings of sides and difficulties
-                    // (`m14_duels -- full` counts them the same way and plays the same matches).
+                    // (`m14_duels -- full` counts them the same way and plays the same pairings,
+                    // with another seed and so along other courses: docs/DECISIONS.md R56).
                     let pairing = ((first_side * groups.len() + second_side) * difficulties
                         + first)
                         * difficulties
@@ -112,6 +123,10 @@ fn computer_players_finish_matches_with_the_shipped_data_on_every_shipped_map() 
     );
     let next = std::sync::atomic::AtomicUsize::new(0);
     let played = std::sync::atomic::AtomicUsize::new(0);
+    // The length of every match with its limit, written to a file when all are played, so
+    // that the margin of this test's own matches (seed 0) is measured by every run of it
+    // (docs/DECISIONS.md R56; before, only the duels' lengths were known, with another seed).
+    let lengths = std::sync::Mutex::new(Vec::new());
     let workers = std::thread::available_parallelism().map_or(4, usize::from);
     std::thread::scope(|scope| {
         for _ in 0..workers.min(jobs.len()) {
@@ -141,17 +156,31 @@ fn computer_players_finish_matches_with_the_shipped_data_on_every_shipped_map() 
                     });
                     setup_match(app.world_mut(), &skirmish, &ai, *map, &players)
                         .unwrap_or_else(|error| panic!("{name}: {error}"));
-                    let outcome = run(app.world_mut(), &name, tick_limit(grid));
+                    let limit = tick_limit(grid);
+                    let outcome = run(app.world_mut(), &name, limit);
                     assert!(
                         matches!(outcome, Some(MatchOutcome::Won { .. })),
                         "{name}: {outcome:?}"
                     );
+                    let ticks = app.world().resource::<sim::SimTick>().0;
+                    lengths
+                        .lock()
+                        .expect("the lengths")
+                        .push((name, ticks, limit));
                     played.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
                 }
             });
         }
     });
     assert_eq!(played.into_inner(), jobs.len());
+    let mut lengths = lengths.into_inner().expect("the lengths");
+    lengths.sort();
+    let mut table = String::from("match\tticks\tlimit\n");
+    for (name, ticks, limit) in &lengths {
+        table.push_str(&format!("{name}\t{ticks}\t{limit}\n"));
+    }
+    let path = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join("m6_production_matches_lengths.tsv");
+    std::fs::write(&path, table).unwrap_or_else(|error| panic!("{}: {error}", path.display()));
 }
 
 /// Runs the match until it ends or the tick limit is reached; returns its outcome. Every rejected
@@ -218,7 +247,25 @@ fn run(world: &mut World, name: &str, limit: u64) -> Option<MatchOutcome> {
             "{name}: tick {at}: {} commands",
             world.resource::<CommandQueue>().len()
         );
-        if let Some(outcome) = world.resource::<MatchState>().outcome() {
+        // The invariants of the soak, to the end of the match (docs/DECISIONS.md R56: since
+        // RA2 the soak's 36,000 ticks end before most matches on the shipped maps do, so the
+        // late game is checked here, where every match is played out). I7 on every tick;
+        // I6', from the units and from the grid, on every sixteenth tick and on the last.
+        for (player, state) in world.resource::<sim::Players>().iter() {
+            assert!(
+                state.credits() >= 0,
+                "{name}: tick {at}: player {} has {} credits",
+                player.0,
+                state.credits()
+            );
+        }
+        let outcome = world.resource::<MatchState>().outcome();
+        if at % CELL_CHECK_INTERVAL == 0 || outcome.is_some() {
+            let mut problems = sim::cell_invariant_violations(world);
+            problems.extend(sim::stray_claims(world));
+            assert!(problems.is_empty(), "{name}: tick {at}: {problems:?}");
+        }
+        if let Some(outcome) = outcome {
             return Some(outcome);
         }
     }
@@ -287,6 +334,15 @@ fn crossroads_armies_finish_after_new_terrain_changes() {
 /// One match of two computer players on a shipped map: the countries `countries` at the
 /// difficulties `difficulties` of the AI file, played to its end within the tick limit.
 fn duel(map: &str, countries: [&str; 2], difficulties: [&str; 2]) -> Option<MatchOutcome> {
+    duel_with_length(map, countries, difficulties).0
+}
+
+/// [`duel`], and the ticks the match took.
+fn duel_with_length(
+    map: &str,
+    countries: [&str; 2],
+    difficulties: [&str; 2],
+) -> (Option<MatchOutcome>, u64) {
     let data = assets().join("data");
     let d = load_ruleset(&data).unwrap();
     let sk = load_skirmish(data.join("skirmish.ron"), &d).unwrap();
@@ -316,7 +372,10 @@ fn duel(map: &str, countries: [&str; 2], difficulties: [&str; 2]) -> Option<Matc
     });
     setup_match(app.world_mut(), &sk, &ai, index, &players).unwrap();
     let name = format!("{map}: {countries:?} at {difficulties:?}");
-    run(app.world_mut(), &name, limit)
+    let outcome = run(app.world_mut(), &name, limit);
+    let ticks = app.world().resource::<sim::SimTick>().0;
+    eprintln!("{name}: {ticks} ticks of {limit}");
+    (outcome, ticks)
 }
 
 #[test]
@@ -336,11 +395,17 @@ fn a_soviet_player_left_with_an_armed_miner_still_finishes_the_match() {
 #[test]
 fn the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first() {
     // Regression (RA1, found by `m14_duels -- full`): on crossroads Libya and Iraq (both easy)
-    // needed 39,983 ticks, more than the limit of 36,000: for the last 13,000 the winner's wave,
-    // formed at its own base, swept the waypoints nearest to itself for three buildings that
-    // stood beside the loser's start. With the slower units of RA1 (docs/DECISIONS.md R7) that
-    // wandering no longer fits the limit, so a sweep starts near the enemy's start on every map
-    // (`crates/sim/src/ai.rs`, `choose_target`; R14).
+    // needed 39,983 ticks, more than the limit of then, 36,000: for the last 13,000 the
+    // winner's wave, formed at its own base, swept the waypoints nearest to itself for three
+    // buildings that stood beside the loser's start. With the slower units of RA1
+    // (docs/DECISIONS.md R7) that wandering no longer fitted the limit, so a sweep starts near
+    // the enemy's start on every map (`crates/sim/src/ai.rs`, `choose_target`; R14).
+    //
+    // Since RA2 the limit is 72,000 (R29), and this match no longer fails by it without the
+    // rule (measured at RA4 with this test's seed: 45,345 ticks with the rule, 53,431 without;
+    // docs/DECISIONS.md R56). What fails without the rule is the unit test
+    // `sim::ai::tests::a_sweep_starts_at_the_waypoint_nearest_to_an_enemy_start`; this test
+    // still shows that the match of the report ends.
     let outcome = duel("crossroads", ["libya", "iraq"], ["easy", "easy"]);
     assert!(
         matches!(outcome, Some(MatchOutcome::Won { .. })),
