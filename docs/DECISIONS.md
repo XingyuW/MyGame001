@@ -3683,3 +3683,24 @@ New: `ra1_commands.rs` 16, `ra1_catalogue.rs` 1, `ra2_charging.rs` 2, `ra3_weapo
 | tests P2-11 | two range checks tested from above only | **fixed** | rows with `-1` | `ra4_definitions.rs` |
 | tests P2-12 | a comparison that can never decide | **fixed** (comment) | `special::reconnaissance` says where the delay ends | - |
 | tests S | a captured building with docks and the queue check | **fixed** with sim P2-1 | the command counts the buildings that stand and are the player's in its tick; the count of aircraft is one stage old only for the player that lost the docks | `ra4_aircraft.rs` (the capture test asserts both players' docks) |
+
+### R57. Review work stopped; the implementation is finished without it (user instruction, 2026-10-13)
+
+During the remediation of the advisory reviews the user wrote: "Finish all the implementation
+and stop review. Write a report about what reviews are left for later review work." From then:
+
+1. No further advisory review is run, and the binding final review of the prompt's section 7
+   is not run in this programme's run. No reviewer's decision exists.
+2. Because section 7 allows the merge and the tag only after GO or GO WITH DOCUMENTED
+   NON-BLOCKING DEBT, `ra2-parity` is not merged into `main` and no tag `ra2-parity-reviewed`
+   is created. `main` stays at `8230a95`.
+3. The remediation of the findings the advisory reviews had already reported (R56) was finished,
+   as implementation work on known defects.
+4. RA5 to RA9 are implemented as planned, each gated by the validation commands, which stay the
+   only gate between milestones. The validation script runs thirteen commands since R56 (the
+   eleven of the prompt and the two regeneration checks).
+5. `docs/reviews/RA2-parity-reviews-outstanding.md` is the report the user asked for: what was
+   and was not reviewed, what the advisory reviewers could not check, the decisions that need a
+   reviewer's or the user's judgment, and a suggested order. The briefs prepared for the panel
+   review (R55) are kept in `docs/prompts/ra2-parity-review/` for whoever does it.
+6. Status entries and commit messages say "validated", never "reviewed" or "approved".
