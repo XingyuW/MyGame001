@@ -391,6 +391,39 @@ fn a_volley_whose_next_shot_cannot_be_fired_ends_and_the_weapon_reloads() {
 }
 
 #[test]
+fn a_volley_whose_next_shot_is_due_while_the_unit_is_switched_off_ends() {
+    // Regression (advisory review 1, sim P2-5): a unit switched off in the middle of a volley
+    // kept the rest of it and fired it when it worked again, however much later; the rule is
+    // that a shot which cannot be fired when it is due ends the volley.
+    let mut app = world();
+    let heavy = spawn(&mut app, P0, "heavy", 10, 10);
+    promote(&mut app, heavy, "heavy");
+    let target = spawn(&mut app, P1, "allied_mcv", 13, 10);
+    assert_eq!(fire_ticks(&mut app, heavy, 2), [1]);
+    assert_eq!(weapon(&mut app, heavy).burst_left, 2);
+    // Switched off for 60 ticks (scenario setup, as a spy or a parasite would do it).
+    let until = app.world().resource::<sim::SimTick>().0 + 60;
+    app.world_mut()
+        .resource_mut::<SpecialState>()
+        .disabled
+        .insert(heavy, until);
+    // The second shot is due in the fifth tick after the first: the volley ends there.
+    ticks(&mut app, 4);
+    assert_eq!(weapon(&mut app, heavy).burst_left, 2, "not yet due");
+    ticks(&mut app, 1);
+    let after = weapon(&mut app, heavy);
+    assert_eq!((after.burst_left, after.cooldown), (0, 30));
+    assert!(fire_ticks(&mut app, heavy, 50).is_empty(), "switched off");
+    assert_eq!(hp(&mut app, target), Some(600 - 20));
+    // Working again, with the reload long over, it fires a whole volley.
+    let fired = fire_ticks(&mut app, heavy, 30);
+    assert_eq!(fired.len(), 3, "{fired:?}");
+    assert_eq!(fired[1] - fired[0], 5);
+    assert_eq!(fired[2] - fired[1], 5);
+    assert_eq!(hp(&mut app, target), Some(600 - 4 * 20));
+}
+
+#[test]
 fn a_weapon_does_not_fire_inside_its_minimum_range() {
     // The mortar: a minimum range of 2 cells (512 subcells), a range of 6.
     let mut app = world();
