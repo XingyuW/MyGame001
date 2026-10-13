@@ -1,7 +1,8 @@
 //! Cell looks: the meaning of the presentation-only `look` tile property (`sim::LoadedMap::looks`),
-//! shared by the map generators and the renderer (`battlefield.rs`). The simulation never reads
-//! it; passability, water, building ground and ore stay the tile's own properties, so a look can
-//! only change what a cell shows, never what it does.
+//! shared by the map generators and the renderer (`battlefield.rs`). Passability, water, building
+//! ground and the amount of ore stay the tile's own properties; of a look the simulation reads
+//! the destructible scenery (`sim::Props`) and, since RA5, whether the ore of a cell is gems
+//! ([`Feature::Gems`], `sim::LOOK_FEATURE_GEMS`).
 //!
 //! A look packs the ground in its low four bits and the feature standing on it in its high four:
 //! `look = ground | feature << 4`. Look 0 is "auto": the renderer derives both from the terrain,
@@ -51,6 +52,10 @@ pub enum Feature {
     Bridge = 8,
     /// A lava flow: impassable, and no sea for ships either.
     Lava = 9,
+    /// Gems (RA5): ore of twice the value that neither grows nor spreads. The one feature that
+    /// tells the simulation something the terrain does not: a cell with ore and this feature
+    /// holds gems.
+    Gems = 10,
 }
 
 pub const GROUNDS: [Ground; 11] = [
@@ -67,7 +72,7 @@ pub const GROUNDS: [Ground; 11] = [
     Ground::Ash,
 ];
 
-pub const FEATURES: [Feature; 10] = [
+pub const FEATURES: [Feature; 11] = [
     Feature::None,
     Feature::Ore,
     Feature::Cliff,
@@ -78,6 +83,7 @@ pub const FEATURES: [Feature; 10] = [
     Feature::Tower,
     Feature::Bridge,
     Feature::Lava,
+    Feature::Gems,
 ];
 
 pub const fn look(ground: Ground, feature: Feature) -> u8 {

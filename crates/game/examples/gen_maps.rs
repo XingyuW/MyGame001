@@ -104,11 +104,14 @@ const fn kind(
 /// Open ground, ore ground, roads, and blocked ground (properties: passable, buildable, ore).
 const OPEN: (bool, bool, i32) = (true, true, 0);
 const ORE_FIELD: (bool, bool, i32) = (true, false, 500);
+/// Gems (RA5): ore ground whose look says gems. An amount of 600 is twelve bails of 50 credits,
+/// the densest a cell is (`sim`'s match setup turns the amounts into bails).
+const GEM_FIELD: (bool, bool, i32) = (true, false, 600);
 const WAY: (bool, bool, i32) = (true, false, 0);
 const BLOCKED: (bool, bool, i32) = (false, false, 0);
 
 /// The tileset, indexed by tile id.
-pub const TILES: [TileKind; 46] = [
+pub const TILES: [TileKind; 51] = [
     kind("grass", [74, 132, 58], OPEN, G::Grass, F::None),
     kind("ore", [196, 158, 44], ORE_FIELD, G::Grass, F::Ore),
     kind("water", [38, 86, 160], BLOCKED, G::Water, F::None),
@@ -167,6 +170,11 @@ pub const TILES: [TileKind; 46] = [
     kind("mangrove", [44, 78, 52], BLOCKED, G::Marsh, F::Forest),
     kind("iceberg", [196, 214, 228], BLOCKED, G::Ice, F::Cliff),
     kind("marsh ore", [150, 138, 52], ORE_FIELD, G::Marsh, F::Ore),
+    kind("gems", [64, 190, 180], GEM_FIELD, G::Grass, F::Gems),
+    kind("desert gems", [84, 196, 176], GEM_FIELD, G::Sand, F::Gems),
+    kind("snow gems", [112, 206, 206], GEM_FIELD, G::Snow, F::Gems),
+    kind("ash gems", [58, 160, 156], GEM_FIELD, G::Ash, F::Gems),
+    kind("marsh gems", [56, 150, 132], GEM_FIELD, G::Marsh, F::Gems),
 ];
 
 pub const GRASS: u32 = 0;
@@ -215,6 +223,11 @@ pub const DESERT_TOWER: u32 = 42;
 pub const MANGROVE: u32 = 43;
 pub const ICEBERG: u32 = 44;
 pub const MARSH_ORE: u32 = 45;
+pub const GEMS: u32 = 46;
+pub const DESERT_GEMS: u32 = 47;
+pub const SNOW_GEMS: u32 = 48;
+pub const ASH_GEMS: u32 = 49;
+pub const MARSH_GEMS: u32 = 50;
 
 /// How a map's terrain is made: a rule per cell (the M7 maps), or a painted recipe
 /// (`world_maps::RECIPES`, looked up by the map's id).

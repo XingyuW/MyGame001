@@ -181,6 +181,7 @@ pub fn look_colour(cell: &Cell, look: u8, sight: Sight) -> [u8; 4] {
     };
     let base: [u8; 3] = match (feature, ground) {
         (Feature::Ore, _) => [200, 170, 40],
+        (Feature::Gems, _) => [70, 196, 190],
         (Feature::Lava, _) => [214, 92, 30],
         (Feature::Cliff, Ground::Snow | Ground::Ice) => [150, 158, 170],
         (Feature::Cliff, Ground::Sand) => [150, 98, 64],
