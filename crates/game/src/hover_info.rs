@@ -111,6 +111,15 @@ pub fn armour_line(definitions: &Definitions, item: ProductionItem) -> Option<St
     })
 }
 
+/// The name of the rank `rank` of a unit (RA4): `Veteran`, `Elite`, or `None` below them.
+pub fn rank_name(rank: u8) -> Option<&'static str> {
+    match rank {
+        0 => None,
+        1 => Some("Veteran"),
+        _ => Some("Elite"),
+    }
+}
+
 /// The label of scenery (`sim::Props`): its name, that it can be destroyed, and its health.
 pub fn scenery_text(kind: sim::PropKind, hit_points: i32) -> String {
     let max = kind.hit_points().max(1);
@@ -222,6 +231,14 @@ pub(crate) fn show_hover_label(
             if let Some(armour) = armour_line(definitions, item) {
                 text.push('\n');
                 text.push_str(&armour);
+            }
+            // RA4: the rank of a veteran or elite unit.
+            if let Some(rank) = world
+                .get::<sim::Experience>(entity)
+                .and_then(|experience| rank_name(experience.rank))
+            {
+                text.push('\n');
+                text.push_str(rank);
             }
             Some((
                 text,
@@ -341,6 +358,14 @@ mod tests {
     }
 
     /// RA3: the label names the armour type of what the cursor is on.
+    /// RA4: the hover text names a veteran and an elite unit, and nothing below them.
+    #[test]
+    fn the_rank_of_a_unit_is_named_from_veteran_on() {
+        assert_eq!(rank_name(0), None);
+        assert_eq!(rank_name(sim::VETERAN), Some("Veteran"));
+        assert_eq!(rank_name(sim::ELITE), Some("Elite"));
+    }
+
     #[test]
     fn the_label_names_the_armour_of_every_shipped_type() {
         let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../assets");

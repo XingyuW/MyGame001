@@ -129,6 +129,22 @@ fn first_shot(water_from: i32, attacker: &str, target: &str, cells: i32) -> Opti
         put(&mut app, P0, "power_plant", 2, 2);
         put(&mut app, P0, "power_plant", 5, 2);
     }
+    // RA4 (docs/DECISIONS.md R49): a Harrier is lost without a dock. As the attacker it stands
+    // on the first dock of an Airforce Command of its owner; as the target, which is silent
+    // and stays where it is, it has its dock far away.
+    let definitions = defs(&app);
+    let bound = |id: &str| {
+        definitions
+            .unit_kind(id)
+            .and_then(|kind| definitions.metadata(sim::ProductionItem::Unit(kind)))
+            .is_some_and(|entry| entry.airport_bound)
+    };
+    if bound(attacker) {
+        put(&mut app, P0, "airforce_command", 10, 10);
+    }
+    if bound(target) {
+        put(&mut app, P1, "airforce_command", 40, 40);
+    }
     let attacker = put(&mut app, P0, attacker, 10, 10);
     let target = put(&mut app, P1, target, 10 + cells, 10);
     silence(&mut app, target);
@@ -343,8 +359,8 @@ fn shipped_ships_follow_their_naval_targeting() {
     for (attacker, target, cells, expected) in [
         // [SubTorpedo] Damage=100 through [APSplash]: heavy 100 %.
         ("typhoon", "destroyer", 4, Some(("sub_torpedo", 100))),
-        // The destroyer's gun cannot reach under water; its stand-in for the Osprey can:
-        // [ASWBomb] Damage=50 through [APSplash].
+        // The destroyer's gun cannot reach under water; its launcher sends the Osprey (RA4),
+        // whose depth charge is the first hit: [ASWBomb] Damage=50 through [APSplash].
         ("destroyer", "typhoon", 5, Some(("asw_launcher", 50))),
         // [155mm] Damage=60 through [ARTYHE]: heavy 60 %.
         ("destroyer", "sea_scorpion", 5, Some(("gun_155mm", 36))),
@@ -354,9 +370,11 @@ fn shipped_ships_follow_their_naval_targeting() {
         // ([SquidPunch] Damage=50 through [HE]: light 70 %).
         ("giant_squid", "destroyer", 1, Some(("squid_grab", 15))),
         ("giant_squid", "dolphin", 1, Some(("squid_punch", 35))),
-        // The Aegis attacks aircraft only: [Medusa] Damage=100 through [SAMWH].
+        // The Aegis attacks aircraft only: [Medusa] Damage=100 through [SAMWH]: light 100 %.
+        // The aircraft is a Kirov (light armour, as the Harrier's): over open sea a Harrier
+        // has no dock and is lost (RA4, docs/DECISIONS.md R49).
         ("aegis_cruiser", "destroyer", 5, None),
-        ("aegis_cruiser", "harrier", 6, Some(("medusa", 100))),
+        ("aegis_cruiser", "kirov", 6, Some(("medusa", 100))),
         // The Sea Scorpion's guns do not reach under water.
         ("sea_scorpion", "typhoon", 4, None),
     ] {

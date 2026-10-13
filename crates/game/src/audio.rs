@@ -18,7 +18,8 @@
 //! prism rings like struck glass as it discharges, and a Tesla weapon snaps and buzzes at twice
 //! the mains frequency, as an electric arc does. A shell that the player sees land is heard
 //! landing ([`Sfx::Impact`]). A soldier driven over by a vehicle is heard as a dull crunch
-//! ([`Sfx::Crush`], RA3) instead of the bang of a destruction.
+//! ([`Sfx::Crush`], RA3) instead of the bang of a destruction. A promotion of one of the human
+//! player's units pings ([`Sfx::Promotion`], RA4).
 //!
 //! At most [`MAX_ACTIVE_EFFECTS`] effects play at once, the same effect at most once per
 //! [`MIN_REPEAT_SECS`], and every effect entity is removed when its sound has ended, also when
@@ -209,12 +210,14 @@ pub enum Sfx {
     Impact,
     /// A vehicle drove over a soldier (RA3).
     Crush,
+    /// A unit of the human player rose in rank (RA4).
+    Promotion,
     /// A unit or building the human player was shown was destroyed.
     Explosion,
 }
 
 impl Sfx {
-    pub const ALL: [Sfx; 26] = [
+    pub const ALL: [Sfx; 27] = [
         Sfx::Acknowledge,
         Sfx::Error,
         Sfx::Ready,
@@ -240,6 +243,7 @@ impl Sfx {
         Sfx::Trigger,
         Sfx::Impact,
         Sfx::Crush,
+        Sfx::Promotion,
         Sfx::Explosion,
     ];
 
@@ -299,6 +303,7 @@ impl Sfx {
             Sfx::Shot | Sfx::Burst | Sfx::Grenade | Sfx::BombFall => 0.62,
             Sfx::Radiation | Sfx::Psychic | Sfx::Chrono | Sfx::Sonic | Sfx::Bite => 0.55,
             Sfx::Crush => 0.6,
+            Sfx::Promotion => 0.5,
             Sfx::Trigger => 0.4,
             _ => 0.8,
         }
@@ -571,6 +576,7 @@ pub fn synthesize(sfx: Sfx) -> Vec<Sample> {
         Sfx::Trigger => 0.25,
         Sfx::Impact => 0.8,
         Sfx::Crush => CRUSH_SECS,
+        Sfx::Promotion => 0.42,
         Sfx::Explosion => EXPLOSION_SECS,
     };
     let mut buffer = vec![0.0f32; samples_for(seconds)];
@@ -654,6 +660,23 @@ pub fn synthesize(sfx: Sfx) -> Vec<Sample> {
         Sfx::Trigger => trigger(&mut buffer),
         Sfx::Impact => impact(&mut buffer),
         Sfx::Crush => crush(&mut buffer),
+        // Two bright notes a fourth apart, the second ringing on: a ping, unlike the three
+        // rising notes of a finished production.
+        Sfx::Promotion => {
+            for (index, frequency) in [1174.66, 1567.98].into_iter().enumerate() {
+                let start = samples_for(0.09 * index as f32);
+                add_note(
+                    &mut buffer,
+                    start,
+                    0.14 + 0.18 * index as f32,
+                    Wave::Sine,
+                    frequency,
+                    frequency,
+                    0.45,
+                    true,
+                );
+            }
+        }
         Sfx::Explosion => explosion(&mut buffer),
     }
     let length = buffer.len() as f32 / SR;
@@ -2125,6 +2148,8 @@ pub fn event_sound(event: &SimEvent, context: &SoundContext) -> Option<Sfx> {
         SimEvent::UnitCrushed {
             player, unit, by, ..
         } => (*player == HUMAN || *by == HUMAN || (context.shown)(*unit)).then_some(Sfx::Crush),
+        // RA4: the player hears its own units' promotions, wherever they are.
+        SimEvent::RankGained { player, .. } => (*player == HUMAN).then_some(Sfx::Promotion),
         SimEvent::UnitDestroyed { player, unit } => (!(context.crushed)(*unit)
             && (*player == HUMAN || (context.shown)(*unit)))
         .then_some(Sfx::Explosion),
@@ -2143,6 +2168,11 @@ pub fn event_sound(event: &SimEvent, context: &SoundContext) -> Option<Sfx> {
         | SimEvent::AttackEnded { .. }
         | SimEvent::Impact { .. }
         | SimEvent::DamageStateChanged { .. }
+        // RA4: a launch is heard as its launcher's shot, a missile's end as its impact.
+        | SimEvent::CrewEscaped { .. }
+        | SimEvent::UnitLaunched { .. }
+        | SimEvent::UnitRecovered { .. }
+        | SimEvent::MissileDetonated { .. }
         // The end screen announces the outcome (M6).
         | SimEvent::PlayerDefeated { .. }
         | SimEvent::MatchEnded { .. } => None,
@@ -2645,6 +2675,32 @@ mod tests {
             crushed: &crushed,
         };
         let sound = |event: SimEvent| event_sound(&event, &context);
+        // RA4. A promotion pings for the human player's own unit only, seen or not.
+        let promotion = |player, unit| SimEvent::RankGained {
+            player,
+            unit,
+            rank: 1,
+        };
+        assert_eq!(sound(promotion(HUMAN, unseen_id)), Some(Sfx::Promotion));
+        assert_eq!(sound(promotion(enemy, seen_id)), None);
+        // A launch, a recovery, a missile's end and a crew have no sound of their own.
+        assert_eq!(
+            sound(SimEvent::UnitLaunched {
+                player: HUMAN,
+                parent: seen_id,
+                unit: SimId(8)
+            }),
+            None
+        );
+        assert_eq!(
+            sound(SimEvent::CrewEscaped {
+                player: HUMAN,
+                from: seen_id,
+                at: sim::CellPos::new(0, 0),
+                units: vec![SimId(8)]
+            }),
+            None
+        );
         // RA3. A crushing is heard by the soldier's owner, by the owner of the vehicle, and
         // where the soldier was shown; and the destruction that follows it is silent.
         let crushing = |player, unit, by| SimEvent::UnitCrushed {

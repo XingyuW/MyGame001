@@ -267,6 +267,8 @@ pub struct Projectile {
     pub flight: u32,
     /// Ticks of flight left.
     pub remaining: u32,
+    /// The firepower multiplier of its attacker when it was fired, in permille (RA4).
+    pub firepower_pm: u32,
 }
 
 /// The projectiles in flight, in the order they were fired (invariant I4).
@@ -278,6 +280,16 @@ pub struct Projectiles {
 impl Projectiles {
     pub fn iter(&self) -> impl Iterator<Item = &Projectile> {
         self.list.iter()
+    }
+
+    /// The projectiles of `from` in flight become those of `to` (RA4: what a launched aircraft
+    /// fired counts for its spawner once the aircraft is gone).
+    pub(crate) fn reassign(&mut self, from: SimId, to: SimId) {
+        for projectile in &mut self.list {
+            if projectile.attacker == from {
+                projectile.attacker = to;
+            }
+        }
     }
 
     pub fn len(&self) -> usize {
@@ -302,6 +314,12 @@ impl Projectiles {
             hasher.write(&[u8::from(projectile.scattered), u8::from(projectile.air)]);
             hasher.write_u32(projectile.flight);
             hasher.write_u32(projectile.remaining);
+            // RA4: written only when it changes something, so that a world without veterancy
+            // hashes as before.
+            if projectile.firepower_pm != 1000 {
+                hasher.write(b"fp");
+                hasher.write_u32(projectile.firepower_pm);
+            }
         }
     }
 }
@@ -355,6 +373,53 @@ pub fn splash_damage(
         .div_euclid(100 * spread * 100)
         .max(1);
     i32::try_from(applied).unwrap_or(i32::MAX)
+}
+
+/// The damage of a hit (docs/RA2_PARITY_PLAN.md section 4.3, with the multipliers of RA4): of
+/// base damage `base` from an attacker whose firepower multiplier is `firepower_pm`, through a
+/// warhead with percentage `versus` against the target's armour, spread `cell_spread`
+/// (subcells) and `percent_at_max` percent at that distance, on something `distance` subcells
+/// from the impact whose armour multiplier is `armour_pm`:
+///
+/// ```text
+/// D2 = floor(base × firepower_pm × (100 R − (100 − percent_at_max) d) × versus
+///            / (1000 × 100 R × 100)),   at least 1 if versus > 0
+/// D3 = floor(D2 × 1000 / armour_pm)
+/// ```
+///
+/// 0 if `versus = 0` and beyond the spread; without a spread (`cell_spread` 0) the share of the
+/// distance is 1, as in [`splash_damage`], which this is for multipliers of 1000. The armour
+/// multiplier is applied after the minimum of equation 2, as the plan's equations have it, so
+/// a hit of 1 on a unit with stronger armour deals nothing. Computed in `i128` and clamped to
+/// `i32` (invariant I12).
+pub fn impact_damage(
+    base: i32,
+    firepower_pm: u32,
+    versus: i32,
+    cell_spread: u32,
+    percent_at_max: u32,
+    distance: u64,
+    armour_pm: u32,
+) -> i32 {
+    if versus <= 0 {
+        return 0;
+    }
+    let (share, whole) = if cell_spread == 0 {
+        (1, 1)
+    } else {
+        let spread = i128::from(cell_spread);
+        let distance = i128::from(distance);
+        if distance > spread {
+            return 0;
+        }
+        let lost = i128::from(100u32.saturating_sub(percent_at_max));
+        (100 * spread - lost * distance, 100 * spread)
+    };
+    let dealt = (i128::from(base) * i128::from(firepower_pm) * share * i128::from(versus))
+        .div_euclid(1000 * whole * 100)
+        .max(1);
+    let taken = dealt * 1000 / i128::from(armour_pm.max(1));
+    i32::try_from(taken).unwrap_or(i32::MAX)
 }
 
 /// Equation 1 of PLAN.md section 5: whether a target at offset (`dx`, `dy`) subcells is within
@@ -624,6 +689,10 @@ struct Target {
     extent: Extent,
     body: Body,
     traits: TargetTraits,
+    /// The divisor of the damage it takes, in permille (RA4: 1000 without experience).
+    armour_pm: u32,
+    /// What it is, for the experience of whoever destroys it.
+    item: Option<crate::ProductionItem>,
 }
 
 /// The traits of a unit or building as a target. `terms` are the combat terms of its type.
@@ -669,6 +738,7 @@ type TargetQuery<'w, 's> = Query<
         Option<&'static Mobile>,
         Option<&'static Building>,
         Option<&'static crate::Unit>,
+        Option<&'static crate::Experience>,
     ),
 >;
 
@@ -683,6 +753,7 @@ type AttackerQuery<'w, 's> = Query<
         Option<&'static Mobile>,
         Option<&'static mut Orders>,
         Option<&'static Building>,
+        Option<&'static crate::Experience>,
     ),
 >;
 
@@ -699,11 +770,23 @@ pub(crate) struct Blast {
     /// The unit, building or scenery it hit: damaged as at the point itself, wherever its
     /// position is.
     pub(crate) direct: Option<SimId>,
+    /// The firepower multiplier of whoever caused it, in permille (RA4).
+    pub(crate) firepower_pm: u32,
+    /// The unit or building that caused it: the killer of what it destroys.
+    pub(crate) source: Option<SimId>,
 }
+
+/// One hit of an impact: what is hit, the damage, and who caused it.
+type Hit = (SimId, i32, Option<SimId>);
+
+/// What an impact needs to know of an entity it may hit: its position (of a unit), its traits,
+/// and the divisor of the damage it takes in permille.
+type Struck = (Option<SubPos>, TargetTraits, u32);
 
 /// The damage of every hit of `blast`, by the id of what is hit, in the order the hits are
 /// found; an entity may be hit more than once (a building, once per cell of its footprint
-/// within the spread). `traits` gives the position (of a unit) and the traits of an entity.
+/// within the spread). `traits` gives the position (of a unit), the traits and the armour
+/// multiplier of an entity.
 ///
 /// Only the cells the spread reaches are looked at, through the grid's occupants (every unit
 /// that holds a cell: a vehicle, or each of the infantry in its spots, by its own distance), so
@@ -712,9 +795,9 @@ fn blast_hits(
     definitions: &Definitions,
     grid: &Grid,
     props: &crate::Props,
-    traits: &dyn Fn(SimId) -> Option<(Option<SubPos>, TargetTraits)>,
+    traits: &dyn Fn(SimId) -> Option<Struck>,
     blast: &Blast,
-    hits: &mut Vec<(SimId, i32)>,
+    hits: &mut Vec<Hit>,
 ) {
     let Some(warhead) = definitions.warhead(blast.warhead) else {
         return;
@@ -723,17 +806,19 @@ fn blast_hits(
         .rules()
         .map_or(i32::MAX, |rules| rules.combat.max_damage);
     let spread = warhead.cell_spread;
-    let mut hit = |id: SimId, traits: &TargetTraits, distance: u64| {
-        let damage = splash_damage(
+    let mut hit = |id: SimId, traits: &TargetTraits, distance: u64, armour_pm: u32| {
+        let damage = impact_damage(
             blast.damage,
+            blast.firepower_pm,
             versus_against(warhead, traits),
             spread,
             warhead.percent_at_max,
             distance,
+            armour_pm,
         )
         .min(most);
         if damage > 0 {
-            hits.push((id, damage));
+            hits.push((id, damage, blast.source));
         }
     };
     let prop_traits = |kind: crate::PropKind| TargetTraits {
@@ -742,10 +827,10 @@ fn blast_hits(
         ..TargetTraits::default()
     };
     if let Some(direct) = blast.direct {
-        if let Some((_, found)) = traits(direct) {
-            hit(direct, &found, 0);
+        if let Some((_, found, armour_pm)) = traits(direct) {
+            hit(direct, &found, 0, armour_pm);
         } else if let Some((_, prop)) = props.get(direct) {
-            hit(direct, &prop_traits(prop.kind), 0);
+            hit(direct, &prop_traits(prop.kind), 0, 1000);
         }
         if spread == 0 {
             return;
@@ -785,16 +870,16 @@ fn blast_hits(
                 if let Some(building) = grid.building(cell)
                     && !(blast.direct == Some(building) && cell == home)
                     && let Some(distance) = within(centre)
-                    && let Some((_, found)) = traits(building)
+                    && let Some((_, found, armour_pm)) = traits(building)
                 {
-                    hit(building, &found, distance);
+                    hit(building, &found, distance, armour_pm);
                 }
                 if let Some(prop) = props.at(cell)
                     && let Some(id) = props.id_at(cell)
                     && blast.direct != Some(id)
                     && let Some(distance) = within(centre)
                 {
-                    hit(id, &prop_traits(prop.kind), distance);
+                    hit(id, &prop_traits(prop.kind), distance, 1000);
                 }
             }
             // A unit holds the cell it stands in and the one it is entering: once is enough.
@@ -803,11 +888,11 @@ fn blast_hits(
                     continue;
                 }
                 seen.push(unit);
-                if let Some((Some(position), found)) = traits(unit)
+                if let Some((Some(position), found, armour_pm)) = traits(unit)
                     && found.airborne == blast.air
                     && let Some(distance) = within(position)
                 {
-                    hit(unit, &found, distance);
+                    hit(unit, &found, distance, armour_pm);
                 }
             }
         }
@@ -909,6 +994,23 @@ pub fn scattered(
 struct Arms {
     weapons: [Option<WeaponKind>; 2],
     terms: CombatTerms,
+    /// The multipliers of the attacker's damage and reload, in permille (RA4).
+    firepower_pm: u32,
+    reload_pm: u32,
+    /// The weapon with which the attacker launches the units it spawns, if it has one that is
+    /// ready to launch (RA4, `crate::flight`): `Some(false)` while none is ready.
+    launcher: Option<(WeaponKind, bool)>,
+}
+
+impl Arms {
+    /// The ticks until the attacker may fire again after a volley of the weapon `def`.
+    fn reload(&self, def: &WeaponDef) -> u32 {
+        if self.reload_pm == 1000 {
+            def.reload
+        } else {
+            crate::veterancy::reload_ticks(def.reload, self.reload_pm)
+        }
+    }
 }
 
 /// The weapon chosen against a target.
@@ -985,6 +1087,8 @@ impl Field<'_> {
                 tree: prop.kind == crate::PropKind::Trees,
                 ..TargetTraits::default()
             },
+            armour_pm: 1000,
+            item: None,
         })
     }
 
@@ -1074,9 +1178,9 @@ impl Field<'_> {
         shots: &mut Shots,
         rng: &mut crate::SimRng,
         attacker: (SimId, PlayerId, &Extent),
+        arms: &Arms,
         choice: &Choice<'_>,
-        target_id: SimId,
-        target: &Target,
+        (target_id, target): (SimId, &Target),
     ) {
         let target = *target;
         let (id, owner, from) = attacker;
@@ -1098,6 +1202,14 @@ impl Field<'_> {
             }
             _ => {}
         }
+        // The shot of a launcher is no impact either: `crate::flight` launches a missile or
+        // an aircraft at the target (RA4).
+        if arms
+            .launcher
+            .is_some_and(|(launcher, _)| launcher == choice.kind)
+        {
+            return;
+        }
         let (dx, dy) = from.gap(&target.extent);
         let distance = distance(dx, dy);
         let aim = target.extent.aim_from(from);
@@ -1114,6 +1226,8 @@ impl Field<'_> {
                 warhead: def.warhead,
                 damage: def.damage,
                 direct: (!scattered).then_some(target_id),
+                firepower_pm: arms.firepower_pm,
+                source: Some(id),
             });
             return;
         }
@@ -1131,6 +1245,7 @@ impl Field<'_> {
             air,
             flight,
             remaining: flight,
+            firepower_pm: arms.firepower_pm,
         });
     }
 }
@@ -1150,17 +1265,22 @@ pub(crate) fn combat(
     mut attackers: AttackerQuery,
     mut props: ResMut<crate::Props>,
     special: Res<crate::SpecialState>,
+    mut kills: ResMut<crate::veterancy::Kills>,
 ) {
     if attackers.is_empty() && projectiles.is_empty() {
         return;
     }
+    // RA4: the units that launch what they spawn, with the weapon slot that does it and the
+    // number they carry.
+    let mut launchers: BTreeMap<SimId, (crate::Launcher, u32)> = BTreeMap::new();
+    let ruled = definitions.rules().is_some();
     let mut roles: BTreeMap<SimId, crate::Role> = BTreeMap::new();
     let mut terms: BTreeMap<SimId, CombatTerms> = BTreeMap::new();
     let mut crushers: BTreeSet<SimId> = BTreeSet::new();
     let index: BTreeMap<SimId, Target> = targets
         .iter()
         .filter_map(
-            |(entity, id, owner, _, armour, position, mobile, building, unit)| {
+            |(entity, id, owner, _, armour, position, mobile, building, unit, experience)| {
                 let extent = match (position, building) {
                     (Some(position), _) => Extent::point(position.0),
                     (None, Some(building)) => Extent::footprint(building.footprint),
@@ -1184,6 +1304,12 @@ pub(crate) fn combat(
                     if role.crusher {
                         crushers.insert(*id);
                     }
+                    if ruled
+                        && role.spawns.is_some()
+                        && let Some(launcher) = role.launcher
+                    {
+                        launchers.insert(*id, (launcher, role.spawns_number));
+                    }
                 }
                 if let Some(of_type) = of_type {
                     terms.insert(*id, of_type);
@@ -1196,6 +1322,8 @@ pub(crate) fn combat(
                         extent,
                         body,
                         traits: traits_of(&grid, *id, armour.0, &body, of_type.as_ref()),
+                        armour_pm: experience.map_or(1000, crate::Experience::armour_pm),
+                        item,
                     },
                 ))
             },
@@ -1250,6 +1378,8 @@ pub(crate) fn combat(
                 warhead: def.warhead,
                 damage: def.damage,
                 direct: Some(projectile.target),
+                firepower_pm: projectile.firepower_pm,
+                source: Some(projectile.attacker),
             }),
             _ if projectile.scattered || spread > 0 => Some(Blast {
                 point: projectile.aim,
@@ -1257,6 +1387,8 @@ pub(crate) fn combat(
                 warhead: def.warhead,
                 damage: def.damage,
                 direct: None,
+                firepower_pm: projectile.firepower_pm,
+                source: Some(projectile.attacker),
             }),
             _ => None,
         };
@@ -1272,7 +1404,7 @@ pub(crate) fn combat(
     }
     order.sort_unstable();
     for (id, entity) in order {
-        let Ok((_, owner, mut weapon, position, mobile, orders, building)) =
+        let Ok((_, owner, mut weapon, position, mobile, orders, building, experience)) =
             attackers.get_mut(entity)
         else {
             continue;
@@ -1281,14 +1413,28 @@ pub(crate) fn combat(
         if special.disabled.contains_key(&id) || special.rearming.contains_key(&id) {
             continue;
         }
+        // RA4: an aircraft that has spent its ammunition does not fire until it has reloaded.
+        if special.ammo.get(&id) == Some(&0) {
+            continue;
+        }
         // Every weapon kind comes from the definitions, which do not change during a match,
         // and every armed unit and building is of a type with combat terms.
         let Some(&of_type) = terms.get(&id) else {
             continue;
         };
+        let launcher = launchers.get(&id).and_then(|&(slot, number)| {
+            let kind = match slot {
+                crate::Launcher::Primary => Some(weapon.kind),
+                crate::Launcher::Secondary => weapon.secondary,
+            }?;
+            Some((kind, special.launch_ready(id, number)))
+        });
         let arms = Arms {
             weapons: [Some(weapon.kind), weapon.secondary],
             terms: of_type,
+            firepower_pm: experience.map_or(1000, crate::Experience::firepower_pm),
+            reload_pm: experience.map_or(1000, crate::Experience::reload_pm),
+            launcher,
         };
         let from = match (position, building) {
             (Some(position), _) => Extent::point(position.0),
@@ -1334,44 +1480,66 @@ pub(crate) fn combat(
             weapon.burst_left = 0;
             weapon.cooldown = definitions
                 .weapon(weapon.volley)
-                .map_or(0, |def| def.reload);
+                .map_or(0, |def| arms.reload(def));
         }
     }
 
     // 3. Damage: every impact's hits, summed per target in `i64` (invariant I12), then applied
-    // in target id order (scenery has the highest ids).
+    // in target id order (scenery has the highest ids). The hit that brings a target's hit
+    // points to 0, in the order of the hits, names its killer (RA4).
     let mut hits = Vec::new();
     {
         let traits = |id: SimId| {
             index.get(&id).map(|target| {
                 let position =
                     matches!(target.body, Body::Unit { .. }).then(|| target.extent.centre());
-                (position, target.traits)
+                (position, target.traits, target.armour_pm)
             })
         };
         for blast in &shots.blasts {
             blast_hits(&definitions, &grid, &props, &traits, blast, &mut hits);
         }
     }
-    let mut damage: BTreeMap<SimId, i64> = BTreeMap::new();
-    for (target, hit) in hits {
-        let total = damage.entry(target).or_default();
-        *total = total.saturating_add(i64::from(hit));
+    let mut damage: BTreeMap<SimId, Vec<(i64, Option<SimId>)>> = BTreeMap::new();
+    for (target, hit, source) in hits {
+        damage
+            .entry(target)
+            .or_default()
+            .push((i64::from(hit), source));
     }
     let mut prop_damage = Vec::new();
-    for (target, damage) in damage {
+    for (target, hits) in damage {
         if special.invulnerable(target, tick.0) {
             continue;
         }
-        let Some(entity) = index.get(&target).and_then(|target| target.entity) else {
+        let damage = hits
+            .iter()
+            .fold(0i64, |total, (hit, _)| total.saturating_add(*hit));
+        let Some(found) = index.get(&target) else {
             if let Some((cell, _)) = props.get(target) {
                 prop_damage.push((cell, damage));
             }
             continue;
         };
+        let Some(entity) = found.entity else {
+            continue;
+        };
         if let Ok((_, _, _, mut health, ..)) = targets.get_mut(entity) {
-            let left = i64::from(health.hit_points).saturating_sub(damage);
+            let before = i64::from(health.hit_points);
+            let left = before.saturating_sub(damage);
             health.hit_points = i32::try_from(left.max(i64::from(i32::MIN))).unwrap_or(i32::MIN);
+            if ruled && before > 0 && left <= 0 {
+                let mut remaining = before;
+                let killer = hits.iter().find_map(|&(hit, source)| {
+                    remaining = remaining.saturating_sub(hit);
+                    (remaining <= 0).then_some(source)
+                });
+                if let (Some(Some(killer)), Some(owner), Some(item)) =
+                    (killer, found.owner, found.item)
+                {
+                    kills.record(killer, owner, crate::veterancy::worth(&definitions, item));
+                }
+            }
         }
     }
     in_flight.extend(shots.fired);
@@ -1406,19 +1574,32 @@ fn impact_event(blast: &Blast) -> SimEvent {
 pub(crate) fn detonate(world: &mut bevy_ecs::world::World, blast: Blast, report: bool) {
     let definitions = world.resource::<Definitions>().clone();
     let tick = world.resource::<SimTick>().0;
-    let mut found: BTreeMap<SimId, (Entity, Option<SubPos>, TargetTraits)> = BTreeMap::new();
+    // Per entity: where it is, its traits, its armour multiplier, its owner and what it is.
+    type Found = (
+        Entity,
+        Option<SubPos>,
+        TargetTraits,
+        u32,
+        PlayerId,
+        Option<crate::ProductionItem>,
+    );
+    let mut found: BTreeMap<SimId, Found> = BTreeMap::new();
     {
         let mut query = world.query::<(
             Entity,
             &SimId,
+            &Owner,
             &Armour,
             Option<&Position>,
             Option<&Mobile>,
             Option<&Building>,
             Option<&crate::Unit>,
+            Option<&crate::Experience>,
         )>();
         let grid = world.resource::<Grid>();
-        for (entity, id, armour, position, mobile, building, unit) in query.iter(world) {
+        for (entity, id, owner, armour, position, mobile, building, unit, experience) in
+            query.iter(world)
+        {
             let Some(body) = Body::of(mobile, building) else {
                 continue;
             };
@@ -1427,12 +1608,20 @@ pub(crate) fn detonate(world: &mut bevy_ecs::world::World, blast: Blast, report:
                 (None, Some(building)) => definitions.building_combat(building.kind),
                 (None, None) => None,
             };
+            let item = match (unit, building) {
+                (Some(unit), _) => Some(crate::ProductionItem::Unit(unit.kind)),
+                (None, Some(building)) => Some(crate::ProductionItem::Building(building.kind)),
+                (None, None) => None,
+            };
             found.insert(
                 *id,
                 (
                     entity,
                     position.map(|position| position.0),
                     traits_of(grid, *id, armour.0, &body, of_type.as_ref()),
+                    experience.map_or(1000, crate::Experience::armour_pm),
+                    owner.0,
+                    item,
                 ),
             );
         }
@@ -1442,7 +1631,7 @@ pub(crate) fn detonate(world: &mut bevy_ecs::world::World, blast: Blast, report:
         let traits = |id: SimId| {
             found
                 .get(&id)
-                .map(|&(_, position, traits)| (position, traits))
+                .map(|&(_, position, traits, armour_pm, ..)| (position, traits, armour_pm))
         };
         blast_hits(
             &definitions,
@@ -1453,7 +1642,7 @@ pub(crate) fn detonate(world: &mut bevy_ecs::world::World, blast: Blast, report:
             &mut hits,
         );
     }
-    for (id, damage) in hits {
+    for (id, damage, source) in hits {
         if world
             .resource::<crate::SpecialState>()
             .invulnerable(id, tick)
@@ -1461,9 +1650,22 @@ pub(crate) fn detonate(world: &mut bevy_ecs::world::World, blast: Blast, report:
             continue;
         }
         match found.get(&id) {
-            Some(&(entity, ..)) => {
+            Some(&(entity, _, _, _, owner, item)) => {
+                let mut killed = false;
                 if let Some(mut health) = world.get_mut::<Health>(entity) {
-                    health.hit_points = health.hit_points.saturating_sub(damage);
+                    let before = health.hit_points;
+                    health.hit_points = before.saturating_sub(damage);
+                    killed = before > 0 && health.hit_points <= 0;
+                }
+                // RA4: whoever caused the impact is the killer of what it destroys.
+                if killed
+                    && definitions.rules().is_some()
+                    && let (Some(killer), Some(item)) = (source, item)
+                {
+                    let cost = crate::veterancy::worth(&definitions, item);
+                    world
+                        .resource_mut::<crate::veterancy::Kills>()
+                        .record(killer, owner, cost);
                 }
             }
             None => {
@@ -1523,7 +1725,7 @@ fn fire_at_target<'a>(
     let target = field.visible_enemy(owner, target_id)?;
     let choice = field.choose(arms, &target.traits)?;
     fire_if_ready(
-        field, shots, rng, attacker, weapon, &choice, target_id, &target,
+        field, shots, rng, attacker, weapon, arms, &choice, target_id, &target,
     )
     .then_some(choice)
 }
@@ -1538,6 +1740,7 @@ fn fire_if_ready(
     rng: &mut crate::SimRng,
     attacker: (SimId, PlayerId, &Extent),
     weapon: &mut Weapon,
+    arms: &Arms,
     choice: &Choice<'_>,
     target_id: SimId,
     target: &Target,
@@ -1547,12 +1750,16 @@ fn fire_if_ready(
     if weapon.cooldown > 0 || !choice.covers(dx, dy) {
         return false;
     }
+    // RA4: a launcher waits until one of the units it spawns is ready.
+    if arms.launcher == Some((choice.kind, false)) {
+        return false;
+    }
     if weapon.burst_left > 0 && weapon.volley != choice.kind {
         weapon.burst_left = 0;
         weapon.cooldown = field
             .definitions
             .weapon(weapon.volley)
-            .map_or(1, |def| def.reload);
+            .map_or(1, |def| arms.reload(def));
         return false;
     }
     weapon.burst_left = if weapon.burst_left > 0 {
@@ -1564,9 +1771,9 @@ fn fire_if_ready(
     weapon.cooldown = if weapon.burst_left > 0 {
         BURST_GAP
     } else {
-        choice.def.reload
+        arms.reload(choice.def)
     };
-    field.fire(shots, rng, attacker, choice, target_id, target);
+    field.fire(shots, rng, attacker, arms, choice, (target_id, target));
     true
 }
 
@@ -1614,6 +1821,7 @@ fn act_unit(
                     rng,
                     (id, owner, from),
                     weapon,
+                    arms,
                     &choice,
                     target,
                     found,
@@ -1790,15 +1998,18 @@ type DeadQuery<'w, 's> = Query<
         &'static Health,
         Option<&'static Mobile>,
         Option<&'static Building>,
+        Option<&'static crate::Unit>,
     ),
 >;
 
 /// Removes every unit and building whose hit points are ≤ 0, in id order, frees its cells, and
-/// reports it (the `Cleanup` stage).
+/// reports it (the `Cleanup` stage). Each is recorded as a wreck, whose crew `crate::crew` lets
+/// out (RA4).
 pub(crate) fn remove_dead(
     mut commands: Commands,
     mut grid: ResMut<Grid>,
     mut events: ResMut<Messages<SimEvent>>,
+    mut wrecks: ResMut<crate::crew::Wrecks>,
     entities: DeadQuery,
 ) {
     let mut dead: Vec<_> = entities
@@ -1806,7 +2017,18 @@ pub(crate) fn remove_dead(
         .filter(|(_, _, _, health, ..)| health.hit_points <= 0)
         .collect();
     dead.sort_unstable_by_key(|(_, id, ..)| **id);
-    for (entity, &id, owner, _, mobile, building) in dead {
+    for (entity, &id, owner, _, mobile, building, unit) in dead {
+        if let (Some(mobile), Some(unit)) = (mobile, unit) {
+            wrecks.0.push(crate::crew::Wreck {
+                owner: owner.0,
+                id,
+                what: crate::crew::Wrecked::Unit {
+                    kind: unit.kind,
+                    cell: mobile.cell,
+                    moving: mobile.step.is_some(),
+                },
+            });
+        }
         if let Some(mobile) = mobile {
             grid.unregister(id);
             grid.release(mobile.cell, id);
@@ -1819,6 +2041,14 @@ pub(crate) fn remove_dead(
             });
         }
         if let Some(building) = building {
+            wrecks.0.push(crate::crew::Wreck {
+                owner: owner.0,
+                id,
+                what: crate::crew::Wrecked::Building {
+                    kind: building.kind,
+                    footprint: building.footprint,
+                },
+            });
             for cell in building.footprint.cells() {
                 grid.uncover(cell, id);
             }
@@ -1886,6 +2116,7 @@ mod tests {
             air: false,
             flight: 5,
             remaining: 3,
+            firepower_pm: 1000,
         };
         let hash = |projectile: Projectile| {
             let mut hasher = Fnv1a64::new();
@@ -1911,6 +2142,10 @@ mod tests {
                 ..shell
             },
             Projectile { air: true, ..shell },
+            Projectile {
+                firepower_pm: 1100,
+                ..shell
+            },
         ] {
             assert_ne!(hash(changed), base, "{changed:?}");
         }

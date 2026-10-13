@@ -127,6 +127,15 @@ impl Vision {
         }
     }
 
+    /// A vision of `grid` in which the cells within `sight` of `cell` are visible (for unit
+    /// tests of what a player may know).
+    #[cfg(test)]
+    pub(crate) fn reveal_for_test(&mut self, grid: &Grid, cell: CellPos, sight: u32) {
+        self.begin(grid);
+        let (x, y) = (i64::from(cell.x), i64::from(cell.y));
+        self.reveal((x, y, x, y), sight);
+    }
+
     /// Reveals the cells within `sight` of the rectangle of cells `x0..=x1`, `y0..=y1`
     /// (equation 6, measured to the rectangle's nearest cell). Computed in `i64`, so no source
     /// position overflows (invariant I12).

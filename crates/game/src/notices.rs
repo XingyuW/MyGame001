@@ -6,6 +6,11 @@
 //! plays ([`announce`], from `crate::skirmish::begin_match`), which is news after a RANDOM
 //! choice.
 //!
+//! Since RA4 also what happens to the human player's own units away from the camera: a unit that
+//! rose in rank ("Grizzly Battle Tank promoted to veteran", [`promotion_text`]) and the crew or
+//! the survivors that left a destroyed vehicle or a destroyed or sold building
+//! ([`crew_text`]), both in the player's colour.
+//!
 //! A notice stays for [`NOTICE_SECONDS`] of real time (also while the match is paused, when no
 //! new one can arrive) and fades out over its last second. The newest is at the bottom of the
 //! column; when a match ends, its notices go with it (`crate::skirmish::end_match`).
@@ -64,6 +69,23 @@ pub fn defeat_text(player: PlayerId, colour: &str, country: Option<&str>) -> Str
             "{} has been defeated",
             crate::skirmish::player_name(colour, country)
         )
+    }
+}
+
+/// The line that reports that a unit of the human player called `label` rose to `rank` (RA4).
+pub fn promotion_text(label: &str, rank: u8) -> String {
+    let rank = crate::hover_info::rank_name(rank)
+        .unwrap_or("Veteran")
+        .to_lowercase();
+    format!("{label} promoted to {rank}")
+}
+
+/// The line that reports that `count` crew members or survivors of the human player left a
+/// wreck (RA4).
+pub fn crew_text(count: usize) -> String {
+    match count {
+        1 => "A survivor escaped".to_owned(),
+        count => format!("{count} survivors escaped"),
     }
 }
 
@@ -130,20 +152,47 @@ pub fn announce(world: &mut World, text: String, colour: Color) {
     world.entity_mut(column).with_child(notice(text, colour));
 }
 
-/// Adds a notice for every player defeated in the ticks of this frame.
+/// The label of the type of the unit `unit`, if it still exists.
+fn unit_label(host: &crate::sim_host::SimHost, unit: sim::SimId) -> Option<String> {
+    let definitions = host.definitions()?;
+    let mut units = host.world().try_query::<(&sim::SimId, &sim::Unit)>()?;
+    let kind = units
+        .iter(host.world())
+        .find(|(id, _)| **id == unit)
+        .map(|(_, unit)| unit.kind)?;
+    definitions
+        .metadata(sim::ProductionItem::Unit(kind))
+        .map(|entry| entry.label.clone())
+}
+
+/// Adds a notice for every player defeated in the ticks of this frame, and for every promotion
+/// and escaped crew of the human player (RA4).
 fn announce_defeats(
     mut commands: Commands,
     mut events: MessageReader<SimEvent>,
     teams: Option<Res<TeamColors>>,
     played: Option<Res<crate::skirmish::MatchPlayers>>,
+    host: Option<Res<crate::sim_host::SimHost>>,
     column: Single<Entity, With<NoticeColumn>>,
     notices: Query<(Entity, &Notice)>,
 ) {
     let mut shown = notices.iter().count();
     for event in events.read() {
-        let SimEvent::PlayerDefeated { player } = event else {
-            continue;
+        let (player, text) = match event {
+            SimEvent::PlayerDefeated { player } => (*player, None),
+            SimEvent::RankGained { player, unit, rank } if *player == HUMAN => {
+                let label = host
+                    .as_deref()
+                    .and_then(|host| unit_label(host, *unit))
+                    .unwrap_or_else(|| "Unit".to_owned());
+                (*player, Some(promotion_text(&label, *rank)))
+            }
+            SimEvent::CrewEscaped { player, units, .. } if *player == HUMAN => {
+                (*player, Some(crew_text(units.len())))
+            }
+            _ => continue,
         };
+        let player = &player;
         let teams = teams.as_deref().copied().unwrap_or_default();
         let (name, [r, g, b]) = TEAM_PALETTE[teams.index_of(*player)];
         let colour = Color::srgb_u8(r, g, b);
@@ -155,10 +204,11 @@ fn announce_defeats(
             shown -= 1;
         }
         shown += 1;
-        let country = played.as_deref().and_then(|played| played.label(*player));
-        commands
-            .entity(*column)
-            .with_child(notice(defeat_text(*player, name, country), colour));
+        let text = text.unwrap_or_else(|| {
+            let country = played.as_deref().and_then(|played| played.label(*player));
+            defeat_text(*player, name, country)
+        });
+        commands.entity(*column).with_child(notice(text, colour));
     }
 }
 
@@ -204,6 +254,18 @@ pub fn clear(world: &mut World) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// RA4: the lines of a promotion and of an escaped crew.
+    #[test]
+    fn a_promotion_and_a_crew_are_reported_in_plain_words() {
+        assert_eq!(
+            promotion_text("Grizzly Battle Tank", sim::VETERAN),
+            "Grizzly Battle Tank promoted to veteran"
+        );
+        assert_eq!(promotion_text("GI", sim::ELITE), "GI promoted to elite");
+        assert_eq!(crew_text(1), "A survivor escaped");
+        assert_eq!(crew_text(6), "6 survivors escaped");
+    }
 
     #[test]
     fn a_defeat_is_reported_in_the_colour_name_of_the_defeated_player() {
@@ -282,6 +344,49 @@ mod tests {
         app.update();
         let world = app.world_mut();
         assert_eq!(world.query::<&Notice>().iter(world).count(), 0);
+    }
+
+    /// RA4, the whole path through Bevy: a promotion and an escaped crew of the human player
+    /// become lines in the player's colour; those of other players do not.
+    #[test]
+    fn only_the_human_players_promotions_and_crews_are_announced() {
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins)
+            .add_message::<SimEvent>()
+            .insert_resource(TeamColors(3))
+            .add_systems(Startup, spawn_notice_column)
+            .add_systems(Update, announce_defeats);
+        app.update();
+        let enemy = PlayerId(1);
+        for player in [HUMAN, enemy] {
+            app.world_mut().write_message(SimEvent::RankGained {
+                player,
+                unit: sim::SimId(3),
+                rank: sim::ELITE,
+            });
+            app.world_mut().write_message(SimEvent::CrewEscaped {
+                player,
+                from: sim::SimId(4),
+                at: sim::CellPos::new(1, 1),
+                units: vec![sim::SimId(5), sim::SimId(6)],
+            });
+        }
+        app.update();
+        let world = app.world_mut();
+        let lines: Vec<(String, Color)> = world
+            .query::<(&Text, &TextColor, &Notice)>()
+            .iter(world)
+            .map(|(text, colour, _)| (text.0.clone(), colour.0))
+            .collect();
+        // Without a simulation to name the unit's type it is a "Unit".
+        let texts: Vec<&str> = lines.iter().map(|(text, _)| text.as_str()).collect();
+        assert_eq!(texts, ["Unit promoted to elite", "2 survivors escaped"]);
+        let (_, [r, g, b]) = TEAM_PALETTE[TeamColors(3).index_of(HUMAN)];
+        assert!(
+            lines
+                .iter()
+                .all(|(_, colour)| *colour == Color::srgb_u8(r, g, b))
+        );
     }
 
     #[test]

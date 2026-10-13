@@ -142,7 +142,9 @@ impl Plugin for SimPlugin {
                 .in_set(SimCoreSet(SimSet::Combat))
                 .in_set(SimSet::Combat),
             (
+                crate::veterancy::award,
                 remove_dead,
+                crate::crew::escape,
                 crate::props::remove_dead_props,
                 crate::combat::update_conditions,
             )
@@ -172,6 +174,8 @@ impl Plugin for SimPlugin {
             .insert_resource(Players::default())
             .insert_resource(crate::SpecialState::default())
             .insert_resource(Projectiles::default())
+            .insert_resource(crate::veterancy::Kills::default())
+            .insert_resource(crate::crew::Wrecks::default())
             .insert_resource(crate::Props::default())
             .insert_resource(MatchState::default())
             .insert_resource(AiPlayers::default())

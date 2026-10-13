@@ -7,6 +7,10 @@
 //! A bar is drawn only over a view that is shown, so the hit points of an enemy the human player
 //! does not see are never drawn (as its view, D31).
 //!
+//! Since RA4 (docs/DECISIONS.md R52) a veteran shows one chevron and an elite unit three under
+//! the right end of where its bar is, whether it is damaged or not, and a building with
+//! aircraft docks shows a small diamond on each of them, brighter where an aircraft holds it.
+//!
 //! Infantry on foot stand three to a cell, each at a spot of its own (RA3, docs/DECISIONS.md
 //! R6), so a soldier's bar is half as long as a vehicle's: the bars of the soldiers of a cell
 //! do not overlap.
@@ -46,6 +50,49 @@ impl Plugin for HealthBarsPlugin {
                 .after(crate::selection::issue_orders),
         );
     }
+}
+
+/// How many chevrons a unit of `rank` shows (RA4): one for a veteran, three for an elite unit.
+pub fn chevron_count(rank: u8) -> usize {
+    match rank {
+        0 => 0,
+        1 => 1,
+        _ => 3,
+    }
+}
+
+/// The chevrons of a unit of `rank` whose bar is centred on `centre` and `length` long: each
+/// three points (left end, tip, right end), stacked upwards under the right end of the bar.
+pub fn rank_chevrons(rank: u8, centre: Vec2, length: f32) -> Vec<[Vec2; 3]> {
+    let base = centre + Vec2::new(length / 2.0 - 4.0, -11.0);
+    (0..chevron_count(rank))
+        .map(|n| {
+            let tip = base + Vec2::new(0.0, 3.0 * n as f32);
+            [tip + Vec2::new(-3.5, -2.5), tip, tip + Vec2::new(3.5, -2.5)]
+        })
+        .collect()
+}
+
+/// The colour of the chevrons of `rank`: gold for a veteran, pale gold for an elite unit.
+pub fn chevron_colour(rank: u8) -> Color {
+    if rank >= sim::ELITE {
+        Color::srgb(1.0, 0.95, 0.62)
+    } else {
+        Color::srgb(1.0, 0.8, 0.22)
+    }
+}
+
+/// The outline of the mark of a dock whose cell centre is at the ground point `at` (RA4): a
+/// closed diamond, as flat as a cell.
+pub fn dock_mark(at: Vec2) -> [Vec2; 5] {
+    let (w, h) = (9.0, 4.5);
+    [
+        at + Vec2::new(-w, 0.0),
+        at + Vec2::new(0.0, h),
+        at + Vec2::new(w, 0.0),
+        at + Vec2::new(0.0, -h),
+        at + Vec2::new(-w, 0.0),
+    ]
 }
 
 /// The filled fraction of a bar for `hit_points` of `max` (0 to 1).
@@ -132,6 +179,7 @@ fn max_hit_points(
 fn draw_health_bars(
     host: Res<SimHost>,
     time: Res<Time<Real>>,
+    map: Option<Res<crate::map::MapView>>,
     selection: Res<Selection>,
     units: Query<(&UnitView, &Transform, &Visibility)>,
     buildings: Query<(&BuildingView, &Transform, &Visibility)>,
@@ -164,23 +212,43 @@ fn draw_health_bars(
         let Some((hit_points, max)) = health(view.unit) else {
             continue;
         };
-        let selected = selection.0.contains(&view.id);
-        if !bar_drawn(*visibility != Visibility::Hidden, hit_points, max, selected) {
-            continue;
-        }
+        let shown = *visibility != Visibility::Hidden;
         // Above the sprite's frame; the sprite's centre lies `GROUND_OFFSET_PX` above the ground.
         let centre = transform.translation.truncate()
             + Vec2::new(0.0, FRAME_SIZE as f32 / 2.0 - GROUND_OFFSET_PX);
         let on_foot = world
             .get::<Unit>(view.unit)
             .is_some_and(|unit| definitions.on_foot(unit.kind));
+        let length = unit_bar_length(on_foot);
+        // RA4: the insignia of a veteran or elite unit, over every such unit that is shown.
+        let rank = world
+            .get::<sim::Experience>(view.unit)
+            .map_or(0, |experience| experience.rank);
+        if shown && rank > 0 {
+            let dark = Color::srgb(0.1, 0.07, 0.0);
+            for [left, tip, right] in rank_chevrons(rank, centre, length) {
+                for (a, b) in [(left, tip), (tip, right)] {
+                    gizmos.line_2d(a - Vec2::Y, b - Vec2::Y, dark);
+                    gizmos.line_2d(a, b, chevron_colour(rank));
+                }
+            }
+        }
+        let selected = selection.0.contains(&view.id);
+        if !bar_drawn(shown, hit_points, max, selected) {
+            continue;
+        }
         draw_bar(
             &mut gizmos,
             centre,
-            unit_bar_length(on_foot),
+            length,
             health_fraction(hit_points, max),
         );
     }
+    // RA4: the docks of the buildings that hold aircraft, each above its cell.
+    let taken: std::collections::BTreeSet<(sim::SimId, u8)> = world
+        .get_resource::<sim::SpecialState>()
+        .map(|state| state.docks.values().copied().collect())
+        .unwrap_or_default();
     for (view, transform, visibility) in &buildings {
         let Some((hit_points, max)) = health(view.building) else {
             continue;
@@ -188,6 +256,30 @@ fn draw_health_bars(
         let Some(building) = world.get::<Building>(view.building) else {
             continue;
         };
+        let docks = definitions
+            .metadata(sim::ProductionItem::Building(building.kind))
+            .map_or(0, |entry| entry.docks);
+        if *visibility != Visibility::Hidden
+            && docks > 0
+            && let Some(map) = map.as_deref()
+        {
+            for dock in 0..docks.min(u32::from(u8::MAX)) as u8 {
+                let cell = sim::dock_cell(building.footprint, dock);
+                let at = crate::units::ground_point(
+                    Vec2::new(cell.x as f32 + 0.5, cell.y as f32 + 0.5),
+                    map.tile,
+                );
+                let colour = if taken.contains(&(view.id, dock)) {
+                    Color::srgba(1.0, 0.95, 0.7, 0.95)
+                } else {
+                    Color::srgba(0.95, 0.8, 0.25, 0.6)
+                };
+                let outline = dock_mark(at);
+                for pair in outline.windows(2) {
+                    gizmos.line_2d(pair[0], pair[1], colour);
+                }
+            }
+        }
         if !bar_drawn(*visibility != Visibility::Hidden, hit_points, max, false) {
             continue;
         }
@@ -214,6 +306,49 @@ fn draw_health_bars(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// RA4: a veteran shows one chevron and an elite unit three, under the right end of its
+    /// bar and within the bar's width, also for a soldier's short bar; a dock is marked by a
+    /// closed diamond around its ground point.
+    #[test]
+    fn the_insignia_fit_under_the_bar_and_a_dock_is_a_closed_diamond() {
+        assert_eq!(chevron_count(0), 0);
+        assert_eq!(chevron_count(sim::VETERAN), 1);
+        assert_eq!(chevron_count(sim::ELITE), 3);
+        assert_ne!(chevron_colour(sim::VETERAN), chevron_colour(sim::ELITE));
+        let centre = Vec2::new(100.0, 50.0);
+        for length in [UNIT_BAR_LENGTH, INFANTRY_BAR_LENGTH] {
+            assert!(rank_chevrons(0, centre, length).is_empty());
+            for rank in [sim::VETERAN, sim::ELITE] {
+                let chevrons = rank_chevrons(rank, centre, length);
+                assert_eq!(chevrons.len(), chevron_count(rank));
+                for [left, tip, right] in &chevrons {
+                    // A chevron points up, is symmetric, and lies below the bar inside its span.
+                    assert!(tip.y > left.y && left.y == right.y);
+                    assert_eq!(tip.x - left.x, right.x - tip.x);
+                    assert!(
+                        left.x >= centre.x - length / 2.0 && right.x <= centre.x + length / 2.0
+                    );
+                    assert!(tip.y < centre.y - 2.0);
+                }
+                // Stacked: no two at one height.
+                for pair in chevrons.windows(2) {
+                    assert!(pair[1][1].y - pair[0][1].y >= 3.0);
+                }
+            }
+        }
+        let at = Vec2::new(10.0, 20.0);
+        let mark = dock_mark(at);
+        assert_eq!(mark[0], mark[4], "closed");
+        let (sum, count) = mark[..4]
+            .iter()
+            .fold((Vec2::ZERO, 0.0), |(sum, count), point| {
+                (sum + *point, count + 1.0)
+            });
+        assert_eq!(sum / count, at, "around the ground point");
+        // As flat as a cell is drawn: twice as wide as high.
+        assert_eq!(mark[2].x - mark[0].x, 2.0 * (mark[1].y - mark[3].y));
+    }
 
     #[test]
     fn the_bar_shows_the_fraction_of_hit_points_left() {

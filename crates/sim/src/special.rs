@@ -35,6 +35,8 @@ pub struct Passenger {
     pub kind: UnitKind,
     pub hp: i32,
     pub harvester: Option<crate::Harvester>,
+    /// The passenger's experience (RA4): it keeps its rank aboard.
+    pub experience: Option<crate::Experience>,
 }
 #[derive(Clone, Debug)]
 pub struct Zone {
@@ -62,10 +64,36 @@ pub struct SpecialState {
     /// Service Depot). A docked vehicle stands beside the building and is repaired in steps
     /// for credits until it is whole, is ordered elsewhere, or the building is lost.
     pub docked: BTreeMap<SimId, SimId>,
+    /// RA4 (`crate::flight`): the volleys an aircraft with ammunition has left, for every one
+    /// that has fewer than its type's `ammo` (0: it must reload before it fires again).
+    pub ammo: BTreeMap<SimId, u32>,
+    /// The ticks an aircraft has stood on its dock toward its next round.
+    pub reloading: BTreeMap<SimId, u32>,
+    /// The dock of an airport bound aircraft: the building, and which of its docks.
+    pub docks: BTreeMap<SimId, (SimId, u8)>,
+    /// The units a spawner carries and what it launched them at, by spawner.
+    pub bays: BTreeMap<SimId, crate::flight::Bay>,
+    /// The unit that launched a missile or aircraft, by the launched unit.
+    pub spawned: BTreeMap<SimId, SimId>,
+    /// The flight of a launched missile.
+    pub missiles: BTreeMap<SimId, crate::flight::MissileFlight>,
+    /// The tick until which a cloakable unit that fired is seen like any other unit.
+    pub surfaced: BTreeMap<SimId, u64>,
 }
 impl SpecialState {
     pub fn invulnerable(&self, id: SimId, tick: u64) -> bool {
         self.protected.get(&id).is_some_and(|&until| until > tick)
+    }
+    /// Whether the spawner `id`, which carries `number` units, has one ready to launch (RA4).
+    pub fn launch_ready(&self, id: SimId, number: u32) -> bool {
+        match self.bays.get(&id) {
+            None => number > 0,
+            Some(bay) => bay.ready(),
+        }
+    }
+    /// The volleys the aircraft `id` of a type with `ammo` volleys has left (RA4).
+    pub fn ammo_of(&self, id: SimId, ammo: u32) -> u32 {
+        self.ammo.get(&id).copied().unwrap_or(ammo).min(ammo)
     }
     pub(crate) fn hash_into(&self, h: &mut Fnv1a64) {
         // Stable ordered data, including off-map passengers and pending effects.
@@ -101,6 +129,10 @@ impl SpecialState {
                     worker.hash_into(h);
                 } else {
                     h.write(&[0]);
+                }
+                if let Some(experience) = &p.experience {
+                    h.write(b"xp");
+                    experience.hash_into(h);
                 }
             }
         }
@@ -146,17 +178,70 @@ impl SpecialState {
             h.write_u32(unit.0);
             h.write_u32(building.0);
         }
+        // RA4: each part is written only if it holds something, under its own tag, so that a
+        // world without aircraft docks, spawners and cloaking hashes as before.
+        for (tag, map) in [(b"am", &self.ammo), (b"rl", &self.reloading)] {
+            if !map.is_empty() {
+                h.write(tag);
+                h.write_u64(map.len() as u64);
+                for (id, value) in map {
+                    h.write_u32(id.0);
+                    h.write_u32(*value);
+                }
+            }
+        }
+        if !self.docks.is_empty() {
+            h.write(b"dk");
+            h.write_u64(self.docks.len() as u64);
+            for (unit, (building, dock)) in &self.docks {
+                h.write_u32(unit.0);
+                h.write_u32(building.0);
+                h.write(&[*dock]);
+            }
+        }
+        if !self.bays.is_empty() {
+            h.write(b"by");
+            h.write_u64(self.bays.len() as u64);
+            for (unit, bay) in &self.bays {
+                h.write_u32(unit.0);
+                bay.hash_into(h);
+            }
+        }
+        if !self.spawned.is_empty() {
+            h.write(b"sp");
+            h.write_u64(self.spawned.len() as u64);
+            for (unit, parent) in &self.spawned {
+                h.write_u32(unit.0);
+                h.write_u32(parent.0);
+            }
+        }
+        if !self.missiles.is_empty() {
+            h.write(b"ms");
+            h.write_u64(self.missiles.len() as u64);
+            for (unit, flight) in &self.missiles {
+                h.write_u32(unit.0);
+                flight.hash_into(h);
+            }
+        }
+        if !self.surfaced.is_empty() {
+            h.write(b"sf");
+            h.write_u64(self.surfaced.len() as u64);
+            for (unit, until) in &self.surfaced {
+                h.write_u32(unit.0);
+                h.write_u64(*until);
+            }
+        }
     }
 }
 #[derive(Clone)]
-struct Actor {
-    entity: Entity,
-    id: SimId,
-    owner: PlayerId,
-    item: ProductionItem,
-    cell: CellPos,
-    foot: Option<Footprint>,
-    hp: i32,
+pub(crate) struct Actor {
+    pub(crate) entity: Entity,
+    pub(crate) id: SimId,
+    pub(crate) owner: PlayerId,
+    pub(crate) item: ProductionItem,
+    pub(crate) cell: CellPos,
+    pub(crate) foot: Option<Footprint>,
+    pub(crate) hp: i32,
 }
 fn actors(world: &mut World) -> BTreeMap<SimId, Actor> {
     world
@@ -282,7 +367,7 @@ fn vacate(world: &mut World, a: &Actor) {
     }
 }
 /// Frees the cells the unit `a` holds and forgets it: it leaves the map.
-fn release(world: &mut World, a: &Actor) {
+pub(crate) fn release(world: &mut World, a: &Actor) {
     vacate(world, a);
     if world.get::<Mobile>(a.entity).is_some() {
         world.resource_mut::<Grid>().unregister(a.id);
@@ -337,6 +422,8 @@ fn area(world: &mut World, effect: Effect, point: crate::SubPos, direct: Option<
             warhead: def.warhead,
             damage: def.damage,
             direct,
+            firepower_pm: 1000,
+            source: None,
         },
         // A radiation zone pulses on everything in it once a second: no event for each.
         effect != Effect::Radiation,
@@ -385,7 +472,7 @@ fn position_of(world: &World, a: &Actor) -> crate::SubPos {
         .map_or(crate::SubPos::centre_of(a.cell), |position| position.0)
 }
 /// The cell of `foot` nearest to `from`.
-fn nearest_cell_of(foot: Footprint, from: CellPos) -> CellPos {
+pub(crate) fn nearest_cell_of(foot: Footprint, from: CellPos) -> CellPos {
     let clamp = |at: i32, origin: i32, side: u8| {
         let last = i64::from(origin) + i64::from(side.max(1)) - 1;
         i32::try_from(i64::from(at).clamp(i64::from(origin), last)).unwrap_or(origin)
@@ -395,7 +482,7 @@ fn nearest_cell_of(foot: Footprint, from: CellPos) -> CellPos {
         clamp(from.y, foot.origin.y, foot.height),
     )
 }
-fn clear_orders(world: &mut World, e: Entity) {
+pub(crate) fn clear_orders(world: &mut World, e: Entity) {
     if let Some(mut o) = world.get_mut::<Orders>(e) {
         o.current = None;
     }
@@ -409,6 +496,13 @@ fn own(index: &BTreeMap<SimId, Actor>, p: PlayerId, id: SimId) -> Result<&Actor,
         return Err(RejectReason::NotOwned(id));
     }
     Ok(a)
+}
+/// A launched missile or carried aircraft takes no commands (RA4).
+fn commandable(world: &World, id: SimId) -> Result<(), RejectReason> {
+    if world.resource::<SpecialState>().spawned.contains_key(&id) {
+        return Err(RejectReason::NotCommandable(id));
+    }
+    Ok(())
 }
 fn unavailable(s: &'static str) -> RejectReason {
     RejectReason::AbilityUnavailable(s)
@@ -430,6 +524,7 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
     match &issued.command {
         Command::Deploy { unit } => {
             let a = own(&index, issued.player, *unit)?;
+            commandable(world, *unit)?;
             let meta = defs
                 .metadata(a.item)
                 .ok_or(unavailable("This unit has no deploy action"))?;
@@ -619,6 +714,7 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
         }
         Command::Interact { unit, target } => {
             let a = own(&index, issued.player, *unit)?;
+            commandable(world, *unit)?;
             let b = index
                 .get(target)
                 .ok_or(RejectReason::UnknownTarget(*target))?;
@@ -899,6 +995,7 @@ fn interact(
                 return Err(unavailable("Only units can embark"));
             };
             let harvester = world.get::<crate::Harvester>(a.entity).cloned();
+            let experience = world.get::<crate::Experience>(a.entity).copied();
             release(world, a);
             world.despawn(a.entity);
             world
@@ -911,6 +1008,7 @@ fn interact(
                     kind,
                     hp: a.hp,
                     harvester,
+                    experience,
                 });
             if role(defs, b) == Role::Ifv && role(defs, a) == Role::Engineer {
                 world.entity_mut(b.entity).remove::<Weapon>();
@@ -974,6 +1072,12 @@ fn unload(world: &mut World, a: &Actor, defs: &Definitions) -> Result<(), Reject
             worker.state = crate::HarvestState::Seeking;
             e.insert(worker);
         }
+        if let Some(experience) = p.experience {
+            // It keeps its rank, and at elite rank its elite weapons (RA4).
+            e.insert(experience);
+            let entity = e.id();
+            crate::veterancy::rearm(world, entity, p.kind);
+        }
     }
     world
         .resource_mut::<SpecialState>()
@@ -1001,6 +1105,8 @@ pub(crate) fn advance(world: &mut World) {
     }
     let defs = world.resource::<Definitions>().clone();
     let tick = world.resource::<SimTick>().0;
+    // RA4: every trainable unit has its experience from its first tick on.
+    crate::veterancy::enlist(world);
     let index = actors(world);
     {
         let mut state = world.resource_mut::<SpecialState>();
@@ -1092,14 +1198,38 @@ pub(crate) fn advance(world: &mut World) {
                 && world
                     .get::<Condition>(a.entity)
                     .is_some_and(|c| c.0 != DamageState::Green);
+            // RA4: the speed multiplier of the unit's rank and bonus, before the slowing.
+            let speed = match world.get::<crate::Experience>(a.entity) {
+                Some(experience) if experience.speed_pm() != 1000 => {
+                    crate::veterancy::scaled_speed(u.speed, experience.speed_pm())
+                }
+                _ => u.speed,
+            };
             if let Some(mut m) = world.get_mut::<Mobile>(a.entity) {
                 m.speed = if disabled {
                     0
                 } else if damaged {
-                    u.speed - u.speed / 4
+                    speed - speed / 4
                 } else {
-                    u.speed
+                    speed
                 };
+            }
+            // RA4: a unit that heals itself (by its type, or by an ability of its rank)
+            // regains a hit point every repair interval of the rules, up to its type's.
+            if let Some(rules) = defs.rules()
+                && tick.is_multiple_of(u64::from(
+                    rules.economy.repair_interval.max(1).unsigned_abs(),
+                ))
+                && (meta.self_healing
+                    || world
+                        .get::<crate::Experience>(a.entity)
+                        .is_some_and(|experience| experience.self_heal))
+                && let Some(terms) = defs.unit_combat(k)
+                && let Some(mut health) = world.get_mut::<Health>(a.entity)
+                && health.hit_points > 0
+                && health.hit_points < terms.hit_points
+            {
+                health.hit_points += 1;
             }
         }
         if meta.role == Role::Chrono
@@ -1259,6 +1389,7 @@ pub(crate) fn advance(world: &mut World) {
         }
     }
     repair_docked(world, &defs, &index, tick);
+    crate::flight::advance(world, &defs, &index, tick);
 }
 
 /// Repairs the vehicles docked at a building that repairs units (RA2, docs/RA2_PARITY_PLAN.md
@@ -1363,6 +1494,8 @@ pub(crate) fn resolve(world: &mut World) {
             let Some(meta) = defs.metadata(a.item) else {
                 continue;
             };
+            // RA4: ammunition, launchers and the surfacing of a cloaked unit.
+            crate::flight::fired(world, &defs, a, target, weapon, tick);
             match meta.role {
                 Role::MindControl if b.foot.is_none() => {
                     if !world
@@ -1414,6 +1547,8 @@ pub(crate) fn resolve(world: &mut World) {
                                 warhead,
                                 damage,
                                 direct: None,
+                                firepower_pm: 1000,
+                                source: Some(a.id),
                             },
                             true,
                         ),
@@ -1594,6 +1729,48 @@ pub(crate) fn reconnaissance(world: &mut World) {
                             } else {
                                 2
                             },
+                        )
+                });
+                if !detected {
+                    hidden.insert((p, a.id));
+                }
+            }
+        }
+    }
+    // RA4 (docs/RA2_PARITY_PLAN.md section 4.8): a cloakable unit is hidden from every enemy
+    // of its owner that has no unit or building with sensors near enough, unless it fired
+    // within the rules' cloak delay.
+    if defs.rules().is_some() {
+        let tick = world.resource::<SimTick>().0;
+        let sensors: Vec<(&Actor, u32)> = index
+            .values()
+            .filter_map(|b| {
+                let sight = defs.metadata(b.item).map_or(0, |entry| entry.sensors_sight);
+                (sight > 0 && b.hp > 0).then_some((b, sight))
+            })
+            .collect();
+        for a in index.values() {
+            if !defs.metadata(a.item).is_some_and(|entry| entry.cloakable) {
+                continue;
+            }
+            if world
+                .resource::<SpecialState>()
+                .surfaced
+                .get(&a.id)
+                .is_some_and(|&until| until > tick)
+            {
+                continue;
+            }
+            for &p in &players {
+                if !world.resource::<Players>().hostile(p, a.owner) {
+                    continue;
+                }
+                let detected = sensors.iter().any(|&(b, sight)| {
+                    b.owner == p
+                        && near(
+                            a.cell,
+                            b.foot.map_or(b.cell, |foot| nearest_cell_of(foot, a.cell)),
+                            sight,
                         )
                 });
                 if !detected {

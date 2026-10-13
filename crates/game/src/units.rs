@@ -566,6 +566,26 @@ fn place_unit_views(
     let world = host.world();
     let fraction = time.overstep_fraction();
     let rearming = world.get_resource::<sim::SpecialState>();
+    // RA4: the cell of the dock of every aircraft that has one (`sim::dock_cell`).
+    let dock_cells: std::collections::BTreeMap<SimId, sim::CellPos> = rearming
+        .filter(|state| !state.docks.is_empty())
+        .and_then(|state| {
+            let mut buildings = world.try_query::<(&SimId, &sim::Building)>()?;
+            let footprints: std::collections::BTreeMap<SimId, sim::Footprint> = buildings
+                .iter(world)
+                .map(|(id, building)| (*id, building.footprint))
+                .collect();
+            Some(
+                state
+                    .docks
+                    .iter()
+                    .filter_map(|(unit, (building, dock))| {
+                        Some((*unit, sim::dock_cell(*footprints.get(building)?, *dock)))
+                    })
+                    .collect(),
+            )
+        })
+        .unwrap_or_default();
     for (entity, mut view, mut sprite, mut anchor, mut transform, mut visibility, children) in
         &mut views
     {
@@ -670,13 +690,15 @@ fn place_unit_views(
         }
         let mut depth = unit_depth(cell);
         if flying {
-            // A strike aircraft that has flown home sits on the ground beside its base while it
-            // rearms; everything else that flies stays up.
+            // An aircraft that stands on its dock has landed there (RA4); with the legacy
+            // ruleset a strike aircraft that has flown home sits on the ground beside its base
+            // while it rearms. Everything else that flies stays up.
             let landed = !walking
-                && rearming.is_some_and(|state| state.rearming.contains_key(&view.id))
-                && host
-                    .grid()
-                    .is_some_and(|grid| beside_a_building(grid, mobile.cell));
+                && (aircraft_landed(dock_cells.get(&view.id).copied(), mobile)
+                    || rearming.is_some_and(|state| state.rearming.contains_key(&view.id))
+                        && host
+                            .grid()
+                            .is_some_and(|grid| beside_a_building(grid, mobile.cell)));
             // Game time: it stands still while the match is paused.
             view.altitude = approach_altitude(
                 view.altitude,
@@ -711,6 +733,12 @@ fn place_unit_views(
             sprite.rect = Some(rect);
         }
     }
+}
+
+/// Whether an aircraft whose dock is above `dock` (`None`: it has none) and that moves as
+/// `mobile` stands on its dock (RA4): it is drawn landed there.
+pub fn aircraft_landed(dock: Option<sim::CellPos>, mobile: &Mobile) -> bool {
+    dock == Some(mobile.cell) && mobile.step.is_none()
 }
 
 /// Whether a building covers a cell within two cells of `cell`: where an aircraft that has
@@ -857,6 +885,42 @@ fn log_sim_events(mut events: MessageReader<SimEvent>) {
                 target,
                 reason,
             } => info!("unit {} stopped attacking {}: {reason:?}", unit.0, target.0),
+            SimEvent::RankGained { player, unit, rank } => {
+                info!("player {}: unit {} rose to rank {rank}", player.0, unit.0);
+            }
+            SimEvent::CrewEscaped {
+                player,
+                from,
+                units,
+                ..
+            } => info!(
+                "player {}: {} survivors left {}",
+                player.0,
+                units.len(),
+                from.0
+            ),
+            SimEvent::UnitLaunched {
+                player,
+                parent,
+                unit,
+            } => debug!(
+                "player {}: unit {} launched unit {}",
+                player.0, parent.0, unit.0
+            ),
+            SimEvent::UnitRecovered {
+                player,
+                parent,
+                unit,
+            } => debug!(
+                "player {}: unit {} took unit {} aboard",
+                player.0, parent.0, unit.0
+            ),
+            SimEvent::MissileDetonated {
+                player, unit, at, ..
+            } => debug!(
+                "player {}: missile {} went off at ({}, {})",
+                player.0, unit.0, at.x, at.y
+            ),
             SimEvent::PlayerDefeated { player } => {
                 info!("player {} is defeated: it owns no building", player.0);
             }
@@ -890,6 +954,30 @@ mod tests {
         (OPPONENT, "light_tank", (50, 30), 5),
         (OPPONENT, "scout", (52, 36), 3),
     ];
+
+    /// RA4: an aircraft is drawn landed exactly while it stands on its dock.
+    #[test]
+    fn an_aircraft_has_landed_while_it_stands_on_its_dock() {
+        let at = |x, y, step| Mobile {
+            speed: 26,
+            cell: sim::CellPos::new(x, y),
+            step,
+        };
+        let dock = Some(sim::CellPos::new(4, 7));
+        assert!(aircraft_landed(dock, &at(4, 7, None)));
+        assert!(!aircraft_landed(dock, &at(5, 7, None)), "elsewhere");
+        assert!(!aircraft_landed(None, &at(4, 7, None)), "no dock");
+        let leaving = sim::Step {
+            to: sim::CellPos::new(5, 7),
+            progress: 10,
+            length: sim::ORTHOGONAL_STEP,
+        };
+        assert!(
+            !aircraft_landed(dock, &at(4, 7, Some(leaving))),
+            "taking off"
+        );
+        assert_eq!(flight_altitude(false, true), LANDED_ALTITUDE);
+    }
 
     #[test]
     fn aircraft_climb_to_their_flying_height_and_land_to_rearm() {

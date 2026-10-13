@@ -199,6 +199,13 @@ fn the_fixture_loads_with_the_traits_of_schema_version_5() {
         }
     );
     assert!(unit("tank").spawns.is_none() && unit("tank").launcher.is_none());
+    // The weapons that launch: the launcher's and the carrier's primary, the boat's secondary.
+    let launchers: Vec<String> = definitions
+        .launcher_weapons()
+        .into_iter()
+        .map(|kind| definitions.weapon(kind).expect("weapon").id.clone())
+        .collect();
+    assert_eq!(launchers, ["launch", "launch_wing", "launch_hunter"]);
     // Cloaking and sensors.
     assert!(unit("sub").cloakable && unit("squid").cloakable && !unit("boat").cloakable);
     assert_eq!(unit("boat").sensors_sight, 5);
@@ -229,6 +236,7 @@ fn the_fixture_loads_with_the_traits_of_schema_version_5() {
     )
     .expect("the fixture");
     assert!(!bare.trainable(kind("tank")) && bare.spawned_kinds().is_empty());
+    assert!(bare.launcher_weapons().is_empty());
 }
 
 // --- Negative and boundary --------------------------------------------------------------------

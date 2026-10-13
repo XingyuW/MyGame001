@@ -1300,6 +1300,28 @@ impl Definitions {
         }
         self.arsenal.0.values().filter_map(|e| e.spawns).collect()
     }
+    /// The weapons with which the types of the arsenal launch what they spawn (RA4, with a
+    /// rules file): the weapon in the `launcher` slot of every spawner, below and at elite
+    /// rank. A shot of such a weapon launches a unit and is no shot at the target itself.
+    pub fn launcher_weapons(&self) -> std::collections::BTreeSet<crate::WeaponKind> {
+        if self.rules().is_none() {
+            return std::collections::BTreeSet::new();
+        }
+        self.arsenal
+            .0
+            .iter()
+            .filter_map(|(item, entry)| match (item, entry.spawns, entry.launcher) {
+                (ProductionItem::Unit(kind), Some(_), Some(slot)) => {
+                    Some((self.unit_combat(*kind)?, slot))
+                }
+                _ => None,
+            })
+            .flat_map(|(terms, slot)| {
+                [false, true].map(|elite| terms.weapons(elite)[slot as usize])
+            })
+            .flatten()
+            .collect()
+    }
     pub fn category(&self, item: ProductionItem) -> Category {
         self.metadata(item).map_or(
             match item {

@@ -213,6 +213,12 @@ pub enum RejectReason {
     NotArmed(SimId),
     /// The target belongs to the issuing player (`Attack`).
     OwnTarget(SimId),
+    /// The aircraft needs a dock, and every dock of the player's buildings is taken by an
+    /// aircraft it owns or has queued (`QueueProduction`; RA4).
+    NoFreeDock(ProductionItem),
+    /// The unit is a missile or an aircraft that another unit launched: it takes no commands
+    /// (RA4).
+    NotCommandable(SimId),
     /// No unit or building with this id is visible to the issuing player (`Attack`): it does not
     /// exist (any more), or it is an enemy the player does not see. The two cases are reported
     /// alike, so that commands reveal nothing about unseen enemies (docs/DECISIONS.md D30).
@@ -223,6 +229,10 @@ impl fmt::Display for RejectReason {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::AbilityUnavailable(reason) => write!(f, "{reason}"),
+            Self::NoFreeDock(item) => {
+                write!(f, "{item:?} needs a dock, and every dock is taken")
+            }
+            Self::NotCommandable(id) => write!(f, "unit {} takes no commands", id.0),
             Self::NoUnits => write!(f, "the command names no unit"),
             Self::TooManyUnits { count, max } => {
                 write!(
@@ -375,6 +385,17 @@ pub(crate) fn process_regular_commands(
             let buildings = buildings.get_or_insert_with(|| economy.building_index());
             validate_player(&issued, &economy)
                 .and_then(|()| validate(&issued, &grid, &economy, &index, &units))
+                .and_then(|()| {
+                    // A launched missile or carried aircraft takes no commands (RA4).
+                    match issued
+                        .command
+                        .units()
+                        .and_then(|ids| ids.iter().find(|id| special.spawned.contains_key(id)))
+                    {
+                        Some(&id) => Err(RejectReason::NotCommandable(id)),
+                        None => Ok(()),
+                    }
+                })
                 .and_then(|()| validate_combat(&issued, &economy, buildings, &index, &units))
                 .map(|()| {
                     if let Some(ids) = issued.command.units() {

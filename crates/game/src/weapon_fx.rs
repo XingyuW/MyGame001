@@ -115,7 +115,8 @@ pub fn shipped_class(id: &str) -> Option<WeaponClass> {
         "mind_control" | "mind_control_e" | "super_mind_control" => Psychic,
         "neutron_rifle" | "neutron_rifle_e" => Chrono,
         "sonic_zap" | "sonic_zap_e" => Sonic,
-        "blimp_bomb" | "blimp_bomb_e" => Bomb,
+        // RA4: the bombs of the Hornets and the depth charge of the Osprey fall like the Kirov's.
+        "blimp_bomb" | "blimp_bomb_e" | "hornet_bomb" | "hornet_bomb_e" | "asw_bomb" => Bomb,
         "sub_torpedo" | "sub_torpedo_e" | "asw_launcher" => Torpedo,
         "good_teeth" | "drone_jump" | "squid_grab" | "squid_grab_e" | "squid_punch"
         | "squid_punch_e" => Melee,
@@ -148,6 +149,9 @@ pub fn damage_smoke(state: sim::DamageState) -> Option<(f32, [f32; 4])> {
 /// The dust a crushed soldier leaves (RA3): how many puffs rise from where it stood, and their
 /// colour, the brown of churned ground.
 pub const CRUSH_DUST: (usize, [f32; 4]) = (3, [0.46, 0.38, 0.28, 0.6]);
+
+/// The colour of the ring and the glow of a promotion (RA4).
+pub const PROMOTION_GOLD: [f32; 4] = [1.0, 0.84, 0.3, 0.8];
 
 /// How large the burst of a warhead with `cell_spread` (subcells) is drawn, in pixels.
 pub fn impact_size(cell_spread: u32) -> f32 {
@@ -472,6 +476,55 @@ impl Painter<'_, '_, '_> {
                 },
             );
         }
+    }
+
+    /// The launch of a missile or an aircraft (RA4): the flash and the smoke of its exhaust
+    /// where it leaves its launcher, and nothing at the target.
+    fn launch(&mut self, at: Vec2, dir: Vec2, cell: CellPos) {
+        self.glow(
+            at,
+            18.0,
+            [1.0, 0.8, 0.5, 0.95],
+            [cell; 2],
+            Stroke {
+                life: 0.14,
+                hold: true,
+                z: Z_CORE,
+                ..default()
+            },
+        );
+        for i in 0..3 {
+            self.smoke(
+                at - dir * (4.0 + 5.0 * i as f32),
+                9.0,
+                [0.8, 0.78, 0.74, 0.5],
+                [cell; 2],
+                Stroke {
+                    delay: 0.03 * i as f32,
+                    life: 0.9,
+                    velocity: -dir * 20.0 + Vec2::Y * 7.0,
+                    growth: Vec2::splat(24.0),
+                    ..default()
+                },
+            );
+        }
+    }
+
+    /// Where a unit rose in rank (RA4): a golden ring that widens on the ground under it and a
+    /// short glow above it.
+    fn promotion(&mut self, at: Vec2, lift: f32, cell: CellPos) {
+        self.ground_ring(at, 14.0, 60.0, PROMOTION_GOLD, cell);
+        self.glow(
+            at + Vec2::Y * lift,
+            26.0,
+            PROMOTION_GOLD,
+            [cell; 2],
+            Stroke {
+                life: 0.45,
+                growth: Vec2::splat(18.0),
+                ..default()
+            },
+        );
     }
 
     /// A round glow.
@@ -1010,6 +1063,8 @@ fn fire(
     let mut bursts: Vec<(sim::WarheadKind, sim::SubPos, bool)> = Vec::new();
     // Soldiers driven over (RA3), each where it stood.
     let mut crushed: Vec<(SimId, sim::SubPos)> = Vec::new();
+    // Units that rose in rank (RA4).
+    let mut promoted: Vec<SimId> = Vec::new();
     for event in events.read() {
         match event {
             SimEvent::WeaponFired {
@@ -1019,10 +1074,11 @@ fn fire(
             } => shots.push((*attacker, *target, *weapon)),
             SimEvent::Impact { warhead, at, air } => bursts.push((*warhead, *at, *air)),
             SimEvent::UnitCrushed { unit, at, .. } => crushed.push((*unit, *at)),
+            SimEvent::RankGained { unit, .. } => promoted.push(*unit),
             _ => {}
         }
     }
-    if shots.is_empty() && bursts.is_empty() && crushed.is_empty() {
+    if shots.is_empty() && bursts.is_empty() && crushed.is_empty() && promoted.is_empty() {
         return;
     }
     let spots = spots(&host, &map, &altitudes);
@@ -1032,6 +1088,20 @@ fn fire(
         mat: &mat,
         left: MAX_FX.saturating_sub(live.iter().count()),
     };
+    // A promotion is drawn where the human player sees the unit and the unit is not hidden
+    // from it (a submerged unit of an enemy stays unseen).
+    for unit in promoted {
+        let Some(spot) = spots.get(&unit).copied() else {
+            continue;
+        };
+        let hidden = host
+            .world()
+            .get_resource::<sim::SpecialState>()
+            .is_some_and(|state| state.hidden.contains(&(crate::units::HUMAN, unit)));
+        if vision.is_visible(spot.cell) && !hidden {
+            painter.promotion(spot.ground, spot.lift, spot.cell);
+        }
+    }
     for (unit, at) in crushed {
         let cell = at.cell();
         if !vision.is_visible(cell) {
@@ -1065,6 +1135,13 @@ fn fire(
             sounds.0 = sounds.0.saturating_add(1);
         }
     }
+    // RA4: the shot of a launcher launches a missile or an aircraft, which is a unit with a
+    // view of its own; nothing else flies to the target.
+    let launchers = if shots.is_empty() {
+        Default::default()
+    } else {
+        definitions.launcher_weapons()
+    };
     for (attacker, target, weapon) in shots {
         let (Some(from), Some(to)) = (
             spots.get(&attacker).copied(),
@@ -1075,6 +1152,13 @@ fn fire(
         let Some(def) = definitions.weapon(weapon) else {
             continue;
         };
+        if launchers.contains(&weapon) {
+            if vision.is_visible(from.cell) {
+                let dir = (to.body() - from.body()).normalize_or_zero();
+                painter.launch(from.body() + dir * from.reach, dir, from.cell);
+            }
+            continue;
+        }
         let class = classify(&def.id, def.projectile_speed == 0);
         let view = shot_view(vision.is_visible(from.cell), vision.is_visible(to.cell));
         if view == ShotView::Hidden {
@@ -2017,6 +2101,10 @@ mod tests {
             ("neutron_rifle", true, Chrono),
             ("sonic_zap", false, Sonic),
             ("blimp_bomb", false, Bomb),
+            // RA4: what the carrier's and the destroyer's aircraft drop.
+            ("hornet_bomb", false, Bomb),
+            ("hornet_bomb_e", false, Bomb),
+            ("asw_bomb", false, Bomb),
             ("good_teeth", true, Melee),
             ("squid_grab", true, Melee),
             ("terror_bomb", true, Trigger),
