@@ -28,8 +28,8 @@
 //!   ([`impact_damage`](crate::impact_damage));
 //! * damage taken: the damage of a hit `× 1000 / armour_pm`, rounded down;
 //! * reload: `max(1, reload × reload_pm / 1000)` ticks after a volley;
-//! * speed: `max(1, speed × speed_pm / 1000)` subcells per tick, before the slowing of a damaged
-//!   vehicle.
+//! * speed: `max(1, speed × speed_pm / 1000)` subcells per tick, at most `MAX_UNIT_SPEED`
+//!   ([`scaled_speed`]), before the slowing of a damaged vehicle.
 //!
 //! [`promote`] and [`set_bonus`] are how another rule gives a unit a rank or a multiplier.
 

@@ -1849,6 +1849,9 @@ pub(crate) fn reconnaissance(world: &mut World) {
             if !defs.metadata(a.item).is_some_and(|entry| entry.cloakable) {
                 continue;
             }
+            // (The delay itself ends in `crate::flight::advance`, which drops an entry whose
+            // tick has come in the `Economy` stage; an entry met here is still running, and
+            // the comparison only says so again.)
             if world
                 .resource::<SpecialState>()
                 .surfaced
