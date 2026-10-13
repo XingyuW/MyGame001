@@ -404,6 +404,7 @@ mod tests {
         assert_eq!(sim::LOOK_GROUND_WATER, Ground::Water as u8);
         assert_eq!(sim::LOOK_FEATURE_ORE, Feature::Ore as u8);
         assert_eq!(sim::LOOK_FEATURE_BRIDGE, Feature::Bridge as u8);
+        assert_eq!(sim::LOOK_FEATURE_GEMS, Feature::Gems as u8);
         for ground in GROUNDS {
             for feature in FEATURES {
                 let value = look(ground, feature);

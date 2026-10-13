@@ -236,6 +236,8 @@ pub fn frozen_sound(p: &mut Painter) {
     ] {
         p.ore(x, y, r, s);
     }
+    // Gems on the island in the middle of the ice.
+    p.gem_seam(112, 120);
     p.home_ore(4, 783);
     p.finish(1, 784);
 }
@@ -424,6 +426,8 @@ pub fn black_water(p: &mut Painter) {
     ] {
         p.ore(x, y, r, s);
     }
+    // Gems on a hummock in the middle of the marsh.
+    p.gem_seam(150, 110);
     p.home_ore(4, 860);
     p.finish(1, 861);
 }
@@ -698,6 +702,10 @@ pub fn wheel_of_worlds(p: &mut Painter) {
         for (r, turn, size) in [(33, 0, 4), (104, -24, 4), (62, -16, 3)] {
             let (x, y) = spoke(p, k, r, turn);
             p.ore(x, y, size, 933 + k as u32);
+            // Gems in the ring of fields around the hub.
+            if r == 33 {
+                p.gem_seam(x, y);
+            }
         }
     }
     p.home_ore(4, 950);

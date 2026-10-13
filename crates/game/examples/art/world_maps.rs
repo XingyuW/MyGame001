@@ -16,15 +16,26 @@
 //! country, then come the roads, the ore ([`Painter::home_ore`] finds room for two fields beside
 //! every base) and [`Painter::finish`]. The maps made for that size are in `frontier_maps.rs`.
 use super::{
-    ADOBE, ASH, ASH_HOUSE, ASH_ORE, ASH_ROAD, ASH_WOODS, BASALT, BRIDGE, CITY, COTTAGE, CROPS,
-    DESERT, DESERT_CITY, DESERT_ORE, DESERT_ROAD, DESERT_TOWER, DIRT, FARMHOUSE, FOREST, GRASS,
-    ICE, ICEBERG, LAVA, MANGROVE, MARSH, MARSH_ORE, MESA, ORCHARD, ORE, PALMS, PLAZA, ROAD, ROCK,
-    SAND, SNOW, SNOW_CITY, SNOW_COTTAGE, SNOW_ORE, SNOW_PINES, SNOW_ROAD, SNOW_ROCK, SNOW_TOWER,
-    STREET, TILES, TOWER, TRACK, WATER,
+    ADOBE, ASH, ASH_GEMS, ASH_HOUSE, ASH_ORE, ASH_ROAD, ASH_WOODS, BASALT, BRIDGE, CITY, COTTAGE,
+    CROPS, DESERT, DESERT_CITY, DESERT_GEMS, DESERT_ORE, DESERT_ROAD, DESERT_TOWER, DIRT,
+    FARMHOUSE, FOREST, GEMS, GRASS, ICE, ICEBERG, LAVA, MANGROVE, MARSH, MARSH_GEMS, MARSH_ORE,
+    MESA, ORCHARD, ORE, PALMS, PLAZA, ROAD, ROCK, SAND, SNOW, SNOW_CITY, SNOW_COTTAGE, SNOW_GEMS,
+    SNOW_ORE, SNOW_PINES, SNOW_ROAD, SNOW_ROCK, SNOW_TOWER, STREET, TILES, TOWER, TRACK, WATER,
 };
 
 #[path = "frontier_maps.rs"]
 mod frontier_maps;
+
+/// An ore field of at least this radius has a seam of gems at its heart (RA5).
+pub const GEM_FIELD_RADIUS: i32 = 5;
+
+/// The radius of a seam of gems: the cells whose squared distance from the field's centre is
+/// at most `r * r + r`, the disc the generators paint.
+pub const GEM_SEAM_RADIUS: i32 = 2;
+
+/// No seam of gems lies in a field whose centre is this near a start position, any of the map's:
+/// gems are for the open country, and a base of a larger match has no more than its ore.
+pub const GEM_BASE_DISTANCE: i32 = 20;
 
 /// Tiles that make up one environment.
 #[derive(Clone, Copy)]
@@ -411,11 +422,47 @@ impl Painter {
         }
     }
 
-    /// An ore field and its mirror: the local ore on open ground of a blob.
+    /// An ore field and its mirror: the local ore on open ground of a blob. A field of radius
+    /// [`GEM_FIELD_RADIUS`] or more has a seam of gems at its heart (RA5): the large fields of
+    /// the open country, which the bases contest, never the two fields beside a base.
     pub fn ore(&mut self, cx: i32, cy: i32, r: i32, seed: u32) {
         let (mx, my) = self.mirror_of(cx, cy);
         self.ore_once(cx, cy, r, seed);
         self.ore_once(mx, my, r, seed);
+        if r >= GEM_FIELD_RADIUS && !self.near_start(cx, cy, GEM_BASE_DISTANCE) {
+            self.gems_once(cx, cy);
+            self.gems_once(mx, my);
+        }
+    }
+
+    /// A seam of gems at the heart of the ore field at (cx, cy), and its mirror: for a map
+    /// whose fields are all smaller than [`GEM_FIELD_RADIUS`].
+    pub fn gem_seam(&mut self, cx: i32, cy: i32) {
+        let (mx, my) = self.mirror_of(cx, cy);
+        self.gems_once(cx, cy);
+        self.gems_once(mx, my);
+    }
+
+    /// Turns the ore within [`GEM_SEAM_RADIUS`] of (cx, cy) into gems. Only ore becomes gems, so
+    /// the terrain of the map (where units go, where buildings stand, where ore lies) is what
+    /// it was without them.
+    fn gems_once(&mut self, cx: i32, cy: i32) {
+        let r = GEM_SEAM_RADIUS;
+        for y in cy - r..=cy + r {
+            for x in cx - r..=cx + r {
+                if self.inside(x, y) && (x - cx).pow(2) + (y - cy).pow(2) <= r * r + r {
+                    let tile = match self.get(x, y) {
+                        ORE => GEMS,
+                        DESERT_ORE => DESERT_GEMS,
+                        SNOW_ORE => SNOW_GEMS,
+                        ASH_ORE => ASH_GEMS,
+                        MARSH_ORE => MARSH_GEMS,
+                        other => other,
+                    };
+                    self.set(x, y, tile);
+                }
+            }
+        }
     }
 
     fn ore_once(&mut self, cx: i32, cy: i32, r: i32, seed: u32) {
@@ -670,7 +717,7 @@ impl Painter {
                         PLAZA | STREET => self.biome(x, y).block,
                         // A floe adrift is open water to the eye and to ships.
                         BRIDGE | ICE => WATER,
-                        MARSH | MARSH_ORE => MANGROVE,
+                        MARSH | MARSH_ORE | MARSH_GEMS => MANGROVE,
                         _ => self.biome(x, y).forest,
                     };
                     self.set(x, y, tile);
@@ -1261,6 +1308,8 @@ pub fn coral_archipelago(p: &mut Painter) {
     ] {
         p.ore(x, y, r, s);
     }
+    // Gems in the field nearest the middle of the archipelago.
+    p.gem_seam(104, 116);
     p.home_ore(4, 560);
     p.finish(2, 127);
 }
@@ -1344,6 +1393,9 @@ pub fn continental_divide(p: &mut Painter) {
     ] {
         p.ore(x, y, r, s);
     }
+    // Gems in the field of the open north-east (the large field lies beside a base of the
+    // larger matches).
+    p.gem_seam(150, 60);
     p.home_ore(4, 580);
     p.finish(2, 147);
 }
@@ -1552,6 +1604,8 @@ pub fn glacier_pass(p: &mut Painter) {
     ] {
         p.ore(x, y, r, s);
     }
+    // Gems in the field before the central pass.
+    p.gem_seam(80, 100);
     p.home_ore(4, 620);
     p.finish(1, 269);
 }
@@ -1685,6 +1739,8 @@ pub fn red_canyon(p: &mut Painter) {
     ] {
         p.ore(x, y, r, s);
     }
+    // Gems in the field of the central basin.
+    p.gem_seam(73, 81);
     p.home_ore(4, 640);
     p.finish(1, 303);
 }
@@ -1860,6 +1916,8 @@ pub fn pacific_atoll(p: &mut Painter) {
     ] {
         p.ore(x, y, r, s);
     }
+    // Gems on the lagoon island.
+    p.gem_seam(116, 120);
     p.home_ore(4, 680);
     p.finish(2, 429);
 }

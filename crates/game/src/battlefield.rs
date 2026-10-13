@@ -95,6 +95,8 @@ pub(crate) const ATLASES: usize = 25;
 const NEIGHBOURS: [(i32, i32, u8); 4] = [(0, -1, 1), (1, 0, 2), (0, 1, 4), (-1, 0, 8)];
 /// What the rock terrace is multiplied with on volcanic ash: black basalt with a scorched cap.
 const BASALT_STAIN: [f32; 3] = [0.64, 0.58, 0.60];
+/// What the ore top is multiplied with on a cell of gems (RA5): the nuggets turn blue-green.
+const GEM_STAIN: [f32; 3] = [0.42, 1.0, 0.96];
 /// Cells more than this far from a shore draw as deep water.
 const DEEP_WATER: u8 = 6;
 #[derive(Component)]
@@ -121,7 +123,9 @@ impl Plugin for BattlefieldPlugin {
                 (
                     terrain,
                     raze_scenery,
+                    sprout_ore,
                     animate_ground,
+                    show_crates,
                     effects,
                     animate_particles,
                 )
@@ -300,6 +304,8 @@ fn terrain(
                         ),
                         stain: if image == CLIFF && ground == Soil::Ash {
                             BASALT_STAIN
+                        } else if image == ORE && feature == Feature::Gems {
+                            GEM_STAIN
                         } else if image == LAVA {
                             // A flow glows unevenly, which also hides the texture's period.
                             let (fx, fy) = (x as f32, y as f32);
@@ -362,8 +368,8 @@ fn terrain(
                     Reach::Ring,
                 );
             }
-            // Mined ground under ore, whatever the ground around it.
-            if feature == Feature::Ore {
+            // Mined ground under ore and gems, whatever the ground around it.
+            if matches!(feature, Feature::Ore | Feature::Gems) {
                 layer(
                     SOIL,
                     lattice(SOIL_PERIOD),
@@ -397,7 +403,7 @@ fn terrain(
             let scatter = (x.wrapping_mul(31) ^ y.wrapping_mul(71)) % 16;
             let top = match (feature, ground) {
                 (Feature::None | Feature::Lava, _) => None,
-                (Feature::Ore, _) => Some((ORE, scatter)),
+                (Feature::Ore | Feature::Gems, _) => Some((ORE, scatter)),
                 (Feature::Cliff, Soil::Snow | Soil::Ice) => Some((SNOW_CLIFF, scatter)),
                 (Feature::Cliff, Soil::Sand) => Some((MESA, scatter)),
                 (Feature::Cliff, _) => Some((CLIFF, scatter)),
@@ -545,6 +551,140 @@ fn covered(reach: Reach) -> &'static [(i32, i32)] {
         Reach::Cell => &[],
         Reach::Ring => &RING,
         Reach::Tall => &TALL,
+    }
+}
+/// How often the simulation's grid is searched for ore that spread onto new ground, in ticks.
+const ORE_SEARCH_TICKS: u64 = 20;
+/// Ore that spread onto ground the map file has no ore on (RA5, `sim`'s `ore` module) gets an
+/// ore top of its own, hidden until the player sees the cell, as a mined-out cell's top is
+/// shown again when ore spreads back onto it ([`animate_ground`]).
+fn sprout_ore(
+    mut commands: Commands,
+    host: Res<SimHost>,
+    map: Option<Res<MapView>>,
+    materials: Option<Res<Materials>>,
+    ground: Query<&Ground>,
+    mut searched: Local<Option<u64>>,
+) {
+    let (Some(map), Some(materials), Some(grid)) = (map, materials, host.grid()) else {
+        return;
+    };
+    let tick = host.tick();
+    if *searched == Some(tick) || !tick.is_multiple_of(ORE_SEARCH_TICKS) {
+        return;
+    }
+    *searched = Some(tick);
+    let topped: std::collections::HashSet<CellPos> = ground
+        .iter()
+        .filter(|tile| tile.ore)
+        .map(|tile| tile.cell)
+        .collect();
+    for y in 0..map.height {
+        for x in 0..map.width {
+            let cell = CellPos::new(x as i32, y as i32);
+            if !grid.cell(cell).is_some_and(|c| c.ore > 0) || topped.contains(&cell) {
+                continue;
+            }
+            let scatter = (x.wrapping_mul(31) ^ y.wrapping_mul(71)) % 16;
+            let px = TERRAIN_ATLAS / 4;
+            let (left, top) = ((scatter % 4) * px, (scatter / 4) * px);
+            let position = crate::projection::cell_centre(cell, map.tile);
+            commands.spawn((
+                BattlefieldVisual,
+                Ground {
+                    cell,
+                    water: false,
+                    phase: scatter as f32,
+                    ore: true,
+                    // Shown once the player sees the cell.
+                    depleted: true,
+                    reach: Reach::Cell,
+                    depth: 0,
+                    foam: 0,
+                    scenery: false,
+                    stain: if grid.is_gems(cell) {
+                        GEM_STAIN
+                    } else {
+                        [1.0; 3]
+                    },
+                },
+                Sprite {
+                    image: materials.terrain[ORE].clone(),
+                    rect: Some(Rect::new(
+                        left as f32,
+                        top as f32,
+                        (left + px) as f32,
+                        (top + px) as f32,
+                    )),
+                    custom_size: Some(Vec2::splat(64.4)),
+                    color: Color::NONE,
+                    ..default()
+                },
+                Transform::from_translation(position.extend(0.5 + (x + y) as f32 / 16384.0)),
+            ));
+        }
+    }
+}
+/// A crate on the map (RA5).
+#[derive(Component)]
+struct CrateMark(CellPos);
+/// The size of a crate's mark in pixels: well inside its cell.
+const CRATE_SIZE: f32 = 22.0;
+/// Draws the crates of the match that the human player sees now (RA5, `sim::Crates`): a plain
+/// wooden box in the cell, gone when the crate is taken or the cell is out of sight. A
+/// placeholder until crates have art of their own.
+fn show_crates(
+    mut commands: Commands,
+    host: Res<SimHost>,
+    map: Option<Res<MapView>>,
+    marks: Query<(Entity, &CrateMark)>,
+    reveal: Option<Res<crate::visual_review::RevealTerrain>>,
+) {
+    let seen: std::collections::BTreeSet<CellPos> = match (
+        host.world().get_resource::<sim::Crates>(),
+        crate::fog::human_vision(host.players()),
+    ) {
+        (Some(crates), Some(vision)) => crates
+            .cells()
+            .filter(|&cell| reveal.is_some() || vision.is_visible(cell))
+            .collect(),
+        _ => Default::default(),
+    };
+    let mut drawn = std::collections::BTreeSet::new();
+    for (entity, mark) in &marks {
+        if seen.contains(&mark.0) {
+            drawn.insert(mark.0);
+        } else {
+            commands.entity(entity).despawn();
+        }
+    }
+    let Some(map) = map else {
+        return;
+    };
+    for cell in seen.difference(&drawn) {
+        let position = crate::projection::cell_centre(*cell, map.tile);
+        let depth = 0.6 + (cell.x + cell.y) as f32 / 16384.0;
+        // A box: its side, and a lighter lid a little above it.
+        for (colour, size, lift, z) in [
+            (Color::srgb(0.36, 0.24, 0.12), CRATE_SIZE, 0.0, depth),
+            (
+                Color::srgb(0.72, 0.54, 0.30),
+                CRATE_SIZE - 6.0,
+                3.0,
+                depth + 0.00001,
+            ),
+        ] {
+            commands.spawn((
+                BattlefieldVisual,
+                CrateMark(*cell),
+                Sprite {
+                    color: colour,
+                    custom_size: Some(Vec2::new(size, size * 0.72)),
+                    ..default()
+                },
+                Transform::from_translation((position + Vec2::Y * lift).extend(z)),
+            ));
+        }
     }
 }
 #[allow(clippy::too_many_arguments)]
