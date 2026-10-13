@@ -637,11 +637,21 @@ impl Grid {
                 hasher.write_u32(spot);
             }
         }
+        // With units on foot both lists are written with their lengths, like every other part
+        // of the hash whose length varies; without any, the hash is what it was before RA3
+        // (docs/DECISIONS.md R6), when the aircraft were the last and only list.
+        let lengths = !self.foot.is_empty();
+        if lengths {
+            hasher.write_u64(self.air_occupants.iter().flatten().count() as u64);
+        }
         for (index, occupant) in self.air_occupants.iter().enumerate() {
             if let Some(id) = occupant {
                 hasher.write_u64(index as u64);
                 hasher.write_u32(id.0);
             }
+        }
+        if lengths {
+            hasher.write_u64(self.foot.len() as u64);
         }
         for id in &self.foot {
             hasher.write_u32(id.0);

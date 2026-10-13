@@ -1410,11 +1410,25 @@ pub(crate) fn combat(
             continue;
         };
         weapon.cooldown = weapon.cooldown.saturating_sub(1);
-        if special.disabled.contains_key(&id) || special.rearming.contains_key(&id) {
-            continue;
-        }
-        // RA4: an aircraft that has spent its ammunition does not fire until it has reloaded.
-        if special.ammo.get(&id) == Some(&0) {
+        // A unit that is switched off or rearming does not fire, nor does an aircraft that has
+        // spent its ammunition until it has reloaded (RA4). A shot of a volley that is due
+        // meanwhile is not fired, so the volley ends and the weapon reloads, as for every shot
+        // that cannot be fired when it is due.
+        if special.disabled.contains_key(&id)
+            || special.rearming.contains_key(&id)
+            || special.ammo.get(&id) == Some(&0)
+        {
+            if weapon.cooldown == 0 && weapon.burst_left > 0 {
+                let reload_pm = experience.map_or(1000, crate::Experience::reload_pm);
+                weapon.burst_left = 0;
+                weapon.cooldown = definitions.weapon(weapon.volley).map_or(0, |def| {
+                    if reload_pm == 1000 {
+                        def.reload
+                    } else {
+                        crate::veterancy::reload_ticks(def.reload, reload_pm)
+                    }
+                });
+            }
             continue;
         }
         // Every weapon kind comes from the definitions, which do not change during a match,
