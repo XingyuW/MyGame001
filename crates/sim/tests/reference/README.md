@@ -58,10 +58,16 @@ python3 scripts/ra2_reference.py --stats    # counts per category, dangling refe
 
 The script reads the vanilla Red Alert 2 `rules.ini` and `art.ini` from
 `~/Library/Caches/MyGame001/ra2-reference/` (or `RA2_REFERENCE_DIR`) and refuses files whose
-SHA-256 differs from the recorded one. Without that cache `--check` passes with a note.
+SHA-256 differs from the recorded one. It writes the SHA-256 of the table beside it
+(`ra2_reference.tsv.sha256`); `--check` first compares the committed table with that hash, so a
+table edited by hand fails also without the cache, and then with a fresh extraction. Without the
+cache it stops after the first comparison and passes with a note that says so. Both `--check`
+calls are commands 12 and 13 of `scripts/validate_ra2_parity.sh`.
 
 Provenance: repository `https://github.com/otherdeniz/CnC_RulesEditor`, commit
 `b7278f2e1dab098c5a2f05d4784fffe70a4e5f9c`; file names and hashes are in `docs/DECISIONS.md`
 (R2) and in the header of `scripts/ra2_reference.py`. The ini files are never committed, and
 neither is any text of them: the tables hold only numbers, percentages, yes/no flags and
-identifiers (section, weapon, warhead, projectile and type ids, house names).
+identifiers (section, weapon, warhead, projectile and type ids, house names; and, because a
+`[Powerups]` value is kept as the one list it is, the short identifier of each crate's
+animation, which the game does not read).
