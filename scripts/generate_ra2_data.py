@@ -314,7 +314,20 @@ EFFECTS = (
     ("dmisl", ("General", "DMislDamage"), ("CombatDamage", "DMislWarhead")),
     ("dmisl_elite", ("General", "DMislEliteDamage"), ("CombatDamage", "DMislEliteWarhead")),
 )
-HARVESTERS = {'chrono_miner': (500, 7), 'war_miner': (1000, 7)}
+# RA5: the rule values the ini has no key for (docs/RA2_PARITY_PLAN.md section 4.10; appendix D,
+# topic 8: assumptions from the overlay count and the ancestor engine), by group of rules.ron.
+OWN_RULES = {
+    "economy": (
+        ("ore_max_bails", 12, "the game's own: 12 density stages of an ore cell"),
+        ("ore_spread_above", 6, "the game's own: ore spreads from a cell above this density"),
+    ),
+}
+
+# RA5 (docs/RA2_PARITY_PLAN.md section 4.10): a miner takes one bail from its cell after every
+# HARVEST_INTERVAL ticks of work. The ini has no key for it (assumption: the 14 frames of the
+# other `.016` minute rates, x 4 / 3); its capacity is the ini's `Storage`.
+HARVEST_RATE = 1
+HARVEST_INTERVAL = 19
 
 # The ids RA1 adds (docs/RA2_PARITY_PLAN.md section 3.3): id: (label, the id whose game specific
 # values and art it takes until it has its own). Docs/DECISIONS.md R11.
@@ -965,7 +978,8 @@ class Data:
         speed = cite("General", "BuildSpeed", self.tables.section("General"))
         wall = cite("General", "WallBuildSpeedCoefficient", self.tables.section("General"))
         lines = [
-            "// Economy definitions, schema version 1 (PLAN.md sections 5 and 7, M3; docs/DECISIONS.md D23).",
+            "// Economy definitions, schema version 2 (PLAN.md sections 5 and 7, M3; docs/DECISIONS.md D23,",
+            "// R58).",
             "//",
             "// placement_distance: a new building must lie within this many cells (Chebyshev distance between",
             "//                     the nearest cells) of a building of its owner",
@@ -977,18 +991,22 @@ class Data:
             f"//             refunded when sold: the cost times {refund}), and free_units",
             "//             (units that leave it when it is placed)",
             "// units:      the production terms of the unit types of units.ron",
-            "// harvesters: ore capacity and ore removed per tick of the harvester unit types",
-            "// refineries: credits paid per ore unit by the refinery building types",
+            "// harvesters: of the harvester unit types the capacity in bails (`Storage`), the bails removed",
+            "//             from a cell at a time, and the ticks of work on the cell for each removal",
+            "// refineries: credits paid per bail of ore and per bail of gems by the refinery building types",
+            "// refunds:    the building types whose sale returns a fixed amount instead of the cost times",
+            f"//             {refund} (`Soylent`, where it is not 0)",
             "//",
             "// Cost, prerequisites, power, sell value and free units are ported from the ini. The build",
             f"// time is the cost times {speed} game minutes per 1000 credits, in ticks",
             f"// (round(cost x 21 / 25), at least 1), and for a wall times {wall}",
-            "// (docs/RA2_PARITY_PLAN.md section 4.2). Footprints, harvesters and refineries are the",
-            "// game's own (the latter two until RA5).",
+            "// (docs/RA2_PARITY_PLAN.md section 4.2). A miner's capacity, the value of a bail and the",
+            "// fixed refunds are ported (section 4.10); footprints and the pace of harvesting are the",
+            "// game's own.",
             "//",
             GENERATED,
             "(",
-            "    schema_version: 1,",
+            "    schema_version: 2,",
             "    placement_distance: 4,",
             "    buildings: [",
         ]
@@ -1016,14 +1034,33 @@ class Data:
                 f" // {item.comment('Cost', 'Prerequisite')}"
             )
         lines += ["    ],", "    harvesters: ["]
-        for game_id, (capacity, rate) in HARVESTERS.items():
-            lines.append(f'        (unit: "{game_id}", capacity: {capacity}, harvest_rate: {rate}),')
+        for game_id in self.units:
+            item = self.items[game_id]
+            if convert("flag", item.ini.get("Harvester", "no")):
+                lines.append(
+                    f'        (unit: "{game_id}", capacity: {int(item.ini["Storage"])}, '
+                    f"harvest_rate: {HARVEST_RATE}, harvest_interval: {HARVEST_INTERVAL}),"
+                    f" // {item.comment('Harvester', 'Storage')}"
+                )
+        ore = cite("Riparius", "Value", self.tables.section("Riparius"))
+        gems = cite("Cruentus", "Value", self.tables.section("Cruentus"))
+        ore_value = int(self.tables.value("Riparius", "Value"))
+        gem_value = int(self.tables.value("Cruentus", "Value"))
         lines += ["    ],", "    refineries: ["]
         for game_id in self.buildings:
             if "Refinery" in self.items[game_id].ini:
                 lines.append(
-                    f'        (building: "{game_id}", credits_per_ore: 1),'
-                    f" // {self.items[game_id].comment('Refinery')}"
+                    f'        (building: "{game_id}", credits_per_ore: {ore_value}, '
+                    f"credits_per_gem: {gem_value}),"
+                    f" // {self.items[game_id].comment('Refinery')}, {ore}, {gems}"
+                )
+        lines += ["    ],", "    refunds: ["]
+        for game_id in self.buildings:
+            item = self.items[game_id]
+            if int(item.ini.get("Soylent", "0")) != 0:
+                lines.append(
+                    f'        (building: "{game_id}", credits: {int(item.ini["Soylent"])}),'
+                    f" // {item.comment('Soylent')}"
                 )
         lines += ["    ],", ")"]
         return "\n".join(lines) + "\n"
@@ -1376,14 +1413,14 @@ class Data:
     def rules_file(self):
         tables = self.tables
         lines = [
-            "// Global rules, schema version 1 (crates/sim/src/rules.rs; docs/RA2_PARITY_PLAN.md sections 3.2",
-            "// and 4; docs/DECISIONS.md R9, R10): the values of the ruleset that belong to no single unit or",
-            "// building, in game units (ticks, 20 per second; subcells, 256 per cell; permille; percent;",
-            "// yes and no as 1 and 0).",
+            "// Global rules, schema version 2 (crates/sim/src/rules.rs; docs/RA2_PARITY_PLAN.md sections 3.2",
+            "// and 4; docs/DECISIONS.md R9, R10, R58): the values of the ruleset that belong to no single unit",
+            "// or building, in game units (ticks, 20 per second; subcells, 256 per cell; permille; percent;",
+            "// yes and no as 1 and 0). A value without a source is the game's own: the ini has no key for it.",
             "//",
             GENERATED,
             "(",
-            "    schema_version: 1,",
+            "    schema_version: 2,",
         ]
 
         def scalars(group):
@@ -1394,6 +1431,8 @@ class Data:
                     lines.append(
                         f"        {field}: {value}, // {cite(section, key, tables.section(section))}"
                     )
+            for field, value, note in OWN_RULES.get(group, ()):
+                lines.append(f"        {field}: {value}, // {note}")
             lines.append("    ),")
 
         for group in RULE_GROUPS:
@@ -1407,6 +1446,16 @@ class Data:
                 f'        (id: "{game_id}", share: {int(parts[0])}, value: {value}),'
                 f" // {cite('Powerups', key, powerups)}"
             )
+        lines.append("    ],")
+        # RA5: the vehicles a crate may hold, `CrateGoodie=yes`, in the order of the units.
+        goodies = [
+            game_id
+            for game_id in self.units
+            if convert("flag", self.items[game_id].ini.get("CrateGoodie", "no"))
+        ]
+        lines.append("    crate_units: [")
+        for game_id in goodies:
+            lines.append(f'        "{game_id}", // {self.items[game_id].comment("CrateGoodie")}')
         lines.append("    ],")
         scalars("dialog")
         lines.append("    difficulty: [")

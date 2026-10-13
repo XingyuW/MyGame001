@@ -2137,6 +2137,8 @@ pub fn event_sound(event: &SimEvent, context: &SoundContext) -> Option<Sfx> {
         SimEvent::BuildingSold { player, .. } => (*player == HUMAN).then_some(Sfx::Sold),
         SimEvent::BuildingUndeployed { player, .. } => (*player == HUMAN).then_some(Sfx::Sold),
         SimEvent::OreDelivered { player, .. } => (*player == HUMAN).then_some(Sfx::Credits),
+        // RA5: the player's own crate, whatever it held.
+        SimEvent::CrateTaken { player, .. } => (*player == HUMAN).then_some(Sfx::Credits),
         SimEvent::WeaponFired {
             attacker,
             target,
@@ -2170,6 +2172,7 @@ pub fn event_sound(event: &SimEvent, context: &SoundContext) -> Option<Sfx> {
         | SimEvent::DamageStateChanged { .. }
         // RA4: a launch is heard as its launcher's shot, a missile's end as its impact.
         | SimEvent::CrewEscaped { .. }
+        | SimEvent::CrateAppeared { .. }
         | SimEvent::UnitLaunched { .. }
         | SimEvent::UnitRecovered { .. }
         | SimEvent::MissileDetonated { .. }
@@ -2769,6 +2772,7 @@ mod tests {
                     harvester: unseen_id,
                     refinery: unseen_id,
                     ore: 1,
+                    gems: 0,
                     credits: 1
                 }),
                 own(Sfx::Credits)

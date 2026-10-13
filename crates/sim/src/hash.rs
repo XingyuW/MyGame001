@@ -68,7 +68,8 @@ impl Default for Fnv1a64 {
 /// the [`MatchState`], and the computer players' [`AiPlayers`] (docs/DECISIONS.md D4, D11,
 /// extended in M2, M3, M4, and M6). Components added by later milestones are appended per entity.
 /// Since RA4 the [`Experience`](crate::Experience) of the trainable units follows at the end, if
-/// there is any.
+/// there is any; since RA5 the [`Crates`](crate::Crates), if the world ever had one. Which ore is
+/// gems and which cells were mined out is part of the [`Grid`].
 ///
 /// # Panics
 ///
@@ -162,6 +163,8 @@ pub fn state_hash(world: &mut World) -> u64 {
     world
         .resource::<crate::crew::Wrecks>()
         .hash_into(&mut hasher);
+    // RA5: the crates, if the world ever had one.
+    world.resource::<crate::Crates>().hash_into(&mut hasher);
     hasher.finish()
 }
 

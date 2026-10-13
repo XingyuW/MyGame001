@@ -326,7 +326,7 @@ fn country(country: &str) -> (Vec<String>, usize) {
         ));
     }
     // The sale of every building it owns now: the refund of its type to the credit (with the
-    // shipped rules half its cost), and a wall is not sold.
+    // shipped rules half its cost, and 300 for a refinery), and a wall is not sold.
     let rules = definitions.rules().expect("rules");
     let mut buildings: Vec<(sim::SimId, BuildingKind)> = {
         let mut query = app.world_mut().query::<(&sim::SimId, &Owner, &Building)>();
@@ -362,7 +362,13 @@ fn country(country: &str) -> (Vec<String>, usize) {
                 _ => None,
             })
             .collect();
-        let expected = cost * i64::from(rules.economy.refund_percent) / 100;
+        // RA5 (docs/DECISIONS.md R58): the two refineries return the ini's `Soylent`, 300,
+        // and every other type the cost times the refund percent (the Ore Purifier's
+        // `Soylent` is half its cost).
+        let expected = match label.as_str() {
+            "refinery" | "soviet_refinery" => 300,
+            _ => cost * i64::from(rules.economy.refund_percent) / 100,
+        };
         let fine = if sellable {
             refunds == [expected]
                 && credits(&app) - before == expected

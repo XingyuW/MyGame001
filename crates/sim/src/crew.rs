@@ -176,7 +176,7 @@ pub(crate) fn escape(world: &mut World) {
                 cell
             }
             Wrecked::Building { kind, footprint } => {
-                let count = survivors(definitions.refund(kind), side.survivor_divisor);
+                let count = survivors(definitions.rule_refund(kind), side.survivor_divisor);
                 let cells: Vec<CellPos> = footprint.cells().collect();
                 for _ in 0..count {
                     match put(world, wreck.owner, side.crew, &cells) {

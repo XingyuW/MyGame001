@@ -1028,10 +1028,15 @@ fn interact(
                 && let Some(def) = defs.building(k)
             {
                 if def.credits_per_ore.is_some() {
+                    // The rules' share of the victim's credits (RA5); half without a rules
+                    // file, the rule of M9.
+                    let percent = defs.rules().map_or(50, |rules| {
+                        i64::from(rules.combat.spy_money_steal_percent.clamp(0, 100))
+                    });
                     let amount = world
                         .resource::<Players>()
                         .get(b.owner)
-                        .map_or(0, |p| p.credits() / 2);
+                        .map_or(0, |p| p.credits().max(0).saturating_mul(percent) / 100);
                     let mut ps = world.resource_mut::<Players>();
                     if let Some(p) = ps.get_mut(b.owner) {
                         p.credits -= amount;
@@ -1708,12 +1713,30 @@ pub(crate) fn resolve(world: &mut World) {
         if let SimEvent::OreDelivered {
             player, credits, ..
         } = event
-            && index.values().any(|b| {
-                b.owner == player && role(&defs, b) == Role::Purifier && powered(world, &defs, b)
-            })
-            && let Some(p) = world.resource_mut::<Players>().get_mut(player)
         {
-            p.credits = p.credits.saturating_add(credits / 4);
+            // Every powered purifier of the player adds the rules' share of the load's value
+            // (RA5, section 4.10); a quarter without a rules file, the rule of M9.
+            let purifiers = index
+                .values()
+                .filter(|b| {
+                    b.owner == player
+                        && role(&defs, b) == Role::Purifier
+                        && powered(world, &defs, b)
+                })
+                .count();
+            let percent = defs.rules().map_or(25, |rules| {
+                i64::from(rules.economy.purifier_bonus_percent.max(0))
+            });
+            let bonus = credits
+                .max(0)
+                .saturating_mul(percent)
+                .saturating_mul(i64::try_from(purifiers).unwrap_or(0))
+                / 100;
+            if bonus > 0
+                && let Some(p) = world.resource_mut::<Players>().get_mut(player)
+            {
+                p.credits = p.credits.saturating_add(bonus);
+            }
         }
     }
     let bombs = world.resource::<SpecialState>().bombs.clone();

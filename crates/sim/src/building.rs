@@ -193,7 +193,12 @@ pub(crate) fn check_footprint(grid: &Grid, footprint: Footprint) -> Result<(), P
         return Err(PlacementError::OutsideMap(footprint));
     }
     for cell in footprint.cells() {
-        if !grid.cell(cell).is_some_and(|terrain| terrain.buildable) {
+        // Nothing is built on ore (RA5): ore that spread onto building ground keeps it free
+        // until it is harvested. A map's own ore ground is no building ground anyway.
+        if !grid
+            .cell(cell)
+            .is_some_and(|terrain| terrain.buildable && terrain.ore == 0)
+        {
             return Err(PlacementError::NotBuildable(cell));
         }
         if let Some(building) = grid.building(cell) {

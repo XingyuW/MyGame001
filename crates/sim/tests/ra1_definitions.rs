@@ -542,6 +542,8 @@ const SCALAR_GROUPS: [(&str, &[Scalar]); 10] = [
             ("ore_spread_interval", 1, TICKS),
             ("ore_spread_pm", 0, 1000),
             ("harvesters_per_refinery", 0, 8),
+            ("ore_max_bails", 1, AMOUNT),
+            ("ore_spread_above", 0, AMOUNT),
         ],
     ),
     (
@@ -2088,8 +2090,8 @@ fn unknown_and_duplicate_fields_are_rejected_in_every_file() {
         // The rules file: the file's struct, a scalar group, an entry of a list.
         (
             File::Rules,
-            "    schema_version: 1,",
-            "    schema_version: 1,\n    seed: 4,",
+            "    schema_version: 2,",
+            "    schema_version: 2,\n    seed: 4,",
             "seed",
             DataErrorKind::UnknownField,
         ),
@@ -2116,8 +2118,8 @@ fn unknown_and_duplicate_fields_are_rejected_in_every_file() {
         ),
         (
             File::Rules,
-            "    schema_version: 1,",
-            "    schema_version: 1,\n    schema_version: 1,",
+            "    schema_version: 2,",
+            "    schema_version: 2,\n    schema_version: 2,",
             "schema_version",
             DataErrorKind::DuplicateField,
         ),
@@ -2369,14 +2371,16 @@ fn values_of_the_wrong_kind_are_syntax_errors_in_every_file() {
 
 #[test]
 fn other_schema_versions_are_rejected_in_every_file() {
-    // The rules file is new at version 1. The arsenal is at 3 since RA2 (2: RA1, without the
+    // The rules file is at version 2 since RA5 (1: RA1, without the densest ore, the density
+    // from which ore spreads and the units of a crate). The arsenal is at 3 since RA2 (2: RA1, without the
     // traits of buildings; 1: M9, without sides, countries and tech levels), the skirmish file
     // at 3 (2: M7, without sides; 1: M6, without
     // rosters), the AI file at 2 (1: one plan at the top level); a file of an earlier version
     // and of any later version is rejected as such.
     let cases = [
-        (File::Rules, "schema_version: 1,", 0, 1),
-        (File::Rules, "schema_version: 1,", 2, 1),
+        (File::Rules, "schema_version: 2,", 0, 2),
+        (File::Rules, "schema_version: 2,", 1, 2),
+        (File::Rules, "schema_version: 2,", 3, 2),
         (File::Arsenal, "schema_version: 5,", 4, 5),
         (File::Arsenal, "schema_version: 5,", 3, 5),
         (File::Arsenal, "schema_version: 5,", 2, 5),

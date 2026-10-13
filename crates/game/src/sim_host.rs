@@ -518,7 +518,11 @@ pub(crate) mod tests {
             }])
             .expect("tick");
         assert_eq!(host.tick(), 1);
-        assert!(events.is_empty(), "{events:?}");
+        // Nothing but the crate the first tick of a match puts down (RA5).
+        assert!(
+            matches!(events.as_slice(), [SimEvent::CrateAppeared { .. }]),
+            "{events:?}"
+        );
         let players = host.players().expect("players");
         assert_eq!(
             players.get(HUMAN).map(|state| state.queues().count()),
@@ -579,7 +583,18 @@ pub(crate) mod tests {
         app.world_mut().run_system_once(run_tick).expect("runs");
         assert_eq!(app.world().resource::<SimHost>().tick(), 1);
         let messages = app.world().resource::<Messages<SimEvent>>();
-        assert_eq!(messages.len(), 1, "the rejection of the stop command");
+        assert_eq!(
+            messages.len(),
+            2,
+            "the rejection of the stop command, and the match's first crate (RA5)"
+        );
+        assert_eq!(
+            messages
+                .iter_current_update_messages()
+                .filter(|event| matches!(event, SimEvent::CommandRejected { .. }))
+                .count(),
+            1
+        );
         app.world_mut().resource_mut::<CommandSink>().toggle_pause();
         for _ in 0..5 {
             app.world_mut().run_system_once(run_tick).expect("runs");

@@ -1,11 +1,12 @@
 //! Immutable economy definitions loaded from RON (PLAN.md sections 5 and 7, M3; docs/DECISIONS.md
 //! D23).
 //!
-//! Economy file, schema version 1:
+//! Economy file, schema version 2 (RA5, docs/DECISIONS.md R58: ore in bails, gems, the time a
+//! harvester takes, fixed refunds):
 //!
 //! ```ron
 //! (
-//!     schema_version: 1,
+//!     schema_version: 2,
 //!     placement_distance: 4,
 //!     buildings: [
 //!         (
@@ -18,10 +19,18 @@
 //!         (unit: "light_tank", cost: 700, build_time: 400, producer: "war_factory",
 //!          prerequisites: []),
 //!     ],
-//!     harvesters: [(unit: "harvester", capacity: 700, harvest_rate: 7)],
-//!     refineries: [(building: "refinery", credits_per_ore: 1)],
+//!     harvesters: [(unit: "harvester", capacity: 40, harvest_rate: 1, harvest_interval: 19)],
+//!     refineries: [(building: "refinery", credits_per_ore: 25, credits_per_gem: 50)],
+//!     refunds: [(building: "refinery", credits: 300)],
 //! )
 //! ```
+//!
+//! The ore unit of a cell, of a harvester's `capacity` and `harvest_rate`, and of a refinery's
+//! `credits_per_ore` is the **bail** (RA5, docs/RA2_PARITY_PLAN.md section 4.10): a harvester
+//! standing on ore removes `harvest_rate` bails after every `harvest_interval` ticks of work
+//! (1: every tick, the rule of M3), and a refinery pays `credits_per_ore` for a bail of ore and
+//! `credits_per_gem` for a bail of gems. `refunds` lists the building types whose sale returns
+//! a fixed amount whatever the refund rule gives (the ini's `Soylent`), each at most once.
 //!
 //! Every field is required, so there are no silent defaults. Building ids and sprite names follow
 //! the rules of unit ids (`definitions::check_name`). Every reference (a producer, a prerequisite,
@@ -39,7 +48,7 @@ use crate::definitions::{MAX_UNIT_TYPES, UnitKind, check_name};
 use crate::hash::Fnv1a64;
 
 /// The schema version of the economy file this crate reads.
-pub const ECONOMY_SCHEMA_VERSION: i64 = 1;
+pub const ECONOMY_SCHEMA_VERSION: i64 = 2;
 
 /// Largest number of building types in an economy file.
 pub const MAX_BUILDING_TYPES: usize = 64;
@@ -67,12 +76,15 @@ pub const MAX_FREE_UNITS: usize = 8;
 /// Largest placement distance in cells.
 pub const MAX_PLACEMENT_DISTANCE: u32 = 32;
 
-/// Largest ore load of a harvester.
+/// Largest ore load of a harvester, in bails.
 pub const MAX_ORE_CAPACITY: u32 = 100_000;
 
-/// Largest number of credits a refinery pays per ore unit. A full load of the largest capacity is
-/// worth at most 10^8 credits.
+/// Largest number of credits a refinery pays per bail, of ore or of gems. A full load of the
+/// largest capacity is worth at most 10^8 credits.
 pub const MAX_CREDITS_PER_ORE: i64 = 1_000;
+
+/// Longest time a harvester works for one removal of ore, in ticks (one minute).
+pub const MAX_HARVEST_INTERVAL: u32 = 1_200;
 
 /// Index of a building type in [`Definitions`](crate::Definitions).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -119,17 +131,24 @@ pub struct BuildingDef {
     pub sell_value: i64,
     /// Units that leave the building when it is placed (for example a refinery's harvester).
     pub free_units: Vec<UnitKind>,
-    /// Credits per ore unit if the building is a refinery.
+    /// Credits per bail of ore if the building is a refinery.
     pub credits_per_ore: Option<i64>,
+    /// Credits per bail of gems if the building is a refinery (RA5).
+    pub credits_per_gem: Option<i64>,
+    /// The credits a sale returns whatever the refund rule gives (RA5: the ini's `Soylent`),
+    /// from 0 to the cost; `None` for a type the economy file's `refunds` does not list.
+    pub fixed_refund: Option<i64>,
 }
 
 /// The harvesting terms of a harvester unit type (PLAN.md section 5, equation 4).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct HarvesterDef {
-    /// Ore units the harvester carries when full, 1 to [`MAX_ORE_CAPACITY`].
+    /// Bails the harvester carries when full, 1 to [`MAX_ORE_CAPACITY`] (the ini's `Storage`).
     pub capacity: u32,
-    /// Ore units it removes from its cell per tick, 1 to `capacity`.
+    /// Bails it removes from its cell at a time, 1 to `capacity`.
     pub harvest_rate: u32,
+    /// Ticks of work on a cell for each removal, 1 to [`MAX_HARVEST_INTERVAL`] (RA5).
+    pub harvest_interval: u32,
 }
 
 /// The economy part of [`Definitions`](crate::Definitions). Empty until match setup installs a
@@ -171,11 +190,17 @@ impl EconomyDefinitions {
             for kind in &building.free_units {
                 hasher.write(&kind.0.to_le_bytes());
             }
-            match building.credits_per_ore {
-                None => hasher.write(&[0]),
-                Some(rate) => {
-                    hasher.write(&[1]);
-                    hasher.write(&rate.to_le_bytes());
+            for value in [
+                building.credits_per_ore,
+                building.credits_per_gem,
+                building.fixed_refund,
+            ] {
+                match value {
+                    None => hasher.write(&[0]),
+                    Some(value) => {
+                        hasher.write(&[1]);
+                        hasher.write(&value.to_le_bytes());
+                    }
                 }
             }
         }
@@ -197,6 +222,7 @@ impl EconomyDefinitions {
                     hasher.write(&[1]);
                     hasher.write_u32(entry.capacity);
                     hasher.write_u32(entry.harvest_rate);
+                    hasher.write_u32(entry.harvest_interval);
                 }
             }
         }
@@ -250,10 +276,16 @@ static HARVESTER_SHAPE: Shape = Shape::Struct(&[
     ("unit", Shape::Str),
     ("capacity", Shape::Int),
     ("harvest_rate", Shape::Int),
+    ("harvest_interval", Shape::Int),
 ]);
 
-static REFINERY_SHAPE: Shape =
-    Shape::Struct(&[("building", Shape::Str), ("credits_per_ore", Shape::Int)]);
+static REFINERY_SHAPE: Shape = Shape::Struct(&[
+    ("building", Shape::Str),
+    ("credits_per_ore", Shape::Int),
+    ("credits_per_gem", Shape::Int),
+]);
+
+static REFUND_SHAPE: Shape = Shape::Struct(&[("building", Shape::Str), ("credits", Shape::Int)]);
 
 static ECONOMY_FILE_SHAPE: Shape = Shape::Struct(&[
     (
@@ -289,6 +321,13 @@ static ECONOMY_FILE_SHAPE: Shape = Shape::Struct(&[
             max: MAX_BUILDING_TYPES,
         },
     ),
+    (
+        "refunds",
+        Shape::List {
+            entry: &REFUND_SHAPE,
+            max: MAX_BUILDING_TYPES,
+        },
+    ),
 ]);
 
 /// The economy file as `ron` reads it. Integers are read as `i64`, the widest type the checker
@@ -302,6 +341,7 @@ struct EconomyFile {
     units: Vec<UnitProductionEntry>,
     harvesters: Vec<HarvesterEntry>,
     refineries: Vec<RefineryEntry>,
+    refunds: Vec<RefundEntry>,
 }
 
 #[derive(Deserialize)]
@@ -337,6 +377,7 @@ struct HarvesterEntry {
     unit: String,
     capacity: i64,
     harvest_rate: i64,
+    harvest_interval: i64,
 }
 
 #[derive(Deserialize)]
@@ -344,6 +385,14 @@ struct HarvesterEntry {
 struct RefineryEntry {
     building: String,
     credits_per_ore: i64,
+    credits_per_gem: i64,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct RefundEntry {
+    building: String,
+    credits: i64,
 }
 
 /// Loads and validates the economy file at `path` against the unit types `units` (the ids of the
@@ -539,6 +588,8 @@ fn validate_parsed(file: EconomyFile, units: &[String]) -> Result<EconomyDefinit
             sell_value,
             free_units,
             credits_per_ore: None,
+            credits_per_gem: None,
+            fixed_refund: None,
         });
     }
     check_acyclic(&buildings)?;
@@ -578,18 +629,26 @@ fn validate_parsed(file: EconomyFile, units: &[String]) -> Result<EconomyDefinit
             entry.capacity,
             1,
             MAX_ORE_CAPACITY,
-            " ore units",
+            " bails",
         )?;
         let harvest_rate = ranged(
             &format!("{field}.harvest_rate"),
             entry.harvest_rate,
             1,
             capacity,
-            " ore units per tick (at most the capacity)",
+            " bails at a time (at most the capacity)",
+        )?;
+        let harvest_interval = ranged(
+            &format!("{field}.harvest_interval"),
+            entry.harvest_interval,
+            1,
+            MAX_HARVEST_INTERVAL,
+            " ticks",
         )?;
         harvesters[usize::from(kind.0)] = Some(HarvesterDef {
             capacity,
             harvest_rate,
+            harvest_interval,
         });
     }
 
@@ -601,16 +660,44 @@ fn validate_parsed(file: EconomyFile, units: &[String]) -> Result<EconomyDefinit
             entry.credits_per_ore,
             1,
             MAX_CREDITS_PER_ORE,
-            " credits per ore unit",
+            " credits per bail",
         )?;
-        let slot = &mut buildings[usize::from(kind.0)].credits_per_ore;
-        if slot.is_some() {
+        let gem_rate = ranged(
+            &format!("{field}.credits_per_gem"),
+            entry.credits_per_gem,
+            1,
+            MAX_CREDITS_PER_ORE,
+            " credits per bail",
+        )?;
+        let def = &mut buildings[usize::from(kind.0)];
+        if def.credits_per_ore.is_some() {
             return Err((
                 format!("{field}.building"),
                 DataErrorKind::DuplicateId(entry.building.clone()),
             ));
         }
-        *slot = Some(rate);
+        def.credits_per_ore = Some(rate);
+        def.credits_per_gem = Some(gem_rate);
+    }
+
+    for (index, entry) in file.refunds.iter().enumerate() {
+        let field = format!("refunds[{index}]");
+        let kind = building(format!("{field}.building"), &entry.building)?;
+        let def = &mut buildings[usize::from(kind.0)];
+        let credits = ranged(
+            &format!("{field}.credits"),
+            entry.credits,
+            0,
+            def.production.cost,
+            " credits (at most the cost)",
+        )?;
+        if def.fixed_refund.is_some() {
+            return Err((
+                format!("{field}.building"),
+                DataErrorKind::DuplicateId(entry.building.clone()),
+            ));
+        }
+        def.fixed_refund = Some(credits);
     }
 
     Ok(EconomyDefinitions {

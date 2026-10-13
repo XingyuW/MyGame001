@@ -4,7 +4,7 @@
 // power plant costs 105 credits over 10 ticks (10 per tick, 15 on the last), the fence costs
 // less than its build time (0 per tick, 3 on the last), and the beacon is built in one tick.
 (
-    schema_version: 1,
+    schema_version: 2,
     placement_distance: 3,
     buildings: [
         (
@@ -139,6 +139,7 @@
     harvesters: [
         (
             unit: "harvester",
+            harvest_interval: 1,
             capacity: 20,
             harvest_rate: 3,
         ),
@@ -146,7 +147,9 @@
     refineries: [
         (
             building: "refinery",
+            credits_per_gem: 4,
             credits_per_ore: 2,
         ),
     ],
+    refunds: [],
 )

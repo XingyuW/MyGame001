@@ -1,17 +1,19 @@
 //! Global rules loaded from RON: the values of the Red Alert 2 ruleset that belong to no single
 //! unit or building (docs/RA2_PARITY_PLAN.md sections 3.2 and 4; docs/DECISIONS.md R9, R10).
 //!
-//! Rules file, schema version 1 (an extension file, like the arsenal: a scenario may omit it, and
+//! Rules file, schema version 2 (RA5, docs/DECISIONS.md R58: the densest ore, the density from
+//! which ore spreads, the units of a crate; an extension file, like the arsenal: a scenario may omit it, and
 //! then every rule that reads it keeps its behaviour of M2 to M9):
 //!
 //! ```ron
 //! (
-//!     schema_version: 1,
+//!     schema_version: 2,
 //!     production: (build_ticks_per_1000: 840, multiple_factory_pm: 800, ...),
 //!     economy: (refund_percent: 50, ...),
 //!     veterancy: (...), crew: (...), combat: (...), radiation: (...), superweapons: (...),
 //!     prism: (...), crates: (...),
 //!     powerups: [(id: "money", share: 20, value: 2000)],
+//!     crate_units: ["mcv", "war_miner"],
 //!     dialog: (min_credits: 5000, credits: 10000, ...),
 //!     difficulty: [(id: "easy", rof_pm: 1200, ...)],
 //!     prerequisite_groups: [(id: "power", buildings: ["power_plant", "tesla_reactor"])],
@@ -25,7 +27,7 @@
 //! 0. The scalar groups are checked field by field against the ranges below; ids follow the rules
 //! of unit ids (`definitions::check_name`) and are unique within their list; every building and
 //! unit named (the members of a prerequisite group, a side's base unit, construction yard, crew,
-//! disguise and paradrop infantry) is defined by the units and economy files; `sides` lists
+//! disguise and paradrop infantry, a crate's units) is defined by the units and economy files; `sides` lists
 //! `allied` and `soviet` at most once each, no two sides share a base unit or a construction
 //! yard, and every country names a listed side. A load error
 //! names the file, the field, and the reason.
@@ -44,7 +46,7 @@ use crate::economy_defs::{BuildingKind, Problem, invalid, ranged, unknown};
 use crate::hash::Fnv1a64;
 
 /// The schema version of the rules file this crate reads.
-pub const RULES_SCHEMA_VERSION: i64 = 1;
+pub const RULES_SCHEMA_VERSION: i64 = 2;
 
 /// Largest number of prerequisite groups.
 pub const MAX_PREREQUISITE_GROUPS: usize = 16;
@@ -57,6 +59,9 @@ pub const MAX_COUNTRIES: usize = 16;
 
 /// Largest number of powerups (crate contents).
 pub const MAX_POWERUPS: usize = 32;
+
+/// Largest number of unit types a crate may hold.
+pub const MAX_CRATE_UNITS: usize = 32;
 
 /// Largest number of difficulty entries.
 pub const MAX_RULES_DIFFICULTIES: usize = 8;
@@ -208,6 +213,10 @@ scalar_group! {
         ore_spread_interval: 1 => MAX_TICKS,
         ore_spread_pm: 0 => 1000,
         harvesters_per_refinery: 0 => 8,
+        /// Most bails a cell holds (RA5): the densest a map's ore is, and where growth ends.
+        ore_max_bails: 1 => MAX_AMOUNT,
+        /// Ore spreads from a cell that holds more bails than this (RA5).
+        ore_spread_above: 0 => MAX_AMOUNT,
     }
 }
 
@@ -423,6 +432,8 @@ pub struct Rules {
     pub prism: PrismRules,
     pub crates: CrateRules,
     pub powerups: Vec<Powerup>,
+    /// The unit types of which a crate's unit is one (RA5: the ini's `CrateGoodie`), each once.
+    pub crate_units: Vec<UnitKind>,
     pub dialog: DialogRules,
     pub difficulties: Vec<DifficultyRules>,
     pub prerequisite_groups: Vec<PrerequisiteGroup>,
@@ -499,6 +510,10 @@ impl Rules {
             text(hasher, &powerup.id);
             hasher.write(&powerup.share.to_le_bytes());
             hasher.write(&powerup.value.to_le_bytes());
+        }
+        hasher.write_u64(self.crate_units.len() as u64);
+        for unit in &self.crate_units {
+            hasher.write(&unit.0.to_le_bytes());
         }
         self.dialog.hash_into(hasher);
         hasher.write_u64(self.difficulties.len() as u64);
@@ -608,6 +623,13 @@ static RULES_FILE_SHAPE: Shape = Shape::Struct(&[
             max: MAX_POWERUPS,
         },
     ),
+    (
+        "crate_units",
+        Shape::List {
+            entry: &Shape::Str,
+            max: MAX_CRATE_UNITS,
+        },
+    ),
     ("dialog", Shape::Struct(DIALOG_FIELDS)),
     (
         "difficulty",
@@ -655,6 +677,7 @@ struct RulesFile {
     prism: PrismEntry,
     crates: CrateEntry,
     powerups: Vec<PowerupEntry>,
+    crate_units: Vec<String>,
     dialog: DialogEntry,
     difficulty: Vec<DifficultyEntry>,
     prerequisite_groups: Vec<GroupEntry>,
@@ -801,6 +824,14 @@ fn validate(file: RulesFile, definitions: &Definitions) -> Result<Rules, Problem
         if powerups.iter().any(|known| known.id == entry.id) {
             return Err((field("id"), DataErrorKind::DuplicateId(entry.id)));
         }
+        // RA5: a powerup is one of the contents a crate may hold (`crate::crates`).
+        if crate::crates::CrateContent::parse(&entry.id).is_none() {
+            return Err(invalid(
+                field("id"),
+                format!("{:?}", entry.id),
+                "money, unit, veteran, heal_base, armour, firepower, speed or reveal",
+            ));
+        }
         powerups.push(Powerup {
             share: ranged(&field("share"), entry.share, 0, 1000, "")?,
             value: ranged(&field("value"), entry.value, 0, MAX_AMOUNT, "")?,
@@ -861,6 +892,16 @@ fn validate(file: RulesFile, definitions: &Definitions) -> Result<Rules, Problem
             .unit_kind(id)
             .ok_or_else(|| unknown(field, "unit", id))
     };
+
+    let mut crate_units: Vec<UnitKind> = Vec::with_capacity(file.crate_units.len());
+    for (index, id) in file.crate_units.iter().enumerate() {
+        let field = format!("crate_units[{index}]");
+        let kind = unit(field.clone(), id)?;
+        if crate_units.contains(&kind) {
+            return Err((field, DataErrorKind::DuplicateId(id.clone())));
+        }
+        crate_units.push(kind);
+    }
 
     let mut prerequisite_groups: Vec<PrerequisiteGroup> =
         Vec::with_capacity(file.prerequisite_groups.len());
@@ -974,6 +1015,7 @@ fn validate(file: RulesFile, definitions: &Definitions) -> Result<Rules, Problem
         prism: PrismRules::validate("prism", &file.prism)?,
         crates,
         powerups,
+        crate_units,
         dialog,
         difficulties,
         prerequisite_groups,

@@ -1,0 +1,50 @@
+// RA5 fixture: the file of the RA4 fixture (below), unchanged (invariant I10).
+//
+// RA4 fixture: the unit types of the RA3 fixture and six more for the tests of veterancy, crews,
+// aircraft, spawned units and submerged units (ra4_*.rs; docs/DECISIONS.md R46 to R52): a
+// launcher and its rocket, a carrier and its drone, the hunter the boat sends against what is
+// underwater, and a striker that needs a dock. Fixture data, independent of the shipped balance
+// (invariant I10).
+(
+    schema_version: 1,
+    units: [
+        (id: "allied_mcv", speed: 16, sprite: "allied_mcv"),
+        (id: "soviet_mcv", speed: 16, sprite: "soviet_mcv"),
+        (id: "rifleman", speed: 16, sprite: "rifleman"),
+        (id: "conscript", speed: 16, sprite: "conscript"),
+        (id: "engineer", speed: 16, sprite: "engineer"),
+        (id: "sniper", speed: 16, sprite: "sniper"),
+        (id: "raider", speed: 32, sprite: "raider"),
+        (id: "militia", speed: 16, sprite: "militia"),
+        (id: "prototype", speed: 16, sprite: "prototype"),
+        (id: "advanced", speed: 16, sprite: "advanced"),
+        (id: "tank", speed: 32, sprite: "tank"),
+        (id: "heavy", speed: 24, sprite: "heavy"),
+        (id: "miner_a", speed: 32, sprite: "miner"),
+        (id: "miner_s", speed: 32, sprite: "miner"),
+        (id: "hovercraft", speed: 32, sprite: "hovercraft"),
+        (id: "gunship", speed: 32, sprite: "gunship"),
+        (id: "boat", speed: 32, sprite: "boat"),
+        (id: "sub", speed: 32, sprite: "sub"),
+        (id: "squid", speed: 32, sprite: "squid"),
+        (id: "flak_car", speed: 32, sprite: "flak_car"),
+        (id: "mortar", speed: 16, sprite: "mortar"),
+        (id: "sapper", speed: 16, sprite: "sapper"),
+        (id: "martyr", speed: 16, sprite: "martyr"),
+        (id: "commando", speed: 16, sprite: "commando"),
+        (id: "seer", speed: 16, sprite: "seer"),
+        (id: "recruit", speed: 16, sprite: "recruit"),
+        (id: "trooper", speed: 16, sprite: "trooper"),
+        (id: "hazmat", speed: 16, sprite: "hazmat"),
+        (id: "jumper", speed: 32, sprite: "jumper"),
+        (id: "truck", speed: 32, sprite: "truck"),
+        (id: "roller", speed: 32, sprite: "roller"),
+        (id: "brute", speed: 32, sprite: "brute"),
+        (id: "launcher", speed: 16, sprite: "launcher"),
+        (id: "rocket", speed: 64, sprite: "rocket"),
+        (id: "carrier", speed: 16, sprite: "carrier"),
+        (id: "drone", speed: 48, sprite: "drone"),
+        (id: "hunter", speed: 48, sprite: "hunter"),
+        (id: "striker", speed: 48, sprite: "striker"),
+    ],
+)

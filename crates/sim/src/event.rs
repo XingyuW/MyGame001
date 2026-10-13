@@ -84,12 +84,14 @@ pub enum SimEvent {
         building: SimId,
         refund: i64,
     },
-    /// A harvester unloaded `ore` units at a refinery, which paid `credits`.
+    /// A harvester unloaded `ore` units (bails since RA5, `gems` of them bails of gems) at a
+    /// refinery, which paid `credits`.
     OreDelivered {
         player: PlayerId,
         harvester: SimId,
         refinery: SimId,
         ore: u32,
+        gems: u32,
         credits: i64,
     },
     /// The harvester stopped its cycle and waits for a `Harvest` command.
@@ -140,6 +142,19 @@ pub enum SimEvent {
         player: PlayerId,
         unit: SimId,
         rank: u8,
+    },
+    /// A crate appeared in `cell` (RA5, `crate::crates`).
+    CrateAppeared { cell: CellPos },
+    /// `player`'s unit `unit` took the crate in `cell` (RA5): what it held in the end
+    /// (`content`: money where another content could not be given), the credits it paid, and
+    /// the unit that came out of it.
+    CrateTaken {
+        player: PlayerId,
+        unit: SimId,
+        cell: CellPos,
+        content: crate::crates::CrateContent,
+        credits: i64,
+        spawned: Option<SimId>,
     },
     /// The crew or the survivors of `player`'s destroyed vehicle, or destroyed or sold building,
     /// `from` left it (RA4, `crate::crew`): the new units `units`, standing in and around
