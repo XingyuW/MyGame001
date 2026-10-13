@@ -358,7 +358,12 @@ pub fn spawn_unit(
     let position = {
         let mut grid = world.resource_mut::<Grid>();
         grid.register(id, domain, on_foot);
-        grid.claim(cell, id);
+        if !grid.claim(cell, id) {
+            // The cell refuses the unit after all (not expected after the checks above): no
+            // unit is spawned that holds no cell (invariant I6').
+            grid.unregister(id);
+            return Err(SpawnError::Impassable(cell));
+        }
         grid.standing_point(cell, id)
     };
     let mut entity = world.spawn(unit_bundle(id, owner, kind, speed, cell, position));

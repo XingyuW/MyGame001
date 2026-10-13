@@ -370,21 +370,20 @@ pub(crate) fn process_regular_commands(
     if queue.pending.is_empty() {
         return;
     }
-    let index: BTreeMap<SimId, Entity> =
-        units.iter().map(|(entity, id, ..)| (*id, entity)).collect();
+    // The units a command may name: those with hit points left. One that an earlier command of
+    // the tick destroyed is removed in `Cleanup` and is gone for the commands after it
+    // (docs/DECISIONS.md R56); so is such a building (`EconomyParams::building_index`).
+    let index: BTreeMap<SimId, Entity> = units
+        .iter()
+        .filter(|(entity, ..)| economy.alive(*entity))
+        .map(|(entity, id, ..)| (*id, entity))
+        .collect();
     let mut buildings = None;
     for issued in queue.pending.drain(..) {
-        let result = if matches!(&issued.command,Command::Attack{target,..} if special.hidden.contains(&(issued.player,*target)))
-        {
-            if let Command::Attack { target, .. } = issued.command {
-                Err(RejectReason::UnknownTarget(target))
-            } else {
-                Ok(())
-            }
-        } else if issued.command.units().is_some() {
+        let result = if issued.command.units().is_some() {
             let buildings = buildings.get_or_insert_with(|| economy.building_index());
             validate_player(&issued, &economy)
-                .and_then(|()| validate(&issued, &grid, &economy, &index, &units))
+                .and_then(|()| validate(&issued, &grid, &economy, &index, &units, &special.hidden))
                 .and_then(|()| {
                     // A launched missile or carried aircraft takes no commands (RA4).
                     match issued
@@ -396,7 +395,16 @@ pub(crate) fn process_regular_commands(
                         None => Ok(()),
                     }
                 })
-                .and_then(|()| validate_combat(&issued, &economy, buildings, &index, &units))
+                .and_then(|()| {
+                    validate_combat(
+                        &issued,
+                        &economy,
+                        buildings,
+                        &index,
+                        &units,
+                        &special.hidden,
+                    )
+                })
                 .map(|()| {
                     if let Some(ids) = issued.command.units() {
                         for id in ids {
@@ -606,14 +614,16 @@ fn apply_harvest(
 }
 
 /// Ownership, existence, and bounds of a unit command. Under fog of war a named unit of another
-/// player that the issuing player does not see is `UnknownUnit` rather than `NotOwned`. The
-/// target of `Attack` is checked by [`validate_combat`] (docs/DECISIONS.md D30).
+/// player that the issuing player does not see, or that is hidden from it (`hidden`: a submerged
+/// unit, RA4), is `UnknownUnit` rather than `NotOwned`. The target of `Attack` is checked by
+/// [`validate_combat`] (docs/DECISIONS.md D30).
 fn validate(
     issued: &IssuedCommand,
     grid: &Grid,
     economy: &EconomyParams,
     index: &BTreeMap<SimId, Entity>,
     units: &UnitQuery,
+    hidden: &BTreeSet<(PlayerId, SimId)>,
 ) -> Result<(), RejectReason> {
     let Some(ids) = issued.command.units() else {
         return Ok(());
@@ -642,10 +652,10 @@ fn validate(
         if owner != issued.player {
             // Under fog of war, another player's unit the player does not see is reported like
             // one that does not exist (docs/DECISIONS.md D30).
-            let hidden = player_fog(issued.player, economy).is_some_and(|vision| {
+            let unseen = player_fog(issued.player, economy).is_some_and(|vision| {
                 !Body::of(Some(&mobile), None).is_some_and(|body| body.seen_by(vision))
-            });
-            return Err(if hidden {
+            }) || hidden.contains(&(issued.player, id));
+            return Err(if unseen {
                 RejectReason::UnknownUnit(id)
             } else {
                 RejectReason::NotOwned(id)
@@ -692,8 +702,9 @@ fn validate_player(issued: &IssuedCommand, economy: &EconomyParams) -> Result<()
 
 /// The checks of `Attack` beyond [`validate`], in this order (docs/DECISIONS.md D29, D30): every
 /// named unit has a weapon (`NotArmed`), and the target is not the player's own (`OwnTarget`),
-/// and exists and is visible to the player (`UnknownTarget`, the same reason for both, so that an
-/// unseen enemy is reported like a missing one). Every unit and building has hit points whenever
+/// and exists and is visible to the player and not hidden from it (`UnknownTarget`, the same
+/// reason for all three, so that an unseen or hidden enemy is reported like a missing one, and
+/// only after the checks that a missing one meets: docs/DECISIONS.md R56). Every unit and building has hit points whenever
 /// any unit has a weapon (a combat file gives every type combat terms, docs/DECISIONS.md D28
 /// item 4), so no check for them is needed (M4 review 1 P2-2, D32).
 fn validate_combat(
@@ -702,6 +713,7 @@ fn validate_combat(
     buildings: &BuildingIndex,
     index: &BTreeMap<SimId, Entity>,
     units: &UnitQuery,
+    hidden: &BTreeSet<(PlayerId, SimId)>,
 ) -> Result<(), RejectReason> {
     let Command::Attack { units: ids, target } = &issued.command else {
         return Ok(());
@@ -743,7 +755,11 @@ fn validate_combat(
     }
     match found {
         Some((owner, _)) if owner == issued.player => Err(RejectReason::OwnTarget(target)),
-        Some((_, Some(body))) if body.seen_by(vision) => Ok(()),
+        Some((_, Some(body)))
+            if body.seen_by(vision) && !hidden.contains(&(issued.player, target)) =>
+        {
+            Ok(())
+        }
         _ => Err(RejectReason::UnknownTarget(target)),
     }
 }
