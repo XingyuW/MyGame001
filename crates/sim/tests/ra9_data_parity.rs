@@ -26,6 +26,13 @@
 //! warhead, projectile speed, the layers its projectile engages, scatter), every warhead
 //! (`Verses`, `CellSpread`, `PercentAtMax`, `Wall`, `Wood`) and the area effects. Later
 //! milestones extend it.
+//!
+//! Since the remediation of advisory review 1 (docs/DECISIONS.md R56) it also compares the
+//! free unit and the `Refinery` flag of a building, the producer of every item, the factory
+//! group, side, domain, category and capacity of the arsenal, power as produced and consumed
+//! separately, and the refund with the section's `Soylent`; the game's own damage of the two
+//! effects without a reference value needs a row; and every field of an item's entry in the
+//! shipped files must be audited or be listed as the game's own (`ITEM_FIELDS`).
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::PathBuf;
@@ -104,6 +111,8 @@ struct Mapped {
     game_id: String,
     building: bool,
     section: String,
+    /// The side the mapping gives the item (`allied`, `soviet`, `none`).
+    side: String,
     note: String,
 }
 
@@ -119,6 +128,7 @@ fn mapping() -> Vec<Mapped> {
             game_id: row[0].clone(),
             building: row[1] == "building",
             section: row[2].clone(),
+            side: row[3].clone(),
             note: row[4].clone(),
         }
     })
@@ -169,6 +179,8 @@ struct Differences {
     rows: Vec<(String, String, String, String)>,
     used: BTreeSet<usize>,
     problems: Vec<String>,
+    /// The fields the audit compared (of any game id), for the completeness guard.
+    checked: BTreeSet<String>,
 }
 
 impl Differences {
@@ -201,12 +213,14 @@ impl Differences {
             rows,
             used: BTreeSet::new(),
             problems: Vec::new(),
+            checked: BTreeSet::new(),
         }
     }
 
     /// Compares the shipped value `game` of `field` of `game_id` with `expected`, the conversion
     /// of the reference value `reference` (as the ini writes it).
     fn check(&mut self, game_id: &str, field: &str, game: &str, expected: &str, reference: &str) {
+        self.checked.insert(field.to_owned());
         let listed = self.rows.iter().position(|(id, name, value, from)| {
             id == game_id && name == field && value == game && from == reference
         });
@@ -316,7 +330,9 @@ fn convert(conversion: Conversion, text: &str) -> i128 {
 const JUMPJET: &str = "{92612C46-";
 
 /// Subcells per tick of a unit section (section 4.1), and the reference value it comes from.
-fn speed(section: &BTreeMap<String, String>) -> (i128, String) {
+/// `infantry`: whether `[InfantryTypes]` lists the section (the one test of "infantry on foot"
+/// of the pipeline: the generator, the arsenal's `infantry` and this audit all use the list).
+fn speed(section: &BTreeMap<String, String>, infantry: bool) -> (i128, String) {
     let key = |name: &str| {
         section
             .get(name)
@@ -329,7 +345,7 @@ fn speed(section: &BTreeMap<String, String>) -> (i128, String) {
         )
     } else {
         let mut leptons = (scaled(key("Speed"), 1, 1) * 256).div_euclid(100).min(255);
-        if section.get("Category").map(String::as_str) == Some("Soldier") {
+        if infantry {
             leptons = (leptons * 3).div_euclid(2);
         }
         (leptons, key("Speed").clone())
@@ -409,6 +425,14 @@ fn list(value: Option<&str>) -> Vec<&str> {
         .split(',')
         .filter(|entry| !entry.is_empty())
         .collect()
+}
+
+/// Whether `[InfantryTypes]` of the reference lists `section`.
+fn in_infantry_list(reference: &Reference, section: &str) -> bool {
+    reference
+        .section("InfantryTypes")
+        .values()
+        .any(|listed| listed == section)
 }
 
 fn joined(mut entries: Vec<String>) -> String {
@@ -655,7 +679,7 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
 
         match item {
             ProductionItem::Unit(kind) => {
-                let (expected, source) = speed(section);
+                let (expected, source) = speed(section, in_infantry_list(&reference, &row.section));
                 let game = definitions.unit(kind).expect("unit").speed;
                 differences.check(
                     id,
@@ -670,25 +694,218 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
                 // `Power` above 0 is produced, below 0 consumed; a building without the key has
                 // neither.
                 let power = value("Power").unwrap_or("0");
-                differences.check(
-                    id,
-                    "power",
-                    &(i128::from(def.power_produced) - i128::from(def.power_consumed)).to_string(),
-                    &convert(Conversion::Int, power).to_string(),
-                    power,
-                );
+                let net = convert(Conversion::Int, power);
+                for (field, game, expected) in [
+                    ("power_produced", def.power_produced, net.max(0)),
+                    ("power_consumed", def.power_consumed, (-net).max(0)),
+                ] {
+                    differences.check(id, field, &game.to_string(), &expected.to_string(), power);
+                }
+                // The refund of a sale: `Soylent` if the section has it and it is not 0 (plan
+                // appendix D, topic 9), else the cost times `RefundPercent`.
                 let cost = required("Cost");
+                let soylent = value("Soylent").filter(|text| convert(Conversion::Int, text) != 0);
                 differences.check(
                     id,
                     "sell_value",
                     &def.sell_value.to_string(),
-                    &(convert(Conversion::Int, cost) * refund)
-                        .div_euclid(100)
+                    &soylent
+                        .map_or(
+                            (convert(Conversion::Int, cost) * refund).div_euclid(100),
+                            |text| convert(Conversion::Int, text),
+                        )
                         .to_string(),
-                    cost,
+                    soylent.unwrap_or(cost),
+                );
+                // `FreeUnit`: the unit that leaves the building when it is placed.
+                let free = value("FreeUnit");
+                let game: Vec<String> = def
+                    .free_units
+                    .iter()
+                    .map(|&kind| definitions.unit(kind).expect("free unit").id.clone())
+                    .collect();
+                differences.check(
+                    id,
+                    "free_units",
+                    &game.join(","),
+                    free.map_or("", |section| {
+                        game_id_of
+                            .get(section)
+                            .unwrap_or_else(|| panic!("[{}] gives unmapped {section}", row.section))
+                    }),
+                    free.unwrap_or(""),
+                );
+                // `Refinery=yes`: the building takes ore (the economy file's `refineries`).
+                let (refinery, text) = {
+                    let text = value("Refinery").unwrap_or("no");
+                    (convert(Conversion::Flag, text), text)
+                };
+                differences.check(
+                    id,
+                    "refinery",
+                    &u8::from(def.credits_per_ore.is_some()).to_string(),
+                    &refinery.to_string(),
+                    text,
                 );
             }
         }
+
+        // The factory group of a building: the ini's `Factory`, with `Naval=yes` a shipyard;
+        // a unit is none.
+        let group_of = |section: &BTreeMap<String, String>| {
+            let naval = section.get("Naval").map(String::as_str) == Some("yes");
+            match (section.get("Factory").map(String::as_str), naval) {
+                (None, _) => "none",
+                (Some("BuildingType"), _) => "buildings",
+                (Some("InfantryType"), _) => "infantry",
+                (Some("UnitType"), false) => "vehicles",
+                (Some("UnitType"), true) => "naval",
+                (Some("AircraftType"), _) => "aircraft",
+                (Some(other), _) => panic!("unknown Factory={other}"),
+            }
+        };
+        let factory = value("Factory").unwrap_or("");
+        differences.check(
+            id,
+            "factory",
+            match entry.factory {
+                None => "none",
+                Some(sim::arsenal::FactoryGroup::Buildings) => "buildings",
+                Some(sim::arsenal::FactoryGroup::Infantry) => "infantry",
+                Some(sim::arsenal::FactoryGroup::Vehicles) => "vehicles",
+                Some(sim::arsenal::FactoryGroup::Naval) => "naval",
+                Some(sim::arsenal::FactoryGroup::Aircraft) => "aircraft",
+            },
+            if row.building {
+                group_of(section)
+            } else {
+                "none"
+            },
+            factory,
+        );
+        // The side: that of the mapping (which `scripts/ra2_reference.py` checks against the
+        // owners of the ini), or none for an item that stands for sections of both sides.
+        let sides: BTreeSet<&str> = mapping
+            .iter()
+            .filter(|other| other.game_id == row.game_id)
+            .map(|other| other.side.as_str())
+            .collect();
+        let side = if sides.len() == 1 {
+            row.side.as_str()
+        } else {
+            "none"
+        };
+        differences.check(
+            id,
+            "side",
+            entry.side.map_or("none", |side| side.id()),
+            side,
+            &row.side,
+        );
+        // The producer: a building is built by the Construction Yard, a unit by the factory of
+        // its type list (`[InfantryTypes]`: the barracks; else a shipyard with `Naval=yes`, an
+        // airfield for the types of `[General] PadAircraft`, a War Factory for the others), of
+        // the item's side where that side has such a factory (an item of no side: Allied).
+        let wanted = if row.building {
+            "buildings"
+        } else if in_infantry_list(&reference, &row.section) {
+            "infantry"
+        } else if value("Naval") == Some("yes") {
+            "naval"
+        } else if list(reference.get("General", "PadAircraft")).contains(&row.section.as_str()) {
+            "aircraft"
+        } else {
+            "vehicles"
+        };
+        let factories: Vec<&Mapped> = mapping
+            .iter()
+            .filter(|other| {
+                other.building
+                    && !LATER.contains(&other.note.as_str())
+                    && group_of(reference.section(&other.section)) == wanted
+            })
+            .collect();
+        let own_side = if side == "none" { "allied" } else { side };
+        let of_side: Vec<&str> = factories
+            .iter()
+            .filter(|other| other.side == own_side)
+            .map(|other| other.game_id.as_str())
+            .collect();
+        let acceptable: Vec<&str> = if of_side.is_empty() {
+            factories
+                .iter()
+                .map(|other| other.game_id.as_str())
+                .collect()
+        } else {
+            of_side
+        };
+        let producer = definitions
+            .building(terms.producer)
+            .expect("producer")
+            .id
+            .as_str();
+        differences.check(
+            id,
+            "producer",
+            producer,
+            &if acceptable.contains(&producer) {
+                producer.to_owned()
+            } else {
+                acceptable.join("|")
+            },
+            wanted,
+        );
+        // The domain: by `MovementZone` for a unit (`Fly`: air; `Water`: naval; the amphibious
+        // zones: amphibious; else land); a building is on land, also a shipyard.
+        let zone = value("MovementZone").unwrap_or("");
+        differences.check(
+            id,
+            "domain",
+            match entry.domain {
+                sim::Domain::Land => "land",
+                sim::Domain::Air => "air",
+                sim::Domain::Naval => "naval",
+                sim::Domain::Amphibious => "amphibious",
+            },
+            match zone {
+                _ if row.building => "land",
+                "Fly" => "air",
+                "Water" => "naval",
+                "Amphibious" | "AmphibiousDestroyer" | "AmphibiousCrusher" => "amphibious",
+                _ => "land",
+            },
+            zone,
+        );
+        // The capacity: the `Passengers` of a unit; nothing else carries anything.
+        let passengers = value("Passengers").filter(|_| !row.building).unwrap_or("0");
+        differences.check(
+            id,
+            "capacity",
+            &entry.capacity.to_string(),
+            &convert(Conversion::Int, passengers).to_string(),
+            passengers,
+        );
+
+        // The category: a building is a defence (`BuildCat=Combat`, the arsenal's `armory`) or
+        // a building; a unit is infantry by its type list, else a vehicle.
+        let build_cat = value("BuildCat").unwrap_or("");
+        differences.check(
+            id,
+            "category",
+            match entry.category {
+                Category::Buildings => "buildings",
+                Category::Armory => "armory",
+                Category::Infantry => "infantry",
+                Category::Vehicles => "vehicles",
+            },
+            match (row.building, build_cat) {
+                (true, "Combat") => "armory",
+                (true, _) => "buildings",
+                (false, _) if in_infantry_list(&reference, &row.section) => "infantry",
+                (false, _) => "vehicles",
+            },
+            build_cat,
+        );
 
         // RA2. The build time: the cost times `BuildSpeed` game minutes per 1000 credits, in
         // ticks, at least 1, and for a wall times `WallBuildSpeedCoefficient` (plan section 4.2).
@@ -1123,7 +1340,281 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
             "{id} is shipped but not mapped to an ini section"
         );
     }
+
+    // Every field of every item's entries in the shipped files is audited above or is on the
+    // list of the game's own fields, so that a field added later cannot go unaudited unseen
+    // (advisory review 1, data P1-2).
+    for &(file, list, fields) in ITEM_FIELDS {
+        let shipped = entry_fields(file, list);
+        let listed: BTreeSet<&str> = fields.iter().map(|(name, _)| *name).collect();
+        assert_eq!(
+            listed.len(),
+            fields.len(),
+            "{file} {list}: a field listed twice"
+        );
+        assert_eq!(
+            shipped.iter().map(String::as_str).collect::<BTreeSet<_>>(),
+            listed,
+            "{file} {list}: the fields of the shipped entries and those the audit lists"
+        );
+        for (name, kind) in fields {
+            match kind {
+                Field::Key => {}
+                Field::Own(reason) => assert!(!reason.is_empty(), "{file} {list}.{name}"),
+                Field::Audited(audited) => assert!(
+                    differences.checked.contains(*audited),
+                    "{file} {list}.{name}: the audit never compared {audited:?}"
+                ),
+            }
+        }
+    }
     differences.finish();
+}
+
+/// What the audit does with a field of an item's entry in a shipped data file.
+enum Field {
+    /// The id that names the item.
+    Key,
+    /// Compared with the reference, under this name in `ra2_differences.tsv`.
+    Audited(&'static str),
+    /// The game's own value, with the reason; no reference value corresponds to it (yet).
+    Own(&'static str),
+}
+
+/// Every field of the entries of units and buildings in the shipped data files: file, list,
+/// and for each field what the audit does with it. The audit fails on a field of a shipped
+/// entry that is not here, on one here that no entry has, and on an audited one it did not
+/// compare.
+const ITEM_FIELDS: &[(&str, &str, &[(&str, Field)])] = &[
+    (
+        "units.ron",
+        "units",
+        &[
+            ("id", Field::Key),
+            ("speed", Field::Audited("speed")),
+            ("sprite", Field::Own("art")),
+        ],
+    ),
+    (
+        "economy.ron",
+        "buildings",
+        &[
+            ("id", Field::Key),
+            ("sprite", Field::Own("art")),
+            (
+                "width",
+                Field::Own("footprints are the game's until a later milestone (R9)"),
+            ),
+            (
+                "height",
+                Field::Own("footprints are the game's until a later milestone (R9)"),
+            ),
+            ("cost", Field::Audited("cost")),
+            ("build_time", Field::Audited("build_time")),
+            ("producer", Field::Audited("producer")),
+            ("prerequisites", Field::Audited("prerequisites")),
+            ("power_produced", Field::Audited("power_produced")),
+            ("power_consumed", Field::Audited("power_consumed")),
+            ("sell_value", Field::Audited("sell_value")),
+            ("free_units", Field::Audited("free_units")),
+        ],
+    ),
+    (
+        "economy.ron",
+        "units",
+        &[
+            ("unit", Field::Key),
+            ("cost", Field::Audited("cost")),
+            ("build_time", Field::Audited("build_time")),
+            ("producer", Field::Audited("producer")),
+            ("prerequisites", Field::Audited("prerequisites")),
+        ],
+    ),
+    (
+        "economy.ron",
+        "harvesters",
+        &[
+            ("unit", Field::Key),
+            (
+                "capacity",
+                Field::Own("ore units of M3; bails and `Storage` come with RA5"),
+            ),
+            (
+                "harvest_rate",
+                Field::Own("ore units of M3; bails and `Storage` come with RA5"),
+            ),
+        ],
+    ),
+    (
+        "economy.ron",
+        "refineries",
+        &[
+            ("building", Field::Audited("refinery")),
+            (
+                "credits_per_ore",
+                Field::Own("ore units of M3; bails come with RA5"),
+            ),
+        ],
+    ),
+    (
+        "combat.ron",
+        "units",
+        &[
+            ("unit", Field::Key),
+            ("hit_points", Field::Audited("strength")),
+            ("armour", Field::Audited("armour")),
+            ("sight", Field::Audited("sight")),
+            ("weapons", Field::Audited("weapons")),
+            ("elite_weapons", Field::Audited("elite_weapons")),
+            ("air_range_bonus", Field::Audited("air_range_bonus")),
+            ("land_targeting", Field::Audited("land_targeting")),
+            ("naval_targeting", Field::Audited("naval_targeting")),
+            ("underwater", Field::Audited("underwater")),
+            ("organic", Field::Audited("organic")),
+        ],
+    ),
+    (
+        "combat.ron",
+        "buildings",
+        &[
+            ("building", Field::Key),
+            ("hit_points", Field::Audited("strength")),
+            ("armour", Field::Audited("armour")),
+            ("sight", Field::Audited("sight")),
+            ("weapons", Field::Audited("weapons")),
+            ("elite_weapons", Field::Audited("elite_weapons")),
+            ("air_range_bonus", Field::Audited("air_range_bonus")),
+            ("land_targeting", Field::Audited("land_targeting")),
+            ("naval_targeting", Field::Audited("naval_targeting")),
+            ("wall", Field::Audited("wall")),
+        ],
+    ),
+    (
+        "arsenal.ron",
+        "entries",
+        &[
+            ("id", Field::Key),
+            ("label", Field::Own("the game's text")),
+            ("description", Field::Own("the game's text")),
+            ("category", Field::Audited("category")),
+            ("domain", Field::Audited("domain")),
+            (
+                "role",
+                Field::Own("the specialist mechanism of M9, replaced by RA6"),
+            ),
+            (
+                "cooldown",
+                Field::Own("a term of the role (M9); RA6 ports the recharge times"),
+            ),
+            ("radius", Field::Own("a term of the role (M9)")),
+            ("strength", Field::Own("a term of the role (M9)")),
+            ("capacity", Field::Audited("capacity")),
+            ("art", Field::Own("art")),
+            ("side", Field::Audited("side")),
+            ("factory", Field::Audited("factory")),
+            ("owner_sides", Field::Audited("owner_sides")),
+            ("required_countries", Field::Audited("required_countries")),
+            ("forbidden_countries", Field::Audited("forbidden_countries")),
+            ("tech_level", Field::Audited("tech_level")),
+            ("prerequisite_groups", Field::Audited("prerequisites")),
+            ("build_limit", Field::Audited("build_limit")),
+            ("adjacent", Field::Audited("adjacent")),
+            ("base_normal", Field::Audited("base_normal")),
+            ("radar", Field::Audited("radar")),
+            ("sellable", Field::Audited("sellable")),
+            ("repairable", Field::Audited("repairable")),
+            ("powered", Field::Audited("powered")),
+            ("is_powered", Field::Audited("is_powered")),
+            ("unit_repair", Field::Audited("unit_repair")),
+            ("crusher", Field::Audited("crusher")),
+            ("crushable", Field::Audited("crushable")),
+            ("size", Field::Audited("size")),
+            ("infantry", Field::Audited("infantry")),
+            ("trainable", Field::Audited("trainable")),
+            ("veteran_abilities", Field::Audited("veteran_abilities")),
+            ("elite_abilities", Field::Audited("elite_abilities")),
+            ("crewed", Field::Audited("crewed")),
+            ("self_healing", Field::Audited("self_healing")),
+            ("ammo", Field::Audited("ammo")),
+            ("airport_bound", Field::Audited("airport_bound")),
+            ("docks", Field::Audited("docks")),
+            ("spawns", Field::Audited("spawns")),
+            ("spawns_number", Field::Audited("spawns_number")),
+            ("spawn_regen", Field::Audited("spawn_regen")),
+            ("spawn_reload", Field::Audited("spawn_reload")),
+            ("launcher", Field::Audited("launcher")),
+            ("missile", Field::Audited("missile")),
+            ("cloakable", Field::Audited("cloakable")),
+            ("sensors_sight", Field::Audited("sensors_sight")),
+        ],
+    ),
+];
+
+/// The names of the fields of the entries of the list `list` (from the line that ends with
+/// `list: [` to the line that closes it, one entry a line, as the generator writes them) of the shipped file `file`: every entry must
+/// have the same fields. Read from the text, so that it sees what the file holds and not what
+/// the loader keeps.
+fn entry_fields(file: &str, list: &str) -> Vec<String> {
+    let path = data_dir().join(file);
+    let text = std::fs::read_to_string(&path).unwrap_or_else(|e| panic!("{}: {e}", path.display()));
+    let mut lines = text
+        .lines()
+        .skip_while(|line| !line.ends_with(&format!("{list}: [")))
+        .skip(1)
+        .take_while(|line| !line.trim_start().starts_with(']'))
+        .peekable();
+    assert!(lines.peek().is_some(), "{file}: no list {list}");
+    let mut fields: Option<Vec<String>> = None;
+    for line in lines {
+        let line = line.trim_start();
+        assert!(
+            line.starts_with('('),
+            "{file} {list}: not an entry: {line:?}"
+        );
+        let mut found = Vec::new();
+        let mut depth = 0;
+        let mut word = String::new();
+        let mut chars = line.chars().peekable();
+        while let Some(c) = chars.next() {
+            match c {
+                '"' => {
+                    // A string: to its closing quote.
+                    while let Some(inner) = chars.next() {
+                        match inner {
+                            '\\' => {
+                                chars.next();
+                            }
+                            '"' => break,
+                            _ => {}
+                        }
+                    }
+                    word.clear();
+                }
+                '/' if chars.peek() == Some(&'/') => break,
+                '(' | '[' => {
+                    depth += 1;
+                    word.clear();
+                }
+                ')' | ']' => {
+                    depth -= 1;
+                    word.clear();
+                }
+                ':' => {
+                    if depth == 1 && !word.is_empty() {
+                        found.push(std::mem::take(&mut word));
+                    }
+                    word.clear();
+                }
+                c if c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_' => word.push(c),
+                _ => word.clear(),
+            }
+        }
+        match &fields {
+            None => fields = Some(found),
+            Some(first) => assert_eq!(&found, first, "{file} {list}: {line:?}"),
+        }
+    }
+    fields.unwrap_or_default()
 }
 
 // --- The audit of the weapons, the warheads and the area effects (RA3) -----------------------------
@@ -1431,15 +1922,20 @@ fn every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_d
         let game = definitions
             .effect(effect)
             .unwrap_or_else(|| panic!("the effect {} is not shipped", effect.id()));
-        if let Some((section, key)) = damage {
-            let text = reference.value(section, key);
-            differences.check(
-                &id,
-                "damage",
-                &game.damage.to_string(),
-                &convert(Conversion::Int, text).to_string(),
-                text,
-            );
+        match damage {
+            Some((section, key)) => {
+                let text = reference.value(section, key);
+                differences.check(
+                    &id,
+                    "damage",
+                    &game.damage.to_string(),
+                    &convert(Conversion::Int, text).to_string(),
+                    text,
+                );
+            }
+            // The game's own value (docs/DECISIONS.md R35): it is a difference, and needs its
+            // row, which names the value; the reference has none ("-").
+            None => differences.check(&id, "damage", &game.damage.to_string(), "-", "-"),
         }
         let warhead = reference.value(section, key);
         differences.check(
@@ -2381,7 +2877,7 @@ fn the_shipped_skirmish_file_and_the_default_options_are_those_of_the_lobby() {
     );
     // The starting unit types (plan section 4.9): the mapped units in the game without
     // `AllowedToStartInMultiplayer=no`, of a tech level of the lobby, built by one side only and
-    // by all of its countries, other than the base units; infantry by `Category=Soldier`.
+    // by all of its countries, other than the base units; infantry by `[InfantryTypes]`.
     let top = convert(Conversion::Int, dialog("TechLevel"));
     let base_units = list(reference.get("General", "BaseUnit"));
     for (side, name) in [(Side::Allied, "GDI"), (Side::Soviet, "Nod")] {
@@ -2406,7 +2902,7 @@ fn the_shipped_skirmish_file_and_the_default_options_are_those_of_the_lobby() {
                 && !get("RequiresStolenSovietTech").is_some()
                 && !base_units.contains(&row.section.as_str());
             if eligible {
-                if get("Category") == Some("Soldier") {
+                if in_infantry_list(&reference, &row.section) {
                     infantry.insert(row.game_id.clone());
                 } else {
                     vehicles.insert(row.game_id.clone());
@@ -2492,45 +2988,35 @@ fn the_conversions_round_half_away_from_zero_in_integers() {
     };
     let foot = "{4A582744-9839-11d1-B709-00A024DDAFD1}";
     assert_eq!(
-        speed(&unit(&[
-            ("Speed", "4"),
-            ("Category", "Soldier"),
-            ("Locomotor", foot)
-        ]))
-        .0,
-        11
+        speed(&unit(&[("Speed", "4"), ("Locomotor", foot)]), true).0,
+        11,
+        "infantry on foot (a section of `[InfantryTypes]`): the factor 3/2"
     );
     assert_eq!(
-        speed(&unit(&[
-            ("Speed", "7"),
-            ("Category", "AFV"),
-            ("Locomotor", foot)
-        ]))
-        .0,
+        speed(&unit(&[("Speed", "7"), ("Locomotor", foot)]), false).0,
         13
     );
     assert_eq!(
-        speed(&unit(&[
-            ("Speed", "14"),
-            ("Category", "AirPower"),
-            ("Locomotor", foot)
-        ]))
-        .0,
+        speed(&unit(&[("Speed", "14"), ("Locomotor", foot)]), false).0,
         26
     );
     // A jumpjet moves by `JumpjetSpeed`; a speed above the engine's 255 leptons is capped.
     let jumpjet = "{92612C46-F71F-11d1-AC9F-006008055BB5}";
     assert_eq!(
-        speed(&unit(&[
-            ("Speed", "9"),
-            ("JumpjetSpeed", "30"),
-            ("Locomotor", jumpjet)
-        ]))
+        speed(
+            &unit(&[
+                ("Speed", "9"),
+                ("JumpjetSpeed", "30"),
+                ("Locomotor", jumpjet)
+            ]),
+            true
+        )
         .0,
-        23
+        23,
+        "a jumpjet, also one of the infantry list (the Rocketeer): no factor"
     );
     assert_eq!(
-        speed(&unit(&[("Speed", "200"), ("Locomotor", foot)])).0,
+        speed(&unit(&[("Speed", "200"), ("Locomotor", foot)]), false).0,
         191
     );
 }

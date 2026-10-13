@@ -18,7 +18,10 @@ parity audit compares the shipped `assets/data/*.ron` with these tab separated t
 * `ra2_differences.tsv`: intentional differences between the shipped data and the reference.
   Columns `game_id`, `field`, `game_value`, `reference_value`, `reason`. Written by hand. A row
   matches one audited value: the game id (`rules` for a value of `rules.ron`), the field as the
-  audit names it (`cost`, `strength`, `sight`, `speed`, `prerequisites`, `power`, `sell_value`,
+  audit names it (`cost`, `strength`, `sight`, `speed`, `prerequisites`, `power_produced`,
+  `power_consumed`, `sell_value` (the section's `Soylent` if it has one that is not 0, else the
+  cost times `RefundPercent`), `free_units`, `refinery`, `producer`, `factory`, `side`,
+  `domain`, `capacity`, `category`,
   `owner_sides`, `required_countries`, `forbidden_countries`, `tech_level`, `present`, since
   RA2 `build_time`, `build_limit`, `lane`, `adjacent`, `base_normal`, `radar`, `sellable`,
   `repairable`, `powered`, `is_powered`, `unit_repair`, since RA3 `armour`, `weapons`,
@@ -33,8 +36,11 @@ parity audit compares the shipped `assets/data/*.ron` with these tab separated t
   `projectile_speed` is `<Projectile>:instant`, `<Projectile>:arcing:<Range>` or
   `<Projectile>:<Speed>`), a warhead as `warhead.<id>` (`versus`, `cell_spread`,
   `percent_at_max`, `wall`, `wood`) and an area effect as `effect.<id>` (`damage`, `warhead`),
-  since a weapon and a unit may share an id. The audit fails on a difference
-  without a row and on a row that no longer applies.
+  since a weapon and a unit may share an id. A value that is the game's own where the
+  reference has none (the damage of the effects `c4` and `radiation`) has a row with the
+  reference value `-`. The audit fails on a difference without a row and on a row that no longer
+  applies; and on a field of an item's entry in a shipped file that it neither compares nor has
+  on its list of the game's own fields (`ITEM_FIELDS` in `ra9_data_parity.rs`).
 
 The shipped data is generated from these tables, and audited against them:
 

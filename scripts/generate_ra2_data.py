@@ -601,13 +601,16 @@ def convert(kind, text):
 JUMPJET = "{92612C46-"
 
 
-def speed(section):
-    """Subcells per tick of a unit section, and the key it comes from (section 4.1)."""
+def speed(section, infantry):
+    """Subcells per tick of a unit section, and the key it comes from (section 4.1).
+
+    `infantry`: whether `[InfantryTypes]` lists the section, the one test of "infantry on foot"
+    in the pipeline (the arsenal's `infantry` and the audit use the same list)."""
     if section["Locomotor"].startswith(JUMPJET):
         key, leptons = "JumpjetSpeed", int(section["JumpjetSpeed"])
     else:
         key, leptons = "Speed", min(int(section["Speed"]) * 256 // 100, 255)
-        if section.get("Category") == "Soldier":
+        if infantry:
             leptons = leptons * 3 // 2
     return leptons_per_tick(leptons), key
 
@@ -944,11 +947,13 @@ class Data:
         ]
         for game_id, values in self.units.items():
             item = self.items[game_id]
-            value, key = speed(item.ini)
-            keys = (key,) if key == "JumpjetSpeed" else (key, "Category")
+            value, key = speed(item.ini, bool(item.infantry))
+            source = item.comment(key)
+            if key == "Speed" and item.infantry_list:
+                source += f"; {item.infantry_list}"
             lines.append(
                 f'        (id: "{game_id}", speed: {value}, sprite: "{values[9]}"),'
-                f" // {item.comment(*keys)}"
+                f" // {source}"
             )
         lines += ["    ],", ")"]
         return "\n".join(lines) + "\n"
