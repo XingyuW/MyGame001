@@ -495,7 +495,9 @@ fn main() -> ExitCode {
                     SkirmishDefinitions::rotating(&groups[first], turn),
                     SkirmishDefinitions::rotating(&groups[second], turn + 1),
                 ) else {
-                    continue;
+                    // A side without a country would be a configuration that is silently not
+                    // soaked (`pairing_groups` leaves empty groups out).
+                    panic!("a side of the shipped skirmish file has no country");
                 };
                 {
                     for difficulty in 0..set.ai.difficulties.len() {

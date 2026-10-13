@@ -127,8 +127,10 @@ fn main() -> ExitCode {
                 * difficulties
                 + sides[1].1;
             let country = |slot: usize| {
+                // A side without a country would be a duel that is not played: an error, not
+                // a match of country 0 (`pairing_groups` leaves empty groups out).
                 SkirmishDefinitions::rotating(&groups[sides[slot].0], map + pairing + slot)
-                    .unwrap_or(0)
+                    .expect("a country of the side")
             };
             jobs.push(Job {
                 map,

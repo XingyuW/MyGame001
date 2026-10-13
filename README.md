@@ -570,9 +570,11 @@ under `docs/validation/ra2-parity/<label>/`.
 
 `--smoke-test <frames>` runs the real game for that many frames, plays the menu flow, and exits
 with code 0 only if every check passes: it measures the menu's layout with its longest texts,
-starts four matches by the menu's buttons (one with every row of the lobby changed, in which it
-deploys the MCV, packs the yard up and deploys it again; its restart; one that starts with the
-Construction Yards; one with the lobby's defaults), and compares each with its choices. The
+starts four matches with the functions the menu's buttons call (the systems that read the
+mouse are not driven; one match with most rows of the lobby changed, in which it deploys the
+MCV, packs the yard up and deploys it again; its restart; one that starts with the Construction
+Yards; one with the lobby's defaults), and compares each with its choices of countries, options
+and rules (not with the chosen game speed and difficulty). The
 benchmark times ticks of 200 fighting units against the budget in `docs/DECISIONS.md`; the soak
 plays computer players against each other for 36,000 ticks on every map and pairing of the sides.
 `m14_duels` plays computer players one against one to the end on every map (all pairings of sides

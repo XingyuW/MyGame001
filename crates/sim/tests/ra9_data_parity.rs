@@ -1381,11 +1381,15 @@ enum Field {
     Own(&'static str),
 }
 
+/// A list of a shipped data file: the file, the list, and each field of its entries with what
+/// the audit does with it.
+type ListFields = (&'static str, &'static str, &'static [(&'static str, Field)]);
+
 /// Every field of the entries of units and buildings in the shipped data files: file, list,
 /// and for each field what the audit does with it. The audit fails on a field of a shipped
 /// entry that is not here, on one here that no entry has, and on an audited one it did not
 /// compare.
-const ITEM_FIELDS: &[(&str, &str, &[(&str, Field)])] = &[
+const ITEM_FIELDS: &[ListFields] = &[
     (
         "units.ron",
         "units",
