@@ -1,0 +1,525 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 2.69s
+     Running `target/release/examples/m7_soak`
+played 4 of 260: shipped demo: korea against cuba, both easy
+played 6 of 260: shipped demo: korea against cuba, both brutal
+played 1 of 260: shipped demo: america against korea, both easy
+played 2 of 260: shipped demo: america against korea, both medium
+played 10 of 260: shipped demo: russia against libya, both easy
+played 3 of 260: shipped demo: america against korea, both brutal
+played 7 of 260: shipped demo: cuba against germany, both easy
+played 9 of 260: shipped demo: cuba against germany, both brutal
+played 5 of 260: shipped demo: korea against cuba, both medium
+played 8 of 260: shipped demo: cuba against germany, both medium
+played 13 of 260: shipped crossroads: korea against france, both easy
+played 16 of 260: shipped crossroads: france against russia, both easy
+played 15 of 260: shipped crossroads: korea against france, both brutal
+played 17 of 260: shipped crossroads: france against russia, both medium
+played 19 of 260: shipped crossroads: russia against great_britain, both easy
+played 11 of 260: shipped demo: russia against libya, both medium
+played 12 of 260: shipped demo: russia against libya, both brutal
+played 14 of 260: shipped crossroads: korea against france, both medium
+played 18 of 260: shipped crossroads: france against russia, both brutal
+played 20 of 260: shipped crossroads: russia against great_britain, both medium
+played 26 of 260: shipped riverlands: france against germany, both medium
+played 25 of 260: shipped riverlands: france against germany, both easy
+played 22 of 260: shipped crossroads: libya against iraq, both easy
+played 27 of 260: shipped riverlands: france against germany, both brutal
+played 23 of 260: shipped crossroads: libya against iraq, both medium
+played 28 of 260: shipped riverlands: germany against libya, both easy
+played 21 of 260: shipped crossroads: russia against great_britain, both brutal
+played 29 of 260: shipped riverlands: germany against libya, both medium
+played 30 of 260: shipped riverlands: germany against libya, both brutal
+played 24 of 260: shipped crossroads: libya against iraq, both brutal
+played 31 of 260: shipped riverlands: libya against america, both easy
+played 34 of 260: shipped riverlands: iraq against cuba, both easy
+played 32 of 260: shipped riverlands: libya against america, both medium
+played 35 of 260: shipped riverlands: iraq against cuba, both medium
+played 33 of 260: shipped riverlands: libya against america, both brutal
+played 36 of 260: shipped riverlands: iraq against cuba, both brutal
+played 37 of 260: shipped liberty_bay: germany against great_britain, both easy
+played 40 of 260: shipped liberty_bay: great_britain against iraq, both easy
+played 38 of 260: shipped liberty_bay: germany against great_britain, both medium
+played 43 of 260: shipped liberty_bay: iraq against korea, both easy
+played 46 of 260: shipped liberty_bay: cuba against russia, both easy
+played 39 of 260: shipped liberty_bay: germany against great_britain, both brutal
+played 41 of 260: shipped liberty_bay: great_britain against iraq, both medium
+played 44 of 260: shipped liberty_bay: iraq against korea, both medium
+played 42 of 260: shipped liberty_bay: great_britain against iraq, both brutal
+played 45 of 260: shipped liberty_bay: iraq against korea, both brutal
+played 49 of 260: shipped frostline: great_britain against america, both easy
+played 47 of 260: shipped liberty_bay: cuba against russia, both medium
+played 52 of 260: shipped frostline: america against cuba, both easy
+played 50 of 260: shipped frostline: great_britain against america, both medium
+played 48 of 260: shipped liberty_bay: cuba against russia, both brutal
+played 55 of 260: shipped frostline: cuba against france, both easy
+played 54 of 260: shipped frostline: america against cuba, both brutal
+played 51 of 260: shipped frostline: great_britain against america, both brutal
+played 53 of 260: shipped frostline: america against cuba, both medium
+played 56 of 260: shipped frostline: cuba against france, both medium
+played 58 of 260: shipped frostline: russia against libya, both easy
+played 61 of 260: shipped oasis_gulf: america against korea, both easy
+played 57 of 260: shipped frostline: cuba against france, both brutal
+played 59 of 260: shipped frostline: russia against libya, both medium
+played 64 of 260: shipped oasis_gulf: korea against russia, both easy
+played 60 of 260: shipped frostline: russia against libya, both brutal
+played 62 of 260: shipped oasis_gulf: america against korea, both medium
+played 65 of 260: shipped oasis_gulf: korea against russia, both medium
+played 63 of 260: shipped oasis_gulf: america against korea, both brutal
+played 66 of 260: shipped oasis_gulf: korea against russia, both brutal
+played 67 of 260: shipped oasis_gulf: russia against germany, both easy
+played 70 of 260: shipped oasis_gulf: libya against iraq, both easy
+played 68 of 260: shipped oasis_gulf: russia against germany, both medium
+played 69 of 260: shipped oasis_gulf: russia against germany, both brutal
+played 71 of 260: shipped oasis_gulf: libya against iraq, both medium
+played 72 of 260: shipped oasis_gulf: libya against iraq, both brutal
+played 73 of 260: shipped coral_archipelago: korea against france, both easy
+played 76 of 260: shipped coral_archipelago: france against libya, both easy
+played 74 of 260: shipped coral_archipelago: korea against france, both medium
+played 75 of 260: shipped coral_archipelago: korea against france, both brutal
+played 79 of 260: shipped coral_archipelago: libya against great_britain, both easy
+played 77 of 260: shipped coral_archipelago: france against libya, both medium
+played 82 of 260: shipped coral_archipelago: iraq against cuba, both easy
+played 80 of 260: shipped coral_archipelago: libya against great_britain, both medium
+played 78 of 260: shipped coral_archipelago: france against libya, both brutal
+played 81 of 260: shipped coral_archipelago: libya against great_britain, both brutal
+played 83 of 260: shipped coral_archipelago: iraq against cuba, both medium
+played 85 of 260: shipped continental_divide: france against germany, both easy
+played 84 of 260: shipped coral_archipelago: iraq against cuba, both brutal
+played 88 of 260: shipped continental_divide: germany against iraq, both easy
+played 86 of 260: shipped continental_divide: france against germany, both medium
+played 87 of 260: shipped continental_divide: france against germany, both brutal
+played 91 of 260: shipped continental_divide: iraq against america, both easy
+played 89 of 260: shipped continental_divide: germany against iraq, both medium
+played 90 of 260: shipped continental_divide: germany against iraq, both brutal
+played 94 of 260: shipped continental_divide: cuba against russia, both easy
+played 92 of 260: shipped continental_divide: iraq against america, both medium
+played 93 of 260: shipped continental_divide: iraq against america, both brutal
+played 95 of 260: shipped continental_divide: cuba against russia, both medium
+played 97 of 260: shipped steel_harbor: germany against great_britain, both easy
+played 96 of 260: shipped continental_divide: cuba against russia, both brutal
+played 100 of 260: shipped steel_harbor: great_britain against cuba, both easy
+played 98 of 260: shipped steel_harbor: germany against great_britain, both medium
+played 103 of 260: shipped steel_harbor: cuba against korea, both easy
+played 99 of 260: shipped steel_harbor: germany against great_britain, both brutal
+played 101 of 260: shipped steel_harbor: great_britain against cuba, both medium
+played 102 of 260: shipped steel_harbor: great_britain against cuba, both brutal
+played 106 of 260: shipped steel_harbor: russia against libya, both easy
+played 104 of 260: shipped steel_harbor: cuba against korea, both medium
+played 105 of 260: shipped steel_harbor: cuba against korea, both brutal
+played 109 of 260: shipped glacier_pass: great_britain against america, both easy
+played 107 of 260: shipped steel_harbor: russia against libya, both medium
+played 108 of 260: shipped steel_harbor: russia against libya, both brutal
+played 112 of 260: shipped glacier_pass: america against russia, both easy
+played 110 of 260: shipped glacier_pass: great_britain against america, both medium
+played 115 of 260: shipped glacier_pass: russia against france, both easy
+played 113 of 260: shipped glacier_pass: america against russia, both medium
+played 111 of 260: shipped glacier_pass: great_britain against america, both brutal
+played 116 of 260: shipped glacier_pass: russia against france, both medium
+played 118 of 260: shipped glacier_pass: libya against iraq, both easy
+played 121 of 260: shipped red_canyon: america against korea, both easy
+played 114 of 260: shipped glacier_pass: america against russia, both brutal
+played 122 of 260: shipped red_canyon: america against korea, both medium
+played 117 of 260: shipped glacier_pass: russia against france, both brutal
+played 123 of 260: shipped red_canyon: america against korea, both brutal
+played 119 of 260: shipped glacier_pass: libya against iraq, both medium
+played 124 of 260: shipped red_canyon: korea against libya, both easy
+played 125 of 260: shipped red_canyon: korea against libya, both medium
+played 127 of 260: shipped red_canyon: libya against germany, both easy
+played 120 of 260: shipped glacier_pass: libya against iraq, both brutal
+played 126 of 260: shipped red_canyon: korea against libya, both brutal
+played 128 of 260: shipped red_canyon: libya against germany, both medium
+played 130 of 260: shipped red_canyon: iraq against cuba, both easy
+played 129 of 260: shipped red_canyon: libya against germany, both brutal
+played 131 of 260: shipped red_canyon: iraq against cuba, both medium
+played 132 of 260: shipped red_canyon: iraq against cuba, both brutal
+played 133 of 260: shipped jungle_delta: korea against france, both easy
+played 136 of 260: shipped jungle_delta: france against iraq, both easy
+played 137 of 260: shipped jungle_delta: france against iraq, both medium
+played 134 of 260: shipped jungle_delta: korea against france, both medium
+played 139 of 260: shipped jungle_delta: iraq against great_britain, both easy
+played 135 of 260: shipped jungle_delta: korea against france, both brutal
+played 138 of 260: shipped jungle_delta: france against iraq, both brutal
+played 142 of 260: shipped jungle_delta: cuba against russia, both easy
+played 140 of 260: shipped jungle_delta: iraq against great_britain, both medium
+played 141 of 260: shipped jungle_delta: iraq against great_britain, both brutal
+played 143 of 260: shipped jungle_delta: cuba against russia, both medium
+played 144 of 260: shipped jungle_delta: cuba against russia, both brutal
+played 145 of 260: shipped pacific_atoll: france against germany, both easy
+played 146 of 260: shipped pacific_atoll: france against germany, both medium
+played 148 of 260: shipped pacific_atoll: germany against cuba, both easy
+played 151 of 260: shipped pacific_atoll: cuba against america, both easy
+played 149 of 260: shipped pacific_atoll: germany against cuba, both medium
+played 147 of 260: shipped pacific_atoll: france against germany, both brutal
+played 152 of 260: shipped pacific_atoll: cuba against america, both medium
+played 150 of 260: shipped pacific_atoll: germany against cuba, both brutal
+played 154 of 260: shipped pacific_atoll: russia against libya, both easy
+played 157 of 260: shipped iron_isthmus: germany against great_britain, both easy
+played 153 of 260: shipped pacific_atoll: cuba against america, both brutal
+played 155 of 260: shipped pacific_atoll: russia against libya, both medium
+played 158 of 260: shipped iron_isthmus: germany against great_britain, both medium
+played 156 of 260: shipped pacific_atoll: russia against libya, both brutal
+played 160 of 260: shipped iron_isthmus: great_britain against russia, both easy
+played 159 of 260: shipped iron_isthmus: germany against great_britain, both brutal
+played 161 of 260: shipped iron_isthmus: great_britain against russia, both medium
+played 163 of 260: shipped iron_isthmus: russia against korea, both easy
+played 162 of 260: shipped iron_isthmus: great_britain against russia, both brutal
+played 166 of 260: shipped iron_isthmus: libya against iraq, both easy
+played 164 of 260: shipped iron_isthmus: russia against korea, both medium
+played 165 of 260: shipped iron_isthmus: russia against korea, both brutal
+played 167 of 260: shipped iron_isthmus: libya against iraq, both medium
+played 169 of 260: shipped arctic_floes: great_britain against america, both easy
+played 170 of 260: shipped arctic_floes: great_britain against america, both medium
+played 168 of 260: shipped iron_isthmus: libya against iraq, both brutal
+played 172 of 260: shipped arctic_floes: america against libya, both easy
+played 171 of 260: shipped arctic_floes: great_britain against america, both brutal
+played 173 of 260: shipped arctic_floes: america against libya, both medium
+played 175 of 260: shipped arctic_floes: libya against france, both easy
+played 174 of 260: shipped arctic_floes: america against libya, both brutal
+played 176 of 260: shipped arctic_floes: libya against france, both medium
+played 178 of 260: shipped arctic_floes: iraq against cuba, both easy
+played 177 of 260: shipped arctic_floes: libya against france, both brutal
+played 179 of 260: shipped arctic_floes: iraq against cuba, both medium
+played 181 of 260: shipped ember_caldera: america against korea, both easy
+played 180 of 260: shipped arctic_floes: iraq against cuba, both brutal
+played 182 of 260: shipped ember_caldera: america against korea, both medium
+played 184 of 260: shipped ember_caldera: korea against iraq, both easy
+played 185 of 260: shipped ember_caldera: korea against iraq, both medium
+played 183 of 260: shipped ember_caldera: america against korea, both brutal
+played 187 of 260: shipped ember_caldera: iraq against germany, both easy
+played 186 of 260: shipped ember_caldera: korea against iraq, both brutal
+played 190 of 260: shipped ember_caldera: cuba against russia, both easy
+played 188 of 260: shipped ember_caldera: iraq against germany, both medium
+played 191 of 260: shipped ember_caldera: cuba against russia, both medium
+played 192 of 260: shipped ember_caldera: cuba against russia, both brutal
+played 189 of 260: shipped ember_caldera: iraq against germany, both brutal
+played 193 of 260: shipped frozen_sound: korea against france, both easy
+played 196 of 260: shipped frozen_sound: france against cuba, both easy
+played 194 of 260: shipped frozen_sound: korea against france, both medium
+played 195 of 260: shipped frozen_sound: korea against france, both brutal
+played 199 of 260: shipped frozen_sound: cuba against great_britain, both easy
+played 197 of 260: shipped frozen_sound: france against cuba, both medium
+played 202 of 260: shipped frozen_sound: russia against libya, both easy
+played 198 of 260: shipped frozen_sound: france against cuba, both brutal
+played 200 of 260: shipped frozen_sound: cuba against great_britain, both medium
+played 203 of 260: shipped frozen_sound: russia against libya, both medium
+played 201 of 260: shipped frozen_sound: cuba against great_britain, both brutal
+played 205 of 260: shipped harvest_plains: france against germany, both easy
+played 204 of 260: shipped frozen_sound: russia against libya, both brutal
+played 206 of 260: shipped harvest_plains: france against germany, both medium
+played 208 of 260: shipped harvest_plains: germany against russia, both easy
+played 211 of 260: shipped harvest_plains: russia against america, both easy
+played 207 of 260: shipped harvest_plains: france against germany, both brutal
+played 209 of 260: shipped harvest_plains: germany against russia, both medium
+played 210 of 260: shipped harvest_plains: germany against russia, both brutal
+played 212 of 260: shipped harvest_plains: russia against america, both medium
+played 214 of 260: shipped harvest_plains: libya against iraq, both easy
+played 213 of 260: shipped harvest_plains: russia against america, both brutal
+played 215 of 260: shipped harvest_plains: libya against iraq, both medium
+played 217 of 260: shipped black_water: germany against great_britain, both easy
+played 216 of 260: shipped harvest_plains: libya against iraq, both brutal
+played 220 of 260: shipped black_water: great_britain against libya, both easy
+played 218 of 260: shipped black_water: germany against great_britain, both medium
+played 221 of 260: shipped black_water: great_britain against libya, both medium
+played 219 of 260: shipped black_water: germany against great_britain, both brutal
+played 223 of 260: shipped black_water: libya against korea, both easy
+played 222 of 260: shipped black_water: great_britain against libya, both brutal
+played 224 of 260: shipped black_water: libya against korea, both medium
+played 226 of 260: shipped black_water: iraq against cuba, both easy
+played 225 of 260: shipped black_water: libya against korea, both brutal
+played 229 of 260: shipped thousand_lakes: great_britain against america, both easy
+played 227 of 260: shipped black_water: iraq against cuba, both medium
+played 228 of 260: shipped black_water: iraq against cuba, both brutal
+played 232 of 260: shipped thousand_lakes: america against iraq, both easy
+played 230 of 260: shipped thousand_lakes: great_britain against america, both medium
+played 235 of 260: shipped thousand_lakes: iraq against france, both easy
+played 233 of 260: shipped thousand_lakes: america against iraq, both medium
+played 231 of 260: shipped thousand_lakes: great_britain against america, both brutal
+played 238 of 260: shipped thousand_lakes: cuba against russia, both easy
+played 234 of 260: shipped thousand_lakes: america against iraq, both brutal
+played 236 of 260: shipped thousand_lakes: iraq against france, both medium
+played 239 of 260: shipped thousand_lakes: cuba against russia, both medium
+played 241 of 260: shipped wheel_of_worlds: america against korea, both easy
+played 237 of 260: shipped thousand_lakes: iraq against france, both brutal
+played 242 of 260: shipped wheel_of_worlds: america against korea, both medium
+played 240 of 260: shipped thousand_lakes: cuba against russia, both brutal
+played 244 of 260: shipped wheel_of_worlds: korea against cuba, both easy
+played 253 of 260: fixture skirmish_40x40: red against red, both easy
+played 254 of 260: fixture skirmish_40x40: red against red, both normal
+played 243 of 260: shipped wheel_of_worlds: america against korea, both brutal
+played 255 of 260: fixture skirmish_40x40: red against blue, both easy
+played 247 of 260: shipped wheel_of_worlds: cuba against germany, both easy
+played 256 of 260: fixture skirmish_40x40: red against blue, both normal
+played 257 of 260: fixture skirmish_40x40: blue against red, both easy
+played 258 of 260: fixture skirmish_40x40: blue against red, both normal
+played 259 of 260: fixture skirmish_40x40: blue against blue, both easy
+played 245 of 260: shipped wheel_of_worlds: korea against cuba, both medium
+played 260 of 260: fixture skirmish_40x40: blue against blue, both normal
+played 246 of 260: shipped wheel_of_worlds: korea against cuba, both brutal
+played 250 of 260: shipped wheel_of_worlds: russia against libya, both easy
+played 248 of 260: shipped wheel_of_worlds: cuba against germany, both medium
+played 251 of 260: shipped wheel_of_worlds: russia against libya, both medium
+played 249 of 260: shipped wheel_of_worlds: cuba against germany, both brutal
+played 252 of 260: shipped wheel_of_worlds: russia against libya, both brutal
+shipped demo: america against korea, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 32.68 s for both runs
+shipped demo: america against korea, both medium: 36000 ticks, 2 matches (1 ended, the last still running), 32.77 s for both runs
+shipped demo: america against korea, both brutal: 36000 ticks, 2 matches (1 ended, the last still running), 33.03 s for both runs
+shipped demo: korea against cuba, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 32.60 s for both runs
+shipped demo: korea against cuba, both medium: 36000 ticks, 4 matches (3 ended, the last still running), 33.75 s for both runs
+shipped demo: korea against cuba, both brutal: 36000 ticks, 2 matches (1 ended, the last still running), 32.66 s for both runs
+shipped demo: cuba against germany, both easy: 36000 ticks, 3 matches (2 ended, the last still running), 33.24 s for both runs
+shipped demo: cuba against germany, both medium: 36000 ticks, 3 matches (2 ended, the last still running), 34.51 s for both runs
+shipped demo: cuba against germany, both brutal: 36000 ticks, 2 matches (1 ended, the last still running), 33.72 s for both runs
+shipped demo: russia against libya, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 32.99 s for both runs
+shipped demo: russia against libya, both medium: 36000 ticks, 3 matches (2 ended, the last still running), 33.58 s for both runs
+shipped demo: russia against libya, both brutal: 36000 ticks, 3 matches (2 ended, the last still running), 33.68 s for both runs
+shipped crossroads: korea against france, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 32.25 s for both runs
+shipped crossroads: korea against france, both medium: 36000 ticks, 2 matches (1 ended, the last still running), 33.85 s for both runs
+shipped crossroads: korea against france, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 32.83 s for both runs
+shipped crossroads: france against russia, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 32.10 s for both runs
+shipped crossroads: france against russia, both medium: 36000 ticks, 4 matches (3 ended, the last still running), 32.59 s for both runs
+shipped crossroads: france against russia, both brutal: 36000 ticks, 2 matches (1 ended, the last still running), 34.07 s for both runs
+shipped crossroads: russia against great_britain, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 32.24 s for both runs
+shipped crossroads: russia against great_britain, both medium: 36000 ticks, 2 matches (1 ended, the last still running), 34.04 s for both runs
+shipped crossroads: russia against great_britain, both brutal: 36000 ticks, 2 matches (1 ended, the last still running), 34.07 s for both runs
+shipped crossroads: libya against iraq, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 32.83 s for both runs
+shipped crossroads: libya against iraq, both medium: 36000 ticks, 2 matches (1 ended, the last still running), 32.89 s for both runs
+shipped crossroads: libya against iraq, both brutal: 36000 ticks, 2 matches (1 ended, the last still running), 34.39 s for both runs
+shipped riverlands: france against germany, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 31.54 s for both runs
+shipped riverlands: france against germany, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 31.30 s for both runs
+shipped riverlands: france against germany, both brutal: 36000 ticks, 2 matches (1 ended, the last still running), 31.95 s for both runs
+shipped riverlands: germany against libya, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 32.32 s for both runs
+shipped riverlands: germany against libya, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 31.47 s for both runs
+shipped riverlands: germany against libya, both brutal: 36000 ticks, 2 matches (1 ended, the last still running), 31.45 s for both runs
+shipped riverlands: libya against america, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 30.72 s for both runs
+shipped riverlands: libya against america, both medium: 36000 ticks, 3 matches (2 ended, the last still running), 31.46 s for both runs
+shipped riverlands: libya against america, both brutal: 36000 ticks, 3 matches (2 ended, the last still running), 31.31 s for both runs
+shipped riverlands: iraq against cuba, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 30.36 s for both runs
+shipped riverlands: iraq against cuba, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 30.29 s for both runs
+shipped riverlands: iraq against cuba, both brutal: 36000 ticks, 2 matches (1 ended, the last still running), 31.91 s for both runs
+shipped liberty_bay: germany against great_britain, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 107.58 s for both runs
+shipped liberty_bay: germany against great_britain, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 125.85 s for both runs
+shipped liberty_bay: germany against great_britain, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 142.48 s for both runs
+shipped liberty_bay: great_britain against iraq, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 106.72 s for both runs
+shipped liberty_bay: great_britain against iraq, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 126.09 s for both runs
+shipped liberty_bay: great_britain against iraq, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 139.60 s for both runs
+shipped liberty_bay: iraq against korea, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 105.87 s for both runs
+shipped liberty_bay: iraq against korea, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 125.92 s for both runs
+shipped liberty_bay: iraq against korea, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 140.95 s for both runs
+shipped liberty_bay: cuba against russia, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 106.58 s for both runs
+shipped liberty_bay: cuba against russia, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 124.38 s for both runs
+shipped liberty_bay: cuba against russia, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 137.60 s for both runs
+shipped frostline: great_britain against america, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 87.30 s for both runs
+shipped frostline: great_britain against america, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 107.70 s for both runs
+shipped frostline: great_britain against america, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 127.38 s for both runs
+shipped frostline: america against cuba, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 94.38 s for both runs
+shipped frostline: america against cuba, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 117.61 s for both runs
+shipped frostline: america against cuba, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 109.37 s for both runs
+shipped frostline: cuba against france, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 92.29 s for both runs
+shipped frostline: cuba against france, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 109.14 s for both runs
+shipped frostline: cuba against france, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 119.84 s for both runs
+shipped frostline: russia against libya, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 95.36 s for both runs
+shipped frostline: russia against libya, both medium: 36000 ticks, 2 matches (1 ended, the last still running), 102.10 s for both runs
+shipped frostline: russia against libya, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 112.59 s for both runs
+shipped oasis_gulf: america against korea, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 85.88 s for both runs
+shipped oasis_gulf: america against korea, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 98.08 s for both runs
+shipped oasis_gulf: america against korea, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 107.45 s for both runs
+shipped oasis_gulf: korea against russia, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 85.95 s for both runs
+shipped oasis_gulf: korea against russia, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 97.55 s for both runs
+shipped oasis_gulf: korea against russia, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 99.87 s for both runs
+shipped oasis_gulf: russia against germany, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 86.09 s for both runs
+shipped oasis_gulf: russia against germany, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 95.75 s for both runs
+shipped oasis_gulf: russia against germany, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 101.78 s for both runs
+shipped oasis_gulf: libya against iraq, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 86.22 s for both runs
+shipped oasis_gulf: libya against iraq, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 96.05 s for both runs
+shipped oasis_gulf: libya against iraq, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 99.80 s for both runs
+shipped coral_archipelago: korea against france, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 109.11 s for both runs
+shipped coral_archipelago: korea against france, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 129.39 s for both runs
+shipped coral_archipelago: korea against france, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 154.62 s for both runs
+shipped coral_archipelago: france against libya, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 104.92 s for both runs
+shipped coral_archipelago: france against libya, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 132.78 s for both runs
+shipped coral_archipelago: france against libya, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 149.48 s for both runs
+shipped coral_archipelago: libya against great_britain, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 106.15 s for both runs
+shipped coral_archipelago: libya against great_britain, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 134.66 s for both runs
+shipped coral_archipelago: libya against great_britain, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 149.37 s for both runs
+shipped coral_archipelago: iraq against cuba, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 107.33 s for both runs
+shipped coral_archipelago: iraq against cuba, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 131.22 s for both runs
+shipped coral_archipelago: iraq against cuba, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 143.70 s for both runs
+shipped continental_divide: france against germany, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 108.83 s for both runs
+shipped continental_divide: france against germany, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 148.47 s for both runs
+shipped continental_divide: france against germany, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 184.78 s for both runs
+shipped continental_divide: germany against iraq, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 126.60 s for both runs
+shipped continental_divide: germany against iraq, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 166.47 s for both runs
+shipped continental_divide: germany against iraq, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 188.27 s for both runs
+shipped continental_divide: iraq against america, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 144.74 s for both runs
+shipped continental_divide: iraq against america, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 170.26 s for both runs
+shipped continental_divide: iraq against america, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 195.12 s for both runs
+shipped continental_divide: cuba against russia, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 150.15 s for both runs
+shipped continental_divide: cuba against russia, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 167.41 s for both runs
+shipped continental_divide: cuba against russia, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 169.62 s for both runs
+shipped steel_harbor: germany against great_britain, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 135.39 s for both runs
+shipped steel_harbor: germany against great_britain, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 147.81 s for both runs
+shipped steel_harbor: germany against great_britain, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 175.55 s for both runs
+shipped steel_harbor: great_britain against cuba, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 121.34 s for both runs
+shipped steel_harbor: great_britain against cuba, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 155.02 s for both runs
+shipped steel_harbor: great_britain against cuba, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 160.43 s for both runs
+shipped steel_harbor: cuba against korea, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 121.76 s for both runs
+shipped steel_harbor: cuba against korea, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 148.80 s for both runs
+shipped steel_harbor: cuba against korea, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 157.76 s for both runs
+shipped steel_harbor: russia against libya, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 123.23 s for both runs
+shipped steel_harbor: russia against libya, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 152.08 s for both runs
+shipped steel_harbor: russia against libya, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 155.14 s for both runs
+shipped glacier_pass: great_britain against america, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 105.67 s for both runs
+shipped glacier_pass: great_britain against america, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 142.00 s for both runs
+shipped glacier_pass: great_britain against america, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 179.38 s for both runs
+shipped glacier_pass: america against russia, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 102.46 s for both runs
+shipped glacier_pass: america against russia, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 133.09 s for both runs
+shipped glacier_pass: america against russia, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 173.31 s for both runs
+shipped glacier_pass: russia against france, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 101.41 s for both runs
+shipped glacier_pass: russia against france, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 137.88 s for both runs
+shipped glacier_pass: russia against france, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 165.25 s for both runs
+shipped glacier_pass: libya against iraq, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 101.68 s for both runs
+shipped glacier_pass: libya against iraq, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 141.25 s for both runs
+shipped glacier_pass: libya against iraq, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 165.57 s for both runs
+shipped red_canyon: america against korea, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 75.26 s for both runs
+shipped red_canyon: america against korea, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 85.41 s for both runs
+shipped red_canyon: america against korea, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 93.44 s for both runs
+shipped red_canyon: korea against libya, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 72.73 s for both runs
+shipped red_canyon: korea against libya, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 84.04 s for both runs
+shipped red_canyon: korea against libya, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 91.07 s for both runs
+shipped red_canyon: libya against germany, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 71.72 s for both runs
+shipped red_canyon: libya against germany, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 87.86 s for both runs
+shipped red_canyon: libya against germany, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 101.68 s for both runs
+shipped red_canyon: iraq against cuba, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 85.07 s for both runs
+shipped red_canyon: iraq against cuba, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 95.15 s for both runs
+shipped red_canyon: iraq against cuba, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 100.11 s for both runs
+shipped jungle_delta: korea against france, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 106.67 s for both runs
+shipped jungle_delta: korea against france, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 130.04 s for both runs
+shipped jungle_delta: korea against france, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 147.69 s for both runs
+shipped jungle_delta: france against iraq, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 107.03 s for both runs
+shipped jungle_delta: france against iraq, both medium: 36000 ticks, 2 matches (1 ended, the last still running), 116.19 s for both runs
+shipped jungle_delta: france against iraq, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 137.21 s for both runs
+shipped jungle_delta: iraq against great_britain, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 92.46 s for both runs
+shipped jungle_delta: iraq against great_britain, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 116.48 s for both runs
+shipped jungle_delta: iraq against great_britain, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 129.45 s for both runs
+shipped jungle_delta: cuba against russia, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 93.55 s for both runs
+shipped jungle_delta: cuba against russia, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 117.43 s for both runs
+shipped jungle_delta: cuba against russia, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 123.45 s for both runs
+shipped pacific_atoll: france against germany, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 110.52 s for both runs
+shipped pacific_atoll: france against germany, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 131.33 s for both runs
+shipped pacific_atoll: france against germany, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 182.07 s for both runs
+shipped pacific_atoll: germany against cuba, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 111.81 s for both runs
+shipped pacific_atoll: germany against cuba, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 138.34 s for both runs
+shipped pacific_atoll: germany against cuba, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 164.50 s for both runs
+shipped pacific_atoll: cuba against america, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 110.64 s for both runs
+shipped pacific_atoll: cuba against america, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 128.40 s for both runs
+shipped pacific_atoll: cuba against america, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 173.80 s for both runs
+shipped pacific_atoll: russia against libya, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 112.53 s for both runs
+shipped pacific_atoll: russia against libya, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 132.64 s for both runs
+shipped pacific_atoll: russia against libya, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 148.99 s for both runs
+shipped iron_isthmus: germany against great_britain, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 92.27 s for both runs
+shipped iron_isthmus: germany against great_britain, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 108.99 s for both runs
+shipped iron_isthmus: germany against great_britain, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 125.64 s for both runs
+shipped iron_isthmus: great_britain against russia, both easy: 36000 ticks, 3 matches (2 ended, the last still running), 90.85 s for both runs
+shipped iron_isthmus: great_britain against russia, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 109.16 s for both runs
+shipped iron_isthmus: great_britain against russia, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 118.10 s for both runs
+shipped iron_isthmus: russia against korea, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 92.22 s for both runs
+shipped iron_isthmus: russia against korea, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 108.56 s for both runs
+shipped iron_isthmus: russia against korea, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 119.98 s for both runs
+shipped iron_isthmus: libya against iraq, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 90.77 s for both runs
+shipped iron_isthmus: libya against iraq, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 107.45 s for both runs
+shipped iron_isthmus: libya against iraq, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 114.95 s for both runs
+shipped arctic_floes: great_britain against america, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 90.43 s for both runs
+shipped arctic_floes: great_britain against america, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 99.63 s for both runs
+shipped arctic_floes: great_britain against america, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 104.56 s for both runs
+shipped arctic_floes: america against libya, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 88.85 s for both runs
+shipped arctic_floes: america against libya, both medium: 36000 ticks, 2 matches (1 ended, the last still running), 99.33 s for both runs
+shipped arctic_floes: america against libya, both brutal: 36000 ticks, 2 matches (1 ended, the last still running), 99.10 s for both runs
+shipped arctic_floes: libya against france, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 91.71 s for both runs
+shipped arctic_floes: libya against france, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 101.00 s for both runs
+shipped arctic_floes: libya against france, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 105.04 s for both runs
+shipped arctic_floes: iraq against cuba, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 93.76 s for both runs
+shipped arctic_floes: iraq against cuba, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 100.20 s for both runs
+shipped arctic_floes: iraq against cuba, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 104.84 s for both runs
+shipped ember_caldera: america against korea, both easy: 36000 ticks, 3 matches (2 ended, the last still running), 98.72 s for both runs
+shipped ember_caldera: america against korea, both medium: 36000 ticks, 3 matches (2 ended, the last still running), 108.69 s for both runs
+shipped ember_caldera: america against korea, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 144.14 s for both runs
+shipped ember_caldera: korea against iraq, both easy: 36000 ticks, 3 matches (2 ended, the last still running), 98.89 s for both runs
+shipped ember_caldera: korea against iraq, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 126.87 s for both runs
+shipped ember_caldera: korea against iraq, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 135.94 s for both runs
+shipped ember_caldera: iraq against germany, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 99.30 s for both runs
+shipped ember_caldera: iraq against germany, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 125.51 s for both runs
+shipped ember_caldera: iraq against germany, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 136.70 s for both runs
+shipped ember_caldera: cuba against russia, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 100.05 s for both runs
+shipped ember_caldera: cuba against russia, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 121.10 s for both runs
+shipped ember_caldera: cuba against russia, both brutal: 36000 ticks, 3 matches (2 ended, the last still running), 110.34 s for both runs
+shipped frozen_sound: korea against france, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 104.48 s for both runs
+shipped frozen_sound: korea against france, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 122.81 s for both runs
+shipped frozen_sound: korea against france, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 138.32 s for both runs
+shipped frozen_sound: france against cuba, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 105.43 s for both runs
+shipped frozen_sound: france against cuba, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 122.35 s for both runs
+shipped frozen_sound: france against cuba, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 137.45 s for both runs
+shipped frozen_sound: cuba against great_britain, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 102.98 s for both runs
+shipped frozen_sound: cuba against great_britain, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 121.60 s for both runs
+shipped frozen_sound: cuba against great_britain, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 134.69 s for both runs
+shipped frozen_sound: russia against libya, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 105.46 s for both runs
+shipped frozen_sound: russia against libya, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 122.99 s for both runs
+shipped frozen_sound: russia against libya, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 131.19 s for both runs
+shipped harvest_plains: france against germany, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 105.41 s for both runs
+shipped harvest_plains: france against germany, both medium: 36000 ticks, 2 matches (1 ended, the last still running), 116.79 s for both runs
+shipped harvest_plains: france against germany, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 152.46 s for both runs
+shipped harvest_plains: germany against russia, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 103.65 s for both runs
+shipped harvest_plains: germany against russia, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 124.63 s for both runs
+shipped harvest_plains: germany against russia, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 141.69 s for both runs
+shipped harvest_plains: russia against america, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 102.32 s for both runs
+shipped harvest_plains: russia against america, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 127.41 s for both runs
+shipped harvest_plains: russia against america, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 145.07 s for both runs
+shipped harvest_plains: libya against iraq, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 107.41 s for both runs
+shipped harvest_plains: libya against iraq, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 122.97 s for both runs
+shipped harvest_plains: libya against iraq, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 140.98 s for both runs
+shipped black_water: germany against great_britain, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 105.68 s for both runs
+shipped black_water: germany against great_britain, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 125.12 s for both runs
+shipped black_water: germany against great_britain, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 141.47 s for both runs
+shipped black_water: great_britain against libya, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 106.09 s for both runs
+shipped black_water: great_britain against libya, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 120.12 s for both runs
+shipped black_water: great_britain against libya, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 133.74 s for both runs
+shipped black_water: libya against korea, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 107.17 s for both runs
+shipped black_water: libya against korea, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 123.36 s for both runs
+shipped black_water: libya against korea, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 131.94 s for both runs
+shipped black_water: iraq against cuba, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 105.78 s for both runs
+shipped black_water: iraq against cuba, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 121.31 s for both runs
+shipped black_water: iraq against cuba, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 128.57 s for both runs
+shipped thousand_lakes: great_britain against america, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 106.73 s for both runs
+shipped thousand_lakes: great_britain against america, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 143.85 s for both runs
+shipped thousand_lakes: great_britain against america, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 176.59 s for both runs
+shipped thousand_lakes: america against iraq, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 109.57 s for both runs
+shipped thousand_lakes: america against iraq, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 147.03 s for both runs
+shipped thousand_lakes: america against iraq, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 162.09 s for both runs
+shipped thousand_lakes: iraq against france, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 108.41 s for both runs
+shipped thousand_lakes: iraq against france, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 136.61 s for both runs
+shipped thousand_lakes: iraq against france, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 170.31 s for both runs
+shipped thousand_lakes: cuba against russia, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 110.00 s for both runs
+shipped thousand_lakes: cuba against russia, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 143.87 s for both runs
+shipped thousand_lakes: cuba against russia, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 158.85 s for both runs
+shipped wheel_of_worlds: america against korea, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 103.79 s for both runs
+shipped wheel_of_worlds: america against korea, both medium: 36000 ticks, 2 matches (1 ended, the last still running), 112.64 s for both runs
+shipped wheel_of_worlds: america against korea, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 133.56 s for both runs
+shipped wheel_of_worlds: korea against cuba, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 105.19 s for both runs
+shipped wheel_of_worlds: korea against cuba, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 118.94 s for both runs
+shipped wheel_of_worlds: korea against cuba, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 134.23 s for both runs
+shipped wheel_of_worlds: cuba against germany, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 103.66 s for both runs
+shipped wheel_of_worlds: cuba against germany, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 107.56 s for both runs
+shipped wheel_of_worlds: cuba against germany, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 112.49 s for both runs
+shipped wheel_of_worlds: russia against libya, both easy: 36000 ticks, 1 matches (0 ended, the last still running), 93.55 s for both runs
+shipped wheel_of_worlds: russia against libya, both medium: 36000 ticks, 1 matches (0 ended, the last still running), 100.00 s for both runs
+shipped wheel_of_worlds: russia against libya, both brutal: 36000 ticks, 1 matches (0 ended, the last still running), 95.49 s for both runs
+fixture skirmish_40x40: red against red, both easy: 36000 ticks, 7 matches (6 ended, the last still running), 5.13 s for both runs
+fixture skirmish_40x40: red against red, both normal: 36000 ticks, 14 matches (13 ended, the last still running), 6.83 s for both runs
+fixture skirmish_40x40: red against blue, both easy: 36000 ticks, 7 matches (6 ended, the last still running), 5.21 s for both runs
+fixture skirmish_40x40: red against blue, both normal: 36000 ticks, 10 matches (9 ended, the last still running), 6.20 s for both runs
+fixture skirmish_40x40: blue against red, both easy: 36000 ticks, 7 matches (6 ended, the last still running), 5.14 s for both runs
+fixture skirmish_40x40: blue against red, both normal: 36000 ticks, 10 matches (9 ended, the last still running), 6.08 s for both runs
+fixture skirmish_40x40: blue against blue, both easy: 36000 ticks, 8 matches (7 ended, the last still running), 5.24 s for both runs
+fixture skirmish_40x40: blue against blue, both normal: 36000 ticks, 13 matches (12 ended, the last still running), 6.40 s for both runs
+m7 soak: 18720000 ticks in 2769.1 s; peak heap in use 214.5 MiB (budget 1024 MiB)
+m7 soak: passed

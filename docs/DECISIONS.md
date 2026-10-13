@@ -2971,7 +2971,7 @@ spots, the hash of the crush flag); in the game `audio` 1 and `health` 1.
    the lists they had. New: `fixtures/data/ra4` (the RA3 fixture with an airfield, a launcher
    and its rocket, a carrier and its drone, the boat's hunter, a striker, and the traits on
    the types its header names) with `tests/ra4_common`.
-6. **Size.** The shipped `arsenal.ron` has 103 KiB of the 128 KiB a data file may have
+6. **Size.** The shipped `arsenal.ron` has 100 KiB of the 128 KiB a data file may have
    (`MAX_DATA_FILE_BYTES`, R32): sixteen fields on 91 entries, and the ini keys of each in its
    comment. **Debt for RA5 and RA6**: another step of this size does not fit; the next schema
    should shorten the entries (the label and description could move to a file of their own)
@@ -3223,6 +3223,79 @@ spots, the hash of the crush flag); in the game `audio` 1 and `health` 1.
    Command and the landed aircraft on its roof; that an aircraft's automatic flight home
    reads as intended; and how a submarine that surfaces to fire and vanishes again looks.
 
+### R53. RA4: the computer player, and how long matches are now
+
+1. **Honest vision and launched units** (`ai.rs`; R50, R51). A unit that is hidden from the
+   computer player is none of the enemies it sees; a launched missile or aircraft is none of
+   its units (not commanded, not counted as armed, its sight not counted on in
+   `View::stays_visible`, since it is gone when it has done its work). Its plans build no
+   aircraft and no ship before RA8, so no match of the suite has docks, launchers or
+   submarines; crews and veterancy are in every match. `ai.ron` is unchanged, and no limit of
+   a test was changed (`MATCH_TICK_LIMIT` is 72,000).
+2. **The last stand** (`ai.rs`, `last_stand`; a fix of the end game, as the brief asks). With
+   survivors that fight on, two players can spend each other: on the RA4 fixture the two
+   brutal players stood from tick 4,400 on with a power plant, two bunkers and two idle miners
+   against a factory without credits, and neither could ever change anything (no winner after
+   72,000 ticks). The rule of D43 for a player that is broke (`sell_for_army`) never sells what
+   its army needs, and does nothing for a player that can produce no army unit. Now a player
+   that has no unit that fights and no harvester at work, and whose credits, units, buildings
+   and queue progress have not changed for `LAST_STAND_PATIENCE` (1,200) ticks, sells its
+   buildings, the dearest first, one a turn, and only in the turn of its player id
+   (`LAST_STAND_TURN`, 256 ticks: two players never sell their last building in one tick,
+   which would end a match without a winner). The survivors of crewed buildings are armed
+   units that join its next wave; a player without a building is defeated in a short game. It
+   stops when it has a unit that fights or a harvester at work again. This is close to the
+   original's computer player, which sells its base and attacks with everything when it is
+   beaten. Regression tests: `ra4_ai.rs::two_players_who_have_spent_each_other_make_their_last_stand_and_the_match_ends`
+   (it fails without the rule: no outcome after 72,000 ticks) and
+   `ai::tests::a_player_that_can_neither_fight_nor_earn_makes_its_last_stand`.
+3. **A defect of the first version of that rule, found by the duels and fixed.** The picture
+   of "nothing has changed" included the fraction of a step of progress that a queue carries
+   from tick to tick while it cannot be paid, so a player with a soldier queued and no credits
+   never stood still. One of the 756 duels then took 94,396 ticks against a limit of 72,000
+   (Crossroads, Libya easy against Korea medium; traced with `m14_duels -- full trace
+   crossroads`): from tick 45,000 on a single Conscript fired at four idle Chrono Miners, which
+   since RA4 heal themselves (R47 item 5) and so took twice as long to wear down as the miners
+   of R44 item 5, while Korea had two barracks, a war factory and no credits. Without the
+   fraction in the picture Korea makes its last stand at tick 46,000 and the match ends in
+   tick 55,159. The unit test above feeds the rule a changing fraction.
+4. **Measured** (`m14_duels -- full`: the 756 pairings of `m6_production_matches.rs` with
+   another seed; ticks; "limit" is that test's, `72,000 x span / 128`). Before: the validation
+   of RA3 (`docs/validation/ra2-parity/ra3/10-duels.log`). After: the validation of RA4
+   (`docs/validation/ra2-parity/ra4/10-duels.log`).
+
+   | | Before RA4 | After RA4 |
+   |---|---|---|
+   | Length over the limit: median, 90th percentile, longest | 0.16, 0.33, 0.96 | 0.17, 0.37, 0.95 |
+   | Matches above 0.5, 0.7, 0.8 of their limit | 25, 3, 1 | 33, 9, 4 |
+   | Small maps (span up to 128): median of each map | 20,855 to 26,320 | 22,440 to 28,292 |
+   | Small maps: longest | 69,221 (Riverlands, America against Korea, both brutal) | 57,054 (Crossroads, Korea against France, both easy: 0.79) |
+   | Large maps: median of each map | 13,096 to 51,825 | 16,114 to 61,399 |
+   | Large maps: longest | 167,856 (Iron Isthmus; limit 270,000: 0.62) | 274,692 (Thousand Lakes, France against Germany, both brutal; limit 288,000: 0.95) |
+   | All 756 matches together | 30.3 million ticks | 32.4 million ticks |
+   | Matches over the limit, matches without a winner | 0, 0 | 0, 0 |
+
+   The bulk of the matches is as long as it was (the median moved from 0.16 to 0.17); the
+   tail is heavier. The matches near their limits are wars between players of the same
+   difficulty on the large maps, in which both keep their thirteen buildings and ten to twenty
+   units for a hundred thousand ticks and more, each spending what its miners bring on waves
+   that the other's army and pillboxes stop; they end when one side's ore is used up. Traced:
+   Thousand Lakes, France against Germany, both brutal. What RA4 adds to such a war: every
+   building that falls gives its owner one to six soldiers at the spot, units that survive a
+   fight come back stronger and heal, and miners heal themselves. The match that R44 item 5
+   traced at 0.96 (Riverlands, America against Korea) now ends at 0.43 (tick 30,778; this
+   run was not traced).
+5. **Debt for RA8** (and for RA5, when ore grows back and such a war no longer ends by
+   itself): a computer player in a balanced war should gather larger waves instead of sending
+   what it has when its patience runs out; a wave that sees no armed enemy should go for the
+   buildings (it still fires at what is nearest, R44 item 5).
+6. **Benchmark, soak** (`docs/validation/ra2-parity/ra4/`; budget: mean 5 ms a tick, longest
+   tick 50 ms): the benchmark on the shipped data has a mean tick of 0.218 ms and a longest of
+   5.237 ms (0.209 and 5.749 after RA3), on the fixture 0.094 and 0.787; the soak plays its 260
+   configurations (18,720,000 ticks) in 2,769 s (2,677 after RA3) with a peak heap of 214.5 MiB
+   of 1,024, and I6' holds on every tick. The state limits of the soak (`MAX_UNITS`,
+   `MAX_PROJECTILES`) were not raised, and the soak passes with them as they were.
+
 ### R54. RA4: tests adapted (none deleted, ignored or weakened)
 
 **Schema migration** (the assertions are unchanged; the arsenals of the fixtures are at schema
@@ -3274,6 +3347,8 @@ over 120 seeds, the survivors of six buildings, the fifth Harrier, its one volle
 ticks, Harriers lost with their Airforce Command, the V3 rocket's flight, damage and pace and
 the elite rocket, a rocket shot down by a Patriot, the Dreadnought's two missiles, the
 carrier's three Hornets and the 800 ticks to replace one, the Typhoon unseen at 5 cells and
-seen by a Destroyer at 8, the Osprey, the 24 ticks after a torpedo); unit tests in `sim`:
-`veterancy` 3, `flight` 2, `crew` 1, `ai` 1. Game: `health` 1, `notices` 2, `hover_info` 1,
-`units` 1, `sidebar` 1.
+seen by a Destroyer at 8, the Osprey, the 24 ticks after a torpedo); `ra4_ai.rs` 2 (the last
+stand of two players who have spent each other, and matches of computer players on the RA4
+fixture that end with a winner; R53); unit tests in `sim`: `veterancy` 3, `flight` 2,
+`crew` 1, `ai` 2. Game: `health` 1, `notices` 2, `hover_info` 1, `units` 1, `sidebar` 1.
+Together 106: 787 tests before RA4, 893 after.

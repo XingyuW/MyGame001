@@ -1,0 +1,187 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `game` (bin "game") generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 19.00s
+     Running `target/debug/game --smoke-test 600`
+[2m2026-10-13T03:19:54.768735Z[0m [32m INFO[0m [2mbevy_diagnostic::system_information_diagnostics_plugin::internal[0m[2m:[0m SystemInfo { os: "macOS 27.0.1", kernel: "27.0.0", cpu: "Apple M5", core_count: "10", memory: "32.0 GiB" }
+[2m2026-10-13T03:19:54.823383Z[0m [32m INFO[0m [2mbevy_render::renderer[0m[2m:[0m AdapterInfo { name: "Apple M5", vendor: 0, device: 0, device_type: IntegratedGpu, device_pci_bus_id: "", driver: "", driver_info: "", backend: Metal, subgroup_min_size: 4, subgroup_max_size: 64, transient_saves_memory: true }
+[2m2026-10-13T03:19:55.192898Z[0m [32m INFO[0m [2mbevy_winit::system[0m[2m:[0m Creating new window MyGame001 (66v0)
+[2m2026-10-13T03:19:55.340751Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/demo/demo.tmx: 64x64 cells, tile 64x32 px
+[2m2026-10-13T03:19:55.344239Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/crossroads/crossroads.tmx: 56x56 cells, tile 64x32 px
+[2m2026-10-13T03:19:55.347617Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/riverlands/riverlands.tmx: 64x48 cells, tile 64x32 px
+[2m2026-10-13T03:19:55.362444Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/liberty_bay/liberty_bay.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-13T03:19:55.375347Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/frostline/frostline.tmx: 224x224 cells, tile 64x32 px
+[2m2026-10-13T03:19:55.387957Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/oasis_gulf/oasis_gulf.tmx: 256x192 cells, tile 64x32 px
+[2m2026-10-13T03:19:55.402507Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/coral_archipelago/coral_archipelago.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-13T03:19:55.417773Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/continental_divide/continental_divide.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-13T03:19:55.433281Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/steel_harbor/steel_harbor.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-13T03:19:55.447140Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/glacier_pass/glacier_pass.tmx: 240x240 cells, tile 64x32 px
+[2m2026-10-13T03:19:55.457569Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/red_canyon/red_canyon.tmx: 192x192 cells, tile 64x32 px
+[2m2026-10-13T03:19:55.470695Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/jungle_delta/jungle_delta.tmx: 256x224 cells, tile 64x32 px
+[2m2026-10-13T03:19:55.485058Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/pacific_atoll/pacific_atoll.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-13T03:19:55.498133Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/iron_isthmus/iron_isthmus.tmx: 256x224 cells, tile 64x32 px
+[2m2026-10-13T03:19:55.511597Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/arctic_floes/arctic_floes.tmx: 240x240 cells, tile 64x32 px
+[2m2026-10-13T03:19:55.526500Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/ember_caldera/ember_caldera.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-13T03:19:55.542487Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/frozen_sound/frozen_sound.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-13T03:19:55.557456Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/harvest_plains/harvest_plains.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-13T03:19:55.573100Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/black_water/black_water.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-13T03:19:55.587761Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/thousand_lakes/thousand_lakes.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-13T03:19:55.603226Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/wheel_of_worlds/wheel_of_worlds.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-13T03:19:56.964361Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m catalogue check: 336 trial setups on 21 maps; players per country: america 275, korea 297, france 278, germany 256, great_britain 234, libya 219, iraq 198, cuba 176, russia 133
+[2m2026-10-13T03:20:07.656737Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m catalogue: 21 maps, 9 factions, 3 difficulties
+[2m2026-10-13T03:20:07.656883Z[0m [32m INFO[0m [2mgame::options[0m[2m:[0m no settings file at /var/folders/vr/n5klx5z92njgzmqc0_v_02vc0000gn/T/mygame001-smoke-79640/settings.txt; the defaults are used
+[2m2026-10-13T03:20:11.928120Z[0m [32m INFO[0m [2mgame::options[0m[2m:[0m settings written to /var/folders/vr/n5klx5z92njgzmqc0_v_02vc0000gn/T/mygame001-smoke-79640/settings.txt
+[2m2026-10-13T03:20:11.933222Z[0m [32m INFO[0m [2mbevy_render::batching::gpu_preprocessing[0m[2m:[0m GPU preprocessing is fully supported on this device.
+[2m2026-10-13T03:20:12.441125Z[0m [32m INFO[0m [2mgame::smoke[0m[2m:[0m smoke test: the fullest menu covers 1247 x 566 pixels (measures: 1247 x 566, must fit 1280 x 720)
+[2m2026-10-13T03:20:12.445855Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map riverlands (88 x 66 cells, map growth, seed 6): Libya (Soviet) against America (Allied) (Brutal) against Russia (Soviet) (Easy) against Russia (Soviet) (Medium) against America (Allied) (Medium); 5000 credits, unit count 0, MCV start, long game, superweapons OFF, crates OFF, MCV repacks ON, free for all, Super Me, all unlocked: 0 buildings and 5 units spawned
+[2m2026-10-13T03:20:14.434904Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: building 1 of type 0 placed
+[2m2026-10-13T03:20:14.434939Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: building 2 of type 29 placed
+[2m2026-10-13T03:20:14.434947Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: building 3 of type 29 placed
+[2m2026-10-13T03:20:14.464176Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 4: building 4 of type 0 placed
+[2m2026-10-13T03:20:14.464219Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 0: building 0 of type 29 placed
+[2m2026-10-13T03:20:14.489263Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 0: building 0 undeployed into its base unit
+[2m2026-10-13T03:20:14.524420Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 0: building 0 of type 29 placed
+[2m2026-10-13T03:20:14.525255Z[0m [32m INFO[0m [2mgame::smoke[0m[2m:[0m smoke test: the MCV deployed, repacked and deployed again by tick 12
+[2m2026-10-13T03:20:14.604385Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map riverlands (88 x 66 cells, map growth, seed 7): Libya (Soviet) against America (Allied) (Brutal) against Russia (Soviet) (Easy) against Germany (Allied) (Medium) against Libya (Soviet) (Medium); 5000 credits, unit count 0, MCV start, long game, superweapons OFF, crates OFF, MCV repacks ON, free for all, Super Me, all unlocked: 0 buildings and 5 units spawned
+[2m2026-10-13T03:20:16.399002Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: building 1 of type 0 placed
+[2m2026-10-13T03:20:16.399048Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: building 2 of type 29 placed
+[2m2026-10-13T03:20:16.399056Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: building 3 of type 0 placed
+[2m2026-10-13T03:20:16.425594Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 4: building 4 of type 29 placed
+[2m2026-10-13T03:20:16.668910Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map riverlands (64 x 48 cells, seed 6): Libya (Soviet) against America (Allied) (Brutal) against Russia (Soviet) (Easy) against Russia (Soviet) (Medium); 10000 credits, unit count 10, yard start, long game, superweapons OFF, crates OFF, MCV repacks OFF, allied computer players, Super Me: 4 buildings and 42 units spawned
+[2m2026-10-13T03:20:18.328875Z[0m [32m INFO[0m [2mbevy_ecs_tiled::tiled::map[0m[2m:[0m Map removed: AssetId<bevy_ecs_tiled::tiled::map::asset::TiledMapAsset>{ index: 0, generation: 0}
+[2m2026-10-13T03:20:18.613411Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map liberty_bay (256 x 256 cells, seed 6): Korea (Allied) against Russia (Soviet) (Medium) against America (Allied) (Medium) against Russia (Soviet) (Medium); 10000 credits, unit count 10, MCV start, short game, superweapons ON, crates ON, MCV repacks ON, allied computer players: 0 buildings and 44 units spawned
+[2m2026-10-13T03:20:20.800348Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: building 1 of type 29 placed
+[2m2026-10-13T03:20:20.800391Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: building 2 of type 0 placed
+[2m2026-10-13T03:20:20.800403Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: building 3 of type 29 placed
+[2m2026-10-13T03:20:21.569170Z[0m [32m INFO[0m [2mbevy_ecs_tiled::tiled::map[0m[2m:[0m Map removed: AssetId<bevy_ecs_tiled::tiled::map::asset::TiledMapAsset>{ index: 0, generation: 1}
+[2m2026-10-13T03:20:22.624415Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 0: building 0 of type 0 placed
+[2m2026-10-13T03:20:29.006581Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Building(BuildingKind(6)) is complete
+[2m2026-10-13T03:20:29.124766Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Building(BuildingKind(6)) is complete
+[2m2026-10-13T03:20:29.247412Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: building 44 of type 6 placed
+[2m2026-10-13T03:20:29.247443Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: building 45 of type 6 placed
+[2m2026-10-13T03:20:31.120823Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Building(BuildingKind(1)) is complete
+[2m2026-10-13T03:20:31.235210Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 0: Building(BuildingKind(1)) is complete
+[2m2026-10-13T03:20:31.235253Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: building 46 of type 1 placed
+[2m2026-10-13T03:20:50.541559Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Building(BuildingKind(30)) is complete
+[2m2026-10-13T03:20:50.541607Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Building(BuildingKind(30)) is complete
+[2m2026-10-13T03:20:50.772674Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: building 47 of type 30 placed
+[2m2026-10-13T03:20:50.772704Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: unit 48 left building 47
+[2m2026-10-13T03:20:50.772712Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: building 49 of type 30 placed
+[2m2026-10-13T03:20:50.772718Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: unit 50 left building 49
+[2m2026-10-13T03:20:52.519785Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Building(BuildingKind(2)) is complete
+[2m2026-10-13T03:20:52.751215Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: building 51 of type 2 placed
+[2m2026-10-13T03:20:52.751258Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: unit 52 left building 51
+[2m2026-10-13T03:20:53.576414Z[0m [32m INFO[0m [2mgame::smoke[0m[2m:[0m smoke test: paused at tick 2491
+[2m2026-10-13T03:20:55.493783Z[0m [32m INFO[0m [2mgame::smoke[0m[2m:[0m smoke test: resumed at tick 2491
+[2m2026-10-13T03:20:58.221399Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Building(BuildingKind(31)) is complete
+[2m2026-10-13T03:20:58.221448Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Building(BuildingKind(31)) is complete
+[2m2026-10-13T03:20:58.453597Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: building 53 of type 31 placed
+[2m2026-10-13T03:20:58.570964Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: building 54 of type 31 placed
+[2m2026-10-13T03:20:59.746378Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Unit(UnitKind(0)) is complete
+[2m2026-10-13T03:20:59.746447Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: unit 55 left building 53
+[2m2026-10-13T03:20:59.868290Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Unit(UnitKind(0)) is complete
+[2m2026-10-13T03:20:59.868339Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: unit 56 left building 54
+[2m2026-10-13T03:21:00.222196Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Building(BuildingKind(3)) is complete
+[2m2026-10-13T03:21:00.459236Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: building 57 of type 3 placed
+[2m2026-10-13T03:21:00.806535Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Unit(UnitKind(0)) is complete
+[2m2026-10-13T03:21:00.806584Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: unit 58 left building 53
+[2m2026-10-13T03:21:00.806591Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Unit(UnitKind(0)) is complete
+[2m2026-10-13T03:21:00.806597Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: unit 59 left building 54
+[2m2026-10-13T03:21:01.851851Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Unit(UnitKind(0)) is complete
+[2m2026-10-13T03:21:01.851884Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: unit 60 left building 53
+[2m2026-10-13T03:21:01.851890Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Unit(UnitKind(0)) is complete
+[2m2026-10-13T03:21:01.851895Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: unit 61 left building 54
+[2m2026-10-13T03:21:02.894571Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Unit(UnitKind(1)) is complete
+[2m2026-10-13T03:21:02.894631Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: unit 62 left building 57
+[2m2026-10-13T03:21:03.939968Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Building(BuildingKind(16)) is complete
+[2m2026-10-13T03:21:04.053782Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Building(BuildingKind(16)) is complete
+[2m2026-10-13T03:21:04.285678Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: building 63 of type 16 placed
+[2m2026-10-13T03:21:04.285719Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: building 64 of type 16 placed
+[2m2026-10-13T03:21:04.982537Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Unit(UnitKind(1)) is complete
+[2m2026-10-13T03:21:04.982574Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: unit 65 left building 57
+[2m2026-10-13T03:21:06.025794Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Building(BuildingKind(15)) is complete
+[2m2026-10-13T03:21:06.255069Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: building 66 of type 15 placed
+[2m2026-10-13T03:21:07.001784Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Unit(UnitKind(1)) is complete
+[2m2026-10-13T03:21:07.001825Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: unit 67 left building 57
+[2m2026-10-13T03:21:07.121521Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Unit(UnitKind(10)) is complete
+[2m2026-10-13T03:21:07.121575Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: unit 68 left building 53
+[2m2026-10-13T03:21:07.121587Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Unit(UnitKind(10)) is complete
+[2m2026-10-13T03:21:07.121624Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: unit 69 left building 54
+[2m2026-10-13T03:21:08.205835Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Unit(UnitKind(0)) is complete
+[2m2026-10-13T03:21:08.205886Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: unit 70 left building 53
+[2m2026-10-13T03:21:08.205894Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Unit(UnitKind(0)) is complete
+[2m2026-10-13T03:21:08.205901Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: unit 71 left building 54
+[2m2026-10-13T03:21:09.144582Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Unit(UnitKind(1)) is complete
+[2m2026-10-13T03:21:09.144640Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: unit 72 left building 57
+[2m2026-10-13T03:21:09.262617Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Unit(UnitKind(0)) is complete
+[2m2026-10-13T03:21:09.262661Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: unit 73 left building 53
+[2m2026-10-13T03:21:09.262673Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Unit(UnitKind(0)) is complete
+[2m2026-10-13T03:21:09.262684Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: unit 74 left building 54
+[2m2026-10-13T03:21:09.742733Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Building(BuildingKind(16)) is complete
+[2m2026-10-13T03:21:09.742783Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Building(BuildingKind(16)) is complete
+[2m2026-10-13T03:21:09.979904Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: building 75 of type 16 placed
+[2m2026-10-13T03:21:09.979935Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: building 76 of type 16 placed
+[2m2026-10-13T03:21:11.283069Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Unit(UnitKind(1)) is complete
+[2m2026-10-13T03:21:11.283126Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: unit 77 left building 57
+[2m2026-10-13T03:21:11.745399Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Building(BuildingKind(15)) is complete
+[2m2026-10-13T03:21:11.977294Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: building 78 of type 15 placed
+[2m2026-10-13T03:21:13.288785Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Unit(UnitKind(1)) is complete
+[2m2026-10-13T03:21:13.288829Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: unit 79 left building 57
+[2m2026-10-13T03:21:14.465061Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Unit(UnitKind(10)) is complete
+[2m2026-10-13T03:21:14.465108Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: unit 80 left building 53
+[2m2026-10-13T03:21:14.465115Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Unit(UnitKind(10)) is complete
+[2m2026-10-13T03:21:14.465121Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: unit 81 left building 54
+[2m2026-10-13T03:21:15.403238Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Unit(UnitKind(1)) is complete
+[2m2026-10-13T03:21:15.403277Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: unit 82 left building 57
+[2m2026-10-13T03:21:15.523157Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Building(BuildingKind(16)) is complete
+[2m2026-10-13T03:21:15.523197Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Building(BuildingKind(16)) is complete
+[2m2026-10-13T03:21:15.523204Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Unit(UnitKind(0)) is complete
+[2m2026-10-13T03:21:15.523210Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: unit 83 left building 53
+[2m2026-10-13T03:21:15.523215Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Unit(UnitKind(0)) is complete
+[2m2026-10-13T03:21:15.523219Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: unit 84 left building 54
+[2m2026-10-13T03:21:15.759728Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: building 85 of type 16 placed
+[2m2026-10-13T03:21:15.759793Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: building 86 of type 16 placed
+[2m2026-10-13T03:21:16.576980Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Unit(UnitKind(0)) is complete
+[2m2026-10-13T03:21:16.577020Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: unit 87 left building 53
+[2m2026-10-13T03:21:16.577032Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Unit(UnitKind(0)) is complete
+[2m2026-10-13T03:21:16.577059Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: unit 88 left building 54
+[2m2026-10-13T03:21:17.510326Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Building(BuildingKind(15)) is complete
+[2m2026-10-13T03:21:17.510370Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Unit(UnitKind(1)) is complete
+[2m2026-10-13T03:21:17.510396Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: unit 89 left building 57
+[2m2026-10-13T03:21:17.742305Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: building 90 of type 15 placed
+[2m2026-10-13T03:21:19.638146Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Unit(UnitKind(1)) is complete
+[2m2026-10-13T03:21:19.638187Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: unit 91 left building 57
+[2m2026-10-13T03:21:19.754391Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Building(BuildingKind(32)) is complete
+[2m2026-10-13T03:21:19.754424Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Building(BuildingKind(32)) is complete
+[2m2026-10-13T03:21:19.986510Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: building 92 of type 32 placed
+[2m2026-10-13T03:21:19.986551Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: building 93 of type 32 placed
+[2m2026-10-13T03:21:21.759658Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Building(BuildingKind(4)) is complete
+[2m2026-10-13T03:21:21.759702Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Unit(UnitKind(1)) is complete
+[2m2026-10-13T03:21:21.759710Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: unit 94 left building 57
+[2m2026-10-13T03:21:21.876973Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Unit(UnitKind(10)) is complete
+[2m2026-10-13T03:21:21.877016Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: unit 95 left building 53
+[2m2026-10-13T03:21:21.877023Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Unit(UnitKind(10)) is complete
+[2m2026-10-13T03:21:21.877029Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: unit 96 left building 54
+[2m2026-10-13T03:21:21.993196Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: building 97 of type 4 placed
+[2m2026-10-13T03:21:22.931047Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Unit(UnitKind(0)) is complete
+[2m2026-10-13T03:21:22.931087Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: unit 98 left building 53
+[2m2026-10-13T03:21:22.931093Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Unit(UnitKind(0)) is complete
+[2m2026-10-13T03:21:22.931099Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: unit 99 left building 54
+[2m2026-10-13T03:21:23.861447Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Unit(UnitKind(1)) is complete
+[2m2026-10-13T03:21:23.861488Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: unit 100 left building 57
+[2m2026-10-13T03:21:23.978747Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Unit(UnitKind(0)) is complete
+[2m2026-10-13T03:21:23.978828Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: unit 101 left building 53
+[2m2026-10-13T03:21:23.978844Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Unit(UnitKind(0)) is complete
+[2m2026-10-13T03:21:23.978856Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: unit 102 left building 54
+[2m2026-10-13T03:21:25.963613Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Unit(UnitKind(1)) is complete
+[2m2026-10-13T03:21:25.963649Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: unit 103 left building 57
+[2m2026-10-13T03:21:26.553380Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Building(BuildingKind(6)) is complete
+[2m2026-10-13T03:21:26.553420Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Building(BuildingKind(6)) is complete
+[2m2026-10-13T03:21:26.791174Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: building 104 of type 6 placed
+[2m2026-10-13T03:21:26.791217Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: building 105 of type 6 placed
+[2m2026-10-13T03:21:27.125426Z[0m [32m INFO[0m [2mgame::smoke[0m[2m:[0m smoke test: 600 frames, 5009 simulation ticks, map created: true, units spawned: 44, units moved: 9 in 5002 ticks after the order, buildings spawned: 0, production charged 800 credits in 4982 ticks, visible cells: 437, enemy views shown: 0, view mismatches: 0, sidebar items: 91 of 91, sidebar buttons outside the window: 0, sidebar credits: Some("Credits  9200"), minimap drawings: 537, minimap pixels lit: 262144, sounds: 27, music players: 1, pause: Done { ticks_while_paused: 0, refused: true }, menu buttons: Some(73), matches started: 4, flow: Last, views: 79 of 79 units and 27 of 27 buildings, computer player's commands: 36 (0 rejected), items outside the roster shown: 0, cards shown: 6 of 17 listed (0 not listed), options buttons: 11, settings saved: true, menu layout problems: Some(0), game flow problems: 0
+[2m2026-10-13T03:21:27.137424Z[0m [33m WARN[0m [2mbevy_winit::state[0m[2m:[0m Skipped event Destroyed for unknown winit Window Id WindowId(505543296256)

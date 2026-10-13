@@ -579,6 +579,209 @@ to crush it (`[CombatDamage] Crush`); starting units get a cell each.
   `View::stays_visible`, or `m6_production_matches.rs` and the soak will find a placement
   rejected without a loss.
 
+### RA4: veterancy, crews, and air and naval mechanics (2026-10-13)
+
+Carried out by one implementer; commits `598db00` to `c6dda01` and the commit of this entry.
+No invariant was amended: I6' holds as RA3 left it, also for the missiles and aircraft that
+units launch (R50 item 1; for the final reviewer: the air layer still holds one aircraft per
+cell, asserted on every tick of the sorties and bombardments of `ra4_aircraft.rs` and
+`ra4_spawns.rs` and in the soak).
+
+**What was done** (the numbers are those of the plan entry's "Change" list).
+1. *Veterancy (R47).* A trainable unit has `Experience` (hashed): the cost of what it
+   destroyed, its rank, the multipliers of its rank and a set of bonus multipliers, in
+   permille. The unit whose hit brings a victim to 0 gains the victim's cost: by its shot, by
+   the splash of its shot, by crushing; a spawned missile or aircraft earns for the unit that
+   launched it. Nothing for own or allied victims, for scenery, to buildings, to untrainable
+   units. Veteran at 3 times its own cost, elite at 6 times, inclusive; `RankGained`. A rank
+   grants each ability of the type's lists once: firepower x 1.1 and armour x 1.5 inside the
+   one damage function (`sim::impact_damage`), reload x 0.6, speed x 1.2, self healing (a
+   point every 19 ticks), the elite weapons at elite rank. `sim::promote` and
+   `sim::set_bonus` are the API for RA5 and RA6.
+2. *Crews and survivors (R48).* A destroyed base unit that stood still releases a GI or a
+   Conscript every other time; a destroyed or sold crewed building `max(1, ceil(refund /
+   divisor))` of them on its footprint, three soldiers to a cell, and a Construction Yard an
+   Engineer one time in four; `CrewEscaped`. Draws from `SimRng` only.
+3. *Aircraft (R49).* Harrier and Black Eagle have one volley, need one of the four docks of
+   an Airforce Command to be queued (`RejectReason::NoFreeDock`) and to leave their factory,
+   fly to their dock whenever they have no order, reload there in 360 ticks, take another
+   dock when theirs is lost and are lost without one. The M9 rearm timer is gone from the
+   shipped data (the role `strike` remains for the legacy fixture). NightHawk, Kirov and
+   Rocketeer need no dock.
+4. *Spawned missiles and aircraft (R50).* V3 rocket, Dreadnought missile, Hornet and Osprey
+   are units of the air layer with the reference's strength, armour, speed and sight, launched
+   from the bay of their spawner 27 ticks apart, shot down by whatever engages aircraft. A
+   missile goes off where its target was with the reference's damage and warhead (the elite
+   ones from an elite launcher) and deals nothing if shot down; Hornets bomb, return, are ready
+   again after 200 ticks and replaced after 800; the Osprey carries the Destroyer's depth
+   charge to submerged targets. Launched units take no commands
+   (`RejectReason::NotCommandable`). The seven stand-in rows of R36 are removed from
+   `ra2_differences.tsv`.
+5. *Submerged units (R51).* Typhoon, Dolphin and Giant Squid are hidden from an enemy without
+   a unit or building with sensors in range (4 cells for the three, 8 for the Destroyer)
+   unless they fired in the last 24 ticks, through the per player hidden set of spies and
+   Mirage Tanks: no acquisition, no `Attack` command, no drawing. The computer player does not
+   see them either.
+6. *Game (R52).* Chevrons for veterans and elite units; a ping, a golden ring and a notice for
+   a promotion; a notice for escaped crews; dock marks and landed aircraft; launches drawn as
+   launches; launched units not selectable; the sidebar's reason for a taken dock; the hover
+   text names the rank. New original art: the sheets of the two missiles.
+
+**Data.** `arsenal.ron` schema 5 (sixteen fields, R46), `combat.ron` schema 3 (four missile
+effects), both generated and audited; every fixture migrated with neutral values; a new
+fixture `fixtures/data/ra4` with `tests/ra4_common`. The spawned types `hornet`, `osprey`,
+`v3_rocket`, `dred_missile` are in the data.
+
+**Computer player (R53).** It does not see what is hidden from it and does not command what
+its units launched. New: the **last stand**. A player that can neither fight nor earn and has
+stood still for 1,200 ticks sells its buildings, so that a match of two players who have
+spent each other ends (a fixture match had no winner after 72,000 ticks without it; one duel
+took 94,396 of 72,000 ticks with a first version of it). `ai.ron` is unchanged;
+`MATCH_TICK_LIMIT` is 72,000.
+
+**Validation** (`docs/validation/ra2-parity/ra4/`, all eleven commands in one run of
+`sh scripts/validate_ra2_parity.sh ra4` on commit `c6dda01`, with a clean tree):
+
+| # | Command | Exit | Result |
+|---|---|---|---|
+| 1 | `cargo fmt --all -- --check` | 0 | |
+| 2 | `git diff --check` | 0 | |
+| 3 | `cargo clippy --workspace --all-targets -- -D warnings` | 0 | |
+| 4 | `cargo test --workspace --release` | 0 | **893 passed, 0 failed, 0 ignored** (3,137 s); 787 after RA3 |
+| 5 | `cargo build --release -p game` | 0 | |
+| 6 | `cargo run --release -p game -- --smoke-test 600` | 0 | 600 frames, 4 matches, 0 layout and 0 flow problems, 716 ticks of the last match, 27 sounds synthesised, the computer player's 4 commands accepted |
+| 7 | `cargo run -p game -- --smoke-test 600` | 0 | 600 frames, 4 matches, 0 layout and 0 flow problems, 5,009 ticks of the last match, the computer player's 36 commands accepted |
+| 8 | `cargo run --release -p sim --example m7_benchmark` | 0 | shipped data: mean tick 0.218 ms, longest 5.237 ms (budget 5 ms mean, 50 ms longest); fixture 0.094 ms and 0.787 ms |
+| 9 | `cargo run --release -p sim --example m7_soak` | 0 | 260 configurations, 18,720,000 ticks, 2,769 s, I6' on every tick, peak heap 215 MiB of 1,024 |
+| 10 | `cargo run --release -p sim --example m14_duels -- full` | 0 | 756 matches, 756 ended, the slowest in tick 274,692 (1,585 s) |
+| 11 | `sh scripts/package_macos.sh` | 0 | the packaged smoke test passed |
+
+This was the one full run. Before it, on the way to this tree, each long command was run by
+itself: the duels twice (the first run, with the first version of the last stand, was
+stopped after 712 matches, one of which had taken 94,396 of 72,000 ticks: the defect of R53
+item 3, fixed in `c6dda01` with a unit test, never by a limit; the second ended all 756), and
+the 756 matches of `m6_production_matches.rs` once.
+
+The session's display was locked: the smoke tests ran without a visible window, and passed.
+Of the 106 new tests, 100 are in the simulation (`ra4_definitions` 8, `ra4_veterancy` 20,
+`ra4_crew` 10, `ra4_aircraft` 14, `ra4_spawns` 14, `ra4_cloak` 8, `ra4_shipped` 16,
+`ra4_ai` 2 and 8 unit tests) and 6 in the game. No test was deleted, ignored or weakened;
+R54 lists every test that was adapted.
+
+**Match lengths (R53).** No limit was changed in RA4; `MATCH_TICK_LIMIT` is 72,000.
+Over the 756 duels the length over the test's limit was 0.16 (median), 0.33 (90th percentile)
+and 0.96 (longest) after RA3; it is 0.17, 0.37 and 0.95 now, and 33, 9 and 4 matches are
+above 0.5, 0.7 and 0.8 of their limits where 25, 3 and 1 were: the bulk is as long as it was
+and the tail is heavier. Slowest duels: Thousand Lakes (256 x 256), France against Germany,
+both brutal, 274,692 ticks of 288,000 (0.95); Oasis Gulf (256 x 192), Germany against Russia,
+both medium, 208,274 of 252,000 (0.83); Wheel of Worlds (256 x 256), Russia against Libya,
+both easy, 233,762 of 288,000 (0.81); Glacier Pass (240 x 240), Cuba brutal against America
+medium, 218,972 of 270,000 (0.81); on the small maps Crossroads (56 x 56), Korea against
+France, both easy, 57,054 of 72,000 (0.79). The match at 0.95 was traced and is not a stall:
+two players of one difficulty keep their bases and ten to twenty units each until one side's
+ore is used up (R53 item 4). The Riverlands match that stood at 0.96 after RA3 ends at 0.43.
+The duels play the pairings of `m6_production_matches.rs` with another seed; that test's
+own 756 matches all end within their limits (command 4).
+
+**Whether a fixture hash or expectation changed.** No expectation of an older fixture test
+changed. Every new piece of state is hashed under a tag of its own and only when it is
+present, so the parts of the state hash that older worlds have are laid out as before; the
+definitions hash more (sixteen fields per arsenal entry, nine effect slots), so the number
+differs, and no test holds an expected hash. The hash trace of R6 item 9 was not repeated:
+that the older scenarios did not move rests on their tests, which pass unchanged, and on the
+gating of every new rule on a rules file and a trait. The matches of computer players do
+move: the last stand is part of their state.
+
+**Assumptions** (each in the decision named). `SIGHT` grants nothing (R47 item 4); self
+healing every 19 ticks for every unit (R47 item 5); `Trainable` is yes for a unit and no for
+a building where the ini has no key (R46 item 4); survivors are `ceil(refund / divisor)`, the engineer's 25
+percent and "not while moving" (R48); a docked aircraft is in the air to the simulation, and
+an aircraft with nothing to do flies home (R49 item 5); the 27 ticks between launches, a
+missile's firepower follows its launcher's rank, a returned Hornet is whole again, the time
+to replace a unit runs from its loss (R50); sensors serve only their own player (R51).
+
+**Decisions.** R46 the arsenal file of schema 5 and the combat file of schema 3; R47
+veterancy; R48 crews and survivors; R49 aircraft ammunition and docks; R50 spawned missiles
+and aircraft; R51 submerged units; R52 the interface; R53 the computer player and match
+lengths; R54 tests adapted.
+
+**Differences from the plan or the brief.**
+- No `sensors` and `dock` fields: `sensors_sight` 0 means none, and an airport bound aircraft
+  lands on every building with `docks`; three fields beyond the plan's list (`self_healing`,
+  `launcher`, `missile`); the combat file changed too (R46 items 1 and 3).
+- A hit of 1 on stronger armour deals 0, as the plan's equations have it (R47 item 5).
+- The V3 launches every 533 ticks plus the flight of its rocket, not every 533 (R50 item 2).
+- Missiles fly along the cells of a path, not a straight line (R50 item 3).
+- `m9_arsenal.rs` needed no change: it runs on the legacy fixture, which keeps M9's rules; the
+  shipped tests that changed are in R54.
+- The self healing of the miners (RA5's "Chrono Miner self heal") is here already: it is the
+  same trait as the Apocalypse's.
+- Beyond the brief: the computer player's last stand (R53 item 2), which the brief's "fix the
+  computer player's end game" asks for once a match stalls.
+
+**Differences from Red Alert 2 that remain in this milestone's scope.** The rows of
+`ra2_differences.tsv` (the launchers' warhead, the Destroyer's launcher's range and layer, the
+uncarried collision weapons); a docked aircraft is not a ground target; `CanPassiveAquire`,
+`Insignificant`, `SCATTER`, `CloakingSpeed`, technicians and the flight path of missiles are
+not modelled; the Psychic Sensor's sensors wait for RA7.
+
+**Debt.**
+- `arsenal.ron` has 100 of 128 KiB: the next schema must shorten its entries or raise the
+  limit with a record (R46 item 6).
+- The tail of long matches is heavier (R53 items 4 and 5): balanced wars on the large maps
+  end only when a side's ore is used up; with RA5's growing ore they may not end. The
+  computer player should gather larger waves in a long war and go for buildings when it sees
+  no armed enemy (RA8, or RA5 if its matches need it).
+- A navy of a computer player needs a detector to fight submarines (RA8; R51 item 3).
+- Kills by area effects that name no unit (superweapons, planted bombs, radiation) have no
+  killer (R47 item 2); RA6 can name one through `Blast::source`.
+- The sidebar lists each building type once, so `check_buildable` takes the player's docks as
+  of the last `Economy` stage when that is more than the listed buildings give (R49 item 3).
+- The debt of RA1 to RA3 stands; the hash trace was not repeated (above).
+
+**Requires user verification.** Everything of R52 item 8: the chevrons, the ping, ring and
+notices of promotions in a busy battle, the two missile sprites, the Hornets as Harriers and
+the Osprey as a NightHawk, the dock marks and the landed aircraft, the automatic flight
+home, a submarine that surfaces to fire. And the feel: aircraft limited to four per Airforce
+Command with one volley each, V3 rockets that Patriots and Flak can stop, bases that release
+infantry as they fall, and computer players that sell out when they are beaten.
+
+**For RA5 and RA6.**
+- **Ranks and multipliers.** `sim::promote(world, unit, rank) -> bool` raises a unit to at
+  least `rank` (`sim::VETERAN` 1, `sim::ELITE` 2): the veteran crate is
+  `promote(world, id, experience.rank + 1)` for the units within the crate's radius; veteran
+  production after an infiltration is `promote(world, id, VETERAN)` for a unit as it leaves
+  its factory (`UnitSpawned` names it). `sim::set_bonus(world, unit, Multipliers { .. })`
+  sets the bonus multipliers, which multiply with the rank's: for the armour, firepower and
+  speed crates read the unit's `Experience::bonus`, change `armour_pm` (1500),
+  `firepower_pm` (2000) or `speed_pm` (1200), and set it; "already has the multiplier" is
+  that field not being 1000. Both work only for trainable units and may be called only from
+  a system of `SimSchedule` (they write state and `RankGained`). The computer player's
+  difficulty multipliers of RA8 fit the same four fields if they are per unit; a per player
+  multiplier would be a new factor where `Arms` and `Target::armour_pm` are filled in
+  `combat.rs`.
+- **Crews** (`crew.rs`): record a `Wreck` for anything that should release survivors (a
+  garrisoned building at red health would rather put its occupants out itself). Survivors
+  are put with `spawn_unit`, which honours I6'.
+- **Killer of a blast**: `Blast { source: Some(id), firepower_pm, .. }` credits `id`; the
+  area effects of `special.rs` pass `None` today.
+- **Hidden units**: add to `SpecialState::hidden` in `special::reconnaissance`; combat,
+  commands, the computer player, the unit views, the minimap and the promotion ring read it.
+  Sensors are `sensors_sight` of the arsenal; a detector of disguise (dogs, the Psychic
+  Sensor) is still M9's fixed radius there.
+- **Launchers**: a new spawner needs only arsenal data (`spawns`, the rates, `launcher`) and,
+  for a missile, an effect of the combat file. The paradrop plane of RA6 can be a launched
+  aircraft or a plain unit; a launched unit is in `SpecialState::spawned` and takes no
+  commands.
+- **The last stand** sells buildings of a player that can neither fight nor earn. A player
+  that should hold out (a tech building that pays, RA5's growing ore) changes its credits and
+  so is not standing still; an Oil Derrick's income counts as earning only through that.
+- **Tests**: the fixture with every RA4 trait is `tests/fixtures/data/ra4` (`ra4_common`:
+  `experience`, `rank`, `units_of`, `run_until`, `definitions_with_arsenal`). A Harrier in a
+  test world needs an Airforce Command of its owner. A unit on a dock or with sensors fires
+  at what comes into range in the first ticks: record events from the first tick.
+- Validation takes about 128 minutes.
+
 ## Repair, aircraft overflight, new music and distinct silhouettes (2026-10-06)
 
 Working-tree follow-up (decisions: "Building repair, aircraft overflight, readable silhouettes"
