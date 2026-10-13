@@ -145,13 +145,33 @@ fn first_shot(water_from: i32, attacker: &str, target: &str, cells: i32) -> Opti
     if bound(target) {
         put(&mut app, P1, "airforce_command", 40, 40);
     }
+    // RA4 (docs/DECISIONS.md R51): a submerged target is hidden from a player without sensors
+    // near it, and nothing fires at a hidden unit whatever its targeting allows. So that the
+    // targeting alone decides, a silent Destroyer of P0 (sensors of 8 cells) lies three cells
+    // from the target, and the target is never hidden from P0 (advisory review 2, tests P1-1:
+    // without it the cases "never at a submarine" passed for the wrong reason).
+    let cloakable = definitions
+        .unit_kind(target)
+        .and_then(|kind| definitions.metadata(sim::ProductionItem::Unit(kind)))
+        .is_some_and(|entry| entry.cloakable);
     let attacker = put(&mut app, P0, attacker, 10, 10);
     let target = put(&mut app, P1, target, 10 + cells, 10);
     silence(&mut app, target);
     set_hp(&mut app, target, AMPLE);
+    if cloakable {
+        let detector = put(&mut app, P0, "destroyer", 10 + cells + 3, 13);
+        silence(&mut app, detector);
+    }
     let mut weapon = None;
     for _ in 0..160 {
         let events = tick(&mut app, Vec::new());
+        assert!(
+            !app.world()
+                .resource::<SpecialState>()
+                .hidden
+                .contains(&(P0, target)),
+            "the target is hidden from the attacker's player"
+        );
         if weapon.is_none() {
             weapon = events.iter().find_map(|event| match event {
                 SimEvent::WeaponFired {

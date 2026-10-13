@@ -242,6 +242,7 @@ pub(crate) fn move_units(
     definitions: Res<Definitions>,
     mut kills: ResMut<crate::veterancy::Kills>,
     mut units: MoveQuery,
+    healths: Query<&crate::combat::Health>,
 ) {
     let mut order: Vec<(SimId, Entity)> =
         units.iter().map(|(entity, id, ..)| (*id, entity)).collect();
@@ -323,15 +324,22 @@ pub(crate) fn move_units(
                             else {
                                 continue;
                             };
-                            // The crusher is the killer (RA4: its experience).
-                            kills.record(
-                                id,
-                                victim_owner,
-                                crate::veterancy::worth(
-                                    &definitions,
-                                    crate::ProductionItem::Unit(victim_kind),
-                                ),
-                            );
+                            // The crusher is the killer (RA4: its experience), unless the
+                            // victim's hit points were gone already: what destroyed it earlier
+                            // in the tick has its kill, or it has no killer.
+                            if !healths
+                                .get(victim_entity)
+                                .is_ok_and(|health| health.hit_points <= 0)
+                            {
+                                kills.record(
+                                    id,
+                                    victim_owner,
+                                    crate::veterancy::worth(
+                                        &definitions,
+                                        crate::ProductionItem::Unit(victim_kind),
+                                    ),
+                                );
+                            }
                             let at = grid.standing_point(next, victim);
                             grid.release_around(next, victim);
                             grid.unregister(victim);

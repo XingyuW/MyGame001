@@ -483,3 +483,39 @@ pub fn definitions_with_arsenal(name: &str, id: &str, edits: &[(&str, &str)]) ->
     .and_then(|definitions| definitions.with_arsenal(&path))
     .unwrap_or_else(|error| panic!("{error}"))
 }
+
+/// Scenery (scenario setup): a tower with the armour `armour` and 1000 hit points in the cell
+/// (`x`, `y`), which becomes rock; its id. Replaces the scenery of the world.
+pub fn tower(app: &mut App, x: i32, y: i32, armour: &str) -> SimId {
+    let cell = CellPos::new(x, y);
+    let rock = Cell {
+        passable: false,
+        water: false,
+        buildable: false,
+        ore: 0,
+    };
+    app.world_mut()
+        .resource_mut::<Grid>()
+        .set_terrain(cell, rock);
+    let (width, height) = {
+        let grid = app.world().resource::<Grid>();
+        (grid.width() as usize, grid.height() as usize)
+    };
+    let mut looks = vec![0u8; width * height];
+    looks[y as usize * width + x as usize] = 7 << 4;
+    let armour = defs(app)
+        .armour_class(armour)
+        .unwrap_or_else(|| panic!("armour {armour}"));
+    let props = sim::Props::from_looks(app.world().resource::<Grid>(), &looks, armour);
+    let id = props.id_at(cell).expect("the tower");
+    app.world_mut().insert_resource(props);
+    id
+}
+
+/// The hit points of the scenery in the cell (`x`, `y`), or `None` once it is gone.
+pub fn scenery_hp(app: &App, x: i32, y: i32) -> Option<i32> {
+    app.world()
+        .resource::<sim::Props>()
+        .at(CellPos::new(x, y))
+        .map(|prop| prop.hit_points)
+}

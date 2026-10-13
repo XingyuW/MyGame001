@@ -925,6 +925,22 @@ impl Arsenal {
             if missile.is_some() && domain != Domain::Air {
                 return Err(bad("missile", "a missile that does not fly"));
             }
+            // A missile goes off with an effect of the combat file, another one when its
+            // launcher is elite: both must be listed, or it would silently deal nothing.
+            if let Some(missile) = missile {
+                for elite in [false, true] {
+                    let effect = missile.effect(elite);
+                    if defs.effect(effect).is_none() {
+                        return Err(err(
+                            format!("entries[{i}].missile"),
+                            DataErrorKind::UnknownReference {
+                                kind: "effect".into(),
+                                id: effect.id().into(),
+                            },
+                        ));
+                    }
+                }
+            }
             result.insert(
                 item,
                 ArsenalEntry {

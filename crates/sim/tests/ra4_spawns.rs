@@ -549,3 +549,109 @@ fn bays_launched_units_and_missiles_are_hashed() {
         assert_ne!(scenario(edit), base, "{name} is not hashed");
     }
 }
+
+// --- Regression: advisory review 2, sim P1-1 and P1-2 (docs/DECISIONS.md R56) -----------------------
+
+#[test]
+fn a_launcher_ordered_onto_scenery_sends_its_rocket_to_the_cell() {
+    // Scenery is no actor of the simulation: the launcher's bay never had its target, and the
+    // launcher fired its launching shot every 200 ticks for ever without a rocket or an end.
+    let mut app = world();
+    let launcher = spawn(&mut app, P0, "launcher", 5, 10);
+    spawn(&mut app, P0, "engineer", 14, 11);
+    let scenery = tower(&mut app, 15, 10, "plate");
+    ticks(&mut app, 2);
+    let mut events = tick(&mut app, vec![attack(P0, launcher, scenery)]);
+    assert!(rejections(&events).is_empty(), "{events:?}");
+    let (more, _) = run_until(&mut app, 200, |_, events| !detonated(events).is_empty());
+    events.extend(more);
+    let rockets = launched(&events);
+    assert_eq!(rockets.len(), 1);
+    assert_eq!(rockets[0].0, launcher);
+    assert_eq!(
+        detonated(&events),
+        [(rockets[0].1, SubPos::centre_of(CellPos::new(15, 10)))]
+    );
+    // The rocket's 150 through `blast` (plate 50 percent) at the tower's own cell.
+    assert_eq!(scenery_hp(&app, 15, 10), Some(1000 - 75));
+}
+
+#[test]
+fn a_launcher_that_boards_a_transport_and_leaves_it_has_no_rocket_sooner() {
+    // The bay of a spawner that went aboard was dropped, and a spawner without a bay has all
+    // it carries: the launcher launched at tick 2, boarded, left, and launched again at tick 8,
+    // where the fixture replaces a rocket 200 ticks after it is gone.
+    let mut app = world();
+    let launcher = spawn(&mut app, P0, "launcher", 5, 10);
+    let craft = spawn(&mut app, P0, "hovercraft", 5, 11);
+    spawn(&mut app, P0, "engineer", 11, 10);
+    let truck = spawn(&mut app, P1, "truck", 15, 10);
+    app.world_mut()
+        .resource_mut::<SpecialState>()
+        .disabled
+        .insert(truck, u64::MAX);
+    set_hp(&mut app, truck, 100_000);
+    tick(&mut app, Vec::new());
+    let mut events = tick(&mut app, vec![attack(P0, launcher, truck)]);
+    events.extend(ticks(&mut app, 3));
+    assert_eq!(launched(&events).len(), 1);
+    assert_eq!(
+        state(&app).bays[&launcher].slots,
+        [Slot::Out(launched(&events)[0].1)]
+    );
+    // Aboard: the bay goes with it, and the rocket that is out counts as lost from now on.
+    let events = tick(
+        &mut app,
+        vec![issue(
+            P0,
+            sim::Command::Interact {
+                unit: launcher,
+                target: craft,
+            },
+        )],
+    );
+    assert!(rejections(&events).is_empty(), "{events:?}");
+    assert!(!state(&app).bays.contains_key(&launcher));
+    let aboard = &state(&app).cargo[&craft];
+    assert_eq!(aboard.len(), 1);
+    assert_eq!(
+        aboard[0].bay.as_ref().map(|bay| bay.slots.clone()),
+        Some(vec![Slot::Lost(200)])
+    );
+    // What a passenger's bay holds is part of the state.
+    let before = hash(&mut app);
+    app.world_mut()
+        .resource_mut::<SpecialState>()
+        .cargo
+        .get_mut(&craft)
+        .expect("cargo")[0]
+        .bay = None;
+    assert_ne!(hash(&mut app), before);
+    app.world_mut()
+        .resource_mut::<SpecialState>()
+        .cargo
+        .get_mut(&craft)
+        .expect("cargo")[0]
+        .bay = Some(sim::Bay {
+        slots: vec![Slot::Lost(200)],
+        target: None,
+        pending: 0,
+        wait: 0,
+    });
+    // The timers stand still aboard.
+    ticks(&mut app, 50);
+    let events = tick(
+        &mut app,
+        vec![issue(P0, sim::Command::Deploy { unit: craft })],
+    );
+    assert!(rejections(&events).is_empty(), "{events:?}");
+    // (Its first tick on the map has passed.)
+    assert_eq!(state(&app).bays[&launcher].slots, [Slot::Lost(199)]);
+    // Ordered to attack again, it launches when the place is filled: 200 ticks after it left
+    // the transport, and not before.
+    let mut events = tick(&mut app, vec![attack(P0, launcher, truck)]);
+    events.extend(ticks(&mut app, 195));
+    assert!(launched(&events).is_empty(), "{:?}", launched(&events));
+    let (events, _) = run_until(&mut app, 240, |_, events| !launched(events).is_empty());
+    assert_eq!(launched(&events).len(), 1);
+}

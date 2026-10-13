@@ -273,10 +273,22 @@ fn flags_outside_0_and_1_and_numbers_outside_their_ranges_are_rejected() {
             over(MAX_SPAWNS),
         ),
         (
+            "spawns_number",
+            "carrier",
+            "spawns_number: 3",
+            "-1".to_owned(),
+        ),
+        (
             "spawn_regen",
             "carrier",
             "spawn_regen: 400",
             over(MAX_SPAWN_TICKS),
+        ),
+        (
+            "spawn_regen",
+            "carrier",
+            "spawn_regen: 400",
+            "-1".to_owned(),
         ),
         (
             "spawn_reload",
@@ -568,10 +580,70 @@ fn the_terms_of_a_spawner_must_fit_together() {
         "missile",
         "a missile that does not fly",
     );
-    accepted(
-        "missile_dmisl",
-        "rocket",
-        &[(r#"missile: "v3""#, r#"missile: "dmisl""#)],
+    // A missile goes off with an effect of the combat file, and with another when its launcher
+    // is elite: both must be listed (advisory review 2, tests P1-4; before, such an arsenal was
+    // accepted and the missile went off without dealing anything). The fixture's combat file
+    // lists the two effects of the V3 rocket and neither of the other missile.
+    let missing = |context: Definitions, name: &str, edits: &[(&str, &str)], effect: &str| {
+        let (path, entry) = variant(name, "rocket", edits);
+        let error = context.with_arsenal(&path).expect_err("rejected");
+        assert_eq!(error.file, path, "{name}");
+        assert_eq!(error.field, format!("entries[{entry}].missile"), "{name}");
+        assert_eq!(
+            error.kind,
+            DataErrorKind::UnknownReference {
+                kind: "effect".into(),
+                id: effect.into()
+            },
+            "{name}: {error}"
+        );
+    };
+    let dmisl = [(r#"missile: "v3""#, r#"missile: "dmisl""#)];
+    missing(context(), "missile_dmisl", &dmisl, "dmisl");
+    // With a combat file edited by `edits` (each `from` occurs once).
+    let combat = |name: &str, edits: &[(&str, &str)]| {
+        let mut text = std::fs::read_to_string(fixture("combat.ron")).expect("the fixture");
+        for (from, to) in edits {
+            assert_eq!(text.matches(from).count(), 1, "{name}: {from:?}");
+            text = text.replace(from, to);
+        }
+        let dir = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join("ra4_definitions");
+        std::fs::create_dir_all(&dir).expect("temporary directory");
+        let path = dir.join(format!("combat_{name}.ron"));
+        std::fs::write(&path, text).expect("temporary file");
+        load_match_definitions(fixture("units.ron"), fixture("economy.ron"), &path)
+            .and_then(|definitions| definitions.with_rules(fixture("rules.ron")))
+            .unwrap_or_else(|error| panic!("{name}: {error}"))
+    };
+    let elite = r#"(id: "v3_rocket_elite", damage: 300, warhead: "blast"),"#;
+    // Only the plain effect of the other missile: its elite effect is missed.
+    let plain = format!("{elite}\n        (id: \"dmisl\", damage: 200, warhead: \"blast\"),");
+    missing(
+        combat("dmisl_plain", &[(elite, plain.as_str())]),
+        "missile_dmisl_plain",
+        &dmisl,
+        "dmisl_elite",
+    );
+    // Both: accepted, and the missile is the arsenal's.
+    let both = format!("{plain}\n        (id: \"dmisl_elite\", damage: 400, warhead: \"blast\"),");
+    let (path, _) = variant("missile_dmisl_both", "rocket", &dmisl);
+    let definitions = combat("dmisl_both", &[(elite, both.as_str())])
+        .with_arsenal(&path)
+        .unwrap_or_else(|error| panic!("{error}"));
+    let rocket = definitions.unit_kind("rocket").expect("rocket");
+    assert_eq!(
+        definitions
+            .metadata(sim::ProductionItem::Unit(rocket))
+            .expect("rocket")
+            .missile,
+        Some(Missile::DMisl)
+    );
+    // The fixture's own missile without its elite effect is rejected too.
+    missing(
+        combat("v3_plain", &[(elite, "")]),
+        "missile_v3_plain",
+        &[],
+        "v3_rocket_elite",
     );
 }
 
@@ -622,7 +694,7 @@ fn every_trait_of_schema_version_5_is_hashed() {
             "missile",
             "rocket",
             r#"missile: "v3""#,
-            r#"missile: "dmisl""#,
+            r#"missile: "none""#,
         ),
         ("cloakable", "sub", "cloakable: 1", "cloakable: 0"),
         ("sensors", "boat", "sensors_sight: 5", "sensors_sight: 6"),

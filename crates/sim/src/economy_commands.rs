@@ -463,6 +463,24 @@ pub(crate) fn apply(
                 &index.kinds_of(player),
                 item,
             )?;
+            // RA4: `check_buildable` counts the docks of `owned` or, if that is more, those the
+            // player had at the last `Economy` stage, for callers that list every type once.
+            // The command knows every building that stands now, and counts those alone: a
+            // dock sold or lost earlier in this tick takes no aircraft.
+            if crate::flight::needs_dock(definitions, item) {
+                let taken = (state.docked_aircraft() as usize).saturating_add(
+                    state
+                        .queues()
+                        .flat_map(|(_, items)| items.iter())
+                        .filter(|queued| crate::flight::needs_dock(definitions, queued.item))
+                        .count(),
+                );
+                let docks =
+                    crate::flight::docks_of(definitions, index.kinds_of(player).into_iter());
+                if taken >= docks as usize {
+                    return Err(RejectReason::NoFreeDock(item));
+                }
+            }
             // `check_buildable` found the production terms.
             let Some(terms) = definitions.production(item) else {
                 return Err(RejectReason::UnknownItem(item));

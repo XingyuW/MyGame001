@@ -509,10 +509,26 @@ fn only_the_base_units_have_a_crew_and_it_is_of_their_owners_side() {
         (0..120)
             .map(|seed| {
                 let mut app = world_seeded(48, seed);
+                // An aircraft that needs a dock has one (it is lost in its first tick without,
+                // R49, and the row would show nothing): it stands on an Airforce Command.
+                let definitions = defs(&app);
+                let bound = definitions
+                    .unit_kind(unit)
+                    .and_then(|kind| definitions.metadata(ProductionItem::Unit(kind)))
+                    .is_some_and(|entry| entry.airport_bound);
+                if bound {
+                    put(&mut app, owner, "airforce_command", 10, 10);
+                }
                 let id = put(&mut app, owner, unit, 10, 10);
                 tick(&mut app, Vec::new());
+                assert!(
+                    hp(&mut app, id).is_some(),
+                    "{unit} stands before it is destroyed"
+                );
                 set_hp(&mut app, id, 0);
-                let crew = escaped(&tick(&mut app, Vec::new()));
+                let events = tick(&mut app, Vec::new());
+                assert!(destroyed(&events).contains(&id), "{unit} is destroyed");
+                let crew = escaped(&events);
                 assert!(crew.len() <= 1);
                 crew.first().map(|&unit| kind_of(&mut app, unit))
             })
@@ -529,9 +545,10 @@ fn only_the_base_units_have_a_crew_and_it_is_of_their_owners_side() {
         // 50 percent of 120: within four standard deviations (5.5 each) of 60.
         assert!((38..=82).contains(&escapes), "{unit}: {escapes} of 120");
     }
-    // A tank has no crew ([MTNK] has no Crewed key), and the Harrier's pilot does not get
-    // out ([ORCA] Crewed=yes: aircraft release nobody).
-    for unit in ["grizzly", "rhino", "harrier", "nighthawk"] {
+    // A tank has no crew ([MTNK] has no Crewed key), and the pilots of the Harrier, the Black
+    // Eagle and the NightHawk do not get out ([ORCA], [BEAG] and [SHAD] Crewed=yes: aircraft
+    // release nobody).
+    for unit in ["grizzly", "rhino", "harrier", "black_eagle", "nighthawk"] {
         assert_eq!(wrecks(P0, unit).iter().flatten().count(), 0, "{unit}");
     }
 }
@@ -549,6 +566,10 @@ fn the_survivors_of_shipped_buildings_follow_the_refund_and_the_divisors() {
         // [GAWEAP] Cost=2000: 1000 / 500 = 2. [NAWEAP]: 1000 / 250 = 4.
         (P0, "war_factory", "gi", 2),
         (P1, "soviet_war_factory", "conscript", 4),
+        // Quotients that are not whole are rounded up (assumption of R48). [NAPOWR] Cost=600:
+        // 300 / 250 = 1.2, 2 survivors. [GAOREP] Cost=2500: 1250 / 500 = 2.5, 3 survivors.
+        (P1, "tesla_reactor", "conscript", 2),
+        (P0, "ore_purifier", "gi", 3),
     ] {
         let mut app = world(48);
         let id = put(&mut app, owner, building, 10, 10);
@@ -664,7 +685,19 @@ fn a_fifth_harrier_is_refused_and_built_after_a_second_airforce_command_stands()
     let mut app = world(48);
     put(&mut app, P0, "war_factory", 10, 10);
     tick(&mut app, Vec::new());
-    assert_eq!(rejections(&tick(&mut app, vec![queue()])).len(), 1);
+    // The reason names what is missing: its prerequisite, the Airforce Command ([ORCA]
+    // Prerequisite=RADAR, of which the Airforce Command is the first member).
+    let definitions = defs(&app);
+    let harrier = ProductionItem::Unit(definitions.unit_kind("harrier").expect("harrier"));
+    assert_eq!(
+        rejections(&tick(&mut app, vec![queue()])),
+        [RejectReason::MissingPrerequisite {
+            item: harrier,
+            prerequisite: definitions
+                .building_kind("airforce_command")
+                .expect("airforce command"),
+        }]
+    );
 }
 
 #[test]
@@ -690,7 +723,12 @@ fn a_harrier_fires_one_volley_and_reloads_it_on_its_dock() {
     events.extend(ticks(&mut app, 30));
     assert_eq!(shots_of(&events, harrier).len(), 2, "one volley of two");
     assert_eq!(hp(&mut app, target), Some(10_000 - 300));
-    // It reloads its one volley in 360 ticks on the dock.
+    // It reloads its one volley in 360 ticks on the dock. The target is taken away first
+    // (scenario setup): a round is spent with the first shot of a volley
+    // (docs/DECISIONS.md R56), and the reloaded Harrier would fire at it in the very tick in
+    // which it has its round again.
+    set_hp(&mut app, target, 0);
+    tick(&mut app, Vec::new());
     let waited = state(&app).reloading[&harrier];
     ticks(&mut app, 359 - waited);
     assert_eq!(state(&app).ammo.get(&harrier), Some(&0));
@@ -973,4 +1011,55 @@ fn a_typhoon_that_fires_is_seen_for_the_cloak_delay() {
     assert!(!hidden(&app, P0, typhoon), "23 ticks later");
     tick(&mut app, Vec::new());
     assert!(hidden(&app, P0, typhoon), "24 ticks later");
+}
+
+// --- Regression: advisory review 2, sim, suspected item 4 (docs/DECISIONS.md R56) ------------------
+
+#[test]
+fn the_chronosphere_does_not_move_a_launched_rocket() {
+    // A launched unit takes no command (R50 item 7), but the unit list of a Chronosphere did
+    // not ask: the V3 rocket is a vehicle of the air domain, so its owner could put a rocket
+    // in flight down on any cell it sees, where it went off.
+    let (mut app, _, target) = v3_and_target();
+    for column in 0..4 {
+        put(&mut app, P0, "power_plant", 30 + 3 * column, 30);
+    }
+    let sphere = put(&mut app, P0, "chronosphere", 30, 34);
+    let own = put(&mut app, P0, "grizzly", 12, 14);
+    ticks(&mut app, 2);
+    let definitions = defs(&app);
+    let kind = definitions
+        .building_kind("chronosphere")
+        .expect("chronosphere");
+    let charge = definitions
+        .metadata(ProductionItem::Building(kind))
+        .expect("chronosphere")
+        .cooldown;
+    app.world_mut()
+        .resource_mut::<SpecialState>()
+        .charge
+        .insert(sphere, charge);
+    let (events, _) = run_until(&mut app, 10, |_, events| !launched(events).is_empty());
+    let rocket = launched(&events)[0];
+    let send = |units: Vec<SimId>| IssuedCommand {
+        player: P0,
+        command: Command::Superweapon {
+            building: sphere,
+            target: CellPos::new(16, 14),
+            units,
+        },
+    };
+    let events = tick(&mut app, vec![send(vec![rocket])]);
+    assert_eq!(rejections(&events), [RejectReason::NotCommandable(rocket)]);
+    // The rocket flies on and goes off at its target; the Chronosphere is still charged, and
+    // moves the player's own tank.
+    let (events, _) = run_until(&mut app, 200, |_, events| !detonated(events).is_empty());
+    assert_eq!(
+        detonated(&events),
+        [(rocket, SubPos::centre_of(CellPos::new(20, 10)))]
+    );
+    assert_eq!(hp(&mut app, target), Some(10_000 - 140));
+    let events = tick(&mut app, vec![send(vec![own])]);
+    assert!(rejections(&events).is_empty(), "{events:?}");
+    assert_ne!(mobile(&mut app, own).cell, CellPos::new(12, 14));
 }
