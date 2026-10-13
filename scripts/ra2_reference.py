@@ -5,7 +5,9 @@
 # Input, never committed: the two ini files in ~/Library/Caches/MyGame001/ra2-reference/ (or in
 # the directory named by RA2_REFERENCE_DIR), read through scripts/ra2_ini.py.
 # Input, committed: crates/sim/tests/reference/ra2_mapping.tsv (game id -> ini section).
-# Output, committed: crates/sim/tests/reference/ra2_reference.tsv (file, section, key, value).
+# Output, committed: crates/sim/tests/reference/ra2_reference.tsv (file, section, key, value)
+# and ra2_reference.tsv.sha256 (the SHA-256 of the table as it was written, so that a table
+# edited by hand is found also where the ini files are not at hand).
 #
 # Provenance (docs/DECISIONS.md, R2): repository https://github.com/otherdeniz/CnC_RulesEditor,
 # commit b7278f2e1dab098c5a2f05d4784fffe70a4e5f9c, files
@@ -17,8 +19,12 @@
 #
 # Only numbers, percentages, yes/no flags and identifiers (section names, weapon, warhead,
 # projectile and type ids, house names) are extracted. Nothing else of the ini files reaches
-# the repository: no comments, no names, no interface strings, no image, voice, sound or
-# animation names. Two rules enforce this:
+# the repository: no comments, no names, no interface strings, no image, voice or sound names,
+# and no animation names with one exception: a [Powerups] value is one list (share, animation,
+# whether it works on water, argument), kept whole, so the table and the comments of
+# `assets/data/rules.ron` carry the short identifier of each crate's animation (ARMOR, MONEY,
+# ...), as they carry a building's `Image` id; the game reads the share and the argument only.
+# Two rules enforce this:
 #   * sections of units, buildings, weapons, warheads, projectiles, superweapons, countries,
 #     land types and ore types are filtered by the explicit key lists below; a key that is
 #     not listed is never written;
@@ -31,8 +37,10 @@
 #
 # Usage (standard library only, Python 3):
 #     python3 scripts/ra2_reference.py            regenerate the table
-#     python3 scripts/ra2_reference.py --check    exit 1 if the committed table is stale;
-#                                                 exit 0 with a note if the cache is absent
+#     python3 scripts/ra2_reference.py --check    exit 1 if the committed table is not the one
+#                                                 this script wrote (its recorded SHA-256) or
+#                                                 is stale; without the cache only the first
+#                                                 is checked, and the note says so (exit 0)
 #     python3 scripts/ra2_reference.py --stats    counts per category, dangling references
 # Exit code 2 reports an error (missing file, wrong hash, mapping that contradicts the ini).
 """Writes the committed RA2 reference table from the cached ini files."""
@@ -48,6 +56,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REFERENCE_DIR = os.path.join(ROOT, "crates", "sim", "tests", "reference")
 MAPPING_PATH = os.path.join(REFERENCE_DIR, "ra2_mapping.tsv")
 TABLE_PATH = os.path.join(REFERENCE_DIR, "ra2_reference.tsv")
+TABLE_HASH_PATH = TABLE_PATH + ".sha256"
 
 SHA256 = {
     "rules": "adc869ca037db5141f562f18092d022045e194de0d1204a46b9ec8372b2b826f",
@@ -592,6 +601,33 @@ def parse_table(text):
     return rows
 
 
+def table_hash(text):
+    """The SHA-256 of the table's text, as the file beside the table records it."""
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def check_recorded_hash():
+    """Whether the committed table is the one this script wrote, by its recorded SHA-256.
+
+    This needs no ini file, so it also runs where the reference cache is absent.
+    """
+    try:
+        with open(TABLE_PATH, "r", encoding="utf-8", newline="") as handle:
+            committed = handle.read()
+        with open(TABLE_HASH_PATH, "r", encoding="ascii") as handle:
+            recorded = handle.read().strip()
+    except OSError as error:
+        print("ra2_reference: cannot read the committed table or its hash: %s" % error)
+        return False
+    if table_hash(committed) != recorded:
+        print("ra2_reference: the committed table does not have the SHA-256 recorded in %s:"
+              " it was edited by hand, or written without its hash;"
+              " run `python3 scripts/ra2_reference.py` and commit the result"
+              % os.path.relpath(TABLE_HASH_PATH, ROOT))
+        return False
+    return True
+
+
 def check(fresh):
     """Compare the committed table with a fresh extraction; returns the exit code."""
     try:
@@ -646,9 +682,12 @@ def main(argv):
     if len(argv) > 2 or mode not in (None, "--check", "--stats"):
         sys.stderr.write("usage: ra2_reference.py [--check | --stats]\n")
         return 2
+    if mode == "--check" and not check_recorded_hash():
+        return 1
     if mode == "--check" and not os.path.isdir(ra2_ini.reference_dir()):
         print("ra2_reference: no reference cache at %s (it is not part of the repository);"
-              " check skipped" % ra2_ini.reference_dir())
+              " the committed table has its recorded SHA-256, the comparison with the ini"
+              " files is skipped" % ra2_ini.reference_dir())
         return 0
     try:
         rules, art = load_reference()
@@ -663,8 +702,11 @@ def main(argv):
     if mode == "--stats":
         stats(table, rules)
         return 0
+    text = table.render()
     with open(TABLE_PATH, "w", encoding="utf-8", newline="\n") as handle:
-        handle.write(table.render())
+        handle.write(text)
+    with open(TABLE_HASH_PATH, "w", encoding="ascii", newline="\n") as handle:
+        handle.write(table_hash(text) + "\n")
     print("ra2_reference: wrote %d rows of %d sections to %s"
           % (len(table.rows), len(table.categories), os.path.relpath(TABLE_PATH, ROOT)))
     return 0

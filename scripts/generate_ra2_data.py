@@ -9,7 +9,7 @@
 #             v
 #     assets/data/{rules,units,economy,combat,arsenal,skirmish,ai}.ron
 #
-# It reads only the two committed tables: never the ini files. Every value ported from the
+# It reads only the three committed tables: never the ini files. Every value ported from the
 # reference is converted with the conversions of the plan's section 2 and written with a
 # trailing comment `// [Section] Key=value` naming where it comes from. Values that are not
 # ported (labels, descriptions, sprites, footprints, roles, the computer player's plans, the
@@ -314,8 +314,6 @@ EFFECTS = (
     ("dmisl", ("General", "DMislDamage"), ("CombatDamage", "DMislWarhead")),
     ("dmisl_elite", ("General", "DMislEliteDamage"), ("CombatDamage", "DMislEliteWarhead")),
 )
-# The limits of the combat file (crates/sim/src/combat_defs.rs).
-MIN_PROJECTILE_SPEED = 16
 HARVESTERS = {'chrono_miner': (500, 7), 'war_miner': (1000, 7)}
 
 # The ids RA1 adds (docs/RA2_PARITY_PLAN.md section 3.3): id: (label, the id whose game specific

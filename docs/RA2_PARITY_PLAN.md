@@ -77,8 +77,12 @@ assets/data/{rules,units,economy,combat,arsenal,skirmish,ai}.ron
 "every shipped value equals conversion(reference value), or is a listed difference"
 ```
 
-* `ra2_reference.tsv` holds only what the game uses: for every mapped section the numeric keys and
-  identifier keys (weapon, warhead, prerequisite, owner lists), no comments, no display strings.
+* `ra2_reference.tsv` holds, for every mapped section and the sections those refer to, the
+  numeric keys and identifier keys (weapon, warhead, prerequisite, owner lists) of the key lists
+  in `scripts/ra2_reference.py`, and the global sections whole: no comments, no display strings.
+  It holds more than the game reads today (4888 rows of 425 sections, among them `[AI]`, `[IQ]`,
+  `ThreatPosed`, `Points` and the `Foundation` and `Height` of `art.ini`, which later milestones
+  or nothing will use): the audit covers what is ported, not every row.
   It is the committed "reference table of values (numbers and ini keys only)" of the prompt.
 * The generator applies the conversions of section 2 and writes each ported value with a trailing
   comment `// [Section] Key=value`. Values that are not ported (sprites, labels, descriptions,
@@ -1064,6 +1068,20 @@ sh scripts/package_macos.sh
 
 `sh scripts/validate_ra2_parity.sh <milestone>` runs them in this order and writes
 `docs/validation/ra2-parity/<milestone>/summary.txt` with every exit status and the test counts.
+
+Since the remediation of advisory review 1 (`docs/DECISIONS.md` R56) the script runs two more
+commands after these eleven, which keep their numbers, so that the pipeline of section 3.1 holds
+at every validated commit:
+
+```
+python3 scripts/generate_ra2_data.py --check     12: the shipped data files are what the generator writes
+python3 scripts/ra2_reference.py --check         13: the reference table is the one the script wrote and extracts
+```
+
+Command 13 compares the committed table with its recorded SHA-256
+(`crates/sim/tests/reference/ra2_reference.tsv.sha256`) and, where the ini files are cached, with
+a fresh extraction; without the cache it passes with a notice that the second comparison was
+skipped.
 
 ### 6.2 Failure conditions (stop and ask the user)
 
