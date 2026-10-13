@@ -1793,9 +1793,11 @@ fn count_frames(
         credits_text_shown: credits_shown.as_deref() == Some(credits_expected.as_str()),
         minimap_drawings: minimap.drawings,
         minimap_lit_pixels: minimap.lit_pixels,
-        // RA2: the drawing of this tick shows the map exactly if the player has radar.
+        // RA2: the drawing of this tick shows the map exactly if the player has radar. What
+        // was drawn is asked (the pixels of the image that show something of the map), not
+        // the flag the drawing sets from the same radar (advisory review 1, tests P1-1).
         minimap_follows_radar: minimap.drawn_tick != Some(tick)
-            || minimap.offline != crate::minimap::radar_online(&host),
+            || (minimap.map_pixels > 0) == crate::minimap::radar_online(&host),
         sounds_complete: sounds == Sfx::ALL.len(),
         music_players: music.iter().count(),
         pause: match smoke.pause {

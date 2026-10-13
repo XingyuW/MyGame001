@@ -616,4 +616,9 @@ fn a_player_id_outside_the_match_changes_nothing() {
         rejections(&events),
         [RejectReason::UnknownPlayer(PlayerId(9))]
     );
+    // Nothing changed: the state is that of the same world after a tick without the command
+    // (advisory review 1, tests P2-11: the name promised it, the test asserted the reason).
+    let mut quiet = base(1_000, 1, 1);
+    tick(&mut quiet, Vec::new());
+    assert_eq!(state_hash(app.world_mut()), state_hash(quiet.world_mut()));
 }

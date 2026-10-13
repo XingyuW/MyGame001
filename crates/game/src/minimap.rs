@@ -408,6 +408,18 @@ pub fn offline_pixels(layout: &MinimapLayout) -> Vec<u8> {
     render(layout, &vec![OFFLINE_COLOUR; cells])
 }
 
+/// The pixels of a minimap image that show something of the map: opaque, not black (shroud)
+/// and not of [`OFFLINE_COLOUR`]. None on the screen without radar; some on every drawn map on
+/// which the player sees or has explored anything.
+pub fn map_pixels(pixels: &[u8]) -> usize {
+    pixels
+        .as_chunks::<4>()
+        .0
+        .iter()
+        .filter(|pixel| pixel[3] > 0 && pixel[..3] != [0, 0, 0] && **pixel != OFFLINE_COLOUR)
+        .count()
+}
+
 // --- Systems --------------------------------------------------------------------------------
 
 /// The minimap image and its layout.
@@ -436,6 +448,11 @@ pub struct MinimapState {
     pub lit_pixels: usize,
     /// Whether the last drawing was that of a minimap without radar (RA2).
     pub offline: bool,
+    /// Pixels of the last drawing that show something of the map: on the map's diamond and
+    /// neither black (shroud) nor of [`OFFLINE_COLOUR`]. Counted on the image as it was drawn,
+    /// so that the smoke test can tell a drawn map from the screen without radar by what is
+    /// on it, not by the flag above (advisory review 1, tests P1-1).
+    pub map_pixels: usize,
 }
 
 pub(crate) fn create_minimap(
@@ -539,6 +556,7 @@ pub(crate) fn draw_minimap(
         .iter()
         .filter(|pixel| pixel[3] > 0 && pixel[..3] != [0, 0, 0])
         .count();
+    state.map_pixels = map_pixels(&pixels);
     if let Some(mut image) = images.get_mut(&minimap.image)
         && image.data.as_ref() != Some(&pixels)
     {
@@ -904,6 +922,94 @@ mod tests {
         let empty = crate::sim_host::tests::fixture_host(|_| {});
         assert!(radar_online(&empty));
         assert_eq!(offline_text(&empty), None);
+    }
+
+    /// What [`draw_minimap`], run as the system it is, draws for `host`: the image, the
+    /// layout, and the state it leaves.
+    fn drawn(host: SimHost) -> (Vec<u8>, MinimapLayout, MinimapState) {
+        use bevy::ecs::system::RunSystemOnce;
+        let grid = host.grid().expect("grid").clone();
+        let layout = MinimapLayout::new(grid.width(), grid.height());
+        let mut world = World::new();
+        let mut images = Assets::<Image>::default();
+        let image = images.add(Image::default());
+        world.insert_resource(images);
+        world.insert_resource(MapTerrain(grid));
+        world.insert_resource(Minimap {
+            image: image.clone(),
+            layout,
+        });
+        world.insert_resource(MinimapState::default());
+        world.insert_resource(host);
+        world
+            .run_system_once(draw_minimap)
+            .expect("the system runs");
+        let data = world
+            .resource::<Assets<Image>>()
+            .get(&image)
+            .and_then(|image| image.data.clone())
+            .expect("the image was drawn");
+        let state = world.remove_resource::<MinimapState>().expect("the state");
+        (data, layout, state)
+    }
+
+    /// Regression (advisory review 1, tests P1-1): no test ran `draw_minimap`, and the smoke
+    /// test compared the flag the drawing sets with the radar it was set from, which cannot
+    /// differ. What is drawn is now looked at: the map with radar, the screen of one colour
+    /// without, and the count the smoke test reads ([`MinimapState::map_pixels`]) tells them
+    /// apart.
+    #[test]
+    fn the_drawing_is_the_map_with_radar_and_the_offline_screen_without() {
+        // No radar building: the offline screen, pixel for pixel.
+        let mut host = crate::sim_host::tests::demo_host();
+        crate::sim_host::tests::run(&mut host, Vec::new());
+        assert!(!radar_online(&host));
+        let (data, layout, state) = drawn(host);
+        assert_eq!(data, offline_pixels(&layout));
+        assert!(state.offline && state.drawings == 1);
+        assert_eq!(state.map_pixels, 0);
+        assert!(state.lit_pixels > 0, "the screen is not black");
+        // A power plant and an Airforce Command: the map, which is not that screen.
+        let mut host = crate::sim_host::tests::demo_host_with(|world| {
+            build(world, "power_plant");
+            build(world, "american_airforce_command");
+        });
+        crate::sim_host::tests::run(&mut host, Vec::new());
+        assert!(radar_online(&host));
+        let (data, layout, state) = drawn(host);
+        assert_ne!(data, offline_pixels(&layout));
+        assert!(!state.offline);
+        assert!(
+            state.map_pixels > 0,
+            "terrain and the player's own buildings"
+        );
+        assert_eq!(state.map_pixels, map_pixels(&data));
+        // Low power: the offline screen again.
+        let mut host = crate::sim_host::tests::demo_host_with(|world| {
+            build(world, "power_plant");
+            build(world, "american_airforce_command");
+            for _ in 0..3 {
+                build(world, "prism_tower");
+            }
+        });
+        crate::sim_host::tests::run(&mut host, Vec::new());
+        assert!(!radar_online(&host));
+        let (data, layout, state) = drawn(host);
+        assert_eq!(data, offline_pixels(&layout));
+        assert!(state.offline);
+        assert_eq!(state.map_pixels, 0);
+        // The count tells the two apart on any image: the offline screen has none, and one
+        // pixel of the map is enough.
+        let mut screen = offline_pixels(&layout);
+        assert_eq!(map_pixels(&screen), 0);
+        let on_map = screen
+            .as_chunks::<4>()
+            .0
+            .iter()
+            .position(|pixel| pixel[3] > 0)
+            .expect("the diamond");
+        screen[on_map * 4..on_map * 4 + 4].copy_from_slice(&[40, 90, 40, 255]);
+        assert_eq!(map_pixels(&screen), 1);
     }
 
     #[test]
