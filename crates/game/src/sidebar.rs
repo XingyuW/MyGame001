@@ -195,7 +195,11 @@ pub fn item_status(
     let owned_kinds: Vec<BuildingKind> = owned.iter().copied().collect();
     let check = sim::check_buildable(definitions, state, superweapons, &owned_kinds, item);
     let available = check.is_ok();
-    let limited = matches!(check, Err(sim::RejectReason::BuildLimitReached { .. }));
+    // RA4: an aircraft whose docks are all taken is listed like an item at its build limit.
+    let limited = matches!(
+        check,
+        Err(sim::RejectReason::BuildLimitReached { .. } | sim::RejectReason::NoFreeDock(_))
+    );
     // The queue of the item: of its factory group and, for a building, of its lane (RA2).
     let queue = definitions
         .queue_of(item)
@@ -347,10 +351,15 @@ pub fn availability_text(
     let rates = defs.rules().map(|rules| rules.production);
     if let Some(s) = state {
         let kinds: Vec<BuildingKind> = owned.iter().copied().collect();
-        if let Err(sim::RejectReason::BuildLimitReached { limit, .. }) =
-            sim::check_buildable(defs, s, true, &kinds, item)
-        {
-            return format!("Build limit reached: {limit} per player");
+        match sim::check_buildable(defs, s, true, &kinds, item) {
+            Err(sim::RejectReason::BuildLimitReached { limit, .. }) => {
+                return format!("Build limit reached: {limit} per player");
+            }
+            // RA4: every dock of the player's buildings holds an aircraft or waits for one.
+            Err(sim::RejectReason::NoFreeDock(_)) => {
+                return "No free dock: every dock is taken".into();
+            }
+            _ => {}
         }
         let queue = defs.queue_of(item).map_or(&[][..], |key| s.lane(key));
         if queue.len() >= defs.queue_capacity(item) {
@@ -651,7 +660,9 @@ pub fn reachable_buildings(
 fn within_reach(check: Result<(), sim::RejectReason>) -> bool {
     matches!(
         check,
-        Ok(()) | Err(sim::RejectReason::BuildLimitReached { .. })
+        Ok(())
+            | Err(sim::RejectReason::BuildLimitReached { .. })
+            | Err(sim::RejectReason::NoFreeDock(_))
     )
 }
 
@@ -1757,6 +1768,79 @@ mod tests {
         assert_eq!(power_text(state), format!("Power  0 / {supplied}"));
         assert_eq!(credits_text(None), "Credits  0");
         let _ = CellPos::new(0, 0);
+    }
+
+    /// RA4: a Harrier whose docks are all taken is not available, stays listed like a card at
+    /// its build limit, and says why; with a second Airforce Command of the same type it is
+    /// available again, although the sidebar lists the type once.
+    #[test]
+    fn an_aircraft_without_a_free_dock_stays_listed_and_says_so() {
+        let spawn = |commands: usize| {
+            crate::sim_host::tests::demo_host_with(move |world| {
+                let mut placed = Vec::new();
+                for id in ["power_plant", "refinery"]
+                    .into_iter()
+                    .chain(std::iter::repeat_n("american_airforce_command", commands))
+                {
+                    let spot = (30..60)
+                        .flat_map(|y| (20..60).map(move |x| CellPos::new(x, y)))
+                        .find_map(|cell| {
+                            sim::spawn_building(world, HUMAN, id, cell)
+                                .ok()
+                                .map(|_| cell)
+                        });
+                    placed.push(spot.unwrap_or_else(|| panic!("ground for {id}")));
+                }
+                // Four Harriers beside the first Airforce Command, which they fly to.
+                let at = placed[2];
+                for n in 0..4 {
+                    sim::spawn_unit(world, HUMAN, "harrier", CellPos::new(at.x + n, at.y))
+                        .expect("a Harrier above its Airforce Command");
+                }
+                // The simulation counts aircraft and docks in its `Economy` stage.
+                world.run_schedule(sim::SimSchedule);
+            })
+        };
+        let harrier = |host: &SimHost| {
+            let definitions = host.definitions().expect("definitions");
+            ProductionItem::Unit(definitions.unit_kind("harrier").expect("harrier"))
+        };
+        let status = |host: &SimHost| {
+            statuses(host)
+                .into_iter()
+                .find(|(entry, _)| *entry == harrier(host))
+                .map(|(_, status)| status)
+                .expect("on the menu")
+        };
+        let full = spawn(1);
+        let state = full.players().and_then(|players| players.get(HUMAN));
+        assert_eq!(
+            state.map(|state| (state.docked_aircraft(), state.docks())),
+            Some((4, 4))
+        );
+        let found = status(&full);
+        assert!(!found.available && found.limited);
+        assert!(listed_items(&full).contains(&harrier(&full)));
+        assert_eq!(
+            availability_text(
+                harrier(&full),
+                full.definitions().expect("definitions"),
+                &owned_kinds(&full),
+                state,
+                1
+            ),
+            "No free dock: every dock is taken"
+        );
+        // Eight docks on two buildings of one type: four are free.
+        let roomy = spawn(2);
+        let state = roomy.players().and_then(|players| players.get(HUMAN));
+        assert_eq!(
+            state.map(|state| (state.docked_aircraft(), state.docks())),
+            Some((4, 8))
+        );
+        assert_eq!(owned_kinds(&roomy).len(), owned_kinds(&full).len());
+        let found = status(&roomy);
+        assert!(found.available && !found.limited);
     }
 
     #[test]

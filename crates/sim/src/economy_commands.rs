@@ -76,6 +76,7 @@ pub(crate) struct EconomyParams<'w, 's> {
     ids: ResMut<'w, SimIdAllocator>,
     props: Res<'w, crate::Props>,
     match_state: Res<'w, crate::MatchState>,
+    wrecks: ResMut<'w, crate::crew::Wrecks>,
     buildings: Query<'w, 's, (Entity, &'static SimId, &'static Owner, &'static Building)>,
 }
 
@@ -294,6 +295,25 @@ pub fn check_buildable(
         }
         if country.is_some_and(|country| entry.forbidden_countries.contains(&country)) {
             return Err(RejectReason::CountryForbidden(item));
+        }
+        // RA4: an aircraft that needs a dock can be queued only while the docks of the
+        // player's buildings outnumber such aircraft it owns and has queued. The docks are
+        // those of the buildings in `owned`, or as many as the player had at the last
+        // `Economy` stage if that is more: a caller that lists every type once (the
+        // sidebar) still counts the docks of two buildings of a type.
+        if crate::flight::needs_dock(definitions, item) {
+            let taken = (state.docked_aircraft() as usize).saturating_add(
+                state
+                    .queues()
+                    .flat_map(|(_, items)| items.iter())
+                    .filter(|queued| crate::flight::needs_dock(definitions, queued.item))
+                    .count(),
+            );
+            let docks =
+                crate::flight::docks_of(definitions, owned.iter().copied()).max(state.docks());
+            if taken >= docks as usize {
+                return Err(RejectReason::NoFreeDock(item));
+            }
         }
         // RA2, the ini's `BuildLimit`: the buildings of the type the player owns and those in
         // its queues together.
@@ -552,6 +572,15 @@ pub(crate) fn apply(
             index.by_id.remove(&building);
             state.repairing.remove(&building);
             state.credits = state.credits.saturating_add(refund);
+            // RA4: the survivors of a sold building leave it at the end of the tick.
+            params.wrecks.0.push(crate::crew::Wreck {
+                owner: player,
+                id: building,
+                what: crate::crew::Wrecked::Building {
+                    kind: target.kind,
+                    footprint: target.footprint,
+                },
+            });
             events.write(SimEvent::BuildingSold {
                 player,
                 building,

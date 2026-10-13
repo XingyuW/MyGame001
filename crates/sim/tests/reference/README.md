@@ -24,7 +24,9 @@ parity audit compares the shipped `assets/data/*.ron` with these tab separated t
   `repairable`, `powered`, `is_powered`, `unit_repair`, since RA3 `armour`, `weapons`,
   `elite_weapons` (the game ids of the slots, comma separated), `air_range_bonus`,
   `land_targeting`, `naval_targeting`, `underwater`, `organic`, `wall`, `infantry`, `crusher`,
-  `crushable`, `size`, or `group.field` for
+  `crushable`, `size`, since RA4 `trainable`, `veteran_abilities`, `elite_abilities`, `crewed`,
+  `self_healing`, `ammo`, `airport_bound`, `docks`, `spawns`, `spawns_number`, `spawn_regen`,
+  `spawn_reload`, `launcher`, `missile`, `cloakable`, `sensors_sight`, or `group.field` for
   `rules.ron`), the shipped value, and the reference value as the ini writes it. Since RA3 a
   weapon is listed as `weapon.<id>` (fields `damage`, `range`, `min_range`, `reload`, `burst`,
   `warhead`, `projectile_speed`, `anti_air`, `anti_ground`, `scatter`; the reference value of

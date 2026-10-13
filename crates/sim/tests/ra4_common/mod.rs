@@ -375,3 +375,111 @@ pub fn impacts(events: &[SimEvent]) -> Vec<(SubPos, bool)> {
         })
         .collect()
 }
+
+// --- RA4 ------------------------------------------------------------------------------------------
+
+/// The experience of the unit `id`, or `None` for a unit without any (untrainable, or gone).
+pub fn experience(app: &mut App, id: SimId) -> Option<sim::Experience> {
+    let world = app.world_mut();
+    let mut query = world.query::<(&SimId, &sim::Experience)>();
+    query
+        .iter(world)
+        .find(|(other, _)| **other == id)
+        .map(|(_, experience)| *experience)
+}
+
+/// The rank of the unit `id` (0 without experience).
+pub fn rank(app: &mut App, id: SimId) -> u8 {
+    experience(app, id).map_or(0, |experience| experience.rank)
+}
+
+/// Whether the unit or building `id` exists.
+pub fn alive(app: &mut App, id: SimId) -> bool {
+    hp(app, id).is_some()
+}
+
+/// The ids of the units of `owner` of the type `kind`, in id order.
+pub fn units_of(app: &mut App, owner: PlayerId, kind: &str) -> Vec<SimId> {
+    let wanted = defs(app)
+        .unit_kind(kind)
+        .unwrap_or_else(|| panic!("{kind}"));
+    let world = app.world_mut();
+    let mut query = world.query::<(&SimId, &sim::Owner, &Unit)>();
+    let mut found: Vec<SimId> = query
+        .iter(world)
+        .filter(|(_, by, unit)| by.0 == owner && unit.kind == wanted)
+        .map(|(id, ..)| *id)
+        .collect();
+    found.sort_unstable();
+    found
+}
+
+/// The commands rejected in `events`, with their reasons.
+pub fn rejections(events: &[SimEvent]) -> Vec<sim::RejectReason> {
+    events
+        .iter()
+        .filter_map(|event| match event {
+            SimEvent::CommandRejected { reason, .. } => Some(reason.clone()),
+            _ => None,
+        })
+        .collect()
+}
+
+/// Runs ticks until `done` holds for the events of a tick, at most `limit`; the events of all
+/// those ticks, and the number of ticks run.
+pub fn run_until(
+    app: &mut App,
+    limit: u32,
+    mut done: impl FnMut(&mut App, &[SimEvent]) -> bool,
+) -> (Vec<SimEvent>, u32) {
+    let mut all = Vec::new();
+    for ran in 1..=limit {
+        let events = tick(app, Vec::new());
+        let stop = done(app, &events);
+        all.extend(events);
+        if stop {
+            return (all, ran);
+        }
+    }
+    panic!("the condition did not hold within {limit} ticks");
+}
+
+/// The state hash of the world.
+pub fn hash(app: &mut App) -> u64 {
+    sim::state_hash(app.world_mut())
+}
+
+/// The definitions of the fixture with each `(from, to)` replaced in the arsenal's line of
+/// the entry `id` (`from` must occur exactly once in it).
+pub fn definitions_with_arsenal(name: &str, id: &str, edits: &[(&str, &str)]) -> Definitions {
+    let text = std::fs::read_to_string(fixture("arsenal.ron")).expect("the fixture");
+    let marker = format!("(id: {id:?},");
+    let mut found = false;
+    let lines: Vec<String> = text
+        .lines()
+        .map(|line| {
+            let mut line = line.to_owned();
+            if line.trim_start().starts_with("(id: ") && line.contains(&marker) {
+                for (from, to) in edits {
+                    assert_eq!(line.matches(from).count(), 1, "{name}: {from:?} in {id}");
+                    line = line.replace(from, to);
+                }
+                found = true;
+            }
+            line
+        })
+        .collect();
+    assert!(found, "{name}: no entry {id}");
+    let dir = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join("ra4");
+    std::fs::create_dir_all(&dir).expect("temporary directory");
+    let path = dir.join(format!("arsenal_{name}_{}.ron", std::process::id()));
+    std::fs::write(&path, lines.join("\n") + "\n").expect("variant");
+    load_match_definitions(
+        fixture("units.ron"),
+        fixture("economy.ron"),
+        fixture("combat.ron"),
+    )
+    .and_then(|definitions| definitions.with_rules(fixture("rules.ron")))
+    .and_then(|definitions| definitions.with_arsenal(&path))
+    .unwrap_or_else(|error| panic!("{error}"))
+}

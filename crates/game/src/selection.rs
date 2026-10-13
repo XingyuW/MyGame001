@@ -381,11 +381,19 @@ pub fn stop_command(selection: &BTreeSet<SimId>) -> Option<Command> {
 
 // --- Systems --------------------------------------------------------------------------------
 
-/// The player's own units and their ground points in the world.
-fn own_units(views: &Query<(&UnitView, &Transform)>) -> Vec<(SimId, Vec2)> {
+/// Whether the unit `id` was launched by another unit (RA4: a missile, a carrier's aircraft): it
+/// takes no commands, so it is never selected.
+fn launched(host: &SimHost, id: SimId) -> bool {
+    host.world()
+        .get_resource::<sim::SpecialState>()
+        .is_some_and(|state| state.spawned.contains_key(&id))
+}
+
+/// The player's own units that take commands, and their ground points in the world.
+fn own_units(host: &SimHost, views: &Query<(&UnitView, &Transform)>) -> Vec<(SimId, Vec2)> {
     views
         .iter()
-        .filter(|(view, _)| view.owner == HUMAN)
+        .filter(|(view, _)| view.owner == HUMAN && !launched(host, view.id))
         .map(|(view, transform)| {
             (
                 view.id,
@@ -527,7 +535,7 @@ fn select_units(
     let (Some(start_world), Some(end_world)) = (to_world(start), to_world(end)) else {
         return;
     };
-    let units = own_units(&views);
+    let units = own_units(&host, &views);
     let mut producer = None;
     let picked = if start.distance(end) < DRAG_THRESHOLD_PX {
         let pick = unit_at(end_world, &units);
@@ -553,6 +561,7 @@ fn select_units(
                 .iter()
                 .filter(|(v, t)| {
                     v.owner == HUMAN
+                        && !launched(&host, v.id)
                         && host
                             .world()
                             .get::<sim::Unit>(v.unit)
@@ -705,7 +714,7 @@ pub(crate) fn preview_order(
             .or(building);
         let own: Vec<(SimId, Vec2)> = views
             .iter()
-            .filter(|(view, ..)| view.owner == HUMAN)
+            .filter(|(view, ..)| view.owner == HUMAN && !launched(&host, view.id))
             .map(|(view, transform, _)| {
                 (
                     view.id,

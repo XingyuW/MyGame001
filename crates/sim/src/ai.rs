@@ -28,7 +28,10 @@
 //!    that a building and a defence are built side by side ([`queue_buildings`]); but when it
 //!    has no armed unit, no working harvester, and too few credits for the
 //!    army unit it can produce, it sells a building its army does not need instead, and queues no
-//!    building until it has an armed unit again ([`broke`]);
+//!    building until it has an armed unit again ([`broke`]); and when it can neither fight
+//!    nor earn and nothing of its state has changed for [`LAST_STAND_PATIENCE`] ticks, it
+//!    sells its buildings, one a turn, so that their survivors fight or the match ends
+//!    ([`last_stand`], RA4);
 //! 3. queues harvesters up to `harvesters_per_refinery` per refinery, and armed units of the army
 //!    composition up to `max_army`, at most [`AI_UNIT_QUEUE`] items per producing building type;
 //! 4. sets the rally point of its new unit producers to its gathering point, and sends idle
@@ -90,6 +93,16 @@ pub const GATHER_RADIUS: u32 = 4;
 /// no ore it can reach or was blocked, which a new order every turn would not change, and every
 /// order makes the simulation search the map for ore.
 pub const HARVEST_RETRY_TICKS: u64 = 200;
+
+/// Ticks for which a computer player that can neither fight nor earn must have stood still (the
+/// same credits, units, buildings and progress of its queues) before it makes its last stand
+/// and sells its buildings ([`last_stand`]; RA4, docs/DECISIONS.md R53).
+pub const LAST_STAND_PATIENCE: u64 = 1200;
+
+/// The length in ticks of the turn of each player id in which that player may sell in its last
+/// stand: two players never sell their last building in the same tick, which would end a
+/// match without a winner.
+pub const LAST_STAND_TURN: u64 = 256;
 
 /// Times an attack wave may come to rest at a remembered building that is still standing before
 /// the building is no longer chosen as a target (it cannot be reached).
@@ -160,6 +173,12 @@ pub struct AiController {
     staging: Option<(CellPos, u64)>,
     /// Waves sent so far; its parity picks the side of the next staging point.
     waves_sent: u64,
+    /// While the player can neither fight nor earn: what it had when that last changed (its
+    /// credits, units, buildings and the progress of its queues, folded into one number) and
+    /// the tick of that change ([`last_stand`], RA4).
+    stalled: (u64, u64),
+    /// Whether it is selling its buildings in its last stand.
+    last_stand: bool,
 }
 
 /// Width + height of the largest map on which a difficulty's army applies unscaled.
@@ -282,6 +301,8 @@ impl AiController {
             flank: grid.width().saturating_add(grid.height()) > ARMY_SCALE_SPAN,
             staging: None,
             waves_sent: 0,
+            stalled: (0, 0),
+            last_stand: false,
             difficulty,
         })
     }
@@ -382,6 +403,9 @@ impl AiController {
             }
         }
         hasher.write_u64(self.waves_sent);
+        hasher.write_u64(self.stalled.0);
+        hasher.write_u64(self.stalled.1);
+        hasher.write(&[u8::from(self.last_stand)]);
     }
 }
 
@@ -542,6 +566,7 @@ struct BuildingSnap {
 
 /// What one computer player may know (docs/DECISIONS.md D43). [`think`] reads nothing else.
 struct View<'a> {
+    player: PlayerId,
     tick: u64,
     state: &'a PlayerState,
     vision: &'a Vision,
@@ -576,11 +601,18 @@ impl<'a> View<'a> {
         superweapons: bool,
         units: &'a [UnitSnap],
         buildings: &'a [BuildingSnap],
+        special: &crate::SpecialState,
     ) -> Self {
         let vision = state.vision();
         // Allies (a team of computer players against the human) are never targets.
         let hostile = |owner: PlayerId| players.hostile(player, owner);
+        // RA4: a missile or an aircraft that another unit launched is no unit of the player's
+        // to command or to count on (it is gone when it has done its work), and a unit that is
+        // hidden from the player (a submerged, disguised or mirage unit) is not seen.
+        let spawned = &special.spawned;
+        let hidden = &special.hidden;
         Self {
+            player,
             tick,
             state,
             vision,
@@ -588,22 +620,32 @@ impl<'a> View<'a> {
             definitions,
             ai,
             superweapons,
-            last_resort: !units
-                .iter()
-                .any(|unit| unit.owner == player && unit.armed && unit.harvest.is_none()),
+            last_resort: !units.iter().any(|unit| {
+                unit.owner == player
+                    && unit.armed
+                    && unit.harvest.is_none()
+                    && !spawned.contains_key(&unit.id)
+            }),
             own_kinds: buildings
                 .iter()
                 .filter(|building| building.owner == player)
                 .map(|building| building.kind)
                 .collect(),
-            own_units: units.iter().filter(|unit| unit.owner == player).collect(),
+            own_units: units
+                .iter()
+                .filter(|unit| unit.owner == player && !spawned.contains_key(&unit.id))
+                .collect(),
             own_buildings: buildings
                 .iter()
                 .filter(|building| building.owner == player)
                 .collect(),
             enemy_units: units
                 .iter()
-                .filter(|unit| hostile(unit.owner) && vision.sees_unit(&unit.mobile))
+                .filter(|unit| {
+                    hostile(unit.owner)
+                        && vision.sees_unit(&unit.mobile)
+                        && !hidden.contains(&(player, unit.id))
+                })
                 .collect(),
             enemy_buildings: buildings
                 .iter()
@@ -752,6 +794,7 @@ pub(crate) fn run_ai(
     mut queue: ResMut<CommandQueue>,
     units: UnitQuery,
     buildings: BuildingQuery,
+    special: Res<crate::SpecialState>,
 ) {
     if ai.controllers.is_empty() || state.outcome().is_some() {
         return;
@@ -833,6 +876,7 @@ pub(crate) fn run_ai(
             state.rules().superweapons,
             &unit_snaps,
             &building_snaps,
+            &special,
         );
         let commands = think(&view, controller);
         controller.issued = controller.issued.saturating_add(commands.len() as u64);
@@ -866,6 +910,9 @@ fn think(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
         }
     } else if !controller.liquidating {
         commands.extend(queue_buildings(view));
+    }
+    if let Some(command) = last_stand(view, controller) {
+        commands.push(command);
     }
     commands.extend(queue_units(view, controller));
     commands.extend(set_rally_points(view, controller));
@@ -1252,6 +1299,72 @@ fn sell_for_army(view: &View<'_>) -> Option<Command> {
             (
                 !builds(building.kind),
                 value,
+                std::cmp::Reverse(building.id),
+            )
+        })
+        .map(|building| Command::SellBuilding {
+            building: building.id,
+        })
+}
+
+/// The last stand (RA4, docs/DECISIONS.md R53). A player that has no unit that fights and no
+/// harvester at work, and whose credits, units, buildings and queues have not changed for
+/// [`LAST_STAND_PATIENCE`] ticks, will never change anything again: it can pay for nothing and
+/// earns nothing, and neither can its opponent be made to end the match (two such players
+/// would stand for ever). It then sells its buildings, the one with the highest refund first
+/// (then the lowest id), one a turn and only in the turn of its player id
+/// ([`LAST_STAND_TURN`]): the survivors of a crewed building are armed units that attack with
+/// the next wave, and a player without a building is defeated in a short game. It stops when
+/// it has a unit that fights or a harvester at work again.
+fn last_stand(view: &View<'_>, controller: &mut AiController) -> Option<Command> {
+    let helpless = !view.own_units.iter().any(|unit| view.fights(unit))
+        && !view.own_units.iter().any(|unit| {
+            unit.harvest
+                .is_some_and(|state| state != HarvestState::Idle)
+        });
+    if !helpless {
+        controller.last_stand = false;
+        controller.stalled = (0, view.tick);
+        return None;
+    }
+    if !controller.last_stand {
+        let mut hasher = Fnv1a64::new();
+        hasher.write(&view.state.credits().to_le_bytes());
+        hasher.write_u64(view.own_units.len() as u64);
+        hasher.write_u64(view.own_buildings.len() as u64);
+        for (_, items) in view.state.queues() {
+            for item in items {
+                hasher.write_u32(item.progress);
+                hasher.write(&item.charged.to_le_bytes());
+                hasher.write_u32(item.fraction);
+            }
+        }
+        let had = hasher.finish();
+        if had != controller.stalled.0 {
+            controller.stalled = (had, view.tick);
+            return None;
+        }
+        if view.tick.saturating_sub(controller.stalled.1) < LAST_STAND_PATIENCE {
+            return None;
+        }
+        controller.last_stand = true;
+    }
+    if (view.tick / LAST_STAND_TURN) % 16 != u64::from(view.player.0 % 16) {
+        return None;
+    }
+    let sellable = |kind: BuildingKind| {
+        view.definitions.rules().is_none()
+            || view
+                .definitions
+                .metadata(ProductionItem::Building(kind))
+                .is_none_or(|entry| entry.sellable)
+    };
+    view.own_buildings
+        .iter()
+        .filter(|building| sellable(building.kind))
+        .max_by_key(|building| {
+            (
+                view.definitions.refund(building.kind),
                 std::cmp::Reverse(building.id),
             )
         })
@@ -1881,6 +1994,7 @@ mod tests {
                 false,
                 &units,
                 &buildings,
+                &crate::SpecialState::default(),
             )
             .stays_visible(cell)
         };
@@ -1897,5 +2011,110 @@ mod tests {
             assert!(lit(id, CellPos::new(23, 21)), "{id}");
             assert!(!lit(id, CellPos::new(16, 16)), "{id}");
         }
+    }
+
+    /// RA4 (docs/DECISIONS.md R51, R50): the computer player keeps its honest vision. An enemy
+    /// unit that is hidden from it (a submerged unit without a detector near) is none of the
+    /// enemies it sees, though it sees the cell; and a missile or aircraft that one of its
+    /// units launched is none of its units: it is not commanded, not counted as an armed unit,
+    /// and its sight is not counted on (it is gone when it has done its work).
+    #[test]
+    fn a_hidden_enemy_is_not_seen_and_a_launched_unit_is_not_the_players_to_command() {
+        let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/data/legacy");
+        let definitions = crate::load_match_definitions(
+            dir.join("units.ron"),
+            dir.join("economy.ron"),
+            dir.join("combat.ron"),
+        )
+        .and_then(|definitions| definitions.with_arsenal(dir.join("arsenal.ron")))
+        .unwrap_or_else(|error| panic!("{error}"));
+        let kind = |id: &str| definitions.unit_kind(id).unwrap_or_else(|| panic!("{id}"));
+        let cell = Cell {
+            passable: true,
+            water: false,
+            buildable: true,
+            ore: 0,
+        };
+        let grid = Grid::from_cells(32, 32, vec![cell; 32 * 32]).expect("a grid");
+        let (player, enemy) = (PlayerId(0), PlayerId(1));
+        let mut players = Players::default();
+        players.add(player, 0).expect("a new player");
+        players.add(enemy, 0).expect("a new player");
+        // The player sees the cells around (10, 10).
+        players
+            .get_mut(player)
+            .expect("the player")
+            .vision
+            .reveal_for_test(&grid, CellPos::new(10, 10), 6);
+        let state = players.get(player).expect("the player");
+        let plan = AiPlan {
+            build_order: Vec::new(),
+            power: BuildingKind(0),
+            harvester: kind("harvester"),
+            army: Vec::new(),
+        };
+        let unit = |id: u32, owner: PlayerId, x: i32| UnitSnap {
+            id: SimId(id),
+            owner,
+            kind: kind("rifleman"),
+            mobile: Mobile {
+                speed: 16,
+                cell: CellPos::new(x, 10),
+                step: None,
+            },
+            has_order: false,
+            harvest: None,
+            armed: true,
+            attacking: false,
+            sight: Some(4),
+        };
+        // Own units 1 and 2 (2 was launched by 1); enemy units 3 and 4 (4 is hidden).
+        let units = [
+            unit(1, player, 9),
+            unit(2, player, 10),
+            unit(3, enemy, 11),
+            unit(4, enemy, 12),
+        ];
+        let view = |special: &crate::SpecialState| {
+            let view = View::new(
+                player,
+                0,
+                &players,
+                state,
+                &grid,
+                &definitions,
+                &plan,
+                false,
+                &units,
+                &[],
+                special,
+            );
+            (
+                view.own_units
+                    .iter()
+                    .map(|unit| unit.id.0)
+                    .collect::<Vec<_>>(),
+                view.enemy_units
+                    .iter()
+                    .map(|unit| unit.id.0)
+                    .collect::<Vec<_>>(),
+                view.last_resort,
+                // A cell that only unit 2 lights: (14, 10) is 4 cells from it and 5 from 1.
+                view.stays_visible(CellPos::new(14, 10)),
+            )
+        };
+        assert_eq!(
+            view(&crate::SpecialState::default()),
+            (vec![1, 2], vec![3, 4], false, true)
+        );
+        let mut special = crate::SpecialState::default();
+        special.hidden.insert((player, SimId(4)));
+        // Hidden from another player only: still seen by this one.
+        special.hidden.insert((enemy, SimId(3)));
+        special.spawned.insert(SimId(2), SimId(1));
+        assert_eq!(view(&special), (vec![1], vec![3], false, false));
+        // With only a launched unit armed, the player has no army of its own.
+        special.spawned.insert(SimId(1), SimId(9));
+        assert_eq!(view(&special), (vec![], vec![3], true, false));
     }
 }

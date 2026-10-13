@@ -113,7 +113,7 @@ type MoveQuery<'w, 's> = Query<
 /// entity and owner (RA3). Empty in a world without crushers, where nothing is ever crushed.
 #[derive(Default)]
 pub(crate) struct Crushable {
-    units: BTreeMap<SimId, (Entity, PlayerId)>,
+    units: BTreeMap<SimId, (Entity, PlayerId, UnitKind)>,
 }
 
 impl Crushable {
@@ -128,7 +128,7 @@ impl Crushable {
         Self {
             units: units
                 .filter(|&(.., kind)| definitions.crushable(kind))
-                .map(|(entity, id, owner, _)| (id, (entity, owner)))
+                .map(|(entity, id, owner, kind)| (id, (entity, owner, kind)))
                 .collect(),
         }
     }
@@ -138,7 +138,7 @@ impl Crushable {
     pub(crate) fn by(&self, players: &Players, owner: PlayerId, victim: SimId) -> bool {
         self.units
             .get(&victim)
-            .is_some_and(|&(_, other)| players.hostile(owner, other))
+            .is_some_and(|&(_, other, _)| players.hostile(owner, other))
     }
 }
 
@@ -240,6 +240,7 @@ pub(crate) fn move_units(
     mut events: ResMut<Messages<SimEvent>>,
     players: Res<Players>,
     definitions: Res<Definitions>,
+    mut kills: ResMut<crate::veterancy::Kills>,
     mut units: MoveQuery,
 ) {
     let mut order: Vec<(SimId, Entity)> =
@@ -317,10 +318,20 @@ pub(crate) fn move_units(
                         // are freed before it claims the cell, so that the cell never holds
                         // both (invariant I6').
                         for victim in grid.blockers(next, id, false).into_iter().flatten() {
-                            let Some(&(victim_entity, victim_owner)) = crushable.units.get(&victim)
+                            let Some(&(victim_entity, victim_owner, victim_kind)) =
+                                crushable.units.get(&victim)
                             else {
                                 continue;
                             };
+                            // The crusher is the killer (RA4: its experience).
+                            kills.record(
+                                id,
+                                victim_owner,
+                                crate::veterancy::worth(
+                                    &definitions,
+                                    crate::ProductionItem::Unit(victim_kind),
+                                ),
+                            );
                             let at = grid.standing_point(next, victim);
                             grid.release_around(next, victim);
                             grid.unregister(victim);

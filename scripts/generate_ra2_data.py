@@ -180,7 +180,7 @@ UNITS = {
         'raider'),
     'terror_drone': ('Terror Drone', 'Immobilizes and damages mechanical targets.', 'vehicles', 'land', 'drone', 100, 2, 20, 0,
         'scout'),
-    'v3_launcher': ('V3 Rocket Launcher', 'Specialized ground combat. Select and right click an enemy to attack.', 'vehicles', 'land', 'combat', 100, 2, 20, 0,
+    'v3_launcher': ('V3 Rocket Launcher', 'Launches a rocket that flies to the target; anti air fire can shoot it down.', 'vehicles', 'land', 'combat', 100, 2, 20, 0,
         'rocket_launcher'),
     'mcv': ('Mobile Construction Vehicle (MCV)', 'D deploys into a Construction Yard on clear ground.', 'vehicles', 'land', 'mcv', 100, 2, 20, 0,
         'harvester'),
@@ -196,9 +196,9 @@ UNITS = {
         'heavy_tank'),
     'demolition_truck': ('Demolition Truck', 'Detonates on reaching attack range.', 'vehicles', 'land', 'suicide', 100, 3, 1600, 0,
         'harvester'),
-    'harrier': ('Harrier', 'Fires a strike then returns to an air facility to rearm.', 'vehicles', 'air', 'strike', 100, 2, 20, 0,
+    'harrier': ('Harrier', 'Fires one volley, then returns to its dock at an Airforce Command to reload.', 'vehicles', 'air', 'combat', 100, 2, 20, 0,
         'scout'),
-    'black_eagle': ('Black Eagle', 'Fires a strike then returns to an air facility to rearm.', 'vehicles', 'air', 'strike', 100, 2, 20, 0,
+    'black_eagle': ('Black Eagle', 'Fires one volley, then returns to its dock at an Airforce Command to reload.', 'vehicles', 'air', 'combat', 100, 2, 20, 0,
         'scout'),
     'nighthawk': ('NightHawk Transport', 'Select passengers; E + click this transport to load. D unloads.', 'vehicles', 'air', 'transport', 100, 2, 20, 5,
         'scout'),
@@ -206,21 +206,21 @@ UNITS = {
         'heavy_tank'),
     'amphibious_transport': ('Amphibious Transport', 'Select passengers; E + click this transport to load. D unloads.', 'vehicles', 'amphibious', 'transport', 100, 2, 20, 12,
         'harvester'),
-    'destroyer': ('Destroyer', 'Specialized naval combat. Select and right click an enemy to attack.', 'vehicles', 'naval', 'combat', 100, 2, 20, 0,
+    'destroyer': ('Destroyer', 'Detects submerged units and sends its Osprey against them.', 'vehicles', 'naval', 'combat', 100, 2, 20, 0,
         'artillery'),
     'aegis_cruiser': ('Aegis Cruiser', 'Specialized naval combat. Select and right click an enemy to attack.', 'vehicles', 'naval', 'flak', 100, 2, 20, 0,
         'artillery'),
     'dolphin': ('Dolphin', 'Specialized naval combat. Select and right click an enemy to attack.', 'vehicles', 'naval', 'combat', 100, 2, 20, 0,
         'artillery'),
-    'aircraft_carrier': ('Aircraft Carrier', 'Launches recoverable strike aircraft; no airbase required.', 'vehicles', 'naval', 'carrier', 100, 2, 20, 2,
+    'aircraft_carrier': ('Aircraft Carrier', 'Launches its three Hornets at the target; lost ones are replaced.', 'vehicles', 'naval', 'combat', 100, 2, 20, 0,
         'artillery'),
-    'typhoon': ('Typhoon Attack Submarine', 'Specialized naval combat. Select and right click an enemy to attack.', 'vehicles', 'naval', 'combat', 100, 2, 20, 0,
+    'typhoon': ('Typhoon Attack Submarine', 'Submerged: unseen unless a unit with sensors is near, or it has just fired.', 'vehicles', 'naval', 'combat', 100, 2, 20, 0,
         'artillery'),
     'sea_scorpion': ('Sea Scorpion', 'Specialized naval combat. Select and right click an enemy to attack.', 'vehicles', 'naval', 'flak', 100, 2, 20, 0,
         'artillery'),
     'giant_squid': ('Giant Squid', 'Immobilizes enemy vessels.', 'vehicles', 'naval', 'squid', 133, 2, 20, 0,
         'artillery'),
-    'dreadnought': ('Dreadnought', 'Specialized naval combat. Select and right click an enemy to attack.', 'vehicles', 'naval', 'combat', 100, 2, 20, 0,
+    'dreadnought': ('Dreadnought', 'Launches two missiles that fly to the target; anti air fire can shoot them down.', 'vehicles', 'naval', 'combat', 100, 2, 20, 0,
         'artillery'),
     # The spawned units of RA4 (docs/DECISIONS.md R50): launched by their carrier or launcher,
     # never produced and never commanded.
@@ -267,40 +267,28 @@ NOT_CARRIED = {
     "HornetCollision": "a spawned aircraft attacks only what its carrier fires at, never an aircraft",
     "ASWCollision": "a spawned aircraft attacks only what its destroyer fires at, never an aircraft",
 }
+# The largest range of the combat file (crates/sim/src/combat_defs.rs), in subcells.
+MAX_WEAPON_RANGE = 7680
 # Values of a weapon that are the game's own instead of the ini's, each a row of
 # ra2_differences.tsv: stand-ins for mechanics of a later milestone (docs/DECISIONS.md R36).
 # A value is a number, or (section, key, conversion) of the reference it is taken from; a
 # warhead is the ini name of a mapped warhead.
 #
-# * The launchers spawn missiles and aircraft from RA4. Until then the V3 Launcher and the
-#   Dreadnought fire a projectile with the missile's damage, warhead and speed at the pace at
-#   which the missile regenerates, the destroyer's secondary weapon is the depth charge of its
-#   Osprey with the range of its gun, and the carrier's weapon names the warhead of its
-#   Hornets (its shot launches aircraft and deals nothing).
+# * The launchers (RA4, docs/DECISIONS.md R50): their shot launches a missile or an aircraft and
+#   deals nothing, and the ini gives them the warhead `Special`, which is no warhead section.
+#   What a launcher may fire at is decided by a warhead all the same, so each names the warhead
+#   of what it launches. The destroyer's launcher has the ini's range -2 (unlimited), which is
+#   the largest range the combat file admits here, and must engage what is at sea although the
+#   ini's virtual projectile engages nothing.
 # * The mechanics of RA6: a dog's bite and the neutron rifle keep the damage of M9 (the ini's
 #   number is not hit points: a bite kills, a rifle erases), the sonic beam keeps M9's damage
 #   per shot (the ini's is per frame of the wave), the bomb of Crazy Ivan names the warhead it
 #   goes off with, and the Demolition Truck needs the smallest range the combat file admits.
 WEAPON_VALUES = {
-    "V3Launcher": {
-        "damage": ("General", "V3RocketDamage", "int"),
-        "warhead": "V3WH",
-        "reload": ("V3", "SpawnRegenRate", "frames"),
-        "projectile_speed": ("V3ROCKET", "Speed", "speed"),
-    },
-    "DredLauncher": {
-        "damage": ("General", "DMislDamage", "int"),
-        "warhead": "DMISLWH",
-        "reload": ("DRED", "SpawnRegenRate", "frames"),
-        "projectile_speed": ("DMISL", "Speed", "speed"),
-    },
+    "V3Launcher": {"warhead": "V3WH"},
+    "DredLauncher": {"warhead": "DMISLWH"},
     "HornetLauncher": {"warhead": "ORCAAP"},
-    "ASWLauncher": {
-        "damage": ("ASWBomb", "Damage", "int"),
-        "warhead": "APSplash",
-        "range": ("155mm", "Range", "cells"),
-        "anti_ground": 1,
-    },
+    "ASWLauncher": {"warhead": "APSplash", "range": MAX_WEAPON_RANGE, "anti_ground": 1},
     "GoodTeeth": {"damage": 200},
     "NeutronRifle": {"damage": 60},
     "NeutronRifleE": {"damage": 60},
@@ -1167,8 +1155,8 @@ class Data:
             "//             schema version 3 (RA4) also of the two spawned missiles, and of each when its",
             "//             launcher is elite",
             "//",
-            "// Everything is ported from the ini, except what a comment calls the game's own: stand-ins for",
-            "// the spawned missiles and aircraft of RA4 and the specialists of RA6, each listed with its",
+            "// Everything is ported from the ini, except what a comment calls the game's own: the warhead and",
+            "// reach of the launchers of RA4 and stand-ins for the specialists of RA6, each listed with its",
             "// reason in crates/sim/tests/reference/ra2_differences.tsv.",
             "//",
             GENERATED,

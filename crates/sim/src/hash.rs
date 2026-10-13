@@ -67,6 +67,8 @@ impl Default for Fnv1a64 {
 /// the [`Definitions`], the [`Players`] (with their visibility grids), the projectiles in flight,
 /// the [`MatchState`], and the computer players' [`AiPlayers`] (docs/DECISIONS.md D4, D11,
 /// extended in M2, M3, M4, and M6). Components added by later milestones are appended per entity.
+/// Since RA4 the [`Experience`](crate::Experience) of the trainable units follows at the end, if
+/// there is any.
 ///
 /// # Panics
 ///
@@ -140,6 +142,26 @@ pub fn state_hash(world: &mut World) -> u64 {
         .resource::<crate::SpecialState>()
         .hash_into(&mut hasher);
     world.resource::<crate::Props>().hash_into(&mut hasher);
+    // RA4: the experience of every trainable unit in id order, and the kills and wrecks of a
+    // tick under way (both empty between ticks). Each part is written only if it holds
+    // something, under its own tag, so that a world without them hashes as before.
+    let mut query = world.query::<(&SimId, &crate::Experience)>();
+    let mut trained: Vec<_> = query.iter(world).collect();
+    if !trained.is_empty() {
+        trained.sort_unstable_by_key(|(id, _)| **id);
+        hasher.write(b"experience");
+        hasher.write_u64(trained.len() as u64);
+        for (id, experience) in trained {
+            hasher.write_u32(id.0);
+            experience.hash_into(&mut hasher);
+        }
+    }
+    world
+        .resource::<crate::veterancy::Kills>()
+        .hash_into(&mut hasher);
+    world
+        .resource::<crate::crew::Wrecks>()
+        .hash_into(&mut hasher);
     hasher.finish()
 }
 

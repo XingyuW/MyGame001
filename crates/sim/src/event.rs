@@ -135,6 +135,44 @@ pub enum SimEvent {
         by: PlayerId,
         at: SubPos,
     },
+    /// `player`'s unit `unit` rose to `rank` (RA4, `crate::veterancy`): 1 veteran, 2 elite.
+    RankGained {
+        player: PlayerId,
+        unit: SimId,
+        rank: u8,
+    },
+    /// The crew or the survivors of `player`'s destroyed vehicle, or destroyed or sold building,
+    /// `from` left it (RA4, `crate::crew`): the new units `units`, standing in and around
+    /// `at`. `from` no longer exists.
+    CrewEscaped {
+        player: PlayerId,
+        from: SimId,
+        at: CellPos,
+        units: Vec<SimId>,
+    },
+    /// `player`'s unit `parent` launched the unit `unit`: a missile, or an aircraft it carries
+    /// (RA4, `crate::flight`). The unit is in the air above `parent` and cannot be commanded.
+    UnitLaunched {
+        player: PlayerId,
+        parent: SimId,
+        unit: SimId,
+    },
+    /// The aircraft `unit` that `player`'s unit `parent` carries came back and was taken
+    /// aboard (RA4): it is no longer on the map.
+    UnitRecovered {
+        player: PlayerId,
+        parent: SimId,
+        unit: SimId,
+    },
+    /// The missile `unit` that `player`'s unit `parent` launched reached the end of its flight
+    /// and went off at `at` (RA4): it is no longer on the map. A [`SimEvent::Impact`] of the
+    /// same tick reports the warhead.
+    MissileDetonated {
+        player: PlayerId,
+        parent: SimId,
+        unit: SimId,
+        at: SubPos,
+    },
     /// The unit's hit points fell to 0 or below, or it was crushed: it was removed and its cells
     /// were freed.
     UnitDestroyed { player: PlayerId, unit: SimId },

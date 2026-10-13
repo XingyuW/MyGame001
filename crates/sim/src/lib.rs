@@ -13,12 +13,14 @@ mod building;
 mod combat;
 mod combat_defs;
 mod command;
+mod crew;
 mod data;
 mod definitions;
 mod economy;
 mod economy_commands;
 mod economy_defs;
 mod event;
+mod flight;
 mod harvest;
 mod hash;
 mod id;
@@ -34,11 +36,13 @@ mod rules;
 mod schedule;
 mod skirmish_defs;
 mod unit;
+mod veterancy;
 mod visibility;
 
 pub use ai::{
     AI_UNIT_QUEUE, ARMY_SCALE_SPAN, AiController, AiPlayers, GATHER_DISTANCE, GATHER_RADIUS,
-    HARVEST_RETRY_TICKS, KnownBuilding, MAX_TARGET_FAILURES, WaveTarget, Waypoint, scaled_for_map,
+    HARVEST_RETRY_TICKS, KnownBuilding, LAST_STAND_PATIENCE, LAST_STAND_TURN, MAX_TARGET_FAILURES,
+    WaveTarget, Waypoint, scaled_for_map,
 };
 pub use ai_defs::{
     AI_SCHEMA_VERSION, AiDefinitions, AiPlan, Difficulty, MAX_AI_ARMY, MAX_ARMY_ENTRIES,
@@ -51,8 +55,8 @@ pub use building::{
 
 pub use combat::{
     Armour, AttackOrder, Condition, DamageState, Health, MAX_CHASES, Projectile, Projectiles,
-    Sight, TargetTraits, Weapon, applied_damage, damage_state, in_range, inside_min_range,
-    scattered, splash_damage, versus_against, weapon_against,
+    Sight, TargetTraits, Weapon, applied_damage, damage_state, impact_damage, in_range,
+    inside_min_range, scattered, splash_damage, versus_against, weapon_against,
 };
 pub use combat_defs::{
     ArmourClass, BURST_GAP, COMBAT_SCHEMA_VERSION, CombatTerms, Effect, EffectDef,
@@ -65,6 +69,7 @@ pub use combat_defs::{
 pub use command::{
     Command, CommandQueue, IssuedCommand, MAX_UNITS_PER_COMMAND, PlayerId, RejectReason,
 };
+pub use crew::{ENGINEER_ESCAPE_PERCENT, survivors};
 pub use data::{DataError, DataErrorKind, MAX_DATA_FILE_BYTES, MAX_STRING_BYTES};
 pub use definitions::{
     Definitions, MAX_NAME_LEN, MAX_UNIT_SPEED, MAX_UNIT_TYPES, UNITS_SCHEMA_VERSION, UnitDef,
@@ -86,6 +91,7 @@ pub use economy_defs::{
     ProductionItem,
 };
 pub use event::{AttackEnd, HarvestIdle, MoveFailure, SimEvent};
+pub use flight::{Bay, MissileFlight, SPAWN_LAUNCH_GAP, Slot, dock_cell};
 pub use harvest::{HarvestState, Harvester, MAX_HARVEST_ATTEMPTS};
 pub use hash::{Fnv1a64, state_hash};
 pub use id::{SimId, SimIdAllocator};
@@ -132,6 +138,10 @@ pub use skirmish_defs::{
 pub use unit::{
     DIAGONAL_STEP, Direction, Facing, Mobile, MoveOrder, ORTHOGONAL_STEP, Orders, Owner, PathState,
     Position, SpawnError, Step, Unit, cell_invariant_violations, spawn_unit, stray_claims,
+};
+pub use veterancy::{
+    ELITE, Experience, Multipliers, VETERAN, experience_for, promote, rank_of, reload_ticks,
+    scaled_speed, set_bonus,
 };
 pub use visibility::Vision;
 

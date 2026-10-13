@@ -142,6 +142,11 @@ pub struct PlayerState {
     /// The player's country (RA1, an index into the countries of the rules file); `None` for a
     /// player of a faction without a side and for a player added without a faction.
     pub(crate) country: Option<crate::rules::CountryId>,
+    /// The aircraft the player owns that need a dock, as of the last `Economy` stage (RA4,
+    /// `crate::flight`).
+    pub(crate) aircraft: u32,
+    /// The docks of the player's buildings, as of the last `Economy` stage.
+    pub(crate) docks: u32,
 }
 
 impl PlayerState {
@@ -156,6 +161,14 @@ impl PlayerState {
     /// The player's country, an index into the countries of the rules file (RA1).
     pub fn country(&self) -> Option<crate::rules::CountryId> {
         self.country
+    }
+    /// The aircraft the player owns that need a dock, as of the last `Economy` stage (RA4).
+    pub fn docked_aircraft(&self) -> u32 {
+        self.aircraft
+    }
+    /// The docks of the player's buildings, as of the last `Economy` stage (RA4).
+    pub fn docks(&self) -> u32 {
+        self.docks
     }
     /// Whether building prerequisites are waived for this player (match option).
     pub fn unlock_all(&self) -> bool {
@@ -454,6 +467,13 @@ impl Players {
                 state.country.map_or(u8::MAX, |country| country.0),
                 u8::from(state.radar),
             ]);
+            // RA4: written only for a player that has such aircraft or docks, so that a world
+            // without them hashes as before.
+            if state.aircraft != 0 || state.docks != 0 {
+                hasher.write(b"ac");
+                hasher.write_u32(state.aircraft);
+                hasher.write_u32(state.docks);
+            }
         }
     }
 }
@@ -966,6 +986,13 @@ pub(crate) fn advance_production(
                     player,
                     item: head.item,
                 });
+            }
+            // RA4: an aircraft that needs a dock waits in its factory while every dock of the
+            // player's working buildings is taken (one was lost while it was built).
+            if crate::flight::needs_dock(&definitions, head.item)
+                && state.aircraft >= crate::flight::docks_of(&definitions, kinds.iter().copied())
+            {
+                continue;
             }
             // Complete: a building waits for `PlaceBuilding`; a unit leaves the first of the
             // player's producing buildings (in id order) that has a free ring cell.
