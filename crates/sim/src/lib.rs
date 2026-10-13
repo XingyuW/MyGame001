@@ -13,6 +13,7 @@ mod building;
 mod combat;
 mod combat_defs;
 mod command;
+mod crates;
 mod crew;
 mod data;
 mod definitions;
@@ -29,6 +30,7 @@ mod map_scale;
 mod map_subset;
 mod match_setup;
 mod movement;
+mod ore;
 mod pathfinding;
 mod props;
 mod rng;
@@ -69,6 +71,10 @@ pub use combat_defs::{
 pub use command::{
     Command, CommandQueue, IssuedCommand, MAX_UNITS_PER_COMMAND, PlayerId, RejectReason,
 };
+pub use crates::{
+    CRATE_MONEY_SPREAD, CRATE_PLACE_ATTEMPTS, CRATE_RETRY_TICKS, CRATE_UNIT_RADIUS, CrateContent,
+    Crates, FREE_MCV_CREDITS, crate_fits,
+};
 pub use crew::{ENGINEER_ESCAPE_PERCENT, survivors};
 pub use data::{DataError, DataErrorKind, MAX_DATA_FILE_BYTES, MAX_STRING_BYTES};
 pub use definitions::{
@@ -87,8 +93,8 @@ pub use economy_commands::{
 pub use economy_defs::{
     BuildingDef, BuildingKind, ECONOMY_SCHEMA_VERSION, HarvesterDef, MAX_BUILD_TIME,
     MAX_BUILDING_TYPES, MAX_COST, MAX_CREDITS_PER_ORE, MAX_FOOTPRINT_SIDE, MAX_FREE_UNITS,
-    MAX_ORE_CAPACITY, MAX_PLACEMENT_DISTANCE, MAX_POWER, MAX_PREREQUISITES, Production,
-    ProductionItem,
+    MAX_HARVEST_INTERVAL, MAX_ORE_CAPACITY, MAX_PLACEMENT_DISTANCE, MAX_POWER, MAX_PREREQUISITES,
+    Production, ProductionItem,
 };
 pub use event::{AttackEnd, HarvestIdle, MoveFailure, SimEvent};
 pub use flight::{Bay, MissileFlight, SPAWN_LAUNCH_GAP, Slot, dock_cell};
@@ -103,9 +109,10 @@ pub use map::{
 };
 pub use map_scale::{
     APRON_RADIUS, CORE_RADIUS, DEFAULT_ORE, EDGE_MARGIN, EnlargedMap, LOOK_FEATURE_BRIDGE,
-    LOOK_FEATURE_ORE, LOOK_GROUND_AUTO, LOOK_GROUND_MASK, LOOK_GROUND_WATER, MAX_SITE_ATTEMPTS,
-    MIN_ORE_CELLS, MIN_START_DISTANCE, MapScaleError, ORE_DISTANCE, ORE_RADIUS, PAD_CORNER,
-    PAD_RADIUS, SCALE_DIVISOR, YARD_CENTRE_OFFSET, axis_map, enlarged_map, enlarged_size,
+    LOOK_FEATURE_GEMS, LOOK_FEATURE_ORE, LOOK_GROUND_AUTO, LOOK_GROUND_MASK, LOOK_GROUND_WATER,
+    MAX_SITE_ATTEMPTS, MIN_ORE_CELLS, MIN_START_DISTANCE, MapScaleError, ORE_DISTANCE, ORE_RADIUS,
+    PAD_CORNER, PAD_RADIUS, SCALE_DIVISOR, YARD_CENTRE_OFFSET, axis_map, enlarged_map,
+    enlarged_size,
 };
 pub use match_setup::{
     AI_TEAM, Controller, MAX_UNIT_SPEED_PERCENT, MatchOptions, MatchOutcome, MatchRules,
@@ -122,7 +129,7 @@ pub use props::{PROP_ID_BASE, Prop, PropKind, Props};
 pub use rng::SimRng;
 pub use rules::{
     CombatRules, Country, CountryId, CrateRules, CrewRules, DialogRules, DifficultyRules,
-    EconomyRules, GroupId, MAX_COUNTRIES, MAX_GROUP_BUILDINGS, MAX_POWERUPS,
+    EconomyRules, GroupId, MAX_COUNTRIES, MAX_CRATE_UNITS, MAX_GROUP_BUILDINGS, MAX_POWERUPS,
     MAX_PREREQUISITE_GROUPS, MAX_RULES_DIFFICULTIES, MAX_TECH_LEVEL, Powerup, PrerequisiteGroup,
     PrismRules, ProductionRules, RULES_SCHEMA_VERSION, RadiationRules, Rules, Side, SideRules,
     SuperweaponRules, VeterancyRules,

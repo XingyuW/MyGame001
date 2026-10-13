@@ -778,6 +778,7 @@ fn match_problems(
                 superweapons: choice.superweapons,
                 mcv_repacks: choice.mcv_repacks,
                 crates: choice.crates,
+                ore_grows: true,
             },
         "short game, superweapons, MCV repacks or crates are not as chosen",
     );
@@ -2819,6 +2820,7 @@ mod tests {
                 superweapons: false,
                 crates: false,
                 mcv_repacks: true,
+                ore_grows: true,
             }
         );
         assert_eq!(

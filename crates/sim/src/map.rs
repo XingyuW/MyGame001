@@ -142,7 +142,8 @@ pub struct Cell {
     pub water: bool,
     /// Buildings may cover the cell.
     pub buildable: bool,
-    /// Ore stored in the cell, in ore units.
+    /// Ore stored in the cell, in ore units: bails since RA5 (docs/RA2_PARITY_PLAN.md section
+    /// 4.10). Whether they are bails of ore or of gems is the grid's ([`Grid::is_gems`]).
     pub ore: u32,
 }
 
@@ -188,6 +189,12 @@ pub struct Grid {
     air_occupants: Vec<Option<SimId>>,
     /// Row-major, as `cells`: the building covering the cell.
     buildings: Vec<Option<SimId>>,
+    /// The row-major indices of the cells whose ore is gems (RA5): always cells with ore. Empty
+    /// on a map without gems, which is hashed as before RA5.
+    gems: BTreeSet<u32>,
+    /// The row-major indices of the cells a harvester emptied and that hold no ore now (RA5):
+    /// ground ore may spread onto again, though a map's ore ground is no building ground.
+    mined: BTreeSet<u32>,
 }
 
 impl Grid {
@@ -211,6 +218,8 @@ impl Grid {
             foot: BTreeSet::new(),
             air_occupants: vec![None; count],
             buildings: vec![None; count],
+            gems: BTreeSet::new(),
+            mined: BTreeSet::new(),
             cells,
         })
     }
@@ -314,16 +323,155 @@ impl Grid {
 
     /// Removes up to `max` ore units from `pos` and returns how many were removed: the smaller of
     /// `max` and the ore in the cell, so the ore never falls below zero (PLAN.md section 5,
-    /// equation 4).
+    /// equation 4). A cell of gems that is emptied is a cell of gems no longer.
     pub(crate) fn take_ore(&mut self, pos: CellPos, max: u32) -> u32 {
-        match self.index(pos).and_then(|index| self.cells.get_mut(index)) {
+        let Some(index) = self.index(pos) else {
+            return 0;
+        };
+        match self.cells.get_mut(index) {
             Some(cell) => {
                 let taken = cell.ore.min(max);
                 cell.ore -= taken;
+                if taken > 0 && cell.ore == 0 {
+                    self.gems.remove(&(index as u32));
+                    self.mined.insert(index as u32);
+                }
                 taken
             }
             None => 0,
         }
+    }
+
+    /// Whether the ore in `pos` is gems (RA5): `false` for a cell of ore, a cell without ore
+    /// and a cell outside the map.
+    pub fn is_gems(&self, pos: CellPos) -> bool {
+        self.index(pos)
+            .is_some_and(|index| self.gems.contains(&(index as u32)))
+    }
+
+    /// How many cells hold gems.
+    pub fn gem_cells(&self) -> usize {
+        self.gems.len()
+    }
+
+    /// Makes the ore in `pos` gems (`gems`) or ore. Returns whether the cell is now as asked:
+    /// `false` outside the map and for gems in a cell without ore. Scenario setup only, like
+    /// [`Grid::set_terrain`].
+    pub fn set_gems(&mut self, pos: CellPos, gems: bool) -> bool {
+        let Some(index) = self.index(pos) else {
+            return false;
+        };
+        if !gems {
+            self.gems.remove(&(index as u32));
+            return true;
+        }
+        if self.cells.get(index).is_none_or(|cell| cell.ore == 0) {
+            return false;
+        }
+        self.gems.insert(index as u32);
+        true
+    }
+
+    /// Marks as gems every cell with ore whose look (`looks`, row-major) has the feature
+    /// [`LOOK_FEATURE_GEMS`](crate::LOOK_FEATURE_GEMS): how a map says where its gems are.
+    pub(crate) fn mark_gems(&mut self, looks: &[u8]) {
+        for (index, (cell, &look)) in self.cells.iter().zip(looks).enumerate() {
+            if cell.ore > 0 && look >> 4 == crate::map_scale::LOOK_FEATURE_GEMS {
+                self.gems.insert(index as u32);
+            }
+        }
+    }
+
+    /// Turns the ore amounts of a map file into bails (RA5, docs/RA2_PARITY_PLAN.md section
+    /// 4.10): a cell with the amount `a` holds `round(a / value)` bails, at least 1 and at most
+    /// `max_bails`, where `value` is `gem_value` for a cell of gems and `ore_value` for any
+    /// other (a value below 1 counts as 1). Match setup only: once, before the first tick.
+    pub(crate) fn ore_to_bails(&mut self, ore_value: u32, gem_value: u32, max_bails: u32) {
+        for (index, cell) in self.cells.iter_mut().enumerate() {
+            if cell.ore == 0 {
+                continue;
+            }
+            let value = if self.gems.contains(&(index as u32)) {
+                gem_value
+            } else {
+                ore_value
+            }
+            .max(1);
+            // Half away from zero: round(a / b) = (2a + b) / (2b), in `u64` (invariant I12).
+            let bails = (2 * u64::from(cell.ore) + u64::from(value)) / (2 * u64::from(value));
+            cell.ore = u32::try_from(bails)
+                .unwrap_or(u32::MAX)
+                .clamp(1, max_bails.max(1));
+        }
+    }
+
+    /// Adds one bail to the ore in `pos` if the cell holds ore (not gems) below `max_bails`.
+    /// Returns whether it grew (RA5: ore growth, `crate::ore`).
+    pub(crate) fn grow_ore(&mut self, pos: CellPos, max_bails: u32) -> bool {
+        let Some(index) = self.index(pos) else {
+            return false;
+        };
+        if self.gems.contains(&(index as u32)) {
+            return false;
+        }
+        match self.cells.get_mut(index) {
+            Some(cell) if cell.ore > 0 && cell.ore < max_bails => {
+                cell.ore += 1;
+                true
+            }
+            _ => false,
+        }
+    }
+
+    /// Whether ore may spread onto `pos` (RA5, `crate::ore`): a land cell inside the map that
+    /// ground units may enter, that holds no ore and no building, and that is building ground
+    /// or was emptied by a harvester (a map's ore ground is no building ground, and neither
+    /// are its roads, beaches and bridges, which stay free of ore).
+    pub fn takes_ore(&self, pos: CellPos) -> bool {
+        let Some(index) = self.index(pos) else {
+            return false;
+        };
+        self.cells.get(index).is_some_and(|cell| {
+            cell.passable
+                && !cell.water
+                && cell.ore == 0
+                && (cell.buildable || self.mined.contains(&(index as u32)))
+        }) && self.buildings.get(index).is_some_and(Option::is_none)
+    }
+
+    /// Puts one bail of ore into `pos` if ore may spread onto it ([`Grid::takes_ore`]).
+    pub(crate) fn plant_ore(&mut self, pos: CellPos) -> bool {
+        if !self.takes_ore(pos) {
+            return false;
+        }
+        let Some(index) = self.index(pos) else {
+            return false;
+        };
+        match self.cells.get_mut(index) {
+            Some(cell) => {
+                cell.ore = 1;
+                self.mined.remove(&(index as u32));
+                true
+            }
+            None => false,
+        }
+    }
+
+    /// The cells with ore that is not gems, with the bails each holds, in row-major order
+    /// (RA5: the cells that grow and spread, `crate::ore`).
+    pub(crate) fn ore_cells(&self) -> Vec<(CellPos, u32)> {
+        let width = self.width.max(1) as usize;
+        self.cells
+            .iter()
+            .enumerate()
+            .filter(|(index, cell)| cell.ore > 0 && !self.gems.contains(&(*index as u32)))
+            .map(|(index, cell)| {
+                (
+                    CellPos::new((index % width) as i32, (index / width) as i32),
+                    cell.ore,
+                )
+            })
+            .collect()
     }
 
     /// A unit standing in or entering `pos`, if any, in the occupancy layer of this view's
@@ -488,10 +636,17 @@ impl Grid {
     /// terrain does not change, and cells become impassable only by being covered by a building
     /// placed with a command (M3). A unit standing on a cell that becomes impassable may still
     /// leave it, and units whose path crosses it repath.
+    ///
+    /// The ore of the new terrain is ore, not gems, whatever the cell held ([`Grid::set_gems`]).
     pub fn set_terrain(&mut self, pos: CellPos, cell: Cell) -> bool {
-        match self.index(pos).and_then(|index| self.cells.get_mut(index)) {
+        let Some(index) = self.index(pos) else {
+            return false;
+        };
+        match self.cells.get_mut(index) {
             Some(slot) => {
                 *slot = cell;
+                self.gems.remove(&(index as u32));
+                self.mined.remove(&(index as u32));
                 true
             }
             None => false,
@@ -656,6 +811,17 @@ impl Grid {
         for id in &self.foot {
             hasher.write_u32(id.0);
         }
+        // RA5: which cells of ore are gems and which cells were mined out, each under a tag
+        // and only if there are any, so that a map without gems hashes as before.
+        for (tag, cells) in [(&b"gems"[..], &self.gems), (&b"mined"[..], &self.mined)] {
+            if !cells.is_empty() {
+                hasher.write(tag);
+                hasher.write_u64(cells.len() as u64);
+                for index in cells {
+                    hasher.write_u32(*index);
+                }
+            }
+        }
     }
 }
 
@@ -671,9 +837,11 @@ pub struct LoadedMap {
     /// the game checks it against the image file before rendering (docs/DECISIONS.md, D13).
     pub tileset_image: TilesetImage,
     /// The look of every cell, in row-major order: the optional tile property `look` (0 when the
-    /// tile has none). Presentation data, not used by the simulation: it tells the renderer what
-    /// stands on a cell (a forest, a city block, a bridge) whose terrain is the same to the
-    /// simulation. The game defines and checks the values.
+    /// tile has none). Presentation data: it tells the renderer what stands on a cell (a
+    /// forest, a city block, a bridge) whose terrain is the same to the simulation. The game
+    /// defines and checks the values. The simulation reads the scenery of a match from it
+    /// (`crate::props`) and, since RA5, which cells of ore hold gems (the feature
+    /// [`LOOK_FEATURE_GEMS`](crate::LOOK_FEATURE_GEMS), already applied to `grid`).
     pub looks: Vec<u8>,
 }
 
@@ -982,19 +1150,24 @@ fn validate(path: &Path, map: &tiled::Map) -> Result<LoadedMap, MapError> {
     let foot = BTreeSet::new();
     let air_occupants = vec![None; cells.len()];
     let buildings = vec![None; cells.len()];
+    let mut grid = Grid {
+        navigation: crate::Domain::Land,
+        domains: BTreeMap::new(),
+        width: map.width,
+        height: map.height,
+        cells,
+        occupants,
+        spots,
+        foot,
+        air_occupants,
+        buildings,
+        gems: BTreeSet::new(),
+        mined: BTreeSet::new(),
+    };
+    // RA5: the one look the simulation reads from a map file, as it reads the ore amounts.
+    grid.mark_gems(&looks);
     Ok(LoadedMap {
-        grid: Grid {
-            navigation: crate::Domain::Land,
-            domains: BTreeMap::new(),
-            width: map.width,
-            height: map.height,
-            cells,
-            occupants,
-            spots,
-            foot,
-            air_occupants,
-            buildings,
-        },
+        grid,
         tile_width: map.tile_width,
         tile_height: map.tile_height,
         tileset_image,
@@ -1465,6 +1638,76 @@ mod tests {
             grid.claim(CellPos::new(3, 3), plane),
             "an aircraft flies over it"
         );
+    }
+
+    /// RA5: gems are the cells with ore whose look says so; they and the mined ground are part
+    /// of the hash, and a grid with neither hashes as it did before RA5 (and before RA3).
+    #[test]
+    fn gems_and_mined_ground_are_marked_kept_in_step_with_the_ore_and_hashed() {
+        let gem_look = crate::map_scale::LOOK_FEATURE_GEMS << 4 | 1;
+        let ore_look = crate::map_scale::LOOK_FEATURE_ORE << 4 | 1;
+        let mut grid = open(4, 2);
+        let with = |ore| Cell {
+            ore,
+            buildable: false,
+            ..*open(1, 1).cell(CellPos::new(0, 0)).expect("a cell")
+        };
+        for x in 0..3 {
+            grid.set_terrain(CellPos::new(x, 0), with(100));
+        }
+        let plain = hash(&grid);
+        assert_eq!(plain, hash_before_ra3(&grid));
+        // The looks: gems on cell 0, ore on cell 1, gems on a cell without ore (3), and fewer
+        // looks than cells.
+        grid.mark_gems(&[gem_look, ore_look, 0, gem_look]);
+        assert!(grid.is_gems(CellPos::new(0, 0)));
+        assert!(!grid.is_gems(CellPos::new(1, 0)) && !grid.is_gems(CellPos::new(3, 0)));
+        assert!(!grid.is_gems(CellPos::new(-1, 0)) && !grid.is_gems(CellPos::new(0, 2)));
+        assert_eq!(grid.gem_cells(), 1);
+        let marked = hash(&grid);
+        assert_ne!(marked, plain);
+        // Gems only where ore lies; and back to ore.
+        assert!(!grid.set_gems(CellPos::new(3, 0), true));
+        assert!(!grid.set_gems(CellPos::new(9, 9), true));
+        assert!(grid.set_gems(CellPos::new(1, 0), true));
+        assert_ne!(hash(&grid), marked);
+        assert!(grid.set_gems(CellPos::new(1, 0), false));
+        assert_eq!(hash(&grid), marked);
+        // Bails: 100 of gems are 2 (value 50), 100 of ore 4 (value 25), at most 3.
+        grid.ore_to_bails(25, 50, 3);
+        let bails = |grid: &Grid, x| grid.cell(CellPos::new(x, 0)).expect("a cell").ore;
+        assert_eq!([0, 1, 2, 3].map(|x| bails(&grid, x)), [2, 3, 3, 0]);
+        // Growth: ore below the most, never gems, never an empty cell.
+        assert!(!grid.grow_ore(CellPos::new(0, 0), 3));
+        assert!(!grid.grow_ore(CellPos::new(1, 0), 3));
+        assert!(grid.grow_ore(CellPos::new(1, 0), 4));
+        assert!(!grid.grow_ore(CellPos::new(3, 0), 4));
+        assert_eq!([0, 1, 2, 3].map(|x| bails(&grid, x)), [2, 4, 3, 0]);
+        // Taking the last bail of gems leaves mined ground that is no gems; taking nothing
+        // from an empty cell leaves it as it was.
+        assert_eq!(grid.take_ore(CellPos::new(0, 0), 5), 2);
+        assert!(!grid.is_gems(CellPos::new(0, 0)));
+        assert_eq!(grid.gem_cells(), 0);
+        assert!(grid.takes_ore(CellPos::new(0, 0)), "mined ground");
+        let mined = hash(&grid);
+        assert_eq!(grid.take_ore(CellPos::new(3, 0), 5), 0);
+        assert_eq!(hash(&grid), mined);
+        assert!(grid.takes_ore(CellPos::new(3, 0)), "building ground");
+        assert!(!grid.takes_ore(CellPos::new(1, 0)), "ore lies there");
+        // Planted ore is one bail of ore, and the ground is mined ground no longer: with the
+        // bail taken off by scenario setup the cell is plain ore ground again.
+        assert!(grid.plant_ore(CellPos::new(0, 0)));
+        assert!(!grid.plant_ore(CellPos::new(0, 0)));
+        assert_eq!(bails(&grid, 0), 1);
+        assert_ne!(hash(&grid), mined);
+        grid.set_terrain(CellPos::new(0, 0), with(0));
+        assert!(!grid.takes_ore(CellPos::new(0, 0)));
+        // A building keeps ore off its ground.
+        grid.cover(CellPos::new(3, 0), SimId(4));
+        assert!(!grid.takes_ore(CellPos::new(3, 0)));
+        // The cells of ore in row-major order, without the gems.
+        assert!(grid.set_gems(CellPos::new(2, 0), true));
+        assert_eq!(grid.ore_cells(), [(CellPos::new(1, 0), 4)]);
     }
 
     /// RA3: the hash of a grid covers who holds which spot (invariant I3), and the hash of a

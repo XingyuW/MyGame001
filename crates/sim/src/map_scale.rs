@@ -94,6 +94,10 @@ pub const LOOK_FEATURE_ORE: u8 = 1;
 /// The feature of a bridge deck, which no made start position touches.
 pub const LOOK_FEATURE_BRIDGE: u8 = 8;
 
+/// The feature of a cell of gems (RA5): a cell with ore and this feature holds gems
+/// ([`Grid::is_gems`]).
+pub const LOOK_FEATURE_GEMS: u8 = 10;
+
 /// A map enlarged for a match.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EnlargedMap {
@@ -718,12 +722,17 @@ pub fn enlarged_map(
     };
     let mut cells = Vec::with_capacity(columns.len() * rows.len());
     let mut shown = Vec::with_capacity(columns.len() * rows.len());
+    // The cells shown from a cell of gems (RA5).
+    let mut gems = Vec::new();
     for &row in &rows {
         for &column in &columns {
             let from = CellPos::new(
                 i32::try_from(column).unwrap_or(i32::MAX),
                 i32::try_from(row).unwrap_or(i32::MAX),
             );
+            if grid.is_gems(from) {
+                gems.push(cells.len());
+            }
             cells.push(grid.cell(from).copied().unwrap_or(blocked));
             let index = u64::from(row) * u64::from(grid.width()) + u64::from(column);
             shown.push(
@@ -762,8 +771,19 @@ pub fn enlarged_map(
             )
         })
         .collect();
+    let before = (canvas.cells.clone(), canvas.looks.clone());
     make_starts(&mut canvas, &mut centres, players)?;
-    let grid = Grid::from_cells(size.0, size.1, canvas.cells).ok_or(too_large)?;
+    let width = canvas.width;
+    // Gems stay gems where a made start position changed nothing; ground it cleared or planted
+    // with ore holds none.
+    gems.retain(|&index| {
+        canvas.cells[index] == before.0[index] && canvas.looks[index] == before.1[index]
+    });
+    let mut grid = Grid::from_cells(size.0, size.1, canvas.cells).ok_or(too_large)?;
+    for index in gems {
+        let index = i32::try_from(index).unwrap_or(i32::MAX);
+        grid.set_gems(CellPos::new(index % width, index / width), true);
+    }
     Ok(EnlargedMap {
         grid,
         looks: canvas.looks,

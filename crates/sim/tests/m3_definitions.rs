@@ -274,6 +274,7 @@ fn the_fixture_loads_with_every_field() {
         Some(HarvesterDef {
             capacity: 20,
             harvest_rate: 3,
+            harvest_interval: 1,
         })
     );
     assert_eq!(definitions.harvester(UnitKind(0)), None);
@@ -394,17 +395,18 @@ fn every_field_is_required_and_unknown_fields_are_rejected() {
 }
 
 #[test]
-fn schema_versions_other_than_1_are_rejected() {
-    for version in [0, 2, -1, i64::MAX] {
+fn schema_versions_other_than_2_are_rejected() {
+    // Schema version 2 since RA5 (docs/DECISIONS.md R58); version 1 is one of the others now.
+    for version in [0, 1, 3, -1, i64::MAX] {
         assert_rejected(
             &variant(
                 &format!("version_{version}"),
-                &[("schema_version: 1,", &format!("schema_version: {version},"))],
+                &[("schema_version: 2,", &format!("schema_version: {version},"))],
             ),
             "schema_version",
             DataErrorKind::UnsupportedSchemaVersion {
                 found: version,
-                expected: 1,
+                expected: 2,
             },
         );
     }
@@ -564,8 +566,8 @@ fn list_lengths_are_bounded() {
             ));
         }
         let text = format!(
-            "(schema_version: 1, placement_distance: 1, buildings: [{}], units: [], \
-             harvesters: [], refineries: [])",
+            "(schema_version: 2, placement_distance: 1, buildings: [{}], units: [], \
+             harvesters: [], refineries: [], refunds: [])",
             entries.join(",\n")
         );
         temp_file(&format!("{name}.ron"), text.as_bytes())
@@ -605,8 +607,8 @@ fn list_lengths_are_bounded() {
     assert_rejected(
         &temp_file(
             "no_buildings.ron",
-            b"(schema_version: 1, placement_distance: 1, buildings: [], units: [], \
-              harvesters: [], refineries: [])",
+            b"(schema_version: 2, placement_distance: 1, buildings: [], units: [], \
+              harvesters: [], refineries: [], refunds: [])",
         ),
         "buildings",
         DataErrorKind::InvalidValue {
@@ -658,8 +660,8 @@ fn references_must_name_defined_types() {
             unknown("building", "harvester"),
         ),
         (
-            "unit: \"harvester\",\n            capacity",
-            "unit: \"runner_x\",\n            capacity",
+            "unit: \"harvester\",\n            harvest_interval",
+            "unit: \"runner_x\",\n            harvest_interval",
             "harvesters[0].unit",
             unknown("unit", "runner_x"),
         ),
@@ -730,7 +732,7 @@ fn names_and_identifiers_are_checked() {
             "duplicate_harvester",
             &[(
                 "            harvest_rate: 3,\n        ),\n",
-                "            harvest_rate: 3,\n        ),\n        (unit: \"harvester\", capacity: 5, harvest_rate: 1),\n",
+                "            harvest_rate: 3,\n        ),\n        (unit: \"harvester\", capacity: 5, harvest_rate: 1, harvest_interval: 1),\n",
             )],
         ),
         "harvesters[1].unit",
@@ -741,7 +743,7 @@ fn names_and_identifiers_are_checked() {
             "duplicate_refinery",
             &[(
                 "            credits_per_ore: 2,\n        ),\n",
-                "            credits_per_ore: 2,\n        ),\n        (building: \"refinery\", credits_per_ore: 3),\n",
+                "            credits_per_ore: 2,\n        ),\n        (building: \"refinery\", credits_per_ore: 3, credits_per_gem: 6),\n",
             )],
         ),
         "refineries[1].building",

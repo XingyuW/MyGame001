@@ -126,6 +126,8 @@ impl Plugin for SimPlugin {
                 advance_production,
                 crate::economy::repair_buildings,
                 harvest,
+                crate::ore::grow,
+                crate::crates::appear,
                 crate::special::advance,
             )
                 .chain()
@@ -134,7 +136,8 @@ impl Plugin for SimPlugin {
             find_paths
                 .in_set(SimCoreSet(SimSet::Pathfinding))
                 .in_set(SimSet::Pathfinding),
-            move_units
+            (move_units, crate::crates::collect)
+                .chain()
                 .in_set(SimCoreSet(SimSet::Movement))
                 .in_set(SimSet::Movement),
             (combat, crate::special::resolve)
@@ -177,6 +180,7 @@ impl Plugin for SimPlugin {
             .insert_resource(crate::veterancy::Kills::default())
             .insert_resource(crate::crew::Wrecks::default())
             .insert_resource(crate::Props::default())
+            .insert_resource(crate::Crates::default())
             .insert_resource(MatchState::default())
             .insert_resource(AiPlayers::default())
             .insert_resource(Messages::<SimEvent>::default())

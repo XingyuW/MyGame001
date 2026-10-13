@@ -127,6 +127,22 @@ impl Vision {
         }
     }
 
+    /// Marks every cell of a grid of `width` × `height` cells as explored (RA5: the crate that
+    /// reveals the map). What is visible now does not change.
+    pub(crate) fn explore_all(&mut self, width: u32, height: u32) {
+        if self.width != width || self.height != height {
+            let cells = usize::try_from(u64::from(width) * u64::from(height)).unwrap_or(0);
+            *self = Vision {
+                width,
+                height,
+                cells: vec![0; cells],
+            };
+        }
+        for bits in &mut self.cells {
+            *bits |= EXPLORED;
+        }
+    }
+
     /// A vision of `grid` in which the cells within `sight` of `cell` are visible (for unit
     /// tests of what a player may know).
     #[cfg(test)]

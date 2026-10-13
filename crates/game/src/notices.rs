@@ -89,6 +89,20 @@ pub fn crew_text(count: usize) -> String {
     }
 }
 
+/// The line that reports what a crate held for the human player (RA5): `credits` for money.
+pub fn crate_text(content: sim::CrateContent, credits: i64) -> String {
+    match content {
+        sim::CrateContent::Money => format!("Crate: {credits} credits"),
+        sim::CrateContent::Unit => "Crate: a free unit".to_owned(),
+        sim::CrateContent::Veteran => "Crate: units promoted".to_owned(),
+        sim::CrateContent::HealBase => "Crate: everything repaired".to_owned(),
+        sim::CrateContent::Armour => "Crate: armour upgraded".to_owned(),
+        sim::CrateContent::Firepower => "Crate: firepower upgraded".to_owned(),
+        sim::CrateContent::Speed => "Crate: speed upgraded".to_owned(),
+        sim::CrateContent::Reveal => "Crate: map revealed".to_owned(),
+    }
+}
+
 /// How opaque a notice with `left` seconds to go is: full, then fading to nothing.
 pub fn notice_alpha(left: f32) -> f32 {
     (left / FADE_SECONDS).clamp(0.0, 1.0)
@@ -190,6 +204,12 @@ fn announce_defeats(
             SimEvent::CrewEscaped { player, units, .. } if *player == HUMAN => {
                 (*player, Some(crew_text(units.len())))
             }
+            SimEvent::CrateTaken {
+                player,
+                content,
+                credits,
+                ..
+            } if *player == HUMAN => (*player, Some(crate_text(*content, *credits))),
             _ => continue,
         };
         let player = &player;
@@ -265,6 +285,16 @@ mod tests {
         assert_eq!(promotion_text("GI", sim::ELITE), "GI promoted to elite");
         assert_eq!(crew_text(1), "A survivor escaped");
         assert_eq!(crew_text(6), "6 survivors escaped");
+        // RA5: every content of a crate has a line of its own, and money names its credits.
+        assert_eq!(
+            crate_text(sim::CrateContent::Money, 2450),
+            "Crate: 2450 credits"
+        );
+        let lines: std::collections::BTreeSet<String> = sim::CrateContent::ALL
+            .into_iter()
+            .map(|content| crate_text(content, 0))
+            .collect();
+        assert_eq!(lines.len(), sim::CrateContent::ALL.len());
     }
 
     #[test]
@@ -370,6 +400,15 @@ mod tests {
                 at: sim::CellPos::new(1, 1),
                 units: vec![sim::SimId(5), sim::SimId(6)],
             });
+            // RA5: a crate, announced to the player who took it alone.
+            app.world_mut().write_message(SimEvent::CrateTaken {
+                player,
+                unit: sim::SimId(3),
+                cell: sim::CellPos::new(2, 2),
+                content: sim::CrateContent::Money,
+                credits: 2100,
+                spawned: None,
+            });
         }
         app.update();
         let world = app.world_mut();
@@ -380,7 +419,14 @@ mod tests {
             .collect();
         // Without a simulation to name the unit's type it is a "Unit".
         let texts: Vec<&str> = lines.iter().map(|(text, _)| text.as_str()).collect();
-        assert_eq!(texts, ["Unit promoted to elite", "2 survivors escaped"]);
+        assert_eq!(
+            texts,
+            [
+                "Unit promoted to elite",
+                "2 survivors escaped",
+                "Crate: 2100 credits"
+            ]
+        );
         let (_, [r, g, b]) = TEAM_PALETTE[TeamColors(3).index_of(HUMAN)];
         assert!(
             lines

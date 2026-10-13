@@ -688,6 +688,27 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
                     &expected.to_string(),
                     &source,
                 );
+                // RA5: `Harvester=yes` is a harvester of the economy file, whose capacity is
+                // the section's `Storage` in bails.
+                let harvester = definitions.harvester(kind);
+                let text = value("Harvester").unwrap_or("no");
+                differences.check(
+                    id,
+                    "harvester",
+                    &u8::from(harvester.is_some()).to_string(),
+                    &convert(Conversion::Flag, text).to_string(),
+                    text,
+                );
+                if let Some(terms) = harvester {
+                    let storage = required("Storage");
+                    differences.check(
+                        id,
+                        "storage",
+                        &terms.capacity.to_string(),
+                        &convert(Conversion::Int, storage).to_string(),
+                        storage,
+                    );
+                }
             }
             ProductionItem::Building(kind) => {
                 let def = definitions.building(kind).expect("building");
@@ -701,21 +722,35 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
                 ] {
                     differences.check(id, field, &game.to_string(), &expected.to_string(), power);
                 }
-                // The refund of a sale: `Soylent` if the section has it and it is not 0 (plan
-                // appendix D, topic 9), else the cost times `RefundPercent`.
+                // The economy file's `sell_value` is what the refund rule gives: the cost times
+                // `RefundPercent`. What a sale returns (`Definitions::refund`, RA5) is the
+                // section's `Soylent` if it has one that is not 0 (plan appendix D, topic 9;
+                // the economy file's `refunds`), else that value.
                 let cost = required("Cost");
-                let soylent = value("Soylent").filter(|text| convert(Conversion::Int, text) != 0);
+                let by_rule = (convert(Conversion::Int, cost) * refund).div_euclid(100);
                 differences.check(
                     id,
                     "sell_value",
                     &def.sell_value.to_string(),
+                    &by_rule.to_string(),
+                    cost,
+                );
+                let soylent = value("Soylent").filter(|text| convert(Conversion::Int, text) != 0);
+                differences.check(
+                    id,
+                    "refund",
+                    &definitions.refund(kind).to_string(),
                     &soylent
-                        .map_or(
-                            (convert(Conversion::Int, cost) * refund).div_euclid(100),
-                            |text| convert(Conversion::Int, text),
-                        )
+                        .map_or(by_rule, |text| convert(Conversion::Int, text))
                         .to_string(),
                     soylent.unwrap_or(cost),
+                );
+                // A type is in `refunds` exactly if its section has a `Soylent` that is not 0.
+                assert_eq!(
+                    def.fixed_refund.is_some(),
+                    soylent.is_some(),
+                    "{id}: the economy file's refunds and [{}] Soylent",
+                    row.section
                 );
                 // `FreeUnit`: the unit that leaves the building when it is placed.
                 let free = value("FreeUnit");
@@ -747,6 +782,22 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
                     &refinery.to_string(),
                     text,
                 );
+                // RA5: a refinery pays the value of a bail of ore and of gems.
+                for (field, game, section) in [
+                    ("credits_per_ore", def.credits_per_ore, "Riparius"),
+                    ("credits_per_gem", def.credits_per_gem, "Cruentus"),
+                ] {
+                    if let Some(game) = game {
+                        let text = reference.value(section, "Value");
+                        differences.check(
+                            id,
+                            field,
+                            &game.to_string(),
+                            &convert(Conversion::Int, text).to_string(),
+                            text,
+                        );
+                    }
+                }
             }
         }
 
@@ -1439,13 +1490,14 @@ const ITEM_FIELDS: &[ListFields] = &[
         "harvesters",
         &[
             ("unit", Field::Key),
-            (
-                "capacity",
-                Field::Own("ore units of M3; bails and `Storage` come with RA5"),
-            ),
+            ("capacity", Field::Audited("storage")),
             (
                 "harvest_rate",
-                Field::Own("ore units of M3; bails and `Storage` come with RA5"),
+                Field::Own("one bail at a time; the ini has no key for the pace of harvesting"),
+            ),
+            (
+                "harvest_interval",
+                Field::Own("19 ticks a bail; the ini has no key for the pace of harvesting"),
             ),
         ],
     ),
@@ -1454,10 +1506,16 @@ const ITEM_FIELDS: &[ListFields] = &[
         "refineries",
         &[
             ("building", Field::Audited("refinery")),
-            (
-                "credits_per_ore",
-                Field::Own("ore units of M3; bails come with RA5"),
-            ),
+            ("credits_per_ore", Field::Audited("credits_per_ore")),
+            ("credits_per_gem", Field::Audited("credits_per_gem")),
+        ],
+    ),
+    (
+        "economy.ron",
+        "refunds",
+        &[
+            ("building", Field::Key),
+            ("credits", Field::Audited("refund")),
         ],
     ),
     (
@@ -1962,6 +2020,14 @@ fn every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_d
 // --- The audit of rules.ron -------------------------------------------------------------------------
 
 /// The scalar values of `rules.ron`: group, field, ini section, ini key, conversion.
+/// The scalar rules the ini has no key for (RA5, docs/RA2_PARITY_PLAN.md section 4.10 and
+/// appendix D, topic 8: assumptions from the overlay count and the ancestor engine): group,
+/// field, and the game's own value.
+const OWN_RULES: &[(&str, &str, i32)] = &[
+    ("economy", "ore_max_bails", 12),
+    ("economy", "ore_spread_above", 6),
+];
+
 const RULES: &[(&str, &str, &str, &str, Conversion)] = {
     use Conversion::*;
     &[
@@ -2562,9 +2628,20 @@ fn every_value_of_the_shipped_rules_equals_its_reference_or_is_a_listed_differen
         .collect();
     differences.used.extend(foreign);
 
-    // Every scalar field has exactly one row of the table, so that none goes unaudited.
+    // Every scalar field has exactly one row of the table, so that none goes unaudited; a
+    // field the ini has no key for is the game's own and has the value recorded here.
     for (group, fields) in scalar_groups(rules) {
         for (field, game) in fields {
+            if let Some((.., own)) = OWN_RULES
+                .iter()
+                .find(|(g, f, _)| *g == group && *f == field)
+            {
+                assert_eq!(
+                    game, *own,
+                    "rules.ron {group}.{field}: the game's own value"
+                );
+                continue;
+            }
             let rows: Vec<_> = RULES
                 .iter()
                 .filter(|(g, f, ..)| *g == group && *f == field)
@@ -2586,13 +2663,33 @@ fn every_value_of_the_shipped_rules_equals_its_reference_or_is_a_listed_differen
         }
     }
     assert_eq!(
-        RULES.len(),
+        RULES.len() + OWN_RULES.len(),
         scalar_groups(rules)
             .iter()
             .map(|(_, fields)| fields.len())
             .sum::<usize>(),
         "the audit table names a field the rules file does not have"
     );
+
+    // RA5: the units of a crate are the mapped units with `CrateGoodie=yes`.
+    let goodies: BTreeSet<String> = mapping()
+        .into_iter()
+        .filter(|row| !row.building)
+        .filter(|row| {
+            reference
+                .get(&row.section, "CrateGoodie")
+                .is_some_and(|text| convert(Conversion::Flag, text) == 1)
+        })
+        .map(|row| row.game_id)
+        .collect();
+    let listed: BTreeSet<String> = rules
+        .crate_units
+        .iter()
+        .map(|&kind| definitions.unit(kind).expect("a crate's unit").id.clone())
+        .collect();
+    assert_eq!(listed, goodies, "rules.ron crate_units and CrateGoodie=yes");
+    assert_eq!(listed.len(), rules.crate_units.len());
+    assert!(!listed.is_empty());
 
     // Powerups: the crate contents with a share above 0, with their argument.
     let powerups = [

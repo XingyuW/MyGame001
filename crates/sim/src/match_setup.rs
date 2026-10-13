@@ -325,8 +325,12 @@ pub struct MatchRules {
     pub superweapons: bool,
     /// `Command::Undeploy` is accepted.
     pub mcv_repacks: bool,
-    /// Crates appear (from RA5).
+    /// Crates appear (RA5, `crate::crates`): in a match with players, in a world with a rules
+    /// file.
     pub crates: bool,
+    /// Ore grows and spreads (RA5, `crate::ore`; the lobby's `TiberiumGrows`). Read only in a
+    /// world with a rules file.
+    pub ore_grows: bool,
 }
 
 impl Default for MatchRules {
@@ -336,6 +340,7 @@ impl Default for MatchRules {
             superweapons: true,
             mcv_repacks: true,
             crates: true,
+            ore_grows: true,
         }
     }
 }
@@ -387,6 +392,11 @@ impl MatchState {
             u8::from(self.rules.mcv_repacks),
             u8::from(self.rules.crates),
         ]);
+        // RA5: written only when it differs from the default, so that a match with the
+        // default hashes as before.
+        if !self.rules.ore_grows {
+            hasher.write(b"ore stands still");
+        }
         hasher.write_u64(self.defeated.len() as u64);
         for (player, tick) in &self.defeated {
             hasher.write(&[player.0]);
@@ -530,6 +540,7 @@ pub struct MatchOptions {
     pub superweapons: bool,
     pub crates: bool,
     pub mcv_repacks: bool,
+    pub ore_grows: bool,
 }
 
 impl Default for MatchOptions {
@@ -548,6 +559,7 @@ impl Default for MatchOptions {
             superweapons: rules.superweapons,
             crates: rules.crates,
             mcv_repacks: rules.mcv_repacks,
+            ore_grows: rules.ore_grows,
         }
     }
 }
@@ -796,6 +808,17 @@ pub fn setup_match_configured(
     }
     for setup in sorted.iter().filter(|setup| random(setup.player)) {
         check_faction(setup)?;
+    }
+
+    // RA5 (docs/RA2_PARITY_PLAN.md section 4.10): with a rules file the ore amounts of the map
+    // file become bails, at most the densest ore of the rules.
+    if let Some(economy) = definitions.rules().map(|rules| rules.economy) {
+        let value = |credits: i32| u32::try_from(credits.max(1)).unwrap_or(1);
+        world.resource_mut::<Grid>().ore_to_bails(
+            value(economy.ore_value),
+            value(economy.gem_value),
+            value(economy.ore_max_bails),
+        );
     }
 
     {
@@ -1057,6 +1080,7 @@ pub fn setup_match_configured(
             superweapons: options.superweapons,
             mcv_repacks: options.mcv_repacks,
             crates: options.crates,
+            ore_grows: options.ore_grows,
         },
         defeated: BTreeMap::new(),
         outcome: None,

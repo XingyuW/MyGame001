@@ -3,7 +3,7 @@
 // superweapon building. Build times are short so that the tests stay fast. Fixture data
 // (invariant I10).
 (
-    schema_version: 1,
+    schema_version: 2,
     placement_distance: 6,
     buildings: [
         (id: "allied_yard", sprite: "yard", width: 3, height: 3, cost: 2000, build_time: 40, producer: "allied_yard", prerequisites: [], power_produced: 0, power_consumed: 0, sell_value: 1000, free_units: []),
@@ -39,11 +39,12 @@
         (unit: "hovercraft", cost: 450, build_time: 20, producer: "allied_factory", prerequisites: ["allied_factory"]),
     ],
     harvesters: [
-        (unit: "miner_a", capacity: 200, harvest_rate: 10),
-        (unit: "miner_s", capacity: 200, harvest_rate: 10),
+        (unit: "miner_a", capacity: 200, harvest_rate: 10, harvest_interval: 1),
+        (unit: "miner_s", capacity: 200, harvest_rate: 10, harvest_interval: 1),
     ],
     refineries: [
-        (building: "allied_refinery", credits_per_ore: 2),
-        (building: "soviet_refinery", credits_per_ore: 2),
+        (building: "allied_refinery", credits_per_ore: 2, credits_per_gem: 4),
+        (building: "soviet_refinery", credits_per_ore: 2, credits_per_gem: 4),
     ],
+    refunds: [],
 )

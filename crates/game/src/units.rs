@@ -888,6 +888,21 @@ fn log_sim_events(mut events: MessageReader<SimEvent>) {
             SimEvent::RankGained { player, unit, rank } => {
                 info!("player {}: unit {} rose to rank {rank}", player.0, unit.0);
             }
+            SimEvent::CrateAppeared { cell } => {
+                debug!("a crate appeared at ({}, {})", cell.x, cell.y);
+            }
+            SimEvent::CrateTaken {
+                player,
+                unit,
+                content,
+                credits,
+                ..
+            } => info!(
+                "player {}: unit {} took a crate: {} ({credits} credits)",
+                player.0,
+                unit.0,
+                content.id()
+            ),
             SimEvent::CrewEscaped {
                 player,
                 from,

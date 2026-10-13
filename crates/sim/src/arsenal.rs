@@ -1231,10 +1231,19 @@ impl Definitions {
             }
         }
     }
-    /// The credits a player gets for selling a building of type `kind`: with a rules file the
-    /// cost times `refund_percent` (RA2, docs/RA2_PARITY_PLAN.md section 4.6), without one the
-    /// economy file's `sell_value`.
+    /// The credits a player gets for selling a building of type `kind`: the fixed refund of a
+    /// type the economy file's `refunds` lists (RA5: the ini's `Soylent`), else what the refund
+    /// rule gives ([`Definitions::rule_refund`]).
     pub fn refund(&self, kind: BuildingKind) -> i64 {
+        self.building(kind)
+            .and_then(|def| def.fixed_refund)
+            .unwrap_or_else(|| self.rule_refund(kind))
+    }
+    /// What the refund rule gives for a building of type `kind`: with a rules file the cost
+    /// times `refund_percent` (RA2, docs/RA2_PARITY_PLAN.md section 4.6), without one the
+    /// economy file's `sell_value`. The survivors of a building follow this value, not a fixed
+    /// refund (docs/DECISIONS.md R58).
+    pub fn rule_refund(&self, kind: BuildingKind) -> i64 {
         let Some(def) = self.building(kind) else {
             return 0;
         };

@@ -1,4 +1,4 @@
-// Economy definitions, schema version 1 (PLAN.md sections 5 and 7, M3; docs/DECISIONS.md D23).
+// Economy definitions, schema version 2 (PLAN.md sections 5 and 7, M3; docs/DECISIONS.md D23).
 //
 // placement_distance: a new building must lie within this many cells (Chebyshev distance between
 //                     the nearest cells) of a building of its owner
@@ -17,7 +17,7 @@
 // is the Vanguard's defence and the rocket tower the Meridian's. These values are balance data
 // (docs/DECISIONS.md D51), used by no simulation test (invariant I10).
 (
-    schema_version: 1,
+    schema_version: 2,
     placement_distance: 4,
     buildings: [
         (
@@ -280,16 +280,19 @@
     harvesters: [
         (
             unit: "harvester",
+            harvest_interval: 1,
             capacity: 700,
             harvest_rate: 7,
         ),
-        (unit: "chrono_miner", capacity: 500, harvest_rate: 7),
-        (unit: "war_miner", capacity: 1000, harvest_rate: 7),
+        (unit: "chrono_miner", capacity: 500, harvest_rate: 7, harvest_interval: 1),
+        (unit: "war_miner", capacity: 1000, harvest_rate: 7, harvest_interval: 1),
     ],
     refineries: [
         (
             building: "refinery",
+            credits_per_gem: 2,
             credits_per_ore: 1,
         ),
     ],
+    refunds: [],
 )

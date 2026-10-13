@@ -4,8 +4,13 @@
 // a repair step restores 10 hit points every 5 ticks (a vehicle on a depot every 4) for 20
 // percent of the price over a whole repair. Fixture data (invariant I10); the values of the
 // groups later milestones consume are placeholders within their ranges.
+//
+// Schema version 2 (RA5): the ore of this fixture stays what it was before RA5. A map amount is
+// a number of bails (ore_value 1, no densest ore to speak of), and ore neither grows nor
+// spreads, so that the tests of RA1 to RA4 keep their numbers; the RA5 fixture (../ra5) has the
+// rules of RA5. Crates appear in the matches set up on this fixture, as in every match.
 (
-    schema_version: 1,
+    schema_version: 2,
     production: (
         build_ticks_per_1000: 840,
         multiple_factory_pm: 800,
@@ -25,13 +30,15 @@
         infantry_repair_interval: 1,
         reload_interval: 360,
         purifier_bonus_percent: 25,
-        ore_value: 25,
-        gem_value: 50,
+        ore_value: 1,
+        gem_value: 2,
         ore_growth_interval: 2933,
-        ore_growth_pm: 60,
+        ore_growth_pm: 0,
         ore_spread_interval: 2933,
-        ore_spread_pm: 60,
+        ore_spread_pm: 0,
         harvesters_per_refinery: 2,
+        ore_max_bails: 1000000,
+        ore_spread_above: 6,
     ),
     veterancy: (
         veteran_ratio_pm: 3000,
@@ -112,6 +119,7 @@
         (id: "money", share: 20, value: 2000),
         (id: "armour", share: 10, value: 1500),
     ],
+    crate_units: [],
     dialog: (
         min_credits: 1000,
         credits: 3000,

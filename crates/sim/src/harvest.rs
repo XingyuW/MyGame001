@@ -1,15 +1,21 @@
 //! The harvester cycle (PLAN.md sections 5 and 7, M3, equation 4; docs/DECISIONS.md D26).
 //!
+//! Since RA5 (docs/RA2_PARITY_PLAN.md section 4.10, docs/DECISIONS.md R58) the ore unit is the
+//! bail, a cell holds bails of ore or of gems ([`Grid::is_gems`]), and a harvester counts the
+//! bails of gems in its load.
+//!
 //! A harvester alternates between ore and a refinery of its owner:
 //!
-//! 1. Standing at the centre of a cell with ore and not full, it removes `harvest_rate` ore
-//!    units per tick, or less if the cell holds less or the harvester has less room left, so a
-//!    cell's ore falls exactly to zero and a load never exceeds the capacity.
+//! 1. Standing at the centre of a cell with ore and not full, it works; after every
+//!    `harvest_interval` ticks of work (1: every tick) it removes `harvest_rate` bails, or less
+//!    if the cell holds less or the harvester has less room left, so a cell's ore falls exactly
+//!    to zero and a load never exceeds the capacity.
 //! 2. Otherwise, if it is not full, it moves to the nearest cell with ore that is reachable over
 //!    passable terrain and neither held by another unit nor the target of another harvester.
 //! 3. When it is full, or carries ore and no ore is left, it moves to the nearest free cell
 //!    around a refinery of its owner (the refinery's ring, `Footprint::ring`) and, standing
-//!    there, unloads: the refinery pays `load × credits_per_ore` credits.
+//!    there, unloads: the refinery pays `credits_per_ore` for every bail of ore and
+//!    `credits_per_gem` for every bail of gems, at once.
 //!
 //! A harvester whose refinery disappears (sold, or from M4 on destroyed) while it carries ore to
 //! it turns to the nearest other refinery of its owner, or stops (`HarvestIdle::NoRefinery`). A
@@ -61,11 +67,16 @@ pub enum HarvestState {
 pub struct Harvester {
     /// Explicitly assigned field, retained across deliveries.
     pub field: Option<CellPos>,
-    /// Ore units carried, from 0 to the capacity.
+    /// Bails carried, of ore and of gems together, from 0 to the capacity.
     pub load: u32,
     pub state: HarvestState,
     /// Times it set out since it last harvested or unloaded.
     pub attempts: u8,
+    /// How many of the bails carried are gems (RA5), from 0 to `load`.
+    pub gems: u32,
+    /// Ticks worked on the cell it stands on since it arrived or last removed ore (RA5), from
+    /// 0 to its type's `harvest_interval` less one.
+    pub work: u32,
 }
 
 impl Harvester {
@@ -76,6 +87,8 @@ impl Harvester {
             load: 0,
             state: HarvestState::Seeking,
             attempts: 0,
+            gems: 0,
+            work: 0,
         }
     }
 
@@ -84,10 +97,11 @@ impl Harvester {
         self.field = None;
         self.state = HarvestState::Idle;
         self.attempts = 0;
+        self.work = 0;
     }
 
     /// Load, then a state tag (0 idle, 1 seeking, 2 to ore with the cell, 3 to a refinery with
-    /// its id and the dock cell), then the attempts.
+    /// its id and the dock cell), then the attempts, the bails of gems and the ticks worked.
     pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
         match self.field {
             Some(cell) => {
@@ -114,15 +128,18 @@ impl Harvester {
             }
         }
         hasher.write(&[self.attempts]);
+        hasher.write_u32(self.gems);
+        hasher.write_u32(self.work);
     }
 }
 
-/// A refinery: its owner, footprint, and payment per ore unit.
+/// A refinery: its owner, footprint, and payment per bail of ore and of gems.
 #[derive(Clone, Copy)]
 struct Refinery {
     owner: PlayerId,
     footprint: Footprint,
     credits_per_ore: i64,
+    credits_per_gem: i64,
 }
 
 /// The cell with ore nearest to `start` (by path cost over passable terrain; `start` itself
@@ -186,6 +203,7 @@ struct Worker<'a> {
     cell: CellPos,
     capacity: u32,
     rate: u32,
+    interval: u32,
     orders: &'a mut Orders,
     harvester: &'a mut Harvester,
 }
@@ -194,6 +212,7 @@ impl Context<'_> {
     fn idle(&mut self, worker: &mut Worker<'_>, reason: HarvestIdle) {
         worker.harvester.state = HarvestState::Idle;
         worker.harvester.attempts = 0;
+        worker.harvester.work = 0;
         worker.orders.current = None;
         self.events.write(SimEvent::HarvesterIdle {
             unit: worker.id,
@@ -209,6 +228,7 @@ impl Context<'_> {
             return;
         }
         worker.harvester.attempts += 1;
+        worker.harvester.work = 0;
         worker.harvester.state = state;
         if let HarvestState::ToOre(target) = state {
             self.claimed.insert(target);
@@ -258,11 +278,21 @@ impl Context<'_> {
         let room = worker.capacity.saturating_sub(load);
         let ore_here = self.grid.cell(worker.cell).map_or(0, |terrain| terrain.ore);
         if room > 0 && ore_here > 0 {
-            let taken = self.grid.take_ore(worker.cell, worker.rate.min(room));
-            worker.harvester.load = load.saturating_add(taken);
             worker.harvester.attempts = 0;
             worker.harvester.state = HarvestState::ToOre(worker.cell);
             self.claimed.insert(worker.cell);
+            // One more tick of work on this cell; the ore comes off when the interval is full.
+            worker.harvester.work = worker.harvester.work.saturating_add(1);
+            if worker.harvester.work < worker.interval {
+                return;
+            }
+            worker.harvester.work = 0;
+            let gems = self.grid.is_gems(worker.cell);
+            let taken = self.grid.take_ore(worker.cell, worker.rate.min(room));
+            worker.harvester.load = load.saturating_add(taken);
+            if gems {
+                worker.harvester.gems = worker.harvester.gems.saturating_add(taken);
+            }
             if worker.harvester.load >= worker.capacity {
                 self.go_to_refinery(worker);
             }
@@ -300,10 +330,15 @@ impl Context<'_> {
             return;
         };
         let ore = worker.harvester.load;
+        let gems = worker.harvester.gems.min(ore);
         // At most MAX_ORE_CAPACITY × MAX_CREDITS_PER_ORE = 10^8; saturating for invariant I12.
-        let credits = i64::from(ore).saturating_mul(target.credits_per_ore);
+        let credits = i64::from(ore - gems)
+            .saturating_mul(target.credits_per_ore)
+            .saturating_add(i64::from(gems).saturating_mul(target.credits_per_gem));
         player.credits = player.credits.saturating_add(credits);
         worker.harvester.load = 0;
+        worker.harvester.gems = 0;
+        worker.harvester.work = 0;
         worker.harvester.attempts = 0;
         worker.harvester.state = HarvestState::Seeking;
         self.events.write(SimEvent::OreDelivered {
@@ -311,6 +346,7 @@ impl Context<'_> {
             harvester: worker.id,
             refinery,
             ore,
+            gems,
             credits,
         });
     }
@@ -329,13 +365,15 @@ pub(crate) fn harvest(
     let refineries: BTreeMap<SimId, Refinery> = buildings
         .iter()
         .filter_map(|(id, owner, building)| {
-            let credits_per_ore = definitions.building(building.kind)?.credits_per_ore?;
+            let def = definitions.building(building.kind)?;
+            let credits_per_ore = def.credits_per_ore?;
             Some((
                 *id,
                 Refinery {
                     owner: owner.0,
                     footprint: building.footprint,
                     credits_per_ore,
+                    credits_per_gem: def.credits_per_gem.unwrap_or(credits_per_ore),
                 },
             ))
         })
@@ -378,6 +416,7 @@ pub(crate) fn harvest(
             cell: mobile.cell,
             capacity: terms.capacity,
             rate: terms.harvest_rate,
+            interval: terms.harvest_interval,
             orders: &mut orders,
             harvester: &mut harvester,
         };

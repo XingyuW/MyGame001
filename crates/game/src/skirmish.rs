@@ -1298,6 +1298,8 @@ impl MenuSelection {
             superweapons: self.superweapons,
             crates: self.crates,
             mcv_repacks: self.mcv_repacks,
+            // The lobby has no row for it yet: ore grows, as in the reference's default.
+            ore_grows: sim::MatchRules::default().ore_grows,
         }
     }
 }
@@ -3759,6 +3761,7 @@ pub(crate) mod tests {
                     superweapons: expected.superweapons,
                     mcv_repacks: expected.mcv_repacks,
                     crates: expected.crates,
+                    ore_grows: true,
                 }),
                 "{row:?}"
             );
