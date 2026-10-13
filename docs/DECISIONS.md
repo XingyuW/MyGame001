@@ -2921,3 +2921,359 @@ and Engineers and round a Tesla Trooper, a Desolator and a Chrono Legionnaire, a
 round a Conscript); 4 unit tests in `sim::map` and `sim::unit` (the grid's rule, the hash of a
 grid with and without spots against the layout before RA3, a soldier's position between
 spots, the hash of the crush flag); in the game `audio` 1 and `health` 1.
+
+### R46. RA4: the arsenal file of schema version 5 and the combat file of schema version 3
+
+1. **`arsenal.ron`, schema 5** (`crates/sim/src/arsenal.rs`; the plan's items 1 to 5). Every
+   field is required. An entry gains sixteen fields: `trainable` (`Trainable`),
+   `veteran_abilities` and `elite_abilities` (the tokens of `VeteranAbilities` and
+   `EliteAbilities`: `stronger`, `firepower`, `rof`, `sight`, `faster`, `self_heal`, `scatter`,
+   the seven the ini uses; each at most once in a list), `crewed` (`Crewed`), `self_healing`
+   (`SelfHealing`), `ammo` (`Ammo`; 0 for the ini's -1, unlimited), `airport_bound`
+   (`AirportBound`), `docks` (`NumberOfDocks`), `spawns`, `spawns_number`, `spawn_regen`,
+   `spawn_reload` (`Spawns`, `SpawnsNumber`, and the two rates in ticks), `launcher`
+   (`"primary"`, `"secondary"` or `"none"`: which weapon has `Spawner=yes`), `missile` (`"v3"`,
+   `"dmisl"` or `"none"`: the type is `[General] V3RocketType` or `DMislType`), `cloakable`
+   (`Cloakable`) and `sensors_sight` (`SensorsSight` of a type with `Sensors=yes`, else 0).
+   **Instead of the plan's `sensors` and `dock` traits**: `sensors_sight` 0 is "no sensors",
+   and an airport bound aircraft lands on every building with `docks` (the generator fails if
+   two such aircraft name different buildings as their `Dock`; in the ini both name the two
+   Airforce Commands), so the arsenal holds no list of buildings per aircraft. `self_healing`,
+   `launcher` and `missile` are beyond the plan's list: the first is the brief's ("self
+   healing"), the other two are what tells the simulation which weapon launches and what a
+   launched unit is, which the ini says with `Spawner=yes` and with two keys of `[General]`.
+2. **Rejected**: a flag outside 0 and 1; a number outside its range (`MAX_AMMO` 255,
+   `MAX_DOCKS` 16, `MAX_SPAWNS` 8, `MAX_SPAWN_TICKS` 72,000, `MAX_SIGHT` for the sensors); an
+   unknown or repeated ability; every trait of a unit on a building (all but `crewed`,
+   `sensors_sight` and `docks`) and `docks` on a unit; more docks than the footprint has cells;
+   `airport_bound` on a unit that is no aircraft with ammunition; a spawned type that is not
+   defined, is the type itself, is no aircraft of the arsenal, or spawns something itself;
+   spawn terms without a spawned type and a spawned type without a number, a time to replace
+   or a launcher; a missile that does not fly. Like the traits of schema version 3 they are
+   read only with a rules file.
+3. **`combat.ron`, schema 3.** The list `effects` may name four more impacts: `v3_rocket`,
+   `v3_rocket_elite`, `dmisl`, `dmisl_elite` (`[General] V3RocketDamage`, `V3RocketEliteDamage`,
+   `DMislDamage`, `DMislEliteDamage` through `[CombatDamage] V3Warhead`, `V3EliteWarhead`,
+   `DMislWarhead`, `DMislEliteWarhead`). Nothing else changed; the version is raised because
+   a reader of version 2 rejects such a file. The rules file also holds the four damages since
+   RA1 (`combat.v3_rocket_damage` and its like); the simulation reads the effects, which name
+   the warhead with the damage, and the audit compares both with the reference.
+4. **The data** (`scripts/generate_ra2_data.py`, `ra2_combat.tsv`, `ra2_mapping.tsv`). The four
+   spawned types are in the shipped data now (`hornet`, `osprey`, `v3_rocket`, `dred_missile`;
+   tech level -1, so that nothing queues them), with the warheads `[V3EWH]` and `[DMISLEWH]`
+   and the weapons `[HornetBomb]`, `[HornetBombE]` and `[ASWBomb]`. **Defaults** where a section
+   has no key: `Trainable` yes for a unit and no for a building (ModEnc), `Crewed` no,
+   `SelfHealing` no, `Ammo` -1, a rate of 0 frames stays 0 ticks. The audit
+   (`ra9_data_parity.rs`) recomputes all sixteen fields of every mapped item and the four
+   effects from the reference.
+5. **Fixtures.** The arsenals of the legacy ruleset and of the RA1, RA2 and RA3 fixtures are at
+   schema 5 with the neutral value in every new field, their combat files at schema 3 with
+   the lists they had. New: `fixtures/data/ra4` (the RA3 fixture with an airfield, a launcher
+   and its rocket, a carrier and its drone, the boat's hunter, a striker, and the traits on
+   the types its header names) with `tests/ra4_common`.
+6. **Size.** The shipped `arsenal.ron` has 103 KiB of the 128 KiB a data file may have
+   (`MAX_DATA_FILE_BYTES`, R32): sixteen fields on 91 entries, and the ini keys of each in its
+   comment. **Debt for RA5 and RA6**: another step of this size does not fit; the next schema
+   should shorten the entries (the label and description could move to a file of their own)
+   or the limit be raised again with a record.
+
+### R47. RA4: veterancy
+
+1. **State** (`crates/sim/src/veterancy.rs`). A unit of a `trainable` type has the component
+   `Experience { value, rank, ranked, bonus, self_heal }`: the summed cost of what it
+   destroyed, its rank (0, 1 veteran, 2 elite), the multipliers of its rank and the bonus
+   multipliers (each `firepower_pm`, `armour_pm`, `reload_pm`, `speed_pm`), and whether a rank
+   ability makes it heal itself. It is given in the `Economy` stage of the first tick the unit
+   exists in (`enlist`), so every way a unit comes into being is covered; a unit without it
+   counts as rank 0 with neutral multipliers. Buildings and untrainable units have none.
+   Hashed at the end of `state_hash`, in id order, under a tag, and only if any unit has it.
+2. **Who gains** (decided from the plan's section 4.5 and appendix D topic 6). The unit whose
+   hit brings a victim's hit points to 0 gains the victim's cost (the economy file's `cost` of
+   the victim's type, whatever was paid). The hits of a tick are walked in the order they
+   happen (projectiles in the order they were fired, then the shots of the attackers in id
+   order), and the hit that crosses 0 names the killer; damage is still applied only after
+   all have fired. A kill by splash counts for the unit that fired; by crushing for the
+   crusher (`UnitCrushed` already named it); by a spawned missile or aircraft for the unit
+   that launched it. **Nothing** for a victim of the killer's own player or of an ally
+   (`Players::hostile` is false), nothing for scenery (it has no cost), nothing to a building
+   and nothing to an untrainable unit. A victim of a player who is no player of the match
+   counts as an enemy's (the neutral buildings of RA5). **Not modelled**: `Insignificant=yes`
+   (walls and the tech buildings give their cost like anything else), and a unit destroyed by
+   an area effect of `special.rs` that names no unit (a superweapon, a planted bomb, radiation)
+   has no killer.
+3. **Ranks.** Veteran when `value x 1000 >= cost x veteran_ratio_pm`, elite at twice that, both
+   inclusive, `cost` being the unit's own type's; `veteran_cap` (2) is the highest rank.
+   `SimEvent::RankGained { player, unit, rank }` once per promotion, at the rank reached.
+4. **What a rank grants.** The abilities of `veteran_abilities` at rank 1, and also those of
+   `elite_abilities` at rank 2; an ability counts once however often it is listed (the tank's
+   elite list repeats three of its veteran list). `firepower`: `firepower_pm` = `combat_pm`
+   (1100); `stronger`: `armour_pm` = `armor_pm` (1500); `rof`: `reload_pm` = `rof_pm` (600);
+   `faster`: `speed_pm` = `speed_pm` (1200); `self_heal`; `sight` nothing (`sight_pm` is 0 in
+   the ini: **assumption**, appendix D); `scatter` not modelled. An elite unit carries the
+   elite weapons of its type in the places of the weapons it has by its type (a weapon a
+   passenger gave an IFV stays).
+5. **Where the multipliers act**, each the product of the rank's and the bonus's, in permille:
+   * damage dealt and taken, in one function (`sim::impact_damage`, the plan's section 4.3):
+     `D2 = floor(base x firepower_pm x share x versus / (1000 x whole x 100))`, at least 1 if
+     `versus > 0`; `D3 = floor(D2 x 1000 / armour_pm)`; at most `max_damage`. The firepower is
+     that of the attacker when it fired (a projectile carries it, hashed). **A hit of 1 on
+     stronger armour deals 0**: the plan's equations apply the minimum before the armour
+     multiplier, and so does the original; an order on such a target does not end by itself,
+     as on an invulnerable one.
+   * reload: `max(1, floor(reload x reload_pm / 1000))` ticks after a volley; the gap between
+     the shots of a burst is not changed.
+   * speed: `clamp(floor(speed x speed_pm / 1000), 1, MAX_UNIT_SPEED)` before the slowing of a
+     damaged vehicle (`s - s div 4`), set where M9 sets a unit's speed every tick.
+   * self healing, by a rank ability or by the type's `self_healing`: 1 hit point in every
+     tick whose number is a multiple of the rules' `repair_interval` (19; **single source**),
+     up to the type's hit points. The plan's item 1 says "by the infantry and unit repair
+     rates"; its section 4.5, which the brief names, says 19 ticks, and that is what is done
+     for every unit.
+6. **The API for RA5 and RA6** (public in `sim`; they change state, so they may be called only
+   from a system of `SimSchedule` or from a scenario setup between ticks, invariant I5):
+   `promote(world, unit, rank) -> bool` raises a unit to at least `rank` (its experience
+   becomes what the rank needs unless it has more), applies what the rank grants and writes
+   `RankGained` (the veteran crate: `promote(world, id, rank + 1)`; veteran production after
+   an infiltration: `promote(world, id, VETERAN)` when the unit leaves its factory);
+   `set_bonus(world, unit, Multipliers { .. }) -> bool` sets the bonus multipliers, which
+   multiply with the rank's (the armour, firepower and speed crates: read
+   `Experience::bonus`, change one field, set it). Both return false for a unit that does not
+   exist or is not trainable. The rules' `initial_veteran` (0 in the ini) makes every
+   trainable unit start as a veteran.
+7. **Passengers** keep their experience aboard (`Passenger::experience`, hashed if present)
+   and their elite weapons when they leave.
+
+### R48. RA4: crews and survivors
+
+1. **The rule** (`crates/sim/src/crew.rs`; the plan's section 4.7). Whatever is destroyed
+   (`remove_dead`) or sold (`SellBuilding`) in a tick is recorded, and at the end of the
+   `Cleanup` stage, in the order of the records (the sales in command order, then the destroyed
+   in id order), the `crewed` ones release their crew:
+   * a vehicle that was not in a step: with `crew_escape_percent` (50) one unit of the crew
+     type of its owner's side (`sides[..].crew`: GI, Conscript), in its cell or the first cell
+     of the ring around it with room; an aircraft releases nobody (appendix D: `[ORCA]` is
+     `Crewed=yes` and aircraft never spawn survivors);
+   * a building: `max(1, ceil(refund / survivor_divisor))` units of that type, `refund` being
+     `Definitions::refund` (cost x `refund_percent`) and the divisor that of the owner's side
+     (500, 250), into the cells of its footprint in their order, as many as find room (three
+     soldiers on foot to a cell); and from a factory of buildings (a construction yard) with
+     `ENGINEER_ESCAPE_PERCENT` (25) one engineer, the first unit type with the role `engineer`.
+2. **Decided here.** The side is that of the owner's country, not of the building's type: a
+   captured Soviet barracks sold by an Allied player releases GIs by the Allied divisor (the
+   ini's keys are per side of the house). An owner without a country has no crew. "Not while
+   moving" is "not in a step" at the moment of destruction. The 25 percent of the engineer is
+   a constant of the code: it is in no ini (hard coded in the original and its ancestor), as
+   `BURST_GAP` is. The technician is not modelled (the plan).
+3. **Randomness**: one draw from `SimRng` per crewed vehicle that stood still, one per
+   construction yard; nothing else draws, so a world without crewed types has the sequence it
+   had. `SimEvent::CrewEscaped { player, from, at, units }` names the new units; they are
+   ordinary units (the cloning vats do not copy them: no `UnitSpawned`).
+4. **I6'**: the new units are put through `spawn_unit`, which asks `Grid::room_in`; the tests
+   run `assert_cells` after every release.
+
+### R49. RA4: aircraft ammunition and docks
+
+1. **Ammunition** (`crates/sim/src/flight.rs`). An aircraft with `ammo` n fires n volleys; a
+   volley is the whole burst of its weapon (the Harrier's two Mavericks are its one round).
+   With none left it does not fire and its attack order ends. Only an airport bound aircraft
+   reloads.
+2. **Docks.** A building with `docks` n holds n airport bound aircraft of its owner, each
+   above a cell of its footprint: the corners first, then the other cells row by row
+   (`sim::dock_cell`; the four docks of an Airforce Command are its four corners). An aircraft
+   takes the nearest free dock of its owner when it has none (ties by the building's id) and
+   keeps it while the building stands and is its owner's. **Whenever it has no order** (no
+   move, no attack) it flies to its dock, and while it stands there it regains one volley
+   every `reload_interval` (360) ticks; leaving the dock starts the round anew.
+3. **Production.** `QueueProduction` of such an aircraft is refused with
+   `RejectReason::NoFreeDock(item)` unless the docks of the player's buildings outnumber the
+   aircraft of this kind it owns (`PlayerState::docked_aircraft`, as of the last `Economy`
+   stage) and has queued. One that is complete stays in its factory while no dock is free
+   (one was lost meanwhile). It leaves the factory like any unit and flies to its dock.
+4. **Loss of the dock.** If its building is destroyed, sold or captured it takes a free dock
+   elsewhere; with none it flies on while it has an order and is destroyed as soon as it has
+   none (`UnitDestroyed`): the ini's `AirportBound`. **Consequence for tests and scenarios**:
+   a Harrier put into a world without an Airforce Command of its owner is lost in its first
+   tick.
+5. **Assumptions and differences.** A docked aircraft is in the air to the rest of the
+   simulation: anti air weapons engage it and ground weapons do not (R33 item 3 assumed that
+   aircraft never land; the original's landed aircraft is a ground target). An idle aircraft
+   on its dock fires at what comes into its range like every unit (`CanPassiveAquire=no` is
+   not ported for any type). The M9 mechanism (the role `strike` with its rearm timer beside
+   any building of the producer's group) remains for a world without a rules file, which is
+   what `m9_arsenal.rs` asserts on the legacy fixture; no shipped type has the role any more.
+6. **State**, all hashed under tags of their own and only when not empty: `SpecialState::ammo`
+   (the volleys left, for aircraft below their full number), `reloading`, `docks`;
+   `PlayerState::aircraft`.
+
+### R50. RA4: spawned missiles and aircraft
+
+1. **Real units.** A V3 rocket, a Dreadnought's missile, a Hornet and an Osprey are units of
+   the air layer with the reference's strength, armour, speed and sight: they hold their cell,
+   are seen, and are shot down by whatever engages aircraft. They are launched by
+   `crates/sim/src/flight.rs` and move by the ordinary movement of the air layer. **Invariant
+   I6' is not amended**: an air cell holds one aircraft, also a missile; the tests assert it
+   on every tick of sorties and bombardments, and nothing jammed: a launched unit appears
+   above its spawner or in the nearest free air cell, units are launched 27 ticks apart, and
+   a returning aircraft is taken aboard within one cell of its spawner, so that none waits
+   for the cell above it.
+2. **The bay.** A spawner has `spawns_number` places (`SpecialState::bays`). Its launcher
+   weapon (the arsenal's `launcher`) fires only while a place is ready; the shot deals
+   nothing and launches every unit that is ready then, one every `SPAWN_LAUNCH_GAP` (27 ticks:
+   the 20 frames of the original, plan section 4.8; a constant, in no ini) while the spawner
+   keeps the target. A place whose unit is lost (shot down, or a missile that went off) is
+   filled `spawn_regen` ticks later; one whose aircraft returned, `spawn_reload` ticks later.
+   So a V3 Launcher launches every 533 ticks **plus the flight of its rocket**, where the
+   plan's section 4.8 says "533 ticks between launches": the time runs from the loss of the
+   unit (ModEnc describes `SpawnRegenRate` as the time to regenerate a lost spawn; single
+   source), and the launcher's own reload (`ROF=150`, 200 ticks) is shorter than either.
+3. **Missiles** fly to where the target was when they were launched (a unit's position, or the
+   cell of a building nearest to the launcher) at their type's speed, **along the cells of a
+   path of the air layer** and not in a straight line (up to 8 percent longer than the
+   straight way; the plan: pitch and turn are not simulated), and go off there with the combat
+   file's effect (`v3_rocket`: 200 through `[V3WH]`; `dmisl`: 300 through `[DMISLWH]`; the elite
+   effects if the launcher was elite when it launched), **multiplied by the launcher's
+   firepower** then (**assumption**: nothing documents whether `FIREPOWER` scales the rocket;
+   the V3 and the Dreadnought have the ability). If its way ends elsewhere (its last cell is
+   held) it goes off where it is. Shot down it deals nothing. A missile in flight outlives its
+   launcher. It is removed without `UnitDestroyed` (`MissileDetonated`, and `Impact`).
+4. **Carried aircraft** (Hornet, Osprey) attack the spawner's target with their own weapon
+   and ammunition (one bomb), fly back when it is spent or the target is gone, and are taken
+   aboard (`UnitRecovered`); they come back whole (**assumption**). They are launched with
+   the rank of their spawner (an elite carrier's Hornets drop `[HornetBombE]`) and are
+   destroyed with it. **Not carried**: `[HornetCollision]` and `[ASWCollision]`, their second
+   weapons against aircraft (a launched aircraft attacks only what its spawner fires at,
+   which is never an aircraft); listed differences.
+5. **The Destroyer** launches its Osprey with its secondary weapon, which its
+   `naval_targeting` 1 chooses against what is underwater (R34): the Osprey's `[ASWBomb]`
+   (50 through `[APSplash]`) is what reaches a Typhoon; the ship's gun does not.
+6. **The launcher weapons in the data.** `[V3Launcher]`, `[DredLauncher]`, `[HornetLauncher]`
+   and `[ASWLauncher]` are ported with their own damage, range, minimum range, reload and
+   burst. Three differences remain, each a row of `ra2_differences.tsv`: their warhead (the
+   ini's `Special` is no warhead section; what a launcher may fire at is decided by the
+   warhead of what it launches), and for the Destroyer's the range (the ini's -2, unlimited:
+   the largest the combat file admits, 30 cells) and `anti_ground` (the ini's virtual
+   projectile engages nothing). **Removed** from the differences: the seven rows of the
+   stand-ins of R36 (damage, projectile speed and reload of the V3's and the Dreadnought's
+   launcher, the damage of the Destroyer's) and the four "not in the data yet" rows.
+7. **Credit and commands.** What a launched unit destroys counts for its spawner
+   (`SpecialState::spawned`; a projectile of an aircraft that is gone when it lands is the
+   spawner's too). A launched unit takes no command (`RejectReason::NotCommandable`).
+8. **`CanPassiveAquire=no`** (V3, Dreadnought, carrier) is not ported: they fire at what
+   comes into reach like every unit. Listed for RA9.
+
+### R51. RA4: submerged units
+
+1. **The rule** (`special::reconnaissance`; the plan's section 4.8). A unit of a `cloakable`
+   type (Typhoon, Dolphin, Giant Squid) is hidden from a player who is an enemy of its owner
+   unless a unit or building of **that player** with `sensors_sight` s stands within s cells
+   (`dx^2 + dy^2 <= s^2` between the cells, to the nearest cell of a building), or the unit
+   fired within the last `cloak_delay` (24) ticks (`SpecialState::surfaced`, hashed). Hidden
+   is the one mechanism spies and Mirage Tanks use (`SpecialState::hidden`, per player): no
+   weapon acquires the unit, an `Attack` command on it is rejected as on an unknown target,
+   an attack order on it ends with `TargetHidden`, and the game does not draw it.
+2. **Decided here.** Allies of the owner see it (the spy and the Mirage Tank of M9 are
+   hidden from allies too; that is left as it was). Sensors serve only their own player, not
+   its allies, as sight does. A hidden unit is still hurt by a blast that reaches it. The
+   three cloakable types have sensors of 4 cells themselves, the Destroyer 8; the Psychic
+   Sensor's `SensorsSight=15` is not ported (it has no `Sensors=yes`; RA7). `CloakingSpeed` is
+   not modelled.
+3. **The computer player** (`ai.rs`) does not see a unit that is hidden from it, and does not
+   count a launched unit among its own (it is no army unit and its sight is not counted on).
+   Unit test: `ai::tests::a_hidden_enemy_is_not_seen_and_a_launched_unit_is_not_the_players_to_command`.
+   Its plans build no ship and no aircraft before RA8, so no match of the suite has a navy;
+   a navy without a detector could not fight submarines (**debt for RA8**: the plans must
+   include a Destroyer or a submerged type of their own where they build a navy).
+
+### R52. RA4: the interface
+
+1. **Rank insignia** (`crates/game/src/health.rs`): one chevron for a veteran and three for an
+   elite unit, gold with a dark edge, under the right end of where the unit's health bar is,
+   within the bar's width (also the short bar of a soldier, so that three soldiers in a cell
+   keep their own), over every such unit that is shown, damaged or not. The hover text names
+   the rank on a line of its own (`hover_info::rank_name`).
+2. **A promotion** of one of the human player's units: a ping (`Sfx::Promotion`, two bright
+   notes; synthesised, no asset file), a notice in the player's colour ("Grizzly Battle Tank
+   promoted to veteran", `notices::promotion_text`), and a golden ring on the ground under the
+   unit with a short glow (`weapon_fx::Painter::promotion`), the last for every promotion the
+   player sees. The ping and the notice are for its own units only.
+3. **Crews**: the survivors are units and appear where the simulation puts them; a notice says
+   how many left a wreck of the human player's ("3 survivors escaped"). No parachute or
+   climbing-out animation.
+4. **Docks**: each dock of a building that is shown is marked by a small flat diamond above its
+   cell, brighter while an aircraft holds it. An aircraft that stands on its dock is drawn
+   landed (`units::aircraft_landed`), as M9's rearming aircraft was beside its base. The
+   sidebar's card of an aircraft whose docks are all taken stays listed like a card at its
+   build limit and says "No free dock: every dock is taken".
+5. **Launches**: a launcher's shot is drawn as the flash and smoke of a launch at the
+   launcher and nothing at the target (`Definitions::launcher_weapons`); the missile or
+   aircraft is a unit with a view of its own. A missile's end is the burst of its
+   `Impact`. Launched units cannot be selected (they take no commands).
+6. **Art** (`assets/LICENSES.md`). New, original, from the existing generators: the sheets of
+   the V3 rocket and the Dreadnought's missile (`scripts/hd_aircraft.py`: `v3_rocket`,
+   `dred_missile`; rendered with Blender by `scripts/render_hd_blender.py` and composed by
+   `scripts/finish_hd_art.py`). **Reused through the `art` alias**: the Hornet shows the
+   Harrier's sheet and the Osprey the NightHawk's (the generator's table `ART`); models of
+   their own were not worth a pass for aircraft a few pixels long.
+7. **Submarines** are drawn only when seen: the unit views and the minimap already hide what
+   `SpecialState::hidden` names for the human player, and the promotion ring respects it.
+8. **Requires user verification**: that the chevrons are legible over every unit and do not
+   crowd a cell of three soldiers; the ping, the ring and the notices in a busy battle (their
+   frequency); the two missile sprites in flight and their size beside their launchers; the
+   Hornets as Harriers and the Osprey as a NightHawk; the dock diamonds on the Airforce
+   Command and the landed aircraft on its roof; that an aircraft's automatic flight home
+   reads as intended; and how a submarine that surfaces to fire and vanishes again looks.
+
+### R54. RA4: tests adapted (none deleted, ignored or weakened)
+
+**Schema migration** (the assertions are unchanged; the arsenals of the fixtures are at schema
+5 with the neutral value in every new field, the combat files at schema 3):
+
+| Test | What changed |
+|---|---|
+| `ra1_definitions.rs` (helper `arsenal_of`, the text edits of four tests) | the header they match and write is `(schema_version: 5, entries: [` |
+| `ra1_definitions.rs::other_schema_versions_are_rejected_in_every_file` | the arsenal rejects 4, 3, 2, 1 and 6 against 5 (one case more) |
+| `ra1_definitions.rs::every_field_of_the_arsenal_file_is_required` | also removes each of the sixteen new fields in turn; `infantry` is no longer the last field of an entry, so its text edit ends with the comma and that of `sensors_sight` begins with it |
+| `ra2_definitions.rs::the_fixture_loads_with_the_traits_of_schema_version_3`, `ra3_definitions.rs::the_fixture_loads_with_the_traits_of_schema_version_4` | assert `ARSENAL_SCHEMA_VERSION == 5`, which keeps the traits they test |
+| `m4_definitions.rs::schema_versions_other_than_2_are_rejected` | renamed `..._other_than_3_...`: rejects 0, 1, 2, 4, -1 and the two extremes against 3 (one case more); the helper `generated()` writes schema 3 |
+| `ra9_data_parity.rs` | extended: the sixteen fields of schema 5 of every mapped item and the four missile effects against the reference; the spawned types are audited like every type (they were "not in the data yet") |
+
+**Expectation or setup changed because RA2 behaviour is intended** (one line each, as the
+brief asks; `m9_arsenal.rs` itself runs on the legacy fixture, which has no rules file and so
+keeps M9's aircraft, carrier and naval rules: unchanged, all 24 tests):
+
+| Test | What changed and why |
+|---|---|
+| `ra3_shipped.rs` (helper `first_shot`) | a Harrier is lost without a dock (R49): as the attacker it stands on the first dock of an Airforce Command of its owner, as the silent target it has an Airforce Command far away. The assertions (which weapon, what damage, or no shot) are unchanged |
+| `ra3_shipped.rs::shipped_ships_follow_their_naval_targeting` | the Aegis's target over open sea is a Kirov instead of a Harrier (both `light`; over open sea a Harrier has no dock): the same weapon and the same 100 damage. The Destroyer's hit on a Typhoon is still `asw_launcher` and 50, now dealt by its Osprey's depth charge (R50); only the comment says so |
+| game `weapon_fx::tests::every_shipped_weapon_has_the_class_its_name_promises` | three rows more (`hornet_bomb`, `hornet_bomb_e`, `asw_bomb`: bombs) |
+| game `audio::tests::events_play_only_what_the_human_player_may_know` | assertions added for a promotion (heard for the human player's own unit only) and for the silent launch and crew events |
+
+**Compile migration**: game `audio.rs` and `units.rs` match the five new events;
+`Sfx::ALL` has 27 entries (the test that synthesises every sound covers the new one).
+
+**New in RA4** (sim): `ra4_definitions.rs` 8 (the traits loaded, each range and combination
+rejected, hashing, the missile effects); `ra4_veterancy.rs` 20 (thresholds inclusive and one
+credit below, each multiplier measured on damage dealt and taken, reload ticks and the ticks of
+a way, self healing, the elite weapon, each ability once, splash, crushing and buildings as
+kills, allies, own units, untrainable units and buildings, the API, passengers, a long battle
+twice, hashing, a world without rules); `ra4_crew.rs` 10 (the rates over 400 seeds, the side,
+moving and uncrewed vehicles with no draw, the nearest cell and no cell, the counts of every
+case, sales, the limit of room, the engineer, a battle twice); `ra4_aircraft.rs` 14 (the dock
+check at its boundary, production that waits, volleys and reloading at their ticks, no
+ammunition, leaving the dock, the loss of the dock in every form, aircraft without the traits,
+sorties twice with I6' on every tick, hashing); `ra4_spawns.rs` 14 (launch, flight, impact and
+its numbers, the time to replace, a missile shot down, veteran and elite launchers, credit,
+the moving target and the dead launcher, minimum range and commands, the carrier's three
+aircraft, their return, loss and replacement, their end with the carrier, elite aircraft, the
+boat's hunter, a bombardment twice with I6' on every tick, hashing); `ra4_cloak.rs` 8 (hidden
+and detected at the boundary of the sensors, sensors of cloaked units and buildings, the 24
+ticks after a shot, commands and weapons on a hidden unit, the end of an attack, allies and
+third parties, a type without the trait, hashing); `ra4_shipped.rs` 16 (the Grizzly's ranks
+and multipliers, the shipped abilities, the Apocalypse's healing, the crews of the base units
+over 120 seeds, the survivors of six buildings, the fifth Harrier, its one volley and its 360
+ticks, Harriers lost with their Airforce Command, the V3 rocket's flight, damage and pace and
+the elite rocket, a rocket shot down by a Patriot, the Dreadnought's two missiles, the
+carrier's three Hornets and the 800 ticks to replace one, the Typhoon unseen at 5 cells and
+seen by a Destroyer at 8, the Osprey, the 24 ticks after a torpedo); unit tests in `sim`:
+`veterancy` 3, `flight` 2, `crew` 1, `ai` 1. Game: `health` 1, `notices` 2, `hover_info` 1,
+`units` 1, `sidebar` 1.

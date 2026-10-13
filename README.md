@@ -113,12 +113,12 @@ warheads and weapons of Red Alert 2 (a range is in cells; a reload at game speed
 * **Two weapons.** Some units carry a second weapon and use whichever fits the target: the
   Apocalypse its guns against the ground and its missiles against aircraft, the Flak Track,
   the Flak Trooper and the Sea Scorpion a flak gun for each, the Destroyer its gun against
-  ships and depth charges against submarines. An IFV's missiles reach aircraft 4 cells beyond
+  ships and its Osprey's depth charges against submarines. An IFV's missiles reach aircraft 4 cells beyond
   their range of 6.
 * **What can attack what.** Aircraft are hit only by weapons for the air: flak, the Patriot,
   the Aegis, the IFV, the Apocalypse's missiles, the Rocketeer, the GI's and the tanks' guns
-  not. Submerged units (Typhoon, Dolphin, Giant Squid) are hit only by the Destroyer's depth
-  charges, the Typhoon's torpedoes, the Dolphin and the squid; they in turn attack nothing on
+  not. Submerged units (Typhoon, Dolphin, Giant Squid) are hit only by the depth charges of the
+  Destroyer's Osprey, the Typhoon's torpedoes, the Dolphin and the squid; they in turn attack nothing on
   land. The Sniper and Tanya shoot at vehicles and buildings only when ordered to (1 percent).
   An order to attack something a unit can never hit ends at once.
 * **Bursts and minimum range.** The Black Eagle, the Harrier, the IFV and the Apocalypse fire
@@ -146,15 +146,48 @@ warheads and weapons of Red Alert 2 (a range is in cells; a reload at game speed
   Terror Drone and a Demolition Truck crush nothing. A unit ordered to **attack** does not
   crush on its way to its target, and a miner at work does not either: move your tanks through
   the infantry to crush it, and move your infantry out of the way of theirs.
-* **Still the game's own until later milestones.** The V3 Launcher's and the Dreadnought's
-  missiles are shots that cannot be intercepted, the Aircraft Carrier launches two aircraft of
-  the Harrier's kind, and the Destroyer's depth charges are fired from the ship (RA4 makes
-  them the missiles and aircraft of Red Alert 2, with veterancy and the elite weapons). C4,
+* **Still the game's own until later milestones.** C4,
   the Chrono Legionnaire's erasing, the dog's and the Terror Drone's instant kills, the Giant
   Squid, mind control, the deployed GI, Desolator and Yuri, radiation after a nuclear strike,
   and the timing of the superweapons keep the simpler mechanics they had (RA6).
   `crates/sim/tests/reference/ra2_differences.tsv` lists every value that differs from Red
   Alert 2's `rules.ini`, with its reason.
+
+## Veterancy, crews, aircraft, missiles and submarines
+
+As in Red Alert 2 (`docs/RA2_PARITY_PLAN.md`, RA4):
+
+* **Veterancy.** A unit gains the cost of every enemy unit and building it destroys (by its
+  shot, by the splash of its shot, by crushing; a V3's rocket and a carrier's Hornets earn for
+  the launcher and the carrier). At three times its own cost it is a **veteran** (one chevron
+  under its health bar), at six times **elite** (three chevrons); a ping, a golden ring and a
+  notice tell you. A rank gives what the unit's type lists: 10 percent more damage, half as
+  much again armour, a reload of 60 percent, 20 percent more speed, and at elite rank the
+  unit's elite weapon and, for most, self healing (a hit point every second). Engineers, dogs,
+  spies, miners of the Allies, MCVs and transports learn nothing; buildings neither. The
+  Apocalypse, the Desolator, the miners, the Kirov and the Giant Squid heal themselves from
+  the start.
+* **Crews and survivors.** A destroyed or sold building lets its people out: a GI or a Conscript
+  for every 500 (Allies) or 250 (Soviets) credits of its selling price, at least one, and
+  from a Construction Yard sometimes an Engineer. A destroyed MCV that stood still lets one
+  out every other time. Defences, walls, shipyards and the Gap Generator have no crew.
+* **Aircraft.** A Harrier or a Black Eagle needs one of the **four docks** of an Airforce
+  Command: you cannot order a fifth until a second Airforce Command stands (the card says "No
+  free dock"). It carries **one volley**, flies home by itself when it has fired or has nothing
+  to do, lands on its dock (a small diamond on the building) and reloads there in 18 seconds.
+  If its Airforce Command is lost it takes a free dock of another; with none it is lost.
+  The NightHawk, the Kirov and the Rocketeer need no dock.
+* **Missiles and carried aircraft.** A V3 Launcher fires a **rocket** and a Dreadnought two
+  **missiles** that fly to where the target stood: real aircraft that Patriots, Flak and every
+  other anti air weapon can shoot down, in which case they do nothing. The next is ready 27
+  seconds (V3) or 5 seconds (Dreadnought) after the last is gone. An Aircraft Carrier sends its
+  **three Hornets**, which drop a bomb each, return and go again; a Hornet that is shot down
+  is replaced after 40 seconds, and all are lost with the carrier. A Destroyer sends its
+  **Osprey** against submerged targets. You cannot select or command these aircraft.
+* **Submarines.** A Typhoon, a Dolphin and a Giant Squid are **unseen** by an enemy, also in
+  water the enemy sees, unless one of its Destroyers is within 8 cells (or one of its own
+  submerged units within 4), or the unit fired in the last second or so. What you cannot see
+  you cannot attack; the computer players cannot either.
 
 [Construction system report](docs/CONSTRUCTION_SYSTEM.md) documents the roster, mechanics,
 integration and tests as they were before the Red Alert 2 parity programme, which
@@ -491,7 +524,8 @@ yours (four for the cheap defences, eight for walls). Shipyards require a visibl
 footprint touching shore within 31 free cells of your base (scout the water first; 18 of the 21
 shipped maps have suitable water within that reach of the first start, and on the others you
 build towards it); naval units stay in water, amphibious transports can use either, and
-aircraft can cross land and water. Harriers and Black Eagles return to Airforce Command to rearm.
+aircraft can cross land and water. Harriers and Black Eagles return to their dock at an Airforce
+Command to reload.
 The minimap shows the map only once you own a radar building.
 
 Units move as fast as in Red Alert 2 at its nominal 15 frames a second, which is slower than this
@@ -506,7 +540,10 @@ clear.
 Aircraft, airships and rocketeers **fly**: they take off where they are built, cruise high above
 the ground over their own shadow, and pass over units, buildings, cliffs and water. A selected
 aircraft shows a plumb line down to the ground cell it is over. Harriers and Black Eagles land
-beside their Airforce Command while they rearm.
+on their dock at an Airforce Command while they reload.
+
+A veteran shows one chevron and an elite unit three; when one of your units is promoted or a
+crew gets out of a wreck, a notice in the top left corner says so.
 
 When a player is defeated, a notice in the top left corner says so in that player's team colour
 and with its country ("Red Player (Iraq) has been defeated"). Hovering an enemy unit or building
