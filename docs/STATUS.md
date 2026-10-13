@@ -934,6 +934,40 @@ next rocket.
 - `Soylent`: see R56 decision 7.
 - Validation has thirteen commands; the last two take a second.
 
+### The run stopped during RA5 (2026-10-13)
+
+The user stopped review work (R57) and then the implementation (R63). **The programme is not
+finished and nothing in it is reviewed or approved.**
+
+| | State |
+|---|---|
+| RA0 to RA4, and the remediation of advisory reviews 1 and 2 | committed; every validation command exited 0 on each final tree (last full run: 13 commands, 925 tests passed, 0 failed, 0 ignored) |
+| RA5 items 1 to 4 (ore and gems in bails, growth and spread, free miner, crates, refinery refund) | committed in `9f625b3`, `c9e3604`, `212874a` (R58 to R62); **validated only in part**: `m14_duels -- full` exited 0 (756 of 756, slowest in tick 268,277 of 288,000); formatting, `git diff --check`, clippy and the two regeneration checks exit 0 on the tree as left; the test run, builds, smoke tests, benchmark, soak and package script were **not run** |
+| RA5 items 5 to 9, RA6, RA7, RA8, RA9 | **not implemented** |
+| Final review, merge into `main`, tag | **not done** |
+
+**Working tree.** `crates/game/src/battlefield.rs` holds an uncommitted, unfinished test module
+left by the stopped implementer; it is not part of any commit.
+
+**What the branch therefore is.** The RA2 ruleset is the default for sides and countries, match
+options, production, power, base building, armour, weapons, crushing, infantry sub cells,
+veterancy, crews, aircraft, spawned missiles, submarines, and (unvalidated) the ore economy and
+crates. Still the game's own, not RA2's: specialists and superweapons (the M9 mechanisms),
+vision (shroud and fog), hotkeys, the computer player beyond ground armies, tech buildings,
+garrisons and bridges. The parity audit is not closed; 34 of the 53 rows of
+`crates/sim/tests/reference/ra2_differences.tsv` wait for milestones that were not built.
+`docs/RA2_GAP_ANALYSIS.md` and `docs/CONSTRUCTION_SYSTEM.md` are stale.
+
+**For whoever continues.** `docs/reviews/RA2-parity-review-requirements.md` (what a review must
+check and by what rules, and what remains to be implemented),
+`docs/reviews/RA2-parity-reviews-outstanding.md`, `docs/prompts/ra2-parity-review/`.
+
+**Requires user verification.** Everything visual, audible and of feel since the baseline: the
+display was locked for the whole run and nothing was seen on a screen. The lists are in the
+entries above and collected in section 4.13 of the requirements document. Decisions that
+reverse or reinterpret what the user asked for: R4 (map growth off by default), R7 (units move
+at RA2's nominal speed, slower than before).
+
 ## Repair, aircraft overflight, new music and distinct silhouettes (2026-10-06)
 
 Working-tree follow-up (decisions: "Building repair, aircraft overflight, readable silhouettes"
