@@ -78,6 +78,7 @@ pub(crate) struct EconomyParams<'w, 's> {
     match_state: Res<'w, crate::MatchState>,
     wrecks: ResMut<'w, crate::crew::Wrecks>,
     buildings: Query<'w, 's, (Entity, &'static SimId, &'static Owner, &'static Building)>,
+    healths: Query<'w, 's, &'static crate::combat::Health>,
 }
 
 /// A building as the commands of one tick see it.
@@ -157,11 +158,24 @@ impl EconomyParams<'_, '_> {
         &self.props
     }
 
+    /// Whether `entity` has hit points left, or has none to lose (a world without a combat
+    /// file). A unit or building that an earlier command of the tick destroyed (a nuclear strike
+    /// lands in the `Commands` stage) is removed only in `Cleanup`; the commands after it
+    /// neither act on it nor for it (docs/DECISIONS.md R56).
+    pub(crate) fn alive(&self, entity: Entity) -> bool {
+        !self
+            .healths
+            .get(entity)
+            .is_ok_and(|health| health.hit_points <= 0)
+    }
+
+    /// The buildings that stand: one without hit points left is none for a command.
     pub(crate) fn building_index(&self) -> BuildingIndex {
         BuildingIndex {
             by_id: self
                 .buildings
                 .iter()
+                .filter(|(entity, ..)| self.alive(*entity))
                 .map(|(entity, id, owner, building)| {
                     (
                         *id,

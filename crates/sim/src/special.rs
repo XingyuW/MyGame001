@@ -18,7 +18,7 @@ use crate::{
     Building, CellPos, Definitions, Footprint, Grid, ProductionItem, SimId, SimTick, UnitKind,
     arsenal::*,
     building::{building_bundle, check_footprint},
-    combat::{Blast, Condition, DamageState, Health, Weapon, combat_components, detonate},
+    combat::{Blast, Body, Condition, DamageState, Health, Weapon, combat_components, detonate},
     combat_defs::Effect,
     command::{Command, IssuedCommand, PlayerId, RejectReason},
     economy::Players,
@@ -243,6 +243,12 @@ pub(crate) struct Actor {
     pub(crate) foot: Option<Footprint>,
     pub(crate) hp: i32,
 }
+impl Actor {
+    /// Whether it has hit points left (one without is removed in the tick's `Cleanup`).
+    pub(crate) fn alive(&self) -> bool {
+        self.hp > 0
+    }
+}
 fn actors(world: &mut World) -> BTreeMap<SimId, Actor> {
     world
         .query::<(
@@ -279,6 +285,15 @@ fn actors(world: &mut World) -> BTreeMap<SimId, Actor> {
             ))
         })
         .collect()
+}
+/// The units and buildings a command may act on, or act for: those with hit points left. A
+/// command can take the last hit points of something (a nuclear strike lands in the `Commands`
+/// stage), and what it destroyed is removed only in `Cleanup`; for every command after it, and
+/// for an order waiting to be carried out, it is gone already (docs/DECISIONS.md R56).
+fn living(world: &mut World) -> BTreeMap<SimId, Actor> {
+    let mut index = actors(world);
+    index.retain(|_, a| a.alive());
+    index
 }
 fn near(a: CellPos, b: CellPos, r: u32) -> bool {
     let dx = i64::from(a.x) - i64::from(b.x);
@@ -380,10 +395,21 @@ fn teleport(world: &mut World, a: &Actor, cell: CellPos) -> bool {
     {
         return false;
     }
+    let held = world.get::<Mobile>(a.entity).copied();
     vacate(world, a);
     let point = {
         let mut g = world.resource_mut::<Grid>();
-        g.claim(cell, a.id);
+        if !g.claim(cell, a.id) {
+            // The cell refuses the unit after all (the checks above are the grid's own, so
+            // this is not expected): it keeps the cells it held and stays.
+            if let Some(m) = held {
+                g.claim(m.cell, a.id);
+                if let Some(s) = m.step {
+                    g.claim(s.to, a.id);
+                }
+            }
+            return false;
+        }
         g.standing_point(cell, a.id)
     };
     if let Some(mut m) = world.get_mut::<Mobile>(a.entity) {
@@ -490,12 +516,42 @@ pub(crate) fn clear_orders(world: &mut World, e: Entity) {
         w.clear();
     }
 }
-fn own(index: &BTreeMap<SimId, Actor>, p: PlayerId, id: SimId) -> Result<&Actor, RejectReason> {
+/// The unit or building `id` of player `p`. One of another player that `p` does not see, or
+/// that is hidden from `p`, is reported like one that does not exist, so that a rejection
+/// reveals nothing about unseen enemies (docs/DECISIONS.md D30, D33, R56).
+fn own<'a>(
+    world: &World,
+    defs: &Definitions,
+    index: &'a BTreeMap<SimId, Actor>,
+    p: PlayerId,
+    id: SimId,
+) -> Result<&'a Actor, RejectReason> {
     let a = index.get(&id).ok_or(RejectReason::UnknownUnit(id))?;
     if a.owner != p {
-        return Err(RejectReason::NotOwned(id));
+        return Err(if known_to(world, defs, p, a) {
+            RejectReason::NotOwned(id)
+        } else {
+            RejectReason::UnknownUnit(id)
+        });
     }
     Ok(a)
+}
+/// Whether player `p` may know of `a`, a unit or building of another player: always without
+/// fog of war (no combat file); with it while `p` sees a cell of its body and it is not hidden
+/// from `p` (a submerged unit, RA4).
+fn known_to(world: &World, defs: &Definitions, p: PlayerId, a: &Actor) -> bool {
+    if !defs.has_combat() {
+        return true;
+    }
+    let body = match a.foot {
+        Some(foot) => Some(Body::Building(foot)),
+        None => Body::of(world.get::<Mobile>(a.entity), None),
+    };
+    world
+        .resource::<Players>()
+        .get(p)
+        .is_some_and(|state| body.is_some_and(|body| body.seen_by(state.vision())))
+        && !world.resource::<SpecialState>().hidden.contains(&(p, a.id))
 }
 /// A launched missile or carried aircraft takes no commands (RA4).
 fn commandable(world: &World, id: SimId) -> Result<(), RejectReason> {
@@ -515,7 +571,7 @@ fn share_of(hp: i32, from: i32, to: i32) -> i32 {
 }
 
 pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), RejectReason> {
-    let index = actors(world);
+    let index = living(world);
     let defs = world.resource::<Definitions>().clone();
     let tick = world.resource::<SimTick>().0;
     if world.resource::<Players>().get(issued.player).is_none() {
@@ -523,7 +579,7 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
     }
     match &issued.command {
         Command::Deploy { unit } => {
-            let a = own(&index, issued.player, *unit)?;
+            let a = own(world, &defs, &index, issued.player, *unit)?;
             commandable(world, *unit)?;
             let meta = defs
                 .metadata(a.item)
@@ -555,14 +611,19 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
                     {
                         grid.release(s.to, a.id);
                     }
-                    check_footprint(&grid, foot).map_err(RejectReason::Placement)?;
-                    if !world
-                        .resource::<Players>()
-                        .get(a.owner)
-                        .is_some_and(|p| foot.cells().all(|c| p.vision().is_visible(c)))
+                    // Whether the player sees the footprint comes first, as for a placement
+                    // (`economy_commands::check_placement`, docs/DECISIONS.md D33): the
+                    // footprint's own errors name the building or unit in a cell. A footprint
+                    // outside the map is left to them (`OutsideMap` reveals nothing).
+                    if foot.inside(&grid)
+                        && !world
+                            .resource::<Players>()
+                            .get(a.owner)
+                            .is_some_and(|p| foot.cells().all(|c| p.vision().is_visible(c)))
                     {
                         return Err(unavailable("Explore the deployment footprint first"));
                     }
+                    check_footprint(&grid, foot).map_err(RejectReason::Placement)?;
                     release(world, a);
                     for c in foot.cells() {
                         world.resource_mut::<Grid>().cover(c, a.id);
@@ -679,7 +740,15 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
                     grid.uncover(c, a.id);
                 }
                 grid.register(a.id, domain, on_foot);
-                grid.claim(foot.origin, a.id);
+                if !grid.claim(foot.origin, a.id) {
+                    // The cell refuses the unit after all (not expected after the check
+                    // above): the yard stays as it was.
+                    grid.unregister(a.id);
+                    for c in foot.cells() {
+                        grid.cover(c, a.id);
+                    }
+                    return Err(unavailable("No room to undeploy"));
+                }
                 grid.standing_point(foot.origin, a.id)
             };
             if let Some(p) = world.resource_mut::<Players>().get_mut(a.owner) {
@@ -713,7 +782,7 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
                 });
         }
         Command::Interact { unit, target } => {
-            let a = own(&index, issued.player, *unit)?;
+            let a = own(world, &defs, &index, issued.player, *unit)?;
             commandable(world, *unit)?;
             let b = index
                 .get(target)
@@ -748,7 +817,7 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
             target,
             units,
         } => {
-            let a = own(&index, issued.player, *building)?;
+            let a = own(world, &defs, &index, issued.player, *building)?;
             let meta = defs
                 .metadata(a.item)
                 .ok_or(unavailable("No strategic ability"))?;
@@ -787,7 +856,7 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
                     if !ids.insert(*id) {
                         return Err(RejectReason::DuplicateUnit(*id));
                     }
-                    let u = own(&index, a.owner, *id)?;
+                    let u = own(world, &defs, &index, a.owner, *id)?;
                     if defs.category(u.item) != Category::Vehicles
                         || matches!(u.item, ProductionItem::Building(_))
                     {
@@ -1056,7 +1125,13 @@ fn unload(world: &mut World, a: &Actor, defs: &Definitions) -> Result<(), Reject
         let point = {
             let mut g = world.resource_mut::<Grid>();
             g.register(p.id, defs.domain(p.kind), on_foot);
-            g.claim(c, p.id);
+            if !g.claim(c, p.id) {
+                // The cell refuses the passenger after all (not expected after the search
+                // above): it stays aboard.
+                g.unregister(p.id);
+                left.push(p);
+                continue;
+            }
             g.standing_point(c, p.id)
         };
         let mut e = world.spawn(unit_bundle(p.id, a.owner, p.kind, u.speed, c, point));
@@ -1278,6 +1353,7 @@ pub(crate) fn advance(world: &mut World) {
         if aura && works && tick.is_multiple_of(20) {
             for u in index.values().filter(|u| {
                 u.owner == a.owner
+                    && u.alive()
                     && defs.category(u.item) == Category::Vehicles
                     && near(a.cell, u.cell, meta.radius)
             }) {
@@ -1349,7 +1425,9 @@ pub(crate) fn advance(world: &mut World) {
         let (Some(a), Some(b)) = (index.get(&id), index.get(&target)) else {
             continue;
         };
-        if validate_interaction(world, a, b, &defs).is_err() {
+        // Neither acts nor is acted on once its hit points are gone (a strike of this tick's
+        // commands): it is removed in `Cleanup`, and the order with it.
+        if !a.alive() || !b.alive() || validate_interaction(world, a, b, &defs).is_err() {
             world
                 .resource_mut::<SpecialState>()
                 .interactions
