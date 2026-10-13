@@ -666,3 +666,172 @@ fn the_state_hash_covers_the_experience() {
     let mut query = plain.world_mut().query::<&Experience>();
     assert_eq!(query.iter(plain.world()).count(), 0);
 }
+
+// --- Integration: an elite unit in a long battle (advisory review 2, tests P1-3) --------------------
+
+/// A tank of P0 earns both ranks by its own kills and then fights on for more than 1,500 ticks:
+/// four damaged heavy tanks of P1 that stand switched off within its reach (each worth 650
+/// credits; elite at 2,400), then, one after the other, three tanks of P1 that are ordered to
+/// advance on it and fight, with quiet stretches between them. Returns the state hash of every tick, the
+/// ranks gained, the weapons the tank fired after it became elite, its hit points at the end
+/// of each duel and after the quiet stretch that follows it, and whether it lives.
+#[allow(clippy::type_complexity)]
+fn elite_battle(
+    seed: u64,
+) -> (
+    Vec<u64>,
+    Vec<(SimId, u8)>,
+    Vec<String>,
+    Vec<(i32, i32)>,
+    bool,
+) {
+    let mut app = world_of(definitions(), seed);
+    let tank = spawn(&mut app, P0, "tank", 10, 10);
+    for n in 0..4 {
+        let victim = spawn(&mut app, P1, "heavy", 14, 8 + n);
+        app.world_mut()
+            .resource_mut::<sim::SpecialState>()
+            .disabled
+            .insert(victim, u64::MAX);
+        set_hp(&mut app, victim, 30);
+    }
+    let mut hashes = Vec::new();
+    let mut gained = Vec::new();
+    let mut elite_shots = Vec::new();
+    let mut step = |app: &mut App, commands: Vec<sim::IssuedCommand>| {
+        // Elite before the tick: the shot that makes it elite is still its cannon's.
+        let elite = rank(app, tank) == ELITE;
+        let events = tick(app, commands);
+        hashes.push(hash(app));
+        assert_cells(app, "the battle of the elite tank");
+        gained.extend(ranks_gained(&events));
+        if elite {
+            let definitions = defs(app);
+            elite_shots.extend(
+                shots(&events, tank)
+                    .into_iter()
+                    .map(|(_, weapon)| definitions.weapon(weapon).expect("weapon").id.clone()),
+            );
+        }
+        events
+    };
+    // The four kills, on its own (it fires at what is in its reach).
+    for _ in 0..150 {
+        step(&mut app, Vec::new());
+    }
+    assert_eq!(units_of(&mut app, P1, "heavy"), []);
+    // Three duels and the quiet after each.
+    let mut healed = Vec::new();
+    for n in 0..3 {
+        let enemy = spawn(&mut app, P1, "tank", 20, 6 + 4 * n);
+        step(&mut app, Vec::new());
+        let advance = issue(
+            P1,
+            Command::AttackMove {
+                units: vec![enemy],
+                target: CellPos::new(11, 10),
+            },
+        );
+        let events = step(&mut app, vec![advance]);
+        assert!(rejections(&events).is_empty(), "{events:?}");
+        let mut ticks = 0;
+        while alive(&mut app, enemy) && alive(&mut app, tank) {
+            step(&mut app, Vec::new());
+            ticks += 1;
+            assert!(ticks < 600, "duel {n} does not end");
+        }
+        if !alive(&mut app, tank) {
+            break;
+        }
+        let after_duel = hp(&mut app, tank).expect("the tank");
+        for _ in 0..300 {
+            step(&mut app, Vec::new());
+        }
+        healed.push((after_duel, hp(&mut app, tank).expect("the tank")));
+    }
+    let lives = alive(&mut app, tank);
+    (hashes, gained, elite_shots, healed, lives)
+}
+
+#[test]
+fn a_unit_that_became_elite_by_its_kills_fights_on_with_all_that_its_rank_gives() {
+    let (hashes, gained, elite_shots, healed, lives) = elite_battle(5);
+    // Both ranks by its own kills (the third heavy tank makes 1,950 credits, the fourth
+    // 2,600: veteran at 1,200, elite at 2,400), and nobody else is promoted.
+    assert_eq!(gained.len(), 2, "{gained:?}");
+    assert_eq!(
+        gained.iter().map(|&(_, rank)| rank).collect::<Vec<_>>(),
+        [VETERAN, ELITE]
+    );
+    assert_eq!(gained[0].0, gained[1].0);
+    assert!(hashes.len() > 1_500, "{} ticks", hashes.len());
+    // Elite, it fires its elite weapon and nothing else, in volleys of three.
+    assert!(elite_shots.len() >= 9, "{elite_shots:?}");
+    assert!(elite_shots.iter().all(|weapon| weapon == "autocannon"));
+    // It wins its three duels (a tank of its own type and cost each: 300 hit points and a
+    // cannon of 40, of which stronger armour lets 26 through), and in the quiet after each it
+    // heals itself: a hit point every 5 ticks, 60 in 300 ticks, up to its 300.
+    assert!(lives);
+    assert_eq!(healed.len(), 3);
+    for &(after_duel, after_quiet) in &healed {
+        assert!(after_duel < 300, "it was hit: {healed:?}");
+        assert_eq!(after_quiet, (after_duel + 60).min(300), "{healed:?}");
+    }
+    // The same battle twice: the same state at every tick.
+    let again = elite_battle(5);
+    assert_eq!(hashes, again.0);
+    assert_eq!(gained, again.1);
+    assert_eq!(healed, again.3);
+}
+
+// --- Regression: advisory review 2, sim, suspected item 1 (docs/DECISIONS.md R56) -------------------
+
+#[test]
+fn a_crusher_gains_nothing_for_driving_over_what_was_destroyed_already() {
+    // A unit whose hit points are gone stays on the grid until `Cleanup`. A crusher that drove
+    // over it in the `Movement` stage of that tick was recorded as its killer, so the victim's
+    // cost was gained for a unit it had not destroyed (and twice, by two units, when a missile
+    // had destroyed it). Here a nuclear strike, which has no killer, takes the recruit's last
+    // hit points in the tick in which the roller drives into its cell.
+    let scene = |strike: bool| {
+        let mut app = world();
+        let roller = spawn(&mut app, P0, "roller", 10, 10);
+        let recruit = spawn(&mut app, P1, "recruit", 11, 10);
+        app.world_mut()
+            .resource_mut::<sim::SpecialState>()
+            .disabled
+            .insert(recruit, u64::MAX);
+        let silo = place(&mut app, P0, "silo", 2, 2);
+        ticks(&mut app, 25);
+        set_hp(&mut app, recruit, 20);
+        let mut commands = vec![move_to(P0, &[roller], 13, 10)];
+        if strike {
+            commands.insert(
+                0,
+                issue(
+                    P0,
+                    Command::Superweapon {
+                        building: silo,
+                        target: CellPos::new(11, 13),
+                        units: Vec::new(),
+                    },
+                ),
+            );
+        }
+        let mut events = tick(&mut app, commands);
+        assert!(rejections(&events).is_empty(), "{events:?}");
+        let crushed_at_once = events
+            .iter()
+            .any(|event| matches!(event, SimEvent::UnitCrushed { unit, .. } if *unit == recruit));
+        events.extend(ticks(&mut app, 40));
+        assert!(!alive(&mut app, recruit));
+        (
+            crushed_at_once,
+            experience(&mut app, roller).expect("experience").value,
+        )
+    };
+    // Control: the roller alone crushes it in the tick of its order and gains its 100.
+    assert_eq!(scene(false), (true, 100));
+    // Struck first in the same tick, it is driven over all the same, for nothing.
+    assert_eq!(scene(true), (true, 0));
+}

@@ -223,12 +223,19 @@ fn an_aircraft_fires_its_volleys_returns_and_reloads_a_round_at_a_time() {
     tick(&mut app, Vec::new());
     assert_eq!(ammo(&app, striker), None, "full");
     let mut events = tick(&mut app, vec![attack(P0, striker, truck)]);
-    // The first volley: two shots, and one volley less.
+    // The first volley: two shots, and one volley less. The round is spent when the volley
+    // begins, with its first shot (docs/DECISIONS.md R56; before, with its last).
     let (more, _) = run_until(&mut app, 200, |app, _| ammo(app, striker) == Some(1));
+    events.extend(more);
+    assert_eq!(shots(&events, striker).len(), 1);
+    let volley_over = |app: &mut App, left: u32| {
+        ammo(app, striker) == Some(left) && weapon(app, striker).burst_left == 0
+    };
+    let (more, _) = run_until(&mut app, 200, |app, _| volley_over(app, 1));
     events.extend(more);
     assert_eq!(shots(&events, striker).len(), 2);
     // The second: it has none left, its attack is over and it flies home.
-    let (more, _) = run_until(&mut app, 200, |app, _| ammo(app, striker) == Some(0));
+    let (more, _) = run_until(&mut app, 200, |app, _| volley_over(app, 0));
     events.extend(more);
     assert_eq!(shots(&events, striker).len(), 4);
     assert_eq!(hp(&mut app, truck), Some(300 - 4 * 20));
@@ -485,4 +492,188 @@ fn ammunition_reloading_and_docks_are_hashed() {
     ] {
         assert_ne!(scenario(edit), base, "{name} is not hashed");
     }
+}
+
+// --- Regression: advisory review 2, sim P0-1 (docs/DECISIONS.md R56) ---------------------------------
+
+#[test]
+fn an_aircraft_spends_its_rounds_on_scenery_as_on_everything_else() {
+    // The striker has 2 volleys of 2 shots of 20. Ordered onto a tower (scenery, no actor of
+    // the simulation) it spent nothing: it fired 50 shots in 400 ticks and never flew home.
+    let (mut app, _, strikers) = airfield_with(1);
+    let striker = strikers[0];
+    let scenery = tower(&mut app, 18, 10, "plate");
+    // An unarmed spotter beside the tower, so that the player has seen its cell.
+    spawn(&mut app, P0, "engineer", 17, 11);
+    ticks(&mut app, 2);
+    let mut events = tick(&mut app, vec![attack(P0, striker, scenery)]);
+    assert!(rejections(&events).is_empty(), "{events:?}");
+    let (more, _) = run_until(&mut app, 400, |app, _| {
+        ammo(app, striker) == Some(0) && landed(app, striker)
+    });
+    events.extend(more);
+    events.extend(ticks(&mut app, 100));
+    assert_eq!(shots(&events, striker).len(), 4, "two volleys of two");
+    assert_eq!(scenery_hp(&app, 18, 10), Some(1000 - 4 * 20));
+    assert!(landed(&mut app, striker));
+}
+
+#[test]
+fn a_volley_that_is_cut_short_costs_its_round() {
+    // Each truck is destroyed by the first shot of a volley, and nothing else is in reach for
+    // the second: the volley ends there, and it has cost a round all the same (before: six
+    // trucks, six kills, the ammunition still full).
+    let (mut app, _, strikers) = airfield_with(1);
+    let striker = strikers[0];
+    spawn(&mut app, P0, "engineer", 15, 10);
+    let mut kills = 0;
+    for (n, left) in [(0, Some(1)), (1, Some(0))] {
+        let victim = spawn(&mut app, P1, "truck", 18, 8 + 2 * n);
+        app.world_mut()
+            .resource_mut::<SpecialState>()
+            .disabled
+            .insert(victim, u64::MAX);
+        set_hp(&mut app, victim, 5);
+        // A tick, so that the spotter has seen it.
+        tick(&mut app, Vec::new());
+        let mut events = tick(&mut app, vec![attack(P0, striker, victim)]);
+        assert!(rejections(&events).is_empty(), "{events:?}");
+        let (more, _) = run_until(&mut app, 200, |app, _| !alive(app, victim));
+        events.extend(more);
+        events.extend(ticks(&mut app, 12));
+        assert_eq!(shots(&events, striker).len(), 1, "victim {n}");
+        assert_eq!(ammo(&app, striker), left, "victim {n}");
+        assert_eq!(
+            weapon(&mut app, striker).burst_left,
+            0,
+            "the volley is over"
+        );
+        kills += 1;
+    }
+    assert_eq!(kills, 2);
+    // Out of ammunition it fires at nothing more, and flies home to reload.
+    let victim = spawn(&mut app, P1, "truck", 18, 14);
+    app.world_mut()
+        .resource_mut::<SpecialState>()
+        .disabled
+        .insert(victim, u64::MAX);
+    tick(&mut app, Vec::new());
+    let mut events = tick(&mut app, vec![attack(P0, striker, victim)]);
+    assert!(rejections(&events).is_empty(), "{events:?}");
+    let (more, _) = run_until(&mut app, 200, |app, _| landed(app, striker));
+    events.extend(more);
+    events.extend(ticks(&mut app, 50));
+    assert!(shots(&events, striker).is_empty());
+    assert_eq!(hp(&mut app, victim), Some(300));
+}
+
+// --- Regression: advisory review 2, tests P1-2 (the loss of a dock by capture) ----------------------
+
+/// An airfield of P0 at (10, 10) with a striker on it and, if `second`, another airfield of P0
+/// at (20, 20); an engineer of P1 beside the first captures it through the command queue.
+/// Returns the world after the tick of the capture, the two airfields, the striker, and the
+/// units destroyed in that tick.
+fn captured(second: bool) -> (App, SimId, Option<SimId>, SimId, Vec<SimId>) {
+    let (mut app, first, strikers) = airfield_with(1);
+    let other = second.then(|| place(&mut app, P0, "airfield", 20, 20));
+    let engineer = spawn(&mut app, P1, "engineer", 12, 10);
+    tick(&mut app, Vec::new());
+    assert_eq!(state(&app).docks[&strikers[0]].0, first);
+    let events = tick(
+        &mut app,
+        vec![issue(
+            P1,
+            Command::Interact {
+                unit: engineer,
+                target: first,
+            },
+        )],
+    );
+    assert!(rejections(&events).is_empty(), "{events:?}");
+    let owner = {
+        let world = app.world_mut();
+        let mut query = world.query::<(&SimId, &sim::Owner)>();
+        query
+            .iter(world)
+            .find(|(id, _)| **id == first)
+            .map(|(_, owner)| owner.0)
+    };
+    assert_eq!(owner, Some(P1), "captured");
+    let lost: Vec<SimId> = destroyed(&events)
+        .into_iter()
+        .filter(|id| *id != engineer)
+        .collect();
+    (app, first, other, strikers[0], lost)
+}
+
+fn docks_of(app: &App, player: PlayerId) -> (u32, u32) {
+    let state = app
+        .world()
+        .resource::<Players>()
+        .get(player)
+        .expect("player");
+    (state.docks(), state.docked_aircraft())
+}
+
+#[test]
+fn an_aircraft_whose_airfield_is_captured_takes_a_dock_of_another_or_is_lost() {
+    // Decision R49 item 4: a dock is lost with its building when that is destroyed, sold or
+    // captured. No test captured one, and an aircraft that kept the dock of a building in
+    // another player's hands passed every test (mutation M22 of the review).
+    // With another airfield of its owner: it takes a dock there and flies over.
+    let (mut app, first, other, striker, lost) = captured(true);
+    assert!(lost.is_empty());
+    let other = other.expect("the second airfield");
+    let (events, _) = run_until(&mut app, 300, |app, _| landed(app, striker));
+    assert!(destroyed(&events).is_empty());
+    assert_eq!(state(&app).docks[&striker].0, other);
+    assert_ne!(state(&app).docks[&striker].0, first);
+    assert_eq!(mobile(&mut app, striker).cell, CellPos::new(20, 20));
+    // The docks follow the buildings: two each, and the aircraft is its owner's.
+    assert_eq!(docks_of(&app, P0), (2, 1));
+    assert_eq!(docks_of(&app, P1), (2, 0));
+    // Without one it has no dock left and, idle, is lost in the tick of the capture.
+    let (mut app, _, _, striker, lost) = captured(false);
+    assert_eq!(lost, [striker]);
+    assert!(!alive(&mut app, striker));
+    assert!(!state(&app).docks.contains_key(&striker));
+    tick(&mut app, Vec::new());
+    assert_eq!(docks_of(&app, P0), (0, 0));
+    assert_eq!(docks_of(&app, P1), (2, 0));
+}
+
+// --- Regression: advisory review 2, sim P2-1 --------------------------------------------------------
+
+#[test]
+fn a_dock_sold_earlier_in_the_tick_takes_no_aircraft() {
+    // The check counted the docks the player had at the last `Economy` stage if that was
+    // more than those of its buildings: with two airfields (4 docks), the sale of one and five
+    // orders in one tick, four aircraft were accepted for the 2 docks left, and the third was
+    // built, paid for and waited at the head of the queue for ever.
+    let mut app = world();
+    let first = place(&mut app, P0, "airfield", 10, 10);
+    place(&mut app, P0, "airfield", 20, 20);
+    place(&mut app, P0, "allied_yard", 2, 2);
+    place(&mut app, P0, "allied_factory", 6, 2);
+    ticks(&mut app, 2);
+    let mut commands = vec![issue(P0, Command::SellBuilding { building: first })];
+    commands.extend((0..5).map(|_| queue(&app, P0)));
+    let events = tick(&mut app, commands);
+    assert_eq!(
+        rejections(&events),
+        vec![RejectReason::NoFreeDock(striker_item(&app)); 3]
+    );
+    // Control: without the sale four are accepted and the fifth is refused.
+    let mut app = world();
+    place(&mut app, P0, "airfield", 10, 10);
+    place(&mut app, P0, "airfield", 20, 20);
+    place(&mut app, P0, "allied_yard", 2, 2);
+    place(&mut app, P0, "allied_factory", 6, 2);
+    ticks(&mut app, 2);
+    let orders = (0..5).map(|_| queue(&app, P0)).collect();
+    let events = tick(&mut app, orders);
+    assert_eq!(
+        rejections(&events),
+        [RejectReason::NoFreeDock(striker_item(&app))]
+    );
 }

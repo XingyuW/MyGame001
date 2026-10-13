@@ -317,8 +317,11 @@ fn docks(world: &mut World, defs: &Definitions, index: &BTreeMap<SimId, Actor>, 
         let mut fighting = world
             .get::<Weapon>(a.entity)
             .is_some_and(|weapon| weapon.order.is_some());
-        if fighting && ammo == 0 {
-            // Out of ammunition: the attack is over.
+        let in_volley = world
+            .get::<Weapon>(a.entity)
+            .is_some_and(|weapon| weapon.burst_left > 0);
+        if fighting && ammo == 0 && !in_volley {
+            // Out of ammunition, and the volley it paid for is over: so is the attack.
             clear_orders(world, a.entity);
             fighting = false;
         }
@@ -567,13 +570,22 @@ fn bays(world: &mut World, defs: &Definitions, index: &BTreeMap<SimId, Actor>, t
             && !stopped
             && let Some(place) = bay.slots.iter().position(|slot| *slot == Slot::Ready)
         {
-            match index.get(&target).filter(|target| target.hp > 0) {
+            // What it launches at: a unit or building that stands, or scenery, which is no
+            // actor and is aimed at where it stands.
+            let aim = match index.get(&target).filter(|target| target.hp > 0) {
+                Some(target) => Some(Aim::Actor(target)),
+                None => world
+                    .resource::<crate::Props>()
+                    .get(target)
+                    .map(|(cell, _)| Aim::Scenery(target, cell)),
+            };
+            match aim {
                 None => {
                     bay.target = None;
                     bay.pending = 0;
                 }
-                Some(target) => {
-                    if let Some(unit) = launch(world, defs, a, target, tick) {
+                Some(aim) => {
+                    if let Some(unit) = launch(world, defs, a, aim, tick) {
                         bay.slots[place] = Slot::Out(unit);
                         bay.pending -= 1;
                         bay.wait = SPAWN_LAUNCH_GAP;
@@ -585,13 +597,58 @@ fn bays(world: &mut World, defs: &Definitions, index: &BTreeMap<SimId, Actor>, t
     }
 }
 
+/// What a spawner launches at.
+#[derive(Clone, Copy)]
+enum Aim<'a> {
+    /// A unit or building.
+    Actor(&'a Actor),
+    /// Scenery (`crate::props`): its id and the cell it stands in.
+    Scenery(SimId, CellPos),
+}
+
+impl Aim<'_> {
+    fn id(&self) -> SimId {
+        match *self {
+            Aim::Actor(target) => target.id,
+            Aim::Scenery(id, _) => id,
+        }
+    }
+
+    fn cell(&self) -> CellPos {
+        match *self {
+            Aim::Actor(target) => target.cell,
+            Aim::Scenery(_, cell) => cell,
+        }
+    }
+}
+
+/// The bay of the spawner `a` as it goes aboard a transport, if it has one: it leaves the map
+/// with its spawner. What it had launched counts as lost from now on (its aircraft are
+/// destroyed with a spawner that is gone, and a missile in flight does not come back), each
+/// place to be filled after the time to replace it; the timers stand still aboard.
+pub(crate) fn stow(world: &mut World, defs: &Definitions, a: &Actor) -> Option<Bay> {
+    let mut bay = world.resource_mut::<SpecialState>().bays.remove(&a.id)?;
+    let regen = defs
+        .metadata(a.item)
+        .map_or(0, |entry| entry.spawn_regen)
+        .max(1);
+    for slot in &mut bay.slots {
+        if matches!(slot, Slot::Out(_)) {
+            *slot = Slot::Lost(regen);
+        }
+    }
+    bay.target = None;
+    bay.pending = 0;
+    Some(bay)
+}
+
 /// Launches one unit of the type `spawner` spawns at `target`; its id, or `None` if there is no
 /// room in the air around the spawner.
 fn launch(
     world: &mut World,
     defs: &Definitions,
     spawner: &Actor,
-    target: &Actor,
+    target: Aim,
     tick: u64,
 ) -> Option<SimId> {
     let kind = defs.metadata(spawner.item)?.spawns?;
@@ -613,7 +670,7 @@ fn launch(
                     width: 1,
                     height: 1,
                 },
-                Some(target.cell),
+                Some(target.cell()),
                 false,
             )
         }
@@ -627,13 +684,16 @@ fn launch(
         .spawned
         .insert(unit, spawner.id);
     if entry.missile.is_some() {
-        // It flies to where the target is now: a unit's position, or the cell of a building
-        // nearest to the launcher.
-        let aim = match target.foot {
-            Some(footprint) => SubPos::centre_of(nearest_cell_of(footprint, from)),
-            None => world
-                .get::<Position>(target.entity)
-                .map_or(SubPos::centre_of(target.cell), |position| position.0),
+        // It flies to where the target is now: a unit's position, the cell of a building
+        // nearest to the launcher, or the cell scenery stands in.
+        let aim = match target {
+            Aim::Actor(target) => match target.foot {
+                Some(footprint) => SubPos::centre_of(nearest_cell_of(footprint, from)),
+                None => world
+                    .get::<Position>(target.entity)
+                    .map_or(SubPos::centre_of(target.cell), |position| position.0),
+            },
+            Aim::Scenery(_, cell) => SubPos::centre_of(cell),
         };
         world.resource_mut::<SpecialState>().missiles.insert(
             unit,
@@ -650,9 +710,9 @@ fn launch(
         // An aircraft has the rank of its spawner and attacks the target.
         crate::veterancy::inherit(world, entity, kind, rank);
         if let Some(mut weapon) = world.get_mut::<Weapon>(entity) {
-            weapon.target = Some(target.id);
+            weapon.target = Some(target.id());
             weapon.order = Some(AttackOrder::Attack {
-                target: target.id,
+                target: target.id(),
                 chases: 0,
             });
         }
@@ -712,14 +772,24 @@ pub(crate) fn fired(
                 .count() as u32;
         }
     }
-    if entry.ammo > 0 && carried.is_none_or(|carried| carried.burst_left == 0) {
+    if entry.ammo > 0 {
+        // A round is a volley, and it is spent when the volley begins: with its first shot,
+        // after which the weapon has all the shots of its burst but one left. A volley that
+        // is cut short (its target is destroyed, or nothing is left to fire at when its next
+        // shot is due) has cost its round all the same (docs/DECISIONS.md R56).
+        let burst = defs.weapon(weapon).map_or(1, |def| def.burst.max(1));
+        let left_in_volley = carried.map_or(0, |carried| carried.burst_left);
         let left = {
             let mut state = world.resource_mut::<SpecialState>();
-            let left = state.ammo_of(a.id, entry.ammo).saturating_sub(1);
-            state.ammo.insert(a.id, left);
+            let mut left = state.ammo_of(a.id, entry.ammo);
+            if left_in_volley == burst - 1 {
+                left = left.saturating_sub(1);
+                state.ammo.insert(a.id, left);
+            }
             left
         };
-        if left == 0 && entry.airport_bound {
+        // With the last shot of its last volley an airport bound aircraft turns for home.
+        if left == 0 && left_in_volley == 0 && entry.airport_bound {
             clear_orders(world, a.entity);
         }
     }

@@ -37,6 +37,9 @@ pub struct Passenger {
     pub harvester: Option<crate::Harvester>,
     /// The passenger's experience (RA4): it keeps its rank aboard.
     pub experience: Option<crate::Experience>,
+    /// The bay of a passenger that spawns units (RA4), as it went aboard: what it had launched
+    /// counts as lost, and the timers of its places stand still until it is unloaded.
+    pub bay: Option<crate::flight::Bay>,
 }
 #[derive(Clone, Debug)]
 pub struct Zone {
@@ -133,6 +136,10 @@ impl SpecialState {
                 if let Some(experience) = &p.experience {
                     h.write(b"xp");
                     experience.hash_into(h);
+                }
+                if let Some(bay) = &p.bay {
+                    h.write(b"by");
+                    bay.hash_into(h);
                 }
             }
         }
@@ -857,6 +864,7 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
                         return Err(RejectReason::DuplicateUnit(*id));
                     }
                     let u = own(world, &defs, &index, a.owner, *id)?;
+                    commandable(world, *id)?;
                     if defs.category(u.item) != Category::Vehicles
                         || matches!(u.item, ProductionItem::Building(_))
                     {
@@ -1065,6 +1073,7 @@ fn interact(
             };
             let harvester = world.get::<crate::Harvester>(a.entity).cloned();
             let experience = world.get::<crate::Experience>(a.entity).copied();
+            let bay = crate::flight::stow(world, defs, a);
             release(world, a);
             world.despawn(a.entity);
             world
@@ -1078,6 +1087,7 @@ fn interact(
                     hp: a.hp,
                     harvester,
                     experience,
+                    bay,
                 });
             if role(defs, b) == Role::Ifv && role(defs, a) == Role::Engineer {
                 world.entity_mut(b.entity).remove::<Weapon>();
@@ -1152,6 +1162,10 @@ fn unload(world: &mut World, a: &Actor, defs: &Definitions) -> Result<(), Reject
             e.insert(experience);
             let entity = e.id();
             crate::veterancy::rearm(world, entity, p.kind);
+        }
+        if let Some(bay) = p.bay {
+            // A spawner has the bay it went aboard with (RA4).
+            world.resource_mut::<SpecialState>().bays.insert(p.id, bay);
         }
     }
     world
@@ -1566,14 +1580,18 @@ pub(crate) fn resolve(world: &mut World) {
             weapon,
         } = event
         {
-            let (Some(a), Some(b)) = (index.get(&attacker), index.get(&target)) else {
+            let Some(a) = index.get(&attacker) else {
+                continue;
+            };
+            // RA4: ammunition, launchers and the surfacing of a cloaked unit, for every shot,
+            // whatever it is fired at (scenery is no actor).
+            crate::flight::fired(world, &defs, a, target, weapon, tick);
+            let Some(b) = index.get(&target) else {
                 continue;
             };
             let Some(meta) = defs.metadata(a.item) else {
                 continue;
             };
-            // RA4: ammunition, launchers and the surfacing of a cloaked unit.
-            crate::flight::fired(world, &defs, a, target, weapon, tick);
             match meta.role {
                 Role::MindControl if b.foot.is_none() => {
                     if !world

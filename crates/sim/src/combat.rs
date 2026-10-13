@@ -1410,13 +1410,14 @@ pub(crate) fn combat(
             continue;
         };
         weapon.cooldown = weapon.cooldown.saturating_sub(1);
-        // A unit that is switched off or rearming does not fire, nor does an aircraft that has
-        // spent its ammunition until it has reloaded (RA4). A shot of a volley that is due
-        // meanwhile is not fired, so the volley ends and the weapon reloads, as for every shot
-        // that cannot be fired when it is due.
+        // A unit that is switched off or rearming does not fire. A shot of a volley that is
+        // due meanwhile is not fired, so the volley ends and the weapon reloads, as for every
+        // shot that cannot be fired when it is due. Nor does an aircraft that has spent its
+        // ammunition fire until it has reloaded (RA4), except the rest of the volley it has
+        // paid for with its last round (`crate::flight::fired`).
         if special.disabled.contains_key(&id)
             || special.rearming.contains_key(&id)
-            || special.ammo.get(&id) == Some(&0)
+            || (special.ammo.get(&id) == Some(&0) && weapon.burst_left == 0)
         {
             if weapon.cooldown == 0 && weapon.burst_left > 0 {
                 let reload_pm = experience.map_or(1000, crate::Experience::reload_pm);

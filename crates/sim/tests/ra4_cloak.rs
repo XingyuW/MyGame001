@@ -269,3 +269,45 @@ fn what_keeps_a_unit_in_sight_is_hashed() {
     assert_ne!(scenario(Some(50)), base);
     assert_ne!(scenario(Some(50)), scenario(Some(51)));
 }
+
+// --- Regression: advisory review 2, sim P0-1, the part on cloaked units (docs/DECISIONS.md R56) -----
+
+#[test]
+fn a_submerged_unit_that_fires_at_scenery_is_seen_for_the_cloak_delay() {
+    // What a shot does for its unit (here: it is seen for 24 ticks) was done only for a shot
+    // at a unit or building; scenery is neither.
+    // Scenery stands on land, and neither the fixture's nor the shipped cloakable units fire at
+    // anything on land (`land_targeting` 1), nor does the fixture's torpedo harm scenery: the
+    // case needs a sub that does and a torpedo that does.
+    let mut app = world_with(
+        "torpedo_on_scenery",
+        &[
+            (
+                "(id: \"torpedo\", cell_spread: 0, percent_at_max: 100, wall: 0, wood: 0,",
+                "(id: \"torpedo\", cell_spread: 0, percent_at_max: 100, wall: 1, wood: 1,",
+            ),
+            (
+                "elite_weapons: [\"torp\"], air_range_bonus: 0, land_targeting: 1, naval_targeting: 5,",
+                "elite_weapons: [\"torp\"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 5,",
+            ),
+        ],
+    );
+    flood(&mut app, (12, 0), (39, 39));
+    spawn(&mut app, P0, "tank", 10, 10);
+    let sub = spawn(&mut app, P1, "sub", 15, 10);
+    let scenery = tower(&mut app, 17, 10, "hull");
+    ticks(&mut app, 2);
+    assert!(hidden(&app, P0, sub));
+    let events = tick(&mut app, vec![attack(P1, sub, scenery)]);
+    assert!(rejections(&events).is_empty(), "{events:?}");
+    let (_, _) = run_until(&mut app, 40, |_, events| !shots(events, sub).is_empty());
+    assert!(!hidden(&app, P0, sub), "it fired");
+    assert!(scenery_hp(&app, 17, 10).is_some_and(|left| left < 1000));
+    // Its order ended (scenario setup: it is silenced), and 24 ticks after its last shot it is
+    // hidden again.
+    silence(&mut app, sub);
+    ticks(&mut app, 23);
+    assert!(!hidden(&app, P0, sub));
+    ticks(&mut app, 2);
+    assert!(hidden(&app, P0, sub));
+}

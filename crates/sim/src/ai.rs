@@ -1309,9 +1309,10 @@ fn sell_for_army(view: &View<'_>) -> Option<Command> {
 
 /// The last stand (RA4, docs/DECISIONS.md R53). A player that has no unit that fights and no
 /// harvester at work, and whose credits, units, buildings and queues have not changed for
-/// [`LAST_STAND_PATIENCE`] ticks, will never change anything again: it can pay for nothing and
-/// earns nothing, and neither can its opponent be made to end the match (two such players
-/// would stand for ever). It then sells its buildings, the one with the highest refund first
+/// [`LAST_STAND_PATIENCE`] ticks, will never change anything again: it earns nothing, and it
+/// can pay for nothing or (with credits that stand still) can use nothing it pays for, such as
+/// a finished building that has no site; neither can its opponent be made to end the match
+/// (two such players would stand for ever). It then sells its buildings, the one with the highest refund first
 /// (then the lowest id), one a turn and only in the turn of its player id
 /// ([`LAST_STAND_TURN`]): the survivors of a crewed building are armed units that attack with
 /// the next wave, and a player without a building is defeated in a short game. It stops when
@@ -2014,6 +2015,97 @@ mod tests {
         }
     }
 
+    /// RA1 regression (docs/DECISIONS.md R14, R56; found by `m14_duels -- full`: Crossroads,
+    /// Libya against Iraq, both easy). A wave that knows no building and has seen every enemy
+    /// start sweeps the map for what is left. It took the waypoints in the order of their
+    /// distance from itself, so a wave formed at its own base wandered its own half of the map
+    /// for 13,000 ticks before it looked beside the loser's start, where the last buildings
+    /// stood. A sweep starts at the waypoints nearest to an enemy start, on every map. (The
+    /// end to end test of that match in `crates/game/tests/m6_production_matches.rs` could no
+    /// longer fail by its limit once the limit was doubled in RA2: this test fails without
+    /// the rule, whatever the limit.)
+    #[test]
+    fn a_sweep_starts_at_the_waypoint_nearest_to_an_enemy_start() {
+        let cell = Cell {
+            passable: true,
+            water: false,
+            buildable: true,
+            ore: 0,
+        };
+        // A small map (the rule held on large maps before RA1).
+        let grid = Grid::from_cells(64, 64, vec![cell; 64 * 64]).expect("a grid");
+        assert!(grid.width() + grid.height() <= ARMY_SCALE_SPAN);
+        let plan = AiPlan {
+            build_order: Vec::new(),
+            power: BuildingKind(0),
+            harvester: UnitKind(0),
+            army: Vec::new(),
+        };
+        let difficulty = Difficulty {
+            id: "test".into(),
+            think_interval: 10,
+            harvesters_per_refinery: 1,
+            max_army: 4,
+            wave_size: 2,
+            first_wave: 0,
+            wave_patience: 100,
+            defence_radius: 4,
+        };
+        let own = CellPos::new(6, 6);
+        let enemy = CellPos::new(56, 56);
+        let mut controller = AiController::new(
+            &grid,
+            &Definitions::default(),
+            plan,
+            difficulty,
+            own,
+            vec![enemy],
+            None,
+        )
+        .expect("a controller");
+        // It knows no building, and every waypoint, the enemy's start among them, was seen
+        // in the same era: beside its own base, in the middle, in a far corner, beside the
+        // enemy's start, and the start itself.
+        let waypoint = |x: i32, y: i32, priority: bool| Waypoint {
+            cell: CellPos::new(x, y),
+            seen: 100,
+            priority,
+        };
+        controller.known.clear();
+        controller.waypoints = vec![
+            waypoint(10, 10, false),
+            waypoint(32, 32, false),
+            waypoint(8, 56, false),
+            waypoint(50, 52, false),
+            waypoint(enemy.x, enemy.y, true),
+        ];
+        // From its own base (where the wave forms) the sweep goes to the enemy's start first,
+        assert_eq!(
+            choose_target(&controller, own),
+            Some(WaveTarget::Waypoint(4)),
+            "not the waypoint nearest to the wave"
+        );
+        // then, the start seen in a later era, to the waypoint beside it, not to those near
+        // the wave,
+        controller.waypoints[4].seen = 100 + SWEEP_ERA_TICKS;
+        assert_eq!(
+            choose_target(&controller, own),
+            Some(WaveTarget::Waypoint(3))
+        );
+        // and so on outwards from the enemy's start.
+        controller.waypoints[3].seen = 100 + SWEEP_ERA_TICKS;
+        assert_eq!(
+            choose_target(&controller, own),
+            Some(WaveTarget::Waypoint(1))
+        );
+        // A start never seen comes before any sweep, and a known building before that.
+        controller.waypoints[4].seen = 0;
+        assert_eq!(
+            choose_target(&controller, own),
+            Some(WaveTarget::Waypoint(4))
+        );
+    }
+
     /// RA4 regression (docs/DECISIONS.md R53). A player with no unit that fights and no
     /// harvester at work, whose credits, units, buildings and queues stand still, sells its
     /// buildings after [`LAST_STAND_PATIENCE`] ticks, the dearest first, one a turn and only in
@@ -2171,6 +2263,12 @@ mod tests {
         assert_eq!(turn(&mut own, 4_000, 0, 0, &idle), None);
         assert_eq!(turn(&mut own, 5_000, 70, 0, &idle), None);
         assert_eq!(turn(&mut own, 8_192, 70, 0, &idle), sell(2));
+        // Credits it does not spend are no change either: a player whose finished building
+        // has no site is as stuck as one that can pay for nothing, and what counts is that
+        // nothing it has moves (advisory review 2, sim, suspected item 2; R56).
+        let mut own = controller(PlayerId(0));
+        assert_eq!(turn(&mut own, 4_000, 5_000, 0, &idle), None);
+        assert_eq!(turn(&mut own, 8_192, 5_000, 0, &idle), sell(2));
         let mut own = controller(PlayerId(0));
         assert_eq!(turn(&mut own, 7_500, 0, 0, &idle), None);
         assert_eq!(
