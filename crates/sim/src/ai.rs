@@ -1027,7 +1027,9 @@ fn deploy_base_unit(view: &View<'_>, controller: &AiController) -> BaseUnit {
                 && view
                     .grid
                     .cell(cell)
-                    .is_some_and(|terrain| terrain.buildable)
+                    // Nothing is built on ore (RA5): a base unit a crate gave it may stand
+                    // on ore that spread.
+                    .is_some_and(|terrain| terrain.buildable && terrain.ore == 0)
                 && clear(cell)
         }) && footprint
             .ring()

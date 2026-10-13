@@ -116,7 +116,10 @@ impl Plugin for SimPlugin {
                 .chain(),
         );
         schedule.add_systems((
-            (advance_events, process_commands)
+            // The ore grows after the commands and before the computer players look at the
+            // map (RA5, `crate::ore`): a placement decided in a tick is applied in the next
+            // one before any ore can have spread onto its ground.
+            (advance_events, process_commands, crate::ore::grow)
                 .chain()
                 .in_set(SimCoreSet(SimSet::Commands))
                 .in_set(SimSet::Commands),
@@ -126,7 +129,6 @@ impl Plugin for SimPlugin {
                 advance_production,
                 crate::economy::repair_buildings,
                 harvest,
-                crate::ore::grow,
                 crate::crates::appear,
                 crate::special::advance,
             )

@@ -2173,6 +2173,7 @@ pub fn event_sound(event: &SimEvent, context: &SoundContext) -> Option<Sfx> {
         // RA4: a launch is heard as its launcher's shot, a missile's end as its impact.
         | SimEvent::CrewEscaped { .. }
         | SimEvent::CrateAppeared { .. }
+        | SimEvent::CrateGone { .. }
         | SimEvent::UnitLaunched { .. }
         | SimEvent::UnitRecovered { .. }
         | SimEvent::MissileDetonated { .. }

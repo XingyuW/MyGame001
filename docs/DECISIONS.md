@@ -3704,3 +3704,238 @@ and stop review. Write a report about what reviews are left for later review wor
    reviewer's or the user's judgment, and a suggested order. The briefs prepared for the panel
    review (R55) are kept in `docs/prompts/ra2-parity-review/` for whoever does it.
 6. Status entries and commit messages say "validated", never "reviewed" or "approved".
+
+### R58. RA5-A: the economy file of schema version 2 and the rules file of schema version 2
+
+RA5 is carried out in two parts (R57 item 4): RA5-A is the plan's items 1 to 4 (bails and gems
+with their map side, growth and spread, the side's free miner, crates) and the refund of a sold
+refinery that R56 deferred; RA5-B is items 5 to 9. This record and R59 to R62 are RA5-A's.
+
+1. **`economy.ron` is at schema version 2.** The ore unit of a cell, of a harvester's `capacity`
+   and `harvest_rate` and of a refinery's `credits_per_ore` is the **bail**. New fields:
+   `harvesters[].harvest_interval` (ticks of work on a cell for each removal of `harvest_rate`
+   bails; 1 is the rule of M3), `refineries[].credits_per_gem`, and the list `refunds` (the
+   building types whose sale returns a fixed amount, from 0 to the cost). The names `capacity`,
+   `harvest_rate` and `credits_per_ore` are kept (the plan calls the capacity `storage`): the
+   meaning of the M3 fields is unchanged for a file whose bail is worth what its ore unit was,
+   which is how every fixture is migrated (plan section 5, RA5: "economy fixtures migrate with
+   one credit bails"; here with their own 2 credits, and `credits_per_gem` at twice that), so
+   every M3 test keeps its numbers and its fixture edits.
+2. **Shipped values.** A miner's capacity is the ini's `Storage` (War Miner 40, Chrono Miner 20);
+   a refinery pays `[Riparius] Value` 25 and `[Cruentus] Value` 50; `refunds` lists the types
+   with a `Soylent` that is not 0 (the two refineries at 300, the Ore Purifier at 1250, which is
+   half its cost). The pace of harvesting is the game's own: one bail after every 19 ticks of
+   work (**assumption**, plan appendix D topic 8: the ini has no key for it; the 14 frames of
+   its other `.016` minute rates). A full War Miner takes 760 ticks of work, where it took 143
+   before. Paid at once on unloading, as before (**assumption**: the reference's unloading time
+   is undocumented).
+3. **`rules.ron` is at schema version 2.** New in `economy`: `ore_max_bails` (12) and
+   `ore_spread_above` (6), the game's own values (**assumptions**, appendix D topic 8: the
+   twelve density stages of an ore cell, and the ancestor engine's rule that ore spreads from
+   above stage 6); the generator writes them without an ini source and the audit holds them in
+   a list of its own (`OWN_RULES`). New list `crate_units`: the mapped units with
+   `CrateGoodie=yes` (ten vehicles, the two MCVs and the two miners among them). A `powerups`
+   entry must name one of the eight contents a crate may hold (`CrateContent`); before, any
+   name loaded and nothing read it. `ore_value` and `gem_value` stay in the rules file: match
+   setup divides a map's ore amounts by them (item 5); what a refinery pays is the economy
+   file's, which the generator writes from the same two reference rows, and a test of the
+   shipped data holds the two together.
+4. **A fixed refund, and who follows it** (R56 decision 7). `Definitions::refund` is the
+   type's fixed refund if `refunds` lists it, else what the rule gives
+   (`Definitions::rule_refund`: with a rules file the cost times `refund_percent`, without one
+   `sell_value`). A sold refinery returns 300 credits. **The survivors of a building follow
+   the rule's value, not the fixed refund** (`crew::escape` reads `rule_refund`): the plan's
+   research gives the survivors as `Cost x SurvivorRate / divisor` (ModEnc) or "sell cost /
+   divisor" (the ini comment), and no source says that `Soylent` enters either; the closest
+   documented behaviour is the formula on the cost (**assumption**). So a sold or destroyed
+   refinery releases 2 GIs or 4 Conscripts as before, and no match of computer players changes
+   through the survivors. The computer player's last stand values a building by what its sale
+   returns (`refund`). The two rows of `ra2_differences.tsv` are deleted; the audit compares
+   `sell_value` with the rule's value and `Definitions::refund` with `Soylent`, and requires
+   that a type is in `refunds` exactly if its section has a `Soylent` that is not 0.
+5. **A map's ore amounts become bails at match setup** (`setup_match_configured`, with a rules
+   file only): a cell with the amount `a` holds `clamp(round(a / value), 1, ore_max_bails)`
+   bails, `value` being `gem_value` for a cell of gems and `ore_value` for any other. The plan
+   puts this "in the map loader's result"; the loader does not know the rules, and every match
+   (the game, the soak, the duels, the tests of matches) goes through the setup, so it is
+   done there, once, before the first tick. The map format stays at schema version 2. With the
+   shipped maps an ore tile (500) is 12 bails, 300 credits where it was 500, and a gem tile
+   (600) 12 bails, 600 credits. A world built without `setup_match` (scenario tests) holds
+   whatever its cells say, in bails. The fixtures of RA1 to RA4 have `ore_value` 1 and an
+   `ore_max_bails` of a million, so that their maps hold what they held.
+6. **Gems.** Which cells of ore are gems is state of the grid (`Grid::is_gems`, a set beside
+   the cells, so that `Cell` and every test that writes one stay as they are), hashed under a
+   tag only when there are any. A map says it with the look feature 10 (`LOOK_FEATURE_GEMS`,
+   `Feature::Gems`): the loader marks every cell with ore and that feature, and an enlarged map
+   keeps the marks where a made start position changed nothing. **Look features in use:** 0
+   none, 1 ore, 2 cliff, 3 road, 4 forest, 5 house, 6 city, 7 tower, 8 bridge, 9 lava, 10
+   gems; 11 to 15 are free (five values) for RA5-B's tech buildings and huts. A harvester
+   counts the bails of gems in its load (`Harvester::gems`), and `OreDelivered` has the field
+   `gems`. An emptied cell of gems is no cell of gems.
+7. **The purifier's and the spy's values are the rules'.** Every powered Ore Purifier of a
+   player adds `purifier_bonus_percent` of a load's value (the plan's section 4.10 says each;
+   before, any number of them added one quarter); a spy in a refinery takes
+   `spy_money_steal_percent` of the owner's credits. Without a rules file the literals of M9
+   stay (a quarter, a half), which the M9 fixtures assert.
+8. **The free miner** was already the side's (`[GAREFN] FreeUnit=CMIN`, `[NAREFN] FreeUnit=HARV`
+   since RA1, audited) and the Chrono Miner's self healing is RA4's; RA5-A adds the test that
+   builds each refinery through commands and finds the miner of its side.
+
+### R59. RA5-A: ore that grows and spreads
+
+1. **The rule** (`crates/sim/src/ore.rs`; plan section 4.10). The pass runs at the end of
+   the `Commands` stage, not in the `Economy` stage the plan names: nothing is built on ore
+   (item 4), a computer player decides where to build in the `Ai` stage and its command is
+   checked in the next tick's `Commands` stage, and a pass between the two could put ore under
+   the footprint and have the command rejected, which the tests of the shipped matches do not
+   allow. After the commands and before the `Ai` stage no decision is pending. Only with a rules file and the match rule `ore_grows` (new in `MatchRules`
+   and `MatchOptions`, default on; hashed only when off). On every tick whose index is a
+   positive multiple of `ore_growth_interval` (2933) each cell of ore below `ore_max_bails`
+   gains a bail with the probability `ore_growth_pm` (60); on the multiples of
+   `ore_spread_interval` each cell of ore with more than `ore_spread_above` bails puts, with
+   the probability `ore_spread_pm`, one bail on one of the free cells around it, each equally
+   likely. Gems neither grow nor spread. `[General] GrowthRate`, which the prompt names, is
+   unused by the engine (plan section 4.10); the per ore keys are the ones ported.
+2. **Order and randomness.** A pass visits the cells of ore in row-major order with the bails
+   they held when it began; for each cell the growth is drawn before the spread; a cell at the
+   densest draws nothing for growth, and a cell with no free cell around it draws nothing for
+   spread; a probability of 0 draws nothing. So a rules file that turns both off (the fixtures
+   of RA1 to RA4) leaves the random sequence of its world as it was. The whole grid is scanned
+   once per pass (65,536 cells every 2933 ticks at most), which the benchmark does not notice.
+3. **Where ore may spread** (`Grid::takes_ore`): a land cell a ground unit may enter, without
+   ore and without a building, that is building ground **or was emptied by a harvester**. The
+   map format's ore ground is no building ground, and neither are its roads, beaches, ice and
+   bridges, which the simulation cannot tell from one another; the grid therefore remembers the
+   cells a harvester emptied (`mined`, hashed under a tag when there are any) so that a field
+   can grow back onto its own ground, and roads and bridges stay free of ore (**decided
+   here**; the plan says "free neighbouring land cell").
+4. **Nothing is built on ore.** `check_footprint` refuses a cell that holds ore
+   (`PlacementError::NotBuildable`), also for the deploying of a base unit: ore that spread
+   onto building ground keeps it free until it is harvested, as in the reference. For the
+   map's own ore ground nothing changes.
+5. **Not modelled:** ore drills (the plan's non goal), and the lobby has no row for
+   `ore_grows` yet (the option exists in the simulation and defaults to the reference's "on";
+   debt for the interface milestone).
+
+### R60. RA5-A: crates
+
+1. **State and stages** (`crates/sim/src/crates.rs`; plan section 4.11). `Crates` (a resource,
+   hashed if the world ever had a crate): the cells with a crate and the tick until which each
+   lies, the ticks at which a crate is due, and whether the match's first crates were asked
+   for. `crates::appear` runs in the
+   `Economy` stage, `crates::collect` in the `Movement` stage after the units have moved. No
+   command names a crate: it is taken by standing on it.
+2. **Where crates come from.** Only with a rules file, in a match with players
+   (`setup_match*`) whose rule `crates` is on: `crates.minimum` (1) appear in the first tick,
+   and a crate that is taken is replaced after a time drawn between half and twice
+   `crates.regen`, both inclusive (1800 to 7200 ticks), unless `crates.maximum` (255) lie on
+   the map then. So a shipped match has one crate at a time, as the reference's `CrateMinimum`
+   keeps it (single source). A crate appears in a cell drawn from the whole map that is land a
+   ground unit may enter, or water, with no building, unit, ore or crate; after 64 draws
+   without such a cell it is tried again 20 ticks later. **A crate nobody takes lies for a
+   time drawn from the same range** (1800 to 7200 ticks) **and is then replaced at once by one
+   somewhere else** (`CrateGone`): the plan does not say what becomes of a crate that is never
+   taken, and with one crate a match, drawn from the whole map, a crate on a pond or behind a
+   ridge would be the match's only crate for good. The ancestor engine gives a crate a lifetime
+   of half to twice its `CrateRegen` and puts another down when it runs out (**assumption**,
+   from the same source as the plan's rule of the minimum; not in the plan's research). A
+   crate on whose cell a building is placed is replaced at once in the same way (decided here:
+   a placement does not look at crates). A crate a scenario puts down lies until it is taken. **A world without a match gets no
+   crates by itself** (decided here: the scenario worlds of several hundred tests have the
+   default rules of a lobby, and a crate that appeared in each would give random effects to
+   whatever drove over it); a scenario puts crates down with `Crates::place`.
+3. **Who takes a crate.** The unit with the lowest id that stands in the cell: a vehicle, a
+   ship or a soldier whose own cell it is (a unit on its way there has not arrived; one
+   passing through takes it), with hit points left, of a player of the match. Aircraft do not
+   (they hold the air layer). Computer players take crates when they happen to cross them.
+4. **What a crate holds** is drawn when it is taken, by the shares of `powerups` (110 in all):
+   `money` (the value 2000 and a draw from 0 to 900, `CRATE_MONEY_SPREAD`: **assumption**
+   that every amount in between is possible), `unit` (a type drawn from `crate_units`, in the
+   nearest cell with room within 3 cells, `CRATE_UNIT_RADIUS`: the game's own),
+   `veteran` (every trainable unit of the collector's owner within `crates.radius` rises one
+   rank), `armour`, `firepower`, `speed` (every such unit that has none yet gets the
+   multiplier 1500, 2000 or 1200 through `Experience::bonus`), `heal_base` (every unit and
+   building of the owner regains its type's hit points), `reveal` (the owner has explored the
+   whole map; **not** "except under enemy Gap Generators", which waits for the shroud rules of
+   RA7: a listed remainder). The radius is measured between the centres of the cells.
+5. **Money instead.** A collector that cannot gain from `veteran`, `armour`, `firepower` or
+   `speed` (it is not trainable, is elite, or has the multiplier already) gets money instead,
+   and then no other unit gains either; the same for a `unit` on water, without a type to
+   draw, or without room. The multipliers need `Experience`, which only trainable types have
+   (R47), so an untrainable unit beside the crate gains nothing (the reference gives it the
+   multiplier; a listed remainder).
+6. **The free base unit** (`crates.free_mcv`). A collector whose owner has no building and no
+   base unit with hit points left and more than 1500 credits (`FREE_MCV_CREDITS`, hard coded
+   in the original) gets the base unit of its side instead of a drawn content, free of
+   charge; money on water. In a short game such a player is defeated already, so the rule
+   acts in long games.
+7. **Randomness**, from `SimRng` only, for each crate taken (the crates of a tick in the order
+   of their cells): the content (unless the free base unit applies), then what the content
+   draws (the unit's type; the credits of money, also of money given instead), then the time
+   until the replacement. A crate that appears draws two numbers an attempt and then the time
+   it lies.
+8. **Events.** `CrateAppeared { cell }`, `CrateGone { cell }` and `CrateTaken { player, unit,
+   cell, content, credits, spawned }`. The game announces the human player's own crate with a notice and the
+   credits sound, and marks a crate the player sees now with a plain box (R61).
+
+### R61. RA5-A: gems on the maps, and what the game shows
+
+1. **Tiles.** Five gem tiles join the shared tileset (ids 46 to 50: on grass, desert, snow,
+   ash and marsh): ore ground (passable, not building ground) with the amount 600 and the look
+   feature `Gems`. Every generated map file and tileset image changes with the tileset;
+   existing tile ids keep their numbers.
+2. **Where.** `Painter::ore` puts a seam of gems (the ore within 2 cells of the centre, 21
+   cells) at the heart of every explicit field of radius 5 or more whose centre is not within
+   20 cells of any of the map's start positions; a map without such a field has one seam pair
+   placed by its recipe (`Painter::gem_seam`: Coral Archipelago, Glacier Pass, Red Canyon,
+   Pacific Atoll, Continental Divide, Frozen Sound, Black Water; Wheel of Worlds has one in
+   each of the ten fields of its hub ring). Only ore tiles become gem tiles, so where units go,
+   where buildings stand and where ore lies is what it was: symmetry, base sites, ore within
+   reach and reachability (`m7_maps`) hold as before. The eighteen large maps have 34 to 210
+   cells of gems, at most a tenth of their ore cells, none within 15 cells of a yard.
+3. **The three small maps.** `demo` (its own generator and tileset): nothing changes.
+   `crossroads` and `riverlands`: no gems and the same cells; their files change only in the
+   tileset definition (51 tiles instead of 46).
+4. **The game.** Gems are drawn with the ore top stained blue-green (no new image; the art
+   of RA5-B may replace it), and are teal on the minimap. Ore that spread onto ground without
+   an ore top gets one when the player sees the cell (the grid is searched every 20 ticks); a
+   mined-out top is shown again when ore spreads back. A crate the player sees now is a plain
+   two tone box: a placeholder. **Requires user verification:** how gems, grown ore and the
+   crate mark look.
+5. **Not done here:** no marker for crates on the minimap, no hover text for gems or crates,
+   no lobby row for `ore_grows` (R59 item 5).
+
+### R62. RA5-A: tests adapted (none deleted, ignored or weakened), and the computer player
+
+Adapted because RA2 behaviour is intended or a schema moved:
+
+* `m3_definitions.rs`: `schema_versions_other_than_1_are_rejected` is
+  `schema_versions_other_than_2_are_rejected` (versions 0, 1, 3, -1 and the largest are
+  rejected; before 0, 2, -1 and the largest); the two files written in the test have
+  `refunds: []` and version 2; the two duplicate entries the test appends carry the new fields;
+  one edit of the fixture names the line that now follows `unit:`; the expected
+  `HarvesterDef` has `harvest_interval: 1`. Every assertion is the same.
+* `ra1_definitions.rs`: the rules file's version is 2 (rejected: 0, 1, 3); the table of the
+  scalar rules has the two new fields, so their limits and the step outside are tested like
+  the others'.
+* `ra1_catalogue.rs`: a sold refinery returns 300, not half its cost (R58 item 4).
+* `ra1_shipped.rs`, `crates/game/src/skirmish.rs`, `smoke.rs`: `MatchRules` and `MatchOptions`
+  have `ore_grows`.
+* `ra9_data_parity.rs`: the audit of the new fields (R58 items 3 and 4).
+* `crates/game/src/sim_host.rs`, two tests: the first tick of a match also has the event of
+  its first crate.
+* The fixtures of RA1 to RA4 (`fixtures/data/ra1..ra4/rules.ron`): `ore_value` 1, `gem_value`
+  2, growth and spread at 0 permille, `ore_max_bails` a million, so that their matches hold
+  the ore they held; their crates stay on (minimum 1), and every test on them passes with
+  crates in their matches.
+
+New: `ra5_definitions.rs` (9 tests), `ra5_ore.rs` (19), `ra5_crates.rs` (18), `ra5_shipped.rs`
+(9), `crates/game/tests/ra5_gem_maps.rs` (3), one unit test in `map.rs`, and additions to the
+notices test. The fixture `fixtures/data/ra5` is the RA4 fixture with the ore and crates of
+RA5, a purifier and a spy.
+
+**The computer player** is unchanged. It takes crates only by chance, deploys a base unit a
+crate gives it (its rule of RA1), and never builds on ore (the placement check). Income fell
+(a load takes five times as long to gather; an ore cell holds 300 credits instead of 500),
+so matches are decided by smaller armies; how long they take is in the validation of RA5-A
+(`docs/validation/ra2-parity/ra5a/`) and in RA5's status entry.

@@ -526,30 +526,58 @@ fn appeared(events: &[SimEvent]) -> Vec<CellPos> {
 }
 
 #[test]
-fn a_match_starts_with_its_crates_and_replaces_a_taken_one_in_time() {
-    for seed in [1, 2, 3, 4, 5, 6] {
+fn a_match_starts_with_a_crate_that_lies_its_time_and_is_replaced_when_taken() {
+    let gone = |events: &[SimEvent]| -> Vec<CellPos> {
+        events
+            .iter()
+            .filter_map(|event| match event {
+                SimEvent::CrateGone { cell } => Some(*cell),
+                _ => None,
+            })
+            .collect()
+    };
+    let mut taken_once = 0;
+    for seed in [1, 2, 3, 4, 5, 6, 7, 8] {
         let mut app = match_with("match", &only("money"), &MatchOptions::default(), seed);
         assert!(crates(&app).is_empty(), "none before the first tick");
         let events = tick(&mut app, Vec::new());
         let cells = appeared(&events);
         assert_eq!(cells.len(), 1, "seed {seed}");
         assert_eq!(crates(&app), cells);
-        let cell = cells[0];
+        let first = cells[0];
         // The cell: land or water, with nothing on it.
         let grid = app.world().resource::<Grid>().clone();
-        let terrain = grid.cell(cell).expect("inside the map");
-        assert!(terrain.passable || terrain.water, "{cell:?}");
+        let terrain = grid.cell(first).expect("inside the map");
+        assert!(terrain.passable || terrain.water, "{first:?}");
         assert_eq!(terrain.ore, 0);
-        assert!(grid.building(cell).is_none() && grid.occupant(cell).is_none());
-        // Nothing more appears while it lies there.
-        let events = ticks(&mut app, 300);
-        assert!(appeared(&events).is_empty());
-        assert_eq!(crates(&app), [cell]);
-        if terrain.water || !terrain.passable {
+        assert!(grid.building(first).is_none() && grid.occupant(first).is_none());
+        // It lies 50 to 200 ticks (half to twice the rules' 100), counted from the tick it
+        // appeared in (index 0); nothing happens before, and in the tick its time is up it is
+        // gone and another appears.
+        let expires = app
+            .world()
+            .resource::<Crates>()
+            .expires(first)
+            .expect("a crate");
+        assert!((50..=200).contains(&expires), "seed {seed}: {expires}");
+        for index in 1..expires {
+            let events = tick(&mut app, Vec::new());
+            assert!(appeared(&events).is_empty() && gone(&events).is_empty());
+            assert_eq!(crates(&app), [first], "tick {index}");
+        }
+        let events = tick(&mut app, Vec::new());
+        assert_eq!(gone(&events), [first], "seed {seed}");
+        let second = appeared(&events);
+        assert_eq!(second.len(), 1);
+        assert_eq!(crates(&app), second);
+        let cell = second[0];
+        let now = expires + 1;
+        // A unit put beside the new crate takes it (scenario setup), if a tank can stand
+        // there; the replacement is due 50 to 200 ticks later and appears in exactly that tick.
+        let grid = app.world().resource::<Grid>().clone();
+        if !grid.is_passable(cell) {
             continue;
         }
-        // A unit put beside it takes it (scenario setup), and the replacement is due 50 to
-        // 200 ticks later and appears in exactly that tick.
         let free = [(1, 0), (-1, 0), (0, 1), (0, -1)]
             .into_iter()
             .map(|(dx, dy)| CellPos::new(cell.x + dx, cell.y + dy))
@@ -557,29 +585,41 @@ fn a_match_starts_with_its_crates_and_replaces_a_taken_one_in_time() {
         let Some(beside) = free else {
             continue;
         };
+        let lies_until = app
+            .world()
+            .resource::<Crates>()
+            .expires(cell)
+            .expect("a crate");
         let tank = spawn(&mut app, P0, "tank", beside.x, beside.y);
         let (_, ran) = fetch(&mut app, P0, tank, cell.x, cell.y);
-        let now = 301 + u64::from(ran);
+        let taken_in = now + u64::from(ran) - 1;
+        assert!(
+            taken_in < lies_until,
+            "the tank is there within a few ticks"
+        );
         let due = app.world().resource::<Crates>().due().to_vec();
         assert_eq!(due.len(), 1);
-        let wait = due[0] - (now - 1);
+        let wait = due[0] - taken_in;
         assert!((50..=200).contains(&wait), "seed {seed}: {wait}");
         assert!(crates(&app).is_empty());
-        let mut tick_index = now;
-        loop {
+        for index in taken_in + 1..due[0] {
             let events = tick(&mut app, Vec::new());
-            let new = appeared(&events);
-            if tick_index < due[0] {
-                assert!(new.is_empty(), "seed {seed}: early at {tick_index}");
-            } else {
-                assert_eq!(new.len(), 1, "seed {seed}: due at {}", due[0]);
-                assert_eq!(crates(&app), new);
-                break;
-            }
-            tick_index += 1;
+            assert!(
+                appeared(&events).is_empty(),
+                "seed {seed}: early at {index}"
+            );
+            assert!(gone(&events).is_empty(), "a taken crate is not gone twice");
         }
+        let events = tick(&mut app, Vec::new());
+        assert_eq!(appeared(&events).len(), 1, "seed {seed}: due at {}", due[0]);
+        assert_eq!(crates(&app), appeared(&events));
         assert!(app.world().resource::<Crates>().due().is_empty());
+        taken_once += 1;
     }
+    assert!(
+        taken_once >= 3,
+        "the second half of the test ran for {taken_once} seeds"
+    );
 }
 
 #[test]
@@ -594,9 +634,10 @@ fn no_crate_appears_with_the_option_off_or_without_a_match() {
     assert!(appeared(&events).is_empty());
     assert!(crates(&app).is_empty());
     assert_eq!(*app.world().resource::<Crates>(), Crates::default());
-    // The same match with the option on has one (the test can fail).
+    // The same match with the option on has one at a time (the test can fail).
     let mut app = match_with("crates_on", &[], &MatchOptions::default(), 1);
-    assert_eq!(appeared(&ticks(&mut app, 600)).len(), 1);
+    assert!(!appeared(&ticks(&mut app, 600)).is_empty());
+    assert_eq!(crates(&app).len(), 1);
     // A world without a match: the rule is on, and nothing appears.
     let mut app = world();
     spawn(&mut app, P0, "tank", 10, 10);
@@ -604,7 +645,7 @@ fn no_crate_appears_with_the_option_off_or_without_a_match() {
     assert!(appeared(&ticks(&mut app, 600)).is_empty());
     assert_eq!(*app.world().resource::<Crates>(), Crates::default());
     // A crate put down in a match with the option off is still a crate: the option decides
-    // what appears, not what a unit may take.
+    // what appears, not what a unit may take. It lies until it is taken, and is not replaced.
     let mut app = match_with("crates_off_put", &only("money"), &off, 1);
     tick(&mut app, Vec::new());
     let (mcv, _) = units_of(&mut app, P0)
@@ -613,15 +654,23 @@ fn no_crate_appears_with_the_option_off_or_without_a_match() {
         .expect("the base unit");
     let at = cell_of(&mut app, mcv);
     crate_at(&mut app, at.x + 2, at.y);
+    assert_eq!(
+        app.world()
+            .resource::<Crates>()
+            .expires(CellPos::new(at.x + 2, at.y)),
+        Some(u64::MAX)
+    );
+    ticks(&mut app, 500);
+    assert_eq!(crates(&app), [CellPos::new(at.x + 2, at.y)]);
     let ((who, content, _, _), _) = fetch(&mut app, P0, mcv, at.x + 2, at.y);
     assert_eq!((who, content), (mcv, CrateContent::Money));
-    // And it is not replaced.
     assert!(appeared(&ticks(&mut app, 400)).is_empty());
 }
 
 #[test]
 fn a_match_keeps_its_minimum_and_never_exceeds_its_maximum() {
-    // Three at the start with a minimum of 3 (the maximum is 3).
+    // Three at the start with a minimum of 3 (the maximum is 3), and three in every tick
+    // after it: one whose time is up is replaced in the same tick.
     let mut app = match_with(
         "three",
         &[("minimum: 1,", "minimum: 3,")],
@@ -630,11 +679,15 @@ fn a_match_keeps_its_minimum_and_never_exceeds_its_maximum() {
     );
     let events = tick(&mut app, Vec::new());
     assert_eq!(appeared(&events).len(), 3);
-    assert_eq!(crates(&app).len(), 3);
-    assert!(appeared(&ticks(&mut app, 600)).is_empty());
+    let mut moved = 0;
+    for _ in 0..600 {
+        moved += appeared(&tick(&mut app, Vec::new())).len();
+        assert_eq!(crates(&app).len(), 3);
+    }
+    assert!(moved >= 6, "every crate lay at most 200 ticks: {moved}");
     // A maximum of 2 with a minimum of 2, and a third put down by hand is over the maximum:
-    // when one is taken, two are left, which is the maximum, so the replacement that comes
-    // due is dropped.
+    // when that one is taken, two are left, which is the maximum, so the replacement that
+    // comes due for it is dropped, and there are never more than two again.
     let mut edits = only("money");
     edits.push(("minimum: 1,", "minimum: 2,"));
     edits.push(("maximum: 3,", "maximum: 2,"));
@@ -651,9 +704,10 @@ fn a_match_keeps_its_minimum_and_never_exceeds_its_maximum() {
     fetch(&mut app, P0, mcv, at.x + 2, at.y);
     assert_eq!(crates(&app).len(), 2);
     assert_eq!(app.world().resource::<Crates>().due().len(), 1);
-    let events = ticks(&mut app, 400);
-    assert!(appeared(&events).is_empty());
-    assert_eq!(crates(&app).len(), 2);
+    for _ in 0..400 {
+        tick(&mut app, Vec::new());
+        assert_eq!(crates(&app).len(), 2);
+    }
     assert!(app.world().resource::<Crates>().due().is_empty());
     // No crates at all with a maximum of 0.
     let mut app = match_with(
@@ -666,6 +720,41 @@ fn a_match_keeps_its_minimum_and_never_exceeds_its_maximum() {
         4,
     );
     assert!(appeared(&ticks(&mut app, 300)).is_empty());
+}
+
+#[test]
+fn a_crate_under_a_new_building_is_gone_and_replaced_at_once() {
+    // No starting units, so that the cells beside the base unit are free.
+    let options = MatchOptions {
+        unit_count: Some(0),
+        ..MatchOptions::default()
+    };
+    let mut app = match_with("built_over", &[], &options, 2);
+    tick(&mut app, Vec::new());
+    // A crate put down beside P0's base unit, and a building placed on it (scenario setup;
+    // a placement by command does not look at crates either).
+    let (mcv, _) = units_of(&mut app, P0)
+        .into_iter()
+        .find(|(_, kind)| kind == "allied_mcv")
+        .expect("the base unit");
+    let at = cell_of(&mut app, mcv);
+    let first = crates(&app);
+    crate_at(&mut app, at.x + 3, at.y);
+    assert_eq!(crates(&app).len(), 2);
+    place(&mut app, P0, "turret", at.x + 3, at.y);
+    let events = tick(&mut app, Vec::new());
+    assert!(
+        events
+            .iter()
+            .any(|event| matches!(event, SimEvent::CrateGone { cell } if *cell == CellPos::new(at.x + 3, at.y)))
+    );
+    // The lost crate is replaced in the same tick, somewhere a crate may lie.
+    let now = crates(&app);
+    assert_eq!(now.len(), 2);
+    assert!(!now.contains(&CellPos::new(at.x + 3, at.y)));
+    assert!(first.iter().all(|cell| now.contains(cell)));
+    let grid = app.world().resource::<Grid>();
+    assert!(now.iter().all(|&cell| grid.building(cell).is_none()));
 }
 
 // --- Determinism and the state hash ----------------------------------------------------------
@@ -742,12 +831,6 @@ fn a_match_of_computer_players_with_crates_and_growing_ore_is_deterministic() {
     assert_eq!(again.0, hashes);
     assert_eq!(again.1, took);
     assert!(came >= 1);
-    // Every crate that was taken was replaced or is due; none appeared out of nothing.
-    assert!(
-        came <= 1 + took.len(),
-        "{came} crates for {} taken",
-        took.len()
-    );
     let other = run(12);
     assert_ne!(other.0, hashes);
 }
