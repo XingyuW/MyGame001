@@ -4103,9 +4103,10 @@ not independently reviewed or approved.
   cannot destroy huts. The default-on `bridge_destruction` match option is hashed and exposed
   in the lobby; its new row changes the rules panel from eight to nine rows. Nobody acquires
   neutral props or tech buildings as autonomous weapon targets.
-- AI bridge recovery reads only currently visible collapsed decks and huts, produces an
-  ordinary Engineer, and issues Interact. A shipped-rule Brutal match regression commands the
-  collapse of the sole route through a full-height water barrier, observes an Engineer consumed
+- AI bridge recovery learns collapsed decks and huts only through current sight, retains that
+  knowledge after sight is lost, and produces an ordinary Engineer. It approaches remembered
+  huts with Move and requires current hut/deck sight for Interact (R69). A shipped-rule Brutal
+  match regression commands the collapse of the sole route through a full-height water barrier, observes an Engineer consumed
   in repair and ground forces crossing, and requires a winner within the unchanged 72,000
   ticks, without aircraft or alternate land paths. Occupied civilian targets enter the existing
   visibility-filtered AI building snapshots.
@@ -4288,3 +4289,50 @@ its exactly-one-edit and rejection assertions are unchanged. These three targets
 before the final full gate. All other simulation targets, including the fixture AI sweeps and
 all new RA5 behavior tests, passed. No runtime code changed after the winning attempt-four
 production sweep.
+
+
+**Exact intended test-expectation ledger (RA5-B).** These are explicit expectation migrations;
+all other checks inside the named tests remain, and no test is deleted or ignored.
+
+- `crates/sim/tests/ra1_definitions.rs::every_field_of_the_arsenal_file_is_required` uses
+  schema 6, adds all thirteen required fields, and anchors `, docks` to avoid matching
+  `vehicle_docks`. `unknown_and_duplicate_fields_are_rejected_in_every_file` uses schema-6
+  mutation input; `other_schema_versions_are_rejected_in_every_file` rejects the old version 5
+  and future version 7. Their `arsenal_of` fixture helper emits schema 6 as well.
+- `crates/sim/tests/ra2_definitions.rs::the_fixture_loads_with_the_traits_of_schema_version_3`,
+  `ra3_definitions.rs::the_fixture_loads_with_the_traits_of_schema_version_4`, and
+  `ra4_definitions.rs::the_fixture_loads_with_the_traits_of_schema_version_5` assert current
+  schema 6 while preserving their complete older-trait assertions.
+- `crates/sim/tests/ra4_definitions.rs::a_trait_of_a_unit_on_a_building_and_docks_on_a_unit_are_rejected`
+  anchors `, docks: 0` so exactly the aircraft-dock field is mutated; the one-edit and invalid
+  unit-trait rejection checks are unchanged.
+- `crates/sim/tests/m1_map.rs::the_optional_look_property_is_presentation_data_per_cell` is
+  renamed `the_optional_look_property_preserves_terrain_and_retains_world_objects`: pure-ground
+  look 15 retains exact Grid equality, maximum look 255 has three exact feature-15 anchors,
+  and clearing only that metadata restores exact terrain equality. Invalid byte bounds remain.
+- `crates/game/tests/m13_grown_maps.rs::every_shipped_map_grows_with_every_player_count` adds
+  the exact discrete-anchor apron/water branch before its existing terrain/start/symmetry
+  assertions. Repeated tech/hut foundations are not repeated buildings; all other cells retain
+  the original checks. The companion new `ra5_all_large_maps_have_symmetric_tech_and_real_objects_after_two_to_ten_player_scaling`
+  supplies the plan's new object-specific symmetry/setup coverage; existing `m7_maps` reachability
+  and mirrored-terrain tests remain unchanged.
+- `crates/game/src/sim_host.rs::menu_matches_ally_the_computer_players_and_install_speed_and_scenery`
+  distinguishes passable intact bridge decks from blocked civilian props, requiring the exact
+  passability for each kind after the shared installer now includes both.
+- `crates/game/src/skirmish.rs::the_menu_and_its_longest_texts_fit_the_smallest_window` expects
+  17 distinct rows after adding Bridge Destruction; every window/text fit check remains.
+  `crates/game/src/smoke.rs::a_run_passes_only_with_the_menu_laid_out_the_cards_listed_and_the_flow_checked`
+  expects 75 menu buttons for that added row and keeps its flow/layout failures.
+- `skirmish.rs::every_on_off_row_sets_its_option_of_the_match_and_no_other`,
+  `smoke.rs::the_flows_menu_presses_choose_its_matches_and_restore_the_lobby`, and
+  `crates/sim/tests/ra1_shipped.rs::the_default_match_is_that_of_red_alert_2s_lobby` extend their
+  option expectations to default-on bridge destruction without changing existing options.
+  `skirmish.rs::every_production_data_file_loads_passes_cross_validation_and_is_licensed` adds
+  the new original crate texture to the exact known asset inventory.
+
+The unchanged `every_hd_unit_facing_and_building_has_team_accents` test was fixed by generated
+art, not by changing its 32-pixel requirement. The final gate has 1,018 static test attributes
+(984 at RA5-A closure), 1,024 runtime passes because shared modules execute in multiple targets,
+zero failures and zero ignores. All thirteen commands passed on source `6d6de28`; only closure
+documentation and validation records follow that source. Duel wall time is the runner's recorded
+19,122 seconds, not a CPU-time measurement.

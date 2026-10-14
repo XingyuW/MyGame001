@@ -1,0 +1,14 @@
+01 exit 0  1 s  cargo fmt --all -- --check
+02 exit 0  0 s  git diff --check
+03 exit 0  0 s  cargo clippy --workspace --all-targets -- -D warnings
+04 exit 0  5579 s  cargo test --workspace --release  [1024 passed, 0 failed, 0 ignored]
+05 exit 0  0 s  cargo build --release -p game
+06 exit 0  16 s  cargo run --release -p game -- --smoke-test 600
+07 exit 0  102 s  cargo run -p game -- --smoke-test 600
+08 exit 0  1 s  cargo run --release -p sim --example m7_benchmark
+09 exit 0  4155 s  cargo run --release -p sim --example m7_soak
+10 exit 0  19122 s  cargo run --release -p sim --example m14_duels -- full
+11 exit 0  20 s  sh scripts/package_macos.sh
+12 exit 0  0 s  python3 scripts/generate_ra2_data.py --check
+13 exit 0  0 s  python3 scripts/ra2_reference.py --check
+validation ra5: PASSED

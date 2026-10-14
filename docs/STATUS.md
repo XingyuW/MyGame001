@@ -1045,6 +1045,120 @@ external directory, clone, worktree, validation copy or substantial temporary ar
 created; no repository/worktree was deleted. The package script uses its existing transient
 empty working directory only.
 
+### RA5 complete: economy and world objects (2026-10-14)
+
+**Validated, not independently reviewed or approved.** Continuation Steps 0 and 1, all RA5
+items 1–9, are complete. RA5-A closure above remains the historical first gate for items 1–4;
+this combined entry supersedes its remaining-RA5-B scope. RA6–RA9 and final independent review
+remain outstanding. Decisions R58–R64 cover the inherited economy/crate work; R65–R70 cover
+world objects, integration, assumptions, fixes and the exact named expectation-change ledger.
+
+**Combined scope.**
+
+1. Ore/gem bails, side-specific miner storage and refinery values, purifier bonus, deterministic
+   growth/spread, the `ore_grows` option, side-correct free miners and Chrono Miner self-healing.
+2. Deterministic optional crates: money, units/FreeMCV, healing, veteran, armour/firepower/speed
+   and reveal effects; gem appearance and pickup notices. RA5-A's scaled wave patience and
+   arrival-aware retry fixes, Thousand Lakes seed-0 and ten-player Crossroads regressions remain.
+3. Reserved neutral owner 255 has no player/team, defeat or victory entry. Engineers capture
+   the four NeedsEngineer/Unsellable tech buildings; Insignificant structures never prolong
+   defeat. Oil Derrick pays 1000 on neutral capture then 20/133 ticks; Hospital heals entered
+   infantry 20/tick; Tech Outpost has one paid vehicle berth separate from air docks. Airport
+   ownership is installed; its paradrop hookup is deliberately RA6 scope.
+4. Destructible civilian House/City/Tower props accept GI/Conscript Occupiers at capacities
+   3/10/10, fire reference occupation weapons with reload divided by crew, reject entry and
+   evacuate at red health, and support Deploy evacuation, ownership-aware selection and pips.
+5. Connected bridge runs share 1500 HP, collapse to water and restore through a consumed
+   Engineer at an indestructible repair hut. `bridge_destruction` is default-on and in the lobby.
+   AI never autonomously targets neutral objects; seen repair objectives survive loss of sight,
+   with ordinary Move then currently visible Interact. Sole-route and fog-loss regressions
+   require consumed repair, ground crossing and a winner without alternative land or air paths.
+6. Schema-2 maps allocate looks 11/12/13/14/15 to Derrick/Hospital/Airport/Outpost/Hut. All 18
+   large maps have symmetric tech/huts; 2–10-player scaling preserves discrete object identity,
+   reachability and start sites. Demo/Crossroads/Riverlands layout coordinates remain. Shared
+   setup retains semantic looks in Grid, so client, production matches, soak and duels install
+   actual world objects. New original Blender tech/hut sprites and generated gem/crate art are
+   licensed; neutral/captured colors, bridge states and occupation effects are presented.
+
+Arsenal schema 6 and all legacy/RA1–RA5 fixtures include thirteen required audited fields.
+The reference table has 4934 rows; all RA5 deferred rows are removed. The reference base roster
+is still **43 units / 29 buildings**, with eight supplementary world-object definitions counted
+separately. `arsenal.ron` is **126827 bytes**, only **4245 bytes below** the unchanged 128KiB parser
+limit; RA6 must plan its additions without silently raising the limit or weakening oversized-file
+coverage. Generated data retains source comments and is reproduced from reference tables.
+
+**Authoritative gate.** All thirteen commands passed on frozen implementation `6d6de28`;
+only this closure, R70's exact function-name ledger and validation records were completed later.
+Logs: `docs/validation/ra2-parity/ra5/`. Runtime **1024 passed / 0 failed / 0 ignored**;
+static test attributes **1018**, versus 984 at RA5-A closure (shared modules run in multiple
+targets). No test was deleted, skipped or weakened. Named intended migrations are in R70.
+
+| # | Command | Exit | Seconds / evidence |
+|---|---|---:|---|
+| 1 | `cargo fmt --all -- --check` | 0 | 1 |
+| 2 | `git diff --check` | 0 | 0 |
+| 3 | `cargo clippy --workspace --all-targets -- -D warnings` | 0 | 0 |
+| 4 | `cargo test --workspace --release` | 0 | 5579; 1024 passed |
+| 5 | `cargo build --release -p game` | 0 | 0 |
+| 6 | `cargo run --release -p game -- --smoke-test 600` | 0 | 16 |
+| 7 | `cargo run -p game -- --smoke-test 600` | 0 | 102 |
+| 8 | `cargo run --release -p sim --example m7_benchmark` | 0 | 1; fixture mean/max 0.098/0.926 ms, shipped 0.223/5.189 ms; peak 1.4 MiB |
+| 9 | `cargo run --release -p sim --example m7_soak` | 0 | 4155; 260 configurations twice, 18,720,000 ticks, peak 222.1 MiB |
+| 10 | `cargo run --release -p sim --example m14_duels -- full` | 0 | 19122; 756/756 winners |
+| 11 | `sh scripts/package_macos.sh` | 0 | 20; app/zip and packaged smoke600 |
+| 12 | `python3 scripts/generate_ra2_data.py --check` | 0 | 0 |
+| 13 | `python3 scripts/ra2_reference.py --check` | 0 | 0; 4934 rows match cached reference |
+
+Times are the runner's wall measurements, including the recorded 19122s duel duration; they are
+not CPU-time measurements. The benchmark remains inside mean 5 ms / max 50 ms / heap 1024 MiB limits.
+The existing winit shutdown warning recurs. The soak's fixed windows may end in the next
+restarted match; its winner, replay-determinism and memory checks passed. No limit increased.
+
+**Match lengths.** Ratios use unchanged scaled test limits; median averages the central pair,
+p90 is nearest rank. Production TSV and exact distributions are preserved alongside the logs.
+
+| Sample | Winners | Total ticks | Median | p90 | Maximum | Counts >0.5 / >0.7 / >0.8 / >0.9 |
+|---|---:|---:|---:|---:|---:|---|
+| Final workspace production sweep | 756 | 27,606,823 | 0.1323229167 | 0.3186944444 | 0.7095694444 | 20 / 1 / 0 / 0 |
+| Final full duel example | 756 | 28,159,459 | 0.1390937500 | 0.3121031746 | 0.8229027778 | 18 / 5 / 1 / 0 |
+
+Production's maximum ratio is Riverlands France/Germany easy, 51089/72000; its longest is
+Coral Archipelago Libya/Germany brutal seed 0, 196067/288000. Duel maximum ratio is Demo
+America/Korea easy, 59249/72000; longest is Ember Caldera France medium/Libya easy, 221221/288000.
+The separate example hard cap 300000 is unchanged. These samples do not prove every seed wins.
+
+**Evidence and decisions.** Attempts 1–4 remain preserved. They exposed missing garrison-to-garrison
+fire, unsafe bridge restoration around naval occupancy, inactive deep rule copies, a real
+Coral bridge/fog stalemate, missing hut ownership paint and intended legacy test migrations.
+Each was fixed with regression or exact expectation evidence before the final full rerun.
+Negative mutations prove startup income, sole-route repair and remembered unseen-hut Move;
+state-hash sensitivity and deterministic replay cover cash timers, bridge HP/decks/links/collapse,
+hospital cargo, garrison ownership/reload/cargo and AI bridge memory. No self-review approval.
+
+**Assumptions, debt and RA6 handoff.** Representative civilian mappings, one-cell tech anchors,
+pier hut foundations, mixed-crew weapon choice, no occupation-kill crew XP and hospital patients
+lost on enemy capture/destruction are explicit R65–R66 assumptions. R67's repair refusal while
+naval holders occupy or reserve deck cells preserves both ship and Engineer; air/amphibious
+occupants remain valid. This is a simulation assumption, not verified RA2 engine behavior, and
+must remain in RA9/final differences. RA6 should use `world_objects`, `Bridges` and
+`SpecialState::garrisons`/existing cargo; preserve shared setup, neutral ownership and all hashed
+state. Wire Airport paradrops without treating neutral NeedsEngineer buildings as active.
+Preserve R64/R69 AI fixes and the independent air/vehicle dock counts. Fog remains current-vision
+until RA7's explicit option. Broader AI/stress work and existing debt remain RA8/RA9 scope.
+
+**Requires user verification:** all new tech/hut/gem/crate art, neutral/captured contrast,
+garrison pips, bridge visual changes, occupation/audio feedback, readability and play feel.
+Passing smoke tests and local image inspection do not establish artistic acceptance.
+
+**Storage.** Reused configured `/Users/xingyuwang/Library/Caches/Codex/cargo-target`, including
+`package/MyGame001.app` and `package/MyGame001-macos.zip`; preserved UV/PIP caches. The only new
+substantial external directory is `/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra5b-render`
+(ten original Blender passes, about 880 KiB), retained for reproducibility and visual verification.
+A temporary mutation backup there was removed after exact SHA restoration. An initial /tmp
+backup command was rejected before execution; the safe cache-backed retry succeeded. No clone,
+worktree, build output or substantial artifact was created under /tmp, and no repository or
+worktree was deleted.
+
 ## Repair, aircraft overflight, new music and distinct silhouettes (2026-10-06)
 
 Working-tree follow-up (decisions: "Building repair, aircraft overflight, readable silhouettes"
