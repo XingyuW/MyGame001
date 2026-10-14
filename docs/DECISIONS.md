@@ -4476,3 +4476,15 @@ those mechanisms are not claimed complete here. Optional radiation source presen
 hashed, so no source and source SimId(0) differ. All timers, charge, erasure, disguise, sites,
 control and infiltration/build-limit state are ordered and hashed. R67's ship-blocked bridge
 repair remains an explicit final difference, and no RA5 AI repair/assembly fix is removed.
+
+### R75. Specialist weapons participate in the presentation inventory
+
+**2026-10-14.** The first frozen RA6-A gate on372d48c passed commands1–3 and5–8,
+but command4 stopped at the unchanged
+`weapon_fx::tests::the_shipped_combat_file_classifies_light_and_electricity`: newly ported
+MakeupKit had no explicit visual class. The complete new weapon inventory now maps AssaultBolt
+to Tesla, RadEruptionWeapon to Radiation, PsiWave to Psychic, and MakeupKit/DefuseKit/Sapper/
+FakeC4 to Trigger. Utility interactions never emit ordinary fire events, but their definitions
+still have an explicit class. The existing test and its no-fallback assertion are unchanged.
+The failed gate logs remain in `docs/validation/ra2-parity/ra6a-attempt1`; the full required
+gate restarts on the corrected source. Visual/audio acceptance still needs user verification.
