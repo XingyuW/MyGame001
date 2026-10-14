@@ -4172,3 +4172,28 @@ source SHA-256 values equal the restored values. Focused deterministic replay co
 state hashes across two capture/hospital runs; separate sensitivity checks cover cash host and
 deadline, bridge HP/collapse/saved decks/hut links, hospital cargo HP and garrison owner/location/
 reload/eviction/cargo HP. The full required-field matrix includes all thirteen new fields.
+
+### R67. RA5 occupied-building targets and safe bridge restoration
+
+A completeness check during the first RA5 gate found that garrison firing enumerated ECS
+actors but not enemy occupied civilian Props. A commanded GI/Conscript two-house regression
+failed with neither garrison firing; the retained log is in `ra5-attempt-1/`. Garrison target
+selection now includes living hostile occupied Props using current visibility, hidden-target
+rejection, their armour and the ordinary occupation weapon/warhead eligibility. All candidates
+share the same distance/SimId tie break. Neutral civilian buildings remain autonomous non-targets.
+The full gate was stopped during its production sweep; completed targets passed, but that
+incomplete run is not authoritative.
+
+Bridge restoration must preserve the simulation's single surface layer. A naval unit may be
+standing in collapsed water or hold it as an in-flight step destination; restoring land under
+it would violate navigation. Repair therefore refuses while any deck cell has a naval holder,
+including reserved destinations. The Engineer and ship remain intact. Validation repeats while
+the Engineer approaches and immediately before restoration, so a later entering ship cancels
+the pending interaction. After clearance, a new ordinary Interact restores the bridge and
+consumes the Engineer. Air and amphibious occupants remain valid and undamaged. Tests cover
+stationary, entering and post-order arrival cases, clearance, and compatible occupants.
+
+This refusal policy is an explicit simulation assumption, **not a verified RA2 engine fact**;
+RA9 and the final differences report must retain it. It avoids inventing ship destruction or
+teleportation to fit the one-layer grid. It has no ini scalar to add to the generated-data
+exception table. No match limit or existing assertion is relaxed.

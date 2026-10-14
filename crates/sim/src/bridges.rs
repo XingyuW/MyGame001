@@ -207,18 +207,26 @@ pub(crate) fn install(world: &mut World) {
 
 pub(crate) fn validate_repair(world: &World, hut: SimId) -> Result<(), crate::RejectReason> {
     let state = world.resource::<Bridges>();
-    if state
+    let bridge = state
         .huts
         .get(&hut)
         .and_then(|id| state.bridges.get(id))
-        .is_some_and(|b| b.collapsed)
-    {
-        Ok(())
-    } else {
-        Err(crate::special::unavailable(
-            "This hut has no collapsed bridge",
-        ))
+        .filter(|b| b.collapsed)
+        .ok_or_else(|| crate::special::unavailable("This hut has no collapsed bridge"))?;
+    let grid = world.resource::<Grid>();
+    // A holder includes both its current cell and a reserved step destination. Keep ships
+    // and the Engineer intact until restoration can preserve their navigation domain.
+    if bridge.cells.iter().any(|&cell| {
+        grid.holders_for(cell, crate::Domain::Land)
+            .into_iter()
+            .flatten()
+            .any(|id| grid.domain_of(id) == crate::Domain::Naval)
+    }) {
+        return Err(crate::special::unavailable(
+            "Ships must clear the collapsed bridge before repair",
+        ));
     }
+    Ok(())
 }
 pub(crate) fn repair(
     world: &mut World,
