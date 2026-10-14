@@ -4197,3 +4197,19 @@ This refusal policy is an explicit simulation assumption, **not a verified RA2 e
 RA9 and the final differences report must retain it. It avoids inventing ship destruction or
 teleportation to fit the one-layer grid. It has no ini scalar to add to the generated-data
 exception table. No match limit or existing assertion is relaxed.
+
+### R68. RA5 inactive world-object systems avoid deep rule copies
+
+The new garrison fire/cleanup and capture-income advance paths cloned `Definitions` before
+checking whether they had work. `Definitions` owns vectors and strings, so this made three deep
+copies every tick even in an ordinary AI match with no garrison or captured derrick. The first
+two gate attempts' multi-enemy target took about 330 seconds against RA5-A's 120 seconds.
+Return before the clone when the corresponding state map is empty. Active behavior, state and
+ordering are unchanged; no old system is refactored. Other new paths clone only when installing
+objects or copy their small live state, and do not add an equivalent inactive ruleset copy.
+
+Attempt two was stopped in the production sweep with no observed test failure and is retained
+in `ra5-attempt-2/`. The 22 focused world-object tests pass. The replay test prints a digest of
+its 141 state checkpoints; `ra5-empty-state-equivalence/` compares the unoptimized and optimized
+sources, requires both runs to pass and their digests to match, and records exact source
+restoration. The complete final gate reruns all thirteen commands after this change.

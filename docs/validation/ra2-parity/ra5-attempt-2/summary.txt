@@ -1,0 +1,4 @@
+01 exit 0  1 s  cargo fmt --all -- --check
+02 exit 0  0 s  git diff --check
+03 exit 0  0 s  cargo clippy --workspace --all-targets -- -D warnings
+Stopped during command04 production sweep after profiling by code inspection found three unconditional full Definitions clones per inactive tick. No failures observed; superseded by final ra5 gate after empty-state early returns.

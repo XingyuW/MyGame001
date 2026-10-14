@@ -1434,7 +1434,17 @@ fn ra5_bridge_collapse_and_hospital_cargo_change_hash_and_replay_deterministical
         assert_eq!(credits(&app, P0), 11_020);
         hashes
     }
-    assert_eq!(replay(), replay());
+    let first = replay();
+    assert_eq!(first, replay());
+    let mut digest = sim::Fnv1a64::new();
+    for hash in &first {
+        digest.write_u64(*hash);
+    }
+    println!(
+        "RA5 replay: {} checkpoints, digest {:016x}",
+        first.len(),
+        digest.finish()
+    );
 }
 
 #[test]

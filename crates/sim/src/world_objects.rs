@@ -127,6 +127,9 @@ pub(crate) fn captured(
 }
 
 pub(crate) fn advance(world: &mut World) {
+    if world.resource::<WorldObjects>().cash_due.is_empty() {
+        return;
+    }
     let definitions = world.resource::<Definitions>().clone();
     let tick = world.resource::<crate::SimTick>().0;
     let index: std::collections::BTreeMap<_, _> = world
