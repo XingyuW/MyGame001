@@ -351,6 +351,9 @@ fn known_to(world: &World, defs: &Definitions, p: PlayerId, a: &Actor) -> bool {
 }
 /// A launched missile or carried aircraft takes no commands (RA4).
 fn commandable(world: &World, id: SimId) -> Result<(), RejectReason> {
+    if world.resource::<SpecialState>().erasures.contains_key(&id) {
+        return Err(unavailable("Target is being erased"));
+    }
     if world.resource::<SpecialState>().spawned.contains_key(&id) {
         return Err(RejectReason::NotCommandable(id));
     }
@@ -386,3 +389,6 @@ pub(crate) use resolve::resolve;
 pub use state::{Passenger, SpecialState, Zone};
 pub(crate) use transport::unload;
 use transport::unload_ready;
+
+pub(crate) mod infantry;
+pub(crate) mod radiation;

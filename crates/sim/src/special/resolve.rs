@@ -23,6 +23,13 @@ pub(crate) fn resolve(world: &mut World) {
             let Some(a) = index.get(&attacker) else {
                 continue;
             };
+            if defs.rules().is_some()
+                && world
+                    .get::<Health>(a.entity)
+                    .is_none_or(|h| h.hit_points <= 0)
+            {
+                continue;
+            }
             // RA4: ammunition, launchers and the surfacing of a cloaked unit, for every shot,
             // whatever it is fired at (scenery is no actor).
             crate::flight::fired(world, &defs, a, target, weapon, tick);
@@ -32,6 +39,9 @@ pub(crate) fn resolve(world: &mut World) {
             let Some(meta) = defs.metadata(a.item) else {
                 continue;
             };
+            if defs.rules().is_some() && infantry::fired(world, &defs, a, b, weapon) {
+                continue;
+            }
             match meta.role {
                 Role::MindControl if b.foot.is_none() => {
                     if !world
@@ -68,6 +78,12 @@ pub(crate) fn resolve(world: &mut World) {
                         .or_insert((tick.saturating_add(delay), meta.strength, meta.radius));
                 }
                 Role::Suicide => {
+                    if defs.rules().is_some() {
+                        world
+                            .resource_mut::<SpecialState>()
+                            .death_detonated
+                            .insert(a.id);
+                    }
                     // With a rules file the blast is the impact of the unit's own weapon where
                     // it stands (`combat` deals no other damage for the shot).
                     let own = defs
@@ -174,6 +190,7 @@ pub(crate) fn resolve(world: &mut World) {
             }
         }
     }
+    infantry::resolve(world, &defs);
     let bombs = world.resource::<SpecialState>().bombs.clone();
     for (id, (due, damage, radius)) in bombs {
         if due <= tick || !index.contains_key(&id) {
@@ -219,4 +236,5 @@ pub(crate) fn resolve(world: &mut World) {
         z.remaining = z.remaining.saturating_sub(1);
     }
     s.zones.retain(|z| z.remaining > 0);
+    infantry::finish_deaths(world, &defs);
 }

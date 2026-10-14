@@ -1179,3 +1179,119 @@ fn ra5_garrison_destroyed_earlier_in_the_command_tick_cannot_deploy() {
         "{events:?}"
     );
 }
+
+#[test]
+fn ra6_shipped_interaction_targets_hidden_unseen_and_missing_have_identical_answers() {
+    for actor_type in [
+        "spy",
+        "engineer",
+        "tanya",
+        "crazy_ivan",
+        "tesla_trooper",
+        "gi",
+    ] {
+        for hidden in [false, true] {
+            let mut app = shipped_world();
+            let actor = spawn(&mut app, P0, actor_type, 3, 3);
+            let target = spawn(
+                &mut app,
+                P1,
+                "spy",
+                if hidden { 5 } else { 40 },
+                if hidden { 3 } else { 40 },
+            );
+            ticks(&mut app, 2);
+            if hidden {
+                app.world_mut()
+                    .resource_mut::<SpecialState>()
+                    .hidden
+                    .insert((P0, target));
+            }
+            let events = tick(
+                &mut app,
+                vec![issue(
+                    P0,
+                    Command::Interact {
+                        unit: actor,
+                        target,
+                    },
+                )],
+            );
+            assert_eq!(
+                rejections(&events),
+                [RejectReason::UnknownTarget(target)],
+                "{actor_type} hidden {hidden}: {events:?}"
+            );
+            let missing = SimId(u32::MAX - 1);
+            let events = tick(
+                &mut app,
+                vec![issue(
+                    P0,
+                    Command::Interact {
+                        unit: actor,
+                        target: missing,
+                    },
+                )],
+            );
+            assert_eq!(
+                rejections(&events),
+                [RejectReason::UnknownTarget(missing)],
+                "{actor_type}"
+            );
+        }
+    }
+}
+
+#[test]
+fn ra6_shipped_specialists_and_transport_passengers_cannot_act_after_same_tick_death() {
+    for actor_type in [
+        "gi",
+        "spy",
+        "engineer",
+        "tanya",
+        "crazy_ivan",
+        "tesla_trooper",
+        "chrono_legionnaire",
+        "yuri",
+        "desolator",
+        "terrorist",
+    ] {
+        let mut app = shipped_world();
+        let silo = charged(&mut app, P1, "nuclear_silo", 1, 1);
+        place(&mut app, P1, "power_plant", 24, 20);
+        let transport = spawn(&mut app, P0, "amphibious_transport", 21, 20);
+        let actor = spawn(&mut app, P0, actor_type, 20, 20);
+        ticks(&mut app, 2);
+        set_hp(&mut app, actor, 1);
+        let events = tick(
+            &mut app,
+            vec![
+                fire(P1, silo, (20, 20)),
+                issue(P0, Command::Deploy { unit: actor }),
+                issue(
+                    P0,
+                    Command::Interact {
+                        unit: actor,
+                        target: transport,
+                    },
+                ),
+            ],
+        );
+        assert_eq!(
+            rejections(&events),
+            [
+                RejectReason::UnknownUnit(actor),
+                RejectReason::UnknownUnit(actor)
+            ],
+            "{actor_type}: {events:?}"
+        );
+        assert!(
+            !app.world()
+                .resource::<SpecialState>()
+                .cargo
+                .values()
+                .flatten()
+                .any(|p| p.id == actor)
+        );
+    }
+}

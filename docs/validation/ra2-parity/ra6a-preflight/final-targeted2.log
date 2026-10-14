@@ -1,0 +1,227 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.60s
+     Running tests/m11_repair.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m11_repair-93da0b8f2c89f038)
+
+running 4 tests
+test selling_a_building_under_repair_ends_the_repair ... ok
+test a_second_repair_order_stops_the_repair ... ok
+test only_the_owner_may_repair_and_a_broke_player_waits_for_credits ... ok
+test repair_restores_a_building_for_a_quarter_of_its_price_and_then_stops ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/m4_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m4_definitions-6d5656a5a13c01ac)
+
+running 16 tests
+test an_economy_file_loaded_after_the_combat_file_removes_it ... ok
+test names_are_checked ... ok
+test schema_versions_other_than_4_are_rejected ... ok
+test the_fixture_loads_with_every_field ... ok
+test references_must_name_defined_entries ... ok
+test every_type_and_armour_class_needs_exactly_one_entry ... ok
+test list_lengths_are_bounded ... ok
+test effects_name_known_effects_once_with_a_damage_and_a_warhead ... ok
+test unreadable_oversized_and_special_files_are_rejected ... ok
+test every_field_of_schema_version_2_is_required ... ok
+test the_rules_between_the_fields_of_schema_version_2_are_checked ... ok
+test every_field_is_required_and_unknown_fields_are_rejected ... ok
+test numeric_fields_accept_their_limits_and_reject_beyond ... ok
+test the_fields_of_schema_version_2_accept_their_limits_and_reject_beyond ... ok
+test truncations_of_the_fixture_are_rejected_without_panic ... ok
+test seeded_mutations_of_the_fixture_load_or_return_a_typed_error ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.14s
+
+     Running tests/m9_arsenal.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m9_arsenal-d7f14e6ca9075c3b)
+
+running 24 tests
+test exact_unified_roster_and_categories ... ok
+test anti_air_defence_ignores_ground_and_stops_without_power ... ok
+test carrier_launches_and_recovers_real_aircraft_without_airbase ... ok
+test gap_satellite_and_direct_vision_use_the_existing_fog_grid ... ok
+test aircraft_strike_returns_to_air_facility_and_rearms ... ok
+test deterministic_extended_state_includes_abilities ... ok
+test lost_prerequisites_pause_queued_progress_and_refund_exactly ... ok
+test cloning_produces_one_extra_infantry_without_recursive_clones ... ok
+test mind_control_reverts_when_controller_is_destroyed ... ok
+test mcv_deploys_and_new_yard_produces ... ok
+test aircraft_fly_over_ground_units_and_ground_units_drive_under_them ... ok
+test spy_infiltration_steals_refinery_credits_and_dogs_reveal_spies ... ok
+test purifier_adds_income_and_radiation_spares_air_and_its_operator ... ok
+test a_clone_goes_to_the_rally_point_of_the_cloning_vats ... ok
+test power_loss_disables_defence_and_pauses_superweapon_charging ... ok
+test prerequisites_refunds_ready_cancellation_and_low_power ... ok
+test transport_ifv_and_engineer_commands_execute ... ok
+test timed_explosives_radiation_and_vehicle_disable_have_effects ... ok
+test collectors_deliver_and_chrono_miner_teleports ... ok
+test shoreline_and_domain_navigation_are_enforced ... ok
+test ore_attack_orders_repeat_deliveries_remember_field_and_stop_on_override ... ok
+test super_me_every_item_costs_one_and_finishes_in_tenth_time ... ok
+test superweapons_charge_activate_and_reset_without_resource_duplication ... ok
+test every_item_executes_queue_cost_completion_and_placement_or_spawn ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.81s
+
+     Running tests/ra1_commands.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra1_commands-d1493c86e1332afc)
+
+running 21 tests
+test a_building_destroyed_by_a_strike_is_not_sold_repaired_or_given_a_rally_point ... ok
+test a_seen_enemy_is_reported_as_not_owned ... ok
+test a_base_unit_destroyed_by_a_strike_is_not_deployed_in_the_same_tick ... ok
+test a_weak_yard_dies_in_the_strike ... ok
+test a_building_destroyed_by_a_strike_is_not_captured_by_an_engineer_who_arrives_in_that_tick ... ok
+test a_unit_destroyed_by_a_strike_takes_no_order_and_is_no_target_in_the_same_tick ... ok
+test a_silo_destroyed_by_a_strike_does_not_fire_in_the_same_tick ... ok
+test a_unit_destroyed_by_a_strike_does_not_embark_and_a_destroyed_transport_takes_nobody ... ok
+test an_engineer_who_arrives_captures_a_building_that_stands ... ok
+test a_destroyed_building_is_no_prerequisite_and_no_anchor_in_the_same_tick ... ok
+test deploying_names_nothing_in_a_footprint_the_player_does_not_see ... ok
+test every_command_answers_for_a_submerged_enemy_as_for_an_id_that_names_nothing ... ok
+test every_command_answers_for_an_unseen_enemy_as_for_an_id_that_names_nothing ... ok
+test ra5_garrison_destroyed_earlier_in_the_command_tick_cannot_deploy ... ok
+test a_yard_destroyed_by_a_strike_is_not_undeployed_in_the_same_tick ... ok
+test the_chronosphere_answers_for_an_unseen_enemy_vehicle_as_for_an_id_that_names_nothing ... ok
+test a_vehicle_destroyed_by_a_strike_is_not_repaired_back_to_life_in_the_same_tick ... ok
+test ra5_unseen_neutral_tech_and_enemy_garrison_ids_answer_exactly_as_missing_targets ... ok
+test ra5_same_tick_dead_actors_cannot_capture_repair_enter_hospital_or_occupy ... ok
+test ra6_shipped_specialists_and_transport_passengers_cannot_act_after_same_tick_death ... ok
+test ra6_shipped_interaction_targets_hidden_unseen_and_missing_have_identical_answers ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.48s
+
+     Running tests/ra1_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra1_definitions-b7bb8656deb8636c)
+
+running 36 tests
+test a_plan_may_list_every_building_of_the_tree_of_its_side ... ok
+test a_faction_without_a_side_loads_with_its_roster_and_starting_lists ... ok
+test an_arsenal_that_names_countries_or_groups_needs_a_rules_file ... ok
+test every_field_of_the_ai_file_is_required ... ok
+test ai_plan_entries_are_built_by_every_country_of_the_side ... ok
+test ai_plan_entries_can_be_obtained_through_the_build_order ... ok
+test ai_references_and_difficulty_values_are_checked ... ok
+test ai_plans_are_checked_for_their_side ... ok
+test other_schema_versions_are_rejected_in_every_file ... ok
+test every_field_of_the_skirmish_file_is_required ... ok
+test arsenal_limits_are_accepted_at_both_ends ... ok
+test skirmish_and_ai_limits_are_accepted_at_both_ends ... ok
+test lists_longer_than_their_schema_allows_are_rejected ... ok
+test skirmish_countries_are_checked ... ok
+test skirmish_factions_without_a_side_are_checked ... ok
+test the_ai_file_needs_a_plan_for_the_side_of_every_faction ... ok
+test the_ai_fixture_loads_with_a_plan_per_side ... ok
+test skirmish_values_outside_their_ranges_are_rejected ... ok
+test the_arsenal_fixture_loads_with_the_fields_of_schema_version_2 ... ok
+test rules_list_values_outside_their_ranges_are_rejected ... ok
+test rules_references_and_ids_are_checked ... ok
+test the_army_of_a_plan_can_damage_every_building_type ... ok
+test the_rules_fixture_loads_with_every_field ... ok
+test the_skirmish_fixture_loads_with_sides_and_countries ... ok
+test skirmish_sides_are_checked ... ok
+test the_cross_checks_of_the_rules_file_are_enforced ... ok
+test arsenal_references_and_ids_are_checked ... ok
+test every_field_of_the_rules_file_is_required ... ok
+test the_base_unit_of_every_side_has_the_role_mcv ... ok
+test unknown_and_duplicate_fields_are_rejected_in_every_file ... ok
+test values_of_the_wrong_kind_are_syntax_errors_in_every_file ... ok
+test every_field_of_the_arsenal_file_is_required ... ok
+test arsenal_values_outside_their_ranges_are_rejected ... ok
+test every_scalar_rule_is_rejected_one_step_outside_its_range ... ok
+test the_limits_of_every_scalar_rule_are_accepted ... ok
+test truncations_of_the_fixtures_are_rejected_without_panic ... ok
+
+test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.49s
+
+     Running tests/ra2_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra2_definitions-d9514b93ec0293f8)
+
+running 7 tests
+test the_fixture_loads_with_the_traits_of_schema_version_3 ... ok
+test lanes_queues_refunds_and_reach_follow_the_traits_with_a_rules_file ... ok
+test without_a_rules_file_the_traits_are_not_read ... ok
+test the_limits_of_the_traits_are_accepted ... ok
+test building_only_traits_on_units_are_rejected_but_unit_build_limits_are_supported ... ok
+test traits_outside_their_ranges_are_rejected ... ok
+test every_trait_changes_the_state_hash ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+     Running tests/ra3_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra3_definitions-27d08f4cd8197329)
+
+running 6 tests
+test the_fixture_loads_with_the_traits_of_schema_version_4 ... ok
+test a_trait_of_a_unit_on_a_building_is_rejected ... ok
+test the_traits_load_at_the_ends_of_their_ranges ... ok
+test a_trait_on_a_unit_that_cannot_have_it_is_rejected ... ok
+test every_trait_of_a_unit_changes_the_state_hash ... ok
+test traits_of_a_unit_outside_their_ranges_are_rejected ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests/ra4_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra4_definitions-4d1cca4028220020)
+
+running 8 tests
+test the_effects_of_the_missiles_are_checked_like_every_effect ... ok
+test the_fixture_loads_with_the_traits_of_schema_version_5 ... ok
+test an_airport_bound_unit_is_an_aircraft_with_ammunition ... ok
+test abilities_must_be_known_and_listed_once ... ok
+test a_trait_of_a_unit_on_a_building_and_docks_on_a_unit_are_rejected ... ok
+test the_terms_of_a_spawner_must_fit_together ... ok
+test every_trait_of_schema_version_5_is_hashed ... ok
+test flags_outside_0_and_1_and_numbers_outside_their_ranges_are_rejected ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+
+     Running tests/ra6_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_definitions-d2e05aa04dbf1c70)
+
+running 2 tests
+test ra6_area_fire_one_cell_minimum_is_narrow_and_new_numbers_are_bounded ... ok
+test ra6_each_new_flag_is_required_bounded_and_hashed ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.75s
+
+     Running tests/ra6_infantry.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_infantry-6103bae3c72d0aed)
+
+running 30 tests
+test ra6_control_chain_returns_to_original_owner_after_second_controller_dies ... ok
+test ra6_dog_bite_kills_infantry_even_above_nominal_weapon_damage ... ok
+test ra6_desolator_emits_on_deploy_and_radiation_spares_buildings_and_immune_infantry ... ok
+test ra6_repeat_psi_deploy_cannot_bypass_weapon_reload ... ok
+test ra6_elite_gi_uses_elite_para_and_elite_temporal_has_double_rate ... ok
+test ra6_gi_deploy_persists_uses_para_and_does_not_move_or_gain_armour ... ok
+test ra6_spy_disguise_default_copy_and_dog_detection ... ok
+test ra6_each_spy_factory_and_lab_entry_sets_only_its_own_unlock ... ok
+test ra6_radiation_diagonal_decay_edge_expiry_and_reirradiation ... ok
+test ra6_spy_refinery_steals_half_once_and_power_causes_only_blackout ... ok
+test ra6_specialists_enter_friendly_hospital_instead_of_infiltrating_or_bombing ... ok
+test ra6_specialist_replay_and_each_new_runtime_state_are_hashed ... ok
+test ra6_factory_training_never_promotes_a_paid_ship ... ok
+test ra6_tanya_c4_is_delayed_and_does_not_kill_on_entry ... ok
+test ra6_radiation_overlap_caps_damage_and_empty_sites_expire ... ok
+test ra6_spy_superweapon_resets_charge_and_radar_resets_only_old_shroud ... ok
+test ra6_tanya_swims_and_sapper_is_exclusive_to_naval_targets ... ok
+test ra6_tanya_c4_hut_collapses_bridge_only_when_enabled ... ok
+test ra6_temporal_sums_beams_freezes_and_releases_unharmed ... ok
+test ra6_terrorist_death_explodes_once_with_shipped_weapon ... ok
+test ra6_temporal_removal_has_no_terrorist_death_blast_and_frozen_actor_cannot_move ... ok
+test ra6_yuri_prime_limit_counts_cargo_and_releases_on_carrier_death ... ok
+test ra6_chrono_infantry_distance_delay_and_stolen_abilities_are_independent ... ok
+test ra6_ivan_normal_elite_and_engineer_defuse_on_due_tick ... ok
+test ra6_stolen_units_require_lab_flags_and_proper_barracks_and_prime_limit_is_same_tick ... ok
+test ra6_yuri_psi_pulse_and_undeploy_boundary ... ok
+test ra6_yuri_releases_previous_and_releases_on_controller_death ... ok
+test ra6_tesla_charge_two_low_power_three_overpowered_one_with_power ... ok
+test ra6_specialists_embark_and_unload_preserving_identity_health_and_rank ... ok
+test ra6_veteran_infiltration_applies_to_paid_production_not_free_spawns ... ok
+
+test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.55s
+
+     Running tests/ra9_data_parity.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_data_parity-5b81c25f41d0ceee)
+
+running 5 tests
+test the_conversions_round_half_away_from_zero_in_integers ... ok
+test every_value_of_the_shipped_rules_equals_its_reference_or_is_a_listed_difference ... ok
+test every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_difference ... ok
+test the_shipped_skirmish_file_and_the_default_options_are_those_of_the_lobby ... ok
+test every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_difference ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+

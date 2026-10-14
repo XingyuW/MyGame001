@@ -1,0 +1,48 @@
+warning: unused imports: `Building` and `ProductionItem`
+ --> crates/sim/tests/ra6_infantry.rs:7:5
+  |
+7 |     Building, Cell, CellPos, Command, CommandQueue, Definitions, Grid, IssuedCommand, Owner,
+  |     ^^^^^^^^
+8 |     PlayerId, Players, ProductionItem, SimEvent, SimId, SimPlugin, SimSchedule, load_ruleset,
+  |                        ^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `owner` is never used
+   --> crates/sim/tests/ra6_infantry.rs:107:4
+    |
+107 | fn owner(app: &mut App, id: SimId) -> Option<PlayerId> {
+    |    ^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `sim` (test "ra6_infantry") generated 2 warnings (run `cargo fix --test "ra6_infantry" -p sim` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s
+     Running tests/ra6_infantry.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_infantry-6103bae3c72d0aed)
+
+running 6 tests
+test ra6_terrorist_death_explodes_once_with_shipped_weapon ... ok
+test ra6_desolator_emits_on_deploy_and_radiation_spares_buildings_and_immune_infantry ... ok
+test ra6_tanya_c4_is_delayed_and_does_not_kill_on_entry ... ok
+test ra6_spy_refinery_steals_half_once_and_power_causes_only_blackout ... ok
+
+thread 'ra6_gi_deploy_persists_uses_para_and_does_not_move_or_gain_armour' (1513091) panicked at crates/sim/tests/ra6_infantry.rs:170:5:
+[]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra6_gi_deploy_persists_uses_para_and_does_not_move_or_gain_armour ... FAILED
+
+thread 'ra6_ivan_normal_elite_and_engineer_defuse_on_due_tick' (1513092) panicked at crates/sim/tests/ra6_infantry.rs:199:9:
+assertion `left == right` failed
+  left: 400
+ right: 600
+test ra6_ivan_normal_elite_and_engineer_defuse_on_due_tick ... FAILED
+
+failures:
+
+failures:
+    ra6_gi_deploy_persists_uses_para_and_does_not_move_or_gain_armour
+    ra6_ivan_normal_elite_and_engineer_defuse_on_due_tick
+
+test result: FAILED. 4 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+error: test failed, to rerun pass `-p sim --test ra6_infantry`

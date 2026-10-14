@@ -107,7 +107,7 @@ use std::{collections::BTreeMap, path::Path};
 
 /// The schema version of the arsenal file this crate reads (2 since RA1, 3 since RA2, 4 since
 /// RA3, 5 since RA4).
-pub const ARSENAL_SCHEMA_VERSION: i64 = 6;
+pub const ARSENAL_SCHEMA_VERSION: i64 = 7;
 
 /// Largest `build_limit` of an arsenal entry.
 pub const MAX_BUILD_LIMIT: u32 = 255;
@@ -371,6 +371,20 @@ pub struct ArsenalEntry {
     pub cash_startup: u32,
     pub cash_amount: u32,
     pub cash_delay: u32,
+    pub deployer: bool,
+    pub deploy_fire: bool,
+    pub c4: bool,
+    pub can_c4: bool,
+    pub bombable: bool,
+    pub spyable: bool,
+    pub detect_disguise: bool,
+    pub immune_psionics: bool,
+    pub immune_radiation: bool,
+    pub teleporter: bool,
+    pub stolen_allied: bool,
+    pub stolen_soviet: bool,
+    pub overpowerable: bool,
+    pub undeploy_delay: u32,
 }
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Arsenal(pub BTreeMap<ProductionItem, ArsenalEntry>);
@@ -443,6 +457,20 @@ struct Entry {
     cash_startup: i64,
     cash_amount: i64,
     cash_delay: i64,
+    deployer: i64,
+    deploy_fire: i64,
+    c4: i64,
+    can_c4: i64,
+    bombable: i64,
+    spyable: i64,
+    detect_disguise: i64,
+    immune_psionics: i64,
+    immune_radiation: i64,
+    teleporter: i64,
+    stolen_allied: i64,
+    stolen_soviet: i64,
+    overpowerable: i64,
+    undeploy_delay: i64,
 }
 static ENTRY: Shape = Shape::Struct(&[
     ("id", Shape::Str),
@@ -541,6 +569,20 @@ static ENTRY: Shape = Shape::Struct(&[
     ("cash_startup", Shape::Int),
     ("cash_amount", Shape::Int),
     ("cash_delay", Shape::Int),
+    ("deployer", Shape::Int),
+    ("deploy_fire", Shape::Int),
+    ("c4", Shape::Int),
+    ("can_c4", Shape::Int),
+    ("bombable", Shape::Int),
+    ("spyable", Shape::Int),
+    ("detect_disguise", Shape::Int),
+    ("immune_psionics", Shape::Int),
+    ("immune_radiation", Shape::Int),
+    ("teleporter", Shape::Int),
+    ("stolen_allied", Shape::Int),
+    ("stolen_soviet", Shape::Int),
+    ("overpowerable", Shape::Int),
+    ("undeploy_delay", Shape::Int),
 ]);
 static FILE: Shape = Shape::Struct(&[
     (
@@ -782,7 +824,7 @@ impl Arsenal {
                 if !(0..=max).contains(&value) {
                     return Err(bad(name, &value.to_string()));
                 }
-                if !building && value != 0 {
+                if !building && value != 0 && name != "build_limit" {
                     return Err(bad(name, "a building trait on a unit type"));
                 }
             }
@@ -820,7 +862,23 @@ impl Arsenal {
             }
             // The traits of RA4 (schema version 5): flags 1 or 0, numbers within their ranges,
             // and each only on the kind of item that the rules can give it to.
+            if !(0..=1_000_000).contains(&e.undeploy_delay) {
+                return Err(bad("undeploy_delay", "outside 0..1000000"));
+            }
             let flags = [
+                ("deployer", e.deployer, true),
+                ("deploy_fire", e.deploy_fire, true),
+                ("c4", e.c4, true),
+                ("can_c4", e.can_c4, true),
+                ("bombable", e.bombable, true),
+                ("spyable", e.spyable, true),
+                ("detect_disguise", e.detect_disguise, true),
+                ("immune_psionics", e.immune_psionics, true),
+                ("immune_radiation", e.immune_radiation, true),
+                ("teleporter", e.teleporter, true),
+                ("stolen_allied", e.stolen_allied, true),
+                ("stolen_soviet", e.stolen_soviet, true),
+                ("overpowerable", e.overpowerable, true),
                 ("needs_engineer", e.needs_engineer, true),
                 ("capturable", e.capturable, true),
                 ("insignificant", e.insignificant, true),
@@ -1056,6 +1114,20 @@ impl Arsenal {
                     cash_startup: e.cash_startup as u32,
                     cash_amount: e.cash_amount as u32,
                     cash_delay: e.cash_delay as u32,
+                    deployer: e.deployer == 1,
+                    deploy_fire: e.deploy_fire == 1,
+                    c4: e.c4 == 1,
+                    can_c4: e.can_c4 == 1,
+                    bombable: e.bombable == 1,
+                    spyable: e.spyable == 1,
+                    detect_disguise: e.detect_disguise == 1,
+                    immune_psionics: e.immune_psionics == 1,
+                    immune_radiation: e.immune_radiation == 1,
+                    teleporter: e.teleporter == 1,
+                    stolen_allied: e.stolen_allied == 1,
+                    stolen_soviet: e.stolen_soviet == 1,
+                    overpowerable: e.overpowerable == 1,
+                    undeploy_delay: e.undeploy_delay as u32,
                 },
             );
         }
@@ -1183,6 +1255,19 @@ impl Arsenal {
                 e.launcher.map_or(u8::MAX, |launcher| launcher as u8),
                 e.missile.map_or(u8::MAX, |missile| missile as u8),
                 u8::from(e.cloakable),
+                u8::from(e.deployer),
+                u8::from(e.deploy_fire),
+                u8::from(e.c4),
+                u8::from(e.can_c4),
+                u8::from(e.bombable),
+                u8::from(e.spyable),
+                u8::from(e.detect_disguise),
+                u8::from(e.immune_psionics),
+                u8::from(e.immune_radiation),
+                u8::from(e.teleporter),
+                u8::from(e.stolen_allied),
+                u8::from(e.stolen_soviet),
+                u8::from(e.overpowerable),
                 u8::from(e.needs_engineer),
                 u8::from(e.capturable),
                 u8::from(e.insignificant),
@@ -1205,6 +1290,7 @@ impl Arsenal {
                 e.cash_startup,
                 e.cash_amount,
                 e.cash_delay,
+                e.undeploy_delay,
             ] {
                 h.write_u32(value);
             }

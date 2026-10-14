@@ -274,6 +274,14 @@ pub fn check_buildable(
             return Err(RejectReason::UnknownItem(item));
         }
     }
+    if entry.is_some_and(|e| {
+        (e.stolen_allied && state.infiltration & 4 == 0)
+            || (e.stolen_soviet && state.infiltration & 8 == 0)
+    }) {
+        return Err(RejectReason::AbilityUnavailable(
+            "Infiltrate the required Battle Lab first",
+        ));
+    }
     if !state.offers(item) {
         return Err(RejectReason::NotInRoster(item));
     }
@@ -331,16 +339,19 @@ pub fn check_buildable(
         }
         // RA2, the ini's `BuildLimit`: the buildings of the type the player owns and those in
         // its queues together.
-        if let ProductionItem::Building(kind) = item
-            && definitions.rules().is_some()
-            && entry.build_limit > 0
-        {
-            let have = owned.iter().filter(|&&other| other == kind).count()
-                + state
-                    .queues()
-                    .flat_map(|(_, items)| items.iter())
-                    .filter(|queued| queued.item == item)
-                    .count();
+        if definitions.rules().is_some() && entry.build_limit > 0 {
+            let have = match item {
+                ProductionItem::Building(kind) => {
+                    owned.iter().filter(|&&other| other == kind).count()
+                }
+                ProductionItem::Unit(kind) => {
+                    state.limited_units.get(&kind).copied().unwrap_or(0) as usize
+                }
+            } + state
+                .queues()
+                .flat_map(|(_, items)| items.iter())
+                .filter(|queued| queued.item == item)
+                .count();
             if have >= entry.build_limit as usize {
                 return Err(RejectReason::BuildLimitReached {
                     item,

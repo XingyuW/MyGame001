@@ -143,7 +143,8 @@ pub(crate) fn advance(world: &mut World) {
                 health.hit_points += 1;
             }
         }
-        if meta.role == Role::Chrono
+        if defs.rules().is_none()
+            && meta.role == Role::Chrono
             && !world
                 .resource::<SpecialState>()
                 .disabled
@@ -330,4 +331,5 @@ pub(crate) fn advance(world: &mut World) {
     crate::garrison::advance(world, &defs, &index);
     repair_docked(world, &defs, &index, tick);
     crate::flight::advance(world, &defs, &index, tick);
+    infantry::advance(world, &defs);
 }

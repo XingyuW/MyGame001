@@ -805,7 +805,7 @@ const BRUTAL_DIFFICULTY: (&str, &str) = ("        (\n            id: \"brutal\",
 /// An arsenal file with the entries of the fixture for the items `ids` only, in this order.
 fn arsenal_of(name: &str, ids: &[&str]) -> PathBuf {
     let fixture = File::Arsenal.text();
-    let mut text = String::from("(schema_version: 6, entries: [\n");
+    let mut text = String::from("(schema_version: 7, entries: [\n");
     for id in ids {
         let entry = format!("(id: {id:?},");
         let lines: Vec<&str> = fixture
@@ -1828,7 +1828,7 @@ fn every_field_of_the_arsenal_file_is_required() {
     let path = variant(
         File::Arsenal,
         "arsenal_missing_schema_version",
-        &[("(schema_version: 6, entries: [", "(entries: [")],
+        &[("(schema_version: 7, entries: [", "(entries: [")],
     );
     assert_rejected(
         File::Arsenal,
@@ -1836,7 +1836,7 @@ fn every_field_of_the_arsenal_file_is_required() {
         "schema_version",
         DataErrorKind::MissingField,
     );
-    let path = temp_file("arsenal_missing_entries.ron", b"(schema_version: 6)\n");
+    let path = temp_file("arsenal_missing_entries.ron", b"(schema_version: 7)\n");
     assert_rejected(File::Arsenal, &path, "entries", DataErrorKind::MissingField);
     // Every field of an entry: those of schema version 1, the eight of version 2, the nine of
     // version 3 (RA2), the four of version 4 (RA3) and the sixteen of version 5 (RA4).
@@ -1901,6 +1901,20 @@ fn every_field_of_the_arsenal_file_is_required() {
         ("cash_startup", ", cash_startup: 0"),
         ("cash_amount", ", cash_amount: 0"),
         ("cash_delay", ", cash_delay: 0"),
+        ("deployer", ", deployer: 0"),
+        ("deploy_fire", ", deploy_fire: 0"),
+        ("c4", ", c4: 0"),
+        ("can_c4", ", can_c4: 0"),
+        ("bombable", ", bombable: 0"),
+        ("spyable", ", spyable: 0"),
+        ("detect_disguise", ", detect_disguise: 0"),
+        ("immune_psionics", ", immune_psionics: 0"),
+        ("immune_radiation", ", immune_radiation: 0"),
+        ("teleporter", ", teleporter: 0"),
+        ("stolen_allied", ", stolen_allied: 0"),
+        ("stolen_soviet", ", stolen_soviet: 0"),
+        ("overpowerable", ", overpowerable: 0"),
+        ("undeploy_delay", ", undeploy_delay: 0"),
     ];
     for (field, from) in fields {
         let path = line_variant(
@@ -2153,8 +2167,8 @@ fn unknown_and_duplicate_fields_are_rejected_in_every_file() {
         // The arsenal.
         (
             File::Arsenal,
-            "(schema_version: 6, entries: [",
-            "(schema_version: 6, mods: 1, entries: [",
+            "(schema_version: 7, entries: [",
+            "(schema_version: 7, mods: 1, entries: [",
             "mods",
             DataErrorKind::UnknownField,
         ),
@@ -2174,8 +2188,8 @@ fn unknown_and_duplicate_fields_are_rejected_in_every_file() {
         ),
         (
             File::Arsenal,
-            "(schema_version: 6, entries: [",
-            "(schema_version: 6, schema_version: 6, entries: [",
+            "(schema_version: 7, entries: [",
+            "(schema_version: 7, schema_version: 7, entries: [",
             "schema_version",
             DataErrorKind::DuplicateField,
         ),
@@ -2394,12 +2408,12 @@ fn other_schema_versions_are_rejected_in_every_file() {
         (File::Rules, "schema_version: 2,", 0, 2),
         (File::Rules, "schema_version: 2,", 1, 2),
         (File::Rules, "schema_version: 2,", 3, 2),
-        (File::Arsenal, "schema_version: 6,", 4, 6),
-        (File::Arsenal, "schema_version: 6,", 3, 6),
-        (File::Arsenal, "schema_version: 6,", 2, 6),
-        (File::Arsenal, "schema_version: 6,", 1, 6),
-        (File::Arsenal, "schema_version: 6,", 5, 6),
-        (File::Arsenal, "schema_version: 6,", 7, 6),
+        (File::Arsenal, "schema_version: 7,", 4, 7),
+        (File::Arsenal, "schema_version: 7,", 3, 7),
+        (File::Arsenal, "schema_version: 7,", 2, 7),
+        (File::Arsenal, "schema_version: 7,", 1, 7),
+        (File::Arsenal, "schema_version: 7,", 5, 7),
+        (File::Arsenal, "schema_version: 7,", 8, 7),
         (File::Skirmish, "schema_version: 3,", 2, 3),
         (File::Skirmish, "schema_version: 3,", 1, 3),
         (File::Skirmish, "schema_version: 3,", 4, 3),

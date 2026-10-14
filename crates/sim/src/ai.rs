@@ -763,7 +763,9 @@ impl<'a> View<'a> {
             let teleports = self
                 .definitions
                 .metadata(ProductionItem::Unit(unit.kind))
-                .is_some_and(|entry| matches!(entry.role, Role::ChronoMiner | Role::Chrono));
+                .is_some_and(|entry| {
+                    entry.teleporter || matches!(entry.role, Role::ChronoMiner | Role::Chrono)
+                });
             !teleports
                 && unit.sight.is_some_and(|sight| {
                     within(cell_footprint(unit.mobile.cell), sight)

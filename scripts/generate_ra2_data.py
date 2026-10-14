@@ -158,7 +158,7 @@ UNITS = {
         'rifleman'),
     'spy': ('Spy', 'E + click a nearby enemy building to infiltrate. Dogs detect spies.', 'infantry', 'land', 'spy', 100, 2, 20, 0,
         'rifleman'),
-    'tanya': ('Tanya', 'Specialized ground combat. Select and right click an enemy to attack.', 'infantry', 'land', 'commando', 100, 2, 20, 0,
+    'tanya': ('Tanya', 'C4 buildings; swims and demolishes ships.', 'infantry', 'amphibious', 'commando', 100, 2, 20, 0,
         'rifleman'),
     'chrono_legionnaire': ('Chrono Legionnaire', 'Teleports when given a move order; beam suppresses targets.', 'infantry', 'land', 'chrono', 100, 2, 20, 0,
         'rifleman'),
@@ -266,13 +266,6 @@ ARMOURS = (
 NOT_CARRIED = {
     "none": "no weapon",
     "VirtualScanner": "NeverUse=yes: the engine never fires it",
-    "MakeupKit": "the spy's disguise (RA6)",
-    "DefuseKit": "the engineer's bomb disposal (RA6)",
-    "AssaultBolt": "the charging of Tesla Coils (RA6)",
-    "PsiWave": "the psi wave of a deployed Yuri (RA6)",
-    "RadEruptionWeapon": "the eruption of a deployed Desolator, the game's radiation zone (RA6)",
-    "Sapper": "C4 on ships (RA6)",
-    "FakeC4": "C4 (RA6)",
     "PrismSupport": "the support beam of the prism chain (RA6)",
     "HornetCollision": "a spawned aircraft attacks only what its carrier fires at, never an aircraft",
     "ASWCollision": "a spawned aircraft attacks only what its destroyer fires at, never an aircraft",
@@ -298,14 +291,11 @@ WEAPON_VALUES = {
     "V3Launcher": {"warhead": "V3WH"},
     "DredLauncher": {"warhead": "DMISLWH"},
     "HornetLauncher": {"warhead": "ORCAAP"},
+    "MakeupKit": {"range": MAX_WEAPON_RANGE},
     "ASWLauncher": {"warhead": "APSplash", "range": MAX_WEAPON_RANGE, "anti_ground": 1},
-    "GoodTeeth": {"damage": 200},
-    "NeutronRifle": {"damage": 60},
-    "NeutronRifleE": {"damage": 60},
+    "Sapper": {"anti_ground": 1},
     "SonicZap": {"damage": 100},
     "SonicZapE": {"damage": 100},
-    "IvanBomber": {"warhead": "IvanWH"},
-    "IvanBomberE": {"warhead": "IvanWH"},
     "Demobomb": {"range": 384},
 }
 # The area effects that are no weapon of a type (crates/sim/src/combat_defs.rs, `Effect`):
@@ -316,8 +306,8 @@ EFFECTS = (
     ("nuke", ("NukePayload", "Damage"), ("NukePayload", "Warhead")),
     ("lightning", ("General", "LightningDamage"), ("General", "LightningWarhead")),
     ("ivan_bomb", ("CombatDamage", "IvanDamage"), ("CombatDamage", "IvanWarhead")),
-    ("c4", 200, ("CombatDamage", "C4Warhead")),
-    ("radiation", 20, ("Radiation", "RadSiteWarhead")),
+    ("c4", ("CombatDamage", "MaxDamage"), ("CombatDamage", "C4Warhead")),
+    ("radiation", 1, ("Radiation", "RadSiteWarhead")),
     # RA4: the impact of the spawned missiles, and of each when its launcher is elite.
     ("v3_rocket", ("General", "V3RocketDamage"), ("CombatDamage", "V3Warhead")),
     ("v3_rocket_elite", ("General", "V3RocketEliteDamage"), ("CombatDamage", "V3EliteWarhead")),
@@ -751,7 +741,7 @@ class Item:
         self.cost = int(section.get("Cost", "0"))
         self.hit_points = int(section["Strength"])
         self.sight = int(section.get("Sight", "0"))
-        self.tech_level = -1 if any(key in section for key in STOLEN) else int(section["TechLevel"])
+        self.tech_level = int(section["TechLevel"])
         houses = [house for house in section.get("Owner", "").split(",") if house]
         self.owner_sides = [
             side
@@ -899,6 +889,8 @@ def game_tables(tables):
         units[game_id] = values + (ART.get(game_id, game_id),)
     for game_id, (label, twin) in NEW_UNITS.items():
         units[game_id] = (label,) + UNITS[twin][1:] + (twin,)
+        if game_id in {"chrono_commando", "psi_commando"}:
+            units[game_id] = units[game_id][:3] + ("land",) + units[game_id][4:]
     for game_id, (kind, _, _, _) in tables.primary.items():
         if game_id not in (buildings if kind == "building" else units):
             raise Failure(f"{game_id} is mapped but has no game specific values")
@@ -1169,10 +1161,12 @@ class Data:
             f"projectile_speed: {value('projectile_speed', flight)}, "
             f"anti_air: {flag(projectile, 'AA', 'no')}, "
             f"anti_ground: {value('anti_ground', lambda: flag(projectile, 'AG', 'yes'))}, "
-            f"scatter: {scatter}"
+            f"scatter: {scatter}, "
+            f"rad_level: {int(weapon.get('RadLevel', '0'))}, "
+            f"area_fire: {flag(weapon, 'AreaFire', 'no')}, naval_only: {int(not flag(projectile, 'AG', 'yes') and not flag(projectile, 'AA', 'no'))}, suicide: {flag(weapon, 'Suicide', 'no')}"
         )
         keys = ("Damage", "Range", "MinimumRange", "ROF", "Burst", "Warhead", "Projectile", "Speed")
-        keys += ("LimboLaunch",)
+        keys += ("LimboLaunch", "RadLevel", "AreaFire", "Suicide")
         comment = f"[{section_name}] " + ", ".join(
             f"{key}={weapon[key]}" for key in keys if key in weapon
         )
@@ -1226,7 +1220,7 @@ class Data:
             "//",
             GENERATED,
             "(",
-            "    schema_version: 3,",
+            "    schema_version: 4,",
             f"    armour_classes: {quoted(ARMOURS)},",
             "    warheads: [",
         ]
@@ -1253,14 +1247,14 @@ class Data:
             if section_name not in used:
                 raise Failure(f"no weapon or effect uses the mapped warhead [{section_name}]")
             warhead = tables.section(section_name)
-            percents = [rounded(number(text)) for text in warhead["Verses"].split(",")]
+            percents = [rounded(number(text)) for text in warhead.get("Verses", ",".join(["100%"] * 11)).split(",")]
             if len(percents) != len(ARMOURS):
                 raise Failure(f"[{section_name}] Verses has {len(percents)} entries")
             entries = ", ".join(
                 f'(armour: "{armour}", percent: {percent})'
                 for armour, percent in zip(ARMOURS, percents)
             )
-            keys = ("CellSpread", "PercentAtMax", "Wall", "Wood", "Verses")
+            keys = ('CellSpread', 'PercentAtMax', 'Wall', 'Wood', 'Verses', 'Temporal', 'MindControl', 'PsychicDamage', 'Radiation', 'Parasite', 'IvanBomb', 'BombDisarm', 'ElectricAssault', 'MakesDisguise')
             comment = f"[{section_name}] " + ", ".join(
                 f"{key}={warhead[key]}" for key in keys if key in warhead
             )
@@ -1270,6 +1264,14 @@ class Data:
                 f"percent_at_max: {convert('percent', warhead.get('PercentAtMax', '1'))}, "
                 f"wall: {convert('flag', warhead.get('Wall', 'no'))}, "
                 f"wood: {convert('flag', warhead.get('Wood', 'no'))}, "
+                f"temporal: {convert('flag', warhead.get('Temporal', 'no'))}, "
+                f"mind_control: {convert('flag', warhead.get('MindControl', 'no'))}, psychic_damage: {convert('flag', warhead.get('PsychicDamage', 'no'))}, "
+                f"radiation: {convert('flag', warhead.get('Radiation', 'no'))}, "
+                f"parasite: {convert('flag', warhead.get('Parasite', 'no'))}, "
+                f"ivan_bomb: {convert('flag', warhead.get('IvanBomb', 'no'))}, "
+                f"bomb_disarm: {convert('flag', warhead.get('BombDisarm', 'no'))}, "
+                f"electric_assault: {convert('flag', warhead.get('ElectricAssault', 'no'))}, "
+                f"makes_disguise: {convert('flag', warhead.get('MakesDisguise', 'no'))}, "
                 f"versus: [{entries}]), // {comment}"
             )
         lines += ["    ],", "    weapons: ["] + weapons
@@ -1307,7 +1309,7 @@ class Data:
                 )
         for game_id, section_name in tables.weapons:
             twins = [name for name, known in tables.weapon_id.items() if known == game_id]
-            if not fired.intersection(twins):
+            if not fired.intersection(twins) and section_name != "OPCoilBolt":
                 raise Failure(f"no type carries the mapped weapon [{section_name}]")
         lines += ["    ],", "    effects: ["] + effects + ["    ],", ")"]
         return "\n".join(lines) + "\n"
@@ -1363,7 +1365,7 @@ class Data:
             "// cash_delay (ProduceCashDelay frames converted to ticks). Missing flags/numbers are 0.",
             "//",
             GENERATED,
-            "(schema_version: 6, entries: [",
+            "(schema_version: 7, entries: [",
         ]
         for table in (self.buildings, self.units):
             for game_id, values in table.items():
@@ -1389,6 +1391,7 @@ class Data:
                         raise Failure(f"{game_id}: the category {category} is not its BuildCat")
                     keys += ["BuildCat", "BuildLimit", "Adjacent", "BaseNormal", "Radar", "Wall"]
                     keys += ["Unsellable", "Repairable", "Powered", "UnitRepair", "SuperWeapon"]
+                keys += ['Deployer', 'DeployFire', 'C4', 'CanC4', 'Bombable', 'Spyable', 'DetectDisguise', 'ImmuneToPsionics', 'ImmuneToRadiation', 'Teleporter', 'RequiresStolenAlliedTech', 'RequiresStolenSovietTech', 'Overpowerable', 'UndeployDelay', 'BuildLimit']
                 source = item.comment(*keys)
                 if item.infantry_list:
                     source += f"; {item.infantry_list}"
@@ -1407,7 +1410,7 @@ class Data:
                     source += f"; {cite('General', item.missile_key, self.tables.section('General'))}"
                 # A unit's `BuildLimit` (Yuri Prime) is not ported until the unit can be built
                 # (RA6); ra2_differences.tsv lists it.
-                limit = item.build_limit if item.kind == "building" else 0
+                limit = item.build_limit
                 lines.append(
                     f'    (id: "{game_id}", label: "{label}", description: "{description}", '
                     f'category: "{category}", domain: "{domain}", role: "{role}", '
@@ -1447,7 +1450,21 @@ class Data:
                     f"vehicle_docks: {item.vehicle_docks}, "
                     f"cash_startup: {item.cash_startup}, "
                     f"cash_amount: {item.cash_amount}, "
-                    f"cash_delay: {item.cash_delay}),"
+                    f"cash_delay: {item.cash_delay}, "
+                    f"deployer: {convert('flag', item.ini.get('Deployer', 'no'))}, "
+                    f"deploy_fire: {convert('flag', item.ini.get('DeployFire', 'no'))}, "
+                    f"c4: {convert('flag', item.ini.get('C4', 'no'))}, "
+                    f"can_c4: {convert('flag', item.ini.get('CanC4', 'yes'))}, "
+                    f"bombable: {convert('flag', item.ini.get('Bombable', 'yes'))}, "
+                    f"spyable: {convert('flag', item.ini.get('Spyable', 'no'))}, "
+                    f"detect_disguise: {convert('flag', item.ini.get('DetectDisguise', 'no'))}, "
+                    f"immune_psionics: {convert('flag', item.ini.get('ImmuneToPsionics', 'yes' if item.kind == 'building' else 'no'))}, "
+                    f"immune_radiation: {convert('flag', item.ini.get('ImmuneToRadiation', 'no'))}, "
+                    f"teleporter: {convert('flag', item.ini.get('Teleporter', 'no'))}, "
+                    f"stolen_allied: {convert('flag', item.ini.get('RequiresStolenAlliedTech', 'no'))}, "
+                    f"stolen_soviet: {convert('flag', item.ini.get('RequiresStolenSovietTech', 'no'))}, "
+                    f"overpowerable: {convert('flag', item.ini.get('Overpowerable', 'no'))}, "
+                    f"undeploy_delay: {convert('frames', item.ini['UndeployDelay']) if 'UndeployDelay' in item.ini else 0}),"
                     f" // {source}"
                 )
         lines.append("])")

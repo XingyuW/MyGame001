@@ -1159,6 +1159,40 @@ backup command was rejected before execution; the safe cache-backed retry succee
 worktree, build output or substantial artifact was created under /tmp, and no repository or
 worktree was deleted.
 
+## RA6-A infantry and radiation implementation (2026-10-14)
+
+**Implementation complete; full validation pending. Not independently reviewed.** Decisions
+R71–R74 record the pure-code-move prerequisite, schemas, bounded loader migrations, mechanics
+and explicit assumptions. The exact shipped acceptance matrix is
+[RA6-A acceptance ledger](validation/ra2-parity/RA6A_ACCEPTANCE.md).
+
+GI, Engineer defuse, Dog, Spy disguise and all infiltration effects, four stolen units and
+unit build limits, Tanya/C4/Sapper/swimming, Temporal and chrono delay, Tesla charging, Ivan,
+Yuri/PsiPulse, Desolator/radiation and Terrorist infantry death weapons are implemented.
+All new persistent state is hashed. Specialist/transport command security and shipped
+transport identity/rank/health, hospital entry and limited passenger coverage close the RA6-A
+part of R56 debt. Legacy no-rules M9 behavior remains, with its tests unchanged.
+
+Arsenal7 is148,986 bytes; the deliberate192 KiB preparse bound has exact-limit and over-limit
+coverage. Combat4 and every legacy/RA1–RA5 fixture migrated; generated data derives only from
+the committed tables. Every new ported field is included in the complete reference audit.
+Two cheap radiation mutations were detected; failed/preliminary logs remain in
+`validation/ra2-parity/ra6a-preflight`. Full gate commands1–8 and10–13 will run on frozen source;
+command9 soak is deferred only for this first RA6 part.
+
+**RA6-B handoff/debt.** Extend `special::infantry::finish_deaths` for vehicle/building payloads
+and `special::radiation::add` for source-bearing radiation; finish vehicles, IFV modes,
+structures, superweapons, crashes/cargo loss and paradrops. Apply veteran infiltration only
+at paid production completion, never all UnitSpawned events. Preserve RA5 observed bridge
+repair/assembly fixes and R67 ship-blocked bridge repair assumption. Broader existing RA7–RA9
+AI/fog/stress debt remains. D-only GI undeploy, effective-Sight disguise detection, utility
+weapon adaptations and elite Ivan600 are explicit R72–R73 assumptions, not engine proof.
+
+**User verification/storage.** Disguised appearance/friendly paint and all visual/audio/play
+feel require user verification. No new substantial external directory was created; configured
+Cargo target/test artifacts are reused, UV/PIP caches preserved, and RA5's render directory
+left intact. No /tmp build outputs, clones or worktrees were created.
+
 ## Repair, aircraft overflight, new music and distinct silhouettes (2026-10-06)
 
 Working-tree follow-up (decisions: "Building repair, aircraft overflight, readable silhouettes"

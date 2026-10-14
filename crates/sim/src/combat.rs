@@ -460,11 +460,21 @@ pub struct TargetTraits {
     pub wall: bool,
     /// Trees: only warheads with `wood` damage them.
     pub tree: bool,
+    pub infantry: bool,
+    pub immune_psionics: bool,
+    pub immune_radiation: bool,
+    pub building: bool,
+    pub bombable: bool,
 }
 
 /// The percentage `warhead` deals to a target with `traits`: its percentage against the armour,
 /// or 0 for a wall or trees that it does not damage at all.
 pub fn versus_against(warhead: &WarheadDef, traits: &TargetTraits) -> i32 {
+    if ((warhead.mind_control || warhead.psychic_damage) && traits.immune_psionics)
+        || (warhead.radiation && (traits.immune_radiation || traits.building))
+    {
+        return 0;
+    }
     if (traits.wall && !warhead.wall) || (traits.tree && !warhead.wood) {
         return 0;
     }
@@ -524,6 +534,19 @@ pub fn weapon_against(
         let Some(def) = definitions.weapon(kind) else {
             continue;
         };
+        if definitions.rules().is_some()
+            && (def.area_fire
+                || (def.naval_only && (!traits.on_water || traits.building))
+                || definitions.warhead(def.warhead).is_some_and(|h| {
+                    h.bomb_disarm
+                        || h.makes_disguise
+                        || h.electric_assault
+                        || (h.mind_control && traits.immune_psionics)
+                        || (h.ivan_bomb && !traits.bombable)
+                }))
+        {
+            continue;
+        }
         let layer = if traits.airborne {
             def.anti_air
         } else {
@@ -722,7 +745,28 @@ pub(crate) fn traits_of(
         organic: terms.is_some_and(|terms| terms.organic),
         wall: terms.is_some_and(|terms| terms.wall),
         tree: false,
+        infantry: grid.is_on_foot(id),
+        immune_psionics: airborne || matches!(body, Body::Building(_)),
+        immune_radiation: false,
+        building: matches!(body, Body::Building(_) | Body::Prop(_)),
+        bombable: true,
     }
+}
+
+fn specialist_traits(
+    mut traits: TargetTraits,
+    defs: &Definitions,
+    item: Option<crate::ProductionItem>,
+) -> TargetTraits {
+    if defs.rules().is_some()
+        && let Some(m) = item.and_then(|i| defs.metadata(i))
+    {
+        traits.immune_psionics |= m.immune_psionics;
+        traits.immune_radiation = m.immune_radiation;
+        traits.infantry = m.infantry;
+        traits.bombable = m.bombable;
+    }
+    traits
 }
 
 type TargetQuery<'w, 's> = Query<
@@ -1208,14 +1252,25 @@ impl Field<'_> {
             target: target_id,
             weapon: choice.kind,
         });
+        if self.definitions.rules().is_some()
+            && self.definitions.warhead(def.warhead).is_some_and(|h| {
+                h.temporal
+                    || h.mind_control
+                    || h.ivan_bomb
+                    || h.makes_disguise
+                    || h.bomb_disarm
+                    || h.electric_assault
+                    || (h.parasite && self.roles.get(&id) == Some(&crate::Role::Dog))
+            })
+        {
+            return;
+        }
         // The shot of some specialists is not an impact of its own: `crate::special` acts on
         // the event (a carrier launches aircraft; with a rules file a mind controller takes
         // its target over, a bomber plants its bomb, and a suicide unit blows itself up).
         match self.roles.get(&id) {
             Some(crate::Role::Carrier) => return,
-            Some(crate::Role::MindControl | crate::Role::Demolition | crate::Role::Suicide)
-                if self.definitions.rules().is_some() =>
-            {
+            Some(crate::Role::Suicide) if self.definitions.rules().is_some() => {
                 return;
             }
             _ => {}
@@ -1282,7 +1337,7 @@ pub(crate) fn combat(
     mut targets: TargetQuery,
     mut attackers: AttackerQuery,
     mut props: ResMut<crate::Props>,
-    special: Res<crate::SpecialState>,
+    mut special: ResMut<crate::SpecialState>,
     mut kills: ResMut<crate::veterancy::Kills>,
 ) {
     if attackers.is_empty() && projectiles.is_empty() {
@@ -1298,7 +1353,10 @@ pub(crate) fn combat(
     let mut index: BTreeMap<SimId, Target> = targets
         .iter()
         .filter_map(
-            |(entity, id, owner, _, armour, position, mobile, building, unit, experience)| {
+            |(entity, id, owner, health, armour, position, mobile, building, unit, experience)| {
+                if ruled && health.hit_points <= 0 {
+                    return None;
+                }
                 let extent = match (position, building) {
                     (Some(position), _) => Extent::point(position.0),
                     (None, Some(building)) => Extent::footprint(building.footprint),
@@ -1339,7 +1397,11 @@ pub(crate) fn combat(
                         owner: Some(owner.0),
                         extent,
                         body,
-                        traits: traits_of(&grid, *id, armour.0, &body, of_type.as_ref()),
+                        traits: specialist_traits(
+                            traits_of(&grid, *id, armour.0, &body, of_type.as_ref()),
+                            &definitions,
+                            item,
+                        ),
                         armour_pm: experience.map_or(1000, crate::Experience::armour_pm),
                         item,
                     },
@@ -1460,7 +1522,12 @@ pub(crate) fn combat(
         // shot that cannot be fired when it is due. Nor does an aircraft that has spent its
         // ammunition fire until it has reloaded (RA4), except the rest of the volley it has
         // paid for with its last round (`crate::flight::fired`).
-        if special.disabled.contains_key(&id)
+        let newly_frozen = shots.events.iter().any(|e| matches!(e,
+            SimEvent::WeaponFired { target, weapon, .. } if *target == id
+                && definitions.weapon(*weapon).and_then(|w| definitions.warhead(w.warhead)).is_some_and(|h| h.temporal)));
+        if newly_frozen
+            || special.erasures.contains_key(&id)
+            || special.disabled.contains_key(&id)
             || special.rearming.contains_key(&id)
             || (special.ammo.get(&id) == Some(&0) && weapon.burst_left == 0)
         {
@@ -1490,7 +1557,15 @@ pub(crate) fn combat(
             Some((kind, special.launch_ready(id, number)))
         });
         let arms = Arms {
-            weapons: [Some(weapon.kind), weapon.secondary],
+            weapons: if ruled
+                && (special.deployed.contains_key(&id)
+                    || special.coil_charge.get(&id).is_some_and(|&n| {
+                        n >= 3 || (n >= 1 && players.get(owner.0).is_some_and(|p| !p.low_power()))
+                    })) {
+                [weapon.secondary, None]
+            } else {
+                [Some(weapon.kind), weapon.secondary]
+            },
             terms: of_type,
             firepower_pm: experience.map_or(1000, crate::Experience::firepower_pm),
             reload_pm: experience.map_or(1000, crate::Experience::reload_pm),
@@ -1521,6 +1596,8 @@ pub(crate) fn combat(
                     Some(building) => !state.powers(&definitions, building.kind),
                     None => state.low_power(),
                 });
+                let low_power =
+                    low_power && !(ruled && special.coil_charge.get(&id).is_some_and(|&n| n >= 2));
                 weapon.target = if low_power {
                     None
                 } else {
@@ -1544,6 +1621,30 @@ pub(crate) fn combat(
         }
     }
 
+    // Temporal shots freeze before this tick's impacts, including simultaneous ordinary fire.
+    if ruled {
+        for event in &shots.events {
+            if let SimEvent::WeaponFired {
+                attacker,
+                target,
+                weapon,
+            } = event
+                && let Some(w) = definitions.weapon(*weapon)
+                && definitions.warhead(w.warhead).is_some_and(|h| h.temporal)
+                && let Some(t) = terms.get(target)
+            {
+                special
+                    .erasures
+                    .entry(*target)
+                    .or_insert(crate::special::infantry::Erasure {
+                        remaining: (t.hit_points.max(1) as u64).saturating_mul(10),
+                        beams: BTreeMap::new(),
+                    })
+                    .beams
+                    .insert(*attacker, w.damage.max(0) as u32);
+            }
+        }
+    }
     // 3. Damage: every impact's hits, summed per target in `i64` (invariant I12), then applied
     // in target id order (scenery has the highest ids). The hit that brings a target's hit
     // points to 0, in the order of the hits, names its killer (RA4).
@@ -1638,6 +1739,17 @@ fn impact_event(blast: &Blast) -> SimEvent {
 /// radiation zone (`crate::special`). Its damage is applied at once, and if `report` it is
 /// reported with [`SimEvent::Impact`].
 pub(crate) fn detonate(world: &mut bevy_ecs::world::World, blast: Blast, report: bool) {
+    detonate_filtered(world, blast, report, None);
+}
+pub(crate) fn detonate_one(world: &mut bevy_ecs::world::World, blast: Blast, id: SimId) {
+    detonate_filtered(world, blast, false, Some(id));
+}
+fn detonate_filtered(
+    world: &mut bevy_ecs::world::World,
+    blast: Blast,
+    report: bool,
+    only: Option<SimId>,
+) {
     let definitions = world.resource::<Definitions>().clone();
     let tick = world.resource::<SimTick>().0;
     // Per entity: where it is, its traits, its armour multiplier, its owner and what it is.
@@ -1684,7 +1796,11 @@ pub(crate) fn detonate(world: &mut bevy_ecs::world::World, blast: Blast, report:
                 (
                     entity,
                     position.map(|position| position.0),
-                    traits_of(grid, *id, armour.0, &body, of_type.as_ref()),
+                    specialist_traits(
+                        traits_of(grid, *id, armour.0, &body, of_type.as_ref()),
+                        &definitions,
+                        item,
+                    ),
                     experience.map_or(1000, crate::Experience::armour_pm),
                     owner.0,
                     item,
@@ -1709,6 +1825,9 @@ pub(crate) fn detonate(world: &mut bevy_ecs::world::World, blast: Blast, report:
         );
     }
     for (id, damage, source) in hits {
+        if only.is_some_and(|target| target != id) {
+            continue;
+        }
         if world
             .resource::<crate::SpecialState>()
             .invulnerable(id, tick)
@@ -1861,6 +1980,17 @@ fn act_unit(
     (weapon, arms): (&mut Weapon, &Arms),
     orders: &mut Orders,
 ) {
+    if field.definitions.rules().is_some()
+        && !matches!(weapon.order, Some(AttackOrder::Attack { .. }))
+        && field
+            .special
+            .controlled
+            .values()
+            .any(|(caster, _)| *caster == id)
+    {
+        weapon.target = None;
+        return;
+    }
     match weapon.order {
         Some(AttackOrder::Attack { target, chases }) => {
             let end = |weapon: &mut Weapon, shots: &mut Shots, reason| {
@@ -2086,6 +2216,7 @@ pub(crate) fn remove_dead(
     mut events: ResMut<Messages<SimEvent>>,
     mut wrecks: ResMut<crate::crew::Wrecks>,
     entities: DeadQuery,
+    special: Res<crate::SpecialState>,
 ) {
     let mut dead: Vec<_> = entities
         .iter()
@@ -2093,7 +2224,9 @@ pub(crate) fn remove_dead(
         .collect();
     dead.sort_unstable_by_key(|(_, id, ..)| **id);
     for (entity, &id, owner, _, mobile, building, unit) in dead {
-        if let (Some(mobile), Some(unit)) = (mobile, unit) {
+        if !special.temporal_removed.contains(&id)
+            && let (Some(mobile), Some(unit)) = (mobile, unit)
+        {
             wrecks.0.push(crate::crew::Wreck {
                 owner: owner.0,
                 id,
@@ -2116,14 +2249,16 @@ pub(crate) fn remove_dead(
             });
         }
         if let Some(building) = building {
-            wrecks.0.push(crate::crew::Wreck {
-                owner: owner.0,
-                id,
-                what: crate::crew::Wrecked::Building {
-                    kind: building.kind,
-                    footprint: building.footprint,
-                },
-            });
+            if !special.temporal_removed.contains(&id) {
+                wrecks.0.push(crate::crew::Wreck {
+                    owner: owner.0,
+                    id,
+                    what: crate::crew::Wrecked::Building {
+                        kind: building.kind,
+                        footprint: building.footprint,
+                    },
+                });
+            }
             for cell in building.footprint.cells() {
                 grid.uncover(cell, id);
             }

@@ -86,7 +86,7 @@ use crate::economy_defs::MAX_BUILDING_TYPES;
 use crate::hash::Fnv1a64;
 
 /// The schema version of the combat file this crate reads.
-pub const COMBAT_SCHEMA_VERSION: i64 = 3;
+pub const COMBAT_SCHEMA_VERSION: i64 = 4;
 
 /// Largest number of armour classes.
 pub const MAX_ARMOUR_CLASSES: usize = 16;
@@ -255,6 +255,15 @@ pub struct WarheadDef {
     pub wall: bool,
     /// It damages trees.
     pub wood: bool,
+    pub temporal: bool,
+    pub mind_control: bool,
+    pub psychic_damage: bool,
+    pub radiation: bool,
+    pub parasite: bool,
+    pub ivan_bomb: bool,
+    pub bomb_disarm: bool,
+    pub electric_assault: bool,
+    pub makes_disguise: bool,
 }
 
 /// A weapon.
@@ -284,6 +293,10 @@ pub struct WeaponDef {
     /// `scatter × distance / range` subcells from its target, and damages by the spread of its
     /// warhead alone; at most [`MAX_SCATTER`].
     pub scatter: u32,
+    pub rad_level: u32,
+    pub area_fire: bool,
+    pub naval_only: bool,
+    pub suicide: bool,
 }
 
 /// The combat terms of a unit or building type.
@@ -390,6 +403,17 @@ impl CombatDefinitions {
         hasher.write_u64(self.warheads.len() as u64);
         for warhead in &self.warheads {
             text(hasher, &warhead.id);
+            hasher.write(&[
+                u8::from(warhead.temporal),
+                u8::from(warhead.mind_control),
+                u8::from(warhead.psychic_damage),
+                u8::from(warhead.radiation),
+                u8::from(warhead.parasite),
+                u8::from(warhead.ivan_bomb),
+                u8::from(warhead.bomb_disarm),
+                u8::from(warhead.electric_assault),
+                u8::from(warhead.makes_disguise),
+            ]);
             hasher.write_u64(warhead.versus.len() as u64);
             for percent in &warhead.versus {
                 hasher.write(&percent.to_le_bytes());
@@ -410,6 +434,12 @@ impl CombatDefinitions {
             hasher.write_u32(weapon.projectile_speed);
             hasher.write(&[u8::from(weapon.anti_air), u8::from(weapon.anti_ground)]);
             hasher.write_u32(weapon.scatter);
+            hasher.write_u32(weapon.rad_level);
+            hasher.write(&[
+                u8::from(weapon.area_fire),
+                u8::from(weapon.naval_only),
+                u8::from(weapon.suicide),
+            ]);
         }
         for list in [&self.units, &self.buildings] {
             hasher.write_u64(list.len() as u64);
@@ -440,6 +470,15 @@ static WARHEAD_SHAPE: Shape = Shape::Struct(&[
     ("percent_at_max", Shape::Int),
     ("wall", Shape::Int),
     ("wood", Shape::Int),
+    ("temporal", Shape::Int),
+    ("mind_control", Shape::Int),
+    ("psychic_damage", Shape::Int),
+    ("radiation", Shape::Int),
+    ("parasite", Shape::Int),
+    ("ivan_bomb", Shape::Int),
+    ("bomb_disarm", Shape::Int),
+    ("electric_assault", Shape::Int),
+    ("makes_disguise", Shape::Int),
     (
         "versus",
         Shape::List {
@@ -461,6 +500,10 @@ static WEAPON_SHAPE: Shape = Shape::Struct(&[
     ("anti_air", Shape::Int),
     ("anti_ground", Shape::Int),
     ("scatter", Shape::Int),
+    ("rad_level", Shape::Int),
+    ("area_fire", Shape::Int),
+    ("naval_only", Shape::Int),
+    ("suicide", Shape::Int),
 ]);
 
 const WEAPON_LIST_SHAPE: Shape = Shape::List {
@@ -580,6 +623,16 @@ struct WarheadEntry {
     percent_at_max: i64,
     wall: i64,
     wood: i64,
+    temporal: i64,
+    mind_control: i64,
+    psychic_damage: i64,
+    radiation: i64,
+    parasite: i64,
+    ivan_bomb: i64,
+    bomb_disarm: i64,
+    electric_assault: i64,
+    makes_disguise: i64,
+
     versus: Vec<VersusEntry>,
 }
 
@@ -604,6 +657,10 @@ struct WeaponEntry {
     anti_air: i64,
     anti_ground: i64,
     scatter: i64,
+    rad_level: i64,
+    area_fire: i64,
+    naval_only: i64,
+    suicide: i64,
 }
 
 #[derive(Deserialize)]
@@ -922,6 +979,15 @@ fn validate(
             percent_at_max: ranged(&at("percent_at_max"), entry.percent_at_max, 0, 100u32, " %")?,
             wall: flag(&at("wall"), entry.wall)?,
             wood: flag(&at("wood"), entry.wood)?,
+            temporal: flag(&at("temporal"), entry.temporal)?,
+            mind_control: flag(&at("mind_control"), entry.mind_control)?,
+            psychic_damage: flag(&at("psychic_damage"), entry.psychic_damage)?,
+            radiation: flag(&at("radiation"), entry.radiation)?,
+            parasite: flag(&at("parasite"), entry.parasite)?,
+            ivan_bomb: flag(&at("ivan_bomb"), entry.ivan_bomb)?,
+            bomb_disarm: flag(&at("bomb_disarm"), entry.bomb_disarm)?,
+            electric_assault: flag(&at("electric_assault"), entry.electric_assault)?,
+            makes_disguise: flag(&at("makes_disguise"), entry.makes_disguise)?,
         });
     }
 
@@ -933,7 +999,11 @@ fn validate(
         let range = ranged(
             &at("range"),
             entry.range,
-            MIN_WEAPON_RANGE,
+            if entry.area_fire == 1 {
+                256
+            } else {
+                MIN_WEAPON_RANGE
+            },
             MAX_WEAPON_RANGE,
             " subcells",
         )?;
@@ -988,6 +1058,10 @@ fn validate(
             anti_air,
             anti_ground,
             scatter,
+            rad_level: ranged(&at("rad_level"), entry.rad_level, 0, 10000u32, "")?,
+            area_fire: flag(&at("area_fire"), entry.area_fire)?,
+            naval_only: flag(&at("naval_only"), entry.naval_only)?,
+            suicide: flag(&at("suicide"), entry.suicide)?,
         });
     }
 
