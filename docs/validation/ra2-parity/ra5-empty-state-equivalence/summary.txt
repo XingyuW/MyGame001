@@ -1,0 +1,4 @@
+Before/after exits: 0/0
+RA5 replay: 141 checkpoints, digest 5707eee71ec6519d
+crates/sim/src/garrison.rs: restored SHA256 e283defbd91dac7e405b7e8ea4c8a43fe86f65e35034215651c7670f54e9d0d7
+crates/sim/src/world_objects.rs: restored SHA256 5d35159188ab286b2308994477ca9b78eb984697208c945f906f6fb1ccfc87fb

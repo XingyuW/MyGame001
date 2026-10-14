@@ -1,0 +1,10 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 13.94s
+     Running tests/ra5_world.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra5_world-109ae10017d56467)
+
+running 1 test
+RA5 replay: 141 checkpoints, digest 5707eee71ec6519d
+test ra5_bridge_collapse_and_hospital_cargo_change_hash_and_replay_deterministically ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 21 filtered out; finished in 0.07s
+

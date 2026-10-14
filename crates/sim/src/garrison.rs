@@ -188,6 +188,9 @@ pub(crate) fn deploy(world: &mut World, owner: PlayerId, id: SimId) -> Result<()
     Ok(())
 }
 pub(crate) fn cleanup(world: &mut World) {
+    if world.resource::<SpecialState>().garrisons.is_empty() {
+        return;
+    }
     let defs = world.resource::<Definitions>().clone();
     let occupied = world.resource::<SpecialState>().garrisons.clone();
     for (id, mut g) in occupied {
@@ -244,6 +247,9 @@ pub(crate) fn cleanup(world: &mut World) {
 /// Occupation weapons use the ordinary impact function and event path. One reload divided by
 /// the current occupant count expresses the reference's combined fire rate.
 pub(crate) fn fire(world: &mut World) {
+    if world.resource::<SpecialState>().garrisons.is_empty() {
+        return;
+    }
     use bevy_ecs::message::Messages;
     let defs = world.resource::<Definitions>().clone();
     let occupied = world.resource::<SpecialState>().garrisons.clone();
