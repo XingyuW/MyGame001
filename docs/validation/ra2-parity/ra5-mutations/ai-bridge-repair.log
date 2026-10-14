@@ -1,0 +1,39 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+warning: unused variable: `bridges`
+   --> crates/sim/src/ai.rs:801:5
+    |
+801 |     bridges: Res<crate::Bridges>,
+    |     ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_bridges`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `repair_bridge` is never used
+   --> crates/sim/src/ai.rs:917:4
+    |
+917 | fn repair_bridge(
+    |    ^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `sim` (lib) generated 2 warnings (run `cargo fix --lib -p sim` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 14.55s
+     Running tests/ra5_world.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra5_world-109ae10017d56467)
+
+running 1 test
+test ra5_ai_repairs_the_only_land_route_with_a_consumed_engineer_and_wins ... FAILED
+
+failures:
+
+---- ra5_ai_repairs_the_only_land_route_with_a_consumed_engineer_and_wins stdout ----
+
+thread 'ra5_ai_repairs_the_only_land_route_with_a_consumed_engineer_and_wins' (861891) panicked at crates/sim/tests/ra5_world.rs:729:5:
+no winner inside unchanged 72000-tick limit; repaired=false, consumed=false, crossed=false, engineers={}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ra5_ai_repairs_the_only_land_route_with_a_consumed_engineer_and_wins
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 19 filtered out; finished in 16.25s
+
+error: test failed, to rerun pass `-p sim --test ra5_world`

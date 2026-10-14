@@ -22,6 +22,7 @@ pub(crate) struct Materials {
     pub(crate) glow: Handle<Image>,
     pub(crate) smoke: Handle<Image>,
     pub(crate) ring: Handle<Image>,
+    crate_image: Handle<Image>,
 }
 #[derive(Component)]
 pub(crate) struct BattlefieldVisual;
@@ -32,6 +33,7 @@ struct Ground {
     phase: f32,
     /// Ore top layer: hidden once the player has seen the cell mined out.
     ore: bool,
+    bridge: bool,
     depleted: bool,
     /// How far the sprite is drawn past its own diamond. It is shown no more revealed than any
     /// cell it covers, so it never paints over shroud or the void beyond the map edge.
@@ -90,7 +92,8 @@ const CROPS: usize = 21;
 const MARSH: usize = 22;
 const ASH: usize = 23;
 const LAVA: usize = 24;
-pub(crate) const ATLASES: usize = 25;
+const GEMS: usize = 25;
+pub(crate) const ATLASES: usize = 26;
 /// Neighbours as (dx, dy, bit): 1 = -y, 2 = +x, 4 = +y, 8 = -x (the road and bridge variants).
 const NEIGHBOURS: [(i32, i32, u8); 4] = [(0, -1, 1), (1, 0, 2), (0, 1, 4), (-1, 0, 8)];
 /// What the rock terrace is multiplied with on volcanic ash: black basalt with a scorched cap.
@@ -123,6 +126,8 @@ impl Plugin for BattlefieldPlugin {
                 (
                     terrain,
                     raze_scenery,
+                    bridge_states,
+                    garrison_pips,
                     sprout_ore,
                     animate_ground,
                     show_crates,
@@ -160,6 +165,7 @@ fn load(world: &mut World) {
             glow: read("glow", 128)?,
             smoke: read("smoke", 128)?,
             ring: read("ring", 128)?,
+            crate_image: read("crate", 128)?,
         })
     })();
     match result {
@@ -282,7 +288,8 @@ fn terrain(
                         cell,
                         water: image == WATER,
                         phase: slot as f32,
-                        ore: image == ORE,
+                        ore: image == ORE || image == GEMS,
+                        bridge: image == BRIDGE,
                         depleted: false,
                         reach,
                         depth: if image == WATER {
@@ -304,7 +311,7 @@ fn terrain(
                         ),
                         stain: if image == CLIFF && ground == Soil::Ash {
                             BASALT_STAIN
-                        } else if image == ORE && feature == Feature::Gems {
+                        } else if image == GEMS {
                             GEM_STAIN
                         } else if image == LAVA {
                             // A flow glows unevenly, which also hides the texture's period.
@@ -402,8 +409,18 @@ fn terrain(
             };
             let scatter = (x.wrapping_mul(31) ^ y.wrapping_mul(71)) % 16;
             let top = match (feature, ground) {
-                (Feature::None | Feature::Lava, _) => None,
-                (Feature::Ore | Feature::Gems, _) => Some((ORE, scatter)),
+                (
+                    Feature::None
+                    | Feature::Lava
+                    | Feature::OilDerrick
+                    | Feature::Hospital
+                    | Feature::Airport
+                    | Feature::TechOutpost
+                    | Feature::BridgeHut,
+                    _,
+                ) => None,
+                (Feature::Ore, _) => Some((ORE, scatter)),
+                (Feature::Gems, _) => Some((GEMS, scatter)),
                 (Feature::Cliff, Soil::Snow | Soil::Ice) => Some((SNOW_CLIFF, scatter)),
                 (Feature::Cliff, Soil::Sand) => Some((MESA, scatter)),
                 (Feature::Cliff, _) => Some((CLIFF, scatter)),
@@ -440,6 +457,67 @@ fn terrain(
 /// Clears destroyed scenery ([`SimEvent::PropDestroyed`]) from the picture: its top goes, churned
 /// earth is left, and the map the interface reads (`MapTerrain`, `MapLooks`: picking, order
 /// preview, minimap) shows open ground there. The blast itself is drawn by [`effects`].
+fn bridge_states(
+    host: Res<SimHost>,
+    mut terrain: Option<ResMut<MapTerrain>>,
+    mut looks: Option<ResMut<crate::map::MapLooks>>,
+    mut last: Local<Option<u64>>,
+) {
+    if *last == Some(host.tick()) {
+        return;
+    }
+    *last = Some(host.tick());
+    let (Some(grid), Some(bridges)) = (host.grid(), host.world().get_resource::<sim::Bridges>())
+    else {
+        return;
+    };
+    let vision = crate::fog::human_vision(host.players());
+    for bridge in bridges.bridges.values() {
+        for &cell in &bridge.cells {
+            if let (Some(terrain), Some(value)) = (terrain.as_mut(), grid.cell(cell)) {
+                terrain.0.set_terrain(cell, *value);
+            }
+            // Fog keeps the last observed deck state; re-observation also catches changes that
+            // happened outside sight, so the minimap and the deck sprite agree.
+            if vision.is_some_and(|v| v.is_visible(cell)) {
+                let index = cell.y as usize * grid.width() as usize + cell.x as usize;
+                if let Some(look) = looks.as_mut().and_then(|l| l.0.get_mut(index)) {
+                    *look = if bridge.collapsed { 6 } else { 6 | (8 << 4) };
+                }
+            }
+        }
+    }
+}
+
+fn garrison_pips(host: Res<SimHost>, map: Option<Res<MapView>>, mut gizmos: Gizmos) {
+    let (Some(map), Some(state)) = (map, host.world().get_resource::<sim::SpecialState>()) else {
+        return;
+    };
+    let Some(vision) = crate::fog::human_vision(host.players()) else {
+        return;
+    };
+    for (id, g) in &state.garrisons {
+        if g.owner != crate::units::HUMAN && !vision.is_visible(g.cell) {
+            continue;
+        }
+        let count = state.cargo.get(id).map_or(0, Vec::len);
+        let point = crate::projection::cell_centre(g.cell, map.tile)
+            + Vec2::new(-(count as f32) * 3.0, 32.0);
+        let color = if g.owner == crate::units::HUMAN {
+            Color::srgb(0.3, 1.0, 0.3)
+        } else {
+            Color::srgb(1.0, 0.3, 0.2)
+        };
+        for i in 0..count {
+            gizmos.rect_2d(
+                point + Vec2::new(i as f32 * 6.0, 0.0),
+                Vec2::new(4.0, 5.0),
+                color,
+            );
+        }
+    }
+}
+
 fn raze_scenery(
     mut commands: Commands,
     mut events: MessageReader<SimEvent>,
@@ -452,7 +530,9 @@ fn raze_scenery(
     let razed: Vec<CellPos> = events
         .read()
         .filter_map(|event| match event {
-            SimEvent::PropDestroyed { cell, .. } => Some(*cell),
+            SimEvent::PropDestroyed { cell, kind, .. } if *kind != sim::PropKind::Bridge => {
+                Some(*cell)
+            }
             _ => None,
         })
         .collect();
@@ -498,6 +578,7 @@ fn raze_scenery(
                 water: false,
                 phase: 0.0,
                 ore: false,
+                bridge: false,
                 depleted: false,
                 reach: Reach::Ring,
                 depth: 0,
@@ -596,6 +677,7 @@ fn sprout_ore(
                     water: false,
                     phase: scatter as f32,
                     ore: true,
+                    bridge: false,
                     // Shown once the player sees the cell.
                     depleted: true,
                     reach: Reach::Cell,
@@ -609,7 +691,7 @@ fn sprout_ore(
                     },
                 },
                 Sprite {
-                    image: materials.terrain[ORE].clone(),
+                    image: materials.terrain[if grid.is_gems(cell) { GEMS } else { ORE }].clone(),
                     rect: Some(Rect::new(
                         left as f32,
                         top as f32,
@@ -632,12 +714,13 @@ struct CrateMark(CellPos);
 const CRATE_SIZE: f32 = 22.0;
 /// Draws the crates of the match that the human player sees now (RA5, `sim::Crates`): a plain
 /// wooden box in the cell, gone when the crate is taken or the cell is out of sight. A
-/// placeholder until crates have art of their own.
+/// original generated timber-and-steel crate with a separate contact shadow.
 fn show_crates(
     mut commands: Commands,
     host: Res<SimHost>,
     map: Option<Res<MapView>>,
     marks: Query<(Entity, &CrateMark)>,
+    materials: Option<Res<Materials>>,
     reveal: Option<Res<crate::visual_review::RevealTerrain>>,
 ) {
     let seen: std::collections::BTreeSet<CellPos> = match (
@@ -666,20 +749,23 @@ fn show_crates(
         let depth = 0.6 + (cell.x + cell.y) as f32 / 16384.0;
         // A box: its side, and a lighter lid a little above it.
         for (colour, size, lift, z) in [
-            (Color::srgb(0.36, 0.24, 0.12), CRATE_SIZE, 0.0, depth),
-            (
-                Color::srgb(0.72, 0.54, 0.30),
-                CRATE_SIZE - 6.0,
-                3.0,
-                depth + 0.00001,
-            ),
+            (Color::srgba(0.1, 0.1, 0.08, 0.35), CRATE_SIZE, -4.0, depth),
+            (Color::WHITE, CRATE_SIZE, 5.0, depth + 0.00001),
         ] {
             commands.spawn((
                 BattlefieldVisual,
                 CrateMark(*cell),
                 Sprite {
+                    image: if lift > 0.0 {
+                        materials
+                            .as_ref()
+                            .map(|m| m.crate_image.clone())
+                            .unwrap_or_default()
+                    } else {
+                        Handle::default()
+                    },
                     color: colour,
-                    custom_size: Some(Vec2::new(size, size * 0.72)),
+                    custom_size: Some(Vec2::new(size, if lift > 0.0 { size } else { size * 0.4 })),
                     ..default()
                 },
                 Transform::from_translation((position + Vec2::Y * lift).extend(z)),
@@ -721,6 +807,10 @@ fn animate_ground(
                 .grid()
                 .and_then(|g| g.cell(tile.cell))
                 .is_some_and(|c| c.ore > 0)
+        } else if tile.bridge && sight == crate::fog::Sight::Visible {
+            host.grid()
+                .and_then(|g| g.cell(tile.cell))
+                .is_some_and(|c| c.water)
         } else {
             tile.depleted
         };
@@ -1238,6 +1328,7 @@ mod tests {
             glow: Handle::default(),
             smoke: Handle::default(),
             ring: Handle::default(),
+            crate_image: Handle::default(),
         });
         app.world_mut().insert_resource(host);
         let tops = |app: &mut App| {
@@ -1293,6 +1384,7 @@ mod tests {
                 glow: Handle::default(),
                 smoke: Handle::default(),
                 ring: Handle::default(),
+                crate_image: Handle::default(),
             });
             app.world_mut().insert_resource(host);
             if sprouted {

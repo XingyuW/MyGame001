@@ -244,6 +244,22 @@ fn every_shipped_map_grows_with_every_player_count() {
                 if (before, look_before) == (after, look_after) {
                     continue;
                 }
+                // RA5 discrete anchors are not repeated as terrain bands: their extra cells
+                // become land aprons or retain the water under a pier hut. Check that exact
+                // new transformation separately from made-start clearing below.
+                if look_before >> 4 >= 11 && look_after == look_before & 15 {
+                    assert_eq!(
+                        *after,
+                        sim::Cell {
+                            passable: !before.water,
+                            water: before.water,
+                            buildable: !before.water,
+                            ore: 0
+                        },
+                        "{name}: discrete foundation {cell:?}"
+                    );
+                    continue;
+                }
                 changed.insert(cell);
                 assert!(after.passable && !after.water, "{name}: {cell:?} {after:?}");
                 assert_eq!(
@@ -402,6 +418,21 @@ fn every_shipped_map_grows_with_every_player_count() {
                 let players = computers_from(&data, players, 1, shift);
                 let (mut app, enlarged) = start(&data, map, &players, 0);
                 let world = app.world_mut();
+                // RA5: setup really installs retained map objects in headless matches, including
+                // scaled anchors, rather than silently discarding LoadedMap.looks.
+                for (cell, feature) in world.resource::<Grid>().world_features() {
+                    if feature >= 11 {
+                        assert!(
+                            world.resource::<Grid>().building(cell).is_some(),
+                            "{name}: missing object {feature} at {cell:?}"
+                        );
+                    } else if matches!(feature, 4..=8) {
+                        assert!(
+                            world.resource::<sim::Props>().id_at(cell).is_some(),
+                            "{name}: missing prop at {cell:?}"
+                        );
+                    }
+                }
                 let bases: BTreeMap<PlayerId, CellPos> = world
                     .query::<(&Owner, &sim::Unit, &Mobile)>()
                     .iter(world)

@@ -9,7 +9,9 @@
 
 mod ai;
 mod ai_defs;
+mod bridges;
 mod building;
+pub use bridges::{Bridge, Bridges};
 mod combat;
 mod combat_defs;
 mod command;
@@ -22,7 +24,9 @@ mod economy_commands;
 mod economy_defs;
 mod event;
 mod flight;
+mod garrison;
 mod harvest;
+pub use garrison::Garrison;
 mod hash;
 mod id;
 mod map;
@@ -40,6 +44,9 @@ mod skirmish_defs;
 mod unit;
 mod veterancy;
 mod visibility;
+mod world_objects;
+pub use world_objects::install as install_world_objects;
+pub use world_objects::{NEUTRAL, WORLD_ID_BASE, WorldObjects};
 
 pub use ai::{
     AI_UNIT_QUEUE, ARMY_SCALE_SPAN, AiController, AiPlayers, GATHER_DISTANCE, GATHER_RADIUS,

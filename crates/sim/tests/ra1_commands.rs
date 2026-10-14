@@ -1002,3 +1002,180 @@ fn deploying_names_nothing_in_a_footprint_the_player_does_not_see() {
         )]
     );
 }
+
+fn ra5_house(app: &mut App, cell: CellPos) -> SimId {
+    let mut looks = vec![0; 48 * 48];
+    looks[cell.y as usize * 48 + cell.x as usize] = 5 << 4;
+    app.world_mut().resource_mut::<sim::Grid>().set_terrain(
+        cell,
+        sim::Cell {
+            passable: false,
+            water: false,
+            buildable: false,
+            ore: 0,
+        },
+    );
+    let props = sim::Props::from_looks(
+        app.world().resource::<sim::Grid>(),
+        &looks,
+        defs(app).armour_class("wood").expect("wood"),
+    );
+    let id = props.id_at(cell).expect("house");
+    app.world_mut().insert_resource(props);
+    id
+}
+
+#[test]
+fn ra5_same_tick_dead_actors_cannot_capture_repair_enter_hospital_or_occupy() {
+    for (target_type, actor_type) in [
+        ("oil_derrick", "engineer"),
+        ("hospital", "engineer"),
+        ("airport", "engineer"),
+        ("tech_outpost", "engineer"),
+        ("bridge_hut", "engineer"),
+        ("hospital", "gi"),
+        ("civilian_house", "gi"),
+    ] {
+        let mut app = shipped_world();
+        let silo = charged(&mut app, P1, "nuclear_silo", 1, 1);
+        spawn(&mut app, P1, "engineer", 24, 20);
+        let target = if target_type == "civilian_house" {
+            ra5_house(&mut app, CellPos::new(21, 20))
+        } else {
+            place(
+                &mut app,
+                if actor_type == "gi" { P0 } else { sim::NEUTRAL },
+                target_type,
+                21,
+                20,
+            )
+        };
+        let actor = spawn(&mut app, P0, actor_type, 20, 20);
+        ticks(&mut app, 2);
+        set_hp(&mut app, actor, 1);
+        let events = tick(
+            &mut app,
+            vec![
+                fire(P1, silo, (20, 20)),
+                issue(
+                    P0,
+                    Command::Interact {
+                        unit: actor,
+                        target,
+                    },
+                ),
+            ],
+        );
+        assert_eq!(
+            rejections(&events),
+            [RejectReason::UnknownUnit(actor)],
+            "{target_type}: {events:?}"
+        );
+        assert_eq!(exists_as(&mut app, actor), (false, false));
+        assert!(
+            !app.world()
+                .resource::<SpecialState>()
+                .cargo
+                .values()
+                .flatten()
+                .any(|p| p.id == actor)
+        );
+    }
+}
+
+#[test]
+fn ra5_unseen_neutral_tech_and_enemy_garrison_ids_answer_exactly_as_missing_targets() {
+    for target_type in [
+        "oil_derrick",
+        "hospital",
+        "airport",
+        "tech_outpost",
+        "bridge_hut",
+        "civilian_house",
+    ] {
+        let mut app = shipped_world();
+        let engineer = spawn(&mut app, P0, "engineer", 3, 3);
+        let tank = spawn(&mut app, P0, "grizzly", 4, 3);
+        let target = if target_type == "civilian_house" {
+            let house = ra5_house(&mut app, CellPos::new(40, 40));
+            let gi = spawn(&mut app, P1, "conscript", 39, 40);
+            ticks(&mut app, 2);
+            let events = tick(
+                &mut app,
+                vec![issue(
+                    P1,
+                    Command::Interact {
+                        unit: gi,
+                        target: house,
+                    },
+                )],
+            );
+            assert!(rejections(&events).is_empty());
+            house
+        } else {
+            place(&mut app, sim::NEUTRAL, target_type, 40, 40)
+        };
+        ticks(&mut app, 2);
+        for id in [target, SimId(0xFFFF_FFFE)] {
+            let events = tick(
+                &mut app,
+                vec![
+                    issue(
+                        P0,
+                        Command::Interact {
+                            unit: engineer,
+                            target: id,
+                        },
+                    ),
+                    issue(
+                        P0,
+                        Command::Attack {
+                            units: vec![tank],
+                            target: id,
+                        },
+                    ),
+                ],
+            );
+            assert_eq!(
+                rejections(&events),
+                [
+                    RejectReason::UnknownTarget(id),
+                    RejectReason::UnknownTarget(id)
+                ],
+                "{target_type}: {events:?}"
+            );
+        }
+    }
+}
+
+#[test]
+fn ra5_garrison_destroyed_earlier_in_the_command_tick_cannot_deploy() {
+    let mut app = shipped_world();
+    let silo = charged(&mut app, P1, "nuclear_silo", 1, 1);
+    spawn(&mut app, P1, "engineer", 24, 20);
+    let house = ra5_house(&mut app, CellPos::new(20, 20));
+    let gi = spawn(&mut app, P0, "gi", 19, 20);
+    ticks(&mut app, 2);
+    tick(
+        &mut app,
+        vec![issue(
+            P0,
+            Command::Interact {
+                unit: gi,
+                target: house,
+            },
+        )],
+    );
+    let events = tick(
+        &mut app,
+        vec![
+            fire(P1, silo, (20, 20)),
+            issue(P0, Command::Deploy { unit: house }),
+        ],
+    );
+    assert_eq!(
+        rejections(&events),
+        [RejectReason::UnknownUnit(house)],
+        "{events:?}"
+    );
+}

@@ -798,6 +798,8 @@ pub(crate) fn run_ai(
     units: UnitQuery,
     buildings: BuildingQuery,
     special: Res<crate::SpecialState>,
+    bridges: Res<crate::Bridges>,
+    props: Res<crate::Props>,
 ) {
     if ai.controllers.is_empty() || state.outcome().is_some() {
         return;
@@ -852,6 +854,26 @@ pub(crate) fn run_ai(
             pending: building.pending_units.clone(),
         })
         .collect();
+    for (id, g) in &special.garrisons {
+        if let Some((cell, prop)) = props.get(*id).filter(|(_, p)| p.hit_points > 0)
+            && let Some(ProductionItem::Building(kind)) =
+                crate::garrison::item(&definitions, prop.kind)
+        {
+            building_snaps.push(BuildingSnap {
+                id: *id,
+                owner: g.owner,
+                kind,
+                footprint: Footprint {
+                    origin: cell,
+                    width: 1,
+                    height: 1,
+                },
+                producer: None,
+                sight: definitions.building_combat(kind).map(|t| t.sight),
+                pending: Vec::new(),
+            });
+        }
+    }
     building_snaps.sort_unstable_by_key(|building| building.id);
 
     let AiPlayers {
@@ -881,12 +903,89 @@ pub(crate) fn run_ai(
             &building_snaps,
             &special,
         );
-        let commands = think(&view, controller);
+        let mut commands = repair_bridge(&view, &special, &bridges, &building_snaps);
+        commands.extend(think(&view, controller));
         controller.issued = controller.issued.saturating_add(commands.len() as u64);
         for command in commands {
             queue.push(IssuedCommand { player, command });
         }
     }
+}
+
+/// Uses only currently seen huts and a visible collapsed deck. Terrain outside vision does
+/// not reveal damage, and no neutral target is added to combat memory.
+fn repair_bridge(
+    view: &View<'_>,
+    special: &crate::SpecialState,
+    bridges: &crate::Bridges,
+    buildings: &[BuildingSnap],
+) -> Vec<Command> {
+    let hut = buildings
+        .iter()
+        .filter(|building| view.vision.sees_footprint(building.footprint))
+        .filter(|building| {
+            bridges
+                .huts
+                .get(&building.id)
+                .and_then(|id| bridges.bridges.get(id))
+                .is_some_and(|bridge| {
+                    bridge.collapsed
+                        && bridge
+                            .cells
+                            .iter()
+                            .any(|&cell| view.vision.is_visible(cell))
+                })
+        })
+        .filter(|building| {
+            crate::pathfinding::nearest_cell(
+                view.grid,
+                view.own_units
+                    .first()
+                    .map_or(building.footprint.origin, |unit| unit.mobile.cell),
+                |cell| {
+                    view.grid.is_passable(cell) && building.footprint.distance_to_cell(cell) == 1
+                },
+            )
+            .is_some()
+        })
+        .min_by_key(|building| building.id);
+    let Some(hut) = hut else { return Vec::new() };
+    let is_engineer = |kind| {
+        view.definitions
+            .metadata(ProductionItem::Unit(kind))
+            .is_some_and(|entry| entry.role == crate::Role::Engineer)
+    };
+    if let Some(unit) = view
+        .own_units
+        .iter()
+        .filter(|unit| is_engineer(unit.kind))
+        .min_by_key(|unit| unit.id)
+    {
+        if special.interactions.get(&unit.id) == Some(&hut.id) {
+            return Vec::new();
+        }
+        return vec![Command::Interact {
+            unit: unit.id,
+            target: hut.id,
+        }];
+    }
+    if view.definitions.units().iter().enumerate().any(|(i, _)| {
+        is_engineer(crate::UnitKind(i as u16))
+            && view.queued(ProductionItem::Unit(crate::UnitKind(i as u16))) > 0
+    }) {
+        return Vec::new();
+    }
+    view.definitions
+        .units()
+        .iter()
+        .enumerate()
+        .filter_map(|(i, _)| {
+            let kind = crate::UnitKind(i as u16);
+            let item = ProductionItem::Unit(kind);
+            (is_engineer(kind) && view.queueable(item)).then_some(Command::QueueProduction { item })
+        })
+        .take(1)
+        .collect()
 }
 
 /// One turn of a computer player: updates its memory and returns its commands.

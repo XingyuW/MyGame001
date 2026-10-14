@@ -98,3 +98,6 @@ war_miner	unit	HARV	soviet	-
 weather_control	building	GAWEAT	allied	-
 yuri	unit	YURI	soviet	-
 yuri_prime	unit	YURIPR	soviet	stolen_tech
+civilian_house	building	CAEUR1	none	civilian
+civilian_city	building	CAWA2A	none	civilian
+civilian_tower	building	CACITY01	none	civilian

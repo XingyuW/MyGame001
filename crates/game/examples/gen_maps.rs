@@ -96,7 +96,7 @@ const fn kind(
         passable,
         buildable,
         ore,
-        water: matches!(ground, G::Water) && matches!(feature, F::None),
+        water: matches!(ground, G::Water) && !matches!(feature, F::Bridge),
         look: look(ground, feature),
     }
 }
@@ -111,7 +111,7 @@ const WAY: (bool, bool, i32) = (true, false, 0);
 const BLOCKED: (bool, bool, i32) = (false, false, 0);
 
 /// The tileset, indexed by tile id.
-pub const TILES: [TileKind; 51] = [
+pub const TILES: [TileKind; 57] = [
     kind("grass", [74, 132, 58], OPEN, G::Grass, F::None),
     kind("ore", [196, 158, 44], ORE_FIELD, G::Grass, F::Ore),
     kind("water", [38, 86, 160], BLOCKED, G::Water, F::None),
@@ -175,6 +175,42 @@ pub const TILES: [TileKind; 51] = [
     kind("snow gems", [112, 206, 206], GEM_FIELD, G::Snow, F::Gems),
     kind("ash gems", [58, 160, 156], GEM_FIELD, G::Ash, F::Gems),
     kind("marsh gems", [56, 150, 132], GEM_FIELD, G::Marsh, F::Gems),
+    kind(
+        "oil derrick",
+        [176, 156, 100],
+        BLOCKED,
+        G::Pavement,
+        F::OilDerrick,
+    ),
+    kind(
+        "hospital",
+        [220, 210, 200],
+        BLOCKED,
+        G::Pavement,
+        F::Hospital,
+    ),
+    kind("airport", [150, 164, 180], BLOCKED, G::Pavement, F::Airport),
+    kind(
+        "tech outpost",
+        [150, 160, 130],
+        BLOCKED,
+        G::Pavement,
+        F::TechOutpost,
+    ),
+    kind(
+        "bridge repair hut",
+        [150, 108, 80],
+        BLOCKED,
+        G::Dirt,
+        F::BridgeHut,
+    ),
+    kind(
+        "pier repair hut",
+        [150, 108, 80],
+        BLOCKED,
+        G::Water,
+        F::BridgeHut,
+    ),
 ];
 
 pub const GRASS: u32 = 0;
@@ -393,6 +429,188 @@ pub const MAPS: [MapSpec; 20] = [
     },
 ];
 
+/// Discrete neutral anchors are point-symmetric and replace existing scenery where possible.
+/// They stay out of all start clearings; the three small rule maps keep their historic cells.
+fn neutral_sites(spec: &MapSpec, tiles: &mut [u32]) {
+    let (w, h) = (spec.width as i32, spec.height as i32);
+    let index = |x: i32, y: i32| (y * w + x) as usize;
+    let total = tiles.len();
+    let mirror = |i: usize| total - 1 - i;
+    // Do not block a peninsula neck or strand a small passable pocket with a hut.
+    let stays_connected = |x: i32, y: i32, tiles: &[u32]| {
+        let neighbors: Vec<_> = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
+            .into_iter()
+            .filter(|&(a, b)| TILES[tiles[index(a, b)] as usize].passable)
+            .collect();
+        let Some(&first) = neighbors.first() else {
+            return true;
+        };
+        let mut seen = std::collections::BTreeSet::from([first]);
+        let mut pending = vec![first];
+        while let Some((a, b)) = pending.pop() {
+            for next in [(a - 1, b), (a + 1, b), (a, b - 1), (a, b + 1)] {
+                let (nx, ny) = next;
+                if nx >= 0
+                    && ny >= 0
+                    && nx < w
+                    && ny < h
+                    && next != (x, y)
+                    && nx.abs_diff(x).max(ny.abs_diff(y)) <= 2
+                    && TILES[tiles[index(nx, ny)] as usize].passable
+                    && seen.insert(next)
+                {
+                    pending.push(next);
+                }
+            }
+        }
+        neighbors.iter().all(|p| seen.contains(p))
+    };
+    let mut placed: Vec<(i32, i32)> = Vec::new();
+    for n in 0..4 {
+        let tx = w * (2 + n % 2) / 5;
+        let ty = h * (1 + n / 2) / 5;
+        let choice = (2..h - 2)
+            .flat_map(|y| (2..w - 2).map(move |x| (x, y)))
+            .filter(|&(x, y)| {
+                let i = index(x, y);
+                let j = total - 1 - i;
+                let t = &TILES[tiles[i] as usize];
+                let m = &TILES[tiles[j] as usize];
+                matches!(t.look >> 4, 4..=7)
+                    && matches!(m.look >> 4, 4..=7)
+                    && spec
+                        .starts()
+                        .iter()
+                        .all(|&(sx, sy)| x.abs_diff(sx as i32).max(y.abs_diff(sy as i32)) > 12)
+                    && placed
+                        .iter()
+                        .all(|&(px, py)| x.abs_diff(px).max(y.abs_diff(py)) > 5)
+                    && [(1, 0), (-1, 0), (0, 1), (0, -1)]
+                        .into_iter()
+                        .filter(|&(dx, dy)| TILES[tiles[index(x + dx, y + dy)] as usize].passable)
+                        .count()
+                        >= 3
+            })
+            .min_by_key(|&(x, y)| ((x - tx).pow(2) + (y - ty).pow(2), y, x));
+        let Some((x, y)) = choice else {
+            panic!("{} has no neutral site {}", spec.id, n)
+        };
+        let i = index(x, y);
+        let j = mirror(i);
+        tiles[i] = 51 + n as u32;
+        tiles[j] = 51 + n as u32;
+        placed.extend([(x, y), (w - 1 - x, h - 1 - y)]);
+    }
+    // A repair hut at each end of each connected deck run, off the traffic lane.
+    let mut remaining: std::collections::BTreeSet<(i32, i32)> = (0..h)
+        .flat_map(|y| (0..w).map(move |x| (x, y)))
+        .filter(|&(x, y)| TILES[tiles[index(x, y)] as usize].look >> 4 == 8)
+        .collect();
+    while let Some(&first) = remaining.first() {
+        let mut pending = vec![first];
+        let mut cells = Vec::new();
+        remaining.remove(&first);
+        while let Some((x, y)) = pending.pop() {
+            cells.push((x, y));
+            for p in [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)] {
+                if remaining.remove(&p) {
+                    pending.push(p);
+                }
+            }
+        }
+        let minx = cells.iter().map(|p| p.0).min().unwrap_or(0);
+        let maxx = cells.iter().map(|p| p.0).max().unwrap_or(0);
+        let miny = cells.iter().map(|p| p.1).min().unwrap_or(0);
+        let maxy = cells.iter().map(|p| p.1).max().unwrap_or(0);
+        let horizontal = maxx - minx >= maxy - miny;
+        for end in [false, true] {
+            let edge = if horizontal {
+                if end { maxx } else { minx }
+            } else if end {
+                maxy
+            } else {
+                miny
+            };
+            let across: Vec<_> = cells
+                .iter()
+                .filter(|p| if horizontal { p.0 == edge } else { p.1 == edge })
+                .map(|p| if horizontal { p.1 } else { p.0 })
+                .collect();
+            let middle = (across.iter().min().copied().unwrap_or(0)
+                + across.iter().max().copied().unwrap_or(0))
+                / 2;
+            let (ex, ey) = if horizontal {
+                (edge, middle)
+            } else {
+                (middle, edge)
+            };
+            let outward = |x, y| {
+                if horizontal {
+                    if end { x > maxx } else { x < minx }
+                } else if end {
+                    y > maxy
+                } else {
+                    y < miny
+                }
+            };
+            if (1..h - 1).any(|y| {
+                (1..w - 1).any(|x| {
+                    outward(x, y)
+                        && x.abs_diff(ex).max(y.abs_diff(ey)) <= 3
+                        && TILES[tiles[index(x, y)] as usize].look >> 4 == 15
+                })
+            }) {
+                continue;
+            }
+            let choice = (1..h - 1)
+                .flat_map(|y| (1..w - 1).map(move |x| (x, y)))
+                .filter(|&(x, y)| {
+                    let t = &TILES[tiles[index(x, y)] as usize];
+                    let mt = &TILES[tiles[total - 1 - index(x, y)] as usize];
+                    let distance = x.abs_diff(ex).max(y.abs_diff(ey));
+                    outward(x, y)
+                        && distance <= 3
+                        && (if horizontal { y != ey } else { x != ex })
+                        && (t.passable || (t.water && distance <= 2))
+                        && t.look >> 4 != 8
+                        && (t.water || stays_connected(x, y, tiles))
+                        && t.ore == 0
+                        && (mt.passable || mt.water)
+                        && mt.look >> 4 != 8
+                        && mt.ore == 0
+                        && [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
+                            .iter()
+                            .filter(|&&(a, b)| {
+                                let n = &TILES[tiles[index(a, b)] as usize];
+                                n.passable || (t.water && n.water)
+                            })
+                            .count()
+                            >= 3
+                })
+                // Some original decks are one-bank piers: the seaward end gets a raised hut
+                // foundation beside the deck, without creating any new traversable land.
+                .min_by_key(|&(x, y)| {
+                    (
+                        TILES[tiles[index(x, y)] as usize].water,
+                        (x - ex).pow(2) + (y - ey).pow(2),
+                        y,
+                        x,
+                    )
+                });
+            if let Some((x, y)) = choice {
+                let i = index(x, y);
+                let hut = if TILES[tiles[i] as usize].water {
+                    56
+                } else {
+                    55
+                };
+                tiles[i] = hut;
+                tiles[total - 1 - i] = hut;
+            }
+        }
+    }
+}
+
 /// The painted maps' tiles, painted once (row-major, in `MAPS` order; empty for rule maps).
 fn painted() -> &'static [Vec<u32>] {
     static PAINTED: std::sync::OnceLock<Vec<Vec<u32>>> = std::sync::OnceLock::new();
@@ -408,6 +626,7 @@ fn painted() -> &'static [Vec<u32>] {
                     let mut painter =
                         world_maps::Painter::new(spec.width, spec.height, &spec.starts(), *biome);
                     recipe(&mut painter);
+                    neutral_sites(spec, &mut painter.tiles);
                     painter.tiles
                 }
             })

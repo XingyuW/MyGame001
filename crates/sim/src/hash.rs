@@ -143,6 +143,10 @@ pub fn state_hash(world: &mut World) -> u64 {
         .resource::<crate::SpecialState>()
         .hash_into(&mut hasher);
     world.resource::<crate::Props>().hash_into(&mut hasher);
+    world
+        .resource::<crate::WorldObjects>()
+        .hash_into(&mut hasher);
+    world.resource::<crate::Bridges>().hash_into(&mut hasher);
     // RA4: the experience of every trainable unit in id order, and the kills and wrecks of a
     // tick under way (both empty between ticks). Each part is written only if it holds
     // something, under its own tag, so that a world without them hashes as before.

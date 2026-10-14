@@ -779,6 +779,7 @@ fn match_problems(
                 mcv_repacks: choice.mcv_repacks,
                 crates: choice.crates,
                 ore_grows: true,
+                bridge_destruction: true,
             },
         "short game, superweapons, MCV repacks or crates are not as chosen",
     );
@@ -2693,8 +2694,8 @@ mod tests {
         smoke.problem(format!("something {}", "else"));
         assert_eq!(smoke.flow_problems, 2);
         assert_eq!(
-            MENU_BUTTONS, 73,
-            "16 rows, 10 countries, 9 difficulties, 3 buttons"
+            MENU_BUTTONS, 75,
+            "17 rows, 10 countries, 9 difficulties, 3 buttons"
         );
     }
 
@@ -2821,6 +2822,7 @@ mod tests {
                 crates: false,
                 mcv_repacks: true,
                 ore_grows: true,
+                bridge_destruction: true,
             }
         );
         assert_eq!(

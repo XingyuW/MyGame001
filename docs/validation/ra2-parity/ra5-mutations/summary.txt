@@ -1,0 +1,2 @@
+startup: expected failure, exit 101, original 11e2c76bdd1a53403736282d67b98d7a60da997d64c63598a4898f4c5973a62e, restored 11e2c76bdd1a53403736282d67b98d7a60da997d64c63598a4898f4c5973a62e
+ai-bridge-repair: expected failure, exit 101, original 5241999603ecb14388a8e1402a350ccb2bb3e2dfcd3dcf5af73a579258aa7053, restored 5241999603ecb14388a8e1402a350ccb2bb3e2dfcd3dcf5af73a579258aa7053

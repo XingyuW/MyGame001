@@ -276,6 +276,12 @@ fn input(
     }
     if keys.just_pressed(KeyCode::KeyD) {
         sink.issue(deploy_commands(&selection));
+        if let Some(id) = selected
+            .0
+            .filter(|id| crate::selection::own_garrisons(&host).contains(id))
+        {
+            sink.issue([Command::Deploy { unit: id }]);
+        }
         // With no unit selected, D packs up the selected Construction Yard (RA1, while the
         // match has "MCV repacks" on).
         sink.issue(repack_target(&host, &selection, &selected));
@@ -304,6 +310,7 @@ fn input(
                 g.occupant(cell)
                     .or_else(|| g.occupant_for(cell, sim::Domain::Air))
                     .or_else(|| g.building(cell))
+                    .or_else(|| host.props().and_then(|p| p.id_at(cell)))
             });
             target.map_or(0, |t| sink.issue(interact_commands(&selection, t)))
         }

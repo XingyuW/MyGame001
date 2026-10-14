@@ -84,7 +84,8 @@ pub fn shipped_class(id: &str) -> Option<WeaponClass> {
     use WeaponClass::*;
     Some(match id {
         "m60" | "m60_e" | "para" | "para_e" | "m1_carbine" | "m1_carbine_e" | "double_pistols"
-        | "double_pistols_e" | "chrono_mp5" | "chrono_mp5_e" => Rifle,
+        | "double_pistols_e" | "chrono_mp5" | "chrono_mp5_e" | "allied_occupy"
+        | "soviet_occupy" => Rifle,
         "vulcan"
         | "vulcan2"
         | "gun_20mm"

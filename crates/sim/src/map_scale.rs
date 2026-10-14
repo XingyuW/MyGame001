@@ -779,7 +779,52 @@ pub fn enlarged_map(
     gems.retain(|&index| {
         canvas.cells[index] == before.0[index] && canvas.looks[index] == before.1[index]
     });
+    // Discrete objects retain source-cell identity: duplicating terrain bands must not
+    // duplicate one building, or merge two adjacent buildings of the same type.
+    let anchors: Vec<_> = grid
+        .world_features()
+        .filter(|(_, feature)| *feature >= 11)
+        .map(|(cell, feature)| {
+            (
+                CellPos::new(
+                    moved(&columns, grid.width(), cell.x),
+                    moved(&rows, grid.height(), cell.y),
+                ),
+                feature,
+            )
+        })
+        .collect();
+    let anchors: std::collections::BTreeMap<_, _> = anchors
+        .into_iter()
+        .filter(|(cell, feature)| {
+            let index = cell.y as usize * width as usize + cell.x as usize;
+            canvas
+                .looks
+                .get(index)
+                .is_some_and(|look| look >> 4 == *feature)
+                && before.0.get(index) == canvas.cells.get(index)
+        })
+        .collect();
+    // A source anchor remains one occupied cell. The repeated terrain bands around it become
+    // its clear apron, not invisible indestructible obstacles or extra buildings.
+    for (index, look) in canvas.looks.iter_mut().enumerate() {
+        if *look >> 4 >= 11 {
+            let cell = CellPos::new(index as i32 % width, index as i32 / width);
+            if !anchors.contains_key(&cell) {
+                *look &= 15;
+                let water = *look == 6;
+                canvas.cells[index] = Cell {
+                    passable: !water,
+                    water,
+                    buildable: !water,
+                    ore: 0,
+                };
+            }
+        }
+    }
     let mut grid = Grid::from_cells(size.0, size.1, canvas.cells).ok_or(too_large)?;
+    grid.mark_world_features(&canvas.looks);
+
     for index in gems {
         let index = i32::try_from(index).unwrap_or(i32::MAX);
         grid.set_gems(CellPos::new(index % width, index / width), true);

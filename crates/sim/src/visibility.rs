@@ -201,9 +201,23 @@ pub(crate) fn update_visibility(
     grid: Res<Grid>,
     mut players: ResMut<Players>,
     sources: Query<(&Owner, &Sight, Option<&Mobile>, Option<&Building>)>,
+    special: Res<crate::SpecialState>,
+    props: Res<crate::Props>,
+    defs: Res<crate::Definitions>,
 ) {
     for (_, state) in players.iter_mut() {
         state.vision.begin(&grid);
+    }
+    for (id, g) in &special.garrisons {
+        if let Some((_, prop)) = props.get(*id)
+            && let Some(crate::ProductionItem::Building(kind)) =
+                crate::garrison::item(&defs, prop.kind)
+            && let Some(terms) = defs.building_combat(kind)
+            && let Some(state) = players.get_mut(g.owner)
+        {
+            let (x, y) = (i64::from(g.cell.x), i64::from(g.cell.y));
+            state.vision.reveal((x, y, x, y), terms.sight);
+        }
     }
     for (owner, sight, mobile, building) in &sources {
         let Some(state) = players.get_mut(owner.0) else {

@@ -139,3 +139,6 @@ super_mind_control	weapon	SuperMindControl
 hornet_bomb	weapon	HornetBomb
 hornet_bomb_e	weapon	HornetBombE
 asw_bomb	weapon	ASWBomb
+allied_occupy	weapon	AlliedOccupyW
+soviet_occupy	weapon	SovietOccupyW
+occupy	warhead	SSAB

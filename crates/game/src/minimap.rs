@@ -196,6 +196,14 @@ pub fn look_colour(cell: &Cell, look: u8, sight: Sight) -> [u8; 4] {
         (Feature::Tower, _) => [170, 172, 184],
         (Feature::Road, _) => [84, 84, 86],
         (Feature::Bridge, _) => [128, 112, 92],
+        (
+            Feature::OilDerrick
+            | Feature::Hospital
+            | Feature::Airport
+            | Feature::TechOutpost
+            | Feature::BridgeHut,
+            _,
+        ) => [196, 188, 156],
         (Feature::None, Ground::Water) => [38, 78, 128],
         (Feature::None, Ground::Dirt) => [122, 100, 70],
         (Feature::None, Ground::Sand) => [196, 176, 124],

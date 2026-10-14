@@ -55,6 +55,7 @@ pub struct SpecialState {
     pub protected: BTreeMap<SimId, u64>,
     pub disabled: BTreeMap<SimId, u64>,
     pub cargo: BTreeMap<SimId, Vec<Passenger>>,
+    pub garrisons: BTreeMap<SimId, crate::Garrison>,
     pub controlled: BTreeMap<SimId, (SimId, PlayerId)>,
     pub bombs: BTreeMap<SimId, (u64, i32, u32)>,
     pub zones: Vec<Zone>,
@@ -118,6 +119,18 @@ impl SpecialState {
         for (fighter, carrier) in &self.carrier_flights {
             h.write_u32(fighter.0);
             h.write_u32(carrier.0);
+        }
+        if !self.garrisons.is_empty() {
+            h.write(b"garrisons");
+            h.write_u64(self.garrisons.len() as u64);
+            for (id, g) in &self.garrisons {
+                h.write_u32(id.0);
+                h.write(&[g.owner.0]);
+                h.write(&g.cell.x.to_le_bytes());
+                h.write(&g.cell.y.to_le_bytes());
+                h.write_u32(g.cooldown);
+                h.write(&[u8::from(g.evicting)]);
+            }
         }
         h.write_u64(self.cargo.len() as u64);
         for (id, ps) in &self.cargo {
@@ -256,7 +269,7 @@ impl Actor {
         self.hp > 0
     }
 }
-fn actors(world: &mut World) -> BTreeMap<SimId, Actor> {
+pub(crate) fn actors(world: &mut World) -> BTreeMap<SimId, Actor> {
     world
         .query::<(
             Entity,
@@ -567,7 +580,7 @@ fn commandable(world: &World, id: SimId) -> Result<(), RejectReason> {
     }
     Ok(())
 }
-fn unavailable(s: &'static str) -> RejectReason {
+pub(crate) fn unavailable(s: &'static str) -> RejectReason {
     RejectReason::AbilityUnavailable(s)
 }
 /// `hp` of `from` hit points as the same share of `to` hit points, at least 1 and at most `to`
@@ -586,6 +599,13 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
     }
     match &issued.command {
         Command::Deploy { unit } => {
+            if world
+                .resource::<SpecialState>()
+                .garrisons
+                .contains_key(unit)
+            {
+                return crate::garrison::deploy(world, issued.player, *unit);
+            }
             let a = own(world, &defs, &index, issued.player, *unit)?;
             commandable(world, *unit)?;
             let meta = defs
@@ -791,6 +811,9 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
         Command::Interact { unit, target } => {
             let a = own(world, &defs, &index, issued.player, *unit)?;
             commandable(world, *unit)?;
+            if world.resource::<crate::Props>().get(*target).is_some() {
+                return crate::garrison::order(world, &defs, a, *target);
+            }
             let b = index
                 .get(target)
                 .ok_or(RejectReason::UnknownTarget(*target))?;
@@ -953,9 +976,45 @@ fn validate_interaction(
         return Err(unavailable("Choose another target"));
     }
     match role(defs, a) {
-        Role::Engineer if b.foot.is_some() => Ok(()),
+        Role::Engineer if b.foot.is_some() => {
+            if defs.metadata(b.item).is_some_and(|m| m.bridge_repair_hut) {
+                return crate::bridges::validate_repair(world, b.id);
+            }
+            if defs
+                .metadata(b.item)
+                .is_some_and(|m| m.immune || (m.needs_engineer && !m.capturable))
+            {
+                return Err(unavailable("Target cannot be captured"));
+            }
+            Ok(())
+        }
         Role::Spy if b.foot.is_some() && b.owner != a.owner => Ok(()),
-        _ if repairs_units(defs, b) => validate_docking(a, b, defs),
+        _ if defs.metadata(b.item).is_some_and(|m| m.hospital) => {
+            if a.owner != b.owner
+                || !defs
+                    .metadata(a.item)
+                    .is_some_and(|m| m.infantry && m.domain == Domain::Land)
+            {
+                return Err(unavailable("Choose an owned hospital for infantry"));
+            }
+            Ok(())
+        }
+        _ if repairs_units(defs, b) => {
+            validate_docking(a, b, defs)?;
+            let capacity = defs.metadata(b.item).map_or(0, |m| m.vehicle_docks);
+            if capacity > 0
+                && world
+                    .resource::<SpecialState>()
+                    .docked
+                    .iter()
+                    .filter(|(unit, host)| **host == b.id && **unit != a.id)
+                    .count()
+                    >= capacity as usize
+            {
+                return Err(unavailable("Repair dock is occupied"));
+            }
+            Ok(())
+        }
         _ => {
             if world
                 .resource::<SpecialState>()
@@ -1005,8 +1064,16 @@ fn interact(
     defs: &Definitions,
 ) -> Result<(), RejectReason> {
     validate_interaction(world, a, b, defs)?;
+    if role(defs, a) == Role::Engineer && defs.metadata(b.item).is_some_and(|m| m.bridge_repair_hut)
+    {
+        return crate::bridges::repair(world, a, b.id);
+    }
     match role(defs, a) {
         Role::Engineer if b.foot.is_some() => {
+            if b.owner != a.owner && defs.metadata(b.item).is_some_and(|m| m.hospital) {
+                world.resource_mut::<SpecialState>().cargo.remove(&b.id);
+            }
+            crate::world_objects::captured(world, defs, b.id, b.item, b.owner, a.owner);
             world.entity_mut(b.entity).insert(Owner(a.owner));
             if let ProductionItem::Building(k) = b.item
                 && let Some(t) = defs.building_combat(k)
@@ -1107,7 +1174,15 @@ fn interact(
     }
     Ok(())
 }
-fn unload(world: &mut World, a: &Actor, defs: &Definitions) -> Result<(), RejectReason> {
+pub(crate) fn unload(world: &mut World, a: &Actor, defs: &Definitions) -> Result<(), RejectReason> {
+    unload_ready(world, a, defs, |_| true)
+}
+fn unload_ready(
+    world: &mut World,
+    a: &Actor,
+    defs: &Definitions,
+    ready: impl Fn(&Passenger) -> bool,
+) -> Result<(), RejectReason> {
     let ps = world
         .resource::<SpecialState>()
         .cargo
@@ -1119,6 +1194,10 @@ fn unload(world: &mut World, a: &Actor, defs: &Definitions) -> Result<(), Reject
     }
     let mut left = Vec::new();
     for p in ps {
+        if !ready(&p) {
+            left.push(p);
+            continue;
+        }
         let g = world.resource::<Grid>();
         let view = g.navigation_for(defs.domain(p.kind));
         let on_foot = defs.on_foot(p.kind);
@@ -1202,6 +1281,11 @@ pub(crate) fn advance(world: &mut World) {
     // RA4: every trainable unit has its experience from its first tick on.
     crate::veterancy::enlist(world);
     let index = actors(world);
+    let props: BTreeSet<_> = world
+        .resource::<crate::Props>()
+        .iter()
+        .filter_map(|(cell, _)| world.resource::<crate::Props>().id_at(cell))
+        .collect();
     {
         let mut state = world.resource_mut::<SpecialState>();
         state
@@ -1211,11 +1295,14 @@ pub(crate) fn advance(world: &mut World) {
             .disabled
             .retain(|id, t| index.contains_key(id) && *t > tick);
         state.charge.retain(|id, _| index.contains_key(id));
-        state.cargo.retain(|id, _| index.contains_key(id));
+        let garrisons: BTreeSet<_> = state.garrisons.keys().copied().collect();
+        state
+            .cargo
+            .retain(|id, _| index.contains_key(id) || garrisons.contains(id));
         state.rearming.retain(|id, _| index.contains_key(id));
         state
             .interactions
-            .retain(|a, b| index.contains_key(a) && index.contains_key(b));
+            .retain(|a, b| index.contains_key(a) && (index.contains_key(b) || props.contains(b)));
         state.outages.retain(|_, t| *t > tick);
         state
             .docked
@@ -1485,6 +1572,32 @@ pub(crate) fn advance(world: &mut World) {
             }
         }
     }
+    // Hospitals heal only their patients, using the reference IRepairStep and IRepairRate.
+    if let Some(rules) = defs.rules()
+        && tick.is_multiple_of(rules.economy.infantry_repair_interval.max(1) as u64)
+    {
+        for a in index.values().filter(|a| {
+            a.alive()
+                && a.owner != crate::NEUTRAL
+                && defs.metadata(a.item).is_some_and(|m| m.hospital)
+        }) {
+            if let Some(patients) = world.resource_mut::<SpecialState>().cargo.get_mut(&a.id) {
+                for patient in patients {
+                    if let Some(terms) = defs.unit_combat(patient.kind) {
+                        patient.hp = patient
+                            .hp
+                            .saturating_add(rules.economy.infantry_repair_step)
+                            .min(terms.hit_points);
+                    }
+                }
+            }
+            let _ = unload_ready(world, a, &defs, |p| {
+                defs.unit_combat(p.kind)
+                    .is_some_and(|terms| p.hp >= terms.hit_points)
+            });
+        }
+    }
+    crate::garrison::advance(world, &defs, &index);
     repair_docked(world, &defs, &index, tick);
     crate::flight::advance(world, &defs, &index, tick);
 }

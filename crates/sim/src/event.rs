@@ -20,6 +20,11 @@ use crate::map::{CellPos, SubPos};
 /// Something that happened during a tick.
 #[derive(Message, Clone, Debug, PartialEq, Eq)]
 pub enum SimEvent {
+    BridgeChanged {
+        bridge: SimId,
+        cells: Vec<CellPos>,
+        intact: bool,
+    },
     StrategicActivated {
         player: PlayerId,
         building: SimId,

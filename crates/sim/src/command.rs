@@ -396,14 +396,7 @@ pub(crate) fn process_regular_commands(
                     }
                 })
                 .and_then(|()| {
-                    validate_combat(
-                        &issued,
-                        &economy,
-                        buildings,
-                        &index,
-                        &units,
-                        &special.hidden,
-                    )
+                    validate_combat(&issued, &economy, buildings, &index, &units, &special)
                 })
                 .map(|()| {
                     if let Some(ids) = issued.command.units() {
@@ -713,7 +706,7 @@ fn validate_combat(
     buildings: &BuildingIndex,
     index: &BTreeMap<SimId, Entity>,
     units: &UnitQuery,
-    hidden: &BTreeSet<(PlayerId, SimId)>,
+    special: &crate::SpecialState,
 ) -> Result<(), RejectReason> {
     let Command::Attack { units: ids, target } = &issued.command else {
         return Ok(());
@@ -743,6 +736,15 @@ fn validate_combat(
                 .get(target)
                 .map(|(owner, _, footprint)| (owner, Some(Body::Building(footprint))))
         });
+    if let Some(g) = special.garrisons.get(&target) {
+        return if g.owner == issued.player {
+            Err(RejectReason::OwnTarget(target))
+        } else if !vision.is_visible(g.cell) || special.hidden.contains(&(issued.player, target)) {
+            Err(RejectReason::UnknownTarget(target))
+        } else {
+            Ok(())
+        };
+    }
     // Scenery (`crate::props`) may be attacked once the player has explored its cell.
     if found.is_none()
         && let Some((cell, _)) = economy.props().get(target)
@@ -756,7 +758,7 @@ fn validate_combat(
     match found {
         Some((owner, _)) if owner == issued.player => Err(RejectReason::OwnTarget(target)),
         Some((_, Some(body)))
-            if body.seen_by(vision) && !hidden.contains(&(issued.player, target)) =>
+            if body.seen_by(vision) && !special.hidden.contains(&(issued.player, target)) =>
         {
             Ok(())
         }

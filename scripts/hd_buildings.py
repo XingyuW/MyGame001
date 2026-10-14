@@ -191,7 +191,7 @@ def gun_turret(k, w, d):
     k.ladder(5.0, 9.05, z, z + 1.7, axis='x')
 
 MODELS = {f.__name__: f for f in [power_plant, war_factory, barracks, tesla_reactor, gun_turret]}
-for _name in ('hd_buildings_a', 'hd_buildings_b', 'hd_buildings_c'):
+for _name in ('hd_buildings_a', 'hd_buildings_b', 'hd_buildings_c', 'hd_buildings_neutral'):
     try:
         MODELS.update(__import__(_name).MODELS)
     except ImportError:
