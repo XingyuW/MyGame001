@@ -58,3 +58,11 @@ loss, structures and superweapons, and complete its own shipped transport intera
 This ledger closes the RA6-A portion of R56 specialist/transport debt only. D-only GI
 undeploy, detector effective-Sight range and elite Ivan600 are explicit R73 assumptions;
 visual/audio quality still requires user verification. No independent approval is claimed.
+
+R76 adds exact production regression
+`m6_production_matches::ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes`
+(pre-fix duplicate Engineer army/repair commands; fixed winner at 60,119/288,000 ticks),
+plus `ai::tests::ra6_shipped_utility_weapons_do_not_recruit_specialists_into_the_army` and
+`ra6_deployed_and_temporally_frozen_units_wait_for_release_before_army_orders`.
+The original production rejection assertion remains unchanged. R76 also records the
+unproven first-spawn concealment scheduling risk for RA7 regression coverage.

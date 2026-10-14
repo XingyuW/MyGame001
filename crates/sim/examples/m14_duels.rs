@@ -1,3 +1,6 @@
+//! Exact diagnostics may set `RA2_DUEL_SEED=0` and
+//! `RA2_DUEL_PAIR=libya:brutal,iraq:medium` with `full coral_archipelago trace`.
+//! Without these selectors, the required full sweep remains unchanged.
 //! Two computer players on the shipped maps, played to the end: how long the matches of the
 //! large maps take (docs/DECISIONS.md, "Maps at the engine's largest size").
 //!
@@ -53,6 +56,18 @@ struct Job {
 }
 
 fn main() -> ExitCode {
+    // Optional diagnostic replay selectors; the full gate retains seed14 and every pairing.
+    let seed = match std::env::var("RA2_DUEL_SEED") {
+        Ok(value) => match value.parse::<u64>() {
+            Ok(seed) => seed,
+            Err(_) => {
+                eprintln!("RA2_DUEL_SEED must be an unsigned integer");
+                return ExitCode::FAILURE;
+            }
+        },
+        Err(_) => 14,
+    };
+    let pair_filter = std::env::var("RA2_DUEL_PAIR").ok();
     let flags = ["full", "doubled", "trace"];
     let arguments: Vec<String> = std::env::args().skip(1).collect();
     let has = |flag: &str| arguments.iter().any(|argument| argument == flag);
@@ -132,6 +147,16 @@ fn main() -> ExitCode {
                 SkirmishDefinitions::rotating(&groups[sides[slot].0], map + pairing + slot)
                     .expect("a country of the side")
             };
+            let pair = format!(
+                "{}:{},{}:{}",
+                skirmish.factions[country(0)].id,
+                ai.difficulties[sides[0].1].id,
+                skirmish.factions[country(1)].id,
+                ai.difficulties[sides[1].1].id
+            );
+            if pair_filter.as_ref().is_some_and(|wanted| wanted != &pair) {
+                continue;
+            }
             jobs.push(Job {
                 map,
                 id: def.id.clone(),
@@ -180,7 +205,7 @@ fn main() -> ExitCode {
                         })
                         .collect();
                     let mut app = App::new();
-                    app.add_plugins(SimPlugin { seed: 14 });
+                    app.add_plugins(SimPlugin { seed });
                     app.world_mut().insert_resource(job.grid.clone());
                     app.world_mut().insert_resource(definitions.clone());
                     if let Err(error) =

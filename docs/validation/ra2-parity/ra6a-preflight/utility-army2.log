@@ -1,0 +1,23 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 13.47s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 2 tests
+test ai::tests::ra6_deployed_and_temporally_frozen_units_wait_for_release_before_army_orders ... ok
+test ai::tests::ra6_shipped_utility_weapons_do_not_recruit_specialists_into_the_army ... FAILED
+
+failures:
+
+---- ai::tests::ra6_shipped_utility_weapons_do_not_recruit_specialists_into_the_army stdout ----
+
+thread 'ai::tests::ra6_shipped_utility_weapons_do_not_recruit_specialists_into_the_army' (1751809) panicked at crates/sim/src/ai.rs:2802:13:
+fakec4
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ai::tests::ra6_shipped_utility_weapons_do_not_recruit_specialists_into_the_army
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 46 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p sim --lib`

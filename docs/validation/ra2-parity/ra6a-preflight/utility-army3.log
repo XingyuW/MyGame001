@@ -1,0 +1,10 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 14.27s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 2 tests
+test ai::tests::ra6_deployed_and_temporally_frozen_units_wait_for_release_before_army_orders ... ok
+test ai::tests::ra6_shipped_utility_weapons_do_not_recruit_specialists_into_the_army ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 46 filtered out; finished in 0.00s
+

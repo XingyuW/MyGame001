@@ -4488,3 +4488,38 @@ FakeC4 to Trigger. Utility interactions never emit ordinary fire events, but the
 still have an explicit class. The existing test and its no-fallback assertion are unchanged.
 The failed gate logs remain in `docs/validation/ra2-parity/ra6a-attempt1`; the full required
 gate restarts on the corrected source. Visual/audio acceptance still needs user verification.
+
+### R76. Utility weapons do not recruit specialists into AI armies
+
+**2026-10-14.** The second frozen gate on `ef7298d` failed command 4 after 5,045 seconds:
+Coral Archipelago, seed 0, Libya (brutal) versus Iraq (medium), tick 105851. Unit 566 was a live
+P0 Engineer with 9 HP, with no mind control, Temporal or deployment state. The exact pre-fix
+queue contained bridge-hut Interact(unit 566,target 2684394882), then AttackMove(unit 579), then
+AttackMove(unit 566). Repair consumed the Engineer before the conflicting army order. Porting
+DefuseKit exposed the old AI heuristic “any anti-ground weapon means combat armed”.
+
+Army weapon eligibility now excludes zero-damage, deploy-only AreaFire, BombDisarm,
+ElectricAssault and MakesDisguise utilities. Engineer and Spy keep their specialist jobs;
+Tesla, Yuri, Temporal, Ivan, Tanya and the stolen units retain genuinely offensive weapons
+(including FakeC4's normal 5,000-damage weapon). Frozen/deployed units are also excluded from
+current army command candidates and rejoin after release; no new persistent AI state is added.
+The original strict rejection assertion in `m6_production_matches::run` is unchanged.
+`ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes` reproduces the failure
+before the fix and wins after it in 60,119/288,000 ticks. New shipped eligibility and transient
+state tests are `ai::tests::ra6_shipped_utility_weapons_do_not_recruit_specialists_into_the_army`
+and `ra6_deployed_and_temporally_frozen_units_wait_for_release_before_army_orders`.
+No existing test expectation or simulation tick limit changes.
+
+`m14_duels` accepts optional diagnostic `RA2_DUEL_SEED` and `RA2_DUEL_PAIR` selectors to replay
+that exact match (`0`, `libya:brutal,iraq:medium`, arguments `full coral_archipelago trace`).
+With neither set, the required full sweep still uses seed 14 and every existing pairing.
+The example's 300,000 diagnostic ceiling is separate from the unchanged production budget
+`72000 * max(width + height,128) / 128`. Pre-fix state/queue traces, exact regression output
+and the failed full-gate logs are retained in `ra6a-preflight` and `ra6a-attempt2`.
+
+**Vision handoff, unproven risk:** neither `economy::Spawner::leave` nor `unit::spawn_unit`
+initializes `SpecialState.hidden`; reconnaissance inserts concealment after Combat. A newly
+produced Spy/cloaked unit in an already visible cell may therefore be targetable on its first
+spawn tick. This inherited scheduling path has been inspected but an actual attack/leak has
+not been reproduced. RA7 must add a first-spawn concealment regression and resolve it if
+confirmed; no engine parity or security completion is claimed for that path here.
