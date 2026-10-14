@@ -111,9 +111,9 @@ pub fn shipped_class(id: &str) -> Option<WeaponClass> {
         | "flak_guy_aa_gun_e" => Flak,
         "prism_shot" | "comet" | "super_comet" => Prism,
         "coil_bolt" | "op_coil_bolt" | "tank_bolt" | "tank_bolt_e" | "electric_bolt"
-        | "electric_bolt_e" => Tesla,
-        "rad_beam_weapon" | "rad_beam_weapon_e" => Radiation,
-        "mind_control" | "mind_control_e" | "super_mind_control" => Psychic,
+        | "electric_bolt_e" | "assault_bolt" => Tesla,
+        "rad_beam_weapon" | "rad_beam_weapon_e" | "rad_eruption_weapon" => Radiation,
+        "mind_control" | "mind_control_e" | "super_mind_control" | "psi_wave" => Psychic,
         "neutron_rifle" | "neutron_rifle_e" => Chrono,
         "sonic_zap" | "sonic_zap_e" => Sonic,
         // RA4: the bombs of the Hornets and the depth charge of the Osprey fall like the Kirov's.
@@ -121,7 +121,8 @@ pub fn shipped_class(id: &str) -> Option<WeaponClass> {
         "sub_torpedo" | "sub_torpedo_e" | "asw_launcher" => Torpedo,
         "good_teeth" | "drone_jump" | "squid_grab" | "squid_grab_e" | "squid_punch"
         | "squid_punch_e" => Melee,
-        "ivan_bomber" | "ivan_bomber_e" | "terror_bomb" | "demobomb" => Trigger,
+        "ivan_bomber" | "ivan_bomber_e" | "terror_bomb" | "demobomb" | "makeup_kit"
+        | "defuse_kit" | "sapper" | "fakec4" => Trigger,
         _ => return None,
     })
 }
