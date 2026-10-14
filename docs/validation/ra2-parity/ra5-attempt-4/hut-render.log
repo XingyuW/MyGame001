@@ -1,0 +1,14 @@
+/Users/xingyuwang/GameProjects/MyGame001/scripts/render_hd_blender.py:160: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world.use_nodes = True
+/Users/xingyuwang/GameProjects/MyGame001/scripts/render_hd_blender.py:208: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat = bpy.data.materials.new('Miniature'); mat.use_nodes = True
+/Users/xingyuwang/GameProjects/MyGame001/scripts/render_hd_blender.py:254: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat = bpy.data.materials.new('TeamMask'); mat.use_nodes = True
+/Users/xingyuwang/GameProjects/MyGame001/scripts/render_hd_blender.py:350: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat = bpy.data.materials.new('K_' + name); mat.use_nodes = True
+00:05.781  render           | Saved: '/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra5b-render/buildings/bridge_hut_color.png'
+00:06.172  render           | Saved: '/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra5b-render/buildings/bridge_hut_mask.png'
+RENDER COMPLETE /Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra5b-render
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:49:19)
+
+Blender quit

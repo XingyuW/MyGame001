@@ -1,0 +1,1 @@
+Winners 756; total ticks 27606823; median 0.1323229167; p90 0.3186944444; maximum 0.7095694444; counts >.5/.7/.8/.9 [20, 1, 0, 0]; max case (0.7095694444444445, 'riverlands: france (easy) against germany (easy)', 51089, 72000)

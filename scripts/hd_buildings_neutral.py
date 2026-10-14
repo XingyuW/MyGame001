@@ -59,7 +59,8 @@ def bridge_hut(k, w, d):
     k.box(2, 2, z, 6, 5, 3.2, BRICK)
     gable(k, 1.7, 1.7, z + 3.2, 6.6, 5.6, 1.8, CLAD_DARK, ridge='x', wall=BRICK)
     with face(k, 'y+', 2, 7, z): door(k, 2); windows(k, 6, 1, z0=1.7, h=.8, margin=.5)
-    k.box(2.2, 7.05, z + 2.8, 5.6, .08, .35, HAZ)
+    # Ownership-mask fascia becomes neutral gray in play; retain a broad visible accent.
+    k.box(2.2, 7.05, z + 2.65, 5.6, .08, .5, TEAM)
     for y in (8, 8.6, 9.2): k.box(1.5, y, z + .1, 6, .3, .4, TIMBER)
 
 MODELS = {f.__name__: f for f in (oil_derrick, hospital, airport, tech_outpost, bridge_hut)}

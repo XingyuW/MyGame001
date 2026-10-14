@@ -4251,3 +4251,40 @@ complete final RA5 gate. The mutation backup used the existing approved `ra5b-re
 cache directory and was removed by its restoration trap; no additional external directory was
 created. An initial /tmp backup command was rejected before execution by automatic approval
 review; the safer cache-backed retry succeeded without a further user approval request.
+
+### R70. RA5 repair-hut paint and semantic look expectations
+
+The fourth gate's complete production sweep passed all 756 matches, then the existing HD
+ownership-art check found zero accent pixels in the new repair-hut sprite. Its original model
+had hazard paint but no team-mask material. Author a broad front fascia in `TEAM`, regenerate
+its colour/mask passes with Blender and compose the shipped PNG with the existing finishing
+script. Neutral presentation renders that mask gray; the hut remains uncapturable. The unchanged
+32-pixel ownership check now passes, as do all 42 cheap game asset/map integration tests. The
+render was inspected for a visible fascia and intact silhouette; artistic acceptance remains
+user verification. The render cache is the same directory recorded in R66, with no new external
+directory. No image was downloaded or reference artwork copied.
+
+The simulation suite, not reached by the interrupted gate, also exposed an old expectation in
+`m1_map`: look byte 255 was previously called presentation-only, but RA5 intentionally allocates
+its high nibble 15 to repair huts. The named test now uses pure-ground look 15 for its original
+exact Grid-equality assertion, still accepts 255, asserts its exact three world-object anchors,
+and removes only metadata before requiring exact equality to the original terrain Grid. The
+negative -1/256 boundary tests remain. This is the intended semantic-map change from R66, not a
+relaxation of terrain or parser coverage.
+
+Attempt four, including the failed art check and the initial simulation expectation failure,
+is retained in `docs/validation/ra2-parity/ra5-attempt-4/`. Its production TSV records 756 winners,
+27,606,823 total ticks, median ratio 0.1323229167, nearest-rank p90 0.3186944444 and maximum
+0.7095694444 (Riverlands, France/Germany easy, 51,089 / 72,000); counts above 0.5/0.7/0.8/0.9 are
+20/1/0/0. Commands 01–03, 05–06 passed; 04 failed only at the later art assertion, 07 was stopped
+and 08–13 were not run. The source and art are frozen again only after the full simulation suite
+and asset/integration checks; the next all-thirteen RA5 run remains the required authority.
+
+The complete `sim --no-fail-fast` run exercised 764 tests: 760 passed and four failures were
+old schema-test expectations, not runtime behavior. The RA2/RA3/RA4 fixture positive tests now
+assert arsenal schema 6 while retaining every older trait check. RA4's invalid unit-docks
+mutation now matches `, docks: 0` exactly so it cannot also match the new `vehicle_docks: 0`;
+its exactly-one-edit and rejection assertions are unchanged. These three targets are rerun
+before the final full gate. All other simulation targets, including the fixture AI sweeps and
+all new RA5 behavior tests, passed. No runtime code changed after the winning attempt-four
+production sweep.

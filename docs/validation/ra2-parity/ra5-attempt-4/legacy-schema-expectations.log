@@ -1,0 +1,41 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 1.29s
+     Running tests/ra2_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra2_definitions-00ec2980e013bc80)
+
+running 7 tests
+test the_fixture_loads_with_the_traits_of_schema_version_3 ... ok
+test lanes_queues_refunds_and_reach_follow_the_traits_with_a_rules_file ... ok
+test without_a_rules_file_the_traits_are_not_read ... ok
+test the_limits_of_the_traits_are_accepted ... ok
+test a_trait_of_a_building_on_a_unit_is_rejected ... ok
+test traits_outside_their_ranges_are_rejected ... ok
+test every_trait_changes_the_state_hash ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/ra3_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra3_definitions-2e6e5746868fe057)
+
+running 6 tests
+test the_fixture_loads_with_the_traits_of_schema_version_4 ... ok
+test a_trait_of_a_unit_on_a_building_is_rejected ... ok
+test the_traits_load_at_the_ends_of_their_ranges ... ok
+test a_trait_on_a_unit_that_cannot_have_it_is_rejected ... ok
+test every_trait_of_a_unit_changes_the_state_hash ... ok
+test traits_of_a_unit_outside_their_ranges_are_rejected ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/ra4_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra4_definitions-f980beb11952cf5c)
+
+running 8 tests
+test the_effects_of_the_missiles_are_checked_like_every_effect ... ok
+test an_airport_bound_unit_is_an_aircraft_with_ammunition ... ok
+test the_fixture_loads_with_the_traits_of_schema_version_5 ... ok
+test abilities_must_be_known_and_listed_once ... ok
+test a_trait_of_a_unit_on_a_building_and_docks_on_a_unit_are_rejected ... ok
+test the_terms_of_a_spawner_must_fit_together ... ok
+test every_trait_of_schema_version_5_is_hashed ... ok
+test flags_outside_0_and_1_and_numbers_outside_their_ranges_are_rejected ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
