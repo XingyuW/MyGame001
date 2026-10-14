@@ -95,7 +95,7 @@ fn accepted(name: &str, id: &str, edits: &[(&str, &str)]) -> Definitions {
 
 #[test]
 fn the_fixture_loads_with_the_traits_of_schema_version_5() {
-    assert_eq!(ARSENAL_SCHEMA_VERSION, 5);
+    assert_eq!(ARSENAL_SCHEMA_VERSION, 6);
     assert_eq!(COMBAT_SCHEMA_VERSION, 3);
     let definitions = definitions();
     let kind = |id: &str| definitions.unit_kind(id).unwrap_or_else(|| panic!("{id}"));
@@ -423,7 +423,7 @@ fn a_trait_of_a_unit_on_a_building_and_docks_on_a_unit_are_rejected() {
     assert_rejected(
         "unit_docks",
         "tank",
-        &[("docks: 0", "docks: 1")],
+        &[(", docks: 0", ", docks: 1")],
         "docks",
         "a building trait on a unit type",
     );
