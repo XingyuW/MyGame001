@@ -553,6 +553,15 @@ fn ra5_bridge_destruction_off_and_immune_hut_ignore_explicit_fire() {
 
 #[test]
 fn ra5_ai_repairs_the_only_land_route_with_a_consumed_engineer_and_wins() {
+    only_land_route_ai(false);
+}
+
+#[test]
+fn ra5_ai_remembers_a_seen_collapse_and_approaches_its_hut_after_losing_sight() {
+    only_land_route_ai(true);
+}
+
+fn only_land_route_ai(lose_sight: bool) {
     let definitions = shipped();
     let mut skirmish =
         sim::load_skirmish(data_dir().join("skirmish.ron"), &definitions).expect("skirmish");
@@ -671,7 +680,24 @@ fn ra5_ai_repairs_the_only_land_route_with_a_consumed_engineer_and_wins() {
         collapsed,
         "the commanded attack must collapse the complete route before the first wave"
     );
-    tick(&mut app, vec![issue(P0, Command::Stop { units: guns })]);
+    // Give the AI a normal observation of the collapse, then remove the scouts' sight.
+    tick(&mut app, vec![]);
+    tick(
+        &mut app,
+        vec![issue(
+            P0,
+            if lose_sight {
+                Command::Move {
+                    units: guns,
+                    target: CellPos::new(8, 10),
+                }
+            } else {
+                Command::Stop { units: guns }
+            },
+        )],
+    );
+    let mut lost_sight = false;
+    let mut approached_from_memory = false;
     let mut engineers = std::collections::BTreeSet::new();
     let mut repaired = false;
     let mut consumed = false;
@@ -684,6 +710,15 @@ fn ra5_ai_repairs_the_only_land_route_with_a_consumed_engineer_and_wins() {
             "AI command rejected: {events:?}"
         );
         let world = app.world_mut();
+        let hut_visible = world
+            .resource::<Players>()
+            .get(P0)
+            .expect("player")
+            .vision()
+            .is_visible(CellPos::new(21, 22));
+        if !repaired && !hut_visible {
+            lost_sight = true;
+        }
         let mut query = world.query::<(&SimId, &Unit, &Owner, &Mobile)>();
         let live: Vec<_> = query
             .iter(world)
@@ -695,6 +730,12 @@ fn ra5_ai_repairs_the_only_land_route_with_a_consumed_engineer_and_wins() {
                 .is_some_and(|m| m.role == sim::Role::Engineer)
             {
                 engineers.insert(*id);
+                if *owner == P0 && lost_sight && !hut_visible {
+                    approached_from_memory |= world.resource::<sim::CommandQueue>().iter().any(|issued| {
+                        issued.player == P0 && matches!(&issued.command, Command::Move { units, target }
+                            if units.contains(id) && (target.x - 21).abs().max((target.y - 22).abs()) == 1)
+                    });
+                }
             }
             assert_ne!(
                 definitions.domain(*kind),
@@ -719,6 +760,12 @@ fn ra5_ai_repairs_the_only_land_route_with_a_consumed_engineer_and_wins() {
                 matches!(outcome, sim::MatchOutcome::Won { .. }),
                 "{outcome:?}"
             );
+            if lose_sight {
+                assert!(
+                    lost_sight && approached_from_memory,
+                    "lost_sight={lost_sight}, approached_from_memory={approached_from_memory}"
+                );
+            }
             assert!(
                 repaired && consumed && crossed,
                 "repaired={repaired}, consumed={consumed}, crossed={crossed}, engineers={engineers:?}"

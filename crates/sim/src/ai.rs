@@ -152,6 +152,9 @@ pub struct AiController {
     gather: CellPos,
     waypoints: Vec<Waypoint>,
     known: BTreeMap<SimId, KnownBuilding>,
+    /// Huts and collapsed decks learned through current sight; retained while fog returns.
+    repair_huts: BTreeMap<SimId, (SimId, CellPos)>,
+    broken_bridges: BTreeSet<SimId>,
     wave: BTreeSet<SimId>,
     target: Option<WaveTarget>,
     failures: BTreeMap<SimId, u8>,
@@ -291,6 +294,8 @@ impl AiController {
             gather,
             waypoints,
             known: BTreeMap::new(),
+            repair_huts: BTreeMap::new(),
+            broken_bridges: BTreeSet::new(),
             wave: BTreeSet::new(),
             target: None,
             failures: BTreeMap::new(),
@@ -369,6 +374,19 @@ impl AiController {
             hasher.write(&[known.owner.0]);
             write_cell(hasher, known.footprint.origin);
             hasher.write(&[known.footprint.width, known.footprint.height]);
+        }
+        if !self.repair_huts.is_empty() || !self.broken_bridges.is_empty() {
+            hasher.write(b"ai_bridge_memory");
+            hasher.write_u64(self.repair_huts.len() as u64);
+            for (hut, (bridge, cell)) in &self.repair_huts {
+                hasher.write_u32(hut.0);
+                hasher.write_u32(bridge.0);
+                write_cell(hasher, *cell);
+            }
+            hasher.write_u64(self.broken_bridges.len() as u64);
+            for id in &self.broken_bridges {
+                hasher.write_u32(id.0);
+            }
         }
         hasher.write_u64(self.wave.len() as u64);
         for id in &self.wave {
@@ -903,7 +921,7 @@ pub(crate) fn run_ai(
             &building_snaps,
             &special,
         );
-        let mut commands = repair_bridge(&view, &special, &bridges, &building_snaps);
+        let mut commands = repair_bridge(&view, controller, &special, &bridges, &building_snaps);
         commands.extend(think(&view, controller));
         controller.issued = controller.issued.saturating_add(commands.len() as u64);
         for command in commands {
@@ -912,62 +930,95 @@ pub(crate) fn run_ai(
     }
 }
 
-/// Uses only currently seen huts and a visible collapsed deck. Terrain outside vision does
-/// not reveal damage, and no neutral target is added to combat memory.
+/// Learn through current sight, then approach a remembered hut with an ordinary Move.
+/// Interact still requires current visibility, and unseen repairs are not disclosed.
 fn repair_bridge(
     view: &View<'_>,
+    controller: &mut AiController,
     special: &crate::SpecialState,
     bridges: &crate::Bridges,
     buildings: &[BuildingSnap],
 ) -> Vec<Command> {
-    let hut = buildings
+    for building in buildings
         .iter()
-        .filter(|building| view.vision.sees_footprint(building.footprint))
-        .filter(|building| {
-            bridges
-                .huts
-                .get(&building.id)
-                .and_then(|id| bridges.bridges.get(id))
-                .is_some_and(|bridge| {
-                    bridge.collapsed
-                        && bridge
-                            .cells
-                            .iter()
-                            .any(|&cell| view.vision.is_visible(cell))
-                })
-        })
-        .filter(|building| {
-            crate::pathfinding::nearest_cell(
-                view.grid,
-                view.own_units
-                    .first()
-                    .map_or(building.footprint.origin, |unit| unit.mobile.cell),
-                |cell| {
-                    view.grid.is_passable(cell) && building.footprint.distance_to_cell(cell) == 1
-                },
-            )
-            .is_some()
-        })
-        .min_by_key(|building| building.id);
-    let Some(hut) = hut else { return Vec::new() };
+        .filter(|b| view.vision.sees_footprint(b.footprint))
+    {
+        if let Some(&bridge) = bridges.huts.get(&building.id) {
+            controller
+                .repair_huts
+                .insert(building.id, (bridge, building.footprint.origin));
+        }
+    }
+    for (&id, bridge) in &bridges.bridges {
+        if bridge
+            .cells
+            .iter()
+            .any(|&cell| view.vision.is_visible(cell))
+        {
+            if bridge.collapsed {
+                controller.broken_bridges.insert(id);
+            } else {
+                controller.broken_bridges.remove(&id);
+            }
+        }
+    }
+    if controller.broken_bridges.is_empty() {
+        return Vec::new();
+    }
     let is_engineer = |kind| {
         view.definitions
             .metadata(ProductionItem::Unit(kind))
             .is_some_and(|entry| entry.role == crate::Role::Engineer)
     };
-    if let Some(unit) = view
+    let engineer = view
         .own_units
         .iter()
-        .filter(|unit| is_engineer(unit.kind))
-        .min_by_key(|unit| unit.id)
-    {
-        if special.interactions.get(&unit.id) == Some(&hut.id) {
+        .filter(|u| is_engineer(u.kind))
+        .min_by_key(|u| u.id);
+    // The Engineer, or its home gathering point before it is trained, must reach the entrance.
+    // An arbitrary army member may already be stranded on the other bank.
+    let from = engineer.map_or(controller.gather, |u| u.mobile.cell);
+    let hut = controller
+        .repair_huts
+        .iter()
+        .filter(|(_, (bridge, _))| controller.broken_bridges.contains(bridge))
+        .filter_map(|(&id, &(bridge, cell))| {
+            crate::pathfinding::nearest_cell(view.grid, from, |p| {
+                view.grid.is_passable(p)
+                    && view.grid.building(p).is_none()
+                    && chebyshev(p, cell) == 1
+            })
+            .map(|goal| (chebyshev(from, cell), id, bridge, cell, goal))
+        })
+        .min_by_key(|(distance, id, _, _, _)| (*distance, *id));
+    let Some((_, hut, bridge, cell, goal)) = hut else {
+        return Vec::new();
+    };
+    if let Some(unit) = engineer {
+        if special.interactions.get(&unit.id) == Some(&hut) {
             return Vec::new();
         }
-        return vec![Command::Interact {
-            unit: unit.id,
-            target: hut.id,
-        }];
+        if view.vision.is_visible(cell)
+            && bridges
+                .bridges
+                .get(&bridge)
+                .is_some_and(|b| b.cells.iter().any(|&p| view.vision.is_visible(p)))
+        {
+            // Only a currently observed collapsed deck justifies a fresh Interact. A remembered
+            // objective that another player already repaired disappears on observation above.
+            return vec![Command::Interact {
+                unit: unit.id,
+                target: hut,
+            }];
+        }
+        return if unit.idle() {
+            vec![Command::Move {
+                units: vec![unit.id],
+                target: goal,
+            }]
+        } else {
+            Vec::new()
+        };
     }
     if view.definitions.units().iter().enumerate().any(|(i, _)| {
         is_engineer(crate::UnitKind(i as u16))
@@ -2026,6 +2077,76 @@ mod tests {
 
     use super::*;
     use crate::map::Cell;
+
+    #[test]
+    fn ra5_bridge_memory_hash_covers_hut_identity_location_and_observed_collapse() {
+        let mut controller = AiController {
+            plan: AiPlan {
+                build_order: Vec::new(),
+                power: BuildingKind(0),
+                harvester: UnitKind(0),
+                army: Vec::new(),
+            },
+            difficulty: Difficulty {
+                id: "test".into(),
+                think_interval: 10,
+                harvesters_per_refinery: 1,
+                max_army: 4,
+                wave_size: 2,
+                first_wave: 0,
+                wave_patience: 100,
+                defence_radius: 4,
+            },
+            start: CellPos::new(1, 1),
+            gather: CellPos::new(2, 2),
+            waypoints: Vec::new(),
+            known: BTreeMap::new(),
+            repair_huts: BTreeMap::new(),
+            broken_bridges: BTreeSet::new(),
+            wave: BTreeSet::new(),
+            target: None,
+            failures: BTreeMap::new(),
+            next_army: 0,
+            patience_until: 0,
+            next_harvest: 0,
+            fall_back_exempt: false,
+            liquidating: false,
+            issued: 0,
+            flank: false,
+            staging: None,
+            waves_sent: 0,
+            stalled: (0, 0),
+            last_stand: false,
+        };
+        let hash = |c: &AiController| {
+            let mut h = Fnv1a64::new();
+            c.hash_into(&mut h);
+            h.finish()
+        };
+        let empty = hash(&controller);
+        controller
+            .repair_huts
+            .insert(SimId(5), (SimId(9), CellPos::new(3, 4)));
+        let known = hash(&controller);
+        assert_ne!(empty, known);
+        controller.broken_bridges.insert(SimId(9));
+        let broken = hash(&controller);
+        assert_ne!(known, broken);
+        for (hut, bridge, cell) in [
+            (6, 9, CellPos::new(3, 4)),
+            (5, 10, CellPos::new(3, 4)),
+            (5, 9, CellPos::new(4, 4)),
+        ] {
+            controller.repair_huts.clear();
+            controller
+                .repair_huts
+                .insert(SimId(hut), (SimId(bridge), cell));
+            assert_ne!(broken, hash(&controller));
+        }
+        controller.repair_huts.clear();
+        controller.broken_bridges.clear();
+        assert_eq!(empty, hash(&controller));
+    }
 
     /// Regression (RA3, docs/DECISIONS.md R44; found by `m6_production_matches.rs`: Thousand
     /// Lakes, Iraq against Korea, both brutal, tick 13,622). A computer player placed a
