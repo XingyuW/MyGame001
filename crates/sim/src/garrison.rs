@@ -356,6 +356,43 @@ pub(crate) fn fire(world: &mut World) {
                     .then_some((distance, a.id, point))
             })
             .min_by_key(|(distance, id, _)| (*distance, *id));
+        // Occupied civilian props have no ECS entity, but are owner-aware combat targets.
+        let props = world.resource::<Props>();
+        let special = world.resource::<SpecialState>();
+        let occupied_targets = special.garrisons.iter().filter_map(|(&other_id, other)| {
+            let (cell, prop) = props.get(other_id)?;
+            if prop.hit_points <= 0
+                || !world.resource::<Players>().hostile(g.owner, other.owner)
+                || !world
+                    .resource::<Players>()
+                    .get(g.owner)
+                    .is_some_and(|p| p.vision().is_visible(cell))
+                || special.hidden.contains(&(g.owner, other_id))
+            {
+                return None;
+            }
+            let traits = crate::combat::traits_of(
+                world.resource::<Grid>(),
+                other_id,
+                props.armour_of(prop.kind),
+                &crate::combat::Body::Prop(cell),
+                None,
+            );
+            if !crate::weapon_against(&defs, &terms, [Some(weapon_kind), None], &traits)
+                .is_some_and(|(_, versus)| versus > 0)
+            {
+                return None;
+            }
+            let dx = i64::from(cell.x) - i64::from(g.cell.x);
+            let dy = i64::from(cell.y) - i64::from(g.cell.y);
+            let distance = (dx * dx + dy * dy) as u64 * 256 * 256;
+            (distance <= u64::from(weapon.range).saturating_mul(u64::from(weapon.range)))
+                .then_some((distance, other_id, cell))
+        });
+        let target = target
+            .into_iter()
+            .chain(occupied_targets)
+            .min_by_key(|(distance, id, _)| (*distance, *id));
         let Some((_, target, cell)) = target else {
             continue;
         };

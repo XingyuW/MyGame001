@@ -1436,3 +1436,260 @@ fn ra5_bridge_collapse_and_hospital_cargo_change_hash_and_replay_deterministical
     }
     assert_eq!(replay(), replay());
 }
+
+#[test]
+fn ra5_enemy_garrisons_exchange_occupation_fire_but_hidden_garrisons_are_not_targets() {
+    let mut app = world();
+    let mut looks = vec![0; 48 * 48];
+    for x in [10, 14] {
+        let cell = CellPos::new(x, 10);
+        app.world_mut().resource_mut::<Grid>().set_terrain(
+            cell,
+            Cell {
+                passable: false,
+                buildable: false,
+                ..OPEN
+            },
+        );
+        looks[10 * 48 + x as usize] = 5 << 4;
+    }
+    app.world_mut()
+        .resource_mut::<Grid>()
+        .mark_world_features(&looks);
+    sim::install_world_objects(app.world_mut(), true);
+    let houses: Vec<_> = [10, 14]
+        .into_iter()
+        .map(|x| {
+            app.world()
+                .resource::<sim::Props>()
+                .id_at(CellPos::new(x, 10))
+                .expect("house")
+        })
+        .collect();
+    let a = put(&mut app, P0, "gi", 9, 10);
+    let b = put(&mut app, P1, "conscript", 15, 10);
+    tick(&mut app, vec![]);
+    tick(
+        &mut app,
+        vec![
+            issue(
+                P0,
+                Command::Interact {
+                    unit: a,
+                    target: houses[0],
+                },
+            ),
+            issue(
+                P1,
+                Command::Interact {
+                    unit: b,
+                    target: houses[1],
+                },
+            ),
+        ],
+    );
+    assert!(entity(&mut app, a).is_none());
+    assert!(entity(&mut app, b).is_none());
+    let mut fired = [false; 2];
+    for _ in 0..30 {
+        for event in tick(&mut app, vec![]) {
+            if let SimEvent::WeaponFired {
+                attacker, target, ..
+            } = event
+            {
+                for i in 0..2 {
+                    if attacker == houses[i] && target == houses[1 - i] {
+                        fired[i] = true;
+                    }
+                }
+            }
+        }
+    }
+    assert_eq!(
+        fired,
+        [true, true],
+        "both owners must target the enemy occupied prop"
+    );
+    for id in &houses {
+        assert!(
+            app.world()
+                .resource::<sim::Props>()
+                .get(*id)
+                .expect("house")
+                .1
+                .hit_points
+                < 300
+        );
+    }
+    for _ in 0..25 {
+        // Hidden is refreshed by visibility at tick end; seed the current tick's observation.
+        app.world_mut()
+            .resource_mut::<sim::SpecialState>()
+            .hidden
+            .insert((P0, houses[1]));
+        assert!(!tick(&mut app,vec![]).iter().any(|event|matches!(event,SimEvent::WeaponFired{attacker,target,..} if *attacker==houses[0] && *target==houses[1])));
+    }
+}
+
+#[test]
+fn ra5_bridge_repair_waits_for_standing_and_entering_ships_without_harming_compatible_units() {
+    for mode in 0..3 {
+        let entering = mode != 0;
+        let (mut app, bridge, hut) = bridge_world(true);
+        let tank = put(&mut app, P0, "grizzly", 20, 24);
+        tick(&mut app, vec![]);
+        tick(
+            &mut app,
+            vec![issue(
+                P0,
+                Command::Attack {
+                    units: vec![tank],
+                    target: bridge,
+                },
+            )],
+        );
+        for _ in 0..4000 {
+            if app.world().resource::<sim::Bridges>().bridges[&bridge].collapsed {
+                break;
+            }
+            tick(&mut app, vec![]);
+        }
+        assert!(app.world().resource::<sim::Bridges>().bridges[&bridge].collapsed);
+        tick(
+            &mut app,
+            vec![issue(P0, Command::Stop { units: vec![tank] })],
+        );
+        let ship = put(
+            &mut app,
+            P0,
+            "destroyer",
+            23,
+            if entering { 23 } else { 24 },
+        );
+        let engineer = put(
+            &mut app,
+            P0,
+            "engineer",
+            if mode == 2 { 16 } else { 20 },
+            22,
+        );
+        if mode == 2 {
+            let events = tick(
+                &mut app,
+                vec![issue(
+                    P0,
+                    Command::Interact {
+                        unit: engineer,
+                        target: hut,
+                    },
+                )],
+            );
+            assert!(
+                rejected(&events).is_empty(),
+                "initially clear repair route: {events:?}"
+            );
+            assert!(
+                app.world()
+                    .resource::<sim::SpecialState>()
+                    .interactions
+                    .contains_key(&engineer)
+            );
+        }
+        if entering {
+            tick(
+                &mut app,
+                vec![issue(
+                    P0,
+                    Command::Move {
+                        units: vec![ship],
+                        target: CellPos::new(23, 24),
+                    },
+                )],
+            );
+            let e = entity(&mut app, ship).expect("ship");
+            let mobile = app.world().get::<Mobile>(e).expect("mobile");
+            assert_eq!(mobile.cell, CellPos::new(23, 23));
+            assert_eq!(mobile.step.expect("reserved step").to, CellPos::new(23, 24));
+        } else {
+            tick(&mut app, vec![]);
+        }
+        if mode == 2 {
+            for _ in 0..200 {
+                tick(&mut app, vec![]);
+            }
+            assert!(
+                entity(&mut app, engineer).is_some(),
+                "arrival cannot consume the Engineer after a ship enters"
+            );
+            assert!(
+                !app.world()
+                    .resource::<sim::SpecialState>()
+                    .interactions
+                    .contains_key(&engineer)
+            );
+        }
+        let ship_hp = hp(&mut app, ship);
+        let events = tick(
+            &mut app,
+            vec![issue(
+                P0,
+                Command::Interact {
+                    unit: engineer,
+                    target: hut,
+                },
+            )],
+        );
+        assert_eq!(rejected(&events).len(), 1, "{events:?}");
+        assert!(entity(&mut app, engineer).is_some());
+        assert_eq!(hp(&mut app, ship), ship_hp);
+        assert!(app.world().resource::<sim::Bridges>().bridges[&bridge].collapsed);
+        assert_eq!(
+            app.world()
+                .resource::<Grid>()
+                .occupant(CellPos::new(23, 24)),
+            Some(ship)
+        );
+        tick(
+            &mut app,
+            vec![issue(
+                P0,
+                Command::Move {
+                    units: vec![ship],
+                    target: CellPos::new(23, 20),
+                },
+            )],
+        );
+        for _ in 0..300 {
+            tick(&mut app, vec![]);
+        }
+        assert_ne!(
+            app.world()
+                .resource::<Grid>()
+                .occupant(CellPos::new(23, 24)),
+            Some(ship)
+        );
+        let amph = put(&mut app, P0, "amphibious_transport", 22, 24);
+        let air = put(&mut app, P0, "rocketeer", 22, 24);
+        tick(
+            &mut app,
+            vec![issue(
+                P0,
+                Command::Interact {
+                    unit: engineer,
+                    target: hut,
+                },
+            )],
+        );
+        assert!(entity(&mut app, engineer).is_none());
+        assert!(!app.world().resource::<sim::Bridges>().bridges[&bridge].collapsed);
+        for id in [ship, amph, air] {
+            assert!(hp(&mut app, id) > 0);
+        }
+        let grid = app.world().resource::<Grid>();
+        assert_eq!(grid.occupant(CellPos::new(22, 24)), Some(amph));
+        assert_eq!(
+            grid.occupant_for(CellPos::new(22, 24), Domain::Air),
+            Some(air)
+        );
+    }
+}
