@@ -630,7 +630,6 @@ impl<'a> View<'a> {
         // RA4: a missile or an aircraft that another unit launched is no unit of the player's
         // to command or to count on (it is gone when it has done its work), and a unit that is
         // hidden from the player (a submerged, disguised or mirage unit) is not seen.
-        let spawned = &special.spawned;
         let hidden = &special.hidden;
         Self {
             player,
@@ -645,7 +644,7 @@ impl<'a> View<'a> {
                 unit.owner == player
                     && unit.armed
                     && unit.harvest.is_none()
-                    && !spawned.contains_key(&unit.id)
+                    && army_commandable(special, unit.id)
             }),
             own_kinds: buildings
                 .iter()
@@ -654,7 +653,7 @@ impl<'a> View<'a> {
                 .collect(),
             own_units: units
                 .iter()
-                .filter(|unit| unit.owner == player && !spawned.contains_key(&unit.id))
+                .filter(|unit| unit.owner == player && army_commandable(special, unit.id))
                 .collect(),
             own_buildings: buildings
                 .iter()
@@ -805,6 +804,27 @@ type BuildingQuery<'w, 's> = Query<
     ),
 >;
 
+// Frozen/deployed actors cannot accept army movement orders. They return to the
+// candidate set after release/undeploy, without retaining a stale wave assignment.
+fn army_commandable(special: &crate::SpecialState, id: SimId) -> bool {
+    !special.spawned.contains_key(&id)
+        && !special.erasures.contains_key(&id)
+        && !special.deployed.contains_key(&id)
+}
+
+// Utility and deploy-only weapons do not make a unit available for army orders. In
+// particular, an Engineer's DefuseKit must not compete with its bridge-repair assignment.
+fn army_weapon(definitions: &Definitions, kind: crate::WeaponKind) -> bool {
+    definitions.weapon(kind).is_some_and(|weapon| {
+        weapon.anti_ground
+            && weapon.damage > 0
+            && !weapon.area_fire
+            && definitions.warhead(weapon.warhead).is_some_and(|warhead| {
+                !warhead.bomb_disarm && !warhead.electric_assault && !warhead.makes_disguise
+            })
+    })
+}
+
 /// The `Ai` stage: every computer player whose turn it is decides and pushes its commands.
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn run_ai(
@@ -853,8 +873,7 @@ pub(crate) fn run_ai(
                     [Some(weapon.kind), weapon.secondary]
                         .into_iter()
                         .flatten()
-                        .filter_map(|kind| definitions.weapon(kind))
-                        .any(|def| def.anti_ground)
+                        .any(|kind| army_weapon(&definitions, kind))
                 }),
                 attacking: weapon.is_some_and(|weapon| weapon.order.is_some()),
                 sight: sight.map(|sight| sight.0),
@@ -2766,5 +2785,66 @@ mod tests {
         // With only a launched unit armed, the player has no army of its own.
         special.spawned.insert(SimId(1), SimId(9));
         assert_eq!(view(&special), (vec![], vec![3], true, false));
+    }
+    #[test]
+    fn ra6_shipped_utility_weapons_do_not_recruit_specialists_into_the_army() {
+        let definitions = crate::load_ruleset(
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../assets/data"),
+        )
+        .unwrap();
+        for id in ["defuse_kit", "makeup_kit", "assault_bolt", "psi_wave"] {
+            assert!(
+                !army_weapon(&definitions, definitions.weapon_kind(id).unwrap()),
+                "{id}"
+            );
+        }
+        assert!(army_weapon(
+            &definitions,
+            definitions.weapon_kind("fakec4").unwrap()
+        ));
+        for (id, expected) in [
+            ("engineer", false),
+            ("spy", false),
+            ("tesla_trooper", true),
+            ("yuri", true),
+            ("chrono_legionnaire", true),
+            ("crazy_ivan", true),
+            ("tanya", true),
+            ("chrono_commando", true),
+            ("psi_commando", true),
+            ("chrono_ivan", true),
+            ("yuri_prime", true),
+        ] {
+            let terms = definitions
+                .unit_combat(definitions.unit_kind(id).unwrap())
+                .unwrap();
+            assert_eq!(
+                [terms.weapon, terms.secondary]
+                    .into_iter()
+                    .flatten()
+                    .any(|kind| army_weapon(&definitions, kind)),
+                expected,
+                "{id}"
+            );
+        }
+    }
+    #[test]
+    fn ra6_deployed_and_temporally_frozen_units_wait_for_release_before_army_orders() {
+        let id = SimId(7);
+        let mut special = crate::SpecialState::default();
+        assert!(army_commandable(&special, id));
+        special.deployed.insert(id, 0);
+        assert!(!army_commandable(&special, id));
+        special.deployed.clear();
+        special.erasures.insert(
+            id,
+            crate::special::infantry::Erasure {
+                remaining: 100,
+                beams: BTreeMap::new(),
+            },
+        );
+        assert!(!army_commandable(&special, id));
+        special.erasures.clear();
+        assert!(army_commandable(&special, id));
     }
 }

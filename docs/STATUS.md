@@ -1162,7 +1162,7 @@ worktree was deleted.
 ## RA6-A infantry and radiation implementation (2026-10-14)
 
 **Implementation complete; full validation pending. Not independently reviewed.** Decisions
-R71–R74 record the pure-code-move prerequisite, schemas, bounded loader migrations, mechanics
+R71–R76 record the pure-code-move prerequisite, schemas, bounded loader migrations, mechanics
 and explicit assumptions. The exact shipped acceptance matrix is
 [RA6-A acceptance ledger](validation/ra2-parity/RA6A_ACCEPTANCE.md).
 
@@ -1185,7 +1185,9 @@ and `special::radiation::add` for source-bearing radiation; finish vehicles, IFV
 structures, superweapons, crashes/cargo loss and paradrops. Apply veteran infiltration only
 at paid production completion, never all UnitSpawned events. Preserve RA5 observed bridge
 repair/assembly fixes and R67 ship-blocked bridge repair assumption. Broader existing RA7–RA9
-AI/fog/stress debt remains. D-only GI undeploy, effective-Sight disguise detection, utility
+AI/fog/stress debt remains. R76 records an unproven first-spawn concealment scheduling risk
+for RA7 to reproduce: production does not initialize hidden state before same-tick Combat.
+D-only GI undeploy, effective-Sight disguise detection, utility
 weapon adaptations and elite Ivan600 are explicit R72–R73 assumptions, not engine proof.
 
 **User verification/storage.** Disguised appearance/friendly paint and all visual/audio/play

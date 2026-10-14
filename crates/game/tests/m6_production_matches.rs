@@ -464,3 +464,9 @@ fn ra5_coral_archipelago_brutal_libya_germany_seed_zero_finishes() {
     );
     assert!(matches!(outcome, Some(MatchOutcome::Won { .. })));
 }
+
+#[test]
+fn ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes() {
+    let outcome = duel("coral_archipelago", ["libya", "iraq"], ["brutal", "medium"]);
+    assert!(matches!(outcome, Some(MatchOutcome::Won { .. })));
+}

@@ -1,0 +1,41 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 2.69s
+     Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-fff13bc99bc7e9e6)
+
+running 1 test
+test ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes has been running for over 60 seconds
+RA6 before tick 105845: queue=[]
+RA6 before tick 105845: SimId(566) Owner(PlayerId(0)) kind=Some("engineer") Health { hit_points: 9 }
+RA6 before tick 105845: controlled={}, erasures={}, deployed={}
+RA6 before tick 105846: queue=[]
+RA6 before tick 105846: SimId(566) Owner(PlayerId(0)) kind=Some("engineer") Health { hit_points: 9 }
+RA6 before tick 105846: controlled={}, erasures={}, deployed={}
+RA6 before tick 105847: queue=[]
+RA6 before tick 105847: SimId(566) Owner(PlayerId(0)) kind=Some("engineer") Health { hit_points: 9 }
+RA6 before tick 105847: controlled={}, erasures={}, deployed={}
+RA6 before tick 105848: queue=[]
+RA6 before tick 105848: SimId(566) Owner(PlayerId(0)) kind=Some("engineer") Health { hit_points: 9 }
+RA6 before tick 105848: controlled={}, erasures={}, deployed={}
+RA6 before tick 105849: queue=[]
+RA6 before tick 105849: SimId(566) Owner(PlayerId(0)) kind=Some("engineer") Health { hit_points: 9 }
+RA6 before tick 105849: controlled={}, erasures={}, deployed={}
+RA6 before tick 105850: queue=[]
+RA6 before tick 105850: SimId(566) Owner(PlayerId(0)) kind=Some("engineer") Health { hit_points: 9 }
+RA6 before tick 105850: controlled={}, erasures={}, deployed={}
+RA6 before tick 105851: queue=[IssuedCommand { player: PlayerId(0), command: Interact { unit: SimId(566), target: SimId(2684394882) } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(579)], target: CellPos { x: 40, y: 55 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(566)], target: CellPos { x: 222, y: 142 } } }]
+RA6 before tick 105851: SimId(566) Owner(PlayerId(0)) kind=Some("engineer") Health { hit_points: 9 }
+RA6 before tick 105851: controlled={}, erasures={}, deployed={}
+
+thread 'ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes' (1748092) panicked at crates/game/tests/m6_production_matches.rs:278:21:
+coral_archipelago: ["libya", "iraq"] at ["brutal", "medium"]: tick 105851: AttackMove { units: [SimId(566)], target: CellPos { x: 222, y: 142 } } rejected (unit 566 does not exist) without a loss
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes ... FAILED
+
+failures:
+
+failures:
+    ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5 filtered out; finished in 80.36s
+
+error: test failed, to rerun pass `-p game --test m6_production_matches`
