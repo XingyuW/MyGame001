@@ -46,7 +46,11 @@ impl TeamColors {
     }
     /// The colour of `player`.
     pub fn rgb_of(&self, player: PlayerId) -> [u8; 3] {
-        TEAM_PALETTE[self.index_of(player)].1
+        if player == sim::NEUTRAL {
+            [156, 156, 148]
+        } else {
+            TEAM_PALETTE[self.index_of(player)].1
+        }
     }
     /// The human player's colour, or the first opponent's.
     pub fn rgb(&self, human: bool) -> [u8; 3] {
@@ -103,7 +107,11 @@ impl TeamPaint<'_, '_> {
             return enemy.clone();
         }
         let colors = self.colors.as_deref().copied().unwrap_or_default();
-        let index = colors.index_of(owner);
+        let index = if owner == sim::NEUTRAL {
+            TEAM_PALETTE.len()
+        } else {
+            colors.index_of(owner)
+        };
         if let Some(handle) = self
             .cache
             .as_deref()
@@ -130,7 +138,14 @@ fn paint_team_sprite(world: &mut World, id: AssetId<Image>, index: usize) {
     let Some(source) = world
         .get_resource::<OriginalPaint>()
         .and_then(|originals| originals.0.get(&id))
-        .map(|source| painted(source, TEAM_PALETTE[index].1))
+        .map(|source| {
+            painted(
+                source,
+                TEAM_PALETTE
+                    .get(index)
+                    .map_or([156, 156, 148], |entry| entry.1),
+            )
+        })
     else {
         return;
     };
@@ -226,6 +241,49 @@ pub fn sprite_pair(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn ra5_neutral_paint_is_gray_then_capture_uses_the_new_owner_without_palette_indexing() {
+        let mut world = World::new();
+        world.init_resource::<Assets<Image>>();
+        let source = Image {
+            data: Some(vec![42, 133, 202, 255]),
+            ..default()
+        };
+        let human = world.resource_mut::<Assets<Image>>().add(source.clone());
+        let enemy = world.resource_mut::<Assets<Image>>().add(source);
+        apply_team_colors(&mut world, 0, vec![(human.clone(), enemy.clone())]);
+        let mut state: bevy::ecs::system::SystemState<TeamPaint> =
+            bevy::ecs::system::SystemState::new(&mut world);
+        state
+            .get_mut(&mut world)
+            .expect("paint")
+            .sprite(sim::NEUTRAL, &human, &enemy);
+        state.apply(&mut world);
+        let neutral =
+            state
+                .get_mut(&mut world)
+                .expect("paint")
+                .sprite(sim::NEUTRAL, &human, &enemy);
+        assert_eq!(
+            world
+                .resource::<Assets<Image>>()
+                .get(&neutral)
+                .expect("gray")
+                .data
+                .as_ref()
+                .expect("pixels")[..3],
+            [156, 156, 148]
+        );
+        assert_eq!(
+            state
+                .get_mut(&mut world)
+                .expect("paint")
+                .sprite(HUMAN, &human, &enemy),
+            human
+        );
+        assert_eq!(TeamColors(9).rgb_of(sim::NEUTRAL), [156, 156, 148]);
+    }
 
     #[test]
     fn every_player_of_the_largest_match_has_its_own_colour_for_every_choice() {

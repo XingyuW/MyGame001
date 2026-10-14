@@ -107,7 +107,7 @@ use std::{collections::BTreeMap, path::Path};
 
 /// The schema version of the arsenal file this crate reads (2 since RA1, 3 since RA2, 4 since
 /// RA3, 5 since RA4).
-pub const ARSENAL_SCHEMA_VERSION: i64 = 5;
+pub const ARSENAL_SCHEMA_VERSION: i64 = 6;
 
 /// Largest `build_limit` of an arsenal entry.
 pub const MAX_BUILD_LIMIT: u32 = 255;
@@ -357,6 +357,20 @@ pub struct ArsenalEntry {
     pub cloakable: bool,
     /// The radius in cells within which the type detects cloaked units; 0: no sensors.
     pub sensors_sight: u32,
+    // RA5: neutral world objects, occupation and captured-building effects.
+    pub needs_engineer: bool,
+    pub capturable: bool,
+    pub insignificant: bool,
+    pub immune: bool,
+    pub hospital: bool,
+    pub bridge_repair_hut: bool,
+    pub occupier: bool,
+    pub can_be_occupied: bool,
+    pub max_occupants: u32,
+    pub vehicle_docks: u32,
+    pub cash_startup: u32,
+    pub cash_amount: u32,
+    pub cash_delay: u32,
 }
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Arsenal(pub BTreeMap<ProductionItem, ArsenalEntry>);
@@ -416,6 +430,19 @@ struct Entry {
     missile: String,
     cloakable: i64,
     sensors_sight: i64,
+    needs_engineer: i64,
+    capturable: i64,
+    insignificant: i64,
+    immune: i64,
+    hospital: i64,
+    bridge_repair_hut: i64,
+    occupier: i64,
+    can_be_occupied: i64,
+    max_occupants: i64,
+    vehicle_docks: i64,
+    cash_startup: i64,
+    cash_amount: i64,
+    cash_delay: i64,
 }
 static ENTRY: Shape = Shape::Struct(&[
     ("id", Shape::Str),
@@ -501,6 +528,19 @@ static ENTRY: Shape = Shape::Struct(&[
     ("missile", Shape::Str),
     ("cloakable", Shape::Int),
     ("sensors_sight", Shape::Int),
+    ("needs_engineer", Shape::Int),
+    ("capturable", Shape::Int),
+    ("insignificant", Shape::Int),
+    ("immune", Shape::Int),
+    ("hospital", Shape::Int),
+    ("bridge_repair_hut", Shape::Int),
+    ("occupier", Shape::Int),
+    ("can_be_occupied", Shape::Int),
+    ("max_occupants", Shape::Int),
+    ("vehicle_docks", Shape::Int),
+    ("cash_startup", Shape::Int),
+    ("cash_amount", Shape::Int),
+    ("cash_delay", Shape::Int),
 ]);
 static FILE: Shape = Shape::Struct(&[
     (
@@ -781,6 +821,14 @@ impl Arsenal {
             // The traits of RA4 (schema version 5): flags 1 or 0, numbers within their ranges,
             // and each only on the kind of item that the rules can give it to.
             let flags = [
+                ("needs_engineer", e.needs_engineer, true),
+                ("capturable", e.capturable, true),
+                ("insignificant", e.insignificant, true),
+                ("immune", e.immune, true),
+                ("hospital", e.hospital, true),
+                ("bridge_repair_hut", e.bridge_repair_hut, true),
+                ("occupier", e.occupier, false),
+                ("can_be_occupied", e.can_be_occupied, true),
                 ("trainable", e.trainable, false),
                 ("crewed", e.crewed, true),
                 ("self_healing", e.self_healing, false),
@@ -821,6 +869,11 @@ impl Arsenal {
             let veteran_abilities = abilities("veteran_abilities", &e.veteran_abilities)?;
             let elite_abilities = abilities("elite_abilities", &e.elite_abilities)?;
             let numbers = [
+                ("max_occupants", e.max_occupants, 32, true),
+                ("vehicle_docks", e.vehicle_docks, 32, true),
+                ("cash_startup", e.cash_startup, 1000000, true),
+                ("cash_amount", e.cash_amount, 1000000, true),
+                ("cash_delay", e.cash_delay, 1000000, true),
                 ("ammo", e.ammo, i64::from(MAX_AMMO), false),
                 ("docks", e.docks, i64::from(MAX_DOCKS), true),
                 (
@@ -990,6 +1043,19 @@ impl Arsenal {
                     missile,
                     cloakable: e.cloakable == 1,
                     sensors_sight: e.sensors_sight as u32,
+                    needs_engineer: e.needs_engineer == 1,
+                    capturable: e.capturable == 1,
+                    insignificant: e.insignificant == 1,
+                    immune: e.immune == 1,
+                    hospital: e.hospital == 1,
+                    bridge_repair_hut: e.bridge_repair_hut == 1,
+                    occupier: e.occupier == 1,
+                    can_be_occupied: e.can_be_occupied == 1,
+                    max_occupants: e.max_occupants as u32,
+                    vehicle_docks: e.vehicle_docks as u32,
+                    cash_startup: e.cash_startup as u32,
+                    cash_amount: e.cash_amount as u32,
+                    cash_delay: e.cash_delay as u32,
                 },
             );
         }
@@ -1117,6 +1183,14 @@ impl Arsenal {
                 e.launcher.map_or(u8::MAX, |launcher| launcher as u8),
                 e.missile.map_or(u8::MAX, |missile| missile as u8),
                 u8::from(e.cloakable),
+                u8::from(e.needs_engineer),
+                u8::from(e.capturable),
+                u8::from(e.insignificant),
+                u8::from(e.immune),
+                u8::from(e.hospital),
+                u8::from(e.bridge_repair_hut),
+                u8::from(e.occupier),
+                u8::from(e.can_be_occupied),
             ]);
             h.write(&e.spawns.map_or(u16::MAX, |kind| kind.0).to_le_bytes());
             for value in [
@@ -1126,6 +1200,11 @@ impl Arsenal {
                 e.spawn_regen,
                 e.spawn_reload,
                 e.sensors_sight,
+                e.max_occupants,
+                e.vehicle_docks,
+                e.cash_startup,
+                e.cash_amount,
+                e.cash_delay,
             ] {
                 h.write_u32(value);
             }

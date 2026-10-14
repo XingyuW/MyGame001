@@ -2130,6 +2130,8 @@ pub struct SoundContext<'a> {
 /// documentation.
 pub fn event_sound(event: &SimEvent, context: &SoundContext) -> Option<Sfx> {
     match event {
+        SimEvent::BridgeChanged { cells, intact: true, .. } => cells.iter().any(|c| (context.cell_visible)(*c)).then_some(Sfx::Placed),
+        SimEvent::BridgeChanged { .. } => None,
         SimEvent::StrategicActivated { player, building, .. } => (*player==HUMAN || (context.seen)(*building)).then_some(Sfx::Explosion),
         SimEvent::CommandRejected { player, .. } => (*player == HUMAN).then_some(Sfx::Error),
         SimEvent::ProductionComplete { player, .. } => (*player == HUMAN).then_some(Sfx::Ready),

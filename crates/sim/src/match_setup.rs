@@ -331,6 +331,7 @@ pub struct MatchRules {
     /// Ore grows and spreads (RA5, `crate::ore`; the lobby's `TiberiumGrows`). Read only in a
     /// world with a rules file.
     pub ore_grows: bool,
+    pub bridge_destruction: bool,
 }
 
 impl Default for MatchRules {
@@ -341,6 +342,7 @@ impl Default for MatchRules {
             mcv_repacks: true,
             crates: true,
             ore_grows: true,
+            bridge_destruction: true,
         }
     }
 }
@@ -394,6 +396,9 @@ impl MatchState {
         ]);
         // RA5: written only when it differs from the default, so that a match with the
         // default hashes as before.
+        if !self.rules.bridge_destruction {
+            hasher.write(b"bridges indestructible");
+        }
         if !self.rules.ore_grows {
             hasher.write(b"ore stands still");
         }
@@ -541,6 +546,7 @@ pub struct MatchOptions {
     pub crates: bool,
     pub mcv_repacks: bool,
     pub ore_grows: bool,
+    pub bridge_destruction: bool,
 }
 
 impl Default for MatchOptions {
@@ -560,6 +566,7 @@ impl Default for MatchOptions {
             crates: rules.crates,
             mcv_repacks: rules.mcv_repacks,
             ore_grows: rules.ore_grows,
+            bridge_destruction: rules.bridge_destruction,
         }
     }
 }
@@ -732,6 +739,11 @@ pub fn setup_match_configured(
     let mut ids = BTreeSet::new();
     let mut starts = BTreeSet::new();
     for setup in players {
+        if setup.player == crate::NEUTRAL {
+            return Err(MatchSetupError::Players(
+                "neutral owner cannot compete".into(),
+            ));
+        }
         if !ids.insert(setup.player) {
             return Err(MatchSetupError::Players(format!(
                 "player {} is given twice",
@@ -1072,6 +1084,7 @@ pub fn setup_match_configured(
             controllers.insert(setup.player, controller);
         }
     }
+    crate::world_objects::install(world, options.bridge_destruction);
     world.insert_resource(AiPlayers::new(ai.clone(), controllers));
     world.insert_resource(MatchState {
         players: sorted.iter().map(|setup| setup.player).collect(),
@@ -1081,6 +1094,7 @@ pub fn setup_match_configured(
             mcv_repacks: options.mcv_repacks,
             crates: options.crates,
             ore_grows: options.ore_grows,
+            bridge_destruction: options.bridge_destruction,
         },
         defeated: BTreeMap::new(),
         outcome: None,
@@ -1103,16 +1117,39 @@ pub(crate) fn check_win_condition(
     teams: Res<Players>,
     definitions: Res<Definitions>,
     special: Res<crate::SpecialState>,
-    buildings: Query<&Owner, bevy_ecs::query::With<Building>>,
+    buildings: Query<(&crate::SimId, &Owner, &Building)>,
     units: Query<(&crate::SimId, &Owner, &Unit)>,
 ) {
     if state.players.is_empty() || state.outcome.is_some() {
         return;
     }
-    let mut alive: BTreeSet<PlayerId> = buildings.iter().map(|owner| owner.0).collect();
+    let mut alive: BTreeSet<PlayerId> = buildings
+        .iter()
+        .filter(|(_, owner, building)| {
+            owner.0 != crate::NEUTRAL
+                && !definitions
+                    .metadata(ProductionItem::Building(building.kind))
+                    .is_some_and(|entry| entry.insignificant)
+        })
+        .map(|(_, owner, _)| owner.0)
+        .collect();
     if let Some(rules) = definitions.rules() {
         let short_game = state.rules.short_game;
         let counts = |kind: UnitKind| !short_game || rules.is_base_unit(kind);
+        if !short_game {
+            for (id, owner, _) in &buildings {
+                if owner.0 != crate::NEUTRAL
+                    && special.cargo.get(id).is_some_and(|crew| !crew.is_empty())
+                {
+                    alive.insert(owner.0);
+                }
+            }
+            for (id, g) in &special.garrisons {
+                if special.cargo.get(id).is_some_and(|crew| !crew.is_empty()) {
+                    alive.insert(g.owner);
+                }
+            }
+        }
         for (id, owner, unit) in &units {
             if counts(unit.kind)
                 || special

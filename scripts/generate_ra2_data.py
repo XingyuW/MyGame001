@@ -73,6 +73,16 @@ FACTORIES = {
 
 # id: (label, description, category, domain, role, cooldown, radius, strength, capacity,
 #      sprite, width, height)
+WORLD_BUILDINGS = {
+    'oil_derrick': ('Oil Derrick', 'Capture to earn credits.', 'buildings', 'land', 'combat', 100, 6, 20, 0, 'gun_turret', 1, 1),
+    'hospital': ('Hospital', 'Capture; send own infantry here to heal.', 'buildings', 'land', 'combat', 100, 6, 20, 0, 'gun_turret', 1, 1),
+    'airport': ('Airport', 'Capture for paradrop support.', 'buildings', 'land', 'combat', 100, 6, 20, 0, 'gun_turret', 1, 1),
+    'tech_outpost': ('Tech Outpost', 'Capture for defence and one vehicle repair dock.', 'buildings', 'land', 'combat', 100, 6, 20, 0, 'gun_turret', 1, 1),
+    'bridge_hut': ('Bridge Repair Hut', 'Send an Engineer to restore the adjacent bridge.', 'buildings', 'land', 'combat', 100, 6, 20, 0, 'gun_turret', 1, 1),
+    'civilian_house': ('House', 'GI and Conscript garrison.', 'buildings', 'land', 'combat', 100, 6, 20, 0, 'gun_turret', 1, 1),
+    'civilian_city': ('City Block', 'GI and Conscript garrison.', 'buildings', 'land', 'combat', 100, 6, 20, 0, 'gun_turret', 1, 1),
+    'civilian_tower': ('Tower', 'GI and Conscript garrison.', 'buildings', 'land', 'combat', 100, 6, 20, 0, 'gun_turret', 1, 1),
+}
 BUILDINGS = {
     'construction_yard': ('Construction Yard', 'Base infrastructure.', 'buildings', 'land', 'combat', 100, 6, 20, 0,
         'construction_yard', 3, 3),
@@ -357,7 +367,7 @@ NEW_UNITS = {
 # difference listed in ra2_differences.tsv).
 SHIPYARD_ADJACENT = 31
 # Mapped ids that enter the game in a later milestone, by the note of ra2_mapping.tsv.
-LATER = ("tech_building", "support")
+LATER = ("support",)
 # Units the ini produces only with stolen technology: in the data, not producible until RA6.
 STOLEN = ("RequiresStolenAlliedTech", "RequiresStolenSovietTech")
 
@@ -738,9 +748,9 @@ class Item:
         self.ini = section
         twins = tables.twins(game_id)
         self.side = "none" if twins else side
-        self.cost = int(section["Cost"])
+        self.cost = int(section.get("Cost", "0"))
         self.hit_points = int(section["Strength"])
-        self.sight = int(section["Sight"])
+        self.sight = int(section.get("Sight", "0"))
         self.tech_level = -1 if any(key in section for key in STOLEN) else int(section["TechLevel"])
         houses = [house for house in section.get("Owner", "").split(",") if house]
         self.owner_sides = [
@@ -775,10 +785,23 @@ class Item:
         # The traits of RA2 (docs/RA2_PARITY_PLAN.md sections 4.2 and 4.6), buildings only.
         flag = lambda key, default: convert("flag", section.get(key, default))
         building = self.kind == "building"
+        self.needs_engineer = flag("NeedsEngineer", "no")
+        self.capturable = flag("Capturable", "no")
+        self.insignificant = flag("Insignificant", "no")
+        self.immune = flag("Immune", "no")
+        self.hospital = flag("Hospital", "no")
+        self.bridge_repair_hut = flag("BridgeRepairHut", "no")
+        self.occupier = flag("Occupier", "no")
+        self.can_be_occupied = flag("CanBeOccupied", "no")
+        self.max_occupants = int(section.get("MaxNumberOccupants", "0"))
+        self.vehicle_docks = int(section.get("NumberOfDocks", "0")) if flag("UnitRepair", "no") else 0
+        self.cash_startup = int(section.get("ProduceCashStartup", "0"))
+        self.cash_amount = int(section.get("ProduceCashAmount", "0"))
+        self.cash_delay = convert("frames", section["ProduceCashDelay"]) if "ProduceCashDelay" in section else 0
         self.wall = building and flag("Wall", "no") == 1
         self.defence = building and section.get("BuildCat") == "Combat"
         self.build_limit = int(section.get("BuildLimit", "0"))
-        self.adjacent = int(section["Adjacent"]) if building else 0
+        self.adjacent = int(section.get("Adjacent", "2")) if building else 0
         # A shipyard reaches farther than the ini lets it (SHIPYARD_ADJACENT).
         self.far_shipyard = building and self.naval and "Factory" in section
         if self.far_shipyard:
@@ -867,9 +890,11 @@ def game_tables(tables):
     twins with their own label and the twin's art."""
     buildings, units = {}, {}
     for game_id, values in BUILDINGS.items():
-        buildings[game_id] = values + (game_id,)
+        buildings[game_id] = values + ("pillbox" if game_id.startswith("civilian_") else game_id,)
     for game_id, (label, twin) in NEW_BUILDINGS.items():
         buildings[game_id] = (label,) + BUILDINGS[twin][1:] + (twin,)
+    for game_id, values in WORLD_BUILDINGS.items():
+        buildings[game_id] = values + ("pillbox" if game_id.startswith("civilian_") else game_id,)
     for game_id, values in UNITS.items():
         units[game_id] = values + (ART.get(game_id, game_id),)
     for game_id, (label, twin) in NEW_UNITS.items():
@@ -1273,7 +1298,7 @@ class Data:
                 keys += ("LandTargeting", "NavalTargeting", "Underwater", "Organic", "Wall")
                 lines.append(
                     f'        ({key}: "{game_id}", hit_points: {item.hit_points}, '
-                    f'armour: "{ini["Armor"].lower()}", sight: {item.sight}, '
+                    f'armour: "{ini.get("Armor", "none").lower()}", sight: {item.sight}, '
                     f"weapons: {ids(slots)}, elite_weapons: {ids(elite)}, "
                     f"air_range_bonus: {convert('cells', ini.get('AirRangeBonus', '0'))}, "
                     f"land_targeting: {int(ini.get('LandTargeting', '0'))}, "
@@ -1291,7 +1316,7 @@ class Data:
 
     def arsenal_file(self):
         lines = [
-            "// The arsenal, schema version 5 (crates/sim/src/arsenal.rs; docs/DECISIONS.md R10, R11, R22, R6, R46): per",
+            "// The arsenal, schema version 6 (crates/sim/src/arsenal.rs; docs/DECISIONS.md R10, R11, R22, R6, R46): per",
             "// item its label, description, category, domain and role with the role's terms (durations in ticks,",
             "// 20 per second), the id of the item whose art it shows, its side, the factory group of a",
             "// building, and the terms of the ini's buildability rule: the sides whose factories build it",
@@ -1330,8 +1355,15 @@ class Data:
             "// `V3RocketType` or `DMislType`); cloakable (`Cloakable`) and sensors_sight",
             "// (`SensorsSight` in cells of a type with `Sensors=yes`).",
             "//",
+            "// Since schema version 6 (RA5, R65): needs_engineer (NeedsEngineer), capturable",
+            "// (Capturable), insignificant (Insignificant), immune (Immune), hospital (Hospital),",
+            "// bridge_repair_hut (BridgeRepairHut), occupier (Occupier), can_be_occupied",
+            "// (CanBeOccupied), max_occupants (MaxNumberOccupants), vehicle_docks (NumberOfDocks",
+            "// on UnitRepair), cash_startup (ProduceCashStartup), cash_amount (ProduceCashAmount),",
+            "// cash_delay (ProduceCashDelay frames converted to ticks). Missing flags/numbers are 0.",
+            "//",
             GENERATED,
-            "(schema_version: 5, entries: [",
+            "(schema_version: 6, entries: [",
         ]
         for table in (self.buildings, self.units):
             for game_id, values in table.items():
@@ -1341,7 +1373,7 @@ class Data:
                 )
                 keys = ["Owner", "RequiredHouses", "ForbiddenHouses", "TechLevel", "Prerequisite"]
                 keys += ["Factory", "Naval"] + list(STOLEN)
-                keys += ["Crewed", "Sensors", "SensorsSight"]
+                keys += ["Crewed", "Sensors", "SensorsSight", "NeedsEngineer", "Capturable", "Insignificant", "Immune", "Hospital", "BridgeRepairHut", "Occupier", "CanBeOccupied", "MaxNumberOccupants", "NumberOfDocks", "ProduceCashStartup", "ProduceCashAmount", "ProduceCashDelay"]
                 if item.kind == "unit":
                     keys += ["Crusher", "Crushable", "Size", "Trainable", "VeteranAbilities"]
                     keys += ["EliteAbilities", "SelfHealing", "Ammo", "AirportBound", "Spawns"]
@@ -1402,11 +1434,26 @@ class Data:
                     f"spawns_number: {item.spawns_number}, "
                     f"spawn_regen: {item.spawn_regen}, spawn_reload: {item.spawn_reload}, "
                     f'launcher: "{item.launcher}", missile: "{item.missile}", '
-                    f"cloakable: {item.cloakable}, sensors_sight: {item.sensors_sight}),"
+                    f"cloakable: {item.cloakable}, sensors_sight: {item.sensors_sight}, "
+                    f"needs_engineer: {item.needs_engineer}, "
+                    f"capturable: {item.capturable}, "
+                    f"insignificant: {item.insignificant}, "
+                    f"immune: {item.immune}, "
+                    f"hospital: {item.hospital}, "
+                    f"bridge_repair_hut: {item.bridge_repair_hut}, "
+                    f"occupier: {item.occupier}, "
+                    f"can_be_occupied: {item.can_be_occupied}, "
+                    f"max_occupants: {item.max_occupants}, "
+                    f"vehicle_docks: {item.vehicle_docks}, "
+                    f"cash_startup: {item.cash_startup}, "
+                    f"cash_amount: {item.cash_amount}, "
+                    f"cash_delay: {item.cash_delay}),"
                     f" // {source}"
                 )
         lines.append("])")
-        return "\n".join(lines) + "\n"
+        # Keep the bounded schema under MAX_DATA_FILE_BYTES without dropping source comments.
+        import re
+        return "\n".join(re.sub(r", (?=[a-z_]+:)", ",", line) for line in lines) + "\n"
 
     # --- rules.ron ---------------------------------------------------------------------------
 

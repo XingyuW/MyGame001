@@ -192,6 +192,8 @@ pub struct Grid {
     /// The row-major indices of the cells whose ore is gems (RA5): always cells with ore. Empty
     /// on a map without gems, which is hashed as before RA5.
     gems: BTreeSet<u32>,
+    /// Semantic map objects, retained when headless callers discard presentation looks.
+    world_features: BTreeMap<CellPos, u8>,
     /// The row-major indices of the cells a harvester emptied and that hold no ore now (RA5):
     /// ground ore may spread onto again, though a map's ore ground is no building ground.
     mined: BTreeSet<u32>,
@@ -219,6 +221,7 @@ impl Grid {
             air_occupants: vec![None; count],
             buildings: vec![None; count],
             gems: BTreeSet::new(),
+            world_features: BTreeMap::new(),
             mined: BTreeSet::new(),
             cells,
         })
@@ -226,6 +229,37 @@ impl Grid {
 
     pub fn width(&self) -> u32 {
         self.width
+    }
+
+    /// Scenario setup: retain only semantic scenery, bridge and neutral-building features.
+    /// Presentation ground colours stay outside the simulation.
+    pub fn mark_world_features(&mut self, looks: &[u8]) {
+        self.world_features.clear();
+        for (index, &look) in looks.iter().take(self.cells.len()).enumerate() {
+            let feature = look >> 4;
+            if matches!(feature, 4..=8 | 11..=15) && self.width > 0 {
+                let index = index as u32;
+                self.world_features.insert(
+                    CellPos::new((index % self.width) as i32, (index / self.width) as i32),
+                    feature,
+                );
+            }
+        }
+    }
+
+    /// Semantic source anchors and deck cells, in deterministic cell order.
+    pub fn world_features(&self) -> impl Iterator<Item = (CellPos, u8)> + '_ {
+        self.world_features
+            .iter()
+            .map(|(&cell, &feature)| (cell, feature))
+    }
+
+    pub(crate) fn set_world_feature(&mut self, cell: CellPos, feature: u8) {
+        if self.contains(cell) && matches!(feature, 4..=8 | 11..=15) {
+            self.world_features.insert(cell, feature);
+        } else {
+            self.world_features.remove(&cell);
+        }
     }
 
     pub fn height(&self) -> u32 {
@@ -811,6 +845,15 @@ impl Grid {
         for id in &self.foot {
             hasher.write_u32(id.0);
         }
+        if !self.world_features.is_empty() {
+            hasher.write(b"world_features");
+            hasher.write_u64(self.world_features.len() as u64);
+            for (cell, feature) in &self.world_features {
+                hasher.write(&cell.x.to_le_bytes());
+                hasher.write(&cell.y.to_le_bytes());
+                hasher.write(&[*feature]);
+            }
+        }
         // RA5: which cells of ore are gems and which cells were mined out, each under a tag
         // and only if there are any, so that a map without gems hashes as before.
         for (tag, cells) in [(&b"gems"[..], &self.gems), (&b"mined"[..], &self.mined)] {
@@ -1162,10 +1205,12 @@ fn validate(path: &Path, map: &tiled::Map) -> Result<LoadedMap, MapError> {
         air_occupants,
         buildings,
         gems: BTreeSet::new(),
+        world_features: BTreeMap::new(),
         mined: BTreeSet::new(),
     };
     // RA5: the one look the simulation reads from a map file, as it reads the ore amounts.
     grid.mark_gems(&looks);
+    grid.mark_world_features(&looks);
     Ok(LoadedMap {
         grid,
         tile_width: map.tile_width,

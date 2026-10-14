@@ -4055,3 +4055,120 @@ gate. Generated data, schemas, commands and match tick limits remain unchanged.
    Both use the unchanged scaled test limit as denominator, not the example's separate
    300,000 cap. The inherited near-limit tail is improved on these samples, not a proof for
    every seed; broader AI capability and stress coverage remain RA8 work.
+
+### R65. RA5 neutral objects, occupation and bridge simulation
+
+RA5-B completes items 5–9 using the existing deterministic simulation stages and ordinary
+`Interact`, `Deploy`, `Attack` and production commands. The new implementation is validated,
+not independently reviewed or approved.
+
+- `PlayerId(255)` is reserved for neutral objects: `Players::add` rejects it, hostility never
+  selects it, and victory excludes it. Captured `Insignificant` buildings do not keep a player
+  alive. Living occupants and hospital patients still count as units in a long game.
+- Arsenal schema 6 adds thirteen required reference-derived fields: `NeedsEngineer`,
+  `Capturable`, `Insignificant`, `Immune`, `Hospital`, `BridgeRepairHut`, `Occupier`,
+  `CanBeOccupied`, `MaxNumberOccupants`, repair `NumberOfDocks`, and the three `ProduceCash`
+  terms. Every legacy and RA1–RA5 fixture migrates. The schema tests intentionally now reject
+  version 5, accept 6 and reject 7. Missing reference Cost/Sight are zero, Armor is none and
+  Adjacent is two; missing new flags/numbers are zero. All mappings enter the completeness
+  audit; the RA5 deferred-present rows are removed. The reference roster remains 43 units and
+  29 buildings; the eight supplementary world definitions are not roster-parity credit.
+- Four tech buildings and repair huts are one-cell map anchors. A consumed Engineer captures
+  a tech building. Neutral capture of the Oil Derrick pays 1000, then its current owner receives
+  20 every 133 ticks; enemy recapture pays no startup grant and restarts the deadline. Captured
+  buildings cannot be sold. Hospitals heal entered friendly land infantry by 20 per tick and
+  return the same ID, health and experience when fully healed. Tech Outposts have exactly one
+  paid vehicle repair berth, distinct from aircraft docks, and the reference HoverMissile.
+  Airport ownership is ready for the RA6 paradrop implementation.
+- Civilian House/City/Tower props use CAEUR1/CAWA2A/CACITY01 as the representative reference
+  types: capacities 3/10/10, strength 300/600/1000, and their reference armour. This is a
+  documented mapping of the game's three visual categories, not a claim that all RA2 civilian
+  buildings share these values. Only GI/Conscript Occupiers enter. Allied/Soviet occupation
+  weapons fire with reload divided by current crew count, floored at one tick. Red health
+  (inclusive 25 percent) refuses entry and evacuates; Deploy also evacuates. Blocked exits
+  retain passengers until ordinary Grid registration and standing-point allocation succeed.
+  Occupation uses the first surviving occupant's side when mixed allied-country crews enter.
+  Cargo health, identity and experience are retained; occupation kills do not grant crew XP.
+- A hospital destroyed or captured by an enemy loses its patients, matching the existing
+  transport-host loss convention. This is an explicit closest implementation assumption where
+  the reference does not specify the game's queued-entry/cargo representation. A destroyed
+  civilian host instead attempts emergency evacuation, retaining blocked exits until room
+  exists. No dead actor acts later in its command tick; unseen or hidden enemy IDs reject as
+  missing IDs. Occupied props are owned, currently visible combat targets; RA7's optional
+  explored-is-visible behavior is not enabled early.
+- Connected bridge decks share the reference 1500 health. One area blast damages a run once,
+  at its strongest affected deck cell. Collapse turns every deck cell to water and destroys
+  land units standing on or stepping into it; air and amphibious units remain. An Engineer
+  entering a mapped repair hut restores the entire saved deck and is consumed. Ordinary damage
+  cannot destroy huts. The default-on `bridge_destruction` match option is hashed and exposed
+  in the lobby; its new row changes the rules panel from eight to nine rows. Nobody acquires
+  neutral props or tech buildings as autonomous weapon targets.
+- AI bridge recovery reads only currently visible collapsed decks and huts, produces an
+  ordinary Engineer, and issues Interact. A shipped-rule Brutal match regression commands the
+  collapse of the sole route through a full-height water barrier, observes an Engineer consumed
+  in repair and ground forces crossing, and requires a winner within the unchanged 72,000
+  ticks, without aircraft or alternate land paths. Occupied civilian targets enter the existing
+  visibility-filtered AI building snapshots.
+
+### R66. RA5 shared map installation, discrete scaling and original world art
+
+`Grid::world_features` retains semantic looks so headless matches cannot silently drop the new
+objects with `LoadedMap.looks`. Match setup installs props, tech buildings, huts and connected
+bridges through the same installer used by the client. Stable map IDs occupy their own reserved
+range. All new future-affecting state is included in the deterministic hash.
+
+Discrete tech/hut anchors retain source-cell identity when a map grows: two adjacent source
+objects remain two objects, and repeated terrain bands do not create extra buildings. Repeated
+land foundation cells become a clear apron; repeated water foundation cells remain water.
+Bridge and civilian-prop cells retain their connected/terrain semantics. Start clearing may
+remove an anchor where it actually changes that cell. Tests cover adjacent identity, absence of
+invisible blocked remnants, real installed objects, symmetry and setup from two to ten players.
+
+The eighteen large map recipes place point-symmetric pairs of all four tech types and bridge-end
+huts. The three small map layouts keep their existing coordinates. Existing maps include bent
+decks and one-bank piers, so a seaward terminal may have no shore. Prefer a shore hut; otherwise
+put its hut on a raised foundation beside the deck, retaining water beneath it and adding no
+traversable land. The shore hut remains the recovery entrance after that pier collapses. This
+is a map-design assumption for the original decorative piers, not a reference-engine rule.
+
+Original models in `scripts/hd_buildings_neutral.py` provide the four tech buildings and repair
+hut; `scripts/generate_ra5_world_art.py` provides a faceted gem atlas and timber crate. Civilian
+simulation definitions reuse the existing civilian scenery presentation. Neutral ownership is
+gray, capture repaints it to the owner, occupied buildings show crew pips and support selection
+and Deploy, crate effects retain their pickup notices, and bridge decks hide/reappear only when
+the viewer sees collapse/repair. Art and audio quality still require user verification.
+
+Storage policy is unchanged: the configured Cargo, uv and pip caches are preserved. The original
+render passes are retained in
+`/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra5b-render` for visual verification and
+reproducibility; no clone, worktree, build output or dataset was created under `/tmp`.
+
+R66 validation also intentionally extends the existing scenery assertion to distinguish passable
+intact decks from blocked civilian scenery; the old assertion had no bridge props. Lobby layout
+expectations become 17 rows and 75 buttons, with all existing fit/bounds checks retained. The
+asset inventory explicitly includes the new crate texture and the two occupation weapons get
+Rifle presentation classes. Supplementary definitions are appended after existing roster entries
+so legacy production indices stay stable; no old type is reordered to accommodate world objects.
+
+The grown-map test's former “nothing is made” assertion assumed every map look was repeatable
+terrain. Its new discrete-foundation branch checks the exact apron/water transformation before
+applying all original made-start and symmetry checks to other changes; repeated offshore huts
+must retain water. The original assertion is retained for every other cell. Separate RA5 tests
+verify adjacent object identity, one anchor per source, and the generated pier's reachable shore
+repair after commanded collapse. No layout, victory, or performance limit is relaxed.
+
+Generated tech sites require three cardinal land neighbours so scaled clear aprons stay joined
+to the existing land. Hut placement additionally preserves local connectivity between its
+neighbours: blocking a narrow peninsula neck can strand a pocket even with three neighbours.
+The existing all-passable-cells reachability assertion remains unchanged and exposed this case
+on Black Water. The required-field deletion matrix now anchors `, docks` to distinguish it from
+`vehicle_docks`; it still requires exactly one fixture edit and rejects the missing field.
+
+Cheap RA5 mutation evidence is retained in `docs/validation/ra2-parity/ra5-mutations/`:
+disabling neutral startup income fails the exact 11,000-credit assertion; disabling AI bridge
+repair fails the sole-route winner regression at its unchanged 72,000-tick cap with no repair,
+Engineer consumption or crossing. Both exit 101 from the intended test assertion, and original
+source SHA-256 values equal the restored values. Focused deterministic replay compares 141
+state hashes across two capture/hospital runs; separate sensitivity checks cover cash host and
+deadline, bridge HP/collapse/saved decks/hut links, hospital cargo HP and garrison owner/location/
+reload/eviction/cargo HP. The full required-field matrix includes all thirteen new fields.

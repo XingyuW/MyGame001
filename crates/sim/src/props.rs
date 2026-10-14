@@ -35,6 +35,7 @@ pub enum PropKind {
     House,
     CityBlock,
     Tower,
+    Bridge,
 }
 
 impl PropKind {
@@ -45,6 +46,7 @@ impl PropKind {
             5 => Some(Self::House),
             6 => Some(Self::CityBlock),
             7 => Some(Self::Tower),
+            8 => Some(Self::Bridge),
             _ => None,
         }
     }
@@ -56,6 +58,7 @@ impl PropKind {
             Self::House => 300,
             Self::CityBlock => 600,
             Self::Tower => 1_000,
+            Self::Bridge => 1_500,
         }
     }
 
@@ -65,6 +68,7 @@ impl PropKind {
             Self::House => "House",
             Self::CityBlock => "City block",
             Self::Tower => "Tower",
+            Self::Bridge => "Bridge",
         }
     }
 
@@ -85,12 +89,27 @@ pub struct Prop {
 pub struct Props {
     width: u32,
     armour: ArmourClass,
+    armours: BTreeMap<PropKind, ArmourClass>,
+    bridge_of: BTreeMap<CellPos, CellPos>,
+    pub(crate) bridge_destructible: bool,
     cells: BTreeMap<CellPos, Prop>,
     /// Cells whose prop was reduced to 0 hit points since the last `Cleanup` stage.
     dying: BTreeSet<CellPos>,
 }
 
 impl Props {
+    /// Shared client/headless installation from the simulation map's retained features.
+    pub fn from_grid(grid: &Grid, armour: ArmourClass) -> Self {
+        let mut looks = vec![0; (u64::from(grid.width()) * u64::from(grid.height())) as usize];
+        for (cell, feature) in grid.world_features() {
+            let index = cell.y as usize * grid.width() as usize + cell.x as usize;
+            if let Some(look) = looks.get_mut(index) {
+                *look = feature << 4;
+            }
+        }
+        Self::from_looks(grid, &looks, armour)
+    }
+
     /// The props of a map: every impassable land cell of `grid` whose look (row-major `looks`)
     /// has a scenery feature. They take damage as `armour` does.
     pub fn from_looks(grid: &Grid, looks: &[u8], armour: ArmourClass) -> Self {
@@ -103,7 +122,9 @@ impl Props {
             let Some(cell) = cell_at(width, index) else {
                 continue;
             };
-            if grid.cell(cell).is_some_and(|c| !c.passable && !c.water) {
+            if grid.cell(cell).is_some_and(|c| {
+                (!c.passable && !c.water) || (kind == PropKind::Bridge && c.passable)
+            }) {
                 cells.insert(
                     cell,
                     Prop {
@@ -116,8 +137,72 @@ impl Props {
         Self {
             width,
             armour,
+            armours: BTreeMap::new(),
+            bridge_of: BTreeMap::new(),
+            bridge_destructible: true,
             cells,
             dying: BTreeSet::new(),
+        }
+    }
+
+    pub(crate) fn configure(&mut self, defs: &crate::Definitions) {
+        for kind in [PropKind::House, PropKind::CityBlock, PropKind::Tower] {
+            if let Some(crate::ProductionItem::Building(building)) =
+                crate::garrison::item(defs, kind)
+                && let Some(terms) = defs.building_combat(building)
+            {
+                self.armours.insert(kind, terms.armour);
+                for prop in self.cells.values_mut().filter(|p| p.kind == kind) {
+                    prop.hit_points = terms.hit_points;
+                }
+            }
+        }
+        if let Some(armour) = defs.armour_class("concrete") {
+            self.armours.insert(PropKind::Bridge, armour);
+        }
+        let hp = defs.rules().map_or(1500, |r| r.combat.bridge_strength);
+        let mut remaining: BTreeSet<_> = self
+            .cells
+            .iter()
+            .filter(|(_, p)| p.kind == PropKind::Bridge)
+            .map(|(&cell, _)| cell)
+            .collect();
+        while let Some(&anchor) = remaining.first() {
+            remaining.remove(&anchor);
+            let mut queue = std::collections::VecDeque::from([anchor]);
+            while let Some(cell) = queue.pop_front() {
+                self.bridge_of.insert(cell, anchor);
+                if let Some(prop) = self.cells.get_mut(&cell) {
+                    prop.hit_points = hp;
+                }
+                for (dx, dy) in [(1, 0), (-1, 0), (0, 1), (0, -1)] {
+                    let next = CellPos::new(cell.x.saturating_add(dx), cell.y.saturating_add(dy));
+                    if remaining.remove(&next) {
+                        queue.push_back(next);
+                    }
+                }
+            }
+        }
+    }
+    pub fn armour_of(&self, kind: PropKind) -> ArmourClass {
+        self.armours.get(&kind).copied().unwrap_or(self.armour)
+    }
+    pub(crate) fn bridge_anchor(&self, cell: CellPos) -> Option<CellPos> {
+        self.bridge_of.get(&cell).copied()
+    }
+    pub(crate) fn bridge_cells(&self) -> impl Iterator<Item = (CellPos, CellPos)> + '_ {
+        self.bridge_of.iter().map(|(&cell, &anchor)| (cell, anchor))
+    }
+    pub(crate) fn restore_bridge(&mut self, cells: &[CellPos], hp: i32) {
+        for &cell in cells {
+            self.cells.insert(
+                cell,
+                Prop {
+                    kind: PropKind::Bridge,
+                    hit_points: hp,
+                },
+            );
+            self.dying.remove(&cell);
         }
     }
 
@@ -169,6 +254,28 @@ impl Props {
         if damage <= 0 {
             return;
         }
+        if let Some(anchor) = self.bridge_anchor(cell) {
+            if !self.bridge_destructible {
+                return;
+            }
+            let hp = self.cells.get(&cell).map_or(0, |p| i64::from(p.hit_points));
+            let left = i32::try_from(hp.saturating_sub(damage).max(0)).unwrap_or(0);
+            let cells: Vec<_> = self
+                .bridge_of
+                .iter()
+                .filter(|(_, group)| **group == anchor)
+                .map(|(&cell, _)| cell)
+                .collect();
+            for cell in cells {
+                if let Some(prop) = self.cells.get_mut(&cell) {
+                    prop.hit_points = left;
+                }
+                if left == 0 {
+                    self.dying.insert(cell);
+                }
+            }
+            return;
+        }
         if let Some(prop) = self.cells.get_mut(&cell) {
             let left = i64::from(prop.hit_points).saturating_sub(damage).max(0);
             prop.hit_points = i32::try_from(left).unwrap_or(0);
@@ -181,6 +288,21 @@ impl Props {
     /// Nothing for a match without props, so that the state hashes of such matches are those of
     /// earlier versions.
     pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
+        if !self.armours.is_empty() || !self.bridge_of.is_empty() {
+            hasher.write(b"prop_types");
+            hasher.write_u64(self.armours.len() as u64);
+            for (kind, armour) in &self.armours {
+                hasher.write(&[kind.tag()]);
+                hasher.write(&armour.0.to_le_bytes());
+            }
+            hasher.write_u64(self.bridge_of.len() as u64);
+            for (cell, anchor) in &self.bridge_of {
+                for coordinate in [cell.x, cell.y, anchor.x, anchor.y] {
+                    hasher.write(&coordinate.to_le_bytes());
+                }
+            }
+            hasher.write(&[u8::from(self.bridge_destructible)]);
+        }
         if self.cells.is_empty() {
             return;
         }
@@ -225,9 +347,9 @@ pub(crate) fn remove_dead_props(
         grid.set_terrain(
             cell,
             Cell {
-                passable: true,
-                water: false,
-                buildable: true,
+                passable: prop.kind != PropKind::Bridge,
+                water: prop.kind == PropKind::Bridge,
+                buildable: prop.kind != PropKind::Bridge,
                 ore: 0,
             },
         );
@@ -244,6 +366,35 @@ mod tests {
     use super::*;
 
     #[test]
+    fn ra5_bridge_health_damage_is_hashed() {
+        let cell = CellPos::new(0, 0);
+        let mut props = Props {
+            width: 1,
+            bridge_destructible: true,
+            ..Props::default()
+        };
+        props.cells.insert(
+            cell,
+            Prop {
+                kind: PropKind::Bridge,
+                hit_points: 1500,
+            },
+        );
+        props.bridge_of.insert(cell, cell);
+        let hash = |p: &Props| {
+            let mut h = Fnv1a64::new();
+            p.hash_into(&mut h);
+            h.finish()
+        };
+        let original = hash(&props);
+        props.hurt(cell, 1);
+        assert_eq!(props.cells[&cell].hit_points, 1499);
+        assert_ne!(hash(&props), original);
+        props.cells.get_mut(&cell).expect("deck").hit_points = 1500;
+        assert_eq!(hash(&props), original);
+    }
+
+    #[test]
     fn ids_and_cells_round_trip_and_only_scenery_looks_are_props() {
         assert_eq!(PropKind::of_look(4 << 4 | 1), Some(PropKind::Trees));
         assert_eq!(PropKind::of_look(7 << 4), Some(PropKind::Tower));
@@ -252,6 +403,9 @@ mod tests {
         let props = Props {
             width: 10,
             armour: ArmourClass::default(),
+            armours: BTreeMap::new(),
+            bridge_of: BTreeMap::new(),
+            bridge_destructible: true,
             cells: BTreeMap::from([(
                 CellPos::new(3, 2),
                 Prop {
@@ -274,6 +428,9 @@ mod tests {
         let mut props = Props {
             width: 4,
             armour: ArmourClass::default(),
+            armours: BTreeMap::new(),
+            bridge_of: BTreeMap::new(),
+            bridge_destructible: true,
             cells: BTreeMap::from([(
                 cell,
                 Prop {

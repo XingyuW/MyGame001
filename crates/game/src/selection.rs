@@ -429,10 +429,25 @@ pub(crate) fn prune_selected_building(
         return;
     };
     if !selection.0.is_empty()
-        || !(own_producers(&host).contains(&id) || own_yards(&host).contains(&id))
+        || !(own_producers(&host).contains(&id)
+            || own_yards(&host).contains(&id)
+            || own_garrisons(&host).contains(&id))
     {
         building.0 = None;
     }
+}
+
+pub(crate) fn own_garrisons(host: &SimHost) -> BTreeSet<SimId> {
+    host.world()
+        .get_resource::<sim::SpecialState>()
+        .map(|s| {
+            s.garrisons
+                .iter()
+                .filter(|(_, g)| g.owner == HUMAN)
+                .map(|(id, _)| *id)
+                .collect()
+        })
+        .unwrap_or_default()
 }
 
 /// The human player's Construction Yards: the buildings that the base unit of a side deploys
@@ -543,8 +558,11 @@ fn select_units(
         // Construction Yard the yard.
         producer = click_pick(
             pick,
-            own_building(&host, hovered.0)
-                .filter(|id| own_producers(&host).contains(id) || own_yards(&host).contains(id)),
+            own_building(&host, hovered.0).filter(|id| {
+                own_producers(&host).contains(id)
+                    || own_yards(&host).contains(id)
+                    || own_garrisons(&host).contains(id)
+            }),
         )
         .1;
         let double = pick.is_some_and(|id| {
@@ -614,7 +632,22 @@ fn shown_enemy_units(views: &Query<(&UnitView, &Transform, &Visibility)>) -> Vec
 
 /// The enemy building covering `cell` that the human player is shown, if any.
 fn shown_enemy_building(host: &SimHost, cell: Option<CellPos>) -> Option<SimId> {
-    let id = host.grid()?.building(cell?)?;
+    let cell = cell?;
+    if let Some(id) = host.props().and_then(|p| p.id_at(cell)).filter(|id| {
+        host.world()
+            .get_resource::<sim::SpecialState>()
+            .is_some_and(|state| {
+                state.garrisons.get(id).is_some_and(|g| g.owner != HUMAN)
+                    && !state.hidden.contains(&(HUMAN, *id))
+            })
+            && host
+                .players()
+                .and_then(|p| p.get(HUMAN))
+                .is_some_and(|p| p.vision().is_visible(cell))
+    }) {
+        return Some(id);
+    }
+    let id = host.grid()?.building(cell)?;
     let players = host.players()?;
     let mut buildings = host.world().try_query::<(&SimId, &Owner, &Building)>()?;
     buildings
@@ -631,11 +664,19 @@ fn shown_enemy_building(host: &SimHost, cell: Option<CellPos>) -> Option<SimId> 
 /// player has explored: a right click with armed units selected orders them to destroy it.
 fn shown_scenery(host: &SimHost, cell: Option<CellPos>) -> Option<SimId> {
     let cell = cell?;
+    let id = host.props()?.id_at(cell)?;
+    if host
+        .world()
+        .get_resource::<sim::SpecialState>()
+        .is_some_and(|s| s.garrisons.contains_key(&id))
+    {
+        return None;
+    }
     host.players()?
         .get(HUMAN)?
         .vision()
         .is_explored(cell)
-        .then(|| host.props()?.id_at(cell))?
+        .then_some(id)
 }
 
 /// The ids of the human player's units that carry component `T`.
@@ -665,7 +706,15 @@ fn terrain_enterable(cell: &sim::Cell, domain: sim::Domain) -> bool {
 
 /// The human player's building covering `cell`, if any.
 fn own_building(host: &SimHost, cell: Option<CellPos>) -> Option<SimId> {
-    let id = host.grid()?.building(cell?)?;
+    let cell = cell?;
+    if let Some(id) = host
+        .props()
+        .and_then(|p| p.id_at(cell))
+        .filter(|id| own_garrisons(host).contains(id))
+    {
+        return Some(id);
+    }
+    let id = host.grid()?.building(cell)?;
     let mut buildings = host.world().try_query::<(&SimId, &Owner)>()?;
     buildings
         .iter(host.world())
@@ -1090,6 +1139,24 @@ fn draw_selected_building(
     phase: f32,
     gizmos: &mut Gizmos,
 ) {
+    if let Some(g) = host
+        .world()
+        .get_resource::<sim::SpecialState>()
+        .and_then(|s| s.garrisons.get(&id))
+    {
+        let outline = footprint_outline(
+            sim::Footprint {
+                origin: g.cell,
+                width: 1,
+                height: 1,
+            },
+            map,
+        );
+        for i in 0..4 {
+            gizmos.line_2d(outline[i], outline[(i + 1) % 4], Color::srgb(0.3, 1.0, 0.3));
+        }
+        return;
+    }
     let Some(mut buildings) = host
         .world()
         .try_query::<(&SimId, &Building, Option<&Producer>)>()
@@ -1328,6 +1395,79 @@ mod tests {
         app.world_mut()
             .resource_mut::<ButtonInput<MouseButton>>()
             .reset_all();
+    }
+
+    #[test]
+    fn ra5_own_garrison_is_selectable_and_enemy_garrison_requires_current_visibility() {
+        for (owner, hidden) in [
+            (HUMAN, false),
+            (sim::PlayerId(1), false),
+            (sim::PlayerId(1), true),
+        ] {
+            let mut house = None;
+            let host = crate::sim_host::tests::demo_host_with(|world| {
+                let cell = CellPos::new(15, 15);
+                let mut grid = world.resource_mut::<sim::Grid>();
+                grid.set_terrain(
+                    cell,
+                    sim::Cell {
+                        passable: false,
+                        water: false,
+                        buildable: false,
+                        ore: 0,
+                    },
+                );
+                let mut looks = vec![0; (grid.width() * grid.height()) as usize];
+                looks[(cell.y as u32 * grid.width() + cell.x as u32) as usize] = 5 << 4;
+                let defs = world.resource::<sim::Definitions>().clone();
+                let props = sim::Props::from_looks(
+                    world.resource::<sim::Grid>(),
+                    &looks,
+                    defs.armour_class("wood").expect("wood"),
+                );
+                let id = props.id_at(cell).expect("house");
+                house = Some(id);
+                world.insert_resource(props);
+                let gi =
+                    sim::spawn_unit(world, owner, "gi", CellPos::new(14, 15)).expect("occupier");
+                sim::spawn_unit(world, HUMAN, "engineer", CellPos::new(15, 14)).expect("scout");
+                world.run_schedule(sim::SimSchedule);
+                world
+                    .resource_mut::<sim::CommandQueue>()
+                    .push(sim::IssuedCommand {
+                        player: owner,
+                        command: sim::Command::Interact {
+                            unit: gi,
+                            target: id,
+                        },
+                    });
+                world.run_schedule(sim::SimSchedule);
+                if hidden {
+                    world
+                        .resource_mut::<sim::SpecialState>()
+                        .hidden
+                        .insert((HUMAN, id));
+                }
+            });
+            let id = house.expect("id");
+            let cell = Some(CellPos::new(15, 15));
+            assert!(
+                host.world()
+                    .resource::<sim::SpecialState>()
+                    .garrisons
+                    .contains_key(&id)
+            );
+            assert_eq!(own_building(&host, cell), (owner == HUMAN).then_some(id));
+            assert_eq!(
+                shown_enemy_building(&host, cell),
+                (owner != HUMAN && !hidden).then_some(id)
+            );
+            assert_eq!(
+                shown_scenery(&host, cell),
+                None,
+                "an occupied building is never neutral scenery"
+            );
+        }
     }
 
     /// RA1: a left click on the player's Construction Yard selects it (to pack it up,

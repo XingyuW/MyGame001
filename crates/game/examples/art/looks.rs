@@ -56,6 +56,11 @@ pub enum Feature {
     /// tells the simulation something the terrain does not: a cell with ore and this feature
     /// holds gems.
     Gems = 10,
+    OilDerrick = 11,
+    Hospital = 12,
+    Airport = 13,
+    TechOutpost = 14,
+    BridgeHut = 15,
 }
 
 pub const GROUNDS: [Ground; 11] = [
@@ -72,7 +77,7 @@ pub const GROUNDS: [Ground; 11] = [
     Ground::Ash,
 ];
 
-pub const FEATURES: [Feature; 11] = [
+pub const FEATURES: [Feature; 16] = [
     Feature::None,
     Feature::Ore,
     Feature::Cliff,
@@ -84,6 +89,11 @@ pub const FEATURES: [Feature; 11] = [
     Feature::Bridge,
     Feature::Lava,
     Feature::Gems,
+    Feature::OilDerrick,
+    Feature::Hospital,
+    Feature::Airport,
+    Feature::TechOutpost,
+    Feature::BridgeHut,
 ];
 
 pub const fn look(ground: Ground, feature: Feature) -> u8 {

@@ -155,16 +155,16 @@ impl SimHost {
     fn install(&mut self, plan: &MatchPlan) -> Result<MatchStart, String> {
         self.world.insert_resource(plan.grid.clone());
         self.world.insert_resource(plan.definitions.clone());
-        // Trees, houses and city blocks take damage as the armour type `wood` does (RA3, the
-        // armour of the reference's lightest civilian buildings; docs/DECISIONS.md R35), and
-        // with the legacy ruleset like its structures.
-        if let Some(armour) = plan
-            .definitions
-            .armour_class("wood")
-            .or_else(|| plan.definitions.armour_class("structure"))
+        if self
+            .world
+            .resource::<Grid>()
+            .world_features()
+            .next()
+            .is_none()
         {
             self.world
-                .insert_resource(sim::Props::from_looks(&plan.grid, &plan.looks, armour));
+                .resource_mut::<Grid>()
+                .mark_world_features(&plan.looks);
         }
         sim::setup_match_configured(
             &mut self.world,
@@ -824,9 +824,10 @@ pub(crate) mod tests {
             assert_eq!(players.unit_speed_percent(first), 100);
             let (props, grid) = (host.props().expect("props"), host.grid().expect("grid"));
             for (cell, prop) in props.iter() {
-                assert!(
-                    !grid.is_passable(cell),
-                    "{id}: scenery stands on blocked ground"
+                assert_eq!(
+                    grid.is_passable(cell),
+                    prop.kind == sim::PropKind::Bridge,
+                    "{id}: intact decks are passable; other scenery stands on blocked ground"
                 );
                 assert_eq!(prop.hit_points, prop.kind.hit_points());
                 assert_eq!(props.get(props.id_at(cell).unwrap()).unwrap().0, cell);

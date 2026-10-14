@@ -4,8 +4,8 @@
  <properties>
   <property name="schema_version" type="int" value="2"/>
  </properties>
- <tileset firstgid="1" name="riverlands_tiles" tilewidth="64" tileheight="32" tilecount="51" columns="51">
-  <image source="riverlands_tiles.png" width="3264" height="32"/>
+ <tileset firstgid="1" name="riverlands_tiles" tilewidth="64" tileheight="32" tilecount="57" columns="57">
+  <image source="riverlands_tiles.png" width="3648" height="32"/>
   <!-- grass -->
   <tile id="0">
    <properties>
@@ -464,6 +464,61 @@
     <property name="buildable" type="bool" value="false"/>
     <property name="ore" type="int" value="600"/>
     <property name="look" type="int" value="169"/>
+   </properties>
+  </tile>
+  <!-- oil derrick -->
+  <tile id="51">
+   <properties>
+    <property name="passable" type="bool" value="false"/>
+    <property name="buildable" type="bool" value="false"/>
+    <property name="ore" type="int" value="0"/>
+    <property name="look" type="int" value="181"/>
+   </properties>
+  </tile>
+  <!-- hospital -->
+  <tile id="52">
+   <properties>
+    <property name="passable" type="bool" value="false"/>
+    <property name="buildable" type="bool" value="false"/>
+    <property name="ore" type="int" value="0"/>
+    <property name="look" type="int" value="197"/>
+   </properties>
+  </tile>
+  <!-- airport -->
+  <tile id="53">
+   <properties>
+    <property name="passable" type="bool" value="false"/>
+    <property name="buildable" type="bool" value="false"/>
+    <property name="ore" type="int" value="0"/>
+    <property name="look" type="int" value="213"/>
+   </properties>
+  </tile>
+  <!-- tech outpost -->
+  <tile id="54">
+   <properties>
+    <property name="passable" type="bool" value="false"/>
+    <property name="buildable" type="bool" value="false"/>
+    <property name="ore" type="int" value="0"/>
+    <property name="look" type="int" value="229"/>
+   </properties>
+  </tile>
+  <!-- bridge repair hut -->
+  <tile id="55">
+   <properties>
+    <property name="passable" type="bool" value="false"/>
+    <property name="buildable" type="bool" value="false"/>
+    <property name="ore" type="int" value="0"/>
+    <property name="look" type="int" value="242"/>
+   </properties>
+  </tile>
+  <!-- pier repair hut -->
+  <tile id="56">
+   <properties>
+    <property name="water" type="bool" value="true"/>
+    <property name="passable" type="bool" value="false"/>
+    <property name="buildable" type="bool" value="false"/>
+    <property name="ore" type="int" value="0"/>
+    <property name="look" type="int" value="246"/>
    </properties>
   </tile>
  </tileset>

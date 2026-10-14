@@ -696,7 +696,7 @@ struct Target {
 }
 
 /// The traits of a unit or building as a target. `terms` are the combat terms of its type.
-fn traits_of(
+pub(crate) fn traits_of(
     grid: &Grid,
     id: SimId,
     armour: ArmourClass,
@@ -822,7 +822,7 @@ fn blast_hits(
         }
     };
     let prop_traits = |kind: crate::PropKind| TargetTraits {
-        armour: props.armour(),
+        armour: props.armour_of(kind),
         tree: kind == crate::PropKind::Trees,
         ..TargetTraits::default()
     };
@@ -859,6 +859,11 @@ fn blast_hits(
     } else {
         crate::Domain::Land
     };
+    let direct_bridge = blast
+        .direct
+        .and_then(|id| props.get(id))
+        .and_then(|(cell, _)| props.bridge_anchor(cell));
+    let mut bridge_hits: BTreeMap<CellPos, (u64, SimId)> = BTreeMap::new();
     let mut seen: Vec<SimId> = Vec::new();
     for y in y0..=y1 {
         for x in x0..=x1 {
@@ -879,7 +884,17 @@ fn blast_hits(
                     && blast.direct != Some(id)
                     && let Some(distance) = within(centre)
                 {
-                    hit(id, &prop_traits(prop.kind), distance, 1000);
+                    if let Some(anchor) = props.bridge_anchor(cell) {
+                        if direct_bridge != Some(anchor) {
+                            let candidate = (distance, id);
+                            bridge_hits
+                                .entry(anchor)
+                                .and_modify(|old| *old = (*old).min(candidate))
+                                .or_insert(candidate);
+                        }
+                    } else {
+                        hit(id, &prop_traits(prop.kind), distance, 1000);
+                    }
                 }
             }
             // A unit holds the cell it stands in and the one it is entering: once is enough.
@@ -896,6 +911,9 @@ fn blast_hits(
                 }
             }
         }
+    }
+    for (_, (distance, id)) in bridge_hits {
+        hit(id, &prop_traits(crate::PropKind::Bridge), distance, 1000);
     }
 }
 
@@ -1083,7 +1101,7 @@ impl Field<'_> {
             }),
             body: Body::Prop(cell),
             traits: TargetTraits {
-                armour: self.props.armour(),
+                armour: self.props.armour_of(prop.kind),
                 tree: prop.kind == crate::PropKind::Trees,
                 ..TargetTraits::default()
             },
@@ -1099,7 +1117,7 @@ impl Field<'_> {
         let vision = self.vision(owner)?;
         (found
             .owner
-            .is_none_or(|other| self.players.hostile(owner, other))
+            .is_none_or(|other| other == crate::NEUTRAL || self.players.hostile(owner, other))
             && found.body.seen_by(vision)
             && !self.special.hidden.contains(&(owner, target)))
         .then_some(found)
@@ -1277,7 +1295,7 @@ pub(crate) fn combat(
     let mut roles: BTreeMap<SimId, crate::Role> = BTreeMap::new();
     let mut terms: BTreeMap<SimId, CombatTerms> = BTreeMap::new();
     let mut crushers: BTreeSet<SimId> = BTreeSet::new();
-    let index: BTreeMap<SimId, Target> = targets
+    let mut index: BTreeMap<SimId, Target> = targets
         .iter()
         .filter_map(
             |(entity, id, owner, _, armour, position, mobile, building, unit, experience)| {
@@ -1329,6 +1347,30 @@ pub(crate) fn combat(
             },
         )
         .collect();
+    for (id, g) in &special.garrisons {
+        if let Some((cell, prop)) = props.get(*id).filter(|(_, p)| p.hit_points > 0) {
+            let footprint = Footprint {
+                origin: cell,
+                width: 1,
+                height: 1,
+            };
+            index.insert(
+                *id,
+                Target {
+                    entity: None,
+                    owner: Some(g.owner),
+                    extent: Extent::footprint(footprint),
+                    body: Body::Building(footprint),
+                    traits: TargetTraits {
+                        armour: props.armour_of(prop.kind),
+                        ..Default::default()
+                    },
+                    armour_pm: 1000,
+                    item: crate::garrison::item(&definitions, prop.kind),
+                },
+            );
+        }
+    }
     let field = Field {
         targets: &index,
         props: &props,
@@ -1409,6 +1451,9 @@ pub(crate) fn combat(
         else {
             continue;
         };
+        if owner.0 == crate::NEUTRAL {
+            continue;
+        }
         weapon.cooldown = weapon.cooldown.saturating_sub(1);
         // A unit that is switched off or rearming does not fire. A shot of a volley that is
         // due meanwhile is not fired, so the volley ends and the weapon reloads, as for every
@@ -1536,7 +1581,13 @@ pub(crate) fn combat(
             }
             continue;
         };
+        if crate::world_objects::immune(&definitions, found.item) {
+            continue;
+        }
         let Some(entity) = found.entity else {
+            if let Some((cell, _)) = props.get(target) {
+                prop_damage.push((cell, damage));
+            }
             continue;
         };
         if let Ok((_, _, _, mut health, ..)) = targets.get_mut(entity) {
@@ -1666,6 +1717,9 @@ pub(crate) fn detonate(world: &mut bevy_ecs::world::World, blast: Blast, report:
         }
         match found.get(&id) {
             Some(&(entity, _, _, _, owner, item)) => {
+                if crate::world_objects::immune(&definitions, item) {
+                    continue;
+                }
                 let mut killed = false;
                 if let Some(mut health) = world.get_mut::<Health>(entity) {
                     let before = health.hit_points;
@@ -1716,6 +1770,12 @@ fn keep_or_acquire(
     current
         .filter(|&target| {
             field.visible_enemy(owner, target).is_some_and(|found| {
+                if !found
+                    .owner
+                    .is_some_and(|other| field.players.hostile(owner, other))
+                {
+                    return false;
+                }
                 let (dx, dy) = from.gap(&found.extent);
                 field
                     .engages(arms, &found.traits)

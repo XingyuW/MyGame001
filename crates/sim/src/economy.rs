@@ -284,12 +284,14 @@ impl PlayerState {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum PlayerSetupError {
     NegativeCredits(i64),
+    ReservedNeutral,
     AlreadyAdded(PlayerId),
 }
 
 impl fmt::Display for PlayerSetupError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Self::ReservedNeutral => write!(f, "the neutral owner cannot compete"),
             Self::NegativeCredits(credits) => {
                 write!(f, "starting credits {credits} are negative")
             }
@@ -333,6 +335,9 @@ impl Players {
         credits: i64,
         roster: Option<BTreeSet<ProductionItem>>,
     ) -> Result<(), PlayerSetupError> {
+        if player == crate::NEUTRAL {
+            return Err(PlayerSetupError::ReservedNeutral);
+        }
         if credits < 0 {
             return Err(PlayerSetupError::NegativeCredits(credits));
         }
@@ -379,7 +384,7 @@ impl Players {
     /// Whether `a` and `b` are enemies: different players that do not share a team. An owner who
     /// is not a player of the match is an enemy of everyone else, as before teams existed.
     pub fn hostile(&self, a: PlayerId, b: PlayerId) -> bool {
-        if a == b {
+        if a == b || a == crate::NEUTRAL || b == crate::NEUTRAL {
             return false;
         }
         let team = |player| self.get(player).map_or(0, |state| state.team);

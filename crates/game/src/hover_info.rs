@@ -81,6 +81,7 @@ pub fn label_text(
     health: Option<(i32, i32)>,
 ) -> String {
     let side = match whose {
+        _ if owner == sim::NEUTRAL => "Neutral",
         _ if owner == HUMAN => "Yours",
         Some(whose) => whose,
         None => "Enemy",
@@ -242,7 +243,9 @@ pub(crate) fn show_hover_label(
             }
             Some((
                 text,
-                if owner == HUMAN {
+                if owner == sim::NEUTRAL {
+                    Color::srgb(0.82, 0.82, 0.78)
+                } else if owner == HUMAN {
                     Color::srgb(0.72, 0.9, 1.0)
                 } else {
                     Color::srgb(1.0, 0.72, 0.66)
@@ -256,11 +259,29 @@ pub(crate) fn show_hover_label(
             let cell = hovered.0?;
             let explored = host.players()?.get(HUMAN)?.vision().is_explored(cell);
             let prop = host.props()?.at(cell).filter(|_| explored)?;
-            Some((
-                scenery_text(prop.kind, prop.hit_points),
-                Color::srgb(0.86, 0.84, 0.7),
-                cursor,
-            ))
+            let id = host.props()?.id_at(cell)?;
+            let mut text = scenery_text(prop.kind, prop.hit_points);
+            if let Some(state) = host.world().get_resource::<sim::SpecialState>()
+                && let Some(g) = state.garrisons.get(&id)
+            {
+                if g.owner != HUMAN
+                    && (!host.players()?.get(HUMAN)?.vision().is_visible(cell)
+                        || state.hidden.contains(&(HUMAN, id)))
+                {
+                    return None;
+                }
+                let count = state.cargo.get(&id).map_or(0, Vec::len);
+                text.push_str(&format!(
+                    "\n{} occupants · {}",
+                    count,
+                    if g.owner == HUMAN {
+                        "Yours · D to evacuate"
+                    } else {
+                        "Enemy"
+                    }
+                ));
+            }
+            Some((text, Color::srgb(0.86, 0.84, 0.7), cursor))
         });
     let (text, node, colour) = &mut *label;
     match found {
@@ -285,6 +306,23 @@ pub(crate) fn show_hover_label(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn ra5_neutral_ownership_is_named_without_an_enemy_team_label() {
+        assert_eq!(
+            label_text(
+                "Oil Derrick",
+                sim::NEUTRAL,
+                Some("Blue Player"),
+                Some((1000, 1000))
+            ),
+            "Oil Derrick\nNeutral  100%"
+        );
+        assert_eq!(
+            label_text("Oil Derrick", HUMAN, None, None),
+            "Oil Derrick\nYours"
+        );
+    }
 
     #[test]
     fn scenery_labels_name_the_kind_and_health() {

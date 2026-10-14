@@ -131,6 +131,7 @@ impl Plugin for SimPlugin {
                 harvest,
                 crate::crates::appear,
                 crate::special::advance,
+                crate::world_objects::advance,
             )
                 .chain()
                 .in_set(SimCoreSet(SimSet::Economy))
@@ -142,11 +143,13 @@ impl Plugin for SimPlugin {
                 .chain()
                 .in_set(SimCoreSet(SimSet::Movement))
                 .in_set(SimSet::Movement),
-            (combat, crate::special::resolve)
+            (combat, crate::garrison::fire, crate::special::resolve)
                 .chain()
                 .in_set(SimCoreSet(SimSet::Combat))
                 .in_set(SimSet::Combat),
             (
+                crate::bridges::collapse,
+                crate::garrison::cleanup,
                 crate::veterancy::award,
                 remove_dead,
                 crate::crew::escape,
@@ -182,6 +185,8 @@ impl Plugin for SimPlugin {
             .insert_resource(crate::veterancy::Kills::default())
             .insert_resource(crate::crew::Wrecks::default())
             .insert_resource(crate::Props::default())
+            .insert_resource(crate::WorldObjects::default())
+            .insert_resource(crate::Bridges::default())
             .insert_resource(crate::Crates::default())
             .insert_resource(MatchState::default())
             .insert_resource(AiPlayers::default())

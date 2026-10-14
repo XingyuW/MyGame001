@@ -172,7 +172,7 @@ fn combat_mapping() -> CombatMapping {
 const COMBAT_PREFIXES: [&str; 3] = ["weapon.", "warhead.", "effect."];
 
 /// The notes of mapped sections whose items enter the game in a later milestone.
-const LATER: [&str; 2] = ["tech_building", "support"];
+const LATER: [&str; 1] = ["support"];
 
 /// The intentional differences, and which of them the audit met.
 struct Differences {
@@ -519,7 +519,10 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
             .metadata(item)
             .unwrap_or_else(|| panic!("{id} has no arsenal entry"));
         let mut number = |field: &str, game: i128, conversion: Conversion, key: &str| {
-            let text = required(key);
+            let text = value(key).unwrap_or_else(|| match key {
+                "Cost" | "Sight" => "0",
+                _ => required(key),
+            });
             differences.check(
                 id,
                 field,
@@ -553,7 +556,7 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
         // ini's `Primary` (or `Weapon1`) and `Secondary`, and `ElitePrimary` (or
         // `EliteWeapon1`) and `EliteSecondary`, each in the place of the weapon of its slot. A
         // weapon of the ini that the game does not carry reads `?Name` and needs a row.
-        let armour = required("Armor");
+        let armour = value("Armor").unwrap_or("none");
         differences.check(
             id,
             "armour",
@@ -726,7 +729,7 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
                 // `RefundPercent`. What a sale returns (`Definitions::refund`, RA5) is the
                 // section's `Soylent` if it has one that is not 0 (plan appendix D, topic 9;
                 // the economy file's `refunds`), else that value.
-                let cost = required("Cost");
+                let cost = value("Cost").unwrap_or("0");
                 let by_rule = (convert(Conversion::Int, cost) * refund).div_euclid(100);
                 differences.check(
                     id,
@@ -964,8 +967,49 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
             let text = value(key).unwrap_or(default);
             (convert(Conversion::Flag, text), text)
         };
+        // RA5: world-object traits, independently converted from reference keys/defaults.
+        for (field, game, key) in [
+            ("needs_engineer", entry.needs_engineer, "NeedsEngineer"),
+            ("capturable", entry.capturable, "Capturable"),
+            ("insignificant", entry.insignificant, "Insignificant"),
+            ("immune", entry.immune, "Immune"),
+            ("hospital", entry.hospital, "Hospital"),
+            (
+                "bridge_repair_hut",
+                entry.bridge_repair_hut,
+                "BridgeRepairHut",
+            ),
+            ("occupier", entry.occupier, "Occupier"),
+            ("can_be_occupied", entry.can_be_occupied, "CanBeOccupied"),
+        ] {
+            let (expected, text) = flag(key, "no");
+            differences.check(
+                id,
+                field,
+                &u8::from(game).to_string(),
+                &expected.to_string(),
+                text,
+            );
+        }
+        for (field, game, key) in [
+            ("max_occupants", entry.max_occupants, "MaxNumberOccupants"),
+            ("vehicle_docks", entry.vehicle_docks, "NumberOfDocks"),
+            ("cash_startup", entry.cash_startup, "ProduceCashStartup"),
+            ("cash_amount", entry.cash_amount, "ProduceCashAmount"),
+            ("cash_delay", entry.cash_delay, "ProduceCashDelay"),
+        ] {
+            let text = value(key).unwrap_or("0");
+            let expected = if field == "vehicle_docks" && !entry.unit_repair {
+                0
+            } else if field == "cash_delay" && text != "0" {
+                convert(Conversion::Frames, text)
+            } else {
+                convert(Conversion::Int, text)
+            };
+            differences.check(id, field, &game.to_string(), &expected.to_string(), text);
+        }
         let (wall, _) = flag("Wall", "no");
-        let cost = required("Cost");
+        let cost = value("Cost").unwrap_or("0");
         let mut expected =
             ((2 * convert(Conversion::Int, cost) * build_speed + 1000).div_euclid(2000)).max(1);
         if row.building && wall == 1 {
@@ -1015,7 +1059,7 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
                 },
                 build_cat,
             );
-            let adjacent = required("Adjacent");
+            let adjacent = value("Adjacent").unwrap_or("2");
             differences.check(
                 id,
                 "adjacent",
@@ -1608,6 +1652,19 @@ const ITEM_FIELDS: &[ListFields] = &[
             ("missile", Field::Audited("missile")),
             ("cloakable", Field::Audited("cloakable")),
             ("sensors_sight", Field::Audited("sensors_sight")),
+            ("needs_engineer", Field::Audited("needs_engineer")),
+            ("capturable", Field::Audited("capturable")),
+            ("insignificant", Field::Audited("insignificant")),
+            ("immune", Field::Audited("immune")),
+            ("hospital", Field::Audited("hospital")),
+            ("bridge_repair_hut", Field::Audited("bridge_repair_hut")),
+            ("occupier", Field::Audited("occupier")),
+            ("can_be_occupied", Field::Audited("can_be_occupied")),
+            ("max_occupants", Field::Audited("max_occupants")),
+            ("vehicle_docks", Field::Audited("vehicle_docks")),
+            ("cash_startup", Field::Audited("cash_startup")),
+            ("cash_amount", Field::Audited("cash_amount")),
+            ("cash_delay", Field::Audited("cash_delay")),
         ],
     ),
 ];

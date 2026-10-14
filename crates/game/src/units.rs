@@ -939,6 +939,9 @@ fn log_sim_events(mut events: MessageReader<SimEvent>) {
                 "player {}: missile {} went off at ({}, {})",
                 player.0, unit.0, at.x, at.y
             ),
+            SimEvent::BridgeChanged { bridge, intact, .. } => {
+                debug!("bridge {} intact: {}", bridge.0, intact)
+            }
             SimEvent::PlayerDefeated { player } => {
                 info!("player {} is defeated: it owns no building", player.0);
             }

@@ -1,10 +1,8 @@
 game_id	field	game_value	reference_value	reason
-airport	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA5 (tech building)
 attack_dog	forbidden_countries		British,French,Germans,Americans,Alliance	Engineers and attack dogs of the two sides differ only in ForbiddenHouses in the ini; the game keeps one type that any barracks trains (docs/RA2_PARITY_PLAN.md section 3.3)
 attack_dog	forbidden_countries		Russians,Confederation,Africans,Arabs	Engineers and attack dogs of the two sides differ only in ForbiddenHouses in the ini; the game keeps one type that any barracks trains (docs/RA2_PARITY_PLAN.md section 3.3)
 attack_dog	weapons	good_teeth	BadTeeth,VirtualScanner	VirtualScanner has NeverUse=yes in the ini: the engine never fires it, and the game does not carry it
 attack_dog	weapons	good_teeth	GoodTeeth,VirtualScanner	VirtualScanner has NeverUse=yes in the ini: the engine never fires it, and the game does not carry it
-bridge_hut	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA5 (bridge repair hut)
 chrono_commando	elite_weapons	chrono_mp5_e	ChronoMP5E,FakeC4	Mechanic of RA6, until then the specialist mechanism of M9 (docs/DECISIONS.md R36): the unit cannot be built before RA6, which gives it its C4 (FakeC4)
 chrono_commando	tech_level	-1	9	The ini gates the unit with RequiresStolenAlliedTech or RequiresStolenSovietTech; until spy infiltration unlocks it in RA6 it is in the data with tech level -1, which cannot be queued
 chrono_commando	weapons	chrono_mp5	ChronoMP5,FakeC4	Mechanic of RA6, until then the specialist mechanism of M9 (docs/DECISIONS.md R36): the unit cannot be built before RA6, which gives it its C4 (FakeC4)
@@ -18,9 +16,7 @@ engineer	forbidden_countries		Russians,Confederation,Africans,Arabs	Engineers an
 engineer	weapons		DefuseKit,VirtualScanner	Mechanic of RA6, until then the specialist mechanism of M9 (docs/DECISIONS.md R36): the engineer's bomb disposal (DefuseKit) is not in the game yet; VirtualScanner is never fired
 hornet	elite_weapons	hornet_bomb_e	HornetBombE,HornetCollision	A spawned aircraft attacks only what its carrier or destroyer fires at, which is never an aircraft (docs/DECISIONS.md R50): the anti air weapon of its second slot is not carried
 hornet	weapons	hornet_bomb	HornetBomb,HornetCollision	A spawned aircraft attacks only what its carrier or destroyer fires at, which is never an aircraft (docs/DECISIONS.md R50): the anti air weapon of its second slot is not carried
-hospital	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA5 (tech building)
 naval_shipyard	adjacent	31	12	Water for a shipyard lies within 12 free cells of the Construction Yard at 28 of the 176 start positions of the shipped maps (the first start of 2 of 21 maps) and within 31 at 132 (18 of 21); the maps are not reshaped, so a shipyard may stand up to 31 free cells from a base building (docs/DECISIONS.md R25)
-oil_derrick	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA5 (tech building)
 osprey	weapons	asw_bomb	ASWBomb,ASWCollision	A spawned aircraft attacks only what its carrier or destroyer fires at, which is never an aircraft (docs/DECISIONS.md R50): the anti air weapon of its second slot is not carried
 paradrop_plane	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA6 (paradrop)
 prism_tower	weapons	prism_shot	PrismShot,PrismSupport	Mechanic of RA6, until then the specialist mechanism of M9 (docs/DECISIONS.md R36): the support beam of the prism chain (PrismSupport) is not in the game yet
@@ -30,7 +26,6 @@ spy	weapons		MakeupKit	Mechanic of RA6, until then the specialist mechanism of M
 tanya	domain	land	AmphibiousDestroyer	Tanya swims in Red Alert 2 (her MovementZone is an amphibious one); the game's Tanya stays on land until RA6 gives the specialists their mechanics
 tanya	elite_weapons	double_pistols_e	DoublePistolsE,Sapper	Mechanic of RA6, until then the specialist mechanism of M9 (docs/DECISIONS.md R36): C4 on ships (Sapper) is not in the game yet; on buildings the effect c4 stands in
 tanya	weapons	double_pistols	DoublePistols,Sapper	Mechanic of RA6, until then the specialist mechanism of M9 (docs/DECISIONS.md R36): C4 on ships (Sapper) is not in the game yet; on buildings the effect c4 stands in
-tech_outpost	present	no	yes	Mapped for a later milestone and not in the shipped data yet: RA5 (tech building)
 terror_drone	weapons	drone_jump	DroneJump,VirtualScanner	VirtualScanner has NeverUse=yes in the ini: the engine never fires it, and the game does not carry it
 tesla_trooper	elite_weapons	electric_bolt_e	ElectricBoltE,AssaultBolt	Mechanic of RA6, until then the specialist mechanism of M9 (docs/DECISIONS.md R36): the charging of Tesla Coils (AssaultBolt) is not in the game yet
 tesla_trooper	weapons	electric_bolt	ElectricBolt,AssaultBolt	Mechanic of RA6, until then the specialist mechanism of M9 (docs/DECISIONS.md R36): the charging of Tesla Coils (AssaultBolt) is not in the game yet
