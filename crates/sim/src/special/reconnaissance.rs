@@ -52,10 +52,17 @@ pub(crate) fn reconnaissance(world: &mut World) {
                 }
                 let detected = index.values().any(|b| {
                     b.owner == p
+                        && b.alive()
+                        && (b.foot.is_none() || powered(world, &defs, b))
+                        && (defs.rules().is_none()
+                            || m.role != Role::Spy
+                            || defs.metadata(b.item).is_some_and(|m| m.detect_disguise))
                         && near(
                             a.cell,
                             b.cell,
-                            if role(&defs, b) == Role::Dog
+                            if defs.rules().is_some() && m.role == Role::Spy {
+                                world.get::<crate::Sight>(b.entity).map_or(0, |s| s.0)
+                            } else if role(&defs, b) == Role::Dog
                                 || (role(&defs, b) == Role::Sensor && powered(world, &defs, b))
                             {
                                 6

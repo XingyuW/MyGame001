@@ -95,8 +95,8 @@ fn accepted(name: &str, id: &str, edits: &[(&str, &str)]) -> Definitions {
 
 #[test]
 fn the_fixture_loads_with_the_traits_of_schema_version_5() {
-    assert_eq!(ARSENAL_SCHEMA_VERSION, 6);
-    assert_eq!(COMBAT_SCHEMA_VERSION, 3);
+    assert_eq!(ARSENAL_SCHEMA_VERSION, 7);
+    assert_eq!(COMBAT_SCHEMA_VERSION, 4);
     let definitions = definitions();
     let kind = |id: &str| definitions.unit_kind(id).unwrap_or_else(|| panic!("{id}"));
     let unit = |id: &str| {

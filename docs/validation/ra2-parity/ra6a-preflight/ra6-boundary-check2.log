@@ -1,0 +1,20 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.85s
+     Running tests/ra6_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_definitions-d2e05aa04dbf1c70)
+
+running 2 tests
+
+thread 'ra6_each_new_flag_is_required_bounded_and_hashed' (1600088) panicked at crates/sim/tests/ra6_definitions.rs:12:5:
+arsenal.ron: , deployer: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra6_each_new_flag_is_required_bounded_and_hashed ... FAILED
+test ra6_area_fire_one_cell_minimum_is_narrow_and_new_numbers_are_bounded ... ok
+
+failures:
+
+failures:
+    ra6_each_new_flag_is_required_bounded_and_hashed
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.38s
+
+error: test failed, to rerun pass `-p sim --test ra6_definitions`

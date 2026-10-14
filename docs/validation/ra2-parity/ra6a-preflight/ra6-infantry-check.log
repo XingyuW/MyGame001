@@ -1,0 +1,63 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+warning: unused imports: `Building` and `ProductionItem`
+ --> crates/sim/tests/ra6_infantry.rs:7:5
+  |
+7 |     Building, Cell, CellPos, Command, CommandQueue, Definitions, Grid, IssuedCommand, Owner,
+  |     ^^^^^^^^
+8 |     PlayerId, Players, ProductionItem, SimEvent, SimId, SimPlugin, SimSchedule, load_ruleset,
+  |                        ^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `owner` is never used
+   --> crates/sim/tests/ra6_infantry.rs:107:4
+    |
+107 | fn owner(app: &mut App, id: SimId) -> Option<PlayerId> {
+    |    ^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `sim` (test "ra6_infantry") generated 2 warnings (run `cargo fix --test "ra6_infantry" -p sim` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 17.36s
+     Running tests/ra6_infantry.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_infantry-6103bae3c72d0aed)
+
+running 6 tests
+
+thread 'ra6_desolator_emits_on_deploy_and_radiation_spares_buildings_and_immune_infantry' (1460945) panicked at crates/sim/tests/ra6_infantry.rs:20:53:
+data file /Users/xingyuwang/GameProjects/MyGame001/crates/sim/../../assets/data/combat.ron: weapons[97].range: value 256 is not supported, expected 384 to 7680 subcells
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'ra6_ivan_normal_elite_and_engineer_defuse_on_due_tick' (1460947) panicked at crates/sim/tests/ra6_infantry.rs:20:53:
+data file /Users/xingyuwang/GameProjects/MyGame001/crates/sim/../../assets/data/combat.ron: weapons[97].range: value 256 is not supported, expected 384 to 7680 subcells
+test ra6_desolator_emits_on_deploy_and_radiation_spares_buildings_and_immune_infantry ... FAILED
+test ra6_ivan_normal_elite_and_engineer_defuse_on_due_tick ... FAILED
+
+thread 'ra6_gi_deploy_persists_uses_para_and_does_not_move_or_gain_armour' (1460946) panicked at crates/sim/tests/ra6_infantry.rs:20:53:
+data file /Users/xingyuwang/GameProjects/MyGame001/crates/sim/../../assets/data/combat.ron: weapons[97].range: value 256 is not supported, expected 384 to 7680 subcells
+test ra6_gi_deploy_persists_uses_para_and_does_not_move_or_gain_armour ... FAILED
+
+thread 'ra6_terrorist_death_explodes_once_with_shipped_weapon' (1460950) panicked at crates/sim/tests/ra6_infantry.rs:20:53:
+data file /Users/xingyuwang/GameProjects/MyGame001/crates/sim/../../assets/data/combat.ron: weapons[97].range: value 256 is not supported, expected 384 to 7680 subcells
+test ra6_terrorist_death_explodes_once_with_shipped_weapon ... FAILED
+
+thread 'ra6_tanya_c4_is_delayed_and_does_not_kill_on_entry' (1460949) panicked at crates/sim/tests/ra6_infantry.rs:20:53:
+data file /Users/xingyuwang/GameProjects/MyGame001/crates/sim/../../assets/data/combat.ron: weapons[97].range: value 256 is not supported, expected 384 to 7680 subcells
+test ra6_tanya_c4_is_delayed_and_does_not_kill_on_entry ... FAILED
+
+thread 'ra6_spy_refinery_steals_half_once_and_power_causes_only_blackout' (1460948) panicked at crates/sim/tests/ra6_infantry.rs:20:53:
+data file /Users/xingyuwang/GameProjects/MyGame001/crates/sim/../../assets/data/combat.ron: weapons[97].range: value 256 is not supported, expected 384 to 7680 subcells
+test ra6_spy_refinery_steals_half_once_and_power_causes_only_blackout ... FAILED
+
+failures:
+
+failures:
+    ra6_desolator_emits_on_deploy_and_radiation_spares_buildings_and_immune_infantry
+    ra6_gi_deploy_persists_uses_para_and_does_not_move_or_gain_armour
+    ra6_ivan_normal_elite_and_engineer_defuse_on_due_tick
+    ra6_spy_refinery_steals_half_once_and_power_causes_only_blackout
+    ra6_tanya_c4_is_delayed_and_does_not_kill_on_entry
+    ra6_terrorist_death_explodes_once_with_shipped_weapon
+
+test result: FAILED. 0 passed; 6 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p sim --test ra6_infantry`

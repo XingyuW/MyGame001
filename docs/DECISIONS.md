@@ -4336,3 +4336,143 @@ art, not by changing its 32-pixel requirement. The final gate has 1,018 static t
 zero failures and zero ignores. All thirteen commands passed on source `6d6de28`; only closure
 documentation and validation records follow that source. Duel wall time is the runner's recorded
 19,122 seconds, not a CPU-time measurement.
+
+### R71. RA6-A specialist module boundaries precede behavior changes
+
+**2026-10-14.** Commit `c8a394f` moves the original `special.rs` functions into
+`special/{state,commands,interaction,transport,advance,repair,resolve,reconnaissance,carrier}.rs`.
+This is a code-move-only commit: all 38 extracted function bodies compare identically after
+whitespace normalization, and the facade keeps the same entry points and schedule ordering.
+Before any RA6 behavior edit, `cargo check -p sim` passed, and the unchanged `m9_arsenal`
+(24 tests) and `m11_repair` (4 tests) passed. RA6-A adds infantry and radiation modules behind
+that facade; the later RA6-B vehicle/structure work uses the same boundaries.
+
+### R72. Explicit specialist schemas, size bound and expectation migrations
+
+**2026-10-14.** Arsenal schema 7 carries independent deploy/C4/disguise/immunity/teleport,
+stolen-tech and Tesla traits, plus `UndeployDelay`. Combat schema 4 carries the warhead's
+Temporal, MindControl, PsychicDamage, Radiation, Parasite, IvanBomb, BombDisarm,
+ElectricAssault and MakesDisguise flags, and weapon RadLevel, AreaFire, Suicide and naval-only
+layer restriction. The latter is derived from a projectile with neither AA nor AG; it still
+engages surface-water units through this simulation's ground layer. All legacy and RA1–RA5
+fixtures explicitly supply zero for the new fields. Worlds without rules retain their M9
+specialist paths. The generator remains the only author of shipped data; the committed
+reference table is unchanged, and `ra9_data_parity` compares every new field and guards the
+complete weapon/warhead/item field inventories.
+
+The arsenal grows from 126,827 bytes beyond the former 131,072-byte ceiling to 148,986 bytes (145.5 KiB). The explicit new maximum is 192 KiB, not an unbounded parser exception. The existing
+oversized/special-file test now also loads a valid file padded to exactly that bound, then
+rejects one extra byte before parsing. `ra6_definitions` requires every new flag, rejects -1/2,
+and proves each affects the hash; new numeric fields retain explicit upper bounds.
+PsiWave's reference Range=1 is permitted only for AreaFire weapons (minimum 256 subcells);
+ordinary weapons retain their 384-subcell minimum, with negative tests for both branches.
+MakeupKit's negative range sentinel is represented by the bounded maximum, never fired:
+visible infantry copying uses Interact. Sapper and ASW's sea-only projectiles use the ground
+layer with the independent naval-only restriction. Missing Verses on the non-damaging
+BombDisarm/ElectricAssault utility warheads defaults to 100%; their handlers never apply it
+as damage. These adaptations are documented in the precise remaining-difference rows.
+
+**Intended expectation migrations, retaining every other assertion:**
+
+- `m4_definitions::the_fixture_loads_with_every_field` extends the exact weapon value with
+  default specialist fields; helper `generated` emits combat 4 and explicit zero traits.
+  `schema_versions_other_than_3_are_rejected` is renamed
+  `schema_versions_other_than_4_are_rejected`, with 3 rejected and 4 accepted.
+  `unreadable_oversized_and_special_files_are_rejected` adds exact-limit acceptance while
+  retaining over-limit rejection. Historical `every_field_of_schema_version_2_is_required`
+  still checks its original field blocks; its name describes the trait generation.
+- `ra1_definitions::every_field_of_the_arsenal_file_is_required` adds all fourteen traits and
+  uses arsenal 7, as do helper `arsenal_of`,
+  `unknown_and_duplicate_fields_are_rejected_in_every_file`, and
+  `other_schema_versions_are_rejected_in_every_file`. All malformed-field checks remain.
+- `ra2_definitions::the_fixture_loads_with_the_traits_of_schema_version_3`,
+  `ra3_definitions::the_fixture_loads_with_the_traits_of_schema_version_4`, and
+  `ra4_definitions::the_fixture_loads_with_the_traits_of_schema_version_5` assert current
+  arsenal 7; the last also asserts combat 4. Their historical names describe retained trait
+  generations, not the current file schema.
+  `ra2_definitions::a_trait_of_a_building_on_a_unit_is_rejected` becomes
+  `building_only_traits_on_units_are_rejected_but_unit_build_limits_are_supported`: unit
+  BuildLimit=1 is accepted and checked; every genuinely building-only trait still rejects.
+  `traits_outside_their_ranges_are_rejected` retains its numeric build-limit bounds.
+- The reference difference rows for implemented infantry mechanics are removed. The Engineer
+  row now records only the unused VirtualScanner; the radiation effect's normalized static
+  damage is 1 because every live application supplies its computed cell damage. C4's effect
+  uses reference MaxDamage=10000. RA6-B rows remain for prism support, sonic weapons and paradrop.
+
+No tests are removed, ignored, weakened or given larger simulation tick budgets.
+
+### R73. RA6-A infantry commands, provenance and temporal ordering
+
+**2026-10-14.** GI deployment selects Para/elite Para, holds its registered spot, rejects
+movement while deployed and adds no armour modifier. D toggles it. Requiring explicit D to
+undeploy, rather than implicitly undeploying on Move, is a control interpretation of the
+plan's “cannot move while deployed”; reference engine order handling has not been verified
+and this remains an explicit simulation assumption. Engineer Interact defuses
+Ivan charges, including in the Commands stage of their due tick. Dog bites use ParasiteDog's
+infantry targeting and instant removal with source kill credit. Spy copies an infantry type,
+or initially uses its side's GI/Conscript. Undetected enemy spies render that type with the
+observer's friendly paint; their true identity remains absent from targeting, AI and hover
+information. DetectDisguise requires a live detector and, for a building, power; in the
+absence of a separate reference range key, effective Sight is the documented range assumption.
+Visual appearance and paint require user verification.
+
+Each infiltration consumes the spy and applies exactly one effect: refinery half current
+credits; power blackout 1333 ticks; superweapon charge reset; future infantry/war-factory
+vehicle training; radar shroud reset (powered satellite prevents it); or Allied/Soviet stolen
+tech. Training calls `sim::promote` only from the paid-production completion branch, never a
+blanket spawn-event listener. Ships and free/scenario/crate-style spawns stay unpromoted.
+CCOMAND/PTROOP require Allied barracks, CIVAN/YURIPR Soviet barracks; the two stolen flags gate
+the correct pairs. Unit build limits count live ownership, passengers and pending units plus
+queues, refreshed at command boundaries, so two same-tick queues cannot evade Yuri Prime's one.
+
+Tanya's amphibious movement and Sapper 2500 naval attack are independent of delayed C4:
+Interact plants Super/MaxDamage after 36 ticks on CanC4 buildings. An immune bridge hut is the
+specific appendix-D exception: C4 collapses its linked bridge only when bridge destruction
+is enabled, and leaves the hut. Friendly transport and hospital entry take precedence over
+spy copying or Ivan planting; amphibious infantry can enter their hospital on land.
+
+Temporal tracks 10×Strength remaining, subtracts three quarters of the sum of active normal8 /
+elite16 beam rates each tick, freezes and protects the target, and releases it unharmed when
+all beams stop. Combat establishes new freezes before that tick's ordinary impacts; a later
+attacker in the same pass cannot act after being frozen. Frozen sources cannot sustain beams.
+Removal is marked Temporal so no crew/death explosion follows. Chrono infantry movement uses
+integer distance/48 frames converted to ticks, with the converted 16-frame minimum. Teleports
+remain excluded from AIView's observed stepped movement extension.
+
+Idle adjacent Tesla Troopers supply coil charge: two allow low-power operation, three select
+OPCoilBolt, or one selects OPCoilBolt with full base power. Ivan charges use IvanWH after600
+ticks, normal400 and the documented elite600 interpretation. IVAN and CIVAN remain
+Trainable=no: the elite test injects scenario rank to exercise the otherwise unreachable
+ElitePrimary, without claiming normal promotion reaches it. Yuri holds one target, an explicit
+new attack releases the old target, and death restores the true original owner even through
+multiple controllers. Automatic acquisition does not churn an existing controlled unit.
+Psionic immunity also covers PsychicDamage; deploy uses PsiWave250/PsiPulse and its weapon
+reload, with automatic undeploy at200 ticks (Yuri Prime100). Repeat deploy toggles cannot
+bypass weapon reload. Desolator and radiation details follow in R74.
+
+The new shipped command matrix covers hidden/unseen/missing Interact targets and specialist
+Deploy/Interact after same-tick lethal commands. Transport tests exercise specialist entry,
+identity/health/rank restoration and limited passengers. The existing M9 tests stay untouched.
+
+### R74. Active radiation sites and the infantry death-weapon handoff
+
+**2026-10-14.** Desolator keeps RadBeam125/67 ticks and, deployed, immediately creates a
+RadEruption500 site, then may re-fire every80 ticks only below one third of that cell's level.
+Radiation stores active sites only and visits living units, never every map cell per tick.
+Spread is truncated to whole cells; integer radial attenuation is applied before the per-cell
+step loss is truncated, as appendix D13 requires. The diagonal cell of a spread10/level500
+site starts429 and becomes344 after its first120-tick decay, not343. Contributions sum and
+cap at500; duration is converted from level×RadDurationMultiple frames; global application is
+every21 ticks through RadSite with level×0.2 base damage, preserving immunity and excluding
+buildings. Expired sites are pruned; same-centre/same-spread re-irradiation adds the remaining
+centre level, caps it and restarts duration. Empty radiation returns before cloning definitions.
+Infantry helpers reuse the caller's definitions instead of adding deep clones each tick.
+
+The new `radiation::add` and source-bearing site representation are the RA6-B payload entry
+point. `infantry::finish_deaths` is the current infantry death-weapon dispatcher: Terrorist's
+225 blast uses RA3 `Blast::source`, occurs once for suicide or ordinary death, and never for
+Temporal. RA6-B extends this to vehicle/building payloads, cargo loss, crashes and IFV modes;
+those mechanisms are not claimed complete here. Optional radiation source presence is itself
+hashed, so no source and source SimId(0) differ. All timers, charge, erasure, disguise, sites,
+control and infiltration/build-limit state are ordered and hashed. R67's ship-blocked bridge
+repair remains an explicit final difference, and no RA5 AI repair/assembly fix is removed.

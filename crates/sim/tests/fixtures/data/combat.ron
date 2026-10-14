@@ -13,7 +13,7 @@
 // every target on land and on water attacked alike, nothing underwater, organic or a wall, and
 // no effects.
 (
-    schema_version: 3,
+    schema_version: 4,
     armour_classes: ["soft", "plate", "concrete"],
     warheads: [
         (
@@ -27,6 +27,7 @@
             percent_at_max: 100,
             wall: 1,
             wood: 1,
+            temporal: 0, mind_control: 0, psychic_damage: 0, radiation: 0, parasite: 0, ivan_bomb: 0, bomb_disarm: 0, electric_assault: 0, makes_disguise: 0,
         ),
         (
             id: "ap",
@@ -39,6 +40,7 @@
             percent_at_max: 100,
             wall: 1,
             wood: 1,
+            temporal: 0, mind_control: 0, psychic_damage: 0, radiation: 0, parasite: 0, ivan_bomb: 0, bomb_disarm: 0, electric_assault: 0, makes_disguise: 0,
         ),
         (
             id: "he",
@@ -51,6 +53,7 @@
             percent_at_max: 100,
             wall: 1,
             wood: 1,
+            temporal: 0, mind_control: 0, psychic_damage: 0, radiation: 0, parasite: 0, ivan_bomb: 0, bomb_disarm: 0, electric_assault: 0, makes_disguise: 0,
         ),
     ],
     weapons: [
@@ -66,6 +69,7 @@
             anti_air: 1,
             anti_ground: 1,
             scatter: 0,
+            rad_level: 0, area_fire: 0, naval_only: 0, suicide: 0,
         ),
         (
             id: "cannon",
@@ -79,6 +83,7 @@
             anti_air: 1,
             anti_ground: 1,
             scatter: 0,
+            rad_level: 0, area_fire: 0, naval_only: 0, suicide: 0,
         ),
         (
             id: "howitzer",
@@ -92,6 +97,7 @@
             anti_air: 1,
             anti_ground: 1,
             scatter: 0,
+            rad_level: 0, area_fire: 0, naval_only: 0, suicide: 0,
         ),
     ],
     units: [

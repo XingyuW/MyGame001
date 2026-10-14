@@ -386,11 +386,19 @@ pub(crate) fn process_regular_commands(
                 .and_then(|()| validate(&issued, &grid, &economy, &index, &units, &special.hidden))
                 .and_then(|()| {
                     // A launched missile or carried aircraft takes no commands (RA4).
-                    match issued
-                        .command
-                        .units()
-                        .and_then(|ids| ids.iter().find(|id| special.spawned.contains_key(id)))
-                    {
+                    match issued.command.units().and_then(|ids| {
+                        ids.iter().find(|id| {
+                            special.spawned.contains_key(id)
+                                || special.erasures.contains_key(id)
+                                || (special.deployed.contains_key(id)
+                                    && matches!(
+                                        issued.command,
+                                        Command::Move { .. }
+                                            | Command::AttackMove { .. }
+                                            | Command::Harvest { .. }
+                                    ))
+                        })
+                    }) {
                         Some(&id) => Err(RejectReason::NotCommandable(id)),
                         None => Ok(()),
                     }
@@ -888,6 +896,7 @@ pub(crate) fn process_commands(world: &mut bevy_ecs::world::World) {
                 | Command::Superweapon { .. }
         ) {
             if !world.resource::<CommandQueue>().pending.is_empty() {
+                crate::special::infantry::refresh_limits(world);
                 world
                     .run_system_cached(process_regular_commands)
                     .expect("registered command system");
@@ -906,6 +915,7 @@ pub(crate) fn process_commands(world: &mut bevy_ecs::world::World) {
         }
     }
     if !world.resource::<CommandQueue>().pending.is_empty() {
+        crate::special::infantry::refresh_limits(world);
         world
             .run_system_cached(process_regular_commands)
             .expect("registered command system");

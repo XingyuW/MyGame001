@@ -142,3 +142,17 @@ asw_bomb	weapon	ASWBomb
 allied_occupy	weapon	AlliedOccupyW
 soviet_occupy	weapon	SovietOccupyW
 occupy	warhead	SSAB
+makeup_kit	weapon	MakeupKit
+snapshot	warhead	Snapshot
+defuse_kit	weapon	DefuseKit
+bomb_disarm	warhead	BombDisarm
+assault_bolt	weapon	AssaultBolt
+electric_assault	warhead	ElectricAssault
+psi_wave	weapon	PsiWave
+psi_pulse	warhead	PsiPulse
+rad_eruption_weapon	weapon	RadEruptionWeapon
+rad_eruption_warhead	warhead	RadEruptionWarhead
+sapper	weapon	Sapper
+fakec4	weapon	FakeC4
+fakec4wh	warhead	FakeC4WH
+ivan_bomb	warhead	IvanBomb

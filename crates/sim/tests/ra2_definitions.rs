@@ -70,8 +70,8 @@ fn building(definitions: &Definitions, id: &str) -> sim::BuildingKind {
 
 #[test]
 fn the_fixture_loads_with_the_traits_of_schema_version_3() {
-    // The file is at schema version 6 since RA5, which keeps the traits of version 3.
-    assert_eq!(ARSENAL_SCHEMA_VERSION, 6);
+    // The file is at schema version 7 since RA6, which keeps the traits of version 3.
+    assert_eq!(ARSENAL_SCHEMA_VERSION, 7);
     let definitions = definitions();
     let entry = |id: &str| {
         definitions
@@ -280,7 +280,7 @@ fn traits_outside_their_ranges_are_rejected() {
 }
 
 #[test]
-fn a_trait_of_a_building_on_a_unit_is_rejected() {
+fn building_only_traits_on_units_are_rejected_but_unit_build_limits_are_supported() {
     let cases = [
         ("build_limit", "build_limit: 0", "build_limit: 1"),
         ("adjacent", "adjacent: 0", "adjacent: 2"),
@@ -294,6 +294,19 @@ fn a_trait_of_a_building_on_a_unit_is_rejected() {
     ];
     for (field, from, to) in cases {
         let (path, entry) = variant(&format!("unit_{field}"), "tank", from, to);
+        if field == "build_limit" {
+            let loaded = context().with_arsenal(&path).expect("RA6 unit limit");
+            let k = loaded.unit_kind("tank").unwrap();
+            assert_eq!(
+                loaded
+                    .metadata(ProductionItem::Unit(k))
+                    .unwrap()
+                    .build_limit,
+                1
+            );
+            continue;
+        }
+
         let error = context()
             .with_arsenal(&path)
             .expect_err("the file must be rejected");

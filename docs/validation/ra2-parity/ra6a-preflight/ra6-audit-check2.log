@@ -1,0 +1,124 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.43s
+     Running tests/ra9_data_parity.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_data_parity-5b81c25f41d0ceee)
+
+running 5 tests
+test the_conversions_round_half_away_from_zero_in_integers ... ok
+test every_value_of_the_shipped_rules_equals_its_reference_or_is_a_listed_difference ... ok
+test every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_difference ... ok
+test the_shipped_skirmish_file_and_the_default_options_are_those_of_the_lobby ... ok
+
+thread 'every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_difference' (1516069) panicked at crates/sim/tests/ra9_data_parity.rs:251:9:
+101 problems:
+aegis_cruiser: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+aircraft_carrier: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+airforce_command: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+airport: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+american_airforce_command: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+amphibious_transport: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+apocalypse: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+attack_dog: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+attack_dog: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+barracks: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+black_eagle: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+bridge_hut: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+chrono_commando: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+chrono_ivan: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+chrono_legionnaire: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+chrono_miner: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+chronosphere: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+cloning_vats: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+conscript: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+construction_yard: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+crazy_ivan: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+demolition_truck: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+desolator: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+destroyer: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+dolphin: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+dreadnought: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+dred_missile: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+engineer: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+engineer: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+flak_cannon: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+flak_track: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+flak_trooper: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+fortress_walls: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+gap_generator: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+gi: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+giant_squid: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+grand_cannon: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+grizzly: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+harrier: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+hornet: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+hospital: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+ifv: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+iron_curtain: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+kirov: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+mcv: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+mirage_tank: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+naval_shipyard: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+nighthawk: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+nuclear_reactor: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+nuclear_silo: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+oil_derrick: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+ore_purifier: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+osprey: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+patriot: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+pillbox: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+power_plant: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+prism_tank: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+prism_tower: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+psi_commando: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+psychic_sensor: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+radar_tower: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+refinery: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+rhino: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+rocketeer: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+sea_scorpion: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+sentry_gun: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+service_depot: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+sniper: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+soviet_amphibious_transport: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+soviet_barracks: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+soviet_battle_lab: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+soviet_construction_yard: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+soviet_mcv: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+soviet_naval_shipyard: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+soviet_refinery: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+soviet_service_depot: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+soviet_walls: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+soviet_war_factory: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+spy: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+spy_satellite: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+tank_destroyer: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+tanya: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+tech_center: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+tech_outpost: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+terror_drone: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+terrorist: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+tesla_coil: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+tesla_reactor: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+tesla_tank: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+tesla_trooper: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+typhoon: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+v3_launcher: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+v3_rocket: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+war_factory: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+war_miner: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+weather_control: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+yuri: undeploy_delay is "200", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+yuri_prime: undeploy_delay is "100", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+civilian_house: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+civilian_city: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+civilian_tower: undeploy_delay is "0", the reference "0" converts to "1", and ra2_differences.tsv does not list it
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_difference ... FAILED
+
+failures:
+
+failures:
+    every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_difference
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+error: test failed, to rerun pass `-p sim --test ra9_data_parity`

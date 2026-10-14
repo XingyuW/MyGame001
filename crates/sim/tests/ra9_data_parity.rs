@@ -1341,6 +1341,70 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
             );
         }
 
+        // RA6 independent specialist traits, including defaults for every mapped type.
+        for (field, game, key, default) in [
+            ("deployer", entry.deployer, "Deployer", "no"),
+            ("deploy_fire", entry.deploy_fire, "DeployFire", "no"),
+            ("c4", entry.c4, "C4", "no"),
+            ("can_c4", entry.can_c4, "CanC4", "yes"),
+            ("bombable", entry.bombable, "Bombable", "yes"),
+            ("spyable", entry.spyable, "Spyable", "no"),
+            (
+                "detect_disguise",
+                entry.detect_disguise,
+                "DetectDisguise",
+                "no",
+            ),
+            (
+                "immune_psionics",
+                entry.immune_psionics,
+                "ImmuneToPsionics",
+                if row.building { "yes" } else { "no" },
+            ),
+            (
+                "immune_radiation",
+                entry.immune_radiation,
+                "ImmuneToRadiation",
+                "no",
+            ),
+            ("teleporter", entry.teleporter, "Teleporter", "no"),
+            (
+                "stolen_allied",
+                entry.stolen_allied,
+                "RequiresStolenAlliedTech",
+                "no",
+            ),
+            (
+                "stolen_soviet",
+                entry.stolen_soviet,
+                "RequiresStolenSovietTech",
+                "no",
+            ),
+            ("overpowerable", entry.overpowerable, "Overpowerable", "no"),
+        ] {
+            let (expected, text) = flag(key, default);
+            differences.check(
+                id,
+                field,
+                &i128::from(game).to_string(),
+                &expected.to_string(),
+                text,
+            );
+        }
+        let delay = value("UndeployDelay").unwrap_or("0");
+        differences.check(
+            id,
+            "undeploy_delay",
+            &entry.undeploy_delay.to_string(),
+            &if delay == "0" {
+                0
+            } else {
+                convert(Conversion::Frames, delay)
+            }
+            .to_string(),
+            delay,
+        );
+
         // Prerequisites: the buildings of the economy file and the groups of the arsenal against
         // the tokens of `Prerequisite`, a group token being one of `[General] Prerequisite...`.
         let game: Vec<String> = terms
@@ -1624,6 +1688,20 @@ const ITEM_FIELDS: &[ListFields] = &[
             ("tech_level", Field::Audited("tech_level")),
             ("prerequisite_groups", Field::Audited("prerequisites")),
             ("build_limit", Field::Audited("build_limit")),
+            ("deployer", Field::Audited("deployer")),
+            ("deploy_fire", Field::Audited("deploy_fire")),
+            ("c4", Field::Audited("c4")),
+            ("can_c4", Field::Audited("can_c4")),
+            ("bombable", Field::Audited("bombable")),
+            ("spyable", Field::Audited("spyable")),
+            ("detect_disguise", Field::Audited("detect_disguise")),
+            ("immune_psionics", Field::Audited("immune_psionics")),
+            ("immune_radiation", Field::Audited("immune_radiation")),
+            ("teleporter", Field::Audited("teleporter")),
+            ("stolen_allied", Field::Audited("stolen_allied")),
+            ("stolen_soviet", Field::Audited("stolen_soviet")),
+            ("overpowerable", Field::Audited("overpowerable")),
+            ("undeploy_delay", Field::Audited("undeploy_delay")),
             ("adjacent", Field::Audited("adjacent")),
             ("base_normal", Field::Audited("base_normal")),
             ("radar", Field::Audited("radar")),
@@ -1798,7 +1876,9 @@ fn every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_d
             .warhead_kind(game_id)
             .and_then(|kind| definitions.warhead(kind))
             .unwrap_or_else(|| panic!("{game_id} is mapped but not shipped"));
-        let verses = reference.value(section, "Verses");
+        let verses = reference
+            .get(section, "Verses")
+            .unwrap_or("100%,100%,100%,100%,100%,100%,100%,100%,100%,100%,100%");
         let expected: Vec<String> = verses
             .split(',')
             .map(|text| convert(Conversion::Int, text.trim_end_matches('%')).to_string())
@@ -1825,6 +1905,19 @@ fn every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_d
         for (field, game, key) in [
             ("wall", warhead.wall, "Wall"),
             ("wood", warhead.wood, "Wood"),
+            ("temporal", warhead.temporal, "Temporal"),
+            ("mind_control", warhead.mind_control, "MindControl"),
+            ("psychic_damage", warhead.psychic_damage, "PsychicDamage"),
+            ("radiation", warhead.radiation, "Radiation"),
+            ("parasite", warhead.parasite, "Parasite"),
+            ("ivan_bomb", warhead.ivan_bomb, "IvanBomb"),
+            ("bomb_disarm", warhead.bomb_disarm, "BombDisarm"),
+            (
+                "electric_assault",
+                warhead.electric_assault,
+                "ElectricAssault",
+            ),
+            ("makes_disguise", warhead.makes_disguise, "MakesDisguise"),
         ] {
             let (expected, text) = flag(section, key, "no");
             differences.check(
@@ -1907,6 +2000,27 @@ fn every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_d
             Some("1"),
             Conversion::Int,
         );
+        number(
+            "rad_level",
+            i128::from(weapon.rad_level),
+            "RadLevel",
+            Some("0"),
+            Conversion::Int,
+        );
+        number(
+            "area_fire",
+            i128::from(weapon.area_fire),
+            "AreaFire",
+            Some("no"),
+            Conversion::Flag,
+        );
+        number(
+            "suicide",
+            i128::from(weapon.suicide),
+            "Suicide",
+            Some("no"),
+            Conversion::Flag,
+        );
         // The warhead: the game id of the ini's, or `?Name` for one the game does not have.
         let warhead = reference.value(section, "Warhead");
         differences.check(
@@ -1967,6 +2081,16 @@ fn every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_d
                 &text,
             );
         }
+        differences.check(
+            &id,
+            "naval_only",
+            &i128::from(weapon.naval_only).to_string(),
+            &i128::from(
+                flag(projectile, "AG", "yes").0 == 0 && flag(projectile, "AA", "no").0 == 0,
+            )
+            .to_string(),
+            projectile,
+        );
         // Scatter (section 4.4): an `Inaccurate` projectile lands up to `BallisticScatter`
         // from its target at full range, an invisible one (the flak in the air) up to twice
         // that.
@@ -1985,6 +2109,66 @@ fn every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_d
             "the weapon {} is shipped but not mapped to an ini section",
             weapon.id
         );
+    }
+
+    for (list, fields) in [
+        (
+            "weapons",
+            vec![
+                "id",
+                "damage",
+                "range",
+                "min_range",
+                "reload",
+                "burst",
+                "warhead",
+                "projectile_speed",
+                "anti_air",
+                "anti_ground",
+                "scatter",
+                "rad_level",
+                "area_fire",
+                "naval_only",
+                "suicide",
+            ],
+        ),
+        (
+            "warheads",
+            vec![
+                "id",
+                "cell_spread",
+                "percent_at_max",
+                "wall",
+                "wood",
+                "versus",
+                "temporal",
+                "mind_control",
+                "psychic_damage",
+                "radiation",
+                "parasite",
+                "ivan_bomb",
+                "bomb_disarm",
+                "electric_assault",
+                "makes_disguise",
+            ],
+        ),
+    ] {
+        assert_eq!(
+            entry_fields("combat.ron", list)
+                .iter()
+                .map(String::as_str)
+                .collect::<BTreeSet<_>>(),
+            fields.iter().copied().collect(),
+            "complete {list} field guard"
+        );
+        for field in fields {
+            if field != "id" {
+                assert!(
+                    differences.checked.contains(field),
+                    "{list}.{field} not compared"
+                );
+            }
+        }
     }
 
     // The area effects: damage and warhead of the ini where it names them. The charge of a
@@ -2007,7 +2191,11 @@ fn every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_d
             Some(("CombatDamage", "IvanDamage")),
             ("CombatDamage", "IvanWarhead"),
         ),
-        (sim::Effect::C4, None, ("CombatDamage", "C4Warhead")),
+        (
+            sim::Effect::C4,
+            Some(("CombatDamage", "MaxDamage")),
+            ("CombatDamage", "C4Warhead"),
+        ),
         (
             sim::Effect::Radiation,
             None,

@@ -1,0 +1,74 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+warning: unused imports: `Building` and `ProductionItem`
+ --> crates/sim/tests/ra6_infantry.rs:7:5
+  |
+7 |     Building, Cell, CellPos, Command, CommandQueue, Definitions, Grid, IssuedCommand, Owner,
+  |     ^^^^^^^^
+8 |     PlayerId, Players, ProductionItem, SimEvent, SimId, SimPlugin, SimSchedule, load_ruleset,
+  |                        ^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `sim` (test "ra6_infantry") generated 1 warning (run `cargo fix --test "ra6_infantry" -p sim` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 19.90s
+     Running tests/m4_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m4_definitions-6d5656a5a13c01ac)
+
+running 16 tests
+test an_economy_file_loaded_after_the_combat_file_removes_it ... ok
+test names_are_checked ... ok
+test schema_versions_other_than_4_are_rejected ... ok
+test the_fixture_loads_with_every_field ... ok
+test every_type_and_armour_class_needs_exactly_one_entry ... ok
+test references_must_name_defined_entries ... ok
+test effects_name_known_effects_once_with_a_damage_and_a_warhead ... ok
+test every_field_of_schema_version_2_is_required ... ok
+test unreadable_oversized_and_special_files_are_rejected ... ok
+test list_lengths_are_bounded ... ok
+test the_rules_between_the_fields_of_schema_version_2_are_checked ... ok
+test every_field_is_required_and_unknown_fields_are_rejected ... ok
+test numeric_fields_accept_their_limits_and_reject_beyond ... ok
+test the_fields_of_schema_version_2_accept_their_limits_and_reject_beyond ... ok
+test truncations_of_the_fixture_are_rejected_without_panic ... ok
+test seeded_mutations_of_the_fixture_load_or_return_a_typed_error ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.14s
+
+     Running tests/ra1_commands.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra1_commands-d1493c86e1332afc)
+
+running 21 tests
+test a_weak_yard_dies_in_the_strike ... ok
+test a_building_destroyed_by_a_strike_is_not_sold_repaired_or_given_a_rally_point ... ok
+test a_base_unit_destroyed_by_a_strike_is_not_deployed_in_the_same_tick ... ok
+test a_seen_enemy_is_reported_as_not_owned ... ok
+test a_building_destroyed_by_a_strike_is_not_captured_by_an_engineer_who_arrives_in_that_tick ... ok
+test a_silo_destroyed_by_a_strike_does_not_fire_in_the_same_tick ... ok
+test a_unit_destroyed_by_a_strike_does_not_embark_and_a_destroyed_transport_takes_nobody ... ok
+test a_unit_destroyed_by_a_strike_takes_no_order_and_is_no_target_in_the_same_tick ... ok
+test a_destroyed_building_is_no_prerequisite_and_no_anchor_in_the_same_tick ... ok
+test an_engineer_who_arrives_captures_a_building_that_stands ... ok
+test deploying_names_nothing_in_a_footprint_the_player_does_not_see ... ok
+test every_command_answers_for_a_submerged_enemy_as_for_an_id_that_names_nothing ... ok
+test every_command_answers_for_an_unseen_enemy_as_for_an_id_that_names_nothing ... ok
+test ra5_garrison_destroyed_earlier_in_the_command_tick_cannot_deploy ... ok
+test a_yard_destroyed_by_a_strike_is_not_undeployed_in_the_same_tick ... ok
+test the_chronosphere_answers_for_an_unseen_enemy_vehicle_as_for_an_id_that_names_nothing ... ok
+test a_vehicle_destroyed_by_a_strike_is_not_repaired_back_to_life_in_the_same_tick ... ok
+
+thread 'ra6_shipped_specialists_and_transport_passengers_cannot_act_after_same_tick_death' (1525252) panicked at crates/sim/tests/ra1_commands.rs:1280:9:
+assertion `left == right` failed: tanya: [CommandRejected { player: PlayerId(1), command: Superweapon { building: SimId(4), target: CellPos { x: 20, y: 20 }, units: [] }, reason: AbilityUnavailable("Strategic target must be visible") }, CommandRejected { player: PlayerId(0), command: Deploy { unit: SimId(7) }, reason: AbilityUnavailable("This unit has no deploy action") }]
+  left: [AbilityUnavailable("Strategic target must be visible"), AbilityUnavailable("This unit has no deploy action")]
+ right: [UnknownUnit(SimId(7)), UnknownUnit(SimId(7))]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra6_shipped_specialists_and_transport_passengers_cannot_act_after_same_tick_death ... FAILED
+test ra5_unseen_neutral_tech_and_enemy_garrison_ids_answer_exactly_as_missing_targets ... ok
+test ra5_same_tick_dead_actors_cannot_capture_repair_enter_hospital_or_occupy ... ok
+test ra6_shipped_interaction_targets_hidden_unseen_and_missing_have_identical_answers ... ok
+
+failures:
+
+failures:
+    ra6_shipped_specialists_and_transport_passengers_cannot_act_after_same_tick_death
+
+test result: FAILED. 20 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.49s
+
+error: test failed, to rerun pass `-p sim --test ra1_commands`

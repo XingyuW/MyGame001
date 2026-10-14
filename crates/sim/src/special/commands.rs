@@ -22,6 +22,9 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
             let meta = defs
                 .metadata(a.item)
                 .ok_or(unavailable("This unit has no deploy action"))?;
+            if defs.rules().is_some() && meta.deployer {
+                return infantry::deploy(world, a, &defs);
+            }
             match meta.role {
                 Role::Mcv => {
                     // With a rules file (RA1) the base unit of a side deploys into that side's

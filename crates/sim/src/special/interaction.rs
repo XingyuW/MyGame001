@@ -10,8 +10,12 @@ pub(super) fn validate_interaction(
     if a.id == b.id {
         return Err(unavailable("Choose another target"));
     }
+    if let Some(result) = infantry::special_interaction(world, a, b, defs) {
+        return result;
+    }
+    let own_hospital = a.owner == b.owner && defs.metadata(b.item).is_some_and(|m| m.hospital);
     match role(defs, a) {
-        Role::Engineer if b.foot.is_some() => {
+        Role::Engineer if b.foot.is_some() && !own_hospital => {
             if defs.metadata(b.item).is_some_and(|m| m.bridge_repair_hut) {
                 return crate::bridges::validate_repair(world, b.id);
             }
@@ -28,7 +32,7 @@ pub(super) fn validate_interaction(
             if a.owner != b.owner
                 || !defs
                     .metadata(a.item)
-                    .is_some_and(|m| m.infantry && m.domain == Domain::Land)
+                    .is_some_and(|m| m.infantry && m.domain != Domain::Air)
             {
                 return Err(unavailable("Choose an owned hospital for infantry"));
             }
@@ -99,12 +103,16 @@ pub(super) fn interact(
     defs: &Definitions,
 ) -> Result<(), RejectReason> {
     validate_interaction(world, a, b, defs)?;
+    if infantry::interact(world, a, b, defs) {
+        return Ok(());
+    }
     if role(defs, a) == Role::Engineer && defs.metadata(b.item).is_some_and(|m| m.bridge_repair_hut)
     {
         return crate::bridges::repair(world, a, b.id);
     }
+    let own_hospital = a.owner == b.owner && defs.metadata(b.item).is_some_and(|m| m.hospital);
     match role(defs, a) {
-        Role::Engineer if b.foot.is_some() => {
+        Role::Engineer if b.foot.is_some() && !own_hospital => {
             if b.owner != a.owner && defs.metadata(b.item).is_some_and(|m| m.hospital) {
                 world.resource_mut::<SpecialState>().cargo.remove(&b.id);
             }
@@ -124,7 +132,7 @@ pub(super) fn interact(
             release(world, a);
             world.despawn(a.entity);
         }
-        Role::Spy if b.foot.is_some() => {
+        Role::Spy if b.foot.is_some() && !own_hospital => {
             let tick = world.resource::<SimTick>().0;
             if let ProductionItem::Building(k) = b.item
                 && let Some(def) = defs.building(k)

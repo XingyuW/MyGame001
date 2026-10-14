@@ -1,0 +1,77 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.42s
+     Running tests/ra1_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra1_definitions-b7bb8656deb8636c)
+
+running 36 tests
+test a_plan_may_list_every_building_of_the_tree_of_its_side ... ok
+test a_faction_without_a_side_loads_with_its_roster_and_starting_lists ... ok
+test an_arsenal_that_names_countries_or_groups_needs_a_rules_file ... ok
+test every_field_of_the_ai_file_is_required ... ok
+test ai_plan_entries_can_be_obtained_through_the_build_order ... ok
+test ai_references_and_difficulty_values_are_checked ... ok
+test ai_plan_entries_are_built_by_every_country_of_the_side ... ok
+test arsenal_limits_are_accepted_at_both_ends ... ok
+test every_field_of_the_skirmish_file_is_required ... ok
+test other_schema_versions_are_rejected_in_every_file ... ok
+test ai_plans_are_checked_for_their_side ... ok
+test skirmish_and_ai_limits_are_accepted_at_both_ends ... ok
+test skirmish_countries_are_checked ... ok
+test skirmish_factions_without_a_side_are_checked ... ok
+test lists_longer_than_their_schema_allows_are_rejected ... ok
+test the_ai_file_needs_a_plan_for_the_side_of_every_faction ... ok
+test rules_list_values_outside_their_ranges_are_rejected ... ok
+test skirmish_values_outside_their_ranges_are_rejected ... ok
+test the_ai_fixture_loads_with_a_plan_per_side ... ok
+test rules_references_and_ids_are_checked ... ok
+test the_arsenal_fixture_loads_with_the_fields_of_schema_version_2 ... ok
+test the_army_of_a_plan_can_damage_every_building_type ... ok
+test the_rules_fixture_loads_with_every_field ... ok
+test the_skirmish_fixture_loads_with_sides_and_countries ... ok
+test the_cross_checks_of_the_rules_file_are_enforced ... ok
+test every_field_of_the_rules_file_is_required ... ok
+test skirmish_sides_are_checked ... ok
+test the_base_unit_of_every_side_has_the_role_mcv ... ok
+test unknown_and_duplicate_fields_are_rejected_in_every_file ... ok
+test arsenal_references_and_ids_are_checked ... ok
+test values_of_the_wrong_kind_are_syntax_errors_in_every_file ... ok
+test every_field_of_the_arsenal_file_is_required ... ok
+test arsenal_values_outside_their_ranges_are_rejected ... ok
+test every_scalar_rule_is_rejected_one_step_outside_its_range ... ok
+test the_limits_of_every_scalar_rule_are_accepted ... ok
+test truncations_of_the_fixtures_are_rejected_without_panic ... ok
+
+test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.42s
+
+     Running tests/ra9_data_parity.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_data_parity-5b81c25f41d0ceee)
+
+running 5 tests
+test the_conversions_round_half_away_from_zero_in_integers ... ok
+
+thread 'every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_difference' (1512331) panicked at crates/sim/tests/ra9_data_parity.rs:368:29:
+data file /Users/xingyuwang/GameProjects/MyGame001/crates/sim/../../assets/data/combat.ron: weapons[99].anti_ground: value 0 is not supported, expected 1 for a weapon whose anti_air is 0: a weapon engages aircraft, the ground, or both
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'the_shipped_skirmish_file_and_the_default_options_are_those_of_the_lobby' (1512335) panicked at crates/sim/tests/ra9_data_parity.rs:368:29:
+data file /Users/xingyuwang/GameProjects/MyGame001/crates/sim/../../assets/data/combat.ron: weapons[99].anti_ground: value 0 is not supported, expected 1 for a weapon whose anti_air is 0: a weapon engages aircraft, the ground, or both
+
+thread 'every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_difference' (1512332) panicked at crates/sim/tests/ra9_data_parity.rs:368:29:
+data file /Users/xingyuwang/GameProjects/MyGame001/crates/sim/../../assets/data/combat.ron: weapons[99].anti_ground: value 0 is not supported, expected 1 for a weapon whose anti_air is 0: a weapon engages aircraft, the ground, or both
+
+thread 'every_value_of_the_shipped_rules_equals_its_reference_or_is_a_listed_difference' (1512333) panicked at crates/sim/tests/ra9_data_parity.rs:368:29:
+data file /Users/xingyuwang/GameProjects/MyGame001/crates/sim/../../assets/data/combat.ron: weapons[99].anti_ground: value 0 is not supported, expected 1 for a weapon whose anti_air is 0: a weapon engages aircraft, the ground, or both
+test every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_difference ... FAILED
+test the_shipped_skirmish_file_and_the_default_options_are_those_of_the_lobby ... FAILED
+test every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_difference ... FAILED
+test every_value_of_the_shipped_rules_equals_its_reference_or_is_a_listed_difference ... FAILED
+
+failures:
+
+failures:
+    every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_difference
+    every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_difference
+    every_value_of_the_shipped_rules_equals_its_reference_or_is_a_listed_difference
+    the_shipped_skirmish_file_and_the_default_options_are_those_of_the_lobby
+
+test result: FAILED. 1 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+error: test failed, to rerun pass `-p sim --test ra9_data_parity`

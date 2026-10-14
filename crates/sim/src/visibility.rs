@@ -45,6 +45,15 @@ pub struct Vision {
 }
 
 impl Vision {
+    pub(crate) fn reset_shroud(&mut self) {
+        for bits in &mut self.cells {
+            *bits = if *bits & VISIBLE != 0 {
+                VISIBLE | EXPLORED
+            } else {
+                0
+            };
+        }
+    }
     pub(crate) fn conceal(&mut self, centre: CellPos, radius: u32) {
         for y in centre.y.saturating_sub(radius as i32)..=centre.y.saturating_add(radius as i32) {
             for x in centre.x.saturating_sub(radius as i32)..=centre.x.saturating_add(radius as i32)

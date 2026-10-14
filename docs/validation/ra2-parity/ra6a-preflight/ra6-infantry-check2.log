@@ -1,0 +1,85 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+warning: unused imports: `Building` and `ProductionItem`
+ --> crates/sim/tests/ra6_infantry.rs:7:5
+  |
+7 |     Building, Cell, CellPos, Command, CommandQueue, Definitions, Grid, IssuedCommand, Owner,
+  |     ^^^^^^^^
+8 |     PlayerId, Players, ProductionItem, SimEvent, SimId, SimPlugin, SimSchedule, load_ruleset,
+  |                        ^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `owner` is never used
+   --> crates/sim/tests/ra6_infantry.rs:107:4
+    |
+107 | fn owner(app: &mut App, id: SimId) -> Option<PlayerId> {
+    |    ^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `sim` (test "ra6_infantry") generated 2 warnings (run `cargo fix --test "ra6_infantry" -p sim` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.28s
+     Running tests/m4_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m4_definitions-6d5656a5a13c01ac)
+
+running 16 tests
+test an_economy_file_loaded_after_the_combat_file_removes_it ... ok
+test names_are_checked ... ok
+test schema_versions_other_than_4_are_rejected ... ok
+test the_fixture_loads_with_every_field ... ok
+test references_must_name_defined_entries ... ok
+test every_type_and_armour_class_needs_exactly_one_entry ... ok
+test unreadable_oversized_and_special_files_are_rejected ... ok
+test effects_name_known_effects_once_with_a_damage_and_a_warhead ... ok
+test list_lengths_are_bounded ... ok
+test every_field_of_schema_version_2_is_required ... ok
+test the_rules_between_the_fields_of_schema_version_2_are_checked ... ok
+test every_field_is_required_and_unknown_fields_are_rejected ... ok
+test numeric_fields_accept_their_limits_and_reject_beyond ... ok
+test the_fields_of_schema_version_2_accept_their_limits_and_reject_beyond ... ok
+test truncations_of_the_fixture_are_rejected_without_panic ... ok
+test seeded_mutations_of_the_fixture_load_or_return_a_typed_error ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.12s
+
+     Running tests/ra6_infantry.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_infantry-6103bae3c72d0aed)
+
+running 6 tests
+
+thread 'ra6_tanya_c4_is_delayed_and_does_not_kill_on_entry' (1465587) panicked at crates/sim/tests/ra6_infantry.rs:20:53:
+data file /Users/xingyuwang/GameProjects/MyGame001/crates/sim/../../assets/data/combat.ron: weapons[99].anti_ground: value 0 is not supported, expected 1 for a weapon whose anti_air is 0: a weapon engages aircraft, the ground, or both
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'ra6_gi_deploy_persists_uses_para_and_does_not_move_or_gain_armour' (1465584) panicked at crates/sim/tests/ra6_infantry.rs:20:53:
+data file /Users/xingyuwang/GameProjects/MyGame001/crates/sim/../../assets/data/combat.ron: weapons[99].anti_ground: value 0 is not supported, expected 1 for a weapon whose anti_air is 0: a weapon engages aircraft, the ground, or both
+test ra6_gi_deploy_persists_uses_para_and_does_not_move_or_gain_armour ... FAILED
+test ra6_tanya_c4_is_delayed_and_does_not_kill_on_entry ... FAILED
+
+thread 'ra6_terrorist_death_explodes_once_with_shipped_weapon' (1465588) panicked at crates/sim/tests/ra6_infantry.rs:20:53:
+data file /Users/xingyuwang/GameProjects/MyGame001/crates/sim/../../assets/data/combat.ron: weapons[99].anti_ground: value 0 is not supported, expected 1 for a weapon whose anti_air is 0: a weapon engages aircraft, the ground, or both
+test ra6_terrorist_death_explodes_once_with_shipped_weapon ... FAILED
+
+thread 'ra6_desolator_emits_on_deploy_and_radiation_spares_buildings_and_immune_infantry' (1465583) panicked at crates/sim/tests/ra6_infantry.rs:20:53:
+data file /Users/xingyuwang/GameProjects/MyGame001/crates/sim/../../assets/data/combat.ron: weapons[99].anti_ground: value 0 is not supported, expected 1 for a weapon whose anti_air is 0: a weapon engages aircraft, the ground, or both
+
+thread 'ra6_spy_refinery_steals_half_once_and_power_causes_only_blackout' (1465586) panicked at crates/sim/tests/ra6_infantry.rs:20:53:
+data file /Users/xingyuwang/GameProjects/MyGame001/crates/sim/../../assets/data/combat.ron: weapons[99].anti_ground: value 0 is not supported, expected 1 for a weapon whose anti_air is 0: a weapon engages aircraft, the ground, or both
+test ra6_desolator_emits_on_deploy_and_radiation_spares_buildings_and_immune_infantry ... FAILED
+test ra6_spy_refinery_steals_half_once_and_power_causes_only_blackout ... FAILED
+
+thread 'ra6_ivan_normal_elite_and_engineer_defuse_on_due_tick' (1465585) panicked at crates/sim/tests/ra6_infantry.rs:20:53:
+data file /Users/xingyuwang/GameProjects/MyGame001/crates/sim/../../assets/data/combat.ron: weapons[99].anti_ground: value 0 is not supported, expected 1 for a weapon whose anti_air is 0: a weapon engages aircraft, the ground, or both
+test ra6_ivan_normal_elite_and_engineer_defuse_on_due_tick ... FAILED
+
+failures:
+
+failures:
+    ra6_desolator_emits_on_deploy_and_radiation_spares_buildings_and_immune_infantry
+    ra6_gi_deploy_persists_uses_para_and_does_not_move_or_gain_armour
+    ra6_ivan_normal_elite_and_engineer_defuse_on_due_tick
+    ra6_spy_refinery_steals_half_once_and_power_causes_only_blackout
+    ra6_tanya_c4_is_delayed_and_does_not_kill_on_entry
+    ra6_terrorist_death_explodes_once_with_shipped_weapon
+
+test result: FAILED. 0 passed; 6 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+error: test failed, to rerun pass `-p sim --test ra6_infantry`

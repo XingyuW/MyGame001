@@ -600,7 +600,10 @@ fn place_unit_views(
             commands.entity(entity).despawn();
             continue;
         };
-        let kind = world.get::<Unit>(view.unit).map(|unit| unit.kind);
+        let disguise = world
+            .get_resource::<sim::SpecialState>()
+            .and_then(|state| state.disguise_for(HUMAN, view.id));
+        let kind = disguise.or_else(|| world.get::<Unit>(view.unit).map(|unit| unit.kind));
         if let Some(owner) = world.get::<Owner>(view.unit) {
             view.owner = owner.0;
         }
@@ -637,7 +640,15 @@ fn place_unit_views(
                 .and_then(|(kind, sprites)| sprites.0.get(&kind).zip(sprites.1.get(&kind))),
         };
         if let Some((human, enemy)) = pair {
-            let image = paint.sprite(view.owner, human, enemy);
+            let image = paint.sprite(
+                if disguise.is_some() {
+                    HUMAN
+                } else {
+                    view.owner
+                },
+                human,
+                enemy,
+            );
             if sprite.image != image {
                 sprite.image = image;
             }
@@ -645,7 +656,8 @@ fn place_unit_views(
         let concealed = world
             .get_resource::<sim::SpecialState>()
             .is_some_and(|s| s.hidden.contains(&(HUMAN, view.id)));
-        let shown = if unit_shown(view.owner, mobile, players) && !concealed {
+        let shown = if unit_shown(view.owner, mobile, players) && (!concealed || disguise.is_some())
+        {
             Visibility::Inherited
         } else {
             Visibility::Hidden

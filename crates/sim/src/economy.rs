@@ -114,6 +114,9 @@ impl QueueItem {
 /// The economic state of one player.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct PlayerState {
+    /// Persistent infiltration benefits: infantry, vehicles, Allied tech, Soviet tech.
+    pub infiltration: u8,
+    pub(crate) limited_units: BTreeMap<UnitKind, u32>,
     pub(crate) super_me: bool,
     /// Match option "unlock all" (human players only, like Super Me): building prerequisites
     /// are waived. Producers, credits, power, placement and exits still apply.
@@ -433,6 +436,15 @@ impl Players {
             if extended {
                 hasher.write(&[state.team]);
                 hasher.write(&state.unit_speed_bonus.to_le_bytes());
+            }
+            if state.infiltration != 0 || !state.limited_units.is_empty() {
+                hasher.write(b"infiltration");
+                hasher.write(&[state.infiltration]);
+                hasher.write_u64(state.limited_units.len() as u64);
+                for (kind, count) in &state.limited_units {
+                    hasher.write(&kind.0.to_le_bytes());
+                    hasher.write_u32(*count);
+                }
             }
             hasher.write(&state.credits.to_le_bytes());
             hasher.write(&state.power_produced.to_le_bytes());
@@ -1002,10 +1014,31 @@ pub(crate) fn advance_production(
             // Complete: a building waits for `PlaceBuilding`; a unit leaves the first of the
             // player's producing buildings (in id order) that has a free ring cell.
             if let ProductionItem::Unit(kind) = head.item
-                && owned
+                && let Some(unit) = owned
                     .iter()
-                    .any(|&exit| spawner.leave(player, kind, exit).is_some())
+                    .find_map(|&exit| spawner.leave(player, kind, exit))
             {
+                // Spy training is a production benefit. Free/refinery/crate/paradrop units
+                // never enter this branch; the queued command runs after the spawn bundle.
+                let eligible = definitions.rules().is_some()
+                    && definitions.metadata(head.item).is_some_and(|m| {
+                        (state.infiltration & 1 != 0 && m.infantry)
+                            || (state.infiltration & 2 != 0
+                                && m.category == crate::Category::Vehicles
+                                && m.domain != crate::Domain::Naval
+                                && definitions
+                                    .metadata(ProductionItem::Building(terms.producer))
+                                    .is_some_and(|p| {
+                                        p.factory == Some(crate::FactoryGroup::Vehicles)
+                                    }))
+                    });
+                if eligible {
+                    spawner
+                        .commands
+                        .queue(move |world: &mut bevy_ecs::world::World| {
+                            crate::promote(world, unit, crate::VETERAN);
+                        });
+                }
                 queue.remove(0);
                 if queue.is_empty() {
                     state.queues.remove(&producer);

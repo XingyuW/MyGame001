@@ -1,0 +1,21 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.46s
+     Running tests/ra6_infantry.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_infantry-6103bae3c72d0aed)
+
+running 1 test
+
+thread 'ra6_radiation_diagonal_decay_edge_expiry_and_reirradiation' (1610920) panicked at crates/sim/tests/ra6_infantry.rs:599:5:
+assertion `left == right` failed
+  left: 258
+ right: 259
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra6_radiation_diagonal_decay_edge_expiry_and_reirradiation ... FAILED
+
+failures:
+
+failures:
+    ra6_radiation_diagonal_decay_edge_expiry_and_reirradiation
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 27 filtered out; finished in 0.06s
+
+error: test failed, to rerun pass `-p sim --test ra6_infantry`

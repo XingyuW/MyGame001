@@ -23,6 +23,15 @@ pub struct Zone {
 }
 #[derive(Resource, Clone, Debug, Default)]
 pub struct SpecialState {
+    pub deployed: BTreeMap<SimId, u64>,
+    pub disguises: BTreeMap<SimId, UnitKind>,
+    pub erasures: BTreeMap<SimId, super::infantry::Erasure>,
+    pub charges: BTreeMap<SimId, super::infantry::Charge>,
+    pub radiation_sites: Vec<super::radiation::Site>,
+    pub coil_charge: BTreeMap<SimId, u32>,
+    pub death_detonated: BTreeSet<SimId>,
+    pub eruption_next: BTreeMap<SimId, u64>,
+    pub temporal_removed: BTreeSet<SimId>,
     pub charge: BTreeMap<SimId, u32>,
     pub protected: BTreeMap<SimId, u64>,
     pub disabled: BTreeMap<SimId, u64>,
@@ -57,8 +66,17 @@ pub struct SpecialState {
     pub surfaced: BTreeMap<SimId, u64>,
 }
 impl SpecialState {
+    /// The visible infantry appearance of an undetected spy, without exposing its true kind.
+    pub fn disguise_for(&self, viewer: PlayerId, id: SimId) -> Option<UnitKind> {
+        self.hidden
+            .contains(&(viewer, id))
+            .then(|| self.disguises.get(&id).copied())
+            .flatten()
+    }
+
     pub fn invulnerable(&self, id: SimId, tick: u64) -> bool {
-        self.protected.get(&id).is_some_and(|&until| until > tick)
+        self.erasures.contains_key(&id)
+            || self.protected.get(&id).is_some_and(|&until| until > tick)
     }
     /// Whether the spawner `id`, which carries `number` units, has one ready to launch (RA4).
     pub fn launch_ready(&self, id: SimId, number: u32) -> bool {
@@ -72,6 +90,7 @@ impl SpecialState {
         self.ammo.get(&id).copied().unwrap_or(ammo).min(ammo)
     }
     pub(crate) fn hash_into(&self, h: &mut Fnv1a64) {
+        super::infantry::hash(self, h);
         // Stable ordered data, including off-map passengers and pending effects.
         for map in [&self.protected, &self.disabled] {
             h.write_u64(map.len() as u64);

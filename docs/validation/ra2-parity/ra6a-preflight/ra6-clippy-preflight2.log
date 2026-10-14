@@ -1,0 +1,14 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Checking game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+error: this expression creates a reference which is immediately dereferenced by the compiler
+    --> crates/sim/tests/ra9_data_parity.rs:1391:17
+     |
+1391 |                 &text,
+     |                 ^^^^^ help: change this to: `text`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_borrow
+     = note: `-D clippy::needless-borrow` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::needless_borrow)]`
+
+error: could not compile `sim` (test "ra9_data_parity") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
