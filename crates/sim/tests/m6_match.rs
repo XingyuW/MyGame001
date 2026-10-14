@@ -957,11 +957,13 @@ fn computer_armies_grow_with_the_map_on_large_maps_only() {
             let big = sim::scaled_for_map(difficulty.clone(), &big);
             assert_eq!(big.max_army, difficulty.max_army * 2);
             assert_eq!(big.wave_size, difficulty.wave_size * 2);
+            assert_eq!(big.wave_patience, difficulty.wave_patience * 2);
             assert!(big.wave_size <= big.max_army && big.max_army <= sim::MAX_AI_ARMY);
             assert_eq!(big.think_interval, difficulty.think_interval);
         }
         // 112 + 112 cells: in between.
         let mid = sim::scaled_for_map(difficulty.clone(), &open(112));
         assert_eq!(mid.max_army, difficulty.max_army * 175 / 100);
+        assert_eq!(mid.wave_patience, difficulty.wave_patience * 175 / 100);
     }
 }

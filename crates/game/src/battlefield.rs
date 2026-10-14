@@ -1107,3 +1107,213 @@ pub(crate) fn clear(world: &mut World) {
     }
     world.insert_resource(AtmosphereClock::default());
 }
+
+#[cfg(test)]
+mod tests {
+    use bevy::ecs::system::RunSystemOnce;
+    use sim::{Command, Crates, Grid, Mobile, Owner, PlayerId};
+
+    use super::*;
+    use crate::sim_host::tests::{demo_host_with, run};
+
+    const HUMAN: PlayerId = PlayerId(0);
+
+    fn view(host: &SimHost) -> MapView {
+        let grid = host.grid().expect("a grid");
+        MapView {
+            width: grid.width(),
+            height: grid.height(),
+            tile: crate::projection::TileSize::new(64, 32),
+        }
+    }
+
+    /// A unit of the human player and a free cell of building ground beside it.
+    fn unit_and_free_cell(world: &mut World) -> (SimId, CellPos) {
+        let mut units = world.query::<(&SimId, &Owner, &Mobile)>();
+        let mut own: Vec<(SimId, CellPos)> = units
+            .iter(world)
+            .filter(|(_, owner, _)| owner.0 == HUMAN)
+            .map(|(id, _, mobile)| (*id, mobile.cell))
+            .collect();
+        own.sort();
+        let grid = world.resource::<Grid>();
+        let crates = world.resource::<Crates>();
+        own.into_iter()
+            .find_map(|(id, at)| {
+                [(1, 0), (-1, 0), (0, 1), (0, -1)]
+                    .into_iter()
+                    .map(|(dx, dy)| CellPos::new(at.x + dx, at.y + dy))
+                    .find(|&cell| {
+                        sim::crate_fits(grid, crates, cell)
+                            && grid.cell(cell).is_some_and(|terrain| terrain.buildable)
+                    })
+                    .map(|cell| (id, cell))
+            })
+            .expect("a free cell beside a unit of the human player")
+    }
+
+    fn marks_at(app: &mut App, cell: CellPos) -> usize {
+        let world = app.world_mut();
+        let mut marks = world.query::<&CrateMark>();
+        marks.iter(world).filter(|mark| mark.0 == cell).count()
+    }
+
+    /// RA5: a crate the human player sees is marked (two sprites), and the mark goes when the
+    /// crate is taken.
+    #[test]
+    fn a_crate_in_sight_is_marked_until_it_is_taken() {
+        let mut placed = None;
+        let host = demo_host_with(|world| {
+            let (unit, cell) = unit_and_free_cell(world);
+            let grid = world.resource::<Grid>().clone();
+            assert!(world.resource_mut::<Crates>().place(&grid, cell));
+            placed = Some((unit, cell));
+        });
+        let (unit, cell) = placed.expect("a crate");
+        // Before the first tick nothing is visible, and nothing is marked.
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        let map = view(&host);
+        app.world_mut().insert_resource(map);
+        app.world_mut().insert_resource(host);
+        app.world_mut().run_system_once(show_crates).expect("runs");
+        assert_eq!(marks_at(&mut app, cell), 0);
+        // The simulation is taken out of the application to be advanced, and put back.
+        let advance = |app: &mut App, commands: Vec<Command>| {
+            let mut host = app
+                .world_mut()
+                .remove_resource::<SimHost>()
+                .expect("the simulation");
+            run(&mut host, commands);
+            let lies = host.world().resource::<Crates>().contains(cell);
+            app.world_mut().insert_resource(host);
+            lies
+        };
+        // After a tick the unit beside it sees the cell.
+        assert!(advance(&mut app, Vec::new()));
+        app.world_mut().run_system_once(show_crates).expect("runs");
+        assert_eq!(marks_at(&mut app, cell), 2);
+        // Running again does not mark it twice.
+        app.world_mut().run_system_once(show_crates).expect("runs");
+        assert_eq!(marks_at(&mut app, cell), 2);
+        // The unit drives onto it: the crate is gone from the simulation and from the picture.
+        let mut lies = advance(
+            &mut app,
+            vec![Command::Move {
+                units: vec![unit],
+                target: cell,
+            }],
+        );
+        for _ in 0..200 {
+            if !lies {
+                break;
+            }
+            lies = advance(&mut app, Vec::new());
+        }
+        assert!(!lies, "the unit took the crate");
+        app.world_mut().run_system_once(show_crates).expect("runs");
+        assert_eq!(marks_at(&mut app, cell), 0);
+    }
+
+    /// RA5: ore on ground without an ore top (ore that spread) gets one top, once, hidden until
+    /// the player sees the cell.
+    #[test]
+    fn ore_on_new_ground_gets_one_ore_top() {
+        let mut planted = None;
+        let host = demo_host_with(|world| {
+            let (_, cell) = unit_and_free_cell(world);
+            let terrain = *world.resource::<Grid>().cell(cell).expect("a cell");
+            world
+                .resource_mut::<Grid>()
+                .set_terrain(cell, sim::Cell { ore: 3, ..terrain });
+            planted = Some(cell);
+        });
+        let cell = planted.expect("ore");
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        let map = view(&host);
+        app.world_mut().insert_resource(map);
+        app.world_mut().insert_resource(Materials {
+            terrain: vec![Handle::default(); ATLASES],
+            glow: Handle::default(),
+            smoke: Handle::default(),
+            ring: Handle::default(),
+        });
+        app.world_mut().insert_resource(host);
+        let tops = |app: &mut App| {
+            let world = app.world_mut();
+            let mut ground = world.query::<&Ground>();
+            ground
+                .iter(world)
+                .filter(|tile| tile.ore && tile.cell == cell)
+                .map(|tile| tile.depleted)
+                .collect::<Vec<bool>>()
+        };
+        assert!(tops(&mut app).is_empty());
+        // Tick 0 is a tick of the search.
+        app.world_mut().run_system_once(sprout_ore).expect("runs");
+        assert_eq!(tops(&mut app), [true], "one top, hidden until it is seen");
+        app.world_mut().run_system_once(sprout_ore).expect("runs");
+        assert_eq!(tops(&mut app).len(), 1, "not twice");
+    }
+
+    /// Both map-authored and newly discovered gems use the ore top with their own tint.
+    #[test]
+    fn gems_have_a_distinct_tint_in_both_terrain_paths() {
+        for sprouted in [false, true] {
+            let host = demo_host_with(|world| {
+                let mut grid = Grid::from_cells(
+                    2,
+                    1,
+                    vec![
+                        sim::Cell {
+                            passable: true,
+                            water: false,
+                            buildable: false,
+                            ore: 3,
+                        };
+                        2
+                    ],
+                )
+                .expect("two ore cells");
+                assert!(grid.set_gems(CellPos::new(1, 0), true));
+                world.insert_resource(grid);
+            });
+            let mut app = App::new();
+            app.add_plugins(MinimalPlugins);
+            app.world_mut().insert_resource(view(&host));
+            app.world_mut()
+                .insert_resource(MapTerrain(host.grid().expect("a grid").clone()));
+            app.world_mut().insert_resource(crate::map::MapLooks(vec![
+                looks::look(Soil::Grass, Feature::Ore),
+                looks::look(Soil::Grass, Feature::Gems),
+            ]));
+            app.world_mut().insert_resource(Materials {
+                terrain: vec![Handle::default(); ATLASES],
+                glow: Handle::default(),
+                smoke: Handle::default(),
+                ring: Handle::default(),
+            });
+            app.world_mut().insert_resource(host);
+            if sprouted {
+                app.world_mut().run_system_once(sprout_ore).expect("runs");
+            } else {
+                app.world_mut().run_system_once(terrain).expect("runs");
+            }
+            let world = app.world_mut();
+            let mut query = world.query::<(&Ground, &Sprite)>();
+            let mut tops: Vec<_> = query
+                .iter(world)
+                .filter(|(tile, _)| tile.ore)
+                .map(|(tile, sprite)| (tile.cell.x, tile.stain, sprite.color))
+                .collect();
+            tops.sort_by_key(|top| top.0);
+            assert_eq!(tops.len(), 2);
+            assert_eq!(tops[0].1, [1.0, 1.0, 1.0]);
+            assert_eq!(tops[1].1, [0.42, 1.0, 0.96]);
+            if sprouted {
+                assert!(tops.iter().all(|top| top.2 == Color::NONE));
+            }
+        }
+    }
+}

@@ -1,0 +1,3 @@
+    Finished `release` profile [optimized] target(s) in 0.15s
+     Running `/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/game --smoke-test 600`
+2026-10-14T04:11:44.045738Z  WARN bevy_winit::state: Skipped event Destroyed for unknown winit Window Id WindowId(515770254592)

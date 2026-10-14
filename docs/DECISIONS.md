@@ -3963,3 +3963,95 @@ later review". So:
 4. `docs/reviews/RA2-parity-review-requirements.md` is the document the user asked for.
 5. `docs/RA2_GAP_ANALYSIS.md` and `docs/CONSTRUCTION_SYSTEM.md` were to be rewritten in RA9 and
    were not: they describe the game of 2026-10-11 and of M9, not the branch.
+
+### R64. RA5-A closure after the stopped run
+
+The continuation prompt's Step 0 resumes only RA5 items 1 to 4. R58 to R62 remain the rules;
+the two AI command/assembly corrections below are needed to finish the unchanged shipped-match
+gate. Generated data, schemas, commands and match tick limits remain unchanged.
+
+1. **Preserve the unfinished tests.** The 150-line module left in `battlefield.rs` contains
+   two useful tests: a crate is hidden before sight, drawn exactly once while seen, and removed
+   after a unit takes it through `Command::Move`; ore on new ground receives exactly one top,
+   initially hidden. Both are retained with their assertions intact. A third test,
+   `gems_have_a_distinct_tint_in_both_terrain_paths`, checks ordinary ore against gems through
+   both `terrain` and `sprout_ore`, with two actual spawned tops and a literal expected tint;
+   dynamically discovered tops are initially transparent. These are presentation-state tests,
+   not a claim that the art looks right. Gems, grown ore and crates still require user verification.
+   Static `#[test]` counts across `crates`: 979 at the incoming committed tip, 981 in the
+   inherited working tree, 984 after the gem and two AI regressions; `#[ignore]` remains absent. All three
+   battlefield tests pass. Runtime workspace totals are reported separately in the status entry.
+2. **Independent reference sample.** Read the cached ini directly with a small independent
+   section/key parser, not the generator, reference TSV or audit. Its SHA-256 is
+   `adc869ca037db5141f562f18092d022045e194de0d1204a46b9ec8372b2b826f`, matching R2.
+   Exact rational arithmetic and half-up integer rounding give the following, all matching
+   the generated `rules.ron` and `economy.ron`:
+
+   | Reference | Recomputed shipped value |
+   |---|---|
+   | `[Riparius] Value=25`, `[Cruentus] Value=50` | 25/50 credits per bail |
+   | `[HARV] Storage=40`, `[CMIN] Storage=20` | 40/20 bails; full ore loads 1000/500 credits, gem loads 2000/1000 |
+   | `[Riparius] Growth=2200`, `Spread=2200` | `round(2200 * 4 / 3)` = 2933 ticks each |
+   | `[Riparius] GrowthPercentage=.06`, `SpreadPercentage=.06` | 60 permille each |
+   | `[Cruentus] Growth=10000`, `Spread=10000`, both percentages 0 | neither growth nor spread, as the gem exclusion in `Grid::ore_cells` implements |
+   | `[CrateRules] CrateRegen=3`, `CrateRadius=3.0` | 3600 ticks, 768 subcells; replacement range 1800 to 7200 ticks |
+   | `[CrateRules] CrateMinimum=1`, `CrateMaximum=255`, `FreeMCV=yes` | 1, 255, enabled |
+   | `[Powerups]` Money, Unit, Veteran | shares 20 each; arguments 2000, absent (0), 1 |
+   | `[Powerups]` HealBase, Armor, Firepower, Speed, Reveal | shares 10 each; arguments absent (0), 1500 pm, 2000 pm, 1200 pm, absent (0); all shares total 110 |
+   | `[GAREFN] Soylent=300`, `[NAREFN] Soylent=300`, `[GAOREP] Soylent=1250` | refunds 300, 300, 1250 credits |
+
+   The cached free units are `GAREFN` → `CMIN`, `NAREFN` → `HARV`. No new engine-behaviour
+   assumption is inferred from this numerical sample; the assumptions about density, harvesting,
+   instantaneous unloading, crate lifetime and money randomness remain those of R58 to R60.
+3. **The distribution missing from R62.** Independently parsed all 756 winning rows of
+   `docs/validation/ra2-parity/ra5a/10-duels.log`. A ratio is the length divided by the
+   shipped test's `72000 * max(width + height, 128) / 128`, as in R29 and R53. Median is the
+   mean of the two central ordered ratios; p90 is nearest rank (`ceil(.9 * 756)`). Median
+   **0.1215044974**, p90 **0.3362777778**, maximum **0.9315173611**; total **27,237,240 ticks**.
+   Counts above 0.5, 0.7, 0.8 and 0.9: **22, 5, 2, 1**; none over 1. The slowest and largest
+   ratio are Steel Harbor, France against Germany, both medium: **268,277 / 288,000**.
+   The duel example itself still has its separate **300,000** tick cap; the test's base limit
+   is still **72,000**. No limit was increased. The near-limit tail remains debt for RA8.
+4. **Storage correction.** The continuation prompt's inherited statement that no target
+   directory is configured is stale. This run preserves
+   `/Users/xingyuwang/Library/Caches/Codex/cargo-target`, `UV_CACHE_DIR` and `PIP_CACHE_DIR`.
+   No clone, worktree, validation copy or substantial temporary artifact is created. The
+   configured Cargo directory holds the compilation cache and the package output.
+5. **The first full gate exposed a real AI stall.** The all-map test failed on Thousand
+   Lakes, France against Germany, both brutal, seed 0: no winner at the unchanged 288,000
+   tick limit. The old duel sample uses seed 14 for this case and finishes at 47,118 ticks;
+   its success did not establish the shipped test's success. Failed and diagnostic logs are
+   preserved under `docs/validation/ra2-parity/ra5a-close-attempt-1/`.
+   Large maps already scale army and wave sizes by up to two, but left their assembly patience
+   unchanged. With the slower RA5 economy the patience expires before the larger wave forms,
+   repeatedly feeding small forces into intact bases. `scaled_for_map` now scales assembly
+   patience by the same capped factor; small maps are unchanged. The existing scaling test
+   gains exact mid/large patience assertions. A shipped-data seed-0 regression reproduces the
+   old failure and now ends at tick **52,499**, well within the original limit.
+   Separately, an idle wave member previously waited for every comrade to stop before receiving
+   another order. A stopped member outside the target's existing gathering radius now receives
+   the existing target's `AttackMove` when comrades have weapon orders, together with new recruits;
+   active and arrived members retain their orders/rest. A direct unit regression checks the exact
+   command and selected member, and that travelling/arrived members are left alone. An initially
+   broader retry prevented search waypoints from retiring and failed the ten-player Crossroads
+   test at 72,000 ticks. That failed second attempt is preserved under
+   `docs/validation/ra2-parity/ra5a-close-attempt-2/`; the arrival-aware correction passes both
+   that unchanged test and the Thousand Lakes regression. This correction alone did not fix the reproduced match, as its diagnostic
+   log shows. Neither correction adds simulation state or changes victory rules, vision,
+   damage, income, or the match limit. The computer still uses ordinary commands.
+6. **Validation.** The full thirteen-command run is recorded under
+   `docs/validation/ra2-parity/ra5a-close/`. Completion and exact counts are recorded in the
+   RA5-A closure status entry. All thirteen commands exited 0; workspace runtime totals are
+   **989 passed, 0 failed, 0 ignored**. This record is not an independent review.
+7. **Final-source distributions, distinct from the inherited sample above.** The workspace
+   production sweep's `production-match-lengths.tsv` records 756 winners, 27,031,638 ticks:
+   median **0.1306853009**, nearest-rank p90 **0.2849236111**, maximum **0.7354740741**
+   (Glacier Pass, **Korea against Russia, both brutal**,
+   198,578 / 270,000). Counts above 0.5/0.7/0.8/0.9 are **21/2/0/0**.
+   The fresh duel example records 756 winners, 28,558,760 ticks: median **0.1349340278**,
+   p90 **0.3227777778**, maximum **0.8229027778** (Demo, America against Korea, both easy,
+   59,249 / 72,000); counts above 0.5/0.7/0.8/0.9 are **18/5/1/0**. Its longest match in
+   absolute ticks is Ember Caldera, France medium against Libya easy, **221,221 / 288,000**.
+   Both use the unchanged scaled test limit as denominator, not the example's separate
+   300,000 cap. The inherited near-limit tail is improved on these samples, not a proof for
+   every seed; broader AI capability and stress coverage remain RA8 work.
