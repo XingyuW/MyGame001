@@ -188,8 +188,50 @@ fn computer_players_finish_matches_with_the_shipped_data_on_every_shipped_map() 
 /// placement command of a player who lost a unit or building then (docs/DECISIONS.md D43).
 fn run(world: &mut World, name: &str, limit: u64) -> Option<MatchOutcome> {
     let mut losses: BTreeMap<PlayerId, BTreeSet<SimId>> = BTreeMap::new();
+    let trace_ra5 = std::env::var_os("RA5_TRACE").is_some() && name.contains("coral_archipelago");
     for at in 0..limit {
         world.run_schedule(SimSchedule);
+        if trace_ra5 && at % 10000 == 0 {
+            let controllers = format!("{:?}", world.resource::<sim::AiPlayers>());
+            let mut compact = String::new();
+            let mut rest = controllers.as_str();
+            while let Some(start) = rest.find("waypoints: [") {
+                compact.push_str(&rest[..start]);
+                let Some(end) = rest[start..].find("known:") else {
+                    break;
+                };
+                rest = &rest[start + end..];
+            }
+            compact.push_str(rest);
+            eprintln!("RA5 tick {at} controllers {compact}");
+            let bridges = world.resource::<sim::Bridges>();
+            for (id, b) in &bridges.bridges {
+                if b.collapsed {
+                    eprintln!(
+                        "RA5 collapsed {id:?} cell_count {} huts {:?}",
+                        b.cells.len(),
+                        b.huts
+                    );
+                }
+            }
+            let d = world.resource::<sim::Definitions>().clone();
+            let mut kinds: BTreeMap<(PlayerId, String), (usize, i64, i64, usize)> = BTreeMap::new();
+            for (o, u, m, orders) in world
+                .query::<(&sim::Owner, &sim::Unit, &sim::Mobile, Option<&sim::Orders>)>()
+                .iter(world)
+            {
+                let key = (
+                    o.0,
+                    d.unit(u.kind).map_or("?", |d| d.id.as_str()).to_owned(),
+                );
+                let value = kinds.entry(key).or_default();
+                value.0 += 1;
+                value.1 += i64::from(m.cell.x);
+                value.2 += i64::from(m.cell.y);
+                value.3 += usize::from(orders.is_none_or(|o| o.current.is_none()));
+            }
+            eprintln!("RA5 types(count,sum_x,sum_y,idle) {kinds:?}");
+        }
         let events: Vec<SimEvent> = world
             .resource::<Messages<SimEvent>>()
             .iter_current_update_messages()
@@ -411,4 +453,14 @@ fn the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first() {
         matches!(outcome, Some(MatchOutcome::Won { .. })),
         "{outcome:?}"
     );
+}
+
+#[test]
+fn ra5_coral_archipelago_brutal_libya_germany_seed_zero_finishes() {
+    let outcome = duel(
+        "coral_archipelago",
+        ["libya", "germany"],
+        ["brutal", "brutal"],
+    );
+    assert!(matches!(outcome, Some(MatchOutcome::Won { .. })));
 }

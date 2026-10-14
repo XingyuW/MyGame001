@@ -1,0 +1,9 @@
+01 exit 0  0 s  cargo fmt --all -- --check
+02 exit 0  0 s  git diff --check
+03 exit 0  5 s  cargo clippy --workspace --all-targets -- -D warnings
+04 exit 101  4949 s  cargo test --workspace --release  [242 passed, 1 failed, 0 ignored]
+05 exit 0  1 s  cargo build --release -p game
+06 exit 0  16 s  cargo run --release -p game -- --smoke-test 600
+07 exit 0  126 s  cargo run -p game -- --smoke-test 600
+08 exit 0  3 s  cargo run --release -p sim --example m7_benchmark
+Stopped just after command08: production command04 failed Coral Archipelago Libya/Germany brutal seed0;09 soak was stopped before its long run. Source2dc5aa1. Superseded by final ra5 after regression/fix.

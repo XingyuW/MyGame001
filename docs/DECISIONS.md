@@ -4213,3 +4213,41 @@ in `ra5-attempt-2/`. The 22 focused world-object tests pass. The replay test pri
 its 141 state checkpoints; `ra5-empty-state-equivalence/` compares the unoptimized and optimized
 sources, requires both runs to pass and their digests to match, and records exact source
 restoration. The complete final gate reruns all thirteen commands after this change.
+
+### R69. RA5 remembered bridge repair objectives after scouts lose sight
+
+The third full gate failed its production sweep only on seed 0, Coral Archipelago, Libya versus
+Germany (both brutal): no winner at the unchanged 288,000-tick cap. The exact focused reproduction
+also failed. Its trace showed collapsed routes left unrepaired after the observing combat units
+moved away or died; Engineers remained at home while army waves became stranded. The previous
+repair policy required the hut and collapsed deck to be currently visible on every decision.
+
+AI controllers now remember hut identity, associated bridge and location only after seeing the
+hut, and remember a collapse only after seeing a deck cell. They forget that collapse when a
+currently visible deck is intact. An idle Engineer may Move toward a remembered reachable hut
+while it is unseen, but fresh Interact requires the hut and a deck cell currently visible.
+This last condition prevents an obsolete remembered objective from producing an invalid repair
+when somebody else restored the bridge out of sight; the first focused fix exposed that at tick
+63,762 and its failure log is retained. Reachability starts at the Engineer, or the home gather
+point before training one, rather than an arbitrary lowest-ID army member already across the
+river. Unreachable huts are excluded in favour of reachable remembered alternatives. Existing
+current-visibility rules remain in force; RA7's explored-is-visible option is not enabled.
+
+All remembered hut IDs, bridge IDs, locations and observed-collapse IDs are hashed in ordered
+collections. A focused sensitivity test changes each field and proves clearing memory restores
+the initial hash. The exact Coral regression now wins at tick 196,067 / 288,000 (0.680788), without
+changing a unit, AI data value or limit. The sole-route command-level regression additionally
+requires a fresh AI Move toward the unseen hut after losing sight, consumed-Engineer repair,
+a ground crossing and a winner within the existing 72,000-tick cap. Its first movement-only
+assertion admitted an Engineer already walking from a visible Interact; the retained mutation
+survived, so the assertion was strengthened to inspect the actual queued Move. Clearing memory
+each think now fails that assertion with `approached_from_memory=false`; exact source SHA-256
+restoration is recorded. No old assertion was removed or relaxed.
+
+Attempt-three gate logs, the exact before/after traces and both mutation outcomes remain in
+`docs/validation/ra2-parity/ra5-attempt-3/`. Commands 01–03 and 05–08 passed; 04 failed as above;
+09 was stopped at startup and 10–13 were not run. This failed attempt is superseded only by the
+complete final RA5 gate. The mutation backup used the existing approved `ra5b-render` review
+cache directory and was removed by its restoration trap; no additional external directory was
+created. An initial /tmp backup command was rejected before execution by automatic approval
+review; the safer cache-backed retry succeeded without a further user approval request.
