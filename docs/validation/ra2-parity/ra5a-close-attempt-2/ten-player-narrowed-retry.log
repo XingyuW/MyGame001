@@ -1,0 +1,30 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 23.18s
+     Running tests/m13_grown_maps.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m13_grown_maps-ee40a9cea2db76e9)
+
+running 1 test
+
+thread 'a_ten_player_match_on_the_smallest_map_is_played_to_its_end' (525681) panicked at crates/game/tests/m13_grown_maps.rs:601:5:
+None after 72000 ticks, defeated {PlayerId(0): 21411, PlayerId(2): 5943, PlayerId(3): 11133, PlayerId(4): 5097, PlayerId(5): 5054, PlayerId(6): 47553, PlayerId(7): 18335, PlayerId(9): 63750}
+PlayerId(0): 4943 credits, 0 buildings [], 8 units [CellPos { x: 7, y: 71 }, CellPos { x: 7, y: 71 }, CellPos { x: 5, y: 71 }, CellPos { x: 7, y: 72 }, CellPos { x: 7, y: 71 }, CellPos { x: 6, y: 71 }, CellPos { x: 8, y: 71 }, CellPos { x: 14, y: 37 }], wave Some((28, Some(Waypoint(1))))
+PlayerId(1): 47375 credits, 13 buildings [CellPos { x: 90, y: 90 }, CellPos { x: 85, y: 80 }, CellPos { x: 90, y: 87 }, CellPos { x: 95, y: 85 }, CellPos { x: 87, y: 95 }, CellPos { x: 87, y: 92 }, CellPos { x: 88, y: 88 }, CellPos { x: 90, y: 94 }, CellPos { x: 93, y: 87 }, CellPos { x: 94, y: 90 }, CellPos { x: 85, y: 88 }, CellPos { x: 92, y: 94 }, CellPos { x: 90, y: 83 }], 43 units [CellPos { x: 37, y: 65 }, CellPos { x: 39, y: 62 }, CellPos { x: 38, y: 65 }, CellPos { x: 35, y: 65 }, CellPos { x: 39, y: 61 }, CellPos { x: 38, y: 63 }, CellPos { x: 40, y: 65 }, CellPos { x: 37, y: 65 }, CellPos { x: 38, y: 64 }, CellPos { x: 36, y: 63 }, CellPos { x: 38, y: 63 }, CellPos { x: 37, y: 64 }, CellPos { x: 40, y: 62 }, CellPos { x: 38, y: 63 }, CellPos { x: 36, y: 64 }, CellPos { x: 38, y: 62 }, CellPos { x: 37, y: 62 }, CellPos { x: 37, y: 65 }, CellPos { x: 36, y: 63 }, CellPos { x: 36, y: 65 }, CellPos { x: 38, y: 62 }, CellPos { x: 37, y: 63 }, CellPos { x: 39, y: 64 }, CellPos { x: 37, y: 62 }, CellPos { x: 38, y: 64 }, CellPos { x: 35, y: 65 }, CellPos { x: 39, y: 65 }, CellPos { x: 36, y: 62 }, CellPos { x: 36, y: 66 }, CellPos { x: 38, y: 62 }, CellPos { x: 39, y: 65 }, CellPos { x: 37, y: 66 }, CellPos { x: 37, y: 62 }, CellPos { x: 36, y: 66 }, CellPos { x: 35, y: 65 }, CellPos { x: 37, y: 61 }, CellPos { x: 38, y: 64 }, CellPos { x: 39, y: 62 }, CellPos { x: 85, y: 79 }, CellPos { x: 84, y: 82 }, CellPos { x: 84, y: 79 }, CellPos { x: 84, y: 81 }, CellPos { x: 84, y: 80 }], wave Some((38, Some(Waypoint(3))))
+PlayerId(2): 2780 credits, 0 buildings [], 0 units [], wave Some((0, None))
+PlayerId(3): 0 credits, 0 buildings [], 0 units [], wave Some((0, None))
+PlayerId(4): 2942 credits, 0 buildings [], 0 units [], wave Some((7, Some(Waypoint(2))))
+PlayerId(5): 3134 credits, 0 buildings [], 0 units [], wave Some((13, Some(Waypoint(4))))
+PlayerId(6): 11970 credits, 0 buildings [], 36 units [CellPos { x: 102, y: 38 }, CellPos { x: 101, y: 37 }, CellPos { x: 103, y: 36 }, CellPos { x: 102, y: 40 }, CellPos { x: 103, y: 37 }, CellPos { x: 104, y: 39 }, CellPos { x: 103, y: 37 }, CellPos { x: 102, y: 39 }, CellPos { x: 101, y: 39 }, CellPos { x: 102, y: 41 }, CellPos { x: 103, y: 36 }, CellPos { x: 101, y: 36 }, CellPos { x: 102, y: 41 }, CellPos { x: 104, y: 39 }, CellPos { x: 101, y: 37 }, CellPos { x: 100, y: 39 }, CellPos { x: 103, y: 39 }, CellPos { x: 100, y: 39 }, CellPos { x: 101, y: 38 }, CellPos { x: 103, y: 38 }, CellPos { x: 104, y: 39 }, CellPos { x: 100, y: 39 }, CellPos { x: 101, y: 37 }, CellPos { x: 103, y: 40 }, CellPos { x: 101, y: 40 }, CellPos { x: 103, y: 36 }, CellPos { x: 102, y: 36 }, CellPos { x: 101, y: 36 }, CellPos { x: 102, y: 41 }, CellPos { x: 101, y: 36 }, CellPos { x: 103, y: 37 }, CellPos { x: 102, y: 37 }, CellPos { x: 29, y: 54 }, CellPos { x: 25, y: 55 }, CellPos { x: 26, y: 56 }, CellPos { x: 28, y: 55 }], wave Some((32, Some(Waypoint(3))))
+PlayerId(7): 0 credits, 0 buildings [], 0 units [], wave Some((0, None))
+PlayerId(8): 0 credits, 13 buildings [CellPos { x: 99, y: 4 }, CellPos { x: 107, y: 7 }, CellPos { x: 101, y: 0 }, CellPos { x: 99, y: 7 }, CellPos { x: 95, y: 4 }, CellPos { x: 94, y: 8 }, CellPos { x: 97, y: 8 }, CellPos { x: 102, y: 4 }, CellPos { x: 99, y: 2 }, CellPos { x: 105, y: 2 }, CellPos { x: 101, y: 11 }, CellPos { x: 103, y: 7 }, CellPos { x: 96, y: 1 }], 31 units [CellPos { x: 18, y: 18 }, CellPos { x: 20, y: 19 }, CellPos { x: 19, y: 18 }, CellPos { x: 18, y: 19 }, CellPos { x: 19, y: 20 }, CellPos { x: 19, y: 19 }, CellPos { x: 19, y: 19 }, CellPos { x: 17, y: 20 }, CellPos { x: 21, y: 18 }, CellPos { x: 18, y: 19 }, CellPos { x: 20, y: 20 }, CellPos { x: 19, y: 18 }, CellPos { x: 18, y: 20 }, CellPos { x: 19, y: 20 }, CellPos { x: 20, y: 20 }, CellPos { x: 19, y: 18 }, CellPos { x: 19, y: 17 }, CellPos { x: 21, y: 17 }, CellPos { x: 20, y: 19 }, CellPos { x: 18, y: 21 }, CellPos { x: 17, y: 20 }, CellPos { x: 20, y: 18 }, CellPos { x: 17, y: 20 }, CellPos { x: 18, y: 21 }, CellPos { x: 20, y: 19 }, CellPos { x: 18, y: 19 }, CellPos { x: 17, y: 18 }, CellPos { x: 94, y: 6 }, CellPos { x: 94, y: 4 }, CellPos { x: 94, y: 5 }, CellPos { x: 94, y: 3 }], wave Some((27, Some(Waypoint(0))))
+PlayerId(9): 250 credits, 0 buildings [], 1 units [CellPos { x: 10, y: 106 }], wave Some((0, None))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test a_ten_player_match_on_the_smallest_map_is_played_to_its_end ... FAILED
+
+failures:
+
+failures:
+    a_ten_player_match_on_the_smallest_map_is_played_to_its_end
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 2 filtered out; finished in 36.38s
+
+error: test failed, to rerun pass `-p game --test m13_grown_maps`

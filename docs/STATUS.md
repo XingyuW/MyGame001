@@ -968,6 +968,83 @@ entries above and collected in section 4.13 of the requirements document. Decisi
 reverse or reinterpret what the user asked for: R4 (map growth off by default), R7 (units move
 at RA2's nominal speed, slower than before).
 
+### RA5-A closure (2026-10-14)
+
+Continuation Step 0 is validated; RA5 items 1 to 4 now have their first complete gate.
+R64 records the independent reference sample, retained tests, two AI corrections and failed
+attempts. This does not implement RA5-B or any later milestone, and is not independent review
+or approval. The stopped-run entry above is historical.
+
+The inherited 150-line battlefield module is preserved intact; its crate visibility/pickup
+and newly grown ore tests pass. Added gem tint coverage exercises both terrain paths. The
+reference sample independently recomputes bail values, miner storage, growth/spread periods
+and percentages, crate shares/arguments/timing/radius and refinery refunds from the cached
+ini; all match generated data. No generated data, schema, command or asset changes here.
+
+The first gate found a real seed-0 Thousand Lakes France/Germany brutal stall at the unchanged
+288,000-tick limit. Large-map wave assembly patience now scales with the already scaled army;
+the regression ends at tick 52,499. Idle wave members can rejoin ongoing orders, while arrived
+members rest so search waypoints can finish. An initially broader retry failed ten-player
+Crossroads; the final arrival-aware rule passes that unchanged 72,000-tick test. Both failed
+attempts and diagnosis logs are retained in `ra5a-close-attempt-1/` and `ra5a-close-attempt-2/`.
+No tests were deleted, skipped or weakened and no match limit increased. Static test attributes:
+979 incoming committed, 981 inherited working tree, **984 final**; no ignores. Runtime totals
+are **989 passed, 0 failed, 0 ignored** (shared test modules execute in multiple targets).
+
+**Authoritative validation:** `docs/validation/ra2-parity/ra5a-close/summary.txt` and numbered
+logs. All thirteen commands ran on the final source; only this report and R64 were completed
+afterward.
+
+| # | Command | Exit | Seconds / evidence |
+|---|---|---:|---|
+| 1 | `cargo fmt --all -- --check` | 0 | 0 |
+| 2 | `git diff --check` | 0 | 0 |
+| 3 | `cargo clippy --workspace --all-targets -- -D warnings` | 0 | 6 |
+| 4 | `cargo test --workspace --release` | 0 | 2909; 989 passed, 0 failed, 0 ignored |
+| 5 | `cargo build --release -p game` | 0 | 0 |
+| 6 | `cargo run --release -p game -- --smoke-test 600` | 0 | 15 |
+| 7 | `cargo run -p game -- --smoke-test 600` | 0 | 118 |
+| 8 | `cargo run --release -p sim --example m7_benchmark` | 0 | 13; fixture mean/max 0.096/0.946 ms, shipped 0.217/5.089 ms; peak 1.3 MiB |
+| 9 | `cargo run --release -p sim --example m7_soak` | 0 | 2263; 18,720,000 ticks, 260 configurations twice, peak 215.5 MiB |
+| 10 | `cargo run --release -p sim --example m14_duels -- full` | 0 | 1290; 756/756 winners |
+| 11 | `sh scripts/package_macos.sh` | 0 | 20; app/zip and packaged smoke600 |
+| 12 | `python3 scripts/generate_ra2_data.py --check` | 0 | 0 |
+| 13 | `python3 scripts/ra2_reference.py --check` | 0 | 0; 4888 rows match cached reference |
+
+The existing linker `__eh_frame` and winit shutdown `Skipped event Destroyed` warnings recur;
+Clippy is clean. Smoke exit status does not establish artistic acceptance. The soak's fixed
+36,000-tick windows can end during the next restarted match, as its log states; its winner,
+determinism and memory checks pass.
+
+**Match lengths against the unchanged scaled test limit.** Median is the average central pair,
+p90 nearest rank. The workspace production sweep and duel example use distinct seeds.
+
+| Sample | Winners | Total ticks | Median | p90 | Maximum | Counts >0.5 / >0.7 / >0.8 / >0.9 |
+|---|---:|---:|---:|---:|---:|---|
+| Inherited RA5-A duel log | 756 | 27,237,240 | 0.1215044974 | 0.3362777778 | 0.9315173611 | 22 / 5 / 2 / 1 |
+| Final workspace production sweep | 756 | 27,031,638 | 0.1306853009 | 0.2849236111 | 0.7354740741 | 21 / 2 / 0 / 0 |
+| Final duel example | 756 | 28,558,760 | 0.1349340278 | 0.3227777778 | 0.8229027778 | 18 / 5 / 1 / 0 |
+
+Final production maximum: Glacier Pass, Korea/Russia brutal, 198,578/270,000. Final duel
+maximum ratio: Demo, America/Korea easy, 59,249/72,000. Longest final duel: Ember Caldera,
+France medium/Libya easy, 221,221/288,000. The example's separate 300,000 cap is unchanged.
+The production TSV is preserved beside the logs. Broader AI and stress coverage remain RA8 debt;
+these samples do not prove every seed ends.
+
+**Assumptions and remaining scope.** R58–R60's economy/crate assumptions stand; no new reference
+behaviour assumption. RA5-B, RA6–RA9 and the final review remain outstanding. All inherited debt
+stands. Gems, grown ore, crates, art/audio/readability and play feel **require user verification**.
+No assets were created or visually approved. Next implementer must preserve the arrival/rest
+condition and the scaled assembly patience, alongside the unchanged limits and new regressions.
+
+**Storage.** Reused the configured
+`/Users/xingyuwang/Library/Caches/Codex/cargo-target` for compilation, test artifacts and
+`package/MyGame001.app` / `package/MyGame001-macos.zip`; these remain useful for reproducibility
+and user verification. Preserved `UV_CACHE_DIR` and `PIP_CACHE_DIR`. No additional substantial
+external directory, clone, worktree, validation copy or substantial temporary artifact was
+created; no repository/worktree was deleted. The package script uses its existing transient
+empty working directory only.
+
 ## Repair, aircraft overflight, new music and distinct silhouettes (2026-10-06)
 
 Working-tree follow-up (decisions: "Building repair, aircraft overflight, readable silhouettes"

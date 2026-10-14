@@ -188,7 +188,9 @@ pub const ARMY_SCALE_SPAN: u32 = 128;
 /// together, the army and its waves grow with the distance they cover, up to twice their size
 /// (docs/DECISIONS.md, "Large maps with environments"). Waves of a small-map size meet in the
 /// middle of a large map and fall back before either reaches the other base; bigger armies break
-/// through. Integer arithmetic, so the result is deterministic.
+/// through. Their assembly patience grows by the same factor: doubling the desired wave
+/// without giving production more time still sends the original small waves when the timer
+/// expires (RA5, with slower harvesting and regrowing ore). Integer arithmetic throughout.
 pub fn scaled_for_map(mut difficulty: Difficulty, grid: &Grid) -> Difficulty {
     let span = grid.width().saturating_add(grid.height());
     if span > ARMY_SCALE_SPAN {
@@ -196,6 +198,7 @@ pub fn scaled_for_map(mut difficulty: Difficulty, grid: &Grid) -> Difficulty {
         let scale = |value: u32| value.saturating_mul(percent) / 100;
         difficulty.max_army = scale(difficulty.max_army).min(crate::ai_defs::MAX_AI_ARMY);
         difficulty.wave_size = scale(difficulty.wave_size).min(difficulty.max_army);
+        difficulty.wave_patience = scale(difficulty.wave_patience);
     }
     difficulty
 }
@@ -1751,13 +1754,28 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
                 target: cell,
             });
         }
-    } else if !joined.is_empty()
-        && let Some(cell) = target_cell(controller, centroid)
-    {
-        commands.push(Command::AttackMove {
-            units: joined,
-            target: cell,
-        });
+    } else if let Some(cell) = target_cell(controller, centroid) {
+        // Rejoin comrades in combat after a blocked move. During travel, let arrived
+        // members rest so the whole wave can finish its waypoint and choose another;
+        // repeatedly ordering those members prevents that transition. Members already
+        // within the gathering radius of the destination have arrived and stay at rest.
+        let fighting = members.iter().any(|unit| unit.attacking);
+        let reinforce: Vec<SimId> = members
+            .iter()
+            .filter(|unit| {
+                joined.contains(&unit.id)
+                    || (fighting
+                        && unit.idle()
+                        && chebyshev(unit.mobile.cell, cell) > GATHER_RADIUS)
+            })
+            .map(|unit| unit.id)
+            .collect();
+        if !reinforce.is_empty() {
+            commands.push(Command::AttackMove {
+                units: reinforce,
+                target: cell,
+            });
+        }
     }
     commands
 }
@@ -2015,6 +2033,129 @@ mod tests {
             assert!(lit(id, CellPos::new(23, 21)), "{id}");
             assert!(!lit(id, CellPos::new(16, 16)), "{id}");
         }
+    }
+
+    /// A blocked member must rejoin an active wave without cancelling the other members'
+    /// moves or attacks. Previously only new recruits were ordered until every member rested.
+    #[test]
+    fn an_idle_wave_member_rejoins_while_its_comrades_keep_fighting() {
+        let grid = Grid::from_cells(
+            32,
+            32,
+            vec![
+                Cell {
+                    passable: true,
+                    water: false,
+                    buildable: true,
+                    ore: 0,
+                };
+                32 * 32
+            ],
+        )
+        .expect("grid");
+        let definitions = Definitions::default();
+        let player = PlayerId(0);
+        let mut players = Players::default();
+        players.add(player, 0).expect("player");
+        let state = players.get(player).expect("player");
+        let plan = AiPlan {
+            build_order: Vec::new(),
+            power: BuildingKind(0),
+            harvester: UnitKind(0),
+            army: Vec::new(),
+        };
+        let difficulty = Difficulty {
+            id: "test".into(),
+            think_interval: 10,
+            harvesters_per_refinery: 1,
+            max_army: 4,
+            wave_size: 2,
+            first_wave: 0,
+            wave_patience: 100,
+            defence_radius: 4,
+        };
+        let mut controller = AiController::new(
+            &grid,
+            &definitions,
+            plan.clone(),
+            difficulty,
+            CellPos::new(4, 4),
+            vec![CellPos::new(28, 28)],
+            None,
+        )
+        .expect("controller");
+        controller.wave = [SimId(1), SimId(2)].into_iter().collect();
+        controller.target = Some(WaveTarget::Waypoint(0));
+        let mut units = [false, true].map(|attacking| UnitSnap {
+            id: SimId(if attacking { 2 } else { 1 }),
+            owner: player,
+            kind: UnitKind(0),
+            mobile: Mobile {
+                speed: 16,
+                cell: CellPos::new(10, 10),
+                step: None,
+            },
+            has_order: false,
+            harvest: None,
+            armed: true,
+            attacking,
+            sight: Some(4),
+        });
+        let view = View::new(
+            player,
+            1000,
+            &players,
+            state,
+            &grid,
+            &definitions,
+            &plan,
+            false,
+            &units,
+            &[],
+            &crate::SpecialState::default(),
+        );
+        let commands = command_army(&view, &mut controller);
+        assert_eq!(
+            commands,
+            vec![Command::AttackMove {
+                units: vec![SimId(1)],
+                target: CellPos::new(28, 28)
+            }]
+        );
+        // A comrade still travelling must not make arrived members restart forever:
+        // they need to rest together to retire the current search waypoint.
+        units[1].attacking = false;
+        units[1].has_order = true;
+        let view = View::new(
+            player,
+            1000,
+            &players,
+            state,
+            &grid,
+            &definitions,
+            &plan,
+            false,
+            &units,
+            &[],
+            &crate::SpecialState::default(),
+        );
+        assert!(command_army(&view, &mut controller).is_empty());
+        units[1].attacking = true;
+        units[0].mobile.cell = CellPos::new(27, 28);
+        let view = View::new(
+            player,
+            1000,
+            &players,
+            state,
+            &grid,
+            &definitions,
+            &plan,
+            false,
+            &units,
+            &[],
+            &crate::SpecialState::default(),
+        );
+        assert!(command_army(&view, &mut controller).is_empty());
     }
 
     /// RA1 regression (docs/DECISIONS.md R14, R56; found by `m14_duels -- full`: Crossroads,
