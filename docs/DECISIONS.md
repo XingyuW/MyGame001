@@ -4767,7 +4767,7 @@ strict workspace Clippy, formatting, diff hygiene and generator/reference checks
 All prior failure logs remain under `validation/ra2-parity/ra6b-*`. This is preflight evidence;
 full frozen-source gate results follow separately, including soak and both756-match sweeps.
 
-## R82 — RA6 gunner AreaFire execution and interrupted gate (2026-10-15)
+### R82. RA6 gunner AreaFire execution and interrupted gate (2026-10-15)
 
 The first RA6 gate on041b1fc was deliberately stopped during command4 compilation after
 commands1–3 passed. Root inspection found that mode8 selected CRMindControl correctly, but
@@ -4789,7 +4789,7 @@ and `ra6_gunner_area_fire_does_not_enable_yuri_automatic_deploy_pulse` exercise 
 fire, one-cell acquisition versus two-cell non-acquisition, vehicle-centred splash, no friendly
 acquisition, immune Yuri, source XP,13-tick reload and the infantry negative case.
 `ra6_ifv_temporal_and_suicide_modes_execute_on_attack` exercises living modes7/10/11:
-actual CRNuke/CRMakeup suicide attacks and the exact572-tick Rhino erasure
+actual CRNuke/CRTerrorBomb suicide attacks and the exact572-tick Rhino erasure
 (Strength400*10 divided by floor(Damage10*3/4)). These supplement selection/unload tests,
 not replace them. Pulse timing fixtures remove return-fire Weapon components and raise the
 victim's HP explicitly while keeping shipped definitions. Initial failures from return fire
@@ -4816,3 +4816,67 @@ six core integration tests pass. `ra6b-ifv-client.log` preserves an invalid `--l
 as `ra6b-ifv-client2.log`: it was stopped during the unchanged multiplayer integration after
 recognizing that it would duplicate the forthcoming full production sweep. It is not claimed
 as a complete package test pass. The final frozen gate runs all workspace tests without filters.
+
+### R83. RA6 complete frozen validation and handoff (2026-10-15)
+
+The combined RA6 implementation at `f9b1e55` passes all thirteen commands in
+`sh scripts/validate_ra2_parity.sh ra6`, with `RA2_DUEL_SEED` and `RA2_DUEL_PAIR`
+explicitly unset. Runtime, data, tests and client source remained unchanged throughout.
+This closure changes documentation and retained evidence only; it is validation, not an
+independent review or user approval. Full command lines, exits and times are in
+`validation/ra2-parity/ra6/summary.txt`; every command exits0.
+
+Workspace release tests:1,096 passed,0 failed,0 ignored (6,844 s), including756/756 production
+winners and both exact Coral regressions. Formatting, diff hygiene, strict all-target Clippy,
+release build, both600-frame smokes, package smoke, generated-data check and reference check
+all pass; the reference comparison covers4,934 rows. Shipped benchmark mean0.306 ms,
+maximum1.805 ms, loaded mean0.709 ms, peak heap1.5 MiB, within unchanged5/50 ms and1,024 MiB
+budgets. Required soak:260 configurations,18,720,000 ticks in5,327.7 s (command5,331 s),
+peak heap224.5 MiB, passed. The separate unfiltered duel sweep passes756/756 matches;
+each outcome was independently counted as `Won`, not merely ended (4,524 s, longest221,221 ticks).
+
+Match-length evidence is retained in `production-lengths.tsv`, `duel-lengths.tsv` and
+`metrics.json` under the gate directory. Ratios use R29's
+`72,000 * max(128, width + height) / 128` comparison limit, with nearest-rank p90:
+
+| Sweep | Winners | Median ratio | p90 ratio | Maximum ratio |
+|---|---:|---:|---:|---:|
+| Production |756/756|0.1323229167|0.3186944444|0.7095694444|
+| Separate duels |756/756|0.1390937500|0.3121031746|0.8229027778|
+
+The worst production ratio is Riverlands France(easy) versus Germany(easy),51,089/72,000.
+The worst duel ratio is Demo America(easy) versus Korea(easy),59,249/72,000. The diagnostic
+duel runner's existing300,000-tick outer ceiling was not changed; the table consistently
+compares both sweeps with R29. No limit was raised and no failed or partial log was removed.
+The interrupted first gate remains `ra6-attempt1`; R80–R82 explain every earlier preflight
+failure, fixture migration and the mode8 correction. The combined acceptance ledger maps
+all gap-analysis section9 rows to exact evidence or named remaining differences.
+
+**Handoff and remaining evidence obligations.** R76's first-spawn Spy/cloak concealment risk
+belongs to RA7: spawning precedes Combat, so require an actual first-spawn visibility regression.
+Retain paid-production-only Spy veterancy, neutral Airport inactivity until capture, separate
+vehicle/air docks, R64/R69 arrival-aware bridge behavior, and R76's utility-weapon/deployed/Temporal
+army filters. Chronosphere automation must use explicit `Chronoshift { building, source, target }`.
+
+RA9 must close the explicit Squid firing-coverage gap before final review: the current
+`ra6_squid_prevents_motion_but_ship_keeps_its_weapon` proves blocked movement and retained
+Weapon, not an actual shot. Add a controlled shipped test that asserts host `WeaponFired`
+while the parasite remains attached, with another hostile target and return fire disabled
+so the Squid is not incidentally evicted. This is an evidence gap, not an observed runtime defect.
+
+RA9's transport audit must also account for existing slot-count/category capacity behavior:
+boarding uses `cargo.len()` and category/amphibious checks, lacks per-unit Size/SizeLimit
+(including the appendix A gap6 LCRF Passengers12/SizeLimit6 contract), and refuses boarding an
+already loaded transport. Identity-preservation tests do not establish complete capacity/size
+parity. RA9 must implement the missing behavior or give a precise justified remaining difference;
+these predate the RA6 specialist changes. Preserve R67's blocked-bridge ship repair difference.
+
+R80/R82's Sonic per-shot approximation (YR wave documentation is not established vanilla
+RA2 accumulation),13-tick cloud lifetime, instantaneous landing/plane exit policy, representative
+cow omission and RA6-A assumptions remain explicit. Original visual/audio/play feel requires
+user verification. No new substantial external directory, clone or worktree was created;
+existing configured Cargo target/test scratch and UV/PIP caches were preserved. Build cache
+remains useful; the app/archive are retained under the existing
+`/Users/xingyuwang/Library/Caches/Codex/cargo-target/package/` for delivery and validation.
+No substantial /tmp artifact was created. `main` remains8230a95. RA7 may begin
+only after root checks this closure; RA8/RA9 and the independent final review remain outstanding.
