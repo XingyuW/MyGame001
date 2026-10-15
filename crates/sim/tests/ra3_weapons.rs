@@ -864,12 +864,12 @@ fn an_army_must_attack_the_ground_and_damage_every_building_with_a_weapon_it_use
         "one_percent",
         &[
             (
-                "(id: \"shell\", cell_spread: 0, percent_at_max: 100, wall: 1, wood: 1, versus: [(armour: \"flesh\", percent: 50), (armour: \"plate\", percent: 100), (armour: \"concrete\", percent: 100),",
-                "(id: \"shell\", cell_spread: 0, percent_at_max: 100, wall: 1, wood: 1, versus: [(armour: \"flesh\", percent: 50), (armour: \"plate\", percent: 100), (armour: \"concrete\", percent: 1),",
+                "versus: [(armour: \"flesh\", percent: 50), (armour: \"plate\", percent: 100), (armour: \"concrete\", percent: 100),",
+                "versus: [(armour: \"flesh\", percent: 50), (armour: \"plate\", percent: 100), (armour: \"concrete\", percent: 1),",
             ),
             (
-                "(id: \"bullet\", cell_spread: 0, percent_at_max: 100, wall: 0, wood: 0, versus: [(armour: \"flesh\", percent: 100), (armour: \"plate\", percent: 20), (armour: \"concrete\", percent: 10),",
-                "(id: \"bullet\", cell_spread: 0, percent_at_max: 100, wall: 0, wood: 0, versus: [(armour: \"flesh\", percent: 100), (armour: \"plate\", percent: 20), (armour: \"concrete\", percent: 1),",
+                "versus: [(armour: \"flesh\", percent: 100), (armour: \"plate\", percent: 20), (armour: \"concrete\", percent: 10),",
+                "versus: [(armour: \"flesh\", percent: 100), (armour: \"plate\", percent: 20), (armour: \"concrete\", percent: 1),",
             ),
         ],
     );

@@ -4369,7 +4369,7 @@ ordinary weapons retain their 384-subcell minimum, with negative tests for both 
 MakeupKit's negative range sentinel is represented by the bounded maximum, never fired:
 visible infantry copying uses Interact. Sapper and ASW's sea-only projectiles use the ground
 layer with the independent naval-only restriction. Missing Verses on the non-damaging
-BombDisarm/ElectricAssault utility warheads defaults to 100%; their handlers never apply it
+BombDisarm/IvanBomb utility warheads defaults to 100%; their handlers never apply it
 as damage. These adaptations are documented in the precise remaining-difference rows.
 
 **Intended expectation migrations, retaining every other assertion:**
@@ -4523,3 +4523,47 @@ produced Spy/cloaked unit in an already visible cell may therefore be targetable
 spawn tick. This inherited scheduling path has been inspected but an actual attack/leak has
 not been reproduced. RA7 must add a first-spawn concealment regression and resolve it if
 confirmed; no engine parity or security completion is claimed for that path here.
+
+### R77. Stolen-unit denial now reports the missing infiltration
+
+**2026-10-14.** The third gate on `05ef109` passed all 756 production matches and the AI
+regressions, then found two stale assertions in `crates/sim/tests/ra1_shipped.rs`:
+`an_allied_player_builds_the_allied_tree_to_the_battle_lab` expected Chrono Commando to be
+`UnknownItem`, and `a_soviet_player_builds_the_soviet_tree_to_the_battle_lab` expected that
+for Yuri Prime. RA6 now supplies their real tech level and stolen-tech prerequisites, so both
+must remain denied with the exact `AbilityUnavailable("Infiltrate the required Battle Lab first")`
+reason. Only these two expected reasons change; every existing tree, country and prerequisite
+assertion remains. The RA6 shipped acceptance tests separately prove successful unlocking
+and same-tick Prime limits. This is an intended expectation migration, not a runtime fix.
+The failed gate remains in `ra6a-attempt3`, including its successful 756-row production timing
+table. Remaining small simulation/shipped and client targets run before the next full gate.
+
+
+### R78. Reference specialist traits opt in without replacing fixture roles
+
+**2026-10-14.** The remaining-target preflight caught the reference dispatch swallowing
+role-only fixture Commando, Demolition and Suicide fire and Spy refinery entry whenever a
+rules file existed. Reference handling now requires its explicit weapon/metadata traits;
+legacy role-only paths remain available (including suppression of direct bomb/control shot
+damage), and the new infantry death hook requires Suicide
+on the weapon. The unchanged `ra3_damage::a_commandos_charge_and_a_radiation_zone_go_through_their_warheads`,
+`a_planted_bomb_goes_off_after_the_rules_delay_through_its_warhead` and
+`a_suicide_unit_blows_up_with_its_own_weapon_where_it_stands` tests and unchanged
+`ra5_ore::a_spy_in_a_refinery_takes_the_rules_share_of_the_owners_credits` are regression
+proof. This is a runtime compatibility fix, not an expectation change.
+
+Two exact schema/audit migrations are intended:
+`ra3_weapons::an_army_must_attack_the_ground_and_damage_every_building_with_a_weapon_it_uses`
+anchors its two one-percent mutations at the unique armour triples because schema 4 inserts
+warhead traits before Versus; its one-edit guards and rejection assertions remain unchanged.
+`ra3_shipped::every_shipped_weapon_deals_the_references_damage_to_every_armour_type` includes
+explicit 100% defaults for only IvanBomb and BombDisarm, whose reference sections omit Verses.
+It asserts those rows are absent and still checks every weapon against all eleven armours;
+all other missing Verses remain errors. ElectricAssault has explicit zero Verses and is not
+a default case; R72's earlier prose naming it has been corrected. Preflight logs are retained.
+
+Final small-target preflight after the fix passes all selected simulation and client targets
+(exit 0 each), including all shipped RA1–RA6 and complete data audit targets. The already
+healthy heavy AI/production sweeps were excluded only from this preflight; the fresh frozen
+gate runs the entire workspace again. `final-small-sim.log`, `final-small-game.log` and
+`trait-opt-in-fixed.log` preserve the results alongside the failed outputs.

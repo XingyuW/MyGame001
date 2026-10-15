@@ -848,7 +848,9 @@ fn an_allied_player_builds_the_allied_tree_to_the_battle_lab() {
     }
     assert_eq!(
         check("chrono_commando"),
-        Err(RejectReason::UnknownItem(data.item("chrono_commando")))
+        Err(RejectReason::AbilityUnavailable(
+            "Infiltrate the required Battle Lab first"
+        ))
     );
 }
 
@@ -906,7 +908,9 @@ fn a_soviet_player_builds_the_soviet_tree_to_the_battle_lab() {
     }
     assert_eq!(
         check("yuri_prime"),
-        Err(RejectReason::UnknownItem(data.item("yuri_prime")))
+        Err(RejectReason::AbilityUnavailable(
+            "Infiltrate the required Battle Lab first"
+        ))
     );
 }
 
