@@ -8,7 +8,7 @@
 // spreads, so that the tests of RA1 to RA4 keep their numbers; the RA5 fixture (../ra5) has the
 // rules of RA5. Crates appear in the matches set up on this fixture, as in every match.
 (
-    schema_version: 2,
+    schema_version: 3,
     production: (
         build_ticks_per_1000: 840,
         multiple_factory_pm: 800,
@@ -82,6 +82,8 @@
         duration_multiple_pm: 1000,
     ),
     superweapons: (
+        nuclear_flight: 200,
+        chrono_freeze: 80,
         nuclear_recharge: 12000,
         lightning_recharge: 12000,
         iron_curtain_recharge: 6000,

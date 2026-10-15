@@ -1,0 +1,46 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 1m 15s
+     Running tests/ra6_vehicles.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra6_vehicles-dcf06dc108fcbc82)
+
+running 27 tests
+test ra6_dolphin_sonic_hit_releases_squid_without_killing_it ... ok
+test ra6_chronosphere_square_moves_both_owners_kills_organic_and_preserves_offsets ... ok
+test ra6_chronosphere_rejects_unseen_area_and_kills_bad_or_occupied_landings ... ok
+test ra6_ivan_ifv_death_uses_crnuke_and_loses_its_passenger ... ok
+test ra6_ifv_mode_twelve_uses_cow_shot_with_an_independent_mode_fixture ... ok
+test ra6_kirov_crash_and_demo_death_damage_nearby_allies ... ok
+test ra6_drone_infantry_bite_and_protected_vehicle_negative ... ok
+test ra6_drone_blocked_escape_retries_with_identity_hp_and_experience ... ok
+test ra6_pending_parasite_and_strategic_state_changes_affect_replay_hash ... ok
+test ra6_public_timers_and_nuclear_marks_do_not_disclose_unseen_sources ... ok
+test ra6_reactor_chain_radiation_and_temporal_suppression ... ok
+test ra6_prism_caps_eight_supporters_and_supports_again_at_tick_80 ... ok
+test ra6_shipped_curtain_death_prevents_later_same_tick_infantry_command ... ok
+test ra6_anti_air_destroys_paradrop_plane_before_it_drops ... ok
+test ra6_stationary_mirage_is_a_tree_to_adjacent_nondetectors ... ok
+test ra6_drone_enters_then_ticks_and_exits_only_on_its_own_kill ... ok
+test ra6_repair_ifv_reaches_diagonal_but_not_two_cells_and_obeys_reload ... ok
+test ra6_squid_prevents_motion_but_ship_keeps_its_weapon ... ok
+test ra6_nuclear_missile_delays_200_ticks_and_radiates ... ok
+test ra6_storm_rejects_a_second_launch_and_preserves_its_charge ... ok
+test ra6_squid_culls_on_the_crossing_hit_and_cannot_cull_through_curtain ... ok
+test ra6_strategic_recharges_power_option_and_readiness_edges ... ok
+test ra6_ifv_uses_reference_modes_and_restores_empty_missiles ... ok
+test ra6_airport_paradrops_one_shootable_plane_and_full_side_payload ... ok
+test ra6_paradrop_blocked_landing_retains_payload_until_space_opens ... ok
+test ra6_curtain_covers_both_owners_kills_infantry_and_expires_at_1000 ... ok
+test ra6_storm_warning_exclusivity_duration_and_cloud_separation_are_deterministic ... ok
+
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.67s
+
+     Running tests/ra9_data_parity.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_data_parity-9d41d76c463c7df7)
+
+running 5 tests
+test the_conversions_round_half_away_from_zero_in_integers ... ok
+test every_value_of_the_shipped_rules_equals_its_reference_or_is_a_listed_difference ... ok
+test the_shipped_skirmish_file_and_the_default_options_are_those_of_the_lobby ... ok
+test every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_difference ... ok
+test every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_difference ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

@@ -138,7 +138,12 @@ fn repairs_units(defs: &Definitions, b: &Actor) -> bool {
 /// The checks of sending unit `a` to the repair building `b` (RA2): `b` is the player's own, `a`
 /// is a vehicle of the building's element (a ship at a shipyard, a ground vehicle elsewhere; no
 /// aircraft), and `a` is damaged.
-fn validate_docking(a: &Actor, b: &Actor, defs: &Definitions) -> Result<(), RejectReason> {
+fn validate_docking(
+    world: &World,
+    a: &Actor,
+    b: &Actor,
+    defs: &Definitions,
+) -> Result<(), RejectReason> {
     if a.owner != b.owner {
         return Err(unavailable("Choose your own repair building"));
     }
@@ -161,6 +166,10 @@ fn validate_docking(a: &Actor, b: &Actor, defs: &Definitions) -> Result<(), Reje
     if defs
         .unit_combat(kind)
         .is_none_or(|terms| a.hp >= terms.hit_points)
+        && !world
+            .resource::<SpecialState>()
+            .parasites
+            .contains_key(&a.id)
     {
         return Err(unavailable("This unit is not damaged"));
     }
@@ -354,7 +363,13 @@ fn commandable(world: &World, id: SimId) -> Result<(), RejectReason> {
     if world.resource::<SpecialState>().erasures.contains_key(&id) {
         return Err(unavailable("Target is being erased"));
     }
-    if world.resource::<SpecialState>().spawned.contains_key(&id) {
+    if world.resource::<SpecialState>().spawned.contains_key(&id)
+        || world
+            .resource::<SpecialState>()
+            .strategic
+            .flights
+            .contains_key(&id)
+    {
         return Err(RejectReason::NotCommandable(id));
     }
     Ok(())
@@ -377,7 +392,9 @@ mod reconnaissance;
 mod repair;
 mod resolve;
 mod state;
+pub(crate) mod superweapons;
 mod transport;
+pub(crate) mod vehicles;
 
 pub(crate) use advance::advance;
 use carrier::launch_fighters;

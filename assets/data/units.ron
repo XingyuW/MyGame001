@@ -57,6 +57,7 @@
         (id: "osprey", speed: 23, sprite: "scout"), // [ASW] Speed=12
         (id: "v3_rocket", speed: 29, sprite: "rocket_launcher"), // [V3ROCKET] Speed=15
         (id: "dred_missile", speed: 38, sprite: "rocket_launcher"), // [DMISL] Speed=20
+        (id: "paradrop_plane", speed: 29, sprite: "scout"), // [PDPLANE] Speed=15
         (id: "soviet_mcv", speed: 8, sprite: "harvester"), // [SMCV] Speed=4
         (id: "soviet_amphibious_transport", speed: 11, sprite: "harvester"), // [SAPC] Speed=6
         (id: "chrono_commando", speed: 14, sprite: "rifleman"), // [CCOMAND] Speed=5; [InfantryTypes] 18=CCOMAND

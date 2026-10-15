@@ -86,7 +86,7 @@ use crate::economy_defs::MAX_BUILDING_TYPES;
 use crate::hash::Fnv1a64;
 
 /// The schema version of the combat file this crate reads.
-pub const COMBAT_SCHEMA_VERSION: i64 = 4;
+pub const COMBAT_SCHEMA_VERSION: i64 = 5;
 
 /// Largest number of armour classes.
 pub const MAX_ARMOUR_CLASSES: usize = 16;
@@ -263,6 +263,8 @@ pub struct WarheadDef {
     pub ivan_bomb: bool,
     pub bomb_disarm: bool,
     pub electric_assault: bool,
+    pub paralyzes: u32,
+    pub culling: bool,
     pub makes_disguise: bool,
 }
 
@@ -296,6 +298,8 @@ pub struct WeaponDef {
     pub rad_level: u32,
     pub area_fire: bool,
     pub naval_only: bool,
+    pub sonic: bool,
+    pub repair: bool,
     pub suicide: bool,
 }
 
@@ -403,6 +407,7 @@ impl CombatDefinitions {
         hasher.write_u64(self.warheads.len() as u64);
         for warhead in &self.warheads {
             text(hasher, &warhead.id);
+            hasher.write_u32(warhead.paralyzes);
             hasher.write(&[
                 u8::from(warhead.temporal),
                 u8::from(warhead.mind_control),
@@ -412,6 +417,7 @@ impl CombatDefinitions {
                 u8::from(warhead.ivan_bomb),
                 u8::from(warhead.bomb_disarm),
                 u8::from(warhead.electric_assault),
+                u8::from(warhead.culling),
                 u8::from(warhead.makes_disguise),
             ]);
             hasher.write_u64(warhead.versus.len() as u64);
@@ -425,6 +431,8 @@ impl CombatDefinitions {
         hasher.write_u64(self.weapons.len() as u64);
         for weapon in &self.weapons {
             text(hasher, &weapon.id);
+            hasher.write(&[u8::from(weapon.sonic)]);
+            hasher.write(&[u8::from(weapon.repair)]);
             hasher.write(&weapon.damage.to_le_bytes());
             hasher.write_u32(weapon.range);
             hasher.write_u32(weapon.min_range);
@@ -478,6 +486,8 @@ static WARHEAD_SHAPE: Shape = Shape::Struct(&[
     ("ivan_bomb", Shape::Int),
     ("bomb_disarm", Shape::Int),
     ("electric_assault", Shape::Int),
+    ("paralyzes", Shape::Int),
+    ("culling", Shape::Int),
     ("makes_disguise", Shape::Int),
     (
         "versus",
@@ -503,6 +513,8 @@ static WEAPON_SHAPE: Shape = Shape::Struct(&[
     ("rad_level", Shape::Int),
     ("area_fire", Shape::Int),
     ("naval_only", Shape::Int),
+    ("sonic", Shape::Int),
+    ("repair", Shape::Int),
     ("suicide", Shape::Int),
 ]);
 
@@ -631,6 +643,8 @@ struct WarheadEntry {
     ivan_bomb: i64,
     bomb_disarm: i64,
     electric_assault: i64,
+    paralyzes: i64,
+    culling: i64,
     makes_disguise: i64,
 
     versus: Vec<VersusEntry>,
@@ -660,6 +674,8 @@ struct WeaponEntry {
     rad_level: i64,
     area_fire: i64,
     naval_only: i64,
+    sonic: i64,
+    repair: i64,
     suicide: i64,
 }
 
@@ -987,6 +1003,8 @@ fn validate(
             ivan_bomb: flag(&at("ivan_bomb"), entry.ivan_bomb)?,
             bomb_disarm: flag(&at("bomb_disarm"), entry.bomb_disarm)?,
             electric_assault: flag(&at("electric_assault"), entry.electric_assault)?,
+            paralyzes: ranged(&at("paralyzes"), entry.paralyzes, 0, 32767u32, "")?,
+            culling: flag(&at("culling"), entry.culling)?,
             makes_disguise: flag(&at("makes_disguise"), entry.makes_disguise)?,
         });
     }
@@ -995,11 +1013,17 @@ fn validate(
     for (index, entry) in file.weapons.iter().enumerate() {
         let field = format!("weapons[{index}]");
         let at = |name: &str| format!("{field}.{name}");
-        let damage = ranged(&at("damage"), entry.damage, 1, MAX_DAMAGE, "")?;
+        let damage = ranged(
+            &at("damage"),
+            entry.damage,
+            if entry.repair == 1 { -MAX_DAMAGE } else { 1 },
+            if entry.repair == 1 { -1 } else { MAX_DAMAGE },
+            "",
+        )?;
         let range = ranged(
             &at("range"),
             entry.range,
-            if entry.area_fire == 1 {
+            if entry.area_fire == 1 || entry.suicide == 1 {
                 256
             } else {
                 MIN_WEAPON_RANGE
@@ -1061,6 +1085,8 @@ fn validate(
             rad_level: ranged(&at("rad_level"), entry.rad_level, 0, 10000u32, "")?,
             area_fire: flag(&at("area_fire"), entry.area_fire)?,
             naval_only: flag(&at("naval_only"), entry.naval_only)?,
+            sonic: flag(&at("sonic"), entry.sonic)?,
+            repair: flag(&at("repair"), entry.repair)?,
             suicide: flag(&at("suicide"), entry.suicide)?,
         });
     }

@@ -70,8 +70,8 @@ fn building(definitions: &Definitions, id: &str) -> sim::BuildingKind {
 
 #[test]
 fn the_fixture_loads_with_the_traits_of_schema_version_3() {
-    // The file is at schema version 7 since RA6, which keeps the traits of version 3.
-    assert_eq!(ARSENAL_SCHEMA_VERSION, 7);
+    // The file is at schema version 8 since RA6, which keeps the traits of version 3.
+    assert_eq!(ARSENAL_SCHEMA_VERSION, 8);
     let definitions = definitions();
     let entry = |id: &str| {
         definitions

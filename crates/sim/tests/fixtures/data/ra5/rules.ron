@@ -11,7 +11,7 @@
 // permille); at most 3 crates, one at the start, a taken one replaced after 50 to 200 ticks,
 // with every content at a share of its own and three unit types.
 (
-    schema_version: 2,
+    schema_version: 3,
     production: (
         build_ticks_per_1000: 840,
         multiple_factory_pm: 800,
@@ -85,6 +85,8 @@
         duration_multiple_pm: 1000,
     ),
     superweapons: (
+        nuclear_flight: 200,
+        chrono_freeze: 80,
         nuclear_recharge: 12000,
         lightning_recharge: 12000,
         iron_curtain_recharge: 6000,

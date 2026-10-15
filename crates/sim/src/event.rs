@@ -20,6 +20,18 @@ use crate::map::{CellPos, SubPos};
 /// Something that happened during a tick.
 #[derive(Message, Clone, Debug, PartialEq, Eq)]
 pub enum SimEvent {
+    SuperweaponBuilt {
+        player: PlayerId,
+        role: crate::Role,
+    },
+    SuperweaponReady {
+        player: PlayerId,
+        role: crate::Role,
+    },
+    SuperweaponLaunched {
+        player: PlayerId,
+        role: crate::Role,
+    },
     BridgeChanged {
         bridge: SimId,
         cells: Vec<CellPos>,
@@ -42,10 +54,16 @@ pub enum SimEvent {
     /// the destination the order assigned, and `true` when units that stand still closed every
     /// way to it and the unit stopped instead at the reachable cell nearest to it
     /// (docs/DECISIONS.md D19 item 6, D21).
-    MoveCompleted { unit: SimId, retargeted: bool },
+    MoveCompleted {
+        unit: SimId,
+        retargeted: bool,
+    },
     /// The unit's move order ended without reaching its destination; the unit stops at the next
     /// cell centre.
-    MoveFailed { unit: SimId, reason: MoveFailure },
+    MoveFailed {
+        unit: SimId,
+        reason: MoveFailure,
+    },
     /// The item at the head of one of the player's production queues has made its last
     /// progress, so its cost has been charged in full: a building is now ready to be placed, and
     /// a unit leaves a producing building as soon as one of its ring cells is free
@@ -100,7 +118,10 @@ pub enum SimEvent {
         credits: i64,
     },
     /// The harvester stopped its cycle and waits for a `Harvest` command.
-    HarvesterIdle { unit: SimId, reason: HarvestIdle },
+    HarvesterIdle {
+        unit: SimId,
+        reason: HarvestIdle,
+    },
     /// `attacker` fired `weapon` at `target`. An instant weapon's damage is dealt in this tick, a
     /// projectile's when it arrives (M4).
     WeaponFired {
@@ -149,10 +170,14 @@ pub enum SimEvent {
         rank: u8,
     },
     /// A crate appeared in `cell` (RA5, `crate::crates`).
-    CrateAppeared { cell: CellPos },
+    CrateAppeared {
+        cell: CellPos,
+    },
     /// The crate in `cell` is gone without having been taken (RA5): its time was up, or a
     /// building was placed on it.
-    CrateGone { cell: CellPos },
+    CrateGone {
+        cell: CellPos,
+    },
     /// `player`'s unit `unit` took the crate in `cell` (RA5): what it held in the end
     /// (`content`: money where another content could not be given), the credits it paid, and
     /// the unit that came out of it.
@@ -198,7 +223,10 @@ pub enum SimEvent {
     },
     /// The unit's hit points fell to 0 or below, or it was crushed: it was removed and its cells
     /// were freed.
-    UnitDestroyed { player: PlayerId, unit: SimId },
+    UnitDestroyed {
+        player: PlayerId,
+        unit: SimId,
+    },
     /// The building's hit points fell to 0 or below: it was removed and its cells were freed.
     /// `lost_units` are the free units that were still waiting to leave it; they are lost with it.
     BuildingDestroyed {
@@ -224,10 +252,14 @@ pub enum SimEvent {
     /// The player of the match is defeated (M6, docs/DECISIONS.md D41): it owns no building any
     /// more, and with a rules file (RA1) no base unit either in a short game, or no unit at all
     /// in a long one.
-    PlayerDefeated { player: PlayerId },
+    PlayerDefeated {
+        player: PlayerId,
+    },
     /// At most one player of the match is left: `winner`, or `None` for a draw. The outcome is
     /// final; it is written once.
-    MatchEnded { winner: Option<PlayerId> },
+    MatchEnded {
+        winner: Option<PlayerId>,
+    },
 }
 
 /// Why an `Attack` order ended.

@@ -1,0 +1,11 @@
+    Blocking waiting for file lock on build directory
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 1m 38s
+     Running unittests src/main.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/game-fe9efcf72dfbb190)
+
+running 1 test
+test sidebar::tests::a_tab_lists_only_what_a_building_of_the_player_could_build ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 207 filtered out; finished in 8.42s
+

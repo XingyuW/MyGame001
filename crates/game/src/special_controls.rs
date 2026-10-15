@@ -22,6 +22,8 @@ struct StrategicButton(SimId);
 struct StrategicText(SimId);
 #[derive(Component)]
 struct ActionHint;
+#[derive(Component)]
+struct PublicTimers;
 /// The button that packs up the selected Construction Yard; it exists only while one is
 /// selected and the match has "MCV repacks" on.
 #[derive(Component)]
@@ -37,7 +39,7 @@ impl Plugin for SpecialControlsPlugin {
             .add_systems(Startup, spawn.after(crate::skirmish::load_catalogue))
             .add_systems(
                 Update,
-                (panel, feedback_and_effects)
+                (panel, public_timer_text, feedback_and_effects)
                     .chain()
                     .after(crate::skirmish::update_screens),
             )
@@ -51,6 +53,17 @@ impl Plugin for SpecialControlsPlugin {
     }
 }
 fn spawn(mut commands: Commands) {
+    commands.spawn((
+        PublicTimers,
+        Text::new(""),
+        TextFont::from_font_size(11.0),
+        Node {
+            position_type: PositionType::Absolute,
+            right: Val::Px(310.0),
+            top: Val::Px(36.0),
+            ..default()
+        },
+    ));
     commands.spawn((
         StrategicPanel,
         Node {
@@ -193,6 +206,26 @@ fn panel(
         }
     }
 }
+fn public_timer_text(host: Res<SimHost>, mut texts: Query<&mut Text, With<PublicTimers>>) {
+    if let Ok(mut text) = texts.single_mut() {
+        text.0 = if host.running() {
+            sim::public_timers(host.world())
+                .into_iter()
+                .map(|t| {
+                    format!(
+                        "Player {} · {:?} · {}s",
+                        t.owner.0 + 1,
+                        t.role,
+                        t.remaining.div_ceil(20)
+                    )
+                })
+                .collect::<Vec<_>>()
+                .join("\n")
+        } else {
+            String::new()
+        };
+    }
+}
 pub fn deploy_commands(selection: &Selection) -> Vec<Command> {
     selection
         .0
@@ -290,7 +323,12 @@ fn input(
         *mode = InterfaceMode::Interact;
     }
     if keys.just_pressed(KeyCode::Escape) || mouse.just_pressed(MouseButton::Right) {
-        if matches!(*mode, InterfaceMode::Interact | InterfaceMode::Strategic(_)) {
+        if matches!(
+            *mode,
+            InterfaceMode::Interact
+                | InterfaceMode::Strategic(_)
+                | InterfaceMode::ChronoDestination(..)
+        ) {
             *mode = InterfaceMode::Normal;
         }
         return;
@@ -302,7 +340,24 @@ fn input(
         return;
     };
     let issued = match *mode {
+        InterfaceMode::ChronoDestination(building, source) => sink.issue([Command::Chronoshift {
+            building,
+            source,
+            target: cell,
+        }]),
         InterfaceMode::Strategic(building) => {
+            let chrono = host.world().iter_entities().any(|e| {
+                e.get::<SimId>() == Some(&building)
+                    && e.get::<Building>().is_some_and(|b| {
+                        host.definitions()
+                            .and_then(|d| d.metadata(ProductionItem::Building(b.kind)))
+                            .is_some_and(|m| m.strategic && m.role == sim::Role::Chronosphere)
+                    })
+            });
+            if chrono {
+                *mode = InterfaceMode::ChronoDestination(building, cell);
+                return;
+            }
             sink.issue([strategic_command(building, cell, &selection)])
         }
         InterfaceMode::Interact => {
@@ -339,6 +394,28 @@ fn feedback_and_effects(
     *remaining = (*remaining - time.delta_secs()).max(0.0);
     for event in events.read() {
         match event {
+            sim::SimEvent::SuperweaponBuilt { player, role }
+            | sim::SimEvent::SuperweaponLaunched { player, role } => {
+                if let Ok(mut t) = hint.single_mut() {
+                    t.0 = format!(
+                        "Player {}: {:?} {}",
+                        player.0 + 1,
+                        role,
+                        if matches!(event, sim::SimEvent::SuperweaponBuilt { .. }) {
+                            "constructed"
+                        } else {
+                            "launched"
+                        }
+                    );
+                    *remaining = 5.0;
+                }
+            }
+            sim::SimEvent::SuperweaponReady { player, role } if *player == HUMAN => {
+                if let Ok(mut t) = hint.single_mut() {
+                    t.0 = format!("{role:?} ready");
+                    *remaining = 5.0;
+                }
+            }
             sim::SimEvent::CommandRejected { player, reason, .. } if *player == HUMAN => {
                 if let Ok(mut t) = hint.single_mut() {
                     t.0 = reason.to_string();
@@ -352,10 +429,11 @@ fn feedback_and_effects(
                 radius,
                 ..
             } if *player == HUMAN
-                || host
-                    .players()
-                    .and_then(|p| p.get(HUMAN))
-                    .is_some_and(|p| p.vision().is_visible(*target)) =>
+                || (*role != sim::Role::Nuke
+                    && host
+                        .players()
+                        .and_then(|p| p.get(HUMAN))
+                        .is_some_and(|p| p.vision().is_visible(*target))) =>
             {
                 effects.0.push((*target, *role, *radius, 3.0))
             }
@@ -381,6 +459,15 @@ fn feedback_and_effects(
     let Some(view) = view else {
         return;
     };
+    for cell in sim::nuclear_marks(host.world(), HUMAN) {
+        let center =
+            crate::projection::to_world(cell.x as f32 + 0.5, cell.y as f32 + 0.5, view.tile);
+        gizmos.circle_2d(
+            Isometry2d::from_translation(center),
+            12.0,
+            Color::srgb(1.0, 0.2, 0.2),
+        );
+    }
     for &(cell, role, radius, t) in &effects.0 {
         let center =
             crate::projection::to_world(cell.x as f32 + 0.5, cell.y as f32 + 0.5, view.tile);

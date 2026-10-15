@@ -44,6 +44,11 @@ pub enum Command {
         unit: SimId,
         target: SimId,
     },
+    Chronoshift {
+        building: SimId,
+        source: CellPos,
+        target: CellPos,
+    },
     Superweapon {
         building: SimId,
         target: CellPos,
@@ -124,6 +129,7 @@ impl Command {
             Command::Deploy { .. }
             | Command::Undeploy { .. }
             | Command::Interact { .. }
+            | Command::Chronoshift { .. }
             | Command::Superweapon { .. }
             | Command::QueueProduction { .. }
             | Command::CancelProduction { .. }
@@ -389,6 +395,7 @@ pub(crate) fn process_regular_commands(
                     match issued.command.units().and_then(|ids| {
                         ids.iter().find(|id| {
                             special.spawned.contains_key(id)
+                                || special.strategic.flights.contains_key(id)
                                 || special.erasures.contains_key(id)
                                 || (special.deployed.contains_key(id)
                                     && matches!(
@@ -520,6 +527,7 @@ fn apply_unit_command(
         Command::Deploy { .. }
         | Command::Undeploy { .. }
         | Command::Interact { .. }
+        | Command::Chronoshift { .. }
         | Command::Superweapon { .. }
         | Command::QueueProduction { .. }
         | Command::CancelProduction { .. }
@@ -893,6 +901,7 @@ pub(crate) fn process_commands(world: &mut bevy_ecs::world::World) {
             Command::Deploy { .. }
                 | Command::Undeploy { .. }
                 | Command::Interact { .. }
+                | Command::Chronoshift { .. }
                 | Command::Superweapon { .. }
         ) {
             if !world.resource::<CommandQueue>().pending.is_empty() {

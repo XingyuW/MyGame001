@@ -83,7 +83,9 @@ pub(crate) fn advance(world: &mut World) {
             continue;
         };
         let works = powered(world, &defs, a);
-        if meta.role.superweapon()
+        if a.alive()
+            && a.owner != crate::NEUTRAL
+            && meta.role.superweapon()
             && charges(world, &defs, a)
             && !world
                 .resource::<SpecialState>()
@@ -92,7 +94,16 @@ pub(crate) fn advance(world: &mut World) {
         {
             let mut s = world.resource_mut::<SpecialState>();
             let c = s.charge.entry(a.id).or_default();
+            let ready = *c < meta.cooldown && c.saturating_add(1) >= meta.cooldown;
             *c = c.saturating_add(1).min(meta.cooldown);
+            if ready && meta.strategic {
+                world
+                    .resource_mut::<Messages<SimEvent>>()
+                    .write(SimEvent::SuperweaponReady {
+                        player: a.owner,
+                        role: meta.role,
+                    });
+            }
         }
         if let ProductionItem::Unit(k) = a.item
             && let Some(u) = defs.unit(k)
@@ -186,7 +197,8 @@ pub(crate) fn advance(world: &mut World) {
                 });
         // The free repair of everything around a Service Depot (M9) is the rule of a world
         // without a rules file; with one a vehicle docks and pays (RA2, `repair_docked`).
-        let aura = (meta.role == Role::Repair && defs.rules().is_none()) || repair_ifv;
+        let aura =
+            (meta.role == Role::Repair && defs.rules().is_none()) || (repair_ifv && !meta.gunner);
         if aura && works && tick.is_multiple_of(20) {
             for u in index.values().filter(|u| {
                 u.owner == a.owner
@@ -332,4 +344,6 @@ pub(crate) fn advance(world: &mut World) {
     repair_docked(world, &defs, &index, tick);
     crate::flight::advance(world, &defs, &index, tick);
     infantry::advance(world, &defs);
+    vehicles::advance(world, &defs);
+    superweapons::advance(world, &defs);
 }

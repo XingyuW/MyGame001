@@ -339,12 +339,12 @@ fn files_of_schema_version_1_are_rejected() {
         )
     );
     assert_eq!(
-        rules_error("rules_v1", &[("schema_version: 2,", "schema_version: 1,")]),
+        rules_error("rules_v1", &[("schema_version: 3,", "schema_version: 1,")]),
         (
             "schema_version".to_owned(),
             DataErrorKind::UnsupportedSchemaVersion {
                 found: 1,
-                expected: 2
+                expected: 3
             }
         )
     );

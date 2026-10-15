@@ -77,3 +77,8 @@ Validated closure (R79): frozen `c86d33f` passes commands 1–8 and 10–13, all
 1,061 runtime tests, zero failed/ignored, including all acceptance cases above. Production
 and default-seed fresh duels each have 756 winners; complete timing tables and logs are in
 `ra6a`. Only first-part command 9 soak is deferred. This is validation, not independent review.
+
+RA6-B cross-reference (R80–R81): the immediate-command death injector is now explicitly
+`ra1_commands::ra6_trait_injected_specialists_and_transport_passengers_cannot_act_after_same_tick_death`;
+the original same-tick assertions remain. Actual shipped Curtain/Chronosphere/nuclear and IFV
+paths are covered in the [combined ledger](RA6_ACCEPTANCE.md).

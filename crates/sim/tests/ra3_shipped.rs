@@ -390,8 +390,8 @@ fn shipped_ships_follow_their_naval_targeting() {
         ("destroyer", "typhoon", 5, Some(("asw_launcher", 50))),
         // [155mm] Damage=60 through [ARTYHE]: heavy 60 %.
         ("destroyer", "sea_scorpion", 5, Some(("gun_155mm", 36))),
-        // The sonic beam keeps M9's damage of 100 until RA6; [SonicWarhead]: heavy 80 %.
-        ("dolphin", "typhoon", 3, Some(("sonic_zap", 80))),
+        // RA6 ports SonicZap Damage=4; [SonicWarhead] heavy 80% truncates to 3 per shot.
+        ("dolphin", "typhoon", 3, Some(("sonic_zap", 3))),
         // The squid grips ships ([SquidGrab] Damage=15) and punches organic targets
         // ([SquidPunch] Damage=50 through [HE]: light 70 %).
         ("giant_squid", "destroyer", 1, Some(("squid_grab", 15))),
@@ -467,6 +467,10 @@ fn strike(app: &mut App, x: i32, y: i32) {
             .any(|event| matches!(event, SimEvent::CommandRejected { .. })),
         "{events:?}"
     );
+    // RA6: retain the damage assertions after the actual 200-tick missile flight.
+    for _ in 0..200 {
+        tick(app, Vec::new());
+    }
 }
 
 #[test]

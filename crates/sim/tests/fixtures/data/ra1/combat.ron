@@ -2,23 +2,23 @@
 // buildings; shells harm everything. The Soviet miner is armed, as the War Miner is. Fixture
 // data (invariant I10).
 (
-    schema_version: 4,
+    schema_version: 5,
     armour_classes: ["flesh", "plate", "concrete"],
     warheads: [
         (id: "bullet", cell_spread: 0, percent_at_max: 100, wall: 1, wood: 1,
-            temporal: 0, mind_control: 0, psychic_damage: 0, radiation: 0, parasite: 0, ivan_bomb: 0, bomb_disarm: 0, electric_assault: 0, makes_disguise: 0, versus: [(armour: "flesh", percent: 100), (armour: "plate", percent: 20), (armour: "concrete", percent: 10)]),
+            temporal: 0, mind_control: 0, psychic_damage: 0, radiation: 0, parasite: 0, ivan_bomb: 0, bomb_disarm: 0, electric_assault: 0, paralyzes: 0, culling: 0, makes_disguise: 0, versus: [(armour: "flesh", percent: 100), (armour: "plate", percent: 20), (armour: "concrete", percent: 10)]),
         (id: "shell", cell_spread: 0, percent_at_max: 100, wall: 1, wood: 1,
-            temporal: 0, mind_control: 0, psychic_damage: 0, radiation: 0, parasite: 0, ivan_bomb: 0, bomb_disarm: 0, electric_assault: 0, makes_disguise: 0, versus: [(armour: "flesh", percent: 50), (armour: "plate", percent: 100), (armour: "concrete", percent: 100)]),
+            temporal: 0, mind_control: 0, psychic_damage: 0, radiation: 0, parasite: 0, ivan_bomb: 0, bomb_disarm: 0, electric_assault: 0, paralyzes: 0, culling: 0, makes_disguise: 0, versus: [(armour: "flesh", percent: 50), (armour: "plate", percent: 100), (armour: "concrete", percent: 100)]),
     ],
     weapons: [
         (id: "rifle", damage: 10, range: 1024, reload: 10, warhead: "bullet", projectile_speed: 0, min_range: 0, burst: 1, anti_air: 1, anti_ground: 1, scatter: 0,
-            rad_level: 0, area_fire: 0, naval_only: 0, suicide: 0),
+            rad_level: 0, area_fire: 0, naval_only: 0, sonic: 0, repair: 0, suicide: 0),
         (id: "long_rifle", damage: 60, range: 2048, reload: 40, warhead: "bullet", projectile_speed: 0, min_range: 0, burst: 1, anti_air: 1, anti_ground: 1, scatter: 0,
-            rad_level: 0, area_fire: 0, naval_only: 0, suicide: 0),
+            rad_level: 0, area_fire: 0, naval_only: 0, sonic: 0, repair: 0, suicide: 0),
         (id: "cannon", damage: 40, range: 1280, reload: 25, warhead: "shell", projectile_speed: 0, min_range: 0, burst: 1, anti_air: 1, anti_ground: 1, scatter: 0,
-            rad_level: 0, area_fire: 0, naval_only: 0, suicide: 0),
+            rad_level: 0, area_fire: 0, naval_only: 0, sonic: 0, repair: 0, suicide: 0),
         (id: "big_cannon", damage: 60, range: 1280, reload: 30, warhead: "shell", projectile_speed: 0, min_range: 0, burst: 1, anti_air: 1, anti_ground: 1, scatter: 0,
-            rad_level: 0, area_fire: 0, naval_only: 0, suicide: 0),
+            rad_level: 0, area_fire: 0, naval_only: 0, sonic: 0, repair: 0, suicide: 0),
     ],
     units: [
         (unit: "allied_mcv", hit_points: 600, armour: "plate", sight: 6, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 5, underwater: 0, organic: 0),

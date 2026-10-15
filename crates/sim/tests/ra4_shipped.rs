@@ -1059,7 +1059,17 @@ fn the_chronosphere_does_not_move_a_launched_rocket() {
         [(rocket, SubPos::centre_of(CellPos::new(20, 10)))]
     );
     assert_eq!(hp(&mut app, target), Some(10_000 - 140));
-    let events = tick(&mut app, vec![send(vec![own])]);
+    let events = tick(
+        &mut app,
+        vec![IssuedCommand {
+            player: P0,
+            command: Command::Chronoshift {
+                building: sphere,
+                source: CellPos::new(12, 14),
+                target: CellPos::new(16, 14),
+            },
+        }],
+    );
     assert!(rejections(&events).is_empty(), "{events:?}");
     assert_ne!(mobile(&mut app, own).cell, CellPos::new(12, 14));
 }

@@ -510,6 +510,7 @@ pub fn mode_text(mode: InterfaceMode, paused: bool, definitions: Option<&Definit
             "Interact: click a structure, a friendly transport,\nor your depot with a damaged vehicle. Esc cancels."
                 .into()
         }
+        InterfaceMode::ChronoDestination(..) => "Chronosphere: choose a visible destination for the 3 x 3 source area. Esc cancels.".into(),
         InterfaceMode::Strategic(_) => {
             "Strategic ability: click a visible target. Esc cancels.".into()
         }
@@ -2176,7 +2177,7 @@ mod tests {
                 matches!(item, ProductionItem::Building(_))
                     && defs
                         .metadata(item)
-                        .is_some_and(|entry| entry.role.superweapon())
+                        .is_some_and(|entry| entry.role.major_superweapon())
             })
             .collect();
         assert!(superweapons.len() >= 4, "{superweapons:?}");

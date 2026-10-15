@@ -150,6 +150,7 @@ impl Plugin for SimPlugin {
             (
                 crate::bridges::collapse,
                 crate::garrison::cleanup,
+                crate::special::vehicles::cleanup,
                 crate::veterancy::award,
                 remove_dead,
                 crate::crew::escape,

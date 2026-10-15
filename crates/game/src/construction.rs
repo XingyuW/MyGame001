@@ -73,6 +73,7 @@ pub enum InterfaceMode {
     Normal,
     Interact,
     Strategic(SimId),
+    ChronoDestination(SimId, sim::CellPos),
     /// Place the ready building of this type.
     Place(BuildingKind),
     /// Sell the player's building under the cursor.
@@ -309,9 +310,10 @@ pub fn mode_click(
     context: &ClickContext,
 ) -> (Vec<Command>, InterfaceMode) {
     match mode {
-        InterfaceMode::Normal | InterfaceMode::Interact | InterfaceMode::Strategic(_) => {
-            (Vec::new(), mode)
-        }
+        InterfaceMode::Normal
+        | InterfaceMode::Interact
+        | InterfaceMode::Strategic(_)
+        | InterfaceMode::ChronoDestination(..) => (Vec::new(), mode),
         InterfaceMode::Place(kind) => match context.placement {
             Some(Ok(_)) => match place_command(Some(kind), hovered, context.definitions) {
                 Some(command) => (vec![command], InterfaceMode::Normal),
@@ -868,7 +870,7 @@ mod tests {
                 Command::Deploy { .. } => "Deploy",
                 Command::Undeploy { .. } => "Undeploy",
                 Command::Interact { .. } => "Interact",
-                Command::Superweapon { .. } => "Superweapon",
+                Command::Superweapon { .. } | Command::Chronoshift { .. } => "Superweapon",
                 Command::Move { .. } => "Move",
                 Command::Stop { .. } => "Stop",
                 Command::Harvest { .. } => "Harvest",

@@ -582,7 +582,18 @@ fn naming(id: SimId, [tank, engineer]: [SimId; 2]) -> Vec<(IssuedCommand, Reject
             ),
             RejectReason::UnknownTarget(id),
         ),
-        (fire(P0, id, (3, 3)), unit),
+        (fire(P0, id, (3, 3)), unit.clone()),
+        (
+            issue(
+                P0,
+                Command::Chronoshift {
+                    building: id,
+                    source: cell,
+                    target: cell,
+                },
+            ),
+            unit,
+        ),
         (
             issue(P0, Command::Undeploy { building: id }),
             building.clone(),
@@ -685,6 +696,7 @@ fn a_seen_enemy_is_reported_as_not_owned() {
         "interact as",
         "interact with",
         "superweapon",
+        "chronoshift",
         "undeploy",
         "sell",
         "repair",
@@ -703,6 +715,7 @@ fn a_seen_enemy_is_reported_as_not_owned() {
         "deploy",
         "interact as",
         "superweapon",
+        "chronoshift",
     ] {
         assert_eq!(by_name(&told, name), not_owned(near_unit), "{name}");
     }
@@ -719,6 +732,7 @@ fn a_seen_enemy_is_reported_as_not_owned() {
         "deploy",
         "interact as",
         "superweapon",
+        "chronoshift",
         "undeploy",
         "sell",
         "repair",
@@ -800,10 +814,52 @@ fn every_command_answers_for_a_submerged_enemy_as_for_an_id_that_names_nothing()
 /// A world of 48 x 48 open cells with the shipped data (`assets/data`) and the players P0
 /// (Great Britain) and P1 (Russia), who are enemies.
 fn shipped_world() -> App {
+    command_world(false)
+}
+fn immediate_death_fixture() -> App {
+    command_world(true)
+}
+fn command_world(inject_death: bool) -> App {
     let definitions = sim::load_ruleset(
         std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets/data"),
     )
     .unwrap_or_else(|error| panic!("{error}"));
+    let definitions = if inject_death {
+        // Preserve the immediate-command damage injector used by these regression tests.
+        // The full shipped delayed launch and repair weapon have separate RA6 acceptance tests.
+        let root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets/data");
+        let source = std::fs::read_to_string(root.join("arsenal.ron")).unwrap();
+        let source = source
+            .lines()
+            .map(|line| {
+                if line.contains(r#"id: "nuclear_silo""#) {
+                    line.replace("strategic: 1", "strategic: 0")
+                } else if line.contains(r#"id: "ifv""#) {
+                    let line = line.replace("gunner: 1", "gunner: 0");
+                    let start = line.find("ifv_weapons: [").unwrap();
+                    let end = start + line[start..].find(']').unwrap();
+                    format!("{}ifv_weapons: []{}", &line[..start], &line[end + 1..])
+                } else {
+                    line.to_owned()
+                }
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
+        let dir =
+            std::path::PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join("ra6-command-injector");
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join(format!(
+            "{}-{:?}.ron",
+            std::process::id(),
+            std::thread::current().id()
+        ));
+        std::fs::write(&path, source).unwrap();
+        let loaded = definitions.with_arsenal(&path).unwrap();
+        std::fs::remove_file(path).unwrap();
+        loaded
+    } else {
+        definitions
+    };
     let mut app = App::new();
     app.add_plugins(sim::SimPlugin { seed: 11 });
     let cell = sim::Cell {
@@ -854,7 +910,7 @@ fn charged(app: &mut App, owner: PlayerId, id: &str, x: i32, y: i32) -> SimId {
 /// ground zero; the strike is issued in a tick in which the IFV repairs. Returns the Grizzly's
 /// hit points after that tick.
 fn strike_beside_a_repair_ifv(hit_points: i32) -> Option<i32> {
-    let mut app = shipped_world();
+    let mut app = immediate_death_fixture();
     let silo = charged(&mut app, P1, "nuclear_silo", 1, 1);
     spawn(&mut app, P1, "engineer", 33, 30);
     let grizzly = spawn(&mut app, P0, "grizzly", 30, 20);
@@ -948,7 +1004,17 @@ fn the_chronosphere_answers_for_an_unseen_enemy_vehicle_as_for_an_id_that_names_
         ]
     );
     // Positive: the player's own vehicle alone goes.
-    let events = tick(&mut app, vec![send(vec![own])]);
+    let events = tick(
+        &mut app,
+        vec![issue(
+            P0,
+            Command::Chronoshift {
+                building: sphere,
+                source: CellPos::new(6, 9),
+                target: CellPos::new(10, 12),
+            },
+        )],
+    );
     assert!(rejections(&events).is_empty(), "{events:?}");
     assert_ne!(mobile(&mut app, own).cell, CellPos::new(6, 9));
 }
@@ -1036,7 +1102,7 @@ fn ra5_same_tick_dead_actors_cannot_capture_repair_enter_hospital_or_occupy() {
         ("hospital", "gi"),
         ("civilian_house", "gi"),
     ] {
-        let mut app = shipped_world();
+        let mut app = immediate_death_fixture();
         let silo = charged(&mut app, P1, "nuclear_silo", 1, 1);
         spawn(&mut app, P1, "engineer", 24, 20);
         let target = if target_type == "civilian_house" {
@@ -1150,7 +1216,7 @@ fn ra5_unseen_neutral_tech_and_enemy_garrison_ids_answer_exactly_as_missing_targ
 
 #[test]
 fn ra5_garrison_destroyed_earlier_in_the_command_tick_cannot_deploy() {
-    let mut app = shipped_world();
+    let mut app = immediate_death_fixture();
     let silo = charged(&mut app, P1, "nuclear_silo", 1, 1);
     spawn(&mut app, P1, "engineer", 24, 20);
     let house = ra5_house(&mut app, CellPos::new(20, 20));
@@ -1243,7 +1309,7 @@ fn ra6_shipped_interaction_targets_hidden_unseen_and_missing_have_identical_answ
 }
 
 #[test]
-fn ra6_shipped_specialists_and_transport_passengers_cannot_act_after_same_tick_death() {
+fn ra6_trait_injected_specialists_and_transport_passengers_cannot_act_after_same_tick_death() {
     for actor_type in [
         "gi",
         "spy",
@@ -1256,7 +1322,7 @@ fn ra6_shipped_specialists_and_transport_passengers_cannot_act_after_same_tick_d
         "desolator",
         "terrorist",
     ] {
-        let mut app = shipped_world();
+        let mut app = immediate_death_fixture();
         let silo = charged(&mut app, P1, "nuclear_silo", 1, 1);
         place(&mut app, P1, "power_plant", 24, 20);
         let transport = spawn(&mut app, P0, "amphibious_transport", 21, 20);

@@ -38,7 +38,17 @@ pub(super) fn repair_docked(
             {
                 return None;
             }
-            if a.hp >= max {
+            if world.resource::<SpecialState>().erasures.contains_key(&id) {
+                return Some(());
+            }
+            let off = world
+                .resource::<SpecialState>()
+                .disabled
+                .contains_key(&building);
+            if !off {
+                vehicles::free(world, defs, id, true);
+            }
+            if a.hp >= max && !world.resource::<SpecialState>().parasites.contains_key(&id) {
                 // Whole: it makes room for the next vehicle.
                 let dest = {
                     let g = world.resource::<Grid>();
@@ -56,10 +66,6 @@ pub(super) fn repair_docked(
                 }
                 return None;
             }
-            let off = world
-                .resource::<SpecialState>()
-                .disabled
-                .contains_key(&building);
             if step_now && !off {
                 let price = defs.production(a.item).map_or(0, |terms| terms.cost);
                 let mut players = world.resource_mut::<Players>();

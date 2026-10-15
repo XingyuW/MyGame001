@@ -418,6 +418,32 @@ pub(crate) fn award(world: &mut World) {
             .copied()
             .unwrap_or(kill.killer);
         let Some((entity, owner, kind)) = trainee(world, killer) else {
+            // A blocked parasite escape retains its identity and earned experience off-map.
+            let pending = world
+                .resource::<crate::SpecialState>()
+                .parasites
+                .iter()
+                .find(|(_, p)| p.passenger.id == killer)
+                .map(|(host, p)| (*host, p.owner, p.passenger.kind));
+            if let Some((host, owner, kind)) = pending
+                && definitions.trainable(kind)
+                && world
+                    .resource::<Players>()
+                    .hostile(owner, kill.victim_owner)
+            {
+                let mut state = world.resource_mut::<crate::SpecialState>();
+                if let Some(p) = state.parasites.get_mut(&host) {
+                    let xp = p.passenger.experience.get_or_insert_default();
+                    xp.value = xp.value.saturating_add(kill.cost.max(0));
+                    let rank = rank_of(
+                        xp.value,
+                        worth(&definitions, ProductionItem::Unit(kind)),
+                        rules.veteran_ratio_pm,
+                        rules.veteran_cap,
+                    );
+                    rank_terms(&definitions, kind, rank, xp);
+                }
+            }
             continue;
         };
         if !world
