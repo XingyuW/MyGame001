@@ -5508,3 +5508,26 @@ required AiPlayers resource rather than leaving an empty one; before3 selected10
 the yard footprint, so ordinary Move correctly stopped adjacent. Only before4 reaches and
 fails the actual artillery assertion. All27 RA8 scenarios pass in `final-capabilities1`;
 the final boundary batch and default-path evidence cover the final source separately.
+
+### R101. RA8 frozen milestone checkpoint before the full gate
+
+**2026-10-15. Validated preflight, not independently reviewed.** Feature commit `bb1f87e` and
+separate measured performance commit `81149b6` freeze the runtime/data/fixtures. Final serial
+preflight passes236 tests across14 targets; full-tree static inventory1124→1162 has38 added,
+zero removed/renamed and zero ignore attributes. Intended fixture migrations remain R94/R96.
+Clippy/all-targets, formatting, generated data and4934-row reference checks pass. The final
+5000-tick profile retains state94f4c6583a68ff22 and660-event digestacbe6072fabd5e3a.
+
+Final unsampled ten-player256 means are0.749938/0.619921/0.605007ms (Liberty/Continental/Pacific),
+all below5ms. Full normal-default m13all exits0 with21/21 explicit winners and all ten players
+building on every map: median54329/p90 nearest-rank106700/max260363 ticks, unchanged400000
+limit. Total measured822.836s/elapsed822.946s. No Super Me/unlock path is used. The two756-match
+R29 ratio comparisons and all thirteen frozen commands remain required, not claimed complete.
+
+Root explicitly holds the long gate for milestone checks of committed artifacts; no validator
+is active. `RA8_ACCEPTANCE.md` and `ra8-preflight/checkpoint.json` map exact evidence/assumptions.
+RA9 retains R83 transport/loaded-boarding/Squid shot, R96 actorless Prop specialist boundaries,
+R97 queued casualty intent and R99's unproven bombable capability lead. Visual/audio/play feel
+and independent final review remain. No clone/worktree/environment was created. New parser
+scratch under configured Cargo target `tmp/ra8_definitions` is708KiB, recreatable and retained
+for reruns; configured Cargo/UV/PIP caches and prior render/evidence directories are preserved.
