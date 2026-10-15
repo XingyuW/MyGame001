@@ -4567,3 +4567,51 @@ Final small-target preflight after the fix passes all selected simulation and cl
 healthy heavy AI/production sweeps were excluded only from this preflight; the fresh frozen
 gate runs the entire workspace again. `final-small-sim.log`, `final-small-game.log` and
 `trait-opt-in-fixed.log` preserve the results alongside the failed outputs.
+
+
+### R79. RA6-A validated closure and RA6-B handoff
+
+**2026-10-14.** Frozen source `c86d33f` passes all twelve required commands: 1–8 and
+10–13, each exit 0, using `validate_ra2_parity.sh ra6a 1 8` then `ra6a 10 13` with both
+`RA2_DUEL_SEED` and `RA2_DUEL_PAIR` unset. Only command 9 soak is deferred, as explicitly
+permitted for the first RA6 part; the complete soak remains required in the continuation.
+The workspace run passes **1,061 runtime tests, zero failures, zero ignored** (1,055 static
+`#[test]` declarations). The final small-target preflight also passed 56 sim targets / 788
+tests and nine game targets / 247 tests. No tests were deleted, skipped or weakened; R72,
+R77 and R78 name intended schema/audit/rejection migrations. Failed attempts 1–3 and
+preflight/mutation evidence are preserved. No independent review is claimed.
+
+Both production and fresh default-seed sweeps have **756/756 winners**. Production takes
+4,840.53 seconds; its unchanged `72000 * max(width + height,128) / 128` budget ratios are
+median **0.1323229167**, nearest-rank p90 **0.3186944444**, maximum **0.7095694444**.
+Fresh duels take 4,625 seconds; against that same production budget, ratios are median
+**0.1390937500**, p90 **0.3121031746**, maximum **0.8229027778** (Demo, America easy versus
+Korea easy, 59,249/72,000 ticks). Their slowest absolute finish is 221,221 ticks. The
+example's independent 300,000-tick diagnostic ceiling is unchanged and is not the ratio
+denominator. Both complete timing TSVs and logs are in `validation/ra2-parity/ra6a`.
+
+Workspace testing took 6,089 seconds versus RA5's recorded 5,579; fresh duels took 4,625
+versus 19,122. These are observed wall times, not a controlled performance comparison or
+causal claim. The shipped benchmark remains within its unchanged budgets: mean 0.268 ms,
+longest 1.674 ms, peak heap 1.3 MiB. Release/debug 600-tick smokes, macOS package, generated
+data and all 4,934 reference rows pass. No tick limits changed.
+
+The acceptance ledger covers GI, Engineer defuse (including due tick), Dog, Spy disguise
+and every infiltration effect, all four stolen units/limits, Tanya C4/naval/swimming/hut
+behavior, Temporal release/multiple firers/chrono delay, Tesla thresholds, Ivan normal/elite,
+Yuri ownership release/immunity/PsiWave, Desolator and radiation overlap/decay/edge/zero,
+Terrorist death weapons, shipped transports, command visibility/dead-actor guards and hashing.
+The pure-move prerequisite and its 38-body/28-legacy-test proof remain R71. RA6-B extends
+`special::infantry::finish_deaths` and `special::radiation::add` for vehicle/building payloads,
+and completes IFV modes, structures, superweapons, crashes/cargo loss and paradrops. Veteran
+infiltration belongs only to paid production. Preserve RA5 bridge/AI fixes and R67's
+ship-blocked bridge repair assumption. R76's first-spawn concealment path is an unproven
+RA7 risk requiring a reproduction test, not a demonstrated defect. The wider RA7–RA9 debts
+and independent review remain open. Explicit R72/R73 assumptions and user visual/audio/play
+verification remain; validation does not substitute for that verification.
+
+**Process deviation:** `c86d33f` omitted the mandatory `RA6:` commit-subject prefix. Its coherent
+content is preserved without amendment/rewrite; this closure and subsequent RA6 commits use
+the prefix. No new substantial external directory, clone or worktree was created. The
+configured Cargo target (including package outputs) was reused and remains needed for
+validation/package evidence; UV/PIP caches and RA5's render directory were preserved.

@@ -71,3 +71,9 @@ R77 records the two exact missing-infiltration denial migrations in `ra1_shipped
 R78 preserves unchanged RA3 damage/RA5 refinery fixture behavior through explicit trait
 opt-in and names the two schema/audit migrations; shipped specialist tests run alongside
 those compatibility regressions. Failed preflight outputs remain available.
+
+
+Validated closure (R79): frozen `c86d33f` passes commands 1–8 and 10–13, all exit 0;
+1,061 runtime tests, zero failed/ignored, including all acceptance cases above. Production
+and default-seed fresh duels each have 756 winners; complete timing tables and logs are in
+`ra6a`. Only first-part command 9 soak is deferred. This is validation, not independent review.

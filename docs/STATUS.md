@@ -1161,8 +1161,8 @@ worktree was deleted.
 
 ## RA6-A infantry and radiation implementation (2026-10-14)
 
-**Implementation complete; full validation pending. Not independently reviewed.** Decisions
-R71–R78 record the pure-code-move prerequisite, schemas, bounded loader migrations, mechanics
+**RA6-A validated; not independently reviewed.** Decisions
+R71–R79 record the pure-code-move prerequisite, schemas, bounded loader migrations, mechanics
 and explicit assumptions. The exact shipped acceptance matrix is
 [RA6-A acceptance ledger](validation/ra2-parity/RA6A_ACCEPTANCE.md).
 
@@ -1177,8 +1177,14 @@ Arsenal7 is148,986 bytes; the deliberate192 KiB preparse bound has exact-limit a
 coverage. Combat4 and every legacy/RA1–RA5 fixture migrated; generated data derives only from
 the committed tables. Every new ported field is included in the complete reference audit.
 Two cheap radiation mutations were detected; failed/preliminary logs remain in
-`validation/ra2-parity/ra6a-preflight`. Full gate commands1–8 and10–13 will run on frozen source;
-command9 soak is deferred only for this first RA6 part.
+`validation/ra2-parity/ra6a-preflight`. Frozen `c86d33f` passes all gate commands 1–8 and 10–13 (twelve exit 0):
+1,061 runtime tests, zero failures/ignored; 1,055 static tests; production and fresh default-seed
+duels each 756/756 winners; release/debug smokes, benchmark, packaging and regeneration pass.
+Production budget ratios median/p90/max: 0.1323229167 / 0.3186944444 / 0.7095694444;
+fresh-duel ratios against that same budget: 0.1390937500 / 0.3121031746 / 0.8229027778.
+Logs/timing tables are in `validation/ra2-parity/ra6a`; R79 records exact timings, benchmark,
+prior failures and the commit-prefix deviation. Command 9 soak is deferred only for this first
+RA6 part and remains required later.
 
 **RA6-B handoff/debt.** Extend `special::infantry::finish_deaths` for vehicle/building payloads
 and `special::radiation::add` for source-bearing radiation; finish vehicles, IFV modes,
