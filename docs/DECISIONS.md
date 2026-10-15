@@ -5205,3 +5205,20 @@ source unchanged. The serial parser/schema/hash/data-audit preflight passes all 
 targets. Its initial compile failure used a nonexistent helper name in the new test; that log
 is preserved, and the corrected invocation completes. No runtime rule, fixture, assertion,
 match limit or generated file changes in this optimization.
+
+### R90. RA8 separate site geometry from production readiness
+
+**2026-10-15.** A naval controller must establish that a coastal site is legal before
+queueing a shipyard. The existing placement preview also requires a finished queue head,
+which made that planning circular. Extract its unchanged geometry into the crate-private
+`check_placement_site`: visibility is checked before footprint contents, then the same
+water, occupancy, footprint, owned base-anchor and adjacency rules apply. Public
+`check_placement` and actual `PlaceBuilding` retain their original readiness check and
+`NotReady` result before calling the extracted helper.
+
+`ra8_legal_site_can_be_inspected_without_consuming_or_bypassing_a_ready_item` checks a
+legal pre-production site, unchanged player state on rejection and the same site's
+success with a finished item. The schedule-level
+`ra8_place_without_a_completed_item_rejects_without_state_mutation` issues the actual
+command and compares its entire resulting simulation hash with an empty-command twin.
+Both pass; their raw logs are retained. This extraction changes no command behavior.

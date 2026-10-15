@@ -420,6 +420,23 @@ pub fn check_placement(
     if !ready {
         return Err(RejectReason::NotReady(building));
     }
+    check_placement_site(grid, definitions, state, owned, building, origin)
+}
+
+/// The shared site rules without requiring a completed queue item. AI navy planning asks
+/// whether a legal coastal site exists before committing its production lane to a shipyard.
+pub(crate) fn check_placement_site(
+    grid: &Grid,
+    definitions: &Definitions,
+    state: &PlayerState,
+    owned: impl Iterator<Item = (BuildingKind, Footprint)>,
+    building: BuildingKind,
+    origin: CellPos,
+) -> Result<Footprint, RejectReason> {
+    let item = ProductionItem::Building(building);
+    let def = definitions
+        .building(building)
+        .ok_or(RejectReason::UnknownItem(item))?;
     let footprint = Footprint {
         origin,
         width: def.width,
@@ -438,6 +455,94 @@ pub fn check_placement(
     check_distance(footprint, anchors, placement_reach(definitions, building))
         .map_err(RejectReason::Placement)?;
     Ok(footprint)
+}
+
+#[cfg(test)]
+mod ra8_site_tests {
+    use super::*;
+
+    #[test]
+    fn ra8_legal_site_can_be_inspected_without_consuming_or_bypassing_a_ready_item() {
+        let path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets/data");
+        let definitions = crate::load_ruleset(path).expect("shipped rules");
+        let grid = Grid::from_cells(
+            32,
+            32,
+            vec![
+                crate::Cell {
+                    passable: true,
+                    water: false,
+                    buildable: true,
+                    ore: 0,
+                };
+                32 * 32
+            ],
+        )
+        .expect("grid");
+        let mut state = PlayerState::default();
+        state
+            .vision
+            .reveal_for_test(&grid, crate::CellPos::new(10, 10), 20);
+        let yard = definitions
+            .building_kind("construction_yard")
+            .expect("yard");
+        let power = definitions.building_kind("power_plant").expect("power");
+        let def = definitions.building(yard).expect("yard definition");
+        let anchor = (
+            yard,
+            Footprint {
+                origin: crate::CellPos::new(10, 10),
+                width: def.width,
+                height: def.height,
+            },
+        );
+        let origin = crate::CellPos::new(7, 10);
+        let before = state.clone();
+        assert!(
+            check_placement_site(
+                &grid,
+                &definitions,
+                &state,
+                [anchor].into_iter(),
+                power,
+                origin
+            )
+            .is_ok()
+        );
+        assert_eq!(
+            check_placement(
+                &grid,
+                &definitions,
+                &state,
+                [anchor].into_iter(),
+                power,
+                origin
+            ),
+            Err(RejectReason::NotReady(power))
+        );
+        assert_eq!(state, before);
+        let item = ProductionItem::Building(power);
+        let mut ready = crate::QueueItem::new(item);
+        ready.progress = definitions
+            .building(power)
+            .expect("power definition")
+            .production
+            .build_time;
+        state
+            .queues
+            .insert(definitions.queue_of(item).expect("lane"), vec![ready]);
+        assert!(
+            check_placement(
+                &grid,
+                &definitions,
+                &state,
+                [anchor].into_iter(),
+                power,
+                origin
+            )
+            .is_ok()
+        );
+    }
 }
 
 /// How far (cells, Chebyshev distance between nearest cells) a naval shipyard may lie from one of
