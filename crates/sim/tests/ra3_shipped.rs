@@ -573,7 +573,7 @@ fn the_armies_of_the_shipped_plans_can_destroy_every_shipped_building() {
     let definitions = shipped();
     let ai = load_ai(assets().join("data/ai.ron"), &definitions)
         .unwrap_or_else(|error| panic!("{error}"));
-    assert_eq!(ai.plans.len(), 2);
+    assert_eq!(ai.plans.len(), 11);
     // By hand for one pairing the check rests on: the Grizzly's shell ([AP], Wall=yes) against
     // the concrete of a wall, 60 %, and the GI's bullet ([SA], no Wall): nothing.
     let grizzly = definitions

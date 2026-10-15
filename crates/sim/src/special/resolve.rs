@@ -181,6 +181,14 @@ pub(crate) fn resolve(world: &mut World) {
             let percent = defs.rules().map_or(25, |rules| {
                 i64::from(rules.economy.purifier_bonus_percent.max(0))
             });
+            // Both kinds add the same source share of the original delivery. Neither bonus
+            // multiplies the other, and OreDelivered continues to carry the base amount.
+            let purifiers = purifiers.saturating_add(
+                world
+                    .resource::<Players>()
+                    .get(player)
+                    .map_or(0, |p| p.ai_virtual_purifiers() as usize),
+            );
             let bonus = credits
                 .max(0)
                 .saturating_mul(percent)

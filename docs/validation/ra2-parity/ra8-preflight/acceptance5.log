@@ -1,0 +1,25 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 17.36s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 14 tests
+test ra8_every_country_has_obtainable_full_tech_national_and_conditional_lists ... ok
+test ra8_near_base_occupier_enters_a_real_civilian_garrison ... ok
+test ra8_raw_spy_spawn_with_empty_queue_is_concealed_before_actual_ai_thinks ... ok
+test ra8_building_and_depot_repairs_use_paid_production_paths ... ok
+test ra8_strategic_strikes_weight_known_clusters_and_do_not_target_unseen_bases ... ok
+test ra8_an_actual_loss_to_an_unseen_mirage_requests_a_detector ... ok
+test ra8_difficulty_start_credit_build_and_reload_use_real_house_rules ... ok
+test ra8_engineer_is_produced_and_captures_seen_tech_through_ordinary_commands ... ok
+test ra8_special_weapon_rof_scales_psi_eruption_parasite_repair_and_occupation_only ... ok
+test ra8_virtual_and_physical_purifiers_add_independent_shares_of_base_delivery ... ok
+test ra8_air_observation_reserves_then_trains_an_anti_air_unit ... ok
+test ra8_medium_country_defence_counts_national_and_later_army_tiers_are_produced ... ok
+great_britain, SW=true: {"airforce_command": 1, "barracks": 1, "chronosphere": 1, "construction_yard": 1, "gap_generator": 1, "ore_purifier": 1, "pillbox": 7, "power_plant": 10, "prism_tower": 7, "refinery": 2, "service_depot": 1, "spy_satellite": 1, "tech_center": 1, "war_factory": 2, "weather_control": 1}, major=true, para=false
+iraq, SW=true: {"cloning_vats": 1, "iron_curtain": 1, "nuclear_reactor": 1, "nuclear_silo": 1, "psychic_sensor": 1, "radar_tower": 1, "sentry_gun": 7, "soviet_barracks": 1, "soviet_battle_lab": 1, "soviet_construction_yard": 1, "soviet_refinery": 2, "soviet_service_depot": 1, "soviet_war_factory": 2, "tesla_coil": 7, "tesla_reactor": 2}, major=true, para=false
+test ra8_navy_requires_reachable_placement_water_and_an_enemy_hurtable_from_that_sea ... ok
+america, SW=false: {"american_airforce_command": 1, "barracks": 1, "construction_yard": 1, "gap_generator": 1, "ore_purifier": 1, "power_plant": 4, "refinery": 2, "service_depot": 1, "spy_satellite": 1, "tech_center": 1, "war_factory": 2}, major=false, para=true
+test ra8_full_tree_builds_and_fires_strategic_weapons_and_off_keeps_american_paradrop ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 20.23s
+

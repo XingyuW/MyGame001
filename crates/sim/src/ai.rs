@@ -58,14 +58,14 @@ use bevy_ecs::resource::Resource;
 use bevy_ecs::system::{Query, Res, ResMut};
 
 use crate::ai_defs::{AiDefinitions, AiPlan, Difficulty};
-use crate::arsenal::Role;
+use crate::arsenal::{Domain, Role};
 use crate::building::{Building, Footprint, Producer};
-use crate::combat::{Sight, Weapon};
+use crate::combat::{Health, Sight, Weapon};
 use crate::command::{Command, CommandQueue, IssuedCommand, PlayerId};
 use crate::definitions::{Definitions, UnitKind};
 use crate::economy::{Lane, PlayerState, Players, QueueKey};
 use crate::economy_commands::{
-    check_buildable, check_placement, extends_base, placement_reach, produces,
+    check_buildable, check_placement_site, extends_base, placement_reach, produces,
 };
 use crate::economy_defs::{BuildingKind, ProductionItem};
 use crate::harvest::{HarvestState, Harvester};
@@ -77,6 +77,8 @@ use crate::pathfinding::octile_distance;
 use crate::schedule::SimTick;
 use crate::unit::{Mobile, Orders, Owner, Unit};
 use crate::visibility::Vision;
+
+mod strategy;
 
 /// Items a computer player keeps queued per producing building type of units.
 pub const AI_UNIT_QUEUE: usize = 2;
@@ -122,6 +124,7 @@ const PRODUCER_GAP: u32 = 3;
 pub struct KnownBuilding {
     pub owner: PlayerId,
     pub footprint: Footprint,
+    pub kind: BuildingKind,
 }
 
 /// A cell an attack wave sweeps, and when the computer player last saw it (the tick index plus
@@ -182,6 +185,14 @@ pub struct AiController {
     stalled: (u64, u64),
     /// Whether it is selling its buildings in its last stand.
     last_stand: bool,
+    next_wave: u64,
+    seen_air: bool,
+    unseen_loss: bool,
+    observed_units: BTreeMap<SimId, CellPos>,
+    reserved: BTreeSet<SimId>,
+    naval_goal: Option<CellPos>,
+    naval_site: Option<CellPos>,
+    next_naval_scan: u64,
 }
 
 /// Width + height of the largest map on which a difficulty's army applies unscaled.
@@ -227,7 +238,14 @@ impl AiController {
         enemy_starts: Vec<CellPos>,
         yard: Option<Footprint>,
     ) -> Option<Self> {
-        let difficulty = scaled_for_map(difficulty, grid);
+        let mut difficulty = scaled_for_map(difficulty, grid);
+        if plan.rules_difficulty
+            && let Some(rule) = definitions
+                .rules()
+                .and_then(|r| r.difficulties.iter().find(|r| r.id == difficulty.id))
+        {
+            difficulty.first_wave = rule.team_delay.unsigned_abs();
+        }
         let (width, height) = (grid_side(grid.width()), grid_side(grid.height()));
         // In `i64`, so that no start position overflows (invariant I12).
         let centre = (i64::from(width / 2), i64::from(height / 2));
@@ -311,6 +329,14 @@ impl AiController {
             waves_sent: 0,
             stalled: (0, 0),
             last_stand: false,
+            next_wave: 0,
+            seen_air: false,
+            unseen_loss: false,
+            observed_units: BTreeMap::new(),
+            reserved: BTreeSet::new(),
+            naval_goal: None,
+            naval_site: None,
+            next_naval_scan: 0,
             difficulty,
         })
     }
@@ -352,6 +378,16 @@ impl AiController {
         self.target
     }
 
+    pub fn observed_aircraft(&self) -> bool {
+        self.seen_air
+    }
+    pub fn needs_detector(&self) -> bool {
+        self.unseen_loss
+    }
+    pub fn naval_target(&self) -> Option<CellPos> {
+        self.naval_goal
+    }
+
     /// Commands it has pushed into the command queue so far.
     pub fn commands_issued(&self) -> u64 {
         self.issued
@@ -372,6 +408,7 @@ impl AiController {
         for (id, known) in &self.known {
             hasher.write_u32(id.0);
             hasher.write(&[known.owner.0]);
+            hasher.write(&known.kind.0.to_le_bytes());
             write_cell(hasher, known.footprint.origin);
             hasher.write(&[known.footprint.width, known.footprint.height]);
         }
@@ -427,6 +464,32 @@ impl AiController {
         hasher.write_u64(self.stalled.0);
         hasher.write_u64(self.stalled.1);
         hasher.write(&[u8::from(self.last_stand)]);
+        hasher.write(&[u8::from(self.seen_air), u8::from(self.unseen_loss)]);
+        hasher.write_u64(self.next_wave);
+        hasher.write_u64(self.next_naval_scan);
+        hasher.write_u64(self.observed_units.len() as u64);
+        for (id, cell) in &self.observed_units {
+            hasher.write_u32(id.0);
+            write_cell(hasher, *cell);
+        }
+        hasher.write_u64(self.reserved.len() as u64);
+        for id in &self.reserved {
+            hasher.write_u32(id.0);
+        }
+        match self.naval_goal {
+            None => hasher.write(&[0]),
+            Some(cell) => {
+                hasher.write(&[1]);
+                write_cell(hasher, cell);
+            }
+        }
+        match self.naval_site {
+            None => hasher.write(&[0]),
+            Some(cell) => {
+                hasher.write(&[1]);
+                write_cell(hasher, cell);
+            }
+        }
     }
 }
 
@@ -513,11 +576,11 @@ pub struct AiPlayers {
 }
 
 impl AiPlayers {
-    pub(crate) fn thinks_at(&self, tick: u64) -> bool {
-        self.controllers.iter().any(|(player, controller)| {
-            let interval = u64::from(controller.difficulty.think_interval.max(1));
-            tick % interval == u64::from(player.0) % interval
-        })
+    pub(crate) fn thinks_at(&self, tick: u64, state: &MatchState) -> bool {
+        state.outcome().is_none()
+            && self.controllers.iter().any(|(player, controller)| {
+                state.defeated(*player).is_none() && due(*player, controller, tick)
+            })
     }
 
     pub(crate) fn new(
@@ -556,10 +619,19 @@ impl AiPlayers {
     }
 }
 
+fn due(player: PlayerId, controller: &AiController, tick: u64) -> bool {
+    let interval = u64::from(controller.difficulty.think_interval.max(1));
+    tick % interval == u64::from(player.0) % interval
+        || (controller.last_stand
+            && tick.is_multiple_of(LAST_STAND_TURN)
+            && (tick / LAST_STAND_TURN) % 16 == u64::from(player.0 % 16))
+}
+
 // --- What the controllers see ---------------------------------------------------------------
 
 /// A unit, as read at the start of the `Ai` stage.
 struct UnitSnap {
+    hp: i32,
     id: SimId,
     owner: PlayerId,
     kind: UnitKind,
@@ -582,6 +654,8 @@ impl UnitSnap {
 
 /// A building, as read at the start of the `Ai` stage.
 struct BuildingSnap {
+    economy: bool,
+    hp: i32,
     id: SimId,
     owner: PlayerId,
     kind: BuildingKind,
@@ -594,6 +668,10 @@ struct BuildingSnap {
 
 /// What one computer player may know (docs/DECISIONS.md D43). [`think`] reads nothing else.
 struct View<'a> {
+    known_occupants: BTreeSet<SimId>,
+    recoverable_garrisons: Vec<SimId>,
+    seen_tech: Vec<&'a BuildingSnap>,
+    living_owned_ids: BTreeSet<SimId>,
     player: PlayerId,
     tick: u64,
     state: &'a PlayerState,
@@ -639,6 +717,87 @@ impl<'a> View<'a> {
         // hidden from the player (a submerged, disguised or mirage unit) is not seen.
         let hidden = &special.hidden;
         Self {
+            known_occupants: units
+                .iter()
+                .filter(|unit| {
+                    unit.owner == player
+                        || (vision.sees_unit(&unit.mobile) && !hidden.contains(&(player, unit.id)))
+                })
+                .map(|unit| unit.id)
+                .collect(),
+            recoverable_garrisons: special
+                .garrisons
+                .iter()
+                .filter(|(id, g)| {
+                    g.owner == player
+                        && !g.evicting
+                        && special.cargo.get(id).is_some_and(|cargo| !cargo.is_empty())
+                })
+                .map(|(&id, _)| id)
+                .collect(),
+            living_owned_ids: units
+                .iter()
+                .filter(|u| {
+                    u.owner == player
+                        && !special.spawned.contains_key(&u.id)
+                        && !special.strategic.flights.contains_key(&u.id)
+                        && definitions
+                            .metadata(ProductionItem::Unit(u.kind))
+                            .is_none_or(|m| {
+                                !matches!(m.role, Role::Engineer | Role::Spy | Role::Mcv)
+                            })
+                })
+                .map(|u| u.id)
+                .chain(
+                    special
+                        .cargo
+                        .iter()
+                        .filter(|(host, _)| {
+                            units.iter().any(|u| u.id == **host && u.owner == player)
+                                || buildings
+                                    .iter()
+                                    .any(|b| b.id == **host && b.owner == player)
+                                || special
+                                    .garrisons
+                                    .get(host)
+                                    .is_some_and(|g| g.owner == player)
+                        })
+                        .flat_map(|(_, cargo)| {
+                            cargo
+                                .iter()
+                                .filter(|passenger| {
+                                    definitions
+                                        .metadata(ProductionItem::Unit(passenger.kind))
+                                        .is_none_or(|meta| {
+                                            !matches!(
+                                                meta.role,
+                                                Role::Engineer | Role::Spy | Role::Mcv
+                                            )
+                                        })
+                                })
+                                .map(|p| p.id)
+                        }),
+                )
+                .chain(
+                    special
+                        .parasites
+                        .values()
+                        .filter(|p| p.owner == player)
+                        .map(|p| p.passenger.id),
+                )
+                .collect(),
+            seen_tech: buildings
+                .iter()
+                .filter(|b| {
+                    (b.owner == crate::NEUTRAL || hostile(b.owner))
+                        && vision.sees_footprint(b.footprint)
+                        && definitions
+                            .metadata(ProductionItem::Building(b.kind))
+                            .is_some_and(|m| {
+                                m.needs_engineer && m.capturable && !m.bridge_repair_hut
+                            })
+                })
+                .collect(),
             player,
             tick,
             state,
@@ -655,7 +814,7 @@ impl<'a> View<'a> {
             }),
             own_kinds: buildings
                 .iter()
-                .filter(|building| building.owner == player)
+                .filter(|building| building.owner == player && building.economy)
                 .map(|building| building.kind)
                 .collect(),
             own_units: units
@@ -664,7 +823,7 @@ impl<'a> View<'a> {
                 .collect(),
             own_buildings: buildings
                 .iter()
-                .filter(|building| building.owner == player)
+                .filter(|building| building.owner == player && building.economy)
                 .collect(),
             enemy_units: units
                 .iter()
@@ -751,6 +910,9 @@ impl<'a> View<'a> {
     /// Legionnaire with a move order at its destination (`crate::special`; RA3,
     /// docs/DECISIONS.md R44).
     fn stays_visible(&self, cell: CellPos) -> bool {
+        if !self.vision.uses_fog() && self.vision.is_visible(cell) {
+            return true;
+        }
         let within = |footprint: Footprint, sight: u32| {
             let (x0, y0) = (i64::from(footprint.origin.x), i64::from(footprint.origin.y));
             let x1 = x0 + i64::from(footprint.width.max(1)) - 1;
@@ -788,6 +950,7 @@ type UnitQuery<'w, 's> = Query<
     's,
     (
         &'static SimId,
+        &'static Health,
         &'static Owner,
         &'static Unit,
         &'static Mobile,
@@ -804,6 +967,7 @@ type BuildingQuery<'w, 's> = Query<
     's,
     (
         &'static SimId,
+        &'static Health,
         &'static Owner,
         &'static Building,
         Option<&'static Producer>,
@@ -818,13 +982,17 @@ fn army_commandable(special: &crate::SpecialState, id: SimId) -> bool {
         && !special.strategic.flights.contains_key(&id)
         && !special.erasures.contains_key(&id)
         && !special.deployed.contains_key(&id)
+        && !special.interactions.contains_key(&id)
+        && !special.docked.contains_key(&id)
+        && !special.rearming.contains_key(&id)
+        && !special.disabled.contains_key(&id)
 }
 
 // Utility and deploy-only weapons do not make a unit available for army orders. In
 // particular, an Engineer's DefuseKit must not compete with its bridge-repair assignment.
 fn army_weapon(definitions: &Definitions, kind: crate::WeaponKind) -> bool {
     definitions.weapon(kind).is_some_and(|weapon| {
-        weapon.anti_ground
+        (weapon.anti_ground || weapon.naval_only)
             && weapon.damage > 0
             && !weapon.area_fire
             && definitions.warhead(weapon.warhead).is_some_and(|warhead| {
@@ -857,8 +1025,7 @@ pub(crate) fn run_ai(
         .controllers
         .iter()
         .filter(|(player, controller)| {
-            let interval = u64::from(controller.difficulty.think_interval.max(1));
-            tick % interval == u64::from(player.0) % interval && state.defeated(**player).is_none()
+            due(**player, controller, tick) && state.defeated(**player).is_none()
         })
         .map(|(player, _)| *player)
         .collect();
@@ -868,7 +1035,8 @@ pub(crate) fn run_ai(
     let mut unit_snaps: Vec<UnitSnap> = units
         .iter()
         .map(
-            |(id, owner, unit, mobile, orders, harvester, weapon, sight)| UnitSnap {
+            |(id, health, owner, unit, mobile, orders, harvester, weapon, sight)| UnitSnap {
+                hp: health.hit_points,
                 id: *id,
                 owner: owner.0,
                 kind: unit.kind,
@@ -888,18 +1056,23 @@ pub(crate) fn run_ai(
             },
         )
         .collect();
+    unit_snaps.retain(|unit| unit.hp > 0);
     unit_snaps.sort_unstable_by_key(|unit| unit.id);
     let mut building_snaps: Vec<BuildingSnap> = buildings
         .iter()
-        .map(|(id, owner, building, producer, sight)| BuildingSnap {
-            id: *id,
-            owner: owner.0,
-            kind: building.kind,
-            footprint: building.footprint,
-            producer: producer.map(|producer| producer.rally),
-            sight: sight.map(|sight| sight.0),
-            pending: building.pending_units.clone(),
-        })
+        .map(
+            |(id, health, owner, building, producer, sight)| BuildingSnap {
+                economy: true,
+                hp: health.hit_points,
+                id: *id,
+                owner: owner.0,
+                kind: building.kind,
+                footprint: building.footprint,
+                producer: producer.map(|producer| producer.rally),
+                sight: sight.map(|sight| sight.0),
+                pending: building.pending_units.clone(),
+            },
+        )
         .collect();
     for (id, g) in &special.garrisons {
         if let Some((cell, prop)) = props.get(*id).filter(|(_, p)| p.hit_points > 0)
@@ -907,6 +1080,8 @@ pub(crate) fn run_ai(
                 crate::garrison::item(&definitions, prop.kind)
         {
             building_snaps.push(BuildingSnap {
+                economy: false,
+                hp: prop.hit_points,
                 id: *id,
                 owner: g.owner,
                 kind,
@@ -921,6 +1096,7 @@ pub(crate) fn run_ai(
             });
         }
     }
+    building_snaps.retain(|building| building.hp > 0);
     building_snaps.sort_unstable_by_key(|building| building.id);
 
     let AiPlayers {
@@ -952,6 +1128,16 @@ pub(crate) fn run_ai(
         );
         let mut commands = repair_bridge(&view, controller, &special, &bridges, &building_snaps);
         commands.extend(think(&view, controller));
+        let extra = strategy::decide(&view, controller, &special, &props);
+        // A unit assigned a specialist job receives only that job this turn.
+        for command in &mut commands {
+            if let Command::Move { units, .. } | Command::AttackMove { units, .. } = command {
+                units.retain(|id| !controller.reserved.contains(id));
+            }
+        }
+        commands.retain(|c| !matches!(c, Command::Move { units, .. } | Command::AttackMove { units, .. } if units.is_empty()));
+        commands.extend(extra);
+        commands.truncate(32);
         controller.issued = controller.issued.saturating_add(commands.len() as u64);
         for command in commands {
             queue.push(IssuedCommand { player, command });
@@ -1091,7 +1277,7 @@ fn think(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
             commands.push(command);
         }
     } else if !controller.liquidating {
-        commands.extend(queue_buildings(view));
+        commands.extend(queue_buildings(view, controller));
     }
     if let Some(command) = last_stand(view, controller) {
         commands.push(command);
@@ -1118,6 +1304,7 @@ fn remember(view: &View<'_>, controller: &mut AiController) {
             KnownBuilding {
                 owner: building.owner,
                 footprint: building.footprint,
+                kind: building.kind,
             },
         );
     }
@@ -1132,6 +1319,51 @@ fn remember(view: &View<'_>, controller: &mut AiController) {
         controller.known.remove(&id);
         controller.failures.remove(&id);
     }
+    controller.seen_air |= view
+        .enemy_units
+        .iter()
+        .any(|u| view.definitions.domain(u.kind) == Domain::Air);
+    let now = view.living_owned_ids.clone();
+    if controller.observed_units.iter().any(|(id, cell)| {
+        !now.contains(id)
+            && !view.enemy_units.iter().any(|enemy| {
+                enemy.armed
+                    && chebyshev(enemy.mobile.cell, *cell)
+                        <= strategy::range(view.definitions, enemy.kind)
+                            .div_ceil(crate::SUBCELLS_PER_CELL as u32)
+            })
+            && !view.enemy_buildings.iter().any(|enemy| {
+                view.definitions
+                    .building_combat(enemy.kind)
+                    .is_some_and(|terms| {
+                        terms
+                            .weapons(false)
+                            .into_iter()
+                            .flatten()
+                            .filter_map(|weapon| view.definitions.weapon(weapon))
+                            .any(|weapon| {
+                                weapon.damage > 0
+                                    && enemy.footprint.distance_to_cell(*cell)
+                                        <= weapon.range.div_ceil(crate::SUBCELLS_PER_CELL as u32)
+                            })
+                    })
+            })
+    }) {
+        controller.unseen_loss = true;
+    }
+    controller.observed_units = now
+        .into_iter()
+        .map(|id| {
+            let cell = view
+                .own_units
+                .iter()
+                .find(|unit| unit.id == id)
+                .map(|unit| unit.mobile.cell)
+                .or_else(|| controller.observed_units.get(&id).copied())
+                .unwrap_or(controller.start);
+            (id, cell)
+        })
+        .collect();
     let stamp = view.tick.saturating_add(1);
     for waypoint in &mut controller.waypoints {
         if view.vision.is_visible(waypoint.cell) {
@@ -1248,7 +1480,8 @@ fn place_ready_building(view: &View<'_>, controller: &AiController) -> Option<Co
 }
 
 /// A footprint origin for a building of type `kind` near the player's base that passes the
-/// command's own validation now ([`check_placement`]) and stays valid until the command is
+/// placement geometry now ([`check_placement_site`]); the actual command also requires a
+/// finished queue item. The site stays valid until the command is
 /// validated in the next tick, unless one of the player's buildings is destroyed in between
 /// (docs/DECISIONS.md D43):
 ///
@@ -1268,6 +1501,22 @@ fn find_placement(
     view: &View<'_>,
     controller: &AiController,
     kind: BuildingKind,
+) -> Option<CellPos> {
+    let preferred = controller.naval_site.filter(|_| {
+        view.definitions
+            .metadata(ProductionItem::Building(kind))
+            .is_some_and(|m| m.role == Role::Shipyard)
+    });
+    find_placement_where(view, controller, kind, |origin| {
+        preferred.is_none_or(|site| site == origin)
+    })
+}
+
+fn find_placement_where(
+    view: &View<'_>,
+    controller: &AiController,
+    kind: BuildingKind,
+    mut accepts: impl FnMut(CellPos) -> bool,
 ) -> Option<CellPos> {
     let def = view.definitions.building(kind)?;
     let (width, height) = (i32::from(def.width.max(1)), i32::from(def.height.max(1)));
@@ -1365,7 +1614,7 @@ fn find_placement(
                 && ring
                     .iter()
                     .any(|&cell| view.vision.is_visible(cell) && view.grid.is_passable(cell))
-                && check_placement(
+                && check_placement_site(
                     view.grid,
                     view.definitions,
                     view.state,
@@ -1374,6 +1623,7 @@ fn find_placement(
                     origin,
                 )
                 .is_ok()
+                && accepts(origin)
         })
 }
 
@@ -1502,11 +1752,13 @@ fn sell_for_army(view: &View<'_>) -> Option<Command> {
 /// the next wave, and a player without a building is defeated in a short game. It stops when
 /// it has a unit that fights or a harvester at work again.
 fn last_stand(view: &View<'_>, controller: &mut AiController) -> Option<Command> {
-    let helpless = !view.own_units.iter().any(|unit| view.fights(unit))
-        && !view.own_units.iter().any(|unit| {
-            unit.harvest
-                .is_some_and(|state| state != HarvestState::Idle)
-        });
+    let helpless = !view.own_units.iter().any(|unit| {
+        unit.harvest
+            .is_some_and(|state| state != HarvestState::Idle)
+    }) && !view
+        .own_units
+        .iter()
+        .any(|unit| strategy::can_finish(view, controller, unit));
     if !helpless {
         controller.last_stand = false;
         controller.stalled = (0, view.tick);
@@ -1532,6 +1784,9 @@ fn last_stand(view: &View<'_>, controller: &mut AiController) -> Option<Command>
         }
         if view.tick.saturating_sub(controller.stalled.1) < LAST_STAND_PATIENCE {
             return None;
+        }
+        if let Some(&unit) = view.recoverable_garrisons.first() {
+            return Some(Command::Deploy { unit });
         }
         controller.last_stand = true;
     }
@@ -1566,17 +1821,59 @@ fn last_stand(view: &View<'_>, controller: &mut AiController) -> Option<Command>
 /// player without enough power, counting what the buildings in its queues will produce and
 /// consume, or if the build order is complete and the player has low power; a lane whose
 /// building must wait for power queues nothing.
-fn queue_buildings(view: &View<'_>) -> Vec<Command> {
+fn queue_buildings(view: &View<'_>, controller: &AiController) -> Vec<Command> {
     let order = &view.ai.build_order;
     let lane = |kind: BuildingKind| view.definitions.lane(ProductionItem::Building(kind));
     let mut needed: BTreeMap<Lane, BuildingKind> = BTreeMap::new();
     for (index, &kind) in order.iter().enumerate() {
+        if let Some(meta) = view.definitions.metadata(ProductionItem::Building(kind))
+            && ((!view.superweapons && meta.role.major_superweapon())
+                || (meta.role == Role::Shipyard && controller.naval_goal.is_none()))
+        {
+            continue;
+        }
         let listed = order[..=index]
             .iter()
             .filter(|&&other| other == kind)
             .count();
         if view.owned(kind) < listed {
             needed.entry(lane(kind)).or_insert(kind);
+        }
+    }
+    if let Some(rule) = strategy::difficulty(view, controller) {
+        let side = view
+            .state
+            .country()
+            .and_then(|c| view.definitions.rules()?.country(c))
+            .map(|c| c.side);
+        let wanted = match side {
+            Some(crate::Side::Allied) => rule.allied_base_defences,
+            Some(crate::Side::Soviet) => rule.soviet_base_defences,
+            None => 0,
+        };
+        let count = view
+            .own_buildings
+            .iter()
+            .filter(|b| view.ai.defences.contains(&b.kind))
+            .count();
+        let eligible: Vec<_> = view
+            .ai
+            .defences
+            .iter()
+            .copied()
+            .filter(|&k| view.buildable(ProductionItem::Building(k)))
+            .filter(|&k| controller.seen_air || !strategy::only_aa_building(view.definitions, k))
+            .collect();
+        // Reserve one slot for each later-tier defence, including a country's special.
+        let cap = (wanted.unsigned_abs() as usize)
+            .saturating_sub(view.ai.defences.len().saturating_sub(eligible.len()));
+        if count < cap {
+            let candidate = eligible
+                .into_iter()
+                .min_by_key(|&k| (view.owned(k), std::cmp::Reverse(k)));
+            if let Some(k) = candidate {
+                needed.entry(lane(k)).or_insert(k);
+            }
         }
     }
     let power_of = |kind: BuildingKind| {
@@ -1667,12 +1964,147 @@ fn queue_units(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
             .into_iter()
             .map(|&kind| view.queued(ProductionItem::Unit(kind)))
             .sum::<usize>();
-    let max = controller.difficulty.max_army as usize;
+    let mut max = controller.difficulty.max_army as usize;
+    if view.ai.rules_difficulty {
+        // Keep a small tier reserve: completing tech or an airfield must still change
+        // production when the surviving opening army already fills its ground quota.
+        for (air, wanted) in [
+            (true, view.ai.tier_reserves[0] as usize),
+            (false, view.ai.tier_reserves[1] as usize),
+        ] {
+            let eligible = |kind| {
+                if air {
+                    view.definitions.domain(kind) == Domain::Air
+                } else {
+                    view.definitions.domain(kind) == Domain::Land
+                        && view
+                            .definitions
+                            .metadata(ProductionItem::Unit(kind))
+                            .is_some_and(|m| m.tech_level >= view.ai.advanced_tech_level as i32)
+                }
+            };
+            let mut count = view.own_units.iter().filter(|u| eligible(u.kind)).count()
+                + army
+                    .iter()
+                    .copied()
+                    .collect::<BTreeSet<_>>()
+                    .iter()
+                    .filter(|&&kind| eligible(kind))
+                    .map(|&kind| view.queued(ProductionItem::Unit(kind)))
+                    .sum::<usize>();
+            if !army.iter().any(|&kind| eligible(kind)) {
+                continue;
+            }
+            for &kind in army.iter().filter(|&&kind| eligible(kind)) {
+                if count >= wanted || total >= max {
+                    break;
+                }
+                let item = ProductionItem::Unit(kind);
+                if has_room(view, item, &mut added) {
+                    commands.push(Command::QueueProduction { item });
+                    total += 1;
+                    count += 1;
+                }
+            }
+            max = max.saturating_sub(wanted.saturating_sub(count));
+        }
+    }
+    // Retain the declared naval capacity before scouting/tech completes. Recruiting
+    // into those slots still requires observed targets and a legal reachable coastal site.
+    if view.ai.rules_difficulty
+        && army
+            .iter()
+            .any(|&kind| view.definitions.domain(kind) == Domain::Naval)
+    {
+        let naval = |kind| view.definitions.domain(kind) == Domain::Naval;
+        let mut count = view.own_units.iter().filter(|u| naval(u.kind)).count()
+            + army
+                .iter()
+                .copied()
+                .collect::<BTreeSet<_>>()
+                .iter()
+                .filter(|&&kind| naval(kind))
+                .map(|&kind| view.queued(ProductionItem::Unit(kind)))
+                .sum::<usize>();
+        // A qualified bombardment route also needs its declared detector escort, even
+        // when that escort's own weapon cannot damage the observed shore target.
+        let detector = |kind| {
+            naval(kind)
+                && view
+                    .definitions
+                    .metadata(ProductionItem::Unit(kind))
+                    .is_some_and(|meta| meta.sensors_sight > 0)
+        };
+        let detectors = view.own_units.iter().filter(|u| detector(u.kind)).count()
+            + army
+                .iter()
+                .copied()
+                .collect::<BTreeSet<_>>()
+                .iter()
+                .filter(|&&kind| detector(kind))
+                .map(|&kind| view.queued(ProductionItem::Unit(kind)))
+                .sum::<usize>();
+        if controller.naval_goal.is_some()
+            && detectors < view.ai.policy.naval_detector_quota as usize
+            && count < view.ai.tier_reserves[2] as usize
+            && total < max
+            && let Some(&kind) = army.iter().find(|&&kind| detector(kind))
+            && has_room(view, ProductionItem::Unit(kind), &mut added)
+        {
+            commands.push(Command::QueueProduction {
+                item: ProductionItem::Unit(kind),
+            });
+            count += 1;
+            total += 1;
+        }
+        for &kind in army.iter().filter(|&&kind| naval(kind)) {
+            if controller.naval_goal.is_none() {
+                break;
+            }
+            if !strategy::recruit(view, controller, kind) {
+                continue;
+            }
+            if count >= view.ai.tier_reserves[2] as usize || total >= max {
+                break;
+            }
+            let item = ProductionItem::Unit(kind);
+            if has_room(view, item, &mut added) {
+                commands.push(Command::QueueProduction { item });
+                count += 1;
+                total += 1;
+            }
+        }
+        max = max.saturating_sub((view.ai.tier_reserves[2] as usize).saturating_sub(count));
+    }
+    let anti_air = |kind| {
+        view.definitions
+            .metadata(ProductionItem::Unit(kind))
+            .is_some_and(|m| matches!(m.role, Role::Ifv | Role::Flak))
+    };
+    if view.ai.rules_difficulty && army.iter().any(|&k| anti_air(k)) {
+        if !controller.seen_air {
+            max = max.saturating_sub(army.iter().filter(|&&kind| anti_air(kind)).count());
+        } else if !view.own_units.iter().any(|u| anti_air(u.kind))
+            && let Some(&kind) = army
+                .iter()
+                .find(|&&k| anti_air(k) && view.queued(ProductionItem::Unit(k)) == 0)
+            && total < max
+            && has_room(view, ProductionItem::Unit(kind), &mut added)
+        {
+            commands.push(Command::QueueProduction {
+                item: ProductionItem::Unit(kind),
+            });
+            total += 1;
+        }
+    }
     for step in 0..army.len() {
         if total >= max {
             break;
         }
         let index = (controller.next_army + step) % army.len();
+        if !strategy::recruit(view, controller, army[index]) {
+            continue;
+        }
         let item = ProductionItem::Unit(army[index]);
         if has_room(view, item, &mut added) {
             commands.push(Command::QueueProduction { item });
@@ -1702,10 +2134,25 @@ fn has_room(view: &View<'_>, item: ProductionItem, added: &mut BTreeMap<QueueKey
 fn set_rally_points(view: &View<'_>, controller: &AiController) -> Vec<Command> {
     view.own_buildings
         .iter()
-        .filter(|building| building.producer == Some(None))
-        .map(|building| Command::SetRallyPoint {
-            building: building.id,
-            cell: controller.gather,
+        .filter_map(|building| {
+            let old = building.producer?;
+            let naval = view.ai.rules_difficulty
+                && view
+                    .definitions
+                    .metadata(ProductionItem::Building(building.kind))
+                    .is_some_and(|m| m.role == Role::Shipyard);
+            let cell = if naval {
+                controller.naval_goal?
+            } else {
+                if old.is_some() {
+                    return None;
+                }
+                controller.gather
+            };
+            (old != Some(cell)).then_some(Command::SetRallyPoint {
+                building: building.id,
+                cell,
+            })
         })
         .collect()
 }
@@ -1760,7 +2207,11 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
     let armed: BTreeMap<SimId, &UnitSnap> = view
         .own_units
         .iter()
-        .filter(|unit| view.fights(unit))
+        .filter(|unit| {
+            view.fights(unit)
+                && (!view.ai.rules_difficulty
+                    || view.definitions.domain(unit.kind) != Domain::Naval)
+        })
         .map(|unit| (unit.id, *unit))
         .collect();
     controller.wave.retain(|id| armed.contains_key(id));
@@ -1842,7 +2293,16 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
     let mut fresh = false;
     let ready = home.len() >= controller.difficulty.wave_size as usize
         || (!home.is_empty() && view.tick >= controller.patience_until);
-    if threat.is_none() && view.tick >= u64::from(controller.difficulty.first_wave) && ready {
+    if threat.is_none()
+        && view.tick >= u64::from(controller.difficulty.first_wave)
+        && view.tick >= controller.next_wave
+        && ready
+    {
+        if let Some(rule) = strategy::difficulty(view, controller) {
+            controller.next_wave = view
+                .tick
+                .saturating_add(u64::from(rule.team_delay.unsigned_abs()));
+        }
         fresh = controller.wave.is_empty();
         controller.patience_until = view
             .tick
@@ -2107,10 +2567,166 @@ mod tests {
     use super::*;
     use crate::map::Cell;
 
+    fn ra8_controller() -> AiController {
+        let grid = Grid::from_cells(
+            32,
+            32,
+            vec![
+                Cell {
+                    passable: true,
+                    water: false,
+                    buildable: true,
+                    ore: 0
+                };
+                32 * 32
+            ],
+        )
+        .expect("grid");
+        AiController::new(
+            &grid,
+            &Definitions::default(),
+            AiPlan {
+                policy: Default::default(),
+                rules_difficulty: false,
+                defences: Vec::new(),
+                support: Vec::new(),
+                tier_reserves: [0; 3],
+                advanced_tech_level: 0,
+                build_order: Vec::new(),
+                power: BuildingKind(0),
+                harvester: UnitKind(0),
+                army: Vec::new(),
+            },
+            Difficulty {
+                id: "test".into(),
+                think_interval: 10,
+                harvesters_per_refinery: 0,
+                max_army: 4,
+                wave_size: 2,
+                first_wave: 0,
+                wave_patience: 100,
+                defence_radius: 4,
+            },
+            CellPos::new(4, 4),
+            Vec::new(),
+            None,
+        )
+        .expect("controller")
+    }
+
+    #[test]
+    fn ra8_every_supported_cadence_and_offset_retains_a_nonstarving_last_stand_slot() {
+        let mut controller = ra8_controller();
+        for interval in 1..=crate::MAX_THINK_INTERVAL {
+            controller.difficulty.think_interval = interval;
+            for player in 0..16 {
+                let player = PlayerId(player);
+                let ordinary = 4096 + u64::from(player.0);
+                controller.last_stand = false;
+                assert_eq!(
+                    due(player, &controller, ordinary),
+                    ordinary % u64::from(interval) == u64::from(player.0) % u64::from(interval)
+                );
+                controller.last_stand = true;
+                let slot = 4096 + u64::from(player.0) * LAST_STAND_TURN;
+                assert!(due(player, &controller, slot), "{interval}, {player:?}");
+                assert_eq!((slot / LAST_STAND_TURN) % 16, u64::from(player.0));
+            }
+        }
+        // Simultaneous helpless houses with mixed slow cadences never share a sale slot.
+        for tick in (4096..8192).step_by(LAST_STAND_TURN as usize) {
+            let sales: Vec<_> = (0..16)
+                .filter(|&player| {
+                    controller.difficulty.think_interval =
+                        [10, 20, 40, 512, 1024, 1200][player as usize % 6];
+                    due(PlayerId(player), &controller, tick)
+                        && (tick / LAST_STAND_TURN) % 16 == u64::from(player)
+                })
+                .collect();
+            assert_eq!(sales.len(), 1);
+        }
+        assert!(!AiPlayers::default().thinks_at(0, &MatchState::default()));
+    }
+
+    #[test]
+    fn ra8_all_added_controller_memory_changes_the_value_hash() {
+        let base = ra8_controller();
+        let hash = |c: &AiController| {
+            let mut h = Fnv1a64::new();
+            c.hash_into(&mut h);
+            h.finish()
+        };
+        let baseline = hash(&base);
+        let changes: &[fn(&mut AiController)] = &[
+            |c| c.next_wave = 1,
+            |c| c.seen_air = true,
+            |c| c.unseen_loss = true,
+            |c| {
+                c.observed_units.insert(SimId(1), CellPos::new(2, 3));
+            },
+            |c| {
+                c.reserved.insert(SimId(1));
+            },
+            |c| c.naval_goal = Some(CellPos::new(1, 2)),
+            |c| c.naval_site = Some(CellPos::new(1, 2)),
+            |c| c.next_naval_scan = 1,
+            |c| {
+                c.known.insert(
+                    SimId(1),
+                    KnownBuilding {
+                        owner: PlayerId(1),
+                        kind: BuildingKind(1),
+                        footprint: cell_footprint(CellPos::new(2, 3)),
+                    },
+                );
+            },
+            |c| c.plan.rules_difficulty = true,
+            |c| c.plan.defences.push(BuildingKind(1)),
+            |c| c.plan.support.push(UnitKind(1)),
+            |c| c.plan.tier_reserves[0] = 1,
+            |c| c.plan.tier_reserves[1] = 1,
+            |c| c.plan.tier_reserves[2] = 1,
+            |c| c.plan.advanced_tech_level = 1,
+            |c| c.plan.policy.garrison_quota = 1,
+            |c| c.plan.policy.garrison_radius = 1,
+            |c| c.plan.policy.depot_radius = 1,
+            |c| c.plan.policy.naval_rescan = 1,
+            |c| c.plan.policy.naval_detector_quota = 1,
+            |c| c.plan.policy.artillery_min_range = 1,
+            |c| c.plan.policy.artillery_standoff = 1,
+            |c| c.plan.policy.paradrop_offset = 1,
+            |c| c.plan.policy.chrono_min_offset = 1,
+            |c| c.plan.policy.chrono_max_offset = 1,
+        ];
+        for (index, change) in changes.iter().enumerate() {
+            let mut changed = base.clone();
+            change(&mut changed);
+            assert_ne!(hash(&changed), baseline, "field {index}");
+        }
+        let mut a = base;
+        a.known.insert(
+            SimId(1),
+            KnownBuilding {
+                owner: PlayerId(1),
+                kind: BuildingKind(1),
+                footprint: cell_footprint(CellPos::new(2, 3)),
+            },
+        );
+        let before = hash(&a);
+        a.known.get_mut(&SimId(1)).expect("known").kind = BuildingKind(2);
+        assert_ne!(before, hash(&a));
+    }
+
     #[test]
     fn ra5_bridge_memory_hash_covers_hut_identity_location_and_observed_collapse() {
         let mut controller = AiController {
             plan: AiPlan {
+                policy: Default::default(),
+                rules_difficulty: false,
+                defences: Vec::new(),
+                support: Vec::new(),
+                tier_reserves: [0; 3],
+                advanced_tech_level: 0,
                 build_order: Vec::new(),
                 power: BuildingKind(0),
                 harvester: UnitKind(0),
@@ -2146,6 +2762,14 @@ mod tests {
             waves_sent: 0,
             stalled: (0, 0),
             last_stand: false,
+            next_wave: 0,
+            seen_air: false,
+            unseen_loss: false,
+            observed_units: BTreeMap::new(),
+            reserved: BTreeSet::new(),
+            naval_goal: None,
+            naval_site: None,
+            next_naval_scan: 0,
         };
         let hash = |c: &AiController| {
             let mut h = Fnv1a64::new();
@@ -2214,6 +2838,12 @@ mod tests {
         players.add(player, 0).expect("a new player");
         let state = players.get(player).expect("the player");
         let plan = AiPlan {
+            policy: Default::default(),
+            rules_difficulty: false,
+            defences: Vec::new(),
+            support: Vec::new(),
+            tier_reserves: [0; 3],
+            advanced_tech_level: 0,
             build_order: Vec::new(),
             power: BuildingKind(0),
             harvester: kind("harvester"),
@@ -2221,6 +2851,7 @@ mod tests {
         };
         // A unit of the type `id` standing at (10, 10) with a sight of 4 cells.
         let standing = |id: &str| UnitSnap {
+            hp: 100,
             id: SimId(1),
             owner: player,
             kind: kind(id),
@@ -2236,6 +2867,8 @@ mod tests {
             sight: Some(4),
         };
         let yard = BuildingSnap {
+            economy: true,
+            hp: 100,
             id: SimId(2),
             owner: player,
             kind: BuildingKind(0),
@@ -2251,6 +2884,7 @@ mod tests {
         let lit = |id: &str, cell: CellPos| {
             let units = [standing(id)];
             let buildings = [BuildingSnap {
+                hp: 100,
                 pending: Vec::new(),
                 ..yard
             }];
@@ -2308,6 +2942,12 @@ mod tests {
         players.add(player, 0).expect("player");
         let state = players.get(player).expect("player");
         let plan = AiPlan {
+            policy: Default::default(),
+            rules_difficulty: false,
+            defences: Vec::new(),
+            support: Vec::new(),
+            tier_reserves: [0; 3],
+            advanced_tech_level: 0,
             build_order: Vec::new(),
             power: BuildingKind(0),
             harvester: UnitKind(0),
@@ -2336,6 +2976,7 @@ mod tests {
         controller.wave = [SimId(1), SimId(2)].into_iter().collect();
         controller.target = Some(WaveTarget::Waypoint(0));
         let mut units = [false, true].map(|attacking| UnitSnap {
+            hp: 100,
             id: SimId(if attacking { 2 } else { 1 }),
             owner: player,
             kind: UnitKind(0),
@@ -2428,6 +3069,12 @@ mod tests {
         let grid = Grid::from_cells(64, 64, vec![cell; 64 * 64]).expect("a grid");
         assert!(grid.width() + grid.height() <= ARMY_SCALE_SPAN);
         let plan = AiPlan {
+            policy: Default::default(),
+            rules_difficulty: false,
+            defences: Vec::new(),
+            support: Vec::new(),
+            tier_reserves: [0; 3],
+            advanced_tech_level: 0,
             build_order: Vec::new(),
             power: BuildingKind(0),
             harvester: UnitKind(0),
@@ -2529,6 +3176,12 @@ mod tests {
         };
         let grid = Grid::from_cells(32, 32, vec![cell; 32 * 32]).expect("a grid");
         let plan = AiPlan {
+            policy: Default::default(),
+            rules_difficulty: false,
+            defences: Vec::new(),
+            support: Vec::new(),
+            tier_reserves: [0; 3],
+            advanced_tech_level: 0,
             build_order: Vec::new(),
             power: BuildingKind(0),
             harvester: unit_kind("harvester"),
@@ -2563,6 +3216,8 @@ mod tests {
         );
         assert!(definitions.refund(yard) > definitions.refund(barracks));
         let building = |id: u32, kind: BuildingKind, x: i32| BuildingSnap {
+            economy: true,
+            hp: 100,
             id: SimId(id),
             owner: PlayerId(0),
             kind,
@@ -2577,6 +3232,7 @@ mod tests {
         };
         // An idle harvester (no ore) and, in the last case, a rifleman.
         let unit = |id: u32, kind: &str, armed: bool| UnitSnap {
+            hp: 100,
             id: SimId(id),
             owner: PlayerId(0),
             kind: unit_kind(kind),
@@ -2725,12 +3381,19 @@ mod tests {
             .reveal_for_test(&grid, CellPos::new(10, 10), 6);
         let state = players.get(player).expect("the player");
         let plan = AiPlan {
+            policy: Default::default(),
+            rules_difficulty: false,
+            defences: Vec::new(),
+            support: Vec::new(),
+            tier_reserves: [0; 3],
+            advanced_tech_level: 0,
             build_order: Vec::new(),
             power: BuildingKind(0),
             harvester: kind("harvester"),
             army: Vec::new(),
         };
         let unit = |id: u32, owner: PlayerId, x: i32| UnitSnap {
+            hp: 100,
             id: SimId(id),
             owner,
             kind: kind("rifleman"),

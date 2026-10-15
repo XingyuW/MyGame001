@@ -1,0 +1,21 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 18.79s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+
+thread 'ra8_lone_yuri_preserves_only_seen_reachable_controllable_building_damaging_recruits' (4846050) panicked at crates/sim/tests/ra8_ai.rs:791:9:
+assertion `left == right` failed: conscript, isolated=false
+  left: false
+ right: true
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_lone_yuri_preserves_only_seen_reachable_controllable_building_damaging_recruits ... FAILED
+
+failures:
+
+failures:
+    ra8_lone_yuri_preserves_only_seen_reachable_controllable_building_damaging_recruits
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 25 filtered out; finished in 0.33s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

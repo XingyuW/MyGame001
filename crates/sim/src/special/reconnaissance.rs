@@ -83,7 +83,10 @@ fn refresh_with_definitions(world: &mut World, defs: &Definitions, reveal: bool)
             && world
                 .get::<Orders>(a.entity)
                 .is_some_and(|o| o.current.is_none());
-        if still
+        // Appearance allocation belongs to the once-per-tick Visibility stage. Early
+        // command/AI concealment refreshes must not consume RNG before Economy crates.
+        if reveal
+            && still
             && !world
                 .resource::<SpecialState>()
                 .mirage_trees

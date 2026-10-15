@@ -1,0 +1,21 @@
+    Finished `release` profile [optimized] target(s) in 0.28s
+     Running `/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples/m13_ten_players to-the-end all`
+demo: 128 x 128 cells for 10 players (file 64 x 64), enlarged in 1.8ms, set up in 4.8ms
+  83693 ticks: mean 723.316µs, 99th centile 8.318ms, longest 22.193ms, busiest 1000 ticks mean 1.610ms, 0 ticks over 50ms
+  at most 270 units and 63 buildings; 10 players built; ended in tick 83692: Won { winner: PlayerId(3), tick: 83692 }
+crossroads: 112 x 112 cells for 10 players (file 56 x 56), enlarged in 852.4µs, set up in 2.3ms
+  44445 ticks: mean 536.171µs, 99th centile 1.165ms, longest 9.596ms, busiest 1000 ticks mean 1.011ms, 0 ticks over 50ms
+  at most 242 units and 64 buildings; 10 players built; ended in tick 44444: Won { winner: PlayerId(0), tick: 44444 }
+riverlands: 128 x 96 cells for 10 players (file 64 x 48), enlarged in 1.3ms, set up in 2.5ms
+  54799 ticks: mean 331.476µs, 99th centile 1.001ms, longest 6.966ms, busiest 1000 ticks mean 881.788µs, 0 ticks over 50ms
+  at most 241 units and 62 buildings; 10 players built; ended in tick 54798: Won { winner: PlayerId(3), tick: 54798 }
+liberty_bay: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 169.2µs, set up in 10.6ms
+  53986 ticks: mean 1.747ms, 99th centile 6.258ms, longest 79.661ms, busiest 1000 ticks mean 3.447ms, 5 ticks over 50ms
+  at most 335 units and 109 buildings; 10 players built; ended in tick 53985: Won { winner: PlayerId(0), tick: 53985 }
+frostline: 252 x 252 cells for 10 players (file 224 x 224), enlarged in 1.4ms, set up in 9.5ms
+  400000 ticks: mean 2.109ms, 99th centile 4.923ms, longest 126.916ms, busiest 1000 ticks mean 4.004ms, 12 ticks over 50ms
+  at most 320 units and 142 buildings; 10 players built; 3 players left after 400000 ticks
+frostline: the match had no winner within 400000 ticks
+oasis_gulf: 256 x 192 cells for 10 players (file 256 x 192), enlarged in 90.8µs, set up in 6.4ms
+  74244 ticks: mean 874.554µs, 99th centile 1.938ms, longest 49.400ms, busiest 1000 ticks mean 1.468ms, 0 ticks over 50ms
+  at most 310 units and 95 buildings; 10 players built; ended in tick 74243: Won { winner: PlayerId(0), tick: 74243 }

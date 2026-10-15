@@ -46,7 +46,7 @@ use crate::economy_defs::{BuildingKind, Problem, invalid, ranged, unknown};
 use crate::hash::Fnv1a64;
 
 /// The schema version of the rules file this crate reads.
-pub const RULES_SCHEMA_VERSION: i64 = 3;
+pub const RULES_SCHEMA_VERSION: i64 = 4;
 
 /// Largest number of prerequisite groups.
 pub const MAX_PREREQUISITE_GROUPS: usize = 16;
@@ -375,6 +375,8 @@ pub struct Powerup {
 /// The multipliers and counts of a computer player's difficulty (section 4.15).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DifficultyRules {
+    /// ConYard, Factory, Power, Engineer, Spy, Miner, MCV, APC, Defence, Plug, Airfield, Temple.
+    pub target_weights: [u32; 12],
     pub id: String,
     /// Reload time factor.
     pub rof_pm: i32,
@@ -521,6 +523,9 @@ impl Rules {
         hasher.write_u64(self.difficulties.len() as u64);
         for difficulty in &self.difficulties {
             text(hasher, &difficulty.id);
+            for weight in difficulty.target_weights {
+                hasher.write_u32(weight);
+            }
             for value in [
                 difficulty.rof_pm,
                 difficulty.build_time_pm,
@@ -573,6 +578,13 @@ static POWERUP_SHAPE: Shape = Shape::Struct(&[
 ]);
 
 static DIFFICULTY_SHAPE: Shape = Shape::Struct(&[
+    (
+        "target_weights",
+        Shape::List {
+            entry: &Shape::Int,
+            max: 12,
+        },
+    ),
     ("id", Shape::Str),
     ("rof_pm", Shape::Int),
     ("build_time_pm", Shape::Int),
@@ -698,6 +710,7 @@ struct PowerupEntry {
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct DifficultyEntry {
+    target_weights: Vec<i64>,
     id: String,
     rof_pm: i64,
     build_time_pm: i64,
@@ -848,7 +861,20 @@ fn validate(file: RulesFile, definitions: &Definitions) -> Result<Rules, Problem
         if difficulties.iter().any(|known| known.id == entry.id) {
             return Err((field("id"), DataErrorKind::DuplicateId(entry.id)));
         }
+        if entry.target_weights.len() != 12 {
+            return Err(invalid(
+                field("target_weights"),
+                format!("{} entries", entry.target_weights.len()),
+                "exactly 12 weights",
+            ));
+        }
+        let mut target_weights = [0; 12];
+        for (i, &value) in entry.target_weights.iter().enumerate() {
+            target_weights[i] =
+                ranged(&field(&format!("target_weights[{i}]")), value, 0, 10000, "")?;
+        }
         difficulties.push(DifficultyRules {
+            target_weights,
             rof_pm: ranged(&field("rof_pm"), entry.rof_pm, 1, MAX_PM, "")?,
             build_time_pm: ranged(&field("build_time_pm"), entry.build_time_pm, 1, MAX_PM, "")?,
             credits_bonus_percent: ranged(

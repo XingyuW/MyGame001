@@ -128,6 +128,16 @@ fn charges(world: &World, defs: &Definitions, a: &Actor) -> bool {
     !state.low_power()
         || (defs.rules().is_some() && defs.metadata(a.item).is_none_or(|m| !m.is_powered))
 }
+
+fn weapon_reload(world: &World, actor: &Actor, ticks: u32) -> u32 {
+    let rank = world
+        .get::<crate::Experience>(actor.entity)
+        .map_or(1000, crate::Experience::reload_pm);
+    crate::veterancy::reload_ticks(
+        ticks,
+        crate::combat::ai_reload(world.resource::<Players>(), actor.owner, rank),
+    )
+}
 /// Whether `b` is a building that repairs the vehicles sent to it (RA2: the arsenal's
 /// `unit_repair`, read with a rules file).
 fn repairs_units(defs: &Definitions, b: &Actor) -> bool {

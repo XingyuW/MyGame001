@@ -122,6 +122,17 @@ pub(super) fn fired(
         bay: None,
     };
     release(world, a);
+    let reload = crate::veterancy::reload_ticks(
+        w.reload,
+        crate::combat::ai_reload(
+            world.resource::<Players>(),
+            a.owner,
+            passenger
+                .experience
+                .as_ref()
+                .map_or(1000, crate::Experience::reload_pm),
+        ),
+    );
     world.despawn(a.entity);
     world.resource_mut::<SpecialState>().parasites.insert(
         b.id,
@@ -129,7 +140,7 @@ pub(super) fn fired(
             passenger,
             owner: a.owner,
             weapon,
-            due: tick.saturating_add(u64::from(w.reload)),
+            due: tick.saturating_add(u64::from(reload)),
             squid,
             escape: None,
         },
@@ -311,6 +322,17 @@ pub(super) fn advance(world: &mut World, defs: &Definitions) {
                 crate::veterancy::worth(defs, a.item),
             );
         }
+        let reload = crate::veterancy::reload_ticks(
+            w.reload,
+            crate::combat::ai_reload(
+                world.resource::<Players>(),
+                p.owner,
+                p.passenger
+                    .experience
+                    .as_ref()
+                    .map_or(1000, crate::Experience::reload_pm),
+            ),
+        );
         if world
             .get::<Health>(a.entity)
             .is_some_and(|h| h.hit_points <= 0)
@@ -328,7 +350,7 @@ pub(super) fn advance(world: &mut World, defs: &Definitions) {
             .parasites
             .get_mut(&host)
         {
-            p.due = tick.saturating_add(u64::from(w.reload));
+            p.due = tick.saturating_add(u64::from(reload));
         }
     }
     // IFV repair is a weapon-rate action; an Engineer passenger has the negative RepairBullet.
@@ -400,8 +422,9 @@ pub(super) fn advance(world: &mut World, defs: &Definitions) {
                 hp.hit_points = hp.hit_points.saturating_sub(w.damage).min(max);
             }
             free(world, defs, b.id, true);
+            let reload = weapon_reload(world, a, w.reload);
             if let Some(mut gun) = world.get_mut::<Weapon>(a.entity) {
-                gun.cooldown = w.reload;
+                gun.cooldown = reload;
             }
         }
     }

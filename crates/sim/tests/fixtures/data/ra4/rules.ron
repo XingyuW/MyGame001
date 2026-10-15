@@ -10,7 +10,7 @@
 // spreads, so that the tests of RA1 to RA4 keep their numbers; the RA5 fixture (../ra5) has the
 // rules of RA5. Crates appear in the matches set up on this fixture, as in every match.
 (
-    schema_version: 3,
+    schema_version: 4,
     production: (
         build_ticks_per_1000: 840,
         multiple_factory_pm: 800,
@@ -141,8 +141,8 @@
         max_players: 8,
     ),
     difficulty: [
-        (id: "easy", rof_pm: 1200, build_time_pm: 1000, credits_bonus_percent: 0, virtual_purifiers: 0, team_delay: 4667, allied_base_defences: 6, soviet_base_defences: 6),
-        (id: "brutal", rof_pm: 800, build_time_pm: 800, credits_bonus_percent: 400, virtual_purifiers: 4, team_delay: 2667, allied_base_defences: 25, soviet_base_defences: 25),
+        (id: "easy", target_weights: [0,0,0,0,0,0,0,0,0,0,0,0], rof_pm: 1200, build_time_pm: 1000, credits_bonus_percent: 0, virtual_purifiers: 0, team_delay: 4667, allied_base_defences: 6, soviet_base_defences: 6),
+        (id: "brutal", target_weights: [0,0,0,0,0,0,0,0,0,0,0,0], rof_pm: 800, build_time_pm: 800, credits_bonus_percent: 400, virtual_purifiers: 4, team_delay: 2667, allied_base_defences: 25, soviet_base_defences: 25),
     ],
     prerequisite_groups: [
         (id: "power", buildings: ["allied_power", "soviet_power"]),

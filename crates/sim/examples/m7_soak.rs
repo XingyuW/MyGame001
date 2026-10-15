@@ -73,6 +73,20 @@ const STRAY_CHECK_INTERVAL: u64 = 256;
 /// Upper limit of heap bytes in use by the process.
 const MEMORY_BUDGET: usize = 1 << 30;
 
+fn completed_with_winner(outcome: MatchOutcome) -> bool {
+    matches!(outcome, MatchOutcome::Won { .. })
+}
+
+#[test]
+fn ra8_completed_soak_matches_require_winners_while_duration_stays_fixed() {
+    assert!(!completed_with_winner(MatchOutcome::Draw { tick: 1 }));
+    assert!(completed_with_winner(MatchOutcome::Won {
+        winner: PlayerId(0),
+        tick: 1
+    }));
+    assert_eq!(SOAK_TICKS, 36_000);
+}
+
 static IN_USE: AtomicUsize = AtomicUsize::new(0);
 static PEAK: AtomicUsize = AtomicUsize::new(0);
 
@@ -421,6 +435,11 @@ fn soak(set: &DataSet, config: Config) -> Played {
         }
         played.hashes.push(state_hash(app.world_mut()));
         if let Some(outcome) = app.world().resource::<MatchState>().outcome() {
+            if !completed_with_winner(outcome) {
+                played.failures.push(format!(
+                    "tick {at}: completed without a winner: {outcome:?}"
+                ));
+            }
             // The next match of the configuration, as the game's Restart starts it.
             played.outcomes.push(Some(outcome));
             losses.clear();

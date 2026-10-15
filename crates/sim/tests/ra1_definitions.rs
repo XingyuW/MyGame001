@@ -899,6 +899,7 @@ fn the_rules_fixture_loads_with_every_field() {
     assert_eq!(
         rules.difficulties[1],
         DifficultyRules {
+            target_weights: [0; 12],
             id: "brutal".into(),
             rof_pm: 800,
             build_time_pm: 800,
@@ -1232,6 +1233,15 @@ fn the_ai_fixture_loads_with_a_plan_per_side() {
     assert_eq!(
         ai.plan_for(&skirmish.factions[2]),
         Some(AiPlan {
+            policy: sim::AiPolicy {
+                naval_rescan: 1,
+                ..Default::default()
+            },
+            rules_difficulty: false,
+            defences: Vec::new(),
+            support: Vec::new(),
+            tier_reserves: [0; 3],
+            advanced_tech_level: 0,
             build_order: soviet.build_order.clone(),
             power: soviet.power,
             harvester: soviet.harvester,
@@ -2062,7 +2072,13 @@ fn every_field_of_the_skirmish_file_is_required() {
 #[test]
 fn every_field_of_the_ai_file_is_required() {
     let text = File::Ai.text();
-    for field in ["schema_version", "plans", "difficulties"] {
+    for field in [
+        "schema_version",
+        "rules_difficulty",
+        "policy",
+        "plans",
+        "difficulties",
+    ] {
         let name = format!("ai_missing_{field}");
         let path = temp_file(
             &format!("{name}.ron"),
@@ -2120,8 +2136,8 @@ fn unknown_and_duplicate_fields_are_rejected_in_every_file() {
         // The rules file: the file's struct, a scalar group, an entry of a list.
         (
             File::Rules,
-            "    schema_version: 3,",
-            "    schema_version: 3,\n    seed: 4,",
+            "    schema_version: 4,",
+            "    schema_version: 4,\n    seed: 4,",
             "seed",
             DataErrorKind::UnknownField,
         ),
@@ -2148,8 +2164,8 @@ fn unknown_and_duplicate_fields_are_rejected_in_every_file() {
         ),
         (
             File::Rules,
-            "    schema_version: 3,",
-            "    schema_version: 3,\n    schema_version: 3,",
+            "    schema_version: 4,",
+            "    schema_version: 4,\n    schema_version: 4,",
             "schema_version",
             DataErrorKind::DuplicateField,
         ),
@@ -2242,8 +2258,8 @@ fn unknown_and_duplicate_fields_are_rejected_in_every_file() {
         // The AI file. A build order at the top level is the layout of schema version 1.
         (
             File::Ai,
-            "    schema_version: 2,",
-            "    schema_version: 2,\n    build_order: [],",
+            "    schema_version: 3,",
+            "    schema_version: 3,\n    build_order: [],",
             "build_order",
             DataErrorKind::UnknownField,
         ),
@@ -2408,10 +2424,11 @@ fn other_schema_versions_are_rejected_in_every_file() {
     // rosters), the AI file at 2 (1: one plan at the top level); a file of an earlier version
     // and of any later version is rejected as such.
     let cases = [
-        (File::Rules, "schema_version: 3,", 0, 3),
-        (File::Rules, "schema_version: 3,", 1, 3),
-        (File::Rules, "schema_version: 3,", 2, 3),
-        (File::Rules, "schema_version: 3,", 4, 3),
+        (File::Rules, "schema_version: 4,", 0, 4),
+        (File::Rules, "schema_version: 4,", 1, 4),
+        (File::Rules, "schema_version: 4,", 2, 4),
+        (File::Rules, "schema_version: 4,", 3, 4),
+        (File::Rules, "schema_version: 4,", 5, 4),
         (File::Arsenal, "schema_version: 9,", 4, 9),
         (File::Arsenal, "schema_version: 9,", 3, 9),
         (File::Arsenal, "schema_version: 9,", 2, 9),
@@ -2422,8 +2439,9 @@ fn other_schema_versions_are_rejected_in_every_file() {
         (File::Skirmish, "schema_version: 3,", 2, 3),
         (File::Skirmish, "schema_version: 3,", 1, 3),
         (File::Skirmish, "schema_version: 3,", 4, 3),
-        (File::Ai, "schema_version: 2,", 1, 2),
-        (File::Ai, "schema_version: 2,", 3, 2),
+        (File::Ai, "schema_version: 3,", 1, 3),
+        (File::Ai, "schema_version: 3,", 2, 3),
+        (File::Ai, "schema_version: 3,", 4, 3),
     ];
     for (index, (file, from, found, expected)) in cases.into_iter().enumerate() {
         let path = variant(
@@ -4415,7 +4433,7 @@ fn ai_plans_are_checked_for_their_side() {
         File::Ai,
         &path,
         "plans",
-        invalid("an empty list", "1 to 3 plans"),
+        invalid("an empty list", "1 to 12 plans"),
     );
     let name = "ai_no_difficulties";
     let no_difficulties = repeat_block(name, &text, EASY_DIFFICULTY, 0);

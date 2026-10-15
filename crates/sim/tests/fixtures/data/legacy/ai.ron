@@ -24,10 +24,17 @@
 // riflemen, rocket soldiers, artillery, and scouts; the Meridian's rocket towers and heavy tanks,
 // conscripts, grenadiers, raiders, and rocket launchers. Balance data (docs/DECISIONS.md D51).
 (
-    schema_version: 2,
+    schema_version: 3,
+    rules_difficulty: 0,
+    policy: (garrison_quota: 0, garrison_radius: 0, depot_radius: 0, naval_rescan: 1, naval_detector_quota: 0, artillery_min_range: 0, artillery_standoff: 0, paradrop_offset: 0, chrono_min_offset: 0, chrono_max_offset: 0),
     plans: [
         (
             side: "none",
+            country: "",
+            defences: [],
+            support: [],
+            tier_reserves: [0,0,0],
+            advanced_tech_level: 0,
             build_order: [
                 "power_plant",
                 "refinery",

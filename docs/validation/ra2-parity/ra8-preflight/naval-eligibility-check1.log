@@ -1,0 +1,16 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0624]: method `bounds` is private
+   --> crates/sim/src/ai/strategy.rs:132:33
+    |
+132 |     let (x0,y0,x1,y1)=footprint.bounds();
+    |                                 ^^^^^^ private method
+    |
+   ::: crates/sim/src/building.rs:40:5
+    |
+ 40 |     fn bounds(&self) -> (i64, i64, i64, i64) {
+    |     ---------------------------------------- private method defined here
+
+For more information about this error, try `rustc --explain E0624`.
+error: could not compile `sim` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `sim` (lib test) due to 1 previous error

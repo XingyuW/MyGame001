@@ -1,0 +1,29 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 2.88s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 4 tests
+
+thread 'ra8_yuri_cannot_acquire_a_hostile_occupied_building_as_a_control_target' (4798835) panicked at crates/sim/tests/ra8_ai.rs:570:9:
+Yuri SimId(3) fired an impossible control shot at occupied host SimId(3221225869): [WeaponFired { attacker: SimId(3), target: SimId(3221225869), weapon: WeaponKind(61) }, AttackEnded { unit: SimId(3), target: SimId(3221225869), reason: NoDamage }]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_yuri_cannot_acquire_a_hostile_occupied_building_as_a_control_target ... FAILED
+
+thread 'ra8_control_holding_yuri_completes_attack_move_and_preserves_explicit_retargeting' (4798833) panicked at crates/sim/tests/ra8_ai.rs:469:5:
+held control left an immortal AttackMove marker: Some(Weapon { kind: WeaponKind(61), secondary: Some(WeaponKind(97)), cooldown: 0, burst_left: 0, volley: WeaponKind(61), target: None, order: Some(AttackMove { destination: CellPos { x: 30, y: 20 }, moving: true }) })
+test ra8_control_holding_yuri_completes_attack_move_and_preserves_explicit_retargeting ... FAILED
+test ra8_endgame_preserves_temporal_mind_control_and_active_naval_travel ... ok
+late Yuri SimId(2): Some(Health { hit_points: 78 }), Some(Weapon { kind: WeaponKind(61), secondary: Some(WeaponKind(97)), cooldown: 0, burst_left: 0, volley: WeaponKind(61), target: None, order: None }), wave={SimId(2), SimId(3), SimId(4), SimId(5), SimId(6), SimId(7)}, held={SimId(4): (SimId(2), PlayerId(1)), SimId(5): (SimId(3), PlayerId(1))}
+late Yuri SimId(3): Some(Health { hit_points: 78 }), Some(Weapon { kind: WeaponKind(61), secondary: Some(WeaponKind(97)), cooldown: 0, burst_left: 0, volley: WeaponKind(61), target: None, order: None }), wave={SimId(2), SimId(3), SimId(4), SimId(5), SimId(6), SimId(7)}, held={SimId(4): (SimId(2), PlayerId(1)), SimId(5): (SimId(3), PlayerId(1))}
+late target transitions: {"Waypoint(1)", "Waypoint(10)", "Waypoint(100)", "Waypoint(108)", "Waypoint(109)", "Waypoint(11)", "Waypoint(110)", "Waypoint(111)", "Waypoint(112)", "Waypoint(113)", "Waypoint(119)", "Waypoint(12)", "Waypoint(120)", "Waypoint(121)", "Waypoint(122)", "Waypoint(123)", "Waypoint(124)", "Waypoint(125)", "Waypoint(126)", "Waypoint(127)", "Waypoint(130)", "Waypoint(131)", "Waypoint(132)", "Waypoint(133)", "Waypoint(134)", "Waypoint(135)", "Waypoint(136)", "Waypoint(137)", "Waypoint(138)", "Waypoint(139)", "Waypoint(140)", "Waypoint(141)", "Waypoint(142)", "Waypoint(143)", "Waypoint(144)", "Waypoint(19)", "Waypoint(20)", "Waypoint(21)", "Waypoint(22)", "Waypoint(23)", "Waypoint(24)", "Waypoint(32)", "Waypoint(33)", "Waypoint(34)", "Waypoint(35)", "Waypoint(36)", "Waypoint(45)", "Waypoint(46)", "Waypoint(47)", "Waypoint(48)", "Waypoint(49)", "Waypoint(58)", "Waypoint(59)", "Waypoint(6)", "Waypoint(60)", "Waypoint(61)", "Waypoint(7)", "Waypoint(71)", "Waypoint(72)", "Waypoint(73)", "Waypoint(74)", "Waypoint(8)", "Waypoint(84)", "Waypoint(85)", "Waypoint(86)", "Waypoint(87)", "Waypoint(9)", "Waypoint(96)", "Waypoint(97)", "Waypoint(98)", "Waypoint(99)"}
+test ra8_control_holding_specialists_do_not_pin_a_capable_ai_wave_to_one_waypoint ... ok
+
+failures:
+
+failures:
+    ra8_control_holding_yuri_completes_attack_move_and_preserves_explicit_retargeting
+    ra8_yuri_cannot_acquire_a_hostile_occupied_building_as_a_control_target
+
+test result: FAILED. 2 passed; 2 failed; 0 ignored; 0 measured; 21 filtered out; finished in 0.49s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

@@ -1,0 +1,14 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0425]: cannot find type `Health` in this scope
+   --> crates/sim/tests/ra5_world.rs:718:79
+    |
+718 | ...   let before: Vec<_> = app.world_mut().query::<(&SimId, &Unit, &Owner, &Health, &sim::Orders, Option<&sim::Weapon>)>().iter(app...
+    |                                                                             ^^^^^^ not found in this scope
+    |
+help: you might be missing a type parameter
+    |
+564 | fn only_land_route_ai<Health>(lose_sight: bool) {
+    |                      ++++++++
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `sim` (test "ra5_world") due to 1 previous error
