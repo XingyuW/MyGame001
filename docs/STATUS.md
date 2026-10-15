@@ -1260,8 +1260,8 @@ RA7; no review or approval tag was created.
 
 ## RA7: vision, tactical commands, interface and announcements (2026-10-15)
 
-Implementation complete; final frozen validation pending. R84–R86 and the
-[RA7 acceptance ledger](validation/ra2-parity/RA7_ACCEPTANCE.md) map scope to exact positive,
+**Validated**, not independently reviewed or approved, on frozen `dd647f5`. All thirteen
+commands pass. R84–R87 and the [RA7 acceptance ledger](validation/ra2-parity/RA7_ACCEPTANCE.md) map scope to exact positive,
 negative and boundary tests. This entry does not claim independent review or approval.
 
 Actual match/lobby fog defaults OFF: explored normal enemies remain visible to rendering,
@@ -1292,6 +1292,35 @@ All earlier failed/partial preflight and mutation logs are preserved in
 RA8's broader AI/performance scope and RA9's R83 transport-size/loaded-boarding/Squid firing
 obligations remain open. Existing RA5/RA6 assumptions remain. No new substantial external
 directory, clone or worktree was created; configured Cargo/UV/PIP caches are preserved.
+
+**Frozen gate** ([exact commands/logs](validation/ra2-parity/ra7/summary.txt),
+[metrics and match identities](validation/ra2-parity/ra7/metrics.json)): 1,130 passed, 0 failed,
+0 ignored; 1,124 static tests/no ignores. Workspace wall 9,495 s; release/debug 600-frame smoke
+16/124 s; full 260-configuration soak command 6,081 s (measured 6,076.9 s), 18,720,000 ticks,
+peak 234.5 MiB; full separate duels 6,816 s and 756/756 Won. Production 756/756 winners and both
+exact Coral regressions pass. Production harness 5,729.66 s; its entire 756-row table is byte-identical
+to attempt1's 5,141.62 s table. Shipped benchmark mean 0.337 ms/max 2.023 ms, loaded mean 0.769 ms,
+peak 1.5 MiB. Packaging, generator and 4,934-row cached reference checks pass. All thirteen
+command durations sum 22,565 s (6 h 16 m 5 s); measured timings govern later performance planning.
+R29 median/p90/max ratios: production 0.1314704861/0.2807579365/0.7824722222; separate duels
+0.1386996528/0.3236736111/0.7664722222. No limits were raised.
+
+Attempt1's failed RA4 lower timing-bound scenario and all prior attempts remain preserved.
+R86 explicitly restores only that original fogON stalemate, preserving every assertion/limit;
+nine companion cases remain actual-default fogOFF. This is an intended scenario migration.
+
+**RA8 handoff boundary.** Command/Combat and actual paid-production concealment are proven.
+Root reading identified raw `spawn_unit` Spy/sub + already revealed cell + empty CommandQueue
+before AI View as a separate boundary for RA8 to reproduce/fix if confirmed. No actual shipped-game
+leak is proven. RA8's broader arsenal/performance/shorter-match work and R83's RA9 transport
+size/loaded-boarding/Squid-host actual WeaponFired obligations remain open, alongside earlier
+assumptions and independent final review. Do not infer these were closed by RA7's gate.
+
+Configured Cargo target/package is preserved. About 5.6 MiB of recreatable RA7 parser scratch
+under its `tmp/ra7_definitions` is retained for reruns; it is not needed for release. No new
+clone/worktree/environment or /tmp build output was created; UV/PIP variables remain unchanged.
+Runtime/data/test source is unchanged after `dd647f5`; this closure changes documentation/logs
+only. `main` remains 8230a95; root must check clean closure before releasing RA8.
 
 ## Repair, aircraft overflight, new music and distinct silhouettes (2026-10-06)
 
