@@ -504,6 +504,16 @@ pub fn weapon_against(
     weapons: [Option<WeaponKind>; 2],
     traits: &TargetTraits,
 ) -> Option<(WeaponKind, i32)> {
+    weapon_against_inner(definitions, terms, weapons, traits, false)
+}
+
+fn weapon_against_inner(
+    definitions: &Definitions,
+    terms: &CombatTerms,
+    weapons: [Option<WeaponKind>; 2],
+    traits: &TargetTraits,
+    gunner: bool,
+) -> Option<(WeaponKind, i32)> {
     let both = [true, true];
     let secondary = [false, true];
     let none = [false, false];
@@ -536,7 +546,7 @@ pub fn weapon_against(
         };
         if definitions.rules().is_some()
             && (def.repair
-                || def.area_fire
+                || (def.area_fire && !gunner)
                 || (def.naval_only && (!traits.on_water || traits.building))
                 || definitions.warhead(def.warhead).is_some_and(|h| {
                     h.bomb_disarm
@@ -1055,6 +1065,8 @@ pub fn scattered(
 /// What an attacker fires with: the weapons it carries and the combat terms of its type.
 #[derive(Clone, Copy)]
 struct Arms {
+    /// Only a passenger-controlled gunner may automatically fire its area weapon.
+    gunner: bool,
     weapons: [Option<WeaponKind>; 2],
     terms: CombatTerms,
     /// The multipliers of the attacker's damage and reload, in permille (RA4).
@@ -1170,7 +1182,13 @@ impl Field<'_> {
 
     /// The weapon `arms` uses against a target with `traits` ([`weapon_against`]).
     fn choose(&self, arms: &Arms, traits: &TargetTraits) -> Option<Choice<'_>> {
-        let (kind, versus) = weapon_against(self.definitions, &arms.terms, arms.weapons, traits)?;
+        let (kind, versus) = weapon_against_inner(
+            self.definitions,
+            &arms.terms,
+            arms.weapons,
+            traits,
+            arms.gunner,
+        )?;
         let def = self.definitions.weapon(kind)?;
         let bonus = if traits.airborne && def.anti_air {
             arms.terms.air_range_bonus
@@ -1286,6 +1304,21 @@ impl Field<'_> {
             .launcher
             .is_some_and(|(launcher, _)| launcher == choice.kind)
         {
+            return;
+        }
+        // AreaFire pulses originate at the firing vehicle, with normal acquisition,
+        // reload, veterancy and RA3 warhead processing. Yuri's deploy-only secondary
+        // never reaches this path because it is not a gunner weapon.
+        if def.area_fire && arms.gunner {
+            shots.blasts.push(Blast {
+                point: from.centre(),
+                air: false,
+                warhead: def.warhead,
+                damage: def.damage,
+                direct: None,
+                firepower_pm: arms.firepower_pm,
+                source: Some(id),
+            });
             return;
         }
         let (dx, dy) = from.gap(&target.extent);
@@ -1588,6 +1621,12 @@ pub(crate) fn combat(
             Some((kind, special.launch_ready(id, number)))
         });
         let arms = Arms {
+            gunner: field
+                .targets
+                .get(&id)
+                .and_then(|t| t.item)
+                .and_then(|item| definitions.metadata(item))
+                .is_some_and(|m| m.gunner),
             weapons: if ruled
                 && (special.deployed.contains_key(&id)
                     || special.coil_charge.get(&id).is_some_and(|&n| {
