@@ -5451,6 +5451,22 @@ neutral difficulty alone diagnoses the race. The isolated bridge fixture retains
 documented original ordinary ground strategy; actual expanded default-path runs remain
 independent acceptance evidence.
 
+### R98. RA8 measured Prop membership cleanup
+
+**2026-10-15.** The five-second native Frostline sample identifies full-map Prop-ID set
+construction in `special/advance.rs` (1408/3626 main-thread stack samples). Replace it with
+the same actor/target retention predicate using direct `Props::get` only for active
+interactions, collecting expired actor IDs in ordered iteration before mutation. Zero-HP
+Props pending removal retain the same membership. There is no RNG/state or definition-copy
+change. This is a separately committed performance change, not an ending-policy fix.
+
+The repeatable default ten-player Frostline seed13 harness measures5000 ticks over14342
+Props: tick total5.3972386s→1.741916029s, mean1.079447ms→348.383µs. Both full-state digests
+are94f4c6583a68ff22 and both660-event digests areacbe6072fabd5e3a. The exact comparison passes.
+Hash/event formatting is excluded from tick cost; total elapsed14.918685625s→11.032613583s
+includes it. Neither measurement is sampled. `RA8_PROP_PERFORMANCE.md` and raw before/after
+logs retain reproduction details; final benchmark/all-map/gate timings are measured afresh.
+
 ### R99. RA8 preserves useful observed infantry control opportunities
 
 **2026-10-15.** The prior capability predicate excluded every on-foot enemy. A lone Easy

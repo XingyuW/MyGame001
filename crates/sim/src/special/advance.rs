@@ -11,10 +11,18 @@ pub(crate) fn advance(world: &mut World) {
     // RA4: every trainable unit has its experience from its first tick on.
     crate::veterancy::enlist(world);
     let index = actors(world);
-    let props: BTreeSet<_> = world
-        .resource::<crate::Props>()
+    // Only active interactions need a prop membership lookup. Building an ordered set of
+    // every scenery ID each tick is equivalent but scales with the whole map.
+    let expired_interactions: Vec<_> = world
+        .resource::<SpecialState>()
+        .interactions
         .iter()
-        .filter_map(|(cell, _)| world.resource::<crate::Props>().id_at(cell))
+        .filter_map(|(&actor, target)| {
+            (!index.contains_key(&actor)
+                || (!index.contains_key(target)
+                    && world.resource::<crate::Props>().get(*target).is_none()))
+            .then_some(actor)
+        })
         .collect();
     {
         let mut state = world.resource_mut::<SpecialState>();
@@ -30,9 +38,9 @@ pub(crate) fn advance(world: &mut World) {
             .cargo
             .retain(|id, _| index.contains_key(id) || garrisons.contains(id));
         state.rearming.retain(|id, _| index.contains_key(id));
-        state
-            .interactions
-            .retain(|a, b| index.contains_key(a) && (index.contains_key(b) || props.contains(b)));
+        for actor in expired_interactions {
+            state.interactions.remove(&actor);
+        }
         state.outages.retain(|_, t| *t > tick);
         state
             .docked
