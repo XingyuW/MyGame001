@@ -5088,3 +5088,76 @@ R86 corrected preflight: all seven AI fixture targets (`m6_ai`, `m7_factions`, `
 the previous small-target coverage this is 1,119 unique runtime tests before the expensive
 sweeps; the remaining eleven heavy game tests passed in attempt1 and will rerun in the full
 gate. Strict Clippy remains green. The corrected freeze changes no runtime source/data.
+
+
+### R87. RA7 frozen validation, measured timings and handoff
+
+**2026-10-15. Validated, not independently reviewed or approved.** Runtime/data/client source
+is frozen at `dd647f5` (implementation `0ef4a53`, explicit fixture migration `dd647f5`).
+`env -u RA2_DUEL_SEED -u RA2_DUEL_PAIR sh scripts/validate_ra2_parity.sh ra7` runs all thirteen
+commands unchanged on that source. Every exit is zero; 1,130 runtime tests pass, zero failed
+or ignored, with 1,124 static test attributes and no ignore attributes. Source remains unchanged
+through this documentation-only closure. `main` remains `8230a95`; no approval/review tag exists.
+The acceptance ledger is `docs/validation/ra2-parity/RA7_ACCEPTANCE.md`.
+
+| # | Check | Exit | Wall seconds / evidence |
+|---|---|---:|---|
+|1|Formatting|0|1|
+|2|Diff hygiene|0|0|
+|3|Strict workspace/all-target Clippy|0|0; warnings denied|
+|4|Workspace release tests|0|9,495; 1,130 passed / 0 failed / 0 ignored|
+|5|Release build|0|1|
+|6|Release smoke|0|16; 600 frames, fog ON/OFF flow|
+|7|Debug smoke|0|124; 600 frames, fog ON/OFF flow|
+|8|Benchmark|0|5; shipped mean 0.337 ms / maximum 2.023 ms, loaded mean 0.769 ms; peak 1.5 MiB|
+|9|Full soak|0|6,081; 260 configurations, 18,720,000 ticks, measured 6,076.9 s; peak 234.5 MiB|
+|10|Separate full duels|0|6,816; 756/756 Won, longest 157,564 ticks|
+|11|macOS package|0|26; app/archive in configured Cargo target/package|
+|12|Generated data|0|0; generator check|
+|13|Reference table|0|0; cached reference matches all 4,934 committed rows|
+
+The command-duration sum is 22,565 s (6 h 16 m 5 s), not a three-hour assumption. The successful
+production target reports 5,729.66 s in its test harness; attempt1 reports 5,141.62 s.
+These harness durations are recorded separately from the shell's command wall durations.
+All 756 production rows (name/ticks/limit) are byte-identical between attempt1 and final:
+zero changed matches. Both targets passed their mandatory winner assertions. Independent
+parsing of the separate duel log confirms 756 ended records and 756 Won records, with no Draw.
+The observed timing variation therefore changes neither this sweep's match identities nor
+its deterministic ending ticks. No cause is inferred from wall time alone.
+
+R29 scaled-budget ratios (median / nearest-rank p90 / maximum): production
+0.1314704861 / 0.2807579365 / 0.7824722222; separate duels
+0.1386996528 / 0.3236736111 / 0.7664722222. The production worst case is Crossroads,
+Libya easy versus Iraq easy, 56,338 / 72,000 ticks; duel worst is Riverlands, Iraq easy versus
+Cuba easy, 55,186 / 72,000 ticks. Limits remain unchanged. Both exact Coral regressions pass.
+`ra7/{summary.txt,metrics.json,production-lengths.tsv,duel-lengths.tsv}` retain the commands,
+values and match identities. `ra7-attempt1` and every failed/partial preflight remain preserved.
+The debug linker retains the same Apple compact-unwind 16 MiB warning present in RA6;
+strict Clippy and both smoke checks pass. No new exception-handling performance claim is made.
+
+**Assumptions and next work.** R84's standalone SimPlugin fogON scenario contract is distinct
+from actual shipped match/lobby defaults OFF; R86 preserves only the original last-stand
+fogON stalemate, with all assertions/limits unchanged and all nine companions default OFF.
+R85 records Guard's explicit reference range or primary-weapon fallback and the separate
+QueueMove variant; no undocumented generic guard/chase equivalence is claimed. Original
+visual/audio/play feel requires user verification.
+
+Proven first-spawn coverage is Command/Combat and actual paid production, with live/powered
+and sold/dead detector boundaries. Root identified a further AI ordering boundary by reading:
+raw `spawn_unit` Spy/sub into a previously revealed cell immediately before an AI turn with an
+empty CommandQueue could reach AI View before the later concealment refresh (Commands→AI→
+Economy). No actual shipped-game leak is proven; paid production and current starting rosters
+do not establish that raw-helper case. RA8 is assigned to reproduce with the actual controller/
+shipped definitions and fix if confirmed. This gate's proven coverage is not a claim that this
+additional AI boundary is closed. Preserve the RA7 phase/privacy regressions when extending AI.
+RA8 also retains broader arsenal use/performance/shorter-match work. R83's transport Size/
+SizeLimit/loaded-boarding and actual attached Squid-host WeaponFired assertions remain RA9
+obligations. Earlier R67 naval bridge repair refusal, RA5/RA6 assumptions and final independent
+review remain unchanged; RA7 does not silently close them.
+
+**Storage.** No clone, worktree, validation environment or /tmp build artifact was created.
+Configured `CARGO_TARGET_DIR=/Users/xingyuwang/Library/Caches/Codex/cargo-target` and UV/PIP cache
+variables are preserved. The existing target/package app/archive remains useful for delivery.
+Tests created about 5.6 MiB of recreatable RON parser variants in that target's
+`tmp/ra7_definitions`; this scratch is retained for reruns and is not required for release.
+All requested logs/evidence remain in the canonical repository.

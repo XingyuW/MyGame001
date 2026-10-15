@@ -1,0 +1,66 @@
+{
+  "frozen_source": "dd647f5",
+  "ratio_basis": "ticks / (72000 * max(128, width + height) / 128); p90 nearest-rank",
+  "production": {
+    "count": 756,
+    "median": 0.13147048611111112,
+    "p90": 0.2807579365079365,
+    "maximum": 0.7824722222222222,
+    "worst_match": "crossroads: libya (easy) against iraq (easy)",
+    "worst_ticks": 56338,
+    "worst_limit": 72000
+  },
+  "duels": {
+    "count": 756,
+    "median": 0.1386996527777778,
+    "p90": 0.3236736111111111,
+    "maximum": 0.7664722222222222,
+    "worst_match": "riverlands: iraq (easy) against cuba (easy)",
+    "worst_ticks": 55186,
+    "worst_limit": 72000
+  },
+  "production_identical_to_attempt1": true,
+  "production_target_elapsed_seconds": 5729.66,
+  "check_seconds": {
+    "01": 1,
+    "02": 0,
+    "03": 0,
+    "04": 9495,
+    "05": 1,
+    "06": 16,
+    "07": 124,
+    "08": 5,
+    "09": 6081,
+    "10": 6816,
+    "11": 26,
+    "12": 0,
+    "13": 0
+  },
+  "command_seconds_sum": 22565,
+  "workspace_tests": {
+    "passed": 1130,
+    "failed": 0,
+    "ignored": 0,
+    "static_test_attributes": 1124
+  },
+  "soak": {
+    "configurations": 260,
+    "ticks": 18720000,
+    "measured_seconds": 6076.9,
+    "peak_heap_MiB": 234.5
+  },
+  "benchmark": {
+    "shipped_mean_ms": 0.337,
+    "shipped_max_ms": 2.023,
+    "loaded_ticks": 309,
+    "loaded_mean_ms": 0.769
+  },
+  "timing_note": "check_seconds are shell date wall durations; production_target_elapsed_seconds is the Rust test-harness reported duration",
+  "storage": {
+    "configured_cargo_target": "/Users/xingyuwang/Library/Caches/Codex/cargo-target",
+    "parser_scratch": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/ra7_definitions",
+    "parser_scratch_bytes": 5807816,
+    "parser_scratch_state": "retained, recreatable; not required for release",
+    "package_state": "existing configured target/package app and archive retained for delivery"
+  }
+}

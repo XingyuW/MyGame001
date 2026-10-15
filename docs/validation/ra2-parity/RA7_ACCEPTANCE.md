@@ -1,7 +1,9 @@
 # RA7 acceptance ledger
 
-Source freeze and complete gate results will be recorded here after validation. This is an
-implementation/validation ledger, not an independent review or approval. R84–R86 record the
+Validated on frozen `dd647f5`: all thirteen gate commands exit 0; 1,130 tests pass with 0 failed
+or ignored, 1,124 static tests, 260 soak configurations and both 756/756-winner sweeps.
+[Full gate](ra7/summary.txt), [metrics and identities](ra7/metrics.json).
+This is an implementation/validation ledger, not an independent review or approval. R84–R87 record the
 rules, compatibility choices and exact intended expectation migrations. Simulation scenarios
 use shipped definitions through CommandQueue + SimSchedule; explicit scenario setup supplies
 positions, HP, charge, terrain and availability to reach boundaries.
@@ -31,12 +33,29 @@ R85; no test was deleted, ignored, skipped or weakened.
 Visual/audio/play feel requires user verification. R67 naval bridge-repair refusal and the
 RA6 assumptions remain. RA9 still owns Size/SizeLimit/loaded boarding and actual attached Squid
 host WeaponFired coverage (R83). Broader AI arsenal use/performance remains RA8; final review
-remains independent. No new substantial external directory is created: Cargo uses the existing
-configured cache; UV/PIP cache variables remain unchanged; logs stay in the canonical repository.
+remains independent. Cargo uses the existing configured cache/package; about 5.6 MiB of recreatable parser scratch
+in its `tmp/ra7_definitions` is retained for reruns and is not required for release. UV/PIP cache
+variables remain unchanged; logs stay in the canonical repository. No clone/worktree/environment
+or /tmp build artifact was created.
 
 
 The failed initial frozen gate is preserved in `ra7-attempt1` (6432s workspace,855/1/0).
 R86 documents the exact RA4 last-stand fixture migration: only its original fogON stalemate
 is explicit; all nine companion matches retain actual default fogOFF with replay checks.
-The first attempt's complete756-row production table and5141.62s target pass remain evidence
+The first attempt's complete 756-row production table and 5141.62 s target pass remain evidence
 for that attempt, not a substitute for the required final full gate.
+
+
+Final R87 evidence: workspace wall 9,495 s, production harness 5,729.66 s, soak command 6,081 s /
+measured 6,076.9 s, separate duels 6,816 s. All thirteen command durations sum 22,565 s (6 h 16 m 5 s).
+Production ending ticks/limits/names are byte-identical to attempt1 for all 756 matches;
+independent duel parsing finds 756/756 Won. Budget ratios median/p90/max are production
+0.1314704861/0.2807579365/0.7824722222 and duels 0.1386996528/0.3236736111/0.7664722222.
+Benchmark shipped mean 0.337 ms/max 2.023 ms/loaded mean 0.769 ms; soak peak 234.5 MiB. No limit changed.
+
+Additional AI handoff check: root's reading identified raw `spawn_unit` Spy/sub in an already
+revealed cell, empty CommandQueue, immediately before AI View. RA8 must reproduce with the
+actual controller/shipped definitions and fix if confirmed. No actual shipped-game leak is
+proven. The validated first-spawn evidence above establishes Command/Combat/paid-production
+protection; it does not close this separate pre-AI raw-helper boundary. R87 distinguishes this
+from the preserved RA5/RA6/R83 debts and records the complete timing/storage evidence.
