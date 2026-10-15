@@ -1057,6 +1057,14 @@ fn apply_move(
 /// resource and collision checks atomic even for mixed commands within one tick.
 pub(crate) fn process_commands(world: &mut bevy_ecs::world::World) {
     if world.resource::<CommandQueue>().is_empty() {
+        // Raw scenario spawns may precede an AI turn without any intervening command.
+        // Its View must use the same living/powered concealment as command validation.
+        if world
+            .resource::<crate::AiPlayers>()
+            .thinks_at(world.resource::<SimTick>().0)
+        {
+            refresh_command_vision(world);
+        }
         return;
     }
     refresh_command_vision(world);
