@@ -592,7 +592,7 @@ fn naming(id: SimId, [tank, engineer]: [SimId; 2]) -> Vec<(IssuedCommand, Reject
                     target: cell,
                 },
             ),
-            unit,
+            unit.clone(),
         ),
         (
             issue(P0, Command::Undeploy { building: id }),
@@ -609,6 +609,101 @@ fn naming(id: SimId, [tank, engineer]: [SimId; 2]) -> Vec<(IssuedCommand, Reject
         (
             issue(P0, Command::SetRallyPoint { building: id, cell }),
             building,
+        ),
+        (issue(P0, Command::Guard { units: vec![id] }), unit.clone()),
+        (
+            issue(P0, Command::Scatter { units: vec![id] }),
+            unit.clone(),
+        ),
+        (
+            issue(
+                P0,
+                Command::Follow {
+                    units: vec![id],
+                    target: tank,
+                },
+            ),
+            unit.clone(),
+        ),
+        (
+            issue(
+                P0,
+                Command::ForceFire {
+                    units: vec![id],
+                    target: sim::ForceTarget::Cell(cell),
+                },
+            ),
+            unit.clone(),
+        ),
+        (
+            issue(
+                P0,
+                Command::ForceMove {
+                    units: vec![id],
+                    target: cell,
+                },
+            ),
+            unit.clone(),
+        ),
+        (
+            issue(
+                P0,
+                Command::QueueMove {
+                    units: vec![id],
+                    target: cell,
+                },
+            ),
+            unit.clone(),
+        ),
+        (
+            issue(
+                P0,
+                Command::Follow {
+                    units: vec![tank],
+                    target: id,
+                },
+            ),
+            RejectReason::UnknownTarget(id),
+        ),
+        (
+            issue(
+                P0,
+                Command::ForceFire {
+                    units: vec![tank],
+                    target: sim::ForceTarget::Entity(id),
+                },
+            ),
+            RejectReason::UnknownTarget(id),
+        ),
+        (
+            issue(
+                P0,
+                Command::Follow {
+                    units: vec![],
+                    target: id,
+                },
+            ),
+            RejectReason::NoUnits,
+        ),
+        (
+            issue(
+                P0,
+                Command::ForceFire {
+                    units: vec![],
+                    target: sim::ForceTarget::Entity(id),
+                },
+            ),
+            RejectReason::NoUnits,
+        ),
+        (
+            issue(
+                P0,
+                Command::ForceFire {
+                    units: vec![engineer],
+                    target: sim::ForceTarget::Entity(id),
+                },
+            ),
+            RejectReason::NotArmed(engineer),
         ),
     ]
 }
@@ -701,6 +796,17 @@ fn a_seen_enemy_is_reported_as_not_owned() {
         "sell",
         "repair",
         "rally",
+        "guard",
+        "scatter",
+        "follow as",
+        "force fire as",
+        "force move",
+        "queue move",
+        "follow on",
+        "force fire on",
+        "follow by nobody",
+        "force fire by nobody",
+        "force fire unarmed",
     ];
     assert_eq!(told.len(), names.len());
     let by_name = |told: &[Option<RejectReason>], name: &str| {
@@ -716,6 +822,12 @@ fn a_seen_enemy_is_reported_as_not_owned() {
         "interact as",
         "superweapon",
         "chronoshift",
+        "guard",
+        "scatter",
+        "follow as",
+        "force fire as",
+        "force move",
+        "queue move",
     ] {
         assert_eq!(by_name(&told, name), not_owned(near_unit), "{name}");
     }
@@ -1359,5 +1471,52 @@ fn ra6_trait_injected_specialists_and_transport_passengers_cannot_act_after_same
                 .flatten()
                 .any(|p| p.id == actor)
         );
+    }
+}
+
+#[test]
+fn ra7_new_command_actors_and_targets_destroyed_earlier_in_the_same_tick_are_missing() {
+    for which in 0..8 {
+        let mut app = world();
+        let dead = spawn(&mut app, P1, "tank", 20, 20);
+        let own = spawn(&mut app, P1, "tank", 25, 20);
+        let silo = charged_silo(&mut app);
+        set_hp(&mut app, dead, 1);
+        let units = vec![dead];
+        let c = match which {
+            0 => Command::Guard { units },
+            1 => Command::Scatter { units },
+            2 => Command::Follow { units, target: own },
+            3 => Command::ForceFire {
+                units,
+                target: sim::ForceTarget::Cell(CellPos::new(25, 20)),
+            },
+            4 => Command::ForceMove {
+                units,
+                target: CellPos::new(25, 20),
+            },
+            5 => Command::QueueMove {
+                units,
+                target: CellPos::new(25, 20),
+            },
+            6 => Command::Follow {
+                units: vec![own],
+                target: dead,
+            },
+            _ => Command::ForceFire {
+                units: vec![own],
+                target: sim::ForceTarget::Entity(dead),
+            },
+        };
+        let events = tick(&mut app, vec![strike(silo), issue(P1, c)]);
+        assert_eq!(
+            rejections(&events),
+            vec![if which < 6 {
+                RejectReason::UnknownUnit(dead)
+            } else {
+                RejectReason::UnknownTarget(dead)
+            }]
+        );
+        assert!(destroyed(&events, dead));
     }
 }

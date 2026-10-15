@@ -4880,3 +4880,176 @@ remains useful; the app/archive are retained under the existing
 `/Users/xingyuwang/Library/Caches/Codex/cargo-target/package/` for delivery and validation.
 No substantial /tmp artifact was created. `main` remains8230a95. RA7 may begin
 only after root checks this closure; RA8/RA9 and the independent final review remain outstanding.
+
+### R84. RA7 shroud-only matches, concealment timing and reconnaissance
+
+**2026-10-15.** Actual match setup installs `MatchOptions::fog_of_war`, default false, into
+hashed MatchRules and Vision. `Vision::is_visible`, bodies and all existing consumers treat
+explored cells as visible when fog is off: normal enemies remain rendered, targetable,
+commandable and known to AI. With fog on, the current-sight behavior remains. SpecialState's
+per-observer concealment is independent. **Compatibility:** `SimPlugin` alone initializes
+scenario-only MatchState with fog true, retaining the older fixture/scenario contract; this
+is distinct from the RA2 match-setup default. The continuation's explicit explored-is-visible
+contract supersedes the stale RA7 plan test sentence saying an explored enemy stays hidden.
+
+Gap uses the committed `[GAGAP] GapRadiusInCells=10`, a clipped squared-distance circle,
+and clears both current and explored bits every tick for hostile players. Allies are excluded;
+local living sight reveals again after shrouding, while Satellite alone cannot counter Gap.
+Legacy no-rules worlds retain the M9 concealment method and fixture behavior. Spy Satellite
+continues to require its actual powered operating state and suppresses radar infiltration.
+Psychic Sensor uses radius15 for disguise detection and provides `psychic_orders(viewer)`:
+ordered source/destination coordinates only, no actor IDs; own/allied, dead and specially
+concealed sources are excluded. Purple client lines consume this owner-scoped query. Boundary
+15 is inclusive;16 is outside. Nuclear marks retain RA6's independent owner/sensor filtering.
+
+**R76 reproduced and fixed:** with prior P0 vision, a newly spawned shipped P1 Spy at12,10 was
+accepted by Attack and fired upon in its first tick. `first-spawn-before2.log` retains that
+failure. Concealment refresh now runs before command batches, after abilities and before
+Combat following production/movement. It borrows Definitions through resource_scope instead
+of adding deep clones. Tests separately exercise command rejection, uncommanded submarine
+acquisition and actual paid Spy production on its exact spawn tick. Living/powered building
+detectors and non-airborne cloak sensors are required. Power totals exclude buildings with
+zero HP in ruled worlds, closing the relevant stale-generator contribution before Economy.
+No claim about unrelated destroyed-actor production or other remaining RA9 debt is implied.
+
+Arsenal9 adds bounded required `guard_range` (0..64 cells), generated from per-type GuardRange;
+zero explicitly means fallback to the ported primary weapon Range. Every legacy/RA1–RA5
+arsenal fixture and all parser/audit helpers migrate together. Gap radius and guard range
+are independently checked by `ra9_data_parity`, and the field inventory includes guard_range.
+Shipped data remains generated only from committed reference tables; the192KiB ceiling is
+unchanged. No reference ini/text/art/sound enters the repository.
+
+### R85. RA7 orders, controls and original rate-limited announcements
+
+**2026-10-15.** New commands are Guard, Scatter, Follow, ForceFire, ForceMove and QueueMove.
+QueueMove is a separate explicit queued-Move variant, avoiding a default-bearing change to
+every older Move constructor. Each shares actor ownership, bounds, liveness and hidden/missing
+validation. Follow/ForceFire entity targets have complete missing/unseen/concealed rejection
+coverage, including empty/unarmed selections; friendly ForceFire targets are permitted.
+Guard/Follow/waypoint maps and ForceFire's combat order are hashed in ordered form. At most32
+pending waypoints per unit are accepted atomically. Stop and successful replacement commands
+clear prior tactical state; successful Interact/Deploy/Undeploy also clear it, as do specialist
+clear_orders paths for teleport/transport. A Follow forgets an unseen or concealed target and
+never updates its route from that target's hidden position.
+
+Guard is anchored where ordered and selects hostile visible targets inside the reference
+GuardRange; when absent, primary weapon Range is the explicit fallback assumption. It returns
+to the anchor when idle. Ordinary idle acquisition is suppressed while this area guard has no
+eligible target, so long-range V3 fire cannot bypass its explicit9-cell GuardRange. The engine's
+undocumented generic guard/chase defaults are not claimed byte-for-byte equivalent. Scatter
+assigns deterministic nearby directions by SimId and asks the ordinary navigation allocator
+for free destinations. ForceMove shares ordinary move/navigation/crush behavior: the game's
+existing Move already permitted hostile crushing. It does not acquire combat targets en route.
+
+ForceFire has a distinct AttackOrder and genuine ordinary weapon choice, reload/burst,
+projectile, RA3 warhead, friendly splash, source credit, ammunition and surfacing paths. Ground
+shots use reserved SimId(u32::MAX), which the allocator never emits; it is not inserted into the
+automatic target index. Ground projectile aim is fixed. Launchers derive ground aim from the
+hashed ForceFire order and launch real missiles/aircraft; flight retains its independent aim
+after the source stops. Entity orders retain normal special concealment checks as targets move.
+
+Q/W/E/R select tabs; K repair,L sell,G guard,X scatter,F follow,Z held waypoints,S stop,D deploy,
+T type,P all combat,H home,N/M next/previous, Alt+digit centre group, Ctrl/Cmd+F1–F4 set and
+F1–F4 jump bookmarks. Ctrl+Shift click wins over Ctrl force fire, Alt force move and Z queues;
+A retains attack move. Global rally moves R→Y, pause P→Pause/F9/backslash, mute M→F10/apostrophe,
+and the old E interaction mode moves to I because E is Infantry. MacBook bookmarks also use
+Alt+arrows, with Ctrl/Cmd+Alt to set (up/right/down/left =1/2/3/4). Modified arrows do not pan.
+README has a prominent previous/current table. F issues a Follow order, as continuation Step3
+requires, superseding appendix D18's camera-follow-only description. Context right click and
+cursor labels use the same read-only interaction validator as simulation execution, including
+Engineer/Spy/transports/garrisons/depot/hospital/Tanya buildings. Ship right clicks keep the ordinary
+Attack path, which selects Tanya's already ported naval Sapper weapon.
+
+Thirteen original synthesized motifs plus text cover unit ready, construction complete,
+on hold,cannot deploy,base attack,unit lost,low power,insufficient funds,superweapon built/ready/
+launch,radar on/off. Owner-only events remain owner-only; public SW notices contain no hidden
+source IDs/positions. A bounded queue, eight-second category cooldown and one-second global
+spacing limit repetition. No audio file or recording is added; LICENSES records the source.
+All visual/audio/play feel requires user verification.
+
+**Exact intended existing-test migrations (no deleted/ignored/weakened tests):**
+- `ra1_definitions::every_field_of_the_arsenal_file_is_required` adds guard_range;
+  `unknown_and_duplicate_fields_are_rejected_in_every_file`,
+  `other_schema_versions_are_rejected_in_every_file` and arsenal_of advance arsenal8→9,
+  retaining old-version rejection (including8) and future10 rejection.
+- `ra2_definitions::the_fixture_loads_with_the_traits_of_schema_version_3`,
+  `ra3_definitions::the_fixture_loads_with_the_traits_of_schema_version_4`, and
+  `ra4_definitions::the_fixture_loads_with_the_traits_of_schema_version_5` expect current9;
+  every retained earlier-trait assertion remains.
+- `ra1_commands::a_seen_enemy_is_reported_as_not_owned` extends its exact name/result table;
+  naming adds all new actors, Follow/ForceFire targets and empty/unarmed target variants to
+  both existing missing/unseen/submerged matrices. Existing positional checks keep their order.
+- `ra1_shipped::the_default_match_is_that_of_red_alert_2s_lobby` includes default-off fog.
+- `hotkeys::tests::every_listed_key_has_one_action` migrates X/R/P/M to L/Y/F9/F10 with the
+  new secondary keys; Q/W become valid tabs and F5/F6 remain explicit unbound negatives.
+- `skirmish::tests::every_on_off_row_sets_its_option_of_the_match_and_no_other` adds Fog/Ore
+  rows and exact propagation. `the_menu_and_its_longest_texts_fit_the_smallest_window` expects
+  nineteen distinct rows instead of seventeen and retains every original size/text bound.
+- `smoke::tests::a_run_passes_only_with_the_menu_laid_out_the_cards_listed_and_the_flow_checked`
+  expects79 buttons instead of75. `the_flows_menu_presses_choose_its_matches_and_restore_the_lobby`
+  includes fog-on/ore-off first matches and restored fog-off/ore-on final defaults. Runtime
+  smoke checks compare both choices to actual MatchRules. No layout, victory or timing limit changes.
+
+R85 preflight compatibility clarifications: the exact
+`ra5_ai_remembers_a_seen_collapse_and_approaches_its_hut_after_losing_sight` scenario explicitly
+requests fog on; its unseen-hut memory, Engineer consumption and unchanged winner limit
+assertions remain. Its companion normal-vision match retains the new actual-match default.
+The early concealment refresh preserves explicit prop/garrison filters until the normal
+Visibility pass, keeping `ra5_enemy_garrisons_exchange_occupation_fire_but_hidden_garrisons_are_not_targets`
+unchanged. Power is refreshed again after Cleanup so lost generators/radar cannot leave a
+stale operating detector in client queries. Concealment also refreshes before tactical
+pathfinding, preventing Follow from reading a newly concealed target after Economy effects.
+The initial small preflight's failures remain in `ra7-preflight/small-sim1.log` and
+`focused2.log`; the guarded-field fixture-prefix failure remains in `focused3.log`.
+
+R85 same-batch command regression: root identified Sensor sale followed by Attack/Follow as a
+boundary worth probing. The shipped `ra7_selling_the_only_sensor_hides_spy_from_later_same_tick_regular_commands`
+failed with both commands accepted after the sole detector was sold; `sensor-sale-before.log`
+retains the exact sequence. Sale/placement and orders involving actual Mirage IDs now flush
+the regular batch, apply deferred entities, recompute live power and refresh concealment before
+later commands. Normal army commands retain contiguous processing, without a per-command
+Definitions clone or full unit scan. A separate moving-Mirage Stop→Attack regression checks the
+concealment transition. ForceFire also shares the legal firing-position/minimum-range search,
+including backing away before firing a V3, and its source-credit test asserts the exact900 XP.
+
+
+R85 final client privacy regression: `ra7_visible_disguise_is_not_an_enemy_cursor_target`
+reproduced a concealed Spy's true enemy identity in the cursor's hit list, despite the intended
+friendly disguise rendering. The enemy hit list now excludes observer-hidden IDs while retaining
+the visible disguise. `disguise-cursor-before2.log` records the failing probe. Modifiers show
+FORCE FIRE/FORCE MOVE/WAYPOINT/ATTACK MOVE labels and preserve Ctrl+Shift precedence; cursor
+hit targets take priority over a cell's first occupant for multi-infantry cells and Follow.
+`ra7_deploy_and_chronoshift_clear_pending_waypoints` adds explicit successful Deploy and
+teleport queue clearing coverage. The Gap exploration mutation must fail its edge regression;
+its original source is restored before the final gate.
+
+
+R85 preflight process deviation: the first expanded small-target invocation continued after
+an added fixture compile correction, and its replacement was started before the first process
+finished. Their existing m6_definitions scratch FIFO path collided (`mkfifo failed`) in the
+first run. Both complete logs are retained; the replacement's exact result is recorded at
+closure, with any affected targets rerun serially. The full frozen gate runs as one serial
+invocation with no competing validator. No production code or existing test was changed for
+the scratch collision.
+
+
+R85 power integration correction: unchanged
+`ra6_storm_warning_exclusivity_duration_and_cloud_separation_are_deterministic` exposed that
+RA7's new post-Cleanup power refresh restored enemy radar during the active Storm. Power/radar
+recomputation now includes the active hostile Storm's exact starts/ends interval. The original
+RA6 assertion remains unchanged; the failing small preflight logs and serial passing rerun
+are retained. Scratch collisions also affected m2/m3/m4 parser variants during the overlapping
+preflight; the complete small suite is rerun serially before freeze.
+
+
+Exact overlapping parser scratch failures: m2_definitions::{
+ron_features_outside_the_subset_are_rejected_before_ron_parses,
+unit_values_outside_their_ranges_are_rejected, schema_versions_other_than_1_are_rejected,
+value_limits_are_inclusive}; m3_definitions::numeric_fields_accept_their_limits_and_reject_beyond;
+m4_definitions::the_fields_of_schema_version_2_accept_their_limits_and_reject_beyond;
+m6_definitions::unreadable_oversized_and_special_files_are_rejected (mkfifo). Independent
+processes wrote the same per-target named scratch variants; ordinary within-binary parallel
+cases use distinct names. The required unmodified `cargo test --workspace --release` invokes
+each target once and no competing validator will run, so this cross-process collision does
+not occur. No test-thread restriction, gate serialization wrapper or assertion change is added.
+The serial preflight means separate Cargo invocations do not overlap, not fewer test threads.

@@ -30,9 +30,9 @@ struct PublicTimers;
 struct RepackButton;
 
 /// What the hint line says while nothing else is to be said.
-const HINT: &str = "D: deploy / unload    E: interact";
+const HINT: &str = "D: deploy / unload    I: interact";
 /// The hint while a Construction Yard that can be packed up is selected.
-const REPACK_HINT: &str = "D: repack the Construction Yard into its MCV    E: interact";
+const REPACK_HINT: &str = "D: repack the Construction Yard into its MCV    I: interact";
 impl Plugin for SpecialControlsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<StrategicEffects>()
@@ -307,7 +307,7 @@ fn input(
             return;
         }
     }
-    if keys.just_pressed(KeyCode::KeyD) {
+    if crate::hotkeys::pressed_hotkeys(&keys).contains(&crate::hotkeys::Hotkey::Deploy) {
         sink.issue(deploy_commands(&selection));
         if let Some(id) = selected
             .0
@@ -319,7 +319,7 @@ fn input(
         // match has "MCV repacks" on).
         sink.issue(repack_target(&host, &selection, &selected));
     }
-    if keys.just_pressed(KeyCode::KeyE) {
+    if crate::hotkeys::pressed_hotkeys(&keys).contains(&crate::hotkeys::Hotkey::Interact) {
         *mode = InterfaceMode::Interact;
     }
     if keys.just_pressed(KeyCode::Escape) || mouse.just_pressed(MouseButton::Right) {

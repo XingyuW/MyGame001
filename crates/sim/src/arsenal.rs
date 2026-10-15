@@ -107,7 +107,7 @@ use std::{collections::BTreeMap, path::Path};
 
 /// The schema version of the arsenal file this crate reads (2 since RA1, 3 since RA2, 4 since
 /// RA3, 5 since RA4).
-pub const ARSENAL_SCHEMA_VERSION: i64 = 8;
+pub const ARSENAL_SCHEMA_VERSION: i64 = 9;
 
 /// Largest `build_limit` of an arsenal entry.
 pub const MAX_BUILD_LIMIT: u32 = 255;
@@ -295,6 +295,8 @@ pub struct ArsenalEntry {
     pub role: Role,
     pub cooldown: u32,
     pub radius: u32,
+    /// Explicit GuardRange in cells; zero uses the reference weapon Range.
+    pub guard_range: u32,
     pub strength: i32,
     pub capacity: usize,
     /// The id of the item whose art the game draws for this one.
@@ -421,6 +423,7 @@ struct Entry {
     role: String,
     cooldown: i64,
     radius: i64,
+    guard_range: i64,
     strength: i64,
     capacity: i64,
     art: String,
@@ -505,6 +508,7 @@ static ENTRY: Shape = Shape::Struct(&[
     ("role", Shape::Str),
     ("cooldown", Shape::Int),
     ("radius", Shape::Int),
+    ("guard_range", Shape::Int),
     ("strength", Shape::Int),
     ("capacity", Shape::Int),
     ("art", Shape::Str),
@@ -725,6 +729,7 @@ impl Arsenal {
             for (name, n, max) in [
                 ("cooldown", e.cooldown, 72000),
                 ("radius", e.radius, 32),
+                ("guard_range", e.guard_range, 64),
                 ("strength", e.strength, 10000),
                 ("capacity", e.capacity, 16),
             ] {
@@ -1127,6 +1132,7 @@ impl Arsenal {
                     role,
                     cooldown: e.cooldown as u32,
                     radius: e.radius as u32,
+                    guard_range: e.guard_range as u32,
                     strength: e.strength as i32,
                     capacity: e.capacity as usize,
                     art: e.art,
@@ -1272,6 +1278,7 @@ impl Arsenal {
             }
             h.write_u32(e.cooldown);
             h.write_u32(e.radius);
+            h.write_u32(e.guard_range);
             h.write(&e.strength.to_le_bytes());
             h.write_u64(e.capacity as u64);
             h.write_u64(e.art.len() as u64);

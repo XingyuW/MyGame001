@@ -6,6 +6,7 @@
 
 #![forbid(unsafe_code)]
 
+mod announcer;
 mod audio;
 mod battlefield;
 mod buildings;
@@ -25,6 +26,7 @@ mod notices;
 mod options;
 mod presentation;
 mod projection;
+mod ra7_controls;
 mod selection;
 mod sidebar;
 mod sim_host;
@@ -90,6 +92,8 @@ fn main() -> AppExit {
     .add_plugins((
         hover_info::HoverInfoPlugin,
         notices::NoticesPlugin,
+        announcer::AnnouncerPlugin,
+        ra7_controls::Ra7ControlsPlugin,
         weapon_fx::WeaponFxPlugin,
     ))
     // A smoke run stores its settings in a file of its own, which it removes, so that it never

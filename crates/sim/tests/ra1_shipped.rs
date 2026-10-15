@@ -496,6 +496,7 @@ fn the_default_match_is_that_of_red_alert_2s_lobby() {
             crates: true,
             ore_grows: true,
             bridge_destruction: true,
+            fog_of_war: false,
         }
     );
     // Deploying where it starts gives each player the yard of its side at its start position,

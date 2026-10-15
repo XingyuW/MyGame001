@@ -807,7 +807,7 @@ const BRUTAL_DIFFICULTY: (&str, &str) = ("        (\n            id: \"brutal\",
 /// An arsenal file with the entries of the fixture for the items `ids` only, in this order.
 fn arsenal_of(name: &str, ids: &[&str]) -> PathBuf {
     let fixture = File::Arsenal.text();
-    let mut text = String::from("(schema_version: 8, entries: [\n");
+    let mut text = String::from("(schema_version: 9, entries: [\n");
     for id in ids {
         let entry = format!("(id: {id:?},");
         let lines: Vec<&str> = fixture
@@ -1830,7 +1830,7 @@ fn every_field_of_the_arsenal_file_is_required() {
     let path = variant(
         File::Arsenal,
         "arsenal_missing_schema_version",
-        &[("(schema_version: 8, entries: [", "(entries: [")],
+        &[("(schema_version: 9, entries: [", "(entries: [")],
     );
     assert_rejected(
         File::Arsenal,
@@ -1838,7 +1838,7 @@ fn every_field_of_the_arsenal_file_is_required() {
         "schema_version",
         DataErrorKind::MissingField,
     );
-    let path = temp_file("arsenal_missing_entries.ron", b"(schema_version: 8)\n");
+    let path = temp_file("arsenal_missing_entries.ron", b"(schema_version: 9)\n");
     assert_rejected(File::Arsenal, &path, "entries", DataErrorKind::MissingField);
     // Every field of an entry: those of schema version 1, the eight of version 2, the nine of
     // version 3 (RA2), the four of version 4 (RA3) and the sixteen of version 5 (RA4).
@@ -1851,6 +1851,7 @@ fn every_field_of_the_arsenal_file_is_required() {
         ("role", r#"role: "combat", "#),
         ("cooldown", "cooldown: 100, "),
         ("radius", "radius: 2, "),
+        ("guard_range", "guard_range: 0, "),
         ("strength", "strength: 20, "),
         ("capacity", "capacity: 0, "),
         ("art", r#"art: "sniper", "#),
@@ -2169,8 +2170,8 @@ fn unknown_and_duplicate_fields_are_rejected_in_every_file() {
         // The arsenal.
         (
             File::Arsenal,
-            "(schema_version: 8, entries: [",
-            "(schema_version: 8, mods: 1, entries: [",
+            "(schema_version: 9, entries: [",
+            "(schema_version: 9, mods: 1, entries: [",
             "mods",
             DataErrorKind::UnknownField,
         ),
@@ -2190,8 +2191,8 @@ fn unknown_and_duplicate_fields_are_rejected_in_every_file() {
         ),
         (
             File::Arsenal,
-            "(schema_version: 8, entries: [",
-            "(schema_version: 8, schema_version: 8, entries: [",
+            "(schema_version: 9, entries: [",
+            "(schema_version: 9, schema_version: 9, entries: [",
             "schema_version",
             DataErrorKind::DuplicateField,
         ),
@@ -2411,12 +2412,13 @@ fn other_schema_versions_are_rejected_in_every_file() {
         (File::Rules, "schema_version: 3,", 1, 3),
         (File::Rules, "schema_version: 3,", 2, 3),
         (File::Rules, "schema_version: 3,", 4, 3),
-        (File::Arsenal, "schema_version: 8,", 4, 8),
-        (File::Arsenal, "schema_version: 8,", 3, 8),
-        (File::Arsenal, "schema_version: 8,", 2, 8),
-        (File::Arsenal, "schema_version: 8,", 1, 8),
-        (File::Arsenal, "schema_version: 8,", 5, 8),
-        (File::Arsenal, "schema_version: 8,", 9, 8),
+        (File::Arsenal, "schema_version: 9,", 4, 9),
+        (File::Arsenal, "schema_version: 9,", 3, 9),
+        (File::Arsenal, "schema_version: 9,", 2, 9),
+        (File::Arsenal, "schema_version: 9,", 1, 9),
+        (File::Arsenal, "schema_version: 9,", 5, 9),
+        (File::Arsenal, "schema_version: 9,", 8, 9),
+        (File::Arsenal, "schema_version: 9,", 10, 9),
         (File::Skirmish, "schema_version: 3,", 2, 3),
         (File::Skirmish, "schema_version: 3,", 1, 3),
         (File::Skirmish, "schema_version: 3,", 4, 3),

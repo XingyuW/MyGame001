@@ -257,11 +257,19 @@ pub(crate) fn pan_camera(
         *edge = EdgePan::default();
         return;
     }
+    let keyboard_enabled = !keys.any_pressed([
+        KeyCode::AltLeft,
+        KeyCode::AltRight,
+        KeyCode::ControlLeft,
+        KeyCode::ControlRight,
+        KeyCode::SuperLeft,
+        KeyCode::SuperRight,
+    ]);
     let keyboard = keyboard_direction(
-        keys.pressed(KeyCode::ArrowLeft),
-        keys.pressed(KeyCode::ArrowRight),
-        keys.pressed(KeyCode::ArrowUp),
-        keys.pressed(KeyCode::ArrowDown),
+        keyboard_enabled && keys.pressed(KeyCode::ArrowLeft),
+        keyboard_enabled && keys.pressed(KeyCode::ArrowRight),
+        keyboard_enabled && keys.pressed(KeyCode::ArrowUp),
+        keyboard_enabled && keys.pressed(KeyCode::ArrowDown),
     );
     let cursor = window.cursor_position();
     // The bands are deep enough to reach interface buttons along the edges (sidebar cards, the

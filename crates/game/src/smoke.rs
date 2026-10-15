@@ -576,6 +576,8 @@ fn choose_first(
         Row::ShortGame,
         Row::Superweapons,
         Row::Crates,
+        Row::FogOfWar,
+        Row::OreGrowth,
         Row::SuperMe,
         Row::UnitSpeed,
         Row::Color,
@@ -673,6 +675,8 @@ fn choose_last(
         Row::ShortGame,
         Row::Superweapons,
         Row::Crates,
+        Row::FogOfWar,
+        Row::OreGrowth,
         Row::SuperMe,
         Row::Color,
     ] {
@@ -778,8 +782,9 @@ fn match_problems(
                 superweapons: choice.superweapons,
                 mcv_repacks: choice.mcv_repacks,
                 crates: choice.crates,
-                ore_grows: true,
-                bridge_destruction: true,
+                ore_grows: choice.ore_grows,
+                bridge_destruction: choice.bridge_destruction,
+                fog_of_war: choice.fog_of_war,
             },
         "short game, superweapons, MCV repacks or crates are not as chosen",
     );
@@ -2694,8 +2699,8 @@ mod tests {
         smoke.problem(format!("something {}", "else"));
         assert_eq!(smoke.flow_problems, 2);
         assert_eq!(
-            MENU_BUTTONS, 75,
-            "17 rows, 10 countries, 9 difficulties, 3 buttons"
+            MENU_BUTTONS, 79,
+            "19 rows, 10 countries, 9 difficulties, 3 buttons"
         );
     }
 
@@ -2821,8 +2826,9 @@ mod tests {
                 superweapons: false,
                 crates: false,
                 mcv_repacks: true,
-                ore_grows: true,
+                ore_grows: false,
                 bridge_destruction: true,
+                fog_of_war: true,
             }
         );
         assert_eq!(

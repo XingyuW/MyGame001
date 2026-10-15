@@ -314,6 +314,9 @@ pub(crate) fn nearest_cell_of(foot: Footprint, from: CellPos) -> CellPos {
     )
 }
 pub(crate) fn clear_orders(world: &mut World, e: Entity) {
+    if let Some(id) = world.get::<SimId>(e).copied() {
+        world.resource_mut::<crate::TacticalState>().clear(id);
+    }
     if let Some(mut o) = world.get_mut::<Orders>(e) {
         o.current = None;
     }
@@ -400,7 +403,7 @@ pub(crate) use advance::advance;
 use carrier::launch_fighters;
 pub(crate) use commands::apply;
 use interaction::{interact, validate_interaction};
-pub(crate) use reconnaissance::reconnaissance;
+pub(crate) use reconnaissance::{reconnaissance, refresh_concealment};
 use repair::repair_docked;
 pub(crate) use resolve::resolve;
 pub use state::{Passenger, SpecialState, Zone};
@@ -409,3 +412,92 @@ use transport::unload_ready;
 
 pub(crate) mod infantry;
 pub(crate) mod radiation;
+
+/// Context action the player's unit may perform on a known target. Runs the same read-only
+/// validator as Interact, so cursor hints cannot disclose hidden targets or promise invalid jobs.
+pub fn interaction_label(
+    world: &World,
+    player: PlayerId,
+    unit: SimId,
+    target: SimId,
+) -> Option<&'static str> {
+    fn actor(e: bevy_ecs::world::EntityRef<'_>) -> Option<Actor> {
+        let id = *e.get::<SimId>()?;
+        let owner = e.get::<Owner>()?.0;
+        let hp = e.get::<Health>()?.hit_points;
+        let (item, cell, foot) = if let Some(u) = e.get::<Unit>() {
+            (ProductionItem::Unit(u.kind), e.get::<Mobile>()?.cell, None)
+        } else {
+            let b = e.get::<Building>()?;
+            (
+                ProductionItem::Building(b.kind),
+                b.footprint.origin,
+                Some(b.footprint),
+            )
+        };
+        (hp > 0).then_some(Actor {
+            entity: e.id(),
+            id,
+            owner,
+            item,
+            cell,
+            foot,
+            hp,
+        })
+    }
+    let defs = world.get_resource::<Definitions>()?;
+    let a = world
+        .iter_entities()
+        .find(|e| e.get::<SimId>() == Some(&unit))
+        .and_then(actor)?;
+    if a.owner != player || commandable(world, unit).is_err() {
+        return None;
+    }
+    if let Some((cell, _)) = world.resource::<crate::Props>().get(target) {
+        if !world
+            .resource::<Players>()
+            .get(player)?
+            .vision()
+            .is_visible(cell)
+        {
+            return None;
+        }
+        return crate::garrison::validate(world, defs, &a, target)
+            .ok()
+            .map(|_| "GARRISON");
+    }
+    let b = world
+        .iter_entities()
+        .find(|e| e.get::<SimId>() == Some(&target))
+        .and_then(actor)?;
+    if (b.owner != player && !known_to(world, defs, player, &b))
+        || validate_interaction(world, &a, &b, defs).is_err()
+    {
+        return None;
+    }
+    let m = defs.metadata(a.item)?;
+    let n = defs.metadata(b.item)?;
+    Some(if n.role == Role::Transport || n.role == Role::Ifv {
+        "BOARD"
+    } else if n.hospital {
+        "HEAL"
+    } else if n.unit_repair {
+        "REPAIR"
+    } else if m.role == Role::Engineer {
+        if a.owner == b.owner || n.bridge_repair_hut {
+            "REPAIR"
+        } else {
+            "CAPTURE"
+        }
+    } else if m.role == Role::Spy {
+        if b.foot.is_some() {
+            "INFILTRATE"
+        } else {
+            "DISGUISE"
+        }
+    } else if m.c4 || m.role == Role::Commando {
+        "C4"
+    } else {
+        "INTERACT"
+    })
+}

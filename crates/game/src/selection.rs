@@ -13,7 +13,7 @@
 //! A left click on one of the player's unit-producing buildings (barracks, war factory, shipyard,
 //! air base) selects it instead ([`SelectedBuilding`]): its rally point is shown as a flag, and a
 //! right click on the map then makes the cell under the cursor that building's rally point
-//! (`SetRallyPoint`), where every unit it produces from then on goes. `R` and the sidebar's
+//! (`SetRallyPoint`), where every unit it produces from then on goes. `Y` and the sidebar's
 //! Rally button still set the rally point of every producer at once (`crate::construction`).
 //! A left click on the player's Construction Yard selects it too (RA1): it has no rally point,
 //! and with "MCV repacks" on `D` or the Repack button packs it up (`crate::special_controls`).
@@ -126,6 +126,11 @@ pub enum OrderIntent {
     Invalid,
     /// A unit-producing building is selected: the cell becomes its rally point.
     Rally,
+    Interact(&'static str),
+    ForceFire,
+    ForceMove,
+    Waypoint,
+    AttackMove,
 }
 
 impl OrderIntent {
@@ -134,11 +139,12 @@ impl OrderIntent {
         match self {
             Self::None => Color::NONE,
             Self::Move => Color::srgb(0.35, 1.0, 0.4),
-            Self::Attack => Color::srgb(1.0, 0.12, 0.08),
+            Self::Attack | Self::ForceFire | Self::AttackMove => Color::srgb(1.0, 0.12, 0.08),
             Self::Harvest => Color::srgb(1.0, 0.82, 0.25),
             Self::Friendly => Color::srgb(0.35, 0.8, 1.0),
             Self::Invalid => Color::srgb(0.62, 0.62, 0.62),
             Self::Rally => RALLY_COLOUR,
+            Self::Interact(_) | Self::ForceMove | Self::Waypoint => Color::srgb(0.4, 0.85, 1.0),
         }
     }
 
@@ -152,6 +158,11 @@ impl OrderIntent {
             Self::Friendly => "FRIENDLY",
             Self::Invalid => "CANNOT GO",
             Self::Rally => "RALLY POINT",
+            Self::Interact(label) => label,
+            Self::ForceFire => "FORCE FIRE",
+            Self::ForceMove => "FORCE MOVE",
+            Self::Waypoint => "WAYPOINT",
+            Self::AttackMove => "ATTACK MOVE",
         }
     }
 }
@@ -514,7 +525,19 @@ fn select_units(
     mut last_click: Local<Option<(SimId, f64)>>,
 ) {
     let (camera, camera_transform) = *camera;
-    if !window.focused || keys.pressed(KeyCode::Space) || buttons.pressed(MouseButton::Middle) {
+    if !window.focused
+        || keys.pressed(KeyCode::Space)
+        || keys.any_pressed([
+            KeyCode::ControlLeft,
+            KeyCode::ControlRight,
+            KeyCode::SuperLeft,
+            KeyCode::SuperRight,
+            KeyCode::AltLeft,
+            KeyCode::AltRight,
+            KeyCode::KeyZ,
+        ])
+        || buttons.pressed(MouseButton::Middle)
+    {
         drag.start = None;
         drag.last = None;
         return;
@@ -617,10 +640,21 @@ fn select_units(
 }
 
 /// The enemy units the human player is shown (not hidden by the fog), with their ground points.
-fn shown_enemy_units(views: &Query<(&UnitView, &Transform, &Visibility)>) -> Vec<(SimId, Vec2)> {
+fn shown_enemy_units(
+    host: &SimHost,
+    views: &Query<(&UnitView, &Transform, &Visibility)>,
+) -> Vec<(SimId, Vec2)> {
     views
         .iter()
-        .filter(|(view, _, visibility)| view.owner != HUMAN && **visibility != Visibility::Hidden)
+        .filter(|(view, _, visibility)| {
+            view.owner != HUMAN
+                && **visibility != Visibility::Hidden
+                && !host
+                    .world()
+                    .resource::<sim::SpecialState>()
+                    .hidden
+                    .contains(&(HUMAN, view.id))
+        })
         .map(|(view, transform, _)| {
             (
                 view.id,
@@ -725,6 +759,7 @@ fn own_building(host: &SimHost, cell: Option<CellPos>) -> Option<SimId> {
 /// Works out what a right click would order ([`order_intent`]) before it happens.
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn preview_order(
+    keys: Res<ButtonInput<KeyCode>>,
     hovered: Res<HoveredCell>,
     selection: Res<Selection>,
     building: Res<SelectedBuilding>,
@@ -759,7 +794,7 @@ pub(crate) fn preview_order(
     if over_map && !selection.0.is_empty() {
         let building = shown_enemy_building(&host, hovered.0);
         facts.enemy = point
-            .and_then(|point| enemy_at(point, &shown_enemy_units(&views), building))
+            .and_then(|point| enemy_at(point, &shown_enemy_units(&host, &views), building))
             .or(building);
         let own: Vec<(SimId, Vec2)> = views
             .iter()
@@ -801,10 +836,49 @@ pub(crate) fn preview_order(
                 })
             });
     }
-    let intent = order_intent(facts);
+    let context_target = facts
+        .enemy
+        .or(facts.friendly)
+        .or_else(|| crate::ra7_controls::known_at(&host, hovered.0));
+    let context = over_map
+        .then(|| {
+            context_target.and_then(|target| {
+                selection.0.iter().find_map(|unit| {
+                    sim::special::interaction_label(host.world(), HUMAN, *unit, target)
+                })
+            })
+        })
+        .flatten();
+    let base = context.map_or_else(|| order_intent(facts), OrderIntent::Interact);
+    let modified = over_map
+        .then(|| {
+            crate::ra7_controls::modified_order(
+                &selection.0,
+                hovered.0,
+                context_target,
+                keys.any_pressed([
+                    KeyCode::ControlLeft,
+                    KeyCode::ControlRight,
+                    KeyCode::SuperLeft,
+                    KeyCode::SuperRight,
+                ]),
+                keys.any_pressed([KeyCode::ShiftLeft, KeyCode::ShiftRight]),
+                keys.any_pressed([KeyCode::AltLeft, KeyCode::AltRight]),
+                keys.pressed(KeyCode::KeyZ),
+            )
+        })
+        .flatten();
+    let intent = match modified {
+        Some(Command::ForceFire { .. }) => OrderIntent::ForceFire,
+        Some(Command::ForceMove { .. }) => OrderIntent::ForceMove,
+        Some(Command::QueueMove { .. }) => OrderIntent::Waypoint,
+        Some(Command::AttackMove { .. }) => OrderIntent::AttackMove,
+        _ => base,
+    };
     let next = OrderPreview {
         intent,
         target: match intent {
+            OrderIntent::Interact(_) | OrderIntent::ForceFire => context_target,
             OrderIntent::Attack => facts.enemy,
             OrderIntent::Friendly => facts.friendly,
             OrderIntent::Rally => building.0,
@@ -851,11 +925,16 @@ fn show_intent_cursor(
     if *shown != Some(preview.intent) {
         use bevy::window::{CursorIcon, SystemCursorIcon};
         let icon = match preview.intent {
-            OrderIntent::Attack => SystemCursorIcon::Crosshair,
-            OrderIntent::Invalid => SystemCursorIcon::NotAllowed,
-            OrderIntent::Friendly | OrderIntent::Harvest | OrderIntent::Rally => {
-                SystemCursorIcon::Pointer
+            OrderIntent::Attack | OrderIntent::ForceFire | OrderIntent::AttackMove => {
+                SystemCursorIcon::Crosshair
             }
+            OrderIntent::Invalid => SystemCursorIcon::NotAllowed,
+            OrderIntent::Interact(_)
+            | OrderIntent::Friendly
+            | OrderIntent::Harvest
+            | OrderIntent::Rally
+            | OrderIntent::ForceMove
+            | OrderIntent::Waypoint => SystemCursorIcon::Pointer,
             OrderIntent::None | OrderIntent::Move => SystemCursorIcon::Default,
         };
         commands.entity(entity).insert(CursorIcon::System(icon));
@@ -909,6 +988,50 @@ pub(crate) fn issue_orders(
         .cursor_position()
         .is_some_and(|p| !over_sidebar(p, window.width()));
     let mut commands = Vec::new();
+    if over_map
+        && *mode == InterfaceMode::Normal
+        && (buttons.just_pressed(MouseButton::Left) || buttons.just_pressed(MouseButton::Right))
+    {
+        let modified = crate::ra7_controls::modified_order(
+            &selection.0,
+            hovered.0,
+            preview
+                .target
+                .or_else(|| crate::ra7_controls::known_at(&host, hovered.0)),
+            keys.any_pressed([
+                KeyCode::ControlLeft,
+                KeyCode::ControlRight,
+                KeyCode::SuperLeft,
+                KeyCode::SuperRight,
+            ]),
+            keys.any_pressed([KeyCode::ShiftLeft, KeyCode::ShiftRight]),
+            keys.any_pressed([KeyCode::AltLeft, KeyCode::AltRight]),
+            keys.pressed(KeyCode::KeyZ),
+        );
+        if let Some(command) = modified {
+            sink.issue([command]);
+            return;
+        }
+        if buttons.just_pressed(MouseButton::Right)
+            && let OrderIntent::Interact(_) = preview.intent
+            && let Some(target) = preview.target
+        {
+            sink.issue(
+                selection
+                    .0
+                    .iter()
+                    .filter(|unit| {
+                        sim::special::interaction_label(host.world(), HUMAN, **unit, target)
+                            .is_some()
+                    })
+                    .map(|unit| Command::Interact {
+                        unit: *unit,
+                        target,
+                    }),
+            );
+            return;
+        }
+    }
     // In a mode of `crate::construction`, a right click leaves the mode instead.
     // A right click where nothing could happen (the preview shows "CANNOT GO") orders nothing.
     if buttons.just_pressed(MouseButton::Right)
@@ -926,7 +1049,7 @@ pub(crate) fn issue_orders(
         let (camera, camera_transform) = *camera;
         let building = shown_enemy_building(&host, hovered.0);
         let enemy = cursor_world(&window, camera, camera_transform)
-            .and_then(|point| enemy_at(point, &shown_enemy_units(&views), building))
+            .and_then(|point| enemy_at(point, &shown_enemy_units(&host, &views), building))
             .or(building)
             .or_else(|| {
                 let armed = own_units_with::<Weapon>(&host);
@@ -1256,7 +1379,7 @@ fn draw_order_preview(
     };
     match preview.intent {
         OrderIntent::None => {}
-        OrderIntent::Attack => {
+        OrderIntent::Attack | OrderIntent::ForceFire | OrderIntent::AttackMove => {
             for radius in [9.0, 14.0] {
                 gizmos.circle_2d(Isometry2d::from_translation(point), radius, colour);
             }
@@ -1267,7 +1390,7 @@ fn draw_order_preview(
                 target_outline(gizmos, target, colour);
             }
         }
-        OrderIntent::Friendly => {
+        OrderIntent::Friendly | OrderIntent::Interact(_) => {
             if let Some(target) = preview.target {
                 target_outline(gizmos, target, colour);
             }
@@ -1286,7 +1409,10 @@ fn draw_order_preview(
             // Where the flag would stand.
             draw_rally_flag(gizmos, point, colour.with_alpha(0.6), 0.0);
         }
-        OrderIntent::Move | OrderIntent::Harvest => {
+        OrderIntent::Move
+        | OrderIntent::Harvest
+        | OrderIntent::ForceMove
+        | OrderIntent::Waypoint => {
             let r = 6.0;
             gizmos.linestrip_2d(
                 [
@@ -1395,6 +1521,91 @@ mod tests {
         app.world_mut()
             .resource_mut::<ButtonInput<MouseButton>>()
             .reset_all();
+    }
+
+    #[test]
+    fn ra7_modifier_cursor_names_the_command_with_the_same_precedence() {
+        let (mut app, window, id) = input_app();
+        app.add_systems(
+            Update,
+            preview_order.before(issue_orders).after(select_units),
+        );
+        app.world_mut().resource_mut::<Selection>().0.insert(id);
+        app.world_mut().resource_mut::<HoveredCell>().0 = Some(CellPos::new(20, 20));
+        cursor(&mut app, window, Some(Vec2::new(800.0, 400.0)));
+        for (keys, intent, label) in [
+            (
+                vec![
+                    KeyCode::ControlLeft,
+                    KeyCode::ShiftLeft,
+                    KeyCode::AltLeft,
+                    KeyCode::KeyZ,
+                ],
+                OrderIntent::AttackMove,
+                "ATTACK MOVE",
+            ),
+            (
+                vec![KeyCode::SuperLeft, KeyCode::AltLeft],
+                OrderIntent::ForceFire,
+                "FORCE FIRE",
+            ),
+            (
+                vec![KeyCode::AltLeft, KeyCode::KeyZ],
+                OrderIntent::ForceMove,
+                "FORCE MOVE",
+            ),
+            (vec![KeyCode::KeyZ], OrderIntent::Waypoint, "WAYPOINT"),
+        ] {
+            app.world_mut()
+                .resource_mut::<ButtonInput<KeyCode>>()
+                .reset_all();
+            for key in keys {
+                app.world_mut()
+                    .resource_mut::<ButtonInput<KeyCode>>()
+                    .press(key);
+            }
+            app.update();
+            let preview = app.world().resource::<OrderPreview>();
+            assert_eq!(preview.intent, intent);
+            assert_eq!(preview.intent.label(), label);
+        }
+    }
+
+    #[test]
+    fn ra7_visible_disguise_is_not_an_enemy_cursor_target() {
+        use bevy::ecs::system::RunSystemOnce;
+        let hidden_id = SimId(91_234);
+        let host = crate::sim_host::tests::demo_host_with(|world| {
+            world
+                .resource_mut::<sim::SpecialState>()
+                .hidden
+                .insert((HUMAN, hidden_id));
+        });
+        let (mut app, _, _) = input_app_on(host);
+        app.world_mut().spawn((
+            UnitView {
+                unit: Entity::PLACEHOLDER,
+                id: hidden_id,
+                owner: sim::PlayerId(1),
+                previous: sim::SubPos::new(0, 0),
+                current: sim::SubPos::new(0, 0),
+                altitude: 0.0,
+                drawn: None,
+                stride: 0.0,
+            },
+            Transform::default(),
+            // The disguise intentionally remains rendered with friendly paint.
+            Visibility::Inherited,
+        ));
+        let targets = app
+            .world_mut()
+            .run_system_once(
+                |host: Res<SimHost>, views: Query<(&UnitView, &Transform, &Visibility)>| {
+                    shown_enemy_units(&host, &views)
+                },
+            )
+            .unwrap();
+        assert!(!targets.iter().any(|(id, _)| *id == hidden_id));
     }
 
     #[test]

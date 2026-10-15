@@ -658,6 +658,12 @@ pub(crate) fn apply(
         | Command::Interact { .. }
         | Command::Chronoshift { .. }
         | Command::Superweapon { .. }
+        | Command::Guard { .. }
+        | Command::Scatter { .. }
+        | Command::Follow { .. }
+        | Command::ForceFire { .. }
+        | Command::ForceMove { .. }
+        | Command::QueueMove { .. }
         | Command::Move { .. }
         | Command::Stop { .. }
         | Command::Harvest { .. }

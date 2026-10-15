@@ -10,17 +10,17 @@
 //! | `S` | stop the selection |
 //! | `A` | attack-move the selection to the cell under the cursor |
 //! | `B` | placement mode for the ready building |
-//! | `X` | sell mode |
-//! | `R` | rally point of the player's unit-producing buildings at the cell under the cursor |
+//! | `L` | sell mode; `X` scatters |
+//! | `Y` | rally point of the player's unit-producing buildings at the cell under the cursor |
 //! | `Delete`, `Backspace` | sell the player's building under the cursor |
 //! | `Escape` | leave the current mode |
-//! | `P`, `Pause` | pause or resume |
+//! | `Pause`, `F9`, backslash | pause or resume |
 //! | `Tab` | next production tab |
 //! | `0` to `9` | select control group n |
 //! | Shift + `0` to `9` | add control group n to the selection |
 //! | Ctrl or Cmd + `0` to `9` | make the selection control group n |
 //! | `-`, `=` | master volume down, up |
-//! | `M` | mute or unmute |
+//! | `F10`, apostrophe | mute or unmute; `M` cycles previous unit |
 
 use std::collections::BTreeSet;
 
@@ -33,6 +33,21 @@ pub const CONTROL_GROUPS: usize = 10;
 /// What a key press asks for.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Hotkey {
+    Deploy,
+    Guard,
+    Scatter,
+    Follow,
+    Waypoint,
+    SelectType,
+    AllCombat,
+    Home,
+    NextUnit,
+    PreviousUnit,
+    Tab(u8),
+    SetBookmark(u8),
+    JumpBookmark(u8),
+    CentreGroup(u8),
+    Interact,
     Stop,
     AttackMove,
     PlaceReady,
@@ -73,10 +88,45 @@ fn digit(key: KeyCode) -> Option<u8> {
 }
 
 /// The action of `key` pressed with Ctrl or Cmd held (`command`) and with Shift held (`shift`).
+#[cfg(test)]
 pub fn hotkey(key: KeyCode, command: bool, shift: bool) -> Option<Hotkey> {
+    modified_hotkey(key, command, shift, false)
+}
+pub fn modified_hotkey(key: KeyCode, command: bool, shift: bool, alt: bool) -> Option<Hotkey> {
+    let bookmark = match key {
+        KeyCode::F1 => Some(0),
+        KeyCode::F2 => Some(1),
+        KeyCode::F3 => Some(2),
+        KeyCode::F4 => Some(3),
+        _ => None,
+    };
+    // Alt+arrow gives MacBook users bookmarks without an Fn modifier. Ctrl+Alt sets it.
+    let bookmark = bookmark.or({
+        if alt {
+            match key {
+                KeyCode::ArrowUp => Some(0),
+                KeyCode::ArrowRight => Some(1),
+                KeyCode::ArrowDown => Some(2),
+                KeyCode::ArrowLeft => Some(3),
+                _ => None,
+            }
+        } else {
+            None
+        }
+    });
+    if let Some(n) = bookmark {
+        return Some(if command {
+            Hotkey::SetBookmark(n)
+        } else {
+            Hotkey::JumpBookmark(n)
+        });
+    }
+
     if let Some(group) = digit(key) {
         return Some(if command {
             Hotkey::AssignGroup(group)
+        } else if alt {
+            Hotkey::CentreGroup(group)
         } else if shift {
             Hotkey::AddGroup(group)
         } else {
@@ -88,19 +138,34 @@ pub fn hotkey(key: KeyCode, command: bool, shift: bool) -> Option<Hotkey> {
         return None;
     }
     Some(match key {
+        KeyCode::KeyQ => Hotkey::Tab(0),
+        KeyCode::KeyW => Hotkey::Tab(1),
+        KeyCode::KeyE => Hotkey::Tab(2),
+        KeyCode::KeyR => Hotkey::Tab(3),
+        KeyCode::KeyG => Hotkey::Guard,
+        KeyCode::KeyX => Hotkey::Scatter,
+        KeyCode::KeyF => Hotkey::Follow,
+        KeyCode::KeyZ => Hotkey::Waypoint,
+        KeyCode::KeyT => Hotkey::SelectType,
+        KeyCode::KeyP => Hotkey::AllCombat,
+        KeyCode::KeyH => Hotkey::Home,
+        KeyCode::KeyN => Hotkey::NextUnit,
+        KeyCode::KeyM => Hotkey::PreviousUnit,
+        KeyCode::KeyI => Hotkey::Interact,
+        KeyCode::KeyD => Hotkey::Deploy,
         KeyCode::KeyS => Hotkey::Stop,
         KeyCode::KeyA => Hotkey::AttackMove,
         KeyCode::KeyB => Hotkey::PlaceReady,
-        KeyCode::KeyX => Hotkey::SellMode,
+        KeyCode::KeyL => Hotkey::SellMode,
         KeyCode::KeyK => Hotkey::RepairMode,
-        KeyCode::KeyR => Hotkey::RallyAtCursor,
+        KeyCode::KeyY => Hotkey::RallyAtCursor,
         KeyCode::Delete | KeyCode::Backspace => Hotkey::SellAtCursor,
         KeyCode::Escape => Hotkey::Cancel,
-        KeyCode::KeyP | KeyCode::Pause => Hotkey::Pause,
+        KeyCode::Pause | KeyCode::F9 | KeyCode::Backslash => Hotkey::Pause,
         KeyCode::Tab => Hotkey::NextTab,
         KeyCode::Minus => Hotkey::VolumeDown,
         KeyCode::Equal => Hotkey::VolumeUp,
-        KeyCode::KeyM => Hotkey::Mute,
+        KeyCode::F10 | KeyCode::Quote => Hotkey::Mute,
         KeyCode::BracketLeft => Hotkey::SpeedDown,
         KeyCode::BracketRight => Hotkey::SpeedUp,
         _ => return None,
@@ -116,8 +181,9 @@ pub fn pressed_hotkeys(keys: &ButtonInput<KeyCode>) -> Vec<Hotkey> {
         KeyCode::SuperRight,
     ]);
     let shift = keys.any_pressed([KeyCode::ShiftLeft, KeyCode::ShiftRight]);
+    let alt = keys.any_pressed([KeyCode::AltLeft, KeyCode::AltRight]);
     keys.get_just_pressed()
-        .filter_map(|&key| hotkey(key, command, shift))
+        .filter_map(|&key| modified_hotkey(key, command, shift, alt))
         .collect()
 }
 
@@ -136,7 +202,7 @@ impl ControlGroups {
                 self.0[group(n)] = selection.clone();
                 selection.clone()
             }
-            Hotkey::SelectGroup(n) => self.0[group(n)].clone(),
+            Hotkey::SelectGroup(n) | Hotkey::CentreGroup(n) => self.0[group(n)].clone(),
             Hotkey::AddGroup(n) => selection.union(&self.0[group(n)]).copied().collect(),
             _ => selection.clone(),
         }
@@ -169,20 +235,20 @@ mod tests {
             hotkey(KeyCode::KeyB, false, false),
             Some(Hotkey::PlaceReady)
         );
-        assert_eq!(hotkey(KeyCode::KeyX, false, false), Some(Hotkey::SellMode));
+        assert_eq!(hotkey(KeyCode::KeyL, false, false), Some(Hotkey::SellMode));
         assert_eq!(
             hotkey(KeyCode::KeyK, false, false),
             Some(Hotkey::RepairMode)
         );
         assert_eq!(
-            hotkey(KeyCode::KeyR, false, false),
+            hotkey(KeyCode::KeyY, false, false),
             Some(Hotkey::RallyAtCursor)
         );
         for key in [KeyCode::Delete, KeyCode::Backspace] {
             assert_eq!(hotkey(key, false, false), Some(Hotkey::SellAtCursor));
         }
         assert_eq!(hotkey(KeyCode::Escape, false, false), Some(Hotkey::Cancel));
-        for key in [KeyCode::KeyP, KeyCode::Pause] {
+        for key in [KeyCode::F9, KeyCode::Pause, KeyCode::Backslash] {
             assert_eq!(hotkey(key, false, false), Some(Hotkey::Pause));
         }
         assert_eq!(hotkey(KeyCode::Tab, false, false), Some(Hotkey::NextTab));
@@ -191,7 +257,7 @@ mod tests {
             Some(Hotkey::VolumeDown)
         );
         assert_eq!(hotkey(KeyCode::Equal, false, false), Some(Hotkey::VolumeUp));
-        assert_eq!(hotkey(KeyCode::KeyM, false, false), Some(Hotkey::Mute));
+        assert_eq!(hotkey(KeyCode::F10, false, false), Some(Hotkey::Mute));
         assert_eq!(
             hotkey(KeyCode::BracketLeft, false, false),
             Some(Hotkey::SpeedDown)
@@ -206,8 +272,8 @@ mod tests {
         for key in [
             KeyCode::ArrowLeft,
             KeyCode::ArrowUp,
-            KeyCode::KeyQ,
-            KeyCode::KeyW,
+            KeyCode::F5,
+            KeyCode::F6,
             KeyCode::Space,
         ] {
             assert_eq!(hotkey(key, false, false), None, "{key:?}");

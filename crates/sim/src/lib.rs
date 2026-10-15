@@ -76,7 +76,8 @@ pub use combat_defs::{
     WeaponDef, WeaponKind,
 };
 pub use command::{
-    Command, CommandQueue, IssuedCommand, MAX_UNITS_PER_COMMAND, PlayerId, RejectReason,
+    Command, CommandQueue, ForceTarget, IssuedCommand, MAX_UNITS_PER_COMMAND, PlayerId,
+    RejectReason,
 };
 pub use crates::{
     CRATE_MONEY_SPREAD, CRATE_PLACE_ATTEMPTS, CRATE_RETRY_TICKS, CRATE_UNIT_RADIUS, CrateContent,
@@ -169,3 +170,6 @@ pub use arsenal::{
 pub mod special;
 pub use special::SpecialState;
 pub use special::superweapons::{PublicTimer, nuclear_marks, public_timers};
+
+mod tactics;
+pub use tactics::{MAX_WAYPOINTS, PsychicOrder, TacticalOrder, TacticalState, psychic_orders};

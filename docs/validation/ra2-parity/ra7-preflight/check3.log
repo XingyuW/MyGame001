@@ -1,0 +1,230 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Checking game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+warning: unused import: `ProductionItem`
+ --> crates/sim/tests/ra7_vision.rs:8:14
+  |
+8 |     Players, ProductionItem, SimEvent, SimId, SimPlugin, SimSchedule, load_ruleset, spawn_building,
+  |              ^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `credits` is never used
+  --> crates/sim/tests/ra7_vision.rs:84:4
+   |
+84 | fn credits(app: &App, player: PlayerId) -> i64 {
+   |    ^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `rejected` is never used
+  --> crates/sim/tests/ra7_vision.rs:92:4
+   |
+92 | fn rejected(events: &[SimEvent]) -> Vec<&SimEvent> {
+   |    ^^^^^^^^
+
+warning: function `entity` is never used
+  --> crates/sim/tests/ra7_vision.rs:99:4
+   |
+99 | fn entity(app: &mut App, id: SimId) -> Option<bevy_ecs::entity::Entity> {
+   |    ^^^^^^
+
+warning: function `owner` is never used
+   --> crates/sim/tests/ra7_vision.rs:107:4
+    |
+107 | fn owner(app: &mut App, id: SimId) -> Option<PlayerId> {
+    |    ^^^^^
+
+warning: function `hp` is never used
+   --> crates/sim/tests/ra7_vision.rs:111:4
+    |
+111 | fn hp(app: &mut App, id: SimId) -> i32 {
+    |    ^^
+
+warning: `sim` (test "ra7_vision") generated 6 warnings (run `cargo fix --test "ra7_vision" -p sim` to apply 1 suggestion)
+error[E0271]: type mismatch resolving `<Option<SimId> as IntoIterator>::Item == Option<SimId>`
+   --> crates/game/src/ra7_controls.rs:26:94
+    |
+ 26 | ...rs_for(cell,sim::Domain::Air)).chain(grid.building(cell)).chain(host.props().and_then(|p|p.id_at(cell)));
+    |                                   ----- ^^^^^^^^^^^^^^^^^^^ expected `Option<SimId>`, found `SimId`
+    |                                   |
+    |                                   required by a bound introduced by this call
+    |
+    = note: expected enum `Option<sim::SimId>`
+             found struct `sim::SimId`
+note: the method call chain might not have had the expected associated types
+   --> crates/game/src/ra7_controls.rs:26:99
+    |
+ 25 |  let grid=host.grid()?;
+    |           ------------ this expression has type `&Grid`
+ 26 |  let ids=grid.holders(cell).into_iter().chain(grid.holders_for(cell,sim::Domain::Air)).chain(grid.building(cell)).chain(host.props(...
+    |                                                                                                   ^^^^^^^^^^^^^^ `IntoIterator::Item` is `SimId` here
+note: required by a bound in `std::iter::Iterator::chain`
+   --> /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/iter/traits/iterator.rs:513:33
+    |
+510 |     fn chain<U>(self, other: U) -> Chain<Self, U::IntoIter>
+    |        ----- required by a bound in this associated function
+...
+513 |         U: [const] IntoIterator<Item = Self::Item>,
+    |                                 ^^^^^^^^^^^^^^^^^ required by this bound in `Iterator::chain`
+
+error[E0599]: the method `chain` exists for struct `Chain<Chain<IntoIter<Option<SimId>, 3>, IntoIter<..., 3>>, ...>`, but its trait bounds were not satisfied
+    --> crates/game/src/ra7_controls.rs:26:115
+     |
+  26 | ...Air)).chain(grid.building(cell)).chain(host.props().and_then(|p|p.id_at(cell)));
+     |                                     ^^^^^ method cannot be called due to unsatisfied trait bounds
+     |
+    ::: /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/option.rs:2621:1
+     |
+2621 | pub struct IntoIter<A> {
+     | ---------------------- doesn't satisfy `<_ as Iterator>::Item = Option<SimId>`
+     |
+    ::: /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/iter/adapters/chain.rs:23:1
+     |
+  23 | pub struct Chain<A, B> {
+     | ---------------------- doesn't satisfy `_: Curve<_>`, `_: CurveExt<_>` or `_: Iterator`
+     |
+     = note: the following trait bounds were not satisfied:
+             `std::iter::Chain<std::iter::Chain<std::array::IntoIter<Option<sim::SimId>, 3>, std::array::IntoIter<Option<sim::SimId>, 3>>, std::option::IntoIter<sim::SimId>>: bevy::bevy_math::Curve<_>`
+             which is required by `std::iter::Chain<std::iter::Chain<std::array::IntoIter<Option<sim::SimId>, 3>, std::array::IntoIter<Option<sim::SimId>, 3>>, std::option::IntoIter<sim::SimId>>: bevy::bevy_math::curve::CurveExt<_>`
+             `<std::option::IntoIter<sim::SimId> as Iterator>::Item = Option<sim::SimId>`
+             which is required by `std::iter::Chain<std::iter::Chain<std::array::IntoIter<Option<sim::SimId>, 3>, std::array::IntoIter<Option<sim::SimId>, 3>>, std::option::IntoIter<sim::SimId>>: Iterator`
+             `&std::iter::Chain<std::iter::Chain<std::array::IntoIter<Option<sim::SimId>, 3>, std::array::IntoIter<Option<sim::SimId>, 3>>, std::option::IntoIter<sim::SimId>>: bevy::bevy_math::Curve<_>`
+             which is required by `&std::iter::Chain<std::iter::Chain<std::array::IntoIter<Option<sim::SimId>, 3>, std::array::IntoIter<Option<sim::SimId>, 3>>, std::option::IntoIter<sim::SimId>>: bevy::bevy_math::curve::CurveExt<_>`
+             `&mut std::iter::Chain<std::iter::Chain<std::array::IntoIter<Option<sim::SimId>, 3>, std::array::IntoIter<Option<sim::SimId>, 3>>, std::option::IntoIter<sim::SimId>>: bevy::bevy_math::Curve<_>`
+             which is required by `&mut std::iter::Chain<std::iter::Chain<std::array::IntoIter<Option<sim::SimId>, 3>, std::array::IntoIter<Option<sim::SimId>, 3>>, std::option::IntoIter<sim::SimId>>: bevy::bevy_math::curve::CurveExt<_>`
+             `std::iter::Chain<std::iter::Chain<std::array::IntoIter<Option<sim::SimId>, 3>, std::array::IntoIter<Option<sim::SimId>, 3>>, std::option::IntoIter<sim::SimId>>: Iterator`
+             which is required by `&mut std::iter::Chain<std::iter::Chain<std::array::IntoIter<Option<sim::SimId>, 3>, std::array::IntoIter<Option<sim::SimId>, 3>>, std::option::IntoIter<sim::SimId>>: Iterator`
+     = note: the full name for the type has been written to '/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/game-28ea79f74b3b005f.long-type-13835691679767592382.txt'
+     = note: consider using `--verbose` to print the full type name to the console
+
+error[E0271]: type mismatch resolving `<Option<SimId> as IntoIterator>::Item == Option<SimId>`
+   --> crates/game/src/ra7_controls.rs:26:94
+    |
+ 26 | ...rs_for(cell,sim::Domain::Air)).chain(grid.building(cell)).chain(host.props().and_then(|p|p.id_at(cell)));
+    |                                   ----- ^^^^^^^^^^^^^^^^^^^ expected `Option<SimId>`, found `SimId`
+    |                                   |
+    |                                   required by a bound introduced by this call
+    |
+    = note: expected enum `Option<SimId>`
+             found struct `SimId`
+note: the method call chain might not have had the expected associated types
+   --> crates/game/src/ra7_controls.rs:26:99
+    |
+ 25 |  let grid=host.grid()?;
+    |           ------------ this expression has type `&Grid`
+ 26 |  let ids=grid.holders(cell).into_iter().chain(grid.holders_for(cell,sim::Domain::Air)).chain(grid.building(cell)).chain(host.props(...
+    |                                                                                                   ^^^^^^^^^^^^^^ `IntoIterator::Item` is `SimId` here
+note: required by a bound in `std::iter::Iterator::chain`
+   --> /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/iter/traits/iterator.rs:513:33
+    |
+510 |     fn chain<U>(self, other: U) -> Chain<Self, U::IntoIter>
+    |        ----- required by a bound in this associated function
+...
+513 |         U: [const] IntoIterator<Item = Self::Item>,
+    |                                 ^^^^^^^^^^^^^^^^^ required by this bound in `Iterator::chain`
+
+error[E0599]: the method `chain` exists for struct `Chain<Chain<IntoIter<Option<SimId>, 3>, IntoIter<..., 3>>, ...>`, but its trait bounds were not satisfied
+    --> crates/game/src/ra7_controls.rs:26:115
+     |
+  26 | ...Air)).chain(grid.building(cell)).chain(host.props().and_then(|p|p.id_at(cell)));
+     |                                     ^^^^^ method cannot be called due to unsatisfied trait bounds
+     |
+    ::: /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/option.rs:2621:1
+     |
+2621 | pub struct IntoIter<A> {
+     | ---------------------- doesn't satisfy `<_ as Iterator>::Item = Option<SimId>`
+     |
+    ::: /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/iter/adapters/chain.rs:23:1
+     |
+  23 | pub struct Chain<A, B> {
+     | ---------------------- doesn't satisfy `_: Curve<_>`, `_: CurveExt<_>` or `_: Iterator`
+     |
+     = note: the following trait bounds were not satisfied:
+             `std::iter::Chain<std::iter::Chain<std::array::IntoIter<Option<SimId>, 3>, std::array::IntoIter<Option<SimId>, 3>>, std::option::IntoIter<SimId>>: Curve<_>`
+             which is required by `std::iter::Chain<std::iter::Chain<std::array::IntoIter<Option<SimId>, 3>, std::array::IntoIter<Option<SimId>, 3>>, std::option::IntoIter<SimId>>: bevy::bevy_math::curve::CurveExt<_>`
+             `<std::option::IntoIter<SimId> as Iterator>::Item = Option<SimId>`
+             which is required by `std::iter::Chain<std::iter::Chain<std::array::IntoIter<Option<SimId>, 3>, std::array::IntoIter<Option<SimId>, 3>>, std::option::IntoIter<SimId>>: Iterator`
+             `&std::iter::Chain<std::iter::Chain<std::array::IntoIter<Option<SimId>, 3>, std::array::IntoIter<Option<SimId>, 3>>, std::option::IntoIter<SimId>>: Curve<_>`
+             which is required by `&std::iter::Chain<std::iter::Chain<std::array::IntoIter<Option<SimId>, 3>, std::array::IntoIter<Option<SimId>, 3>>, std::option::IntoIter<SimId>>: bevy::bevy_math::curve::CurveExt<_>`
+             `&mut std::iter::Chain<std::iter::Chain<std::array::IntoIter<Option<SimId>, 3>, std::array::IntoIter<Option<SimId>, 3>>, std::option::IntoIter<SimId>>: Curve<_>`
+             which is required by `&mut std::iter::Chain<std::iter::Chain<std::array::IntoIter<Option<SimId>, 3>, std::array::IntoIter<Option<SimId>, 3>>, std::option::IntoIter<SimId>>: bevy::bevy_math::curve::CurveExt<_>`
+             `std::iter::Chain<std::iter::Chain<std::array::IntoIter<Option<SimId>, 3>, std::array::IntoIter<Option<SimId>, 3>>, std::option::IntoIter<SimId>>: Iterator`
+             which is required by `&mut std::iter::Chain<std::iter::Chain<std::array::IntoIter<Option<SimId>, 3>, std::array::IntoIter<Option<SimId>, 3>>, std::option::IntoIter<SimId>>: Iterator`
+     = note: the full name for the type has been written to '/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/game-e8bd47d5931b0454.long-type-2267272302214173859.txt'
+     = note: consider using `--verbose` to print the full type name to the console
+
+error[E0004]: non-exhaustive patterns: `OrderIntent::Interact(_)` not covered
+    --> crates/game/src/selection.rs:1270:11
+     |
+1270 |     match preview.intent {
+     |           ^^^^^^^^^^^^^^ pattern `OrderIntent::Interact(_)` not covered
+     |
+note: `OrderIntent` defined here
+    --> crates/game/src/selection.rs:112:10
+     |
+ 112 | pub enum OrderIntent {
+     |          ^^^^^^^^^^^
+...
+ 129 |     Interact(&'static str),
+     |     -------- not covered
+     = note: the matched value is of type `OrderIntent`
+help: ensure that all possible cases are being handled by adding a match arm with a wildcard pattern or an explicit pattern as shown
+     |
+1314 ~         },
+1315 +         OrderIntent::Interact(_) => todo!()
+     |
+
+error[E0004]: non-exhaustive patterns: `&sim::Command::Guard { .. }`, `&sim::Command::Scatter { .. }`, `&sim::Command::Follow { .. }` and 3 more not covered
+   --> crates/game/src/construction.rs:869:35
+    |
+869 |             variants.insert(match command {
+    |                                   ^^^^^^^ patterns `&sim::Command::Guard { .. }`, `&sim::Command::Scatter { .. }`, `&sim::Command::Follow { .. }` and 3 more not covered
+    |
+note: `sim::Command` defined here
+   --> crates/sim/src/command.rs:37:1
+    |
+ 37 | pub enum Command {
+    | ^^^^^^^^^^^^^^^^
+ 38 |     Guard { units: Vec<SimId> },
+    |     ----- not covered
+ 39 |     Scatter { units: Vec<SimId> },
+    |     ------- not covered
+ 40 |     Follow { units: Vec<SimId>, target: SimId },
+    |     ------ not covered
+ 41 |     ForceFire { units: Vec<SimId>, target: ForceTarget },
+    |     --------- not covered
+ 42 |     ForceMove { units: Vec<SimId>, target: CellPos },
+    |     --------- not covered
+    = note: the matched value is of type `&sim::Command`
+help: ensure that all possible cases are being handled by adding a match arm with a wildcard pattern as shown, or multiple match arms
+    |
+884 ~                 Command::AttackMove { .. } => "AttackMove",
+885 ~                 _ => todo!(),
+    |
+
+Some errors have detailed explanations: E0004, E0271, E0599.
+For more information about an error, try `rustc --explain E0004`.
+error: could not compile `game` (bin "game") due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...
+error[E0004]: non-exhaustive patterns: `selection::OrderIntent::Interact(_)` not covered
+    --> crates/game/src/selection.rs:1270:11
+     |
+1270 |     match preview.intent {
+     |           ^^^^^^^^^^^^^^ pattern `selection::OrderIntent::Interact(_)` not covered
+     |
+note: `selection::OrderIntent` defined here
+    --> crates/game/src/selection.rs:112:10
+     |
+ 112 | pub enum OrderIntent {
+     |          ^^^^^^^^^^^
+...
+ 129 |     Interact(&'static str),
+     |     -------- not covered
+     = note: the matched value is of type `selection::OrderIntent`
+help: ensure that all possible cases are being handled by adding a match arm with a wildcard pattern or an explicit pattern as shown
+     |
+1314 ~         },
+1315 +         selection::OrderIntent::Interact(_) => todo!()
+     |
+
+error: could not compile `game` (bin "game" test) due to 4 previous errors

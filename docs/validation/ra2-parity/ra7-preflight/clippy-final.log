@@ -1,0 +1,19 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Checking game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+error[E0599]: no method named `contains` found for struct `std::collections::BTreeMap<K, V, A>` in the current scope
+   --> crates/sim/tests/ra7_orders.rs:564:14
+    |
+561 | /         app.world()
+562 | |             .resource::<sim::SpecialState>()
+563 | |             .deployed
+564 | |             .contains(&gi)
+    | |_____________-^^^^^^^^
+    |
+help: there is a method `contains_key` with a similar name
+    |
+564 |             .contains_key(&gi)
+    |                      ++++
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `sim` (test "ra7_orders") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

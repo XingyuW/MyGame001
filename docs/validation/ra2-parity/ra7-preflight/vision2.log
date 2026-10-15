@@ -1,0 +1,15 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 14.47s
+     Running tests/ra7_vision.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra7_vision-43172b1ea6252b0f)
+
+running 7 tests
+test ra7_sensor_detects_spy_at_fifteen_but_not_sixteen_and_needs_power ... ok
+test ra7_new_spy_is_concealed_before_first_combat_and_command ... ok
+test ra7_new_cloaked_sub_is_hidden_before_automatic_first_combat ... ok
+test ra7_gap_restores_circle_shroud_every_tick_but_local_sight_and_allies_counter_it ... ok
+test ra7_psychic_order_boundary_power_death_and_special_concealment ... ok
+test ra7_explored_enemy_is_known_with_fog_off_but_hidden_with_fog_on ... ok
+test ra7_paid_spy_production_is_concealed_before_automatic_spawn_tick_fire ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+

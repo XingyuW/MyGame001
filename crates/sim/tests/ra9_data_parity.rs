@@ -1464,6 +1464,22 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
                 recharge,
             );
         }
+        differences.check(
+            id,
+            "guard_range",
+            &entry.guard_range.to_string(),
+            value("GuardRange").unwrap_or("0"),
+            "GuardRange",
+        );
+        if let Some(radius) = value("GapRadiusInCells") {
+            differences.check(
+                id,
+                "gap_radius",
+                &entry.radius.to_string(),
+                radius,
+                "GapRadiusInCells",
+            );
+        }
         if let Some(radius) = value("PsychicDetectionRadius") {
             differences.check(
                 id,
@@ -1766,6 +1782,7 @@ const ITEM_FIELDS: &[ListFields] = &[
             ),
             ("cooldown", Field::Audited("strategic_cooldown")),
             ("radius", Field::Audited("sensor_radius")),
+            ("guard_range", Field::Audited("guard_range")),
             ("strength", Field::Own("a term of the role (M9)")),
             ("capacity", Field::Audited("capacity")),
             ("art", Field::Own("art")),
