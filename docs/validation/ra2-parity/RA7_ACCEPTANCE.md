@@ -1,7 +1,7 @@
 # RA7 acceptance ledger
 
 Source freeze and complete gate results will be recorded here after validation. This is an
-implementation/validation ledger, not an independent review or approval. R84–R85 record the
+implementation/validation ledger, not an independent review or approval. R84–R86 record the
 rules, compatibility choices and exact intended expectation migrations. Simulation scenarios
 use shipped definitions through CommandQueue + SimSchedule; explicit scenario setup supplies
 positions, HP, charge, terrain and availability to reach boundaries.
@@ -33,3 +33,10 @@ RA6 assumptions remain. RA9 still owns Size/SizeLimit/loaded boarding and actual
 host WeaponFired coverage (R83). Broader AI arsenal use/performance remains RA8; final review
 remains independent. No new substantial external directory is created: Cargo uses the existing
 configured cache; UV/PIP cache variables remain unchanged; logs stay in the canonical repository.
+
+
+The failed initial frozen gate is preserved in `ra7-attempt1` (6432s workspace,855/1/0).
+R86 documents the exact RA4 last-stand fixture migration: only its original fogON stalemate
+is explicit; all nine companion matches retain actual default fogOFF with replay checks.
+The first attempt's complete756-row production table and5141.62s target pass remain evidence
+for that attempt, not a substitute for the required final full gate.

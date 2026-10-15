@@ -1,0 +1,30 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 2.22s
+     Running tests/ra4_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra4_ai-4dcc50c27d5fddc2)
+
+running 1 test
+RA7 last-stand diagnostic fog=false tick2262: BuildingSold { player: PlayerId(1), building: SimId(14), refund: 240 }
+RA7 last-stand diagnostic fog=false tick2352: BuildingSold { player: PlayerId(1), building: SimId(11), refund: 120 }
+RA7 last-stand diagnostic fog=false tick2362: BuildingSold { player: PlayerId(1), building: SimId(37), refund: 120 }
+RA7 last-stand diagnostic fog=false tick2551: BuildingSold { player: PlayerId(0), building: SimId(16), refund: 240 }
+RA7 last-stand diagnostic fog=false tick2561: BuildingSold { player: PlayerId(0), building: SimId(12), refund: 120 }
+RA7 last-stand diagnostic fog=false tick2871: BuildingSold { player: PlayerId(0), building: SimId(38), refund: 120 }
+RA7 last-stand diagnostic fog=false tick2881: BuildingSold { player: PlayerId(0), building: SimId(13), refund: 100 }
+RA7 last-stand diagnostic fog=false tick3061: BuildingSold { player: PlayerId(0), building: SimId(18), refund: 100 }
+RA7 last-stand diagnostic fog=false tick3071: BuildingSold { player: PlayerId(0), building: SimId(0), refund: 800 }
+RA7 last-stand diagnostic fog=false tick3192: BuildingSold { player: PlayerId(1), building: SimId(1), refund: 800 }
+RA7 last-stand diagnostic seed7 default fogOFF: Played { outcome: Some(Won { winner: PlayerId(1), tick: 4193 }), ticks: 4194, hash: 11709602216865450126, unexplained: [], promotions: 5, survivors: 10 }
+
+thread 'two_players_who_have_spent_each_other_make_their_last_stand_and_the_match_ends' (3501165) panicked at crates/sim/tests/ra4_ai.rs:191:5:
+assertion failed: played.ticks > 4_400 + sim::LAST_STAND_PATIENCE
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test two_players_who_have_spent_each_other_make_their_last_stand_and_the_match_ends ... FAILED
+
+failures:
+
+failures:
+    two_players_who_have_spent_each_other_make_their_last_stand_and_the_match_ends
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.35s
+
+error: test failed, to rerun pass `-p sim --test ra4_ai`

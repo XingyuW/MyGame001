@@ -1260,7 +1260,7 @@ RA7; no review or approval tag was created.
 
 ## RA7: vision, tactical commands, interface and announcements (2026-10-15)
 
-Implementation complete; final frozen validation pending. R84–R85 and the
+Implementation complete; final frozen validation pending. R84–R86 and the
 [RA7 acceptance ledger](validation/ra2-parity/RA7_ACCEPTANCE.md) map scope to exact positive,
 negative and boundary tests. This entry does not claim independent review or approval.
 

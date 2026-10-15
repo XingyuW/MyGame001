@@ -56,7 +56,7 @@ fn computer(player: PlayerId, faction: usize, start: usize, difficulty: usize) -
     }
 }
 
-fn start(data: &Data, players: &[PlayerSetup]) -> App {
+fn start(data: &Data, players: &[PlayerSetup], options: &MatchOptions) -> App {
     let mut app = App::new();
     app.add_plugins(SimPlugin { seed: 7 });
     let map =
@@ -70,7 +70,7 @@ fn start(data: &Data, players: &[PlayerSetup]) -> App {
         &data.ai,
         0,
         players,
-        &MatchOptions::default(),
+        options,
     )
     .unwrap_or_else(|error| panic!("{error}"));
     app
@@ -92,7 +92,16 @@ struct Played {
 /// every tick that no credits are negative (I7) and every 16th tick that the cells are in
 /// order (I6').
 fn play(data: &Data, players: &[PlayerSetup], limit: u64) -> Played {
-    let mut app = start(data, players);
+    play_with_options(data, players, limit, &MatchOptions::default())
+}
+
+fn play_with_options(
+    data: &Data,
+    players: &[PlayerSetup],
+    limit: u64,
+    options: &MatchOptions,
+) -> Played {
+    let mut app = start(data, players, options);
     let mut unexplained = Vec::new();
     let mut lost_before: BTreeMap<PlayerId, Vec<SimId>> = BTreeMap::new();
     let (mut ticks, mut promotions, mut survivors) = (0, 0, 0);
@@ -168,7 +177,17 @@ fn play(data: &Data, players: &[PlayerSetup], limit: u64) -> Played {
 fn two_players_who_have_spent_each_other_make_their_last_stand_and_the_match_ends() {
     let data = data();
     let players = [computer(P0, ALPHA, 0, 1), computer(P1, GAMMA, 1, 1)];
-    let played = play(&data, &players, 72_000);
+    // This regression needs the original current-sight stalemate. The nine companion matches
+    // retain the actual RA7 fog-off default, including this same pairing and replay.
+    let played = play_with_options(
+        &data,
+        &players,
+        72_000,
+        &MatchOptions {
+            fog_of_war: true,
+            ..MatchOptions::default()
+        },
+    );
     assert!(
         matches!(played.outcome, Some(MatchOutcome::Won { .. })),
         "{:?} after {} ticks",

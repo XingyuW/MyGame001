@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 2.40s
+     Running tests/ra4_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra4_ai-4dcc50c27d5fddc2)
+
+running 1 test
+
+thread 'two_players_who_have_spent_each_other_make_their_last_stand_and_the_match_ends' (3498432) panicked at crates/sim/tests/ra4_ai.rs:181:5:
+assertion failed: played.ticks > 4_400 + sim::LAST_STAND_PATIENCE
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test two_players_who_have_spent_each_other_make_their_last_stand_and_the_match_ends ... FAILED
+
+failures:
+
+failures:
+    two_players_who_have_spent_each_other_make_their_last_stand_and_the_match_ends
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.34s
+
+error: test failed, to rerun pass `-p sim --test ra4_ai`
