@@ -114,6 +114,10 @@ impl QueueItem {
 /// The economic state of one player.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct PlayerState {
+    /// Zero is the neutral scenario default; actual AI houses install ported rules at setup.
+    pub(crate) ai_rof_pm: u32,
+    pub(crate) ai_build_time_pm: u32,
+    pub(crate) ai_virtual_purifiers: u32,
     /// Persistent infiltration benefits: infantry, vehicles, Allied tech, Soviet tech.
     pub infiltration: u8,
     pub(crate) limited_units: BTreeMap<UnitKind, u32>,
@@ -153,6 +157,23 @@ pub struct PlayerState {
 }
 
 impl PlayerState {
+    pub fn ai_reload_pm(&self) -> u32 {
+        if self.ai_rof_pm == 0 {
+            1000
+        } else {
+            self.ai_rof_pm
+        }
+    }
+    pub fn ai_build_time_pm(&self) -> u32 {
+        if self.ai_build_time_pm == 0 {
+            1000
+        } else {
+            self.ai_build_time_pm
+        }
+    }
+    pub fn ai_virtual_purifiers(&self) -> u32 {
+        self.ai_virtual_purifiers
+    }
     /// The player's buildings being repaired.
     pub fn repairing(&self) -> &BTreeSet<SimId> {
         &self.repairing
@@ -445,6 +466,15 @@ impl Players {
                     hasher.write(&kind.0.to_le_bytes());
                     hasher.write_u32(*count);
                 }
+            }
+            if state.ai_rof_pm != 0
+                || state.ai_build_time_pm != 0
+                || state.ai_virtual_purifiers != 0
+            {
+                hasher.write(b"ai_difficulty");
+                hasher.write_u32(state.ai_rof_pm);
+                hasher.write_u32(state.ai_build_time_pm);
+                hasher.write_u32(state.ai_virtual_purifiers);
             }
             hasher.write(&state.credits.to_le_bytes());
             hasher.write(&state.power_produced.to_le_bytes());
@@ -944,6 +974,7 @@ pub(crate) fn advance_production(
         let low_power = state.low_power();
         let speed = state.production_speed();
         let super_me = state.super_me;
+        let ai_build_time_pm = state.ai_build_time_pm();
         let unlock_all = state.unlock_all;
         let (produced, consumed) = (state.power_produced, state.power_consumed);
         let producers: Vec<QueueKey> = state.queues.keys().copied().collect();
@@ -993,7 +1024,9 @@ pub(crate) fn advance_production(
                             .filter(|&&kind| definitions.same_factory(kind, terms.producer))
                             .count();
                         let rate =
-                            production_rate_pm(rates, factories, produced, consumed, super_me);
+                            production_rate_pm(rates, factories, produced, consumed, super_me)
+                                .saturating_mul(1000)
+                                / u64::from(ai_build_time_pm);
                         advance_item(head, terms.cost, terms.build_time, rate, super_me, credits);
                     }
                     // Without a rules file: one unit per tick, on even ticks under low power.
@@ -1269,7 +1302,10 @@ mod tests {
             );
         });
         let radar = hash(&|state| state.radar = true);
-        let all = [plain, fraction, lane, radar];
+        let rof = hash(&|state| state.ai_rof_pm = 800);
+        let build = hash(&|state| state.ai_build_time_pm = 800);
+        let purifiers = hash(&|state| state.ai_virtual_purifiers = 4);
+        let all = [plain, fraction, lane, radar, rof, build, purifiers];
         for (index, a) in all.iter().enumerate() {
             for b in &all[index + 1..] {
                 assert_ne!(a, b);

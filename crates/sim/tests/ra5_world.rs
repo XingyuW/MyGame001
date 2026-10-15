@@ -566,7 +566,13 @@ fn only_land_route_ai(lose_sight: bool) {
     let mut skirmish =
         sim::load_skirmish(data_dir().join("skirmish.ron"), &definitions).expect("skirmish");
     skirmish.maps[0].starts = vec![CellPos::new(4, 20), CellPos::new(40, 20)];
-    let ai = sim::load_ai(data_dir().join("ai.ron"), &definitions).expect("AI");
+    // Keep the original ordinary ground plans neutral: the only route must be repaired.
+    // Actual shipped full-tech composition/difficulty is exercised by RA8 and full sweeps.
+    let ai = sim::load_ai(
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/data/ra5/bridge_ai.ron"),
+        &definitions,
+    )
+    .expect("bridge AI fixture");
     let brutal = ai
         .difficulties
         .iter()

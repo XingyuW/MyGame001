@@ -3,14 +3,24 @@
 //! (PLAN.md section 7, M6: "a data defined build order ... difficulty set by data parameters";
 //! docs/DECISIONS.md D42).
 //!
-//! AI file, schema version 2 (RA1: one plan per side; version 1 had one plan at the top level):
+//! AI file, schema version 3 (RA8: optional country overrides, defence/support lists and
+//! explicit house-difficulty policy; RA1 version 2 had one plan per side):
 //!
 //! ```ron
 //! (
-//!     schema_version: 2,
+//!     schema_version: 3,
+//!     rules_difficulty: 0,
+//!     policy: (garrison_quota: 0, garrison_radius: 0, depot_radius: 0, naval_rescan: 1, naval_detector_quota: 0,
+//!              artillery_min_range: 0, artillery_standoff: 0, paradrop_offset: 0,
+//!              chrono_min_offset: 0, chrono_max_offset: 0),
 //!     plans: [
 //!         (
 //!             side: "none",
+//!             country: "",
+//!             defences: [],
+//!             support: [],
+//!             tier_reserves: [0, 0, 0],
+//!             advanced_tech_level: 0,
 //!             build_order: ["power_plant", "refinery", "barracks"],
 //!             power: "power_plant",
 //!             harvester: "harvester",
@@ -34,7 +44,8 @@
 //!
 //! Every field is required, so there are no silent defaults. A plan is for the factions of its
 //! `side`: `"none"` for the factions without a side, `"allied"` or `"soviet"` (a side of the
-//! rules file) for the countries of that side; each side has at most one plan. The file is cross
+//! rules file) for the countries of that side. A nonempty country selects an exact override;
+//! each side/country pair is unique. The file is cross
 //! validated against the match definitions, which must include a combat file. For every plan:
 //! every building of the build order is defined, and its prerequisites are listed before it; the
 //! power building produces power and has no prerequisites, so that it can be queued whenever
@@ -78,11 +89,11 @@ use crate::hash::Fnv1a64;
 use crate::rules::Side;
 use crate::skirmish_defs::{FactionDef, SkirmishDefinitions, country_tree};
 
-/// The schema version of the AI file this crate reads (2 since RA1: a plan per side).
-pub const AI_SCHEMA_VERSION: i64 = 2;
+/// The schema version of the AI file this crate reads (RA8 country and capability plans).
+pub const AI_SCHEMA_VERSION: i64 = 3;
 
-/// Largest number of plans: one for the factions without a side and one per side.
-pub const MAX_PLANS: usize = 3;
+/// Largest number of plans: common side plans plus the nine country overrides.
+pub const MAX_PLANS: usize = 12;
 
 /// Longest build order.
 pub const MAX_BUILD_ORDER: usize = 32;
@@ -106,6 +117,118 @@ pub const MAX_HARVESTERS_PER_REFINERY: u32 = 8;
 
 /// Largest radius around its buildings in which a computer player defends, in cells.
 pub const MAX_DEFENCE_RADIUS: u32 = 32;
+
+/// Game-owned tactical choices, explicit in data rather than hidden balance constants.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct AiPolicy {
+    pub garrison_quota: u32,
+    pub garrison_radius: u32,
+    pub depot_radius: u32,
+    pub naval_rescan: u32,
+    pub naval_detector_quota: u32,
+    pub artillery_min_range: u32,
+    pub artillery_standoff: u32,
+    pub paradrop_offset: u32,
+    pub chrono_min_offset: u32,
+    pub chrono_max_offset: u32,
+}
+
+impl AiPolicy {
+    fn hash_into(&self, hasher: &mut Fnv1a64) {
+        for value in [
+            self.garrison_quota,
+            self.garrison_radius,
+            self.depot_radius,
+            self.naval_rescan,
+            self.naval_detector_quota,
+            self.artillery_min_range,
+            self.artillery_standoff,
+            self.paradrop_offset,
+            self.chrono_min_offset,
+            self.chrono_max_offset,
+        ] {
+            hasher.write_u32(value);
+        }
+    }
+}
+
+static POLICY_FIELDS: &[(&str, Shape)] = &[
+    ("garrison_quota", Shape::Int),
+    ("garrison_radius", Shape::Int),
+    ("depot_radius", Shape::Int),
+    ("naval_rescan", Shape::Int),
+    ("naval_detector_quota", Shape::Int),
+    ("artillery_min_range", Shape::Int),
+    ("artillery_standoff", Shape::Int),
+    ("paradrop_offset", Shape::Int),
+    ("chrono_min_offset", Shape::Int),
+    ("chrono_max_offset", Shape::Int),
+];
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct PolicyEntry {
+    garrison_quota: i64,
+    garrison_radius: i64,
+    depot_radius: i64,
+    naval_rescan: i64,
+    naval_detector_quota: i64,
+    artillery_min_range: i64,
+    artillery_standoff: i64,
+    paradrop_offset: i64,
+    chrono_min_offset: i64,
+    chrono_max_offset: i64,
+}
+
+fn validate_policy(entry: PolicyEntry) -> Result<AiPolicy, Problem> {
+    let radius = |name: &str, value| {
+        ranged(
+            &format!("policy.{name}"),
+            value,
+            0,
+            MAX_DEFENCE_RADIUS,
+            " cells",
+        )
+    };
+    let policy = AiPolicy {
+        garrison_quota: ranged(
+            "policy.garrison_quota",
+            entry.garrison_quota,
+            0,
+            MAX_AI_ARMY,
+            " units",
+        )?,
+        garrison_radius: radius("garrison_radius", entry.garrison_radius)?,
+        depot_radius: radius("depot_radius", entry.depot_radius)?,
+        naval_rescan: ranged(
+            "policy.naval_rescan",
+            entry.naval_rescan,
+            1,
+            MAX_THINK_INTERVAL,
+            " ticks",
+        )?,
+        naval_detector_quota: ranged(
+            "policy.naval_detector_quota",
+            entry.naval_detector_quota,
+            0,
+            MAX_AI_ARMY,
+            " units",
+        )?,
+        artillery_min_range: radius("artillery_min_range", entry.artillery_min_range)?,
+        artillery_standoff: radius("artillery_standoff", entry.artillery_standoff)?,
+        paradrop_offset: radius("paradrop_offset", entry.paradrop_offset)?,
+        chrono_min_offset: radius("chrono_min_offset", entry.chrono_min_offset)?,
+        chrono_max_offset: radius("chrono_max_offset", entry.chrono_max_offset)?,
+    };
+    if policy.chrono_min_offset > policy.chrono_max_offset {
+        return Err(invalid(
+            "policy.chrono_max_offset".into(),
+            policy.chrono_max_offset.to_string(),
+            "at least chrono_min_offset",
+        ));
+    }
+    Ok(policy)
+}
 
 /// A difficulty: how fast and how strongly a computer player acts.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -135,6 +258,13 @@ pub struct Difficulty {
 pub struct SidePlan {
     /// `None`: the plan of the factions without a side.
     pub side: Option<Side>,
+    /// Optional exact country override; None is the common side plan.
+    pub country: Option<crate::CountryId>,
+    pub defences: Vec<BuildingKind>,
+    pub support: Vec<UnitKind>,
+    /// Reserved aircraft, advanced land and naval slots, respectively.
+    pub tier_reserves: [u32; 3],
+    pub advanced_tech_level: u32,
     /// Building types in the order they are built; a type listed n times is kept at n buildings.
     pub build_order: Vec<BuildingKind>,
     /// The building type built when the power would not suffice.
@@ -148,7 +278,10 @@ pub struct SidePlan {
 /// The AI file.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct AiDefinitions {
-    /// At least one plan, at most one per side.
+    pub policy: AiPolicy,
+    /// Apply ported rules to actual AI houses; explicit off for balance-independent fixtures.
+    pub rules_difficulty: bool,
+    /// At least one plan, at most one per side/country pair.
     pub plans: Vec<SidePlan>,
     pub difficulties: Vec<Difficulty>,
 }
@@ -157,6 +290,12 @@ pub struct AiDefinitions {
 /// of its faction offers (M7, docs/DECISIONS.md D49).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct AiPlan {
+    pub policy: AiPolicy,
+    pub rules_difficulty: bool,
+    pub defences: Vec<BuildingKind>,
+    pub support: Vec<UnitKind>,
+    pub tier_reserves: [u32; 3],
+    pub advanced_tech_level: u32,
     /// The buildings of `build_order` the faction offers, in the file's order.
     pub build_order: Vec<BuildingKind>,
     pub power: BuildingKind,
@@ -167,6 +306,20 @@ pub struct AiPlan {
 
 impl AiPlan {
     pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
+        hasher.write(&[u8::from(self.rules_difficulty)]);
+        self.policy.hash_into(hasher);
+        for value in self.tier_reserves {
+            hasher.write_u32(value);
+        }
+        hasher.write_u32(self.advanced_tech_level);
+        hasher.write_u64(self.defences.len() as u64);
+        for kind in &self.defences {
+            hasher.write(&kind.0.to_le_bytes());
+        }
+        hasher.write_u64(self.support.len() as u64);
+        for kind in &self.support {
+            hasher.write(&kind.0.to_le_bytes());
+        }
         hasher.write_u64(self.build_order.len() as u64);
         for kind in &self.build_order {
             hasher.write(&kind.0.to_le_bytes());
@@ -186,7 +339,7 @@ impl AiDefinitions {
         self.plans
             .iter()
             .enumerate()
-            .find(|(_, plan)| plan.side == side)
+            .find(|(_, plan)| plan.side == side && plan.country.is_none())
     }
 
     /// The plan of a computer player of `faction`: the plan of the faction's side, and for a
@@ -194,10 +347,26 @@ impl AiDefinitions {
     /// offers, in the file's order. `None` if the file has no plan for the faction's side.
     /// [`check_ai_factions`] (and match setup) check that this plan exists and is complete for
     /// every faction a computer player may play.
+    fn for_faction(&self, faction: &FactionDef) -> Option<(usize, &SidePlan)> {
+        self.plans
+            .iter()
+            .enumerate()
+            .find(|(_, p)| {
+                p.side == faction.side && p.country.is_some() && p.country == faction.country
+            })
+            .or_else(|| self.plan(faction.side))
+    }
+
     pub fn plan_for(&self, faction: &FactionDef) -> Option<AiPlan> {
-        let (_, plan) = self.plan(faction.side)?;
+        let (_, plan) = self.for_faction(faction)?;
         let offered = |item: ProductionItem| faction.side.is_some() || faction.offers(item);
         Some(AiPlan {
+            policy: self.policy,
+            rules_difficulty: self.rules_difficulty,
+            defences: plan.defences.clone(),
+            support: plan.support.clone(),
+            tier_reserves: plan.tier_reserves,
+            advanced_tech_level: plan.advanced_tech_level,
             build_order: plan
                 .build_order
                 .iter()
@@ -216,8 +385,23 @@ impl AiDefinitions {
     }
 
     pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
+        self.policy.hash_into(hasher);
+        hasher.write(&[u8::from(self.rules_difficulty)]);
         hasher.write_u64(self.plans.len() as u64);
         for plan in &self.plans {
+            for value in plan.tier_reserves {
+                hasher.write_u32(value);
+            }
+            hasher.write_u32(plan.advanced_tech_level);
+            hasher.write(&[plan.country.map_or(u8::MAX, |c| c.0)]);
+            hasher.write_u64(plan.defences.len() as u64);
+            for k in &plan.defences {
+                hasher.write(&k.0.to_le_bytes());
+            }
+            hasher.write_u64(plan.support.len() as u64);
+            for k in &plan.support {
+                hasher.write(&k.0.to_le_bytes());
+            }
             hasher.write(&[plan.side.map_or(u8::MAX, |side| side.index() as u8)]);
             hasher.write_u64(plan.build_order.len() as u64);
             for kind in &plan.build_order {
@@ -269,7 +453,30 @@ static DIFFICULTY_SHAPE: Shape = Shape::Struct(&[
 ]);
 
 static PLAN_SHAPE: Shape = Shape::Struct(&[
+    (
+        "tier_reserves",
+        Shape::List {
+            entry: &Shape::Int,
+            max: 3,
+        },
+    ),
+    ("advanced_tech_level", Shape::Int),
     ("side", Shape::Str),
+    ("country", Shape::Str),
+    (
+        "defences",
+        Shape::List {
+            entry: &Shape::Str,
+            max: MAX_ARMY_ENTRIES,
+        },
+    ),
+    (
+        "support",
+        Shape::List {
+            entry: &Shape::Str,
+            max: MAX_ARMY_ENTRIES,
+        },
+    ),
     (
         "build_order",
         Shape::List {
@@ -289,7 +496,9 @@ static PLAN_SHAPE: Shape = Shape::Struct(&[
 ]);
 
 static AI_FILE_SHAPE: Shape = Shape::Struct(&[
+    ("policy", Shape::Struct(POLICY_FIELDS)),
     ("schema_version", Shape::SchemaVersion(AI_SCHEMA_VERSION)),
+    ("rules_difficulty", Shape::Int),
     (
         "plans",
         Shape::List {
@@ -311,6 +520,8 @@ static AI_FILE_SHAPE: Shape = Shape::Struct(&[
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct AiFile {
+    policy: PolicyEntry,
+    rules_difficulty: i64,
     schema_version: i64,
     plans: Vec<PlanEntry>,
     difficulties: Vec<DifficultyEntry>,
@@ -319,6 +530,11 @@ struct AiFile {
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct PlanEntry {
+    tier_reserves: Vec<i64>,
+    advanced_tech_level: i64,
+    country: String,
+    defences: Vec<String>,
+    support: Vec<String>,
     side: String,
     build_order: Vec<String>,
     power: String,
@@ -427,7 +643,32 @@ fn validate(file: AiFile, definitions: &Definitions) -> Result<AiDefinitions, Pr
                     })?,
             ),
         };
-        if plans.iter().any(|plan| plan.side == side) {
+        let country = if entry.country.is_empty() {
+            None
+        } else {
+            Some(
+                definitions
+                    .rules()
+                    .and_then(|r| r.country_id(&entry.country))
+                    .filter(|id| {
+                        definitions
+                            .rules()
+                            .and_then(|r| r.country(*id))
+                            .is_some_and(|c| Some(c.side) == side)
+                    })
+                    .ok_or_else(|| {
+                        invalid(
+                            at("country"),
+                            format!("{:?}", entry.country),
+                            "a country of the plan's side",
+                        )
+                    })?,
+            )
+        };
+        if plans
+            .iter()
+            .any(|plan| plan.side == side && plan.country == country)
+        {
             return Err((at("side"), DataErrorKind::DuplicateId(entry.side.clone())));
         }
         if entry.build_order.is_empty() {
@@ -456,8 +697,49 @@ fn validate(file: AiFile, definitions: &Definitions) -> Result<AiDefinitions, Pr
         for (index, id) in entry.army.iter().enumerate() {
             army.push(unit(definitions, at(&format!("army[{index}]")), id)?);
         }
+        let defences = entry
+            .defences
+            .iter()
+            .enumerate()
+            .map(|(i, id)| building(definitions, at(&format!("defences[{i}]")), id))
+            .collect::<Result<Vec<_>, _>>()?;
+        let support = entry
+            .support
+            .iter()
+            .enumerate()
+            .map(|(i, id)| unit(definitions, at(&format!("support[{i}]")), id))
+            .collect::<Result<Vec<_>, _>>()?;
+        if entry.tier_reserves.len() != 3 {
+            return Err(invalid(
+                at("tier_reserves"),
+                format!("{} entries", entry.tier_reserves.len()),
+                "exactly three reserve counts",
+            ));
+        }
+        let mut tier_reserves = [0; 3];
+        for (index, value) in entry.tier_reserves.iter().copied().enumerate() {
+            tier_reserves[index] = ranged(
+                &at(&format!("tier_reserves[{index}]")),
+                value,
+                0,
+                MAX_AI_ARMY,
+                "",
+            )?;
+        }
+        let advanced_tech_level = ranged(
+            &at("advanced_tech_level"),
+            entry.advanced_tech_level,
+            0,
+            10,
+            "",
+        )?;
         let plan = SidePlan {
+            tier_reserves,
+            advanced_tech_level,
             side,
+            country,
+            defences,
+            support,
             build_order,
             power,
             harvester,
@@ -476,6 +758,31 @@ fn validate(file: AiFile, definitions: &Definitions) -> Result<AiDefinitions, Pr
             &side_start(definitions, side),
             None,
         )?;
+        let available: Vec<_> = side_start(definitions, side)
+            .into_iter()
+            .chain(plan.build_order.iter().copied())
+            .collect();
+        for (i, &kind) in plan.defences.iter().enumerate() {
+            let item = ProductionItem::Building(kind);
+            if definitions.lane(item) != crate::Lane::Defences
+                || listed_prerequisite(definitions, &available, item).is_some()
+            {
+                return Err(invalid(
+                    at(&format!("defences[{i}]")),
+                    building_name(definitions, kind),
+                    "a defence obtainable after the build order",
+                ));
+            }
+        }
+        for (i, &kind) in plan.support.iter().enumerate() {
+            obtainable(
+                definitions,
+                &plan.build_order,
+                &at(&format!("support[{i}]")),
+                &unit_name(definitions, kind),
+                kind,
+            )?;
+        }
         check_countries(definitions, position, &plan)?;
         plans.push(plan);
     }
@@ -541,7 +848,24 @@ fn validate(file: AiFile, definitions: &Definitions) -> Result<AiDefinitions, Pr
             id: entry.id,
         });
     }
+    let rules_difficulty = ranged::<u8>("rules_difficulty", file.rules_difficulty, 0, 1, "")? == 1;
+    if rules_difficulty {
+        for (index, difficulty) in difficulties.iter().enumerate() {
+            if !definitions
+                .rules()
+                .is_some_and(|rules| rules.difficulties.iter().any(|r| r.id == difficulty.id))
+            {
+                return Err(invalid(
+                    format!("difficulties[{index}].id"),
+                    &difficulty.id,
+                    "a difficulty defined by rules.ron when rules_difficulty is enabled",
+                ));
+            }
+        }
+    }
     Ok(AiDefinitions {
+        policy: validate_policy(file.policy)?,
+        rules_difficulty,
         plans,
         difficulties,
     })
@@ -578,6 +902,18 @@ fn check_countries(
         .enumerate()
         .map(|(index, &kind)| (format!("army[{index}]"), ProductionItem::Unit(kind)));
     let entries: Vec<(String, ProductionItem)> = buildings
+        .chain(
+            plan.defences
+                .iter()
+                .enumerate()
+                .map(|(i, &k)| (format!("defences[{i}]"), ProductionItem::Building(k))),
+        )
+        .chain(
+            plan.support
+                .iter()
+                .enumerate()
+                .map(|(i, &k)| (format!("support[{i}]"), ProductionItem::Unit(k))),
+        )
         .chain(std::iter::once((
             "power".to_owned(),
             ProductionItem::Building(plan.power),
@@ -589,7 +925,7 @@ fn check_countries(
         .chain(units)
         .collect();
     for (index, country) in rules.countries.iter().enumerate() {
-        if country.side != side {
+        if country.side != side || plan.country.is_some_and(|c| usize::from(c.0) != index) {
             continue;
         }
         let Ok(id) = u8::try_from(index) else {
@@ -921,7 +1257,7 @@ pub(crate) fn unobtainable_producer(
     definitions: &Definitions,
     faction: &FactionDef,
 ) -> Option<(String, BuildingKind, BuildingKind)> {
-    let (position, side_plan) = ai.plan(faction.side)?;
+    let (position, side_plan) = ai.for_faction(faction)?;
     let start = faction_start(definitions, faction);
     let producer = |kind: BuildingKind| {
         definitions
@@ -992,7 +1328,7 @@ pub(crate) fn faction_plan_problem(
     definitions: &Definitions,
     faction: &FactionDef,
 ) -> Result<(), Problem> {
-    let Some((position, plan)) = ai.plan(faction.side) else {
+    let Some((position, plan)) = ai.for_faction(faction) else {
         return Err((
             "plans".into(),
             DataErrorKind::MissingEntry {

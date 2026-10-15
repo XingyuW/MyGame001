@@ -5222,3 +5222,273 @@ success with a finished item. The schedule-level
 `ra8_place_without_a_completed_item_rejects_without_state_mutation` issues the actual
 command and compares its entire resulting simulation hash with an empty-command twin.
 Both pass; their raw logs are retained. This extraction changes no command behavior.
+
+### R91. RA8 country plans, source difficulty and declared AI policy
+
+**2026-10-15.** AI schema 3 adds required country overrides, defense/support lists,
+three tier reserves, an advanced-tech cutoff, bounded policy fields and an explicit
+`rules_difficulty` switch. The generator supplies two side fallbacks and all nine country
+plans; the neutral legacy/RA1–RA5 fixtures opt out of shipped house difficulty and strategy.
+Rules schema 4 adds all twelve source AIIonCannon target weights for each difficulty.
+Every fixture is migrated, and independent reference audits cover the generated values.
+
+The shipped house settings follow source Easy/Medium/Brutal: weapon ROF 1200/1000/800,
+build time 1000/1000/800, initial credits 1x/1x/5x, virtual purifiers 0/2/4, wave delays
+4667/3333/2667, and defense counts 6/(20 Allied,22 Soviet)/25. The existing runtime had no
+old difficulty firepower/armor multipliers to remove; first-hit damage remains equal.
+Physical powered purifiers and virtual counts independently add the source 25 percent
+bonus of the base ore load, with integer accounting; their bonuses do not compound.
+Weapon ROF also covers parasite attacks, RepairBullet, PsiWave, eruption and occupation
+weapons (occupation then divides by crew). Global superweapon, bomb, rearm and deployment
+timers remain separate source rules. Player multipliers and all controller policy/memory
+are value-hashed.
+
+Full-tech Allied plans distinguish radar/airfield, America paradrops and Korean aircraft;
+Soviet plans include radar and Battle Lab. Both include second refinery, depot, national
+special, late economy, defense and optional major superweapons. America paradrops remain
+available with major superweapons disabled. Unit production retains ordinary prerequisites,
+ownership and dock checks. These plans and their composition are game-owned AI assumptions,
+not a claim to reproduce the closed-source original decision algorithm. Shipped maximum
+armies/waves are 16/8,24/12,36/16, with air/advanced/naval reserves 1/2/2 and advanced cutoff6,
+so the initial 9/11 combat units leave room for actual tech progression. Policy declares
+garrison quota3/radius12, depot radius16, naval rescan600, artillery range8/standoff3,
+paradrop offset4 and Chronoshift offsets3–8. A naval detector quota1 fits within the declared
+naval reserve2. Parser tests require and bound every field.
+
+### R92. RA8 honest specialist strategy and non-starving endings
+
+**2026-10-15.** Controllers remember observed air and locally unexplained losses, recruit
+AA/detectors reactively, assign engineers to seen tech and known broken bridges, garrison
+nearby buildings, repair owned buildings and send damaged vehicles to compatible service
+bays. Specialist reservations prevent a subsequent army order from replacing their jobs.
+Occupied civilian Props remain combat targets but cannot become economy buildings; a
+depleted house deploys recoverable garrison infantry before liquidating its actual base.
+
+Naval recruitment requires a legal reachable coastal placement and an observed enemy that
+the chosen weapon can hurt from that water component. Candidate components use terrain,
+owned buildings and visible enemy buildings; hidden occupancy never filters a route.
+The remembered site, target and rescan time are hashed. Focused tests include an isolated
+pond nearer than the useful coast, actual ship firing, and twin worlds differing only by
+an unseen blocking shipyard. Removing the visibility filter makes that last test fail;
+the exact source SHA before and after restoration matches.
+
+The exact Coral regression trace then exposed R51's remaining escort gap: Soviet
+Dreadnoughts could be built against a shore target while Typhoon/Squid were withheld because
+their individual weapons could not hurt that building. The generated detector quota now
+recruits a sensor escort from the existing qualified route before offensive naval reserves,
+still within the naval and whole-army bounds. It reads no unseen enemy state. The dedicated
+test requires actual fully paid Typhoon production and movement toward the known fleet goal.
+
+Strategic strikes rank only known buildings/visible units with all twelve source weights.
+Other ordinary buildings use the source Plug category; ordinary unclassified units receive
+zero strategic weight. This category mapping is an explicit AI assumption. Curtain and
+Chronoshift select real own vehicle waves; Chronoshift uses its explicit source and target
+command. Landing checks use known occupancy. Normal production and recharge are exercised.
+
+R53 retains patience1200 and player sale slots256/modulo16. An activated last stand gains
+its exact sale-slot decision in addition to its ordinary cadence, avoiding starvation at
+512/1024 and other supported intervals without a 19,200-tick cycle or simultaneous last
+building sales. Capability checks exclude Dog/Drone/Squid building-incapable remnants and
+stranded naval-only forces while preserving Temporal, legitimate mind-control opportunities
+and active naval travel. Explicit winners are now required by m13, m14 and completed soak
+matches; existing 400000/300000/36000 outer limits and R29 scaled limits are unchanged.
+
+### R93. RA8 concealment refresh has no appearance RNG side effect
+
+**2026-10-15.** In shipped human-controlled matches with crates enabled, a newly stationary
+Mirage plus a rejected empty Guard produced a different crate than the otherwise identical
+no-command world: `mirage-rng-before1.log` retains positions34,29 versus30,34 and differing
+lifetimes. No AI is due in this probe. Early concealment refresh had allocated Mirage art
+variants and consumed SimRng before Economy. Variant allocation now occurs only in the
+regular revealing Visibility stage. Early refresh still derives concealment and removes
+moving disguises. The complete resulting hashes, crates and next RNG value now match,
+preserving command rejection's no-mutation contract and RA7 same-batch visibility rules.
+
+### R94. RA8 fixture migrations and preserved preflight evidence
+
+**2026-10-15.** Existing test migrations are limited to the declared schemas and stronger
+hash coverage. Exact functions: `ra1_definitions::the_rules_fixture_loads_with_every_field`
+adds neutral twelve target weights; `the_ai_fixture_loads_with_a_plan_per_side` adds the
+neutral policy/plan fields (naval_rescan1, its minimum); `every_field_of_the_ai_file_is_required`
+also requires rules_difficulty and policy; `unknown_and_duplicate_fields_are_rejected_in_every_file`
+uses schema anchors4/3; `other_schema_versions_are_rejected_in_every_file` rejects versions
+around the new current ones; `ai_plans_are_checked_for_their_side` tests the new maximum12.
+`ra3_shipped::the_armies_of_the_shipped_plans_can_destroy_every_shipped_building` expects
+eleven plans instead of two and retains every damage assertion.
+`ra5_definitions::files_of_schema_version_1_are_rejected` expects rules4.
+`economy::tests::fractions_lanes_and_radar_are_hashed` additionally checks all three new
+house fields. Compile-only snapshot literals gain health/economy/new neutral plan fields.
+No original assertion or match limit is relaxed; no test is deleted, ignored or skipped.
+
+`serial-preflight1.log` stopped at the AI fixture's expected neutral naval_rescan0 versus
+its required minimum1; that expected value was corrected. `serial-preflight2.log` stopped
+at the unchanged RA4 last-stand lower bound: an unrelated army-cursor traversal correction
+had changed its historical composition. Removing that change restores both RA4 tests in
+`legacy-cursor1.log`; no fixture, timing assertion or game win was delayed. The shipped
+reserve strategy is verified separately with the retained historical traversal policy.
+
+Earlier failures remain evidence: the rejected initial broad shell-edit proposal ran no
+mutation and was replaced with exact-context patches; strategy-tests1 exposed the rejected
+1200-tick sale-slot design. The initial raw-spawn probe lacked idle responders and therefore
+failed to expose the leak; raw-spawn-before3 is the actual negative result. Initial specialist
+ROF probes used incorrect test APIs or missed the immediate occupation shot; corrected tests
+measure real cadence. Capability acceptance4 recorded legitimate early Chrono wins. Its
+isolated production fixture now uses an explicitly inaccessible reserve: extra HP alone
+cannot delay Temporal strength-based erasure. Production and normal recharge assertions
+remain. Navy3 selected zero tests and is not positive evidence; subsequent actual firing and
+component/honesty tests are. The first unseen-blocker fixture placed its blocker in actual
+Sight10 and was corrected to genuinely unseen ground. Exact negative mutation/restoration
+SHA files and logs remain. Nothing rewrites these failed or incomplete raw captures.
+
+R90 commit process deviation: the first git add failed on index permissions, and an empty
+commit attempt failed. After the explicit escalated add, the staged whitespace check flagged
+only terminal blank lines in raw `ra8-preflight/site1.log:9` and `site-command1.log:9`.
+The tool batch nevertheless committed a9ad1b1. Preserve that commit and both raw logs; this
+check did not pass. This repeats the earlier R87 orchestration mistake. Subsequent commits
+must inspect a separate staged-check result before invoking commit. Any source/data/test
+whitespace error must be fixed. Intentional raw-log EOF diagnostics must be classified by
+exact path/line before proceeding, without suppressing checks or changing captured evidence.
+
+The separate RA8 feature staged check returns2 with32 intentional raw-capture diagnostics,
+not a pass:22 terminal blank-line diagnostics plus Coral trace trailing spaces at
+`coral-regression1.log:4` through`:13`. Exact paths/lines, raw lines and unfiltered stdout
+are preserved in `ra8-preflight/feature-staged-whitespace-check1.json`. No source/data/test
+diagnostic occurs. The captures remain unchanged; the manifest and this classification are
+staged, then a separate check must confirm the identical diagnostic set before commit.
+
+### R95. RA8 Frostline control-holding attack-move lifecycle
+
+**2026-10-15.** The first default ten-player all-map run fails Frostline seed13 at its
+unchanged 400000-tick limit. Preserve `ten-player-all-end1.log`, including the subsequent
+partial Oasis Gulf result, and both diagnostic trace replays. At84000 the survivors are
+America0 (credits0, five buildings, one Carrier), Iraq6 (credits54248, about32 buildings,
+55 commandable units), and Russia8 (credits25414,43 buildings,53 commandable units).
+Iraq's48-member wave is at Waypoint8 and Russia's42-member wave at Waypoint0. Later traces
+show the same idle formations and growing money. The Carrier is legitimately attacking a
+Tesla Coil; it is not attacking an occupied Prop. The supposed garrison-control cause is
+therefore refuted for this stall.
+
+The actual cause is `combat::act_unit` returning for a mind controller holding a victim
+before its existing AttackMove can resume or finish. Weapon.target is already None, but
+the permanent order marker prevents `ai::at_rest` from advancing the entire wave. The
+shared continuation now processes that movement lifecycle while preserving the original
+ban on automatic retargeting and the explicit Attack exception. No timeout, winner delay,
+limit change or broad AI attack override is added.
+
+`yuri-boundaries-before1` proves the isolated marker failure. The first AI-wave fixture
+failed to fail because a building-only target caused explicit Attack to clear the marker;
+`yuri-wave-before4` adds a real distant Kirov and proves the actual held-controller stall
+at Waypoint94. The strengthened fixture requires both surviving controllers to remain in
+the wave and retain their victims. Both lifecycle regressions pass in
+`yuri-lifecycle-after1`, including preserved explicit retargeting and six later AI waypoints.
+The all-map attempt also retains four earlier explicit winners and Oasis Gulf's winner;
+it is not an all-map acceptance pass.
+After the lifecycle/classification fixes and R98 cleanup, the exact unsampled default
+ten-player Frostline replay exits0: Won(P6) at113712,113713 ticks measured, mean687.947µs,
+measured total78.229s/elapsed78.237s. All ten players build; peak320 units/141 buildings.
+`frostline-end-after1.log` retains the unchanged400000-limit positive result. It closes the
+specific reproduced stall, while the required all-map run remains separate acceptance.
+
+### R96. RA8 synthetic civilian-building traits and RA9 actor boundary
+
+**2026-10-15.** Occupied civilian Props were inserted into the combat target index with a
+Building body but default traits: in particular, building=false and immune_psionics=false.
+`ra8_yuri_cannot_acquire_a_hostile_occupied_building_as_a_control_target` uses shipped
+Conscript occupation and a normal Yuri Attack command. Before the fix, the schedule emits
+WeaponFired from Yuri SimId3 to host3221225869 with weapon61 (Controller) and then ends for
+NoDamage. The automatic-fire-only initial probe passed because Wood versus0 suppresses
+automatic acquisition; it was insufficient negative evidence. The explicit-command probe
+fails before and passes after the shared physical-trait construction.
+
+Mapped House/CityBlock/Tower Props now derive building combat and specialist metadata by
+the same pipeline as real buildings, in the combat index, explicit scenery lookup,
+occupation targeting and blast impact paths. Unmapped Trees/Bridge traits keep their
+previous behavior. This reconciles building/psionic/radiation/bombable classification; it
+does not supply actor-backed specialist abilities to scenery.
+
+RA9 must investigate and reconcile these exact actorless boundaries against specified
+mechanics and remaining differences: `special/resolve.rs::resolve` requires the target in
+`actors` before infantry/vehicle fired handling, Ivan role charges and legacy C4 handling;
+`special/infantry.rs::retain_beams` requires actor-index targets for Temporal retention;
+`special/commands.rs` routes Interact with any Prop directly to garrison order, and
+`special.rs::interaction_label` similarly offers only validated GARRISON. These are source
+inspection findings, not newly reproduced C4/Ivan/Temporal schedule tests or a claim that
+those abilities work on occupied Props. RA8 reproduces only the impossible Yuri control
+shot and fixes classification independently of the Frostline order lifecycle.
+In particular, `special/infantry.rs::fired` documents FakeC4/Sapper as ordinary impacts;
+that physical combat path differs from actor-backed legacy C4 charges. The actor boundary
+must not be misreported as proof that every C4 weapon fails against scenery.
+
+The broader `yuri-boundaries-after1.log` stops with21 passing RA5-world cases and two
+failed ground-army preconditions: `ra5_ai_repairs_the_only_land_route_with_a_consumed_engineer_and_wins`
+and `ra5_ai_remembers_a_seen_collapse_and_approaches_its_hut_after_losing_sight` load the
+expanded shipped AI, which now contains aircraft. Their shared `only_land_route_ai` fixture
+loads `fixtures/data/ra5/bridge_ai.ron`, the exact RA7 shipped ordinary ground plans and
+difficulties migrated to neutral RA8 fields. This preserves the existing no-air precondition,
+bridge collapse/observation/repair/consumption/crossing/winner assertions and72000 limit.
+The actual shipped default composition remains covered separately by RA8 and default-path
+sweeps. Merely retaining all Land types introduces new specialists; restoring only the old
+six-type armies or disabling sourced difficulty alone does not restore the original neutral
+strategy. Failed probes `yuri-boundaries-after2/3/4` remain unchanged.
+
+### R97. RA9 handoff: queued AI intent can outlive a combat casualty
+
+**2026-10-15.** `bridge-command-trace3.log` reproduces a generic Commands→Ai→Combat race
+under expanded strategy in the fog-on bridge-memory scenario. At AI decision tick12391,
+P1 Attack Dog (UnitKind3) SimId202 is alive with HP7, no MoveOrder/Weapon.order and weapon6 cooldown4.
+That tick's combat emits UnitDestroyed(P1,202). The next Commands stage rejects P1's queued
+AttackMove([202,210,212],21,23) with UnknownUnit202 (reported posttick12393). Thus the
+controller did not select an already-dead snapshot; a valid queued intent outlived its actor.
+`bridge-command-trace1` is a diagnostic compile failure, trace2 lacks the preceding actor,
+and trace3 is the complete negative evidence.
+The initial report incorrectly called UnitKind3 a Conscript; verifying the actual unit table
+corrects that label to Attack Dog. The raw numeric evidence is unchanged.
+
+RA9 must decide whether internal AI intent needs lifecycle pruning while public missing/dead
+unit IDs continue to reject exactly as specified. RA8 does not silently remove IDs from
+public commands, relax validation, weaken the bridge no-rejection assertion or claim that
+neutral difficulty alone diagnoses the race. The isolated bridge fixture retains its
+documented original ordinary ground strategy; actual expanded default-path runs remain
+independent acceptance evidence.
+
+### R99. RA8 preserves useful observed infantry control opportunities
+
+**2026-10-15.** The prior capability predicate excluded every on-foot enemy. A lone Easy
+Yuri at15,8 with no income and a normally visible hostile Conscript at24,8 therefore sells
+its base before the usable capture opportunity (`infantry-opportunity-before1`). Eligibility
+now uses the actual mind-control weapon/warhead and target immunity, requires a recruit that
+can damage buildings, and checks static-terrain reach to firing range. It reads only visible
+hostile snapshots and public terrain; temporary traffic and building occupancy, including
+hidden occupancy, cannot prove permanent isolation. No state, timer or balance field is added.
+
+The schedule regression retains the base beyond its normal first sale slot for Conscript
+and GI, then proves ordinary-command capture and actual building HP loss from the recruit.
+Immune Tanya, building-incapable Dog and Conscript across an impassable water strip do not
+postpone liquidation. The first after probe additionally demanded automatic capture by an
+arbitrary14000-tick waypoint deadline; it retained the base correctly but failed that unrelated
+expectation. The corrected capability probe uses normal commands after4200 retained ticks,
+without changing target-selection policy or weakening an existing test. Raw failures remain.
+
+**Unproven RA9 audit lead, explicitly deferred by root:**
+`crates/sim/src/ai/strategy.rs::damages_buildings` constructs hypothetical building traits
+with default bombable=false, whereas physical building targets derive metadata through
+`crates/sim/src/combat.rs::{traits_of,specialist_traits}`. This may undercount charge-planter
+victory capability (for example Ivan) or useful controlled charge recruits. No match-ending
+defect is reproduced for this lead; it is not a claim that all charge planters fail. RA9
+must reconcile broader specialist capability classification during its data/soundness audit.
+
+### R100. RA8 artillery follows the surface front in mixed waves
+
+**2026-10-15.** The front-line predicate admitted aircraft. The real scheduled mixed-wave
+probe (`artillery-line-before4`) places Rhino14,8, V3Launcher12,8 and Kirov22,8 with a known
+enemy barracks34,8 and visible armed Rocketeer24,14. The V3 receives AttackMove19,8 behind
+the nearer Kirov rather than11,8 behind the Rhino. Requiring Domain::Land in the existing
+front predicate fixes this single eligibility error; the declared range/standoff policy
+remains unchanged. The fixture preserves actual controller memory/wave formation, pauses
+decisions while ordinary commands arrange legal positions, and resumes the scheduled AI.
+
+Earlier fixture failures remain: before1 used nonexistent unit ID `v3`; before2 removed a
+required AiPlayers resource rather than leaving an empty one; before3 selected10,8 inside
+the yard footprint, so ordinary Move correctly stopped adjacent. Only before4 reaches and
+fails the actual artillery assertion. All27 RA8 scenarios pass in `final-capabilities1`;
+the final boundary batch and default-path evidence cover the final source separately.

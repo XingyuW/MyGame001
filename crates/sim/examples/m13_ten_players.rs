@@ -31,9 +31,9 @@ use std::time::{Duration, Instant};
 use bevy_app::App;
 use bevy_ecs::message::Messages;
 use sim::{
-    Building, Controller, MAX_MATCH_PLAYERS, MatchState, PlayerId, PlayerSetup, SimEvent,
-    SimPlugin, SimSchedule, Unit, enlarged_map, load_ai, load_map, load_ruleset, load_skirmish,
-    map_asset_path, setup_match,
+    Building, Controller, MAX_MATCH_PLAYERS, MatchOutcome, MatchState, PlayerId, PlayerSetup,
+    SimEvent, SimPlugin, SimSchedule, Unit, enlarged_map, load_ai, load_map, load_ruleset,
+    load_skirmish, map_asset_path, setup_match,
 };
 
 /// The budget for the mean tick time, as in the M7 benchmark.
@@ -64,8 +64,129 @@ fn repository() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..")
 }
 
+fn has_winner(ended: Option<(u64, MatchOutcome)>) -> bool {
+    matches!(ended, Some((_, MatchOutcome::Won { .. })))
+}
+
+fn trace(world: &mut bevy_ecs::world::World, definitions: &sim::Definitions, map: &str, tick: u64) {
+    let units: Vec<_> = world
+        .query::<(
+            &sim::SimId,
+            &sim::Owner,
+            &sim::Unit,
+            &sim::Mobile,
+            &sim::Orders,
+            &sim::Health,
+            Option<&sim::Weapon>,
+        )>()
+        .iter(world)
+        .map(|(id, owner, unit, mobile, orders, health, weapon)| {
+            (
+                *id,
+                owner.0,
+                unit.kind,
+                mobile.cell,
+                mobile.step.is_some(),
+                health.hit_points,
+                format!("{:?}", orders.current),
+                format!("{weapon:?}"),
+                weapon.and_then(|w| w.target),
+            )
+        })
+        .collect();
+    let buildings: Vec<_> = world
+        .query::<(&sim::SimId, &sim::Owner, &sim::Building, &sim::Health)>()
+        .iter(world)
+        .map(|(id, owner, building, hp)| {
+            (
+                *id,
+                owner.0,
+                building.kind,
+                building.footprint.origin,
+                hp.hit_points,
+            )
+        })
+        .collect();
+    let special = world.resource::<sim::SpecialState>();
+    for target in units
+        .iter()
+        .filter_map(|unit| unit.8)
+        .collect::<BTreeSet<_>>()
+    {
+        let unit = units.iter().find(|unit| unit.0 == target);
+        let building = buildings.iter().find(|building| building.0 == target);
+        let garrison = special.garrisons.get(&target);
+        let prop = world.resource::<sim::Props>().get(target);
+        eprintln!(
+            "{map} trace tick{tick} acquired{target:?}: unit{unit:?}, building{building:?}, garrison{garrison:?}, prop{prop:?}"
+        );
+    }
+    for (player, state) in world.resource::<sim::Players>().iter() {
+        if world.resource::<MatchState>().defeated(player).is_some() {
+            continue;
+        }
+        let controller = world.resource::<sim::AiPlayers>().controller(player);
+        let own_buildings: Vec<_> = buildings
+            .iter()
+            .filter(|b| b.1 == player)
+            .map(|b| {
+                (
+                    b.0,
+                    definitions.building(b.2).map(|d| d.id.as_str()),
+                    b.3,
+                    b.4,
+                )
+            })
+            .collect();
+        let queues: Vec<_> = state.queues().collect();
+        eprintln!(
+            "{map} trace tick{tick} player{}: credits{}, queues{queues:?}, buildings{own_buildings:?}, wave{:?}, target{:?}, sea{:?}",
+            player.0,
+            state.credits(),
+            controller.map(|c| c.wave()),
+            controller.and_then(|c| c.target()),
+            controller.and_then(|c| c.naval_target())
+        );
+        for unit in units.iter().filter(|u| u.1 == player) {
+            let commandable = !special.spawned.contains_key(&unit.0)
+                && !special.strategic.flights.contains_key(&unit.0)
+                && !special.erasures.contains_key(&unit.0)
+                && !special.deployed.contains_key(&unit.0)
+                && !special.interactions.contains_key(&unit.0)
+                && !special.docked.contains_key(&unit.0)
+                && !special.rearming.contains_key(&unit.0)
+                && !special.disabled.contains_key(&unit.0);
+            eprintln!(
+                "  {:?} {:?} at{:?} stepping{} hp{} commandable{commandable} order{} attack{}",
+                unit.0,
+                definitions.unit(unit.2).map(|d| d.id.as_str()),
+                unit.3,
+                unit.4,
+                unit.5,
+                unit.6,
+                unit.7
+            );
+        }
+    }
+}
+
+#[test]
+fn ra8_ten_player_completion_requires_an_explicit_win() {
+    assert!(!has_winner(None));
+    assert!(!has_winner(Some((1, MatchOutcome::Draw { tick: 1 }))));
+    assert!(has_winner(Some((
+        1,
+        MatchOutcome::Won {
+            winner: PlayerId(0),
+            tick: 1
+        }
+    ))));
+    assert_eq!(END_LIMIT, 400_000);
+}
+
 fn main() -> ExitCode {
     let to_the_end = std::env::args().any(|argument| argument == "to-the-end");
+    let tracing = std::env::args().any(|argument| argument == "trace");
     let data = repository().join("assets/data");
     let loaded = load_ruleset(&data).and_then(|definitions| {
         let skirmish = load_skirmish(data.join("skirmish.ron"), &definitions)?;
@@ -153,10 +274,14 @@ fn main() -> ExitCode {
         let (mut most_units, mut most_buildings) = (0, 0);
         let mut builders: BTreeSet<PlayerId> = BTreeSet::new();
         let mut ended = None;
+        let playing = Instant::now();
         for tick in 0..limit {
             let started = Instant::now();
             world.run_schedule(SimSchedule);
             times.push(started.elapsed());
+            if tracing && tick.is_multiple_of(12_000) {
+                trace(world, &definitions, id, tick);
+            }
             for event in world
                 .resource::<Messages<SimEvent>>()
                 .iter_current_update_messages()
@@ -175,6 +300,7 @@ fn main() -> ExitCode {
             }
         }
         let total: Duration = times.iter().sum();
+        let elapsed = playing.elapsed();
         let mean = total / u32::try_from(times.len().max(1)).unwrap_or(u32::MAX);
         let longest = times.iter().max().copied().unwrap_or_default();
         let late = times.iter().filter(|&&time| time > TICK_PERIOD).count();
@@ -196,7 +322,7 @@ fn main() -> ExitCode {
         );
         println!(
             "  {} ticks: mean {mean:.3?}, 99th centile {centile:.3?}, longest {longest:.3?}, \
-             busiest {WINDOW} ticks mean {busiest:.3?}, {late} ticks over {TICK_PERIOD:?}",
+             busiest {WINDOW} ticks mean {busiest:.3?}, {late} ticks over {TICK_PERIOD:?}; measured total {total:.3?}, elapsed {elapsed:.3?}",
             times.len()
         );
         println!(
@@ -226,8 +352,8 @@ fn main() -> ExitCode {
             );
             failed = true;
         }
-        if to_the_end && ended.is_none() {
-            eprintln!("{id}: the match did not end within {END_LIMIT} ticks");
+        if to_the_end && !has_winner(ended) {
+            eprintln!("{id}: the match had no winner within {END_LIMIT} ticks");
             failed = true;
         }
     }

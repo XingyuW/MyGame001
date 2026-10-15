@@ -1,0 +1,22 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 2.71s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+
+thread 'ra8_artillery_uses_the_surface_tank_line_when_aircraft_share_its_wave' (4849104) panicked at /Users/xingyuwang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bevy_ecs-0.19.1/src/error/handler.rs:130:1:
+Encountered an error in system `<Enable the debug feature to see the name>`: Parameter `<Enable the debug feature to see the name>` failed validation: Resource does not exist
+If this is an expected state, wrap the parameter in `Option<T>` and handle `None` when it happens, or wrap the parameter in `If<T>` to skip the system when it happens.
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+Encountered a panic in system `<Enable the debug feature to see the name>`!
+test ra8_artillery_uses_the_surface_tank_line_when_aircraft_share_its_wave ... FAILED
+
+failures:
+
+failures:
+    ra8_artillery_uses_the_surface_tank_line_when_aircraft_share_its_wave
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 26 filtered out; finished in 0.16s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

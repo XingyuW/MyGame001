@@ -58,6 +58,9 @@ impl Default for Vision {
 }
 
 impl Vision {
+    pub fn uses_fog(&self) -> bool {
+        self.fog_of_war
+    }
     pub(crate) fn reset_shroud(&mut self) {
         for bits in &mut self.cells {
             *bits = if *bits & VISIBLE != 0 {

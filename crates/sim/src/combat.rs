@@ -803,6 +803,42 @@ fn specialist_traits(
     traits
 }
 
+/// Civilian buildings represented by props have the same physical target traits as their
+/// building definitions. This classification does not create an ECS actor for abilities.
+pub(crate) fn scenery_target_traits(
+    defs: &Definitions,
+    grid: &Grid,
+    props: &crate::Props,
+    id: SimId,
+    cell: CellPos,
+    kind: crate::PropKind,
+) -> TargetTraits {
+    let item = crate::garrison::item(defs, kind);
+    if let Some(crate::ProductionItem::Building(building)) = item {
+        let body = Body::Building(Footprint {
+            origin: cell,
+            width: 1,
+            height: 1,
+        });
+        return specialist_traits(
+            traits_of(
+                grid,
+                id,
+                props.armour_of(kind),
+                &body,
+                defs.building_combat(building).as_ref(),
+            ),
+            defs,
+            item,
+        );
+    }
+    TargetTraits {
+        armour: props.armour_of(kind),
+        tree: kind == crate::PropKind::Trees,
+        ..TargetTraits::default()
+    }
+}
+
 type TargetQuery<'w, 's> = Query<
     'w,
     's,
@@ -899,16 +935,13 @@ fn blast_hits(
             hits.push((id, damage, blast.source));
         }
     };
-    let prop_traits = |kind: crate::PropKind| TargetTraits {
-        armour: props.armour_of(kind),
-        tree: kind == crate::PropKind::Trees,
-        ..TargetTraits::default()
-    };
+    let prop_traits =
+        |id, cell, kind| scenery_target_traits(definitions, grid, props, id, cell, kind);
     if let Some(direct) = blast.direct {
         if let Some((_, found, armour_pm)) = traits(direct) {
             hit(direct, &found, 0, armour_pm);
-        } else if let Some((_, prop)) = props.get(direct) {
-            hit(direct, &prop_traits(prop.kind), 0, 1000);
+        } else if let Some((cell, prop)) = props.get(direct) {
+            hit(direct, &prop_traits(direct, cell, prop.kind), 0, 1000);
         }
         if spread == 0 {
             return;
@@ -971,7 +1004,7 @@ fn blast_hits(
                                 .or_insert(candidate);
                         }
                     } else {
-                        hit(id, &prop_traits(prop.kind), distance, 1000);
+                        hit(id, &prop_traits(id, cell, prop.kind), distance, 1000);
                     }
                 }
             }
@@ -991,7 +1024,9 @@ fn blast_hits(
         }
     }
     for (_, (distance, id)) in bridge_hits {
-        hit(id, &prop_traits(crate::PropKind::Bridge), distance, 1000);
+        if let Some((cell, prop)) = props.get(id) {
+            hit(id, &prop_traits(id, cell, prop.kind), distance, 1000);
+        }
     }
 }
 
@@ -1181,11 +1216,14 @@ impl Field<'_> {
                 height: 1,
             }),
             body: Body::Prop(cell),
-            traits: TargetTraits {
-                armour: self.props.armour_of(prop.kind),
-                tree: prop.kind == crate::PropKind::Trees,
-                ..TargetTraits::default()
-            },
+            traits: scenery_target_traits(
+                self.definitions,
+                self.grid,
+                self.props,
+                target,
+                cell,
+                prop.kind,
+            ),
             armour_pm: 1000,
             item: None,
         })
@@ -1385,6 +1423,13 @@ impl Field<'_> {
     }
 }
 
+pub(crate) fn ai_reload(players: &Players, owner: PlayerId, rank: u32) -> u32 {
+    (u64::from(rank).saturating_mul(u64::from(
+        players.get(owner).map_or(1000, |p| p.ai_reload_pm()),
+    )) / 1000)
+        .clamp(1, u64::from(u32::MAX)) as u32
+}
+
 /// Moves projectiles, lets armed units and buildings choose targets and fire, and applies the
 /// tick's damage (see the module documentation).
 #[allow(clippy::too_many_arguments)]
@@ -1486,10 +1531,14 @@ pub(crate) fn combat(
                     owner: Some(g.owner),
                     extent: Extent::footprint(footprint),
                     body: Body::Building(footprint),
-                    traits: TargetTraits {
-                        armour: props.armour_of(prop.kind),
-                        ..Default::default()
-                    },
+                    traits: scenery_target_traits(
+                        &definitions,
+                        &grid,
+                        &props,
+                        *id,
+                        cell,
+                        prop.kind,
+                    ),
                     armour_pm: 1000,
                     item: crate::garrison::item(&definitions, prop.kind),
                 },
@@ -1622,7 +1671,11 @@ pub(crate) fn combat(
             || (special.ammo.get(&id) == Some(&0) && weapon.burst_left == 0)
         {
             if weapon.cooldown == 0 && weapon.burst_left > 0 {
-                let reload_pm = experience.map_or(1000, crate::Experience::reload_pm);
+                let reload_pm = ai_reload(
+                    &players,
+                    owner.0,
+                    experience.map_or(1000, crate::Experience::reload_pm),
+                );
                 weapon.burst_left = 0;
                 weapon.cooldown = definitions.weapon(weapon.volley).map_or(0, |def| {
                     if reload_pm == 1000 {
@@ -1664,7 +1717,11 @@ pub(crate) fn combat(
             },
             terms: of_type,
             firepower_pm: experience.map_or(1000, crate::Experience::firepower_pm),
-            reload_pm: experience.map_or(1000, crate::Experience::reload_pm),
+            reload_pm: ai_reload(
+                &players,
+                owner.0,
+                experience.map_or(1000, crate::Experience::reload_pm),
+            ),
             launcher,
         };
         let from = match (position, building) {
@@ -2147,6 +2204,15 @@ fn act_unit(
             .any(|(caster, _)| *caster == id)
     {
         weapon.target = None;
+        // Holding a victim suppresses automatic acquisition, but an attack-move still
+        // has to resume after its capture and finish when its movement has ended.
+        if let Some(AttackOrder::AttackMove {
+            destination,
+            moving,
+        }) = weapon.order
+        {
+            continue_attack_move(field, id, weapon, orders, destination, moving);
+        }
         return;
     }
     if weapon.order.is_none()
@@ -2362,24 +2428,7 @@ fn act_unit(
                 fire_at_target(field, shots, rng, (id, owner, from), weapon, arms);
                 return;
             }
-            if orders.current.is_some() {
-                return;
-            }
-            if moving {
-                // The move to the destination ended; its event says how.
-                weapon.clear();
-                return;
-            }
-            // The move of an `AttackMove` command: a crusher may crush on its way.
-            orders.current = Some(MoveOrder::commanded(
-                destination,
-                field.tick,
-                field.crushers.contains(&id),
-            ));
-            weapon.order = Some(AttackOrder::AttackMove {
-                destination,
-                moving: true,
-            });
+            continue_attack_move(field, id, weapon, orders, destination, moving);
         }
         None => {
             if orders.current.is_some() {
@@ -2391,6 +2440,33 @@ fn act_unit(
             fire_at_target(field, shots, rng, (id, owner, from), weapon, arms);
         }
     }
+}
+
+fn continue_attack_move(
+    field: &Field<'_>,
+    id: SimId,
+    weapon: &mut Weapon,
+    orders: &mut Orders,
+    destination: CellPos,
+    moving: bool,
+) {
+    if orders.current.is_some() {
+        return;
+    }
+    if moving {
+        // The move to the destination ended; its event says how.
+        weapon.clear();
+        return;
+    }
+    orders.current = Some(MoveOrder::commanded(
+        destination,
+        field.tick,
+        field.crushers.contains(&id),
+    ));
+    weapon.order = Some(AttackOrder::AttackMove {
+        destination,
+        moving: true,
+    });
 }
 
 type ConditionQuery<'w, 's> = Query<

@@ -208,8 +208,9 @@ pub(crate) fn deploy(world: &mut World, a: &Actor, defs: &Definitions) -> Result
                     },
                     true,
                 );
+                let reload = weapon_reload(world, a, w.reload);
                 if let Some(mut weapon) = world.get_mut::<Weapon>(a.entity) {
-                    weapon.cooldown = w.reload;
+                    weapon.cooldown = reload;
                 }
             }
         }
@@ -591,10 +592,11 @@ pub(crate) fn advance(world: &mut World, defs: &Definitions) {
         {
             let spread = defs.warhead(w.warhead).map_or(0, |h| h.cell_spread);
             radiation::add(world, a.cell, spread, w.rad_level, Some(a.id));
+            let reload = weapon_reload(world, a, w.reload);
             world
                 .resource_mut::<SpecialState>()
                 .eruption_next
-                .insert(a.id, tick.saturating_add(u64::from(w.reload.max(1))));
+                .insert(a.id, tick.saturating_add(u64::from(reload)));
         }
     }
 }

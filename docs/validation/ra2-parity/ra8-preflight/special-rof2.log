@@ -1,0 +1,9 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0433]: cannot find `MapLooks` in `sim`
+   --> crates/sim/tests/ra8_ai.rs:162:28
+    |
+162 |         let mut looks=sim::MapLooks::empty(48,48);
+    |                            ^^^^^^^^ could not find `MapLooks` in `sim`
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `sim` (test "ra8_ai") due to 1 previous error

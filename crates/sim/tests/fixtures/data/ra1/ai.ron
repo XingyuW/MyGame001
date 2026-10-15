@@ -1,10 +1,17 @@
 // RA1 fixture: the computer player's plans for the two sides of the small world, and two
 // difficulties. Fixture data (invariant I10).
 (
-    schema_version: 2,
+    schema_version: 3,
+    rules_difficulty: 0,
+    policy: (garrison_quota: 0, garrison_radius: 0, depot_radius: 0, naval_rescan: 1, naval_detector_quota: 0, artillery_min_range: 0, artillery_standoff: 0, paradrop_offset: 0, chrono_min_offset: 0, chrono_max_offset: 0),
     plans: [
         (
             side: "allied",
+            country: "",
+            defences: [],
+            support: [],
+            tier_reserves: [0,0,0],
+            advanced_tech_level: 0,
             build_order: ["allied_power", "allied_refinery", "allied_barracks", "allied_factory", "allied_power"],
             power: "allied_power",
             harvester: "miner_a",
@@ -12,6 +19,11 @@
         ),
         (
             side: "soviet",
+            country: "",
+            defences: [],
+            support: [],
+            tier_reserves: [0,0,0],
+            advanced_tech_level: 0,
             build_order: ["soviet_power", "soviet_refinery", "soviet_barracks", "soviet_factory", "soviet_power"],
             power: "soviet_power",
             harvester: "miner_s",

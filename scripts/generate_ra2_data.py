@@ -390,9 +390,9 @@ AI_PLANS = (
 # id, think_interval, harvesters_per_refinery, max_army, wave_size, first_wave, wave_patience,
 # defence_radius
 AI_DIFFICULTIES = (
-    ("easy", 40, 1, 8, 6, 6000, 3600, 8),
-    ("medium", 20, 2, 16, 8, 3600, 2400, 10),
-    ("brutal", 10, 2, 30, 10, 2400, 1800, 12),
+    ("easy", 40, 1, 16, 8, 6000, 3600, 8),
+    ("medium", 20, 2, 24, 12, 3600, 2400, 10),
+    ("brutal", 10, 2, 36, 16, 2400, 1800, 12),
 )
 
 # The maps of the skirmish menu and their start positions, as `cargo run -p game --example
@@ -550,6 +550,7 @@ POWERUPS = (
 # human's point of view, plan section 4.15), and the index in the lists of [General], which
 # are ordered hard, medium, easy.
 DIFFICULTIES = (("easy", "Difficult", 2), ("medium", "Normal", 1), ("brutal", "Easy", 0))
+TARGET_KEYS = ("ConYard", "WarFactory", "Power", "Engineer", "Thief", "Harvester", "MCV", "APC", "BaseDefense", "Plug", "Helipad", "Temple")
 DIFFICULTY_FIELDS = (
     ("rof_pm", None, "ROF", "pm"),
     ("build_time_pm", None, "BuildTime", "pm"),
@@ -1493,14 +1494,14 @@ class Data:
     def rules_file(self):
         tables = self.tables
         lines = [
-            "// Global rules, schema version 3 (crates/sim/src/rules.rs; docs/RA2_PARITY_PLAN.md sections 3.2",
+            "// Global rules, schema version 4 (crates/sim/src/rules.rs; docs/RA2_PARITY_PLAN.md sections 3.2",
             "// and 4; docs/DECISIONS.md R9, R10, R58): the values of the ruleset that belong to no single unit",
             "// or building, in game units (ticks, 20 per second; subcells, 256 per cell; permille; percent;",
             "// yes and no as 1 and 0). A value without a source is the game's own: the ini has no key for it.",
             "//",
             GENERATED,
             "(",
-            "    schema_version: 3,",
+            "    schema_version: 4,",
         ]
 
         def scalars(group):
@@ -1542,6 +1543,9 @@ class Data:
         general = tables.section("General")
         for game_id, section, index in DIFFICULTIES:
             fields, sources = [], []
+            weights = [general[f"AIIonCannon{k}Value"].split(",")[index] for k in TARGET_KEYS]
+            fields.append(f"target_weights: [{', '.join(weights)}]")
+            sources.extend(cite("General", f"AIIonCannon{k}Value", general) for k in TARGET_KEYS)
             for field, where, key, kind in DIFFICULTY_FIELDS:
                 if where is None:
                     text = tables.value(section, key)
@@ -1686,62 +1690,48 @@ class Data:
     # --- ai.ron ------------------------------------------------------------------------------
 
     def ai_file(self):
-        lines = [
-            "// The computer player's definitions, schema version 2 (crates/sim/src/ai_defs.rs;",
-            "// docs/DECISIONS.md D42, D49, R14).",
-            "//",
-            "// plans:        one per side, followed by the computer players of its countries:",
-            "//   build_order:  building types in the order the computer player builds them; a type listed n",
-            "//                 times is kept at n buildings, so lost buildings are rebuilt. A power building",
-            "//                 is built first whenever the next building would leave the player short of",
-            "//                 power. Prerequisites come before the buildings that need them; the",
-            "//                 Construction Yard the side's base unit deploys into counts as owned.",
-            "//   power:        the building type built for power",
-            "//   harvester:    the miner unit type (its producer and prerequisites are in build_order)",
-            "//   army:         armed unit types, produced in this order, cyclically (their producers and",
-            "//                 prerequisites are in build_order)",
-            "//   Every entry can be built by every country of the side on its own.",
-            "// difficulties: id; think_interval (ticks between two decisions, 20 per second);",
-            "//               harvesters_per_refinery; max_army (armed units it builds up to); wave_size (armed",
-            "//               units at home that start an attack wave); first_wave (the tick from which waves",
-            "//               may start); wave_patience (ticks after first_wave or the last wave after which",
-            "//               the units at home attack even if fewer than wave_size); defence_radius (visible",
-            "//               enemies this many cells from its buildings are attacked by its army at home)",
-            "//",
-            "// Game specific data: the ini has no build orders. RA8 extends the plans to the full arsenal.",
-            "//",
-            GENERATED,
-            "(",
-            "    schema_version: 2,",
-            "    plans: [",
-        ]
-        for side, build_order, power, harvester, army in AI_PLANS:
-            lines += [
-                "        (",
-                f'            side: "{side}",',
-                "            build_order: [",
-            ]
-            lines += [f'                "{building}",' for building in build_order]
-            lines += [
-                "            ],",
-                f'            power: "{power}",',
-                f'            harvester: "{harvester}",',
-                f"            army: {quoted(army)},",
-                "        ),",
-            ]
+        lines = ["// RA8 schema 3: explicit country plans, conditional navy, tier army and support.",
+                 "// rules_difficulty=1 applies rules.ron's actual AI house multipliers.",
+                 "// Common plans retain a side fallback; exact country entries take precedence.",
+                 GENERATED, "(", "    schema_version: 3,", "    rules_difficulty: 1,",
+                 "    // Game-owned tactical policy; all values are explicit and validated.",
+                 "    policy: (garrison_quota: 3, garrison_radius: 12, depot_radius: 16, naval_rescan: 600, naval_detector_quota: 1,",
+                 "             artillery_min_range: 8, artillery_standoff: 3, paradrop_offset: 4, chrono_min_offset: 3, chrono_max_offset: 8),",
+                 "    plans: ["]
+        plans = [(side, "", builds, power, miner, army, (), ()) for side, builds, power, miner, army in AI_PLANS]
+        for country, side in (("america","allied"),("korea","allied"),("france","allied"),("germany","allied"),("great_britain","allied"),("russia","soviet"),("iraq","soviet"),("cuba","soviet"),("libya","soviet")):
+            if side == "allied":
+                field = "american_airforce_command" if country == "america" else "airforce_command"
+                builds = ["power_plant","refinery","barracks","war_factory",field,"service_depot","tech_center","refinery","war_factory","ore_purifier","spy_satellite","gap_generator","lightning_storm","chronosphere","naval_shipyard"]
+                # Storm is the game role; the generated building id is weather_control.
+                builds[12] = "weather_control"
+                army = ["grizzly","gi","grizzly","prism_tank","mirage_tank","ifv","chrono_legionnaire","tanya","black_eagle" if country == "korea" else "harrier","destroyer","aircraft_carrier","dolphin"]
+                special = {"germany":"tank_destroyer","great_britain":"sniper"}.get(country)
+                if special: army.insert(3,special)
+                defences = ["pillbox","prism_tower","patriot"]
+                if country == "france": defences.insert(0,"grand_cannon")
+                power, miner = "power_plant", "chrono_miner"
+            else:
+                builds = ["tesla_reactor","soviet_refinery","soviet_barracks","soviet_war_factory","radar_tower","soviet_service_depot","soviet_battle_lab","nuclear_reactor","soviet_refinery","soviet_war_factory","cloning_vats","psychic_sensor","nuclear_silo","iron_curtain","soviet_naval_shipyard"]
+                army = ["rhino","conscript","rhino","v3_launcher","apocalypse","tesla_trooper","flak_track","yuri","kirov","typhoon","dreadnought","giant_squid"]
+                special = {"russia":"tesla_tank","iraq":"desolator","cuba":"terrorist","libya":"demolition_truck"}.get(country)
+                if special: army.insert(3,special)
+                defences = ["sentry_gun","tesla_coil","flak_cannon"]
+                power, miner = "tesla_reactor", "war_miner"
+            plans.append((side,country,builds,power,miner,army,defences,("engineer","attack_dog")))
+        for side,country,builds,power,miner,army,defences,support in plans:
+            lines += ["        (", f'            side: "{side}", country: "{country}",',
+                      f"            build_order: {quoted(builds)},", f'            power: "{power}",',
+                      f'            harvester: "{miner}",', f"            army: {quoted(army)},",
+                      f"            defences: {quoted(defences)},", f"            support: {quoted(support)},",
+                      f"            tier_reserves: {[1,2,2] if country else [0,0,0]}, advanced_tech_level: 6,", "        ),"]
         lines += ["    ],", "    difficulties: ["]
-        names = (
-            "think_interval", "harvesters_per_refinery", "max_army", "wave_size", "first_wave",
-            "wave_patience", "defence_radius",
-        )
+        names = ("think_interval","harvesters_per_refinery","max_army","wave_size","first_wave","wave_patience","defence_radius")
         for difficulty in AI_DIFFICULTIES:
             lines += ["        (", f'            id: "{difficulty[0]}",']
-            lines += [
-                f"            {name}: {value}," for name, value in zip(names, difficulty[1:])
-            ]
+            lines += [f"            {name}: {value}," for name,value in zip(names,difficulty[1:])]
             lines.append("        ),")
-        lines += ["    ],", ")"]
-        return "\n".join(lines) + "\n"
+        return "\n".join(lines + ["    ],", ")"]) + "\n"
 
     def files(self):
         return {

@@ -31,9 +31,9 @@ use std::time::Instant;
 
 use bevy_app::App;
 use sim::{
-    Building, CellPos, Controller, Grid, MAX_MATCH_PLAYERS, MatchState, Mobile, Owner, PlayerId,
-    PlayerSetup, SimPlugin, SimSchedule, SkirmishDefinitions, Unit, enlarged_map, load_ai,
-    load_map, load_ruleset, load_skirmish, map_asset_path, setup_match,
+    Building, CellPos, Controller, Grid, MAX_MATCH_PLAYERS, MatchOutcome, MatchState, Mobile,
+    Owner, PlayerId, PlayerSetup, SimPlugin, SimSchedule, SkirmishDefinitions, Unit, enlarged_map,
+    load_ai, load_map, load_ruleset, load_skirmish, map_asset_path, setup_match,
 };
 
 /// Ticks a match may take before the run gives up on it.
@@ -41,6 +41,26 @@ const END_LIMIT: u64 = 300_000;
 
 /// Ticks between two lines of a traced match.
 const TRACE_EVERY: u64 = 3_000;
+
+fn winning_tick(tick: u64, outcome: MatchOutcome) -> Option<u64> {
+    matches!(outcome, MatchOutcome::Won { .. }).then_some(tick)
+}
+
+#[test]
+fn ra8_duel_completion_requires_a_winner() {
+    assert_eq!(winning_tick(1, MatchOutcome::Draw { tick: 1 }), None);
+    assert_eq!(
+        winning_tick(
+            1,
+            MatchOutcome::Won {
+                winner: PlayerId(0),
+                tick: 1
+            }
+        ),
+        Some(1)
+    );
+    assert_eq!(END_LIMIT, 300_000);
+}
 
 fn repository() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..")
@@ -224,7 +244,7 @@ fn main() -> ExitCode {
                             println!("{name}, tick {tick}: {}", situation(world));
                         }
                         if let Some(outcome) = world.resource::<MatchState>().outcome() {
-                            ended = Some(tick);
+                            ended = winning_tick(tick, outcome);
                             println!(
                                 "{name}: ended in tick {tick} ({outcome:?}) after {:.1?}",
                                 started.elapsed()
@@ -234,7 +254,7 @@ fn main() -> ExitCode {
                     }
                     if ended.is_none() {
                         println!(
-                            "{name}: NOT ENDED after {END_LIMIT} ticks ({:.1?}): {}",
+                            "{name}: NO WINNER within {END_LIMIT} ticks ({:.1?}): {}",
                             started.elapsed(),
                             situation(world)
                         );

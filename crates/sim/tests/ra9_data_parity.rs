@@ -3165,6 +3165,30 @@ fn every_value_of_the_shipped_rules_equals_its_reference_or_is_a_listed_differen
                 .nth(index)
                 .expect(key)
         };
+        for (slot, key) in [
+            "ConYard",
+            "WarFactory",
+            "Power",
+            "Engineer",
+            "Thief",
+            "Harvester",
+            "MCV",
+            "APC",
+            "BaseDefense",
+            "Plug",
+            "Helipad",
+            "Temple",
+        ]
+        .iter()
+        .enumerate()
+        {
+            let key = format!("AIIonCannon{key}Value");
+            assert_eq!(
+                game.target_weights[slot],
+                entry(&key).parse::<u32>().unwrap(),
+                "{id}: {key}"
+            );
+        }
         for (field, game, text, conversion) in [
             (
                 "rof_pm",

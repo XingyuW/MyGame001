@@ -844,6 +844,22 @@ pub fn setup_match_configured(
         let mut state = world.resource_mut::<Players>();
         for setup in &sorted {
             let faction = &skirmish.factions[setup.faction];
+            let difficulty_rules = if ai.rules_difficulty {
+                match setup.controller {
+                    Controller::Ai { difficulty } => definitions.rules().and_then(|rules| {
+                        rules
+                            .difficulties
+                            .iter()
+                            .find(|rule| rule.id == ai.difficulties[difficulty].id)
+                    }),
+                    Controller::Human => None,
+                }
+            } else {
+                None
+            };
+            let starting_credits = difficulty_rules.map_or(starting_credits, |rule| {
+                starting_credits.saturating_mul(100 + i64::from(rule.credits_bonus_percent)) / 100
+            });
             match faction.side {
                 // A country's player has no roster: the buildability rule decides (RA1).
                 Some(_) => state.add(setup.player, starting_credits),
@@ -875,6 +891,11 @@ pub fn setup_match_configured(
             }
             .map_err(MatchSetupError::AddPlayer)?;
             state.set_country(setup.player, faction.country);
+            if let (Some(rule), Some(player)) = (difficulty_rules, state.get_mut(setup.player)) {
+                player.ai_rof_pm = rule.rof_pm.unsigned_abs();
+                player.ai_build_time_pm = rule.build_time_pm.unsigned_abs();
+                player.ai_virtual_purifiers = rule.virtual_purifiers.unsigned_abs();
+            }
             if setup.controller == Controller::Human
                 && super_players.contains(&setup.player)
                 && let Some(player) = state.get_mut(setup.player)

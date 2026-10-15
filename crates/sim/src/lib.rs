@@ -54,7 +54,7 @@ pub use ai::{
     WaveTarget, Waypoint, scaled_for_map,
 };
 pub use ai_defs::{
-    AI_SCHEMA_VERSION, AiDefinitions, AiPlan, Difficulty, MAX_AI_ARMY, MAX_ARMY_ENTRIES,
+    AI_SCHEMA_VERSION, AiDefinitions, AiPlan, AiPolicy, Difficulty, MAX_AI_ARMY, MAX_ARMY_ENTRIES,
     MAX_BUILD_ORDER, MAX_DEFENCE_RADIUS, MAX_DIFFICULTIES, MAX_HARVESTERS_PER_REFINERY, MAX_PLANS,
     MAX_THINK_INTERVAL, SidePlan, check_ai_factions, load_ai,
 };

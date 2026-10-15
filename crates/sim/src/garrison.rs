@@ -377,12 +377,13 @@ pub(crate) fn fire(world: &mut World) {
             {
                 return None;
             }
-            let traits = crate::combat::traits_of(
+            let traits = crate::combat::scenery_target_traits(
+                &defs,
                 world.resource::<Grid>(),
+                props,
                 other_id,
-                props.armour_of(prop.kind),
-                &crate::combat::Body::Prop(cell),
-                None,
+                cell,
+                prop.kind,
             );
             if !crate::weapon_against(&defs, &terms, [Some(weapon_kind), None], &traits)
                 .is_some_and(|(_, versus)| versus > 0)
@@ -422,9 +423,12 @@ pub(crate) fn fire(world: &mut World) {
             },
             false,
         );
+        let reload = crate::veterancy::reload_ticks(
+            weapon.reload,
+            crate::combat::ai_reload(world.resource::<Players>(), g.owner, 1000),
+        );
         if let Some(saved) = world.resource_mut::<SpecialState>().garrisons.get_mut(&id) {
-            saved.cooldown =
-                (weapon.reload / u32::try_from(crew.len()).unwrap_or(u32::MAX).max(1)).max(1);
+            saved.cooldown = (reload / u32::try_from(crew.len()).unwrap_or(u32::MAX).max(1)).max(1);
         }
     }
 }
