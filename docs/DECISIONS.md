@@ -5161,3 +5161,10 @@ variables are preserved. The existing target/package app/archive remains useful 
 Tests created about 5.6 MiB of recreatable RON parser variants in that target's
 `tmp/ra7_definitions`; this scratch is retained for reruns and is not required for release.
 All requested logs/evidence remain in the canonical repository.
+
+R87 closure process note: the cached diff hygiene check flagged only a terminal blank line in
+raw captured `ra7/04-test.log`. The docs/log commit `9179d7b` proceeded because the tool
+orchestration did not stop after that nonzero check. Preserve the raw stdout unchanged.
+This artifact-formatting issue does not alter the frozen source or the successful gate
+step02; the final working-tree diff check is recorded separately. No gate is rerun or
+represented as passing to conceal that closure check result.
