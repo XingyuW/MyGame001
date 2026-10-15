@@ -1201,28 +1201,62 @@ feel require user verification. No new substantial external directory was create
 Cargo target/test artifacts are reused, UV/PIP caches preserved, and RA5's render directory
 left intact. No /tmp build outputs, clones or worktrees were created.
 
-## RA6-B combined implementation (2026-10-15)
+## RA6: combined specialist and strategic validation (2026-10-15)
 
-Implementation is complete enough for final preflight; the full thirteen-command RA6 gate
-is **pending**, including the required soak. No independent review is claimed.
-[Combined RA6 acceptance ledger](validation/ra2-parity/RA6_ACCEPTANCE.md) maps every gap9 row
-to exact tests or an explicit remaining difference. R80–R82 document mechanics and every
-existing-test expectation migration. Arsenal8/combat5/rules3 and all fixtures are migrated;
-shipped arsenal is164,206 bytes under the unchanged192 KiB preparse bound.
+**Validated**, not independently reviewed or approved. Combined RA6-A/RA6-B runtime, data,
+client and tests were frozen at `f9b1e55`; all thirteen commands pass. R80–R83 document
+mechanics, exact existing-test migrations, the IFV AreaFire correction and remaining evidence
+obligations. [Combined acceptance ledger](validation/ra2-parity/RA6_ACCEPTANCE.md) maps every
+gap-analysis section9 row to exact tests or an explicit remaining difference.
 
-Vehicle/structure/SW mechanics include capped Prism chains, per-observer Mirage trees,
-identity-preserving parasites/blocked exits, full IFV modes, ordered source-bearing death
-chains, explicit Chronosphere source/destination, Curtain, delayed nuclear/storm payloads,
-AA-vulnerable paradrop aircraft, ported recharge/power behavior and location-free public
-warnings/timers with owner-only readiness. Failed preflight logs are preserved. R82 corrects
-IFV mode8 AreaFire execution and adds actual mode7/8/10/11 firing coverage; the first gate
-was stopped before long sweeps and retained as `ra6-attempt1` (commands1–3 passed).
+Infantry/radiation from RA6-A and capped Prism chains, observer-specific Mirage trees,
+identity-preserving parasites/blocked exits, thirteen IFV modes, ordered source-bearing death
+chains, explicit Chronosphere areas, Curtain, nuclear/storm timing, vulnerable paradrop aircraft,
+ported recharge/power behavior and location-free warnings/timers are implemented. Readiness
+is owner-only. Arsenal8/combat5/rules3 and all fixtures are migrated; shipped arsenal is164,206
+bytes under the unchanged192 KiB preparse bound. Existing `m9_arsenal.rs` and `m11_repair.rs` test files remain untouched.
 
-R80's Sonic per-shot, cloud-lifetime and landing/exit approximations remain explicit. R76's
-first-spawn Spy/cloak risk belongs to RA7; paid-production-only veterancy and RA5 bridge/AI
-fixes remain. Visual/audio/play feel requires user verification. No new substantial external
-directory, clone or worktree was created; the configured Cargo cache and its test scratch
-files are reused, UV/PIP caches preserved. No /tmp build output was created.
+**Frozen gate** ([logs and exact commands](validation/ra2-parity/ra6/summary.txt)):
+
+| # | Check | Exit | Evidence |
+|---|---|---:|---|
+|1|Formatting|0|`cargo fmt --all -- --check`|
+|2|Diff hygiene|0|`git diff --check`|
+|3|Strict workspace Clippy|0|All targets, warnings denied|
+|4|Workspace release tests|0|1,096 passed,0 failed,0 ignored;6,844 s;756/756 production winners|
+|5|Release build|0|Game binary|
+|6|Release smoke|0|600 frames;16 s|
+|7|Debug smoke|0|600 frames;145 s|
+|8|Benchmark|0|Shipped mean0.306 ms/max1.805 ms; loaded mean0.709 ms; peak1.5 MiB|
+|9|Soak|0|260 configurations;18,720,000 ticks;5,327.7 s; peak224.5 MiB|
+|10|Full separate duels|0|756/756 `Won`;4,524 s; longest221,221 ticks|
+|11|macOS package|0|Packaged smoke;19 s|
+|12|Generated data|0|Generator check|
+|13|Reference table|0|4,934 rows match cached reference|
+
+R29 tick-limit ratios (median/p90/max; nearest-rank p90): production
+0.1323229167/0.3186944444/0.7095694444; separate duels
+0.1390937500/0.3121031746/0.8229027778. [Metrics and match identities](validation/ra2-parity/ra6/metrics.json)
+retain exact values and worst cases; no limits were raised. Both exact Coral regressions pass.
+The first interrupted gate and every failed/partial preflight remain preserved; R82 explains
+why mapping-only IFV coverage was insufficient and records the actual firing correction.
+
+**Remaining differences and next milestones.** R80/R82's Sonic per-shot,13-tick cloud lifetime,
+landing/exit and representative cow assumptions remain explicit, alongside RA6-A assumptions
+and R67 naval bridge-repair refusal. Original visuals/audio/play feel still require user
+verification. RA7 must settle R76's first-spawn Spy/cloak concealment risk and preserve the
+paid-only veterancy/neutral Airport/bridge and utility-weapon rules listed in R83.
+RA9 must add an actual host `WeaponFired` assertion while Squid remains attached (current
+coverage only retains Weapon and blocks motion), and audit missing transport per-unit
+Size/SizeLimit plus refusal to board loaded transports; identity tests do not prove full
+transport capacity parity. These are explicit audit obligations before the independent final
+review, not claims of observed new runtime failures. RA7/RA8/RA9 and final review remain open.
+
+No new substantial external directory, clone or worktree was created. Configured Cargo target
+and its test scratch were reused, UV/PIP caches preserved; no /tmp build output was created.
+The cache remains useful, including the app/archive under its existing `package/` directory.
+`main` remains8230a95. Root must check this closure before releasing
+RA7; no review or approval tag was created.
 
 ## Repair, aircraft overflight, new music and distinct silhouettes (2026-10-06)
 
