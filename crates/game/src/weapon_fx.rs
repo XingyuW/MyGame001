@@ -92,29 +92,34 @@ pub fn shipped_class(id: &str) -> Option<WeaponClass> {
         | "gun_20mm_e"
         | "gun_20mm_rapid"
         | "black_hawk_cannon"
-        | "black_hawk_cannon_e" => MachineGun,
+        | "black_hawk_cannon_e"
+        | "crm60"
+        | "crmp5" => MachineGun,
         "awp" | "awp_e" => Sniper,
         // The flak guns against the ground fire a shell that bursts where it lands.
         "gun_105mm" | "gun_105mm_e" | "gun_120mm" | "gun_120mm_e" | "gun_120mmx"
         | "gun_120mmx_e" | "sabot" | "sabot_e" | "gun_20mm_rapid_e" | "mirage_gun"
         | "mirage_gun_e" | "flak_track_gun" | "flak_track_gun_e" | "flak_guy_gun"
-        | "flak_guy_gun_e" => Cannon,
+        | "flak_guy_gun_e" | "cr_flak_guy_gun" => Cannon,
         "gun_155mm" | "gun_155mm_e" | "grand_cannon_weapon" => Artillery,
         "hover_missile" | "hover_missile_e" | "mammoth_tusk" | "maverick" | "maverick_e"
         | "maverick2" | "maverick2_e" | "medusa" | "medusa_e" | "red_eye2" | "v3_launcher"
-        | "dred_launcher" | "hornet_launcher" => Rocket,
+        | "dred_launcher" | "hornet_launcher" | "para_drop_weapon" => Rocket,
         "flak_weapon"
         | "flak_weapon_e"
         | "flak_track_aa_gun"
         | "flak_track_aa_gun_e"
         | "flak_guy_aa_gun"
         | "flak_guy_aa_gun_e" => Flak,
-        "prism_shot" | "comet" | "super_comet" => Prism,
+        "prism_shot" | "prism_support" | "comet" | "super_comet" => Prism,
         "coil_bolt" | "op_coil_bolt" | "tank_bolt" | "tank_bolt_e" | "electric_bolt"
-        | "electric_bolt_e" | "assault_bolt" => Tesla,
-        "rad_beam_weapon" | "rad_beam_weapon_e" | "rad_eruption_weapon" => Radiation,
-        "mind_control" | "mind_control_e" | "super_mind_control" | "psi_wave" => Psychic,
-        "neutron_rifle" | "neutron_rifle_e" => Chrono,
+        | "electric_bolt_e" | "cr_electric_bolt" | "assault_bolt" => Tesla,
+        "rad_beam_weapon" | "rad_beam_weapon_e" | "rad_eruption_weapon" | "cr_rad_beam_weapon" => {
+            Radiation
+        }
+        "mind_control" | "mind_control_e" | "super_mind_control" | "cr_mind_control"
+        | "psi_wave" => Psychic,
+        "neutron_rifle" | "neutron_rifle_e" | "cr_neutron_rifle" => Chrono,
         "sonic_zap" | "sonic_zap_e" => Sonic,
         // RA4: the bombs of the Hornets and the depth charge of the Osprey fall like the Kirov's.
         "blimp_bomb" | "blimp_bomb_e" | "hornet_bomb" | "hornet_bomb_e" | "asw_bomb" => Bomb,
@@ -122,7 +127,8 @@ pub fn shipped_class(id: &str) -> Option<WeaponClass> {
         "good_teeth" | "drone_jump" | "squid_grab" | "squid_grab_e" | "squid_punch"
         | "squid_punch_e" => Melee,
         "ivan_bomber" | "ivan_bomber_e" | "terror_bomb" | "demobomb" | "makeup_kit"
-        | "defuse_kit" | "sapper" | "fakec4" => Trigger,
+        | "defuse_kit" | "sapper" | "fakec4" | "cr_nuke" | "cr_terror_bomb" | "nuke_payload"
+        | "oil_explosion" | "repair_bullet" | "cow_shot" => Trigger,
         _ => return None,
     })
 }

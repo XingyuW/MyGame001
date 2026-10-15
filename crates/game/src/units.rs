@@ -14,6 +14,46 @@
 //! match starts (cross validation, PLAN.md section 5; D20); the renderer receives exactly the
 //! checked bytes (`crate::checked_assets`).
 
+/// Original procedural foliage; hidden Mirage identities never gain a sprite, label or selection target.
+fn draw_mirage_trees(host: Res<SimHost>, map: Option<Res<MapView>>, mut gizmos: Gizmos) {
+    let Some(map) = map else {
+        return;
+    };
+    let world = host.world();
+    let Some(state) = world.get_resource::<sim::SpecialState>() else {
+        return;
+    };
+    let Some(players) = host.players() else {
+        return;
+    };
+    for e in world.iter_entities() {
+        let (Some(id), Some(m)) = (e.get::<SimId>(), e.get::<Mobile>()) else {
+            continue;
+        };
+        let Some(&v) = state.mirage_trees.get(id) else {
+            continue;
+        };
+        if !state.hidden.contains(&(HUMAN, *id))
+            || !players.get(HUMAN).is_some_and(|p| p.vision().sees_unit(m))
+        {
+            continue;
+        }
+        let p = ground_point(
+            Vec2::new(m.cell.x as f32 + 0.5, m.cell.y as f32 + 0.5),
+            map.tile,
+        );
+        gizmos.line_2d(p, p + Vec2::Y * 25.0, Color::srgb(0.30, 0.19, 0.09));
+        let green = Color::srgb(0.12 + f32::from(v) * 0.025, 0.32, 0.13);
+        for (offset, r) in [
+            (Vec2::new(-6.0, 23.0), 9.0),
+            (Vec2::new(6.0, 25.0), 10.0),
+            (Vec2::new(0.0, 33.0), 11.0),
+        ] {
+            gizmos.circle_2d(p + offset, r + f32::from(v), green);
+        }
+    }
+}
+
 #[cfg(test)]
 use sim::Direction;
 use std::collections::BTreeMap;
@@ -108,7 +148,10 @@ impl Plugin for UnitsPlugin {
         app.init_resource::<UnitViews>()
             .init_resource::<UnitStatus>()
             .init_resource::<Altitudes>()
-            .add_systems(Update, (spawn_unit_views, log_sim_events))
+            .add_systems(
+                Update,
+                (spawn_unit_views, log_sim_events, draw_mirage_trees),
+            )
             .add_systems(
                 PostUpdate,
                 place_unit_views.before(bevy::transform::TransformSystems::Propagate),
@@ -771,6 +814,9 @@ fn beside_a_building(grid: &sim::Grid, cell: sim::CellPos) -> bool {
 fn log_sim_events(mut events: MessageReader<SimEvent>) {
     for event in events.read() {
         match event {
+            SimEvent::SuperweaponBuilt { .. }
+            | SimEvent::SuperweaponLaunched { .. }
+            | SimEvent::SuperweaponReady { .. } => {}
             SimEvent::PropDestroyed { cell, kind, .. } => {
                 info!("{} at ({}, {}) destroyed", kind.name(), cell.x, cell.y);
             }

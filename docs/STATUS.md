@@ -1201,6 +1201,27 @@ feel require user verification. No new substantial external directory was create
 Cargo target/test artifacts are reused, UV/PIP caches preserved, and RA5's render directory
 left intact. No /tmp build outputs, clones or worktrees were created.
 
+## RA6-B combined implementation (2026-10-15)
+
+Implementation is complete enough for final preflight; the full thirteen-command RA6 gate
+is **pending**, including the required soak. No independent review is claimed.
+[Combined RA6 acceptance ledger](validation/ra2-parity/RA6_ACCEPTANCE.md) maps every gap9 row
+to exact tests or an explicit remaining difference. R80–R81 document mechanics and every
+existing-test expectation migration. Arsenal8/combat5/rules3 and all fixtures are migrated;
+shipped arsenal is164,206 bytes under the unchanged192 KiB preparse bound.
+
+Vehicle/structure/SW mechanics include capped Prism chains, per-observer Mirage trees,
+identity-preserving parasites/blocked exits, full IFV modes, ordered source-bearing death
+chains, explicit Chronosphere source/destination, Curtain, delayed nuclear/storm payloads,
+AA-vulnerable paradrop aircraft, ported recharge/power behavior and location-free public
+warnings/timers with owner-only readiness. Failed preflight logs are preserved.
+
+R80's Sonic per-shot, cloud-lifetime and landing/exit approximations remain explicit. R76's
+first-spawn Spy/cloak risk belongs to RA7; paid-production-only veterancy and RA5 bridge/AI
+fixes remain. Visual/audio/play feel requires user verification. No new substantial external
+directory, clone or worktree was created; the configured Cargo cache and its test scratch
+files are reused, UV/PIP caches preserved. No /tmp build output was created.
+
 ## Repair, aircraft overflight, new music and distinct silhouettes (2026-10-06)
 
 Working-tree follow-up (decisions: "Building repair, aircraft overflight, readable silhouettes"

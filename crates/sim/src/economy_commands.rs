@@ -287,7 +287,7 @@ pub fn check_buildable(
     }
     if !superweapons
         && matches!(item, ProductionItem::Building(_))
-        && entry.is_some_and(|entry| entry.role.superweapon())
+        && entry.is_some_and(|entry| entry.role.major_superweapon())
     {
         return Err(RejectReason::DisabledByOptions);
     }
@@ -656,6 +656,7 @@ pub(crate) fn apply(
         Command::Deploy { .. }
         | Command::Undeploy { .. }
         | Command::Interact { .. }
+        | Command::Chronoshift { .. }
         | Command::Superweapon { .. }
         | Command::Move { .. }
         | Command::Stop { .. }

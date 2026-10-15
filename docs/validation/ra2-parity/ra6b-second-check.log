@@ -1,0 +1,70 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0425]: cannot find value `weapon` in this scope
+   --> crates/sim/tests/ra9_data_parity.rs:521:128
+    |
+521 | ...ference.get(section,"ROF").is_none());assert_eq!(weapon.reload,1);}
+    |                                                     ^^^^^^ not found in this scope
+
+error[E0425]: cannot find value `weapon` in this scope
+   --> crates/sim/tests/ra9_data_parity.rs:522:98
+    |
+522 |         if section=="OilExplosion" {assert!(reference.get(section,"Range").is_none());assert_eq!(weapon.range,384);}
+    |                                                                                                  ^^^^^^ not found in this scope
+
+error[E0599]: no method named `as_str` found for reference `&BTreeMap<String, String>` in the current scope
+   --> crates/sim/tests/ra9_data_parity.rs:521:29
+    |
+521 | ...   if matches!(section.as_str(),"NukePayload"|"OilExplosion") {assert!(reference.get(section,"ROF").is_none());assert_eq!(weapon...
+    |                           ^^^^^^ method not found in `&BTreeMap<String, String>`
+
+error[E0308]: mismatched types
+   --> crates/sim/tests/ra9_data_parity.rs:521:91
+    |
+521 | ...ilExplosion") {assert!(reference.get(section,"ROF").is_none());assert_eq!(weapon.reload,1);}
+    |                                     --- ^^^^^^^ expected `&str`, found `&BTreeMap<String, String>`
+    |                                     |
+    |                                     arguments to this method are incorrect
+    |
+    = note: expected reference `&str`
+               found reference `&BTreeMap<String, String>`
+note: method defined here
+   --> crates/sim/tests/ra9_data_parity.rs:99:8
+    |
+ 99 |     fn get(&self, section: &str, key: &str) -> Option<&str> {
+    |        ^^^        -------------
+
+error[E0277]: can't compare `BTreeMap<String, String>` with `str`
+    --> crates/sim/tests/ra9_data_parity.rs:522:19
+     |
+ 522 |         if section=="OilExplosion" {assert!(reference.get(section,"Range").is_none());assert_eq!(weapon.range,384);}
+     |                   ^^ no implementation for `BTreeMap<String, String> == str`
+     |
+help: the trait `PartialEq<str>` is not implemented for `BTreeMap<String, String>`
+      but trait `PartialEq<BTreeMap<String, String>>` is implemented for it
+    --> /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/src/rust/library/alloc/src/collections/btree/map.rs:2606:1
+     |
+2606 | impl<K: PartialEq, V: PartialEq, A: Allocator + Clone> PartialEq for BTreeMap<K, V, A> {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     = help: for that trait implementation, expected `BTreeMap<String, String>`, found `str`
+     = note: required for `&BTreeMap<String, String>` to implement `PartialEq<&str>`
+
+error[E0308]: mismatched types
+   --> crates/sim/tests/ra9_data_parity.rs:522:59
+    |
+522 |         if section=="OilExplosion" {assert!(reference.get(section,"Range").is_none());assert_eq!(weapon.range,384);}
+    |                                                       --- ^^^^^^^ expected `&str`, found `&BTreeMap<String, String>`
+    |                                                       |
+    |                                                       arguments to this method are incorrect
+    |
+    = note: expected reference `&str`
+               found reference `&BTreeMap<String, String>`
+note: method defined here
+   --> crates/sim/tests/ra9_data_parity.rs:99:8
+    |
+ 99 |     fn get(&self, section: &str, key: &str) -> Option<&str> {
+    |        ^^^        -------------
+
+Some errors have detailed explanations: E0277, E0308, E0425, E0599.
+For more information about an error, try `rustc --explain E0277`.
+error: could not compile `sim` (test "ra9_data_parity") due to 6 previous errors
+warning: build failed, waiting for other jobs to finish...

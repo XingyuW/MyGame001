@@ -46,7 +46,7 @@ use crate::economy_defs::{BuildingKind, Problem, invalid, ranged, unknown};
 use crate::hash::Fnv1a64;
 
 /// The schema version of the rules file this crate reads.
-pub const RULES_SCHEMA_VERSION: i64 = 2;
+pub const RULES_SCHEMA_VERSION: i64 = 3;
 
 /// Largest number of prerequisite groups.
 pub const MAX_PREREQUISITE_GROUPS: usize = 16;
@@ -293,6 +293,8 @@ scalar_group! {
 scalar_group! {
     /// Superweapons and support powers (section 4.13).
     SuperweaponRules, SuperweaponEntry, SUPERWEAPON_FIELDS {
+        nuclear_flight: 1 => MAX_TICKS,
+        chrono_freeze: 1 => MAX_TICKS,
         nuclear_recharge: 1 => MAX_TICKS,
         lightning_recharge: 1 => MAX_TICKS,
         iron_curtain_recharge: 1 => MAX_TICKS,

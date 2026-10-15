@@ -23,7 +23,10 @@ pub struct Zone {
 }
 #[derive(Resource, Clone, Debug, Default)]
 pub struct SpecialState {
+    pub strategic: super::superweapons::StrategicState,
+    pub parasites: BTreeMap<SimId, super::vehicles::Parasite>,
     pub deployed: BTreeMap<SimId, u64>,
+    pub mirage_trees: BTreeMap<SimId, u8>,
     pub disguises: BTreeMap<SimId, UnitKind>,
     pub erasures: BTreeMap<SimId, super::infantry::Erasure>,
     pub charges: BTreeMap<SimId, super::infantry::Charge>,
@@ -91,6 +94,32 @@ impl SpecialState {
     }
     pub(crate) fn hash_into(&self, h: &mut Fnv1a64) {
         super::infantry::hash(self, h);
+        self.strategic.hash(h);
+        h.write_u64(self.mirage_trees.len() as u64);
+        for (id, v) in &self.mirage_trees {
+            h.write_u32(id.0);
+            h.write(&[*v]);
+        }
+        h.write_u64(self.parasites.len() as u64);
+        for (host, p) in &self.parasites {
+            h.write_u32(host.0);
+            h.write_u32(p.passenger.id.0);
+            h.write(&[u8::from(p.escape.is_some())]);
+            if let Some(c) = p.escape {
+                h.write(&c.x.to_le_bytes());
+                h.write(&c.y.to_le_bytes());
+            }
+            h.write(&p.passenger.kind.0.to_le_bytes());
+            h.write(&p.passenger.hp.to_le_bytes());
+            h.write(&[p.owner.0, u8::from(p.squid)]);
+            h.write(&p.weapon.0.to_le_bytes());
+            h.write_u64(p.due);
+            h.write(&[u8::from(p.passenger.experience.is_some())]);
+            if let Some(xp) = p.passenger.experience {
+                xp.hash_into(h);
+            }
+        }
+
         // Stable ordered data, including off-map passengers and pending effects.
         for map in [&self.protected, &self.disabled] {
             h.write_u64(map.len() as u64);

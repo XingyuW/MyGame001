@@ -172,7 +172,7 @@ fn combat_mapping() -> CombatMapping {
 const COMBAT_PREFIXES: [&str; 3] = ["weapon.", "warhead.", "effect."];
 
 /// The notes of mapped sections whose items enter the game in a later milestone.
-const LATER: [&str; 1] = ["support"];
+const LATER: [&str; 0] = [];
 
 /// The intentional differences, and which of them the audit met.
 struct Differences {
@@ -1381,6 +1381,14 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
                 "no",
             ),
             ("overpowerable", entry.overpowerable, "Overpowerable", "no"),
+            ("gunner", entry.gunner, "Gunner", "no"),
+            ("explodes", entry.explodes, "Explodes", "no"),
+            (
+                "disguise_when_still",
+                entry.disguise_when_still,
+                "DisguiseWhenStill",
+                "no",
+            ),
         ] {
             let (expected, text) = flag(key, default);
             differences.check(
@@ -1391,6 +1399,90 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
                 text,
             );
         }
+        differences.check(
+            id,
+            "ifv_mode",
+            &entry.ifv_mode.to_string(),
+            value("IFVMode").unwrap_or("0"),
+            "IFVMode",
+        );
+        let death = entry
+            .death_weapon
+            .and_then(|w| definitions.weapon(w))
+            .map(|w| w.id.as_str())
+            .unwrap_or("none");
+        let combat = combat_mapping();
+        let expected = value("DeathWeapon")
+            .or_else(|| {
+                (value("BalloonHover") == Some("yes"))
+                    .then(|| value("Primary"))
+                    .flatten()
+            })
+            .and_then(|v| combat.weapon_id.get(v))
+            .map(String::as_str)
+            .unwrap_or("none");
+        differences.check(id, "death_weapon", death, expected, "DeathWeapon");
+        let actual = entry
+            .ifv_weapons
+            .iter()
+            .map(|&w| definitions.weapon(w).unwrap().id.as_str())
+            .collect::<Vec<_>>()
+            .join(",");
+        let expected = (1..=if entry.gunner { 13 } else { 0 })
+            .filter_map(|n| value(&format!("Weapon{n}")))
+            .map(|v| combat.weapon_id.get(v).unwrap().as_str())
+            .collect::<Vec<_>>()
+            .join(",");
+        differences.check(id, "ifv_weapons", &actual, &expected, "Weapon1..13");
+        if entry.gunner {
+            assert_eq!(value("WeaponCount"), Some("13"));
+            for n in 2..=13 {
+                assert_eq!(
+                    value(&format!("EliteWeapon{n}")),
+                    value(&format!("Weapon{n}")),
+                    "unchanged elite IFV mode {}",
+                    n - 1
+                );
+            }
+        }
+        differences.check(
+            id,
+            "strategic",
+            &u8::from(entry.strategic).to_string(),
+            &u8::from(value("SuperWeapon").is_some()).to_string(),
+            "SuperWeapon",
+        );
+        if let Some(sw) = value("SuperWeapon") {
+            let recharge = reference
+                .get(sw, "RechargeTime")
+                .expect("strategic recharge");
+            differences.check(
+                id,
+                "strategic_cooldown",
+                &entry.cooldown.to_string(),
+                &convert(Conversion::Minutes, recharge).to_string(),
+                recharge,
+            );
+        }
+        if let Some(radius) = value("PsychicDetectionRadius") {
+            differences.check(
+                id,
+                "sensor_radius",
+                &entry.radius.to_string(),
+                radius,
+                "PsychicDetectionRadius",
+            );
+        }
+        let show = value("SuperWeapon")
+            .and_then(|sw| reference.get(sw, "ShowTimer"))
+            .unwrap_or("no");
+        differences.check(
+            id,
+            "show_timer",
+            &u8::from(entry.show_timer).to_string(),
+            &convert(Conversion::Flag, show).to_string(),
+            show,
+        );
         let delay = value("UndeployDelay").unwrap_or("0");
         differences.check(
             id,
@@ -1672,11 +1764,8 @@ const ITEM_FIELDS: &[ListFields] = &[
                 "role",
                 Field::Own("the specialist mechanism of M9, replaced by RA6"),
             ),
-            (
-                "cooldown",
-                Field::Own("a term of the role (M9); RA6 ports the recharge times"),
-            ),
-            ("radius", Field::Own("a term of the role (M9)")),
+            ("cooldown", Field::Audited("strategic_cooldown")),
+            ("radius", Field::Audited("sensor_radius")),
             ("strength", Field::Own("a term of the role (M9)")),
             ("capacity", Field::Audited("capacity")),
             ("art", Field::Own("art")),
@@ -1701,6 +1790,14 @@ const ITEM_FIELDS: &[ListFields] = &[
             ("stolen_allied", Field::Audited("stolen_allied")),
             ("stolen_soviet", Field::Audited("stolen_soviet")),
             ("overpowerable", Field::Audited("overpowerable")),
+            ("gunner", Field::Audited("gunner")),
+            ("strategic", Field::Audited("strategic")),
+            ("show_timer", Field::Audited("show_timer")),
+            ("explodes", Field::Audited("explodes")),
+            ("disguise_when_still", Field::Audited("disguise_when_still")),
+            ("ifv_mode", Field::Audited("ifv_mode")),
+            ("death_weapon", Field::Audited("death_weapon")),
+            ("ifv_weapons", Field::Audited("ifv_weapons")),
             ("undeploy_delay", Field::Audited("undeploy_delay")),
             ("adjacent", Field::Audited("adjacent")),
             ("base_normal", Field::Audited("base_normal")),
@@ -1902,6 +1999,13 @@ fn every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_d
             &convert(Conversion::Percent, at_max).to_string(),
             at_max,
         );
+        differences.check(
+            &id,
+            "paralyzes",
+            &warhead.paralyzes.to_string(),
+            reference.get(section, "Paralyzes").unwrap_or("0"),
+            "Paralyzes",
+        );
         for (field, game, key) in [
             ("wall", warhead.wall, "Wall"),
             ("wood", warhead.wood, "Wood"),
@@ -1918,6 +2022,7 @@ fn every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_d
                 "ElectricAssault",
             ),
             ("makes_disguise", warhead.makes_disguise, "MakesDisguise"),
+            ("culling", warhead.culling, "Culling"),
         ] {
             let (expected, text) = flag(section, key, "no");
             differences.check(
@@ -1951,6 +2056,14 @@ fn every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_d
             .weapon_kind(game_id)
             .and_then(|kind| definitions.weapon(kind))
             .unwrap_or_else(|| panic!("{game_id} is mapped but not shipped"));
+        if matches!(section.as_str(), "NukePayload" | "OilExplosion") {
+            assert!(reference.get(section, "ROF").is_none());
+            assert_eq!(weapon.reload, 1);
+        }
+        if section == "OilExplosion" {
+            assert!(reference.get(section, "Range").is_none());
+            assert_eq!(weapon.range, 384);
+        }
         let mut number = |field: &str, game: i128, key: &str, default: Option<&'static str>, c| {
             let text = match (reference.get(section, key), default) {
                 (Some(text), _) => text,
@@ -1976,7 +2089,11 @@ fn every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_d
             "range",
             i128::from(weapon.range),
             "Range",
-            None,
+            if section == "OilExplosion" {
+                Some("0")
+            } else {
+                None
+            },
             Conversion::Cells,
         );
         number(
@@ -1990,7 +2107,11 @@ fn every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_d
             "reload",
             i128::from(weapon.reload),
             "ROF",
-            None,
+            if matches!(section.as_str(), "NukePayload" | "OilExplosion") {
+                Some("0")
+            } else {
+                None
+            },
             Conversion::Frames,
         );
         number(
@@ -2020,6 +2141,20 @@ fn every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_d
             "Suicide",
             Some("no"),
             Conversion::Flag,
+        );
+        number(
+            "sonic",
+            i128::from(weapon.sonic),
+            "IsSonic",
+            Some("no"),
+            Conversion::Flag,
+        );
+        differences.check(
+            &id,
+            "repair",
+            &u8::from(weapon.repair).to_string(),
+            &u8::from(convert(Conversion::Int, reference.value(section, "Damage")) < 0).to_string(),
+            "Damage<0",
         );
         // The warhead: the game id of the ini's, or `?Name` for one the game does not have.
         let warhead = reference.value(section, "Warhead");
@@ -2130,6 +2265,8 @@ fn every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_d
                 "area_fire",
                 "naval_only",
                 "suicide",
+                "sonic",
+                "repair",
             ],
         ),
         (
@@ -2150,6 +2287,8 @@ fn every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_d
                 "bomb_disarm",
                 "electric_assault",
                 "makes_disguise",
+                "paralyzes",
+                "culling",
             ],
         ),
     ] {
@@ -2269,6 +2408,7 @@ fn every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_d
 /// appendix D, topic 8: assumptions from the overlay count and the ancestor engine): group,
 /// field, and the game's own value.
 const OWN_RULES: &[(&str, &str, i32)] = &[
+    ("superweapons", "nuclear_flight", 200),
     ("economy", "ore_max_bails", 12),
     ("economy", "ore_spread_above", 6),
 ];
@@ -2488,6 +2628,13 @@ const RULES: &[(&str, &str, &str, &str, Conversion)] = {
             "CombatDamage",
             "HomingScatter",
             Cells,
+        ),
+        (
+            "superweapons",
+            "chrono_freeze",
+            "General",
+            "ChronoDelay",
+            Frames,
         ),
         ("combat", "c4_delay", "CombatDamage", "C4Delay", Minutes),
         ("combat", "ivan_damage", "CombatDamage", "IvanDamage", Int),

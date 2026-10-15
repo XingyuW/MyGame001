@@ -1403,6 +1403,10 @@ fn ra5_one_area_blast_hits_a_connected_bridge_once_at_its_strongest_deck_cell() 
         )],
     );
     assert!(rejected(&events).is_empty(), "{events:?}");
+    // RA6 retains this exact bridge damage assertion after the 200-tick missile flight.
+    for _ in 0..200 {
+        tick(&mut app, vec![]);
+    }
     // Shipped NukePayload 600, NUKE versus concrete 8%: 48 once, not once per deck.
     for cell in &app.world().resource::<sim::Bridges>().bridges[&bridge].cells {
         let props = app.world().resource::<sim::Props>();

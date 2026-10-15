@@ -95,5 +95,6 @@ pub(super) fn unload_ready(
     {
         world.entity_mut(a.entity).insert(Weapon::new(w));
     }
+    vehicles::ifv_weapon(world, defs, a);
     Ok(())
 }

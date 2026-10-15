@@ -4615,3 +4615,154 @@ content is preserved without amendment/rewrite; this closure and subsequent RA6 
 the prefix. No new substantial external directory, clone or worktree was created. The
 configured Cargo target (including package outputs) was reused and remains needed for
 validation/package evidence; UV/PIP caches and RA5's render directory were preserved.
+
+### R80. RA6-B reference vehicles, strategic payloads, and explicit state
+
+**2026-10-15.** RA6-B adds new `special/vehicles.rs` and `special/superweapons.rs`
+mechanics; it does not perform a further extraction of existing bodies. R71's isolated
+pure-move commit remains the prerequisite. Arsenal schema 8, combat schema 5, and rules
+schema 3 migrate every committed legacy/RA1–RA5 fixture and the generator. Required fields
+include all thirteen IFV weapons, death weapons, Gunner/Explodes/DisguiseWhenStill,
+SuperWeapon/ShowTimer, IsSonic, repair-only negative damage, Paralyzes and Culling. The
+existing 192 KiB pre-parse arsenal bound remains unchanged. Death-only NukePayload lacks
+ROF, and OilExplosion lacks ROF and Range: the exact permitted source absences are audited;
+unused bounded scheduling placeholders are one tick and 384 subcells. Ordinary weapons
+retain the complete ROF/Range audit. Negative damage is accepted only for explicit repair
+weapons; ordinary negative-damage variants remain rejected.
+
+`Paralyzes=32767` is retained as its exact numeric source value, not relabeled as a source
+boolean. A positive value enables host movement paralysis for the attached parasite's
+lifetime; no arbitrary 32767-frame timeout is substituted. The ship keeps its weapon.
+Squid culling checks the post-hit red/yellow threshold, honors Curtain/Temporal protection,
+and records its source kill credit. Drone and Squid retain identity, owner, HP and experience
+off-map. A self-kill or sonic eviction uses the shared ring allocator; a blocked exit retains
+an explicit hashed pending cell and retries. An externally destroyed host loses its parasite.
+A blocked escape still earns kill experience. Repair removes a Drone, and RepairBullet uses
+its exact squared subcell range and reload. IFV mode 12 is tested with an explicit independent
+mode fixture because the representative civilian roster does not include cows.
+
+Prism support walks ordered ready same-owner towers through secondary range links, takes
+at most eight donors, applies `1 + 1.5*N`, and disables donors for 80 ticks. Readiness includes
+the cooldown-one boundary before combat decrements it and excludes Temporal-frozen towers.
+Mirage uses an original procedural tree silhouette per observer and a hashed SimRng variant;
+DetectDisguise is required even for adjacent ordinary units. No reference art is copied.
+SonicZap damage is now the exact 4/8 source value and frees Squid. **Remaining difference:**
+this deterministic shot model applies that value once per shot, without the original engine's
+persistent sonic-wave frame accumulation; the available plan does not establish its lifetime.
+This is an explicit approximation, not a claim of sonic-wave parity.
+
+Death payloads use RA3 `Blast::source`, effects and radiation. The ordered dispatcher repeats
+after bridge/garrison cleanup until no additional payload is discovered. Each actor detonates
+at most once. Stored transport cargo dies with its host and does not independently explode; Ivan IFV
+instead uses its mode-7 CRNuke payload. Kirov uses its primary as its ground crash blast, explicitly generated into death metadata
+from BalloonHover/Primary so legacy role-only fixtures do not opt in. Garrison evacuation
+retains RA5 semantics and is revisited within the cleanup fixed point.
+Temporal removal suppresses payloads and crew. These are deterministic cleanup policies,
+including deaths occurring after the ordinary Combat stage.
+
+Chronosphere has a distinct validated source/destination command and two-click client flow.
+It vacates the whole 3x3 selection together, preserves offsets, kills organic infantry except
+Teleporters, and kills invalid/occupied destination units instead of violating I6'. Moved units
+freeze for 80 ticks. Curtain affects all owners in its 3x3 footprint-intersection area, kills
+infantry and protects remaining targets for exactly 1000 ticks. Nuclear payload flight is a
+200-tick game timing assumption; the 600 NUKE payload and 500 radiation are ported data.
+Storm warns for 333 ticks, then runs for 240 with 13/7-tick direct/random attempts, a 10x10
+square, source damage and enemy radar loss. Direct bolts ignore separation, random bolts
+respect every active cloud including the fixed target. **Cloud lifetime assumption:** one
+direct-bolt interval (13 ticks); no precise cloud animation lifetime is established by the
+reference contract. Storm exclusivity includes the warning period.
+
+Paradrops use one ordinary 400-HP aircraft, vulnerable to AA, entering from a legal map-edge
+cell. The side payload is six GI/nine Conscripts; America receives eight GI. Drop attempts
+begin within four cells. **Landing/exit approximation:** infantry materialize on legal spots
+within the target radius without a parachute fall simulation, and the aircraft exits when its
+payload is placed. If landing is blocked it retains the undispatched count and retries; AA
+loss discards the remainder. Free troops do not inherit paid-production spy veterancy.
+
+Public built/launch messages and timer views expose only owner, role and remaining time,
+never an unseen source id/cell or target. Readiness is shown/audible only to its owner.
+Nuclear target marks are owner-visible or require a powered Psychic Sensor within its ported
+15-cell radius; ordinary vision alone does not reveal that warning. Visual/audio feel still
+requires user verification.
+
+Regression migrations retain their assertions: `m4_definitions::schema_versions_other_than_4_are_rejected`
+is renamed for schema 5 and its unsupported-version matrix advances; generated limit
+fixtures gain required fields. `ra1_commands` adds Chronoshift to every naming/rejection
+matrix. Its immediate-death setup is explicitly separated as `immediate_death_fixture`,
+modifying only silo `strategic=0` and IFV `gunner=0`/empty mode list. It is used only by
+`strike_beside_a_repair_ifv`, `ra5_same_tick_dead_actors_cannot_capture_repair_enter_hospital_or_occupy`,
+`ra5_garrison_destroyed_earlier_in_the_command_tick_cannot_deploy`, and the renamed
+`ra6_trait_injected_specialists_and_transport_passengers_cannot_act_after_same_tick_death`.
+Those tests exercise unchanged same-command-stage death guards, not actual shipped nuclear
+flight or RepairBullet. `shipped_world` remains the unmodified shipped ruleset for the
+visibility/security matrix; `ra6_vehicles` separately exercises actual strategic/gunner paths,
+including Curtain's immediate infantry death. Legacy m9_arsenal and m11_repair remain untouched.
+
+### R81. RA6-B exact existing-test expectation ledger
+
+**2026-10-15.** The following changes migrate an intended contract; they do not remove or
+relax assertions. New positive/negative/boundary tests run alongside them.
+
+- `m4_definitions::the_fixture_loads_with_every_field` supplies explicit false Sonic/repair
+  fields in the expected WeaponDef. `schema_versions_other_than_4_are_rejected` becomes
+  `schema_versions_other_than_5_are_rejected`, rejecting old 4 and future 6 as well as the
+  previous unsupported values. Its `generated` helper (used by `list_lengths_are_bounded`)
+  writes schema5 and all required neutral fields.
+- `ra1_definitions::the_rules_fixture_loads_with_every_field`,
+  `every_field_of_the_rules_file_is_required`, `every_scalar_rule_is_rejected_one_step_outside_its_range`,
+  and `the_limits_of_every_scalar_rule_are_accepted` extend `SCALAR_GROUPS` with both required
+  strategic timing fields and their 1..72000 bounds. Every fixture retains the parser helper's
+  one-field-per-line shape. `every_field_of_the_arsenal_file_is_required` advances its schema
+  literals to8; `unknown_and_duplicate_fields_are_rejected_in_every_file` advances only rules3
+  and arsenal8 literals; `other_schema_versions_are_rejected_in_every_file` rejects old/future
+  versions against those current schemas. The `arsenal_of` helper writes schema8.
+- `ra2_definitions::the_fixture_loads_with_the_traits_of_schema_version_3` and
+  `ra3_definitions::the_fixture_loads_with_the_traits_of_schema_version_4` expect arsenal8;
+  `ra4_definitions::the_fixture_loads_with_the_traits_of_schema_version_5` expects arsenal8
+  and combat5. Their historical trait expectations remain unchanged.
+- `ra5_definitions::files_of_schema_version_1_are_rejected` expects rules3 while still
+  expecting economy2; both continue rejecting schema1.
+- `ra1_commands::a_seen_enemy_is_reported_as_not_owned` extends its exact name-to-result
+  matrix with Chronoshift. The shared `naming` helper extends
+  `every_command_answers_for_an_unseen_enemy_as_for_an_id_that_names_nothing` and
+  `every_command_answers_for_a_submerged_enemy_as_for_an_id_that_names_nothing` with the
+  same new command. `the_chronosphere_answers_for_an_unseen_enemy_vehicle_as_for_an_id_that_names_nothing`
+  preserves all unseen/missing rejection assertions and uses explicit source/destination
+  Chronoshift for its positive own-vehicle move. R80 names the four scoped immediate-death
+  fixture users and the renamed specialist test; other shipped helpers retain original data.
+- `ra3_shipped::shipped_ships_follow_their_naval_targeting` changes only Dolphin's expected
+  heavy-armour hit from80 to3: source Damage4 times80%, truncated, replacing the deferred M9
+  Damage100. Squid's first periodic hit remains15. The `strike` helper used by
+  `a_nuclear_strike_destroys_a_power_plant_and_not_a_construction_yard` now waits exactly200
+  ticks for actual flight; every original footprint/armour/damage assertion remains.
+- `ra4_shipped::the_chronosphere_does_not_move_a_launched_rocket` retains the exact
+  NotCommandable denial and rocket impact assertions; only its successful tank relocation
+  uses the new area command. Area selection itself also excludes launched units and paradrop
+  aircraft. Temporal-erased targets are untargetable by Chronosphere/Curtain.
+- `sidebar::tests::a_tab_lists_only_what_a_building_of_the_player_could_build` identifies the
+  same four *major* superweapons for the lobby-off assertions. The new Paradrop role remains
+  an ability but does not disable America's radar/airfield when the major-weapon switch is off;
+  the existing comparison that every other card is unaffected remains intact.
+- `ra9_data_parity` expands its independent inventories and complete field guards for the
+  plane, all IFV/death weapons, exact elite-mode equivalence, strategic recharge/timers,
+  Psychic Sensor radius and the new schema traits. It permits only the named, verified
+  absent death-weapon scheduling keys. No ordinary weapon/source field is omitted.
+
+The added long-game win-condition test verifies that an attached or pending parasite retains
+its living owner, like other off-map transported units. Short-game building/MCV rules remain.
+A pending self-kill escape may use the host's cell once cleanup frees it, after trying the
+ordinary ring, preventing permanent entrapment by an occupied ring on otherwise legal terrain.
+R76's first-spawn Spy/cloak visibility risk remains an explicit RA7 handoff, not closed here.
+
+R81 additional timing migration: `ra5_world::ra5_one_area_blast_hits_a_connected_bridge_once_at_its_strongest_deck_cell`
+waits the actual200-tick nuclear flight, then retains its exact1452-HP assertions for every
+connected bridge cell. This changes observation time, not the one-blast/strongest-cell rule.
+
+RA6-B freeze preflight: the complete sim pass reported828 passed/1 failed/0 ignored (only
+the bridge test's old immediate-strike observation); complete client/asset preflight reported
+254 passed/1 failed/0 ignored (only the lobby-card major-weapon classification). Both exact
+failures were corrected and rerun successfully, with all original substantive assertions.
+The final security/repair target run passes50 tests (21 command +29 vehicle/SW), and final
+strict workspace Clippy, formatting, diff hygiene and generator/reference checks pass.
+All prior failure logs remain under `validation/ra2-parity/ra6b-*`. This is preflight evidence;
+full frozen-source gate results follow separately, including soak and both756-match sweeps.

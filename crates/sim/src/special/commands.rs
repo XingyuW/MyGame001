@@ -256,11 +256,45 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
                 clear_orders(world, a.entity);
             }
         }
+        Command::Chronoshift {
+            building,
+            source,
+            target,
+        } => {
+            return superweapons::launch(world, issued.player, *building, *target, Some(*source));
+        }
         Command::Superweapon {
             building,
             target,
             units,
         } => {
+            if defs.rules().is_some()
+                && defs
+                    .metadata(index.get(building).map_or(
+                        ProductionItem::Building(crate::BuildingKind(u16::MAX)),
+                        |a| a.item,
+                    ))
+                    .is_some_and(|m| m.strategic)
+            {
+                // Authorize the source before inspecting optional unit arguments: hidden
+                // enemy sources must answer exactly as missing sources, regardless of type.
+                own(world, &defs, &index, issued.player, *building)?;
+                commandable(world, *building)?;
+                if index
+                    .get(building)
+                    .is_some_and(|a| role(&defs, a) == Role::Chronosphere)
+                {
+                    let mut ids = BTreeSet::new();
+                    for id in units {
+                        if !ids.insert(*id) {
+                            return Err(RejectReason::DuplicateUnit(*id));
+                        }
+                        own(world, &defs, &index, issued.player, *id)?;
+                        commandable(world, *id)?;
+                    }
+                }
+                return superweapons::launch(world, issued.player, *building, *target, None);
+            }
             let a = own(world, &defs, &index, issued.player, *building)?;
             let meta = defs
                 .metadata(a.item)

@@ -262,6 +262,8 @@ fn the_fixture_loads_with_every_field() {
             rad_level: 0,
             area_fire: false,
             naval_only: false,
+            sonic: false,
+            repair: false,
             suicide: false,
         }
     );
@@ -495,17 +497,17 @@ fn every_field_is_required_and_unknown_fields_are_rejected() {
 }
 
 #[test]
-fn schema_versions_other_than_4_are_rejected() {
-    for version in [0, 1, 2, 3, 5, -1, i64::MIN, i64::MAX] {
+fn schema_versions_other_than_5_are_rejected() {
+    for version in [0, 1, 2, 3, 4, 6, -1, i64::MIN, i64::MAX] {
         assert_rejected(
             &variant(
                 &format!("version_{version}"),
-                &[("schema_version: 4,", &format!("schema_version: {version},"))],
+                &[("schema_version: 5,", &format!("schema_version: {version},"))],
             ),
             "schema_version",
             DataErrorKind::UnsupportedSchemaVersion {
                 found: version,
-                expected: 4,
+                expected: 5,
             },
         );
     }
@@ -650,7 +652,7 @@ fn generated(
         .map(|w| {
             format!(
                 "(id: \"w{w}\", cell_spread: 0, percent_at_max: 100, wall: 1, wood: 1, \
-                 temporal: 0, mind_control: 0, psychic_damage: 0, radiation: 0, parasite: 0, ivan_bomb: 0, bomb_disarm: 0, electric_assault: 0, makes_disguise: 0, versus: [{}])",
+                 temporal: 0, mind_control: 0, psychic_damage: 0, radiation: 0, parasite: 0, paralyzes: 0, culling: 0, ivan_bomb: 0, bomb_disarm: 0, electric_assault: 0, makes_disguise: 0, versus: [{}])",
                 versus.join(", ")
             )
         })
@@ -659,7 +661,7 @@ fn generated(
         .map(|k| {
             format!(
                 "(id: \"k{k}\", damage: 1, range: 384, min_range: 0, reload: 1, burst: 1, \
-                 warhead: \"w0\", projectile_speed: 0, anti_air: 1, anti_ground: 1, scatter: 0, rad_level: 0, area_fire: 0, naval_only: 0, suicide: 0)"
+                 warhead: \"w0\", projectile_speed: 0, anti_air: 1, anti_ground: 1, scatter: 0, rad_level: 0, area_fire: 0, naval_only: 0, suicide: 0, sonic: 0, repair: 0)"
             )
         })
         .collect();
@@ -696,7 +698,7 @@ fn generated(
     })
     .collect();
     let text = format!(
-        "(schema_version: 4, armour_classes: [{}], warheads: [{}], weapons: [{}], units: [{}], \
+        "(schema_version: 5, armour_classes: [{}], warheads: [{}], weapons: [{}], units: [{}], \
          buildings: [{}], effects: [])",
         class_names.join(", "),
         warhead_list.join(",\n"),

@@ -1150,6 +1150,11 @@ pub(crate) fn check_win_condition(
                 }
             }
         }
+        for parasite in special.parasites.values() {
+            if parasite.owner != crate::NEUTRAL && counts(parasite.passenger.kind) {
+                alive.insert(parasite.owner);
+            }
+        }
         for (id, owner, unit) in &units {
             if counts(unit.kind)
                 || special
@@ -1198,4 +1203,75 @@ pub(crate) fn check_win_condition(
             MatchOutcome::Draw { .. } => None,
         },
     });
+}
+
+#[cfg(test)]
+mod ra6_parasite_tests {
+    use super::*;
+    #[test]
+    fn ra6_an_attached_drone_keeps_its_owner_alive_in_a_long_game() {
+        let definitions = crate::load_ruleset(
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../assets/data"),
+        )
+        .unwrap();
+        let mut app = bevy_app::App::new();
+        app.add_plugins(crate::SimPlugin { seed: 1 });
+        app.world_mut().insert_resource(definitions);
+        app.world_mut().insert_resource(
+            Grid::from_cells(
+                20,
+                20,
+                vec![
+                    crate::Cell {
+                        passable: true,
+                        water: false,
+                        buildable: true,
+                        ore: 0
+                    };
+                    400
+                ],
+            )
+            .unwrap(),
+        );
+        let p0 = PlayerId(0);
+        let p1 = PlayerId(1);
+        app.world_mut()
+            .resource_mut::<Players>()
+            .add(p0, 0)
+            .unwrap();
+        app.world_mut()
+            .resource_mut::<Players>()
+            .add(p1, 0)
+            .unwrap();
+        let drone =
+            crate::spawn_unit(app.world_mut(), p0, "terror_drone", CellPos::new(8, 8)).unwrap();
+        let host = crate::spawn_unit(app.world_mut(), p1, "rhino", CellPos::new(9, 8)).unwrap();
+        app.world_mut().run_schedule(crate::SimSchedule);
+        app.world_mut().insert_resource(MatchState {
+            players: vec![p0, p1],
+            rules: MatchRules {
+                short_game: false,
+                ..Default::default()
+            },
+            ..Default::default()
+        });
+        app.world_mut()
+            .resource_mut::<crate::CommandQueue>()
+            .push(crate::IssuedCommand {
+                player: p0,
+                command: crate::Command::Attack {
+                    units: vec![drone],
+                    target: host,
+                },
+            });
+        app.world_mut().run_schedule(crate::SimSchedule);
+        assert!(
+            app.world()
+                .resource::<crate::SpecialState>()
+                .parasites
+                .contains_key(&host)
+        );
+        assert_eq!(app.world().resource::<MatchState>().defeated(p0), None);
+        assert_eq!(app.world().resource::<MatchState>().outcome(), None);
+    }
 }

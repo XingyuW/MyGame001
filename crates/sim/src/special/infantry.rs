@@ -824,17 +824,7 @@ pub(crate) fn finish_deaths(world: &mut World, defs: &Definitions) {
     loop {
         let next = actors(world).into_values().find(|a| {
             !a.alive()
-                && defs
-                    .metadata(a.item)
-                    .is_some_and(|m| m.infantry && m.role == Role::Suicide)
-                && match a.item {
-                    ProductionItem::Unit(k) => defs
-                        .unit_combat(k)
-                        .and_then(|t| t.weapon)
-                        .and_then(|w| defs.weapon(w))
-                        .is_some_and(|w| w.suicide),
-                    ProductionItem::Building(_) => false,
-                }
+                && vehicles::death_weapon(world, defs, a).is_some()
                 && !world
                     .resource::<SpecialState>()
                     .temporal_removed
@@ -851,27 +841,8 @@ pub(crate) fn finish_deaths(world: &mut World, defs: &Definitions) {
             .resource_mut::<SpecialState>()
             .death_detonated
             .insert(a.id);
-        let ProductionItem::Unit(k) = a.item else {
-            continue;
-        };
-        if let Some(w) = defs
-            .unit_combat(k)
-            .and_then(|t| t.weapon)
-            .and_then(|w| defs.weapon(w))
-        {
-            detonate(
-                world,
-                Blast {
-                    point: position_of(world, &a),
-                    air: false,
-                    warhead: w.warhead,
-                    damage: w.damage,
-                    direct: None,
-                    firepower_pm: 1000,
-                    source: Some(a.id),
-                },
-                true,
-            );
+        if let Some(w) = vehicles::death_weapon(world, defs, &a) {
+            vehicles::payload(world, defs, &a, w);
         }
     }
     let index = living(world);

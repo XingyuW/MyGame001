@@ -107,7 +107,7 @@ use std::{collections::BTreeMap, path::Path};
 
 /// The schema version of the arsenal file this crate reads (2 since RA1, 3 since RA2, 4 since
 /// RA3, 5 since RA4).
-pub const ARSENAL_SCHEMA_VERSION: i64 = 7;
+pub const ARSENAL_SCHEMA_VERSION: i64 = 8;
 
 /// Largest `build_limit` of an arsenal entry.
 pub const MAX_BUILD_LIMIT: u32 = 255;
@@ -269,12 +269,20 @@ pub enum Role {
     Storm,
     Curtain,
     Nuke,
+    Paradrop,
 }
 impl Role {
+    /// Major weapons governed by the lobby switch; paradrops remain available.
+    pub fn major_superweapon(self) -> bool {
+        matches!(
+            self,
+            Self::Chronosphere | Self::Curtain | Self::Storm | Self::Nuke
+        )
+    }
     pub fn superweapon(self) -> bool {
         matches!(
             self,
-            Self::Chronosphere | Self::Storm | Self::Curtain | Self::Nuke
+            Self::Chronosphere | Self::Storm | Self::Curtain | Self::Nuke | Self::Paradrop
         )
     }
 }
@@ -385,6 +393,14 @@ pub struct ArsenalEntry {
     pub stolen_soviet: bool,
     pub overpowerable: bool,
     pub undeploy_delay: u32,
+    pub strategic: bool,
+    pub show_timer: bool,
+    pub gunner: bool,
+    pub explodes: bool,
+    pub disguise_when_still: bool,
+    pub ifv_mode: u32,
+    pub death_weapon: Option<crate::WeaponKind>,
+    pub ifv_weapons: Vec<crate::WeaponKind>,
 }
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Arsenal(pub BTreeMap<ProductionItem, ArsenalEntry>);
@@ -471,6 +487,14 @@ struct Entry {
     stolen_soviet: i64,
     overpowerable: i64,
     undeploy_delay: i64,
+    strategic: i64,
+    show_timer: i64,
+    gunner: i64,
+    explodes: i64,
+    disguise_when_still: i64,
+    ifv_mode: i64,
+    death_weapon: String,
+    ifv_weapons: Vec<String>,
 }
 static ENTRY: Shape = Shape::Struct(&[
     ("id", Shape::Str),
@@ -583,6 +607,20 @@ static ENTRY: Shape = Shape::Struct(&[
     ("stolen_soviet", Shape::Int),
     ("overpowerable", Shape::Int),
     ("undeploy_delay", Shape::Int),
+    ("strategic", Shape::Int),
+    ("show_timer", Shape::Int),
+    ("gunner", Shape::Int),
+    ("explodes", Shape::Int),
+    ("disguise_when_still", Shape::Int),
+    ("ifv_mode", Shape::Int),
+    ("death_weapon", Shape::Str),
+    (
+        "ifv_weapons",
+        Shape::List {
+            entry: &Shape::Str,
+            max: 13,
+        },
+    ),
 ]);
 static FILE: Shape = Shape::Struct(&[
     (
@@ -676,6 +714,7 @@ impl Arsenal {
                 "storm" => Role::Storm,
                 "curtain" => Role::Curtain,
                 "nuke" => Role::Nuke,
+                "paradrop" => Role::Paradrop,
                 _ => return Err(bad("role", &e.role)),
             };
             if (matches!(item, ProductionItem::Building(_)) && domain != Domain::Land)
@@ -865,7 +904,33 @@ impl Arsenal {
             if !(0..=1_000_000).contains(&e.undeploy_delay) {
                 return Err(bad("undeploy_delay", "outside 0..1000000"));
             }
+            if !(0..=12).contains(&e.ifv_mode) {
+                return Err(bad("ifv_mode", "outside 0..12"));
+            }
+            let death_weapon = if e.death_weapon == "none" {
+                None
+            } else {
+                Some(
+                    defs.weapon_kind(&e.death_weapon)
+                        .ok_or_else(|| bad("death_weapon", &e.death_weapon))?,
+                )
+            };
+            if e.gunner == 1 && e.ifv_weapons.len() != 13
+                || e.gunner == 0 && !e.ifv_weapons.is_empty()
+            {
+                return Err(bad("ifv_weapons", "a gunner requires thirteen weapons"));
+            }
+            let ifv_weapons = e
+                .ifv_weapons
+                .iter()
+                .map(|id| defs.weapon_kind(id).ok_or_else(|| bad("ifv_weapons", id)))
+                .collect::<Result<Vec<_>, _>>()?;
             let flags = [
+                ("strategic", e.strategic, true),
+                ("show_timer", e.show_timer, true),
+                ("gunner", e.gunner, true),
+                ("explodes", e.explodes, true),
+                ("disguise_when_still", e.disguise_when_still, true),
                 ("deployer", e.deployer, true),
                 ("deploy_fire", e.deploy_fire, true),
                 ("c4", e.c4, true),
@@ -1128,6 +1193,14 @@ impl Arsenal {
                     stolen_soviet: e.stolen_soviet == 1,
                     overpowerable: e.overpowerable == 1,
                     undeploy_delay: e.undeploy_delay as u32,
+                    strategic: e.strategic == 1,
+                    show_timer: e.show_timer == 1,
+                    gunner: e.gunner == 1,
+                    explodes: e.explodes == 1,
+                    disguise_when_still: e.disguise_when_still == 1,
+                    ifv_mode: e.ifv_mode as u32,
+                    death_weapon,
+                    ifv_weapons,
                 },
             );
         }
@@ -1239,6 +1312,13 @@ impl Arsenal {
                 u8::from(e.infantry),
             ]);
             h.write_u32(e.size);
+            h.write_u32(e.ifv_mode);
+            h.write(&e.death_weapon.map_or(u16::MAX, |w| w.0).to_le_bytes());
+            h.write_u64(e.ifv_weapons.len() as u64);
+            for w in &e.ifv_weapons {
+                h.write(&w.0.to_le_bytes());
+            }
+
             // RA4: the traits of schema version 5.
             let bits = |abilities: &[Ability]| {
                 abilities
@@ -1255,6 +1335,11 @@ impl Arsenal {
                 e.launcher.map_or(u8::MAX, |launcher| launcher as u8),
                 e.missile.map_or(u8::MAX, |missile| missile as u8),
                 u8::from(e.cloakable),
+                u8::from(e.strategic),
+                u8::from(e.show_timer),
+                u8::from(e.gunner),
+                u8::from(e.explodes),
+                u8::from(e.disguise_when_still),
                 u8::from(e.deployer),
                 u8::from(e.deploy_fire),
                 u8::from(e.c4),

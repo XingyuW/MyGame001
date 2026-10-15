@@ -535,7 +535,8 @@ pub fn weapon_against(
             continue;
         };
         if definitions.rules().is_some()
-            && (def.area_fire
+            && (def.repair
+                || def.area_fire
                 || (def.naval_only && (!traits.on_water || traits.building))
                 || definitions.warhead(def.warhead).is_some_and(|h| {
                     h.bomb_disarm
@@ -1260,7 +1261,9 @@ impl Field<'_> {
                     || h.makes_disguise
                     || h.bomb_disarm
                     || h.electric_assault
-                    || (h.parasite && self.roles.get(&id) == Some(&crate::Role::Dog))
+                    || h.parasite
+                    || def.repair
+                    || def.suicide
             })
         {
             return;
@@ -1435,6 +1438,25 @@ pub(crate) fn combat(
             );
         }
     }
+    let prism_kind = definitions.building_kind("prism_tower");
+    let prism_ready: BTreeSet<_> = attackers
+        .iter()
+        .filter_map(|(id, _, w, _, _, _, b, _)| {
+            (ruled
+                && w.cooldown <= 1
+                && b.is_some_and(|b| Some(b.kind) == prism_kind)
+                && !special.disabled.contains_key(id)
+                && !special.erasures.contains_key(id)
+                && index
+                    .get(id)
+                    .and_then(|t| t.owner)
+                    .and_then(|o| players.get(o))
+                    .is_some_and(|p| b.is_some_and(|b| p.powers(&definitions, b.kind))))
+            .then_some(*id)
+        })
+        .collect();
+    let mut prism_supporters = BTreeSet::new();
+    let mut already_fired = BTreeSet::new();
     let field = Field {
         targets: &index,
         props: &props,
@@ -1510,6 +1532,12 @@ pub(crate) fn combat(
     }
     order.sort_unstable();
     for (id, entity) in order {
+        if prism_supporters.contains(&id) {
+            continue;
+        }
+        let event_start = shots.events.len();
+        let blast_start = shots.blasts.len();
+        let flight_start = shots.fired.len();
         let Ok((_, owner, mut weapon, position, mobile, orders, building, experience)) =
             attackers.get_mut(entity)
         else {
@@ -1531,6 +1559,7 @@ pub(crate) fn combat(
             || special.erasures.contains_key(&id)
             || special.disabled.contains_key(&id)
             || special.rearming.contains_key(&id)
+            || special.strategic.flights.contains_key(&id)
             || (special.ammo.get(&id) == Some(&0) && weapon.burst_left == 0)
         {
             if weapon.cooldown == 0 && weapon.burst_left > 0 {
@@ -1615,6 +1644,61 @@ pub(crate) fn combat(
                 );
             }
         }
+        if shots.events.len() > event_start {
+            already_fired.insert(id);
+            if prism_ready.contains(&id)
+                && let Some(rules) = definitions.rules()
+            {
+                let mut chain = vec![id];
+                let reach = weapon
+                    .secondary
+                    .and_then(|w| definitions.weapon(w))
+                    .map_or(0, |w| w.range);
+                loop {
+                    if chain.len().saturating_sub(1) >= rules.prism.support_max as usize {
+                        break;
+                    }
+                    let next = prism_ready
+                        .iter()
+                        .find(|candidate| {
+                            !already_fired.contains(*candidate)
+                                && !prism_supporters.contains(*candidate)
+                                && index.get(*candidate).is_some_and(|t| {
+                                    t.owner == Some(owner)
+                                        && chain.iter().any(|root| {
+                                            index.get(root).is_some_and(|r| {
+                                                let a = r.extent.centre();
+                                                let b = t.extent.centre();
+                                                in_range(
+                                                    i64::from(a.x) - i64::from(b.x),
+                                                    i64::from(a.y) - i64::from(b.y),
+                                                    reach,
+                                                )
+                                            })
+                                        })
+                                })
+                        })
+                        .copied();
+                    let Some(next) = next else {
+                        break;
+                    };
+                    prism_supporters.insert(next);
+                    chain.push(next);
+                }
+                let multiplier = 1000u64.saturating_add(
+                    (chain.len().saturating_sub(1) as u64)
+                        .saturating_mul(rules.prism.support_modifier_pm as u64),
+                );
+                for b in &mut shots.blasts[blast_start..] {
+                    b.firepower_pm = (u64::from(b.firepower_pm).saturating_mul(multiplier) / 1000)
+                        .min(u64::from(u32::MAX)) as u32;
+                }
+                for b in &mut shots.fired[flight_start..] {
+                    b.firepower_pm = (u64::from(b.firepower_pm).saturating_mul(multiplier) / 1000)
+                        .min(u64::from(u32::MAX)) as u32;
+                }
+            }
+        }
         if due && weapon.cooldown == 0 {
             weapon.burst_left = 0;
             weapon.cooldown = definitions
@@ -1623,6 +1707,13 @@ pub(crate) fn combat(
         }
     }
 
+    if let Some(rules) = definitions.rules() {
+        for id in prism_supporters {
+            special
+                .disabled
+                .insert(id, tick.0.saturating_add(rules.prism.support_delay as u64));
+        }
+    }
     // Temporal shots freeze before this tick's impacts, including simultaneous ordinary fire.
     if ruled {
         for event in &shots.events {

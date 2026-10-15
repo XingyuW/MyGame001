@@ -30,6 +30,7 @@
 """Writes assets/data/*.ron from the committed RA2 reference tables."""
 
 import os
+import re
 import sys
 from fractions import Fraction
 from math import isqrt
@@ -266,7 +267,6 @@ ARMOURS = (
 NOT_CARRIED = {
     "none": "no weapon",
     "VirtualScanner": "NeverUse=yes: the engine never fires it",
-    "PrismSupport": "the support beam of the prism chain (RA6)",
     "HornetCollision": "a spawned aircraft attacks only what its carrier fires at, never an aircraft",
     "ASWCollision": "a spawned aircraft attacks only what its destroyer fires at, never an aircraft",
 }
@@ -288,15 +288,14 @@ MAX_WEAPON_RANGE = 7680
 #   per shot (the ini's is per frame of the wave), the bomb of Crazy Ivan names the warhead it
 #   goes off with, and the Demolition Truck needs the smallest range the combat file admits.
 WEAPON_VALUES = {
+    "NukePayload": {"reload": 1},
+    "OilExplosion": {"range": 384, "reload": 1},
     "V3Launcher": {"warhead": "V3WH"},
     "DredLauncher": {"warhead": "DMISLWH"},
     "HornetLauncher": {"warhead": "ORCAAP"},
     "MakeupKit": {"range": MAX_WEAPON_RANGE},
     "ASWLauncher": {"warhead": "APSplash", "range": MAX_WEAPON_RANGE, "anti_ground": 1},
     "Sapper": {"anti_ground": 1},
-    "SonicZap": {"damage": 100},
-    "SonicZapE": {"damage": 100},
-    "Demobomb": {"range": 384},
 }
 # The area effects that are no weapon of a type (crates/sim/src/combat_defs.rs, `Effect`):
 # id, base damage and warhead, each a number or the (section, key) of the reference.
@@ -317,6 +316,7 @@ EFFECTS = (
 # RA5: the rule values the ini has no key for (docs/RA2_PARITY_PLAN.md section 4.10; appendix D,
 # topic 8: assumptions from the overlay count and the ancestor engine), by group of rules.ron.
 OWN_RULES = {
+    "superweapons": (("nuclear_flight", 200, "assumption: fixed launch-to-impact flight, appendix D12"),),
     "economy": (
         ("ore_max_bails", 12, "the game's own: 12 density stages of an ore cell"),
         ("ore_spread_above", 6, "the game's own: ore spreads from a cell above this density"),
@@ -343,6 +343,7 @@ NEW_BUILDINGS = {
     "soviet_walls": ("Soviet Walls", "fortress_walls"),
 }
 NEW_UNITS = {
+    "paradrop_plane": ("Paradrop Plane", "harrier"),
     "soviet_mcv": ("Soviet MCV", "mcv"),
     "soviet_amphibious_transport": ("Soviet Amphibious Transport", "amphibious_transport"),
     "chrono_commando": ("Chrono Commando", "tanya"),
@@ -357,7 +358,7 @@ NEW_UNITS = {
 # difference listed in ra2_differences.tsv).
 SHIPYARD_ADJACENT = 31
 # Mapped ids that enter the game in a later milestone, by the note of ra2_mapping.tsv.
-LATER = ("support",)
+LATER = ()
 # Units the ini produces only with stolen technology: in the data, not producible until RA6.
 STOLEN = ("RequiresStolenAlliedTech", "RequiresStolenSovietTech")
 
@@ -485,6 +486,7 @@ RULES = (
     ("radiation", "level_factor_pm", "Radiation", "RadLevelFactor", "pm", None),
     ("radiation", "level_max", "Radiation", "RadLevelMax", "int", None),
     ("radiation", "duration_multiple_pm", "Radiation", "RadDurationMultiple", "pm", None),
+    ("superweapons", "chrono_freeze", "General", "ChronoDelay", "frames", None),
     ("superweapons", "nuclear_recharge", "MultiSpecial", "RechargeTime", "minutes", None),
     ("superweapons", "lightning_recharge", "LightningStormSpecial", "RechargeTime", "minutes", None),
     ("superweapons", "iron_curtain_recharge", "IronCurtainSpecial", "RechargeTime", "minutes", None),
@@ -1163,10 +1165,10 @@ class Data:
             f"anti_ground: {value('anti_ground', lambda: flag(projectile, 'AG', 'yes'))}, "
             f"scatter: {scatter}, "
             f"rad_level: {int(weapon.get('RadLevel', '0'))}, "
-            f"area_fire: {flag(weapon, 'AreaFire', 'no')}, naval_only: {int(not flag(projectile, 'AG', 'yes') and not flag(projectile, 'AA', 'no'))}, suicide: {flag(weapon, 'Suicide', 'no')}"
+            f"area_fire: {flag(weapon, 'AreaFire', 'no')}, naval_only: {int(not flag(projectile, 'AG', 'yes') and not flag(projectile, 'AA', 'no'))}, sonic: {flag(weapon, 'IsSonic', 'no')}, repair: {int(int(weapon['Damage']) < 0)}, suicide: {flag(weapon, 'Suicide', 'no')}"
         )
         keys = ("Damage", "Range", "MinimumRange", "ROF", "Burst", "Warhead", "Projectile", "Speed")
-        keys += ("LimboLaunch", "RadLevel", "AreaFire", "Suicide")
+        keys += ("LimboLaunch", "RadLevel", "AreaFire", "Suicide", "IsSonic")
         comment = f"[{section_name}] " + ", ".join(
             f"{key}={weapon[key]}" for key in keys if key in weapon
         )
@@ -1184,7 +1186,7 @@ class Data:
     def combat_file(self):
         tables = self.tables
         lines = [
-            "// Combat definitions, schema version 3 (crates/sim/src/combat_defs.rs; PLAN.md sections 5 and",
+            "// Combat definitions, schema version 5 (crates/sim/src/combat_defs.rs; PLAN.md sections 5 and",
             "// 7, M4; docs/RA2_PARITY_PLAN.md sections 4.3, 4.4 and 4.8; docs/DECISIONS.md D28, R32 to R36,",
             "// R46).",
             "//",
@@ -1220,7 +1222,7 @@ class Data:
             "//",
             GENERATED,
             "(",
-            "    schema_version: 4,",
+            "    schema_version: 5,",
             f"    armour_classes: {quoted(ARMOURS)},",
             "    warheads: [",
         ]
@@ -1254,7 +1256,7 @@ class Data:
                 f'(armour: "{armour}", percent: {percent})'
                 for armour, percent in zip(ARMOURS, percents)
             )
-            keys = ('CellSpread', 'PercentAtMax', 'Wall', 'Wood', 'Verses', 'Temporal', 'MindControl', 'PsychicDamage', 'Radiation', 'Parasite', 'IvanBomb', 'BombDisarm', 'ElectricAssault', 'MakesDisguise')
+            keys = ('CellSpread', 'PercentAtMax', 'Wall', 'Wood', 'Verses', 'Temporal', 'MindControl', 'PsychicDamage', 'Radiation', 'Parasite', 'IvanBomb', 'BombDisarm', 'ElectricAssault', 'MakesDisguise', 'Paralyzes', 'Culling')
             comment = f"[{section_name}] " + ", ".join(
                 f"{key}={warhead[key]}" for key in keys if key in warhead
             )
@@ -1271,6 +1273,7 @@ class Data:
                 f"ivan_bomb: {convert('flag', warhead.get('IvanBomb', 'no'))}, "
                 f"bomb_disarm: {convert('flag', warhead.get('BombDisarm', 'no'))}, "
                 f"electric_assault: {convert('flag', warhead.get('ElectricAssault', 'no'))}, "
+                f"paralyzes: {int(warhead.get('Paralyzes', '0'))}, culling: {convert('flag', warhead.get('Culling', 'no'))}, "
                 f"makes_disguise: {convert('flag', warhead.get('MakesDisguise', 'no'))}, "
                 f"versus: [{entries}]), // {comment}"
             )
@@ -1286,6 +1289,7 @@ class Data:
                 ini = item.ini
                 slots, elite = self.carried(item)
                 fired.update(weapon for weapon in slots + elite if weapon)
+                fired.update(v for k,v in ini.items() if k == "DeathWeapon" or re.fullmatch(r"(?:Elite)?Weapon[0-9]+", k))
                 ids = lambda pair: quoted(
                     [tables.weapon_id[weapon] for weapon in pair if weapon]
                 )
@@ -1318,7 +1322,7 @@ class Data:
 
     def arsenal_file(self):
         lines = [
-            "// The arsenal, schema version 6 (crates/sim/src/arsenal.rs; docs/DECISIONS.md R10, R11, R22, R6, R46): per",
+            "// The arsenal, schema version 8 (crates/sim/src/arsenal.rs; docs/DECISIONS.md R10, R11, R22, R6, R46): per",
             "// item its label, description, category, domain and role with the role's terms (durations in ticks,",
             "// 20 per second), the id of the item whose art it shows, its side, the factory group of a",
             "// building, and the terms of the ini's buildability rule: the sides whose factories build it",
@@ -1365,7 +1369,7 @@ class Data:
             "// cash_delay (ProduceCashDelay frames converted to ticks). Missing flags/numbers are 0.",
             "//",
             GENERATED,
-            "(schema_version: 7, entries: [",
+            "(schema_version: 8, entries: [",
         ]
         for table in (self.buildings, self.units):
             for game_id, values in table.items():
@@ -1373,8 +1377,13 @@ class Data:
                 label, description, category, domain, role, cooldown, radius, strength, capacity = (
                     values[:9]
                 )
+                if item.section_name == "NAPSIS":
+                    radius=int(item.ini["PsychicDetectionRadius"])
+                if item.special:
+                    cooldown=convert("minutes",self.tables.value(item.special,"RechargeTime"))
+                    if item.special in ("ParaDropSpecial","AmericanParaDropSpecial"): role="paradrop"; radius=4
                 keys = ["Owner", "RequiredHouses", "ForbiddenHouses", "TechLevel", "Prerequisite"]
-                keys += ["Factory", "Naval"] + list(STOLEN)
+                keys += ["Factory", "Naval", "PsychicDetectionRadius", "SuperWeapon", "BalloonHover"] + list(STOLEN)
                 keys += ["Crewed", "Sensors", "SensorsSight", "NeedsEngineer", "Capturable", "Insignificant", "Immune", "Hospital", "BridgeRepairHut", "Occupier", "CanBeOccupied", "MaxNumberOccupants", "NumberOfDocks", "ProduceCashStartup", "ProduceCashAmount", "ProduceCashDelay"]
                 if item.kind == "unit":
                     keys += ["Crusher", "Crushable", "Size", "Trainable", "VeteranAbilities"]
@@ -1391,14 +1400,14 @@ class Data:
                         raise Failure(f"{game_id}: the category {category} is not its BuildCat")
                     keys += ["BuildCat", "BuildLimit", "Adjacent", "BaseNormal", "Radar", "Wall"]
                     keys += ["Unsellable", "Repairable", "Powered", "UnitRepair", "SuperWeapon"]
-                keys += ['Deployer', 'DeployFire', 'C4', 'CanC4', 'Bombable', 'Spyable', 'DetectDisguise', 'ImmuneToPsionics', 'ImmuneToRadiation', 'Teleporter', 'RequiresStolenAlliedTech', 'RequiresStolenSovietTech', 'Overpowerable', 'UndeployDelay', 'BuildLimit']
+                keys += ['Deployer', 'DeployFire', 'C4', 'CanC4', 'Bombable', 'Spyable', 'DetectDisguise', 'ImmuneToPsionics', 'ImmuneToRadiation', 'Teleporter', 'RequiresStolenAlliedTech', 'RequiresStolenSovietTech', 'Overpowerable', 'UndeployDelay', 'BuildLimit', 'Gunner', 'Explodes', 'DisguiseWhenStill', 'IFVMode', 'DeathWeapon'] + [f'Weapon{n}' for n in range(1,14)]
                 source = item.comment(*keys)
                 if item.infantry_list:
                     source += f"; {item.infantry_list}"
                 if item.kind == "building":
                     if item.special:
                         special = self.tables.section(item.special)
-                        source += f"; {cite(item.special, 'IsPowered', special)}"
+                        source += "; " + "; ".join(cite(item.special,key,special) for key in ("IsPowered","RechargeTime","ShowTimer") if key in special)
                     if item.far_shipyard:
                         source += "; adjacent is the game's own (ra2_differences.tsv)"
                     if item.docks:
@@ -1464,7 +1473,12 @@ class Data:
                     f"stolen_allied: {convert('flag', item.ini.get('RequiresStolenAlliedTech', 'no'))}, "
                     f"stolen_soviet: {convert('flag', item.ini.get('RequiresStolenSovietTech', 'no'))}, "
                     f"overpowerable: {convert('flag', item.ini.get('Overpowerable', 'no'))}, "
-                    f"undeploy_delay: {convert('frames', item.ini['UndeployDelay']) if 'UndeployDelay' in item.ini else 0}),"
+                    f"undeploy_delay: {convert('frames', item.ini['UndeployDelay']) if 'UndeployDelay' in item.ini else 0},"
+                    f"strategic: {int(item.special is not None)}, show_timer: {convert('flag', self.tables.section(item.special).get('ShowTimer','no')) if item.special else 0}, "
+                    f"gunner: {convert('flag', item.ini.get('Gunner', 'no'))}, explodes: {convert('flag', item.ini.get('Explodes', 'no'))}, "
+                    f"disguise_when_still: {convert('flag', item.ini.get('DisguiseWhenStill', 'no'))}, ifv_mode: {item.ini.get('IFVMode', '0')}, "
+                    f'death_weapon: "{self.tables.weapon_id[item.ini["DeathWeapon"]] if "DeathWeapon" in item.ini else (self.tables.weapon_id[item.ini["Primary"]] if convert("flag",item.ini.get("BalloonHover","no")) else "none")}", '
+                    f'ifv_weapons: {quoted([self.tables.weapon_id[item.ini[f"Weapon{n}"]] for n in range(1,14)]) if item.ini.get("Gunner") == "yes" else "[]"}),'
                     f" // {source}"
                 )
         lines.append("])")
@@ -1477,14 +1491,14 @@ class Data:
     def rules_file(self):
         tables = self.tables
         lines = [
-            "// Global rules, schema version 2 (crates/sim/src/rules.rs; docs/RA2_PARITY_PLAN.md sections 3.2",
+            "// Global rules, schema version 3 (crates/sim/src/rules.rs; docs/RA2_PARITY_PLAN.md sections 3.2",
             "// and 4; docs/DECISIONS.md R9, R10, R58): the values of the ruleset that belong to no single unit",
             "// or building, in game units (ticks, 20 per second; subcells, 256 per cell; permille; percent;",
             "// yes and no as 1 and 0). A value without a source is the game's own: the ini has no key for it.",
             "//",
             GENERATED,
             "(",
-            "    schema_version: 2,",
+            "    schema_version: 3,",
         ]
 
         def scalars(group):

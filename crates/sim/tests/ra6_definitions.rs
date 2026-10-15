@@ -22,6 +22,8 @@ fn variant(file: &str, from: &str, to: &str) -> PathBuf {
 fn load(file: &str, path: PathBuf) -> Result<Definitions, sim::DataError> {
     if file == "arsenal.ron" {
         base().with_arsenal(path)
+    } else if file == "rules.ron" {
+        base().with_rules(path)
     } else {
         base().with_combat(path)
     }
@@ -52,6 +54,10 @@ fn ra6_each_new_flag_is_required_bounded_and_hashed() {
                 "stolen_allied",
                 "stolen_soviet",
                 "overpowerable",
+                "explodes",
+                "disguise_when_still",
+                "strategic",
+                "show_timer",
             ],
         ),
         (
@@ -69,6 +75,8 @@ fn ra6_each_new_flag_is_required_bounded_and_hashed() {
                 "area_fire",
                 "naval_only",
                 "suicide",
+                "sonic",
+                "culling",
             ],
         ),
     ] {
@@ -117,6 +125,8 @@ fn ra6_area_fire_one_cell_minimum_is_narrow_and_new_numbers_are_bounded() {
     for (file, field, max) in [
         ("arsenal.ron", "undeploy_delay", 1_000_000),
         ("combat.ron", "rad_level", 10_000),
+        ("combat.ron", "paralyzes", 32767),
+        ("arsenal.ron", "ifv_mode", 12),
     ] {
         let from = format!("{field}: 0");
         assert!(load(file, variant(file, &from, &format!("{field}: {max}"))).is_ok());
@@ -155,4 +165,101 @@ fn ra6_area_fire_one_cell_minimum_is_narrow_and_new_numbers_are_bounded() {
         )
         .is_err()
     );
+}
+
+#[test]
+fn ra6_repair_negative_damage_is_narrow_and_gunner_requires_all_thirteen_modes() {
+    let combat = std::fs::read_to_string(root().join("combat.ron")).unwrap();
+    let repair = combat
+        .lines()
+        .find(|l| l.contains("id: \"repair_bullet\""))
+        .unwrap();
+    assert!(repair.contains("damage: -50"));
+    assert!(
+        load(
+            "combat.ron",
+            variant(
+                "combat.ron",
+                repair,
+                &repair.replace("repair: 1", "repair: 0")
+            )
+        )
+        .is_err()
+    );
+    for damage in [-1, -50, i32::MIN] {
+        let ordinary = combat
+            .lines()
+            .find(|l| l.contains("id: \"prism_shot\""))
+            .unwrap();
+        assert!(
+            load(
+                "combat.ron",
+                variant(
+                    "combat.ron",
+                    ordinary,
+                    &ordinary.replace("damage: 120", &format!("damage: {damage}"))
+                )
+            )
+            .is_err()
+        );
+    }
+    let arsenal = std::fs::read_to_string(root().join("arsenal.ron")).unwrap();
+    let ifv = arsenal.lines().find(|l| l.contains("id: \"ifv\"")).unwrap();
+    assert!(
+        load(
+            "arsenal.ron",
+            variant("arsenal.ron", ifv, &ifv.replace("gunner: 1", "gunner: 0"))
+        )
+        .is_err()
+    );
+    let start = ifv.find("ifv_weapons: [").unwrap();
+    let end = start + ifv[start..].find(']').unwrap();
+    let empty = format!("{}ifv_weapons: []{}", &ifv[..start], &ifv[end + 1..]);
+    assert!(load("arsenal.ron", variant("arsenal.ron", ifv, &empty)).is_err());
+    let disabled = load(
+        "arsenal.ron",
+        variant("arsenal.ron", ifv, &empty.replace("gunner: 1", "gunner: 0")),
+    )
+    .unwrap();
+    assert_ne!(hash(disabled), hash(base()));
+    assert!(
+        load(
+            "arsenal.ron",
+            variant(
+                "arsenal.ron",
+                ifv,
+                &ifv.replace("\"cow_shot\"", "\"missing\"")
+            )
+        )
+        .is_err()
+    );
+}
+#[test]
+fn ra6_strategic_timing_fields_are_required_bounded_and_hashed() {
+    for (field, value) in [("nuclear_flight", 200), ("chrono_freeze", 80)] {
+        let old = format!("{field}: {value},");
+        assert!(matches!(
+            load("rules.ron", variant("rules.ron", &old, ""))
+                .unwrap_err()
+                .kind,
+            DataErrorKind::MissingField
+        ));
+        for value in [0, 72_001] {
+            assert!(
+                load(
+                    "rules.ron",
+                    variant("rules.ron", &old, &format!("{field}: {value},"))
+                )
+                .is_err()
+            );
+        }
+        for value in [1, 72_000] {
+            let d = load(
+                "rules.ron",
+                variant("rules.ron", &old, &format!("{field}: {value},")),
+            )
+            .unwrap();
+            assert_ne!(hash(d), hash(base()));
+        }
+    }
 }

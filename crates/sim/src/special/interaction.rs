@@ -39,7 +39,7 @@ pub(super) fn validate_interaction(
             Ok(())
         }
         _ if repairs_units(defs, b) => {
-            validate_docking(a, b, defs)?;
+            validate_docking(world, a, b, defs)?;
             let capacity = defs.metadata(b.item).map_or(0, |m| m.vehicle_docks);
             if capacity > 0
                 && world
@@ -204,6 +204,10 @@ pub(super) fn interact(
                     experience,
                     bay,
                 });
+            if defs.metadata(b.item).is_some_and(|m| m.gunner) {
+                vehicles::ifv_weapon(world, defs, b);
+                return Ok(());
+            }
             if role(defs, b) == Role::Ifv && role(defs, a) == Role::Engineer {
                 world.entity_mut(b.entity).remove::<Weapon>();
             }

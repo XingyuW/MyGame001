@@ -39,7 +39,10 @@ pub(crate) fn resolve(world: &mut World) {
             let Some(meta) = defs.metadata(a.item) else {
                 continue;
             };
-            if defs.rules().is_some() && infantry::fired(world, &defs, a, b, weapon) {
+            if defs.rules().is_some()
+                && (vehicles::fired(world, &defs, a, b, weapon)
+                    || infantry::fired(world, &defs, a, b, weapon))
+            {
                 continue;
             }
             match meta.role {

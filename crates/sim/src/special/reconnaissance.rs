@@ -10,6 +10,10 @@ pub(crate) fn reconnaissance(world: &mut World) {
     let index = actors(world);
     let players: Vec<_> = world.resource::<Players>().iter().map(|(p, _)| p).collect();
     let mut hidden = BTreeSet::new();
+    world
+        .resource_mut::<SpecialState>()
+        .mirage_trees
+        .retain(|id, _| index.get(id).is_some_and(Actor::alive));
     for a in index.values() {
         let Some(m) = defs.metadata(a.item) else {
             continue;
@@ -37,8 +41,34 @@ pub(crate) fn reconnaissance(world: &mut World) {
                 }
             }
         }
+        let still = m.disguise_when_still
+            && world
+                .get::<Mobile>(a.entity)
+                .is_some_and(|m| m.step.is_none())
+            && world
+                .get::<Orders>(a.entity)
+                .is_some_and(|o| o.current.is_none());
+        if still
+            && !world
+                .resource::<SpecialState>()
+                .mirage_trees
+                .contains_key(&a.id)
+        {
+            let variant = (world.resource_mut::<crate::SimRng>().next_u32() % 4) as u8;
+            world
+                .resource_mut::<SpecialState>()
+                .mirage_trees
+                .insert(a.id, variant);
+        } else if !still {
+            world
+                .resource_mut::<SpecialState>()
+                .mirage_trees
+                .remove(&a.id);
+        }
         let concealed = m.role == Role::Spy
-            || (m.role == Role::Mirage
+            || still
+            || (!m.disguise_when_still
+                && m.role == Role::Mirage
                 && world
                     .get::<Orders>(a.entity)
                     .is_some_and(|o| o.current.is_none())
@@ -55,12 +85,14 @@ pub(crate) fn reconnaissance(world: &mut World) {
                         && b.alive()
                         && (b.foot.is_none() || powered(world, &defs, b))
                         && (defs.rules().is_none()
-                            || m.role != Role::Spy
+                            || (m.role != Role::Spy && !m.disguise_when_still)
                             || defs.metadata(b.item).is_some_and(|m| m.detect_disguise))
                         && near(
                             a.cell,
                             b.cell,
-                            if defs.rules().is_some() && m.role == Role::Spy {
+                            if defs.rules().is_some()
+                                && (m.role == Role::Spy || m.disguise_when_still)
+                            {
                                 world.get::<crate::Sight>(b.entity).map_or(0, |s| s.0)
                             } else if role(&defs, b) == Role::Dog
                                 || (role(&defs, b) == Role::Sensor && powered(world, &defs, b))

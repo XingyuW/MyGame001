@@ -808,6 +808,7 @@ type BuildingQuery<'w, 's> = Query<
 // candidate set after release/undeploy, without retaining a stale wave assignment.
 fn army_commandable(special: &crate::SpecialState, id: SimId) -> bool {
     !special.spawned.contains_key(&id)
+        && !special.strategic.flights.contains_key(&id)
         && !special.erasures.contains_key(&id)
         && !special.deployed.contains_key(&id)
 }
