@@ -1360,3 +1360,115 @@ fn ra6_hidden_strategic_sources_do_not_disclose_type_through_legacy_unit_argumen
         );
     }
 }
+
+#[test]
+fn ra6_ifv_psi_pulse_attacks_from_vehicle_with_immunity_and_reload() {
+    let mut app = world();
+    let ifv = put(&mut app, P0, "ifv", 8, 8);
+    let passenger = put(&mut app, P0, "yuri", 9, 8);
+    steps(&mut app, 1);
+    assert!(rejected(&interact(&mut app, passenger, ifv)).is_empty());
+    // Friendly infantry alone must not trigger autonomous fire.
+    let friend = put(&mut app, P0, "gi", 7, 8);
+    let e = entity(&mut app, friend).unwrap();
+    app.world_mut().entity_mut(e).remove::<sim::Weapon>();
+    steps(&mut app, 2);
+    let before = hp(&mut app, friend);
+    assert_eq!(before, 125);
+    let outside_range = put(&mut app, P1, "conscript", 6, 8);
+    let e = entity(&mut app, outside_range).unwrap();
+    app.world_mut().entity_mut(e).remove::<sim::Weapon>();
+    set_hp(&mut app, outside_range, 2000);
+    let events = tick(&mut app, vec![]);
+    assert!(
+        !events
+            .iter()
+            .any(|e| matches!(e, SimEvent::WeaponFired { attacker, .. } if *attacker == ifv))
+    );
+    assert_eq!(hp(&mut app, outside_range), 2000);
+    let target = put(&mut app, P1, "conscript", 9, 8);
+    let immune = put(&mut app, P1, "yuri", 8, 9);
+    // Remove return fire in this timing fixture; all weapon and armour definitions
+    // remain the shipped definitions.
+    for id in [friend, target, immune] {
+        let e = entity(&mut app, id).unwrap();
+        app.world_mut().entity_mut(e).remove::<sim::Weapon>();
+    }
+    // High health isolates reload timing from normal lethal infantry damage.
+    set_hp(&mut app, target, 2000);
+    let events = attack(&mut app, ifv, target);
+    assert!(rejected(&events).is_empty(), "{events:?}");
+    assert!(
+        events
+            .iter()
+            .any(|e| matches!(e, SimEvent::WeaponFired { attacker, .. } if *attacker == ifv))
+    );
+    assert!(hp(&mut app, target) < 2000);
+    assert!(hp(&mut app, outside_range) < 2000);
+    assert_eq!(hp(&mut app, immune), 100);
+    // The opposite side of the IFV is inside the pulse too, proving vehicle origin.
+    assert!(entity(&mut app, friend).is_none() || hp(&mut app, friend) < before);
+    let after = hp(&mut app, target);
+    steps(&mut app, 12);
+    assert_eq!(hp(&mut app, target), after);
+    steps(&mut app, 1);
+    assert!(hp(&mut app, target) < after);
+    set_hp(&mut app, target, 1);
+    steps(&mut app, 13);
+    assert!(entity(&mut app, target).is_none());
+    let e = entity(&mut app, ifv).unwrap();
+    assert!(app.world().get::<sim::Experience>(e).unwrap().value >= 100);
+}
+
+#[test]
+fn ra6_ifv_temporal_and_suicide_modes_execute_on_attack() {
+    for passenger in ["chrono_legionnaire", "crazy_ivan", "terrorist"] {
+        let mut app = world();
+        let ifv = put(&mut app, P0, "ifv", 8, 8);
+        let p = put(&mut app, P0, passenger, 9, 8);
+        steps(&mut app, 1);
+        assert!(rejected(&interact(&mut app, p, ifv)).is_empty());
+        let target = put(&mut app, P1, "rhino", 9, 8);
+        let before = hp(&mut app, target);
+        let events = attack(&mut app, ifv, target);
+        assert!(rejected(&events).is_empty(), "{passenger}: {events:?}");
+        if passenger == "chrono_legionnaire" {
+            assert!(
+                app.world()
+                    .resource::<sim::SpecialState>()
+                    .erasures
+                    .contains_key(&target)
+            );
+            // Rhino Strength400 * 10 / floor(CRNeutronRifle10 * 3/4): 572 ticks.
+            steps(&mut app, 570);
+            assert!(entity(&mut app, target).is_some());
+            steps(&mut app, 1);
+            assert!(entity(&mut app, target).is_none());
+            assert!(entity(&mut app, ifv).is_some());
+        } else {
+            assert!(entity(&mut app, ifv).is_none(), "{passenger}");
+            assert!(
+                entity(&mut app, target).is_none() || hp(&mut app, target) < before,
+                "{passenger}"
+            );
+        }
+    }
+}
+
+#[test]
+fn ra6_gunner_area_fire_does_not_enable_yuri_automatic_deploy_pulse() {
+    let mut app = world();
+    let yuri = put(&mut app, P0, "yuri", 8, 8);
+    let immune = put(&mut app, P1, "yuri", 9, 8);
+    let e = entity(&mut app, immune).unwrap();
+    app.world_mut().entity_mut(e).remove::<sim::Weapon>();
+    for _ in 0..80 {
+        let events = tick(&mut app, vec![]);
+        assert!(
+            !events
+                .iter()
+                .any(|e| matches!(e, SimEvent::WeaponFired { attacker, .. } if *attacker == yuri))
+        );
+    }
+    assert_eq!(hp(&mut app, immune), 100);
+}

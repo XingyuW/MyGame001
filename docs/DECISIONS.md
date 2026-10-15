@@ -4766,3 +4766,53 @@ The final security/repair target run passes50 tests (21 command +29 vehicle/SW),
 strict workspace Clippy, formatting, diff hygiene and generator/reference checks pass.
 All prior failure logs remain under `validation/ra2-parity/ra6b-*`. This is preflight evidence;
 full frozen-source gate results follow separately, including soak and both756-match sweeps.
+
+## R82 — RA6 gunner AreaFire execution and interrupted gate (2026-10-15)
+
+The first RA6 gate on041b1fc was deliberately stopped during command4 compilation after
+commands1–3 passed. Root inspection found that mode8 selected CRMindControl correctly, but
+`combat::weapon_against` rejected every AreaFire weapon. Mapping-only mode coverage therefore
+did not establish firing behavior. Its incomplete logs remain in `validation/ra2-parity/ra6-attempt1`;
+this attempt is not a completed gate. No long duel sweep from that attempt was started.
+
+The combat selector now permits AreaFire only for an actor whose reference metadata says
+Gunner. Normal hostile acquisition, range, cooldown, veterancy and RA3 source credit apply.
+The blast originates at the vehicle, has no direct-target override, and uses PsiPulse's
+ordinary psychic damage, armour, immunity and friendly-fire rules. It does not control units.
+Yuri's non-gunner deploy-only secondary remains excluded from automatic fire. This follows
+[ModEnc AreaFire](https://modenc.renegadeprojects.com/AreaFire), which describes detonation at
+the firer's cell and the infantry deployment limitation. No schema or generated-data change
+is necessary. The Chronosphere first-click hint now explicitly names the3x3 source area.
+
+New command/schedule tests `ra6_ifv_psi_pulse_attacks_from_vehicle_with_immunity_and_reload`
+and `ra6_gunner_area_fire_does_not_enable_yuri_automatic_deploy_pulse` exercise actual pulse
+fire, one-cell acquisition versus two-cell non-acquisition, vehicle-centred splash, no friendly
+acquisition, immune Yuri, source XP,13-tick reload and the infantry negative case.
+`ra6_ifv_temporal_and_suicide_modes_execute_on_attack` exercises living modes7/10/11:
+actual CRNuke/CRMakeup suicide attacks and the exact572-tick Rhino erasure
+(Strength400*10 divided by floor(Damage10*3/4)). These supplement selection/unload tests,
+not replace them. Pulse timing fixtures remove return-fire Weapon components and raise the
+victim's HP explicitly while keeping shipped definitions. Initial failures from return fire
+and too-short Temporal observation windows are retained in `ra6b-ifv-pulse-fix1/2.log`;
+the corrected focused cases pass in `ra6b-ifv-pulse-fix3.log`. No existing test assertion was
+weakened or removed. The combined acceptance ledger now distinguishes mapping and execution.
+
+Sonic confidence clarification: [ModEnc IsSonic](https://modenc.renegadeprojects.com/IsSonic)
+documents a20-frame persistent wave and repeated damage, but labels its damage analysis as
+Yuri's Revenge executable behavior and warns other games can differ. Vanilla RA2 lifetime,
+path coverage and accumulation have not been established here. The4/8-per-shot implementation
+remains an explicitly recorded approximation, not a claim that no wave reference exists or
+that vanilla persistent-wave parity has been achieved.
+
+R82 integration preflight passes125 tests,0 failed,0 ignored across `ra6_vehicles`,
+`ra6_infantry`, `ra1_commands`, `ra3_damage`, untouched `m9_arsenal` and `m11_repair`.
+The first integration log also preserves a range-fixture failure caused by its friendly GI
+shooting the distant victim before return fire was disabled; the corrected fixture disables
+that Weapon before the observation, and retains the exact2000-HP negative assertion.
+
+R82 client/lint preflight: strict workspace Clippy passes; the game binary's208 tests and
+six core integration tests pass. `ra6b-ifv-client.log` preserves an invalid `--lib` invocation
+(the package is a binary). The corrected package-wide invocation's partial log is retained
+as `ra6b-ifv-client2.log`: it was stopped during the unchanged multiplayer integration after
+recognizing that it would duplicate the forthcoming full production sweep. It is not claimed
+as a complete package test pass. The final frozen gate runs all workspace tests without filters.

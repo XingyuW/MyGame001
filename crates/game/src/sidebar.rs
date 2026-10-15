@@ -512,7 +512,7 @@ pub fn mode_text(mode: InterfaceMode, paused: bool, definitions: Option<&Definit
         }
         InterfaceMode::ChronoDestination(..) => "Chronosphere: choose a visible destination for the 3 x 3 source area. Esc cancels.".into(),
         InterfaceMode::Strategic(_) => {
-            "Strategic ability: click a visible target. Esc cancels.".into()
+            "Strategic ability: click a visible target. Chronosphere: choose the 3 x 3 source first. Esc cancels.".into()
         }
         InterfaceMode::Normal => {
             "Left: select   Right: order\nS stop  A attack-move  Ctrl+0-9 group".into()

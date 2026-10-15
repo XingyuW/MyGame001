@@ -1206,7 +1206,7 @@ left intact. No /tmp build outputs, clones or worktrees were created.
 Implementation is complete enough for final preflight; the full thirteen-command RA6 gate
 is **pending**, including the required soak. No independent review is claimed.
 [Combined RA6 acceptance ledger](validation/ra2-parity/RA6_ACCEPTANCE.md) maps every gap9 row
-to exact tests or an explicit remaining difference. R80–R81 document mechanics and every
+to exact tests or an explicit remaining difference. R80–R82 document mechanics and every
 existing-test expectation migration. Arsenal8/combat5/rules3 and all fixtures are migrated;
 shipped arsenal is164,206 bytes under the unchanged192 KiB preparse bound.
 
@@ -1214,7 +1214,9 @@ Vehicle/structure/SW mechanics include capped Prism chains, per-observer Mirage 
 identity-preserving parasites/blocked exits, full IFV modes, ordered source-bearing death
 chains, explicit Chronosphere source/destination, Curtain, delayed nuclear/storm payloads,
 AA-vulnerable paradrop aircraft, ported recharge/power behavior and location-free public
-warnings/timers with owner-only readiness. Failed preflight logs are preserved.
+warnings/timers with owner-only readiness. Failed preflight logs are preserved. R82 corrects
+IFV mode8 AreaFire execution and adds actual mode7/8/10/11 firing coverage; the first gate
+was stopped before long sweeps and retained as `ra6-attempt1` (commands1–3 passed).
 
 R80's Sonic per-shot, cloud-lifetime and landing/exit approximations remain explicit. R76's
 first-spawn Spy/cloak risk belongs to RA7; paid-production-only veterancy and RA5 bridge/AI

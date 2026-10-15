@@ -1,7 +1,7 @@
 # Combined RA6 acceptance ledger
 
 Implementation evidence; the final full thirteen-command RA6 gate is pending. This is not an
-independent review. R71–R81 explain schemas, production paths, migrations and assumptions.
+independent review. R71–R82 explain schemas, production paths, migrations and assumptions.
 Tests use CommandQueue + SimSchedule with shipped definitions unless explicitly labeled as a
 fixture. Scenario setup may set HP, rank, timing, terrain or ownership to reach a boundary.
 The [RA6-A ledger](RA6A_ACCEPTANCE.md) retains exact positive/negative/boundary names for its
@@ -26,7 +26,7 @@ prefix are in `crates/sim/tests/ra6_vehicles.rs`; `A` means the linked RA6-A led
 | Yuri | A ownership chain/release/immunity/PsiWave and repeated-deploy cooldown. IFV mode8 uses CRMindControl area damage, not unit mind control. |
 | Desolator | A deployed radiation, immune targets, diagonal decay, exact edge/expiry, overlap cap and mutation evidence. IFV mode9 beam is ported. |
 | Terror Drone and Squid | `ra6_drone_enters_then_ticks_and_exits_only_on_its_own_kill`, `ra6_drone_infantry_bite_and_protected_vehicle_negative`, `ra6_drone_blocked_escape_retries_with_identity_hp_and_experience`, `ra6_squid_culls_on_the_crossing_hit_and_cannot_cull_through_curtain`, `ra6_squid_prevents_motion_but_ship_keeps_its_weapon`, `ra6_dolphin_sonic_hit_releases_squid_without_killing_it`, depot/repair IFV test. Exact80/132 intervals and elite threshold; long-game attached-owner survival in `match_setup::ra6_parasite_tests`. |
-| IFV | `ra6_ifv_uses_reference_modes_and_restores_empty_missiles` covers shipped passenger modes0–11 and unloading; `ra6_ifv_mode_twelve_uses_cow_shot_with_an_independent_mode_fixture` covers12 (cow absent from representative roster). `ra6_repair_ifv_reaches_diagonal_but_not_two_cells_and_obeys_reload` covers1.8-cell range and107-tick cadence. Independent audit verifies all thirteen normal/elite source entries. |
+| IFV | `ra6_ifv_uses_reference_modes_and_restores_empty_missiles` covers shipped passenger modes0–11 and unloading; `ra6_ifv_mode_twelve_uses_cow_shot_with_an_independent_mode_fixture` covers12 (cow absent from representative roster). `ra6_repair_ifv_reaches_diagonal_but_not_two_cells_and_obeys_reload` covers1.8-cell range and107-tick cadence. `ra6_ifv_psi_pulse_attacks_from_vehicle_with_immunity_and_reload` verifies actual mode8 firing/range/immunity/source/reload; `ra6_gunner_area_fire_does_not_enable_yuri_automatic_deploy_pulse` preserves infantry deploy-only behavior; `ra6_ifv_temporal_and_suicide_modes_execute_on_attack` executes modes7/10/11. Independent audit verifies all thirteen normal/elite source entries. |
 | Nuclear Reactor | `ra6_reactor_chain_radiation_and_temporal_suppression`; ordered chain, 600NUKE/rad500 and erased-reactor suppression. Ivan IFV, Demo Truck and Kirov death cases cover transport cargo loss/crash dispatch. |
 | Chronosphere | `ra6_chronosphere_square_moves_both_owners_kills_organic_and_preserves_offsets`, `ra6_chronosphere_rejects_unseen_area_and_kills_bad_or_occupied_landings`; 3x3 edge, enemy ownership, offsets, wrong terrain/occupancy and I6'. `ra1_commands` matrix and `ra4_shipped::the_chronosphere_does_not_move_a_launched_rocket` retain hidden/missing and launched-unit restrictions. Two-click client uses explicit source/destination;80-tick freeze. |
 | Iron Curtain | `ra6_curtain_covers_both_owners_kills_infantry_and_expires_at_1000`, `ra6_shipped_curtain_death_prevents_later_same_tick_infantry_command`; any owner, area edge, organic death, exact expiry. |
@@ -42,7 +42,7 @@ inventories, unchanged `m9_arsenal`/`m11_repair`, shipped specialist transport c
 and the expanded `ra1_commands` matrix. R80–R81 list every intended existing-test migration.
 
 Remaining precise differences: persistent Sonic wave frame accumulation is not modeled
-(source4/8 damage applied once per shot); no parachute fall/plane exit animation; Storm cloud
+(source4/8 damage applied once per shot; ModEnc describes20-frame YR behavior, but vanilla RA2 accumulation is not established; R82); no parachute fall/plane exit animation; Storm cloud
 lifetime uses13 ticks; representative cow roster omission is covered with an explicit mode12
 fixture; original turret/tree/beam/audio presentation requires user verification. R67 naval
 bridge-repair refusal and RA6-A documented assumptions remain. Broader RA7 vision/AI and

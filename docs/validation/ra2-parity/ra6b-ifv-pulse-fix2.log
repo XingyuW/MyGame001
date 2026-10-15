@@ -1,0 +1,22 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 1.99s
+     Running tests/ra6_vehicles.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra6_vehicles-dcf06dc108fcbc82)
+
+running 4 tests
+test ra6_ifv_mode_twelve_uses_cow_shot_with_an_independent_mode_fixture ... ok
+test ra6_ifv_psi_pulse_attacks_from_vehicle_with_immunity_and_reload ... ok
+
+thread 'ra6_ifv_temporal_and_suicide_modes_execute_on_attack' (2544054) panicked at crates/sim/tests/ra6_vehicles.rs:1423:13:
+assertion failed: entity(&mut app, target).is_none()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra6_ifv_temporal_and_suicide_modes_execute_on_attack ... FAILED
+test ra6_ifv_uses_reference_modes_and_restores_empty_missiles ... ok
+
+failures:
+
+failures:
+    ra6_ifv_temporal_and_suicide_modes_execute_on_attack
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 27 filtered out; finished in 0.07s
+
+error: test failed, to rerun pass `-p sim --test ra6_vehicles`
