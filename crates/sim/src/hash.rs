@@ -132,6 +132,9 @@ pub fn state_hash(world: &mut World) -> u64 {
             }
         }
     }
+    world
+        .resource::<crate::TacticalState>()
+        .hash_into(&mut hasher);
     world.resource::<Grid>().hash_into(&mut hasher);
     world.resource::<Definitions>().hash_into(&mut hasher);
     world.resource::<Players>().hash_into(&mut hasher);

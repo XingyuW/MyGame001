@@ -1258,6 +1258,41 @@ The cache remains useful, including the app/archive under its existing `package/
 `main` remains8230a95. Root must check this closure before releasing
 RA7; no review or approval tag was created.
 
+## RA7: vision, tactical commands, interface and announcements (2026-10-15)
+
+Implementation complete; final frozen validation pending. R84–R85 and the
+[RA7 acceptance ledger](validation/ra2-parity/RA7_ACCEPTANCE.md) map scope to exact positive,
+negative and boundary tests. This entry does not claim independent review or approval.
+
+Actual match/lobby fog defaults OFF: explored normal enemies remain visible to rendering,
+commands, targeting and AI; explicit fog ON retains current-sight behavior. Spy/submarine/
+Mirage concealment remains independent. Powered hostile Gap radius10 restores shroud each
+tick, local sight counters it, powered Sensor radius15 detects disguises and exposes hostile
+orders aimed inside its area, and Satellite reveals outside hostile Gaps. First-spawn Spy/
+cloak and actual paid production concealment now refresh before commands/combat; live/powered
+and same-tick sold/dead detector boundaries are protected.
+
+Guard, Scatter, Follow, ForceFire, ForceMove and bounded QueueMove orders validate and hash
+state. ForceFire uses ordinary weapon/reload/warhead/ammo/launcher/source-credit paths with
+fixed ground aim; Follow forgets concealed targets. Guard range uses the explicit reference
+field or the documented primary-weapon fallback. Replacement, boarding, deploy and teleport
+clear tactical state. The complete actor/target missing/unseen/concealed/dead matrix extends
+ra1_commands. Arsenal9 adds required bounded guard_range, migrates every fixture and remains
+165,940 bytes under the unchanged192KiB limit; all shipped data is generator-produced and
+independently audited.
+
+RA2 key bindings, four bookmarks and Mac secondary keys, cursor labels/context right click,
+selection/camera commands and a prominent README old→new table are implemented. Hidden true
+Spy identities are excluded from enemy cursors while their friendly disguise remains drawn.
+Thirteen original synthesized motifs with text cover production, funds/power/radar, losses/
+base attack and strategic readiness/launch. Announcements are bounded and rate limited.
+
+All earlier failed/partial preflight and mutation logs are preserved in
+`validation/ra2-parity/ra7-preflight`. Visual/audio/play feel requires user verification;
+RA8's broader AI/performance scope and RA9's R83 transport-size/loaded-boarding/Squid firing
+obligations remain open. Existing RA5/RA6 assumptions remain. No new substantial external
+directory, clone or worktree was created; configured Cargo/UV/PIP caches are preserved.
+
 ## Repair, aircraft overflight, new music and distinct silhouettes (2026-10-06)
 
 Working-tree follow-up (decisions: "Building repair, aircraft overflight, readable silhouettes"

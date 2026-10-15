@@ -8,8 +8,8 @@
 //! | Right click on an item | `CancelProduction` of the item (if one is queued) |
 //! | Tabs, or `Tab` | show the buildings or the units |
 //! | Sell, Repair, Rally | sell mode, repair mode, rally mode (`crate::construction`) |
-//! | Pause, or `P` | pause or resume (`crate::sim_host::CommandSink`) |
-//! | Volume buttons, `-`, `=`, `M` | master, music, and effects volume, mute (`crate::audio`) |
+//! | Pause, `Pause`, `F9`, or backslash | pause or resume (`crate::sim_host::CommandSink`) |
+//! | Volume buttons, `-`, `=`, `F10`, apostrophe | master, music, and effects volume, mute (`crate::audio`) |
 //!
 //! Since RA1 a tab lists, as Red Alert 2 shows a cameo, only the items that some building the
 //! player owns could build ([`item_listed`]): the player owns a factory of the item's kind and
@@ -503,7 +503,7 @@ pub fn power_text(state: Option<&PlayerState>) -> String {
 /// The hint for the current mode.
 pub fn mode_text(mode: InterfaceMode, paused: bool, definitions: Option<&Definitions>) -> String {
     if paused {
-        return "Paused: press P or Pause to resume".into();
+        return "Paused: Pause / F9 / \u{005c} to resume".into();
     }
     match mode {
         InterfaceMode::Interact => {
@@ -1238,6 +1238,9 @@ fn sidebar_input(
     for key in pressed_hotkeys(&keys) {
         effects.push(match key {
             Hotkey::NextTab => SidebarEffect::Tab(tab.next()),
+            Hotkey::Tab(n) => SidebarEffect::Tab(
+                [Tab::Buildings, Tab::Armory, Tab::Infantry, Tab::Vehicles][usize::from(n).min(3)],
+            ),
             Hotkey::Pause => SidebarEffect::TogglePause,
             Hotkey::VolumeDown => SidebarEffect::Volume(Channel::Master, false),
             Hotkey::VolumeUp => SidebarEffect::Volume(Channel::Master, true),

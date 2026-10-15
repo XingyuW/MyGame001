@@ -157,12 +157,21 @@ pub struct Sight(pub u32);
 /// A combat order of a unit.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum AttackOrder {
+    ForceFire {
+        target: crate::ForceTarget,
+    },
     /// Attack `target` until it is destroyed or no longer visible. `chases` counts the moves
     /// toward it since the unit last fired.
-    Attack { target: SimId, chases: u8 },
+    Attack {
+        target: SimId,
+        chases: u8,
+    },
     /// Move to `destination`, fighting visible enemies in range on the way. `moving` is set while
     /// the move order toward the destination that this order gave is under way.
-    AttackMove { destination: CellPos, moving: bool },
+    AttackMove {
+        destination: CellPos,
+        moving: bool,
+    },
 }
 
 /// The weapons of a unit or building, and what it does with them.
@@ -227,6 +236,20 @@ impl Weapon {
         }
         match self.order {
             None => hasher.write(&[0]),
+            Some(AttackOrder::ForceFire { target }) => {
+                hasher.write(&[3]);
+                match target {
+                    crate::ForceTarget::Cell(c) => {
+                        hasher.write(&[0]);
+                        hasher.write(&c.x.to_le_bytes());
+                        hasher.write(&c.y.to_le_bytes());
+                    }
+                    crate::ForceTarget::Entity(id) => {
+                        hasher.write(&[1]);
+                        hasher.write_u32(id.0);
+                    }
+                }
+            }
             Some(AttackOrder::Attack { target, chases }) => {
                 hasher.write(&[1]);
                 hasher.write_u32(target.0);
@@ -1108,6 +1131,7 @@ impl Choice<'_> {
 
 /// Everything an attacker needs to know in the tick.
 struct Field<'a> {
+    tactics: &'a crate::TacticalState,
     targets: &'a BTreeMap<SimId, Target>,
     props: &'a crate::Props,
     players: &'a Players,
@@ -1336,7 +1360,7 @@ impl Field<'_> {
                 air,
                 warhead: def.warhead,
                 damage: def.damage,
-                direct: (!scattered).then_some(target_id),
+                direct: (!scattered && target_id != SimId(u32::MAX)).then_some(target_id),
                 firepower_pm: arms.firepower_pm,
                 source: Some(id),
             });
@@ -1352,7 +1376,7 @@ impl Field<'_> {
             weapon: choice.kind,
             origin: from.centre(),
             aim,
-            scattered,
+            scattered: scattered || target_id == SimId(u32::MAX),
             air,
             flight,
             remaining: flight,
@@ -1376,6 +1400,7 @@ pub(crate) fn combat(
     mut attackers: AttackerQuery,
     mut props: ResMut<crate::Props>,
     mut special: ResMut<crate::SpecialState>,
+    tactics: Res<crate::TacticalState>,
     mut kills: ResMut<crate::veterancy::Kills>,
 ) {
     if attackers.is_empty() && projectiles.is_empty() {
@@ -1491,6 +1516,7 @@ pub(crate) fn combat(
     let mut prism_supporters = BTreeSet::new();
     let mut already_fired = BTreeSet::new();
     let field = Field {
+        tactics: &tactics,
         targets: &index,
         props: &props,
         players: &players,
@@ -2123,7 +2149,103 @@ fn act_unit(
         weapon.target = None;
         return;
     }
+    if weapon.order.is_none()
+        && matches!(
+            field.tactics.orders.get(&id),
+            Some(crate::TacticalOrder::Guard { .. })
+        )
+    {
+        weapon.target = None;
+        return;
+    }
     match weapon.order {
+        Some(AttackOrder::ForceFire { target }) => {
+            let (target_id, found) = match target {
+                crate::ForceTarget::Entity(target) => {
+                    let Some(found) = field.target(target).filter(|t| {
+                        (t.owner == Some(owner)
+                            || field.vision(owner).is_some_and(|v| t.body.seen_by(v)))
+                            && !field.special.hidden.contains(&(owner, target))
+                    }) else {
+                        weapon.clear();
+                        orders.current = None;
+                        return;
+                    };
+                    (target, found)
+                }
+                crate::ForceTarget::Cell(cell) => (
+                    SimId(u32::MAX),
+                    Target {
+                        entity: None,
+                        owner: None,
+                        extent: Extent::point(SubPos::centre_of(cell)),
+                        body: Body::Prop(cell),
+                        traits: TargetTraits::default(),
+                        armour_pm: 1000,
+                        item: None,
+                    },
+                ),
+            };
+            let Some(choice) = field.choose(arms, &found.traits) else {
+                weapon.clear();
+                return;
+            };
+            let (dx, dy) = from.gap(&found.extent);
+            if choice.covers(dx, dy) {
+                weapon.target = Some(target_id);
+                orders.current = None;
+                fire_if_ready(
+                    field,
+                    shots,
+                    rng,
+                    (id, owner, from),
+                    weapon,
+                    arms,
+                    &choice,
+                    target_id,
+                    &found,
+                );
+            } else {
+                // Ordinary legal firing-position search: back away from MinimumRange and
+                // reserve enough room for each promised vehicle or infantry spot.
+                let on_foot = field.grid.is_on_foot(id);
+                let fires_from = |point| {
+                    let (dx, dy) = Extent::point(point).gap(&found.extent);
+                    choice.covers(dx, dy)
+                };
+                let reachable = |cell| {
+                    if on_foot {
+                        (0..SPOTS_PER_CELL as u8)
+                            .all(|spot| fires_from(SubPos::spot_of(cell, spot)))
+                    } else {
+                        fires_from(SubPos::centre_of(cell))
+                    }
+                };
+                if orders
+                    .current
+                    .as_ref()
+                    .is_some_and(|o| reachable(o.destination))
+                {
+                    return;
+                }
+                let view = field.grid.navigation_for(field.grid.domain_of(id));
+                let needed = Grid::room_needed(on_foot);
+                let destination = nearest_cell(&view, mobile.next_centre(), |cell| {
+                    view.room(cell, on_foot, |holder| holder != id)
+                        .saturating_sub(shots.chase_cells.get(&cell).copied().unwrap_or(0))
+                        >= needed
+                        && reachable(cell)
+                });
+                if let Some(cell) = destination {
+                    let promised = shots.chase_cells.entry(cell).or_default();
+                    *promised = promised.saturating_add(needed);
+                    orders.current = Some(MoveOrder::new(cell, field.tick));
+                } else {
+                    weapon.clear();
+                    orders.current = None;
+                }
+            }
+        }
         Some(AttackOrder::Attack { target, chases }) => {
             let end = |weapon: &mut Weapon, shots: &mut Shots, reason| {
                 weapon.clear();

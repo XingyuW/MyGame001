@@ -1,0 +1,57 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+warning: unused import: `Owner`
+ --> crates/sim/tests/ra7_vision.rs:7:77
+  |
+7 |     Cell, CellPos, Command, CommandQueue, Definitions, Grid, IssuedCommand, Owner, PlayerId,
+  |                                                                             ^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `hp` is never used
+  --> crates/sim/tests/ra7_vision.rs:92:4
+   |
+92 | fn hp(app: &mut App, id: SimId) -> i32 {
+   |    ^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `at` is never used
+   --> crates/sim/tests/ra7_vision.rs:112:4
+    |
+112 | fn at(app:&mut App,id:SimId)->CellPos { let e=entity(app,id).expect("unit");app.world().get::<sim::Mobile>(e).expect("mobile").cell }
+    |    ^^
+
+warning: `sim` (test "ra7_vision") generated 3 warnings (run `cargo fix --test "ra7_vision" -p sim` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 14.51s
+     Running tests/ra7_vision.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra7_vision-43172b1ea6252b0f)
+
+running 7 tests
+test ra7_new_cloaked_sub_is_hidden_before_automatic_first_combat ... ok
+test ra7_new_spy_is_concealed_before_first_combat_and_command ... ok
+test ra7_sensor_detects_spy_at_fifteen_but_not_sixteen_and_needs_power ... FAILED
+test ra7_psychic_order_boundary_power_death_and_special_concealment ... FAILED
+test ra7_gap_restores_circle_shroud_every_tick_but_local_sight_and_allies_counter_it ... ok
+test ra7_explored_enemy_is_known_with_fog_off_but_hidden_with_fog_on ... ok
+test ra7_paid_spy_production_is_concealed_before_automatic_spawn_tick_fire ... ok
+
+failures:
+
+---- ra7_sensor_detects_spy_at_fifteen_but_not_sixteen_and_needs_power stdout ----
+
+thread 'ra7_sensor_detects_spy_at_fifteen_but_not_sixteen_and_needs_power' (2926893) panicked at crates/sim/tests/ra7_vision.rs:151:126:
+assertion failed: app.world().resource::<sim::SpecialState>().hidden.contains(&(P0, a))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- ra7_psychic_order_boundary_power_death_and_special_concealment stdout ----
+
+thread 'ra7_psychic_order_boundary_power_death_and_special_concealment' (2926892) panicked at crates/sim/tests/ra7_vision.rs:143:217:
+assertion failed: sim::psychic_orders(app.world(), P0).is_empty()
+
+
+failures:
+    ra7_psychic_order_boundary_power_death_and_special_concealment
+    ra7_sensor_detects_spy_at_fifteen_but_not_sixteen_and_needs_power
+
+test result: FAILED. 5 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+error: test failed, to rerun pass `-p sim --test ra7_vision`

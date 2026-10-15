@@ -6,12 +6,12 @@
 //! | Input | Effect |
 //! |-------|--------|
 //! | Sidebar: a ready building, or `B` | placement mode: a preview of the building follows the cursor, green where `PlaceBuilding` would be accepted and red where it would be rejected; a left click on a green footprint places it (`PlaceBuilding`) |
-//! | Sidebar: Sell, or `X` | sell mode: a left click on one of the player's buildings sells it (`SellBuilding`); the mode stays until it is left |
+//! | Sidebar: Sell, or `L` | sell mode: a left click on one of the player's buildings sells it (`SellBuilding`); the mode stays until it is left |
 //! | Sidebar: Repair, or `K` | repair mode: a left click on one of the player's buildings starts repairing it, or stops (`RepairBuilding`); the mode stays until it is left |
 //! | Sidebar: Rally | rally mode: a left click on a cell makes it the rally point of every unit-producing building of the player (`SetRallyPoint`) |
 //! | Right click or `Escape` in a mode | leaves the mode |
 //! | `Delete` or `Backspace` | `SellBuilding` of the player's building under the cursor |
-//! | `R` | `SetRallyPoint` of every unit-producing building of the player, to the cell under the cursor |
+//! | `Y` | `SetRallyPoint` of every unit-producing building of the player, to the cell under the cursor |
 //!
 //! The production queue itself is driven from the sidebar (`crate::sidebar`), which uses
 //! [`production_menu`] and [`menu_command`]. As in `crate::selection`, the decisions are pure
@@ -882,6 +882,12 @@ mod tests {
                 Command::SetRallyPoint { .. } => "SetRallyPoint",
                 Command::Attack { .. } => "Attack",
                 Command::AttackMove { .. } => "AttackMove",
+                Command::Guard { .. } => "Guard",
+                Command::Scatter { .. } => "Scatter",
+                Command::Follow { .. } => "Follow",
+                Command::ForceFire { .. } => "ForceFire",
+                Command::ForceMove { .. } => "ForceMove",
+                Command::QueueMove { .. } => "QueueMove",
             });
         }
         assert_eq!(variants.len(), 15, "{variants:?}");

@@ -556,9 +556,20 @@ fn bays(world: &mut World, defs: &Definitions, index: &BTreeMap<SimId, Actor>, t
         }
         bay.wait = bay.wait.saturating_sub(1);
         // It launches at a target only while it keeps that target.
-        let keeps = world
+        let ground = world
             .get::<Weapon>(a.entity)
-            .and_then(|weapon| weapon.target);
+            .and_then(|w| w.order)
+            .and_then(|o| match o {
+                AttackOrder::ForceFire {
+                    target: crate::ForceTarget::Cell(c),
+                } => Some(c),
+                _ => None,
+            });
+        let keeps = ground.map(|_| SimId(u32::MAX)).or_else(|| {
+            world
+                .get::<Weapon>(a.entity)
+                .and_then(|weapon| weapon.target)
+        });
         if bay.target != keeps {
             bay.target = None;
             bay.pending = 0;
@@ -577,7 +588,8 @@ fn bays(world: &mut World, defs: &Definitions, index: &BTreeMap<SimId, Actor>, t
                 None => world
                     .resource::<crate::Props>()
                     .get(target)
-                    .map(|(cell, _)| Aim::Scenery(target, cell)),
+                    .map(|(cell, _)| Aim::Scenery(target, cell))
+                    .or_else(|| ground.map(|c| Aim::Scenery(target, c))),
             };
             match aim {
                 None => {
@@ -711,9 +723,15 @@ fn launch(
         crate::veterancy::inherit(world, entity, kind, rank);
         if let Some(mut weapon) = world.get_mut::<Weapon>(entity) {
             weapon.target = Some(target.id());
-            weapon.order = Some(AttackOrder::Attack {
-                target: target.id(),
-                chases: 0,
+            weapon.order = Some(if target.id() == SimId(u32::MAX) {
+                AttackOrder::ForceFire {
+                    target: crate::ForceTarget::Cell(target.cell()),
+                }
+            } else {
+                AttackOrder::Attack {
+                    target: target.id(),
+                    chases: 0,
+                }
             });
         }
     }

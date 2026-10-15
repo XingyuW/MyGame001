@@ -37,7 +37,7 @@ fn red(defs: &Definitions, prop: &crate::Prop) -> bool {
         .map_or(prop.kind.hit_points(), |t| t.hit_points);
     i64::from(prop.hit_points) * 100 <= i64::from(full) * i64::from(percent)
 }
-fn validate(
+pub(crate) fn validate(
     world: &World,
     defs: &Definitions,
     a: &Actor,

@@ -1,0 +1,45 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+error[E0599]: no associated function or constant named `default` found for struct `sim::SubPos` in the current scope
+    --> crates/game/src/selection.rs:1482:40
+     |
+1482 |                 previous: sim::SubPos::default(),
+     |                                        ^^^^^^^ associated function or constant not found in `sim::SubPos`
+     |
+note: if you're trying to build a new `sim::SubPos` consider using one of the following associated functions:
+      sim::SubPos::new
+      sim::SubPos::centre_of
+      sim::SubPos::spot_of
+    --> crates/sim/src/map.rs:79:5
+     |
+  79 |     pub const fn new(x: i32, y: i32) -> Self {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+  85 |     pub const fn centre_of(cell: CellPos) -> Self {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 101 |     pub const fn spot_of(cell: CellPos, spot: u8) -> Self {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no associated function or constant named `default` found for struct `sim::SubPos` in the current scope
+    --> crates/game/src/selection.rs:1483:39
+     |
+1483 |                 current: sim::SubPos::default(),
+     |                                       ^^^^^^^ associated function or constant not found in `sim::SubPos`
+     |
+note: if you're trying to build a new `sim::SubPos` consider using one of the following associated functions:
+      sim::SubPos::new
+      sim::SubPos::centre_of
+      sim::SubPos::spot_of
+    --> crates/sim/src/map.rs:79:5
+     |
+  79 |     pub const fn new(x: i32, y: i32) -> Self {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+  85 |     pub const fn centre_of(cell: CellPos) -> Self {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 101 |     pub const fn spot_of(cell: CellPos, spot: u8) -> Self {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `game` (bin "game" test) due to 2 previous errors

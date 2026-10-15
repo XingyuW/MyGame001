@@ -332,6 +332,8 @@ pub struct MatchRules {
     /// world with a rules file.
     pub ore_grows: bool,
     pub bridge_destruction: bool,
+    /// Explored cells cease showing current activity when enabled (RA7).
+    pub fog_of_war: bool,
 }
 
 impl Default for MatchRules {
@@ -343,6 +345,7 @@ impl Default for MatchRules {
             crates: true,
             ore_grows: true,
             bridge_destruction: true,
+            fog_of_war: false,
         }
     }
 }
@@ -396,6 +399,7 @@ impl MatchState {
         ]);
         // RA5: written only when it differs from the default, so that a match with the
         // default hashes as before.
+        hasher.write(&[u8::from(self.rules.fog_of_war)]);
         if !self.rules.bridge_destruction {
             hasher.write(b"bridges indestructible");
         }
@@ -547,6 +551,8 @@ pub struct MatchOptions {
     pub mcv_repacks: bool,
     pub ore_grows: bool,
     pub bridge_destruction: bool,
+    /// Explored cells cease showing current activity when enabled (RA7).
+    pub fog_of_war: bool,
 }
 
 impl Default for MatchOptions {
@@ -567,6 +573,7 @@ impl Default for MatchOptions {
             mcv_repacks: rules.mcv_repacks,
             ore_grows: rules.ore_grows,
             bridge_destruction: rules.bridge_destruction,
+            fog_of_war: rules.fog_of_war,
         }
     }
 }
@@ -1095,6 +1102,7 @@ pub fn setup_match_configured(
             crates: options.crates,
             ore_grows: options.ore_grows,
             bridge_destruction: options.bridge_destruction,
+            fog_of_war: options.fog_of_war,
         },
         defeated: BTreeMap::new(),
         outcome: None,

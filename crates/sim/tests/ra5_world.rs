@@ -641,6 +641,7 @@ fn only_land_route_ai(lose_sight: bool) {
         &players,
         &sim::MatchOptions {
             mcv_start: false,
+            fog_of_war: lose_sight,
             unit_count: Some(0),
             ..Default::default()
         },

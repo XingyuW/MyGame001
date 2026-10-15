@@ -1,0 +1,92 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error: this function has too many arguments (8/7)
+   --> crates/sim/src/command.rs:402:1
+    |
+402 | / pub(crate) fn process_regular_commands(
+403 | |     mut queue: ResMut<CommandQueue>,
+404 | |     mut grid: ResMut<Grid>,
+405 | |     tick: Res<SimTick>,
+...   |
+410 | |     mut tactics: ResMut<crate::TacticalState>,
+411 | | ) {
+    | |_^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#too_many_arguments
+    = note: `-D clippy::too-many-arguments` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::too_many_arguments)]`
+
+error: this function has too many arguments (8/7)
+   --> crates/sim/src/command.rs:512:1
+    |
+512 | / fn apply_unit_command(
+513 | |     command: &Command,
+514 | |     tick: u64,
+515 | |     grid: &Grid,
+...   |
+520 | |     tactics: &mut crate::TacticalState,
+521 | | ) {
+    | |_^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#too_many_arguments
+
+error: this expression creates a reference which is immediately dereferenced by the compiler
+  --> crates/sim/src/special/reconnaissance.rs:98:64
+   |
+98 |                         && (b.foot.is_none() || powered(world, &defs, b))
+   |                                                                ^^^^^ help: change this to: `defs`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_borrow
+   = note: `-D clippy::needless-borrow` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::needless_borrow)]`
+
+error: this expression creates a reference which is immediately dereferenced by the compiler
+   --> crates/sim/src/special/reconnaissance.rs:111:44
+    |
+111 | ...                   } else if role(&defs, b) == Role::Dog
+    |                                      ^^^^^ help: change this to: `defs`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_borrow
+
+error: this expression creates a reference which is immediately dereferenced by the compiler
+   --> crates/sim/src/special/reconnaissance.rs:112:42
+    |
+112 | ...                   || (role(&defs, b) == Role::Sensor && powered(world, &defs, b))
+    |                                ^^^^^ help: change this to: `defs`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_borrow
+
+error: this expression creates a reference which is immediately dereferenced by the compiler
+   --> crates/sim/src/special/reconnaissance.rs:112:86
+    |
+112 | ...                   || (role(&defs, b) == Role::Sensor && powered(world, &defs, b))
+    |                                                                            ^^^^^ help: change this to: `defs`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_borrow
+
+error: this `if` statement can be collapsed
+  --> crates/sim/src/tactics.rs:81:9
+   |
+81 | /         if h.hit_points > 0 {
+82 | |             if let Some(body) = Body::of(mobile, building) {
+83 | |                 actors.insert(
+84 | |                     *id,
+...  |
+96 | |         }
+   | |_________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#collapsible_if
+   = note: `-D clippy::collapsible-if` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+   |
+81 ~         if h.hit_points > 0
+82 ~             && let Some(body) = Body::of(mobile, building) {
+83 |                 actors.insert(
+...
+94 |                 );
+95 ~             }
+   |
+
+error: could not compile `sim` (lib) due to 7 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `sim` (lib test) due to 7 previous errors

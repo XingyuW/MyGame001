@@ -33,15 +33,28 @@ pub(crate) static NO_VISION: Vision = Vision {
     width: 0,
     height: 0,
     cells: Vec::new(),
+    fog_of_war: true,
 };
 
 /// A player's view of the grid.
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Vision {
     width: u32,
     height: u32,
     /// Row-major, as the grid: [`VISIBLE`] and [`EXPLORED`] bits.
     cells: Vec<u8>,
+    fog_of_war: bool,
+}
+
+impl Default for Vision {
+    fn default() -> Self {
+        Self {
+            width: 0,
+            height: 0,
+            cells: Vec::new(),
+            fog_of_war: true,
+        }
+    }
 }
 
 impl Vision {
@@ -65,6 +78,26 @@ impl Vision {
         }
     }
 
+    /// RA7: a powered hostile gap restores circular shroud, including satellite exploration.
+    pub(crate) fn reshroud(&mut self, centre: CellPos, radius: u32) {
+        let r = i64::from(radius);
+        for y in (i64::from(centre.y) - r).max(0)
+            ..=(i64::from(centre.y) + r).min(i64::from(self.height) - 1)
+        {
+            for x in (i64::from(centre.x) - r).max(0)
+                ..=(i64::from(centre.x) + r).min(i64::from(self.width) - 1)
+            {
+                let dx = x - i64::from(centre.x);
+                let dy = y - i64::from(centre.y);
+                if dx * dx + dy * dy <= r * r
+                    && let Some(i) = self.index(CellPos::new(x as i32, y as i32))
+                {
+                    self.cells[i] = 0;
+                }
+            }
+        }
+    }
+
     fn index(&self, cell: CellPos) -> Option<usize> {
         let x = u32::try_from(cell.x).ok()?;
         let y = u32::try_from(cell.y).ok()?;
@@ -81,9 +114,10 @@ impl Vision {
             .unwrap_or(0)
     }
 
-    /// Whether `cell` is visible now (`false` outside the map).
+    /// Whether `cell` is visible to the player: current sight with fog on, explored ground
+    /// with fog off (`false` outside the map).
     pub fn is_visible(&self, cell: CellPos) -> bool {
-        self.bits(cell) & VISIBLE != 0
+        self.bits(cell) & VISIBLE != 0 || (!self.fog_of_war && self.is_explored(cell))
     }
 
     /// Whether `cell` has ever been visible: not shroud (`false` outside the map).
@@ -102,11 +136,11 @@ impl Vision {
         footprint.cells().any(|cell| self.is_visible(cell))
     }
 
-    /// The number of cells visible now.
+    /// The number of cells visible under the configured fog rule.
     pub fn visible_cells(&self) -> usize {
         self.cells
             .iter()
-            .filter(|&&bits| bits & VISIBLE != 0)
+            .filter(|&&bits| bits & VISIBLE != 0 || (!self.fog_of_war && bits & EXPLORED != 0))
             .count()
     }
 
@@ -128,6 +162,7 @@ impl Vision {
                 width: grid.width(),
                 height: grid.height(),
                 cells: vec![0; cells],
+                fog_of_war: self.fog_of_war,
             };
             return;
         }
@@ -145,6 +180,7 @@ impl Vision {
                 width,
                 height,
                 cells: vec![0; cells],
+                fog_of_war: self.fog_of_war,
             };
         }
         for bits in &mut self.cells {
@@ -201,6 +237,9 @@ impl Vision {
         hasher.write_u32(self.width);
         hasher.write_u32(self.height);
         hasher.write(&self.cells);
+        if !self.fog_of_war {
+            hasher.write(b"shroud only");
+        }
     }
 }
 
@@ -213,9 +252,12 @@ pub(crate) fn update_visibility(
     special: Res<crate::SpecialState>,
     props: Res<crate::Props>,
     defs: Res<crate::Definitions>,
+    state: Res<crate::MatchState>,
 ) {
-    for (_, state) in players.iter_mut() {
-        state.vision.begin(&grid);
+    let fog = defs.rules().is_none() || state.rules().fog_of_war;
+    for (_, player) in players.iter_mut() {
+        player.vision.begin(&grid);
+        player.vision.fog_of_war = fog;
     }
     for (id, g) in &special.garrisons {
         if let Some((_, prop)) = props.get(*id)
@@ -262,6 +304,7 @@ mod tests {
             width,
             height,
             cells: vec![0; (width * height) as usize],
+            fog_of_war: true,
         }
     }
 

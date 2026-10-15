@@ -1322,7 +1322,7 @@ class Data:
 
     def arsenal_file(self):
         lines = [
-            "// The arsenal, schema version 8 (crates/sim/src/arsenal.rs; docs/DECISIONS.md R10, R11, R22, R6, R46): per",
+            "// The arsenal, schema version 9 (crates/sim/src/arsenal.rs; docs/DECISIONS.md R10, R11, R22, R6, R46): per",
             "// item its label, description, category, domain and role with the role's terms (durations in ticks,",
             "// 20 per second), the id of the item whose art it shows, its side, the factory group of a",
             "// building, and the terms of the ini's buildability rule: the sides whose factories build it",
@@ -1369,7 +1369,7 @@ class Data:
             "// cash_delay (ProduceCashDelay frames converted to ticks). Missing flags/numbers are 0.",
             "//",
             GENERATED,
-            "(schema_version: 8, entries: [",
+            "(schema_version: 9, entries: [",
         ]
         for table in (self.buildings, self.units):
             for game_id, values in table.items():
@@ -1377,13 +1377,15 @@ class Data:
                 label, description, category, domain, role, cooldown, radius, strength, capacity = (
                     values[:9]
                 )
+                if item.section_name == "GAGAP":
+                    radius=int(item.ini["GapRadiusInCells"])
                 if item.section_name == "NAPSIS":
                     radius=int(item.ini["PsychicDetectionRadius"])
                 if item.special:
                     cooldown=convert("minutes",self.tables.value(item.special,"RechargeTime"))
                     if item.special in ("ParaDropSpecial","AmericanParaDropSpecial"): role="paradrop"; radius=4
                 keys = ["Owner", "RequiredHouses", "ForbiddenHouses", "TechLevel", "Prerequisite"]
-                keys += ["Factory", "Naval", "PsychicDetectionRadius", "SuperWeapon", "BalloonHover"] + list(STOLEN)
+                keys += ["Factory", "Naval", "GapRadiusInCells", "GuardRange", "PsychicDetectionRadius", "SuperWeapon", "BalloonHover"] + list(STOLEN)
                 keys += ["Crewed", "Sensors", "SensorsSight", "NeedsEngineer", "Capturable", "Insignificant", "Immune", "Hospital", "BridgeRepairHut", "Occupier", "CanBeOccupied", "MaxNumberOccupants", "NumberOfDocks", "ProduceCashStartup", "ProduceCashAmount", "ProduceCashDelay"]
                 if item.kind == "unit":
                     keys += ["Crusher", "Crushable", "Size", "Trainable", "VeteranAbilities"]
@@ -1423,7 +1425,7 @@ class Data:
                 lines.append(
                     f'    (id: "{game_id}", label: "{label}", description: "{description}", '
                     f'category: "{category}", domain: "{domain}", role: "{role}", '
-                    f"cooldown: {cooldown}, radius: {radius}, strength: {strength}, "
+                    f"cooldown: {cooldown}, radius: {radius}, guard_range: {int(item.ini.get('GuardRange',0))}, strength: {strength}, "
                     f'capacity: {capacity}, art: "{values[-1]}", side: "{item.side}", '
                     f'factory: "{item.factory}", owner_sides: {quoted(item.owner_sides)}, '
                     f"required_countries: {quoted(item.required)}, "

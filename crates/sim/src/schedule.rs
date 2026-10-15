@@ -136,14 +136,24 @@ impl Plugin for SimPlugin {
                 .chain()
                 .in_set(SimCoreSet(SimSet::Economy))
                 .in_set(SimSet::Economy),
-            find_paths
+            (
+                crate::special::refresh_concealment,
+                crate::tactics::advance,
+                find_paths,
+            )
+                .chain()
                 .in_set(SimCoreSet(SimSet::Pathfinding))
                 .in_set(SimSet::Pathfinding),
             (move_units, crate::crates::collect)
                 .chain()
                 .in_set(SimCoreSet(SimSet::Movement))
                 .in_set(SimSet::Movement),
-            (combat, crate::garrison::fire, crate::special::resolve)
+            (
+                crate::special::refresh_concealment,
+                combat,
+                crate::garrison::fire,
+                crate::special::resolve,
+            )
                 .chain()
                 .in_set(SimCoreSet(SimSet::Combat))
                 .in_set(SimSet::Combat),
@@ -160,7 +170,11 @@ impl Plugin for SimPlugin {
                 .chain()
                 .in_set(SimCoreSet(SimSet::Cleanup))
                 .in_set(SimSet::Cleanup),
-            (update_visibility, crate::special::reconnaissance)
+            (
+                update_power,
+                update_visibility,
+                crate::special::reconnaissance,
+            )
                 .chain()
                 .in_set(SimCoreSet(SimSet::Visibility))
                 .in_set(SimSet::Visibility),
@@ -178,6 +192,7 @@ impl Plugin for SimPlugin {
             .insert_resource(CommandQueue::default())
             .insert_resource(SimIdAllocator::default())
             .insert_resource(SimRng::new(self.seed))
+            .insert_resource(crate::TacticalState::default())
             .insert_resource(Grid::default())
             .insert_resource(Definitions::default())
             .insert_resource(Players::default())
@@ -189,7 +204,16 @@ impl Plugin for SimPlugin {
             .insert_resource(crate::WorldObjects::default())
             .insert_resource(crate::Bridges::default())
             .insert_resource(crate::Crates::default())
-            .insert_resource(MatchState::default())
+            .insert_resource({
+                // Scenario-only worlds retain the historical current-sight rules. Actual
+                // setup_match installs MatchOptions, whose RA2 default is shroud only.
+                let mut state = MatchState::default();
+                state.set_rules(crate::MatchRules {
+                    fog_of_war: true,
+                    ..Default::default()
+                });
+                state
+            })
             .insert_resource(AiPlayers::default())
             .insert_resource(Messages::<SimEvent>::default())
             .add_schedule(schedule);

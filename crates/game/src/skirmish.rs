@@ -773,6 +773,8 @@ pub enum Row {
     /// The option exists since RA1; crates appear once the simulation has them.
     Crates,
     BridgeDestruction,
+    FogOfWar,
+    OreGrowth,
     /// Whether a Construction Yard can be packed up into the base unit again.
     McvRepacks,
     SuperMe,
@@ -805,12 +807,14 @@ impl Row {
 
     /// The rows of the menu's second column: the lobby options of Red Alert 2, then this game's
     /// extensions.
-    pub const RULES: [Row; 9] = [
+    pub const RULES: [Row; 11] = [
         Row::McvStart,
         Row::ShortGame,
         Row::Superweapons,
         Row::Crates,
         Row::BridgeDestruction,
+        Row::FogOfWar,
+        Row::OreGrowth,
         Row::McvRepacks,
         Row::SuperMe,
         Row::UnitSpeed,
@@ -852,6 +856,8 @@ impl Row {
             Row::Superweapons => "Superweapons",
             Row::Crates => "Crates",
             Row::BridgeDestruction => "Bridges",
+            Row::FogOfWar => "FOG OF WAR",
+            Row::OreGrowth => "Ore growth",
             Row::McvRepacks => "MCV repacks",
             Row::SuperMe => "Super Me",
             Row::UnitSpeed => "Unit speed",
@@ -891,6 +897,8 @@ pub struct MenuSelection {
     pub superweapons: bool,
     pub crates: bool,
     pub bridge_destruction: bool,
+    pub fog_of_war: bool,
+    pub ore_grows: bool,
     pub mcv_repacks: bool,
     /// Off: the computer players are allied against the human player.
     pub free_for_all: bool,
@@ -927,6 +935,8 @@ impl Default for MenuSelection {
             superweapons: lobby.superweapons,
             crates: lobby.crates,
             bridge_destruction: lobby.bridge_destruction,
+            fog_of_war: lobby.fog_of_war,
+            ore_grows: lobby.ore_grows,
             mcv_repacks: lobby.mcv_repacks,
             free_for_all: lobby.free_for_all,
             map_growth: false,
@@ -1155,6 +1165,8 @@ impl MenuSelection {
             Row::Superweapons => switch(self.superweapons),
             Row::Crates => switch(self.crates),
             Row::BridgeDestruction => switch(self.bridge_destruction),
+            Row::FogOfWar => switch(self.fog_of_war),
+            Row::OreGrowth => switch(self.ore_grows),
             Row::McvRepacks => switch(self.mcv_repacks),
             Row::SuperMe => switch(self.super_me),
             Row::UnitSpeed => (self.unit_speed, UNIT_SPEEDS.len()),
@@ -1208,6 +1220,8 @@ impl MenuSelection {
             Row::Superweapons => self.superweapons = index != 0,
             Row::Crates => self.crates = index != 0,
             Row::BridgeDestruction => self.bridge_destruction = index != 0,
+            Row::FogOfWar => self.fog_of_war = index != 0,
+            Row::OreGrowth => self.ore_grows = index != 0,
             Row::McvRepacks => self.mcv_repacks = index != 0,
             Row::SuperMe => self.super_me = index != 0,
             Row::UnitSpeed => self.unit_speed = index,
@@ -1306,8 +1320,9 @@ impl MenuSelection {
             crates: self.crates,
             mcv_repacks: self.mcv_repacks,
             // The lobby has no row for it yet: ore grows, as in the reference's default.
-            ore_grows: sim::MatchRules::default().ore_grows,
+            ore_grows: self.ore_grows,
             bridge_destruction: self.bridge_destruction,
+            fog_of_war: self.fog_of_war,
         }
     }
 }
@@ -1448,6 +1463,8 @@ pub fn row_text(row: Row, selection: MenuSelection, catalogue: &Catalogue) -> St
         Row::ShortGame => switch(selection.short_game),
         Row::Superweapons => switch(selection.superweapons),
         Row::Crates => switch(selection.crates),
+        Row::FogOfWar => switch(selection.fog_of_war),
+        Row::OreGrowth => switch(selection.ore_grows),
         Row::BridgeDestruction => if selection.bridge_destruction {
             "DESTRUCTIBLE"
         } else {
@@ -3741,11 +3758,13 @@ pub(crate) mod tests {
         };
         let defaults = initial.options();
         type Field = fn(&mut sim::MatchOptions) -> &mut bool;
-        let rows: [(Row, Field, &str, &str); 6] = [
+        let rows: [(Row, Field, &str, &str); 8] = [
             (Row::McvStart, |o| &mut o.mcv_start, "ON", "OFF"),
             (Row::ShortGame, |o| &mut o.short_game, "ON", "OFF"),
             (Row::Superweapons, |o| &mut o.superweapons, "ON", "OFF"),
             (Row::Crates, |o| &mut o.crates, "ON", "OFF"),
+            (Row::FogOfWar, |o| &mut o.fog_of_war, "OFF", "ON"),
+            (Row::OreGrowth, |o| &mut o.ore_grows, "ON", "OFF"),
             (Row::McvRepacks, |o| &mut o.mcv_repacks, "ON", "OFF"),
             (
                 Row::TeamMode,
@@ -3775,8 +3794,9 @@ pub(crate) mod tests {
                     superweapons: expected.superweapons,
                     mcv_repacks: expected.mcv_repacks,
                     crates: expected.crates,
-                    ore_grows: true,
+                    ore_grows: expected.ore_grows,
                     bridge_destruction: true,
+                    fog_of_war: expected.fog_of_war,
                 }),
                 "{row:?}"
             );
@@ -4288,9 +4308,9 @@ pub(crate) mod tests {
         let size = menu_size();
         assert!(size.x <= MENU_FIT.x && size.y <= MENU_FIT.y, "{size}");
         assert!(size.x > 1000.0 && size.y > 400.0, "{size}");
-        assert_eq!(Row::MATCH.len() + Row::RULES.len(), 17);
+        assert_eq!(Row::MATCH.len() + Row::RULES.len(), 19);
         let rows: BTreeSet<Row> = Row::MATCH.into_iter().chain(Row::RULES).collect();
-        assert_eq!(rows.len(), 17, "every row once");
+        assert_eq!(rows.len(), 19, "every row once");
         // Every text a row can show fits its place. The interface font is FiraMono, in which
         // every character is 0.6 of the font size wide.
         let width = |text: &str, font: f32| text.chars().count() as f32 * 0.6 * font;

@@ -1,0 +1,16 @@
+RA7 preflight (source frozen only after these checks)
+small-sim-serial.log: 56 targets, 815 passed, 0 failed, 0 ignored.
+orders-storm-freeze.log: final changed orders + unchanged RA6 vehicles, 44 passed, 0 failed, 0 ignored.
+client-freeze-final.log: final full game binary, 217 passed, 0 failed, 0 ignored.
+client-final.log: game binary at then-current 215 plus nine asset/map targets 42, all257 passed.
+Thus all small targets have passing coverage (815 sim +217 final client +42 asset/map =1074 unique runtime tests).
+clippy-freeze-final.log: strict workspace/all-targets Clippy exit0.
+generate-final.log: shipped generator --check exit0.
+reference-final.log: committed4934-row reference matches cached source, exit0.
+fmt and diff checked again at freeze; full required gate repeats every check.
+
+Deliberate failing evidence: first-spawn-before2.log, sensor-sale-before.log,
+disguise-cursor-before2.log, mutation-gap-explored.log (source restored).
+All earlier compile, fixture, Storm integration and overlapping-process scratch failures
+are preserved. DECISIONS R84/R85 explain exact test migrations and process corrections.
+No ignored tests, raised limits, changed required gate/thread settings or self-review claim.

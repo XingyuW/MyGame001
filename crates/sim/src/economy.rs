@@ -752,13 +752,16 @@ pub(crate) fn repair_buildings(
 pub(crate) fn update_power(
     mut players: ResMut<Players>,
     definitions: Res<Definitions>,
-    buildings: Query<(&SimId, &Owner, &Building)>,
+    buildings: Query<(&SimId, &Owner, &Building, Option<&crate::Health>)>,
     special: Res<crate::SpecialState>,
     tick: Res<SimTick>,
 ) {
     let mut totals: BTreeMap<PlayerId, (i32, i32)> = BTreeMap::new();
     let mut radars: BTreeSet<PlayerId> = BTreeSet::new();
-    for (id, owner, building) in &buildings {
+    for (id, owner, building, health) in &buildings {
+        if definitions.rules().is_some() && health.is_some_and(|h| h.hit_points <= 0) {
+            continue;
+        }
         let Some(def) = definitions.building(building.kind) else {
             continue;
         };
@@ -777,13 +780,29 @@ pub(crate) fn update_power(
         total.0 = total.0.saturating_add(def.power_produced);
         total.1 = total.1.saturating_add(def.power_consumed);
     }
+    let storm_suppressed: BTreeSet<_> = special
+        .strategic
+        .storm
+        .as_ref()
+        .filter(|storm| tick.0 >= storm.starts && tick.0 < storm.ends)
+        .map(|storm| {
+            players
+                .iter()
+                .map(|(p, _)| p)
+                .filter(|p| players.hostile(*p, storm.owner))
+                .collect()
+        })
+        .unwrap_or_default();
     for (player, state) in &mut players.players {
         let (produced, consumed) = totals.get(player).copied().unwrap_or_default();
         let outage = special.outages.get(player).is_some_and(|t| *t > tick.0);
         state.power_produced = if outage { 0 } else { produced };
         state.power_consumed = consumed;
         state.radar = definitions.rules().is_none()
-            || (radars.contains(player) && !outage && !state.low_power());
+            || (radars.contains(player)
+                && !outage
+                && !state.low_power()
+                && !storm_suppressed.contains(player));
     }
 }
 

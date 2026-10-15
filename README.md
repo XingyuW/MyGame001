@@ -80,7 +80,7 @@ These follow Red Alert 2 since milestone RA2 of the parity programme (times are 
   button) restores 8 hit points about once a second (every 19 ticks) and charges each step, so
   that a whole repair costs about 15 percent of the price; it waits while you cannot pay. Walls
   can be neither sold nor repaired.
-* **Service Depot.** Select damaged vehicles, press `E` and click your Service Depot: they drive
+* **Service Depot.** Select damaged vehicles, right click your Service Depot (or press `I` and click it): they drive
   up to it and are repaired there step by step for credits, at the rate and price of a building
   repair (a Grizzly: 2 credits per 8 hit points), then make room. Any new order ends the
   repair. Ships are repaired the same way at a Naval Shipyard. Nothing is repaired for free by
@@ -441,7 +441,34 @@ builds `$CARGO_TARGET_DIR/package/MyGame001.app` (or `target/package/MyGame001.a
 `MyGame001-macos.zip` in that same package directory, and runs the smoke test from the package. The application is
 not signed: on another Mac, open it with a right click and **Open** the first time.
 
+## Vision and announcements
+
+**FOG OF WAR defaults OFF.** Once you explore a cell, normal enemies and activity there remain
+visible and targetable. With the option ON, enemies disappear when they leave current sight.
+Spies, submerged units and stationary Mirage disguises still require a suitable detector.
+A powered hostile Gap Generator restores circular shroud within 10 cells every tick, even
+against a Spy Satellite; your own local sight counters it. A powered Psychic Sensor detects
+disguises and displays enemy orders aimed within 15 cells as purple lines. Concealed sources
+remain concealed. A powered Spy Satellite reveals the map outside gaps and prevents radar-spy
+shroud resets. Ore growth is also configurable in the lobby (default ON).
+
+Original synthesized motifs and text announce unit ready, construction complete, production
+on hold, cannot deploy, base under attack, unit lost, low power, insufficient funds, superweapon
+construction/readiness/launch and radar online/offline. Repeated categories are limited to one
+per eight seconds, with one second between announcements. These are cues, without recorded speech.
+
 ## Controls
+
+**RA7 changes the familiar keys to the RA2 layout:**
+
+| Previous binding | Current binding | Action |
+|---|---|---|
+| X | L | Sell mode; X now scatters |
+| R | Y | Global rally; R now selects Vehicles |
+| P | Pause or F9; backslash on a MacBook | Pause; P now selects all combat units |
+| M | F10 or apostrophe on a MacBook | Mute; M now selects the previous unit |
+| E | I or context right click | Interact; E now selects Infantry |
+
 
 ### Camera
 
@@ -465,12 +492,27 @@ not signed: on another Mac, open it with a right click and **Open** the first ti
 | Right click on a visible enemy | attack it with the selected armed units |
 | Hover before right-clicking | the cursor previews the order: red reticle, red target outline and **ATTACK** over a valid enemy; green **MOVE**; gold **HARVEST** over ore with miners; blue **FRIENDLY** over your own units or buildings; grey **CANNOT GO** (and no order) over terrain none of the selection can enter or off the map |
 | `A` | attack-move the selection to the cell under the cursor: fight enemies on the way |
-| `S` | stop |
+| `S` | stop and clear queued orders |
+| `G` | guard the current area; acquire within the reference GuardRange, or weapon range when unspecified |
+| `X` | scatter selected units into nearby free positions |
+| `F` | follow the known unit or building under the cursor; stops tracking if it becomes concealed or unseen |
+| Hold `Z` and click | append movement waypoints, up to 32 pending per unit |
+| Ctrl or Cmd + click | force fire at the known object or ground cell, including friendly targets |
+| Alt + click | force move, including crushing hostile crushable infantry |
+| Ctrl or Cmd + Shift + click; `A` | attack move |
+| `T` | select all your units of the selected type |
+| `P` | select all your combat units |
+| `N`, `M` | select and centre on the next or previous unit |
+| `H` | centre on your Construction Yard |
+| Ctrl or Cmd + `F1`–`F4`; `F1`–`F4` | set and jump to four camera bookmarks |
+| Ctrl or Cmd + Alt + arrow; Alt + arrow | MacBook bookmark alternatives: up/right/down/left select slots 1/2/3/4 |
+| Right click on an applicable target | Engineer capture/repair, Spy disguise/infiltration, boarding, garrison, depot repair or Tanya C4; the cursor names the action |
 | `D` | deploy the selected MCV into a Construction Yard where it stands, unload a transport, or contaminate the area with a Desolator |
-| `E`, then left click | engineer repair/capture, spy infiltration, load selected ground passengers into a friendly transport, or send selected damaged vehicles to your Service Depot for a paid repair |
+| `I`, then left click | engineer repair/capture, spy infiltration, load selected ground passengers into a friendly transport, or send selected damaged vehicles to your Service Depot for a paid repair |
 | Ctrl or Cmd + `0` to `9` | make the selection control group n |
 | `0` to `9` | select control group n |
 | Shift + `0` to `9` | add control group n to the selection |
+| Alt + `0` to `9` | select control group n and centre the view |
 
 ### Base and production (sidebar)
 
@@ -479,26 +521,26 @@ not signed: on another Mac, open it with a right click and **Open** the first ti
 | Left click on an item | queue it (a tab lists what your buildings could build; a LOCKED card explains what it still needs; the yard builds one building and one defence at a time) |
 | Right click on an item | cancel the last queued entry, with a refund of what was paid |
 | Left click on a building marked READY, or `B` | placement mode: the footprint is green where it can be placed and red where not; left click places it |
-| `Tab` | cycle Buildings, Armory, Infantry and Vehicles |
-| Strategic ability button, then map click | activate a charged superweapon; select vehicles first for Chronosphere |
-| **Sell** button or `X` | sell mode: left click sells your building (refund of half its cost; walls cannot be sold) |
+| `Q`, `W`, `E`, `R`; `Tab` cycles | Buildings, Armory, Infantry, Vehicles |
+| Strategic ability button, then map click | activate a charged superweapon; Chronosphere uses a source-area click followed by a destination click |
+| **Sell** button or `L` | sell mode: left click sells your building (refund of half its cost; walls cannot be sold) |
 | **Repair** button or `K` | repair mode: left click starts or stops the repair of your building, paid step by step |
 | `Delete` or `Backspace` | sell your building under the cursor |
 | Left click on your War Factory, Barracks, Cloning Vats, Naval Shipyard or Airforce Command | select that building: green brackets mark it and its rally point is shown as an orange flag |
 | Right click on the map with such a building selected | set **that building's** rally point (the cursor shows RALLY POINT): every unit it builds from then on goes there; the Cloning Vats send their copies to their own point, apart from the Barracks' |
 | Left click on your Construction Yard, then `D` or the **Repack** button | pack the yard up into its MCV again, which you can drive elsewhere and deploy with `D`. Only with **MCV repacks** on; the button (bottom left) and the hint appear only then. While the yard is packed up nothing can be built |
 | **Rally** button | rally mode: left click sets where new units of **every** producing building go |
-| `R` | set the rally point of every producing building to the cell under the cursor |
+| `Y` | set the rally point of every producing building to the cell under the cursor |
 | `Escape` or right click | leave the current mode |
 
 ### Game
 
 | Input | Action |
 |-------|--------|
-| `P` or `Pause`, or the **Pause** button | pause and resume |
+| `Pause`, `F9`, backslash, or the **Pause** button | pause and resume |
 | `[` and `]`, or the sidebar's **Speed** `-` `+` | game speed 0.5×, 1×, 1.5×, 2×, 3× or 4× (shown in the sidebar); it changes how many simulation ticks run per second, so movement, combat, production, mining, AI and every timer scale together |
 | `-` and `=` | master volume down and up |
-| `M` | mute and unmute |
+| `F10` or apostrophe | mute and unmute |
 
 ### How to start and how to win
 
