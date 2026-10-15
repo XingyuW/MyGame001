@@ -5186,3 +5186,22 @@ RA7's existing refresh and batching. The refresh borrows Definitions, with no ne
 `ra8_raw_spy_spawn_with_empty_queue_is_concealed_before_actual_ai_thinks` now passes and never
 inserts hidden state itself. This closes the separate raw-spawn AI boundary, not a claim that
 the already protected paid-production path leaked. No data, match limit or vision rule changes.
+
+### R89. RA8 measured immutable definition sharing
+
+**2026-10-15.** The immutable `Definitions` resource previously deep-cloned owned vectors,
+strings, maps and nested rules in several exclusive systems every tick and for each external
+blast. The repeatable `ra8_profile` harness measures 20,000 copies and a fixed 5,000-tick
+shipped match with a per-tick value-hash digest. Before:628.801ms copying and1.853s ticks/hash.
+After sharing the five immutable table handles using Arc:203.542microseconds copying and
+1.062s ticks/hash. Both produce exactly `6696b039de9f6296`. These are local measurements,
+not a prediction of final gate wall time. The raw logs remain under ra8-preflight.
+
+Hashing/equality still visit values; pointers and reference counts never enter simulation
+state or iteration. Consuming loaders replace their own handles, so variants cannot mutate
+another clone. The new loader-independence test checks shared read-only references, a typed
+failed reload leaving the source equal, and successful economy loading leaving the units-only
+source unchanged. The serial parser/schema/hash/data-audit preflight passes all selected
+targets. Its initial compile failure used a nonexistent helper name in the new test; that log
+is preserved, and the corrected invocation completes. No runtime rule, fixture, assertion,
+match limit or generated file changes in this optimization.

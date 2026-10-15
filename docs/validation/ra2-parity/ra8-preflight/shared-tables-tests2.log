@@ -1,0 +1,185 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 1.90s
+     Running tests/m2_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m2_definitions-5778f4a3eb286fd4)
+
+running 14 tests
+test the_fixture_loads_with_every_field ... ok
+test deeply_nested_input_is_rejected_without_recursion ... ok
+test unit_lists_must_be_non_empty_bounded_and_unique ... ok
+test bytes_outside_printable_ascii_are_rejected ... ok
+test schema_versions_other_than_1_are_rejected ... ok
+test layout_variations_inside_the_subset_load_to_the_same_definitions ... ok
+test unknown_missing_and_duplicate_fields_are_rejected ... ok
+test value_limits_are_inclusive ... ok
+test values_of_the_wrong_kind_are_syntax_errors_at_their_field ... ok
+test ron_features_outside_the_subset_are_rejected_before_ron_parses ... ok
+test unit_values_outside_their_ranges_are_rejected ... ok
+test unreadable_oversized_and_special_files_are_rejected ... ok
+test content_after_the_root_and_truncated_files_are_rejected ... ok
+test seeded_mutations_of_the_fixture_load_or_return_a_typed_error ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.54s
+
+     Running tests/m3_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m3_definitions-6b332692a58a585b)
+
+running 11 tests
+test the_fixture_loads_with_every_field ... ok
+test prerequisite_cycles_are_rejected ... ok
+test schema_versions_other_than_2_are_rejected ... ok
+test list_lengths_are_bounded ... ok
+test unreadable_oversized_and_special_files_are_rejected ... ok
+test names_and_identifiers_are_checked ... ok
+test references_must_name_defined_types ... ok
+test every_field_is_required_and_unknown_fields_are_rejected ... ok
+test numeric_fields_accept_their_limits_and_reject_beyond ... ok
+test truncations_of_the_fixture_are_rejected_without_panic ... ok
+test seeded_mutations_of_the_fixture_load_or_return_a_typed_error ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.44s
+
+     Running tests/m4_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m4_definitions-099523d5df055ffe)
+
+running 16 tests
+test an_economy_file_loaded_after_the_combat_file_removes_it ... ok
+test names_are_checked ... ok
+test references_must_name_defined_entries ... ok
+test schema_versions_other_than_5_are_rejected ... ok
+test the_fixture_loads_with_every_field ... ok
+test every_type_and_armour_class_needs_exactly_one_entry ... ok
+test effects_name_known_effects_once_with_a_damage_and_a_warhead ... ok
+test list_lengths_are_bounded ... ok
+test unreadable_oversized_and_special_files_are_rejected ... ok
+test the_rules_between_the_fields_of_schema_version_2_are_checked ... ok
+test every_field_is_required_and_unknown_fields_are_rejected ... ok
+test every_field_of_schema_version_2_is_required ... ok
+test numeric_fields_accept_their_limits_and_reject_beyond ... ok
+test the_fields_of_schema_version_2_accept_their_limits_and_reject_beyond ... ok
+test truncations_of_the_fixture_are_rejected_without_panic ... ok
+test seeded_mutations_of_the_fixture_load_or_return_a_typed_error ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.91s
+
+     Running tests/ra1_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra1_definitions-6f60fd0b4a270903)
+
+running 36 tests
+test a_plan_may_list_every_building_of_the_tree_of_its_side ... ok
+test a_faction_without_a_side_loads_with_its_roster_and_starting_lists ... ok
+test ai_plan_entries_are_built_by_every_country_of_the_side ... ok
+test an_arsenal_that_names_countries_or_groups_needs_a_rules_file ... ok
+test arsenal_limits_are_accepted_at_both_ends ... ok
+test every_field_of_the_ai_file_is_required ... ok
+test ai_plans_are_checked_for_their_side ... ok
+test ai_plan_entries_can_be_obtained_through_the_build_order ... ok
+test ai_references_and_difficulty_values_are_checked ... ok
+test other_schema_versions_are_rejected_in_every_file ... ok
+test every_field_of_the_skirmish_file_is_required ... ok
+test skirmish_and_ai_limits_are_accepted_at_both_ends ... ok
+test skirmish_countries_are_checked ... ok
+test skirmish_factions_without_a_side_are_checked ... ok
+test rules_list_values_outside_their_ranges_are_rejected ... ok
+test rules_references_and_ids_are_checked ... ok
+test the_ai_fixture_loads_with_a_plan_per_side ... ok
+test the_ai_file_needs_a_plan_for_the_side_of_every_faction ... ok
+test lists_longer_than_their_schema_allows_are_rejected ... ok
+test skirmish_values_outside_their_ranges_are_rejected ... ok
+test the_arsenal_fixture_loads_with_the_fields_of_schema_version_2 ... ok
+test the_army_of_a_plan_can_damage_every_building_type ... ok
+test arsenal_references_and_ids_are_checked ... ok
+test the_skirmish_fixture_loads_with_sides_and_countries ... ok
+test the_rules_fixture_loads_with_every_field ... ok
+test skirmish_sides_are_checked ... ok
+test the_cross_checks_of_the_rules_file_are_enforced ... ok
+test the_base_unit_of_every_side_has_the_role_mcv ... ok
+test unknown_and_duplicate_fields_are_rejected_in_every_file ... ok
+test values_of_the_wrong_kind_are_syntax_errors_in_every_file ... ok
+test every_field_of_the_rules_file_is_required ... ok
+test arsenal_values_outside_their_ranges_are_rejected ... ok
+test every_field_of_the_arsenal_file_is_required ... ok
+test every_scalar_rule_is_rejected_one_step_outside_its_range ... ok
+test the_limits_of_every_scalar_rule_are_accepted ... ok
+test truncations_of_the_fixtures_are_rejected_without_panic ... ok
+
+test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 18.47s
+
+     Running tests/ra2_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra2_definitions-00ec2980e013bc80)
+
+running 7 tests
+test lanes_queues_refunds_and_reach_follow_the_traits_with_a_rules_file ... ok
+test the_fixture_loads_with_the_traits_of_schema_version_3 ... ok
+test without_a_rules_file_the_traits_are_not_read ... ok
+test the_limits_of_the_traits_are_accepted ... ok
+test building_only_traits_on_units_are_rejected_but_unit_build_limits_are_supported ... ok
+test traits_outside_their_ranges_are_rejected ... ok
+test every_trait_changes_the_state_hash ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/ra3_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra3_definitions-2e6e5746868fe057)
+
+running 6 tests
+test the_fixture_loads_with_the_traits_of_schema_version_4 ... ok
+test a_trait_of_a_unit_on_a_building_is_rejected ... ok
+test the_traits_load_at_the_ends_of_their_ranges ... ok
+test a_trait_on_a_unit_that_cannot_have_it_is_rejected ... ok
+test every_trait_of_a_unit_changes_the_state_hash ... ok
+test traits_of_a_unit_outside_their_ranges_are_rejected ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/ra4_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra4_definitions-f980beb11952cf5c)
+
+running 8 tests
+test the_effects_of_the_missiles_are_checked_like_every_effect ... ok
+test the_fixture_loads_with_the_traits_of_schema_version_5 ... ok
+test an_airport_bound_unit_is_an_aircraft_with_ammunition ... ok
+test abilities_must_be_known_and_listed_once ... ok
+test a_trait_of_a_unit_on_a_building_and_docks_on_a_unit_are_rejected ... ok
+test every_trait_of_schema_version_5_is_hashed ... ok
+test the_terms_of_a_spawner_must_fit_together ... ok
+test flags_outside_0_and_1_and_numbers_outside_their_ranges_are_rejected ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running tests/ra5_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra5_definitions-925bc25a8220b7e4)
+
+running 9 tests
+test the_fixture_loads_with_bails_gems_the_pace_of_harvesting_and_a_fixed_refund ... ok
+test the_rules_fixture_loads_with_the_ore_limits_and_the_units_of_a_crate ... ok
+test files_of_schema_version_1_are_rejected ... ok
+test the_new_fields_of_the_economy_file_are_required ... ok
+test the_new_values_of_the_economy_file_are_checked ... ok
+test a_crate_holds_from_no_unit_type_to_the_most_the_schema_allows ... ok
+test the_new_fields_and_values_of_the_rules_file_are_checked ... ok
+test the_limits_of_the_new_values_are_accepted ... ok
+test definitions_with_other_values_hash_differently ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/ra6_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra6_definitions-5f9348c6175f019a)
+
+running 4 tests
+test ra6_repair_negative_damage_is_narrow_and_gunner_requires_all_thirteen_modes ... ok
+test ra6_strategic_timing_fields_are_required_bounded_and_hashed ... ok
+test ra6_area_fire_one_cell_minimum_is_narrow_and_new_numbers_are_bounded ... ok
+test ra6_each_new_flag_is_required_bounded_and_hashed ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.30s
+
+     Running tests/ra8_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_definitions-276fc765560f5f96)
+
+running 1 test
+test ra8_clones_share_read_only_tables_but_loading_a_variant_replaces_only_that_clone ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/ra9_data_parity.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_data_parity-9d41d76c463c7df7)
+
+running 5 tests
+test the_conversions_round_half_away_from_zero_in_integers ... ok
+test every_value_of_the_shipped_rules_equals_its_reference_or_is_a_listed_difference ... ok
+test the_shipped_skirmish_file_and_the_default_options_are_those_of_the_lobby ... ok
+test every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_difference ... ok
+test every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_difference ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
