@@ -513,6 +513,13 @@ pub struct AiPlayers {
 }
 
 impl AiPlayers {
+    pub(crate) fn thinks_at(&self, tick: u64) -> bool {
+        self.controllers.iter().any(|(player, controller)| {
+            let interval = u64::from(controller.difficulty.think_interval.max(1));
+            tick % interval == u64::from(player.0) % interval
+        })
+    }
+
     pub(crate) fn new(
         definitions: AiDefinitions,
         controllers: BTreeMap<PlayerId, AiController>,

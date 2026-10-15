@@ -5168,3 +5168,21 @@ orchestration did not stop after that nonzero check. Preserve the raw stdout unc
 This artifact-formatting issue does not alter the frozen source or the successful gate
 step02; the final working-tree diff check is recorded separately. No gate is rerun or
 represented as passing to conceal that closure check result.
+
+### R88. RA8 concealment before an otherwise empty-command AI turn
+
+**2026-10-15.** R87's raw-helper boundary is confirmed using shipped definitions and an
+actual match controller. A new enemy Spy is spawned on already visible ground with an empty
+CommandQueue immediately before P0's next think. With idle ordinary army responders, the AI
+queued AttackMove for all nine starting combat units to the concealed Spy's exact cell.
+`ra8-preflight/raw-spawn-before3.log` preserves the failure. The initial probe passed because
+its responders still had orders; it did not exercise defense selection. Its two preliminary
+logs remain, including the configured-cache permission failure before any test ran.
+
+An otherwise empty Commands pass now refreshes live power and concealment if any controller
+is due at that exact tick. The predicate uses the same interval and player-offset arithmetic
+as run_ai. Worlds with no controller avoid this work; ordinary nonempty command batches keep
+RA7's existing refresh and batching. The refresh borrows Definitions, with no new deep copy.
+`ra8_raw_spy_spawn_with_empty_queue_is_concealed_before_actual_ai_thinks` now passes and never
+inserts hidden state itself. This closes the separate raw-spawn AI boundary, not a claim that
+the already protected paid-production path leaked. No data, match limit or vision rule changes.
