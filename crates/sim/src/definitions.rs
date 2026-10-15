@@ -16,7 +16,7 @@
 //! 1 to [`MAX_UNIT_SPEED`]. `sprite` names a sprite of the game; `sim` checks only its form, and the
 //! game checks that the sprite exists before the match starts (cross validation).
 
-use std::path::Path;
+use std::{path::Path, sync::Arc};
 
 use bevy_ecs::resource::Resource;
 use serde::Deserialize;
@@ -58,22 +58,23 @@ pub struct UnitDef {
 }
 
 /// Immutable definitions of the current match (PLAN.md section 5).
+/// Clones share immutable tables; consuming loader methods replace only their own handles.
 ///
 /// [`SimPlugin`](crate::SimPlugin) starts with no definitions; match setup installs the loaded
 /// ones before units are spawned.
 #[derive(Resource, Clone, Debug, Default, PartialEq, Eq)]
 pub struct Definitions {
-    units: Vec<UnitDef>,
-    pub(crate) arsenal: crate::arsenal::Arsenal,
+    units: Arc<Vec<UnitDef>>,
+    pub(crate) arsenal: Arc<crate::arsenal::Arsenal>,
     /// Empty unless the definitions were loaded with an economy file ([`load_definitions`]).
-    economy: EconomyDefinitions,
+    economy: Arc<EconomyDefinitions>,
     /// Empty unless a combat file was loaded ([`Definitions::with_combat`]); then every unit and
     /// building type has combat terms.
-    combat: CombatDefinitions,
+    combat: Arc<CombatDefinitions>,
     /// `None` unless a rules file was loaded ([`Definitions::with_rules`], RA1): the global
     /// values, sides and countries of the Red Alert 2 ruleset. Without it every rule that reads
     /// it keeps its behaviour of M2 to M9.
-    rules: Option<crate::rules::Rules>,
+    rules: Option<Arc<crate::rules::Rules>>,
 }
 
 impl Definitions {
@@ -250,12 +251,12 @@ impl Definitions {
 
     /// The rules file, or `None` for definitions loaded without one.
     pub fn rules(&self) -> Option<&crate::rules::Rules> {
-        self.rules.as_ref()
+        self.rules.as_deref()
     }
 
     pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
         hasher.write_u64(self.units.len() as u64);
-        for unit in &self.units {
+        for unit in self.units.iter() {
             for text in [&unit.id, &unit.sprite] {
                 hasher.write_u64(text.len() as u64);
                 hasher.write(text.as_bytes());
@@ -347,10 +348,10 @@ impl Definitions {
     /// ([`Definitions::with_combat`]). The same holds for the rules and the arsenal.
     pub fn with_economy(mut self, economy_file: impl AsRef<Path>) -> Result<Self, DataError> {
         let ids: Vec<String> = self.units.iter().map(|unit| unit.id.clone()).collect();
-        self.economy = economy_defs::load(economy_file.as_ref(), &ids)?;
-        self.combat = CombatDefinitions::default();
+        self.economy = Arc::new(economy_defs::load(economy_file.as_ref(), &ids)?);
+        self.combat = Arc::default();
         self.rules = None;
-        self.arsenal = crate::arsenal::Arsenal::default();
+        self.arsenal = Arc::default();
         Ok(self)
     }
 
@@ -360,8 +361,8 @@ impl Definitions {
     /// arsenal loaded before; load the arsenal afterwards ([`Definitions::with_arsenal`]). Every
     /// problem is a [`DataError`] naming the file, the field, and the reason.
     pub fn with_rules(mut self, rules_file: impl AsRef<Path>) -> Result<Self, DataError> {
-        self.rules = Some(crate::rules::load(rules_file.as_ref(), &self)?);
-        self.arsenal = crate::arsenal::Arsenal::default();
+        self.rules = Some(Arc::new(crate::rules::load(rules_file.as_ref(), &self)?));
+        self.arsenal = Arc::default();
         Ok(self)
     }
 
@@ -377,7 +378,7 @@ impl Definitions {
             .iter()
             .map(|building| building.id.clone())
             .collect();
-        self.combat = combat_defs::load(combat_file.as_ref(), &units, &buildings)?;
+        self.combat = Arc::new(combat_defs::load(combat_file.as_ref(), &units, &buildings)?);
         Ok(self)
     }
 }
@@ -458,10 +459,10 @@ fn validate(path: &Path, file: UnitsFile) -> Result<Definitions, DataError> {
         });
     }
     Ok(Definitions {
-        units,
-        economy: EconomyDefinitions::default(),
-        combat: CombatDefinitions::default(),
-        arsenal: crate::arsenal::Arsenal::default(),
+        units: Arc::new(units),
+        economy: Arc::default(),
+        combat: Arc::default(),
+        arsenal: Arc::default(),
         rules: None,
     })
 }

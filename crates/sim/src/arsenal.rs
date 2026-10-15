@@ -1391,7 +1391,7 @@ impl Arsenal {
 }
 impl Definitions {
     pub fn with_arsenal(mut self, path: impl AsRef<Path>) -> Result<Self, DataError> {
-        self.arsenal = Arsenal::load(path.as_ref(), &self)?;
+        self.arsenal = std::sync::Arc::new(Arsenal::load(path.as_ref(), &self)?);
         Ok(self)
     }
     pub fn prerequisite_met(
