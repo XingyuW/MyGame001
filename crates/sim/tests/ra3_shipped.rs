@@ -238,6 +238,12 @@ fn every_shipped_weapon_deals_the_references_damage_to_every_armour_type() {
             verses.insert(game_id.clone(), percents);
         }
     }
+    // These selector warheads omit Verses in rules.ini; the engine default is 100%.
+    // Keep every other missing reference row an error and still check all eleven armours.
+    for id in ["ivan_bomb", "bomb_disarm"] {
+        assert!(!verses.contains_key(id));
+        verses.insert(id.to_owned(), vec![100; 11]);
+    }
     let definitions = shipped();
     assert_eq!(definitions.armour_classes().len(), 11);
     let mut pairs = 0;

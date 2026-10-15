@@ -1162,7 +1162,7 @@ worktree was deleted.
 ## RA6-A infantry and radiation implementation (2026-10-14)
 
 **Implementation complete; full validation pending. Not independently reviewed.** Decisions
-R71–R76 record the pure-code-move prerequisite, schemas, bounded loader migrations, mechanics
+R71–R78 record the pure-code-move prerequisite, schemas, bounded loader migrations, mechanics
 and explicit assumptions. The exact shipped acceptance matrix is
 [RA6-A acceptance ledger](validation/ra2-parity/RA6A_ACCEPTANCE.md).
 
@@ -1171,7 +1171,7 @@ unit build limits, Tanya/C4/Sapper/swimming, Temporal and chrono delay, Tesla ch
 Yuri/PsiPulse, Desolator/radiation and Terrorist infantry death weapons are implemented.
 All new persistent state is hashed. Specialist/transport command security and shipped
 transport identity/rank/health, hospital entry and limited passenger coverage close the RA6-A
-part of R56 debt. Legacy no-rules M9 behavior remains, with its tests unchanged.
+part of R56 debt. Legacy M9 and role-only RA3/RA5 fixture behavior remains, with its behavior tests unchanged.
 
 Arsenal7 is148,986 bytes; the deliberate192 KiB preparse bound has exact-limit and over-limit
 coverage. Combat4 and every legacy/RA1–RA5 fixture migrated; generated data derives only from

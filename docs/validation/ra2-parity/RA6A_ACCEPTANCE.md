@@ -66,3 +66,8 @@ plus `ai::tests::ra6_shipped_utility_weapons_do_not_recruit_specialists_into_the
 `ra6_deployed_and_temporally_frozen_units_wait_for_release_before_army_orders`.
 The original production rejection assertion remains unchanged. R76 also records the
 unproven first-spawn concealment scheduling risk for RA7 regression coverage.
+
+R77 records the two exact missing-infiltration denial migrations in `ra1_shipped`.
+R78 preserves unchanged RA3 damage/RA5 refinery fixture behavior through explicit trait
+opt-in and names the two schema/audit migrations; shipped specialist tests run alongside
+those compatibility regressions. Failed preflight outputs remain available.

@@ -226,6 +226,16 @@ pub(crate) fn special_interaction(
     defs.rules()?;
     let m = defs.metadata(a.item)?;
     let target = defs.metadata(b.item)?;
+    let primary = match a.item {
+        ProductionItem::Unit(k) => defs.unit_combat(k).and_then(|t| t.weapon),
+        ProductionItem::Building(_) => None,
+    }
+    .and_then(|w| defs.weapon(w))
+    .and_then(|w| defs.warhead(w.warhead));
+    // A role alone also exists in legacy fixtures; only reference traits opt in.
+    if m.role == Role::Spy && !primary.is_some_and(|h| h.makes_disguise) {
+        return None;
+    }
     if m.role == Role::Engineer
         && world
             .resource::<SpecialState>()
@@ -273,7 +283,7 @@ pub(crate) fn special_interaction(
             },
         );
     }
-    if m.role == Role::Demolition {
+    if m.role == Role::Demolition && primary.is_some_and(|h| h.ivan_bomb) {
         return Some(if target.bombable && !target.immune {
             Ok(())
         } else {
@@ -720,11 +730,8 @@ pub(crate) fn fired(
     if d.suicide {
         return false;
     }
-    // All other shipped infantry weapons are ordinary RA3 impacts (including FakeC4/Sapper).
-    !matches!(
-        role(defs, a),
-        Role::Drone | Role::Squid | Role::Carrier | Role::Strike
-    )
+    // FakeC4/Sapper are ordinary impacts. Legacy role-only commandos keep their M9 charge.
+    defs.metadata(a.item).is_some_and(|m| m.c4 || m.teleporter)
 }
 pub(crate) fn resolve(world: &mut World, defs: &Definitions) {
     if defs.rules().is_none() {
@@ -820,6 +827,14 @@ pub(crate) fn finish_deaths(world: &mut World, defs: &Definitions) {
                 && defs
                     .metadata(a.item)
                     .is_some_and(|m| m.infantry && m.role == Role::Suicide)
+                && match a.item {
+                    ProductionItem::Unit(k) => defs
+                        .unit_combat(k)
+                        .and_then(|t| t.weapon)
+                        .and_then(|w| defs.weapon(w))
+                        .is_some_and(|w| w.suicide),
+                    ProductionItem::Building(_) => false,
+                }
                 && !world
                     .resource::<SpecialState>()
                     .temporal_removed

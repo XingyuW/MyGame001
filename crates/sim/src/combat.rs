@@ -1270,7 +1270,9 @@ impl Field<'_> {
         // its target over, a bomber plants its bomb, and a suicide unit blows itself up).
         match self.roles.get(&id) {
             Some(crate::Role::Carrier) => return,
-            Some(crate::Role::Suicide) if self.definitions.rules().is_some() => {
+            Some(crate::Role::MindControl | crate::Role::Demolition | crate::Role::Suicide)
+                if self.definitions.rules().is_some() =>
+            {
                 return;
             }
             _ => {}
