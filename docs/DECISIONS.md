@@ -5053,3 +5053,38 @@ cases use distinct names. The required unmodified `cargo test --workspace --rele
 each target once and no competing validator will run, so this cross-process collision does
 not occur. No test-thread restriction, gate serialization wrapper or assertion change is added.
 The serial preflight means separate Cargo invocations do not overlap, not fewer test threads.
+
+
+### R86. RA7 last-stand fixture preserves its explicit current-sight scenario
+
+**2026-10-15.** Frozen `0ef4a53`'s first full gate is preserved as `ra7-attempt1`, not a full
+validation pass: workspace 6,432 s, 855 passed / 1 failed / 0 ignored. The failure was solely
+`ra4_ai::two_players_who_have_spent_each_other_make_their_last_stand_and_the_match_ends`'s
+unchanged lower-bound assertion `played.ticks > 4400 + LAST_STAND_PATIENCE`. Winner, upper
+limit and unexplained-command assertions already passed. With seed 7, actual default fogOFF
+changes observations/battle/last-stand timing and wins for P1 at tick 4,193 (4,194 iterations),
+with no unexplained commands. With explicit fogON, the original scenario wins P1 at 8,221
+(8,222 iterations), no unexplained commands, and every original assertion passes. Exact winner
+and BuildingSold traces are retained in the last-stand diagnostic preflight logs.
+
+The fixture `start` now receives MatchOptions; `play_with_options` runs an explicit option
+set, while existing `play` retains MatchOptions::default(). Only that specific original
+last-stand regression opts into fogON, preserving every assertion and the 72,000 limit.
+`computer_players_finish_their_matches_with_veterans_and_survivors` retains nine actual-default
+fogOFF cases, including the identical brutal ALPHA/GAMMA pairing and exact replay checks.
+No runtime AI delay/cadence/vision rule changes are made to force a legitimately earlier win
+to wait for the fixture's historical 4,400-tick timeline. This is an intended fixture scenario
+migration, analogous to the explicit RA5 lost-sight bridge-memory scenario in R85.
+
+First-attempt production target passed all 756 matches in 5,141.62 s, versus RA6's 5,462.06 s; its
+complete timing table is retained in `ra7-attempt1/production-lengths.tsv`. Gate 1/2/3/5/6
+exited 0. The failed attempt was stopped during debug smoke before expensive soak/duels;
+that interruption is not a smoke validation pass. All AI fixture targets are added to the
+corrected preflight before a new coherent freeze and fresh all-thirteen-command gate.
+
+
+R86 corrected preflight: all seven AI fixture targets (`m6_ai`, `m7_factions`, `ra1_match`,
+`ra2_ai`, `ra3_ai`, `ra4_ai`, `ra5_ai`) pass all 45 tests, zero failed/ignored. Combined with
+the previous small-target coverage this is 1,119 unique runtime tests before the expensive
+sweeps; the remaining eleven heavy game tests passed in attempt1 and will rerun in the full
+gate. Strict Clippy remains green. The corrected freeze changes no runtime source/data.
