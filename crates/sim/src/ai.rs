@@ -1235,7 +1235,7 @@ pub(crate) fn run_ai(
                 units.retain(|id| !controller.reserved.contains(id));
             }
         }
-        commands.retain(|c| !matches!(c, Command::Move { units, .. } | Command::AttackMove { units, .. } if units.is_empty()));
+        commands.retain(|c| !matches!(c, Command::Move { units, .. } | Command::AttackMove { units, .. } | Command::Attack { units, .. } if units.is_empty()));
         commands.extend(extra);
         commands.truncate(32);
         controller.issued = controller.issued.saturating_add(commands.len() as u64);
@@ -2108,7 +2108,13 @@ fn queue_buildings(view: &View<'_>, controller: &AiController) -> Vec<Command> {
                 .into_iter()
                 .min_by_key(|&k| (view.owned(k), std::cmp::Reverse(k)));
             if let Some(k) = candidate {
-                needed.entry(lane(k)).or_insert(k);
+                let slot = needed.entry(lane(k)).or_insert(k);
+                // A later-tech item must not reserve an otherwise idle
+                // defence lane before its prerequisites exist. Ready build-order
+                // items keep their priority over the sourced defence count.
+                if !view.buildable(ProductionItem::Building(*slot)) {
+                    *slot = k;
+                }
             }
         }
     }
@@ -2493,20 +2499,46 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
                 .map(|building| (building.id, building.footprint)),
         )
         .filter(|&(_, footprint)| near_base(footprint))
+        .filter(|&(id, _)| {
+            !view.ai.rules_difficulty
+                || home
+                    .iter()
+                    .any(|unit| strategy::defence_reachable(view, unit, id))
+        })
         .map(|(id, footprint)| (id, nearest_cell(footprint, controller.start)))
         .min_by_key(|&(id, cell)| (chebyshev(cell, controller.start), id));
+    let mut defenders = BTreeSet::new();
     match threat {
-        Some((_, cell)) => {
-            let responders: Vec<SimId> = home
-                .iter()
-                .filter(|unit| !unit.attacking)
-                .map(|unit| unit.id)
-                .collect();
-            if !responders.is_empty() {
-                commands.push(Command::AttackMove {
-                    units: responders,
-                    target: cell,
-                });
+        Some((target, cell)) => {
+            if view.ai.rules_difficulty {
+                for unit in &home {
+                    if !strategy::defence_reachable(view, unit, target) {
+                        continue;
+                    }
+                    defenders.insert(unit.id);
+                    // Keep an existing chase intact, including its failure bound.
+                    if !unit.attacking
+                        && !matches!(unit.attack_order,
+                        Some(crate::AttackOrder::Attack { target: current, .. }) if current == target)
+                    {
+                        commands.push(Command::Attack {
+                            units: vec![unit.id],
+                            target,
+                        });
+                    }
+                }
+            } else {
+                let responders: Vec<SimId> = home
+                    .iter()
+                    .filter(|unit| !unit.attacking)
+                    .map(|unit| unit.id)
+                    .collect();
+                if !responders.is_empty() {
+                    commands.push(Command::AttackMove {
+                        units: responders,
+                        target: cell,
+                    });
+                }
             }
         }
         None => {
@@ -2525,6 +2557,10 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
             }
         }
     }
+    let home: Vec<_> = home
+        .into_iter()
+        .filter(|unit| !defenders.contains(&unit.id))
+        .collect();
 
     // A wave reduced to less than half its size falls back to the gathering point and rejoins the
     // units at home, so that the next wave attacks with them at full size instead of feeding
@@ -2558,7 +2594,7 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
     let mut fresh = false;
     let ready = home.len() >= controller.difficulty.wave_size as usize
         || (!home.is_empty() && view.tick >= controller.patience_until);
-    if threat.is_none()
+    if (threat.is_none() || view.ai.rules_difficulty)
         && view.tick >= u64::from(controller.difficulty.first_wave)
         && view.tick >= controller.next_wave
         && ready

@@ -442,7 +442,7 @@ fn a_base_is_built_from_an_mcv_in_the_time_the_build_time_formula_gives() {
 #[test]
 fn a_computer_player_builds_in_both_lanes_of_its_yard() {
     // Two computer players of the shipped data on a shipped map: the Allied one has a Pillbox
-    // in its build order, and builds it beside its other buildings.
+    // in its complete defence plan, and builds it beside its other buildings.
     let definitions = shipped();
     let dir = assets().join("data");
     let skirmish =
@@ -505,6 +505,10 @@ fn a_computer_player_builds_in_both_lanes_of_its_yard() {
             }
         }
     }
+    eprintln!(
+        "first default main/defence overlap tick {:?}",
+        both.map(|at| at + 1)
+    );
     assert!(
         both.is_some(),
         "a building and a defence in production at once"

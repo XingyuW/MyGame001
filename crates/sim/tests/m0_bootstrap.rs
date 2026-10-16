@@ -42,7 +42,12 @@ fn consume_randomness(mut rng: ResMut<SimRng>) {
 
 fn sim_app_consuming_randomness(seed: u64) -> App {
     let mut app = sim_app(seed);
-    app.add_systems(SimSchedule, consume_randomness.in_set(SimSet::Ai));
+    app.add_systems(
+        SimSchedule,
+        consume_randomness
+            .in_set(SimSet::Ai)
+            .after(sim::SimCoreSet(SimSet::Ai)),
+    );
     app
 }
 

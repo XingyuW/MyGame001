@@ -6716,3 +6716,413 @@ conservative known-fire landing endpoints and narrow erasure cancellation are ex
 scope,not claims to closed-source AI policy or global route safety. Independent review and user
 visual/audio/play-feel verification remain. Full13 launches only after the committed milestone
 check; healthy source stays frozen and any concrete failure is preserved before dependent work.
+
+## R124 — Order the original bootstrap RNG injector after core AI (2026-10-16)
+
+Sixth frozen gate e01d7e5 fails phase4 (3458s,366 passed/3 failed/0 ignored) only after the
+successful756/756 production sweep,all19 retained exact matches,and simlib67. Its three failures
+are same_seed_consuming_randomness_gives_equal_hashes_at_every_tick,
+hash_reflects_consumed_randomness,and different_seeds_consuming_randomness_give_different_hashes
+in crates/sim/tests/m0_bootstrap.rs. Schedule initialization aborts before their RNG/hash
+assertions: an injected Ai-stage system is unordered against a coreAi system accessing World.
+The raw release diagnostic hides system names; source signatures identify the exclusive system
+as command::certify_ai_strategic_intents, chained after parameter-based run_ai in SimCoreSet(Ai).
+The initial "exclusive run_ai" shorthand is explicitly corrected,not silently retained as fact.
+
+Only sim_app_consuming_randomness fixture registration changes: consume_randomness remains
+in Ai and now runs after the public SimCoreSet(Ai) hook,exactly like the existing stage logger.
+It still consumes one next_u64 per tick. These apps have no controllers/queued strategic intent,
+so ordinary coreAi/certification consumes no randomness; no production ordering is changed.
+All seed values,500-tick per-tick trace comparisons,before/after hash assertions and the explicit
+conflicting_unordered_systems_are_a_schedule_build_error test remain byte-unchanged. Ambiguity
+is still an error; no ambiguous_with exemption,gate relaxation or hidden production conflict.
+This is the exact named existing-fixture migration,not a simulation fix or changed expectation.
+
+All attempt6 raw bytes,partial05 output and hashes are retained under ra8-attempt6. Its fresh
+756-winner production table is historical attempt6 evidence until another complete final-source
+gate passes. It reports2650.17s,median20485/p9051516/max178917; R29 fractions median0.09313955,
+p900.25247917,max0.86475. Maximum fraction rises versusRA7 even though raw maximum falls; no
+limit changes. The three fixture failures require affected bootstrap and meaningful neighboring
+schedule/privacy checks before refreeze. Runtime/assets/scripts remain d1aa0f0 byte-identical,
+so final-source m13/default256 evidence remains applicable; final full13 must still repeat.
+
+## R125 — Compare rejected-command worlds after consuming the hashed pending input (2026-10-16)
+
+The expanded serial fullsim preflight after R124 stops at m2_movement,with34 passed/3 failed.
+The exact existing functions a_move_outside_the_map_is_rejected,
+commands_for_missing_foreign_or_repeated_units_are_rejected,and
+validation_checks_each_named_unit_in_turn share assert_rejected_without_state_change. It
+queues a public command in one app and compares full state_hash against an empty-queue control
+BEFORE Commands runs. R103 deliberately value-hashes all pending command payload/origin/action
+state to satisfy I3; those two pending states must differ. The observed failure is this initial
+pre-application comparison at465,not an applied rejection changing gameplay. Raw
+attempt6-sim-all1.log retains the failure; dependent validation stops.
+
+The helper's identical-setup assert_eq moves before enqueue,and an additional assert_ne now
+requires the intended pending-input hash difference after enqueue. The original actual
+CommandRejected event/reason assertion and every post-consumption equality through30 further
+ticks remain unchanged. No command selection,public validation,queue hash,fixture timing,
+limit or gameplay behavior changes. This strengthens the queue-state requirement while
+preserving the rejected-command no-gameplay-mutation contract. Exact three existing-function
+migration is recorded here; no test is deleted,ignored or renamed. Fullsim and required
+privacy/queue/hash neighbors must pass before refreeze. Runtime/assets/scripts remain identical
+to d1aa0f0; m13/budget evidence is unaffected,but the entire frozen13 must still repeat.
+
+## R126 — A locked later-tech entry cannot monopolize the idle defence lane (2026-10-16)
+
+Expanded fullsim after R125 reaches actual shipped ra2_shipped and reproduces
+ a_computer_player_builds_in_both_lanes_of_its_yard: France/Cuba Medium seed5 on Crossroads
+never concurrently fills Main/Defences within the original6000 ticks. All original setup,
+nonnegative-credit,single-building-per-lane,concurrency assertion and6000 bound stay intact.
+Only its now-outdated build_order comment and a bounded observed-overlap diagnostic change.
+This is a genuine default strategy regression,not a reason to substitute a legacy fixture.
+
+The unchanged-runtime trace rules out resource/producer/ending explanations. At3001 the owned
+Yard/Power/Refinery/Barracks remain,credits7290,Main WarFactory progress80 and no outcome.
+Normal check_buildable(Pillbox) succeeds; it is Defences and its weapon is anti-ground.
+queue_buildings preselects each lane's first missing build_order entry without requiring its
+prerequisites. That entry monopolizes needed[Defences]; sourced legal defence selection then
+uses or_insert and cannot fill it. Full country plans include later-tech armory items before
+the source-count defences. The initial specific WeatherControl attribution was too narrow:
+the earlier SpySatellite is actually first; then other later-tech armory/strategic items follow.
+The controlled ready-priority probe positively exposes this exact ordering and corrects the
+initial shorthand. Raw observations are preserved,not silently relabelled.
+
+The minimal selection fix keeps the existing build_order lane item whenever it is currently
+buildable. Otherwise a currently legal sourced-count defence may replace that impossible
+candidate. Queue capacity,producer,ownership/country/prerequisites,power and credit validation
+remain normal; no command/state/knob/schema is added. An occupied lane still cannot queue more
+than one building. Once later tech is available its existing build_order priority resumes.
+Neutral/legacy empty defence lists and opt-out behavior are unchanged. No balance literal,
+extra income,raised limit,delay or artificial winner is introduced.
+
+ra8_a_locked_late_tech_item_leaves_its_lane_for_a_legal_early_defence declares owned early
+prerequisites and drives actual paid queues with shipped definitions/SimSchedule. Old source
+fails naturally: locked=false legal paid lane blocked. After the fix it requires actual paid
+Pillbox alongside Main; with all later prerequisites owned it preserves SpySatellite priority.
+The first new ready-priority expectation mistakenly named WeatherControl; source correctly
+queued earlier SpySatellite,so that NEW fixture expectation is corrected,not a runtime policy.
+The first expanded trace also had a missing borrow in a diagnostic call; that compile failure
+remains. Diagnostic-only temporary detailed tracing is removed after capture; no original
+assertion changes. Original default6000 test and actual full-tree strategic production/fire/
+recharge/off-with-America-paradrop test now pass. All before/after/insufficient logs remain.
+
+This runtime change makes prior m13/budget and successful attempt6 production historical.
+A complete serial fullsim run must pass first,then all retained exact matches plus freshly
+repeated actual-default all21 ten-player winners and256 mean budget,before committed refreeze
+and another full13. R124/R125 named fixture migrations remain; neither runtime queue hashing
+nor ambiguity rejection is weakened. R29 limits and all existing assertions remain unchanged.
+
+## R127 — Reserve base defenders for threats they can actually fight from their terrain (2026-10-16)
+
+R126's intended legal early defence is retained. Fullsim943 passes,then actual default Demo
+France/Cuba Brutal/Brutal seed0 fails at its unchanged72000 R29 limit in ra8_ai_matches.
+All three earlier demo pairings win; dependent checks stop. The focused new exact function
+ra8_gate_demo_france_cuba_brutal_seed_zero_finishes reproduces the same ending. No existing
+assertion,fixture,limit or winner requirement changes. Raw attempt6-game-ai1 and two unchanged
+runtime focused economy/command traces remain byte-preserved.
+
+At60000 and72000 both sides have zero credits and unchanged paid queues/buildings/health.
+The final12000-tick economy window has no delivery,production,repair,shot or loss. P1 owns
+14 buildings,Idle WarMiner285 and Conscript289. Its Conscript receives AttackMove to visible
+Destroyer cell44,25 every10 ticks,then MoveFailed NoDestination next tick. The ship lies inside
+the Radar52,36 defence radius; this threat prevents the land reserve entering any offensive
+wave. This is positive exact evidence in Demo for a lead previously refuted in Oasis,not a
+revision of that earlier refutation. Public AttackMove correctly cannot put infantry in water.
+Ordinary Attack already searches an actual eligible land firing position and maintains bounded
+chase history,so the AI must use that intent when defending against an observed entity.
+
+For rules_difficulty strategy only,the nearest observed near-base threat must have at least
+one home actor whose actual source weapon/warhead can damage it from a firing position
+reachable through public terrain. The search visits each in-bounds terrain cell at most once
+and uses ordinary source weapon range/minimum range and the same all-three-infantry-spots
+geometry as actual Attack. It reads no occupants or building occupancy; physical legality,
+traffic and bounded chase remain normal Commands/Combat responsibilities. Eligible defenders
+receive ordinary Attack,without resetting matching healthy attacks; other home actors remain
+eligible for ordinary assembly/offense. No unit is made commandable,utility/transient/deployed
+restrictions remain,and the explicitly neutral legacy strategy keeps its original defence
+path. No new policy knob,simulation state or balance/schema change is introduced.
+
+ra8_land_defenders_use_reachable_firing_positions_and_leave_isolated_ships_to_the_fleet
+uses actual shipped Conscript/Destroyer metadata and SimSchedule,declared public water terrain
+and an unarmed controlled target. Old runtime fails the actual shore-shot assertion. The
+corrected controller must fire at a reachable ship from land; against isolated water it must
+join a normal wave and actually fire at the observed land building. No hidden occupancy is
+queried to decide this. Existing base-defence,assembly,witness and privacy checks remain
+required before refreeze.
+
+The first exact replay after this change exposes a new integration error at6682: a core
+defence Attack becomes empty after the existing specialist reservation removes its sole
+actor. The old final internal empty-selection guard covers Move/AttackMove only,because core
+think previously emitted no Attack. Extend precisely that guard to Attack; public empty
+Attack still rejects NoUnits unchanged. The actual overlapping depot-repair regression
+ra8_a_specialist_repair_reservation_removes_the_overlapping_defence_attack requires no empty
+internal Attack and preservation/completion of its ordinary paid service action. The first
+failed replay is retained,not labelled an old lifecycle cancellation or ignored rejection.
+
+With only this defence/admission correction and internal empty-Attack filtering,the exact
+default Demo France/Cuba Brutal seed0 explicitly wins P1 at53249,inside72000. The preserved
+raw attempt6-demo-france-cuba-defence2 command takes51.400891s,simulation10.74s. Co-occurring
+old late-state full-ammo Harrier failed-target sweep and potential-vs-owned naval-range
+observations are uncredited leads: neither aircraft/scout/failure policy nor naval planning
+is changed to obtain this win. No artificial liquidation,income,defence rollback or limit
+change is used. Remaining final-source preflight,all21 default ten-player winners,256 mean
+budget and frozen full13 must repeat on this runtime; prior metrics remain historical.
+
+The first new isolated-water negative probe was insufficient: that branch passed under old
+source because its distant ship was not yet observed; it failed only later on the shore case.
+The first reservation-filter mutation likewise passed: initial AI ran before ordinary sight
+initialization,so service reserved the actor before a defence intent existed. Both raw failed-
+to-fail probes and exact immediate restoration hashes remain. Correct only these NEW fixtures:
+a stationary owned Spy supplies actual offshore sight; one normal schedule tick with controllers
+temporarily absent initializes vision,then controllers are restored and explicit visibility is
+asserted before the decision. No SpecialState.hidden/vision bits are seeded. With the isolated
+branch first,old defence source now fails specifically reachable=false (before3); removing only
+the empty-Attack filter fails the actual overlapping reservation assertion (reserved-before2).
+Each mutation restores ai.rs and the test byte-for-byte immediately,with matching pre/post SHA
+in attempt6-defence-negative-restoration2.json,before any subsequent validation. The failed
+exact-context patch applied no partial changes; it was retried with smaller verified context.
+
+## R128 — Keep real strike focus while handling actual nearby threats (2026-10-16)
+
+Serial post-R127 fullsim stops at equal_brutal_armies_finish_thousand_lakes_with_regrowing_ore:
+704 passed/1 failed/0 ignored across50 completed targets; later targets are not run. The
+869.801744s command retains the original288000 bound and every assertion. Exact retained
+ra8_gate_thousand_lakes_france_germany_seed_zero_finishes reproduces France/Germany Brutal
+seed0 with actual default setup in277.675213s (240.35s test),without a rejection exemption.
+The R126 early-defence and R127 legitimate terrain-aware defence fixes remain intended.
+
+At288000 P0 has only PowerPlant456 at42,19,HP750,credits12897,no queue/income,and GI668
+attacking repaired P1 Prism247. P1 has21 buildings,credits58768,active ore deliveries,two
+miners/Engineers and four full-ammo Harriers650/652/654/655; its Yard,Barracks,Factory and
+strategic sources are gone. P1 remembers only456 with failure3,targetWaypoint3008. Actual
+late commands at276000/288000 send the aircraft to their own airfield vicinity213,225 every
+10 ticks. Ammo/reloading/disabled/service maps are empty; ordinary dock commitments remain.
+The last48000 window includes13000 P1 ore credits and34 Harrier Power shots across earlier
+remaining plants,but no final attack on456. Neither forced liquidation nor a reload/value
+change is justified: a legal finishing weapon and source dock exist.
+
+strategy::decide bypasses direct known-base focus whenever ANY armed non-harvester enemy
+unit exists anywhere. A distant GI blocks an air wave although its weapons cannot hit it.
+Meanwhile core target failures permanently exclude456 and the actually observed waypoint
+policy keeps selecting a local point. Final baseline stability is deduced from actual default
+fogOFF,known previously observed456,and absence of any remaining P0 Gap/strategic source;
+the controlled reproduction also directly asserts current target visibility and fogOFF.
+No hidden target is manufactured or learned. The previous Demo air observation alone was
+uncredited; this separate ending failure plus actual controlled sortie now establishes it.
+
+ra8_a_remote_armed_unit_does_not_strand_real_strike_sorties_at_their_dock declares owned
+ordinary powered airport/satellite infrastructure,one actual Harrier,sole hostile Power750
+and a distant stationary GI. Only the unwanted initial fixture Yard is removed; target
+health,ammo,failure counters and perception are not seeded. Source before2 fires exactly
+one two-shot volley,observes ordinary airport reload,then sits loaded at home with natural
+failure3 and a waypoint for18000 ticks; the actual destruction assertion fails. The first
+new observation mistakenly inspected special rearming rather than airport reloading and
+is preserved as insufficient evidence. Two shots are ONE Harrier Burst2 volley,not two
+sorties; successful validation must exceed the sourced burst and observe actual reload.
+
+For an active wave consisting entirely of airport-bound strike aircraft,base focus now
+considers source-eligible hostile/response weapon envelopes at actual observed wave positions,
+including minimum range and applicable air bonus. Unarmed or incapable distant units do not
+own that strike wave's mission. A real nearby eligible threat keeps ordinary AttackMove
+acquisition; its base-focused Attack meeting that threat hands back to AttackMove. Matching
+healthy strike attacks/chases are preserved. Other waves retain the original global armed-unit
+check,ground focus and artillery standoff behavior. This is an explicit AI policy assumption
+using source ranges,not a closed-source AI claim or full route-threat prediction; no new
+radius,quota,timer,state or balance/schema field is introduced. Source target immunity and
+bombability metadata remain part of weapon/warhead eligibility.
+
+The first predicate/matching-order candidate still fails. Its bounded actual trace shows
+17960/17980 healthy Attack(Power6,chases1),full ammo,and a pending core home AttackMove13,5;
+alternate turns hold home plus a new focus Attack. The existing reservation mechanism must
+also own the preserved focused job,so core scouting cannot overwrite it while the strategy
+properly refrains from resetting its chase. Local-threat handoff and matching ordinary
+approaches retain their job without filtering away the extra legitimate command. The
+reserved set is already bounded/value-hashed; actual state still changes only through FIFO
+commands/SimSchedule. Service,disabled/deployed/transient exclusions,strategic support
+selection and public command validation remain intact. No blanket failure clear is used.
+
+With this integration,the controlled Power is actually destroyed around6341 after six shots
+and real reload,inside its unchanged18000 setup bound. The local FlakTrooper control also
+requires an actual strike shot at a real nearby anti-air threat. Its first NEW fixture used
+4000 ticks to observe assembly,but actual Brutal first_wave+patience is4467; its explicit
+6000 observation window now waits for real wave admission before adding the local threat.
+That insufficient setup log remains. ra8_a_resumed_strike_focus_preserves_its_healthy_chase_across_controller_turns
+checks the actual reloaded approach across controller turns without repeated/conflicting
+core commands; mutation proof and full validation remain required before refreeze.
+
+The existing RA8 function ra8_aircraft_complete_real_ammo_return_and_reload_before_ai_retasks_them
+is strengthened: both early-exit and final shot-count predicates become greater than the
+actual source burst,instead of>=2. Harrier Burst2 made two shots alone an insufficient proof
+of firing after refill. Its original empty-ammo and uninterrupted reload assertions remain;
+no source ammo/recharge/range/ROF is altered. This exact named expectation change strengthens
+the intended actual post-reload contract rather than mirroring an implementation detail.
+
+R127's new defence helper has one separately reproduced source boundary: an IFV isolated on
+a legal land cell can already shoot a visible Rocketeer using its source AirRangeBonus4,
+although no plain-range chase position exists. Actual scheduled old source fails its
+defence admission assertion. ra8_a_defender_already_inside_its_source_air_bonus_range_remains_eligible
+initializes ordinary sight with controllers/weapons temporarily absent,then restores the
+actual owned weapon at a due turn and requires both queued Attack and real current-position
+shot. The helper now accepts actual current-position bonus coverage first,while retaining
+Combat's deliberate PLAIN-range chase search. It does not invent bonus-only chase destinations.
+
+Every failed candidate,new-fixture observation correction,raw complete failure and mutation
+restoration remains. Exact default Lakes/Demo ending credit,complete final-source sim/game,
+all21 ten-player winners,256 mean budget and all13 frozen gates are still pending. No original
+RA5 assertion,public rejection,match limit or default-path requirement is weakened.
+
+The first broader local-threat candidate passed five focused boundaries but correctly failed
+the unchanged ra8_artillery_uses_the_surface_tank_line_when_aircraft_share_its_wave:
+V3 expected11,8 behind Rhino,got no standoff. Raw attempt6-artillery-focus1 is preserved.
+Applying the new strike predicate/ownership/handoff to mixed ground/air waves was too broad.
+Restrict precisely those new paths to a nonempty active wave whose sourced metadata is all
+airport_bound. This is a source capability category,not a new balance quota or guessed radius.
+The original mixed/ground/artillery path and every existing assertion are retained; no fixture
+exception or expectation migration is used. The precise Harrier versus mixed-Rhino/V3/Kirov
+boundaries,local AA control,healthy ownership,reload and source-bonus checks must pass before
+exact Lakes/Demo replays. Final-source metrics and the full13 remain pending.
+
+The narrowed candidate passes all six focused boundaries,including unchanged mixed-wave
+artillery and the strengthened real post-reload third shot. Exact final-candidate Lakes
+France/Germany Brutal seed0 now explicitly wins P0 at249844 (limit288000),285.348313s command/
+251.31s test; Demo France/Cuba Brutal seed0 retains P1 at53249 (limit72000),12.551624s command/
+12.00s test. Lakes ends under P0's surviving Mirage pressure; do not misattribute its whole
+ending to P1 destroying the last Power. The separate controlled actual six-shot destruction,
+reload and local-threat/healthy-chase proofs establish the repaired strike capability. Both
+independently proved current-position bonus and strike corrections belong to this candidate;
+no isolated exact-winner causality is claimed. Raw complete before/after logs remain.
+
+Standalone fmt,unfiltered working diff,workspace Clippy -D warnings,generator and reference
+checks all exit0 on this source. Complete final-source simulation all-targets preflight is
+active; no source expansion or competing simulation runs during it. Game/exact/default
+ten-player/256 budget,committed milestone and all13 gates still remain.
+
+## R129 — Stop futile paid repairs before they renew helpless patience (2026-10-16)
+
+Final-source fullsim5 passes949 tests/72 targets, but the serial game preflight stops on
+its second exact Demo pairing: Germany/Great Britain, both Brutal, seed0 has no winner at
+the original72000 bound. Game/bin217 passes; later game commands do not run. The complete
+failure and exact replay remain as attempt6-game-ai2 and demo-germany-britain-trace1.
+No fixture/default/limit/rejection assertion is changed to pass the game.
+
+At60000 and72000 P0 owns only Refinery151 and four idle unarmed ChronoMiners, no producer,
+queue, income or finishing force. P1 owns eleven buildings and its sole Harrier265, has
+zero credits and stalled production. Its aircraft makes real sorties and normal reloads.
+In the final12000 ticks it fires22 refinery shots; P0 pays3444HP of repair, credits fall
+3777→2905. Own repair debits change R53's credit signature repeatedly, moving its stalled
+start59990→71980 without any recovery. This is a repair-admission loop, not a reload defect
+or evidence that the surviving capable opponent should liquidate.
+
+Strategy now uses one ordinary RepairBuilding toggle per decision: it stops already-active
+repairs and does not start new ones when no owned finishing/recovery opportunity exists.
+The conservative recovery check preserves owned source-qualified finishing forces (including
+recoverable/temporarily unavailable owned forces), active refinery/harvester or cash income,
+recoverable garrisons, an MCV, an Engineer with observed capturable tech, owned strategic
+capability, and any normally buildable building or army item. The latter reuses the normal
+prerequisite/producer/owner checks without a cash or queue-capacity restriction, so a brief
+funding gap or attainable producer does not cancel useful repairs. No enemy hidden state,
+new quota/radius, persistent state, source repair value, public command validation, R53
+hash/signature/credit-change behavior, patience or turn cadence changes. This conservative
+admission is a declared AI policy assumption; it does not claim source closed-AI policy.
+
+New scheduled ra8_futile_paid_building_repairs_do_not_renew_a_helpless_last_stand_forever
+first requires the real controller to enable ordinary paid repair and actually heal; then
+the declared producer/crew loss leaves a refinery under real hostile GI fire. Old runtime
+before2 records474 credit changes/9000 ticks, no stop and no winner, failing the ordinary-toggle
+assertion. New source records two credit changes, an ordinary stop and P1Won2021. New
+ra8_income_production_and_a_usable_force_keep_useful_building_repairs separately retains
+repair under oil income, a legal Yard and a real Grizzly, requiring actual healing. Original
+ra8_building_and_depot_repairs_use_paid_production_paths passes unchanged. The first NEW
+negative fixture introduced fire before its initial net-healing observation, so before1
+failed that setup assertion and does not prove the loop; introduce the real GI only after
+observed paid healing. The first NEW positive checked net HP over200 ticks under continued
+fire, which is not an observation of repair work; after1 is retained and the new fixture now
+accumulates actual per-tick HP increases while forbidding a cancellation. No existing test
+expectation is migrated. All complete failed/insufficient logs remain byte-exact.
+
+The new exact ra8_gate_demo_germany_great_britain_brutal_seed_zero_finishes uses the shared
+normal-game harness with an explicitly stricter72000 cap (min with unchanged R29 scaled
+limit). It now wins P1 at45057, command42.908337s/test9.58s including compilation. The original
+R53 unit test a_player_that_can_neither_fight_nor_earn_makes_its_last_stand and both RA4 AI
+tests pass without assertion changes. Final-source full sim/game, all21 default ten-player
+winners,256 mean budget and frozen all13 must repeat; earlier final-source metrics are
+historical after this runtime change. Independent review remains pending.
+
+## R130 — Give an escorted strike subset its own bounded job (2026-10-16)
+
+Final R129 strict checks and full simulation pass951 tests/72 targets. Game/bin217, all ten
+cheap default Demo pairings, all five M10 tests and the five retained production companions
+pass. The retained exact target completes ten explicit winners, then Liberty Iraq/America
+Brutal seed0 fails its unchanged288000 bound. Stop only the verified owned test child after
+that completed failure; keep its complete snapshot/assertion and the subsequent partial
+Liberty Medium output. attempt6-finalgame3-09 exit101/1180.571257s has SHA78b80ea37b6f3ab75e4822e78ba952450525d17617f6a69bbc11d8d8528c9103.
+The stop metadata names PID/command/signal; no unrelated process or source is changed.
+
+Exact unchanged-runtime trace1 again fails288000,219.623626s, SHA4dc37ae67dce79514bcfb6244415432b5b65e617f4427affe8b747b65e79a0a6.
+Its late240000..287999 counters show real ore deliveries33400/31200, normal paid production,
+losses and repairs. P0 activates Nuke4/Curtain8; P1 Storm4/Chronosphere1/Paradrop8. Strategic
+availability and reload failure are refuted, and both sides retain real finishing/income/
+production capability; liquidation is unjustified. P1 loses ten Harriers,23 Grizzlies and
+eight Prisms. Its Harriers fire eleven shots into Flak Cannons and mostly enemy army shots,
+no economic-building shots. P0 repairs5971 Flak HP; P1 repairs12452 Patriot/7596 Prism/5028
+Pillbox HP. Full counters remain in the raw trace and extracted late-metrics record.
+
+P1's final wave is three Harriers plus a Dog. R128's whole-wave all-airport-bound predicate
+therefore suppresses the focused strike job even though the aircraft are the same eligible
+actors. Independently prove this in new scheduled
+ra8_a_detector_escort_keeps_real_strike_sorties_and_its_own_wave_mission: actual controller
+membership must include both Dog and Harrier, actual ammo return/reload occurs, and focused
+orders must resume while both remain in the wave. Multiple actual sorties and real base
+destruction are separately required. Old sourceSHA1d3ac444be92004109b4ceedb34aa0549b0e511a893507646ad4fca19239f2a2
+records joinedtrue/returnedtrue/resumedfalse,only two shots(one source Burst),no destruction
+at18000. New source records joined/returned/resumedtrue,six shots,ordinary target destruction.
+No failure/perception/ammo/target-HP state is seeded. Both complete raw outcomes remain.
+
+Apply focus, local source-eligible threat handoff and healthy-job reservation to only the
+eligible airport-bound subset after the existing specialist/service/AA reservations. The
+original global-enemy/direct-focus/artillery policy executes separately for all other actors,
+including Dog/Rhino/V3/Kirov. Strategic support and screen planning still see the original
+eligible complete wave before partition. No legitimate escort is removed from army/membership,
+no utility/disabled/deployed/service/transient actor is promoted, and matching aircraft orders
+are preserved. The original mixed Rhino/V3/Kirov artillery assertion passes unchanged, as do
+remote strike, actual local AA response, healthy-chase ownership and strengthened real reload.
+This is a declared AI job-admission policy assumption using existing source capability,
+weapons, visibility and reservations; no new tuning constant, state/schema or timer is added.
+
+The controlled capability proof is separate from exact Liberty ending credit. All ten cheap
+Demo pairings and the exact failed Liberty replay run before another complete fullsim repeat;
+no ending credit or final benchmark transfer is claimed until they complete. Final-source
+complete simulation/game/exact, all21 default ten-player winners,256 mean budget and frozen
+all13 remain required. No existing assertion, rejection exemption or match limit changes.
+
+The six scheduled controls pass on this subset implementation. The complete ten cheap
+Demo pairings then pass unchanged. Exact Liberty Iraq/America Brutal seed0 now wins P0 at
+107940/288000,218.016803s command/212.18s test, rawSHA7b9b628f3f1bf35c7e4b158b4637b918a743db2587c461071ca848b6006ce25e.
+The controlled repaired P1 strike capability and the actual P0 match winner are distinct
+claims; no isolated claim that P1 aircraft caused the final win is made. Repeat all21
+retained exact cases before the remaining complete simulation/game preflight to catch
+integration failures earlier. Fresh ten-player/256 budget and all13 still remain mandatory.
+
+Final R130 preflight7 completes all16 commands with exit0: strict five checks; all21 retained
+exact winners; complete simulation952 tests/72 targets; game/bin217,M10five,five original
+production companions; then both required m13 commands. Together with the earlier same-source
+Demo harness(one test/ten winners),this is1201 passed/0failed/0ignored across81 test-target
+invocations. Focused proof repeats overlap and are not added. Source339 manifest5 rehashes
+without a mismatch. No validator is active at the source-commit point.
+
+Actual default ten-player all21 completes21/21 explicit winners/ten builders each,means<5ms,
+command1408.635261s,measured1403.896s/mapelapsed1404.023s. Endings median85128/p90125479/
+max174450 versus sixth checkpoint65538/90705/99602:all rise under unchanged400000,reported
+without causal attribution or artificial timing. Worst reported mean is Arctic Floes1.051ms;
+the earlier compact message naming Red Canyon1.035ms as worst was preliminary and is corrected
+by the full parse. Frostline's real longest725.867ms/busiest1000mean8.033ms remain in the raw
+record; no maximum-tick or smooth-play guarantee is claimed. The fixed24000-tick three-map
+256×256 benchmark passes65.758103s,all ten builders:Liberty.953828ms,Continental1.006ms,
+Pacific.757202ms,below unchanged5ms. No competing validation simulation or profiler runs.
+All measurements and historical counterparts are in attempt6-final-m13-metrics.json.
+
+New external task storage remains only recreatable configured-Cargo parser scratch:58 files,
+584038 file bytes/733184 allocated bytes(716KiB),freshly remeasured after final runs. Earlier
+RA5/RA7 evidence and all configured caches remain. All thirteen frozen commands,both fresh
+756-winner two-player R29 distributions and independent review still remain required.
