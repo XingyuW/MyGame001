@@ -193,6 +193,27 @@ pub struct AiController {
     naval_goal: Option<CellPos>,
     naval_site: Option<CellPos>,
     next_naval_scan: u64,
+    /// Progress of each observed AA clearance job; reinforcements do not renew a failed hold.
+    air_screens: BTreeMap<SimId, AirScreenProgress>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct AirScreenProgress {
+    remaining: u32,
+    distance: u32,
+    hp: i32,
+    last_progress: u64,
+}
+
+impl AirScreenProgress {
+    fn advance(&mut self, remaining: u32, distance: u32, hp: i32, tick: u64) {
+        if remaining < self.remaining || distance < self.distance || hp < self.hp {
+            self.last_progress = tick;
+        }
+        self.remaining = self.remaining.min(remaining);
+        self.distance = self.distance.min(distance);
+        self.hp = self.hp.min(hp);
+    }
 }
 
 /// Width + height of the largest map on which a difficulty's army applies unscaled.
@@ -337,6 +358,7 @@ impl AiController {
             naval_goal: None,
             naval_site: None,
             next_naval_scan: 0,
+            air_screens: BTreeMap::new(),
             difficulty,
         })
     }
@@ -467,6 +489,14 @@ impl AiController {
         hasher.write(&[u8::from(self.seen_air), u8::from(self.unseen_loss)]);
         hasher.write_u64(self.next_wave);
         hasher.write_u64(self.next_naval_scan);
+        hasher.write_u64(self.air_screens.len() as u64);
+        for (id, progress) in &self.air_screens {
+            hasher.write_u32(id.0);
+            hasher.write_u32(progress.remaining);
+            hasher.write_u32(progress.distance);
+            hasher.write_u32(progress.hp as u32);
+            hasher.write_u64(progress.last_progress);
+        }
         hasher.write_u64(self.observed_units.len() as u64);
         for (id, cell) in &self.observed_units {
             hasher.write_u32(id.0);
@@ -642,6 +672,11 @@ struct UnitSnap {
     /// [`View::fights`].
     armed: bool,
     attacking: bool,
+    /// Existing combat intent, derived from the already hashed Weapon state.
+    attack_order: Option<crate::AttackOrder>,
+    combat_target: Option<SimId>,
+    /// Actual movement progress from the already hashed current order.
+    move_progress: Option<(CellPos, u32)>,
     sight: Option<u32>,
 }
 
@@ -669,7 +704,10 @@ struct BuildingSnap {
 /// What one computer player may know (docs/DECISIONS.md D43). [`think`] reads nothing else.
 struct View<'a> {
     known_occupants: BTreeSet<SimId>,
+    owned_units: Vec<&'a UnitSnap>,
+    frozen_army: BTreeSet<SimId>,
     recoverable_garrisons: Vec<SimId>,
+    recoverable_service: Vec<&'a UnitSnap>,
     seen_tech: Vec<&'a BuildingSnap>,
     living_owned_ids: BTreeSet<SimId>,
     player: PlayerId,
@@ -716,7 +754,42 @@ impl<'a> View<'a> {
         // to command or to count on (it is gone when it has done its work), and a unit that is
         // hidden from the player (a submerged, disguised or mirage unit) is not seen.
         let hidden = &special.hidden;
+        let service_candidate = |unit: &&UnitSnap| {
+            unit.owner == player
+                && unit.hp > 0
+                && !unit.has_order
+                && !unit.attacking
+                && available_for_army(special, unit.id)
+                && !special.parasites.contains_key(&unit.id)
+                && !definitions.on_foot(unit.kind)
+                && definitions.domain(unit.kind) != Domain::Air
+                && special.docked.get(&unit.id).is_some_and(|host| {
+                    buildings.iter().any(|b| {
+                        b.id == *host
+                            && b.economy
+                            && b.owner == player
+                            && b.hp > 0
+                            && b.footprint.distance_to_cell(unit.mobile.cell) <= 1
+                            && definitions
+                                .metadata(ProductionItem::Building(b.kind))
+                                .is_some_and(|m| m.unit_repair)
+                    })
+                })
+        };
         Self {
+            owned_units: units.iter().filter(|u| u.owner == player).collect(),
+            frozen_army: units
+                .iter()
+                .filter(|u| {
+                    u.owner == player
+                        && u.armed
+                        && special.disabled.contains_key(&u.id)
+                        && !special.docked.contains_key(&u.id)
+                        && !special.parasites.contains_key(&u.id)
+                        && available_when_enabled(special, u.id)
+                })
+                .map(|u| u.id)
+                .collect(),
             known_occupants: units
                 .iter()
                 .filter(|unit| {
@@ -725,6 +798,7 @@ impl<'a> View<'a> {
                 })
                 .map(|unit| unit.id)
                 .collect(),
+            recoverable_service: units.iter().filter(service_candidate).collect(),
             recoverable_garrisons: special
                 .garrisons
                 .iter()
@@ -810,7 +884,7 @@ impl<'a> View<'a> {
                 unit.owner == player
                     && unit.armed
                     && unit.harvest.is_none()
-                    && army_commandable(special, unit.id)
+                    && (army_commandable(special, unit.id) || service_candidate(&unit))
             }),
             own_kinds: buildings
                 .iter()
@@ -978,14 +1052,20 @@ type BuildingQuery<'w, 's> = Query<
 // Frozen/deployed actors cannot accept army movement orders. They return to the
 // candidate set after release/undeploy, without retaining a stale wave assignment.
 fn army_commandable(special: &crate::SpecialState, id: SimId) -> bool {
+    !special.docked.contains_key(&id) && available_for_army(special, id)
+}
+
+fn available_for_army(special: &crate::SpecialState, id: SimId) -> bool {
+    !special.disabled.contains_key(&id) && available_when_enabled(special, id)
+}
+
+fn available_when_enabled(special: &crate::SpecialState, id: SimId) -> bool {
     !special.spawned.contains_key(&id)
         && !special.strategic.flights.contains_key(&id)
         && !special.erasures.contains_key(&id)
         && !special.deployed.contains_key(&id)
         && !special.interactions.contains_key(&id)
-        && !special.docked.contains_key(&id)
         && !special.rearming.contains_key(&id)
-        && !special.disabled.contains_key(&id)
 }
 
 // Utility and deploy-only weapons do not make a unit available for army orders. In
@@ -1052,6 +1132,12 @@ pub(crate) fn run_ai(
                         .any(|kind| army_weapon(&definitions, kind))
                 }),
                 attacking: weapon.is_some_and(|weapon| weapon.order.is_some()),
+                attack_order: weapon.and_then(|weapon| weapon.order),
+                combat_target: weapon.and_then(|weapon| weapon.target),
+                move_progress: orders
+                    .current
+                    .as_ref()
+                    .map(|order| (order.destination, order.best)),
                 sight: sight.map(|sight| sight.0),
             },
         )
@@ -1171,6 +1257,12 @@ pub(crate) fn run_ai(
                     if u.armed {
                         witness.armed.insert(id);
                     }
+                } else if matches!(command, Command::Move { .. })
+                    && view.recoverable_service.iter().any(|u| u.id == id)
+                {
+                    // A normal Move is valid for this decision-time owned service occupant.
+                    // Other docked/transient actors never obtain this cancellation witness.
+                    witness.owned.insert(id);
                 } else if (matches!(command, Command::Deploy { .. })
                     && view.recoverable_garrisons.contains(&id))
                     || (command.units().is_none()
@@ -1374,7 +1466,12 @@ fn think(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
     }
     // While it sells buildings to fund an army unit, and until it has one, it does not queue
     // buildings, which would take the credits first.
-    if view.own_units.iter().any(|unit| view.fights(unit)) {
+    if view
+        .own_units
+        .iter()
+        .chain(&view.recoverable_service)
+        .any(|unit| view.fights(unit))
+    {
         controller.liquidating = false;
     }
     if broke(view) {
@@ -1423,6 +1520,7 @@ fn remember(view: &View<'_>, controller: &mut AiController) {
         .collect();
     for id in gone {
         controller.known.remove(&id);
+        controller.air_screens.remove(&id);
         controller.failures.remove(&id);
     }
     controller.seen_air |= view
@@ -1778,7 +1876,11 @@ fn visible_ore(view: &View<'_>) -> Vec<CellPos> {
 /// produce). Without income its credits will not grow, so a match between such players would never
 /// end (docs/DECISIONS.md D43).
 fn broke(view: &View<'_>) -> bool {
-    if view.own_units.iter().any(|unit| view.fights(unit))
+    if view
+        .own_units
+        .iter()
+        .chain(&view.recoverable_service)
+        .any(|unit| view.fights(unit))
         || view.own_units.iter().any(|unit| {
             unit.harvest
                 .is_some_and(|state| state != HarvestState::Idle)
@@ -1891,6 +1993,7 @@ fn last_stand(view: &View<'_>, controller: &mut AiController) -> Option<Command>
     }) && !view
         .own_units
         .iter()
+        .chain(&view.recoverable_service)
         .any(|unit| strategy::can_finish(view, controller, unit));
     if !helpless {
         controller.last_stand = false;
@@ -2362,7 +2465,11 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
         })
         .map(|unit| (unit.id, *unit))
         .collect();
-    controller.wave.retain(|id| armed.contains_key(id));
+    // A living owned combat member frozen by a temporary ability keeps its mission,
+    // but remains absent from active candidates and receives no commands until release.
+    controller
+        .wave
+        .retain(|id| armed.contains_key(id) || view.frozen_army.contains(id));
     let home: Vec<&UnitSnap> = armed
         .values()
         .filter(|unit| !controller.wave.contains(&unit.id))
@@ -2426,7 +2533,17 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
         && controller.wave.len().saturating_mul(2) < controller.difficulty.wave_size as usize
         && !controller.fall_back_exempt
     {
-        let back: Vec<SimId> = controller.wave.iter().copied().collect();
+        let back: Vec<SimId> = controller
+            .wave
+            .iter()
+            .copied()
+            .filter(|id| armed.contains_key(id))
+            .collect();
+        if back.is_empty() {
+            // All surviving members are temporarily frozen. Keep this casualty
+            // retreat pending until an active member can receive the ordinary order.
+            return commands;
+        }
         controller.wave.clear();
         controller.target = None;
         commands.push(Command::AttackMove {
@@ -2472,6 +2589,9 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
         .iter()
         .filter_map(|id| armed.get(id).copied())
         .collect();
+    if members.is_empty() {
+        return commands;
+    }
     let at_rest = members.iter().all(|unit| unit.idle()) && joined.is_empty();
     let centroid = centroid(&members, controller.start);
     // Large maps: a new wave first moves through a staging point beside the direct route.
@@ -2829,6 +2949,239 @@ mod tests {
     }
 
     #[test]
+    fn ra8_service_recovery_does_not_admit_unavailable_or_foreign_actors_to_the_army() {
+        let definitions = crate::load_ruleset(
+            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets/data"),
+        )
+        .unwrap();
+        let grid = Grid::from_cells(
+            32,
+            32,
+            vec![
+                Cell {
+                    passable: true,
+                    water: false,
+                    buildable: true,
+                    ore: 0,
+                };
+                32 * 32
+            ],
+        )
+        .unwrap();
+        let mut players = Players::default();
+        players.add(PlayerId(0), 0).unwrap();
+        let state = players.get(PlayerId(0)).unwrap();
+        let plan = ra8_controller().plan;
+        let unit = UnitSnap {
+            hp: 200,
+            id: SimId(1),
+            owner: PlayerId(0),
+            kind: definitions.unit_kind("grizzly").unwrap(),
+            mobile: Mobile {
+                speed: 16,
+                cell: CellPos::new(10, 10),
+                step: None,
+            },
+            has_order: false,
+            harvest: None,
+            armed: true,
+            attacking: false,
+            attack_order: None,
+            combat_target: None,
+            move_progress: None,
+            sight: Some(4),
+        };
+        let building = BuildingSnap {
+            economy: true,
+            hp: 1000,
+            id: SimId(2),
+            owner: PlayerId(0),
+            kind: definitions.building_kind("service_depot").unwrap(),
+            footprint: Footprint {
+                origin: CellPos::new(11, 10),
+                width: 3,
+                height: 2,
+            },
+            producer: None,
+            sight: Some(4),
+            pending: Vec::new(),
+        };
+        let mut special = crate::SpecialState::default();
+        special.docked.insert(unit.id, building.id);
+        let check =
+            |special: &crate::SpecialState, unit: &UnitSnap, building: &BuildingSnap, expected| {
+                let units = std::slice::from_ref(unit);
+                let buildings = std::slice::from_ref(building);
+                let view = View::new(
+                    PlayerId(0),
+                    0,
+                    &players,
+                    state,
+                    &grid,
+                    &definitions,
+                    &plan,
+                    false,
+                    units,
+                    buildings,
+                    special,
+                );
+                assert!(
+                    view.own_units.is_empty(),
+                    "service occupants stay outside ordinary army selection"
+                );
+                assert_eq!(view.recoverable_service.len(), expected);
+            };
+        check(&special, &unit, &building, 1);
+        for change in [
+            |s: &mut crate::SpecialState| {
+                s.deployed.insert(SimId(1), 0);
+            },
+            |s: &mut crate::SpecialState| {
+                s.disabled.insert(SimId(1), u64::MAX);
+            },
+            |s: &mut crate::SpecialState| {
+                s.rearming.insert(SimId(1), 100);
+            },
+            |s: &mut crate::SpecialState| {
+                s.interactions.insert(SimId(1), SimId(2));
+            },
+            |s: &mut crate::SpecialState| {
+                s.spawned.insert(SimId(1), SimId(2));
+            },
+            |s: &mut crate::SpecialState| {
+                s.erasures.insert(
+                    SimId(1),
+                    crate::special::infantry::Erasure {
+                        remaining: 100,
+                        beams: BTreeMap::new(),
+                    },
+                );
+            },
+            |s: &mut crate::SpecialState| {
+                s.strategic.flights.insert(
+                    SimId(1),
+                    crate::special::superweapons::Flight {
+                        owner: PlayerId(0),
+                        target: CellPos::new(20, 20),
+                        infantry: UnitKind(0),
+                        count: 1,
+                    },
+                );
+            },
+            |s: &mut crate::SpecialState| {
+                s.parasites.insert(
+                    SimId(1),
+                    crate::special::vehicles::Parasite {
+                        passenger: crate::special::Passenger {
+                            id: SimId(3),
+                            kind: UnitKind(0),
+                            hp: 10,
+                            harvester: None,
+                            experience: None,
+                            bay: None,
+                        },
+                        owner: PlayerId(1),
+                        weapon: crate::WeaponKind(0),
+                        due: 100,
+                        squid: false,
+                        escape: None,
+                    },
+                );
+            },
+        ] {
+            let mut unavailable = special.clone();
+            change(&mut unavailable);
+            check(&unavailable, &unit, &building, 0);
+        }
+        for change in [
+            |b: &mut BuildingSnap| {
+                b.owner = PlayerId(1);
+            },
+            |b: &mut BuildingSnap| {
+                b.hp = 0;
+            },
+            |b: &mut BuildingSnap| {
+                b.economy = false;
+            },
+        ] {
+            let mut invalid = BuildingSnap {
+                pending: Vec::new(),
+                ..building
+            };
+            change(&mut invalid);
+            check(&special, &unit, &invalid, 0);
+        }
+    }
+
+    #[test]
+    fn ra8_aa_job_progress_survives_reinforcement_and_preserves_slow_approaches() {
+        let mut progress = AirScreenProgress {
+            remaining: 300,
+            distance: 30,
+            hp: 900,
+            last_progress: 0,
+        };
+        // New participants, repairs and restarted longer routes are not progress.
+        for tick in 1..=3000 {
+            progress.advance(400, 35, 900 + (tick % 2) as i32, tick);
+        }
+        assert_eq!(progress.last_progress, 0);
+        // The expired job remains expired on the next decision with identical facts.
+        progress.advance(300, 30, 900, 3020);
+        assert_eq!(progress.last_progress, 0);
+        // An actual improving detour can be slow and temporarily farther away.
+        progress.advance(299, 31, 900, 3040);
+        assert_eq!(progress.last_progress, 3040);
+        progress.advance(299, 29, 900, 5000);
+        assert_eq!(progress.last_progress, 5000);
+        progress.advance(299, 29, 899, 7000);
+        assert_eq!(progress.last_progress, 7000);
+        assert_eq!(
+            (progress.remaining, progress.distance, progress.hp),
+            (299, 29, 899)
+        );
+    }
+
+    #[test]
+    fn ra8_each_aa_job_progress_field_changes_the_value_hash() {
+        let mut base = ra8_controller();
+        base.air_screens.insert(
+            SimId(1),
+            AirScreenProgress {
+                remaining: 20,
+                distance: 3,
+                hp: 900,
+                last_progress: 10,
+            },
+        );
+        let hash = |c: &AiController| {
+            let mut h = Fnv1a64::new();
+            c.hash_into(&mut h);
+            h.finish()
+        };
+        let changes: &[fn(&mut AiController)] = &[
+            |c| c.air_screens.clear(),
+            |c| {
+                c.air_screens.get_mut(&SimId(1)).unwrap().remaining = 19;
+            },
+            |c| {
+                c.air_screens.get_mut(&SimId(1)).unwrap().distance = 2;
+            },
+            |c| {
+                c.air_screens.get_mut(&SimId(1)).unwrap().hp = 899;
+            },
+            |c| {
+                c.air_screens.get_mut(&SimId(1)).unwrap().last_progress = 11;
+            },
+        ];
+        for change in changes {
+            let mut changed = base.clone();
+            change(&mut changed);
+            assert_ne!(hash(&base), hash(&changed));
+        }
+    }
+
+    #[test]
     fn ra8_all_added_controller_memory_changes_the_value_hash() {
         let base = ra8_controller();
         let hash = |c: &AiController| {
@@ -2950,6 +3303,7 @@ mod tests {
             naval_goal: None,
             naval_site: None,
             next_naval_scan: 0,
+            air_screens: BTreeMap::new(),
         };
         let hash = |c: &AiController| {
             let mut h = Fnv1a64::new();
@@ -3044,6 +3398,9 @@ mod tests {
             harvest: None,
             armed: false,
             attacking: false,
+            attack_order: None,
+            combat_target: None,
+            move_progress: None,
             sight: Some(4),
         };
         let yard = BuildingSnap {
@@ -3169,6 +3526,9 @@ mod tests {
             harvest: None,
             armed: true,
             attacking,
+            attack_order: None,
+            combat_target: None,
+            move_progress: None,
             sight: Some(4),
         });
         let view = View::new(
@@ -3425,6 +3785,9 @@ mod tests {
             harvest: (!armed).then_some(HarvestState::Idle),
             armed,
             attacking: false,
+            attack_order: None,
+            combat_target: None,
+            move_progress: None,
             sight: Some(4),
         };
         // One turn of player 0 at `tick`, with `credits`, a soldier queued whose step of
@@ -3586,6 +3949,9 @@ mod tests {
             harvest: None,
             armed: true,
             attacking: false,
+            attack_order: None,
+            combat_target: None,
+            move_progress: None,
             sight: Some(4),
         };
         // Own units 1 and 2 (2 was launched by 1); enemy units 3 and 4 (4 is hidden).

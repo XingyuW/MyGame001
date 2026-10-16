@@ -1390,8 +1390,12 @@ pub(crate) fn process_commands(world: &mut bevy_ecs::world::World) {
                         "Strategic target must be visible",
                     ))
                 && crate::special::strategic_intent_valid(world, &issued, false);
+            let source_erasure_began = ai_intent.as_ref().is_some_and(|w| w.strategic_valid)
+                && result == Err(RejectReason::AbilityUnavailable("Target is being erased"))
+                && crate::special::strategic_intent_erasure_only(world, &issued);
             if let Err(reason) = result
                 && !cell_visibility_lost
+                && !source_erasure_began
                 && !ai_intent
                     .as_ref()
                     .is_some_and(|w| stale_ai_intent(&reason, w))

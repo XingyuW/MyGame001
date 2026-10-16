@@ -6243,3 +6243,476 @@ required milestone check of this committed checkpoint; this is not RA8 closure o
 R115 checkpoint staged hygiene: the separately inspected unfiltered check exits0 with empty
 stdout/stderr. `checkpoint5-staged-hygiene.json` records that result; a separate recheck after
 staging the record also precedes the checkpoint commit. No raw log byte is changed.
+
+## R116 — Failed fifth gate: bounded AA clearance, honest interception and preserved approaches (2026-10-16)
+
+Frozen2343be1/runtimebbb09fe fails phase4 after7346s:253 passed,1 failed,0 ignored.
+The production target has5 passing companion tests and1 failing sweep in6998.99s; its raw
+output contains seven seed0 stalls under the unchanged R29 limits: Liberty Bay IraqBrutal/
+AmericaBrutal; Oasis Gulf GermanyBrutal/GreatBritainBrutal; Steel Harbor FranceMedium/
+GermanyMedium; Frozen Sound CubaBrutal/GermanyBrutal; Black Water LibyaBrutal/AmericaBrutal
+and KoreaBrutal/FranceBrutal; Wheel of Worlds GermanyBrutal/GreatBritainBrutal. There is no
+successful756-row result/table. The owned-group monitor stops after the complete failed phase;
+phase5 is empty/partial and6–13 do not run. `ra8-attempt5` retains all ten captured raw files
+and hashes. Its initial last-Wheel-only observation is retained with an explicit seven-case
+correction, not silently rewritten. Every earlier attempt remains unchanged.
+
+Read-only liveness shows the long tail on one core. The parent authorizes one bounded native
+sample:5 seconds requested,5.241876s command, retained raw/SHA and included in gate timing.
+`combat::act_unit → nearest_cell → destination_cells/BinaryHeap` dominates non-wait stacks.
+The finite closed-cell/strict-lower-cost/eight-neighbour/map bounds are evident; other scheduled
+stages appear. This is no evidence of an accidental infinite loop, nor proof of match progress
+or an unprofiled performance measurement. No optimization or source edit occurs during the gate.
+
+The exact SteelMedium replay on unchanged runtime fails at288000 in438.370s. Its60k ore
+windows are P0:81300/53000/37500/39500, P1:73775/46525/40000/35500, followed by the final partial
+window. Ground units actually hit Patriots; final tanks/aircraft/harvesters still travel or work.
+That refutes blanket unreachable-force, reload or helpless-liquidation explanations. It also
+records thousands of repeated direct AA Attack intents across long approaches. R114 reissued
+those intents every decision, resetting chase/path failure history and bypassing ordinary
+combat against intervening units; a moving/returning aircraft could keep a failed ground team
+from the core's all-idle failure condition. No limit, difficulty, source defense count, public
+rejection rule or legitimate travel is relaxed to obtain a winner.
+
+Controlled probe history is explicit in `ra8-preflight/attempt5-diagnosis.json`. The first
+new helper permits pre-wave idle fire; later geometry also lets reactor34,2 tie economic34,12
+for nearest known objective and win origin ordering outside the AA envelope. Those earlier
+new-helper negative/fallback observations are invalid R114 evidence, retained and superseded.
+An incidental-splash explanation was provisional and not established: the actor dump reveals
+the missing actual-job positive control. The corrected helper uses reactor42,2, real6000-tick
+initialization and introduces the interceptor only after an actual AA focus command is queued.
+The original `ra8_air_strikes_wait_for_ground_to_clear_an_observed_outranging_aa_screen`
+scenario and every assertion remain unchanged; only failure diagnostics are added. No old test
+expectation or fixture is migrated by this correction. A six-case diagnostic launched just
+before the parent's bounded-probe priority is stopped after21.344s by exact owned PID, retaining
+its partial output and explicit non-semantic-interruption record; it is neither a pass nor an
+assertion failure.
+
+Corrected positive-controlled schedule tests prove a visible intervening Rhino receives actual
+ground fire and a terrain-separated ground job releases aircraft to cross the barrier. One
+bounded probe replaces only strategy.rs with exactbbb09fe R114 source: BOTH fail. Immediate
+finally restoration precedes any next check/build/commit; before/restored SHA is
+5f7a6945cd72401823bbe28c4179608deb72a2bb31a8476705ea1fbf30dce2eb, old SHA is
+2cc8c63d13836e13d63baee36c9ce6bfda4c5fc60272d6d1a5174475461be4f5.
+A separate schedule test gives an already established actual Attack a valid prior chase count2.
+The old source resets it to1 and fails; that single probe restores immediately, with exact
+before/restored SHA512541a8fd7abe84a8061709ce40215008c774acdababf5fe1ed24c118a887be.
+Raw failures and both integrity JSON files are retained. There is no leftover negative source.
+
+The scoped correction retains matching Attack/AttackMove orders and their normal progress/
+chase/failure history. Ground forces use ordinary combat along the approach and focus the AA
+at source weapon range. A visible source-eligible armed unit within an actor's actual weapon
+reach is handled before continuing the clearance job; both directions' weapon/warhead/traits
+eligibility and normal visibility apply, with ordered distance/id selection. AA priority is
+retained if an incidental real unarmed/AA-only economy building diverts the approach; synthetic
+occupied Props are not assumed safe economic buildings. All actions remain bounded ordinary
+commands. Idle ground with no combat target and no actual AA firing reach uses the existing
+MAX_TARGET_FAILURES bound when moving aircraft alone keep the wave active; the core continues
+to count ordinary all-idle failures. This reads owned movement/combat outcomes and supplies no
+hidden blocker information. Legitimate travel, combat, aircraft return and reload remain active.
+The first corrected four-test focused batch passes, but exact Steel still fails at288000
+(`attempt5-exact-after1-01.log`,192.614s including compilation). Its P0 Patriot688 remains
+HP900 at120000/180000/240000/288000 while clearance IDs are replaced; P1 Patriot551 also
+remains HP900 at120000/180000. Reinforcements clear the core failure counters, so active
+replacements repeatedly renew an unchanged clearance job. This is failed job progress, not
+successful clearance and not grounds for forced liquidation of useful forces.
+
+Each observed AA job now retains an ordered, value-hashed progress entry: global least actual
+remaining path cost to a source-legal firing goal, least physical distance, lowest observed
+HP, and last genuine improvement tick. The existing map-scaled `wave_patience` bounds a hold
+without such progress; no new tuning value is introduced. Reinforcement IDs, restarted longer
+paths and repaired/increased HP do not renew it. An expired same-target entry survives the
+core's reinforcement failure reset, so the next decision cannot reinstall that hold without
+actual closer approach or damage. Genuine slow/detouring movement can renew it through the
+existing MoveOrder.best actual-step metric even when temporarily farther away. Entries are
+removed alongside forgotten known buildings, bounding memory by known targets. The controller
+never inspects unseen terrain/occupancy/health to infer a reason for failure. On expiry it
+simply leaves ordinary healthy ground/air orders, return/reload and target selection available.
+Three read-only snapshot fields derive existing Weapon order/target and Orders movement
+progress, already value-hashed in simulation state; no additional pathfinder/topology cache
+is introduced. These are declared game-owned AI policy assumptions, not recovered original
+AI source. All exact default winner/compatibility/performance evidence and a new frozen full13
+remain required for closure.
+
+The first recurring-casualty fixture released after only two replacement batches via the older
+all-idle fallback, so its minimum-batch assertion correctly failed and did not isolate this
+new guard. The corrected schedule fixture declares external normal Move orders to keep
+owned ground forces active behind its water barrier and spawns real fresh recruits under the
+normal assembly cadence, with no improvement against the untouched Patriot. This isolates
+progress from idle status. A subsequent compile probe caught misuse of CommandQueue.push's
+IssuedCommand API, and a runtime fixture probe found a recruit cell occupied by moving unit11;
+both raw failures remain. The fixture now uses its existing issue helper and bounded free-cell
+placement attempts. No runtime public validation or old assertion changes to accommodate them.
+The initial progress-state compile requires controller-compatible PartialEq/Eq; that retained
+compile failure is corrected before dependent testing.
+
+The job-progress schedule counterexample passes with31 real fresh recruits and unchanged
+Patriot HP900. Disabling ONLY the new deadline makes it fail (0 passed/1 failed); immediate
+finally byte restoration is verified before any subsequent action, before/restored SHA
+86ae95223f142b24eac71876ff0f00a479d0efd68d475559d5a89058a3186d7f, mutated SHA
+7a38531f6320103ca3718837a0de149d51bf0251d0e9cd95e0c52e39bc787acd. This proves that
+bounded no-progress release, not an idle fallback, releases those aircraft. Restored16 RA8
+lib tests and5 controlled schedule tests pass. A separate actual2800-tick approach at declared
+units-file speed1 passes beyond Medium's2400-tick patience with every ground unit advancing,
+no AA damage and held aircraft. Its initial raw Mobile.speed probe is invalid: scheduled
+special::advance correctly restores source speed, letting the AA die before the observation.
+Both failed slow probes/dumps remain; the corrected fixture parses only two speed variants
+under existing configured cargo-target/tmp/ra8_definitions (no new external directory). Source
+combat/rules/arsenal and normal movement scheduling are retained. No old test is weakened.
+
+## R117 — AA tactical reservations preserve combat-wave strategic support (2026-10-16)
+
+The first exact R116 batch stops after SteelMedium Won(P1,114681), retained Thousand Lakes
+France/GermanyBrutal Won(P1,167951), then Liberty Iraq/AmericaBrutal None at288000. The five
+remaining cases have not run; neither positive is substituted for them. Raw logs, durations
+and exact source hashes are retained in attempt5-exact-after2.json. Liberty is a distinct
+remaining failure: old flak220 progress remains expired since151541, but its final flak2218
+job has legitimate damage progress (lowestHP739,last287651). Both players retain real mobile
+capabilities, ongoing harvesting, production, repairs and strategic recharge, so liquidation,
+a new hold deadline or a reload adjustment is not justified.
+
+An unchanged-runtime economy replay preserves the exact288000 failure. Its60k delivery
+windows P0 are68000/47600/41100/40000, P1 are69000/42050/47650/46000, plus final partial
+32000/36300. P1 produces9/8/18/12/12 Prism tanks, losing8/5/19/13/10; it repairs Patriot
+HP1653/5754/7893/6898/6528. P0 repairs flakHP4239/3406/3298/5863/3730. Full counters and
+actual surviving capabilities are retained separately; these observations refute an inactive
+economy or universally incapable survivor explanation, without claiming any one drain causes
+the complete match trajectory.
+
+At120000 Chronosphere241 is fully ready8400. Its actual wave has13 members; tactical screen
+reservations cover all12 except on-foot Tanya1344. strategy::decide then removes every
+reserved actor before passing ground_wave to strategic. Consequently no tank in the actual
+AA clearance job can receive Curtain/Chronosphere support, even with a legal ready source.
+A schedule regression establishes the real observed AA job first, announces a real owned
+Chronosphere normally, then seeds readiness solely to isolate this targeting boundary. It
+fails on the unchanged R116 source (0 passed/1 failed). Source recharge remains independently
+covered by the paid full-tree tests; this readiness probe does not claim to test recharge.
+
+Combat support is now selected from the actual combat wave before AA-specific tactical
+reservations, and still queued after tactical commands in the same original FIFO position.
+Earlier service/specialist reservations and the commandable/army/transient/disabled filters
+remain in force; utility actors are not admitted. The screen still prevents conflicting
+movement/attack orders, while its real tanks remain eligible for the unchanged sourced
+Curtain or explicit Chronoshift {building,source,target} logic. Source ownership, power,
+readiness, source-cell eligibility, infantry safety and actual landing legality are unchanged.
+No new state, tuning value, command variant or hidden-world inspection is introduced by this
+support-boundary fix. The controlled regression, existing support/AA tests, exact Liberty
+winner and all remaining cases must pass before crediting the ending fix or refreezing.
+
+The controlled support/clearance batch passes8 tests, but exact support-fixed Liberty still
+fails None at288000 (168.93s test/202.594s command including compilation). This is a proved
+capability correction, not an ending win. The reordered batch stops there, so its remaining
+seven rechecks have not run. Prior Steel and France/Germany positives remain evidence for the
+preceding source only. No limit, public rejection or legitimate surviving capability is relaxed.
+
+## R118 — Aircraft wait near an observed clearance opening, using known source AA ranges (2026-10-16)
+
+A read-only exact Liberty coordination replay preserves the failure at288000. At101211,
+full-ammo Harriers88/74/1042 at97,92 /84,81 /155,154 are sent to home218,218. Enemy flaks
+292/509/642 fall at102985/103747/103936. Hold samples at103011/103821 put aircraft112/1042
+near231,228 /229,228. Replacement flak1270 appears106461; subsequent airport-plane building
+shots first occur108848 (1042→884), then109916 (88→884). Other AA, including610, survives:
+this is a missed local opening, not a claim that the entire enemy base was AA-free. Raw
+coordination/economy output is diagnostic and is not an unprofiled performance measurement.
+
+Loaded aircraft now wait at an explored cell on the map-clipped perimeter one cell beyond
+rounded-up source AA reach around the selected observed barrier. Actual source weapon,
+warhead eligibility, armour traits and air-range bonus determine the envelope. Candidate
+endpoints are rejected if covered by any remembered AA building or presently observed
+eligible AA unit. Ordered integer distance/row/column selection and per-decision assigned
+cells retain deterministic air occupancy; Grid::room_in(Air) sees only known occupants.
+No raw unseen building footprint is consulted. Existing matching healthy wait movement or
+an already safe perimeter position is retained. With no perimeter endpoint, a safe current
+position or gather point may be used; with none available, no new endpoint is ordered.
+Empty planes keep ordinary actual return/reload. This guarantees the stated endpoint checks,
+not global avoidance along a route: normal movement and commands enforce physical occupancy.
+There is no new global air path planner, persistent state, quota, radius or timer. The one-cell
+rounding margin is geometry derived from source range. This is declared game-owned coordination
+policy, not recovered original AI source.
+
+A controlled slow-ground schedule kills the actual observed Patriot at elapsed3601. Under
+home-wait it misses a declared60-tick local opening; forward-wait produces an actual aircraft
+shot at the known economic barracks inside it. The first fixture used a raw replacement
+Patriot, explicitly not a paid/ready placement. It is superseded by a stronger ordinary-path
+fixture: a defender Engineer captures a neutral derrick, its startup/income pays a legal
+Flak Cannon queue, the test asserts full source cost/build progress before placement, and an
+ordinary PlaceBuilding closes the same declared60-tick opening. It does not claim60 is the
+source production duration. Both raw first-fixture results are retained separately.
+
+Three newly added, still-uncommitted R116 probes assumed crossing x22 meant release or that
+holding meant staying on the home side. Forward waiting legitimately crosses that line while
+still held. ra8_an_unreachable_ground_screen_does_not_hold_strike_aircraft_forever and
+ra8_reinforcements_without_aa_job_progress_cannot_renew_the_aircraft_hold now observe actual
+ordinary Attack/AttackMove eligibility; ra8_a_slow_advancing_aa_team_keeps_its_aircraft_hold_beyond_initial_patience
+asserts the absence of that release while actual ground progress continues. This preserves
+their semantic requirements and removes a home-position implementation assumption. The original
+pre-existing clearance function and every assertion remain unchanged. The revised no-progress
+deadline-only mutation fails and immediately restores exactly; its SHA record is retained.
+
+The first fog twin used a forward own barracks, accidentally triggering base defense instead
+of establishing the intended wave; it now uses stationary Engineer source sight. Both hidden
+unit and unseen newly built building twins pass identical endpoint/controller/command assertions.
+A bounded all-occupants/raw-building mutation initially catches only the building twin: its
+airport-bound Harrier is not a valid stationary occupancy negative. Replacing that actor with
+an unseen stationary Kirov makes BOTH tests fail on the occupancy mutation (0 passed/2 failed),
+with immediate byte/SHA restoration before any following action. The partial1pass/1fail negative
+is preserved as insufficient proof. The corrected paid-opening and both positive twins pass.
+Final-source focused checks, all exact defaults, ten-player budget/completion and a frozen full13
+remain required; no ending win is credited yet.
+
+The strengthened fixture passes with charged1000/progress840 matching Flak source cost1000/
+build time840, and a real ordinary placement. The captured neutral derrick supplies actual
+startup/income; no credits or completed production are injected. With ONLY endpoint selection
+changed back to home gather, this same fixture fails. Immediate finally restoration matches
+SHA278aa7a3aef38719be47443a5a80a023df758f81288d2039d624df0a52a3e3ea. The corrected
+stationary-Kirov/building occupancy mutation fails both twins and restores exactly
+bfdbd9fbd6837e73d43ed88185dae5340de2dfeab9b44db17d14f280043f393c. The earlier Harrier
+negative did not establish stationary occupancy at the planning boundary; its precise movement
+cause was not traced, and no docking/reload diagnosis is claimed from that insufficient probe.
+The revised semantic no-progress negative restores b8c1bf811c049732c6514cf6f07c68543529dad87729c489a3eb1f6287cb9098.
+All raw negatives, positives and integrity records remain unchanged.
+
+## R119 — Recover a permanently unfunded service occupant through ordinary movement (2026-10-16)
+
+The final R118 exact batch wins Liberty Iraq/America Brutal at251722, Steel France/Germany
+Medium at136154, and the retained Thousand Lakes France/Germany Brutal at139627. Oasis Gulf
+Germany/Great Britain Brutal still reaches its unchanged252000 limit. Its actual surviving
+state is distinct: P1 has zero credits, no yard or refinery, four correctly idle miners,
+stranded naval survivors and two legitimately travelling GIs. Grizzly1645 remains HP291 at
+223,99 docked to service1543. The source repair loop correctly skips unaffordable steps, but
+army_commandable excludes all docked actors, so AI never gives this recoverable tank an order.
+P0 still has real income and travelling combat forces. These facts do not justify forced
+liquidation, fictional income, an aircraft reload change or another AA timeout.
+
+View now derives a separate ephemeral set of owned living stationary service occupants:
+real live owned unit-repair building, adjacent vehicle, no existing movement/combat order,
+and every ordinary spawned/strategic-flight/Temporal/deployed/interacting/rearming/disabled
+exclusion plus parasite, infantry and aircraft exclusion. They remain excluded from ordinary
+army selection. When source repair_step_cost is unaffordable and owned economic state shows
+no income (neither a refinery with active harvesting nor a cash-income building), strategy
+queues an ordinary Move away. Land vehicles use the existing gather target; naval vehicles
+clear the job at their present cell. Ordinary command validation and physical movement apply.
+Fresh depot admission uses the same funding/income guard, preventing immediate redocking.
+No-income stranding is distinguished from a brief cash gap with actual owned income; this is
+explicit game-owned recovery policy. No persistent state, tuning or public command is added.
+
+Only those valid decision-time recovery Move actors receive the existing owned-intent witness.
+No other docked/transient actor is certified by this exception. Recoverable combat occupants
+also count toward existing survival capability checks before base liquidation or miner draft;
+they do not become utility combat recruits. Public commands remain strict.
+
+The actual scheduled regression first uses ordinary Interact, consumes exactly one source
+repair-step payment, and observes real HP gain before funds reach zero. On the original source
+it fails because the still-damaged tank never leaves. With recovery it observes actual AI Move,
+dock removal, unchanged unpaid HP, no sale or redocking, and real WeaponFired in subsequent
+combat. Raw before/after logs are retained. Focused exclusion, income and lifecycle checks,
+then an exact Oasis winner and all other retained/failing pairs remain required before
+claiming this ending fixed or refreezing.
+
+R119's four focused recovery/security checks pass: real paid repair and subsequent combat,
+owned-income cash-gap retention, later ownership-loss cancellation versus identical public
+rejection, and complete View exclusions for eight unavailable/parasite states plus invalid
+host ownership/liveness/economy classification. Exact Oasis still fails252000 (157.06s test,
+201.067s including compilation). Recovery is therefore a capability correction only. Its
+unchanged diagnostic replay shows Grizzly1645 travelling221,101 at243000 to202,95 at246000,
+actually firing at1629, then dying246108. P1 GI1659/1660 first appear in the3000-tick sample
+at249000 idle218,100 and reach126,45 by252000; this refutes treating their final active step
+as proof of a long-lived stalled route. Exact birth/source tracing remains pending.
+
+An initial remote-tech/naval-threat admission lead is explicitly unproved and is refuted
+by physical footprint checks at all five periodic snapshots: no actual hostile unit or
+building lies within the sourced12-cell radius of a P0 real owned building there. The offline
+negative records its limited visibility/Props scope and does not claim an exact decision
+replay. No admission-policy change is made from that lead. Source also confirms that an
+existing wave already admits home replacements under the ordinary cohort/patience and
+next-wave rules; there is no nonexistent empty-wave-only gate to remove. The air-only wave
+snapshots do not by themselves establish permanent reinforcement starvation. Further exact
+late birth, killing-shot, objective and membership evidence selects any next correction.
+
+OreDelivered reports the base amount; physical and virtual purifier bonuses are applied
+separately by special/resolve.rs. Diagnostic ore_credits counters preserve that raw event
+amount and must not be mistaken for the complete credited-income total. Current parser
+scratch is remeasured at58files/584038 file bytes/733184 allocated bytes (716KiB), including
+the slow-AA speed fixture; it remains recreatable, retained for reruns and unnecessary for
+release. No new external directory was created for these diagnostics.
+
+## R120 — Preserve temporarily frozen attack missions and choose known-fire-safe Chronoshift landings (2026-10-16)
+
+The second unchanged Oasis diagnostic traces actual births, killing shots, strategic activations
+and sampled wave membership. Prism1558 is born216307 at35,101, rests near home219000, and is
+Chronoshifted by230 to218,103 at219261. Known enemy Prism Tower242 at219,98 kills it that SAME
+tick. Prism1512 is born203296, shifted203391 to234,113, and appears204000 at233,113 with a
+HOME35,89 AttackMove and wave=false; enemy GI shots kill it204149. Other units have distinct
+losses: Grizzly1417 (born180585) and1425 (born181734) die185243/184955 to the observed northern
+fleet and its launched aircraft. No single universal killing cause is claimed. P1's final
+GI1659/1660 are actual CrewEscaped from981 at248280 (236,91), not an indefinitely static route.
+Storm and Chronoshift really activate repeatedly; charge snapshots are not proof of unused
+strategic capability. No ending win is credited from these diagnostics.
+
+Actual source Chronoshift clears movement/combat orders and disables arrivals for unchanged
+chrono_freeze80. Core army selection correctly excludes disabled units, but wave.retain then
+forgets the temporarily frozen mission. After release the unit is treated as a new home stray
+and may be ordered back across the map instead of resuming the offense. View now separately
+derives existing living owned armed members that are ONLY temporarily disabled, retaining their
+already value-hashed wave IDs. They remain absent from active command candidates. Deployed,
+service, interaction, rearming, erased, spawned, strategic-flight and parasite exclusions remain;
+no new actor becomes commandable. Dead/captured IDs disappear, and an all-frozen wave neither
+issues an empty selection nor advances an invented resting objective. A genuine casualty retreat
+uses active actors only. No new persistent state or timer is introduced.
+
+AI Chronoshift planning now translates the complete owned source group, excluding a source
+that would also take unavailable/aircraft actors or ordinary infantry. Every translated landing
+must retain all previous visible geometry/occupancy rules AND lie outside remembered building
+and currently observed unit weapon envelopes eligible against that actual arriving unit's
+armour/domain/organic/psionic traits. Source range, air bonus, minimum range, weapon and warhead
+eligibility supply the checks; no policy radius or multiplier is added. Unseen enemies are not
+queried. This is conservative endpoint planning during the source freeze, not invulnerability,
+global route avoidance, a prediction of future production, or a change to public Chronoshift's
+permissive rules. Normal source ownership, explicit source/target, power, charge and recharge
+remain. Owned complete snapshots are planning information, not command candidates or new state.
+
+The scheduled freeze regression establishes a real attack wave, a real source announcement and
+ordinary activation; readiness is seeded solely to isolate this capability boundary. Before the
+fix it fails exactly because source freeze erases membership. Afterward it requires no actor
+commands while disabled, release into the existing offensive wave, no home retreat, and actual
+WeaponFired. A separate schedule test removes dead/captured frozen members normally.
+
+New-fixture corrections are retained explicitly: the first compile used a private command helper;
+the next setup ran before first_wave+wave_patience. The helper now waits those actual public
+difficulty values before restoring controllers. A high-weight reactor at the map edge initially
+had no legal destination. An interior target then accidentally forced a safe first landing due
+to the unrelated yard footprint (old source passed, so it was insufficient negative evidence).
+The corrected declared War Factory28,30 / powered Prism Tower26,36 / power plant22,34 setup
+admits the old first translated landing31,33 in source tower range; old source fails naturally.
+After the fix it chooses the existing later legal candidate36,38, with the ENTIRE translated
+group outside that range. Unseen new ground-unit and building twins use actual local Rocketeer
+sight rather than insufficient Engineer sight; they preserve identical queued source/destination,
+controller state and commands. No hidden state is preseeded. Existing tests/assertions remain.
+
+The three initial corrected boundary checks pass after the fix. Required death/ownership-loss,
+existing support/command suites and exact Oasis are in progress; final-source all-map completion,
+mean budget and all13 frozen checks remain required before closure. Source difficulty, freeze,
+recharge, public validation and every match limit are unchanged.
+
+## R121 — Do not plan from erased strategic sources; cancel only a fully revalidated later erasure (2026-10-16)
+
+The R120 exact Oasis replay changes trajectory but fails an ordinary command boundary at31061:
+owned captured airport2684384142 queues Paradrop while its own source is already in Temporal
+erasure, rejected AbilityUnavailable("Target is being erased"). Its remaining5186 is below
+the sourced initial6000, so the erasure predates the one-tick decision/application interval.
+strategic() checked power/disabled/charge but omitted own source erasures. It now skips such
+sources rather than suppressing their intrinsically invalid commands.
+
+The first actual-beam fixture omitted the attacker's initial scheduled sight and correctly
+received UnknownTarget. After sight was added, a powered Chronosphere probe was masked by
+its reactor's earlier automatic beam and resulting power loss; that pass is insufficient
+negative evidence. The exact replacement normally captures a neutral airport with an Engineer,
+announces real ownership, uses an actual enemy Chrono attack, and asserts the erasure before
+restoring the controller. Source readiness is seeded only to isolate already-erased admission;
+it is not a recharge test. The unpowered airport reproduces the intrinsic queued-source error
+before the fix. Source power semantics and America/airport-major-SW independence remain.
+
+The existing R113 complete certificate ALREADY performs own→commandable→validate_launch.
+There was no omitted common guard to fix: already-erased sources are correctly not certified.
+An engine-only scheduled boundary test nevertheless proves that a fully valid decision followed
+by source erasure before application formerly rejects instead of cancelling. It seeds that
+late state after scheduled Visibility to isolate the same post-decision actor change an actual
+Combat beam creates; the separate airport fixture establishes a real beam. Its initial matrix
+also observed that wrong-type sources preserve the earlier "No strategic ability" error rather
+than "Target is being erased"; the new assertion records that exact original error order.
+
+Only a strategic intent certified fully valid at decision may now cancel an application whose
+actual result is exactly "Target is being erased", whose source is currently erased, and whose
+ENTIRE current authorization/type/argument/bounds/visibility/power/charge/form validation passes
+when only that erasure guard is omitted. Spawned/strategic-flight restrictions remain checked.
+Public commands and intrinsically erased sources retain their original rejection. An additional
+current unready/type/argument error prevents cancellation; no generic AI error is hidden.
+The existing certificate value is already included in the queued-state hash; no new queue state
+or public command is added. The common commandability extraction preserves public check order
+and strings. Read-only revalidation changes no gameplay state and feeds no hidden data to AI.
+
+The focused strategic lifecycle/visibility/hash batch passes3 tests; actual airport planner,
+exact Oasis and remaining full-source acceptance checks remain in progress. No limit, error
+exemption, source freeze/recharge or source balance is changed, and no ending is credited yet.
+
+R121's extended private matrix passes alongside the existing strategic visibility/hash cases:
+fully certified later erasure cancels only that action; intrinsic already-erased/public sources
+still reject. Later unready, spawned-restriction, changed source type and changed command
+arguments remain rejected with the original public check order/strings. The complete certificate
+never omits common commandability. The actual captured-airport planner test now passes as well.
+Exact default Oasis finally wins P1 at41171/252000 (20.04s test,54.414s command including compile).
+This credits the combined corrected source, not R119 recovery alone. Other exact cases, final
+source performance/completion and the full13 remain required.
+
+A coordinator's source-only casualty/freeze concern is pending an actual scheduled reproduction:
+fallback constructs an active-only retreat after clearing wave membership. The final run_ai
+filter already removes empty AttackMove selections, so no externally emitted rejection is
+claimed from that inspection. The distinct question is whether an all-frozen, casualty-reduced
+non-exempt wave should defer its legitimate retreat until active members return. No change is
+made from source inspection alone; the healthy exact-case batch continues first.
+
+## R122 — Defer an all-frozen casualty retreat until actual actors can move (2026-10-16)
+
+The R121 source concern is now an actual scheduled reproduction, not an emitted-command
+rejection claim. run_ai already filters empty selections. The defect is lost deferred mission:
+a formerly full, non-exempt wave reduced below half while every survivor is Chronoshift-frozen
+clears membership before any survivor can execute its legitimate casualty retreat.
+
+ra8_an_all_frozen_casualty_wave_defers_its_nonempty_retreat_until_release builds the actual
+sourced32-member cohort after normal assembly readiness, performs ordinary explicit Chronoshift,
+observes actual disabled arrivals, and applies controlled lethal damage to nonshifted members
+through the schedule. Before the guard, it fails exactly because the wave forgot its deferred
+retreat (attempt5-frozen-casualty-before1). The narrow guard returns before clearing the mission
+when the active retreat selection is empty. After actual release, ordinary nonempty AttackMove
+to gather performs the existing casualty policy. No disabled actor receives a command and no
+empty command rejection is claimed. The positive scheduled probe passes (after1).
+
+No new persistent state, timer, quota, command, eligibility exception or match limit is added;
+existing wave IDs remain value-hashed. Dead/captured members still leave normally. This restores
+the same temporary-freeze lifecycle already established by R120, including a genuine retreat
+rather than inventing an offensive or forced liquidation. Affected frozen/death/capture checks,
+final-source exact matches, m13/budget and all13 frozen gates remain required before closure.
+
+## R123 — Sixth final-source preflight checkpoint, not full acceptance (2026-10-16)
+
+R116–R122 now pass the complete serial relevant batch:512 passed,0 failed,0 ignored across22
+result targets (265 simulation/13 targets,217 game unit,one demo harness with10 explicit wins,
+five multi-player tests,five original production companions,and19 retained exact seed0 winners).
+The whole19 target takes1078.135s; total serial command time1601.179s. Every fifth-gate failure
+and the retained France/Germany Thousand Lakes case is included on the final R122 source.
+No old assertion, limit or rejection exemption is changed by these corrections. R116/R118
+explicitly retain the insufficient/corrected NEW probe observations and immediate restoration
+proofs. R97's actual stale-intent mechanism is closed by R103, not deferred as known broken play.
+
+Actual default ten-player m13 --to-the-end all passes21/21 explicit wins with ten builders each,
+mean<5ms on every map and unchanged400000 outer limit. Endings:median65538,p9090705,max99602;
+command871.883s,measured866.706s,sum of map elapsed866.824s. Frostline winsP7 at60753 with
+mean0.976574ms and59.336s elapsed. No Super Me,unlock,injectedHP or startup-option change enters
+these normal runs. Fixed24000-tick256x256 means are0.938850/0.783365/0.770953ms for
+Liberty/Continental/Pacific; command60.300s. Peak ticks124.145/119.145/73.141ms remain explicit;
+mean budget is not a maximum-tick/smooth-play guarantee. Raw seventh-run logs and structured
+attempt5-final-m13-metrics.json retain every result.
+
+Full-tree inventory against RA7f5505cd:1124→1226 (+102),zero removed/renamed/unmapped/ignored
+tests,without path exclusions. Strict fmt,unfiltered working diff,Clippy-Dwarnings,generator
+and reference checks pass. The339-file runtime/assets/scripts/example/dependency manifest is
+unchanged across final preflight and timing. R29's72000-scaled limits and all assertions remain.
+Fresh final756-winner production/duel distributions and all13 frozen commands are STILL required;
+no independent review or completed RA8 acceptance is claimed here.
+
+Storage is remeasured after the slow-speed fixture:configured Cargo tmp/ra8_definitions has
+58 files,584038 file bytes,733184 allocated bytes (716KiB). It is retained recreatable parser
+scratch for reruns and unnecessary for release. No clone/worktree/environment/substantial tmp
+artifact or other new external directory exists;configured Cargo/UV/PIP caches and earlier
+RA5 render/RA7 parser evidence remain. All five failed gates,partial outputs,CPU sample and
+negative/failed-to-fail probes remain byte-preserved. The fifth-gate sample's5.242s overhead
+belongs only to that failed gate,not these unprofiled final measurements.
+
+Checkpoint6 records exact commits,raw evidence,migration ledger,assumptions and RA9 handoff.
+R83 transport/attached-Squid,R96 actorless occupied-Prop ability boundaries and the unproven
+R99 bombable=false capability lead remain for RA9. R91/R92 data-owned AI policy assumptions
+remain; R114/R116–R118 source-derived observed-AA coordination,temporary-freeze mission retention,
+conservative known-fire landing endpoints and narrow erasure cancellation are explicit review
+scope,not claims to closed-source AI policy or global route safety. Independent review and user
+visual/audio/play-feel verification remain. Full13 launches only after the committed milestone
+check; healthy source stays frozen and any concrete failure is preserved before dependent work.
