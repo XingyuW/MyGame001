@@ -1,0 +1,6 @@
+{
+  "utc": "2026-10-16T08:46:15.710389+00:00",
+  "owned_diagnostic_process": "73891 73890 73866 /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_gate_matches-556affa51f6ab831 --exact --test-threads=6 ra8_gate_liberty_iraq_america_brutal_seed_zero_finishes ra8_gate_oasis_germany_great_britain_brutal_seed_zero_finishes ra8_gate_frozen_cuba_germany_brutal_seed_zero_finishes ra8_gate_black_water_libya_america_brutal_seed_zero_finishes ra8_gate_black_water_korea_france_brutal_seed_zero_finishes ra8_gate_wheel_germany_great_britain_brutal_seed_zero_finishes",
+  "signal": "SIGTERM to this exact test PID only",
+  "reason": "Parent directs prioritizing bounded controlled R114 cause probes rather than full-horizon six-case replay before the shared cause is proven. Captured partial run is retained; this interruption is not a test assertion failure or pass."
+}

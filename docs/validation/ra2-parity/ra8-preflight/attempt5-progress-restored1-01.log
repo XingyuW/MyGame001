@@ -1,0 +1,24 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 22.11s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 16 tests
+test ai::tests::ra8_aa_job_progress_survives_reinforcement_and_preserves_slow_approaches ... ok
+test ai::tests::ra8_all_added_controller_memory_changes_the_value_hash ... ok
+test ai::tests::ra8_each_aa_job_progress_field_changes_the_value_hash ... ok
+test ai::tests::ra8_every_supported_cadence_and_offset_retains_a_nonstarving_last_stand_slot ... ok
+test command::ra8_intent_tests::ra8_internal_and_public_commands_keep_fifo_across_ordinary_and_ability_boundaries ... ok
+test command::ra8_intent_tests::ra8_internal_mixed_and_fully_stale_selections_prune_only_witnessed_lifecycle_changes ... ok
+test command::ra8_intent_tests::ra8_internal_targets_cancel_after_death_capture_or_real_detector_loss_but_public_stays_strict ... ok
+test command::ra8_intent_tests::ra8_intrinsically_invalid_internal_intents_still_reject_with_original_public_reasons ... ok
+test command::ra8_intent_tests::ra8_pending_intent_origin_witness_payload_and_order_are_value_hashed ... ok
+test command::ra8_intent_tests::ra8_private_bridge_goal_authorizes_before_readiness_and_hashes_its_distinct_action ... ok
+test command::ra8_intent_tests::ra8_private_bridge_goal_planning_and_pending_hash_ignore_unseen_naval_blockers ... ok
+test command::ra8_intent_tests::ra8_private_bridge_goal_preserves_fifo_and_rechecks_arrival_occupancy ... ok
+test command::ra8_intent_tests::ra8_private_bridge_goal_waits_for_hidden_occupancy_then_consumes_engineer_only_after_clear ... ok
+test command::ra8_intent_tests::ra8_strategic_visibility_certificate_is_value_hashed_and_never_certifies_hidden_cells ... ok
+test command::ra8_intent_tests::ra8_strategic_visible_cell_loss_cancels_only_fully_valid_internal_intents ... ok
+test economy_commands::ra8_site_tests::ra8_legal_site_can_be_inspected_without_consuming_or_bypassing_a_ready_item ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 49 filtered out; finished in 0.46s
+

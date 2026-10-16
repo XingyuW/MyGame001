@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1",
+    "ra8_distant_aa_clearance_fights_an_observed_interceptor_en_route",
+    "ra8_an_unreachable_ground_screen_does_not_hold_strike_aircraft_forever",
+    "ra8_air_strikes_wait_for_ground_to_clear_an_observed_outranging_aa_screen"
+  ],
+  "exit": 101,
+  "elapsed_seconds": 6.213779041019734,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-screen-controlled-after5.log",
+  "probe_setup_correction": "helper reactor42,2 no longer wins closest-known objective tie; interceptor is introduced only after actual AA job command"
+}

@@ -1,0 +1,21 @@
+{
+  "name": "attempt5-exact-after5-02",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate_black_water_libya_america_brutal_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 0,
+  "started_utc": "2026-10-16T11:07:04.082026+00:00",
+  "elapsed_seconds": 72.48063399997773,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-exact-after5-02.log"
+}

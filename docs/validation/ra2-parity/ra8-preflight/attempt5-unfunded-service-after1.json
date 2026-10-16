@@ -1,0 +1,18 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_an_unfunded_service_occupant_leaves_normally_and_rejoins_real_combat",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 0,
+  "elapsed_seconds": 25.13531845799298
+}

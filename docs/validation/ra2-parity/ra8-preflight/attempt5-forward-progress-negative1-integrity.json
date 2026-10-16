@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_reinforcements_without_aa_job_progress_cannot_renew_the_aircraft_hold",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 101,
+  "elapsed_seconds": 27.57304162500077,
+  "before_sha256": "b8c1bf811c049732c6514cf6f07c68543529dad87729c489a3eb1f6287cb9098",
+  "mutated_sha256": "84f855dbb4d680de26fc0a8621b937b7cda9efd36c17c0e2c11582025aa3bcbb",
+  "restored_sha256": "b8c1bf811c049732c6514cf6f07c68543529dad87729c489a3eb1f6287cb9098",
+  "mutation": "Disable only no-progress deadline; semantic ordinary-raid release assertion; immediate exact restoration"
+}

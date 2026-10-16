@@ -1,0 +1,23 @@
+{
+  "frozen_head": "2343be15afa50a22a88aad07f28009f105fb449e",
+  "frozen_runtime": "bbb09feab392b31e6d627d0060586c73b100e6db",
+  "main": "8230a955b251e9341d349f99eaeb86f7f8253664",
+  "runner_pid": 63425,
+  "owned_process_group": 63451,
+  "command": [
+    "env",
+    "-u",
+    "RA2_DUEL_SEED",
+    "-u",
+    "RA2_DUEL_PAIR",
+    "sh",
+    "scripts/validate_ra2_parity.sh",
+    "ra8"
+  ],
+  "started_utc": "2026-10-16T06:30:13.306226+00:00",
+  "monitor": "only complete nonzero phase summary stops the owned group; no source/probe/build competition",
+  "exit": -15,
+  "elapsed_seconds": 7348.2962987089995,
+  "stopped_on_complete_failed_phase": "04 exit 101  7346 s  cargo test --workspace --release  [253 passed, 1 failed, 0 ignored]",
+  "finished_utc": "2026-10-16T08:32:41.635865+00:00"
+}

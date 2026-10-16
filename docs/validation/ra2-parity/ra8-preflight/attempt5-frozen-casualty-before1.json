@@ -1,0 +1,18 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_an_all_frozen_casualty_wave_defers_its_nonempty_retreat_until_release",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 101,
+  "elapsed_seconds": 4.796096125006443
+}

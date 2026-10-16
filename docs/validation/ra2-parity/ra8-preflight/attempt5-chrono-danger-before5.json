@@ -1,0 +1,18 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_chronoshift_keeps_the_whole_translated_group_out_of_known_ground_fire",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 0,
+  "elapsed_seconds": 4.4974779580079485
+}

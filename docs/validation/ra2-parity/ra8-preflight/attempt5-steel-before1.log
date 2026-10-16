@@ -1,0 +1,4 @@
+error: failed to open: /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/.cargo-build-lock
+
+Caused by:
+  Operation not permitted (os error 1)

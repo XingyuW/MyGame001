@@ -1,0 +1,20 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1",
+    "ra8_an_unseen_air_unit_cannot_change_the_forward_wait_endpoint_or_commands",
+    "ra8_an_unseen_new_building_cannot_change_the_forward_wait_endpoint_or_commands",
+    "ra8_strike_aircraft_exploit_a_short_observed_ground_clearance_opening"
+  ],
+  "exit": 0,
+  "elapsed_seconds": 26.505520584003534
+}

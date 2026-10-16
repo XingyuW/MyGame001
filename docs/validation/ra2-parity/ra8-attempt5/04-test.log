@@ -1,0 +1,1414 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 1m 55s
+     Running unittests src/main.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/game-fe9efcf72dfbb190)
+
+running 217 tests
+test announcer::acceptance::ra7_announcements_filter_private_events_and_keep_public_warnings ... ok
+test audio::tests::effects_are_limited_in_number_and_repetition ... ok
+test audio::tests::volume_steps_stay_within_their_range ... ok
+test audio::tests::the_music_can_be_written_as_a_wav_file ... ok
+test audio::tests::events_play_only_what_the_human_player_may_know ... ok
+test audio::tests::the_decoder_hands_out_the_samples_unchanged ... ok
+test announcer::tests::announcer_rate_limits_bursts_and_resets_categories ... ok
+test audio::tests::a_crushing_is_a_short_dull_crunch ... ok
+test buildings::tests::a_sprite_stands_on_its_footprint ... ok
+test announcer::tests::every_original_cue_is_bounded_distinct_and_has_text ... ok
+test buildings::tests::a_missing_or_wrongly_sized_building_sprite_is_reported_with_the_data_file_and_field ... ok
+test buildings::tests::the_sprite_layout_matches_the_generator ... ok
+test buildings::tests::the_title_shows_credits_and_power ... ok
+test camera::tests::centre_inside_the_bounds_is_unchanged ... ok
+test camera::tests::clamping_at_all_four_borders ... ok
+test camera::tests::drag_keeps_the_grabbed_world_point_under_the_cursor ... ok
+test camera::tests::edge_directions ... ok
+test camera::tests::edge_scrolling_is_equally_responsive_on_all_four_edges_and_diagonals ... ok
+test camera::tests::held_rate_pan_continues_without_cursor_motion_or_window_edges ... ok
+test camera::tests::hovering_an_interface_button_inside_an_edge_band_does_not_scroll ... ok
+test camera::tests::keyboard_directions ... ok
+test camera::tests::leaving_the_window_through_an_edge_keeps_panning_that_way ... ok
+test camera::tests::panning_eases_in_and_comes_to_a_definite_stop ... ok
+test camera::tests::the_camera_keeps_panning_while_the_cursor_is_in_the_title_bar_or_on_the_dock ... ok
+test camera::tests::the_part_of_the_view_beside_the_sidebar_stays_inside_the_bounds ... ok
+test camera::tests::view_larger_than_the_bounds_is_centred_on_that_axis ... ok
+test camera::tests::zoom_stays_within_its_limits ... ok
+test checked_assets::tests::only_registered_bytes_are_served_and_meta_files_are_never_read ... ok
+test checked_assets::tests::the_plugin_replaces_the_default_asset_source ... ok
+test cli::tests::errors_have_descriptive_messages ... ok
+test cli::tests::no_arguments_runs_normally ... ok
+test cli::tests::repeated_smoke_test_is_rejected ... ok
+test cli::tests::smoke_test_frame_count_boundaries ... ok
+test cli::tests::smoke_test_with_frame_count ... ok
+test cli::tests::smoke_test_without_frame_count_is_rejected ... ok
+test cli::tests::unknown_arguments_are_rejected ... ok
+test construction::tests::a_complete_building_at_the_head_of_a_queue_is_ready ... ok
+test construction::tests::every_command_variant_is_built_by_a_pure_interface_function ... ok
+test construction::tests::menu_keys_queue_and_cancel_the_menu_entries ... ok
+test construction::tests::modes_follow_keys_clicks_and_the_ready_building ... ok
+test construction::tests::sell_and_rally_keys_name_the_players_buildings ... ok
+test audio::tests::weapons_sound_like_what_they_are ... ok
+test construction::tests::the_ready_building_is_placed_centred_on_the_cursor ... ok
+test audio::tests::weapon_sounds_end_in_silence_and_the_music_loops_without_a_click ... ok
+test fog::tests::an_instant_shot_shows_only_the_ends_the_human_player_sees ... ok
+test fog::tests::cells_are_tinted_by_what_the_human_player_sees ... ok
+test fog::tests::enemies_are_shown_exactly_while_the_human_player_sees_them ... ok
+test fog::tests::the_fog_systems_share_no_state_with_other_game_systems_without_an_order ... ok
+test audio::tests::every_sound_is_synthesised_within_bounds_and_the_same_on_every_run ... ok
+test game_speed::tests::levels_labels_and_steps ... ok
+test buildings::tests::the_production_buildings_load_and_every_sprite_passes_its_check ... ok
+test hd_art::tests::a_stride_picks_its_frame_of_the_walk_sheet ... ok
+test hd_art::tests::cameos_crop_to_the_solid_miniature ... ok
+test announcer::acceptance::ra7_simulation_event_reaches_the_actual_notice_column ... ok
+test battlefield::tests::ore_on_new_ground_gets_one_ore_top ... ok
+test hd_art::tests::hd_ground_anchors_match_simulation_footprints ... ok
+test health::tests::bars_are_drawn_only_over_shown_views_of_damaged_or_selected_entities ... ok
+test health::tests::the_bar_shows_the_fraction_of_hit_points_left ... ok
+test health::tests::the_bars_of_three_soldiers_in_a_cell_do_not_overlap_and_each_can_be_picked ... ok
+test health::tests::the_insignia_fit_under_the_bar_and_a_dock_is_a_closed_diamond ... ok
+test hotkeys::tests::control_groups_assign_select_add_and_forget_dead_units ... ok
+test hotkeys::tests::digit_keys_select_add_and_assign_control_groups ... ok
+test hotkeys::tests::every_listed_key_has_one_action ... ok
+test hover_info::tests::every_shipped_type_has_a_readable_name ... ok
+test hover_info::tests::labels_name_the_type_owner_and_health ... ok
+test hover_info::tests::ra5_neutral_ownership_is_named_without_an_enemy_team_label ... ok
+test hover_info::tests::scenery_labels_name_the_kind_and_health ... ok
+test battlefield::tests::a_crate_in_sight_is_marked_until_it_is_taken ... ok
+test hover_info::tests::the_rank_of_a_unit_is_named_from_veteran_on ... ok
+test map::tests::an_asset_load_failure_ends_the_game_with_an_error ... ok
+test map::tests::demo_map_is_aligned ... ok
+test map::tests::demo_tileset_image_matches_its_declared_size ... ok
+test map::tests::offsets_and_parallax_are_reported ... ok
+test map::tests::the_simulation_reads_looks_as_the_renderer_does ... ok
+test map::tests::tileset_images_other_than_the_declared_png_are_rejected ... ok
+test map::tests::tileset_limits_fit_the_texture_limits_every_gpu_supports ... ok
+test minimap::tests::an_enemy_is_marked_exactly_while_the_human_player_sees_it ... ok
+test minimap::tests::every_cell_of_every_accepted_map_size_is_drawn_by_a_pixel ... ok
+test minimap::tests::every_pixel_shows_the_cell_under_it ... ok
+test minimap::tests::the_camera_frame_is_the_visible_part_of_the_view ... ok
+test hover_info::tests::the_label_names_the_armour_of_every_shipped_type ... ok
+test construction::tests::the_placement_preview_is_the_commands_validation_for_the_human_player ... ok
+test minimap::tests::the_layout_fills_the_image_with_the_maps_bounding_rectangle ... ok
+test hd_art::tests::every_roster_identity_has_distinct_valid_hd_art ... ok
+test minimap::tests::the_minimap_shows_shroud_fog_and_only_shown_units ... ok
+test minimap::tests::the_offline_screen_fills_the_maps_diamond_and_shows_nothing_of_it ... ok
+test notices::tests::a_defeat_is_reported_in_the_colour_name_of_the_defeated_player ... ok
+test notices::tests::a_defeated_player_is_announced_in_its_team_colour_and_the_notice_expires ... ok
+test notices::tests::a_notice_is_solid_until_its_last_moments ... ok
+test notices::tests::a_promotion_and_a_crew_are_reported_in_plain_words ... ok
+test notices::tests::notices_name_the_country_a_player_plays ... ok
+test notices::tests::only_the_human_players_promotions_and_crews_are_announced ... ok
+test notices::tests::the_oldest_notice_makes_room_and_a_match_end_clears_them ... ok
+test options::tests::malformed_settings_are_rejected_with_the_line_key_and_reason ... ok
+test options::tests::option_buttons_step_within_their_ranges_and_switch ... ok
+test options::tests::the_file_is_read_with_a_bound_and_only_if_it_is_a_regular_file ... ok
+test options::tests::the_written_file_reads_back_unchanged_for_every_value_at_both_ends ... ok
+test presentation::tests::every_player_of_the_largest_match_has_its_own_colour_for_every_choice ... ok
+test presentation::tests::further_computer_players_get_their_own_copies_painted_on_first_use ... ok
+test presentation::tests::palette_restarts_repaint_from_source_and_preserve_neutral_materials ... ok
+test presentation::tests::ra5_neutral_paint_is_gray_then_capture_uses_the_new_owner_without_palette_indexing ... ok
+test presentation::tests::team_paint_preserves_materials_alpha_and_shading ... ok
+test presentation::tests::the_palette_has_a_distinct_colour_for_each_of_the_ten_players ... ok
+test projection::tests::cell_world_cell_round_trip_for_every_cell ... ok
+test projection::tests::map_bounds_enclose_the_diamond_exactly ... ok
+test projection::tests::map_origin_offset_aligns_bevy_ecs_tilemap_with_the_projection ... ok
+test projection::tests::picking_at_centres_edges_and_corners ... ok
+test projection::tests::picking_outside_the_map_returns_none ... ok
+test projection::tests::shared_edges_and_corners_belong_to_the_larger_coordinate ... ok
+test projection::tests::the_tested_tile_size_is_the_only_one_maps_may_use ... ok
+test projection::tests::tile_cell_inverts_the_tilemap_placement_of_every_cell ... ok
+test ra7_controls::deployment_mapping::ra7_deploy_key_maps_every_selected_unit_without_modifier_collisions ... ok
+test ra7_controls::tests::ra7_every_new_binding_maps_input_to_its_order_or_ui_action ... ok
+test construction::tests::two_ready_buildings_of_the_two_lanes_are_each_placed_in_their_own_mode ... ok
+test selection::tests::a_box_selects_the_units_whose_ground_point_lies_inside ... ok
+test game_speed::tests::the_game_clock_stops_while_paused ... ok
+test selection::tests::a_click_picks_a_unit_before_a_factory_and_a_factory_alone_offers_a_rally_point ... ok
+test selection::tests::a_click_selects_the_unit_whose_body_is_under_the_cursor ... ok
+test selection::tests::a_right_click_on_a_visible_enemy_orders_the_armed_units_to_attack_it ... ok
+test selection::tests::a_right_click_on_ore_sends_the_selected_harvesters_to_harvest ... ok
+test hd_art::tests::every_foot_soldier_has_a_walk_cycle ... ok
+test selection::tests::game_systems_that_share_state_in_a_frame_are_ordered ... ok
+test selection::tests::no_two_game_systems_share_state_in_post_update_without_an_order ... ok
+test selection::tests::orders_are_commands_for_the_whole_selection ... ok
+test battlefield::tests::gems_have_a_distinct_tint_in_both_terrain_paths ... ok
+test buildings::tests::the_demo_map_holds_the_starting_buildings_and_units ... ok
+test minimap::tests::the_demo_match_shows_no_enemy_the_human_player_does_not_see ... ok
+test selection::tests::a_click_on_the_construction_yard_selects_it_without_a_rally_point ... ok
+test ra7_controls::tests::ra7_selection_cycle_type_all_and_bookmark_actions_execute_on_client_state ... ok
+test selection::tests::shift_adds_to_the_selection_and_otherwise_replaces_it ... ok
+test selection::tests::the_attack_move_key_orders_the_whole_selection ... ok
+test selection::tests::a_selected_factory_takes_its_rally_point_from_a_right_click ... ok
+test selection::tests::the_preview_tells_attack_move_harvest_friendly_and_invalid_apart_before_the_click ... ok
+test selection::tests::production_order_input_ignores_sidebar_and_acknowledges_battlefield_clicks ... ok
+test selection::tests::production_selection_uses_visible_body_and_keeps_last_drag_endpoint ... ok
+test selection::tests::ra7_modifier_cursor_names_the_command_with_the_same_precedence ... ok
+test selection::tests::ra7_visible_disguise_is_not_an_enemy_cursor_target ... ok
+test sidebar::tests::item_buttons_queue_cancel_and_start_placement ... ok
+test selection::tests::the_cursor_turns_red_over_an_enemy_before_the_click_and_refuses_blocked_ground ... ok
+test minimap::tests::the_drawing_is_the_map_with_radar_and_the_offline_screen_without ... ok
+test sidebar::tests::mode_tab_pause_and_volume_buttons ... ok
+test sidebar::tests::texts_and_colours_of_the_sidebar ... ok
+test sidebar::tests::the_cursor_is_over_the_sidebar_on_its_whole_width ... ok
+test sidebar::tests::the_game_systems_share_no_state_without_an_order ... ok
+test minimap::tests::the_minimap_is_drawn_only_while_the_human_player_has_radar ... ok
+test sidebar::tests::items_outside_the_roster_of_the_players_faction_are_neither_available_nor_shown ... ok
+test sidebar::tests::a_card_at_its_build_limit_stays_listed_and_says_so ... ok
+test sidebar::tests::item_status_follows_the_players_buildings_and_queue ... ok
+test sidebar::tests::an_aircraft_without_a_free_dock_stays_listed_and_says_so ... ok
+test sim_host::tests::the_game_world_holds_no_simulation_state ... ok
+test sim_host::tests::the_sink_accepts_the_human_players_commands_until_paused_or_full ... ok
+test sim_host::tests::the_sink_refuses_commands_once_the_match_is_over_and_reopens_for_the_next ... ok
+test selection::tests::ra5_own_garrison_is_selectable_and_enemy_garrison_requires_current_visibility ... ok
+test sidebar::tests::cards_follow_the_tech_tree_and_unlock_all_waives_only_prerequisites ... ok
+test sim_host::tests::a_tick_applies_the_sinks_commands_as_the_human_players_and_returns_its_events ... ok
+test sim_host::tests::match_setup_installs_the_loaded_match_or_ends_the_game_with_an_error ... ok
+test sim_host::tests::menu_matches_ally_the_computer_players_and_install_speed_and_scenery ... ok
+test sidebar::tests::the_time_of_an_item_follows_the_factories_and_the_power ... ok
+test sim_host::tests::the_tick_system_does_not_tick_while_paused_and_copies_the_events ... ok
+test sim_host::tests::ticks_run_only_while_a_match_is_running ... ok
+test skirmish::tests::menu_bundles_spawn_without_duplicate_components ... ok
+test skirmish::tests::menu_buttons_cycle_through_each_row_and_start_only_a_valid_choice ... ok
+test skirmish::tests::loading_rejects_a_start_position_outside_its_map ... ok
+test skirmish::tests::country_and_difficulty_rows_set_each_player_of_the_match ... ok
+test sim_host::tests::commands_pending_when_a_match_is_replaced_are_discarded_with_a_log_line ... ok
+test skirmish::tests::every_on_off_row_sets_its_option_of_the_match_and_no_other ... ok
+test sidebar::tests::a_tab_lists_only_what_a_building_of_the_player_could_build ... ok
+test skirmish::tests::the_end_screen_names_the_outcome_and_restarts_the_last_match ... ok
+test skirmish::tests::the_end_screen_says_what_decided_the_match_by_its_rule ... ok
+test skirmish::tests::the_human_plays_the_first_start_and_the_computer_the_second ... ok
+test game_speed::tests::every_speed_runs_the_simulation_that_many_times_faster_in_real_time ... ok
+test skirmish::tests::row_texts_name_the_chosen_entries ... ok
+test skirmish::tests::map_growth_is_an_option_and_off_limits_the_enemies_to_the_starts_of_the_file ... ok
+test skirmish::tests::random_countries_are_drawn_by_the_simulation_and_named_once_the_match_starts ... ok
+test smoke::tests::a_run_passes_only_if_the_pause_stops_the_ticks_and_refuses_commands ... ok
+test smoke::tests::a_run_passes_only_with_every_configured_starting_unit ... ok
+test smoke::tests::a_run_passes_only_with_its_buildings_and_charged_production ... ok
+test smoke::tests::a_run_passes_only_with_the_fog_computed_and_unseen_enemies_hidden ... ok
+test smoke::tests::a_run_passes_only_with_the_full_interface_loaded ... ok
+test smoke::tests::a_run_passes_only_with_the_menu_laid_out_the_cards_listed_and_the_flow_checked ... ok
+test smoke::tests::a_run_passes_only_with_the_menu_the_game_flow_and_the_computer_player ... ok
+test smoke::tests::a_run_passes_only_with_the_roster_shown_and_the_options_stored ... ok
+test smoke::tests::an_exit_before_the_last_frame_fails_the_run ... ok
+test skirmish::tests::the_credits_and_unit_count_rows_cover_their_ranges_and_reach_the_match ... ok
+test skirmish::tests::the_menu_and_its_longest_texts_fit_the_smallest_window ... ok
+test skirmish::tests::the_menu_chooses_several_independent_enemies_with_distinct_colours ... ok
+test smoke::tests::the_layout_check_finds_a_menu_that_is_too_large_overlaps_or_cuts_a_text ... ok
+test skirmish::tests::the_production_catalogue_loads_every_map_faction_and_difficulty ... ok
+test skirmish::tests::the_menu_opens_with_the_lobby_of_red_alert_2 ... ok
+test units::tests::a_missing_or_malformed_sprite_is_reported_with_the_data_file_and_field ... ok
+test units::tests::aircraft_climb_to_their_flying_height_and_land_to_rearm ... ok
+test units::tests::an_aircraft_has_landed_while_it_stands_on_its_dock ... ok
+test units::tests::an_aircrafts_shadow_stays_on_the_ground_below_it ... ok
+test units::tests::every_facing_has_its_own_frame ... ok
+test units::tests::interpolation_moves_from_the_previous_to_the_current_position ... ok
+test units::tests::starting_units_that_do_not_fit_are_a_setup_error ... ok
+test skirmish::tests::every_production_data_file_loads_passes_cross_validation_and_is_licensed ... ok
+test smoke::tests::the_flows_menu_presses_choose_its_matches_and_restore_the_lobby ... ok
+test units::tests::the_sprite_layout_matches_the_generator ... ok
+test units::tests::units_lower_on_the_screen_are_drawn_in_front ... ok
+test units::tests::units_on_the_ground_have_no_altitude ... ok
+test special_controls::tests::a_selected_construction_yard_is_repacked_only_with_the_option_on ... ok
+test skirmish::tests::the_catalogue_rejects_starting_credits_the_lobby_does_not_offer ... ok
+test units::tests::the_production_data_loads_with_the_combat_file ... ok
+test smoke::tests::the_demo_player_can_queue_a_building_with_its_starting_buildings ... ok
+test weapon_fx::tests::a_bolt_joins_its_ends_and_strays_between_them ... ok
+test weapon_fx::tests::every_shipped_weapon_has_the_class_its_name_promises ... ok
+test weapon_fx::tests::the_shipped_combat_file_classifies_light_and_electricity ... ok
+test units::tests::the_production_units_load_and_every_sprite_passes_its_check ... ok
+test visual_review::tests::developed_base_is_valid_and_does_not_extend_the_opponents_start ... ok
+test visual_review::tests::roster_lineup_is_a_valid_match_with_every_type_once ... ok
+test visual_review::tests::technology_scene_uses_valid_real_match_setup ... ok
+test skirmish::tests::the_catalogue_rejects_starts_off_their_map_unbuildable_ai_files_and_unplayable_matches ... ok
+test smoke::tests::the_demo_match_expects_all_of_its_starting_units ... ok
+test visual_review::tests::the_weapons_scene_is_a_valid_match ... ok
+test units::tests::the_demo_map_holds_every_starting_unit_on_its_own_free_cell ... ok
+test skirmish::tests::every_shipped_match_can_be_set_up_for_every_faction_pairing ... ok
+
+test result: ok. 217 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 40.38s
+
+     Running tests/m0_spike.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m0_spike-2408ac835b30d356)
+
+running 6 tests
+test plan_projection_puts_cell_origin_at_top_corner ... ok
+test spike_map_exposes_custom_tile_properties ... ok
+test spike_map_cells_use_tiled_coordinates ... ok
+test spike_map_is_an_isometric_diamond_map ... ok
+test committed_tileset_matches_generator_output ... ok
+test plan_projection_matches_bevy_ecs_tilemap_diamond_for_every_cell ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/m10_unlocks_and_enemies.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m10_unlocks_and_enemies-61e318796d819d42)
+
+running 5 tests
+test every_human_production_item_has_a_reachable_unlock_path ... ok
+test a_defeated_human_ends_while_several_computer_players_fight_on ... ok
+test advanced_requirements_hold_and_unlock_all_waives_only_prerequisites ... ok
+test allied_and_soviet_units_unlock_through_their_structures_and_obey_orders ... ok
+test several_independent_computer_players_play_complete_matches_on_every_map has been running for over 60 seconds
+test several_independent_computer_players_play_complete_matches_on_every_map ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 172.56s
+
+     Running tests/m13_grown_maps.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m13_grown_maps-ee40a9cea2db76e9)
+
+running 3 tests
+test every_shipped_map_grows_with_every_player_count ... ok
+test a_ten_player_match_on_the_smallest_map_is_played_to_its_end ... ok
+test ten_computer_players_build_bases_and_bring_in_ore_on_enlarged_maps ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 15.89s
+
+     Running tests/m1_demo_map.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m1_demo_map-23f9c416f676cd4d)
+
+running 3 tests
+test demo_map_has_markers_and_every_terrain_kind ... ok
+test demo_map_loads_as_a_64_by_64_grid_matching_the_generator ... ok
+test committed_demo_files_match_generator_output ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/m1_tileset_image.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m1_tileset_image-b416d7cbd7d9c04d)
+
+running 6 tests
+test image_data_the_decoder_rejects_is_rejected_before_the_hand_off ... ok
+test image_files_above_the_size_limit_are_rejected_without_being_read_whole ... ok
+test pixel_formats_other_than_8_bit_rgb_and_rgba_are_rejected ... ok
+test chunk_structure_outside_the_subset_is_rejected ... ok
+test images_inside_the_subset_pass_and_their_checked_bytes_are_returned ... ok
+test compressed_and_other_unlisted_chunks_are_rejected_before_any_decoding ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+
+     Running tests/m2_unit_sprites.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m2_unit_sprites-7eb10af477a8320f)
+
+running 5 tests
+test the_facing_order_is_the_order_of_sim_directions ... ok
+test sprite_sheets_pass_the_png_subset_with_their_declared_size ... ok
+test a_named_pipe_is_rejected_without_blocking ... ok
+test every_frame_points_in_the_screen_direction_of_its_facing ... ok
+test committed_sprite_sheets_match_generator_output ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/m3_building_sprites.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m3_building_sprites-37cc444c06ad7590)
+
+running 3 tests
+test building_sprites_pass_the_png_subset_at_their_footprints_size ... ok
+test a_sprite_covers_its_footprint_and_the_walls_above_it ... ok
+test committed_building_sprites_match_generator_output ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-fff13bc99bc7e9e6)
+
+running 6 tests
+test a_soviet_player_left_with_an_armed_miner_still_finishes_the_match ... ok
+test the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first ... ok
+test crossroads_armies_finish_after_new_terrain_changes ... ok
+test ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes ... ok
+test computer_players_finish_matches_with_the_shipped_data_on_every_shipped_map has been running for over 60 seconds
+test ra5_coral_archipelago_brutal_libya_germany_seed_zero_finishes has been running for over 60 seconds
+test ra5_coral_archipelago_brutal_libya_germany_seed_zero_finishes ... ok
+test computer_players_finish_matches_with_the_shipped_data_on_every_shipped_map ... FAILED
+
+failures:
+
+---- computer_players_finish_matches_with_the_shipped_data_on_every_shipped_map stdout ----
+liberty_bay: iraq (brutal) against america (brutal) stalled: players [(PlayerId(0), 0), (PlayerId(1), 0)]
+building SimId(132) Owner(PlayerId(1)) BuildingKind(4) CellPos { x: 223, y: 233 }
+building SimId(967) Owner(PlayerId(1)) BuildingKind(9) CellPos { x: 93, y: 164 }
+building SimId(985) Owner(PlayerId(1)) BuildingKind(3) CellPos { x: 221, y: 224 }
+building SimId(48) Owner(PlayerId(1)) BuildingKind(4) CellPos { x: 224, y: 228 }
+building SimId(59) Owner(PlayerId(1)) BuildingKind(34) CellPos { x: 229, y: 226 }
+building SimId(2469) Owner(PlayerId(0)) BuildingKind(32) CellPos { x: 33, y: 23 }
+building SimId(2528) Owner(PlayerId(0)) BuildingKind(31) CellPos { x: 29, y: 26 }
+building SimId(1179) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 215, y: 220 }
+building SimId(2684381858) Owner(PlayerId(1)) BuildingKind(41) CellPos { x: 162, y: 106 }
+building SimId(1974) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 215, y: 230 }
+building SimId(1003) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 222, y: 218 }
+building SimId(1898) Owner(PlayerId(0)) BuildingKind(20) CellPos { x: 23, y: 27 }
+building SimId(546) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 229, y: 212 }
+building SimId(220) Owner(PlayerId(0)) BuildingKind(18) CellPos { x: 22, y: 35 }
+building SimId(227) Owner(PlayerId(0)) BuildingKind(16) CellPos { x: 37, y: 25 }
+building SimId(242) Owner(PlayerId(0)) BuildingKind(20) CellPos { x: 37, y: 35 }
+building SimId(2071) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 222, y: 210 }
+building SimId(258) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 219, y: 221 }
+building SimId(2415) Owner(PlayerId(0)) BuildingKind(20) CellPos { x: 22, y: 29 }
+building SimId(2023) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 218, y: 214 }
+building SimId(278) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 229, y: 231 }
+building SimId(2111) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 222, y: 238 }
+building SimId(292) Owner(PlayerId(0)) BuildingKind(18) CellPos { x: 34, y: 33 }
+building SimId(295) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 220, y: 232 }
+building SimId(297) Owner(PlayerId(0)) BuildingKind(16) CellPos { x: 21, y: 37 }
+building SimId(642) Owner(PlayerId(0)) BuildingKind(18) CellPos { x: 33, y: 31 }
+building SimId(717) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 224, y: 219 }
+building SimId(1434) Owner(PlayerId(0)) BuildingKind(18) CellPos { x: 23, y: 25 }
+building SimId(349) Owner(PlayerId(0)) BuildingKind(18) CellPos { x: 38, y: 21 }
+building SimId(1860) Owner(PlayerId(0)) BuildingKind(18) CellPos { x: 33, y: 27 }
+building SimId(359) Owner(PlayerId(0)) BuildingKind(16) CellPos { x: 39, y: 25 }
+building SimId(382) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 227, y: 212 }
+building SimId(393) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 234, y: 216 }
+building SimId(2418) Owner(PlayerId(0)) BuildingKind(16) CellPos { x: 30, y: 35 }
+building SimId(1349) Owner(PlayerId(0)) BuildingKind(18) CellPos { x: 26, y: 33 }
+building SimId(644) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 220, y: 237 }
+building SimId(439) Owner(PlayerId(0)) BuildingKind(16) CellPos { x: 38, y: 37 }
+building SimId(1297) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 211, y: 224 }
+building SimId(483) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 233, y: 214 }
+building SimId(484) Owner(PlayerId(0)) BuildingKind(20) CellPos { x: 36, y: 39 }
+building SimId(509) Owner(PlayerId(0)) BuildingKind(18) CellPos { x: 32, y: 41 }
+building SimId(1053) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 220, y: 218 }
+building SimId(519) Owner(PlayerId(0)) BuildingKind(16) CellPos { x: 39, y: 35 }
+building SimId(536) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 214, y: 233 }
+building SimId(1111) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 217, y: 220 }
+building SimId(605) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 212, y: 230 }
+building SimId(609) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 237, y: 228 }
+building SimId(1893) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 211, y: 222 }
+building SimId(2395) Owner(PlayerId(0)) BuildingKind(20) CellPos { x: 35, y: 27 }
+building SimId(2072) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 214, y: 217 }
+building SimId(1255) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 213, y: 221 }
+building SimId(2208) Owner(PlayerId(0)) BuildingKind(20) CellPos { x: 32, y: 33 }
+building SimId(2545) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 212, y: 228 }
+building SimId(2684404764) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 28, y: 196 }
+building SimId(2684374822) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 38, y: 79 }
+building SimId(2684379175) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 39, y: 96 }
+building SimId(2684401983) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 63, y: 185 }
+building SimId(2684405312) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 64, y: 198 }
+building SimId(2684412998) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 70, y: 228 }
+building SimId(2684409928) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 72, y: 216 }
+building SimId(2684402252) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 76, y: 186 }
+building SimId(961) Owner(PlayerId(1)) BuildingKind(23) CellPos { x: 223, y: 215 }
+building SimId(1251) Owner(PlayerId(0)) BuildingKind(30) CellPos { x: 29, y: 46 }
+building SimId(289) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 216, y: 234 }
+building SimId(2684387190) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 118, y: 127 }
+building SimId(2684386943) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 127, y: 126 }
+building SimId(2684387712) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 128, y: 129 }
+building SimId(2684387465) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 137, y: 128 }
+building SimId(216) Owner(PlayerId(1)) BuildingKind(26) CellPos { x: 236, y: 221 }
+building SimId(170) Owner(PlayerId(0)) BuildingKind(27) CellPos { x: 19, y: 26 }
+building SimId(2062) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 218, y: 211 }
+building SimId(2684372403) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 179, y: 69 }
+building SimId(2684364727) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 183, y: 39 }
+building SimId(2684361657) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 185, y: 27 }
+building SimId(2684369343) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 191, y: 57 }
+building SimId(2684372672) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 192, y: 70 }
+building SimId(2684395480) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 216, y: 159 }
+building SimId(2684399833) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 217, y: 176 }
+building SimId(2684369891) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 227, y: 59 }
+building SimId(1) Owner(PlayerId(1)) BuildingKind(0) CellPos { x: 224, y: 224 }
+building SimId(0) Owner(PlayerId(0)) BuildingKind(29) CellPos { x: 29, y: 29 }
+building SimId(414) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 237, y: 225 }
+building SimId(23) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 224, y: 221 }
+building SimId(1954) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 220, y: 215 }
+building SimId(26) Owner(PlayerId(1)) BuildingKind(2) CellPos { x: 228, y: 222 }
+building SimId(241) Owner(PlayerId(1)) BuildingKind(25) CellPos { x: 224, y: 211 }
+building SimId(1047) Owner(PlayerId(1)) BuildingKind(22) CellPos { x: 221, y: 220 }
+building SimId(68) Owner(PlayerId(1)) BuildingKind(11) CellPos { x: 220, y: 229 }
+building SimId(646) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 213, y: 235 }
+building SimId(1282) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 237, y: 218 }
+building SimId(169) Owner(PlayerId(1)) BuildingKind(7) CellPos { x: 234, y: 228 }
+building SimId(185) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 234, y: 218 }
+building SimId(109) Owner(PlayerId(0)) BuildingKind(8) CellPos { x: 22, y: 32 }
+building SimId(520) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 224, y: 238 }
+building SimId(116) Owner(PlayerId(1)) BuildingKind(2) CellPos { x: 232, y: 221 }
+building SimId(2416) Owner(PlayerId(0)) BuildingKind(30) CellPos { x: 36, y: 17 }
+building SimId(137) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 217, y: 231 }
+building SimId(177) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 219, y: 234 }
+building SimId(145) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 234, y: 225 }
+building SimId(146) Owner(PlayerId(0)) BuildingKind(28) CellPos { x: 18, y: 29 }
+building SimId(2017) Owner(PlayerId(1)) BuildingKind(5) CellPos { x: 221, y: 212 }
+building SimId(2483) Owner(PlayerId(0)) BuildingKind(12) CellPos { x: 29, y: 20 }
+building SimId(2533) Owner(PlayerId(0)) BuildingKind(6) CellPos { x: 26, y: 30 }
+building SimId(2539) Owner(PlayerId(0)) BuildingKind(35) CellPos { x: 25, y: 27 }
+unit SimId(1118) Owner(PlayerId(1)) CellPos { x: 200, y: 212 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 126, y: 212 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(1469) Owner(PlayerId(1)) CellPos { x: 215, y: 152 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 209, y: 124 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(134) Owner(PlayerId(1)) CellPos { x: 193, y: 213 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 126, y: 213 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(1448) Owner(PlayerId(1)) CellPos { x: 215, y: 192 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 211, y: 123 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(1690) Owner(PlayerId(1)) CellPos { x: 218, y: 217 } None
+unit SimId(25) Owner(PlayerId(0)) CellPos { x: 111, y: 47 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 133, y: 48 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(140) Owner(PlayerId(0)) CellPos { x: 113, y: 74 } Some(Harvester { field: None, load: 2, state: ToOre(CellPos { x: 113, y: 74 }), attempts: 0, gems: 0, work: 1 })
+unit SimId(122) Owner(PlayerId(0)) CellPos { x: 109, y: 45 } Some(Harvester { field: None, load: 40, state: ToRefinery { refinery: SimId(1251), dock: CellPos { x: 32, y: 45 } }, attempts: 1, gems: 0, work: 0 })
+unit SimId(334) Owner(PlayerId(0)) CellPos { x: 66, y: 44 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 134, y: 44 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(1252) Owner(PlayerId(0)) CellPos { x: 91, y: 45 } Some(Harvester { field: None, load: 40, state: ToRefinery { refinery: SimId(1251), dock: CellPos { x: 32, y: 45 } }, attempts: 1, gems: 34, work: 0 })
+unit SimId(2417) Owner(PlayerId(0)) CellPos { x: 100, y: 54 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 110, y: 73 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(1257) Owner(PlayerId(1)) CellPos { x: 99, y: 157 } None
+unit SimId(2536) Owner(PlayerId(0)) CellPos { x: 27, y: 23 } None
+unit SimId(74) Owner(PlayerId(1)) CellPos { x: 224, y: 221 } None
+unit SimId(88) Owner(PlayerId(1)) CellPos { x: 230, y: 226 } None
+unit SimId(421) Owner(PlayerId(0)) CellPos { x: 133, y: 122 } None
+unit SimId(392) Owner(PlayerId(0)) CellPos { x: 132, y: 124 } None
+unit SimId(1159) Owner(PlayerId(1)) CellPos { x: 100, y: 157 } None
+unit SimId(612) Owner(PlayerId(0)) CellPos { x: 133, y: 123 } None
+unit SimId(102) Owner(PlayerId(1)) CellPos { x: 225, y: 225 } None
+unit SimId(479) Owner(PlayerId(0)) CellPos { x: 134, y: 122 } None
+unit SimId(528) Owner(PlayerId(0)) CellPos { x: 134, y: 124 } None
+unit SimId(2540) Owner(PlayerId(0)) CellPos { x: 31, y: 27 } None
+unit SimId(1052) Owner(PlayerId(1)) CellPos { x: 101, y: 156 } None
+unit SimId(986) Owner(PlayerId(1)) CellPos { x: 100, y: 156 } None
+unit SimId(641) Owner(PlayerId(0)) CellPos { x: 132, y: 125 } None
+unit SimId(449) Owner(PlayerId(0)) CellPos { x: 135, y: 122 } None
+unit SimId(2515) Owner(PlayerId(1)) CellPos { x: 180, y: 173 } None
+unit SimId(112) Owner(PlayerId(1)) CellPos { x: 226, y: 223 } None
+unit SimId(2496) Owner(PlayerId(0)) CellPos { x: 135, y: 133 } None
+unit SimId(2512) Owner(PlayerId(0)) CellPos { x: 135, y: 133 } None
+unit SimId(501) Owner(PlayerId(0)) CellPos { x: 133, y: 124 } None
+unit SimId(324) Owner(PlayerId(0)) CellPos { x: 135, y: 124 } None
+unit SimId(2531) Owner(PlayerId(0)) CellPos { x: 27, y: 21 } None
+unit SimId(1235) Owner(PlayerId(1)) CellPos { x: 101, y: 155 } None
+unit SimId(2509) Owner(PlayerId(1)) CellPos { x: 204, y: 218 } None
+unit SimId(2514) Owner(PlayerId(0)) CellPos { x: 131, y: 129 } None
+unit SimId(2511) Owner(PlayerId(0)) CellPos { x: 133, y: 131 } None
+unit SimId(2535) Owner(PlayerId(0)) CellPos { x: 28, y: 23 } None
+unit SimId(2543) Owner(PlayerId(0)) CellPos { x: 27, y: 16 } None
+unit SimId(2499) Owner(PlayerId(0)) CellPos { x: 135, y: 133 } None
+unit SimId(2538) Owner(PlayerId(0)) CellPos { x: 27, y: 18 } None
+unit SimId(2530) Owner(PlayerId(0)) CellPos { x: 27, y: 20 } None
+unit SimId(2495) Owner(PlayerId(1)) CellPos { x: 157, y: 157 } None
+unit SimId(2542) Owner(PlayerId(1)) CellPos { x: 206, y: 218 } None
+unit SimId(2541) Owner(PlayerId(1)) CellPos { x: 216, y: 218 } None
+unit SimId(2516) Owner(PlayerId(1)) CellPos { x: 159, y: 165 } None
+unit SimId(2537) Owner(PlayerId(1)) CellPos { x: 212, y: 218 } None
+unit SimId(2534) Owner(PlayerId(0)) CellPos { x: 27, y: 21 } None
+unit SimId(2497) Owner(PlayerId(0)) CellPos { x: 166, y: 173 } None
+unit SimId(2517) Owner(PlayerId(0)) CellPos { x: 27, y: 17 } None
+unit SimId(2518) Owner(PlayerId(0)) CellPos { x: 32, y: 25 } None
+unit SimId(2523) Owner(PlayerId(0)) CellPos { x: 27, y: 18 } None
+unit SimId(2529) Owner(PlayerId(0)) CellPos { x: 29, y: 23 } None
+
+thread '<unnamed>' (5607102) panicked at crates/game/tests/m6_production_matches.rs:161:21:
+liberty_bay: iraq (brutal) against america (brutal): None
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+oasis_gulf: germany (brutal) against great_britain (brutal) stalled: players [(PlayerId(0), 0), (PlayerId(1), 0)]
+building SimId(1101) Owner(PlayerId(1)) BuildingKind(4) CellPos { x: 226, y: 109 }
+building SimId(1744) Owner(PlayerId(0)) BuildingKind(10) CellPos { x: 24, y: 84 }
+building SimId(137) Owner(PlayerId(0)) BuildingKind(4) CellPos { x: 32, y: 98 }
+building SimId(49) Owner(PlayerId(0)) BuildingKind(4) CellPos { x: 30, y: 93 }
+building SimId(1112) Owner(PlayerId(1)) BuildingKind(10) CellPos { x: 233, y: 106 }
+building SimId(1543) Owner(PlayerId(0)) BuildingKind(3) CellPos { x: 28, y: 80 }
+building SimId(1884) Owner(PlayerId(1)) BuildingKind(3) CellPos { x: 218, y: 93 }
+building SimId(672) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 27, y: 76 }
+building SimId(491) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 16, y: 89 }
+building SimId(1733) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 222, y: 104 }
+building SimId(1509) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 220, y: 99 }
+building SimId(1823) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 20, y: 79 }
+building SimId(252) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 32, y: 87 }
+building SimId(824) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 224, y: 89 }
+building SimId(263) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 34, y: 87 }
+building SimId(281) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 221, y: 89 }
+building SimId(501) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 32, y: 77 }
+building SimId(1668) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 18, y: 85 }
+building SimId(301) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 24, y: 94 }
+building SimId(1215) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 224, y: 104 }
+building SimId(314) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 36, y: 91 }
+building SimId(1492) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 30, y: 87 }
+building SimId(355) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 37, y: 89 }
+building SimId(378) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 229, y: 89 }
+building SimId(1110) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 225, y: 106 }
+building SimId(1135) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 214, y: 104 }
+building SimId(1078) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 230, y: 91 }
+building SimId(418) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 232, y: 90 }
+building SimId(419) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 27, y: 97 }
+building SimId(1265) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 230, y: 98 }
+building SimId(439) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 25, y: 100 }
+building SimId(754) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 34, y: 77 }
+building SimId(450) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 17, y: 87 }
+building SimId(1103) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 228, y: 103 }
+building SimId(474) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 18, y: 94 }
+building SimId(490) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 235, y: 94 }
+building SimId(1119) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 227, y: 106 }
+building SimId(548) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 234, y: 90 }
+building SimId(650) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 29, y: 76 }
+building SimId(1582) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 36, y: 87 }
+building SimId(1057) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 229, y: 95 }
+building SimId(1557) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 33, y: 89 }
+building SimId(1072) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 216, y: 103 }
+building SimId(1222) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 226, y: 104 }
+building SimId(1545) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 27, y: 91 }
+building SimId(1604) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 28, y: 86 }
+building SimId(1671) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 25, y: 77 }
+building SimId(1722) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 222, y: 99 }
+building SimId(1745) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 25, y: 81 }
+building SimId(1748) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 224, y: 98 }
+building SimId(1763) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 23, y: 81 }
+building SimId(1779) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 25, y: 79 }
+building SimId(1798) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 227, y: 95 }
+building SimId(1882) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 220, y: 104 }
+building SimId(2684368717) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 77, y: 55 }
+building SimId(2684371277) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 77, y: 65 }
+building SimId(2684365916) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 92, y: 44 }
+building SimId(2684366434) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 98, y: 46 }
+building SimId(230) Owner(PlayerId(0)) BuildingKind(25) CellPos { x: 19, y: 81 }
+building SimId(214) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 39, y: 83 }
+building SimId(229) Owner(PlayerId(1)) BuildingKind(25) CellPos { x: 215, y: 106 }
+building SimId(632) Owner(PlayerId(0)) BuildingKind(26) CellPos { x: 42, y: 91 }
+building SimId(1021) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 19, y: 100 }
+building SimId(276) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 19, y: 97 }
+building SimId(2684391837) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 157, y: 145 }
+building SimId(2684392355) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 163, y: 147 }
+building SimId(2684386994) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 178, y: 126 }
+building SimId(2684389554) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 178, y: 136 }
+building SimId(1) Owner(PlayerId(1)) BuildingKind(0) CellPos { x: 224, y: 100 }
+building SimId(0) Owner(PlayerId(0)) BuildingKind(0) CellPos { x: 29, y: 89 }
+building SimId(275) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 215, y: 109 }
+building SimId(1156) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 213, y: 93 }
+building SimId(407) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 39, y: 80 }
+building SimId(24) Owner(PlayerId(0)) BuildingKind(2) CellPos { x: 26, y: 93 }
+building SimId(1538) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 28, y: 83 }
+building SimId(72) Owner(PlayerId(0)) BuildingKind(11) CellPos { x: 35, y: 93 }
+building SimId(978) Owner(PlayerId(1)) BuildingKind(2) CellPos { x: 224, y: 80 }
+building SimId(84) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 29, y: 98 }
+building SimId(872) Owner(PlayerId(1)) BuildingKind(2) CellPos { x: 220, y: 85 }
+building SimId(111) Owner(PlayerId(0)) BuildingKind(5) CellPos { x: 39, y: 89 }
+building SimId(811) Owner(PlayerId(1)) BuildingKind(26) CellPos { x: 229, y: 105 }
+building SimId(1526) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 226, y: 114 }
+building SimId(596) Owner(PlayerId(0)) BuildingKind(2) CellPos { x: 24, y: 102 }
+building SimId(1217) Owner(PlayerId(1)) BuildingKind(11) CellPos { x: 225, y: 86 }
+building SimId(1210) Owner(PlayerId(1)) BuildingKind(22) CellPos { x: 231, y: 111 }
+building SimId(149) Owner(PlayerId(0)) BuildingKind(23) CellPos { x: 39, y: 86 }
+building SimId(1771) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 224, y: 91 }
+building SimId(152) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 39, y: 92 }
+building SimId(1505) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 223, y: 114 }
+building SimId(161) Owner(PlayerId(0)) BuildingKind(22) CellPos { x: 37, y: 97 }
+building SimId(849) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 42, y: 86 }
+building SimId(169) Owner(PlayerId(0)) BuildingKind(7) CellPos { x: 22, y: 98 }
+building SimId(174) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 232, y: 92 }
+building SimId(746) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 40, y: 97 }
+building SimId(1639) Owner(PlayerId(1)) BuildingKind(5) CellPos { x: 221, y: 101 }
+building SimId(1651) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 228, y: 100 }
+building SimId(1531) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 26, y: 88 }
+building SimId(1749) Owner(PlayerId(1)) BuildingKind(7) CellPos { x: 226, y: 97 }
+building SimId(1753) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 20, y: 84 }
+building SimId(1767) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 22, y: 78 }
+building SimId(1761) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 224, y: 94 }
+building SimId(1879) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 221, y: 96 }
+building SimId(1883) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 221, y: 93 }
+building SimId(1890) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 215, y: 97 }
+unit SimId(1887) Owner(PlayerId(0)) CellPos { x: 96, y: 95 } None
+unit SimId(1759) Owner(PlayerId(0)) CellPos { x: 73, y: 84 } None
+unit SimId(1124) Owner(PlayerId(1)) CellPos { x: 219, y: 101 } None
+unit SimId(1174) Owner(PlayerId(1)) CellPos { x: 235, y: 108 } None
+unit SimId(402) Owner(PlayerId(1)) CellPos { x: 94, y: 40 } None
+unit SimId(207) Owner(PlayerId(1)) CellPos { x: 95, y: 39 } None
+unit SimId(1889) Owner(PlayerId(0)) CellPos { x: 63, y: 94 } None
+unit SimId(436) Owner(PlayerId(1)) CellPos { x: 95, y: 28 } None
+unit SimId(1768) Owner(PlayerId(0)) CellPos { x: 98, y: 84 } None
+unit SimId(507) Owner(PlayerId(1)) CellPos { x: 96, y: 29 } None
+unit SimId(1153) Owner(PlayerId(1)) CellPos { x: 221, y: 103 } None
+unit SimId(1822) Owner(PlayerId(0)) CellPos { x: 207, y: 93 } None
+unit SimId(357) Owner(PlayerId(1)) CellPos { x: 95, y: 38 } None
+unit SimId(381) Owner(PlayerId(1)) CellPos { x: 96, y: 38 } None
+unit SimId(1842) Owner(PlayerId(0)) CellPos { x: 131, y: 93 } None
+unit SimId(217) Owner(PlayerId(1)) CellPos { x: 94, y: 41 } None
+unit SimId(304) Owner(PlayerId(1)) CellPos { x: 95, y: 40 } None
+unit SimId(564) Owner(PlayerId(1)) CellPos { x: 96, y: 41 } None
+unit SimId(599) Owner(PlayerId(1)) CellPos { x: 94, y: 42 } None
+unit SimId(236) Owner(PlayerId(1)) CellPos { x: 95, y: 41 } None
+unit SimId(1142) Owner(PlayerId(1)) CellPos { x: 221, y: 101 } None
+unit SimId(1886) Owner(PlayerId(0)) CellPos { x: 71, y: 94 } None
+unit SimId(1787) Owner(PlayerId(0)) CellPos { x: 129, y: 92 } None
+unit SimId(1880) Owner(PlayerId(0)) CellPos { x: 53, y: 94 } None
+unit SimId(1877) Owner(PlayerId(1)) CellPos { x: 139, y: 95 } None
+unit SimId(1873) Owner(PlayerId(1)) CellPos { x: 139, y: 95 } None
+unit SimId(1891) Owner(PlayerId(1)) CellPos { x: 223, y: 106 } None
+unit SimId(23) Owner(PlayerId(1)) CellPos { x: 205, y: 70 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 147, y: 58 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(25) Owner(PlayerId(0)) CellPos { x: 48, y: 121 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 75, y: 163 }), attempts: 0, gems: 0, work: 1 })
+unit SimId(597) Owner(PlayerId(0)) CellPos { x: 50, y: 125 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 71, y: 165 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(1665) Owner(PlayerId(1)) CellPos { x: 212, y: 77 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 146, y: 59 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(138) Owner(PlayerId(0)) CellPos { x: 44, y: 115 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 72, y: 165 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(127) Owner(PlayerId(0)) CellPos { x: 63, y: 149 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 76, y: 163 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(873) Owner(PlayerId(1)) CellPos { x: 193, y: 148 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 193, y: 161 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(900) Owner(PlayerId(1)) CellPos { x: 209, y: 96 } Some(Harvester { field: Some(CellPos { x: 167, y: 115 }), load: 0, state: ToOre(CellPos { x: 141, y: 148 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(979) Owner(PlayerId(1)) CellPos { x: 147, y: 59 } Some(Harvester { field: Some(CellPos { x: 148, y: 61 }), load: 2, state: ToOre(CellPos { x: 145, y: 60 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(1888) Owner(PlayerId(0)) CellPos { x: 49, y: 120 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 69, y: 166 }), attempts: 1, gems: 0, work: 0 })
+
+thread '<unnamed>' (5607106) panicked at crates/game/tests/m6_production_matches.rs:161:21:
+oasis_gulf: germany (brutal) against great_britain (brutal): None
+steel_harbor: france (medium) against germany (medium) stalled: players [(PlayerId(0), 29), (PlayerId(1), 0)]
+building SimId(1225) Owner(PlayerId(1)) BuildingKind(10) CellPos { x: 228, y: 227 }
+building SimId(1102) Owner(PlayerId(1)) BuildingKind(4) CellPos { x: 220, y: 237 }
+building SimId(635) Owner(PlayerId(0)) BuildingKind(4) CellPos { x: 39, y: 19 }
+building SimId(1267) Owner(PlayerId(0)) BuildingKind(3) CellPos { x: 26, y: 32 }
+building SimId(1270) Owner(PlayerId(0)) BuildingKind(10) CellPos { x: 31, y: 37 }
+building SimId(1280) Owner(PlayerId(0)) BuildingKind(4) CellPos { x: 36, y: 37 }
+building SimId(697) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 219, y: 221 }
+building SimId(1205) Owner(PlayerId(0)) BuildingKind(21) CellPos { x: 29, y: 19 }
+building SimId(1236) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 228, y: 222 }
+building SimId(957) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 32, y: 27 }
+building SimId(1221) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 32, y: 33 }
+building SimId(971) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 33, y: 31 }
+building SimId(1055) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 231, y: 231 }
+building SimId(1003) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 24, y: 27 }
+building SimId(884) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 225, y: 236 }
+building SimId(1069) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 223, y: 234 }
+building SimId(1271) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 22, y: 27 }
+building SimId(1268) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 34, y: 33 }
+building SimId(1156) Owner(PlayerId(0)) BuildingKind(21) CellPos { x: 26, y: 29 }
+building SimId(1141) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 226, y: 222 }
+building SimId(1179) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 33, y: 29 }
+building SimId(1223) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 221, y: 222 }
+building SimId(1246) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 27, y: 23 }
+building SimId(1281) Owner(PlayerId(0)) BuildingKind(21) CellPos { x: 38, y: 24 }
+building SimId(1288) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 27, y: 21 }
+building SimId(2684383239) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 7, y: 112 }
+building SimId(2684389387) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 11, y: 136 }
+building SimId(2684383259) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 27, y: 112 }
+building SimId(2684389916) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 28, y: 138 }
+building SimId(2684386360) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 56, y: 124 }
+building SimId(2684389432) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 56, y: 136 }
+building SimId(2684397625) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 57, y: 168 }
+building SimId(2684398143) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 63, y: 170 }
+building SimId(2684376403) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 83, y: 85 }
+building SimId(2684376409) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 89, y: 85 }
+building SimId(1164) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 231, y: 222 }
+building SimId(2684378722) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 98, y: 94 }
+building SimId(2684389986) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 98, y: 138 }
+building SimId(2684381796) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 100, y: 106 }
+building SimId(2684386660) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 100, y: 125 }
+building SimId(1139) Owner(PlayerId(0)) BuildingKind(22) CellPos { x: 32, y: 21 }
+building SimId(231) Owner(PlayerId(0)) BuildingKind(25) CellPos { x: 29, y: 16 }
+building SimId(2684384894) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 126, y: 118 }
+building SimId(2684392831) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 127, y: 149 }
+building SimId(2684381824) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 128, y: 106 }
+building SimId(2684389761) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 129, y: 137 }
+building SimId(1167) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 22, y: 29 }
+building SimId(1244) Owner(PlayerId(1)) BuildingKind(11) CellPos { x: 223, y: 218 }
+building SimId(2684387995) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 155, y: 130 }
+building SimId(2684392859) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 155, y: 149 }
+building SimId(2684384669) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 157, y: 117 }
+building SimId(2684395933) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 157, y: 161 }
+building SimId(1117) Owner(PlayerId(0)) BuildingKind(2) CellPos { x: 44, y: 19 }
+building SimId(2684398246) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 166, y: 170 }
+building SimId(2684398252) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 172, y: 170 }
+building SimId(2684376512) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 192, y: 85 }
+building SimId(2684377030) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 198, y: 87 }
+building SimId(2684385223) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 199, y: 119 }
+building SimId(2684388295) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 199, y: 131 }
+building SimId(2684384739) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 227, y: 117 }
+building SimId(2684391396) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 228, y: 143 }
+building SimId(2684385268) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 244, y: 119 }
+building SimId(2684391416) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 248, y: 143 }
+building SimId(1) Owner(PlayerId(1)) BuildingKind(0) CellPos { x: 224, y: 224 }
+building SimId(0) Owner(PlayerId(0)) BuildingKind(0) CellPos { x: 29, y: 29 }
+building SimId(1080) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 29, y: 25 }
+building SimId(932) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 232, y: 236 }
+building SimId(207) Owner(PlayerId(0)) BuildingKind(26) CellPos { x: 30, y: 41 }
+building SimId(1235) Owner(PlayerId(0)) BuildingKind(7) CellPos { x: 29, y: 33 }
+building SimId(1089) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 231, y: 233 }
+building SimId(1137) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 35, y: 25 }
+building SimId(696) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 237, y: 228 }
+building SimId(978) Owner(PlayerId(0)) BuildingKind(2) CellPos { x: 29, y: 46 }
+building SimId(1140) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 35, y: 22 }
+building SimId(668) Owner(PlayerId(1)) BuildingKind(25) CellPos { x: 217, y: 230 }
+building SimId(1073) Owner(PlayerId(1)) BuildingKind(5) CellPos { x: 220, y: 234 }
+building SimId(1086) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 26, y: 25 }
+building SimId(375) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 20, y: 19 }
+building SimId(1106) Owner(PlayerId(0)) BuildingKind(11) CellPos { x: 23, y: 24 }
+building SimId(871) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 228, y: 237 }
+building SimId(1095) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 32, y: 24 }
+building SimId(1104) Owner(PlayerId(0)) BuildingKind(23) CellPos { x: 29, y: 22 }
+building SimId(1185) Owner(PlayerId(1)) BuildingKind(23) CellPos { x: 221, y: 224 }
+building SimId(1195) Owner(PlayerId(0)) BuildingKind(5) CellPos { x: 22, y: 32 }
+building SimId(1222) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 19, y: 29 }
+building SimId(1203) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 228, y: 224 }
+building SimId(1210) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 223, y: 221 }
+building SimId(1215) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 24, y: 21 }
+building SimId(1219) Owner(PlayerId(1)) BuildingKind(22) CellPos { x: 224, y: 228 }
+building SimId(1220) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 221, y: 227 }
+building SimId(1286) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 19, y: 26 }
+unit SimId(267) Owner(PlayerId(1)) CellPos { x: 144, y: 50 } None
+unit SimId(1282) Owner(PlayerId(0)) CellPos { x: 118, y: 122 } None
+unit SimId(1285) Owner(PlayerId(0)) CellPos { x: 116, y: 120 } None
+unit SimId(1263) Owner(PlayerId(1)) CellPos { x: 169, y: 168 } None
+unit SimId(1287) Owner(PlayerId(0)) CellPos { x: 35, y: 35 } None
+unit SimId(23) Owner(PlayerId(1)) CellPos { x: 78, y: 186 } Some(Harvester { field: Some(CellPos { x: 180, y: 173 }), load: 20, state: Idle, attempts: 0, gems: 0, work: 0 })
+unit SimId(25) Owner(PlayerId(0)) CellPos { x: 51, y: 20 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 195, y: 27 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(66) Owner(PlayerId(1)) CellPos { x: 78, y: 187 } Some(Harvester { field: Some(CellPos { x: 180, y: 174 }), load: 20, state: Idle, attempts: 0, gems: 0, work: 0 })
+unit SimId(67) Owner(PlayerId(0)) CellPos { x: 63, y: 181 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 68, y: 184 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(123) Owner(PlayerId(0)) CellPos { x: 180, y: 69 } Some(Harvester { field: None, load: 16, state: ToOre(CellPos { x: 180, y: 69 }), attempts: 0, gems: 0, work: 10 })
+unit SimId(125) Owner(PlayerId(1)) CellPos { x: 77, y: 192 } Some(Harvester { field: None, load: 20, state: Idle, attempts: 0, gems: 0, work: 0 })
+unit SimId(136) Owner(PlayerId(0)) CellPos { x: 82, y: 168 } Some(Harvester { field: Some(CellPos { x: 24, y: 36 }), load: 4, state: ToOre(CellPos { x: 65, y: 186 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(156) Owner(PlayerId(0)) CellPos { x: 95, y: 39 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 179, y: 67 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(373) Owner(PlayerId(1)) CellPos { x: 78, y: 189 } Some(Harvester { field: None, load: 20, state: Idle, attempts: 0, gems: 0, work: 0 })
+unit SimId(404) Owner(PlayerId(1)) CellPos { x: 77, y: 191 } Some(Harvester { field: None, load: 20, state: Idle, attempts: 0, gems: 0, work: 0 })
+unit SimId(438) Owner(PlayerId(0)) CellPos { x: 139, y: 57 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 178, y: 68 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(585) Owner(PlayerId(1)) CellPos { x: 66, y: 226 } Some(Harvester { field: None, load: 20, state: Idle, attempts: 0, gems: 0, work: 0 })
+unit SimId(979) Owner(PlayerId(0)) CellPos { x: 65, y: 18 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 194, y: 29 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(1118) Owner(PlayerId(0)) CellPos { x: 61, y: 30 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 179, y: 68 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(1200) Owner(PlayerId(1)) CellPos { x: 78, y: 190 } Some(Harvester { field: None, load: 20, state: Idle, attempts: 0, gems: 0, work: 0 })
+
+thread '<unnamed>' (5607105) panicked at crates/game/tests/m6_production_matches.rs:161:21:
+steel_harbor: france (medium) against germany (medium): None
+frozen_sound: cuba (brutal) against germany (brutal) stalled: players [(PlayerId(0), 0), (PlayerId(1), 446)]
+building SimId(2214) Owner(PlayerId(0)) BuildingKind(13) CellPos { x: 28, y: 41 }
+building SimId(138) Owner(PlayerId(1)) BuildingKind(4) CellPos { x: 225, y: 231 }
+building SimId(2008) Owner(PlayerId(0)) BuildingKind(32) CellPos { x: 39, y: 29 }
+building SimId(2409) Owner(PlayerId(1)) BuildingKind(3) CellPos { x: 219, y: 227 }
+building SimId(408) Owner(PlayerId(0)) BuildingKind(20) CellPos { x: 18, y: 35 }
+building SimId(391) Owner(PlayerId(0)) BuildingKind(16) CellPos { x: 19, y: 37 }
+building SimId(1903) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 216, y: 226 }
+building SimId(1881) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 222, y: 230 }
+building SimId(202) Owner(PlayerId(0)) BuildingKind(16) CellPos { x: 33, y: 36 }
+building SimId(218) Owner(PlayerId(0)) BuildingKind(20) CellPos { x: 29, y: 39 }
+building SimId(454) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 236, y: 218 }
+building SimId(249) Owner(PlayerId(0)) BuildingKind(20) CellPos { x: 20, y: 35 }
+building SimId(1340) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 217, y: 229 }
+building SimId(1929) Owner(PlayerId(0)) BuildingKind(18) CellPos { x: 24, y: 27 }
+building SimId(2318) Owner(PlayerId(0)) BuildingKind(18) CellPos { x: 28, y: 27 }
+building SimId(271) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 227, y: 220 }
+building SimId(1373) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 222, y: 226 }
+building SimId(278) Owner(PlayerId(0)) BuildingKind(20) CellPos { x: 36, y: 23 }
+building SimId(292) Owner(PlayerId(0)) BuildingKind(18) CellPos { x: 19, y: 29 }
+building SimId(1357) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 226, y: 211 }
+building SimId(297) Owner(PlayerId(0)) BuildingKind(16) CellPos { x: 29, y: 20 }
+building SimId(302) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 235, y: 220 }
+building SimId(311) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 219, y: 232 }
+building SimId(312) Owner(PlayerId(0)) BuildingKind(20) CellPos { x: 34, y: 22 }
+building SimId(1505) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 222, y: 228 }
+building SimId(526) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 225, y: 236 }
+building SimId(2329) Owner(PlayerId(0)) BuildingKind(16) CellPos { x: 25, y: 29 }
+building SimId(332) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 214, y: 228 }
+building SimId(338) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 234, y: 228 }
+building SimId(340) Owner(PlayerId(0)) BuildingKind(20) CellPos { x: 27, y: 20 }
+building SimId(352) Owner(PlayerId(0)) BuildingKind(18) CellPos { x: 38, y: 23 }
+building SimId(499) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 219, y: 234 }
+building SimId(359) Owner(PlayerId(0)) BuildingKind(16) CellPos { x: 19, y: 27 }
+building SimId(368) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 213, y: 226 }
+building SimId(1364) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 229, y: 212 }
+building SimId(375) Owner(PlayerId(0)) BuildingKind(20) CellPos { x: 32, y: 42 }
+building SimId(383) Owner(PlayerId(0)) BuildingKind(18) CellPos { x: 33, y: 20 }
+building SimId(466) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 222, y: 235 }
+building SimId(1789) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 216, y: 224 }
+building SimId(2081) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 226, y: 226 }
+building SimId(507) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 213, y: 230 }
+building SimId(437) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 237, y: 220 }
+building SimId(2360) Owner(PlayerId(0)) BuildingKind(18) CellPos { x: 29, y: 25 }
+building SimId(1383) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 231, y: 212 }
+building SimId(2197) Owner(PlayerId(0)) BuildingKind(16) CellPos { x: 33, y: 34 }
+building SimId(2051) Owner(PlayerId(0)) BuildingKind(18) CellPos { x: 27, y: 29 }
+building SimId(866) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 227, y: 236 }
+building SimId(2684407392) Owner(PlayerId(1)) BuildingKind(39) CellPos { x: 96, y: 206 }
+building SimId(462) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 237, y: 225 }
+building SimId(523) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 236, y: 228 }
+building SimId(1027) Owner(PlayerId(0)) BuildingKind(30) CellPos { x: 42, y: 25 }
+building SimId(2398) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 228, y: 222 }
+building SimId(1) Owner(PlayerId(1)) BuildingKind(0) CellPos { x: 224, y: 222 }
+building SimId(0) Owner(PlayerId(0)) BuildingKind(29) CellPos { x: 29, y: 31 }
+building SimId(181) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 234, y: 225 }
+building SimId(2132) Owner(PlayerId(0)) BuildingKind(12) CellPos { x: 39, y: 25 }
+building SimId(1707) Owner(PlayerId(1)) BuildingKind(23) CellPos { x: 228, y: 209 }
+building SimId(2215) Owner(PlayerId(1)) BuildingKind(2) CellPos { x: 92, y: 203 }
+building SimId(171) Owner(PlayerId(1)) BuildingKind(7) CellPos { x: 235, y: 222 }
+building SimId(400) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 238, y: 222 }
+building SimId(173) Owner(PlayerId(0)) BuildingKind(27) CellPos { x: 28, y: 22 }
+building SimId(191) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 221, y: 232 }
+building SimId(82) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 230, y: 226 }
+building SimId(2399) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 224, y: 216 }
+building SimId(108) Owner(PlayerId(1)) BuildingKind(5) CellPos { x: 232, y: 222 }
+building SimId(115) Owner(PlayerId(0)) BuildingKind(8) CellPos { x: 31, y: 23 }
+building SimId(116) Owner(PlayerId(0)) BuildingKind(24) CellPos { x: 32, y: 39 }
+building SimId(152) Owner(PlayerId(0)) BuildingKind(28) CellPos { x: 18, y: 31 }
+building SimId(2350) Owner(PlayerId(0)) BuildingKind(35) CellPos { x: 35, y: 28 }
+building SimId(1220) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 226, y: 213 }
+building SimId(1331) Owner(PlayerId(1)) BuildingKind(2) CellPos { x: 99, y: 209 }
+building SimId(224) Owner(PlayerId(1)) BuildingKind(26) CellPos { x: 215, y: 231 }
+building SimId(2386) Owner(PlayerId(1)) BuildingKind(22) CellPos { x: 224, y: 219 }
+building SimId(2390) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 221, y: 222 }
+building SimId(2396) Owner(PlayerId(0)) BuildingKind(36) CellPos { x: 35, y: 25 }
+unit SimId(1332) Owner(PlayerId(1)) CellPos { x: 79, y: 192 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 66, y: 154 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(541) Owner(PlayerId(1)) CellPos { x: 138, y: 147 } Some(Harvester { field: Some(CellPos { x: 184, y: 227 }), load: 0, state: ToOre(CellPos { x: 142, y: 131 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(139) Owner(PlayerId(1)) CellPos { x: 142, y: 166 } Some(Harvester { field: Some(CellPos { x: 181, y: 147 }), load: 0, state: ToOre(CellPos { x: 188, y: 106 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(1969) Owner(PlayerId(1)) CellPos { x: 81, y: 194 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 68, y: 151 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(2216) Owner(PlayerId(1)) CellPos { x: 86, y: 199 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 66, y: 153 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(2393) Owner(PlayerId(0)) CellPos { x: 90, y: 90 } None
+unit SimId(2394) Owner(PlayerId(0)) CellPos { x: 90, y: 90 } None
+unit SimId(25) Owner(PlayerId(0)) CellPos { x: 141, y: 29 } Some(Harvester { field: None, load: 40, state: ToRefinery { refinery: SimId(1027), dock: CellPos { x: 45, y: 24 } }, attempts: 1, gems: 0, work: 0 })
+unit SimId(61) Owner(PlayerId(0)) CellPos { x: 59, y: 24 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 166, y: 28 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(1761) Owner(PlayerId(0)) CellPos { x: 164, y: 32 } Some(Harvester { field: None, load: 1, state: ToOre(CellPos { x: 166, y: 32 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(476) Owner(PlayerId(0)) CellPos { x: 165, y: 33 } Some(Harvester { field: Some(CellPos { x: 99, y: 52 }), load: 31, state: ToOre(CellPos { x: 165, y: 32 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(2258) Owner(PlayerId(0)) CellPos { x: 150, y: 29 } Some(Harvester { field: None, load: 40, state: ToRefinery { refinery: SimId(1027), dock: CellPos { x: 45, y: 24 } }, attempts: 1, gems: 0, work: 0 })
+unit SimId(2362) Owner(PlayerId(0)) CellPos { x: 174, y: 174 } None
+unit SimId(2384) Owner(PlayerId(0)) CellPos { x: 124, y: 131 } None
+unit SimId(2401) Owner(PlayerId(1)) CellPos { x: 216, y: 215 } None
+unit SimId(2392) Owner(PlayerId(0)) CellPos { x: 66, y: 68 } None
+unit SimId(2395) Owner(PlayerId(0)) CellPos { x: 68, y: 70 } None
+unit SimId(2388) Owner(PlayerId(0)) CellPos { x: 70, y: 72 } None
+unit SimId(2405) Owner(PlayerId(0)) CellPos { x: 66, y: 69 } None
+unit SimId(2363) Owner(PlayerId(0)) CellPos { x: 174, y: 174 } None
+unit SimId(2361) Owner(PlayerId(0)) CellPos { x: 168, y: 168 } None
+unit SimId(2366) Owner(PlayerId(0)) CellPos { x: 170, y: 170 } None
+unit SimId(2387) Owner(PlayerId(0)) CellPos { x: 70, y: 72 } None
+unit SimId(2365) Owner(PlayerId(0)) CellPos { x: 173, y: 173 } None
+unit SimId(2391) Owner(PlayerId(0)) CellPos { x: 70, y: 72 } None
+unit SimId(2410) Owner(PlayerId(1)) CellPos { x: 218, y: 217 } None
+unit SimId(2411) Owner(PlayerId(1)) CellPos { x: 218, y: 218 } None
+unit SimId(2412) Owner(PlayerId(0)) CellPos { x: 35, y: 36 } None
+
+thread '<unnamed>' (5607109) panicked at crates/game/tests/m6_production_matches.rs:161:21:
+frozen_sound: cuba (brutal) against germany (brutal): None
+black_water: libya (brutal) against america (brutal) stalled: players [(PlayerId(0), 0), (PlayerId(1), 0)]
+building SimId(131) Owner(PlayerId(1)) BuildingKind(4) CellPos { x: 228, y: 221 }
+building SimId(1869) Owner(PlayerId(1)) BuildingKind(3) CellPos { x: 230, y: 232 }
+building SimId(59) Owner(PlayerId(1)) BuildingKind(34) CellPos { x: 215, y: 224 }
+building SimId(48) Owner(PlayerId(1)) BuildingKind(4) CellPos { x: 220, y: 224 }
+building SimId(2385) Owner(PlayerId(0)) BuildingKind(31) CellPos { x: 33, y: 37 }
+building SimId(2424) Owner(PlayerId(0)) BuildingKind(32) CellPos { x: 29, y: 29 }
+building SimId(676) Owner(PlayerId(0)) BuildingKind(16) CellPos { x: 22, y: 33 }
+building SimId(511) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 231, y: 218 }
+building SimId(802) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 223, y: 212 }
+building SimId(1852) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 210, y: 231 }
+building SimId(790) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 224, y: 209 }
+building SimId(978) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 228, y: 210 }
+building SimId(301) Owner(PlayerId(0)) BuildingKind(18) CellPos { x: 24, y: 33 }
+building SimId(321) Owner(PlayerId(0)) BuildingKind(16) CellPos { x: 33, y: 42 }
+building SimId(852) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 231, y: 226 }
+building SimId(366) Owner(PlayerId(0)) BuildingKind(18) CellPos { x: 24, y: 35 }
+building SimId(1824) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 220, y: 214 }
+building SimId(386) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 218, y: 217 }
+building SimId(1803) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 218, y: 221 }
+building SimId(405) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 223, y: 218 }
+building SimId(2316) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 220, y: 216 }
+building SimId(1026) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 212, y: 231 }
+building SimId(1871) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 220, y: 218 }
+building SimId(1256) Owner(PlayerId(0)) BuildingKind(20) CellPos { x: 38, y: 35 }
+building SimId(752) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 222, y: 209 }
+building SimId(1756) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 218, y: 211 }
+building SimId(589) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 226, y: 210 }
+building SimId(1733) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 216, y: 213 }
+building SimId(620) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 218, y: 213 }
+building SimId(1714) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 212, y: 222 }
+building SimId(2152) Owner(PlayerId(0)) BuildingKind(16) CellPos { x: 26, y: 34 }
+building SimId(560) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 228, y: 229 }
+building SimId(985) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 230, y: 211 }
+building SimId(1047) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 230, y: 209 }
+building SimId(1817) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 216, y: 221 }
+building SimId(1956) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 218, y: 219 }
+building SimId(989) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 220, y: 212 }
+building SimId(2684381998) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 46, y: 107 }
+building SimId(2684399918) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 46, y: 177 }
+building SimId(2684412462) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 46, y: 226 }
+building SimId(2684380208) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 48, y: 100 }
+building SimId(2684402736) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 48, y: 188 }
+building SimId(2684412977) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 49, y: 228 }
+building SimId(2684366386) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 50, y: 46 }
+building SimId(2684366646) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 54, y: 47 }
+building SimId(2684387128) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 56, y: 127 }
+building SimId(2684387643) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 59, y: 129 }
+building SimId(2684407867) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 59, y: 208 }
+building SimId(2684387134) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 62, y: 127 }
+building SimId(2684407870) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 62, y: 208 }
+building SimId(2684407873) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 65, y: 208 }
+building SimId(2684407365) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 69, y: 206 }
+building SimId(2684386897) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 81, y: 126 }
+building SimId(2684366946) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 98, y: 48 }
+building SimId(960) Owner(PlayerId(0)) BuildingKind(30) CellPos { x: 45, y: 25 }
+building SimId(323) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 214, y: 229 }
+building SimId(2684407398) Owner(PlayerId(1)) BuildingKind(39) CellPos { x: 102, y: 206 }
+building SimId(2684366953) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 105, y: 48 }
+building SimId(2684387179) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 107, y: 127 }
+building SimId(2684386928) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 112, y: 126 }
+building SimId(2684387192) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 120, y: 127 }
+building SimId(2684387196) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 124, y: 127 }
+building SimId(2684407420) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 124, y: 206 }
+building SimId(2684386174) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 126, y: 123 }
+building SimId(2684388222) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 126, y: 131 }
+building SimId(2684381055) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 127, y: 103 }
+building SimId(2684407167) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 127, y: 205 }
+building SimId(2684367488) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 128, y: 50 }
+building SimId(2684393600) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 128, y: 152 }
+building SimId(2684386433) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 129, y: 124 }
+building SimId(2684388481) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 129, y: 132 }
+building SimId(2684367235) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 131, y: 49 }
+building SimId(2684387459) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 131, y: 128 }
+building SimId(2684387463) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 135, y: 128 }
+building SimId(2684387727) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 143, y: 129 }
+building SimId(2684387476) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 148, y: 128 }
+building SimId(2684407702) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 150, y: 207 }
+building SimId(1564) Owner(PlayerId(0)) BuildingKind(24) CellPos { x: 42, y: 25 }
+building SimId(303) Owner(PlayerId(1)) BuildingKind(26) CellPos { x: 223, y: 230 }
+building SimId(578) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 233, y: 220 }
+building SimId(2684407709) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 157, y: 207 }
+building SimId(2684387758) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 174, y: 129 }
+building SimId(2684367290) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 186, y: 49 }
+building SimId(2684366782) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 190, y: 47 }
+building SimId(2684366785) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 193, y: 47 }
+building SimId(2684387521) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 193, y: 128 }
+building SimId(2684366788) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 196, y: 47 }
+building SimId(2684387012) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 196, y: 126 }
+building SimId(2684387527) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 199, y: 128 }
+building SimId(2684408009) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 201, y: 208 }
+building SimId(2684408269) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 205, y: 209 }
+building SimId(2684361678) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 206, y: 27 }
+building SimId(2684371919) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 207, y: 67 }
+building SimId(2684394447) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 207, y: 155 }
+building SimId(2684362193) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 209, y: 29 }
+building SimId(2684374737) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 209, y: 78 }
+building SimId(2684392657) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 209, y: 148 }
+building SimId(2684385919) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 127, y: 122 }
+building SimId(2684387180) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 108, y: 127 }
+building SimId(2684386874) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 58, y: 126 }
+building SimId(2684385920) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 128, y: 122 }
+building SimId(2684387475) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 147, y: 128 }
+building SimId(2684387203) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 131, y: 127 }
+building SimId(2684387781) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 197, y: 129 }
+building SimId(2684388734) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 126, y: 133 }
+building SimId(2684388736) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 128, y: 133 }
+building SimId(2684388480) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 128, y: 132 }
+building SimId(1) Owner(PlayerId(1)) BuildingKind(0) CellPos { x: 220, y: 220 }
+building SimId(0) Owner(PlayerId(0)) BuildingKind(29) CellPos { x: 33, y: 33 }
+building SimId(1179) Owner(PlayerId(0)) BuildingKind(30) CellPos { x: 43, y: 21 }
+building SimId(1754) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 211, y: 224 }
+building SimId(1705) Owner(PlayerId(0)) BuildingKind(28) CellPos { x: 33, y: 29 }
+building SimId(26) Owner(PlayerId(1)) BuildingKind(2) CellPos { x: 224, y: 220 }
+building SimId(434) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 211, y: 228 }
+building SimId(674) Owner(PlayerId(1)) BuildingKind(5) CellPos { x: 230, y: 229 }
+building SimId(1747) Owner(PlayerId(1)) BuildingKind(2) CellPos { x: 206, y: 228 }
+building SimId(778) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 233, y: 217 }
+building SimId(81) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 225, y: 224 }
+building SimId(741) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 227, y: 231 }
+building SimId(1030) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 232, y: 211 }
+building SimId(2151) Owner(PlayerId(0)) BuildingKind(12) CellPos { x: 26, y: 31 }
+building SimId(885) Owner(PlayerId(1)) BuildingKind(25) CellPos { x: 233, y: 223 }
+building SimId(2303) Owner(PlayerId(1)) BuildingKind(11) CellPos { x: 205, y: 220 }
+building SimId(160) Owner(PlayerId(1)) BuildingKind(22) CellPos { x: 217, y: 229 }
+building SimId(139) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 225, y: 227 }
+building SimId(152) Owner(PlayerId(1)) BuildingKind(23) CellPos { x: 220, y: 229 }
+building SimId(1822) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 236, y: 220 }
+building SimId(1782) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 209, y: 221 }
+building SimId(174) Owner(PlayerId(1)) BuildingKind(7) CellPos { x: 228, y: 226 }
+building SimId(923) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 232, y: 214 }
+building SimId(2329) Owner(PlayerId(0)) BuildingKind(6) CellPos { x: 37, y: 28 }
+building SimId(2377) Owner(PlayerId(0)) BuildingKind(6) CellPos { x: 30, y: 33 }
+building SimId(2382) Owner(PlayerId(0)) BuildingKind(6) CellPos { x: 37, y: 32 }
+building SimId(2428) Owner(PlayerId(0)) BuildingKind(6) CellPos { x: 34, y: 26 }
+building SimId(2432) Owner(PlayerId(0)) BuildingKind(6) CellPos { x: 40, y: 32 }
+building SimId(2440) Owner(PlayerId(0)) BuildingKind(35) CellPos { x: 40, y: 29 }
+unit SimId(718) Owner(PlayerId(1)) CellPos { x: 173, y: 197 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 123, y: 159 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(1712) Owner(PlayerId(1)) CellPos { x: 212, y: 119 } Some(Harvester { field: None, load: 13, state: ToOre(CellPos { x: 212, y: 119 }), attempts: 0, gems: 0, work: 1 })
+unit SimId(1748) Owner(PlayerId(1)) CellPos { x: 137, y: 175 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 124, y: 159 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(252) Owner(PlayerId(1)) CellPos { x: 211, y: 142 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 211, y: 119 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(2436) Owner(PlayerId(0)) CellPos { x: 87, y: 77 } None
+unit SimId(2426) Owner(PlayerId(1)) CellPos { x: 196, y: 195 } None
+unit SimId(151) Owner(PlayerId(0)) CellPos { x: 48, y: 106 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 53, y: 142 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(961) Owner(PlayerId(0)) CellPos { x: 86, y: 68 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 130, y: 101 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(207) Owner(PlayerId(0)) CellPos { x: 47, y: 137 } Some(Harvester { field: None, load: 40, state: ToRefinery { refinery: SimId(960), dock: CellPos { x: 47, y: 28 } }, attempts: 1, gems: 0, work: 0 })
+unit SimId(2113) Owner(PlayerId(0)) CellPos { x: 129, y: 92 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 130, y: 100 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(2431) Owner(PlayerId(1)) CellPos { x: 204, y: 203 } None
+unit SimId(2442) Owner(PlayerId(1)) CellPos { x: 206, y: 205 } None
+unit SimId(103) Owner(PlayerId(1)) CellPos { x: 214, y: 219 } None
+unit SimId(391) Owner(PlayerId(0)) CellPos { x: 133, y: 120 } None
+unit SimId(76) Owner(PlayerId(1)) CellPos { x: 214, y: 221 } None
+unit SimId(2409) Owner(PlayerId(1)) CellPos { x: 92, y: 83 } None
+unit SimId(113) Owner(PlayerId(1)) CellPos { x: 214, y: 217 } None
+unit SimId(90) Owner(PlayerId(1)) CellPos { x: 217, y: 219 } None
+unit SimId(2427) Owner(PlayerId(1)) CellPos { x: 208, y: 209 } None
+unit SimId(2411) Owner(PlayerId(1)) CellPos { x: 73, y: 71 } None
+unit SimId(2439) Owner(PlayerId(0)) CellPos { x: 28, y: 30 } None
+unit SimId(2438) Owner(PlayerId(0)) CellPos { x: 30, y: 35 } None
+unit SimId(2437) Owner(PlayerId(0)) CellPos { x: 30, y: 35 } None
+unit SimId(2407) Owner(PlayerId(1)) CellPos { x: 90, y: 81 } None
+unit SimId(2434) Owner(PlayerId(1)) CellPos { x: 200, y: 199 } None
+unit SimId(2444) Owner(PlayerId(1)) CellPos { x: 30, y: 26 } None
+unit SimId(2445) Owner(PlayerId(1)) CellPos { x: 30, y: 26 } None
+unit SimId(2446) Owner(PlayerId(1)) CellPos { x: 30, y: 26 } None
+unit SimId(2447) Owner(PlayerId(1)) CellPos { x: 29, y: 25 } None
+unit SimId(2448) Owner(PlayerId(1)) CellPos { x: 29, y: 25 } None
+unit SimId(2449) Owner(PlayerId(1)) CellPos { x: 29, y: 25 } None
+unit SimId(2450) Owner(PlayerId(1)) CellPos { x: 30, y: 25 } None
+unit SimId(2451) Owner(PlayerId(1)) CellPos { x: 30, y: 25 } None
+
+thread '<unnamed>' (5607104) panicked at crates/game/tests/m6_production_matches.rs:161:21:
+black_water: libya (brutal) against america (brutal): None
+black_water: korea (brutal) against france (brutal) stalled: players [(PlayerId(0), 0), (PlayerId(1), 0)]
+building SimId(1489) Owner(PlayerId(0)) BuildingKind(3) CellPos { x: 33, y: 27 }
+building SimId(1505) Owner(PlayerId(0)) BuildingKind(10) CellPos { x: 39, y: 27 }
+building SimId(861) Owner(PlayerId(1)) BuildingKind(3) CellPos { x: 220, y: 217 }
+building SimId(352) Owner(PlayerId(1)) BuildingKind(9) CellPos { x: 201, y: 218 }
+building SimId(60) Owner(PlayerId(1)) BuildingKind(10) CellPos { x: 215, y: 224 }
+building SimId(1275) Owner(PlayerId(0)) BuildingKind(4) CellPos { x: 33, y: 37 }
+building SimId(1554) Owner(PlayerId(1)) BuildingKind(4) CellPos { x: 232, y: 231 }
+building SimId(1709) Owner(PlayerId(0)) BuildingKind(4) CellPos { x: 37, y: 42 }
+building SimId(1756) Owner(PlayerId(1)) BuildingKind(4) CellPos { x: 232, y: 223 }
+building SimId(646) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 216, y: 213 }
+building SimId(344) Owner(PlayerId(1)) BuildingKind(21) CellPos { x: 226, y: 230 }
+building SimId(699) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 31, y: 33 }
+building SimId(1656) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 224, y: 218 }
+building SimId(884) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 216, y: 221 }
+building SimId(291) Owner(PlayerId(1)) BuildingKind(21) CellPos { x: 214, y: 229 }
+building SimId(649) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 206, y: 220 }
+building SimId(799) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 23, y: 33 }
+building SimId(665) Owner(PlayerId(1)) BuildingKind(21) CellPos { x: 209, y: 231 }
+building SimId(534) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 210, y: 211 }
+building SimId(324) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 220, y: 209 }
+building SimId(543) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 209, y: 227 }
+building SimId(329) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 31, y: 44 }
+building SimId(1527) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 224, y: 220 }
+building SimId(356) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 41, y: 24 }
+building SimId(357) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 209, y: 220 }
+building SimId(1157) Owner(PlayerId(1)) BuildingKind(21) CellPos { x: 232, y: 228 }
+building SimId(373) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 231, y: 218 }
+building SimId(376) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 22, y: 37 }
+building SimId(380) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 209, y: 222 }
+building SimId(1687) Owner(PlayerId(1)) BuildingKind(21) CellPos { x: 225, y: 209 }
+building SimId(842) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 218, y: 214 }
+building SimId(739) Owner(PlayerId(1)) BuildingKind(21) CellPos { x: 236, y: 220 }
+building SimId(878) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 218, y: 221 }
+building SimId(439) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 21, y: 35 }
+building SimId(551) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 222, y: 233 }
+building SimId(465) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 30, y: 21 }
+building SimId(506) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 210, y: 213 }
+building SimId(509) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 229, y: 210 }
+building SimId(1506) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 30, y: 29 }
+building SimId(1635) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 33, y: 31 }
+building SimId(638) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 212, y: 231 }
+building SimId(1732) Owner(PlayerId(1)) BuildingKind(21) CellPos { x: 227, y: 220 }
+building SimId(1734) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 31, y: 31 }
+building SimId(1745) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 220, y: 227 }
+building SimId(2684381998) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 46, y: 107 }
+building SimId(2684399918) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 46, y: 177 }
+building SimId(2684412462) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 46, y: 226 }
+building SimId(2684380208) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 48, y: 100 }
+building SimId(2684402736) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 48, y: 188 }
+building SimId(2684412977) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 49, y: 228 }
+building SimId(2684366386) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 50, y: 46 }
+building SimId(2684366646) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 54, y: 47 }
+building SimId(2684387128) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 56, y: 127 }
+building SimId(2684387643) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 59, y: 129 }
+building SimId(2684407867) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 59, y: 208 }
+building SimId(2684387134) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 62, y: 127 }
+building SimId(2684407870) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 62, y: 208 }
+building SimId(2684407873) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 65, y: 208 }
+building SimId(2684407365) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 69, y: 206 }
+building SimId(2684386897) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 81, y: 126 }
+building SimId(2684366946) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 98, y: 48 }
+building SimId(384) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 43, y: 24 }
+building SimId(1375) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 233, y: 220 }
+building SimId(658) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 224, y: 233 }
+building SimId(2684366953) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 105, y: 48 }
+building SimId(2684387179) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 107, y: 127 }
+building SimId(2684386928) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 112, y: 126 }
+building SimId(2684387192) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 120, y: 127 }
+building SimId(2684387196) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 124, y: 127 }
+building SimId(2684407420) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 124, y: 206 }
+building SimId(2684386174) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 126, y: 123 }
+building SimId(2684388222) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 126, y: 131 }
+building SimId(2684381055) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 127, y: 103 }
+building SimId(2684407167) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 127, y: 205 }
+building SimId(2684367488) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 128, y: 50 }
+building SimId(2684393600) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 128, y: 152 }
+building SimId(2684386433) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 129, y: 124 }
+building SimId(2684388481) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 129, y: 132 }
+building SimId(2684367235) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 131, y: 49 }
+building SimId(2684387459) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 131, y: 128 }
+building SimId(2684387463) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 135, y: 128 }
+building SimId(2684387727) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 143, y: 129 }
+building SimId(2684387476) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 148, y: 128 }
+building SimId(2684407702) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 150, y: 207 }
+building SimId(1524) Owner(PlayerId(0)) BuildingKind(11) CellPos { x: 29, y: 26 }
+building SimId(299) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 211, y: 228 }
+building SimId(226) Owner(PlayerId(1)) BuildingKind(26) CellPos { x: 228, y: 226 }
+building SimId(2684407709) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 157, y: 207 }
+building SimId(2684387758) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 174, y: 129 }
+building SimId(2684367290) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 186, y: 49 }
+building SimId(2684366782) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 190, y: 47 }
+building SimId(2684366785) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 193, y: 47 }
+building SimId(2684387521) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 193, y: 128 }
+building SimId(2684366788) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 196, y: 47 }
+building SimId(2684387012) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 196, y: 126 }
+building SimId(2684387527) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 199, y: 128 }
+building SimId(2684408009) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 201, y: 208 }
+building SimId(2684408269) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 205, y: 209 }
+building SimId(2684361678) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 206, y: 27 }
+building SimId(2684371919) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 207, y: 67 }
+building SimId(2684394447) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 207, y: 155 }
+building SimId(2684362193) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 209, y: 29 }
+building SimId(2684374737) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 209, y: 78 }
+building SimId(2684392657) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 209, y: 148 }
+building SimId(2684385919) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 127, y: 122 }
+building SimId(2684387180) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 108, y: 127 }
+building SimId(2684386874) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 58, y: 126 }
+building SimId(2684385920) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 128, y: 122 }
+building SimId(2684387475) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 147, y: 128 }
+building SimId(2684387203) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 131, y: 127 }
+building SimId(2684387781) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 197, y: 129 }
+building SimId(2684388734) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 126, y: 133 }
+building SimId(2684388736) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 128, y: 133 }
+building SimId(2684388480) Owner(PlayerId(255)) BuildingKind(42) CellPos { x: 128, y: 132 }
+building SimId(1) Owner(PlayerId(1)) BuildingKind(0) CellPos { x: 220, y: 220 }
+building SimId(0) Owner(PlayerId(0)) BuildingKind(0) CellPos { x: 33, y: 33 }
+building SimId(242) Owner(PlayerId(0)) BuildingKind(25) CellPos { x: 32, y: 22 }
+building SimId(218) Owner(PlayerId(0)) BuildingKind(26) CellPos { x: 43, y: 27 }
+building SimId(1676) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 222, y: 210 }
+building SimId(745) Owner(PlayerId(0)) BuildingKind(2) CellPos { x: 47, y: 25 }
+building SimId(1660) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 220, y: 213 }
+building SimId(1476) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 37, y: 33 }
+building SimId(1279) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 220, y: 224 }
+building SimId(637) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 231, y: 211 }
+building SimId(165) Owner(PlayerId(0)) BuildingKind(22) CellPos { x: 42, y: 31 }
+building SimId(1685) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 217, y: 210 }
+building SimId(231) Owner(PlayerId(1)) BuildingKind(7) CellPos { x: 211, y: 225 }
+building SimId(131) Owner(PlayerId(0)) BuildingKind(2) CellPos { x: 33, y: 42 }
+building SimId(1150) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 229, y: 230 }
+building SimId(1662) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 25, y: 33 }
+building SimId(154) Owner(PlayerId(1)) BuildingKind(23) CellPos { x: 220, y: 229 }
+building SimId(728) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 227, y: 233 }
+building SimId(156) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 211, y: 222 }
+building SimId(1712) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 224, y: 222 }
+building SimId(164) Owner(PlayerId(1)) BuildingKind(22) CellPos { x: 217, y: 229 }
+building SimId(628) Owner(PlayerId(1)) BuildingKind(5) CellPos { x: 232, y: 214 }
+building SimId(1483) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 36, y: 30 }
+building SimId(897) Owner(PlayerId(1)) BuildingKind(2) CellPos { x: 212, y: 209 }
+building SimId(1696) Owner(PlayerId(1)) BuildingKind(2) CellPos { x: 217, y: 204 }
+building SimId(267) Owner(PlayerId(1)) BuildingKind(25) CellPos { x: 223, y: 230 }
+building SimId(1723) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 223, y: 225 }
+building SimId(1729) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 28, y: 33 }
+building SimId(1733) Owner(PlayerId(1)) BuildingKind(11) CellPos { x: 227, y: 223 }
+building SimId(1739) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 27, y: 30 }
+building SimId(1742) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 230, y: 220 }
+building SimId(1754) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 26, y: 27 }
+unit SimId(852) Owner(PlayerId(1)) CellPos { x: 214, y: 214 } None
+unit SimId(1751) Owner(PlayerId(1)) CellPos { x: 214, y: 214 } None
+unit SimId(1757) Owner(PlayerId(0)) CellPos { x: 40, y: 40 } None
+unit SimId(1547) Owner(PlayerId(0)) CellPos { x: 41, y: 28 } None
+unit SimId(1753) Owner(PlayerId(0)) CellPos { x: 39, y: 40 } None
+unit SimId(1748) Owner(PlayerId(1)) CellPos { x: 146, y: 156 } None
+unit SimId(1731) Owner(PlayerId(1)) CellPos { x: 54, y: 48 } None
+unit SimId(98) Owner(PlayerId(1)) CellPos { x: 217, y: 224 } None
+unit SimId(1755) Owner(PlayerId(0)) CellPos { x: 39, y: 39 } None
+unit SimId(1566) Owner(PlayerId(0)) CellPos { x: 39, y: 39 } None
+unit SimId(113) Owner(PlayerId(1)) CellPos { x: 167, y: 178 } None
+unit SimId(1530) Owner(PlayerId(0)) CellPos { x: 38, y: 34 } None
+unit SimId(875) Owner(PlayerId(1)) CellPos { x: 165, y: 174 } None
+unit SimId(1726) Owner(PlayerId(1)) CellPos { x: 50, y: 47 } None
+unit SimId(889) Owner(PlayerId(1)) CellPos { x: 167, y: 176 } None
+unit SimId(1721) Owner(PlayerId(1)) CellPos { x: 52, y: 47 } None
+unit SimId(1740) Owner(PlayerId(1)) CellPos { x: 166, y: 176 } None
+unit SimId(1750) Owner(PlayerId(1)) CellPos { x: 214, y: 213 } None
+unit SimId(1746) Owner(PlayerId(0)) CellPos { x: 145, y: 154 } None
+unit SimId(1589) Owner(PlayerId(0)) CellPos { x: 39, y: 34 } None
+unit SimId(1759) Owner(PlayerId(0)) CellPos { x: 39, y: 38 } None
+unit SimId(1752) Owner(PlayerId(0)) CellPos { x: 39, y: 39 } None
+unit SimId(1749) Owner(PlayerId(1)) CellPos { x: 139, y: 135 } None
+unit SimId(1758) Owner(PlayerId(0)) CellPos { x: 40, y: 39 } None
+unit SimId(1760) Owner(PlayerId(0)) CellPos { x: 37, y: 35 } None
+unit SimId(23) Owner(PlayerId(1)) CellPos { x: 153, y: 111 } Some(Harvester { field: None, load: 14, state: ToOre(CellPos { x: 153, y: 111 }), attempts: 0, gems: 0, work: 1 })
+unit SimId(25) Owner(PlayerId(0)) CellPos { x: 146, y: 109 } Some(Harvester { field: Some(CellPos { x: 89, y: 72 }), load: 13, state: ToOre(CellPos { x: 146, y: 109 }), attempts: 0, gems: 0, work: 9 })
+unit SimId(65) Owner(PlayerId(1)) CellPos { x: 151, y: 112 } Some(Harvester { field: None, load: 19, state: ToOre(CellPos { x: 151, y: 112 }), attempts: 0, gems: 7, work: 2 })
+unit SimId(898) Owner(PlayerId(1)) CellPos { x: 207, y: 174 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 152, y: 112 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(130) Owner(PlayerId(1)) CellPos { x: 152, y: 194 } Some(Harvester { field: Some(CellPos { x: 118, y: 235 }), load: 0, state: ToOre(CellPos { x: 83, y: 188 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(205) Owner(PlayerId(1)) CellPos { x: 160, y: 126 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 153, y: 112 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(144) Owner(PlayerId(1)) CellPos { x: 181, y: 141 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 150, y: 113 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(145) Owner(PlayerId(0)) CellPos { x: 47, y: 82 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 45, y: 137 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(831) Owner(PlayerId(1)) CellPos { x: 197, y: 157 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 149, y: 114 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(1465) Owner(PlayerId(0)) CellPos { x: 45, y: 66 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 39, y: 135 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(1477) Owner(PlayerId(0)) CellPos { x: 38, y: 54 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 38, y: 134 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(1697) Owner(PlayerId(1)) CellPos { x: 151, y: 113 } Some(Harvester { field: None, load: 3, state: ToOre(CellPos { x: 151, y: 113 }), attempts: 0, gems: 0, work: 5 })
+
+thread '<unnamed>' (5607111) panicked at crates/game/tests/m6_production_matches.rs:161:21:
+black_water: korea (brutal) against france (brutal): None
+wheel_of_worlds: germany (brutal) against great_britain (brutal) stalled: players [(PlayerId(0), 136729), (PlayerId(1), 0)]
+building SimId(621) Owner(PlayerId(1)) BuildingKind(4) CellPos { x: 215, y: 170 }
+building SimId(27) Owner(PlayerId(0)) BuildingKind(3) CellPos { x: 29, y: 96 }
+building SimId(61) Owner(PlayerId(0)) BuildingKind(10) CellPos { x: 28, y: 91 }
+building SimId(49) Owner(PlayerId(0)) BuildingKind(4) CellPos { x: 35, y: 91 }
+building SimId(60) Owner(PlayerId(1)) BuildingKind(10) CellPos { x: 216, y: 162 }
+building SimId(2811) Owner(PlayerId(1)) BuildingKind(3) CellPos { x: 225, y: 157 }
+building SimId(2813) Owner(PlayerId(0)) BuildingKind(4) CellPos { x: 34, y: 105 }
+building SimId(2726) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 40, y: 102 }
+building SimId(279) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 25, y: 94 }
+building SimId(242) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 36, y: 96 }
+building SimId(597) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 30, y: 82 }
+building SimId(2850) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 221, y: 161 }
+building SimId(270) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 229, y: 156 }
+building SimId(273) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 27, y: 100 }
+building SimId(278) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 217, y: 155 }
+building SimId(2763) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 219, y: 158 }
+building SimId(297) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 27, y: 88 }
+building SimId(300) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 230, y: 158 }
+building SimId(304) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 25, y: 101 }
+building SimId(307) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 229, y: 154 }
+building SimId(309) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 27, y: 86 }
+building SimId(312) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 230, y: 160 }
+building SimId(319) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 25, y: 86 }
+building SimId(2544) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 33, y: 102 }
+building SimId(327) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 38, y: 85 }
+building SimId(2826) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 35, y: 102 }
+building SimId(333) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 23, y: 86 }
+building SimId(336) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 231, y: 152 }
+building SimId(344) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 44, y: 92 }
+building SimId(2186) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 36, y: 98 }
+building SimId(2207) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 213, y: 153 }
+building SimId(2597) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 223, y: 161 }
+building SimId(363) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 32, y: 82 }
+building SimId(380) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 27, y: 84 }
+building SimId(2294) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 215, y: 153 }
+building SimId(2217) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 29, y: 100 }
+building SimId(502) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 40, y: 85 }
+building SimId(2832) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 38, y: 101 }
+building SimId(430) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 231, y: 150 }
+building SimId(2330) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 207, y: 160 }
+building SimId(516) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 224, y: 170 }
+building SimId(2083) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 219, y: 147 }
+building SimId(2308) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 209, y: 161 }
+building SimId(506) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 219, y: 170 }
+building SimId(467) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 217, y: 145 }
+building SimId(2717) Owner(PlayerId(0)) BuildingKind(17) CellPos { x: 34, y: 100 }
+building SimId(512) Owner(PlayerId(1)) BuildingKind(17) CellPos { x: 226, y: 145 }
+building SimId(2316) Owner(PlayerId(1)) BuildingKind(15) CellPos { x: 208, y: 158 }
+building SimId(2709) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 32, y: 100 }
+building SimId(2482) Owner(PlayerId(1)) BuildingKind(19) CellPos { x: 225, y: 155 }
+building SimId(2221) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 33, y: 110 }
+building SimId(2807) Owner(PlayerId(0)) BuildingKind(19) CellPos { x: 39, y: 104 }
+building SimId(2817) Owner(PlayerId(0)) BuildingKind(15) CellPos { x: 36, y: 100 }
+building SimId(261) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 29, y: 84 }
+building SimId(521) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 231, y: 168 }
+building SimId(222) Owner(PlayerId(1)) BuildingKind(26) CellPos { x: 227, y: 167 }
+building SimId(2128) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 30, y: 110 }
+building SimId(179) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 38, y: 87 }
+building SimId(343) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 212, y: 167 }
+building SimId(1) Owner(PlayerId(1)) BuildingKind(0) CellPos { x: 221, y: 157 }
+building SimId(0) Owner(PlayerId(0)) BuildingKind(0) CellPos { x: 32, y: 96 }
+building SimId(2264) Owner(PlayerId(1)) BuildingKind(23) CellPos { x: 209, y: 167 }
+building SimId(21) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 32, y: 93 }
+building SimId(2752) Owner(PlayerId(0)) BuildingKind(2) CellPos { x: 47, y: 97 }
+building SimId(471) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 44, y: 89 }
+building SimId(2265) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 226, y: 171 }
+building SimId(72) Owner(PlayerId(0)) BuildingKind(11) CellPos { x: 25, y: 96 }
+building SimId(83) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 221, y: 165 }
+building SimId(230) Owner(PlayerId(0)) BuildingKind(25) CellPos { x: 41, y: 87 }
+building SimId(474) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 221, y: 171 }
+building SimId(247) Owner(PlayerId(1)) BuildingKind(25) CellPos { x: 228, y: 164 }
+building SimId(163) Owner(PlayerId(0)) BuildingKind(22) CellPos { x: 35, y: 87 }
+building SimId(126) Owner(PlayerId(0)) BuildingKind(2) CellPos { x: 40, y: 90 }
+building SimId(143) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 225, y: 164 }
+building SimId(144) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 32, y: 87 }
+building SimId(232) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 215, y: 167 }
+building SimId(150) Owner(PlayerId(0)) BuildingKind(23) CellPos { x: 24, y: 91 }
+building SimId(153) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 221, y: 168 }
+building SimId(154) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 29, y: 87 }
+building SimId(162) Owner(PlayerId(1)) BuildingKind(22) CellPos { x: 218, y: 167 }
+building SimId(314) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 35, y: 84 }
+building SimId(173) Owner(PlayerId(0)) BuildingKind(7) CellPos { x: 24, y: 88 }
+building SimId(183) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 32, y: 84 }
+building SimId(185) Owner(PlayerId(1)) BuildingKind(2) CellPos { x: 211, y: 163 }
+building SimId(2269) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 211, y: 170 }
+building SimId(200) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 224, y: 167 }
+building SimId(207) Owner(PlayerId(0)) BuildingKind(26) CellPos { x: 42, y: 102 }
+building SimId(426) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 231, y: 165 }
+building SimId(2271) Owner(PlayerId(1)) BuildingKind(7) CellPos { x: 221, y: 174 }
+building SimId(2747) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 46, y: 93 }
+building SimId(2279) Owner(PlayerId(1)) BuildingKind(11) CellPos { x: 229, y: 171 }
+building SimId(2263) Owner(PlayerId(1)) BuildingKind(1) CellPos { x: 208, y: 163 }
+building SimId(2844) Owner(PlayerId(0)) BuildingKind(5) CellPos { x: 35, y: 110 }
+building SimId(2821) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 39, y: 106 }
+building SimId(2828) Owner(PlayerId(0)) BuildingKind(1) CellPos { x: 42, y: 106 }
+unit SimId(2871) Owner(PlayerId(0)) CellPos { x: 38, y: 97 } None
+unit SimId(2808) Owner(PlayerId(1)) CellPos { x: 89, y: 103 } None
+unit SimId(1449) Owner(PlayerId(1)) CellPos { x: 216, y: 157 } None
+unit SimId(2806) Owner(PlayerId(0)) CellPos { x: 83, y: 104 } None
+unit SimId(892) Owner(PlayerId(1)) CellPos { x: 163, y: 220 } None
+unit SimId(715) Owner(PlayerId(1)) CellPos { x: 162, y: 219 } None
+unit SimId(2809) Owner(PlayerId(0)) CellPos { x: 85, y: 104 } None
+unit SimId(93) Owner(PlayerId(1)) CellPos { x: 215, y: 158 } None
+unit SimId(943) Owner(PlayerId(1)) CellPos { x: 162, y: 221 } None
+unit SimId(1122) Owner(PlayerId(1)) CellPos { x: 216, y: 160 } None
+unit SimId(121) Owner(PlayerId(0)) CellPos { x: 38, y: 98 } None
+unit SimId(931) Owner(PlayerId(0)) CellPos { x: 30, y: 93 } None
+unit SimId(2787) Owner(PlayerId(0)) CellPos { x: 84, y: 102 } None
+unit SimId(673) Owner(PlayerId(1)) CellPos { x: 163, y: 218 } None
+unit SimId(2840) Owner(PlayerId(0)) CellPos { x: 79, y: 103 } None
+unit SimId(2782) Owner(PlayerId(1)) CellPos { x: 88, y: 104 } None
+unit SimId(2830) Owner(PlayerId(0)) CellPos { x: 76, y: 103 } None
+unit SimId(2843) Owner(PlayerId(0)) CellPos { x: 76, y: 103 } None
+unit SimId(2788) Owner(PlayerId(0)) CellPos { x: 75, y: 103 } None
+unit SimId(1255) Owner(PlayerId(1)) CellPos { x: 165, y: 221 } None
+unit SimId(1131) Owner(PlayerId(1)) CellPos { x: 163, y: 222 } None
+unit SimId(827) Owner(PlayerId(1)) CellPos { x: 162, y: 220 } None
+unit SimId(1089) Owner(PlayerId(1)) CellPos { x: 163, y: 221 } None
+unit SimId(703) Owner(PlayerId(0)) CellPos { x: 33, y: 93 } None
+unit SimId(1118) Owner(PlayerId(1)) CellPos { x: 164, y: 221 } None
+unit SimId(886) Owner(PlayerId(0)) CellPos { x: 32, y: 95 } None
+unit SimId(1300) Owner(PlayerId(1)) CellPos { x: 164, y: 222 } None
+unit SimId(2785) Owner(PlayerId(0)) CellPos { x: 86, y: 104 } None
+unit SimId(1290) Owner(PlayerId(1)) CellPos { x: 217, y: 157 } None
+unit SimId(766) Owner(PlayerId(1)) CellPos { x: 163, y: 219 } None
+unit SimId(2825) Owner(PlayerId(0)) CellPos { x: 81, y: 103 } None
+unit SimId(2820) Owner(PlayerId(0)) CellPos { x: 79, y: 103 } None
+unit SimId(2829) Owner(PlayerId(0)) CellPos { x: 69, y: 103 } None
+unit SimId(2769) Owner(PlayerId(0)) CellPos { x: 87, y: 104 } None
+unit SimId(2815) Owner(PlayerId(0)) CellPos { x: 68, y: 102 } None
+unit SimId(2784) Owner(PlayerId(0)) CellPos { x: 83, y: 101 } None
+unit SimId(2827) Owner(PlayerId(0)) CellPos { x: 81, y: 103 } None
+unit SimId(2789) Owner(PlayerId(0)) CellPos { x: 84, y: 103 } None
+unit SimId(2831) Owner(PlayerId(0)) CellPos { x: 74, y: 103 } None
+unit SimId(2834) Owner(PlayerId(0)) CellPos { x: 73, y: 103 } None
+unit SimId(2810) Owner(PlayerId(0)) CellPos { x: 84, y: 104 } None
+unit SimId(2804) Owner(PlayerId(0)) CellPos { x: 85, y: 104 } None
+unit SimId(2803) Owner(PlayerId(0)) CellPos { x: 85, y: 104 } None
+unit SimId(2842) Owner(PlayerId(0)) CellPos { x: 76, y: 103 } None
+unit SimId(2791) Owner(PlayerId(0)) CellPos { x: 83, y: 102 } None
+unit SimId(2792) Owner(PlayerId(0)) CellPos { x: 83, y: 107 } None
+unit SimId(2793) Owner(PlayerId(0)) CellPos { x: 83, y: 107 } None
+unit SimId(2795) Owner(PlayerId(0)) CellPos { x: 84, y: 104 } None
+unit SimId(2796) Owner(PlayerId(0)) CellPos { x: 82, y: 107 } None
+unit SimId(2797) Owner(PlayerId(0)) CellPos { x: 85, y: 105 } None
+unit SimId(2798) Owner(PlayerId(0)) CellPos { x: 85, y: 105 } None
+unit SimId(2799) Owner(PlayerId(0)) CellPos { x: 83, y: 107 } None
+unit SimId(2800) Owner(PlayerId(0)) CellPos { x: 85, y: 103 } None
+unit SimId(2801) Owner(PlayerId(0)) CellPos { x: 84, y: 106 } None
+unit SimId(2802) Owner(PlayerId(0)) CellPos { x: 85, y: 105 } None
+unit SimId(2812) Owner(PlayerId(0)) CellPos { x: 84, y: 104 } None
+unit SimId(2814) Owner(PlayerId(0)) CellPos { x: 77, y: 103 } None
+unit SimId(2816) Owner(PlayerId(0)) CellPos { x: 68, y: 102 } None
+unit SimId(2819) Owner(PlayerId(0)) CellPos { x: 71, y: 103 } None
+unit SimId(2822) Owner(PlayerId(0)) CellPos { x: 78, y: 103 } None
+unit SimId(2823) Owner(PlayerId(0)) CellPos { x: 78, y: 103 } None
+unit SimId(2824) Owner(PlayerId(0)) CellPos { x: 67, y: 101 } None
+unit SimId(2833) Owner(PlayerId(0)) CellPos { x: 74, y: 103 } None
+unit SimId(2835) Owner(PlayerId(0)) CellPos { x: 81, y: 103 } None
+unit SimId(2836) Owner(PlayerId(0)) CellPos { x: 80, y: 103 } None
+unit SimId(2837) Owner(PlayerId(0)) CellPos { x: 80, y: 103 } None
+unit SimId(2838) Owner(PlayerId(0)) CellPos { x: 82, y: 104 } None
+unit SimId(2839) Owner(PlayerId(0)) CellPos { x: 80, y: 103 } None
+unit SimId(2841) Owner(PlayerId(0)) CellPos { x: 72, y: 103 } None
+unit SimId(2845) Owner(PlayerId(0)) CellPos { x: 79, y: 103 } None
+unit SimId(2846) Owner(PlayerId(0)) CellPos { x: 66, y: 100 } None
+unit SimId(2847) Owner(PlayerId(0)) CellPos { x: 78, y: 103 } None
+unit SimId(2848) Owner(PlayerId(1)) CellPos { x: 89, y: 104 } None
+unit SimId(2849) Owner(PlayerId(0)) CellPos { x: 70, y: 103 } None
+unit SimId(2851) Owner(PlayerId(0)) CellPos { x: 60, y: 97 } None
+unit SimId(2867) Owner(PlayerId(0)) CellPos { x: 65, y: 99 } None
+unit SimId(2853) Owner(PlayerId(0)) CellPos { x: 62, y: 97 } None
+unit SimId(2854) Owner(PlayerId(0)) CellPos { x: 64, y: 98 } None
+unit SimId(2863) Owner(PlayerId(1)) CellPos { x: 172, y: 151 } None
+unit SimId(2856) Owner(PlayerId(0)) CellPos { x: 62, y: 98 } None
+unit SimId(2857) Owner(PlayerId(0)) CellPos { x: 59, y: 97 } None
+unit SimId(2858) Owner(PlayerId(0)) CellPos { x: 61, y: 97 } None
+unit SimId(2862) Owner(PlayerId(0)) CellPos { x: 63, y: 97 } None
+unit SimId(2860) Owner(PlayerId(0)) CellPos { x: 61, y: 98 } None
+unit SimId(2868) Owner(PlayerId(0)) CellPos { x: 38, y: 98 } None
+unit SimId(2869) Owner(PlayerId(0)) CellPos { x: 38, y: 97 } None
+unit SimId(2870) Owner(PlayerId(0)) CellPos { x: 38, y: 97 } None
+unit SimId(2872) Owner(PlayerId(0)) CellPos { x: 37, y: 98 } None
+unit SimId(486) Owner(PlayerId(0)) CellPos { x: 110, y: 105 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 142, y: 105 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(25) Owner(PlayerId(0)) CellPos { x: 64, y: 91 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 103, y: 152 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(1412) Owner(PlayerId(0)) CellPos { x: 53, y: 96 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 142, y: 101 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(67) Owner(PlayerId(0)) CellPos { x: 59, y: 96 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 111, y: 149 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(659) Owner(PlayerId(0)) CellPos { x: 78, y: 89 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 142, y: 102 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(127) Owner(PlayerId(0)) CellPos { x: 59, y: 138 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 102, y: 153 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(139) Owner(PlayerId(0)) CellPos { x: 81, y: 92 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 107, y: 151 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(586) Owner(PlayerId(0)) CellPos { x: 54, y: 97 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 103, y: 153 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(169) Owner(PlayerId(1)) CellPos { x: 219, y: 101 } Some(Harvester { field: Some(CellPos { x: 221, y: 110 }), load: 0, state: ToOre(CellPos { x: 219, y: 75 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(2739) Owner(PlayerId(1)) CellPos { x: 160, y: 120 } Some(Harvester { field: None, load: 0, state: ToOre(CellPos { x: 160, y: 118 }), attempts: 1, gems: 0, work: 0 })
+unit SimId(2753) Owner(PlayerId(0)) CellPos { x: 142, y: 103 } Some(Harvester { field: None, load: 6, state: ToOre(CellPos { x: 143, y: 103 }), attempts: 1, gems: 0, work: 0 })
+
+thread '<unnamed>' (5607110) panicked at crates/game/tests/m6_production_matches.rs:161:21:
+wheel_of_worlds: germany (brutal) against great_britain (brutal): None
+
+thread 'computer_players_finish_matches_with_the_shipped_data_on_every_shipped_map' (5607083) panicked at crates/game/tests/m6_production_matches.rs:131:5:
+a scoped thread panicked
+
+
+failures:
+    computer_players_finish_matches_with_the_shipped_data_on_every_shipped_map
+
+test result: FAILED. 5 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6998.99s
+
+error: test failed, to rerun pass `-p game --test m6_production_matches`

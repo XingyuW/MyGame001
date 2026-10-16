@@ -1,0 +1,23 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate_liberty_iraq_america_brutal_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "env": {
+    "RA8_ECONOMY_TRACE": "1",
+    "RA8_AIR_COORD_TRACE": "1"
+  },
+  "exit": 101,
+  "elapsed_seconds": 191.7953307919961,
+  "strategy_sha256": "98eac27829a29265681358763fbd8c085b05129e544a1eb8e18092030d1d7c68"
+}

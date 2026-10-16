@@ -1,0 +1,19 @@
+{
+  "name": "attempt5-erasure-lifecycle-after2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ra8_strategic_",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 0,
+  "started_utc": "2026-10-16T11:05:14.396372+00:00",
+  "elapsed_seconds": 19.364697624987457,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-erasure-lifecycle-after2.log"
+}

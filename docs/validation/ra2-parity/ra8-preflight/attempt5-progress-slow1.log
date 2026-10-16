@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 4.65s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+test ra8_a_slow_advancing_aa_team_keeps_its_aircraft_hold_beyond_initial_patience ... 
+thread 'ra8_a_slow_advancing_aa_team_keeps_its_aircraft_hold_beyond_initial_patience' (5785501) panicked at crates/sim/tests/ra8_ai.rs:3670:9:
+healthy slow ground progress lost its aircraft hold
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ra8_a_slow_advancing_aa_team_keeps_its_aircraft_hold_beyond_initial_patience
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 42 filtered out; finished in 0.21s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

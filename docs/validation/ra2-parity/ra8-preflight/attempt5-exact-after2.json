@@ -1,0 +1,72 @@
+{
+  "source_sha256": {
+    "crates/sim/src/ai.rs": "32755e08cffe95e6ae632291c9b28dbeabc2c9a908269be0a33aba8989bff031",
+    "crates/sim/src/ai/strategy.rs": "86ae95223f142b24eac71876ff0f00a479d0efd68d475559d5a89058a3186d7f"
+  },
+  "cases": [
+    {
+      "name": "ra8_gate_steel_france_germany_medium_seed_zero_finishes",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate_steel_france_germany_medium_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "started_utc": "2026-10-16T09:25:58.805645+00:00",
+      "elapsed_seconds": 98.45940162500483,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-exact-after2-01.log"
+    },
+    {
+      "name": "ra8_gate_thousand_lakes_france_germany_seed_zero_finishes",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate_thousand_lakes_france_germany_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "started_utc": "2026-10-16T09:27:37.267563+00:00",
+      "elapsed_seconds": 114.9075116669992,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-exact-after2-02.log"
+    },
+    {
+      "name": "ra8_gate_liberty_iraq_america_brutal_seed_zero_finishes",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate_liberty_iraq_america_brutal_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "started_utc": "2026-10-16T09:29:32.176062+00:00",
+      "elapsed_seconds": 170.12506666698027,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-exact-after2-03.log"
+    }
+  ],
+  "policy": "serial stop at first failure; actual default setup/seed0 and unchanged rejection/invariant/R29 limits"
+}
