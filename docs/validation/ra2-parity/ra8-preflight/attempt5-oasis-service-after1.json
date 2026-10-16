@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate_oasis_germany_great_britain_brutal_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 101,
+  "elapsed_seconds": 201.06665854199673,
+  "source_sha256": {
+    "crates/sim/src/ai.rs": "c7738b61a1cd45ee4a54a2506cbe39b1577983b58eb5f4835b771a814b484141",
+    "crates/sim/src/ai/strategy.rs": "7a1f4f93f5cfb7ce7b66484e429e921367044c3e4fd896ba5edb1979e8820e80"
+  }
+}

@@ -1,0 +1,8 @@
+    Finished `release` profile [optimized] target(s) in 0.15s
+     Running tests/ra8_gate_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_gate_matches-556affa51f6ab831)
+
+running 6 tests
+error: test failed, to rerun pass `-p game --test ra8_gate_matches`
+
+Caused by:
+  process didn't exit successfully: `/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_gate_matches-556affa51f6ab831 --exact --test-threads=6 ra8_gate_liberty_iraq_america_brutal_seed_zero_finishes ra8_gate_oasis_germany_great_britain_brutal_seed_zero_finishes ra8_gate_frozen_cuba_germany_brutal_seed_zero_finishes ra8_gate_black_water_libya_america_brutal_seed_zero_finishes ra8_gate_black_water_korea_france_brutal_seed_zero_finishes ra8_gate_wheel_germany_great_britain_brutal_seed_zero_finishes` (signal: 15, SIGTERM: termination signal)

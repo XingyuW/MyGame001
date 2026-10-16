@@ -1,0 +1,178 @@
+{
+  "policy": "Serial stop on first failure, unchanged exact default seed0 and R29 limits; Oasis final source separately Won41171.",
+  "runtime_sha256": {
+    "crates/sim/src/ai.rs": "e660e829d53883f2aaf0f85f0c6d10471600a73c5e89f74cbbc7b9bca1c3cc47",
+    "crates/sim/src/ai/strategy.rs": "bd64dc114dbd8dc4fb148ec704b94fe46225e30df9ac354f04e7ad66c2778b02",
+    "crates/sim/src/command.rs": "e455a18aa7eb4e03da5a9536ee6c51d1cf5e22e38dbc81ca7a2b161899ac5ec8",
+    "crates/sim/src/special.rs": "9585dd15fcc4f788f6900fd0e08f2c548fd8ee93e3a15078c7f14077a41899bc",
+    "crates/sim/src/special/superweapons.rs": "87068d26b0ae3b3120eaa7a2b3d665502747731201b0487a001b99f603d603ce"
+  },
+  "cases": [
+    {
+      "name": "attempt5-erasure-lifecycle-after2",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ra8_strategic_",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "started_utc": "2026-10-16T11:05:14.396372+00:00",
+      "elapsed_seconds": 19.364697624987457,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-erasure-lifecycle-after2.log"
+    },
+    {
+      "name": "attempt5-exact-after5-01",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate_frozen_cuba_germany_brutal_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "started_utc": "2026-10-16T11:05:33.761810+00:00",
+      "elapsed_seconds": 90.31739095901139,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-exact-after5-01.log"
+    },
+    {
+      "name": "attempt5-exact-after5-02",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate_black_water_libya_america_brutal_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "started_utc": "2026-10-16T11:07:04.082026+00:00",
+      "elapsed_seconds": 72.48063399997773,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-exact-after5-02.log"
+    },
+    {
+      "name": "attempt5-exact-after5-03",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate_black_water_korea_france_brutal_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "started_utc": "2026-10-16T11:08:16.563667+00:00",
+      "elapsed_seconds": 51.019144209014485,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-exact-after5-03.log"
+    },
+    {
+      "name": "attempt5-exact-after5-04",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate_wheel_germany_great_britain_brutal_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "started_utc": "2026-10-16T11:09:07.583701+00:00",
+      "elapsed_seconds": 109.96681645800709,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-exact-after5-04.log"
+    },
+    {
+      "name": "attempt5-exact-after5-05",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate_liberty_iraq_america_brutal_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "started_utc": "2026-10-16T11:10:57.551787+00:00",
+      "elapsed_seconds": 72.12287120797555,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-exact-after5-05.log"
+    },
+    {
+      "name": "attempt5-exact-after5-06",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate_steel_france_germany_medium_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "started_utc": "2026-10-16T11:12:09.675709+00:00",
+      "elapsed_seconds": 61.41106212500017,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-exact-after5-06.log"
+    },
+    {
+      "name": "attempt5-exact-after5-07",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate_thousand_lakes_france_germany_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "started_utc": "2026-10-16T11:13:11.087791+00:00",
+      "elapsed_seconds": 64.20979533300851,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-exact-after5-07.log"
+    }
+  ]
+}

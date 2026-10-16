@@ -1,0 +1,25 @@
+{
+  "method": "Raw periodic snapshot physical candidates only; not yet an exact AI visibility/hostility/Props replay; uses source footprint sizes and defence_radius12. Start-distance sorting illustrative, start actual32,100 must verify controller.",
+  "snapshots": [
+    {
+      "tick": "SimTick(60000)",
+      "actual_unit_threat_candidates": []
+    },
+    {
+      "tick": "SimTick(120000)",
+      "actual_unit_threat_candidates": []
+    },
+    {
+      "tick": "SimTick(180000)",
+      "actual_unit_threat_candidates": []
+    },
+    {
+      "tick": "SimTick(240000)",
+      "actual_unit_threat_candidates": []
+    },
+    {
+      "tick": "SimTick(252000)",
+      "actual_unit_threat_candidates": []
+    }
+  ]
+}

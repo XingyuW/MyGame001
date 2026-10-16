@@ -1,0 +1,24 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate_steel_france_germany_medium_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "environment_override": {
+    "RA8_ECONOMY_TRACE": "1"
+  },
+  "runtime": "bbb09fe",
+  "started_utc": "2026-10-16T08:37:45.214579+00:00",
+  "exit": 101,
+  "elapsed_seconds": 438.3701799589908,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-steel-before2.log"
+}

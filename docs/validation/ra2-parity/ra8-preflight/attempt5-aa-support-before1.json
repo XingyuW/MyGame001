@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_a_reserved_aa_clearance_wave_still_receives_legal_chronosphere_support",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 101,
+  "elapsed_seconds": 4.781728000001749,
+  "strategy_sha256": "86ae95223f142b24eac71876ff0f00a479d0efd68d475559d5a89058a3186d7f"
+}

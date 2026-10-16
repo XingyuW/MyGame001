@@ -1,0 +1,20 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1",
+    "ra8_distant_aa_clearance_fights_an_observed_interceptor_en_route",
+    "ra8_air_strikes_wait_for_ground_to_clear_an_observed_outranging_aa_screen"
+  ],
+  "exit": 101,
+  "elapsed_seconds": 6.421546500001568,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-screen-controlled-after2.log"
+}

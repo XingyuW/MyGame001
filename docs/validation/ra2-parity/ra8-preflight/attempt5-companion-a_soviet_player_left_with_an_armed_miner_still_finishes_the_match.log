@@ -1,0 +1,10 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 3.77s
+     Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-fff13bc99bc7e9e6)
+
+running 1 test
+test a_soviet_player_left_with_an_armed_miner_still_finishes_the_match ... riverlands: ["france", "cuba"] at ["brutal", "easy"]: 7802 ticks of 72000
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 1.20s
+

@@ -1,0 +1,21 @@
+{
+  "name": "attempt5-exact-after5-06",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate_steel_france_germany_medium_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 0,
+  "started_utc": "2026-10-16T11:12:09.675709+00:00",
+  "elapsed_seconds": 61.41106212500017,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-exact-after5-06.log"
+}

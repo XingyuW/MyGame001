@@ -1,0 +1,25 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 4.68s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 5 tests
+test ra8_air_strikes_wait_for_ground_to_clear_an_observed_outranging_aa_screen ... AA screen destroyed true; eligible ground focus true/hit true; aircraft released true
+ok
+test ra8_an_existing_aa_clearance_attack_keeps_its_chase_history ... ok
+test ra8_an_unreachable_ground_screen_does_not_hold_strike_aircraft_forever ... ok
+test ra8_distant_aa_clearance_fights_an_observed_interceptor_en_route ... controlled interceptor installed Some(SimId(15)); fought true
+ok
+test ra8_reinforcements_without_aa_job_progress_cannot_renew_the_aircraft_hold ... 
+thread 'ra8_reinforcements_without_aa_job_progress_cannot_renew_the_aircraft_hold' (5779918) panicked at crates/sim/tests/ra8_ai.rs:3616:87:
+called `Result::unwrap()` on an `Err` value: Occupied { cell: CellPos { x: 6, y: 27 }, by: SimId(11) }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ra8_reinforcements_without_aa_job_progress_cannot_renew_the_aircraft_hold
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 37 filtered out; finished in 1.08s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`
