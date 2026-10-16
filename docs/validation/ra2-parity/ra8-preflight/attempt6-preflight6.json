@@ -1,0 +1,79 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.8731952499947511,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-fmt6.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.014334583014715463,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-diff6.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 7.1219440839777235,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-clippy6.log",
+    "sha256": "9e47c9c95f1fef058ce7ed5aaee81a4bf309d385e8d504632cca73319e654afd"
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/generate_ra2_data.py",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.09640725000645034,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-generated6.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/ra2_reference.py",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.09359945898177102,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-reference6.log",
+    "sha256": "5fa32e9687ef749dd76543b607f37bc835ddd9e7469e2b7b5874d233ee5cf964"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--all-targets",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 815.6007020419929,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-sim-all6.log",
+    "sha256": "3aa0f7695e2a9c5406595bc341d0696493eff2a6ad739f88ef86fe23f5030edf"
+  }
+]

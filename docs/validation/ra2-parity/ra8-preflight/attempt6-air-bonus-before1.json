@@ -1,0 +1,20 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_a_defender_already_inside_its_source_air_bonus_range_remains_eligible",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 101,
+  "elapsed_seconds": 5.295508417009842,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-air-bonus-before1.log",
+  "sha256": "be85ad0e173a4439d4fd7ae3728f78967c85ccc0d8d254d4515577a539a761a9"
+}

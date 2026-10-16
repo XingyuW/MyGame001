@@ -1,0 +1,148 @@
+{
+  "policy": "Final R129 runtime; serial stop at first failure; complete game compatibility and all21 retained exact default winners.",
+  "commands": [
+    {
+      "name": "attempt6-finalgame3-01",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--bin",
+        "game",
+        "--",
+        "--test-threads=1"
+      ]
+    },
+    {
+      "name": "attempt6-finalgame3-02",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_ai_matches",
+        "--",
+        "--test-threads=1",
+        "--nocapture"
+      ]
+    },
+    {
+      "name": "attempt6-finalgame3-03",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m10_unlocks_and_enemies",
+        "--",
+        "--test-threads=1"
+      ]
+    },
+    {
+      "name": "attempt6-finalgame3-04",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "a_soviet_player_left_with_an_armed_miner_still_finishes_the_match",
+        "--",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ]
+    },
+    {
+      "name": "attempt6-finalgame3-05",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first",
+        "--",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ]
+    },
+    {
+      "name": "attempt6-finalgame3-06",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "crossroads_armies_finish_after_new_terrain_changes",
+        "--",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ]
+    },
+    {
+      "name": "attempt6-finalgame3-07",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ]
+    },
+    {
+      "name": "attempt6-finalgame3-08",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra5_coral_archipelago_brutal_libya_germany_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ]
+    },
+    {
+      "name": "attempt6-finalgame3-09",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "--",
+        "--test-threads=1",
+        "--nocapture"
+      ]
+    }
+  ]
+}

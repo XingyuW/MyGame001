@@ -1,0 +1,24 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate_demo_france_cuba_brutal_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "environment": {
+    "RA8_ECONOMY_TRACE": "1",
+    "RA8_DEMO_LATE_TRACE": "1"
+  },
+  "exit": 101,
+  "elapsed_seconds": 18.46066220899229,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-demo-france-cuba-trace2.log",
+  "sha256": "47ad4275f73ebb960ee145551fa41032214c6882623561bd772e9a6ff781f969"
+}

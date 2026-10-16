@@ -1,0 +1,20 @@
+    Finished `release` profile [optimized] target(s) in 0.07s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+test ra8_artillery_uses_the_surface_tank_line_when_aircraft_share_its_wave ... 
+thread 'ra8_artillery_uses_the_surface_tank_line_when_aircraft_share_its_wave' (6488422) panicked at crates/sim/tests/ra8_ai.rs:1012:5:
+assertion `left == right` failed: V3 must stand behind the Rhino, not the nearer Kirov
+  left: None
+ right: Some(CellPos { x: 11, y: 8 })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ra8_artillery_uses_the_surface_tank_line_when_aircraft_share_its_wave
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 62 filtered out; finished in 0.19s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

@@ -1,0 +1,17 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 3.67s
+     Running tests/ra2_shipped.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra2_shipped-81303f38e56d4728)
+
+running 8 tests
+test a_base_is_built_from_an_mcv_in_the_time_the_build_time_formula_gives ... ok
+test a_computer_player_builds_in_both_lanes_of_its_yard ... first default main/defence overlap tick Some(2922)
+ok
+test a_construction_yard_is_repaired_in_steps_of_eight_hit_points_for_three_credits ... ok
+test a_damaged_tank_sent_to_the_service_depot_is_repaired_for_credits ... ok
+test a_sale_refunds_half_the_cost_and_walls_are_neither_sold_nor_repaired ... ok
+test low_power_stops_the_powered_buildings_that_consume_power_and_no_others ... ok
+test radar_needs_a_radar_building_and_power_and_a_spy_in_a_power_plant_takes_it_away ... ok
+test shipyard_water_lies_farther_from_the_starts_than_the_shipyards_adjacent_distance ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s
+

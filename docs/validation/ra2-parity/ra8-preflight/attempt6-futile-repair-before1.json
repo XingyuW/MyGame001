@@ -1,0 +1,20 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_futile_paid_building_repairs_do_not_renew_a_helpless_last_stand_forever",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 101,
+  "elapsed_seconds": 4.729633667011512,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-futile-repair-before1.log",
+  "sha256": "eae3c2edc96430826b423815f7915461ab34fee4504de39bc050440108ec69d7"
+}

@@ -1,0 +1,24 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_a_resumed_strike_focus_preserves_its_healthy_chase_across_controller_turns",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "pre_sha256": "8b6f7ab98f5cc5c4325110993b885d173f6106b86efba873bba02aa31348e9e9",
+  "probe_sha256": "7c822ba99a568d7c15a2f46f40d13ff6a77b5a10607029d0433f787ab6558d57",
+  "exit": 101,
+  "elapsed_seconds": 23.189619458978996,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-focus-ownership-before1.log",
+  "sha256": "d6384730f12b0494f9257e5ad1abc78a11b6904374cd50792b76664e5176dd2b",
+  "restored_sha256": "8b6f7ab98f5cc5c4325110993b885d173f6106b86efba873bba02aa31348e9e9",
+  "restored_exactly": true
+}

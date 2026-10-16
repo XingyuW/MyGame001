@@ -1,0 +1,9 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 3.43s
+     Running tests/ra2_shipped.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra2_shipped-81303f38e56d4728)
+
+running 1 test
+test a_computer_player_builds_in_both_lanes_of_its_yard ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.15s
+

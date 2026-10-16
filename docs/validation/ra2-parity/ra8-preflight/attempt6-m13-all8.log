@@ -1,0 +1,66 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 3.47s
+     Running `/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples/m13_ten_players to-the-end all`
+demo: 128 x 128 cells for 10 players (file 64 x 64), enlarged in 819.0µs, set up in 2.1ms
+  71194 ticks: mean 269.719µs, 99th centile 2.289ms, longest 11.894ms, busiest 1000 ticks mean 928.503µs, 0 ticks over 50ms; measured total 19.202s, elapsed 19.207s
+  at most 238 units and 115 buildings; 10 players built; ended in tick 71193: Won { winner: PlayerId(1), tick: 71193 }
+crossroads: 112 x 112 cells for 10 players (file 56 x 56), enlarged in 658.8µs, set up in 1.6ms
+  51870 ticks: mean 349.424µs, 99th centile 1.701ms, longest 24.944ms, busiest 1000 ticks mean 1.089ms, 0 ticks over 50ms; measured total 18.125s, elapsed 18.129s
+  at most 234 units and 110 buildings; 10 players built; ended in tick 51869: Won { winner: PlayerId(1), tick: 51869 }
+riverlands: 128 x 96 cells for 10 players (file 64 x 48), enlarged in 993.6µs, set up in 1.7ms
+  110666 ticks: mean 220.704µs, 99th centile 1.304ms, longest 10.929ms, busiest 1000 ticks mean 825.224µs, 0 ticks over 50ms; measured total 24.424s, elapsed 24.431s
+  at most 229 units and 114 buildings; 10 players built; ended in tick 110665: Won { winner: PlayerId(3), tick: 110665 }
+liberty_bay: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 86.5µs, set up in 6.9ms
+  82101 ticks: mean 777.065µs, 99th centile 6.702ms, longest 106.708ms, busiest 1000 ticks mean 2.906ms, 27 ticks over 50ms; measured total 63.798s, elapsed 63.803s
+  at most 291 units and 176 buildings; 10 players built; ended in tick 82100: Won { winner: PlayerId(6), tick: 82100 }
+frostline: 252 x 252 cells for 10 players (file 224 x 224), enlarged in 1.1ms, set up in 5.9ms
+  162439 ticks: mean 885.201µs, 99th centile 5.753ms, longest 725.867ms, busiest 1000 ticks mean 8.033ms, 59 ticks over 50ms; measured total 143.791s, elapsed 143.807s
+  at most 268 units and 237 buildings; 10 players built; ended in tick 162438: Won { winner: PlayerId(7), tick: 162438 }
+oasis_gulf: 256 x 192 cells for 10 players (file 256 x 192), enlarged in 111.0µs, set up in 12.6ms
+  87161 ticks: mean 646.022µs, 99th centile 6.792ms, longest 119.994ms, busiest 1000 ticks mean 1.833ms, 5 ticks over 50ms; measured total 56.308s, elapsed 56.314s
+  at most 272 units and 158 buildings; 10 players built; ended in tick 87160: Won { winner: PlayerId(3), tick: 87160 }
+coral_archipelago: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 58.3µs, set up in 4.2ms
+  104073 ticks: mean 934.341µs, 99th centile 8.134ms, longest 80.353ms, busiest 1000 ticks mean 2.470ms, 19 ticks over 50ms; measured total 97.240s, elapsed 97.246s
+  at most 277 units and 240 buildings; 10 players built; ended in tick 104072: Won { winner: PlayerId(1), tick: 104072 }
+continental_divide: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 62.1µs, set up in 6.0ms
+  85129 ticks: mean 973.040µs, 99th centile 6.566ms, longest 133.939ms, busiest 1000 ticks mean 3.542ms, 57 ticks over 50ms; measured total 82.834s, elapsed 82.839s
+  at most 289 units and 182 buildings; 10 players built; ended in tick 85128: Won { winner: PlayerId(9), tick: 85128 }
+steel_harbor: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 62.4µs, set up in 6.9ms
+  67597 ticks: mean 937.515µs, 99th centile 6.592ms, longest 97.188ms, busiest 1000 ticks mean 2.313ms, 7 ticks over 50ms; measured total 63.373s, elapsed 63.377s
+  at most 282 units and 176 buildings; 10 players built; ended in tick 67596: Won { winner: PlayerId(2), tick: 67596 }
+glacier_pass: 240 x 240 cells for 10 players (file 240 x 240), enlarged in 1.6ms, set up in 4.9ms
+  74298 ticks: mean 885.286µs, 99th centile 4.450ms, longest 76.930ms, busiest 1000 ticks mean 2.056ms, 19 ticks over 50ms; measured total 65.775s, elapsed 65.780s
+  at most 270 units and 233 buildings; 10 players built; ended in tick 74297: Won { winner: PlayerId(4), tick: 74297 }
+red_canyon: 240 x 240 cells for 10 players (file 192 x 192), enlarged in 1.1ms, set up in 4.6ms
+  89103 ticks: mean 1.035ms, 99th centile 14.185ms, longest 71.474ms, busiest 1000 ticks mean 5.513ms, 32 ticks over 50ms; measured total 92.256s, elapsed 92.261s
+  at most 281 units and 203 buildings; 10 players built; ended in tick 89102: Won { winner: PlayerId(1), tick: 89102 }
+jungle_delta: 256 x 224 cells for 10 players (file 256 x 224), enlarged in 1.7ms, set up in 5.2ms
+  61442 ticks: mean 572.906µs, 99th centile 3.610ms, longest 102.448ms, busiest 1000 ticks mean 1.575ms, 9 ticks over 50ms; measured total 35.201s, elapsed 35.205s
+  at most 275 units and 183 buildings; 10 players built; ended in tick 61441: Won { winner: PlayerId(7), tick: 61441 }
+pacific_atoll: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 1.6ms, set up in 3.0ms
+  57747 ticks: mean 754.200µs, 99th centile 6.888ms, longest 58.929ms, busiest 1000 ticks mean 1.431ms, 2 ticks over 50ms; measured total 43.553s, elapsed 43.557s
+  at most 277 units and 144 buildings; 10 players built; ended in tick 57746: Won { winner: PlayerId(5), tick: 57746 }
+iron_isthmus: 256 x 224 cells for 10 players (file 256 x 224), enlarged in 1.7ms, set up in 3.0ms
+  91262 ticks: mean 644.722µs, 99th centile 8.204ms, longest 223.932ms, busiest 1000 ticks mean 2.203ms, 6 ticks over 50ms; measured total 58.839s, elapsed 58.845s
+  at most 276 units and 152 buildings; 10 players built; ended in tick 91261: Won { winner: PlayerId(7), tick: 91261 }
+arctic_floes: 240 x 240 cells for 10 players (file 240 x 240), enlarged in 1.4ms, set up in 2.7ms
+  81266 ticks: mean 1.051ms, 99th centile 10.307ms, longest 248.506ms, busiest 1000 ticks mean 3.537ms, 35 ticks over 50ms; measured total 85.432s, elapsed 85.439s
+  at most 266 units and 150 buildings; 10 players built; ended in tick 81265: Won { winner: PlayerId(1), tick: 81265 }
+ember_caldera: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 1.4ms, set up in 4.3ms
+  77186 ticks: mean 560.396µs, 99th centile 4.507ms, longest 69.023ms, busiest 1000 ticks mean 1.866ms, 12 ticks over 50ms; measured total 43.255s, elapsed 43.260s
+  at most 296 units and 177 buildings; 10 players built; ended in tick 77185: Won { winner: PlayerId(7), tick: 77185 }
+frozen_sound: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 52.2µs, set up in 6.3ms
+  72509 ticks: mean 757.402µs, 99th centile 5.439ms, longest 65.834ms, busiest 1000 ticks mean 2.466ms, 2 ticks over 50ms; measured total 54.919s, elapsed 54.923s
+  at most 275 units and 153 buildings; 10 players built; ended in tick 72508: Won { winner: PlayerId(4), tick: 72508 }
+harvest_plains: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 57.9µs, set up in 6.9ms
+  94100 ticks: mean 855.522µs, 99th centile 9.040ms, longest 78.625ms, busiest 1000 ticks mean 3.389ms, 47 ticks over 50ms; measured total 80.505s, elapsed 80.510s
+  at most 285 units and 166 buildings; 10 players built; ended in tick 94099: Won { winner: PlayerId(5), tick: 94099 }
+black_water: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 60.0µs, set up in 6.6ms
+  107115 ticks: mean 757.636µs, 99th centile 4.537ms, longest 86.451ms, busiest 1000 ticks mean 2.139ms, 22 ticks over 50ms; measured total 81.154s, elapsed 81.161s
+  at most 273 units and 251 buildings; 10 players built; ended in tick 107114: Won { winner: PlayerId(0), tick: 107114 }
+thousand_lakes: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 64.5µs, set up in 6.6ms
+  174451 ticks: mean 685.125µs, 99th centile 4.209ms, longest 100.268ms, busiest 1000 ticks mean 3.742ms, 41 ticks over 50ms; measured total 119.521s, elapsed 119.531s
+  at most 286 units and 261 buildings; 10 players built; ended in tick 174450: Won { winner: PlayerId(0), tick: 174450 }
+wheel_of_worlds: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 56.3µs, set up in 6.7ms
+  125480 ticks: mean 592.847µs, 99th centile 4.611ms, longest 80.798ms, busiest 1000 ticks mean 2.690ms, 41 ticks over 50ms; measured total 74.391s, elapsed 74.398s
+  at most 291 units and 175 buildings; 10 players built; ended in tick 125479: Won { winner: PlayerId(9), tick: 125479 }

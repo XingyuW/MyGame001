@@ -1,0 +1,42 @@
+[
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "ra8_a_remote_armed_unit_does_not_strand_real_strike_sorties_at_their_dock",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 23.088297332986258,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-remote-strike-after2.log",
+    "sha256": "ed9fd210f622f70e440488425adf523112c7b1f8231a3f387942761c0a9bf501"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "ra8_a_local_eligible_air_threat_keeps_real_en_route_strike_combat",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.38820899999700487,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-local-strike-after2.log",
+    "sha256": "94063b65ee219cb24560431de1041d1090ac6da3c17b86a88547c62cd0aa4baa"
+  }
+]

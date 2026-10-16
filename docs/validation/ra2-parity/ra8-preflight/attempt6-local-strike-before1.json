@@ -1,0 +1,20 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_a_local_eligible_air_threat_keeps_real_en_route_strike_combat",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 101,
+  "elapsed_seconds": 5.644763374992181,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-local-strike-before1.log",
+  "sha256": "7a8936eb96d3a38b43f08fe0f7ae72564827fcebb1a0731abb8ddc698356d4cb"
+}

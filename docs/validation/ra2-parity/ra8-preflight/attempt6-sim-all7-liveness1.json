@@ -1,0 +1,8 @@
+{
+  "time_utc": "2026-10-16T19:25:52.588021+00:00",
+  "rows": [
+    "48321 46496 42573  59:37.36  98.8 /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_ai-39cf04a6b4df1362 --test-threads=1"
+  ],
+  "metadata_elapsed_seconds": 0.03156037497683428,
+  "method": "Read-only native process metadata only; no CPU stack sampling, debugger or competing simulation."
+}
