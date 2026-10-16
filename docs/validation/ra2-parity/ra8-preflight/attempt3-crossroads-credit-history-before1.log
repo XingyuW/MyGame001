@@ -1,0 +1,157 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 4.43s
+     Running tests/m10_unlocks_and_enemies.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m10_unlocks_and_enemies-61e318796d819d42)
+
+running 1 test
+Crossroads seed7 after3001 ticks: snapshot !=5000 5/6, actual histories 6
+PlayerId(0) changes2800 min1855 max5000 first[(0, 5000), (2, 4999), (3, 4998), (4, 4997), (5, 4996), (6, 4995), (7, 4994), (8, 4993)] last[(2950, 3255), (2951, 3250), (2952, 3245), (2953, 3240), (2954, 3235), (2955, 3230), (2956, 3225), (2957, 3220), (2958, 3215), (2959, 3210), (2960, 3205), (2961, 3200)]
+PlayerId(0) queues []
+PlayerId(1) changes2841 min1283 max5000 first[(0, 5000), (3, 4999), (4, 4998), (5, 4997), (6, 4996), (7, 4995), (8, 4994), (9, 4993)] last[(2990, 1316), (2991, 1313), (2992, 1310), (2993, 1307), (2994, 1304), (2995, 1301), (2996, 1298), (2997, 1295), (2998, 1292), (2999, 1289), (3000, 1286), (3001, 1283)]
+PlayerId(1) queues [(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(2)), progress: 400, charged: 2000, fraction: 0 }]), (QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(3)), progress: 139, charged: 139, fraction: 0 }, QueueItem { item: Unit(UnitKind(2)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(9)), progress: 339, charged: 678, fraction: 0 }, QueueItem { item: Unit(UnitKind(5)), progress: 0, charged: 0, fraction: 0 }])]
+PlayerId(2) changes2651 min0 max5000 first[(0, 5000), (4, 4999), (5, 4998), (6, 4997), (7, 4996), (8, 4995), (9, 4994), (10, 4993)] last[(2990, 505), (2991, 500), (2992, 495), (2993, 490), (2994, 485), (2995, 480), (2996, 475), (2997, 470), (2998, 465), (2999, 460), (3000, 455), (3001, 450)]
+PlayerId(2) queues [(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(2)), progress: 250, charged: 1250, fraction: 0 }])]
+PlayerId(3) changes2641 min0 max5000 first[(0, 5000), (5, 4999), (6, 4998), (7, 4997), (8, 4996), (9, 4995), (10, 4994), (11, 4993)] last[(2794, 76), (2795, 68), (2796, 60), (2797, 52), (2798, 44), (2799, 36), (2800, 28), (2801, 20), (2802, 12), (2803, 4), (2804, 1), (2805, 0)]
+PlayerId(3) queues [(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(2)), progress: 216, charged: 1080, fraction: 0 }]), (QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(3)), progress: 140, charged: 140, fraction: 0 }, QueueItem { item: Unit(UnitKind(2)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(7)), progress: 40, charged: 80, fraction: 0 }, QueueItem { item: Unit(UnitKind(9)), progress: 0, charged: 0, fraction: 0 }])]
+PlayerId(4) changes1060 min2478 max5000 first[(0, 5000), (6, 4999), (7, 4998), (8, 4997), (9, 4996), (10, 4995), (11, 4994), (12, 4993)] last[(1245, 3561), (1247, 3560), (1249, 3559), (1251, 3558), (1253, 3557), (1255, 3556), (1257, 3555), (1259, 3554), (1261, 3553), (1263, 3552), (1266, 3650), (1316, 4350)]
+PlayerId(4) queues []
+PlayerId(5) changes1053 min2524 max5000 first[(0, 5000), (7, 4999), (8, 4998), (9, 4997), (10, 4996), (11, 4995), (12, 4994), (13, 4993)] last[(1261, 4299), (1263, 4298), (1265, 4297), (1267, 4296), (1269, 4295), (1271, 4294), (1273, 4293), (1275, 4292), (1277, 4291), (1279, 4290), (1287, 4300), (1382, 5000)]
+PlayerId(5) queues []
+tick200 ProductionComplete { player: PlayerId(0), item: Building(BuildingKind(1)) }
+tick201 ProductionComplete { player: PlayerId(1), item: Building(BuildingKind(1)) }
+tick202 ProductionComplete { player: PlayerId(2), item: Building(BuildingKind(1)) }
+tick203 ProductionComplete { player: PlayerId(3), item: Building(BuildingKind(1)) }
+tick204 ProductionComplete { player: PlayerId(4), item: Building(BuildingKind(1)) }
+tick205 ProductionComplete { player: PlayerId(5), item: Building(BuildingKind(1)) }
+tick640 ProductionComplete { player: PlayerId(0), item: Building(BuildingKind(2)) }
+tick641 ProductionComplete { player: PlayerId(1), item: Building(BuildingKind(2)) }
+tick642 ProductionComplete { player: PlayerId(2), item: Building(BuildingKind(2)) }
+tick643 ProductionComplete { player: PlayerId(3), item: Building(BuildingKind(2)) }
+tick644 ProductionComplete { player: PlayerId(4), item: Building(BuildingKind(2)) }
+tick645 ProductionComplete { player: PlayerId(5), item: Building(BuildingKind(2)) }
+tick794 OreDelivered { player: PlayerId(0), harvester: SimId(67), refinery: SimId(66), ore: 700, gems: 0, credits: 700 }
+tick833 OreDelivered { player: PlayerId(1), harvester: SimId(69), refinery: SimId(68), ore: 700, gems: 0, credits: 700 }
+tick851 OreDelivered { player: PlayerId(3), harvester: SimId(73), refinery: SimId(72), ore: 700, gems: 0, credits: 700 }
+tick857 OreDelivered { player: PlayerId(2), harvester: SimId(71), refinery: SimId(70), ore: 700, gems: 0, credits: 700 }
+tick862 OreDelivered { player: PlayerId(5), harvester: SimId(77), refinery: SimId(76), ore: 700, gems: 0, credits: 700 }
+tick907 OreDelivered { player: PlayerId(4), harvester: SimId(75), refinery: SimId(74), ore: 700, gems: 0, credits: 700 }
+tick912 OreDelivered { player: PlayerId(0), harvester: SimId(67), refinery: SimId(66), ore: 700, gems: 0, credits: 700 }
+tick920 ProductionComplete { player: PlayerId(0), item: Building(BuildingKind(3)) }
+tick921 ProductionComplete { player: PlayerId(1), item: Building(BuildingKind(3)) }
+tick922 ProductionComplete { player: PlayerId(2), item: Building(BuildingKind(3)) }
+tick923 ProductionComplete { player: PlayerId(3), item: Building(BuildingKind(3)) }
+tick924 ProductionComplete { player: PlayerId(4), item: Building(BuildingKind(3)) }
+tick925 ProductionComplete { player: PlayerId(5), item: Building(BuildingKind(3)) }
+tick951 OreDelivered { player: PlayerId(1), harvester: SimId(69), refinery: SimId(68), ore: 700, gems: 0, credits: 700 }
+tick984 OreDelivered { player: PlayerId(3), harvester: SimId(73), refinery: SimId(72), ore: 700, gems: 0, credits: 700 }
+tick986 ProductionCancelled { player: PlayerId(5), item: Building(BuildingKind(4)), refund: 20 }
+tick1006 OreDelivered { player: PlayerId(2), harvester: SimId(71), refinery: SimId(70), ore: 700, gems: 0, credits: 700 }
+tick1011 OreDelivered { player: PlayerId(5), harvester: SimId(77), refinery: SimId(76), ore: 700, gems: 0, credits: 700 }
+tick1061 ProductionComplete { player: PlayerId(1), item: Unit(UnitKind(2)) }
+tick1062 OreDelivered { player: PlayerId(0), harvester: SimId(67), refinery: SimId(66), ore: 700, gems: 0, credits: 700 }
+tick1063 ProductionComplete { player: PlayerId(3), item: Unit(UnitKind(2)) }
+tick1065 ProductionComplete { player: PlayerId(5), item: Unit(UnitKind(2)) }
+tick1080 ProductionComplete { player: PlayerId(0), item: Unit(UnitKind(0)) }
+tick1082 ProductionComplete { player: PlayerId(2), item: Unit(UnitKind(0)) }
+tick1084 ProductionComplete { player: PlayerId(4), item: Unit(UnitKind(0)) }
+tick1084 OreDelivered { player: PlayerId(1), harvester: SimId(69), refinery: SimId(68), ore: 700, gems: 0, credits: 700 }
+tick1085 ProductionCancelled { player: PlayerId(4), item: Building(BuildingKind(4)), refund: 428 }
+tick1104 OreDelivered { player: PlayerId(4), harvester: SimId(75), refinery: SimId(74), ore: 700, gems: 0, credits: 700 }
+tick1133 OreDelivered { player: PlayerId(3), harvester: SimId(73), refinery: SimId(72), ore: 700, gems: 0, credits: 700 }
+tick1161 ProductionComplete { player: PlayerId(1), item: Unit(UnitKind(2)) }
+tick1162 OreDelivered { player: PlayerId(2), harvester: SimId(71), refinery: SimId(70), ore: 700, gems: 0, credits: 700 }
+tick1163 ProductionComplete { player: PlayerId(3), item: Unit(UnitKind(2)) }
+tick1200 ProductionComplete { player: PlayerId(0), item: Unit(UnitKind(0)) }
+tick1202 ProductionComplete { player: PlayerId(2), item: Unit(UnitKind(0)) }
+tick1209 OreDelivered { player: PlayerId(5), harvester: SimId(77), refinery: SimId(76), ore: 700, gems: 0, credits: 700 }
+tick1227 OreDelivered { player: PlayerId(0), harvester: SimId(67), refinery: SimId(66), ore: 700, gems: 0, credits: 700 }
+tick1258 ProductionComplete { player: PlayerId(5), item: Unit(UnitKind(2)) }
+tick1265 ProductionCancelled { player: PlayerId(4), item: Unit(UnitKind(0)), refund: 98 }
+tick1273 OreDelivered { player: PlayerId(1), harvester: SimId(69), refinery: SimId(68), ore: 700, gems: 0, credits: 700 }
+tick1285 ProductionCancelled { player: PlayerId(4), item: Unit(UnitKind(1)), refund: 0 }
+tick1286 ProductionCancelled { player: PlayerId(5), item: Unit(UnitKind(3)), refund: 10 }
+tick1306 ProductionCancelled { player: PlayerId(5), item: Unit(UnitKind(2)), refund: 0 }
+tick1315 OreDelivered { player: PlayerId(4), harvester: SimId(75), refinery: SimId(74), ore: 700, gems: 0, credits: 700 }
+tick1321 ProductionComplete { player: PlayerId(1), item: Unit(UnitKind(3)) }
+tick1323 ProductionComplete { player: PlayerId(3), item: Unit(UnitKind(3)) }
+tick1329 OreDelivered { player: PlayerId(3), harvester: SimId(73), refinery: SimId(72), ore: 700, gems: 0, credits: 700 }
+tick1365 OreDelivered { player: PlayerId(2), harvester: SimId(71), refinery: SimId(70), ore: 700, gems: 0, credits: 700 }
+tick1380 ProductionComplete { player: PlayerId(0), item: Unit(UnitKind(1)) }
+tick1381 OreDelivered { player: PlayerId(5), harvester: SimId(77), refinery: SimId(76), ore: 700, gems: 0, credits: 700 }
+tick1382 ProductionComplete { player: PlayerId(2), item: Unit(UnitKind(1)) }
+tick1408 OreDelivered { player: PlayerId(0), harvester: SimId(67), refinery: SimId(66), ore: 700, gems: 0, credits: 700 }
+tick1421 ProductionComplete { player: PlayerId(1), item: Unit(UnitKind(2)) }
+tick1423 ProductionComplete { player: PlayerId(3), item: Unit(UnitKind(2)) }
+tick1438 OreDelivered { player: PlayerId(1), harvester: SimId(69), refinery: SimId(68), ore: 700, gems: 0, credits: 700 }
+tick1460 ProductionComplete { player: PlayerId(0), item: Building(BuildingKind(4)) }
+tick1461 ProductionComplete { player: PlayerId(1), item: Building(BuildingKind(4)) }
+tick1462 ProductionComplete { player: PlayerId(2), item: Building(BuildingKind(4)) }
+tick1463 ProductionComplete { player: PlayerId(3), item: Building(BuildingKind(4)) }
+tick1485 OreDelivered { player: PlayerId(3), harvester: SimId(73), refinery: SimId(72), ore: 700, gems: 0, credits: 700 }
+tick1500 ProductionComplete { player: PlayerId(0), item: Unit(UnitKind(0)) }
+tick1502 ProductionComplete { player: PlayerId(2), item: Unit(UnitKind(0)) }
+tick1537 OreDelivered { player: PlayerId(2), harvester: SimId(71), refinery: SimId(70), ore: 700, gems: 0, credits: 700 }
+tick1564 OreDelivered { player: PlayerId(0), harvester: SimId(67), refinery: SimId(66), ore: 700, gems: 0, credits: 700 }
+tick1581 ProductionComplete { player: PlayerId(1), item: Unit(UnitKind(3)) }
+tick1583 ProductionComplete { player: PlayerId(3), item: Unit(UnitKind(3)) }
+tick1610 OreDelivered { player: PlayerId(1), harvester: SimId(69), refinery: SimId(68), ore: 700, gems: 0, credits: 700 }
+tick1680 ProductionComplete { player: PlayerId(0), item: Unit(UnitKind(1)) }
+tick1681 ProductionComplete { player: PlayerId(1), item: Unit(UnitKind(2)) }
+tick1682 ProductionComplete { player: PlayerId(2), item: Unit(UnitKind(1)) }
+tick1683 ProductionComplete { player: PlayerId(3), item: Unit(UnitKind(2)) }
+tick1697 OreDelivered { player: PlayerId(3), harvester: SimId(73), refinery: SimId(72), ore: 700, gems: 0, credits: 700 }
+tick1713 OreDelivered { player: PlayerId(0), harvester: SimId(67), refinery: SimId(66), ore: 700, gems: 0, credits: 700 }
+tick1740 ProductionComplete { player: PlayerId(0), item: Building(BuildingKind(6)) }
+tick1742 ProductionComplete { player: PlayerId(2), item: Building(BuildingKind(6)) }
+tick1751 OreDelivered { player: PlayerId(2), harvester: SimId(71), refinery: SimId(70), ore: 700, gems: 0, credits: 700 }
+tick1761 ProductionComplete { player: PlayerId(1), item: Building(BuildingKind(7)) }
+tick1763 ProductionComplete { player: PlayerId(3), item: Building(BuildingKind(7)) }
+tick1783 ProductionComplete { player: PlayerId(3), item: Unit(UnitKind(2)) }
+tick1800 ProductionComplete { player: PlayerId(0), item: Unit(UnitKind(0)) }
+tick1802 ProductionComplete { player: PlayerId(2), item: Unit(UnitKind(0)) }
+tick1814 OreDelivered { player: PlayerId(1), harvester: SimId(69), refinery: SimId(68), ore: 700, gems: 0, credits: 700 }
+tick1885 OreDelivered { player: PlayerId(3), harvester: SimId(73), refinery: SimId(72), ore: 700, gems: 0, credits: 700 }
+tick1895 OreDelivered { player: PlayerId(0), harvester: SimId(67), refinery: SimId(66), ore: 700, gems: 0, credits: 700 }
+tick1900 ProductionComplete { player: PlayerId(0), item: Unit(UnitKind(10)) }
+tick1901 ProductionComplete { player: PlayerId(1), item: Unit(UnitKind(10)) }
+tick1902 ProductionComplete { player: PlayerId(2), item: Unit(UnitKind(10)) }
+tick1903 ProductionComplete { player: PlayerId(3), item: Unit(UnitKind(10)) }
+tick1976 OreDelivered { player: PlayerId(2), harvester: SimId(71), refinery: SimId(70), ore: 700, gems: 0, credits: 700 }
+tick1980 ProductionComplete { player: PlayerId(0), item: Building(BuildingKind(1)) }
+tick1982 ProductionComplete { player: PlayerId(2), item: Building(BuildingKind(1)) }
+tick2001 ProductionComplete { player: PlayerId(1), item: Building(BuildingKind(1)) }
+tick2003 ProductionComplete { player: PlayerId(3), item: Building(BuildingKind(1)) }
+tick2016 OreDelivered { player: PlayerId(1), harvester: SimId(69), refinery: SimId(68), ore: 700, gems: 0, credits: 700 }
+tick2076 OreDelivered { player: PlayerId(0), harvester: SimId(67), refinery: SimId(66), ore: 700, gems: 0, credits: 700 }
+tick2087 OreDelivered { player: PlayerId(3), harvester: SimId(73), refinery: SimId(72), ore: 700, gems: 0, credits: 700 }
+tick2111 OreDelivered { player: PlayerId(1), harvester: SimId(121), refinery: SimId(68), ore: 700, gems: 0, credits: 700 }
+tick2200 ProductionComplete { player: PlayerId(0), item: Unit(UnitKind(6)) }
+tick2202 ProductionComplete { player: PlayerId(2), item: Unit(UnitKind(6)) }
+tick2229 OreDelivered { player: PlayerId(2), harvester: SimId(71), refinery: SimId(70), ore: 700, gems: 0, credits: 700 }
+tick2236 OreDelivered { player: PlayerId(0), harvester: SimId(120), refinery: SimId(66), ore: 700, gems: 0, credits: 700 }
+tick2250 OreDelivered { player: PlayerId(1), harvester: SimId(69), refinery: SimId(68), ore: 700, gems: 0, credits: 700 }
+tick2273 OreDelivered { player: PlayerId(0), harvester: SimId(67), refinery: SimId(66), ore: 700, gems: 0, credits: 700 }
+tick2307 OreDelivered { player: PlayerId(3), harvester: SimId(123), refinery: SimId(72), ore: 700, gems: 0, credits: 700 }
+tick2324 OreDelivered { player: PlayerId(1), harvester: SimId(121), refinery: SimId(68), ore: 700, gems: 0, credits: 700 }
+tick2351 ProductionComplete { player: PlayerId(1), item: Unit(UnitKind(7)) }
+tick2353 ProductionComplete { player: PlayerId(3), item: Unit(UnitKind(7)) }
+tick2470 OreDelivered { player: PlayerId(1), harvester: SimId(69), refinery: SimId(68), ore: 700, gems: 0, credits: 700 }
+tick2493 OreDelivered { player: PlayerId(0), harvester: SimId(67), refinery: SimId(66), ore: 700, gems: 0, credits: 700 }
+tick2513 OreDelivered { player: PlayerId(0), harvester: SimId(120), refinery: SimId(66), ore: 700, gems: 0, credits: 700 }
+tick2520 ProductionComplete { player: PlayerId(0), item: Building(BuildingKind(5)) }
+tick2522 ProductionComplete { player: PlayerId(2), item: Building(BuildingKind(5)) }
+tick2541 ProductionComplete { player: PlayerId(1), item: Building(BuildingKind(5)) }
+tick2543 ProductionComplete { player: PlayerId(3), item: Building(BuildingKind(5)) }
+tick2570 OreDelivered { player: PlayerId(1), harvester: SimId(121), refinery: SimId(68), ore: 700, gems: 0, credits: 700 }
+tick2699 OreDelivered { player: PlayerId(3), harvester: SimId(73), refinery: SimId(72), ore: 700, gems: 0, credits: 700 }
+tick2713 OreDelivered { player: PlayerId(1), harvester: SimId(69), refinery: SimId(68), ore: 700, gems: 0, credits: 700 }
+tick2729 OreDelivered { player: PlayerId(0), harvester: SimId(67), refinery: SimId(66), ore: 700, gems: 0, credits: 700 }
+tick2742 OreDelivered { player: PlayerId(0), harvester: SimId(120), refinery: SimId(66), ore: 700, gems: 0, credits: 700 }
+tick2810 OreDelivered { player: PlayerId(2), harvester: SimId(71), refinery: SimId(70), ore: 700, gems: 0, credits: 700 }
+tick2861 ProductionComplete { player: PlayerId(1), item: Unit(UnitKind(2)) }
+tick2861 OreDelivered { player: PlayerId(2), harvester: SimId(122), refinery: SimId(70), ore: 700, gems: 0, credits: 700 }
+tick2960 ProductionComplete { player: PlayerId(0), item: Building(BuildingKind(2)) }
+tick2981 ProductionComplete { player: PlayerId(1), item: Building(BuildingKind(2)) }
+test ra8_crossroads_credit_history_probe ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.43s
+

@@ -1,0 +1,9 @@
+{
+  "purpose": "single exact Crossroads six-player seed7 credit-history diagnostic; temporary test-only instrumentation, runtime unchanged; immediate source restore before any subsequent test",
+  "before_sha256": "169420d28688ceb98fa85f61564b25ff6d202f7b77b785ed7c42534d4d73433b",
+  "probe_sha256": "0762b3c75b0845327a4ca0e93a90605520ad39df5f925e0e357ed2774d56c33e",
+  "exit": 0,
+  "elapsed_seconds": 5.510755750001408,
+  "restored_sha256": "169420d28688ceb98fa85f61564b25ff6d202f7b77b785ed7c42534d4d73433b",
+  "restored_identical": true
+}

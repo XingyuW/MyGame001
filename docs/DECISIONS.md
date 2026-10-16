@@ -5913,3 +5913,62 @@ The separately inspected checkpoint staged check exits2, not a pass, solely for 
 `attempt2-game-exact-final2.log:551` blank EOF. Exact raw line/unfiltered stdout are retained
 in `checkpoint3-staged-whitespace-check.json`; a separate exact-output recheck precedes the
 checkpoint commit. No source/data/test/doc diagnostic or raw evidence edit occurs.
+
+
+### R110. Legacy multiplayer economy history instead of a coincidental balance snapshot
+
+**2026-10-16 UTC.** Third frozen gate checkpoint6b9f358/runtime65fa8d6 fails the existing
+`several_independent_computer_players_play_complete_matches_on_every_map`: Crossroads's
+"every economy runs" observes5 versus6 at `m10_unlocks_and_enemies.rs:813`. Workspace04
+exits101 after331s,227 passed/1 failed/0 ignored; affected target162.84s.01–03/05–06 exit0;
+07 debug smoke was already active when the failure was observed and was stopped before
+08–13. Only verified owned validator47434/debug49546/caffeinate47439 were terminated,
+outer143. `ra8-attempt3` preserves raw07/incomplete summary, stop annotation and all eight
+stop-time raw SHA256 hashes (reverified unchanged). No production/soak/duel sweep was reached;
+there is no new756-row production table. Runtime stayed frozen throughout the healthy gate.
+
+The exact legacy Crossroads/six-player/seed7 probe records every tick through the original
+3000 checkpoint. Missing Player5 actually changes credits1053 times, min2524/max5000,
+first spending at the seventh executed tick. Paid completions are power plant205, refinery645,
+barracks925 and two Conscripts1065/1258; their total cost is2800. Exactly FOUR700-credit
+ore deliveries occur862/1011/1209/1381, total2800. Cancelled partial factory986/refund20
+and Grenadier1286/refund10, plus an uncharged Conscript1306/refund0, use ordinary refunds.
+After the final delivery,4300 becomes5000 at executed tick1382 and remains exactly5000
+at the single sampled checkpoint. Thus the old snapshot sees5/6 while actual histories
+prove6/6 economies ran. This is not an inactive AI, hidden source change or timing defect.
+
+`attempt3-crossroads-credit-history-before1.log` retains exact histories, queues and economic
+events. Its temporary test-only probe is removed immediately after its single run, before
+any subsequent test: contemporaneous original/restored SHA256
+169420d28688ceb98fa85f61564b25ff6d202f7b77b785ed7c42534d4d73433b match; the distinct probe
+SHA/exit/elapsed are in the integrity JSON. No temporary test remains or is counted as shipped.
+
+Named intended observation migration:
+`crates/game/tests/m10_unlocks_and_enemies.rs::several_independent_computer_players_play_complete_matches_on_every_map`
+and its `several_players_play` helper now accumulate actual credit changes from each player's
+real initial balance on every tick through the SAME3000 checkpoint, rather than comparing
+one instant to literal5000. The final `credits_moved.len()==count` requirement stays intact.
+Every original independence/starting-yard/winner/replay assertion, player/map setup and
+scaled72000 limit is unchanged. No fixture, runtime, source balance or valid win is changed
+or delayed. The correction strengthens measurement of the test's existing "every economy
+runs" invariant rather than tuning simulation to a coincidental test balance.
+
+Only test observation and documentation/evidence differ after runtime65fa8d6. The repeated
+21-winner m13/default exact-pair/256x256 timing evidence remains final-runtime applicable;
+R109's metrics are retained, not rerun under an invented runtime. Static test count stays1187,
+63 added versus RA7,none removed/renamed/ignored. R110 is the only additional existing-test
+migration after R94/R96/R102; it is explicitly listed here. All13 commands must rerun on the
+new committed test tree. No new external directory or policy assumption is introduced;
+RA9 handoffs and708KiB configured Cargo parser scratch remain unchanged.
+
+The full affected m10 target now passes5/5,0 failed/ignored, including all shipped maps and
+original deterministic replays; command156.648s. Strict all-target Clippy/fmt also pass.
+Runtime/data/scripts remain byte-identical to65fa8d6. `checkpoint4.json` carries the same
+final-runtime metrics/1187 inventory and all three preserved gate attempts into the next
+complete13-command rerun; no independent review or completed RA8 gate is claimed.
+
+Separately inspected staged hygiene exits2, not passed, solely for untouched raw EOF lines
+`attempt3-crossroads-credit-history-before1.log:157` and `attempt3-m10-after1.log:14`.
+`checkpoint4-staged-whitespace-check.json` preserves exact lines/unfiltered stdout; no
+source/data/test/doc diagnostic or raw-log edit exists. A separate exact-output recheck
+precedes the test/docs/evidence commit.

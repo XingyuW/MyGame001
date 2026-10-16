@@ -355,3 +355,27 @@ R83/R96/R99 remain RA9 handoffs; R97's mechanism is closed by R103. R91/R92 AI p
 mapping and R67 bridge assumptions, earlier programme debt and user visual/audio/play-feel
 verification remain explicit. No new external directory: configured Cargo parser scratch
 708KiB is retained/recreatable/not required for release, with earlier RA5/RA7 evidence preserved.
+
+
+## Third frozen failure: strengthen the legacy economy observation
+
+`ra8-attempt3` preserves the complete third gate failure: workspace04 exit101/331s,
+227passed/1failed/0ignored; m10 target162.84s.01–03/05–06 exit0;07 debug smoke stopped,
+outer143;08–13 not reached. All eight raw capture SHA256 values reverify unchanged.
+
+R110 names `several_independent_computer_players_play_complete_matches_on_every_map` and
+`several_players_play`: the old single tick3000 balance comparison missed Player5 despite
+1053 actual changes, paid2800 production and FOUR700-credit deliveries, because its balance
+returned to5000 at executed tick1382. Exact credit history/economic events and immediate
+source-probe restoration hashes remain in the attempt3 preflight captures. Actual economy
+activity is proven, so runtime65fa8d6 stays unchanged. The helper now records actual movement
+from each initial balance through the SAME3000 checkpoint; the final all-player requirement
+and every independence/starting-yard/winner/replay/limit assertion remain intact. No fixture,
+valid win or timing is altered. This is a named observation-strengthening migration, not a
+new exception. Static inventory stays1187 (+63,none removed/renamed/ignored); no temporary
+probe test is retained. R109's actual final-runtime m13/256/default evidence remains applicable.
+The full affected target/strict hygiene and all13 frozen commands remain required.
+
+Full affected m10 target now passes5/5/0failed/0ignored, all original maps/replays,156.648s
+command elapsed. Strict all-target Clippy/fmt pass. `checkpoint4.json` records the unchanged
+65fa8d6 runtime and repeated default evidence; all13 gate commands still must rerun.
