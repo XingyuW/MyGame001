@@ -201,6 +201,17 @@ pub(crate) fn docks_of(
         .fold(0u32, |total, entry| total.saturating_add(entry.docks))
 }
 
+/// Existing aircraft and queued commitments share a dock before production starts.
+pub(crate) fn dock_commitments(definitions: &Definitions, state: &crate::PlayerState) -> usize {
+    (state.docked_aircraft() as usize).saturating_add(
+        state
+            .queues()
+            .flat_map(|(_, items)| items.iter())
+            .filter(|queued| needs_dock(definitions, queued.item))
+            .count(),
+    )
+}
+
 /// Whether units of the type of `item` need a dock (the arsenal's `airport_bound`, with a
 /// rules file).
 pub(crate) fn needs_dock(definitions: &Definitions, item: ProductionItem) -> bool {

@@ -1,0 +1,22 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 17.49s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 2 tests
+
+thread 'command::ra8_intent_tests::ra8_internal_mixed_and_fully_stale_selections_prune_only_witnessed_lifecycle_changes' (4989847) panicked at crates/sim/src/ra8_intents.rs:60:41:
+assertion `left == right` failed
+  left: Some(UnknownUnit(SimId(2)))
+ right: Some(NotOwned(SimId(2)))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test command::ra8_intent_tests::ra8_internal_mixed_and_fully_stale_selections_prune_only_witnessed_lifecycle_changes ... FAILED
+test command::ra8_intent_tests::ra8_internal_targets_cancel_after_death_capture_or_real_detector_loss_but_public_stays_strict ... ok
+
+failures:
+
+failures:
+    command::ra8_intent_tests::ra8_internal_mixed_and_fully_stale_selections_prune_only_witnessed_lifecycle_changes
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 54 filtered out; finished in 0.05s
+
+error: test failed, to rerun pass `-p sim --lib`

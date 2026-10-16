@@ -324,13 +324,7 @@ pub fn check_buildable(
         // `Economy` stage if that is more: a caller that lists every type once (the
         // sidebar) still counts the docks of two buildings of a type.
         if crate::flight::needs_dock(definitions, item) {
-            let taken = (state.docked_aircraft() as usize).saturating_add(
-                state
-                    .queues()
-                    .flat_map(|(_, items)| items.iter())
-                    .filter(|queued| crate::flight::needs_dock(definitions, queued.item))
-                    .count(),
-            );
+            let taken = crate::flight::dock_commitments(definitions, state);
             let docks =
                 crate::flight::docks_of(definitions, owned.iter().copied()).max(state.docks());
             if taken >= docks as usize {
@@ -496,13 +490,7 @@ pub(crate) fn apply(
             // The command knows every building that stands now, and counts those alone: a
             // dock sold or lost earlier in this tick takes no aircraft.
             if crate::flight::needs_dock(definitions, item) {
-                let taken = (state.docked_aircraft() as usize).saturating_add(
-                    state
-                        .queues()
-                        .flat_map(|(_, items)| items.iter())
-                        .filter(|queued| crate::flight::needs_dock(definitions, queued.item))
-                        .count(),
-                );
+                let taken = crate::flight::dock_commitments(definitions, state);
                 let docks =
                     crate::flight::docks_of(definitions, index.kinds_of(player).into_iter());
                 if taken >= docks as usize {

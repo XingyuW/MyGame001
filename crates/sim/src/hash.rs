@@ -172,6 +172,9 @@ pub fn state_hash(world: &mut World) -> u64 {
         .hash_into(&mut hasher);
     // RA5: the crates, if the world ever had one.
     world.resource::<crate::Crates>().hash_into(&mut hasher);
+    world
+        .resource::<crate::CommandQueue>()
+        .hash_into(&mut hasher);
     hasher.finish()
 }
 

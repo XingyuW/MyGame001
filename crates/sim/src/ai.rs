@@ -1131,7 +1131,10 @@ pub(crate) fn run_ai(
         let extra = strategy::decide(&view, controller, &special, &props);
         // A unit assigned a specialist job receives only that job this turn.
         for command in &mut commands {
-            if let Command::Move { units, .. } | Command::AttackMove { units, .. } = command {
+            if let Command::Move { units, .. }
+            | Command::AttackMove { units, .. }
+            | Command::Attack { units, .. } = command
+            {
                 units.retain(|id| !controller.reserved.contains(id));
             }
         }
@@ -1140,7 +1143,70 @@ pub(crate) fn run_ai(
         commands.truncate(32);
         controller.issued = controller.issued.saturating_add(commands.len() as u64);
         for command in commands {
-            queue.push(IssuedCommand { player, command });
+            let mut witness = crate::command::AiIntent::default();
+            let actor_ids: Vec<_> = match &command {
+                Command::Deploy { unit } | Command::Interact { unit, .. } => vec![*unit],
+                Command::Undeploy { building }
+                | Command::SellBuilding { building }
+                | Command::RepairBuilding { building }
+                | Command::SetRallyPoint { building, .. }
+                | Command::Chronoshift { building, .. }
+                | Command::Superweapon { building, .. } => vec![*building],
+                _ => command.units().unwrap_or(&[]).to_vec(),
+            };
+            for id in actor_ids {
+                if let Some(u) = view.own_units.iter().find(|u| u.id == id) {
+                    witness.owned.insert(id);
+                    if u.armed {
+                        witness.armed.insert(id);
+                    }
+                } else if (matches!(command, Command::Deploy { .. })
+                    && view.recoverable_garrisons.contains(&id))
+                    || (command.units().is_none()
+                        && !matches!(command, Command::Deploy { .. } | Command::Interact { .. })
+                        && view.own_buildings.iter().any(|b| b.id == id))
+                {
+                    witness.owned.insert(id);
+                }
+            }
+            let target = match command {
+                Command::Attack { target, .. } | Command::Interact { target, .. } => Some(target),
+                _ => None,
+            };
+            witness.target = target.filter(|id| {
+                view.enemy_units.iter().any(|u| u.id == *id)
+                    || view.enemy_buildings.iter().any(|b| b.id == *id)
+                    || (!matches!(command, Command::Attack { .. })
+                        && (view.own_buildings.iter().any(|b| b.id == *id)
+                            || view.seen_tech.iter().any(|b| b.id == *id)
+                            || props
+                                .get(*id)
+                                .is_some_and(|(cell, _)| view.vision.is_visible(cell))))
+            });
+            if let Some(ids) = command.units() {
+                let valid = !ids.is_empty()
+                    && ids.len() <= crate::MAX_UNITS_PER_COMMAND
+                    && ids.iter().copied().collect::<BTreeSet<_>>().len() == ids.len()
+                    && ids.iter().all(|id| witness.owned.contains(id))
+                    && (!matches!(command, Command::Attack { .. })
+                        || ids.iter().all(|id| witness.armed.contains(id)))
+                    && (!matches!(command, Command::Harvest { .. })
+                        || ids.iter().all(|id| {
+                            view.own_units
+                                .iter()
+                                .any(|u| u.id == *id && u.harvest.is_some())
+                        }))
+                    && match command {
+                        Command::Move { target, .. }
+                        | Command::AttackMove { target, .. }
+                        | Command::Harvest { target, .. } => view.grid.contains(target),
+                        _ => true,
+                    };
+                if !valid {
+                    witness = crate::command::AiIntent::default();
+                }
+            }
+            queue.push_ai(IssuedCommand { player, command }, witness);
         }
     }
 }
@@ -1924,7 +1990,7 @@ fn queue_buildings(view: &View<'_>, controller: &AiController) -> Vec<Command> {
 /// composition up to its army size, at most [`AI_UNIT_QUEUE`] items per producing building type.
 fn queue_units(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
     let mut commands = Vec::new();
-    let mut added: BTreeMap<QueueKey, usize> = BTreeMap::new();
+    let mut added = AddedUnits::default();
     let harvester = ProductionItem::Unit(view.ai.harvester);
     let refineries = view
         .own_buildings
@@ -2118,15 +2184,30 @@ fn queue_units(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
 /// Whether one more `item` may be queued this turn: its producing building type holds fewer than
 /// [`AI_UNIT_QUEUE`] items, counting those `added` this turn, and the command would be accepted.
 /// Records the item in `added` if so.
-fn has_room(view: &View<'_>, item: ProductionItem, added: &mut BTreeMap<QueueKey, usize>) -> bool {
+#[derive(Default)]
+struct AddedUnits {
+    queues: BTreeMap<QueueKey, usize>,
+    docks: usize,
+}
+
+fn has_room(view: &View<'_>, item: ProductionItem, added: &mut AddedUnits) -> bool {
     let Some(producer) = view.queue_key(item) else {
         return false;
     };
-    let extra = added.get(&producer).copied().unwrap_or(0);
+    let extra = added.queues.get(&producer).copied().unwrap_or(0);
     if view.queue_len(item).saturating_add(extra) >= AI_UNIT_QUEUE || !view.queueable(item) {
         return false;
     }
-    *added.entry(producer).or_insert(0) += 1;
+    if crate::flight::needs_dock(view.definitions, item) {
+        let taken = crate::flight::dock_commitments(view.definitions, view.state)
+            .saturating_add(added.docks);
+        let capacity = crate::flight::docks_of(view.definitions, view.own_kinds.iter().copied());
+        if taken >= capacity as usize {
+            return false;
+        }
+        added.docks += 1;
+    }
+    *added.queues.entry(producer).or_insert(0) += 1;
     true
 }
 

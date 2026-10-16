@@ -1,0 +1,9 @@
+{
+  "path": "crates/sim/src/ai.rs",
+  "mutation": "disable only the same-decision aircraft dock guard",
+  "mutant_sha256": "78f16bb50fe5219487c7af9603e3aef933e775ce39f86b86fd4a6500a374af97",
+  "expected_original_sha256": "86db668bd27521c8fd77608bc67c4ef515b01030f5a5a7bbe6afd87033adb023",
+  "pre_hash_method": "reconstructed from the sole exact reversible mutation; a pre-mutation SHA was not captured at mutation time",
+  "restored_sha256": "86db668bd27521c8fd77608bc67c4ef515b01030f5a5a7bbe6afd87033adb023",
+  "verified": true
+}

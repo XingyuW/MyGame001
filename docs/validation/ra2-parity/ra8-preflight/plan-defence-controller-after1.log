@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 3.54s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+
+thread 'ra8_every_shipped_plan_places_a_paid_armed_defence_from_its_separate_list' (4970756) panicked at crates/sim/tests/ra8_ai.rs:1362:51:
+great_britain fallback=true: no paid armed defence
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_every_shipped_plan_places_a_paid_armed_defence_from_its_separate_list ... FAILED
+
+failures:
+
+failures:
+    ra8_every_shipped_plan_places_a_paid_armed_defence_from_its_separate_list
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 27 filtered out; finished in 0.55s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

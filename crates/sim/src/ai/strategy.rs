@@ -158,6 +158,16 @@ pub(super) fn decide(
                     .is_some_and(|m| {
                         m.unit_repair
                             && (m.role == Role::Shipyard) == (meta.domain == Domain::Naval)
+                            && (m.vehicle_docks == 0
+                                || special
+                                    .docked
+                                    .iter()
+                                    .chain(&special.interactions)
+                                    .filter(|(_, host)| **host == b.id)
+                                    .map(|(unit, _)| *unit)
+                                    .collect::<BTreeSet<_>>()
+                                    .len()
+                                    < m.vehicle_docks as usize)
                     })
             })
             .min_by_key(|b| (b.footprint.distance_to_cell(unit.mobile.cell), b.id))
@@ -176,7 +186,19 @@ pub(super) fn decide(
         .iter()
         .filter(|(_, g)| g.owner == view.player)
         .map(|(id, _)| special.cargo.get(id).map_or(0, Vec::len))
-        .sum();
+        .sum::<usize>()
+        + special
+            .interactions
+            .iter()
+            .filter(|(unit, host)| {
+                view.living_owned_ids.contains(unit)
+                    && props.get(**host).is_some_and(|(_, p)| {
+                        crate::garrison::item(view.definitions, p.kind)
+                            .and_then(|item| view.definitions.metadata(item))
+                            .is_some_and(|meta| meta.can_be_occupied)
+                    })
+            })
+            .count();
     if occupied < view.ai.policy.garrison_quota as usize && view.state.credits() > 0 {
         let host = props
             .iter()
@@ -188,8 +210,17 @@ pub(super) fn decide(
                 let id = props.id_at(cell)?;
                 let item = crate::garrison::item(view.definitions, p.kind)?;
                 let meta = view.definitions.metadata(item)?;
-                let full =
-                    special.cargo.get(&id).map_or(0, Vec::len) >= meta.max_occupants as usize;
+                let incoming = special
+                    .interactions
+                    .iter()
+                    .filter(|(unit, host)| **host == id && view.living_owned_ids.contains(unit))
+                    .count();
+                let full = special
+                    .cargo
+                    .get(&id)
+                    .map_or(0, Vec::len)
+                    .saturating_add(incoming)
+                    >= meta.max_occupants as usize;
                 let maximum = match item {
                     ProductionItem::Building(k) => view
                         .definitions
