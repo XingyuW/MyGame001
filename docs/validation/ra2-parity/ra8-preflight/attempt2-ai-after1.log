@@ -1,0 +1,74 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 23.12s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 37 tests
+test ra8_air_observation_reserves_then_trains_an_anti_air_unit ... ok
+test ra8_aircraft_complete_real_ammo_return_and_reload_before_ai_retasks_them ... actual shots {SimId(6): 2, SimId(7): 2, SimId(8): 2}; sawempty true, uninterrupted reload true, special SpecialState { strategic: StrategicState { missiles: [], storm: None, flights: {}, announced: {} }, parasites: {}, deployed: {}, mirage_trees: {}, disguises: {SimId(5): UnitKind(1)}, erasures: {}, charges: {}, radiation_sites: [], coil_charge: {}, death_detonated: {}, eruption_next: {}, temporal_removed: {}, charge: {}, protected: {}, disabled: {}, cargo: {}, garrisons: {}, controlled: {}, bombs: {}, zones: [], rearming: {}, carrier_flights: {}, interactions: {}, hidden: {(PlayerId(1), SimId(5))}, outages: {}, docked: {}, ammo: {SimId(6): 0, SimId(7): 0, SimId(8): 0}, reloading: {SimId(6): 14, SimId(7): 8, SimId(8): 21}, docks: {SimId(6): (SimId(3), 0), SimId(7): (SimId(3), 1), SimId(8): (SimId(3), 2)}, bays: {}, spawned: {}, missiles: {}, surfaced: {} }
+ok
+test ra8_aircraft_same_decision_admission_counts_existing_queued_and_new_dock_commitments ... ok
+test ra8_an_actual_loss_to_an_unseen_mirage_requests_a_detector ... ok
+test ra8_artillery_uses_the_surface_tank_line_when_aircraft_share_its_wave ... ok
+test ra8_bridge_intents_wait_for_known_holders_and_arrivals_without_reading_hidden_ships ... ok
+test ra8_building_and_depot_repairs_use_paid_production_paths ... ok
+test ra8_control_holding_specialists_do_not_pin_a_capable_ai_wave_to_one_waypoint ... late Yuri SimId(3): Some(Health { hit_points: 78 }), Some(Weapon { kind: WeaponKind(61), secondary: Some(WeaponKind(97)), cooldown: 0, burst_left: 0, volley: WeaponKind(61), target: None, order: None }), wave={SimId(3), SimId(4), SimId(5), SimId(6), SimId(7), SimId(8)}, held={SimId(5): (SimId(3), PlayerId(1)), SimId(6): (SimId(4), PlayerId(1))}
+late Yuri SimId(4): Some(Health { hit_points: 78 }), Some(Weapon { kind: WeaponKind(61), secondary: Some(WeaponKind(97)), cooldown: 0, burst_left: 0, volley: WeaponKind(61), target: None, order: None }), wave={SimId(3), SimId(4), SimId(5), SimId(6), SimId(7), SimId(8)}, held={SimId(5): (SimId(3), PlayerId(1)), SimId(6): (SimId(4), PlayerId(1))}
+late target transitions: {"Waypoint(0)", "Waypoint(1)", "Waypoint(106)", "Waypoint(108)", "Waypoint(119)", "Waypoint(12)", "Waypoint(120)", "Waypoint(130)", "Waypoint(131)", "Waypoint(132)", "Waypoint(141)", "Waypoint(142)", "Waypoint(143)", "Waypoint(144)", "Waypoint(20)", "Waypoint(24)", "Waypoint(25)", "Waypoint(33)", "Waypoint(36)", "Waypoint(45)", "Waypoint(47)", "Waypoint(48)", "Waypoint(49)", "Waypoint(58)", "Waypoint(59)", "Waypoint(61)", "Waypoint(7)", "Waypoint(70)", "Waypoint(8)", "Waypoint(82)", "Waypoint(94)"}
+ok
+test ra8_control_holding_yuri_completes_attack_move_and_preserves_explicit_retargeting ... ok
+test ra8_curtain_and_explicit_chronoshift_support_actual_tank_attack_waves ... ok
+test ra8_damaged_own_garrison_is_no_economy_building_and_depleted_base_recovers_its_infantry ... ok
+test ra8_depot_reserves_known_incoming_and_occupied_bays_without_rejected_orders ... ok
+test ra8_difficulty_start_credit_build_and_reload_use_real_house_rules ... ok
+test ra8_endgame_preserves_temporal_mind_control_and_active_naval_travel ... ok
+test ra8_engineer_is_produced_and_captures_seen_tech_through_ordinary_commands ... ok
+test ra8_every_country_has_obtainable_full_tech_national_and_conditional_lists ... ok
+test ra8_every_shipped_plan_places_a_paid_armed_defence_from_its_complete_plan ... great_britain fallback=true: paid defence BuildingKind(15) at tick 3402
+russia fallback=true: paid defence BuildingKind(16) at tick 3242
+america fallback=false: paid defence BuildingKind(19) at tick 17282
+korea fallback=false: paid defence BuildingKind(19) at tick 17282
+france fallback=false: paid defence BuildingKind(21) at tick 17722
+germany fallback=false: paid defence BuildingKind(19) at tick 17282
+great_britain fallback=false: paid defence BuildingKind(19) at tick 17282
+russia fallback=false: paid defence BuildingKind(20) at tick 10762
+iraq fallback=false: paid defence BuildingKind(20) at tick 10762
+cuba fallback=false: paid defence BuildingKind(20) at tick 10762
+libya fallback=false: paid defence BuildingKind(20) at tick 10762
+ok
+test ra8_full_tree_builds_and_fires_strategic_weapons_and_off_keeps_american_paradrop ... great_britain, SW=true: {"airforce_command": 1, "barracks": 1, "chronosphere": 1, "construction_yard": 1, "gap_generator": 1, "ore_purifier": 1, "pillbox": 7, "power_plant": 10, "prism_tower": 7, "refinery": 2, "service_depot": 1, "spy_satellite": 1, "tech_center": 1, "war_factory": 2, "weather_control": 1}, major=true, para=false
+iraq, SW=true: {"cloning_vats": 1, "iron_curtain": 1, "nuclear_reactor": 1, "nuclear_silo": 1, "psychic_sensor": 1, "radar_tower": 1, "sentry_gun": 7, "soviet_barracks": 1, "soviet_battle_lab": 1, "soviet_construction_yard": 1, "soviet_refinery": 2, "soviet_service_depot": 1, "soviet_war_factory": 2, "tesla_coil": 7, "tesla_reactor": 2}, major=true, para=false
+america, SW=false: {"american_airforce_command": 1, "barracks": 1, "construction_yard": 1, "gap_generator": 1, "ore_purifier": 1, "power_plant": 4, "refinery": 2, "service_depot": 1, "spy_satellite": 1, "tech_center": 1, "war_factory": 2}, major=false, para=true
+ok
+test ra8_garrison_quota_and_capacity_include_known_incoming_occupiers ... ok
+test ra8_incapable_specialist_and_stranded_ship_survivors_do_not_block_a_real_winner ... ok
+test ra8_lone_yuri_preserves_only_seen_reachable_controllable_building_damaging_recruits ... ok
+test ra8_lost_prerequisites_cancel_only_incomplete_paid_heads_then_rebuild_and_resume ... ok
+test ra8_medium_country_defence_counts_national_and_later_army_tiers_are_produced ... ok
+test ra8_mixed_slow_last_stand_cadences_produce_a_win_instead_of_a_simultaneous_draw ... ok
+test ra8_navy_requires_reachable_placement_water_and_an_enemy_hurtable_from_that_sea ... ok
+test ra8_near_base_occupier_enters_a_real_civilian_garrison ... ok
+test ra8_observed_scouting_goals_release_a_crowded_wave_without_waiting_for_slow_aircraft ... ok
+test ra8_paid_naval_detector_escorts_the_fleet_toward_a_known_shore_target ... 
+thread 'ra8_paid_naval_detector_escorts_the_fleet_toward_a_known_shore_target' (5211340) panicked at crates/sim/tests/ra8_ai.rs:2342:5:
+the detector escort must be paid production
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test ra8_raw_spy_spawn_with_empty_queue_is_concealed_before_actual_ai_thinks ... ok
+test ra8_recovery_preserves_unpaid_low_power_and_disabled_heads_until_actual_producer_loss ... ok
+test ra8_rejected_empty_guard_cannot_reorder_mirage_appearance_and_crate_rng ... ok
+test ra8_slow_air_sweep_starts_at_enemy_origin_then_finds_an_unseen_remote_capture ... remote captured refinery search: tick SimTick(35203), first Some(Waypoint { cell: CellPos { x: 112, y: 112 }, seen: 0, priority: true }), discovered true, outcome Some(Won { winner: PlayerId(0), tick: 35202 })
+ok
+test ra8_special_weapon_rof_scales_psi_eruption_parasite_repair_and_occupation_only ... ok
+test ra8_strategic_strikes_weight_known_clusters_and_do_not_target_unseen_bases ... ok
+test ra8_unseen_enemy_water_building_cannot_change_naval_planning ... ok
+test ra8_virtual_and_physical_purifiers_add_independent_shares_of_base_delivery ... ok
+test ra8_yuri_cannot_acquire_a_hostile_occupied_building_as_a_control_target ... ok
+
+failures:
+
+failures:
+    ra8_paid_naval_detector_escorts_the_fleet_toward_a_known_shore_target
+
+test result: FAILED. 36 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 65.21s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

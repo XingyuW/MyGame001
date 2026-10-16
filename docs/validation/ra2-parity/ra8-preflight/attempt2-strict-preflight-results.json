@@ -1,0 +1,65 @@
+[
+  {
+    "name": "attempt2-prerequisite-final1",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "ra8_lost_prerequisites_cancel_only_incomplete_paid_heads_then_rebuild_and_resume",
+      "--",
+      "--exact"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 3.861900624993723
+  },
+  {
+    "name": "attempt2-clippy2",
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 4.146183584001847
+  },
+  {
+    "name": "attempt2-fmt1",
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.9670227080059703
+  },
+  {
+    "name": "attempt2-data-generated1",
+    "command": [
+      "python3",
+      "scripts/generate_ra2_data.py",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.08313116600038484
+  },
+  {
+    "name": "attempt2-reference1",
+    "command": [
+      "python3",
+      "scripts/ra2_reference.py",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.08797074999893084
+  }
+]

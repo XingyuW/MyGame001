@@ -5696,3 +5696,165 @@ The standalone check exits2, not a pass. An initial diagnostic shell call also r
 masking that check's outer status as0; the warning was inspected and an immediate standalone
 check returned2 before any commit. The exact single raw diagnostic is classified and a
 separate exact-set recheck precedes commit. No capture is altered or broadly suppressed.
+
+
+### R105. RA8 second frozen gate failure and exact default reproductions
+
+**2026-10-16 UTC.** The second full gate froze checkpoint `c3d6fb8`, runtime `d840b44`.
+Its production target exited101 after4156.59s; workspace04 exited101 after4512s with253
+passed/1 failed/0 ignored. Commands01–03/05–06 exited0;07 partial debug compilation was
+stopped before dependent long checks, outer143;08–13 did not run. All untouched captures,
+incomplete summary, stop annotation and raw SHA256 manifest remain in `ra8-attempt2`.
+No successful756-row table was emitted: the older configured-target TSV is stale and is
+not evidence for this attempt. Quiet production was making CPU progress: owned-process
+samples54:27→55:28 elapsed recorded296:18.50→298:28.72 accumulated CPU,215.3 percent in
+the second sample. No competing build/probe was introduced while that gate was healthy.
+
+Six exact default seed0 cases had no winner under unchanged R29: LibertyBay IraqMedium/
+KoreaMedium, RedCanyon FranceMedium/RussiaEasy, SteelHarbor CubaBrutal/AmericaBrutal,
+ContinentalDivide FranceEasy/CubaMedium, EmberCaldera LibyaBrutal/KoreaMedium and
+WheelOfWorlds CubaBrutal/FranceBrutal. Three more rejected bridge Interact with "Ships must
+clear collapsed bridge": Continental IraqBrutal/GreatBritainBrutal tick24811 actor309→hut
+2684387735; Glacier KoreaBrutal/RussiaBrutal33402 actor496→2684383492; Harvest AmericaBrutal/
+KoreaBrutal66131 actor933→2684388479. None is accepted as a passing default path.
+
+New `crates/game/tests/ra8_gate_matches.rs` contains nine named schedule regressions for
+those exact pair/map/seed combinations. They retain the original production sweep's
+rejection exemptions, nonnegative credits, cell/stray checks, bounded queue and unchanged
+`72000*max(128,width+height)/128` limit, requiring explicit Won. Failure diagnostics expose
+actual owned forces/resources/queues/controller goals, not new AI knowledge. Existing Demo
+regression still covers ten earlier failures. m14 failure/trace output also includes goals,
+known buildings and current objective visibility; this instrumentation does not alter play.
+The old-runtime diagnostic executable's SHA256150966e8218fd2e9babb84ff3ea2b4fa1ec62add32e99eef903ccd21d18e4103
+is recorded with its Red/Steel state captures; it was run directly from the existing Cargo
+cache before normal rebuilding, without a copy, clone, source rollback or worktree.
+
+All initial compile/probe mistakes, failed exact replays and partial output are retained.
+In particular the old nine-case diagnostic run was stopped after the first bridge rejection,
+Continental's complete no-winner and mature Ember snapshots; it is not claimed complete.
+The m14 diagnostic processes explicitly exited1 for no winner even where their Python
+orchestrator exited0 after recording child statuses. R106–R108 address distinct causes;
+no assertion, permitted rejection, limit or healthy attack is weakened or delayed.
+
+### R106. Known naval occupancy defers ordinary bridge repair
+
+**2026-10-16 UTC.** R67 remains binding: no bridge repair while a ship holds or reserves
+the collapsed deck. `ai.rs::repair_bridge` filters unit snapshots through the player's
+`known_occupants` before consulting Naval domain, then defers a candidate for current deck
+occupants, reserved arrivals, or a known active ship one ordinary step away that can reserve
+the deck after Ai and before next Commands. A departing ship still holds its current cell.
+An idle adjacent ship is not occupancy and does not block. No hidden ship, world occupancy
+query or special bridge-repair bypass informs this choice; the public command stays strict.
+Amphibious transports use their actual non-Naval domain and do not become naval blockers.
+
+`ra8_bridge_intents_wait_for_known_holders_and_arrivals_without_reading_hidden_ships`
+creates the collapse through ordinary attack, then exercises empty, standing, departing,
+reserved, incoming, idle-adjacent, visible-enemy, hidden-enemy and amphibious cases through
+the actual schedule. Real Move establishes travel/reservations at natural cadence boundaries;
+real scheduled submarine concealment supplies the hidden case. Engineer liveness and the
+actual reserved/departing/incoming cells are asserted, so absence of repair is not a dead
+engineer or failed movement. The hidden twin checks equal emitted planning before Interact
+applies; it does not claim a hidden occupied deck can legally repair. R67's repair refusal
+remains a documented game assumption, not a newly verified RA2-engine fact.
+
+The first after-run used a broader conservative known-adjacent guard; final code narrows it
+to active arrivals and keeps the idle-adjacent positive case. Intermediate captures are
+historical evidence only. Exact default bridge regressions pass on the narrower guard with
+all original command-rejection checks retained.
+
+### R107. Recover incomplete paid queues after actual prerequisite or producer loss
+
+**2026-10-16 UTC.** RedCanyon's Russia retained44063 credits, a working WarMiner and yard,
+but a paid Barracks head at343 could not progress after its TeslaReactor was lost. SteelHarbor's
+Cuba retained293634 credits, income and yard, but a WarFactory head at230 was blocked after
+Barracks loss. Existing `economy::advance_production` correctly waits for a physical owned
+producer and prerequisite; the AI never canceled the blocked head to rebuild the prerequisite.
+These are recoverable economies, not a reason for an artificial last stand or timeout change.
+
+`cancel_blocked_head` uses the same `produces` and `missing_prerequisite` predicates over
+owned real building kinds, respecting unlock_all exactly as economy does. Only incomplete
+heads whose actual producer/prerequisite is absent qualify. Temporary power/funds/disable,
+country/queue capacity/build limits and general QueueProduction rejection are not consulted.
+One ordinary CancelProduction is queued per decision; normal cancellation refunds exactly
+charged credits. Completed items keep their normal exit/placement path. Existing public
+last-matching cancellation semantics and FIFO order remain: later duplicate types may cancel
+first over bounded decisions before the blocked head, without arbitrary queue mutation.
+
+`ra8_lost_prerequisites_cancel_only_incomplete_paid_heads_then_rebuild_and_resume` fails
+before the fix, then proves actual paid head, ordinary prerequisite sale, exact refund,
+rebuilding and resumed paid production; its completed-head companion is placed without
+cancel/refund. `ra8_recovery_preserves_unpaid_low_power_and_disabled_heads_until_actual_producer_loss`
+retains a temporarily disabled, low-power, unpaid head for300 ticks, then verifies normal
+producer sale and cancellation. Healthy owned armor keeps that isolated fixture outside R53.
+No old test is migrated. The first new aircraft-ammo fixture omitted an Economy visibility/
+dock-commitment initialization tick and correctly got NoFreeDock; the corrected schedule
+probe observes real shots, empty ammo, reload wait and firing again. Aircraft behavior is
+unchanged because actual reload works; both raw probes remain.
+
+### R108. Observed scouting completion, nearby continuation and legacy strategy boundary
+
+**2026-10-16 UTC.** Continental's51-member wave and Ember/Wheel's71-member waves waited
+for every member to become idle at an already observed waypoint. Crowded surface formations
+and slow aircraft could keep a completed scouting objective alive indefinitely. New
+`ra8_observed_scouting_goals_release_a_crowded_wave_without_waiting_for_slow_aircraft`
+forms an actual eight-Rhino/Kirov wave; the pre-fix assertion fails, while the correction
+retires an actually visible goal with slow aircraft still traveling. Its unobserved companion
+retains legitimate travel. Known-building objectives retain their existing validity rules.
+
+Liberty then still failed its unchanged288000 limit: issued-command count306→405 from
+60000→288000 showed active Kirov travel, but every sweep leg re-ranked by distance to the
+original enemy start, repeatedly crossing expanding rings before remote captured structures.
+`choose_target` retains its original first-search wrapper and ordering. Only continuation
+from an actually observed scouting objective replaces the enemy-origin tie-break with the
+nearest stale waypoint, then deterministic distance/row/column. Remembered buildings still
+rank first; no unseen target location is supplied and no persistent state is added. Current
+visibility and the existing objective/waypoint memory are already hashed.
+
+`ra8_slow_air_sweep_starts_at_enemy_origin_then_finds_an_unseen_remote_capture` uses shipped
+definitions on declared128x128 terrain: a human Engineer legally captures an initially neutral
+refinery at8,104 and sells its original yard. The lone enemy Kirov initially knows neither
+capture nor refinery; its first objective must remain112,112. The old repeated-origin policy
+has no discovery/winner at the unchanged144000 R29 horizon; corrected actual search discovers
+and wins at35202. Initial probes are preserved: a wrong MatchOptions field failed compilation,
+an insignificant Hospital permitted a legitimate early ending, and a64x64 probe passed the
+old policy (failed-to-fail). The final128x128 negative is the meaningful regression. The exact
+default Liberty replay subsequently wins at143617/288000, rather than relying only on the
+isolated capability fixture.
+
+An intermediate continuation rule treated any previous waypoint as a sweep phase. It broke
+`ra8_paid_naval_detector_escorts_the_fleet_toward_a_known_shore_target`: failed, unobserved
+ground approaches had marked waypoints, so later aircraft wandered before inspecting the
+enemy origin. The preserved failure is corrected by requiring actual current visibility,
+not merely a previous waypoint or seen-era marker. That original paid escort assertion and
+24000 bound pass unchanged. No new policy constant or source data adjustment is introduced.
+
+Serial compatibility then caught the explicit fog-on RA4 neutral legacy scenario ending at
+5028, earlier than its original `4400+LAST_STAND_PATIENCE` lower bound. Two bounded one-test
+probes isolated the cause: gating queue recovery did not change the failure; gating only the
+new observed-scout retirement/continuation restored Won(P1)8211,7 promotions/10 survivors/no
+unexplained rejections, with every original assertion intact. Each probe immediately restored
+its sole source file and verified identical contemporaneous pre/post SHA256 before another
+test; raw logs and integrity JSONs are retained. R91 already declares neutral legacy/RA1–RA5
+fixtures opted out of shipped difficulty AND strategy, but the new search branches omitted
+that boundary. Final code applies their existing rules_difficulty opt-in, preserving real
+shipped wins without delaying them. The existing RA4 function only gains diagnostic output/
+assertion text; no fixture setting, assertion condition or limit changes. R14's original
+first-search test and calls are unchanged. An empty malformed apply_patch attempt changed no
+file before the safe exact-context test diagnostic patch.
+
+Final correction preflight passes236 sim tests across13 targets,0 failed/ignored, including
+all37 RA8 AI tests and the original RA4 scenario. Five unchanged production companions pass:
+armed-miner7802/72000, original last-building search30598/72000, Crossroads terrain, Coral
+LibyaBrutal/IraqMedium30930/288000 and LibyaBrutal/GermanyBrutal34304/288000. Strict Clippy
+first caught clone_on_copy only in the new queue-head test; dereferencing Copy data fixes it,
+that exact test passes again, and strict all-target Clippy/fmt/generated-data/4934-row audit
+all exit0. The failed lint capture is retained. Full-tree inventory is1187 static tests,
+63 added relative to RA7's1124,zero removed/renamed/ignored/unmapped. No new existing-test
+expectation migration is introduced. Final default replay/m13/budget and all13 gates must
+still repeat on the committed correction; prior final-runtime claims remain historical.
+
+The separately inspected staged whitespace check exits2, not a pass:426 exact diagnostics
+are solely preserved raw captures (406 trailing trace/progress-space lines,20 blank EOF lines).
+`attempt2-staged-whitespace-check1.json` retains every path/line/raw content, the complete
+unfiltered stdout and its SHA256; no source/data/test/doc diagnostic exists. Raw output is
+not edited or broadly exempted. A separate exact-output recheck precedes commit.
