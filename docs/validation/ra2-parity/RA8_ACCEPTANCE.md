@@ -1,9 +1,10 @@
 # RA8 acceptance record
 
-Status: first frozen attempt failed and was stopped. R102 records the complete-plan test
-correction; the broader game preflight then exposed real default-path admission/lifecycle
-defects, fixed in R103. Corrected final-runtime match/budget repeats pass; the complete
-thirteen-command rerun remains required. This is not an independent review.
+Status: fourth frozen attempt failed and was stopped. R111–R114 record its exact three
+failures, narrow private bridge/cell lifecycle corrections and the controlled observed-AA
+response. Focused schedule/default-pair corrections pass. Final-source affected compatibility,
+21-map completion/256-budget repeats and the complete thirteen-command gate remain required.
+This is validated work in progress, not independent review or completed RA8 acceptance.
 All earlier validation directories and failed RA8 probes are retained.
 
 ## Acceptance checklist
@@ -379,3 +380,67 @@ The full affected target/strict hygiene and all13 frozen commands remain require
 Full affected m10 target now passes5/5/0failed/0ignored, all original maps/replays,156.648s
 command elapsed. Strict all-target Clippy/fmt pass. `checkpoint4.json` records the unchanged
 65fa8d6 runtime and repeated default evidence; all13 gate commands still must rerun.
+
+
+## Fourth gate failure and final-source correction checkpoint (R111–R114)
+
+`ra8-attempt4` preserves the frozen4dfeeed/runtime65fa8d6 failure: workspace04 exits101/
+2703s,253 passed/1 failed/0 ignored; production target5 passed/1 failed in2497.71s. The three
+seed0 failures are Steel Harbor AmericaBrutal/CubaBrutal bridge readiness, Thousand Lakes
+GreatBritainEasy/AmericaEasy strategic-cell visibility loss, and Thousand Lakes FranceBrutal/
+GermanyBrutal active attrition with no winner at unchanged288000.01–03/05–06 exit0,07 stopped,
+08–13 unrun. No successful756-row table is claimed; raw hashes and partial outputs are retained.
+
+R111 traces establish hidden Typhoons already reserving the deck at decision, so a larger
+admission guess/false decision-clear witness cannot solve it. R112 adds an explicitly tagged,
+value-hashed private conditional repair goal: validate Engineer/known hut/type/collapsed job
+first, wait without controller feedback when physically blocked, otherwise dispatch ordinary
+Interact after preceding FIFO effects. Public Interact retains its original occupied-deck
+rejection. Actual repair still checks R67 current/reserved Naval holders before restoring or
+consuming an Engineer. Scheduled tests cover hidden occupancy→clear→actual repair, occupancy
+after acceptance, prior/later Stop, invalid/dead/hidden actor/target and action hash. An actual
+controller hidden-ship twin proves identical decisions/witnesses/goal queue hash.
+
+R113 extracts full read-only strategic validation and certifies only completely valid engine
+intents at core Ai end. Only a later exact cell-visibility rejection may cancel, and only when
+all other current checks still pass ignoring visibility. Real scheduled Gap shrouding tests
+retain strict public/initially invalid/later unready/source-form/map/argument behavior and
+prove certificate value hashing. Both new queued state tags are included by value, with no
+pointer/refcount/random appearance contribution.
+
+Lifecycle-only exact replays: Steel Harbor winsP1 at48279; GreatBritain/America winsP0 at78811;
+France/Germany still None288000. A read-only economy probe proves actual late ore deliveries,
+paid production/repair/cancellations, losses and meaningful combat. Actual empty aircraft are
+returning/reloading; the real late Storm is not a timing exception. No forced liquidation or
+limit/valid-win timing change is justified. The controlled AA scenario fails before when
+Harriers attack an economic building through a known longer-range Patriot, and passes after:
+eligible ground explicitly hits/destroys AA, then aircraft resume real economic-target fire.
+The isolated economic target's explicit durable HP prevents premature observation-target loss;
+no normal game receives it. The resulting exact default France/Germany replay winsP1 at164850/
+288000 (112.08s harness/147.064s command), without changing any public rejection exemption.
+
+The observed-AA target/approach rule is a game-owned AI policy assumption derived from actual
+weapon eligibility/armour/positive damage/source ranges/air bonus and existing gather/failure
+policy. It adds no balance quota/weight/radius/schema, changes no source defense/difficulty/
+economy values, and preserves actual empty-aircraft return/reload. Two single negative probes
+fail the intended bridge and strategic assertions, immediately restoring command.rs to exact
+SHA256 f34246f19382754be318b576cbaf19a11245768dfff3543f99c9240ef77acfe4 before further work;
+raw failures/mutations/distinct hashes/restoration evidence remain in integrity JSONs.
+
+All14 RA8 internal lib tests pass; strict all-target Clippy/fmt/generated/reference checks
+pass after a retained needless-borrow diagnostic is corrected. Static inventory1197 versus
+RA7's1124:73 added,none removed/renamed/ignored/unmapped. No existing assertion/fixture/limit
+migration is added after R110; prior exact migration ledger R94/R96/R102/R110 and neutral
+strategy compatibility R108 remain. Earlier65fa8d6 m13 metrics are historical after these
+runtime changes; final-source21-winner and256-mean evidence must be repeated before freeze.
+All previous probes/attempts and original validation logs remain. New external directories:
+none; the retained708KiB configured-Cargo parser scratch and prior RA5/RA7 evidence remain.
+
+
+The completed affected serial preflight now passes483 tests across22 targets,zero failed/
+ignored:243 sim,217 game unit,Demo one test/ten games,twelve exact maps,m10 five,and five
+unchanged production companions. See `ra8-preflight/attempt4-final-preflight-summary.json`.
+All twelve exact cases have explicit winners; maximum242941 remains below its unchanged
+288000 limit. R114 records longer outcomes transparently. No existing migration/assertion/
+rejection exception is added after R110. No validator is active at the source-commit point;
+final-source m13/all21,256-budget and all13 frozen commands remain required.

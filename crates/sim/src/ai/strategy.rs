@@ -260,7 +260,7 @@ pub(super) fn decide(
             });
         }
     }
-    let ground_wave: Vec<_> = view
+    let mut ground_wave: Vec<_> = view
         .own_units
         .iter()
         .filter(|u| {
@@ -270,6 +270,8 @@ pub(super) fn decide(
         })
         .copied()
         .collect();
+    screen_strike_aircraft(view, controller, special, &ground_wave, &mut commands);
+    ground_wave.retain(|unit| !controller.reserved.contains(&unit.id));
     if let Some(target) = controller
         .known
         .iter()
@@ -361,6 +363,168 @@ pub(super) fn decide(
         commands.push(command);
     }
     commands
+}
+
+/// A dock-bound strike plane cannot trade through an observed longer-range AA screen
+/// indefinitely. Let eligible ground wave members clear that screen first; the existing
+/// target failure/arrival policy still handles unreachable jobs and ordinary movement.
+fn screen_strike_aircraft(
+    view: &View<'_>,
+    controller: &mut AiController,
+    special: &crate::SpecialState,
+    wave: &[&UnitSnap],
+    commands: &mut Vec<Command>,
+) {
+    let Some(objective) = controller.known.values().min_by_key(|b| {
+        (
+            b.footprint.distance_to_cell(controller.start),
+            b.footprint.origin,
+        )
+    }) else {
+        return;
+    };
+    let aircraft: Vec<_> = wave
+        .iter()
+        .copied()
+        .filter(|u| {
+            view.definitions
+                .metadata(ProductionItem::Unit(u.kind))
+                .is_some_and(|m| m.airport_bound)
+        })
+        .collect();
+    if aircraft.is_empty() {
+        return;
+    }
+    let barrier = view
+        .enemy_buildings
+        .iter()
+        .filter(|b| {
+            stable(view, b.footprint.origin)
+                && only_aa_building(view.definitions, b.kind)
+                && controller.failures.get(&b.id).copied().unwrap_or(0) < MAX_TARGET_FAILURES
+        })
+        .filter_map(|b| {
+            let terms = view.definitions.building_combat(b.kind)?;
+            let traits = crate::TargetTraits {
+                armour: terms.armour,
+                building: true,
+                immune_psionics: true,
+                wall: terms.wall,
+                bombable: view
+                    .definitions
+                    .metadata(ProductionItem::Building(b.kind))
+                    .is_some_and(|m| m.bombable),
+                ..crate::TargetTraits::default()
+            };
+            let threatened: Vec<_> = aircraft
+                .iter()
+                .copied()
+                .filter(|aircraft| {
+                    let Some(air) = view.definitions.unit_combat(aircraft.kind) else {
+                        return false;
+                    };
+                    let air_traits = crate::TargetTraits {
+                        armour: air.armour,
+                        airborne: true,
+                        immune_psionics: true,
+                        organic: air.organic,
+                        ..crate::TargetTraits::default()
+                    };
+                    let Some((anti_air, percent)) = crate::weapon_against(
+                        view.definitions,
+                        &terms,
+                        terms.weapons(false),
+                        &air_traits,
+                    ) else {
+                        return false;
+                    };
+                    let Some(anti_air) = view
+                        .definitions
+                        .weapon(anti_air)
+                        .filter(|w| w.damage > 0 && percent > 1)
+                    else {
+                        return false;
+                    };
+                    let Some((strike, percent)) =
+                        crate::weapon_against(view.definitions, &air, air.weapons(false), &traits)
+                    else {
+                        return false;
+                    };
+                    let Some(strike) = view
+                        .definitions
+                        .weapon(strike)
+                        .filter(|w| w.damage > 0 && percent > 1)
+                    else {
+                        return false;
+                    };
+                    let reach = anti_air.range.saturating_add(terms.air_range_bonus);
+                    reach > strike.range
+                        && within_reach(
+                            b.footprint,
+                            objective.footprint.origin,
+                            reach.div_ceil(crate::SUBCELLS_PER_CELL as u32),
+                        )
+                        && !within_reach(
+                            b.footprint,
+                            controller.gather,
+                            reach.div_ceil(crate::SUBCELLS_PER_CELL as u32),
+                        )
+                })
+                .collect();
+            if threatened.is_empty() {
+                return None;
+            }
+            let ground: Vec<_> = wave
+                .iter()
+                .copied()
+                .filter(|u| {
+                    view.definitions.domain(u.kind) == Domain::Land
+                        && view.fights(u)
+                        && view.definitions.unit_combat(u.kind).is_some_and(|t| {
+                            crate::weapon_against(view.definitions, &t, t.weapons(false), &traits)
+                                .is_some_and(|(k, p)| {
+                                    p > 1
+                                        && view.definitions.weapon(k).is_some_and(|w| w.damage > 0)
+                                })
+                        })
+                })
+                .map(|u| u.id)
+                .collect();
+            (!ground.is_empty()).then_some((b, threatened, ground))
+        })
+        .min_by_key(|(b, _, _)| (b.footprint.distance_to_cell(controller.start), b.id));
+    let Some((barrier, aircraft, ground)) = barrier else {
+        return;
+    };
+    // Tracking this actual objective preserves the core's bounded arrival/failure handling.
+    controller.target = Some(WaveTarget::Building(barrier.id));
+    controller.reserved.extend(ground.iter().copied());
+    commands.push(Command::Attack {
+        units: ground,
+        target: barrier.id,
+    });
+    let mut hold = Vec::new();
+    for unit in aircraft {
+        controller.reserved.insert(unit.id);
+        let ammo = view
+            .definitions
+            .metadata(ProductionItem::Unit(unit.kind))
+            .map_or(0, |m| m.ammo);
+        // Empty planes retain their normal return/reload cycle. A held plane already on
+        // its way to gather needs no repeated order/path reset on each decision.
+        if special.ammo_of(unit.id, ammo) > 0
+            && (unit.attacking
+                || (unit.idle() && chebyshev(unit.mobile.cell, controller.gather) > GATHER_RADIUS))
+        {
+            hold.push(unit.id);
+        }
+    }
+    if !hold.is_empty() {
+        commands.push(Command::Move {
+            units: hold,
+            target: controller.gather,
+        });
+    }
 }
 
 fn queue_support(view: &View<'_>, needed: Role, commands: &mut Vec<Command>) {
