@@ -316,3 +316,42 @@ required. No independent review is claimed and no new external directory was cre
 Strict all-target Clippy, fmt, generated-data and4934-row reference audit now pass; the sole
 new-test clone_on_copy failure and corrected exact test pass are preserved. All five original
 production companions pass unchanged (raw attempt2-companion captures).
+
+
+## Recovery-runtime refreeze checkpoint
+
+Correction runtime `65fa8d669ac1e14adadc30b2745887071b580bec` is unchanged for all final-source
+evidence. `attempt2-game-exact-final2.log` passes10 functions/19 default pairings, every match
+Won; all nine previously failing pairs have identical winners/ticks to the earlier true-strategy
+run. All original invariants/rejection exemptions/R29 limits remain. R109 preserves the exact
+results and the failed game --lib command alongside the correct217-test binary run.
+
+`ten-player-all-end5.log` exits0:21/21 explicit winners, all ten players building on every map,
+every mean<5ms, unchanged400000 limit. Ending median55554/p90 nearest91393/max331947 (Oasis).
+Measured721.741s/per-map elapsed721.845s; command726.132s includes compilation/setup. Frostline
+Won(P6)53261, mean908.996µs/elapsed48.419s. Oasis's longer ending remains visible; no timing
+workaround is applied. Normal default setup, no cheat/unlock, is used throughout.
+
+The final unprofiled `ten-player256-benchmark5.log` exits0, each24000 ticks/all ten building:
+
+| Map | Mean ms | p99 ms | Maximum ms | Busiest1000 mean ms | Peak units/buildings |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Liberty Bay | 0.867841 | 5.049 | 58.054 | 1.840 | 337/107 |
+| Continental Divide | 0.602632 | 1.925 | 50.904 | 1.172 | 332/104 |
+| Pacific Atoll | 0.704461 | 4.170 | 34.359 | 1.310 | 318/84 |
+
+All means satisfy the unchanged5ms budget. First two maps retain1/2 ticks over50ms; no maximum
+guarantee is claimed. `attempt2-m13-metrics.json` contains every map, budget and command result.
+
+`checkpoint3.json` maps1187 static tests/63 added/zero removed/renamed/ignored/unmapped,
+236-test/13-target disjoint sim preflight, five unchanged production companions, all strict
+lint/data checks, exact R94/R96/R102 migration ledger and R108 compatibility diagnosis. No
+source/data/script edits follow65fa8d6; View's army_commandable witness filter remains intact.
+Both failed frozen attempts and all failed probes remain. Both756-winner final sweeps/R29
+comparisons and all13 commands remain pending; the committed checkpoint is held for the
+parent's required milestone check before launch. Validated preflight, not independent review.
+
+R83/R96/R99 remain RA9 handoffs; R97's mechanism is closed by R103. R91/R92 AI policy/source
+mapping and R67 bridge assumptions, earlier programme debt and user visual/audio/play-feel
+verification remain explicit. No new external directory: configured Cargo parser scratch
+708KiB is retained/recreatable/not required for release, with earlier RA5/RA7 evidence preserved.
