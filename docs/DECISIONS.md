@@ -5858,3 +5858,58 @@ are solely preserved raw captures (406 trailing trace/progress-space lines,20 bl
 `attempt2-staged-whitespace-check1.json` retains every path/line/raw content, the complete
 unfiltered stdout and its SHA256; no source/data/test/doc diagnostic exists. Raw output is
 not edited or broadly exempted. A separate exact-output recheck precedes commit.
+
+
+### R109. RA8 recovery-runtime refreeze with repeated default evidence
+
+**2026-10-16 UTC. Validated preflight, not independently reviewed.** Runtime correction
+`65fa8d669ac1e14adadc30b2745887071b580bec` is unchanged through the final default replays and
+both m13 runs. `attempt2-game-exact-final2.log` passes10 test functions/19 exact default
+matches (the existing ten-Demo-pair replay plus all nine frozen failures), every match Won,
+all original rejection/invariant checks and R29 limits intact; command394.500s. All nine
+endings match the preceding true-strategy run, confirming the neutral opt-out correction
+preserves their shipped behavior. Liberty wins143617/288000, Continental bridge103879,
+Harvest67427, Glacier39516, Red19927, Steel79225 and Wheel38636. The failed game --lib
+invocation is retained separately: game has only a binary target; the corrected --bin game
+run passes217 tests. No passing package/library target is invented.
+
+Final `ten-player-all-end5.log` exits0 with21/21 explicit Won outcomes, all ten players
+building on each map and every mean<5ms. Ending median55554/p90 nearest-rank91393/max331947
+(Oasis Gulf), within unchanged400000 outer limit. Measured721.741s/per-map elapsed721.845s;
+command726.132s includes compilation/setup. Frostline Won(P6)53261, mean908.996µs/48.419s.
+Oasis is longer than the previous runtime's outcome and remains visible in the distribution;
+no artificial timing intervention or hidden target knowledge is introduced.
+
+Final `ten-player256-benchmark5.log` exits0,24000 ticks and all ten players building per map.
+Liberty/Continental/Pacific means0.867841/0.602632/0.704461ms satisfy the unchanged5ms budget;
+p99 is5.049/1.925/4.170ms, max58.054/50.904/34.359ms, busiest1000 mean1.840/1.172/1.310ms.
+The first two retain1/2 ticks above50ms; no maximum guarantee is claimed. These are unprofiled
+normal default setup runs, without Super Me or unlock, on the committed runtime. Full per-map
+fields and command durations are in `attempt2-m13-metrics.json` and default-results JSON.
+
+`checkpoint3.json` records1187 static tests/63 added versus RA7's1124,zero removed/renamed/
+ignored/unmapped;236-test serial sim preflight across13 targets; all five unchanged production
+companions; strict Clippy/fmt/generator/4934-row audit; exact migration and failure ledgers;
+both unchanged before-R29 distributions; and retained RA9/user-verification/storage work.
+R108 adds only diagnostics to an old test and restores its existing strategy opt-out; it does
+not migrate an assertion or fixture. The source validity explanation remains: View::new filters
+own_units through army_commandable before intent witnesses; recoverable Prop Deploy is distinct.
+
+No source/data/script edit follows65fa8d6. Both failed frozen attempts and every earlier
+probe remain preserved. The complete thirteen-command gate and both756-winner final R29
+before/after distributions remain required; gate launch is held briefly for the parent's
+required milestone checks of committed artifacts. This is not independent review or RA8
+closure. R83 transport-size/loaded-boarding/actual Squid-host firing, R96 actorless occupied-Prop
+ability boundaries and R99 source-only unproven bombable=false lead remain RA9 work. R97's
+mechanism is closed by R103, not deferred as known broken play. R91/R92 game-owned composition,
+policy offsets/source-weight mapping and R67 bridge assumption remain explicit; earlier
+programme assumptions/debt and user visual/audio/play-feel verification remain.
+
+No new external directory is created. Configured Cargo target is preserved; its recreatable
+`tmp/ra8_definitions` remains708KiB for reruns only. Earlier RA5 render/RA7 scratch evidence is
+retained; UV/PIP variables unchanged. No clone/worktree/environment or substantial tmp artifact.
+
+The separately inspected checkpoint staged check exits2, not a pass, solely for preserved
+`attempt2-game-exact-final2.log:551` blank EOF. Exact raw line/unfiltered stdout are retained
+in `checkpoint3-staged-whitespace-check.json`; a separate exact-output recheck precedes the
+checkpoint commit. No source/data/test/doc diagnostic or raw evidence edit occurs.
