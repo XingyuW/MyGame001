@@ -2,8 +2,8 @@
 
 Status: first frozen attempt failed and was stopped. R102 records the complete-plan test
 correction; the broader game preflight then exposed real default-path admission/lifecycle
-defects, fixed in R103. Final-runtime match/budget repeats and a complete thirteen-command
-rerun remain required. This is not an independent review.
+defects, fixed in R103. Corrected final-runtime match/budget repeats pass; the complete
+thirteen-command rerun remains required. This is not an independent review.
 All earlier validation directories and failed RA8 probes are retained.
 
 ## Acceptance checklist
@@ -231,3 +231,35 @@ functions pass at31367/288000 (LibyaBrutal/IraqMedium) and33213/288000
 (LibyaBrutal/GermanyBrutal). `refreeze2-test-inventory.json` records1124→1172 static tests,
 48 added,zero removed/renamed/ignored. Final-source default-match/budget repeats and all13
 gate commands remain pending; no independent review is claimed.
+
+## Corrected-runtime refreeze checkpoint
+
+Runtime `d840b44797a81b66ae284d0bcb623499c6cc8a86` is unchanged through both repeated default-path
+runs. `ten-player-all-end4.log` exits0 with21/21 explicit winners and all ten players building
+on every map; all means are below5ms and all endings satisfy the unchanged400000 limit.
+Ending median63573/p90 nearest-rank106700/max186405 (Arctic Floes); measured744.679s,
+elapsed744.791s. Frostline Won(P6) at63573, mean902.399µs/elapsed57.375s. Pacific Atoll Won(P3)
+at66076, mean508.810µs. No cheat or alternate setup path is used.
+
+The final `ten-player256-benchmark4.log` exits0, each map24000 normal ticks/all ten building:
+
+| Map | Mean ms | p99 ms | Maximum ms | Busiest1000 mean ms | Peak units/buildings |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Liberty Bay | 0.739225 | 4.269 | 52.777 | 1.495 | 337/107 |
+| Continental Divide | 0.628747 | 3.346 | 48.205 | 1.093 | 332/104 |
+| Pacific Atoll | 0.560533 | 2.287 | 31.618 | 1.070 | 318/84 |
+
+All means satisfy the unchanged5ms budget; Liberty has one tick above50ms, so no maximum
+guarantee is claimed. `refreeze-m13-metrics.json` retains all per-map fields and exact runtime.
+
+Witness validity source explanation: `ai.rs::View::new` filters own_units through
+`army_commandable` before witness capture. It excludes spawned/flights/erasures/deployed,
+interacting/docked/rearming/disabled units. Recoverable occupied Props use the distinct Deploy
+branch. The parent checked this concern and confirmed the filter already resolves it; no
+source mutation or interruption of the healthy sweep was needed.
+
+`checkpoint2.json` records1172 static tests/48 added/zero removed/renamed/ignored, exact
+migration/evidence/storage/handoff paths and both RA7 R29 baselines, with the final two756-match
+distributions still pending. R97's lifecycle mechanism is fixed in R103; R83/R96/R99 handoffs
+remain. No new external directory was created; parser scratch remains708KiB. The gate is held
+for required parent milestone checks of committed artifacts before the exact all13 rerun.
