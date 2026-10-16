@@ -376,6 +376,10 @@ fn commandable(world: &World, id: SimId) -> Result<(), RejectReason> {
     if world.resource::<SpecialState>().erasures.contains_key(&id) {
         return Err(unavailable("Target is being erased"));
     }
+    commandable_except_erasure(world, id)
+}
+
+fn commandable_except_erasure(world: &World, id: SimId) -> Result<(), RejectReason> {
     if world.resource::<SpecialState>().spawned.contains_key(&id)
         || world
             .resource::<SpecialState>()
@@ -407,7 +411,7 @@ mod repair;
 mod resolve;
 mod state;
 pub(crate) mod superweapons;
-pub(crate) use superweapons::strategic_intent_valid;
+pub(crate) use superweapons::{strategic_intent_erasure_only, strategic_intent_valid};
 mod transport;
 pub(crate) mod vehicles;
 

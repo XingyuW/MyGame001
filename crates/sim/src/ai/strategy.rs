@@ -76,6 +76,20 @@ pub(super) fn decide(
     }
     let mut commands = Vec::new();
     naval(view, controller);
+    if !service_income(view) {
+        for unit in &view.recoverable_service {
+            if service_cost(view, unit).is_some_and(|cost| view.state.credits() < cost) {
+                commands.push(Command::Move {
+                    units: vec![unit.id],
+                    target: if view.definitions.domain(unit.kind) == Domain::Naval {
+                        unit.mobile.cell
+                    } else {
+                        controller.gather
+                    },
+                });
+            }
+        }
+    }
     // One paid building repair per decision; the ordinary repair system retains the toggle.
     if let Some(building) = view.own_buildings.iter().find(|b| {
         view.definitions
@@ -142,7 +156,9 @@ pub(super) fn decide(
         let Some(health) = view.definitions.unit_combat(unit.kind) else {
             continue;
         };
-        if meta.infantry
+        if (!service_income(view)
+            && service_cost(view, unit).is_some_and(|cost| view.state.credits() < cost))
+            || meta.infantry
             || meta.domain == Domain::Air
             || unit.hp >= health.hit_points
             || chebyshev(unit.mobile.cell, controller.start) > view.ai.policy.depot_radius
@@ -270,6 +286,10 @@ pub(super) fn decide(
         })
         .copied()
         .collect();
+    // Service/specialist reservations above exclude unavailable actors. An active
+    // combat clearance job below reserves against conflicting tactical orders only;
+    // its actual wave remains eligible for ordinary Curtain/Chronosphere support.
+    let combat_support = strategic(view, controller, special, &ground_wave);
     screen_strike_aircraft(view, controller, special, &ground_wave, &mut commands);
     ground_wave.retain(|unit| !controller.reserved.contains(&unit.id));
     if let Some(target) = controller
@@ -359,7 +379,7 @@ pub(super) fn decide(
             });
         }
     }
-    if let Some(command) = strategic(view, controller, special, &ground_wave) {
+    if let Some(command) = combat_support {
         commands.push(command);
     }
     commands
@@ -496,35 +516,379 @@ fn screen_strike_aircraft(
     let Some((barrier, aircraft, ground)) = barrier else {
         return;
     };
-    // Tracking this actual objective preserves the core's bounded arrival/failure handling.
+    let Some(barrier_terms) = view.definitions.building_combat(barrier.kind) else {
+        return;
+    };
+    let traits = crate::TargetTraits {
+        armour: barrier_terms.armour,
+        building: true,
+        immune_psionics: true,
+        wall: barrier_terms.wall,
+        bombable: view
+            .definitions
+            .metadata(ProductionItem::Building(barrier.kind))
+            .is_some_and(|m| m.bombable),
+        ..crate::TargetTraits::default()
+    };
+    let target_extent = crate::combat::Extent::footprint(barrier.footprint);
+    let mut remaining = u32::MAX;
+    let mut distance = u32::MAX;
+    for unit in wave.iter().copied().filter(|u| ground.contains(&u.id)) {
+        distance = distance.min(barrier.footprint.distance_to_cell(unit.mobile.cell));
+        let Some(terms) = view.definitions.unit_combat(unit.kind) else {
+            continue;
+        };
+        let Some((weapon, _)) =
+            crate::weapon_against(view.definitions, &terms, terms.weapons(false), &traits)
+        else {
+            continue;
+        };
+        let Some(weapon) = view.definitions.weapon(weapon) else {
+            continue;
+        };
+        let covers = |position| {
+            let (dx, dy) = crate::combat::Extent::point(position).gap(&target_extent);
+            crate::in_range(dx, dy, weapon.range)
+                && !crate::inside_min_range(dx, dy, weapon.min_range)
+        };
+        if covers(unit.mobile.position(view.grid, unit.id)) {
+            remaining = 0;
+        } else if let Some((goal, best)) = unit.move_progress
+            && covers(crate::SubPos::centre_of(goal))
+        {
+            remaining = remaining.min(best);
+        }
+    }
+    let progress = controller
+        .air_screens
+        .entry(barrier.id)
+        .or_insert(AirScreenProgress {
+            remaining,
+            distance,
+            hp: barrier.hp,
+            last_progress: view.tick,
+        });
+    progress.advance(remaining, distance, barrier.hp, view.tick);
+    // The deadline belongs to this observed target, not to the current recruits.
+    // A failed job stays released until actual closer approach or damage improves it.
+    if view.tick.saturating_sub(progress.last_progress)
+        >= u64::from(controller.difficulty.wave_patience)
+    {
+        return;
+    }
+    let mut focus = Vec::new();
+    let mut approach = Vec::new();
+    let mut intercepts: BTreeMap<SimId, Vec<SimId>> = BTreeMap::new();
+    let mut ground_stalled = wave
+        .iter()
+        .filter(|u| ground.contains(&u.id))
+        .all(|u| u.idle() && u.combat_target.is_none());
+    for unit in wave.iter().copied().filter(|u| ground.contains(&u.id)) {
+        let Some(terms) = view.definitions.unit_combat(unit.kind) else {
+            continue;
+        };
+        let own_traits = screen_unit_traits(view, unit, &terms);
+        let from = crate::combat::Extent::point(unit.mobile.position(view.grid, unit.id));
+        let threat = view
+            .enemy_units
+            .iter()
+            .filter_map(|enemy| {
+                let enemy_terms = view.definitions.unit_combat(enemy.kind)?;
+                let (hostile_weapon, percent) = crate::weapon_against(
+                    view.definitions,
+                    &enemy_terms,
+                    enemy_terms.weapons(false),
+                    &own_traits,
+                )?;
+                if percent <= 1 || view.definitions.weapon(hostile_weapon)?.damage <= 0 {
+                    return None;
+                }
+                let enemy_traits = screen_unit_traits(view, enemy, &enemy_terms);
+                let (weapon, percent) = crate::weapon_against(
+                    view.definitions,
+                    &terms,
+                    terms.weapons(false),
+                    &enemy_traits,
+                )?;
+                let weapon = view.definitions.weapon(weapon)?;
+                let (dx, dy) = from.gap(&crate::combat::Extent::point(
+                    enemy.mobile.position(view.grid, enemy.id),
+                ));
+                let reach =
+                    weapon
+                        .range
+                        .saturating_add(if enemy_traits.airborne && weapon.anti_air {
+                            terms.air_range_bonus
+                        } else {
+                            0
+                        });
+                (percent > 1
+                    && weapon.damage > 0
+                    && crate::in_range(dx, dy, reach)
+                    && !crate::inside_min_range(dx, dy, weapon.min_range))
+                .then_some((
+                    dx.saturating_mul(dx).saturating_add(dy.saturating_mul(dy)),
+                    enemy.id,
+                ))
+            })
+            .min();
+        if let Some((_, target)) = threat {
+            ground_stalled = false;
+            let matching = matches!(unit.attack_order, Some(crate::AttackOrder::Attack { target: current, .. }) if current == target)
+                || (matches!(
+                    unit.attack_order,
+                    Some(crate::AttackOrder::AttackMove { .. })
+                ) && unit.combat_target == Some(target));
+            if !matching {
+                intercepts.entry(target).or_default().push(unit.id);
+            }
+            continue;
+        }
+        if matches!(unit.attack_order, Some(crate::AttackOrder::Attack { target, .. }) if target == barrier.id)
+        {
+            // Reissuing Attack resets the chase/path failure history every decision.
+            continue;
+        }
+        let Some((weapon, _)) =
+            crate::weapon_against(view.definitions, &terms, terms.weapons(false), &traits)
+        else {
+            continue;
+        };
+        let Some(weapon) = view.definitions.weapon(weapon) else {
+            continue;
+        };
+        let covers = |position| {
+            let (dx, dy) = crate::combat::Extent::point(position).gap(&target_extent);
+            crate::in_range(dx, dy, weapon.range)
+                && !crate::inside_min_range(dx, dy, weapon.min_range)
+        };
+        ground_stalled &= !covers(unit.mobile.position(view.grid, unit.id));
+        let incidental_safe_building = unit.combat_target.is_some_and(|target| {
+            view.enemy_buildings.iter().any(|building| {
+                building.id == target
+                    && building.economy
+                    && only_aa_building(view.definitions, building.kind)
+            })
+        });
+        if covers(unit.mobile.position(view.grid, unit.id)) || incidental_safe_building {
+            // An ordinary approach may stop for an unarmed economy building before
+            // reaching the AA. Keep the clearance objective, while ordinary combat
+            // against intervening ground threats is allowed to finish.
+            focus.push(unit.id);
+        } else if !matches!(unit.attack_order, Some(crate::AttackOrder::AttackMove { destination, .. })
+            if covers(crate::SubPos::centre_of(destination)))
+        {
+            // Travel through ordinary combat rather than walking past observed enemies.
+            // A matching approach keeps its movement progress and bounded failure state.
+            approach.push(unit.id);
+        }
+    }
+    // A returning/holding plane is not progress by the ground clearance team. The
+    // core already counts failed all-idle waves; count the same bounded failure when
+    // only those planes keep it active. Own movement/combat outcomes supply the fact,
+    // without probing unseen blockers or delaying legitimate movement/firing.
+    if ground_stalled && wave.iter().any(|u| !u.idle()) {
+        let failures = controller.failures.entry(barrier.id).or_default();
+        *failures = failures.saturating_add(1);
+        if *failures >= MAX_TARGET_FAILURES {
+            return;
+        }
+    }
     controller.target = Some(WaveTarget::Building(barrier.id));
     controller.reserved.extend(ground.iter().copied());
-    commands.push(Command::Attack {
-        units: ground,
-        target: barrier.id,
-    });
-    let mut hold = Vec::new();
+    commands.extend(
+        intercepts
+            .into_iter()
+            .map(|(target, units)| Command::Attack { units, target }),
+    );
+    if !focus.is_empty() {
+        commands.push(Command::Attack {
+            units: focus,
+            target: barrier.id,
+        });
+    }
+    if !approach.is_empty() {
+        commands.push(Command::AttackMove {
+            units: approach,
+            target: barrier.footprint.origin,
+        });
+    }
+    let mut waiting = BTreeSet::new();
     for unit in aircraft {
         controller.reserved.insert(unit.id);
         let ammo = view
             .definitions
             .metadata(ProductionItem::Unit(unit.kind))
             .map_or(0, |m| m.ammo);
-        // Empty planes retain their normal return/reload cycle. A held plane already on
-        // its way to gather needs no repeated order/path reset on each decision.
-        if special.ammo_of(unit.id, ammo) > 0
-            && (unit.attacking
-                || (unit.idle() && chebyshev(unit.mobile.cell, controller.gather) > GATHER_RADIUS))
+        // Empty planes keep the actual dock return/reload cycle. Loaded aircraft wait
+        // outside known source-AA reach near this job, rather than crossing the map home.
+        if special.ammo_of(unit.id, ammo) == 0 {
+            continue;
+        }
+        let Some(target) = air_wait_cell(view, controller, unit, barrier, &waiting) else {
+            continue;
+        };
+        waiting.insert(target);
+        if unit.attacking
+            || (unit.move_progress.map(|(goal, _)| goal) != Some(target)
+                && (unit.mobile.cell != target || unit.mobile.step.is_some()))
         {
-            hold.push(unit.id);
+            commands.push(Command::Move {
+                units: vec![unit.id],
+                target,
+            });
         }
     }
-    if !hold.is_empty() {
-        commands.push(Command::Move {
-            units: hold,
-            target: controller.gather,
-        });
+}
+
+fn air_wait_cell(
+    view: &View<'_>,
+    controller: &AiController,
+    unit: &UnitSnap,
+    barrier: &BuildingSnap,
+    waiting: &BTreeSet<CellPos>,
+) -> Option<CellPos> {
+    let terms = view.definitions.unit_combat(unit.kind)?;
+    let traits = screen_unit_traits(view, unit, &terms);
+    let reach = |enemy: &crate::CombatTerms| {
+        let (kind, percent) =
+            crate::weapon_against(view.definitions, enemy, enemy.weapons(false), &traits)?;
+        let weapon = view.definitions.weapon(kind)?;
+        (percent > 1 && weapon.damage > 0).then_some((
+            weapon.range.saturating_add(enemy.air_range_bonus),
+            weapon.min_range,
+        ))
+    };
+    let (range, _) = reach(&view.definitions.building_combat(barrier.kind)?)?;
+    // One cell beyond the rounded-up source envelope. This is geometry, not a policy radius.
+    let radius = i64::from(range.div_ceil(crate::SUBCELLS_PER_CELL as u32)) + 1;
+    let x0 = i64::from(barrier.footprint.origin.x) - radius;
+    let x1 =
+        i64::from(barrier.footprint.origin.x) + i64::from(barrier.footprint.width) - 1 + radius;
+    let y0 = i64::from(barrier.footprint.origin.y) - radius;
+    let y1 =
+        i64::from(barrier.footprint.origin.y) + i64::from(barrier.footprint.height) - 1 + radius;
+    let safe = |cell: CellPos| {
+        let point = crate::combat::Extent::point(crate::SubPos::centre_of(cell));
+        let threatened = |extent: crate::combat::Extent, enemy: &crate::CombatTerms| {
+            reach(enemy).is_some_and(|(range, minimum)| {
+                let (dx, dy) = extent.gap(&point);
+                crate::in_range(dx, dy, range) && !crate::inside_min_range(dx, dy, minimum)
+            })
+        };
+        !controller.known.values().any(|b| {
+            view.definitions
+                .building_combat(b.kind)
+                .is_some_and(|terms| {
+                    threatened(crate::combat::Extent::footprint(b.footprint), &terms)
+                })
+        }) && !view.enemy_units.iter().any(|u| {
+            view.definitions.unit_combat(u.kind).is_some_and(|terms| {
+                threatened(
+                    crate::combat::Extent::point(u.mobile.position(view.grid, u.id)),
+                    &terms,
+                )
+            })
+        })
+    };
+    let available = |cell| {
+        view.vision.is_explored(cell)
+            && view.grid.passable_for(cell, Domain::Air)
+            && !waiting.contains(&cell)
+            && view.grid.room_in(cell, Domain::Air, false, |id| {
+                id != unit.id && view.known_occupants.contains(&id)
+            }) > 0
+            && safe(cell)
+    };
+    let perimeter = |cell: CellPos| {
+        let (x, y) = (i64::from(cell.x), i64::from(cell.y));
+        (x == x0 || x == x1) && (y0..=y1).contains(&y)
+            || (y == y0 || y == y1) && (x0..=x1).contains(&x)
+    };
+    if let Some((goal, _)) = unit.move_progress
+        && perimeter(goal)
+        && available(goal)
+    {
+        return Some(goal);
     }
+    if perimeter(unit.mobile.cell) && available(unit.mobile.cell) {
+        return Some(unit.mobile.cell);
+    }
+    let mut cells = BTreeSet::new();
+    for y in y0.max(0)..=y1.min(i64::from(view.grid.height()) - 1) {
+        for x in [x0, x1] {
+            if x >= 0 && x < i64::from(view.grid.width()) {
+                cells.insert(CellPos::new(x as i32, y as i32));
+            }
+        }
+    }
+    for x in x0.max(0)..=x1.min(i64::from(view.grid.width()) - 1) {
+        for y in [y0, y1] {
+            if y >= 0 && y < i64::from(view.grid.height()) {
+                cells.insert(CellPos::new(x as i32, y as i32));
+            }
+        }
+    }
+    cells
+        .into_iter()
+        .filter(|&cell| available(cell))
+        .min_by_key(|&cell| (octile_distance(unit.mobile.cell, cell), cell.y, cell.x))
+        .or_else(|| available(unit.mobile.cell).then_some(unit.mobile.cell))
+        .or_else(|| available(controller.gather).then_some(controller.gather))
+}
+
+fn service_income(view: &View<'_>) -> bool {
+    let refinery = view.own_kinds.iter().any(|&kind| {
+        view.definitions
+            .building(kind)
+            .is_some_and(|b| b.credits_per_ore.is_some())
+    });
+    (refinery
+        && view
+            .own_units
+            .iter()
+            .any(|u| u.harvest.is_some_and(|h| h != HarvestState::Idle)))
+        || view.own_buildings.iter().any(|b| {
+            view.definitions
+                .metadata(ProductionItem::Building(b.kind))
+                .is_some_and(|m| m.cash_amount > 0)
+        })
+}
+
+fn service_cost(view: &View<'_>, unit: &UnitSnap) -> Option<i64> {
+    let rules = &view.definitions.rules()?.economy;
+    let cost = view
+        .definitions
+        .production(ProductionItem::Unit(unit.kind))?
+        .cost;
+    let maximum = view.definitions.unit_combat(unit.kind)?.hit_points;
+    Some(crate::repair_step_cost(
+        rules,
+        cost,
+        maximum,
+        view.state.super_me,
+    ))
+}
+
+fn screen_unit_traits(
+    view: &View<'_>,
+    unit: &UnitSnap,
+    terms: &crate::CombatTerms,
+) -> crate::TargetTraits {
+    let mut traits = crate::combat::traits_of(
+        view.grid,
+        unit.id,
+        terms.armour,
+        &crate::combat::Body::Unit {
+            cell: unit.mobile.cell,
+            next: unit.mobile.step.map(|step| step.to),
+        },
+        Some(terms),
+    );
+    if let Some(meta) = view.definitions.metadata(ProductionItem::Unit(unit.kind)) {
+        traits.immune_psionics |= meta.immune_psionics || meta.role == Role::MindControl;
+    }
+    traits
 }
 
 fn queue_support(view: &View<'_>, needed: Role, commands: &mut Vec<Command>) {
@@ -963,6 +1327,66 @@ fn strike_target(
     })
 }
 
+// The source freeze prevents an arriving vehicle from immediately defending itself.
+// Plan against remembered building and currently observed unit fire only. Public
+// Chronoshift retains its ordinary permissive geometry and ownership validation.
+fn chrono_landing_safe(
+    view: &View<'_>,
+    controller: &AiController,
+    unit: &UnitSnap,
+    cell: CellPos,
+) -> bool {
+    let Some(terms) = view.definitions.unit_combat(unit.kind) else {
+        return false;
+    };
+    let mut traits = crate::combat::traits_of(
+        view.grid,
+        unit.id,
+        terms.armour,
+        &crate::combat::Body::Unit { cell, next: None },
+        Some(&terms),
+    );
+    if let Some(meta) = view.definitions.metadata(ProductionItem::Unit(unit.kind)) {
+        traits.immune_psionics |= meta.immune_psionics || meta.role == Role::MindControl;
+    }
+    let to = crate::combat::Extent::point(crate::SubPos::centre_of(cell));
+    let threatens = |enemy: &crate::CombatTerms, from: crate::combat::Extent| {
+        let Some((weapon, percent)) =
+            crate::weapon_against(view.definitions, enemy, enemy.weapons(false), &traits)
+        else {
+            return false;
+        };
+        let Some(weapon) = view.definitions.weapon(weapon) else {
+            return false;
+        };
+        let (dx, dy) = from.gap(&to);
+        percent > 1
+            && weapon.damage > 0
+            && crate::in_range(
+                dx,
+                dy,
+                weapon.range.saturating_add(if traits.airborne {
+                    enemy.air_range_bonus
+                } else {
+                    0
+                }),
+            )
+            && !crate::inside_min_range(dx, dy, weapon.min_range)
+    };
+    !controller.known.values().any(|b| {
+        view.definitions
+            .building_combat(b.kind)
+            .is_some_and(|t| threatens(&t, crate::combat::Extent::footprint(b.footprint)))
+    }) && !view.enemy_units.iter().any(|u| {
+        view.definitions.unit_combat(u.kind).is_some_and(|t| {
+            threatens(
+                &t,
+                crate::combat::Extent::point(u.mobile.position(view.grid, u.id)),
+            )
+        })
+    })
+}
+
 fn strategic(
     view: &View<'_>,
     controller: &AiController,
@@ -978,6 +1402,7 @@ fn strategic(
             || (!view.superweapons && meta.role.major_superweapon())
             || (meta.is_powered && view.state.low_power())
             || special.disabled.contains_key(&building.id)
+            || special.erasures.contains_key(&building.id)
             || special.charge.get(&building.id).copied().unwrap_or(0) < meta.cooldown
         {
             continue;
@@ -1052,9 +1477,18 @@ fn strategic(
                 let Some(source) = source else {
                     continue;
                 };
+                let group: Vec<_> = view
+                    .owned_units
+                    .iter()
+                    .copied()
+                    .filter(|u| chebyshev(u.mobile.cell, source) <= 1)
+                    .collect();
                 if !stable(view, source)
-                    || view.own_units.iter().any(|u| {
-                        view.definitions.on_foot(u.kind) && chebyshev(u.mobile.cell, source) <= 1
+                    || group.iter().any(|u| {
+                        view.definitions.on_foot(u.kind)
+                            || (meta.role == Role::Chronosphere
+                                && (view.definitions.domain(u.kind) == Domain::Air
+                                    || !view.own_units.iter().any(|active| active.id == u.id)))
                     })
                 {
                     continue;
@@ -1077,27 +1511,24 @@ fn strategic(
                             base.y
                                 .saturating_add((base.y - controller.start.y).signum() * radius),
                         );
-                        let legal = view
-                            .own_units
-                            .iter()
-                            .filter(|u| chebyshev(u.mobile.cell, source) <= 1)
-                            .all(|u| {
-                                let cell = CellPos::new(
-                                    dest.x.saturating_add(u.mobile.cell.x - source.x),
-                                    dest.y.saturating_add(u.mobile.cell.y - source.y),
-                                );
-                                stable(view, cell)
-                                    && view
-                                        .grid
-                                        .passable_for(cell, view.definitions.domain(u.kind))
-                                    && view.grid.building(cell).is_none()
-                                    && view.grid.room_in(
-                                        cell,
-                                        view.definitions.domain(u.kind),
-                                        view.definitions.on_foot(u.kind),
-                                        |id| view.known_occupants.contains(&id),
-                                    ) > 0
-                            });
+                        let legal = group.iter().all(|u| {
+                            let cell = CellPos::new(
+                                dest.x.saturating_add(u.mobile.cell.x - source.x),
+                                dest.y.saturating_add(u.mobile.cell.y - source.y),
+                            );
+                            stable(view, cell)
+                                && view
+                                    .grid
+                                    .passable_for(cell, view.definitions.domain(u.kind))
+                                && view.grid.building(cell).is_none()
+                                && chrono_landing_safe(view, controller, u, cell)
+                                && view.grid.room_in(
+                                    cell,
+                                    view.definitions.domain(u.kind),
+                                    view.definitions.on_foot(u.kind),
+                                    |id| view.known_occupants.contains(&id),
+                                ) > 0
+                        });
                         if legal {
                             return Some(Command::Chronoshift {
                                 building: building.id,

@@ -3345,6 +3345,9 @@ fn ra8_air_strikes_wait_for_ground_to_clear_an_observed_outranging_aa_screen() {
     eprintln!(
         "AA screen destroyed {screen_destroyed}; eligible ground focus {ground_focus}/hit {ground_hit}; aircraft released {aircraft_released}"
     );
+    if !ground_focus || !ground_hit || !aircraft_released {
+        dump_screen(&mut app);
+    }
     assert!(
         ground_focus && ground_hit,
         "eligible ground units must clear the known AA, not let strike aircraft repeatedly pay for the same barrier"
@@ -3353,4 +3356,1296 @@ fn ra8_air_strikes_wait_for_ground_to_clear_an_observed_outranging_aa_screen() {
         screen_destroyed && aircraft_released,
         "air strikes resume actual combat after the observed barrier is gone"
     );
+}
+
+fn distant_screen(blocked: bool) -> (App, Vec<sim::SimId>, Vec<sim::SimId>, sim::SimId) {
+    distant_screen_options(blocked, false)
+}
+
+fn distant_screen_options(
+    blocked: bool,
+    superweapons: bool,
+) -> (App, Vec<sim::SimId>, Vec<sim::SimId>, sim::SimId) {
+    let mut app = scenario("germany", "medium", 0, 0, superweapons);
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    put(&mut app, "nuclear_reactor", 2, 2);
+    put(&mut app, "spy_satellite", 10, 2);
+    put(&mut app, "airforce_command", 2, 12);
+    let economic = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "soviet_barracks",
+        CellPos::new(34, 12),
+    )
+    .unwrap();
+    // Keep the observed objective alive while testing the approach, not damage balance.
+    let entity = unit_entity(&mut app, economic);
+    app.world_mut()
+        .get_mut::<sim::Health>(entity)
+        .unwrap()
+        .hit_points = 1_000_000;
+    let aa = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "patriot",
+        CellPos::new(38, 14),
+    )
+    .unwrap();
+    sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "nuclear_reactor",
+        CellPos::new(42, 2),
+    )
+    .unwrap();
+    if blocked {
+        let mut grid = app.world_mut().resource_mut::<Grid>();
+        for y in 0..48 {
+            grid.set_terrain(
+                CellPos::new(22, y),
+                Cell {
+                    passable: false,
+                    buildable: false,
+                    water: true,
+                    ore: 0,
+                },
+            );
+        }
+    }
+    // Establish a ready wave on the actual clock before actors exist. Otherwise idle
+    // artillery can shoot the interceptor before the AI's first offensive decision.
+    for _ in 0..6000 {
+        step(&mut app);
+    }
+    let ground = [
+        ("prism_tank", 15, 15),
+        ("prism_tank", 16, 15),
+        ("grizzly", 15, 17),
+        ("grizzly", 16, 17),
+    ]
+    .into_iter()
+    .map(|(kind, x, y)| spawn_unit(app.world_mut(), PlayerId(0), kind, CellPos::new(x, y)).unwrap())
+    .collect();
+    let air = [10, 12, 14]
+        .into_iter()
+        .map(|x| spawn_unit(app.world_mut(), PlayerId(0), "harrier", CellPos::new(x, 14)).unwrap())
+        .collect();
+    step(&mut app);
+    app.world_mut().insert_resource(controllers);
+    (app, ground, air, aa)
+}
+
+#[test]
+fn ra8_distant_aa_clearance_fights_an_observed_interceptor_en_route() {
+    let (mut app, ground, _, aa) = distant_screen(false);
+    let mut interceptor = None;
+    let mut fought = false;
+    for _ in 0..12000 {
+        for event in step(&mut app) {
+            fought |= matches!(event, sim::SimEvent::WeaponFired { attacker, target, .. }
+                if ground.contains(&attacker) && Some(target) == interceptor);
+        }
+        // Introduce an observed tank after the clearance job really issued its AA
+        // focus, so idle fire or incidental splash cannot satisfy the regression.
+        if interceptor.is_none() && app.world().resource::<CommandQueue>().iter().any(|issued|
+            matches!(&issued.command, Command::Attack {units,target} if *target == aa && units.iter().any(|id|ground.contains(id)))) {
+            let entity = unit_entity(&mut app, ground[0]);
+            let cell = app.world().get::<sim::Mobile>(entity).unwrap().cell;
+            let cell = CellPos::new(cell.x + 3, cell.y + 3);
+            interceptor = Some(spawn_unit(app.world_mut(),PlayerId(1),"rhino",cell).unwrap());
+        }
+        if fought {
+            break;
+        }
+    }
+    eprintln!("controlled interceptor installed {interceptor:?}; fought {fought}");
+    if !fought {
+        dump_screen(&mut app);
+    }
+    assert!(
+        interceptor.is_some() && fought,
+        "AA clearance bypassed the observed hostile tank instead of fighting along its approach"
+    );
+}
+
+fn dump_screen(app: &mut App) {
+    let world = app.world_mut();
+    eprintln!(
+        "controlled screen tick{:?} {:?}",
+        world.resource::<sim::SimTick>(),
+        world.resource::<sim::AiPlayers>()
+    );
+    for (id, owner, unit, mobile, hp, weapon, orders) in world
+        .query::<(
+            &sim::SimId,
+            &sim::Owner,
+            &sim::Unit,
+            &sim::Mobile,
+            &sim::Health,
+            Option<&sim::Weapon>,
+            &sim::Orders,
+        )>()
+        .iter(world)
+    {
+        eprintln!("controlled {id:?} {owner:?} {unit:?} {mobile:?} {hp:?} {weapon:?} {orders:?}");
+    }
+}
+
+#[test]
+fn ra8_an_unreachable_ground_screen_does_not_hold_strike_aircraft_forever() {
+    let (mut app, ground, air, aa) = distant_screen(true);
+    let mut released = false;
+    let mut clearance_ordered = false;
+    for _ in 0..12000 {
+        step(&mut app);
+        clearance_ordered |=
+            app.world()
+                .resource::<CommandQueue>()
+                .iter()
+                .any(|issued| match &issued.command {
+                    Command::Attack { units, target } => {
+                        *target == aa && units.iter().any(|id| ground.contains(id))
+                    }
+                    Command::AttackMove { units, target } => {
+                        *target == CellPos::new(38, 14)
+                            && units.iter().any(|id| ground.contains(id))
+                    }
+                    _ => false,
+                });
+        released |= ordinary_air_raid_queued(&app, &air);
+        if released {
+            break;
+        }
+    }
+    assert!(
+        clearance_ordered && released,
+        "aircraft stayed held behind ground units separated from the screen by impassable terrain"
+    );
+}
+
+#[test]
+fn ra8_an_existing_aa_clearance_attack_keeps_its_chase_history() {
+    let (mut app, ground, _, aa) = distant_screen(false);
+    let aa_entity = unit_entity(&mut app, aa);
+    let footprint = app
+        .world()
+        .get::<sim::Building>(aa_entity)
+        .unwrap()
+        .footprint;
+    let defs = app.world().resource::<sim::Definitions>().clone();
+    let mut tracked = None;
+    for _ in 0..12000 {
+        step(&mut app);
+        let tick = app.world().resource::<SimTick>().0;
+        if let Some((entity, since)) = tracked {
+            if tick >= since + 40 {
+                let weapon = app.world().get::<sim::Weapon>(entity).unwrap();
+                assert!(
+                    matches!(weapon.order, Some(sim::AttackOrder::Attack { target, chases }) if target == aa && chases >= 2),
+                    "a matching healthy clearance attack lost its bounded chase history: {weapon:?}"
+                );
+                assert!(
+                    app.world()
+                        .get::<sim::Orders>(entity)
+                        .unwrap()
+                        .current
+                        .is_some()
+                );
+                return;
+            }
+        } else {
+            for id in &ground {
+                let entity = unit_entity(&mut app, *id);
+                let mobile = *app.world().get::<sim::Mobile>(entity).unwrap();
+                let weapon = *app.world().get::<sim::Weapon>(entity).unwrap();
+                let range = defs
+                    .weapon(weapon.kind)
+                    .unwrap()
+                    .range
+                    .div_ceil(sim::SUBCELLS_PER_CELL as u32);
+                if matches!(weapon.order, Some(sim::AttackOrder::Attack { target, .. }) if target == aa)
+                    && app
+                        .world()
+                        .get::<sim::Orders>(entity)
+                        .unwrap()
+                        .current
+                        .is_some()
+                    && footprint.distance_to_cell(mobile.cell) > range + 2
+                {
+                    // Preserve a valid prior chase count on an actual scheduled Attack.
+                    // Forty ticks is two controller turns, short of its firing position.
+                    app.world_mut()
+                        .get_mut::<sim::Weapon>(entity)
+                        .unwrap()
+                        .order = Some(sim::AttackOrder::Attack {
+                        target: aa,
+                        chases: 2,
+                    });
+                    tracked = Some((entity, tick));
+                    break;
+                }
+            }
+        }
+    }
+    panic!("no healthy distant AA clearance attack was established");
+}
+
+#[test]
+fn ra8_reinforcements_without_aa_job_progress_cannot_renew_the_aircraft_hold() {
+    let (mut app, mut ground, air, aa) = distant_screen(true);
+    let mut installed = false;
+    let mut replacements = 0;
+    let mut released = false;
+    for elapsed in 0..12000 {
+        step(&mut app);
+        installed |= app.world().resource::<CommandQueue>().iter().any(|issued|
+            matches!(&issued.command, Command::Attack { units, target } if *target == aa && units.iter().any(|id| ground.contains(id)))
+            || matches!(&issued.command, Command::AttackMove { units, target } if *target == CellPos::new(38,14) && units.iter().any(|id| ground.contains(id))));
+        if installed {
+            // Declared external orders keep every surviving recruit active on our side
+            // of the wall. This isolates job progress from the separate all-idle fallback.
+            issue(
+                &mut app,
+                Command::Move {
+                    units: ground.clone(),
+                    target: CellPos::new(2, 40),
+                },
+            );
+            if elapsed % 80 == 79 {
+                // Fresh, farther participants are real spawned units; the controller's
+                // normal assembly/reinforcement cadence determines when they join.
+                let recruit = (0..225)
+                    .find_map(|index| {
+                        let cell = CellPos::new(3 + index % 15, 27 + index / 15);
+                        spawn_unit(app.world_mut(), PlayerId(0), "grizzly", cell).ok()
+                    })
+                    .expect("fixture has a free cell for a fresh recruit");
+                ground.push(recruit);
+                replacements += 1;
+            }
+        }
+        released |= ordinary_air_raid_queued(&app, &air);
+        if released {
+            break;
+        }
+    }
+    let entity = unit_entity(&mut app, aa);
+    let hp = app.world().get::<sim::Health>(entity).unwrap().hit_points;
+    eprintln!(
+        "reinforced AA job installed={installed}, replacement batches={replacements}, released={released}, AA HP={hp}"
+    );
+    assert!(
+        installed && replacements >= 20 && released && hp == 900,
+        "fresh recruits renewed an unchanged failed AA clearance hold"
+    );
+}
+
+fn slow_screen_ground(app: &mut App) {
+    // A declared units-file fixture makes a healthy approach exceed Medium's
+    // 2400-tick patience. Special advance correctly reapplies data speed each tick.
+    let source = std::fs::read_to_string(data().join("units.ron")).unwrap();
+    let text = source
+        .replace("id: \"grizzly\", speed: 13", "id: \"grizzly\", speed: 1")
+        .replace(
+            "id: \"prism_tank\", speed: 8",
+            "id: \"prism_tank\", speed: 1",
+        );
+    assert_ne!(source, text);
+    let dir = PathBuf::from(std::env::var("CARGO_TARGET_DIR").unwrap()).join("tmp/ra8_definitions");
+    std::fs::create_dir_all(&dir).unwrap();
+    let path = dir.join("slow-aa-units.ron");
+    std::fs::write(&path, text).unwrap();
+    let definitions =
+        sim::load_match_definitions(&path, data().join("economy.ron"), data().join("combat.ron"))
+            .unwrap()
+            .with_rules(data().join("rules.ron"))
+            .unwrap()
+            .with_arsenal(data().join("arsenal.ron"))
+            .unwrap();
+    app.world_mut().insert_resource(definitions);
+}
+
+#[test]
+fn ra8_a_slow_advancing_aa_team_keeps_its_aircraft_hold_beyond_initial_patience() {
+    let (mut app, ground, air, aa) = distant_screen(false);
+    slow_screen_ground(&mut app);
+    let initial: Vec<_> = ground
+        .iter()
+        .map(|id| {
+            let entity = unit_entity(&mut app, *id);
+            app.world().get::<sim::Mobile>(entity).unwrap().cell
+        })
+        .collect();
+    let mut installed = false;
+    for _ in 0..2800 {
+        step(&mut app);
+        installed |= app.world().resource::<CommandQueue>().iter().any(|issued|
+            matches!(&issued.command, Command::AttackMove { units, target } if *target == CellPos::new(38,14) && units.iter().any(|id| ground.contains(id)))
+            || matches!(&issued.command, Command::Attack { units, target } if *target == aa && units.iter().any(|id| ground.contains(id))));
+        let held = !ordinary_air_raid_queued(&app, &air);
+        if !held {
+            eprintln!("slow probe installed={installed}");
+            dump_screen(&mut app);
+        }
+        assert!(held, "healthy slow ground progress lost its aircraft hold");
+    }
+    let advanced = ground.iter().zip(initial).all(|(id, old)| {
+        let entity = unit_entity(&mut app, *id);
+        app.world().get::<sim::Mobile>(entity).unwrap().cell.x > old.x
+    });
+    let entity = unit_entity(&mut app, aa);
+    assert!(
+        installed && advanced && app.world().get::<sim::Health>(entity).unwrap().hit_points == 900,
+        "probe must observe actual slower-than-patience approach before AA damage"
+    );
+}
+
+#[test]
+fn ra8_a_reserved_aa_clearance_wave_still_receives_legal_chronosphere_support() {
+    let (mut app, ground, _, aa) = distant_screen_options(false, true);
+    let source = put(&mut app, "chronosphere", 2, 18);
+    step(&mut app); // Real source announcement initializes its charge.
+    let mut installed = false;
+    for _ in 0..100 {
+        step(&mut app);
+        installed |= app.world().resource::<CommandQueue>().iter().any(|issued|
+            matches!(&issued.command, Command::Attack { units, target } if *target == aa && units.iter().any(|id| ground.contains(id)))
+            || matches!(&issued.command, Command::AttackMove { units, target } if *target == CellPos::new(38,14) && units.iter().any(|id| ground.contains(id))));
+        if installed {
+            break;
+        }
+    }
+    assert!(
+        installed,
+        "probe must establish the actual AA job before readiness"
+    );
+    let defs = app.world().resource::<sim::Definitions>();
+    let cooldown = defs
+        .metadata(sim::ProductionItem::Building(
+            defs.building_kind("chronosphere").unwrap(),
+        ))
+        .unwrap()
+        .cooldown;
+    app.world_mut()
+        .resource_mut::<sim::SpecialState>()
+        .charge
+        .insert(source, cooldown);
+    let mut explicit = false;
+    let mut activated = false;
+    for _ in 0..100 {
+        let events = step(&mut app);
+        explicit |= app.world().resource::<CommandQueue>().iter().any(|issued|
+            matches!(issued.command, Command::Chronoshift { building, .. } if building == source));
+        activated |= events.iter().any(|event|
+            matches!(event, sim::SimEvent::StrategicActivated { building, .. } if *building == source));
+        if activated {
+            break;
+        }
+    }
+    if !activated {
+        dump_screen(&mut app);
+    }
+    assert!(
+        explicit && activated,
+        "movement reservation hid the actual clearance tanks from a ready legal Chronosphere"
+    );
+    assert!(
+        app.world().resource::<sim::SpecialState>().charge[&source] < cooldown,
+        "activation must consume ordinary source readiness"
+    );
+}
+
+#[test]
+fn ra8_strike_aircraft_exploit_a_short_observed_ground_clearance_opening() {
+    let (mut app, ground, air, aa) = distant_screen(false);
+    slow_screen_ground(&mut app);
+    sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "soviet_construction_yard",
+        CellPos::new(38, 16),
+    )
+    .unwrap();
+    let oil = sim::spawn_building(
+        app.world_mut(),
+        sim::NEUTRAL,
+        "oil_derrick",
+        CellPos::new(42, 8),
+    )
+    .unwrap();
+    let engineer = spawn_unit(
+        app.world_mut(),
+        PlayerId(1),
+        "engineer",
+        CellPos::new(41, 8),
+    )
+    .unwrap();
+    step(&mut app); // Actual Engineer sight before the ordinary capture command.
+    let replacement = sim::ProductionItem::Building(
+        app.world()
+            .resource::<sim::Definitions>()
+            .building_kind("flak_cannon")
+            .unwrap(),
+    );
+    for command in [
+        Command::Interact {
+            unit: engineer,
+            target: oil,
+        },
+        Command::QueueProduction { item: replacement },
+    ] {
+        app.world_mut()
+            .resource_mut::<CommandQueue>()
+            .push(sim::IssuedCommand {
+                player: PlayerId(1),
+                command,
+            });
+    }
+    let mut paid_ready = false;
+    let mut killed = None;
+    let mut struck = false;
+    let mut rebuilt = false;
+    for elapsed in 0..12000 {
+        let events = step(&mut app);
+        for event in events {
+            paid_ready |= matches!(event, sim::SimEvent::ProductionComplete { player, item } if player == PlayerId(1) && item == replacement);
+            if matches!(event, sim::SimEvent::BuildingDestroyed { building, .. } if building == aa)
+            {
+                killed = Some(elapsed);
+            }
+            if matches!(event, sim::SimEvent::WeaponFired { attacker, target, .. }
+                if air.contains(&attacker) && target != aa && !ground.contains(&target))
+                && killed.is_some()
+                && !rebuilt
+            {
+                // Require the actual known economic objective, not an incidental unit.
+                let world = app.world_mut();
+                if let sim::SimEvent::WeaponFired { target, .. } = event {
+                    struck |= world
+                        .query::<(&sim::SimId, &sim::Building)>()
+                        .iter(world)
+                        .any(|(id, b)| *id == target && b.footprint.origin == CellPos::new(34, 12));
+                }
+            }
+        }
+        if let Some(at) = killed
+            && elapsed >= at + 60
+        {
+            // The defender captured a real neutral derrick and fully paid this
+            // replacement in advance. Only its normal placement is withheld sixty ticks.
+            let ready = app
+                .world()
+                .resource::<sim::Players>()
+                .get(PlayerId(1))
+                .unwrap()
+                .queues()
+                .flat_map(|(_, q)| q)
+                .find(|head| head.item == replacement)
+                .unwrap();
+            let defs = app.world().resource::<sim::Definitions>();
+            let production = defs.production(replacement).unwrap();
+            assert!(
+                paid_ready
+                    && ready.charged == production.cost
+                    && ready.progress == production.build_time
+            );
+            eprintln!(
+                "ready replacement charged{} progress{} source_cost{} source_time{}",
+                ready.charged, ready.progress, production.cost, production.build_time
+            );
+            let sim::ProductionItem::Building(building) = replacement else {
+                unreachable!()
+            };
+            app.world_mut()
+                .resource_mut::<CommandQueue>()
+                .push(sim::IssuedCommand {
+                    player: PlayerId(1),
+                    command: Command::PlaceBuilding {
+                        building,
+                        origin: CellPos::new(38, 14),
+                    },
+                });
+            rebuilt = step(&mut app).iter().any(|event| matches!(event, sim::SimEvent::BuildingPlaced { player, kind, .. } if *player == PlayerId(1) && *kind == building));
+            break;
+        }
+    }
+    eprintln!("short AA opening kill={killed:?}, rebuilt={rebuilt}, economic strike={struck}");
+    if !struck {
+        dump_screen(&mut app);
+    }
+    assert!(
+        killed.is_some() && rebuilt && struck,
+        "strike aircraft missed the observed clearance window while returning to distant home"
+    );
+}
+
+fn ordinary_air_raid_queued(app: &App, air: &[sim::SimId]) -> bool {
+    app.world()
+        .resource::<CommandQueue>()
+        .iter()
+        .any(|issued| match &issued.command {
+            Command::Attack { units, .. } | Command::AttackMove { units, .. } => {
+                units.iter().any(|id| air.contains(id))
+            }
+            _ => false,
+        })
+}
+
+fn forward_wait_fog_fixture() -> (App, Vec<sim::SimId>) {
+    let (mut app, _, air, _) = distant_screen(false);
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "engineer",
+        CellPos::new(34, 14),
+    )
+    .unwrap(); // Stationary source sight keeps the actual AA job observed.
+    let kind = app
+        .world()
+        .resource::<sim::Definitions>()
+        .building_kind("spy_satellite")
+        .unwrap();
+    let world = app.world_mut();
+    let satellite = *world
+        .query::<(&sim::SimId, &sim::Building)>()
+        .iter(world)
+        .find(|(_, b)| b.kind == kind)
+        .unwrap()
+        .0;
+    let entity = unit_entity(&mut app, satellite);
+    app.world_mut()
+        .get_mut::<sim::Health>(entity)
+        .unwrap()
+        .hit_points = 0;
+    let mut rules = app.world().resource::<sim::MatchState>().rules();
+    rules.fog_of_war = true;
+    app.world_mut()
+        .resource_mut::<sim::MatchState>()
+        .set_rules(rules);
+    step(&mut app); // Lose satellite sight with controllers absent; explored memory remains.
+    app.world_mut().insert_resource(controllers);
+    (app, air)
+}
+
+fn first_forward_wait(app: &mut App, air: &[sim::SimId]) -> CellPos {
+    for _ in 0..100 {
+        step(app);
+        if let Some(target) = app
+            .world()
+            .resource::<CommandQueue>()
+            .iter()
+            .find_map(|issued| match &issued.command {
+                Command::Move { units, target } if units.iter().any(|id| air.contains(id)) => {
+                    Some(*target)
+                }
+                _ => None,
+            })
+        {
+            return target;
+        }
+    }
+    dump_screen(app);
+    panic!("fixture must establish an actual forward aircraft wait");
+}
+
+fn forward_wait_unknown_twin(building: bool) {
+    let (mut probe, air) = forward_wait_fog_fixture();
+    let endpoint = first_forward_wait(&mut probe, &air);
+    let (mut actual, air) = forward_wait_fog_fixture();
+    let (mut control, control_air) = forward_wait_fog_fixture();
+    let vision = actual
+        .world()
+        .resource::<sim::Players>()
+        .get(PlayerId(0))
+        .unwrap()
+        .vision();
+    assert!(
+        vision.is_explored(endpoint) && !vision.is_visible(endpoint),
+        "endpoint must be remembered terrain outside current sight: {endpoint:?}"
+    );
+    if building {
+        sim::spawn_building(actual.world_mut(), PlayerId(1), "flak_cannon", endpoint).unwrap();
+    } else {
+        spawn_unit(actual.world_mut(), PlayerId(1), "kirov", endpoint).unwrap();
+    }
+    assert_eq!(first_forward_wait(&mut actual, &air), endpoint);
+    assert_eq!(first_forward_wait(&mut control, &control_air), endpoint);
+    assert_eq!(
+        actual.world().resource::<sim::AiPlayers>(),
+        control.world().resource::<sim::AiPlayers>()
+    );
+    assert_eq!(
+        actual
+            .world()
+            .resource::<CommandQueue>()
+            .iter()
+            .collect::<Vec<_>>(),
+        control
+            .world()
+            .resource::<CommandQueue>()
+            .iter()
+            .collect::<Vec<_>>()
+    );
+}
+
+#[test]
+fn ra8_an_unseen_air_unit_cannot_change_the_forward_wait_endpoint_or_commands() {
+    forward_wait_unknown_twin(false);
+}
+
+#[test]
+fn ra8_an_unseen_new_building_cannot_change_the_forward_wait_endpoint_or_commands() {
+    forward_wait_unknown_twin(true);
+}
+
+fn paid_then_unfunded_service_fixture() -> (App, sim::SimId, i32) {
+    let defs = load_ruleset(data()).unwrap();
+    let kind = defs.unit_kind("grizzly").unwrap();
+    let maximum = defs.unit_combat(kind).unwrap().hit_points;
+    let rules = defs.rules().unwrap().economy;
+    let cost = sim::repair_step_cost(
+        &rules,
+        defs.production(sim::ProductionItem::Unit(kind))
+            .unwrap()
+            .cost,
+        maximum,
+        false,
+    );
+    let mut app = scenario("germany", "medium", cost, 0, false);
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    put(&mut app, "nuclear_reactor", 2, 2);
+    put(&mut app, "spy_satellite", 10, 2);
+    let depot = put(&mut app, "service_depot", 14, 8);
+    let tank = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "grizzly",
+        CellPos::new(13, 10),
+    )
+    .unwrap();
+    let entity = unit_entity(&mut app, tank);
+    let damaged = maximum - rules.repair_step * 2;
+    app.world_mut()
+        .get_mut::<sim::Health>(entity)
+        .unwrap()
+        .hit_points = damaged;
+    step(&mut app);
+    issue(
+        &mut app,
+        Command::Interact {
+            unit: tank,
+            target: depot,
+        },
+    );
+    for _ in 0..200 {
+        step(&mut app);
+        if app.world().get::<sim::Health>(entity).unwrap().hit_points > damaged {
+            break;
+        }
+    }
+    let repaired = app.world().get::<sim::Health>(entity).unwrap().hit_points;
+    assert!(
+        repaired > damaged && repaired < maximum,
+        "normal paid repair must precede the funding loss"
+    );
+    assert_eq!(
+        app.world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .credits(),
+        0
+    );
+    assert_eq!(
+        app.world()
+            .resource::<sim::SpecialState>()
+            .docked
+            .get(&tank),
+        Some(&depot)
+    );
+    app.world_mut().insert_resource(controllers);
+    (app, tank, repaired)
+}
+
+#[test]
+fn ra8_an_unfunded_service_occupant_leaves_normally_and_rejoins_real_combat() {
+    let (mut app, tank, repaired) = paid_then_unfunded_service_fixture();
+    let mut ordered = false;
+    let mut released = false;
+    for _ in 0..80 {
+        let events = step(&mut app);
+        assert!(
+            !events
+                .iter()
+                .any(|event| matches!(event, sim::SimEvent::BuildingSold { .. })),
+            "a recoverable combat unit must precede base liquidation"
+        );
+        ordered |= app.world().resource::<CommandQueue>().iter().any(|issued|
+            matches!(&issued.command, Command::Move { units, .. } if units.contains(&tank)));
+        released |= !app
+            .world()
+            .resource::<sim::SpecialState>()
+            .docked
+            .contains_key(&tank);
+        if ordered && released {
+            break;
+        }
+    }
+    assert!(
+        ordered && released,
+        "a usable tank stayed at a depot with no repair funds or income"
+    );
+    let entity = unit_entity(&mut app, tank);
+    assert_eq!(
+        app.world().get::<sim::Health>(entity).unwrap().hit_points,
+        repaired
+    );
+    let mut fought = false;
+    for _ in 0..9000 {
+        let events = step(&mut app);
+        assert!(
+            !events
+                .iter()
+                .any(|event| matches!(event, sim::SimEvent::BuildingSold { .. }))
+        );
+        assert!(
+            !app.world()
+                .resource::<sim::SpecialState>()
+                .docked
+                .contains_key(&tank),
+            "the tank re-entered its unaffordable repair job"
+        );
+        fought |= events.iter().any(|event| matches!(event,sim::SimEvent::WeaponFired { attacker, .. } if *attacker == tank));
+        if fought {
+            break;
+        }
+    }
+    assert!(
+        fought,
+        "released tank must make an actual normal combat contribution"
+    );
+}
+
+#[test]
+fn ra8_a_service_cash_gap_with_owned_income_keeps_the_repair_job() {
+    let (mut app, tank, repaired) = paid_then_unfunded_service_fixture();
+    // An actual owned income building will pay on its ordinary source timer;
+    // the current zero-credit interval is not permanent economic stranding.
+    put(&mut app, "oil_derrick", 2, 18);
+    for _ in 0..80 {
+        step(&mut app);
+        assert!(
+            app.world()
+                .resource::<sim::SpecialState>()
+                .docked
+                .contains_key(&tank)
+        );
+        assert!(!app.world().resource::<CommandQueue>().iter().any(
+            |issued| matches!(&issued.command, Command::Move { units, .. } if units.contains(&tank))
+        ));
+    }
+    let entity = unit_entity(&mut app, tank);
+    assert!(app.world().get::<sim::Health>(entity).unwrap().hit_points >= repaired);
+}
+
+#[test]
+fn ra8_a_decided_service_release_cancels_only_its_later_actor_loss() {
+    for public in [false, true] {
+        let (mut app, tank, _) = paid_then_unfunded_service_fixture();
+        let mut release = None;
+        for _ in 0..80 {
+            step(&mut app);
+            release = app.world().resource::<CommandQueue>().iter().find(|issued|
+                matches!(&issued.command, Command::Move { units, .. } if units.contains(&tank))).cloned();
+            if release.is_some() {
+                break;
+            }
+        }
+        let release = release.expect("actual AI service release must be queued");
+        if public {
+            *app.world_mut().resource_mut::<CommandQueue>() = CommandQueue::default();
+            app.world_mut().resource_mut::<CommandQueue>().push(release);
+        }
+        let entity = unit_entity(&mut app, tank);
+        app.world_mut().get_mut::<sim::Owner>(entity).unwrap().0 = PlayerId(1);
+        app.world_mut().run_schedule(SimSchedule);
+        let rejected = app
+            .world()
+            .resource::<bevy_ecs::message::Messages<sim::SimEvent>>()
+            .iter_current_update_messages()
+            .any(|event| matches!(event, sim::SimEvent::CommandRejected { .. }));
+        assert_eq!(
+            rejected, public,
+            "public ownership validation remains strict"
+        );
+        assert!(sim::cell_invariant_violations(app.world_mut()).is_empty());
+    }
+}
+
+fn chrono_boundary_fixture(reveal: bool) -> (App, sim::SimId, Vec<sim::SimId>) {
+    let mut app = scenario("great_britain", "brutal", 0, 0, true);
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    let timing = controllers.controller(PlayerId(0)).unwrap().difficulty();
+    let initial_assembly = timing.first_wave + timing.wave_patience + timing.think_interval;
+    let world = app.world_mut();
+    for (owner, mut hp) in world
+        .query::<(&sim::Owner, &mut sim::Health)>()
+        .iter_mut(world)
+    {
+        if owner.0 == PlayerId(1) {
+            hp.hit_points = 1_000_000;
+        }
+    }
+    put(&mut app, "nuclear_reactor", 2, 2);
+    let source = put(&mut app, "chronosphere", 2, 5);
+    if reveal {
+        put(&mut app, "spy_satellite", 2, 12);
+    } else {
+        spawn_unit(
+            app.world_mut(),
+            PlayerId(0),
+            "rocketeer",
+            CellPos::new(43, 36),
+        )
+        .unwrap();
+    }
+    let tanks = [(14, 14), (15, 14), (14, 15), (15, 15)]
+        .map(|(x, y)| {
+            spawn_unit(app.world_mut(), PlayerId(0), "grizzly", CellPos::new(x, y)).unwrap()
+        })
+        .to_vec();
+    for _ in 0..initial_assembly {
+        step(&mut app);
+    }
+    let defs = app.world().resource::<sim::Definitions>();
+    let cooldown = defs
+        .metadata(sim::ProductionItem::Building(
+            defs.building_kind("chronosphere").unwrap(),
+        ))
+        .unwrap()
+        .cooldown;
+    app.world_mut()
+        .resource_mut::<sim::SpecialState>()
+        .charge
+        .insert(source, cooldown);
+    app.world_mut().insert_resource(controllers);
+    (app, source, tanks)
+}
+
+fn queued_chronoshift(app: &mut App, source: sim::SimId) -> (CellPos, CellPos) {
+    for _ in 0..40 {
+        step(app);
+        if let Some((from, to)) = app
+            .world()
+            .resource::<CommandQueue>()
+            .iter()
+            .find_map(|issued| match issued.command {
+                Command::Chronoshift {
+                    building,
+                    source: from,
+                    target,
+                } if building == source => Some((from, target)),
+                _ => None,
+            })
+        {
+            return (from, to);
+        }
+    }
+    panic!("ready legal source must support the actual wave");
+}
+
+#[test]
+fn ra8_chronoshift_freeze_preserves_the_wave_and_resumes_offensive_combat() {
+    let (mut app, source, tanks) = chrono_boundary_fixture(true);
+    let (from, _) = queued_chronoshift(&mut app, source);
+    let selected: Vec<_> = tanks
+        .into_iter()
+        .filter(|id| {
+            let entity = unit_entity(&mut app, *id);
+            let cell = app.world().get::<sim::Mobile>(entity).unwrap().cell;
+            cell.x.abs_diff(from.x) <= 1 && cell.y.abs_diff(from.y) <= 1
+        })
+        .collect();
+    assert!(!selected.is_empty());
+    let events = step(&mut app);
+    assert!(events.iter().any(
+        |event| matches!(event,sim::SimEvent::StrategicActivated {building,..} if *building==source)
+    ));
+    let mut saw_freeze = false;
+    let mut resumed = false;
+    let mut fired = false;
+    for _ in 0..800 {
+        let events = step(&mut app);
+        let frozen = &app.world().resource::<sim::SpecialState>().disabled;
+        let controller = app
+            .world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap();
+        for id in &selected {
+            assert!(
+                controller.wave().contains(id),
+                "temporary source freeze erased the offensive wave"
+            );
+            if frozen.contains_key(id) {
+                saw_freeze = true;
+                assert!(
+                    !app.world().resource::<CommandQueue>().iter().any(|issued| {
+                        match &issued.command {
+                            Command::Move { units, .. }
+                            | Command::AttackMove { units, .. }
+                            | Command::Attack { units, .. } => units.contains(id),
+                            Command::Interact { unit, .. } | Command::Deploy { unit } => unit == id,
+                            _ => false,
+                        }
+                    }),
+                    "disabled actor received an army command"
+                );
+            } else {
+                resumed = true;
+            }
+        }
+        assert!(!app.world().resource::<CommandQueue>().iter().any(|issued|
+            matches!(&issued.command, Command::Move{units,target}|Command::AttackMove{units,target}
+                if *target==controller.gather() && units.iter().any(|id|selected.contains(id)))), "teleported attack wave was sent home");
+        fired |= events.iter().any(|event| matches!(event,sim::SimEvent::WeaponFired {attacker,..} if selected.contains(attacker)));
+        if saw_freeze && resumed && fired {
+            break;
+        }
+    }
+    assert!(saw_freeze && resumed && fired);
+}
+
+#[test]
+fn ra8_an_all_frozen_casualty_wave_defers_its_nonempty_retreat_until_release() {
+    let (mut app, source, mut tanks) = chrono_boundary_fixture(true);
+    let wanted = app
+        .world()
+        .resource::<sim::AiPlayers>()
+        .controller(PlayerId(0))
+        .unwrap()
+        .difficulty()
+        .wave_size as usize;
+    let additional = wanted.checked_sub(tanks.len()).unwrap();
+    for i in 0..additional {
+        tanks.push(
+            spawn_unit(
+                app.world_mut(),
+                PlayerId(0),
+                "grizzly",
+                CellPos::new(10 + (i % 7) as i32, 19 + (i / 7) as i32),
+            )
+            .unwrap(),
+        );
+    }
+    queued_chronoshift(&mut app, source);
+    assert_eq!(
+        app.world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .wave()
+            .len(),
+        wanted,
+        "real full initial cohort must be non-exempt"
+    );
+    step(&mut app);
+    let selected: Vec<_> = tanks
+        .iter()
+        .copied()
+        .filter(|id| {
+            app.world()
+                .resource::<sim::SpecialState>()
+                .disabled
+                .contains_key(id)
+        })
+        .collect();
+    assert!(!selected.is_empty() && selected.len() * 2 < wanted);
+    // Real cleanup/casualty processing runs after this isolated damage setup. All
+    // survivors are the actual Chronoshift arrivals, still in their source freeze.
+    for id in tanks.iter().filter(|id| !selected.contains(id)) {
+        let entity = unit_entity(&mut app, *id);
+        app.world_mut()
+            .get_mut::<sim::Health>(entity)
+            .unwrap()
+            .hit_points = 0;
+    }
+    let mut retreated = false;
+    for _ in 0..200 {
+        step(&mut app); // Also asserts zero rejected commands and physical invariants.
+        let frozen = &app.world().resource::<sim::SpecialState>().disabled;
+        let controller = app
+            .world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap();
+        if selected.iter().any(|id| frozen.contains_key(id)) {
+            assert!(
+                selected.iter().all(|id| controller.wave().contains(id)),
+                "an all-frozen casualty wave forgot its deferred retreat"
+            );
+            assert!(!app.world().resource::<CommandQueue>().iter().any(|issued|
+                matches!(&issued.command,Command::Move {units,..}|Command::AttackMove {units,..}|Command::Attack {units,..}
+                    if units.iter().any(|id|selected.contains(id)))),"retreat commanded a disabled member");
+        }
+        retreated |= app.world().resource::<CommandQueue>().iter().any(|issued| {
+            matches!(&issued.command,Command::AttackMove {units,target} if !units.is_empty()
+                && *target==controller.gather() && units.iter().any(|id|selected.contains(id))
+                && units.iter().all(|id|!frozen.contains_key(id)))
+        });
+        if retreated {
+            break;
+        }
+    }
+    assert!(
+        retreated,
+        "the actual casualty retreat must resume after release"
+    );
+}
+
+#[test]
+fn ra8_an_already_erased_strategic_source_is_not_queued_by_the_controller() {
+    let mut app = scenario("germany", "medium", 0, 0, false);
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    put(&mut app, "nuclear_reactor", 2, 2);
+    put(&mut app, "spy_satellite", 2, 12);
+    let source = sim::spawn_building(
+        app.world_mut(),
+        sim::NEUTRAL,
+        "airport",
+        CellPos::new(14, 25),
+    )
+    .unwrap();
+    let engineer = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "engineer",
+        CellPos::new(13, 25),
+    )
+    .unwrap();
+    step(&mut app);
+    issue(
+        &mut app,
+        Command::Interact {
+            unit: engineer,
+            target: source,
+        },
+    );
+    let source_entity = unit_entity(&mut app, source);
+    for _ in 0..100 {
+        step(&mut app);
+        if app.world().get::<sim::Owner>(source_entity).unwrap().0 == PlayerId(0) {
+            break;
+        }
+    }
+    assert_eq!(
+        app.world().get::<sim::Owner>(source_entity).unwrap().0,
+        PlayerId(0)
+    );
+    let enemy = spawn_unit(
+        app.world_mut(),
+        PlayerId(1),
+        "chrono_legionnaire",
+        CellPos::new(14, 24),
+    )
+    .unwrap();
+    step(&mut app); // Actual owner sight before the ordinary targeted attack.
+    app.world_mut()
+        .resource_mut::<CommandQueue>()
+        .push(sim::IssuedCommand {
+            player: PlayerId(1),
+            command: Command::Attack {
+                units: vec![enemy],
+                target: source,
+            },
+        });
+    for _ in 0..100 {
+        step(&mut app);
+        if app
+            .world()
+            .resource::<sim::SpecialState>()
+            .erasures
+            .contains_key(&source)
+        {
+            break;
+        }
+    }
+    assert!(
+        app.world()
+            .resource::<sim::SpecialState>()
+            .erasures
+            .contains_key(&source),
+        "actual Temporal beam must precede the AI decision"
+    );
+    let defs = app.world().resource::<sim::Definitions>();
+    let meta = defs
+        .metadata(sim::ProductionItem::Building(
+            defs.building_kind("airport").unwrap(),
+        ))
+        .unwrap();
+    assert!(!meta.is_powered);
+    let cooldown = meta.cooldown;
+    app.world_mut()
+        .resource_mut::<sim::SpecialState>()
+        .charge
+        .insert(source, cooldown);
+    app.world_mut().insert_resource(controllers);
+    for _ in 0..40 {
+        step(&mut app);
+        assert!(!app.world().resource::<CommandQueue>().iter().any(|issued|
+            matches!(issued.command,Command::Chronoshift {building,..}|Command::Superweapon {building,..} if building==source)),"intrinsically unavailable source was queued");
+    }
+}
+
+#[test]
+fn ra8_chronoshift_frozen_membership_still_discards_death_and_ownership_loss() {
+    for captured in [false, true] {
+        let (mut app, source, tanks) = chrono_boundary_fixture(true);
+        let (from, _) = queued_chronoshift(&mut app, source);
+        let selected = tanks
+            .into_iter()
+            .find(|id| {
+                let entity = unit_entity(&mut app, *id);
+                let cell = app.world().get::<sim::Mobile>(entity).unwrap().cell;
+                cell.x.abs_diff(from.x) <= 1 && cell.y.abs_diff(from.y) <= 1
+            })
+            .unwrap();
+        step(&mut app);
+        assert!(
+            app.world()
+                .resource::<sim::SpecialState>()
+                .disabled
+                .contains_key(&selected)
+        );
+        let entity = unit_entity(&mut app, selected);
+        if captured {
+            app.world_mut().get_mut::<sim::Owner>(entity).unwrap().0 = PlayerId(1);
+        } else {
+            app.world_mut()
+                .get_mut::<sim::Health>(entity)
+                .unwrap()
+                .hit_points = 0;
+        }
+        for _ in 0..30 {
+            step(&mut app);
+        }
+        assert!(
+            !app.world()
+                .resource::<sim::AiPlayers>()
+                .controller(PlayerId(0))
+                .unwrap()
+                .wave()
+                .contains(&selected)
+        );
+    }
+}
+
+#[test]
+fn ra8_chronoshift_keeps_the_whole_translated_group_out_of_known_ground_fire() {
+    let (mut app, source, tanks) = chrono_boundary_fixture(true);
+    sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "power_plant",
+        CellPos::new(22, 34),
+    )
+    .unwrap();
+    sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "war_factory",
+        CellPos::new(28, 30),
+    )
+    .unwrap();
+    sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "prism_tower",
+        CellPos::new(26, 36),
+    )
+    .unwrap();
+    let (from, to) = queued_chronoshift(&mut app, source);
+    eprintln!("known ground-fire probe from{from:?} to{to:?}");
+    let defs = app.world().resource::<sim::Definitions>();
+    let terms = defs
+        .building_combat(defs.building_kind("prism_tower").unwrap())
+        .unwrap();
+    let range = defs.weapon(terms.weapon.unwrap()).unwrap().range;
+    let mut moved = 0;
+    for id in tanks {
+        let entity = unit_entity(&mut app, id);
+        let cell = app.world().get::<sim::Mobile>(entity).unwrap().cell;
+        if cell.x.abs_diff(from.x) > 1 || cell.y.abs_diff(from.y) > 1 {
+            continue;
+        }
+        moved += 1;
+        let dest = CellPos::new(to.x + cell.x - from.x, to.y + cell.y - from.y);
+        let point = sim::SubPos::centre_of(dest);
+        let dx = (i64::from(point.x) - 27 * 256 + 1)
+            .max(26 * 256 - i64::from(point.x))
+            .max(0);
+        let dy = (i64::from(point.y) - 37 * 256 + 1)
+            .max(36 * 256 - i64::from(point.y))
+            .max(0);
+        assert!(
+            !sim::in_range(dx, dy, range),
+            "known tower can fire at frozen landing {dest:?}"
+        );
+    }
+    assert!(moved > 0);
+}
+
+#[test]
+fn ra8_chronoshift_landing_commands_ignore_unseen_ground_threats() {
+    for building in [false, true] {
+        let (mut actual, source, _) = chrono_boundary_fixture(false);
+        let (mut control, control_source, _) = chrono_boundary_fixture(false);
+        assert!(
+            !actual
+                .world()
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap()
+                .vision()
+                .is_visible(CellPos::new(35, 40))
+        );
+        if building {
+            sim::spawn_building(
+                actual.world_mut(),
+                PlayerId(1),
+                "prism_tower",
+                CellPos::new(35, 40),
+            )
+            .unwrap();
+        } else {
+            spawn_unit(
+                actual.world_mut(),
+                PlayerId(1),
+                "prism_tank",
+                CellPos::new(35, 40),
+            )
+            .unwrap();
+        }
+        assert_eq!(
+            queued_chronoshift(&mut actual, source),
+            queued_chronoshift(&mut control, control_source)
+        );
+        assert_eq!(
+            actual.world().resource::<sim::AiPlayers>(),
+            control.world().resource::<sim::AiPlayers>()
+        );
+        assert_eq!(
+            actual
+                .world()
+                .resource::<CommandQueue>()
+                .iter()
+                .collect::<Vec<_>>(),
+            control
+                .world()
+                .resource::<CommandQueue>()
+                .iter()
+                .collect::<Vec<_>>()
+        );
+    }
 }

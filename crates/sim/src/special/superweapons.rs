@@ -149,6 +149,21 @@ pub(crate) fn strategic_intent_valid(
     issued: &IssuedCommand,
     check_visibility: bool,
 ) -> bool {
+    check_strategic_intent(world, issued, check_visibility, false)
+}
+
+/// Revalidate every current requirement except a newly erased source actor. This
+/// read-only counterfactual is used only after a fully valid decision certificate.
+pub(crate) fn strategic_intent_erasure_only(world: &mut World, issued: &IssuedCommand) -> bool {
+    check_strategic_intent(world, issued, true, true)
+}
+
+fn check_strategic_intent(
+    world: &mut World,
+    issued: &IssuedCommand,
+    check_visibility: bool,
+    erasure_only: bool,
+) -> bool {
     let (id, target, source) = match &issued.command {
         Command::Superweapon {
             building,
@@ -172,7 +187,14 @@ pub(crate) fn strategic_intent_valid(
     }
     own(world, defs, &index, issued.player, id)
         .and_then(|a| {
-            commandable(world, id)?;
+            if erasure_only {
+                if !world.resource::<SpecialState>().erasures.contains_key(&id) {
+                    return Err(unavailable("Target is not being erased"));
+                }
+                commandable_except_erasure(world, id)?;
+            } else {
+                commandable(world, id)?;
+            }
             validate_launch(world, defs, a, target, source, check_visibility)
         })
         .is_ok()

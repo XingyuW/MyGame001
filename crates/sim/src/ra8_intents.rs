@@ -815,6 +815,211 @@ fn ra8_private_bridge_goal_authorizes_before_readiness_and_hashes_its_distinct_a
 }
 
 #[test]
+fn ra8_strategic_erasure_cancels_only_a_certified_later_actor_change() {
+    use bevy_ecs::schedule::IntoScheduleConfigs;
+    let mut outcomes = Vec::new();
+    for mode in [
+        "internal",
+        "public",
+        "already_erased",
+        "became_unready",
+        "became_spawned",
+        "became_wrong_type",
+        "became_arguments",
+        "wrong_type",
+        "wrong_form",
+        "outside",
+        "unit_arguments",
+    ] {
+        let mut app = app();
+        app.world_mut().insert_resource(crate::AiPlayers::default());
+        crate::spawn_building(
+            app.world_mut(),
+            PlayerId(0),
+            "nuclear_reactor",
+            CellPos::new(2, 2),
+        )
+        .unwrap();
+        crate::spawn_building(
+            app.world_mut(),
+            PlayerId(0),
+            "spy_satellite",
+            CellPos::new(14, 2),
+        )
+        .unwrap();
+        let ability = match mode {
+            "wrong_type" => "barracks",
+            "wrong_form" => "chronosphere",
+            _ => "nuclear_silo",
+        };
+        let source =
+            crate::spawn_building(app.world_mut(), PlayerId(0), ability, CellPos::new(2, 20))
+                .unwrap();
+        tick(&mut app); // Ordinary source announcement before isolated readiness.
+        let cooldown = app
+            .world()
+            .resource::<Definitions>()
+            .metadata(ProductionItem::Building(
+                app.world()
+                    .resource::<Definitions>()
+                    .building_kind(ability)
+                    .unwrap(),
+            ))
+            .unwrap()
+            .cooldown;
+        app.world_mut()
+            .resource_mut::<crate::SpecialState>()
+            .charge
+            .insert(source, cooldown);
+        let decision_tick = app.world().resource::<SimTick>().0;
+        app.add_systems(
+            SimSchedule,
+            (move |world: &mut bevy_ecs::world::World| {
+                if world.resource::<SimTick>().0 != decision_tick {
+                    return;
+                }
+                if mode == "already_erased" {
+                    world.resource_mut::<crate::SpecialState>().erasures.insert(
+                        source,
+                        crate::special::infantry::Erasure {
+                            remaining: 6000,
+                            beams: BTreeMap::new(),
+                        },
+                    );
+                }
+                let issued = IssuedCommand {
+                    player: PlayerId(0),
+                    command: Command::Superweapon {
+                        building: source,
+                        target: if mode == "outside" {
+                            CellPos::new(-1, -1)
+                        } else {
+                            CellPos::new(28, 28)
+                        },
+                        units: if mode == "unit_arguments" {
+                            vec![SimId(999999)]
+                        } else {
+                            Vec::new()
+                        },
+                    },
+                };
+                if mode == "public" {
+                    world.resource_mut::<CommandQueue>().push(issued);
+                } else {
+                    world
+                        .resource_mut::<CommandQueue>()
+                        .push_ai(issued, AiIntent::default());
+                }
+                certify_ai_strategic_intents(world);
+            })
+            .in_set(crate::SimSet::Ai)
+            .after(crate::SimCoreSet(crate::SimSet::Ai)),
+        );
+        app.add_systems(
+            SimSchedule,
+            (move |world: &mut bevy_ecs::world::World| {
+                if world.resource::<SimTick>().0 != decision_tick {
+                    return;
+                }
+                // Isolate the same late actor-state boundary that an actual Combat beam
+                // creates, after the decision's complete read-only certification.
+                world.resource_mut::<crate::SpecialState>().erasures.insert(
+                    source,
+                    crate::special::infantry::Erasure {
+                        remaining: 6000,
+                        beams: BTreeMap::new(),
+                    },
+                );
+                if mode == "became_unready" {
+                    world
+                        .resource_mut::<crate::SpecialState>()
+                        .charge
+                        .insert(source, 0);
+                }
+                if mode == "became_spawned" {
+                    world
+                        .resource_mut::<crate::SpecialState>()
+                        .spawned
+                        .insert(source, SimId(999999));
+                }
+                if mode == "became_wrong_type" {
+                    let kind = world
+                        .resource::<Definitions>()
+                        .building_kind("barracks")
+                        .unwrap();
+                    let entity = world
+                        .query::<(Entity, &SimId)>()
+                        .iter(world)
+                        .find(|(_, id)| **id == source)
+                        .unwrap()
+                        .0;
+                    world.get_mut::<crate::Building>(entity).unwrap().kind = kind;
+                }
+                if mode == "became_arguments" {
+                    for pending in &mut world.resource_mut::<CommandQueue>().pending {
+                        if let Command::Superweapon { units, .. } = &mut pending.issued.command {
+                            units.push(SimId(999999));
+                        }
+                    }
+                }
+            })
+            .in_set(crate::SimSet::Visibility)
+            .after(crate::SimCoreSet(crate::SimSet::Visibility)),
+        );
+        tick(&mut app);
+        let certified = app
+            .world()
+            .resource::<CommandQueue>()
+            .pending
+            .iter()
+            .find_map(|p| p.ai_intent.as_ref().map(|w| w.strategic_valid))
+            .unwrap_or(false);
+        assert_eq!(
+            certified,
+            [
+                "internal",
+                "became_unready",
+                "became_spawned",
+                "became_wrong_type",
+                "became_arguments"
+            ]
+            .contains(&mode),
+            "{mode}: full source guard certification"
+        );
+        let events = tick(&mut app);
+        assert!(
+            !events
+                .iter()
+                .any(|e| matches!(e, SimEvent::StrategicActivated { .. })),
+            "{mode}"
+        );
+        let rejection = events.iter().find_map(|e| match e {
+            SimEvent::CommandRejected { reason, .. } => Some(reason),
+            _ => None,
+        });
+        if let Some(reason) = rejection {
+            assert_eq!(
+                *reason,
+                RejectReason::AbilityUnavailable(
+                    if ["wrong_type", "became_wrong_type"].contains(&mode) {
+                        "No strategic ability"
+                    } else {
+                        "Target is being erased"
+                    }
+                ),
+                "{mode}: original public error order/string"
+            );
+        }
+        let rejected = rejection.is_some();
+        eprintln!("erasure lifecycle {mode}: certified={certified} rejected={rejected} {events:?}");
+        outcomes.push((mode, rejected));
+    }
+    for (mode, rejected) in outcomes {
+        assert_eq!(rejected, mode != "internal", "{mode}");
+    }
+}
+
+#[test]
 fn ra8_strategic_visible_cell_loss_cancels_only_fully_valid_internal_intents() {
     use bevy_ecs::schedule::IntoScheduleConfigs;
     for mode in [

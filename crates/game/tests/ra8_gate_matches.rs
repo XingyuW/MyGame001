@@ -13,6 +13,7 @@ struct EconomyTrace {
     counters: BTreeMap<String, u64>,
     buildings: BTreeMap<SimId, String>,
     units: BTreeMap<SimId, String>,
+    last_air_hold: BTreeMap<PlayerId, (Option<SimId>, u64)>,
 }
 
 fn trace_before_economy(
@@ -48,7 +49,18 @@ fn trace_economy_events(world: &mut bevy::ecs::world::World, events: &[SimEvent]
         return;
     };
     let definitions = world.resource::<sim::Definitions>().clone();
-    for (id, unit) in world.query::<(&SimId, &sim::Unit)>().iter(world) {
+    let service = std::env::var_os("RA8_SERVICE_TRACE").is_some() && at >= 180000;
+    for (id, owner, unit, mobile) in world
+        .query::<(&SimId, &sim::Owner, &sim::Unit, &sim::Mobile)>()
+        .iter(world)
+    {
+        if service && !trace.units.contains_key(id) {
+            eprintln!(
+                "service birth tick{at} {id:?} {owner:?} {} cell{:?}",
+                definitions.unit(unit.kind).unwrap().id,
+                mobile.cell
+            );
+        }
         trace
             .units
             .insert(*id, definitions.unit(unit.kind).unwrap().id.clone());
@@ -57,6 +69,39 @@ fn trace_economy_events(world: &mut bevy::ecs::world::World, events: &[SimEvent]
         trace
             .buildings
             .insert(*id, definitions.building(building.kind).unwrap().id.clone());
+    }
+    let coordination = std::env::var_os("RA8_AIR_COORD_TRACE").is_some();
+    if coordination {
+        for event in events {
+            let relevant = match event {
+                SimEvent::BuildingPlaced { kind, .. }
+                | SimEvent::BuildingDestroyed { kind, .. } => {
+                    definitions.building_combat(*kind).is_some_and(|terms| {
+                        terms
+                            .weapons(false)
+                            .into_iter()
+                            .flatten()
+                            .filter_map(|k| definitions.weapon(k))
+                            .any(|w| w.anti_air && !w.anti_ground)
+                    })
+                }
+                SimEvent::WeaponFired {
+                    attacker, target, ..
+                } => {
+                    trace
+                        .units
+                        .get(attacker)
+                        .and_then(|id| definitions.unit_kind(id))
+                        .and_then(|k| definitions.metadata(sim::ProductionItem::Unit(k)))
+                        .is_some_and(|m| m.airport_bound)
+                        && trace.buildings.contains_key(target)
+                }
+                _ => false,
+            };
+            if relevant {
+                eprintln!("coord tick{at} {event:?}");
+            }
+        }
     }
     for event in events {
         let (key, amount) = match event {
@@ -118,9 +163,133 @@ fn trace_economy_events(world: &mut bevy::ecs::world::World, events: &[SimEvent]
                     .map_or("?", String::as_str);
                 (format!("shots {attacker}->{target}"), 1)
             }
+            SimEvent::AttackEnded {
+                unit,
+                target,
+                reason,
+            } => (format!("ended {unit:?}->{target:?} {reason:?}"), 1),
             _ => continue,
         };
         *trace.counters.entry(key).or_default() += amount;
+    }
+    let pending: Vec<_> = world.resource::<CommandQueue>().iter().cloned().collect();
+    if service {
+        for event in events {
+            if matches!(
+                event,
+                SimEvent::UnitDestroyed { .. }
+                    | SimEvent::ProductionComplete { .. }
+                    | SimEvent::BuildingSold { .. }
+                    | SimEvent::UnitSpawned { .. }
+                    | SimEvent::CrewEscaped { .. }
+                    | SimEvent::StrategicActivated { .. }
+                    | SimEvent::Impact { .. }
+                    | SimEvent::DamageStateChanged { .. }
+            ) {
+                eprintln!("service tick{at} {event:?}");
+            }
+            if let SimEvent::WeaponFired {
+                attacker, target, ..
+            } = event
+            {
+                let target_kind = trace
+                    .units
+                    .get(target)
+                    .or_else(|| trace.buildings.get(target))
+                    .map(String::as_str);
+                let attacker_kind = trace
+                    .units
+                    .get(attacker)
+                    .or_else(|| trace.buildings.get(attacker))
+                    .map(String::as_str);
+                eprintln!(
+                    "service shot tick{at} {attacker:?} {attacker_kind:?} -> {target:?} {target_kind:?}"
+                );
+            }
+        }
+        if at.is_multiple_of(3000) {
+            for (id, owner, unit, mobile, orders, weapon) in world
+                .query::<(
+                    &SimId,
+                    &sim::Owner,
+                    &sim::Unit,
+                    &sim::Mobile,
+                    &sim::Orders,
+                    Option<&sim::Weapon>,
+                )>()
+                .iter(world)
+            {
+                if weapon.is_some() {
+                    eprintln!(
+                        "service tick{at} P{} {id:?} {} cell{:?} move{:?} weapon{weapon:?} dock{:?} wave{}",
+                        owner.0.0,
+                        definitions.unit(unit.kind).unwrap().id,
+                        mobile.cell,
+                        orders
+                            .current
+                            .as_ref()
+                            .map(|m| (m.destination, m.best, &m.state)),
+                        world.resource::<sim::SpecialState>().docked.get(id),
+                        world
+                            .resource::<sim::AiPlayers>()
+                            .controller(owner.0)
+                            .is_some_and(|c| c.wave().contains(id))
+                    );
+                }
+            }
+        }
+    }
+    for issued in &pending {
+        if coordination && let sim::Command::Move { units, target } = &issued.command {
+            let controller = world.resource::<sim::AiPlayers>().controller(issued.player);
+            if controller.is_some_and(|c| c.gather() == *target) {
+                let job = controller.and_then(|c| match c.target() {
+                    Some(sim::WaveTarget::Building(id)) => Some(id),
+                    _ => None,
+                });
+                let previous = trace.last_air_hold.get(&issued.player);
+                if previous
+                    .is_none_or(|(last, when)| *last != job || at.saturating_sub(*when) >= 6000)
+                {
+                    let mut aircraft = Vec::new();
+                    for (id, unit, mobile) in world
+                        .query::<(&SimId, &sim::Unit, &sim::Mobile)>()
+                        .iter(world)
+                    {
+                        if units.contains(id)
+                            && let Some(meta) =
+                                definitions.metadata(sim::ProductionItem::Unit(unit.kind))
+                            && meta.airport_bound
+                        {
+                            aircraft.push((
+                                *id,
+                                mobile.cell,
+                                world
+                                    .resource::<sim::SpecialState>()
+                                    .ammo_of(*id, meta.ammo),
+                            ));
+                        }
+                    }
+                    if !aircraft.is_empty() {
+                        eprintln!(
+                            "coord tick{at} hold P{} job{job:?} target{target:?} aircraft{aircraft:?}",
+                            issued.player.0
+                        );
+                        trace.last_air_hold.insert(issued.player, (job, at));
+                    }
+                }
+            }
+        }
+        if let sim::Command::Attack { units, target } = &issued.command {
+            let target_kind = trace.buildings.get(target).map_or("?", String::as_str);
+            let key = format!(
+                "P{} queued_attack {target:?} {target_kind}",
+                issued.player.0
+            );
+            *trace.counters.entry(key).or_default() += 1;
+            let key = format!("P{} queued_attack_actors {target:?}", issued.player.0);
+            *trace.counters.entry(key).or_default() += units.len() as u64;
+        }
     }
     if at % 60000 == 59999 {
         eprintln!("economy window {}..{} {:?}", at - 59999, at, trace.counters);
@@ -161,7 +330,9 @@ fn run_case(map_id: &str, countries: [&str; 2], difficulties: [&str; 2]) {
         },
     });
     sim::setup_match(app.world_mut(), &skirmish, &ai, map, &players).unwrap();
-    if map_id == "thousand_lakes" && countries == ["france", "germany"] {
+    if (map_id == "thousand_lakes" && countries == ["france", "germany"])
+        || std::env::var_os("RA8_ECONOMY_TRACE").is_some()
+    {
         app.init_resource::<EconomyTrace>();
         app.add_systems(
             SimSchedule,
@@ -353,6 +524,7 @@ fn trace_lifecycle(world: &mut bevy::ecs::world::World, stage: &str) {
 fn dump(world: &mut bevy::ecs::world::World) {
     let definitions = world.resource::<sim::Definitions>().clone();
     eprintln!("snapshot tick {:?}", world.resource::<sim::SimTick>());
+    eprintln!("queued {:?}", world.resource::<CommandQueue>());
     for (player, state) in world.resource::<sim::Players>().iter() {
         eprintln!(
             "player {player:?} credits {} queues {:?}",
@@ -474,6 +646,49 @@ fn ra8_gate_thousand_lakes_france_germany_seed_zero_finishes() {
     run_case(
         "thousand_lakes",
         ["france", "germany"],
+        ["brutal", "brutal"],
+    );
+}
+
+#[test]
+fn ra8_gate_liberty_iraq_america_brutal_seed_zero_finishes() {
+    run_case("liberty_bay", ["iraq", "america"], ["brutal", "brutal"]);
+}
+
+#[test]
+fn ra8_gate_oasis_germany_great_britain_brutal_seed_zero_finishes() {
+    run_case(
+        "oasis_gulf",
+        ["germany", "great_britain"],
+        ["brutal", "brutal"],
+    );
+}
+
+#[test]
+fn ra8_gate_steel_france_germany_medium_seed_zero_finishes() {
+    run_case("steel_harbor", ["france", "germany"], ["medium", "medium"]);
+}
+
+#[test]
+fn ra8_gate_frozen_cuba_germany_brutal_seed_zero_finishes() {
+    run_case("frozen_sound", ["cuba", "germany"], ["brutal", "brutal"]);
+}
+
+#[test]
+fn ra8_gate_black_water_libya_america_brutal_seed_zero_finishes() {
+    run_case("black_water", ["libya", "america"], ["brutal", "brutal"]);
+}
+
+#[test]
+fn ra8_gate_black_water_korea_france_brutal_seed_zero_finishes() {
+    run_case("black_water", ["korea", "france"], ["brutal", "brutal"]);
+}
+
+#[test]
+fn ra8_gate_wheel_germany_great_britain_brutal_seed_zero_finishes() {
+    run_case(
+        "wheel_of_worlds",
+        ["germany", "great_britain"],
         ["brutal", "brutal"],
     );
 }
