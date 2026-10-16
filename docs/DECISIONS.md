@@ -6186,3 +6186,60 @@ not passed, solely for twelve preserved raw blank EOF lines. Exact full paths/li
 unfiltered stdout are retained in `attempt4-aa-staged-hygiene.json`; staged bytes match each
 capture. No source/data/test/doc diagnostic exists. A separate exact-output recheck precedes
 committing; no raw evidence or required validation check is altered or suppressed.
+
+
+### R115. Fifth RA8 checkpoint: committed concrete corrections and repeated normal-game acceptance
+
+**2026-10-16 UTC.** Lifecycle3b81f76 and separate observed-AA/runtimebbb09fe commit only
+R111–R114's concrete gate corrections, focused regressions and preserved evidence. No source,
+asset, generator, script or dependency change follows runtimebbb09feab392b31e6d627d0060586c73b100e6db.
+Main remains8230a955. Both commits follow separately inspected unfiltered staged checks and
+separate exact-output rechecks: exit2 classified solely as5 then12 untouched raw blank EOF
+lines, not passed; manifests retain all exact paths/lines/hashes/stdout. No source/data/test/
+doc hygiene error or evidence edit is accepted. Earlier process deviations remain recorded.
+
+Final source repeats `m13_ten_players -- to-the-end all` with actual setup_match/default
+options,ten ordinary Medium controllers/seed13,no Super Me/unlock. It exits0 in918.242s:
+21/21 explicit Won,ten builders each,every mean<5ms,unchanged400000 outer. Ending median56614,
+p90 nearest-rank108259,max288884; measured914.394s/per-map elapsed914.567s. Relative to prior
+65fa8d6's55554/91393/331947,median andp90 rise while maximum falls; no uniform shortening is
+claimed. Frostline winsP6 at73741,mean0.848679ms/62.589s elapsed. Every raw per-map field is
+retained in `ten-player-all-end6.log` and `attempt4-m13-metrics.json`.
+
+The exact fixed24000-tick256×256 Liberty/Continental/Pacific benchmark exits0 in54.550s,
+all ten players building. Means0.842308/0.623839/0.780129ms pass the unchanged5ms budget;
+p994.762/2.023/4.540ms,max109.899/113.223/76.099ms,busiest1000 means1.790/1.150/1.418ms,
+2/4/2 ticks over50ms. The all-map longest tick is290.853ms. Tails are preserved; no maximum
+or smooth-play guarantee is claimed. These are unprofiled normal-game measurements, not
+clone microbenchmark extrapolations or evidence of a CPU cause from wall time alone.
+
+`checkpoint5.json` records1197 static tests,73 added versus RA7's1124,none removed/renamed/
+ignored/unmapped;483 passing tests across22 affected serial targets; strict all-target
+Clippy/fmt/generated/reference checks; exact migration ledger; both unchanged RA7 R29
+before distributions; all21 winners/256 means; and retained assumptions/debt/verification/
+storage. Its initial metadata merge twice uses an incorrect historical field/type; both
+errors are retained in `checkpoint5-parser-diagnostics.json`, corrected without source/test
+mutation. Metrics remain valid; no checkpoint is written by either failed generation.
+All24 archived stop-time raw hashes for attempts2–4 reverify unchanged. Attempt1 also remains.
+
+The internal extension is in review scope: private tagged/value-hashed conditional bridge
+goals with actor/type/owner/visible-hut authorization before readiness and strict actual R67
+restoration; complete strategic validity certificates with narrowly revalidated cell-loss
+cancellation. Public commands remain strict. R114's observed-AA algorithm is an explicit
+game-owned policy assumption derived from source data/existing policy, not recovered AI code.
+Prior R91/R92 composition/purifier/source-category assumptions remain. R83 transport size/
+loaded boarding/actual Squid-host firing,R96 actorless occupied-Prop C4/Ivan/Temporal boundaries,
+and R99 source-only unproven bombable=false lead remain RA9 work; R97 is closed in R103.
+User visual/audio/play-feel verification and the independent review remain pending.
+
+No new external directory is created. Configured Cargo/UV/PIP caches remain; recreatable
+configured-target tmp/ra8_definitions remains708KiB for reruns,not release. Earlier RA5 render/
+RA7 scratch evidence is retained. No clone/worktree/environment or substantial tmp artifact.
+No validator remains active. The complete13-command frozen gate and both756-winner R29
+before/after distributions are still required. Gate launch is held only for the parent's
+required milestone check of this committed checkpoint; this is not RA8 closure or review.
+
+
+R115 checkpoint staged hygiene: the separately inspected unfiltered check exits0 with empty
+stdout/stderr. `checkpoint5-staged-hygiene.json` records that result; a separate recheck after
+staging the record also precedes the checkpoint commit. No raw log byte is changed.
