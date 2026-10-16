@@ -1,0 +1,17 @@
+[
+  {
+    "case": "steel_harbor_america_cuba_bridge",
+    "exit": 101,
+    "elapsed_seconds": 20.04254550000769
+  },
+  {
+    "case": "thousand_lakes_great_britain_america",
+    "exit": 101,
+    "elapsed_seconds": 9.55171354097547
+  },
+  {
+    "case": "thousand_lakes_france_germany",
+    "exit": 101,
+    "elapsed_seconds": 185.19402987498324
+  }
+]

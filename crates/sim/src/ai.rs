@@ -1134,6 +1134,10 @@ pub(crate) fn run_ai(
             &building_snaps,
             &unit_snaps,
         );
+        let bridge_job = commands.iter().find_map(|command| match command {
+            Command::Interact { unit, target } => Some((*unit, *target)),
+            _ => None,
+        });
         commands.extend(think(&view, controller));
         let extra = strategy::decide(&view, controller, &special, &props);
         // A unit assigned a specialist job receives only that job this turn.
@@ -1213,7 +1217,12 @@ pub(crate) fn run_ai(
                     witness = crate::command::AiIntent::default();
                 }
             }
-            queue.push_ai(IssuedCommand { player, command }, witness);
+            match command {
+                Command::Interact { unit, target } if bridge_job == Some((unit, target)) => {
+                    queue.push_bridge_goal(player, unit, target, witness);
+                }
+                command => queue.push_ai(IssuedCommand { player, command }, witness),
+            }
         }
     }
 }

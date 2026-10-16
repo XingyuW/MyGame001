@@ -101,6 +101,7 @@ fn witness(ids: &[SimId], target: Option<SimId>) -> AiIntent {
         owned: ids.iter().copied().collect(),
         armed: ids.iter().copied().collect(),
         target,
+        strategic_valid: false,
     }
 }
 
@@ -429,4 +430,583 @@ fn ra8_internal_and_public_commands_keep_fifo_across_ordinary_and_ability_bounda
         })
         .collect();
     assert_eq!(rejections, vec![&RejectReason::NotCommandable(gi)]);
+}
+
+fn bridge_job_app() -> (App, SimId, SimId, SimId) {
+    bridge_job_app_from(20)
+}
+fn bridge_job_app_from(x: i32) -> (App, SimId, SimId, SimId) {
+    let (app, bridge, hut, engineer, _) = bridge_job_with_controllers(x);
+    (app, bridge, hut, engineer)
+}
+fn bridge_job_with_controllers(x: i32) -> (App, SimId, SimId, SimId, crate::AiPlayers) {
+    let mut app = app();
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<crate::AiPlayers>());
+    let mut looks = vec![0; 48 * 48];
+    {
+        let mut grid = app.world_mut().resource_mut::<Grid>();
+        for y in 0..48 {
+            for x in 22..=24 {
+                grid.set_terrain(
+                    CellPos::new(x, y),
+                    Cell {
+                        passable: false,
+                        water: true,
+                        buildable: false,
+                        ore: 0,
+                    },
+                );
+            }
+        }
+        for x in 22..=24 {
+            grid.set_terrain(
+                CellPos::new(x, 24),
+                Cell {
+                    passable: true,
+                    water: false,
+                    buildable: false,
+                    ore: 0,
+                },
+            );
+            looks[24 * 48 + x as usize] = 8 << 4;
+        }
+        for (x, y) in [(21, 22), (25, 22)] {
+            looks[y * 48 + x] = 15 << 4;
+        }
+        grid.mark_world_features(&looks);
+    }
+    crate::install_world_objects(app.world_mut(), true);
+    let bridge = *app
+        .world()
+        .resource::<crate::Bridges>()
+        .bridges
+        .keys()
+        .next()
+        .unwrap();
+    let hut = app
+        .world()
+        .resource::<Grid>()
+        .building(CellPos::new(21, 22))
+        .unwrap();
+    app.world_mut()
+        .resource_mut::<crate::Props>()
+        .hurt(CellPos::new(23, 24), i64::MAX);
+    tick(&mut app); // Real scheduled collapse updates both terrain and bridge state.
+    assert!(app.world().resource::<crate::Bridges>().bridges[&bridge].collapsed);
+    let engineer = unit(&mut app, 0, "engineer", x, 22);
+    tick(&mut app);
+    (app, bridge, hut, engineer, controllers)
+}
+
+fn bridge_goal(app: &mut App, unit: SimId, hut: SimId) {
+    app.world_mut()
+        .resource_mut::<CommandQueue>()
+        .push_bridge_goal(PlayerId(0), unit, hut, AiIntent::default());
+}
+
+#[test]
+fn ra8_private_bridge_goal_planning_and_pending_hash_ignore_unseen_naval_blockers() {
+    let mut decisions = Vec::new();
+    for hidden_ship in [false, true] {
+        let (mut app, _, hut, engineer, controllers) = bridge_job_with_controllers(20);
+        let ship = hidden_ship.then(|| unit(&mut app, 1, "typhoon", 23, 24));
+        tick(&mut app);
+        if let Some(ship) = ship {
+            assert!(
+                app.world()
+                    .resource::<crate::SpecialState>()
+                    .hidden
+                    .contains(&(PlayerId(0), ship))
+            );
+        }
+        while !app.world().resource::<SimTick>().0.is_multiple_of(40) {
+            tick(&mut app);
+        }
+        app.world_mut().insert_resource(controllers);
+        tick(&mut app); // Actual shipped controller; no fabricated visibility/hidden state.
+        let queue = app.world().resource::<CommandQueue>();
+        assert!(
+            queue
+                .pending
+                .iter()
+                .any(|p| p.action == PendingAction::ConditionalBridgeRepair
+                    && p.issued.command
+                        == Command::Interact {
+                            unit: engineer,
+                            target: hut
+                        })
+        );
+        let mut h = crate::Fnv1a64::new();
+        queue.hash_into(&mut h);
+        decisions.push((queue.iter().cloned().collect::<Vec<_>>(), h.finish()));
+    }
+    assert_eq!(
+        decisions[0], decisions[1],
+        "unknown physical occupancy cannot change controller output, goal tagging, or witnesses"
+    );
+}
+
+#[test]
+fn ra8_private_bridge_goal_waits_for_hidden_occupancy_then_consumes_engineer_only_after_clear() {
+    for reserved in [false, true] {
+        let (mut app, bridge, hut, engineer) = bridge_job_app();
+        let ship = unit(&mut app, 1, "typhoon", 23, if reserved { 23 } else { 24 });
+        tick(&mut app);
+        if reserved {
+            app.world_mut()
+                .resource_mut::<CommandQueue>()
+                .push(IssuedCommand {
+                    player: PlayerId(1),
+                    command: Command::Move {
+                        units: vec![ship],
+                        target: CellPos::new(23, 24),
+                    },
+                });
+            tick(&mut app);
+            let ship_entity = entity(&mut app, ship);
+            assert_eq!(
+                app.world()
+                    .get::<Mobile>(ship_entity)
+                    .unwrap()
+                    .step
+                    .unwrap()
+                    .to,
+                CellPos::new(23, 24)
+            );
+        }
+        assert!(
+            app.world()
+                .resource::<crate::SpecialState>()
+                .hidden
+                .contains(&(PlayerId(0), ship))
+        );
+        issue(
+            &mut app,
+            Command::Interact {
+                unit: engineer,
+                target: hut,
+            },
+            None,
+        );
+        assert!(tick(&mut app).iter().any(|e| matches!(
+            e,
+            SimEvent::CommandRejected {
+                reason: RejectReason::AbilityUnavailable(
+                    "Ships must clear the collapsed bridge before repair"
+                ),
+                ..
+            }
+        )));
+        bridge_goal(&mut app, engineer, hut);
+        assert!(
+            !tick(&mut app)
+                .iter()
+                .any(|e| matches!(e, SimEvent::CommandRejected { .. }))
+        );
+        assert!(app.world().resource::<crate::Bridges>().bridges[&bridge].collapsed);
+        let engineer_entity = entity(&mut app, engineer);
+        assert!(
+            app.world()
+                .get::<crate::Health>(engineer_entity)
+                .unwrap()
+                .hit_points
+                > 0
+        );
+        app.world_mut()
+            .resource_mut::<CommandQueue>()
+            .push(IssuedCommand {
+                player: PlayerId(1),
+                command: Command::Move {
+                    units: vec![ship],
+                    target: CellPos::new(23, 20),
+                },
+            });
+        for _ in 0..300 {
+            tick(&mut app);
+        }
+        bridge_goal(&mut app, engineer, hut);
+        assert!(
+            tick(&mut app)
+                .iter()
+                .any(|e| matches!(e, SimEvent::BridgeChanged { intact: true, .. }))
+        );
+        assert!(!app.world().resource::<crate::Bridges>().bridges[&bridge].collapsed);
+        assert!(app.world().get::<Unit>(engineer_entity).is_none());
+    }
+}
+
+#[test]
+fn ra8_private_bridge_goal_preserves_fifo_and_rechecks_arrival_occupancy() {
+    for stop_after in [false, true] {
+        let (mut app, bridge, hut, engineer) = bridge_job_app_from(18);
+        let e = entity(&mut app, engineer);
+        // A far Engineer starts a genuine Interact travel job on a clear deck.
+        if !stop_after {
+            issue(
+                &mut app,
+                Command::Stop {
+                    units: vec![engineer],
+                },
+                None,
+            );
+        }
+        bridge_goal(&mut app, engineer, hut);
+        if stop_after {
+            issue(
+                &mut app,
+                Command::Stop {
+                    units: vec![engineer],
+                },
+                None,
+            );
+        }
+        let events = tick(&mut app);
+        assert!(
+            !events
+                .iter()
+                .any(|e| matches!(e, SimEvent::CommandRejected { .. })),
+            "{events:?}"
+        );
+        assert_eq!(
+            app.world()
+                .resource::<crate::SpecialState>()
+                .interactions
+                .get(&engineer)
+                == Some(&hut),
+            !stop_after
+        );
+        if stop_after {
+            continue;
+        }
+        let ship = unit(&mut app, 1, "typhoon", 23, 24);
+        for _ in 0..400 {
+            tick(&mut app);
+        }
+        assert!(app.world().resource::<crate::Bridges>().bridges[&bridge].collapsed);
+        assert!(app.world().get::<crate::Health>(e).unwrap().hit_points > 0);
+        app.world_mut()
+            .resource_mut::<CommandQueue>()
+            .push(IssuedCommand {
+                player: PlayerId(1),
+                command: Command::Move {
+                    units: vec![ship],
+                    target: CellPos::new(23, 20),
+                },
+            });
+        for _ in 0..300 {
+            tick(&mut app);
+        }
+        bridge_goal(&mut app, engineer, hut);
+        let mut repaired = false;
+        for _ in 0..400 {
+            repaired |= tick(&mut app)
+                .iter()
+                .any(|event| matches!(event, SimEvent::BridgeChanged { intact: true, .. }));
+        }
+        assert!(repaired);
+        assert!(app.world().get::<Unit>(e).is_none());
+    }
+}
+
+#[test]
+fn ra8_private_bridge_goal_authorizes_before_readiness_and_hashes_its_distinct_action() {
+    for blocked in [false, true] {
+        for fault in [
+            "missing_actor",
+            "dead_actor",
+            "enemy_actor",
+            "hidden_actor",
+            "wrong_type",
+            "missing_hut",
+            "dead_hut",
+            "hidden_hut",
+            "wrong_target",
+        ] {
+            let (mut app, _, hut, engineer) = bridge_job_app();
+            if blocked {
+                unit(&mut app, 1, "typhoon", 23, 24);
+                tick(&mut app);
+            }
+            let (actor, target) = match fault {
+                "missing_actor" => (SimId(999999), hut),
+                "dead_actor" => {
+                    let e = entity(&mut app, engineer);
+                    app.world_mut()
+                        .get_mut::<crate::Health>(e)
+                        .unwrap()
+                        .hit_points = 0;
+                    (engineer, hut)
+                }
+                "enemy_actor" => (unit(&mut app, 1, "engineer", 19, 22), hut),
+                "hidden_actor" => {
+                    let id = unit(&mut app, 1, "spy", 19, 22);
+                    tick(&mut app);
+                    (id, hut)
+                }
+                "wrong_type" => (unit(&mut app, 0, "rhino", 19, 22), hut),
+                "missing_hut" => (engineer, SimId(999998)),
+                "dead_hut" => {
+                    let e = entity(&mut app, hut);
+                    app.world_mut()
+                        .get_mut::<crate::Health>(e)
+                        .unwrap()
+                        .hit_points = 0;
+                    (engineer, hut)
+                }
+                "hidden_hut" => {
+                    let e = entity(&mut app, hut);
+                    app.world_mut().get_mut::<Owner>(e).unwrap().0 = PlayerId(1);
+                    app.world_mut()
+                        .resource_mut::<crate::Players>()
+                        .get_mut(PlayerId(0))
+                        .unwrap()
+                        .vision
+                        .reshroud(CellPos::new(21, 22), 20);
+                    (engineer, hut)
+                }
+                _ => (engineer, engineer),
+            };
+            let issued = IssuedCommand {
+                player: PlayerId(0),
+                command: Command::Interact {
+                    unit: actor,
+                    target,
+                },
+            };
+            let reason =
+                crate::special::bridge_goal_ready(app.world_mut(), &issued).expect_err(fault);
+            match fault {
+                "missing_actor" | "dead_actor" | "hidden_actor" => {
+                    assert_eq!(reason, RejectReason::UnknownUnit(actor))
+                }
+                "enemy_actor" => assert_eq!(reason, RejectReason::NotOwned(actor)),
+                "missing_hut" | "dead_hut" | "hidden_hut" => {
+                    assert_eq!(reason, RejectReason::UnknownTarget(target))
+                }
+                _ => assert_eq!(
+                    reason,
+                    RejectReason::AbilityUnavailable("Choose an Engineer and bridge repair hut")
+                ),
+            }
+            bridge_goal(&mut app, actor, target);
+            assert!(
+                tick(&mut app).iter().any(
+                    |e| matches!(e,SimEvent::CommandRejected {reason:found,..} if *found==reason)
+                ),
+                "{fault}"
+            );
+        }
+    }
+    let (mut app, _, hut, engineer) = bridge_job_app();
+    let issued = IssuedCommand {
+        player: PlayerId(0),
+        command: Command::Interact {
+            unit: engineer,
+            target: hut,
+        },
+    };
+    app.world_mut()
+        .resource_mut::<CommandQueue>()
+        .push_ai(issued.clone(), AiIntent::default());
+    let ordinary = crate::state_hash(app.world_mut());
+    *app.world_mut().resource_mut::<CommandQueue>() = CommandQueue::default();
+    bridge_goal(&mut app, engineer, hut);
+    assert_ne!(ordinary, crate::state_hash(app.world_mut()));
+}
+
+#[test]
+fn ra8_strategic_visible_cell_loss_cancels_only_fully_valid_internal_intents() {
+    use bevy_ecs::schedule::IntoScheduleConfigs;
+    for mode in [
+        "internal",
+        "public",
+        "already_unready",
+        "became_unready",
+        "wrong_type",
+        "wrong_chronosphere",
+        "outside",
+        "unit_arguments",
+    ] {
+        let mut app = app();
+        app.world_mut().insert_resource(crate::AiPlayers::default());
+        crate::spawn_building(
+            app.world_mut(),
+            PlayerId(0),
+            "nuclear_reactor",
+            CellPos::new(2, 2),
+        )
+        .unwrap();
+        crate::spawn_building(
+            app.world_mut(),
+            PlayerId(0),
+            "spy_satellite",
+            CellPos::new(14, 2),
+        )
+        .unwrap();
+        crate::spawn_building(
+            app.world_mut(),
+            PlayerId(1),
+            "nuclear_reactor",
+            CellPos::new(32, 2),
+        )
+        .unwrap();
+        let ability = if mode == "wrong_chronosphere" {
+            "chronosphere"
+        } else if mode == "wrong_type" {
+            "barracks"
+        } else {
+            "nuclear_silo"
+        };
+        let source =
+            crate::spawn_building(app.world_mut(), PlayerId(0), ability, CellPos::new(2, 20))
+                .unwrap();
+        tick(&mut app); // Real announcement initializes the timer before fixture readiness.
+        let cooldown = app
+            .world()
+            .resource::<Definitions>()
+            .metadata(ProductionItem::Building(
+                app.world()
+                    .resource::<Definitions>()
+                    .building_kind(ability)
+                    .unwrap(),
+            ))
+            .unwrap()
+            .cooldown;
+        if mode != "already_unready" {
+            app.world_mut()
+                .resource_mut::<crate::SpecialState>()
+                .charge
+                .insert(source, cooldown);
+        }
+        let target = if mode == "outside" {
+            CellPos::new(-1, -1)
+        } else {
+            CellPos::new(28, 28)
+        };
+        assert!(
+            app.world()
+                .resource::<crate::Players>()
+                .get(PlayerId(0))
+                .unwrap()
+                .vision()
+                .is_visible(CellPos::new(28, 28))
+        );
+        let decision_tick = app.world().resource::<SimTick>().0;
+        app.add_systems(
+            SimSchedule,
+            (move |world: &mut bevy_ecs::world::World| {
+                if world.resource::<SimTick>().0 != decision_tick {
+                    return;
+                }
+                let command = Command::Superweapon {
+                    building: source,
+                    target,
+                    units: if mode == "unit_arguments" {
+                        vec![SimId(999999)]
+                    } else {
+                        Vec::new()
+                    },
+                };
+                let issued = IssuedCommand {
+                    player: PlayerId(0),
+                    command,
+                };
+                if mode == "public" {
+                    world.resource_mut::<CommandQueue>().push(issued);
+                } else {
+                    world
+                        .resource_mut::<CommandQueue>()
+                        .push_ai(issued, AiIntent::default());
+                }
+                certify_ai_strategic_intents(world);
+                crate::spawn_building(world, PlayerId(1), "gap_generator", CellPos::new(30, 30))
+                    .unwrap();
+                if mode == "became_unready" {
+                    world
+                        .resource_mut::<crate::SpecialState>()
+                        .charge
+                        .insert(source, 0);
+                }
+            })
+            .in_set(crate::SimSet::Ai)
+            .after(crate::SimCoreSet(crate::SimSet::Ai)),
+        );
+        let events = tick(&mut app);
+        assert!(
+            !events
+                .iter()
+                .any(|e| matches!(e, SimEvent::StrategicActivated { .. }))
+        );
+        assert!(
+            !app.world()
+                .resource::<crate::Players>()
+                .get(PlayerId(0))
+                .unwrap()
+                .vision()
+                .is_visible(CellPos::new(28, 28)),
+            "{mode}: real Gap must remove satellite-only sight"
+        );
+        let certified = app
+            .world()
+            .resource::<CommandQueue>()
+            .pending
+            .iter()
+            .find_map(|p| p.ai_intent.as_ref().map(|w| w.strategic_valid))
+            .unwrap_or(false);
+        assert_eq!(
+            certified,
+            ["internal", "became_unready"].contains(&mode),
+            "{mode}"
+        );
+        let events = tick(&mut app);
+        assert!(
+            !events
+                .iter()
+                .any(|e| matches!(e, SimEvent::StrategicActivated { .. })),
+            "{mode}"
+        );
+        assert_eq!(
+            events
+                .iter()
+                .any(|e| matches!(e, SimEvent::CommandRejected { .. })),
+            mode != "internal",
+            "{mode}: {events:?}"
+        );
+    }
+}
+
+#[test]
+fn ra8_strategic_visibility_certificate_is_value_hashed_and_never_certifies_hidden_cells() {
+    let mut app = app();
+    let source = crate::spawn_building(
+        app.world_mut(),
+        PlayerId(0),
+        "nuclear_silo",
+        CellPos::new(2, 20),
+    )
+    .unwrap();
+    issue(
+        &mut app,
+        Command::Superweapon {
+            building: source,
+            target: CellPos::new(40, 2),
+            units: Vec::new(),
+        },
+        Some(AiIntent::default()),
+    );
+    certify_ai_strategic_intents(app.world_mut());
+    assert!(
+        !app.world().resource::<CommandQueue>().pending[0]
+            .ai_intent
+            .as_ref()
+            .unwrap()
+            .strategic_valid
+    );
+    let before = crate::state_hash(app.world_mut());
+    app.world_mut().resource_mut::<CommandQueue>().pending[0]
+        .ai_intent
+        .as_mut()
+        .unwrap()
+        .strategic_valid = true;
+    assert_ne!(before, crate::state_hash(app.world_mut()));
 }

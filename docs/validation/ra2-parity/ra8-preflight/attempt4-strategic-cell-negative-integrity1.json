@@ -1,0 +1,14 @@
+{
+  "source": "crates/sim/src/command.rs",
+  "test": "command::ra8_intent_tests::ra8_strategic_visible_cell_loss_cancels_only_fully_valid_internal_intents",
+  "mutation": {
+    "old": "let cell_visibility_lost = ai_intent",
+    "new": "let cell_visibility_lost = false && ai_intent"
+  },
+  "before_sha256": "f34246f19382754be318b576cbaf19a11245768dfff3543f99c9240ef77acfe4",
+  "mutated_sha256": "d95c11288d5b10e0d1c0e7bea8232c8dd23c82ab6b8b022673137e777bb9c82f",
+  "restored_sha256": "f34246f19382754be318b576cbaf19a11245768dfff3543f99c9240ef77acfe4",
+  "exact_restoration": true,
+  "exit": 101,
+  "elapsed_seconds": 20.43086104199756
+}

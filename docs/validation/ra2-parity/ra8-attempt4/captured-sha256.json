@@ -1,0 +1,10 @@
+{
+  "05-build-release.log": "ea443ce5ecdb04d56b3579fce71f4e6a2cc4c77b3cf8bcf374a23cf2174ea2de",
+  "01-fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "06-smoke-release.log": "2c7b293e53de43e27ae2cf66ec219dc9ec3905faaf616e412227380ce2d31f82",
+  "summary.txt": "079e676d6d88d940da4f89fdae5f3ffd5df7f5fede5a7c965d97206234c6a653",
+  "07-smoke-debug.log": "42eb40a8e3b629245affe036f4527cf7cdcc632b1e710e891bf7c132d1d5b2ec",
+  "03-clippy.log": "4f27ac380b22e1d975eee20ce727fa8cbc09061177f6253af0777fd4de7b7506",
+  "02-diff-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "04-test.log": "d9f9048ef9408abb876db02f653efd1b5833ba66c1d560a3a84b58a1e7ee01f7"
+}

@@ -1,6 +1,46 @@
 //! Specialist commands mechanics, moved unchanged from special.rs.
 use super::*;
 
+/// Engine-only conditional bridge job. Actor/target authorization precedes readiness;
+/// a hidden ship can never turn a bad actor or unknown hut into an accepted goal.
+pub(crate) fn bridge_goal_ready(
+    world: &mut World,
+    issued: &IssuedCommand,
+) -> Result<bool, RejectReason> {
+    if world.resource::<Players>().get(issued.player).is_none() {
+        return Err(RejectReason::UnknownPlayer(issued.player));
+    }
+    let Command::Interact { unit, target } = issued.command else {
+        return Err(unavailable("Choose an Engineer and bridge repair hut"));
+    };
+    let index = living(world);
+    let defs = world.resource::<Definitions>();
+    let a = own(world, defs, &index, issued.player, unit)?;
+    commandable(world, unit)?;
+    let b = index
+        .get(&target)
+        .ok_or(RejectReason::UnknownTarget(target))?;
+    if b.owner != a.owner
+        && (!world.resource::<Players>().get(a.owner).is_some_and(|p| {
+            b.foot.map_or(p.vision().is_visible(b.cell), |f| {
+                p.vision().sees_footprint(f)
+            })
+        }) || world
+            .resource::<SpecialState>()
+            .hidden
+            .contains(&(a.owner, b.id)))
+    {
+        return Err(RejectReason::UnknownTarget(target));
+    }
+    if a.id == b.id
+        || role(defs, a) != Role::Engineer
+        || !defs.metadata(b.item).is_some_and(|m| m.bridge_repair_hut)
+    {
+        return Err(unavailable("Choose an Engineer and bridge repair hut"));
+    }
+    crate::bridges::repair_ready(world, target)
+}
+
 pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), RejectReason> {
     let index = living(world);
     let defs = world.resource::<Definitions>().clone();

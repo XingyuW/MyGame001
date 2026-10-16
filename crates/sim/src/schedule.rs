@@ -123,7 +123,10 @@ impl Plugin for SimPlugin {
                 .chain()
                 .in_set(SimCoreSet(SimSet::Commands))
                 .in_set(SimSet::Commands),
-            run_ai.in_set(SimCoreSet(SimSet::Ai)).in_set(SimSet::Ai),
+            (run_ai, crate::command::certify_ai_strategic_intents)
+                .chain()
+                .in_set(SimCoreSet(SimSet::Ai))
+                .in_set(SimSet::Ai),
             (
                 update_power,
                 advance_production,

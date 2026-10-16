@@ -1,0 +1,5 @@
+# Stopped frozen RA8 attempt4
+
+Frozen4dfeeedc910ea9589889806d396aaa51c13c03c4, runtime65fa8d669ac1e14adadc30b2745887071b580bec. Workspace04 exited101/2703s,253passed/1failed/0ignored; production target5passed/1failed/2497.71s. Concrete seed0 failures: SteelHarbor AmericaBrutal/CubaBrutal bridge Interact518→2684378722 at28241; ThousandLakes GreatBritainEasy/AmericaEasy Superweapon62→(23,23) at28922 Strategic target must be visible; ThousandLakes FranceBrutal/GermanyBrutal no winner under unchanged R29. Full assertions/state are in04-test.log.
+
+01–03/05–06 exited0;07 debug smoke stopped. Verified owned root50452/debug53820/caffeinate50457 only were terminated, outer143;08–13 not reached. All raw files/incomplete summary are retained; captured-sha256.json records untouched bytes before this annotation. No successful756-row table was emitted; stale target tables are not evidence. Source stayed frozen through the healthy gate. Owned production CPU progressed07:28/64:19.99→08:43/74:43.24→20:00/170:17.85→34:09/289:35.54, with867.9percent CPU in last sample. No competing probe/validation/source edit occurred.

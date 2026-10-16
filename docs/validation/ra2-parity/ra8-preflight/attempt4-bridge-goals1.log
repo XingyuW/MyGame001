@@ -1,0 +1,50 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0308]: arguments to this method are incorrect
+   --> crates/sim/src/ra8_intents.rs:607:14
+    |
+607 |             .register(CellPos::new(16, 22), engineer, true)
+    |              ^^^^^^^^ --------------------  -------- argument #2 of type `arsenal::Domain` is missing
+    |                       |
+    |                       unexpected argument #1 of type `map::CellPos`
+    |
+note: method defined here
+   --> crates/sim/src/map.rs:301:19
+    |
+301 |     pub(crate) fn register(&mut self, id: SimId, domain: crate::Domain, on_foot: bool) {
+    |                   ^^^^^^^^                       ---------------------
+help: did you mean
+    |
+607 -             .register(CellPos::new(16, 22), engineer, true)
+607 +             .register(engineer, /* arsenal::Domain */, true)
+    |
+
+error[E0599]: no method named `unwrap` found for unit type `()` in the current scope
+   --> crates/sim/src/ra8_intents.rs:608:14
+    |
+605 | /         app.world_mut()
+606 | |             .resource_mut::<Grid>()
+607 | |             .register(CellPos::new(16, 22), engineer, true)
+608 | |             .unwrap();
+    | |             -^^^^^^ method not found in `()`
+    | |_____________|
+    |
+    |
+note: method `register` modifies its receiver in-place, it is not meant to be used in method chains.
+   --> crates/sim/src/ra8_intents.rs:607:14
+    |
+607 |             .register(CellPos::new(16, 22), engineer, true)
+    |              ^^^^^^^^ this call modifies its receiver in-place
+
+error[E0502]: cannot borrow `app` as mutable because it is also borrowed as immutable
+   --> crates/sim/src/ra8_intents.rs:525:43
+    |
+524 |                 app.world()
+    |                 --- immutable borrow occurs here
+525 |                     .get::<Mobile>(entity(&mut app, ship))
+    |                      ---                  ^^^^^^^^ mutable borrow occurs here
+    |                      |
+    |                      immutable borrow later used by call
+
+Some errors have detailed explanations: E0308, E0502, E0599.
+For more information about an error, try `rustc --explain E0308`.
+error: could not compile `sim` (lib test) due to 3 previous errors
