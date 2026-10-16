@@ -1,10 +1,10 @@
 # RA8 acceptance record
 
-Status: fourth frozen attempt failed and was stopped. R111–R114 record its exact three
-failures, narrow private bridge/cell lifecycle corrections and the controlled observed-AA
-response. Focused schedule/default-pair corrections pass. Final-source affected compatibility,
-21-map completion/256-budget repeats and the complete thirteen-command gate remain required.
-This is validated work in progress, not independent review or completed RA8 acceptance.
+Status: final runtimebbb09fe closes the fourth gate's three concrete failures with separate
+lifecycle3b81f76 and observed-AA commits. Affected serial preflight passes483 tests; repeated
+normal ten-player completion has21/21 winners and exact256×256 means pass. Checkpoint5 awaits
+the required milestone check and complete thirteen-command frozen rerun. This is validated
+preflight, not independent review or completed RA8 acceptance.
 All earlier validation directories and failed RA8 probes are retained.
 
 ## Acceptance checklist
@@ -444,3 +444,39 @@ All twelve exact cases have explicit winners; maximum242941 remains below its un
 288000 limit. R114 records longer outcomes transparently. No existing migration/assertion/
 rejection exception is added after R110. No validator is active at the source-commit point;
 final-source m13/all21,256-budget and all13 frozen commands remain required.
+
+
+## Fifth committed freeze checkpoint (R115)
+
+Final runtime: `bbb09feab392b31e6d627d0060586c73b100e6db`; lifecycle correction:`3b81f76`.
+`ra8-preflight/checkpoint5.json` carries1197 static tests/73 additions,zero removals/renames/
+ignores,483 passing affected tests/22 targets,strict checks,precise old-test migration ledger,
+all failed attempts,negative source restoration evidence,assumptions/debt/storage and the
+unchanged before-R29 distributions. No source/assets/scripts/dependencies change afterward.
+
+Repeated actual default ten-player `-- to-the-end all` exits0,21/21 Won,ten builders each,
+every mean<5ms. Endings median56614/p90108259/max288884 below unchanged400000; command918.242s,
+measured914.394s/per-map elapsed914.567s. Prior65fa's median/p90/max55554/91393/331947 are
+preserved: median/p90 rise while max falls. Raw `ten-player-all-end6.log` and structured
+`attempt4-m13-metrics.json` retain all fields,including all-map longest tick290.853ms.
+
+Exact fixed24000-tick256×256 unprofiled normal-game benchmark exits0,ten builders per map:
+
+| Map | Mean ms | p99 ms | Maximum ms | Busiest 1000 mean ms | Ticks above50ms |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Liberty Bay | 0.842308 | 4.762 | 109.899 | 1.790 | 2 |
+| Continental Divide | 0.623839 | 2.023 | 113.223 | 1.150 | 4 |
+| Pacific Atoll | 0.780129 | 4.540 | 76.099 | 1.418 | 2 |
+
+The unchanged mean budget is5ms. There is no maximum-tick or smooth-play guarantee. Raw
+`ten-player256-benchmark6.log` and default-results JSON retain command54.550s and all values.
+No Super Me/unlock,manual injected HP or altered startup options enter these normal runs.
+
+Review scope explicitly includes R112's private conditional goal/authorization/FIFO/actual
+restoration safety and R113's complete strategic decision certificate/narrow cell-loss
+cancellation. Public Interact remains strict. R114's AA target/approach algorithm is a declared
+source-derived game-owned policy,with no new balance quota/weight/radius/schema. All prior
+assumptions and RA9 R83/R96/R99 handoffs remain; R97's mechanism is closed in R103. Independent
+review and user visual/audio/play-feel verification remain. No new external directory; retained
+configured-Cargo708KiB parser scratch is recreatable and unnecessary for release. Full13 and
+both756-winner final R29 before/after distributions still remain required before RA8 closure.
