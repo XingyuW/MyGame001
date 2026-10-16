@@ -788,19 +788,27 @@ fn several_players_play(data: &Data, map: usize, def: &sim::MapDef) {
             let yard = footprints(world, PlayerId(k as u8));
             assert!(yard.iter().any(|f| f.origin == *start), "{}: {k}", def.id);
         }
+        let initial_credits: BTreeMap<_, _> = world
+            .resource::<Players>()
+            .iter()
+            .map(|(id, state)| (id, state.credits()))
+            .collect();
         let mut credits_moved = BTreeSet::new();
         let mut outcome = None;
         for at in 0..limit {
             world.run_schedule(SimSchedule);
-            if at == 3_000 {
-                check_independent(world, count);
+            // An active economy can spend and earn back its exact starting balance.
+            // Observe its history through the original checkpoint instead of one snapshot.
+            if at <= 3_000 {
                 let players = world.resource::<Players>();
-                for k in 0..count {
-                    let id = PlayerId(k as u8);
-                    if players.get(id).is_some_and(|s| s.credits() != 5000) {
+                for (&id, &initial) in &initial_credits {
+                    if players.get(id).is_some_and(|s| s.credits() != initial) {
                         credits_moved.insert(id);
                     }
                 }
+            }
+            if at == 3_000 {
+                check_independent(world, count);
             }
             outcome = world.resource::<MatchState>().outcome();
             if outcome.is_some() {
