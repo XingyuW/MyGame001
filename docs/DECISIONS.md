@@ -5661,3 +5661,38 @@ capture EOF blank lines, not a pass. Exact paths/lines, raw lines and unfiltered
 `ra8-preflight/refreeze-staged-whitespace-check2.json`; no source/data/test/doc diagnostic is
 present. Captures are neither trimmed nor broadly exempted. A separate exact-set recheck
 precedes the correction commit, as required after R94's orchestration mistakes.
+
+### R104. RA8 corrected-runtime refreeze and repeated default-path evidence
+
+**2026-10-16 UTC. Validated preflight, not independently reviewed.** Correction commit
+`d840b44797a81b66ae284d0bcb623499c6cc8a86` remains unchanged for both repeated m13 runs.
+All21 default ten-player maps have explicit winners, all ten players building and means<5ms:
+ending median63573/p90 nearest-rank106700/max186405, within unchanged400000 limit;
+measured744.679s/elapsed744.791s. Frostline Won(P6) at63573, mean902.399µs/elapsed57.375s;
+Pacific Won(P3) at66076, mean508.810µs. Final256 means are0.739225/0.628747/0.560533ms for
+Liberty/Continental/Pacific, each24000 ticks/all ten building. Liberty's one52.777ms tick is
+retained; no maximum guarantee is claimed. Full fields are in `refreeze-m13-metrics.json`.
+
+The parent raised and resolved a decision-witness concern by source inspection:
+`ai.rs::View::new` already filters own_units through `army_commandable`, excluding all
+spawned/flights/erasures/deployed/interacting/docked/rearming/disabled actors before capture.
+Recoverable occupied Props use the explicit separate Deploy branch. No source change or
+interruption of the healthy default sweep was needed. This is a milestone check, not final review.
+
+`checkpoint2.json` maps the final1172-static-test inventory (48 added,zero removed/renamed/
+ignored),230-test serial sim preflight, exact failed-Demo and unchanged Crossroads/Coral
+proofs, strict Clippy/fmt/generator/reference checks, R102's exact old-test migration and
+all preserved failures. It retains both before-R29 distributions by raw ticks and unchanged
+scaled ratios; final756-production and756-duel distributions remain required. The first
+failed frozen attempt remains intact at `ra8-attempt1`; the exact all13 gate is held for
+parent milestone checks of the committed refreeze. R97's mechanism is fixed by R103;
+R83/R96 specialist/transport and R99's unproven capability lead remain RA9 work. No new external
+directory was created; configured Cargo parser scratch remains708KiB/recreatable/retained.
+
+The first original Crossroads case also passes on exact final runtime in4.45s
+(`crossroads-final2.log`). Its raw line8 is the sole staged whitespace diagnostic, an EOF
+blank line retained in `checkpoint2-staged-whitespace-check.json` with unfiltered stdout.
+The standalone check exits2, not a pass. An initial diagnostic shell call also ran stat,
+masking that check's outer status as0; the warning was inspected and an immediate standalone
+check returned2 before any commit. The exact single raw diagnostic is classified and a
+separate exact-set recheck precedes commit. No capture is altered or broadly suppressed.

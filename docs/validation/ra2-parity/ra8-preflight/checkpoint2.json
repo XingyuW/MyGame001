@@ -1,0 +1,107 @@
+{
+  "frozen_runtime": "d840b44797a81b66ae284d0bcb623499c6cc8a86",
+  "feature_commit": "bb1f87e9496236ecf3bcdcd797fd1446f732d203",
+  "main_unchanged": "8230a955b251e9341d349f99eaeb86f7f8253664",
+  "gate_state": "held_pending_root_required_refreeze_checks; no validator active",
+  "next_command": "env -u RA2_DUEL_SEED -u RA2_DUEL_PAIR sh scripts/validate_ra2_parity.sh ra8",
+  "full_gate_required_commands": 13,
+  "acceptance": "docs/validation/ra2-parity/RA8_ACCEPTANCE.md",
+  "decisions": "docs/DECISIONS.md R88-R104",
+  "fixture_migration_ledger": "DECISIONS.md R94/R96/R102; R103 changes no old assertion or limit",
+  "static_tests": 1172,
+  "added_tests": 48,
+  "removed_or_renamed_tests": 0,
+  "ignores": 0,
+  "test_inventory": "refreeze2-test-inventory.json",
+  "serial_preflight": {
+    "targets": 13,
+    "passed": 230,
+    "failed": 0,
+    "ignored": 0,
+    "logs": [
+      "refreeze-boundaries2.log",
+      "refreeze-compatibility2.log",
+      "refreeze-data-audit2.log"
+    ]
+  },
+  "m13_metrics": "refreeze-m13-metrics.json",
+  "m13_winners": 21,
+  "m13_count": 21,
+  "m13_ending_median": 63573,
+  "m13_ending_p90": 106700,
+  "m13_ending_maximum": 186405,
+  "m13_limit_unchanged": 400000,
+  "ten_player256_means_ms": [
+    0.739225,
+    0.628747,
+    0.560533
+  ],
+  "mean_budget_ms_unchanged": 5,
+  "profile_state_digest": "94f4c6583a68ff22",
+  "profile_event_count": 660,
+  "profile_event_digest": "acbe6072fabd5e3a",
+  "ra9_handoff": [
+    "R83 Size/SizeLimit/loaded boarding and actual attached-Squid host WeaponFired debt",
+    "R96 actorless occupied-Prop C4/Ivan/Temporal resolution boundaries: source-inspected, not ability-support claims",
+    "R99 source-only unproven hypothetical bombable=false capability lead; broader audit explicitly deferred"
+  ],
+  "assumptions": "R91/R92 game-owned full-tech composition, tier reserves, tactical radii/standoff/offsets and source-weight category mapping; prior RA5/RA6 assumptions remain",
+  "storage": {
+    "configured_cargo_target": "/Users/xingyuwang/Library/Caches/Codex/cargo-target",
+    "new_external_directory": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/ra8_definitions",
+    "allocated_KiB": 708,
+    "retention": "retained, recreatable, needed only for reruns; no clone/worktree/environment or substantial tmp artifact",
+    "other_caches": "configured UV_CACHE_DIR/PIP_CACHE_DIR preserved; existing RA5 render and RA7 evidence retained"
+  },
+  "verification_pending": [
+    "all thirteen frozen gates, both756-winner sweeps and unchanged-R29 before/after metrics",
+    "independent final review",
+    "user visual/audio/play-feel verification"
+  ],
+  "staged_whitespace_checks": {
+    "feature": "feature-staged-whitespace-check1.json: exit2,32 classified preserved raw diagnostics; not passed",
+    "performance": "performance-staged-whitespace-check1.json: exit2,one preserved raw EOF; not passed",
+    "process": "separate exact-set rechecks inspected before each commit; no source/data/test diagnostics or suppression",
+    "correction": "refreeze-staged-whitespace-check2.json: exit2 solely12 exact preserved raw EOF diagnostics, separately classified and exact-rechecked before later commit; not passed",
+    "refreeze_checkpoint": "checkpoint2-staged-whitespace-check.json: standaloneexit2 solelycrossroads-final2.log:8 preservedrawEOF; separatelyclassified/rechecked, notpassed"
+  },
+  "previous_checkpoint": "b9388f59f1e8f735677ef994c73107ac73ad73de",
+  "correction_decisions": "R102/R103",
+  "failed_attempt": "ra8-attempt1/STOPPED.md, raw logs/summary unchanged; first04 exited101 and attempt stopped143; all13 must rerun",
+  "focused_game": {
+    "demo_exact_failed_pairs": 10,
+    "explicit_winners": 10,
+    "log": "demo-lifecycle-after2.log",
+    "old_crossroads_functions": 2,
+    "old_coral_functions": 2,
+    "all_original_assertions_and_limits": "unchanged"
+  },
+  "m13_measured_seconds": 744.679,
+  "m13_elapsed_seconds": 744.791,
+  "before_R29": {
+    "production": {
+      "source": "docs/validation/ra2-parity/ra7/production-lengths.tsv",
+      "count": 756,
+      "tick_median": 31540.0,
+      "tick_p90_nearest_rank": 64532,
+      "tick_maximum": 209163,
+      "R29_ratio_median": 0.13147048611111112,
+      "R29_ratio_p90_nearest_rank": 0.2807579365079365,
+      "R29_ratio_maximum": 0.7824722222222222
+    },
+    "duel": {
+      "source": "docs/validation/ra2-parity/ra7/duel-lengths.tsv",
+      "count": 756,
+      "tick_median": 32782.5,
+      "tick_p90_nearest_rank": 69184,
+      "tick_maximum": 157564,
+      "R29_ratio_median": 0.1386996527777778,
+      "R29_ratio_p90_nearest_rank": 0.3236736111111111,
+      "R29_ratio_maximum": 0.7664722222222222
+    }
+  },
+  "R29_comparison_pending": "both756-winner final frozen sweeps; ratios use unchanged72000*max(128,width+height)/128; p90 nearest-rank",
+  "witness_actor_guard": "ai.rs View::new own_units filters through army_commandable before capture; excludes spawned/flights/erasures/deployed/interactions/docked/rearming/disabled; recoverable Prop Deploy uses a distinct branch. Parent confirmed no source change necessary.",
+  "R97_status": "mechanism closed in R103 because actual default gate reproductions required it; not deferred as known broken play",
+  "profile_note": "R89/R98 seeded equalities remain historical evidence for isolated performance commits; new queue hash intentionally extends state format"
+}
