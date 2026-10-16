@@ -337,6 +337,23 @@ fn situation(world: &mut bevy_ecs::world::World) -> String {
             "player {player}: {buildings} buildings {owned:?}, {units} units {centre} \
              {kinds:?}, harvesters {harvest:?}, {credits} credits; "
         ));
+        if let Some(controller) = world
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(player))
+        {
+            let waypoint = match controller.target() {
+                Some(sim::WaveTarget::Waypoint(index)) => controller.waypoints().get(index),
+                _ => None,
+            };
+            let observed = waypoint.is_some_and(|waypoint| {
+                world
+                    .resource::<sim::Players>()
+                    .get(PlayerId(player))
+                    .is_some_and(|state| state.vision().is_visible(waypoint.cell))
+            });
+            text.push_str(&format!("AI wave{} target{:?} waypoint{waypoint:?} observed{observed} known{:?} naval{:?}; ",
+                controller.wave().len(), controller.target(), controller.known_buildings(), controller.naval_target()));
+        }
     }
     text
 }

@@ -1,0 +1,150 @@
+[
+  {
+    "name": "attempt2-sim-final2",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "--test",
+      "ra1_commands",
+      "--test",
+      "ra8_ai",
+      "--test",
+      "ra8_definitions",
+      "--test",
+      "ra8_placement",
+      "--test",
+      "ra4_ai",
+      "--test",
+      "ra5_world",
+      "--test",
+      "ra6_infantry",
+      "--test",
+      "ra6_vehicles",
+      "--test",
+      "ra7_context",
+      "--test",
+      "ra7_orders",
+      "--test",
+      "ra7_vision",
+      "--test",
+      "ra9_data_parity",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 107.10135899999295
+  },
+  {
+    "name": "attempt2-companion-a_soviet_player_left_with_an_armed_miner_still_finishes_the_match",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "m6_production_matches",
+      "a_soviet_player_left_with_an_armed_miner_still_finishes_the_match",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 39.80688575000386
+  },
+  {
+    "name": "attempt2-companion-the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "m6_production_matches",
+      "the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 4.505402208014857
+  },
+  {
+    "name": "attempt2-companion-crossroads_armies_finish_after_new_terrain_changes",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "m6_production_matches",
+      "crossroads_armies_finish_after_new_terrain_changes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 5.140057791984873
+  },
+  {
+    "name": "attempt2-companion-ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "m6_production_matches",
+      "ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 15.9303881249798
+  },
+  {
+    "name": "attempt2-companion-ra5_coral_archipelago_brutal_libya_germany_seed_zero_finishes",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "m6_production_matches",
+      "ra5_coral_archipelago_brutal_libya_germany_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 23.167895916005364
+  },
+  {
+    "name": "attempt2-clippy1",
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 101,
+    "elapsed_seconds": 4.28725462500006
+  }
+]

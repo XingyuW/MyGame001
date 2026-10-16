@@ -1126,7 +1126,14 @@ pub(crate) fn run_ai(
             &building_snaps,
             &special,
         );
-        let mut commands = repair_bridge(&view, controller, &special, &bridges, &building_snaps);
+        let mut commands = repair_bridge(
+            &view,
+            controller,
+            &special,
+            &bridges,
+            &building_snaps,
+            &unit_snaps,
+        );
         commands.extend(think(&view, controller));
         let extra = strategy::decide(&view, controller, &special, &props);
         // A unit assigned a specialist job receives only that job this turn.
@@ -1219,6 +1226,7 @@ fn repair_bridge(
     special: &crate::SpecialState,
     bridges: &crate::Bridges,
     buildings: &[BuildingSnap],
+    units: &[UnitSnap],
 ) -> Vec<Command> {
     for building in buildings
         .iter()
@@ -1263,6 +1271,26 @@ fn repair_bridge(
         .repair_huts
         .iter()
         .filter(|(_, (bridge, _))| controller.broken_bridges.contains(bridge))
+        .filter(|(_, (bridge, _))| {
+            bridges.bridges.get(bridge).is_some_and(|bridge| {
+                // Current/departing holders and reserved arrivals must clear. A known ship
+                // with an active order one step away can reserve the deck later this tick,
+                // before the queued Interact runs. An idle adjacent ship need not block.
+                // Unknown occupants never influence this decision (including hidden subs).
+                !units
+                    .iter()
+                    .filter(|ship| view.known_occupants.contains(&ship.id))
+                    .filter(|ship| view.definitions.domain(ship.kind) == Domain::Naval)
+                    .any(|ship| {
+                        bridge.cells.iter().any(|&cell| {
+                            ship.mobile.cell == cell
+                                || ship.mobile.step.is_some_and(|step| step.to == cell)
+                                || ((ship.has_order || ship.attacking)
+                                    && chebyshev(ship.mobile.cell, cell) <= 1)
+                        })
+                    })
+            })
+        })
         .filter_map(|(&id, &(bridge, cell))| {
             crate::pathfinding::nearest_cell(view.grid, from, |p| {
                 view.grid.is_passable(p)
@@ -1329,6 +1357,9 @@ fn think(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
         BaseUnit::None => {}
     }
     let mut commands = Vec::new();
+    if let Some(command) = cancel_blocked_head(view) {
+        commands.push(command);
+    }
     if let Some(command) = place_ready_building(view, controller) {
         commands.push(command);
     }
@@ -1439,6 +1470,33 @@ fn remember(view: &View<'_>, controller: &mut AiController) {
 }
 
 // --- Construction ---------------------------------------------------------------------------
+
+/// Recover a lane after its actual producer or prerequisite is lost. These are the same
+/// predicates that pause an incomplete head in `economy::advance_production`, evaluated
+/// against owned buildings. Temporary outages, credits, power, queue capacity and build
+/// limits are not losses. Completed paid items keep their ordinary placement/exit path.
+fn cancel_blocked_head(view: &View<'_>) -> Option<Command> {
+    view.state.queues().find_map(|(_, queue)| {
+        let head = queue.first()?;
+        let terms = view.definitions.production(head.item)?;
+        if head.progress >= terms.build_time {
+            return None;
+        }
+        let lost_producer = !view
+            .own_kinds
+            .iter()
+            .any(|&kind| produces(view.definitions, kind, head.item));
+        let lost_prerequisite = !view.state.unlock_all()
+            && crate::economy_commands::missing_prerequisite(
+                view.definitions,
+                &view.own_kinds,
+                head.item,
+            )
+            .is_some();
+        (lost_producer || lost_prerequisite)
+            .then_some(Command::CancelProduction { item: head.item })
+    })
+}
 
 /// What a turn does about the player's base unit.
 enum BaseUnit {
@@ -2448,8 +2506,24 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
     }
     let valid = match controller.target {
         Some(WaveTarget::Building(id)) => controller.known.contains_key(&id),
-        Some(WaveTarget::Waypoint(_)) => true,
+        // Scouting completes on actual observation. Slow aircraft or a crowded formation
+        // need not all become idle at a cell that the player has already inspected.
+        // A known building remains an attack objective until it is gone or unreachable.
+        // Neutral legacy fixtures retain their declared original strategy (R91).
+        Some(WaveTarget::Waypoint(index)) => {
+            controller.waypoints.get(index).is_some_and(|waypoint| {
+                !view.ai.rules_difficulty || !view.vision.is_visible(waypoint.cell)
+            })
+        }
         None => false,
+    };
+    let observed_scout = match controller.target {
+        Some(WaveTarget::Waypoint(index)) => {
+            controller.waypoints.get(index).is_some_and(|waypoint| {
+                view.ai.rules_difficulty && view.vision.is_visible(waypoint.cell)
+            })
+        }
+        _ => false,
     };
     if at_rest || !valid {
         if at_rest {
@@ -2467,7 +2541,7 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
                 _ => {}
             }
         }
-        controller.target = choose_target(controller, centroid);
+        controller.target = choose_target_with_sweep(controller, centroid, observed_scout);
         if let Some(cell) = target_cell(controller, centroid) {
             commands.push(Command::AttackMove {
                 units: members.iter().map(|unit| unit.id).collect(),
@@ -2564,9 +2638,17 @@ fn centroid(units: &[&UnitSnap], fallback: CellPos) -> CellPos {
 }
 
 /// The nearest remembered building that the wave has not failed to reach too often; else the
-/// nearest enemy start position never seen; else the waypoint of the era seen longest ago that
-/// is nearest to an enemy start position, then to the wave.
+/// nearest enemy start position never seen; else begin a sweep near an enemy start. An
+/// actually observed scouting leg continues to the nearest stale waypoint below.
 fn choose_target(controller: &AiController, from: CellPos) -> Option<WaveTarget> {
+    choose_target_with_sweep(controller, from, false)
+}
+
+fn choose_target_with_sweep(
+    controller: &AiController,
+    from: CellPos,
+    continuing_sweep: bool,
+) -> Option<WaveTarget> {
     let building = controller
         .known
         .iter()
@@ -2607,6 +2689,10 @@ fn choose_target(controller: &AiController, from: CellPos) -> Option<WaveTarget>
             .min()
             .unwrap_or(0)
     };
+    // R14's first sweep starts beside the enemy origin. Once that scouting leg is
+    // actually observed, continue through nearby unseen ground instead of crossing the same
+    // expanding ring repeatedly. A failed/unobserved land approach is not an observation:
+    // a later aircraft must still search the original enemy area before wandering elsewhere.
     controller
         .waypoints
         .iter()
@@ -2614,7 +2700,11 @@ fn choose_target(controller: &AiController, from: CellPos) -> Option<WaveTarget>
         .min_by_key(|(_, waypoint)| {
             (
                 waypoint.seen / SWEEP_ERA_TICKS,
-                near_enemy(waypoint.cell),
+                if continuing_sweep {
+                    0
+                } else {
+                    near_enemy(waypoint.cell)
+                },
                 octile_distance(from, waypoint.cell),
                 waypoint.cell.y,
                 waypoint.cell.x,

@@ -194,10 +194,14 @@ fn two_players_who_have_spent_each_other_make_their_last_stand_and_the_match_end
         played.outcome,
         played.ticks
     );
+    eprintln!("RA4 fog-on last stand: {played:?}");
     assert!(played.ticks < 20_000, "{} ticks", played.ticks);
     assert!(played.unexplained.is_empty(), "{:?}", played.unexplained);
     // It waited out its patience first: the players had spent each other by tick 4,400.
-    assert!(played.ticks > 4_400 + sim::LAST_STAND_PATIENCE);
+    assert!(
+        played.ticks > 4_400 + sim::LAST_STAND_PATIENCE,
+        "{played:?}"
+    );
 }
 
 #[test]

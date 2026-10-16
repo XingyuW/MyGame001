@@ -263,3 +263,56 @@ migration/evidence/storage/handoff paths and both RA7 R29 baselines, with the fi
 distributions still pending. R97's lifecycle mechanism is fixed in R103; R83/R96/R99 handoffs
 remain. No new external directory was created; parser scratch remains708KiB. The gate is held
 for required parent milestone checks of committed artifacts before the exact all13 rerun.
+
+
+## Second frozen failure and concrete recovery corrections
+
+The preceding corrected-runtime checkpoint is historical. `ra8-attempt2/STOPPED.md` and
+`captured-sha256.json` preserve the complete untouched failure: workspace04 exited101 after
+4512s (253 passed/1 failed/0 ignored); production target4156.59s, five companions passed.
+01–03/05–06 exited0;07 partial compilation stopped, outer143;08–13 did not run. No successful
+756-row production table was emitted. Its older configured-target table is not copied or
+claimed. All eight captured raw files reverify against their stop-time SHA256 manifest.
+
+R105–R108 record the six exact seed0 no-winner pairs and three ship-blocked repair rejections,
+actual surviving resources/forces/queues/objectives, distinct diagnoses and ordinary-command
+fixes. New nine-case `ra8_gate_matches` preserves original R29 limits, command rejection
+exemptions, credit/cell/stray/queue invariants and requires Won. Before the final legacy-boundary
+correction, all nine exact default replays and the existing ten-pair Demo replay pass; Liberty
+wins at143617/288000. Final-source default evidence is repeated before the next freeze.
+
+Known live/departing/reserved/imminently arriving naval occupants defer bridge repair; an idle
+adjacent ship does not. The nine-mode schedule probe checks actual movement/reservations and
+live Engineers, real concealment and identical emitted hidden-twin planning before Interact.
+Public R67 repair refusal is unchanged; no unknown ship influences the decision. Recovery of
+incomplete paid queue heads uses economy's exact physical producer/prerequisite predicates,
+ordinary charged-credit refund and no temporary power/funds/capacity shortcut. Completed heads
+retain placement and FIFO. The actual aircraft reload cycle passes; aircraft code is unchanged.
+
+Observed scouting objectives can complete without every crowded/slow member becoming idle.
+Their actual-observation continuation searches nearby stale ground after the initial enemy-start
+search, with deterministic ordering and no invented remote-target knowledge/new persistent state.
+A real Engineer-captured remote refinery remains unseen to the Kirov until its search discovers
+it. The old policy fails at144000; corrected search wins at35202. Known-building attacks and
+legitimate unobserved travel remain. An over-broad intermediate phase rule broke the paid naval
+escort test; the actual-visibility predicate restores its existing assertion/deadline.
+
+The neutral fog-on RA4 regression then caught a missing R91 opt-out on these new strategy
+branches: winner5028 violated its unchanged patience lower bound. Bounded source-restored
+probes exclude queue recovery and isolate scouting; the documented rules_difficulty strategy
+boundary restores winner8211, all assertions unchanged. Only diagnostic output/assertion text
+is added to that existing function. No fixture setting, duration bound or valid shipped win
+is altered/delayed. All prior migration entries remain R94/R96/R102; there is no new existing
+assertion/fixture migration. Raw failed probes and contemporaneous restoration hashes remain.
+
+Corrected disjoint serial sim preflight passes236 tests across13 targets, zero failed/ignored:
+core57, public commands22, RA4 AI2, RA5 world23, RA6 infantry30/vehicles32, RA7 context1/orders12/
+vision10, RA8 AI37/definitions4/placement1 and audit5. Full-tree inventory now1124→1187,
+63 added,zero removed/renamed/ignored; all test attributes map to named functions. The failed
+first serial preflight and both bounded negative/probe logs are retained. Final companion,
+strict lint/data, default m13/budget and the complete frozen thirteen-command gate remain
+required. No independent review is claimed and no new external directory was created.
+
+Strict all-target Clippy, fmt, generated-data and4934-row reference audit now pass; the sole
+new-test clone_on_copy failure and corrected exact test pass are preserved. All five original
+production companions pass unchanged (raw attempt2-companion captures).

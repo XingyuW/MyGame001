@@ -2339,6 +2339,28 @@ fn ra8_paid_naval_detector_escorts_the_fleet_toward_a_known_shore_target() {
             break;
         }
     }
+    if !paid {
+        let world = app.world_mut();
+        let controller = world
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap();
+        eprintln!(
+            "escort search target {:?}, known {:?}, naval {:?}, first {:?}",
+            controller.target(),
+            controller.known_buildings(),
+            controller.naval_target(),
+            controller.waypoints().first()
+        );
+        eprintln!(
+            "escort fixture units {:?}",
+            world
+                .query::<(&sim::Owner, &sim::Unit, &sim::Mobile)>()
+                .iter(world)
+                .map(|(o, u, m)| (o.0, defs.unit(u.kind).unwrap().id.as_str(), m.cell))
+                .collect::<Vec<_>>()
+        );
+    }
     assert!(paid, "the detector escort must be paid production");
     assert!(
         participated,
@@ -2491,5 +2513,750 @@ fn ra8_raw_spy_spawn_with_empty_queue_is_concealed_before_actual_ai_thinks() {
             .resource::<sim::SpecialState>()
             .hidden
             .contains(&(PlayerId(0), spy))
+    );
+}
+
+#[test]
+fn ra8_observed_scouting_goals_release_a_crowded_wave_without_waiting_for_slow_aircraft() {
+    for observed in [false, true] {
+        let mut app = scenario("russia", "easy", 0, 0, false);
+        let tanks: Vec<_> = (0..8)
+            .map(|i| {
+                spawn_unit(
+                    app.world_mut(),
+                    PlayerId(0),
+                    "rhino",
+                    CellPos::new(14 + i % 4, 14 + i / 4),
+                )
+                .unwrap()
+            })
+            .collect();
+        let air = spawn_unit(app.world_mut(), PlayerId(0), "kirov", CellPos::new(12, 18)).unwrap();
+        let old = loop {
+            step(&mut app);
+            let controller = app
+                .world()
+                .resource::<sim::AiPlayers>()
+                .controller(PlayerId(0))
+                .unwrap();
+            if controller.wave().contains(&air)
+                && let Some(target @ sim::WaveTarget::Waypoint(_)) = controller.target()
+            {
+                break target;
+            }
+            assert!(app.world().resource::<SimTick>().0 < 10_000);
+        };
+        let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+        let sim::WaveTarget::Waypoint(index) = old else {
+            unreachable!()
+        };
+        let goal = controllers.controller(PlayerId(0)).unwrap().waypoints()[index].cell;
+        issue(
+            &mut app,
+            Command::Stop {
+                units: tanks.iter().copied().chain([air]).collect(),
+            },
+        );
+        if observed {
+            for (i, &tank) in tanks.iter().enumerate() {
+                issue(
+                    &mut app,
+                    Command::Move {
+                        units: vec![tank],
+                        target: CellPos::new(
+                            goal.x - 3 - (i % 4) as i32,
+                            goal.y - 3 - (i / 4) as i32,
+                        ),
+                    },
+                );
+            }
+        }
+        for _ in 0..2000 {
+            step(&mut app);
+            if tanks.iter().all(|id| {
+                let e = unit_entity(&mut app, *id);
+                app.world().get::<sim::Orders>(e).unwrap().current.is_none()
+            }) {
+                break;
+            }
+        }
+        assert_eq!(
+            app.world()
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap()
+                .vision()
+                .is_visible(goal),
+            observed
+        );
+        // A genuine slow aircraft move remains in progress at the scheduled decision.
+        issue(
+            &mut app,
+            Command::Move {
+                units: vec![air],
+                target: CellPos::new(1, 46),
+            },
+        );
+        step(&mut app);
+        while !app.world().resource::<SimTick>().0.is_multiple_of(40) {
+            step(&mut app);
+        }
+        let entity = unit_entity(&mut app, air);
+        assert!(
+            app.world()
+                .get::<sim::Orders>(entity)
+                .unwrap()
+                .current
+                .is_some()
+        );
+        app.world_mut().insert_resource(controllers);
+        step(&mut app);
+        let next = app
+            .world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .target();
+        if observed {
+            assert_ne!(
+                next,
+                Some(old),
+                "an observed scouting objective is already complete despite the slow aircraft"
+            );
+        } else {
+            assert_eq!(
+                next,
+                Some(old),
+                "legitimate travel toward an unobserved objective must continue"
+            );
+        }
+    }
+}
+
+#[test]
+fn ra8_aircraft_complete_real_ammo_return_and_reload_before_ai_retasks_them() {
+    let mut app = scenario("germany", "medium", 0, 0, false);
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    put(&mut app, "power_plant", 4, 4);
+    put(&mut app, "airforce_command", 16, 8);
+    let target = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "soviet_barracks",
+        CellPos::new(34, 16),
+    )
+    .unwrap();
+    let target_entity = unit_entity(&mut app, target);
+    app.world_mut()
+        .get_mut::<sim::Health>(target_entity)
+        .unwrap()
+        .hit_points = 1_000_000;
+    spawn_unit(app.world_mut(), PlayerId(0), "spy", CellPos::new(32, 17)).unwrap();
+    let aircraft: Vec<_> = [10, 12, 14]
+        .into_iter()
+        .map(|x| spawn_unit(app.world_mut(), PlayerId(0), "harrier", CellPos::new(x, 14)).unwrap())
+        .collect();
+    // Initialize real dock commitments/visibility before the first controller decision.
+    step(&mut app);
+    app.world_mut().insert_resource(controllers);
+    let mut shots = std::collections::BTreeMap::<_, usize>::new();
+    let mut empty = false;
+    let mut reload_wait = false;
+    for _ in 0..14000 {
+        for event in step(&mut app) {
+            if let sim::SimEvent::WeaponFired { attacker, .. } = event
+                && aircraft.contains(&attacker)
+            {
+                *shots.entry(attacker).or_default() += 1;
+            }
+        }
+        let special = app.world().resource::<sim::SpecialState>();
+        empty |= aircraft.iter().any(|id| special.ammo.get(id) == Some(&0));
+        reload_wait |= aircraft
+            .iter()
+            .any(|id| special.reloading.get(id).is_some_and(|wait| *wait > 20));
+        if shots.values().any(|count| *count >= 2) && reload_wait {
+            break;
+        }
+    }
+    eprintln!(
+        "actual shots {shots:?}; sawempty {empty}, uninterrupted reload {reload_wait}, special {:?}",
+        app.world().resource::<sim::SpecialState>()
+    );
+    assert!(empty, "actual combat must expend aircraft ammunition");
+    assert!(
+        reload_wait,
+        "AI must leave the sourced reload timer uninterrupted"
+    );
+    assert!(
+        shots.values().any(|count| *count >= 2),
+        "a real aircraft must fire again after returning and reloading"
+    );
+}
+
+#[test]
+fn ra8_lost_prerequisites_cancel_only_incomplete_paid_heads_then_rebuild_and_resume() {
+    for completed in [false, true] {
+        let mut app = scenario("russia", "medium", 10_000, 0, false);
+        quiet(&mut app);
+        let definitions = app.world().resource::<sim::Definitions>().clone();
+        let factory = definitions.building_kind("soviet_war_factory").unwrap();
+        let barracks = definitions.building_kind("soviet_barracks").unwrap();
+        let item = sim::ProductionItem::Building(factory);
+        let build_time = definitions.production(item).unwrap().build_time;
+        for _ in 0..14000 {
+            step(&mut app);
+            if app
+                .world()
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap()
+                .queues()
+                .any(|(_, queue)| {
+                    queue.first().is_some_and(|head| {
+                        head.item == item && head.charged > 0 && head.progress < build_time
+                    })
+                })
+            {
+                break;
+            }
+        }
+        let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+        if completed {
+            for _ in 0..4000 {
+                if app
+                    .world()
+                    .resource::<sim::Players>()
+                    .get(PlayerId(0))
+                    .unwrap()
+                    .queues()
+                    .any(|(_, queue)| {
+                        queue
+                            .first()
+                            .is_some_and(|head| head.item == item && head.progress >= build_time)
+                    })
+                {
+                    break;
+                }
+                step(&mut app);
+            }
+        }
+        let head = *app
+            .world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .queues()
+            .find_map(|(_, queue)| queue.first().filter(|head| head.item == item))
+            .unwrap();
+        assert!(head.charged > 0);
+        assert_eq!(head.progress >= build_time, completed);
+        let missing = {
+            let world = app.world_mut();
+            *world
+                .query::<(&sim::SimId, &sim::Owner, &sim::Building)>()
+                .iter(world)
+                .find(|(_, owner, building)| owner.0 == PlayerId(0) && building.kind == barracks)
+                .unwrap()
+                .0
+        };
+        issue(&mut app, Command::SellBuilding { building: missing });
+        step(&mut app);
+        let owned: Vec<_> = {
+            let world = app.world_mut();
+            world
+                .query::<(&sim::Owner, &sim::Building)>()
+                .iter(world)
+                .filter(|(owner, _)| owner.0 == PlayerId(0))
+                .map(|(_, building)| building.kind)
+                .collect()
+        };
+        assert!(!owned.contains(&barracks));
+        assert!(sim::missing_prerequisite(&definitions, &owned, item).is_some());
+        app.world_mut().insert_resource(controllers);
+        let mut refund = None;
+        let mut rebuilt = false;
+        let mut resumed = false;
+        for _ in 0..10000 {
+            for event in step(&mut app) {
+                match event {
+                    sim::SimEvent::ProductionCancelled {
+                        player: PlayerId(0),
+                        item: found,
+                        refund: value,
+                    } if found == item => refund = Some(value),
+                    sim::SimEvent::BuildingPlaced {
+                        player: PlayerId(0),
+                        kind,
+                        ..
+                    } if kind == barracks => rebuilt = true,
+                    sim::SimEvent::BuildingPlaced {
+                        player: PlayerId(0),
+                        kind,
+                        ..
+                    } if kind == factory => resumed = true,
+                    _ => {}
+                }
+            }
+            if rebuilt && resumed {
+                break;
+            }
+        }
+        if completed {
+            assert_eq!(refund, None, "completed paid items remain placeable");
+        } else {
+            assert_eq!(
+                refund,
+                Some(head.charged),
+                "ordinary cancellation refunds exactly the actual charged credits"
+            );
+        }
+        assert!(
+            rebuilt,
+            "the missing prerequisite must be rebuilt through ordinary production"
+        );
+        assert!(resumed, "normal paid factory production must resume");
+    }
+}
+
+#[test]
+fn ra8_recovery_preserves_unpaid_low_power_and_disabled_heads_until_actual_producer_loss() {
+    let mut app = scenario("russia", "medium", 0, 0, false);
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    put(&mut app, "soviet_barracks", 16, 8);
+    let factory = put(&mut app, "soviet_war_factory", 16, 12);
+    spawn_unit(app.world_mut(), PlayerId(0), "rhino", CellPos::new(20, 20)).unwrap();
+    step(&mut app);
+    let kind = app
+        .world()
+        .resource::<sim::Definitions>()
+        .unit_kind("rhino")
+        .unwrap();
+    let item = sim::ProductionItem::Unit(kind);
+    issue(&mut app, Command::QueueProduction { item });
+    step(&mut app);
+    app.world_mut()
+        .resource_mut::<sim::SpecialState>()
+        .disabled
+        .insert(factory, 1000);
+    app.world_mut().insert_resource(controllers);
+    assert!(
+        app.world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .low_power()
+    );
+    for _ in 0..300 {
+        assert!(!step(&mut app).iter().any(|event| matches!(event, sim::SimEvent::ProductionCancelled { item: found, .. } if *found == item)));
+    }
+    let head = app
+        .world()
+        .resource::<sim::Players>()
+        .get(PlayerId(0))
+        .unwrap()
+        .queues()
+        .find_map(|(_, queue)| queue.first().filter(|head| head.item == item))
+        .unwrap();
+    assert_eq!((head.charged, head.progress), (0, 0));
+    issue(&mut app, Command::SellBuilding { building: factory });
+    let mut cancelled = false;
+    for _ in 0..200 {
+        cancelled |= step(&mut app).iter().any(|event| matches!(event, sim::SimEvent::ProductionCancelled { player: PlayerId(0), item: found, refund: 0 } if *found == item));
+    }
+    assert!(
+        cancelled,
+        "physical producer loss, unlike a temporary disable/funds/power shortage, releases the blocked lane"
+    );
+    assert!(
+        !app.world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .queues()
+            .any(|(_, queue)| queue.iter().any(|queued| queued.item == item)),
+        "ordinary repeated cancellation must release the head as well as any later duplicate"
+    );
+}
+
+#[test]
+fn ra8_bridge_intents_wait_for_known_holders_and_arrivals_without_reading_hidden_ships() {
+    for mode in [
+        "empty",
+        "standing",
+        "departing",
+        "reserved",
+        "incoming",
+        "idle_adjacent",
+        "visible_enemy",
+        "hidden_enemy",
+        "amphibious",
+    ] {
+        let mut app = scenario("russia", "medium", 0, 0, false);
+        let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+        let mut looks = vec![0; 48 * 48];
+        {
+            let mut grid = app.world_mut().resource_mut::<Grid>();
+            for y in 0..48 {
+                for x in 22..=24 {
+                    grid.set_terrain(
+                        CellPos::new(x, y),
+                        Cell {
+                            passable: false,
+                            water: true,
+                            buildable: false,
+                            ore: 0,
+                        },
+                    );
+                }
+            }
+            for x in 22..=24 {
+                grid.set_terrain(
+                    CellPos::new(x, 24),
+                    Cell {
+                        passable: true,
+                        water: false,
+                        buildable: false,
+                        ore: 0,
+                    },
+                );
+                looks[24 * 48 + x as usize] = 8 << 4;
+            }
+            for (x, y) in [(21, 22), (25, 22)] {
+                looks[y * 48 + x] = 15 << 4;
+            }
+            grid.mark_world_features(&looks);
+        }
+        sim::install_world_objects(app.world_mut(), true);
+        let bridge = *app
+            .world()
+            .resource::<sim::Bridges>()
+            .bridges
+            .keys()
+            .next()
+            .unwrap();
+        let hut = app
+            .world()
+            .resource::<Grid>()
+            .building(CellPos::new(21, 22))
+            .unwrap();
+        let tank = spawn_unit(
+            app.world_mut(),
+            PlayerId(0),
+            "grizzly",
+            CellPos::new(20, 24),
+        )
+        .unwrap();
+        step(&mut app);
+        issue(
+            &mut app,
+            Command::Attack {
+                units: vec![tank],
+                target: bridge,
+            },
+        );
+        for _ in 0..4000 {
+            step(&mut app);
+            if app.world().resource::<sim::Bridges>().bridges[&bridge].collapsed {
+                break;
+            }
+        }
+        assert!(app.world().resource::<sim::Bridges>().bridges[&bridge].collapsed);
+        issue(&mut app, Command::Stop { units: vec![tank] });
+        step(&mut app);
+        let engineer = spawn_unit(
+            app.world_mut(),
+            PlayerId(0),
+            "engineer",
+            CellPos::new(20, 22),
+        )
+        .unwrap();
+        let ship = if mode == "empty" {
+            None
+        } else {
+            let owner = if mode.ends_with("enemy") {
+                PlayerId(1)
+            } else {
+                PlayerId(0)
+            };
+            let kind = if mode == "amphibious" {
+                "amphibious_transport"
+            } else if mode == "visible_enemy" {
+                "destroyer"
+            } else {
+                "typhoon"
+            };
+            let y = if ["reserved", "incoming", "idle_adjacent"].contains(&mode) {
+                23
+            } else {
+                24
+            };
+            Some(spawn_unit(app.world_mut(), owner, kind, CellPos::new(23, y)).unwrap())
+        };
+        step(&mut app);
+        let offset = if ["departing", "reserved"].contains(&mode) {
+            19
+        } else {
+            0
+        };
+        while app.world().resource::<SimTick>().0 % 20 != offset {
+            step(&mut app);
+        }
+        if let Some(ship) = ship {
+            if ["departing", "reserved"].contains(&mode) {
+                issue(
+                    &mut app,
+                    Command::Move {
+                        units: vec![ship],
+                        target: CellPos::new(23, if mode == "departing" { 20 } else { 24 }),
+                    },
+                );
+                step(&mut app);
+                let e = unit_entity(&mut app, ship);
+                let mobile = app.world().get::<sim::Mobile>(e).unwrap();
+                let travel = mobile.step.as_ref().unwrap();
+                if mode == "reserved" {
+                    assert_eq!(travel.to, CellPos::new(23, 24));
+                } else {
+                    assert_eq!(mobile.cell, CellPos::new(23, 24));
+                }
+            } else if mode == "incoming" {
+                // Command stage installs the active path; Pathfinding reserves later this tick.
+                issue(
+                    &mut app,
+                    Command::Move {
+                        units: vec![ship],
+                        target: CellPos::new(23, 24),
+                    },
+                );
+            }
+            if mode == "hidden_enemy" {
+                assert!(
+                    app.world()
+                        .resource::<sim::SpecialState>()
+                        .hidden
+                        .contains(&(PlayerId(0), ship)),
+                    "concealment must be derived by the real schedule"
+                );
+            }
+        }
+        let engineer_entity = unit_entity(&mut app, engineer);
+        assert!(
+            app.world()
+                .get::<sim::Health>(engineer_entity)
+                .unwrap()
+                .hit_points
+                > 0,
+            "{mode}"
+        );
+        app.world_mut().insert_resource(controllers);
+        step(&mut app);
+        if mode == "incoming" {
+            let e = unit_entity(&mut app, ship.unwrap());
+            assert_eq!(
+                app.world()
+                    .get::<sim::Mobile>(e)
+                    .unwrap()
+                    .step
+                    .as_ref()
+                    .unwrap()
+                    .to,
+                CellPos::new(23, 24)
+            );
+        }
+        let repairs = app.world().resource::<CommandQueue>().iter().any(|issued| matches!(issued.command,Command::Interact {unit,target} if unit==engineer && target==hut));
+        assert_eq!(
+            repairs,
+            ["empty", "idle_adjacent", "hidden_enemy", "amphibious"].contains(&mode),
+            "{mode}"
+        );
+    }
+}
+
+#[test]
+fn ra8_slow_air_sweep_starts_at_enemy_origin_then_finds_an_unseen_remote_capture() {
+    let definitions = load_ruleset(data()).unwrap();
+    let mut skirmish = load_skirmish(data().join("skirmish.ron"), &definitions).unwrap();
+    skirmish.maps[0].starts = vec![CellPos::new(8, 8), CellPos::new(112, 112)];
+    skirmish.starting_credits = 0;
+    let ai = load_ai(data().join("ai.ron"), &definitions).unwrap();
+    let mut app = App::new();
+    app.add_plugins(SimPlugin { seed: 19 });
+    app.world_mut().insert_resource(
+        Grid::from_cells(
+            128,
+            128,
+            vec![
+                Cell {
+                    passable: true,
+                    buildable: true,
+                    water: false,
+                    ore: 0
+                };
+                128 * 128
+            ],
+        )
+        .unwrap(),
+    );
+    app.world_mut().insert_resource(definitions);
+    let players = ["russia", "great_britain"].map(|country| {
+        skirmish
+            .factions
+            .iter()
+            .position(|f| f.id == country)
+            .unwrap()
+    });
+    let medium = ai
+        .difficulties
+        .iter()
+        .position(|d| d.id == "medium")
+        .unwrap();
+    setup_match_configured(
+        app.world_mut(),
+        &skirmish,
+        &ai,
+        0,
+        &[
+            PlayerSetup {
+                player: PlayerId(0),
+                faction: players[0],
+                start: 0,
+                controller: Controller::Ai { difficulty: medium },
+            },
+            PlayerSetup {
+                player: PlayerId(1),
+                faction: players[1],
+                start: 1,
+                controller: Controller::Human,
+            },
+        ],
+        &MatchOptions {
+            mcv_start: false,
+            unit_count: Some(0),
+            crates: false,
+            superweapons: false,
+            ..MatchOptions::default()
+        },
+    )
+    .unwrap();
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    let remote = sim::spawn_building(
+        app.world_mut(),
+        sim::NEUTRAL,
+        "refinery",
+        CellPos::new(8, 104),
+    )
+    .unwrap();
+    let engineer = spawn_unit(
+        app.world_mut(),
+        PlayerId(1),
+        "engineer",
+        CellPos::new(7, 104),
+    )
+    .unwrap();
+    spawn_unit(app.world_mut(), PlayerId(0), "kirov", CellPos::new(12, 12)).unwrap();
+    step(&mut app);
+    app.world_mut()
+        .resource_mut::<CommandQueue>()
+        .push(sim::IssuedCommand {
+            player: PlayerId(1),
+            command: Command::Interact {
+                unit: engineer,
+                target: remote,
+            },
+        });
+    for _ in 0..100 {
+        step(&mut app);
+        let entity = unit_entity(&mut app, remote);
+        if app.world().get::<sim::Owner>(entity).unwrap().0 == PlayerId(1) {
+            break;
+        }
+    }
+    let entity = unit_entity(&mut app, remote);
+    assert_eq!(
+        app.world().get::<sim::Owner>(entity).unwrap().0,
+        PlayerId(1)
+    );
+    let yard_kind = app
+        .world()
+        .resource::<sim::Definitions>()
+        .building_kind("construction_yard")
+        .unwrap();
+    let yard = {
+        let world = app.world_mut();
+        *world
+            .query::<(&sim::SimId, &sim::Owner, &sim::Building)>()
+            .iter(world)
+            .find(|(_, owner, building)| owner.0 == PlayerId(1) && building.kind == yard_kind)
+            .unwrap()
+            .0
+    };
+    app.world_mut()
+        .resource_mut::<CommandQueue>()
+        .push(sim::IssuedCommand {
+            player: PlayerId(1),
+            command: Command::SellBuilding { building: yard },
+        });
+    step(&mut app);
+    assert!(
+        !app.world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .vision()
+            .is_visible(CellPos::new(8, 104))
+    );
+    assert!(
+        !controllers
+            .controller(PlayerId(0))
+            .unwrap()
+            .known_buildings()
+            .contains_key(&remote)
+    );
+    app.world_mut().insert_resource(controllers);
+    let mut first = None;
+    let mut discovered = false;
+    let mut outcome = None;
+    // The unchanged R29 limit scaled to this 128x128 fixture.
+    for _ in app.world().resource::<SimTick>().0..144000 {
+        step(&mut app);
+        let controller = app
+            .world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap();
+        if first.is_none()
+            && let Some(sim::WaveTarget::Waypoint(index)) = controller.target()
+        {
+            first = Some(controller.waypoints()[index]);
+        }
+        discovered |= controller.known_buildings().contains_key(&remote);
+        outcome = app.world().resource::<sim::MatchState>().outcome();
+        if outcome.is_some() {
+            break;
+        }
+    }
+    eprintln!(
+        "remote captured refinery search: tick {:?}, first {first:?}, discovered {discovered}, outcome {outcome:?}",
+        app.world().resource::<SimTick>()
+    );
+    let first = first.expect("a real scouting wave");
+    assert!(
+        first.priority && first.cell == CellPos::new(112, 112),
+        "the original enemy start retains first-search priority: {first:?}"
+    );
+    assert!(
+        discovered,
+        "the remote captured building must first be discovered through real vision"
+    );
+    assert!(
+        matches!(
+            outcome,
+            Some(sim::MatchOutcome::Won {
+                winner: PlayerId(0),
+                ..
+            })
+        ),
+        "slow-air remote sweep: {outcome:?}"
     );
 }
