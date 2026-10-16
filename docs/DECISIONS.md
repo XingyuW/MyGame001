@@ -7126,3 +7126,36 @@ New external task storage remains only recreatable configured-Cargo parser scrat
 584038 file bytes/733184 allocated bytes(716KiB),freshly remeasured after final runs. Earlier
 RA5/RA7 evidence and all configured caches remain. All thirteen frozen commands,both fresh
 756-winner two-player R29 distributions and independent review still remain required.
+
+## R131 — Freeze the seventh RA8 source checkpoint for the full gate (2026-10-16)
+
+Runtime b6eac0c7c31e69ff8dff91dc154a9497143b7484 follows a separately inspected staged
+unfiltered diff check with exit0. All final-source preflight commands pass;1201 executed tests/
+81 target invocations,all21 retained exact winners,ten original cheap Demo winners,complete
+simulation952/72 targets and full game/bin217 plus M10five/five production companions. No
+existing test is removed/renamed/ignored;full-tree inventory1238 versus RA7's1124 (+114).
+Manifest5 contains339 runtime/data/assets/examples/scripts/dependency files,rehashes clean,
+and is unchanged through current benchmark evidence. The current all21 ten-player ending
+median85128/p90125479/max174450 is transparently longer than checkpoint6's65538/90705/99602,
+within unchanged400000. The fresh three256×256 fixed means .953828/1.006/.757202ms pass the
+unchanged5ms budget. Actual long ticks remain,no smooth-play guarantee. No validator is active.
+
+checkpoint7.json/RA8_ACCEPTANCE.md carry exact raw hashes,timings,migrations,assumptions,
+failed-attempt preservation,RA9 R83/R96/R99 handoff and current716KiB external parser scratch.
+R97's mechanism is closed R103. The all-map full parse corrects the preliminary compact
+worst-mean attribution:Arctic Floes1.051ms,not Red Canyon1.035ms. Raw evidence is unchanged.
+The next mandatory command is the exact complete thirteen-command frozen ra8 gate;fresh
+production/duel756 winners and R29 before/after distributions remain required before RA8
+closure. This checkpoint is validated preflight,not independently reviewed or approved.
+
+Evidence receives its own separate unfiltered staged check. Preserve raw trailing blanks/
+spaces,record exact path/line/fileSHA/lineSHA and complete stdoutSHA for any diagnostic,
+classify nonzero rather than call it pass,and require an identical final staged recheck
+before a separate evidence commit. Any source/data/test/document hygiene error is fixed first.
+
+The evidence standalone unfiltered check exits2,not passed:80 exact raw-log or captured-
+snapshot EOF/trailing-space diagnostics,zero source/data/test/document diagnostics. The
+complete outputSHA is be046cb06220eec38ad474775eee4e91d2d8a401551e8b2b38297137f071d1b5;
+checkpoint7-staged-hygiene.json records all exact paths/lines/file and line hashes. Preserve
+all raw bytes and require an identical final staged stdout/stderr/exit before the separate
+commit. Source runtime remains b6eac0c;this classification changes no code or evidence.

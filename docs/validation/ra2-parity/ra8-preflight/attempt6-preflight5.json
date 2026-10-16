@@ -1,0 +1,79 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 1.033249666012125,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-fmt5.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.021867542003747076,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-diff5.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 6.857460499973968,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-clippy5.log",
+    "sha256": "24ea9722fc019c3039b2353dd1e5fee0d8c6833d0f19df524397576b3f700a85"
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/generate_ra2_data.py",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.08642387500731274,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-generated5.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/ra2_reference.py",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.08054924997850321,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-reference5.log",
+    "sha256": "5fa32e9687ef749dd76543b607f37bc835ddd9e7469e2b7b5874d233ee5cf964"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--all-targets",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 748.9923864590237,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-sim-all5.log",
+    "sha256": "e9a47ac19893d5adc0735942a4b6f5e1c5bf0b6a5618497ccc82caedd534c721"
+  }
+]

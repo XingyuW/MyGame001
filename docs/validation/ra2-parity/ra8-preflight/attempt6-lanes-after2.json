@@ -1,0 +1,62 @@
+[
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "ra8_a_locked_late_tech_item_leaves_its_lane_for_a_legal_early_defence",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 23.51967212499585,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-locked-lane-after2.log",
+    "sha256": "615d8f13ae03c933a7d19f7e30259cd5c92e01b56613550077d48c0352d84595"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra2_shipped",
+      "a_computer_player_builds_in_both_lanes_of_its_yard",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 3.924902958009625,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-original-lanes-after2.log",
+    "sha256": "79afb978f7ccab193a3f35547ce3a037cdcd64302e73da6ef2c322ad299fd1ea"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "ra8_full_tree_builds_and_fires_strategic_weapons_and_off_keeps_american_paradrop",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 19.597723957995186,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-fulltree-sw-after2.log",
+    "sha256": "6d8edef763a62fecd87b7bcf0bc27669ac5207f410cb15016a755c162bb4c552"
+  }
+]

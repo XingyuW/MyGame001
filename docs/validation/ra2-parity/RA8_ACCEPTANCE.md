@@ -1,11 +1,10 @@
 # RA8 acceptance record
 
-Status: sixth final-source checkpoint is ready for committed milestone checks. R116–R122
-correct the concrete fifth-gate failures; final serial preflight passes512 tests/22 targets,
-all19 retained exact cases win,and the actual default ten-player run has21/21 explicit winners.
-The256×256 mean budget passes on all three required maps. The new complete thirteen-command
-gate and both fresh756-winner distributions remain required. This is validated preflight,
-not independent review or completed RA8 acceptance. All earlier attempts/probes remain.
+Status: seventh final-source checkpoint is ready for committed milestone checks. Current source
+passes1201 preflight tests/81 target invocations,all21 retained exact winners,and21/21 actual
+default ten-player winners. The fixed256×256 three-map mean budget passes below5ms. All13
+frozen commands and both fresh756-winner R29 distributions remain required. This is validated
+preflight,not independent review or completed RA8 acceptance. All earlier raw evidence remains.
 
 ## Acceptance checklist
 
@@ -524,3 +523,121 @@ separate unfiltered check exits2,not passed:71 exact preserved raw-log EOF/trail
 diagnostics,all classified by path/line/raw-file and lineSHA in checkpoint6-staged-hygiene.json.
 No source/test/data/document diagnostic is present. Raw bytes are retained;no suppression.
 The exact final staged set must reproduce the same stdoutSHA before a separate commit.
+
+
+## Seventh final-source checkpoint (R124–R131)
+
+The sixth frozen gate stopped after its completed workspace M0 schedule failure; raw gate
+and partial build output are preserved in ra8-attempt6. Later complete failed/insufficient
+preflights remain under ra8-preflight/attempt6-*. No old failure is reclassified as a pass.
+R124–R130 record the exact diagnoses,source/fixture boundaries and all before/after evidence.
+
+Current strict fmt,unfiltered working diff,workspace Clippy -D warnings,generator and reference
+checks all exit0. Current all21 retained exact cases explicitly win under unchanged original
+limits/rejection rules:2093.413839s,raw attempt6-retained-all7.log SHA44b8b88cba79795d64a56713edaea533122747e1b5e7421d9de9fd749939bf94.
+Their median66530/p90107940/max254201 are a focused-regression distribution,not the required
+756-pair acceptance distribution or ten-player distribution. Current complete simulation
+all-targets passes952/0failed/0ignored across72 targets,976.514759s,raw attempt6-sim-all7.log
+SHA35b60447bea23a082dc56358138b87d9980c06b96a4254976b08d069c68f04f6.
+All ten cheap default Demo pairings independently pass on this same R130 runtime in
+attempt6-demo-subset-all1.log. Remaining game compatibility and both m13 runs also complete as recorded below.
+
+Whole-tree inventory4 counts1238 versus RA7's1124:114 added,none removed/renamed/ignored/
+unmapped. Runtime/assets/scripts/examples/dependency manifest5 has339 files,SHA132667c0730673308068963e09047ad8d8a118fa823212ed8e90b4db5bd47d27.
+No source/data/script expansion occurs during healthy validation. This manifest is
+rechecked at the committed checkpoint; previous d1aa0f0 ten-player metrics are historical.
+
+Exact new existing-test migration/strengthening ledger:
+
+- R124 shared helper sim_app_consuming_randomness explicitly orders its one-RNG-per-tick
+  injector after public SimCoreSet(Ai),whose exclusive certifier caused the ambiguity.
+  same_seed_consuming_randomness_gives_equal_hashes_at_every_tick,
+  different_seeds_consuming_randomness_give_different_hashes and
+  hash_reflects_consumed_randomness retain every original seed/tick/hash assertion.
+  The unordered-system ambiguity error test remains unchanged.
+- R125 shared M2 helper compares initial equality before enqueue,requires unequal hashed
+  pending state,then retains every rejection/event and30-posttick equality assertion in
+  a_move_outside_the_map_is_rejected,
+  commands_for_missing_foreign_or_repeated_units_are_rejected and
+  validation_checks_each_named_unit_in_turn. No hash is weakened.
+- R126 a_computer_player_builds_in_both_lanes_of_its_yard retains its actual default setup,
+  all assertions and6000 bound; only comments/diagnostic observation change. Runtime
+  candidate selection stops a locked later-tech entry monopolizing the legal defence lane.
+- R128 ra8_aircraft_complete_real_ammo_return_and_reload_before_ai_retasks_them strengthens
+  its shot-count break/final predicates from>=2 to greater than the actual source burst.
+  Two Harrier shots are one Burst,so this proves actual firing after refill. Every original
+  empty-ammo/uninterrupted-reload assertion remains. No ammo/range/recharge/ROF value changes.
+- R129/R130 add regression functions;no existing assertion,fixture,limit or rejection
+  exemption changes. Earlier exact migrations R94/R96/R102/R110 and neutral-strategy
+  compatibility R108 remain binding and are not replaced by the new defaults.
+
+R127 uses observed source weapon eligibility plus static-terrain firing reach for home
+threat admission,ordinary healthy Attack and the current-position AirRangeBonus versus
+plain-range chase distinction. R129 stops futile paid repair through the ordinary toggle
+when no conservative owned finishing/income/production recovery opportunity exists;R53's
+external credit-change signature,patience and cadence are unchanged. R130 gives eligible
+airport-bound actors their own bounded strike job inside an escorted mixed wave,while
+retaining the original surface/undocked-air/artillery policy. These are declared game-owned
+AI policy assumptions using existing source capabilities/commands,not closed-AI claims.
+No new quota,timer,schema or persistent state is introduced by these corrections.
+
+Controlled capability evidence and exact ending attribution remain distinct: the Dog/Harrier
+old-source scenario has actual reload but only one two-shot Burst/no resumed focus;new source
+has resumed focus while both belong to the wave,six shots and real base destruction. Exact
+Liberty Iraq/America Brutal now ends with P0 at107940/288000;this is not a claim that P1's
+planes alone caused its ending. Exact Demo Germany/Great Britain now ends P1 at45057/72000
+while the real paid-repair positive/negative cases establish the separate repair correction.
+
+All earlier performance-equivalence proofs and R88–R123 scope remain. Fresh ten-player
+means and all21 normal winners are recorded below;all13 gate timings remain required. No clone/worktree
+or new substantial external directory is created;configured Cargo/UV/PIP caches remain.
+Parser scratch was measured58 files/584038 file bytes/733184 allocated bytes(716KiB),retained
+recreatable for reruns and unnecessary for release;the final checkpoint remeasurement is below. RA5 render
+and RA7 parser evidence remain. RA9 inherits R83 transport/attached-Squid firing,R96 actorless
+occupied-Prop ability boundaries and R99's explicitly unproven capability lead. R97's actual
+queued-AI lifecycle mechanism is CLOSED in R103. Independent review and user visual/audio/
+play-feel verification remain required;no independent review claim is made here.
+
+
+Final source is `b6eac0c7c31e69ff8dff91dc154a9497143b7484`. All16 final preflight commands exit0;with the earlier
+same-source Demo harness this totals1201 passed/0failed/0ignored across81 test-target
+invocations. Overlapping focused proof repeats are not added. All339 manifest5 files rehash
+without mismatch. No validator is active before committing the evidence checkpoint.
+
+Actual default ten-player all-map run exits0:21/21 explicit winners,all ten builders each,
+all means<5ms. Endings median85128/p90125479/max174450 remain below unchanged400000. All three
+summary values rise versus checkpoint6's65538/90705/99602;both sets remain without causal
+attribution or artificial timing. Command1408.635261s,measured1403.896s/mapelapsed1404.023s.
+Full-parse worst mean is Arctic Floes1.051ms;the earlier compact Red Canyon1.035ms worst-mean
+observation was preliminary and is explicitly corrected. Raw attempt6-m13-all8.log SHA
+109fb9c6fd57d7626d5e5d0b0262833cc06253aa056a6320383974dde0ac7cc3.
+
+| Fixed24000-tick256×256 map | Mean ms | p99 ms | Maximum ms | Busiest1000 mean ms | >50ms ticks |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Liberty Bay | 0.953828 | 6.675 | 93.376 | 1.704 | 1 |
+| Continental Divide | 1.006000 | 5.588 | 87.715 | 2.170 | 1 |
+| Pacific Atoll | 0.757202 | 5.956 | 59.132 | 1.213 | 2 |
+
+Fixed benchmark exits0/65.758103s,all ten builders on every map. Raw attempt6-m13-budget8.log
+SHA312bb9b3a5923e75804715fbb0380b410716519c640484047fb508abb6238239. The unchanged budget
+is whole-run mean5ms. Frostline's actual longest725.867ms/busiest1000mean8.033ms and all other
+long ticks remain;no maximum-tick or smooth-play guarantee is claimed. These normal runs use
+actual default options,seed13,ten ordinary Medium controllers,no Super Me/unlock/injected HP.
+They have no competing validation simulation or profiler. Full current/historical fields are
+in attempt6-final-m13-metrics.json. No additional performance optimization is required by the
+measured mean budget;the prior separately measured value-equivalence optimizations remain.
+
+Storage is freshly remeasured after final runs:58 parser scratch files/584038 file bytes/
+733184 allocated bytes(716KiB),retained recreatable in configured Cargo target and unnecessary
+for release. No other new substantial external directory. R83/R96/R99 remain RA9 handoff;
+R97 is closed R103. R126–R130 policies/assumptions and exact R124/R125/R128 migrations above
+enter RA9/final-review scope. Full13,both756-winner before/after R29 metrics,independent review
+and user visual/audio/play-feel verification remain pending.
+
+
+The runtime commit's standalone staged unfiltered check exits0. The separate evidence check
+exits2,not passed:80 exact intentional raw-log/captured-snapshot EOF or trailing-space
+diagnostics,zero source/data/test/document errors. checkpoint7-staged-hygiene.json retains
+full stdout/stderr,every exact path/line/raw-fileSHA/lineSHA and stdoutSHA
+be046cb06220eec38ad474775eee4e91d2d8a401551e8b2b38297137f071d1b5. Raw bytes are unchanged;no suppression.
+Require an identical final staged stdout/stderr/exit recheck before a separate evidence commit.

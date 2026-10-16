@@ -1,0 +1,42 @@
+[
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "ra8_land_defenders_use_reachable_firing_positions_and_leave_isolated_ships_to_the_fleet",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 29.210104166995734,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-defence-shore-after2.log",
+    "sha256": "d81020a9b591b8bea59dac495172e21f001b1daf1a2704f04b6c18609f8a60b7"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "ra8_a_specialist_repair_reservation_removes_the_overlapping_defence_attack",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.12328020800487138,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-defence-reserved-after1.log",
+    "sha256": "cccae72273b793e73421d1b54fbbd9386e7bb94d8d1911f7b09aab44393622d5"
+  }
+]

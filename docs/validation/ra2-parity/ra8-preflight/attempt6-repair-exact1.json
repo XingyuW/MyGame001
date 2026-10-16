@@ -1,0 +1,57 @@
+[
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate_demo_germany_great_britain_brutal_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 42.90833750000456,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-demo-germany-britain-repair1.log",
+    "sha256": "5a8882d0fc22005160a4bac929961711620515f76e930ba75a493c91eb34f068"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "a_player_that_can_neither_fight_nor_earn_makes_its_last_stand",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 17.4358325409994,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-last-stand-repair1.log",
+    "sha256": "16f12b18fad8a80cf60adc232f3a1ed1bd45811664f5a6bc9f07c6ed2fd9ddcc"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra4_ai",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 5.585347707994515,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-ra4-repair1.log",
+    "sha256": "7d22897a6629b8de331d38240af19cbee8ead608d6065b0241db31c664db7a36"
+  }
+]

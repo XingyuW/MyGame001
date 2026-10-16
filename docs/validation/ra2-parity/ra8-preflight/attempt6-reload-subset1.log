@@ -1,0 +1,9 @@
+    Finished `release` profile [optimized] target(s) in 0.06s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+test ra8_aircraft_complete_real_ammo_return_and_reload_before_ai_retasks_them ... actual shots {SimId(6): 2, SimId(7): 3, SimId(8): 2}; sawempty true, uninterrupted reload true, special SpecialState { strategic: StrategicState { missiles: [], storm: None, flights: {}, announced: {} }, parasites: {}, deployed: {}, mirage_trees: {}, disguises: {SimId(5): UnitKind(1)}, erasures: {}, charges: {}, radiation_sites: [], coil_charge: {}, death_detonated: {}, eruption_next: {}, temporal_removed: {}, charge: {}, protected: {}, disabled: {}, cargo: {}, garrisons: {}, controlled: {}, bombs: {}, zones: [], rearming: {}, carrier_flights: {}, interactions: {}, hidden: {(PlayerId(1), SimId(5))}, outages: {}, docked: {}, ammo: {SimId(7): 0}, reloading: {}, docks: {SimId(6): (SimId(3), 0), SimId(7): (SimId(3), 1), SimId(8): (SimId(3), 2)}, bays: {}, spawned: {}, missiles: {}, surfaced: {} }
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 65 filtered out; finished in 0.21s
+

@@ -1,0 +1,20 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_land_defenders_use_reachable_firing_positions_and_leave_isolated_ships_to_the_fleet",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 0,
+  "elapsed_seconds": 21.961135582998395,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-defence-shore-after1.log",
+  "sha256": "679c7a4177b40d692013ad58d9e50ba98b4e4df0de6c19e8c5c6528770dfe823"
+}

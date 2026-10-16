@@ -1,0 +1,27 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 0.89s
+     Running tests/m0_bootstrap.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m0_bootstrap-deb2c89d6eea7468)
+
+running 12 tests
+test conflicting_unordered_systems_are_a_schedule_build_error - should panic ... 
+thread 'conflicting_unordered_systems_are_a_schedule_build_error' (6092701) panicked at /Users/xingyuwang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bevy_ecs-0.19.1/src/schedule/schedule.rs:566:13:
+Error when initializing schedule SimSchedule: 1 pairs of systems with conflicting data access have indeterminate execution order. Consider adding `before`, `after`, or `ambiguous_with` relationships between these:
+ -- <Enable the debug feature to see the name> (in set Movement) and <Enable the debug feature to see the name> (in set Movement)
+    conflict on: ["<Enable the debug feature to see the name>"]
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+ok
+test different_seeds_consuming_randomness_give_different_hashes ... ok
+test hash_changes_every_tick ... ok
+test hash_changes_when_an_entity_is_added ... ok
+test hash_is_independent_of_entity_spawn_order ... ok
+test hash_reflects_consumed_randomness ... ok
+test same_seed_and_empty_command_log_give_equal_hashes_at_every_tick ... ok
+test same_seed_consuming_randomness_gives_equal_hashes_at_every_tick ... ok
+test stages_run_once_per_tick_in_plan_order ... ok
+test tick_counter_equals_n_after_n_schedule_runs ... ok
+test tick_counter_increments_by_exactly_one_per_run ... ok
+test tick_counter_starts_at_zero ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

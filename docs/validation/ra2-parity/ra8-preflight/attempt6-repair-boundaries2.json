@@ -1,0 +1,42 @@
+[
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "ra8_income_production_and_a_usable_force_keep_useful_building_repairs",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 6.002222165989224,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-useful-repair-after2.log",
+    "sha256": "0159b9627e4c3913164321d9e5aed34c3fc415a80d8e82a2b46db01dab1253c5"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "ra8_building_and_depot_repairs_use_paid_production_paths",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.12629104100051336,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-paid-repairs-after1.log",
+    "sha256": "2323380e0328cc2c44169370bcfa25d64a23e2df37cf4cb4fb295c42f1606452"
+  }
+]

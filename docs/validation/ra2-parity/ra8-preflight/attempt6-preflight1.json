@@ -1,0 +1,75 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 1.0469668750010896,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-fmt1.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.011620541015872732,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-diff1.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 1.158879208000144,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-clippy1.log",
+    "sha256": "52b56b6480499c0616da02f32b48002f5a89b0acbd3bd70738eb46df345453cf"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "m0_bootstrap",
+      "--",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 1.0499538750154898,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-m0-after1.log",
+    "sha256": "104b53209eeb6f73c6241d9f3bb38334bfa1b4413d0603858d5e494195f98932"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--tests",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 101,
+    "elapsed_seconds": 73.8121534170059,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-sim-all1.log",
+    "sha256": "fe8dc9fdcdb012236770267e231b91ddb30c6bb757774c308ff6013cc38bd227"
+  }
+]
