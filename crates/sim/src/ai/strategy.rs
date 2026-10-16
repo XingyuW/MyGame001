@@ -90,8 +90,20 @@ pub(super) fn decide(
             }
         }
     }
-    // One paid building repair per decision; the ordinary repair system retains the toggle.
-    if let Some(building) = view.own_buildings.iter().find(|b| {
+    // One ordinary repair toggle per decision. Futile paid repairs must not keep
+    // changing a helpless player's credits and restarting its last-stand patience.
+    let repair_recovery = repair_recovery(view, controller);
+    if !repair_recovery {
+        if let Some(building) = view
+            .own_buildings
+            .iter()
+            .find(|b| view.state.repairing().contains(&b.id))
+        {
+            commands.push(Command::RepairBuilding {
+                building: building.id,
+            });
+        }
+    } else if let Some(building) = view.own_buildings.iter().find(|b| {
         view.definitions
             .building_combat(b.kind)
             .is_some_and(|t| b.hp < t.hit_points)
@@ -298,7 +310,60 @@ pub(super) fn decide(
         .filter(|(_, b)| stable(view, b.footprint.origin))
         .min_by_key(|(id, b)| (b.footprint.distance_to_cell(controller.start), **id))
     {
-        // Unarmed miners must not distract a wave indefinitely from the actual base.
+        // Dock-bound strike aircraft keep their job even in an escorted wave.
+        // The other actors retain their original combat/standoff policy below.
+        let matching_attack = |unit: &UnitSnap| {
+            matches!(unit.attack_order,
+            Some(crate::AttackOrder::Attack { target: current, .. }) if current == *target.0)
+        };
+        let strike_wave: Vec<_> = ground_wave
+            .iter()
+            .copied()
+            .filter(|unit| {
+                view.definitions
+                    .metadata(ProductionItem::Unit(unit.kind))
+                    .is_some_and(|m| m.airport_bound)
+            })
+            .collect();
+        let interrupted = strike_wave.iter().any(|unit| local_wave_threat(view, unit));
+        if !interrupted {
+            // This job also owns its preserved healthy Attack: suppress contradictory
+            // core scouting/gather orders without resetting the existing chase.
+            controller
+                .reserved
+                .extend(strike_wave.iter().filter(|u| view.fights(u)).map(|u| u.id));
+            let units: Vec<_> = strike_wave
+                .iter()
+                .filter(|u| view.fights(u) && !matching_attack(u))
+                .map(|u| u.id)
+                .collect();
+            if !units.is_empty() {
+                commands.push(Command::Attack {
+                    units,
+                    target: *target.0,
+                });
+            }
+        } else {
+            // If a base-focused approach meets a real threat, ordinary AttackMove
+            // resumes en-route acquisition. Other healthy orders keep their history.
+            controller.reserved.extend(strike_wave.iter().filter(|unit| {
+                    matching_attack(unit) || matches!(unit.attack_order,
+                        Some(crate::AttackOrder::AttackMove { destination, .. }) if destination == target.1.footprint.origin)
+                }).map(|unit| unit.id));
+            let units: Vec<_> = strike_wave
+                .iter()
+                .filter(|unit| matching_attack(unit))
+                .map(|unit| unit.id)
+                .collect();
+            if !units.is_empty() {
+                commands.push(Command::AttackMove {
+                    units,
+                    target: target.1.footprint.origin,
+                });
+            }
+        }
+        // Keep the original policy for the surface/undocked-air part of a mixed
+        // wave; a Dog keeps its own mission and artillery keeps its tank line.
         if !view
             .enemy_units
             .iter()
@@ -306,7 +371,13 @@ pub(super) fn decide(
         {
             let units: Vec<_> = ground_wave
                 .iter()
-                .filter(|u| view.fights(u))
+                .filter(|u| {
+                    view.fights(u)
+                        && !view
+                            .definitions
+                            .metadata(ProductionItem::Unit(u.kind))
+                            .is_some_and(|m| m.airport_bound)
+                })
                 .map(|u| u.id)
                 .collect();
             if !units.is_empty() {
@@ -855,6 +926,33 @@ fn service_income(view: &View<'_>) -> bool {
         })
 }
 
+fn repair_recovery(view: &View<'_>, controller: &AiController) -> bool {
+    service_income(view)
+        || view.owned_units.iter().any(|unit| {
+            can_finish(view, controller, unit)
+                || role(view, unit.kind) == Role::Mcv
+                || (role(view, unit.kind) == Role::Engineer && !view.seen_tech.is_empty())
+        })
+        || !view.recoverable_garrisons.is_empty()
+        || view.own_buildings.iter().any(|building| {
+            view.definitions
+                .metadata(ProductionItem::Building(building.kind))
+                .is_some_and(|meta| meta.role.superweapon())
+        })
+        // These are the ordinary prerequisite/producer/owner checks, independent
+        // of cash and temporary queue capacity. A recoverable base keeps repairs.
+        || view.definitions.buildings().iter().enumerate().any(|(i, _)| {
+            u16::try_from(i)
+                .ok()
+                .is_some_and(|i| view.buildable(ProductionItem::Building(BuildingKind(i))))
+        })
+        || view
+            .ai
+            .army
+            .iter()
+            .any(|&kind| view.buildable(ProductionItem::Unit(kind)))
+}
+
 fn service_cost(view: &View<'_>, unit: &UnitSnap) -> Option<i64> {
     let rules = &view.definitions.rules()?.economy;
     let cost = view
@@ -889,6 +987,178 @@ fn screen_unit_traits(
         traits.immune_psionics |= meta.immune_psionics || meta.role == Role::MindControl;
     }
     traits
+}
+
+fn local_wave_threat(view: &View<'_>, unit: &UnitSnap) -> bool {
+    let Some(terms) = view.definitions.unit_combat(unit.kind) else {
+        return false;
+    };
+    let unit_traits = |unit: &UnitSnap, terms: &crate::CombatTerms| {
+        let mut traits = screen_unit_traits(view, unit, terms);
+        if let Some(meta) = view.definitions.metadata(ProductionItem::Unit(unit.kind)) {
+            traits.bombable = meta.bombable;
+            traits.immune_radiation = meta.immune_radiation;
+        }
+        traits
+    };
+    let traits = unit_traits(unit, &terms);
+    let from = crate::combat::Extent::point(unit.mobile.position(view.grid, unit.id));
+    view.enemy_units.iter().any(|enemy| {
+        let Some(hostile) = view.definitions.unit_combat(enemy.kind) else {
+            return false;
+        };
+        let Some((weapon, percent)) =
+            crate::weapon_against(view.definitions, &hostile, hostile.weapons(false), &traits)
+        else {
+            return false;
+        };
+        let Some(weapon) = view
+            .definitions
+            .weapon(weapon)
+            .filter(|w| percent > 1 && w.damage > 0)
+        else {
+            return false;
+        };
+        let (dx, dy) = from.gap(&crate::combat::Extent::point(
+            enemy.mobile.position(view.grid, enemy.id),
+        ));
+        let hostile_range = weapon
+            .range
+            .saturating_add(if traits.airborne && weapon.anti_air {
+                hostile.air_range_bonus
+            } else {
+                0
+            });
+        if crate::in_range(dx, dy, hostile_range)
+            && !crate::inside_min_range(dx, dy, weapon.min_range)
+        {
+            return true;
+        }
+        let enemy_traits = unit_traits(enemy, &hostile);
+        crate::weapon_against(
+            view.definitions,
+            &terms,
+            terms.weapons(false),
+            &enemy_traits,
+        )
+        .and_then(|(kind, percent)| {
+            view.definitions
+                .weapon(kind)
+                .filter(|w| percent > 1 && w.damage > 0)
+        })
+        .is_some_and(|weapon| {
+            let reach = weapon
+                .range
+                .saturating_add(if enemy_traits.airborne && weapon.anti_air {
+                    terms.air_range_bonus
+                } else {
+                    0
+                });
+            crate::in_range(dx, dy, reach) && !crate::inside_min_range(dx, dy, weapon.min_range)
+        })
+    })
+}
+
+/// An observed base threat may reserve a defender only when its actual weapon can
+/// reach a firing position through public terrain. Occupancy is deliberately absent:
+/// ordinary Attack handles traffic and the physical, bounded chase at application.
+pub(super) fn defence_reachable(view: &View<'_>, unit: &UnitSnap, target: SimId) -> bool {
+    let Some(terms) = view.definitions.unit_combat(unit.kind) else {
+        return false;
+    };
+    let target = if let Some(enemy) = view.enemy_units.iter().find(|u| u.id == target) {
+        let Some(enemy_terms) = view.definitions.unit_combat(enemy.kind) else {
+            return false;
+        };
+        let mut traits = screen_unit_traits(view, enemy, &enemy_terms);
+        if let Some(meta) = view.definitions.metadata(ProductionItem::Unit(enemy.kind)) {
+            traits.bombable = meta.bombable;
+            traits.immune_radiation = meta.immune_radiation;
+        }
+        (
+            traits,
+            crate::combat::Extent::point(enemy.mobile.position(view.grid, enemy.id)),
+        )
+    } else if let Some(enemy) = view.enemy_buildings.iter().find(|b| b.id == target) {
+        let Some(enemy_terms) = view.definitions.building_combat(enemy.kind) else {
+            return false;
+        };
+        let mut traits = crate::combat::traits_of(
+            view.grid,
+            enemy.id,
+            enemy_terms.armour,
+            &crate::combat::Body::Building(enemy.footprint),
+            Some(&enemy_terms),
+        );
+        if let Some(meta) = view
+            .definitions
+            .metadata(ProductionItem::Building(enemy.kind))
+        {
+            traits.bombable = meta.bombable;
+            traits.immune_psionics |= meta.immune_psionics;
+            traits.immune_radiation = meta.immune_radiation;
+        }
+        (traits, crate::combat::Extent::footprint(enemy.footprint))
+    } else {
+        return false;
+    };
+    let Some((weapon, percent)) =
+        crate::weapon_against(view.definitions, &terms, terms.weapons(false), &target.0)
+    else {
+        return false;
+    };
+    let Some(weapon) = view
+        .definitions
+        .weapon(weapon)
+        .filter(|w| percent > 1 && w.damage > 0)
+    else {
+        return false;
+    };
+    let fires_from = |point, range| {
+        let (dx, dy) = crate::combat::Extent::point(point).gap(&target.1);
+        crate::in_range(dx, dy, range) && !crate::inside_min_range(dx, dy, weapon.min_range)
+    };
+    // Actual current-position shots include AirRangeBonus. Ordinary Attack deliberately
+    // seeks a plain-range chase destination, which is still the search below.
+    let shot_range = weapon
+        .range
+        .saturating_add(if target.0.airborne && weapon.anti_air {
+            terms.air_range_bonus
+        } else {
+            0
+        });
+    if fires_from(unit.mobile.position(view.grid, unit.id), shot_range) {
+        return true;
+    }
+    let covers = |point| fires_from(point, weapon.range);
+    let on_foot = view.grid.is_on_foot(unit.id);
+    let mut seen = BTreeSet::from([unit.mobile.cell]);
+    let mut open = VecDeque::from([unit.mobile.cell]);
+    while let Some(cell) = open.pop_front() {
+        if if on_foot {
+            (0..crate::SPOTS_PER_CELL as u8).all(|spot| covers(crate::SubPos::spot_of(cell, spot)))
+        } else {
+            covers(crate::SubPos::centre_of(cell))
+        } {
+            return true;
+        }
+        for (dx, dy) in [(0, -1), (-1, 0), (1, 0), (0, 1)] {
+            let next = CellPos::new(cell.x.saturating_add(dx), cell.y.saturating_add(dy));
+            let terrain =
+                view.grid
+                    .cell(next)
+                    .is_some_and(|cell| match view.definitions.domain(unit.kind) {
+                        Domain::Land => cell.passable,
+                        Domain::Naval => cell.water,
+                        Domain::Amphibious => cell.passable || cell.water,
+                        Domain::Air => true,
+                    });
+            if terrain && seen.insert(next) {
+                open.push_back(next);
+            }
+        }
+    }
+    false
 }
 
 fn queue_support(view: &View<'_>, needed: Role, commands: &mut Vec<Command>) {

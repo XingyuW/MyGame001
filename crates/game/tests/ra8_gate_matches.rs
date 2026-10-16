@@ -49,6 +49,37 @@ fn trace_economy_events(world: &mut bevy::ecs::world::World, events: &[SimEvent]
         return;
     };
     let definitions = world.resource::<sim::Definitions>().clone();
+    if std::env::var_os("RA8_DEMO_LATE_TRACE").is_some()
+        && ((59980..=60020).contains(&at) || (71980..=72000).contains(&at))
+    {
+        eprintln!(
+            "demo late tick{at} queue{:?}",
+            world.resource::<CommandQueue>()
+        );
+        for event in events {
+            if matches!(event, SimEvent::MoveFailed { .. }) {
+                eprintln!("demo late tick{at} {event:?}");
+            }
+        }
+    }
+    if std::env::var_os("RA8_LATE_MISSION_TRACE").is_some()
+        && ((275980..=276020).contains(&at) || (287980..=288000).contains(&at))
+    {
+        eprintln!(
+            "mission tick{at} queue{:?}",
+            world.resource::<CommandQueue>()
+        );
+        for event in events {
+            if matches!(
+                event,
+                SimEvent::MoveFailed { .. }
+                    | SimEvent::AttackEnded { .. }
+                    | SimEvent::WeaponFired { .. }
+            ) {
+                eprintln!("mission tick{at} {event:?}");
+            }
+        }
+    }
     let service = std::env::var_os("RA8_SERVICE_TRACE").is_some() && at >= 180000;
     for (id, owner, unit, mobile) in world
         .query::<(&SimId, &sim::Owner, &sim::Unit, &sim::Mobile)>()
@@ -127,6 +158,9 @@ fn trace_economy_events(world: &mut bevy::ecs::world::World, events: &[SimEvent]
                 format!("P{} cancelled {item:?} refund{refund}", player.0),
                 1,
             ),
+            SimEvent::StrategicActivated { player, role, .. } => {
+                (format!("P{} strategic {role:?}", player.0), 1)
+            }
             SimEvent::BuildingSold { player, refund, .. } => {
                 (format!("P{} sales_refund", player.0), *refund as u64)
             }
@@ -299,6 +333,15 @@ fn trace_economy_events(world: &mut bevy::ecs::world::World, events: &[SimEvent]
 }
 
 fn run_case(map_id: &str, countries: [&str; 2], difficulties: [&str; 2]) {
+    run_case_to(map_id, countries, difficulties, None);
+}
+
+fn run_case_to(
+    map_id: &str,
+    countries: [&str; 2],
+    difficulties: [&str; 2],
+    stricter_limit: Option<u64>,
+) {
     let assets = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets");
     let definitions = sim::load_ruleset(assets.join("data")).unwrap();
     let skirmish = sim::load_skirmish(assets.join("data/skirmish.ron"), &definitions).unwrap();
@@ -308,6 +351,7 @@ fn run_case(map_id: &str, countries: [&str; 2], difficulties: [&str; 2]) {
         .unwrap()
         .grid;
     let limit = 72000 * u64::from(grid.width() + grid.height()).max(128) / 128;
+    let limit = stricter_limit.map_or(limit, |stricter| stricter.min(limit));
     let name = format!("{map_id} seed0 {countries:?} {difficulties:?}");
     let mut app = bevy::app::App::new();
     app.add_plugins(SimPlugin { seed: 0 });
@@ -578,6 +622,21 @@ fn dump(world: &mut bevy::ecs::world::World) {
     }
     eprintln!("special {:?}", world.resource::<sim::SpecialState>());
 }
+#[test]
+fn ra8_gate_demo_germany_great_britain_brutal_seed_zero_finishes() {
+    run_case_to(
+        "demo",
+        ["germany", "great_britain"],
+        ["brutal", "brutal"],
+        Some(72000),
+    );
+}
+
+#[test]
+fn ra8_gate_demo_france_cuba_brutal_seed_zero_finishes() {
+    run_case("demo", ["france", "cuba"], ["brutal", "brutal"]);
+}
+
 #[test]
 fn ra8_gate_liberty_seed_zero_finishes() {
     run_case("liberty_bay", ["iraq", "korea"], ["medium", "medium"]);
