@@ -81,17 +81,16 @@ fn covered(a: &Actor, c: CellPos) -> bool {
     a.foot
         .map_or(square(a.cell, c), |f| f.cells().any(|p| square(p, c)))
 }
-pub(super) fn launch(
-    world: &mut World,
-    player: PlayerId,
-    id: SimId,
+fn validate_launch(
+    world: &World,
+    defs: &Definitions,
+    a: &Actor,
     target: CellPos,
     source: Option<CellPos>,
+    check_visibility: bool,
 ) -> Result<(), RejectReason> {
-    let defs = world.resource::<Definitions>().clone();
-    let index = living(world);
-    let a = own(world, &defs, &index, player, id)?;
-    commandable(world, id)?;
+    let player = a.owner;
+    let id = a.id;
     let m = defs
         .metadata(a.item)
         .filter(|m| m.strategic)
@@ -99,23 +98,21 @@ pub(super) fn launch(
     if m.show_timer && !world.resource::<crate::MatchState>().rules().superweapons {
         return Err(unavailable("Superweapons are disabled"));
     }
-    let rules = defs
-        .rules()
-        .ok_or(unavailable("No strategic rules"))?
-        .superweapons;
+    defs.rules().ok_or(unavailable("No strategic rules"))?;
     for c in [Some(target), source].into_iter().flatten() {
         if !world.resource::<Grid>().contains(c) {
             return Err(RejectReason::OutsideMap(c));
         }
-        if !world
-            .resource::<Players>()
-            .get(player)
-            .is_some_and(|p| p.vision().is_visible(c))
+        if check_visibility
+            && !world
+                .resource::<Players>()
+                .get(player)
+                .is_some_and(|p| p.vision().is_visible(c))
         {
             return Err(unavailable("Strategic target must be visible"));
         }
     }
-    if !charges(world, &defs, a)
+    if !charges(world, defs, a)
         || world
             .resource::<SpecialState>()
             .charge
@@ -134,6 +131,72 @@ pub(super) fn launch(
             "Choose a Chronosphere source area and destination",
         ));
     }
+    if m.role == Role::Paradrop {
+        drop_plan(world, defs, a, target)?;
+    } else if !matches!(
+        m.role,
+        Role::Chronosphere | Role::Curtain | Role::Nuke | Role::Storm
+    ) {
+        return Err(unavailable("No strategic ability"));
+    }
+    Ok(())
+}
+
+/// Read-only complete validation for an engine-created strategic intent. Unsupported
+/// legacy commands are never certified. No result is fed back into the AI's target choice.
+pub(crate) fn strategic_intent_valid(
+    world: &mut World,
+    issued: &IssuedCommand,
+    check_visibility: bool,
+) -> bool {
+    let (id, target, source) = match &issued.command {
+        Command::Superweapon {
+            building,
+            target,
+            units,
+        } if units.is_empty() => (*building, *target, None),
+        Command::Chronoshift {
+            building,
+            target,
+            source,
+        } => (*building, *target, Some(*source)),
+        _ => return false,
+    };
+    if world.resource::<Players>().get(issued.player).is_none() {
+        return false;
+    }
+    let index = living(world);
+    let defs = world.resource::<Definitions>();
+    if defs.rules().is_none() {
+        return false;
+    }
+    own(world, defs, &index, issued.player, id)
+        .and_then(|a| {
+            commandable(world, id)?;
+            validate_launch(world, defs, a, target, source, check_visibility)
+        })
+        .is_ok()
+}
+
+pub(super) fn launch(
+    world: &mut World,
+    player: PlayerId,
+    id: SimId,
+    target: CellPos,
+    source: Option<CellPos>,
+) -> Result<(), RejectReason> {
+    let defs = world.resource::<Definitions>().clone();
+    let index = living(world);
+    let a = own(world, &defs, &index, player, id)?;
+    commandable(world, id)?;
+    validate_launch(world, &defs, a, target, source, true)?;
+    let m = defs
+        .metadata(a.item)
+        .ok_or(unavailable("No strategic ability"))?;
+    let rules = defs
+        .rules()
+        .ok_or(unavailable("No strategic rules"))?
+        .superweapons;
     let tick = world.resource::<SimTick>().0;
     match m.role {
         Role::Chronosphere => {
@@ -256,17 +319,17 @@ pub(super) fn launch(
         });
     Ok(())
 }
-fn drop_plane(
-    world: &mut World,
+fn drop_plan(
+    world: &World,
     defs: &Definitions,
     a: &Actor,
     target: CellPos,
-) -> Result<(), RejectReason> {
+) -> Result<(CellPos, UnitKind, u32), RejectReason> {
     let (width, height) = {
         let g = world.resource::<Grid>();
         (g.width(), g.height())
     };
-    let plane = defs
+    let _plane = defs
         .unit_kind("paradrop_plane")
         .ok_or(unavailable("Paradrop plane unavailable"))?;
     let entry = (0..width)
@@ -298,6 +361,15 @@ fn drop_plane(
     } else {
         side.paradrop_count as u32
     };
+    Ok((entry, infantry, count))
+}
+fn drop_plane(
+    world: &mut World,
+    defs: &Definitions,
+    a: &Actor,
+    target: CellPos,
+) -> Result<(), RejectReason> {
+    let (entry, infantry, count) = drop_plan(world, defs, a, target)?;
     let id = crate::spawn_unit(world, a.owner, "paradrop_plane", entry)
         .map_err(|_| unavailable("No clear plane entry"))?;
     if let Some(e) = actors(world).get(&id).map(|a| a.entity) {
@@ -306,7 +378,6 @@ fn drop_plane(
             o.current = Some(MoveOrder::new(target, tick));
         }
     }
-    let _ = plane;
     world
         .resource_mut::<SpecialState>()
         .strategic

@@ -205,7 +205,8 @@ pub(crate) fn install(world: &mut World) {
     world.insert_resource(state);
 }
 
-pub(crate) fn validate_repair(world: &World, hut: SimId) -> Result<(), crate::RejectReason> {
+/// A known hut job can wait for physical readiness without disclosing its blockers.
+pub(crate) fn repair_ready(world: &World, hut: SimId) -> Result<bool, crate::RejectReason> {
     let state = world.resource::<Bridges>();
     let bridge = state
         .huts
@@ -216,12 +217,15 @@ pub(crate) fn validate_repair(world: &World, hut: SimId) -> Result<(), crate::Re
     let grid = world.resource::<Grid>();
     // A holder includes both its current cell and a reserved step destination. Keep ships
     // and the Engineer intact until restoration can preserve their navigation domain.
-    if bridge.cells.iter().any(|&cell| {
+    Ok(!bridge.cells.iter().any(|&cell| {
         grid.holders_for(cell, crate::Domain::Land)
             .into_iter()
             .flatten()
             .any(|id| grid.domain_of(id) == crate::Domain::Naval)
-    }) {
+    }))
+}
+pub(crate) fn validate_repair(world: &World, hut: SimId) -> Result<(), crate::RejectReason> {
+    if !repair_ready(world, hut)? {
         return Err(crate::special::unavailable(
             "Ships must clear the collapsed bridge before repair",
         ));

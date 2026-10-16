@@ -378,6 +378,16 @@ struct PendingCommand {
     issued: IssuedCommand,
     // Only run_ai may create this origin; public push stays strictly atomic, even for an AI owner.
     ai_intent: Option<AiIntent>,
+    action: PendingAction,
+}
+
+/// Private goals are distinct from ordinary public command attempts. A bridge goal
+/// authorizes a known Engineer/hut job, then dispatches Interact only when physically safe.
+#[derive(Debug, Default, PartialEq, Eq)]
+enum PendingAction {
+    #[default]
+    Command,
+    ConditionalBridgeRepair,
 }
 
 /// Facts established by the controller's honest decision snapshot, not validation exemptions.
@@ -386,6 +396,7 @@ pub(crate) struct AiIntent {
     pub owned: BTreeSet<SimId>,
     pub armed: BTreeSet<SimId>,
     pub target: Option<SimId>,
+    pub strategic_valid: bool,
 }
 
 impl CommandQueue {
@@ -393,6 +404,7 @@ impl CommandQueue {
         self.pending.push(PendingCommand {
             issued,
             ai_intent: None,
+            action: PendingAction::Command,
         });
     }
 
@@ -400,6 +412,24 @@ impl CommandQueue {
         self.pending.push(PendingCommand {
             issued,
             ai_intent: Some(witness),
+            action: PendingAction::Command,
+        });
+    }
+
+    pub(crate) fn push_bridge_goal(
+        &mut self,
+        player: PlayerId,
+        unit: SimId,
+        hut: SimId,
+        witness: AiIntent,
+    ) {
+        self.pending.push(PendingCommand {
+            issued: IssuedCommand {
+                player,
+                command: Command::Interact { unit, target: hut },
+            },
+            ai_intent: Some(witness),
+            action: PendingAction::ConditionalBridgeRepair,
         });
     }
 
@@ -411,7 +441,8 @@ impl CommandQueue {
         self.pending.is_empty()
     }
 
-    /// The pending commands in push order. After a tick these are the commands the computer
+    /// The pending commands in push order; a private conditional bridge goal projects its
+    /// proposed Interact, without disclosing physical readiness. After a tick these are the commands the computer
     /// players pushed in its `Ai` stage (M6), since the `Commands` stage drained the queue first.
     pub fn iter(&self) -> impl Iterator<Item = &IssuedCommand> {
         self.pending.iter().map(|pending| &pending.issued)
@@ -424,6 +455,10 @@ impl CommandQueue {
         h.write(b"queued_commands_ra8");
         h.write_u64(self.pending.len() as u64);
         for pending in &self.pending {
+            h.write(&[match pending.action {
+                PendingAction::Command => 0,
+                PendingAction::ConditionalBridgeRepair => 1,
+            }]);
             h.write(&[
                 pending.issued.player.0,
                 u8::from(pending.ai_intent.is_some()),
@@ -439,6 +474,7 @@ impl CommandQueue {
                 if let Some(target) = witness.target {
                     h.write_u32(target.0);
                 }
+                h.write(&[u8::from(witness.strategic_valid)]);
             }
             hash_command(&pending.issued.command, h);
         }
@@ -641,6 +677,7 @@ pub(crate) fn process_regular_commands(
     for PendingCommand {
         mut issued,
         ai_intent,
+        action: _,
     } in queue.pending.drain(..)
     {
         if let Some(witness) = &ai_intent
@@ -1310,7 +1347,12 @@ pub(crate) fn process_commands(world: &mut bevy_ecs::world::World) {
     refresh_command_vision(world);
     let mut mirages = concealment_movers(world);
     let pending = std::mem::take(&mut world.resource_mut::<CommandQueue>().pending);
-    for PendingCommand { issued, ai_intent } in pending {
+    for PendingCommand {
+        issued,
+        ai_intent,
+        action,
+    } in pending
+    {
         if matches!(
             issued.command,
             Command::Deploy { .. }
@@ -1330,9 +1372,26 @@ pub(crate) fn process_commands(world: &mut bevy_ecs::world::World) {
                 Command::Undeploy { building } => Some(*building),
                 _ => None,
             };
-            let result = crate::special::apply(world, &issued);
+            let result = if action == PendingAction::ConditionalBridgeRepair {
+                match crate::special::bridge_goal_ready(world, &issued) {
+                    // Waiting is a goal outcome, not a failed ordinary Interact. No hidden
+                    // blocker information or changed order is returned to the controller.
+                    Ok(false) => continue,
+                    Ok(true) => crate::special::apply(world, &issued),
+                    Err(reason) => Err(reason),
+                }
+            } else {
+                crate::special::apply(world, &issued)
+            };
             let accepted = result.is_ok();
+            let cell_visibility_lost = ai_intent.as_ref().is_some_and(|w| w.strategic_valid)
+                && result
+                    == Err(RejectReason::AbilityUnavailable(
+                        "Strategic target must be visible",
+                    ))
+                && crate::special::strategic_intent_valid(world, &issued, false);
             if let Err(reason) = result
+                && !cell_visibility_lost
                 && !ai_intent
                     .as_ref()
                     .is_some_and(|w| stale_ai_intent(&reason, w))
@@ -1361,7 +1420,11 @@ pub(crate) fn process_commands(world: &mut bevy_ecs::world::World) {
             world
                 .resource_mut::<CommandQueue>()
                 .pending
-                .push(PendingCommand { issued, ai_intent });
+                .push(PendingCommand {
+                    issued,
+                    ai_intent,
+                    action,
+                });
             if boundary {
                 crate::special::infantry::refresh_limits(world);
                 world
@@ -1393,6 +1456,28 @@ fn stale_ai_intent(reason: &RejectReason, witness: &AiIntent) -> bool {
         }
         _ => false,
     }
+}
+
+/// Certify only completely valid strategic decisions before Economy/Visibility can change
+/// their cell visibility. Ordinary/public commands and intrinsically bad intents stay strict.
+pub(crate) fn certify_ai_strategic_intents(world: &mut bevy_ecs::world::World) {
+    if !world.resource::<CommandQueue>().pending.iter().any(|p| {
+        p.ai_intent.is_some()
+            && matches!(
+                p.issued.command,
+                Command::Superweapon { .. } | Command::Chronoshift { .. }
+            )
+    }) {
+        return;
+    }
+    let mut pending = std::mem::take(&mut world.resource_mut::<CommandQueue>().pending);
+    for p in &mut pending {
+        if let Some(witness) = &mut p.ai_intent {
+            witness.strategic_valid =
+                crate::special::strategic_intent_valid(world, &p.issued, true);
+        }
+    }
+    world.resource_mut::<CommandQueue>().pending = pending;
 }
 
 /// Only sales/placement and actual Mirage orders split regular batches. Normal army orders

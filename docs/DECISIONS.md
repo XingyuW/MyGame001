@@ -5972,3 +5972,116 @@ Separately inspected staged hygiene exits2, not passed, solely for untouched raw
 `checkpoint4-staged-whitespace-check.json` preserves exact lines/unfiltered stdout; no
 source/data/test/doc diagnostic or raw-log edit exists. A separate exact-output recheck
 precedes the test/docs/evidence commit.
+
+
+### R111. Fourth frozen RA8 gate: physical bridge readiness, strategic cell loss and active attrition
+
+**2026-10-16 UTC.** Frozen4dfeeed/runtime65fa8d6 fails workspace04 after2703s,
+253 passed/1 failed/0 ignored. Production target5 passed/1 failed in2497.71s reports three
+exact seed0 cases: Steel Harbor AmericaBrutal/CubaBrutal Engineer518→hut2684378722 at28241
+("Ships must clear the collapsed bridge before repair"); Thousand Lakes GreatBritainEasy/
+AmericaEasy strategic source62→(23,23) at28922 ("Strategic target must be visible");
+Thousand Lakes FranceBrutal/GermanyBrutal None under its unchanged288000 R29 limit.
+01–03/05–06 exit0; already-active07 debug smoke is stopped143 before08–13. Only verified
+owned root50452/debug53820/caffeinate50457 are terminated. `ra8-attempt4` preserves all eight
+raw files/stop-time SHA256 manifest/incomplete summary/STOPPED annotation. No successful
+756-row table is emitted; older target TSVs are not copied as evidence. The source remains
+frozen throughout the healthy gate. Production's quiet output is checked for CPU progress,
+not mistaken for deadlock: elapsed07:28/CPU64:19.99→08:43/74:43.24→20:00/170:17.85→
+34:09/289:35.54, final867.9percent CPU. No competing validator/probe is running.
+
+The first three focused diagnostic captures fail to compile (test-only borrow conflict);
+those `before1` logs are retained, not claimed negative simulation evidence. Corrected
+`before2` captures reproduce all three real failures serially, command20.043s/9.552s/
+185.194s respectively. Bridge decision28240 already has enemy Typhoons511/484 reserving
+collapsed deck(100,98)/(100,97), progress248/256 from neighboring cells. Both are hidden
+fromP0 even with fog off. At application28241 they occupy that deck and remain hidden.
+Thus R105's known-occupant admission cannot guarantee physical safety; this is neither a
+valid decision-clear witness nor justification for a larger proximity guess/hidden oracle.
+
+The strategic source is American Airforce Command62 (Paradrop). P0 queues Gap22 at(23,26)
+on28920 and places it28921. P1's actual28921 decision sees(23,23), fog=false/power good/
+no Storm; the real final Visibility stage shrouds it. Application28922 therefore loses
+cell sight after a genuinely visible decision. R103's entity-target witness does not cover
+this cell lifecycle. Public validation and intrinsic charge/type/argument errors remain strict.
+
+The stalled pair is active attrition, not stale ToOre or an absent weapon opportunity.
+A read-only scheduled Economy/event probe retains the same failed288000 outcome in
+183.510s (`attempt4-thousand-lakes-economy-before1.log`). P0 actual ore-credit deliveries
+in successive60000-tick windows are81500/23000/15000/25000; P1 are87500/7000/0/5000.
+P1 separately receives legitimate sales7500 and3500 in the late windows. During180000–239999,
+P0 produces8 Grizzlies/4 Harriers/5 Chrono Legionnaires/2 Prism tanks and other units,
+loses10 Harriers/8 Grizzlies/5 Chronos; P1 loses3 power plants/barracks/depot/pillbox.
+Thirty Patriot→Harrier shots coexist with actual Harrier shots at refinery8/pillbox6 and
+incidental units. Repair HP, paid completions/cancellations/losses/shots are retained by
+window, not inferred from idle orders. At288000 P0 aircraft1010 is on its actual fourth dock,
+ammo0/reloading232; P1 aircraft1005 reloads280 and980 returns. This refutes a global reload
+fix. P1's legitimate Storm starts288005, five ticks past the horizon; no limit/valid-win timing
+is changed to accommodate it. Remaining ground/air/Temporal attacks and working miners
+preclude forced R53 liquidation. Any tactical correction first requires replay after the
+separately proven bridge/cell fixes; no unneeded balance policy is added on this evidence.
+
+
+### R112. Private conditional bridge-repair goals preserve public Interact and R67 safety
+
+**2026-10-16 UTC.** A separately tagged, value-hashed `PendingAction::ConditionalBridgeRepair`
+is an engine-only goal in the same FIFO CommandQueue, created only for the AI's observed
+Engineer/hut repair job. It is distinct from an ordinary command attempt; `iter` projects
+its proposed Interact for existing diagnostics. The controller still plans solely from known
+huts/observed collapsed decks/known occupants. Commands flush preceding ordinary effects,
+then authorize current player/live owned commandable Engineer/currently known hut/type/
+collapsed job BEFORE inspecting physical readiness. An occupied deck means wait: dispatch
+no ordinary Interact, change no actor order, expose no blocker ID/reason to the controller.
+The existing bounded AI cadence retries its known job. This is a one-shot conditional goal,
+not a persistent order that can override a later public Stop or block the queue.
+
+When ready it dispatches unchanged ordinary Interact. `bridges::repair_ready` extracts the
+same current/reserved Naval-holder predicate; public `validate_repair` maps false to its
+original rejection verbatim. Actual `bridges::repair` still revalidates immediately before
+restoring terrain/despawning the Engineer. A ship arriving after initial acceptance therefore
+cannot be covered or consumed: the in-progress job drops safely and a later goal may retry.
+No public Command variant/Interact target kind is added, so the private action's equivalent
+security/FIFO/hash tests accompany the unchanged public matrix. Reconnaissance alone cannot
+guarantee next-tick occupancy and would require new recruitment/routing policy; the private
+conditional job is the narrower honest design. R67's physical safety is preserved.
+
+Three focused schedule regressions pass: hidden standing/reserved ship→wait, unchanged
+public occupied Interact rejection, ship clears→actual repair/consumed Engineer; prior/later
+public Stop ordering and occupancy arising during actual Engineer travel; missing/dead/hidden/
+wrong actor/target authorization before readiness and action-tag hash. Earlier fixture compile
+failure and far-hut visibility/fog-off conceal-versus-shroud errors remain in goals1/goals2;
+corrected goals3 passes3/3. Those are fixture corrections, not existing-test assertion changes.
+
+
+### R113. Completely valid strategic decision certificates for later cell-visibility loss
+
+**2026-10-16 UTC.** The existing strategic launch's read-only checks are extracted without
+changing ordinary validation order/rejection strings: ownership/commandability/strategic
+metadata/options/rules/map/current sight/power/full charge/Storm state/Chronosphere form/
+role and Paradrop plane/entry/side availability. Paradrop entry planning is shared with actual
+launch. At the end of core Ai, only engine-created supported strategic pending intents receive
+a value-hashed certificate when this complete validator succeeds. Public commands never
+receive one; unsupported legacy/nonempty-argument forms are not certified. The certificate
+cannot influence the controller's choice or expose an unseen object.
+
+At application, only the original exact cell-visibility rejection can cancel a certified
+intent, and only if all remaining launch checks still succeed while ignoring cell visibility.
+An initially unready/type/form/map-invalid intent remains an ordinary rejection;
+unsupported nonempty argument forms receive no certificate;
+a newly unready source also retains rejection even when sight is gone. No catch-all
+AbilityUnavailable suppression, charge consumption, strategic effect or public exemption is
+introduced. Other R103 witnessed entity/selection lifecycle rules are unchanged.
+
+Two schedule/hash regressions pass with real powered enemy Gap construction after decision
+and actual scheduled satellite shrouding. They distinguish internal/public, initially and
+later unready, wrong type/Chronosphere form/outside/nonempty arguments, prove no launch and
+only legitimate internal cancellation, and prove certificate value hashing. `attempt4-strategic-
+cell1.log` retains2 passed/0 failed/0 ignored. Full affected preflight/default completion and
+all13 final gate remain required; these focused results are validated, not independent review.
+
+R113 lifecycle commit staged hygiene: the separately inspected unfiltered check exits2,
+not passed, solely for five preserved raw blank EOF lines: goals3:11,intents-all1:22,
+Steel America/Cuba lifecycle1:99,strategic-cell1:10,and GreatBritain/America lifecycle1:117.
+`attempt4-lifecycle-staged-hygiene.json` retains exact full paths/lines/raw hashes/unfiltered
+stdout. Staged raw bytes equal their captures; no source/data/test/doc diagnostic exists.
+A separate exact-output recheck precedes committing; no raw evidence is trimmed or suppressed.

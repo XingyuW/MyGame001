@@ -400,12 +400,14 @@ fn share_of(hp: i32, from: i32, to: i32) -> i32 {
 mod advance;
 mod carrier;
 mod commands;
+pub(crate) use commands::bridge_goal_ready;
 mod interaction;
 mod reconnaissance;
 mod repair;
 mod resolve;
 mod state;
 pub(crate) mod superweapons;
+pub(crate) use superweapons::strategic_intent_valid;
 mod transport;
 pub(crate) mod vehicles;
 

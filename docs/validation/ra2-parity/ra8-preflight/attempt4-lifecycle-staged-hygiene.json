@@ -1,0 +1,45 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit": 2,
+  "stdout": "docs/validation/ra2-parity/ra8-preflight/attempt4-bridge-goals3.log:11: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt4-intents-all1.log:22: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt4-steel_harbor_america_cuba_bridge-lifecycle1.log:99: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt4-strategic-cell1.log:10: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt4-thousand_lakes_great_britain_america-lifecycle1.log:117: new blank line at EOF.\n",
+  "stderr": "",
+  "classification": [
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt4-bridge-goals3.log",
+      "line": 11,
+      "kind": "intentional untouched captured blank EOF",
+      "sha256": "ff81d686ac88d3855b39d41219a4de6ce9cbb18b67f2911d1e5e71ff587f4bda"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt4-intents-all1.log",
+      "line": 22,
+      "kind": "intentional untouched captured blank EOF",
+      "sha256": "f394100198ce0049db2925501907d52e8f8a56533f903f9c2445a79b0ffa335f"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt4-steel_harbor_america_cuba_bridge-lifecycle1.log",
+      "line": 99,
+      "kind": "intentional untouched captured blank EOF",
+      "sha256": "6c571c5d7a0f62eb3b8fbee5da3369f3a0d926aa5020eb53f890682be67af172"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt4-strategic-cell1.log",
+      "line": 10,
+      "kind": "intentional untouched captured blank EOF",
+      "sha256": "0b3e69d2ec7a8aa7b2ac3d0aaa5ccef2028b515c9d3707a5f71b9e6bbe94749c"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt4-thousand_lakes_great_britain_america-lifecycle1.log",
+      "line": 117,
+      "kind": "intentional untouched captured blank EOF",
+      "sha256": "1da6e4a324c70eb80ffab0661324af352832328f17f0444ff377167d5b495ded"
+    }
+  ],
+  "source_data_test_doc_diagnostics": 0,
+  "status": "exit2 classified solely as exact raw EOF evidence; not a passed check"
+}
