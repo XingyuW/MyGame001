@@ -1,7 +1,10 @@
 # RA8 acceptance record
 
-Status: pre-freeze checks complete; full frozen validation has not run. This record is not an
-independent review. All earlier validation directories and failed RA8 probes are retained.
+Status: first frozen attempt failed and was stopped. R102 records the complete-plan test
+correction; the broader game preflight then exposed real default-path admission/lifecycle
+defects, fixed in R103. Final-runtime match/budget repeats and a complete thirteen-command
+rerun remain required. This is not an independent review.
+All earlier validation directories and failed RA8 probes are retained.
 
 ## Acceptance checklist
 
@@ -175,3 +178,56 @@ exit2 has the sole `prop-boundaries-after1.log:219` EOF line. Exact paths/lines 
 output are retained in the feature/performance staged-whitespace JSON manifests. Separate
 rechecks confirmed identical sets before their commits. No source/data/test diagnostic,
 suppression or raw-log edit occurred; the required unfiltered validation script is unchanged.
+
+## Test-only refreeze after the first gate failure
+
+The historical checkpoint above is retained. `ra8-attempt1/STOPPED.md` maps the failed/incomplete
+first gate:01–03/05–06 exited0;04 exited101 (216 passed,1 failed,0 ignored);07 partial compilation
+was stopped, outer exit143;08–13 were not run. Raw logs and summary remain unchanged.
+
+R102 names the sole existing-test migration:
+`game::units::tests::the_production_data_loads_with_the_combat_file` checks the complete plan's
+armed defences and pillbox membership across both build_order and defences. It keeps every
+original armed/combat requirement. The new actual-controller test proves paid armed placement
+under all eleven shipped plans, including the separately declared lists under all nine country
+overrides and the original build orders under both isolated side fallbacks. Earlier new-probe
+mistakes and the successful placement trace are preserved in the plan-defence captures.
+
+Only test code changed after runtime `81149b6`; the actual default21-winner sweep and final
+256×256 timing/equivalence evidence remain final-runtime evidence. Refreeze inventory is
+1124→1163 static tests,39 added,zero removed/renamed/ignored. The new complete frozen gate,
+both756-winner distributions and final command timings remain required before RA8 closure.
+
+## Admission and lifecycle correction after broader preflight
+
+The preceding test-only checkpoint is historical and superseded by R103's runtime fixes.
+The complete failed `refreeze-game1.log` preserves all actual assertions: occupied Soviet bays,
+same-decision aircraft over-admission and queued target invalidation. The original Crossroads
+functions now pass unchanged, the second at21153/72000 after accounting for incoming garrison
+reservations. A new focused default-path test replays all ten failed Demo pairings with their
+original rejection exemptions/invariants/72000 limit; all ten have explicit winners in33.84s.
+
+Internal AI intents carry value-hashed decision witnesses, with FIFO and ordinary validation;
+public push is strict even for an actual AI owner. Mixed/all-stale actors, real detector-loss
+concealment, target death/capture, retained intrinsic errors and Deploy boundaries are covered.
+The final affected serial boundary batch (`refreeze-boundaries2.log`) exits0:115 passed,
+zero failed/ignored across core57, public commands22, RA8 AI31, definitions4 and placement1.
+The aircraft admission negative test fails exactly with two orders for one remaining dock;
+its sole condition mutation is restored and byte-verified in the integrity JSON. Its original
+SHA is explicitly reconstructed rather than claimed contemporaneously captured. No old test,
+assertion or limit is weakened; R102 is the only additional existing-test migration.
+
+Runtime now differs from81149b6; final default21-map completion and256×256 means must repeat.
+Earlier seeded Prop-optimization equality remains evidence for that isolated optimization;
+the new queued-command state format intentionally extends hashing. R97's lifecycle mechanism
+is fixed here because it became a concrete gate failure, rather than deferred as known broken
+default play. R83/R96 specialist/transport and R99 unproven capability leads remain RA9 work.
+No new external directory or schema was introduced by this correction.
+
+The subsequent unchanged compatibility batch passes110 tests and source audit5, bringing the
+disjoint corrected sim preflight to230 passed/0 failed/0 ignored across13 targets. Strict
+all-target Clippy, fmt, generated data and4934-row reference checks pass. Both original Coral
+functions pass at31367/288000 (LibyaBrutal/IraqMedium) and33213/288000
+(LibyaBrutal/GermanyBrutal). `refreeze2-test-inventory.json` records1124→1172 static tests,
+48 added,zero removed/renamed/ignored. Final-source default-match/budget repeats and all13
+gate commands remain pending; no independent review is claimed.

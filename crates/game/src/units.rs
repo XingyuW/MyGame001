@@ -1216,18 +1216,22 @@ mod tests {
         assert!(armed(turret));
         // The computer player of the demo match builds it (M6: the starting buildings are data
         // of the skirmish file, and the computer player's buildings follow the AI file's build
-        // order, D40, D42); since RA1 the plan of each side builds an armed structure of its own.
+        // order, D40, D42); RA8 also declares its sourced-count defenses separately. The
+        // complete plan of each side must still build an armed structure of its own.
         let catalogue = crate::skirmish::tests::production_catalogue();
         assert!(
             catalogue
                 .ai
                 .plans
                 .iter()
-                .any(|plan| plan.build_order.contains(&turret))
+                .any(|plan| plan.build_order.contains(&turret) || plan.defences.contains(&turret))
         );
         for plan in &catalogue.ai.plans {
             assert!(
-                plan.build_order.iter().any(|&kind| armed(kind)),
+                plan.build_order
+                    .iter()
+                    .chain(&plan.defences)
+                    .any(|&kind| armed(kind)),
                 "{:?}",
                 plan.side
             );

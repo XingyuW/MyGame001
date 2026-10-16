@@ -5531,3 +5531,133 @@ R97 queued casualty intent and R99's unproven bombable capability lead. Visual/a
 and independent final review remain. No clone/worktree/environment was created. New parser
 scratch under configured Cargo target `tmp/ra8_definitions` is708KiB, recreatable and retained
 for reruns; configured Cargo/UV/PIP caches and prior render/evidence directories are preserved.
+
+### R102. RA8 complete-plan armed-defence invariant and stopped first gate
+
+**2026-10-15.** The first frozen gate at checkpoint `b9388f5` failed the existing
+`crates/game/src/units.rs::tests::the_production_data_loads_with_the_combat_file` assertion:
+every production plan must include an armed defence, but it inspected only `build_order`.
+RA8's nine country overrides declare their sourced-count defences in `defences`; the two
+legacy side fallbacks retain armed structures in `build_order`. The named test now checks
+both lists for both its pillbox-membership assertion and its per-plan armed-defence assertion.
+The armed requirement, combat coverage and every other existing assertion remain intact.
+This is a schema/plan compatibility migration in test code; no runtime/data change is made.
+
+New schedule-level regression
+`ra8_every_shipped_plan_places_a_paid_armed_defence_from_its_complete_plan` runs all eleven
+shipped plans through actual QueueProduction and PlaceBuilding with shipped definitions,
+normal prerequisites/ownership/payment, zero initial units, declared credits/quiet terrain,
+and no rejected commands or cell violations. Country overrides must place an armed type from
+their separate defence list. To exercise the two otherwise-shadowed side fallbacks, only the
+selected country override is removed from the isolated test's loaded configuration; fallback
+armed types must come from their actual build order. The placed entity's owner/type is checked.
+
+The first new probe incorrectly required a fallback placement from its empty separate list;
+the second correctly handled fallbacks but used an arbitrary12000-tick deadline, insufficient
+for the Allied full-tech/defence-lane priority. Both failures are preserved. The new test uses
+the existing full-tech defence-count scenario's45000-tick horizon, without changing any old
+test or match limit. All eleven actual placements pass: side fallbacks3402/3242, Allied
+countries17282 except France17722, Soviet countries10762. Raw evidence is
+`ra8-preflight/plan-defence-controller-after3.log`; this proves consumption, not only nonempty
+configuration. The original targeted game invariant also passes.
+
+The failed gate's untouched raw directory is preserved as `ra8-attempt1`:01–03 exited0,
+04 exited101 (216 passed,1 failed,0 ignored),05/06 exited0;07 partial debug compilation was
+stopped before the unnecessary long checks. The owned validator/process subtree was
+terminated, outer exit143;08–13 never ran. The summary is intentionally incomplete and is not
+a passing gate. All thirteen commands must rerun on the corrected, committed test tree.
+The runtime/data/scripts remain byte-identical to `81149b6`, so final-source default m13,
+256×256 timing and seeded equivalence evidence remain applicable. Refreeze inventory records
+1124→1163 static tests,39 added,zero removed/renamed and zero ignored. Earlier checkpoint and
+failure captures are retained without rewriting their historical claims.
+
+### R103. RA8 admission reservations and witnessed queued-intent lifecycle
+
+**2026-10-16.** The broader game-package preflight after R102 passed217 game unit tests,
+the unchanged all-map multi-player/replay target (169.76s), and grown-map/asset targets,
+then failed four m6 production functions. These are concrete command-rejection defects,
+not duration failures. The complete exit101 capture is `ra8-preflight/refreeze-game1.log`.
+No assertion, permitted-rejection category, route/search rule or match limit is changed.
+
+The original `crossroads_armies_finish_after_new_terrain_changes` rejects repair Interact47→60
+at10562; `the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first` rejects69→58
+at13562. New strategy selected occupied Soviet service bays. Eligibility now counts existing
+docked vehicles and known incoming reservations together, deduplicated by unit, against the
+sourced vehicle_docks. Zero retains ordinary unlimited capacity (Allied service depot);
+Soviet depot/shipyards use their declared capacities. Specialist-reserved units also leave the
+new direct Attack selection, just as they already leave Move/AttackMove. The first Crossroads
+function passes; the second then exposes Interact97→Prop3221226108 at16921, "Garrison is full".
+Garrison quota and host-capacity admission now include known owned incoming occupiers. With
+that correction the original second function wins at21153/72000 with all assertions intact.
+
+The production sweep also rejects a Harrier queue in demo GermanyBrutal/GreatBritainBrutal
+at12862. Each candidate checked only existing/queued aircraft, omitting other aircraft added
+by the same decision. `flight::dock_commitments` extracts exactly the existing owned+queued
+arithmetic, used by both public admission paths and AI. AI additionally counts its same-turn
+admissions and uses actual owned-building dock capacity, preserving tier/naval/queue caps and
+the original army cursor. An actual full-prerequisite controller with three of four docks
+taken admits exactly one Harrier and completes paid production. Disabling only this guard
+fails the new test with "admitted2"; the raw negative capture is preserved. The condition was
+immediately restored and SHA256 verified before subsequent validation. The integrity JSON
+records mutant78f16bb50fe5219487c7af9603e3aef933e775ce39f86b86fd4a6500a374af97 and
+restored86db668bd27521c8fd77608bc67c4ef515b01030f5a5a7bbe6afd87033adb023. The original
+digest was reconstructed from the sole reversible condition patch, not captured beforehand;
+this limitation is explicit rather than claimed as a contemporaneous pre-mutation capture.
+
+Other workers and `ra5_coral_archipelago_brutal_libya_germany_seed_zero_finishes` reject Attack
+targets that were valid at decision and disappeared/became unseen before next Commands.
+Examples: demo GermanyMedium/GreatBritainEasy target74 at8901; FranceBrutal/CubaBrutal target129
+at9621; RussiaMedium/LibyaMedium target0 at11422; Coral LibyaBrutal/GermanyBrutal target195 at24941.
+The new focused `ra8_demo_admission_and_target_lifecycle_regressions_finish_with_original_rejection_rules`
+replays all ten failed demo pairs under seed0, actual default setup, original m6 rejection
+exemptions, credit/cell/queue invariants and72000 limit. All ten have explicit winners in
+`demo-lifecycle-after2.log`; old-window traces retain actual decision witnesses.
+
+R97's queued casualty lifecycle debt must therefore close in RA8, rather than hand a known
+failing default path to RA9. Only `run_ai` can mark a queued command as internal. Each marked
+intent records honest decision-time facts: live owned actors, armed actors and a visible
+target. Invalid/duplicate/oversized/empty selections, wrong-owner actors or building IDs in
+unit selections, unavailable attack weapons, wrong Harvest type or out-of-map AI move targets receive no cancellation
+witness. Public push remains strict even for an actual AI owner. At application, witnessed
+dead/changed-owner selections may be pruned; a fully stale valid selection cancels. Ordinary
+validation cancels only witnessed actor/target lifecycle errors. Intrinsically invalid internal
+commands retain normal rejection; queue, placement, type and ability failures are not hidden.
+The controller learns no cancellation reason and gains no unseen-world knowledge. Contiguous
+batching, ability boundaries and FIFO order remain. No deep Definitions copy is added.
+
+Queued commands now hash origin, ordered player/command payload and all witness sets/target
+by value, with explicit variant tags and integer bytes; no pointer or platform Hash state.
+The empty queue appends nothing, preserving earlier empty-queue hashes. Schedule regressions
+cover mixed/all-stale casualty/ownership selections, real detector-loss concealment, target
+death/capture, retained intrinsic rejection, public strictness for an AI owner, ordinary/Deploy
+FIFO boundaries and origin/payload/witness/order hash differences. Admission regressions cover
+incoming/occupied Soviet bays and incoming garrison quota, as well as paid aircraft completion.
+
+All new-probe failures remain: a lifecycle ownership check initially ran before real Visibility
+and correctly received UnknownUnit; new bay fixture initially used the sourced unlimited
+Allied depot; new garrison commands initially lacked initial Visibility; aircraft setup initially
+omitted the full prerequisite composition/power and did not reach the air candidate in its
+first decision. Fixtures now declare those preconditions; no shipped data or old assertion was
+altered. The new focused game test's ambiguous integer tick compile error is also retained.
+
+This runtime change supersedes the R101/R102 final-runtime checkpoint claim. Historical default
+21-winner/256×256/equivalence captures remain evidence for their recorded runtime; final-source
+default completion and mean-budget runs must repeat before refreeze. The old measured Prop
+optimization's before/after equality remains valid for that isolated change; the newly hashed
+queue intentionally extends the state format. All thirteen gates and both756-winner/R29
+distributions remain required. No new external directory, data schema or AI policy assumption
+is introduced by these fixes.
+
+Corrected serial preflight passes230 sim tests across13 targets: core57, public commands22,
+RA8 AI31, definitions4, placement1, RA4 AI2, RA5 world23, RA6 infantry30/vehicles32,
+RA7 context1/orders12/vision10 and source audit5, with zero failed/ignored. Strict all-target
+Clippy, formatting, generated-data and4934-row reference checks pass. Both unchanged Coral
+functions pass: LibyaBrutal/IraqMedium31367/288000 and LibyaBrutal/GermanyBrutal33213/288000.
+Full-tree inventory is1124→1172,48 added,zero removed/renamed/ignored; R102 remains the only
+new migration of an existing test. These checks do not replace the still-required full gate.
+
+The separately inspected staged whitespace check exits2 solely for twelve preserved raw
+capture EOF blank lines, not a pass. Exact paths/lines, raw lines and unfiltered stdout are in
+`ra8-preflight/refreeze-staged-whitespace-check2.json`; no source/data/test/doc diagnostic is
+present. Captures are neither trimmed nor broadly exempted. A separate exact-set recheck
+precedes the correction commit, as required after R94's orchestration mistakes.

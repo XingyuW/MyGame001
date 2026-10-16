@@ -32,6 +32,7 @@ struct ScenarioMode {
     human: bool,
     second_ai: bool,
     cadences: Option<[u32; 2]>,
+    fallback_plan: bool,
 }
 
 fn scenario_mode(
@@ -47,6 +48,16 @@ fn scenario_mode(
     skirmish.maps[0].starts = vec![CellPos::new(8, 8), CellPos::new(38, 38)];
     skirmish.starting_credits = credits;
     let mut ai = load_ai(data().join("ai.ron"), &definitions).unwrap();
+    if mode.fallback_plan {
+        let selected = skirmish
+            .factions
+            .iter()
+            .find(|f| f.id == country)
+            .unwrap()
+            .country;
+        ai.plans
+            .retain(|plan| plan.country.is_none() || plan.country != selected);
+    }
     let difficulty = ai
         .difficulties
         .iter()
@@ -1324,6 +1335,106 @@ fn ra8_medium_country_defence_counts_national_and_later_army_tiers_are_produced(
 }
 
 #[test]
+fn ra8_every_shipped_plan_places_a_paid_armed_defence_from_its_complete_plan() {
+    let definitions = load_ruleset(data()).unwrap();
+    let skirmish = load_skirmish(data().join("skirmish.ron"), &definitions).unwrap();
+    let ai = load_ai(data().join("ai.ron"), &definitions).unwrap();
+    assert_eq!(ai.plans.len(), 11);
+    for expected in &ai.plans {
+        let faction = if let Some(country) = expected.country {
+            skirmish
+                .factions
+                .iter()
+                .find(|f| f.country == Some(country))
+                .unwrap()
+        } else {
+            let country = if expected.side == Some(sim::Side::Allied) {
+                "great_britain"
+            } else {
+                "russia"
+            };
+            skirmish.factions.iter().find(|f| f.id == country).unwrap()
+        };
+        let mut app = scenario_mode(
+            &faction.id,
+            "easy",
+            100000,
+            0,
+            false,
+            ScenarioMode {
+                fallback_plan: expected.country.is_none(),
+                ..ScenarioMode::default()
+            },
+        );
+        quiet(&mut app);
+        assert_eq!(
+            app.world()
+                .resource::<sim::AiPlayers>()
+                .controller(PlayerId(0))
+                .unwrap()
+                .plan()
+                .defences,
+            expected.defences
+        );
+        // Legacy side fallbacks retain their armed structures in build_order. Country
+        // overrides must exercise the new sourced-count defence lane itself.
+        let defence_kinds = if expected.country.is_some() {
+            &expected.defences
+        } else {
+            &expected.build_order
+        };
+        let mut placed = None;
+        for tick in 0..45000 {
+            for event in step(&mut app) {
+                if let sim::SimEvent::BuildingPlaced {
+                    player: PlayerId(0),
+                    building,
+                    kind,
+                    ..
+                } = event
+                    && defence_kinds.contains(&kind)
+                    && definitions
+                        .building_combat(kind)
+                        .is_some_and(|terms| terms.weapon.is_some())
+                {
+                    eprintln!(
+                        "{} fallback={}: paid defence {:?} at tick {}",
+                        faction.id,
+                        expected.country.is_none(),
+                        kind,
+                        tick + 1
+                    );
+                    placed = Some((building, kind));
+                }
+            }
+            if placed.is_some() {
+                break;
+            }
+        }
+        let (id, kind) = placed.unwrap_or_else(|| {
+            let world = app.world_mut();
+            let owned: Vec<_> = world
+                .query::<(&sim::Owner, &sim::Building)>()
+                .iter(world)
+                .filter(|(o, _)| o.0 == PlayerId(0))
+                .map(|(_, b)| definitions.building(b.kind).unwrap().id.clone())
+                .collect();
+            panic!(
+                "{} fallback={}: no paid armed defence, owned={owned:?}",
+                faction.id,
+                expected.country.is_none()
+            )
+        });
+        let entity = unit_entity(&mut app, id);
+        assert_eq!(
+            app.world().get::<sim::Owner>(entity).unwrap().0,
+            PlayerId(0)
+        );
+        assert_eq!(app.world().get::<sim::Building>(entity).unwrap().kind, kind);
+    }
+}
+
+#[test]
 fn ra8_strategic_strikes_weight_known_clusters_and_do_not_target_unseen_bases() {
     for reveal in [false, true] {
         let mut app = scenario("iraq", "brutal", 100000, 0, true);
@@ -1659,6 +1770,111 @@ fn ra8_engineer_is_produced_and_captures_seen_tech_through_ordinary_commands() {
 }
 
 #[test]
+fn ra8_aircraft_same_decision_admission_counts_existing_queued_and_new_dock_commitments() {
+    let mut app = scenario("great_britain", "brutal", 100000, 0, false);
+    quiet(&mut app);
+    put(&mut app, "barracks", 2, 2);
+    put(&mut app, "war_factory", 2, 10);
+    put(&mut app, "airforce_command", 2, 16);
+    put(&mut app, "tech_center", 2, 25);
+    put(&mut app, "refinery", 2, 32);
+    for x in [6, 10, 14] {
+        put(&mut app, "power_plant", x, 2);
+    }
+    for y in 8..11 {
+        spawn_unit(app.world_mut(), PlayerId(0), "harrier", CellPos::new(28, y)).unwrap();
+    }
+    let controllers = app.world_mut().remove_resource::<sim::AiPlayers>().unwrap();
+    app.world_mut().insert_resource(sim::AiPlayers::default());
+    step(&mut app); // Real Economy/flight initializes the three existing dock commitments.
+    app.world_mut().insert_resource(controllers);
+    let harrier = app
+        .world()
+        .resource::<sim::Definitions>()
+        .unit_kind("harrier")
+        .unwrap();
+    let mut admitted = false;
+    for _ in 0..10 {
+        step(&mut app);
+        let count = app.world().resource::<CommandQueue>().iter().filter(|c| matches!(c.command, Command::QueueProduction { item: sim::ProductionItem::Unit(k) } if k == harrier)).count();
+        assert!(
+            count <= 1,
+            "only one of four docks remains, admitted {count}"
+        );
+        admitted |= count == 1;
+    }
+    assert!(
+        admitted,
+        "the available dock must remain usable: pending={:?}",
+        app.world().resource::<CommandQueue>()
+    );
+    let mut trained = false;
+    for _ in 0..2000 {
+        trained |= step(&mut app).iter().any(|e| matches!(e, sim::SimEvent::ProductionComplete { player: PlayerId(0), item: sim::ProductionItem::Unit(kind) } if *kind == harrier));
+    }
+    assert!(
+        trained,
+        "accepted aircraft must complete through paid production"
+    );
+}
+
+#[test]
+fn ra8_depot_reserves_known_incoming_and_occupied_bays_without_rejected_orders() {
+    for first_x in [5, 16] {
+        let mut app = scenario("russia", "medium", 100000, 0, false);
+        quiet(&mut app);
+        let depot = put(&mut app, "soviet_service_depot", 2, 20);
+        let first = spawn_unit(
+            app.world_mut(),
+            PlayerId(0),
+            "rhino",
+            CellPos::new(first_x, 20),
+        )
+        .unwrap();
+        let second =
+            spawn_unit(app.world_mut(), PlayerId(0), "rhino", CellPos::new(7, 20)).unwrap();
+        for id in [first, second] {
+            let e = unit_entity(&mut app, id);
+            app.world_mut()
+                .get_mut::<sim::Health>(e)
+                .unwrap()
+                .hit_points = 10;
+        }
+        issue(
+            &mut app,
+            Command::Interact {
+                unit: first,
+                target: depot,
+            },
+        );
+        step(&mut app);
+        let special = app.world().resource::<sim::SpecialState>();
+        assert_eq!(
+            special
+                .docked
+                .get(&first)
+                .or(special.interactions.get(&first)),
+            Some(&depot)
+        );
+        assert!(!app.world().resource::<CommandQueue>().iter().any(|c| matches!(c.command, Command::Interact { unit, target } if unit == second && target == depot)));
+        for _ in 0..600 {
+            step(&mut app);
+            assert!(
+                app.world()
+                    .resource::<sim::SpecialState>()
+                    .docked
+                    .values()
+                    .filter(|&&host| host == depot)
+                    .count()
+                    <= 1
+            );
+        }
+        let e = unit_entity(&mut app, first);
+        assert!(app.world().get::<sim::Health>(e).unwrap().hit_points > 10);
+    }
+}
+
+#[test]
 fn ra8_building_and_depot_repairs_use_paid_production_paths() {
     let mut app = scenario("great_britain", "medium", 100000, 0, true);
     quiet(&mut app);
@@ -1791,6 +2007,57 @@ fn ra8_full_tree_builds_and_fires_strategic_weapons_and_off_keeps_american_parad
         };
         assert!(types.contains_key(lab));
     }
+}
+
+#[test]
+fn ra8_garrison_quota_and_capacity_include_known_incoming_occupiers() {
+    let mut app = scenario("great_britain", "medium", 100000, 0, false);
+    quiet(&mut app);
+    let cell = CellPos::new(13, 8);
+    app.world_mut().resource_mut::<Grid>().set_terrain(
+        cell,
+        Cell {
+            passable: false,
+            buildable: false,
+            water: false,
+            ore: 0,
+        },
+    );
+    let mut looks = vec![0; 48 * 48];
+    looks[8 * 48 + 13] = 5 << 4;
+    let defs = app.world().resource::<sim::Definitions>();
+    let armour = defs
+        .building_combat(defs.building_kind("civilian_house").unwrap())
+        .unwrap()
+        .armour;
+    let props = sim::Props::from_looks(app.world().resource::<Grid>(), &looks, armour);
+    let host = props.id_at(cell).unwrap();
+    app.world_mut().insert_resource(props);
+    let mut incoming = Vec::new();
+    for y in 8..11 {
+        let unit = spawn_unit(app.world_mut(), PlayerId(0), "gi", CellPos::new(24, y)).unwrap();
+        incoming.push(unit);
+    }
+    let extra = spawn_unit(app.world_mut(), PlayerId(0), "gi", CellPos::new(12, 8)).unwrap();
+    let controllers = app.world_mut().remove_resource::<sim::AiPlayers>().unwrap();
+    app.world_mut().insert_resource(sim::AiPlayers::default());
+    step(&mut app); // Establish real visibility before the three ordinary Interact orders.
+    app.world_mut().insert_resource(controllers);
+    for &unit in &incoming {
+        issue(&mut app, Command::Interact { unit, target: host });
+    }
+    for _ in 0..20 {
+        step(&mut app);
+    }
+    assert!(!app.world().resource::<CommandQueue>().iter().any(|c| matches!(c.command, Command::Interact { unit, target } if unit == extra && target == host)));
+    for _ in 0..300 {
+        step(&mut app);
+    }
+    let state = app.world().resource::<sim::SpecialState>();
+    let cargo = state.cargo.get(&host).unwrap();
+    assert_eq!(cargo.len(), 3);
+    assert!(incoming.iter().all(|id| cargo.iter().any(|p| p.id == *id)));
+    assert!(!cargo.iter().any(|p| p.id == extra));
 }
 
 #[test]

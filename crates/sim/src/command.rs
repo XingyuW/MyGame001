@@ -147,6 +147,23 @@ pub enum Command {
 }
 
 impl Command {
+    fn units_mut(&mut self) -> Option<&mut Vec<SimId>> {
+        match self {
+            Self::Guard { units }
+            | Self::Scatter { units }
+            | Self::Follow { units, .. }
+            | Self::ForceFire { units, .. }
+            | Self::ForceMove { units, .. }
+            | Self::QueueMove { units, .. }
+            | Self::Move { units, .. }
+            | Self::Stop { units }
+            | Self::Harvest { units, .. }
+            | Self::Attack { units, .. }
+            | Self::AttackMove { units, .. } => Some(units),
+            _ => None,
+        }
+    }
+
     /// The units a unit command names; `None` for the economy commands.
     pub(crate) fn units(&self) -> Option<&[SimId]> {
         match self {
@@ -353,12 +370,37 @@ pub struct IssuedCommand {
 /// (invariant I5).
 #[derive(Resource, Debug, Default)]
 pub struct CommandQueue {
-    pending: Vec<IssuedCommand>,
+    pending: Vec<PendingCommand>,
+}
+
+#[derive(Debug)]
+struct PendingCommand {
+    issued: IssuedCommand,
+    // Only run_ai may create this origin; public push stays strictly atomic, even for an AI owner.
+    ai_intent: Option<AiIntent>,
+}
+
+/// Facts established by the controller's honest decision snapshot, not validation exemptions.
+#[derive(Debug, Default)]
+pub(crate) struct AiIntent {
+    pub owned: BTreeSet<SimId>,
+    pub armed: BTreeSet<SimId>,
+    pub target: Option<SimId>,
 }
 
 impl CommandQueue {
     pub fn push(&mut self, issued: IssuedCommand) {
-        self.pending.push(issued);
+        self.pending.push(PendingCommand {
+            issued,
+            ai_intent: None,
+        });
+    }
+
+    pub(crate) fn push_ai(&mut self, issued: IssuedCommand, witness: AiIntent) {
+        self.pending.push(PendingCommand {
+            issued,
+            ai_intent: Some(witness),
+        });
     }
 
     pub fn len(&self) -> usize {
@@ -372,7 +414,181 @@ impl CommandQueue {
     /// The pending commands in push order. After a tick these are the commands the computer
     /// players pushed in its `Ai` stage (M6), since the `Commands` stage drained the queue first.
     pub fn iter(&self) -> impl Iterator<Item = &IssuedCommand> {
-        self.pending.iter()
+        self.pending.iter().map(|pending| &pending.issued)
+    }
+
+    pub(crate) fn hash_into(&self, h: &mut crate::Fnv1a64) {
+        if self.pending.is_empty() {
+            return;
+        }
+        h.write(b"queued_commands_ra8");
+        h.write_u64(self.pending.len() as u64);
+        for pending in &self.pending {
+            h.write(&[
+                pending.issued.player.0,
+                u8::from(pending.ai_intent.is_some()),
+            ]);
+            if let Some(witness) = &pending.ai_intent {
+                for ids in [&witness.owned, &witness.armed] {
+                    h.write_u64(ids.len() as u64);
+                    for id in ids {
+                        h.write_u32(id.0);
+                    }
+                }
+                h.write(&[u8::from(witness.target.is_some())]);
+                if let Some(target) = witness.target {
+                    h.write_u32(target.0);
+                }
+            }
+            hash_command(&pending.issued.command, h);
+        }
+    }
+}
+
+fn hash_command(command: &Command, h: &mut crate::Fnv1a64) {
+    fn ids(h: &mut crate::Fnv1a64, values: &[SimId]) {
+        h.write_u64(values.len() as u64);
+        for id in values {
+            h.write_u32(id.0);
+        }
+    }
+    fn cell(h: &mut crate::Fnv1a64, p: CellPos) {
+        h.write(&p.x.to_le_bytes());
+        h.write(&p.y.to_le_bytes());
+    }
+    fn item(h: &mut crate::Fnv1a64, p: ProductionItem) {
+        match p {
+            ProductionItem::Unit(k) => {
+                h.write(&[0]);
+                h.write(&k.0.to_le_bytes());
+            }
+            ProductionItem::Building(k) => {
+                h.write(&[1]);
+                h.write(&k.0.to_le_bytes());
+            }
+        }
+    }
+    match command {
+        Command::Guard { units } => {
+            h.write(&[0]);
+            ids(h, units);
+        }
+        Command::Scatter { units } => {
+            h.write(&[1]);
+            ids(h, units);
+        }
+        Command::Follow { units, target } => {
+            h.write(&[2]);
+            ids(h, units);
+            h.write_u32(target.0);
+        }
+        Command::ForceFire { units, target } => {
+            h.write(&[3]);
+            ids(h, units);
+            match target {
+                ForceTarget::Cell(p) => {
+                    h.write(&[0]);
+                    cell(h, *p);
+                }
+                ForceTarget::Entity(id) => {
+                    h.write(&[1]);
+                    h.write_u32(id.0);
+                }
+            }
+        }
+        Command::ForceMove { units, target } => {
+            h.write(&[4]);
+            ids(h, units);
+            cell(h, *target);
+        }
+        Command::QueueMove { units, target } => {
+            h.write(&[5]);
+            ids(h, units);
+            cell(h, *target);
+        }
+        Command::Deploy { unit } => {
+            h.write(&[6]);
+            h.write_u32(unit.0);
+        }
+        Command::Undeploy { building } => {
+            h.write(&[7]);
+            h.write_u32(building.0);
+        }
+        Command::Interact { unit, target } => {
+            h.write(&[8]);
+            h.write_u32(unit.0);
+            h.write_u32(target.0);
+        }
+        Command::Chronoshift {
+            building,
+            source,
+            target,
+        } => {
+            h.write(&[9]);
+            h.write_u32(building.0);
+            cell(h, *source);
+            cell(h, *target);
+        }
+        Command::Superweapon {
+            building,
+            target,
+            units,
+        } => {
+            h.write(&[10]);
+            h.write_u32(building.0);
+            cell(h, *target);
+            ids(h, units);
+        }
+        Command::Move { units, target } => {
+            h.write(&[11]);
+            ids(h, units);
+            cell(h, *target);
+        }
+        Command::Stop { units } => {
+            h.write(&[12]);
+            ids(h, units);
+        }
+        Command::Harvest { units, target } => {
+            h.write(&[13]);
+            ids(h, units);
+            cell(h, *target);
+        }
+        Command::QueueProduction { item: p } => {
+            h.write(&[14]);
+            item(h, *p);
+        }
+        Command::CancelProduction { item: p } => {
+            h.write(&[15]);
+            item(h, *p);
+        }
+        Command::PlaceBuilding { building, origin } => {
+            h.write(&[16]);
+            h.write(&building.0.to_le_bytes());
+            cell(h, *origin);
+        }
+        Command::SellBuilding { building } => {
+            h.write(&[17]);
+            h.write_u32(building.0);
+        }
+        Command::RepairBuilding { building } => {
+            h.write(&[18]);
+            h.write_u32(building.0);
+        }
+        Command::SetRallyPoint { building, cell: p } => {
+            h.write(&[19]);
+            h.write_u32(building.0);
+            cell(h, *p);
+        }
+        Command::Attack { units, target } => {
+            h.write(&[20]);
+            ids(h, units);
+            h.write_u32(target.0);
+        }
+        Command::AttackMove { units, target } => {
+            h.write(&[21]);
+            ids(h, units);
+            cell(h, *target);
+        }
     }
 }
 
@@ -422,7 +638,27 @@ pub(crate) fn process_regular_commands(
         .map(|(entity, id, ..)| (*id, entity))
         .collect();
     let mut buildings = None;
-    for issued in queue.pending.drain(..) {
+    for PendingCommand {
+        mut issued,
+        ai_intent,
+    } in queue.pending.drain(..)
+    {
+        if let Some(witness) = &ai_intent
+            && let Some(ids) = issued.command.units_mut()
+        {
+            // A controller decided before the preceding tick's Economy/Combat stages.
+            // Keep only its still living, owned selections; public selections stay atomic.
+            let was_nonempty = !ids.is_empty();
+            ids.retain(|id| {
+                !witness.owned.contains(id)
+                    || index.get(id).and_then(|e| units.get(*e).ok()).is_some_and(
+                        |(entity, _, owner, ..)| owner.0 == issued.player && economy.alive(entity),
+                    )
+            });
+            if was_nonempty && ids.is_empty() {
+                continue;
+            }
+        }
         let result = if issued.command.units().is_some() {
             let buildings = buildings.get_or_insert_with(|| economy.building_index());
             validate_player(&issued, &economy)
@@ -499,7 +735,11 @@ pub(crate) fn process_regular_commands(
             let buildings = buildings.get_or_insert_with(|| economy.building_index());
             economy_commands::apply(&issued, &mut economy, buildings, &mut grid, &mut events)
         };
-        if let Err(reason) = result {
+        if let Err(reason) = result
+            && !ai_intent
+                .as_ref()
+                .is_some_and(|w| stale_ai_intent(&reason, w))
+        {
             events.write(SimEvent::CommandRejected {
                 player: issued.player,
                 command: issued.command,
@@ -1070,7 +1310,7 @@ pub(crate) fn process_commands(world: &mut bevy_ecs::world::World) {
     refresh_command_vision(world);
     let mut mirages = concealment_movers(world);
     let pending = std::mem::take(&mut world.resource_mut::<CommandQueue>().pending);
-    for issued in pending {
+    for PendingCommand { issued, ai_intent } in pending {
         if matches!(
             issued.command,
             Command::Deploy { .. }
@@ -1092,7 +1332,11 @@ pub(crate) fn process_commands(world: &mut bevy_ecs::world::World) {
             };
             let result = crate::special::apply(world, &issued);
             let accepted = result.is_ok();
-            if let Err(reason) = result {
+            if let Err(reason) = result
+                && !ai_intent
+                    .as_ref()
+                    .is_some_and(|w| stale_ai_intent(&reason, w))
+            {
                 world
                     .resource_mut::<Messages<SimEvent>>()
                     .write(SimEvent::CommandRejected {
@@ -1114,7 +1358,10 @@ pub(crate) fn process_commands(world: &mut bevy_ecs::world::World) {
                 .command
                 .units()
                 .is_some_and(|ids| ids.iter().any(|id| mirages.contains(id)));
-            world.resource_mut::<CommandQueue>().pending.push(issued);
+            world
+                .resource_mut::<CommandQueue>()
+                .pending
+                .push(PendingCommand { issued, ai_intent });
             if boundary {
                 crate::special::infantry::refresh_limits(world);
                 world
@@ -1129,6 +1376,22 @@ pub(crate) fn process_commands(world: &mut bevy_ecs::world::World) {
         world
             .run_system_cached(process_regular_commands)
             .expect("registered command system");
+    }
+}
+
+/// Cancellation of an engine-created intent uses ordinary validation and reveals no reason
+/// to its controller. Invalid public commands still emit their original rejection unchanged.
+fn stale_ai_intent(reason: &RejectReason, witness: &AiIntent) -> bool {
+    match reason {
+        RejectReason::UnknownUnit(id)
+        | RejectReason::UnknownBuilding(id)
+        | RejectReason::NotOwned(id)
+        | RejectReason::NotCommandable(id) => witness.owned.contains(id),
+        RejectReason::NotArmed(id) => witness.armed.contains(id),
+        RejectReason::UnknownTarget(id) | RejectReason::OwnTarget(id) => {
+            witness.target == Some(*id)
+        }
+        _ => false,
     }
 }
 
@@ -1153,3 +1416,7 @@ fn refresh_command_vision(world: &mut bevy_ecs::world::World) {
         .expect("registered power system");
     crate::special::refresh_concealment(world);
 }
+
+#[cfg(test)]
+#[path = "ra8_intents.rs"]
+mod ra8_intent_tests;

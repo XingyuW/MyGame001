@@ -1,0 +1,18 @@
+    Finished `release` profile [optimized] target(s) in 0.14s
+     Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-fff13bc99bc7e9e6)
+
+running 1 test
+
+thread 'the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first' (4992181) panicked at crates/game/tests/m6_production_matches.rs:270:21:
+crossroads: ["libya", "iraq"] at ["easy", "easy"]: tick 16921: Interact { unit: SimId(97), target: SimId(3221226108) } rejected (Garrison is full) without a loss
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first ... FAILED
+
+failures:
+
+failures:
+    the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5 filtered out; finished in 2.14s
+
+error: test failed, to rerun pass `-p game --test m6_production_matches`
