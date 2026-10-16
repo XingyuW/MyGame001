@@ -6085,3 +6085,104 @@ Steel America/Cuba lifecycle1:99,strategic-cell1:10,and GreatBritain/America lif
 `attempt4-lifecycle-staged-hygiene.json` retains exact full paths/lines/raw hashes/unfiltered
 stdout. Staged raw bytes equal their captures; no source/data/test/doc diagnostic exists.
 A separate exact-output recheck precedes committing; no raw evidence is trimmed or suppressed.
+
+
+### R114. Observed outranging AA screens are ground objectives before repeated strike sorties
+
+**2026-10-16 UTC.** The exact FranceBrutal/GermanyBrutal Thousand Lakes replay after ONLY
+R112/R113 still returns None at unchanged288000:193.86s harness/194.046s command, retained
+`attempt4-thousand_lakes_france_germany-lifecycle1.log`. Initial60000-tick economy counters
+remain identical. Thus those lifecycle fixes are not credited with resolving this attrition
+stall. Steel Harbor America/Cuba instead winsP1 at48279 (49.31s harness/86.492s command),
+and Thousand Lakes GreatBritain/America winsP0 at78811 (34.90s/35.111s), retaining original
+rejection rules. No other runtime policy intervenes in these three baseline replays.
+
+The separate controlled `ra8_air_strikes_wait_for_ground_to_clear_an_observed_outranging_aa_screen`
+uses shipped units/weapons, actual match controller/visibility/power/docks and SimSchedule.
+A known Patriot covers a nearer economic building; eligible Prism/Grizzly ground wave and
+three dock-bound Harriers are available. Both before captures fail on actual aircraft fire at
+the economic building while its AA screen lives. The second explicitly gives only that
+isolated economic target1000000HP so ground splash cannot remove the observation target
+before the post-clearance air strike; no default game receives injected HP/timing. After
+correction, ground explicitly targets and actually hits/destroys the Patriot, then aircraft
+resume real fire at the economic target. First after capture is a compile error (air bonus
+belongs to CombatTerms, not WeaponDef); retained second passes in0.27s. These are new fixture
+iterations, not migrations or relaxed assertions of existing tests.
+
+`strategy::screen_strike_aircraft` handles only currently visible AA-only buildings covering
+the known economic attack objective, which outrange an actual dock-bound strike aircraft.
+It derives weapon eligibility/armour/positive damage via weapon_against, range plus the
+source CombatTerms air bonus, and the aircraft's actual weapon reach against that building.
+With an eligible current ground wave, those units receive ordinary Attack on the AA building;
+strike aircraft wait at the existing gather point outside its range. Empty aircraft retain
+their real return/reload orders. Existing reserved actor handling prevents conflicting core
+army orders; existing target/failure handling remains responsible for approach/arrival and
+unreachable objectives. With no eligible ground wave or safe existing gather point, this
+policy does not hold aircraft indefinitely. Normal vision/ownership/target validation and
+bounded queue semantics still apply; unknown AA cannot affect this decision.
+
+This target/approach algorithm is a declared game-owned AI policy assumption, not a recovered
+closed-source AI algorithm. It adds no quota/weight/radius/balance literal: it derives conditions
+from ported weapon/type data and reuses existing gather and target-failure policy. Source
+25-defense counts, difficulty, economy, strategic recharge and full-tech composition remain
+unchanged. It neither forces liquidation with legitimate capabilities nor tunes around the
+real Storm at288005. Its exact default replay now winsP1 at164850/288000 in112.08s harness/
+147.064s command including compilation (`attempt4-thousand-lakes-aa-after1.log`). The controlled
+before/after and separate default baseline establish what this tactical correction changes.
+
+The private-goal follow-up uses a typed unit/hut constructor, preventing mismatched command
+payloads. An actual shipped-controller twin with/without an unseen Typhoon proves identical
+projected decisions, action tag, witnesses and pending queue value hash; no SpecialState.hidden
+is fabricated. All14 RA8 internal lib intent/site/hash tests pass. Two bounded single negative
+probes establish the distinct mechanisms: replacing bridge wait with ordinary Interact causes
+the hidden-occupancy rejection; disabling the certified strategic cell cancellation causes
+its valid internal Gap-loss rejection. Before/restored command.rs SHA256 for BOTH is
+f34246f19382754be318b576cbaf19a11245768dfff3543f99c9240ef77acfe4; distinct mutant hashes,
+raw failures, exact replacement text and immediate-restoration assertions are retained in the
+two integrity JSONs. Restoration occurs immediately after each one test, before another probe,
+check or commit. The second negative source is never retained as implementation.
+
+Strict preflight initially rejects a needless double borrow left in the read-only validator
+extraction. It is corrected without behavior change; strict all-target Clippy/fmt/generator/
+reference checks then pass. Full-tree anchored static inventory now1124→1197:73 added,none
+removed/renamed/ignored/unmapped. The only additional test functions since R110 are the three
+exact default failures, six private goal/cell security/hash tests and controlled AA scenario.
+No existing test expectation/fixture/limit is changed after R110; witness helper fields receive
+only their new explicit false default. All earlier migration names/reasons remain R94/R96/R102/
+R110, with R108's restored neutral strategy boundary and unchanged original assertions.
+
+Affected serial compatibility/default preflight, repeated final-source21-map completion/256
+means and the complete13-command gate remain required. No independent review/RA8 closure is
+claimed. No new external directory is created; configured target's recreatable708KiB
+ra8_definitions scratch and prior retained RA5/RA7 evidence remain as documented.
+
+
+R114 preflight update: full sim compatibility passes243 tests/13 targets in107.997s; game
+binary unit target passes217 in173.076s command; Demo lifecycle target passes its10 normal
+matches (one test) in60.249s. The first game invocation mistakenly requested --lib on the
+binary-only package and exits before tests; the raw no-library-target error is retained,
+then the corrected --bin game succeeds. No simulation/expectation change follows that error.
+The final exact-map target passes12/12 explicit Won in1469.076s command, with original
+rejection exceptions and72000-scaled limits. All endings and source SHA256 values are in
+`attempt4-default-exact-results.json`. Long tails remain explicit: Continental Divide bridge
+203419, Harvest Plains242941, reversed Cuba/America Steel Harbor129081, Wheel86485, all
+within unchanged limits; the previous outcomes are not rewritten or described as uniformly
+shorter. France/Germany repeats164850 and GreatBritain/America78811 exactly on the final tree.
+Multiplayer/unchanged companions and repeated m13/budget/full13 remain pending at this update.
+
+
+R114 completed affected serial preflight:483 tests across22 targets,zero failures/ignores,
+with no double-counting of the earlier focused tests. This comprises243 sim/13 targets,
+217 game binary unit tests,one Demo test/ten actual matches,twelve exact-map tests,five m10
+multiplayer tests,and five unchanged production companions. RA5 Coral Libya/Germany wins
+at34304/288000; RA6 Coral/armed-miner/first-search/terrain-change assertions also remain
+unchanged and pass. `attempt4-final-preflight-summary.json` retains all ten commands/exits/
+elapsed times and the22 result buckets. No validator remains active before the coherent
+commits. Final-source m13 all21/256 means and full13 still remain required.
+
+
+R114 AA/preflight commit staged hygiene: the separately inspected unfiltered check exits2,
+not passed, solely for twelve preserved raw blank EOF lines. Exact full paths/lines/raw SHA256/
+unfiltered stdout are retained in `attempt4-aa-staged-hygiene.json`; staged bytes match each
+capture. No source/data/test/doc diagnostic exists. A separate exact-output recheck precedes
+committing; no raw evidence or required validation check is altered or suppressed.

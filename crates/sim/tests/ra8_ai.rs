@@ -3260,3 +3260,97 @@ fn ra8_slow_air_sweep_starts_at_enemy_origin_then_finds_an_unseen_remote_capture
         "slow-air remote sweep: {outcome:?}"
     );
 }
+
+#[test]
+fn ra8_air_strikes_wait_for_ground_to_clear_an_observed_outranging_aa_screen() {
+    let mut app = scenario("germany", "medium", 0, 0, false);
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    put(&mut app, "nuclear_reactor", 2, 2);
+    put(&mut app, "spy_satellite", 10, 2);
+    put(&mut app, "airforce_command", 2, 12);
+    let economic = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "soviet_barracks",
+        CellPos::new(30, 12),
+    )
+    .unwrap();
+    // Isolate protection/clearance from the economic target dying to ground splash first.
+    let economic_entity = unit_entity(&mut app, economic);
+    app.world_mut()
+        .get_mut::<sim::Health>(economic_entity)
+        .unwrap()
+        .hit_points = 1_000_000;
+    let aa = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "patriot",
+        CellPos::new(34, 14),
+    )
+    .unwrap();
+    sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "nuclear_reactor",
+        CellPos::new(34, 2),
+    )
+    .unwrap();
+    let ground: Vec<_> = [
+        ("prism_tank", 15, 15),
+        ("prism_tank", 16, 15),
+        ("grizzly", 15, 17),
+        ("grizzly", 16, 17),
+    ]
+    .into_iter()
+    .map(|(kind, x, y)| spawn_unit(app.world_mut(), PlayerId(0), kind, CellPos::new(x, y)).unwrap())
+    .collect();
+    let air: Vec<_> = [10, 12, 14]
+        .into_iter()
+        .map(|x| spawn_unit(app.world_mut(), PlayerId(0), "harrier", CellPos::new(x, 14)).unwrap())
+        .collect();
+    step(&mut app); // Real visibility, power, and dock assignment before the decision.
+    app.world_mut().insert_resource(controllers);
+    let mut ground_focus = false;
+    let mut ground_hit = false;
+    let mut aircraft_released = false;
+    let mut screen_destroyed = false;
+    for _ in 0..12000 {
+        for event in step(&mut app) {
+            if let sim::SimEvent::BuildingDestroyed { building, .. } = event
+                && building == aa
+            {
+                screen_destroyed = true;
+            }
+            if let sim::SimEvent::WeaponFired {
+                attacker, target, ..
+            } = event
+            {
+                if ground.contains(&attacker) && target == aa {
+                    ground_hit = true;
+                }
+                if air.contains(&attacker) && target == economic {
+                    assert!(
+                        screen_destroyed,
+                        "strike aircraft attacked the economic building through its observed outranging AA screen"
+                    );
+                    aircraft_released = true;
+                }
+            }
+        }
+        ground_focus |= app.world().resource::<CommandQueue>().iter().any(|issued|matches!(&issued.command,Command::Attack {units,target} if *target==aa && units.iter().any(|id|ground.contains(id))));
+        if screen_destroyed && ground_hit && aircraft_released {
+            break;
+        }
+    }
+    eprintln!(
+        "AA screen destroyed {screen_destroyed}; eligible ground focus {ground_focus}/hit {ground_hit}; aircraft released {aircraft_released}"
+    );
+    assert!(
+        ground_focus && ground_hit,
+        "eligible ground units must clear the known AA, not let strike aircraft repeatedly pay for the same barrier"
+    );
+    assert!(
+        screen_destroyed && aircraft_released,
+        "air strikes resume actual combat after the observed barrier is gone"
+    );
+}

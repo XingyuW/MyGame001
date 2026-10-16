@@ -1,10 +1,133 @@
 //! Exact seed-zero frozen RA8 gate failures, with the original R29 limits and rejection rules.
 use bevy::ecs::message::Messages;
+use bevy::ecs::schedule::IntoScheduleConfigs;
 use sim::{
     CommandQueue, Controller, MatchOutcome, MatchState, PlayerId, PlayerSetup, RejectReason,
     SimEvent, SimId, SimPlugin, SimSchedule,
 };
 use std::collections::{BTreeMap, BTreeSet};
+
+#[derive(bevy::prelude::Resource, Default)]
+struct EconomyTrace {
+    before: BTreeMap<SimId, i32>,
+    counters: BTreeMap<String, u64>,
+    buildings: BTreeMap<SimId, String>,
+    units: BTreeMap<SimId, String>,
+}
+
+fn trace_before_economy(
+    mut trace: bevy::prelude::ResMut<EconomyTrace>,
+    buildings: bevy::prelude::Query<(&SimId, &sim::Building, &sim::Health)>,
+) {
+    trace.before = buildings
+        .iter()
+        .map(|(id, _, hp)| (*id, hp.hit_points))
+        .collect();
+}
+
+fn trace_after_economy(
+    mut trace: bevy::prelude::ResMut<EconomyTrace>,
+    definitions: bevy::prelude::Res<sim::Definitions>,
+    buildings: bevy::prelude::Query<(&SimId, &sim::Owner, &sim::Building, &sim::Health)>,
+) {
+    for (id, owner, building, hp) in &buildings {
+        let before = trace.before.get(id).copied().unwrap_or(hp.hit_points);
+        if hp.hit_points > before {
+            let key = format!(
+                "P{} repaired_hp {}",
+                owner.0.0,
+                definitions.building(building.kind).unwrap().id
+            );
+            *trace.counters.entry(key).or_default() += (hp.hit_points - before) as u64;
+        }
+    }
+}
+
+fn trace_economy_events(world: &mut bevy::ecs::world::World, events: &[SimEvent], at: u64) {
+    let Some(mut trace) = world.remove_resource::<EconomyTrace>() else {
+        return;
+    };
+    let definitions = world.resource::<sim::Definitions>().clone();
+    for (id, unit) in world.query::<(&SimId, &sim::Unit)>().iter(world) {
+        trace
+            .units
+            .insert(*id, definitions.unit(unit.kind).unwrap().id.clone());
+    }
+    for (id, building) in world.query::<(&SimId, &sim::Building)>().iter(world) {
+        trace
+            .buildings
+            .insert(*id, definitions.building(building.kind).unwrap().id.clone());
+    }
+    for event in events {
+        let (key, amount) = match event {
+            SimEvent::OreDelivered {
+                player, credits, ..
+            } => (format!("P{} ore_credits", player.0), *credits as u64),
+            SimEvent::ProductionComplete { player, item } => {
+                (format!("P{} produced {item:?}", player.0), 1)
+            }
+            SimEvent::BuildingPlaced { player, kind, .. } => (
+                format!(
+                    "P{} placed {}",
+                    player.0,
+                    definitions.building(*kind).unwrap().id
+                ),
+                1,
+            ),
+            SimEvent::ProductionCancelled {
+                player,
+                item,
+                refund,
+            } => (
+                format!("P{} cancelled {item:?} refund{refund}", player.0),
+                1,
+            ),
+            SimEvent::BuildingSold { player, refund, .. } => {
+                (format!("P{} sales_refund", player.0), *refund as u64)
+            }
+            SimEvent::UnitDestroyed { player, unit } => (
+                format!(
+                    "P{} lost {}",
+                    player.0,
+                    trace.units.get(unit).map_or("?", String::as_str)
+                ),
+                1,
+            ),
+            SimEvent::BuildingDestroyed {
+                player, building, ..
+            } => (
+                format!(
+                    "P{} lost_building {}",
+                    player.0,
+                    trace.buildings.get(building).map_or("?", String::as_str)
+                ),
+                1,
+            ),
+            SimEvent::WeaponFired {
+                attacker, target, ..
+            } => {
+                let attacker = trace
+                    .units
+                    .get(attacker)
+                    .or_else(|| trace.buildings.get(attacker))
+                    .map_or("?", String::as_str);
+                let target = trace
+                    .units
+                    .get(target)
+                    .or_else(|| trace.buildings.get(target))
+                    .map_or("?", String::as_str);
+                (format!("shots {attacker}->{target}"), 1)
+            }
+            _ => continue,
+        };
+        *trace.counters.entry(key).or_default() += amount;
+    }
+    if at % 60000 == 59999 {
+        eprintln!("economy window {}..{} {:?}", at - 59999, at, trace.counters);
+        trace.counters.clear();
+    }
+    world.insert_resource(trace);
+}
 
 fn run_case(map_id: &str, countries: [&str; 2], difficulties: [&str; 2]) {
     let assets = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets");
@@ -38,6 +161,37 @@ fn run_case(map_id: &str, countries: [&str; 2], difficulties: [&str; 2]) {
         },
     });
     sim::setup_match(app.world_mut(), &skirmish, &ai, map, &players).unwrap();
+    if map_id == "thousand_lakes" && countries == ["france", "germany"] {
+        app.init_resource::<EconomyTrace>();
+        app.add_systems(
+            SimSchedule,
+            trace_before_economy
+                .in_set(sim::SimSet::Economy)
+                .before(sim::SimCoreSet(sim::SimSet::Economy)),
+        );
+        app.add_systems(
+            SimSchedule,
+            trace_after_economy
+                .in_set(sim::SimSet::Economy)
+                .after(sim::SimCoreSet(sim::SimSet::Economy)),
+        );
+    }
+    if (map_id == "steel_harbor" && countries == ["america", "cuba"])
+        || (map_id == "thousand_lakes" && countries == ["great_britain", "america"])
+    {
+        app.add_systems(
+            SimSchedule,
+            (|world: &mut bevy::ecs::world::World| trace_lifecycle(world, "decision"))
+                .in_set(sim::SimSet::Ai)
+                .after(sim::SimCoreSet(sim::SimSet::Ai)),
+        );
+        app.add_systems(
+            SimSchedule,
+            (|world: &mut bevy::ecs::world::World| trace_lifecycle(world, "application"))
+                .in_set(sim::SimSet::Commands)
+                .before(sim::SimCoreSet(sim::SimSet::Commands)),
+        );
+    }
     let mut losses: BTreeMap<PlayerId, BTreeSet<SimId>> = BTreeMap::new();
     let mut outcome = None;
     for at in 0_u64..limit {
@@ -52,6 +206,7 @@ fn run_case(map_id: &str, countries: [&str; 2], difficulties: [&str; 2]) {
             .iter_current_update_messages()
             .cloned()
             .collect();
+        trace_economy_events(world, &events, at);
         for event in events {
             match event {
                 SimEvent::CommandRejected {
@@ -78,6 +233,9 @@ fn run_case(map_id: &str, countries: [&str; 2], difficulties: [&str; 2]) {
                         | RejectReason::Placement(_) => lost.is_some_and(|l| !l.is_empty()),
                         _ => false,
                     };
+                    if !explained {
+                        dump(world);
+                    }
                     assert!(
                         explained,
                         "{name} tick{at}: {command:?} rejected {reason:?}"
@@ -120,10 +278,76 @@ fn run_case(map_id: &str, countries: [&str; 2], difficulties: [&str; 2]) {
     if outcome.is_none() {
         dump(app.world_mut());
     }
+    if let Some(trace) = app.world().get_resource::<EconomyTrace>() {
+        eprintln!("economy final partial window {:?}", trace.counters);
+    }
     assert!(
         matches!(outcome, Some(MatchOutcome::Won { .. })),
         "{name}: {outcome:?} after{limit}"
     );
+}
+
+fn trace_lifecycle(world: &mut bevy::ecs::world::World, stage: &str) {
+    let tick = world.resource::<sim::SimTick>().0;
+    if !(28239..=28242).contains(&tick) && !(28920..=28923).contains(&tick) {
+        return;
+    }
+    eprintln!(
+        "lifecycle {stage} tick{tick} queued {:?}",
+        world.resource::<CommandQueue>()
+    );
+    let definitions = world.resource::<sim::Definitions>().clone();
+    for (id, owner, building) in world
+        .query::<(&SimId, &sim::Owner, &sim::Building)>()
+        .iter(world)
+    {
+        if id.0 == 62 {
+            let player = world.resource::<sim::Players>().get(owner.0).unwrap();
+            eprintln!(
+                "strategic62 {owner:?} {} target23,23 visible{} fog{} lowpower{}",
+                definitions.building(building.kind).unwrap().id,
+                player.vision().is_visible(sim::CellPos::new(23, 23)),
+                player.vision().uses_fog(),
+                player.low_power()
+            );
+        }
+    }
+    let mut ships = world.query::<(&SimId, &sim::Owner, &sim::Unit, &sim::Mobile, &sim::Orders)>();
+    let special = world.resource::<sim::SpecialState>();
+    eprintln!("strategic storm {:?}", special.strategic.storm);
+    let bridges = world.resource::<sim::Bridges>();
+    let hut = SimId(2684378722);
+    if let Some(bridge) = bridges
+        .huts
+        .get(&hut)
+        .and_then(|id| bridges.bridges.get(id))
+    {
+        eprintln!(
+            "bridge{hut:?} cells{:?} collapsed{}",
+            bridge.cells, bridge.collapsed
+        );
+        for (id, owner, unit, mobile, orders) in ships.iter(world) {
+            if definitions.domain(unit.kind) == sim::Domain::Naval
+                && bridge
+                    .cells
+                    .iter()
+                    .any(|c| c.x.abs_diff(mobile.cell.x) <= 2 && c.y.abs_diff(mobile.cell.y) <= 2)
+            {
+                let seen = [0, 1].map(|p| {
+                    world
+                        .resource::<sim::Players>()
+                        .get(PlayerId(p))
+                        .is_some_and(|s| s.vision().sees_unit(mobile))
+                        && !special.hidden.contains(&(PlayerId(p), *id))
+                });
+                eprintln!(
+                    "ship{id:?} {owner:?} {} domain{:?} {mobile:?} orders{orders:?} seen{seen:?}",
+                    definitions.unit(unit.kind).unwrap().id,
+                    definitions.domain(unit.kind)
+                );
+            }
+        }
+    }
 }
 
 fn dump(world: &mut bevy::ecs::world::World) {
@@ -229,4 +453,27 @@ fn ra8_gate_glacier_bridge_seed_zero_finishes() {
 #[test]
 fn ra8_gate_harvest_bridge_seed_zero_finishes() {
     run_case("harvest_plains", ["america", "korea"], ["brutal", "brutal"]);
+}
+
+#[test]
+fn ra8_gate_steel_harbor_america_cuba_bridge_seed_zero_finishes() {
+    run_case("steel_harbor", ["america", "cuba"], ["brutal", "brutal"]);
+}
+
+#[test]
+fn ra8_gate_thousand_lakes_great_britain_america_seed_zero_finishes() {
+    run_case(
+        "thousand_lakes",
+        ["great_britain", "america"],
+        ["easy", "easy"],
+    );
+}
+
+#[test]
+fn ra8_gate_thousand_lakes_france_germany_seed_zero_finishes() {
+    run_case(
+        "thousand_lakes",
+        ["france", "germany"],
+        ["brutal", "brutal"],
+    );
 }

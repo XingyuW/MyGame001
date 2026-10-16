@@ -1,0 +1,191 @@
+{
+  "base_commit": "4dfeeedc910ea9589889806d396aaa51c13c03c4",
+  "log": "attempt4-game-exact1.log",
+  "source_sha256_at_preflight": {
+    "crates/sim/src/ai.rs": "e70842a2754f0e6e632c7fac670c4dbd1999cba21c81885d77035a758fabb8bb",
+    "crates/sim/src/ai/strategy.rs": "2cc8c63d13836e13d63baee36c9ce6bfda4c5fc60272d6d1a5174475461be4f5",
+    "crates/sim/src/bridges.rs": "2b5df9e2df967c32fa1aa4c735622f336ff756684d1ec350b3ade3f5ed2508b3",
+    "crates/sim/src/command.rs": "f34246f19382754be318b576cbaf19a11245768dfff3543f99c9240ef77acfe4",
+    "crates/sim/src/ra8_intents.rs": "63bc6067aa5ade0af10e39a21331324eb27bccbfaa4e00c4c92c8c24885fba82",
+    "crates/sim/src/schedule.rs": "179c6de848e8f463058e378e06fc56a0204cdac6e328b1f289b520f42dc89f7a",
+    "crates/sim/src/special.rs": "6e32b139f933232a8d08761713989fc710bf6a33240f2fe63b752fbc38eb374f",
+    "crates/sim/src/special/commands.rs": "1339d4f5a577c2e1e0dbf8c08a7577788a04a5a87ae8c048034393b20ccf23c4",
+    "crates/sim/src/special/superweapons.rs": "448c2e36618752920d1d054bb9b08b5c4a1c043d9040bd4a60b765b4361fab31"
+  },
+  "passed": 12,
+  "failed": 0,
+  "ignored": 0,
+  "command_seconds": 1469.0755125410215,
+  "limits": "original72000 scaled by max(128,width+height)/128; no change",
+  "rejection_rules": "original harness exceptions only; no new exemption",
+  "cases": [
+    {
+      "map": "continental_divide",
+      "seed": 0,
+      "countries": [
+        "iraq",
+        "great_britain"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "ending_tick": 203419
+    },
+    {
+      "map": "continental_divide",
+      "seed": 0,
+      "countries": [
+        "france",
+        "cuba"
+      ],
+      "difficulties": [
+        "easy",
+        "medium"
+      ],
+      "winner": 1,
+      "ending_tick": 39716
+    },
+    {
+      "map": "ember_caldera",
+      "seed": 0,
+      "countries": [
+        "libya",
+        "korea"
+      ],
+      "difficulties": [
+        "brutal",
+        "medium"
+      ],
+      "winner": 0,
+      "ending_tick": 53505
+    },
+    {
+      "map": "glacier_pass",
+      "seed": 0,
+      "countries": [
+        "korea",
+        "russia"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "ending_tick": 39303
+    },
+    {
+      "map": "harvest_plains",
+      "seed": 0,
+      "countries": [
+        "america",
+        "korea"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "ending_tick": 242941
+    },
+    {
+      "map": "liberty_bay",
+      "seed": 0,
+      "countries": [
+        "iraq",
+        "korea"
+      ],
+      "difficulties": [
+        "medium",
+        "medium"
+      ],
+      "winner": 0,
+      "ending_tick": 99687
+    },
+    {
+      "map": "red_canyon",
+      "seed": 0,
+      "countries": [
+        "france",
+        "russia"
+      ],
+      "difficulties": [
+        "medium",
+        "easy"
+      ],
+      "winner": 0,
+      "ending_tick": 19927
+    },
+    {
+      "map": "steel_harbor",
+      "seed": 0,
+      "countries": [
+        "america",
+        "cuba"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "ending_tick": 48279
+    },
+    {
+      "map": "steel_harbor",
+      "seed": 0,
+      "countries": [
+        "cuba",
+        "america"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "ending_tick": 129081
+    },
+    {
+      "map": "thousand_lakes",
+      "seed": 0,
+      "countries": [
+        "france",
+        "germany"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "ending_tick": 164850
+    },
+    {
+      "map": "thousand_lakes",
+      "seed": 0,
+      "countries": [
+        "great_britain",
+        "america"
+      ],
+      "difficulties": [
+        "easy",
+        "easy"
+      ],
+      "winner": 0,
+      "ending_tick": 78811
+    },
+    {
+      "map": "wheel_of_worlds",
+      "seed": 0,
+      "countries": [
+        "cuba",
+        "france"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "ending_tick": 86485
+    }
+  ]
+}
