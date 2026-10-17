@@ -2,6 +2,159 @@
 use super::*;
 use std::collections::VecDeque;
 
+pub(super) fn attack_job_eligible(controller: &AiController, target: SimId) -> bool {
+    controller
+        .building_jobs
+        .get(&target)
+        .is_none_or(|job| job.failures < MAX_TARGET_FAILURES || job.approaching)
+}
+
+fn stowed_own_attacker(view: &View<'_>, special: &crate::SpecialState, id: SimId) -> bool {
+    view.own_buildings.iter().any(|b| b.id == id)
+        || special.cargo.iter().any(|(host, passengers)| {
+            passengers.iter().any(|p| p.id == id)
+                && (view.owned_units.iter().any(|u| u.id == *host)
+                    || view.own_buildings.iter().any(|b| b.id == *host)
+                    || special
+                        .garrisons
+                        .get(host)
+                        .is_some_and(|g| g.owner == view.player))
+        })
+        || special
+            .parasites
+            .values()
+            .any(|p| p.owner == view.player && p.passenger.id == id)
+}
+
+/// Complete only actual own loss/capture or a source-ammunition cycle, never slow travel
+/// or temporary removal. Repairs cannot turn the same repeated HP low into new progress.
+pub(super) fn observe_attack_jobs(
+    view: &View<'_>,
+    controller: &mut AiController,
+    special: &crate::SpecialState,
+) {
+    if !view.ai.rules_difficulty {
+        return;
+    }
+    controller
+        .building_jobs
+        .retain(|id, _| controller.known.contains_key(id));
+    for (&id, job) in &mut controller.building_jobs {
+        let Some(target) = view.enemy_buildings.iter().find(|b| b.id == id) else {
+            continue;
+        };
+        let mut completed = false;
+        job.actors.retain(|actor, old_ammo| {
+            let Some(unit) = view.owned_units.iter().find(|u| u.id == *actor) else {
+                if stowed_own_attacker(view, special, *actor) { return true; }
+                completed = true;
+                return false;
+            };
+            let ammo = view.definitions.metadata(ProductionItem::Unit(unit.kind)).map_or(0, |m| m.ammo);
+            if *old_ammo > 0 && special.ammo_of(*actor, ammo) == 0 {
+                completed = true;
+                return false;
+            }
+            if !view.own_units.iter().any(|active| active.id == *actor) { return true; }
+            matches!(unit.attack_order, Some(crate::AttackOrder::Attack { target, .. }) if target == id)
+        });
+        job.founders.retain(|actor| job.actors.contains_key(actor));
+        if target.hp < job.hp {
+            job.hp = target.hp;
+            job.failures = 0;
+            job.founders = job.actors.keys().copied().collect();
+        } else if completed {
+            job.failures = job.failures.saturating_add(1).min(MAX_TARGET_FAILURES);
+        }
+        // The original cohort's healthy path/freeze can finish. Replacing casualties
+        // alone never installs a fresh exemption for an already failed job.
+        job.approaching = job.founders.iter().any(|actor| {
+            view.frozen_army.contains(actor) || view.own_units.iter().any(|u| {
+                u.id == *actor && u.has_order
+                    && matches!(u.attack_order, Some(crate::AttackOrder::Attack { target, .. }) if target == id)
+            })
+        });
+    }
+}
+
+pub(super) fn record_attack_job(
+    view: &View<'_>,
+    controller: &mut AiController,
+    special: &crate::SpecialState,
+    command: &Command,
+) {
+    if !view.ai.rules_difficulty {
+        return;
+    }
+    let Command::Attack { units, target } = command else {
+        return;
+    };
+    let Some(building) = view.enemy_buildings.iter().find(|b| b.id == *target) else {
+        return;
+    };
+    let Some(terms) = view.definitions.building_combat(building.kind) else {
+        return;
+    };
+    let mut traits = crate::combat::traits_of(
+        view.grid,
+        building.id,
+        terms.armour,
+        &crate::combat::Body::Building(building.footprint),
+        Some(&terms),
+    );
+    if let Some(meta) = view
+        .definitions
+        .metadata(ProductionItem::Building(building.kind))
+    {
+        traits.bombable = meta.bombable;
+        traits.immune_psionics |= meta.immune_psionics;
+        traits.immune_radiation = meta.immune_radiation;
+    }
+    let admitted: Vec<_> = view
+        .own_units
+        .iter()
+        .filter(|u| units.contains(&u.id))
+        .filter_map(|u| {
+            let terms = view.definitions.unit_combat(u.kind)?;
+            let (weapon, percent) =
+                crate::weapon_against(view.definitions, &terms, terms.weapons(false), &traits)?;
+            if percent <= 1
+                || view
+                    .definitions
+                    .weapon(weapon)
+                    .is_none_or(|w| w.damage <= 0)
+            {
+                return None;
+            }
+            let ammo = view
+                .definitions
+                .metadata(ProductionItem::Unit(u.kind))
+                .map_or(0, |m| m.ammo);
+            let remaining = special.ammo_of(u.id, ammo);
+            (ammo == 0 || remaining > 0).then_some((u.id, remaining))
+        })
+        .collect();
+    if admitted.is_empty() {
+        return;
+    }
+    let job = controller
+        .building_jobs
+        .entry(*target)
+        .or_insert_with(|| BuildingJobProgress {
+            hp: building.hp,
+            failures: 0,
+            actors: BTreeMap::new(),
+            founders: BTreeSet::new(),
+            approaching: false,
+        });
+    for (id, ammo) in admitted {
+        job.actors.entry(id).or_insert(ammo);
+        if job.failures == 0 {
+            job.founders.insert(id);
+        }
+    }
+}
+
 pub(super) fn difficulty<'a>(
     view: &'a View<'_>,
     controller: &AiController,
@@ -307,6 +460,7 @@ pub(super) fn decide(
     if let Some(target) = controller
         .known
         .iter()
+        .filter(|(id, _)| attack_job_eligible(controller, **id))
         .filter(|(_, b)| stable(view, b.footprint.origin))
         .min_by_key(|(id, b)| (b.footprint.distance_to_cell(controller.start), **id))
     {
@@ -1576,9 +1730,9 @@ fn strike_target(
 ) -> Option<CellPos> {
     let targets: Vec<_> = controller
         .known
-        .values()
-        .filter(|b| stable(view, b.footprint.origin))
-        .map(|b| (b.footprint, weight(view, b.kind, weights)))
+        .iter()
+        .filter(|(id, b)| attack_job_eligible(controller, **id) && stable(view, b.footprint.origin))
+        .map(|(_, b)| (b.footprint, weight(view, b.kind, weights)))
         .chain(
             view.enemy_units
                 .iter()

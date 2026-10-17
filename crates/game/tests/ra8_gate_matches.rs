@@ -80,7 +80,11 @@ fn trace_economy_events(world: &mut bevy::ecs::world::World, events: &[SimEvent]
             }
         }
     }
-    let service = std::env::var_os("RA8_SERVICE_TRACE").is_some() && at >= 180000;
+    let trace_from = std::env::var("RA8_TRACE_FROM")
+        .ok()
+        .and_then(|value| value.parse::<u64>().ok())
+        .unwrap_or(180000);
+    let service = std::env::var_os("RA8_SERVICE_TRACE").is_some() && at >= trace_from;
     for (id, owner, unit, mobile) in world
         .query::<(&SimId, &sim::Owner, &sim::Unit, &sim::Mobile)>()
         .iter(world)
@@ -274,6 +278,9 @@ fn trace_economy_events(world: &mut bevy::ecs::world::World, events: &[SimEvent]
         }
     }
     for issued in &pending {
+        if service {
+            eprintln!("service decision tick{at} {issued:?}");
+        }
         if coordination && let sim::Command::Move { units, target } = &issued.command {
             let controller = world.resource::<sim::AiPlayers>().controller(issued.player);
             if controller.is_some_and(|c| c.gather() == *target) {
@@ -391,7 +398,8 @@ fn run_case_to(
                 .after(sim::SimCoreSet(sim::SimSet::Economy)),
         );
     }
-    if (map_id == "steel_harbor" && countries == ["america", "cuba"])
+    if std::env::var_os("RA8_GATE7_SERVICE_TRACE").is_some()
+        || (map_id == "steel_harbor" && countries == ["america", "cuba"])
         || (map_id == "thousand_lakes" && countries == ["great_britain", "america"])
     {
         app.add_systems(
@@ -504,6 +512,10 @@ fn run_case_to(
 
 fn trace_lifecycle(world: &mut bevy::ecs::world::World, stage: &str) {
     let tick = world.resource::<sim::SimTick>().0;
+    if std::env::var_os("RA8_GATE7_SERVICE_TRACE").is_some() && (21275..=21285).contains(&tick) {
+        eprintln!("service lifecycle {stage} tick{tick}");
+        dump(world);
+    }
     if !(28239..=28242).contains(&tick) && !(28920..=28923).contains(&tick) {
         return;
     }
@@ -750,4 +762,28 @@ fn ra8_gate_wheel_germany_great_britain_brutal_seed_zero_finishes() {
         ["germany", "great_britain"],
         ["brutal", "brutal"],
     );
+}
+
+#[test]
+fn ra8_gate7_riverlands_iraq_cuba_easy_seed_zero_finishes() {
+    run_case("riverlands", ["iraq", "cuba"], ["easy", "easy"]);
+}
+
+#[test]
+fn ra8_gate7_jungle_cuba_russia_easy_seed_zero_finishes() {
+    run_case("jungle_delta", ["cuba", "russia"], ["easy", "easy"]);
+}
+
+#[test]
+fn ra8_gate7_pacific_cuba_great_britain_brutal_seed_zero_finishes() {
+    run_case(
+        "pacific_atoll",
+        ["cuba", "great_britain"],
+        ["brutal", "brutal"],
+    );
+}
+
+#[test]
+fn ra8_gate7_lakes_russia_medium_libya_brutal_seed_zero_finishes() {
+    run_case("thousand_lakes", ["russia", "libya"], ["medium", "brutal"]);
 }

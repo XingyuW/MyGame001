@@ -1559,6 +1559,136 @@ fn strike_sortie_fixture() -> (App, sim::SimId, sim::SimId) {
 }
 
 #[test]
+fn ra8_paid_repairs_cannot_pin_real_reloaded_strikes_to_one_unchanged_building() {
+    let (mut app, plane, target) = strike_sortie_fixture();
+    let alternate = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "barracks",
+        CellPos::new(40, 20),
+    )
+    .unwrap();
+    let oil = sim::spawn_building(
+        app.world_mut(),
+        sim::NEUTRAL,
+        "oil_derrick",
+        CellPos::new(44, 28),
+    )
+    .unwrap();
+    let engineer = spawn_unit(
+        app.world_mut(),
+        PlayerId(1),
+        "engineer",
+        CellPos::new(43, 28),
+    )
+    .unwrap();
+    step(&mut app); // Ordinary sight before the public capture command.
+    app.world_mut()
+        .resource_mut::<CommandQueue>()
+        .push(sim::IssuedCommand {
+            player: PlayerId(1),
+            command: Command::Interact {
+                unit: engineer,
+                target: oil,
+            },
+        });
+    let entity = unit_entity(&mut app, plane);
+    let definitions = app.world().resource::<sim::Definitions>();
+    let maximum = definitions
+        .building_combat(definitions.building_kind("power_plant").unwrap())
+        .unwrap()
+        .hit_points;
+    let kind = definitions.unit_kind("harrier").unwrap();
+    let ammo = definitions
+        .metadata(sim::ProductionItem::Unit(kind))
+        .unwrap()
+        .ammo;
+    let burst = definitions
+        .weapon(definitions.unit_combat(kind).unwrap().weapons(false)[0].unwrap())
+        .unwrap()
+        .burst as usize;
+    let mut shots = 0;
+    let mut other_shots = 0;
+    let mut reloads = 0;
+    let mut was_empty = false;
+    let mut paid_healing = 0;
+    for _ in 0..18000 {
+        let world = app.world_mut();
+        let hp_before = world
+            .query::<(&sim::SimId, &sim::Health)>()
+            .iter(world)
+            .find(|(id, _)| **id == target)
+            .map(|(_, hp)| hp.hit_points)
+            .unwrap_or(0);
+        let credits_before = world
+            .resource::<sim::Players>()
+            .get(PlayerId(1))
+            .unwrap()
+            .credits();
+        let events = step(&mut app);
+        let world = app.world_mut();
+        let hp_after = world
+            .query::<(&sim::SimId, &sim::Health)>()
+            .iter(world)
+            .find(|(id, _)| **id == target)
+            .map(|(_, hp)| hp.hit_points)
+            .unwrap_or(0);
+        let state = world.resource::<sim::Players>().get(PlayerId(1)).unwrap();
+        paid_healing += usize::from(hp_after > hp_before && state.credits() < credits_before);
+        let repair = hp_after > 0
+            && hp_after < maximum
+            && !state.repairing().contains(&target)
+            && state.credits() > 0;
+        if repair {
+            world
+                .resource_mut::<CommandQueue>()
+                .push(sim::IssuedCommand {
+                    player: PlayerId(1),
+                    command: Command::RepairBuilding { building: target },
+                });
+        }
+        shots += events.iter().filter(|e| matches!(e, sim::SimEvent::WeaponFired {attacker,target: found,..} if *attacker==plane && *found==target)).count();
+        other_shots += events.iter().filter(|e| matches!(e, sim::SimEvent::WeaponFired {attacker,target: found,..} if *attacker==plane && *found==alternate)).count();
+        let empty = app
+            .world()
+            .resource::<sim::SpecialState>()
+            .ammo_of(plane, ammo)
+            == 0;
+        if was_empty && !empty {
+            reloads += 1;
+        }
+        was_empty = empty;
+        assert!(
+            app.world()
+                .get::<sim::Health>(entity)
+                .is_some_and(|hp| hp.hit_points > 0)
+        );
+        if other_shots > 0 {
+            break;
+        }
+    }
+    eprintln!(
+        "paid-repair sortie shots{shots} other{other_shots} reloads{reloads} paid_healing{paid_healing}"
+    );
+    eprintln!(
+        "paid-repair final controller{:?} weapon{:?} mobile{:?}",
+        app.world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0)),
+        app.world().get::<sim::Weapon>(entity),
+        app.world().get::<sim::Mobile>(entity)
+    );
+    assert!(
+        shots > burst && reloads > 1 && paid_healing > 0,
+        "the actual source weapon, ammo, reload and paid repairs must establish repeated non-convergence"
+    );
+    assert!(
+        other_shots > 0,
+        "the repaired nearest building monopolized every real sortie"
+    );
+}
+
+#[test]
 fn ra8_a_remote_armed_unit_does_not_strand_real_strike_sorties_at_their_dock() {
     let (mut app, plane, target) = strike_sortie_fixture();
     let definitions = app.world().resource::<sim::Definitions>();

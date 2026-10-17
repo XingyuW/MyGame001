@@ -7233,3 +7233,85 @@ HP offsets16 Rhino shots in180000–239999. Pacific has112 aircraft shots into t
 are real. Riverlands has a late crew/paid-infantry battle and newly travelling capable survivors.
 A further mission-progress correction requires its own controlled and exact winner evidence.
 All previous gates, negative/insufficient probes and source restoration evidence remain.
+
+
+### R133 — Observed completed attack attempts retain repaired-building job history
+
+**Concrete failure and scope.** Gate7's unchanged default Jungle CubaEasy/RussiaEasy seed0
+reaches270000 without a winner. Real Rhino replacements repeatedly travel to TeslaCoil80;
+in180000–239999 eight Rhinos/four Flaks die, sixteen Rhino shots deal640HP which ordinary
+paid repairs restore. Pacific CubaBrutal/GreatBritainBrutal seed0 reaches288000: its last48000
+ticks contain112 Harrier shots against Curtain195 and12592 repairedHP, plus four legitimate
+Storm activations. Aircraft actually return/reload; a reload-timer change and liquidation of
+these capable income-supported armies are unjustified. Riverlands IraqEasy/CubaEasy seed0
+has its own late infantry/crew battle and real travelling survivors at72000; it is not diagnosed
+as the same attrition loop. Raw before/late traces and all gate7 bytes remain retained.
+
+**Policy assumption.** Reuse the existing bounded MAX_TARGET_FAILURES policy for completed
+observed building-attack batches. A new value-hashed ordered building_jobs map records each
+known target's lowest observedHP, completed-batch count, outstanding owned attacker IDs and
+admitted source ammunition, original-cohort IDs and whether that cohort still has a healthy
+approach/source freeze. Only final emitted bounded Attack commands against a currently seen
+building, with actual positive eligible source weapon damage, admit actors. No hiddenHP,
+occupants, new timer, quota, source weight or balance number is introduced. Different IDs from
+replacement production do not erase a repaired job's completed-attempt history.
+
+A batch completes on actual owned actor loss/ownership transfer or exhaustion of its admitted
+source ammunition. Cargo (including owned garrisons/hosts), deployed same-ID buildings,
+parasite passengers, docks, reloading, Chronoshift freeze and Temporal disable are not casualties.
+Changing/leaving an attack order removes that outstanding assignment without counting a loss.
+Only a new observedHP low resets the count/cohort. Original healthy travel/freeze remains eligible;
+replacement IDs alone cannot renew the exemption after failed history. Remembered unseen targets
+pause observation. Gone targets discard their history through the existing honest memory path.
+
+The direct known-building focus, core wave target/selection and source-weighted offensive
+superweapon candidate pool honor this eligibility. Source ranking among eligible candidates is
+unchanged. All-exhausted pools retain ordinary legal scouting/automatic combat and genuine
+capability; they cause no fabricated loss/winner, liquidation or limit change. Neutral legacy
+rules_difficulty=false fixtures retain their documented strategy boundary.
+
+**Controlled evidence and rejected candidates.** New actual-controller scheduled regression
+ra8_paid_repairs_cannot_pin_real_reloaded_strikes_to_one_unchanged_building uses normal
+Harrier shots/ammo/dock reload, a human-controlled target's ordinary RepairBuilding toggles,
+and ordinary Engineer capture of a neutral Oil Derrick to fund paid repairs. Its first probe
+spawned an owned but inactive oil building: zero paid healing made it insufficient and it is
+retained as such. Corrected old-source before2 records34 first-target shots/16 real reloads/
+616 paid-healing steps/zero alternate shots, failing the actual alternate-shot assertion.
+
+An initial candidate additionally filtered direct focus through the old core failures counter;
+after1/after2 fail with only2 shots/1 reload/38 healing steps because that counter marks all
+three known buildings exhausted and the loaded aircraft scouts at home. Remove only that new
+blanket counter filter, preserving R128/R130's healthy focused sorties. After3 passes with14
+first-target shots/7 real reloads/265 paid-healing steps and an actual alternate-building shot.
+No existing artillery/ground/mixed-wave assertion or fixture is changed.
+
+Eight new dedicated private schedule/hash tests in ai/ra8_attrition_tests.rs prove: each field,
+key, ammo and founder changes valuehash while BTree insertion order does not; actual public
+cargo/depot interactions do not fabricate casualties; real public Chronoshift and Temporal
+beams retain attempts; real Conscript destruction and Yuri transfer complete only the lost
+owned batch; actual Harrier HP decreases reset the count through multiple source ammo/reload
+cycles; original real approach survives declared exhausted history but an actual AI-admitted
+replacement ID cannot renew it after source-fire founder death; all-exhausted jobs retain
+nonempty legal search/capability/no fabricated outcome; and actual Curtain launch/recharge
+does not complete an army attempt or enroll the source as an attacker.
+
+New-fixture failures remain: BTreeSet push compile error corrected to insert; replacement
+spawn initially overlapped a real moving tank; aircraft normal reload is SpecialState.reloading,
+not transient rearming, and the ordinary target is destroyed after two observedHP decreases.
+The depot assertion initially required retention after a legitimate R119 no-income Move release;
+the corrected assertion requires zero fabricated failures and the real service exit. None of
+these changes alters an existing test or weakens public validation.
+
+**Exact ending evidence.** On the frozen candidate the three independent exact replays all
+exit0: Jungle P1Won178737/270000 (command72.470483s/test41.53s), Pacific P0Won101693/288000
+(98.747151s/test98.38s), Riverlands P0Won69364/72000 (9.097642s/test8.92s). Causal controlled
+attrition evidence is separate from ending credit; Riverlands' changed trajectory is not
+attributed to an unproved common stall mechanism. Source manifest and raw logs are retained.
+All existing rejection/I6/I7/command bounds and R29limits remain unchanged. These are focused
+results, not completed full13 acceptance or independent review. R132 remains a separate fix.
+
+
+Final focused batch: all8 dedicated progress tests pass (command17.488481s), the complete
+RA8controller target passes68/68 (69.163152s including compilation; test50.82s), and strict
+workspace/all-target Clippy exits0/6.356562s. Format exits0. These overlapping focused
+checks do not replace the required final-source fullsim/game/retained25/m13/budget/full13.
