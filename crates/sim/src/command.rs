@@ -1349,11 +1349,37 @@ pub(crate) fn process_commands(world: &mut bevy_ecs::world::World) {
     refresh_command_vision(world);
     let mut mirages = concealment_movers(world);
     let pending = std::mem::take(&mut world.resource_mut::<CommandQueue>().pending);
-    for PendingCommand {
-        issued,
-        ai_intent,
-        action,
-    } in pending
+    let strategic_source = |issued: &IssuedCommand| match issued.command {
+        Command::Superweapon { building, .. } | Command::Chronoshift { building, .. } => {
+            Some((issued.player, building))
+        }
+        _ => None,
+    };
+    let mut occurrences = BTreeMap::new();
+    for entry in &pending {
+        if let Some(key) = strategic_source(&entry.issued) {
+            let count = occurrences.entry(key).or_insert(0_usize);
+            *count = count.saturating_add(1);
+        }
+    }
+    let mut power_losses = BTreeMap::new();
+    for (at, entry) in pending.iter().enumerate() {
+        if entry.ai_intent.as_ref().is_some_and(|w| w.strategic_valid)
+            && strategic_source(&entry.issued).is_some_and(|key| occurrences.get(&key) == Some(&1))
+            && crate::special::strategic_intent_power_only(world, &entry.issued)
+            && let Some(player) = world.resource::<crate::Players>().get(entry.issued.player)
+        {
+            power_losses.insert(at, (player.power_produced(), player.power_consumed()));
+        }
+    }
+    for (
+        at,
+        PendingCommand {
+            issued,
+            ai_intent,
+            action,
+        },
+    ) in pending.into_iter().enumerate()
     {
         if matches!(
             issued.command,
@@ -1395,12 +1421,25 @@ pub(crate) fn process_commands(world: &mut bevy_ecs::world::World) {
             let source_erasure_began = ai_intent.as_ref().is_some_and(|w| w.strategic_valid)
                 && result == Err(RejectReason::AbilityUnavailable("Target is being erased"))
                 && crate::special::strategic_intent_erasure_only(world, &issued);
+            let natural_power_lost = power_losses.get(&at).is_some_and(|entry| {
+                world
+                    .resource::<crate::Players>()
+                    .get(issued.player)
+                    .is_some_and(|player| {
+                        *entry == (player.power_produced(), player.power_consumed())
+                    })
+            }) && result
+                == Err(RejectReason::AbilityUnavailable(
+                    "Ability requires power and a full charge",
+                ))
+                && crate::special::strategic_intent_power_only(world, &issued);
             let service_healed = ai_intent.as_ref().is_some_and(|w| w.service_valid)
                 && result == Err(RejectReason::AbilityUnavailable("This unit is not damaged"))
                 && crate::special::service_intent_valid(world, &issued, false);
             if let Err(reason) = result
                 && !cell_visibility_lost
                 && !source_erasure_began
+                && !natural_power_lost
                 && !service_healed
                 && !ai_intent
                     .as_ref()

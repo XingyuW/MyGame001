@@ -7443,3 +7443,77 @@ pairings all finish with explicit Won and no ordinary rejection failure (85.9605
 56.63s test). The exact previously failing RussiaEasy/LibyaEasy seed0 now yields P1Won69633
 within72000. This is separate ending evidence after controlled financial proofs; the full26
 retained matches, final-source fullsim/game/m13/budget and frozen full13 remain required.
+
+### R136 — Cancel only certified natural strategic power loss before FIFO application
+
+**Exact failure and diagnosis.** Frozen6c78ade retained-case preflight completes the first10
+exact matches with winners, then HarvestPlains AmericaBrutal/KoreaBrutal seed0 rejects source223
+WeatherControl at35722: 'Ability requires power and a full charge'. The serial wrapper stops;
+remaining15 and fullsim are unrun. The complete raw case11 log and source341-file manifest remain.
+The diagnostic rerun changes only environment-gated observation in the test harness, preserving
+production runtime: decision35721 has charge12000, power400/275, lowpowerfalse and the full
+strategic_valid certificate. Its exact FIFO contains three ordinary Attack commands followed by
+that one strategic action, with no Sale/Place/duplicate. PowerPlant173HP27 exists at decision
+and is destroyed before Commands35722; source223 still holds12000, power is now200/275. Raw
+strategic-before1 SHA48231a6531e284cc8a0e8543dec730784445e22bed117fb2c16915db81726427
+records113.669340s/exit101. This is actual natural between-stage power loss, not intrinsic
+unreadiness, a duplicate launch or a preceding contradictory queued action.
+
+**Narrow semantics.** At command-application entry, after the ordinary live power refresh and
+before any FIFO effects, derive a temporary ordered map for fully certified, uniquely occurring
+(player,source) strategic intents that currently pass every launch guard except powered-source
+availability. The source must actually require power, its owner must currently be low power,
+charge must still be full and all actor/ownership/type/arguments/target/visibility/global Storm
+requirements remain valid. Count both public/private strategic source occurrences; duplicates
+receive no outage cancellation. Capture produced/consumed power at entry. A subsequent ordinary
+power/full-charge error cancels only when the current pair exactly matches entry and the complete
+power-only counterfactual still passes. Earlier same-FIFO Sale/Place-caused loss, altered power
+inputs, consumed charge, invalid arguments/type/location, other state restrictions and public
+commands keep original rejection behavior. Normal validate_launch passes both ordinary guards
+and retains exact error order/strings; only the private read-only counterfactual omits the power
+predicate, never full charge. No new persistent state, timing, source balance or command exists;
+the temporary map/ordinal derives from existing value-hashed queue and world state.
+
+**Scheduled proof and insufficient probes.** New natural-destruction regression uses ordinary
+human Attack and source Tesla fire to kill a declared1HP PowerPlant after an AI-stage complete
+certificate; real WeaponFired/BuildingDestroyed, low power and unchanged full charge are required.
+The true before4 fails only on the original readiness rejection; the identical candidate passes.
+Earlier probes are retained as insufficient: before1 has a missing crate::Players qualification;
+before2 lacks prior attacker sight; before3 produces the real shot/destruction but the chosen
+remote cell is unseen and cannot receive a complete certificate. Corrected setup observes the
+attacker through the normal schedule and uses an actually observed legal cell, without injecting
+perception. Source readiness is seeded only after its real initialization event; the enemy is
+declared loaded for this isolated shot.
+
+A second actual-schedule regression pairs private/public worlds across12 modes: natural loss,
+intrinsic unpowered/unready sources, duplicate natural/powered launches, earlier/later ordinary
+Sale, a same-FIFO change to entry power inputs, and later charge/type/arguments/outside-map errors.
+Only the certified unique natural-loss private action may cancel; all intrinsic/FIFO error vectors
+must equal strict public results, duplicates must still reject, and valid earlier launches still
+activate before later Sale. The first matrix probe tried to change an already removed dead plant
+again in the intrinsic-power control; its raw failure is retained and the corrected fixture omits
+that redundant mutation. One exact-context patch rejection made no partial change and no following
+test ran; the smaller exact patch then applied. Existing strategic/service/bridge/private hash,
+visibility and erasure regressions remain required unchanged. Exact Harvest winner credit and
+all final-source validation remain separate from this controlled lifecycle result.
+
+The next intrinsic-power matrix probe set its declared dead plant immediately before a custom
+AI-stage injector on a tick where the real controller was not due. The intentionally conditional
+empty-command refresh therefore left the previous cached power at that artificial decision,
+so it was not a valid intrinsic-outage setup. Corrected fixture runs one ordinary power/cleanup
+tick to establish the declared initial outage before installing its isolated decision system;
+actual due-turn planning and R87 production concealment/power cadence are unchanged. The failed
+certificate-precondition log remains retained rather than counted as a passing security control.
+
+The corrected matrix and all existing intent regressions pass15/15 (17.230612s command), and
+public ra1_commands passes22/22 (16.159518s including rebuild). Strict Clippy then rejects two
+identical assertion branches in the NEW matrix, so the dependent exact Harvest command does not
+run. Combine those conditions without suppressing the lint or changing any assertion; retain
+the failure and rerun the controls/Clippy before the separate exact ending check.
+
+Final focused rerun passes15/15 intent tests (17.603512s command) and strict all-target workspace
+Clippy exits0 (4.252456s). Exact HarvestPlains AmericaBrutal/KoreaBrutal seed0 completes with
+P0Won36040 under its unchanged R29 limit, exit0/141.397559s including compilation (111.34s test).
+This closes the exact rejection separately from the normal source-destruction and strictness
+proofs; all earlier raw artifacts remain. Final-source default/retained/fullsim/m13/budget and
+all13 acceptance are still pending. No independent review is claimed.
