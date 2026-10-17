@@ -7,6 +7,16 @@ pub(super) fn validate_interaction(
     b: &Actor,
     defs: &Definitions,
 ) -> Result<(), RejectReason> {
+    validate_interaction_damage(world, a, b, defs, true)
+}
+
+pub(super) fn validate_interaction_damage(
+    world: &World,
+    a: &Actor,
+    b: &Actor,
+    defs: &Definitions,
+    check_damage: bool,
+) -> Result<(), RejectReason> {
     if a.id == b.id {
         return Err(unavailable("Choose another target"));
     }
@@ -39,7 +49,7 @@ pub(super) fn validate_interaction(
             Ok(())
         }
         _ if repairs_units(defs, b) => {
-            validate_docking(world, a, b, defs)?;
+            validate_docking(world, a, b, defs, check_damage)?;
             let capacity = defs.metadata(b.item).map_or(0, |m| m.vehicle_docks);
             if capacity > 0
                 && world

@@ -1,6 +1,40 @@
 //! Specialist commands mechanics, moved unchanged from special.rs.
 use super::*;
 
+/// Complete read-only certificate for the owned vehicle/repair-building interaction.
+/// Only the damage requirement may be omitted when revalidating a witnessed later heal.
+pub(crate) fn service_intent_valid(
+    world: &mut World,
+    issued: &IssuedCommand,
+    check_damage: bool,
+) -> bool {
+    if world.resource::<Players>().get(issued.player).is_none() {
+        return false;
+    }
+    let Command::Interact { unit, target } = issued.command else {
+        return false;
+    };
+    let index = living(world);
+    let defs = world.resource::<Definitions>();
+    let Ok(a) = own(world, defs, &index, issued.player, unit) else {
+        return false;
+    };
+    if commandable(world, unit).is_err() {
+        return false;
+    }
+    let Some(b) = index.get(&target) else {
+        return false;
+    };
+    if a.owner != b.owner
+        || !matches!(a.item, ProductionItem::Unit(_))
+        || defs.category(a.item) != Category::Vehicles
+        || !repairs_units(defs, b)
+    {
+        return false;
+    }
+    interaction::validate_interaction_damage(world, a, b, defs, check_damage).is_ok()
+}
+
 /// Engine-only conditional bridge job. Actor/target authorization precedes readiness;
 /// a hidden ship can never turn a bad actor or unknown hut into an accepted goal.
 pub(crate) fn bridge_goal_ready(

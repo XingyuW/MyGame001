@@ -2378,6 +2378,59 @@ fn ra8_depot_reserves_known_incoming_and_occupied_bays_without_rejected_orders()
 }
 
 #[test]
+fn ra8_source_self_healing_after_a_real_ai_service_decision_cancels_the_healed_job() {
+    let mut app = scenario("russia", "medium", 100000, 0, false);
+    quiet(&mut app);
+    let depot = put(&mut app, "soviet_service_depot", 2, 20);
+    let miner = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "war_miner",
+        CellPos::new(5, 20),
+    )
+    .unwrap();
+    let entity = unit_entity(&mut app, miner);
+    let definitions = app.world().resource::<sim::Definitions>();
+    let kind = definitions.unit_kind("war_miner").unwrap();
+    let maximum = definitions.unit_combat(kind).unwrap().hit_points;
+    assert!(
+        definitions
+            .metadata(sim::ProductionItem::Unit(kind))
+            .unwrap()
+            .self_healing
+    );
+    app.world_mut()
+        .get_mut::<sim::Health>(entity)
+        .unwrap()
+        .hit_points = maximum - 1;
+    step(&mut app);
+    assert!(
+        app.world().resource::<CommandQueue>().iter().any(
+            |c| matches!(c.command, Command::Interact {unit,target} if unit==miner && target==depot)
+        ),
+        "actual controller must decide while the miner is damaged"
+    );
+    assert_eq!(
+        app.world().get::<sim::Health>(entity).unwrap().hit_points,
+        maximum,
+        "the ordinary source self-heal runs after the decision"
+    );
+    step(&mut app);
+    assert!(
+        !app.world()
+            .resource::<sim::SpecialState>()
+            .interactions
+            .contains_key(&miner)
+    );
+    assert!(
+        !app.world()
+            .resource::<sim::SpecialState>()
+            .docked
+            .contains_key(&miner)
+    );
+}
+
+#[test]
 fn ra8_building_and_depot_repairs_use_paid_production_paths() {
     let mut app = scenario("great_britain", "medium", 100000, 0, true);
     quiet(&mut app);
