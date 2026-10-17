@@ -2434,7 +2434,14 @@ fn queue_buildings(view: &View<'_>, controller: &AiController) -> Vec<Command> {
         );
     let mut commands = Vec::new();
     let mut taken: BTreeSet<Lane> = BTreeSet::new();
-    let reserve = combat_credit_reserve(view);
+    let construction_debt = view
+        .state
+        .queues()
+        .flat_map(|(_, queue)| queue.iter())
+        .filter(|item| matches!(item.item, ProductionItem::Building(_)))
+        .map(|item| outstanding_cost(view, item))
+        .fold(0_i64, i64::saturating_add);
+    let reserve = combat_credit_reserve(view).saturating_add(construction_debt);
     let mut cash = view.state.credits();
     let mut finite_budget = (view.ai.rules_difficulty && !strategy::service_income(view))
         .then(|| view.state.credits().saturating_sub(reserve).max(0));

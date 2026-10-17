@@ -778,3 +778,104 @@ fn ra8_finite_funds_preserve_paid_head_and_finance_source_cost_finisher_after_un
         "preserved head plus source-cost finisher never reached a real building shot"
     );
 }
+
+#[test]
+fn ra8_existing_main_building_obligation_cannot_be_reused_to_fund_the_defence_lane() {
+    let mut app = app();
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<AiPlayers>());
+    let barracks = building(&mut app, 0, "barracks", CellPos::new(2, 14));
+    building(&mut app, 0, "war_factory", CellPos::new(5, 14));
+    building(&mut app, 0, "radar_tower", CellPos::new(12, 4));
+    unit(&mut app, 0, "grizzly", CellPos::new(14, 20));
+    let defs = app.world().resource::<Definitions>();
+    let main = ProductionItem::Building(defs.building_kind("tech_center").unwrap());
+    let infantry = ProductionItem::Unit(defs.unit_kind("gi").unwrap());
+    let defence = ProductionItem::Building(defs.building_kind("pillbox").unwrap());
+    let main_cost = defs.production(main).unwrap().cost;
+    let cash = main_cost
+        + defs.production(infantry).unwrap().cost
+        + defs.production(defence).unwrap().cost
+        - 1;
+    app.world_mut()
+        .resource_mut::<Players>()
+        .get_mut(PlayerId(0))
+        .unwrap()
+        .credits = cash;
+    step(&mut app);
+    issue(&mut app, 0, Command::QueueProduction { item: main });
+    for _ in 0..3000 {
+        step(&mut app);
+        if app
+            .world()
+            .resource::<Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .queues()
+            .flat_map(|(_, q)| q.iter())
+            .any(|q| q.item == main && q.charged >= main_cost / 3)
+        {
+            break;
+        }
+    }
+    issue(&mut app, 0, Command::QueueProduction { item: infantry });
+    step(&mut app);
+    let state = app.world().resource::<Players>().get(PlayerId(0)).unwrap();
+    assert!(
+        state
+            .queues()
+            .flat_map(|(_, q)| q.iter())
+            .any(|q| q.item == main && q.charged > 0 && q.charged < main_cost)
+    );
+    assert!(
+        state
+            .queues()
+            .flat_map(|(_, q)| q.iter())
+            .any(|q| q.item == infantry)
+    );
+    app.world_mut().insert_resource(controllers);
+    let mut placed = false;
+    let mut paid_infantry = false;
+    for _ in 0..5000 {
+        for event in step(&mut app) {
+            assert!(
+                !matches!(event, crate::SimEvent::ProductionCancelled { player: PlayerId(0), item, .. } if item == main),
+                "attainable existing construction was cancelled instead of funded"
+            );
+            placed |= matches!(event, crate::SimEvent::BuildingPlaced { player: PlayerId(0), kind, .. } if ProductionItem::Building(kind) == main);
+            paid_infantry |= matches!(event, crate::SimEvent::UnitSpawned { player: PlayerId(0), building, .. } if building == barracks);
+        }
+        let state = app.world().resource::<Players>().get(PlayerId(0)).unwrap();
+        let defs = app.world().resource::<Definitions>();
+        let existing = state
+            .queues()
+            .flat_map(|(_, q)| q.iter())
+            .map(|q| defs.production(q.item).unwrap().cost - q.charged)
+            .sum::<i64>();
+        let pending: Vec<_> = app
+            .world()
+            .resource::<CommandQueue>()
+            .iter()
+            .filter(|p| p.player == PlayerId(0))
+            .filter_map(|p| match p.command {
+                Command::QueueProduction { item } => Some(item),
+                _ => None,
+            })
+            .collect();
+        let added = pending
+            .iter()
+            .map(|item| defs.production(*item).unwrap().cost)
+            .sum::<i64>();
+        assert!(
+            existing.saturating_add(added) <= state.credits(),
+            "finite existing{existing} + new{added} {pending:?} exceeds cash{}",
+            state.credits()
+        );
+        if placed && paid_infantry {
+            break;
+        }
+    }
+    assert!(
+        placed && paid_infantry,
+        "existing main construction and ordinary paid infantry did not finish"
+    );
+}
