@@ -464,19 +464,58 @@ pub(super) fn decide(
         .filter(|(_, b)| stable(view, b.footprint.origin))
         .min_by_key(|(id, b)| (b.footprint.distance_to_cell(controller.start), **id))
     {
-        // Dock-bound strike aircraft keep their job even in an escorted wave.
+        // Eligible air attackers keep their job even in an escorted wave.
         // The other actors retain their original combat/standoff policy below.
         let matching_attack = |unit: &UnitSnap| {
             matches!(unit.attack_order,
             Some(crate::AttackOrder::Attack { target: current, .. }) if current == *target.0)
         };
+        let target_traits = view
+            .definitions
+            .building_combat(target.1.kind)
+            .map(|terms| {
+                let mut traits = crate::combat::traits_of(
+                    view.grid,
+                    *target.0,
+                    terms.armour,
+                    &crate::combat::Body::Building(target.1.footprint),
+                    Some(&terms),
+                );
+                if let Some(meta) = view
+                    .definitions
+                    .metadata(ProductionItem::Building(target.1.kind))
+                {
+                    traits.bombable = meta.bombable;
+                    traits.immune_psionics |= meta.immune_psionics;
+                    traits.immune_radiation = meta.immune_radiation;
+                }
+                traits
+            });
         let strike_wave: Vec<_> = ground_wave
             .iter()
             .copied()
             .filter(|unit| {
-                view.definitions
-                    .metadata(ProductionItem::Unit(unit.kind))
-                    .is_some_and(|m| m.airport_bound)
+                view.definitions.domain(unit.kind) == Domain::Air
+                    && view.fights(unit)
+                    && target_traits.as_ref().is_some_and(|traits| {
+                        view.definitions
+                            .unit_combat(unit.kind)
+                            .is_some_and(|terms| {
+                                crate::weapon_against(
+                                    view.definitions,
+                                    &terms,
+                                    terms.weapons(false),
+                                    traits,
+                                )
+                                .is_some_and(|(kind, percent)| {
+                                    percent > 1
+                                        && view
+                                            .definitions
+                                            .weapon(kind)
+                                            .is_some_and(|weapon| weapon.damage > 0)
+                                })
+                            })
+                    })
             })
             .collect();
         let interrupted = strike_wave.iter().any(|unit| local_wave_threat(view, unit));
@@ -516,7 +555,7 @@ pub(super) fn decide(
                 });
             }
         }
-        // Keep the original policy for the surface/undocked-air part of a mixed
+        // Keep the original policy for the surface part of a mixed
         // wave; a Dog keeps its own mission and artillery keeps its tank line.
         if !view
             .enemy_units
@@ -525,13 +564,7 @@ pub(super) fn decide(
         {
             let units: Vec<_> = ground_wave
                 .iter()
-                .filter(|u| {
-                    view.fights(u)
-                        && !view
-                            .definitions
-                            .metadata(ProductionItem::Unit(u.kind))
-                            .is_some_and(|m| m.airport_bound)
-                })
+                .filter(|u| view.fights(u) && view.definitions.domain(u.kind) != Domain::Air)
                 .map(|u| u.id)
                 .collect();
             if !units.is_empty() {
@@ -610,7 +643,7 @@ pub(super) fn decide(
     commands
 }
 
-/// A dock-bound strike plane cannot trade through an observed longer-range AA screen
+/// An air attacker cannot trade through an observed longer-range AA screen
 /// indefinitely. Let eligible ground wave members clear that screen first; the existing
 /// target failure/arrival policy still handles unreachable jobs and ordinary movement.
 fn screen_strike_aircraft(
@@ -631,11 +664,7 @@ fn screen_strike_aircraft(
     let aircraft: Vec<_> = wave
         .iter()
         .copied()
-        .filter(|u| {
-            view.definitions
-                .metadata(ProductionItem::Unit(u.kind))
-                .is_some_and(|m| m.airport_bound)
-        })
+        .filter(|u| view.definitions.domain(u.kind) == Domain::Air && view.fights(u))
         .collect();
     if aircraft.is_empty() {
         return;
@@ -735,7 +764,23 @@ fn screen_strike_aircraft(
                 })
                 .map(|u| u.id)
                 .collect();
-            (!ground.is_empty()).then_some((b, threatened, ground))
+            if ground.is_empty() {
+                return None;
+            }
+            if let Some(progress) = controller.air_screens.get(&b.id) {
+                // Test an existing job before choosing the minimum candidate. A
+                // released job cannot starve another barrier, but real observed
+                // approach/damage can still reopen it. Never install unselected jobs.
+                let (remaining, distance) = screen_approach(view, wave, &ground, b, &traits);
+                let mut prospective = progress.clone();
+                prospective.advance(remaining, distance, b.hp, view.tick);
+                if view.tick.saturating_sub(prospective.last_progress)
+                    >= u64::from(controller.difficulty.wave_patience)
+                {
+                    return None;
+                }
+            }
+            Some((b, threatened, ground))
         })
         .min_by_key(|(b, _, _)| (b.footprint.distance_to_cell(controller.start), b.id));
     let Some((barrier, aircraft, ground)) = barrier else {
@@ -756,34 +801,7 @@ fn screen_strike_aircraft(
         ..crate::TargetTraits::default()
     };
     let target_extent = crate::combat::Extent::footprint(barrier.footprint);
-    let mut remaining = u32::MAX;
-    let mut distance = u32::MAX;
-    for unit in wave.iter().copied().filter(|u| ground.contains(&u.id)) {
-        distance = distance.min(barrier.footprint.distance_to_cell(unit.mobile.cell));
-        let Some(terms) = view.definitions.unit_combat(unit.kind) else {
-            continue;
-        };
-        let Some((weapon, _)) =
-            crate::weapon_against(view.definitions, &terms, terms.weapons(false), &traits)
-        else {
-            continue;
-        };
-        let Some(weapon) = view.definitions.weapon(weapon) else {
-            continue;
-        };
-        let covers = |position| {
-            let (dx, dy) = crate::combat::Extent::point(position).gap(&target_extent);
-            crate::in_range(dx, dy, weapon.range)
-                && !crate::inside_min_range(dx, dy, weapon.min_range)
-        };
-        if covers(unit.mobile.position(view.grid, unit.id)) {
-            remaining = 0;
-        } else if let Some((goal, best)) = unit.move_progress
-            && covers(crate::SubPos::centre_of(goal))
-        {
-            remaining = remaining.min(best);
-        }
-    }
+    let (remaining, distance) = screen_approach(view, wave, &ground, barrier, &traits);
     let progress = controller
         .air_screens
         .entry(barrier.id)
@@ -947,7 +965,7 @@ fn screen_strike_aircraft(
             .map_or(0, |m| m.ammo);
         // Empty planes keep the actual dock return/reload cycle. Loaded aircraft wait
         // outside known source-AA reach near this job, rather than crossing the map home.
-        if special.ammo_of(unit.id, ammo) == 0 {
+        if ammo > 0 && special.ammo_of(unit.id, ammo) == 0 {
             continue;
         }
         let Some(target) = air_wait_cell(view, controller, unit, barrier, &waiting) else {
@@ -964,6 +982,45 @@ fn screen_strike_aircraft(
             });
         }
     }
+}
+
+fn screen_approach(
+    view: &View<'_>,
+    wave: &[&UnitSnap],
+    ground: &[SimId],
+    barrier: &BuildingSnap,
+    traits: &crate::TargetTraits,
+) -> (u32, u32) {
+    let target_extent = crate::combat::Extent::footprint(barrier.footprint);
+    let mut remaining = u32::MAX;
+    let mut distance = u32::MAX;
+    for unit in wave.iter().copied().filter(|u| ground.contains(&u.id)) {
+        distance = distance.min(barrier.footprint.distance_to_cell(unit.mobile.cell));
+        let Some(terms) = view.definitions.unit_combat(unit.kind) else {
+            continue;
+        };
+        let Some((weapon, _)) =
+            crate::weapon_against(view.definitions, &terms, terms.weapons(false), traits)
+        else {
+            continue;
+        };
+        let Some(weapon) = view.definitions.weapon(weapon) else {
+            continue;
+        };
+        let covers = |position| {
+            let (dx, dy) = crate::combat::Extent::point(position).gap(&target_extent);
+            crate::in_range(dx, dy, weapon.range)
+                && !crate::inside_min_range(dx, dy, weapon.min_range)
+        };
+        if covers(unit.mobile.position(view.grid, unit.id)) {
+            remaining = 0;
+        } else if let Some((goal, best)) = unit.move_progress
+            && covers(crate::SubPos::centre_of(goal))
+        {
+            remaining = remaining.min(best);
+        }
+    }
+    (remaining, distance)
 }
 
 fn air_wait_cell(

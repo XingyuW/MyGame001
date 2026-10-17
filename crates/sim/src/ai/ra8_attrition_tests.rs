@@ -678,3 +678,171 @@ fn ra8_real_support_launch_and_source_recharge_do_not_complete_an_army_attempt()
         "normal real launch/recharge must precede the progress assertions"
     );
 }
+
+#[test]
+fn ra8_an_expired_aa_job_cannot_starve_a_fresh_observed_barrier() {
+    let mut app = app();
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<AiPlayers>());
+    let first = building(&mut app, 1, "patriot", CellPos::new(34, 12));
+    building(&mut app, 1, "nuclear_reactor", CellPos::new(42, 2));
+    building(&mut app, 1, "soviet_barracks", CellPos::new(30, 20));
+    for _ in 0..6000 {
+        step(&mut app);
+    }
+    let old_ground = unit(&mut app, 0, "gi", CellPos::new(30, 12));
+    let air = unit(&mut app, 0, "kirov", CellPos::new(12, 14));
+    step(&mut app);
+    app.world_mut().insert_resource(controllers);
+    let mut installed = false;
+    for _ in 0..3000 {
+        step(&mut app);
+        installed = app
+            .world()
+            .resource::<AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .air_screens
+            .contains_key(&first);
+        if installed {
+            break;
+        }
+    }
+    assert!(installed, "first actual clearance job must be selected");
+    // Ordinary external orders move the original team away. Its real approach/HP
+    // minima remain observed history; no timer or controller field is seeded.
+    let mut expired = None;
+    for _ in 0..6000 {
+        issue(
+            &mut app,
+            0,
+            Command::Move {
+                units: vec![old_ground, air],
+                target: CellPos::new(3, 40),
+            },
+        );
+        step(&mut app);
+        let c = app
+            .world()
+            .resource::<AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap();
+        let progress = &c.air_screens[&first];
+        if app
+            .world()
+            .resource::<SimTick>()
+            .0
+            .saturating_sub(progress.last_progress)
+            >= u64::from(c.difficulty.wave_patience)
+        {
+            expired = Some(progress.clone());
+            break;
+        }
+    }
+    let expired = expired.expect("actual source patience expires after observed progress stops");
+    let second = building(&mut app, 1, "patriot", CellPos::new(34, 28));
+    let recruits = [
+        CellPos::new(30, 28),
+        CellPos::new(30, 29),
+        CellPos::new(30, 30),
+        CellPos::new(31, 30),
+    ]
+    .map(|at| unit(&mut app, 0, "gi", at));
+    assert!(
+        !app.world()
+            .resource::<AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .air_screens
+            .contains_key(&second)
+    );
+    let mut selected = false;
+    let mut assigned = false;
+    let mut fired = false;
+    for _ in 0..3000 {
+        issue(
+            &mut app,
+            0,
+            Command::Move {
+                units: vec![old_ground, air],
+                target: CellPos::new(3, 40),
+            },
+        );
+        for event in step(&mut app) {
+            fired |= assigned
+                && matches!(event, crate::SimEvent::WeaponFired { attacker, target, .. } if recruits.contains(&attacker) && target == second);
+        }
+        let c = app
+            .world()
+            .resource::<AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap();
+        selected |= c.air_screens.contains_key(&second);
+        assigned |=
+            app.world()
+                .resource::<CommandQueue>()
+                .iter()
+                .any(|issued| match &issued.command {
+                    Command::Attack { units, target } => {
+                        *target == second && units.iter().any(|id| recruits.contains(id))
+                    }
+                    Command::AttackMove { units, target } => {
+                        *target == CellPos::new(34, 28)
+                            && units.iter().any(|id| recruits.contains(id))
+                    }
+                    _ => false,
+                });
+        if c.air_screens[&first] != expired || (selected && assigned && fired) {
+            break;
+        }
+    }
+    let c = app
+        .world()
+        .resource::<AiPlayers>()
+        .controller(PlayerId(0))
+        .unwrap();
+    eprintln!(
+        "two AA jobs: selected{selected} assigned{assigned} fired{fired} first{:?} expired{expired:?} all{:?}",
+        c.air_screens.get(&first),
+        c.air_screens
+    );
+    assert!(
+        selected && assigned && fired,
+        "the expired minimum candidate starved a fresh observed AA clearance job"
+    );
+    assert_eq!(
+        c.air_screens[&first], expired,
+        "the selected fresh job must leave the unchanged expired first job alone"
+    );
+    // Genuine observed damage still reopens the original job. Ordinary source GI
+    // fire, not a seeded HP/history change, supplies the new opportunity.
+    let shooter = unit(&mut app, 0, "gi", CellPos::new(30, 12));
+    issue(
+        &mut app,
+        0,
+        Command::Attack {
+            units: vec![shooter],
+            target: first,
+        },
+    );
+    let mut hit = false;
+    let mut reopened = false;
+    for _ in 0..300 {
+        for event in step(&mut app) {
+            hit |= matches!(event, crate::SimEvent::WeaponFired { attacker, target, .. } if attacker == shooter && target == first);
+        }
+        let progress = &app
+            .world()
+            .resource::<AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .air_screens[&first];
+        reopened |= progress.hp < expired.hp && progress.last_progress > expired.last_progress;
+        if hit && reopened {
+            break;
+        }
+    }
+    assert!(
+        hit && reopened,
+        "actual observed HP progress must reopen the old job"
+    );
+}

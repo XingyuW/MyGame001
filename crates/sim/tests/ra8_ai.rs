@@ -1532,6 +1532,10 @@ fn ra8_a_specialist_repair_reservation_removes_the_overlapping_defence_attack() 
 }
 
 fn strike_sortie_fixture() -> (App, sim::SimId, sim::SimId) {
+    strike_aircraft_fixture("harrier")
+}
+
+fn strike_aircraft_fixture(aircraft: &str) -> (App, sim::SimId, sim::SimId) {
     let mut app = scenario("germany", "brutal", 0, 0, false);
     let world = app.world_mut();
     let reserve = world
@@ -1546,7 +1550,7 @@ fn strike_sortie_fixture() -> (App, sim::SimId, sim::SimId) {
     put(&mut app, "nuclear_reactor", 2, 2);
     put(&mut app, "spy_satellite", 2, 8);
     put(&mut app, "airforce_command", 12, 4);
-    let plane = spawn_unit(app.world_mut(), PlayerId(0), "harrier", CellPos::new(12, 8)).unwrap();
+    let plane = spawn_unit(app.world_mut(), PlayerId(0), aircraft, CellPos::new(12, 8)).unwrap();
     let target = sim::spawn_building(
         app.world_mut(),
         PlayerId(1),
@@ -1556,6 +1560,48 @@ fn strike_sortie_fixture() -> (App, sim::SimId, sim::SimId) {
     .unwrap();
     spawn_unit(app.world_mut(), PlayerId(1), "gi", CellPos::new(43, 40)).unwrap();
     (app, plane, target)
+}
+
+#[test]
+fn ra8_unlimited_bomber_focus_ignores_an_incapable_en_route_ground_unit() {
+    let (mut app, bomber, target) = strike_aircraft_fixture("kirov");
+    let distraction = spawn_unit(app.world_mut(), PlayerId(1), "gi", CellPos::new(32, 8)).unwrap();
+    let mut first = None;
+    let mut destroyed = false;
+    for _ in 0..12000 {
+        for event in step(&mut app) {
+            if let sim::SimEvent::WeaponFired {
+                attacker,
+                target: found,
+                ..
+            } = event
+                && attacker == bomber
+            {
+                first.get_or_insert(found);
+            }
+            destroyed |= matches!(event, sim::SimEvent::BuildingDestroyed { building, .. } if building == target);
+        }
+        if destroyed {
+            break;
+        }
+    }
+    let world = app.world_mut();
+    let distraction_lives = world
+        .query::<(&sim::SimId, &sim::Health)>()
+        .iter(world)
+        .any(|(id, hp)| *id == distraction && hp.hit_points > 0);
+    eprintln!(
+        "unlimited bomber first{first:?}, objective{target:?}, destroyed{destroyed}, incapable GI alive{distraction_lives}"
+    );
+    assert_eq!(
+        first,
+        Some(target),
+        "a ground-only unit cannot replace the bomber's observed building mission"
+    );
+    assert!(
+        destroyed && distraction_lives,
+        "the bomber must finish its real building job while leaving the incapable diversion alone"
+    );
 }
 
 #[test]
@@ -1854,6 +1900,59 @@ fn ra8_a_local_eligible_air_threat_keeps_real_en_route_strike_combat() {
         PlayerId(1),
         "flak_trooper",
         CellPos::new(18, 8),
+    )
+    .unwrap();
+    let mut fired = false;
+    for _ in 0..160 {
+        let events = step(&mut app);
+        assert!(!app.world().resource::<CommandQueue>().iter().any(|issued| matches!(&issued.command, Command::Attack { units, target: found } if *found == target && units.contains(&plane))), "base focus overrode an actually nearby anti-air threat");
+        fired |= events.iter().any(|event| matches!(event, sim::SimEvent::WeaponFired { attacker, target: found, .. } if *attacker == plane && *found == enemy));
+        if fired {
+            break;
+        }
+    }
+    assert!(
+        fired,
+        "ordinary strike combat must engage the local eligible threat"
+    );
+}
+
+#[test]
+fn ra8_unlimited_bombers_still_fight_an_actual_local_anti_air_threat() {
+    let (mut app, plane, target) = strike_aircraft_fixture("kirov");
+    for _ in 0..6000 {
+        step(&mut app);
+        if app
+            .world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .wave()
+            .contains(&plane)
+        {
+            break;
+        }
+    }
+    assert!(
+        app.world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .wave()
+            .contains(&plane)
+    );
+    while !app.world().resource::<SimTick>().0.is_multiple_of(10) {
+        step(&mut app);
+    }
+    // Kirov source speed4 cannot cross the Harrier fixture's six cells in160 ticks.
+    // Place this actual source AA threat one cell from the live bomber instead.
+    let entity = unit_entity(&mut app, plane);
+    let cell = app.world().get::<sim::Mobile>(entity).unwrap().cell;
+    let enemy = spawn_unit(
+        app.world_mut(),
+        PlayerId(1),
+        "flak_trooper",
+        CellPos::new(cell.x + 1, cell.y),
     )
     .unwrap();
     let mut fired = false;
@@ -4208,6 +4307,145 @@ fn ra8_air_strikes_wait_for_ground_to_clear_an_observed_outranging_aa_screen() {
     );
 }
 
+#[test]
+fn ra8_unlimited_ammo_bombers_wait_for_ground_to_clear_known_outranging_aa() {
+    let mut app = scenario("germany", "medium", 0, 0, false);
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    put(&mut app, "nuclear_reactor", 2, 2);
+    put(&mut app, "spy_satellite", 10, 2);
+    put(&mut app, "airforce_command", 2, 12);
+    let economic = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "soviet_barracks",
+        CellPos::new(30, 12),
+    )
+    .unwrap();
+    // Isolate protection/clearance from the economic target dying to ground splash first.
+    let economic_entity = unit_entity(&mut app, economic);
+    app.world_mut()
+        .get_mut::<sim::Health>(economic_entity)
+        .unwrap()
+        .hit_points = 1_000_000;
+    let aa = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "patriot",
+        CellPos::new(34, 14),
+    )
+    .unwrap();
+    sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "nuclear_reactor",
+        CellPos::new(34, 2),
+    )
+    .unwrap();
+    let ground: Vec<_> = [
+        ("prism_tank", 15, 15),
+        ("prism_tank", 16, 15),
+        ("grizzly", 15, 17),
+        ("grizzly", 16, 17),
+    ]
+    .into_iter()
+    .map(|(kind, x, y)| spawn_unit(app.world_mut(), PlayerId(0), kind, CellPos::new(x, y)).unwrap())
+    .collect();
+    let air: Vec<_> = [10, 12, 14]
+        .into_iter()
+        .map(|x| spawn_unit(app.world_mut(), PlayerId(0), "kirov", CellPos::new(x, 14)).unwrap())
+        .collect();
+    let (aa_footprint, aa_reach) = {
+        let defs = app.world().resource::<sim::Definitions>();
+        let bomber = defs.unit_kind("kirov").unwrap();
+        assert_eq!(
+            defs.metadata(sim::ProductionItem::Unit(bomber))
+                .unwrap()
+                .ammo,
+            0
+        );
+        let terms = defs
+            .building_combat(defs.building_kind("patriot").unwrap())
+            .unwrap();
+        let reach = terms
+            .weapons(false)
+            .into_iter()
+            .flatten()
+            .filter_map(|kind| defs.weapon(kind))
+            .filter(|weapon| weapon.anti_air)
+            .map(|weapon| weapon.range.saturating_add(terms.air_range_bonus))
+            .max()
+            .unwrap();
+        (
+            sim::Footprint {
+                origin: CellPos::new(34, 14),
+                width: 1,
+                height: 1,
+            },
+            reach.div_ceil(sim::SUBCELLS_PER_CELL as u32),
+        )
+    };
+    step(&mut app); // Real visibility and power before the decision.
+    app.world_mut().insert_resource(controllers);
+    let mut safe_wait = false;
+    let mut ground_focus = false;
+    let mut ground_hit = false;
+    let mut aircraft_released = false;
+    let mut screen_destroyed = false;
+    for _ in 0..12000 {
+        for event in step(&mut app) {
+            if let sim::SimEvent::BuildingDestroyed { building, .. } = event
+                && building == aa
+            {
+                screen_destroyed = true;
+            }
+            if let sim::SimEvent::WeaponFired {
+                attacker, target, ..
+            } = event
+            {
+                if ground.contains(&attacker) && target == aa {
+                    ground_hit = true;
+                }
+                if air.contains(&attacker) && target == economic {
+                    assert!(
+                        screen_destroyed,
+                        "strike aircraft attacked the economic building through its observed outranging AA screen"
+                    );
+                    aircraft_released = true;
+                }
+            }
+        }
+        for issued in app.world().resource::<CommandQueue>().iter() {
+            if let Command::Move { units, target } = &issued.command
+                && units.iter().any(|id| air.contains(id))
+            {
+                assert!(
+                    aa_footprint.distance_to_cell(*target) > aa_reach,
+                    "bomber wait must stay beyond the known source AA envelope: {target:?}"
+                );
+                safe_wait = true;
+            }
+        }
+        ground_focus |= app.world().resource::<CommandQueue>().iter().any(|issued|matches!(&issued.command,Command::Attack {units,target} if *target==aa && units.iter().any(|id|ground.contains(id))));
+        if screen_destroyed && ground_hit && aircraft_released {
+            break;
+        }
+    }
+    eprintln!(
+        "unlimited bombers safe wait {safe_wait}; AA screen destroyed {screen_destroyed}; eligible ground focus {ground_focus}/hit {ground_hit}; aircraft released {aircraft_released}"
+    );
+    if !ground_focus || !ground_hit || !aircraft_released {
+        dump_screen(&mut app);
+    }
+    assert!(
+        safe_wait && ground_focus && ground_hit,
+        "eligible ground units must clear the known AA, not let strike aircraft repeatedly pay for the same barrier"
+    );
+    assert!(
+        screen_destroyed && aircraft_released,
+        "air strikes resume actual combat after the observed barrier is gone"
+    );
+}
+
 fn distant_screen(blocked: bool) -> (App, Vec<sim::SimId>, Vec<sim::SimId>, sim::SimId) {
     distant_screen_options(blocked, false)
 }
@@ -4215,6 +4453,14 @@ fn distant_screen(blocked: bool) -> (App, Vec<sim::SimId>, Vec<sim::SimId>, sim:
 fn distant_screen_options(
     blocked: bool,
     superweapons: bool,
+) -> (App, Vec<sim::SimId>, Vec<sim::SimId>, sim::SimId) {
+    distant_screen_aircraft(blocked, superweapons, "harrier")
+}
+
+fn distant_screen_aircraft(
+    blocked: bool,
+    superweapons: bool,
+    aircraft: &str,
 ) -> (App, Vec<sim::SimId>, Vec<sim::SimId>, sim::SimId) {
     let mut app = scenario("germany", "medium", 0, 0, superweapons);
     let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
@@ -4278,7 +4524,7 @@ fn distant_screen_options(
     .collect();
     let air = [10, 12, 14]
         .into_iter()
-        .map(|x| spawn_unit(app.world_mut(), PlayerId(0), "harrier", CellPos::new(x, 14)).unwrap())
+        .map(|x| spawn_unit(app.world_mut(), PlayerId(0), aircraft, CellPos::new(x, 14)).unwrap())
         .collect();
     step(&mut app);
     app.world_mut().insert_resource(controllers);
@@ -4344,6 +4590,38 @@ fn dump_screen(app: &mut App) {
 #[test]
 fn ra8_an_unreachable_ground_screen_does_not_hold_strike_aircraft_forever() {
     let (mut app, ground, air, aa) = distant_screen(true);
+    let mut released = false;
+    let mut clearance_ordered = false;
+    for _ in 0..12000 {
+        step(&mut app);
+        clearance_ordered |=
+            app.world()
+                .resource::<CommandQueue>()
+                .iter()
+                .any(|issued| match &issued.command {
+                    Command::Attack { units, target } => {
+                        *target == aa && units.iter().any(|id| ground.contains(id))
+                    }
+                    Command::AttackMove { units, target } => {
+                        *target == CellPos::new(38, 14)
+                            && units.iter().any(|id| ground.contains(id))
+                    }
+                    _ => false,
+                });
+        released |= ordinary_air_raid_queued(&app, &air);
+        if released {
+            break;
+        }
+    }
+    assert!(
+        clearance_ordered && released,
+        "aircraft stayed held behind ground units separated from the screen by impassable terrain"
+    );
+}
+
+#[test]
+fn ra8_unlimited_ammo_bombers_resume_when_ground_cannot_reach_the_screen() {
+    let (mut app, ground, air, aa) = distant_screen_aircraft(true, false, "kirov");
     let mut released = false;
     let mut clearance_ordered = false;
     for _ in 0..12000 {
@@ -4741,8 +5019,8 @@ fn ordinary_air_raid_queued(app: &App, air: &[sim::SimId]) -> bool {
         })
 }
 
-fn forward_wait_fog_fixture() -> (App, Vec<sim::SimId>) {
-    let (mut app, _, air, _) = distant_screen(false);
+fn forward_wait_fog_fixture(aircraft: &str) -> (App, Vec<sim::SimId>) {
+    let (mut app, _, air, _) = distant_screen_aircraft(false, false, aircraft);
     let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
     spawn_unit(
         app.world_mut(),
@@ -4799,11 +5077,11 @@ fn first_forward_wait(app: &mut App, air: &[sim::SimId]) -> CellPos {
     panic!("fixture must establish an actual forward aircraft wait");
 }
 
-fn forward_wait_unknown_twin(building: bool) {
-    let (mut probe, air) = forward_wait_fog_fixture();
+fn forward_wait_unknown_twin(building: bool, aircraft: &str) {
+    let (mut probe, air) = forward_wait_fog_fixture(aircraft);
     let endpoint = first_forward_wait(&mut probe, &air);
-    let (mut actual, air) = forward_wait_fog_fixture();
-    let (mut control, control_air) = forward_wait_fog_fixture();
+    let (mut actual, air) = forward_wait_fog_fixture(aircraft);
+    let (mut control, control_air) = forward_wait_fog_fixture(aircraft);
     let vision = actual
         .world()
         .resource::<sim::Players>()
@@ -4841,12 +5119,22 @@ fn forward_wait_unknown_twin(building: bool) {
 
 #[test]
 fn ra8_an_unseen_air_unit_cannot_change_the_forward_wait_endpoint_or_commands() {
-    forward_wait_unknown_twin(false);
+    forward_wait_unknown_twin(false, "harrier");
 }
 
 #[test]
 fn ra8_an_unseen_new_building_cannot_change_the_forward_wait_endpoint_or_commands() {
-    forward_wait_unknown_twin(true);
+    forward_wait_unknown_twin(true, "harrier");
+}
+
+#[test]
+fn ra8_unseen_air_occupancy_cannot_change_unlimited_bomber_clearance_waits() {
+    forward_wait_unknown_twin(false, "kirov");
+}
+
+#[test]
+fn ra8_unseen_building_occupancy_cannot_change_unlimited_bomber_clearance_waits() {
+    forward_wait_unknown_twin(true, "kirov");
 }
 
 fn paid_then_unfunded_service_fixture() -> (App, sim::SimId, i32) {

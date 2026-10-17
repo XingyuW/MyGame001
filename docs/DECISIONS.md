@@ -7549,3 +7549,164 @@ Strict workspace/all-target Clippy passes0/5.822207s. All10 unchanged default De
 have explicit Won, exit0/86.064626s command (56.34s test), including RussiaEasy/LibyaEasy69633.
 These focused results validate the correction but do not transfer the historical retained-match,
 fullsim or m13 measurements; those must run again on this final source before checkpoint/full13.
+
+### R138 — Unlimited-ammo bombers share observed anti-air clearance
+
+**Concrete failure and refuted lead.** Final3 retained case15 on runtime54094f4 is the actual
+default LibertyBay IraqBrutal/AmericaBrutal seed0, None after its unchanged288000 limit
+(exit101/281.535182s command). The unchanged late replay is retained separately as
+attempt7-liberty-late-before1 (exit101/286.179051s, with diagnostic overhead). In240000–287999,
+real ore deliveries total42000/25500; P0 loses8 Kirovs and10 Rhinos while P1 repairs10128
+PatriotHP. No Kirov or Rhino fires on Patriot250/301 in that window; actual Nuke/Storm,
+Curtain and Chronosphere cycles continue. This is capable active attrition, not permission
+to liquidate or extend the horizon. Periodic real MoveOrder best/path and positions prove
+current original Kirovs2691/2719/2738 steadily approaching, e.g.2691 at43,43→76,76→109,109→
+142,142→176,176→209,209. The stale-approach hypothesis is refuted for these actors. No
+patience deadline is added to R133 founders. Observed job250 lower HP418 legitimately reset
+its history before this current cohort; replacement-only renewal is not established here.
+
+**Controlled old failure, then narrow capability correction.** Existing clearance admitted
+only airport_bound aircraft. Thus source Ammo0 Kirov could never receive the same known-AA
+ground-clearance/forward-safe-wait coordination, despite being an actual Air attacker whose
+short weapon is outranged by Patriot. New schedule test
+ra8_unlimited_ammo_bombers_wait_for_ground_to_clear_known_outranging_aa, using shipped source
+weapons and actual controller/vision/power, genuinely fails before runtime changes: the Kirov
+fires on the economic objective while the observed Patriot is still alive (before1 exit101/
+19.544509s; raw SHA ff16a146fc63383efcb1cf134cf5aaf38388928259446d01c590165a7205eeb2).
+The isolated economic target has declared large HP, as in the unchanged existing plane
+clearance test, to prevent incidental ground splash from ending the observation early.
+
+Admit fighting Air-domain wave members to this existing clearance policy. All actual opposing
+weapon/warhead eligibility, source range comparison, stable known target, eligible ground,
+core failure bound, per-job progress/patience and known-safe endpoint checks remain unchanged.
+Source Ammo0 means unlimited, so only positive-ammo actors with zero remaining ammunition
+retain the existing empty-plane return/reload exception. There is no new policy constant,
+state, hash field, source balance, timer or public command. The separate airport-bound direct
+focus subset and original mixed surface/artillery policy are unchanged. Endpoint safety is
+still the guarantee; this introduces no global route-avoidance claim.
+
+The candidate requires actual ground focus/fire/destruction, source-derived safe Move endpoints,
+then a real Kirov shot at the economic objective after AA destruction, with source Ammo0
+asserted explicitly. It passes after1. Add actual unreachable-ground release and both unseen
+Air-unit/new-building occupancy twins for Kirov; parameterized fixture helpers preserve the
+original Harrier calls/assertions. All72 ra8_ai scenarios pass0/57.860190s command (53.10s tests),
+including unchanged reinforcement/no-progress, healthy slow progress, reload, hidden knowledge,
+local threats, strategic support and mixed artillery controls. No existing expectation, timing,
+limit or assertion is migrated. Exact ending credit remains separate until its replay exits;
+all final-source default/retained/fullsim/game/m13/budget and all13 validation remain required.
+
+Exact R138-only Liberty replay still reaches None288000 (exit101/272.877747s command,
+242.81s test; raw SHA4b0e8a0876aba7b2195e777f41186b3acfee9e77a7f4d6d57ff1d43f5dfce981).
+The new admission does activate: P0 job250 records remaining20/distance9/HP300/last_progress33190
+by60000, unchanged through240000. Its existing bound correctly releases the aircraft; this
+is not an indefinite hold or justification for dropping the core failure gate. Preserve the
+separate controlled capability credit and open ending. An unchanged R138-only diagnostic
+replay (247.740137s, raw SHA2da1c0b611ac9b6f2f30eb6c84b2f70db3c2136966f132a62a892f33b2802f29)
+shows only2 Kirov building shots (Chronosphere, first60000), against repeated GI/Grizzly/Miner/
+Prism/Mirage acquisitions. Last48000 has ZERO Kirov shots and only1 loss, so late distraction
+is not claimed from that window. Actual all-window firing supports a separate controlled
+job-ownership investigation rather than assuming the clearance correction solved the ending.
+
+### R139 — Actual air building attackers retain focused jobs through harmless ground traffic
+
+**Property, not single-unit stall claim.** R138-only history includes Kirov acquisitions of
+visible ground-only actors unable to damage an Air target, while direct strike-job ownership
+still admits only airport_bound types. New actual-schedule source-health control
+ra8_unlimited_bomber_focus_ignores_an_incapable_en_route_ground_unit declares one ordinary
+GI on the approach to an observed PowerPlant. The genuine before2 first shot targets GI8,
+which dies, and the PowerPlant6 also eventually dies; this proves irrelevant acquisition,
+not a single-GI ending stall. Expected building-first shot and preserved GI fail as intended
+(exit101/4.738786s, raw SHAa8acb701d44c301c470ef6220e708370a9dc094f018ad22a89846294543c0eaa).
+The first new-test probe instead unwrapped the already-dead GI while observing it, so is
+retained as an insufficient fixture failure. Corrected observation safely searches live
+Health/SimId; no runtime change preceded the genuine negative. No actor's source maximum
+health, speed, weapon or damage is changed in this control.
+
+Generalize the focused subset to actual Air-domain fighting wave members whose source weapon
+and warhead can damage this real known building's traits. Preserve the existing matching
+Attack/chase ownership, actual local eligible hostile-unit handoff, service/ammo/lifecycle
+availability and all source/public launch rules. The surface part retains its old global
+armed-enemy/standoff logic; this is not a whole-wave predicate, timer, failure bypass or new
+balance knob. Ineligible air units do not receive an invalid building Attack. Existing source
+traits include building/armor/wall/bombable and immunity classifications. No persistent state,
+hash field, public command or data schema is added.
+
+After1 passes the genuine focus control but the NEW Kirov Flak control copied the Harrier's
+six-cell travel geometry and160-tick bound: source speed4 cannot cover the five cells needed
+to reach its one-cell bomb range in that time. Preserve that failed raw probe. Correct only
+this new fixture to place actual Flak one cell from the bomber's live position, retaining
+160 and every assertion; the existing Harrier control is unchanged. After2 passes both real
+building destruction with GI alive and actual local-Flak firing. Complete AI/mixed-artillery,
+clearance/release/fog/reload controls and exact Liberty ending remain separately required.
+
+All74 ra8_ai scenarios pass0/53.075906s command (52.99s test), including the unchanged mixed
+Rhino/V3/Kirov line, real Harrier ammo/dock/reload, local-threat/chase ownership, both Air
+occupancy twins, no-progress/reinforcement release, source slow approach and strategic support.
+Strict workspace/all-target Clippy passes0/5.998424s. The exact default Liberty retry remains
+separate and pending at this record point; no ending or full acceptance claim follows from
+these focused properties.
+
+Exact R139 Liberty remains None288000, exit101/329.067642s command (299.84s test), raw
+SHA41db94d4a24008acadff0d5368e6e39a2a035a564f510bd269c441a52b4ccd25. The building-first
+property is validated separately; no ending credit is assigned. Final P0 has274credits,
+7 miners,4 Kirovs and a24-member mixed wave; P1 has471credits,5 miners,4 Harriers and paid
+production. Actual capable travel and combat remain. R140 addresses the separately reproduced
+candidate-selection starvation; no liquidation, cadence, source damage or horizon changes.
+
+### R140 — Expired anti-air candidates cannot starve another observed clearance job
+
+**Exact lead and actual scheduled negative.** In the R139 Liberty final state, Kirovs attack
+new Patriot2719 at216,220 while ground core targets Prism2550 at221,212. Sole old AA history250
+has remaining0/distance2/HP300/last_progress225020. Selection minimizes the barrier first and
+then returns on that old history's expiry, preventing evaluation of other valid observed jobs.
+New private schedule regression ra8_an_expired_aa_job_cannot_starve_a_fresh_observed_barrier
+uses actual source GI/Kirov weapons and normal external Move orders to stop the first selected
+team's real progress. It waits the unchanged controller patience, then introduces an observed
+second Patriot and fresh ordinary GI recruits. No controller state, target HP or clock is seeded.
+Old behavior selects no fresh job, assigns none of its recruits and supplies no assigned shot;
+it routes recruits back to the first job until genuine new HP damage886 reopens it at9560.
+Before2 fails the intended starvation property (exit101/16.659244s, raw
+SHAc0fae974a5701cddce9e084ffd55bb53377f0c5adff31c6adf241d37e9959545).
+Before1 had compared unchanged history first despite this GENUINE HP improvement, so retain it
+as an insufficient assertion diagnosis, not evidence that damage must not reopen a job.
+
+Extract the identical source-weapon approach calculation. Before choosing the minimum barrier,
+project ONLY an EXISTING job's progress in a local value copy using actual observed approach,
+distance and HP; exclude it if it would still be expired. Never create/update persistent history
+for an unselected candidate. A genuine improvement can still reopen the old candidate. New
+jobs get their ordinary history only after actual selection. Existing patience, core failure
+filter, deterministic rank, source weapon eligibility, honest vision, commands and state hash
+fields are unchanged; no failure map is cleared, no deadline extended, and no new tuning exists.
+
+Strengthen the positive beyond observing a fresh history: actual AI clearance must assign fresh
+recruits and they must subsequently fire on that second Patriot, leaving the expired first
+history byte-equal. Then an ordinary newly introduced GI plus public Attack produces real first
+Patriot damage and requires its old job to reopen. After2 passes (16.682256s command). A bounded
+negative removes ONLY the new read-only preselection guard against the identical strengthened
+test: before3 exits101 at the same starvation property, selected/assigned/fired allfalse, raw
+SHA0bbfea4ad27c54d100a94666578e6afe9e76432b52ceed66fed221a335a8abbf. Immediate finally-block
+restoration and a separate SHA read verify exact strategy source
+before/restored a8fbfc44e95073851fcf97bbbd57ed6607c20382d5c0fe4e8e74e25b267a5418;
+mutated fbf0cf580327af5d7f0cda04307f16127fda08e0c3f2a513a7189d15889d9fe6.
+No subsequent test/commit ran before the restoration was checked. All original single-barrier,
+slow-progress, no-progress/reinforcement, hidden-world and mixed-artillery controls and exact
+Liberty/default ending checks remain required separately.
+
+After verified restoration, all9 private scheduled attrition lifecycle tests pass0/18.081127s
+command, all74 ra8_ai scenarios pass0/71.221138s, and strict workspace/all-target Clippy
+passes0/6.007762s. The exact Liberty replay and then default10 remain separate; source freeze
+and all earlier failure/raw evidence are retained.
+
+Exact default LibertyBay IraqBrutal/AmericaBrutal seed0 now has explicit P0Won150265 under
+its UNCHANGED288000 limit, exit0/248.038413s command (218.82s test), raw
+SHA91b0964292fe75e296906d3066dae489bdf17a09bd4d55eac59684125c0ee76b. This final candidate
+has source a8fbfc44e95073851fcf97bbbd57ed6607c20382d5c0fe4e8e74e25b267a5418. Actual multiple
+selected barrier histories exercise the corrected selection in the exact game. This ending
+credit follows R140's integration, separately from the R138/R139 capability proofs and their
+failed exact replays. Default10 and final retained26/fullsim/game/m13/budget/all13 validation
+remain required; no independent review is claimed.
+
+All10 default Demo pairings retain explicit Won under72000, exit0/60.839917s command (57.08s
+test), raw SHA8283b48c9c526ed9b9e77212364b231193b1dc49ee1e89171083ad16805bab02. RussiaEasy/
+LibyaEasy remains69633. These results permit the coherent source commit and final-source
+preflight; all earlier exact failures and negative probes remain retained unchanged.
