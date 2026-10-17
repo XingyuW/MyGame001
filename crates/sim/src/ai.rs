@@ -195,7 +195,23 @@ pub struct AiController {
     next_naval_scan: u64,
     /// Progress of each observed AA clearance job; reinforcements do not renew a failed hold.
     air_screens: BTreeMap<SimId, AirScreenProgress>,
+    /// Observed attack attempts; replacement IDs do not erase a repaired job's history.
+    building_jobs: BTreeMap<SimId, BuildingJobProgress>,
 }
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct BuildingJobProgress {
+    hp: i32,
+    failures: u8,
+    /// Outstanding owned attackers and their ammunition at admission (zero for non-aircraft).
+    actors: BTreeMap<SimId, u32>,
+    founders: BTreeSet<SimId>,
+    approaching: bool,
+}
+
+#[cfg(test)]
+#[path = "ai/ra8_attrition_tests.rs"]
+mod ra8_attrition_tests;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct AirScreenProgress {
@@ -359,6 +375,7 @@ impl AiController {
             naval_site: None,
             next_naval_scan: 0,
             air_screens: BTreeMap::new(),
+            building_jobs: BTreeMap::new(),
             difficulty,
         })
     }
@@ -496,6 +513,22 @@ impl AiController {
             hasher.write_u32(progress.distance);
             hasher.write_u32(progress.hp as u32);
             hasher.write_u64(progress.last_progress);
+        }
+        hasher.write_u64(self.building_jobs.len() as u64);
+        for (id, progress) in &self.building_jobs {
+            hasher.write_u32(id.0);
+            hasher.write(&progress.hp.to_le_bytes());
+            hasher.write(&[progress.failures]);
+            hasher.write_u64(progress.actors.len() as u64);
+            for (actor, ammo) in &progress.actors {
+                hasher.write_u32(actor.0);
+                hasher.write_u32(*ammo);
+            }
+            hasher.write_u64(progress.founders.len() as u64);
+            for actor in &progress.founders {
+                hasher.write_u32(actor.0);
+            }
+            hasher.write(&[u8::from(progress.approaching)]);
         }
         hasher.write_u64(self.observed_units.len() as u64);
         for (id, cell) in &self.observed_units {
@@ -1224,6 +1257,7 @@ pub(crate) fn run_ai(
             Command::Interact { unit, target } => Some((*unit, *target)),
             _ => None,
         });
+        strategy::observe_attack_jobs(&view, controller, &special);
         commands.extend(think(&view, controller));
         let extra = strategy::decide(&view, controller, &special, &props);
         // A unit assigned a specialist job receives only that job this turn.
@@ -1238,6 +1272,9 @@ pub(crate) fn run_ai(
         commands.retain(|c| !matches!(c, Command::Move { units, .. } | Command::AttackMove { units, .. } | Command::Attack { units, .. } if units.is_empty()));
         commands.extend(extra);
         commands.truncate(32);
+        for command in &commands {
+            strategy::record_attack_job(&view, controller, &special, command);
+        }
         controller.issued = controller.issued.saturating_add(commands.len() as u64);
         for command in commands {
             let mut witness = crate::command::AiIntent::default();
@@ -1521,6 +1558,7 @@ fn remember(view: &View<'_>, controller: &mut AiController) {
     for id in gone {
         controller.known.remove(&id);
         controller.air_screens.remove(&id);
+        controller.building_jobs.remove(&id);
         controller.failures.remove(&id);
     }
     controller.seen_air |= view
@@ -2670,7 +2708,9 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
         }
     }
     let valid = match controller.target {
-        Some(WaveTarget::Building(id)) => controller.known.contains_key(&id),
+        Some(WaveTarget::Building(id)) => {
+            controller.known.contains_key(&id) && strategy::attack_job_eligible(controller, id)
+        }
         // Scouting completes on actual observation. Slow aircraft or a crowded formation
         // need not all become idle at a cell that the player has already inspected.
         // A known building remains an attack objective until it is gone or unreachable.
@@ -2818,6 +2858,7 @@ fn choose_target_with_sweep(
         .known
         .iter()
         .filter(|(id, _)| controller.failures.get(id).copied().unwrap_or(0) < MAX_TARGET_FAILURES)
+        .filter(|(id, _)| strategy::attack_job_eligible(controller, **id))
         .min_by_key(|(id, known)| (known.footprint.distance_to_cell(from), **id))
         .map(|(id, _)| WaveTarget::Building(*id));
     if building.is_some() {
@@ -3340,6 +3381,7 @@ mod tests {
             naval_site: None,
             next_naval_scan: 0,
             air_screens: BTreeMap::new(),
+            building_jobs: BTreeMap::new(),
         };
         let hash = |c: &AiController| {
             let mut h = Fnv1a64::new();
