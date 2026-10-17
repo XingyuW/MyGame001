@@ -7315,3 +7315,131 @@ Final focused batch: all8 dedicated progress tests pass (command17.488481s), the
 RA8controller target passes68/68 (69.163152s including compilation; test50.82s), and strict
 workspace/all-target Clippy exits0/6.356562s. Format exits0. These overlapping focused
 checks do not replace the required final-source fullsim/game/retained25/m13/budget/full13.
+
+### R134 — Reserve finite production funds and recover unfinished construction through commands
+
+**Concrete source and limits.** After R133's three exact winners, the unchanged default Demo
+RussiaEasy/LibyaEasy seed0 still reaches72000 without a winner. The corrected late-before2
+trace (the first probe omitted its economy-trace flag and supplies snapshots only) shows no
+harvester/refinery/income, cash0, and P0's unfinished BattleLab holding1679 paid credits while
+legal combat queues cannot advance. Later ordinary sales finance real travelling troops; their
+next wave follows the source4667 cadence. This supports refunding genuinely stranded finite
+construction funds, not shortening that cadence, liquidating capable actors, or raising limits.
+All failed default/trace candidates remain distinct from capability proof.
+
+For shipped strategy without actual recoverable income, sum source remaining costs over every
+legal queued unit FIFO entry. Ordinary CancelProduction may recover an incomplete charged
+building HEAD when current cash cannot fund those real unit obligations. Completed heads,
+power production, ore-processing/refinery and cash-income buildings remain protected. No queue,
+credit or simulation state is mutated directly. Prospective construction reserves the whole
+unit FIFO and the cheapest legal source army item; merely prospective army demand cannot cause
+cancellation. Both construction lanes share the finite admission budget. Ordinary actual
+low-power recovery can fund an affordable source Power building even when future unit tails
+would otherwise reserve its credits; optional expansion while already powered has no exemption.
+
+Ordinary unit admission also reserves all existing production costs and source costs of earlier
+same-turn admissions. A final read-only command-FIFO accounting pass applies exact public
+last-matching cancellation refunds and preceding QueueProduction commitments before admitting
+another internal unit intent. This includes specialist production appended by strategy. Public
+validation, charged credits, actual production/placement and FIFO processing remain unchanged.
+The accounting is ephemeral derived planning, not new persistent/hash state. The existing32
+command bound is named MAX_AI_COMMANDS and still enforced after all planning.
+
+**Scheduled evidence.** ai/ra8_recovery_tests.rs uses actual source production, captures,
+refunds, placements and spawned units. A normal1600-paid incomplete TechCenter plus a starved
+Grizzly head yields exactly one1600 refund, paid Grizzly completion, no TechCenter requeue and
+100 remaining credits. Active captured Oil, an incomplete Refinery and a completed paid building
+retain normal work. Actual low-power production advances5/8ticks before an ordinary source
+PowerPlant placement and10/8ticks afterward, with real post-placement debit; this proves
+restored production rate, not an absolute initial halt. The latest complete-unit admission
+accounting changes that measured debit from20 to10 without changing the source rate assertion.
+
+Preserved new-fixture/candidate failures: initial Airfield supplied an unrelated legal aircraft
+lane, so refund1200 financed infantry/armor/aircraft rather than the claimed tank. The corrected
+captured Soviet Radar supplies RADAR without that air lane; declared budget1600 supports the
+unchanged paid-tank assertion. Initial head-only reservation missed real unit tails and financed
+unnecessary Power; whole-FIFO reservation fixes it. A first2000-budget Power probe assumed600
+but actual Allied Power costs800; source-derived2500 cash with1800 unit commitments leaves700
+reserved-budget room yet genuinely attainable800 Power. The initial report's 'no paid tank'
+was corrected: its counter was paid tank AFTER Power, not all tank production.
+
+Bounded negatives immediately restored exact source bytes before any later test: construction
+before3 uses matching old588f6de AI plus only the private test-module inclusion and restores
+SHA006341889b2d8462e96e3f613f39533862bcfa38d278a6d68b14f28937f9b1c2;
+power-before2 disables only the recovery exception and restores
+SHA451fa1f62725e33bd81be487252ec777288b4c8ec64f8d0818daad78f827a719.
+Raw JSON includes probe/restored hashes and failed logs. One exact-context patch rejection made
+no partial mutation and prevented its following negative command from running; smaller patches
+then succeeded. No old assertion, timing, fixture or public command contract changed.
+
+### R135 — Reallocate unaffordable army debt with exact finite-fund FIFO reservations
+
+**Independent remaining evidence.** R134's positive construction controls do not establish a
+Demo ending. Later exact traces show construction empty and real units firing/approaching,
+but cash0 and unaffordable paid unit heads: P0TeslaTrooper159/TeslaTank272 and P1Dog93/
+DemoTruck843. A later candidate reaches72000 with only P0Barracks489HP/cash33 and five real
+P1Conscripts approaching/firing, both queues empty. Its recent real casualty/last-stand timestamp
+71960 does not justify premature liquidation. All these failures and changed trajectories stay
+retained; no source cadence, patience, signature or horizon changes are made.
+
+**Policy assumption and safety.** In a no-income shipped plan, ordinary cancellation can replace
+an incomplete unaffordable army head only with a strictly cheaper, normally queueable finisher
+that can actually damage a currently observed real hostile building. Static bounded terrain
+reach and actual source weapon/warhead/armor eligibility derive from the existing defense-reach
+path; future units receive no fictional current-position AirRangeBonus. Dynamic occupants and
+unseen building footprints do not become a planning oracle. Actual normal production and
+movement retain physical safety. Existing current-position bonus fire/plain-range chase behavior
+is unchanged and has its original scheduled positive tests.
+
+Choose the largest source-cost eligible alternative that the finite budget can fully fund.
+This deliberately invests finite source credits; it is NOT a claim that cost ranks DPS or
+strength. No guessed DPS/armor/burst weight or new balance constant is introduced. Incomplete
+unaffordable FIFOs may drop unpaid ordinary army tails. Cancel eligible paid heads in descending
+actual paid-refund order only until current cash+refund covers ALL retained production remaining
+costs plus the new unit. Completed heads protect their whole FIFO. Harvesters, Engineer, Spy,
+MCV, transports, repair service and Dogs are protected; protecting every Dog includes the R91
+unseen-loss detector obligation. Known unresolved bridge-repair demand conservatively prevents
+this reallocation. Commands remain bounded; last-matching duplicate tails cancel before their
+paid head, exact charged refunds are reserved against all subsequent same-turn admissions,
+and no direct queue mutation/cancel-requeue loop is used. All-candidate failure retains existing
+work and real capabilities rather than fabricating a loss.
+
+**Controlled before/after and preserved failures.** A real350 budget funds Tanya175 and
+TankDestroyer175 heads, followed by public unpaid duplicate Destroyer tails and a GI tail.
+Without unit recovery no refund, recruit or finishing shot occurs. Recovery refunds each unpaid
+tail0 then actual paid heads175+175, produces a normal paid GI and records a real building shot.
+The exact new-test refund assertion reflects canonical all-zero-tails-before-paid-head order.
+A completed paid TankDestroyer with a duplicate tail is never cancelled: declared water moat
+leaves one amphibious-held land exit; after the controller observes it, ordinary Move frees the
+exit and normal production spawns the paid head. The first ring-only crowd fixture legitimately
+spawned farther away because normal exit search explores24 steps; that failed raw log is kept.
+
+Aggregate proof declares1600 cash, then normal source payment leaves6 cash, Tanya839 paid and
+Destroyer755 paid. The old cheapest/whole-FIFO candidate refunds all1594, discards the nearly
+paid armor and fails the Grizzly-shot assertion. The first revised candidate still cancels both
+heads (retained after1 failure); stopping cancellation once fully financed preserves the755-paid
+Destroyer, funds its remaining145 plus a source700 Grizzly from839 refund+6cash, and records an
+actual paid Grizzly spawn and enemy-building shot. Before1/before2 erroneously expected all1600
+paid; source payment quanta leave6 and the corrected source-cost conservation includes that cash.
+The new observation window5000 permits ordinary source production, assembly, travel and real
+shot; the initial3000 window saw the recruit but not a shot. No existing limit/assertion changed.
+Actual captured income, harvester queues and a declared terrain-isolated target preserve their
+heads. The detector control declares remembered unseen loss with no living detector and retains
+its real partially paid Dog and duplicate tails. Earlier failures, compilation/format logs and
+all subsequent final-source evidence remain under ra8-preflight/attempt7-construction-*.
+
+The detector control's first new setup put Tanya and Dog in the same Infantry FIFO, so its
+assertion that BOTH heads had paid failed before the protection observation. Corrected declared
+setup uses Dog/Destroyer in distinct ordinary Infantry/Armor lanes; all7 financial tests pass,
+including required detector retention. Public ra1_commands passes in full and strict workspace/
+all-target Clippy exits0. The defense shore-shot/isolation and current-position source AirRangeBonus
+regressions also pass unchanged after the behavior-preserving shared reach extraction. Future
+finisher recovery is conservatively restricted to source Land/Amphibious production. These
+focused capability/security results do not replace final-source match endings or full acceptance.
+
+Final scoped batch:7 recovery tests pass (17.180351s command),22 public ra1_commands tests pass
+(1.722441s), strict workspace/all-target Clippy exits0 (6.535753s). The unchanged default10 Demo
+pairings all finish with explicit Won and no ordinary rejection failure (85.960576s command,
+56.63s test). The exact previously failing RussiaEasy/LibyaEasy seed0 now yields P1Won69633
+within72000. This is separate ending evidence after controlled financial proofs; the full26
+retained matches, final-source fullsim/game/m13/budget and frozen full13 remain required.

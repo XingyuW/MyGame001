@@ -1062,7 +1062,7 @@ fn air_wait_cell(
         .or_else(|| available(controller.gather).then_some(controller.gather))
 }
 
-fn service_income(view: &View<'_>) -> bool {
+pub(super) fn service_income(view: &View<'_>) -> bool {
     let refinery = view.own_kinds.iter().any(|&kind| {
         view.definitions
             .building(kind)
@@ -1217,7 +1217,50 @@ fn local_wave_threat(view: &View<'_>, unit: &UnitSnap) -> bool {
 /// reach a firing position through public terrain. Occupancy is deliberately absent:
 /// ordinary Attack handles traffic and the physical, bounded chase at application.
 pub(super) fn defence_reachable(view: &View<'_>, unit: &UnitSnap, target: SimId) -> bool {
-    let Some(terms) = view.definitions.unit_combat(unit.kind) else {
+    weapon_reachable(
+        view,
+        unit.kind,
+        unit.mobile.cell,
+        Some(unit.mobile.position(view.grid, unit.id)),
+        view.grid.is_on_foot(unit.id),
+        target,
+    )
+}
+
+// Future production has no current-position bonus shot or registered occupant.
+// Only public terrain and currently observed real building targets justify recovery.
+pub(super) fn production_finisher(view: &View<'_>, kind: UnitKind) -> bool {
+    if !matches!(
+        view.definitions.domain(kind),
+        Domain::Land | Domain::Amphibious
+    ) {
+        return false;
+    }
+    view.own_buildings
+        .iter()
+        .filter(|b| produces(view.definitions, b.kind, ProductionItem::Unit(kind)))
+        .flat_map(|b| b.footprint.ring())
+        .filter(|&cell| {
+            view.grid.cell(cell).is_some_and(|c| {
+                c.passable || (view.definitions.domain(kind) == Domain::Amphibious && c.water)
+            })
+        })
+        .any(|cell| {
+            view.enemy_buildings.iter().filter(|b| b.economy).any(|b| {
+                weapon_reachable(view, kind, cell, None, view.definitions.on_foot(kind), b.id)
+            })
+        })
+}
+
+fn weapon_reachable(
+    view: &View<'_>,
+    kind: UnitKind,
+    from: CellPos,
+    current: Option<crate::SubPos>,
+    on_foot: bool,
+    target: SimId,
+) -> bool {
+    let Some(terms) = view.definitions.unit_combat(kind) else {
         return false;
     };
     let target = if let Some(enemy) = view.enemy_units.iter().find(|u| u.id == target) {
@@ -1281,13 +1324,12 @@ pub(super) fn defence_reachable(view: &View<'_>, unit: &UnitSnap, target: SimId)
         } else {
             0
         });
-    if fires_from(unit.mobile.position(view.grid, unit.id), shot_range) {
+    if current.is_some_and(|point| fires_from(point, shot_range)) {
         return true;
     }
     let covers = |point| fires_from(point, weapon.range);
-    let on_foot = view.grid.is_on_foot(unit.id);
-    let mut seen = BTreeSet::from([unit.mobile.cell]);
-    let mut open = VecDeque::from([unit.mobile.cell]);
+    let mut seen = BTreeSet::from([from]);
+    let mut open = VecDeque::from([from]);
     while let Some(cell) = open.pop_front() {
         if if on_foot {
             (0..crate::SPOTS_PER_CELL as u8).all(|spot| covers(crate::SubPos::spot_of(cell, spot)))
@@ -1301,7 +1343,7 @@ pub(super) fn defence_reachable(view: &View<'_>, unit: &UnitSnap, target: SimId)
             let terrain =
                 view.grid
                     .cell(next)
-                    .is_some_and(|cell| match view.definitions.domain(unit.kind) {
+                    .is_some_and(|cell| match view.definitions.domain(kind) {
                         Domain::Land => cell.passable,
                         Domain::Naval => cell.water,
                         Domain::Amphibious => cell.passable || cell.water,
