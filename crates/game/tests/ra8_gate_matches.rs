@@ -399,6 +399,7 @@ fn run_case_to(
         );
     }
     if std::env::var_os("RA8_GATE7_SERVICE_TRACE").is_some()
+        || std::env::var_os("RA8_STRATEGIC_TRACE_FROM").is_some()
         || (map_id == "steel_harbor" && countries == ["america", "cuba"])
         || (map_id == "thousand_lakes" && countries == ["great_britain", "america"])
     {
@@ -512,6 +513,26 @@ fn run_case_to(
 
 fn trace_lifecycle(world: &mut bevy::ecs::world::World, stage: &str) {
     let tick = world.resource::<sim::SimTick>().0;
+    if let Some(from) = std::env::var("RA8_STRATEGIC_TRACE_FROM")
+        .ok()
+        .and_then(|value| value.parse::<u64>().ok())
+        && (from..=from.saturating_add(3)).contains(&tick)
+    {
+        eprintln!(
+            "strategic lifecycle {stage} tick{tick} queue{:?}",
+            world.resource::<CommandQueue>()
+        );
+        for player in [PlayerId(0), PlayerId(1)] {
+            let state = world.resource::<sim::Players>().get(player).unwrap();
+            eprintln!(
+                "strategic power {player:?} produced{} consumed{} low{}",
+                state.power_produced(),
+                state.power_consumed(),
+                state.low_power()
+            );
+        }
+        dump(world);
+    }
     if std::env::var_os("RA8_GATE7_SERVICE_TRACE").is_some() && (21275..=21285).contains(&tick) {
         eprintln!("service lifecycle {stage} tick{tick}");
         dump(world);

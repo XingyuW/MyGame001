@@ -413,7 +413,9 @@ mod repair;
 mod resolve;
 mod state;
 pub(crate) mod superweapons;
-pub(crate) use superweapons::{strategic_intent_erasure_only, strategic_intent_valid};
+pub(crate) use superweapons::{
+    strategic_intent_erasure_only, strategic_intent_power_only, strategic_intent_valid,
+};
 mod transport;
 pub(crate) mod vehicles;
 

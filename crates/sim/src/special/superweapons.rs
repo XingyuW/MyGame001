@@ -88,6 +88,7 @@ fn validate_launch(
     target: CellPos,
     source: Option<CellPos>,
     check_visibility: bool,
+    check_power: bool,
 ) -> Result<(), RejectReason> {
     let player = a.owner;
     let id = a.id;
@@ -112,7 +113,7 @@ fn validate_launch(
             return Err(unavailable("Strategic target must be visible"));
         }
     }
-    if !charges(world, defs, a)
+    if (check_power && !charges(world, defs, a))
         || world
             .resource::<SpecialState>()
             .charge
@@ -149,13 +150,19 @@ pub(crate) fn strategic_intent_valid(
     issued: &IssuedCommand,
     check_visibility: bool,
 ) -> bool {
-    check_strategic_intent(world, issued, check_visibility, false)
+    check_strategic_intent(world, issued, check_visibility, false, false)
 }
 
 /// Revalidate every current requirement except a newly erased source actor. This
 /// read-only counterfactual is used only after a fully valid decision certificate.
 pub(crate) fn strategic_intent_erasure_only(world: &mut World, issued: &IssuedCommand) -> bool {
-    check_strategic_intent(world, issued, true, true)
+    check_strategic_intent(world, issued, true, true, false)
+}
+
+/// Complete current validation except an actual powered-source outage. Charge,
+/// actor, target, type, arguments and global strategic conflicts remain required.
+pub(crate) fn strategic_intent_power_only(world: &mut World, issued: &IssuedCommand) -> bool {
+    check_strategic_intent(world, issued, true, false, true)
 }
 
 fn check_strategic_intent(
@@ -163,6 +170,7 @@ fn check_strategic_intent(
     issued: &IssuedCommand,
     check_visibility: bool,
     erasure_only: bool,
+    power_only: bool,
 ) -> bool {
     let (id, target, source) = match &issued.command {
         Command::Superweapon {
@@ -187,6 +195,15 @@ fn check_strategic_intent(
     }
     own(world, defs, &index, issued.player, id)
         .and_then(|a| {
+            if power_only
+                && (!world
+                    .resource::<Players>()
+                    .get(a.owner)
+                    .is_some_and(|p| p.low_power())
+                    || !defs.metadata(a.item).is_some_and(|m| m.is_powered))
+            {
+                return Err(unavailable("Source has no power outage"));
+            }
             if erasure_only {
                 if !world.resource::<SpecialState>().erasures.contains_key(&id) {
                     return Err(unavailable("Target is not being erased"));
@@ -195,7 +212,15 @@ fn check_strategic_intent(
             } else {
                 commandable(world, id)?;
             }
-            validate_launch(world, defs, a, target, source, check_visibility)
+            validate_launch(
+                world,
+                defs,
+                a,
+                target,
+                source,
+                check_visibility,
+                !power_only,
+            )
         })
         .is_ok()
 }
@@ -211,7 +236,7 @@ pub(super) fn launch(
     let index = living(world);
     let a = own(world, &defs, &index, player, id)?;
     commandable(world, id)?;
-    validate_launch(world, &defs, a, target, source, true)?;
+    validate_launch(world, &defs, a, target, source, true, true)?;
     let m = defs
         .metadata(a.item)
         .ok_or(unavailable("No strategic ability"))?;

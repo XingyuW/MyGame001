@@ -1487,3 +1487,365 @@ fn ra8_strategic_visibility_certificate_is_value_hashed_and_never_certifies_hidd
         .strategic_valid = true;
     assert_ne!(before, crate::state_hash(app.world_mut()));
 }
+
+#[test]
+fn ra8_certified_strategic_intent_waits_after_real_between_stage_power_plant_destruction() {
+    use bevy_ecs::schedule::IntoScheduleConfigs;
+    let mut app = app();
+    let source = crate::spawn_building(
+        app.world_mut(),
+        PlayerId(0),
+        "weather_control",
+        CellPos::new(10, 14),
+    )
+    .unwrap();
+    crate::spawn_building(
+        app.world_mut(),
+        PlayerId(0),
+        "power_plant",
+        CellPos::new(2, 14),
+    )
+    .unwrap();
+    let plant = crate::spawn_building(
+        app.world_mut(),
+        PlayerId(0),
+        "power_plant",
+        CellPos::new(5, 14),
+    )
+    .unwrap();
+    crate::spawn_building(
+        app.world_mut(),
+        PlayerId(0),
+        "prism_tower",
+        CellPos::new(25, 4),
+    )
+    .unwrap();
+    let attacker = unit(&mut app, 1, "tesla_tank", 5, 17);
+    tick(&mut app); // Actual source initialization and ordinary attacker sight.
+    let cooldown = app
+        .world()
+        .resource::<Definitions>()
+        .metadata(ProductionItem::Building(
+            app.world()
+                .resource::<Definitions>()
+                .building_kind("weather_control")
+                .unwrap(),
+        ))
+        .unwrap()
+        .cooldown;
+    app.world_mut()
+        .resource_mut::<crate::SpecialState>()
+        .charge
+        .insert(source, cooldown);
+    let plant_entity = entity(&mut app, plant);
+    app.world_mut()
+        .get_mut::<Health>(plant_entity)
+        .unwrap()
+        .hit_points = 1;
+    let attacker_entity = entity(&mut app, attacker);
+    app.world_mut()
+        .get_mut::<crate::Weapon>(attacker_entity)
+        .unwrap()
+        .cooldown = 0;
+    app.world_mut()
+        .resource_mut::<CommandQueue>()
+        .push(IssuedCommand {
+            player: PlayerId(1),
+            command: Command::Attack {
+                units: vec![attacker],
+                target: plant,
+            },
+        });
+    let decision_tick = app.world().resource::<SimTick>().0;
+    app.add_systems(
+        SimSchedule,
+        (move |world: &mut World| {
+            if world.resource::<SimTick>().0 != decision_tick {
+                return;
+            }
+            world.resource_mut::<CommandQueue>().push_ai(
+                IssuedCommand {
+                    player: PlayerId(0),
+                    command: Command::Superweapon {
+                        building: source,
+                        // A genuinely observed legal cell isolates readiness; no
+                        // target knowledge is injected into the certificate.
+                        target: CellPos::new(8, 8),
+                        units: Vec::new(),
+                    },
+                },
+                AiIntent::default(),
+            );
+            certify_ai_strategic_intents(world);
+        })
+        .in_set(crate::SimSet::Ai)
+        .after(crate::SimCoreSet(crate::SimSet::Ai)),
+    );
+    let events = tick(&mut app);
+    assert!(events.iter().any(|e| matches!(e, SimEvent::WeaponFired { attacker: id, target, .. } if *id == attacker && *target == plant)), "{events:?}");
+    assert!(
+        events.iter().any(
+            |e| matches!(e, SimEvent::BuildingDestroyed { building, .. } if *building == plant)
+        ),
+        "{events:?}"
+    );
+    assert!(
+        app.world()
+            .resource::<CommandQueue>()
+            .pending
+            .iter()
+            .any(|p| p.ai_intent.as_ref().is_some_and(|w| w.strategic_valid))
+    );
+    assert!(
+        app.world()
+            .resource::<crate::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .low_power()
+    );
+    assert_eq!(
+        app.world()
+            .resource::<crate::SpecialState>()
+            .charge
+            .get(&source),
+        Some(&cooldown)
+    );
+    let events = tick(&mut app);
+    assert!(
+        !events
+            .iter()
+            .any(|e| matches!(e, SimEvent::StrategicActivated { .. })),
+        "{events:?}"
+    );
+    assert!(
+        !events
+            .iter()
+            .any(|e| matches!(e, SimEvent::CommandRejected { .. })),
+        "{events:?}"
+    );
+}
+
+#[test]
+fn ra8_power_lifecycle_keeps_public_intrinsic_duplicate_fifo_and_additional_errors_strict() {
+    use bevy_ecs::schedule::IntoScheduleConfigs;
+    for mode in [
+        "natural",
+        "intrinsic_power",
+        "intrinsic_charge",
+        "duplicate_natural",
+        "duplicate_powered",
+        "earlier_sale",
+        "later_sale",
+        "changed_fifo_power",
+        "later_charge",
+        "later_type",
+        "later_arguments",
+        "later_outside",
+    ] {
+        let mut results = Vec::new();
+        for public in [false, true] {
+            let mut app = app();
+            let source = crate::spawn_building(
+                app.world_mut(),
+                PlayerId(0),
+                "weather_control",
+                CellPos::new(10, 14),
+            )
+            .unwrap();
+            let first = crate::spawn_building(
+                app.world_mut(),
+                PlayerId(0),
+                "power_plant",
+                CellPos::new(2, 14),
+            )
+            .unwrap();
+            let plant = crate::spawn_building(
+                app.world_mut(),
+                PlayerId(0),
+                "power_plant",
+                CellPos::new(5, 14),
+            )
+            .unwrap();
+            crate::spawn_building(
+                app.world_mut(),
+                PlayerId(0),
+                "prism_tower",
+                CellPos::new(25, 4),
+            )
+            .unwrap();
+            tick(&mut app);
+            let kind = app
+                .world()
+                .resource::<Definitions>()
+                .building_kind("weather_control")
+                .unwrap();
+            let cooldown = app
+                .world()
+                .resource::<Definitions>()
+                .metadata(ProductionItem::Building(kind))
+                .unwrap()
+                .cooldown;
+            if mode != "intrinsic_charge" {
+                app.world_mut()
+                    .resource_mut::<crate::SpecialState>()
+                    .charge
+                    .insert(source, cooldown);
+            }
+            let plant_entity = entity(&mut app, plant);
+            if mode == "intrinsic_power" {
+                app.world_mut()
+                    .get_mut::<Health>(plant_entity)
+                    .unwrap()
+                    .hit_points = 0;
+                // Establish this declared initial outage through ordinary power
+                // refresh/cleanup before the isolated decision system runs.
+                tick(&mut app);
+            }
+            let decision_tick = app.world().resource::<SimTick>().0;
+            app.add_systems(
+                SimSchedule,
+                (move |world: &mut World| {
+                    if world.resource::<SimTick>().0 != decision_tick {
+                        return;
+                    }
+                    let mut issue = |command| {
+                        let issued = IssuedCommand {
+                            player: PlayerId(0),
+                            command,
+                        };
+                        if public {
+                            world.resource_mut::<CommandQueue>().push(issued);
+                        } else {
+                            world
+                                .resource_mut::<CommandQueue>()
+                                .push_ai(issued, AiIntent::default());
+                        }
+                    };
+                    if matches!(mode, "earlier_sale" | "changed_fifo_power") {
+                        issue(Command::SellBuilding { building: first });
+                    }
+                    issue(Command::Superweapon {
+                        building: source,
+                        target: CellPos::new(8, 8),
+                        units: Vec::new(),
+                    });
+                    if mode.starts_with("duplicate_") {
+                        issue(Command::Superweapon {
+                            building: source,
+                            target: CellPos::new(8, 8),
+                            units: Vec::new(),
+                        });
+                    }
+                    if mode == "later_sale" {
+                        issue(Command::SellBuilding { building: first });
+                    }
+                    certify_ai_strategic_intents(world);
+                })
+                .in_set(crate::SimSet::Ai)
+                .after(crate::SimCoreSet(crate::SimSet::Ai)),
+            );
+            app.add_systems(
+                SimSchedule,
+                (move |world: &mut World| {
+                    if world.resource::<SimTick>().0 != decision_tick {
+                        return;
+                    }
+                    // Isolate the same late power boundary proved by actual source
+                    // fire above. These controls alter only their declared state axis.
+                    if !matches!(
+                        mode,
+                        "earlier_sale" | "later_sale" | "duplicate_powered" | "intrinsic_power"
+                    ) {
+                        world.get_mut::<Health>(plant_entity).unwrap().hit_points = 0;
+                    }
+                    if mode == "later_charge" {
+                        world
+                            .resource_mut::<crate::SpecialState>()
+                            .charge
+                            .insert(source, 0);
+                    }
+                    if mode == "later_type" {
+                        let k = world
+                            .resource::<Definitions>()
+                            .building_kind("barracks")
+                            .unwrap();
+                        let e = world
+                            .query::<(Entity, &SimId)>()
+                            .iter(world)
+                            .find(|(_, id)| **id == source)
+                            .unwrap()
+                            .0;
+                        world.get_mut::<crate::Building>(e).unwrap().kind = k;
+                    }
+                    if matches!(mode, "later_arguments" | "later_outside") {
+                        for pending in &mut world.resource_mut::<CommandQueue>().pending {
+                            if let Command::Superweapon { target, units, .. } =
+                                &mut pending.issued.command
+                            {
+                                if mode == "later_arguments" {
+                                    units.push(SimId(999999));
+                                } else {
+                                    *target = CellPos::new(-1, -1);
+                                }
+                            }
+                        }
+                    }
+                })
+                .in_set(crate::SimSet::Visibility)
+                .after(crate::SimCoreSet(crate::SimSet::Visibility)),
+            );
+            tick(&mut app);
+            let certified = app
+                .world()
+                .resource::<CommandQueue>()
+                .pending
+                .iter()
+                .filter_map(|p| match p.issued.command {
+                    Command::Superweapon { .. } => {
+                        Some(p.ai_intent.as_ref().is_some_and(|w| w.strategic_valid))
+                    }
+                    _ => None,
+                })
+                .collect::<Vec<_>>();
+            assert!(
+                certified
+                    .iter()
+                    .all(|v| *v
+                        == (!public && !matches!(mode, "intrinsic_power" | "intrinsic_charge"))),
+                "{mode} public{public}: {certified:?}"
+            );
+            let events = tick(&mut app);
+            let rejected = events
+                .iter()
+                .filter_map(|e| match e {
+                    SimEvent::CommandRejected { reason, .. } => Some(reason.clone()),
+                    _ => None,
+                })
+                .collect::<Vec<_>>();
+            let activated = events
+                .iter()
+                .filter(|e| matches!(e, SimEvent::StrategicActivated { .. }))
+                .count();
+            assert_eq!(
+                activated,
+                usize::from(matches!(mode, "later_sale" | "duplicate_powered")),
+                "{mode} public{public}: {events:?}"
+            );
+            if (mode == "natural" && !public) || mode == "later_sale" {
+                assert!(rejected.is_empty(), "{events:?}");
+            } else {
+                assert!(!rejected.is_empty(), "{mode} public{public}: {events:?}");
+            }
+            if mode == "duplicate_natural" {
+                assert_eq!(rejected.len(), 2, "{events:?}");
+            }
+            results.push(rejected);
+        }
+        if mode != "natural" {
+            assert_eq!(
+                results[0], results[1],
+                "{mode}: private intrinsic/FIFO errors differ from strict public validation"
+            );
+        }
+    }
+}
