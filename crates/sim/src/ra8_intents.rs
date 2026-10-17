@@ -1,7 +1,8 @@
 //! Engine-only intent lifecycle regression fixtures; public commands use the same schedule.
 use super::*;
-use crate::{Cell, Controller, MatchOptions, PlayerSetup, SimPlugin, SimSchedule};
+use crate::{Cell, Controller, Health, MatchOptions, PlayerSetup, SimPlugin, SimSchedule};
 use bevy_app::App;
+use bevy_ecs::world::World;
 
 fn app() -> App {
     let data = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets/data");
@@ -102,6 +103,277 @@ fn witness(ids: &[SimId], target: Option<SimId>) -> AiIntent {
         armed: ids.iter().copied().collect(),
         target,
         strategic_valid: false,
+        service_valid: false,
+    }
+}
+
+#[test]
+fn ra8_service_healing_certificate_keeps_public_intrinsic_capacity_and_fifo_errors_strict() {
+    use bevy_ecs::schedule::IntoScheduleConfigs;
+    for mode in [
+        "internal",
+        "public",
+        "already_full",
+        "already_occupied",
+        "wrong_domain",
+        "wrong_target",
+        "earlier_occupant",
+        "later_occupant",
+        "later_owner",
+        "later_spawned",
+    ] {
+        let mut app = app();
+        let depot = crate::spawn_building(
+            app.world_mut(),
+            PlayerId(0),
+            if mode == "wrong_target" {
+                "soviet_barracks"
+            } else {
+                "soviet_service_depot"
+            },
+            CellPos::new(2, 20),
+        )
+        .unwrap();
+        let unit_kind = if mode == "wrong_domain" {
+            "kirov"
+        } else {
+            "war_miner"
+        };
+        let miner = unit(&mut app, 0, unit_kind, 5, 20);
+        let other = unit(&mut app, 0, "rhino", 4, 21);
+        let miner_entity = entity(&mut app, miner);
+        let other_entity = entity(&mut app, other);
+        app.world_mut()
+            .get_mut::<Health>(other_entity)
+            .unwrap()
+            .hit_points = 10;
+        let maximum = app
+            .world()
+            .resource::<Definitions>()
+            .unit_combat(
+                app.world()
+                    .resource::<Definitions>()
+                    .unit_kind(unit_kind)
+                    .unwrap(),
+            )
+            .unwrap()
+            .hit_points;
+        app.world_mut()
+            .get_mut::<Health>(miner_entity)
+            .unwrap()
+            .hit_points = maximum - i32::from(!["already_full", "wrong_domain"].contains(&mode));
+        if mode == "already_occupied" {
+            issue(
+                &mut app,
+                Command::Interact {
+                    unit: other,
+                    target: depot,
+                },
+                None,
+            );
+            tick(&mut app);
+            assert_eq!(
+                app.world()
+                    .resource::<crate::SpecialState>()
+                    .docked
+                    .get(&other),
+                Some(&depot)
+            );
+        }
+        let repair_interval = app
+            .world()
+            .resource::<Definitions>()
+            .rules()
+            .unwrap()
+            .economy
+            .repair_interval
+            .unsigned_abs();
+        app.world_mut().resource_mut::<SimTick>().0 = u64::from(repair_interval);
+        let decision_tick = app.world().resource::<SimTick>().0;
+        app.add_systems(
+            SimSchedule,
+            (move |world: &mut World| {
+                if world.resource::<SimTick>().0 != decision_tick {
+                    return;
+                }
+                let service = IssuedCommand {
+                    player: PlayerId(0),
+                    command: Command::Interact {
+                        unit: miner,
+                        target: depot,
+                    },
+                };
+                let before = crate::state_hash(world);
+                let valid = crate::special::service_intent_valid(world, &service, true);
+                assert_eq!(
+                    before,
+                    crate::state_hash(world),
+                    "{mode}: certification must be read-only"
+                );
+                assert_eq!(
+                    valid,
+                    ![
+                        "already_full",
+                        "already_occupied",
+                        "wrong_domain",
+                        "wrong_target"
+                    ]
+                    .contains(&mode),
+                    "{mode}"
+                );
+                let occupant = IssuedCommand {
+                    player: PlayerId(0),
+                    command: Command::Interact {
+                        unit: other,
+                        target: depot,
+                    },
+                };
+                if mode == "earlier_occupant" {
+                    world.resource_mut::<CommandQueue>().push(occupant.clone());
+                }
+                if mode == "public" {
+                    world.resource_mut::<CommandQueue>().push(service);
+                } else {
+                    world
+                        .resource_mut::<CommandQueue>()
+                        .push_ai(service, AiIntent::default());
+                }
+                if mode == "later_occupant" {
+                    world.resource_mut::<CommandQueue>().push(occupant);
+                }
+                certify_ai_strategic_intents(world);
+            })
+            .in_set(crate::SimSet::Ai)
+            .after(crate::SimCoreSet(crate::SimSet::Ai)),
+        );
+        app.add_systems(
+            SimSchedule,
+            (move |world: &mut World| {
+                if world.resource::<SimTick>().0 != decision_tick {
+                    return;
+                }
+                if mode == "later_owner" {
+                    let e = world
+                        .query::<(Entity, &SimId)>()
+                        .iter(world)
+                        .find(|(_, id)| **id == depot)
+                        .unwrap()
+                        .0;
+                    world.get_mut::<Owner>(e).unwrap().0 = PlayerId(1);
+                }
+                if mode == "later_spawned" {
+                    world
+                        .resource_mut::<crate::SpecialState>()
+                        .spawned
+                        .insert(miner, SimId(999999));
+                }
+            })
+            .in_set(crate::SimSet::Visibility)
+            .after(crate::SimCoreSet(crate::SimSet::Visibility)),
+        );
+        tick(&mut app);
+        assert_eq!(
+            app.world().get::<Health>(miner_entity).unwrap().hit_points,
+            maximum,
+            "{mode}: ordinary source heal"
+        );
+        let certified = app
+            .world()
+            .resource::<CommandQueue>()
+            .pending
+            .iter()
+            .find(|p| matches!(p.issued.command, Command::Interact {unit,..} if unit==miner))
+            .and_then(|p| p.ai_intent.as_ref())
+            .is_some_and(|w| w.service_valid);
+        assert_eq!(
+            certified,
+            ![
+                "public",
+                "already_full",
+                "already_occupied",
+                "wrong_domain",
+                "wrong_target"
+            ]
+            .contains(&mode),
+            "{mode}"
+        );
+        if certified {
+            let before = crate::state_hash(app.world_mut());
+            let pending = app.world_mut().resource_mut::<CommandQueue>().into_inner();
+            let w = pending
+                .pending
+                .iter_mut()
+                .find(|p| matches!(p.issued.command, Command::Interact {unit,..} if unit==miner))
+                .unwrap()
+                .ai_intent
+                .as_mut()
+                .unwrap();
+            w.service_valid = false;
+            assert_ne!(
+                before,
+                crate::state_hash(app.world_mut()),
+                "service certificate must be value-hashed"
+            );
+            app.world_mut()
+                .resource_mut::<CommandQueue>()
+                .pending
+                .iter_mut()
+                .find(|p| matches!(p.issued.command, Command::Interact {unit,..} if unit==miner))
+                .unwrap()
+                .ai_intent
+                .as_mut()
+                .unwrap()
+                .service_valid = true;
+        }
+        let events = tick(&mut app);
+        let rejection = events.iter().find_map(|event| match event {
+            SimEvent::CommandRejected {
+                command: Command::Interact { unit, .. },
+                reason,
+                ..
+            } if *unit == miner => Some(reason),
+            _ => None,
+        });
+        let cancelled = ["internal", "later_occupant"].contains(&mode);
+        assert_eq!(rejection.is_none(), cancelled, "{mode}: {events:?}");
+        if let Some(reason) = rejection {
+            let expected = match mode {
+                "wrong_domain" => {
+                    RejectReason::AbilityUnavailable("This unit is not repaired here")
+                }
+                "wrong_target" => RejectReason::AbilityUnavailable("Choose a friendly transport"),
+                "later_owner" => {
+                    RejectReason::AbilityUnavailable("Choose your own repair building")
+                }
+                "later_spawned" => RejectReason::NotCommandable(miner),
+                _ => RejectReason::AbilityUnavailable("This unit is not damaged"),
+            };
+            assert_eq!(*reason, expected, "{mode}: original public error order");
+        }
+        assert!(
+            !app.world()
+                .resource::<crate::SpecialState>()
+                .docked
+                .contains_key(&miner),
+            "{mode}"
+        );
+        assert!(
+            !app.world()
+                .resource::<crate::SpecialState>()
+                .interactions
+                .contains_key(&miner),
+            "{mode}"
+        );
+        if ["earlier_occupant", "later_occupant", "already_occupied"].contains(&mode) {
+            assert_eq!(
+                app.world()
+                    .resource::<crate::SpecialState>()
+                    .docked
+                    .get(&other),
+                Some(&depot),
+                "{mode}: ordinary FIFO occupant must still dock"
+            );
+        }
     }
 }
 

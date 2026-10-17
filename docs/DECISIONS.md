@@ -7159,3 +7159,77 @@ complete outputSHA is be046cb06220eec38ad474775eee4e91d2d8a401551e8b2b38297137f0
 checkpoint7-staged-hygiene.json records all exact paths/lines/file and line hashes. Preserve
 all raw bytes and require an identical final staged stdout/stderr/exit before the separate
 commit. Source runtime remains b6eac0c;this classification changes no code or evidence.
+
+## R132 — A fully healed service intent cancels only its witnessed damage change (2026-10-16)
+
+The seventh frozen gate at `85b6f56`/runtime `b6eac0c` is not acceptance. Commands1–3 exit0;
+command4 exits101 with253passed/1failed/0ignored. Its production target has5passed/1failed
+and takes5090.83s. Four exact seed0 failures are preserved: Riverlands IraqEasy/CubaEasy
+None72000; JungleDelta CubaEasy/RussiaEasy None270000; PacificAtoll CubaBrutal/GreatBritainBrutal
+None288000; ThousandLakes RussiaMedium/LibyaBrutal rejects Interact227→104 at21281,
+"This unit is not damaged" without a loss. The owned process group54111 is stopped only after
+completed command4 failure; any partial following output remains. No other command is claimed.
+`ra8-attempt7/ARCHIVE.json` records every captured file hash; raw `04-test.log` SHA-256 is
+`da4b590976fe2f7dc1df2c6f7f4038accf14391988100b73bbdbbe0e837d0c3a`.
+The script's date-based phase4 duration9649s differs from wrapper monotonic5471.912490s
+for the whole stopped run. Both are retained without a sleep/CPU/clock-cause claim. An early
+liveness message incorrectly attributed wrapper elapsed to M10; the preserved correction says
+M10 actually takes201.56s, game44.11s and compilation1m50s, so that attribution is unsupported.
+Only bounded process metadata was read; no new stack sample or competing simulation ran.
+
+**Reproduction and semantics.** `attempt7-service-before1.log` records actual shipped WarMiner227
+HP999 at Ai decision21280, an ordinary Interact to owned SovietServiceDepot104, and HP1000
+before Commands21281. Normal source self-healing runs after the decision. This is a real
+lifecycle change, not intrinsically full-HP planning. The new scheduled
+`ra8_source_self_healing_after_a_real_ai_service_decision_cancels_the_healed_job` uses the
+actual controller, shipped definitions and normal repair-interval self-heal. All decision,
+healing and next-command observations precede its no-rejection assertion. Before2 fails with
+the exact public not-damaged rejection; after1 and after2 pass. Before1 is explicitly an
+insufficient new-fixture probe: its chosen spawn8,8 intersects the existing yard. Only that
+new fixture's declared spawn is corrected to5,20; the failed log remains.
+
+`AiIntent.service_valid` is separately value-hashed. The existing scheduled certifier retains
+its private name `certify_ai_strategic_intents` but now also certifies service Interact intents.
+Only a currently completely valid owned vehicle→owned repair building is certified. The
+read-only helper authorizes player, living actor, ownership and commandability; requires the
+actual repair-building/type/domain path and shares the existing ordered interaction/dock
+validation, including capacity. It neither changes commands nor learns a hidden reason for
+AI planning. Ordinary interaction validation calls that extracted path with damage checking
+on, preserving all original public errors/order. Actorless Props and other Interact kinds
+are unchanged and cannot receive this certificate.
+
+After an exact not-damaged error, cancellation additionally requires the decision certificate
+and complete current validation with only the damage requirement omitted. A newly full dock,
+wrong type/domain/target, owner change or other invalidity cannot use the exception. There is
+no blanket AbilityUnavailable suppression. Ordinary public pushes remain strict, including
+for an AI owner. No credits, order or bay is changed by cancelling a now-unnecessary service
+job. The common FIFO processing and previous casualty/concealment/strategic certificates remain.
+
+**Boundary proof.** New private
+`ra8_service_healing_certificate_keeps_public_intrinsic_capacity_and_fifo_errors_strict`
+checks10 scheduled modes: legitimate internal heal; public heal; already full; already occupied;
+wrong domain; wrong target; an earlier ordinary dock occupant; a later ordinary dock occupant;
+later ownership change; later non-commandability. It proves read-only certification by state
+hash, the separate bit's hash contribution, and that earlier occupancy retains the original
+not-damaged public error whereas later occupancy still docks after legitimate cancellation.
+Its first executed probe fails only because its newly declared occupant is two cells from the
+2×2 depot and has not docked; the corrected adjacent4,21 cell uses ordinary Interact. The raw
+failure remains. An initial unqualified library `--exact` invocation runs0 tests and is not
+claimed proof; the fully qualified reruns execute the test. No old test expectation is weakened,
+renamed or removed; only the existing private witness helper initializes the new false field.
+
+Final focused serial batch in `attempt7-service-preflight5.json` passes60 tests/5 targets,
+0failed/ignored:13 private lifecycle tests,1 actual source-heal test,22 public command tests,
+23 RA5 world tests and1 default Demo harness (all10 original pairings/winner assertions).
+Format and strict workspace/all-target Clippy also exit0. The separate exact default
+`ra8_gate7_lakes_russia_medium_libya_brutal_seed_zero_finishes` passes with P1Won28667,
+under unchanged288000; test37.91s/command67.206674s. No limit or rejection exemption changes.
+
+**Still open.** The other three exact stalls remain reproduced, not fixed or accepted here.
+Their read-only late traces distinguish real travel/attrition and paid repairs from frozen
+movement. Jungle replacements actually approach and die at the Tesla Coil, whose640 repaired
+HP offsets16 Rhino shots in180000–239999. Pacific has112 aircraft shots into the Curtain and
+12592 repaired HP in the last48000 ticks, plus4 normal Storm activations; its forces and income
+are real. Riverlands has a late crew/paid-infantry battle and newly travelling capable survivors.
+A further mission-progress correction requires its own controlled and exact winner evidence.
+All previous gates, negative/insufficient probes and source restoration evidence remain.

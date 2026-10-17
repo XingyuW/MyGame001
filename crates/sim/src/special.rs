@@ -153,6 +153,7 @@ fn validate_docking(
     a: &Actor,
     b: &Actor,
     defs: &Definitions,
+    check_damage: bool,
 ) -> Result<(), RejectReason> {
     if a.owner != b.owner {
         return Err(unavailable("Choose your own repair building"));
@@ -173,9 +174,10 @@ fn validate_docking(
     if !fits {
         return Err(unavailable("This unit is not repaired here"));
     }
-    if defs
-        .unit_combat(kind)
-        .is_none_or(|terms| a.hp >= terms.hit_points)
+    if check_damage
+        && defs
+            .unit_combat(kind)
+            .is_none_or(|terms| a.hp >= terms.hit_points)
         && !world
             .resource::<SpecialState>()
             .parasites
@@ -404,7 +406,7 @@ fn share_of(hp: i32, from: i32, to: i32) -> i32 {
 mod advance;
 mod carrier;
 mod commands;
-pub(crate) use commands::bridge_goal_ready;
+pub(crate) use commands::{bridge_goal_ready, service_intent_valid};
 mod interaction;
 mod reconnaissance;
 mod repair;

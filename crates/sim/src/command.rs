@@ -397,6 +397,7 @@ pub(crate) struct AiIntent {
     pub armed: BTreeSet<SimId>,
     pub target: Option<SimId>,
     pub strategic_valid: bool,
+    pub service_valid: bool,
 }
 
 impl CommandQueue {
@@ -475,6 +476,7 @@ impl CommandQueue {
                     h.write_u32(target.0);
                 }
                 h.write(&[u8::from(witness.strategic_valid)]);
+                h.write(&[u8::from(witness.service_valid)]);
             }
             hash_command(&pending.issued.command, h);
         }
@@ -1393,9 +1395,13 @@ pub(crate) fn process_commands(world: &mut bevy_ecs::world::World) {
             let source_erasure_began = ai_intent.as_ref().is_some_and(|w| w.strategic_valid)
                 && result == Err(RejectReason::AbilityUnavailable("Target is being erased"))
                 && crate::special::strategic_intent_erasure_only(world, &issued);
+            let service_healed = ai_intent.as_ref().is_some_and(|w| w.service_valid)
+                && result == Err(RejectReason::AbilityUnavailable("This unit is not damaged"))
+                && crate::special::service_intent_valid(world, &issued, false);
             if let Err(reason) = result
                 && !cell_visibility_lost
                 && !source_erasure_began
+                && !service_healed
                 && !ai_intent
                     .as_ref()
                     .is_some_and(|w| stale_ai_intent(&reason, w))
@@ -1462,14 +1468,16 @@ fn stale_ai_intent(reason: &RejectReason, witness: &AiIntent) -> bool {
     }
 }
 
-/// Certify only completely valid strategic decisions before Economy/Visibility can change
-/// their cell visibility. Ordinary/public commands and intrinsically bad intents stay strict.
+/// Certify complete strategic/service decisions before later scheduled stages change
+/// their validity. Ordinary/public commands and intrinsically bad intents stay strict.
 pub(crate) fn certify_ai_strategic_intents(world: &mut bevy_ecs::world::World) {
     if !world.resource::<CommandQueue>().pending.iter().any(|p| {
         p.ai_intent.is_some()
             && matches!(
                 p.issued.command,
-                Command::Superweapon { .. } | Command::Chronoshift { .. }
+                Command::Superweapon { .. }
+                    | Command::Chronoshift { .. }
+                    | Command::Interact { .. }
             )
     }) {
         return;
@@ -1479,6 +1487,7 @@ pub(crate) fn certify_ai_strategic_intents(world: &mut bevy_ecs::world::World) {
         if let Some(witness) = &mut p.ai_intent {
             witness.strategic_valid =
                 crate::special::strategic_intent_valid(world, &p.issued, true);
+            witness.service_valid = crate::special::service_intent_valid(world, &p.issued, true);
         }
     }
     world.resource_mut::<CommandQueue>().pending = pending;
