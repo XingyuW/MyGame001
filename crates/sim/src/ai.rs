@@ -119,6 +119,8 @@ const BUILDING_GAP: u32 = 2;
 /// command's validation, and steps on at once, cannot reach the new footprint (D43).
 const PRODUCER_GAP: u32 = 3;
 
+const MAX_AI_COMMANDS: usize = 32;
+
 /// A building another player owns that a computer player has seen.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct KnownBuilding {
@@ -212,6 +214,10 @@ struct BuildingJobProgress {
 #[cfg(test)]
 #[path = "ai/ra8_attrition_tests.rs"]
 mod ra8_attrition_tests;
+
+#[cfg(test)]
+#[path = "ai/ra8_recovery_tests.rs"]
+mod ra8_recovery_tests;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct AirScreenProgress {
@@ -1271,7 +1277,8 @@ pub(crate) fn run_ai(
         }
         commands.retain(|c| !matches!(c, Command::Move { units, .. } | Command::AttackMove { units, .. } | Command::Attack { units, .. } if units.is_empty()));
         commands.extend(extra);
-        commands.truncate(32);
+        retain_funded_unit_intents(&view, &mut commands);
+        commands.truncate(MAX_AI_COMMANDS);
         for command in &commands {
             strategy::record_attack_job(&view, controller, &special, command);
         }
@@ -1495,8 +1502,13 @@ fn think(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
         BaseUnit::None => {}
     }
     let mut commands = Vec::new();
-    if let Some(command) = cancel_blocked_head(view) {
+    let mut recovering = false;
+    if let Some(command) = cancel_blocked_head(view).or_else(|| cancel_starved_construction(view)) {
         commands.push(command);
+    } else {
+        let recovery = recover_unit_credits(view, controller);
+        recovering = !recovery.is_empty();
+        commands.extend(recovery);
     }
     if let Some(command) = place_ready_building(view, controller) {
         commands.push(command);
@@ -1511,18 +1523,20 @@ fn think(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
     {
         controller.liquidating = false;
     }
-    if broke(view) {
+    if !recovering && broke(view) {
         if let Some(command) = sell_for_army(view) {
             controller.liquidating = true;
             commands.push(command);
         }
-    } else if !controller.liquidating {
+    } else if !recovering && !controller.liquidating {
         commands.extend(queue_buildings(view, controller));
     }
-    if let Some(command) = last_stand(view, controller) {
-        commands.push(command);
+    if !recovering {
+        if let Some(command) = last_stand(view, controller) {
+            commands.push(command);
+        }
+        commands.extend(queue_units(view, controller));
     }
-    commands.extend(queue_units(view, controller));
     commands.extend(set_rally_points(view, controller));
     if let Some(command) = put_harvesters_to_work(view, controller) {
         commands.push(command);
@@ -1639,6 +1653,248 @@ fn cancel_blocked_head(view: &View<'_>) -> Option<Command> {
             )
             .is_some();
         (lost_producer || lost_prerequisite)
+            .then_some(Command::CancelProduction { item: head.item })
+    })
+}
+
+fn pending_unit_credit_need(view: &View<'_>) -> i64 {
+    view.state
+        .queues()
+        .flat_map(|(_, queue)| queue.iter())
+        .filter(|head| matches!(head.item, ProductionItem::Unit(_)))
+        .filter(|head| production_can_advance(view, head.item))
+        .filter_map(|head| {
+            view.definitions
+                .production(head.item)
+                .map(|terms| terms.cost.saturating_sub(head.charged))
+        })
+        .fold(0_i64, i64::saturating_add)
+}
+
+fn production_can_advance(view: &View<'_>, item: ProductionItem) -> bool {
+    view.own_kinds
+        .iter()
+        .any(|&kind| produces(view.definitions, kind, item))
+        && (view.state.unlock_all()
+            || crate::economy_commands::missing_prerequisite(
+                view.definitions,
+                &view.own_kinds,
+                item,
+            )
+            .is_none())
+}
+
+fn outstanding_cost(view: &View<'_>, item: &crate::QueueItem) -> i64 {
+    view.definitions
+        .production(item.item)
+        .map_or(0, |terms| terms.cost.saturating_sub(item.charged))
+}
+
+fn pending_production_cost(view: &View<'_>) -> i64 {
+    view.state
+        .queues()
+        .flat_map(|(_, q)| q.iter())
+        .map(|q| outstanding_cost(view, q))
+        .fold(0, i64::saturating_add)
+}
+
+/// No-income recovery replaces an unaffordable army head and removes unpaid
+/// army tails with ordinary last-matching cancellations. Prefer the largest
+/// source-cost finisher the finite budget can fully fund; this is an investment
+/// policy, not a damage ranking. Retained work reserves its entire remaining cost.
+fn recover_unit_credits(view: &View<'_>, controller: &AiController) -> Vec<Command> {
+    if !view.ai.rules_difficulty
+        || strategy::service_income(view)
+        || !controller.broken_bridges.is_empty()
+    {
+        return Vec::new();
+    }
+    let mut alternatives: Vec<_> = view
+        .ai
+        .army
+        .iter()
+        .copied()
+        .filter(|&kind| view.queueable(ProductionItem::Unit(kind)))
+        .filter_map(|kind| {
+            view.definitions
+                .production(ProductionItem::Unit(kind))
+                .map(|p| (p.cost, kind))
+        })
+        .collect();
+    alternatives.sort_unstable();
+    alternatives.dedup();
+    for (cost, kind) in alternatives.into_iter().rev() {
+        let mut cancellations = Vec::new();
+        let mut refund = 0_i64;
+        let mut protected = 0_i64;
+        let mut heads = Vec::new();
+        for (_, queue) in view.state.queues() {
+            let unfunded = queue.first().is_some_and(|head| {
+                view.definitions.production(head.item).is_some_and(|terms| {
+                    head.progress < terms.build_time
+                        && terms.cost.saturating_sub(head.charged) > view.state.credits()
+                })
+            });
+            for (at, item) in queue.iter().enumerate().rev() {
+                let army = matches!(item.item, ProductionItem::Unit(k)
+                    if view.ai.army.contains(&k)
+                        && view.definitions.harvester(k).is_none()
+                        && view.definitions.metadata(item.item).is_some_and(|m|
+                            !matches!(m.role, crate::Role::Dog | crate::Role::Engineer
+                                | crate::Role::Spy | crate::Role::Mcv | crate::Role::Transport
+                                | crate::Role::Repair | crate::Role::ChronoMiner)));
+                let cancel = unfunded
+                    && army
+                    && view.definitions.production(item.item).is_some_and(|terms| {
+                        item.progress < terms.build_time
+                            && if at == 0 {
+                                terms.cost > cost
+                            } else {
+                                item.charged == 0
+                            }
+                    });
+                if cancel {
+                    if at == 0 {
+                        heads.push((item.charged, item));
+                        protected = protected.saturating_add(outstanding_cost(view, item));
+                    }
+                } else {
+                    protected = protected.saturating_add(outstanding_cost(view, item));
+                }
+                if cancel && at != 0 {
+                    cancellations.push(Command::CancelProduction { item: item.item });
+                }
+            }
+        }
+        // Recover the largest real paid refund first, stopping as soon as the
+        // entire retained FIFO and new item are financed. Other paid heads stay.
+        heads.sort_unstable_by_key(|(paid, item)| (std::cmp::Reverse(*paid), item.item));
+        let mut replaced = BTreeSet::new();
+        for (paid, item) in heads {
+            refund = refund.saturating_add(paid);
+            protected = protected.saturating_sub(outstanding_cost(view, item));
+            replaced.insert(item.item);
+            if view.state.credits().saturating_add(refund) >= protected.saturating_add(cost) {
+                break;
+            }
+        }
+        // Unpaid tails must precede a matching paid head under public last-match
+        // cancellation. Their canonical queue/reverse order is already above.
+        cancellations.extend(
+            replaced
+                .iter()
+                .map(|&item| Command::CancelProduction { item }),
+        );
+        // Leave room for the existing outer bridge action and ready placement.
+        if replaced.is_empty()
+            || cancellations.len().saturating_add(1) > MAX_AI_COMMANDS.saturating_sub(2)
+            || view.state.credits().saturating_add(refund) < protected.saturating_add(cost)
+            || !strategy::production_finisher(view, kind)
+        {
+            continue;
+        }
+        cancellations.push(Command::QueueProduction {
+            item: ProductionItem::Unit(kind),
+        });
+        return cancellations;
+    }
+    Vec::new()
+}
+
+/// Read-only FIFO accounting for final bounded intents. Simulate public
+/// last-matching refunds, and reserve current/same-turn production before adding
+/// another unit. The actual commands still perform every validation and charge.
+fn retain_funded_unit_intents(view: &View<'_>, commands: &mut Vec<Command>) {
+    if !view.ai.rules_difficulty || strategy::service_income(view) {
+        return;
+    }
+    let mut queues: BTreeMap<_, _> = view
+        .state
+        .queues()
+        .map(|(key, q)| (key, q.to_vec()))
+        .collect();
+    let mut cash = view.state.credits();
+    commands.retain(|command| {
+        match command {
+            Command::CancelProduction { item } => {
+                if let Some(key) = view.definitions.queue_of(*item)
+                    && let Some(queue) = queues.get_mut(&key)
+                    && let Some(at) = queue.iter().rposition(|q| q.item == *item)
+                {
+                    cash = cash.saturating_add(queue.remove(at).charged);
+                }
+            }
+            Command::QueueProduction { item } => {
+                if let Some(terms) = view.definitions.production(*item) {
+                    if matches!(item, ProductionItem::Unit(_)) {
+                        let reserved = queues
+                            .values()
+                            .flat_map(|q| q.iter())
+                            .map(|q| outstanding_cost(view, q))
+                            .fold(0_i64, i64::saturating_add);
+                        if cash < reserved.saturating_add(terms.cost) {
+                            return false;
+                        }
+                    }
+                    if let Some(key) = view.definitions.queue_of(*item) {
+                        queues
+                            .entry(key)
+                            .or_default()
+                            .push(crate::QueueItem::new(*item));
+                    }
+                }
+            }
+            _ => {}
+        }
+        true
+    });
+}
+
+/// Reserve the whole existing unit FIFO, or the next legal replacement's cost.
+/// With no income, new construction must not claim the same finite credits.
+fn combat_credit_reserve(view: &View<'_>) -> i64 {
+    let next = view
+        .ai
+        .army
+        .iter()
+        .copied()
+        .filter(|&kind| view.buildable(ProductionItem::Unit(kind)))
+        .filter_map(|kind| {
+            view.definitions
+                .production(ProductionItem::Unit(kind))
+                .map(|terms| terms.cost)
+        })
+        .min()
+        .unwrap_or(0);
+    pending_unit_credit_need(view).max(next)
+}
+
+fn income_construction(view: &View<'_>, kind: BuildingKind) -> bool {
+    view.definitions
+        .building(kind)
+        .is_some_and(|b| b.power_produced > 0 || b.credits_per_ore.is_some())
+        || view
+            .definitions
+            .metadata(ProductionItem::Building(kind))
+            .is_some_and(|m| m.cash_amount > 0)
+}
+
+/// Ordinary exact-refund cancellation, only when finite credits really starve
+/// otherwise legal combat production. Keep completed heads and income recovery.
+fn cancel_starved_construction(view: &View<'_>) -> Option<Command> {
+    if !view.ai.rules_difficulty
+        || strategy::service_income(view)
+        || view.state.credits() >= pending_unit_credit_need(view)
+    {
+        return None;
+    }
+    view.state.queues().find_map(|(_, queue)| {
+        let head = queue.first()?;
+        let ProductionItem::Building(kind) = head.item else {
+            return None;
+        };
+        let terms = view.definitions.production(head.item)?;
+        (head.charged > 0 && head.progress < terms.build_time && !income_construction(view, kind))
             .then_some(Command::CancelProduction { item: head.item })
     })
 }
@@ -2178,9 +2434,31 @@ fn queue_buildings(view: &View<'_>, controller: &AiController) -> Vec<Command> {
         );
     let mut commands = Vec::new();
     let mut taken: BTreeSet<Lane> = BTreeSet::new();
+    let reserve = combat_credit_reserve(view);
+    let mut cash = view.state.credits();
+    let mut finite_budget = (view.ai.rules_difficulty && !strategy::service_income(view))
+        .then(|| view.state.credits().saturating_sub(reserve).max(0));
     let mut queue = |kind: BuildingKind, spare: &mut i32, taken: &mut BTreeSet<Lane>| {
         let item = ProductionItem::Building(kind);
         if !taken.contains(&lane(kind)) && view.queue_len(item) == 0 && view.queueable(item) {
+            if let Some(budget) = &mut finite_budget {
+                let Some(terms) = view.definitions.production(item) else {
+                    return;
+                };
+                // A real current power shortage is recovery, rather than optional
+                // expansion. Preserve its affordable ordinary production even
+                // when later unit FIFO entries reserve more than current cash.
+                let restores_power = view.state.low_power()
+                    && view
+                        .definitions
+                        .building(kind)
+                        .is_some_and(|b| b.power_produced > 0);
+                if terms.cost > *budget && !(restores_power && terms.cost <= cash) {
+                    return;
+                }
+                cash = cash.saturating_sub(terms.cost);
+                *budget = cash.saturating_sub(reserve).max(0);
+            }
             taken.insert(lane(kind));
             *spare = spare.saturating_add(power_of(kind));
             commands.push(Command::QueueProduction { item });
@@ -2402,6 +2680,7 @@ fn queue_units(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
 struct AddedUnits {
     queues: BTreeMap<QueueKey, usize>,
     docks: usize,
+    credits: i64,
 }
 
 fn has_room(view: &View<'_>, item: ProductionItem, added: &mut AddedUnits) -> bool {
@@ -2410,6 +2689,19 @@ fn has_room(view: &View<'_>, item: ProductionItem, added: &mut AddedUnits) -> bo
     };
     let extra = added.queues.get(&producer).copied().unwrap_or(0);
     if view.queue_len(item).saturating_add(extra) >= AI_UNIT_QUEUE || !view.queueable(item) {
+        return false;
+    }
+    let cost = view
+        .definitions
+        .production(item)
+        .map_or(0, |terms| terms.cost);
+    if view.ai.rules_difficulty
+        && !strategy::service_income(view)
+        && view.state.credits()
+            < pending_production_cost(view)
+                .saturating_add(added.credits)
+                .saturating_add(cost)
+    {
         return false;
     }
     if crate::flight::needs_dock(view.definitions, item) {
@@ -2422,6 +2714,7 @@ fn has_room(view: &View<'_>, item: ProductionItem, added: &mut AddedUnits) -> bo
         added.docks += 1;
     }
     *added.queues.entry(producer).or_insert(0) += 1;
+    added.credits = added.credits.saturating_add(cost);
     true
 }
 

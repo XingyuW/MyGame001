@@ -3,7 +3,11 @@ use super::*;
 use bevy_app::App;
 use bevy_ecs::{entity::Entity, message::Messages};
 
-fn app() -> App {
+pub(super) fn app() -> App {
+    app_with_power(true)
+}
+
+pub(super) fn app_with_power(power: bool) -> App {
     let data = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets/data");
     let definitions = crate::load_ruleset(&data).unwrap();
     let mut skirmish = crate::load_skirmish(data.join("skirmish.ron"), &definitions).unwrap();
@@ -63,15 +67,17 @@ fn app() -> App {
         },
     )
     .unwrap();
-    building(&mut app, 0, "nuclear_reactor", CellPos::new(2, 2));
+    if power {
+        building(&mut app, 0, "nuclear_reactor", CellPos::new(2, 2));
+    }
     building(&mut app, 0, "spy_satellite", CellPos::new(2, 8));
     app
 }
 
-fn building(app: &mut App, owner: u8, kind: &str, cell: CellPos) -> SimId {
+pub(super) fn building(app: &mut App, owner: u8, kind: &str, cell: CellPos) -> SimId {
     crate::spawn_building(app.world_mut(), PlayerId(owner), kind, cell).unwrap()
 }
-fn unit(app: &mut App, owner: u8, kind: &str, cell: CellPos) -> SimId {
+pub(super) fn unit(app: &mut App, owner: u8, kind: &str, cell: CellPos) -> SimId {
     crate::spawn_unit(app.world_mut(), PlayerId(owner), kind, cell).unwrap()
 }
 fn entity(app: &mut App, id: SimId) -> Option<Entity> {
@@ -86,7 +92,7 @@ fn cell(app: &mut App, id: SimId) -> CellPos {
     let e = entity(app, id).unwrap();
     app.world().get::<Mobile>(e).unwrap().cell
 }
-fn step(app: &mut App) -> Vec<crate::SimEvent> {
+pub(super) fn step(app: &mut App) -> Vec<crate::SimEvent> {
     app.world_mut().run_schedule(crate::SimSchedule);
     let events: Vec<_> = app
         .world()
@@ -103,7 +109,7 @@ fn step(app: &mut App) -> Vec<crate::SimEvent> {
     assert!(crate::cell_invariant_violations(app.world_mut()).is_empty());
     events
 }
-fn issue(app: &mut App, owner: u8, command: Command) {
+pub(super) fn issue(app: &mut App, owner: u8, command: Command) {
     app.world_mut()
         .resource_mut::<CommandQueue>()
         .push(IssuedCommand {

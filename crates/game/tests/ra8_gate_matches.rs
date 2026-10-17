@@ -787,3 +787,8 @@ fn ra8_gate7_pacific_cuba_great_britain_brutal_seed_zero_finishes() {
 fn ra8_gate7_lakes_russia_medium_libya_brutal_seed_zero_finishes() {
     run_case("thousand_lakes", ["russia", "libya"], ["medium", "brutal"]);
 }
+
+#[test]
+fn ra8_gate7_demo_russia_libya_easy_seed_zero_finishes() {
+    run_case("demo", ["russia", "libya"], ["easy", "easy"]);
+}
