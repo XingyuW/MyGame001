@@ -7517,3 +7517,35 @@ P0Won36040 under its unchanged R29 limit, exit0/141.397559s including compilatio
 This closes the exact rejection separately from the normal source-destruction and strictness
 proofs; all earlier raw artifacts remain. Final-source default/retained/fullsim/m13/budget and
 all13 acceptance are still pending. No independent review is claimed.
+
+### R137 — Existing building obligations participate in both-lane finite admission
+
+**Reproduction, then correction.** The R134 construction admission reserve counted existing
+unit FIFOs and prospective replacement cost but omitted credits still owed on ALREADY queued
+buildings. Root's source concern is reproduced before changing runtime by new actual-schedule
+ra8_existing_main_building_obligation_cannot_be_reused_to_fund_the_defence_lane. A declared
+source-derived finite budget (TechCenter+GI+Pillbox costs minus1), normal partial TechCenter
+production and ordinary GI queue leave current cash2016 and remaining existing work1517.
+Actual AI queues the legal1500 PrismTower (BuildingKind19), producing total3017>2016.
+The before1 raw failure exits101/16.937396s; this is a real emission, not a helper mirror or
+hypothetical cancellation-loop claim.
+
+Add source remaining costs of every queued building to the same finite reserve that already
+covers whole units/prospective replacement. Both new construction lanes consume that shared
+remaining budget. Current affordable low-power recovery keeps its explicit existing exception;
+active income, normal eligibility/priority, completed heads, exact public cancellation and refund
+semantics are unchanged. No new constant, data field, persistent/hash state, source cost or
+public validation change is introduced. The new regression checks actual current obligations
+plus final queued costs never exceed remaining cash, prohibits cancellation of attainable main
+construction, and requires normal paid infantry spawn plus actual TechCenter placement.
+
+After1 passes all8 recovery tests (17.687971s command), including actual low-power→funded source
+Power→production-rate restoration, captured income, completed construction/unit exit, required
+Dog, harvester, isolated-route, exact duplicate FIFO/refund and financed building-shot controls.
+No old test, timing, limit or expectation is migrated. Strict Clippy, default10/retained26 and
+all final-source fullsim/game/m13/budget/full13 checks remain separate acceptance requirements.
+
+Strict workspace/all-target Clippy passes0/5.822207s. All10 unchanged default Demo pairings again
+have explicit Won, exit0/86.064626s command (56.34s test), including RussiaEasy/LibyaEasy69633.
+These focused results validate the correction but do not transfer the historical retained-match,
+fullsim or m13 measurements; those must run again on this final source before checkpoint/full13.
