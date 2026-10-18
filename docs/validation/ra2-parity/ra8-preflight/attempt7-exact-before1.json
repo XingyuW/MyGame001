@@ -1,0 +1,86 @@
+[
+  {
+    "case": "service",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate7_lakes_russia_medium_libya_brutal_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 101,
+    "seconds": 33.251102209003875,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-before1.log",
+    "expected": "diagnostic reproduction; unchanged runtime, full original bound/rejection assertions"
+  },
+  {
+    "case": "riverlands",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate7_riverlands_iraq_cuba_easy_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 101,
+    "seconds": 10.229054583003744,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-riverlands-before1.log",
+    "expected": "diagnostic reproduction; unchanged runtime, full original bound/rejection assertions"
+  },
+  {
+    "case": "jungle",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate7_jungle_cuba_russia_easy_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 101,
+    "seconds": 64.40642524999566,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-jungle-before1.log",
+    "expected": "diagnostic reproduction; unchanged runtime, full original bound/rejection assertions"
+  },
+  {
+    "case": "pacific",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate7_pacific_cuba_great_britain_brutal_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 101,
+    "seconds": 207.7642337080033,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-pacific-before1.log",
+    "expected": "diagnostic reproduction; unchanged runtime, full original bound/rejection assertions"
+  }
+]

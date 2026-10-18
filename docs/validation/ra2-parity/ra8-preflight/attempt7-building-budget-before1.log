@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 16.63s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+test ai::ra8_recovery_tests::ra8_existing_main_building_obligation_cannot_be_reused_to_fund_the_defence_lane ... 
+thread 'ai::ra8_recovery_tests::ra8_existing_main_building_obligation_cannot_be_reused_to_fund_the_defence_lane' (7349632) panicked at crates/sim/src/ai/ra8_recovery_tests.rs:868:9:
+finite existing1517 + new1500 [Building(BuildingKind(19))] exceeds cash2016
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ai::ra8_recovery_tests::ra8_existing_main_building_obligation_cannot_be_reused_to_fund_the_defence_lane
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 85 filtered out; finished in 0.04s
+
+error: test failed, to rerun pass `-p sim --lib`

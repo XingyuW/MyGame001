@@ -1,0 +1,48 @@
+{
+  "frozen_head": "85b6f560e55c4e0d5de1075552ecd529e2b2eba0",
+  "runtime": "b6eac0c7c31e69ff8dff91dc154a9497143b7484",
+  "command": [
+    "env",
+    "-u",
+    "RA2_DUEL_SEED",
+    "-u",
+    "RA2_DUEL_PAIR",
+    "sh",
+    "scripts/validate_ra2_parity.sh",
+    "ra8"
+  ],
+  "start_utc": "2026-10-16T22:17:32.984193+00:00",
+  "pid": 54111,
+  "pgid": 54111,
+  "phases": [
+    {
+      "phase": 1,
+      "exit": 0,
+      "seconds": 3,
+      "details": "cargo fmt --all -- --check"
+    },
+    {
+      "phase": 2,
+      "exit": 0,
+      "seconds": 0,
+      "details": "git diff --check"
+    },
+    {
+      "phase": 3,
+      "exit": 0,
+      "seconds": 1,
+      "details": "cargo clippy --workspace --all-targets -- -D warnings"
+    },
+    {
+      "phase": 4,
+      "exit": 101,
+      "seconds": 9649,
+      "details": "cargo test --workspace --release  [253 passed, 1 failed, 0 ignored]"
+    }
+  ],
+  "stopped_after_completed_failure": 4,
+  "end_utc": "2026-10-17T00:58:25.477479+00:00",
+  "elapsed_seconds": 5471.912490167015,
+  "exit": -15,
+  "completed_failure": true
+}

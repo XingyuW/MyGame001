@@ -1,0 +1,20 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 15.93s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+power recovery placedfalse slow8ticks5 fast8ticks_progress_and_paidcreditsNone
+
+thread 'ai::ra8_recovery_tests::ra8_attainable_power_recovery_restores_real_production_despite_reserved_unit_tails' (7264662) panicked at crates/sim/src/ai/ra8_recovery_tests.rs:274:5:
+finite-cost power recovery was reserved out by unaffordable unit tails
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ai::ra8_recovery_tests::ra8_attainable_power_recovery_restores_real_production_despite_reserved_unit_tails ... FAILED
+
+failures:
+
+failures:
+    ai::ra8_recovery_tests::ra8_attainable_power_recovery_restores_real_production_despite_reserved_unit_tails
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 78 filtered out; finished in 0.12s
+
+error: test failed, to rerun pass `-p sim --lib`

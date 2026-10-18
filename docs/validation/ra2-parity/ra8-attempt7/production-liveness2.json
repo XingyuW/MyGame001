@@ -1,0 +1,8 @@
+{
+  "observed_utc": "2026-10-16T23:56:13.357602+00:00",
+  "elapsed_seconds": 0.05699391700909473,
+  "exit": 0,
+  "raw_matching_stdout": "54111 54087 54111    01:38:41   0:00.02   0.0 Ss   sh\n56659 54168 54111       22:39 203:17.70 747.7 R    /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-fff13bc99bc7e9e6\n",
+  "stderr": "",
+  "scope": "read-only owned-process metadata only; no stack sample/debugger or competing simulation"
+}

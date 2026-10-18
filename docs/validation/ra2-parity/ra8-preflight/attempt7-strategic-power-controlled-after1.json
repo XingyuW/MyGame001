@@ -1,0 +1,30 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all"
+    ],
+    "exit": 0,
+    "seconds": 0.9194442920270376,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-format3.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "command::ra8_intent_tests::ra8_certified_strategic_intent_waits_after_real_between_stage_power_plant_destruction",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 17.035309041006258,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-controlled-after1.log"
+  }
+]

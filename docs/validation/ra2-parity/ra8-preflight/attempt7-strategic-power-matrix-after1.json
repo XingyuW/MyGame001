@@ -1,0 +1,29 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all"
+    ],
+    "exit": 0,
+    "seconds": 0.9210492499987595,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-format4.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "command::ra8_intent_tests",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 101,
+    "seconds": 17.16139520800789,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-matrix-after1.log"
+  }
+]

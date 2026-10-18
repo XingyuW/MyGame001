@@ -1,0 +1,59 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all"
+    ],
+    "exit": 0,
+    "seconds": 0.8469717499974649,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-attrition-format8.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "ai::ra8_attrition_tests",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 17.48848116598674,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-attrition-lifecycle5.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 69.16315179201774,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-attrition-ai-all2.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 0,
+    "seconds": 6.356561583990697,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-attrition-clippy2.log"
+  }
+]

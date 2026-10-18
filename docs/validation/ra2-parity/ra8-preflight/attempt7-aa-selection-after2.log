@@ -1,0 +1,10 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 16.13s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+test ai::ra8_attrition_tests::ra8_an_expired_aa_job_cannot_starve_a_fresh_observed_barrier ... two AA jobs: selectedtrue assignedtrue firedtrue firstSome(AirScreenProgress { remaining: 0, distance: 4, hp: 893, last_progress: 6010 }) expiredAirScreenProgress { remaining: 0, distance: 4, hp: 893, last_progress: 6010 } all{SimId(4): AirScreenProgress { remaining: 0, distance: 4, hp: 893, last_progress: 6010 }, SimId(9): AirScreenProgress { remaining: 0, distance: 4, hp: 585, last_progress: 8680 }}
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 86 filtered out; finished in 0.28s
+

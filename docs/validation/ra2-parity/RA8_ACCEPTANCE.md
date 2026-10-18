@@ -1,10 +1,11 @@
 # RA8 acceptance record
 
-Status: seventh final-source checkpoint is ready for committed milestone checks. Current source
-passes1201 preflight tests/81 target invocations,all21 retained exact winners,and21/21 actual
-default ten-player winners. The fixed256×256 three-map mean budget passes below5ms. All13
-frozen commands and both fresh756-winner R29 distributions remain required. This is validated
-preflight,not independent review or completed RA8 acceptance. All earlier raw evidence remains.
+Status: eighth final-source checkpoint is ready for committed milestone checks. Runtime
+`f431d122d1c147fdc948d21b55156aa0a7477cc1` passes1238 preflight tests/106 target invocations,
+all26 retained exact winners,and21/21 actual default ten-player winners. Fixed256×256 means
+are0.963805/1.028/0.807054ms,below5ms. All13 frozen commands and both fresh756-winner R29
+distributions remain required. This is validated preflight,not independent review or completed
+RA8 acceptance. Every earlier failed attempt and raw evidence remains preserved.
 
 ## Acceptance checklist
 
@@ -641,3 +642,97 @@ diagnostics,zero source/data/test/document errors. checkpoint7-staged-hygiene.js
 full stdout/stderr,every exact path/line/raw-fileSHA/lineSHA and stdoutSHA
 be046cb06220eec38ad474775eee4e91d2d8a401551e8b2b38297137f071d1b5. Raw bytes are unchanged;no suppression.
 Require an identical final staged stdout/stderr/exit recheck before a separate evidence commit.
+
+## Eighth final-source checkpoint — R132–R143
+
+Runtime is `f431d122d1c147fdc948d21b55156aa0a7477cc1`. All41 final5 preflight commands exit0,
+1237 passed/0failed/0ignored across105 test-target invocations. The earlier same-runtime default
+Demo harness adds1 passed/1 target,so the checkpoint totals1238/0/0 across106 invocations.
+Focused proof repeats contained in fullsim are not added. Fullsim is984/0/0 across72targets
+in658.423891s;gamebin217/0/0 in132.187275s;M10five/0/0 in128.082761s. All26 retained exact
+matches and allfive M6 companions have explicit winners under their unchanged limits;the26
+command durations sum2038.020318s. Their median70289/p90130029/max178737 is a focused-regression
+distribution,not either required R29 sweep. Full final5 command time is4663.680560s;every341-file
+manifest rehash matches. Static inventory is1275 vs RA7baseline1124 (+151),none removed,renamed
+or ignored. `main` remains8230a955b251e9341d349f99eaeb86f7f8253664. No validator remains active
+before the evidence checkpoint. Raw records are `ra8-preflight/attempt7-final5-*` and
+`checkpoint8-{inventory,source-check,storage}.json`.
+
+The preserved seventh failed gate supplies the concrete R132–R142 corrections. Review and RA9
+scope includes the narrow complete vehicle-service certificate for actual self-heal between
+decision/application (R132);observed repaired-building attempt history,source ammo and real
+loss/capture versus cargo/dock/freeze/disable distinctions (R133);whole-FIFO finite financing,
+exact public last-matching refunds and source-cost reachable finishers (R134/R135);natural
+between-stage fully charged strategic-source power loss with conservative FIFO/duplicate
+controls (R136);existing construction-lane obligations (R137);actual Air-domain unlimited-ammo
+AA clearance and focused jobs (R138/R139);and read-only expiry before selecting another observed
+AA barrier (R140). `ai/ra8_attrition_tests.rs`, `ai/ra8_recovery_tests.rs`,all controller state
+hashes and private service/power guards enter independent review scope. Real slow Kirov approach
+is not timed out;Ammo0 means unlimited. Refuted leads and failed broader candidates remain in
+the decisions/raw logs. No cadence,deadline,limit,public validation or original artillery rule
+was relaxed to obtain the observed endings.
+
+R141 admits NEW quota workers only for visible ore in a producer/refinery public-terrain
+component. Owned/currently visible buildings are known blockers;unseen building occupancy and
+hidden ore cannot change complete planned intents. This is a declared conservative economic
+job assumption. Existing cargo/workers/accepted heads are protected;one-bail live seed and
+source maximum fields both produce real paid deliveries. R142 separately breaks the proved
+no-unit-work construction reservation cycle ONLY for a single incomplete paid non-income/
+non-power head,with a currently legal/source-qualified reachable building finisher and full
+exact-refund funding of retained work plus that recruit. Ordinary commands produce the real
+refund/spawn/shot;no queue or credit mutation is introduced. Existing/completed/income/power/
+funded/unreachable controls pass. Worker-only Riverlands still failed72000;R142 integration
+then wins57601,and the final26 rerun repeats that ending. Capability proofs and exact ending
+attribution remain separate. Both assumptions are reviewed explicitly rather than presented
+as source AI-script parity.
+
+The exact existing input migration is
+`ra8_aircraft_same_decision_admission_counts_existing_queued_and_new_dock_commitments`: add
+visible reachable source ore beside its existing refinery so its original worker-plus-combat
+first decision remains economically valid under R141. Every <=1 dock/available-within10/
+paid-completion-within2000/zero-rejection assertion remains. The revised fixture passes;removing
+ONLY added.docks fails the original capacity assertion with2 admissions. Finally restoration
+and a separate SHA read verify exact original/restored19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7.
+Initial new fixture observation/setup failures and the transport/formatter orchestration lapse
+remain explicit in R141/R142;none is counted as a pass. No other existing expectation is
+changed in these corrections;the earlier R124/R125/R128/R130 migrations remain recorded above.
+
+Fresh actual-default ten-player all-map run exits0/1485.564768s:21/21 explicit winners,ten
+builders each,all means<5ms. Endings median87848/p90 nearest-rank145665/max172912 remain below
+unchanged400000. Prior checkpoint7's85128/125479/174450 is preserved:median/p90 rise while max
+falls,without causal attribution or artificial timing. Measured total1481.782s,map elapsed
+1481.942s. Worst reported whole-run mean is Coral Archipelago1.075ms. Actual longest tick is
+Ember Caldera179.436ms;Red Canyon's busiest1000 mean10.780ms/295ticks>50ms also remains. A mean
+budget pass is not a maximum-tick or smooth-play guarantee. Raw all-map SHA is
+12febbcd19cdd233cfb8e3fe1fce12cea04ac17f3a51019a7b65c1fd66022bd6.
+
+| Fixed24000-tick256×256 map | Mean ms | p99 ms | Maximum ms | Busiest1000 mean ms | >50ms ticks |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Liberty Bay | 0.963805 | 5.820 | 93.713 | 1.701 | 1 |
+| Continental Divide | 1.028000 | 7.893 | 92.760 | 1.942 | 2 |
+| Pacific Atoll | 0.807054 | 5.962 | 61.071 | 1.347 | 3 |
+
+Fixed benchmark exits0/67.839183s,all ten builders each. Its three finite-duration runs are
+budget evidence,not completed-match winners. Raw SHA
+1be688d1659a236085768271d3581c832e02ddc92558baaf749cc3a25874a2e4. All normal runs use actual
+default options,seed13,ten ordinary Medium controllers,no Super Me/unlock/injected HP,with no
+profiler or competing simulation. Two bounded native CPU metadata observations during earlier
+fullsim confirmed progress;they did not profile or overlap these benchmark runs. Full current
+fields are in `attempt7-final5-m13-metrics.json`.
+
+Storage is freshly remeasured:58 parser scratch files/584038 file bytes/733184 allocated
+bytes(716KiB),retained recreatable in configured Cargo target for reruns and unnecessary for
+release. No additional substantial external directory was created;configured Cargo/UV/PIP
+caches and RA5 render/RA7 parser evidence remain. R83 transport/loaded boarding/attached-Squid
+firing,R96 actorless occupied-Prop ability resolution and R99's explicitly unproven bombable
+capability lead remain RA9 scope. R97 is CLOSED in R103. Full13,both fresh756-winner R29
+before/after distributions,independent review and user visual/audio/play-feel verification
+remain pending. The checkpoint is validated,not independently reviewed or approved.
+
+The runtime commit's standalone staged unfiltered check exits0. Evidence staging exits2,not
+passed:153 intentional raw-log diagnostics (134 blank EOF lines,19 captured unfinished test
+progress spaces),zero source/data/test/document errors. `checkpoint8-staged-hygiene.json`
+classifies every exact path/line/fileSHA/including-EOL-lineSHA/index blob;its -raw.json companion
+retains full stdout/stderr. stdout SHA is
+0c90536b9aed2f68888a9d19e507db559ccfd51ebb0e5e82f7b0c06aa58b4b16. No raw byte is altered or
+suppressed. Require identical final staged stdout/stderr/exit before the separate commit.

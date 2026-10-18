@@ -1,0 +1,29 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate7_demo_russia_libya_easy_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 101,
+  "seconds": 14.175096916995244,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-demo-russia-libya-late-after1.log",
+  "sha256": "3fa72e141aa5b69a37f56e54c1e5bd5d8991ea6c0303337000bf9e91b6eae460",
+  "production_source_sha256": {
+    "crates/sim/src/ai.rs": "451fa1f62725e33bd81be487252ec777288b4c8ec64f8d0818daad78f827a719",
+    "crates/sim/src/ai/strategy.rs": "4fbeefbe7485e072ebfbd7d2b99496898e2536c9be32f5319b8c9ab3bc26b878"
+  },
+  "environment": {
+    "RA8_SERVICE_TRACE": "1",
+    "RA8_TRACE_FROM": "57000",
+    "RA8_ECONOMY_TRACE": "1"
+  }
+}

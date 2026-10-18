@@ -1,0 +1,11 @@
+    Finished `release` profile [optimized] target(s) in 0.18s
+     Running `/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples/m13_ten_players liberty_bay continental_divide pacific_atoll`
+liberty_bay: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 317.1µs, set up in 12.5ms
+  24000 ticks: mean 963.805µs, 99th centile 5.820ms, longest 93.713ms, busiest 1000 ticks mean 1.701ms, 1 ticks over 50ms; measured total 23.131s, elapsed 23.133s
+  at most 291 units and 179 buildings; 10 players built; 5 players left after 24000 ticks
+continental_divide: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 63.8µs, set up in 7.0ms
+  24000 ticks: mean 1.028ms, 99th centile 7.893ms, longest 92.760ms, busiest 1000 ticks mean 1.942ms, 2 ticks over 50ms; measured total 24.674s, elapsed 24.676s
+  at most 289 units and 177 buildings; 10 players built; 8 players left after 24000 ticks
+pacific_atoll: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 1.7ms, set up in 3.3ms
+  24000 ticks: mean 807.054µs, 99th centile 5.962ms, longest 61.071ms, busiest 1000 ticks mean 1.347ms, 3 ticks over 50ms; measured total 19.369s, elapsed 19.371s
+  at most 277 units and 143 buildings; 10 players built; 5 players left after 24000 ticks

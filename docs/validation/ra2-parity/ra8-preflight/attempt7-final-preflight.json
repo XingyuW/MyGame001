@@ -1,0 +1,90 @@
+{
+  "runtime_manifest": "attempt7-final-runtime-manifest.json",
+  "commands": [
+    {
+      "phase": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 0.8637720420083497,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-final-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 0.006456375005654991,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-final-diff.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 0.2159749999991618,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-final-clippy.log",
+      "sha256": "f0788aa36d1c86b6ccdfb7f4042a5574102d82061c046422a2d42e008a1e4710"
+    },
+    {
+      "phase": "generated",
+      "command": [
+        "python3",
+        "scripts/generate_ra2_data.py",
+        "--check"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 0.07163287501316518,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-final-generated.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "reference",
+      "command": [
+        "python3",
+        "scripts/ra2_reference.py",
+        "--check"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 0.07597212502150796,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-final-reference.log",
+      "sha256": "5fa32e9687ef749dd76543b607f37bc835ddd9e7469e2b7b5874d233ee5cf964"
+    },
+    {
+      "phase": "demo",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_ai_matches",
+        "--",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "exit": 101,
+      "elapsed_seconds": 61.01909241700196,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-final-demo.log",
+      "sha256": "6d11d5cc46ccd3ba2862cb05707a817b1ed83429eb6b0de5f080bde8b8293277"
+    }
+  ]
+}

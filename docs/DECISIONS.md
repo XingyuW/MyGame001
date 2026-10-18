@@ -7871,3 +7871,51 @@ After independently verified source restoration, all74 shipped AI integration sc
 Current full-tree static inventory is1275 vs RA7baseline1124 (+151), no removed/renamed/ignored
 tests. R141/R142 add four scheduled tests; the one existing dock-fixture input migration above
 retains every assertion. Broader final-source validation remains pending.
+
+### R143 — Eighth frozen preflight checkpoint and preserved validation evidence
+
+Runtime f431d122d1c147fdc948d21b55156aa0a7477cc1 completes all41 final5 preflight commands with
+exit0,1237passed/0failed/0ignored across105 test-target invocations. The earlier same-runtime
+default10 harness adds1passed/1target,for1238/0/0 across106. Fullsim984/72targets exits0 in
+658.423891s;gamebin217 exits0 in132.187275s;M10five exits0 in128.082761s. All26 retained exact
+winners and allfive M6 companions preserve their limits/assertions. The26 focused endings have
+median70289/p90130029/max178737;this is explicitly not either required756-match R29 distribution.
+All341 manifest files rehash without mismatch;main remains8230a955b251e9341d349f99eaeb86f7f8253664.
+Static inventory is1275 versus1124 at RA7 (+151),none removed/renamed/ignored. Two bounded owned
+process metadata reads during quiet fullsim confirm CPU progress;no profiler,mutation or
+competing simulation is introduced. They precede the unprofiled m13 measurements.
+
+Actual default m13 `to-the-end all` exits0/1485.564768s,21explicitWon and21ten-builder summaries,
+all means<5ms. Endings median87848/p90 nearest-rank145665/max172912 remain below unchanged400000.
+Previous checkpoint7's85128/125479/174450 remains historical:median/p90 rise and max falls,
+without inferred causal attribution. Measured total1481.782s/mapelapsed1481.942s. Worst whole-run
+mean is Coral Archipelago1.075ms;actual maximum tick is Ember179.436ms. Red Canyon's busiest1000
+mean10.780ms/295ticks>50ms is retained,not hidden by the whole-run mean. Fixed24000-tick actual
+256×256 Liberty/Continental/Pacific means0.963805/1.028/0.807054ms pass the unchanged5ms budget,
+exit0/67.839183s. Their p99/max/busy/late counts are recorded in acceptance and full structured
+metrics,not described as smooth-play guarantees or completed-match winners. Raw all-map SHA
+12febbcd19cdd233cfb8e3fe1fce12cea04ac17f3a51019a7b65c1fd66022bd6;fixed-budget SHA
+1be688d1659a236085768271d3581c832e02ddc92558baaf749cc3a25874a2e4.
+
+All prior raw failed gate/preflight/negative/probe evidence remains byte-preserved. The exact
+new existing fixture input migration and all source assumptions are in R141/R142;prior
+R124/R125/R128/R130 migrations and R132–R140 scopes remain independent review/RA9 inputs. R97 is
+closed R103. R83,R96,R99 remain the explicit RA9 handoff;unknown bombable capability remains
+unproven. No source/data/scripts change follows f431d12 in this evidence checkpoint. All13 and
+both fresh756-winner R29 distributions remain required after root's committed milestone check;
+no independent review/approval is claimed. User visual/audio/play-feel verification remains.
+
+Storage is remeasured at58 files/584038 file bytes/733184 allocated bytes(716KiB) under configured
+cargo-target/tmp/ra8_definitions,retained recreatable for reruns and unnecessary for release.
+No additional substantial external directory is created;configured Cargo/UV/PIP caches and RA5
+render/RA7 parser evidence remain. No validator is active before checkpoint commit. Separate
+staged unfiltered hygiene inspection and exact raw-only classification must precede that commit.
+
+The standalone runtime commit's staged unfiltered check exits0. The separate evidence staged
+check exits2,NOT passed:153 exact raw-log diagnostics (134 final blank lines,19 captured
+unfinished test-progress trailing spaces),zero source/data/test/document errors. Every path,
+line,raw-file SHA,including-EOL line SHA and staged Git blob is classified in
+checkpoint8-staged-hygiene.json;full unfiltered stdout/stderr remain in its -raw.json companion.
+stdout SHA0c90536b9aed2f68888a9d19e507db559ccfd51ebb0e5e82f7b0c06aa58b4b16. Raw bytes are
+unchanged;there is no whitespace suppression. Require identical final staged stdout/stderr/
+exit before the separate evidence commit. All13 script checks remain unmodified and required.

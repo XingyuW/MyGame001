@@ -1,0 +1,30 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all"
+    ],
+    "exit": 0,
+    "seconds": 0.8543754999991506,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-attrition-format1.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "ra8_paid_repairs_cannot_pin_real_reloaded_strikes_to_one_unchanged_building",
+      "--",
+      "--exact",
+      "--nocapture"
+    ],
+    "exit": 101,
+    "seconds": 4.7726792920148,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-attrition-controlled-before1.log"
+  }
+]

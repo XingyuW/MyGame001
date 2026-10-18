@@ -1,0 +1,21 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 16.46s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+
+thread 'ai::ra8_recovery_tests::ra8_no_income_reallocates_real_unfinished_tech_credits_to_starved_combat_without_requeue' (7250354) panicked at crates/sim/src/ai/ra8_recovery_tests.rs:132:5:
+assertion `left == right` failed: exact paid construction funds must be refunded once
+  left: []
+ right: [1200]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ai::ra8_recovery_tests::ra8_no_income_reallocates_real_unfinished_tech_credits_to_starved_combat_without_requeue ... FAILED
+
+failures:
+
+failures:
+    ai::ra8_recovery_tests::ra8_no_income_reallocates_real_unfinished_tech_credits_to_starved_combat_without_requeue
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 77 filtered out; finished in 0.12s
+
+error: test failed, to rerun pass `-p sim --lib`

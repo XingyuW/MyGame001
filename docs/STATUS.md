@@ -4318,3 +4318,40 @@ not duplicated. The four evidence directories under
 user verification: `m8` (96 KiB), `m8-review-1` (4.2 MiB), `m8-remediation-1` (6.4 MiB), and
 `m8-review-2` (about 124 MiB, including its independent probe executable). No clone/worktree or
 substantial temporary-directory artifact was created. The user's untracked handoff is untouched.
+
+### RA8: eighth final-source checkpoint, frozen gate pending (2026-10-18)
+
+Runtime `f431d122d1c147fdc948d21b55156aa0a7477cc1` completes the current serial preflight:
+all 41 final5 commands exit 0, with 1,237 passed / 0 failed / 0 ignored across 105 test-target
+invocations. The earlier same-runtime default Demo harness adds one passed test/target, making
+1,238 / 0 / 0 across 106 invocations. This includes full simulation (984 tests), game binary
+(217), M10 (five), all five M6 companion regressions and 26 exact retained winners under
+unchanged limits. All 341 runtime-manifest hashes match. The full-tree static inventory is
+1,275 versus RA7's 1,124: 151 added, none removed, renamed or ignored. `main` remains
+8230a955b251e9341d349f99eaeb86f7f8253664.
+
+All 21 actual default ten-player maps end with explicit winners and all ten players building.
+Ending median / nearest-rank p90 / maximum are 87,848 / 145,665 / 172,912, below the unchanged
+400,000 cap. The fixed 24,000-tick 256×256 means are 0.963805 / 1.028 / 0.807054 ms, below the
+unchanged 5 ms budget. Long ticks remain in the raw evidence. No profiler or competing
+simulation ran during these measurements. Full metrics, exact migration and assumption ledger,
+source freeze, raw logs and prior failures are in `docs/validation/ra2-parity/RA8_ACCEPTANCE.md`
+and `ra8-preflight/attempt7-final5-*`.
+
+R132–R142 record the concrete seventh-gate failures, controlled proofs, rejected candidates and
+narrow corrections. The latest worker-job admission is based on visible ore and public terrain,
+and prospective construction recovery requires a real source-qualified reachable finisher and
+exact full financing. The existing aircraft dock fixture gains a real ore job while every
+original admission/time/payment/rejection assertion remains unchanged; a bounded negative still
+fails its original overbooking assertion and is exactly restored. No match limit, source wave
+cadence, public validation or legitimate finishing capability was waived to obtain a winner.
+
+All 13 frozen validation commands and both fresh 756-winner R29 before/after distributions
+remain required before RA8 closure. This is validated preflight, not independent review or
+approval. R97 queued-intent lifecycle debt is closed in R103. R83 transport/loaded boarding/
+attached-Squid firing, R96 actorless occupied-Prop ability resolution and R99's unproven
+capability lead remain RA9 scope. Independent final review and user visual/audio/play-feel
+verification remain pending. Fresh storage measurement is 58 parser files, 584,038 file bytes,
+733,184 allocated bytes (716 KiB), retained for recreatable reruns and unnecessary for release.
+No additional substantial external directory was created; configured caches and earlier RA5/RA7
+evidence remain preserved.

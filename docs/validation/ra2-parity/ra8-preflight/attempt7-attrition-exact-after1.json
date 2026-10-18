@@ -1,0 +1,65 @@
+[
+  {
+    "case": "jungle",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate7_jungle_cuba_russia_easy_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 72.47048325001379,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-jungle-attrition-after1.log",
+    "scope": "independent exact ending replay; unchanged bound/rejection assertions, no tracing env"
+  },
+  {
+    "case": "pacific",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate7_pacific_cuba_great_britain_brutal_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 98.7471506249858,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-pacific-attrition-after1.log",
+    "scope": "independent exact ending replay; unchanged bound/rejection assertions, no tracing env"
+  },
+  {
+    "case": "riverlands",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate7_riverlands_iraq_cuba_easy_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 9.097641708009178,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-riverlands-attrition-after1.log",
+    "scope": "independent exact ending replay; unchanged bound/rejection assertions, no tracing env"
+  }
+]

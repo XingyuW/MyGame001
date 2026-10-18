@@ -1,0 +1,20 @@
+    Finished `release` profile [optimized] target(s) in 0.06s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+
+thread 'command::ra8_intent_tests::ra8_service_healing_certificate_keeps_public_intrinsic_capacity_and_fifo_errors_strict' (7196163) panicked at crates/sim/src/ra8_intents.rs:164:13:
+assertion `left == right` failed
+  left: None
+ right: Some(SimId(2))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test command::ra8_intent_tests::ra8_service_healing_certificate_keeps_public_intrinsic_capacity_and_fifo_errors_strict ... FAILED
+
+failures:
+
+failures:
+    command::ra8_intent_tests::ra8_service_healing_certificate_keeps_public_intrinsic_capacity_and_fifo_errors_strict
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 67 filtered out; finished in 0.03s
+
+error: test failed, to rerun pass `-p sim --lib`

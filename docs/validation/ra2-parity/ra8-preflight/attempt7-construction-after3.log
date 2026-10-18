@@ -1,0 +1,22 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 16.83s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 2 tests
+test ai::ra8_recovery_tests::ra8_income_recovery_and_completed_construction_keep_their_normal_heads ... ok
+test ai::ra8_recovery_tests::ra8_no_income_reallocates_real_unfinished_tech_credits_to_starved_combat_without_requeue ... finite construction charged1600 refunds[1600] paid_tankfalse requeuedfalse
+finite recovery final credits0 queues[(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(1)), progress: 510, charged: 510, fraction: 0 }]), (QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 167, charged: 167, fraction: 500 }, QueueItem { item: Unit(UnitKind(1)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(17)), progress: 523, charged: 523, fraction: 0 }, QueueItem { item: Unit(UnitKind(17)), progress: 0, charged: 0, fraction: 0 }])]
+
+thread 'ai::ra8_recovery_tests::ra8_no_income_reallocates_real_unfinished_tech_credits_to_starved_combat_without_requeue' (7257591) panicked at crates/sim/src/ai/ra8_recovery_tests.rs:156:5:
+ordinary paid combat production stayed starved
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ai::ra8_recovery_tests::ra8_no_income_reallocates_real_unfinished_tech_credits_to_starved_combat_without_requeue
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 76 filtered out; finished in 0.27s
+
+error: test failed, to rerun pass `-p sim --lib`

@@ -1,0 +1,17 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_recovery_tests::ra8_no_income_reallocates_real_unfinished_tech_credits_to_starved_combat_without_requeue",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "exit": 101,
+  "seconds": 16.425315332977334,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-before2.log"
+}

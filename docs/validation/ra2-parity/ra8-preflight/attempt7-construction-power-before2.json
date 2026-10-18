@@ -1,0 +1,22 @@
+{
+  "scope": "Single bounded negative disables only affordable current-power-shortage admission. Exact2500finitecash/sourcePower800 fixture; immediate finally SHA restoration before further tests.",
+  "candidate_ai_sha256": "451fa1f62725e33bd81be487252ec777288b4c8ec64f8d0818daad78f827a719",
+  "probe_ai_sha256": "f544e3d1c20a99ee413b3cd295116040f7f32c23ff654fb30cab6fcda60ff15e",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_recovery_tests::ra8_attainable_power_recovery_restores_real_production_despite_reserved_unit_tails",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-power-before2.log",
+  "exit": 101,
+  "seconds": 16.31443150000996,
+  "restored_ai_sha256": "451fa1f62725e33bd81be487252ec777288b4c8ec64f8d0818daad78f827a719",
+  "log_sha256": "effadfd34fff9e4803892c0810dc7999621166b7c5ead1d099b9f52e80a25358"
+}

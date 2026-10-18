@@ -1,0 +1,14 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 15.98s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 3 tests
+test ai::ra8_recovery_tests::ra8_attainable_power_recovery_restores_real_production_despite_reserved_unit_tails ... power recovery placedtrue slow8ticks5 fast8ticks_progress_and_paidcreditsSome((10, 20))
+ok
+test ai::ra8_recovery_tests::ra8_income_recovery_and_completed_construction_keep_their_normal_heads ... ok
+test ai::ra8_recovery_tests::ra8_no_income_reallocates_real_unfinished_tech_credits_to_starved_combat_without_requeue ... finite construction charged1600 refunds[1600] paid_tanktrue requeuedfalse
+finite recovery final credits0 queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 0, charged: 0, fraction: 0 }, QueueItem { item: Unit(UnitKind(1)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(17)), progress: 100, charged: 100, fraction: 0 }, QueueItem { item: Unit(UnitKind(17)), progress: 0, charged: 0, fraction: 0 }])]
+ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 76 filtered out; finished in 0.30s
+

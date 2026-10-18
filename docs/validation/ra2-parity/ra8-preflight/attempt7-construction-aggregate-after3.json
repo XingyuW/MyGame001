@@ -1,0 +1,67 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all"
+    ],
+    "exit": 0,
+    "seconds": 0.8704240829974879,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-format16.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "ai::ra8_recovery_tests",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 17.147591083979933,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-aggregate-after3.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "ra8_land_defenders_use_reachable_firing_positions_and_leave_isolated_ships_to_the_fleet",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 18.87874704200658,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-defence-after2.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "ra8_a_defender_already_inside_its_source_air_bonus_range_remains_eligible",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 0.10140441701514646,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-bonus-after2.log"
+  }
+]
