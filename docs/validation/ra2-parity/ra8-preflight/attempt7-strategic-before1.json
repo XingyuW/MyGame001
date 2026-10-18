@@ -1,0 +1,33 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all"
+    ],
+    "exit": 0,
+    "seconds": 0.8706459999957588,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-format1.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate_harvest_bridge_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 101,
+    "seconds": 113.66934037499595,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-before1.log",
+    "log_sha256": "48231a6531e284cc8a0e8543dec730784445e22bed117fb2c16915db81726427"
+  }
+]

@@ -1,0 +1,109 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all"
+    ],
+    "exit": 0,
+    "seconds": 0.9037347919947933,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-format4.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "command::ra8_intent_tests",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 16.765036875003716,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-security-after4.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "ra8_source_self_healing_after_a_real_ai_service_decision_cancels_the_healed_job",
+      "--",
+      "--exact",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "seconds": 0.1170835830271244,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-source-after2.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra1_commands",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 1.7460544590139762,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-public1.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra5_world",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 5.558927541977027,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-world1.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_ai_matches",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 55.77519454198773,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-demo1.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 0,
+    "seconds": 6.61526083399076,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-clippy1.log"
+  }
+]

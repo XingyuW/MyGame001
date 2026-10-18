@@ -1,0 +1,29 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all"
+    ],
+    "exit": 0,
+    "seconds": 0.9330445000086911,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-format5.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "ai::ra8_recovery_tests::ra8_attainable_power_recovery_restores_real_production_despite_reserved_unit_tails",
+      "--",
+      "--exact",
+      "--nocapture"
+    ],
+    "exit": 101,
+    "seconds": 16.929879792005522,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-power-before1.log"
+  }
+]

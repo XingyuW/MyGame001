@@ -1,0 +1,75 @@
+{
+  "archived_utc": "2026-10-17T00:58:36.855041+00:00",
+  "frozen_head": "85b6f560e55c4e0d5de1075552ecd529e2b2eba0",
+  "runtime": "b6eac0c7c31e69ff8dff91dc154a9497143b7484",
+  "completed_failure": "phase4 workspace exit101,253passed1failed0ignored;production target5passed1failed5090.83s",
+  "stopped": "wrapper terminated ownedPGID54111 immediately after completed phase4; later healthy phases not claimed",
+  "timing_note": "script phase4 date wall9649s differs wrapper monotonic5471.912490s; retain both, no causal attribution",
+  "files": [
+    {
+      "path": "01-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "02-diff-check.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "03-clippy.log",
+      "bytes": 72,
+      "sha256": "3dbebdfe57c58e155ac8a657a434094c1504a64a2cee500df8a6e14e483660d2"
+    },
+    {
+      "path": "04-test.log",
+      "bytes": 33587,
+      "sha256": "da4b590976fe2f7dc1df2c6f7f4038accf14391988100b73bbdbbe0e837d0c3a"
+    },
+    {
+      "path": "gate-process-output.log",
+      "bytes": 235,
+      "sha256": "650698de025b06cee34acde49d2eec0144c6c4ff03345c3dde8b39e9a9aaab3a"
+    },
+    {
+      "path": "gate-process.json",
+      "bytes": 1066,
+      "sha256": "9a75f64a85059afc93bdf7669781839076f26123e2c8fdb06eb0fe1d3a87fce8"
+    },
+    {
+      "path": "production-liveness1.json",
+      "bytes": 913,
+      "sha256": "83cec5ece2b55f1171757d30967e2c53696500a4b35e88278b57ff5ee19acbed"
+    },
+    {
+      "path": "production-liveness2.json",
+      "bytes": 470,
+      "sha256": "98283d628462ab426d43c91bc19b5372443929fea77ff6b92b9012aa37c481e2"
+    },
+    {
+      "path": "production-liveness3.json",
+      "bytes": 471,
+      "sha256": "c017a8a55601a8939574c64aee925b8096319e81a273df3519d38592b49f57cd"
+    },
+    {
+      "path": "production-liveness4.json",
+      "bytes": 470,
+      "sha256": "0f7d006b8389a0c7318b7316cde3c28c1d4022b9699c7e7e3bafcc5696d42f03"
+    },
+    {
+      "path": "production-liveness5.json",
+      "bytes": 470,
+      "sha256": "d74342215d6ae52586d412fcbe0440153fb21e9881b0c3b4b7e74e62a62c3624"
+    },
+    {
+      "path": "production-liveness6.json",
+      "bytes": 471,
+      "sha256": "0bbb6002f7b8403fe2356be02e7e1683bbc9ec67655effb14ef282725137ec18"
+    },
+    {
+      "path": "summary.txt",
+      "bytes": 235,
+      "sha256": "650698de025b06cee34acde49d2eec0144c6c4ff03345c3dde8b39e9a9aaab3a"
+    }
+  ]
+}

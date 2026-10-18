@@ -1,0 +1,26 @@
+{
+  "commit": "d1b484b",
+  "stage_paths": [
+    "crates/sim/src/command.rs",
+    "crates/sim/src/ra8_intents.rs",
+    "crates/sim/src/special.rs",
+    "crates/sim/src/special/commands.rs",
+    "crates/sim/src/special/interaction.rs",
+    "crates/sim/tests/ra8_ai.rs",
+    "docs/DECISIONS.md"
+  ],
+  "hygiene": {
+    "command": [
+      "git",
+      "diff",
+      "--cached",
+      "--check"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "inspection": "Separate call inspected exit0 before a separate git commit call; no suppression."
+  },
+  "proof": "attempt7-service-preflight5.json plus exact after2; raw failures/probes retained",
+  "other_work": "Game diagnostic harness and attempt7 logs remain uncommitted; three default ending failures open."
+}

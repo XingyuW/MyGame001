@@ -1,0 +1,18 @@
+{
+  "cmd": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_recovery_tests::",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 0,
+  "seconds": 19.66017479202128,
+  "ai_source_sha": "19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7",
+  "log_sha": "8844562dd61df653ef25a4c94ae4e61ae5ff13aa8a946f4a1359f372ab07ad0e"
+}

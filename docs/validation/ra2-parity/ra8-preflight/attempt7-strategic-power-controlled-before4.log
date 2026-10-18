@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 17.66s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+test command::ra8_intent_tests::ra8_certified_strategic_intent_waits_after_real_between_stage_power_plant_destruction ... 
+thread 'command::ra8_intent_tests::ra8_certified_strategic_intent_waits_after_real_between_stage_power_plant_destruction' (7336665) panicked at crates/sim/src/ra8_intents.rs:1620:5:
+[CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(2), target: CellPos { x: 8, y: 8 }, units: [] }, reason: AbilityUnavailable("Ability requires power and a full charge") }, AttackEnded { unit: SimId(6), target: SimId(4), reason: TargetGone }, WeaponFired { attacker: SimId(7), target: SimId(6), weapon: WeaponKind(14) }, WeaponFired { attacker: SimId(8), target: SimId(6), weapon: WeaponKind(14) }]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    command::ra8_intent_tests::ra8_certified_strategic_intent_waits_after_real_between_stage_power_plant_destruction
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 83 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p sim --lib`

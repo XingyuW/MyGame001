@@ -1,0 +1,33 @@
+[
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 16.557000500004506,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-attrition-lib1.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 50.665394707990345,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-attrition-ai-all1.log"
+  }
+]

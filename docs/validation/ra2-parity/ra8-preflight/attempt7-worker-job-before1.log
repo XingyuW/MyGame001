@@ -1,0 +1,22 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 16.57s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+test ai::ra8_recovery_tests::ra8_paid_worker_replacement_requires_a_known_reachable_economic_job ... worker job empty: paidtrue workers{SimId(8)} actual_deliveryfalse
+
+thread 'ai::ra8_recovery_tests::ra8_paid_worker_replacement_requires_a_known_reachable_economic_job' (7486217) panicked at crates/sim/src/ai/ra8_recovery_tests.rs:981:9:
+assertion `left == right` failed: worker quota has no known reachable economic job: empty
+  left: true
+ right: false
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ai::ra8_recovery_tests::ra8_paid_worker_replacement_requires_a_known_reachable_economic_job
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 87 filtered out; finished in 0.06s
+
+error: test failed, to rerun pass `-p sim --lib`

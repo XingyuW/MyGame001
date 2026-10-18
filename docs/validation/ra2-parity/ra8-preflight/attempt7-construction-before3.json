@@ -1,0 +1,23 @@
+{
+  "scope": "Single negative against exact588f6de production AI with only new cfg(test) recovery module declaration; other source unchanged. Immediate finally restoration before any subsequent check.",
+  "candidate_ai_sha256": "006341889b2d8462e96e3f613f39533862bcfa38d278a6d68b14f28937f9b1c2",
+  "probe_ai_sha256": "67b89ff425782ecae1b5f41ba50d7133ee2fb5b478101ed734b588bd47f5d446",
+  "base_ai_sha256": "e0dde7da85562710356a976c754edf14a4331524c1048c24bc2cf9040b15d9f4",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_recovery_tests::ra8_no_income_reallocates_real_unfinished_tech_credits_to_starved_combat_without_requeue",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-before3.log",
+  "exit": 101,
+  "seconds": 16.429977832973236,
+  "restored_ai_sha256": "006341889b2d8462e96e3f613f39533862bcfa38d278a6d68b14f28937f9b1c2",
+  "log_sha256": "c55625e79780a096364f666b04387dc5aa45c5067f6ce1ff3225a440c67bcba3"
+}

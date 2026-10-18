@@ -1,0 +1,20 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 18.06s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+paid-repair sortie shots2 other0 reloads1 paid_healing38
+
+thread 'ra8_paid_repairs_cannot_pin_real_reloaded_strikes_to_one_unchanged_building' (7213757) panicked at crates/sim/tests/ra8_ai.rs:1673:5:
+the actual source weapon, ammo, reload and paid repairs must establish repeated non-convergence
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_paid_repairs_cannot_pin_real_reloaded_strikes_to_one_unchanged_building ... FAILED
+
+failures:
+
+failures:
+    ra8_paid_repairs_cannot_pin_real_reloaded_strikes_to_one_unchanged_building
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 67 filtered out; finished in 0.71s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

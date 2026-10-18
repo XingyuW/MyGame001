@@ -1,0 +1,20 @@
+{
+  "cmd": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_unlimited_bomber_focus_ignores_an_incapable_en_route_ground_unit",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 101,
+  "seconds": 4.7387863749754615,
+  "runtime_sha": "816b6b088ac4305752f4fd230be97c058a4acd33d038c5f88b9bccfb1034029f",
+  "log_sha": "a8acb701d44c301c470ef6220e708370a9dc094f018ad22a89846294543c0eaa"
+}

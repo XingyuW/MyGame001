@@ -1,0 +1,9 @@
+    Finished `release` profile [optimized] target(s) in 0.14s
+     Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-fff13bc99bc7e9e6)
+
+running 1 test
+test the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first ... crossroads: ["libya", "iraq"] at ["easy", "easy"]: 55575 ticks of 72000
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 8.28s
+

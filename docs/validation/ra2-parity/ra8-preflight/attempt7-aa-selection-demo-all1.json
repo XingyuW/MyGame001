@@ -1,0 +1,18 @@
+{
+  "cmd": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_ai_matches",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 0,
+  "seconds": 60.839916792028816,
+  "runtime_sha": "a8fbfc44e95073851fcf97bbbd57ed6607c20382d5c0fe4e8e74e25b267a5418",
+  "log_sha": "8283b48c9c526ed9b9e77212364b231193b1dc49ee1e89171083ad16805bab02"
+}

@@ -1,0 +1,18 @@
+{
+  "cmd": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_recovery_tests::ra8_paid_worker_replacement_requires_a_known_reachable_economic_job",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 0,
+  "seconds": 34.13074145800783,
+  "log_sha": "20503f0c0eb31b263fe7bc059d3a64d180ad8cd4103378a6cefa421a862a2956"
+}

@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-18T16:40:02.292273+00:00",
+  "prior": {
+    "utc": "2026-10-18T16:38:40.804516+00:00",
+    "scope": "owned active final5 m6_ai test process metadata only; no stack sample or competing simulation",
+    "processes": [
+      "81079 79395       04:37  41:10.99 295.6 /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_ai-39cf04a6b4df1362 --test-threads=1"
+    ]
+  },
+  "current": "81079 79395 05:59  43:31.69  99.3 /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_ai-39cf04a6b4df1362 --test-threads=1",
+  "scope": "second bounded metadata observation of the same owned PID; no stack sample"
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all"
+    ],
+    "exit": 0,
+    "seconds": 0.9209574999986216,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-building-budget-format1.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "ai::ra8_recovery_tests::ra8_existing_main_building_obligation_cannot_be_reused_to_fund_the_defence_lane",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 101,
+    "seconds": 16.937395584012847,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-building-budget-before1.log"
+  }
+]

@@ -1,0 +1,22 @@
+{
+  "original_sha": "19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7",
+  "cmd": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_aircraft_same_decision_admission_counts_existing_queued_and_new_dock_commitments",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "mutated_sha": "f61faed2d8a6d7d2d1d7a9843dc7602f5b44a7a5bb4302979483159942cca867",
+  "exit": 101,
+  "seconds": 19.726547083002515,
+  "log_sha": "5cace7f3d79207fd227502d508d7594f839e3a6249dc8183469cb126dcbe9f75",
+  "restored_sha": "19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7"
+}

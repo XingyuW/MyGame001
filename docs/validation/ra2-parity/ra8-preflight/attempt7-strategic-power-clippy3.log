@@ -1,0 +1,25 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Checking game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+error: this `if` has identical blocks
+    --> crates/sim/src/ra8_intents.rs:1834:45
+     |
+1834 |               if mode == "natural" && !public {
+     |  _____________________________________________^
+1835 | |                 assert!(rejected.is_empty(), "{events:?}");
+1836 | |             } else if mode == "later_sale" {
+     | |_____________^
+     |
+note: same as this
+    --> crates/sim/src/ra8_intents.rs:1836:44
+     |
+1836 |               } else if mode == "later_sale" {
+     |  ____________________________________________^
+1837 | |                 assert!(rejected.is_empty(), "{events:?}");
+1838 | |             } else {
+     | |_____________^
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#if_same_then_else
+     = note: `-D clippy::if-same-then-else` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::if_same_then_else)]`
+
+error: could not compile `sim` (lib test) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
