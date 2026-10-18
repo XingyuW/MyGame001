@@ -609,6 +609,55 @@ fn dump(world: &mut bevy::ecs::world::World) {
             state.queues().collect::<Vec<_>>()
         );
     }
+    if std::env::var_os("RA8_RIVERLANDS_TRACE").is_some() {
+        let grid = world.resource::<sim::Grid>();
+        let ore: Vec<_> = (0..grid.height())
+            .flat_map(|y| (0..grid.width()).map(move |x| sim::CellPos::new(x as i32, y as i32)))
+            .filter(|&cell| grid.cell(cell).is_some_and(|t| t.ore > 0))
+            .collect();
+        for (player, state) in world.resource::<sim::Players>().iter() {
+            eprintln!(
+                "diagnostic ore {player:?} total_cells{} visible_cells{}",
+                ore.len(),
+                ore.iter()
+                    .filter(|&&at| state.vision().is_visible(at))
+                    .count()
+            );
+        }
+        let targets: Vec<_> = world
+            .query::<(&sim::Owner, &sim::Building)>()
+            .iter(world)
+            .filter(|(owner, _)| owner.0 == PlayerId(1))
+            .map(|(_, b)| b.footprint)
+            .collect();
+        let starts: Vec<_> = world
+            .query::<(&SimId, &sim::Owner, &sim::Mobile)>()
+            .iter(world)
+            .filter(|(_, owner, _)| owner.0 == PlayerId(0))
+            .map(|(id, _, mobile)| (*id, mobile.cell))
+            .collect();
+        let grid = world.resource::<sim::Grid>();
+        for (id, start) in starts {
+            let mut seen = BTreeSet::from([start]);
+            let mut open = std::collections::VecDeque::from([(start, 0_u32)]);
+            let mut path = None;
+            while let Some((cell, distance)) = open.pop_front() {
+                if targets.iter().any(|f| f.distance_to_cell(cell) == 1) {
+                    path = Some(distance);
+                    break;
+                }
+                for (dx, dy) in [(0, -1), (-1, 0), (1, 0), (0, 1)] {
+                    let next = sim::CellPos::new(cell.x + dx, cell.y + dy);
+                    if grid.passable_for(next, sim::Domain::Land) && seen.insert(next) {
+                        open.push_back((next, distance + 1));
+                    }
+                }
+            }
+            eprintln!(
+                "diagnostic physical terrain/building route {id:?} from{start:?} to_enemy_ring{path:?} (temporary traffic excluded)"
+            );
+        }
+    }
     let controllers = format!("{:?}", world.resource::<sim::AiPlayers>());
     let mut rest = controllers.as_str();
     while let Some(start) = rest.find("waypoints: [") {

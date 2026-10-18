@@ -7710,3 +7710,164 @@ All10 default Demo pairings retain explicit Won under72000, exit0/60.839917s com
 test), raw SHA8283b48c9c526ed9b9e77212364b231193b1dc49ee1e89171083ad16805bab02. RussiaEasy/
 LibyaEasy remains69633. These results permit the coherent source commit and final-source
 preflight; all earlier exact failures and negative probes remain retained unchanged.
+
+### R141 — Replacement workers require an observed reachable economic job
+
+The retained final4 preflight completes21 exact winners, then fails Riverlands IraqEasy/CubaEasy
+seed0 at the unchanged72000 limit (attempt7-final4-exact-22). The exact late trace shows ordinary
+paid WarMiner189 born70816 for1400, then idle without an observed ore job. Neither player has
+visible ore at60000 or72000; the diagnostic also observes global ore0, but that hidden-world
+fact is NOT an input to planning. Existing ore growth visits live ore seeds only. The trace's
+public-terrain/physical-building diagnostic finds43–45-cell land paths for the final P0 actors;
+it does not establish a terrain disconnection or justify overriding sourced TeamDelay4667.
+Original Miner29 actually fights until death65774; the replacement is not called globally
+incapable. Separate construction-credit reservation evidence remains a distinct investigation.
+
+A controlled actual shipped controller test,
+`ra8_paid_worker_replacement_requires_a_known_reachable_economic_job`, fails before the runtime
+change: an ordinary factory-paid ChronoMiner8 completes with no ore and no delivery. Raw
+attempt7-worker-job-before1 exits101/16.896782s, SHA
+7cfb4684025abd28bd38b5fda57a48d082cc0aa2d5254396cc08ebc9525fb5b3. No negative source mutation
+was needed. `queue_units` now admits a NEW quota worker only if current visible ore belongs to
+a public-terrain component containing an actual owned producer ring and owned refinery ring.
+The bounded cardinal component traversal has at most the map's cells; actual diagonal movement
+requires a passable orthogonal neighbour, so it does not join otherwise disconnected components.
+It derives domain from shipped definitions, excludes owned/currently visible building footprints,
+and ignores temporary units and unseen building occupancy. Actual movement still handles traffic
+and physical I6. No hidden ore exhaustion oracle, radius, cadence, persistent state or new tuning
+is introduced. This is a declared AI job-admission assumption, gated by the existing shipped
+`rules_difficulty` opt-in; neutral legacy fixtures retain their explicit contract.
+
+Existing workers, returning cargo and previously accepted worker heads are not cancelled or
+reassigned by this query. An observed small live seed qualifies for potential source regrowth;
+unknown future fields do not. The current ordinary ChronoMiner path first finds a reachable dock
+in harvest::nearest_dock before special/advance can perform its return teleport, so the query
+does not invent an inaccessible-island mining cycle or change that mechanic. After2's expanded
+scheduled test proves empty/isolated fields produce no new paid worker; reachable/max-bail and
+one-bail regrowth fields both produce a real paid worker with an actual ore delivery; and an
+already queued ordinary paid worker still completes when no field is visible. It exits0/
+33.419340s including32.31s compilation; raw SHA
+ab2c0ade0f093608a2c5a3fc0608ca8cfecdf38ecd6037f42d6e4aae58e85eca.
+
+`ra8_worker_admission_cannot_learn_hidden_ore_or_building_occupancy` compares complete actual
+queued AI intents in fog-on twins with hidden ore versus none, then an unseen newly constructed
+factory blocking a public-terrain crossing versus no factory, with a genuinely visible one-bail
+field. Both twins produce the same intents; visible field admits the worker, hidden ore does
+not. Its first new fixture accidentally inspected tick1, which is not a sourced AI due turn;
+empty queues caused the positive admission assertion to fail (after1, retained SHA
+e7c8e4e47a312afa63fec08f449bfd099c8063d2f570255556de6c1854c5d939). The fixture now waits the
+actual `due` predicate, retaining all assertions, and passes after2/36.956789s, raw SHA
+c567e9fcd074051807a59817b0a427bd39fbddc9bd284d3a9d3b5b97f3183ff2. This correction changes
+only the new observation setup, not production cadence or any existing test expectation.
+
+Transport recovery preserved all raw files and verified ai.rs/strategy.rs exactly matched
+118c4c1 before any new runtime edit. A diagnostic orchestration lapse is explicit: formatter
+session34730 had yielded when diagnostic62023 started, before its exit was inspected. Both were
+subsequently inspected (0 and101); no mutation/commit or pass claim depended on that ordering.
+The completed diagnostic failure is preserved as attempt7-riverlands-trace-before2, not counted
+as a validation pass. All subsequent format/build steps are serial with inspected completion.
+Exact Riverlands/default10/full preflight and ending credit remain separate from these proofs.
+
+The worker-only exact Riverlands retry remains None72000, exit101/86.850141s command including
+compilation (17.96s test), raw SHA5d3460a61471b3bab134568da24a773867694b302dbec63c08d6e3169463c157.
+It has no wasted new worker, but a real idle V3/Desolator/Conscript squad still waits its existing
+wave cadence. This proves R141 is a capability correction, not the complete ending repair; the
+separate prospective construction-credit loop is investigated next without cadence/limit changes.
+
+### R142 — A finite construction reservation cannot exclude its first funded finisher forever
+
+The exact Riverlands trace shows cash160, no unit queue and an incomplete NuclearSilo charged839.
+`retain_funded_unit_intents` correctly reserves all existing construction debt before admitting
+another unit, but `cancel_starved_construction` previously required actual unit debt. With no
+unit head, that need is0 and cancellation never starts. Thus an impossible construction head can
+permanently exclude a perfectly legal affordable-after-refund fighter, independently of R141's
+worker issue. No source TeamDelay, first-wave, patience, last-stand state or match limit changes.
+
+A schedule-level controlled proof,
+`ra8_unfundable_construction_cannot_reserve_out_the_first_reachable_finisher_forever`, first
+charges1600 to ordinary TechCenter production, then uses public CancelProduction to remove ONLY
+an unpaid Grizzly request (refund0). The real no-income state has no unit work and an existing
+capable actor, so this is not a fabricated helplessness/liquidation case. Before the change,
+6000 scheduled ticks give refunds[], recruits{}, building_shots0; it fails101/32.641466s command,
+raw SHA813bd355aad93d167a610b58752250cc0aec196eb9ceb72f35dfda0ea7590ef9. No mutation was needed.
+
+The existing `recover_unit_credits` counterfactual now also considers one incomplete paid
+non-income/non-power construction head, ONLY when no unit work exists and that construction
+queue has exactly one entry, so public last-matching cancellation cannot remove a different
+duplicate/tail. Its remaining cost must exceed current cash. Before emitting any cancellation,
+the existing algorithm still requires a currently legal source-cost army alternative, actual
+owned producer, source-derived weapon/warhead eligibility against a currently observed real
+building, public-terrain firing reach, and enough exact charged refunds to finance that
+alternative PLUS every retained production obligation. Completed heads, income/power recovery,
+active income, bridge recovery, protected unit work and all ordinary FIFO/refund rules remain.
+This is a finite-financing recovery assumption, not a new quota, DPS ranking or horizon policy.
+The command queue performs actual cancellation and paid production; no queues or credits are
+mutated directly. Existing bounded command limits and deterministic order apply unchanged.
+
+The identical controlled positive refunds exactly1600 once, produces source-cost700 Grizzly9
+and records its actual shot against a real building, without requeueing the unfundable tech.
+After1 exits0/40.557550s including39.83s compilation, raw SHA
+472e871c1539e0ef5f14db6a8e906e33beddeb9482dba0674fc2241a033a82fa. This proves the financed
+capability; exact Riverlands/default ending credit remains separate.
+
+The new negative boundary test,
+`ra8_prospective_finisher_refunds_preserve_income_power_completed_and_attainable_work`, removes
+the unpaid unit request by public command and checks real captured oil, refinery construction,
+power construction, completed construction, sufficient cash obtained through ordinary satellite
+sale, and terrain-isolated enemy building. The first new power fixture mistakenly queued a
+Soviet NuclearReactor from Germany without its Soviet BattleLab; strict command validation
+correctly rejects MissingPrerequisite(BuildingKind36). All11 other recovery tests pass in that
+run; attempt7-prospective-recovery-all1 exits101/18.871156s, raw SHA
+f043df308dc0a7ed6867261ad0a47687cfcfab42ea6459ce8933bb4a07ef3d38. The new fixture now uses
+Germany's legal800-credit PowerPlant with declared500 initial credits; its protected-head
+assertion and all existing fixture assertions are unchanged. This is a new test setup correction,
+not a production permission exception or migration of any existing expectation.
+
+After the new legal PowerPlant setup correction, all12 recovery module tests pass0/19.660175s
+command (2.15s tests); raw SHA8844562dd61df653ef25a4c94ae4e61ae5ff13aa8a946f4a1359f372ab07ad0e.
+This includes the existing exact duplicate-tail/refund/FIFO, protected worker/detector/income,
+completed unit, attainable power-production, both construction lane reservation controls and
+all R141 honesty/economic job checks. No existing expectation or bound was weakened.
+
+Exact Riverlands IraqEasy/CubaEasy seed0 now ends with explicit P0Won57601 under the unchanged
+72000 limit, exit0/36.521707s command including27.98s compilation (7.98s test), raw SHA
+65d2ffd4ae8d6120b419050d070d6fa7bff5e440af0f0974c1c36721a413100b. The worker-only exact replay
+had still failed; this ending credit follows R142 financing integration, separate from its
+controlled capability proof. Final ai.rs SHA is19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7.
+All10 default Demo pairings then have explicit Won under unchanged72000, exit0/62.068293s
+command (58.85s test), raw SHA62e55eeb71ced9e435430112d70b968f991e1adb5c30599f8f34c0a2244e01fe;
+strict workspace/all-target Clippy passes0/6.911869s. Full retained26, fullsim/game/m13/budget and
+all13 gate evidence remain required on this source; no prior timing or production sweep transfers.
+
+R141 fixture compatibility follow-up: the first full `ra8_ai` integration rerun has73passed,
+1failed/0ignored, exit101/73.346828s command, raw SHA
+a857e75ab01a5f11bbb5ff329bce59e6af1a3e94af883d22581c493ee7fe309d. Exact function
+`ra8_aircraft_same_decision_admission_counts_existing_queued_and_new_dock_commitments` includes
+a refinery but no ore anywhere. Removing its old speculative worker correctly changes the
+original mutable composition traversal's first decision: two advanced ground reservations
+replace worker+one advanced unit, so no Harrier is attempted within the existing10-tick
+observation. There is no overbooking or command rejection in that failure. The runtime cursor,
+dock policy, think interval and every assertion remain unchanged. The fixture now declares a
+currently visible reachable ore cell(8,32) with source ore_max_bails alongside its refinery,
+retaining the original economically justified worker-plus-combat decision composition. Its
+<=1-aircraft admission, available-dock-within10, actual paid completion within2000 and strict
+zero-rejection assertions all remain intact. This exact named input migration is required by
+the new job admission, not a strategy opt-out or relaxation of the dock contract. The exact test
+passes0/5.178783s, raw SHA92aa5a3b3330c52632e45a8e5951c5bf1923bf14a9944e731853ac0484f24ef9.
+
+A bounded negative then removes ONLY `.saturating_add(added.docks)` from same-decision admission
+against this corrected fixture. It fails101/19.726547s with the unchanged capacity assertion,
+"only one of four docks remains, admitted2"; raw SHA
+5cace7f3d79207fd227502d508d7594f839e3a6249dc8183469cb126dcbe9f75. Immediate finally restoration
+and a separate subsequent SHA read verify original/restored ai.rs
+19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7;
+mutated f61faed2d8a6d7d2d1d7a9843dc7602f5b44a7a5bb4302979483159942cca867. No dependent test or
+commit ran before that independent restoration read. Thus the migrated fixture remains
+fail-able for its original real same-decision dock accounting defect. All74 integration
+scenarios are rerun after restoration before the coherent commit.
+
+After independently verified source restoration, all74 shipped AI integration scenarios pass0/
+73.491121s command (53.28s tests), raw SHAd7064a6d730d7d8f4de595d2eb81ce38281c84920ff1fab4ad377d7e997ea293.
+Current full-tree static inventory is1275 vs RA7baseline1124 (+151), no removed/renamed/ignored
+tests. R141/R142 add four scheduled tests; the one existing dock-fixture input migration above
+retains every assertion. Broader final-source validation remains pending.
