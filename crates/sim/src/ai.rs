@@ -1723,6 +1723,11 @@ fn recover_unit_credits(view: &View<'_>, controller: &AiController) -> Vec<Comma
         .collect();
     alternatives.sort_unstable();
     alternatives.dedup();
+    let no_unit_work = view
+        .state
+        .queues()
+        .flat_map(|(_, queue)| queue.iter())
+        .all(|q| !matches!(q.item, ProductionItem::Unit(_)));
     for (cost, kind) in alternatives.into_iter().rev() {
         let mut cancellations = Vec::new();
         let mut refund = 0_i64;
@@ -1743,11 +1748,18 @@ fn recover_unit_credits(view: &View<'_>, controller: &AiController) -> Vec<Comma
                             !matches!(m.role, crate::Role::Dog | crate::Role::Engineer
                                 | crate::Role::Spy | crate::Role::Mcv | crate::Role::Transport
                                 | crate::Role::Repair | crate::Role::ChronoMiner)));
+                let construction = no_unit_work
+                    && queue.len() == 1
+                    && at == 0
+                    && item.charged > 0
+                    && matches!(item.item, ProductionItem::Building(k) if !income_construction(view, k));
                 let cancel = unfunded
-                    && army
+                    && (army || construction)
                     && view.definitions.production(item.item).is_some_and(|terms| {
                         item.progress < terms.build_time
-                            && if at == 0 {
+                            && if construction {
+                                true
+                            } else if at == 0 {
                                 terms.cost > cost
                             } else {
                                 item.charged == 0
@@ -2163,6 +2175,79 @@ fn visible_ore(view: &View<'_>) -> Vec<CellPos> {
         .collect()
 }
 
+/// A new worker needs an observed field in the same public-terrain component
+/// as an actual producer and refinery. Existing cargo, workers and queued heads
+/// are left alone. Temporary traffic and unseen building occupancy are not facts
+/// available to this planning query; ordinary movement still enforces them.
+fn worker_job(view: &View<'_>) -> bool {
+    let ore: BTreeSet<_> = visible_ore(view).into_iter().collect();
+    if ore.is_empty() {
+        return false;
+    }
+    let domain = view.definitions.domain(view.ai.harvester);
+    let own_cells: BTreeSet<_> = view
+        .own_buildings
+        .iter()
+        .flat_map(|b| b.footprint.cells())
+        .collect();
+    let passable = |cell: CellPos| {
+        view.grid.cell(cell).is_some_and(|c| match domain {
+            Domain::Land => c.passable,
+            Domain::Amphibious => c.passable || c.water,
+            Domain::Naval => c.water,
+            Domain::Air => true,
+        }) && !own_cells.contains(&cell)
+            && !(view.vision.is_visible(cell) && view.grid.building(cell).is_some())
+    };
+    let docks: BTreeSet<_> = view
+        .own_buildings
+        .iter()
+        .filter(|b| {
+            view.definitions
+                .building(b.kind)
+                .is_some_and(|def| def.credits_per_ore.is_some())
+        })
+        .flat_map(|b| b.footprint.ring())
+        .filter(|&cell| passable(cell))
+        .collect();
+    let mut visited = BTreeSet::new();
+    for start in view
+        .own_buildings
+        .iter()
+        .filter(|b| {
+            produces(
+                view.definitions,
+                b.kind,
+                ProductionItem::Unit(view.ai.harvester),
+            )
+        })
+        .flat_map(|b| b.footprint.ring())
+        .filter(|&cell| passable(cell))
+    {
+        if !visited.insert(start) {
+            continue;
+        }
+        let mut queue = std::collections::VecDeque::from([start]);
+        let (mut field, mut dock) = (false, false);
+        while let Some(cell) = queue.pop_front() {
+            field |= ore.contains(&cell);
+            dock |= docks.contains(&cell);
+            if field && dock {
+                return true;
+            }
+            // Cardinal connectivity is equivalent to the movement graph's
+            // diagonals, which require a passable orthogonal neighbour.
+            for (dx, dy) in [(0, -1), (-1, 0), (1, 0), (0, 1)] {
+                let next = CellPos::new(cell.x.saturating_add(dx), cell.y.saturating_add(dy));
+                if passable(next) && visited.insert(next) {
+                    queue.push_back(next);
+                }
+            }
+        }
+    }
+    false
+}
+
 /// Whether the player can neither fight nor pay for a fighter, though it could produce one: it has
 /// no armed unit, none of its harvesters is working (all have stopped, or it has none), it owns the
 /// producer and prerequisites of some army unit type, and its credits are below what the cheapest
@@ -2513,7 +2598,10 @@ fn queue_units(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
             .count()
         + view.queued(harvester);
     let wanted = refineries.saturating_mul(controller.difficulty.harvesters_per_refinery as usize);
-    if harvesters < wanted && has_room(view, harvester, &mut added) {
+    if harvesters < wanted
+        && (!view.ai.rules_difficulty || worker_job(view))
+        && has_room(view, harvester, &mut added)
+    {
         commands.push(Command::QueueProduction { item: harvester });
     }
 

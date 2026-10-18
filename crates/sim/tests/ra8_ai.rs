@@ -2510,6 +2510,24 @@ fn ra8_aircraft_same_decision_admission_counts_existing_queued_and_new_dock_comm
     put(&mut app, "airforce_command", 2, 16);
     put(&mut app, "tech_center", 2, 25);
     put(&mut app, "refinery", 2, 32);
+    // Retain the original worker-plus-combat decision composition with a real
+    // economic job; an empty map no longer admits speculative quota workers.
+    let ore = app
+        .world()
+        .resource::<sim::Definitions>()
+        .rules()
+        .unwrap()
+        .economy
+        .ore_max_bails as u32;
+    app.world_mut().resource_mut::<Grid>().set_terrain(
+        CellPos::new(8, 32),
+        Cell {
+            passable: true,
+            buildable: true,
+            water: false,
+            ore,
+        },
+    );
     for x in [6, 10, 14] {
         put(&mut app, "power_plant", x, 2);
     }
