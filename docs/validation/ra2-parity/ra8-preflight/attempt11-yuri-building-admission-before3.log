@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 29.11s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+
+thread 'ai::ra8_attrition_tests::ra8_a_unit_controller_keeps_its_native_approach_instead_of_attacking_an_immune_building' (9885994) panicked at crates/sim/src/ai/ra8_attrition_tests.rs:1363:5:
+a unit-control actor must preserve native movement, actually take the controllable tank and use its gun; wrong_building_orders640, native_endings643, takenfalse, contributedfalse
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ai::ra8_attrition_tests::ra8_a_unit_controller_keeps_its_native_approach_instead_of_attacking_an_immune_building ... FAILED
+
+failures:
+
+failures:
+    ai::ra8_attrition_tests::ra8_a_unit_controller_keeps_its_native_approach_instead_of_attacking_an_immune_building
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 117 filtered out; finished in 0.44s
+
+error: test failed, to rerun pass `-p sim --lib`

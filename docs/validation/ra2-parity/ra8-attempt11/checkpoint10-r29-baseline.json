@@ -1,0 +1,38 @@
+{
+  "baseline_runtime": "RA7 f5505cd",
+  "distributions": {
+    "production": {
+      "source": "docs/validation/ra2-parity/ra7/production-lengths.tsv",
+      "sha256": "e128b205f1098af36617ed97140548b33a7a831b6d3a099ab246448e49336dda",
+      "matches": 756,
+      "ticks": {
+        "median": 31540.0,
+        "p90_nearest_rank": 64532,
+        "maximum": 209163
+      },
+      "fraction_of_unchanged_R29_limit": {
+        "median": 0.13147048611111112,
+        "p90_nearest_rank": 0.2807579365079365,
+        "maximum": 0.7824722222222222
+      },
+      "normalization": "Literal escaped tab delimiters normalized in memory only; immutable raw file unchanged."
+    },
+    "duel": {
+      "source": "docs/validation/ra2-parity/ra7/duel-lengths.tsv",
+      "sha256": "b66013a0267b7f652b2aade882ca5a3eb78a3d1de714392f2a811d4a6e66482a",
+      "matches": 756,
+      "ticks": {
+        "median": 32782.5,
+        "p90_nearest_rank": 69184,
+        "maximum": 157564
+      },
+      "fraction_of_unchanged_R29_limit": {
+        "median": 0.1386996527777778,
+        "p90_nearest_rank": 0.3236736111111111,
+        "maximum": 0.7664722222222222
+      },
+      "normalization": "Literal escaped tab delimiters normalized in memory only; immutable raw file unchanged."
+    }
+  },
+  "current_sweep_status": "pending; no fresh RA8 winner or distribution claim"
+}

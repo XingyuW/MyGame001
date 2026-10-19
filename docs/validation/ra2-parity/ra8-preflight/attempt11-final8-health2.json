@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-19T19:57:48.666586+00:00",
+  "purpose": "bounded read-only owned-process activity snapshot; CPU activity only, not match health/pass or an ending claim",
+  "wrapper_pid": 47118,
+  "cargo_pid": 50550,
+  "rows": [
+    "47118  7720 47118    01:03:30   0:00.83   0.0 Ss   /opt/homebrew/Cellar/python@3.15/3.15.0/Frameworks/Python.framework/Versions/3.15/Resources/Python.app/Contents/MacOS/Python",
+    "50550 47118 47118       22:49  21:54.88  91.9 R    /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples/m13_ten_players"
+  ],
+  "sampling": false,
+  "no_parallel_simulation": true
+}

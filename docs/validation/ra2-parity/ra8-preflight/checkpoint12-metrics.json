@@ -1,0 +1,1216 @@
+{
+  "verified_utc": "2026-10-19T20:28:21.837967+00:00",
+  "preflight": {
+    "commands": 18,
+    "test_target_invocations": 17,
+    "passed": 317,
+    "failed": 0,
+    "ignored": 0,
+    "wall_seconds": 5535.755056624999,
+    "command_seconds_sum": 5535.743548705068,
+    "all_exits_zero": true,
+    "summary_sha256": "0f487b09b8b16cda62d7b4a9ec7952a542240ad4d9248fafb16430f8b231e426"
+  },
+  "all_map": {
+    "count": 21,
+    "winners": 21,
+    "ten_builders": 21,
+    "unchanged_outer_limit": 400000,
+    "mean_budget_ms": 5,
+    "end_tick_median": 85258,
+    "end_tick_p90_nearest_rank": 113337,
+    "end_tick_max": 218369,
+    "worst_mean_map": "coral_archipelago",
+    "worst_mean_ms": 2.598,
+    "measured_seconds_sum": 2983.326,
+    "elapsed_seconds_sum": 2983.738,
+    "raw_sha256": "d83b41b30d27bd4232fab2d43ff31e6b92cb0c31a8318edf9ec97c1f7f87364a",
+    "maps": [
+      {
+        "map": "demo",
+        "width": 128,
+        "height": 128,
+        "players": 10,
+        "ticks": 65421,
+        "mean_ms": 0.45434800000000003,
+        "p99_ms": 3.915,
+        "max_ms": 76.044,
+        "busy_window": 1000,
+        "busy_mean_ms": 2.056,
+        "ticks_over_50ms": 1,
+        "measured_seconds": 29.724,
+        "elapsed_seconds": 29.733,
+        "peak_units": 244,
+        "peak_buildings": 109,
+        "builders": 10,
+        "ending_text": "ended in tick 65420: Won { winner: PlayerId(3), tick: 65420 }",
+        "raw_block": "demo: 128 x 128 cells for 10 players (file 64 x 64), enlarged in 1.8ms, set up in 4.2ms\n  65421 ticks: mean 454.348\u00b5s, 99th centile 3.915ms, longest 76.044ms, busiest 1000 ticks mean 2.056ms, 1 ticks over 50ms; measured total 29.724s, elapsed 29.733s\n  at most 244 units and 109 buildings; 10 players built; ended in tick 65420: Won { winner: PlayerId(3), tick: 65420 }",
+        "end_tick": 65420,
+        "winner": 3
+      },
+      {
+        "map": "crossroads",
+        "width": 112,
+        "height": 112,
+        "players": 10,
+        "ticks": 36114,
+        "mean_ms": 0.6115349999999999,
+        "p99_ms": 2.873,
+        "max_ms": 46.876,
+        "busy_window": 1000,
+        "busy_mean_ms": 2.16,
+        "ticks_over_50ms": 0,
+        "measured_seconds": 22.085,
+        "elapsed_seconds": 22.09,
+        "peak_units": 234,
+        "peak_buildings": 110,
+        "builders": 10,
+        "ending_text": "ended in tick 36113: Won { winner: PlayerId(1), tick: 36113 }",
+        "raw_block": "crossroads: 112 x 112 cells for 10 players (file 56 x 56), enlarged in 1.2ms, set up in 2.9ms\n  36114 ticks: mean 611.535\u00b5s, 99th centile 2.873ms, longest 46.876ms, busiest 1000 ticks mean 2.160ms, 0 ticks over 50ms; measured total 22.085s, elapsed 22.090s\n  at most 234 units and 110 buildings; 10 players built; ended in tick 36113: Won { winner: PlayerId(1), tick: 36113 }",
+        "end_tick": 36113,
+        "winner": 1
+      },
+      {
+        "map": "riverlands",
+        "width": 128,
+        "height": 96,
+        "players": 10,
+        "ticks": 92266,
+        "mean_ms": 0.383898,
+        "p99_ms": 2.596,
+        "max_ms": 27.357,
+        "busy_window": 1000,
+        "busy_mean_ms": 1.837,
+        "ticks_over_50ms": 0,
+        "measured_seconds": 35.421,
+        "elapsed_seconds": 35.432,
+        "peak_units": 229,
+        "peak_buildings": 113,
+        "builders": 10,
+        "ending_text": "ended in tick 92265: Won { winner: PlayerId(6), tick: 92265 }",
+        "raw_block": "riverlands: 128 x 96 cells for 10 players (file 64 x 48), enlarged in 1.5ms, set up in 2.5ms\n  92266 ticks: mean 383.898\u00b5s, 99th centile 2.596ms, longest 27.357ms, busiest 1000 ticks mean 1.837ms, 0 ticks over 50ms; measured total 35.421s, elapsed 35.432s\n  at most 229 units and 113 buildings; 10 players built; ended in tick 92265: Won { winner: PlayerId(6), tick: 92265 }",
+        "end_tick": 92265,
+        "winner": 6
+      },
+      {
+        "map": "liberty_bay",
+        "width": 256,
+        "height": 256,
+        "players": 10,
+        "ticks": 62527,
+        "mean_ms": 1.273,
+        "p99_ms": 8.79,
+        "max_ms": 277.66,
+        "busy_window": 1000,
+        "busy_mean_ms": 3.887,
+        "ticks_over_50ms": 33,
+        "measured_seconds": 79.615,
+        "elapsed_seconds": 79.627,
+        "peak_units": 272,
+        "peak_buildings": 170,
+        "builders": 10,
+        "ending_text": "ended in tick 62526: Won { winner: PlayerId(6), tick: 62526 }",
+        "raw_block": "liberty_bay: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 158.8\u00b5s, set up in 12.2ms\n  62527 ticks: mean 1.273ms, 99th centile 8.790ms, longest 277.660ms, busiest 1000 ticks mean 3.887ms, 33 ticks over 50ms; measured total 79.615s, elapsed 79.627s\n  at most 272 units and 170 buildings; 10 players built; ended in tick 62526: Won { winner: PlayerId(6), tick: 62526 }",
+        "end_tick": 62526,
+        "winner": 6
+      },
+      {
+        "map": "frostline",
+        "width": 252,
+        "height": 252,
+        "players": 10,
+        "ticks": 108309,
+        "mean_ms": 1.932,
+        "p99_ms": 13.84,
+        "max_ms": 333.432,
+        "busy_window": 1000,
+        "busy_mean_ms": 5.855,
+        "ticks_over_50ms": 187,
+        "measured_seconds": 209.214,
+        "elapsed_seconds": 209.236,
+        "peak_units": 266,
+        "peak_buildings": 219,
+        "builders": 10,
+        "ending_text": "ended in tick 108308: Won { winner: PlayerId(4), tick: 108308 }",
+        "raw_block": "frostline: 252 x 252 cells for 10 players (file 224 x 224), enlarged in 1.9ms, set up in 10.4ms\n  108309 ticks: mean 1.932ms, 99th centile 13.840ms, longest 333.432ms, busiest 1000 ticks mean 5.855ms, 187 ticks over 50ms; measured total 209.214s, elapsed 209.236s\n  at most 266 units and 219 buildings; 10 players built; ended in tick 108308: Won { winner: PlayerId(4), tick: 108308 }",
+        "end_tick": 108308,
+        "winner": 4
+      },
+      {
+        "map": "oasis_gulf",
+        "width": 256,
+        "height": 192,
+        "players": 10,
+        "ticks": 107011,
+        "mean_ms": 1.236,
+        "p99_ms": 12.14,
+        "max_ms": 103.74,
+        "busy_window": 1000,
+        "busy_mean_ms": 3.784,
+        "ticks_over_50ms": 9,
+        "measured_seconds": 132.281,
+        "elapsed_seconds": 132.295,
+        "peak_units": 266,
+        "peak_buildings": 155,
+        "builders": 10,
+        "ending_text": "ended in tick 107010: Won { winner: PlayerId(4), tick: 107010 }",
+        "raw_block": "oasis_gulf: 256 x 192 cells for 10 players (file 256 x 192), enlarged in 121.1\u00b5s, set up in 8.1ms\n  107011 ticks: mean 1.236ms, 99th centile 12.140ms, longest 103.740ms, busiest 1000 ticks mean 3.784ms, 9 ticks over 50ms; measured total 132.281s, elapsed 132.295s\n  at most 266 units and 155 buildings; 10 players built; ended in tick 107010: Won { winner: PlayerId(4), tick: 107010 }",
+        "end_tick": 107010,
+        "winner": 4
+      },
+      {
+        "map": "coral_archipelago",
+        "width": 256,
+        "height": 256,
+        "players": 10,
+        "ticks": 103545,
+        "mean_ms": 2.598,
+        "p99_ms": 29.664,
+        "max_ms": 768.559,
+        "busy_window": 1000,
+        "busy_mean_ms": 5.85,
+        "ticks_over_50ms": 221,
+        "measured_seconds": 268.999,
+        "elapsed_seconds": 269.027,
+        "peak_units": 267,
+        "peak_buildings": 219,
+        "builders": 10,
+        "ending_text": "ended in tick 103544: Won { winner: PlayerId(1), tick: 103544 }",
+        "raw_block": "coral_archipelago: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 91.0\u00b5s, set up in 7.2ms\n  103545 ticks: mean 2.598ms, 99th centile 29.664ms, longest 768.559ms, busiest 1000 ticks mean 5.850ms, 221 ticks over 50ms; measured total 268.999s, elapsed 269.027s\n  at most 267 units and 219 buildings; 10 players built; ended in tick 103544: Won { winner: PlayerId(1), tick: 103544 }",
+        "end_tick": 103544,
+        "winner": 1
+      },
+      {
+        "map": "continental_divide",
+        "width": 256,
+        "height": 256,
+        "players": 10,
+        "ticks": 113338,
+        "mean_ms": 1.297,
+        "p99_ms": 8.635,
+        "max_ms": 197.555,
+        "busy_window": 1000,
+        "busy_mean_ms": 4.509,
+        "ticks_over_50ms": 47,
+        "measured_seconds": 147.018,
+        "elapsed_seconds": 147.038,
+        "peak_units": 288,
+        "peak_buildings": 161,
+        "builders": 10,
+        "ending_text": "ended in tick 113337: Won { winner: PlayerId(3), tick: 113337 }",
+        "raw_block": "continental_divide: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 330.3\u00b5s, set up in 14.0ms\n  113338 ticks: mean 1.297ms, 99th centile 8.635ms, longest 197.555ms, busiest 1000 ticks mean 4.509ms, 47 ticks over 50ms; measured total 147.018s, elapsed 147.038s\n  at most 288 units and 161 buildings; 10 players built; ended in tick 113337: Won { winner: PlayerId(3), tick: 113337 }",
+        "end_tick": 113337,
+        "winner": 3
+      },
+      {
+        "map": "steel_harbor",
+        "width": 256,
+        "height": 256,
+        "players": 10,
+        "ticks": 51242,
+        "mean_ms": 1.624,
+        "p99_ms": 17.74,
+        "max_ms": 186.665,
+        "busy_window": 1000,
+        "busy_mean_ms": 5.479,
+        "ticks_over_50ms": 59,
+        "measured_seconds": 83.232,
+        "elapsed_seconds": 83.239,
+        "peak_units": 280,
+        "peak_buildings": 168,
+        "builders": 10,
+        "ending_text": "ended in tick 51241: Won { winner: PlayerId(2), tick: 51241 }",
+        "raw_block": "steel_harbor: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 334.1\u00b5s, set up in 13.4ms\n  51242 ticks: mean 1.624ms, 99th centile 17.740ms, longest 186.665ms, busiest 1000 ticks mean 5.479ms, 59 ticks over 50ms; measured total 83.232s, elapsed 83.239s\n  at most 280 units and 168 buildings; 10 players built; ended in tick 51241: Won { winner: PlayerId(2), tick: 51241 }",
+        "end_tick": 51241,
+        "winner": 2
+      },
+      {
+        "map": "glacier_pass",
+        "width": 240,
+        "height": 240,
+        "players": 10,
+        "ticks": 218370,
+        "mean_ms": 1.609,
+        "p99_ms": 9.353,
+        "max_ms": 267.521,
+        "busy_window": 1000,
+        "busy_mean_ms": 11.758,
+        "ticks_over_50ms": 250,
+        "measured_seconds": 351.281,
+        "elapsed_seconds": 351.364,
+        "peak_units": 268,
+        "peak_buildings": 192,
+        "builders": 10,
+        "ending_text": "ended in tick 218369: Won { winner: PlayerId(1), tick: 218369 }",
+        "raw_block": "glacier_pass: 240 x 240 cells for 10 players (file 240 x 240), enlarged in 2.9ms, set up in 8.6ms\n  218370 ticks: mean 1.609ms, 99th centile 9.353ms, longest 267.521ms, busiest 1000 ticks mean 11.758ms, 250 ticks over 50ms; measured total 351.281s, elapsed 351.364s\n  at most 268 units and 192 buildings; 10 players built; ended in tick 218369: Won { winner: PlayerId(1), tick: 218369 }",
+        "end_tick": 218369,
+        "winner": 1
+      },
+      {
+        "map": "red_canyon",
+        "width": 240,
+        "height": 240,
+        "players": 10,
+        "ticks": 82383,
+        "mean_ms": 2.359,
+        "p99_ms": 21.177,
+        "max_ms": 194.281,
+        "busy_window": 1000,
+        "busy_mean_ms": 9.621,
+        "ticks_over_50ms": 177,
+        "measured_seconds": 194.301,
+        "elapsed_seconds": 194.339,
+        "peak_units": 286,
+        "peak_buildings": 137,
+        "builders": 10,
+        "ending_text": "ended in tick 82382: Won { winner: PlayerId(0), tick: 82382 }",
+        "raw_block": "red_canyon: 240 x 240 cells for 10 players (file 192 x 192), enlarged in 3.9ms, set up in 16.4ms\n  82383 ticks: mean 2.359ms, 99th centile 21.177ms, longest 194.281ms, busiest 1000 ticks mean 9.621ms, 177 ticks over 50ms; measured total 194.301s, elapsed 194.339s\n  at most 286 units and 137 buildings; 10 players built; ended in tick 82382: Won { winner: PlayerId(0), tick: 82382 }",
+        "end_tick": 82382,
+        "winner": 0
+      },
+      {
+        "map": "jungle_delta",
+        "width": 256,
+        "height": 224,
+        "players": 10,
+        "ticks": 88185,
+        "mean_ms": 2.04,
+        "p99_ms": 15.417,
+        "max_ms": 260.946,
+        "busy_window": 1000,
+        "busy_mean_ms": 7.015,
+        "ticks_over_50ms": 173,
+        "measured_seconds": 179.926,
+        "elapsed_seconds": 179.947,
+        "peak_units": 274,
+        "peak_buildings": 170,
+        "builders": 10,
+        "ending_text": "ended in tick 88184: Won { winner: PlayerId(5), tick: 88184 }",
+        "raw_block": "jungle_delta: 256 x 224 cells for 10 players (file 256 x 224), enlarged in 3.0ms, set up in 9.3ms\n  88185 ticks: mean 2.040ms, 99th centile 15.417ms, longest 260.946ms, busiest 1000 ticks mean 7.015ms, 173 ticks over 50ms; measured total 179.926s, elapsed 179.947s\n  at most 274 units and 170 buildings; 10 players built; ended in tick 88184: Won { winner: PlayerId(5), tick: 88184 }",
+        "end_tick": 88184,
+        "winner": 5
+      },
+      {
+        "map": "pacific_atoll",
+        "width": 256,
+        "height": 256,
+        "players": 10,
+        "ticks": 73837,
+        "mean_ms": 1.605,
+        "p99_ms": 28.957,
+        "max_ms": 174.147,
+        "busy_window": 1000,
+        "busy_mean_ms": 5.69,
+        "ticks_over_50ms": 122,
+        "measured_seconds": 118.486,
+        "elapsed_seconds": 118.5,
+        "peak_units": 276,
+        "peak_buildings": 134,
+        "builders": 10,
+        "ending_text": "ended in tick 73836: Won { winner: PlayerId(5), tick: 73836 }",
+        "raw_block": "pacific_atoll: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 3.3ms, set up in 5.8ms\n  73837 ticks: mean 1.605ms, 99th centile 28.957ms, longest 174.147ms, busiest 1000 ticks mean 5.690ms, 122 ticks over 50ms; measured total 118.486s, elapsed 118.500s\n  at most 276 units and 134 buildings; 10 players built; ended in tick 73836: Won { winner: PlayerId(5), tick: 73836 }",
+        "end_tick": 73836,
+        "winner": 5
+      },
+      {
+        "map": "iron_isthmus",
+        "width": 256,
+        "height": 224,
+        "players": 10,
+        "ticks": 75087,
+        "mean_ms": 2.11,
+        "p99_ms": 30.642,
+        "max_ms": 243.994,
+        "busy_window": 1000,
+        "busy_mean_ms": 5.858,
+        "ticks_over_50ms": 220,
+        "measured_seconds": 158.43,
+        "elapsed_seconds": 158.446,
+        "peak_units": 275,
+        "peak_buildings": 148,
+        "builders": 10,
+        "ending_text": "ended in tick 75086: Won { winner: PlayerId(1), tick: 75086 }",
+        "raw_block": "iron_isthmus: 256 x 224 cells for 10 players (file 256 x 224), enlarged in 3.2ms, set up in 5.1ms\n  75087 ticks: mean 2.110ms, 99th centile 30.642ms, longest 243.994ms, busiest 1000 ticks mean 5.858ms, 220 ticks over 50ms; measured total 158.430s, elapsed 158.446s\n  at most 275 units and 148 buildings; 10 players built; ended in tick 75086: Won { winner: PlayerId(1), tick: 75086 }",
+        "end_tick": 75086,
+        "winner": 1
+      },
+      {
+        "map": "arctic_floes",
+        "width": 240,
+        "height": 240,
+        "players": 10,
+        "ticks": 72385,
+        "mean_ms": 1.813,
+        "p99_ms": 24.313,
+        "max_ms": 320.536,
+        "busy_window": 1000,
+        "busy_mean_ms": 6.083,
+        "ticks_over_50ms": 33,
+        "measured_seconds": 131.24,
+        "elapsed_seconds": 131.253,
+        "peak_units": 263,
+        "peak_buildings": 134,
+        "builders": 10,
+        "ending_text": "ended in tick 72384: Won { winner: PlayerId(2), tick: 72384 }",
+        "raw_block": "arctic_floes: 240 x 240 cells for 10 players (file 240 x 240), enlarged in 2.5ms, set up in 4.8ms\n  72385 ticks: mean 1.813ms, 99th centile 24.313ms, longest 320.536ms, busiest 1000 ticks mean 6.083ms, 33 ticks over 50ms; measured total 131.240s, elapsed 131.253s\n  at most 263 units and 134 buildings; 10 players built; ended in tick 72384: Won { winner: PlayerId(2), tick: 72384 }",
+        "end_tick": 72384,
+        "winner": 2
+      },
+      {
+        "map": "ember_caldera",
+        "width": 256,
+        "height": 256,
+        "players": 10,
+        "ticks": 78082,
+        "mean_ms": 1.354,
+        "p99_ms": 14.569,
+        "max_ms": 119.665,
+        "busy_window": 1000,
+        "busy_mean_ms": 4.534,
+        "ticks_over_50ms": 50,
+        "measured_seconds": 105.753,
+        "elapsed_seconds": 105.763,
+        "peak_units": 292,
+        "peak_buildings": 168,
+        "builders": 10,
+        "ending_text": "ended in tick 78081: Won { winner: PlayerId(6), tick: 78081 }",
+        "raw_block": "ember_caldera: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 2.3ms, set up in 6.7ms\n  78082 ticks: mean 1.354ms, 99th centile 14.569ms, longest 119.665ms, busiest 1000 ticks mean 4.534ms, 50 ticks over 50ms; measured total 105.753s, elapsed 105.763s\n  at most 292 units and 168 buildings; 10 players built; ended in tick 78081: Won { winner: PlayerId(6), tick: 78081 }",
+        "end_tick": 78081,
+        "winner": 6
+      },
+      {
+        "map": "frozen_sound",
+        "width": 256,
+        "height": 256,
+        "players": 10,
+        "ticks": 85259,
+        "mean_ms": 1.422,
+        "p99_ms": 10.708,
+        "max_ms": 142.522,
+        "busy_window": 1000,
+        "busy_mean_ms": 4.955,
+        "ticks_over_50ms": 60,
+        "measured_seconds": 121.224,
+        "elapsed_seconds": 121.239,
+        "peak_units": 280,
+        "peak_buildings": 137,
+        "builders": 10,
+        "ending_text": "ended in tick 85258: Won { winner: PlayerId(2), tick: 85258 }",
+        "raw_block": "frozen_sound: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 175.2\u00b5s, set up in 11.0ms\n  85259 ticks: mean 1.422ms, 99th centile 10.708ms, longest 142.522ms, busiest 1000 ticks mean 4.955ms, 60 ticks over 50ms; measured total 121.224s, elapsed 121.239s\n  at most 280 units and 137 buildings; 10 players built; ended in tick 85258: Won { winner: PlayerId(2), tick: 85258 }",
+        "end_tick": 85258,
+        "winner": 2
+      },
+      {
+        "map": "harvest_plains",
+        "width": 256,
+        "height": 256,
+        "players": 10,
+        "ticks": 104921,
+        "mean_ms": 1.496,
+        "p99_ms": 15.103,
+        "max_ms": 183.516,
+        "busy_window": 1000,
+        "busy_mean_ms": 7.612,
+        "ticks_over_50ms": 434,
+        "measured_seconds": 157.013,
+        "elapsed_seconds": 157.029,
+        "peak_units": 293,
+        "peak_buildings": 145,
+        "builders": 10,
+        "ending_text": "ended in tick 104920: Won { winner: PlayerId(0), tick: 104920 }",
+        "raw_block": "harvest_plains: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 215.9\u00b5s, set up in 12.3ms\n  104921 ticks: mean 1.496ms, 99th centile 15.103ms, longest 183.516ms, busiest 1000 ticks mean 7.612ms, 434 ticks over 50ms; measured total 157.013s, elapsed 157.029s\n  at most 293 units and 145 buildings; 10 players built; ended in tick 104920: Won { winner: PlayerId(0), tick: 104920 }",
+        "end_tick": 104920,
+        "winner": 0
+      },
+      {
+        "map": "black_water",
+        "width": 256,
+        "height": 256,
+        "players": 10,
+        "ticks": 63945,
+        "mean_ms": 1.747,
+        "p99_ms": 16.188,
+        "max_ms": 155.21,
+        "busy_window": 1000,
+        "busy_mean_ms": 4.575,
+        "ticks_over_50ms": 77,
+        "measured_seconds": 111.733,
+        "elapsed_seconds": 111.746,
+        "peak_units": 272,
+        "peak_buildings": 208,
+        "builders": 10,
+        "ending_text": "ended in tick 63944: Won { winner: PlayerId(0), tick: 63944 }",
+        "raw_block": "black_water: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 224.9\u00b5s, set up in 12.2ms\n  63945 ticks: mean 1.747ms, 99th centile 16.188ms, longest 155.210ms, busiest 1000 ticks mean 4.575ms, 77 ticks over 50ms; measured total 111.733s, elapsed 111.746s\n  at most 272 units and 208 buildings; 10 players built; ended in tick 63944: Won { winner: PlayerId(0), tick: 63944 }",
+        "end_tick": 63944,
+        "winner": 0
+      },
+      {
+        "map": "thousand_lakes",
+        "width": 256,
+        "height": 256,
+        "players": 10,
+        "ticks": 92506,
+        "mean_ms": 1.76,
+        "p99_ms": 10.887,
+        "max_ms": 286.907,
+        "busy_window": 1000,
+        "busy_mean_ms": 5.67,
+        "ticks_over_50ms": 83,
+        "measured_seconds": 162.808,
+        "elapsed_seconds": 162.827,
+        "peak_units": 280,
+        "peak_buildings": 226,
+        "builders": 10,
+        "ending_text": "ended in tick 92505: Won { winner: PlayerId(1), tick: 92505 }",
+        "raw_block": "thousand_lakes: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 203.4\u00b5s, set up in 10.2ms\n  92506 ticks: mean 1.760ms, 99th centile 10.887ms, longest 286.907ms, busiest 1000 ticks mean 5.670ms, 83 ticks over 50ms; measured total 162.808s, elapsed 162.827s\n  at most 280 units and 226 buildings; 10 players built; ended in tick 92505: Won { winner: PlayerId(1), tick: 92505 }",
+        "end_tick": 92505,
+        "winner": 1
+      },
+      {
+        "map": "wheel_of_worlds",
+        "width": 256,
+        "height": 256,
+        "players": 10,
+        "ticks": 160258,
+        "mean_ms": 1.145,
+        "p99_ms": 7.076,
+        "max_ms": 205.579,
+        "busy_window": 1000,
+        "busy_mean_ms": 3.789,
+        "ticks_over_50ms": 107,
+        "measured_seconds": 183.542,
+        "elapsed_seconds": 183.568,
+        "peak_units": 279,
+        "peak_buildings": 158,
+        "builders": 10,
+        "ending_text": "ended in tick 160257: Won { winner: PlayerId(9), tick: 160257 }",
+        "raw_block": "wheel_of_worlds: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 338.7\u00b5s, set up in 12.2ms\n  160258 ticks: mean 1.145ms, 99th centile 7.076ms, longest 205.579ms, busiest 1000 ticks mean 3.789ms, 107 ticks over 50ms; measured total 183.542s, elapsed 183.568s\n  at most 279 units and 158 buildings; 10 players built; ended in tick 160257: Won { winner: PlayerId(9), tick: 160257 }",
+        "end_tick": 160257,
+        "winner": 9
+      }
+    ]
+  },
+  "fixed256": {
+    "raw_sha256": "d0b573dc10b9fdd60e77f377b044ff93a665867f0e38bf0f10f2e2f4f2998402",
+    "maps": [
+      {
+        "map": "liberty_bay",
+        "width": 256,
+        "height": 256,
+        "players": 10,
+        "ticks": 24000,
+        "mean_ms": 1.351,
+        "p99_ms": 7.653,
+        "max_ms": 42.515,
+        "busy_window": 1000,
+        "busy_mean_ms": 2.611,
+        "ticks_over_50ms": 0,
+        "measured_seconds": 32.422,
+        "elapsed_seconds": 32.425,
+        "peak_units": 272,
+        "peak_buildings": 170,
+        "builders": 10,
+        "ending_text": "6 players left after 24000 ticks",
+        "raw_block": "liberty_bay: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 191.3\u00b5s, set up in 8.5ms\n  24000 ticks: mean 1.351ms, 99th centile 7.653ms, longest 42.515ms, busiest 1000 ticks mean 2.611ms, 0 ticks over 50ms; measured total 32.422s, elapsed 32.425s\n  at most 272 units and 170 buildings; 10 players built; 6 players left after 24000 ticks"
+      },
+      {
+        "map": "continental_divide",
+        "width": 256,
+        "height": 256,
+        "players": 10,
+        "ticks": 24000,
+        "mean_ms": 1.446,
+        "p99_ms": 7.923,
+        "max_ms": 76.322,
+        "busy_window": 1000,
+        "busy_mean_ms": 3.013,
+        "ticks_over_50ms": 14,
+        "measured_seconds": 34.705,
+        "elapsed_seconds": 34.709,
+        "peak_units": 288,
+        "peak_buildings": 161,
+        "builders": 10,
+        "ending_text": "8 players left after 24000 ticks",
+        "raw_block": "continental_divide: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 144.6\u00b5s, set up in 9.5ms\n  24000 ticks: mean 1.446ms, 99th centile 7.923ms, longest 76.322ms, busiest 1000 ticks mean 3.013ms, 14 ticks over 50ms; measured total 34.705s, elapsed 34.709s\n  at most 288 units and 161 buildings; 10 players built; 8 players left after 24000 ticks"
+      },
+      {
+        "map": "pacific_atoll",
+        "width": 256,
+        "height": 256,
+        "players": 10,
+        "ticks": 24000,
+        "mean_ms": 1.297,
+        "p99_ms": 24.9,
+        "max_ms": 162.008,
+        "busy_window": 1000,
+        "busy_mean_ms": 3.615,
+        "ticks_over_50ms": 3,
+        "measured_seconds": 31.126,
+        "elapsed_seconds": 31.129,
+        "peak_units": 276,
+        "peak_buildings": 134,
+        "builders": 10,
+        "ending_text": "4 players left after 24000 ticks",
+        "raw_block": "pacific_atoll: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 2.8ms, set up in 5.0ms\n  24000 ticks: mean 1.297ms, 99th centile 24.900ms, longest 162.008ms, busiest 1000 ticks mean 3.615ms, 3 ticks over 50ms; measured total 31.126s, elapsed 31.129s\n  at most 276 units and 134 buildings; 10 players built; 4 players left after 24000 ticks"
+      }
+    ]
+  },
+  "retained37": {
+    "test_functions": 37,
+    "distinct_configurations": 36,
+    "explicit_winners": 37,
+    "passed": 37,
+    "failed": 0,
+    "ignored": 0,
+    "raw_sha256": "6a52a41da8fe46ff09f93861489998fcd86baae74393b3bb6b3908249ec04b66",
+    "outcomes": [
+      {
+        "map": "demo",
+        "seed": 0,
+        "countries": [
+          "russia",
+          "libya"
+        ],
+        "difficulties": [
+          "easy",
+          "easy"
+        ],
+        "winner": 1,
+        "tick": 68863
+      },
+      {
+        "map": "frozen_sound",
+        "seed": 0,
+        "countries": [
+          "russia",
+          "libya"
+        ],
+        "difficulties": [
+          "easy",
+          "easy"
+        ],
+        "winner": 0,
+        "tick": 37282
+      },
+      {
+        "map": "riverlands",
+        "seed": 0,
+        "countries": [
+          "iraq",
+          "cuba"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 0,
+        "tick": 25641
+      },
+      {
+        "map": "demo",
+        "seed": 0,
+        "countries": [
+          "russia",
+          "libya"
+        ],
+        "difficulties": [
+          "easy",
+          "easy"
+        ],
+        "winner": 1,
+        "tick": 68863
+      },
+      {
+        "map": "jungle_delta",
+        "seed": 0,
+        "countries": [
+          "cuba",
+          "russia"
+        ],
+        "difficulties": [
+          "easy",
+          "easy"
+        ],
+        "winner": 1,
+        "tick": 50317
+      },
+      {
+        "map": "thousand_lakes",
+        "seed": 0,
+        "countries": [
+          "russia",
+          "libya"
+        ],
+        "difficulties": [
+          "medium",
+          "brutal"
+        ],
+        "winner": 1,
+        "tick": 35150
+      },
+      {
+        "map": "coral_archipelago",
+        "seed": 0,
+        "countries": [
+          "iraq",
+          "cuba"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 0,
+        "tick": 89118
+      },
+      {
+        "map": "riverlands",
+        "seed": 0,
+        "countries": [
+          "iraq",
+          "cuba"
+        ],
+        "difficulties": [
+          "easy",
+          "easy"
+        ],
+        "winner": 1,
+        "tick": 49417
+      },
+      {
+        "map": "crossroads",
+        "seed": 0,
+        "countries": [
+          "great_britain",
+          "america"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 1,
+        "tick": 36907
+      },
+      {
+        "map": "oasis_gulf",
+        "seed": 0,
+        "countries": [
+          "russia",
+          "france"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 1,
+        "tick": 93084
+      },
+      {
+        "map": "thousand_lakes",
+        "seed": 0,
+        "countries": [
+          "cuba",
+          "russia"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 1,
+        "tick": 102411
+      },
+      {
+        "map": "harvest_plains",
+        "seed": 0,
+        "countries": [
+          "france",
+          "germany"
+        ],
+        "difficulties": [
+          "easy",
+          "easy"
+        ],
+        "winner": 1,
+        "tick": 119790
+      },
+      {
+        "map": "oasis_gulf",
+        "seed": 0,
+        "countries": [
+          "france",
+          "russia"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 1,
+        "tick": 69633
+      },
+      {
+        "map": "liberty_bay",
+        "seed": 0,
+        "countries": [
+          "france",
+          "germany"
+        ],
+        "difficulties": [
+          "medium",
+          "medium"
+        ],
+        "winner": 1,
+        "tick": 110533
+      },
+      {
+        "map": "oasis_gulf",
+        "seed": 0,
+        "countries": [
+          "libya",
+          "iraq"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 1,
+        "tick": 47242
+      },
+      {
+        "map": "pacific_atoll",
+        "seed": 0,
+        "countries": [
+          "cuba",
+          "great_britain"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 1,
+        "tick": 98305
+      },
+      {
+        "map": "continental_divide",
+        "seed": 0,
+        "countries": [
+          "france",
+          "cuba"
+        ],
+        "difficulties": [
+          "easy",
+          "medium"
+        ],
+        "winner": 1,
+        "tick": 30996
+      },
+      {
+        "map": "demo",
+        "seed": 0,
+        "countries": [
+          "france",
+          "cuba"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 1,
+        "tick": 28088
+      },
+      {
+        "map": "demo",
+        "seed": 0,
+        "countries": [
+          "germany",
+          "great_britain"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 1,
+        "tick": 27249
+      },
+      {
+        "map": "ember_caldera",
+        "seed": 0,
+        "countries": [
+          "libya",
+          "korea"
+        ],
+        "difficulties": [
+          "brutal",
+          "medium"
+        ],
+        "winner": 0,
+        "tick": 28656
+      },
+      {
+        "map": "continental_divide",
+        "seed": 0,
+        "countries": [
+          "iraq",
+          "great_britain"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 1,
+        "tick": 42172
+      },
+      {
+        "map": "black_water",
+        "seed": 0,
+        "countries": [
+          "korea",
+          "france"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 0,
+        "tick": 136700
+      },
+      {
+        "map": "black_water",
+        "seed": 0,
+        "countries": [
+          "libya",
+          "america"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 0,
+        "tick": 86273
+      },
+      {
+        "map": "liberty_bay",
+        "seed": 0,
+        "countries": [
+          "iraq",
+          "america"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 1,
+        "tick": 82842
+      },
+      {
+        "map": "glacier_pass",
+        "seed": 0,
+        "countries": [
+          "korea",
+          "russia"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 1,
+        "tick": 86361
+      },
+      {
+        "map": "harvest_plains",
+        "seed": 0,
+        "countries": [
+          "america",
+          "korea"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 1,
+        "tick": 114193
+      },
+      {
+        "map": "liberty_bay",
+        "seed": 0,
+        "countries": [
+          "iraq",
+          "korea"
+        ],
+        "difficulties": [
+          "medium",
+          "medium"
+        ],
+        "winner": 0,
+        "tick": 51268
+      },
+      {
+        "map": "red_canyon",
+        "seed": 0,
+        "countries": [
+          "france",
+          "russia"
+        ],
+        "difficulties": [
+          "medium",
+          "easy"
+        ],
+        "winner": 0,
+        "tick": 21246
+      },
+      {
+        "map": "frozen_sound",
+        "seed": 0,
+        "countries": [
+          "cuba",
+          "germany"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 0,
+        "tick": 104040
+      },
+      {
+        "map": "steel_harbor",
+        "seed": 0,
+        "countries": [
+          "france",
+          "germany"
+        ],
+        "difficulties": [
+          "medium",
+          "medium"
+        ],
+        "winner": 1,
+        "tick": 108526
+      },
+      {
+        "map": "oasis_gulf",
+        "seed": 0,
+        "countries": [
+          "germany",
+          "great_britain"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 1,
+        "tick": 143361
+      },
+      {
+        "map": "thousand_lakes",
+        "seed": 0,
+        "countries": [
+          "great_britain",
+          "america"
+        ],
+        "difficulties": [
+          "easy",
+          "easy"
+        ],
+        "winner": 0,
+        "tick": 110849
+      },
+      {
+        "map": "thousand_lakes",
+        "seed": 0,
+        "countries": [
+          "france",
+          "germany"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 1,
+        "tick": 80889
+      },
+      {
+        "map": "steel_harbor",
+        "seed": 0,
+        "countries": [
+          "cuba",
+          "america"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 0,
+        "tick": 106878
+      },
+      {
+        "map": "steel_harbor",
+        "seed": 0,
+        "countries": [
+          "america",
+          "cuba"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 0,
+        "tick": 188712
+      },
+      {
+        "map": "wheel_of_worlds",
+        "seed": 0,
+        "countries": [
+          "germany",
+          "great_britain"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 1,
+        "tick": 181460
+      },
+      {
+        "map": "wheel_of_worlds",
+        "seed": 0,
+        "countries": [
+          "cuba",
+          "france"
+        ],
+        "difficulties": [
+          "brutal",
+          "brutal"
+        ],
+        "winner": 1,
+        "tick": 166729
+      }
+    ]
+  },
+  "raw_logs": [
+    {
+      "phase": "fmt",
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final8-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exit": 0
+    },
+    {
+      "phase": "clippy",
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final8-clippy.log",
+      "bytes": 230,
+      "sha256": "bdc353777352d8ea9333ffe3655f8e131532f05c974dffae9744817403a59fe3",
+      "exit": 0
+    },
+    {
+      "phase": "generator",
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final8-generator.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exit": 0
+    },
+    {
+      "phase": "reference",
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final8-reference.log",
+      "bytes": 69,
+      "sha256": "5fa32e9687ef749dd76543b607f37bc835ddd9e7469e2b7b5874d233ee5cf964",
+      "exit": 0
+    },
+    {
+      "phase": "focused-ra8-ai",
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final8-focused-ra8-ai.log",
+      "bytes": 10003,
+      "sha256": "c59d2724fff29550b9047776188d9a16382e25ebd85eace48b3892050d74867f",
+      "exit": 0
+    },
+    {
+      "phase": "focused-attrition",
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final8-focused-attrition.log",
+      "bytes": 2054,
+      "sha256": "465a917eeae18d530b1e337c862bad8c22bb718eb36730961c2b0f59c6665b21",
+      "exit": 0
+    },
+    {
+      "phase": "focused-recovery",
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final8-focused-recovery.log",
+      "bytes": 2692,
+      "sha256": "0316dc169cd3472ae4faa9a120c82804f25f74295d81f640f36e51e9818da559",
+      "exit": 0
+    },
+    {
+      "phase": "focused-composition",
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final8-focused-composition.log",
+      "bytes": 1934,
+      "sha256": "cfc113cea601dbfcc559678a24684d207eb6b64edb130ad0e255c7327984e3bc",
+      "exit": 0
+    },
+    {
+      "phase": "focused-ra4",
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final8-focused-ra4.log",
+      "bytes": 719,
+      "sha256": "9cd31681e4dee2241559080f10526bfd64f710ff00ea4a6311fe97cdf977ee81",
+      "exit": 0
+    },
+    {
+      "phase": "focused-temporal-affected",
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final8-focused-temporal-affected.log",
+      "bytes": 9808,
+      "sha256": "7bbc6ca6b4999f01014f693f5aaf725f521c34237956a790e3e284176c30274e",
+      "exit": 0
+    },
+    {
+      "phase": "default-demo10",
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final8-default-demo10.log",
+      "bytes": 7501,
+      "sha256": "2c1e50830d8ae0d1906594e86e2f526b2220ea5f716766bf892fe28f815934b9",
+      "exit": 0
+    },
+    {
+      "phase": "failed-smallest-ten-player-and-neighbors",
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final8-failed-smallest-ten-player-and-neighbors.log",
+      "bytes": 868,
+      "sha256": "4296e9d71d2b490968f0b4745155bd9dcecec98188322c9b0aa053b02bd8673f",
+      "exit": 0
+    },
+    {
+      "phase": "retained37",
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final8-retained37.log",
+      "bytes": 1550907,
+      "sha256": "6a52a41da8fe46ff09f93861489998fcd86baae74393b3bb6b3908249ec04b66",
+      "exit": 0
+    },
+    {
+      "phase": "m13-all",
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final8-m13-all.log",
+      "bytes": 8345,
+      "sha256": "d83b41b30d27bd4232fab2d43ff31e6b92cb0c31a8318edf9ec97c1f7f87364a",
+      "exit": 0
+    },
+    {
+      "phase": "m13-256",
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final8-m13-256.log",
+      "bytes": 1269,
+      "sha256": "d0b573dc10b9fdd60e77f377b044ff93a665867f0e38bf0f10f2e2f4f2998402",
+      "exit": 0
+    },
+    {
+      "phase": "example-guard-m13_ten_players",
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final8-example-guard-m13_ten_players.log",
+      "bytes": 470,
+      "sha256": "084012f6d6b262efc27ae49292c87405cebaaa8efc5d1cb0221b052e7775f075",
+      "exit": 0
+    },
+    {
+      "phase": "example-guard-m14_duels",
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final8-example-guard-m14_duels.log",
+      "bytes": 445,
+      "sha256": "894cbf0d0bad85a0bc11d6025a47b1b127379ff9949dc47dc674284d7da66c31",
+      "exit": 0
+    },
+    {
+      "phase": "example-guard-m7_soak",
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final8-example-guard-m7_soak.log",
+      "bytes": 473,
+      "sha256": "763207bb909dadccc456a3c3ddf0be71b67e8ff7cdeaf61cfda54166ad4a5f5e",
+      "exit": 0
+    }
+  ],
+  "performance_scope": "No concurrent validation/profiler. Bounded read-only health metadata only. Passing means do not imply smooth tails; retain all p99,max,busiest-window and >50ms measurements."
+}

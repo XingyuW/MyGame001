@@ -9396,3 +9396,797 @@ stored JSON-escaped to avoid recursively creating raw diagnostic snapshots. All3
 file/line/EOL/staged-blob hashes match,0source/data/test/prose errors. No suppression or
 normalization is used. An identical final staged check precedes the separate deliberate
 commit;the diagnostic classification does not convert exit2 into a pass.
+
+### R162 — Capability-qualified last-resort armed workers (RA8, 2026-10-19)
+
+Checkpoint11's complete workspace command fails101 after6414 script seconds versus
+6414.145369 monotonic seconds (253passed/1failed/0ignored). M6 is5passed/1failed,
+6151.73 native seconds: seed0 None at unchanged limits for Crossroads GreatBritainBrutal/
+AmericaBrutal, Riverlands IraqBrutal/CubaBrutal, Oasis RussiaBrutal/FranceBrutal, Coral
+IraqBrutal/CubaBrutal and Frozen RussiaEasy/LibyaEasy. The wrapper stops after completed
+row4,process-15,total6415.675003s;05partial/06–13unrun and stale unchanged production TSV
+are preserved. No full756 result is claimed. Attempt11 PRESERVED.json retains the entire
+34-file label/166895bytes per set/68copies,zero mismatches,manifest7505f204… and raw04
+fc4dccd4…. CPU activity samples were not case-success evidence: the harness captures
+worker panics until its scope finishes. Installed built-test help and binary confirm
+output-only no-capture support; repo source does not read RUST_TEST_NOCAPTURE. A future
+unchanged13-command gate may use that output setting to expose unexpected failures sooner;
+expected should_panic output alone never authorizes stopping.
+
+Exact Crossroads trace897708c9… reproduces101/18.086042s: real late Carrier sorties and
+GI attacks rule out global helplessness. That ending remains open. Exact Riverlands trace
+d8ca958d… reproduces101/17.706165s. At60k/72k both ordinary survivors are submerged Typhoons
+210/226; eight empty idle WarMiners have no orders/steps and no building shots in the last
+12k (40 incidental Miner→Conscript shots). Mere armed non-worker presence disables
+View::last_resort,even where the existing honest can_finish excludes that naval force.
+The resulting workers never enter the army despite an actual land finishing opportunity.
+
+For source-opted plans only,the per-decision View now also permits last-resort empty armed
+workers when no commandable/recoverable-service non-worker passes the existing finishing
+capability test,and no observed reachable worker_job remains. Actual non-idle harvesting
+stays excluded by fights; capable land/control/naval actors retain their existing test.
+No controller/resource/pending state is added: this flag is derived afresh from the same
+owned/observed View and controller memory. Legacy neutral rules_difficulty=false retains
+the old predicate. No visibility oracle,public command/cost/source statistic,timer,cadence,
+limit,composition or hash format changes. This is a useful-force admission correction,
+not forced liquidation or a claim that workers globally lack economic/combat value.
+
+The actual schedule regression
+ra8_an_incapable_naval_survivor_does_not_suppress_a_real_armed_miner_attack keeps both actors
+alive,the player nondefeated,the match unfinished,and proves ordinary yard observation of
+the enemy Barracks. Final old-source negative d1c30a99…101/20.295066s fails only the real
+Miner building-shot assertion. Finally restores candidate AI512fc9b6…; a SEPARATE later
+SHA read verifies AI/unchanged strategye689d137… before dependent runs. Candidate positive
+6cb6883a…0/5.648934s physically fires. Initial before1/2 are compile API mistakes;
+before3/after1/after2 used a farther unseen target and healthy scouting travel,so are
+insufficient for the final seen-target proof. Their logs remain; no failed candidate is
+called a pass. Controls invocation1 was rejected by Cargo argument placement; invocation2
+has two genuine passes but UnknownUnitType("rhino_tank") setup failure in the third.
+Corrected source ID rhino yields all3passed0failed0ignored (7031667b…,0/5.813700s):
+ra8_a_capable_living_land_force_keeps_empty_miners_out_of_the_attack_wave proves real Rhino
+building fire with no Miner combat order/shot; and
+ra8_a_real_reachable_ore_cycle_survives_an_incapable_naval_companion proves actual native
+OreDelivered while preserving the worker's economic role. No existing assertion is changed.
+
+Exact Riverlands on this candidate explicitly P0IraqWon27584<72000
+(raw37644a967551739ce571a6210706b1be3295fc095bf17863aadcbb7bf8d88eb2,
+0/36.830311s command including compile,5.74s native). Ending credit is for this combined
+runtime; the controlled property proof remains distinct. Four other current failures
+remain open and need actual diagnosis,not an assumed shared cause. Four new gate11
+regressions plus existing Crossroads retain every original predicate/limit. The target
+now has37 test functions; duplicate Demo configs remain under the no-deletion rule,so
+this is not a claim of37 distinct configurations. The entire retained target will execute
+once on the eventual final source before another gate; no full acceptance/review claim.
+
+### R163 — Preserve an already eligible current building mission (RA8, 2026-10-19)
+
+Frozen RussiaEasy/LibyaEasy remains None288000 after R162 (raw9801d7d0…,101/52.074318s).
+Actual60k..288k P0 has no units,queues,yard or unit producer: ServiceDepot80,Reactor85,
+captured OilDerrick and TechOutpost remain; cash6337→36321. P1 retains one FlakTrack132,
+Factory/Radar/Sentry,cash26/no income. Its real continuous Depot fire (762shots/4936paid
+repairHP last48k) is absorbed by passive income. No idle-force/global helplessness claim.
+The core's current wave target is85,but strategy repeatedly emits Attack80 (1200intents
+last48k),selecting the building nearest HOME rather than the legal selected wave mission.
+The non-ammo,non-casualty cohort never completes R133's loss/sortie cycle. No passive-income,
+credit-signature,timer or source-repair rule is waived by the following correction.
+
+Strategy still filters exactly the existing eligible,stable known building candidates.
+Among those only,it now prefers an existing WaveTarget::Building current ID before the
+unchanged (home-distance,ID) fallback. A missing,exhausted or unstable current target gains
+no admission or new vision/reach. No persistent state/hash field,weight,timer,range,source
+statistic,limit or ordinary public command behavior changes. The ground and air parts keep
+their existing weapon/threat/standoff logic. This is mission consistency,not guaranteed
+combat success against funded repairs.
+
+ra8_a_current_observed_building_mission_is_not_replaced_by_a_repaired_home_nearer_target
+runs a native schedule: real Engineer capture activates OilDerrick income,Flak fire actually
+DAMAGES a nearer-home Depot AFTER projectile impact,ordinary paid repairs restore it,and
+ordinary Move establishes a front where core AI itself selects a known/visible/eligible
+Reactor. No wave/target/history field is seeded. Old strategy fails the intended alternate
+WeaponFired assertion (a46f9ded…,101/18.176411s); candidate passes real Reactor fire
+(cdea7408…,0/18.499969s). The extended native control then uses ordinary Rhino reinforcement
+to destroy that objective and observes Flak fire at the remaining legal Depot,with the gone
+ID removed from memory (ecea7cb3…,0/18.422977s). All11 relevant attrition controls remain
+passing (05014081…,0/1.041630s),including real loss/capture,temporary cargo/service/freeze,
+ammunition cycles,declining HP,source recharge and independent strategic damage.
+
+Initial before1 is a private-module path compile error. Before2/3 fail paid-repair premises:
+repair was enabled after WeaponFired but before projectile damage,so full-health automatic
+shutdown occurred; the real captured-income setup is retained. Before4 fails the current-
+front premise because its firing position ties the source target distance; ordinary Move
+in the final fixture establishes the non-tied front. All insufficient logs remain and select
+no fix. No existing assertion is weakened or migrated; only the new controlled fixture is
+corrected. Source delta is the current-ID tie component among existing valid candidates,
+AI512fc9b6… unchanged from R162 and strategye689d137…→8b57bcdf….
+
+Exact Frozen on combined R162/R163 STILL fails None288000 (raw8008c2a0…,101/82.535375s
+including compile,51.23s native). The correction actually moves Flak fire to Reactor85,
+but762shots/4928paid repairHP last48k are still absorbed,with P0cash36351. This is capability/
+mission proof only,not ending credit. No new passive-income or crew-sale policy is selected;
+remaining exact cases are replayed on this combined source before further runtime policy.
+
+R163 subsequent combined-source exact replays: Crossroads P0GreatBritainWon28114/72000
+(rawfd587dfb…,0/7.964244s/native7.66),Oasis P0RussiaWon110849/252000
+(raw2a2ce5a1…,0/80.643656s/native80.47),Coral P0IraqWon71271/288000
+(rawaf80bb3e…,0/77.587834s/native77.41). Together with R162 Riverlands27584,these are four
+actual repaired endings,not isolated attribution of every trajectory to one condition.
+Frozen remains open on that source; no broader runtime policy preceded those replays.
+
+### R164 — Passive-income repair investment needs an actor or production use (RA8, 2026-10-19)
+
+The distinct Frozen evidence in R163 establishes an actorless,producerless remnant whose
+periodic OilDerrick cash can indefinitely finance these observed repair/damage rates,while
+its rich wallet has no native unit-production use. The R53 credit-change signature rightly
+continues observing actual income. Neither the cash flow nor that signature/timer/stagger is
+changed. No crew-sale policy is added. Instead,only repair_recovery's leading income
+exemption now requires ANY actual owned unit (including temporarily unavailable actors or
+stowed hosts),or ANY normally buildable unit. All existing independent force/MCV/Engineer,
+garrison,ordinary building-construction,powered offensive strategic and exact financing/
+completed-head recovery checks remain. Future income may finance legal production even
+before a unit exists; no full-current-price guard is imposed there. This is a deliberately
+conservative game-owned repair-investment policy,not proof that every imaginable crew-sale
+or other recovery choice is physically impossible. No owner/sight/source repair cost/rate,
+production prerequisite/difficulty/stat,command validation,composition,timer or match limit
+changes. The bounded source-definition iteration uses checked UnitKind conversion; no new
+persistent state/hash field is introduced.
+
+ra8_passive_income_without_actors_or_production_does_not_fund_an_endless_repair_duel uses
+actual Engineer capture/consumption,real periodic income increasing the wallet AFTER the
+capture baseline,actual paid heals from enemy GI fire,zero owned units,all native unit
+buildability checks failing,empty queues and a living nondefeated player. Before1 is
+INSUFFICIENT: inherited former-yard work in the helper's queue invalidates the empty-queue
+premise. The final setup settles that work via ordinary bounded CancelProduction BEFORE
+capture and the income baseline;no refund is attributed to periodic income. Old policy then
+fails only the required ordinary repair-off assertion (cf0eb8c5…,101/6.062296s). Candidate
+passes (7a3afb28…,0/20.691605s): ordinary RepairBuilding toggles off,then the EXISTING enemy
+GI physically destroys the remnant and P1Wins,with no sales/refunds after decision. No
+liquidation or fabricated winner substitutes for that native damage.
+
+ra8_passive_income_with_real_unit_production_keeps_paid_recovery_repairs is the useful
+positive (987793a9…,0/6.071096s): ordinary captured income,zero owned units at entry,a live
+legal Barracks/power prerequisite chain,actual paid repair increments,ProductionComplete
+AND an owned living GI. Source prices/normal owner/prerequisite checks apply. It preserves
+production recovery rather than merely asserting a predicate. Existing unavailable-unit,
+garrison,real MCV/power/strategic and funded/completed-head guards remain required in the
+full relevant focused suite. All unsuccessful premises/raw logs remain. No existing test
+assertion or fixture expectation is weakened.
+
+Exact Frozen on combined R162/R163/R164 now explicitly P1LibyaWon60225<288000
+(raw7bed68b13e307da499148e5ddf84b27b0a56974a36dd5c01ee5b19c788422969,
+0/47.837022s command including compile,17.91s native). Controlled native repair/fire proof
+and this combined match result are distinct evidence. AI512fc9b6… remains unchanged;
+strategy8b57bcdf…→e344244c…. All five attempt11 cases now have individual wins along this
+source progression. No final-source transfer is claimed: the entire37-function retained
+match target,meaningful focused/legacy/recovery controls,all21 actual ten-player endings,
+three isolated256 means,three executed example guards and unchanged full13 gate remain
+required. Independent review and user play-feel verification remain pending.
+
+R164 scoped final1 stops early and is NOT a pass: fmt/strictClippy/generator/reference exit0,
+then ra8_ai is99passed/1failed/0ignored (rawdede5396…,101/59.311725s),all443 source snapshots
+unchanged. The remaining12 phases,including37/all21/fixed/examples,are unrun. Exact existing
+function ra8_income_production_and_a_usable_force_keep_useful_building_repairs fails only
+its oil_derrick case's repair-preservation assertion. Verified setup: the helper removes
+all actors/producers,then raw put(oil_derrick) alone supplied a metadata-only income premise,
+not an ordinary captured income source with a useful production opportunity. That older
+income-alone positive policy is intentionally superseded by the demonstrated R164 boundary.
+
+Named SETUP migration: ONLY that function's oil_derrick branch now owns a normal PowerPlant
+and Barracks and performs actual neutral-OilDerrick capture with an Engineer. Its original
+200-tick bound,repair-not-cancelled/healed/no-outcome assertions remain byte-for-byte; other
+construction_yard/grizzly cases remain unchanged. Added owner/Engineer-consumption and
+charged native unit-queue progression assertions substantiate useful recovery within the
+SAME bound. The exact function passes (fe5aeb2c…,0/6.949576s). No stale assertion is lowered,
+no source fix is reverted for the old assumption,and the separate actorless/producerless
+negative retains its original old-source intended-fail evidence. Fresh final2 manifests
+and the complete targeted final source preflight remain required after this fixture change.
+
+### R165 — Preserve unfunded garrison recovery beyond the release command (RA8)
+
+Scoped final2 is failed/incomplete,not acceptance: the first nine commands pass
+(100RA8AI+11attrition+21recovery+14composition+2RA4=148passed),then defaultDemo fails
+RussiaEasy/LibyaEasy seed0 None72000 after four earlier explicit wins
+(raw58b34c1485c34ec96bd8575996417617a047cd5ce107f1013b81822fa1c766e6,
+101/34.761742s). The remaining37-function target,grown-map target,all21/fixed256/examples
+are unrun. All443 source-snapshot paths remain unchanged throughout that failed preflight.
+The earlier R16070234 win is historical and is not transferred to this source.
+
+One exact scheduled native trace,not another broad baseline,retains the concrete cause
+(2ff00b6c6978f97c751af93672953e0a3e46ba6e746450576a91167b64048fda,
+101/10.863039s). P0 has nine real Conscript/Tesla actors and zero credits at60k.
+P1's real occupied civilian kills the late attack around66–67k; P0 later sells an ordinary
+building and funds more troops. Four Conscripts genuinely fire on the Reactor at72k,
+whose HP440→412 over the last40ticks. P1's wallet62 is stable65–71k,then45 with Reactor
+repair active. This is active combat/recovery,not a helplessness or idle-army finding.
+
+The narrower lifecycle contradiction is directly visible: last-stand Deploy releases
+host3221228905 at65641; ordinary strategy reassigns its recovered infantry through Interact
+at65681,66201,66241. A similar release/re-entry repeats after the next host at66961.
+The garrison policy required only credits>0,although62 cannot pay the source100 Conscript
+price and there is no income. R96 proved release,but did not follow the next decisions.
+
+ra8_unfunded_garrison_recovery_retains_its_released_infantry_for_real_offence establishes a
+living nondefeated remnant,ordinary occupied Conscript,62credits,source100 cost,ordinary
+last-stand Deploy,and subsequent re-entry. Old source fails the exact required no-re-entry
+assertion (92a5cb87…,101/6.438398s). Candidate after1/3 correctly prevents re-entry but its
+initial intended enemy building is unseen; healthy initial scouting therefore refutes those
+attempts as actual-fire proofs. After2 is only a fixture borrow compile failure. Final setup
+adds a real unarmed Engineer observer of the distant Reactor,not seeded controller memory,
+and proves released Conscript→Reactor WeaponFired (3ad80be6…,0/6.427136s).
+
+The only new policy is optional garrison admission: preserve the previous choice when
+actual service income exists,or the wallet covers the selected occupier's declared source
+cost. Otherwise require a currently observed eligible ground-unit target within the host's
+real side-selected occupation-weapon range. The actual native occupation weapon and
+warhead eligibility are used,not the infantry's ordinary gun or remembered hidden enemies.
+This is a conservative liquidity rule,NOT a whole-FIFO financing or producer/buildability
+certificate. Cash-rich precursor construction remains allowed; source cost alone does not
+prove replacement is currently buildable. No new state,quota,threshold,timer,credit-signature,
+source price/rate/combat/difficulty or limit change is introduced. Public commands and native
+physical safety remain unchanged.
+
+ra8_garrison_admission_keeps_source_cost_cash_real_income_and_actual_defensive_fire retains
+three native controls:100cash/source100 cost; actual captured OilDerrick plus periodic income
+with wallet below100 and a genuinely charged ordinary Kirov head; and62cash plus actual
+occupation-gun WeaponFired at a visible hostile GI. The income ledger cash+charged exceeds
+startup1062,so capture bonus alone is insufficient. Controls1 is a retained borrow compile
+failure; controls2 passes (a57bc24d…,0/6.356807s). No existing fixture/assertion is migrated.
+
+The FINAL formatted recovery fixture is independently fail-able: remove only the new
+admission conjunct,run exactly its one test,and restore unconditionally in finally.
+9b3f0b4d7d351e576d3d1790d0b41c107a631d4b7e71bf0ef2c3f23fdb9743d9 is
+101/20.330760s at the intended immediate-regarrison assertion. Pre/post strategy SHA is
+4fc1dc0a0e2c2fd5e3339a3995a2accf4a99234a8aa0c51ea7136c227f9a323a;
+the separate later restoration record verifies that exact source before any dependent run.
+The affected five garrison tests then all pass (882d7a7d…,0/20.855206s including compile).
+Exact Demo ending evidence and fresh final-source scoped acceptance remain pending here;
+the controlled lifecycle correction alone is not an ending or full13 acceptance claim.
+
+R165 exact Demo after1 is STILL None72000 (479e3cbd73fd83b5ed024ae59b30e257aba0362077c53ba25ec2784c703ff1c0,
+101/39.677910s including compile,9.83s native). The corrected garrison capability is not
+credited as an ending fix. The final state now contains genuinely released P1Conscripts
+approaching/firing at P0's front and no occupied hosts. Four P0Conscripts continue real
+direct Reactor fire while those defenders approach; the separate local-response boundary
+must be proved before another policy change. No active combat is called helpless.
+
+### R166 — A short-range building focus responds to newly observed incoming fire (RA8)
+
+R165's still-failed exact Demo exposes a separate order lifecycle: the four P0Conscripts
+retain direct Attack(Reactor) while newly arrived P1Conscripts approach and shoot them.
+The existing surface strategy installs direct building focus when no hostile unit is seen,
+then only stops issuing NEW focus commands when defenders appear; the installed direct
+Attack remains. R128's air handoff does not cover this surface subset. This is not an
+absence of paid forces or evidence that combat is globally stalled.
+
+ra8_surface_building_focus_responds_to_a_new_real_local_defender proves the actual sequence:
+ordinary shipped Rhino genuinely reaches direct building Attack and WeaponFired on an
+observed Radar,then a newly spawned visible source Rhino genuinely fires on it. Old source
+fails only required return fire (ee821d8d…,101/6.631278s). Candidate returns a native shot
+(9e42618e…,0/20.366345s including compile). Final fixture explicitly asserts the prior
+direct Attack order,not just incidental idle/AttackMove acquisition. Its real Engineer
+observer provides target knowledge; no memory/order is seeded and HP stays source-correct.
+
+The final correction is narrower than the first candidate: only active Land/Amphibious
+actors with range BELOW the existing ai.ron artillery_min_range,whose current direct
+Attack matches this already-eligible observed building,can switch once to ordinary
+AttackMove when an observed enemy's normal source weapon can damage/reach them. Existing
+local_wave_threat also accepts our OWN opportunistic reach; it remains unchanged for Air,
+and the new incoming_wave_threat checks incoming eligibility/range/minimum only. Source
+weapon readiness/elite bonuses are not claimed as a perfect oracle. Healthy matching
+AttackMove retains path/weapon history; no repeated reset is added. Original long-range
+artillery/front/standoff paths remain outside the new response subset.
+
+The destination is a deterministic public-terrain BFS to the building's OUTSIDE ring,
+avoiding owned/actually visible building footprints,never its blocked interior. Search is
+bounded by existing grid cells and never consults unseen occupancy. Without a known route,
+the owned actor's current legal cell supports local combat; no fabricated route is used.
+Ordinary movement/combat enforce real occupancy/I6 and selection/command bounds. The work
+is derived per decision; no new persistent state/hash field,policy number,source combat
+stat,cadence,timer,match limit or public command changes. Legacy opt-out remains untouched.
+
+ra8_a_first_stationary_hidden_mirage_cannot_change_surface_focus_intents runs twins through
+the actual due AI stage,including first-spawn concealment. A real stationary source Mirage
+is hidden at the post-AI/pre-Combat boundary; its later possible firing is not mistaken for
+decision-time knowledge. Actual controller values and all emitted intents equal the twin
+without that actor. ra8_surface_response_does_not_replace_the_existing_long_range_artillery_policy
+keeps a normal source Prism's prior direct focus for the bounded20-tick real-incoming-fire
+control; it is not an indefinite-focus requirement. The original R100 causal standoff
+tests are retained separately. The first added Prism fixture fails its PREMISE: idle Guard
+fires before an AI wave mission. Corrected setup uses ordinary ForceMove until the actual
+AI installs its direct mission,with no HP/stat injection. Four controls then pass
+(b61314fe…,0/6.808211s); no existing assertion is migrated.
+
+ra8_unseen_building_occupancy_cannot_change_a_surface_response_route_intent uses explicit
+fog,an actual visible local defender and a public-terrain detour whose sole distant gap
+contains an unseen new SentryGun in one twin. Both AI/controller/intents match and actually
+choose the outside ring rather than no-route fallback. The first added setup fails only
+its hidden premise because fog-off explored terrain remains visible; retained as
+insufficient. Corrected native visibility premise passes (1040b8ad…,0/6.670176s).
+
+Final formatted negative proofs each restore in finally and verify a SEPARATE later read
+before dependencies: removing ONLY the new response block fails intended actual return
+fire (ca8641808e8bab911d76a19b753ee6d9917651a4ee8674b9ef448b15b5105d1b,
+101/20.704399s). Changing ONLY its route query to raw building occupancy fails the twin's
+exact intent equality (a810e3b62f56000b73f230c9115f179d048e7cff3871e8e9c479918a7f8aed2c,
+101/20.824170s). Both pre/post strategy SHAs are
+b0df5e184134726456cea67079c2621a6395aadb75c1c5b971c8c341787e5c8c.
+Five restored surface controls pass (b238f96b…,0/21.791894s including compile).
+Exact ending and complete frozen acceptance remain pending; no property proof is a full13
+pass or independent review. A rejected append patch's exact-context mismatch made no file
+mutation; the corrected append follows a read of the actual ledger tail.
+
+R166 exact Demo after1 on the combined R162–R166 source now explicitly
+P1LibyaWon65767<72000 (d7f9b8cf105ad8e6cb00673af374fc599d10169b92ea75e01f8f0e87066d1a65,
+0/39.365911s including compile,8.77s native). This is a combined normal-play ending,
+distinct from the isolated incoming-fire property proof; it does not force a particular
+winner or transfer acceptance to other configurations. Three artillery controls pass
+(90498149…,0/0.710702s),including the original remote replacement's actual shots/destruction
+and moving-front assertions unchanged. Source AI512fc9b6…/strategyb0df5e18… and unchanged
+generated data/generator are frozen for fresh scoped final3,including retained37 once,
+actual all21 ten-player winners/three isolated256 budgets and explicit example guards.
+
+Scoped final3 stops at strict Clippy101 before any simulation (raw3c2a24c2…,6.117343s):
+two clone_on_copy diagnostics in the new garrison failure-only debug snapshot. Mobile and
+Weapon are Copy; dereferencing retains exactly the same diagnostic values. Runtime source
+is unchanged. fmt0 and Clippy101 are preserved; all remaining15 phases are unrun. Final4
+uses fresh manifests after this test-only style correction; no failed phase is called pass.
+
+### R167 — actual ore income with only an unarmed worker is not optional repair recovery
+
+Scoped final4 preserves194passed/1failed/0ignored across12 completed commands. The retained
+37 functions all explicitly win, but the separate original smallest ten-player Crossroads
+112×112/default Medium/seed7 case reaches72000 with no winner. All21,three fixed256 and
+three example guard phases are unrun. No earlier ending is transferred. The exact native
+trace (63c0645a07df5709ce9567ef99588201ac7ec5e048f4bdb38bd3f215b6c93f0f,
+101/32.756651s) demonstrates real P1 approach/fire/destruction, not a traffic or global
+helplessness finding: Apocalypse1144's remaining path falls784→476→168 at66–68k; late native
+destruction removes P0's power, defenses,refinery and finally power71681, leaving Chronosphere
+HP213 at72000. P8 retains a genuinely attacking Harrier; no forced liquidation is justified.
+
+P0's only late surviving actor is unarmed ChronoMiner820. It actually delivers ore while
+producerless: earned78000 at60k→80500 at72k, until refinery698 dies71278. This is actual
+refinery income, not an Oil assumption. The no-queue finance trace records296 native debit
+rows/545credits at62530..71270,including actual heals; optional repairs continue under
+R164's any-owned-actor income allowance. Finite observed spending is not an infinite-income
+claim. R53 credit signature/patience/stagger,harvesting and source repair prices/rates remain
+unchanged.
+
+The narrow policy excludes ONLY unarmed harvesters from the leading service_income actor
+exception. All other owned actors (including frozen/stowed/rearming/unavailable ones),armed
+workers and any normally legal future unit-production opportunity retain it. Every later
+MCV/capture/garrison/force/building/financed-head/offensive-SW recovery path is unchanged.
+This does not claim every incapable actor solved or physical unrecoverability. It is ordinary
+RepairBuilding investment choice,not income suppression or an automatic loss.
+
+The existing ra8_passive_income_without_actors_or_production_does_not_fund_an_endless_repair_duel
+now calls a shared scenario helper with its original actorless Oil setup/assertions retained.
+New ra8_real_ore_income_with_only_an_unarmed_worker_does_not_renew_producerless_repairs instead
+uses NO Oil: actual source ChronoMiner/Harvest/OreDelivered,existing enemy source damage,
+paid heals and growing cash,empty queues/no normal unit buildability/living player. On old
+b0df source it fails ONLY the required ordinary repair-off assertion (d4132ec2…,101/7.914315s);
+the candidate passes and real enemy damage physically finishes the base (20b8e233…,0/24.170287s).
+New ra8_real_armed_worker_income_keeps_native_paid_repairs_and_harvesting preserves source
+WarMiner income and continued actual paid healing after AI resumes. Its initial500tick setup
+failed only the income premise for larger source cargo; retained as18pass/1fail,not a policy
+failure.1500 native preparation ticks permit real delivery without changing existing cases
+or lowering assertions. All19 final repair controls pass (60d83e42…,0/7.744705s),including
+native unit production,financed/completed work,power restoration and support/offensive sources.
+
+A first mutation-runner exact-context assertion failed BEFORE writing or running a test;
+a separate source read proves8362c19c… unchanged. The corrected final-form negative removes
+ONLY this actor qualification, fails intended ordinary repair-off (eb54a0049be22c9cb5f4e48ac0a4eb59dfb876d0a6ae7074cf5a2cde38d2db57,
+101/24.589667s),restores in finally,then a SEPARATE later SHA read confirms strategy
+8362c19c3552d2375f4dd4e2a5142ed93b9108b1020f92b52ff35f3fdeadf854 before the exact original
+seed7 replay. That ending and complete frozen acceptance remain pending; no property proof
+is a full13 pass or independent review.
+
+R167 exact original seed7 after1 remainsNone72000 (9c65ee6cd554df996546fcc94f776d8161c771c4a8dff68547410ccbde7b1cc2,
+101/61.785144s including32.92scompile,28.30snative). P0 now genuinely loses its final building
+and is defeated71572, but P1/P8 remain. This is a validated repair property,not an ending fix.
+The prior trace shows P1's legal source next_wave72114 and idle home Dogs1164/1165,Kirov1166
+and TeslaTroopers1167/1168 at70k. Its known-building map contains only P0,never P8,whereas
+P8 Harrier1146 actually fires67520/68733/70641 and returns/reloads. Neither legitimate cadence
+waiting nor healthy travel is called a scheduler defect. General unused detector discovery
+is evaluated separately with native combat/visibility evidence before any play change.
+
+R167 proof tightening: retained_heals was initially computed but a scripted replacement did
+not insert it into the armed-worker assertion. The warning exposed this before strict
+preflight. Prior19 raw establishes preparation paid heals and continued no-Off,not explicit
+after-resume healing; the earlier stronger prose claim is insufficient until the tightened
+assertion reruns. Raw bytes remain unchanged; the assertion now requires retained_heals>0.
+
+### R168 — unused detector support discovers unknown starts alongside a real combat mission
+
+The seed7 trace demonstrates two idle home Dogs while P1's actual combat wave fights P0;
+P1's honest known-building map contains only P0 through72k,never P8. P8 has a genuine active
+Harrier and remaining producers,not a helpless-remnant shortcut. Shared next_wave is legitimate
+source TeamDelay,not a scheduler defect. Parallel reconnaissance is an explicit general
+AI play assumption using existing owned detector capability,not a map/seed/country/horizon
+branch or new source cadence/vision.
+
+New ra8_idle_detectors_discover_an_unseen_start_while_the_real_wave_fights has a real FlakTrack
+wave/current factory mission and native factory WeaponFired. A newly available non-wave
+Dog can reach the never-observed actual enemy start. Old source before2 fails intended
+scoutfalse/knownfalse/firetrue (d2dcb214…,101/6.619954s). Before1 instead attempted a Flak
+spawn inside the actual3×3 own yard(10,8);retained as insufficient,corrected tolegal12,8.
+No HP above source maximum,AI state injection or weakened factory-fire assertion is used.
+
+The opted-in strategy starts only idle non-wave Role::Dog actors while a current already-valid
+known-building mission exists. It uses the existing priority/seen==0 enemy-start waypoints,
+nearest ordered distance/y/x. Actual core defenders keep the same observed-target/native
+weapon/reach/base-radius eligibility. Existing wave Dogs and all air-wave reservations remain
+untouched. A healthy ordinary scout AttackMove owns its job until observation,native route
+failure or genuine local defense; no persistent flag,timer,quota or new balance parameter.
+The core home-candidate filter recognizes this specific derived scout ownership rather than
+treating the general reserved set as noncombat (that would break existing air waves).
+All commands remain ordinary bounded FIFO actions; every reused order/controller field is
+already value-hashed. No new hidden building/grid occupancy input is read.
+
+New ra8_a_healthy_detector_route_survives_the_next_main_wave_admission uses a declared public
+serpentine terrain route long enough to span a real source Medium3333 interval,while actual
+source factory fire continues. Initial candidate exposes real native normalization: requested
+start(38,38) becomes legal endpoint(38,37); exact-coordinate ownership then admits the healthy
+Dog at7881 despite remaining2154/best2154 and startseen0. Reusing existing GATHER_RADIUS
+arrival geometry preserves that same order without reissuing it. A second candidate releases
+the job after the other factory mission is physically destroyed;that violates the declared
+scout lifecycle,so the initial-building condition now applies only when starting the scout,
+not when preserving an existing healthy approach. Corrected five detector controls pass
+(19989c11…,0/22.359102s),including native long-route discovery and existing naval/strike roles.
+A diagnostic E0502 compile failure and a later query of the genuinely destroyed factory are
+retained as insufficient diagnostics,not native failures or positive evidence.
+
+Final added controls cover actual home Dog→visible Conscript fire and unseen newly built
+Sentry occupancy twins with real scout intents/controller equality. Final controls,ownership
+negative/restoration and original seed7 ending remain pending. No focused property proof
+is full13 acceptance or independent review.
+
+R167 tightened after-resume armed-worker proof now passes explicitly with retained_heals>0:
+0e3898a748dcbbda64068ea5f46a09879e9fa37d7afb0fb06a0822e1f597f1a3,0/0.130592s.
+Earlier raw/control claims remain classified above,not retrospectively strengthened.
+
+R168 final seven controls pass (cd9898a5046179ed7b61491215300263cb9debcae6158f8a86de187264c55c15,
+0/21.937004s),including actual discovery/native long-route next-wave crossing,real home
+Dog→Conscript fire,unseen newly built occupancy's same controller/issued scout intents,and
+unchanged existing strike-wave Dog/naval escort controls. Removing ONLY the core scout home
+filter fails the actual unrelated-wave admission assertion in the final long-route fixture
+(f361193de61f5c41b9e4d951c1dd3400a6eb757866961d127f457a461303c3c0,101/20.590055s).
+Finally restores AI640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c;
+a SEPARATE later source read verifies that and strategy952827fe16b30aaa0e48b7b360872686a2891aab8c53b05abbe1aa88efa6bafa
+before any dependent test. No live mutation remains.
+
+The exact original Crossroads/default Medium/ten-player seed7 now P1Won48160 after48161steps,
+9defeated,all original made-start assertions retained (0fde525633504a76427fc27311e84a511d798fbe1be9dca5cf9de836c128c121,
+0/48.129401s including28.30scompile,19.21snative). This is the combined R167/R168 normal-play
+ending,not isolated causal winner attribution or full acceptance. No match limit,winner
+requirement,source TeamDelay or combat/repair statistic changed.
+
+Fresh final5 discovers current snapshot paths instead of assuming prior lists: runtime344
+adds the two crate Cargo.toml files to the previous342 scope;additional168 adds67fixture/
+reference files to the previous101 integration/example scope. Previous snapshots remain
+byte-for-byte unchanged;their historical mismatch claims cover only their recorded paths.
+The two snapshots overlap at examples and are not a disjoint file-count sum. Frozen scoped
+validation orders actual defaultDemo and grown3 before retained37,then isolated all21/fixed3/
+example guards. No repeated broad workspace preflight;full13 still requires root release.
+
+R168 frozen final5 first12commands all0/201passed,retained37actualWon/36distinct configurations
+(c86820dd…,825.294222s). Isolated all21 now observes Frostline400000/noWinner/2playersleft,
+all10builders/mean438.293µs,175.318smeasured/175.342selapsed. This is an ending failure,not
+budget failure or a diagnosis. The owned all21 command continues every map under the
+explicit collection policy;dependent fixed3/examples remain unrun pending its nonzero exit.
+No source mutation or separate diagnostic run overlaps it;full13 remains unreleased.
+
+
+## R169 — Restore an unthreatened short-range surface building mission despite distant observed actors
+
+Frozen scoped final5 completed13commands,201Rust passes/0failures/0ignored and a separate
+m13 all-map exit1:20actualWon/21ten-builder results;Frostline alone reached400000with
+P4/P7alive. Fixed256andthreeexample guards remain unrun. Preservation is
+`attempt11-final5-PRESERVED.json` (21files,1,215,825bytes,
+SHAda579aea297435d858a9d630cb89cae7f9baa3d4ffa048cc1b7ffc3ee95da8b9).
+Its worstmeanCoral1.376ms satisfies5ms;largestbusy1000isWheel5.706ms,notCoral5.212ms.
+This is an ending failure,not performance failure or completed acceptance.
+
+One authorized exact trace,`attempt11-frostline-native-trace1`,exit1/182.925140s,
+rawSHA3bc9af5f009f41e3e8b28d03252f926f1fd00be581d8e6dca3b15b7366d4652b,
+shows Mirage2300 at65,224 repeatedly firing at Coil1049(66,231),while the core selected
+Refinery1691(55,225). Windows ENDING>=120000 include108000..120000 and record5309
+Mirage→Coil shots,13732nativeCoilHP-increase observations and simultaneous-credit-delta
+sum−36696 (co-occurrence,not exact repair attribution),zeroBuildingDestroyed. P7has two
+real armedWarMiners traveling/delivering/firing,realincome and ample repair funds. It is
+not the actorless/unarmed-income boundary. No repair/capability/timer change follows.
+
+The first visibility hypothesis was not established: footprint observations alone do not
+prove origin stability,but P4also retains a poweredSpySatellite. The bounded observational
+`attempt11-frostline-focus-guard-probe2` confirms fogfalse/allP7originsvisible at120000.
+It also exposes the omitted input: visible living actors of defeated owners remain hostile,
+including remoteConscripts112..114,209..212/GI200,118/carriers31,155. The prior trace printed
+units only for nondefeated players. The global `enemy_units.any(armed&&!harvest)` guard
+therefore suppresses every surface direct-focus candidate despite no incoming unit threat
+near the Mirage. Its healthy AttackMove keeps acquiring the repaired Coil,so no direct
+building-job cohort is recorded. Do not redefine defeat/hostility or remove those actors.
+
+The bounded probe intentionally stops after120001schedules;its no-winner text/exit1 is
+NOTa400000match result. Original example bound is restored in finally and a separate later
+SHA read confirms4537d24263cc36436118c0093a8b925412c4c8097a514026daa545b1ae4b0aac.
+Its rawSHA079cd96ad98e22ce587f9f15e4b0527284e37fd51d32f701099031cb6d753022,
+elapsed112.637251s includes compilation/instrumentation,not budget evidence. Probe1is
+an insufficient private-field compile error,raw d764ed25…;it was not a simulation.
+New example trace-only counters/snapshots stay outsideWorld/state and issue no commands.
+
+Policy: only inside the existing armed-enemies-present branch,an active short-range
+Land/Amphibious wave actor may resume the already-valid/stable selected building when
+`incoming_wave_threat` finds no currently observed direct positive-damage normal-weapon
+incoming threat (the existing R166 boundary,not every specialist hazard).
+Skip an already-matching directAttack to preserve chase/weapon history. Reuse declared
+artillery_min_range;the original artillery/standoff/air branches and real-local-unit
+return-fire response remain. This is a game-owned local tactical preference,not a source
+AI-script reconstruction,guarantee of future safety,or global path/threat planner.
+No new state/tuning/hidden occupancy query,prices/ranges/sourceTeamDelays/R53 changes.
+
+New scheduled regression
+`ai::ra8_attrition_tests::ra8_a_remote_armed_unit_does_not_pin_a_surface_mission_on_a_repaired_distraction`
+first obtains actual core refinery selection,then ordinary AttackMove→real Mirage/Coil
+shots,ordinary income-funded Coil healing and visible distantGI. The human test Coil is
+unpowered,so this isolates the controller mission boundary without adding damage immunity.
+Oldsource before3 fails the intended actual-refinery-WeaponFired assertion (raw26ab4af9…,
+101/18.045714s). Earlier before2proved the same property with an unarmed ServiceDepot
+(raw7699fdd6…);before1selected0tests due unqualified--exact and is insufficient,not a pass.
+Corrected source after1passes actual refinery fire plus40ticks without repeated/conflicting
+actor commands (raw1db5292f…,0/21.611828s). Existing test assertions are not migrated.
+Exact Frostline ending and impacted controls remain required separately;this property
+alone is not an ending or RA8 acceptance claim.
+
+R169 impacted controls on the narrow semantic correction:5surface/0fail/0ignored,
+3artillery/0/0,12attrition/0/0;raw f3bc15cf…,4ca10cef…,59cfe83f… respectively.
+The final fixture also explicitly asserts native lowpower for its Coil premise;formatting
+changes no policy. Exact default Frostline runs isolated on AI640e8f96/strategyd58f8f8d;
+no ending/budget outcome is claimed before command completion.
+
+R169 exact native Frostline after1 exits0,raw
+a96d6d68b7fb6103ac7c81f746c08ebc08fb6fa33abf27cdb98bf29b14fb441b,
+141.297660s including17.19scompile/native123.861s:137491schedules,P5Won137490/400000,
+all10builders,mean900.793µs/p996.748ms/max105.432ms/busy2.448ms/14ticks>50ms.
+The general policy changes earlier trajectories;do not claim P4Mirage destroyed the final
+fortress or won. Controlled mission proof and combined exact ending are distinct.
+Fresh scoped final6 now repeats strict/focused,defaultDemo/grown before retained37once,
+thenall21/three256/exampleguards on unchangedAI640e8f96/strategyd58f8f8d.
+Source remains unfrozen for full13 until final scoped checkpoint/root checks;no staging yet.
+
+
+## R170 — Qualify resumed surface building focus by the selected target and native weapon
+
+R169 scoped final6 completed12commands:201Rust passes/1failure/0ignored. The retained
+37-function target completed36actualWon/36passes and one Coral Iraq/Cuba Brutal seed0
+None288000;all21/fixed256/threeexample guards are unrun. This is not RA8 acceptance.
+Preservation `attempt11-final6-PRESERVED.json` retains20files/2,227,545bytes,
+SHA8039aadb468c48250149c3155623741b80c7afe23e2d22bec956b803f0714a22.
+The previous exact Frostline win remains property/trajectory evidence,not a transferred
+final-source ending. Current terminal Coral metadata maps BuildingKind35 to
+`soviet_service_depot`,not the initially misstated IndustrialPlant;Yuri is not an
+ordinary building-damage actor. The terminal snapshot alone does not prove helplessness.
+
+The native regression
+`ai::ra8_attrition_tests::ra8_a_unit_controller_keeps_its_native_approach_instead_of_attacking_an_immune_building`
+uses an actual learned Depot,actual controllable Rhino and living admitted Yuri. Old R169
+source before3 emits640wrong building Attacks/643native AttackEnded events and fails the
+actual takeover plus captured-tank building-fire assertion (raw09ea26c2859f01e17388006ca5811bb251709a46e4767471d85f357c3d17c68a,
+101/29.794903s). Before1 is a compile failure and before2 an unknown-building setup
+failure,not causal proofs. Public Attack legitimately accepts then replaces actor orders;
+Combat cannot select a mind-control weapon against that building. No public rule changes.
+
+Only R169's new resumed short-range surface-focus branch now builds the actual selected
+building TargetTraits and requires native weapon_against selection,warhead percent>1 and
+selected source weapon damage>0. Existing genuine incoming-threat response,matching-attack
+history,air/artillery paths and legacy zero-damage public orders remain unchanged. This
+reuses native target/weapon semantics rather than assuming all armed actors can damage
+buildings or excluding every non-Normal weapon. No state,hash field,balance knob,hidden
+query,price/range/TeamDelay/R53 mechanism or match limit changes. The corrected actual
+Yuri takeover/captured-Rhino fire assertion passes after1 (rawa8b88074f50f98aac5a187b02ec77f52dc0510d5776b4e7823e8d047874083f5,
+0/27.649058s). Existing test assertions are not migrated.
+
+A new native positive
+`ai::ra8_attrition_tests::ra8_target_qualified_surface_focus_keeps_native_temporal_and_ivan_effects`
+retains actual AI focus,WeaponFired and full erasure/real bomb damage. It advances ordinary
+schedule to the real initial readiness with untouched controllers temporarily absent,
+then admits a source actor inside both currently implemented geometries. It additionally
+requires actual Erasure.remaining progression or actual planted Ivan charge. Controls2
+runs all14attrition tests,0failed/0ignored,raw2cb71ad3055cace7c69a8d27a2d6ae82a30e39e18dae89ba2cc4b79119a1f259,
+0/26.959515s;Temporal first remaining7494 decreases then target disappears;Ivan plants
+and damages the target. Exact Coral/Frostline and impacted controls remain pending.
+
+Independent reproduced RA9 debt: the original positive control focused/fired Temporal
+but never erased. Controls1 retains13pass/1fail,rawc754dc45a9cc9467508bbe6ab73b5f5ea7085c73f5695350a05910cd5d390715.
+Original-setup observational replay raw046256cf54b41ad195ac5f9117a8d69b0e723cb83bb3ea8d8ec445cffd858991
+fails unchanged effect assertion (101/48.2385945s):actor29,14,targetPowerPlant34,12,
+nearest footprint cell34,13,source range5. The trace prints Mobile.cell,not the historical
+fine Position/infantry spot. Combat uses footprint-edge Extent::gap
+(`crates/sim/src/combat.rs` footprint624/gap641,target1470),whereas
+`special/infantry.rs::retain_beams`603..640 uses the nearest footprint cell centre.
+Cell-centred illustrative gaps(4.5,.5) versus(5,1) demonstrate the distinction,not measured
+historical finepoint values. Native infantry spots alter those numbers;RA9 must record
+actual Position and both exact gaps during the original-setup replay before certifying
+the precise boundary. Repeated erasureNone/native fire is observed;the source geometry
+mismatch is the concrete lead,not a complete finepoint measurement. This refutes the
+initial teleport-churn inference;it is not proof of full Temporal correctness. RA9 must
+reconcile that real-building channel range with native Combat geometry. No canonical Temporal code
+is changed here;the original failure/observations are preserved. Finally restoration plus
+separate later SHA proof are `attempt11-temporal-original-native-trace1-restore.json` and
+`...-separate-restore.json` (AI640e8f96/strategy323f97d8/test1b7e230d before subsequent
+positive-only counter strengthening). This is distinct from actorless occupied-Prop debt.
+
+Procedural disclosure: one cargo fmt unexpectedly returned a running tool session;the next
+control was launched before separately inspecting its exit. Immediate inspection found
+fmt exit0 and unchanged runtime hashes,but this was not a prelaunch inspected check.
+`attempt11-yuri-building-admission-fmt-sequencing.json` preserves the deviation. All later
+dependent commands inspect completed exits. No failed output/raw bytes are rewritten.
+
+R170 impacted final-source controls:surface5/0/0 (raw8c17aa0712752c8ea5aa4204d84d4119ae698d4b5358f3032df86921c038b0e8,0/31.236828s),artillery3/0/0 (raw6da6246ab619744b3e00962fb9740f8a1a84e753461f4db4dca21de32a787fc6,0/0.537110s). No existing assertions changed. Native exact Coral and Frostline remain pending.
+
+R170 exact native Coral after1 exits0,rawac56a115144c02235d0386e29849a8cb9ce8d5c2dacf124ce5cb3c236b87c9db,
+174.775661s including41.54scompile/132.73snative:P0Won89118/288000,1pass0fail0ignore.
+This is the combined ending on AI640e8f96/strategy323f97d8,not isolated mind-control winner
+attribution. Current-source Frostline guard remains pending;no full13 release yet.
+
+R170 exact Frostline guard after1 exits0,raw732e7ecba39a6fd34115533ebf5f43ebc180a4995ff807602c355041242134ce,
+154.131947swrapper/150.895selapsed/150.880smeasured:109515schedules,P4Won109514/400000,
+all10builders,mean1.378ms/p999.693/max165.436/busy5.394/99ticks>50ms. Mean passes5ms;
+long-tail quality remains explicit. This is combined trajectory credit,not a claim that the
+Yuri or Temporal fixture won Frostline. Fresh scoped final7 now freezes AI640e8f96/
+strategy323f97d8,cheapDemo/grown before37once,thenall21/three256/exampleguards.
+No full13 launch or staging before completed scoped checkpoint/root checks.
+
+R170 scoped final7 completes12commands:203Rustpasses/1failure/0ignored. Retained37 has
+36actualWon/36passes and sole Oasis Germany/GreatBritain Brutal seed0 None252000,
+raw35792ff087ee913d6efd00b543f24dd1ebf171d8ae38e4bf9f79d319fe81e9b6,
+1529.961551swrapper/1529.55snative. All21/fixed256/threeexampleguards are unrun.
+Preservation attempt11-final7-PRESERVED.json retains19files/1,641,501bytes,
+SHA6f388f5b93d7b265778614051abda13392b4a36c9f6d1b8c3eb930ffe6b0ce7b;
+all12raw/494snapshot hashes match. No full13 acceptance or source staging follows.
+
+The emitted terminal Oasis snapshot has real opposing native travel and paid work;
+no global helplessness/range-defect conclusion is supported. An initial numeric-kind
+message incorrectly called queued UnitKind30 a Destroyer;exact units.ron indexing corrects
+it immediately to Harrier (3Dog,7ChronoLegionnaire,19IFV,25Prism,27TankDestroyer).
+One exact observational replay now records definition names alongside numeric kinds,
+remaining source costs,wallet/power/repair flags,actual native Economy HP increases and
+shared repair_step_cost,controller objectives/paths and any Temporal fire/channel values.
+Instrumentation `attempt11-oasis-native-instrumentation.json` records test helper SHA
+7bc635b8→38cd3bf9;production AI640e8f96/strategy323f97d8 unchanged. Observations distinguish
+external loop index from SimTick and post-schedule fine positions from pre-shot certainty.
+No commands,simulation state,limit or assertion changes. No policy selected before evidence.
+
+
+## R171 — Retain native Temporal channels with Combat body-distance geometry
+
+R170 scoped final7's sole retained Oasis Germany/GreatBritain Brutal seed0 failure is
+preserved above. One exact observational replay remains None252000,raw
+09b812b01018204b51ea8205184fb59e96aedd493980657f1d8a5261fd7e73bd,
+2,430,423bytes,101/195.066992s,start18:29:19Z. Other damage and ordinary moving/paid forces
+remain real. In this exact world38Temporal building shots34938..37244 target real Hospital
+2684363675 at155,35/1x1,all erasureNone. Observed actor424 fine(38608,9584) has actual edge
+gap(1072,369),squared1,285,345<=range1280²1,638,400,versus nearest-cell-centre delta
+(−1200,496),squared1,686,016. Actor397(38464,9536) has edge(1216,321),squared1,581,697,
+versus centre(−1344,448),squared2,007,040. Positive unit channels advance normally. Hospital
+HP800→13 confirms other damage;these observations alone do not prove the whole ending's
+exclusive cause. Terminal force travel is an ordinary building approach,not mobile kiting.
+Queued UnitKind30 is Harrier,as corrected above. No helplessness/sale/timer policy follows.
+
+Diagnostic raw labels `oasis paid repair economy` only establish Economy HP increase plus
+computed native repair_step_cost,not exact paid debits: Engineer interactions can heal
+within Economy. Do not sum those rows as paid spending without excluding other heal paths.
+`attempt11-oasis-native-instrumentation.json` and its raw patch preserve the temporary
+observer. Capture/hash verification finally restores test helper7bc635b8 at18:33:44;
+separate later read18:33:52 confirms it/AI640e8f96/strategy323f97d8. The original replay
+wrapper itself did not restore it;the later guarded capture did. No raw bytes are rewritten.
+
+The genuine native geometry defect is now owned by RA8 rather than deferred solely to RA9.
+Only `special/infantry.rs::retain_beams` changes: use existing Combat Extent::point(Position)
+with footprint fallback and the existing inclusive maximum/strict-inside-minimum helpers.
+Retain living-index,w.target,moving/frozen/disabled source,known_to and weapon guards.
+A beam continues while its weapon reloads;no cooldown gate is added. No new state/hash
+format,command,target admission,hidden query,source price/range/duration/stat or limit
+changes. Infantry source94a2be77→31dce2c0;AI640e8f96/strategy323f97d8 unchanged. The cache-only
+`temporal-edge-20261019-v1.UNVALIDATED.*` preparation is an inspected starting point,not
+validation/review. APIs/fixtures are refreshed and native tests live in new `ra8_temporal.rs`.
+No actorless-Prop/scenery support or generic modded Temporal-air bonus claim follows.
+
+New edge regression before1 fails after actual WeaponFired(fired=true),not setup,raw
+43571025c874a42c5dcfe454e86a93afc64352a586cdb8d4d2b7d24e29ab3ecd,
+101/1.613667s. Actual native source point(7488,3648) versus PowerPlant34,12/2x2 gives edge
+(1216,65) and old centre(−1344,192). Original20,20 actual-AI setup is separately retained
+as `ra8_original_surface_approach_keeps_its_native_temporal_building_channel`;before1
+raw284ab8d97ceaa99191455e6292691bcb86d5e47751f012eade034e174d3a130a fails
+focus=true/fire=true/progress=false/erasureNone and observes the same first fine point.
+The earlier R170 cell-only raw remains unchanged;new measurement does not retroactively
+supply missing fine positions. Existing valid-range R170 test remains unchanged.
+
+New six-test controls cover normal/elite full erasure and per-tick reload progression,
+actual unit points/building extents,max inclusion,legal isolated minimum inclusion/inside
+exclusion,ordinary Stop/Move/retarget,already-dead source/target Cleanup,actual native
+freezing of the source,and actual powered-detector sale→Spy concealment→channel release/
+public UnknownTarget. The direct HP0 cases prove already-dead/Cleanup boundaries,not a
+weapon-kill attribution;existing RA6 native death coverage is retained. Outside-initiation
+controls do not isolate retention's outside-range branch because Combat already blocks
+that shot. After1 has5pass/1setup-failure:the unvalidated draft minimum1280 incorrectly
+matched maximum1280;the parser correctly requires min<max. Only this NEW fixture is
+corrected to min1024/exact4cells versus inside3cells,leaving shipped maximum1280 untouched.
+No existing assertion/bound is relaxed. After2 has6pass/0fail/0ignored,raw
+91d88cbf6d3bfb7431a9295c0e76ab79f81ea410958c35e95d8e796f34e04228,
+0/1.386142s. Its one short-lived parser fixture uses configured TMPDIR and is removed
+before load-result assertions;no substantial directory/dataset/environment is created.
+
+Full attrition after1 has15pass/0fail/0ignored,raw226d47e3f655f5a4757e24853d7cbd379270dbcc1c626a2fbe151c7929d2e97d,
+0/23.678406s,including actual original AI channel progression/full erasure. Three bounded
+final-body causal negatives each restore in finally and receive a SEPARATE later five-file
+SHA inspection before any dependent command:old94a2be77 restoration fails original AI
+focus/fire/no-progress(ec54cb2f486768efbf12aafba5cdc00c453c849cfc81efb096a8236c28127948,
+101/19.117404s);range−1 retention alone kills actual exact-max native fire/beam assertion
+(16d08d538d2252f69e05df287ffaf2e0e4f67e99f96e568adf7f8774938cf243,
+101/16.120885s);minimum+1 retention alone kills legal exact-min native fire/beam assertion
+(6ec53ca3fe4c6634519e2bc1992addfe6197aea914809b759d3efc087022960a,
+101/15.963157s). Every final negative binds infantry/newTemporal/attrition plus AI/strategy
+SHA;all restore exactly31dce2c0/1f2745ba/bc5e2c07/640e8f96/323f97d8. These are witnessed
+mutation failures,not passed validation. They also close the initial AI-negative metadata's
+omitted attrition-path binding without altering its original raw record.
+
+Post-restoration affected controls have109pass/0fail/0ignored across six targets:
+M4Combat32,RA1commands22,RA4cloak9,RA6infantry30,RA7vision10,newTemporal6;
+rawe5dcb00a8b96e95755252c328dacf4a7844d5f5946cf822747975e1222e87684,
+0/22.810817s. No test is deleted,renamed,ignored or weakened. Exact Oasis on corrected native
+runtime is now running once with existing observational counters;no exclusive ending
+attribution or fresh scoped/full13 acceptance is claimed before completion. RA9 retains
+actorless occupied-Prop C4/Ivan/Temporal and the other recorded soundness debts;the real
+building-edge channel defect has this native correction and still requires final gates.
+
+R171 NEW fixture revision is exactly `ra8_temporal_fixture_minimum_is_strict_at_the_native_point_boundary`: parser-invalid equal min/max is replaced by legal min1024/exact4cells versus inside3cells, unchanged shipped maximum1280. Existing tests and all match limits are unchanged.
+
+R171 exact Oasis after1 exits0,raw9bce0b0d6e6362153c5fe5d10983ec41ed813a73a728d11d5213aa811ea6531b,
+143.111361swrapper/111.15snative:P1Won143361/252000,1pass0fail0ignore. All six bound source
+files remain unchanged. This is combined native-correction trajectory credit,not proof the
+early Hospital shots exclusively prolonged the old war. No new AI preference,source stat,
+limit or R53 change follows. Fresh scoped final8 includes newTemporal/affected six-target
+controls before long matches;cheapDemo/grown precede37once,thenisolatedall21/fixed3/guards.
+Full13 and source/evidence staging still wait completed scoped checkpoint/root checks.
+
+R171 checkpoint12 follow-up: frozen scoped final8 completes all18 commands exit0,
+317Rustpasses/0failed/0ignored across17 target invocations;summary0f487b09…,
+command sum5535.743549s/wall5535.755057s. Retained37 has37actualWon/36distinct configs,
+raw6a52a41d…;all21 actual-default ten-player maps have winners/tenbuilders,median85258/
+p90nearest113337/max218369 under400000,rawd83b41b3…. All means meet<5ms;worstCoral2.598ms,
+longestCoral768.559ms,p99Iron30.642ms,busiest1000Glacier11.758ms and2343ticks>50ms remain
+explicit quality limitations. Fixed256 actual24k/tenbuilders each means1.351/1.446/1.297ms;
+three explicit example guards pass one each. No extra broad workspace run or optional
+optimization follows. Static1124→1359/+235/none removed/ignored differs from execution.
+Fresh344runtime+169additional/18overlap=495unique source paths match;attempt11's34files in
+both sets retain68copies/166895bytes per set unchanged. CurrentDemo68863/72000 is an RA9
+near-limit watch. Checkpoint12/acceptance carry exact tails,storage,assumptions and debts;
+source is still an uncommitted frozen working tree at this record,not a postcommit run.
+Full13,both fresh756-winner distributions,RA9 and independent review remain required.
+
+R171 source binding: after the coordinator checked the completed scoped checkpoint,the eight
+source/test paths pass a standalone unfiltered cached check0 and are committed as8d5fa86.
+All scoped commands ran earlier on the identical frozen working source;checkpoint12 records
+the full commit/hash binding. Evidence staging and explicit full13 release still follow.
+
+R171 checkpoint12 evidence hygiene is unfiltered exit2,NOTpassed:94diagnostics,90blankEOF
+plus4trailing whitespace,all92native logs/2captured raw patch contexts. Zero source/data/test/
+prose errors;each file/line/EOL/staged-blob SHA is verified,raw equals staged. Native stdout
+is preserved JSON-escaped directly (d892be6b…),so no recursive log copy is introduced. Raw
+bytes are not normalized. Separate identical final recheck and later deliberate evidence
+commit remain required;this classification is not a passed check or independent review.
+
+### R172 — User-authorized final review scheduling within four agent slots
+
+On 2026-10-19 the user selected “Use two batches with full review coverage” in response
+to the coordinator's explicit proposal to run all five independent review slices in two
+batches, then a fresh lead, allowing the review to exceed three hours. The platform has
+four total agent slots, leaving three worker slots alongside the coordinator; five
+simultaneous independent slices cannot fit. This explicit user authorization overrides
+only the simultaneous-five-slice and three-hour total scheduling requirements in the
+continuation prompt sections 6 and 9. It does not reduce review coverage or independence.
+
+All five fresh slices remain required, each with its original maximum 120-minute budget,
+against the same clean final tip and full13 validation background. A fresh lead still
+verifies every P0/P1 finding; the maximum three remediation cycles/four full panels and
+all other review requirements remain unchanged. No review starts under this record before
+RA8 and RA9 finish their required work. This is a procedural authorization, not runtime,
+validation, approval, or independent-review completion evidence.

@@ -1,0 +1,36 @@
+{
+  "label": "attempt11-demo-native-after-passive1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate10_demo_russia_libya_easy_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "env": {
+    "RA8_ECONOMY_TRACE": "1",
+    "RA8_SERVICE_TRACE": "1",
+    "RA8_TRACE_FROM": "65000",
+    "RA8_RIVERLANDS_TRACE": "1",
+    "RA8_DEMO_LATE_TRACE": "1"
+  },
+  "start_utc": "2026-10-19T12:01:32.793781+00:00",
+  "elapsed_seconds": 10.86303912504809,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "e344244c93d906c31ea816e57597b8b1cd84ce220c507698dcc252f4cbdfa720"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "e344244c93d906c31ea816e57597b8b1cd84ce220c507698dcc252f4cbdfa720"
+  },
+  "log_sha256": "2ff00b6c6978f97c751af93672953e0a3e46ba6e746450576a91167b64048fda"
+}

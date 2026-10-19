@@ -4416,3 +4416,168 @@ No new substantial external directory;configured caches remain. Current RA8scrat
 recreatable evidence useful for reruns/unnecessary for release. RA9 carries gathering-point
 partition,R83transport/attachedSquid,R96actorlessProp,R99unproven lead and the near-limit
 watch;R97closedR103. Independent review and user visual/audio/play-feel verification remain.
+
+### RA8: eleventh gate and corrective ten-player failure preserved (2026-10-19)
+
+The complete eleventh frozen gate fails workspace101 (253passed/1failed/0ignored),
+6414 scriptseconds/6414.145369 monotonic phase seconds. Its production sweep has five
+companion passes but five exact seed0 stalls;no fresh756 table is claimed. Attempt11's
+34 captured files/68 archive+current copies/166895bytes per set remain byte-identical;
+partial05/unrun06–13/stale production tables are explicit,not passes. R162–R166 retain
+native causal evidence,failed/insufficient premises and separate mutation restoration.
+
+Corrections use ordinary owned commands: genuinely useful armed miners are not excluded by
+an inapplicable naval survivor;already-valid observed core missions precede home-nearer
+distractions;passive-income actorless/producerless remnants do not finance optional repairs;
+unfunded recovered garrison infantry avoid immediate optional re-entry;short-range building
+focus responds to observed incoming eligible fire while original artillery policy remains.
+No source prices/stats/cadences/limits,R53 signature/timer/stagger,public command or hash
+format change is made. The exact stale Oil-positive setup migration retains every original
+assertion with actual capture/useful production. No test is removed,renamed or ignored.
+
+All five failed gate configurations have individual normal-play wins along this correction
+sequence;the later defaultDemo regression now P1Won65767/72000 on combined working source.
+These isolated results are not full acceptance. Frozen final4 stops after12commands with
+194passed/1failed/0ignored: all37 retained matches won, but the separate smallest ten-player
+Crossroads seed7 case reaches its unchanged72000 bound. All21,isolated256 and three explicit
+example guards are unrun. Its exact native trace preserves real P1 approach/fire/destruction
+progress and P0 unarmed ChronoMiner ore income/producerless paid repair investment;no global
+helplessness or terminal-snapshot cause is inferred. Scoped causal diagnosis is in progress.
+Static inventory1343 versus1124 was219 added at final4,distinct from executed counts.
+No competing validator/profiler or new substantial external directory is created.
+Full13/both fresh R29 distributions,RA9 and independent review remain.
+
+### RA8: native smallest ten-player recovery and frozen final5 (2026-10-19)
+
+R167 preserves the final4 grown failure and demonstrates actual producerless ChronoMiner
+ore income/paid repairs,then narrowly excludes only unarmed harvesters from that repair
+income-use exception. Armed workers/all other unavailable actors/future producers and all
+other recovery paths remain. Its corrected armed-worker positive explicitly requires real
+after-resume paid healing;the earlier missing-assertion evidence gap stays recorded. R168
+uses otherwise idle non-wave Dogs to discover never-observed enemy starts alongside actual
+core building combat,preserving native defenders and healthy scout ownership through source
+wave admission. Native legal-endpoint normalization/mission-transition defects and every
+failed/insufficient probe remain preserved. New inputs use honest snapshots;no new state,
+quota,timer,source TeamDelay,combat statistic,limit or forced outcome is introduced.
+
+The original Crossroads112×112/default Medium/ten-player seed7 now P1Won48160 after48161steps,
+9defeated and original made-start assertions retained (raw0fde5256…). This combined ending
+is separate from property evidence and not full acceptance. Frozen final5 uses freshly
+discovered344runtime+168additional paths (overlap at examples),including previously omitted
+crate manifests/fixture/reference files without rewriting old snapshots. Static count1349
+versus1124 is225 added,zero removed/ignored. Cheap defaultDemo/grown3 run before retained37;
+all21/fixed3/examples and root checkpoint release/full13/both fresh R29 distributions still
+remain. No competing validator/profiler or new substantial external directory is created.
+
+Frozen final5 first12commands all0/201passed,including37retained explicit winners across
+36distinct configurations. Its active isolated all21 command reports Frostline400000ticks,
+2playersleft/noWinner,10builders,mean438.293µs/175.318smeasured/175.342selapsed. This is an
+ending failure,not a budget failure;no cause is inferred from the summary. Per collection
+policy the same owned command continues all21 before dependent fixed3/examples stop on
+nonzero exit. Source remains frozen;no diagnostic replay or mutation overlaps it.
+
+
+RA8 scoped final5 completed201Rustpasses/0failures/0ignored,but isolatedall21exit1:
+20actualWon/all21tenbuilders,FrostlineNone400000;fixed256/threeexampleguardsunrun.
+R169 native trace+boundedguard snapshot refutes actorless/unarmed-income and invisible-origin
+premises. PoweredSpySatellite exposes remote armed survivors of defeated owners;the global
+surfaceguard suppresses actual building focus. Narrow unthreatened short-range surface
+focus proof passes actual selected-refineryfire+healthy40tickorderpreservation;
+5surface/3artillery/12attritioncontrols pass. ExactFrostline ending is pending separately.
+No sourcecombat/difficulty/TeamDelay/R53/limit/repair change;full13 remains unreleased.
+
+R169 exact defaultFrostline nowP5Won137490/400000/all10builders,mean900.793µs;
+combined ending,notisolatedMiragewinnerattribution. Fresh scopedfinal6starts unchanged
+AI640e8f96/strategyd58f8f8d;defaultDemo/grown aheadretained37,thenall21/fixed3/exampleguards.
+Full13/bothfresh756distributions/independentreview still pending;rootcheckpoint beforestaging.
+
+
+### RA8: target-qualified surface resumption, scoped acceptance still open (2026-10-19)
+
+Frozen scoped final6 completed12commands/201Rustpasses/1failed/0ignored,36retainedWon
+and one Coral Iraq/Cuba Brutal None288000. Five dependent all21/fixed3/example phases
+remain unrun;20captured files/2,227,545bytes are preserved in place with hashes. R170
+proves native Yuri movement/takeover was replaced by ineffective immune-building attacks.
+Only the R169 resumption now requires actual target/native weapon qualification. New
+actual takeover/captured-Rhino-fire and native Temporal/Ivan effects pass;14attrition,
+5surface and3artillery controls pass. Exact Coral nowP0Won89118/288000;current-source
+Frostline remains pending separately. No source prices/ranges/TeamDelay/R53/public rules,
+hash state or limits change. No full acceptance claim follows isolated wins.
+
+Original native Temporal positive exposes a separate range discrepancy:Combat footprint
+edges versus retain_beams nearest-cell centres;raw Mobile.cell alone does not measure the
+historical fine Position/infantry spot. RA9 must measure both exact distances and reconcile
+the native channel. Original failed effect/diagnostic/restoration evidence is retained;
+no canonical Temporal fix or full correctness claim is made. Gathering-point partition,
+R83/R96/R99 and near-limit watches likewise remain. Full13,both fresh756distributions,
+RA9,independent review and user visual/audio/play-feel verification still remain.
+
+R170 current-source Frostline guard nowP4Won109514/400000/tenbuilders,mean1.378ms,
+max165.436/busy5.394/99ticks>50ms;mean passes,quality tails stay explicit. Fresh scoped
+final7 starts17:55:41Z on AI640e8f96/strategy323f97d8. Both344runtime+168additional
+snapshots (18overlap=494unique) match;root independent inventory1124→1352/+228,
+0removed/ignored is static,not executed coverage. No full13 or staging release yet.
+
+
+RA8 scoped final7 STOPPED after12commands/203Rustpasses/1failure/0ignored. Retained37
+completes36actualWon/36passes;Oasis Germany/GreatBritain Brutal alone reaches252000.
+All21/fixed3/threeexampleguards unrun. Nineteen files/1,641,501bytes preserved with
+manifest6f388f5b…;all12raw and494snapshot hashes match. No full13/staging release.
+One exact observational source-named funding/repair/mission replay is running;terminal
+real moving forces/paid work refute a snapshot-only helplessness inference. No policy
+selected;no sourcecombat/limit/R53 change or new substantial external directory.
+
+
+### RA8: native Temporal edge consistency and fresh scoped final8 (2026-10-19)
+
+R171 reproduces38real Hospital shots losing legal Temporal channels in exact failedOasis;
+actual fine positions distinguish Combat footprint edges from retention's cell centres.
+The minimal two-hunk retain_beams correction reuses existing Combat body geometry/min/max,
+with all other guards unchanged. New native normal/elite full erasure,reload progress,
+unit/min/max,Stop/Move/retarget/already-deadCleanup/frozen-source and real detector-loss
+controls pass,as does original20,20 actual-AI erasure. Three intended causal mutations
+restore in finally plus separate later five-source SHA reads.109affected command/combat/
+infantry/cloak/vision controls pass. Invalid NEW equal-min/max fixture failure is preserved
+and corrected legally without changing shipped max or any existing assertion/limit.
+
+Exact corrected Oasis Germany/GBBrutal seed0 nowP1Won143361/252000;native property proof
+and combined ending remain distinct. No AI preference/stat/data/R53/limit change. The real
+building-edge debt moves from RA9 to this validated-property correction pending finalgates;
+actorlessProp/scenery and other recorded RA9 debts remain. Fresh scoped final8 includes
+new Temporal/affected controls before cheapDemo/grown,37once,all21/fixed3/exampleguards.
+No full13/staging release before completed checkpoint/root checks;no new substantial
+external directory (small parser fixtures use configured TMPDIR and are removed).
+
+### RA8: twelfth scoped checkpoint complete, mandatory gate still pending (2026-10-19)
+
+Frozen working source based onab4a176 completes all18 scoped commands exit0:
+317Rustpassed/0failed/0ignored across17 target invocations;command sum5535.743549s,
+wall5535.755057s,summary0f487b09…. Retained37 has37explicitWon/36distinct configurations;
+all21 actual-default m13 maps win with ten builders,median85258/p90nearest113337/
+max218369 under unchanged400000. WorstmeanCoral2.598ms meets<5ms;longest tick768.559ms,
+Ironp9930.642ms,Glacier busiest1000=11.758ms and2343ticks>50ms remain recorded limitations.
+Fixed256 actual24k/tenbuilders each means1.351/1.446/1.297ms pass;three explicit example
+guards each pass. CurrentDemoRussia/LibyaEasy68863/72000 remains RA9 near-limit watch;
+grownCrossroadsseed7 P1Won34423 retains every original ending/start assertion.
+
+Static1124→1359/+235/0removed/renamed/ignored is distinct from runtime execution.
+Fresh344runtime+169additional/18overlap=495unique hashes match. Attempt11's entire failed
+label remains byte-identical in both34-file/166895-byte sets (68copies),includingpartial05,
+unrun06–13 and staleTSV provenance. Checkpoint12 metrics/inventory/storage/preservation and
+RA8_ACCEPTANCE carry exact raw hashes/tails. After coordinator checks,the eight source paths
+passed a separate staged check0 and were committed as8d5fa86;all scoped commands preceded
+that commit on identical frozen source. Evidence commit and explicit full13 release remain.
+
+R172 records explicit user authorization for allfive independent review slices in two
+batches then a fresh lead,allowing more than3hours because only3worker slots are available;
+coverage,independence,120minute/slice and other review requirements stay fixed. This is
+procedural authorization,not review completion. R171 native real-building Temporal edge
+retention is corrected;R96actorlessProps and M6 gathering partition/R83/R99/other recorded
+RA9 boundaries remain. Full13/bothfresh756distributions/RA9/independent review/user quality
+verification still pending. No new substantial external directory;configured cached RA5
+render and RA7/RA8 parser scratch are retained for reruns and unnecessary for release.
+
+Checkpoint12 evidence hygiene is classified exit2/NOTpassed:94exact raw diagnostics
+(90blankEOF/4trailing;92logs/2capturedpatchcontexts),0source/data/test/prose errors.
+All line/EOL/file/stagedblob hashes match without normalizing raw bytes;stdout is captured
+directly in JSON. Separate final identical staged recheck precedes the evidence commit.

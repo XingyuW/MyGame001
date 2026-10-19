@@ -1,0 +1,38 @@
+{
+  "completed_failed_phase": {
+    "phase": "default-demo10",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_ai_matches",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "start_utc": "2026-10-19T11:58:51.745329+00:00",
+    "exit": 101,
+    "elapsed_seconds": 34.761742000002414,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt11-final2-default-demo10.log",
+    "sha256": "58b34c1485c34ec96bd8575996417617a047cd5ce107f1013b81822fa1c766e6",
+    "test_targets": 1,
+    "passed": 0,
+    "failed": 1,
+    "ignored": 0,
+    "source_mismatches": []
+  },
+  "remaining_unrun": [
+    "retained37",
+    "failed-smallest-ten-player-and-neighbors",
+    "m13-all",
+    "m13-256",
+    "example-guard-m13_ten_players",
+    "example-guard-m14_duels",
+    "example-guard-m7_soak"
+  ],
+  "runtime_mismatches": [],
+  "elapsed_seconds": 125.94638237496838
+}

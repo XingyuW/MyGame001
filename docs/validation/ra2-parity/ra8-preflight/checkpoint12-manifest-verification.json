@@ -1,0 +1,21 @@
+{
+  "verified_utc": "2026-10-19T20:28:21.837967+00:00",
+  "snapshots": [
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final8-runtime-manifest.json",
+      "sha256": "c0efe49e5cc23556d54845415618f7926e9b627acd7adaa5253b55c7f260ebc6",
+      "files": 344
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final8-test-example-manifest.json",
+      "sha256": "9a1b200d8e749786c75230b074b469e7334afc2705f195765cb4c2c2df17434a",
+      "files": 169
+    }
+  ],
+  "runtime_files": 344,
+  "additional_files": 169,
+  "overlap": 18,
+  "unique_files": 495,
+  "mismatches": [],
+  "historical_scopes_not_rewritten": true
+}

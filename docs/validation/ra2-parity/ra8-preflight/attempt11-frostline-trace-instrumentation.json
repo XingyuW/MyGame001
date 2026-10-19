@@ -1,0 +1,8 @@
+{
+  "created_utc": "2026-10-19T16:28:15.056501+00:00",
+  "path": "crates/sim/examples/m13_ten_players.rs",
+  "before_sha256": "043810dc12cc60ea83eabe095b7e986363e509d94fab7c30dd39dc4d8b0c94b0",
+  "after_sha256": "42de9a2713e6e327294bb01650024a5d39dcbef506c0433fbc89dcbc2cde74df",
+  "patch_sha256": "2c7c29644485fd699953f519128bfbdffe319b69bea222a5490a77ae33a6cf08",
+  "purpose": "Trace-only event-window counters and actual native HP/credit co-occurrence/repair state. No simulation state, command writes or AI access. Diagnostic timings are not budget evidence."
+}

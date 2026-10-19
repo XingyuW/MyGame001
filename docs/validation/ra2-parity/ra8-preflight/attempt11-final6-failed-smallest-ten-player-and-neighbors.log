@@ -1,0 +1,12 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 5.79s
+     Running tests/m13_grown_maps.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m13_grown_maps-ee40a9cea2db76e9)
+
+running 3 tests
+test a_ten_player_match_on_the_smallest_map_is_played_to_its_end ... grown exact Some(Won { winner: PlayerId(1), tick: 43273 }) after 43274 ticks, defeated {PlayerId(0): 43273, PlayerId(2): 7800, PlayerId(3): 10902, PlayerId(4): 6521, PlayerId(5): 6535, PlayerId(6): 17292, PlayerId(7): 22839, PlayerId(8): 31215, PlayerId(9): 28108}
+ok
+test every_shipped_map_grows_with_every_player_count ... ok
+test ten_computer_players_build_bases_and_bring_in_ore_on_enlarged_maps ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 48.66s
+

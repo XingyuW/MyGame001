@@ -1,0 +1,42 @@
+{
+  "completed_failed_phase": {
+    "phase": "focused-ra8-ai",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "--",
+      "--test-threads=1"
+    ],
+    "start_utc": "2026-10-19T11:53:48.711810+00:00",
+    "exit": 101,
+    "elapsed_seconds": 59.31172520801192,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt11-final1-focused-ra8-ai.log",
+    "sha256": "dede53964280bff5f8993140f81abb79b6b2772eb477afbf3b24eb8add6c88a4",
+    "test_targets": 1,
+    "passed": 99,
+    "failed": 1,
+    "ignored": 0,
+    "source_mismatches": []
+  },
+  "remaining_unrun": [
+    "focused-attrition",
+    "focused-recovery",
+    "focused-composition",
+    "focused-ra4",
+    "default-demo10",
+    "retained37",
+    "failed-smallest-ten-player-and-neighbors",
+    "m13-all",
+    "m13-256",
+    "example-guard-m13_ten_players",
+    "example-guard-m14_duels",
+    "example-guard-m7_soak"
+  ],
+  "runtime_mismatches": [],
+  "elapsed_seconds": 66.9387299590162
+}

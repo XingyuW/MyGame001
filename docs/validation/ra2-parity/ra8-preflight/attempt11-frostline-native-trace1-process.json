@@ -1,0 +1,24 @@
+{
+  "captured_utc": "2026-10-19T16:30:16.144743+00:00",
+  "status": "single exact Frostline diagnostic active; no concurrent validator",
+  "session_id": 77186,
+  "native_pid": 22926,
+  "wrapper_parent_pid": 22902,
+  "process_group": 22902,
+  "argv": [
+    "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples/m13_ten_players",
+    "to-the-end",
+    "frostline",
+    "trace"
+  ],
+  "core_ai_sha256": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+  "strategy_sha256": "952827fe16b30aaa0e48b7b360872686a2891aab8c53b05abbe1aa88efa6bafa",
+  "trace_example_sha256": "42de9a2713e6e327294bb01650024a5d39dcbef506c0433fbc89dcbc2cde74df",
+  "latest_read_snapshot_tick": 72000,
+  "active_players_at_snapshot": [
+    0,
+    4,
+    7
+  ],
+  "note": "CPU activity/partial snapshots are not an ending or causal conclusion; trace-only diagnostics are not performance evidence."
+}

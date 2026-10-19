@@ -1,0 +1,26 @@
+{
+  "label": "attempt11-remote-surface-mission-before2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ra8_a_remote_armed_unit_does_not_pin_a_surface_mission_on_a_repaired_distraction",
+    "--",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T16:42:13.189772+00:00",
+  "elapsed_seconds": 0.35831612499896437,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "952827fe16b30aaa0e48b7b360872686a2891aab8c53b05abbe1aa88efa6bafa"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "952827fe16b30aaa0e48b7b360872686a2891aab8c53b05abbe1aa88efa6bafa"
+  },
+  "log_sha256": "7699fdd61910a84a933146f0d7468b7341f7a0a128819b72bb449d94b50687fc"
+}

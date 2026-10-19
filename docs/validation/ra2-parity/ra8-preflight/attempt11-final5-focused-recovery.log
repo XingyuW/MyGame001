@@ -1,0 +1,28 @@
+    Finished `release` profile [optimized] target(s) in 0.06s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 21 tests
+test ai::ra8_recovery_tests::ra8_a_completed_paid_unit_waiting_for_exit_keeps_source_funded_repairs ... ok
+test ai::ra8_recovery_tests::ra8_a_full_bounded_ai_fifo_still_pauses_repairs_before_the_paid_recruit ... ok
+test ai::ra8_recovery_tests::ra8_a_refund_outside_the_emitted_prefix_cannot_fund_repairs_of_a_real_paid_head ... ok
+test ai::ra8_recovery_tests::ra8_actual_owned_income_keeps_multiple_repairs_while_a_recruit_is_paid ... ok
+test ai::ra8_recovery_tests::ra8_attainable_power_recovery_restores_real_production_despite_reserved_unit_tails ... ok
+test ai::ra8_recovery_tests::ra8_borderline_repair_surplus_covers_every_source_step_between_ai_turns ... ok
+test ai::ra8_recovery_tests::ra8_completed_paid_unit_heads_and_duplicate_tails_keep_normal_exit_and_fifo ... ok
+test ai::ra8_recovery_tests::ra8_existing_main_building_obligation_cannot_be_reused_to_fund_the_defence_lane ... ok
+test ai::ra8_recovery_tests::ra8_finite_funds_preserve_paid_head_and_finance_source_cost_finisher_after_unpaid_tails ... ok
+test ai::ra8_recovery_tests::ra8_finite_unit_funding_is_not_spent_on_repairs_before_the_paid_recruit_can_finish ... ok
+test ai::ra8_recovery_tests::ra8_income_recovery_and_completed_construction_keep_their_normal_heads ... ok
+test ai::ra8_recovery_tests::ra8_multiple_active_repairs_cannot_each_claim_the_same_finite_recruit_surplus ... ok
+test ai::ra8_recovery_tests::ra8_no_income_reallocates_real_unfinished_tech_credits_to_starved_combat_without_requeue ... ok
+test ai::ra8_recovery_tests::ra8_paid_worker_replacement_requires_a_known_reachable_economic_job ... ok
+test ai::ra8_recovery_tests::ra8_prospective_finisher_refunds_preserve_income_power_completed_and_attainable_work ... ok
+test ai::ra8_recovery_tests::ra8_real_periodic_income_funds_paid_recruit_before_optional_repairs ... ok
+test ai::ra8_recovery_tests::ra8_source_funded_surplus_keeps_multiple_repairs_and_actual_paid_recruitment ... ok
+test ai::ra8_recovery_tests::ra8_unfundable_construction_cannot_reserve_out_the_first_reachable_finisher_forever ... ok
+test ai::ra8_recovery_tests::ra8_unfundable_duplicate_unit_heads_refund_exactly_and_produce_a_real_cheaper_finisher ... ok
+test ai::ra8_recovery_tests::ra8_unit_reallocation_preserves_actual_income_harvesters_and_unreachable_alternatives ... ok
+test ai::ra8_recovery_tests::ra8_worker_admission_cannot_learn_hidden_ore_or_building_occupancy ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 95 filtered out; finished in 2.92s
+

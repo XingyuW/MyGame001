@@ -1,0 +1,28 @@
+{
+  "label": "attempt11-surface-hidden-control1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_a_first_stationary_hidden_mirage_cannot_change_surface_focus_intents",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T12:18:31.034732+00:00",
+  "elapsed_seconds": 6.549262042040937,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "1b8423e8df02189ad25eb27a0716e240d3fbc691ef97ab1c6809dc70a7050c4d"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "1b8423e8df02189ad25eb27a0716e240d3fbc691ef97ab1c6809dc70a7050c4d"
+  },
+  "log_sha256": "36eb30f6f98b11e181b2715c38573fd44603cb21c9d93e71fc3740360251691c"
+}

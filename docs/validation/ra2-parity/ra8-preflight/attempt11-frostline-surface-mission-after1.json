@@ -1,0 +1,27 @@
+{
+  "label": "attempt11-frostline-surface-mission-after1",
+  "command": [
+    "cargo",
+    "run",
+    "--release",
+    "-p",
+    "sim",
+    "--example",
+    "m13_ten_players",
+    "--",
+    "to-the-end",
+    "frostline"
+  ],
+  "start_utc": "2026-10-19T16:45:20.532564+00:00",
+  "elapsed_seconds": 141.29766004200792,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "d58f8f8d9a26206010bcdec84f2f0db1038c273c55dbb6f4808d05c991e22f7b"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "d58f8f8d9a26206010bcdec84f2f0db1038c273c55dbb6f4808d05c991e22f7b"
+  },
+  "log_sha256": "a96d6d68b7fb6103ac7c81f746c08ebc08fb6fa33abf27cdb98bf29b14fb441b"
+}

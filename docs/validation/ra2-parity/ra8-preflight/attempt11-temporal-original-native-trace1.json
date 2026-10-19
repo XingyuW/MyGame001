@@ -1,0 +1,26 @@
+{
+  "label": "attempt11-temporal-original-native-trace1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ra8_target_qualified_surface_focus_keeps_native_temporal_and_ivan_effects",
+    "--",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T17:41:30.354953+00:00",
+  "elapsed_seconds": 48.238594499998726,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "323f97d83614232db3d1d619d54847b885c1f0635d55382bc8804d95bb998ef9"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "323f97d83614232db3d1d619d54847b885c1f0635d55382bc8804d95bb998ef9"
+  },
+  "log_sha256": "046256cf54b41ad195ac5f9117a8d69b0e723cb83bb3ea8d8ec445cffd858991"
+}
