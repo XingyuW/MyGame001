@@ -1,0 +1,36 @@
+{
+  "label": "attempt8-final1-riverlands-funding2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate7_riverlands_iraq_cuba_easy_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "env": {
+    "RA8_ECONOMY_TRACE": "1",
+    "RA8_RIVERLANDS_TRACE": "1",
+    "RA8_SERVICE_TRACE": "1",
+    "RA8_TRACE_FROM": "40000"
+  },
+  "purpose": "Read-only diagnostic extension only: actual every40tick credits/repair flags/queues/buildingHP plus births/assignments/shots from40000. Production ai/strategy unchanged; distinguish late real combat from prior finite-fund repair spending.",
+  "start_utc": "2026-10-18T21:52:15.955049+00:00",
+  "elapsed_seconds": 16.10231508302968,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e",
+    "crates/sim/src/ai/strategy.rs": "97bf9859f160d5f4d6e8a54f0b10a948f6c974ffb3ba3e83a8b9e88e9fa055e3"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e",
+    "crates/sim/src/ai/strategy.rs": "97bf9859f160d5f4d6e8a54f0b10a948f6c974ffb3ba3e83a8b9e88e9fa055e3"
+  },
+  "log_sha256": "907d93c760c8f14b28ba7f7bf57193fca584bed2151735d5004e1a2c3f175cd0"
+}

@@ -1,0 +1,199 @@
+{
+  "attempt8-harvest-artillery-after1": [
+    {
+      "window": "economy window 0..59999",
+      "paid_prisms": {
+        "P0 produced Unit(UnitKind(25))": 4,
+        "P1 produced Unit(UnitKind(25))": 2
+      },
+      "prism_shots": {
+        "shots prism_tank->airport": 3,
+        "shots prism_tank->attack_dog": 1,
+        "shots prism_tank->barracks": 1,
+        "shots prism_tank->chrono_legionnaire": 3,
+        "shots prism_tank->engineer": 1,
+        "shots prism_tank->gi": 6,
+        "shots prism_tank->grizzly": 10,
+        "shots prism_tank->ifv": 3,
+        "shots prism_tank->power_plant": 5,
+        "shots prism_tank->prism_tank": 3,
+        "shots prism_tank->refinery": 1
+      },
+      "prism_losses": {
+        "P0 lost prism_tank": 3
+      },
+      "prism_building_shots": 10
+    },
+    {
+      "window": "economy window 60000..119999",
+      "paid_prisms": {
+        "P0 produced Unit(UnitKind(25))": 5,
+        "P1 produced Unit(UnitKind(25))": 2
+      },
+      "prism_shots": {
+        "shots prism_tank->airforce_command": 1,
+        "shots prism_tank->attack_dog": 1,
+        "shots prism_tank->barracks": 2,
+        "shots prism_tank->chrono_miner": 15,
+        "shots prism_tank->gi": 17,
+        "shots prism_tank->grizzly": 8,
+        "shots prism_tank->ifv": 4,
+        "shots prism_tank->oil_derrick": 4,
+        "shots prism_tank->patriot": 5,
+        "shots prism_tank->power_plant": 4,
+        "shots prism_tank->prism_tank": 1,
+        "shots prism_tank->tank_destroyer": 10,
+        "shots prism_tank->tech_outpost": 11
+      },
+      "prism_losses": {
+        "P0 lost prism_tank": 5,
+        "P1 lost prism_tank": 4
+      },
+      "prism_building_shots": 22
+    },
+    {
+      "window": "economy window 120000..179999",
+      "paid_prisms": {
+        "P0 produced Unit(UnitKind(25))": 3
+      },
+      "prism_shots": {
+        "shots prism_tank->attack_dog": 2,
+        "shots prism_tank->chrono_legionnaire": 1,
+        "shots prism_tank->chrono_miner": 7,
+        "shots prism_tank->gi": 4,
+        "shots prism_tank->grizzly": 23,
+        "shots prism_tank->ifv": 2,
+        "shots prism_tank->patriot": 5,
+        "shots prism_tank->pillbox": 2,
+        "shots prism_tank->prism_tower": 3,
+        "shots prism_tank->tech_center": 3
+      },
+      "prism_losses": {
+        "P0 lost prism_tank": 4
+      },
+      "prism_building_shots": 3
+    },
+    {
+      "window": "economy window 180000..239999",
+      "paid_prisms": {
+        "P0 produced Unit(UnitKind(25))": 5,
+        "P1 produced Unit(UnitKind(25))": 1
+      },
+      "prism_shots": {
+        "shots prism_tank->attack_dog": 2,
+        "shots prism_tank->gi": 3,
+        "shots prism_tank->grizzly": 11,
+        "shots prism_tank->ifv": 4,
+        "shots prism_tank->power_plant": 4,
+        "shots prism_tank->war_factory": 3
+      },
+      "prism_losses": {
+        "P0 lost prism_tank": 5
+      },
+      "prism_building_shots": 7
+    },
+    {
+      "window": "economy final partial window",
+      "paid_prisms": {
+        "P0 produced Unit(UnitKind(25))": 3,
+        "P1 produced Unit(UnitKind(25))": 4
+      },
+      "prism_shots": {
+        "shots prism_tank->airforce_command": 4,
+        "shots prism_tank->attack_dog": 2,
+        "shots prism_tank->chrono_legionnaire": 1,
+        "shots prism_tank->chrono_miner": 18,
+        "shots prism_tank->gi": 14,
+        "shots prism_tank->grizzly": 10,
+        "shots prism_tank->power_plant": 6,
+        "shots prism_tank->prism_tank": 5,
+        "shots prism_tank->tank_destroyer": 4,
+        "shots prism_tank->war_factory": 3,
+        "shots prism_tank->weather_control": 4
+      },
+      "prism_losses": {
+        "P0 lost prism_tank": 2,
+        "P1 lost prism_tank": 4
+      },
+      "prism_building_shots": 13
+    }
+  ],
+  "attempt8-harvest-siege-weight-candidate1": [
+    {
+      "window": "economy window 0..59999",
+      "paid_prisms": {
+        "P0 produced Unit(UnitKind(25))": 4,
+        "P1 produced Unit(UnitKind(25))": 2
+      },
+      "prism_shots": {
+        "shots prism_tank->airport": 3,
+        "shots prism_tank->attack_dog": 1,
+        "shots prism_tank->chrono_legionnaire": 3,
+        "shots prism_tank->engineer": 1,
+        "shots prism_tank->gi": 5,
+        "shots prism_tank->grizzly": 39,
+        "shots prism_tank->ifv": 3,
+        "shots prism_tank->prism_tank": 3
+      },
+      "prism_losses": {
+        "P0 lost prism_tank": 3,
+        "P1 lost prism_tank": 1
+      },
+      "prism_building_shots": 3
+    },
+    {
+      "window": "economy window 60000..119999",
+      "paid_prisms": {
+        "P0 produced Unit(UnitKind(25))": 4,
+        "P1 produced Unit(UnitKind(25))": 4
+      },
+      "prism_shots": {
+        "shots prism_tank->attack_dog": 5,
+        "shots prism_tank->chrono_miner": 16,
+        "shots prism_tank->gi": 25,
+        "shots prism_tank->grizzly": 16,
+        "shots prism_tank->ifv": 5,
+        "shots prism_tank->power_plant": 6,
+        "shots prism_tank->prism_tank": 4,
+        "shots prism_tank->refinery": 5,
+        "shots prism_tank->tank_destroyer": 2,
+        "shots prism_tank->tanya": 2,
+        "shots prism_tank->tech_outpost": 11
+      },
+      "prism_losses": {
+        "P0 lost prism_tank": 4,
+        "P1 lost prism_tank": 4
+      },
+      "prism_building_shots": 22
+    },
+    {
+      "window": "economy final partial window",
+      "paid_prisms": {
+        "P0 produced Unit(UnitKind(25))": 1,
+        "P1 produced Unit(UnitKind(25))": 3
+      },
+      "prism_shots": {
+        "shots prism_tank->attack_dog": 2,
+        "shots prism_tank->chrono_legionnaire": 3,
+        "shots prism_tank->chrono_miner": 6,
+        "shots prism_tank->gi": 21,
+        "shots prism_tank->grizzly": 7,
+        "shots prism_tank->ifv": 5,
+        "shots prism_tank->mcv": 1,
+        "shots prism_tank->ore_purifier": 5,
+        "shots prism_tank->patriot": 5,
+        "shots prism_tank->power_plant": 12,
+        "shots prism_tank->prism_tank": 3,
+        "shots prism_tank->prism_tower": 4,
+        "shots prism_tank->refinery": 1,
+        "shots prism_tank->tank_destroyer": 2,
+        "shots prism_tank->war_factory": 3
+      },
+      "prism_losses": {
+        "P0 lost prism_tank": 2,
+        "P1 lost prism_tank": 4
+      },
+      "prism_building_shots": 21
+    }
+  ]
+}

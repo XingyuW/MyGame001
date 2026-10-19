@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 24.45s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+test ai::ra8_attrition_tests::ra8_failed_real_sorties_do_not_blacklist_a_naturally_charged_strategic_strike ... 
+thread 'ai::ra8_attrition_tests::ra8_failed_real_sorties_do_not_blacklist_a_naturally_charged_strategic_strike' (8673424) panicked at crates/sim/src/ai/ra8_attrition_tests.rs:759:42:
+called `Option::unwrap()` on a `None` value
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ai::ra8_attrition_tests::ra8_failed_real_sorties_do_not_blacklist_a_naturally_charged_strategic_strike
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 108 filtered out; finished in 0.53s
+
+error: test failed, to rerun pass `-p sim --lib`

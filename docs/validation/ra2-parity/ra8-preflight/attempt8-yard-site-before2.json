@@ -1,0 +1,30 @@
+{
+  "label": "attempt8-yard-site-before2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_composition_tests::ra8_paid_shipyard_uses_an_available_same_sea_site_outside_observed_bombardment",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "env": {},
+  "purpose": "Corrected test event payload; actual source paid shipyard placement and source fire before any runtime change. Prior compile failure preserved.",
+  "start_utc": "2026-10-19T03:15:26.589886+00:00",
+  "elapsed_seconds": 18.686918916006107,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80"
+  },
+  "log_sha256": "9b5968e3e51df73a5db20de8031032487d0702bb1a7c956ca850f4618e5b7093"
+}

@@ -1,0 +1,20 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 17.24s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 2 tests
+test ai::ra8_composition_tests::ra8_naval_site_preference_preserves_hidden_unit_intents_and_controller_hash ... ok
+test ai::ra8_composition_tests::ra8_naval_site_preference_retains_source_minimum_target_eligibility_and_exposed_fallback ... 
+thread 'ai::ra8_composition_tests::ra8_naval_site_preference_retains_source_minimum_target_eligibility_and_exposed_fallback' (8782168) panicked at crates/sim/src/ai/ra8_composition_tests.rs:182:14:
+called `Option::unwrap()` on a `None` value
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ai::ra8_composition_tests::ra8_naval_site_preference_retains_source_minimum_target_eligibility_and_exposed_fallback
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 110 filtered out; finished in 0.16s
+
+error: test failed, to rerun pass `-p sim --lib`

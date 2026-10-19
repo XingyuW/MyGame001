@@ -1,0 +1,26 @@
+{
+  "label": "attempt8-ai-after2",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "--",
+    "--nocapture"
+  ],
+  "purpose": "All77 AI schedule/security/strategy regressions on restored naval source and final601 hidden-world twin staging.",
+  "start_utc": "2026-10-18T20:14:16.950321+00:00",
+  "elapsed_seconds": 73.02947937505087,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "log_sha256": "3a0ac1afb837b147f2eb4db7b4585dac46b6fe2ad7193b9b62aa4080540afccb"
+}

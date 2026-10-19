@@ -1,0 +1,10 @@
+{
+  "reason": "Completed strict Clippy failure in three new test syntax warnings; all dependent checks unrun. Later test-only syntax correction is not retroactively applied to this evidence.",
+  "commands_complete": 3,
+  "failed_phase": "clippy",
+  "exit": 101,
+  "runtime_manifest": "attempt8-final3-runtime-manifest.json",
+  "manifest_sha256": "953616386389ff40af5309c3e77fe8cf915b6eabe0451ebf068235fd992be38d",
+  "summary_sha256": "d58df7bdcd8e4748638ba1656c7a6ba88a0f33fb3361fb3511f64318ab50dcf1",
+  "later_changed_paths": []
+}

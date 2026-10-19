@@ -1,0 +1,36 @@
+{
+  "label": "attempt8-oasis-libya-iraq-progress-before1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate8_oasis_libya_iraq_brutal_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "env": {
+    "RA8_ECONOMY_TRACE": "1",
+    "RA8_SERVICE_TRACE": "1",
+    "RA8_TRACE_FROM": "180000",
+    "RA8_COMPOSITION_TRACE": "1"
+  },
+  "purpose": "Exact sole retained31 failure on unchanged corrected source: actual paid production/harvest/repair/cancellation/loss/source-shot and late strategic/mission progress, original252000 limit unchanged. Diagnostic overhead not performance evidence.",
+  "start_utc": "2026-10-19T00:42:11.633919+00:00",
+  "elapsed_seconds": 118.26857541699428,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591"
+  },
+  "log_sha256": "30c00c301b1639d09ada02a7dbd676cb32fa58c42ea3644fb2334b5a70ecbfec"
+}

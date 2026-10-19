@@ -1,0 +1,28 @@
+{
+  "label": "attempt8-naval-all86-after1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "All86 RA8 AI scheduled controls on source-consistent naval unit/building geometry and per-kind qualified-component recruitment; retain source-minimum, hidden occupancy, edge gap and legacy controls.",
+  "start_utc": "2026-10-19T00:14:10.052729+00:00",
+  "elapsed_seconds": 75.6043570410111,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591"
+  },
+  "log_sha256": "e301d4bf7976634e2d299c887a5af25aa131dd0cabb0ba6d968a137bb4f7f030"
+}

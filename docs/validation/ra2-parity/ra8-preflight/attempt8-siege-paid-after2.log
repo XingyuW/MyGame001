@@ -1,0 +1,15 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 17.75s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 6 tests
+test ai::ra8_composition_tests::ra8_germany_pays_its_declared_siege_pair_and_national_unit_again_after_real_casualties ... ok
+test ai::ra8_composition_tests::ra8_legacy_composition_keeps_its_existing_paid_traversal ... ok
+test ai::ra8_composition_tests::ra8_opted_in_composition_pays_and_spawns_every_declared_entry_in_order_and_wraps ... actual paid traversal [UnitKind(17), UnitKind(25), UnitKind(24), UnitKind(17), UnitKind(25), UnitKind(24)]; expected [UnitKind(17), UnitKind(25), UnitKind(24), UnitKind(17), UnitKind(25), UnitKind(24)]
+ok
+test ai::ra8_composition_tests::ra8_opted_in_composition_skips_a_funded_locked_entry_and_pays_later_legal_units ... ok
+test ai::ra8_composition_tests::ra8_opted_in_composition_skips_locked_and_unaffordable_entries_without_losing_legal_work ... ok
+test ai::ra8_composition_tests::ra8_opted_in_tier_reserves_share_real_queue_bounds_and_paid_capacity ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 91 filtered out; finished in 0.68s
+

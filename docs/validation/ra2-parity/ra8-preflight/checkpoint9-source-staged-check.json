@@ -1,0 +1,27 @@
+{
+  "utc": "2026-10-19T04:40:08.879305+00:00",
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit": 0,
+  "stdout": "",
+  "stderr": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "staged_paths": [
+    "assets/data/ai.ron",
+    "crates/game/tests/ra8_gate_matches.rs",
+    "crates/sim/examples/m13_ten_players.rs",
+    "crates/sim/src/ai.rs",
+    "crates/sim/src/ai/ra8_attrition_tests.rs",
+    "crates/sim/src/ai/ra8_composition_tests.rs",
+    "crates/sim/src/ai/ra8_recovery_tests.rs",
+    "crates/sim/src/ai/strategy.rs",
+    "crates/sim/tests/ra8_ai.rs",
+    "docs/DECISIONS.md",
+    "scripts/generate_ra2_data.py"
+  ]
+}

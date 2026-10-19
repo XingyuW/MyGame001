@@ -1,0 +1,302 @@
+{
+  "reason": "All31 retained cases completed in one four-thread target:30Won,one OasisLibya/Iraq None252000. Dependent fullsim/game/M10/companions/m13/benchmarks UNRUN.",
+  "command_count": 11,
+  "elapsed_seconds": 1318.190023416013,
+  "passed": 145,
+  "failed": 1,
+  "ignored": 0,
+  "summary_sha256": "76b838d0fd58495ac199931f006ead2e345ebcf468a24b4820795d6b519bfa12",
+  "manifests": {
+    "attempt8-final4-runtime-manifest.json": {
+      "files": 342,
+      "sha256": "953616386389ff40af5309c3e77fe8cf915b6eabe0451ebf068235fd992be38d",
+      "mismatches": []
+    },
+    "attempt8-final4-test-example-manifest.json": {
+      "files": 101,
+      "sha256": "5ef9d3227d5f5cd854b2456d1a82befd50082d36e4e233691efeeeaaa5abb2c3",
+      "mismatches": []
+    }
+  },
+  "outcomes": [
+    {
+      "test": "ra8_gate_demo_germany_great_britain_brutal_seed_zero_finishes",
+      "case": "demo seed0 [\"germany\", \"great_britain\"] [\"brutal\", \"brutal\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(1), tick: 50831 })",
+      "winner": 1,
+      "ending_tick": 50831,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate_demo_france_cuba_brutal_seed_zero_finishes",
+      "case": "demo seed0 [\"france\", \"cuba\"] [\"brutal\", \"brutal\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(1), tick: 21533 })",
+      "winner": 1,
+      "ending_tick": 21533,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate_liberty_seed_zero_finishes",
+      "case": "liberty_bay seed0 [\"iraq\", \"korea\"] [\"medium\", \"medium\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(1), tick: 104386 })",
+      "winner": 1,
+      "ending_tick": 104386,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate_red_canyon_seed_zero_finishes",
+      "case": "red_canyon seed0 [\"france\", \"russia\"] [\"medium\", \"easy\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(0), tick: 31614 })",
+      "winner": 0,
+      "ending_tick": 31614,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate_steel_harbor_seed_zero_finishes",
+      "case": "steel_harbor seed0 [\"cuba\", \"america\"] [\"brutal\", \"brutal\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(0), tick: 53266 })",
+      "winner": 0,
+      "ending_tick": 53266,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate_continental_stall_seed_zero_finishes",
+      "case": "continental_divide seed0 [\"france\", \"cuba\"] [\"easy\", \"medium\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(1), tick: 24703 })",
+      "winner": 1,
+      "ending_tick": 24703,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate_ember_seed_zero_finishes",
+      "case": "ember_caldera seed0 [\"libya\", \"korea\"] [\"brutal\", \"medium\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(0), tick: 32935 })",
+      "winner": 0,
+      "ending_tick": 32935,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate_wheel_seed_zero_finishes",
+      "case": "wheel_of_worlds seed0 [\"cuba\", \"france\"] [\"brutal\", \"brutal\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(1), tick: 144684 })",
+      "winner": 1,
+      "ending_tick": 144684,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate_continental_bridge_seed_zero_finishes",
+      "case": "continental_divide seed0 [\"iraq\", \"great_britain\"] [\"brutal\", \"brutal\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(0), tick: 103117 })",
+      "winner": 0,
+      "ending_tick": 103117,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate_glacier_bridge_seed_zero_finishes",
+      "case": "glacier_pass seed0 [\"korea\", \"russia\"] [\"brutal\", \"brutal\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(1), tick: 59637 })",
+      "winner": 1,
+      "ending_tick": 59637,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate_harvest_bridge_seed_zero_finishes",
+      "case": "harvest_plains seed0 [\"america\", \"korea\"] [\"brutal\", \"brutal\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(1), tick: 146287 })",
+      "winner": 1,
+      "ending_tick": 146287,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate_steel_harbor_america_cuba_bridge_seed_zero_finishes",
+      "case": "steel_harbor seed0 [\"america\", \"cuba\"] [\"brutal\", \"brutal\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(1), tick: 178261 })",
+      "winner": 1,
+      "ending_tick": 178261,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate_thousand_lakes_great_britain_america_seed_zero_finishes",
+      "case": "thousand_lakes seed0 [\"great_britain\", \"america\"] [\"easy\", \"easy\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(1), tick: 108661 })",
+      "winner": 1,
+      "ending_tick": 108661,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate_thousand_lakes_france_germany_seed_zero_finishes",
+      "case": "thousand_lakes seed0 [\"france\", \"germany\"] [\"brutal\", \"brutal\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(0), tick: 107685 })",
+      "winner": 0,
+      "ending_tick": 107685,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate_liberty_iraq_america_brutal_seed_zero_finishes",
+      "case": "liberty_bay seed0 [\"iraq\", \"america\"] [\"brutal\", \"brutal\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(0), tick: 94886 })",
+      "winner": 0,
+      "ending_tick": 94886,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate_oasis_germany_great_britain_brutal_seed_zero_finishes",
+      "case": "oasis_gulf seed0 [\"germany\", \"great_britain\"] [\"brutal\", \"brutal\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(1), tick: 53249 })",
+      "winner": 1,
+      "ending_tick": 53249,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate_steel_france_germany_medium_seed_zero_finishes",
+      "case": "steel_harbor seed0 [\"france\", \"germany\"] [\"medium\", \"medium\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(0), tick: 58598 })",
+      "winner": 0,
+      "ending_tick": 58598,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate_frozen_cuba_germany_brutal_seed_zero_finishes",
+      "case": "frozen_sound seed0 [\"cuba\", \"germany\"] [\"brutal\", \"brutal\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(0), tick: 70138 })",
+      "winner": 0,
+      "ending_tick": 70138,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate_black_water_libya_america_brutal_seed_zero_finishes",
+      "case": "black_water seed0 [\"libya\", \"america\"] [\"brutal\", \"brutal\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(0), tick: 55464 })",
+      "winner": 0,
+      "ending_tick": 55464,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate_black_water_korea_france_brutal_seed_zero_finishes",
+      "case": "black_water seed0 [\"korea\", \"france\"] [\"brutal\", \"brutal\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(1), tick: 127676 })",
+      "winner": 1,
+      "ending_tick": 127676,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate_wheel_germany_great_britain_brutal_seed_zero_finishes",
+      "case": "wheel_of_worlds seed0 [\"germany\", \"great_britain\"] [\"brutal\", \"brutal\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(1), tick: 57417 })",
+      "winner": 1,
+      "ending_tick": 57417,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate7_riverlands_iraq_cuba_easy_seed_zero_finishes",
+      "case": "riverlands seed0 [\"iraq\", \"cuba\"] [\"easy\", \"easy\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(1), tick: 69169 })",
+      "winner": 1,
+      "ending_tick": 69169,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate7_jungle_cuba_russia_easy_seed_zero_finishes",
+      "case": "jungle_delta seed0 [\"cuba\", \"russia\"] [\"easy\", \"easy\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(0), tick: 52444 })",
+      "winner": 0,
+      "ending_tick": 52444,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate7_pacific_cuba_great_britain_brutal_seed_zero_finishes",
+      "case": "pacific_atoll seed0 [\"cuba\", \"great_britain\"] [\"brutal\", \"brutal\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(1), tick: 51902 })",
+      "winner": 1,
+      "ending_tick": 51902,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate7_lakes_russia_medium_libya_brutal_seed_zero_finishes",
+      "case": "thousand_lakes seed0 [\"russia\", \"libya\"] [\"medium\", \"brutal\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(1), tick: 28392 })",
+      "winner": 1,
+      "ending_tick": 28392,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate7_demo_russia_libya_easy_seed_zero_finishes",
+      "case": "demo seed0 [\"russia\", \"libya\"] [\"easy\", \"easy\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(1), tick: 65669 })",
+      "winner": 1,
+      "ending_tick": 65669,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate8_crossroads_great_britain_america_brutal_seed_zero_finishes",
+      "case": "crossroads seed0 [\"great_britain\", \"america\"] [\"brutal\", \"brutal\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(1), tick: 35064 })",
+      "winner": 1,
+      "ending_tick": 35064,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate8_liberty_france_germany_medium_seed_zero_finishes",
+      "case": "liberty_bay seed0 [\"france\", \"germany\"] [\"medium\", \"medium\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(1), tick: 69855 })",
+      "winner": 1,
+      "ending_tick": 69855,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate8_oasis_libya_iraq_brutal_seed_zero_finishes",
+      "case": "oasis_gulf seed0 [\"libya\", \"iraq\"] [\"brutal\", \"brutal\"]",
+      "status": "FAILED",
+      "outcome": "None after252000",
+      "winner": null,
+      "ending_tick": null,
+      "failed_limit": 252000
+    },
+    {
+      "test": "ra8_gate8_oasis_france_russia_brutal_seed_zero_finishes",
+      "case": "oasis_gulf seed0 [\"france\", \"russia\"] [\"brutal\", \"brutal\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(1), tick: 126977 })",
+      "winner": 1,
+      "ending_tick": 126977,
+      "failed_limit": null
+    },
+    {
+      "test": "ra8_gate8_harvest_france_germany_easy_seed_zero_finishes",
+      "case": "harvest_plains seed0 [\"france\", \"germany\"] [\"easy\", \"easy\"]",
+      "status": "ok",
+      "outcome": "Some(Won { winner: PlayerId(1), tick: 172033 })",
+      "winner": 1,
+      "ending_tick": 172033,
+      "failed_limit": null
+    }
+  ]
+}

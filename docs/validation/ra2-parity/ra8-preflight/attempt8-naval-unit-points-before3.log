@@ -1,0 +1,31 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 6.22s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 3 tests
+test ra8_naval_unit_movement_positions_and_observed_destinations_drive_jobs ... 
+thread 'ra8_naval_unit_movement_positions_and_observed_destinations_drive_jobs' (8417887) panicked at crates/sim/tests/ra8_ai.rs:1101:10:
+called `Result::unwrap()` on an `Err` value: Placement(OutsideMap(Footprint { origin: CellPos { x: 47, y: 18 }, width: 2, height: 2 }))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test ra8_naval_unit_points_at_source_maximum_support_real_paid_fire ... 
+thread 'ra8_naval_unit_points_at_source_maximum_support_real_paid_fire' (8417888) panicked at crates/sim/tests/ra8_ai.rs:1080:9:
+source unit-point boundary remains a real paid firing job
+FAILED
+test ra8_naval_unit_points_outside_source_maximum_are_not_footprint_edge_jobs ... unit outside maximum humantrue: queuedfalse/paidfalse/firedfalse
+unit outside maximum humanfalse: queuedtrue/paidtrue/firedfalse
+
+thread 'ra8_naval_unit_points_outside_source_maximum_are_not_footprint_edge_jobs' (8417913) panicked at crates/sim/tests/ra8_ai.rs:1058:9:
+a unit point cannot inherit a building's footprint-edge range
+FAILED
+
+failures:
+
+failures:
+    ra8_naval_unit_movement_positions_and_observed_destinations_drive_jobs
+    ra8_naval_unit_points_at_source_maximum_support_real_paid_fire
+    ra8_naval_unit_points_outside_source_maximum_are_not_footprint_edge_jobs
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 83 filtered out; finished in 0.35s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

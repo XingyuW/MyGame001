@@ -1,0 +1,271 @@
+{
+  "raw": "attempt8-five-after1.log",
+  "scope": "Completed Harvest only; raw remains append-only while other cases continue. Counts aggregate source/target types, NOT individual target IDs or verified objective progress.",
+  "windows": [
+    {
+      "window": "economy window 0..59999",
+      "ore": {
+        "P0 ore_credits": 52000,
+        "P1 ore_credits": 51500
+      },
+      "building_losses": {
+        "P0 lost_building airforce_command": 1,
+        "P0 lost_building airport": 1,
+        "P0 lost_building hospital": 1,
+        "P0 lost_building oil_derrick": 1,
+        "P0 lost_building ore_purifier": 1,
+        "P0 lost_building power_plant": 1,
+        "P0 lost_building refinery": 1,
+        "P0 lost_building tech_outpost": 1,
+        "P1 lost_building airport": 1,
+        "P1 lost_building hospital": 1,
+        "P1 lost_building service_depot": 1,
+        "P1 lost_building tech_center": 1
+      },
+      "repair_hp": {
+        "P0 repaired_hp airforce_command": 486,
+        "P0 repaired_hp hospital": 88,
+        "P0 repaired_hp oil_derrick": 786,
+        "P0 repaired_hp ore_purifier": 232,
+        "P0 repaired_hp power_plant": 632,
+        "P0 repaired_hp refinery": 380,
+        "P0 repaired_hp tech_outpost": 1888,
+        "P1 repaired_hp airport": 432,
+        "P1 repaired_hp hospital": 232,
+        "P1 repaired_hp oil_derrick": 416,
+        "P1 repaired_hp patriot": 253,
+        "P1 repaired_hp power_plant": 696,
+        "P1 repaired_hp service_depot": 192,
+        "P1 repaired_hp tech_center": 16,
+        "P1 repaired_hp tech_outpost": 3136
+      },
+      "strategic": {
+        "P1 strategic Paradrop": 1
+      },
+      "building_shots": {
+        "shots gi->patriot": 8,
+        "shots gi->power_plant": 78,
+        "shots grizzly->airforce_command": 2,
+        "shots grizzly->patriot": 3,
+        "shots grizzly->power_plant": 8,
+        "shots grizzly->refinery": 26,
+        "shots grizzly->tech_center": 7,
+        "shots harrier->airforce_command": 8,
+        "shots harrier->ore_purifier": 8,
+        "shots harrier->war_factory": 4,
+        "shots ifv->patriot": 10,
+        "shots ifv->tech_center": 12,
+        "shots prism_tank->barracks": 1,
+        "shots prism_tank->power_plant": 5,
+        "shots prism_tank->refinery": 1,
+        "shots tank_destroyer->refinery": 6
+      }
+    },
+    {
+      "window": "economy window 60000..119999",
+      "ore": {
+        "P0 ore_credits": 34000,
+        "P1 ore_credits": 30000
+      },
+      "building_losses": {
+        "P0 lost_building airforce_command": 1,
+        "P0 lost_building barracks": 4,
+        "P0 lost_building chronosphere": 1,
+        "P0 lost_building pillbox": 1,
+        "P0 lost_building power_plant": 1,
+        "P0 lost_building refinery": 3,
+        "P0 lost_building war_factory": 1,
+        "P0 lost_building weather_control": 1,
+        "P1 lost_building oil_derrick": 1,
+        "P1 lost_building ore_purifier": 1,
+        "P1 lost_building patriot": 1,
+        "P1 lost_building tech_center": 1,
+        "P1 lost_building tech_outpost": 1
+      },
+      "repair_hp": {
+        "P0 repaired_hp airforce_command": 220,
+        "P0 repaired_hp barracks": 336,
+        "P0 repaired_hp construction_yard": 1045,
+        "P0 repaired_hp pillbox": 388,
+        "P0 repaired_hp power_plant": 1754,
+        "P0 repaired_hp refinery": 719,
+        "P0 repaired_hp war_factory": 304,
+        "P0 repaired_hp weather_control": 176,
+        "P1 repaired_hp oil_derrick": 264,
+        "P1 repaired_hp ore_purifier": 804,
+        "P1 repaired_hp patriot": 86,
+        "P1 repaired_hp pillbox": 300,
+        "P1 repaired_hp power_plant": 773,
+        "P1 repaired_hp refinery": 384,
+        "P1 repaired_hp tech_center": 56,
+        "P1 repaired_hp tech_outpost": 56
+      },
+      "strategic": {},
+      "building_shots": {
+        "shots attack_dog->airforce_command": 1,
+        "shots gi->patriot": 2,
+        "shots gi->power_plant": 17,
+        "shots gi->refinery": 18,
+        "shots harrier->airforce_command": 4,
+        "shots harrier->barracks": 16,
+        "shots harrier->chronosphere": 4,
+        "shots harrier->ore_purifier": 14,
+        "shots harrier->pillbox": 8,
+        "shots harrier->power_plant": 14,
+        "shots harrier->refinery": 18,
+        "shots harrier->tech_center": 4,
+        "shots harrier->weather_control": 6,
+        "shots ifv->refinery": 12,
+        "shots ifv->war_factory": 4,
+        "shots mirage_tank->war_factory": 16,
+        "shots mirage_tank->weather_control": 29,
+        "shots prism_tank->airforce_command": 1,
+        "shots prism_tank->barracks": 2,
+        "shots prism_tank->patriot": 5,
+        "shots prism_tank->power_plant": 4,
+        "shots tank_destroyer->refinery": 19
+      }
+    },
+    {
+      "window": "economy window 120000..179999",
+      "ore": {
+        "P0 ore_credits": 32000,
+        "P1 ore_credits": 24000
+      },
+      "building_losses": {
+        "P0 lost_building airforce_command": 2,
+        "P0 lost_building barracks": 4,
+        "P0 lost_building chronosphere": 1,
+        "P0 lost_building power_plant": 3,
+        "P0 lost_building refinery": 1,
+        "P0 lost_building weather_control": 2,
+        "P1 lost_building ore_purifier": 1,
+        "P1 lost_building patriot": 2,
+        "P1 lost_building pillbox": 2,
+        "P1 lost_building power_plant": 3,
+        "P1 lost_building prism_tower": 2,
+        "P1 lost_building refinery": 1,
+        "P1 lost_building tech_center": 2
+      },
+      "repair_hp": {
+        "P0 repaired_hp airforce_command": 464,
+        "P0 repaired_hp barracks": 296,
+        "P0 repaired_hp construction_yard": 660,
+        "P0 repaired_hp power_plant": 620,
+        "P0 repaired_hp refinery": 770,
+        "P0 repaired_hp weather_control": 720,
+        "P1 repaired_hp barracks": 125,
+        "P1 repaired_hp construction_yard": 12,
+        "P1 repaired_hp patriot": 70,
+        "P1 repaired_hp pillbox": 725,
+        "P1 repaired_hp power_plant": 120,
+        "P1 repaired_hp refinery": 505,
+        "P1 repaired_hp tech_center": 35
+      },
+      "strategic": {
+        "P0 strategic Storm": 1
+      },
+      "building_shots": {
+        "shots gi->patriot": 10,
+        "shots gi->power_plant": 10,
+        "shots gi->refinery": 88,
+        "shots gi->tech_center": 1,
+        "shots harrier->airforce_command": 12,
+        "shots harrier->barracks": 26,
+        "shots harrier->chronosphere": 6,
+        "shots harrier->power_plant": 22,
+        "shots harrier->refinery": 8,
+        "shots harrier->weather_control": 17,
+        "shots prism_tank->patriot": 5,
+        "shots prism_tank->pillbox": 2,
+        "shots prism_tank->prism_tower": 3,
+        "shots prism_tank->tech_center": 3,
+        "shots tank_destroyer->refinery": 2
+      }
+    },
+    {
+      "window": "economy window 180000..239999",
+      "ore": {
+        "P0 ore_credits": 38000,
+        "P1 ore_credits": 26000
+      },
+      "building_losses": {
+        "P0 lost_building airforce_command": 2,
+        "P0 lost_building barracks": 5,
+        "P0 lost_building chronosphere": 1,
+        "P0 lost_building power_plant": 3,
+        "P0 lost_building refinery": 2,
+        "P0 lost_building weather_control": 1,
+        "P1 lost_building tech_center": 1
+      },
+      "repair_hp": {
+        "P0 repaired_hp airforce_command": 300,
+        "P0 repaired_hp barracks": 664,
+        "P0 repaired_hp chronosphere": 123,
+        "P0 repaired_hp construction_yard": 117,
+        "P0 repaired_hp pillbox": 300,
+        "P0 repaired_hp power_plant": 644,
+        "P0 repaired_hp refinery": 630,
+        "P0 repaired_hp weather_control": 160,
+        "P1 repaired_hp refinery": 368,
+        "P1 repaired_hp tech_center": 80,
+        "P1 repaired_hp war_factory": 600
+      },
+      "strategic": {
+        "P0 strategic Chronosphere": 1
+      },
+      "building_shots": {
+        "shots gi->tech_center": 5,
+        "shots grizzly->refinery": 8,
+        "shots grizzly->tech_center": 13,
+        "shots harrier->airforce_command": 10,
+        "shots harrier->barracks": 26,
+        "shots harrier->chronosphere": 5,
+        "shots harrier->pillbox": 2,
+        "shots harrier->power_plant": 20,
+        "shots harrier->refinery": 12,
+        "shots harrier->weather_control": 6,
+        "shots prism_tank->war_factory": 3
+      }
+    },
+    {
+      "window": "economy final partial window",
+      "ore": {
+        "P0 ore_credits": 26000,
+        "P1 ore_credits": 18500
+      },
+      "building_losses": {
+        "P0 lost_building barracks": 3,
+        "P0 lost_building construction_yard": 1,
+        "P0 lost_building pillbox": 1,
+        "P0 lost_building power_plant": 2,
+        "P1 lost_building refinery": 1,
+        "P1 lost_building tech_center": 1
+      },
+      "repair_hp": {
+        "P0 repaired_hp airforce_command": 300,
+        "P0 repaired_hp barracks": 40,
+        "P0 repaired_hp power_plant": 152,
+        "P0 repaired_hp refinery": 330,
+        "P1 repaired_hp ore_purifier": 200,
+        "P1 repaired_hp refinery": 184,
+        "P1 repaired_hp tech_center": 32
+      },
+      "strategic": {},
+      "building_shots": {
+        "shots gi->power_plant": 9,
+        "shots gi->refinery": 85,
+        "shots gi->tech_center": 5,
+        "shots grizzly->power_plant": 6,
+        "shots grizzly->refinery": 1,
+        "shots grizzly->tech_center": 12,
+        "shots harrier->airforce_command": 2,
+        "shots harrier->barracks": 12,
+        "shots harrier->pillbox": 4,
+        "shots harrier->power_plant": 12,
+        "shots harrier->refinery": 5,
+        "shots prism_tank->ore_purifier": 1
+      }
+    }
+  ]
+}

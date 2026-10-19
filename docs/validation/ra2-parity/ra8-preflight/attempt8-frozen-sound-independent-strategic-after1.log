@@ -1,0 +1,6 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 3.10s
+     Running `/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples/m13_ten_players to-the-end frozen_sound`
+frozen_sound: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 134.4µs, set up in 8.1ms
+  107725 ticks: mean 844.100µs, 99th centile 5.308ms, longest 83.940ms, busiest 1000 ticks mean 3.236ms, 9 ticks over 50ms; measured total 90.931s, elapsed 90.940s
+  at most 275 units and 152 buildings; 10 players built; ended in tick 107724: Won { winner: PlayerId(1), tick: 107724 }

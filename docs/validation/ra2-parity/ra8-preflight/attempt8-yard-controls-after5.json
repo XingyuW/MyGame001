@@ -1,0 +1,29 @@
+{
+  "label": "attempt8-yard-controls-after5",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ra8_naval_site_preference",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "env": {},
+  "purpose": "Source eligibility controls use unarmed owned base anchors so Tech Outpost's real HoverMissile cannot kill the observed threat before placement; preserve prior actor-disappearance premise failure. Hidden twins and fallback unchanged assertions.",
+  "start_utc": "2026-10-19T03:22:21.321637+00:00",
+  "elapsed_seconds": 17.409403958008625,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+  },
+  "log_sha256": "ce43fa2de435a06fcbcbceae59d918e2a1402cd7f9e3b8812ef0112c76d0204f"
+}

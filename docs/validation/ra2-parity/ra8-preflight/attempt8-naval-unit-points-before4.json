@@ -1,0 +1,29 @@
+{
+  "label": "attempt8-naval-unit-points-before4",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_naval_unit_",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "Record actual selected weapon and fine firing positions; separate genuine unit-point admission failure from corrected Gap/map and shot premises.",
+  "start_utc": "2026-10-19T00:12:49.506737+00:00",
+  "elapsed_seconds": 5.765581333020236,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "65a00aa3fa4636b49354f51792970c41424ee4ce1893dfeca112b67294220337"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "65a00aa3fa4636b49354f51792970c41424ee4ce1893dfeca112b67294220337"
+  },
+  "log_sha256": "dbf785ade0033ab9ce1582dfee59d52cdcdf54194596ce1aa1d0905adec32689"
+}

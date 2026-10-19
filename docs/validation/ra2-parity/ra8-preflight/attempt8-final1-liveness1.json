@@ -1,0 +1,10 @@
+{
+  "utc": "2026-10-18T21:30:14.830153+00:00",
+  "exit": 0,
+  "rows": [
+    " 8869  7146       03:05   0:00.19 S    /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo",
+    " 8872  8869       03:05   2:58.52 R    /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_gate_matches-556affa51f6ab831"
+  ],
+  "stderr": "",
+  "purpose": "Bounded executable-only owned-validator liveness; no arguments,profiling or competing simulation."
+}

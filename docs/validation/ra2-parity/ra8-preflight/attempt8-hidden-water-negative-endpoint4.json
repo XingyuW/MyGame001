@@ -1,0 +1,24 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_unseen_water_obstacle_before_the_edge_range_endpoint_cannot_change_naval_planning",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "Distinct endpoint geometry: remove only honest occupancy guard; original fixture preserved. Finally restoration precedes all dependent work.",
+  "start_utc": "2026-10-18T22:36:10.160634+00:00",
+  "elapsed_seconds": 23.545749042008538,
+  "exit": 101,
+  "source_before": "65a00aa3fa4636b49354f51792970c41424ee4ce1893dfeca112b67294220337",
+  "source_mutated": "a166adfe8f66b1de02b8b6b5be9c5712e91b1f3efd8c29c43220fda0629276be",
+  "source_restored": "65a00aa3fa4636b49354f51792970c41424ee4ce1893dfeca112b67294220337",
+  "log_sha256": "52053f74473e85bdda08602ab212a6028521615e48a1f9bb4696412642a07b26"
+}

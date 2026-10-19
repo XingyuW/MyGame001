@@ -1,0 +1,10 @@
+{
+  "utc": "2026-10-18T22:20:24.064027+00:00",
+  "exit": 0,
+  "rows": [],
+  "source_shas": {
+    "crates/sim/src/ai.rs": "872c91082778ccc57da43e7f1caba4c2a0d0f45aa5d14284bf9b09765b4d4ccd",
+    "crates/sim/src/ai/strategy.rs": "97bf9859f160d5f4d6e8a54f0b10a948f6c974ffb3ba3e83a8b9e88e9fa055e3"
+  },
+  "pending_output": "99574 completed101; genuine prefix controlled failure preserved. No mutation probe active."
+}

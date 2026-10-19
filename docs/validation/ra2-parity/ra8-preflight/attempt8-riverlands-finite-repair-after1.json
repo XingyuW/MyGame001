@@ -1,0 +1,30 @@
+{
+  "label": "attempt8-riverlands-finite-repair-after1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate7_riverlands_iraq_cuba_easy_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "Independent exact Riverlands Iraq/CubaEasy seed0 ending after source-cost/aggregate-cadence finite repair funding guard; original72000/rejection rules, winner not presumed.",
+  "start_utc": "2026-10-18T22:08:18.396560+00:00",
+  "elapsed_seconds": 39.43852458399488,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "872c91082778ccc57da43e7f1caba4c2a0d0f45aa5d14284bf9b09765b4d4ccd",
+    "crates/sim/src/ai/strategy.rs": "97bf9859f160d5f4d6e8a54f0b10a948f6c974ffb3ba3e83a8b9e88e9fa055e3"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "872c91082778ccc57da43e7f1caba4c2a0d0f45aa5d14284bf9b09765b4d4ccd",
+    "crates/sim/src/ai/strategy.rs": "97bf9859f160d5f4d6e8a54f0b10a948f6c974ffb3ba3e83a8b9e88e9fa055e3"
+  },
+  "log_sha256": "5e8d5bed5d21b7b909c8c8a40f301204fff1cae092d905a3e521636952625d9c"
+}

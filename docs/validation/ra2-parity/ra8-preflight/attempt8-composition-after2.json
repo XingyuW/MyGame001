@@ -1,0 +1,27 @@
+{
+  "label": "attempt8-composition-after2",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--lib",
+    "ra8_composition_tests",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "Five normal paid composition controls, adding a funded-but-locked source prerequisite case distinct from the finite-funding skip.",
+  "start_utc": "2026-10-18T20:46:26.380050+00:00",
+  "elapsed_seconds": 23.4757082919823,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "log_sha256": "4bf207909ec8b1e32ea19074d9afc012011d92b2b0086e4c909f2b362ce417c9"
+}

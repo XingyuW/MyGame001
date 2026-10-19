@@ -1,0 +1,28 @@
+{
+  "label": "attempt8-hidden-water-release-after7",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_unseen_enemy_water_building_cannot_change_naval_planning",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "purpose": "Release ordinary Move at599 so scheduled path completion precedes AI600; require idle hull and fresh mission at601, continuous honest visibility, original positive/equality assertions.",
+  "start_utc": "2026-10-18T20:13:13.850999+00:00",
+  "elapsed_seconds": 6.901564624975435,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "log_sha256": "8bd9e09488b8d490c4816e54402f53a2d3c51b10bb1e8ff75e11d4f537bd1f3a"
+}

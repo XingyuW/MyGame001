@@ -1,0 +1,36 @@
+{
+  "label": "attempt8-steel-america-cuba-independent-strategic-before1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate_steel_harbor_america_cuba_bridge_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "env": {
+    "RA8_ECONOMY_TRACE": "1",
+    "RA8_SERVICE_TRACE": "1",
+    "RA8_TRACE_FROM": "180000",
+    "RA8_LATE_MISSION_TRACE": "1"
+  },
+  "purpose": "Exact default Steel Harbor America/CubaBrutal seed0 None288000 diagnosis on9952 strategy; actual income/production/losses/SWtargets/damage/mission state before any further correction, original limit unchanged.",
+  "start_utc": "2026-10-19T03:00:19.064797+00:00",
+  "elapsed_seconds": 322.0999307500315,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80"
+  },
+  "log_sha256": "8630586975dec00d66bd88ab3ef1f2fd75cfbe71e9e6e93c28b02edeeaa01fd9"
+}
