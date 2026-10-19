@@ -1176,11 +1176,49 @@ fn repair_recovery(view: &View<'_>, controller: &AiController) -> bool {
                 .ok()
                 .is_some_and(|i| view.buildable(ProductionItem::Building(BuildingKind(i))))
         })
-        || view
-            .ai
-            .army
+        || funded_army_recovery(view, controller)
+}
+
+// A surviving producer needs real financing to justify continued paid repairs.
+// Preserve native paid/completed heads and the existing exact-refund recovery.
+fn funded_army_recovery(view: &View<'_>, controller: &AiController) -> bool {
+    let cash = view.state.credits();
+    if view.state.queues().any(|(_, queue)| {
+        queue.first().is_some_and(|head| {
+            let Some(terms) = view.definitions.production(head.item) else {
+                return false;
+            };
+            let produced = view
+                .own_kinds
+                .iter()
+                .any(|&kind| produces(view.definitions, kind, head.item));
+            matches!(head.item, ProductionItem::Unit(_))
+                && produced
+                && (head.progress >= terms.build_time || production_can_advance(view, head.item))
+                && outstanding_cost(view, head) <= cash
+        })
+    }) || !recover_unit_credits(view, controller).is_empty()
+    {
+        return true;
+    }
+    // The existing ordinary sale excludes declared army producers/prerequisites.
+    // A sale cannot hypothetically finance a unit after deleting its producer.
+    let refund = match sell_for_army(view) {
+        Some(Command::SellBuilding { building }) => view
+            .own_buildings
             .iter()
-            .any(|&kind| view.buildable(ProductionItem::Unit(kind)))
+            .find(|b| b.id == building)
+            .map_or(0, |b| view.definitions.refund(b.kind)),
+        _ => 0,
+    };
+    let reserved = pending_production_cost(view);
+    view.ai.army.iter().any(|&kind| {
+        let item = ProductionItem::Unit(kind);
+        view.queueable(item)
+            && view.definitions.production(item).is_some_and(|terms| {
+                reserved.saturating_add(terms.cost) <= cash.saturating_add(refund)
+            })
+    })
 }
 
 fn service_cost(view: &View<'_>, unit: &UnitSnap) -> Option<i64> {

@@ -9214,3 +9214,140 @@ recorded sets,not a retrospective expansion of older manifests. Static inventory
 versus RA7's1124 (+197),none removed,renamed or ignored. Mandatory full13,both fresh756-winner
 R29 before/after distributions,independent review and user verification remain pending.
 No optional performance optimization or additional composition trial follows passing means.
+
+### R159 — Current-wallet repair priority with real ongoing income (RA8, 2026-10-19)
+
+The frozen checkpoint10 full gate does NOT pass: fmt/diff/Clippy exit0, then workspace
+exit101 (253passed/1failed/0ignored,5415 script seconds/5415.186230 monotonic seconds).
+Its production target has five companion successes but its all-match test has TWO explicit
+seed0 None288000 cases: Frozen Sound CubaBrutal/GermanyBrutal and Thousand Lakes
+CubaBrutal/RussiaBrutal. No fresh756-winner/table claim is made. Wrapper interruption after
+that completed failed row preserves partial05 as unrun/incomplete,not a completed pass.
+`ra8-attempt10/PRESERVED.json` records27 original files/159237bytes per archive/current set;
+all54 copies are byte-identical. Raw04 SHA463e9ff580a01d6546c42d124e8f3990a8bf4450011462a9b02abd2c82d66fc9
+and every prior attempt remain unchanged. Exact Lakes becomes the new named retained test
+`ra8_gate10_lakes_cuba_russia_brutal_seed_zero_finishes`; its ordinary defaults,288000 bound,
+strict command exemptions,32 cap,credits/invariants and explicitWon assertion are unchanged.
+
+Native exact traces reproduce both failures (Frozen295.717587s/rawc9f72ad7…,
+Lakes129.715649s/rawb22ec936…). `attempt10-native-findings-before1.json` retains five actual
+windows each,including the final48000 ticks. Frozen has real late ore income26425/25375,
+zero wallets and paid FIFOs,actual combat and charged native strategic launches. Four late
+Cuba Nukes target221,215: Patriot393 becomes Yellow and ordinary paid repairs restore Green
+between strikes. Lakes has no surviving producers after60000 but real income/repairs/native
+Nukes; its P0 Miner71 actually fires continuously on service depot84. P0 repeatedly damages
+three repaired P1 defenses,which return Green; P1 targets that source self-healing Miner.
+These observations refute idle-economy/idle-source/global-helplessness claims. They do not
+establish a common strategic defect or justify liquidation. A preliminary Curtain-duration
+statement incorrectly read legacy metadata strength200: actual shipped protection uses
+rules.iron_curtain_duration1000. That mistaken reading selected NO code change; actual
+protected-until state,not legacy metadata,is authoritative for any causal conclusion.
+
+R149's final bounded FIFO/aggregate native repair projection returned immediately whenever
+`service_income` was true. Real future income does not simultaneously finance the current
+wallet's repairs and legitimate paid work. New scheduled
+`ra8_real_periodic_income_funds_paid_recruit_before_optional_repairs` declares a GI200 wallet
+of100 after normal Engineer capture of a source Derrick (20credits/133ticks),real source
+shots damage two owned buildings,and an existing Grizzly prevents unrelated emergency sales.
+Its declared no-construction plan projection isolates repair versus ordinary recruitment;
+normal source ownership/prerequisites/prices/durations/commands remain. By tick999 real grants
+can finance the GI,but old repairs leave charged167/200 and cash18,no recruit. The first two
+probes instead receive750 from an unrelated SpySat sale and PASS; they are insufficient
+negative evidence,retained as such. An extra capture-boundary step did not remove that sale.
+The final fixture explicitly rejects BOTH sales and production cancellations,so refunds
+cannot substitute for the real periodic-income proof. No old test assertion is weakened.
+
+The narrow runtime change keeps income-backed production admission unrestricted. The same
+actual bounded-prefix queue/refund projection,source repair_step_cost,unavoidable current
+Economy charge and aggregate cadence reservation now also govern competing repairs with
+income. Ordinary repair toggles pause that spending when current credits cannot cover the
+paid FIFO plus repair obligations; repairs resume with funded surplus. Completed heads/no
+unit work keep repairs. Source repair costs/rates/power,public validation,32 cap,FIFO and
+R53 signature/timers are unchanged. This is an explicit game-owned allocation priority for
+paid work,not a claim that forecast income stopped or a closed-source AI rule. No new state,
+hash field,balance knob,hidden query,strategic filter or replacement-MCV policy is added.
+Existing no-income admission accounting remains exact.
+
+The final no-refund fixture genuinely fails old runtime1f5325e2… for its FUNDING assertion
+(rawbc3722ab…,101/17.988512s),not sale/setup. The bounded negative restores currentAI9d47fb7e…
+in finally; a SEPARATE later SHA read verifies exact restoration and strategy5c5fd561… before
+any dependent work. All21 recovery controls then pass,including unchanged funded-income,
+multiple-surplus/cadence,damaged-producer,completed-head,no-work and bounded32/prefix controls
+(raw92020336…,0/20.247425s). Existing helper calls merely pass the new false isolation flag;
+the new branch alone adds damage/armed actor/construction isolation/no-refund requirements.
+
+Exact Frozen on this repair-only runtime delta now P1GermanyWon146710/288000
+(raw32a38fec02e01b41d5b109e095e3a509a5dc2e3ce8a275e45647ddd88b063a8e,
+0/216.585955s command,186.14s target). Exact Lakes now P0CubaWon98562/288000
+(raw0031a348fec640ac63d90c1057062c32ff661a2fafefe5399740b43deb2e1e68,
+0/94.891008s command,94.53s target). Credit combined native endings separately from the
+controlled funding property; no strategic-cycle/MCV causal claim is transferred. The
+repair evidence index records all raw hashes,including insufficient probes. Broader scoped
+guards,fresh all21/default256 acceptance and the mandatory complete full13 remain pending.
+No standalone entire-sim/game/32-case replay is substituted for or duplicated before the
+mandatory unchanged workspace gate; all retained exact tests execute there.
+
+### R160 — Finance the surviving producer's actual recovery before renewing repairs (RA8, 2026-10-19)
+
+R159 scoped final1 stops on its tenth completed command: strict checks and139 focused tests
+pass,then default Demo's first FOUR pairings win but RussiaEasy/LibyaEasy seed0 None72000
+(rawa49b697d…,101/60.471332s command,30.06s target). All342 runtime and101 additional snapshot
+paths remain unchanged. Grown-map/all21/fixed256/three example guards are UNRUN,not passes.
+The earlier source's same Demo pairing P1Won67048 is historical. Preserve final1's complete
+STOPPED record and raw output; no broad rerun or unchanged-match-limit exception is made.
+The exact config becomes `ra8_gate10_demo_russia_libya_easy_seed_zero_finishes`,with the
+same ordinary defaults,72000 bound,rejections/invariants and explicitWon assertion.
+
+The actual scheduled trace (af246d6a…,101/14.535261s) shows P0's last TeslaTank dies after
+60000. P0 ends with NO units,income or queues,42credits and only warfactory39+radar45.
+P1's real FlakTrack140 continuously fires on radar45; P0 pays1046 repairedHP in the final
+12000 ticks,renewing ordinary credit changes in R53's unchanged signature. This is not a
+claim that finite credits last forever or that active P1 is helpless. The source legal
+army choices with P0's surviving factory/radar are FlakTrack500,V3800,Rhino900,TeslaTank1200;
+42 cannot fund any. Source sell values are factory1000/radar500. Existing `sell_for_army`
+protects producers/prerequisites of ANY declared army type: factory supports those units;
+radar supports V3/TeslaTank,so that policy offers no sale. This is an AI allocation policy,
+NOT physical unrecoverability: a conceivable radar sale could finance FlakTrack while
+forgoing the more advanced types. No claim that every legal counterfactual sale is absent
+is made,and no new sale policy is introduced here.
+
+R129/R156 repair recovery accepted mere army buildability. Narrow only that unit-production
+branch: retain a native financed FIFO head using REMAINING cost,including a completed head
+with its live producer; retain the existing exact-refund recovery dry run; otherwise require
+an ordinarily queueable army admission financed after whole-FIFO reservation and the
+existing eligible sale's exact refund. Never hypothetically sell its required producer.
+Active income,living capable forces,Engineers/MCVs/garrisons,independent useful strategic
+sources and the preexisting buildable-BUILDING branch remain unchanged. The latter's
+cash-independent predicate is not silently expanded into this proof. No new state,hash,
+knob,source repair/damage/price/power behavior,public command,winner logic or R53 timer,
+signature/stagger/cadence changes. Ordinary repair toggles stop the demonstrated spending;
+normal late liquidation/crew/native combat decide the match.
+
+Three new actual scheduled guards exercise poor-wallet,affordable production,and a genuinely
+partly-paid head with wallet BELOW full price but enough remaining cost. Real public repair
+first pays/heals; real enemy GI source fire sustains damage; every sale/cancellation is
+rejected by the fixture; funded cases actually charge unit work and heal. The partial case
+observes native healing while its real paid head's remaining cost fits that smaller wallet.
+A real radar survivor exists through every declared-loss step; explicit active-match,
+nondefeated,zero-surviving-unit,exact-two-buildings and empty-queue premises exclude hidden
+crew/defeat bypasses. Initial private credit API/entity-index and signed div_ceil compile
+errors are retained. Initial before2 and after1 are INSUFFICIENT: the initial setup killed
+all buildings before adding remnants,so the controller could already be defeated; both
+its positive and negative assertions failed. The provisional209bae94… strategy patch was
+preserved then restored to5c5fd561… with a separate successful SHA read before corrected
+probes; those invalid runs select no credited fix.
+
+Corrected old strategy before5 gives2passed/1failed (dd492501…,101/5.766205s): both real
+financing positives pass,only the live unfundable remnant fails its ordinary-stop assertion.
+The final strengthened fixture again fails old strategy for THAT assertion,not refund or
+setup (92587c3e…,101/20.608107s). Finally restores strategye689d137…; a SEPARATE later read
+verifies that and AI9d47fb7e… before dependent validation. The candidate's three controls
+pass (cb40d58e…,0/20.344205s); final broad affected guards remain required.
+
+Exact Demo on combined R159/R160 runtime now P1LibyaWon70234/72000
+(rawbef2f63c6b4f03156bd625595d2b9ed7ec30f9cd8711232ee1778d5b00d78aac,
+0/39.292968s command,9.28s target). This97.55%-of-limit result is an explicit RA9 near-limit
+watch,not permission for case-specific tuning or a transferred complete-RA8 acceptance.
+All unsuccessful/insufficient probes and the exact evidence index remain preserved. Fresh
+scoped guards,impacted Frozen/Lakes replays,all21/default256 and complete full13 are pending.
+No current runtime source/data is widened to the speculative strategic-cycle/MCV leads.

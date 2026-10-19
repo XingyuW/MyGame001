@@ -4426,6 +4426,243 @@ fn ra8_futile_paid_building_repairs_do_not_renew_a_helpless_last_stand_forever()
 }
 
 #[test]
+fn ra8_an_unaffordable_remaining_factory_does_not_renew_futile_paid_repairs() {
+    remaining_factory_repair(false, false);
+}
+
+#[test]
+fn ra8_an_affordable_remaining_factory_keeps_paid_repairs_and_real_unit_work() {
+    remaining_factory_repair(true, false);
+}
+
+#[test]
+fn ra8_a_financed_partly_paid_factory_head_keeps_repairs_below_its_full_price() {
+    remaining_factory_repair(true, true);
+}
+
+fn remaining_factory_repair(funded: bool, partial: bool) {
+    let definitions = load_ruleset(data()).unwrap();
+    let tank = definitions.unit_kind("tesla_tank").unwrap();
+    let radar = definitions.building_kind("radar_tower").unwrap();
+    let rules = &definitions.rules().unwrap().economy;
+    let maximum = definitions.building_combat(radar).unwrap().hit_points;
+    let repair_budget =
+        sim::repair_step_cost(
+            rules,
+            definitions
+                .production(sim::ProductionItem::Building(radar))
+                .unwrap()
+                .cost,
+            maximum,
+            false,
+        ) * i64::from(maximum.saturating_add(rules.repair_step - 1) / rules.repair_step.max(1));
+    let partial_budget = definitions
+        .production(sim::ProductionItem::Unit(tank))
+        .unwrap()
+        .cost
+        + repair_budget;
+    let mut app = scenario(
+        "russia",
+        "easy",
+        if funded {
+            if partial { partial_budget } else { 10000 }
+        } else {
+            42
+        },
+        0,
+        false,
+    );
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    // Keep a real surviving building throughout the declared loss so MatchState
+    // never defeats this controller before its remnant decision is exercised.
+    let radar = put(&mut app, "radar_tower", 14, 8);
+    // Resolve ordinary deaths and their crew, preserving that actual remnant.
+    for _ in 0..2 {
+        let world = app.world_mut();
+        for (id, owner, mut hp) in world
+            .query::<(&sim::SimId, &sim::Owner, &mut sim::Health)>()
+            .iter_mut(world)
+        {
+            if owner.0 == PlayerId(0) && *id != radar {
+                hp.hit_points = 0;
+            }
+        }
+        step(&mut app);
+    }
+    let factory = put(&mut app, "soviet_war_factory", 8, 8);
+    assert!(
+        app.world()
+            .resource::<sim::MatchState>()
+            .defeated(PlayerId(0))
+            .is_none()
+    );
+    assert!(
+        app.world()
+            .resource::<sim::MatchState>()
+            .outcome()
+            .is_none()
+    );
+    {
+        let world = app.world_mut();
+        assert!(
+            !world
+                .query::<(&sim::Owner, &sim::Unit)>()
+                .iter(world)
+                .any(|(owner, _)| owner.0 == PlayerId(0)),
+            "no hidden surviving crew may supply recovery"
+        );
+        let mut owned_ids = world
+            .query::<(&sim::SimId, &sim::Owner, &sim::Building)>()
+            .iter(world)
+            .filter(|(_, owner, _)| owner.0 == PlayerId(0))
+            .map(|(id, _, _)| *id)
+            .collect::<Vec<_>>();
+        owned_ids.sort();
+        let mut expected = vec![radar, factory];
+        expected.sort();
+        assert_eq!(owned_ids, expected);
+        assert!(
+            world
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap()
+                .queues()
+                .all(|(_, q)| q.is_empty())
+        );
+    }
+    let entity = unit_entity(&mut app, radar);
+    let definitions = app.world().resource::<sim::Definitions>().clone();
+    let kind = definitions.unit_kind("rhino").unwrap();
+    let item = sim::ProductionItem::Unit(kind);
+    let cost = definitions.production(item).unwrap().cost;
+    assert!(cost > 42);
+    let owned = [
+        definitions.building_kind("soviet_war_factory").unwrap(),
+        definitions.building_kind("radar_tower").unwrap(),
+    ];
+    assert!(
+        sim::check_buildable(
+            &definitions,
+            app.world()
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap(),
+            false,
+            &owned,
+            item
+        )
+        .is_ok(),
+        "the actual producer/prerequisite path must be legal independent of the wallet"
+    );
+    let maximum = app.world().get::<sim::Health>(entity).unwrap().hit_points;
+    app.world_mut()
+        .get_mut::<sim::Health>(entity)
+        .unwrap()
+        .hit_points = maximum - 200;
+    let initial = app
+        .world()
+        .resource::<sim::Players>()
+        .get(PlayerId(0))
+        .unwrap()
+        .credits();
+    issue(&mut app, Command::RepairBuilding { building: radar });
+    let mut paid = false;
+    for _ in 0..40 {
+        step(&mut app);
+        paid |= app.world().get::<sim::Health>(entity).unwrap().hit_points > maximum - 200;
+        if paid {
+            break;
+        }
+    }
+    assert!(
+        paid && app
+            .world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .credits()
+            < initial,
+        "real ordinary repair must first pay and heal"
+    );
+    spawn_unit(app.world_mut(), PlayerId(1), "gi", CellPos::new(18, 9)).unwrap();
+    // No later credit is injected; every payment/toggle is scheduled normally.
+    app.world_mut().insert_resource(controllers);
+    let mut stopped = false;
+    let mut healed = false;
+    let mut charged = false;
+    let mut shot = false;
+    let mut previous = app.world().get::<sim::Health>(entity).unwrap().hit_points;
+    let mut healed_partial = false;
+    for _ in 0..if partial { 2000 } else { 200 } {
+        let state = app
+            .world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap();
+        let partial_financed = state.queues().any(|(_, q)| {
+            q.first().is_some_and(|head| {
+                let terms = definitions.production(head.item).unwrap();
+                matches!(head.item, sim::ProductionItem::Unit(_))
+                    && head.charged > 0
+                    && terms.cost > state.credits()
+                    && terms.cost - head.charged <= state.credits()
+            })
+        });
+        stopped |= state.repairing().contains(&radar) && app.world().resource::<CommandQueue>().iter().any(|issued| matches!(issued.command, Command::RepairBuilding { building } if building == radar));
+        for event in step(&mut app) {
+            assert!(
+                !matches!(
+                    event,
+                    sim::SimEvent::BuildingSold {
+                        player: PlayerId(0),
+                        ..
+                    } | sim::SimEvent::ProductionCancelled {
+                        player: PlayerId(0),
+                        ..
+                    }
+                ),
+                "refund cannot fund this remnant: {event:?}"
+            );
+            shot |= matches!(event, sim::SimEvent::WeaponFired { target,.. } if target == radar);
+        }
+        let current = app.world().get::<sim::Health>(entity).unwrap().hit_points;
+        healed |= current > previous;
+        healed_partial |= partial_financed && current > previous;
+        previous = current;
+        charged |= app
+            .world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .queues()
+            .flat_map(|(_, q)| q.iter())
+            .any(|q| matches!(q.item, sim::ProductionItem::Unit(_)) && q.charged > 0);
+    }
+    assert!(
+        shot,
+        "actual enemy source fire must maintain the damaged remnant"
+    );
+    let factory_entity = unit_entity(&mut app, factory);
+    assert!(app.world().get::<sim::Building>(factory_entity).is_some());
+    if funded {
+        assert!(
+            !stopped && healed && charged,
+            "an actually financed producer keeps repairs and real paid work"
+        );
+        assert!(
+            !partial || healed_partial,
+            "a real partly paid head must retain repairs while its remaining cost, not full price, fits the wallet"
+        );
+    } else {
+        assert!(
+            stopped,
+            "a merely buildable but unaffordable army renewed futile repair spending"
+        );
+        assert!(!charged);
+    }
+}
+
+#[test]
 fn ra8_income_production_and_a_usable_force_keep_useful_building_repairs() {
     for recovery in ["oil_derrick", "construction_yard", "grizzly"] {
         let (mut app, refinery) = paid_refinery_repair_after_producer_loss();

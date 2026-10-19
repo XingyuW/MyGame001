@@ -5,32 +5,37 @@ use bevy_app::App;
 
 #[test]
 fn ra8_finite_unit_funding_is_not_spent_on_repairs_before_the_paid_recruit_can_finish() {
-    finite_repair_recruit(Some(0), 10, false, false, false);
+    finite_repair_recruit(Some(0), 10, false, false, false, false);
 }
 
 #[test]
 fn ra8_borderline_repair_surplus_covers_every_source_step_between_ai_turns() {
-    finite_repair_recruit(Some(1), 40, false, false, false);
+    finite_repair_recruit(Some(1), 40, false, false, false, false);
 }
 
 #[test]
 fn ra8_multiple_active_repairs_cannot_each_claim_the_same_finite_recruit_surplus() {
-    finite_repair_recruit(Some(2), 40, true, false, false);
+    finite_repair_recruit(Some(2), 40, true, false, false, false);
 }
 
 #[test]
 fn ra8_source_funded_surplus_keeps_multiple_repairs_and_actual_paid_recruitment() {
-    finite_repair_recruit(None, 40, true, false, false);
+    finite_repair_recruit(None, 40, true, false, false, false);
+}
+
+#[test]
+fn ra8_real_periodic_income_funds_paid_recruit_before_optional_repairs() {
+    finite_repair_recruit(Some(0), 40, true, true, false, true);
 }
 
 #[test]
 fn ra8_actual_owned_income_keeps_multiple_repairs_while_a_recruit_is_paid() {
-    finite_repair_recruit(Some(2), 40, true, true, false);
+    finite_repair_recruit(Some(2), 40, true, true, false, false);
 }
 
 #[test]
 fn ra8_a_full_bounded_ai_fifo_still_pauses_repairs_before_the_paid_recruit() {
-    finite_repair_recruit(Some(0), 40, false, false, true);
+    finite_repair_recruit(Some(0), 40, false, false, true, false);
 }
 
 #[test]
@@ -172,6 +177,7 @@ fn finite_repair_recruit(
     multiple: bool,
     income: bool,
     saturated: bool,
+    constrained_income: bool,
 ) {
     let mut app = app();
     let mut controllers = std::mem::take(app.world_mut().resource_mut::<AiPlayers>().into_inner());
@@ -181,6 +187,14 @@ fn finite_repair_recruit(
         .unwrap()
         .difficulty
         .think_interval = cadence;
+    if constrained_income {
+        let plan = &mut controllers.controllers.get_mut(&PlayerId(0)).unwrap().plan;
+        // Declared policy projection isolates native repair versus recruitment:
+        // no unrelated construction, with ordinary source GI composition/cost.
+        plan.build_order.clear();
+        plan.defences.clear();
+        unit(&mut app, 0, "grizzly", CellPos::new(14, 20));
+    }
     let producer = building(&mut app, 0, "barracks", CellPos::new(6, 14));
     let mut repair_targets = vec![producer];
     if multiple {
@@ -239,6 +253,43 @@ fn finite_repair_recruit(
             shot,
             "the second repair must also follow actual ordinary weapon fire"
         );
+    }
+    if constrained_income {
+        for &target in &repair_targets {
+            issue(
+                &mut app,
+                1,
+                Command::Attack {
+                    units: vec![attacker],
+                    target,
+                },
+            );
+            let mut half = false;
+            for _ in 0..2000 {
+                step(&mut app);
+                let world = app.world_mut();
+                half = world
+                    .query::<(&SimId, &crate::Building, &crate::Health)>()
+                    .iter(world)
+                    .any(|(id, b, h)| {
+                        *id == target
+                            && h.hit_points
+                                <= world
+                                    .resource::<Definitions>()
+                                    .building_combat(b.kind)
+                                    .unwrap()
+                                    .hit_points
+                                    / 2
+                    });
+                if half {
+                    break;
+                }
+            }
+            assert!(
+                half,
+                "ordinary source fire must establish the repair obligation"
+            );
+        }
     }
     issue(
         &mut app,
@@ -340,6 +391,11 @@ fn finite_repair_recruit(
             captured,
             "actual income must be initialized by ordinary Engineer capture"
         );
+        if constrained_income {
+            // Finish the capture boundary before declaring the small wallet;
+            // only real periodic income may fund the later paid recruit.
+            step(&mut app);
+        }
     }
     let kind = app
         .world()
@@ -395,13 +451,20 @@ fn finite_repair_recruit(
         },
         |steps| step_cost.saturating_mul(i64::from(steps)),
     );
-    // Declared finite budget: exactly one source recruit, no ore/income. Every
-    // later credit and HP change uses ordinary queues, repairs and weapons.
+    // Declare the wallet after setup/capture. Every subsequent credit and HP
+    // change uses ordinary income, queues, repairs and source weapons.
     app.world_mut()
         .resource_mut::<Players>()
         .get_mut(PlayerId(0))
         .unwrap()
-        .credits = cost.saturating_add(surplus);
+        .credits = if constrained_income {
+        // A real captured Derrick pays twenty credits every 133 source ticks.
+        // This wallet plus those actual grants can fund the ordinary GI, but
+        // cannot simultaneously fund two continuously active source repairs.
+        cost / 2
+    } else {
+        cost.saturating_add(surplus)
+    };
     app.world_mut().insert_resource(controllers);
     let mut recruited = BTreeSet::new();
     let mut shots = 0;
@@ -434,6 +497,9 @@ fn finite_repair_recruit(
             eprintln!("actual saturated decision {pending:?}");
             assert_eq!(pending.len(), MAX_AI_COMMANDS);
             assert!(pending.iter().any(|issued| matches!(issued.command,Command::QueueProduction {item:ProductionItem::Unit(k)} if k == kind)));
+        }
+        if constrained_income && tick < 100 {
+            eprintln!("periodic income tick{tick} events{events:?}");
         }
         let refund = events.iter().any(|event| {
             matches!(
@@ -476,7 +542,7 @@ fn finite_repair_recruit(
                 | crate::SimEvent::ProductionCancelled {
                     player: PlayerId(0),
                     ..
-                } if !income => panic!(
+                } if !income || constrained_income => panic!(
                     "the declared source-cost budget must suffice without another refund: {event:?}"
                 ),
                 crate::SimEvent::UnitSpawned {
@@ -538,7 +604,7 @@ fn finite_repair_recruit(
         shots > 0,
         "the actually financed recruit must contribute a real building shot"
     );
-    if surplus_steps.is_none() || income {
+    if surplus_steps.is_none() || (income && !constrained_income) {
         assert!(
             repair_targets
                 .iter()
