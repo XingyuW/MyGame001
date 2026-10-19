@@ -1,0 +1,41 @@
+{
+  "before": {
+    "scripts/generate_ra2_data.py": "6a0477b0720c54971bd8b11ed5b8ba7fda00b23101516f349477dbca209057d9",
+    "assets/data/ai.ron": "42cf650956788f04f4520e7f5be1d617c416b83e6e2f555e8b7a417b4a1a5b2a",
+    "crates/sim/src/ai.rs": "1f5325e272804b7c34b95fbe73f67d73dcd72a86a157aee73bff81b5f3119d7c",
+    "crates/sim/src/ai/strategy.rs": "5c5fd561a4aa9d4184011128d092409ef9b0597dc23088c8515ba8a61fb88d34",
+    "crates/sim/tests/ra8_ai.rs": "9c72bcf1e7a59ef3c2c2c2f99cb7bfceebef802371382a173cbdcdc77d64a11e"
+  },
+  "start_utc": "2026-10-19T05:43:49.426725+00:00",
+  "purpose": "final exact fixture with only old global patience, no runtime/stat/limit change",
+  "mutated": {
+    "scripts/generate_ra2_data.py": "357c3dd026e7ff537106e1d29a1fb4c131a2ca68474d4c2806675da7bae168fa",
+    "assets/data/ai.ron": "a29e0ceedfb2212d26bdc4c9c1ecc94f7d05106b7e635fd45925d48451a964b7",
+    "crates/sim/src/ai.rs": "1f5325e272804b7c34b95fbe73f67d73dcd72a86a157aee73bff81b5f3119d7c",
+    "crates/sim/src/ai/strategy.rs": "5c5fd561a4aa9d4184011128d092409ef9b0597dc23088c8515ba8a61fb88d34",
+    "crates/sim/tests/ra8_ai.rs": "9c72bcf1e7a59ef3c2c2c2f99cb7bfceebef802371382a173cbdcdc77d64a11e"
+  },
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_ready_finite_cohorts_use_shorter_assembly_but_keep_the_source_team_delay",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "exit": 101,
+  "log_sha256": "9bedd7758bd4f9ee92e23afacb3ab83c7a156955bb6f1e898ccbf070bebd0bf6",
+  "restored": {
+    "scripts/generate_ra2_data.py": "6a0477b0720c54971bd8b11ed5b8ba7fda00b23101516f349477dbca209057d9",
+    "assets/data/ai.ron": "42cf650956788f04f4520e7f5be1d617c416b83e6e2f555e8b7a417b4a1a5b2a",
+    "crates/sim/src/ai.rs": "1f5325e272804b7c34b95fbe73f67d73dcd72a86a157aee73bff81b5f3119d7c",
+    "crates/sim/src/ai/strategy.rs": "5c5fd561a4aa9d4184011128d092409ef9b0597dc23088c8515ba8a61fb88d34",
+    "crates/sim/tests/ra8_ai.rs": "9c72bcf1e7a59ef3c2c2c2f99cb7bfceebef802371382a173cbdcdc77d64a11e"
+  },
+  "elapsed_seconds": 5.688819875009358
+}

@@ -9,46 +9,68 @@
     "scripts/validate_ra2_parity.sh",
     "ra8"
   ],
-  "freeze_commit": "618e9b4f2890a9cb5e95d920dcd94fedbca3955f",
-  "runtime_commit": "f431d122d1c147fdc948d21b55156aa0a7477cc1",
-  "runtime_manifest": "../ra8-preflight/attempt7-final5-runtime-manifest.json",
-  "start_utc": "2026-10-18T17:24:24.405168+00:00",
+  "freeze_commit": "24094ecc0d9b3e3abb3c8173a20200775095defc",
+  "runtime_commit": "4e2c3774cff5b2d26c5630413227f2c35f776877",
+  "runtime_manifest": "../ra8-preflight/attempt8-final8-runtime-manifest.json",
+  "test_example_manifest": "../ra8-preflight/attempt8-final8-test-example-manifest.json",
+  "start_utc": "2026-10-19T04:45:49.288387+00:00",
   "phases": [
     {
       "phase": 1,
       "exit": 0,
-      "script_seconds": 1,
-      "observed_monotonic_phase_seconds": 1.0070965829654597,
-      "summary_line": "01 exit 0  1 s  cargo fmt --all -- --check"
+      "script_seconds": 3,
+      "observed_monotonic_phase_seconds": 2.783320249989629,
+      "summary_line": "01 exit 0  3 s  cargo fmt --all -- --check"
     },
     {
       "phase": 2,
       "exit": 0,
       "script_seconds": 0,
-      "observed_monotonic_phase_seconds": 0.013825792004354298,
+      "observed_monotonic_phase_seconds": 0.11681395902996883,
       "summary_line": "02 exit 0  0 s  git diff --check"
     },
     {
       "phase": 3,
       "exit": 0,
-      "script_seconds": 0,
-      "observed_monotonic_phase_seconds": 0.4960127919912338,
-      "summary_line": "03 exit 0  0 s  cargo clippy --workspace --all-targets -- -D warnings"
+      "script_seconds": 1,
+      "observed_monotonic_phase_seconds": 1.117851332994178,
+      "summary_line": "03 exit 0  1 s  cargo clippy --workspace --all-targets -- -D warnings"
     },
     {
       "phase": 4,
       "exit": 101,
-      "script_seconds": 7001,
-      "observed_monotonic_phase_seconds": 7000.9060897910385,
-      "summary_line": "04 exit 101  7001 s  cargo test --workspace --release  [253 passed, 1 failed, 0 ignored]"
+      "script_seconds": 494,
+      "observed_monotonic_phase_seconds": 493.7799065830186,
+      "summary_line": "04 exit 101  494 s  cargo test --workspace --release  [230 passed, 1 failed, 0 ignored]"
     }
   ],
-  "timing_note": "script seconds are unchanged date-based measurements; observed phase seconds are monotonic intervals between received completed summary rows, including shell transition overhead",
-  "owned_script_pid": 82891,
-  "elapsed_monotonic_seconds": 7002.423490666959,
+  "prior_attempt8_preservation": "../ra8-preflight/checkpoint9-attempt8-preservation.json",
+  "preexisting_production_table": {
+    "sha256": "6c3ec135cec4acb23ec3489e7324cfc760e12c6e0da6727fef8675901548d435",
+    "mtime_ns": 1792155643228129596,
+    "bytes": 49763
+  },
+  "timing_note": "Script seconds are unchanged date-based values; observed monotonic phase intervals include transitions and wrapper hash/metadata overhead. Total monotonic elapsed is recorded independently.",
+  "owned_script_pid": 71027,
+  "elapsed_monotonic_seconds": 497.87758683401626,
+  "current_source_mismatches": {
+    "attempt8-final8-runtime-manifest.json": [],
+    "attempt8-final8-test-example-manifest.json": []
+  },
+  "production_table_after_workspace": {
+    "sha256": "6c3ec135cec4acb23ec3489e7324cfc760e12c6e0da6727fef8675901548d435",
+    "bytes": 49763,
+    "source_mtime_ns": 1792155643228129596,
+    "rewritten_since_start": false,
+    "workspace_exit": 101,
+    "success_claim_requires_full_workspace_exit_zero": true
+  },
   "stopped_after_completed_failure": 4,
   "process_exit": -15,
-  "end_utc": "2026-10-18T19:21:06.869163+00:00",
-  "final_runtime_mismatches": [],
-  "process_output_sha256": "d15344679231384324c1c53171c1c585e857e8056ceb64aebf8d9c7e6827dd15"
+  "end_utc": "2026-10-19T04:54:07.168430+00:00",
+  "final_source_mismatches": {
+    "attempt8-final8-runtime-manifest.json": [],
+    "attempt8-final8-test-example-manifest.json": []
+  },
+  "process_output_sha256": "99e16e4ed622d86b8a7df606c5b110c90236043e05c4090740df70f226d3244c"
 }

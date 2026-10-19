@@ -1,0 +1,32 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 42.62s
+     Running tests/m13_grown_maps.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m13_grown_maps-ee40a9cea2db76e9)
+
+running 3 tests
+test every_shipped_map_grows_with_every_player_count ... ok
+test ten_computer_players_build_bases_and_bring_in_ore_on_enlarged_maps ... ok
+
+thread 'a_ten_player_match_on_the_smallest_map_is_played_to_its_end' (8984014) panicked at crates/game/tests/m13_grown_maps.rs:662:5:
+None after 72000 ticks, defeated {PlayerId(2): 10562, PlayerId(3): 20583, PlayerId(4): 6805, PlayerId(5): 6828, PlayerId(6): 19241, PlayerId(7): 30226, PlayerId(9): 34101}
+PlayerId(0): 4958 credits, 10 buildings [CellPos { x: 10, y: 17 }, CellPos { x: 8, y: 19 }, CellPos { x: 13, y: 11 }, CellPos { x: 15, y: 16 }, CellPos { x: 12, y: 16 }, CellPos { x: 15, y: 10 }, CellPos { x: 14, y: 13 }, CellPos { x: 10, y: 19 }, CellPos { x: 10, y: 25 }, CellPos { x: 11, y: 13 }], 0 units [], wave Some((0, None))
+PlayerId(1): 27 credits, 38 buildings [CellPos { x: 88, y: 83 }, CellPos { x: 98, y: 97 }, CellPos { x: 87, y: 87 }, CellPos { x: 95, y: 98 }, CellPos { x: 99, y: 89 }, CellPos { x: 88, y: 81 }, CellPos { x: 82, y: 95 }, CellPos { x: 88, y: 91 }, CellPos { x: 84, y: 88 }, CellPos { x: 86, y: 82 }, CellPos { x: 84, y: 95 }, CellPos { x: 86, y: 91 }, CellPos { x: 97, y: 84 }, CellPos { x: 82, y: 87 }, CellPos { x: 95, y: 83 }, CellPos { x: 94, y: 90 }, CellPos { x: 84, y: 90 }, CellPos { x: 87, y: 85 }, CellPos { x: 93, y: 82 }, CellPos { x: 87, y: 89 }, CellPos { x: 81, y: 92 }, CellPos { x: 84, y: 86 }, CellPos { x: 90, y: 90 }, CellPos { x: 95, y: 92 }, CellPos { x: 86, y: 94 }, CellPos { x: 90, y: 82 }, CellPos { x: 81, y: 89 }, CellPos { x: 95, y: 95 }, CellPos { x: 83, y: 92 }, CellPos { x: 85, y: 97 }, CellPos { x: 90, y: 99 }, CellPos { x: 98, y: 86 }, CellPos { x: 90, y: 77 }, CellPos { x: 96, y: 89 }, CellPos { x: 90, y: 94 }, CellPos { x: 94, y: 86 }, CellPos { x: 98, y: 92 }, CellPos { x: 90, y: 87 }], 19 units [CellPos { x: 84, y: 84 }, CellPos { x: 44, y: 46 }, CellPos { x: 21, y: 17 }, CellPos { x: 19, y: 17 }, CellPos { x: 84, y: 83 }, CellPos { x: 84, y: 85 }, CellPos { x: 83, y: 84 }, CellPos { x: 84, y: 83 }, CellPos { x: 85, y: 84 }, CellPos { x: 84, y: 83 }, CellPos { x: 83, y: 84 }, CellPos { x: 83, y: 84 }, CellPos { x: 84, y: 84 }, CellPos { x: 84, y: 84 }, CellPos { x: 85, y: 88 }, CellPos { x: 52, y: 55 }, CellPos { x: 52, y: 54 }, CellPos { x: 61, y: 58 }, CellPos { x: 66, y: 53 }], wave Some((3, Some(Building(SimId(813)))))
+PlayerId(2): 0 credits, 0 buildings [], 0 units [], wave Some((0, None))
+PlayerId(3): 0 credits, 0 buildings [], 6 units [CellPos { x: 99, y: 37 }, CellPos { x: 99, y: 37 }, CellPos { x: 99, y: 37 }, CellPos { x: 98, y: 37 }, CellPos { x: 96, y: 41 }, CellPos { x: 98, y: 37 }], wave Some((0, None))
+PlayerId(4): 925 credits, 0 buildings [], 0 units [], wave Some((0, None))
+PlayerId(5): 1293 credits, 0 buildings [], 0 units [], wave Some((17, Some(Waypoint(2))))
+PlayerId(6): 814 credits, 0 buildings [], 0 units [], wave Some((0, None))
+PlayerId(7): 0 credits, 0 buildings [], 0 units [], wave Some((0, None))
+PlayerId(8): 0 credits, 5 buildings [CellPos { x: 97, y: 10 }, CellPos { x: 97, y: 8 }, CellPos { x: 99, y: 7 }, CellPos { x: 103, y: 7 }, CellPos { x: 104, y: 2 }], 1 units [CellPos { x: 88, y: 37 }], wave Some((1, None))
+PlayerId(9): 0 credits, 0 buildings [], 2 units [CellPos { x: 6, y: 107 }, CellPos { x: 6, y: 107 }], wave Some((1, Some(Waypoint(0))))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test a_ten_player_match_on_the_smallest_map_is_played_to_its_end ... FAILED
+
+failures:
+
+failures:
+    a_ten_player_match_on_the_smallest_map_is_played_to_its_end
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 38.64s
+
+error: test failed, to rerun pass `-p game --test m13_grown_maps`

@@ -4355,3 +4355,31 @@ verification remain pending. Fresh storage measurement is 58 parser files, 584,0
 733,184 allocated bytes (716 KiB), retained for recreatable reruns and unnecessary for release.
 No additional substantial external directory was created; configured caches and earlier RA5/RA7
 evidence remain preserved.
+
+### RA8: tenth source checkpoint, mandatory gate pending (2026-10-19)
+
+Runtime016300034474deb8db0be570c5569124372c3d75 passes17 reduced scoped commands,145 tests/
+0failed/0ignored across10 target invocations. R156–R158 retain the failed ninth gate and
+actual scheduled repair/fair-composition proofs,the rejected paired-V3 trial,and one global
+game-owned patience retune while preserving sourced TeamDelays/first wave/think cadence,
+combat/economy values,caps and every match limit. The exact default Crossroads112×112 ten-
+country Medium seed7 now P1Won68628 within72000 with every original ending/building assertion.
+Named national-capture and AA-reinforcement pressure setup migrations preserve all original
+quantitative assertions;no old test is removed,renamed or ignored. Static inventory1321 versus
+RA7's1124 (+197) is distinct from executed counts.
+
+All21 actual-default ten-player maps have winners/ten builders,ending median94209/p90nearest-
+rank129403/max166861 under400000. Worst meanCoral1.107ms;fixed256 means Liberty0.851890/
+Continental0.779806/Pacific0.778092ms pass5ms. Long tick tails remain raw;means do not promise
+smoothness. Both342-runtime and101-additional-test/example snapshots match. Full current
+metrics,proofs,migrations/assumptions and source freeze are in RA8_ACCEPTANCE.md/checkpoint10.
+Mandatory workspace command4 will run all31 retained cases/fullsim/game/M10 unfiltered;they
+are not redundantly preflight-run here. All13 frozen commands and both fresh756-winner R29
+before/after distributions remain required. This is validated preflight,not independent review.
+
+The failed ninth gate's complete16-file label plus partial05 and stale tables is preserved
+byte-identically in attempt9 (32copies checked). Earlier logs are unchanged. No new substantial
+external directory is created;RA8 parser scratch remains58files/584038logical/733184allocated,
+with existing RA5render/RA7parser caches retained. RA9 still owns the documented gathering-point
+partition debt,R83 transport/attached-Squid,R96 actorlessProp abilities and unprovenR99 lead;
+R97 is closed inR103. Independent review and user visual/audio/play-feel verification remain.

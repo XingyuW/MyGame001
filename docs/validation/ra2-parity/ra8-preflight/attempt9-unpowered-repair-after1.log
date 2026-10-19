@@ -1,0 +1,12 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0502]: cannot borrow `app` as mutable because it is also borrowed as immutable
+    --> crates/sim/tests/ra8_ai.rs:4013:56
+     |
+4013 |     assert!(app.world().get::<sim::Health>(unit_entity(&mut app, tank)).is_some_and(|h| h.hit_points > 0));
+     |             ---         ---                            ^^^^^^^^ mutable borrow occurs here
+     |             |           |
+     |             |           immutable borrow later used by call
+     |             immutable borrow occurs here
+
+For more information about this error, try `rustc --explain E0502`.
+error: could not compile `sim` (test "ra8_ai") due to 1 previous error

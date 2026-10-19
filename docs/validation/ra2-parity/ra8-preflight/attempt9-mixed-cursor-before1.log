@@ -1,0 +1,10 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 23.19s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+mixed factory actual paid spawns [UnitKind(22), UnitKind(18), UnitKind(33)], infantry spawns 7
+test ai::ra8_composition_tests::ra8_mixed_producer_admissions_cannot_skip_the_busy_factorys_declared_cycle ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 112 filtered out; finished in 0.11s
+

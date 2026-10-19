@@ -1,0 +1,28 @@
+{
+  "label": "attempt9-unpowered-repair-before1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_an_unpowered_strategic_remnant_cannot_keep_futile_paid_repairs_alive",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T05:01:48.393161+00:00",
+  "elapsed_seconds": 7.264641207992099,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+  },
+  "log_sha256": "51dd0ada6d41fa7521c63ea2ba5e9f30744bef522a05a2922f6ea5cfd165d910"
+}

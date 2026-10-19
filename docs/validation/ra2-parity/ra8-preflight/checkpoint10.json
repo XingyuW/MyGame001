@@ -1,0 +1,91 @@
+{
+  "checkpoint": 10,
+  "utc": "2026-10-19T06:20:53.143988+00:00",
+  "status": "validated reduced scoped preflight; mandatory full13 and both fresh756-winner R29 distributions pending root release; not independent review",
+  "source_commit": "016300034474deb8db0be570c5569124372c3d75",
+  "preflight_working_tree_base": "24094ecc0d9b3e3abb3c8173a20200775095defc",
+  "runtime": {
+    "crates/sim/src/ai.rs": "1f5325e272804b7c34b95fbe73f67d73dcd72a86a157aee73bff81b5f3119d7c",
+    "crates/sim/src/ai/strategy.rs": "5c5fd561a4aa9d4184011128d092409ef9b0597dc23088c8515ba8a61fb88d34",
+    "assets/data/ai.ron": "42cf650956788f04f4520e7f5be1d617c416b83e6e2f555e8b7a417b4a1a5b2a",
+    "scripts/generate_ra2_data.py": "6a0477b0720c54971bd8b11ed5b8ba7fda00b23101516f349477dbca209057d9"
+  },
+  "main": "8230a955b251e9341d349f99eaeb86f7f8253664",
+  "branch": "ra2-parity",
+  "static_tests": 1321,
+  "baseline_static_tests": 1124,
+  "added": 197,
+  "removed_or_renamed": 0,
+  "ignored": 0,
+  "preflight": {
+    "commands": 17,
+    "test_target_invocations": 10,
+    "passed": 145,
+    "failed": 0,
+    "ignored": 0,
+    "wall_seconds": 1735.1976865829783,
+    "command_seconds_sum": 1734.447395999974,
+    "all_exits_zero": true,
+    "summary_sha256": "afd872814f7fad64029a60a20abca45b59294c2330b21a2f4bd73b4eadf08d18"
+  },
+  "m13": {
+    "count": 21,
+    "winners": 21,
+    "ten_builders": 21,
+    "unchanged_outer_limit": 400000,
+    "mean_budget_ms": 5,
+    "end_tick_median": 94209,
+    "end_tick_p90_nearest_rank": 129403,
+    "end_tick_max": 166861,
+    "worst_mean_map": "coral_archipelago",
+    "worst_mean_ms": 1.107,
+    "measured_seconds_sum": 1474.413,
+    "elapsed_seconds_sum": 1474.57,
+    "raw_sha256": "c422eb2ac86af44bf0f3bf7889b409df648ce4dd286576abe69edacabb775918"
+  },
+  "fixed256_means_ms": {
+    "liberty_bay": 0.85189,
+    "continental_divide": 0.779806,
+    "pacific_atoll": 0.778092
+  },
+  "references": [
+    "checkpoint10-metrics.json",
+    "checkpoint10-inventory.json",
+    "checkpoint10-source-check.json",
+    "checkpoint10-source-staged-check.json",
+    "checkpoint10-storage.json",
+    "checkpoint10-attempt9-preservation.json",
+    "attempt9-final1-runtime-manifest.json",
+    "attempt9-final1-test-example-manifest.json"
+  ],
+  "source_staged_hygiene_exit": 0,
+  "evidence_staged_hygiene": {
+    "exit": 2,
+    "passed": false,
+    "raw_only_diagnostic_count": 18,
+    "counts": {
+      "new blank line at EOF": 18
+    },
+    "source_data_test_document_errors": 0,
+    "stdout_sha256": "b5e283813107e573e1c77905fcb1e70d6a36fa43c2665d2d83ff608f8dc7030a",
+    "raw": "checkpoint10-staged-hygiene-raw.json",
+    "identical_final_staged_recheck_required": true,
+    "classification": "checkpoint10-staged-hygiene.json"
+  },
+  "assumptions_and_migrations": "DECISIONS R156\u2013R158; retaining R88\u2013R155. Named setup-only national-last-capture and faster reinforcement-pressure migrations preserve original quantitative assertions and limits. Global game-owned patience trial retains source TeamDelays/first wave/think/build/ROF/caps/counts unchanged.",
+  "ra9_carryforward": [
+    "M6 review2 P2 gathering_point terrain-only floodfill/owned-yard partition",
+    "R83 Size/SizeLimit/loaded boarding and attached Squid-host WeaponFired",
+    "R96 actorless occupied-Prop C4/Ivan/Temporal ability resolution",
+    "R99 unproved bombable capability lead",
+    "All new modules/policies/migrations and source soundness; R97 mechanism closed in R103",
+    "R156 owned-beneficiary repair qualification; R157 per-QueueKey progress/hash; R158 global game-owned patience/lease and exact named fixture migrations"
+  ],
+  "verification_pending": [
+    "full13 on this committed source",
+    "both fresh756-winner sweeps/R29 before-after distributions",
+    "independent review",
+    "user visual/audio/play feel"
+  ],
+  "new_substantial_external_directories_since_checkpoint9": []
+}
