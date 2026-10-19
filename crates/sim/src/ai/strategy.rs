@@ -237,6 +237,69 @@ fn role(view: &View<'_>, kind: UnitKind) -> Role {
         .map_or(Role::Combat, |m| m.role)
 }
 
+// Existing idle detector support can discover a never-observed enemy start while
+// the main wave has a real building mission. Its ordinary order owns the scout
+// lifecycle: keep a healthy approach, release on observation or native failure.
+pub(super) fn detector_scout_goal(
+    view: &View<'_>,
+    controller: &AiController,
+    unit: &UnitSnap,
+) -> Option<CellPos> {
+    if !view.ai.rules_difficulty
+        || role(view, unit.kind) != Role::Dog
+        || controller.wave.contains(&unit.id)
+    {
+        return None;
+    }
+    // Preserve the core's actual defensive assignment, using the same observed
+    // targets, source eligibility and existing base-defense radius.
+    let defensive =
+        view.enemy_units
+            .iter()
+            .map(|u| (u.id, cell_footprint(u.mobile.cell)))
+            .chain(view.enemy_buildings.iter().map(|b| (b.id, b.footprint)))
+            .any(|(id, footprint)| {
+                view.own_buildings.iter().any(|b| {
+                    b.footprint.distance(&footprint) <= controller.difficulty.defence_radius
+                }) && defence_reachable(view, unit, id)
+            });
+    if defensive {
+        return None;
+    }
+    // Ordinary movement may normalize an occupied start to a legal nearby
+    // endpoint. Reuse the core's arrival geometry instead of replacing that path.
+    let unobserved = |cell| {
+        controller
+            .waypoints
+            .iter()
+            .any(|w| w.priority && w.seen == 0 && chebyshev(w.cell, cell) <= GATHER_RADIUS)
+    };
+    if let Some(crate::AttackOrder::AttackMove { destination, .. }) = unit.attack_order
+        && unit.has_order
+        && unobserved(destination)
+    {
+        return Some(destination);
+    }
+    if !unit.idle()
+        || !matches!(controller.target, Some(WaveTarget::Building(id))
+        if controller.known.contains_key(&id) && attack_job_eligible(controller, id))
+    {
+        return None;
+    }
+    controller
+        .waypoints
+        .iter()
+        .filter(|w| w.priority && w.seen == 0)
+        .min_by_key(|w| {
+            (
+                octile_distance(unit.mobile.cell, w.cell),
+                w.cell.y,
+                w.cell.x,
+            )
+        })
+        .map(|w| w.cell)
+}
+
 pub(super) fn decide(
     view: &View<'_>,
     controller: &mut AiController,
@@ -249,6 +312,17 @@ pub(super) fn decide(
     }
     let mut commands = Vec::new();
     naval(view, controller);
+    for unit in &view.own_units {
+        if let Some(goal) = detector_scout_goal(view, controller, unit) {
+            controller.reserved.insert(unit.id);
+            if unit.idle() {
+                commands.push(Command::AttackMove {
+                    units: vec![unit.id],
+                    target: goal,
+                });
+            }
+        }
+    }
     if !service_income(view) {
         for unit in &view.recoverable_service {
             if service_cost(view, unit).is_some_and(|cost| view.state.credits() < cost) {
@@ -452,6 +526,7 @@ pub(super) fn decide(
                         .definitions
                         .metadata(ProductionItem::Unit(u.kind))
                         .is_some_and(|m| m.occupier)
+                    && garrison_investment(view, props, host, cell, u)
             })
         {
             controller.reserved.insert(unit.id);
@@ -477,12 +552,25 @@ pub(super) fn decide(
     let combat_support = strategic(view, controller, special, &ground_wave);
     screen_strike_aircraft(view, controller, special, &ground_wave, &mut commands);
     ground_wave.retain(|unit| !controller.reserved.contains(&unit.id));
+    let current_building = match controller.target {
+        Some(WaveTarget::Building(id)) => Some(id),
+        _ => None,
+    };
     if let Some(target) = controller
         .known
         .iter()
         .filter(|(id, _)| attack_job_eligible(controller, **id))
         .filter(|(_, b)| stable(view, b.footprint.origin))
-        .min_by_key(|(id, b)| (b.footprint.distance_to_cell(controller.start), **id))
+        // The core already selected this wave's objective from its actual front.
+        // Do not replace a legal observed mission with a home-nearer repaired
+        // distraction. Missing, exhausted or unstable jobs retain the fallback.
+        .min_by_key(|(id, b)| {
+            (
+                Some(**id) != current_building,
+                b.footprint.distance_to_cell(controller.start),
+                **id,
+            )
+        })
     {
         // Eligible air attackers keep their job even in an escorted wave.
         // The other actors retain their original combat/standoff policy below.
@@ -594,6 +682,70 @@ pub(super) fn decide(
                 });
             }
         } else {
+            // A distant observed soldier does not screen this building. Resume
+            // unthreatened short-range surface missions instead of leaving
+            // AttackMove pinned on a repaired opportunistic target. Preserve an
+            // already matching chase and the separate artillery policy below.
+            let units: Vec<_> = ground_wave
+                .iter()
+                .filter(|unit| {
+                    view.fights(unit)
+                        && matches!(
+                            view.definitions.domain(unit.kind),
+                            Domain::Land | Domain::Amphibious
+                        )
+                        && range(view.definitions, unit.kind)
+                            < view.ai.policy.artillery_min_range * crate::SUBCELLS_PER_CELL as u32
+                        && !matching_attack(unit)
+                        // A unit-control actor still owns useful movement toward
+                        // recruits; an immune building must not replace it with
+                        // a weapon order that immediately ends without effect.
+                        && target_traits.as_ref().is_some_and(|traits| {
+                            view.definitions.unit_combat(unit.kind).is_some_and(|terms| {
+                                crate::weapon_against(
+                                    view.definitions,
+                                    &terms,
+                                    terms.weapons(false),
+                                    traits,
+                                )
+                                .is_some_and(|(kind, percent)| {
+                                    percent > 1
+                                        && view.definitions.weapon(kind)
+                                            .is_some_and(|weapon| weapon.damage > 0)
+                                })
+                            })
+                        })
+                        && !incoming_wave_threat(view, unit)
+                })
+                .map(|unit| unit.id)
+                .collect();
+            if !units.is_empty() {
+                commands.push(Command::Attack {
+                    units,
+                    target: *target.0,
+                });
+            }
+            // A previously installed building focus must not ignore newly arrived
+            // local defenders. Switch once to normal en-route acquisition; an
+            // already healthy AttackMove keeps its path and weapon history.
+            let mut responses: BTreeMap<CellPos, Vec<SimId>> = BTreeMap::new();
+            for unit in ground_wave.iter().filter(|unit| {
+                view.fights(unit)
+                    && matches!(
+                        view.definitions.domain(unit.kind),
+                        Domain::Land | Domain::Amphibious
+                    )
+                    && range(view.definitions, unit.kind)
+                        < view.ai.policy.artillery_min_range * crate::SUBCELLS_PER_CELL as u32
+                    && matching_attack(unit)
+                    && incoming_wave_threat(view, unit)
+            }) {
+                let cell = surface_response_cell(view, unit, target.1.footprint);
+                responses.entry(cell).or_default().push(unit.id);
+            }
+            for (target, units) in responses {
+                commands.push(Command::AttackMove { units, target });
+            }
             // Long range weapons sit behind the foremost tank, acquiring through normal combat.
             let front = ground_wave
                 .iter()
@@ -1148,8 +1300,83 @@ pub(super) fn service_income(view: &View<'_>) -> bool {
         })
 }
 
+// Do not immediately park an unfunded last-stand recovery force again. Cash-rich
+// openings and real income retain their ordinary policy; a current occupation
+// shot can still justify defending even when a replacement cannot be paid for.
+fn garrison_investment(
+    view: &View<'_>,
+    props: &crate::Props,
+    host: SimId,
+    cell: CellPos,
+    unit: &UnitSnap,
+) -> bool {
+    if service_income(view)
+        || view
+            .definitions
+            .production(ProductionItem::Unit(unit.kind))
+            .is_some_and(|terms| terms.cost <= view.state.credits())
+    {
+        return true;
+    }
+    let Some((_, prop)) = props.get(host) else {
+        return false;
+    };
+    let Some(ProductionItem::Building(kind)) = crate::garrison::item(view.definitions, prop.kind)
+    else {
+        return false;
+    };
+    let Some(terms) = view.definitions.building_combat(kind) else {
+        return false;
+    };
+    let allied = view
+        .definitions
+        .metadata(ProductionItem::Unit(unit.kind))
+        .is_some_and(|meta| meta.side == Some(crate::Side::Allied));
+    let Some(weapon_kind) = (if allied {
+        terms.weapon
+    } else {
+        terms.secondary
+    }) else {
+        return false;
+    };
+    let Some(weapon) = view.definitions.weapon(weapon_kind) else {
+        return false;
+    };
+    view.enemy_units.iter().any(|enemy| {
+        if view.definitions.domain(enemy.kind) == Domain::Air {
+            return false;
+        }
+        let Some(enemy_terms) = view.definitions.unit_combat(enemy.kind) else {
+            return false;
+        };
+        let traits = screen_unit_traits(view, enemy, &enemy_terms);
+        let dx = i64::from(enemy.mobile.cell.x) - i64::from(cell.x);
+        let dy = i64::from(enemy.mobile.cell.y) - i64::from(cell.y);
+        crate::weapon_against(view.definitions, &terms, [Some(weapon_kind), None], &traits)
+            .is_some_and(|(_, versus)| versus > 0)
+            && (dx * dx + dy * dy) as u64 * 256 * 256
+                <= u64::from(weapon.range).saturating_mul(u64::from(weapon.range))
+    })
+}
+
 fn repair_recovery(view: &View<'_>, controller: &AiController) -> bool {
-    service_income(view)
+    // Income alone cannot rebuild a producerless base whose only actors are
+    // unarmed harvesters. Keep their ordinary economic work, but do not renew
+    // optional repair investment on that fact alone. Preserve every other owned
+    // actor (including unavailable/stowed hosts), armed workers, and future
+    // income financing any normally legal unit-production opportunity.
+    (service_income(view)
+        && (view.owned_units.iter().any(|unit| unit.harvest.is_none() || unit.armed)
+            || view
+                .definitions
+                .units()
+                .iter()
+                .enumerate()
+                .any(|(i, _)| {
+                    u16::try_from(i).ok().is_some_and(|i| {
+                        view.buildable(ProductionItem::Unit(UnitKind(i)))
+                    })
+                })))
         || view.owned_units.iter().any(|unit| {
             can_finish(view, controller, unit)
                 || role(view, unit.kind) == Role::Mcv
@@ -1255,6 +1482,83 @@ fn screen_unit_traits(
         traits.immune_psionics |= meta.immune_psionics || meta.role == Role::MindControl;
     }
     traits
+}
+
+// A public-terrain route to the building's outside ring keeps the response's
+// destination off its blocked footprint. Unknown occupancy is not planning data;
+// normal movement still owns actual traffic and physical safety.
+fn surface_response_cell(view: &View<'_>, unit: &UnitSnap, target: Footprint) -> CellPos {
+    let goals: BTreeSet<_> = target.ring().collect();
+    let own: BTreeSet<_> = view
+        .own_buildings
+        .iter()
+        .flat_map(|b| b.footprint.cells())
+        .collect();
+    let mut seen = BTreeSet::from([unit.mobile.cell]);
+    let mut queue = VecDeque::from([unit.mobile.cell]);
+    while let Some(cell) = queue.pop_front() {
+        if goals.contains(&cell) {
+            return cell;
+        }
+        for (dx, dy) in [(0, -1), (-1, 0), (1, 0), (0, 1)] {
+            let next = CellPos::new(cell.x.saturating_add(dx), cell.y.saturating_add(dy));
+            let passable = view.grid.cell(next).is_some_and(|c| {
+                c.passable || (view.definitions.domain(unit.kind) == Domain::Amphibious && c.water)
+            });
+            if passable
+                && !own.contains(&next)
+                && !(view.vision.is_visible(next) && view.grid.building(next).is_some())
+                && seen.insert(next)
+            {
+                queue.push_back(next);
+            }
+        }
+    }
+    // With no known route, resolve the real local combat at the owned actor's
+    // current legal cell; no hidden occupancy or manufactured path is consulted.
+    unit.mobile.cell
+}
+
+// Surface handoffs require incoming eligible fire, not merely an opportunity
+// for our own longer-range gun to shoot an otherwise harmless distraction.
+fn incoming_wave_threat(view: &View<'_>, unit: &UnitSnap) -> bool {
+    let Some(terms) = view.definitions.unit_combat(unit.kind) else {
+        return false;
+    };
+    let mut traits = screen_unit_traits(view, unit, &terms);
+    if let Some(meta) = view.definitions.metadata(ProductionItem::Unit(unit.kind)) {
+        traits.bombable = meta.bombable;
+        traits.immune_radiation = meta.immune_radiation;
+    }
+    let from = crate::combat::Extent::point(unit.mobile.position(view.grid, unit.id));
+    view.enemy_units.iter().any(|enemy| {
+        let Some(hostile) = view.definitions.unit_combat(enemy.kind) else {
+            return false;
+        };
+        let Some((kind, percent)) =
+            crate::weapon_against(view.definitions, &hostile, hostile.weapons(false), &traits)
+        else {
+            return false;
+        };
+        let Some(weapon) = view
+            .definitions
+            .weapon(kind)
+            .filter(|weapon| percent > 1 && weapon.damage > 0)
+        else {
+            return false;
+        };
+        let (dx, dy) = from.gap(&crate::combat::Extent::point(
+            enemy.mobile.position(view.grid, enemy.id),
+        ));
+        let reach = weapon
+            .range
+            .saturating_add(if traits.airborne && weapon.anti_air {
+                hostile.air_range_bonus
+            } else {
+                0
+            });
+        crate::in_range(dx, dy, reach) && !crate::inside_min_range(dx, dy, weapon.min_range)
+    })
 }
 
 fn local_wave_threat(view: &View<'_>, unit: &UnitSnap) -> bool {

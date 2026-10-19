@@ -23,7 +23,7 @@
 //! instead of the four of [`MAPS`], and map ids measure those maps: `-- to-the-end all`,
 //! `-- to-the-end frostline`.
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::PathBuf;
 use std::process::ExitCode;
 use std::time::{Duration, Instant};
@@ -131,6 +131,34 @@ fn trace(world: &mut bevy_ecs::world::World, definitions: &sim::Definitions, map
             continue;
         }
         let controller = world.resource::<sim::AiPlayers>().controller(player);
+        if tick == 120_000 {
+            let vision = state.vision();
+            let visible_units: Vec<_> = units
+                .iter()
+                .filter(|u| world.resource::<sim::Players>().hostile(player, u.1))
+                .map(|u| {
+                    (
+                        u.0,
+                        u.1,
+                        definitions.unit(u.2).map(|d| d.id.as_str()),
+                        u.3,
+                        vision.is_visible(u.3),
+                        special.hidden.contains(&(player, u.0)),
+                        harvesters.iter().any(|h| h.0 == u.0),
+                        &u.7,
+                    )
+                })
+                .collect();
+            let origin_visibility: Vec<_> = buildings
+                .iter()
+                .filter(|b| world.resource::<sim::Players>().hostile(player, b.1))
+                .map(|b| (b.0, vision.is_visible(b.3)))
+                .collect();
+            eprintln!(
+                "{map} focus guard tick{tick} player{player:?} fog{} origins{origin_visibility:?} visible_hostiles{visible_units:?}",
+                vision.uses_fog()
+            );
+        }
         let own_buildings: Vec<_> = buildings
             .iter()
             .filter(|b| b.1 == player)
@@ -145,9 +173,10 @@ fn trace(world: &mut bevy_ecs::world::World, definitions: &sim::Definitions, map
             .collect();
         let queues: Vec<_> = state.queues().collect();
         eprintln!(
-            "{map} trace tick{tick} player{}: credits{}, queues{queues:?}, buildings{own_buildings:?}, wave{:?}, target{:?}, sea{:?}",
+            "{map} trace tick{tick} player{}: credits{}, repairing{:?}, queues{queues:?}, buildings{own_buildings:?}, wave{:?}, target{:?}, sea{:?}",
             player.0,
             state.credits(),
+            state.repairing(),
             controller.map(|c| c.wave()),
             controller.and_then(|c| c.target()),
             controller.and_then(|c| c.naval_target())
@@ -314,13 +343,25 @@ fn main() -> ExitCode {
         let mut builders: BTreeSet<PlayerId> = BTreeSet::new();
         let mut ended = None;
         let playing = Instant::now();
+        // Observational trace counters never enter the World or command queue.
+        let mut trace_window: BTreeMap<String, u64> = BTreeMap::new();
         for tick in 0..limit {
+            let trace_before = (tracing && tick >= 120_000).then(|| {
+                let credits: BTreeMap<_, _> = world
+                    .resource::<sim::Players>()
+                    .iter()
+                    .map(|(id, state)| (id, state.credits()))
+                    .collect();
+                let hp: BTreeMap<_, _> = world
+                    .query::<(&sim::SimId, &sim::Health)>()
+                    .iter(world)
+                    .map(|(id, hp)| (*id, hp.hit_points))
+                    .collect();
+                (credits, hp)
+            });
             let started = Instant::now();
             world.run_schedule(SimSchedule);
             times.push(started.elapsed());
-            if tracing && tick.is_multiple_of(12_000) {
-                trace(world, &definitions, id, tick);
-            }
             for event in world
                 .resource::<Messages<SimEvent>>()
                 .iter_current_update_messages()
@@ -328,6 +369,51 @@ fn main() -> ExitCode {
                 if let SimEvent::BuildingPlaced { player, .. } = event {
                     builders.insert(*player);
                 }
+                if tracing
+                    && matches!(
+                        event,
+                        SimEvent::WeaponFired { .. }
+                            | SimEvent::OreDelivered { .. }
+                            | SimEvent::StrategicActivated { .. }
+                            | SimEvent::BuildingDestroyed { .. }
+                            | SimEvent::UnitDestroyed { .. }
+                            | SimEvent::ProductionComplete { .. }
+                            | SimEvent::ProductionCancelled { .. }
+                            | SimEvent::UnitSpawned { .. }
+                            | SimEvent::BuildingPlaced { .. }
+                            | SimEvent::BuildingSold { .. }
+                            | SimEvent::MoveFailed { .. }
+                            | SimEvent::CommandRejected { .. }
+                    )
+                {
+                    let count = trace_window.entry(format!("{event:?}")).or_default();
+                    *count = count.saturating_add(1);
+                }
+            }
+            if let Some((credits, hp)) = trace_before {
+                for (actor, owner, current) in world
+                    .query::<(&sim::SimId, &sim::Owner, &sim::Health)>()
+                    .iter(world)
+                {
+                    if let Some(&previous) = hp.get(actor)
+                        && current.hit_points > previous
+                    {
+                        let delta =
+                            world
+                                .resource::<sim::Players>()
+                                .get(owner.0)
+                                .and_then(|state| {
+                                    credits.get(&owner.0).map(|before| state.credits() - before)
+                                });
+                        let count = trace_window.entry(format!("NativeHpIncrease {{ actor: {actor:?}, owner: {:?}, hp_gain: {}, simultaneous_credit_delta: {delta:?} }}", owner.0, current.hit_points - previous)).or_default();
+                        *count = count.saturating_add(1);
+                    }
+                }
+            }
+            if tracing && (tick.is_multiple_of(12_000) || tick + 1 == limit) {
+                trace(world, &definitions, id, tick);
+                eprintln!("{id} native event window ending tick{tick}: {trace_window:?}");
+                trace_window.clear();
             }
             if tick % 100 == 0 {
                 most_units = most_units.max(world.query::<&Unit>().iter(world).count());

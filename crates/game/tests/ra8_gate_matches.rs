@@ -1285,3 +1285,23 @@ fn ra8_gate8_oasis_france_russia_brutal_seed_zero_finishes() {
 fn ra8_gate8_harvest_france_germany_easy_seed_zero_finishes() {
     run_case("harvest_plains", ["france", "germany"], ["easy", "easy"]);
 }
+
+#[test]
+fn ra8_gate11_riverlands_iraq_cuba_brutal_seed_zero_finishes() {
+    run_case("riverlands", ["iraq", "cuba"], ["brutal", "brutal"]);
+}
+
+#[test]
+fn ra8_gate11_oasis_russia_france_brutal_seed_zero_finishes() {
+    run_case("oasis_gulf", ["russia", "france"], ["brutal", "brutal"]);
+}
+
+#[test]
+fn ra8_gate11_coral_iraq_cuba_brutal_seed_zero_finishes() {
+    run_case("coral_archipelago", ["iraq", "cuba"], ["brutal", "brutal"]);
+}
+
+#[test]
+fn ra8_gate11_frozen_russia_libya_easy_seed_zero_finishes() {
+    run_case("frozen_sound", ["russia", "libya"], ["easy", "easy"]);
+}
