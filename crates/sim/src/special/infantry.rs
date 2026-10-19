@@ -610,10 +610,18 @@ fn retain_beams(world: &mut World, defs: &Definitions, index: &BTreeMap<SimId, A
             let Some(w) = world.get::<Weapon>(a.entity) else {
                 return false;
             };
-            let p = position_of(world, a);
-            let q = b.foot.map_or(position_of(world, b), |f| {
-                crate::SubPos::centre_of(nearest_cell_of(f, a.cell))
-            });
+            // Retain against the same body geometry as Combat. The nearest
+            // footprint cell centre is an aim point, not the range boundary.
+            let extent = |actor: &Actor| {
+                world
+                    .get::<Position>(actor.entity)
+                    .map(|p| crate::combat::Extent::point(p.0))
+                    .or_else(|| actor.foot.map(crate::combat::Extent::footprint))
+            };
+            let (Some(from), Some(to)) = (extent(a), extent(b)) else {
+                return false;
+            };
+            let (dx, dy) = from.gap(&to);
             w.target == Some(id)
                 && !world
                     .resource::<SpecialState>()
@@ -628,11 +636,8 @@ fn retain_beams(world: &mut World, defs: &Definitions, index: &BTreeMap<SimId, A
                     .contains_key(source)
                 && known_to(world, defs, a.owner, b)
                 && defs.weapon(w.kind).is_some_and(|d| {
-                    crate::combat::in_range(
-                        i64::from(p.x) - i64::from(q.x),
-                        i64::from(p.y) - i64::from(q.y),
-                        d.range,
-                    )
+                    crate::combat::in_range(dx, dy, d.range)
+                        && !crate::combat::inside_min_range(dx, dy, d.min_range)
                 })
         });
         if erase.beams.is_empty() {

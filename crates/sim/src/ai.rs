@@ -1254,7 +1254,7 @@ pub(crate) fn run_ai(
             continue;
         };
         let plan = controller.plan.clone();
-        let view = View::new(
+        let mut view = View::new(
             player,
             tick,
             &players,
@@ -1267,6 +1267,26 @@ pub(crate) fn run_ai(
             &building_snaps,
             &special,
         );
+        // A stranded or inapplicable specialist is not an alternative to a
+        // useful empty armed worker. Keep actual harvesting and observed
+        // reachable economic jobs, and use the same honest finishing test as
+        // last_stand rather than mere weapon presence.
+        if view.ai.rules_difficulty
+            && !view.last_resort
+            && view
+                .own_units
+                .iter()
+                .any(|u| u.armed && u.harvest == Some(HarvestState::Idle))
+            && !view
+                .own_units
+                .iter()
+                .chain(&view.recoverable_service)
+                .filter(|u| u.harvest.is_none())
+                .any(|u| strategy::can_finish(&view, controller, u))
+            && !worker_job(&view)
+        {
+            view.last_resort = true;
+        }
         let mut commands = repair_bridge(
             &view,
             controller,
@@ -3057,6 +3077,9 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
     let home: Vec<&UnitSnap> = armed
         .values()
         .filter(|unit| !controller.wave.contains(&unit.id))
+        // Scout ownership is derived from this Dog's ordinary healthy order,
+        // not the general reservation set (which also contains combat waves).
+        .filter(|unit| strategy::detector_scout_goal(view, controller, unit).is_none())
         .copied()
         .collect();
 

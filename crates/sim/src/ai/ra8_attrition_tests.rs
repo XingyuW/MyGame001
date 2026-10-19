@@ -1023,3 +1023,497 @@ fn ra8_an_expired_aa_job_cannot_starve_a_fresh_observed_barrier() {
         "actual observed HP progress must reopen the old job"
     );
 }
+
+#[test]
+fn ra8_a_current_observed_building_mission_is_not_replaced_by_a_repaired_home_nearer_target() {
+    let mut app = app();
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<AiPlayers>());
+    let distraction = building(&mut app, 1, "soviet_service_depot", CellPos::new(28, 12));
+    let objective = building(&mut app, 1, "tesla_reactor", CellPos::new(34, 12));
+    let oil = building(&mut app, 255, "oil_derrick", CellPos::new(44, 2));
+    let engineer = unit(&mut app, 1, "engineer", CellPos::new(43, 2));
+    step(&mut app);
+    issue(
+        &mut app,
+        1,
+        Command::Interact {
+            unit: engineer,
+            target: oil,
+        },
+    );
+    for _ in 0..6000 {
+        step(&mut app);
+    }
+    assert!(
+        entity(&mut app, engineer).is_none(),
+        "ordinary engineer capture must activate the income source"
+    );
+    assert!(
+        app.world()
+            .resource::<Players>()
+            .get(PlayerId(1))
+            .unwrap()
+            .credits()
+            > 0
+    );
+    let attacker = unit(&mut app, 0, "flak_track", CellPos::new(34, 17));
+    issue(
+        &mut app,
+        0,
+        Command::Attack {
+            units: vec![attacker],
+            target: distraction,
+        },
+    );
+    let definitions = app.world().resource::<Definitions>();
+    let maximum = definitions
+        .building_combat(definitions.building_kind("soviet_service_depot").unwrap())
+        .unwrap()
+        .hit_points;
+    let mut hit = false;
+    let mut damaged = false;
+    for _ in 0..200 {
+        hit |= step(&mut app).iter().any(|e| matches!(e, crate::SimEvent::WeaponFired { attacker: found, target, .. } if *found == attacker && *target == distraction));
+        let e = entity(&mut app, distraction).unwrap();
+        damaged = app.world().get::<crate::Health>(e).unwrap().hit_points < maximum;
+        if hit && damaged {
+            break;
+        }
+    }
+    assert!(
+        hit && damaged,
+        "the distraction must be genuinely damaged after the native projectile impact"
+    );
+    issue(
+        &mut app,
+        1,
+        Command::RepairBuilding {
+            building: distraction,
+        },
+    );
+    let before = app
+        .world()
+        .resource::<Players>()
+        .get(PlayerId(1))
+        .unwrap()
+        .credits();
+    let mut healed = false;
+    for _ in 0..100 {
+        let e = entity(&mut app, distraction).unwrap();
+        let hp = app.world().get::<crate::Health>(e).unwrap().hit_points;
+        step(&mut app);
+        let e = entity(&mut app, distraction).unwrap();
+        healed |= app.world().get::<crate::Health>(e).unwrap().hit_points > hp;
+    }
+    assert!(
+        healed
+            && app
+                .world()
+                .resource::<Players>()
+                .get(PlayerId(1))
+                .unwrap()
+                .credits()
+                < before.saturating_add(20),
+        "ordinary income-funded repairs must really compete with native damage: healed{healed}, before{before}, after{}",
+        app.world()
+            .resource::<Players>()
+            .get(PlayerId(1))
+            .unwrap()
+            .credits()
+    );
+    let at = CellPos::new(38, 15);
+    issue(
+        &mut app,
+        0,
+        Command::Move {
+            units: vec![attacker],
+            target: at,
+        },
+    );
+    let mut arrived = false;
+    for _ in 0..300 {
+        step(&mut app);
+        let e = entity(&mut app, attacker).unwrap();
+        let mobile = app.world().get::<Mobile>(e).unwrap();
+        arrived = mobile.cell == at && mobile.step.is_none();
+        if arrived {
+            break;
+        }
+    }
+    assert!(
+        arrived,
+        "ordinary movement must establish the current front before AI admission"
+    );
+    app.world_mut().insert_resource(controllers);
+    let mut actual_objective = false;
+    for _ in 0..20 {
+        step(&mut app);
+        let c = app
+            .world()
+            .resource::<AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap();
+        actual_objective |= c.target == Some(WaveTarget::Building(objective));
+    }
+    assert!(
+        actual_objective,
+        "ordinary core selection must choose the nearer current-front objective"
+    );
+    let c = app
+        .world()
+        .resource::<AiPlayers>()
+        .controller(PlayerId(0))
+        .unwrap();
+    assert!(c.known.contains_key(&objective) && c.known.contains_key(&distraction));
+    assert!(strategy::attack_job_eligible(c, objective));
+    assert!(
+        app.world()
+            .resource::<Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .vision()
+            .is_visible(CellPos::new(34, 12))
+    );
+    let mut objective_shot = false;
+    for _ in 0..1000 {
+        objective_shot |= step(&mut app).iter().any(|e| matches!(e, crate::SimEvent::WeaponFired {attacker: found,target,..} if *found == attacker && *target == objective));
+        if objective_shot {
+            break;
+        }
+    }
+    assert!(
+        objective_shot,
+        "strategy must preserve the legal current mission through actual alternative-building fire"
+    );
+    // Ordinary native reinforcement destroys the selected objective; a stale
+    // current ID must not prevent the next legal observed mission from firing.
+    let reinforcement = unit(&mut app, 0, "rhino", CellPos::new(36, 16));
+    issue(
+        &mut app,
+        0,
+        Command::Attack {
+            units: vec![reinforcement],
+            target: objective,
+        },
+    );
+    let mut gone = false;
+    let mut fallback_shot = false;
+    for _ in 0..4000 {
+        for event in step(&mut app) {
+            gone |= matches!(event, crate::SimEvent::BuildingDestroyed { building, .. } if building == objective);
+            fallback_shot |= gone
+                && matches!(event, crate::SimEvent::WeaponFired { attacker: found, target, .. } if found == attacker && target == distraction);
+        }
+        if fallback_shot {
+            break;
+        }
+    }
+    assert!(
+        gone && fallback_shot,
+        "native objective destruction must permit actual fire at the remaining legal distraction"
+    );
+    assert!(
+        !app.world()
+            .resource::<AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .known
+            .contains_key(&objective)
+    );
+}
+
+#[test]
+fn ra8_a_remote_armed_unit_does_not_pin_a_surface_mission_on_a_repaired_distraction() {
+    let mut app = app();
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<AiPlayers>());
+    let oil = building(&mut app, 255, "oil_derrick", CellPos::new(44, 2));
+    let engineer = unit(&mut app, 1, "engineer", CellPos::new(43, 2));
+    step(&mut app);
+    issue(
+        &mut app,
+        1,
+        Command::Interact {
+            unit: engineer,
+            target: oil,
+        },
+    );
+    for _ in 0..6000 {
+        step(&mut app);
+    }
+    assert!(entity(&mut app, engineer).is_none());
+    let objective = building(&mut app, 1, "soviet_refinery", CellPos::new(15, 25));
+    let attacker = unit(&mut app, 0, "mirage_tank", CellPos::new(28, 24));
+    app.world_mut().insert_resource(controllers);
+    for _ in 0..20 {
+        step(&mut app);
+    }
+    assert_eq!(
+        app.world()
+            .resource::<AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .target,
+        Some(WaveTarget::Building(objective)),
+        "the actual core must first select the refinery"
+    );
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<AiPlayers>());
+    let distraction = building(&mut app, 1, "tesla_coil", CellPos::new(27, 29));
+    let remote = unit(&mut app, 1, "gi", CellPos::new(44, 44));
+    issue(
+        &mut app,
+        0,
+        Command::AttackMove {
+            units: vec![attacker],
+            target: CellPos::new(15, 24),
+        },
+    );
+    let mut distraction_shots = 0;
+    for _ in 0..100 {
+        distraction_shots += step(&mut app).iter().filter(|e| matches!(e, crate::SimEvent::WeaponFired { attacker: a, target, .. } if *a == attacker && *target == distraction)).count();
+    }
+    assert!(
+        distraction_shots > 0,
+        "ordinary opportunistic acquisition must actually fire at the distraction"
+    );
+    assert!(
+        app.world()
+            .resource::<Players>()
+            .get(PlayerId(1))
+            .unwrap()
+            .low_power(),
+        "the native unpowered Coil isolates mission selection without damage immunity"
+    );
+    issue(
+        &mut app,
+        1,
+        Command::RepairBuilding {
+            building: distraction,
+        },
+    );
+    let mut healed = false;
+    for _ in 0..100 {
+        let e = entity(&mut app, distraction).unwrap();
+        let before = app.world().get::<crate::Health>(e).unwrap().hit_points;
+        step(&mut app);
+        let e = entity(&mut app, distraction).unwrap();
+        healed |= app.world().get::<crate::Health>(e).unwrap().hit_points > before;
+    }
+    assert!(healed, "income must pay for actual native repair steps");
+    let state = app.world().resource::<Players>().get(PlayerId(0)).unwrap();
+    assert!(
+        state.vision().is_visible(CellPos::new(44, 44))
+            && state.vision().is_visible(CellPos::new(15, 25))
+    );
+    assert!(entity(&mut app, remote).is_some());
+    app.world_mut().insert_resource(controllers);
+    let mut objective_shot = false;
+    for _ in 0..1000 {
+        objective_shot |= step(&mut app).iter().any(|e| matches!(e, crate::SimEvent::WeaponFired {attacker: a, target, ..} if *a == attacker && *target == objective));
+        if objective_shot {
+            break;
+        }
+    }
+    assert!(
+        objective_shot,
+        "a visible remote armed unit must not prevent the native wave from resuming and firing at its selected building mission"
+    );
+    for _ in 0..40 {
+        step(&mut app);
+        assert!(entity(&mut app, objective).is_some());
+        assert!(!app.world().resource::<crate::CommandQueue>().iter().any(|issued| matches!(&issued.command,
+            Command::Move { units, .. } | Command::AttackMove { units, .. } | Command::Attack { units, .. } if units.contains(&attacker))),
+            "an already matching healthy surface focus must not be reset by another decision");
+    }
+}
+
+#[test]
+fn ra8_a_unit_controller_keeps_its_native_approach_instead_of_attacking_an_immune_building() {
+    let mut app = app_with_country("iraq");
+    let objective = building(&mut app, 1, "soviet_service_depot", CellPos::new(34, 12));
+    let recruit = unit(&mut app, 1, "rhino", CellPos::new(36, 17));
+    let controller_unit = unit(&mut app, 0, "yuri", CellPos::new(20, 20));
+    let definitions = app.world().resource::<Definitions>();
+    let role = definitions
+        .metadata(crate::ProductionItem::Unit(
+            definitions.unit_kind("yuri").unwrap(),
+        ))
+        .unwrap()
+        .role;
+    assert_eq!(role, Role::MindControl);
+    let targets: BTreeSet<_> = app
+        .world_mut()
+        .query::<(&SimId, &Owner, &Building)>()
+        .iter(app.world())
+        .filter(|(_, owner, _)| owner.0 == PlayerId(1))
+        .map(|(id, _, _)| *id)
+        .collect();
+    let mut known = false;
+    let mut in_wave = false;
+    let mut wrong_building_orders = 0;
+    let mut native_endings = 0;
+    let mut taken = false;
+    let mut contributed = false;
+    for _ in 0..10000 {
+        let events = step(&mut app);
+        for event in events {
+            native_endings += usize::from(
+                matches!(event, crate::SimEvent::AttackEnded { unit, .. } if unit == controller_unit),
+            );
+            contributed |= matches!(event, crate::SimEvent::WeaponFired { attacker, target, .. } if attacker == recruit && targets.contains(&target));
+        }
+        let ai = app
+            .world()
+            .resource::<AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap();
+        known |= ai.known.contains_key(&objective);
+        in_wave |= ai.wave.contains(&controller_unit);
+        wrong_building_orders += app.world().resource::<crate::CommandQueue>().iter().filter(|issued| matches!(&issued.command,
+            Command::Attack { units, target } if units.contains(&controller_unit) && *target == objective)).count();
+        let e = entity(&mut app, recruit).unwrap();
+        taken |= app.world().get::<Owner>(e).unwrap().0 == PlayerId(0);
+        if taken && contributed {
+            break;
+        }
+    }
+    assert!(
+        known && in_wave,
+        "the actual controller must admit the living source unit and learn the real building"
+    );
+    assert!(
+        taken && contributed,
+        "a unit-control actor must preserve native movement, actually take the controllable tank and use its gun; wrong_building_orders{wrong_building_orders}, native_endings{native_endings}, taken{taken}, contributed{contributed}"
+    );
+    assert_eq!(
+        wrong_building_orders, 0,
+        "an immune building must not receive the unit controller's focus orders"
+    );
+}
+
+#[test]
+fn ra8_target_qualified_surface_focus_keeps_native_temporal_and_ivan_effects() {
+    for (country, kind) in [("germany", "chrono_legionnaire"), ("iraq", "crazy_ivan")] {
+        let mut app = app_with_country(country);
+        let objective = building(&mut app, 1, "power_plant", CellPos::new(34, 12));
+        // Let the real initial source-wave deadline pass without home travel,
+        // then admit a native actor inside both Combat's footprint-edge range
+        // and Temporal's current nearest-cell-centre range. R170 records the
+        // independent edge mismatch; complete native effects remain required.
+        let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<AiPlayers>());
+        let c = controllers.controller(PlayerId(0)).unwrap();
+        let ready = c
+            .difficulty
+            .first_wave
+            .saturating_add(c.difficulty.wave_patience)
+            .saturating_add(1);
+        for _ in 0..ready {
+            step(&mut app);
+        }
+        assert!(
+            app.world()
+                .resource::<crate::MatchState>()
+                .outcome()
+                .is_none()
+        );
+        let actor = unit(&mut app, 0, kind, CellPos::new(30, 15));
+        app.world_mut().insert_resource(controllers);
+        let remote = unit(&mut app, 1, "gi", CellPos::new(44, 44));
+        let e = entity(&mut app, objective).unwrap();
+        let initial = app.world().get::<crate::Health>(e).unwrap().hit_points;
+        let mut focused = false;
+        let mut fired = false;
+        let mut effect = false;
+        let mut first_remaining = None;
+        let mut progressed = false;
+        let mut planted = false;
+        for _ in 0..10000 {
+            fired |= step(&mut app).iter().any(|event| matches!(event,
+                crate::SimEvent::WeaponFired { attacker, target, .. } if *attacker == actor && *target == objective));
+            focused |= app
+                .world()
+                .resource::<crate::CommandQueue>()
+                .iter()
+                .any(|issued| {
+                    matches!(&issued.command,
+                Command::Attack { units, target } if units.contains(&actor) && *target == objective)
+                });
+            effect |= entity(&mut app, objective)
+                .is_none_or(|e| app.world().get::<crate::Health>(e).unwrap().hit_points < initial);
+            let special = app.world().resource::<crate::SpecialState>();
+            if let Some(beam) = special.erasures.get(&objective) {
+                let first = first_remaining.get_or_insert(beam.remaining);
+                progressed |= beam.remaining < *first;
+            }
+            planted |= special.charges.contains_key(&objective);
+            if focused && fired && effect {
+                break;
+            }
+        }
+        assert!(
+            entity(&mut app, remote).is_some(),
+            "the remote armed-unit branch must remain active"
+        );
+        eprintln!(
+            "native ability {kind}: focused{focused}, fired{fired}, effect{effect}, first_remaining{first_remaining:?}, progressed{progressed}, planted{planted}"
+        );
+        assert!(
+            if kind == "chrono_legionnaire" {
+                progressed
+            } else {
+                planted
+            },
+            "the actual Temporal channel must advance, or the actual Ivan charge must exist before its impact"
+        );
+        assert!(
+            focused && fired && effect,
+            "{kind} must retain actual AI focus, native weapon fire and real erasure/bomb damage: focused{focused}, fired{fired}, effect{effect}"
+        );
+    }
+}
+
+#[test]
+fn ra8_original_surface_approach_keeps_its_native_temporal_building_channel() {
+    let mut app = app_with_country("germany");
+    let objective = building(&mut app, 1, "power_plant", CellPos::new(34, 12));
+    let actor = unit(&mut app, 0, "chrono_legionnaire", CellPos::new(20, 20));
+    let remote = unit(&mut app, 1, "gi", CellPos::new(44, 44));
+    let mut focused = false;
+    let mut fired = false;
+    let mut first_remaining = None;
+    let mut progressed = false;
+    let mut first_point = None;
+    for _ in 0..10000 {
+        let events = step(&mut app);
+        if events.iter().any(|event| matches!(event,
+            crate::SimEvent::WeaponFired { attacker, target, .. } if *attacker == actor && *target == objective)) {
+            fired = true;
+            let e = entity(&mut app, actor).unwrap();
+            first_point.get_or_insert(app.world().get::<crate::Position>(e).unwrap().0);
+        }
+        focused |= app
+            .world()
+            .resource::<crate::CommandQueue>()
+            .iter()
+            .any(|issued| {
+                matches!(&issued.command,
+            Command::Attack { units, target } if units.contains(&actor) && *target == objective)
+            });
+        if let Some(beam) = app
+            .world()
+            .resource::<crate::SpecialState>()
+            .erasures
+            .get(&objective)
+        {
+            let first = first_remaining.get_or_insert(beam.remaining);
+            progressed |= beam.remaining < *first;
+        }
+        if entity(&mut app, objective).is_none() {
+            break;
+        }
+    }
+    assert!(entity(&mut app, actor).is_some() && entity(&mut app, remote).is_some());
+    assert!(
+        focused && fired && progressed && entity(&mut app, objective).is_none(),
+        "original native approach must actually focus/fire/progress/erase: focused{focused} fired{fired} progressed{progressed} first_remaining{first_remaining:?} first_point{first_point:?}"
+    );
+}
