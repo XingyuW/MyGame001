@@ -1,0 +1,89 @@
+{
+  "preserved_utc": "2026-10-19T04:54:27.586332+00:00",
+  "source": "../ra8",
+  "frozen_commit": "24094ecc0d9b3e3abb3c8173a20200775095defc",
+  "runtime_commit": "4e2c3774cff5b2d26c5630413227f2c35f776877",
+  "files": [
+    {
+      "file": "01-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "02-diff-check.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "03-clippy.log",
+      "bytes": 72,
+      "sha256": "722d29ea08e9c02d30dfca303565fa46ef94610bb96adaf4242a9fabe05e9436"
+    },
+    {
+      "file": "04-test.log",
+      "bytes": 23827,
+      "sha256": "d68cbb5d025275f7f293949d10a3aae0717cbf526e6df9993afd50dc66ec6c2a"
+    },
+    {
+      "file": "05-build-release.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "gate-process-output.log",
+      "bytes": 234,
+      "sha256": "99e16e4ed622d86b8a7df606c5b110c90236043e05c4090740df70f226d3244c"
+    },
+    {
+      "file": "gate-process.json",
+      "bytes": 2760,
+      "sha256": "2ec0aac41c0c548e319de4b8ab1748d89d8d3ca8c256667aad3a7e0ea2268494"
+    },
+    {
+      "file": "production-lengths-before.tsv",
+      "bytes": 49763,
+      "sha256": "6c3ec135cec4acb23ec3489e7324cfc760e12c6e0da6727fef8675901548d435"
+    },
+    {
+      "file": "production-lengths.tsv",
+      "bytes": 49763,
+      "sha256": "6c3ec135cec4acb23ec3489e7324cfc760e12c6e0da6727fef8675901548d435"
+    },
+    {
+      "file": "production-liveness1.json",
+      "bytes": 343,
+      "sha256": "f487d30b24682c3de2c54cf5db5dc60cd7b99b2d8259a2b04a28c0be623acc69"
+    },
+    {
+      "file": "production-liveness2.json",
+      "bytes": 664,
+      "sha256": "4057d3d73491aab06282400a98b9d3d4f3a034611afeedfd66d9ed9a2b344de0"
+    },
+    {
+      "file": "production-liveness3.json",
+      "bytes": 316,
+      "sha256": "abd692ed6fe97abfb76e6b15c77d75b2595c777ee067849146c7347e6f49e8d6"
+    },
+    {
+      "file": "production-liveness4.json",
+      "bytes": 445,
+      "sha256": "7f732f0ac0fe64ccf7958110e1abb1c20930774abcfb82dbdcd589debe24f049"
+    },
+    {
+      "file": "production-liveness5.json",
+      "bytes": 448,
+      "sha256": "b834f93b726bda6db30b206b653f4ba7b93f95f67bad4acac274afae297ec4fb"
+    },
+    {
+      "file": "production-liveness6.json",
+      "bytes": 448,
+      "sha256": "8e080ae715a1e70f2c662c5db1a500b723716fec9de4c22b6c77adc2dd87392f"
+    },
+    {
+      "file": "summary.txt",
+      "bytes": 234,
+      "sha256": "99e16e4ed622d86b8a7df606c5b110c90236043e05c4090740df70f226d3244c"
+    }
+  ],
+  "note": "Complete current files preserved including old timestamped liveness records and any partial next phase. Script was stopped after completed workspace101; no fresh production success."
+}

@@ -1,0 +1,11 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 5.21s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+finite first cohort sourcefirst3333 delay3333 joinedSome(5441)
+finite reinforcementSome(8781) outcomeNone
+test ra8_ready_finite_cohorts_use_shorter_assembly_but_keep_the_source_team_delay ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 91 filtered out; finished in 0.20s
+

@@ -1,13 +1,13 @@
 # RA8 acceptance record
 
-Status: ninth source checkpoint has passed fresh scoped preflight:17 commands all0,
-165 tests passed/0failed/0ignored across10 target invocations,all31 retained exact winners,
-and21/21 actual default ten-player winners with ten builders each. Fixed256×256 means are
-3.391/2.314/1.497ms,below5ms. Runtime source commit is `4e2c3774cff5b2d26c5630413227f2c35f776877`
-(AIa833cde5/strategy746f4d9e),with the identity and snapshots recorded in checkpoint9.json. All13 frozen commands
-and both fresh756-winner R29 distributions remain required. This is validated preflight,
-not independent review or completed RA8 acceptance. Every earlier failed/interrupted/raw
-observation and corrected hypothesis remains preserved.
+Status: tenth source checkpoint passes reduced fresh scoped preflight:17 commands all0,
+145 tests passed/0failed/0ignored across10 target invocations. The exact previously failing
+Crossroads112×112 ten-country Medium seed7 now wins within unchanged72000;all21 default
+m13 maps win with ten builders each. Fixed256 means0.851890/0.779806/0.778092ms pass5ms.
+Runtime commit is `016300034474deb8db0be570c5569124372c3d75` (AI1f5325e2/strategy5c5fd561).
+Mandatory full13 and both fresh756-winner R29 distributions remain required. This is
+validated preflight,not independent review or completed RA8 acceptance. Every earlier failed,
+interrupted,insufficient and corrected observation remains preserved.
 
 ## Acceptance checklist
 
@@ -34,7 +34,7 @@ observation and corrected hypothesis remains preserved.
 
 ## Policy and evidence
 
-R88–R155 in `docs/DECISIONS.md` record the implementation, exact existing-test migrations,
+R88–R158 in `docs/DECISIONS.md` record the implementation, exact existing-test migrations,
 game-owned AI assumptions, failure diagnoses, negative mutation and process deviations.
 Source difficulty and target weights come from the audited reference table. Closed-source
 AI policy is not claimed: composition, tier reserves, target-category mapping, garrison/depot
@@ -49,6 +49,78 @@ No clone, worktree or validation environment was created. Configured Cargo/UV/PI
 preserved. New recreatable parser scratch is at configured Cargo target `tmp/ra8_definitions`
 (716 KiB measured after the slow-speed parser fixture;58 files/584038 file bytes), retained for reruns and unnecessary for release.
 Earlier RA5 render and RA7 parser evidence remain.
+
+## Tenth checkpoint: final1 focused evidence and failed ninth gate
+
+[Structured checkpoint](ra8-preflight/checkpoint10.json),[metrics](ra8-preflight/checkpoint10-metrics.json)
+and [inventory](ra8-preflight/checkpoint10-inventory.json) distinguish static1321 tests versus
+RA7's1124 (+197,none removed/renamed/ignored) from executed145/0/0 across10 target invocations.
+All17 reduced preflight commands exit0;sum1734.447396s/wall1735.197687s,summary SHA
+`afd872814f7fad64029a60a20abca45b59294c2330b21a2f4bd73b4eadf08d18`.
+This includes strict fmt/unfiltered diff/Clippy/generator/reference,AI92,attrition10,recovery20,
+composition/hash14,RA4two,defaultDemo's ten-pairing guard,the exact grown-map failure plus both
+neighbor guards,and explicit m13/m14/m7 example guards. The unchanged31-case target,fullsim,
+game/M10/companions are not redundantly preflight-run here:mandatory workspace command4
+still runs them unfiltered. This is an efficiency change,not omitted gate coverage.
+
+The ninth frozen gate on24094ec/runtime4e2c377 fails workspace command4:230passed/1failed/
+0ignored after494 script seconds (493.779907s monotonic phase interval). Its exact default
+Crossroads112×112 ten-player seed7 returnsNone72000. Later phases are stopped;partial05 and
+both stale production tables are preserved,not claimed passed/fresh756. Wrapper−15/497.877587s
+and every raw byte are retained in `ra8-attempt9/`;the current canonical failed label and
+archive each have16files/129317bytes. Fresh [preservation](ra8-preflight/checkpoint10-attempt9-preservation.json)
+verifies32copies with0mismatches before label reuse. Timestamped older health records remain
+explicitly historical. Earlier attempt8/older evidence is unchanged.
+
+R156 closes actual paid-repair renewal by an unpowered strategic remnant and powered
+support-only remnant without beneficiaries,while retaining real owned forces/income/production/
+paid power recovery and native Nuke/Storm/American paradrop opportunities. R157 proves actual
+mixed barracks/factory admissions can corrupt shared country-composition progress;ordered
+per-QueueKey cursors now advance independently and every new value/key is hashed. Legacy
+neutral scalar traversal stays unchanged. The existing national capture fixture now captures
+the first actual paid national within its original16-admission bound,explicitly one before/
+zero after capture;all original physical/cost/replacement/cap assertions remain. R158's ONE
+global generator-owned game-policy trial halves unscaled patience toEasy1800/Medium1200/
+Brutal900. Source TeamDelays4667/3333/2667,first-wave/think cadence,multipliers,prices,defense
+counts,caps,reserves and limits remain exact. Ready finite cohorts still respect source wave
+spacing;healthy slow AA progress retains its lease. The no-progress reinforcement fixture
+keeps every original quantitative/HP/release/bound assertion but supplies fresh real recruits
+every two actual think intervals,so30 batches challenge the shorter1200 lease. This is a named
+pressure-setup migration,not a renewed-hold bug or reduced threshold. Refuted long-idle/cargo/
+refund leads and the rejected paired-V3 trial remain preserved. Exact seed7 now P1LibyaWon68628,
+with all original9-defeated/made-start assertions unchanged. Credit the combined ending only.
+
+All21 actual-default m13 maps have explicit winners and ten builders;median94209/p90 nearest-
+rank129403/max166861 under unchanged400000. Command1478.090826s;measured sum1474.413s/elapsed
+sum1474.570s. Worst whole-run meanCoral1.107ms;Ember's180.970ms longest tick remains. Raw SHA
+`c422eb2ac86af44bf0f3bf7889b409df648ce4dd286576abe69edacabb775918`.
+No profiler or competing simulation ran;no optional optimization follows passing means.
+The prior checkpoint9 distribution remains historical,not either required756-match R29 sweep.
+
+| Fixed256 map | Ticks | Mean ms | p99 ms | Maximum ms | Busiest1000 mean ms | Ticks>50ms | Builders |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Liberty Bay | 24000 | 0.851890 | 4.949 | 94.791 | 1.550 | 2 | 10 |
+| Continental Divide | 24000 | 0.779806 | 3.994 | 86.297 | 2.195 | 2 | 10 |
+| Pacific Atoll | 24000 | 0.778092 | 12.695 | 34.920 | 1.730 | 0 | 10 |
+
+Fixed command exits0/58.360914s,raw SHA
+`f4fedfe284622f4184b920bc8188ad2ced65045f2d851a5cdcce509c706bd44e`.
+These finite-duration runs prove budget/builders,not endings. Passing means do not establish
+smoothness or a maximum-tick guarantee. Current342-runtime and101-additional-test/example
+snapshots both rehash with0mismatches;the latter complements the recorded runtime set,not a
+retrospective assertion that older sets included every integration file. Manifest SHAs are
+`ccb5c922b8b2625813d6b442896c9d6ba9d2f408d1a407e0a873318b56cd4a52` and
+`3e8a021515f1fb869d611cf404b2bedb2c2eaf8c47e78115bc0fddccdfc4e440`.
+
+No new substantial external directory is created. Fresh storage remains RA5render10files/
+875468logical/901120allocated,RA7parser70files/11615632logical/11755520allocated,and RA8parser
+58files/584038logical/733184allocated. Retained caches/evidence are recreatable and unnecessary
+for release;no clone/worktree/system-tmp validation artifact is created. RA9 retains M6review2
+P2 gathering-point terrain-only floodfill/owned-yard partition,R83 transport/loaded boarding/
+attached-Squid firing,R96 actorless occupied-Prop abilities and R99's unproven capability lead.
+R97 is closed in R103. NewR156–158 policy/state/migrations join independent review scope.
+Full13,both fresh756 R29 distributions,independent review and user visual/audio/play feel remain
+pending. Source staged hygiene exits0;evidence's separate raw-only check is recorded below.
 
 ## Ninth checkpoint: final8 scoped evidence
 
@@ -798,3 +870,11 @@ exits2,NOT passed;140 exact captured raw-log-only diagnostics are preserved/clas
 with every path,line,file/line SHA and staged blob. No source/data/test/document hygiene
 error is waived. Full unfiltered stdout/stderr are retained;require identical final staged
 output before the later deliberate evidence commit. No whitespace suppression is used.
+
+Checkpoint10 commit hygiene: source's separate staged unfiltered check exits0 over8paths.
+Evidence's separate unfiltered cached check exits2,NOT passed:18 captured native-log blank-EOF
+diagnostics,0source/data/test/document errors. Every exact path/line/fileSHA/EOL-lineSHA/staged
+blob is preserved in checkpoint10-staged-hygiene.json;full raw stdout/stderr remain in its
+-raw companion. stdout SHAb5e283813107e573e1c77905fcb1e70d6a36fa43c2665d2d83ff608f8dc7030a.
+No raw byte is normalized or suppressed. Require identical final staged output before a
+separate deliberate evidence commit.

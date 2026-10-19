@@ -1,0 +1,20 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+error[E0502]: cannot borrow `*world` as mutable because it is also borrowed as immutable
+   --> crates/game/tests/m13_grown_maps.rs:521:109
+    |
+520 | ... = world.resource::<Players>().get(PlayerId(0)).unwrap();
+    |       ----- immutable borrow occurs here
+521 | ...edits(), state.queues().all(|(_, queue)| queue.is_empty()), state.repairing().clone(), world.query::<(&sim::SimId, &Owner, &sim::Health)>().iter(world).filter(|(_, owner, _)| owner.0 == PlayerId(0)).map(|(id, _, hp)| (*id, hp.hit_points)).collect::<BTreeMap<_,_>>())
+    |             --------------                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ mutable borrow occurs here                                                                                                   - ... and the immutable borrow might be used here, when that temporary is dropped and runs the destructor for type `impl Iterator<Item = (QueueKey, &[QueueItem])>`
+    |             |
+    |             a temporary with access to the immutable borrow is created here ...
+    |
+    = note: the temporary is part of an expression at the end of a block;
+            consider forcing this temporary to be dropped sooner, before the block's local variables are dropped
+help: for example, you could save the expression's value in a new local variable `x` and then make `x` be the expression at the end of the block
+    |
+521 |             let x = (state.credits(), state.queues().all(|(_, queue)| queue.is_empty()), state.repairing().clone(), world.query::<(&sim::SimId, &Owner, &sim::Health)>().iter(world).filter(|(_, owner, _)| owner.0 == PlayerId(0)).map(|(id, _, hp)| (*id, hp.hit_points)).collect::<BTreeMap<_,_>>()); x
+    |             +++++++                                                                                                                                                                                                                                                                                    +++
+
+For more information about this error, try `rustc --explain E0502`.
+error: could not compile `game` (test "m13_grown_maps") due to 1 previous error

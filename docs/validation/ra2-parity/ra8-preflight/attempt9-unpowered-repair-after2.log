@@ -1,0 +1,22 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 28.41s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 3 tests
+
+thread 'ra8_an_unpowered_strategic_source_keeps_repairs_during_real_paid_power_recovery' (8981080) panicked at crates/sim/tests/ra8_ai.rs:182:5:
+[CommandRejected { player: PlayerId(0), command: QueueProduction { item: Building(BuildingKind(1)) }, reason: QueueFull { producer: BuildingKind(0), max: 1 } }, SuperweaponBuilt { player: PlayerId(0), role: Chronosphere }]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_an_unpowered_strategic_source_keeps_repairs_during_real_paid_power_recovery ... FAILED
+unpowered strategic remnant paid credit changes 1, ordinary repair-off true
+test ra8_an_unpowered_strategic_remnant_cannot_keep_futile_paid_repairs_alive ... ok
+test ra8_an_unpowered_chronosphere_keeps_repairs_for_its_real_support_force ... ok
+
+failures:
+
+failures:
+    ra8_an_unpowered_strategic_source_keeps_repairs_during_real_paid_power_recovery
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 86 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

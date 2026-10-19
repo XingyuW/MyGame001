@@ -1,0 +1,31 @@
+{
+  "label": "attempt9-grown-trace-before2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "m13_grown_maps",
+    "a_ten_player_match_on_the_smallest_map_is_played_to_its_end",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "env": {
+    "RA8_GROWN_TRACE": "1"
+  },
+  "start_utc": "2026-10-19T04:58:42.170177+00:00",
+  "elapsed_seconds": 65.74331166601041,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+  },
+  "log_sha256": "5b69cf7b2264f13b2c46c545e45800213d043dec5f62af8cd0c4f52aeb8b7a9e"
+}

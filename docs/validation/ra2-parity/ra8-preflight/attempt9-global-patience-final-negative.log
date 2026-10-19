@@ -1,0 +1,20 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 5.21s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+finite first cohort sourcefirst3333 delay3333 joinedNone
+
+thread 'ra8_ready_finite_cohorts_use_shorter_assembly_but_keep_the_source_team_delay' (9053840) panicked at crates/sim/tests/ra8_ai.rs:4183:10:
+a ready finite cohort must not add another complete source TeamDelay of assembly
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_ready_finite_cohorts_use_shorter_assembly_but_keep_the_source_team_delay ... FAILED
+
+failures:
+
+failures:
+    ra8_ready_finite_cohorts_use_shorter_assembly_but_keep_the_source_team_delay
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 91 filtered out; finished in 0.13s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`
