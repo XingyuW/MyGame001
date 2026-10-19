@@ -1,0 +1,30 @@
+{
+  "label": "attempt8-naval-unit-points-before2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_naval_unit_",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "env": {},
+  "purpose": "Correct new fixture command construction to actual IssuedCommand API; retain prior compile failure. Actual point/movement/Gap controls before runtime changes.",
+  "start_utc": "2026-10-19T00:07:25.148283+00:00",
+  "elapsed_seconds": 6.177918999979738,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "65a00aa3fa4636b49354f51792970c41424ee4ce1893dfeca112b67294220337"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "65a00aa3fa4636b49354f51792970c41424ee4ce1893dfeca112b67294220337"
+  },
+  "log_sha256": "a6d715a65aa72c6a7ef47db794138085c218ac3c7841e1afdaa565ac4b3b716e"
+}

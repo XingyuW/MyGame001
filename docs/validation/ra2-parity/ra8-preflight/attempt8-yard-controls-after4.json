@@ -1,0 +1,29 @@
+{
+  "label": "attempt8-yard-controls-after4",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ra8_naval_site_preference",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "env": {},
+  "purpose": "Correct the observer-keyed hidden-state assertion; run scheduled hidden-unit intent/hash and source min/target/fallback controls. Prior test compile error preserved.",
+  "start_utc": "2026-10-19T03:21:27.385520+00:00",
+  "elapsed_seconds": 17.699154458008707,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+  },
+  "log_sha256": "8043c754c3b8faf9ed260d8153ba04d43cfb10c5b34d4990493fffc9799961d9"
+}

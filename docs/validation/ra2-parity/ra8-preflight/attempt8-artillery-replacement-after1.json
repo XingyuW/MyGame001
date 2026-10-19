@@ -1,0 +1,28 @@
+{
+  "label": "attempt8-artillery-replacement-after1",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_a_remote_replacement_tank_does_not_pull_advancing_artillery_back_home",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "purpose": "Reject only newly computed rear artillery slots behind a remote tank beyond source weapon range; preserve healthy approach and actual source Barracks fire/destruction. No timer/state/newtuning.",
+  "start_utc": "2026-10-18T20:57:05.260619+00:00",
+  "elapsed_seconds": 27.312781832995825,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e",
+    "crates/sim/src/ai/strategy.rs": "97bf9859f160d5f4d6e8a54f0b10a948f6c974ffb3ba3e83a8b9e88e9fa055e3"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e",
+    "crates/sim/src/ai/strategy.rs": "97bf9859f160d5f4d6e8a54f0b10a948f6c974ffb3ba3e83a8b9e88e9fa055e3"
+  },
+  "log_sha256": "c607a19bd5a5853dc3117fdc70b23d38354fd6d8c480db9ebfba72049973e982"
+}

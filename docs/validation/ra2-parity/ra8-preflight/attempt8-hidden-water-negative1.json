@@ -1,0 +1,24 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_unseen_enemy_water_building_cannot_change_naval_planning",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "start_utc": "2026-10-18T19:45:32.118492+00:00",
+  "elapsed_seconds": 18.54335783299757,
+  "exit": 101,
+  "original_sha256": "9e539b2a5509ea1bc462ee8f9324bbf08106ddd7d4939afd258878730530cae2",
+  "mutated_sha256": "a5fd3e9e4ee10e62b8a1a2ba1f6d2404f2fbd5ebc8ab1b8d68fd1aa4d6f56692",
+  "restored_sha256": "9e539b2a5509ea1bc462ee8f9324bbf08106ddd7d4939afd258878730530cae2",
+  "mutation": "only remove observed-or-unknown guard from naval water-component building exclusion; ordinary raw occupancy then leaks unseen building",
+  "log_sha256": "3112966b02c71d8ad543701e76c4e9c48f6ace73742394070912d56445690d9f"
+}

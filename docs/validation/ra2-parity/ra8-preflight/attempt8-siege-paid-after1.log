@@ -1,0 +1,27 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 21.30s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 6 tests
+test ai::ra8_composition_tests::ra8_germany_pays_its_declared_siege_pair_and_national_unit_again_after_real_casualties ... 
+thread 'ai::ra8_composition_tests::ra8_germany_pays_its_declared_siege_pair_and_national_unit_again_after_real_casualties' (8137269) panicked at crates/sim/src/ai/ra8_composition_tests.rs:213:5:
+assertion `left == right` failed
+  left: [UnitKind(25), UnitKind(17), UnitKind(25), UnitKind(25)]
+ right: [UnitKind(17), UnitKind(25), UnitKind(25), UnitKind(27)]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test ai::ra8_composition_tests::ra8_legacy_composition_keeps_its_existing_paid_traversal ... ok
+test ai::ra8_composition_tests::ra8_opted_in_composition_pays_and_spawns_every_declared_entry_in_order_and_wraps ... actual paid traversal [UnitKind(17), UnitKind(25), UnitKind(24), UnitKind(17), UnitKind(25), UnitKind(24)]; expected [UnitKind(17), UnitKind(25), UnitKind(24), UnitKind(17), UnitKind(25), UnitKind(24)]
+ok
+test ai::ra8_composition_tests::ra8_opted_in_composition_skips_a_funded_locked_entry_and_pays_later_legal_units ... ok
+test ai::ra8_composition_tests::ra8_opted_in_composition_skips_locked_and_unaffordable_entries_without_losing_legal_work ... ok
+test ai::ra8_composition_tests::ra8_opted_in_tier_reserves_share_real_queue_bounds_and_paid_capacity ... ok
+
+failures:
+
+failures:
+    ai::ra8_composition_tests::ra8_germany_pays_its_declared_siege_pair_and_national_unit_again_after_real_casualties
+
+test result: FAILED. 5 passed; 1 failed; 0 ignored; 0 measured; 91 filtered out; finished in 0.66s
+
+error: test failed, to rerun pass `-p sim --lib`

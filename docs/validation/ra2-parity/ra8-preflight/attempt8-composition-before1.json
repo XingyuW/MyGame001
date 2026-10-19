@@ -1,0 +1,27 @@
+{
+  "label": "attempt8-composition-before1",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--lib",
+    "ra8_composition_tests",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "Controlled normal paid queues/spawns prove or refute declared opted-in traversal, wraparound, funded/locked entries, real tier reservations and preserved legacy behavior before any runtime correction.",
+  "start_utc": "2026-10-18T20:33:11.082899+00:00",
+  "elapsed_seconds": 23.310236917051952,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "cc075e26fe7d12262c0eeafb6e6e32848783482ef705187ea50da4fcba9f0c8e",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "cc075e26fe7d12262c0eeafb6e6e32848783482ef705187ea50da4fcba9f0c8e",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "log_sha256": "d9582b588e9c146106886f587e9574ae8c29d1aff7c3c883b896a2a0825fdec8"
+}

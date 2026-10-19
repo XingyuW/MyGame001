@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 23.20s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+test ra8_unseen_water_obstacle_before_the_edge_range_endpoint_cannot_change_naval_planning ... 
+thread 'ra8_unseen_water_obstacle_before_the_edge_range_endpoint_cannot_change_naval_planning' (8256398) panicked at crates/sim/tests/ra8_ai.rs:4238:9:
+the released live hull must receive a fresh qualified mission at the comparison decision
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ra8_unseen_water_obstacle_before_the_edge_range_endpoint_cannot_change_naval_planning
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 81 filtered out; finished in 0.06s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

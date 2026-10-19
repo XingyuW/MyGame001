@@ -1,0 +1,30 @@
+{
+  "label": "attempt8-yard-site-after2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_composition_tests::ra8_paid_shipyard_uses_an_available_same_sea_site_outside_observed_bombardment",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "env": {},
+  "purpose": "Isolate snapshot endpoint preference with three actual occupied source firing cells exhausting their separate pond. Earlier after1 selected a safe current endpoint but mobile hulls later approached; not a future-safety guarantee.",
+  "start_utc": "2026-10-19T03:19:00.009578+00:00",
+  "elapsed_seconds": 20.398076082987245,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+  },
+  "log_sha256": "8436bf3e2982bf300686a0d2a88b6c5cf2a53b63f0d49246aa4f4427d1c2b1a7"
+}

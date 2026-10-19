@@ -1,0 +1,30 @@
+{
+  "label": "attempt8-independent-strategic-cohort-before1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_attrition_tests::ra8_failed_real_sorties_do_not_blacklist_a_naturally_charged_strategic_strike",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "env": {},
+  "purpose": "Before-fix schedule proof: actual Harrier ammunition/paid-repair failures then naturally charged ordinary Weather strike; no injected readiness/history and retained failed-ground-job assertions.",
+  "start_utc": "2026-10-19T02:20:02.412067+00:00",
+  "elapsed_seconds": 25.37273645796813,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591"
+  },
+  "log_sha256": "624c798fe88260b6b76e5d621f1140b296611ebf429188941746199ad05949a3"
+}

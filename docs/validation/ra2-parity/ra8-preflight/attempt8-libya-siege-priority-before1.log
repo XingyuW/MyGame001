@@ -1,0 +1,20 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 17.99s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+test ai::ra8_composition_tests::ra8_libya_shipped_land_cycle_funds_and_spawns_siege_alongside_its_national_reserve ... Libya actual mixed-lane paid cycle [UnitKind(0), UnitKind(10), UnitKind(29), UnitKind(12), UnitKind(0), UnitKind(10), UnitKind(26), UnitKind(12), UnitKind(0), UnitKind(18), UnitKind(10), UnitKind(18), UnitKind(12), UnitKind(0), UnitKind(18), UnitKind(18)]
+
+thread 'ai::ra8_composition_tests::ra8_libya_shipped_land_cycle_funds_and_spawns_siege_alongside_its_national_reserve' (8508978) panicked at crates/sim/src/ai/ra8_composition_tests.rs:413:5:
+legally affordable source siege must actually be funded and spawned through the mixed-producer plan
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ai::ra8_composition_tests::ra8_libya_shipped_land_cycle_funds_and_spawns_siege_alongside_its_national_reserve
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 105 filtered out; finished in 0.20s
+
+error: test failed, to rerun pass `-p sim --lib`

@@ -1,0 +1,30 @@
+{
+  "label": "attempt8-yard-site-after1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_composition_tests::ra8_paid_shipyard_uses_an_available_same_sea_site_outside_observed_bombardment",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "env": {},
+  "purpose": "Prefer ordinary qualified naval sites outside currently observed source unit min/max fire; real paid yard and counterforce production, unchanged source prices and component/placement rules.",
+  "start_utc": "2026-10-19T03:18:01.799481+00:00",
+  "elapsed_seconds": 18.180146583006717,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+  },
+  "log_sha256": "63032d79b3712d594c9ca349456cc83c659f08b2e71072cc978d88fe5fd373f8"
+}

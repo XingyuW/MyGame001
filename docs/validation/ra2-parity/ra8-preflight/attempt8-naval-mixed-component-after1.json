@@ -1,0 +1,29 @@
+{
+  "label": "attempt8-naval-mixed-component-after1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_mixed_naval_recruitment_",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "Prove shared sea goal no longer excludes legal farther Dread cells, including actual paid hull completion and shore fire.",
+  "start_utc": "2026-10-19T00:13:52.831919+00:00",
+  "elapsed_seconds": 0.20116749999579042,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "fd133e66d93fff14030be8e5cf1933c4e134e6fe3b5857b06118db8d2cff7337"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "fd133e66d93fff14030be8e5cf1933c4e134e6fe3b5857b06118db8d2cff7337"
+  },
+  "log_sha256": "8171141e0596da4609f2b5ca47d619087dd353e4d0febec6abb691540e536fb9"
+}

@@ -1,0 +1,28 @@
+{
+  "label": "attempt8-libya-siege-priority-before1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_composition_tests::ra8_libya_shipped_land_cycle_",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "Before any data retune, actual Libya land-cycle/mixed-lane paid spawn control on normal owners/prerequisites/source prices/cadence/advanced quota; no map-specific behavior.",
+  "start_utc": "2026-10-19T00:50:42.992446+00:00",
+  "elapsed_seconds": 18.396188999991864,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591"
+  },
+  "log_sha256": "e5bdb10f0ec314bf08b44c5d361aaf6800fbddb471554a43eda149c61fca4185"
+}

@@ -1,0 +1,29 @@
+{
+  "label": "attempt8-naval-minimum-after1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "dreadnought",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "Source min/max observation-qualified reach for capability, prospective yards and admission; both actual tiny-pond failures plus unchanged back-out/fire/destroy positive, no source weapon/stat/limit change.",
+  "start_utc": "2026-10-18T22:25:59.830582+00:00",
+  "elapsed_seconds": 19.597124541003723,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "41b8afa0583e9f6eda7d4244f0b03eb5d29940828cb75b3c1faa212ad4bf8ad4"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "41b8afa0583e9f6eda7d4244f0b03eb5d29940828cb75b3c1faa212ad4bf8ad4"
+  },
+  "log_sha256": "954a284661465f8469c2fcfb2cbe633b9052e19280f364a076db8d6883f6d2e9"
+}

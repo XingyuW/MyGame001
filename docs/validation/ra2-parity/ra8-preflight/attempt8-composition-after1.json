@@ -1,0 +1,27 @@
+{
+  "label": "attempt8-composition-after1",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--lib",
+    "ra8_composition_tests",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "Opted-in saved traversal origin; normal paid ordered/wrapped spawns, locked/unaffordable guard, actual tier queues and unchanged legacy traversal. No data/difficulty/weapon/cadence change.",
+  "start_utc": "2026-10-18T20:38:43.426295+00:00",
+  "elapsed_seconds": 23.50443833397003,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "log_sha256": "46846970f7b0ee5bb02dc514a0abe8f446f6104a0727643e06bc26086e7a39a5"
+}

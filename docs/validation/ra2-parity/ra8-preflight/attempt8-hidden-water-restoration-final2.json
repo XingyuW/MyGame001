@@ -1,0 +1,7 @@
+{
+  "separate_post_finally_sha_read_confirmed": true,
+  "sources": {
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a",
+    "crates/sim/src/ai.rs": "19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7"
+  }
+}

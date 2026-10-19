@@ -1,0 +1,12 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 44.36s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 3 tests
+test ai::ra8_composition_tests::ra8_libya_replaces_its_national_with_paid_production_after_real_enemy_capture ... ok
+test ai::ra8_composition_tests::ra8_libya_shipped_land_cycle_funds_and_spawns_siege_alongside_its_national_reserve ... Libya actual mixed-lane paid cycle [UnitKind(0), UnitKind(10), UnitKind(29), UnitKind(12), UnitKind(0), UnitKind(10), UnitKind(26), UnitKind(12), UnitKind(0), UnitKind(18), UnitKind(10), UnitKind(18), UnitKind(12), UnitKind(0), UnitKind(22), UnitKind(18)]
+ok
+test ai::ra8_composition_tests::ra8_libya_siege_priority_keeps_the_normal_locked_tech_tank_opening ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 105 filtered out; finished in 1.29s
+

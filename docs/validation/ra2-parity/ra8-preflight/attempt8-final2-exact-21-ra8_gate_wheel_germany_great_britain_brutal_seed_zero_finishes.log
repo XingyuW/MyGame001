@@ -1,0 +1,9 @@
+    Finished `release` profile [optimized] target(s) in 0.34s
+     Running tests/ra8_gate_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_gate_matches-556affa51f6ab831)
+
+running 1 test
+test ra8_gate_wheel_germany_great_britain_brutal_seed_zero_finishes ... wheel_of_worlds seed0 ["germany", "great_britain"] ["brutal", "brutal"]: Some(Won { winner: PlayerId(1), tick: 57417 })
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 30 filtered out; finished in 100.76s
+

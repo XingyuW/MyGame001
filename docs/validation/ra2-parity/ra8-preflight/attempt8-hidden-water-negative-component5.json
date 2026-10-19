@@ -1,0 +1,23 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_unseen_water_obstacle_before_the_edge_range_endpoint_cannot_change_naval_planning",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "Remove only honest hidden-building occupancy guard on final unit/component source. Finally restore exact original bytes before any dependent work.",
+  "elapsed_seconds": 19.516348666977137,
+  "exit": 101,
+  "source_before": "95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591",
+  "source_mutated": "e2f3d64b8f508fab50d7e3b6a4f1b53c9a98b7cef8a5829e21c9ee21bb76cc34",
+  "source_restored": "95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591",
+  "log_sha256": "4bf3f8bc167759307e963a00dd17333d4f80357f62d1a2eae6edcc1ff1e71cac"
+}

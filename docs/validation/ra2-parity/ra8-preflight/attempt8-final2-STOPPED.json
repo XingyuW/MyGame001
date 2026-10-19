@@ -1,0 +1,39 @@
+{
+  "utc": "2026-10-18T23:24:52.419575+00:00",
+  "reason": "Completed exact24 Pacific None288000; batch automatically stopped, all dependent commands unrun.",
+  "summary_sha256": "a2103d2a3587e739425fc9c11a31bd309da87e21c77c841cfcf3ce85a28e9270",
+  "manifest_sha256": "eba9f5a0b914250dd1a21b435901e0d28dbd77f28ce8d8c4a24d16f42534a46a",
+  "file_count": 342,
+  "mismatches": {},
+  "completed_commands": 34,
+  "passed": 134,
+  "failed": 1,
+  "ignored": 0,
+  "elapsed_seconds": 2849.2869265420013,
+  "failure": {
+    "phase": "exact-24-ra8_gate7_pacific_cuba_great_britain_brutal_seed_zero_finishes",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate7_pacific_cuba_great_britain_brutal_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 101,
+    "elapsed_seconds": 471.9475079579861,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-24-ra8_gate7_pacific_cuba_great_britain_brutal_seed_zero_finishes.log",
+    "sha256": "f6296a794564f6d646b77b9f287f38612415dede1896c12ed9cba46d1f018b08",
+    "test_targets": 1,
+    "passed": 0,
+    "failed": 1,
+    "ignored": 0,
+    "source_mismatches": []
+  }
+}

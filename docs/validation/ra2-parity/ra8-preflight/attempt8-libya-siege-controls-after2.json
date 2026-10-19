@@ -1,0 +1,28 @@
+{
+  "label": "attempt8-libya-siege-controls-after2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_composition_tests::ra8_libya_",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "Candidate Libya controls: initial source legality/cost and actual mixed paid siege; locked-tech two-tank opening; ordinary move plus actual enemy mind-control capture then paid national replacement.",
+  "start_utc": "2026-10-19T00:56:59.550660+00:00",
+  "elapsed_seconds": 30.469339457980823,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591"
+  },
+  "log_sha256": "6372720a56dbb0352fe8b81f3cbfa9cfb6cf41de7aa56c78d8f3f7798b6a376b"
+}

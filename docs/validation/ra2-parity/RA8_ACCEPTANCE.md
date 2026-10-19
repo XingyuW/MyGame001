@@ -1,11 +1,13 @@
 # RA8 acceptance record
 
-Status: eighth final-source checkpoint is ready for committed milestone checks. Runtime
-`f431d122d1c147fdc948d21b55156aa0a7477cc1` passes1238 preflight tests/106 target invocations,
-all26 retained exact winners,and21/21 actual default ten-player winners. Fixed256×256 means
-are0.963805/1.028/0.807054ms,below5ms. All13 frozen commands and both fresh756-winner R29
-distributions remain required. This is validated preflight,not independent review or completed
-RA8 acceptance. Every earlier failed attempt and raw evidence remains preserved.
+Status: ninth source checkpoint has passed fresh scoped preflight:17 commands all0,
+165 tests passed/0failed/0ignored across10 target invocations,all31 retained exact winners,
+and21/21 actual default ten-player winners with ten builders each. Fixed256×256 means are
+3.391/2.314/1.497ms,below5ms. Runtime source commit is `4e2c3774cff5b2d26c5630413227f2c35f776877`
+(AIa833cde5/strategy746f4d9e),with the identity and snapshots recorded in checkpoint9.json. All13 frozen commands
+and both fresh756-winner R29 distributions remain required. This is validated preflight,
+not independent review or completed RA8 acceptance. Every earlier failed/interrupted/raw
+observation and corrected hypothesis remains preserved.
 
 ## Acceptance checklist
 
@@ -32,7 +34,7 @@ RA8 acceptance. Every earlier failed attempt and raw evidence remains preserved.
 
 ## Policy and evidence
 
-R88–R98 in `docs/DECISIONS.md` record the implementation, exact existing-test migrations,
+R88–R155 in `docs/DECISIONS.md` record the implementation, exact existing-test migrations,
 game-owned AI assumptions, failure diagnoses, negative mutation and process deviations.
 Source difficulty and target weights come from the audited reference table. Closed-source
 AI policy is not claimed: composition, tier reserves, target-category mapping, garrison/depot
@@ -47,6 +49,60 @@ No clone, worktree or validation environment was created. Configured Cargo/UV/PI
 preserved. New recreatable parser scratch is at configured Cargo target `tmp/ra8_definitions`
 (716 KiB measured after the slow-speed parser fixture;58 files/584038 file bytes), retained for reruns and unnecessary for release.
 Earlier RA5 render and RA7 parser evidence remain.
+
+## Ninth checkpoint: final8 scoped evidence
+
+[Structured metrics](ra8-preflight/checkpoint9-metrics.json) retain all21 per-map timings,
+endings,builders and raw blocks. The complete all-map command exits0 in2496.001729s with
+median101272/p90 nearest-rank152216/max275899 below unchanged400000. Worst whole-map mean
+is Coral1.693ms;Frostline has a319.024ms maximum and8.475ms busiest1000mean. Passing whole-run
+means do not establish smooth play or a maximum-tick bound. No optional optimization/repeat
+is justified. The31 retained cases are not either required756-match distribution.
+
+| Fixed256 map | Ticks | Mean ms | p99 ms | Maximum ms | Busiest1000 mean ms | Ticks>50ms | Builders |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Liberty Bay | 24000 | 3.391 | 19.901 | 295.763 | 5.568 | 32 | 10 |
+| Continental Divide | 24000 | 2.314 | 14.325 | 133.283 | 5.445 | 17 | 10 |
+| Pacific Atoll | 24000 | 1.497 | 20.368 | 160.131 | 2.517 | 23 | 10 |
+
+Raw all-map SHA338ca4002178a162921a649785511986c428d8b0aeec6d5b7245c20fb12a65e5;
+fixed256 SHAdf574b1e02e388e79fdfc27388be5bfdc365d8c65ad8ee773807e662d0eb8b18.
+The example guards m13_ten_players,m14_duels,m7_soak explicitly execute and pass one test
+each. Ordinary workspace testing does not execute their example tests. The mandatory
+unfiltered workspace command4 supplies fullsim/game/M10/companions;duplicated broad preflight
+is intentionally superseded,not counted as passed or skipped from the full13.
+
+[Inventory](ra8-preflight/checkpoint9-inventory.json):1313 static tests versus RA7's1124,
+189 added,none removed/renamed/ignored. Static and execution counts remain separate.
+[Runtime/source checks](ra8-preflight/checkpoint9-source-check.json) verify the defined342
+runtime and additional101 integration/example snapshots independently with0mismatches;
+these sets may overlap. [Preservation](ra8-preflight/checkpoint9-attempt8-preservation.json)
+freshly verifies all13 current failed-ra8 files,including wrappers/process/liveness,against
+the original attempt8 archive hashes before any label reuse. All76632bytes are unchanged.
+
+R144–R155 record the source-correct naval observation/component/min-max/unit-point work,
+finite repair/final-prefix accounting,declared cyclic production,Allied paired siege,
+Libya paid national/siege priority,independent strategic eligibility,and the normal-kind
+snapshot naval-site preference. The latter prefers otherwise qualified endpoints outside
+observed fire at ordinary site selection/rescan;it predicts neither elite/readiness changes,
+future movement nor safe routes. It keeps exposed fallback. All named fixture migrations,
+negative probes,insufficient premises and exact winner attribution limits remain explicit.
+All source difficulty/stats/prices/defense counts,reserves and limits remain unchanged.
+
+RA9 explicitly also carries historical M6 review2 P2: gathering_point's terrain-only floodfill
+and contrived owned-yard partition. Steel did not prove that cause;not every inherited AI
+debt is claimed closed here. R83/R96/R99 remain as below;R97 is closed inR103. All new modules,
+policies and the R144–R155 records remain independent-review/RA9 scope. User visual/audio/
+play-feel verification remains required.
+
+[Fresh storage](ra8-preflight/checkpoint9-storage.json): RA5 render10files/875468logical/
+901120allocated bytes;RA7 parser70files/11615632logical/11755520allocated;RA8 parser58files/
+584038logical/733184allocated. All are retained cache/review evidence or recreatable scratch;
+no additional substantial external directory,clone,worktree or system/tmp artifact was created.
+No validator or mutation is active at checkpoint preparation. Full13 remains pending root's
+committed milestone check;no independent review/approval is claimed.
+
+## Historical preflight evidence (retained)
 
 ## Ten-player benchmark preflight
 
@@ -736,3 +792,9 @@ classifies every exact path/line/fileSHA/including-EOL-lineSHA/index blob;its -r
 retains full stdout/stderr. stdout SHA is
 0c90536b9aed2f68888a9d19e507db559ccfd51ebb0e5e82f7b0c06aa58b4b16. No raw byte is altered or
 suppressed. Require identical final staged stdout/stderr/exit before the separate commit.
+
+Checkpoint9 commit hygiene: the separate source staged check exits0. Evidence staged check
+exits2,NOT passed;140 exact captured raw-log-only diagnostics are preserved/classified
+with every path,line,file/line SHA and staged blob. No source/data/test/document hygiene
+error is waived. Full unfiltered stdout/stderr are retained;require identical final staged
+output before the later deliberate evidence commit. No whitespace suppression is used.

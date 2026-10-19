@@ -1,0 +1,30 @@
+{
+  "label": "attempt8-oasis-libya-iraq-siege-priority-after1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate8_oasis_libya_iraq_brutal_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "Exact default Oasis candidate replay after generator-only Libya siege priority proves paid siege and national reserve; source stats/cadence/reserves/difficulty/252000limit unchanged. Ending decides retention, not paid capability alone.",
+  "start_utc": "2026-10-19T00:52:56.779519+00:00",
+  "elapsed_seconds": 113.2750370830181,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591"
+  },
+  "log_sha256": "0724d03e1f7d0f5ccba48da27077baf52772fc939963941883d82af6749b8625"
+}

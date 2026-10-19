@@ -1,0 +1,20 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 5.22s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+test ra8_mixed_naval_recruitment_uses_each_hulls_legal_cells_in_the_same_sea ... mixed naval first funded decision: goalSome(CellPos { x: 14, y: 22 })/Dreadqueuedfalse
+
+thread 'ra8_mixed_naval_recruitment_uses_each_hulls_legal_cells_in_the_same_sea' (8392948) panicked at crates/sim/tests/ra8_ai.rs:921:5:
+a shared close submarine goal cannot exclude a source-legal Dreadnought firing cell in the same reachable sea
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ra8_mixed_naval_recruitment_uses_each_hulls_legal_cells_in_the_same_sea
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 82 filtered out; finished in 0.05s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

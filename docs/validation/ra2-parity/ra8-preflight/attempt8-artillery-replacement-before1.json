@@ -1,0 +1,28 @@
+{
+  "label": "attempt8-artillery-replacement-before1",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_a_remote_replacement_tank_does_not_pull_advancing_artillery_back_home",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "purpose": "Actual recruited wave, normal command positioning, source Prism fire/destruction and advancing replacement front; healthy forward-order twin first. Prove remote rear-front admission defect before runtime correction.",
+  "start_utc": "2026-10-18T20:53:30.561485+00:00",
+  "elapsed_seconds": 7.723498832958285,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "log_sha256": "04268ae40d0af7fe4aa2ece9472e14eb69c7723a610c9daae83257825a1c2bd4"
+}

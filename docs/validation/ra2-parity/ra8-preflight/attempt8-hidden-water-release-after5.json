@@ -1,0 +1,28 @@
+{
+  "label": "attempt8-hidden-water-release-after5",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_unseen_enemy_water_building_cannot_change_naval_planning",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "purpose": "Final twins use ordinary repeated Guard during staging then Move release at600; require actual fresh live-hull mission at601 and continuous visibility preconditions.",
+  "start_utc": "2026-10-18T20:12:16.601675+00:00",
+  "elapsed_seconds": 7.061214916990139,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "log_sha256": "8217702c33f6615c926d0792f56f38f3c23b86dfcdc5c9ebfc75c3c12eebd964"
+}

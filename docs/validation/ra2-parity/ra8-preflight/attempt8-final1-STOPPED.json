@@ -1,0 +1,17 @@
+{
+  "utc": "2026-10-18T21:50:59.114527+00:00",
+  "manifest": "attempt8-final1-runtime-manifest.json",
+  "file_count": 342,
+  "mismatches": {},
+  "failed_case": "Riverlands Iraq/Cuba Easy seed0 None72000",
+  "stopped_after": "exact22",
+  "dependent_commands_not_run": [
+    "exact23..31",
+    "fullsim",
+    "game-bin",
+    "m10",
+    "fivecompanions",
+    "m13all",
+    "m13256"
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "label": "attempt8-harvest-artillery-before2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate8_harvest_france_germany_easy_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "env": {
+    "RA8_ECONOMY_TRACE": "1",
+    "RA8_SERVICE_TRACE": "1",
+    "RA8_TRACE_FROM": "240000"
+  },
+  "purpose": "Exact unchanged Harvest after traversal correction: last48000 actual birth/queued orders/shots/Move progress, source target HP and cohort history; test whether the observed artillery return-to-old-slot is a genuine lifecycle failure before any tactical or data correction.",
+  "start_utc": "2026-10-18T20:47:41.941130+00:00",
+  "elapsed_seconds": 119.35093795799185,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "log_sha256": "7c336fd1cc8ccdb28acb82656cfaa08ec0034ea0dfa8c03e0a6984d89e99f229"
+}

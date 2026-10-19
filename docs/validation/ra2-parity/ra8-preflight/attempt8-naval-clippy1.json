@@ -1,0 +1,25 @@
+{
+  "label": "attempt8-naval-clippy1",
+  "command": [
+    "cargo",
+    "clippy",
+    "--workspace",
+    "--all-targets",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "purpose": "strict compile/static preflight after naval observation and live-hull component changes",
+  "start_utc": "2026-10-18T20:02:16.087097+00:00",
+  "elapsed_seconds": 6.215714375022799,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "log_sha256": "d56cd63eac5604f582b5b4d4c37c6c435e3e89b29770f88c15959bd6bbcfbab6"
+}

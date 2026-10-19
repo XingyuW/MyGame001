@@ -1,0 +1,6 @@
+{
+  "utc": "2026-10-19T04:29:50.257970+00:00",
+  "purpose": "Second bounded snapshot of the same verified owned all-map process; metadata only, no sampling/profiling/signals/other simulation.",
+  "pid": 62366,
+  "ps": "62366 59492 38:34  38:01.05 100.0 /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples/m13_ten_players to-the-end all"
+}

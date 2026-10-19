@@ -9009,3 +9009,20 @@ requirements. No new substantial external directory,clone,worktree or system/tmp
 is created;Cargo/UV/PIP caches remain configured. No validator or mutation is active before
 checkpoint preparation. Deliberate stage,SEPARATE unfiltered cached-check inspection and
 raw-only classification must precede each SEPARATE commit;no nonzero check is called passed.
+
+The separately inspected unfiltered SOURCE staged check exits0 over exactly11 owned paths,
+empty stdout/stderr (SHAe3b0c442...). The later separate source commit is
+4e2c3774cff5b2d26c5630413227f2c35f776877 (`RA8: qualify naval jobs and preserve funded combat plans`).
+All runtime bytes remain identical to final8's successful manifests;checkpoint9.json records
+the committed identity without rewriting earlier run metadata. Evidence staging/checking and
+raw-only diagnostic classification remain separate from the deliberate evidence commit.
+
+The standalone EVIDENCE staged unfiltered check exits2,NOT passed: 140 exact
+captured raw-log diagnostics (117 final blank lines,23 native unfinished/interleaved
+test-progress trailing-space lines),zero source/data/test/document errors. Every exact
+path,line,file SHA,including-EOL line SHA/content and staged Git blob is classified in
+checkpoint9-staged-hygiene.json;full unfiltered stdout/stderr remain in its -raw companion.
+stdout SHA9d882e024ac396b890dad6631776fec9edc8f30d0e0f3b1667b11edc9636fbe8.
+All staged diagnostic-file bytes equal their working raw bytes. Nothing is rewritten or
+suppressed. Require identical exit/stdout/stderr after final evidence staging before the
+SEPARATE deliberate evidence commit. The mandatory validation-script check is unchanged.

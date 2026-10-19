@@ -1,0 +1,31 @@
+{
+  "label": "attempt8-pacific-naval-weight-candidate1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate7_pacific_cuba_great_britain_brutal_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "env": {},
+  "purpose": "Exact unchanged-limit Pacific A/B of paired Dread game-owned cyclic composition; no source weapon/difficulty/defense/reserve/cap/runtime changes.",
+  "start_utc": "2026-10-18T23:34:58.684703+00:00",
+  "elapsed_seconds": 404.6594114580075,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "65a00aa3fa4636b49354f51792970c41424ee4ce1893dfeca112b67294220337"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "65a00aa3fa4636b49354f51792970c41424ee4ce1893dfeca112b67294220337"
+  },
+  "log_sha256": "50e8542e2f51979c1047dca289ace9c852708599d9e3b0b63ed7856251f7b44b"
+}
