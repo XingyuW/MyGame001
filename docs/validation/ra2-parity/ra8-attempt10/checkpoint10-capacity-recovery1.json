@@ -1,0 +1,18 @@
+{
+  "utc": "2026-10-19T07:52:17.933902+00:00",
+  "event": "Transient selected-model capacity error; resumed same ongoing validation, not a test/build result.",
+  "unified_session": 18234,
+  "owned_script_pid": 83684,
+  "production_pid": 85959,
+  "freeze_commit": "d82617645047338fa9270e67c5850299ec8731cf",
+  "runtime_commit": "016300034474deb8db0be570c5569124372c3d75",
+  "active_mutation": null,
+  "runtime_manifest_files_verified": 342,
+  "additional_test_example_files_verified": 101,
+  "source_mismatches": [],
+  "process_evidence": "checkpoint10-liveness9.json",
+  "duplicated_validator": false,
+  "signals_sent": false,
+  "source_changes": false,
+  "observed_status": "Five M6 companions pass; main756 pending; no visible failure. Service interruption is not counted as a validation pass."
+}

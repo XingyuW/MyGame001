@@ -4383,3 +4383,36 @@ external directory is created;RA8 parser scratch remains58files/584038logical/73
 with existing RA5render/RA7parser caches retained. RA9 still owns the documented gathering-point
 partition debt,R83 transport/attached-Squid,R96 actorlessProp abilities and unprovenR99 lead;
 R97 is closed inR103. Independent review and user visual/audio/play-feel verification remain.
+
+### RA8: eleventh source checkpoint, complete frozen gate still required (2026-10-19)
+
+Runtime313e96b3ef0e37af3b834c32f02d23fcc19cc17c passes18 fresh scoped commands,151tests/
+0failed/0ignored across12 invocations. Static1327 versus RA7's1124 is203 added,none removed,
+renamed or ignored. R159/R160 prove actual real-income/paid-work repair competition and a
+surviving but currently unfunded unit-producer repair loop. Current-wallet repair priority
+and native-financed recovery preserve partly-paid/completed heads,existing refund/sale,
+income,force/power/strategic controls. No source price/damage/repair/difficulty/cap/limit or
+R53 signature/timer/stagger/cadence changes;no existing test assertion is weakened. The sale
+policy protects every declared army prerequisite;this is not physical unrecoverability.
+
+The tenth full gate failed workspace101 (253passed/1failed/0ignored,5415 script seconds/
+5415.186230 monotonic). Both exact Frozen/Lakes None288000 failures now Won146710/98562.
+New Demo RussiaEasy/LibyaEasy stall now P1Won70234/72000,a97.55%-of-limit RA9 watch.
+Attempt10's27 captured files/54 archive+current copies/159237bytes per set are reverified
+byte-identical;partial05 and unrun06–13 are not passes. No fresh756 table is claimed.
+All prior logs,failed/insufficient/refuted probes and mutation restorations are retained.
+
+All21 actual-default ten-player maps Won/ten builders,median77405/p90nearest96994/max114793
+under400000. WorstmeanCoral1.422ms;fixed256 actual24k means.785201/.808316/.846548ms pass5ms.
+Raw long-tick tails remain;means do not promise smoothness. Both342+101 separate snapshots
+match. The18-command preflight sum1755.003373s/wall1755.009555s and all proof/inventory/
+storage/migration/assumption records are in RA8_ACCEPTANCE.md/checkpoint11. Workspace
+command4 still runs all33 retained exact tests/fullsim/game/M10;no duplicate broad preflight.
+All13 complete frozen commands and both fresh756-winner R29 before/after distributions
+remain required. This is validated preflight,not independent review or completed RA8.
+
+No new substantial external directory;configured caches remain. Current RA8scratch58files/
+584038logical/733184allocated,RA7scratch70/11615632/11755520,RA5render10/875468/901120 remain
+recreatable evidence useful for reruns/unnecessary for release. RA9 carries gathering-point
+partition,R83transport/attachedSquid,R96actorlessProp,R99unproven lead and the near-limit
+watch;R97closedR103. Independent review and user visual/audio/play-feel verification remain.

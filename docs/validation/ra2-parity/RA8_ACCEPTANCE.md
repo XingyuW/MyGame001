@@ -1,13 +1,13 @@
 # RA8 acceptance record
 
-Status: tenth source checkpoint passes reduced fresh scoped preflight:17 commands all0,
-145 tests passed/0failed/0ignored across10 target invocations. The exact previously failing
-Crossroads112×112 ten-country Medium seed7 now wins within unchanged72000;all21 default
-m13 maps win with ten builders each. Fixed256 means0.851890/0.779806/0.778092ms pass5ms.
-Runtime commit is `016300034474deb8db0be570c5569124372c3d75` (AI1f5325e2/strategy5c5fd561).
-Mandatory full13 and both fresh756-winner R29 distributions remain required. This is
-validated preflight,not independent review or completed RA8 acceptance. Every earlier failed,
-interrupted,insufficient and corrected observation remains preserved.
+Status: eleventh source checkpoint passes18 fresh scoped commands,151 tests passed/
+0failed/0ignored across12 target invocations. Runtime313e96b3ef0e37af3b834c32f02d23fcc19cc17c
+(AI9d47fb7e/strategye689d137) fixes actual repair/paid-work funding boundaries. Both failed
+attempt10 pairs and the new Demo Easy stall now win under unchanged limits; all21 actual
+default m13 maps win with ten builders. Fixed256 means.785201/.808316/.846548ms pass5ms.
+Mandatory complete full13 and both fresh756-winner R29 distributions remain required.
+This is validated preflight,not independent review or completed RA8 acceptance. Every prior
+failed,interrupted,insufficient and corrected observation remains preserved.
 
 ## Acceptance checklist
 
@@ -34,7 +34,7 @@ interrupted,insufficient and corrected observation remains preserved.
 
 ## Policy and evidence
 
-R88–R158 in `docs/DECISIONS.md` record the implementation, exact existing-test migrations,
+R88–R160 in `docs/DECISIONS.md` record the implementation, exact existing-test migrations,
 game-owned AI assumptions, failure diagnoses, negative mutation and process deviations.
 Source difficulty and target weights come from the audited reference table. Closed-source
 AI policy is not claimed: composition, tier reserves, target-category mapping, garrison/depot
@@ -878,3 +878,66 @@ blob is preserved in checkpoint10-staged-hygiene.json;full raw stdout/stderr rem
 -raw companion. stdout SHAb5e283813107e573e1c77905fcb1e70d6a36fa43c2665d2d83ff608f8dc7030a.
 No raw byte is normalized or suppressed. Require identical final staged output before a
 separate deliberate evidence commit.
+
+## Eleventh checkpoint: actual wallet and financed recovery
+
+[Checkpoint11](ra8-preflight/checkpoint11.json),[metrics](ra8-preflight/checkpoint11-metrics.json),
+[inventory](ra8-preflight/checkpoint11-inventory.json),[source checks](ra8-preflight/checkpoint11-source-check.json)
+and [storage](ra8-preflight/checkpoint11-storage.json) record the current result. Source commit
+`313e96b3ef0e37af3b834c32f02d23fcc19cc17c` has no data/difficulty/combat/limit change. Static1327
+versus RA7f5505cd1124 is203 added,0removed/renamed/ignored; this differs from executed151/0/0
+across12 target invocations. All18 final2 commands exit0,sum1755.003373s/wall1755.009555s;
+preflight SHA`50b5facb45bd2af5250427c1f8fb06f95a58dfffc3e082700ffa1bcfc0591e00`.
+Strict fmt/Clippy/generator/reference,95AI,10attrition,21recovery,14composition,twoRA4,actual
+Demo all10 pairings,two impacted exact pairs,grown-map3 and three executed example guards
+pass. Mandatory workspace command4 still executes all33 retained exact tests/fullsim/game/
+M10 unfiltered;no redundant broad preflight substitutes for the full13.
+
+The tenth full gate FAILS workspace101/253passed1failed0ignored,5415 script seconds versus
+5415.186230 monotonic phase seconds. Its M6 target has five companion passes but two explicit
+seed0 None288000 cases,Frozen CubaBrutal/GermanyBrutal and Lakes CubaBrutal/RussiaBrutal;
+no fresh756 table/winner claim. [Attempt10 preservation](ra8-preflight/checkpoint11-attempt10-preservation.json)
+checks all27 captured files/54 archive+current copies/159237bytes per set byte-identically.
+Numbered01–04 completed (04failed),05partial;06–13were unrun/not invented as passes. The old
+production table is stale. The [R29 baseline](ra8-preflight/checkpoint11-r29-baseline.json)
+retains RA7 production median31540/p9064532/max209163 and duel32782.5/69184/157564;
+fresh after-values and ratios remain pending. All earlier archives/raws stay unchanged.
+
+R159 proves real future income cannot also fund current paid repairs and unit work. Current
+wallet/whole-FIFO/source-cadence repair accounting now covers income bases while their unit
+admission stays unrestricted. R160 narrows only mere unit-production buildability as repair
+recovery: native remaining-head cost/completed live-producer work,exact-refund recovery and
+eligible ordinary-sale financing are preserved. Income,capable forces,useful strategic/power
+recovery and the existing building-production branch remain. All costs/rates/public commands/
+R53 signature,timers,stagger and cadence stay exact. This is a game-owned spending policy,
+not physical unrecoverability: all-army prerequisite protection can forgo a cheaper legal
+sale. No existing test expectation changes; new native funding/partial-head controls and
+strict final negatives distinguish meaningful failures from compile/inactive-player/sale-
+funded insufficient probes. See R159/R160 and both evidence indices for exact hashes.
+Final Frozen remains P1Won146710,Lakes P0Won98562,and Demo RussiaEasy/LibyaEasy P1Won70234
+of72000. The latter97.55%-of-limit result is a RA9 watch,not case-specific tuning permission.
+
+All21 fresh m13 outcomes explicitlyWon,allten builders,median77405/p90nearest96994/max114793
+under400000. Raw`7e8fde2ef4807fab0bb7d894607e1610afcd76ab3d2098c4ce92b1e602afb359`;
+command1180.446574s,measured sum1176.603s/elapsed1176.745s. Worst meanCoral1.422ms,
+p9912.963/max74.865/busy4.244/7ticks>50ms;BlackWater's141.089ms longest tick and39>50ms remain.
+Three fixed256 actual24000-tick means Liberty.785201/Continental.808316/Pacific.846548ms
+pass5ms with ten builders each (rawd6813567e9ec9e7b78727a6e3a8a2504a50da54a8d0c78ac5ef0bcb1b0923b6e).
+Pacificp9916.374ms and Libertymax93.680ms remain raw;means do not promise smoothness.
+No competing simulation/profiler ran;no mean-budget optimization is indicated.
+
+Both342-runtime/101-additional integration/example snapshot sets match every recorded hash;
+separate sets do not retroactively expand earlier runtime manifests. Source staged check
+exits0 over six owned paths. Separate unfiltered evidence staged check exits2,NOTpassed:
+Initial32 diagnostics remain classified unchanged (25 native blank EOF,6 native test-progress
+spaces,one raw patch context space). Preserving that verbatim stdout adds seven copied
+context/progress diagnostics:final inclusive39 is31 native-log +1 raw-patch +7 raw-hygiene-
+stdout. All artifact file/EOL/staged-blob hashes match;0 source/data/test/prose errors. Raw
+bytes stay unchanged;subsequent stdout is JSON-escaped. Exact final classification is in
+checkpoint11-staged-hygiene.json;an identical final staged recheck
+precedes the separate deliberate commit. No new substantial external directory,clone/worktree or system/tmp artifact exists.
+RA8 parser scratch remains58files/584038logical/733184allocated (716KiB),RA7scratch70files/
+11615632logical/11755520allocated,RA5render10files/875468logical/901120allocated;retained for
+recreatable reruns and unnecessary for release. RA9 carries gathering-point partition,R83,
+R96,R99 and near-limit policy watch;R97 remains closed inR103. Independent review and user
+visual/audio/play-feel verification remain pending.

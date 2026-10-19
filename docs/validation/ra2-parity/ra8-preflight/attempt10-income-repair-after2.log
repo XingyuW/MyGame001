@@ -1,0 +1,182 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 17.10s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 21 tests
+test ai::ra8_recovery_tests::ra8_a_completed_paid_unit_waiting_for_exit_keeps_source_funded_repairs ... ok
+test ai::ra8_recovery_tests::ra8_a_full_bounded_ai_fifo_still_pauses_repairs_before_the_paid_recruit ... finite repair before tick0 cash200 repairing{SimId(4)} queues[]
+actual saturated decision [IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(4) } }, IssuedCommand { player: PlayerId(0), command: QueueProduction { item: Unit(UnitKind(1)) } }, IssuedCommand { player: PlayerId(0), command: SetRallyPoint { building: SimId(4), cell: CellPos { x: 14, y: 14 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(8)], target: CellPos { x: 2, y: 22 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(20)], target: CellPos { x: 2, y: 27 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(32)], target: CellPos { x: 2, y: 32 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(44)], target: CellPos { x: 2, y: 37 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(56)], target: CellPos { x: 2, y: 42 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(10)], target: CellPos { x: 6, y: 22 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(22)], target: CellPos { x: 6, y: 27 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(34)], target: CellPos { x: 6, y: 32 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(46)], target: CellPos { x: 6, y: 37 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(58)], target: CellPos { x: 6, y: 42 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(12)], target: CellPos { x: 10, y: 22 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(24)], target: CellPos { x: 10, y: 27 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(36)], target: CellPos { x: 10, y: 32 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(48)], target: CellPos { x: 10, y: 37 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(60)], target: CellPos { x: 10, y: 42 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(14)], target: CellPos { x: 14, y: 22 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(26)], target: CellPos { x: 14, y: 27 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(38)], target: CellPos { x: 14, y: 32 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(50)], target: CellPos { x: 14, y: 37 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(62)], target: CellPos { x: 14, y: 42 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(16)], target: CellPos { x: 18, y: 22 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(28)], target: CellPos { x: 18, y: 27 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(40)], target: CellPos { x: 18, y: 32 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(52)], target: CellPos { x: 18, y: 37 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(64)], target: CellPos { x: 18, y: 42 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(18)], target: CellPos { x: 22, y: 22 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(30)], target: CellPos { x: 22, y: 27 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(42)], target: CellPos { x: 22, y: 32 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(54)], target: CellPos { x: 22, y: 37 } } }]
+finite repair before tick20 cash177 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 23, charged: 23, fraction: 750 }])]
+finite repair before tick40 cash152 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 48, charged: 48, fraction: 750 }])]
+finite repair before tick60 cash127 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 73, charged: 73, fraction: 750 }])]
+finite repair before tick80 cash102 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 98, charged: 98, fraction: 750 }])]
+ok
+test ai::ra8_recovery_tests::ra8_a_refund_outside_the_emitted_prefix_cannot_fund_repairs_of_a_real_paid_head ... ok
+test ai::ra8_recovery_tests::ra8_actual_owned_income_keeps_multiple_repairs_while_a_recruit_is_paid ... finite repair before tick0 cash202 repairing{SimId(4), SimId(5)} queues[]
+finite repair before tick20 cash200 repairing{SimId(4), SimId(5)} queues[]
+finite repair before tick40 cash947 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 1, charged: 1, fraction: 250 }])]
+finite repair before tick60 cash922 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 26, charged: 26, fraction: 250 }])]
+finite repair before tick80 cash895 repairing{} queues[(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(2)), progress: 1, charged: 1, fraction: 250 }]), (QueueKey { producer: BuildingKind(0), lane: Defences }, [QueueItem { item: Building(BuildingKind(15)), progress: 1, charged: 1, fraction: 250 }]), (QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 51, charged: 51, fraction: 250 }, QueueItem { item: Unit(UnitKind(1)), progress: 0, charged: 0, fraction: 0 }])]
+finite repair recruit{SimId(12), SimId(13)} cash0 queues[(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(2)), progress: 328, charged: 328, fraction: 250 }]), (QueueKey { producer: BuildingKind(0), lane: Defences }, [QueueItem { item: Building(BuildingKind(15)), progress: 325, charged: 325, fraction: 250 }]), (QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 35, charged: 35, fraction: 750 }, QueueItem { item: Unit(UnitKind(1)), progress: 0, charged: 0, fraction: 0 }])]
+ok
+test ai::ra8_recovery_tests::ra8_attainable_power_recovery_restores_real_production_despite_reserved_unit_tails ... power recovery placedtrue slow8ticks5 fast8ticks_progress_and_paidcreditsSome((10, 10))
+ok
+test ai::ra8_recovery_tests::ra8_borderline_repair_surplus_covers_every_source_step_between_ai_turns ... finite repair before tick0 cash201 repairing{} queues[]
+finite repair before tick20 cash178 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 23, charged: 23, fraction: 750 }])]
+finite repair before tick40 cash153 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 48, charged: 48, fraction: 750 }])]
+finite repair before tick60 cash128 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 73, charged: 73, fraction: 750 }])]
+finite repair before tick80 cash103 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 98, charged: 98, fraction: 750 }])]
+finite repair recruit{SimId(7)} cash0 queues[]
+ok
+test ai::ra8_recovery_tests::ra8_completed_paid_unit_heads_and_duplicate_tails_keep_normal_exit_and_fifo ... ok
+test ai::ra8_recovery_tests::ra8_existing_main_building_obligation_cannot_be_reused_to_fund_the_defence_lane ... ok
+test ai::ra8_recovery_tests::ra8_finite_funds_preserve_paid_head_and_finance_source_cost_finisher_after_unpaid_tails ... aggregate recovery refunds[(Unit(UnitKind(1)), 0), (Unit(UnitKind(27)), 0), (Unit(UnitKind(27)), 0), (Unit(UnitKind(6)), 839)] grizzlies{SimId(10)} building_shots1
+ok
+test ai::ra8_recovery_tests::ra8_finite_unit_funding_is_not_spent_on_repairs_before_the_paid_recruit_can_finish ... finite repair before tick0 cash200 repairing{} queues[]
+finite repair before tick20 cash177 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 23, charged: 23, fraction: 750 }])]
+finite repair before tick40 cash152 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 48, charged: 48, fraction: 750 }])]
+finite repair before tick60 cash127 repairing{SimId(4)} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 73, charged: 73, fraction: 750 }])]
+finite repair before tick80 cash102 repairing{SimId(4)} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 98, charged: 98, fraction: 750 }])]
+finite repair recruit{SimId(7)} cash0 queues[]
+ok
+test ai::ra8_recovery_tests::ra8_income_recovery_and_completed_construction_keep_their_normal_heads ... ok
+test ai::ra8_recovery_tests::ra8_multiple_active_repairs_cannot_each_claim_the_same_finite_recruit_surplus ... finite repair before tick0 cash202 repairing{SimId(4), SimId(5)} queues[]
+finite repair before tick20 cash179 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 23, charged: 23, fraction: 750 }])]
+finite repair before tick40 cash154 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 48, charged: 48, fraction: 750 }])]
+finite repair before tick60 cash128 repairing{SimId(4)} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 73, charged: 73, fraction: 750 }])]
+finite repair before tick80 cash102 repairing{SimId(4)} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 98, charged: 98, fraction: 750 }])]
+finite repair recruit{SimId(8)} cash0 queues[]
+ok
+test ai::ra8_recovery_tests::ra8_no_income_reallocates_real_unfinished_tech_credits_to_starved_combat_without_requeue ... finite construction charged1600 refunds[1600] paid_tanktrue requeuedfalse
+finite recovery final credits100 queues[]
+ok
+test ai::ra8_recovery_tests::ra8_paid_worker_replacement_requires_a_known_reachable_economic_job ... worker job empty: paidfalse workers{} actual_deliveryfalse
+worker job reachable: paidtrue workers{SimId(8)} actual_deliverytrue
+worker job isolated: paidfalse workers{} actual_deliveryfalse
+worker job regrowth: paidtrue workers{SimId(8)} actual_deliverytrue
+worker job queued: paidtrue workers{SimId(8)} actual_deliveryfalse
+ok
+test ai::ra8_recovery_tests::ra8_prospective_finisher_refunds_preserve_income_power_completed_and_attainable_work ... ok
+test ai::ra8_recovery_tests::ra8_real_periodic_income_funds_paid_recruit_before_optional_repairs ... finite repair before tick0 cash100 repairing{SimId(5), SimId(6)} queues[]
+periodic income tick0 events[]
+periodic income tick1 events[]
+periodic income tick2 events[]
+periodic income tick3 events[]
+periodic income tick4 events[]
+periodic income tick5 events[]
+periodic income tick6 events[]
+periodic income tick7 events[DamageStateChanged { player: PlayerId(0), id: SimId(6), state: Green }]
+periodic income tick8 events[]
+periodic income tick9 events[]
+periodic income tick10 events[]
+periodic income tick11 events[]
+periodic income tick12 events[]
+periodic income tick13 events[]
+periodic income tick14 events[]
+periodic income tick15 events[]
+periodic income tick16 events[]
+periodic income tick17 events[]
+periodic income tick18 events[]
+periodic income tick19 events[]
+finite repair before tick20 cash98 repairing{SimId(5), SimId(6)} queues[]
+periodic income tick20 events[]
+periodic income tick21 events[]
+periodic income tick22 events[]
+periodic income tick23 events[]
+periodic income tick24 events[]
+periodic income tick25 events[]
+periodic income tick26 events[DamageStateChanged { player: PlayerId(0), id: SimId(5), state: Green }]
+periodic income tick27 events[]
+periodic income tick28 events[]
+periodic income tick29 events[]
+periodic income tick30 events[]
+periodic income tick31 events[]
+periodic income tick32 events[]
+periodic income tick33 events[]
+periodic income tick34 events[]
+periodic income tick35 events[]
+periodic income tick36 events[]
+periodic income tick37 events[]
+periodic income tick38 events[]
+periodic income tick39 events[]
+finite repair before tick40 cash94 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 2, charged: 2, fraction: 500 }])]
+periodic income tick40 events[]
+periodic income tick41 events[]
+periodic income tick42 events[]
+periodic income tick43 events[]
+periodic income tick44 events[]
+periodic income tick45 events[]
+periodic income tick46 events[]
+periodic income tick47 events[]
+periodic income tick48 events[]
+periodic income tick49 events[]
+periodic income tick50 events[]
+periodic income tick51 events[]
+periodic income tick52 events[]
+periodic income tick53 events[]
+periodic income tick54 events[]
+periodic income tick55 events[]
+periodic income tick56 events[]
+periodic income tick57 events[]
+periodic income tick58 events[]
+periodic income tick59 events[]
+finite repair before tick60 cash69 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 27, charged: 27, fraction: 500 }])]
+periodic income tick60 events[]
+periodic income tick61 events[]
+periodic income tick62 events[]
+periodic income tick63 events[]
+periodic income tick64 events[]
+periodic income tick65 events[]
+periodic income tick66 events[]
+periodic income tick67 events[]
+periodic income tick68 events[MoveCompleted { unit: SimId(8), retargeted: false }]
+periodic income tick69 events[]
+periodic income tick70 events[]
+periodic income tick71 events[]
+periodic income tick72 events[]
+periodic income tick73 events[]
+periodic income tick74 events[]
+periodic income tick75 events[]
+periodic income tick76 events[]
+periodic income tick77 events[]
+periodic income tick78 events[]
+periodic income tick79 events[]
+finite repair before tick80 cash44 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 52, charged: 52, fraction: 500 }, QueueItem { item: Unit(UnitKind(1)), progress: 0, charged: 0, fraction: 0 }])]
+periodic income tick80 events[]
+periodic income tick81 events[]
+periodic income tick82 events[]
+periodic income tick83 events[]
+periodic income tick84 events[]
+periodic income tick85 events[]
+periodic income tick86 events[]
+periodic income tick87 events[]
+periodic income tick88 events[]
+periodic income tick89 events[]
+periodic income tick90 events[]
+periodic income tick91 events[]
+periodic income tick92 events[]
+periodic income tick93 events[]
+periodic income tick94 events[]
+periodic income tick95 events[]
+periodic income tick96 events[]
+periodic income tick97 events[]
+periodic income tick98 events[]
+periodic income tick99 events[]
+finite repair recruit{SimId(11)} cash0 queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 36, charged: 36, fraction: 500 }, QueueItem { item: Unit(UnitKind(1)), progress: 0, charged: 0, fraction: 0 }])]
+ok
+test ai::ra8_recovery_tests::ra8_source_funded_surplus_keeps_multiple_repairs_and_actual_paid_recruitment ... finite repair before tick0 cash210 repairing{SimId(4), SimId(5)} queues[]
+finite repair before tick20 cash185 repairing{SimId(4), SimId(5)} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 23, charged: 23, fraction: 750 }])]
+finite repair before tick40 cash158 repairing{SimId(4), SimId(5)} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 48, charged: 48, fraction: 750 }])]
+finite repair before tick60 cash131 repairing{SimId(4), SimId(5)} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 73, charged: 73, fraction: 750 }])]
+finite repair before tick80 cash104 repairing{SimId(5)} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 98, charged: 98, fraction: 750 }])]
+finite repair recruit{SimId(8)} cash0 queues[]
+ok
+test ai::ra8_recovery_tests::ra8_unfundable_construction_cannot_reserve_out_the_first_reachable_finisher_forever ... prospective finisher charged1600 cost700 refunds[1600] recruits{SimId(9)} building_shots1 requeuedfalse
+ok
+test ai::ra8_recovery_tests::ra8_unfundable_duplicate_unit_heads_refund_exactly_and_produce_a_real_cheaper_finisher ... unit recovery refunds[(Unit(UnitKind(1)), 0), (Unit(UnitKind(27)), 0), (Unit(UnitKind(27)), 0), (Unit(UnitKind(6)), 175), (Unit(UnitKind(27)), 175)] recruits{SimId(9)} actual_building_shots1
+ok
+test ai::ra8_recovery_tests::ra8_unit_reallocation_preserves_actual_income_harvesters_and_unreachable_alternatives ... ok
+test ai::ra8_recovery_tests::ra8_worker_admission_cannot_learn_hidden_ore_or_building_occupancy ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 94 filtered out; finished in 2.93s
+

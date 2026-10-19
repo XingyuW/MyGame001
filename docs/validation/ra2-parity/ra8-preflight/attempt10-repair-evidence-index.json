@@ -1,0 +1,90 @@
+[
+  {
+    "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt10-format1.json",
+    "metadata_sha256": "4afa5466f39587ff46dd9eb5278ddee24bc19d5df080b9b4b56cce78604203bf",
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt10-format1.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "exit": 0,
+    "elapsed_seconds": 0.9302858749870211
+  },
+  {
+    "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt10-frozen-income-after1.json",
+    "metadata_sha256": "a8f10f2447e89db4b1c315dcaf99930d30537342cd033db1096240a0a0e507ab",
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt10-frozen-income-after1.log",
+    "log_sha256": "32a38fec02e01b41d5b109e095e3a509a5dc2e3ce8a275e45647ddd88b063a8e",
+    "exit": 0,
+    "elapsed_seconds": 216.58595458394848
+  },
+  {
+    "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt10-frozen-trace-before1.json",
+    "metadata_sha256": "dfdcf946faa0b45fb670836c2a9e5ac83020f2d8471f39b1a77ab89454c2c396",
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt10-frozen-trace-before1.log",
+    "log_sha256": "c9f72ad7706ac7bdb999d4ba54a5269c985c0a1b113e002b19cf3fba6626cfe2",
+    "exit": 101,
+    "elapsed_seconds": 295.71758674999
+  },
+  {
+    "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt10-income-repair-after1.json",
+    "metadata_sha256": "6d6ed0f075dffd30e6c71262ee6f0987d46121b13dd9def099f79f71b183d435",
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt10-income-repair-after1.log",
+    "log_sha256": "0ce19e7149dfc302eae9cfe8978a03d9ee13aeeb4ed435f9401662001f7eb8ae",
+    "exit": 0,
+    "elapsed_seconds": 20.32918816700112
+  },
+  {
+    "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt10-income-repair-after2.json",
+    "metadata_sha256": "fe8d2937068222eaa98cb2b6b4752d42aa22d32c9822bd771f468a43b5068199",
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt10-income-repair-after2.log",
+    "log_sha256": "92020336877b2af1fa229131236398cf6406c5eb2c64fd6df0c881ff540760f5",
+    "exit": 0,
+    "elapsed_seconds": 20.247424874978606
+  },
+  {
+    "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt10-income-repair-before1.json",
+    "metadata_sha256": "9cee262e29ba9fc77a6c2d07aedaa75377b8ad49edfe9e2d33c7fe0c61f741fc",
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt10-income-repair-before1.log",
+    "log_sha256": "81b76ceaa9f54406e2b5666f980c0b10a1b3c2a49d04207e9475b0a267bc6934",
+    "exit": 0,
+    "elapsed_seconds": 18.608284749963786
+  },
+  {
+    "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt10-income-repair-before2.json",
+    "metadata_sha256": "a4bc69b1029b2f64fa0d649d3317180c17d38c1692f8549a14f31d99c2031086",
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt10-income-repair-before2.log",
+    "log_sha256": "2928e020791e0d7458053e4ccaa8a8147d5160fa3f216cea285e4e23798d434f",
+    "exit": 0,
+    "elapsed_seconds": 17.577036375005264
+  },
+  {
+    "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt10-income-repair-before3.json",
+    "metadata_sha256": "a402077ec0cab46760f5959702ae4f68a4c81fd6cfd28dadfef74f0f89d3a2ff",
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt10-income-repair-before3.log",
+    "log_sha256": "36a136cd4450a83e95be3dd45052179a076468799be250a54744a9ab71a543bf",
+    "exit": 101,
+    "elapsed_seconds": 17.532264292007312
+  },
+  {
+    "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt10-income-repair-final-negative1.json",
+    "metadata_sha256": "f4b41b39f6ad2c8f4a2362807ef6783eb1cb0c4bc814f09224264c6060c20d7c",
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt10-income-repair-final-negative1.log",
+    "log_sha256": "bc3722abbc35982b5c629c8fdeec25659a3c1c7c8a1a1bc6d7a60602fe86419a",
+    "exit": 101,
+    "elapsed_seconds": 17.988512000010815
+  },
+  {
+    "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt10-lakes-income-after1.json",
+    "metadata_sha256": "12540fe32c4af81f2248ae0c98487220239ec477019687081a83931a6004a176",
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt10-lakes-income-after1.log",
+    "log_sha256": "0031a348fec640ac63d90c1057062c32ff661a2fafefe5399740b43deb2e1e68",
+    "exit": 0,
+    "elapsed_seconds": 94.89100775000406
+  },
+  {
+    "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt10-lakes-trace-before1.json",
+    "metadata_sha256": "9b3825f155c342e46a11ac01018d0788a5ec4892065bc9b1c576adb283250da5",
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt10-lakes-trace-before1.log",
+    "log_sha256": "b22ec936fe4696a6ab25849253e1d57b51e1090fefaee053c7113877e167ab34",
+    "exit": 101,
+    "elapsed_seconds": 129.7156486249878
+  }
+]

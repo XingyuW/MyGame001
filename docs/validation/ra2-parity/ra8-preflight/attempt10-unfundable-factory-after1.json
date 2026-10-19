@@ -1,0 +1,28 @@
+{
+  "label": "attempt10-unfundable-factory-after1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "remaining_factory",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "start_utc": "2026-10-19T08:35:28.073389+00:00",
+  "elapsed_seconds": 20.144345209002495,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "9d47fb7efae4ed984a1f4fd6052ffc463bc023386144c5de580a0648bf31c367",
+    "crates/sim/src/ai/strategy.rs": "209bae94233ec222de20f83ef80f2c6bb1a8a0a12f081684e77ba02ebcc8a2cd"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "9d47fb7efae4ed984a1f4fd6052ffc463bc023386144c5de580a0648bf31c367",
+    "crates/sim/src/ai/strategy.rs": "209bae94233ec222de20f83ef80f2c6bb1a8a0a12f081684e77ba02ebcc8a2cd"
+  },
+  "log_sha256": "3cbdfac8d5ed140b1111bf20b2a42cab0bde78607a4a46d4530df05c0ee1430c"
+}

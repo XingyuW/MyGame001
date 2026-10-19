@@ -1,0 +1,76 @@
+{
+  "command": [
+    "env",
+    "-u",
+    "RA2_DUEL_SEED",
+    "-u",
+    "RA2_DUEL_PAIR",
+    "sh",
+    "scripts/validate_ra2_parity.sh",
+    "ra8"
+  ],
+  "freeze_commit": "d82617645047338fa9270e67c5850299ec8731cf",
+  "runtime_commit": "016300034474deb8db0be570c5569124372c3d75",
+  "runtime_manifest": "../ra8-preflight/attempt9-final1-runtime-manifest.json",
+  "test_example_manifest": "../ra8-preflight/attempt9-final1-test-example-manifest.json",
+  "start_utc": "2026-10-19T06:24:27.769938+00:00",
+  "phases": [
+    {
+      "phase": 1,
+      "exit": 0,
+      "script_seconds": 1,
+      "observed_monotonic_phase_seconds": 0.9456091669853777,
+      "summary_line": "01 exit 0  1 s  cargo fmt --all -- --check"
+    },
+    {
+      "phase": 2,
+      "exit": 0,
+      "script_seconds": 0,
+      "observed_monotonic_phase_seconds": 0.04210287501337007,
+      "summary_line": "02 exit 0  0 s  git diff --check"
+    },
+    {
+      "phase": 3,
+      "exit": 0,
+      "script_seconds": 1,
+      "observed_monotonic_phase_seconds": 0.3399715409614146,
+      "summary_line": "03 exit 0  1 s  cargo clippy --workspace --all-targets -- -D warnings"
+    },
+    {
+      "phase": 4,
+      "exit": 101,
+      "script_seconds": 5415,
+      "observed_monotonic_phase_seconds": 5415.186230249994,
+      "summary_line": "04 exit 101  5415 s  cargo test --workspace --release  [253 passed, 1 failed, 0 ignored]"
+    }
+  ],
+  "prior_attempt9_preservation": "../ra8-preflight/checkpoint10-attempt9-preservation.json",
+  "preexisting_production_table": {
+    "sha256": "6c3ec135cec4acb23ec3489e7324cfc760e12c6e0da6727fef8675901548d435",
+    "mtime_ns": 1792155643228129596,
+    "bytes": 49763
+  },
+  "timing_note": "Script seconds are unchanged date-based values; observed monotonic phase intervals include transitions and wrapper hash/metadata overhead. Total monotonic elapsed is recorded independently.",
+  "owned_script_pid": 83684,
+  "elapsed_monotonic_seconds": 5416.617585457978,
+  "current_source_mismatches": {
+    "attempt9-final1-runtime-manifest.json": [],
+    "attempt9-final1-test-example-manifest.json": []
+  },
+  "production_table_after_workspace": {
+    "sha256": "6c3ec135cec4acb23ec3489e7324cfc760e12c6e0da6727fef8675901548d435",
+    "bytes": 49763,
+    "source_mtime_ns": 1792155643228129596,
+    "rewritten_since_start": false,
+    "workspace_exit": 101,
+    "success_claim_requires_full_workspace_exit_zero": true
+  },
+  "stopped_after_completed_failure": 4,
+  "process_exit": -15,
+  "end_utc": "2026-10-19T07:54:44.415314+00:00",
+  "final_source_mismatches": {
+    "attempt9-final1-runtime-manifest.json": [],
+    "attempt9-final1-test-example-manifest.json": []
+  },
+  "process_output_sha256": "f1c2d63f3ae5a461054117f2b40e8afa90f04381cf4aef9770ffa9c882762442"
+}
