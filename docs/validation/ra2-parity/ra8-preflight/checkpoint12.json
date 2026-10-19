@@ -1,0 +1,129 @@
+{
+  "checkpoint": 12,
+  "utc": "2026-10-19T20:28:21.837967+00:00",
+  "status": "Complete frozen scoped validation; source committed. Preserved evidence staged hygiene is classified exit2,NOTpassed; explicit coordinator full13 release remains pending. Not independently reviewed.",
+  "source_commit": "8d5fa86cf75a1917aa92a7eaba5562b3a090c9b0",
+  "preflight_working_tree_base": "ab4a17606fcd013a4d8cc6452aa8435fcd24e987",
+  "runtime": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "323f97d83614232db3d1d619d54847b885c1f0635d55382bc8804d95bb998ef9",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "bc5e2c071410f3f9f64a2bdc44f64db7d2bc8a59b25c726b0d297f04779ac1e8",
+    "assets/data/ai.ron": "42cf650956788f04f4520e7f5be1d617c416b83e6e2f555e8b7a417b4a1a5b2a",
+    "scripts/generate_ra2_data.py": "6a0477b0720c54971bd8b11ed5b8ba7fda00b23101516f349477dbca209057d9"
+  },
+  "main": "8230a955b251e9341d349f99eaeb86f7f8253664",
+  "branch": "ra2-parity",
+  "static_tests": 1359,
+  "baseline_static_tests": 1124,
+  "added": 235,
+  "removed_or_renamed": 0,
+  "ignored": 0,
+  "preflight": {
+    "commands": 18,
+    "test_target_invocations": 17,
+    "passed": 317,
+    "failed": 0,
+    "ignored": 0,
+    "wall_seconds": 5535.755056624999,
+    "command_seconds_sum": 5535.743548705068,
+    "all_exits_zero": true,
+    "summary_sha256": "0f487b09b8b16cda62d7b4a9ec7952a542240ad4d9248fafb16430f8b231e426"
+  },
+  "snapshots": {
+    "runtime": 344,
+    "additional": 169,
+    "overlap": 18,
+    "unique": 495,
+    "mismatches": 0
+  },
+  "m13": {
+    "count": 21,
+    "winners": 21,
+    "ten_builders": 21,
+    "unchanged_outer_limit": 400000,
+    "mean_budget_ms": 5,
+    "end_tick_median": 85258,
+    "end_tick_p90_nearest_rank": 113337,
+    "end_tick_max": 218369,
+    "worst_mean_map": "coral_archipelago",
+    "worst_mean_ms": 2.598,
+    "measured_seconds_sum": 2983.326,
+    "elapsed_seconds_sum": 2983.738,
+    "raw_sha256": "d83b41b30d27bd4232fab2d43ff31e6b92cb0c31a8318edf9ec97c1f7f87364a"
+  },
+  "fixed256_means_ms": {
+    "liberty_bay": 1.351,
+    "continental_divide": 1.446,
+    "pacific_atoll": 1.297
+  },
+  "retained": {
+    "test_functions": 37,
+    "distinct_configurations": 36,
+    "explicit_winners": 37,
+    "passed": 37,
+    "failed": 0,
+    "ignored": 0,
+    "raw_sha256": "6a52a41da8fe46ff09f93861489998fcd86baae74393b3bb6b3908249ec04b66"
+  },
+  "current_near_limit_watch": "Demo RussiaEasy/LibyaEasy68863/72000=0.9564305556; duplicate test functions preserve both existing guards. SteelAmerica/Cuba188712/288000=0.65525,not near-limit.",
+  "references": [
+    "checkpoint12-metrics.json",
+    "checkpoint12-inventory.json",
+    "checkpoint12-manifest-verification.json",
+    "checkpoint12-storage.json",
+    "checkpoint12-attempt11-preservation.json",
+    "checkpoint11-r29-baseline.json",
+    "attempt11-final8-runtime-manifest.json",
+    "attempt11-final8-test-example-manifest.json",
+    "attempt11-corrections-evidence-index.json",
+    "checkpoint12-source-staged-check.json",
+    "checkpoint12-source-commit.json",
+    "checkpoint12-evidence-stage-plan.json",
+    "checkpoint12-evidence-cached-check-first.json",
+    "checkpoint12-evidence-hygiene.json",
+    "checkpoint12-evidence-cached-check-final.json"
+  ],
+  "assumptions_and_migrations": "DECISIONS R162\u2013R172; preserve R88\u2013R161. R164 existing useful Oil-income fixture adds real native capture/producer opportunity with all original assertions. R171 NEW parser-minimum fixture corrected legally. No old assertion/limit relaxed; native Temporal range correction shares Combat Extent. R172 explicit user procedural scheduling override only.",
+  "ra9_carryforward": [
+    "M6review2 P2 terrain-only gathering-point own-yard partition",
+    "R83 Size/SizeLimit loaded boarding and actual attached-Squid-host WeaponFired",
+    "R96 actorless occupied-Prop C4/Ivan/Temporal ability resolution; separate from R171 real-building edge correction",
+    "R99 unproven bombable/capability lead",
+    "R160 prerequisite-sale policy and current Demo68863/72000 near-limit watch",
+    "R167 conservative protection of other nonharvester income actors,not all incapable-actor cases solved",
+    "R97 closed by R103;R171 real-building edge channel corrected,final gate still required"
+  ],
+  "verification_pending": [
+    "one complete unchanged full13 all0",
+    "both fresh756-winner R29 distributions/before-after ratios",
+    "RA9 soundness/audit",
+    "independent five-slice review in user-authorized two batches then fresh lead perR172",
+    "user visual/audio/play-feel verification"
+  ],
+  "new_substantial_external_directories_since_checkpoint11": [],
+  "prepared_status": "Complete frozen scoped preflight; uncommitted source, coordinator checks required before staging/full13. Validated scoped results, not independently reviewed.",
+  "source_bound_utc": "2026-10-19T20:31:48.009736+00:00",
+  "source_staged_hygiene_exit": 0,
+  "evidence_staged_hygiene": {
+    "exit": 2,
+    "passed": false,
+    "stdout_sha256": "d892be6bf155db79317bb5a18ae6090205a8e3a1c1fd4e1b0d5690532ebe2449",
+    "diagnostic_count": 94,
+    "counts": {
+      "new blank line at EOF.": 90,
+      "trailing whitespace.": 4
+    },
+    "classifications": {
+      "preserved native log bytes": 92,
+      "preserved raw source-delta patch context": 2
+    },
+    "source_data_test_prose_errors": 0,
+    "raw_bytes_normalized": false,
+    "classification": "checkpoint12-evidence-hygiene.json",
+    "first_raw_capture": "checkpoint12-evidence-cached-check-first.json",
+    "final_raw_capture": "checkpoint12-evidence-cached-check-final.json",
+    "identical_final_staged_recheck_required": true
+  }
+}

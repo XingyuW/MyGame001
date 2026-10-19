@@ -1,0 +1,26 @@
+{
+  "label": "attempt11-current-building-mission-after1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ra8_a_current_observed_building_mission_is_not_replaced_by_a_repaired_home_nearer_target",
+    "--",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T11:35:20.805872+00:00",
+  "elapsed_seconds": 18.49996895797085,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "8b57bcdfd20d7de715d2e5ec62f052408640127804f18d580e90090de6bad087"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "8b57bcdfd20d7de715d2e5ec62f052408640127804f18d580e90090de6bad087"
+  },
+  "log_sha256": "cdea7408ea07c24dceafc07796b453b6824458bbb98116ff60a46f298d03679f"
+}

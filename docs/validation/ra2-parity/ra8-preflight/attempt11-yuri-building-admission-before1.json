@@ -1,0 +1,26 @@
+{
+  "label": "attempt11-yuri-building-admission-before1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ra8_a_unit_controller_keeps_its_native_approach_instead_of_attacking_an_immune_building",
+    "--",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T17:31:48.282837+00:00",
+  "elapsed_seconds": 4.026882499980275,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "d58f8f8d9a26206010bcdec84f2f0db1038c273c55dbb6f4808d05c991e22f7b"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "d58f8f8d9a26206010bcdec84f2f0db1038c273c55dbb6f4808d05c991e22f7b"
+  },
+  "log_sha256": "3901e160e60d27113a8e9119d024a3a48d5559d8f46e8e413ce79d14c35c60bb"
+}

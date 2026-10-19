@@ -1,0 +1,202 @@
+--- frozen/crates/game/tests/ra8_gate_matches.rs
++++ diagnostic/crates/game/tests/ra8_gate_matches.rs
+@@ -219,11 +219,37 @@
+ fn trace_after_economy(
+     mut trace: bevy::prelude::ResMut<EconomyTrace>,
+     definitions: bevy::prelude::Res<sim::Definitions>,
++    players: bevy::prelude::Res<sim::Players>,
++    tick: bevy::prelude::Res<sim::SimTick>,
+     buildings: bevy::prelude::Query<(&SimId, &sim::Owner, &sim::Building, &sim::Health)>,
+ ) {
+     for (id, owner, building, hp) in &buildings {
+         let before = trace.before.get(id).copied().unwrap_or(hp.hit_points);
+         if hp.hit_points > before {
++            if std::env::var_os("RA8_OASIS_NATIVE_TRACE").is_some()
++                && tick.0 >= 180000
++                && let Some(state) = players.get(owner.0)
++                && let Some(rules) = definitions.rules()
++            {
++                let def = definitions.building(building.kind).unwrap();
++                let maximum = definitions
++                    .building_combat(building.kind)
++                    .unwrap()
++                    .hit_points;
++                let step_cost = sim::repair_step_cost(
++                    &rules.economy,
++                    def.production.cost,
++                    maximum,
++                    state.super_me(),
++                );
++                eprintln!(
++                    "oasis paid repair economy tick{} {owner:?} {id:?} {} hp{before}->{} native_step_cost{step_cost} credits_after_economy{}",
++                    tick.0,
++                    def.id,
++                    hp.hit_points,
++                    state.credits()
++                );
++            }
+             let key = format!(
+                 "P{} repaired_hp {}",
+                 owner.0.0,
+@@ -311,6 +337,153 @@
+     }
+ }
+ 
++// One exact ending diagnosis: observations only, no commands or simulation state writes.
++fn trace_oasis_native(
++    world: &mut bevy::ecs::world::World,
++    definitions: &sim::Definitions,
++    events: &[SimEvent],
++    at: u64,
++) {
++    if std::env::var_os("RA8_OASIS_NATIVE_TRACE").is_none() {
++        return;
++    }
++    let tick = world.resource::<sim::SimTick>().0;
++    let snapshot = at % 6000 == 5999;
++    if snapshot {
++        for (player, state) in world.resource::<sim::Players>().iter() {
++            let queues: Vec<_> = state
++                .queues()
++                .map(|(key, q)| {
++                    let entries: Vec<_> = q
++                        .iter()
++                        .map(|head| {
++                            let name = match head.item {
++                                sim::ProductionItem::Unit(k) => {
++                                    definitions.unit(k).unwrap().id.as_str()
++                                }
++                                sim::ProductionItem::Building(k) => {
++                                    definitions.building(k).unwrap().id.as_str()
++                                }
++                            };
++                            let cost = definitions.production(head.item).unwrap().cost;
++                            (
++                                head.item,
++                                name,
++                                head.charged,
++                                cost.saturating_sub(head.charged),
++                            )
++                        })
++                        .collect();
++                    (key, entries)
++                })
++                .collect();
++            let ai = world.resource::<sim::AiPlayers>().controller(player);
++            eprintln!(
++                "oasis native loop{at} tick{tick} {player:?} credits{} power{}/{} repairing{:?} queues{queues:?} target{:?} wave{:?}",
++                state.credits(),
++                state.power_produced(),
++                state.power_consumed(),
++                state.repairing(),
++                ai.and_then(|c| c.target()),
++                ai.map(|c| c.wave())
++            );
++        }
++        for (id, owner, u, m, p, hp, orders, weapon) in world
++            .query::<(
++                &SimId,
++                &sim::Owner,
++                &sim::Unit,
++                &sim::Mobile,
++                &sim::Position,
++                &sim::Health,
++                &sim::Orders,
++                Option<&sim::Weapon>,
++            )>()
++            .iter(world)
++        {
++            eprintln!(
++                "oasis actor loop{at} tick{tick} {id:?} {owner:?} {} kind{:?} cell{:?} fine{:?} hp{} step{:?} order{:?} weapon{weapon:?}",
++                definitions.unit(u.kind).unwrap().id,
++                u.kind,
++                m.cell,
++                p.0,
++                hp.hit_points,
++                m.step,
++                orders
++                    .current
++                    .as_ref()
++                    .map(|o| (o.destination, o.best, &o.state))
++            );
++        }
++        for (id, owner, b, hp) in world
++            .query::<(&SimId, &sim::Owner, &sim::Building, &sim::Health)>()
++            .iter(world)
++        {
++            let special = world.resource::<sim::SpecialState>();
++            eprintln!(
++                "oasis building loop{at} tick{tick} {id:?} {owner:?} {} hp{} charge{:?} erasure{:?}",
++                definitions.building(b.kind).unwrap().id,
++                hp.hit_points,
++                special.charge.get(id),
++                special.erasures.get(id)
++            );
++        }
++    }
++    for event in events {
++        if let SimEvent::WeaponFired {
++            attacker,
++            target,
++            weapon,
++        } = event
++        {
++            let Some(terms) = definitions.weapon(*weapon) else {
++                continue;
++            };
++            if !definitions
++                .warhead(terms.warhead)
++                .is_some_and(|warhead| warhead.temporal)
++            {
++                continue;
++            }
++            for (id, owner, u, m, p) in world
++                .query::<(
++                    &SimId,
++                    &sim::Owner,
++                    &sim::Unit,
++                    &sim::Mobile,
++                    &sim::Position,
++                )>()
++                .iter(world)
++            {
++                if id == attacker {
++                    eprintln!(
++                        "oasis temporal loop{at} tick{tick} {id:?} {owner:?} {} cell{:?} fine{:?} target{target:?} weapon{:?} range{} erasure{:?}",
++                        definitions.unit(u.kind).unwrap().id,
++                        m.cell,
++                        p.0,
++                        weapon,
++                        terms.range,
++                        world.resource::<sim::SpecialState>().erasures.get(target)
++                    );
++                }
++            }
++            for (id, b, hp) in world
++                .query::<(&SimId, &sim::Building, &sim::Health)>()
++                .iter(world)
++            {
++                if id == target {
++                    eprintln!(
++                        "oasis temporal target loop{at} tick{tick} {id:?} {} footprint{:?} hp{}",
++                        definitions.building(b.kind).unwrap().id,
++                        b.footprint,
++                        hp.hit_points
++                    );
++                }
++            }
++        }
++    }
++}
++
+ fn trace_economy_events(world: &mut bevy::ecs::world::World, events: &[SimEvent], at: u64) {
+     let Some(mut trace) = world.remove_resource::<EconomyTrace>() else {
+         return;
+@@ -392,6 +565,7 @@
+             .buildings
+             .insert(*id, definitions.building(building.kind).unwrap().id.clone());
+     }
++    trace_oasis_native(world, &definitions, events, at);
+     let coordination = std::env::var_os("RA8_AIR_COORD_TRACE").is_some();
+     if coordination {
+         for event in events {

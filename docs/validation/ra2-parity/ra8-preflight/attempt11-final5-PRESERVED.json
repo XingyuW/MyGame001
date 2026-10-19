@@ -1,0 +1,92 @@
+{
+  "created_utc": "2026-10-19T16:26:47.231917+00:00",
+  "status": "Immutable failed scoped-prefix preserved in place; no prefix reuse/overwrite",
+  "count": 21,
+  "bytes": 1215825,
+  "files": {
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-RUNNING.json": {
+      "bytes": 409,
+      "sha256": "272791a60e9c651cc2ff4caf814e99dc352667d1cbefcee54214c0260d6fcd04"
+    },
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-STOPPED.json": {
+      "bytes": 834,
+      "sha256": "492d8fbcf44271282d3af9b3dd834ce2e39726332675ba27772fc925c98579be"
+    },
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-clippy.log": {
+      "bytes": 230,
+      "sha256": "035c12edf2f802729f92ba99882749e232e7352d1fdd83bf6535494329009fcc"
+    },
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-default-demo10.log": {
+      "bytes": 6989,
+      "sha256": "335db9d2d3583e269280ac79aa64ab8686fd8a19b59aff43b8eb8844384cbf4c"
+    },
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-failed-outcomes.json": {
+      "bytes": 12004,
+      "sha256": "2ecdcce16cbd8280542027e335a82c4e14cd0e591b3eae3436c3551ca961227a"
+    },
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-failed-smallest-ten-player-and-neighbors.log": {
+      "bytes": 789,
+      "sha256": "e70af198fcf13b3006f4dc77069ff0c81b5a70d070725c6a2bc322e6841fc894"
+    },
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-fmt.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-focused-attrition.log": {
+      "bytes": 1590,
+      "sha256": "c26135b807cde331843651ae38145d9adee8c01e21ab80bf526146a09dd3689f"
+    },
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-focused-composition.log": {
+      "bytes": 1934,
+      "sha256": "e5b5698af9a7a1aaff22473bc6f88b728e961c277fb5f8176586ae53c0eb0746"
+    },
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-focused-ra4.log": {
+      "bytes": 719,
+      "sha256": "62d36ce2575657eead987eab069fbbe44ebfa9ec965f0276dfcbcb5068a2f65f"
+    },
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-focused-ra8-ai.log": {
+      "bytes": 10004,
+      "sha256": "9ecae783801176f84e7c87aa8204734576fd07421cfc0b0c65d301a7f0875ecf"
+    },
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-focused-recovery.log": {
+      "bytes": 2692,
+      "sha256": "0663a870f38b99efc5453fa275c8eca58d3f033e4372aad6cc76c2320050e9d3"
+    },
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-generator.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-m13-all.log": {
+      "bytes": 8341,
+      "sha256": "d8fe48a5ebe6c6ad7dabba2d114e93b4e606a43f7f462510167f44caa3681e49"
+    },
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-preflight.json": {
+      "bytes": 8736,
+      "sha256": "a02b0d5b3cd1865affa6cba17413db3e72d04ea0665bb3e0320f7aa69f904f6c"
+    },
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-reference.log": {
+      "bytes": 69,
+      "sha256": "5fa32e9687ef749dd76543b607f37bc835ddd9e7469e2b7b5874d233ee5cf964"
+    },
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-retained-results.json": {
+      "bytes": 11118,
+      "sha256": "67b64a5fce0529d4c408d7c0f7357db5eaeed8338041f6696997a1c27ea066a9"
+    },
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-retained37.log": {
+      "bytes": 1057807,
+      "sha256": "c86820ddb23ec29897d5d2c74fd5f66e9368b946cada16dedbd30f31af6220e5"
+    },
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-runtime-manifest.json": {
+      "bytes": 38191,
+      "sha256": "e644c417cc7c19969cb822a310880bd3d6fd4eb77a3bc4400e86d773b237d519"
+    },
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-test-example-manifest.json": {
+      "bytes": 19436,
+      "sha256": "79f9b6b2155bcf7b4b4290d65b7b33e1c74b15f9d9a258e2b37d401cddbaa24c"
+    },
+    "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-test-inventory.json": {
+      "bytes": 33933,
+      "sha256": "53ad6b20f0e82c3bd2a35a36e9bc8cc27faabcc89a43bac1773fac30b6856649"
+    }
+  }
+}

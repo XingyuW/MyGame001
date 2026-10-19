@@ -1,0 +1,31 @@
+{
+  "label": "attempt11-temporal-original-ai-before1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_attrition_tests::ra8_original_surface_approach_keeps_its_native_temporal_building_channel",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T18:39:12.403387+00:00",
+  "elapsed_seconds": 20.18239920801716,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "323f97d83614232db3d1d619d54847b885c1f0635d55382bc8804d95bb998ef9",
+    "crates/sim/src/special/infantry.rs": "94a2be776139901edbc3ab58fbf7e8bad09f89bd7cdabf60d6b5854043b9d7c2",
+    "crates/sim/tests/ra8_temporal.rs": "c281b0f3e0a93f682d8aceb91caf1b3acda29f729ab06f49b99fd97c1017eca5"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "323f97d83614232db3d1d619d54847b885c1f0635d55382bc8804d95bb998ef9",
+    "crates/sim/src/special/infantry.rs": "94a2be776139901edbc3ab58fbf7e8bad09f89bd7cdabf60d6b5854043b9d7c2",
+    "crates/sim/tests/ra8_temporal.rs": "c281b0f3e0a93f682d8aceb91caf1b3acda29f729ab06f49b99fd97c1017eca5"
+  },
+  "log_sha256": "284ab8d97ceaa99191455e6292691bcb86d5e47751f012eade034e174d3a130a"
+}

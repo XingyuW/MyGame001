@@ -1,0 +1,23 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_unfunded_garrison_recovery_retains_its_released_infantry_for_real_offence",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T12:11:15.126971+00:00",
+  "source_before": "4fc1dc0a0e2c2fd5e3339a3995a2accf4a99234a8aa0c51ea7136c227f9a323a",
+  "mutation": "remove only the new garrison investment admission guard",
+  "mutated_source": "0a5d0a9220c00b3bb7b918de7fc796fd1f279139cc7cee875a021df4335f196a",
+  "exit": 101,
+  "restored_source": "4fc1dc0a0e2c2fd5e3339a3995a2accf4a99234a8aa0c51ea7136c227f9a323a",
+  "elapsed_seconds": 20.330760416050907,
+  "log_sha256": "9b3f0b4d7d351e576d3d1790d0b41c107a631d4b7e71bf0ef2c3f23fdb9743d9"
+}

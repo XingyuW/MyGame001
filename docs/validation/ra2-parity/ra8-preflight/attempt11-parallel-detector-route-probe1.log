@@ -1,0 +1,27 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0502]: cannot borrow `app` as mutable because it is also borrowed as immutable
+    --> crates/sim/tests/ra8_ai.rs:9146:37
+     |
+9140 | ...   let controller = app.world().resource::<sim::AiPlayers>().controller(PlayerId(0)).unwrap();
+     |                        --- immutable borrow occurs here
+...
+9146 | ...           let e = unit_entity(&mut app, dog);
+     |                                   ^^^^^^^^ mutable borrow occurs here
+...
+9151 | ...       assert!(!controller.wave().contains(&dog), "an independently scouting Dog must not silently join the unrelated combat wa...
+     |                    ---------- immutable borrow later used here
+
+error[E0502]: cannot borrow `app` as mutable because it is also borrowed as immutable
+    --> crates/sim/tests/ra8_ai.rs:9148:37
+     |
+9140 | ...   let controller = app.world().resource::<sim::AiPlayers>().controller(PlayerId(0)).unwrap();
+     |                        --- immutable borrow occurs here
+...
+9148 | ...           let e = unit_entity(&mut app, factory);
+     |                                   ^^^^^^^^ mutable borrow occurs here
+...
+9151 | ...       assert!(!controller.wave().contains(&dog), "an independently scouting Dog must not silently join the unrelated combat wa...
+     |                    ---------- immutable borrow later used here
+
+For more information about this error, try `rustc --explain E0502`.
+error: could not compile `sim` (test "ra8_ai") due to 2 previous errors

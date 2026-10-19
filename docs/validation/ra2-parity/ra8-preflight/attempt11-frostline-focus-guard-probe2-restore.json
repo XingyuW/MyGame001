@@ -1,0 +1,6 @@
+{
+  "diagnostic_only": true,
+  "meaning": "Intentionally bounded observational snapshot at120000; no-winner diagnostic is not a full400000 outcome. Example bound restored in finally.",
+  "example_sha_before": "4537d24263cc36436118c0093a8b925412c4c8097a514026daa545b1ae4b0aac",
+  "example_sha_after": "4537d24263cc36436118c0093a8b925412c4c8097a514026daa545b1ae4b0aac"
+}

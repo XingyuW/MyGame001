@@ -1,0 +1,22 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Checking game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+error: using `clone` on type `Mobile` which implements the `Copy` trait
+    --> crates/sim/tests/ra8_ai.rs:8515:37
+     |
+8515 |             .map(|(id, m, w)| (*id, m.clone(), w.clone()))
+     |                                     ^^^^^^^^^ help: try dereferencing it: `*m`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#clone_on_copy
+     = note: `-D clippy::clone-on-copy` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::clone_on_copy)]`
+
+error: using `clone` on type `Weapon` which implements the `Copy` trait
+    --> crates/sim/tests/ra8_ai.rs:8515:48
+     |
+8515 |             .map(|(id, m, w)| (*id, m.clone(), w.clone()))
+     |                                                ^^^^^^^^^ help: try dereferencing it: `*w`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#clone_on_copy
+
+error: could not compile `sim` (test "ra8_ai") due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...

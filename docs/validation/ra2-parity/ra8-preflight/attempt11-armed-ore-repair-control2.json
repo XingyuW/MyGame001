@@ -1,0 +1,28 @@
+{
+  "label": "attempt11-armed-ore-repair-control2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_real_armed_worker_income_keeps_native_paid_repairs_and_harvesting",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T13:05:58.014231+00:00",
+  "elapsed_seconds": 7.443633334012702,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "8362c19c3552d2375f4dd4e2a5142ed93b9108b1020f92b52ff35f3fdeadf854"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "8362c19c3552d2375f4dd4e2a5142ed93b9108b1020f92b52ff35f3fdeadf854"
+  },
+  "log_sha256": "92fa1198f0f90218e95d53cf1f4ad3ec3848097aad1d4669964f2ffc1f7b59e2"
+}

@@ -1,0 +1,22 @@
+{
+  "utc": "2026-10-19T11:23:04.475142+00:00",
+  "original_sha256": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+  "old_sha256": "9d47fb7efae4ed984a1f4fd6052ffc463bc023386144c5de580a0648bf31c367",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_an_incapable_naval_survivor_does_not_suppress_a_real_armed_miner_attack",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "exit": 101,
+  "elapsed_seconds": 20.295065792044625,
+  "log_sha256": "d1c30a9901f1d9fd8ef51f8a6660dd6617c306b08f3eefd6e5981d890222bd4b",
+  "restored_sha256": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4"
+}

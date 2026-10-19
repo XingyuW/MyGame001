@@ -1,0 +1,22 @@
+{
+  "phase": "retained37",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "--",
+    "--nocapture",
+    "--test-threads=4"
+  ],
+  "wrapper_pid": 37305,
+  "child_pid": 38059,
+  "start_utc": "2026-10-19T17:59:42.908942+00:00",
+  "head": "ab4a17606fcd013a4d8cc6452aa8435fcd24e987",
+  "active": false,
+  "exit": 101,
+  "elapsed_seconds": 1529.961550665961
+}

@@ -1,0 +1,11 @@
+    Finished `release` profile [optimized] target(s) in 0.14s
+     Running tests/m13_grown_maps.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m13_grown_maps-ee40a9cea2db76e9)
+
+running 3 tests
+test a_ten_player_match_on_the_smallest_map_is_played_to_its_end ... grown exact Some(Won { winner: PlayerId(1), tick: 48160 }) after 48161 ticks, defeated {PlayerId(0): 44974, PlayerId(2): 16943, PlayerId(3): 11034, PlayerId(4): 6766, PlayerId(5): 6584, PlayerId(6): 19670, PlayerId(7): 23595, PlayerId(8): 48160, PlayerId(9): 26648}
+ok
+test every_shipped_map_grows_with_every_player_count ... ok
+test ten_computer_players_build_bases_and_bring_in_ore_on_enlarged_maps ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 35.89s
+

@@ -1,0 +1,28 @@
+{
+  "label": "attempt11-garrison-recovery-after2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_unfunded_garrison_recovery_retains_its_released_infantry_for_real_offence",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T12:07:16.888694+00:00",
+  "elapsed_seconds": 0.49450170900672674,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "f25afdd910e51146e3e60e2848f56182e364e3d0cfecb62e1dc16b421ead4dc5"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "f25afdd910e51146e3e60e2848f56182e364e3d0cfecb62e1dc16b421ead4dc5"
+  },
+  "log_sha256": "2e6b3ee4cb801d7c61f0ac059ed98d85bf98772e6da58701bf7199559cb1eab6"
+}

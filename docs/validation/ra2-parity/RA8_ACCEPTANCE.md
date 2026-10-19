@@ -1,13 +1,15 @@
 # RA8 acceptance record
 
-Status: eleventh source checkpoint passes18 fresh scoped commands,151 tests passed/
-0failed/0ignored across12 target invocations. Runtime313e96b3ef0e37af3b834c32f02d23fcc19cc17c
-(AI9d47fb7e/strategye689d137) fixes actual repair/paid-work funding boundaries. Both failed
-attempt10 pairs and the new Demo Easy stall now win under unchanged limits; all21 actual
-default m13 maps win with ten builders. Fixed256 means.785201/.808316/.846548ms pass5ms.
-Mandatory complete full13 and both fresh756-winner R29 distributions remain required.
-This is validated preflight,not independent review or completed RA8 acceptance. Every prior
-failed,interrupted,insufficient and corrected observation remains preserved.
+Status: corrective scoped final8 completed all18 commands with exit0,317Rustpasses,
+0failed/ignored across17 target invocations. Retained37 has37explicitWon/36distinct
+configurations;all21 actual-default ten-player maps have winners and ten builders.
+The three fixed256 means pass. R171's native Temporal edge-retention correction has
+normal/elite/full-erasure/original-AI and109affected controls,with original failures and
+three bounded causal mutations preserved. This is scoped validation,not full acceptance
+or exclusive Hospital-cause attribution. Mandatory gate11's failed raw bytes remain.
+Checkpoint12 binds source8d5fa86 after coordinator checks and a separate staged check0.
+The scoped commands ran before that commit on identical frozen source;full13 release is pending. One complete all0full13,both fresh756-winner
+R29 distributions,RA9 and independent review remain. Historical metrics are not transferred.
 
 ## Acceptance checklist
 
@@ -28,14 +30,16 @@ failed,interrupted,insufficient and corrected observation remains preserved.
 - Compatibility: RA5 bridge behavior, RA6 utility/transient exclusions and paid Spy veterancy,
   RA7 commands, guard range, live-power and first-spawn/same-batch concealment regressions.
 - Performance: measured immutable sharing and Prop membership with identical seeded digests;
-  final-source ten-player 256×256 means pass below5ms and all21 maps have explicit winners.
+  final-source ten-player 256×256 means must pass below5ms and all21 maps require explicit winners.
 - Validation: serial relevant preflight, all thirteen frozen commands, both756-winner sweeps,
   fixed soak, package/smokes and before/after match-length median/p90/max remain to close.
 
 ## Policy and evidence
 
-R88–R160 in `docs/DECISIONS.md` record the implementation, exact existing-test migrations,
+R88–R171 in `docs/DECISIONS.md` record the implementation, exact existing-test migrations,
 game-owned AI assumptions, failure diagnoses, negative mutation and process deviations.
+R172 records the user's two-batch scheduling authorization for all five independent review
+slices and a fresh lead;review coverage and independence remain required.
 Source difficulty and target weights come from the audited reference table. Closed-source
 AI policy is not claimed: composition, tier reserves, target-category mapping, garrison/depot
 radii, artillery standoff, naval rescan and strategic offsets are declared data assumptions.
@@ -49,6 +53,70 @@ No clone, worktree or validation environment was created. Configured Cargo/UV/PI
 preserved. New recreatable parser scratch is at configured Cargo target `tmp/ra8_definitions`
 (716 KiB measured after the slow-speed parser fixture;58 files/584038 file bytes), retained for reruns and unnecessary for release.
 Earlier RA5 render and RA7 parser evidence remain.
+
+## Twelfth checkpoint: completed final8 scoped validation, full13 pending
+
+[Checkpoint12](ra8-preflight/checkpoint12.json),[metrics](ra8-preflight/checkpoint12-metrics.json),
+[inventory](ra8-preflight/checkpoint12-inventory.json),[source snapshots](ra8-preflight/checkpoint12-manifest-verification.json)
+and [preservation](ra8-preflight/checkpoint12-attempt11-preservation.json) bind the frozen
+working tree based on ab4a176,later committed as8d5fa86 after its separate staged check0.
+No scoped command is claimed postcommit. An explicit full13 release remains pending.
+All18 commands exit0:317passed/0failed/0ignored across17 Rust target invocations;command
+sum5535.743549s/wall5535.755057s. Summary SHA
+`0f487b09b8b16cda62d7b4a9ec7952a542240ad4d9248fafb16430f8b231e426`.
+This includes AI112,attrition15,recovery21,composition14,legacyRA4two,109affected native
+Temporal/command/combat/infantry/cloak/vision tests,defaultDemo's ten pairings,grown-map
+three,retained37 and three explicit example guards. No duplicate broad workspace suite
+was run;mandatory full13 still runs its unfiltered workspace command.
+
+Static inventory is1124→1359 (+235),none removed/renamed/ignored;this differs from executed
+counts. Fresh344runtime+169additional snapshots overlap18=495unique paths,all hashes match.
+Both preserved attempt11 sets retain34files/166895bytes each:68copies,0mismatches,including
+failed253/1/0 workspace,partial05,unrun06–13 and stale production TSV provenance. No old
+raw bytes were normalized. The107-probe provenance index is not107passes or acceptance.
+
+All21 m13 maps finish with explicit Won and ten builders under unchanged400000:ending
+median85258/p90nearest-rank113337/max218369. Command2993.285836s;measured sum2983.326s/
+elapsed sum2983.738s. Raw SHA
+`d83b41b30d27bd4232fab2d43ff31e6b92cb0c31a8318edf9ec97c1f7f87364a`.
+Worst whole-run meanCoral2.598ms meets<5ms;Coral also has the longest tick768.559ms.
+Largest p99IronIsthmus30.642ms;largest busiest1000Glacier11.758ms;all21 record2343ticks
+over50ms. These tails remain limitations;passing means do not establish smoothness.
+No optional optimization followed passing budgets. Only bounded read-only process metadata
+was captured;no profiler or competing simulation ran.
+
+| Fixed256 map | Ticks | Mean ms | p99 ms | Maximum ms | Busiest1000 mean ms | Ticks>50ms | Builders |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Liberty Bay | 24000 | 1.351 | 7.653 | 42.515 | 2.611 | 0 | 10 |
+| Continental Divide | 24000 | 1.446 | 7.923 | 76.322 | 3.013 | 14 | 10 |
+| Pacific Atoll | 24000 | 1.297 | 24.900 | 162.008 | 3.615 | 3 | 10 |
+
+Retained37/36distinct configurations all win,raw6a52a41d…/2213.262857s. Exact current
+Demo RussiaEasy/LibyaEasy68863/72000≈.956431 remains an RA9 near-limit watch (both duplicate
+tests retained);SteelAmerica/Cuba188712/288000=.65525 is not near-limit. Grown-map exact
+Crossroadsseed7 P1Won34423 retains all9-defeated/made-start assertions. Fresh corrected
+OasisGermany/GBBrutal P1Won143361 remains combined native-correction ending evidence.
+
+No source price/stat/TeamDelay/R53/public rule or limit changed in R162–R171;R171 adds only
+shared native Temporal geometry. Existing Oil-income repair fixture migration preserves
+all assertions and adds real captured income/production. Only a NEW Temporal parser fixture
+changes invalid equal min/max to legal min1024/exact4cells,unchanged shipped maximum.
+M6 gathering-point partition,R83,R96actorlessProps,R99 and conservative income/sale-policy
+boundaries remain RA9 debt;R97 is closed byR103. Real building Temporal edge retention is
+corrected here and still requires the final gate,not every Temporal/scenery mechanic.
+
+[Fresh storage](ra8-preflight/checkpoint12-storage.json):RA5render10files/875468logicalB,
+RA7parser70/11615632B,RA8parser58/584038B;all retained in configured caches for reruns,
+unnecessary for release. No new substantial external directory,clone or worktree.
+Full13/both fresh756 R29 distributions,RA9,independent review and user visual/audio/play-feel
+verification remain pending;coordinator checks are not independent review.
+
+Checkpoint12 source commit8d5fa86 contains exactly8owned source/test paths after a separate
+unfiltered staged check0. Evidence cached check exits2,NOTpassed:94preserved raw diagnostics
+(90blankEOF/4trailing;92native-log/2captured-patch-context),zero source/data/test/prose errors.
+Every diagnostic records exact file/line/EOL and staged-blob SHA;raw equals staged. Stdout is
+JSON-escaped directly (d892be6b…),not copied into a recursive raw log. Raw bytes remain intact;
+a separate identical final staged recheck precedes the later deliberate evidence commit.
 
 ## Tenth checkpoint: final1 focused evidence and failed ninth gate
 

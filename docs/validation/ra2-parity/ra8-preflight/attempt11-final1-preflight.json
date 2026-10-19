@@ -1,0 +1,112 @@
+{
+  "start_utc": "2026-10-19T11:53:41.084798+00:00",
+  "head": "ab4a17606fcd013a4d8cc6452aa8435fcd24e987",
+  "runtime_manifest": "attempt11-final1-runtime-manifest.json",
+  "additional_manifest": "attempt11-final1-test-example-manifest.json",
+  "hygiene_note": "No optional unfiltered diff preflight here; mandatory full13 and standalone staged checks retain their original unfiltered checks. Raw failed gate remains unstaged/preserved.",
+  "commands": [
+    {
+      "phase": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start_utc": "2026-10-19T11:53:41.084943+00:00",
+      "exit": 0,
+      "elapsed_seconds": 0.9715722919791006,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt11-final1-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_targets": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "source_mismatches": []
+    },
+    {
+      "phase": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "start_utc": "2026-10-19T11:53:42.056825+00:00",
+      "exit": 0,
+      "elapsed_seconds": 6.422115041990764,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt11-final1-clippy.log",
+      "sha256": "ed908de7036a000cb5180c792e71049887d41eb66959dd13cc415251299be738",
+      "test_targets": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "source_mismatches": []
+    },
+    {
+      "phase": "generator",
+      "command": [
+        "python3",
+        "scripts/generate_ra2_data.py",
+        "--check"
+      ],
+      "start_utc": "2026-10-19T11:53:48.479236+00:00",
+      "exit": 0,
+      "elapsed_seconds": 0.1156642499845475,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt11-final1-generator.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_targets": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "source_mismatches": []
+    },
+    {
+      "phase": "reference",
+      "command": [
+        "python3",
+        "scripts/ra2_reference.py",
+        "--check"
+      ],
+      "start_utc": "2026-10-19T11:53:48.595168+00:00",
+      "exit": 0,
+      "elapsed_seconds": 0.11637733300449327,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt11-final1-reference.log",
+      "sha256": "5fa32e9687ef749dd76543b607f37bc835ddd9e7469e2b7b5874d233ee5cf964",
+      "test_targets": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "source_mismatches": []
+    },
+    {
+      "phase": "focused-ra8-ai",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "--",
+        "--test-threads=1"
+      ],
+      "start_utc": "2026-10-19T11:53:48.711810+00:00",
+      "exit": 101,
+      "elapsed_seconds": 59.31172520801192,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt11-final1-focused-ra8-ai.log",
+      "sha256": "dede53964280bff5f8993140f81abb79b6b2772eb477afbf3b24eb8add6c88a4",
+      "test_targets": 1,
+      "passed": 99,
+      "failed": 1,
+      "ignored": 0,
+      "source_mismatches": []
+    }
+  ],
+  "elapsed_seconds": 66.9387299590162
+}

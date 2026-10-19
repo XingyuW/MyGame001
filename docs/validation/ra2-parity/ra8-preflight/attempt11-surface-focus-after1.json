@@ -1,0 +1,28 @@
+{
+  "label": "attempt11-surface-focus-after1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_surface_building_focus_responds_to_a_new_real_local_defender",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T12:15:54.048855+00:00",
+  "elapsed_seconds": 20.36634462501388,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "1b8423e8df02189ad25eb27a0716e240d3fbc691ef97ab1c6809dc70a7050c4d"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "1b8423e8df02189ad25eb27a0716e240d3fbc691ef97ab1c6809dc70a7050c4d"
+  },
+  "log_sha256": "9e42618ed4ebe1dfeda7968cac296fad4b66cd91bfbac41fc9125ca5b6a065a3"
+}

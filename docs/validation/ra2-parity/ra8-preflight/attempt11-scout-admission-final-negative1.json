@@ -1,0 +1,23 @@
+{
+  "label": "attempt11-scout-admission-final-negative1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_a_healthy_detector_route_survives_the_next_main_wave_admission",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T13:21:32.468533+00:00",
+  "elapsed_seconds": 20.59005470899865,
+  "exit": 101,
+  "original_sha256": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+  "mutated_sha256": "5fd506d0f48a459c7de8b9278a7c13d94ce2dae24e547b6ed15657826d98d123",
+  "restored_sha256": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+  "log_sha256": "f361193de61f5c41b9e4d951c1dd3400a6eb757866961d127f457a461303c3c0"
+}

@@ -1,0 +1,21 @@
+{
+  "phase": "focused-ra8-ai",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "--",
+    "--test-threads=1"
+  ],
+  "wrapper_pid": 4327,
+  "child_pid": 4497,
+  "start_utc": "2026-10-19T11:53:48.711810+00:00",
+  "head": "ab4a17606fcd013a4d8cc6452aa8435fcd24e987",
+  "active": false,
+  "exit": 101,
+  "elapsed_seconds": 59.31172520801192
+}

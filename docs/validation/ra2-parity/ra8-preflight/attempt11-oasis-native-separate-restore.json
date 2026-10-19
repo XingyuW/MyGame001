@@ -1,0 +1,9 @@
+{
+  "checked_utc": "2026-10-19T18:33:52.783380+00:00",
+  "note": "Separate later source read after temporary diagnostic restoration, before any dependent validation or runtime change.",
+  "sha256": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "323f97d83614232db3d1d619d54847b885c1f0635d55382bc8804d95bb998ef9",
+    "crates/game/tests/ra8_gate_matches.rs": "7bc635b8a0bf2fd7a1f44893658af2b23d3ffa11e485e0c93cf9c5acf4bf6b05"
+  }
+}

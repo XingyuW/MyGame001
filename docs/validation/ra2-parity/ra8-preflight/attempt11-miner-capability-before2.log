@@ -1,0 +1,15 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0600]: cannot apply unary operator `!` to type `Option<u64>`
+    --> crates/sim/tests/ra8_ai.rs:7826:13
+     |
+7826 |     assert!(!world.resource::<sim::MatchState>().defeated(PlayerId(0)));
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ cannot apply unary operator `!`
+     |
+note: `Option<u64>` does not implement `Not`
+    --> /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/option.rs:598:1
+     |
+ 598 | pub enum Option<T> {
+     | ^^^^^^^^^^^^^^^^^^ `Option<u64>` is defined in another crate
+
+For more information about this error, try `rustc --explain E0600`.
+error: could not compile `sim` (test "ra8_ai") due to 1 previous error

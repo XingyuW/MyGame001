@@ -1,0 +1,28 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+warning: function `garrison_investment` is never used
+    --> crates/sim/src/ai/strategy.rs:1167:4
+     |
+1167 | fn garrison_investment(
+     |    ^^^^^^^^^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `sim` (lib) generated 1 warning
+    Finished `release` profile [optimized] target(s) in 19.99s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+
+thread 'ra8_unfunded_garrison_recovery_retains_its_released_infantry_for_real_offence' (9525435) panicked at crates/sim/tests/ra8_ai.rs:8492:13:
+last-stand recovered infantry was immediately regarrisoned
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_unfunded_garrison_recovery_retains_its_released_infantry_for_real_offence ... FAILED
+
+failures:
+
+failures:
+    ra8_unfunded_garrison_recovery_retains_its_released_infantry_for_real_offence
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 101 filtered out; finished in 0.06s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

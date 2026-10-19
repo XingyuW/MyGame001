@@ -1,0 +1,35 @@
+{
+  "utc": "2026-10-19T20:30:58.765831+00:00",
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit": 0,
+  "passed": true,
+  "paths": [
+    "crates/game/tests/ra8_gate_matches.rs",
+    "crates/sim/examples/m13_ten_players.rs",
+    "crates/sim/src/ai.rs",
+    "crates/sim/src/ai/ra8_attrition_tests.rs",
+    "crates/sim/src/ai/strategy.rs",
+    "crates/sim/src/special/infantry.rs",
+    "crates/sim/tests/ra8_ai.rs",
+    "crates/sim/tests/ra8_temporal.rs"
+  ],
+  "stdout": "",
+  "stderr": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stage_blob_sha256": {
+    "crates/game/tests/ra8_gate_matches.rs": "7bc635b8a0bf2fd7a1f44893658af2b23d3ffa11e485e0c93cf9c5acf4bf6b05",
+    "crates/sim/examples/m13_ten_players.rs": "59650e6ece191b49fea9749ba10e088d2ccad4f586366ef4a0fa1587783bda56",
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "bc5e2c071410f3f9f64a2bdc44f64db7d2bc8a59b25c726b0d297f04779ac1e8",
+    "crates/sim/src/ai/strategy.rs": "323f97d83614232db3d1d619d54847b885c1f0635d55382bc8804d95bb998ef9",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/sim/tests/ra8_ai.rs": "2d4e17508f6406183719ff5f5090fd2e610c3ff9a759c19039bb3afa5888566c",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553"
+  },
+  "separate_commit_required": true
+}

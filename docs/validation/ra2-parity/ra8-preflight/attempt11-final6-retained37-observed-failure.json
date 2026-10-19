@@ -1,0 +1,46 @@
+{
+  "observed_utc": "2026-10-19T17:10:33.347740+00:00",
+  "scope": "One verified unexpected failed native case within still-running retained37 command; whole-target exit/count pending. No dependent phase may run after nonzero completion.",
+  "raw_path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-retained37.log",
+  "raw_prefix_bytes": 831004,
+  "raw_prefix_sha256": "614051644da7fd47674c5aec18ba5b5e3228489ab25a2cf5bbc63bfa0ee73d0c",
+  "context": [
+    "building SimId(243) Owner(PlayerId(1)) nuclear_reactor CellPos { x: 225, y: 207 } Health { hit_points: 1000 }",
+    "building SimId(178) Owner(PlayerId(1)) iron_curtain CellPos { x: 212, y: 209 } Health { hit_points: 501 }",
+    "building SimId(207) Owner(PlayerId(1)) tesla_reactor CellPos { x: 224, y: 210 } Health { hit_points: 750 }",
+    "building SimId(154) Owner(PlayerId(1)) nuclear_silo CellPos { x: 206, y: 222 } Health { hit_points: 1000 }",
+    "building SimId(64) Owner(PlayerId(1)) radar_tower CellPos { x: 213, y: 218 } Health { hit_points: 861 }",
+    "building SimId(111) Owner(PlayerId(1)) soviet_battle_lab CellPos { x: 221, y: 209 } Health { hit_points: 500 }",
+    "building SimId(74) Owner(PlayerId(1)) tesla_reactor CellPos { x: 220, y: 212 } Health { hit_points: 750 }",
+    "building SimId(205) Owner(PlayerId(1)) tesla_reactor CellPos { x: 203, y: 221 } Health { hit_points: 750 }",
+    "special SpecialState { strategic: StrategicState { missiles: [], storm: None, flights: {}, announced: {SimId(154): PlayerId(1), SimId(155): PlayerId(0), SimId(176): PlayerId(0), SimId(178): PlayerId(1), SimId(2264): PlayerId(0), SimId(2684383079): PlayerId(1), SimId(2684391576): PlayerId(1)} }, parasites: {}, deployed: {}, mirage_trees: {}, disguises: {}, erasures: {}, charges: {}, radiation_sites: [], coil_charge: {}, death_detonated: {}, eruption_next: {}, temporal_removed: {}, charge: {SimId(154): 9018, SimId(176): 399, SimId(178): 6000}, protected: {SimId(2378): 288601}, disabled: {}, cargo: {SimId(2684368275): [], SimId(2684406380): []}, garrisons: {}, controlled: {}, bombs: {}, zones: [], rearming: {}, carrier_flights: {}, interactions: {}, hidden: {(PlayerId(0), SimId(1949))}, outages: {}, docked: {}, ammo: {}, reloading: {}, docks: {}, bays: {SimId(2378): Bay { slots: [Lost(322)], target: Some(SimId(82)), pending: 0, wait: 0 }}, spawned: {}, missiles: {}, surfaced: {} }",
+    "",
+    "thread 'ra8_gate11_coral_iraq_cuba_brutal_seed_zero_finishes' (9824238) panicked at crates/game/tests/ra8_gate_matches.rs:834:5:",
+    "coral_archipelago seed0 [\"iraq\", \"cuba\"] [\"brutal\", \"brutal\"]: None after288000",
+    "note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace",
+    "test ra8_gate11_coral_iraq_cuba_brutal_seed_zero_finishes ... FAILED",
+    "test ra8_gate_ember_seed_zero_finishes has been running for over 60 seconds",
+    "ember_caldera seed0 [\"libya\", \"korea\"] [\"brutal\", \"medium\"]: Some(Won { winner: PlayerId(0), tick: 37121 })",
+    "test ra8_gate_ember_seed_zero_finishes ... ok"
+  ],
+  "running": {
+    "phase": "retained37",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "--",
+      "--nocapture",
+      "--test-threads=4"
+    ],
+    "wrapper_pid": 26077,
+    "child_pid": 27579,
+    "start_utc": "2026-10-19T16:56:58.134167+00:00",
+    "head": "ab4a17606fcd013a4d8cc6452aa8435fcd24e987",
+    "active": true
+  }
+}

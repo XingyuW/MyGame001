@@ -1,0 +1,23 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_unseen_building_occupancy_cannot_change_a_surface_response_route_intent",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T12:25:14.552369+00:00",
+  "source_before": "b0df5e184134726456cea67079c2621a6395aadb75c1c5b971c8c341787e5c8c",
+  "mutation": "only surface_response_cell consults all raw building occupancy instead of visible occupancy",
+  "mutated_source": "8c97d42099b87155dadbb8d2e9d50363a8fec3a97c4e5e7270e3a0fa7dc2e119",
+  "exit": 101,
+  "restored_source": "b0df5e184134726456cea67079c2621a6395aadb75c1c5b971c8c341787e5c8c",
+  "elapsed_seconds": 20.824169958999846,
+  "log_sha256": "a810e3b62f56000b73f230c9115f179d048e7cff3871e8e9c479918a7f8aed2c"
+}

@@ -1,0 +1,567 @@
+{
+  "created_utc": "2026-10-19T13:43:08.361049+00:00",
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt11-final5-retained37.log",
+  "log_sha256": "c86820ddb23ec29897d5d2c74fd5f66e9368b946cada16dedbd30f31af6220e5",
+  "passed_functions": [
+    "ra8_gate10_demo_russia_libya_easy_seed_zero_finishes",
+    "ra8_gate11_frozen_russia_libya_easy_seed_zero_finishes",
+    "ra8_gate11_riverlands_iraq_cuba_brutal_seed_zero_finishes",
+    "ra8_gate7_demo_russia_libya_easy_seed_zero_finishes",
+    "ra8_gate7_jungle_cuba_russia_easy_seed_zero_finishes",
+    "ra8_gate11_oasis_russia_france_brutal_seed_zero_finishes",
+    "ra8_gate11_coral_iraq_cuba_brutal_seed_zero_finishes",
+    "ra8_gate7_riverlands_iraq_cuba_easy_seed_zero_finishes",
+    "ra8_gate7_lakes_russia_medium_libya_brutal_seed_zero_finishes",
+    "ra8_gate8_crossroads_great_britain_america_brutal_seed_zero_finishes",
+    "ra8_gate8_harvest_france_germany_easy_seed_zero_finishes",
+    "ra8_gate10_lakes_cuba_russia_brutal_seed_zero_finishes",
+    "ra8_gate8_liberty_france_germany_medium_seed_zero_finishes",
+    "ra8_gate7_pacific_cuba_great_britain_brutal_seed_zero_finishes",
+    "ra8_gate8_oasis_france_russia_brutal_seed_zero_finishes",
+    "ra8_gate8_oasis_libya_iraq_brutal_seed_zero_finishes",
+    "ra8_gate_continental_stall_seed_zero_finishes",
+    "ra8_gate_demo_france_cuba_brutal_seed_zero_finishes",
+    "ra8_gate_black_water_korea_france_brutal_seed_zero_finishes",
+    "ra8_gate_demo_germany_great_britain_brutal_seed_zero_finishes",
+    "ra8_gate_continental_bridge_seed_zero_finishes",
+    "ra8_gate_ember_seed_zero_finishes",
+    "ra8_gate_black_water_libya_america_brutal_seed_zero_finishes",
+    "ra8_gate_frozen_cuba_germany_brutal_seed_zero_finishes",
+    "ra8_gate_glacier_bridge_seed_zero_finishes",
+    "ra8_gate_liberty_seed_zero_finishes",
+    "ra8_gate_red_canyon_seed_zero_finishes",
+    "ra8_gate_harvest_bridge_seed_zero_finishes",
+    "ra8_gate_liberty_iraq_america_brutal_seed_zero_finishes",
+    "ra8_gate_steel_france_germany_medium_seed_zero_finishes",
+    "ra8_gate_oasis_germany_great_britain_brutal_seed_zero_finishes",
+    "ra8_gate_thousand_lakes_great_britain_america_seed_zero_finishes",
+    "ra8_gate_thousand_lakes_france_germany_seed_zero_finishes",
+    "ra8_gate_steel_harbor_america_cuba_bridge_seed_zero_finishes",
+    "ra8_gate_wheel_seed_zero_finishes",
+    "ra8_gate_wheel_germany_great_britain_brutal_seed_zero_finishes",
+    "ra8_gate_steel_harbor_seed_zero_finishes"
+  ],
+  "function_count": 37,
+  "explicit_winners": 37,
+  "distinct_configurations": 36,
+  "results": [
+    {
+      "map": "demo",
+      "seed": 0,
+      "countries": [
+        "russia",
+        "libya"
+      ],
+      "difficulties": [
+        "easy",
+        "easy"
+      ],
+      "winner": 1,
+      "tick": 65767
+    },
+    {
+      "map": "frozen_sound",
+      "seed": 0,
+      "countries": [
+        "russia",
+        "libya"
+      ],
+      "difficulties": [
+        "easy",
+        "easy"
+      ],
+      "winner": 1,
+      "tick": 59768
+    },
+    {
+      "map": "riverlands",
+      "seed": 0,
+      "countries": [
+        "iraq",
+        "cuba"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 25671
+    },
+    {
+      "map": "demo",
+      "seed": 0,
+      "countries": [
+        "russia",
+        "libya"
+      ],
+      "difficulties": [
+        "easy",
+        "easy"
+      ],
+      "winner": 1,
+      "tick": 65767
+    },
+    {
+      "map": "jungle_delta",
+      "seed": 0,
+      "countries": [
+        "cuba",
+        "russia"
+      ],
+      "difficulties": [
+        "easy",
+        "easy"
+      ],
+      "winner": 1,
+      "tick": 101282
+    },
+    {
+      "map": "oasis_gulf",
+      "seed": 0,
+      "countries": [
+        "russia",
+        "france"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 69889
+    },
+    {
+      "map": "coral_archipelago",
+      "seed": 0,
+      "countries": [
+        "iraq",
+        "cuba"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 72021
+    },
+    {
+      "map": "riverlands",
+      "seed": 0,
+      "countries": [
+        "iraq",
+        "cuba"
+      ],
+      "difficulties": [
+        "easy",
+        "easy"
+      ],
+      "winner": 1,
+      "tick": 60927
+    },
+    {
+      "map": "thousand_lakes",
+      "seed": 0,
+      "countries": [
+        "russia",
+        "libya"
+      ],
+      "difficulties": [
+        "medium",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 37438
+    },
+    {
+      "map": "crossroads",
+      "seed": 0,
+      "countries": [
+        "great_britain",
+        "america"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 28114
+    },
+    {
+      "map": "harvest_plains",
+      "seed": 0,
+      "countries": [
+        "france",
+        "germany"
+      ],
+      "difficulties": [
+        "easy",
+        "easy"
+      ],
+      "winner": 1,
+      "tick": 22013
+    },
+    {
+      "map": "thousand_lakes",
+      "seed": 0,
+      "countries": [
+        "cuba",
+        "russia"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 100645
+    },
+    {
+      "map": "liberty_bay",
+      "seed": 0,
+      "countries": [
+        "france",
+        "germany"
+      ],
+      "difficulties": [
+        "medium",
+        "medium"
+      ],
+      "winner": 1,
+      "tick": 63513
+    },
+    {
+      "map": "pacific_atoll",
+      "seed": 0,
+      "countries": [
+        "cuba",
+        "great_britain"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 67665
+    },
+    {
+      "map": "oasis_gulf",
+      "seed": 0,
+      "countries": [
+        "france",
+        "russia"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 83386
+    },
+    {
+      "map": "oasis_gulf",
+      "seed": 0,
+      "countries": [
+        "libya",
+        "iraq"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 44836
+    },
+    {
+      "map": "continental_divide",
+      "seed": 0,
+      "countries": [
+        "france",
+        "cuba"
+      ],
+      "difficulties": [
+        "easy",
+        "medium"
+      ],
+      "winner": 1,
+      "tick": 31554
+    },
+    {
+      "map": "demo",
+      "seed": 0,
+      "countries": [
+        "france",
+        "cuba"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 29130
+    },
+    {
+      "map": "black_water",
+      "seed": 0,
+      "countries": [
+        "korea",
+        "france"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 39176
+    },
+    {
+      "map": "demo",
+      "seed": 0,
+      "countries": [
+        "germany",
+        "great_britain"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 33008
+    },
+    {
+      "map": "continental_divide",
+      "seed": 0,
+      "countries": [
+        "iraq",
+        "great_britain"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 43749
+    },
+    {
+      "map": "ember_caldera",
+      "seed": 0,
+      "countries": [
+        "libya",
+        "korea"
+      ],
+      "difficulties": [
+        "brutal",
+        "medium"
+      ],
+      "winner": 0,
+      "tick": 28179
+    },
+    {
+      "map": "black_water",
+      "seed": 0,
+      "countries": [
+        "libya",
+        "america"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 44018
+    },
+    {
+      "map": "frozen_sound",
+      "seed": 0,
+      "countries": [
+        "cuba",
+        "germany"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 74455
+    },
+    {
+      "map": "glacier_pass",
+      "seed": 0,
+      "countries": [
+        "korea",
+        "russia"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 90493
+    },
+    {
+      "map": "liberty_bay",
+      "seed": 0,
+      "countries": [
+        "iraq",
+        "korea"
+      ],
+      "difficulties": [
+        "medium",
+        "medium"
+      ],
+      "winner": 0,
+      "tick": 41233
+    },
+    {
+      "map": "red_canyon",
+      "seed": 0,
+      "countries": [
+        "france",
+        "russia"
+      ],
+      "difficulties": [
+        "medium",
+        "easy"
+      ],
+      "winner": 0,
+      "tick": 14772
+    },
+    {
+      "map": "harvest_plains",
+      "seed": 0,
+      "countries": [
+        "america",
+        "korea"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 60853
+    },
+    {
+      "map": "liberty_bay",
+      "seed": 0,
+      "countries": [
+        "iraq",
+        "america"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 111860
+    },
+    {
+      "map": "steel_harbor",
+      "seed": 0,
+      "countries": [
+        "france",
+        "germany"
+      ],
+      "difficulties": [
+        "medium",
+        "medium"
+      ],
+      "winner": 1,
+      "tick": 40359
+    },
+    {
+      "map": "oasis_gulf",
+      "seed": 0,
+      "countries": [
+        "germany",
+        "great_britain"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 87965
+    },
+    {
+      "map": "thousand_lakes",
+      "seed": 0,
+      "countries": [
+        "great_britain",
+        "america"
+      ],
+      "difficulties": [
+        "easy",
+        "easy"
+      ],
+      "winner": 0,
+      "tick": 107861
+    },
+    {
+      "map": "thousand_lakes",
+      "seed": 0,
+      "countries": [
+        "france",
+        "germany"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 109783
+    },
+    {
+      "map": "steel_harbor",
+      "seed": 0,
+      "countries": [
+        "america",
+        "cuba"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 93947
+    },
+    {
+      "map": "wheel_of_worlds",
+      "seed": 0,
+      "countries": [
+        "cuba",
+        "france"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 79267
+    },
+    {
+      "map": "wheel_of_worlds",
+      "seed": 0,
+      "countries": [
+        "germany",
+        "great_britain"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 88047
+    },
+    {
+      "map": "steel_harbor",
+      "seed": 0,
+      "countries": [
+        "cuba",
+        "america"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 142871
+    }
+  ]
+}
