@@ -7919,3 +7919,1093 @@ checkpoint8-staged-hygiene.json;full unfiltered stdout/stderr remain in its -raw
 stdout SHA0c90536b9aed2f68888a9d19e507db559ccfd51ebb0e5e82f7b0c06aa58b4b16. Raw bytes are
 unchanged;there is no whitespace suppression. Require identical final staged stdout/stderr/
 exit before the separate evidence commit. All13 script checks remain unmodified and required.
+
+### R144 — Naval firing capability includes an honest observation path (RA8, 2026-10-18)
+
+Checkpoint8's frozen618e9b4 gate fails completed phase4:253 passed/1failed/0ignored,script7001s
+versus independently observed7002.423491s total. The production target reports5 companion
+passes/1failed sweep in6737.58s. The owned observer stops dependent phases after the completed
+nonzero row;process-15 is that deliberate stop,not a test exit. All341 frozen source hashes
+still match. Complete raw output,summary,process metadata and six bounded CPU-only liveness
+records are copied byte-for-byte to ra8-attempt8 with PRESERVED.json hashes;the production log
+SHA is bd5e98e56efe17fa5a865c82e7fd1f86f67f48f4e0860d069edbdfd61ed56ea6.
+
+All five scoped-worker failures are seed0 None under unchanged limits:Crossroads Great Britain
+Brutal/America Brutal;Liberty Bay France Medium/Germany Medium;Oasis Gulf Libya Brutal/Iraq
+Brutal;Oasis Gulf France Brutal/Russia Brutal;Harvest Plains France Easy/Germany Easy. All five
+are added to ra8_gate_matches and reproduced separately on unchanged production SHAs. Their
+logs/metadata remain attempt8-*-before1. No successful756 count is claimed. Root's initial
+fixed-worker-chunk hypothesis is corrected:workers pull one shared AtomicUsize. A panic lowers
+capacity;the failed run has no final played count,so neither completeness nor unexecuted chunks
+are inferred. Collect-all failure diagnostics were considered but not implemented.
+
+Crossroads72000 has no income/queued work,unarmed idle Chrono Miners and five surviving ships.
+Actual source carrier Sight7/range25 and public-terrain45-cell pond diagnostics show remembered
+Gap182 is invisible and at least21 cells from water;hidden Chronosphere261 is18 cells away.
+The visible refinery's Chebyshev25 does not fit the actual circular range because of its
+diagonal offset. No existing local actor can reveal these targets from those ponds. The final
+1000-tick trace repeatedly issues AttackMove to(40,15) for P0 and(40,14) for P1. P0 incorrectly
+keeps last_stand=false from geometrical hidden-target range alone. P1's separate existing-hull
+goal points to the other pond;that confirmed mission boundary remains separately assessed below,
+not credited as repaired by the visibility change.
+
+Shared naval_reach now caps an unseen remembered target's weapon reach by source sight. A
+currently observed footprint retains full weapon range,including observation by another owned
+actor. Existing survivors use their actual Sight component;prospective recruitment/site checks
+use the source unit sight. This uses current honest vision and remembered footprints only;
+there is no hidden Gap/power/occupancy query,new balance knob,state,deadline or liquidation-timer
+change. Public commands and physical movement validation are unchanged. Vision's circular
+reveal geometry and the existing circular reach calculation agree.
+
+The schedule-level shipped test
+ra8_gap_hidden_shore_requires_a_real_naval_observation_path_but_allied_sight_keeps_long_range_fire
+first learns the powered Gap via a real Engineer observer. Its positive branch retains that
+observer and requires an actual carrier launch at range beyond its own sight. Its negative
+moves the observer home through ordinary Move,verifies genuine Gap invisibility,then creates
+the carrier in an isolated pond. Before the source change,the positive fires but the negative
+fails the recovery assertion after5000 ticks (101,5.381247s including compile,raw SHA
+9cc53bfa713acea8cf25b53804d868ffb3a551fcada6fb71ae315064846ab8ee). After qualification both
+branches pass (0,19.632582s including compile,raw SHA
+3ea19df55845c0b7cd6ec92ff8850487d07df94a277e023c9252e996875da05b).
+This proves the capability boundary;exact ending attribution and affected controls follow.
+
+The four other exact failures have real paid combat/income,not proved helpless states. Liberty's
+last48000 ticks deliver36875/36200 credits and launch real strategic weapons. Oasis Libya/Iraq's
+last12000 deliver5000/7300 with active ground/Kirov approaches. Their target destruction/repair,
+mission and source-special cycles require further exact diagnosis;no timeout or forced loss is
+selected from a snapshot. No original assertion,cadence,rejection exemption or limit is relaxed.
+
+The first affected naval batch is3passed/1failed,retained as failure. The exact existing
+fixture ra8_unseen_enemy_water_building_cannot_change_naval_planning had killed its only GI
+observer after learning a yard20 cells from the water strip. With source carrier Sight7 it
+no longer had a legal observation path,so the original positive naval_target.is_some assertion
+correctly failed. The named input migration replaces that killed armed scout with a living
+unarmed Engineer at the same source-sight location. All original known-target,positive naval
+goal,AiPlayers value equality and complete queued-intent equality assertions remain. New
+assertions prove the intended yard remains actually visible and the interposed hidden water
+building remains unseen in BOTH twins at the same601-tick checkpoint. The separate new Gap
+case retains actual observation loss through ordinary Move. No visibility/rules exemption is
+introduced. All four naval controls then pass,including paid detector escort and active travel
+(0,6.261816s;raw SHA a26408c17ba136feb48ea84db8f88b958f2f95bd15b85982633f207c421b0797).
+
+Bounded mutation removes ONLY the observed-or-unknown guard from the naval component's building
+exclusion. The revised hidden-building fixture fails its original positive goal assertion
+(101,18.543358s including compile;raw SHA
+3112966b02c71d8ad543701e76c4e9c48f6ace73742394070912d56445690d9f). This proves the fixture
+still detects an unseen raw-occupancy leak. Finally restoration and an immediate SEPARATE SHA
+read precede every subsequent build/test/commit:original/restored
+9e539b2a5509ea1bc462ee8f9324bbf08106ddd7d4939afd258878730530cae2;
+mutation a5fd3e9e4ee10e62b8a1a2ba1f6d2404f2fbd5ebc8ab1b8d68fd1aa4d6f56692.
+No mutation remains active. Exact Crossroads ending is being checked independently.
+
+Exact Crossroads then wins P0 at45332/72000 after observation qualification ONLY (0,40.810892s
+including restored-source compile;test11.10s;raw SHA
+fb959459323f57677be2c72b858179db5566724ccb551d87ef704fcab7b42666).
+This does not solve or erase the separately confirmed other-pond mission defect. Its first
+two new-fixture probes fail before the intended counterexample:before1 lacks actual shore
+observation;before2 adds a real powered satellite but checks at40 before the configured600-tick
+rescan. Both raw failures remain and are NOT claimed as proof of the mission defect. The
+corrected setup explicitly verifies both targets' real visibility and waits the data-owned
+naval_rescan without changing any runtime cadence or intended firing/destruction assertion.
+
+### R145 — Existing naval hulls keep jobs in their own sea (RA8, 2026-10-18)
+
+R144's exact trace separately confirms existing P1 ships in the lower-left45-cell pond receive
+the prospective yard's upper-right pond goal. The corrected scheduled counterexample
+ra8_an_existing_hull_uses_its_reachable_shore_job_instead_of_a_prospective_yards_other_pond
+has two disconnected water components,a real powered satellite,an existing yard in one and a
+surviving Destroyer in the other. Both shore targets are genuinely observed;the configured
+naval_rescan completes before checking the future-yard goal. The existing hull can really
+approach and hurt its own shore target. Before the mission change it reports fired=false,
+destroyed=false,sent_to_other_pond=true and fails the unchanged actual firing/destruction
+assertion (101,5.001563s;before3 SHA
+6c254b2d1e0f4932bfd17c9fd2e382094e46b05496192ebfd75e7ae69a7675a0). The two earlier setup
+failures remain explicitly insufficient evidence in R144. After correction it reports
+fired=true,destroyed=true,sent_to_other_pond=false (0,23.394891s including compile;after1 SHA
+03349cfd6eb5179629fd9c13ddb95dbb5b64ba7a0eff17300f90dc340aa661ce).
+
+Prospective shipyard placement/recruitment keeps its separate qualified goal. Existing idle
+hulls now receive only a firing/escort goal in their own known-water component,even if their
+producer was destroyed. A decision-local ordered cache shares each kind/Sight/component
+search;there is no new persistent state,RNG,wall clock or balance knob. At most MAX_AI_ARMY
+existing candidates are inspected;ordinary global command/selection bounds remain. Empty
+target/eligible-goal sets do not scan the map. Healthy existing orders and currently acquired
+automatic fire are preserved. Destinations use source weapon/warhead eligibility,the R144
+observation qualification and ordinary source minimum range. Detector escorts may accompany
+the already qualified bombardment route without having to hurt the shore themselves. Each
+cell is visited once per cached kind/Sight/component;fresh final-source mean-budget evidence
+remains mandatory rather than inferred from earlier measurements.
+
+known_naval_water extracts the prospective planner's unchanged static-water/own-building/
+currently observed building filter and is shared by live-hull planning. Unknown raw building
+occupancy and temporary unit traffic never enter this planning predicate;actual commands and
+movement retain physical I6 safety. The helper does not inspect hidden enemies or learn new
+targets. Grouped destinations and actors use deterministic ordered iteration.
+
+The additional actual source control
+ra8_an_existing_dreadnought_without_a_yard_backs_out_to_its_real_minimum_range_and_finishes
+starts a living Dreadnought genuinely inside its source minimum range,with no reachable
+prospective yard. It backs away,launches ordinary missiles from an actually legal position
+and destroys the shore building (0,5.203978s;first launch Mobile.cell(9,18);raw SHA
+3b0dbbaa04503dcbf8873db701688a03ebb9a3530073c8ec1af43b3c9124bf10). Actual Combat/movement
+positions remain authoritative;the planning endpoint does not redefine weapon geometry.
+This is capability/mission evidence,not attribution for the four remaining exact endings.
+Affected naval/security/escort/endgame controls and all five exact replays follow before any
+further tactical change. No public validation,original assertion,rejection exemption,cadence,
+match limit or winner timing is relaxed.
+
+
+R145 final hidden-world fixture follow-up: the first full77 AI run is76pass/1fail
+(attempt8-ai-after1), because the strengthened unseen-cell premise actually fails. Diagnostic
+attempt8-hidden-water-observation-before2 establishes BOTH twins genuinely reveal the
+interposed cell at SimTick230. At601 their carrier/Hornet positions differ after observing
+different worlds. This is not evidence of an unseen-occupancy leak. Those failures/raw logs
+remain unchanged. The named fixture
+ra8_unseen_enemy_water_building_cannot_change_naval_planning keeps the SAME interposed cell,
+SAME intended yard, SAME601 checkpoint and every original known-target/positive-goal/
+AiPlayers-value/complete-public-intent equality assertion. Its living unarmed observer now
+keeps the yard actually visible, while ordinary public Guard commands hold the hull during
+setup and comparison staging. Ordinary Move to its current cell at599 releases Guard;
+normal scheduled path completion leaves the hull idle before AI600. The test requires that
+idle state and a freshly queued nontrivial carrier AttackMove at601, proving live-hull
+planning actually ran rather than passing through healthy-order preservation. Both twins
+prove the obstacle stays unseen and the yard stays visible after EVERY intervening tick.
+
+Intermediate staging probes are retained,not credited as passing:after3 has two test-only
+u32/u64 compile mismatches;after4 proves one-time Guard is idle to the controller and can be
+replaced;after5 omitted the initial22-tick hold;after6 releases Move at600 before ordinary
+path completion and therefore correctly has no fresh same-turn mission. After7 releases at599
+and passes (0,6.901565s;raw SHA
+8bd9e09488b8d490c4816e54402f53a2d3c51b10bb1e8ff75e11d4f537bd1f3a).
+One failed exact-context apply_patch performed no partial mutation or dependent validation;
+the smaller context was inspected and applied separately.
+
+The required negative is repeated on THIS FINAL fixture. Removing ONLY known_naval_water's
+observed-or-unknown guard fails the fresh live-hull mission assertion (101,26.735973s
+including compile;attempt8-hidden-water-negative-final2 raw SHA
+ ef75eb122926614b820a6fd3658c254d772f239b7a4a75be32b5e79ca34f3969).
+The original guard-negative proof predates this staging and is retained as historical only.
+Source original/restored SHA is
+fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a;
+negative SHA d02bcc577721a23f2b24b6235440acc64bd30c9649cd6af1595a05f2a857bb2c.
+Finally restoration was followed IMMEDIATELY by a SEPARATE source SHA read before any
+subsequent build/test/commit. ai.rs remains19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7.
+No mutation remains active. No hidden-building relocation,visibility exemption,cadence,
+public validation or runtime tactical policy is introduced by this fixture migration.
+
+
+### R146 — Opted-in composition follows its declared traversal (RA8, 2026-10-18)
+
+R144/R145 final naval candidate passes all77 ra8_ai tests (0,73.029479s command,
+46.66s target;attempt8-ai-after2 raw3a0ac1afb837b147f2eb4db7b4585dac46b6fe2ad7193b9b62aa4080540afccb).
+Allfive exact attempt8 failures were replayed before any further tactical change:
+Crossroads P0Won45322,Liberty France/GermanyMedium P0Won130804 and Oasis France/RussiaBrutal
+P0Won119212. Harvest France/GermanyEasy remains None288000;Oasis Libya/IraqBrutal remains
+None252000. The full five-case debug replay is3pass/2fail/0ignored,764.321939s command,
+734.99s target (raw009b72312531022b8cf93e254351781d3fe73cb10e9bf479d0646b5294a5dfaf).
+Earlier exact diagnoses were release builds,so these wall times are not comparable CPU evidence.
+Those three actual wins are distinguished from the independent controlled naval capability
+proofs. No756-sweep success or closure is claimed.
+
+The two remaining traces show actual income,combat,losses and repairs. Harvest's final48000
+has real ore26000/18500,loss of P0's Construction Yard,three Barracks and two Power Plants,
+and P1 Refinery/Tech Center destruction. It does not justify helplessness/liquidation or
+altering source cadence/limits. Oasis Libya/Iraq pays P0 two V3s versus37 Demolition Trucks,
+19 Kirovs and41 Rhinos;P1 pays28 V3s. P0 has zero living V3 in EVERY60000,120000,180000,
+240000 and252000 snapshot. Counts alone do not establish causal starvation:ownership changes,
+source prerequisites,available slots and actual candidate admission must be separated.
+V3 source TechLevel3 is below the declared advanced cutoff6;Demolition Truck10/Apocalypse7
+are advanced. A pre-Economy diagnostic hook at the actual AI boundary captures ordinary
+check_buildable result,funds,producer queue,owned/queued army counts and admitted types;
+a diagnostic-only owner map records every actual V3 lifetime/ownership transition. These
+observations do not mutate simulation decisions or RNG,and their overhead is not a benchmark.
+
+Independently,the existing main queue loop changes next_army after each success,then adds
+step to that CHANGED value for subsequent candidates. It therefore skips the declared cyclic
+order even when every entry is source-legal,funded and on the same free producer. A new actual
+scheduled paid-composition fixture disables unrelated construction/support/reserves while
+keeping source owners,normal prerequisites/producers,prices,commands,queue limits and actual
+unit spawns. Before correction the opted-in declared Grizzly/Prism/Mirage sequence pays and
+spawns Grizzly,Mirage,Grizzly,Prism,Mirage,Grizzly instead of two complete declared cycles
+(101;attempt8-composition-before1 raw
+d9582b588e9c146106886f587e9574ae8c29d1aff7c3c883b896a2a0825fdec8).
+The same test verifies exact credits and bounded actual producer queues before asserting the
+sequence. Legacy/neutral traversal and the locked/unaffordable-entry control pass unchanged.
+The first tier-reserve fixture expected only3 admissions while allowing cap4;the fourth
+Harrier is actually legal on its separate available aircraft lane. That setup failure is
+retained,NOT a second runtime defect. Its declared cap is corrected to3 to isolate the
+three sourced reserve slots and real bounded paid capacity.
+
+R94 removed an earlier unrelated cursor change to preserve independent RA4 fixture behavior.
+This new controlled paid evidence establishes a real declared-composition defect under the
+RA8 strategy opt-in boundary. Any correction is limited to rules_difficulty=true country
+plans;the documented neutral/legacy traversal and all existing RA4 assertions remain.
+No difficulty multiplier,defence count,weapon,balance quota,cadence or match limit is changed.
+Exact ending attribution remains open until the unchanged-limit replays actually win.
+
+
+The full unchanged-runtime Oasis composition diagnostic still fails its original252000 bound
+(101,146.496015s release plus diagnostic overhead;raw
+77803fc5a5bc220e1668eef339492b82b296b36f6505abe3232ea3e8cc7041e4).
+It records93 actual decision-time opportunities with no owned V3,check_buildableOk,current
+cash>=800 and owned army+queued count below max minus a conservative five reserved slots.
+Examples:P0 tick4460 cash39530/empty factoryqueue/owned22+queued3/max72 admits Demolition
+Truck;tick5060 cash38122/owned27+queued3 admits another Truck;tick6070 cash36230/owned32+3
+admits Rhino. These are legal funded opportunities,not a rule that V3 must win each choice.
+Actual P0 paid V3 lifetimes are21736..23222 and178209..179352;later temporary P0 ownership
+of P1 launchers is explicitly captured separately,including203405/204171/206824/206886 and
+225030 transitions. This closes the evidence gap between low production counts and real
+available composition opportunities;ending attribution remains separate.
+
+The opted-in correction snapshots next_army at the start of this bounded pass. Successful
+admissions still update the already value-hashed cursor for the NEXT decision. Each current
+pass inspects each declared list position once from its original origin. rules_difficulty=false
+uses its original changing origin,so neutral/legacy fixture behavior stays exact. All existing
+has_room/recruit/credit/dock/producer/reserve/command bounds remain. No data schema or balance
+literal changes. Allfour actual paid controls then pass (0,23.504438s including compile;raw
+46846970f7b0ee5bb02dc514a0abe8f446f6104a0727643e06bc26086e7a39a5).
+The complete unchanged ra4_ai target also passes (0,33.416318s;raw
+a047f71e8f9bb6fb89375d467eff4bf0596b728cff8ea488ab9bc24473353022),including the exact
+fog-on neutral last-stand scenario and every original duration/assertion. Exact Oasis and
+Harvest endings follow before broad final preflight;no win is inferred from these controls.
+
+
+Exact Oasis Libya/IraqBrutal then ends with a normal P1Won208419 below the unchanged252000
+limit,with no rejected command/assertion exemption (0,130.753205s command including compile,
+101.89s target;raw16aa9bb03f8f3d79ca5a1def5b3bd7275df2cd80d97c6e491106fbfc0b72c444).
+This actual ending result follows only the opted-in traversal correction after the earlier
+same-navalsource diagnostic still failed252000. It is distinguished from the controlled
+paid-order proof and does not predict Harvest or any retained/default/sweep result.
+
+
+The separate funded-but-locked prerequisite control is added so the failed-entry case is
+not masked by insufficient credits:Chrono Commando's cost fits the declared5000 budget,but
+normal check_buildable rejects its missing infiltration capability;later legal Grizzly and
+Mirage are actually paid/spawned. Allfive paid-composition controls pass (0,23.475708s;raw
+4bf207909ec8b1e32ea19074d9afc012011d92b2b0086e4c909f2b362ce417c9).
+Harvest after this runtime still fails None288000 (101,120.370610s release;raw
+81006fda5dcb67e5f1d9b151c2141c2f2ec98739ba1cbd0f0d03d0e24dec6212). Its ongoing source
+combat/income is retained;R146 is a proven composition correction and exact Oasis ending,
+not a claimed solution for Harvest. No source deadline/liquidation/cadence change follows.
+
+
+### R147 — A remote replacement is not an artillery front screen (RA8, 2026-10-18)
+
+Harvest remains the one open attempt8 exact ending after R146. The unchanged-runtime
+last48000 command/shot/progress replay again fails None288000 (101,119.350938s release plus
+diagnostic overhead;attempt8-harvest-artillery-before2 raw
+7c336fd1cc8ccdb28acb82656cfaa08ec0034ea0dfa8c03e0a6984d89e99f229).
+The initial snapshot-only hypothesis was a preserved stale slot after acquisition. The real
+trace CORRECTS that attribution:Prism572 is born268444;the forward slot52,55 is queued278081,
+and it genuinely advances to77,80 by282000. Its old forward tank disappears;replacement
+Grizzly585 is born276734 and is still behind. At283641 the SAME FIFO contains core offensive
+AttackMove27,31 FOLLOWED BY strategy AttackMove155,158 for572. That newly computed slot is
+behind the remote replacement. At285000 the Prism has reversed to82,85 toward155,158 while
+the tank advances127,109;at288000 Prism128,144 still heads backward while tank35,39 already
+fights at the enemy base. Prism572's only actual late shots are at ChronoMiner314;it fires
+at no building in that window. This is a new rear-slot admission problem,not evidence for
+refreshing every existing healthy movement order or adding a timer.
+
+The controlled schedule keeps real controller recruitment/memory,pauses only decisions while
+ordinary Stop/Move arrange the geometry,and resumes the actual AI turn. It compares an
+already healthy forward AttackMove first with an idle advanced Prism facing a remote rear
+Grizzly. The enemy Barracks keeps its real source HP;ordinary weapon fire/destruction and
+actual front movement are required. The quiet helper's inaccessible reserve is explicitly
+balance-independent and never the measured Barracks. R100's genuine LOCAL Rhino/V3/Kirov
+backstep and source range/standoff remain required unchanged. No order-refresh or tuning
+correction is selected solely from the snapshot.
+
+
+The first new fixture probe fails its arrangement assertion because8,8 is inside the owned
+Construction Yard;ordinary Move correctly stops8,7. No runtime defect is inferred. Before2
+uses legal positions but PASSES old source because neither the Barracks nor remote armed
+Rocketeer is actually observed;its emitted37,37 goal is the old enemy-start search,not the
+combined-arms rear-slot branch. This is explicitly insufficient negative evidence,not a
+claimed old-source failure. Before3 adds real local unarmed Engineer/Spy observers and
+asserts BOTH targets' actual visibility before resuming. With Tank12,14/Prism24,14 and a
+normal Barracks36,14,the healthy forward-order twin passes unchanged with3 Prism shots and
+ordinary destruction. The idle advanced twin receives SAMEFIFO forward36,14 then rear9,14,
+firesZERO shots and fails actual destruction while its tank genuinely advances31,14
+(101,8.562919s;rawbdc4d642573be48a52a55f290cd6d9c3fa3c2177b6b66f6ad306272c26918a32).
+
+The correction excludes only a NEW rear slot that increases the gun's distance to the
+known target when the alleged front tank is farther away than that gun's existing source
+weapon range. A local tank line still permits its original three-cell backstep;an advancing
+or holding slot still qualifies. This range-derived distinction is the documented tactical
+assumption that a remote replacement is not a screen for a gun already beyond it. It adds
+no distance knob,timer,persistent state,RNG,hidden path query or new command. All healthy
+existing orders remain excluded by the original idle predicate;there is no refresh-on-jitter.
+The ordinary offensive command remains available through the existing core FIFO.
+After1 passes BOTH real fire/destruction twins (0,27.312782s including compile;raw
+c607a19bd5a5853dc3117fdc70b23d38354fd6d8c480db9ebfba72049973e982). Source range/standoff
+are unchanged;R100 and the complete affected AI suite run before exact ending attribution.
+
+
+All78 affected ra8_ai tests pass on the correction (0,42.903993s;raw
+213b37a0cb937a3f98b76ff1b8ae96f92dc6eaae8e8a000df9c01c04e682b258),including R100's
+unchanged local surface-front backstep,actual healthy approach,source ROF/full-tree support,
+naval reach/escort/hidden-occupancy twins and prior endgame/security scenarios. Exact Harvest
+is rerun independently below its original288000 bound before any broader preflight claim.
+
+
+The independent R147 Harvest replay STILL fails None288000 (101,148.323111s command
+including compile;attempt8-harvest-artillery-after1 raw
+37605ea028f9cfed56ae103b474b25f4a9ea68deb1ef64fc7cc43a33eff84c61). The scheduled
+artillery correction is proved separately;it is not credited with an ending success.
+Both players retain actual income and capable fighting forces;no deadline,source cadence
+or helplessness/liquidation adjustment follows.
+
+### R148 — Declared Allied paired siege weighting (RA8, 2026-10-18)
+
+After the transient model-capacity error,the owned process/source recovery check found no
+active Cargo/rustc/simulation and no mutation left active (attempt8-capacity-recovery-process1).
+All pending output was inspected rather than rerun by assumption. Runtime ai.rs7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e and
+strategy.rs97bf9859f160d5f4d6e8a54f0b10a948f6c974ffb3ba3e83a8b9e88e9fa055e3 were
+unchanged. The contemplated miniature fortress fixture was never implemented;it is replaced
+by the exact shipped Harvest France/GermanyEasy seed0 A/B,avoiding a fixture sculpted to win.
+
+Continuation4.1 permits evidenced game-owned ai.ron composition tuning. The smallest selected
+candidate duplicates the adjacent Prism entry in each exact Allied country cycle and places
+Germany's national Tank Destroyer after that pair. Duplicate list entries deliberately weight
+the cyclic paid composition;they do not change source weapons,prices,difficulty multipliers,
+defence counts,reserve caps,owners,prerequisites or match limits. Legacy common side plans and
+Soviet country lists are unchanged. Germany's national remains present and must actually be
+paid again after real casualties in the independent production control. This is an explicit
+AI composition assumption,not a claim that these cyclic weights came from a source AI list.
+
+Only scripts/generate_ra2_data.py generates the changed ai.ron. The complete342-file A/B
+manifest attempt8-siege-weight-ab.json proves only that generator and ai.ron differ between
+the failed R147 baseline and this candidate. Baseline ai.ron SHA
+b0907c417555fc6e1e02e2ca67a26f8b529c3cf9a3da1390c98deec459e96984 becomes
+e7ffe53251fa47bd795b5b5ac3fe2a0cde3ba7248e2f2bb64f03bf9493dc1bb6;generator
+0ab69d987d03002f78c31b937b74ae4ba24eae4ee3c37dfa52654b8420d0adc6 becomes
+98349a7d847450694c309f2cc49633fcaae3a65f3d89ab998a039879456f6204.
+Generator --check and reference audit pass (4934 rows). After the candidate match every342
+manifest entry is independently rehashed with zero mismatches.
+
+The exact candidate completes P1Won165615 below the unchanged288000 limit
+(0,66.221022s command/66.05s target;attempt8-harvest-siege-weight-candidate1 raw
+92351b6c27ac50c4ff701cf712339d788652e98d5e777f5e9f897c742fd28ac8). This is ending
+evidence for the exact data A/B,not a benchmark or a transferred full-gate success. All
+retained/default matches,focused suites and fresh ten-player/budget checks follow on the
+final source. The failed baseline and every earlier insufficient/unsuccessful probe remain.
+
+
+The independent control projects the actual Germany list to its direct-fire ground vehicles
+(excluding the separate infantry/air/naval and reactive-AA policies),requiring the exact
+[G,G,Prism,Prism,TankDestroyer,Mirage] order. Ordinary bounded production first pays/spawns
+[Prism,Prism,G,G,Prism,Prism,TankDestroyer,Mirage,G],with exact source-credit accounting.
+Only controller decisions are paused while ordinary friendly ForceFire produces five actual
+source-HP vehicle deaths (three Prisms,Mirage,and the national unit);all have source crewed=0.
+The surviving Prism leaves one advanced slot. Restoring the unchanged controller/cursor pays
+[Prism,G,Prism,Prism,TankDestroyer],including the reserve refill and a second real national
+spawn. The initial new fixture incorrectly expected source-tech2 TankDestroyer to fill the
+advanced-tech6 reserve;its failure is retained (attempt8-siege-paid-after1 raw
+cb3335d26aecceae1c3304f2e42480df6c95939c1737980cea781e63d3e90d3d). The corrected casualty
+cohort and allfive original paid controls pass (six tests,0,18.693896s;after2 raw
+903679523176de23400af9080e21e2dcdc8e2e7c97e9a3f3102eb4fc11d1b2af). This corrects a new
+fixture assumption,not source tech or recruitment. Every original traversal/reservation
+assertion remains. The production-only fixture's declared large first-wave delay isolates
+paid cycles;the separate exact default Harvest match retains all real timing and limits.
+
+
+The captured combat-window summary (attempt8-siege-weight-combat-summary.json) preserves
+all observed Prism shots,ordinary paid completions and actual losses in both A/B logs.
+Through119999 baseline P1 pays four Prisms;candidate P1 pays six,while P0 pays nine/eight
+respectively. These are actual queue completions,not advertised list membership or inferred
+starvation. Candidate final-window Prisms fire on normal power,refinery,war-factory,purifier,
+Prism-tower and Patriot buildings;the exact winner remains an aggregate match result,not
+a claim that every listed shot alone caused victory. Raw logs permit independent extraction.
+
+
+### R149 — Finite unit funding includes competing ordinary repairs (RA8, 2026-10-18)
+
+Final1 strict checks/default Demo10 and21 retained exact winners pass;completed exact22
+Riverlands Iraq/CubaEasy fails None72000 (101,9.563324s;raw
+8f70f43a0a006d9772a8a4e2d26e56b3883272f54efc3ec0f17c262d8e37bf5e). The batch stops
+before remaining9/fullsim/game/m13. All342 manifest hashes still match;STOPPED metadata
+preserves that boundary. This Soviet pairing uses unchanged Soviet country data;R148's
+Allied weights are not credited or blamed. R146 changes actual runtime composition traversal;
+R147 changes artillery admission. No single-change ending attribution is presumed.
+
+Actual diagnostic funding2 (101,16.102315s;raw907d93c760c8f14b28ba7f7bf57193fca584bed2151735d5004e1a2c3f175cd0)
+refutes early timeless helplessness. P0Conscript183/Trooper185 fight until71607/71646.
+P1Trooper190 is actually paid/born70381,assigned70481,first fires at Barracks31 at71498 and
+then every96ticks through71978. P0 cash2605/Barracks409HP at62760 funds four actual500-credit
+Troopers,three100-credit Conscripts and a200-credit Dog by66960;repairs leave93 rather than
+105. No later ore income is observed. Repeated ordinary repairs from67520 drain93 to37 by
+69920 and19 by71960. Real forces and shots,not the final HP snapshot,select a financing
+investigation. No R53 signature,timer,source team cadence,repair price/rate or limit changes.
+
+The controlled ordinary schedule declares one real GI's source200-credit budget after an
+enemy Grizzly actually damages its producer and then ordinarily moves away. The old AI
+queues GI plus repair;after20ticks cash187 plus charged13 still equals200,then repair diverts
+credits and normal broke recovery sells a750-credit Satellite. That violates the no-extra-
+refund budget assertion (before2 rawdfad8f29a5d7e69c8525ef04bfcb018237db5601bcb926477a2932482a0f6e86,
+101,17.130952s). Before1's identical sale is retained;before2 adds actual funding observations
+and requires the spawned unit's real GI kind. The assertion is not weakened to accept a sale.
+The candidate preserves exact source queue/cancel FIFO accounting and uses ordinary repair
+toggles;it never alters credits or HP itself.
+
+A provisional one-step guard passes the exact-budget capability control (after1 raw369d2c13...)
+but fails a meaningful one-source-step surplus case with supported40-tick AI cadence versus
+actual19-tick repairs (before1 rawb733026c7eaee22f6a0aa21673b1758a5ab9947b7665102bc1caa2d3d0379eb9,
+101,17.230543s). The final projection therefore reserves EVERY source repair charge from
+next command application through the next decision tick,when its off command can only take
+effect one tick later. Existing active repairs due in the current Economy stage are reserved
+before admitting a new queue;they cannot be stopped retroactively. It sums all active/new
+repairs using the same repair_step_cost as Economy,all projected queue remaining costs and
+exact ordinary last-matching refunds. When finite funds cannot cover both paid unit work
+and these repair obligations,new on intents are omitted and active repairs are stopped by
+bounded ordinary toggles in known building order. Income,completed paid work,no-unit-work
+and genuinely source-funded surplus keep normal repair choices. No persistent state,knob,
+RNG,hidden lookup or public repair behavior changes.
+
+The first cadence implementation has four closure-reference compile errors (after2 raw
+80151f37c9878071904b9446b4a0b845db7244a7b40bbd0b66c8416ee92463d4),not a test pass.
+A second capacity interruption is recovered by inspecting completed session output and a
+bounded executable-only process read:rows empty,ai81d6d0f9.../strategy97bf9859... unchanged,
+no mutation active (attempt8-capacity-recovery-process2). Correcting the &&BuildingSnap
+closure compiles and passes the cadence counterexample;its historical single selected test
+is not mislabeled as the full recovery suite.
+
+The expanded recovery suite first passes16/17:the new income fixture directly spawns an
+owned Oil Derrick,which does not initialize the periodic ownership-capture payment path;
+it also incorrectly imposes the no-extra-refund constraint on an income-positive world
+with independent construction work (after4 rawbd96ebfa...). This fixture observation is
+corrected to an actual neutral Oil Derrick Engineer capture,asserted ownership and real
+periodic credit rise excluding refund ticks. Finite cases keep the original no-sale/no-
+cancel assertion. Income cases require actual repairs alongside paid recruitment;normal
+income-world financing choices remain allowed. Both damaged buildings receive actual source
+shots,not injected HP. All17 recovery tests then pass0/20.067130s (after5 raw
+42cf0f81f63b563e4caa2dbf4ebdac9eb026adc67fce717e504125cf8bfc351c),including multiple
+active repairs,borderline surplus,source-funded surplus,actual income,ordinary paid spawning
+and real building shots plus every earlier recovery/FIFO/refund control. Exact Riverlands
+is replayed separately before any ending credit or new full preflight claim.
+
+
+The independent exact Riverlands replay now ends P1Won69169 below unchanged72000
+(0,39.438525s command including compile/9.10s target;raw
+5e8d5bed5d21b7b909c8c8a40f301204fff1cae092d905a3e521636952625d9c). This is separate
+from the controlled financing proof. No result transfers to remaining final1 cases or a
+new full preflight;current runtime ai872c9108.../strategy97bf9859... still requires those.
+
+
+The completed-head positive is strengthened by an independent actual-source-shot fixture:
+a fully paid Tank Destroyer waits behind a real occupied factory exit while source-funded
+repairs heal its producer;ordinary amphibious movement releases it. Existing function
+ra8_completed_paid_unit_heads_and_duplicate_tails_keep_normal_exit_and_fifo delegates to
+a shared fixture with its original duplicate-tail/default path and EVERY original assertion
+unchanged. New repair mode omits the unrelated unpaid tail and adds the paid-head repair
+positive. All18 recovery controls pass (after6,0,20.357904s;raw
+fdb88dd18fe0ee8916957cc20d80f2a147c8308f25e9e55555fe730d6e0d2123).
+
+A root-requested command-budget boundary then proves the guard needs actual off capacity.
+The first new fixture has30 hulls in one pond;their common goal coalesces into one command,
+so it fails only its saturation precondition (before1 rawe91be9b4...). This is insufficient
+funding evidence and remains preserved. The corrected declared geometry has30 separate
+two-cell ponds and normal observed adjacent source buildings. Actual AI emits exactly32
+commands:paid GI,rally,and30 distinct naval jobs. There is no room for the old appended
+repair off;three real repair credits are spent and the recruit never finishes within the
+unchanged capability checkpoint (before2,101,17.149485s;raw
+05ce8ed072c3945a4744b5e6a17661a9ccc3e2fe6f4752cff4d54415e874b97a). After actual paid
+spawning,the new fixture isolates the recruit's ordinary building shot with an explicit
+public attack while controller decisions pause;this does not claim a default naval mission
+or match-ending proof. The companion isolated finance boundary uses a real partially paid
+queue,fully financed remainder,32 emitted ordinary commands and a33rd cancellation that
+never executes. Projecting that un-emitted refund falsely allows repair spending and
+starves the real head (before1,101,17.317456s;raw
+d83e18478f1e2477b89e5e56454e70994aa285844ea077160bef6da8c335c05d). This is actual
+subsequent command/economy behavior,complementing the actual-controller capacity proof.
+
+After the next capacity interruption,completed99574 output,source872c9108.../97bf9859...
+and an empty bounded process inventory are retained in recovery-process3;no mutation was
+left active. The final correction caps the candidate prefix BEFORE projection,places
+required ordinary repair offs first within the SAME32 cap,keeps all other relative FIFO
+ordering,and recomputes financial admission over the actual resulting emitted prefix.
+It does not recurse or create command capacity. A truncated cancellation cannot supply
+credits or remove a real obligation. The normal public command validators remain exact.
+All20 recovery controls now pass (after7,0,20.162661s;raw
+684860b5d1f7317d248d91b8cba99a94d826e26d5f41a05a3a3a1a21319241c2). Earlier69169
+Riverlands ending remains historical until its separate final-prefix replay completes.
+
+
+On final bounded-prefix ai3aed244c... the separate exact Riverlands replay again ends
+P1Won69169/72000 (0,39.356890s command including compile;raw
+6a41756e543ab12e77aeca8a501cba994c269ddc18518f5591b28c83ce576e89). This does not
+transfer earlier final1 wins or predict the remaining preflight. The requested naval
+minimum-range source-consistency lead is now assessed independently with actual schedules.
+One orchestration source-string attempt fails JavaScript parsing before ANY nested call;
+a separate source read confirms no partial test mutation,and smaller exact apply_patch
+calls add the controls. No validator/mutation result is inferred from that tool error.
+
+### R150 — qualify every naval job with actual source weapon minimum/maximum and honest sight
+
+The root source-consistency lead is confirmed through actual schedules,not a source-only
+inference. New tiny-pond Dreadnought controls isolate a declared parsed production plan
+containing that source hull while retaining source owners,prerequisites,costs and weapons.
+Every reachable water position is inside its real minimum;the remote enemy Conyard is
+outside maximum. A living incapable hull prevents ordinary last-stand sale,and prospective
+normal AI actually queues and pays for another incapable hull. Before1 exits101/20.002176s
+(raw88a7015921ee688d5c8a9e1f3835d50c3a7497390165fbeb98c837edbb93d5f3).
+Both new controls and the unchanged real Dreadnought back-out/fire/destruction positive
+pass after shared minimum qualification (after1,0/19.597125s;raw
+954a284661465f8469c2fcfb2cbe633b9052e19280f364a076db8d6883f6d2e9).
+
+A separate actual maximum boundary confirms that integer cell-centre distance is NOT
+the actual Combat weapon geometry. The source Destroyer can fire from a water cell whose
+nearest footprint-cell delta is(range,2):real SubPos-centre to footprint-edge gap is inside
+source range. The human world actually fires,but the corresponding AI world pays no hull
+and fires nothing (maximum-before1,101/5.725933s;raw
+e7860fe3c3a219b32eb48e870154e93fc089b353bcd080bd17b9e6500faf506d).
+The new shared NavalReach preserves source weapon minimum AND maximum in subcells and
+uses Combat Extent gaps/in_range/inside_min_range. Source Sight remains a distinct cell
+radius only for a remembered target lacking current actual observation. Per-kind prospective
+yard/recruitment,complete capability BFS,and actual live-hull components use that same
+qualification;minimums are not collapsed by taking another hull's maximum. Detector escorts
+retain their declared bombardment-route exception. No source stats,limits,state,RNG or
+new policy knob changes. All81 RA8 schedule controls pass on strategy65a00aa3... with
+ai3aed244c... (geometry-after2,0/76.306352s;raw
+e7acf931dc831d5fe9a830fd614c716852284eafa0dd6a9c575816b14f5d2dad).
+
+A second large source-string tool attempt fails JavaScript parsing before ANY nested call;
+the separate recovery read confirms no max test or partial mutation and unchanged hashes.
+Small exact apply_patch calls then add it. No validator or mutation outcome is inferred
+from the orchestration error. No owned Cargo/simulation remained active at recovery.
+
+The requested repeated hidden-water guard mutation on final geometry restores in finally,
+followed by a separate source SHA read before dependent builds. It now PASSES0/23.130400s
+(negative-geometry3,raw5590ac15c8088f015ebed6347ce2ac68bfcb2c4f593092639d32e01ee70ee523).
+This is retained as a refuted current fail-ability claim:actual footprint-edge maximum
+admits a firing endpoint before the original unseen yard at16,23. The original fixture's
+assertions,obstacle,visible target,ordinary Guard/Move release and601 checkpoint remain
+unchanged via helper extraction. A distinct new twin places its unseen obstacle at16,21,
+before that newly legal endpoint,and must independently prove all the same observation
+and fresh-live-hull premises. Its positive/negative results are recorded separately below.
+
+The distinct16,21 endpoint twin passes normally (positive4,0/23.192966s;raw
+1eb6b93d3a0f019c609a94cb435d2508126837da51ac42a6072723152fbb6df9),including real
+visible target,unseen obstacle,ordinary Guard/Move release and fresh601 mission. Removing
+ONLY the same honest occupancy guard now fails its fresh-qualified-mission assertion
+(negative-endpoint4,101/23.545749s;raw
+52053f74473e85bdda08602ab212a6028521615e48a1f9bb4696412642a07b26). The hidden raw
+occupancy changes planning. Immediate finally restoration and the separate subsequent
+SHA read both confirm strategy65a00aa3.../ai3aed244c... before dependent validation.
+The original ra8_unseen_enemy_water_building_cannot_change_naval_planning remains
+unchanged in meaning/assertions via unseen_enemy_water_building(cell);the new named
+endpoint twin adds independent geometry rather than silently relocating its obstacle.
+All broader final-source checks and exact endings remain pending at this evidence point.
+
+Fresh final2 stops on a REAL completed exact24 Pacific failure,not a timeout cutoff:
+Cuba/Great BritainBrutal seed0 has no winner after unchanged288000,101/471.947508s,
+rawf6296a794564f6d646b77b9f287f38612415dede1896c12ed9cba46d1f018b08. The first23
+retained exact cases all win,including Riverlands P1Won69169;strict5,82AI,20recovery,
+6composition,both unchangedRA4 and defaultDemo10 also pass. Total completed34 commands
+report134passed/1failed/0ignored in2849.286927s. Remaining7exact/fullsim/game/M10/
+companions/m13 are UNRUN. STOPPED captures all342 rehashed files with zero mismatches;
+summarySHAa2103d2a3587e739425fc9c11a31bd309da87e21c77c841cfcf3ce85a28e9270.
+No result transfers to those dependent checks. The actual Pacific late states retain
+capable Dreadnoughts,paid GI production,loaded miners and source strategic recharge;
+cash/queue snapshots alone do not justify liquidation or a timer/cadence change.
+An unchanged-runtime actual economy/shot/repair/strategic trace diagnoses that separate
+failure before another policy is selected.
+
+### R151 — reject ineffective naval weighting and test each hull's reachable firing cells
+
+The unchanged Pacific economy trace also ends None288000 (101/410.111749s;raw
+404c0b3b76b579ad9fbe27c507957f521068d82de9e8d35617fb01e212b4fdcc). Its actual final
+48000 ticks contain432 Dreadnought→Patriot and490→Prism volleys,923 Patriot→missile shots,
+3312 PatriotHP and1928 PrismHP repaired,and NO P1 building loss. Each side actually
+launches four strategic weapons;the repeated Nuke cell is173,188 and Storm cell70,61.
+P0 delivers19000 ore credits while P1 actually pays25GI and5Dogs. Lifetime P0 Dreadnought
+production is10 with8 losses/two survivors;Typhoons16 with6 losses/ten survivors. This
+does NOT prove cursor starvation or helplessness. The combat summary preserves all
+source-window counters and actual late launch/shot identities.
+
+A minimal generator-owned paired-Dread cyclic-weight A/B changes ONLY generator and
+generated ai.ron among342 frozen paths. It still ends None288000 (101/404.659411s;raw
+50e8542e2f51979c1047dca289ace9c852708599d9e3b0b63ed7856251f7b44b),and its240k
+surviving fleet/cash match baseline. REJECTED,no ending improvement claimed. The candidate
+is reversed through the generator;the separate subsequent SHA read confirms ALL342
+files exactly match final2 baseline (ai.ron e7ffe532.../generator98349a7...). No candidate
+paid control or broad success claim is retained. Both A/B manifests and raw logs remain.
+
+Root identifies a distinct source-consistency lead:the one shared naval goal can be
+inside one kind's source minimum while another cell in the SAME qualified water component
+is legal for that kind. Recruitment currently checks only that shared cell. A new declared
+mixed Typhoon/Dread production fixture retains complete normal prerequisites/owners,
+source costs and real terrain;its parsed minimal Soviet build plan is actually present.
+The first probe fails plan validation before action (before1 raw5b348b6e...). Correcting
+the chain but checking before the initial rescan gives goalNone (before2 rawec59e475...);
+its Amphibious transport also is not the Naval target class intended by the hypothesis.
+Both are insufficient capability evidence. The fixture then uses an actual Allied human
+Destroyer and waits through the600 scan,but before3 still stops atSimTick601,after strategy
+updates its goal but BEFORE queue_units reads that goal on its next due turn. My initial
+proof claim is explicitly corrected;before3 raw801cce5f... is insufficient ordering evidence.
+
+The corrected check derives scan+think cadence from data and includes AI620/SimTick621.
+It still emits no Dread with sharedgoal14,22 (before4,101/5.552681s;raw
+9fcdbcaf44864c06abff42077adfaeab328605c82b9bf05a7979785c4e683f5d). The pond has farther
+source-legal shore cells;normal paid completion and actual source fire are required after
+any correction. No production fix or Pacific ending attribution exists at this point.
+Existing default ScenarioMode remains unchanged;new opponent/production-only fields are
+used solely by this declared capability fixture,with normal parsed plan validation.
+
+The first bounded Pacific admission logger samples the post-strategy goal at scan turns,
+which may differ from the old goal actually read by queue_units. Its observation is
+insufficient and is deliberately stopped,not counted as an assertion/match failure
+(121.420628s,Cargo101 after ownedRustPID25550 SIGTERM;raw
+d4cd302a0c0391ecaab0161db681eff215d4751b7a43688ad0470fe9acecae35).
+One process-inventory tool invocation fails JavaScript parsing before any nested call;
+direct retry identifies only the owned replay and preserves the partial log. Both production
+source SHAs remain unchanged. The corrected logger captures the pre-AI goal explicitly,
+then reports the post-strategy goal separately. It samples at most8 actual funded,
+source-valid,free-queue opportunities and compares actual min/max/sight against farther
+known-water component cells. No actor,command,RNG or simulation-state write is introduced.
+
+The corrected pre-AI admission diagnostic is also intentionally interrupted, not a match
+result: owned Rust26054/Cargo26020 receive SIGTERM after bounded elapsed5:52/CPU6:00.57;
+Cargo exits101 after365.540594s (raw ac678544ab002e4decf2a9bf98434b4bf368bbdee594fec14b72ee8acf201b2d).
+The interrupted record preserves both unchanged production SHAs. Its conservative funded
+filter at600-tick rescan samples reports no qualifying opportunity through120k; this does
+NOT establish absence at other actual AI turns or Pacific causality. No further complete
+baseline is run solely for attribution. If a corrected exact replay still fails, any next
+required funding funnel must observe actual due decisions, not only rescan samples.
+
+R151 retains the independent mixed-range correction: naval_goal qualifies one known water
+component, not a universal firing cell for every declared hull. recruit now searches that
+same component with each kind's actual weapon minimum/maximum/observation eligibility,
+using ordered bounded map traversal and only owned/observed building obstacles. It adds
+no persistent controller state, tuning, occupancy oracle or command bypass. The corrected
+mixed fixture after1 passes0/.201167s (raw8171141e0596da4609f2b5ca47d619087dd353e4d0febec6abb691540e536fb9):
+actual sharedgoal14,22 still applies, but a legal Dread is queued, paid and fires at shore.
+
+The adjacent unit geometry is reconciled with Combat: remembered buildings retain actual
+footprint extents and source sight-cell qualification; already View-observed naval units
+use Extent::point(Mobile.position(grid,id)), including actual movement interpolation, and
+need no second old-cell visibility test. Vision legitimately observes current OR next
+movement cells. NavalTarget/Reach are ephemeral derived values; no hash schema changes.
+
+Three new scheduled unit-boundary controls retain insufficient probes explicitly. Before1
+fails compilation (IssuedCommand API); before2 uses an assumed six-cell Destroyer range
+and a moving-visibility premise that is false. Native fire there proves neither an AI
+geometry error nor actual closing. The selected source gun_155mm actually has range2048
+(eight cells). Before3 derives that weapon and isolates the static enemy in one water cell:
+the human never fires outside delta(8,2), while AI queues/pays a hull. Its moving setup is
+outside the map, and the positive AI paid hull still never fires. Before4 corrects that
+map premise and proves old-cell-hidden/next-visible Dread perception before failing the
+AI naval-goal assertion. Its actual human exact-max shot records SubPos(3712,5248) to
+(5760,5248); the paid AI at that boundary fails to fire on old geometry. All four raw logs
+remain, with no inference that every earlier failure was a production defect.
+
+On corrected geometry, all three controls pass (after1,0/20.315003s including compile;
+raw6fd4be20df21fe1d2a3e5f3a86130d7feae89342bd86c6f80291ee4c04018103):
+ra8_naval_unit_points_outside_source_maximum_are_not_footprint_edge_jobs emits no paid or
+queued hull outside actual point range; ra8_naval_unit_points_at_source_maximum_support_real_paid_fire
+pays and fires from the same exact maximum source positions as the human;
+ra8_naval_unit_movement_positions_and_observed_destinations_drive_jobs uses actual Move,
+real Gap concealment, next-cell observation and a paid Dread shot. No injected perception,
+HP, reload or rules_difficulty exemption is used. The source-derived Gap radius places
+only the old cell under shroud; a long-range Dread keeps own/yard local sight out of range.
+
+All86 RA8 AI schedule controls then pass0/75.604357s on formatted strategy95fdb509...,
+including original building-edge/minimum, useful existing hull, hidden-world intent and
+normal production assertions (rawe301d4bf7976634e2d299c887a5af25aa131dd0cabb0ba6d968a137bb4f7f030).
+A repeated final-source one-guard negative removes only the honest hidden-building water
+check. It fails the actual fresh601 live-hull mission assertion (101/19.516349s;
+raw4bf3f8bc167759307e963a00dd17333d4f80357f62d1a2eae6edcc1ff1e71cac).
+Finally restores exact source bytes; a separate subsequent SHA read confirms strategy
+95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591 and AI
+3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366 before the next replay.
+The independently justified corrections do not themselves establish a Pacific ending.
+
+The ONE exact corrected-source Pacific replay now finishes P1Won51902 within the unchanged
+288000 limit (0/131.173599s including29.75s compilation; test100.87s; raw
+317211448ff460be11383211e0362222b66b3f1da9acfba216f50e0cb56cd059).
+This is combined source-correction ending evidence, distinct from each controlled property
+proof; no isolated full-match attribution to one correction is asserted. ai.ron remains
+e7ffe532..., AI3aed244c..., strategy95fdb509... . Fresh full preflight remains required.
+The next retained31-case target runs once with --test-threads=4, preserving every existing
+name, assertion and limit, with its full raw output/manifest and per-case outcomes. This
+is one bounded owned harness batch; no validator or timing measurement overlaps it.
+
+The first broader final3 preflight stops at strict Clippy: three NEW test syntax warnings
+(one single-element loop,two collapsible ifs),101/7.561339s,raw
+5cc6a117bdc31df0e1f497c56ab1a000772c678922888707bbba795cd34ab87c.
+Dependent checks are unrun. Equivalent syntax/format corrections change no fixture,
+assertion,runtime or data; the entire fresh final4 preflight restarts. Its runtime manifest
+continues the recorded342 runtime/data/script paths; these historically do NOT include
+integration tests. A complementary snapshot explicitly records101 integration-test/example
+files (SHA5ef9d3227d5f5cd854b2456d1a82befd50082d36e4e233691efeeeaaa5abb2c3),
+without rewriting any prior manifest or retroactively expanding earlier unchanged claims.
+Static inventory is1124 at RA7f5505cd versus1306 current,182added,none removed/ignored.
+Final4 strictfive checks,86AI/20recovery/6composition/2RA4 and allten Demo pairings pass;
+its retained31 and subsequent fullsim/game/m13/performance remain pending at this entry.
+
+Final4's complete retained31 target exits101 after1118.975520s:30pass/onefail/0ignored,
+raw04c927f7f984dc1d4da0380a4fc11940f9836da2f8d8fe54e4d1521d089377da. The ONLY failure is
+ra8_gate8_oasis_libya_iraq_brutal_seed_zero_finishes:None252000 at the original explicit-Won
+assertion. All31 cases actually execute in this bounded four-thread harness;SteelHarbor
+America/Cuba finishesP1Won178261 andWheelCuba/FranceP1Won144684. The STOPPED record maps each
+exact test name/case/status/outcome and verifies all342 runtime plus101 integration/example
+hashes unchanged. Across eleven completed commands:145pass/onefail/zeroignored/1318.190023s;
+summarySHA76b838d0fd58495ac199931f006ead2e345ebcf468a24b4820795d6b519bfa12.
+All dependent fullsim/game/M10/companions/m13/benchmarks are UNRUN. No broader acceptance is
+claimed from the thirty winners. Isolated existing read-only economy/service/composition
+instrumentation now diagnoses Oasis on unchanged source and limit;the late snapshot has
+surviving ordinary traveling forces,loaded returning harvesters and live strategic sources,
+so it is not proof of helplessness or a basis for liquidation/cadence/limit changes.
+
+### R152 — Libya's declared siege priority preserves paid national recovery (RA8, 2026-10-18)
+
+Final4 has exactly one completed retained failure,OasisLibya/IraqBrutal seed0 None252000.
+An isolated existing read-only economy/service/composition trace reproduces it unchanged
+(101/118.268575s;raw30c00c301b1639d09ada02a7dbd676cb32fa58c42ea3644fb2334b5a70ecbfec).
+Both sides have actual income,production,repair,travel and strategic launches. Across full
+60k windows P0 ore is71000/43000/39000/37000,P1 is75000/45000/42000/39000;P0 loses
+10/6/8/7 War Factories versus P1zero/zero/one/zero. Late actual enemy ground/Kirov/V3 shots
+and source nukes occur;no helplessness,unused-source,stopped-clock or forced-loss inference.
+
+An initial report mislabeled UnitKind20 as paidV3:it is FlakTrack. That report is explicitly
+CORRECTED,not silently reused. Actual source V3 isUnitKind22. P0 pays ZERO V3 throughout
+252000;P1 pays11/11/5/6 in full windows andone in the final partial window. P0's two early
+V3 losses are captured P1 hulls (IDs166/302,actual ownership changes then destruction),not
+P0 production or enduring filled siege reservations. The actual composition trace records
+funded legal V3 opportunities:at4460 P0 has39530credits andempty factory queue,normal
+source legality succeeds,but admissions choose DemoTruck29;the pattern recurs. Existing
+advanced/air reserve priority plus mixed producer traversal can favor its national factory
+unit without serving cheap siege. This is play/composition evidence,not a claim that a
+source rules or strict per-producer scheduler contract was violated.
+
+A small game-owned policy moves ONLY Libya's existing V3 entry to the front of its generated
+cyclic army. Normal Radar prerequisite retains the opening tanks;the national DemoTruck
+remains present and eligible for the unchanged advanced reserve. No weapon,health,price,
+owner,prerequisite,source difficulty,defense count,reserve,cap,cadence or limit changes.
+No map,seed,winner or horizon branch exists. Generator357c3dd026e7ff537106e1d29a1fb4c131a2ca68474d4c2806675da7bae168fa
+writes ai.ron a29e0ceedfb2212d26bdc4c9c1ecc94f7d05106b7e635fd45925d48451a964b7.
+The A/B snapshot records all342 runtime/data/script paths and verifies ONLY these two
+files change at candidate creation. Later additive test controls change test-only modules;
+the original A/B manifest is retained verbatim,not retroactively expanded.
+
+New ra8_libya_shipped_land_cycle_funds_and_spawns_siege_alongside_its_national_reserve
+projects the real Libya land cycle onto actual mixed infantry/factory lanes,normal owners,
+source Radar/Lab/producer prerequisites and40000 credits. It isolates unrelated building,
+support,air/naval spending and combat while retaining the source advanced reserve,cadence
+and real source prices. Before2 explicitly verifies buildability/producer presence and
+V3cost800/Democost1500,then fails because16 actual paid/spawned units contain no V3
+(101/18.601919s;raw4d0a46ae961b61c38626654ba35f65cadb145c10f6cb92020a48d3cc42d96dd4).
+Before1's same paid outcome is also preserved. The unchanged after1 control passes0/.366874s
+(rawb205abbf9808fdd335c549c71e610de0eaa9fffaf8f16949c3d3950e92605f3d):Demo is still
+third paid and V3 is fifteenth paid. Exact source-credit debit,real spawned counts and bounded
+ordinary producer queues are asserted. No broad scheduler fairness or DPS claim is made.
+
+The ONE exact candidate default Oasis replay finishesP1Won171042/252000
+(0/113.275037s;raw0724d03e1f7d0f5ccba48da27077baf52772fc939963941883d82af6749b8625).
+This combined plan-ending result does not claim Libya's new artillery won the match:
+Iraq,P1,actually wins. Retention remains subject to fresh bundled31,m13 and full13 gates.
+No extra full replay solely for tactical attribution is required.
+
+Two new source-positive controls retain opening and national recovery:
+ra8_libya_siege_priority_keeps_the_normal_locked_tech_tank_opening verifies both source
+siege/national prerequisites reject before Radar/Lab and pays two actual Rhinos;
+ra8_libya_replaces_its_national_with_paid_production_after_real_enemy_capture first pays
+its national,ordinary-Moves it away,uses an actual enemy Yuri capture,then requires an
+ordinary newly paid/spawned national replacement. Controllers are held only during the
+isolated ownership-loss setup;public commands,source MindControl,queues and prices remain
+normal. Its first fixture probe incorrectly names a target immediately after raw Yuri
+spawn,before real Visibility,and correctly rejects UnknownTarget (after2,2pass/1fail,
+raw6372720a56dbb0352fe8b81f3cbfa9cfb6cf41de7aa56c78d8f3f7798b6a376b).
+The fixture now waits an ordinary tick with Yuri outside source range7 but inside source
+Sight12,and explicitly proves target still ownedP0 and seen byP1 before issuing Attack.
+Allthree controls then pass0/45.979591s including44.36s compile (raw
+d3a9c61e313803c5292cc5b199605238038a3ef6282b0aa833e13e90de46a7ba).
+No public rejection or original test assertion is relaxed. The shared test setup only gains
+an explicit country parameter;every previous helper call retains Germany/power defaults.
+
+One runner-preparation JavaScript typo fails parsing before any nested call;its corrected
+retry only stores a future runner,with no source/process mutation. Following root's explicit
+validation-efficiency instruction,the NEXT fresh preflight runs strict checks,focused
+AI/recovery/composition/RA4/default10,bundled31,and isolated m13 all-to-end/fixed256 evidence.
+The previously planned duplicate fullsim/game/M10/companions preflight is UNRUN and superseded
+by mandatory full13 workspace command4;no mandatory command,test,runner option or limit is
+removed. All13 still runs on the committed root-checked final tree. Old failed attempts and
+all raw diagnostics remain intact;RA8 is not yet fully validated or independently reviewed.
+
+Fresh final5 stops at strict Clippy before dependent work:one clone_on_copy warning in the
+NEW capture fixture's observed Mobile snapshot (101/3.281297s;raw
+fd44c5eaa1117f136f70caf2a4c83bfcd28d6d4784b3c9fb7b1758edffd9f5ad).
+Replacing m.clone() with equivalent *m changes no fixture,assertion,gameplay or data. Final6
+restarts all scoped preflight stages;the original final5 manifests remain unchanged and
+correctly precede that one test-only library-module byte correction. The isolated exact
+Oasis game/runtime/data are unchanged. No phase beyond the failed check is counted passed.
+
+### R153 — Strategic strikes are independent of exhausted army cohorts (RA8, 2026-10-18)
+
+Fresh final6 passes all five strict checks,86 AI/20 recovery/9 composition/2 RA4 controls,
+the ten default Demo pairings and the complete four-thread31-case retained target
+(149passed/0failed/0ignored across six test commands). All31 have explicit winners;
+the target takes1230.277466s,raw135c97ca307a8d77224a1167d24072ca22d55d7d5fcf3754061f589c52807d3b.
+The subsequent isolated actual-default ten-player sweep completes16 winners and then
+Frozen Sound reaches the original400000 limit with two players left. Its mean596.419us
+passes the5ms mean budget;this is an ending failure,not a performance failure.
+
+The owned binary47206,parent40058,is verified by anchored pgrep and exact ps before SIGTERM.
+The wrapper records child-15/2532.668930s,not a completed all-map command exit1. Raw SHA is
+f2327ce1cd299f6a7baa342afde64d8e2ffe97999e445f62874e6a9f893dd2be.
+attempt8-final6-STOPPED.json preserves all seventeen completed map outputs,both342 runtime
+and101 integration/example hashes without mismatch,and the four uncompleted maps. A following
+map may have run partially before termination;no outcome or assertion result is claimed.
+Fixed256/example guards/full13 remain UNRUN. An initial broad ps tool output was truncated;
+no PID selection used it and no unrelated process was stopped. Root subsequently directs
+the NEXT all21 sweep to complete every map even if one reports None,and stop dependent
+phases only after its actual nonzero command exit. No old raw record is rewritten.
+
+The exact seed13 ten-player replay with existing trace reproduces None400000
+(1/203.461222s;rawa494c093f038206adf9272f1a70445c41519b93732a9db14c10a1c3163eb0c0a).
+At396000 P1 Korea has161202credits,full technology,Weather/Chronosphere/SpySat and a real
+51-member wave (26Grizzly/9Prism/4Eagle/4Chrono plus infantry) idling near214..220,214..220.
+P2 France has62547credits,only refinery751 at231,37 and Prism791 at228,28,full1000/600HP,
+two unarmed ChronoMiners and no queues. Its factory disappears252000..264000. P1 clearly
+has finishing capability;P2 mining income alone does NOT establish offensive/recovery
+capability. No helplessness or forced-sale inference is made.
+
+One necessary detailed replay adds read-only output ONLY to the existing explicit trace
+mode:compact controller/known history,actual visibility,power,charge and harvester state.
+It again ends None400000 (1/382.349553s;rawe7665096205de6c61089de45fdeb70b4a21c1ab6465bca0bff7da527257a934f).
+P1 knows and currently observes the last buildings;their jobs have3 completed army attempts,
+empty actors/founders and approaching=false. Power is2200/2010,not low. The selected scouting
+waypoint is the already observed home217,217. Weather charge cycles rather than remaining
+permanently full/idle;the old trace does not identify accepted strike locations,so an actual
+worker-target causal claim is unproved. P2 late power is0/125,low;its offensive status remains
+unclassified. The derived diagnosis corrects its initially assumed0/100 after an exact raw
+line check. No third whole baseline is run solely for attribution or any performance claim
+made from diagnostics. Source AI remains3aed244c.../strategy95fdb509...through both replays.
+
+New ra8_failed_real_sorties_do_not_blacklist_a_naturally_charged_strategic_strike uses actual
+source Harrier ammunition/reload and ordinary paid plant repairs. Before1's closer plant
+dies before the intended premise is established (101/25.372736s,raw624c798fe88260b6b76e5d621f1140b296611ebf429188941746199ad05949a3);
+that is insufficient,not eligibility proof. Before2 reuses the retained paid-sortie distance
+and actual oil-capture positions:14 real shots and227 paid healing steps produce hp450,
+failures3,empty actors/founders. Only then is a normal Weather source added and allowed to
+recharge naturally. It is powered,not disabled/erased,and reaches full source cooldown,
+but never launches/damages the observed plant. Ground failures remain unchanged and no
+failed ground Attack is reinstalled. Before2 fails at the intended final assertion
+(101/25.784897s;raw18eaa383f10ace89b1bc6119af080c05f07e097f6d7b535ee9c00c931c37593e).
+No charge,history,ammunition or above-source HP is seeded.
+
+The correction removes ONLY army attack_job_eligible from strike_target's known-building
+candidates. Source stable visibility,exact difficulty weights and all native source power,
+ownership,readiness,disabled/erasure and command checks remain. Ground/air army history,
+replacement-ID protections and other strategic best selection are untouched. A failed
+cohort does not establish that an independent fully charged strategic weapon cannot help.
+No new policy knob,state,hash field,timer,cadence,limit,source stat or forced loss is added.
+Strategy is9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80.
+The identical regression passes with natural readiness,native Storm activation and actual
+damage (0/25.573051s;raw9002bd1834521e8d5e622f1c298cff919d9645dffb849d0edbd12c4d5a2a0643).
+All10 retained attrition controls pass separately,including unchanged exhausted-ground,
+replacement,real approach,cargo/dock/freeze,loss/capture,recharge and AA expiry boundaries
+(0/3.200055s;rawfc05ad17e053a6d78911f061d1bedcb22d63c2a6abe607847c7362153bddab38).
+All86 strategic availability/vision/capability controls and one exact Frozen Sound replay
+remain pending at this entry. Capability proof is not exact-match ending credit.
+
+Root identifies three existing example test guards not executed by ordinary workspace test:
+m13_ten_players,m14_duels,m7_soak have no test=true example declarations. After the NEXT
+isolated timing runs,explicit cheap example-test targets must execute and retain exact counts.
+This is specific missing execution coverage,not restoration of redundant broad preflight.
+Static inventory is1310 versus RA7f5505cd1124 (+186),none removed/ignored;executed counts
+remain separate. Full13,both fresh756-winner distributions and independent review remain open.
+
+RA9 also explicitly carries historical M6 review2 P2: gathering_point's terrain-only floodfill
+and its recorded contrived own-yard partition reproduction still require actual setup/command
+soundness closure. This correction does not claim all inherited AI debt is closed. R83/R96
+and the unproved R99 capability lead remain;R97's lifecycle mechanism is closed in R103.
+
+All86 retained AI scenarios then pass0/182.107119s
+(raw65a7057672e194f6420b343105736bc9e2821515a910d867c37d51eaa0c58b5d).
+The ONE unsampled exact Frozen Sound replay finishesP1Won107724/400000,all ten builders,
+107725ticks at mean844.100us/p995.308ms/max83.940ms/busiest1000mean3.236ms/nineticks>50ms.
+Measured90.931s/elapsed90.940s;command0/94.452326s includes3.10s compile,raw
+b7d74b01847b96e36f37553ea481261d3eadea95f4c4de4058607924f1dc1c4a.
+This exact ending is separate from the controlled source-capability proof;no P2 liquidation
+or source/timer/limit change is involved. Fresh final7 now repeats the scoped strict checks,
+AI/attrition/recovery/composition/RA4/default10/bundled31,then the entire isolated all21
+ten-player sweep/fixed256 and three explicit example-test guards. It will collect every
+all-map outcome before reacting to a completed nonzero command. Full13 remains unrun.
+
+Fresh final7's five strict checks,86 AI/10 attrition/20 recovery/9 composition/two RA4 controls
+and all ten default Demo pairings pass. Its complete31-case four-thread target then finishes
+30pass/onefail/0ignored:ra8_gate_steel_harbor_america_cuba_bridge_seed_zero_finishes reaches
+None288000 at the unchanged original explicit-Won assertion. Target101/1533.257875s,raw
+88d09015dd08b5ff885498598086cd5b2fd3e5d087320fa0497819ca6b16d388.
+All12 completed commands total158pass/onefail/0ignored/1734.530650s. The STOPPED record maps
+all31 outcomes and verifies342 runtime plus101 integration/example hashes without mismatch.
+All dependent fresh m13/fixed256/example guards/full13 are UNRUN. R153's controlled native
+proof and Frozen Sound ending remain valid;this is no basis for a blind revert or global
+failed-job reset. One exact existing economy/service/late-mission trace diagnoses Steel's
+actual income,forces,paths,strategic targeting and damage before any further source selection.
+The preserved final6 SteelP1Won178261 is historical comparison,not a result transferred to
+the corrected runtime. Both surviving bases retain yards,tech,strategic sources and many
+buildings;no helplessness inference or horizon-specific change is justified.
+
+### R154 — Prefer a useful naval construction endpoint outside observed normal fire
+
+Final7's sole Steel Harbor America/CubaBrutal seed0 failure remains unchanged in its raw
+31-case result (30Won/oneNone288000). The one necessary actual economy/service trace
+also ends None288000:101/322.099931s,raw8630586975dec00d66bd88ab3ef1f2fd75cfbe71e9e6e93c28b02edeeaa01fd9.
+Both sides retain real income,producers,tech,strategic sources and combat. No helplessness,
+gathering trap,absent siege or starvation contract is established. In particular,P1's
+idle Dread snapshot does NOT establish permanent idleness: actual yard shots number
+204/155/98 across60–120k/120–180k/180–240k,and478 real missiles are born180–288k.
+P0 also pays Grizzly/Prism/Chrono/Harrier units in every recorded window. The observed
+replacement choice is narrower: P0 places/loses14/13,11/11,7/8 naval yards in the same
+three windows,repeatedly at118,107,without later named naval production after the first
+Destroyer/Carrier losses. Aggregate losses alone do not prove a safer actual-world site
+or a cause. A normal paid-placement counterexample independently establishes the choice.
+
+New ra8_paid_shipyard_uses_an_available_same_sea_site_outside_observed_bombardment uses
+source owners,prerequisites,prices,normal construction/placement and a genuine reachable
+shore job. A read-only source buildability/site check proves the alternative42,20 legal.
+Before1 is an event-payload compile failure;before2's human attacker lacks observation and
+properly gets UnknownTarget. Both are insufficient,not a negative proof. Powered ordinary
+human satellite observation repairs that premise. Before3/before4 then place18,20:
+native Dread shots destroy the paid yard before counterforce completion. Before4 retains
+all explicit legal-alternative/source-prerequisite premises (101/19.865733s,rawefbdfc3646c261adab1ab06cf8da34ad42c18a21a46f416e5ac36e2418453bf4).
+
+The game-owned play correction ranks otherwise normal qualified shipyard sites outside
+currently observed enemy unit normal-kind weapon envelopes before exposed sites. It uses
+native weapon/warhead eligibility and subcell point-to-footprint minimum/maximum geometry.
+Prospective building traits use public terrain and source metadata;no actor is created.
+UnitSnap has no rank,so this is not an oracle for elite,bonus,readiness or future hostile
+movement. Existing ownership,visibility,footprint,occupancy,shore,placement reach and useful
+sea-component checks still decide admission. Exposed sites remain eligible fallback.
+Neutral/legacy plans retain their old all-false ordering. No source stat,price,difficulty,
+policy knob,cadence,limit,persistent state or hash field changes. Only opted-in naval-site
+ordering changes;no global route-avoidance or future safety is promised.
+
+After1 actually chooses a current safe site36,20,but hostile hulls move within their
+larger pond and later destroy it. That failed positive is preserved and explicitly refutes
+a future-survival interpretation. The final fixture restricts that separate pond to the
+three already occupied firing cells,isolating endpoint choice instead of predicting motion.
+After2 preserves the yard at36,20 and completes normal paid production. Root then identifies
+that ProductionComplete precedes physical spawning;the final assertion is strengthened to
+require UnitSpawned from that yard,an actual living owned Destroyer,the correct source-yard
+Grid registration,exact yard+unit credit cost,and no cell invariant or stray-claim failure.
+
+New ra8_naval_site_preference_preserves_hidden_unit_intents_and_controller_hash compares
+601 scheduled ticks against a truly automatically concealed source Typhoon,without seeding
+hidden flags. Real naval planning runs;all emitted intents,controller values and value hashes
+match. New ra8_naval_site_preference_retains_source_minimum_target_eligibility_and_exposed_fallback
+keeps actual too-close Dread minimum,harmless Dog target eligibility and an exposed-only
+useful sea. Its preparatory failures are preserved: observer-keyed hidden assertion compile
+error;armed Tech Outpost legitimately kills a control actor;the adjacent harmless Dog
+legitimately shifts the nearest legal site one cell through the EXISTING placement ring;
+an exactly3x3 sealed pond has no free water exit and properly cannot qualify. Final controls
+use unarmed anchors,a five-by-three exit-bearing exposed sea,and retain every stated source
+eligibility/fallback assertion. No existing test assertion or bound is weakened.
+
+All63 library RA8 controls pass0/25.555641s (native7.52s),including all three new controls,
+real spawn/registration/cost and retained lifecycle/attrition/recovery/composition boundaries;
+raw8e00c34fc787b271905bc5e2e3702ee1077ff0bffd65ad53441da0c22eade054.
+The final constrained/live-spawn fixture is then proved fail-able by reversing ONLY the
+new preference:18,20,native shot/destruction,no Destroyer;101/17.772009s,
+raw978e706566b938f213d6cbe758f30c99d2847ac40abd10e83d6b5956749d53bf.
+The single mutation is restored in finally:AI original/restored
+a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174,
+mutated5ee838c6592064c6f89c90b55e6737b54734928b96ae1a336298c0b4653d33cc.
+A SEPARATE subsequent SHA read verifies AIa833/strategy746f before any dependent command.
+No mutation remains. Full raw/metadata and corrected/insufficient observations are indexed
+in attempt8-yard-site-evidence.json;all earlier evidence remains byte-identical.
+
+ONE exact default Steel replay on restored source finishes P1(Cuba)Won65860/288000:
+0/126.410865s including compilation,raw3e264935a7d907ea805f439522e243ef008f3b3904b542ad8d05f39de85874ae.
+AIa833cde5/strategy746f4d9e remain identical before/after;Allied/Libya dataa29e0cee and
+generator357c3dd0 are untouched. R153 is retained. This combined exact ending is separate
+from the controlled play opportunity;no inference about the winner's particular naval
+contribution or all-map performance is transferred. Fresh scoped strict/focused/default10,
+bundled31/all21 ten-player/fixed256/example guard evidence and the root checkpoint remain
+required before the mandatory frozen full13. No broad RA8 acceptance or independent review
+is claimed. Historical M6 gathering_point own-yard partition debt remains explicitly RA9.
+
+### R155 — Ninth frozen scoped-preflight checkpoint (RA8, 2026-10-19)
+
+The completed final8 preflight has17 commands,all exit0,165passed/0failed/0ignored across
+10 test-target invocations. Wall4003.874346s,command-duration sum4002.749486s. The five strict
+checks remain unfiltered;86 AI,10 attrition,20 recovery,12 composition,two original RA4,
+the default Demo ten-pairing target,and the complete31-case four-thread target all pass.
+The three example winner/duration guards are explicitly executed,one pass each,because
+ordinary workspace test does not execute examples. Counts overlap prior evidence and are
+not added to it. The complete31 target has31 explicitWon,0/1157.025084s;raw
+2bd24bfc0fdd3f79c0ca58acb404d94d3fb0241b4248278b4b60ebe443250b6c.
+It is not either required756-match R29 distribution. Fullsim/game/M10/companion duplicate
+preflight runs are explicitly superseded by mandatory unfiltered full13 workspace command4;
+no required command or named test is skipped. All earlier failed/interrupted/insufficient
+probes and their corrected explanations remain preserved.
+
+The ONE complete fresh m13 to-the-end all command exits0/2496.001729s,raw
+338ca4002178a162921a649785511986c428d8b0aeec6d5b7245c20fb12a65e5.
+All21 maps have explicitWon and all ten builders. Exact ending distribution is
+median101272,p90 nearest-rank152216,max275899,under unchanged400000. All means<5ms;
+worst Coral1.693ms. Measured totals2489.336s/mapelapsed2489.602s. Detailed p99/max/busy/late
+counts remain in checkpoint9-metrics.json and raw: Frostline maximum319.024ms/busiest1000
+mean8.475ms and Thousand Lakes273ticks>50ms are not hidden by whole-run means. No smoothness
+or maximum-tick guarantee or isolated cross-attempt performance attribution is claimed.
+Two bounded snapshots of the same owned process show cumulative CPU progress;no profiling,
+sampling,signals or other simulation occurs. Earlier tail-only progress counts omitted the
+already completed Crossroads and understated partial progress by one;the complete raw parser
+establishes all21 outcomes. No earlier stopped partial sweep is relabeled complete.
+
+Fresh isolated fixed256 Liberty/Continental/Pacific each runs24000 actual default scheduled
+ticks,ten builders,and mean3.391/2.314/1.497ms below5ms;0/173.884961s,raw
+df574b1e02e388e79fdfc27388be5bfdc365d8c65ad8ee773807e662d0eb8b18.
+Their p99 values19.901/14.325/20.368ms,max295.763/133.283/160.131ms,busiest1000means
+5.568/5.445/2.517ms and32/17/23ticks>50ms remain explicit. These natural fixed-duration
+cutoffs are performance evidence,not completed-match winners. Passing means justify no
+optional optimization or repeat. R154 remains a normal-kind snapshot endpoint preference
+at ordinary naval site selection/rescan,not an elite/readiness/future/route safety oracle.
+All source stats,difficulty values,defense counts,prices,reserves,quotas and limits remain.
+
+Fresh attribute-aware static inventory is1313 versus RA7f5505cd1124:189 added,none removed,
+renamed or ignored. It is separate from executed counts. All342 recorded runtime paths and
+all101 additional integration/example paths rehash without mismatch. These two explicitly
+defined snapshots may overlap;they are not retroactively merged or claimed disjoint.
+Manifest SHAs21f36ba65a1d18b873868fe2f9f3a98d694e358250a26595adcd26e0430340fa and
+770a15eef7a15cc7c1ed2e2e3ed4a3979ad93820b69a52468e5833e7384a9242.
+Current AIa833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174,
+strategy746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d,
+dataa29e0cee/generator357c3dd0 are frozen. Main remains8230a955b251e9341d349f99eaeb86f7f8253664.
+The source/evidence commits will record their own identities;no source bytes change after
+these successful commands. Runtime hashes,all17 raw hashes,full static inventory and actual
+metrics are durable checkpoint9 records.
+
+Before any ra8 label reuse,a FRESH checkpoint9-attempt8-preservation.json verifies all13
+current failed-gate files against their attempt8 archive AND the original PRESERVED.json
+hashes,including wrapper/process/liveness metadata;all76632bytes are identical. Original
+raw and preservation metadata are not rewritten. Other failed attempts remain untouched.
+
+R144–R154 name the new corrections,ordinary paid/physical/privacy proofs,exact old-fixture
+migrations and every unsuccessful candidate. Game-owned play assumptions include Allied
+paired-Prism cyclic weighting,Libya siege priority and the R154 placement preference;they
+are not claimed closed-source policy or isolated ending causes. R144/R145/R151 naval fixture
+observation/Guard/Move premises preserve original hidden-world intent/controller equality
+and positive naval assertions;R149 preserves actual final32-command prefix/refund/repair
+accounting and all source rates. R153 preserves failed ground histories while independently
+admitting native strategic weapons. Every added module/policy and these migrations remain
+RA9/independent-review scope. No source stat,assertion,bound or rejection exemption is relaxed.
+
+RA9 carryforward explicitly includes historical M6 review2 P2 gathering_point's terrain-only
+floodfill/contrived owned-yard partition,not proved in Steel;R83 transport Size/SizeLimit/
+loaded boarding and attached Squid-host WeaponFired;R96 actorless occupied-Prop C4/Ivan/
+Temporal resolution;and R99's unproved bombable capability lead. R97's generic lifecycle
+mechanism is closed in R103,with narrower later certificates explicitly tested. RA8 does
+not claim every inherited AI debt closed. User visual/audio/play-feel verification and
+independent review remain pending. All13 frozen commands and BOTH fresh756-winner R29
+before/after distributions remain mandatory after root's committed milestone check.
+This is validated scoped preflight,not completed RA8 acceptance or independent approval.
+
+Fresh storage: RA5 render10files/875468logical/901120allocated bytes;RA7 parser70files/
+11615632logical/11755520allocated;RA8 parser58files/584038logical/733184allocated(716KiB).
+All remain in configured cache/review paths,retained for evidence/reruns and not release
+requirements. No new substantial external directory,clone,worktree or system/tmp artifact
+is created;Cargo/UV/PIP caches remain configured. No validator or mutation is active before
+checkpoint preparation. Deliberate stage,SEPARATE unfiltered cached-check inspection and
+raw-only classification must precede each SEPARATE commit;no nonzero check is called passed.

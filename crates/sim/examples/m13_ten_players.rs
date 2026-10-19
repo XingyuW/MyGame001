@@ -107,6 +107,11 @@ fn trace(world: &mut bevy_ecs::world::World, definitions: &sim::Definitions, map
             )
         })
         .collect();
+    let harvesters: Vec<_> = world
+        .query::<(&sim::SimId, &sim::Owner, &sim::Harvester)>()
+        .iter(world)
+        .map(|(id, owner, harvest)| (*id, owner.0, format!("{harvest:?}")))
+        .collect();
     let special = world.resource::<sim::SpecialState>();
     for target in units
         .iter()
@@ -147,6 +152,40 @@ fn trace(world: &mut bevy_ecs::world::World, definitions: &sim::Definitions, map
             controller.and_then(|c| c.target()),
             controller.and_then(|c| c.naval_target())
         );
+        if tick >= 120_000
+            && let Some(controller) = controller
+        {
+            let debug = format!("{controller:?}");
+            let tail = debug.split_once(", known: ").map(|(_, tail)| tail);
+            let objective = match controller.target() {
+                Some(sim::WaveTarget::Waypoint(index)) => controller.waypoints().get(index),
+                _ => None,
+            };
+            let observations: Vec<_> = controller
+                .known_buildings()
+                .iter()
+                .map(|(id, known)| (*id, state.vision().sees_footprint(known.footprint)))
+                .collect();
+            let charges: Vec<_> = buildings
+                .iter()
+                .filter(|building| building.1 == player)
+                .filter_map(|building| {
+                    special
+                        .charge
+                        .get(&building.0)
+                        .map(|charge| (building.0, *charge))
+                })
+                .collect();
+            let own_harvesters: Vec<_> = harvesters.iter().filter(|h| h.1 == player).collect();
+            eprintln!(
+                "{map} detail tick{tick} player{} power{}/{} low{} gather{:?} objective{objective:?} observations{observations:?} charges{charges:?} harvesters{own_harvesters:?} known_and_controller{tail:?}",
+                player.0,
+                state.power_produced(),
+                state.power_consumed(),
+                state.low_power(),
+                controller.gather()
+            );
+        }
         for unit in units.iter().filter(|u| u.1 == player) {
             let commandable = !special.spawned.contains_key(&unit.0)
                 && !special.strategic.flights.contains_key(&unit.0)

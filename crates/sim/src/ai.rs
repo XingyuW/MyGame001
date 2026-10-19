@@ -219,6 +219,10 @@ mod ra8_attrition_tests;
 #[path = "ai/ra8_recovery_tests.rs"]
 mod ra8_recovery_tests;
 
+#[cfg(test)]
+#[path = "ai/ra8_composition_tests.rs"]
+mod ra8_composition_tests;
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct AirScreenProgress {
     remaining: u32,
@@ -1277,7 +1281,7 @@ pub(crate) fn run_ai(
         }
         commands.retain(|c| !matches!(c, Command::Move { units, .. } | Command::AttackMove { units, .. } | Command::Attack { units, .. } if units.is_empty()));
         commands.extend(extra);
-        retain_funded_unit_intents(&view, &mut commands);
+        retain_funded_unit_intents(&view, &mut commands, controller.difficulty.think_interval);
         commands.truncate(MAX_AI_COMMANDS);
         for command in &commands {
             strategy::record_attack_job(&view, controller, &special, command);
@@ -1816,50 +1820,141 @@ fn recover_unit_credits(view: &View<'_>, controller: &AiController) -> Vec<Comma
 /// Read-only FIFO accounting for final bounded intents. Simulate public
 /// last-matching refunds, and reserve current/same-turn production before adding
 /// another unit. The actual commands still perform every validation and charge.
-fn retain_funded_unit_intents(view: &View<'_>, commands: &mut Vec<Command>) {
+fn retain_funded_unit_intents(view: &View<'_>, commands: &mut Vec<Command>, cadence: u32) {
     if !view.ai.rules_difficulty || strategy::service_income(view) {
         return;
     }
-    let mut queues: BTreeMap<_, _> = view
-        .state
-        .queues()
-        .map(|(key, q)| (key, q.to_vec()))
-        .collect();
-    let mut cash = view.state.credits();
-    commands.retain(|command| {
-        match command {
-            Command::CancelProduction { item } => {
-                if let Some(key) = view.definitions.queue_of(*item)
-                    && let Some(queue) = queues.get_mut(&key)
-                    && let Some(at) = queue.iter().rposition(|q| q.item == *item)
-                {
-                    cash = cash.saturating_add(queue.remove(at).charged);
+    // Only the bounded candidate prefix can supply refunds or claim credits.
+    commands.truncate(MAX_AI_COMMANDS);
+    let rules = view.definitions.rules().map(|r| &r.economy);
+    let repair_step = |building: &&BuildingSnap| {
+        let rules = rules?;
+        let max = view.definitions.building_combat(building.kind)?.hit_points;
+        (building.hp < max).then(|| {
+            let price = view
+                .definitions
+                .production(ProductionItem::Building(building.kind))
+                .map_or(0, |terms| terms.cost);
+            crate::repair_step_cost(rules, price, max, view.state.super_me)
+        })
+    };
+    // Commands apply next tick. Existing repairs due in this Economy stage
+    // cannot be stopped retroactively, so new queues cannot claim that money.
+    let due_now = rules.is_some_and(|r| {
+        view.tick
+            .is_multiple_of(u64::from(r.repair_interval.max(1).unsigned_abs()))
+    });
+    let unavoidable = if due_now {
+        view.own_buildings
+            .iter()
+            .filter(|b| view.state.repairing().contains(&b.id))
+            .filter_map(repair_step)
+            .fold(0_i64, i64::saturating_add)
+    } else {
+        0
+    };
+    let project = |commands: &mut Vec<Command>| {
+        let mut queues: BTreeMap<_, _> = view
+            .state
+            .queues()
+            .map(|(key, q)| (key, q.to_vec()))
+            .collect();
+        let mut cash = view.state.credits().saturating_sub(unavoidable).max(0);
+        commands.retain(|command| {
+            match command {
+                Command::CancelProduction { item } => {
+                    if let Some(key) = view.definitions.queue_of(*item)
+                        && let Some(queue) = queues.get_mut(&key)
+                        && let Some(at) = queue.iter().rposition(|q| q.item == *item)
+                    {
+                        cash = cash.saturating_add(queue.remove(at).charged);
+                    }
                 }
-            }
-            Command::QueueProduction { item } => {
-                if let Some(terms) = view.definitions.production(*item) {
-                    if matches!(item, ProductionItem::Unit(_)) {
-                        let reserved = queues
-                            .values()
-                            .flat_map(|q| q.iter())
-                            .map(|q| outstanding_cost(view, q))
-                            .fold(0_i64, i64::saturating_add);
-                        if cash < reserved.saturating_add(terms.cost) {
-                            return false;
+                Command::QueueProduction { item } => {
+                    if let Some(terms) = view.definitions.production(*item) {
+                        if matches!(item, ProductionItem::Unit(_)) {
+                            let reserved = queues
+                                .values()
+                                .flat_map(|q| q.iter())
+                                .map(|q| outstanding_cost(view, q))
+                                .fold(0_i64, i64::saturating_add);
+                            if cash < reserved.saturating_add(terms.cost) {
+                                return false;
+                            }
+                        }
+                        if let Some(key) = view.definitions.queue_of(*item) {
+                            queues
+                                .entry(key)
+                                .or_default()
+                                .push(crate::QueueItem::new(*item));
                         }
                     }
-                    if let Some(key) = view.definitions.queue_of(*item) {
-                        queues
-                            .entry(key)
-                            .or_default()
-                            .push(crate::QueueItem::new(*item));
-                    }
                 }
+                _ => {}
             }
-            _ => {}
+            true
+        });
+        (queues, cash)
+    };
+    let (queues, cash) = project(commands);
+    // A repair step spends the same finite wallet as these ordinary queues.
+    // Do not make a fully financed paid recruit require another sale/refund.
+    // Completed heads need no further credits; income keeps normal repairs.
+    if !queues
+        .values()
+        .flatten()
+        .any(|q| matches!(q.item, ProductionItem::Unit(_)) && outstanding_cost(view, q) > 0)
+    {
+        return;
+    }
+    let Some(rules) = rules else {
+        return;
+    };
+    let mut repairing = view.state.repairing().clone();
+    for command in commands.iter() {
+        if let Command::RepairBuilding { building } = command
+            && !repairing.remove(building)
+        {
+            repairing.insert(*building);
         }
-        true
+    }
+    let repair_cost = view
+        .own_buildings
+        .iter()
+        .filter(|b| repairing.contains(&b.id))
+        .filter_map(repair_step)
+        .fold(0_i64, i64::saturating_add);
+    let interval = u64::from(rules.repair_interval.max(1).unsigned_abs());
+    // A repair enabled at tick+1 can charge through the next decision tick;
+    // that turn's ordinary off command also applies one tick later.
+    let steps = view.tick.saturating_add(u64::from(cadence)) / interval - view.tick / interval;
+    let repair_cost = repair_cost.saturating_mul(i64::try_from(steps).unwrap_or(i64::MAX));
+    let reserved = queues
+        .values()
+        .flatten()
+        .map(|q| outstanding_cost(view, q))
+        .fold(0_i64, i64::saturating_add);
+    if cash >= reserved.saturating_add(repair_cost) {
+        return;
+    }
+    commands.retain(|c| {
+        !matches!(c, Command::RepairBuilding { building }
+            if !view.state.repairing().contains(building))
     });
+    let mut pauses: Vec<_> = view
+        .own_buildings
+        .iter()
+        .filter(|b| repairing.contains(&b.id) && view.state.repairing().contains(&b.id))
+        .take(MAX_AI_COMMANDS)
+        .map(|b| Command::RepairBuilding { building: b.id })
+        .collect();
+    // Pausing the competing spend needs actual command capacity. Keep the
+    // relative FIFO of other intents, then recompute the real emitted prefix:
+    // an insertion must not leave a dropped tail refund in the projection.
+    pauses.append(commands);
+    pauses.truncate(MAX_AI_COMMANDS);
+    let _ = project(&mut pauses);
+    *commands = pauses;
 }
 
 /// Reserve the whole existing unit FIFO, or the next legal replacement's cost.
@@ -2097,7 +2192,12 @@ fn find_placement_where(
     } else {
         Vec::new()
     };
-    let mut candidates: Vec<(u32, u32, CellPos)> = origins
+    let avoid_naval_fire = view.ai.rules_difficulty
+        && view
+            .definitions
+            .metadata(ProductionItem::Building(kind))
+            .is_some_and(|meta| meta.role == Role::Shipyard);
+    let mut candidates: Vec<(bool, u32, u32, CellPos)> = origins
         .into_iter()
         .map(footprint_at)
         .filter(|footprint| footprint.inside(view.grid) && spaced(footprint))
@@ -2108,14 +2208,16 @@ fn find_placement_where(
                 .min()
                 .unwrap_or(0);
             (
+                avoid_naval_fire && strategy::naval_site_exposed(view, kind, footprint),
                 to_ore,
                 octile_distance(footprint.origin, controller.start),
                 footprint.origin,
             )
         })
         .collect();
-    candidates
-        .sort_unstable_by_key(|&(to_ore, distance, origin)| (to_ore, distance, origin.y, origin.x));
+    candidates.sort_unstable_by_key(|&(exposed, to_ore, distance, origin)| {
+        (exposed, to_ore, distance, origin.y, origin.x)
+    });
     let owned: Vec<(BuildingKind, Footprint)> = view
         .own_buildings
         .iter()
@@ -2750,11 +2852,20 @@ fn queue_units(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
             total += 1;
         }
     }
+    let start = controller.next_army;
     for step in 0..army.len() {
         if total >= max {
             break;
         }
-        let index = (controller.next_army + step) % army.len();
+        // Country plans declare a cyclic composition. Advance the saved cursor
+        // only for the next decision; updating this pass's origin skips entries.
+        // Neutral fixtures retain their documented pre-RA8 traversal.
+        let origin = if view.ai.rules_difficulty {
+            start
+        } else {
+            controller.next_army
+        };
+        let index = (origin + step) % army.len();
         if !strategy::recruit(view, controller, army[index]) {
             continue;
         }

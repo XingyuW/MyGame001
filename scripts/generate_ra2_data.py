@@ -1705,9 +1705,11 @@ class Data:
                 builds = ["power_plant","refinery","barracks","war_factory",field,"service_depot","tech_center","refinery","war_factory","ore_purifier","spy_satellite","gap_generator","lightning_storm","chronosphere","naval_shipyard"]
                 # Storm is the game role; the generated building id is weather_control.
                 builds[12] = "weather_control"
-                army = ["grizzly","gi","grizzly","prism_tank","mirage_tank","ifv","chrono_legionnaire","tanya","black_eagle" if country == "korea" else "harrier","destroyer","aircraft_carrier","dolphin"]
+                # Game-owned cyclic weighting: paired siege vehicles accompany
+                # the two opening tanks; all weapon/price rules remain sourced.
+                army = ["grizzly","gi","grizzly","prism_tank","prism_tank","mirage_tank","ifv","chrono_legionnaire","tanya","black_eagle" if country == "korea" else "harrier","destroyer","aircraft_carrier","dolphin"]
                 special = {"germany":"tank_destroyer","great_britain":"sniper"}.get(country)
-                if special: army.insert(3,special)
+                if special: army.insert(5 if country == "germany" else 3,special)
                 defences = ["pillbox","prism_tower","patriot"]
                 if country == "france": defences.insert(0,"grand_cannon")
                 power, miner = "power_plant", "chrono_miner"
@@ -1716,6 +1718,12 @@ class Data:
                 army = ["rhino","conscript","rhino","v3_launcher","apocalypse","tesla_trooper","flak_track","yuri","kirov","typhoon","dreadnought","giant_squid"]
                 special = {"russia":"tesla_tank","iraq":"desolator","cuba":"terrorist","libya":"demolition_truck"}.get(country)
                 if special: army.insert(3,special)
+                if country == "libya":
+                    # Game-owned play priority: once Radar makes siege legal,
+                    # serve it before this country's factory-built national reserve.
+                    # Its normal prerequisites retain the opening tank composition.
+                    army.remove("v3_launcher")
+                    army.insert(0,"v3_launcher")
                 defences = ["sentry_gun","tesla_coil","flak_cannon"]
                 power, miner = "tesla_reactor", "war_miner"
             plans.append((side,country,builds,power,miner,army,defences,("engineer","attack_dog")))
