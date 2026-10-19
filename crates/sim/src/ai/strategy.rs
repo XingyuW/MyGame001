@@ -1159,7 +1159,15 @@ fn repair_recovery(view: &View<'_>, controller: &AiController) -> bool {
         || view.own_buildings.iter().any(|building| {
             view.definitions
                 .metadata(ProductionItem::Building(building.kind))
-                .is_some_and(|meta| meta.role.superweapon())
+                .is_some_and(|meta| {
+                    // An unpowered remnant cannot justify renewing paid repairs when
+                    // no income, force or ordinary power/production recovery
+                    // exists. Those independent recovery paths remain below.
+                    // Curtain/Chronosphere require an owned beneficiary; the
+                    // living-force/recovery checks above already retain those.
+                    matches!(meta.role, Role::Nuke | Role::Storm | Role::Paradrop)
+                        && (!meta.is_powered || !view.state.low_power())
+                })
         })
         // These are the ordinary prerequisite/producer/owner checks, independent
         // of cash and temporary queue capacity. A recoverable base keeps repairs.
