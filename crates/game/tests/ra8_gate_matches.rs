@@ -1200,6 +1200,16 @@ fn ra8_gate_frozen_cuba_germany_brutal_seed_zero_finishes() {
 }
 
 #[test]
+fn ra8_gate10_lakes_cuba_russia_brutal_seed_zero_finishes() {
+    run_case("thousand_lakes", ["cuba", "russia"], ["brutal", "brutal"]);
+}
+
+#[test]
+fn ra8_gate10_demo_russia_libya_easy_seed_zero_finishes() {
+    run_case("demo", ["russia", "libya"], ["easy", "easy"]);
+}
+
+#[test]
 fn ra8_gate_black_water_libya_america_brutal_seed_zero_finishes() {
     run_case("black_water", ["libya", "america"], ["brutal", "brutal"]);
 }

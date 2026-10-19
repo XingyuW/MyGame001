@@ -1833,9 +1833,10 @@ fn recover_unit_credits(view: &View<'_>, controller: &AiController) -> Vec<Comma
 /// last-matching refunds, and reserve current/same-turn production before adding
 /// another unit. The actual commands still perform every validation and charge.
 fn retain_funded_unit_intents(view: &View<'_>, commands: &mut Vec<Command>, cadence: u32) {
-    if !view.ai.rules_difficulty || strategy::service_income(view) {
+    if !view.ai.rules_difficulty {
         return;
     }
+    let income = strategy::service_income(view);
     // Only the bounded candidate prefix can supply refunds or claim credits.
     commands.truncate(MAX_AI_COMMANDS);
     let rules = view.definitions.rules().map(|r| &r.economy);
@@ -1890,7 +1891,9 @@ fn retain_funded_unit_intents(view: &View<'_>, commands: &mut Vec<Command>, cade
                                 .flat_map(|q| q.iter())
                                 .map(|q| outstanding_cost(view, q))
                                 .fold(0_i64, i64::saturating_add);
-                            if cash < reserved.saturating_add(terms.cost) {
+                            // Actual income may finance work over time. Its
+                            // existence does not also fund paid repairs now.
+                            if !income && cash < reserved.saturating_add(terms.cost) {
                                 return false;
                             }
                         }
@@ -1911,7 +1914,8 @@ fn retain_funded_unit_intents(view: &View<'_>, commands: &mut Vec<Command>, cade
     let (queues, cash) = project(commands);
     // A repair step spends the same finite wallet as these ordinary queues.
     // Do not make a fully financed paid recruit require another sale/refund.
-    // Completed heads need no further credits; income keeps normal repairs.
+    // Completed heads need no further credits. Income-backed queues remain
+    // admitted, while repairs resume when the current wallet covers this work.
     if !queues
         .values()
         .flatten()
