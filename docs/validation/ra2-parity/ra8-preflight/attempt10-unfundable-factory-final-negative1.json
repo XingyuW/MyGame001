@@ -1,0 +1,24 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_an_unaffordable_remaining_factory_does_not_renew_futile_paid_repairs",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "start_utc": "2026-10-19T08:42:11.776405+00:00",
+  "current_sha256": "e689d137e343eafcaa8345fc2d3bf4f2a8e641b413a97dd8ff2a7021a079b7b1",
+  "negative_sha256": "5c5fd561a4aa9d4184011128d092409ef9b0597dc23088c8515ba8a61fb88d34",
+  "test_sha256": "bd0ae728af2288ac9bcecb0944641bdc6d1c44b013c2933a93109992f42e343f",
+  "exit": 101,
+  "restored_sha256": "e689d137e343eafcaa8345fc2d3bf4f2a8e641b413a97dd8ff2a7021a079b7b1",
+  "elapsed_seconds": 20.608107041975018,
+  "log_sha256": "92587c3e274ac282e45fde9fd8c27360ae5df0a0131c27bfce681fbbc9da7825"
+}

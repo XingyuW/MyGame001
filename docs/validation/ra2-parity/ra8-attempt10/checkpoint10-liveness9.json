@@ -1,0 +1,32 @@
+{
+  "utc": "2026-10-19T07:51:48.297517+00:00",
+  "owned_script_pid": 83684,
+  "kind": "Bounded owned-process CPU metadata only; no profiler/sample/signal/competing run.",
+  "production_cpu_seconds_increase_since_liveness8": 3966.4400000000023,
+  "processes": [
+    {
+      "pid": 83684,
+      "ppid": 83658,
+      "elapsed": "01:27:21",
+      "cpu_time": "0:00.01",
+      "cpu_percent": "0.0",
+      "command": "sh scripts/validate_ra2_parity.sh ra8"
+    },
+    {
+      "pid": 83736,
+      "ppid": 83684,
+      "elapsed": "01:27:19",
+      "cpu_time": "0:00.62",
+      "cpu_percent": "0.0",
+      "command": "/Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo test --workspace --release"
+    },
+    {
+      "pid": 85959,
+      "ppid": 83736,
+      "elapsed": "01:22:34",
+      "cpu_time": "746:01.76",
+      "cpu_percent": "894.5",
+      "command": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-fff13bc99bc7e9e6"
+    }
+  ]
+}

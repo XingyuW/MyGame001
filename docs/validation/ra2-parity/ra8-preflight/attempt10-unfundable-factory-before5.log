@@ -1,0 +1,21 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 5.41s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 3 tests
+test ra8_a_financed_partly_paid_factory_head_keeps_repairs_below_its_full_price ... ok
+test ra8_an_affordable_remaining_factory_keeps_paid_repairs_and_real_unit_work ... ok
+test ra8_an_unaffordable_remaining_factory_does_not_renew_futile_paid_repairs ... 
+thread 'ra8_an_unaffordable_remaining_factory_does_not_renew_futile_paid_repairs' (9277543) panicked at crates/sim/tests/ra8_ai.rs:4521:9:
+a merely buildable but unaffordable army renewed futile repair spending
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ra8_an_unaffordable_remaining_factory_does_not_renew_futile_paid_repairs
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 92 filtered out; finished in 0.11s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

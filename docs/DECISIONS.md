@@ -9351,3 +9351,48 @@ watch,not permission for case-specific tuning or a transferred complete-RA8 acce
 All unsuccessful/insufficient probes and the exact evidence index remain preserved. Fresh
 scoped guards,impacted Frozen/Lakes replays,all21/default256 and complete full13 are pending.
 No current runtime source/data is widened to the speculative strategic-cycle/MCV leads.
+
+### R161 — Eleventh frozen source checkpoint and preserved tenth gate (RA8, 2026-10-19)
+
+Source313e96b3ef0e37af3b834c32f02d23fcc19cc17c contains only R159/R160 source/regressions and
+their ledger. Separate source staged check exits0 over exactly six owned paths. The frozen
+working source, later committed as313e96b3, completed scoped final2 with18commands all0,151passed0failed0ignored across12 target invocations,
+sum1755.003373s/wall1755.009555s;every raw SHA matches,342 runtime+101 additional source
+snapshots have zero mismatches. Current static1327 versus RA7f5505cd1124 adds203 with no
+removed/renamed/ignored tests. All33 retained cases/fullsim/game/M10 remain required in the
+unchanged mandatory workspace gate,not redundantly broad-preflight-run here.
+
+All21 actual-default ten-player maps explicitlyWon/ten builders,median77405/p90nearest-
+rank96994/max114793<400000;worstmeanCoral1.422ms<5. Actual fixed25624000-tick means are
+Liberty.785201/Continental.808316/Pacific.846548ms,all ten builders. Three example guards
+actually execute and pass. Preserve every p99/busy/longest/>50ms tail:BlackWater141.089ms
+longest/39ticks>50ms and fixedPacificp9916.374ms remain. No competing simulation/profiler or
+optional mean optimization. Metrics/raw hashes and exact intervals are in checkpoint11.
+
+Fresh preservation checks all27 captured attempt10 files/54 archive+current copies,
+159237bytes each set,zero mismatches. Numbered01–04 completed (04failed),05partial;06–13
+were unrun/not created. Stale production TSV is not a fresh756 result. Keep both RA7 R29
+baselines (production31540/64532/209163;duel32782.5/69184/157564 median/p90/max) unchanged;
+both fresh after-distributions/fraction ratios are still required after one complete full13.
+All older failed/interrupted/insufficient/corrected probes remain immutable. Evidence staged
+hygiene must be a separate unfiltered capture,exact raw-only classification if nonzero,
+and later deliberate commit;no raw blank EOF/trailing progress byte is normalized.
+
+No new substantial external directory/clones/worktrees/system/tmp artifacts. Fresh cache
+inventory remains RA8parser58files/584038logical/733184allocated,RA7parser70/11615632/11755520,
+RA5render10/875468/901120. Retain recreatable evidence for reruns,unnecessary for release.
+RA9 still carries the recorded gathering-point partition,R83,R96,R99 and R160near-limit/
+sale-policy watch;R97closedR103. Independent review and user visual/audio/play-feel
+verification remain pending. This is validated preflight,not independent review or full
+RA8 acceptance. Root checks and explicit release precede the next mandatory full13.
+
+Checkpoint11's separate unfiltered evidence staged check exits2,NOTpassed. The initial32
+classification remains immutable:25 native blank EOF,6 native test-progress trailing spaces,
+and one preserved provisional unified-diff blank-context space at
+`attempt10-unfundable-initial-candidate.patch:44`. Including that verbatim initial hygiene
+stdout snapshot adds seven copied progress/context diagnostics,so final inclusive39 is
+31 native-log +1 raw-patch +7 raw-hygiene-stdout diagnostics. Subsequent unfiltered output is
+stored JSON-escaped to avoid recursively creating raw diagnostic snapshots. All39 exact
+file/line/EOL/staged-blob hashes match,0source/data/test/prose errors. No suppression or
+normalization is used. An identical final staged check precedes the separate deliberate
+commit;the diagnostic classification does not convert exit2 into a pass.

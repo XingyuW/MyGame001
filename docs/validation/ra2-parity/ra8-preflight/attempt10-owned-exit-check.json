@@ -1,0 +1,14 @@
+{
+  "utc": "2026-10-19T07:56:57.369301+00:00",
+  "command": [
+    "ps",
+    "-p",
+    "83684,83736,85959",
+    "-o",
+    "pid=,ppid=,pgid=,stat=,command="
+  ],
+  "exit": 1,
+  "stdout": "",
+  "stderr": "",
+  "interpretation": "No previous gate/cargo/production process remains; ps exit1 means no selected PIDs. Safe to start one exact diagnostic, not a validation pass."
+}

@@ -1,0 +1,22 @@
+{
+  "phase": "default-demo10",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_ai_matches",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "wrapper_pid": 91370,
+  "child_pid": 92118,
+  "start_utc": "2026-10-19T08:27:39.003183+00:00",
+  "head": "d82617645047338fa9270e67c5850299ec8731cf",
+  "active": false,
+  "exit": 101,
+  "elapsed_seconds": 60.47133195801871
+}
