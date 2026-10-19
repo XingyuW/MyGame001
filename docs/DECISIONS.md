@@ -9026,3 +9026,191 @@ stdout SHA9d882e024ac396b890dad6631776fec9edc8f30d0e0f3b1667b11edc9636fbe8.
 All staged diagnostic-file bytes equal their working raw bytes. Nothing is rewritten or
 suppressed. Require identical exit/stdout/stderr after final evidence staging before the
 SEPARATE deliberate evidence commit. The mandatory validation-script check is unchanged.
+
+
+### R156 — Stop paid repairs justified only by an unusable strategic remnant (RA8, 2026-10-19)
+
+The ninth frozen gate on24094ecc/runtime4e2c377 passes phases1–3 and fails workspace4:
+230passed/1failed/0ignored,494 script seconds/493.779907 monotonic phase interval.
+`a_ten_player_match_on_the_smallest_map_is_played_to_its_end` uses the actual default
+Crossroads112×112 ten-player free-for-all,rotating countries,Medium,seed7,unchanged72000.
+It has seven defeated players but no Won. The wrapper stops only its owned process group
+before dependent work (actual process−15,total497.877587s). Attempt9 preserves all16 files,
+129317bytes per set,including partial next-command output and timestamped older health
+records. PRESERVED.json SHA0fde3fdf416543fc6c4ffceca1fe6053f05a424a9a5856779636452d94ebb2ed
+and both342/101 source snapshots verify. The unchanged production TSV is explicitly stale;
+no new756 success or later phase pass is claimed.
+
+Exact read-only snapshots are5b69cf7b2264f13b2c46c545e45800213d043dec5f62af8cd0c4f52aeb8b7a9e.
+The diagnostic field-name compile failure is preserved,not passed. At70k P0 has no units,
+producer,refinery or queues,200power/900demand and an unpowered Chronosphere. P1 has real
+income/production/forces and P8 a traveling GI: there is no global helplessness inference.
+The separate actual finance trace7b4a4b7bb75190b389e3636d763c4eba0372bbc4a42a91106b690f1e5b4ff4d2
+records105 debit ticks/665credits during70k..72k,with empty queues and real HP increases
+on all105 ticks. Paid repairs renew R53's credit signature past the required bound;finite
+credits do not establish mathematically infinite spending. The first finance probe's
+borrow compile error remains preserved.
+
+`repair_recovery` previously accepted any owned superweapon. First require current power
+for a source that needs it; independent real income,usable owned force,garrison,MCV,
+Engineer opportunity and ordinary buildable production/power recovery remain. The old
+scheduled unpowered-remnant probe genuinely fails (8ef07bd4…):10 paid changes/200ticks,
+no ordinary repair-off,after normal producer-loss cancellation,zero owned units. Its earlier
+premature empty-queue assertion is an insufficient setup probe. The positive recovery
+fixture preserves the ORIGINAL paid Power head; enqueueing a duplicate correctly rejected
+QueueFull and is preserved as a fixture error. Real head charging→placement→power restored
+and real support force positives pass. A test-only borrow compile error is also retained.
+
+That first correction does NOT finish seed7:04f8fb78… stillNone72000. The actual mission
+traceb64f474e… proves P0 stops repairs,enters last_stand by65000 and sells purifier735 at65538;
+Nuke69463 subsequently lowers demand enough to restore power. The powered but beneficiary-
+less Chronosphere then re-enables paid repairs. Scheduled native Chronosphere AND Curtain
+controls both pay10times/200ticks before the second correction (400a80ff…),with zero forces
+and empty queues. Only Nuke,Storm and Paradrop now independently justify strategic repair
+spending,subject to source power. Curtain/Chronosphere require the real owned force/recovery
+paths already tested; no hidden or enemy beneficiary is invented. Normal charging sources
+need not already be ready. This is an explicit conservative owned-beneficiary AI policy,
+not a change to public abilities,source power/repair/cooldown rules or R53 signature/timers.
+No disabled/erasure behavior is broadened without reproduction.
+
+All12 focused repair tests pass (810b78cd966973dd1cbba91ddc9de0ea649b64f21adaa47593e8b81f6ae0bd25),
+including real paid heals/recharge for Nuke,Weather and America AMRADR; real Grizzly/Rhino
+support for both roles; actual paid power recovery and existing income/producer/bridge/depot
+controls. The initial new America positive mistakenly spawned nonstrategic GAAIRC instead
+of its real country-specific AMRADR; its failed recharge premise remains preserved and
+only that new setup is corrected. Existing helper
+`paid_refinery_repair_after_producer_loss` retains its Germany/SW-off defaults through a
+parameterized helper; no old assertion is changed. Five new scheduled guards are added.
+No new persistent state,data/schema,timer,price,repair arithmetic or public command change.
+Exact seed7 still fails after both narrow corrections (3b87b99d…),so these are capability
+corrections only; no ending or complete-RA8 acceptance credit is claimed.
+
+### R157 — Independent country composition progress for real production FIFOs (RA8, 2026-10-19)
+
+Actual seed7 snapshots show mixed production and no surviving V3 in the late sampled windows;
+sparse snapshots are NOT proof of zero paid V3s or starvation. The controlled normal-price
+mixed Libya factory+barracks counterexample independently establishes the shared-cursor
+fault. Declare the legal cycle V3,Rhino,Conscript,Yuri,Kirov with unrelated tier refills and
+combat isolated,all native owners/prerequisites/prices/durations and actual command queues.
+The first three actual factory spawns V3/Rhino/Kirov pass (e2018371…); that is a retained
+positive,not a negative. A second full cycle genuinely fails: six paid/live factory spawns
+are22,18,33,33,33,33 while19 infantry spawn,versus declared22,18,33,22,18,33
+(raw317f857d385d0d9777df70cb43811f5479536a0f4e6f9a714df2de6ba9794e6e).
+Actual post-AI snapshots prove barracks admissions consume the scalar progress while the
+factory is busy; later factory admissions repeatedly choose Kirov. The initial diagnostic
+sample at SimTick%20=0 missed the preceding AI stage and is corrected to post-AI%20=1.
+
+Opted-in country plans now keep `AiController.army_cursors: BTreeMap<QueueKey,usize>`.
+Each real production FIFO advances only upon its own general admission,using the declared
+army order and a fixed pass origin. Producer service order is first appearance in data,
+not a hardcoded infantry/vehicle ranking. Reserve/reactive admissions,real owner/prereq/
+queue/dock/credit checks,max army,tier capacities and MAX_AI_COMMANDS remain. The map is
+bounded by the plan's finite producer keys; iterations and value hashing are ordered.
+Hash covers presence/count,producer,lane,index; insertion order does not matter. Empty
+maps retain legacy hash encoding. Neutral `rules_difficulty=false` keeps its original scalar
+walk,without new cursor entries. No new balance knob,source statistic,hidden query or
+scheduler/timing change is introduced. The paid six-spawn control now produces the complete
+declared two cycles; the independent hash-key/index/order guard passes.
+
+The first composition batch is13pass/1fail (d999c738…),not a pass. Its existing
+`ra8_libya_replaces_its_national_with_paid_production_after_real_enemy_capture` fixture waits
+for16 paid recruits. New fair traversal produces TWO live Demolition Trucks (3rd and16th),
+so capturing one leaves a national in a full16-unit army; another duplicate need not be
+produced. The actual before/after ownership/cap/cursor diagnostic056c71ac… verifies16→15
+owned,2→1 nationals,cap16,factory cursor5. Do not force a duplicate in production to satisfy
+that changed setup premise. Named SETUP migration: capture the FIRST actual paid national,
+still assert it appears within the original16-admission bound; explicitly assert exactly
+one owned before and zero after actual enemy Yuri capture. Every original physical capture,
+5000-tick paid replacement/live-new-ID assertion,queue-cap/max-army16 check remains.
+The strengthened fixture and all14 composition/hash/reserve/legacy/casualty/placement controls
+pass (592f177103d1df62f00cb9d2df4006c2c604b1a2fee9e81489a99bd3f866aa11).
+No old test is deleted,renamed,ignored or has its bound raised.
+
+Exact seed7 after both repairs and per-FIFO fairness stillNone72000,now eight defeated
+(ec9a6819ca5e4bcf16ed0de21dd005d447a32a2bab72987c6d6c65cace337c5f).
+No ending credit. Current late mission trace5fba59d2… and cargo ledgerb14e5908… show legitimate
+combat/strategic activity. P0's Grizzly1118 is on offense64–66k,owned by P1 after real mind
+control67–69k,and returns to P0/fights at70k; it and newly present GI1144 are idle only71–72k.
+Their ordinary next_wave71393/patience72260 explain that short wait. A long-stale mission
+or globally helpless player is refuted; no timer/cadence waiver is made. At65k another
+ChronoMiner has20 bails,but it is lost; surviving139 is empty/Idle at70k. Both players know
+11 ore bails. All incomplete unit refunds933 cannot fund refinery's remaining1262 at65k;
+a cancellation-alone income shortcut is refuted,not implemented. No fabricated refund or
+sale of a capable base is introduced.
+
+A separate generator-owned Libya paired-V3 play candidate is explicitly REJECTED. Baseline
+is ec9a6819…; candidate changes only generator/ai.ron's one Libya list and retains all source
+stats/prices/ranges/caps/reserves/counts/limits. Exact seed7 remainsNone72000 (101/29.298178s,
+a78702e65cd65bf872730e8c4d28bbe81efcac73a98600ab1e913cb17637f190). No ending benefit or zero-
+production cause is claimed. `attempt9-libya-pair-candidate.json` and -rejected.patch retain
+before/candidate/restored hashes. Finally restore generator357c3dd0…/dataa29e0cee…; a SEPARATE
+post-restoration read verifies both and AI1f5325e2…/strategy5c5fd561…,before other work.
+There is no active mutation. Broader preflight/all21/fixed256/full13 remain pending a real
+ending correction; no failed attempt is relabeled accepted and no optional retunes follow
+without new concrete evidence.
+
+### R158 — Global game-owned assembly/progress patience trial (RA8, 2026-10-19)
+
+R157's actual short late wait is ordinary policy,not a scheduler or long-idle defect.
+Continuation4.1 permits evidenced game-owned AI play tuning. One global aggression A/B
+halves only ai.ron's unscaled wave_patience: Easy3600→1800,Medium2400→1200,Brutal1800→900,
+through the generator. All countries retain the same difficulty ordering. Source TeamDelays
+4667/3333/2667,first-wave overrides,think cadence,map scaling,ROF/build multipliers,bonuses,
+defense counts,weapons,prices,reserves,caps,public commands,recharge and match limits are
+unchanged. This is an explicit game-owned aggression assumption,not a source-AI parity
+claim or a horizon/seed/map branch. The field also bounds failed AA-job leases; genuinely
+improving approach/damage must continue renewing those jobs.
+
+The new scheduled finite-cohort guard
+`ra8_ready_finite_cohorts_use_shorter_assembly_but_keep_the_source_team_delay` uses a112-grid,
+one real Grizzly,no income/production and normal enemy bases. With old data it genuinely
+fails to admit the ready cohort by first source delay+another source delay
+(a1478e7edd68b7c09cd343e2a24e503707bf53ffa21d4512d20730876e90975c).
+The initial one-base candidate observes admission5441 but no second admission; its continued-
+match premise was unestablished,not proof of an early win. The final two-normal-base setup
+observes first admission5441,reinforcement8781 and actual source weapon fire; reinforcement
+cannot bypass source3333 (b19ab670382fc2ef0aae22c917c2fe3d29a407a05651fd08f2edc07fa796685f).
+Repeating the old-data negative on that final fixture fails again
+(9bedd7758bd4f9ee92e23afacb3ab83c7a156955bb6f1e898ccbf070bebd0bf6).
+Finally restore current generator6a0477b0…/data42cf6509…; a SEPARATE subsequent SHA read
+verifies both,AI1f5325e2…,strategy5c5fd561… and the test source before dependent work.
+
+Exact default Crossroads112×112 ten-country Medium seed7 now P1LibyaWon at68628,completed
+68629<72000,with every original9-defeated/made-start assertion unchanged
+(f89d9b56e405324930f8b8e2a6b6df0779f0cc7b69cf2e801fa079805ecc4c68,
+0/23.751900s). Credit the combined current runtime/policy ending,not isolated quality or
+complete acceptance. The earlier repair-only/fairness-only and rejected paired-V3 failures
+remain failures. No credits,damage,winner,loss or liquidation are manufactured.
+
+The first full AI batch is91pass/1fail,not passed (83f61e2c…):
+`ra8_reinforcements_without_aa_job_progress_cannot_renew_the_aircraft_hold` installs its
+first lease at SimTick6021 and releases7221 exactly1200 later,with unchanged last_progress
+6020,distance22 and AAHP900 (cf2cc70b6860cbe6703958d4afbcebb25fbfb39b1acaca711fe9feb636ecdbd8).
+There is no renewal defect. Its external80-tick recruit cadence creates only15 replacement
+batches before the intentionally shorter lease,so the original >=20-pressure premise fails.
+Named SETUP migration: send a real fresh external recruit every TWO actual Medium think
+intervals (40ticks),retaining every original installed/replacements>=20/released/HP900 and
+12000-bound assertion. This strengthens incoming pressure rather than reducing the count
+or lengthening the hold. The final probe sees30 replacement batches with the same6021→7221
+lease and unchanged progress/HP. All92 AI guards pass,including healthy slow progress beyond
+initial patience (4cc4d796f8d6ca29350e371d3d1abd1e81d9fe85cd382bf70c642563bfecb847).
+Read-only diagnostic output remains; no AA progress algorithm or source statistic changes.
+Broader affected checks,all21/default256 measurements and mandatory full13 remain pending;
+the global policy is provisional until that acceptance evidence completes.
+
+Subsequent frozen `attempt9-final1` scoped preflight completes17commands all0,145passed/
+0failed/0ignored across10 target invocations (sum1734.447396s,wall1735.197687s). This includes
+all92 AI,10 attrition,20 recovery,14 composition/hash,two unchanged RA4,default Demo all10
+pairings,the exact grown-map failure and both neighboring guards,and three explicitly
+executed example guards. No redundant fullsim/game/31-case preflight is substituted for
+mandatory workspace command4. All21 actual-default ten-player maps have explicit winners
+and ten builders;ending median94209/p90 nearest-rank129403/max166861 under400000. Raw SHA
+c422eb2ac86af44bf0f3bf7889b409df648ce4dd286576abe69edacabb775918;command1478.090826s.
+Worst mean is Coral1.107ms;Ember's180.970ms longest tick remains visible,not hidden by a mean
+pass. Isolated fixed24000-tick256×256 means Liberty0.851890/Continental0.779806/Pacific0.778092ms
+all pass5ms with ten builders each (f4fedfe284622f4184b920bc8188ad2ced65045f2d851a5cdcce509c706bd44e).
+All342 runtime and101 additional test/example snapshot hashes match;these are separate
+recorded sets,not a retrospective expansion of older manifests. Static inventory is1321
+versus RA7's1124 (+197),none removed,renamed or ignored. Mandatory full13,both fresh756-winner
+R29 before/after distributions,independent review and user verification remain pending.
+No optional performance optimization or additional composition trial follows passing means.

@@ -164,6 +164,8 @@ pub struct AiController {
     target: Option<WaveTarget>,
     failures: BTreeMap<SimId, u8>,
     next_army: usize,
+    /// Country composition progress is independent for each real production FIFO.
+    army_cursors: BTreeMap<QueueKey, usize>,
     /// The tick from which the units at home attack even if fewer than the wave size.
     patience_until: u64,
     /// The tick from which idle harvesters may be ordered to work again.
@@ -365,6 +367,7 @@ impl AiController {
             target: None,
             failures: BTreeMap::new(),
             next_army: 0,
+            army_cursors: BTreeMap::new(),
             patience_until: u64::from(difficulty.first_wave)
                 .saturating_add(u64::from(difficulty.wave_patience)),
             next_harvest: 0,
@@ -495,6 +498,15 @@ impl AiController {
             hasher.write(&[*count]);
         }
         hasher.write_u64(self.next_army as u64);
+        if !self.army_cursors.is_empty() {
+            hasher.write(b"ai_army_queue_cursors");
+            hasher.write_u64(self.army_cursors.len() as u64);
+            for (key, index) in &self.army_cursors {
+                hasher.write(&key.producer.0.to_le_bytes());
+                hasher.write(&[key.lane as u8]);
+                hasher.write_u64(*index as u64);
+            }
+        }
         hasher.write_u64(self.patience_until);
         hasher.write_u64(self.next_harvest);
         hasher.write(&[u8::from(self.fall_back_exempt), u8::from(self.liquidating)]);
@@ -2852,20 +2864,45 @@ fn queue_units(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
             total += 1;
         }
     }
-    let start = controller.next_army;
+    if view.ai.rules_difficulty {
+        // Preserve the data's first-appearance order between producers. A busy
+        // factory keeps its own place while a barracks continues admitting.
+        let mut seen = BTreeSet::new();
+        let producers: Vec<_> = army
+            .iter()
+            .filter_map(|&kind| view.queue_key(ProductionItem::Unit(kind)))
+            .filter(|key| seen.insert(*key))
+            .collect();
+        for producer in producers {
+            let start = controller.army_cursors.get(&producer).copied().unwrap_or(0);
+            for step in 0..army.len() {
+                if total >= max {
+                    break;
+                }
+                let index = (start + step) % army.len();
+                let item = ProductionItem::Unit(army[index]);
+                if view.queue_key(item) != Some(producer)
+                    || !strategy::recruit(view, controller, army[index])
+                {
+                    continue;
+                }
+                if has_room(view, item, &mut added) {
+                    commands.push(Command::QueueProduction { item });
+                    total += 1;
+                    controller
+                        .army_cursors
+                        .insert(producer, (index + 1) % army.len());
+                }
+            }
+        }
+        return commands;
+    }
     for step in 0..army.len() {
         if total >= max {
             break;
         }
-        // Country plans declare a cyclic composition. Advance the saved cursor
-        // only for the next decision; updating this pass's origin skips entries.
         // Neutral fixtures retain their documented pre-RA8 traversal.
-        let origin = if view.ai.rules_difficulty {
-            start
-        } else {
-            controller.next_army
-        };
-        let index = (origin + step) % army.len();
+        let index = (controller.next_army + step) % army.len();
         if !strategy::recruit(view, controller, army[index]) {
             continue;
         }
@@ -3861,6 +3898,7 @@ mod tests {
             target: None,
             failures: BTreeMap::new(),
             next_army: 0,
+            army_cursors: BTreeMap::new(),
             patience_until: 0,
             next_harvest: 0,
             fall_back_exempt: false,

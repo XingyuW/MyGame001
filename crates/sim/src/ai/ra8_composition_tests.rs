@@ -845,6 +845,200 @@ fn libya_land_cycle(tech: bool) -> (App, AiPlan) {
 }
 
 #[test]
+fn ra8_per_queue_composition_cursor_hash_covers_keys_indices_and_ordered_values() {
+    let app = app();
+    let base = app
+        .world()
+        .resource::<AiPlayers>()
+        .controller(PlayerId(0))
+        .unwrap()
+        .clone();
+    let hash = |controller: &AiController| {
+        let mut h = Fnv1a64::new();
+        controller.hash_into(&mut h);
+        h.finish()
+    };
+    let factory = QueueKey {
+        producer: BuildingKind(4),
+        lane: Lane::Main,
+    };
+    let barracks = QueueKey {
+        producer: BuildingKind(3),
+        lane: Lane::Main,
+    };
+    let mut a = base.clone();
+    a.army_cursors.insert(factory, 0);
+    assert_ne!(
+        hash(&base),
+        hash(&a),
+        "even a zero cursor is recorded queue state"
+    );
+    for (key, value) in [
+        (
+            QueueKey {
+                producer: BuildingKind(5),
+                ..factory
+            },
+            0,
+        ),
+        (
+            QueueKey {
+                lane: Lane::Defences,
+                ..factory
+            },
+            0,
+        ),
+        (factory, 1),
+    ] {
+        let mut changed = base.clone();
+        changed.army_cursors.insert(key, value);
+        assert_ne!(
+            hash(&a),
+            hash(&changed),
+            "producer, lane and index independently affect state"
+        );
+    }
+    a.army_cursors.insert(barracks, 2);
+    let mut b = base.clone();
+    b.army_cursors.insert(barracks, 2);
+    b.army_cursors.insert(factory, 0);
+    assert_eq!(a, b);
+    assert_eq!(
+        hash(&a),
+        hash(&b),
+        "insertion order cannot affect ordered state"
+    );
+    b.army_cursors.clear();
+    assert_eq!(
+        hash(&base),
+        hash(&b),
+        "empty legacy state retains its original hash encoding"
+    );
+}
+
+#[test]
+fn ra8_mixed_producer_admissions_cannot_skip_the_busy_factorys_declared_cycle() {
+    let (mut app, _) = libya_land_cycle(true);
+    let definitions = app.world().resource::<Definitions>().clone();
+    let declared = kinds(
+        &app,
+        &["v3_launcher", "rhino", "conscript", "yuri", "kirov"],
+    );
+    let expected = kinds(&app, &["v3_launcher", "rhino", "kirov"]).repeat(2);
+    let factory = definitions
+        .production(ProductionItem::Unit(expected[0]))
+        .unwrap()
+        .producer;
+    let owned: Vec<_> = {
+        let world = app.world_mut();
+        world
+            .query::<(&Owner, &Building)>()
+            .iter(world)
+            .filter(|(o, _)| o.0 == PlayerId(0))
+            .map(|(_, b)| b.kind)
+            .collect()
+    };
+    for &kind in &declared {
+        assert!(
+            crate::check_buildable(
+                &definitions,
+                app.world().resource::<Players>().get(PlayerId(0)).unwrap(),
+                true,
+                &owned,
+                ProductionItem::Unit(kind)
+            )
+            .is_ok()
+        );
+    }
+    {
+        let controller = app
+            .world_mut()
+            .resource_mut::<AiPlayers>()
+            .into_inner()
+            .controllers
+            .get_mut(&PlayerId(0))
+            .unwrap();
+        // Project the real legal Libya mixed lanes, isolating tier refills and
+        // combat. Source prices/durations, FIFO bounds and ordinary AI remain.
+        controller.plan.army = declared;
+        controller.plan.tier_reserves = [0; 3];
+        controller.difficulty.max_army = 42;
+        controller.difficulty.first_wave = 20_000;
+        controller.next_wave = 20_000;
+    }
+    let mut spawned = Vec::new();
+    let mut infantry = 0;
+    for _ in 0..10_000 {
+        let events = step(&mut app);
+        assert!(
+            app.world()
+                .resource::<Players>()
+                .get(PlayerId(0))
+                .unwrap()
+                .queues()
+                .all(|(_, q)| q.len() <= AI_UNIT_QUEUE)
+        );
+        let at = app.world().resource::<SimTick>().0;
+        for event in events {
+            if let crate::SimEvent::UnitSpawned {
+                player: PlayerId(0),
+                unit,
+                ..
+            } = event
+            {
+                let world = app.world_mut();
+                let kind = world
+                    .query::<(&SimId, &Unit)>()
+                    .iter(world)
+                    .find(|(id, _)| **id == unit)
+                    .unwrap()
+                    .1
+                    .kind;
+                if definitions
+                    .production(ProductionItem::Unit(kind))
+                    .unwrap()
+                    .producer
+                    == factory
+                {
+                    spawned.push(kind);
+                } else {
+                    infantry += 1;
+                }
+            }
+        }
+        if at % 20 == 1 {
+            let intents: Vec<_> = app
+                .world()
+                .resource::<crate::CommandQueue>()
+                .iter()
+                .filter(|i| {
+                    i.player == PlayerId(0) && matches!(i.command, Command::QueueProduction { .. })
+                })
+                .collect();
+            if !intents.is_empty() {
+                let state = app.world().resource::<Players>().get(PlayerId(0)).unwrap();
+                eprintln!(
+                    "mixed cycle tick{at} queues{:?} intents{intents:?}",
+                    state.queues().collect::<Vec<_>>()
+                );
+            }
+        }
+        if spawned.len() >= expected.len() {
+            break;
+        }
+    }
+    eprintln!("mixed factory actual paid spawns {spawned:?}, infantry spawns {infantry}");
+    assert!(
+        infantry > 0,
+        "the other lane must really run while the factory is busy"
+    );
+    assert_eq!(
+        spawned, expected,
+        "a barracks admission cannot consume a factory entry that has not been admitted"
+    );
+}
+
+#[test]
 fn ra8_libya_shipped_land_cycle_funds_and_spawns_siege_alongside_its_national_reserve() {
     let (mut app, source_plan) = libya_land_cycle(true);
     let definitions = app.world().resource::<Definitions>().clone();
@@ -954,7 +1148,46 @@ fn ra8_libya_replaces_its_national_with_paid_production_after_real_enemy_capture
         .resource::<Definitions>()
         .unit_kind("demolition_truck")
         .unwrap();
-    assert!(paid_sequence(&mut app, 16).contains(&national));
+    // Capture the first real paid national, still within the original first16
+    // admissions. Waiting for all16 may now produce a second national, which
+    // does not exercise loss of the country's sole representative.
+    let mut first_paid = Vec::new();
+    for _ in 0..10_000 {
+        for event in step(&mut app) {
+            if let crate::SimEvent::ProductionComplete {
+                player: PlayerId(0),
+                item: ProductionItem::Unit(kind),
+            } = event
+            {
+                first_paid.push(kind);
+            }
+        }
+        if first_paid.contains(&national) {
+            break;
+        }
+    }
+    assert!(
+        first_paid.len() <= 16 && first_paid.contains(&national),
+        "the national must still be paid within the original16-admission bound"
+    );
+    {
+        let world = app.world_mut();
+        let own: Vec<_> = world
+            .query::<(&Owner, &Unit)>()
+            .iter(world)
+            .filter(|(o, _)| o.0 == PlayerId(0))
+            .map(|(_, u)| u.kind)
+            .collect();
+        let controller = world
+            .resource::<AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap();
+        eprintln!(
+            "national capture setup owned{own:?} cap{} cursors{:?}",
+            controller.difficulty.max_army, controller.army_cursors
+        );
+        assert_eq!(own.iter().filter(|&&kind| kind == national).count(), 1);
+    }
     let victim = {
         let world = app.world_mut();
         world
@@ -1034,6 +1267,20 @@ fn ra8_libya_replaces_its_national_with_paid_production_after_real_enemy_capture
         captured,
         "actual source mind control must remove national ownership without fabricated death or queue mutation"
     );
+    {
+        let world = app.world_mut();
+        let own: Vec<_> = world
+            .query::<(&Owner, &Unit)>()
+            .iter(world)
+            .filter(|(o, _)| o.0 == PlayerId(0))
+            .map(|(_, u)| u.kind)
+            .collect();
+        eprintln!("national after actual capture owned{own:?}");
+        assert!(
+            !own.contains(&national),
+            "actual capture must remove the last owned national"
+        );
+    }
     app.world_mut().insert_resource(controllers);
     let mut paid = false;
     for _ in 0..5000 {

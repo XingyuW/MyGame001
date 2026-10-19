@@ -389,10 +389,11 @@ AI_PLANS = (
 )
 # id, think_interval, harvesters_per_refinery, max_army, wave_size, first_wave, wave_patience,
 # defence_radius
+# Game-owned assembly/progress patience; sourced TeamDelays remain in rules.ron.
 AI_DIFFICULTIES = (
-    ("easy", 40, 1, 16, 8, 6000, 3600, 8),
-    ("medium", 20, 2, 24, 12, 3600, 2400, 10),
-    ("brutal", 10, 2, 36, 16, 2400, 1800, 12),
+    ("easy", 40, 1, 16, 8, 6000, 1800, 8),
+    ("medium", 20, 2, 24, 12, 3600, 1200, 10),
+    ("brutal", 10, 2, 36, 16, 2400, 900, 12),
 )
 
 # The maps of the skirmish menu and their start positions, as `cargo run -p game --example

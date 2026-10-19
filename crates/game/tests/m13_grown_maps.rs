@@ -513,13 +513,67 @@ struct Course {
 /// Runs the match for up to `limit` ticks, or until it ends.
 fn run(world: &mut World, limit: u64) -> Course {
     let mut course = Course::default();
+    let diagnostic = std::env::var_os("RA8_GROWN_TRACE").is_some();
+    let finance = std::env::var_os("RA8_GROWN_FINANCE_TRACE").is_some();
+    let mission = std::env::var_os("RA8_GROWN_MISSION_TRACE").is_some();
     for tick in 0..limit {
+        let before_finance = (finance && tick >= 60_000).then(|| {
+            let state = world.resource::<Players>().get(PlayerId(0)).unwrap();
+            let (cash, empty, repairing) = (
+                state.credits(),
+                state.queues().all(|(_, queue)| queue.is_empty()),
+                state.repairing().clone(),
+            );
+            (
+                cash,
+                empty,
+                repairing,
+                world
+                    .query::<(&sim::SimId, &Owner, &sim::Health)>()
+                    .iter(world)
+                    .filter(|(_, owner, _)| owner.0 == PlayerId(0))
+                    .map(|(id, _, hp)| (*id, hp.hit_points))
+                    .collect::<BTreeMap<_, _>>(),
+            )
+        });
         world.run_schedule(SimSchedule);
+        if let Some((cash, no_queues, repairing, hp)) = before_finance {
+            let state = world.resource::<Players>().get(PlayerId(0)).unwrap();
+            if no_queues && state.credits() < cash {
+                let now = state.credits();
+                let healed: Vec<_> = world
+                    .query::<(&sim::SimId, &Owner, &sim::Health)>()
+                    .iter(world)
+                    .filter(|(id, owner, h)| {
+                        owner.0 == PlayerId(0)
+                            && hp.get(id).is_some_and(|before| h.hit_points > *before)
+                    })
+                    .map(|(id, _, h)| (*id, hp[id], h.hit_points))
+                    .collect();
+                eprintln!(
+                    "grown finite debit tick{} cash{cash}->{now} emptyqueues repair{repairing:?} actual_heals{healed:?}",
+                    tick + 1
+                );
+            }
+        }
         course.ticks = tick + 1;
         for event in world
             .resource::<Messages<SimEvent>>()
             .iter_current_update_messages()
         {
+            if mission
+                && tick >= 50_000
+                && matches!(
+                    event,
+                    SimEvent::StrategicActivated { .. }
+                        | SimEvent::BuildingSold { .. }
+                        | SimEvent::BuildingDestroyed { .. }
+                        | SimEvent::UnitDestroyed { .. }
+                        | SimEvent::WeaponFired { .. }
+                )
+            {
+                eprintln!("grown event tick{} {event:?}", tick + 1);
+            }
             match event {
                 SimEvent::BuildingPlaced { player, .. } => {
                     *course.placed.entry(*player).or_default() += 1;
@@ -534,6 +588,117 @@ fn run(world: &mut World, limit: u64) -> Course {
             }
         }
         course.outcome = world.resource::<MatchState>().outcome();
+        if mission && course.ticks >= 50_000 && course.ticks.is_multiple_of(1_000) {
+            eprintln!("grown mission tick{}", course.ticks);
+            for (id, owner, harvest) in world
+                .query::<(&sim::SimId, &Owner, &sim::Harvester)>()
+                .iter(world)
+                .filter(|(_, owner, _)| [0, 1].contains(&owner.0.0))
+            {
+                eprintln!("mission harvest{id:?} {:?} {harvest:?}", owner.0);
+            }
+            for player in [PlayerId(0), PlayerId(1)] {
+                let grid = world.resource::<Grid>();
+                let state = world.resource::<Players>().get(player).unwrap();
+                let known_ore: u64 = cells(grid)
+                    .filter(|&cell| state.vision().is_visible(cell))
+                    .filter_map(|cell| grid.cell(cell))
+                    .map(|cell| u64::from(cell.ore))
+                    .sum();
+                eprintln!("mission known_ore{player:?} {known_ore}");
+            }
+            for (id, state) in world
+                .resource::<Players>()
+                .iter()
+                .filter(|(id, _)| [0, 1, 8].contains(&id.0))
+            {
+                let controller = world.resource::<AiPlayers>().controller(id).unwrap();
+                let debug = format!("{controller:?}");
+                eprintln!(
+                    "mission player{id:?} cash{} lowpower{} repair{:?} queues{:?} {}",
+                    state.credits(),
+                    state.low_power(),
+                    state.repairing(),
+                    state.queues().collect::<Vec<_>>(),
+                    debug.split_once("repair_huts:").unwrap().1
+                );
+            }
+            let defs = world.resource::<Definitions>().clone();
+            for (id, owner, u, mobile, hp, weapon, orders) in world
+                .query::<(
+                    &sim::SimId,
+                    &Owner,
+                    &sim::Unit,
+                    &Mobile,
+                    &sim::Health,
+                    Option<&sim::Weapon>,
+                    Option<&sim::Orders>,
+                )>()
+                .iter(world)
+                .filter(|(_, owner, _, _, _, _, _)| [0, 1, 8].contains(&owner.0.0))
+            {
+                eprintln!(
+                    "mission unit{id:?} {:?} {} HP{} {mobile:?} {weapon:?} {orders:?}",
+                    owner.0,
+                    defs.unit(u.kind).unwrap().id,
+                    hp.hit_points
+                );
+            }
+            for (id, owner, b, hp) in world
+                .query::<(&sim::SimId, &Owner, &Building, &sim::Health)>()
+                .iter(world)
+                .filter(|(_, owner, _, _)| [0, 8].contains(&owner.0.0))
+            {
+                eprintln!(
+                    "mission building{id:?} {:?} {} HP{} {:?}",
+                    owner.0,
+                    defs.building(b.kind).unwrap().id,
+                    hp.hit_points,
+                    b.footprint
+                );
+            }
+        }
+        if diagnostic && (course.ticks.is_multiple_of(10_000) || course.ticks == limit) {
+            eprintln!(
+                "grown tick{} defeated{:?} earned{:?}\n{}",
+                course.ticks,
+                course.defeated,
+                course.earned,
+                report(world)
+            );
+            let definitions = world.resource::<Definitions>().clone();
+            for (id, owner, building, health) in world
+                .query::<(&sim::SimId, &Owner, &Building, &sim::Health)>()
+                .iter(world)
+            {
+                eprintln!(
+                    "grown building {id:?} {:?} {} {:?} HP{}",
+                    owner.0,
+                    definitions.building(building.kind).unwrap().id,
+                    building.footprint,
+                    health.hit_points
+                );
+            }
+            for (id, owner, unit, mobile, health) in world
+                .query::<(&sim::SimId, &Owner, &sim::Unit, &Mobile, &sim::Health)>()
+                .iter(world)
+            {
+                eprintln!(
+                    "grown unit {id:?} {:?} {} HP{} {mobile:?}",
+                    owner.0,
+                    definitions.unit(unit.kind).unwrap().id,
+                    health.hit_points
+                );
+            }
+            for (id, state) in world.resource::<Players>().iter() {
+                eprintln!("grown player {id:?} {state:?}");
+                eprintln!(
+                    "grown controller {id:?} {:?}",
+                    world.resource::<AiPlayers>().controller(id)
+                );
+            }
+            eprintln!("grown special {:?}", world.resource::<sim::SpecialState>());
+        }
         if course.outcome.is_some() {
             break;
         }
@@ -629,6 +794,10 @@ fn a_ten_player_match_on_the_smallest_map_is_played_to_its_end() {
     let (mut app, _) = start(&data, map, &players, 7);
     let world = app.world_mut();
     let course = run(world, MATCH_TICK_LIMIT);
+    eprintln!(
+        "grown exact {:?} after {} ticks, defeated {:?}",
+        course.outcome, course.ticks, course.defeated
+    );
     assert!(
         matches!(course.outcome, Some(MatchOutcome::Won { .. })),
         "{:?} after {} ticks, defeated {:?}\n{}",

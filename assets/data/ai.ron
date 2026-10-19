@@ -128,7 +128,7 @@
             max_army: 16,
             wave_size: 8,
             first_wave: 6000,
-            wave_patience: 3600,
+            wave_patience: 1800,
             defence_radius: 8,
         ),
         (
@@ -138,7 +138,7 @@
             max_army: 24,
             wave_size: 12,
             first_wave: 3600,
-            wave_patience: 2400,
+            wave_patience: 1200,
             defence_radius: 10,
         ),
         (
@@ -148,7 +148,7 @@
             max_army: 36,
             wave_size: 16,
             first_wave: 2400,
-            wave_patience: 1800,
+            wave_patience: 900,
             defence_radius: 12,
         ),
     ],

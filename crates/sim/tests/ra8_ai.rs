@@ -29,6 +29,7 @@ fn scenario(country: &str, difficulty: &str, credits: i64, units: u32, superweap
 
 #[derive(Default)]
 struct ScenarioMode {
+    map_side: Option<u32>,
     human: bool,
     second_ai: bool,
     cadences: Option<[u32; 2]>,
@@ -134,12 +135,13 @@ fn scenario_mode(
             },
         },
     ];
+    let side = mode.map_side.unwrap_or(48);
     let mut app = App::new();
     app.add_plugins(SimPlugin { seed: 8 });
     app.world_mut().insert_resource(
         Grid::from_cells(
-            48,
-            48,
+            side,
+            side,
             vec![
                 Cell {
                     passable: true,
@@ -147,7 +149,7 @@ fn scenario_mode(
                     water: false,
                     ore: 0
                 };
-                48 * 48
+                (side * side) as usize
             ],
         )
         .unwrap(),
@@ -3878,8 +3880,28 @@ fn ra8_building_and_depot_repairs_use_paid_production_paths() {
 }
 
 fn paid_refinery_repair_after_producer_loss() -> (App, sim::SimId) {
-    let mut app = scenario("germany", "medium", 10000, 0, false);
-    let refinery = put(&mut app, "refinery", 14, 8);
+    paid_refinery_repair_after_producer_loss_options(false)
+}
+
+fn paid_refinery_repair_after_producer_loss_options(superweapons: bool) -> (App, sim::SimId) {
+    paid_refinery_repair_after_producer_loss_for("germany", superweapons)
+}
+
+fn paid_refinery_repair_after_producer_loss_for(
+    country: &str,
+    superweapons: bool,
+) -> (App, sim::SimId) {
+    let mut app = scenario(country, "medium", 10000, 0, superweapons);
+    let refinery = put(
+        &mut app,
+        if country == "russia" {
+            "soviet_refinery"
+        } else {
+            "refinery"
+        },
+        14,
+        8,
+    );
     let entity = unit_entity(&mut app, refinery);
     let maximum = app.world().get::<sim::Health>(entity).unwrap().hit_points;
     app.world_mut()
@@ -3945,6 +3967,409 @@ fn paid_refinery_repair_after_producer_loss() -> (App, sim::SimId) {
             .contains(&refinery)
     );
     (app, refinery)
+}
+
+#[test]
+fn ra8_powered_support_remnants_without_a_force_do_not_renew_paid_repairs() {
+    let mut renewed = Vec::new();
+    for (country, source) in [("germany", "chronosphere"), ("russia", "iron_curtain")] {
+        let (mut app, refinery) = paid_refinery_repair_after_producer_loss_for(country, true);
+        put(&mut app, source, 2, 2);
+        if country == "russia" {
+            put(&mut app, "nuclear_reactor", 2, 8);
+        } else {
+            put(&mut app, "power_plant", 2, 14);
+            put(&mut app, "power_plant", 2, 20);
+        }
+        let mut stopped = false;
+        let mut paid_changes = 0;
+        let mut credits = app
+            .world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .credits();
+        for _ in 0..200 {
+            let state = app
+                .world()
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap();
+            stopped |= state.repairing().contains(&refinery) && app.world().resource::<CommandQueue>().iter().any(|issued| matches!(issued.command, Command::RepairBuilding { building } if building == refinery));
+            step(&mut app);
+            let state = app
+                .world()
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap();
+            assert!(
+                !state.low_power(),
+                "{source} control must really have restored power"
+            );
+            let next = state.credits();
+            paid_changes += usize::from(next < credits);
+            credits = next;
+        }
+        let world = app.world_mut();
+        assert!(
+            world
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap()
+                .queues()
+                .all(|(_, queue)| queue.is_empty())
+        );
+        assert_eq!(
+            world
+                .query::<(&sim::Owner, &sim::Unit)>()
+                .iter(world)
+                .filter(|(owner, _)| owner.0 == PlayerId(0))
+                .count(),
+            0
+        );
+        eprintln!("powered support {source} paid changes {paid_changes} repair-off {stopped}");
+        if !stopped {
+            renewed.push(source);
+        }
+    }
+    assert!(
+        renewed.is_empty(),
+        "support-only remnants renewed repairs without a force: {renewed:?}"
+    );
+}
+
+#[test]
+fn ra8_powered_offensive_and_recruiting_sources_keep_real_paid_repairs() {
+    for (country, source) in [
+        ("germany", "weather_control"),
+        ("russia", "nuclear_silo"),
+        ("america", "american_airforce_command"),
+    ] {
+        let (mut app, refinery) = paid_refinery_repair_after_producer_loss_for(country, true);
+        let source_id = put(&mut app, source, 2, 2);
+        if country == "russia" {
+            put(&mut app, "nuclear_reactor", 2, 8);
+        } else {
+            put(&mut app, "power_plant", 2, 14);
+            put(&mut app, "power_plant", 2, 20);
+        }
+        let mut healed = false;
+        let entity = unit_entity(&mut app, refinery);
+        let mut hp = app.world().get::<sim::Health>(entity).unwrap().hit_points;
+        let mut spent = false;
+        let mut cash = app
+            .world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .credits();
+        for _ in 0..200 {
+            let state = app
+                .world()
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap();
+            assert!(!state.repairing().contains(&refinery) || !app.world().resource::<CommandQueue>().iter().any(|issued| matches!(issued.command, Command::RepairBuilding { building } if building == refinery)), "{source}: independent strategic capability keeps repairs");
+            step(&mut app);
+            let state = app
+                .world()
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap();
+            assert!(!state.low_power());
+            spent |= state.credits() < cash;
+            cash = state.credits();
+            let next = app.world().get::<sim::Health>(entity).unwrap().hit_points;
+            healed |= next > hp;
+            hp = next;
+        }
+        assert!(
+            healed && spent,
+            "{source} must actually keep paying/healing"
+        );
+        assert!(
+            app.world()
+                .resource::<sim::SpecialState>()
+                .charge
+                .get(&source_id)
+                .is_some_and(|charge| *charge > 0),
+            "{source}: normal powered recharge must advance"
+        );
+    }
+}
+
+#[test]
+fn ra8_ready_finite_cohorts_use_shorter_assembly_but_keep_the_source_team_delay() {
+    let mut app = scenario_mode(
+        "germany",
+        "medium",
+        0,
+        0,
+        false,
+        ScenarioMode {
+            map_side: Some(112),
+            ..Default::default()
+        },
+    );
+    // A second normal source base leaves a real later objective while the
+    // first cohort fights, so an early first-base destruction does not end
+    // the separate source-reinforcement observation.
+    sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "soviet_construction_yard",
+        CellPos::new(100, 100),
+    )
+    .unwrap();
+    let tank = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "grizzly",
+        CellPos::new(14, 14),
+    )
+    .unwrap();
+    let rule = app
+        .world()
+        .resource::<sim::Definitions>()
+        .rules()
+        .unwrap()
+        .difficulties
+        .iter()
+        .find(|r| r.id == "medium")
+        .unwrap()
+        .clone();
+    let source_delay = u64::from(rule.team_delay.unsigned_abs());
+    let first_wave = u64::from(
+        app.world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .difficulty()
+            .first_wave,
+    );
+    assert_eq!(
+        first_wave, source_delay,
+        "source first-wave gate stays exact"
+    );
+    let cadence = u64::from(
+        app.world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .difficulty()
+            .think_interval,
+    );
+    let mut joined = None;
+    let mut fired = false;
+    for _ in 0..first_wave + source_delay + cadence {
+        for event in step(&mut app) {
+            fired |=
+                matches!(event, sim::SimEvent::WeaponFired { attacker, .. } if attacker == tank);
+        }
+        if app
+            .world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .wave()
+            .contains(&tank)
+        {
+            joined = Some(app.world().resource::<SimTick>().0);
+            break;
+        }
+    }
+    eprintln!("finite first cohort sourcefirst{first_wave} delay{source_delay} joined{joined:?}");
+    let joined = joined
+        .expect("a ready finite cohort must not add another complete source TeamDelay of assembly");
+    assert!(joined >= first_wave && joined <= first_wave + source_delay + cadence);
+    let gather = app
+        .world()
+        .resource::<sim::AiPlayers>()
+        .controller(PlayerId(0))
+        .unwrap()
+        .gather();
+    let recruit = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "gi",
+        CellPos::new(gather.x + 1, gather.y),
+    )
+    .unwrap();
+    let mut reinforcement = None;
+    for _ in 0..source_delay + cadence * 2 {
+        for event in step(&mut app) {
+            fired |=
+                matches!(event, sim::SimEvent::WeaponFired { attacker, .. } if attacker == tank);
+        }
+        if app
+            .world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .wave()
+            .contains(&recruit)
+        {
+            reinforcement = Some(app.world().resource::<SimTick>().0);
+            break;
+        }
+    }
+    eprintln!(
+        "finite reinforcement{reinforcement:?} outcome{:?}",
+        app.world().resource::<sim::MatchState>().outcome()
+    );
+    let reinforcement =
+        reinforcement.expect("normal later source-gated reinforcement must still join");
+    assert!(
+        reinforcement >= joined + source_delay,
+        "shorter assembly cannot bypass source TeamDelay"
+    );
+    assert!(
+        fired,
+        "normal ready-cohort orders must lead to actual source combat"
+    );
+}
+
+#[test]
+fn ra8_an_unpowered_strategic_remnant_cannot_keep_futile_paid_repairs_alive() {
+    let (mut app, refinery) = paid_refinery_repair_after_producer_loss_options(true);
+    put(&mut app, "chronosphere", 2, 2);
+    let mut stopped = false;
+    let mut paid_changes = 0;
+    let mut credits = app
+        .world()
+        .resource::<sim::Players>()
+        .get(PlayerId(0))
+        .unwrap()
+        .credits();
+    for _ in 0..200 {
+        let state = app
+            .world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap();
+        stopped |= state.repairing().contains(&refinery) && app.world().resource::<CommandQueue>().iter().any(|issued| matches!(issued.command, Command::RepairBuilding { building } if building == refinery));
+        step(&mut app);
+        let state = app
+            .world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap();
+        assert!(state.low_power());
+        let next = state.credits();
+        paid_changes += usize::from(next < credits);
+        credits = next;
+    }
+    let world = app.world_mut();
+    assert!(
+        world
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .queues()
+            .all(|(_, queue)| queue.is_empty()),
+        "producer-loss cancellation must finish before judging the stranded source"
+    );
+    assert_eq!(
+        world
+            .query::<(&sim::Owner, &sim::Unit)>()
+            .iter(world)
+            .filter(|(owner, _)| owner.0 == PlayerId(0))
+            .count(),
+        0
+    );
+    eprintln!(
+        "unpowered strategic remnant paid credit changes {paid_changes}, ordinary repair-off {stopped}"
+    );
+    assert!(
+        stopped,
+        "an unusable Chronosphere without any power-restoration path must not qualify renewed paid repairs"
+    );
+}
+
+#[test]
+fn ra8_an_unpowered_strategic_source_keeps_repairs_during_real_paid_power_recovery() {
+    let (mut app, refinery) = paid_refinery_repair_after_producer_loss_options(true);
+    put(&mut app, "chronosphere", 2, 2);
+    put(&mut app, "construction_yard", 2, 20);
+    let power = app
+        .world()
+        .resource::<sim::Definitions>()
+        .building_kind("power_plant")
+        .unwrap();
+    // The original paid Power head survives the declared producer loss. The
+    // replacement yard makes that real head attainable again; do not enqueue
+    // a duplicate into the source's one-item construction lane.
+    assert!(
+        app.world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .queues()
+            .any(|(_, queue)| queue
+                .iter()
+                .any(|q| q.item == sim::ProductionItem::Building(power)))
+    );
+    let mut paid_head = false;
+    let mut placed = false;
+    let mut recovered = false;
+    for _ in 0..2500 {
+        let state = app
+            .world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap();
+        paid_head |= state.queues().any(|(_, queue)| {
+            queue
+                .iter()
+                .any(|q| q.item == sim::ProductionItem::Building(power) && q.charged > 0)
+        });
+        if state.low_power() {
+            assert!(!state.repairing().contains(&refinery) || !app.world().resource::<CommandQueue>().iter().any(|issued| matches!(issued.command, Command::RepairBuilding { building } if building == refinery)), "actual queued/buildable power recovery keeps useful repairs");
+        }
+        for event in step(&mut app) {
+            placed |= matches!(event, sim::SimEvent::BuildingPlaced { player: PlayerId(0), kind, .. } if kind == power);
+        }
+        recovered |= !app
+            .world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .low_power();
+        if paid_head && placed && recovered {
+            break;
+        }
+    }
+    assert!(
+        paid_head && placed && recovered,
+        "ordinary paid power head must actually place and restore power"
+    );
+}
+
+#[test]
+fn ra8_an_unpowered_chronosphere_keeps_repairs_for_its_real_support_force() {
+    for (country, source, kind) in [
+        ("germany", "chronosphere", "grizzly"),
+        ("russia", "iron_curtain", "rhino"),
+    ] {
+        let (mut app, refinery) = paid_refinery_repair_after_producer_loss_for(country, true);
+        put(&mut app, source, 2, 2);
+        let tank = spawn_unit(app.world_mut(), PlayerId(0), kind, CellPos::new(13, 12)).unwrap();
+        for _ in 0..200 {
+            let state = app
+                .world()
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap();
+            assert!(!state.repairing().contains(&refinery) || !app.world().resource::<CommandQueue>().iter().any(|issued| matches!(issued.command, Command::RepairBuilding { building } if building == refinery)), "{source}: a living support force is an independent recovery path");
+            step(&mut app);
+        }
+        let tank_entity = unit_entity(&mut app, tank);
+        assert!(
+            app.world()
+                .get::<sim::Health>(tank_entity)
+                .is_some_and(|h| h.hit_points > 0)
+        );
+    }
 }
 
 #[test]
@@ -6040,11 +6465,33 @@ fn ra8_reinforcements_without_aa_job_progress_cannot_renew_the_aircraft_hold() {
     let mut installed = false;
     let mut replacements = 0;
     let mut released = false;
+    let mut installed_at = None;
+    let replacement_interval = app
+        .world()
+        .resource::<sim::AiPlayers>()
+        .controller(PlayerId(0))
+        .unwrap()
+        .difficulty()
+        .think_interval
+        * 2;
     for elapsed in 0..12000 {
         step(&mut app);
         installed |= app.world().resource::<CommandQueue>().iter().any(|issued|
             matches!(&issued.command, Command::Attack { units, target } if *target == aa && units.iter().any(|id| ground.contains(id)))
             || matches!(&issued.command, Command::AttackMove { units, target } if *target == CellPos::new(38,14) && units.iter().any(|id| ground.contains(id))));
+        if installed && installed_at.is_none() {
+            installed_at = Some(app.world().resource::<SimTick>().0);
+            let c = app
+                .world()
+                .resource::<sim::AiPlayers>()
+                .controller(PlayerId(0))
+                .unwrap();
+            eprintln!(
+                "AA lease installed{installed_at:?} patience{} {}",
+                c.difficulty().wave_patience,
+                format!("{c:?}").split_once("air_screens:").unwrap().1
+            );
+        }
         if installed {
             // Declared external orders keep every surviving recruit active on our side
             // of the wall. This isolates job progress from the separate all-idle fallback.
@@ -6055,7 +6502,7 @@ fn ra8_reinforcements_without_aa_job_progress_cannot_renew_the_aircraft_hold() {
                     target: CellPos::new(2, 40),
                 },
             );
-            if elapsed % 80 == 79 {
+            if elapsed % replacement_interval == replacement_interval - 1 {
                 // Fresh, farther participants are real spawned units; the controller's
                 // normal assembly/reinforcement cadence determines when they join.
                 let recruit = (0..225)
@@ -6070,6 +6517,16 @@ fn ra8_reinforcements_without_aa_job_progress_cannot_renew_the_aircraft_hold() {
         }
         released |= ordinary_air_raid_queued(&app, &air);
         if released {
+            let c = app
+                .world()
+                .resource::<sim::AiPlayers>()
+                .controller(PlayerId(0))
+                .unwrap();
+            eprintln!(
+                "AA lease released tick{} {}",
+                app.world().resource::<SimTick>().0,
+                format!("{c:?}").split_once("air_screens:").unwrap().1
+            );
             break;
         }
     }
@@ -6086,7 +6543,7 @@ fn ra8_reinforcements_without_aa_job_progress_cannot_renew_the_aircraft_hold() {
 
 fn slow_screen_ground(app: &mut App) {
     // A declared units-file fixture makes a healthy approach exceed Medium's
-    // 2400-tick patience. Special advance correctly reapplies data speed each tick.
+    // initial patience. Special advance correctly reapplies data speed each tick.
     let source = std::fs::read_to_string(data().join("units.ron")).unwrap();
     let text = source
         .replace("id: \"grizzly\", speed: 13", "id: \"grizzly\", speed: 1")
