@@ -190,13 +190,33 @@ pub(super) fn recruit(view: &View<'_>, controller: &AiController, kind: UnitKind
         let Some(goal) = controller.naval_goal else {
             return false;
         };
-        if !naval_targets(view, controller)
+        let targets: Vec<_> = naval_targets(view, controller)
             .into_iter()
-            .any(|(footprint, target)| {
-                naval_reach(view, kind, &target)
-                    .is_some_and(|reach| within_reach(footprint, goal, reach))
+            .filter_map(|(footprint, target)| {
+                naval_reach(view, kind, &target, None).map(|reach| (footprint, reach))
             })
-        {
+            .collect();
+        if targets.is_empty() {
+            return false;
+        }
+        // The shared yard goal qualifies a sea, not every kind's firing cell.
+        // Search only that same known component for this hull's source ranges.
+        let mut visited = BTreeSet::from([goal]);
+        let mut open = VecDeque::from([goal]);
+        let mut qualified = false;
+        while let Some(cell) = open.pop_front() {
+            if targets.iter().any(|(f, reach)| reach.contains(*f, cell)) {
+                qualified = true;
+                break;
+            }
+            for (dx, dy) in [(0, -1), (-1, 0), (1, 0), (0, 1)] {
+                let next = CellPos::new(cell.x.saturating_add(dx), cell.y.saturating_add(dy));
+                if known_naval_water(view, next) && visited.insert(next) {
+                    open.push_back(next);
+                }
+            }
+        }
+        if !qualified {
             return false;
         }
     }
@@ -607,6 +627,14 @@ pub(super) fn decide(
                             && range(view.definitions, u.kind)
                                 >= view.ai.policy.artillery_min_range
                                     * crate::SUBCELLS_PER_CELL as u32
+                            // A remote rear replacement cannot screen an already
+                            // advanced gun. Keep its ordinary offensive approach;
+                            // local tank-line backsteps retain their source range.
+                            && (target.1.footprint.distance_to_cell(cell)
+                                <= target.1.footprint.distance_to_cell(u.mobile.cell)
+                                || chebyshev(u.mobile.cell, front.mobile.cell)
+                                    .saturating_mul(crate::SUBCELLS_PER_CELL as u32)
+                                    <= range(view.definitions, u.kind))
                     })
                     .map(|u| u.id)
                     .collect();
@@ -619,24 +647,7 @@ pub(super) fn decide(
             }
         }
     }
-    if let Some(goal) = controller.naval_goal {
-        let units: Vec<_> = view
-            .own_units
-            .iter()
-            .filter(|u| {
-                view.definitions.domain(u.kind) == Domain::Naval
-                    && u.idle()
-                    && !controller.reserved.contains(&u.id)
-            })
-            .map(|u| u.id)
-            .collect();
-        if !units.is_empty() {
-            commands.push(Command::AttackMove {
-                units,
-                target: goal,
-            });
-        }
-    }
+    commands.extend(existing_naval_orders(view, controller));
     if let Some(command) = combat_support {
         commands.push(command);
     }
@@ -1451,19 +1462,164 @@ fn within_reach(footprint: Footprint, cell: CellPos, reach: u32) -> bool {
         <= i64::from(reach).saturating_mul(i64::from(reach))
 }
 
-fn naval_reach(view: &View<'_>, kind: UnitKind, target: &crate::TargetTraits) -> Option<u32> {
-    let unit = view.definitions.unit_combat(kind)?;
-    let (weapon, percent) =
-        crate::weapon_against(view.definitions, &unit, unit.weapons(false), target)?;
-    (percent > 1)
-        .then(|| view.definitions.weapon(weapon).map(|w| w.range / 256))
-        .flatten()
+#[derive(Clone, Copy)]
+struct NavalReach {
+    target: crate::combat::Extent,
+    maximum_subcells: u32,
+    minimum_subcells: u32,
+    sight_cells: Option<u32>,
 }
 
-fn naval_targets(
+impl NavalReach {
+    fn contains(self, footprint: Footprint, cell: CellPos) -> bool {
+        let from = crate::combat::Extent::point(crate::SubPos::centre_of(cell));
+        let (dx, dy) = from.gap(&self.target);
+        crate::in_range(dx, dy, self.maximum_subcells)
+            && !crate::inside_min_range(dx, dy, self.minimum_subcells)
+            && self
+                .sight_cells
+                .is_none_or(|sight| within_reach(footprint, cell, sight))
+    }
+}
+
+fn naval_reach(
     view: &View<'_>,
-    controller: &AiController,
-) -> Vec<(Footprint, crate::TargetTraits)> {
+    kind: UnitKind,
+    target: &NavalTarget,
+    sight: Option<u32>,
+) -> Option<NavalReach> {
+    let unit = view.definitions.unit_combat(kind)?;
+    let (weapon, percent) =
+        crate::weapon_against(view.definitions, &unit, unit.weapons(false), &target.traits)?;
+    if percent <= 1 {
+        return None;
+    }
+    let weapon = view.definitions.weapon(weapon)?;
+    // A remembered target under Gap/shroud still needs a real observation path.
+    // Existing allied sight preserves the full weapon range; otherwise the hull
+    // must be able to reveal a firing target with its own source-derived sight.
+    Some(NavalReach {
+        target: target.extent,
+        maximum_subcells: weapon.range,
+        minimum_subcells: weapon.min_range,
+        sight_cells: (!target.observed).then_some(sight.unwrap_or(unit.sight)),
+    })
+}
+
+fn known_naval_water(view: &View<'_>, cell: CellPos) -> bool {
+    view.grid.cell(cell).is_some_and(|c| c.water)
+        && !view
+            .own_buildings
+            .iter()
+            .any(|b| b.footprint.contains(cell))
+        && (!view.vision.is_visible(cell) || view.grid.building(cell).is_none())
+}
+
+/// A prospective yard may belong to a different sea from a surviving hull. Plan
+/// each idle hull's actual approach within its own known component, sharing each
+/// kind/sight/component search for this decision only. Healthy fire/orders stay put.
+fn existing_naval_orders(view: &View<'_>, controller: &AiController) -> Vec<Command> {
+    struct Component {
+        cells: BTreeSet<CellPos>,
+        goal: Option<CellPos>,
+    }
+    let targets = naval_targets(view, controller);
+    if targets.is_empty() {
+        return Vec::new();
+    }
+    let mut components: BTreeMap<(UnitKind, Option<u32>), Vec<Component>> = BTreeMap::new();
+    let mut groups: BTreeMap<CellPos, Vec<SimId>> = BTreeMap::new();
+    for unit in view
+        .own_units
+        .iter()
+        .copied()
+        .filter(|u| {
+            view.definitions.domain(u.kind) == Domain::Naval
+                && u.idle()
+                && u.combat_target.is_none()
+                && !controller.reserved.contains(&u.id)
+        })
+        .take(crate::MAX_AI_ARMY as usize)
+    {
+        let cache = components.entry((unit.kind, unit.sight)).or_default();
+        let goal = if let Some(found) = cache.iter().find(|c| c.cells.contains(&unit.mobile.cell)) {
+            found.goal
+        } else {
+            let escort = view
+                .definitions
+                .metadata(ProductionItem::Unit(unit.kind))
+                .is_some_and(|m| m.sensors_sight > 0);
+            let kinds: BTreeSet<_> = if escort {
+                view.ai
+                    .army
+                    .iter()
+                    .copied()
+                    .filter(|&k| view.definitions.domain(k) == Domain::Naval)
+                    .collect()
+            } else {
+                BTreeSet::from([unit.kind])
+            };
+            let mut goals = Vec::new();
+            for kind in kinds {
+                for (footprint, target) in &targets {
+                    let sight = if kind == unit.kind { unit.sight } else { None };
+                    let Some(mut reach) = naval_reach(view, kind, target, sight) else {
+                        continue;
+                    };
+                    // An escort follows the qualified bombardment route; it need
+                    // not damage that shore target with its own detector weapon.
+                    if escort {
+                        reach.minimum_subcells = 0;
+                    }
+                    goals.push((*footprint, reach));
+                }
+            }
+            if goals.is_empty() {
+                continue;
+            }
+            let mut visited = BTreeSet::from([unit.mobile.cell]);
+            let mut open = VecDeque::from([unit.mobile.cell]);
+            let mut best = None;
+            while let Some(cell) = open.pop_front() {
+                for &(footprint, reach) in &goals {
+                    if reach.contains(footprint, cell) {
+                        let key = (footprint.distance_to_cell(cell), cell.y, cell.x);
+                        if best.as_ref().is_none_or(|(found, _)| key < *found) {
+                            best = Some((key, cell));
+                        }
+                    }
+                }
+                for (dx, dy) in [(0, -1), (-1, 0), (1, 0), (0, 1)] {
+                    let next = CellPos::new(cell.x.saturating_add(dx), cell.y.saturating_add(dy));
+                    if known_naval_water(view, next) && visited.insert(next) {
+                        open.push_back(next);
+                    }
+                }
+            }
+            let goal = best.map(|(_, cell)| cell);
+            cache.push(Component {
+                cells: visited,
+                goal,
+            });
+            goal
+        };
+        if let Some(goal) = goal.filter(|&goal| goal != unit.mobile.cell) {
+            groups.entry(goal).or_default().push(unit.id);
+        }
+    }
+    groups
+        .into_iter()
+        .map(|(target, units)| Command::AttackMove { units, target })
+        .collect()
+}
+
+struct NavalTarget {
+    traits: crate::TargetTraits,
+    extent: crate::combat::Extent,
+    observed: bool,
+}
+
+fn naval_targets(view: &View<'_>, controller: &AiController) -> Vec<(Footprint, NavalTarget)> {
     controller
         .known
         .values()
@@ -1471,13 +1627,17 @@ fn naval_targets(
             let t = view.definitions.building_combat(b.kind)?;
             Some((
                 b.footprint,
-                crate::TargetTraits {
-                    armour: t.armour,
-                    wall: t.wall,
-                    building: true,
-                    immune_psionics: true,
-                    on_water: view.grid.cell(b.footprint.origin).is_some_and(|c| c.water),
-                    ..crate::TargetTraits::default()
+                NavalTarget {
+                    extent: crate::combat::Extent::footprint(b.footprint),
+                    observed: view.vision.sees_footprint(b.footprint),
+                    traits: crate::TargetTraits {
+                        armour: t.armour,
+                        wall: t.wall,
+                        building: true,
+                        immune_psionics: true,
+                        on_water: view.grid.cell(b.footprint.origin).is_some_and(|c| c.water),
+                        ..crate::TargetTraits::default()
+                    },
                 },
             ))
         })
@@ -1489,12 +1649,20 @@ fn naval_targets(
                     let t = view.definitions.unit_combat(u.kind)?;
                     Some((
                         cell_footprint(u.mobile.cell),
-                        crate::TargetTraits {
-                            armour: t.armour,
-                            on_water: true,
-                            underwater: t.underwater,
-                            organic: t.organic,
-                            ..crate::TargetTraits::default()
+                        NavalTarget {
+                            extent: crate::combat::Extent::point(
+                                u.mobile.position(view.grid, u.id),
+                            ),
+                            // View already admits actually observed units, including
+                            // those seen through their current movement destination.
+                            observed: true,
+                            traits: crate::TargetTraits {
+                                armour: t.armour,
+                                on_water: true,
+                                underwater: t.underwater,
+                                organic: t.organic,
+                                ..crate::TargetTraits::default()
+                            },
                         },
                     ))
                 }),
@@ -1646,7 +1814,7 @@ pub(super) fn can_finish(view: &View<'_>, controller: &AiController, unit: &Unit
     }
     let targets: Vec<_> = naval_targets(view, controller)
         .into_iter()
-        .filter_map(|(f, t)| naval_reach(view, unit.kind, &t).map(|range| (f, range)))
+        .filter_map(|(f, t)| naval_reach(view, unit.kind, &t, unit.sight).map(|range| (f, range)))
         .collect();
     if targets.is_empty() {
         return unit.mobile.step.is_some();
@@ -1654,7 +1822,7 @@ pub(super) fn can_finish(view: &View<'_>, controller: &AiController, unit: &Unit
     let mut seen = BTreeSet::from([unit.mobile.cell]);
     let mut open = VecDeque::from([unit.mobile.cell]);
     while let Some(cell) = open.pop_front() {
-        if targets.iter().any(|(f, r)| within_reach(*f, cell, *r)) {
+        if targets.iter().any(|(f, r)| r.contains(*f, cell)) {
             return true;
         }
         for (dx, dy) in [(0, -1), (-1, 0), (1, 0), (0, 1)] {
@@ -1677,19 +1845,16 @@ fn naval(view: &View<'_>, controller: &mut AiController) {
         .saturating_add(u64::from(view.ai.policy.naval_rescan));
     controller.naval_goal = None;
     controller.naval_site = None;
-    let goals: Vec<_> = naval_targets(view, controller)
-        .into_iter()
-        .filter_map(|(footprint, target)| {
-            let reach = view
-                .ai
-                .army
-                .iter()
-                .filter(|&&kind| view.definitions.domain(kind) == Domain::Naval)
-                .filter_map(|&kind| naval_reach(view, kind, &target))
-                .max()?;
-            Some((footprint, reach))
-        })
-        .collect();
+    let mut goals = Vec::new();
+    for (footprint, target) in naval_targets(view, controller) {
+        for &kind in &view.ai.army {
+            if view.definitions.domain(kind) == Domain::Naval
+                && let Some(reach) = naval_reach(view, kind, &target, None)
+            {
+                goals.push((footprint, reach));
+            }
+        }
+    }
     if goals.is_empty() {
         return;
     }
@@ -1704,14 +1869,7 @@ fn naval(view: &View<'_>, controller: &mut AiController) {
     let Some(def) = view.definitions.building(yard) else {
         return;
     };
-    let water = |cell| {
-        view.grid.cell(cell).is_some_and(|c| c.water)
-            && !view
-                .own_buildings
-                .iter()
-                .any(|b| b.footprint.contains(cell))
-            && (!view.vision.is_visible(cell) || view.grid.building(cell).is_none())
-    };
+    let water = |cell| known_naval_water(view, cell);
     // Cache each component once while trying legal sites. Unknown building occupancy
     // cannot change planning; only static water and observed/owned blockers may do so.
     let mut components: BTreeMap<CellPos, Option<CellPos>> = BTreeMap::new();
@@ -1737,7 +1895,7 @@ fn naval(view: &View<'_>, controller: &mut AiController) {
                 if let Some(distance) = goals
                     .iter()
                     .filter_map(|(f, reach)| {
-                        within_reach(*f, cell, *reach).then_some(f.distance_to_cell(cell))
+                        reach.contains(*f, cell).then_some(f.distance_to_cell(cell))
                     })
                     .min()
                 {
@@ -1806,6 +1964,55 @@ fn weight(view: &View<'_>, kind: BuildingKind, weights: &[u32; 12]) -> u32 {
     weights[index]
 }
 
+/// A future naval yard has no registered actor. Rank its ordinary legal sites
+/// against presently observed unit fire, without consulting hidden occupancy.
+/// This protects the endpoint only; it predicts neither future enemy movement
+/// nor safe routes, and does not prohibit an exposed site when it is the only one.
+pub(super) fn naval_site_exposed(
+    view: &View<'_>,
+    kind: BuildingKind,
+    footprint: Footprint,
+) -> bool {
+    let Some(terms) = view.definitions.building_combat(kind) else {
+        return false;
+    };
+    let Some(meta) = view.definitions.metadata(ProductionItem::Building(kind)) else {
+        return false;
+    };
+    let mut traits = crate::combat::traits_of(
+        view.grid,
+        SimId(u32::MAX),
+        terms.armour,
+        &crate::combat::Body::Building(footprint),
+        Some(&terms),
+    );
+    // A prospective structure has no grid infantry registration.
+    traits.infantry = meta.infantry;
+    traits.immune_psionics |= meta.immune_psionics;
+    traits.immune_radiation = meta.immune_radiation;
+    traits.bombable = meta.bombable;
+    let target = crate::combat::Extent::footprint(footprint);
+    view.enemy_units.iter().any(|unit| {
+        let Some(enemy) = view.definitions.unit_combat(unit.kind) else {
+            return false;
+        };
+        let Some((kind, percent)) =
+            crate::weapon_against(view.definitions, &enemy, enemy.weapons(false), &traits)
+        else {
+            return false;
+        };
+        let Some(weapon) = view.definitions.weapon(kind) else {
+            return false;
+        };
+        let (dx, dy) =
+            crate::combat::Extent::point(unit.mobile.position(view.grid, unit.id)).gap(&target);
+        percent > 1
+            && weapon.damage > 0
+            && crate::in_range(dx, dy, weapon.range)
+            && !crate::inside_min_range(dx, dy, weapon.min_range)
+    })
+}
+
 fn unit_weight(view: &View<'_>, unit: &UnitSnap, weights: &[u32; 12]) -> u32 {
     let index = if unit.harvest.is_some() {
         Some(5)
@@ -1829,9 +2036,11 @@ fn strike_target(
 ) -> Option<CellPos> {
     let targets: Vec<_> = controller
         .known
-        .iter()
-        .filter(|(id, b)| attack_job_eligible(controller, **id) && stable(view, b.footprint.origin))
-        .map(|(_, b)| (b.footprint, weight(view, b.kind, weights)))
+        .values()
+        // Failed army cohorts do not establish failure of an independent,
+        // normally charged strategic strike. Retain its source-weighted targets.
+        .filter(|b| stable(view, b.footprint.origin))
+        .map(|b| (b.footprint, weight(view, b.kind, weights)))
         .chain(
             view.enemy_units
                 .iter()

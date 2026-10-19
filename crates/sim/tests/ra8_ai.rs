@@ -33,6 +33,9 @@ struct ScenarioMode {
     second_ai: bool,
     cadences: Option<[u32; 2]>,
     fallback_plan: bool,
+    army: Option<&'static [&'static str]>,
+    production_only: bool,
+    opponent: Option<&'static str>,
 }
 
 fn scenario_mode(
@@ -48,6 +51,39 @@ fn scenario_mode(
     skirmish.maps[0].starts = vec![CellPos::new(8, 8), CellPos::new(38, 38)];
     skirmish.starting_credits = credits;
     let mut ai = load_ai(data().join("ai.ron"), &definitions).unwrap();
+    if let Some(army) = mode.army {
+        let selected = skirmish
+            .factions
+            .iter()
+            .find(|f| f.id == country)
+            .unwrap()
+            .country;
+        for plan in ai.plans.iter_mut().filter(|p| p.country == selected) {
+            plan.army = army
+                .iter()
+                .map(|id| definitions.unit_kind(id).unwrap())
+                .collect();
+            if mode.production_only {
+                // Declared Soviet production fixture, with a complete legal
+                // prerequisite chain that is actually present in the world.
+                plan.build_order = [
+                    "tesla_reactor",
+                    "soviet_refinery",
+                    "soviet_barracks",
+                    "soviet_war_factory",
+                    "radar_tower",
+                    "soviet_battle_lab",
+                    "soviet_naval_shipyard",
+                ]
+                .iter()
+                .map(|id| definitions.building_kind(id).unwrap())
+                .collect();
+                plan.defences.clear();
+                plan.support.clear();
+                plan.tier_reserves = [0; 3];
+            }
+        }
+    }
     if mode.fallback_plan {
         let selected = skirmish
             .factions
@@ -88,7 +124,7 @@ fn scenario_mode(
             faction: skirmish
                 .factions
                 .iter()
-                .position(|f| f.id == "russia")
+                .position(|f| f.id == mode.opponent.unwrap_or("russia"))
                 .unwrap(),
             start: 1,
             controller: if mode.second_ai {
@@ -261,6 +297,954 @@ fn ra8_incapable_specialist_and_stranded_ship_survivors_do_not_block_a_real_winn
                 })
             ),
             "{kind} prevented a winner"
+        );
+    }
+}
+
+#[test]
+fn ra8_gap_hidden_shore_requires_a_real_naval_observation_path_but_allied_sight_keeps_long_range_fire()
+ {
+    for observed in [true, false] {
+        let mut app = scenario("great_britain", "brutal", 0, 0, false);
+        for y in 18..23 {
+            for x in 2..7 {
+                app.world_mut().resource_mut::<Grid>().set_terrain(
+                    CellPos::new(x, y),
+                    Cell {
+                        passable: false,
+                        buildable: false,
+                        water: true,
+                        ore: 0,
+                    },
+                );
+            }
+        }
+        sim::spawn_building(
+            app.world_mut(),
+            PlayerId(1),
+            "nuclear_reactor",
+            CellPos::new(38, 30),
+        )
+        .unwrap();
+        let gap = sim::spawn_building(
+            app.world_mut(),
+            PlayerId(1),
+            "gap_generator",
+            CellPos::new(25, 20),
+        )
+        .unwrap();
+        let observer = spawn_unit(
+            app.world_mut(),
+            PlayerId(0),
+            "engineer",
+            CellPos::new(24, 19),
+        )
+        .unwrap();
+        for _ in 0..40 {
+            step(&mut app);
+        }
+        assert!(
+            app.world()
+                .resource::<sim::AiPlayers>()
+                .controller(PlayerId(0))
+                .unwrap()
+                .known_buildings()
+                .contains_key(&gap),
+            "the target must be learned through actual local sight"
+        );
+        if !observed {
+            issue(
+                &mut app,
+                Command::Move {
+                    units: vec![observer],
+                    target: CellPos::new(10, 9),
+                },
+            );
+        }
+        for _ in 0..700 {
+            step(&mut app);
+        }
+        assert_eq!(
+            app.world()
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap()
+                .vision()
+                .is_visible(CellPos::new(25, 20)),
+            observed,
+            "powered Gap must really hide the remembered shore without the observer"
+        );
+        let carrier = spawn_unit(
+            app.world_mut(),
+            PlayerId(0),
+            "aircraft_carrier",
+            CellPos::new(4, 20),
+        )
+        .unwrap();
+        let mut fired = false;
+        let mut sold = false;
+        for _ in 0..5000 {
+            for event in step(&mut app) {
+                fired |= matches!(event, sim::SimEvent::WeaponFired { attacker, target, .. } if attacker == carrier && target == gap);
+                sold |= matches!(
+                    event,
+                    sim::SimEvent::BuildingSold {
+                        player: PlayerId(0),
+                        ..
+                    }
+                );
+            }
+            if fired
+                || app
+                    .world()
+                    .resource::<sim::MatchState>()
+                    .outcome()
+                    .is_some()
+            {
+                break;
+            }
+        }
+        assert_eq!(fired, observed, "long-range launch needs real observation");
+        if !observed {
+            assert!(
+                sold,
+                "a hidden target outside every reachable sight cell cannot indefinitely block recovery"
+            );
+            assert!(matches!(
+                app.world().resource::<sim::MatchState>().outcome(),
+                Some(sim::MatchOutcome::Won {
+                    winner: PlayerId(1),
+                    ..
+                })
+            ));
+        } else {
+            assert!(
+                !sold,
+                "a genuinely observed long-range target remains viable"
+            );
+        }
+    }
+}
+
+#[test]
+fn ra8_an_existing_hull_uses_its_reachable_shore_job_instead_of_a_prospective_yards_other_pond() {
+    let mut app = scenario("great_britain", "brutal", 0, 0, false);
+    for (left, top, right, bottom) in [(18, 8, 22, 12), (10, 28, 22, 32)] {
+        for y in top..=bottom {
+            for x in left..=right {
+                app.world_mut().resource_mut::<Grid>().set_terrain(
+                    CellPos::new(x, y),
+                    Cell {
+                        passable: false,
+                        buildable: false,
+                        water: true,
+                        ore: 0,
+                    },
+                );
+            }
+        }
+    }
+    put(&mut app, "nuclear_reactor", 2, 2);
+    put(&mut app, "spy_satellite", 2, 8);
+    put(&mut app, "naval_shipyard", 18, 8);
+    sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "power_plant",
+        CellPos::new(25, 8),
+    )
+    .unwrap();
+    let shore = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "power_plant",
+        CellPos::new(25, 30),
+    )
+    .unwrap();
+    let hull = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "destroyer",
+        CellPos::new(10, 30),
+    )
+    .unwrap();
+    let rescan = load_ai(
+        data().join("ai.ron"),
+        app.world().resource::<sim::Definitions>(),
+    )
+    .unwrap()
+    .policy
+    .naval_rescan;
+    for _ in 0..=rescan {
+        step(&mut app);
+    }
+    for target in [CellPos::new(25, 8), CellPos::new(25, 30)] {
+        assert!(
+            app.world()
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap()
+                .vision()
+                .is_visible(target),
+            "the powered source satellite must really reveal both shore jobs"
+        );
+    }
+    let future = app
+        .world()
+        .resource::<sim::AiPlayers>()
+        .controller(PlayerId(0))
+        .unwrap()
+        .naval_target()
+        .unwrap();
+    assert!(
+        future.y < 20,
+        "the real shipyard's qualified future goal must remain in the other pond: {future:?}"
+    );
+    let mut fired = false;
+    let mut destroyed = false;
+    let mut sent_to_other_pond = false;
+    for _ in 0..5000 {
+        for event in step(&mut app) {
+            fired |= matches!(event, sim::SimEvent::WeaponFired { attacker, target, .. } if attacker == hull && target == shore);
+            destroyed |= matches!(event, sim::SimEvent::BuildingDestroyed { building, .. } if building == shore);
+        }
+        sent_to_other_pond |= app.world().resource::<CommandQueue>().iter().any(|issued| {
+            matches!(&issued.command, Command::AttackMove { units, target } if units.contains(&hull) && target.y < 20)
+        });
+        if destroyed {
+            break;
+        }
+    }
+    eprintln!(
+        "existing hull shore fired{fired} destroyed{destroyed} sent_to_other_pond{sent_to_other_pond}"
+    );
+    assert!(
+        fired && destroyed,
+        "the existing hull must approach, fire at and destroy its genuinely reachable shore target"
+    );
+    assert!(
+        !sent_to_other_pond,
+        "prospective yard planning must not assign an unreachable pond to a living hull"
+    );
+}
+
+#[test]
+fn ra8_an_existing_dreadnought_without_a_yard_backs_out_to_its_real_minimum_range_and_finishes() {
+    let mut app = scenario("great_britain", "brutal", 0, 0, false);
+    for y in 18..23 {
+        for x in 2..15 {
+            app.world_mut().resource_mut::<Grid>().set_terrain(
+                CellPos::new(x, y),
+                Cell {
+                    passable: false,
+                    buildable: false,
+                    water: true,
+                    ore: 0,
+                },
+            );
+        }
+    }
+    put(&mut app, "nuclear_reactor", 2, 2);
+    put(&mut app, "spy_satellite", 2, 8);
+    let shore = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "power_plant",
+        CellPos::new(17, 20),
+    )
+    .unwrap();
+    let hull = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "dreadnought",
+        CellPos::new(14, 20),
+    )
+    .unwrap();
+    let defs = app.world().resource::<sim::Definitions>();
+    let kind = defs.unit_kind("dreadnought").unwrap();
+    let weapon = defs.unit_combat(kind).unwrap().weapons(false)[0].unwrap();
+    assert!(
+        defs.weapon(weapon).unwrap().min_range > 3 * sim::SUBCELLS_PER_CELL as u32,
+        "the declared starting cell must genuinely be inside the source minimum range"
+    );
+    let mut first_fire = None;
+    let mut destroyed = false;
+    for _ in 0..5000 {
+        for event in step(&mut app) {
+            if matches!(event, sim::SimEvent::WeaponFired { attacker, target, .. } if attacker == hull && target == shore)
+                && first_fire.is_none()
+            {
+                let entity = unit_entity(&mut app, hull);
+                first_fire = Some(app.world().get::<sim::Mobile>(entity).unwrap().cell);
+            }
+            destroyed |= matches!(event, sim::SimEvent::BuildingDestroyed { building, .. } if building == shore);
+        }
+        if destroyed {
+            break;
+        }
+    }
+    eprintln!("minimum-range hull first_fire{first_fire:?} destroyed{destroyed}");
+    assert!(
+        first_fire.is_some_and(|cell| cell.x < 14),
+        "the too-close hull must really back away before an ordinary legal launcher shot"
+    );
+    assert!(
+        destroyed,
+        "normal source missiles must actually destroy the shore target"
+    );
+    assert!(
+        app.world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .naval_target()
+            .is_none(),
+        "the existing-hull job must work independently of a prospective shipyard"
+    );
+}
+
+fn dreadnought_minimum_pond(live: bool) -> (App, sim::SimId, Option<sim::SimId>) {
+    let mut app = if live {
+        scenario("great_britain", "brutal", 0, 0, false)
+    } else {
+        // Declared production-only naval projection: isolate the source weapon
+        // with a minimum range; owners/prerequisites/costs remain exact.
+        scenario_mode(
+            "russia",
+            "medium",
+            20_000,
+            0,
+            false,
+            ScenarioMode {
+                army: Some(&["dreadnought"]),
+                ..ScenarioMode::default()
+            },
+        )
+    };
+    for y in 18..23 {
+        for x in 10..16 {
+            assert!(app.world_mut().resource_mut::<Grid>().set_terrain(
+                CellPos::new(x, y),
+                Cell {
+                    passable: false,
+                    buildable: false,
+                    water: true,
+                    ore: 0
+                }
+            ));
+        }
+    }
+    put(&mut app, "nuclear_reactor", 2, 2);
+    put(&mut app, "spy_satellite", 2, 8);
+    let target = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "power_plant",
+        CellPos::new(17, 20),
+    )
+    .unwrap();
+    let hull = if live {
+        Some(
+            spawn_unit(
+                app.world_mut(),
+                PlayerId(0),
+                "dreadnought",
+                CellPos::new(14, 20),
+            )
+            .unwrap(),
+        )
+    } else {
+        put(&mut app, "soviet_battle_lab", 12, 10);
+        put(&mut app, "tesla_reactor", 10, 14);
+        put(&mut app, "soviet_naval_shipyard", 10, 18);
+        None
+    };
+    let defs = app.world().resource::<sim::Definitions>();
+    let kind = defs.unit_kind("dreadnought").unwrap();
+    let terms = defs.unit_combat(kind).unwrap();
+    let weapon = defs.weapon(terms.weapons(false)[0].unwrap()).unwrap();
+    assert!(weapon.min_range >= 8 * sim::SUBCELLS_PER_CELL as u32);
+    // Every source-water centre is too close even to the nearest target edge;
+    // the only other enemy building at38,38 is beyond source maximum range.
+    assert!(weapon.range < 27 * sim::SUBCELLS_PER_CELL as u32);
+    if !live {
+        let kinds = {
+            let world = app.world_mut();
+            world
+                .query::<(&sim::Owner, &sim::Building)>()
+                .iter(world)
+                .filter(|(o, _)| o.0 == PlayerId(0))
+                .map(|(_, b)| b.kind)
+                .collect::<Vec<_>>()
+        };
+        assert!(
+            sim::check_buildable(
+                app.world().resource::<sim::Definitions>(),
+                app.world()
+                    .resource::<sim::Players>()
+                    .get(PlayerId(0))
+                    .unwrap(),
+                true,
+                &kinds,
+                sim::ProductionItem::Unit(kind)
+            )
+            .is_ok()
+        );
+    }
+    (app, target, hull)
+}
+
+#[test]
+fn ra8_a_dreadnought_wholly_inside_source_minimum_cannot_pin_last_stand() {
+    let (mut app, target, hull) = dreadnought_minimum_pond(true);
+    let mut sold = false;
+    let mut fired = false;
+    for _ in 0..6000 {
+        for event in step(&mut app) {
+            sold |= matches!(
+                event,
+                sim::SimEvent::BuildingSold {
+                    player: PlayerId(0),
+                    ..
+                }
+            );
+            fired |= matches!(event,sim::SimEvent::WeaponFired {attacker,target:found,..} if Some(attacker) == hull && found == target);
+        }
+        if sold {
+            break;
+        }
+    }
+    assert!(
+        !fired,
+        "the tiny pond must genuinely provide no legal source-range shot"
+    );
+    assert!(
+        sold,
+        "an incapable minimum-range remnant must not permanently claim finishing capability"
+    );
+}
+
+#[test]
+fn ra8_a_dreadnought_wholly_inside_source_minimum_is_not_recruited_for_that_shore() {
+    let (mut app, _, _) = dreadnought_minimum_pond(false);
+    let kind = app
+        .world()
+        .resource::<sim::Definitions>()
+        .unit_kind("dreadnought")
+        .unwrap();
+    let mut queued = false;
+    let mut produced = false;
+    for _ in 0..4000 {
+        for event in step(&mut app) {
+            produced |= matches!(event,sim::SimEvent::ProductionComplete {player:PlayerId(0),item:sim::ProductionItem::Unit(found)} if found == kind);
+        }
+        queued |= app.world().resource::<CommandQueue>().iter().any(|issued| matches!(issued.command,Command::QueueProduction {item:sim::ProductionItem::Unit(found)} if found == kind));
+    }
+    assert!(
+        !queued && !produced,
+        "legally producible source hull has no reachable firing cell outside its minimum: queued{queued}/paid{produced}"
+    );
+}
+
+#[test]
+fn ra8_a_real_naval_edge_gap_shot_remains_an_eligible_paid_ai_shore_job() {
+    for human in [true, false] {
+        let mut app = scenario_mode(
+            "great_britain",
+            "medium",
+            if human { 0 } else { 20_000 },
+            0,
+            false,
+            ScenarioMode {
+                human,
+                army: Some(&["destroyer"]),
+                ..ScenarioMode::default()
+            },
+        );
+        let defs = app.world().resource::<sim::Definitions>();
+        let kind = defs.unit_kind("destroyer").unwrap();
+        let terms = defs.unit_combat(kind).unwrap();
+        let weapon = defs.weapon(terms.weapons(false)[0].unwrap()).unwrap();
+        let scale = sim::SUBCELLS_PER_CELL as u32;
+        assert_eq!(weapon.range % scale, 0);
+        let cells = i32::try_from(weapon.range / scale).unwrap();
+        assert!(cells >= 3);
+        for y in 18..21 {
+            for x in 10..15 {
+                assert!(app.world_mut().resource_mut::<Grid>().set_terrain(
+                    CellPos::new(x, y),
+                    Cell {
+                        passable: false,
+                        buildable: false,
+                        water: true,
+                        ore: 0
+                    }
+                ));
+            }
+        }
+        put(&mut app, "nuclear_reactor", 2, 2);
+        put(&mut app, "spy_satellite", 2, 8);
+        let target = sim::spawn_building(
+            app.world_mut(),
+            PlayerId(1),
+            "power_plant",
+            CellPos::new(14 + cells, 22),
+        )
+        .unwrap();
+        let hull = if human {
+            Some(
+                spawn_unit(
+                    app.world_mut(),
+                    PlayerId(0),
+                    "destroyer",
+                    CellPos::new(14, 20),
+                )
+                .unwrap(),
+            )
+        } else {
+            put(&mut app, "radar_tower", 12, 4);
+            put(&mut app, "naval_shipyard", 10, 18);
+            None
+        };
+        // The nearest water cell has centre delta(range,2): outside the old
+        // integer-cell circle, but inside the actual weapon's footprint-edge gap.
+        let mut paid = human;
+        let mut fired = false;
+        for _ in 0..4000 {
+            for event in step(&mut app) {
+                paid |= matches!(event, sim::SimEvent::ProductionComplete { player: PlayerId(0), item: sim::ProductionItem::Unit(found) } if found == kind);
+                fired |= matches!(event, sim::SimEvent::WeaponFired { attacker, target: found, .. } if found == target && hull.is_none_or(|h| attacker == h));
+            }
+        }
+        eprintln!("edge-gap human{human}: paid{paid}/fired{fired}");
+        assert!(
+            paid && fired,
+            "source-legal footprint-edge shot must remain a paid shore job: human{human}/paid{paid}/fired{fired}"
+        );
+    }
+}
+
+#[test]
+fn ra8_mixed_naval_recruitment_uses_each_hulls_legal_cells_in_the_same_sea() {
+    let mut app = scenario_mode(
+        "cuba",
+        "medium",
+        20_000,
+        0,
+        false,
+        ScenarioMode {
+            army: Some(&["typhoon", "dreadnought"]),
+            production_only: true,
+            opponent: Some("america"),
+            ..ScenarioMode::default()
+        },
+    );
+    for y in 18..23 {
+        for x in 10..16 {
+            assert!(app.world_mut().resource_mut::<Grid>().set_terrain(
+                CellPos::new(x, y),
+                Cell {
+                    passable: false,
+                    buildable: false,
+                    water: true,
+                    ore: 0
+                }
+            ));
+        }
+    }
+    put(&mut app, "nuclear_reactor", 2, 2);
+    put(&mut app, "spy_satellite", 2, 8);
+    put(&mut app, "soviet_refinery", 2, 14);
+    put(&mut app, "soviet_barracks", 6, 14);
+    put(&mut app, "soviet_war_factory", 18, 4);
+    put(&mut app, "radar_tower", 12, 4);
+    put(&mut app, "soviet_battle_lab", 12, 10);
+    put(&mut app, "tesla_reactor", 10, 14);
+    put(&mut app, "soviet_naval_shipyard", 10, 18);
+    let target = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "power_plant",
+        CellPos::new(20, 22),
+    )
+    .unwrap();
+    spawn_unit(
+        app.world_mut(),
+        PlayerId(1),
+        "destroyer",
+        CellPos::new(14, 22),
+    )
+    .unwrap();
+    let kind = app
+        .world()
+        .resource::<sim::Definitions>()
+        .unit_kind("dreadnought")
+        .unwrap();
+    let mut queued = false;
+    let rescan = load_ai(
+        data().join("ai.ron"),
+        app.world().resource::<sim::Definitions>(),
+    )
+    .unwrap()
+    .policy
+    .naval_rescan;
+    let cadence = app
+        .world()
+        .resource::<sim::AiPlayers>()
+        .controller(PlayerId(0))
+        .unwrap()
+        .difficulty()
+        .think_interval;
+    // queue_units reads the previous scan's goal. Include the entire next due
+    // turn after strategy installs its first600-tick scan (AI620/SimTick621).
+    for _ in 0..u64::from(rescan) + u64::from(cadence) + 1 {
+        step(&mut app);
+        queued |= app.world().resource::<CommandQueue>().iter().any(|issued| matches!(issued.command, Command::QueueProduction { item: sim::ProductionItem::Unit(found) } if found == kind));
+    }
+    assert!(
+        app.world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .naval_target()
+            .is_some(),
+        "the actual rescan must qualify the shared sea before testing per-kind admission"
+    );
+    eprintln!(
+        "mixed naval first funded decision: goal{:?}/Dreadqueued{queued}",
+        app.world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .naval_target()
+    );
+    assert!(
+        queued,
+        "a shared close submarine goal cannot exclude a source-legal Dreadnought firing cell in the same reachable sea"
+    );
+    let mut paid = false;
+    let mut fired = false;
+    for _ in 0..5000 {
+        for event in step(&mut app) {
+            paid |= matches!(event, sim::SimEvent::ProductionComplete { player: PlayerId(0), item: sim::ProductionItem::Unit(found) } if found == kind);
+            if let sim::SimEvent::WeaponFired {
+                attacker,
+                target: found,
+                ..
+            } = event
+            {
+                let world = app.world_mut();
+                fired |= found == target
+                    && world
+                        .query::<(&sim::SimId, &sim::Unit)>()
+                        .iter(world)
+                        .any(|(id, unit)| *id == attacker && unit.kind == kind);
+            }
+        }
+        if paid && fired {
+            break;
+        }
+    }
+    assert!(
+        paid && fired,
+        "admitted hull must actually be paid and fire at its legal shore target"
+    );
+}
+
+fn naval_unit_boundary(
+    human: bool,
+    dread: bool,
+    target: CellPos,
+) -> (App, sim::SimId, sim::UnitKind, Option<sim::SimId>) {
+    let mut app = scenario_mode(
+        if dread { "cuba" } else { "great_britain" },
+        "medium",
+        if human { 0 } else { 20_000 },
+        0,
+        false,
+        ScenarioMode {
+            human,
+            opponent: Some("america"),
+            production_only: dread,
+            army: Some(if dread {
+                &["dreadnought"]
+            } else {
+                &["destroyer"]
+            }),
+            ..ScenarioMode::default()
+        },
+    );
+    for y in 18..21 {
+        for x in 10..15 {
+            assert!(app.world_mut().resource_mut::<Grid>().set_terrain(
+                CellPos::new(x, y),
+                Cell {
+                    passable: false,
+                    buildable: false,
+                    water: true,
+                    ore: 0
+                }
+            ));
+        }
+    }
+    {
+        assert!(app.world_mut().resource_mut::<Grid>().set_terrain(
+            target,
+            Cell {
+                passable: false,
+                buildable: false,
+                water: true,
+                ore: 0
+            }
+        ));
+    }
+    put(&mut app, "nuclear_reactor", 2, 2);
+    put(&mut app, "spy_satellite", 2, 8);
+    put(&mut app, "radar_tower", 12, 4);
+    if dread {
+        put(&mut app, "soviet_refinery", 2, 14);
+        put(&mut app, "soviet_barracks", 6, 14);
+        put(&mut app, "soviet_war_factory", 18, 4);
+        put(&mut app, "soviet_battle_lab", 12, 10);
+        put(&mut app, "tesla_reactor", 10, 14);
+        put(&mut app, "soviet_naval_shipyard", 10, 18);
+    } else if !human {
+        put(&mut app, "naval_shipyard", 10, 18);
+    }
+    let id = if dread { "dreadnought" } else { "destroyer" };
+    let kind = app
+        .world()
+        .resource::<sim::Definitions>()
+        .unit_kind(id)
+        .unwrap();
+    let own =
+        human.then(|| spawn_unit(app.world_mut(), PlayerId(0), id, CellPos::new(14, 20)).unwrap());
+    let enemy = spawn_unit(app.world_mut(), PlayerId(1), "destroyer", target).unwrap();
+    (app, enemy, kind, own)
+}
+
+fn naval_unit_range(dread: bool) -> i32 {
+    let defs = load_ruleset(data()).unwrap();
+    let terms = defs
+        .unit_combat(
+            defs.unit_kind(if dread { "dreadnought" } else { "destroyer" })
+                .unwrap(),
+        )
+        .unwrap();
+    let enemy = defs
+        .unit_combat(defs.unit_kind("destroyer").unwrap())
+        .unwrap();
+    let (weapon, percent) = sim::weapon_against(
+        &defs,
+        &terms,
+        terms.weapons(false),
+        &sim::TargetTraits {
+            armour: enemy.armour,
+            on_water: true,
+            underwater: enemy.underwater,
+            organic: enemy.organic,
+            ..sim::TargetTraits::default()
+        },
+    )
+    .unwrap();
+    assert!(percent > 1);
+    let range = defs.weapon(weapon).unwrap().range;
+    eprintln!("actual naval weapon {weapon:?} / range {range}");
+    assert_eq!(range % sim::SUBCELLS_PER_CELL as u32, 0);
+    i32::try_from(range / sim::SUBCELLS_PER_CELL as u32).unwrap()
+}
+
+#[test]
+fn ra8_naval_unit_points_outside_source_maximum_are_not_footprint_edge_jobs() {
+    for human in [true, false] {
+        let (mut app, target, kind, own) =
+            naval_unit_boundary(human, false, CellPos::new(14 + naval_unit_range(false), 22));
+        let mut queued = false;
+        let mut paid = false;
+        let mut fired = false;
+        for _ in 0..if human { 40 } else { 4000 } {
+            for e in step(&mut app) {
+                paid |= matches!(e,sim::SimEvent::ProductionComplete {player:PlayerId(0),item:sim::ProductionItem::Unit(k)} if k==kind);
+                if let sim::SimEvent::WeaponFired {
+                    attacker,
+                    target: found,
+                    ..
+                } = e
+                    && found == target
+                    && own.is_none_or(|id| id == attacker)
+                {
+                    let world = app.world_mut();
+                    let positions: Vec<_> = world
+                        .query::<(&sim::SimId, &sim::Mobile)>()
+                        .iter(world)
+                        .filter(|(id, _)| **id == target || **id == attacker)
+                        .map(|(id, m)| (*id, m.position(world.resource::<Grid>(), *id)))
+                        .collect();
+                    eprintln!(
+                        "actual unit-boundary fire {attacker:?}->{target:?} positions{positions:?}"
+                    );
+                    fired = true;
+                }
+            }
+            queued|=app.world().resource::<CommandQueue>().iter().any(|c|matches!(c.command,Command::QueueProduction {item:sim::ProductionItem::Unit(k)} if k==kind));
+        }
+        eprintln!("unit outside maximum human{human}: queued{queued}/paid{paid}/fired{fired}");
+        assert!(
+            !fired,
+            "the actual unit point must genuinely be outside source range"
+        );
+        assert!(
+            !queued && !paid,
+            "a unit point cannot inherit a building's footprint-edge range"
+        );
+    }
+}
+
+#[test]
+fn ra8_naval_unit_points_at_source_maximum_support_real_paid_fire() {
+    for human in [true, false] {
+        let (mut app, target, kind, own) =
+            naval_unit_boundary(human, false, CellPos::new(14 + naval_unit_range(false), 20));
+        let mut paid = human;
+        let mut fired = false;
+        for _ in 0..4000 {
+            for e in step(&mut app) {
+                paid |= matches!(e,sim::SimEvent::ProductionComplete {player:PlayerId(0),item:sim::ProductionItem::Unit(k)} if k==kind);
+                if let sim::SimEvent::WeaponFired {
+                    attacker,
+                    target: found,
+                    ..
+                } = e
+                    && found == target
+                    && own.is_none_or(|id| id == attacker)
+                {
+                    let world = app.world_mut();
+                    let positions: Vec<_> = world
+                        .query::<(&sim::SimId, &sim::Mobile)>()
+                        .iter(world)
+                        .filter(|(id, _)| **id == target || **id == attacker)
+                        .map(|(id, m)| (*id, m.position(world.resource::<Grid>(), *id)))
+                        .collect();
+                    eprintln!(
+                        "actual unit-boundary fire {attacker:?}->{target:?} positions{positions:?}"
+                    );
+                    fired = true;
+                }
+            }
+            if paid && fired {
+                break;
+            }
+        }
+        eprintln!("unit maximum human{human}: paid{paid}/fired{fired}");
+        assert!(
+            paid && fired,
+            "source unit-point boundary remains a real paid firing job"
+        );
+    }
+}
+
+#[test]
+fn ra8_naval_unit_movement_positions_and_observed_destinations_drive_jobs() {
+    {
+        let dread = true;
+        let start = CellPos::new(35, 22);
+        let (mut app, target, kind, _) = naval_unit_boundary(false, dread, start);
+        assert!(app.world_mut().resource_mut::<Grid>().set_terrain(
+            CellPos::new(start.x - 1, start.y),
+            Cell {
+                passable: false,
+                buildable: false,
+                water: true,
+                ore: 0
+            }
+        ));
+        let radius = app
+            .world()
+            .resource::<sim::Definitions>()
+            .metadata(sim::ProductionItem::Building(
+                app.world()
+                    .resource::<sim::Definitions>()
+                    .building_kind("gap_generator")
+                    .unwrap(),
+            ))
+            .unwrap()
+            .radius;
+        let gap = CellPos::new(start.x + i32::try_from(radius).unwrap(), 22);
+        sim::spawn_building(
+            app.world_mut(),
+            PlayerId(1),
+            "power_plant",
+            CellPos::new(gap.x - 2, 18),
+        )
+        .unwrap();
+        sim::spawn_building(app.world_mut(), PlayerId(1), "gap_generator", gap).unwrap();
+        for _ in 0..590 {
+            step(&mut app);
+        }
+        // The enemy's ordinary move exposes its destination while its old cell
+        // remains under a real powered Gap. No injected vision or hidden state.
+        app.world_mut()
+            .resource_mut::<CommandQueue>()
+            .push(sim::IssuedCommand {
+                player: PlayerId(1),
+                command: Command::Move {
+                    units: vec![target],
+                    target: CellPos::new(start.x - 1, start.y),
+                },
+            });
+        while app.world().resource::<SimTick>().0 < 601 {
+            step(&mut app);
+        }
+        let entity = unit_entity(&mut app, target);
+        let mobile = app.world().get::<sim::Mobile>(entity).unwrap();
+        assert_eq!(mobile.cell, start);
+        assert!(mobile.step.is_some());
+        let vision = app
+            .world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .vision();
+        assert!(!vision.is_visible(start));
+        assert!(
+            vision.sees_unit(mobile),
+            "the moving target must actually be observed through its destination"
+        );
+        assert!(
+            app.world()
+                .resource::<sim::AiPlayers>()
+                .controller(PlayerId(0))
+                .unwrap()
+                .naval_target()
+                .is_some(),
+            "an observed unit uses actual subcell position and full source weapon range"
+        );
+        let mut paid = false;
+        let mut fired = false;
+        for _ in 0..5000 {
+            for e in step(&mut app) {
+                paid |= matches!(e,sim::SimEvent::ProductionComplete {player:PlayerId(0),item:sim::ProductionItem::Unit(k)} if k==kind);
+                if let sim::SimEvent::WeaponFired {
+                    attacker,
+                    target: found,
+                    ..
+                } = e
+                {
+                    let world = app.world_mut();
+                    fired |= found == target
+                        && world
+                            .query::<(&sim::SimId, &sim::Unit)>()
+                            .iter(world)
+                            .any(|(id, u)| *id == attacker && u.kind == kind);
+                }
+            }
+            if paid && fired {
+                break;
+            }
+        }
+        assert!(
+            paid && fired,
+            "the actual observed moving-unit job must pay and fire"
         );
     }
 }
@@ -1014,6 +1998,184 @@ fn ra8_artillery_uses_the_surface_tank_line_when_aircraft_share_its_wave() {
         Some(CellPos::new(11, 8)),
         "V3 must stand behind the Rhino, not the nearer Kirov"
     );
+}
+
+#[test]
+fn ra8_a_remote_replacement_tank_does_not_pull_advancing_artillery_back_home() {
+    // The healthy-order twin runs first: its real forward order must remain intact.
+    for healthy in [true, false] {
+        let mut app = scenario("germany", "medium", 0, 0, false);
+        quiet(&mut app);
+        let tank =
+            spawn_unit(app.world_mut(), PlayerId(0), "grizzly", CellPos::new(8, 18)).unwrap();
+        let artillery = spawn_unit(
+            app.world_mut(),
+            PlayerId(0),
+            "prism_tank",
+            CellPos::new(8, 20),
+        )
+        .unwrap();
+        // A genuinely observed armed unit retains the normal combined-arms branch,
+        // without putting an unrelated local combat threat in this firing lane.
+        spawn_unit(
+            app.world_mut(),
+            PlayerId(1),
+            "rocketeer",
+            CellPos::new(45, 25),
+        )
+        .unwrap();
+        spawn_unit(
+            app.world_mut(),
+            PlayerId(0),
+            "engineer",
+            CellPos::new(33, 12),
+        )
+        .unwrap();
+        spawn_unit(app.world_mut(), PlayerId(0), "spy", CellPos::new(44, 24)).unwrap();
+        let target = sim::spawn_building(
+            app.world_mut(),
+            PlayerId(1),
+            "barracks",
+            CellPos::new(36, 14),
+        )
+        .unwrap();
+        for _ in 0..10_000 {
+            step(&mut app);
+            if app
+                .world()
+                .resource::<sim::AiPlayers>()
+                .controller(PlayerId(0))
+                .unwrap()
+                .wave()
+                .contains(&artillery)
+            {
+                break;
+            }
+        }
+        let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+        for id in [tank, artillery] {
+            assert!(
+                controllers
+                    .controller(PlayerId(0))
+                    .unwrap()
+                    .wave()
+                    .contains(&id)
+            );
+        }
+        // Preserve actual recruitment/memory, pause only decisions while normal
+        // commands arrange an advanced hull and the remote rear replacement.
+        issue(
+            &mut app,
+            Command::Stop {
+                units: vec![tank, artillery],
+            },
+        );
+        for (id, target) in [
+            (tank, CellPos::new(12, 14)),
+            (artillery, CellPos::new(24, 14)),
+        ] {
+            issue(
+                &mut app,
+                Command::Move {
+                    units: vec![id],
+                    target,
+                },
+            );
+        }
+        for _ in 0..2000 {
+            step(&mut app);
+            if [tank, artillery].iter().all(|id| {
+                let e = unit_entity(&mut app, *id);
+                app.world().get::<sim::Orders>(e).unwrap().current.is_none()
+            }) {
+                break;
+            }
+        }
+        for (id, target) in [
+            (tank, CellPos::new(12, 14)),
+            (artillery, CellPos::new(24, 14)),
+        ] {
+            let e = unit_entity(&mut app, id);
+            assert_eq!(app.world().get::<sim::Mobile>(e).unwrap().cell, target);
+        }
+        if healthy {
+            issue(
+                &mut app,
+                Command::AttackMove {
+                    units: vec![artillery],
+                    target: CellPos::new(33, 14),
+                },
+            );
+            step(&mut app);
+        }
+        while !app.world().resource::<SimTick>().0.is_multiple_of(20) {
+            step(&mut app);
+        }
+        for cell in [CellPos::new(36, 14), CellPos::new(45, 25)] {
+            assert!(
+                app.world()
+                    .resource::<sim::Players>()
+                    .get(PlayerId(0))
+                    .unwrap()
+                    .vision()
+                    .is_visible(cell),
+                "real local observers must reveal target and armed-unit branch"
+            );
+        }
+        app.world_mut().insert_resource(controllers);
+        step(&mut app);
+        let queued: Vec<_> = app
+            .world()
+            .resource::<CommandQueue>()
+            .iter()
+            .filter_map(|issued| match &issued.command {
+                Command::AttackMove { units, target } if units.contains(&artillery) => {
+                    Some(*target)
+                }
+                _ => None,
+            })
+            .collect();
+        if healthy {
+            assert!(
+                queued.is_empty(),
+                "a healthy forward approach must not be refreshed: {queued:?}"
+            );
+            let e = unit_entity(&mut app, artillery);
+            assert_eq!(
+                app.world()
+                    .get::<sim::Orders>(e)
+                    .unwrap()
+                    .current
+                    .as_ref()
+                    .unwrap()
+                    .destination,
+                CellPos::new(33, 14)
+            );
+        }
+        let mut shots = 0;
+        let mut destroyed = false;
+        for _ in 0..1000 {
+            for event in step(&mut app) {
+                shots += usize::from(
+                    matches!(event, sim::SimEvent::WeaponFired { attacker, target: t, .. } if attacker == artillery && t == target),
+                );
+                destroyed |= matches!(event, sim::SimEvent::BuildingDestroyed { building, .. } if building == target);
+            }
+            if destroyed {
+                break;
+            }
+        }
+        let e = unit_entity(&mut app, tank);
+        let front = app.world().get::<sim::Mobile>(e).unwrap().cell;
+        eprintln!(
+            "remote replacement healthy{healthy}: queued{queued:?}, artillery shots{shots}, destroyed{destroyed}, moving front{front:?}"
+        );
+        assert!(front.x > 12, "the ordinary front must genuinely advance");
+        assert!(
+            shots >= 2 && destroyed,
+            "advanced artillery must retain a real offensive contribution instead of returning behind a remote newcomer"
+        );
+    }
 }
 
 #[test]
@@ -3336,6 +4498,15 @@ fn ra8_paid_naval_detector_escorts_the_fleet_toward_a_known_shore_target() {
 
 #[test]
 fn ra8_unseen_enemy_water_building_cannot_change_naval_planning() {
+    unseen_enemy_water_building(CellPos::new(16, 23));
+}
+
+#[test]
+fn ra8_unseen_water_obstacle_before_the_edge_range_endpoint_cannot_change_naval_planning() {
+    unseen_enemy_water_building(CellPos::new(16, 21));
+}
+
+fn unseen_enemy_water_building(cell: CellPos) {
     let make = || {
         let mut app = scenario("great_britain", "brutal", 0, 0, false);
         let mut rules = app.world().resource::<sim::MatchState>().rules();
@@ -3357,15 +4528,38 @@ fn ra8_unseen_enemy_water_building_cannot_change_naval_planning() {
             }
         }
         put(&mut app, "naval_shipyard", 16, 8);
-        spawn_unit(
+        let carrier = spawn_unit(
             app.world_mut(),
             PlayerId(0),
             "aircraft_carrier",
             CellPos::new(16, 11),
         )
         .unwrap();
-        let scout = spawn_unit(app.world_mut(), PlayerId(0), "gi", CellPos::new(38, 34)).unwrap();
+        // Hold through ordinary public orders until the comparison decision;
+        // otherwise the live hull can genuinely reveal the interposed cell.
+        issue(
+            &mut app,
+            Command::Guard {
+                units: vec![carrier],
+            },
+        );
+        // A real local observer keeps the distant firing target available while
+        // the interposed water cell stays unseen. The separate Gap regression
+        // covers losing that observation through ordinary movement.
+        spawn_unit(
+            app.world_mut(),
+            PlayerId(0),
+            "engineer",
+            CellPos::new(38, 34),
+        )
+        .unwrap();
         for _ in 0..21 {
+            issue(
+                &mut app,
+                Command::Guard {
+                    units: vec![carrier],
+                },
+            );
             step(&mut app);
         }
         assert!(
@@ -3376,17 +4570,33 @@ fn ra8_unseen_enemy_water_building_cannot_change_naval_planning() {
                 .known_buildings()
                 .is_empty()
         );
-        let e = unit_entity(&mut app, scout);
-        app.world_mut()
-            .get_mut::<sim::Health>(e)
-            .unwrap()
-            .hit_points = 0;
+        assert!(
+            app.world()
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap()
+                .vision()
+                .is_visible(CellPos::new(38, 38))
+        );
+        issue(
+            &mut app,
+            Command::Guard {
+                units: vec![carrier],
+            },
+        );
         step(&mut app);
-        app
+        (app, carrier)
     };
-    let mut actual = make();
-    let mut control = make();
-    let cell = CellPos::new(16, 23);
+    let (mut actual, actual_carrier) = make();
+    let (mut control, control_carrier) = make();
+    assert_eq!(actual_carrier, control_carrier);
+    let definitions = load_ai(
+        data().join("ai.ron"),
+        actual.world().resource::<sim::Definitions>(),
+    )
+    .unwrap();
+    let rescan = definitions.policy.naval_rescan;
+    assert_eq!(rescan + 1, 601);
     assert!(
         !actual
             .world()
@@ -3398,8 +4608,96 @@ fn ra8_unseen_enemy_water_building_cannot_change_naval_planning() {
     );
     sim::spawn_building(actual.world_mut(), PlayerId(1), "naval_shipyard", cell).unwrap();
     while actual.world().resource::<SimTick>().0 < 601 {
+        if actual.world().resource::<SimTick>().0 < u64::from(rescan - 1) {
+            for (app, carrier) in [
+                (&mut actual, actual_carrier),
+                (&mut control, control_carrier),
+            ] {
+                issue(
+                    app,
+                    Command::Guard {
+                        units: vec![carrier],
+                    },
+                );
+            }
+        } else if actual.world().resource::<SimTick>().0 == u64::from(rescan - 1) {
+            for (app, carrier) in [
+                (&mut actual, actual_carrier),
+                (&mut control, control_carrier),
+            ] {
+                issue(
+                    app,
+                    Command::Move {
+                        units: vec![carrier],
+                        target: CellPos::new(16, 11),
+                    },
+                );
+            }
+        }
+        if actual.world().resource::<SimTick>().0 == u64::from(rescan) {
+            for (app, carrier) in [
+                (&mut actual, actual_carrier),
+                (&mut control, control_carrier),
+            ] {
+                let entity = unit_entity(app, carrier);
+                assert_eq!(
+                    app.world().get::<sim::Mobile>(entity).unwrap().cell,
+                    CellPos::new(16, 11)
+                );
+                assert!(
+                    app.world()
+                        .get::<sim::Orders>(entity)
+                        .unwrap()
+                        .current
+                        .is_none(),
+                    "ordinary Move must release Guard before the live-hull decision"
+                );
+                assert!(
+                    app.world()
+                        .get::<sim::Weapon>(entity)
+                        .unwrap()
+                        .order
+                        .is_none()
+                );
+            }
+        }
         step(&mut actual);
         step(&mut control);
+        for app in [&actual, &control] {
+            let vision = app
+                .world()
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap()
+                .vision();
+            assert!(
+                vision.is_visible(CellPos::new(38, 38)),
+                "the observer must keep the intended yard visible through comparison"
+            );
+            assert!(
+                !vision.is_visible(cell),
+                "the interposed water cell must remain unseen through comparison"
+            );
+        }
+    }
+    for (app, carrier) in [(&actual, actual_carrier), (&control, control_carrier)] {
+        assert!(app.world().resource::<CommandQueue>().iter().any(|issued| matches!(&issued.command, Command::AttackMove { units, target } if units.contains(&carrier) && *target != CellPos::new(16, 11))), "the released live hull must receive a fresh qualified mission at the comparison decision");
+    }
+    for app in [&actual, &control] {
+        let vision = app
+            .world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .vision();
+        assert!(
+            vision.is_visible(CellPos::new(38, 38)),
+            "the observer must really reveal the intended yard"
+        );
+        assert!(
+            !vision.is_visible(cell),
+            "the interposed water building must remain unseen in both twins"
+        );
     }
     assert!(
         actual

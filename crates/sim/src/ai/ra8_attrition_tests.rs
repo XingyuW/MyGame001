@@ -8,13 +8,21 @@ pub(super) fn app() -> App {
 }
 
 pub(super) fn app_with_power(power: bool) -> App {
+    app_country(power, "germany")
+}
+
+pub(super) fn app_with_country(country: &str) -> App {
+    app_country(true, country)
+}
+
+fn app_country(power: bool, country: &str) -> App {
     let data = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets/data");
     let definitions = crate::load_ruleset(&data).unwrap();
     let mut skirmish = crate::load_skirmish(data.join("skirmish.ron"), &definitions).unwrap();
     skirmish.maps[0].starts = vec![CellPos::new(8, 8), CellPos::new(38, 38)];
     skirmish.starting_credits = 0;
     let ai = crate::load_ai(data.join("ai.ron"), &definitions).unwrap();
-    let setups = ["germany", "russia"].map(|country| crate::PlayerSetup {
+    let setups = [country, "russia"].map(|country| crate::PlayerSetup {
         player: PlayerId(u8::from(country == "russia")),
         faction: skirmish
             .factions
@@ -676,6 +684,175 @@ fn ra8_real_support_launch_and_source_recharge_do_not_complete_an_army_attempt()
     assert!(
         launched && restarted,
         "normal real launch/recharge must precede the progress assertions"
+    );
+}
+
+#[test]
+fn ra8_failed_real_sorties_do_not_blacklist_a_naturally_charged_strategic_strike() {
+    let mut app = app();
+    // Declared isolated enemy base: the real plant and captured income below.
+    let reserve = {
+        let world = app.world_mut();
+        world
+            .query::<(Entity, &Owner, &Building)>()
+            .iter(world)
+            .find(|(_, owner, _)| owner.0 == PlayerId(1))
+            .unwrap()
+            .0
+    };
+    app.world_mut()
+        .get_mut::<crate::Health>(reserve)
+        .unwrap()
+        .hit_points = 0;
+    building(&mut app, 0, "airforce_command", CellPos::new(12, 4));
+    let plane = unit(&mut app, 0, "harrier", CellPos::new(12, 8));
+    let target = building(&mut app, 1, "power_plant", CellPos::new(40, 8));
+    let oil = crate::spawn_building(
+        app.world_mut(),
+        crate::NEUTRAL,
+        "oil_derrick",
+        CellPos::new(44, 28),
+    )
+    .unwrap();
+    let engineer = unit(&mut app, 1, "engineer", CellPos::new(43, 28));
+    unit(&mut app, 1, "gi", CellPos::new(43, 40));
+    step(&mut app);
+    issue(
+        &mut app,
+        1,
+        Command::Interact {
+            unit: engineer,
+            target: oil,
+        },
+    );
+    let maximum = app
+        .world()
+        .resource::<Definitions>()
+        .building_combat(
+            app.world()
+                .resource::<Definitions>()
+                .building_kind("power_plant")
+                .unwrap(),
+        )
+        .unwrap()
+        .hit_points;
+    let mut paid_heals = 0;
+    let mut shots = 0;
+    let mut exhausted = false;
+    for _ in 0..18_000 {
+        let target_entity = entity(&mut app, target).unwrap();
+        let before = app
+            .world()
+            .get::<crate::Health>(target_entity)
+            .unwrap()
+            .hit_points;
+        let credits = app
+            .world()
+            .resource::<Players>()
+            .get(PlayerId(1))
+            .unwrap()
+            .credits();
+        for event in step(&mut app) {
+            shots += usize::from(
+                matches!(event, crate::SimEvent::WeaponFired { attacker, target: found, .. } if attacker == plane && found == target),
+            );
+        }
+        let e = entity(&mut app, target).unwrap();
+        let hp = app.world().get::<crate::Health>(e).unwrap().hit_points;
+        let state = app.world().resource::<Players>().get(PlayerId(1)).unwrap();
+        paid_heals += usize::from(hp > before && state.credits() < credits);
+        let repair =
+            hp < maximum && hp > 0 && state.credits() > 0 && !state.repairing().contains(&target);
+        if repair {
+            issue(&mut app, 1, Command::RepairBuilding { building: target });
+        }
+        exhausted = app
+            .world()
+            .resource::<AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .building_jobs
+            .get(&target)
+            .is_some_and(|job| job.failures == MAX_TARGET_FAILURES && !job.approaching);
+        if exhausted {
+            break;
+        }
+    }
+    assert!(
+        exhausted && shots > 2 && paid_heals > 0,
+        "real sorties/paid repair did not exhaust a building job: shots{shots}, heals{paid_heals}"
+    );
+    let old = progress(&app, target).clone();
+    assert!(old.actors.is_empty() && old.founders.is_empty());
+    // The source is added only after real failed attempts. No charge, target HP,
+    // ammo, failure history or readiness is injected; normal recharge is measured.
+    let source = building(&mut app, 0, "weather_control", CellPos::new(2, 20));
+    step(&mut app);
+    let definitions = app.world().resource::<Definitions>();
+    let cooldown = definitions
+        .metadata(ProductionItem::Building(
+            definitions.building_kind("weather_control").unwrap(),
+        ))
+        .unwrap()
+        .cooldown;
+    assert_eq!(
+        app.world()
+            .resource::<crate::SpecialState>()
+            .charge
+            .get(&source),
+        Some(&0)
+    );
+    let mut saw_ready = false;
+    let mut launched = false;
+    let mut damaged = false;
+    for _ in 0..cooldown.saturating_add(2400) {
+        let special = app.world().resource::<crate::SpecialState>();
+        if special
+            .charge
+            .get(&source)
+            .is_some_and(|charge| *charge >= cooldown)
+        {
+            saw_ready = true;
+            assert!(
+                !app.world()
+                    .resource::<Players>()
+                    .get(PlayerId(0))
+                    .unwrap()
+                    .low_power()
+            );
+            assert!(
+                !special.disabled.contains_key(&source) && !special.erasures.contains_key(&source)
+            );
+        }
+        if !launched {
+            assert_eq!(
+                progress(&app, target).failures,
+                old.failures,
+                "ordinary recharge must not clear the ground job"
+            );
+            assert!(!app.world().resource::<CommandQueue>().iter().any(|issued| matches!(&issued.command, Command::Attack { target: found, .. } if *found == target)), "failed ground job was silently reinstalled");
+        }
+        let e = entity(&mut app, target);
+        let before = e
+            .and_then(|e| app.world().get::<crate::Health>(e))
+            .map_or(0, |hp| hp.hit_points);
+        for event in step(&mut app) {
+            launched |= matches!(event, crate::SimEvent::StrategicActivated { building, target: found, role: crate::Role::Storm, .. } if building == source && found == CellPos::new(40, 8));
+        }
+        let after = entity(&mut app, target)
+            .and_then(|e| app.world().get::<crate::Health>(e))
+            .map_or(0, |hp| hp.hit_points);
+        damaged |= launched && after < before;
+        if launched && damaged {
+            break;
+        }
+    }
+    eprintln!(
+        "failed-sortie strategic: shots{shots}, paid_heals{paid_heals}, old{old:?}, naturally_ready{saw_ready}, launched{launched}, damage{damaged}"
+    );
+    assert!(
+        saw_ready && launched && damaged,
+        "ground-cohort failure suppressed an independently legal naturally charged strategic strike"
     );
 }
 

@@ -14,6 +14,196 @@ struct EconomyTrace {
     buildings: BTreeMap<SimId, String>,
     units: BTreeMap<SimId, String>,
     last_air_hold: BTreeMap<PlayerId, (Option<SimId>, u64)>,
+    v3_owners: BTreeMap<SimId, PlayerId>,
+    naval_samples: u32,
+    naval_decision_goal: Option<sim::CellPos>,
+    naval_decision_tick: u64,
+}
+
+fn trace_naval_goal_before_ai(world: &mut bevy::ecs::world::World) {
+    let goal = world
+        .resource::<sim::AiPlayers>()
+        .controller(PlayerId(0))
+        .unwrap()
+        .naval_target();
+    let tick = world.resource::<sim::SimTick>().0;
+    let mut trace = world.resource_mut::<EconomyTrace>();
+    trace.naval_decision_goal = goal;
+    trace.naval_decision_tick = tick;
+}
+
+// Bounded diagnostic at actual funded decision boundaries; no simulation writes.
+fn trace_naval_admission(world: &mut bevy::ecs::world::World) {
+    let at = world.resource::<sim::SimTick>().0;
+    if !at.is_multiple_of(600) || world.resource::<EconomyTrace>().naval_samples >= 8 {
+        return;
+    }
+    let definitions = world.resource::<sim::Definitions>().clone();
+    let kind = definitions.unit_kind("dreadnought").unwrap();
+    let item = sim::ProductionItem::Unit(kind);
+    let terms = definitions.production(item).unwrap();
+    let own: Vec<_> = world
+        .query::<(&sim::Owner, &sim::Building, &sim::Health)>()
+        .iter(world)
+        .filter(|(o, _, h)| o.0 == PlayerId(0) && h.hit_points > 0)
+        .map(|(_, b, _)| (b.kind, b.footprint))
+        .collect();
+    let ships: Vec<_> = world
+        .query::<(&SimId, &sim::Owner, &sim::Unit, &sim::Mobile, &sim::Health)>()
+        .iter(world)
+        .filter(|(_, o, u, _, h)| {
+            o.0 != PlayerId(0)
+                && h.hit_points > 0
+                && definitions.domain(u.kind) == sim::Domain::Naval
+        })
+        .map(|(id, _, u, m, _)| (*id, u.kind, m.cell))
+        .collect();
+    let state = world.resource::<sim::Players>().get(PlayerId(0)).unwrap();
+    let pending = state
+        .queues()
+        .flat_map(|(_, q)| q)
+        .map(|q| {
+            definitions
+                .production(q.item)
+                .unwrap()
+                .cost
+                .saturating_sub(q.charged)
+        })
+        .fold(0_i64, i64::saturating_add);
+    if state.credits() < pending.saturating_add(terms.cost)
+        || state.queue(terms.producer).len() >= 2
+        || sim::check_buildable(
+            &definitions,
+            state,
+            world.resource::<MatchState>().rules().superweapons,
+            &own.iter().map(|(k, _)| *k).collect::<Vec<_>>(),
+            item,
+        )
+        .is_err()
+    {
+        return;
+    }
+    let controller = world
+        .resource::<sim::AiPlayers>()
+        .controller(PlayerId(0))
+        .unwrap();
+    assert_eq!(world.resource::<EconomyTrace>().naval_decision_tick, at);
+    let Some(goal) = world.resource::<EconomyTrace>().naval_decision_goal else {
+        return;
+    };
+    let grid = world.resource::<sim::Grid>();
+    let vision = state.vision();
+    let mut targets = Vec::new();
+    for (id, b) in controller.known_buildings() {
+        let t = definitions.building_combat(b.kind).unwrap();
+        targets.push((
+            *id,
+            b.footprint,
+            sim::TargetTraits {
+                armour: t.armour,
+                wall: t.wall,
+                building: true,
+                immune_psionics: true,
+                on_water: grid.cell(b.footprint.origin).is_some_and(|c| c.water),
+                ..Default::default()
+            },
+        ));
+    }
+    for (id, kind, cell) in ships {
+        if !vision.is_visible(cell)
+            || world
+                .resource::<sim::SpecialState>()
+                .hidden
+                .contains(&(PlayerId(0), id))
+        {
+            continue;
+        }
+        let t = definitions.unit_combat(kind).unwrap();
+        targets.push((
+            id,
+            sim::Footprint {
+                origin: cell,
+                width: 1,
+                height: 1,
+            },
+            sim::TargetTraits {
+                armour: t.armour,
+                on_water: true,
+                underwater: t.underwater,
+                organic: t.organic,
+                ..Default::default()
+            },
+        ));
+    }
+    let t = definitions.unit_combat(kind).unwrap();
+    let qualifies = |f: sim::Footprint, target: &sim::TargetTraits, cell: sim::CellPos| {
+        let Some((w, percent)) = sim::weapon_against(&definitions, &t, t.weapons(false), target)
+        else {
+            return false;
+        };
+        let w = definitions.weapon(w).unwrap();
+        let point = sim::SubPos::centre_of(cell);
+        let scale = i64::from(sim::SUBCELLS_PER_CELL);
+        let (x, y) = (i64::from(point.x), i64::from(point.y));
+        let x0 = i64::from(f.origin.x) * scale;
+        let y0 = i64::from(f.origin.y) * scale;
+        let dx = x - x.clamp(x0, x0 + i64::from(f.width) * scale);
+        let dy = y - y.clamp(y0, y0 + i64::from(f.height) * scale);
+        let cx = i64::from(cell.x);
+        let cy = i64::from(cell.y);
+        let sx = cx
+            - cx.clamp(
+                i64::from(f.origin.x),
+                i64::from(f.origin.x) + i64::from(f.width) - 1,
+            );
+        let sy = cy
+            - cy.clamp(
+                i64::from(f.origin.y),
+                i64::from(f.origin.y) + i64::from(f.height) - 1,
+            );
+        percent > 1
+            && sim::in_range(dx, dy, w.range)
+            && !sim::inside_min_range(dx, dy, w.min_range)
+            && (vision.sees_footprint(f)
+                || sx * sx + sy * sy <= i64::from(t.sight) * i64::from(t.sight))
+    };
+    let legal: Vec<_> = targets
+        .iter()
+        .filter(|(_, f, t)| qualifies(*f, t, goal))
+        .map(|(id, _, _)| *id)
+        .collect();
+    if !legal.is_empty() {
+        return;
+    }
+    let water = |cell| {
+        grid.cell(cell).is_some_and(|c| c.water)
+            && !own.iter().any(|(_, f)| f.contains(cell))
+            && (!vision.is_visible(cell) || grid.building(cell).is_none())
+    };
+    let mut seen = BTreeSet::from([goal]);
+    let mut open = std::collections::VecDeque::from([goal]);
+    let mut farther = None;
+    while let Some(cell) = open.pop_front() {
+        if let Some((id, _, _)) = targets.iter().find(|(_, f, t)| qualifies(*f, t, cell)) {
+            farther = Some((*id, cell));
+            break;
+        }
+        for (dx, dy) in [(0, -1), (-1, 0), (1, 0), (0, 1)] {
+            let next = sim::CellPos::new(cell.x + dx, cell.y + dy);
+            if water(next) && seen.insert(next) {
+                open.push_back(next);
+            }
+        }
+    }
+    eprintln!(
+        "naval admission tick{at} cash{} pending{pending} Dreadcost{} currentqueue{:?} decision_sharedgoal{goal:?} rescannedgoal{:?} goal_legal{legal:?} farther{farther:?} actual_intents{:?}",
+        state.credits(),
+        terms.cost,
+        state.queue(terms.producer),
+        controller.naval_target(),
+        world.resource::<CommandQueue>()
+    );
+    world.resource_mut::<EconomyTrace>().naval_samples += 1;
 }
 
 fn trace_before_economy(
@@ -41,6 +231,83 @@ fn trace_after_economy(
             );
             *trace.counters.entry(key).or_default() += (hp.hit_points - before) as u64;
         }
+    }
+}
+
+// Diagnostic-only observation at the actual decision boundary, before Economy.
+fn trace_composition_decisions(world: &mut bevy::ecs::world::World) {
+    let at = world.resource::<sim::SimTick>().0;
+    let definitions = world.resource::<sim::Definitions>().clone();
+    let pending: Vec<_> = world.resource::<CommandQueue>().iter().cloned().collect();
+    let v3 = definitions.unit_kind("v3_launcher").unwrap();
+    let item = sim::ProductionItem::Unit(v3);
+    let producer = definitions.production(item).unwrap().producer;
+    let owned: Vec<_> = world
+        .query::<(&SimId, &sim::Owner, &sim::Unit)>()
+        .iter(world)
+        .map(|(id, owner, unit)| (*id, owner.0, unit.kind))
+        .collect();
+    let buildings: Vec<_> = world
+        .query::<(&sim::Owner, &sim::Building)>()
+        .iter(world)
+        .map(|(owner, building)| (owner.0, building.kind))
+        .collect();
+    for player in [PlayerId(0), PlayerId(1)] {
+        let emitted: Vec<_> = pending
+            .iter()
+            .filter(|c| c.player == player)
+            .filter_map(|c| match c.command {
+                sim::Command::QueueProduction {
+                    item: sim::ProductionItem::Unit(k),
+                } if definitions
+                    .production(sim::ProductionItem::Unit(k))
+                    .unwrap()
+                    .producer
+                    == producer =>
+                {
+                    Some(k)
+                }
+                _ => None,
+            })
+            .collect();
+        if emitted.is_empty() {
+            continue;
+        }
+        let state = world.resource::<sim::Players>().get(player).unwrap();
+        let controller = world
+            .resource::<sim::AiPlayers>()
+            .controller(player)
+            .unwrap();
+        let kinds: Vec<_> = buildings
+            .iter()
+            .filter(|(p, _)| *p == player)
+            .map(|(_, k)| *k)
+            .collect();
+        let legal = sim::check_buildable(
+            &definitions,
+            state,
+            world.resource::<MatchState>().rules().superweapons,
+            &kinds,
+            item,
+        );
+        let live: Vec<_> = owned
+            .iter()
+            .filter(|(_, p, k)| *p == player && *k == v3)
+            .map(|(id, _, _)| *id)
+            .collect();
+        let army_owned = owned
+            .iter()
+            .filter(|(_, p, k)| *p == player && controller.plan().army.contains(k))
+            .count();
+        let queued_army = state.queues().flat_map(|(_, q)| q).filter(|q| matches!(q.item,sim::ProductionItem::Unit(k) if controller.plan().army.contains(&k))).count();
+        eprintln!(
+            "composition tick{at} P{} V3live{live:?} V3legal{legal:?} cost{} cash{} factoryqueue{:?} all_owned_army{army_owned} queued_army{queued_army} max{} emitted{emitted:?}",
+            player.0,
+            definitions.production(item).unwrap().cost,
+            state.credits(),
+            state.queue(producer),
+            controller.difficulty().max_army
+        );
     }
 }
 
@@ -85,6 +352,26 @@ fn trace_economy_events(world: &mut bevy::ecs::world::World, events: &[SimEvent]
         .and_then(|value| value.parse::<u64>().ok())
         .unwrap_or(180000);
     let service = std::env::var_os("RA8_SERVICE_TRACE").is_some() && at >= trace_from;
+    if service && std::env::var_os("RA8_RIVERLANDS_TRACE").is_some() && at.is_multiple_of(40) {
+        for (owner, state) in world.resource::<sim::Players>().iter() {
+            eprintln!(
+                "service funds tick{at} {owner:?} credits{} repairing{:?} queues{:?}",
+                state.credits(),
+                state.repairing(),
+                state.queues().collect::<Vec<_>>()
+            );
+        }
+        for (id, owner, building, hp) in world
+            .query::<(&SimId, &sim::Owner, &sim::Building, &sim::Health)>()
+            .iter(world)
+        {
+            eprintln!(
+                "service health tick{at} {id:?} {owner:?} {} hp{}",
+                definitions.building(building.kind).unwrap().id,
+                hp.hit_points
+            );
+        }
+    }
     for (id, owner, unit, mobile) in world
         .query::<(&SimId, &sim::Owner, &sim::Unit, &sim::Mobile)>()
         .iter(world)
@@ -209,6 +496,22 @@ fn trace_economy_events(world: &mut bevy::ecs::world::World, events: &[SimEvent]
             _ => continue,
         };
         *trace.counters.entry(key).or_default() += amount;
+    }
+    if std::env::var_os("RA8_COMPOSITION_TRACE").is_some() {
+        let v3 = definitions.unit_kind("v3_launcher").unwrap();
+        let current: BTreeMap<_, _> = world
+            .query::<(&SimId, &sim::Owner, &sim::Unit)>()
+            .iter(world)
+            .filter(|(_, _, u)| u.kind == v3)
+            .map(|(id, owner, _)| (*id, owner.0))
+            .collect();
+        if current != trace.v3_owners {
+            eprintln!(
+                "composition lifecycle tick{at} before{:?} after{current:?}",
+                trace.v3_owners
+            );
+            trace.v3_owners = current;
+        }
     }
     let pending: Vec<_> = world.resource::<CommandQueue>().iter().cloned().collect();
     if service {
@@ -381,6 +684,29 @@ fn run_case_to(
         },
     });
     sim::setup_match(app.world_mut(), &skirmish, &ai, map, &players).unwrap();
+    if std::env::var_os("RA8_NAVAL_RECRUIT_TRACE").is_some() {
+        app.init_resource::<EconomyTrace>();
+        app.add_systems(
+            SimSchedule,
+            trace_naval_goal_before_ai
+                .in_set(sim::SimSet::Ai)
+                .before(sim::SimCoreSet(sim::SimSet::Ai)),
+        );
+        app.add_systems(
+            SimSchedule,
+            trace_naval_admission
+                .in_set(sim::SimSet::Ai)
+                .after(sim::SimCoreSet(sim::SimSet::Ai)),
+        );
+    }
+    if std::env::var_os("RA8_COMPOSITION_TRACE").is_some() {
+        app.add_systems(
+            SimSchedule,
+            trace_composition_decisions
+                .in_set(sim::SimSet::Ai)
+                .after(sim::SimCoreSet(sim::SimSet::Ai)),
+        );
+    }
     if (map_id == "thousand_lakes" && countries == ["france", "germany"])
         || std::env::var_os("RA8_ECONOMY_TRACE").is_some()
     {
@@ -608,6 +934,64 @@ fn dump(world: &mut bevy::ecs::world::World) {
             state.credits(),
             state.queues().collect::<Vec<_>>()
         );
+    }
+    if std::env::var_os("RA8_NAVAL_TRACE").is_some() {
+        let ships: Vec<_> = world
+            .query::<(&SimId, &sim::Owner, &sim::Unit, &sim::Mobile, &sim::Sight)>()
+            .iter(world)
+            .filter(|(_, _, unit, _, _)| definitions.domain(unit.kind) == sim::Domain::Naval)
+            .map(|(id, owner, unit, mobile, sight)| (*id, owner.0, unit.kind, mobile.cell, sight.0))
+            .collect();
+        let grid = world.resource::<sim::Grid>();
+        for (id, owner, kind, start, sight) in ships {
+            let mut cells = BTreeSet::from([start]);
+            let mut open = std::collections::VecDeque::from([start]);
+            while let Some(cell) = open.pop_front() {
+                for (dx, dy) in [(0, -1), (-1, 0), (1, 0), (0, 1)] {
+                    let next = sim::CellPos::new(cell.x + dx, cell.y + dy);
+                    if grid.cell(next).is_some_and(|c| c.water) && cells.insert(next) {
+                        open.push_back(next);
+                    }
+                }
+            }
+            let ranges: Vec<_> = definitions
+                .unit_combat(kind)
+                .unwrap()
+                .weapons(false)
+                .into_iter()
+                .flatten()
+                .map(|weapon| definitions.weapon(weapon).unwrap().range / 256)
+                .collect();
+            let reach = ranges.iter().copied().max().unwrap_or(0);
+            eprintln!(
+                "naval diagnostic {id:?} P{} {} sight{sight} ranges{ranges:?} water_component{}",
+                owner.0,
+                definitions.unit(kind).unwrap().id,
+                cells.len()
+            );
+            let Some(controller) = world.resource::<sim::AiPlayers>().controller(owner) else {
+                continue;
+            };
+            let state = world.resource::<sim::Players>().get(owner).unwrap();
+            for (target, building) in controller.known_buildings() {
+                let closest = cells
+                    .iter()
+                    .map(|&cell| building.footprint.distance_to_cell(cell))
+                    .min()
+                    .unwrap();
+                if closest <= reach {
+                    let visible = building
+                        .footprint
+                        .cells()
+                        .any(|cell| state.vision().is_visible(cell));
+                    eprintln!(
+                        "naval diagnostic target{target:?} {} visible{visible} closest_water_sight_distance{closest} {:?}",
+                        definitions.building(building.kind).unwrap().id,
+                        building.footprint
+                    );
+                }
+            }
+        }
     }
     if std::env::var_os("RA8_RIVERLANDS_TRACE").is_some() {
         let grid = world.resource::<sim::Grid>();
@@ -861,4 +1245,33 @@ fn ra8_gate7_lakes_russia_medium_libya_brutal_seed_zero_finishes() {
 #[test]
 fn ra8_gate7_demo_russia_libya_easy_seed_zero_finishes() {
     run_case("demo", ["russia", "libya"], ["easy", "easy"]);
+}
+
+#[test]
+fn ra8_gate8_crossroads_great_britain_america_brutal_seed_zero_finishes() {
+    run_case(
+        "crossroads",
+        ["great_britain", "america"],
+        ["brutal", "brutal"],
+    );
+}
+
+#[test]
+fn ra8_gate8_liberty_france_germany_medium_seed_zero_finishes() {
+    run_case("liberty_bay", ["france", "germany"], ["medium", "medium"]);
+}
+
+#[test]
+fn ra8_gate8_oasis_libya_iraq_brutal_seed_zero_finishes() {
+    run_case("oasis_gulf", ["libya", "iraq"], ["brutal", "brutal"]);
+}
+
+#[test]
+fn ra8_gate8_oasis_france_russia_brutal_seed_zero_finishes() {
+    run_case("oasis_gulf", ["france", "russia"], ["brutal", "brutal"]);
+}
+
+#[test]
+fn ra8_gate8_harvest_france_germany_easy_seed_zero_finishes() {
+    run_case("harvest_plains", ["france", "germany"], ["easy", "easy"]);
 }
