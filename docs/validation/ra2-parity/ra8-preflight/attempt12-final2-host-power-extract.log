@@ -1,0 +1,38 @@
+2026-10-19 17:57:33 -0400 Sleep               	Entering Sleep state due to 'Clamshell Sleep':TCPKeepAlive=active Using Batt (Charge:80%) 142 secs  
+2026-10-19 17:59:55 -0400 DarkWake            	DarkWake from Deep Idle [CDNP] : due to smc.sysState.Wake(0x70070000) wifibt SMC.OutboxNotEmpty centauri-beta/ Using BATT (Charge:80%) 12 secs   
+2026-10-19 18:00:07 -0400 Sleep               	Entering Sleep state due to 'Maintenance Sleep':TCPKeepAlive=active Using Batt (Charge:80%) 360 secs  
+2026-10-19 18:06:07 -0400 DarkWake            	DarkWake from Deep Idle [CDNP] : due to smc.sysState.Wake(0x70070000) wifibt SMC.OutboxNotEmpty centauri-alpha E_RX_IP_PACKET ARPT/ Using BATT (Charge:80%) 12 secs   
+2026-10-19 18:06:19 -0400 Sleep               	Entering Sleep state due to 'Maintenance Sleep':TCPKeepAlive=active Using Batt (Charge:80%) 49 secs   
+2026-10-19 18:07:08 -0400 DarkWake            	DarkWake from Deep Idle [CDNP] : due to smc.sysState.Wake(0x70070000) wifibt SMC.OutboxNotEmpty centauri-alpha E_PFN_NET_FOUND ARPT/ Using BATT (Charge:80%) 6 secs    
+2026-10-19 18:07:14 -0400 Sleep               	Entering Sleep state due to 'Maintenance Sleep':TCPKeepAlive=active Using Batt (Charge:80%) 14 secs   
+2026-10-19 18:07:28 -0400 DarkWake            	DarkWake from Deep Idle [CDNP] : due to NUB.SPMI0.SW3 nub-spmi0.0x02 rtc/Maintenance Using BATT (Charge:80%) 5 secs    
+2026-10-19 18:07:33 -0400 Sleep               	Entering Sleep state due to 'Maintenance Sleep':TCPKeepAlive=active Using Batt (Charge:80%) 307 secs  
+2026-10-19 18:12:40 -0400 DarkWake            	DarkWake from Deep Idle [CDNP] : due to smc.sysState.Wake(0x70070000) wifibt SMC.OutboxNotEmpty centauri-alpha E_PFN_NET_FOUND ARPT/ Using BATT (Charge:80%) 6 secs    
+2026-10-19 18:12:46 -0400 Sleep               	Entering Sleep state due to 'Maintenance Sleep':TCPKeepAlive=active Using Batt (Charge:80%) 191 secs  
+2026-10-19 18:15:57 -0400 DarkWake            	DarkWake from Deep Idle [CDNP] : due to smc.sysState.Wake(0x70070000) wifibt SMC.OutboxNotEmpty centauri-alpha E_PFN_NET_FOUND ARPT/ Using BATT (Charge:80%) 5 secs    
+2026-10-19 18:16:02 -0400 Sleep               	Entering Sleep state due to 'Maintenance Sleep':TCPKeepAlive=active Using Batt (Charge:80%) 49 secs   
+2026-10-19 18:16:51 -0400 DarkWake            	DarkWake from Deep Idle [CDNP] : due to smc.sysState.Wake(0x70070000) wifibt SMC.OutboxNotEmpty centauri-alpha E_PFN_NET_FOUND ARPT/ Using BATT (Charge:80%) 5 secs    
+2026-10-19 18:16:56 -0400 Sleep               	Entering Sleep state due to 'Maintenance Sleep':TCPKeepAlive=active Using Batt (Charge:80%) 336 secs  
+2026-10-19 18:22:32 -0400 DarkWake            	DarkWake from Deep Idle [CDNP] : due to smc.sysState.Wake(0x70070000) wifibt SMC.OutboxNotEmpty centauri-alpha E_PFN_NET_FOUND ARPT/ Using BATT (Charge:80%) 5 secs    
+2026-10-19 18:22:37 -0400 Sleep               	Entering Sleep state due to 'Maintenance Sleep':TCPKeepAlive=active Using Batt (Charge:80%) 316 secs  
+2026-10-19 18:27:53 -0400 DarkWake            	DarkWake from Deep Idle [CDNP] : due to smc.sysState.Wake(0x70070000) wifibt SMC.OutboxNotEmpty centauri-alpha E_PFN_NET_FOUND ARPT/ Using BATT (Charge:80%) 7 secs    
+2026-10-19 18:28:00 -0400 Sleep               	Entering Sleep state due to 'Maintenance Sleep':TCPKeepAlive=active Using Batt (Charge:80%) 48 secs   
+2026-10-19 18:28:48 -0400 DarkWake            	DarkWake from Deep Idle [CDNP] : due to smc.sysState.Wake(0x70070000) wifibt SMC.OutboxNotEmpty centauri-alpha E_PFN_NET_FOUND ARPT/ Using BATT (Charge:80%) 5 secs    
+2026-10-19 18:28:53 -0400 Sleep               	Entering Sleep state due to 'Maintenance Sleep':TCPKeepAlive=active Using Batt (Charge:80%) 924 secs  
+2026-10-19 18:44:17 -0400 DarkWake            	DarkWake from Deep Idle [CDNP] : due to NUB.SPMI0.SW3 nub-spmi0.0x02 rtc/SleepService Using BATT (Charge:80%) 2 secs    
+2026-10-19 18:44:19 -0400 Sleep               	Entering Sleep state due to 'Sleep Service Back to Sleep':TCPKeepAlive=active Using Batt (Charge:80%) 789 secs  
+2026-10-19 18:57:28 -0400 DarkWake            	DarkWake from Deep Idle [CDNP] : due to NUB.SPMI0.SW3 nub-spmi0.0x02 rtc/Maintenance Using BATT (Charge:80%) 6 secs    
+2026-10-19 18:57:34 -0400 Sleep               	Entering Sleep state due to 'Maintenance Sleep':TCPKeepAlive=active Using Batt (Charge:80%) 19 secs   
+2026-10-19 18:57:53 -0400 DarkWake            	DarkWake from Deep Idle [CDNP] : due to smc.sysState.Wake(0x70070000) wifibt SMC.OutboxNotEmpty centauri-beta/ Using BATT (Charge:80%) 6 secs    
+2026-10-19 18:57:59 -0400 Sleep               	Entering Sleep state due to 'Maintenance Sleep':TCPKeepAlive=active Using Batt (Charge:80%) 974 secs  
+2026-10-19 19:14:13 -0400 DarkWake            	DarkWake from Deep Idle [CDNP] : due to NUB.SPMI0.SW3 nub-spmi0.0x02 rtc/SleepService Using BATT (Charge:80%) 2 secs    
+2026-10-19 19:14:15 -0400 Sleep               	Entering Sleep state due to 'Sleep Service Back to Sleep':TCPKeepAlive=active Using Batt (Charge:80%) 1044 secs 
+2026-10-19 19:31:39 -0400 DarkWake            	DarkWake from Deep Idle [CDNP] : due to NUB.SPMI0.SW3 nub-spmi0.0x02 rtc/SleepService Using BATT (Charge:80%) 2 secs    
+2026-10-19 19:31:41 -0400 Sleep               	Entering Sleep state due to 'Sleep Service Back to Sleep':TCPKeepAlive=active Using Batt (Charge:80%) 724 secs  
+2026-10-19 19:43:45 -0400 DarkWake            	DarkWake from Deep Idle [CDNP] : due to smc.sysState.Wake(0x70070000) wifibt SMC.OutboxNotEmpty centauri-alpha E_PFN_NET_FOUND ARPT/ Using BATT (Charge:80%) 15 secs   
+2026-10-19 19:44:00 -0400 Sleep               	Entering Sleep state due to 'Maintenance Sleep':TCPKeepAlive=active Using Batt (Charge:80%) 868 secs  
+2026-10-19 19:58:28 -0400 DarkWake            	DarkWake from Deep Idle [CDNP] : due to NUB.SPMI0.SW3 nub-spmi0.0x02 rtc/Maintenance Using BATT (Charge:80%) 6 secs    
+2026-10-19 19:58:34 -0400 Sleep               	Entering Sleep state due to 'Maintenance Sleep':TCPKeepAlive=active Using Batt (Charge:80%) 34 secs   
+2026-10-19 19:59:08 -0400 DarkWake            	DarkWake from Deep Idle [CDNP] : due to smc.sysState.Wake(0x70070000) wifibt SMC.OutboxNotEmpty centauri-alpha E_TKO_SEQ_NUM_INVALID ARPT/ Using BATT (Charge:80%) 6 secs    
+2026-10-19 19:59:14 -0400 Sleep               	Entering Sleep state due to 'Maintenance Sleep':TCPKeepAlive=active Using Batt (Charge:80%) 242 secs  
+2026-10-19 20:03:16 -0400 Wake                	Wake from Deep Idle [CDNVA] : due to smc.sysState.Wake(0x70070000) lid SMC.OutboxNotEmpty RTP.multi-touch/HID Activity Using BATT (Charge:80%)           

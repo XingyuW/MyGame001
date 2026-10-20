@@ -1,0 +1,39 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 1m 12s
+     Running tests/ra8_ai_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai_matches-f4b147b14025da0d)
+
+running 1 test
+test ra8_demo_admission_and_target_lifecycle_regressions_finish_with_original_rejection_rules ... demo seed0 ["germany", "great_britain"] ["medium", "easy"] before tick8899: CommandQueue { pending: [] }
+demo seed0 ["germany", "great_britain"] ["medium", "easy"] before tick8900: CommandQueue { pending: [] }
+demo seed0 ["germany", "great_britain"] ["medium", "easy"] before tick8901: CommandQueue { pending: [] }
+demo seed0 ["germany", "great_britain"] ["medium", "easy"]: Some(Won { winner: PlayerId(0), tick: 29263 })
+demo seed0 ["germany", "great_britain"] ["brutal", "brutal"] before tick12860: CommandQueue { pending: [] }
+demo seed0 ["germany", "great_britain"] ["brutal", "brutal"] before tick12861: CommandQueue { pending: [PendingCommand { issued: IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(92), SimId(140), SimId(173)], target: SimId(3221228907) } }, ai_intent: Some(AiIntent { owned: {SimId(92), SimId(140), SimId(173)}, armed: {SimId(92), SimId(140), SimId(173)}, target: Some(SimId(3221228907)), strategic_valid: false, service_valid: false }), action: Command }] }
+demo seed0 ["germany", "great_britain"] ["brutal", "brutal"] before tick12862: CommandQueue { pending: [PendingCommand { issued: IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(91), SimId(107), SimId(125), SimId(139)], target: SimId(96) } }, ai_intent: Some(AiIntent { owned: {SimId(91), SimId(107), SimId(125), SimId(139)}, armed: {SimId(91), SimId(107), SimId(125), SimId(139)}, target: Some(SimId(96)), strategic_valid: false, service_valid: false }), action: Command }] }
+demo seed0 ["germany", "great_britain"] ["brutal", "brutal"]: Some(Won { winner: PlayerId(1), tick: 27249 })
+demo seed0 ["france", "iraq"] ["medium", "easy"] before tick13480: CommandQueue { pending: [] }
+demo seed0 ["france", "iraq"] ["medium", "easy"] before tick13481: CommandQueue { pending: [] }
+demo seed0 ["france", "iraq"] ["medium", "easy"] before tick13482: CommandQueue { pending: [] }
+demo seed0 ["france", "iraq"] ["medium", "easy"]: Some(Won { winner: PlayerId(1), tick: 30640 })
+demo seed0 ["france", "cuba"] ["brutal", "brutal"] before tick9619: CommandQueue { pending: [] }
+demo seed0 ["france", "cuba"] ["brutal", "brutal"] before tick9620: CommandQueue { pending: [] }
+demo seed0 ["france", "cuba"] ["brutal", "brutal"] before tick9621: CommandQueue { pending: [PendingCommand { issued: IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(89)], target: SimId(132) } }, ai_intent: Some(AiIntent { owned: {SimId(89)}, armed: {SimId(89)}, target: Some(SimId(132)), strategic_valid: false, service_valid: false }), action: Command }, PendingCommand { issued: IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(107)], target: SimId(132) } }, ai_intent: Some(AiIntent { owned: {SimId(107)}, armed: {SimId(107)}, target: Some(SimId(132)), strategic_valid: false, service_valid: false }), action: Command }, PendingCommand { issued: IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(125)], target: SimId(132) } }, ai_intent: Some(AiIntent { owned: {SimId(125)}, armed: {SimId(125)}, target: Some(SimId(132)), strategic_valid: false, service_valid: false }), action: Command }, PendingCommand { issued: IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(137)], target: SimId(132) } }, ai_intent: Some(AiIntent { owned: {SimId(137)}, armed: {SimId(137)}, target: Some(SimId(132)), strategic_valid: false, service_valid: false }), action: Command }] }
+demo seed0 ["france", "cuba"] ["brutal", "brutal"]: Some(Won { winner: PlayerId(1), tick: 25601 })
+demo seed0 ["russia", "libya"] ["easy", "easy"] before tick10240: CommandQueue { pending: [] }
+demo seed0 ["russia", "libya"] ["easy", "easy"] before tick10241: CommandQueue { pending: [] }
+demo seed0 ["russia", "libya"] ["easy", "easy"] before tick10242: CommandQueue { pending: [PendingCommand { issued: IssuedCommand { player: PlayerId(1), command: Harvest { units: [SimId(27)], target: CellPos { x: 52, y: 46 } } }, ai_intent: Some(AiIntent { owned: {SimId(27)}, armed: {SimId(27)}, target: None, strategic_valid: false, service_valid: false }), action: Command }] }
+
+thread 'ra8_demo_admission_and_target_lifecycle_regressions_finish_with_original_rejection_rules' (10402742) panicked at crates/game/tests/ra8_ai_matches.rs:142:9:
+demo seed0 ["russia", "libya"] ["easy", "easy"]: None after72000
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ra8_demo_admission_and_target_lifecycle_regressions_finish_with_original_rejection_rules
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 250.97s
+
+error: test failed, to rerun pass `-p game --test ra8_ai_matches`

@@ -1,0 +1,27 @@
+{
+  "observed_utc": "2026-10-19T20:47:25.108237+00:00",
+  "freeze_commit": "b7d6dc0522224a322a3eb05c45a9a27b7ecce117",
+  "runtime_commit": "8d5fa86cf75a1917aa92a7eaba5562b3a090c9b0",
+  "owned_session": 42424,
+  "wrapper_pid": 61360,
+  "script_pid": 61386,
+  "script_pgid": 61386,
+  "process_rows": [
+    "61360  7720 61360       11:01   0:00.26   0.0 Ss   /opt/homebrew/Cellar/python@3.15/3.15.0/Frameworks/Python.framework/Versions/3.15/Resources/Python.app/Contents/MacOS/Python",
+    "61386 61360 61386       11:01   0:00.01   0.0 Ss   sh",
+    "61392 61386 61386       11:01   0:00.01   0.0 S    caffeinate",
+    "61434 61386 61386       10:59   0:00.62   0.0 S    /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo",
+    "66730 61434 61386       03:25  22:27.02 496.8 R    /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-fff13bc99bc7e9e6"
+  ],
+  "unexpected_real_failure": "demo: great_britain (easy) against cuba (easy): None",
+  "source_location": "crates/game/tests/m6_production_matches.rs:161:21",
+  "phase4": "incomplete; verified native worker None,not a completed workspace count",
+  "earlier_completed_workspace_targets": 8,
+  "earlier_completed_passed": 248,
+  "phase5_to13": "unrun in this attempt; any old files are stale",
+  "fresh756_production_table": false,
+  "raw_prefix_path": "docs/validation/ra2-parity/ra8-preflight/attempt12-observed-m6-failure-prefix.log",
+  "raw_prefix_bytes": 25259,
+  "raw_prefix_sha256": "162f94cb3468319a0da39575066779b2931350709211a298f7a502c4d9436e4e",
+  "action": "SIGTERM only verified owned script group61386; wrapper61360 is outside that group and retains finally metadata."
+}

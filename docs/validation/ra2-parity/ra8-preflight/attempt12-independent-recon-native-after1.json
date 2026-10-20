@@ -1,0 +1,38 @@
+{
+  "label": "attempt12-independent-recon-native-after1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_an_idle_detector_discovers_an_unseen_start_before_a_main_wave_exists",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T21:29:17.413391+00:00",
+  "elapsed_seconds": 56.33194895804627,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "fcf15641832e881f8e848fda0ed2b85ba6c47fc6976a810694055b0ecbb339b0",
+    "crates/sim/src/ai/strategy.rs": "cc4d09d5f9d68bc67105bc03dc939ae0644e7d6c3385eadd2719471c9dafa288",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "bc5e2c071410f3f9f64a2bdc44f64db7d2bc8a59b25c726b0d297f04779ac1e8",
+    "crates/game/tests/ra8_gate_matches.rs": "743c78d3ba344d0690cbb595c720c0910be78e69b276197799bbfc99e41af6c0",
+    "crates/sim/tests/ra8_ai.rs": "4de8e563e2e399d0a18bfefce513f8107823f17d9b84b034de1b1786296e0ed2"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "fcf15641832e881f8e848fda0ed2b85ba6c47fc6976a810694055b0ecbb339b0",
+    "crates/sim/src/ai/strategy.rs": "cc4d09d5f9d68bc67105bc03dc939ae0644e7d6c3385eadd2719471c9dafa288",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "bc5e2c071410f3f9f64a2bdc44f64db7d2bc8a59b25c726b0d297f04779ac1e8",
+    "crates/game/tests/ra8_gate_matches.rs": "743c78d3ba344d0690cbb595c720c0910be78e69b276197799bbfc99e41af6c0",
+    "crates/sim/tests/ra8_ai.rs": "4de8e563e2e399d0a18bfefce513f8107823f17d9b84b034de1b1786296e0ed2"
+  },
+  "log_sha256": "0ad604163811ab8c3baf93ca7842a4c13746b16ae728e627787b45f96d6b4487"
+}
