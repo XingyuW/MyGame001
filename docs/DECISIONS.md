@@ -10190,3 +10190,213 @@ verifies every P0/P1 finding; the maximum three remediation cycles/four full pan
 all other review requirements remain unchanged. No review starts under this record before
 RA8 and RA9 finish their required work. This is a procedural authorization, not runtime,
 validation, approval, or independent-review completion evidence.
+
+
+### R173 — Service eligible opted-in last stands without another sixteen-period wait
+
+Full13 attempt12 on checkpoint b7d6dc0/runtime8d5fa86 is interrupted after the real M6
+worker failure `demo: great_britain (easy) against cuba (easy): None`, seed0/72000.
+The unchanged script used output-only RUST_TEST_NOCAPTURE=1. Phases1–3 exit0;
+phase4 is partial, not a completed failed suite: eight completed targets have248passes,
+four M6 companions visibly pass, the main756 sweep is incomplete. Only the verified
+owned process group61386 is terminated after the unexpected assertion. Wrapper monotonic
+660.216675s includes658.287961s observed partial phase4;05–13 are unrun. The old production
+TSV is stale, not fresh756 evidence. `ra8-attempt12/PRESERVED.json` baf7af07… binds35files,
+149847bytes per set/70archive+current copies, all byte-identical before source mutation.
+All495 frozen paths still match at preservation. No failed or partial count is promoted.
+
+One exact observational native replay retains ordinary seed/options/commands and source-name
+mappings: `attempt12-demo-gb-cuba-easy-native-before1`, exit101/15.970762s wrapper/10.60s
+native, rawdc91b4b6643d82d52c39fc7f3ca4486769120218e860de661f909ded74fae6c3.
+P0's last useful GI123 dies69973; the next real Easy decision70000 records its unchanged
+remnant signature. Patience1200 makes it eligible71200. Its old player0 window69632–69887
+has already passed; the next is73728, beyond the unchanged72000 bound. P0 then has an
+unarmed idle ChronoMiner27/no refinery and AirforceCommand46, no queues, power0/50,
+credits928. The opponent's paid FlakTrack125 is born69301 following an ordinary500sale
+refund and begins real Airfield shots69956 at63-tick cadence. It is making positive slow
+progress, not permanently incapable. Earlier GI/WarMiner combat and both players' real
+funding transitions remain explicit; this is avoidable post-patience scheduling delay,
+not a source-damage, price, global helplessness, or permanent-stall finding. The old
+observer's units-first ID cache labels some shots at deployed Yard0 as `mcv`; native
+building snapshots establish the actual target. HP increases alone are not exact paid
+repair debits. Temporary observer instrumentation is finally restored to7bc635b8… at
+20:53:24.306745Z, then separately read/hash-verified20:53:32.604772Z before new work.
+Only the retained exact new test is subsequently re-added (helper743c78d3…).
+
+For existing opted-in RA2 plans only, use one distinct player point slot per existing256
+period: tick%256==player%16. The original R53 helplessness, signature,1200patience,
+crew recovery, ordered ordinary SellBuilding and native defeat/outcome path are unchanged.
+One pure `last_stand_slot` predicate serves both admission and due; legacy plans keep
+both their original256-wide windows per4096rotation and boundary-only extra due wakeup,
+not a new every-tick legacy wake. Ordinary decision cadence is unchanged. No new state,
+hash format, RNG, policy knob, source TeamDelay/stat, match limit or direct outcome write.
+This is a global game-owned scheduling policy, not a map/country/seed/horizon branch.
+Configured policy is uniform: AiDefinitions::plan_for (ai_defs.rs360–365) copies its one
+global rules_difficulty flag into each plan; match_setup.rs1080–1116 constructs every
+controller and AiPlayers from the same definition. Distinct-sale/no-simultaneous-last-sale
+claims apply to either uniform configured policy. Manually assembled inconsistent
+AiPlayers mixing plan flags is a separate API boundary, not evidence of configured mixing.
+
+New schedule regression
+`ra8_opted_in_last_stand_services_a_native_remnant_within_one_existing_period` establishes
+actual enemy source fire and ordinary visibility before public Attack, retains untouched
+real controllers, and requires ordinary sale/Win after unchanged patience within one
+existing period plus decision interval. Its remnant setup uses controlled HP0 and ordinary
+Cleanup for the old yard/crew, not a claimed native weapon-kill reproduction of GI69973.
+Before1 fails the visibility premise and is insufficient (raw2a777b38…); before2 has28real
+shots/soldNone/outcomeNone and fails the intended sale bound, raw88fd787d24203219c518c3781475657fa14a12187b1993c124a6beb6416dbdcc,
+101/8.296490s. After1 has24shots/saleobserved1282/nativeP1Won1281,1pass0fail,
+raw1c65e42f8ca62246143911bbec5a5f02b618f81f4b88624107c572cb2dcd86f5,
+0/25.477995s. Exact new retained38th test
+`ra8_gate12_demo_great_britain_cuba_easy_seed_zero_finishes` now P1Won62977/72000,
+raw991f6b25cd120b666613920cb57704ccf4ea8cf479ca1a422fc95648ec8669e3,
+0/42.831613s wrapper/8.47s native. This is combined trajectory ending evidence, not proof
+the earlier point of the whole war is unchanged or exclusively caused by its late slot.
+
+Permanent new unit controls exhaustively compare all original ticks over two rotations,
+players0..15 and every supported interval1..1200, retaining the original R53 assertions;
+all opted-in eligibility offsets receive distinct due slots within256. Native recovery
+control retains a living Grizzly, actual OreDelivered, and a fully financed Harrier's
+charged head/completion/live spawn without a sale. Existing mixed512/1024/1200 cadences
+still yield Won, and legacy/R53/min-range/futile-repair controls remain unchanged.
+Unit filtered last_stand target4/0/0, raw5ca21e7695c7aa05c989cf9e478167f55d11314e1822edbbeaf95dc6e7f288f1;
+native last_stand target5/0/0, rawdfee955be63ff1c037f2b0b7a5ffc6d853aa946618b2ae0ed8c2521e4e18c507.
+No existing expectation, function name or assertion is migrated; four tests plus the exact
+match test are added. The larger ai.rs diff includes the two new test bodies; production
+change remains the shared helper/due/admission extraction.
+
+Final-body mutation changes only the opted-in shared point expression back to its legacy
+window, leaving the new due expression otherwise intact. The native test still has28real
+shots/no sale and fails its intended bound: raw52e4adbd26e7bedbd8001a328015907ce5584805c895f5e021e0506c9bff18d6,
+101/33.733637s. MutantAId9a43db7… is finally restored tofcf15641… at21:10:06.359650Z;
+a SEPARATE later tool read at21:10:12.317583Z verifies all seven bound source/test SHAs
+against pre-mutation values. This is a witnessed negative, not passed validation.
+Current strategy323f97d8/infantry31dce2c0/data42cf6509/generator6a0477b0 are unchanged.
+Fresh scoped final1 will check strict/focused/legacy controls, cheapDemo+grown before
+retained38 once (37distinct configurations), then isolated all21/fixed256/three example
+guards. Full13, fresh both756 distributions, RA9 and independent review remain open.
+
+
+R173 scoped final1 follow-up: strict four commands and focused seven commands all exit0,
+279Rustpasses/0failed/0ignored. Default Demo target then fails Russia/LibyaEasy seed0
+None72000 after four earlier actual winners; its one Rust function is0pass/1fail/0ignored,
+not ten results. The remaining five Demo configurations and seven later phases are unrun.
+Raw7cc5341fe6115877bfbb211cc4520cb9c1d76c75d2e9266654f58a3f57f2598d,
+101/324.963372s wrapper/250.97s native. All495 source hashes match. Unique-prefix
+attempt12-final1-PRESERVED.json4c1a6f71… binds17leaves/100537bytes without label reuse.
+The real R173 native scheduling property and GB/Cuba result remain property/one-ending
+evidence; they are not full acceptance or evidence that this other match now ends.
+
+### R174 — Spare detector reconnaissance after initial team readiness without a main mission
+
+One exact current Russia/LibyaEasy native replay preserves72000/options/seed/source rules:
+attempt12-demo-russia-libya-native-before1, raw04c48aeed779030d42552e69f28f09969068e465b0c75e15af6580f45bf7557d,
+101/105.745382s wrapper/92.13s native. Observational6000-tick snapshots plus real event,
+credit, queue, source-name and controller histories show ongoing fighting, not a global
+helpless state. P0 last Conscript165 dies71431, signature starts71440: its unchanged1200
+patience is legitimately unexpired at72000. P1 retains normal Conscripts/garrisoned crew,
+producer infrastructure and a newly produced Dog177 at71533, idle at gather without a
+main target or known buildings. Its next source cohort is legitimately not ready until
+72268. The prior R168 path starts independent discovery only alongside an existing known
+building mission, so targetNone excludes that ordinary use of spare reconnaissance.
+This is a general play opportunity, not an assertion that Dog177 alone could finish the
+war or that source TeamDelay/last-stand patience is defective. No deadline is changed.
+Temporary diagnostic helperc99e5088… is finally restored to743c78d3… at21:26:07.317970Z;
+a SEPARATE later read21:26:16.590152Z verifies all five source bindings before changes.
+The observational patch also gives building names precedence over stale same-ID deployed
+MCV unit-name cache entries; raw HP increases remain nonexclusive healing observations.
+
+The first broad None-path candidate has a real provisional before/after discovery proof:
+new pre-first-wave test fails intended physical discovery under old logic, raw9b29066f…,
+101/21.158702s; broad candidatecc4d09d5… passes, raw0ad60416…,0/56.331949s. It is NOT the
+retained final policy: original detector controls find7pass/1fail, raw6397e4de…,
+101/5.379855s. Existing ra8_a_detector_escort_keeps_real_strike_sorties_and_its_own_wave_mission
+must still naturally join Dog and Harrier, reload, resume and destroy its target. Its
+assertions are unchanged. A cheap observational replay d34f3ea3… (101/15.333708s) shows
+the premature tick0 Dog route before source first_wave; by tick11 Satellite sight has
+revealed the intended base/start, but that early route continues and the Dog dies before
+1000, before ordinary escort assembly. This test-only observer emits one unused-variable
+warning, not a compiler failure; its native assertion fails. Finally restores4de8e563…
+at21:32:43.949362Z, separately verified21:32:54.251075Z, no diagnostic body retained.
+
+Final game-owned policy changes ONLY the new None admission: the existing source-derived
+first_wave readiness must already have passed. Original known-Building eligibility,
+healthy route ownership, source defense/weapon reach, priority unseen starts, deterministic
+nearest ranking, normal AttackMove, reservation/home exclusion, source TeamDelay and actual
+movement remain intact. No new tuning, persistent state/hash field, RNG, hidden occupancy
+query, source stat, native command or match limit. Initial team/escort assembly is preserved;
+late spare discovery does not need a combat mission first. Strategyec57866c… binds this
+narrow extension, with AIfcf15641/infantry31dce2c0/data42cf6509/generator6a0477b0 unchanged.
+
+NEW provisional fixture is revised/renamed to
+ra8_an_idle_detector_discovers_an_unseen_start_after_initial_team_readiness: a real healthy
+Conscript preserves the base while ordinary SimSchedule advances the opening. It forbids
+pre-first_wave scout admission, asserts naturally empty wave/target, then requires targetNone
+at the actual later ordinary scout command, no contradictory wave membership and actual
+physical visibility/known-building discovery. No SimTick, controller history, deadline,
+knowledge or outcome is seeded. This is a named NEW test semantic/setup correction;
+no existing test function/assertion is renamed, dropped or weakened. The earlier provisional
+pre-first-wave pair remains archived, not reinterpreted as the final property's proof.
+Final eight detector controls pass93bb717added7aa9b3830eac9047fe9a5098c549e39d2bbb990ff6bef094e26d,
+0/23.064607s, including original real escort membership/reload/fire/destruction, long route
+across next_wave, actual home defense, hidden-world twins and useful naval detector.
+
+The final-body one-cause bypass sets only the new None admission tofalse. All initial-phase,
+active-match and visibility premises survive; physical discovery then fails as intended:
+raw7ac5e4ed28ddc9a9ae066a8833f94e82d66948823688e3e1f71cedf0471bc31a,
+101/54.151913s. Mutanta78d3456… is finally restoredec57866c… at21:37:13.170318Z;
+a SEPARATE later read21:37:43.625595Z verifies all seven bound paths before exact replay.
+These are negative/provenance records, not passed tests. Exact Russia/Libya and GB/Cuba
+ending checks follow; no whole-ending causality or fresh scoped/full13 acceptance is claimed
+before their actual results. R173's valid scheduling policy is retained independently.
+
+
+R174 exact ending checks on the restored final candidate both pass: Russia/LibyaEasy seed0
+P1Won68806/72000, rawf973831ef77872822f881794018d1d42eaaaceb3b98d69ed55da474335c349d4,
+0/86.162309s wrapper/17.59s native; GB/CubaEasy seed0 passes the unchanged exact assertion,
+raw0ba33935747cd70d4c2c62be59bb2b9be99b5a8ddca25cea8d208ccb0aa2964c,
+0/16.299394s wrapper/15.78s native. All seven source bindings are unchanged. This is combined
+normal-play ending evidence, not a claim that the terminal Dog alone explains the whole
+trajectory. Russia/Libya remains a near-limit watch (68806/72000≈0.95564). Fresh scoped
+final2 now repeats the cheap known regressions before retained38/all21/fixed3/guards, with
+new frozen snapshots. Failed final1/raws and all earlier scoped/full-gate records remain
+unchanged. Full13 and both fresh756-winner distributions remain required.
+
+R174 GB/Cuba exact native ending is P1Won62721/72000, as the retained raw above records.
+
+
+R174 checkpoint13 follow-up: the frozen working source based onb7d6dc0 completes all19
+scoped final2 commands exit0 before its later four-path2d720e9 source commit. Separate
+unfiltered staged check0 precedes the commit; no scoped result is claimed postcommit.
+325 Rust passes/0 failed/0 ignored across18 target invocations; command sum4057.261503s,
+recorded wrapper monotonic4058.808918s. Retained38 gives38 explicit Won/37 distinct
+configurations; current Demo Russia/LibyaEasy68806/72000 remains a near-limit watch.
+Grown-map three/defaultDemo ten retain every original assertion. All21 actual-default
+m13 maps win/ten builders under400000: median97048/p90 nearest167644/max340649, worst mean
+1.644ms. Recorded tails: max224.303ms/p9916.452ms/busiest1000 7.246ms/516 ticks>50ms.
+Three fixed256 actual24000-tick means1.059/.944383/.959516ms meet<5; example guards each
+execute one passing test. No optional optimization follows passing mean budgets.
+
+The retained target overlaps host clamshell sleep21:57:33Z→00:03:16Z. The bounded38-line
+power extract and independent metadata/raw hashes preserve OS observations; UTC, OS elapsed
+and monotonic durations remain distinct. No interval is retroactively subtracted. All-map
+and fixed timing follow wake. Metadata preparation failures (whole-TMX invalid-comment XML,
+then an overescaped header regex and a historical key mismatch) occur before the successful
+checkpoint builder; they run no Cargo/simulation and change no production source/raw logs.
+
+Static1124→1365/+241/0removed/renamed/ignored and495 matching source hashes are distinct from
+executed counts. Checkpoint13 preservation verifies35 attempt12 leaves/149847 bytes per set,
+70 archive/current copies, zero mismatches. Existing failed gate remains phase4 partial,
+05–13 unrun and productionTSV stale; all earlier evidence stays unchanged. R173/R174 are
+scoped validated properties/ending evidence, not full13, independent review or all-debt
+closure. No new substantial external directory; configured caches remain retained. Evidence
+hygiene and an explicit clean-tip full13 release remain required.
+
+
+Checkpoint13 evidence hygiene: first unfiltered staged check exits2, NOTpassed. All68
+classified diagnostics across31 native log paths are29 preserved blank EOFs, one actual
+interleaved native-progress trailing space and38 verbatim OS power-log trailing spaces.
+Exact file/line/EOL/staged-blob SHA bindings match; zero source/data/test/prose errors.
+Captured stdout is JSON-escaped directly (247c5eb2…), preserving every raw byte. A separate
+restaged unfiltered check must match before a later deliberate evidence commit; no raw
+normalization or broad whitespace suppression is used.

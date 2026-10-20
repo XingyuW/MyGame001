@@ -1,15 +1,16 @@
 # RA8 acceptance record
 
-Status: corrective scoped final8 completed all18 commands with exit0,317Rustpasses,
-0failed/ignored across17 target invocations. Retained37 has37explicitWon/36distinct
-configurations;all21 actual-default ten-player maps have winners and ten builders.
-The three fixed256 means pass. R171's native Temporal edge-retention correction has
-normal/elite/full-erasure/original-AI and109affected controls,with original failures and
-three bounded causal mutations preserved. This is scoped validation,not full acceptance
-or exclusive Hospital-cause attribution. Mandatory gate11's failed raw bytes remain.
-Checkpoint12 binds source8d5fa86 after coordinator checks and a separate staged check0.
-The scoped commands ran before that commit on identical frozen source;full13 release is pending. One complete all0full13,both fresh756-winner
-R29 distributions,RA9 and independent review remain. Historical metrics are not transferred.
+Status: checkpoint13 scoped final2 completes all19 commands with exit0: 325 Rust
+passes, zero failures/ignored across18 target invocations. Retained38 has38 explicit
+winners across37 distinct configurations; all21 actual-default ten-player maps win
+with ten builders, and all three fixed256 means meet the5ms budget. R173's shared
+staggered slot and R174's readiness-qualified spare detector discovery have native
+before/after and final-body causal bypass proofs. This is scoped validation, not full
+acceptance. Source2d720e9 contains four paths after a separate staged check0; the scoped
+commands ran earlier on the identical frozen working source. The failed attempt12
+full gate is preserved, with phases05–13 unrun and its production table stale. Evidence
+commit, one complete all0 full13, both fresh756-winner R29 distributions, RA9 and
+independent review remain pending. Historical metrics are not transferred.
 
 ## Acceptance checklist
 
@@ -36,7 +37,7 @@ R29 distributions,RA9 and independent review remain. Historical metrics are not 
 
 ## Policy and evidence
 
-R88–R171 in `docs/DECISIONS.md` record the implementation, exact existing-test migrations,
+R88–R174 in `docs/DECISIONS.md` record the implementation, exact existing-test migrations,
 game-owned AI assumptions, failure diagnoses, negative mutation and process deviations.
 R172 records the user's two-batch scheduling authorization for all five independent review
 slices and a fresh lead;review coverage and independence remain required.
@@ -53,6 +54,72 @@ No clone, worktree or validation environment was created. Configured Cargo/UV/PI
 preserved. New recreatable parser scratch is at configured Cargo target `tmp/ra8_definitions`
 (716 KiB measured after the slow-speed parser fixture;58 files/584038 file bytes), retained for reruns and unnecessary for release.
 Earlier RA5 render and RA7 parser evidence remain.
+
+## Thirteenth checkpoint: completed scoped final2, mandatory full13 pending
+
+[Checkpoint13](ra8-preflight/checkpoint13.json), [metrics](ra8-preflight/checkpoint13-metrics.json),
+[inventory](ra8-preflight/checkpoint13-inventory.json), [source snapshots](ra8-preflight/checkpoint13-manifest-verification.json),
+[preservation](ra8-preflight/checkpoint13-attempt12-preservation.json) and
+[storage](ra8-preflight/checkpoint13-storage.json) bind the working source based onb7d6dc0,
+later committed as2d720e9 after the separate four-path staged check0. All19 commands exit0:
+325 passed/0 failed/0 ignored across18 Rust target invocations. Command sum4057.261503s;
+recorded wrapper monotonic4058.808918s. Summary SHA
+`b328780a34a8ed76cb54f72aa9981189fe580fa4d04c0924315788c66bdd8650`.
+Strict fmt/Clippy/generation/reference checks, AI115, last-stand4, attrition15, recovery21,
+composition14, legacyRA4two, native affected109, defaultDemo's ten pairings, grown-map3,
+retained38 and three explicit example guards all pass. No duplicate broad workspace run
+replaces the still-required unfiltered full13 workspace command.
+
+Static inventory is1124→1365 (+241), zero removed/renamed/ignored; executed counts differ.
+The344 runtime and169 additional paths overlap18, yielding495 unique matching hashes.
+Attempt12 retains35 files/149847 bytes per set,70 current/archive copies with zero mismatch.
+Its real M6 Demo GB/CubaEasy seed0 None72000 stopped command4: earlier248 Rust passes and
+four visible companion passes are partial, not a completed756 result. Phases05–13 are unrun;
+the preserved production table is stale. R173/R174 preserve1200 last-stand patience,
+source first-wave/TeamDelay, ordinary commands, all original assertions and every limit.
+
+Retained38 produces38 explicit Won across37 distinct configurations (the existing duplicate
+Demo Russia/Libya remains). Raw SHA
+`8420003791f1fabe46a1c5f28053cde1036e279b2f99e52c51165b5e16e3bea4`.
+Wrapper monotonic1476.202206s/native1475.93s is recorded separately from UTC. The bounded
+[host power extract](ra8-preflight/attempt12-final2-host-power-extract.log) preserves38
+verbatim OS lines: clamshell sleep2026-10-19 17:57:33−0400 to full wake20:03:16−0400 overlaps
+this target. No interval is retroactively subtracted from any duration. OS elapsed, UTC
+and monotonic clocks remain distinct; all-map/fixed timing follows wake. Current Demo
+Russia/LibyaEasy68806/72000≈.95564 remains an RA9 near-limit watch. SteelAmerica/CubaBrutal
+234763/288000 is current; earlier188712 is historical. Grown Crossroads seed7 wins34217
+with all original nine-defeated/start assertions.
+
+All21 m13 maps finish under unchanged400000 with ten builders: ending median97048,
+p90 nearest-rank167644, max340649 (Thousand Lakes). Raw SHA
+`3cb8dd811100fbc45b11cbc5eaf6f88c8cb2686cb9a118b01b5e734c690fc1ea`.
+Measured sum2095.540s/elapsed sum2095.734s. Worst whole-run meanThousand1.644ms meets<5ms;
+largest p99Pacific16.452ms, longest tickWheel224.303ms, busiest1000Wheel7.246ms, and516 ticks
+over50ms remain recorded tails. Passing means do not establish smoothness. No optional
+optimization, profiler or competing simulation followed passing budgets.
+
+| Fixed256 map | Actual ticks | Mean ms | p99 ms | Maximum ms | Busiest1000 ms | Ticks>50ms | Builders |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Liberty Bay | 24000 | 1.059 | 5.507 | 114.312 | 2.104 | 2 | 10 |
+| Continental Divide | 24000 | .944383 | 5.072 | 58.193 | 2.191 | 11 | 10 |
+| Pacific Atoll | 24000 | .959516 | 18.587 | 67.998 | 2.811 | 2 | 10 |
+
+Three explicit example guards each execute one passing test. No source stats, prices,
+reload/build multipliers, source cadence, RNG or outcome rule changes in R173/R174. R173's
+slot is a game-owned scheduling correction for already-eligible remnants, with uniform
+configured-plan policy and exhaustive legacy due equivalence. R174's new None branch waits
+for source first-wave readiness; original healthy reconnaissance and escort assertions stay
+intact. Initial broad admission's real escort regression and scoped final1's failed Demo are
+preserved as failures. Final-body bypasses fail the intended native sale/discovery assertions,
+then restore in finally plus separate later source reads before dependent checks.
+
+RA9 carries gathering-point partition, R83 transport/Squid, R96 actorless-Prop abilities,
+R99 unproven capability and conservative sale/income-policy boundaries; no claim closes
+all inherited AI debt. R172's user-authorized two-batch full review still requires five
+fresh independent slices and a fresh lead. User visual/audio/play-feel verification remains.
+Storage is unchanged: RA5render10 files/875468 logical bytes, RA7parser70/11615632,
+RA8parser58/584038, retained in configured caches for reruns and unnecessary for release.
+No new substantial external directory, clone or worktree was created.
 
 ## Twelfth checkpoint: completed final8 scoped validation, full13 pending
 
@@ -1009,3 +1076,12 @@ RA8 parser scratch remains58files/584038logical/733184allocated (716KiB),RA7scra
 recreatable reruns and unnecessary for release. RA9 carries gathering-point partition,R83,
 R96,R99 and near-limit policy watch;R97 remains closed inR103. Independent review and user
 visual/audio/play-feel verification remain pending.
+
+
+Checkpoint13 evidence hygiene: first unfiltered staged check exits2, NOTpassed. All68
+classified diagnostics across31 native log paths are29 preserved blank EOFs, one actual
+interleaved native-progress trailing space and38 verbatim OS power-log trailing spaces.
+Exact file/line/EOL/staged-blob SHA bindings match; zero source/data/test/prose errors.
+Captured stdout is JSON-escaped directly (247c5eb2…), preserving every raw byte. A separate
+restaged unfiltered check must match before a later deliberate evidence commit; no raw
+normalization or broad whitespace suppression is used.

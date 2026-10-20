@@ -1,0 +1,61 @@
+{
+  "command": [
+    "env",
+    "-u",
+    "RA2_DUEL_SEED",
+    "-u",
+    "RA2_DUEL_PAIR",
+    "RUST_TEST_NOCAPTURE=1",
+    "sh",
+    "scripts/validate_ra2_parity.sh",
+    "ra8"
+  ],
+  "freeze_commit": "b7d6dc0522224a322a3eb05c45a9a27b7ecce117",
+  "runtime_commit": "8d5fa86cf75a1917aa92a7eaba5562b3a090c9b0",
+  "runtime_manifest": "../ra8-preflight/attempt11-final8-runtime-manifest.json",
+  "test_example_manifest": "../ra8-preflight/attempt11-final8-test-example-manifest.json",
+  "start_utc": "2026-10-19T20:36:24.891659+00:00",
+  "phases": [
+    {
+      "phase": 1,
+      "exit": 0,
+      "script_seconds": 2,
+      "observed_monotonic_phase_seconds": 1.1855518330121413,
+      "summary_line": "01 exit 0  2 s  cargo fmt --all -- --check"
+    },
+    {
+      "phase": 2,
+      "exit": 0,
+      "script_seconds": 0,
+      "observed_monotonic_phase_seconds": 0.045788625022396445,
+      "summary_line": "02 exit 0  0 s  git diff --check"
+    },
+    {
+      "phase": 3,
+      "exit": 0,
+      "script_seconds": 0,
+      "observed_monotonic_phase_seconds": 0.6973736249492504,
+      "summary_line": "03 exit 0  0 s  cargo clippy --workspace --all-targets -- -D warnings"
+    }
+  ],
+  "prior_attempt11_preservation": "../ra8-preflight/checkpoint12-attempt11-preservation.json",
+  "preexisting_production_table": {
+    "sha256": "6c3ec135cec4acb23ec3489e7324cfc760e12c6e0da6727fef8675901548d435",
+    "mtime_ns": 1792155643228129596,
+    "bytes": 49763
+  },
+  "timing_note": "Script seconds are unchanged date-based values; observed monotonic phase intervals include transitions and wrapper hash/metadata overhead. Total monotonic elapsed is recorded independently.",
+  "owned_script_pid": 61386,
+  "elapsed_monotonic_seconds": 660.2166749170283,
+  "current_source_mismatches": {
+    "attempt11-final8-runtime-manifest.json": [],
+    "attempt11-final8-test-example-manifest.json": []
+  },
+  "process_exit": -15,
+  "end_utc": "2026-10-19T20:47:25.111057+00:00",
+  "final_source_mismatches": {
+    "attempt11-final8-runtime-manifest.json": [],
+    "attempt11-final8-test-example-manifest.json": []
+  },
+  "process_output_sha256": "222fa3b9c8a98e0fb71a07d02024d27e7237bd0cc847324acf58da668a87265e"
+}

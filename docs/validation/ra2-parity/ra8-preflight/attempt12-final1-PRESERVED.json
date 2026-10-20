@@ -1,0 +1,93 @@
+{
+  "utc": "2026-10-19T21:23:38.342154+00:00",
+  "files": [
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt12-final1-RUNNING.json",
+      "bytes": 430,
+      "sha256": "425b578ef993a3ff4946d4ca5926b8ee5f088936ee9767fd4514624b396dcb19"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt12-final1-STOPPED.json",
+      "bytes": 424,
+      "sha256": "56bdfe5ff14fa0871ff7520a1b4b63161f48d9e577b47919b6ca567bdf7dbf3e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt12-final1-clippy.log",
+      "bytes": 231,
+      "sha256": "9c514f9de6d2029f95d75866163af2e4f3f8ccaedba37c758a0712d6135581c4"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt12-final1-default-demo10.log",
+      "bytes": 5175,
+      "sha256": "7cc5341fe6115877bfbb211cc4520cb9c1d76c75d2e9266654f58a3f57f2598d"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt12-final1-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt12-final1-focused-attrition.log",
+      "bytes": 1975,
+      "sha256": "21868a77e880f78046a314d3661b6cf66914b992f13d287c08aeb262224cf54b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt12-final1-focused-composition.log",
+      "bytes": 1934,
+      "sha256": "9b1c23db0ef977c1c023159364dd92dbc0d4a83d23e1d8e37df169ba69692f52"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt12-final1-focused-last-stand.log",
+      "bytes": 764,
+      "sha256": "e1a688b90f998388091328d030a55ffda0f0a269cb825cffeab88343af53ffc9"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt12-final1-focused-ra4.log",
+      "bytes": 719,
+      "sha256": "21c282ac0ed4d0c7ae0b85429adf7df630fa63acff4bb798a4e20c51fa451827"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt12-final1-focused-ra8-ai.log",
+      "bytes": 10184,
+      "sha256": "5c4be540b3c298f75b7149af5d174f4a38e6af717413a5bf9895a4b2c9f311ad"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt12-final1-focused-recovery.log",
+      "bytes": 2693,
+      "sha256": "8e1e03c1ebbdd70383413907eb0ae8bd1405584e99c27fb82e238a6efa9f2bfe"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt12-final1-focused-temporal-affected.log",
+      "bytes": 9887,
+      "sha256": "af8ee7a40797d265c0a1188ad9b15ab79661c867b4fcfb9ab4d15862a501f354"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt12-final1-generator.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt12-final1-preflight.json",
+      "bytes": 8317,
+      "sha256": "b9eef27c43d892c125c04c6f79d8cd306c3fc6cd6e52bff016eba8c78fd2c444"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt12-final1-reference.log",
+      "bytes": 69,
+      "sha256": "5fa32e9687ef749dd76543b607f37bc835ddd9e7469e2b7b5874d233ee5cf964"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt12-final1-runtime-manifest.json",
+      "bytes": 38191,
+      "sha256": "d930f617e48c1b98ebae9bb62c6a7eadd193293bfbdc22defe34f57185f383a3"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt12-final1-test-example-manifest.json",
+      "bytes": 19544,
+      "sha256": "bfe4a567fce72a205545c88eb576cf0c7a7e7c06d35d864948c5493b9b831467"
+    }
+  ],
+  "count": 17,
+  "bytes": 100537,
+  "note": "Unique failed scoped prefix retained byte-identically; no label is reused. Completed default-demo10 failed; later7phases unrun."
+}

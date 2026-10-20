@@ -1,0 +1,15 @@
+{
+  "utc": "2026-10-19T20:53:24.305530+00:00",
+  "file": "crates/game/tests/ra8_gate_matches.rs",
+  "before_restoration_sha256": "2dd884f201aff2f0d5ad47d93f9bf4b34308e1dd866f1b6191fe66dbfdffc99d",
+  "original_sha256": "7bc635b8a0bf2fd7a1f44893658af2b23d3ffa11e485e0c93cf9c5acf4bf6b05",
+  "chronology": "The already-completed observational replay did not itself restore the helper. This guarded post-replay evidence capture restores it in finally; a separate later SHA read is required before dependent work.",
+  "replay_exit": 101,
+  "replay_elapsed_seconds": 15.97076245903736,
+  "raw_sha256": "dc91b4b6643d82d52c39fc7f3ca4486769120218e860de661f909ded74fae6c3",
+  "raw_bytes": 638935,
+  "production_sources_unchanged": true,
+  "result": "Exact native ending failure, not a passed validation; no runtime policy selected.",
+  "restored_sha256": "7bc635b8a0bf2fd7a1f44893658af2b23d3ffa11e485e0c93cf9c5acf4bf6b05",
+  "restore_utc": "2026-10-19T20:53:24.306745+00:00"
+}

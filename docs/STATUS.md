@@ -4581,3 +4581,44 @@ Checkpoint12 evidence hygiene is classified exit2/NOTpassed:94exact raw diagnost
 (90blankEOF/4trailing;92logs/2capturedpatchcontexts),0source/data/test/prose errors.
 All line/EOL/file/stagedblob hashes match without normalizing raw bytes;stdout is captured
 directly in JSON. Separate final identical staged recheck precedes the evidence commit.
+
+
+### RA8: thirteenth scoped checkpoint, complete gate still required (2026-10-20 UTC)
+
+R173 corrects avoidable post-patience service delay through one shared pure slot predicate:
+opted-in country plans have distinct single-tick slots; legacy windows and boundary-only
+extra wakeups remain equivalent across all supported cadences. Existing helplessness,
+1200 patience, native sale/outcome and source TeamDelay stay unchanged. R174 permits spare
+detector discovery without a main mission only after initial source readiness, preserving
+real escorted sorties, healthy long routes and home defense. Both have intended-fail native
+proofs and final-body bypasses with finally plus separate later SHA restoration. Initial
+premise failures, broad-admission escort regression and scoped final1 failure remain explicit.
+
+Frozen scoped final2 completes19 commands exit0,325 Rust passes/0 failed/0 ignored across18
+target invocations. Recorded wrapper monotonic4058.808918s/command sum4057.261503s. Retained38
+wins38 times across37 distinct configurations; defaultDemo ten and grown-map three pass.
+Current Demo Russia/LibyaEasy68806/72000 remains a near-limit watch. All21 actual-default
+m13 maps win with ten builders: median97048/p90 nearest167644/max340649; worst mean1.644ms.
+Fixed256 actual24000/ten builders each means1.059/.944383/.959516ms pass. Full tails remain:
+all-map max224.303ms/p9916.452ms/busiest1000 7.246ms/516 ticks>50ms. Passing means do not
+prove smoothness. Host clamshell sleep overlaps retained38 UTC; raw OS lines and separate
+monotonic/UTC measures are preserved without retroactively subtracting time.
+
+Static1124→1365 (+241), zero removed/renamed/ignored;344runtime+169additional with18 overlap
+bind495 matching paths. The working source was validated before its four-path2d720e9 commit,
+which follows a separate staged check0 and coordinator release. Evidence checkpoint13 and
+all19 raw hashes bind actual results. Attempt12's failed fullgate35 files/149847 bytes per
+set remain byte-identical across70 copies; phase4 is partial,05–13 unrun,TSV stale. One new
+complete unchanged all0 full13 and both fresh756 R29 distributions remain required before
+RA8 validation closure. RA9, independent review and user quality verification remain pending;
+R172 authorizes review scheduling in two batches only. No new substantial external directory;
+configured RA5 render and RA7/RA8 parser caches remain retained for reruns.
+
+
+Checkpoint13 evidence hygiene: first unfiltered staged check exits2, NOTpassed. All68
+classified diagnostics across31 native log paths are29 preserved blank EOFs, one actual
+interleaved native-progress trailing space and38 verbatim OS power-log trailing spaces.
+Exact file/line/EOL/staged-blob SHA bindings match; zero source/data/test/prose errors.
+Captured stdout is JSON-escaped directly (247c5eb2…), preserving every raw byte. A separate
+restaged unfiltered check must match before a later deliberate evidence commit; no raw
+normalization or broad whitespace suppression is used.

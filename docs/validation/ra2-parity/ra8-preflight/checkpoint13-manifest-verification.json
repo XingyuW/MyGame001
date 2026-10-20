@@ -1,0 +1,12 @@
+{
+  "verified_utc": "2026-10-20T00:53:41.763026+00:00",
+  "runtime_count": 344,
+  "additional_count": 169,
+  "overlap": 18,
+  "unique": 495,
+  "mismatches": [],
+  "runtime_manifest": "attempt12-final2-runtime-manifest.json",
+  "runtime_manifest_sha256": "712a64143db93219db9052c624f97cb9bfcb13bad4408938a559380f82f31b3e",
+  "additional_manifest": "attempt12-final2-test-example-manifest.json",
+  "additional_manifest_sha256": "c9f6225b2a4774c2d36d61a9b181eb969fdf384bf86b2fc61f6a52724d8ce9c5"
+}

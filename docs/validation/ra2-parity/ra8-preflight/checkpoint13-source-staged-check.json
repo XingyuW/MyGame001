@@ -1,0 +1,31 @@
+{
+  "receipt_utc": "2026-10-20T00:57:14.486671+00:00",
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit": 0,
+  "passed": true,
+  "stdout": "",
+  "stderr": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "paths": [
+    "crates/game/tests/ra8_gate_matches.rs",
+    "crates/sim/src/ai.rs",
+    "crates/sim/src/ai/strategy.rs",
+    "crates/sim/tests/ra8_ai.rs"
+  ],
+  "source_blob_sha256": {
+    "crates/game/tests/ra8_gate_matches.rs": "743c78d3ba344d0690cbb595c720c0910be78e69b276197799bbfc99e41af6c0",
+    "crates/sim/src/ai.rs": "fcf15641832e881f8e848fda0ed2b85ba6c47fc6976a810694055b0ecbb339b0",
+    "crates/sim/src/ai/strategy.rs": "ec57866cd73ffc7cbd6049fdd27587c544e850bd63b4048de2d49353a0ebac96",
+    "crates/sim/tests/ra8_ai.rs": "90c2398a96971c35e311d7aa0baa71df7a1a126b3acdc10042c38bef2f967814"
+  },
+  "check_evidence": "Standalone tool operation completed exit0/empty before separate staged inspection at2026-10-20T00:55:45Z and later root-confirmed source commit. Not rerun after commit under an empty index.",
+  "source_commit": "2d720e9b3cbde95dcd0b742dfe64e7e61e4f6fe8",
+  "source_commit_utc": "2026-10-19T20:56:06-04:00",
+  "diff_summary": "4 files,461 insertions,12 deletions",
+  "separate_commit": true
+}

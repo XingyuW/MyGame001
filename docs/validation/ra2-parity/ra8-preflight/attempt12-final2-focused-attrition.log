@@ -1,0 +1,22 @@
+    Finished `release` profile [optimized] target(s) in 0.22s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 15 tests
+test ai::ra8_attrition_tests::ra8_a_current_observed_building_mission_is_not_replaced_by_a_repaired_home_nearer_target ... ok
+test ai::ra8_attrition_tests::ra8_a_remote_armed_unit_does_not_pin_a_surface_mission_on_a_repaired_distraction ... ok
+test ai::ra8_attrition_tests::ra8_a_unit_controller_keeps_its_native_approach_instead_of_attacking_an_immune_building ... ok
+test ai::ra8_attrition_tests::ra8_actual_chronoshift_and_temporal_disable_keep_attack_attempts_alive ... ok
+test ai::ra8_attrition_tests::ra8_actual_death_and_mind_control_complete_only_the_lost_owned_attempt ... ok
+test ai::ra8_attrition_tests::ra8_an_expired_aa_job_cannot_starve_a_fresh_observed_barrier ... ok
+test ai::ra8_attrition_tests::ra8_each_building_job_field_is_value_hashed_in_canonical_order ... ok
+test ai::ra8_attrition_tests::ra8_exhausted_known_jobs_keep_legal_search_and_do_not_fabricate_a_winner ... ok
+test ai::ra8_attrition_tests::ra8_failed_real_sorties_do_not_blacklist_a_naturally_charged_strategic_strike ... ok
+test ai::ra8_attrition_tests::ra8_original_approach_survives_but_replacement_ids_cannot_renew_a_failed_job ... ok
+test ai::ra8_attrition_tests::ra8_original_surface_approach_keeps_its_native_temporal_building_channel ... ok
+test ai::ra8_attrition_tests::ra8_real_cargo_and_depot_entry_do_not_fabricate_building_attack_losses ... ok
+test ai::ra8_attrition_tests::ra8_real_declining_hp_and_ammunition_reloads_keep_a_healthy_building_job ... ok
+test ai::ra8_attrition_tests::ra8_real_support_launch_and_source_recharge_do_not_complete_an_army_attempt ... ok
+test ai::ra8_attrition_tests::ra8_target_qualified_surface_focus_keeps_native_temporal_and_ivan_effects ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 107 filtered out; finished in 5.36s
+

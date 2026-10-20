@@ -1,0 +1,15 @@
+{
+  "utc": "2026-10-19T20:50:55.943015+00:00",
+  "file": "crates/game/tests/ra8_gate_matches.rs",
+  "baseline_commit": "8d5fa86cf75a1917aa92a7eaba5562b3a090c9b0",
+  "baseline_sha256": "7bc635b8a0bf2fd7a1f44893658af2b23d3ffa11e485e0c93cf9c5acf4bf6b05",
+  "diagnostic_sha256": "2dd884f201aff2f0d5ad47d93f9bf4b34308e1dd866f1b6191fe66dbfdffc99d",
+  "patch": "docs/validation/ra2-parity/ra8-preflight/attempt12-demo-native-instrumentation.patch",
+  "patch_sha256": "7107cedc733b8206f8230c79987570e5171164c82657b3574b22f9580f81c1ad",
+  "new_retained_test": "ra8_gate12_demo_great_britain_cuba_easy_seed_zero_finishes",
+  "seed": 0,
+  "limit": 72000,
+  "semantic_scope": "New exact default-path regression plus optional observational six-thousand-tick snapshots/counters/repairing/power prints. No runtime policy/state/command/RNG/vision changes. Existing assertions and limits unchanged.",
+  "repair_attribution_caveat": "Economy HP-increase counters alone are not exact paid-repair debits;Engineers can heal. Actual repairing membership/credits/queues/events must establish any causal financing claim.",
+  "format_exit": 0
+}

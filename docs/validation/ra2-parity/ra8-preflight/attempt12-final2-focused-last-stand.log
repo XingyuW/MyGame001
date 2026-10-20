@@ -1,0 +1,12 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 40.14s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 4 tests
+test ai::tests::a_player_that_can_neither_fight_nor_earn_makes_its_last_stand ... ok
+test ai::tests::ra8_every_supported_cadence_and_offset_retains_a_nonstarving_last_stand_slot ... ok
+test ai::tests::ra8_legacy_last_stand_due_matches_every_original_tick_and_supported_cadence ... ok
+test ai::tests::ra8_opted_in_last_stand_slots_are_distinct_and_due_for_every_supported_cadence ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.38s
+

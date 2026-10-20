@@ -1,0 +1,27 @@
+{
+  "utc": "2026-10-20T00:45:16.982675+00:00",
+  "note": "Bounded owned-process metadata only;19 completed map winners, nextThousandLakes pending, activity is not a case outcome. No profiler/signal.",
+  "log_last_modified_utc": "2026-10-20T00:38:56.659664+00:00",
+  "processes": [
+    {
+      "pid": 85965,
+      "ppid": 7720,
+      "pgid": 85965,
+      "elapsed": "03:05:12",
+      "cpu_time": "0:01.21",
+      "cpu_percent": "0.0",
+      "state": "Ss",
+      "command": "/opt/homebrew/Cellar/python@3.15/3.15.0/Frameworks/Python.framework/Versions/3.15/Resources/Python.app/Contents/MacOS/Python -"
+    },
+    {
+      "pid": 91845,
+      "ppid": 85965,
+      "pgid": 85965,
+      "elapsed": "30:43",
+      "cpu_time": "30:35.95",
+      "cpu_percent": "98.4",
+      "state": "R",
+      "command": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples/m13_ten_players to-the-end all"
+    }
+  ]
+}
