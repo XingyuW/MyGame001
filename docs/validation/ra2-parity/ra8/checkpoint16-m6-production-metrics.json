@@ -1,0 +1,71 @@
+{
+  "utc": "2026-10-20T14:22:45.067582+00:00",
+  "attempt": 16,
+  "head": "26ad1e384ff17aff2a0075a08f39d510f28d0067",
+  "runtime_commit": "b411bed120ca05bfe909afc071d044e7928ecb78",
+  "native_table": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/m6_production_matches_lengths.tsv",
+  "native_mtime_ns": 1792506111018655498,
+  "native_mtime_after_launch": true,
+  "table": "docs/validation/ra2-parity/ra8/checkpoint16-m6-production-lengths.tsv",
+  "table_sha256": "f896198edf4615e8c7ebe8e2742ea3b0e7e17bfdf85f0d87dd9afda384191ba0",
+  "rows": 756,
+  "unique_matches": 756,
+  "maps": {
+    "arctic_floes": 36,
+    "black_water": 36,
+    "continental_divide": 36,
+    "coral_archipelago": 36,
+    "crossroads": 36,
+    "demo": 36,
+    "ember_caldera": 36,
+    "frostline": 36,
+    "frozen_sound": 36,
+    "glacier_pass": 36,
+    "harvest_plains": 36,
+    "iron_isthmus": 36,
+    "jungle_delta": 36,
+    "liberty_bay": 36,
+    "oasis_gulf": 36,
+    "pacific_atoll": 36,
+    "red_canyon": 36,
+    "riverlands": 36,
+    "steel_harbor": 36,
+    "thousand_lakes": 36,
+    "wheel_of_worlds": 36
+  },
+  "native_target_result": "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6304.38s",
+  "universal_winner_evidence": "M6 completed756/756 non_Won0, strict played756 and failures.empty assertions before table publication, native target6/0/0. Workspace command and full13 may still be running.",
+  "ticks": {
+    "minimum": 6659,
+    "mean": 37644.29232804233,
+    "median": 29428.0,
+    "p90_nearest_rank": 72617,
+    "p99_nearest_rank": 142005,
+    "maximum": 250882
+  },
+  "fraction_of_unchanged_R29_limit": {
+    "minimum": 0.04167013888888889,
+    "mean": 0.16846145658366227,
+    "median": 0.12105034722222222,
+    "p90_nearest_rank": 0.3428809523809524,
+    "p99_nearest_rank": 0.7111388888888889,
+    "maximum": 0.9312638888888889
+  },
+  "maximum_tick_cases": [
+    {
+      "match": "black_water: france (easy) against libya (easy)",
+      "ticks": 250882,
+      "limit": 288000
+    }
+  ],
+  "maximum_fraction_cases": [
+    {
+      "match": "crossroads: korea (easy) against france (easy)",
+      "ticks": 67051,
+      "limit": 72000
+    }
+  ],
+  "growing_workspace_log": "docs/validation/ra2-parity/ra8/04-test.log",
+  "tick_semantics": "M6 native table records SimTick schedule steps after outcome; event Won tick may be one less. Immutable raw bytes preserved; escaped tab delimiters normalized in memory only.",
+  "not_claimed": "No completed workspace/full13/duel756/current isolated performance acceptance from this production-target result."
+}

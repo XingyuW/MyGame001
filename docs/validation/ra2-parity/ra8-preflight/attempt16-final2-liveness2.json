@@ -1,0 +1,37 @@
+{
+  "utc": "2026-10-20T22:40:13.671238+00:00",
+  "scope": "Read-only owned process activity; long legacy all-map target pending, no outcome inference from CPU",
+  "owned_pgid": 58488,
+  "processes": [
+    {
+      "pid": 58488,
+      "ppid": 7720,
+      "pgid": 58488,
+      "elapsed": "19:59",
+      "cpu_time": "0:00.58",
+      "cpu_percent": "0.0",
+      "state": "Ss",
+      "command": "/opt/homebrew/Cellar/python@3.15/3.15.0/Frameworks/Python.framework/Versions/3.15/Resources/Python.app/Contents/MacOS/Python -"
+    },
+    {
+      "pid": 60275,
+      "ppid": 58488,
+      "pgid": 58488,
+      "elapsed": "16:47",
+      "cpu_time": "0:00.42",
+      "cpu_percent": "0.0",
+      "state": "S",
+      "command": "/Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo test --release -p sim"
+    },
+    {
+      "pid": 63143,
+      "ppid": 60275,
+      "pgid": 58488,
+      "elapsed": "13:54",
+      "cpu_time": "39:37.49",
+      "cpu_percent": "504.9",
+      "state": "R",
+      "command": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_ai-39cf04a6b4df1362"
+    }
+  ]
+}

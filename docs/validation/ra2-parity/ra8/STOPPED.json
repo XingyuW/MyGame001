@@ -1,0 +1,206 @@
+{
+  "utc": "2026-10-20T21:45:21.958015+00:00",
+  "attempt": 16,
+  "checkpoint": 16,
+  "status": "FAILED_AT_COMPLETED_PHASE10; dependent phases stopped",
+  "head": "26ad1e384ff17aff2a0075a08f39d510f28d0067",
+  "runtime_commit": "b411bed120ca05bfe909afc071d044e7928ecb78",
+  "branch": "ra2-parity",
+  "main": "8230a955b251e9341d349f99eaeb86f7f8253664",
+  "completed_phases": [
+    {
+      "line": "01 exit 0  1 s  cargo fmt --all -- --check",
+      "number": 1,
+      "exit": 0,
+      "script_date_seconds": 1,
+      "completion_observed_utc": "2026-10-20T12:32:09.897419+00:00",
+      "wrapper_elapsed_seconds": 2.00321354100015,
+      "observed_interval_seconds": 2.00321354100015
+    },
+    {
+      "line": "02 exit 0  0 s  git diff --check",
+      "number": 2,
+      "exit": 0,
+      "script_date_seconds": 0,
+      "completion_observed_utc": "2026-10-20T12:32:09.947026+00:00",
+      "wrapper_elapsed_seconds": 2.0528898750199005,
+      "observed_interval_seconds": 0.04967633401975036
+    },
+    {
+      "line": "03 exit 0  1 s  cargo clippy --workspace --all-targets -- -D warnings",
+      "number": 3,
+      "exit": 0,
+      "script_date_seconds": 1,
+      "completion_observed_utc": "2026-10-20T12:32:10.019075+00:00",
+      "wrapper_elapsed_seconds": 2.1249401660170406,
+      "observed_interval_seconds": 0.07205029099714011
+    },
+    {
+      "line": "04 exit 0  10426 s  cargo test --workspace --release  [1389 passed, 0 failed, 0 ignored]",
+      "number": 4,
+      "exit": 0,
+      "script_date_seconds": 10426,
+      "completion_observed_utc": "2026-10-20T15:25:56.073727+00:00",
+      "wrapper_elapsed_seconds": 8248.068310540984,
+      "observed_interval_seconds": 8245.943370374967
+    },
+    {
+      "line": "05 exit 0  1 s  cargo build --release -p game",
+      "number": 5,
+      "exit": 0,
+      "script_date_seconds": 1,
+      "completion_observed_utc": "2026-10-20T15:25:57.180744+00:00",
+      "wrapper_elapsed_seconds": 8249.175334791013,
+      "observed_interval_seconds": 1.1070242500281893
+    },
+    {
+      "line": "06 exit 0  16 s  cargo run --release -p game -- --smoke-test 600",
+      "number": 6,
+      "exit": 0,
+      "script_date_seconds": 16,
+      "completion_observed_utc": "2026-10-20T15:26:18.253349+00:00",
+      "wrapper_elapsed_seconds": 8270.247856458009,
+      "observed_interval_seconds": 21.07252166699618
+    },
+    {
+      "line": "07 exit 0  131 s  cargo run -p game -- --smoke-test 600",
+      "number": 7,
+      "exit": 0,
+      "script_date_seconds": 131,
+      "completion_observed_utc": "2026-10-20T15:28:34.492911+00:00",
+      "wrapper_elapsed_seconds": 8406.486090541002,
+      "observed_interval_seconds": 136.23823408299359
+    },
+    {
+      "line": "08 exit 0  1 s  cargo run --release -p sim --example m7_benchmark",
+      "number": 8,
+      "exit": 0,
+      "script_date_seconds": 1,
+      "completion_observed_utc": "2026-10-20T15:28:35.590927+00:00",
+      "wrapper_elapsed_seconds": 8407.584098665975,
+      "observed_interval_seconds": 1.0980081249726936
+    },
+    {
+      "line": "09 exit 0  9163 s  cargo run --release -p sim --example m7_soak",
+      "number": 9,
+      "exit": 0,
+      "script_date_seconds": 9163,
+      "completion_observed_utc": "2026-10-20T18:01:19.217587+00:00",
+      "wrapper_elapsed_seconds": 17571.159575290978,
+      "observed_interval_seconds": 9163.575476625003
+    },
+    {
+      "line": "10 exit 1  13368 s  cargo run --release -p sim --example m14_duels -- full",
+      "number": 10,
+      "exit": 1,
+      "script_date_seconds": 13368,
+      "completion_observed_utc": "2026-10-20T21:44:07.146317+00:00",
+      "wrapper_elapsed_seconds": 30443.050675874983,
+      "observed_interval_seconds": 12871.891100584005
+    }
+  ],
+  "workspace_Rust_results": {
+    "passed": 1389,
+    "failed": 0,
+    "ignored": 0,
+    "targets": 82
+  },
+  "M6": {
+    "cases": 756,
+    "Won": 756,
+    "nonWon": 0,
+    "table_sha256": "f896198edf4615e8c7ebe8e2742ea3b0e7e17bfdf85f0d87dd9afda384191ba0"
+  },
+  "soak": {
+    "configurations": 260,
+    "repeat_runs": 2,
+    "total_ticks": 18720000,
+    "exit": 0,
+    "log_sha256": "2ce032f1069eb9139e454c10af329aceada3cc8171147bb844316c67868c1fba"
+  },
+  "m14": {
+    "cases": 756,
+    "Won": 755,
+    "nonWon": 1,
+    "actual_limit": 300000,
+    "seed": 14,
+    "log_sha256": "48fe2b52e8145f364de72231554130e85eac4e9cfd9f92052ad58810ac43d79d",
+    "results_path": "docs/validation/ra2-parity/ra8/checkpoint16-duel-results.json",
+    "results_sha256": "a67e73d23fe6c7a063c7b5627fa883e0a74da8cde79382870678a2a0415f5634"
+  },
+  "uncompleted_phases": [
+    11,
+    12,
+    13
+  ],
+  "dependent_log_presence": {
+    "11": false,
+    "12": false,
+    "13": false
+  },
+  "dependent_phase_credit": "No completed rows and no11/12/13 log created; no execution/pass credit. Wrapper stopped owned script group after phase10nonzero.",
+  "owned_processes": {
+    "session": 66547,
+    "wrapper_pid": 84658,
+    "script_pgid": 84687,
+    "native_m14_pid": 14459,
+    "script_exit": -15,
+    "unified_wrapper_tool_exit": 0,
+    "wrapper_exit_is_not_gate_success": true,
+    "poststop_process_read_utc": "2026-10-20T21:44:37.838670+00:00",
+    "owned_or_validator_rows_remaining": []
+  },
+  "timing": {
+    "start_utc": "2026-10-20T12:32:07.885020+00:00",
+    "end_utc": "2026-10-20T21:44:07.285458+00:00",
+    "wrapper_monotonic_seconds": 30443.18987570802,
+    "UTC_interval_seconds": 33119.400438,
+    "note": "Retain script date seconds, native durations, UTC interval and wrapper monotonic independently; no retroactive subtraction or unsupported cause attribution."
+  },
+  "source_files_verified": 495,
+  "source_mismatches": [],
+  "logs": {
+    "01-fmt.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "02-diff-check.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "03-clippy.log": {
+      "bytes": 72,
+      "sha256": "a16685927daa0790a2b357e2b56df170e7bad259186d3c802d6d441422dfd0cf"
+    },
+    "04-test.log": {
+      "bytes": 1485783,
+      "sha256": "5a58b1e59817218eb8c4b04c244f47641b670ffeaae834b161bed7a0d60d2342"
+    },
+    "05-build-release.log": {
+      "bytes": 62,
+      "sha256": "db073818ee343e803727ffd505942b2c27966062c682b273fe90a689e93185e6"
+    },
+    "06-smoke-release.log": {
+      "bytes": 287,
+      "sha256": "7cc5754b0b0912d96f403a9b8b5b3ee7cf6a77abefdafa980e1b926a4336a854"
+    },
+    "07-smoke-debug.log": {
+      "bytes": 735,
+      "sha256": "d0455754f9eb37435d4089f9e13e5341011e94529bf2bdea1a0f7be03fa00e8e"
+    },
+    "08-benchmark.log": {
+      "bytes": 827,
+      "sha256": "1ed906e1ec1c32bca4e8172ff625c1c0ad49fa3db5f16a476efbfcff6bedc4c9"
+    },
+    "09-soak.log": {
+      "bytes": 55729,
+      "sha256": "2ce032f1069eb9139e454c10af329aceada3cc8171147bb844316c67868c1fba"
+    },
+    "10-duels.log": {
+      "bytes": 106783,
+      "sha256": "48fe2b52e8145f364de72231554130e85eac4e9cfd9f92052ad58810ac43d79d"
+    }
+  },
+  "postgate_acceptance": "all21/fixed3/3exampleguards UNRUN, deferred until a successful unchanged-source full13. RA9/final review unreleased.",
+  "next": "Preserve whole label byte-identically in attempt16 archive before any reuse/mutation, then ONE exact observed Coral seed14 native300000 trace. Terminal snapshot is not causal diagnosis."
+}

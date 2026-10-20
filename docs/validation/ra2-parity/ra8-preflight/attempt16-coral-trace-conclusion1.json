@@ -1,0 +1,250 @@
+{
+  "utc": "2026-10-20T22:09:58.195362+00:00",
+  "raw": "docs/validation/ra2-parity/ra8-preflight/attempt16-coral-native-trace1.log",
+  "raw_sha256": "1e0352a314aa6877f8f75a1e306777f1c65f74a292e3052f879c11e9b79682ae",
+  "native_nuke155_activations": [
+    {
+      "tick": 23032,
+      "target": [
+        207,
+        212
+      ]
+    },
+    {
+      "tick": 35042,
+      "target": [
+        208,
+        212
+      ]
+    },
+    {
+      "tick": 47052,
+      "target": [
+        208,
+        212
+      ]
+    },
+    {
+      "tick": 59062,
+      "target": [
+        214,
+        210
+      ]
+    },
+    {
+      "tick": 71072,
+      "target": [
+        204,
+        216
+      ]
+    },
+    {
+      "tick": 83082,
+      "target": [
+        217,
+        210
+      ]
+    },
+    {
+      "tick": 95092,
+      "target": [
+        212,
+        202
+      ]
+    },
+    {
+      "tick": 107102,
+      "target": [
+        198,
+        212
+      ]
+    },
+    {
+      "tick": 119112,
+      "target": [
+        198,
+        212
+      ]
+    },
+    {
+      "tick": 131122,
+      "target": [
+        212,
+        212
+      ]
+    },
+    {
+      "tick": 143132,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 155142,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 167152,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 179162,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 191172,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 203182,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 215192,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 227202,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 239212,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 251222,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 263232,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 275242,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 287252,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 299262,
+      "target": [
+        211,
+        167
+      ]
+    }
+  ],
+  "late_activations_after180000": [
+    {
+      "tick": 191172,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 203182,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 215192,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 227202,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 239212,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 251222,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 263232,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 275242,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 287252,
+      "target": [
+        211,
+        167
+      ]
+    },
+    {
+      "tick": 299262,
+      "target": [
+        211,
+        167
+      ]
+    }
+  ],
+  "typed_correction": "SimId401 is actual P1 soviet_war_factory, native placed24593, not a shipyard. No stale/destroyed/captured-target premise.",
+  "observed_boundary": "At189000 known only401/full1000HP, sees_footprint true; origin220,224 false while221,224 and222,225 visible. Source155 powered2000/1415; actual Nuke activations consume charge on visible WarMiner27 at211,167. Source building weight100 vs harvester1.",
+  "scope": "Observational admission diagnosis, not proof of sole whole-ending cause or exact healing/repair debit attribution. Source remains unchanged; intended native regression pending."
+}

@@ -1,0 +1,389 @@
+{
+  "utc": "2026-10-20T22:49:36.015969+00:00",
+  "summary": "attempt16-final2-summary.json",
+  "summary_sha256": "2b93145409a32e85c60302589cfce8bd608fae1f45a412f84b102a76475f06bd",
+  "commands": 9,
+  "target_results": 73,
+  "rust_counts": [
+    1085,
+    0,
+    0
+  ],
+  "command_seconds": 1172.3285594990011,
+  "wrapper_monotonic_seconds": 1172.9970242920099,
+  "fullsim": {
+    "name": "full-sim",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim"
+    ],
+    "start_utc": "2026-10-20T22:23:26.652541+00:00",
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-09-full-sim.log",
+    "end_utc": "2026-10-20T22:47:42.429833+00:00",
+    "elapsed_seconds": 981.3773653339595,
+    "exit": 0,
+    "log_sha256": "e502acac306c46d2f9a83d24c5b671b26a5a28c8cdefc2cb088cd5596945ed21",
+    "rust_results": [
+      {
+        "passed": 124,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 12,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 4,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 33,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 24,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 37,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 11,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 22,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 10,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 32,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 16,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 11,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 15,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 24,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 11,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 22,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 36,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 20,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 15,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 12,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 22,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 13,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 10,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 17,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 18,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 9,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 10,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 17,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 16,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 22,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 19,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 9,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 19,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 9,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 23,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 4,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 30,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 32,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 12,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 10,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 131,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 4,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "source_mismatches": []
+  },
+  "known_exact_ticks": [
+    62005,
+    41738,
+    33776
+  ],
+  "demo_russia_libya_easy_tick": 62722,
+  "coral_seed14": {
+    "receipt": "attempt16-coral-edge-after1.json",
+    "raw_sha256": "71f5c99d6fc3726f2bd04cab8679e53cf6a1d947d4b759cde9a6d99d7086b86f",
+    "outcome": "P1Won79081",
+    "actual_original_limit": 300000,
+    "source_scope": 11,
+    "fixture_syntax_correction": "attempt16-edge-strike-clippy-correction.json"
+  },
+  "timing_context": "Functional preflight/replay can overlap explicitly leased serial short jobs1 RA9 copy-only checks. Not isolated performance. UTC/monotonic/CPU intervals retained independently; no sleep cause inferred.",
+  "postgate_acceptance": "All21/fixed3/3exampleguards after successful unchanged full13; unrun now."
+}

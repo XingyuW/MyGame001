@@ -11264,3 +11264,132 @@ copies at1576140 bytes per set without mismatch before any label reuse.
 Checkpoint16, coherent source/evidence commits and separate unfiltered hygiene
 checks still precede explicit full13 release. Both fresh756 distributions and
 all13exit0, then unchanged-source isolated all21/fixed3/example guards remain owed.
+
+
+### R189 — Aim strategic strikes at a stable visible building footprint cell (2026-10-20)
+
+Checkpoint16's unchanged full attempt16 completes phases1–9 with exit0. The
+workspace reports1389/0/0 across82 Rust target results, including the retained41
+and all756 production outcomes. Its fresh production table SHA
+f896198edf4615e8c7ebe8e2742ea3b0e7e17bfdf85f0d87dd9afda384191ba0 records756
+unique bounded SimTicks: median29428,p90 nearest-rank72617,max250882; normalized
+median.12105034722222222,p90.3428809523809524,max.9312638888888889. These are
+current-source scoped successes, not a full gate acceptance. The soak repeats
+260 configurations twice at36000 ticks,18720000 total; restarts mean final samples
+need not be ended worlds. Phase10 instead completes755Won and one None among756
+unique pairs: Coral Archipelago IraqBrutal/CubaBrutal, seed14, original300000
+M14 bound. That bound is separate from M6's unchanged per-map R29 bounds.
+The owned group stops after completed phase10 exit1. Phases11–13 and isolated
+post-gate acceptance are unrun; wrapper completion0 is not a gate pass.
+
+The entire attempt16 label is preserved before instrumentation:130 leaves,
+2307707 bytes per set,260 current/archive copies. PRESERVED.json SHA
+cec5b5e5294ecc3b3c7481247b7b03e8736ce1fc5e5c66905c04783adb216116 binds it.
+The one exact observational replay retains seed/pair/options/300000 and adds
+trace-only external Arc/Mutex counters, event receipts and typed snapshots.
+Only m14_duels.rs changes; no World/AI/rules/command mutation is introduced.
+The replay returns None300000, exit1,1032.641632 monotonic seconds; raw97552219
+bytes SHA1e0352a314aa6877f8f75a1e306777f1c65f74a292e3052f879c11e9b79682ae.
+Its reported terminal fields match the original reported fields, which is not a
+full world/hash trajectory equivalence claim. Finally22:08:08.791884Z restores
+examplec2276424. The separate22:08:16.862019Z receipt rehashes all495 original
+bindings with zero mismatch before dependent source edits. Raw source and patch
+bindings are retained in attempt16-coral-native-trace1.json and its receipts.
+
+Typed native evidence corrects the earlier manual kind-index interpretation:
+SimId401 is an actual P1 soviet_war_factory, placed24593, not a shipyard. It
+remains P1/full1000HP in late observations. Absence from an incorrectly typed
+terminal list establishes neither destruction nor capture. No stale-memory
+purge or nonexistent-target premise is retained. At189000 P0 knows only401;
+its3×3 footprint starts220,224. Origin visibility is false, but221,224 and222,225
+are visible and sees_footprint is true. P0 has normal2000/1415 power and a live
+Nuke source155. Actual Nuke activations191172,203182,215192,227202,239212,
+251222,263232,275242,287252 and299262 target211,167, the observed WarMiner27.
+This is not a wholly idle/uncharged strategic source. The shipped source target
+weight is100 for a Vehicles factory and1 for a harvester; no weight change is
+needed. HP snapshots and shot counts alone do not establish exact repair debits,
+net healing or an exclusive whole-war cause.
+
+strike_target previously required stable(footprint.origin), although native
+building observation accepts any footprint cell and a public strategic command
+requires its selected target cell visible. It consequently excludes this known
+observed factory while scoring a visible miner. The smallest correction retains
+the building footprint and source weight, choosing its first stable footprint
+cell as the candidate point. Row-major cells put the origin first when valid,
+preserving existing origin-visible selections/ties. Full footprint distance still
+scores blast coverage. Unit filtering, source readiness/power/disabled/erasure,
+positive weights, radius and all other strategic roles remain unchanged. stable
+retains the existing fog-on stays_visible veto; no hidden occupancy/state is read.
+This is a general game-owned targeting choice, not a claim of original closed
+source AI implementation or guaranteed future visibility/safety.
+
+New native regression ra8_a_naturally_charged_strike_uses_an_observed_building_edge
+uses a controlled Reactor/Sensor/Silo and enemy source3×3 WarFactory. Its helper
+adds an optional satellite flag; all old callers retain their original satellite.
+The new case has none. Untouched controllers are temporarily withheld while the
+real source naturally charges through bounded normal schedules; no charge,
+controller history, clock or enemy HP is injected. Actual origin30,20 remains
+unseen while edge32,20 is visible. BEFORE1 is a preserved compile-only wrong
+Rules field, not causal evidence. Corrected BEFORE2 on original strategy8c5b44a7
+really declines the AI launch; an ordinary public edge command then launches and
+damages the building, proving legality/effect before the intended final assertion
+fails. Raw7f22d6ba9262f0899f06d55995131862d4b13550406216108ba7eee9d999c418
+is101,0/1/0. AFTER1 on strategy56c39f14 with identical fixturec8bf152a launches
+at32,20 and damages the target: raw54446243f537a0b2ac11ee7389e4aa6c1256ca12f365a0d831fdfb8c5a068d71,
+0,1/0/0. The exact original Coral replay and affected controls remain pending;
+this proves the admission property, not an accepted whole ending or full gate.
+
+RA9 preliminary work is separately authorized only in an isolated ordinary cache
+copy extracted from immutable26ad. Its short serial jobs1 Cargo lease is explicitly
+revoked and released before this canonical build. A prior3.21s unleased copy-only
+compile failure stays separately recorded, without retroactive approval or pass
+credit. Loaded diagnostic timing overlaps preliminary short copy compilation and
+heavy tracing, so is not isolated performance evidence. Canonical source/Git and
+validator scheduling remain owned by RA8. Full13 and unchanged-source isolated
+all21/fixed3/three example guards remain mandatory before closure.
+
+R189's exact original seed14 Coral AFTER replay now reports P1Won79081/300000,
+exit0, raw71f5c99d6fc3726f2bd04cab8679e53cf6a1d947d4b759cde9a6d99d7086b86f,
+205.361716 wrapper seconds including32.36 compile and169.8 native seconds.
+All eleven receipt source bindings match before/after. That receipt does not
+include the example path: its original uninstrumented bytes are bound by the
+separate prior495-file restoration and later adjacent example read, not a
+retrospective expansion of the eleven-path probe scope. This is a combined
+current-selector ending, not proof the late401 opportunity alone caused the win:
+the general selector can also alter earlier partial-footprint choices. Preliminary
+RA9 short copy-only jobs overlap this functional replay by explicit lease; elapsed
+is not isolated performance evidence. Same-source compatibility/frozen fullsim,
+clean checkpoint and required full13 still precede any RA8 closure.
+
+R189 frozen final1 stops after strict Clippy101 on the new test's collapsible_if
+style diagnostic; fmt/regeneration pass and all six dependent game/sim commands
+are unrun. No behavior failure or acceptance is inferred. The sole correction
+collapses the nested event/source condition, preserving every comparison and
+assertion. Its receipt mechanically reverses final fixturee5667a1f to the exact
+c8bf152a native BEFORE2/AFTER1 bytes. Those probes remain bound to their actual
+historical fixture bytes. Fresh final2 discovers495 paths again; final syntax
+executes in its ONE full sim command. Production strategy56c39f14 remains the
+same as the exact Coral ending; no duplicate isolated replay is required for a
+test-only equivalent syntax correction. No lint waiver or assertion migration
+is used.
+
+R189 final2 completes all nine frozen commands with exit0 and no495-source
+mismatch. ONE full sim reports1078/0/0 across68 result targets, including final
+edge-strike syntax, original recovery21 and all strategic/hidden/availability
+controls. Its rawe502acac306c46d2f9a83d24c5b671b26a5a28c8cdefc2cb088cd5596945ed21
+binds981.377365 command seconds. Aggregate frozen Rust counts1085/0/0 across73
+target results exclude the separately bound exact Coral example (which has no
+Rust result). Strict checks, three known exacts62005/41738/33776, all10DemoWon
+including Russia/LibyaEasy62722, and grown3 pass. Wrapper monotonic1172.997024s;
+functional overlap with leased short RA9 copy work is disclosed, not isolated
+performance. Static1124→1387(+263),0removed/renamed/ignored. Fresh preservation
+verifies all130 attempt16 leaves/260copies at2307707B per set. Checkpoint17 binds
+the one coherent provenance record and existing raw bytes. Following the user's
+speed priority, coordinator standing authorization permits coherent commits,
+appropriate unfiltered hygiene classification and clean495 freeze verification,
+then immediate mandatory full13 without another release wait. All original gates
+and post-success same-source isolated acceptance remain owed.
+
+Checkpoint17 source was later committed aseb308a231e302048c9dc8d1e8b9543b7c5f64ef7: exactly2validated paths,174insertions/13deletions. Standalone stagedcheck0 at22:49:49Z and separate completed-result read22:49:54Z precede commit; preflight is not represented as postcommit. Evidence raw-only hygiene and clean freeze precede immediate mandatory full13 under standing authorization.
+
+Checkpoint17 evidence unfiltered stagedcheck exits2, NOTpassed, stdoutef3cfea47e58b2917caf7df777bccd52c153b27424eb00468769af18859119ba. All144 diagnostics across18 exact raw evidence paths are classified with file/stagedblob/line/EOL hashes; zero source/data/test/prose errors. Raw bytes remain untouched. Final identical unfiltered check precedes deliberate evidence commit and immediate clean-source full13.

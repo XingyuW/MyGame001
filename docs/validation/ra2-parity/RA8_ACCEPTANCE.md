@@ -1,6 +1,24 @@
 # RA8 acceptance record
 
-Status: checkpoint16 preparation follows R186–R188. Full attempt15 completed the
+
+Current status (2026-10-20): unchanged full attempt16 passed phases1–9, including
+1389 Rust tests, the actual756 production winners and repeat soak. Phase10 then
+completed755Won/one Coral IraqBrutal/CubaBrutal seed14 nonwinner at the original
+300000 bound; phases11–13 and post-gate isolated acceptance are unrun. All130
+label leaves are preserved before diagnosis. Those scoped successes do not close RA8.
+
+R189 corrects strategic building targeting at an actually stable visible footprint
+cell while retaining full footprint/source-weight scoring. A naturally charged native
+edge regression fails the original AI despite a legal effective public launch, then
+passes with actual AI launch and damage. The exact original Coral replay now ends
+P1Won79081/300000. This is combined current-selector ending evidence. Fresh final2
+passes all9commands: strict/three known exacts/Demo10/grown3/ONE fullsim1078/0/0;
+aggregate1085/0/0 across73 target results. No full13, RA9 canonical release or independent review is claimed.
+Historical checkpoint16 records follow; the next clean checkpoint requires coordinator
+checks before another unchanged full13, followed by same-source all21/fixed3/guards.
+
+
+Historical checkpoint16 status: preparation followed R186–R188. Full attempt15 completed the
 required production sweep with756 actual Won and retained41/0/0, then failed seven
 original recovery invariants; its entire70-leaf label is preserved. Those successes
 belong to the old runtime and are not transferred to this correction. R186's initial
@@ -1198,3 +1216,9 @@ EOF diagnostics,zero source/data/test/prose errors. File/line/EOL and actual sta
 SHA bindings match; raw output is captured directly as JSON-escaped stdout(d0c4e178…).
 No byte normalization or whitespace suppression; separate final identical unfiltered
 check and a later deliberate evidence commit remain required.
+
+[Checkpoint17](ra8-preflight/checkpoint17.json) binds the frozen495 inputs,1387 static tests, final2 raw provenance and preserved attempt16. Coherent commits/clean freeze precede immediate full13 under standing coordinator authorization; no additional release wait or optional diagnostics. Both fresh756 winner distributions and post-success isolated all21/fixed3/guards remain mandatory.
+
+Checkpoint17 source was later committed aseb308a231e302048c9dc8d1e8b9543b7c5f64ef7: exactly2validated paths,174insertions/13deletions. Standalone stagedcheck0 at22:49:49Z and separate completed-result read22:49:54Z precede commit; preflight is not represented as postcommit. Evidence raw-only hygiene and clean freeze precede immediate mandatory full13 under standing authorization.
+
+Checkpoint17 evidence unfiltered stagedcheck exits2, NOTpassed, stdoutef3cfea47e58b2917caf7df777bccd52c153b27424eb00468769af18859119ba. All144 diagnostics across18 exact raw evidence paths are classified with file/stagedblob/line/EOL hashes; zero source/data/test/prose errors. Raw bytes remain untouched. Final identical unfiltered check precedes deliberate evidence commit and immediate clean-source full13.

@@ -1,0 +1,46 @@
+{
+  "utc": "2026-10-20T19:51:30.752937+00:00",
+  "attempt": 16,
+  "head": "26ad1e384ff17aff2a0075a08f39d510f28d0067",
+  "runtime_commit": "b411bed120ca05bfe909afc071d044e7928ecb78",
+  "status": "PARTIAL_RUNNING_WITH_ACTUAL_BOUNDED_NONWINNER",
+  "session_id": 66547,
+  "wrapper_pid": 84658,
+  "script_pgid": 84687,
+  "native_pid": 14459,
+  "case": {
+    "map": "coral_archipelago",
+    "dimensions": [
+      256,
+      256
+    ],
+    "countries": [
+      "iraq",
+      "cuba"
+    ],
+    "difficulties": [
+      "brutal",
+      "brutal"
+    ],
+    "seed": 14,
+    "actual_unchanged_tick_limit": 300000,
+    "outcome": "NO WINNER",
+    "reported_case_elapsed_seconds": 4716.5
+  },
+  "failure_line": {
+    "path": "docs/validation/ra2-parity/ra8/checkpoint16-duel-first-nonwinner.log",
+    "bytes": 2990,
+    "sha256": "c2f221dab8fd21222d1578a5e68ef62b610f593ab7414d0a8c9f1ab6839768d8"
+  },
+  "raw_prefix": {
+    "path": "docs/validation/ra2-parity/ra8/checkpoint16-duel-first-failure-prefix.log",
+    "bytes": 60663,
+    "sha256": "bd2f6a5ecf2b5b4ce76806558b132edf4a2aab39666fa201dcd4ae5a27248dd9"
+  },
+  "actual_Won_lines_so_far": 423,
+  "nonwinner_lines_so_far": 1,
+  "source_files_verified": 495,
+  "source_mismatches": [],
+  "handling": "Keep this ONE current full m14 sweep unchanged through all jobs to collect every bounded outcome. No trace, source mutation or competing validator. Owned wrapper stops dependent phases after completed nonzero phase10; archive entire final attempt before diagnosis/label reuse.",
+  "not_inferred": "Terminal state is not causal diagnosis or helplessness proof. Current M6 and soak passes remain scoped successes; full13 cannot pass."
+}
