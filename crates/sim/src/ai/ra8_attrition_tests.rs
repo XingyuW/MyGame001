@@ -16,6 +16,10 @@ pub(super) fn app_with_country(country: &str) -> App {
 }
 
 fn app_country(power: bool, country: &str) -> App {
+    app_country_with_satellite(power, country, true)
+}
+
+fn app_country_with_satellite(power: bool, country: &str, satellite: bool) -> App {
     let data = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets/data");
     let definitions = crate::load_ruleset(&data).unwrap();
     let mut skirmish = crate::load_skirmish(data.join("skirmish.ron"), &definitions).unwrap();
@@ -78,7 +82,9 @@ fn app_country(power: bool, country: &str) -> App {
     if power {
         building(&mut app, 0, "nuclear_reactor", CellPos::new(2, 2));
     }
-    building(&mut app, 0, "spy_satellite", CellPos::new(2, 8));
+    if satellite {
+        building(&mut app, 0, "spy_satellite", CellPos::new(2, 8));
+    }
     app
 }
 
@@ -853,6 +859,146 @@ fn ra8_failed_real_sorties_do_not_blacklist_a_naturally_charged_strategic_strike
     assert!(
         saw_ready && launched && damaged,
         "ground-cohort failure suppressed an independently legal naturally charged strategic strike"
+    );
+}
+
+#[test]
+fn ra8_a_naturally_charged_strike_uses_an_observed_building_edge() {
+    let mut app = app_country_with_satellite(true, "iraq", false);
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<AiPlayers>());
+    // Controlled ordinary source actors. The stationary sensor observes the far
+    // edge without revealing the building's origin; no global satellite is added.
+    building(&mut app, 0, "psychic_sensor", CellPos::new(42, 20));
+    let source = building(&mut app, 0, "nuclear_silo", CellPos::new(2, 20));
+    let target = building(&mut app, 1, "soviet_war_factory", CellPos::new(30, 20));
+    let target_entity = entity(&mut app, target).unwrap();
+    let footprint = app
+        .world()
+        .get::<Building>(target_entity)
+        .unwrap()
+        .footprint;
+    let definitions = app.world().resource::<Definitions>();
+    let cooldown = definitions
+        .metadata(ProductionItem::Building(
+            definitions.building_kind("nuclear_silo").unwrap(),
+        ))
+        .unwrap()
+        .cooldown;
+    let flight = definitions.rules().unwrap().superweapons.nuclear_flight;
+    step(&mut app);
+    assert_eq!(
+        app.world()
+            .resource::<crate::SpecialState>()
+            .charge
+            .get(&source),
+        Some(&0)
+    );
+    for _ in 0..cooldown.saturating_add(1) {
+        if app
+            .world()
+            .resource::<crate::SpecialState>()
+            .charge
+            .get(&source)
+            .is_some_and(|charge| *charge >= cooldown)
+        {
+            break;
+        }
+        step(&mut app);
+    }
+    let state = app.world().resource::<Players>().get(PlayerId(0)).unwrap();
+    assert!(!state.low_power());
+    assert!(state.vision().sees_footprint(footprint));
+    assert!(!state.vision().is_visible(footprint.origin));
+    let edge = footprint
+        .cells()
+        .find(|&cell| state.vision().is_visible(cell))
+        .unwrap();
+    assert!(
+        app.world()
+            .resource::<crate::SpecialState>()
+            .charge
+            .get(&source)
+            .is_some_and(|charge| *charge >= cooldown)
+    );
+    *app.world_mut().resource_mut::<AiPlayers>() = controllers;
+    let maximum = app
+        .world()
+        .get::<crate::Health>(target_entity)
+        .unwrap()
+        .hit_points;
+    let mut launched = false;
+    let mut damage = false;
+    let mut launch_cell = None;
+    for _ in 0..flight.saturating_add(200) {
+        for event in step(&mut app) {
+            if let crate::SimEvent::StrategicActivated {
+                building,
+                target: cell,
+                role: Role::Nuke,
+                ..
+            } = event
+                && building == source
+            {
+                assert!(footprint.contains(cell));
+                assert!(
+                    app.world()
+                        .resource::<Players>()
+                        .get(PlayerId(0))
+                        .unwrap()
+                        .vision()
+                        .is_visible(cell)
+                );
+                launched = true;
+                launch_cell = Some(cell);
+            }
+        }
+        damage |= launched
+            && entity(&mut app, target)
+                .and_then(|e| app.world().get::<crate::Health>(e))
+                .is_none_or(|hp| hp.hit_points < maximum);
+        if launched && damage {
+            break;
+        }
+    }
+    // Establish public command legality even when the old AI origin filter
+    // declines this otherwise ready strike. This is a premise, not an AI pass.
+    let mut public_launched = launched;
+    let mut public_damage = damage;
+    if !launched {
+        std::mem::take(&mut *app.world_mut().resource_mut::<AiPlayers>());
+        issue(
+            &mut app,
+            0,
+            Command::Superweapon {
+                building: source,
+                target: edge,
+                units: Vec::new(),
+            },
+        );
+        for _ in 0..flight.saturating_add(2) {
+            for event in step(&mut app) {
+                public_launched |= matches!(event, crate::SimEvent::StrategicActivated { building, target: cell, role: Role::Nuke, .. } if building == source && cell == edge);
+            }
+            public_damage |= public_launched
+                && entity(&mut app, target)
+                    .and_then(|e| app.world().get::<crate::Health>(e))
+                    .is_none_or(|hp| hp.hit_points < maximum);
+            if public_launched && public_damage {
+                break;
+            }
+        }
+    }
+    eprintln!(
+        "edge strike: origin{:?}, edge{edge:?}, native launch{launch_cell:?}/damage{damage}, public launch{public_launched}/damage{public_damage}",
+        footprint.origin
+    );
+    assert!(
+        public_launched && public_damage,
+        "visible edge was not a legal effective native strike"
+    );
+    assert!(
+        launched && damage,
+        "AI skipped a ready effective strike at an actually observed building edge"
     );
 }
 
