@@ -1315,3 +1315,13 @@ fn ra8_gate12_demo_great_britain_cuba_easy_seed_zero_finishes() {
 fn ra8_gate13_crossroads_russia_america_easy_seed_zero_finishes() {
     run_case("crossroads", ["russia", "america"], ["easy", "easy"]);
 }
+
+#[test]
+fn ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes() {
+    run_case("crossroads", ["america", "russia"], ["easy", "easy"]);
+}
+
+#[test]
+fn ra8_gate14_riverlands_france_germany_easy_seed_zero_finishes() {
+    run_case("riverlands", ["france", "germany"], ["easy", "easy"]);
+}

@@ -560,6 +560,82 @@ pub(super) fn decide(
     let combat_support = strategic(view, controller, special, &ground_wave);
     screen_strike_aircraft(view, controller, special, &ground_wave, &mut commands);
     ground_wave.retain(|unit| !controller.reserved.contains(&unit.id));
+    let cohort_threats: Vec<_> = view
+        .enemy_units
+        .iter()
+        .copied()
+        .filter(|enemy| {
+            ground_wave.iter().any(|friend| {
+                view.fights(friend)
+                    && matches!(
+                        view.definitions.domain(friend.kind),
+                        Domain::Land | Domain::Amphibious
+                    )
+                    && incoming_wave_threat_from(view, friend, enemy)
+            })
+        })
+        .collect();
+    // Ordinary nearest acquisition may choose an unarmed worker or economic building while a real
+    // observed defender fires at the wave. Use the selected ground weapon's
+    // range, not a longer AA secondary, to qualify this short-range counterfire.
+    let mut counterfire: BTreeMap<SimId, Vec<SimId>> = BTreeMap::new();
+    for unit in ground_wave.iter().filter(|unit| {
+        view.fights(unit)
+            && matches!(
+                view.definitions.domain(unit.kind),
+                Domain::Land | Domain::Amphibious
+            )
+    }) {
+        if healthy_counterfire(view, unit, &cohort_threats) {
+            controller.reserved.insert(unit.id);
+            continue;
+        }
+        let distracted = matches!(
+            unit.attack_order,
+            Some(crate::AttackOrder::AttackMove { moving: false, .. })
+        ) && (view.enemy_units.iter().any(|enemy| {
+            Some(enemy.id) == unit.combat_target && !enemy.armed && enemy.harvest.is_some()
+        }) || view.enemy_buildings.iter().any(|enemy| {
+            Some(enemy.id) == unit.combat_target
+                && enemy.economy
+                && view
+                    .definitions
+                    .building_combat(enemy.kind)
+                    .is_some_and(|terms| {
+                        terms
+                            .weapons(false)
+                            .into_iter()
+                            .all(|weapon| weapon.is_none())
+                    })
+        }));
+        // A rear member of this same building mission may help an actually
+        // threatened front before entering the defender's own firing envelope.
+        let assisting = !incoming_wave_threat(view, unit)
+            && matches!(unit.attack_order, Some(crate::AttackOrder::Attack {target,..})
+            if controller.target == Some(WaveTarget::Building(target)) && controller.known.contains_key(&target));
+        if !distracted && !assisting {
+            continue;
+        }
+        if let Some(enemy) = view
+            .enemy_units
+            .iter()
+            .filter(|enemy| {
+                counterfire_eligible(view, unit, enemy)
+                    && (incoming_wave_threat_from(view, unit, enemy)
+                        || (assisting
+                            && cohort_threats.iter().any(|threat| threat.id == enemy.id)
+                            && counterfire_route(view, unit, enemy)))
+            })
+            .min_by_key(|enemy| (chebyshev(unit.mobile.cell, enemy.mobile.cell), enemy.id))
+        {
+            controller.reserved.insert(unit.id);
+            counterfire.entry(enemy.id).or_default().push(unit.id);
+        }
+    }
+    for (target, units) in counterfire {
+        commands.push(Command::Attack { units, target });
+    }
+    ground_wave.retain(|unit| !controller.reserved.contains(&unit.id));
     let current_building = match controller.target {
         Some(WaveTarget::Building(id)) => Some(id),
         _ => None,
@@ -1438,9 +1514,10 @@ fn funded_army_recovery(view: &View<'_>, controller: &AiController) -> bool {
     {
         return true;
     }
-    // The existing ordinary sale excludes declared army producers/prerequisites.
-    // A sale cannot hypothetically finance a unit after deleting its producer.
-    let refund = match sell_for_army(view) {
+    // The ordinary sale prefers optional assets; guarded understrength consolidation
+    // separately proves a retained legal producer and source-reachable building finisher.
+    // This existing financing check conservatively reuses that native sale opportunity.
+    let refund = match sell_for_army(view, controller) {
         Some(Command::SellBuilding { building }) => view
             .own_buildings
             .iter()
@@ -1531,7 +1608,61 @@ fn surface_response_cell(view: &View<'_>, unit: &UnitSnap, target: Footprint) ->
 
 // Surface handoffs require incoming eligible fire, not merely an opportunity
 // for our own longer-range gun to shoot an otherwise harmless distraction.
+fn counterfire_eligible(view: &View<'_>, unit: &UnitSnap, enemy: &UnitSnap) -> bool {
+    if !enemy.armed {
+        return false;
+    }
+    let (Some(own), Some(hostile)) = (
+        view.definitions.unit_combat(unit.kind),
+        view.definitions.unit_combat(enemy.kind),
+    ) else {
+        return false;
+    };
+    let traits = screen_unit_traits(view, enemy, &hostile);
+    crate::weapon_against(view.definitions, &own, own.weapons(false), &traits).is_some_and(
+        |(kind, percent)| {
+            percent > 1
+                && view.definitions.weapon(kind).is_some_and(|weapon| {
+                    weapon.damage > 0
+                        && weapon.range
+                            < view.ai.policy.artillery_min_range * crate::SUBCELLS_PER_CELL as u32
+                })
+        },
+    )
+}
+
+fn counterfire_route(view: &View<'_>, unit: &UnitSnap, enemy: &UnitSnap) -> bool {
+    weapon_reachable(
+        view,
+        unit.kind,
+        unit.mobile.cell,
+        Some(unit.mobile.position(view.grid, unit.id)),
+        view.definitions.on_foot(unit.kind),
+        enemy.id,
+    )
+}
+
+fn healthy_counterfire(view: &View<'_>, unit: &UnitSnap, cohort_threats: &[&UnitSnap]) -> bool {
+    let Some(crate::AttackOrder::Attack { target, .. }) = unit.attack_order else {
+        return false;
+    };
+    view.enemy_units.iter().any(|enemy| {
+        enemy.id == target
+            && counterfire_eligible(view, unit, enemy)
+            && (incoming_wave_threat_from(view, unit, enemy)
+                || (unit.has_order
+                    && cohort_threats.iter().any(|threat| threat.id == enemy.id)
+                    && counterfire_route(view, unit, enemy)))
+    })
+}
+
 fn incoming_wave_threat(view: &View<'_>, unit: &UnitSnap) -> bool {
+    view.enemy_units
+        .iter()
+        .any(|enemy| incoming_wave_threat_from(view, unit, enemy))
+}
+
+fn incoming_wave_threat_from(view: &View<'_>, unit: &UnitSnap, enemy: &UnitSnap) -> bool {
     let Some(terms) = view.definitions.unit_combat(unit.kind) else {
         return false;
     };
@@ -1541,34 +1672,32 @@ fn incoming_wave_threat(view: &View<'_>, unit: &UnitSnap) -> bool {
         traits.immune_radiation = meta.immune_radiation;
     }
     let from = crate::combat::Extent::point(unit.mobile.position(view.grid, unit.id));
-    view.enemy_units.iter().any(|enemy| {
-        let Some(hostile) = view.definitions.unit_combat(enemy.kind) else {
-            return false;
-        };
-        let Some((kind, percent)) =
-            crate::weapon_against(view.definitions, &hostile, hostile.weapons(false), &traits)
-        else {
-            return false;
-        };
-        let Some(weapon) = view
-            .definitions
-            .weapon(kind)
-            .filter(|weapon| percent > 1 && weapon.damage > 0)
-        else {
-            return false;
-        };
-        let (dx, dy) = from.gap(&crate::combat::Extent::point(
-            enemy.mobile.position(view.grid, enemy.id),
-        ));
-        let reach = weapon
-            .range
-            .saturating_add(if traits.airborne && weapon.anti_air {
-                hostile.air_range_bonus
-            } else {
-                0
-            });
-        crate::in_range(dx, dy, reach) && !crate::inside_min_range(dx, dy, weapon.min_range)
-    })
+    let Some(hostile) = view.definitions.unit_combat(enemy.kind) else {
+        return false;
+    };
+    let Some((kind, percent)) =
+        crate::weapon_against(view.definitions, &hostile, hostile.weapons(false), &traits)
+    else {
+        return false;
+    };
+    let Some(weapon) = view
+        .definitions
+        .weapon(kind)
+        .filter(|weapon| percent > 1 && weapon.damage > 0)
+    else {
+        return false;
+    };
+    let (dx, dy) = from.gap(&crate::combat::Extent::point(
+        enemy.mobile.position(view.grid, enemy.id),
+    ));
+    let reach = weapon
+        .range
+        .saturating_add(if traits.airborne && weapon.anti_air {
+            hostile.air_range_bonus
+        } else {
+            0
+        });
+    crate::in_range(dx, dy, reach) && !crate::inside_min_range(dx, dy, weapon.min_range)
 }
 
 fn local_wave_threat(view: &View<'_>, unit: &UnitSnap) -> bool {
@@ -1658,6 +1787,14 @@ pub(super) fn defence_reachable(view: &View<'_>, unit: &UnitSnap, target: SimId)
 // Future production has no current-position bonus shot or registered occupant.
 // Only public terrain and currently observed real building targets justify recovery.
 pub(super) fn production_finisher(view: &View<'_>, kind: UnitKind) -> bool {
+    production_finisher_without(view, kind, None)
+}
+
+pub(super) fn production_finisher_without(
+    view: &View<'_>,
+    kind: UnitKind,
+    sold: Option<SimId>,
+) -> bool {
     if !matches!(
         view.definitions.domain(kind),
         Domain::Land | Domain::Amphibious
@@ -1666,7 +1803,9 @@ pub(super) fn production_finisher(view: &View<'_>, kind: UnitKind) -> bool {
     }
     view.own_buildings
         .iter()
-        .filter(|b| produces(view.definitions, b.kind, ProductionItem::Unit(kind)))
+        .filter(|b| {
+            Some(b.id) != sold && produces(view.definitions, b.kind, ProductionItem::Unit(kind))
+        })
         .flat_map(|b| b.footprint.ring())
         .filter(|&cell| {
             view.grid.cell(cell).is_some_and(|c| {
