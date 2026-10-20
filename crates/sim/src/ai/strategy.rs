@@ -705,6 +705,8 @@ pub(super) fn decide(
                         && range(view.definitions, unit.kind)
                             < view.ai.policy.artillery_min_range * crate::SUBCELLS_PER_CELL as u32
                         && !matching_attack(unit)
+                        && !matches!(unit.attack_order,
+                            Some(crate::AttackOrder::AttackMove { moving: true, .. }))
                         // A unit-control actor still owns useful movement toward
                         // recruits; an immune building must not replace it with
                         // a weapon order that immediately ends without effect.

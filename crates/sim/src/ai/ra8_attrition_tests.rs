@@ -1327,6 +1327,86 @@ fn ra8_a_remote_armed_unit_does_not_pin_a_surface_mission_on_a_repaired_distract
 }
 
 #[test]
+fn ra8_surface_focus_preserves_a_real_healthy_approach_before_native_building_fire() {
+    let mut app = app();
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<AiPlayers>());
+    for _ in 0..6000 {
+        step(&mut app);
+    }
+    let objective = building(&mut app, 1, "soviet_refinery", CellPos::new(15, 25));
+    let attacker = unit(&mut app, 0, "rhino", CellPos::new(28, 24));
+    unit(&mut app, 1, "gi", CellPos::new(44, 44));
+    app.world_mut().insert_resource(controllers);
+    for _ in 0..20 {
+        step(&mut app);
+    }
+    let controller = app
+        .world()
+        .resource::<AiPlayers>()
+        .controller(PlayerId(0))
+        .unwrap();
+    assert_eq!(controller.target, Some(WaveTarget::Building(objective)));
+    assert!(controller.wave.contains(&attacker));
+    let cadence = u64::from(controller.difficulty().think_interval);
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<AiPlayers>());
+    let destination = CellPos::new(15, 24);
+    issue(
+        &mut app,
+        0,
+        Command::AttackMove {
+            units: vec![attacker],
+            target: destination,
+        },
+    );
+    step(&mut app);
+    while !app
+        .world()
+        .resource::<crate::SimTick>()
+        .0
+        .is_multiple_of(cadence)
+    {
+        step(&mut app);
+    }
+    let entity_id = entity(&mut app, attacker).unwrap();
+    let mobile = *app.world().get::<Mobile>(entity_id).unwrap();
+    assert!(
+        mobile.step.is_some(),
+        "ordinary native pathfinding must establish real approach progress"
+    );
+    assert!(
+        matches!(app.world().get::<crate::Weapon>(entity_id).unwrap().order,
+        Some(crate::AttackOrder::AttackMove { destination: found, moving: true }) if found == destination)
+    );
+    app.world_mut().insert_resource(controllers);
+    // Execute the actual due AI decision and then apply its FIFO intent.
+    step(&mut app);
+    step(&mut app);
+    let entity_id = entity(&mut app, attacker).unwrap();
+    eprintln!(
+        "healthy surface approach before{mobile:?} after{:?} order{:?}",
+        app.world().get::<Mobile>(entity_id),
+        app.world().get::<crate::Weapon>(entity_id).unwrap().order
+    );
+    assert!(
+        matches!(app.world().get::<crate::Weapon>(entity_id).unwrap().order,
+        Some(crate::AttackOrder::AttackMove { destination: found, moving: true }) if found == destination),
+        "a real healthy approach must retain native movement/combat ownership across the due AI application"
+    );
+    let mut fired = false;
+    for _ in 0..1000 {
+        fired |= step(&mut app).iter().any(|event| matches!(event,
+            crate::SimEvent::WeaponFired { attacker: found, target, .. } if *found == attacker && *target == objective));
+        if fired {
+            break;
+        }
+    }
+    assert!(
+        fired,
+        "preserving the native approach must still yield a real building shot"
+    );
+}
+
+#[test]
 fn ra8_a_unit_controller_keeps_its_native_approach_instead_of_attacking_an_immune_building() {
     let mut app = app_with_country("iraq");
     let objective = building(&mut app, 1, "soviet_service_depot", CellPos::new(34, 12));

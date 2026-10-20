@@ -1310,3 +1310,8 @@ fn ra8_gate11_frozen_russia_libya_easy_seed_zero_finishes() {
 fn ra8_gate12_demo_great_britain_cuba_easy_seed_zero_finishes() {
     run_case("demo", ["great_britain", "cuba"], ["easy", "easy"]);
 }
+
+#[test]
+fn ra8_gate13_crossroads_russia_america_easy_seed_zero_finishes() {
+    run_case("crossroads", ["russia", "america"], ["easy", "easy"]);
+}

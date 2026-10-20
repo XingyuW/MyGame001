@@ -37,6 +37,8 @@ struct ScenarioMode {
     army: Option<&'static [&'static str]>,
     production_only: bool,
     opponent: Option<&'static str>,
+    legacy_ai: bool,
+    fog: bool,
 }
 
 fn scenario_mode(
@@ -52,6 +54,9 @@ fn scenario_mode(
     skirmish.maps[0].starts = vec![CellPos::new(8, 8), CellPos::new(38, 38)];
     skirmish.starting_credits = credits;
     let mut ai = load_ai(data().join("ai.ron"), &definitions).unwrap();
+    if mode.legacy_ai {
+        ai.rules_difficulty = false;
+    }
     if let Some(army) = mode.army {
         let selected = skirmish
             .factions
@@ -164,6 +169,7 @@ fn scenario_mode(
         &MatchOptions {
             mcv_start: false,
             crates: false,
+            fog_of_war: mode.fog,
             unit_count: Some(units),
             superweapons,
             ..MatchOptions::default()
@@ -8220,17 +8226,46 @@ fn ra8_a_capable_living_land_force_keeps_empty_miners_out_of_the_attack_wave() {
         CellPos::new(14, 8),
     )
     .unwrap();
+    // R177: preserve useful worker roles with an actual known economic job,
+    // rather than the superseded assumption that an empty map requires idleness.
+    put(&mut app, "soviet_refinery", 12, 14);
+    let ore_at = CellPos::new(9, 18);
+    let mut ore = *app.world().resource::<Grid>().cell(ore_at).unwrap();
+    ore.ore = 5000;
+    app.world_mut()
+        .resource_mut::<Grid>()
+        .set_terrain(ore_at, ore);
+    let mut delivered = false;
     let mut tank_shot = false;
     let mut miner_shot = false;
     let mut miner_order = false;
     for _ in 0..1000 {
         for event in step(&mut app) {
+            delivered |= matches!(
+                event,
+                sim::SimEvent::OreDelivered {
+                    player: PlayerId(0),
+                    ..
+                }
+            );
             tank_shot |= matches!(event, sim::SimEvent::WeaponFired { attacker, target: found, .. } if attacker == tank && found == target);
             miner_shot |=
                 matches!(event, sim::SimEvent::WeaponFired { attacker, .. } if attacker == miner);
         }
         miner_order |= app.world().resource::<CommandQueue>().iter().any(|c| matches!(&c.command, Command::AttackMove {units,..} | Command::Attack {units,..} if units.contains(&miner)));
     }
+    assert!(
+        delivered,
+        "the real worker job must produce ordinary income"
+    );
+    assert!(
+        app.world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .vision()
+            .is_visible(ore_at)
+    );
     assert!(
         tank_shot,
         "the ordinary capable land defender must really fire"
@@ -9747,4 +9782,844 @@ fn ra8_unseen_building_occupancy_does_not_change_parallel_detector_intents() {
     assert_eq!(a.controllers, b.controllers);
     assert_eq!(a.commands, b.commands);
     assert!(a.commands.iter().any(|issued| matches!(&issued.command, Command::AttackMove { units, target } if units.contains(&dog) && *target == CellPos::new(38, 38))), "the real new scout must run in both twins");
+}
+
+#[test]
+fn ra8_empty_armed_workers_keep_fighting_while_an_optional_asset_funds_a_paid_recruit() {
+    let mut app = scenario("russia", "brutal", 0, 0, false);
+    let barracks = put(&mut app, "soviet_barracks", 5, 12);
+    put(&mut app, "tesla_reactor", 3, 5);
+    let asset = put(&mut app, "soviet_service_depot", 18, 5);
+    let miner = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "war_miner",
+        CellPos::new(12, 13),
+    )
+    .unwrap();
+    let target = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "soviet_construction_yard",
+        CellPos::new(17, 13),
+    )
+    .unwrap();
+    let defs = app.world().resource::<sim::Definitions>();
+    let kind = defs.unit_kind("conscript").unwrap();
+    let item = sim::ProductionItem::Unit(kind);
+    let cost = defs.production(item).unwrap().cost;
+    let refund = defs.refund(defs.building_kind("soviet_service_depot").unwrap());
+    assert!(refund >= cost && cost > 0);
+    let mut sold = None;
+    let mut paid = false;
+    let mut charged = false;
+    let mut recruited = std::collections::BTreeSet::new();
+    let mut recruit_shot = false;
+    let mut miner_shot = false;
+    for _ in 0..6000 {
+        charged |= app
+            .world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .queues()
+            .flat_map(|(_, q)| q)
+            .any(|q| q.item == item && q.charged > 0);
+        for event in step(&mut app) {
+            match event {
+                sim::SimEvent::BuildingSold {
+                    player: PlayerId(0),
+                    building,
+                    refund: amount,
+                } => {
+                    assert_eq!(building, asset, "retain all ordinary producers");
+                    assert_eq!(amount, refund, "native exact refund only");
+                    assert!(sold.replace(amount).is_none(), "one optional sale suffices");
+                }
+                sim::SimEvent::ProductionComplete {
+                    player: PlayerId(0),
+                    item: found,
+                } if found == item => paid = true,
+                sim::SimEvent::UnitSpawned {
+                    player: PlayerId(0),
+                    building,
+                    unit,
+                } if building == barracks => {
+                    recruited.insert(unit);
+                }
+                sim::SimEvent::WeaponFired {
+                    attacker,
+                    target: found,
+                    ..
+                } if found == target => {
+                    miner_shot |= attacker == miner;
+                    recruit_shot |= recruited.contains(&attacker);
+                }
+                sim::SimEvent::OreDelivered {
+                    player: PlayerId(0),
+                    ..
+                } => panic!("declared empty map must have no income"),
+                _ => {}
+            }
+        }
+        if recruit_shot && miner_shot {
+            break;
+        }
+    }
+    let entity = unit_entity(&mut app, miner);
+    assert!(
+        app.world()
+            .get::<sim::Health>(entity)
+            .is_some_and(|h| h.hit_points > 0)
+    );
+    assert!(
+        app.world()
+            .resource::<sim::MatchState>()
+            .outcome()
+            .is_none()
+    );
+    assert!(
+        app.world()
+            .resource::<sim::MatchState>()
+            .defeated(PlayerId(0))
+            .is_none()
+    );
+    eprintln!(
+        "worker reinforcement sold{sold:?} exact_refund{refund} source_cost{cost} paid{paid} recruits{recruited:?} miner_shot{miner_shot} recruit_shot{recruit_shot}"
+    );
+    assert_eq!(
+        sold,
+        Some(refund),
+        "active useful worker must not exclude financing ordinary reinforcement from an optional asset"
+    );
+    assert!(
+        charged && paid && !recruited.is_empty() && recruit_shot && miner_shot,
+        "real paid recruit and the retained living worker must both make native building shots"
+    );
+}
+
+#[test]
+fn ra8_paid_reinforcements_do_not_send_an_active_empty_worker_wave_home() {
+    let mut app = scenario("russia", "brutal", 0, 0, false);
+    let miner = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "war_miner",
+        CellPos::new(21, 13),
+    )
+    .unwrap();
+    let target = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "soviet_construction_yard",
+        CellPos::new(25, 13),
+    )
+    .unwrap();
+    let mut initial_shot = false;
+    for _ in 0..6000 {
+        initial_shot |= step(&mut app).iter().any(|e| matches!(e,sim::SimEvent::WeaponFired {attacker,target:found,..} if *attacker==miner && *found==target));
+        if initial_shot
+            && app
+                .world()
+                .resource::<sim::AiPlayers>()
+                .controller(PlayerId(0))
+                .unwrap()
+                .wave()
+                .contains(&miner)
+        {
+            break;
+        }
+    }
+    assert!(
+        initial_shot,
+        "the living worker must first enter a real ordinary offensive mission"
+    );
+    assert!(
+        app.world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .wave()
+            .contains(&miner)
+    );
+    let barracks = put(&mut app, "soviet_barracks", 5, 12);
+    let refinery = put(&mut app, "soviet_refinery", 12, 17);
+    put(&mut app, "tesla_reactor", 3, 5);
+    let asset = put(&mut app, "soviet_service_depot", 18, 5);
+    let mut paid = false;
+    let mut spawned = None;
+    let mut sale = false;
+    let mut after_spawn_shot = false;
+    let mut lost_membership = false;
+    let mut replacement_seen_at = None;
+    let mut redirected = false;
+    for _ in 0..1500 {
+        for event in step(&mut app) {
+            match event {
+                sim::SimEvent::ProductionComplete {
+                    player: PlayerId(0),
+                    item: sim::ProductionItem::Unit(kind),
+                } if app
+                    .world()
+                    .resource::<sim::Definitions>()
+                    .unit(kind)
+                    .unwrap()
+                    .id
+                    == "conscript" =>
+                {
+                    paid = true
+                }
+                sim::SimEvent::BuildingSold {
+                    player: PlayerId(0),
+                    building,
+                    ..
+                } if building == asset => sale = true,
+                sim::SimEvent::UnitSpawned {
+                    player: PlayerId(0),
+                    building,
+                    unit,
+                } if building == barracks => {
+                    spawned = Some(unit);
+                    replacement_seen_at.get_or_insert(app.world().resource::<SimTick>().0);
+                }
+                sim::SimEvent::WeaponFired {
+                    attacker,
+                    target: found,
+                    ..
+                } if attacker == miner && found == target && spawned.is_some() => {
+                    after_spawn_shot |= app.world().resource::<SimTick>().0
+                        >= replacement_seen_at.unwrap() + sim::HARVEST_RETRY_TICKS
+                }
+                _ => {}
+            }
+        }
+        if spawned.is_some() {
+            lost_membership |= !app
+                .world()
+                .resource::<sim::AiPlayers>()
+                .controller(PlayerId(0))
+                .unwrap()
+                .wave()
+                .contains(&miner);
+            let gather = app
+                .world()
+                .resource::<sim::AiPlayers>()
+                .controller(PlayerId(0))
+                .unwrap()
+                .gather();
+            redirected |= app
+                .world()
+                .resource::<CommandQueue>()
+                .iter()
+                .any(|issued| match &issued.command {
+                    Command::Harvest { units, .. } => units.contains(&miner),
+                    Command::AttackMove { units, target } => {
+                        units.contains(&miner) && *target == gather
+                    }
+                    _ => false,
+                });
+            if app.world().resource::<SimTick>().0 >= replacement_seen_at.unwrap() + 400 {
+                break;
+            }
+        }
+    }
+    eprintln!(
+        "worker mission initial_shot{initial_shot} sale{sale} paid{paid} spawned{spawned:?} lost_membership{lost_membership} redirected{redirected} after_spawn_shot{after_spawn_shot}"
+    );
+    assert!(
+        sale && paid && spawned.is_some(),
+        "ordinary optional refund must first produce a real replacement"
+    );
+    assert!(
+        !lost_membership && !redirected && after_spawn_shot,
+        "a naturally serving living worker must retain its offensive mission and actual building fire after ordinary paid reinforcement arrives"
+    );
+    let entity = unit_entity(&mut app, miner);
+    assert!(
+        app.world()
+            .get::<sim::Health>(entity)
+            .is_some_and(|h| h.hit_points > 0)
+    );
+    assert!(
+        app.world()
+            .resource::<sim::MatchState>()
+            .outcome()
+            .is_none()
+    );
+    // A newly available real economic job still belongs to an ordinary Harvest.
+    // This is declared terrain setup, followed by public command and native income.
+    let ore_cell = CellPos::new(14, 21);
+    let mut terrain = *app.world().resource::<Grid>().cell(ore_cell).unwrap();
+    terrain.ore = 5000;
+    app.world_mut()
+        .resource_mut::<Grid>()
+        .set_terrain(ore_cell, terrain);
+    let refinery_entity = unit_entity(&mut app, refinery);
+    let origin = app
+        .world()
+        .get::<sim::Building>(refinery_entity)
+        .unwrap()
+        .footprint
+        .origin;
+    issue(
+        &mut app,
+        Command::Harvest {
+            units: vec![miner],
+            target: origin,
+        },
+    );
+    let mut delivered = false;
+    for _ in 0..4000 {
+        delivered |= step(&mut app).iter().any(|event| {
+            matches!(
+                event,
+                sim::SimEvent::OreDelivered {
+                    player: PlayerId(0),
+                    ..
+                }
+            )
+        });
+        if delivered {
+            break;
+        }
+    }
+    assert!(
+        delivered,
+        "real newly available ore must still produce ordinary income after the serving worker's public Harvest"
+    );
+    assert!(
+        !app.world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .wave()
+            .contains(&miner)
+    );
+}
+
+#[test]
+fn ra8_real_forces_economic_jobs_and_financed_heads_preserve_optional_worker_assets() {
+    for control in ["force", "income", "paid_head"] {
+        let mut app = scenario(
+            "russia",
+            if control == "paid_head" {
+                "medium"
+            } else {
+                "brutal"
+            },
+            if control == "paid_head" { 100 } else { 0 },
+            0,
+            false,
+        );
+        let barracks = put(&mut app, "soviet_barracks", 5, 12);
+        put(&mut app, "tesla_reactor", 3, 5);
+        let asset = put(&mut app, "soviet_service_depot", 18, 5);
+        let miner = spawn_unit(
+            app.world_mut(),
+            PlayerId(0),
+            "war_miner",
+            CellPos::new(12, 13),
+        )
+        .unwrap();
+        let target = sim::spawn_building(
+            app.world_mut(),
+            PlayerId(1),
+            "soviet_construction_yard",
+            CellPos::new(17, 13),
+        )
+        .unwrap();
+        let fighter = if control == "force" {
+            Some(spawn_unit(app.world_mut(), PlayerId(0), "rhino", CellPos::new(13, 12)).unwrap())
+        } else {
+            None
+        };
+        if control == "income" {
+            put(&mut app, "soviet_refinery", 12, 17);
+            let at = CellPos::new(14, 21);
+            let mut cell = *app.world().resource::<Grid>().cell(at).unwrap();
+            cell.ore = 5000;
+            app.world_mut().resource_mut::<Grid>().set_terrain(at, cell);
+        }
+        if control == "income" {
+            let controllers = std::mem::take(
+                app.world_mut()
+                    .resource_mut::<sim::AiPlayers>()
+                    .into_inner(),
+            );
+            issue(&mut app, Command::Stop { units: vec![miner] });
+            step(&mut app);
+            let entity = unit_entity(&mut app, miner);
+            assert_eq!(
+                app.world().get::<sim::Harvester>(entity).unwrap().state,
+                sim::HarvestState::Idle
+            );
+            assert!(
+                app.world()
+                    .resource::<sim::Players>()
+                    .get(PlayerId(0))
+                    .unwrap()
+                    .vision()
+                    .is_visible(CellPos::new(14, 21))
+            );
+            let world = app.world_mut();
+            assert!(
+                !world
+                    .query::<(&sim::Owner, &sim::Building)>()
+                    .iter(world)
+                    .any(|(o, b)| o.0 == PlayerId(0)
+                        && world
+                            .resource::<sim::Definitions>()
+                            .building(b.kind)
+                            .unwrap()
+                            .id
+                            == "soviet_war_factory")
+            );
+            app.world_mut().insert_resource(controllers);
+        }
+        if control == "paid_head" {
+            let controllers = std::mem::take(
+                app.world_mut()
+                    .resource_mut::<sim::AiPlayers>()
+                    .into_inner(),
+            );
+            let item = sim::ProductionItem::Unit(
+                app.world()
+                    .resource::<sim::Definitions>()
+                    .unit_kind("conscript")
+                    .unwrap(),
+            );
+            assert_eq!(
+                app.world()
+                    .resource::<sim::Definitions>()
+                    .production(item)
+                    .unwrap()
+                    .cost,
+                100
+            );
+            issue(&mut app, Command::QueueProduction { item });
+            for _ in 0..20 {
+                step(&mut app);
+            }
+            let state = app
+                .world()
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap();
+            let head = state
+                .queues()
+                .flat_map(|(_, q)| q)
+                .find(|q| q.item == item)
+                .unwrap();
+            assert!(head.charged > 0 && head.charged < 100);
+            assert_eq!(state.credits(), 100 - head.charged);
+            app.world_mut().insert_resource(controllers);
+        }
+        let mut delivered = false;
+        let mut fired = false;
+        let mut spawned = false;
+        for _ in 0..2000 {
+            for event in step(&mut app) {
+                assert!(
+                    !matches!(
+                        event,
+                        sim::SimEvent::BuildingSold {
+                            player: PlayerId(0),
+                            ..
+                        }
+                    ),
+                    "{control}: native financing must preserve this optional asset"
+                );
+                delivered |= matches!(
+                    event,
+                    sim::SimEvent::OreDelivered {
+                        player: PlayerId(0),
+                        ..
+                    }
+                );
+                fired |= matches!(event,sim::SimEvent::WeaponFired {attacker,target:found,..} if Some(attacker)==fighter && found==target);
+                spawned |= matches!(event,sim::SimEvent::UnitSpawned {player:PlayerId(0),building,..} if building==barracks);
+            }
+        }
+        let asset_entity = unit_entity(&mut app, asset);
+        assert!(app.world().get::<sim::Building>(asset_entity).is_some());
+        match control {
+            "force" => assert!(fired),
+            "income" => assert!(delivered),
+            "paid_head" => assert!(spawned),
+            _ => unreachable!(),
+        }
+    }
+}
+
+#[test]
+fn ra8_redundant_source_power_can_finance_a_real_recruit_without_selling_its_yard() {
+    let mut app = scenario("russia", "brutal", 0, 0, false);
+    let barracks = put(&mut app, "soviet_barracks", 5, 12);
+    let first = put(&mut app, "tesla_reactor", 3, 5);
+    let second = put(&mut app, "tesla_reactor", 3, 8);
+    let miner = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "war_miner",
+        CellPos::new(12, 13),
+    )
+    .unwrap();
+    let target = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "soviet_construction_yard",
+        CellPos::new(17, 13),
+    )
+    .unwrap();
+    let mut sold = None;
+    let mut charged = false;
+    let mut spawned = std::collections::BTreeSet::new();
+    let mut shot = false;
+    for _ in 0..6000 {
+        charged |= app
+            .world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .queues()
+            .flat_map(|(_, q)| q)
+            .any(|q| matches!(q.item, sim::ProductionItem::Unit(_)) && q.charged > 0);
+        for event in step(&mut app) {
+            match event {
+                sim::SimEvent::BuildingSold {
+                    player: PlayerId(0),
+                    building,
+                    refund,
+                } => {
+                    assert!(
+                        [first, second].contains(&building),
+                        "sell a genuinely redundant source power member before the real construction yard"
+                    );
+                    assert!(sold.replace((building, refund)).is_none());
+                }
+                sim::SimEvent::UnitSpawned {
+                    player: PlayerId(0),
+                    building,
+                    unit,
+                } if building == barracks => {
+                    spawned.insert(unit);
+                }
+                sim::SimEvent::WeaponFired {
+                    attacker,
+                    target: found,
+                    ..
+                } if spawned.contains(&attacker) && found == target => shot = true,
+                _ => {}
+            }
+        }
+        if shot {
+            break;
+        }
+    }
+    eprintln!("redundant source power sold{sold:?} charged{charged} spawned{spawned:?} shot{shot}");
+    assert!(sold.is_some() && charged && !spawned.is_empty() && shot);
+    let state = app
+        .world()
+        .resource::<sim::Players>()
+        .get(PlayerId(0))
+        .unwrap();
+    assert!(!state.low_power());
+    let world = app.world_mut();
+    let kinds = world
+        .query::<(&sim::Owner, &sim::Building)>()
+        .iter(world)
+        .filter(|(o, _)| o.0 == PlayerId(0))
+        .map(|(_, b)| b.kind)
+        .collect::<Vec<_>>();
+    let defs = world.resource::<sim::Definitions>();
+    assert!(kinds.contains(&defs.building_kind("soviet_construction_yard").unwrap()));
+    assert!(kinds.contains(&defs.building_kind("tesla_reactor").unwrap()));
+    assert!(
+        sim::check_buildable(
+            defs,
+            world.resource::<sim::Players>().get(PlayerId(0)).unwrap(),
+            false,
+            &kinds,
+            sim::ProductionItem::Unit(defs.unit_kind("conscript").unwrap())
+        )
+        .is_ok()
+    );
+    let entity = unit_entity(&mut app, miner);
+    assert!(
+        app.world()
+            .get::<sim::Health>(entity)
+            .is_some_and(|h| h.hit_points > 0)
+    );
+}
+
+fn paid_worker_team_fixture(
+    legacy_ai: bool,
+    fog: bool,
+) -> (App, sim::SimId, sim::SimId, sim::SimId) {
+    let mut app = scenario_mode(
+        "russia",
+        "medium",
+        400,
+        0,
+        false,
+        ScenarioMode {
+            legacy_ai,
+            fog,
+            ..Default::default()
+        },
+    );
+    let controllers = std::mem::take(
+        app.world_mut()
+            .resource_mut::<sim::AiPlayers>()
+            .into_inner(),
+    );
+    let barracks = put(&mut app, "soviet_barracks", 5, 12);
+    put(&mut app, "tesla_reactor", 3, 5);
+    let miner = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "war_miner",
+        CellPos::new(21, 13),
+    )
+    .unwrap();
+    let target = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "soviet_construction_yard",
+        CellPos::new(25, 13),
+    )
+    .unwrap();
+    let item = sim::ProductionItem::Unit(
+        app.world()
+            .resource::<sim::Definitions>()
+            .unit_kind("conscript")
+            .unwrap(),
+    );
+    assert_eq!(
+        app.world()
+            .resource::<sim::Definitions>()
+            .production(item)
+            .unwrap()
+            .cost,
+        100
+    );
+    issue(&mut app, Command::QueueProduction { item });
+    let mut recruit = None;
+    let mut charged = false;
+    for _ in 0..300 {
+        charged |= app
+            .world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .queues()
+            .flat_map(|(_, q)| q)
+            .any(|q| q.item == item && q.charged > 0);
+        for event in step(&mut app) {
+            if let sim::SimEvent::UnitSpawned {
+                player: PlayerId(0),
+                building,
+                unit,
+            } = event
+                && building == barracks
+            {
+                recruit = Some(unit);
+            }
+        }
+        if recruit.is_some() {
+            break;
+        }
+    }
+    assert!(charged && recruit.is_some());
+    app.world_mut().insert_resource(controllers);
+    (app, miner, target, recruit.unwrap())
+}
+
+#[test]
+fn ra8_zero_job_armed_workers_join_real_paid_infantry_through_ordinary_team_readiness() {
+    let (mut app, miner, target, recruit) = paid_worker_team_fixture(false, false);
+    let first_wave = u64::from(
+        app.world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .difficulty()
+            .first_wave,
+    );
+    let mut infantry_shot = false;
+    let mut worker_wave_shot = false;
+    let mut worker_joined = false;
+    for _ in 0..6000 {
+        for event in step(&mut app) {
+            assert!(!matches!(
+                event,
+                sim::SimEvent::OreDelivered {
+                    player: PlayerId(0),
+                    ..
+                }
+            ));
+            if let sim::SimEvent::WeaponFired {
+                attacker,
+                target: found,
+                ..
+            } = event
+                && found == target
+            {
+                infantry_shot |= attacker == recruit;
+                worker_wave_shot |= attacker == miner
+                    && app
+                        .world()
+                        .resource::<sim::AiPlayers>()
+                        .controller(PlayerId(0))
+                        .unwrap()
+                        .wave()
+                        .contains(&miner);
+            }
+        }
+        worker_joined |= app
+            .world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .wave()
+            .contains(&miner);
+        if app.world().resource::<SimTick>().0 <= first_wave {
+            assert!(
+                !worker_joined,
+                "ordinary source first-wave readiness still gates admission"
+            );
+        }
+        if infantry_shot && worker_wave_shot {
+            break;
+        }
+    }
+    eprintln!(
+        "zero-job combined arms paid{recruit:?} infantry_shot{infantry_shot} worker_joined{worker_joined} worker_wave_shot{worker_wave_shot}"
+    );
+    assert!(
+        infantry_shot,
+        "the ordinary paid infantry must really approach and fire"
+    );
+    assert!(
+        worker_joined && worker_wave_shot,
+        "a worker with no actual or known economic job must contribute to the ordinary ready infantry wave"
+    );
+    let entity = unit_entity(&mut app, miner);
+    assert!(
+        app.world()
+            .get::<sim::Health>(entity)
+            .is_some_and(|h| h.hit_points > 0)
+    );
+    assert!(
+        app.world()
+            .resource::<sim::MatchState>()
+            .outcome()
+            .is_none()
+    );
+}
+
+#[test]
+fn ra8_legacy_paid_teams_keep_the_original_worker_admission_policy() {
+    let (mut app, miner, target, recruit) = paid_worker_team_fixture(true, false);
+    let mut infantry_shot = false;
+    for _ in 0..6000 {
+        for event in step(&mut app) {
+            infantry_shot |= matches!(event, sim::SimEvent::WeaponFired { attacker, target: found, .. } if attacker == recruit && found == target);
+        }
+        assert!(
+            !app.world()
+                .resource::<sim::AiPlayers>()
+                .controller(PlayerId(0))
+                .unwrap()
+                .wave()
+                .contains(&miner),
+            "the neutral plan must retain its original worker roles alongside a real paid army"
+        );
+    }
+    assert!(
+        infantry_shot,
+        "the legacy paid infantry must actually fight"
+    );
+}
+
+#[test]
+fn ra8_unseen_ore_does_not_change_real_worker_team_admission_or_intents() {
+    let (mut actual, miner, target, recruit) = paid_worker_team_fixture(false, true);
+    let (mut control, other_miner, other_target, other_recruit) =
+        paid_worker_team_fixture(false, true);
+    assert_eq!(
+        (miner, target, recruit),
+        (other_miner, other_target, other_recruit)
+    );
+    let hidden = CellPos::new(44, 2);
+    let mut cell = *actual.world().resource::<Grid>().cell(hidden).unwrap();
+    cell.ore = 5000;
+    actual
+        .world_mut()
+        .resource_mut::<Grid>()
+        .set_terrain(hidden, cell);
+    let mut joined = false;
+    let mut worker_shot = false;
+    let mut infantry_shot = false;
+    for _ in 0..6000 {
+        let a = step(&mut actual);
+        let b = step(&mut control);
+        assert_eq!(
+            a, b,
+            "unseen ore must not alter native events before observation"
+        );
+        for app in [&actual, &control] {
+            assert!(
+                !app.world()
+                    .resource::<sim::Players>()
+                    .get(PlayerId(0))
+                    .unwrap()
+                    .vision()
+                    .is_visible(hidden),
+                "the ore twin's premise must remain genuinely unseen"
+            );
+        }
+        assert_eq!(
+            actual.world().resource::<sim::AiPlayers>(),
+            control.world().resource::<sim::AiPlayers>()
+        );
+        assert_eq!(
+            actual
+                .world()
+                .resource::<CommandQueue>()
+                .iter()
+                .collect::<Vec<_>>(),
+            control
+                .world()
+                .resource::<CommandQueue>()
+                .iter()
+                .collect::<Vec<_>>()
+        );
+        let wave = actual
+            .world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .wave();
+        joined |= wave.contains(&miner);
+        for event in a {
+            if let sim::SimEvent::WeaponFired {
+                attacker,
+                target: found,
+                ..
+            } = event
+                && found == target
+            {
+                worker_shot |= attacker == miner && wave.contains(&miner);
+                infantry_shot |= attacker == recruit;
+            }
+        }
+        if worker_shot && infantry_shot {
+            break;
+        }
+    }
+    assert!(
+        joined && worker_shot && infantry_shot,
+        "both genuinely independent hidden-ore twins must reach real paid-infantry and worker wave fire"
+    );
 }
