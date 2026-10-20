@@ -790,7 +790,7 @@ struct View<'a> {
     superweapons: bool,
     /// The types of the player's buildings, one entry per building.
     own_kinds: Vec<BuildingKind>,
-    /// Whether the player has no armed unit other than harvesters ([`View::fights`]).
+    /// Whether current economic/capability knowledge admits stopped armed workers.
     last_resort: bool,
     own_units: Vec<&'a UnitSnap>,
     own_buildings: Vec<&'a BuildingSnap>,
@@ -994,9 +994,9 @@ impl<'a> View<'a> {
     /// Whether `unit` (one of the player's) belongs to its army: it has a weapon and is no
     /// harvester. An armed harvester (the Soviet War Miner) mines: drafted into the army it
     /// would be called to the gathering point and into the waves, and its player would earn
-    /// nothing. Only as a last resort does it fight: while the player has no other armed unit
-    /// and the harvester's cycle has stopped (no ore or no refinery it can reach), so that a
-    /// player left with nothing else still attacks (RA1, docs/DECISIONS.md R14).
+    /// nothing. A stopped worker fights as a last resort when no usable alternative
+    /// remains (R14/R162), or under the opted-in policy when neither actual income
+    /// nor currently observed ore gives it an economic opportunity (R176).
     fn fights(&self, unit: &UnitSnap) -> bool {
         unit.armed
             && match unit.harvest {
@@ -1300,6 +1300,22 @@ pub(crate) fn run_ai(
         {
             view.last_resort = true;
         }
+        // A stopped armed worker has no observed economic opportunity on an
+        // exhausted known field. It may join ordinary teams alongside paid
+        // troops; any actual income or observed ore conserves worker roles.
+        // This is conservative: visible but unreachable ore also prevents this
+        // additional admission. The existing lone-worker policy stays above.
+        if view.ai.rules_difficulty
+            && !view.last_resort
+            && view
+                .own_units
+                .iter()
+                .any(|u| u.armed && u.harvest == Some(HarvestState::Idle))
+            && !strategy::service_income(&view)
+            && visible_ore(&view).is_empty()
+        {
+            view.last_resort = true;
+        }
         let mut commands = repair_bridge(
             &view,
             controller,
@@ -1564,12 +1580,7 @@ fn think(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
     }
     // While it sells buildings to fund an army unit, and until it has one, it does not queue
     // buildings, which would take the credits first.
-    if view
-        .own_units
-        .iter()
-        .chain(&view.recoverable_service)
-        .any(|unit| view.fights(unit))
-    {
+    if funding_force(view) {
         controller.liquidating = false;
     }
     if !recovering && broke(view) {
@@ -2399,18 +2410,27 @@ fn worker_job(view: &View<'_>) -> bool {
     false
 }
 
-/// Whether the player can neither fight nor pay for a fighter, though it could produce one: it has
-/// no armed unit, none of its harvesters is working (all have stopped, or it has none), it owns the
+/// Whether a combat force already makes optional-asset financing unnecessary.
+/// Empty armed workers still fight normally, but an opted-in base without income
+/// may finance ordinary reinforcements alongside them. Keep the same predicate
+/// when releasing the funding latch, so construction cannot reclaim the refund.
+fn funding_force(view: &View<'_>) -> bool {
+    let force = || view.own_units.iter().chain(&view.recoverable_service);
+    force().any(|unit| view.fights(unit) && unit.harvest.is_none())
+        || (force().any(|unit| view.fights(unit) && unit.harvest.is_some())
+            && (!view.ai.rules_difficulty
+                || strategy::service_income(view)
+                || !visible_ore(view).is_empty()))
+}
+
+/// Whether the player cannot pay for ordinary reinforcements, though it could produce one: it has
+/// no funding force, none of its harvesters is working (all have stopped, or it has none), it owns the
 /// producer and prerequisites of some army unit type, and its credits are below what the cheapest
 /// army unit in its queues still costs (or, with none queued, the cost of the cheapest one it can
-/// produce). Without income its credits will not grow, so a match between such players would never
-/// end (docs/DECISIONS.md D43).
+/// produce). With no economic job, optional native refunds can fund ordinary
+/// reinforcements while the existing workers continue fighting.
 fn broke(view: &View<'_>) -> bool {
-    if view
-        .own_units
-        .iter()
-        .chain(&view.recoverable_service)
-        .any(|unit| view.fights(unit))
+    if funding_force(view)
         || view.own_units.iter().any(|unit| {
             unit.harvest
                 .is_some_and(|state| state != HarvestState::Idle)
