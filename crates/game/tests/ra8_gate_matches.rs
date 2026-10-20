@@ -1305,3 +1305,8 @@ fn ra8_gate11_coral_iraq_cuba_brutal_seed_zero_finishes() {
 fn ra8_gate11_frozen_russia_libya_easy_seed_zero_finishes() {
     run_case("frozen_sound", ["russia", "libya"], ["easy", "easy"]);
 }
+
+#[test]
+fn ra8_gate12_demo_great_britain_cuba_easy_seed_zero_finishes() {
+    run_case("demo", ["great_britain", "cuba"], ["easy", "easy"]);
+}

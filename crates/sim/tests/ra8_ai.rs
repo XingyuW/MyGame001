@@ -1252,6 +1252,276 @@ fn ra8_naval_unit_movement_positions_and_observed_destinations_drive_jobs() {
 }
 
 #[test]
+fn ra8_opted_in_last_stand_services_a_native_remnant_within_one_existing_period() {
+    let (mut app, airfield, _) = native_last_stand_remnant(928);
+    let start = app.world().resource::<SimTick>().0;
+    let think = u64::from(
+        app.world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .difficulty()
+            .think_interval,
+    );
+    let bound = sim::LAST_STAND_PATIENCE + sim::LAST_STAND_TURN + think;
+    let mut sold = None;
+    let mut shots = 0;
+    for _ in 0..=bound {
+        for event in step(&mut app) {
+            shots += usize::from(
+                matches!(event, sim::SimEvent::WeaponFired { target, .. } if target == airfield),
+            );
+            if matches!(event, sim::SimEvent::BuildingSold { player: PlayerId(0), building, .. } if building == airfield)
+            {
+                sold = Some(app.world().resource::<SimTick>().0);
+            }
+        }
+        if sold.is_some() {
+            break;
+        }
+    }
+    eprintln!(
+        "native remnant start{start} bound{bound} shots{shots} sold{sold:?} outcome{:?}",
+        app.world().resource::<sim::MatchState>().outcome()
+    );
+    assert!(
+        shots > 0,
+        "the real opponent must continue native source fire"
+    );
+    assert!(
+        sold.is_some_and(|at| at.saturating_sub(start) >= sim::LAST_STAND_PATIENCE
+            && at.saturating_sub(start) <= bound),
+        "after the unchanged patience, an opted-in remnant must receive a unique ordinary sale opportunity within one existing period"
+    );
+    assert!(matches!(
+        app.world().resource::<sim::MatchState>().outcome(),
+        Some(sim::MatchOutcome::Won {
+            winner: PlayerId(1),
+            ..
+        })
+    ));
+}
+
+#[test]
+fn ra8_opted_in_last_stand_keeps_live_force_working_income_and_funded_production() {
+    for mode in ["force", "ore", "paid"] {
+        let mut app = native_last_stand_remnant(if mode == "paid" { 1200 } else { 928 }).0;
+        let mut actor = None;
+        let harrier = app
+            .world()
+            .resource::<sim::Definitions>()
+            .unit_kind("harrier")
+            .unwrap();
+        let item = sim::ProductionItem::Unit(harrier);
+        if mode == "force" {
+            actor = Some(
+                spawn_unit(app.world_mut(), PlayerId(0), "grizzly", CellPos::new(4, 40)).unwrap(),
+            );
+        } else if mode == "ore" {
+            put(&mut app, "refinery", 15, 3);
+            let cell = CellPos::new(20, 8);
+            let mut terrain = *app.world().resource::<Grid>().cell(cell).unwrap();
+            terrain.ore = 5000;
+            app.world_mut()
+                .resource_mut::<Grid>()
+                .set_terrain(cell, terrain);
+            let world = app.world_mut();
+            let worker = world
+                .query::<(&sim::SimId, &sim::Owner, &sim::Unit)>()
+                .iter(world)
+                .find(|(_, owner, unit)| {
+                    owner.0 == PlayerId(0)
+                        && unit.kind
+                            == world
+                                .resource::<sim::Definitions>()
+                                .unit_kind("chrono_miner")
+                                .unwrap()
+                })
+                .map(|(id, _, _)| *id)
+                .unwrap();
+            actor = Some(worker);
+            issue(
+                &mut app,
+                Command::Harvest {
+                    units: vec![worker],
+                    target: cell,
+                },
+            );
+        } else {
+            assert_eq!(
+                app.world()
+                    .resource::<sim::Definitions>()
+                    .production(item)
+                    .unwrap()
+                    .cost,
+                1200
+            );
+            put(&mut app, "power_plant", 10, 3);
+            issue(&mut app, Command::QueueProduction { item });
+        }
+        let mut delivered = false;
+        let mut charged = false;
+        let mut completed = false;
+        let mut live = false;
+        for _ in 0..1600 {
+            for event in step(&mut app) {
+                assert!(
+                    !matches!(
+                        event,
+                        sim::SimEvent::BuildingSold {
+                            player: PlayerId(0),
+                            ..
+                        }
+                    ),
+                    "{mode}: recovery must not be liquidated"
+                );
+                delivered |= matches!(event, sim::SimEvent::OreDelivered { harvester, credits, .. } if Some(harvester) == actor && credits > 0);
+                completed |= matches!(event, sim::SimEvent::ProductionComplete { player: PlayerId(0), item: found } if found == item);
+            }
+            charged |= app
+                .world()
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap()
+                .queues()
+                .any(|(_, q)| q.iter().any(|head| head.item == item && head.charged > 0));
+            let world = app.world_mut();
+            live |= world
+                .query::<(&sim::Owner, &sim::Unit)>()
+                .iter(world)
+                .any(|(owner, unit)| owner.0 == PlayerId(0) && unit.kind == harrier);
+        }
+        match mode {
+            "force" => {
+                let world = app.world_mut();
+                assert!(
+                    world
+                        .query::<(&sim::SimId, &sim::Health)>()
+                        .iter(world)
+                        .any(|(id, hp)| Some(*id) == actor && hp.hit_points > 0)
+                );
+            }
+            "ore" => assert!(
+                delivered,
+                "the working-income control must physically deliver ore"
+            ),
+            "paid" => assert!(
+                charged && completed && live,
+                "actual funded native work must charge, complete and spawn a live Harrier"
+            ),
+            _ => unreachable!(),
+        }
+    }
+}
+
+fn native_last_stand_remnant(credits: i64) -> (App, sim::SimId, sim::SimId) {
+    let mut app = scenario("great_britain", "easy", credits, 0, false);
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    let airfield = put(&mut app, "airforce_command", 14, 8);
+    // Keep this real remnant alive through ordinary Cleanup of the old yard
+    // and any native crew. No controller history, outcome or timer is seeded.
+    for _ in 0..3 {
+        let world = app.world_mut();
+        for (id, owner, mut health) in world
+            .query::<(&sim::SimId, &sim::Owner, &mut sim::Health)>()
+            .iter_mut(world)
+        {
+            if owner.0 == PlayerId(0) && *id != airfield {
+                health.hit_points = 0;
+            }
+        }
+        step(&mut app);
+    }
+    let worker = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "chrono_miner",
+        CellPos::new(20, 8),
+    )
+    .unwrap();
+    let enemy = spawn_unit(
+        app.world_mut(),
+        PlayerId(1),
+        "flak_track",
+        CellPos::new(20, 10),
+    )
+    .unwrap();
+    // A raw spawn is not an injected perception fact. Establish the attacker's
+    // ordinary scheduled sight before submitting the public Attack command.
+    step(&mut app);
+    let airfield_entity = unit_entity(&mut app, airfield);
+    let footprint = app
+        .world()
+        .get::<sim::Building>(airfield_entity)
+        .unwrap()
+        .footprint;
+    assert!(
+        app.world()
+            .resource::<sim::Players>()
+            .get(PlayerId(1))
+            .unwrap()
+            .vision()
+            .sees_footprint(footprint)
+    );
+    app.world_mut()
+        .resource_mut::<CommandQueue>()
+        .push(sim::IssuedCommand {
+            player: PlayerId(1),
+            command: Command::Attack {
+                units: vec![enemy],
+                target: airfield,
+            },
+        });
+    let mut fired = false;
+    for _ in 0..20 {
+        fired |= step(&mut app).iter().any(|e| matches!(e, sim::SimEvent::WeaponFired { attacker, target, .. } if *attacker == enemy && *target == airfield));
+        if fired {
+            break;
+        }
+    }
+    assert!(fired, "the fixture must establish actual legal native fire");
+    let state = app
+        .world()
+        .resource::<sim::Players>()
+        .get(PlayerId(0))
+        .unwrap();
+    assert_eq!(state.credits(), credits);
+    assert!(state.low_power());
+    assert!(state.queues().all(|(_, q)| q.is_empty()));
+    assert!(
+        app.world()
+            .resource::<sim::MatchState>()
+            .defeated(PlayerId(0))
+            .is_none()
+    );
+    assert!(
+        app.world()
+            .resource::<sim::MatchState>()
+            .outcome()
+            .is_none()
+    );
+    let definitions = app.world().resource::<sim::Definitions>();
+    let harrier = definitions.unit_kind("harrier").unwrap();
+    assert!(
+        definitions
+            .production(sim::ProductionItem::Unit(harrier))
+            .unwrap()
+            .cost
+            > 928
+    );
+    app.world_mut().insert_resource(controllers);
+    assert!(
+        app.world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .plan()
+            .rules_difficulty
+    );
+    (app, airfield, worker)
+}
+
+#[test]
 fn ra8_mixed_slow_last_stand_cadences_produce_a_win_instead_of_a_simultaneous_draw() {
     for cadences in [[512, 1024], [1024, 512], [1200, 40]] {
         let mut app = scenario_mode(
@@ -9078,6 +9348,106 @@ fn ra8_unseen_building_occupancy_cannot_change_a_surface_response_route_intent()
             .unwrap()
             .vision()
             .is_visible(unseen)
+    );
+}
+
+#[test]
+fn ra8_an_idle_detector_discovers_an_unseen_start_after_initial_team_readiness() {
+    let mut app = scenario("russia", "easy", 0, 0, false);
+    // A real healthy combat actor preserves this base through the natural
+    // opening. No controller history, wave deadline or SimTick is injected.
+    spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "conscript",
+        CellPos::new(14, 8),
+    )
+    .unwrap();
+    let remote = {
+        let world = app.world_mut();
+        world
+            .query::<(&sim::SimId, &sim::Owner, &sim::Building)>()
+            .iter(world)
+            .find(|(_, owner, _)| owner.0 == PlayerId(1))
+            .map(|(id, _, _)| *id)
+            .unwrap()
+    };
+    let dog = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "attack_dog",
+        CellPos::new(8, 11),
+    )
+    .unwrap();
+    let controller = app
+        .world()
+        .resource::<sim::AiPlayers>()
+        .controller(PlayerId(0))
+        .unwrap();
+    assert!(controller.wave().is_empty() && controller.target().is_none());
+    assert!(!controller.known_buildings().contains_key(&remote));
+    assert!(
+        controller
+            .waypoints()
+            .iter()
+            .any(|w| w.priority && w.seen == 0 && w.cell == CellPos::new(38, 38))
+    );
+    let first_wave = controller.difficulty().first_wave;
+    while app.world().resource::<SimTick>().0 < u64::from(first_wave) {
+        step(&mut app);
+        let controller = app
+            .world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap();
+        assert!(controller.wave().is_empty() && controller.target().is_none());
+        assert!(!controller.known_buildings().contains_key(&remote));
+        assert!(!app.world().resource::<CommandQueue>().iter().any(|c| matches!(&c.command, Command::AttackMove { units, target } if units.contains(&dog) && *target == CellPos::new(38, 38))), "initial source team/escort assembly must remain intact");
+        assert!(
+            app.world()
+                .resource::<sim::MatchState>()
+                .outcome()
+                .is_none()
+        );
+    }
+    let mut scouting = false;
+    let mut discovered = false;
+    for _ in 0..1000 {
+        step(&mut app);
+        let controller = app
+            .world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap();
+        assert!(
+            !controller.wave().contains(&dog),
+            "independent reconnaissance must not consume the waiting main cohort"
+        );
+        let issued = app.world().resource::<CommandQueue>().iter().any(|c| matches!(&c.command, Command::AttackMove { units, target } if units.contains(&dog) && *target == CellPos::new(38, 38)));
+        if issued && !scouting {
+            assert!(
+                controller.target().is_none(),
+                "the native scout admission must occur without a main mission"
+            );
+            assert!(app.world().resource::<SimTick>().0 >= u64::from(first_wave));
+        }
+        scouting |= issued;
+        discovered = controller.known_buildings().contains_key(&remote);
+        if discovered {
+            break;
+        }
+    }
+    assert!(
+        scouting && discovered,
+        "the actual idle detector must move and physically discover the unknown start without waiting for a combat mission"
+    );
+    assert!(
+        app.world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .vision()
+            .is_visible(CellPos::new(38, 38))
     );
 }
 

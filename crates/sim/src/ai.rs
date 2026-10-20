@@ -101,9 +101,9 @@ pub const HARVEST_RETRY_TICKS: u64 = 200;
 /// and sells its buildings ([`last_stand`]; RA4, docs/DECISIONS.md R53).
 pub const LAST_STAND_PATIENCE: u64 = 1200;
 
-/// The length in ticks of the turn of each player id in which that player may sell in its last
-/// stand: two players never sell their last building in the same tick, which would end a
-/// match without a winner.
+/// Period of distinct player sale slots for opted-in country plans. Legacy plans retain
+/// a window of this width per player. Both policies stagger ordinary last-stand sales so
+/// two players do not sell their last building in the same tick.
 pub const LAST_STAND_TURN: u64 = 256;
 
 /// Times an attack wave may come to rest at a remembered building that is still standing before
@@ -704,12 +704,25 @@ impl AiPlayers {
     }
 }
 
+// Configured matches take this flag from one shared AiDefinitions (plan_for),
+// so all their controllers use the same slot policy. Keep the legacy window
+// intact; opted-in plans receive one distinct slot per existing period instead
+// of waiting an additional sixteen-period rotation after their patience ends.
+fn last_stand_slot(player: PlayerId, opted_in: bool, tick: u64) -> bool {
+    let slot = u64::from(player.0 % 16);
+    if opted_in {
+        tick % LAST_STAND_TURN == slot
+    } else {
+        (tick / LAST_STAND_TURN) % 16 == slot
+    }
+}
+
 fn due(player: PlayerId, controller: &AiController, tick: u64) -> bool {
     let interval = u64::from(controller.difficulty.think_interval.max(1));
     tick % interval == u64::from(player.0) % interval
         || (controller.last_stand
-            && tick.is_multiple_of(LAST_STAND_TURN)
-            && (tick / LAST_STAND_TURN) % 16 == u64::from(player.0 % 16))
+            && (controller.plan.rules_difficulty || tick.is_multiple_of(LAST_STAND_TURN))
+            && last_stand_slot(player, controller.plan.rules_difficulty, tick))
 }
 
 // --- What the controllers see ---------------------------------------------------------------
@@ -2543,7 +2556,7 @@ fn last_stand(view: &View<'_>, controller: &mut AiController) -> Option<Command>
         }
         controller.last_stand = true;
     }
-    if (view.tick / LAST_STAND_TURN) % 16 != u64::from(view.player.0 % 16) {
+    if !last_stand_slot(view.player, controller.plan.rules_difficulty, view.tick) {
         return None;
     }
     let sellable = |kind: BuildingKind| {
@@ -3586,6 +3599,59 @@ mod tests {
             assert_eq!(sales.len(), 1);
         }
         assert!(!AiPlayers::default().thinks_at(0, &MatchState::default()));
+    }
+
+    #[test]
+    fn ra8_legacy_last_stand_due_matches_every_original_tick_and_supported_cadence() {
+        let mut controller = ra8_controller();
+        assert!(!controller.plan.rules_difficulty);
+        controller.last_stand = true;
+        for interval in 1..=crate::MAX_THINK_INTERVAL {
+            controller.difficulty.think_interval = interval;
+            for player in 0..16 {
+                let player = PlayerId(player);
+                for tick in 0..8192 {
+                    let ordinary =
+                        tick % u64::from(interval) == u64::from(player.0) % u64::from(interval);
+                    let old_extra = tick.is_multiple_of(LAST_STAND_TURN)
+                        && (tick / LAST_STAND_TURN) % 16 == u64::from(player.0);
+                    assert_eq!(due(player, &controller, tick), ordinary || old_extra);
+                    assert_eq!(
+                        last_stand_slot(player, false, tick),
+                        (tick / LAST_STAND_TURN) % 16 == u64::from(player.0)
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn ra8_opted_in_last_stand_slots_are_distinct_and_due_for_every_supported_cadence() {
+        let mut controller = ra8_controller();
+        controller.plan.rules_difficulty = true;
+        controller.last_stand = true;
+        for tick in 0..8192 {
+            let count = (0..16)
+                .filter(|&player| last_stand_slot(PlayerId(player), true, tick))
+                .count();
+            assert_eq!(count, usize::from(tick % LAST_STAND_TURN < 16));
+        }
+        for interval in 1..=crate::MAX_THINK_INTERVAL {
+            controller.difficulty.think_interval = interval;
+            for player in 0..16 {
+                let player = PlayerId(player);
+                // Different eligibility offsets, including each legacy-window edge,
+                // must all be serviced within one existing period.
+                for eligible in 4096..8192 {
+                    let at = eligible
+                        + (u64::from(player.0) + LAST_STAND_TURN - eligible % LAST_STAND_TURN)
+                            % LAST_STAND_TURN;
+                    assert!(at - eligible < LAST_STAND_TURN);
+                    assert!(last_stand_slot(player, true, at));
+                    assert!(due(player, &controller, at));
+                }
+            }
+        }
     }
 
     #[test]

@@ -238,8 +238,9 @@ fn role(view: &View<'_>, kind: UnitKind) -> Role {
 }
 
 // Existing idle detector support can discover a never-observed enemy start while
-// the main wave has a real building mission. Its ordinary order owns the scout
-// lifecycle: keep a healthy approach, release on observation or native failure.
+// the main wave assembles or fights a real building mission. Its ordinary order
+// owns the scout lifecycle: keep a healthy approach, release on observation or
+// native failure.
 pub(super) fn detector_scout_goal(
     view: &View<'_>,
     controller: &AiController,
@@ -280,10 +281,17 @@ pub(super) fn detector_scout_goal(
     {
         return Some(destination);
     }
-    if !unit.idle()
-        || !matches!(controller.target, Some(WaveTarget::Building(id))
-        if controller.known.contains_key(&id) && attack_job_eligible(controller, id))
-    {
+    let available_mission = match controller.target {
+        // Preserve initial team/escort assembly. Once that native readiness
+        // phase has passed, spare detector reconnaissance need not wait for
+        // the next combat cohort to acquire a building mission.
+        None => view.tick >= u64::from(controller.difficulty.first_wave),
+        Some(WaveTarget::Building(id)) => {
+            controller.known.contains_key(&id) && attack_job_eligible(controller, id)
+        }
+        Some(WaveTarget::Waypoint(_)) => false,
+    };
+    if !unit.idle() || !available_mission {
         return None;
     }
     controller
