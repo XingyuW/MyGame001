@@ -1,0 +1,44 @@
+{
+  "utc": "2026-10-20T10:06:43.450838+00:00",
+  "head": "57595d274261a9d4859ab2d1d15b86b9d9bb071f",
+  "runtime": "0d8f16daba2cc31edba5757d3b99fc2e3c094145",
+  "source_path": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/m6_production_matches_lengths.tsv",
+  "source_mtime_utc": "2026-10-20T10:05:36.043967+00:00",
+  "launch_utc": "2026-10-20T05:56:11.299628Z",
+  "table_path": "docs/validation/ra2-parity/ra8/checkpoint15-m6-production-lengths.tsv",
+  "bytes": 49793,
+  "sha256": "1ba1644b15e8ab25852c51475ff6d1d9aa5425b38e44dd41d217d502dfd32cf1",
+  "rows": 756,
+  "unique_cases": 756,
+  "m6_target_result": {
+    "passed": 6,
+    "failed": 0,
+    "ignored": 0,
+    "native_seconds": 14687.37
+  },
+  "all756_reported_non_Won": 0,
+  "ticks_semantics": "SimTick after outcome schedule, from M6 TSV; not necessarily Won event tick.",
+  "ticks": {
+    "median": 29475.5,
+    "mean": 37658.19047619047,
+    "p90_nearest_rank": 72617,
+    "max": 250882
+  },
+  "ticks_divided_by_original_limit": {
+    "median": 0.12105034722222222,
+    "mean": 0.16865448641905323,
+    "p90_nearest_rank": 0.3428809523809524,
+    "max": 0.9312638888888889
+  },
+  "max_case": {
+    "match": "black_water: france (easy) against libya (easy)",
+    "ticks": "250882",
+    "limit": "288000"
+  },
+  "max_ratio_case": {
+    "match": "crossroads: korea (easy) against france (easy)",
+    "ticks": "67051",
+    "limit": "72000"
+  },
+  "scope": "M6 only; workspace and remaining full13 phases still pending."
+}

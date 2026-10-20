@@ -1,0 +1,80 @@
+{
+  "label": "attempt16-final1",
+  "head": "26ad1e384ff17aff2a0075a08f39d510f28d0067",
+  "start_utc": "2026-10-20T22:19:18.516561+00:00",
+  "pid": 57808,
+  "pgid": 57808,
+  "runtime_paths": 344,
+  "additional_paths": 169,
+  "overlap": 18,
+  "unique": 495,
+  "commands": [
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start_utc": "2026-10-20T22:19:18.516664+00:00",
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt16-final1-01-fmt.log",
+      "end_utc": "2026-10-20T22:19:20.133789+00:00",
+      "elapsed_seconds": 1.6170909579959698,
+      "exit": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "regenerate",
+      "command": [
+        "python3",
+        "scripts/generate_ra2_data.py",
+        "--check"
+      ],
+      "start_utc": "2026-10-20T22:19:20.191357+00:00",
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt16-final1-02-regenerate.log",
+      "end_utc": "2026-10-20T22:19:20.292137+00:00",
+      "elapsed_seconds": 0.10071250004693866,
+      "exit": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "start_utc": "2026-10-20T22:19:20.348070+00:00",
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt16-final1-03-clippy.log",
+      "end_utc": "2026-10-20T22:19:25.571249+00:00",
+      "elapsed_seconds": 5.2231032499694265,
+      "exit": 101,
+      "log_sha256": "24f5ebe3be27e70b884856e4ca96385351fe55e2fecad885da26b3b579ee97ff",
+      "rust_results": [],
+      "source_mismatches": []
+    }
+  ],
+  "status": "FAILED",
+  "reordered_acceptance": "Required full13 before isolated all21/fixed3/3exampleguards, no drops. Fullsim replaces redundant individual AI/attrition/recovery commands.",
+  "prior_exact_receipt": "attempt16-coral-edge-after1.json;11-bound receipt before this fresh discovered495 manifest; no retrospective495 claim.",
+  "unrun": [
+    "crossroads",
+    "crossroads-reverse",
+    "riverlands",
+    "demo10",
+    "grown3",
+    "full-sim"
+  ],
+  "end_utc": "2026-10-20T22:19:25.621802+00:00",
+  "elapsed_seconds": 7.105133083998226
+}

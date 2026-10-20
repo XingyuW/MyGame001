@@ -4755,3 +4755,26 @@ Checkpoint16 source chronology: final3 ran on frozen working source, later commi
 Checkpoint16 evidence first unfiltered cachedcheck exits2, NOTpassed, stdout46f573c71a033797f588ce7b7880286ee2de6d9b6d31eb0777daf1c0c53e7d7e. All18 diagnostics/18 raw paths are17 native-log blankEOFs plus1 raw-patch context space, with exact file/stagedblob/line/EOL hashes and zero source/data/test/prose errors. Native bytes are preserved. Metadata restage, separate identical final check and later deliberate evidence commit precede explicit full13 release.
 
 Checkpoint16 separate final evidence check exits2 at12:29:49Z, identical46f573c7…/18raw diagnostics, followed by completed-result/line-and-blob read12:30:03Z. Metadata restage and a last standalone identical unfiltered check precede the later deliberate evidence commit. Native bytes remain unchanged; full13 still requires coordinator clean-tip release.
+
+
+### RA8 R189 candidate after full attempt16 (2026-10-20)
+
+Attempt16's frozen source passes phases1–9: workspace1389/0/0, all756 actual
+production winners, retained41 and repeat soak. Phase10 completes755Won and one
+Coral IraqBrutal/CubaBrutal seed14 None300000; phases11–13 and post-gate isolated
+acceptance are unrun. All130 label leaves/260 current-archive copies are preserved.
+Typed exact trace establishes a real factory with visible footprint edges and an
+unseen origin while the Nuke repeatedly selects a visible miner. No stale-target,
+helplessness, weight/stat or bound-change premise is used. R189 chooses a stable
+visible footprint cell, preserving source weights/full footprint scoring and
+previously visible origins. Native old-source counterexample/after launch+damage
+and exact P1Won79081/300000 are retained. Fresh strict/known exact positives are
+scoped evidence; final compatibility, clean checkpoint, full13 and same-source
+isolated all21/fixed3/example guards remain owed. RA9 preliminary copy work is
+separate from canonical release and independent review.
+
+R189 final2 compatibility completes9commands0,1085/0/0 across73 targets; ONE fullsim1078/0/0. Checkpoint17 binds495 frozen inputs, static1387/0removed/0ignored and all130 prior-label preservation pairs. Coherent source/evidence commits and clean verification precede immediate mandatory full13 under standing authorization. All21/fixed3/3guards remain deferred until successful same-source full13. No RA8 closure or RA9 canonical/review release.
+
+Checkpoint17 source was later committed aseb308a231e302048c9dc8d1e8b9543b7c5f64ef7: exactly2validated paths,174insertions/13deletions. Standalone stagedcheck0 at22:49:49Z and separate completed-result read22:49:54Z precede commit; preflight is not represented as postcommit. Evidence raw-only hygiene and clean freeze precede immediate mandatory full13 under standing authorization.
+
+Checkpoint17 evidence unfiltered stagedcheck exits2, NOTpassed, stdoutef3cfea47e58b2917caf7df777bccd52c153b27424eb00468769af18859119ba. All144 diagnostics across18 exact raw evidence paths are classified with file/stagedblob/line/EOL hashes; zero source/data/test/prose errors. Raw bytes remain untouched. Final identical unfiltered check precedes deliberate evidence commit and immediate clean-source full13.

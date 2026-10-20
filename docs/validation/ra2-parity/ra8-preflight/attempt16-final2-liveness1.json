@@ -1,0 +1,127 @@
+{
+  "utc": "2026-10-20T22:25:03.526555+00:00",
+  "scope": "Read-only owned final2 group activity; CPU is activity, not outcome or performance acceptance",
+  "owned_pgid": 58488,
+  "processes": [
+    {
+      "pid": 58488,
+      "ppid": 7720,
+      "pgid": 58488,
+      "elapsed": "04:49",
+      "cpu_time": "0:00.58",
+      "cpu_percent": "0.0",
+      "state": "Ss",
+      "command": "/opt/homebrew/Cellar/python@3.15/3.15.0/Frameworks/Python.framework/Versions/3.15/Resources/Python.app/Contents/MacOS/Python -"
+    },
+    {
+      "pid": 60275,
+      "ppid": 58488,
+      "pgid": 58488,
+      "elapsed": "01:37",
+      "cpu_time": "0:00.33",
+      "cpu_percent": "0.0",
+      "state": "S",
+      "command": "/Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo test --release -p sim"
+    },
+    {
+      "pid": 60279,
+      "ppid": 60275,
+      "pgid": 58488,
+      "elapsed": "01:37",
+      "cpu_time": "1:01.85",
+      "cpu_percent": "42.0",
+      "state": "R",
+      "command": "/Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name sim --edition=2024 crates/sim/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --emit=dep-info,link -C opt-level=3 -C embed-bitcode=no --test --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values()) -C metadata=15d4357b6cfddb23 -C extra-filename=-1e941bb2a2132385 --out-dir /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps -C strip=debuginfo -L dependency=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps --extern bevy_app=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libbevy_app-9ed0b3bc241e1e32.rlib --extern bevy_ecs=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libbevy_ecs-13e3df4e806a27e4.rlib --extern quick_xml=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libquick_xml-b1386a6c3da54b4c.rlib --extern rand_chacha=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/librand_chacha-b42e4ac45901dd1f.rlib --extern ron=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libron-5d1675b14a8c8a1d.rlib --extern serde=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libserde-5d990192734bd4db.rlib --extern tiled=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libtiled-982659205343f799.rlib"
+    },
+    {
+      "pid": 61294,
+      "ppid": 60275,
+      "pgid": 58488,
+      "elapsed": "00:11",
+      "cpu_time": "0:08.44",
+      "cpu_percent": "48.0",
+      "state": "R",
+      "command": "/Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name ra5_world --edition=2024 crates/sim/tests/ra5_world.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --emit=dep-info,link -C opt-level=3 -C embed-bitcode=no --test --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values()) -C metadata=7d6a144419c94bc6 -C extra-filename=-109ae10017d56467 --out-dir /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps -C strip=debuginfo -L dependency=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps --extern bevy_app=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libbevy_app-9ed0b3bc241e1e32.rlib --extern bevy_ecs=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libbevy_ecs-13e3df4e806a27e4.rlib --extern quick_xml=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libquick_xml-b1386a6c3da54b4c.rlib --extern rand_chacha=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/librand_chacha-b42e4ac45901dd1f.rlib --extern ron=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libron-5d1675b14a8c8a1d.rlib --extern serde=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libserde-5d990192734bd4db.rlib --extern sim=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libsim-9e1d78097accbea9.rlib --extern tiled=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libtiled-982659205343f799.rlib"
+    },
+    {
+      "pid": 61318,
+      "ppid": 60275,
+      "pgid": 58488,
+      "elapsed": "00:10",
+      "cpu_time": "0:07.96",
+      "cpu_percent": "60.6",
+      "state": "R",
+      "command": "/Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name ra8_profile --edition=2024 crates/sim/examples/ra8_profile.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type bin --emit=dep-info,link -C opt-level=3 -C embed-bitcode=no --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values()) -C metadata=a7e147f9a4df1bf2 -C extra-filename=-91768f6c446e5039 --out-dir /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples -C strip=debuginfo -L dependency=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps --extern bevy_app=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libbevy_app-9ed0b3bc241e1e32.rlib --extern bevy_ecs=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libbevy_ecs-13e3df4e806a27e4.rlib --extern quick_xml=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libquick_xml-b1386a6c3da54b4c.rlib --extern rand_chacha=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/librand_chacha-b42e4ac45901dd1f.rlib --extern ron=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libron-5d1675b14a8c8a1d.rlib --extern serde=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libserde-5d990192734bd4db.rlib --extern sim=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libsim-9e1d78097accbea9.rlib --extern tiled=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libtiled-982659205343f799.rlib"
+    },
+    {
+      "pid": 61378,
+      "ppid": 60275,
+      "pgid": 58488,
+      "elapsed": "00:08",
+      "cpu_time": "0:05.84",
+      "cpu_percent": "60.8",
+      "state": "R",
+      "command": "/Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name ra8_ai --edition=2024 crates/sim/tests/ra8_ai.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --emit=dep-info,link -C opt-level=3 -C embed-bitcode=no --test --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values()) -C metadata=09d70b0444c0175c -C extra-filename=-fe272913e06cf281 --out-dir /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps -C strip=debuginfo -L dependency=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps --extern bevy_app=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libbevy_app-9ed0b3bc241e1e32.rlib --extern bevy_ecs=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libbevy_ecs-13e3df4e806a27e4.rlib --extern quick_xml=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libquick_xml-b1386a6c3da54b4c.rlib --extern rand_chacha=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/librand_chacha-b42e4ac45901dd1f.rlib --extern ron=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libron-5d1675b14a8c8a1d.rlib --extern serde=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libserde-5d990192734bd4db.rlib --extern sim=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libsim-9e1d78097accbea9.rlib --extern tiled=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libtiled-982659205343f799.rlib"
+    },
+    {
+      "pid": 61400,
+      "ppid": 60275,
+      "pgid": 58488,
+      "elapsed": "00:06",
+      "cpu_time": "0:04.25",
+      "cpu_percent": "0.1",
+      "state": "R",
+      "command": "/Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name ra2_ai --edition=2024 crates/sim/tests/ra2_ai.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --emit=dep-info,link -C opt-level=3 -C embed-bitcode=no --test --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values()) -C metadata=d9a19272a0720d4e -C extra-filename=-de3943e87c747659 --out-dir /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps -C strip=debuginfo -L dependency=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps --extern bevy_app=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libbevy_app-9ed0b3bc241e1e32.rlib --extern bevy_ecs=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libbevy_ecs-13e3df4e806a27e4.rlib --extern quick_xml=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libquick_xml-b1386a6c3da54b4c.rlib --extern rand_chacha=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/librand_chacha-b42e4ac45901dd1f.rlib --extern ron=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libron-5d1675b14a8c8a1d.rlib --extern serde=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libserde-5d990192734bd4db.rlib --extern sim=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libsim-9e1d78097accbea9.rlib --extern tiled=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libtiled-982659205343f799.rlib"
+    },
+    {
+      "pid": 61444,
+      "ppid": 60275,
+      "pgid": 58488,
+      "elapsed": "00:03",
+      "cpu_time": "0:02.59",
+      "cpu_percent": "49.4",
+      "state": "R",
+      "command": "/Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name ra5_definitions --edition=2024 crates/sim/tests/ra5_definitions.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --emit=dep-info,link -C opt-level=3 -C embed-bitcode=no --test --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values()) -C metadata=9b90ff2acf30db83 -C extra-filename=-925bc25a8220b7e4 --out-dir /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps -C strip=debuginfo -L dependency=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps --extern bevy_app=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libbevy_app-9ed0b3bc241e1e32.rlib --extern bevy_ecs=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libbevy_ecs-13e3df4e806a27e4.rlib --extern quick_xml=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libquick_xml-b1386a6c3da54b4c.rlib --extern rand_chacha=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/librand_chacha-b42e4ac45901dd1f.rlib --extern ron=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libron-5d1675b14a8c8a1d.rlib --extern serde=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libserde-5d990192734bd4db.rlib --extern sim=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libsim-9e1d78097accbea9.rlib --extern tiled=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libtiled-982659205343f799.rlib"
+    },
+    {
+      "pid": 61445,
+      "ppid": 60275,
+      "pgid": 58488,
+      "elapsed": "00:03",
+      "cpu_time": "0:02.48",
+      "cpu_percent": "46.3",
+      "state": "R",
+      "command": "/Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name m1_map_subset --edition=2024 crates/sim/tests/m1_map_subset.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --emit=dep-info,link -C opt-level=3 -C embed-bitcode=no --test --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values()) -C metadata=c0abd2a03ca958b8 -C extra-filename=-af1325b134b6261c --out-dir /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps -C strip=debuginfo -L dependency=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps --extern bevy_app=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libbevy_app-9ed0b3bc241e1e32.rlib --extern bevy_ecs=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libbevy_ecs-13e3df4e806a27e4.rlib --extern quick_xml=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libquick_xml-b1386a6c3da54b4c.rlib --extern rand_chacha=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/librand_chacha-b42e4ac45901dd1f.rlib --extern ron=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libron-5d1675b14a8c8a1d.rlib --extern serde=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libserde-5d990192734bd4db.rlib --extern sim=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libsim-9e1d78097accbea9.rlib --extern tiled=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libtiled-982659205343f799.rlib"
+    },
+    {
+      "pid": 61467,
+      "ppid": 60275,
+      "pgid": 58488,
+      "elapsed": "00:03",
+      "cpu_time": "0:01.83",
+      "cpu_percent": "50.7",
+      "state": "R",
+      "command": "/Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name m5_placement_preview --edition=2024 crates/sim/tests/m5_placement_preview.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --emit=dep-info,link -C opt-level=3 -C embed-bitcode=no --test --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values()) -C metadata=713e258aad962497 -C extra-filename=-00d2fd1027afb896 --out-dir /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps -C strip=debuginfo -L dependency=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps --extern bevy_app=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libbevy_app-9ed0b3bc241e1e32.rlib --extern bevy_ecs=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libbevy_ecs-13e3df4e806a27e4.rlib --extern quick_xml=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libquick_xml-b1386a6c3da54b4c.rlib --extern rand_chacha=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/librand_chacha-b42e4ac45901dd1f.rlib --extern ron=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libron-5d1675b14a8c8a1d.rlib --extern serde=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libserde-5d990192734bd4db.rlib --extern sim=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libsim-9e1d78097accbea9.rlib --extern tiled=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libtiled-982659205343f799.rlib"
+    },
+    {
+      "pid": 61511,
+      "ppid": 60275,
+      "pgid": 58488,
+      "elapsed": "00:01",
+      "cpu_time": "0:00.49",
+      "cpu_percent": "51.6",
+      "state": "R",
+      "command": "/Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name ra1_buildability --edition=2024 crates/sim/tests/ra1_buildability.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --emit=dep-info,link -C opt-level=3 -C embed-bitcode=no --test --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values()) -C metadata=d8adbed3ff347fd4 -C extra-filename=-617d0f5cbf04c010 --out-dir /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps -C strip=debuginfo -L dependency=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps --extern bevy_app=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libbevy_app-9ed0b3bc241e1e32.rlib --extern bevy_ecs=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libbevy_ecs-13e3df4e806a27e4.rlib --extern quick_xml=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libquick_xml-b1386a6c3da54b4c.rlib --extern rand_chacha=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/librand_chacha-b42e4ac45901dd1f.rlib --extern ron=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libron-5d1675b14a8c8a1d.rlib --extern serde=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libserde-5d990192734bd4db.rlib --extern sim=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libsim-9e1d78097accbea9.rlib --extern tiled=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libtiled-982659205343f799.rlib"
+    },
+    {
+      "pid": 61513,
+      "ppid": 60275,
+      "pgid": 58488,
+      "elapsed": "00:01",
+      "cpu_time": "0:00.49",
+      "cpu_percent": "50.8",
+      "state": "R",
+      "command": "/Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name ra1_catalogue --edition=2024 crates/sim/tests/ra1_catalogue.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --emit=dep-info,link -C opt-level=3 -C embed-bitcode=no --test --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values()) -C metadata=f102997cfc8edccb -C extra-filename=-e212392d3cdb297f --out-dir /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps -C strip=debuginfo -L dependency=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps --extern bevy_app=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libbevy_app-9ed0b3bc241e1e32.rlib --extern bevy_ecs=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libbevy_ecs-13e3df4e806a27e4.rlib --extern quick_xml=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libquick_xml-b1386a6c3da54b4c.rlib --extern rand_chacha=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/librand_chacha-b42e4ac45901dd1f.rlib --extern ron=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libron-5d1675b14a8c8a1d.rlib --extern serde=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libserde-5d990192734bd4db.rlib --extern sim=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libsim-9e1d78097accbea9.rlib --extern tiled=/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/libtiled-982659205343f799.rlib"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 30.21s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+edge strike: originCellPos { x: 30, y: 20 }, edgeCellPos { x: 32, y: 20 }, native launchNone/damagefalse, public launchtrue/damagetrue
+
+thread 'ai::ra8_attrition_tests::ra8_a_naturally_charged_strike_uses_an_observed_building_edge' (13007750) panicked at crates/sim/src/ai/ra8_attrition_tests.rs:1000:5:
+AI skipped a ready effective strike at an actually observed building edge
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ai::ra8_attrition_tests::ra8_a_naturally_charged_strike_uses_an_observed_building_edge ... FAILED
+
+failures:
+
+failures:
+    ai::ra8_attrition_tests::ra8_a_naturally_charged_strike_uses_an_observed_building_edge
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 123 filtered out; finished in 0.30s
+
+error: test failed, to rerun pass `-p sim --lib`

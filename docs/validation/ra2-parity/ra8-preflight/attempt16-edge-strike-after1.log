@@ -1,0 +1,10 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 30.68s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+edge strike: originCellPos { x: 30, y: 20 }, edgeCellPos { x: 32, y: 20 }, native launchSome(CellPos { x: 32, y: 20 })/damagetrue, public launchtrue/damagetrue
+test ai::ra8_attrition_tests::ra8_a_naturally_charged_strike_uses_an_observed_building_edge ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 123 filtered out; finished in 0.28s
+
