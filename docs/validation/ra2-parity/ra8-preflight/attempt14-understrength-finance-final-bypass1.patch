@@ -1,0 +1,11 @@
+--- crates/sim/src/ai.rs
++++ crates/sim/src/ai.rs
+@@ -2421,7 +2421,7 @@
+             && (!view.ai.rules_difficulty
+                 || strategy::service_income(view)
+                 || !visible_ore(view).is_empty())))
+-        && !understrength_funding(view, controller)
++        && true
+ }
+ 
+ fn understrength_funding(view: &View<'_>, controller: &AiController) -> bool {

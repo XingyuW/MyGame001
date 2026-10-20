@@ -1,0 +1,37 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0277]: the trait bound `i32: From<u32>` is not satisfied
+     --> crates/sim/tests/ra8_ai.rs:10157:38
+      |
+10157 |                     CellPos::new(3 + i32::from(n % 6), 25 + i32::from(n / 6)),
+      |                                      ^^^ the trait `From<u32>` is not implemented for `i32`
+      |
+      = help: `i32` implements trait `From<T>`:
+                From<bool>
+                From<i16>
+                From<i8>
+                From<miniz_oxide::deflate::CompressionLevel>
+                From<miniz_oxide::deflate::core::CompressionStrategy>
+                From<nix::unistd::Pid>
+                From<nonmax::NonMaxI32>
+                From<u16>
+              and 3 others
+
+error[E0277]: the trait bound `i32: From<u32>` is not satisfied
+     --> crates/sim/tests/ra8_ai.rs:10157:61
+      |
+10157 |                     CellPos::new(3 + i32::from(n % 6), 25 + i32::from(n / 6)),
+      |                                                             ^^^ the trait `From<u32>` is not implemented for `i32`
+      |
+      = help: `i32` implements trait `From<T>`:
+                From<bool>
+                From<i16>
+                From<i8>
+                From<miniz_oxide::deflate::CompressionLevel>
+                From<miniz_oxide::deflate::core::CompressionStrategy>
+                From<nix::unistd::Pid>
+                From<nonmax::NonMaxI32>
+                From<u16>
+              and 3 others
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `sim` (test "ra8_ai") due to 2 previous errors

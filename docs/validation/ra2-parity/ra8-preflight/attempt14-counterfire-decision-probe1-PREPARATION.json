@@ -1,0 +1,6 @@
+{
+  "utc": "2026-10-20T02:59:26.740394+00:00",
+  "exit": 1,
+  "cause": "Exact observer substitution not found after formatting; assertion before any source write or Cargo execution",
+  "separate_current_strategy_sha256": "11f9dde2286a9927183c815c1288ea7fcea56d88abc729d9b9425c87d92b9817"
+}

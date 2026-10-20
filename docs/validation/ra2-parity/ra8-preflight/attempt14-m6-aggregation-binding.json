@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-20T03:17:37.973532+00:00",
+  "path": "crates/game/tests/m6_production_matches.rs",
+  "before_sha256": "81c217ff176820b9b17ccbc3b6b3e22f6ca2fe052fe8cc5e29f2b47e4eaed05f",
+  "after_pre_fmt_sha256": "d492074c00ef3911172785793cefd29d7d524736ff4d754d94d1a1dc0b3f7b59",
+  "run_and_remaining_companion_source_unchanged": true,
+  "run_and_remaining_suffix_sha256": "32c3553e80e563ab4bce9ceb65372b124c7fda307412bef4f76bdb1146107846",
+  "tick_limit_source_unchanged": true,
+  "native_validation": "No extra756 sweep; compile/strict checks and next mandatory full13 execute this report-timing-only migration",
+  "final_formatted_sha256": "ae394550771394e7082bd9c6027d67b5e7ab2beff3b3c2b4008804246e32ac92",
+  "post_fmt_run_suffix_unchanged": true
+}

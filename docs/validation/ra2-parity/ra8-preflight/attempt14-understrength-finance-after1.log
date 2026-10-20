@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0061]: this function takes 2 arguments but 1 argument was supplied
+    --> crates/sim/src/ai/strategy.rs:1484:24
+     |
+1484 |     let refund = match sell_for_army(view) {
+     |                        ^^^^^^^^^^^^^------ argument #2 of type `&ai::AiController` is missing
+     |
+note: function defined here
+    --> crates/sim/src/ai.rs:2499:4
+     |
+2499 | fn sell_for_army(view: &View<'_>, controller: &AiController) -> Option<Command> {
+     |    ^^^^^^^^^^^^^                  -------------------------
+help: provide the argument
+     |
+1484 |     let refund = match sell_for_army(view, /* &ai::AiController */) {
+     |                                          +++++++++++++++++++++++++
+
+For more information about this error, try `rustc --explain E0061`.
+error: could not compile `sim` (lib) due to 1 previous error

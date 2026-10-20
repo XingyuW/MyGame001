@@ -1,0 +1,15 @@
+{
+  "utc": "2026-10-20T05:28:13.781833+00:00",
+  "probe": "docs/validation/ra2-parity/ra8-preflight/attempt14-productive-consolidation-final-bypass1.json",
+  "source_sha256": {
+    "crates/sim/src/ai.rs": "7ae5272510471d242770a8fcd620bbd258d647ddfb76a1a94f9de9f1ebaba042",
+    "crates/sim/src/ai/strategy.rs": "d3be904b03e102f6c9fe905708d809f126938e54d66c2d7a8db5f736f84aabdb",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "92a0fc584a2fe719fd9d7b505c0de9197161e1e491077ce6e7a5c0be837f0595",
+    "crates/game/tests/ra8_gate_matches.rs": "112fccc43a99547c3d1a0d66c407756a8832de222868771b6cb2ee04a0b10b35",
+    "crates/sim/tests/ra8_ai.rs": "eca054cab9289a436bdf00934e9d3d358293890e77cb8fde2569553b262b8eec",
+    "crates/game/tests/m6_production_matches.rs": "ae394550771394e7082bd9c6027d67b5e7ab2beff3b3c2b4008804246e32ac92"
+  },
+  "matches_before_and_finally": true
+}

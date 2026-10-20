@@ -4668,3 +4668,48 @@ EOF diagnostics,zero source/data/test/prose errors. File/line/EOL and actual sta
 SHA bindings match; raw output is captured directly as JSON-escaped stdout(d0c4e178…).
 No byte normalization or whitespace suppression; separate final identical unfiltered
 check and a later deliberate evidence commit remain required.
+
+### RA8: fifteenth targeted checkpoint, full13 still required (2026-10-20 UTC)
+
+Attempt14 is an interrupted partial workspace gate with TWO real observed non-Won cases:
+Crossroads America/RussiaEasy and Riverlands France/GermanyEasy, seed0/72000. All38 archived
+leaves remain exact across76 current/archive copies (157388bytes/set);05–13 are unrun and
+production TSV is stale. R179's optional existing-garrison retention trial is rejected and
+fully restored. Native fine damage refutes zero-net-healing/helplessness explanations.
+
+R180/R183 prioritize actual observed incoming defenders over stationary unarmed worker or
+economic-building acquisition, retaining armed-building, distant-chase, hidden-world and
+source artillery/air controls. R182 finances depleted ordinary ground cohorts through native
+optional refunds; R184 only consolidates an idle protected producer with no queued work and
+an exactly financed legal source-reachable finisher through retained production. Existing
+Air capability and all strategic-source power/recovery paths conservatively opt out of this
+NEW investment scope. R185 permits same-wave rear assistance before its own incoming contact;
+self-threatened fronts retain R166, and healthy unrelated approaches remain owned. No new
+state/RNG/timing/stat/price/limit/public-command relaxation or forced outcome is introduced.
+All declared assumptions and exact named full-cohort/Refinery setup migrations are in
+R182–R185; original meaningful assertions remain. Native negatives/failed control premises,
+strict Clippy failure and all finally/separate-later restorations are preserved.
+
+Current frozen final4:12commands all0,160Rustpasses/0failed/0ignored across9 target invocations.
+Includes131AI/16attrition/4slots/2legacy, three exact retained cases, Demo1Rust/10Won and grown3.
+Final Crossroads Russia/AmericaP0Won61986, reverseP0Won41738, RiverlandsP0Won33776; DemoRussia/
+LibyaEasy62722 and grown ten-playerCrossroadsP1Won45321/45322steps/9defeated. Source495paths
+remain exact; static1124→1385(+261),0removed/renamed/ignored. Checkpoint15/source/evidence
+staging and separate unfiltered hygiene checks/commits await coordinator release; no full
+acceptance or independent review is claimed.
+
+R181 changes ONLY strict M6 failure reporting: same756 jobs/limits/rejections/I6 checks,
+collect returned non-Won tuples and finish the ONE required sweep; assert played756 and
+allWon before any TSV publication. No extra diagnostic756 or panic catches. Next full13
+must complete all13exit0 and BOTH actual fresh756 distributions; after that success,
+same-source isolated all21/fixed3/three example guards remain mandatory before RA8 closure.
+No broad workspace or standalone41 retained-case preflight is duplicated. All prior RA9
+debts, R172 two-batch full independent review protocol and user quality checks remain.
+No new substantial external directory; configured caches/parser/render scratch are remeasured
+and retained for reruns, unnecessary for release. Main and branch remain unchanged.
+
+Checkpoint15 source chronology: final4 ran on the frozen working source before its coherent five-path 0d8f16daba2cc31edba5757d3b99fc2e3c094145 commit. Source unfiltered cachedcheck0 at05:50:35Z and separate completed-result read05:50:46Z preceded commit; no postcommit native run claimed. Evidence hygiene/commit and explicit full13 release remain required.
+
+Checkpoint15 evidence hygiene: first unfiltered stagedcheck exits2, NOTpassed. All42 exact diagnostics across41rawpaths are35native-log blankEOFs and7raw-patch-context trailing spaces. Every file/line/EOL/stagedblob SHA matches;zero source/data/test/prose errors. First stdout7737c0dc… is captured directly as JSON-escaped text. No raw bytes normalized; separate identical final check and a later deliberate evidence commit remain required.
+
+Checkpoint15 separate final unfiltered evidence check exits2 at05:53:22Z, identically7737c0dc…/42raw diagnostics; separate completed-result read05:53:37Z confirms NOTpassed/classified. Metadata is restaged before the last standalone identical check and later deliberate commit, with raw bytes unchanged.

@@ -1,0 +1,7 @@
+{
+  "utc": "2026-10-20T05:24:14.567517+00:00",
+  "change": "Pure conjunction reordering: cheap selected normal/base positive short-range weapon eligibility before public-terrain reach search; identical Boolean policy, no state or tuning change.",
+  "path": "crates/sim/src/ai/strategy.rs",
+  "before_sha256": "8e67de4df4f7e08911b107f8d7a0af123a4c192bfac61f25791f56454aa5779d",
+  "after_sha256": "e8138ab270fca780cdcb19b4eba0019578ae9261a1b9366ea11b04d745f90a6b"
+}

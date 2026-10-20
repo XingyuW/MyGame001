@@ -1,0 +1,278 @@
+diff --git a/crates/sim/src/ai/strategy.rs b/crates/sim/src/ai/strategy.rs
+index ded114b..47a8621 100644
+--- a/crates/sim/src/ai/strategy.rs
++++ b/crates/sim/src/ai/strategy.rs
+@@ -463,6 +463,33 @@ pub(super) fn decide(
+             break;
+         }
+     }
++    // Reconsider the same investment when infantry are already inside. A
++    // surviving field soldier must not indefinitely strand an unaffordable,
++    // currently idle occupation while ordinary teams can use its passengers.
++    if view.ai.rules_difficulty {
++        for &host in &view.recoverable_garrisons {
++            let Some((cell, prop)) = props.get(host) else {
++                continue;
++            };
++            if prop.hit_points <= 0 || !stable(view, cell) {
++                continue;
++            }
++            let Some(passengers) = special.cargo.get(&host) else {
++                continue;
++            };
++            if passengers.iter().all(|passenger| {
++                passenger.hp > 0
++                    && view
++                        .definitions
++                        .metadata(ProductionItem::Unit(passenger.kind))
++                        .is_some_and(|m| m.occupier)
++                    && !garrison_investment(view, props, host, cell, passenger.kind)
++            }) {
++                commands.push(Command::Deploy { unit: host });
++                break;
++            }
++        }
++    }
+     // Keep a small near-base garrison without consuming every infantry attack wave.
+     let occupied: usize = special
+         .garrisons
+@@ -534,7 +561,7 @@ pub(super) fn decide(
+                         .definitions
+                         .metadata(ProductionItem::Unit(u.kind))
+                         .is_some_and(|m| m.occupier)
+-                    && garrison_investment(view, props, host, cell, u)
++                    && garrison_investment(view, props, host, cell, u.kind)
+             })
+         {
+             controller.reserved.insert(unit.id);
+@@ -1318,12 +1345,12 @@ fn garrison_investment(
+     props: &crate::Props,
+     host: SimId,
+     cell: CellPos,
+-    unit: &UnitSnap,
++    unit_kind: UnitKind,
+ ) -> bool {
+     if service_income(view)
+         || view
+             .definitions
+-            .production(ProductionItem::Unit(unit.kind))
++            .production(ProductionItem::Unit(unit_kind))
+             .is_some_and(|terms| terms.cost <= view.state.credits())
+     {
+         return true;
+@@ -1340,7 +1367,7 @@ fn garrison_investment(
+     };
+     let allied = view
+         .definitions
+-        .metadata(ProductionItem::Unit(unit.kind))
++        .metadata(ProductionItem::Unit(unit_kind))
+         .is_some_and(|meta| meta.side == Some(crate::Side::Allied));
+     let Some(weapon_kind) = (if allied {
+         terms.weapon
+diff --git a/crates/sim/tests/ra8_ai.rs b/crates/sim/tests/ra8_ai.rs
+index eeb93aa..a71db9d 100644
+--- a/crates/sim/tests/ra8_ai.rs
++++ b/crates/sim/tests/ra8_ai.rs
+@@ -9067,6 +9067,41 @@ fn ra8_garrison_admission_keeps_source_cost_cash_real_income_and_actual_defensiv
+                 "the real source occupation gun must fire on the observed hostile infantry"
+             );
+         }
++        // Continue through ordinary decisions after native occupation, so the
++        // same investment reasons preserve useful existing hosts as well.
++        let mut retained_ticks = 0;
++        for _ in 0..80 {
++            step(&mut app);
++            let world = app.world_mut();
++            let defensive_target_alive = enemy.is_some_and(|enemy| {
++                world
++                    .query::<(&sim::SimId, &sim::Health)>()
++                    .iter(world)
++                    .any(|(id, hp)| *id == enemy && hp.hit_points > 0)
++            });
++            if mode != "defence" || defensive_target_alive {
++                assert!(
++                    world
++                        .resource::<sim::SpecialState>()
++                        .cargo
++                        .get(&host)
++                        .is_some_and(|cargo| cargo.iter().any(|p| p.id == infantry)),
++                    "{mode}: an actual useful occupation was evacuated"
++                );
++                assert!(
++                    !world
++                        .resource::<CommandQueue>()
++                        .iter()
++                        .any(|c| matches!(c.command, Command::Deploy { unit } if unit == host)),
++                    "{mode}: an actual useful occupation was ordered to leave"
++                );
++                retained_ticks += 1;
++            }
++        }
++        assert!(
++            retained_ticks > 0,
++            "{mode}: no genuine retention boundary was observed"
++        );
+     }
+ }
+ 
+@@ -10623,3 +10658,160 @@ fn ra8_unseen_ore_does_not_change_real_worker_team_admission_or_intents() {
+         "both genuinely independent hidden-ore twins must reach real paid-infantry and worker wave fire"
+     );
+ }
++
++#[test]
++fn ra8_unfunded_idle_garrison_reinforces_a_living_offensive_force() {
++    let mut app = scenario("russia", "easy", 62, 0, false);
++    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
++    let remnant = put(&mut app, "radar_tower", 15, 8);
++    for _ in 0..2 {
++        let world = app.world_mut();
++        for (id, owner, mut hp) in world
++            .query::<(&sim::SimId, &sim::Owner, &mut sim::Health)>()
++            .iter_mut(world)
++        {
++            if owner.0 == PlayerId(0) && *id != remnant {
++                hp.hit_points = 0;
++            }
++        }
++        step(&mut app);
++    }
++    let host = civilian(&mut app, CellPos::new(13, 8));
++    let infantry = spawn_unit(
++        app.world_mut(),
++        PlayerId(0),
++        "conscript",
++        CellPos::new(12, 8),
++    )
++    .unwrap();
++    let enemy = sim::spawn_building(
++        app.world_mut(),
++        PlayerId(1),
++        "tesla_reactor",
++        CellPos::new(27, 8),
++    )
++    .unwrap();
++    // A real unarmed observer establishes the intended building objective;
++    // the released infantry must not depend on a seeded controller memory.
++    spawn_unit(
++        app.world_mut(),
++        PlayerId(0),
++        "engineer",
++        CellPos::new(25, 10),
++    )
++    .unwrap();
++    step(&mut app);
++    issue(
++        &mut app,
++        Command::Interact {
++            unit: infantry,
++            target: host,
++        },
++    );
++    for _ in 0..40 {
++        step(&mut app);
++        if app
++            .world()
++            .resource::<sim::SpecialState>()
++            .cargo
++            .get(&host)
++            .is_some_and(|cargo| cargo.iter().any(|p| p.id == infantry))
++        {
++            break;
++        }
++    }
++    assert!(
++        app.world().resource::<sim::SpecialState>().cargo[&host]
++            .iter()
++            .any(|p| p.id == infantry)
++    );
++    assert_eq!(
++        app.world()
++            .resource::<sim::Players>()
++            .get(PlayerId(0))
++            .unwrap()
++            .credits(),
++        62
++    );
++    let definitions = app.world().resource::<sim::Definitions>();
++    assert_eq!(
++        definitions
++            .production(sim::ProductionItem::Unit(
++                definitions.unit_kind("conscript").unwrap()
++            ))
++            .unwrap()
++            .cost,
++        100
++    );
++    // Controlled live field-force setup: this capable actor prevents the
++    // existing helplessness recovery path from evacuating the occupied host.
++    let field = spawn_unit(
++        app.world_mut(),
++        PlayerId(0),
++        "conscript",
++        CellPos::new(12, 12),
++    )
++    .unwrap();
++    app.world_mut().insert_resource(controllers);
++    let mut field_shot = false;
++    let mut host_shot = false;
++    let mut exit_issued = false;
++    let mut released = false;
++    let mut shot = false;
++    for _ in 0..7000 {
++        let events = step(&mut app);
++        let world = app.world_mut();
++        field_shot |= events.iter().any(|e| matches!(e, sim::SimEvent::WeaponFired { attacker, target, .. } if *attacker == field && *target == enemy));
++        host_shot |= events
++            .iter()
++            .any(|e| matches!(e, sim::SimEvent::WeaponFired { attacker, .. } if *attacker == host));
++        exit_issued |= world
++            .resource::<CommandQueue>()
++            .iter()
++            .any(|c| matches!(c.command, Command::Deploy { unit } if unit == host));
++        let live = world
++            .query::<(&sim::SimId, &sim::Owner, &sim::Unit)>()
++            .iter(world)
++            .any(|(id, owner, _)| *id == infantry && owner.0 == PlayerId(0));
++        released |= live;
++        if released {
++            assert!(!world.resource::<CommandQueue>().iter().any(|c| matches!(c.command, Command::Interact { unit, target } if unit == infantry && target == host)), "unfunded released infantry was immediately regarrisoned");
++        }
++        shot |= events.iter().any(|e| matches!(e, sim::SimEvent::WeaponFired { attacker, target, .. } if *attacker == infantry && *target == enemy));
++        if shot && field_shot {
++            break;
++        }
++        assert!(world.resource::<sim::MatchState>().outcome().is_none());
++        assert!(
++            world
++                .resource::<sim::MatchState>()
++                .defeated(PlayerId(0))
++                .is_none()
++        );
++    }
++    assert!(
++        field_shot,
++        "the actual living field infantry must already contribute against the known building"
++    );
++    assert!(
++        !host_shot,
++        "the remote occupied host has no current native defensive shot"
++    );
++    assert!(
++        released && exit_issued,
++        "an unfunded idle garrison must use ordinary Deploy to reinforce the real offensive force"
++    );
++    let units = {
++        let world = app.world_mut();
++        world
++            .query::<(&sim::SimId, &sim::Mobile, &sim::Weapon)>()
++            .iter(world)
++            .map(|(id, m, w)| (*id, *m, *w))
++            .collect::<Vec<_>>()
++    };
++    assert!(
++        shot,
++        "the recovered source infantry must actually fire on the known enemy building; controller {:?}; units {units:?}",
++        app.world().resource::<sim::AiPlayers>()
++    );
++}

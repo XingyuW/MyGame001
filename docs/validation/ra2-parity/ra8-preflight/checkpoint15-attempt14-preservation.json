@@ -1,0 +1,10 @@
+{
+  "utc": "2026-10-20T05:45:16.758183+00:00",
+  "manifest": "docs/validation/ra2-parity/ra8-attempt14/PRESERVED.json",
+  "manifest_sha256": "2527a350f00d8db04d9b5dc0a758ad4a9b6048b8079da66c9fb850d02e4f6bb4",
+  "files_per_set": 38,
+  "bytes_per_set": 157388,
+  "copies_checked": 76,
+  "mismatches": [],
+  "status": "All archived attempt14 and current label bytes identical before any next label reuse. Historical interrupted gate remains nonacceptance."
+}
