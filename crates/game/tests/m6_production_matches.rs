@@ -127,6 +127,10 @@ fn computer_players_finish_matches_with_the_shipped_data_on_every_shipped_map() 
     // that the margin of this test's own matches (seed 0) is measured by every run of it
     // (docs/DECISIONS.md R56; before, only the duels' lengths were known, with another seed).
     let lengths = std::sync::Mutex::new(Vec::new());
+    // Preserve worker capacity after a bounded non-Won match, so this same
+    // required sweep reports every such case. Validation/invariant panics in
+    // run remain fatal; the universal winner assertion still precedes the TSV.
+    let failures = std::sync::Mutex::new(Vec::new());
     let workers = std::thread::available_parallelism().map_or(4, usize::from);
     std::thread::scope(|scope| {
         for _ in 0..workers.min(jobs.len()) {
@@ -158,22 +162,43 @@ fn computer_players_finish_matches_with_the_shipped_data_on_every_shipped_map() 
                         .unwrap_or_else(|error| panic!("{name}: {error}"));
                     let limit = tick_limit(grid);
                     let outcome = run(app.world_mut(), &name, limit);
-                    assert!(
-                        matches!(outcome, Some(MatchOutcome::Won { .. })),
-                        "{name}: {outcome:?}"
-                    );
                     let ticks = app.world().resource::<sim::SimTick>().0;
-                    lengths
-                        .lock()
-                        .expect("the lengths")
-                        .push((name, ticks, limit));
-                    played.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                    if matches!(outcome, Some(MatchOutcome::Won { .. })) {
+                        lengths
+                            .lock()
+                            .expect("the lengths")
+                            .push((name, ticks, limit));
+                    } else {
+                        eprintln!("M6 non-Won seed0 {name}: {outcome:?} ticks{ticks} limit{limit}");
+                        failures
+                            .lock()
+                            .expect("the non-Won cases")
+                            .push((name, outcome, ticks, limit));
+                    }
+                    let completed = played.fetch_add(1, std::sync::atomic::Ordering::Relaxed) + 1;
+                    if completed.is_multiple_of(36) || completed == jobs.len() {
+                        eprintln!(
+                            "M6 production progress completed{completed}/{} non_Won{}",
+                            jobs.len(),
+                            failures.lock().expect("the non-Won cases").len()
+                        );
+                    }
                 }
             });
         }
     });
     assert_eq!(played.into_inner(), jobs.len());
+    let failures = failures.into_inner().expect("the non-Won cases");
+    assert!(
+        failures.is_empty(),
+        "every shipped match must end with a winner; non-Won cases: {failures:#?}"
+    );
     let mut lengths = lengths.into_inner().expect("the lengths");
+    assert_eq!(
+        lengths.len(),
+        jobs.len(),
+        "one actual Won length per played job"
+    );
     lengths.sort();
     let mut table = String::from("match\tticks\tlimit\n");
     for (name, ticks, limit) in &lengths {

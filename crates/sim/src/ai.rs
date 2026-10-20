@@ -1578,13 +1578,13 @@ fn think(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
     if let Some(command) = place_ready_building(view, controller) {
         commands.push(command);
     }
-    // While it sells buildings to fund an army unit, and until it has one, it does not queue
-    // buildings, which would take the credits first.
-    if funding_force(view) {
+    // While optional sales fund ordinary reinforcements, do not let new
+    // construction reclaim those same credits before the declared force is ready.
+    if funding_force(view, controller) {
         controller.liquidating = false;
     }
-    if !recovering && broke(view) {
-        if let Some(command) = sell_for_army(view) {
+    if !recovering && broke(view, controller) {
+        if let Some(command) = sell_for_army(view, controller) {
             controller.liquidating = true;
             commands.push(command);
         }
@@ -1917,8 +1917,14 @@ fn retain_funded_unit_intents(view: &View<'_>, commands: &mut Vec<Command>, cade
             .map(|(key, q)| (key, q.to_vec()))
             .collect();
         let mut cash = view.state.credits().saturating_sub(unavoidable).max(0);
+        let mut owned: Vec<_> = view.own_buildings.iter().map(|b| (b.id, b.kind)).collect();
+        let mut sold_producer = false;
         commands.retain(|command| {
             match command {
+                Command::SellBuilding { building } => {
+                    owned.retain(|(id, _)| id != building);
+                    sold_producer = true;
+                }
                 Command::CancelProduction { item } => {
                     if let Some(key) = view.definitions.queue_of(*item)
                         && let Some(queue) = queues.get_mut(&key)
@@ -1928,6 +1934,25 @@ fn retain_funded_unit_intents(view: &View<'_>, commands: &mut Vec<Command>, cade
                     }
                 }
                 Command::QueueProduction { item } => {
+                    // An ordinary planned sale may consolidate idle production.
+                    // Never emit a later same-FIFO queue whose actual producer
+                    // or prerequisite that sale removes. Public errors stay strict.
+                    if sold_producer {
+                        let kinds: Vec<_> = owned.iter().map(|(_, kind)| *kind).collect();
+                        if !kinds
+                            .iter()
+                            .any(|&kind| produces(view.definitions, kind, *item))
+                            || (!view.state.unlock_all()
+                                && crate::economy_commands::missing_prerequisite(
+                                    view.definitions,
+                                    &kinds,
+                                    *item,
+                                )
+                                .is_some())
+                        {
+                            return false;
+                        }
+                    }
                     if let Some(terms) = view.definitions.production(*item) {
                         if matches!(item, ProductionItem::Unit(_)) {
                             let reserved = queues
@@ -2411,16 +2436,66 @@ fn worker_job(view: &View<'_>) -> bool {
 }
 
 /// Whether a combat force already makes optional-asset financing unnecessary.
-/// Empty armed workers still fight normally, but an opted-in base without income
-/// may finance ordinary reinforcements alongside them. Keep the same predicate
+/// Empty armed workers and an understrength opted-in field force still fight
+/// normally while optional assets finance ordinary reinforcements. Keep the same predicate
 /// when releasing the funding latch, so construction cannot reclaim the refund.
-fn funding_force(view: &View<'_>) -> bool {
+fn funding_force(view: &View<'_>, controller: &AiController) -> bool {
     let force = || view.own_units.iter().chain(&view.recoverable_service);
-    force().any(|unit| view.fights(unit) && unit.harvest.is_none())
+    (force().any(|unit| view.fights(unit) && unit.harvest.is_none())
         || (force().any(|unit| view.fights(unit) && unit.harvest.is_some())
             && (!view.ai.rules_difficulty
                 || strategy::service_income(view)
-                || !visible_ore(view).is_empty()))
+                || !visible_ore(view).is_empty())))
+        && !understrength_funding(view, controller)
+}
+
+fn understrength_funding(view: &View<'_>, controller: &AiController) -> bool {
+    if !view.ai.rules_difficulty
+        || strategy::service_income(view)
+        || !visible_ore(view).is_empty()
+        || !view.recoverable_service.is_empty()
+        // The new finite ground-reinforcement investment must not spend the
+        // support economy of an existing air force or its real reload lifecycle.
+        || view
+            .owned_units
+            .iter()
+            .any(|unit| view.definitions.domain(unit.kind) == Domain::Air)
+        // Preserve a strategic capability's complete power/recovery path, not
+        // just the source building, before optional ground reinforcement sales.
+        || view.own_buildings.iter().any(|building| {
+            view.definitions
+                .metadata(ProductionItem::Building(building.kind))
+                .is_some_and(|meta| {
+                    matches!(
+                        meta.role,
+                        Role::Nuke
+                            | Role::Storm
+                            | Role::Curtain
+                            | Role::Chronosphere
+                            | Role::Paradrop
+                    )
+                })
+        })
+        || !view
+            .own_units
+            .iter()
+            .any(|unit| view.fights(unit) && unit.harvest.is_none())
+    {
+        return false;
+    }
+    // Reuse the declared cohort target. Temporarily unavailable owned combat
+    // actors and stowed own passengers conservatively retain their places.
+    let owned = view
+        .owned_units
+        .iter()
+        .filter(|unit| view.fights(unit))
+        .count();
+    let stowed = view
+        .living_owned_ids
+        .iter()
+        .filter(|id| !view.owned_units.iter().any(|u| u.id == **id))
+        .count();
+    owned.saturating_add(stowed) < controller.difficulty.wave_size as usize
 }
 
 /// Whether the player cannot pay for ordinary reinforcements, though it could produce one: it has
@@ -2428,9 +2503,9 @@ fn funding_force(view: &View<'_>) -> bool {
 /// producer and prerequisites of some army unit type, and its credits are below what the cheapest
 /// army unit in its queues still costs (or, with none queued, the cost of the cheapest one it can
 /// produce). With no economic job, optional native refunds can fund ordinary
-/// reinforcements while the existing workers continue fighting.
-fn broke(view: &View<'_>) -> bool {
-    if funding_force(view)
+/// reinforcements while the existing force continues fighting.
+fn broke(view: &View<'_>, controller: &AiController) -> bool {
+    if funding_force(view, controller)
         || view.own_units.iter().any(|unit| {
             unit.harvest
                 .is_some_and(|state| state != HarvestState::Idle)
@@ -2464,11 +2539,12 @@ fn broke(view: &View<'_>) -> bool {
     view.state.credits() < queued.unwrap_or(cheapest)
 }
 
-/// While broke, sells one building to fund army units: never one needed to produce an army unit
-/// type (a producer or prerequisite of one), and a building that produces buildings only when
-/// nothing else is left to sell; otherwise the one with the highest sell value (then the lowest
-/// id). It does not rebuild while broke, so selling does not feed rebuilding.
-fn sell_for_army(view: &View<'_>) -> Option<Command> {
+/// While broke, prefers an optional building to fund army production, preserving declared
+/// producers/prerequisites. An opted-in understrength force with no queued work may instead
+/// consolidate an idle producer if its exact refund fully funds a legal building finisher
+/// through a retained producer. Building-production and useful service assets stay protected
+/// during this reinforcement investment; native sale and production apply all source costs.
+fn sell_for_army(view: &View<'_>, controller: &AiController) -> Option<Command> {
     // The producers and prerequisites of the army: a building that produces one of its unit
     // types, a prerequisite of one, or a member of one of its prerequisite groups.
     let mut needed: BTreeSet<BuildingKind> = BTreeSet::new();
@@ -2510,9 +2586,35 @@ fn sell_for_army(view: &View<'_>) -> Option<Command> {
                 .metadata(ProductionItem::Building(kind))
                 .is_none_or(|entry| entry.sellable)
     };
-    view.own_buildings
+    let reinforcing = understrength_funding(view, controller);
+    let useful_service = |kind: BuildingKind| {
+        let Some(building) = view.definitions.metadata(ProductionItem::Building(kind)) else {
+            return false;
+        };
+        view.owned_units.iter().any(|unit| {
+            let Some(meta) = view.definitions.metadata(ProductionItem::Unit(unit.kind)) else {
+                return false;
+            };
+            (building.docks > 0 && meta.airport_bound)
+                || (building.unit_repair
+                    && !meta.infantry
+                    && meta.domain != Domain::Air
+                    && (building.role == Role::Shipyard) == (meta.domain == Domain::Naval)
+                    && view
+                        .definitions
+                        .unit_combat(unit.kind)
+                        .is_some_and(|health| unit.hp < health.hit_points))
+        })
+    };
+    let optional = view
+        .own_buildings
         .iter()
         .filter(|building| !needed.contains(&building.kind) && sellable(building.kind))
+        // A living depleted cohort seeks optional reinforcement capital, not
+        // liquidation of its building-production recovery capability.
+        .filter(|building| {
+            !reinforcing || (!builds(building.kind) && !useful_service(building.kind))
+        })
         .max_by_key(|building| {
             let value = view.definitions.refund(building.kind);
             (
@@ -2523,7 +2625,45 @@ fn sell_for_army(view: &View<'_>) -> Option<Command> {
         })
         .map(|building| Command::SellBuilding {
             building: building.id,
+        });
+    if optional.is_some() || !reinforcing || view.state.queues().any(|(_, queue)| !queue.is_empty())
+    {
+        return optional;
+    }
+    // With no paid/completed work to abandon, an otherwise protected idle
+    // producer may fund a real replacement through another retained producer.
+    view.own_buildings
+        .iter()
+        .filter(|b| sellable(b.kind) && !builds(b.kind) && !useful_service(b.kind))
+        .filter(|building| {
+            let remaining: Vec<_> = view
+                .own_buildings
+                .iter()
+                .filter(|b| b.id != building.id)
+                .map(|b| b.kind)
+                .collect();
+            let funds = view
+                .state
+                .credits()
+                .saturating_add(view.definitions.refund(building.kind));
+            view.ai.army.iter().any(|&kind| {
+                let item = ProductionItem::Unit(kind);
+                view.definitions
+                    .production(item)
+                    .is_some_and(|terms| terms.cost <= funds)
+                    && check_buildable(
+                        view.definitions,
+                        view.state,
+                        view.superweapons,
+                        &remaining,
+                        item,
+                    )
+                    .is_ok()
+                    && strategy::production_finisher_without(view, kind, Some(building.id))
+            })
         })
+        .max_by_key(|b| (view.definitions.refund(b.kind), std::cmp::Reverse(b.id)))
+        .map(|b| Command::SellBuilding { building: b.id })
 }
 
 /// The last stand (RA4, docs/DECISIONS.md R53). A player that has no unit that fights and no

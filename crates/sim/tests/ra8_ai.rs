@@ -9943,7 +9943,6 @@ fn ra8_paid_reinforcements_do_not_send_an_active_empty_worker_wave_home() {
             .contains(&miner)
     );
     let barracks = put(&mut app, "soviet_barracks", 5, 12);
-    let refinery = put(&mut app, "soviet_refinery", 12, 17);
     put(&mut app, "tesla_reactor", 3, 5);
     let asset = put(&mut app, "soviet_service_depot", 18, 5);
     let mut paid = false;
@@ -10048,6 +10047,11 @@ fn ra8_paid_reinforcements_do_not_send_an_active_empty_worker_wave_home() {
     );
     // A newly available real economic job still belongs to an ordinary Harvest.
     // This is declared terrain setup, followed by public command and native income.
+    // R184 named setup migration: introduce the controlled refinery with its
+    // genuinely observed economic job, after the no-income offensive phase.
+    // Earlier no-ore ownership is now an optional financing asset, not a
+    // guaranteed future income commitment known by the controller.
+    let refinery = put(&mut app, "soviet_refinery", 12, 17);
     let ore_cell = CellPos::new(14, 21);
     let mut terrain = *app.world().resource::<Grid>().cell(ore_cell).unwrap();
     terrain.ore = 5000;
@@ -10133,6 +10137,35 @@ fn ra8_real_forces_economic_jobs_and_financed_heads_preserve_optional_worker_ass
         } else {
             None
         };
+        if matches!(control, "force" | "paid_head") {
+            // R182 setup migration: ordinary presence alone no longer fills
+            // the declared reinforcement target. Preserve the original full
+            // observation/no-sale/fire/paid-head assertions with a real cohort.
+            // The paid branch remains one actor short until its funded head spawns.
+            let cohort = app
+                .world()
+                .resource::<sim::AiPlayers>()
+                .controller(PlayerId(0))
+                .unwrap()
+                .difficulty()
+                .wave_size;
+            for n in 0..cohort.saturating_sub(2) {
+                spawn_unit(
+                    app.world_mut(),
+                    PlayerId(0),
+                    if control == "force" {
+                        "rhino"
+                    } else {
+                        "conscript"
+                    },
+                    CellPos::new(
+                        3 + i32::try_from(n % 6).unwrap(),
+                        25 + i32::try_from(n / 6).unwrap(),
+                    ),
+                )
+                .unwrap();
+            }
+        }
         if control == "income" {
             put(&mut app, "soviet_refinery", 12, 17);
             let at = CellPos::new(14, 21);
@@ -10621,5 +10654,1442 @@ fn ra8_unseen_ore_does_not_change_real_worker_team_admission_or_intents() {
     assert!(
         joined && worker_shot && infantry_shot,
         "both genuinely independent hidden-ore twins must reach real paid-infantry and worker wave fire"
+    );
+}
+
+#[test]
+fn ra8_surface_counterfire_prioritizes_a_real_defender_over_a_nearer_unarmed_miner() {
+    let (mut app, building, gunner) = surface_building_focus_fixture_for("flak_track");
+    let entity = unit_entity(&mut app, gunner);
+    let at = app.world().get::<sim::Mobile>(entity).unwrap().cell;
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    let miner = spawn_unit(
+        app.world_mut(),
+        PlayerId(1),
+        "chrono_miner",
+        CellPos::new(at.x, at.y + 1),
+    )
+    .unwrap();
+    let defender = spawn_unit(
+        app.world_mut(),
+        PlayerId(1),
+        "gi",
+        CellPos::new(at.x + 3, at.y + 1),
+    )
+    .unwrap();
+    let defender_entity = unit_entity(&mut app, defender);
+    let defender_initial = app
+        .world()
+        .get::<sim::Health>(defender_entity)
+        .unwrap()
+        .hit_points;
+    let definitions = app.world().resource::<sim::Definitions>();
+    let source = definitions
+        .unit_combat(definitions.unit_kind("flak_track").unwrap())
+        .unwrap();
+    let victim = definitions
+        .unit_combat(definitions.unit_kind("gi").unwrap())
+        .unwrap();
+    let traits = sim::TargetTraits {
+        armour: victim.armour,
+        organic: victim.organic,
+        ..Default::default()
+    };
+    let (gun, versus) =
+        sim::weapon_against(definitions, &source, source.weapons(false), &traits).unwrap();
+    let gun = definitions.weapon(gun).unwrap();
+    let threshold = load_ai(data().join("ai.ron"), definitions)
+        .unwrap()
+        .policy
+        .artillery_min_range
+        * sim::SUBCELLS_PER_CELL as u32;
+    assert!(versus > 1 && gun.anti_ground && gun.damage > 0 && gun.range < threshold);
+    assert!(
+        source
+            .weapons(false)
+            .into_iter()
+            .flatten()
+            .filter_map(|w| definitions.weapon(w))
+            .any(|w| w.range >= threshold && w.anti_air && !w.anti_ground),
+        "the longer AA source weapon must not misclassify the selected normal ground gun"
+    );
+    let preserve_ticks = 2 * u64::from(
+        controllers
+            .controller(PlayerId(0))
+            .unwrap()
+            .difficulty()
+            .think_interval,
+    );
+    let initial = app.world().get::<sim::Health>(entity).unwrap().hit_points;
+    issue(
+        &mut app,
+        Command::AttackMove {
+            units: vec![gunner],
+            target: CellPos::new(at.x, at.y + 4),
+        },
+    );
+    let mut minimum_hp = initial;
+    let mut incoming = false;
+    let mut acquired = false;
+    for _ in 0..120 {
+        let events = step(&mut app);
+        if let Some(hp) = app.world().get::<sim::Health>(entity) {
+            minimum_hp = minimum_hp.min(hp.hit_points);
+        }
+        incoming |= events.iter().any(|event| matches!(event, sim::SimEvent::WeaponFired { attacker, target, .. } if *attacker == defender && *target == gunner));
+        let weapon = app.world().get::<sim::Weapon>(entity).unwrap();
+        acquired |= weapon.target == Some(miner)
+            && matches!(
+                weapon.order,
+                Some(sim::AttackOrder::AttackMove { moving: false, .. })
+            );
+        if incoming && acquired {
+            break;
+        }
+    }
+    assert!(
+        incoming && acquired,
+        "actual stationary AttackMove must acquire the unarmed miner while an observed armed defender fires"
+    );
+    app.world_mut().insert_resource(controllers);
+    let mut returned = false;
+    let mut resumed = false;
+    let mut defender_damaged = false;
+    let mut defender_destroyed = false;
+    let mut preserved_ticks = 0;
+    let mut distraction_shots = 0;
+    for _ in 0..1800 {
+        let events = step(&mut app);
+        if let Some(hp) = app.world().get::<sim::Health>(entity) {
+            minimum_hp = minimum_hp.min(hp.hit_points);
+        }
+        let defender_alive = app
+            .world()
+            .get::<sim::Health>(defender_entity)
+            .is_some_and(|h| {
+                defender_damaged |= h.hit_points < defender_initial;
+                h.hit_points > 0
+            });
+        if returned && defender_alive {
+            assert!(
+                matches!(app.world().get::<sim::Weapon>(entity).unwrap().order, Some(sim::AttackOrder::Attack { target, .. }) if target == defender),
+                "a matching healthy counter-Attack must retain its native history"
+            );
+            assert!(!app.world().resource::<CommandQueue>().iter().any(|c| matches!(&c.command, Command::Attack { units, .. } | Command::AttackMove { units, .. } if units.contains(&gunner))), "do not repeatedly reset the matching counter-Attack");
+            preserved_ticks += 1;
+        }
+        for event in events {
+            defender_destroyed |=
+                matches!(event, sim::SimEvent::UnitDestroyed { unit, .. } if unit == defender);
+            incoming |= matches!(event, sim::SimEvent::WeaponFired { attacker, target, .. } if attacker == defender && target == gunner);
+            returned |= matches!(event, sim::SimEvent::WeaponFired { attacker, target, .. } if attacker == gunner && target == defender);
+            distraction_shots += u32::from(
+                matches!(event, sim::SimEvent::WeaponFired { attacker, target, .. } if attacker == gunner && target == miner),
+            );
+            resumed |= returned
+                && defender_destroyed
+                && matches!(event, sim::SimEvent::WeaponFired { attacker, target, .. } if attacker == gunner && target == building);
+        }
+        if resumed {
+            break;
+        }
+        assert!(
+            app.world()
+                .resource::<sim::MatchState>()
+                .outcome()
+                .is_none()
+        );
+    }
+    let final_hp = app.world().get::<sim::Health>(entity).map(|h| h.hit_points);
+    assert!(
+        incoming && minimum_hp < initial,
+        "the actual source defender must fire and damage the focused gunner; incoming{incoming} initial{initial} minimum{minimum_hp} final{final_hp:?} returned{returned} resumed{resumed} distractions{distraction_shots}"
+    );
+    assert!(
+        returned,
+        "counterfire must hit the armed source defender instead of only a nearer unarmed miner; distraction_shots{distraction_shots}"
+    );
+    assert!(
+        defender_damaged && defender_destroyed,
+        "the source gun must actually damage and destroy the defender, not only emit WeaponFired"
+    );
+    assert!(
+        preserved_ticks >= preserve_ticks,
+        "the healthy counter-Attack must survive multiple actual AI decisions"
+    );
+    assert!(
+        resumed,
+        "after actual counterfire the natural building mission must resume native fire"
+    );
+}
+
+#[test]
+fn ra8_distant_unrelated_unit_chase_is_not_a_current_counterfire_job() {
+    let (mut app, building, gunner) = surface_building_focus_fixture();
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    assert!(
+        matches!(controllers.controller(PlayerId(0)).unwrap().target(), Some(sim::WaveTarget::Building(id)) if id == building)
+    );
+    let interval = u64::from(
+        controllers
+            .controller(PlayerId(0))
+            .unwrap()
+            .difficulty()
+            .think_interval,
+    );
+    let distant = spawn_unit(app.world_mut(), PlayerId(1), "gi", CellPos::new(36, 14)).unwrap();
+    spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "engineer",
+        CellPos::new(34, 16),
+    )
+    .unwrap();
+    step(&mut app);
+    let distant_entity = unit_entity(&mut app, distant);
+    assert!(
+        app.world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .vision()
+            .sees_unit(app.world().get::<sim::Mobile>(distant_entity).unwrap())
+    );
+    issue(
+        &mut app,
+        Command::Attack {
+            units: vec![gunner],
+            target: distant,
+        },
+    );
+    step(&mut app);
+    step(&mut app);
+    let gunner_entity = unit_entity(&mut app, gunner);
+    assert!(
+        matches!(app.world().get::<sim::Weapon>(gunner_entity).unwrap().order, Some(sim::AttackOrder::Attack { target, .. }) if target == distant)
+    );
+    assert!(
+        app.world()
+            .get::<sim::Orders>(gunner_entity)
+            .unwrap()
+            .current
+            .is_some()
+    );
+    let from = app.world().get::<sim::Mobile>(gunner_entity).unwrap().cell;
+    let definitions = app.world().resource::<sim::Definitions>();
+    let gi = definitions
+        .unit_combat(definitions.unit_kind("gi").unwrap())
+        .unwrap();
+    let range = definitions.weapon(gi.weapon.unwrap()).unwrap().range;
+    let dx = i64::from(from.x - 36) * i64::from(sim::SUBCELLS_PER_CELL);
+    let dy = i64::from(from.y - 14) * i64::from(sim::SUBCELLS_PER_CELL);
+    assert!(
+        !sim::in_range(dx, dy, range),
+        "the visible unrelated unit is outside its actual incoming source range"
+    );
+    app.world_mut().insert_resource(controllers);
+    let mut issued = false;
+    let mut resumed = false;
+    let mut incoming = false;
+    for _ in 0..2 * interval + 2 {
+        let events = step(&mut app);
+        incoming |= events.iter().any(|e| matches!(e, sim::SimEvent::WeaponFired { attacker, target, .. } if *attacker == distant && *target == gunner));
+        issued |= app.world().resource::<CommandQueue>().iter().any(|c| matches!(&c.command, Command::Attack { units, target } if units.contains(&gunner) && *target == building));
+        resumed |= matches!(app.world().get::<sim::Weapon>(gunner_entity).unwrap().order, Some(sim::AttackOrder::Attack { target, .. }) if target == building);
+    }
+    assert!(!incoming);
+    assert!(
+        issued && resumed,
+        "a distant unrelated chase must not steal counterfire ownership from the actual building mission"
+    );
+    let mut fired = false;
+    for _ in 0..500 {
+        let events = step(&mut app);
+        fired |= events.iter().any(|e| matches!(e, sim::SimEvent::WeaponFired { attacker, target, .. } if *attacker == gunner && *target == building));
+        assert!(
+            app.world()
+                .get::<sim::Health>(distant_entity)
+                .is_some_and(|hp| hp.hit_points > 0),
+            "the mission must resume before the unrelated unit dies"
+        );
+        if fired {
+            break;
+        }
+    }
+    assert!(
+        fired,
+        "the restored real building mission must reach native fire"
+    );
+}
+
+#[test]
+fn ra8_an_understrength_living_field_force_can_finance_a_paid_reinforcement() {
+    let mut app = scenario("russia", "brutal", 0, 0, false);
+    let barracks = put(&mut app, "soviet_barracks", 5, 12);
+    put(&mut app, "tesla_reactor", 3, 5);
+    let asset = put(&mut app, "soviet_service_depot", 18, 5);
+    let fighter = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "conscript",
+        CellPos::new(12, 13),
+    )
+    .unwrap();
+    let target = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "soviet_construction_yard",
+        CellPos::new(17, 13),
+    )
+    .unwrap();
+    let defs = app.world().resource::<sim::Definitions>();
+    let kind = defs.unit_kind("conscript").unwrap();
+    let item = sim::ProductionItem::Unit(kind);
+    let cost = defs.production(item).unwrap().cost;
+    let refund = defs.refund(defs.building_kind("soviet_service_depot").unwrap());
+    assert!(refund >= cost && cost > 0);
+    assert!(
+        app.world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .difficulty()
+            .wave_size
+            > 1
+    );
+    let mut sold = None;
+    let mut paid = false;
+    let mut charged = false;
+    let mut recruited = std::collections::BTreeSet::new();
+    let mut recruit_shot = false;
+    let mut fighter_shot = false;
+    for _ in 0..6000 {
+        charged |= app
+            .world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .queues()
+            .flat_map(|(_, q)| q)
+            .any(|q| q.item == item && q.charged > 0);
+        for event in step(&mut app) {
+            match event {
+                sim::SimEvent::BuildingSold {
+                    player: PlayerId(0),
+                    building,
+                    refund: amount,
+                } => {
+                    assert_eq!(building, asset, "retain all ordinary producers");
+                    assert_eq!(amount, refund, "native exact refund only");
+                    assert!(sold.replace(amount).is_none(), "one optional sale suffices");
+                }
+                sim::SimEvent::ProductionComplete {
+                    player: PlayerId(0),
+                    item: found,
+                } if found == item => paid = true,
+                sim::SimEvent::UnitSpawned {
+                    player: PlayerId(0),
+                    building,
+                    unit,
+                } if building == barracks => {
+                    recruited.insert(unit);
+                }
+                sim::SimEvent::WeaponFired {
+                    attacker,
+                    target: found,
+                    ..
+                } if found == target => {
+                    fighter_shot |= attacker == fighter;
+                    recruit_shot |= recruited.contains(&attacker);
+                }
+                sim::SimEvent::OreDelivered {
+                    player: PlayerId(0),
+                    ..
+                } => panic!("declared empty map must have no income"),
+                _ => {}
+            }
+        }
+        if recruit_shot && fighter_shot {
+            break;
+        }
+    }
+    let entity = unit_entity(&mut app, fighter);
+    assert!(
+        app.world()
+            .get::<sim::Health>(entity)
+            .is_some_and(|h| h.hit_points > 0)
+    );
+    assert!(
+        app.world()
+            .resource::<sim::MatchState>()
+            .outcome()
+            .is_none()
+    );
+    assert!(
+        app.world()
+            .resource::<sim::MatchState>()
+            .defeated(PlayerId(0))
+            .is_none()
+    );
+    eprintln!(
+        "understrength field reinforcement sold{sold:?} exact_refund{refund} source_cost{cost} paid{paid} recruits{recruited:?} fighter_shot{fighter_shot} recruit_shot{recruit_shot}"
+    );
+    assert!(
+        fighter_shot,
+        "the original living ordinary field infantry must actually fight before judging financing"
+    );
+    assert_eq!(
+        sold,
+        Some(refund),
+        "living understrength field force must not exclude financing ordinary reinforcement from an optional asset"
+    );
+    assert!(
+        charged && paid && !recruited.is_empty() && recruit_shot && fighter_shot,
+        "real paid recruit and the retained living field force must both make native building shots"
+    );
+}
+
+#[test]
+fn ra8_understrength_financing_preserves_legacy_and_real_service_assets() {
+    // A native paid docking job is still useful after its cash is exhausted.
+    let (mut repair, tank, repaired) = paid_then_unfunded_service_fixture();
+    let depot = repair.world().resource::<sim::SpecialState>().docked[&tank];
+    let entity = unit_entity(&mut repair, tank);
+    let maximum = repair
+        .world()
+        .resource::<sim::Definitions>()
+        .unit_combat(repair.world().get::<sim::Unit>(entity).unwrap().kind)
+        .unwrap()
+        .hit_points;
+    assert!(repaired < maximum);
+    put(&mut repair, "barracks", 5, 12);
+    let mut released = false;
+    for _ in 0..2000 {
+        for event in step(&mut repair) {
+            if matches!(event, sim::SimEvent::BuildingSold { building, .. } if building == depot) {
+                assert_eq!(
+                    repair
+                        .world()
+                        .get::<sim::Health>(entity)
+                        .unwrap()
+                        .hit_points,
+                    maximum,
+                    "a native service asset must remain until the actual damaged vehicle is fully repaired"
+                );
+            }
+        }
+        released |= !repair
+            .world()
+            .resource::<sim::SpecialState>()
+            .docked
+            .contains_key(&tank);
+    }
+    assert!(
+        released
+            && repair
+                .world()
+                .get::<sim::Health>(entity)
+                .unwrap()
+                .hit_points
+                >= repaired
+    );
+
+    // Captured foreign docks can support an owned aircraft absent from the
+    // declared Soviet army; a new recruit must not consume its reload facility.
+    let mut air = scenario("russia", "medium", 0, 0, false);
+    let controllers = std::mem::take(&mut *air.world_mut().resource_mut::<sim::AiPlayers>());
+    put(&mut air, "tesla_reactor", 4, 4);
+    put(&mut air, "soviet_barracks", 5, 12);
+    let dock = put(&mut air, "airforce_command", 16, 8);
+    let target = sim::spawn_building(
+        air.world_mut(),
+        PlayerId(1),
+        "soviet_barracks",
+        CellPos::new(34, 16),
+    )
+    .unwrap();
+    let target_entity = unit_entity(&mut air, target);
+    // Declared durable combat fixture, as in the retained reload control.
+    air.world_mut()
+        .get_mut::<sim::Health>(target_entity)
+        .unwrap()
+        .hit_points = 1_000_000;
+    spawn_unit(air.world_mut(), PlayerId(0), "spy", CellPos::new(32, 17)).unwrap();
+    spawn_unit(
+        air.world_mut(),
+        PlayerId(0),
+        "conscript",
+        CellPos::new(12, 14),
+    )
+    .unwrap();
+    let plane = spawn_unit(
+        air.world_mut(),
+        PlayerId(0),
+        "harrier",
+        CellPos::new(10, 14),
+    )
+    .unwrap();
+    step(&mut air);
+    air.world_mut().insert_resource(controllers);
+    let mut shots = 0;
+    let mut empty = false;
+    let mut reloading = false;
+    let burst = {
+        let entity = unit_entity(&mut air, plane);
+        air.world()
+            .resource::<sim::Definitions>()
+            .weapon(air.world().get::<sim::Weapon>(entity).unwrap().kind)
+            .unwrap()
+            .burst
+    };
+    for _ in 0..14000 {
+        for event in step(&mut air) {
+            assert!(
+                !matches!(event, sim::SimEvent::BuildingSold { building, .. } if building == dock),
+                "captured native reload capability must remain available to its real aircraft"
+            );
+            shots += u32::from(
+                matches!(event, sim::SimEvent::WeaponFired {attacker,..} if attacker == plane),
+            );
+        }
+        let special = air.world().resource::<sim::SpecialState>();
+        empty |= special.ammo.get(&plane) == Some(&0);
+        reloading |= special.reloading.get(&plane).is_some_and(|wait| *wait > 20);
+        if reloading && shots > burst {
+            break;
+        }
+    }
+    assert!(
+        empty && reloading && shots > burst,
+        "real captured aircraft must fire, return, reload and fire again"
+    );
+
+    let mut legacy = scenario_mode(
+        "russia",
+        "brutal",
+        0,
+        0,
+        false,
+        ScenarioMode {
+            legacy_ai: true,
+            ..Default::default()
+        },
+    );
+    put(&mut legacy, "tesla_reactor", 3, 5);
+    put(&mut legacy, "soviet_barracks", 5, 12);
+    let asset = put(&mut legacy, "soviet_service_depot", 18, 5);
+    let fighter = spawn_unit(
+        legacy.world_mut(),
+        PlayerId(0),
+        "conscript",
+        CellPos::new(12, 13),
+    )
+    .unwrap();
+    let target = sim::spawn_building(
+        legacy.world_mut(),
+        PlayerId(1),
+        "soviet_construction_yard",
+        CellPos::new(17, 13),
+    )
+    .unwrap();
+    let mut fired = false;
+    for _ in 0..2000 {
+        for event in step(&mut legacy) {
+            assert!(
+                !matches!(event, sim::SimEvent::BuildingSold { building, .. } if building == asset),
+                "legacy presence-based financing remains unchanged"
+            );
+            fired |= matches!(event, sim::SimEvent::WeaponFired { attacker,target:found,..} if attacker == fighter && found == target);
+        }
+    }
+    assert!(fired);
+}
+
+#[test]
+fn ra8_surface_counterfire_leaves_an_unarmed_economy_building_to_fight_its_real_defender() {
+    let (mut app, building, gunner) = surface_building_focus_fixture_for("flak_track");
+    let entity = unit_entity(&mut app, gunner);
+    let at = app.world().get::<sim::Mobile>(entity).unwrap().cell;
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    let distraction = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "soviet_barracks",
+        CellPos::new(at.x, at.y + 1),
+    )
+    .unwrap();
+    let distraction_entity = unit_entity(&mut app, distraction);
+    let kind = app
+        .world()
+        .get::<sim::Building>(distraction_entity)
+        .unwrap()
+        .kind;
+    assert!(
+        app.world()
+            .resource::<sim::Definitions>()
+            .building_combat(kind)
+            .is_none_or(|terms| terms.weapons(false).into_iter().all(|w| w.is_none()))
+    );
+    let defender = spawn_unit(
+        app.world_mut(),
+        PlayerId(1),
+        "gi",
+        CellPos::new(at.x + 3, at.y + 1),
+    )
+    .unwrap();
+    let defender_entity = unit_entity(&mut app, defender);
+    let defender_initial = app
+        .world()
+        .get::<sim::Health>(defender_entity)
+        .unwrap()
+        .hit_points;
+    let definitions = app.world().resource::<sim::Definitions>();
+    let source = definitions
+        .unit_combat(definitions.unit_kind("flak_track").unwrap())
+        .unwrap();
+    let victim = definitions
+        .unit_combat(definitions.unit_kind("gi").unwrap())
+        .unwrap();
+    let traits = sim::TargetTraits {
+        armour: victim.armour,
+        organic: victim.organic,
+        ..Default::default()
+    };
+    let (gun, versus) =
+        sim::weapon_against(definitions, &source, source.weapons(false), &traits).unwrap();
+    let gun = definitions.weapon(gun).unwrap();
+    let threshold = load_ai(data().join("ai.ron"), definitions)
+        .unwrap()
+        .policy
+        .artillery_min_range
+        * sim::SUBCELLS_PER_CELL as u32;
+    assert!(versus > 1 && gun.anti_ground && gun.damage > 0 && gun.range < threshold);
+    assert!(
+        source
+            .weapons(false)
+            .into_iter()
+            .flatten()
+            .filter_map(|w| definitions.weapon(w))
+            .any(|w| w.range >= threshold && w.anti_air && !w.anti_ground),
+        "the longer AA source weapon must not misclassify the selected normal ground gun"
+    );
+    let preserve_ticks = 2 * u64::from(
+        controllers
+            .controller(PlayerId(0))
+            .unwrap()
+            .difficulty()
+            .think_interval,
+    );
+    let initial = app.world().get::<sim::Health>(entity).unwrap().hit_points;
+    issue(
+        &mut app,
+        Command::AttackMove {
+            units: vec![gunner],
+            target: CellPos::new(at.x, at.y + 4),
+        },
+    );
+    let mut minimum_hp = initial;
+    let mut incoming = false;
+    let mut acquired = false;
+    for _ in 0..120 {
+        let events = step(&mut app);
+        if let Some(hp) = app.world().get::<sim::Health>(entity) {
+            minimum_hp = minimum_hp.min(hp.hit_points);
+        }
+        incoming |= events.iter().any(|event| matches!(event, sim::SimEvent::WeaponFired { attacker, target, .. } if *attacker == defender && *target == gunner));
+        let weapon = app.world().get::<sim::Weapon>(entity).unwrap();
+        acquired |= weapon.target == Some(distraction)
+            && matches!(
+                weapon.order,
+                Some(sim::AttackOrder::AttackMove { moving: false, .. })
+            );
+        if incoming && acquired {
+            break;
+        }
+    }
+    assert!(
+        incoming && acquired,
+        "actual stationary AttackMove must acquire the unarmed economy building while an observed armed defender fires"
+    );
+    app.world_mut().insert_resource(controllers);
+    let mut returned = false;
+    let mut resumed = false;
+    let mut defender_damaged = false;
+    let mut defender_destroyed = false;
+    let mut preserved_ticks = 0;
+    let mut distraction_shots = 0;
+    for _ in 0..1800 {
+        let events = step(&mut app);
+        if let Some(hp) = app.world().get::<sim::Health>(entity) {
+            minimum_hp = minimum_hp.min(hp.hit_points);
+        }
+        let defender_alive = app
+            .world()
+            .get::<sim::Health>(defender_entity)
+            .is_some_and(|h| {
+                defender_damaged |= h.hit_points < defender_initial;
+                h.hit_points > 0
+            });
+        if returned && defender_alive {
+            assert!(
+                matches!(app.world().get::<sim::Weapon>(entity).unwrap().order, Some(sim::AttackOrder::Attack { target, .. }) if target == defender),
+                "a matching healthy counter-Attack must retain its native history"
+            );
+            assert!(!app.world().resource::<CommandQueue>().iter().any(|c| matches!(&c.command, Command::Attack { units, .. } | Command::AttackMove { units, .. } if units.contains(&gunner))), "do not repeatedly reset the matching counter-Attack");
+            preserved_ticks += 1;
+        }
+        for event in events {
+            defender_destroyed |=
+                matches!(event, sim::SimEvent::UnitDestroyed { unit, .. } if unit == defender);
+            incoming |= matches!(event, sim::SimEvent::WeaponFired { attacker, target, .. } if attacker == defender && target == gunner);
+            returned |= matches!(event, sim::SimEvent::WeaponFired { attacker, target, .. } if attacker == gunner && target == defender);
+            distraction_shots += u32::from(
+                matches!(event, sim::SimEvent::WeaponFired { attacker, target, .. } if attacker == gunner && target == distraction),
+            );
+            resumed |= returned
+                && defender_destroyed
+                && matches!(event, sim::SimEvent::WeaponFired { attacker, target, .. }
+                    if attacker == gunner && [building, distraction].contains(&target)
+                    && app.world().resource::<sim::AiPlayers>().controller(PlayerId(0)).unwrap().target() == Some(sim::WaveTarget::Building(target)));
+        }
+        if resumed {
+            break;
+        }
+        assert!(
+            app.world()
+                .resource::<sim::MatchState>()
+                .outcome()
+                .is_none()
+        );
+    }
+    let final_hp = app.world().get::<sim::Health>(entity).map(|h| h.hit_points);
+    eprintln!(
+        "building counterfire returned{returned} damaged{defender_damaged} destroyed{defender_destroyed} resumed{resumed} distractionshots{distraction_shots} target{:?} order{:?}",
+        app.world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .target(),
+        app.world().get::<sim::Weapon>(entity)
+    );
+    assert!(
+        incoming && minimum_hp < initial,
+        "the actual source defender must fire and damage the focused gunner; incoming{incoming} initial{initial} minimum{minimum_hp} final{final_hp:?} returned{returned} resumed{resumed} distractions{distraction_shots}"
+    );
+    assert!(
+        returned,
+        "counterfire must hit the armed source defender instead of only a nearer unarmed economy building; distraction_shots{distraction_shots}"
+    );
+    assert!(
+        defender_damaged && defender_destroyed,
+        "the source gun must actually damage and destroy the defender, not only emit WeaponFired"
+    );
+    assert!(
+        preserved_ticks >= preserve_ticks,
+        "the healthy counter-Attack must survive multiple actual AI decisions"
+    );
+    assert!(
+        resumed,
+        "after actual defender destruction the naturally selected observed building mission must receive native fire"
+    );
+}
+
+#[test]
+fn ra8_surface_counterfire_preserves_a_real_armed_building_engagement() {
+    let (mut app, _, gunner) = surface_building_focus_fixture_for("flak_track");
+    let entity = unit_entity(&mut app, gunner);
+    let at = app.world().get::<sim::Mobile>(entity).unwrap().cell;
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    let defended = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "pillbox",
+        CellPos::new(at.x, at.y + 1),
+    )
+    .unwrap();
+    let defender = spawn_unit(
+        app.world_mut(),
+        PlayerId(1),
+        "gi",
+        CellPos::new(at.x + 3, at.y + 1),
+    )
+    .unwrap();
+    let interval = controllers
+        .controller(PlayerId(0))
+        .unwrap()
+        .difficulty()
+        .think_interval;
+    let terms = app
+        .world()
+        .resource::<sim::Definitions>()
+        .building_combat(
+            app.world()
+                .resource::<sim::Definitions>()
+                .building_kind("pillbox")
+                .unwrap(),
+        )
+        .unwrap();
+    assert!(
+        terms
+            .weapons(false)
+            .into_iter()
+            .any(|weapon| weapon.is_some())
+    );
+    issue(
+        &mut app,
+        Command::AttackMove {
+            units: vec![gunner],
+            target: CellPos::new(at.x, at.y + 4),
+        },
+    );
+    let mut acquired = false;
+    let mut building_incoming = false;
+    let mut infantry_incoming = false;
+    for _ in 0..120 {
+        for event in step(&mut app) {
+            building_incoming |= matches!(event, sim::SimEvent::WeaponFired {attacker,target,..} if attacker == defended && target == gunner);
+            infantry_incoming |= matches!(event, sim::SimEvent::WeaponFired {attacker,target,..} if attacker == defender && target == gunner);
+        }
+        let weapon = app.world().get::<sim::Weapon>(entity).unwrap();
+        acquired |= weapon.target == Some(defended)
+            && matches!(
+                weapon.order,
+                Some(sim::AttackOrder::AttackMove { moving: false, .. })
+            );
+        if acquired && building_incoming && infantry_incoming {
+            break;
+        }
+    }
+    assert!(
+        acquired && building_incoming && infantry_incoming,
+        "actual armed-building engagement and both incoming sources must precede policy observation"
+    );
+    // Two AI intervals can be shorter than the native gun's remaining reload.
+    let observation = u64::from(app.world().get::<sim::Weapon>(entity).unwrap().cooldown)
+        + 2 * u64::from(interval)
+        + 1;
+    app.world_mut().insert_resource(controllers);
+    let mut building_fire = false;
+    for _ in 0..observation {
+        for event in step(&mut app) {
+            assert!(
+                !matches!(event, sim::SimEvent::WeaponFired {attacker,target,..} if attacker == gunner && target == defender),
+                "an armed building is not an unarmed economic distraction"
+            );
+            building_fire |= matches!(event, sim::SimEvent::WeaponFired {attacker,target,..} if attacker == gunner && target == defended);
+        }
+        assert!(!app.world().resource::<CommandQueue>().iter().any(|issued| matches!(&issued.command, Command::Attack {units,target} if units.contains(&gunner) && *target == defender)));
+    }
+    assert!(
+        building_fire,
+        "the preserved engagement must produce real native armed-building fire"
+    );
+}
+
+#[test]
+fn ra8_an_understrength_force_can_consolidate_a_producer_for_real_paid_infantry() {
+    let mut app = scenario("russia", "brutal", 0, 0, false);
+    let barracks = put(&mut app, "soviet_barracks", 5, 12);
+    // No optional Reactor refund: this controlled ordinary infantry producer
+    // remains source-buildable without a powered-factory prerequisite.
+    let asset = put(&mut app, "soviet_war_factory", 18, 5);
+    let fighter = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "conscript",
+        CellPos::new(12, 13),
+    )
+    .unwrap();
+    let target = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "soviet_construction_yard",
+        CellPos::new(17, 13),
+    )
+    .unwrap();
+    let defs = app.world().resource::<sim::Definitions>();
+    let kind = defs.unit_kind("conscript").unwrap();
+    let item = sim::ProductionItem::Unit(kind);
+    let cost = defs.production(item).unwrap().cost;
+    let refund = defs.refund(defs.building_kind("soviet_war_factory").unwrap());
+    assert!(refund >= cost && cost > 0);
+    assert!(
+        app.world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .difficulty()
+            .wave_size
+            > 1
+    );
+    let remaining = {
+        let world = app.world_mut();
+        world
+            .query::<(&sim::SimId, &sim::Owner, &sim::Building)>()
+            .iter(world)
+            .filter(|(id, owner, _)| owner.0 == PlayerId(0) && **id != asset)
+            .map(|(_, _, building)| building.kind)
+            .collect::<Vec<_>>()
+    };
+    let definitions = app.world().resource::<sim::Definitions>();
+    let state = app
+        .world()
+        .resource::<sim::Players>()
+        .get(PlayerId(0))
+        .unwrap();
+    assert!(
+        sim::check_buildable(definitions, state, false, &remaining, item).is_ok(),
+        "ordinary source prerequisites/owner/country permit the replacement after the actual proposed factory loss"
+    );
+    let rhino = sim::ProductionItem::Unit(definitions.unit_kind("rhino").unwrap());
+    assert!(
+        sim::check_buildable(definitions, state, false, &remaining, rhino).is_err(),
+        "the controlled choice actually gives up heavy production rather than calling every producer optional"
+    );
+    let mut sold = None;
+    let mut paid = false;
+    let mut charged = false;
+    let mut recruited = std::collections::BTreeSet::new();
+    let mut recruit_shot = false;
+    let mut fighter_shot = false;
+    for _ in 0..6000 {
+        charged |= app
+            .world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .queues()
+            .flat_map(|(_, q)| q)
+            .any(|q| q.item == item && q.charged > 0);
+        for event in step(&mut app) {
+            match event {
+                sim::SimEvent::BuildingSold {
+                    player: PlayerId(0),
+                    building,
+                    refund: amount,
+                } => {
+                    assert_eq!(
+                        building, asset,
+                        "sell only the counterfactually redundant producer"
+                    );
+                    assert_eq!(amount, refund, "native exact refund only");
+                    assert!(sold.replace(amount).is_none(), "one optional sale suffices");
+                }
+                sim::SimEvent::ProductionComplete {
+                    player: PlayerId(0),
+                    item: found,
+                } if found == item => paid = true,
+                sim::SimEvent::UnitSpawned {
+                    player: PlayerId(0),
+                    building,
+                    unit,
+                } if building == barracks => {
+                    recruited.insert(unit);
+                }
+                sim::SimEvent::WeaponFired {
+                    attacker,
+                    target: found,
+                    ..
+                } if found == target => {
+                    fighter_shot |= attacker == fighter;
+                    recruit_shot |= recruited.contains(&attacker);
+                }
+                sim::SimEvent::OreDelivered {
+                    player: PlayerId(0),
+                    ..
+                } => panic!("declared empty map must have no income"),
+                _ => {}
+            }
+        }
+        if recruit_shot && fighter_shot {
+            break;
+        }
+    }
+    let entity = unit_entity(&mut app, fighter);
+    assert!(
+        app.world()
+            .get::<sim::Health>(entity)
+            .is_some_and(|h| h.hit_points > 0)
+    );
+    assert!(
+        app.world()
+            .resource::<sim::MatchState>()
+            .outcome()
+            .is_none()
+    );
+    assert!(
+        app.world()
+            .resource::<sim::MatchState>()
+            .defeated(PlayerId(0))
+            .is_none()
+    );
+    eprintln!(
+        "productive consolidation sold{sold:?} exact_refund{refund} source_cost{cost} paid{paid} recruits{recruited:?} fighter_shot{fighter_shot} recruit_shot{recruit_shot}"
+    );
+    assert!(
+        fighter_shot,
+        "the original living ordinary field infantry must actually fight before judging financing"
+    );
+    assert_eq!(
+        sold,
+        Some(refund),
+        "a retained legal infantry producer must permit native consolidation of an otherwise unfundable second producer"
+    );
+    assert!(
+        charged && paid && !recruited.is_empty() && recruit_shot && fighter_shot,
+        "real paid recruit and the retained living field force must both make native building shots"
+    );
+}
+
+#[test]
+fn ra8_a_rear_wave_member_assists_its_actually_threatened_front_before_own_contact() {
+    let mut app = scenario("russia", "medium", 0, 0, false);
+    let building = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "radar_tower",
+        CellPos::new(22, 8),
+    )
+    .unwrap();
+    spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "engineer",
+        CellPos::new(23, 11),
+    )
+    .unwrap();
+    let front = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "conscript",
+        CellPos::new(14, 8),
+    )
+    .unwrap();
+    let rear = [
+        spawn_unit(
+            app.world_mut(),
+            PlayerId(0),
+            "conscript",
+            CellPos::new(12, 8),
+        )
+        .unwrap(),
+        spawn_unit(
+            app.world_mut(),
+            PlayerId(0),
+            "conscript",
+            CellPos::new(12, 10),
+        )
+        .unwrap(),
+    ];
+    let mut mission_fire = false;
+    for _ in 0..7000 {
+        mission_fire |= step(&mut app).iter().any(|e| matches!(e,sim::SimEvent::WeaponFired{attacker,target,..} if *attacker==front && *target==building));
+        let wave = app
+            .world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .wave();
+        if mission_fire && [front, rear[0], rear[1]].iter().all(|id| wave.contains(id)) {
+            break;
+        }
+    }
+    assert!(mission_fire);
+    assert!(
+        [front, rear[0], rear[1]].iter().all(|id| app
+            .world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .wave()
+            .contains(id)),
+        "all actors must join the same ordinary source-ready wave naturally"
+    );
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    let front_entity = unit_entity(&mut app, front);
+    let at = app.world().get::<sim::Mobile>(front_entity).unwrap().cell;
+    issue(&mut app, Command::Stop { units: vec![front] });
+    let destinations = [
+        CellPos::new(at.x - 6, at.y),
+        CellPos::new(at.x - 6, at.y + 2),
+    ];
+    for (id, destination) in rear.into_iter().zip(destinations) {
+        issue(
+            &mut app,
+            Command::Move {
+                units: vec![id],
+                target: destination,
+            },
+        );
+    }
+    let entities = rear.map(|id| unit_entity(&mut app, id));
+    let mut arrived = false;
+    for _ in 0..1000 {
+        step(&mut app);
+        arrived = entities
+            .into_iter()
+            .zip(destinations)
+            .all(|(entity, destination)| {
+                app.world()
+                    .get::<sim::Mobile>(entity)
+                    .is_some_and(|mobile| mobile.cell == destination && mobile.step.is_none())
+            });
+        if arrived {
+            break;
+        }
+    }
+    assert!(
+        arrived,
+        "rear spacing must come from real public Move completion"
+    );
+    let defender = spawn_unit(
+        app.world_mut(),
+        PlayerId(1),
+        "gi",
+        CellPos::new(at.x + 3, at.y + 1),
+    )
+    .unwrap();
+    let defender_entity = unit_entity(&mut app, defender);
+    let initial_defender = app
+        .world()
+        .get::<sim::Health>(defender_entity)
+        .unwrap()
+        .hit_points;
+    issue(
+        &mut app,
+        Command::Attack {
+            units: rear.to_vec(),
+            target: building,
+        },
+    );
+    issue(
+        &mut app,
+        Command::AttackMove {
+            units: vec![front],
+            target: CellPos::new(at.x, at.y + 3),
+        },
+    );
+    let front_initial = app
+        .world()
+        .get::<sim::Health>(front_entity)
+        .unwrap()
+        .hit_points;
+    let mut incoming = false;
+    for _ in 0..100 {
+        incoming |= step(&mut app).iter().any(|e|matches!(e,sim::SimEvent::WeaponFired{attacker,target,..} if *attacker==defender && *target==front));
+        if incoming
+            && app
+                .world()
+                .get::<sim::Health>(front_entity)
+                .unwrap()
+                .hit_points
+                < front_initial
+        {
+            break;
+        }
+    }
+    assert!(
+        incoming
+            && app
+                .world()
+                .get::<sim::Health>(front_entity)
+                .unwrap()
+                .hit_points
+                < front_initial,
+        "native incoming fire must actually damage the same-wave front"
+    );
+    let definitions = app.world().resource::<sim::Definitions>();
+    let terms = definitions
+        .unit_combat(definitions.unit_kind("gi").unwrap())
+        .unwrap();
+    let victim = definitions
+        .unit_combat(definitions.unit_kind("conscript").unwrap())
+        .unwrap();
+    let traits = sim::TargetTraits {
+        armour: victim.armour,
+        organic: victim.organic,
+        ..Default::default()
+    };
+    let (weapon, percent) =
+        sim::weapon_against(definitions, &terms, terms.weapons(false), &traits).unwrap();
+    let range = definitions.weapon(weapon).unwrap().range;
+    assert!(percent > 1);
+    let outside_incoming = |app: &App, entity| {
+        let world = app.world();
+        let grid = world.resource::<Grid>();
+        let (Some(own), Some(enemy), Some(id)) = (
+            world.get::<sim::Mobile>(entity),
+            world.get::<sim::Mobile>(defender_entity),
+            world.get::<sim::SimId>(entity),
+        ) else {
+            return false;
+        };
+        let a = own.position(grid, *id);
+        let b = enemy.position(grid, defender);
+        let dx = i64::from(a.x) - i64::from(b.x);
+        let dy = i64::from(a.y) - i64::from(b.y);
+        dx * dx + dy * dy > i64::from(range) * i64::from(range)
+    };
+    assert!(
+        entities
+            .iter()
+            .all(|entity| outside_incoming(&app, *entity)),
+        "the controlled rear is genuinely outside the source incoming range at restoration"
+    );
+    app.world_mut().insert_resource(controllers);
+    let mut assisted_before_contact = false;
+    let mut rear_fire = false;
+    let mut first_rear_fire = None;
+    let mut damaged = false;
+    let mut destroyed = false;
+    let mut resumed = false;
+    for _ in 0..2000 {
+        for (id, entity) in rear.iter().zip(entities) {
+            assisted_before_contact |= outside_incoming(&app, entity)
+                && app
+                    .world()
+                    .get::<sim::Mobile>(entity)
+                    .unwrap()
+                    .step
+                    .is_some()
+                && matches!(app.world().get::<sim::Weapon>(entity).unwrap().order,
+                    Some(sim::AttackOrder::Attack {target,..}) if target == defender)
+                && app
+                    .world()
+                    .resource::<sim::AiPlayers>()
+                    .controller(PlayerId(0))
+                    .unwrap()
+                    .wave()
+                    .contains(id);
+        }
+        let events = step(&mut app);
+        damaged |= app
+            .world()
+            .get::<sim::Health>(defender_entity)
+            .is_some_and(|hp| hp.hit_points < initial_defender);
+        for event in events {
+            rear_fire |= matches!(event,sim::SimEvent::WeaponFired{attacker,target,..} if rear.contains(&attacker) && target==defender);
+            if rear_fire && first_rear_fire.is_none() {
+                first_rear_fire = Some((
+                    app.world().resource::<SimTick>().0,
+                    app.world()
+                        .get::<sim::Health>(front_entity)
+                        .map(|hp| hp.hit_points),
+                ));
+            }
+            destroyed |= matches!(event,sim::SimEvent::UnitDestroyed{unit,..} if unit==defender);
+            resumed |= destroyed
+                && matches!(event,sim::SimEvent::WeaponFired{attacker,target,..} if rear.contains(&attacker) && target==building);
+        }
+        if resumed {
+            break;
+        }
+    }
+    eprintln!(
+        "cohort assistance early{assisted_before_contact} rear_fire{rear_fire} damaged{damaged} destroyed{destroyed} resumed{resumed} first_rear{first_rear_fire:?}"
+    );
+    assert!(
+        assisted_before_contact,
+        "a capable rear wave member must coordinate against the observed source actually harming its front before being attacked itself"
+    );
+    assert!(
+        rear_fire && damaged && destroyed && resumed,
+        "the actual assistance must hurt/kill the defender and resume the original real building mission"
+    );
+}
+
+#[test]
+fn ra8_understrength_financing_keeps_a_ground_support_sources_real_power_path() {
+    let mut app = scenario("germany", "brutal", 0, 0, true);
+    let reactor = put(&mut app, "nuclear_reactor", 2, 2);
+    put(&mut app, "barracks", 5, 12);
+    let source = put(&mut app, "chronosphere", 2, 18);
+    let controllers = app.world().resource::<sim::AiPlayers>().clone();
+    let think = u64::from(
+        controllers
+            .controller(PlayerId(0))
+            .unwrap()
+            .difficulty()
+            .think_interval,
+    );
+    let cooldown = {
+        let defs = app.world().resource::<sim::Definitions>();
+        defs.metadata(sim::ProductionItem::Building(
+            defs.building_kind("chronosphere").unwrap(),
+        ))
+        .unwrap()
+        .cooldown
+    };
+    app.world_mut().insert_resource(sim::AiPlayers::default());
+    let threshold = cooldown.saturating_sub((think * 3) as u32);
+    for _ in 0..u64::from(cooldown) + think {
+        if app
+            .world()
+            .resource::<sim::SpecialState>()
+            .charge
+            .get(&source)
+            .copied()
+            .unwrap_or(0)
+            >= threshold
+        {
+            break;
+        }
+        step(&mut app);
+    }
+    assert!(
+        app.world()
+            .resource::<sim::SpecialState>()
+            .charge
+            .get(&source)
+            .copied()
+            .unwrap_or(0)
+            >= threshold,
+        "native source charge must reach the actual near-ready premise within its source-derived bound"
+    );
+    let tank = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "grizzly",
+        CellPos::new(12, 13),
+    )
+    .unwrap();
+    spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "attack_dog",
+        CellPos::new(41, 39),
+    )
+    .unwrap();
+    step(&mut app); // Actual observation; no remembered-target/controller seeding.
+    let world = app.world_mut();
+    let enemy_base = world
+        .query::<(&sim::Owner, &sim::Building)>()
+        .iter(world)
+        .find(|(owner, _)| owner.0 == PlayerId(1))
+        .unwrap()
+        .1
+        .footprint;
+    assert!(
+        world
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .vision()
+            .sees_footprint(enemy_base),
+        "the untouched controller must receive an actually observed legal support objective"
+    );
+    let offset = controllers
+        .controller(PlayerId(0))
+        .unwrap()
+        .plan()
+        .policy
+        .chrono_min_offset as i32;
+    let landing = CellPos::new(enemy_base.origin.x + offset, enemy_base.origin.y + offset);
+    assert!(
+        app.world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .vision()
+            .is_visible(landing),
+        "the actual source-policy landing cell must be revealed too, not just the target footprint"
+    );
+    assert!(
+        !app.world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .low_power()
+    );
+    assert_eq!(
+        app.world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .credits(),
+        0
+    );
+    assert!(
+        app.world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .queues()
+            .all(|(_, q)| q.is_empty())
+    );
+    let world = app.world_mut();
+    assert!(
+        world
+            .query::<(&sim::Owner, &sim::Unit)>()
+            .iter(world)
+            .filter(|(owner, _)| owner.0 == PlayerId(0))
+            .all(
+                |(_, unit)| world.resource::<sim::Definitions>().domain(unit.kind)
+                    != sim::Domain::Air
+            )
+    );
+    app.world_mut().insert_resource(controllers);
+    let mut activated = false;
+    let mut waved = false;
+    for _ in 0..think * 12 {
+        for event in step(&mut app) {
+            assert!(
+                !matches!(
+                    event,
+                    sim::SimEvent::BuildingSold {
+                        player: PlayerId(0),
+                        ..
+                    }
+                ),
+                "an understrength ground cohort must preserve the real charging support source and its sole reactor"
+            );
+            activated |= matches!(event, sim::SimEvent::StrategicActivated {building, ..} if building == source);
+        }
+        waved |= app
+            .world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .wave()
+            .contains(&tank);
+        if activated {
+            break;
+        }
+    }
+    let reactor_entity = unit_entity(&mut app, reactor);
+    assert!(
+        app.world()
+            .get::<sim::Health>(reactor_entity)
+            .is_some_and(|hp| hp.hit_points > 0)
+    );
+    assert!(
+        !app.world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .low_power()
+    );
+    eprintln!(
+        "ground support waved{waved} activated{activated} tick{:?} cooldown{cooldown} charge{:?} known{:?} wave{:?} commands{:?}",
+        app.world().resource::<SimTick>(),
+        app.world()
+            .resource::<sim::SpecialState>()
+            .charge
+            .get(&source),
+        app.world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .known_buildings(),
+        app.world()
+            .resource::<sim::AiPlayers>()
+            .controller(PlayerId(0))
+            .unwrap()
+            .wave(),
+        app.world().resource::<CommandQueue>()
+    );
+    assert!(
+        waved && activated,
+        "the actual ground-only wave must receive native Chronoshift after natural source charge completes"
     );
 }
