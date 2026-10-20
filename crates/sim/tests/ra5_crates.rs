@@ -32,6 +32,30 @@ fn world_with(content: &str) -> App {
     world_seeded(content, 7)
 }
 
+#[test]
+fn concurrent_fixture_variants_keep_each_readers_requested_rules() {
+    let written = std::sync::Barrier::new(2);
+    std::thread::scope(|scope| {
+        for content in ["money", "veteran"] {
+            let written = &written;
+            scope.spawn(move || {
+                let path = variant("parallel_contents", "rules.ron", &only(content));
+                written.wait();
+                let definitions = load(fixture("economy.ron"), path).expect("independent rules");
+                let enabled: Vec<_> = definitions
+                    .rules()
+                    .unwrap()
+                    .powerups
+                    .iter()
+                    .filter(|entry| entry.share > 0)
+                    .map(|entry| entry.id.as_str())
+                    .collect();
+                assert_eq!(enabled, vec![content]);
+            });
+        }
+    });
+}
+
 /// Sends `unit` of `player` to (`x`, `y`) and runs until a crate is taken, at most 400 ticks:
 /// what the crate held, and the ticks it took.
 fn fetch(

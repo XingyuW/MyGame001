@@ -4,6 +4,7 @@
 #![allow(dead_code)]
 
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicU64, Ordering};
 
 use bevy_app::App;
 use bevy_ecs::message::Messages;
@@ -25,6 +26,7 @@ pub fn fixture(file: &str) -> PathBuf {
 /// The path of the fixture's `file` with each `(from, to)` edit applied (`from` must occur
 /// exactly once); the fixture's own file without edits.
 pub fn variant(name: &str, file: &str, edits: &[(&str, &str)]) -> PathBuf {
+    static NEXT_VARIANT: AtomicU64 = AtomicU64::new(0);
     if edits.is_empty() {
         return fixture(file);
     }
@@ -39,7 +41,8 @@ pub fn variant(name: &str, file: &str, edits: &[(&str, &str)]) -> PathBuf {
     }
     let dir = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join("ra5");
     std::fs::create_dir_all(&dir).expect("temporary directory");
-    let path = dir.join(format!("{name}_{}_{file}", std::process::id()));
+    let sequence = NEXT_VARIANT.fetch_add(1, Ordering::Relaxed);
+    let path = dir.join(format!("{name}_{}_{sequence}_{file}", std::process::id()));
     std::fs::write(&path, text).expect("variant");
     path
 }

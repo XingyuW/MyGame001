@@ -2480,6 +2480,18 @@ fn understrength_funding(view: &View<'_>, controller: &AiController) -> bool {
             .own_units
             .iter()
             .any(|unit| view.fights(unit) && unit.harvest.is_none())
+        // A previously admitted wave may need a new cohort after living membership
+        // empties. Before that history exists, finance stationary engagement,
+        // not another purchase immediately after the first paid recruit spawns.
+        || !((controller.next_wave > 0
+            && controller.wave.is_disjoint(&view.living_owned_ids))
+            || view.own_units.iter().any(|unit| {
+                unit.attacking
+                    && unit.mobile.step.is_none()
+                    && unit.combat_target.is_some_and(|target| {
+                        view.enemy_buildings.iter().any(|building| building.id == target)
+                    })
+            }))
     {
         return false;
     }
