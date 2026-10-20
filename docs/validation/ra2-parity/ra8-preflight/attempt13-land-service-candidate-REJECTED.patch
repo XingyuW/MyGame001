@@ -1,0 +1,295 @@
+--- crates/sim/src/ai.rs.before
++++ crates/sim/src/ai.rs.candidate
+@@ -2790,6 +2790,105 @@
+             .sum::<usize>();
+     let mut max = controller.difficulty.max_army as usize;
+     if view.ai.rules_difficulty {
++        // A land factory serves one entry of its declared cycle before filling
++        // an advanced reserve. Otherwise a readily available national vehicle
++        // can consume every finite opening wallet before ordinary siege gets
++        // a turn. Keep all tier capacity reserved, and keep their normal caps.
++        let ordinary = max.saturating_sub(view.ai.tier_reserves.iter().map(|&n| n as usize).sum());
++        let mut seen = BTreeSet::new();
++        let factories: Vec<_> = army
++            .iter()
++            .copied()
++            .filter(|&kind| {
++                view.definitions.domain(kind) == Domain::Land
++                    && !view.definitions.on_foot(kind)
++                    && view
++                        .definitions
++                        .metadata(ProductionItem::Unit(kind))
++                        .is_some_and(|m| m.tech_level >= view.ai.advanced_tech_level as i32)
++            })
++            .filter_map(|kind| view.queue_key(ProductionItem::Unit(kind)))
++            .filter(|key| seen.insert(*key))
++            .collect();
++        for factory in factories {
++            if total >= ordinary {
++                break;
++            }
++            let start = controller.army_cursors.get(&factory).copied().unwrap_or(0);
++            let advanced = |kind| {
++                view.definitions.domain(kind) == Domain::Land
++                    && view
++                        .definitions
++                        .metadata(ProductionItem::Unit(kind))
++                        .is_some_and(|m| m.tech_level >= view.ai.advanced_tech_level as i32)
++            };
++            let reserved = view.own_units.iter().filter(|u| advanced(u.kind)).count()
++                + army
++                    .iter()
++                    .copied()
++                    .collect::<BTreeSet<_>>()
++                    .into_iter()
++                    .filter(|&kind| advanced(kind))
++                    .map(|kind| view.queued(ProductionItem::Unit(kind)))
++                    .sum::<usize>();
++            if reserved >= view.ai.tier_reserves[1] as usize {
++                continue;
++            }
++            let first = (0..army.len())
++                .map(|step| army[(start + step) % army.len()])
++                .find(|&kind| {
++                    view.definitions.domain(kind) == Domain::Land
++                        && !view.definitions.on_foot(kind)
++                        && view.queue_key(ProductionItem::Unit(kind)) == Some(factory)
++                        && view.queueable(ProductionItem::Unit(kind))
++                        && strategy::recruit(view, controller, kind)
++                });
++            let reserve = army.iter().copied().find(|&kind| {
++                advanced(kind)
++                    && view.queue_key(ProductionItem::Unit(kind)) == Some(factory)
++                    && view.queueable(ProductionItem::Unit(kind))
++            });
++            let (Some(first), Some(reserve)) = (first, reserve) else {
++                continue;
++            };
++            let first_item = ProductionItem::Unit(first);
++            if view.queue_len(first_item) != 0 {
++                continue;
++            }
++            let price = |kind| {
++                view.definitions
++                    .production(ProductionItem::Unit(kind))
++                    .map_or(0, |terms| terms.cost)
++            };
++            let funds = view
++                .state
++                .credits()
++                .saturating_sub(pending_production_cost(view))
++                .saturating_sub(added.credits);
++            if funds < price(reserve) || funds >= price(reserve).saturating_add(price(first)) {
++                // A rich wallet preserves the original reserve-first order;
++                // an unaffordable reserve cannot starve the ordinary pass.
++                continue;
++            }
++            for step in 0..army.len() {
++                let index = (start + step) % army.len();
++                let kind = army[index];
++                let item = ProductionItem::Unit(kind);
++                if view.definitions.domain(kind) == Domain::Land
++                    && !view.definitions.on_foot(kind)
++                    && view.queue_key(item) == Some(factory)
++                    && strategy::recruit(view, controller, kind)
++                    && has_room(view, item, &mut added)
++                {
++                    commands.push(Command::QueueProduction { item });
++                    total += 1;
++                    controller
++                        .army_cursors
++                        .insert(factory, (index + 1) % army.len());
++                    break;
++                }
++            }
++        }
+         // Keep a small tier reserve: completing tech or an airfield must still change
+         // production when the surviving opening army already fills its ground quota.
+         for (air, wanted) in [
+@@ -2815,7 +2914,10 @@
+                     .iter()
+                     .filter(|&&kind| eligible(kind))
+                     .map(|&kind| view.queued(ProductionItem::Unit(kind)))
+-                    .sum::<usize>();
++                    .sum::<usize>()
++                + commands.iter().filter(|command| matches!(command,
++                    Command::QueueProduction { item: ProductionItem::Unit(kind) } if eligible(*kind)))
++                    .count();
+             if !army.iter().any(|&kind| eligible(kind)) {
+                 continue;
+             }
+@@ -2909,6 +3011,10 @@
+         if !controller.seen_air {
+             max = max.saturating_sub(army.iter().filter(|&&kind| anti_air(kind)).count());
+         } else if !view.own_units.iter().any(|u| anti_air(u.kind))
++            && !commands.iter().any(|command| {
++                matches!(command,
++                Command::QueueProduction { item: ProductionItem::Unit(kind) } if anti_air(*kind))
++            })
+             && let Some(&kind) = army
+                 .iter()
+                 .find(|&&k| anti_air(k) && view.queued(ProductionItem::Unit(k)) == 0)
+--- scripts/generate_ra2_data.py.before
++++ scripts/generate_ra2_data.py.candidate
+@@ -1719,7 +1719,7 @@
+                 army = ["rhino","conscript","rhino","v3_launcher","apocalypse","tesla_trooper","flak_track","yuri","kirov","typhoon","dreadnought","giant_squid"]
+                 special = {"russia":"tesla_tank","iraq":"desolator","cuba":"terrorist","libya":"demolition_truck"}.get(country)
+                 if special: army.insert(3,special)
+-                if country == "libya":
++                if country in ("libya", "russia"):
+                     # Game-owned play priority: once Radar makes siege legal,
+                     # serve it before this country's factory-built national reserve.
+                     # Its normal prerequisites retain the opening tank composition.
+--- assets/data/ai.ron.before
++++ assets/data/ai.ron.candidate
+@@ -84,7 +84,7 @@
+             build_order: ["tesla_reactor", "soviet_refinery", "soviet_barracks", "soviet_war_factory", "radar_tower", "soviet_service_depot", "soviet_battle_lab", "nuclear_reactor", "soviet_refinery", "soviet_war_factory", "cloning_vats", "psychic_sensor", "nuclear_silo", "iron_curtain", "soviet_naval_shipyard"],
+             power: "tesla_reactor",
+             harvester: "war_miner",
+-            army: ["rhino", "conscript", "rhino", "tesla_tank", "v3_launcher", "apocalypse", "tesla_trooper", "flak_track", "yuri", "kirov", "typhoon", "dreadnought", "giant_squid"],
++            army: ["v3_launcher", "rhino", "conscript", "rhino", "tesla_tank", "apocalypse", "tesla_trooper", "flak_track", "yuri", "kirov", "typhoon", "dreadnought", "giant_squid"],
+             defences: ["sentry_gun", "tesla_coil", "flak_cannon"],
+             support: ["engineer", "attack_dog"],
+             tier_reserves: [1, 2, 2], advanced_tech_level: 6,
+--- crates/sim/tests/ra8_ai.rs.before
++++ crates/sim/tests/ra8_ai.rs.candidate
+@@ -10623,3 +10623,139 @@
+         "both genuinely independent hidden-ore twins must reach real paid-infantry and worker wave fire"
+     );
+ }
++
++#[test]
++fn ra8_russian_declared_opening_funds_real_siege_without_losing_its_tank() {
++    let mut app = scenario("russia", "medium", 1800, 0, false);
++    let controllers = std::mem::take(
++        app.world_mut()
++            .resource_mut::<sim::AiPlayers>()
++            .into_inner(),
++    );
++    let factory = put(&mut app, "soviet_war_factory", 5, 15);
++    put(&mut app, "soviet_barracks", 5, 12);
++    put(&mut app, "radar_tower", 15, 5);
++    put(&mut app, "tesla_reactor", 3, 5);
++    // Controlled production fixture: normal live source producers and prerequisites,
++    // but no construction lane competing for this declared finite opening wallet.
++    let world = app.world_mut();
++    let yards = world
++        .query::<(bevy_ecs::entity::Entity, &sim::Owner, &sim::Building)>()
++        .iter(world)
++        .filter(|(_, owner, b)| {
++            owner.0 == PlayerId(0)
++                && world
++                    .resource::<sim::Definitions>()
++                    .building(b.kind)
++                    .unwrap()
++                    .id
++                    == "soviet_construction_yard"
++        })
++        .map(|(entity, _, _)| entity)
++        .collect::<Vec<_>>();
++    assert_eq!(yards.len(), 1);
++    for yard in yards {
++        world.get_mut::<sim::Health>(yard).unwrap().hit_points = 0;
++    }
++    step(&mut app);
++    let world = app.world_mut();
++    let owned = world
++        .query::<(&sim::Owner, &sim::Building)>()
++        .iter(world)
++        .filter(|(o, _)| o.0 == PlayerId(0))
++        .map(|(_, b)| b.kind)
++        .collect::<Vec<_>>();
++    let defs = world.resource::<sim::Definitions>();
++    let v3 = defs.unit_kind("v3_launcher").unwrap();
++    let rhino = defs.unit_kind("rhino").unwrap();
++    for (kind, price) in [(v3, 800), (rhino, 900)] {
++        let item = sim::ProductionItem::Unit(kind);
++        assert_eq!(defs.production(item).unwrap().cost, price);
++        assert!(
++            sim::check_buildable(
++                defs,
++                world.resource::<sim::Players>().get(PlayerId(0)).unwrap(),
++                false,
++                &owned,
++                item
++            )
++            .is_ok(),
++            "both source candidates must actually be legal before admission"
++        );
++    }
++    assert_eq!(
++        world
++            .resource::<sim::Players>()
++            .get(PlayerId(0))
++            .unwrap()
++            .credits(),
++        1800
++    );
++    app.world_mut().insert_resource(controllers);
++    let mut charged = std::collections::BTreeSet::new();
++    let mut born = Vec::new();
++    for _ in 0..2500 {
++        for (_, queue) in app
++            .world()
++            .resource::<sim::Players>()
++            .get(PlayerId(0))
++            .unwrap()
++            .queues()
++        {
++            for head in queue {
++                if head.charged > 0 {
++                    charged.insert(head.item);
++                }
++            }
++        }
++        for event in step(&mut app) {
++            assert!(!matches!(
++                event,
++                sim::SimEvent::BuildingSold {
++                    player: PlayerId(0),
++                    ..
++                } | sim::SimEvent::ProductionCancelled {
++                    player: PlayerId(0),
++                    ..
++                } | sim::SimEvent::OreDelivered {
++                    player: PlayerId(0),
++                    ..
++                }
++            ));
++            if let sim::SimEvent::UnitSpawned {
++                player: PlayerId(0),
++                building,
++                unit,
++            } = event
++                && building == factory
++            {
++                let entity = unit_entity(&mut app, unit);
++                born.push(app.world().get::<sim::Unit>(entity).unwrap().kind);
++            }
++        }
++        if born.len() == 2 {
++            break;
++        }
++    }
++    eprintln!("Russian finite factory opening charged{charged:?} born{born:?}");
++    assert_eq!(
++        born,
++        vec![v3, rhino],
++        "the declared opening must pay for and physically spawn a siege/tank pair"
++    );
++    for kind in [v3, rhino] {
++        assert!(charged.contains(&sim::ProductionItem::Unit(kind)));
++    }
++    assert!(
++        app.world()
++            .resource::<sim::MatchState>()
++            .outcome()
++            .is_none()
++    );
++    assert!(
++        app.world()
++            .resource::<sim::MatchState>()
++            .defeated(PlayerId(0))
++            .is_none()
++    );
++}

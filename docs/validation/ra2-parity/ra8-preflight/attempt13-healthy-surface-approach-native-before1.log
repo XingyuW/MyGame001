@@ -1,0 +1,20 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 19.13s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+healthy surface approach beforeMobile { speed: 11, cell: CellPos { x: 27, y: 24 }, step: Some(Step { to: CellPos { x: 26, y: 24 }, progress: 52, length: 256 }) } afterSome(Mobile { speed: 11, cell: CellPos { x: 27, y: 24 }, step: Some(Step { to: CellPos { x: 26, y: 24 }, progress: 74, length: 256 }) }) orderSome(Attack { target: SimId(4), chases: 1 })
+
+thread 'ai::ra8_attrition_tests::ra8_surface_focus_preserves_a_real_healthy_approach_before_native_building_fire' (10785234) panicked at crates/sim/src/ai/ra8_attrition_tests.rs:1390:5:
+a real healthy approach must retain native movement/combat ownership across the due AI application
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ai::ra8_attrition_tests::ra8_surface_focus_preserves_a_real_healthy_approach_before_native_building_fire ... FAILED
+
+failures:
+
+failures:
+    ai::ra8_attrition_tests::ra8_surface_focus_preserves_a_real_healthy_approach_before_native_building_fire
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 122 filtered out; finished in 0.15s
+
+error: test failed, to rerun pass `-p sim --lib`

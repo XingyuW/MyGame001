@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-20T01:09:30.801318+00:00",
+  "finally_restored_helper_sha256": "2adf6ddf6a41a3b57eccae63b96b274e7b52466dcf8798c3291640c2b1b7e33c",
+  "expected_retained_helper_sha256": "2adf6ddf6a41a3b57eccae63b96b274e7b52466dcf8798c3291640c2b1b7e33c",
+  "source_after": {
+    "crates/sim/src/ai.rs": "fcf15641832e881f8e848fda0ed2b85ba6c47fc6976a810694055b0ecbb339b0",
+    "crates/sim/src/ai/strategy.rs": "ec57866cd73ffc7cbd6049fdd27587c544e850bd63b4048de2d49353a0ebac96",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/game/tests/ra8_gate_matches.rs": "2adf6ddf6a41a3b57eccae63b96b274e7b52466dcf8798c3291640c2b1b7e33c"
+  },
+  "requires_separate_later_read": true
+}

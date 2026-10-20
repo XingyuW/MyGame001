@@ -4622,3 +4622,49 @@ Exact file/line/EOL/staged-blob SHA bindings match; zero source/data/test/prose 
 Captured stdout is JSON-escaped directly (247c5eb2…), preserving every raw byte. A separate
 restaged unfiltered check must match before a later deliberate evidence commit; no raw
 normalization or broad whitespace suppression is used.
+
+
+### RA8: fourteenth scoped checkpoint, full13 reordered before isolated timing (2026-10-20 UTC)
+
+Attempt13 stopped on the actual Crossroads Russia/AmericaEasyNone72000 native case; it is
+an interrupted partial workspace command, not756 completed or successful matches. Its
+36files/152671bytes per set remain exact across72copies. Commands05–13 are unrun and the
+production TSV is stale. R175 allows ordinary optional reinforcement financing alongside
+only stopped armed workers while retaining actual income/observed ore/real forces/paid heads;
+R176 allows zero-observed-ore workers into source-timed paid teams, with legacy, real income,
+no-factory incumbent and hidden-ore controls. R177's bounded service/composition experiment
+still failed and is fully rejected/restored, including its candidate-only test body in a
+retained raw patch. R178 narrows focus resumption to preserve healthy moving AttackMove
+ownership, retaining native stationary-distraction, defender and ability controls.
+
+Exact combined source yields AmericaP1Won67958/72000. Reordered affected checks complete:
+12commands all0,149Rustpass0fail0ignore/7native target invocations; includes122AI,16attrition,
+source slots4,legacy2,exactCrossroads1,Demo1Rust/10explicitWins and grown3. DemoRussia/LibyaEasy
+is now61614; original ten-player grownCrossroadsP1Won51137/51138steps/9defeated. Native proof
+bindings remain original: the only final text change is a mechanically bound doc-comment
+R177→R176 reference, followed by final fmt/strictClippy0. Current495source paths and static
+1124→1374(+250),0removed/renamed/ignored are bound in checkpoint14. Source/evidence staging,
+separate unfiltered checks/classification and clean commits await coordinator release.
+
+The next mandatory gate is unchanged full13 with RUST_TEST_NOCAPTURE=1; it must finish all13
+exit0 and both actual fresh756Won sweeps. Following that success, isolated all21/fixed256/
+three example guards run once on that same source before RA8 closure. No acceptance,
+performance, quality, review or debt requirement is dropped; prior metrics are historical.
+RA9 and independent review remain held, with the user's R172 two-batch review authorization
+preserved. No new substantial external directory; configured parser/render scratch is
+remeasured and retained for reruns, not required for release. This is scoped validation,
+not independent review or final RA8 closure.
+
+
+Checkpoint14 source binding: the frozen working source, with the separately bound final
+doc-comment reference correction, was later committed as66d0def across exactlyfivepaths.
+Unfiltered source cachedcheck exits0 at02:20:19Z; the separate completed-result read at
+02:20:26Z precedes the later commit. No native run is claimed to have occurred postcommit.
+Evidence staging/raw-only classification and explicit full13 release remain required.
+
+
+Checkpoint14 evidence cachedcheck exits2, NOTpassed: exactly17 retained native-log blank
+EOF diagnostics,zero source/data/test/prose errors. File/line/EOL and actual staged-blob
+SHA bindings match; raw output is captured directly as JSON-escaped stdout(d0c4e178…).
+No byte normalization or whitespace suppression; separate final identical unfiltered
+check and a later deliberate evidence commit remain required.

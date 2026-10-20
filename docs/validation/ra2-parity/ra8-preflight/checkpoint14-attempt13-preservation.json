@@ -1,0 +1,9 @@
+{
+  "utc": "2026-10-20T02:17:53.733197+00:00",
+  "manifest": "docs/validation/ra2-parity/ra8-attempt13/PRESERVED.json",
+  "manifest_sha256": "fb60ca0aa42f34dd48bd5061f5a18ba51f022ab47dcbada4d93439f635a96f75",
+  "files_per_set": 36,
+  "bytes_per_set": 152671,
+  "copies_checked": 72,
+  "mismatches": []
+}

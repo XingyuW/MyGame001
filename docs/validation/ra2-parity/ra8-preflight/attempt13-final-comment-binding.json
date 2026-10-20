@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-20T02:15:02.176418+00:00",
+  "path": "crates/sim/src/ai.rs",
+  "before_sha256": "0c811992001e72cf79b4946b6357b395bbe2de5b35840eec26c6c8b5f534f04b",
+  "after_sha256": "88497b2dde9a95a704e2d6439f85e84ea172bd4d04b2aa92dc148cc254f1d860",
+  "exact_only_replacement": {
+    "from": "    /// nor currently observed ore gives it an economic opportunity (R177).",
+    "to": "    /// nor currently observed ore gives it an economic opportunity (R176)."
+  },
+  "behavior_change": false,
+  "native_receipts_remain_bound_to_original_source_bytes": true
+}

@@ -1,0 +1,38 @@
+{
+  "label": "attempt13-russia-siege-opening-native-before1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_russian_declared_opening_funds_real_siege_without_losing_its_tank",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-20T01:55:18.624362+00:00",
+  "elapsed_seconds": 24.706234541954473,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "0c811992001e72cf79b4946b6357b395bbe2de5b35840eec26c6c8b5f534f04b",
+    "crates/sim/src/ai/strategy.rs": "ec57866cd73ffc7cbd6049fdd27587c544e850bd63b4048de2d49353a0ebac96",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "bc5e2c071410f3f9f64a2bdc44f64db7d2bc8a59b25c726b0d297f04779ac1e8",
+    "crates/game/tests/ra8_gate_matches.rs": "2adf6ddf6a41a3b57eccae63b96b274e7b52466dcf8798c3291640c2b1b7e33c",
+    "crates/sim/tests/ra8_ai.rs": "ad6cf30a6aa28e842b7332b5c1acbf70e22ab74e054e309cb35ec15140292482"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "0c811992001e72cf79b4946b6357b395bbe2de5b35840eec26c6c8b5f534f04b",
+    "crates/sim/src/ai/strategy.rs": "ec57866cd73ffc7cbd6049fdd27587c544e850bd63b4048de2d49353a0ebac96",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "bc5e2c071410f3f9f64a2bdc44f64db7d2bc8a59b25c726b0d297f04779ac1e8",
+    "crates/game/tests/ra8_gate_matches.rs": "2adf6ddf6a41a3b57eccae63b96b274e7b52466dcf8798c3291640c2b1b7e33c",
+    "crates/sim/tests/ra8_ai.rs": "ad6cf30a6aa28e842b7332b5c1acbf70e22ab74e054e309cb35ec15140292482"
+  },
+  "log_sha256": "61e7cbbc2107a96702d836ab69a0a210702855e8501ff7fa14c603e32149ffc7"
+}

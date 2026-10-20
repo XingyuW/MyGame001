@@ -1,0 +1,181 @@
+{
+  "utc": "2026-10-20T02:22:23.450929+00:00",
+  "native_check_exit": 2,
+  "passed": false,
+  "stdout_sha256": "d0c4e178562b83eb339791d57a9858752897d7e88027b6c214d15a04f39f45e4",
+  "diagnostic_count": 17,
+  "all_raw_native_log_eof": true,
+  "source_data_test_prose_errors": [],
+  "items": [
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt13-crossroads-russia-america-healthy-approach-after1.log",
+      "line": 47,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native tool stdout blank EOF; raw bytes retained; not a source/data/test/prose error",
+      "file_sha256": "b02411c34021d23435a0106f04fee167497b9f946d77aeee76749caa7dbfe121",
+      "staged_blob_sha256": "b02411c34021d23435a0106f04fee167497b9f946d77aeee76749caa7dbfe121",
+      "line_including_eol_hex": "0a",
+      "line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt13-final1-04-slot.log",
+      "line": 12,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native tool stdout blank EOF; raw bytes retained; not a source/data/test/prose error",
+      "file_sha256": "0e42a9ff8cf8ab443ea2abf27b1d81b336e6a492812fea2b953ad801f2b13a83",
+      "staged_blob_sha256": "0e42a9ff8cf8ab443ea2abf27b1d81b336e6a492812fea2b953ad801f2b13a83",
+      "line_including_eol_hex": "0a",
+      "line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt13-final1-05-legacy.log",
+      "line": 11,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native tool stdout blank EOF; raw bytes retained; not a source/data/test/prose error",
+      "file_sha256": "c1d1c5a7821c749a625412e694083eb345d6e3d436409edb075c99e7fc92fecd",
+      "staged_blob_sha256": "c1d1c5a7821c749a625412e694083eb345d6e3d436409edb075c99e7fc92fecd",
+      "line_including_eol_hex": "0a",
+      "line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt13-final1-06-demo10.log",
+      "line": 50,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native tool stdout blank EOF; raw bytes retained; not a source/data/test/prose error",
+      "file_sha256": "abe347dd72600e87c0fe9b6bc646787572bbdebd328b0a3123b0097e8ebe0def",
+      "staged_blob_sha256": "abe347dd72600e87c0fe9b6bc646787572bbdebd328b0a3123b0097e8ebe0def",
+      "line_including_eol_hex": "0a",
+      "line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt13-final1-07-grown3.log",
+      "line": 12,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native tool stdout blank EOF; raw bytes retained; not a source/data/test/prose error",
+      "file_sha256": "d9d1723aec67ef015bde7ad25cad9c5841ec85fc6c7cc14b600ace0329f68484",
+      "staged_blob_sha256": "d9d1723aec67ef015bde7ad25cad9c5841ec85fc6c7cc14b600ace0329f68484",
+      "line_including_eol_hex": "0a",
+      "line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt13-final1-ai.log",
+      "line": 193,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native tool stdout blank EOF; raw bytes retained; not a source/data/test/prose error",
+      "file_sha256": "c14890acaf9a603f3d83c7b66126fbbec15c66333fe5988179bd688eabe023d9",
+      "staged_blob_sha256": "c14890acaf9a603f3d83c7b66126fbbec15c66333fe5988179bd688eabe023d9",
+      "line_including_eol_hex": "0a",
+      "line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt13-healthy-surface-approach-native-after1.log",
+      "line": 29,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native tool stdout blank EOF; raw bytes retained; not a source/data/test/prose error",
+      "file_sha256": "164accb6ae7f5918a2b8bb49ec94049666223097fe064c5f6b96ceee799107df",
+      "staged_blob_sha256": "164accb6ae7f5918a2b8bb49ec94049666223097fe064c5f6b96ceee799107df",
+      "line_including_eol_hex": "0a",
+      "line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt13-idle-incumbent-income-native-after1.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native tool stdout blank EOF; raw bytes retained; not a source/data/test/prose error",
+      "file_sha256": "e9f67422498c065c14d4f99b9551f2d5d0b0e4b11de1fe5dbc43104c6ea67fe5",
+      "staged_blob_sha256": "e9f67422498c065c14d4f99b9551f2d5d0b0e4b11de1fe5dbc43104c6ea67fe5",
+      "line_including_eol_hex": "0a",
+      "line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt13-idle-incumbent-income-native-before1.log",
+      "line": 8,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native tool stdout blank EOF; raw bytes retained; not a source/data/test/prose error",
+      "file_sha256": "05f32a83f5d4b36aa4754ab1b7f63b5d673022cef3eb351f6c600acb564b6847",
+      "staged_blob_sha256": "05f32a83f5d4b36aa4754ab1b7f63b5d673022cef3eb351f6c600acb564b6847",
+      "line_including_eol_hex": "0a",
+      "line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt13-known-worker-job-migration-after1.log",
+      "line": 8,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native tool stdout blank EOF; raw bytes retained; not a source/data/test/prose error",
+      "file_sha256": "b277269b85f803f371c359afc80987ec4f0affd23e38db6f30f442bdc8c846e4",
+      "staged_blob_sha256": "b277269b85f803f371c359afc80987ec4f0affd23e38db6f30f442bdc8c846e4",
+      "line_including_eol_hex": "0a",
+      "line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt13-redundant-power-native-before1.log",
+      "line": 10,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native tool stdout blank EOF; raw bytes retained; not a source/data/test/prose error",
+      "file_sha256": "f23758098cdc6711725e03cec4fe4f08a0d4ec18446555c0c227c3f1e61a5365",
+      "staged_blob_sha256": "f23758098cdc6711725e03cec4fe4f08a0d4ec18446555c0c227c3f1e61a5365",
+      "line_including_eol_hex": "0a",
+      "line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt13-russia-siege-opening-native-after1.log",
+      "line": 10,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native tool stdout blank EOF; raw bytes retained; not a source/data/test/prose error",
+      "file_sha256": "76d5d5451ef2f8424d6c12088160cda2223c3649b1ec79debc169d979ea425bd",
+      "staged_blob_sha256": "76d5d5451ef2f8424d6c12088160cda2223c3649b1ec79debc169d979ea425bd",
+      "line_including_eol_hex": "0a",
+      "line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt13-worker-final-controls2.log",
+      "line": 15,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native tool stdout blank EOF; raw bytes retained; not a source/data/test/prose error",
+      "file_sha256": "dafd2dbb73fc80ae881080591e1621f58ac967c7c65da0c41456e04584f9f6c5",
+      "staged_blob_sha256": "dafd2dbb73fc80ae881080591e1621f58ac967c7c65da0c41456e04584f9f6c5",
+      "line_including_eol_hex": "0a",
+      "line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt13-worker-final-controls3.log",
+      "line": 19,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native tool stdout blank EOF; raw bytes retained; not a source/data/test/prose error",
+      "file_sha256": "70e98fba3509fca11c43f776fcd65bc43f27f19dae0b8868b208e1d9ba12c043",
+      "staged_blob_sha256": "70e98fba3509fca11c43f776fcd65bc43f27f19dae0b8868b208e1d9ba12c043",
+      "line_including_eol_hex": "0a",
+      "line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt13-worker-mission-native-after1.log",
+      "line": 10,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native tool stdout blank EOF; raw bytes retained; not a source/data/test/prose error",
+      "file_sha256": "9d1983e2bd0979b3a28886907900e3a8ba354e30358f675a1569849b7996d7f4",
+      "staged_blob_sha256": "9d1983e2bd0979b3a28886907900e3a8ba354e30358f675a1569849b7996d7f4",
+      "line_including_eol_hex": "0a",
+      "line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt13-worker-reinforcement-native-after1.log",
+      "line": 10,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native tool stdout blank EOF; raw bytes retained; not a source/data/test/prose error",
+      "file_sha256": "418b5caef6fe67d19aa08b3c7be1ca5f5442c8abb92e4e333bd7e7633be2dd6d",
+      "staged_blob_sha256": "418b5caef6fe67d19aa08b3c7be1ca5f5442c8abb92e4e333bd7e7633be2dd6d",
+      "line_including_eol_hex": "0a",
+      "line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt13-zero-job-worker-native-after1.log",
+      "line": 17,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native tool stdout blank EOF; raw bytes retained; not a source/data/test/prose error",
+      "file_sha256": "21de867dad2bb4d189ca6b87f152624beb783ecf70820a574e8eecf9dd57ae3b",
+      "staged_blob_sha256": "21de867dad2bb4d189ca6b87f152624beb783ecf70820a574e8eecf9dd57ae3b",
+      "line_including_eol_hex": "0a",
+      "line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    }
+  ]
+}

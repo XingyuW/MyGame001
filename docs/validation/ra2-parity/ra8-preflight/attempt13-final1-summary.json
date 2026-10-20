@@ -1,0 +1,183 @@
+{
+  "label": "attempt13-final1",
+  "head": "785cba25011e92f5de9f15b410d8ee680b183f53",
+  "start_utc": "2026-10-20T02:12:09.365626+00:00",
+  "pid": 14560,
+  "pgid": 14560,
+  "runtime_paths": 344,
+  "additional_paths": 169,
+  "overlap": 18,
+  "unique": 495,
+  "commands": [
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start_utc": "2026-10-20T02:12:09.365677+00:00",
+      "end_utc": "2026-10-20T02:12:10.388368+00:00",
+      "elapsed_seconds": 1.0227098329924047,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt13-final1-01-fmt.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "regenerate",
+      "command": [
+        "python3",
+        "scripts/generate_ra2_data.py",
+        "--check"
+      ],
+      "start_utc": "2026-10-20T02:12:10.388637+00:00",
+      "end_utc": "2026-10-20T02:12:10.503151+00:00",
+      "elapsed_seconds": 0.11453637498198077,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt13-final1-02-regenerate.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "start_utc": "2026-10-20T02:12:10.503405+00:00",
+      "end_utc": "2026-10-20T02:12:17.558814+00:00",
+      "elapsed_seconds": 7.055413374968339,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt13-final1-03-clippy.log",
+      "log_sha256": "2967859bcb1cee0aecb30b051af4883cfba739d4974bf54b49a226bf9b3863b0",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "slot",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "last_stand",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T02:12:17.559066+00:00",
+      "end_utc": "2026-10-20T02:12:36.114490+00:00",
+      "elapsed_seconds": 18.555395832983777,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt13-final1-04-slot.log",
+      "log_sha256": "0e42a9ff8cf8ab443ea2abf27b1d81b336e6a492812fea2b953ad801f2b13a83",
+      "rust_results": [
+        [
+          4,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "legacy",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra4_ai",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T02:12:36.114756+00:00",
+      "end_utc": "2026-10-20T02:12:41.741364+00:00",
+      "elapsed_seconds": 5.626619333052076,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt13-final1-05-legacy.log",
+      "log_sha256": "c1d1c5a7821c749a625412e694083eb345d6e3d436409edb075c99e7fc92fecd",
+      "rust_results": [
+        [
+          2,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "demo10",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_ai_matches",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T02:12:41.741649+00:00",
+      "end_utc": "2026-10-20T02:14:11.902142+00:00",
+      "elapsed_seconds": 90.16023891698569,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt13-final1-06-demo10.log",
+      "log_sha256": "abe347dd72600e87c0fe9b6bc646787572bbdebd328b0a3123b0097e8ebe0def",
+      "rust_results": [
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "grown3",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m13_grown_maps",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T02:14:11.902416+00:00",
+      "end_utc": "2026-10-20T02:14:37.070332+00:00",
+      "elapsed_seconds": 25.16786358394893,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt13-final1-07-grown3.log",
+      "log_sha256": "d9d1723aec67ef015bde7ad25cad9c5841ec85fc6c7cc14b600ace0329f68484",
+      "rust_results": [
+        [
+          3,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    }
+  ],
+  "reordered_acceptance": "No duplicate workspace or retained39 preflight. Mandatory full13 after cheap final checks/clean checkpoint; all21/fixed3/exampleguards after successful full13, all required before closure.",
+  "elapsed_seconds": 147.70454166695708,
+  "status": "COMPLETE all7 commands0; full13/postgate isolated timing still required",
+  "end_utc": "2026-10-20T02:14:37.070635+00:00"
+}

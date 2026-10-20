@@ -1,0 +1,10 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 6.91s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+redundant source power soldSome((SimId(3), 300)) chargedtrue spawned{SimId(9), SimId(10)} shottrue
+test ra8_redundant_source_power_can_finance_a_real_recruit_without_selling_its_yard ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.03s
+
