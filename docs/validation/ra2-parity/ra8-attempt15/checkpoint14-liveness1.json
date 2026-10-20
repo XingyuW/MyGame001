@@ -1,0 +1,13 @@
+{
+  "utc": "2026-10-20T02:27:52.512778+00:00",
+  "owned_pgid": 18345,
+  "ownership_source": "gate-process.json",
+  "ps_columns": "pid ppid pgid etime time %cpu state comm",
+  "owned_rows": [
+    "18345 18319 18345       03:01   0:00.01   0.0 Ss   sh",
+    "18351 18345 18345       03:01   0:00.01   0.0 S    caffeinate",
+    "18390 18345 18345       02:59   0:00.53   0.0 S    /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo",
+    "21191 18390 18345       00:16   2:19.97 855.6 R    /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m10_unlocks_and_enemies-61e318796d819d42"
+  ],
+  "interpretation": "CPU/elapsed are liveness only,not match/test success. No profiling/signal/source changes."
+}

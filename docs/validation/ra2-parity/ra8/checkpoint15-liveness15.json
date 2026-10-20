@@ -1,0 +1,10 @@
+{
+  "utc": "2026-10-20T08:25:11.233880+00:00",
+  "purpose": "Bounded owned-process metadata only; CPU establishes activity, not correctness/completion. No profiling/sampling/signal.",
+  "session_id": 75533,
+  "owned_pgid": 46889,
+  "ps_stdout": "  PID  PPID  PGID  ELAPSED      TIME  %CPU STAT COMMAND\n46861  7720 46861 02:28:59   0:02.33   0.0 Ss   /opt/homebrew/Cellar/python@3.15/3.15.0/Frameworks/Python.framework/Versions/3.15/Resources/Python.app/Contents/MacOS/Python -\n46889 46861 46889 02:28:59   0:00.01   0.0 Ss   sh scripts/validate_ra2_parity.sh ra8\n46940 46889 46889 02:28:58   0:00.48   0.0 S    /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo test --workspace --release\n49352 46940 46889 02:24:22 631:22.48 198.0 R    /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-fff13bc99bc7e9e6\n",
+  "m6_latest_progress": "504/756 non_Won0",
+  "returned_non_Won": [],
+  "raw_partial_bytes": 24532
+}

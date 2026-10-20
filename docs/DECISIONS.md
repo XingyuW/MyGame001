@@ -11033,3 +11033,234 @@ Checkpoint15 final scoped follow-up: final4 completes12 commands all0/160 Rust p
 Checkpoint15 evidence hygiene: first unfiltered stagedcheck exits2, NOTpassed. All42 exact diagnostics across41rawpaths are35native-log blankEOFs and7raw-patch-context trailing spaces. Every file/line/EOL/stagedblob SHA matches;zero source/data/test/prose errors. First stdout7737c0dc… is captured directly as JSON-escaped text. No raw bytes normalized; separate identical final check and a later deliberate evidence commit remain required.
 
 Checkpoint15 separate final unfiltered evidence check exits2 at05:53:22Z, identically7737c0dc…/42raw diagnostics; separate completed-result read05:53:37Z confirms NOTpassed/classified. Metadata is restaged before the last standalone identical check and later deliberate commit, with raw bytes unchanged.
+
+### R186 — Preserve first-recruit recovery before financing an engaged depleted force (2026-10-20)
+
+Full attempt15 runs on clean checkpoint57595d2/runtime0d8f16d. Its required M6
+sweep completes all756 jobs with zero non-Won outcomes and passes6/0/0, in
+14687.37 native seconds. The fresh source table has756 unique rows and SHA
+1ba1644b15e8ab25852c51475ff6d1d9aa5425b38e44dd41d217d502dfd32cf1.
+Its median29475.5 steps, nearest-rank p90=72617 and max250882 are genuine
+current-attempt M6 results, not full-gate acceptance. The normalized maximum is
+Crossroads KoreaEasy/FranceEasy67051/72000=.9312638889, a later RA9 margin watch.
+The retained match target also passes41/0/0 in1709.34 native seconds.
+
+The subsequent simulation library fails seven original recovery assertions:
+four no-refund repair-budget controls at ra8_recovery_tests.rs545 (finite,
+borderline, multiple repairs, source-funded surplus), completed paid heads at1387,
+the detector obligation at1201, and duplicate-head requeue at1173. These are
+native compatibility failures, not obsolete expectations. Workspace reports
+428passed/7failed/0ignored; the failed library itself reports116/7/0. Phase4
+exits101 after17010 script-date seconds; the owned wrapper stops its group at
+10:39:42.857594Z after17011.448856 monotonic seconds. Phase5 has no completed
+result and any partial bytes are retained; phases6–13 and the post-gate isolated
+acceptance are unrun. No fresh duel756 result is claimed.
+
+[Attempt15 preservation](validation/ra2-parity/ra8-attempt15/PRESERVED.json)
+binds70 label leaves,1576140 bytes per set,140 verified current/archive copies,
+SHA372fb053e748023ba1374ed7f4f156d68f9a59813cd79d3cadacaa71547a151e.
+Raw04 SHA is d49539d724ccfa41b5e3b5849f419d019c15335bb3e33b2d51a2f0d3d28a3789.
+All495 frozen source hashes still match. The historical label production table
+is preserved as stale; the genuinely fresh M6 table and its metrics have separate
+checkpoint15-m6-production-* records. The owned process group is verified empty
+before diagnosis. No successful earlier scope is promoted to full13 acceptance.
+
+An observational-only native replay retains the original finite-budget test.
+Observe1 cannot open the configured Cargo cache under the sandbox and exits101
+before compilation; it is insufficient evidence. Observe2 logs an actual sale
+at SimTick850: cash0, wave{}, queues[], sole newly produced GI7 at8,14 with no
+attack order, no combat target and attacking=false. It then fails the unchanged
+no-additional-refund assertion on building3/refund750. Raw b50b864f6f18ab892b800892a7b4fe87d09ae837bec92f13baa68dda4c1532d2
+binds the real cause: the added R182 investment treated an idle first funded
+recruit as a depleted force needing another asset sale. Instrumentation restores
+in finally10:45:02.811109Z; a separate10:45:52.555972Z nine-path read confirms
+original AIc5685cf9 and unchanged tests before any correction.
+
+The retained correction adds only nine lines to understrength_funding: the
+additional investment requires an owned actor with a Weapon order, no current
+Mobile step, and a current combat target that is an actually observed enemy
+building. This is a chosen stationary-engagement policy, not proof of a previous
+shot, guaranteed safety, or absence of later travel. It preserves the existing
+force/cohort counts, income/ore/service/Air/strategic exclusions, declared wave
+size, public sale path, financing accounting and all source timing. No new
+snapshot field, persistent state, RNG, timer, stat, rule, test or assertion changes.
+
+Two candidate distinctions are preserved honestly. An existing-wave requirement
+plus queue-dependency protection passes recovery21 but fails two original native
+reinforcement/consolidation controls (2passed/2failed): genuine building fire
+exists without offensive wave membership. The wave-only candidate is not retained.
+The smaller stationary predicate plus queue protection passes recovery21 and
+native understrength4, including real400/1000 refunds, charged recruitment,
+original/recruit building fire, native service, and real ground Chronoshift use.
+Those are intermediate candidate results, not the final source validation.
+
+The queue-protection-only bypass still passes21/0/0 (raw7fd01de2…). It does not
+establish independent causality, so that extra policy, refactor and comment are
+removed. Its exact small candidate patch is archived as UNRETAINED. Conversely,
+removing only the stationary-engagement admission from that intermediate body
+reproduces all seven original failures (14passed/7failed, rawe0826a28…). Its
+finally10:57:31.000091Z and separate later nine-path read restore the candidate
+before the deliberate removal of queue protection. No passing negative is
+relabeled a failure, and no exclusive queue-guard credit is claimed.
+
+Final AI8fd45ad8081f0ff8a304fde3fef9fccfa5de6fc774b72b2372a1168f506bb6e9
+differs from the failed frozen source only by that nine-line admission. The
+original declared-army sale dependency body/comment and every test remain exact.
+Fresh scoped final1 replaces redundant AI/attrition/slot/legacy/recovery invocations
+with ONE complete `cargo test --release -p sim`, following root's explicit coverage
+adjustment after these cross-boundary failures. Strict checks, both exact Crossroads
+directions, Riverlands, Demo10 and grown3 remain; full13 and same-source isolated
+all21/fixed3/example guards are still required. No ending or acceptance result is
+transferred across this runtime change.
+
+R186 final1 follow-up: strict fmt/regeneration/Clippy all0. On the exact final
+nine-line-only runtime, the simulation library passes123/0/0 including every
+original failed recovery assertion. The complete sim command later stops at an
+independent fixture-loading race described in R187:51 completed targets total
+778passed/1failed/0ignored, exit101,1164.615377 command seconds. Its frozen source
+has zero mismatches. Both exact Crossroads directions, Riverlands, Demo10 and
+grown3 remain unrun in this failed prefix; no final checkpoint/full13 release.
+
+### R187 — Give parallel RA5 fixture readers independent variant files (2026-10-20)
+
+The R186 full-sim preflight fails unchanged original
+`a_veteran_crate_promotes_the_owners_units_within_three_cells` while loading
+`CARGO_TARGET_TMPDIR/ra5/only_veteran_75774_rules.ron`: the parser observes EOF
+instead of the initial struct. Raw full-sim SHA
+1a3309b149b78b376c603b02c205b363e0f3789af565742d5c269d8d15b68c79
+and its failed final1 summary are preserved. This happens before scenario
+construction or AI execution, not in the nine-line financing decision.
+
+`ra5_common::variant` formerly writes `name + process PID + file` with ordinary
+truncating `std::fs::write`. Two tests in the same ra5_crates process call
+`world_with("veteran")` (the original promotion and already-elite fallback
+tests), so a reader can observe the other thread's transient empty file. The
+same name with different edits can also load another caller's completed content.
+
+One bounded regression adds two scoped threads requesting the same variant
+name/file with distinct legal money/veteran content. A barrier holds both actual
+native `load` calls until both writes finish; each parsed Definitions must
+contain only its own requested enabled powerup. No sleep, retry, panic catch,
+gameplay expectation migration or probabilistic stress is used. With unchanged
+helper157fdbece7e2d276a97a245aaf432bb2d12a039ece421911395743db8a9ca209,
+BEFORE36d44e5c66ab44fa2d091bad5c46e40d110b8a5d6e0acf8a1a824dfb3ee45c97
+fails the actual loaded-rule assertion (money instead of veteran),0passed/1failed,
+8.029589 wrapper seconds. The new test body remains identical afterward.
+
+The helper now appends one process-local AtomicU64 invocation sequence to that
+existing cache filename. Relaxed ordering supplies distinct invocation numbers;
+no shared file is rewritten by another concurrent caller. The fixture edits,
+parsed data, native loader, original gameplay assertions and configured Cargo
+cache root stay unchanged. This counter belongs only to test-file naming, not
+simulation state, AI, RNG or hashes. No files are moved to system temporary paths.
+
+AFTER434d8da9544f6d2f25dfdc96173a95f53ae787d5abc3d4f0fb55600381d6bdb9
+passes the entire ra5_crates target19/0/0 (all18 original tests plus the new
+concurrency regression),8.494974 wrapper/1.77 native seconds. Metadata binds the
+helper0a3d57fe1c6e01a5dc00f672bdbe8e3fa6753e80ea79ef72044af6cf342c1c95,
+new test file133743cc92638fbf53e3a4a97c0f7c6ac98483365d6527fb3551be29f1e36074,
+unchanged R186 AI8fd45ad8 and all11 observed source paths before/after. Existing
+crate determinism and all source-content/effect assertions remain intact.
+
+Fresh final2 reruns the agreed strict checks, ONE complete sim crate, affected
+three exact matches, Demo10 and grown3 on the final source. No result is transferred
+from the failed complete-sim prefix as a successful command. Mandatory full13
+and unchanged-source isolated all21/fixed3/example guards still follow only after
+the clean checkpoint/root release and successful full gate, respectively.
+
+### R188 — Rebuild an admitted wave without treating the first recruit as depletion (2026-10-20)
+
+R187 final2 completes ONE full sim command with1077passed/0failed/0ignored
+across68 result targets, including all seven original R186 failures and the
+fixture-race regression. Raw727a0d7da808b2122c2129cff4b4f995f04b56a29d32bce261130d7477445851
+binds867.339290 command seconds. The next unchanged Crossroads
+RussiaEasy/AmericaEasy seed0 case nevertheless reports None72000,0/1/0,
+rawa870e7690e70082e51409b7330102311fe584c88ac4f5d4c8d1f44615048d5c9.
+The completed failed prefix, nine unique leaves/207142 bytes, is preserved by
+attempt15-final2-STOPPED-preservation.json (SHA245f099f813584933c58f8f663345c4fe12b942b1817f6802f4dbd594dd7ce0b).
+The reverse case, Riverlands, Demo10 and grown3 are unrun in that prefix.
+
+Two exact observational replays use the existing trace-only event/service hooks,
+without gameplay writes or altered bounds. Current stationary-only AI8fd45ad8
+again returns None72000 (rawadcccd3fadc6152c97f166b881c52ed139878275ec25b40161758ee15013cf90).
+Removing only its nine-line admission reproduces exact original AIc5685cf9 and
+P0Won61986 (raw985599b4ec98ff77e4dcb55a241d1d8070d29523c80291cba5a293ad9b10420b).
+That bounded mutation restores all11 observed source paths in finally
+11:45:34.442437Z; a separate later restored-read receipt confirms AI8fd45ad8
+before this new candidate is edited. The original full attempt15 seven failures
+remain genuine evidence against restoring unrestricted first-recruit investment.
+
+The ordered service observations share3682 prefix lines. Both record Unit134
+destroyed at50842. The first captured service-command divergence is50881:
+original P1 sells building86 while current P1 issues only the same worker orders.
+The original native sale refunds750 at50882 and production is queued at50921.
+Actual typed snapshots show P1's Harriers104/134 in its wave at48000; they are
+not GI. Replacement Mirage195/GI201 are idle and outside the wave at51000 in
+the current trajectory. This is evidence of cohort rebuilding after a prior
+admission, not a terminal helplessness or zero-damage claim. Prefix equality
+applies to captured service observations, not an exhaustive world comparison.
+
+The bounded refinement permits the R182 investment when existing controller
+next_wave is positive and wave membership is empty, OR when R186's stationary
+current observed-building engagement holds. next_wave starts0 and is set by
+ordinary wave admission; it is already hashed. This is admission history, not
+proof every prior member died or that every emitted order succeeded. Existing
+income/observed-ore/service/Air/strategic/force/cohort exclusions remain exact.
+No state, RNG, cadence, source rule, limit, assertion or fixture is added or changed.
+
+On candidate AI50b73f301eb8d9c8d6edf1a5f77a0abe519a8bba00fe3e0966cc5e57556d29e6,
+unchanged recovery21 passes (raw8291b814e61798c30d74d6cd4d02917d8d10f7725c54d00147a2f65f405d2ea6)
+and all four native understrength controls pass (raw0914573fd897f545ac5aef2abad38547e36c9fdbd6e63e33f653e3cdd4499ecd).
+The raw candidate replay662dc3f8f9e5e3de1b25b31f357c4b79d38e792e55f696acb3d1f8afacf69c36
+still returns None72000,0/1/0,46.125256 wrapper seconds. No ending or full
+acceptance follows from those scoped positives. Source order supplies a further
+boundary to verify: funding runs before command_army removes no-longer-owned
+wave IDs. A raw empty-set test can therefore retain a just-killed member through
+the funding decision. Bounded observational raw4eeef7eaad4b8e936fb9fea4f50cda0956780bd24cda8818240007a06d875f60
+confirms P1 at50881: next_wave53348, wave{134}, living-owned IDs
+{27,176,177,180,195,201}. The just-destroyed134 is absent. The print-only
+mutation restores in finally11:58:38.373295Z; a separate later eleven-path read
+matches the original candidate before the next edit.
+
+The refinement therefore uses wave.is_disjoint(living_owned_ids) rather than
+wave.is_empty(). This reads the existing own-actor snapshot, including retained
+stowed/temporarily unavailable ownership, before ordinary later wave pruning.
+It does not move stages, remove a live member or create persistent history.
+Final-refinement AIa219bfb73d6038cb56e5461120182350dce98585945bfbc50a525d36a1aaa17b
+passes unchanged recovery21 (rawef7f29198df773630617812f634f8216a1a20dba078ac2b0ebc3199e22ed6b79)
+and native understrength4 (raw458f98c818106750ee72addfd509d3cbc37270a0e1686f5718e9261f382502a1).
+Both eleven-path source maps match before/after. The exact Crossroads replay now
+reports P0Won62005/72000,1/0/0,rawdc6c37c42b3be295c988cf3554287ea369d877b88211d5aadf6d32c470ffb099,
+86.488669 wrapper/19.61 native seconds. This differs from the original61986
+and is ending evidence only for the combined current source. The preserved
+raw-empty candidate's None is the one-predicate BEFORE for live-owned exhaustion;
+no additional causal replay is needed. Reverse Crossroads now reports
+P0Won41738/72000 (rawb9a4d5b4af20326c0f7a641b5c30f88f5d99c7cc2bccd9cc776b5088d11931ca)
+and Riverlands FranceEasy/GermanyEasy P0Won33776/72000
+(raw7da056a5c2c8abd705dffb56abf7bc4888fc6b87c6213610f5a10664d6f22cf3).
+All three exact receipts bind the same eleven observed source paths before/after.
+They precede, and are explicitly referenced by, the fresh discovered495-path
+final3 freeze for strict/Demo/grown/ONE complete-sim checks. No retrospective
+495-path claim or duplicate exact replay is made. Full13 and post-gate isolated
+acceptance remain pending.
+
+R188 frozen final3 completes all six remaining commands with exit0: formatting,
+regeneration, strict workspace/all-target Clippy, Demo1 Rust test with10 actual
+Won matches, grown3, and ONE complete sim crate1077/0/0 across68 result targets.
+The full-sim rawdfbd2c8532e85d5769bfa9b8c1c88ff8062f9b24ebbd2ceb86119c5aa9ebb604
+binds938.901080 command seconds, including all original seven recovery assertions,
+131 AI tests and the19 crate tests. Remaining-batch monotonic time is1108.191284s.
+Together with the three separately bound earlier exact receipts, the frozen
+scope contains nine commands,73 Rust target results,1084passed/0failed/0ignored.
+These are command counts, not a claim that the three earlier probes had a495-file
+manifest or that all tests ran under one continuous wrapper. Against final2's
+same495-path set, only ai.rs changed; the other494 bindings agree.
+
+Demo Russia/LibyaEasy ends62722/72000 and grown ten-player Crossroads ends
+P1Won45321/45322 schedule steps with9defeated. Static inventory versus RA7f5505cd
+is1124→1386 (+262),0removed/renamed/ignored; it remains distinct from executed
+counts. Fresh preservation verifies all70 prior-label leaves/140 current/archive
+copies at1576140 bytes per set without mismatch before any label reuse.
+Checkpoint16, coherent source/evidence commits and separate unfiltered hygiene
+checks still precede explicit full13 release. Both fresh756 distributions and
+all13exit0, then unchanged-source isolated all21/fixed3/example guards remain owed.

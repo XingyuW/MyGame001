@@ -1,0 +1,41 @@
+{
+  "utc": "2026-10-20T12:23:35.032782+00:00",
+  "directories": [
+    {
+      "path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra5b-render",
+      "files": 10,
+      "logical_bytes": 875468,
+      "allocated_bytes": 901120,
+      "retained": "Existing configured cache/scratch retained for reruns; unnecessary for release, no deletion."
+    },
+    {
+      "path": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/ra7_definitions",
+      "files": 80,
+      "logical_bytes": 13275008,
+      "allocated_bytes": 13434880,
+      "retained": "Existing configured cache/scratch retained for reruns; unnecessary for release, no deletion."
+    },
+    {
+      "path": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/ra8_definitions",
+      "files": 58,
+      "logical_bytes": 587557,
+      "allocated_bytes": 733184,
+      "retained": "Existing configured cache/scratch retained for reruns; unnecessary for release, no deletion."
+    },
+    {
+      "path": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/ra5",
+      "files": 2173,
+      "logical_bytes": 15600744,
+      "allocated_bytes": 20430848,
+      "retained": "Existing configured cache/scratch retained for reruns; unnecessary for release, no deletion. RA5 variant files now receive independent per-invocation names."
+    }
+  ],
+  "configured_caches": {
+    "CARGO_TARGET_DIR": "/Users/xingyuwang/Library/Caches/Codex/cargo-target",
+    "UV_CACHE_DIR": "/Users/xingyuwang/Library/Caches/Codex/uv-cache",
+    "PIP_CACHE_DIR": "/Users/xingyuwang/Library/Caches/Codex/pip-cache",
+    "TMPDIR": "/Users/xingyuwang/Library/Caches/Codex/tmp"
+  },
+  "new_substantial_external_directories_since_checkpoint15": [],
+  "note": "No clone/worktree/new external validation environment; Rust and fixture outputs stay in configured Cargo target/cache. No system temporary artifacts."
+}

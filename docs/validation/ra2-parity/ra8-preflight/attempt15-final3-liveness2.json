@@ -1,0 +1,37 @@
+{
+  "utc": "2026-10-20T12:17:20.427549+00:00",
+  "wrapper_pid": 79455,
+  "owned_descendants": [
+    {
+      "pid": 79455,
+      "ppid": 7720,
+      "pgid": 79455,
+      "elapsed": "13:02",
+      "cpu_time": "0:00.64",
+      "cpu_percent": "0.0",
+      "state": "Ss",
+      "command": "/opt/homebrew/Cellar/python@3.15/3.15.0/Frameworks/Python.framework/Versions/3.15/Resources/Python.app/Contents/MacOS/Python"
+    },
+    {
+      "pid": 79887,
+      "ppid": 79455,
+      "pgid": 79455,
+      "elapsed": "10:12",
+      "cpu_time": "0:00.49",
+      "cpu_percent": "0.0",
+      "state": "S",
+      "command": "/Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo"
+    },
+    {
+      "pid": 82002,
+      "ppid": 79887,
+      "pgid": 79455,
+      "elapsed": "07:28",
+      "cpu_time": "46:33.45",
+      "cpu_percent": "297.9",
+      "state": "R",
+      "command": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_ai-39cf04a6b4df1362"
+    }
+  ],
+  "note": "Bounded read-only activity snapshot; CPU is activity, not test success or performance acceptance."
+}

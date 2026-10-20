@@ -1,0 +1,553 @@
+{
+  "utc": "2026-10-20T12:23:35.046360+00:00",
+  "scope": "Attempt15 probe/preflight provenance, not a pass count. Original failures, compiler/setup/race observations, rejected candidates, passing bypass and all restorations remain preserved.",
+  "entries": [
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-crossroads-funding-current-trace1.json",
+      "metadata_sha256": "242cc3ba0da6a7b1bd6b6c780b70e704226b64ea5a576d3a3d67ccef446f540b",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-crossroads-funding-current-trace1.log",
+          "bytes": 697851,
+          "sha256": "adcccd3fadc6152c97f166b881c52ed139878275ec25b40161758ee15013cf90"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-crossroads-original-admission-trace1-restored-read.json",
+      "metadata_sha256": "deae89704cea249028bbff08aa8f8c5c87e210ec36e40c2d491a27b78e89a208",
+      "logs": [],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-crossroads-original-admission-trace1.json",
+      "metadata_sha256": "1a93ffc06d0b3190d9ef2b9f9e117a4bf290d1f68fc422e9972ee3424b925224",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-crossroads-original-admission-trace1.log",
+          "bytes": 583646,
+          "sha256": "985599b4ec98ff77e4dcb55a241d1d8070d29523c80291cba5a293ad9b10420b"
+        }
+      ],
+      "patches": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-crossroads-original-admission-trace1.patch",
+          "bytes": 690,
+          "sha256": "c15f4615151b1dd3e00c5fb1e7ab11f900a78dc084ed287ae1a5df37c9c6e2f2"
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-engagement-only-bypass1-restored-read.json",
+      "metadata_sha256": "f3a01127d4f24d2b4ba577711ef02aa4d49069c5cd45dabf77667ab45e263326",
+      "logs": [],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-engagement-only-bypass1.json",
+      "metadata_sha256": "d1bff6094cf1c011c2a4161835a22c7c3e305ddf6b279216d1d46b3f25782863",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-engagement-only-bypass1.log",
+          "bytes": 21248,
+          "sha256": "e0826a286f9666bfbed15bd1e6f2aad86cff7e1620a3eb5988c1dadf0f060a9a"
+        }
+      ],
+      "patches": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-engagement-only-bypass1.patch",
+          "bytes": 645,
+          "sha256": "3234272abfa47bc9228a90f708cc5ad6ba939ba5df531a7dc7a6f3c50d2cc48a"
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-final1-liveness1.json",
+      "metadata_sha256": "dba6a92889cc3babeccb8ac3a72168bdaac85be4a5426a9f782c53ec2ca60349",
+      "logs": [],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-final1-runtime-manifest.json",
+      "metadata_sha256": "089dbd4f6273b499973a57a2e44a2efa6cbf9e13f639308ffea1e15122834273",
+      "logs": [],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-final1-summary.json",
+      "metadata_sha256": "d8af2f87017892717fc71c8bffb3308519e19ea4145afb772877e046927d8a64",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final1-01-fmt.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final1-02-regenerate.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final1-03-clippy.log",
+          "bytes": 231,
+          "sha256": "82a0ce178c45e1bd6f70908fbcd4ebd07085596835d182489b1e0ab81fc5cca1"
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final1-04-full-sim.log",
+          "bytes": 70483,
+          "sha256": "1a3309b149b78b376c603b02c205b363e0f3789af565742d5c269d8d15b68c79"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-final1-test-example-manifest.json",
+      "metadata_sha256": "0f9b63e596e0d7399a370fc2ef32746044b107df0b1a7630c4dbc6c41ab07633",
+      "logs": [],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-STOPPED-preservation.json",
+      "metadata_sha256": "245f099f813584933c58f8f663345c4fe12b942b1817f6802f4dbd594dd7ce0b",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-01-fmt.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-02-regenerate.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-03-clippy.log",
+          "bytes": 150,
+          "sha256": "cba2cc0944756afe9d20e2b0bb260c107594beccc0e758f1a3cf2694885359dc"
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-04-full-sim.log",
+          "bytes": 98032,
+          "sha256": "727a0d7da808b2122c2129cff4b4f995f04b56a29d32bce261130d7477445851"
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-05-crossroads-russia-america.log",
+          "bytes": 42397,
+          "sha256": "a870e7690e70082e51409b7330102311fe584c88ac4f5d4c8d1f44615048d5c9"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-liveness1.json",
+      "metadata_sha256": "a2297c13562b7d7a2f41829b4c0ee218efa708fa417386702e2f95dd29def52c",
+      "logs": [],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-runtime-manifest.json",
+      "metadata_sha256": "b502ce3763d26342868e0ae9d69a1dd51c801ad6303919a2105cb22992537215",
+      "logs": [],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-summary.json",
+      "metadata_sha256": "f1600a9f820af521ef2ebf0b16cb59b3c80bf5fc9adbf36894595d2f9050817a",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-01-fmt.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-02-regenerate.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-03-clippy.log",
+          "bytes": 150,
+          "sha256": "cba2cc0944756afe9d20e2b0bb260c107594beccc0e758f1a3cf2694885359dc"
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-04-full-sim.log",
+          "bytes": 98032,
+          "sha256": "727a0d7da808b2122c2129cff4b4f995f04b56a29d32bce261130d7477445851"
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-05-crossroads-russia-america.log",
+          "bytes": 42397,
+          "sha256": "a870e7690e70082e51409b7330102311fe584c88ac4f5d4c8d1f44615048d5c9"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-test-example-manifest.json",
+      "metadata_sha256": "07db2658e5fef2c1b85c9e4d29cf5e7dfc84d317df6fb666e1870b738aae1157",
+      "logs": [],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-liveness1.json",
+      "metadata_sha256": "56dee4027075dd95b90f574863fe26f2667c1341a2592750faf8b12957847fa2",
+      "logs": [],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-liveness2.json",
+      "metadata_sha256": "3ede5fd641858fa98cdd03ea74f70998ced71747ac06a4d8499f282e97a967a4",
+      "logs": [],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-runtime-manifest.json",
+      "metadata_sha256": "c1a381ab4cedfe3690fe0262d874d65dc126f0dd223d2376506f341189856659",
+      "logs": [],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-summary.json",
+      "metadata_sha256": "606c99d696ec5ca67e97deac79b09235c2534170856a1a326a68350ca2d6dac0",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-01-fmt.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-02-regenerate.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-03-clippy.log",
+          "bytes": 231,
+          "sha256": "f59e788a97737a2431269fd539c01af335f9e0c3b3a04a5ee4650ce198e70c2d"
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-04-demo10.log",
+          "bytes": 10054,
+          "sha256": "bfae6996231b173bca8d4cd5d9baf44edabbc9f3bca2e0b45f6d64f7a5d8890d"
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-05-grown3.log",
+          "bytes": 869,
+          "sha256": "faf1acb483f209e6d11c19db4a108598557ccb13de746a8a560fc0c514db621c"
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-06-full-sim.log",
+          "bytes": 98032,
+          "sha256": "dfbd2c8532e85d5769bfa9b8c1c88ff8062f9b24ebbd2ceb86119c5aa9ebb604"
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-crossroads-after1.log",
+          "bytes": 22972,
+          "sha256": "dc6c37c42b3be295c988cf3554287ea369d877b88211d5aadf6d32c470ffb099"
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-crossroads-reverse-after1.log",
+          "bytes": 493,
+          "sha256": "b9a4d5b4af20326c0f7a641b5c30f88f5d99c7cc2bccd9cc776b5088d11931ca"
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-riverlands-after1.log",
+          "bytes": 492,
+          "sha256": "7da056a5c2c8abd705dffb56abf7bc4888fc6b87c6213610f5a10664d6f22cf3"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-test-example-manifest.json",
+      "metadata_sha256": "b4fe3911796016424aa6ca9c13e35cbb4651a8e886a64635e8a7dd30b1b001dd",
+      "logs": [],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-finance-observe1.json",
+      "metadata_sha256": "1817fb95c2aa4af52fdc1b1cffccd2fc3efbe2506173db19f7edf5ee99417808",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-finance-observe1.log",
+          "bytes": 152,
+          "sha256": "8d1195e4a1bae566139318e5fd2e565285412963ce300de0887b32e81b23b983"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-finance-observe2-restored-read.json",
+      "metadata_sha256": "a02427cc29d985efb652ccc3f800ef037721b1b1e219e83fc563ffb12f6bdbf4",
+      "logs": [],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-finance-observe2.json",
+      "metadata_sha256": "dd1623c8e9cdee0811275088a66238ebe66e212fcd08541384ae7c1e90f67b00",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-finance-observe2.log",
+          "bytes": 2108,
+          "sha256": "b50b864f6f18ab892b800892a7b4fe87d09ae837bec92f13baa68dda4c1532d2"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-fixture-race-after1.json",
+      "metadata_sha256": "a2c89e5a9c0f175e7f9c049e0021ce8eaac066c707837b87651fcf9ba04d249f",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-fixture-race-after1.log",
+          "bytes": 1751,
+          "sha256": "434d8da9544f6d2f25dfdc96173a95f53ae787d5abc3d4f0fb55600381d6bdb9"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-fixture-race-before1.json",
+      "metadata_sha256": "6b84a786fde941c607f966c2c510cb33a248b46cbf3bb66ba985dfcc869b3cbd",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-fixture-race-before1.log",
+          "bytes": 999,
+          "sha256": "36d44e5c66ab44fa2d091bad5c46e40d110b8a5d6e0acf8a1a824dfb3ee45c97"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-history-crossroads-after1.json",
+      "metadata_sha256": "c22dde9e8f5dfafbeb3b8d411f0c82754401eeed58961d3d27ec5c9b0aa9f09f",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-history-crossroads-after1.log",
+          "bytes": 42586,
+          "sha256": "662dc3f8f9e5e3de1b25b31f357c4b79d38e792e55f696acb3d1f8afacf69c36"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-history-recovery-after1.json",
+      "metadata_sha256": "84582160ccb740f005708aa34830dc54f3fdc8d98ff00f5092b2e16fba787f4b",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-history-recovery-after1.log",
+          "bytes": 18022,
+          "sha256": "8291b814e61798c30d74d6cd4d02917d8d10f7725c54d00147a2f65f405d2ea6"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-history-stale-membership-observe1-restored-read.json",
+      "metadata_sha256": "ba0fd72433d1e18cb850f0579216287c00de884ca236227cf23c57ef9f77fa89",
+      "logs": [],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-history-stale-membership-observe1.json",
+      "metadata_sha256": "8e31800ee1b8e8e57610a76220482a92e52862452a203b74d92182517e4e7356",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-history-stale-membership-observe1.log",
+          "bytes": 42900,
+          "sha256": "4eeef7eaad4b8e936fb9fea4f50cda0956780bd24cda8818240007a06d875f60"
+        }
+      ],
+      "patches": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-history-stale-membership-observe1.patch",
+          "bytes": 490,
+          "sha256": "e66bb971c5bc132ea35e215fdeb66ea6282e8bb532697f30028c4e51df34c736"
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-history-understrength-after1.json",
+      "metadata_sha256": "c37c723ba79645a8c530f829cccc3c9aa367bf7ebc8d91721fa2e55b67ff83c6",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-history-understrength-after1.log",
+          "bytes": 1309,
+          "sha256": "0914573fd897f545ac5aef2abad38547e36c9fdbd6e63e33f653e3cdd4499ecd"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-crossroads-after1.json",
+      "metadata_sha256": "d85c2b435e956641bf4a226beae55881cb5dc867d5d6413ef937080ad4cfc57e",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-crossroads-after1.log",
+          "bytes": 22972,
+          "sha256": "dc6c37c42b3be295c988cf3554287ea369d877b88211d5aadf6d32c470ffb099"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-crossroads-reverse-after1.json",
+      "metadata_sha256": "d2c0a1674b53465935f828dd908bad387dcaf17cebc323f73b62a392b0daf679",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-crossroads-reverse-after1.log",
+          "bytes": 493,
+          "sha256": "b9a4d5b4af20326c0f7a641b5c30f88f5d99c7cc2bccd9cc776b5088d11931ca"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-recovery-after1.json",
+      "metadata_sha256": "4da0f0d34541033dd70b47f678f3c8c47230d294353ff1380784b5467284a61e",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-recovery-after1.log",
+          "bytes": 18022,
+          "sha256": "ef7f29198df773630617812f634f8216a1a20dba078ac2b0ebc3199e22ed6b79"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-riverlands-after1.json",
+      "metadata_sha256": "b4f8c6a93349e7237d30fb7fa163e1975660122d5de58e699f3388d96287ec88",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-riverlands-after1.log",
+          "bytes": 492,
+          "sha256": "7da056a5c2c8abd705dffb56abf7bc4888fc6b87c6213610f5a10664d6f22cf3"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-understrength-after1.json",
+      "metadata_sha256": "da2841b7e3c4348621f7e45d0722cb5103ce5872c7e475e683cdf5d6c92b18ab",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-understrength-after1.log",
+          "bytes": 1309,
+          "sha256": "458f98c818106750ee72addfd509d3cbc37270a0e1686f5718e9261f382502a1"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-minimal-final-source.json",
+      "metadata_sha256": "a2498e4fd10b3a414cd01d7efc1aadf6a5099e70f0f9a948dc6b73b8977e5796",
+      "logs": [],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-queued-work-only-bypass1-restored-read.json",
+      "metadata_sha256": "ca765c64435b88c0e8d82d682dafc881418b69e91d8b47a7b90c5a665bc7a89a",
+      "logs": [],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-queued-work-only-bypass1.json",
+      "metadata_sha256": "56741060369afcf9cf358e8d4049f2421450cfc45a20002134fa206027fb7b9b",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-queued-work-only-bypass1.log",
+          "bytes": 18022,
+          "sha256": "7fd01de2330e406abc75806b82b09ba0ab68265419bc12ef7ba94120a77da90e"
+        }
+      ],
+      "patches": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-queued-work-only-bypass1.patch",
+          "bytes": 406,
+          "sha256": "d451e0d3cc0e9536368f1df6a39cb24ce87a8d721c8ca37fb874f05907369c99"
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-recovery-after1.json",
+      "metadata_sha256": "d8116145bd078d307461f80edb45dfa596765dc0abdc8af49ae33aed1fdd30a2",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-recovery-after1.log",
+          "bytes": 19921,
+          "sha256": "8b72ddd53daf0bdfae1eeaeb9354876041340ad001d1d4ce79f7b1861553caff"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-recovery-after2.json",
+      "metadata_sha256": "40610d0c2db4295720b2cd2c8271e75076b64ff27e389216d6630ab3b35603c0",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-recovery-after2.log",
+          "bytes": 18022,
+          "sha256": "7faea1bc73fc4d823c50eec4d10f34dd29a4372a4869d880a136da8b6c079b9c"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-recovery-after3.json",
+      "metadata_sha256": "ef8f8f503cc23aade58ea8ba1523fb14e59c9ba48afcf7945a4cbc28c92d531d",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-recovery-after3.log",
+          "bytes": 18022,
+          "sha256": "4efed3026edf475384682ab2ef222eae01f81fef5a72038f7bbc5b86c28b8dd6"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-understrength-after1.json",
+      "metadata_sha256": "a4c58e12266d66a9e85c2c782a62e17e7c1b49ce2e74fca07cfa1fcc8f3e4982",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-understrength-after1.log",
+          "bytes": 2237,
+          "sha256": "d463fd321ed9f6b448b45214e18714fbf2740417f057394d9c5cf4f2f29350cd"
+        }
+      ],
+      "patches": []
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt15-understrength-after2.json",
+      "metadata_sha256": "9bf9fbe42e9682ab1214af4b95c7df99956c7f2a5cd28bf64d95340f75beae07",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-understrength-after2.log",
+          "bytes": 1309,
+          "sha256": "f37292336878f6166459dd38b073d4a4a31625f44fb7480763c17b9194d68d09"
+        }
+      ],
+      "patches": []
+    }
+  ],
+  "parse_errors_preserved": [],
+  "metadata_records": 42,
+  "unique_raw_files": 37,
+  "unique_patches": 6,
+  "unique_raw_bytes": 1853872,
+  "unique_patch_bytes": 6711,
+  "standalone_patches": [
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-queued-work-UNRETAINED-candidate.patch",
+      "bytes": 2213,
+      "sha256": "35118cb98f6d602c4d1ff4b1f222c3379dd80e93b5a22011db990c495bb14f57",
+      "classification": "Preserved rejected/unretained candidate, not retained runtime or pass evidence."
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-wave-engagement-candidate.patch",
+      "bytes": 2267,
+      "sha256": "6a32f2f248b757f2c0acb5c3a5efb98b12884f387bdc6c8ee906fe5e428028c6",
+      "classification": "Preserved rejected/unretained candidate, not retained runtime or pass evidence."
+    }
+  ]
+}

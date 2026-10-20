@@ -1,0 +1,14 @@
+--- crates/sim/src/ai.rs
++++ crates/sim/src/ai.rs
+@@ -2563,11 +2563,6 @@
+         .iter()
+         .copied()
+         .map(ProductionItem::Unit)
+-        .chain(
+-            view.state
+-                .queues()
+-                .flat_map(|(_, queue)| queue.iter().map(|q| q.item)),
+-        )
+         .collect();
+     for item in work {
+         if let Some(terms) = view.definitions.production(item) {

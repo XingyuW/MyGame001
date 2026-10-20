@@ -1,0 +1,15 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 50.25s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 4 tests
+understrength field reinforcement soldSome(400) exact_refund400 source_cost100 paidtrue recruits{SimId(9), SimId(10)} fighter_shottrue recruit_shottrue
+test ra8_an_understrength_living_field_force_can_finance_a_paid_reinforcement ... ok
+productive consolidation soldSome(1000) exact_refund1000 source_cost100 paidtrue recruits{SimId(10)} fighter_shottrue recruit_shottrue
+test ra8_an_understrength_force_can_consolidate_a_producer_for_real_paid_infantry ... ok
+ground support wavedtrue activatedtrue tickSimTick(8412) cooldown8400 chargeSome(1) known{SimId(1): KnownBuilding { owner: PlayerId(1), footprint: Footprint { origin: CellPos { x: 38, y: 38 }, width: 3, height: 3 }, kind: BuildingKind(29) }} wave{SimId(5), SimId(6)} commandsCommandQueue { pending: [] }
+test ra8_understrength_financing_keeps_a_ground_support_sources_real_power_path ... ok
+test ra8_understrength_financing_preserves_legacy_and_real_service_assets ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 127 filtered out; finished in 0.73s
+

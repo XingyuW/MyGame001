@@ -1,0 +1,27 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 6.47s
+     Running tests/ra5_crates.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra5_crates-9b88c521967589f6)
+
+running 19 tests
+test a_crate_lies_only_in_a_free_cell_of_land_or_water ... ok
+test a_crate_under_a_new_building_is_gone_and_replaced_at_once ... ok
+test a_heal_crate_makes_everything_of_its_collectors_owner_whole ... ok
+test a_reveal_crate_explores_the_whole_map_for_its_collectors_owner ... ok
+test a_veteran_crate_promotes_the_owners_units_within_three_cells ... ok
+test a_player_without_base_and_base_unit_gets_the_base_unit_of_its_side ... ok
+test a_crate_of_a_unit_is_money_on_water_without_room_and_without_types ... ok
+test an_aircraft_does_not_take_a_crate_and_a_unit_takes_it_when_it_arrives ... ok
+test concurrent_fixture_variants_keep_each_readers_requested_rules ... ok
+test armour_firepower_and_speed_crates_set_the_multiplier_of_their_kind ... ok
+test a_collector_that_cannot_gain_gets_money_instead ... ok
+test a_crate_of_money_pays_its_value_and_a_draw ... ok
+test the_free_base_unit_needs_more_than_1500_credits_and_nothing_to_build_with ... ok
+test a_crate_of_a_unit_gives_one_of_its_types_beside_the_crate ... ok
+test the_state_hash_covers_the_crates ... ok
+test a_match_keeps_its_minimum_and_never_exceeds_its_maximum ... ok
+test no_crate_appears_with_the_option_off_or_without_a_match ... ok
+test a_match_starts_with_a_crate_that_lies_its_time_and_is_replaced_when_taken ... ok
+test a_match_of_computer_players_with_crates_and_growing_ore_is_deterministic ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.77s
+
