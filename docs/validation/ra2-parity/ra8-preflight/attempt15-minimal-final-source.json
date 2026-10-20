@@ -1,0 +1,5 @@
+{
+  "utc": "2026-10-20T10:58:47.873455+00:00",
+  "purpose": "Remove unproved queued-work protection and its refactor/comment; retain only demonstrated stationary/current-observed-building added investment admission. No test changes.",
+  "ai_sha256": "8fd45ad8081f0ff8a304fde3fef9fccfa5de6fc774b72b2372a1168f506bb6e9"
+}

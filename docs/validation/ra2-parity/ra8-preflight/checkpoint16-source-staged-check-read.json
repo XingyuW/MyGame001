@@ -1,0 +1,9 @@
+{
+  "utc": "2026-10-20T12:25:40.827780+00:00",
+  "checked_receipt": "docs/validation/ra2-parity/ra8-preflight/checkpoint16-source-staged-check.json",
+  "receipt_sha256": "8288a7e0cb650adb4bb13945a03e92d3bea6ee784c91b99f69dafce93df685de",
+  "completed_exit": 0,
+  "stdout_empty": true,
+  "staged_paths_unchanged": true,
+  "staged_blob_hashes_match": true
+}

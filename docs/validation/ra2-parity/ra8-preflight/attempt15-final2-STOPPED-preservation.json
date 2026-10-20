@@ -1,0 +1,52 @@
+{
+  "utc": "2026-10-20T11:40:26.711125+00:00",
+  "purpose": "Failed final2 frozen prefix retained in unique original paths; no label reuse. Four remaining match-control commands unrun. Fullsim1077/0/0 remains scoped positive; full13 not released.",
+  "files": [
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-01-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-02-regenerate.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-03-clippy.log",
+      "bytes": 150,
+      "sha256": "cba2cc0944756afe9d20e2b0bb260c107594beccc0e758f1a3cf2694885359dc"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-04-full-sim.log",
+      "bytes": 98032,
+      "sha256": "727a0d7da808b2122c2129cff4b4f995f04b56a29d32bce261130d7477445851"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-05-crossroads-russia-america.log",
+      "bytes": 42397,
+      "sha256": "a870e7690e70082e51409b7330102311fe584c88ac4f5d4c8d1f44615048d5c9"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-liveness1.json",
+      "bytes": 985,
+      "sha256": "a2297c13562b7d7a2f41829b4c0ee218efa708fa417386702e2f95dd29def52c"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-runtime-manifest.json",
+      "bytes": 38145,
+      "sha256": "b502ce3763d26342868e0ae9d69a1dd51c801ad6303919a2105cb22992537215"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-summary.json",
+      "bytes": 7935,
+      "sha256": "f1600a9f820af521ef2ebf0b16cb59b3c80bf5fc9adbf36894595d2f9050817a"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-final2-test-example-manifest.json",
+      "bytes": 19498,
+      "sha256": "07db2658e5fef2c1b85c9e4d29cf5e7dfc84d317df6fb666e1870b738aae1157"
+    }
+  ],
+  "bytes": 207142
+}

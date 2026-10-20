@@ -1,0 +1,437 @@
+{
+  "utc": "2026-10-20T10:40:49.349052+00:00",
+  "attempt": 15,
+  "source_label": "docs/validation/ra2-parity/ra8",
+  "archive": "docs/validation/ra2-parity/ra8-attempt15",
+  "head": "57595d274261a9d4859ab2d1d15b86b9d9bb071f",
+  "runtime": "0d8f16daba2cc31edba5757d3b99fc2e3c094145",
+  "files": [
+    {
+      "current": "docs/validation/ra2-parity/ra8/01-fmt.log",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/01-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/02-diff-check.log",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/02-diff-check.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/03-clippy.log",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/03-clippy.log",
+      "bytes": 72,
+      "sha256": "45f75b19e5718ce74d75d27dc949e2b0cc21908a1e53dca4d31c24e03ebe8e09"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/04-test.log",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/04-test.log",
+      "bytes": 1355954,
+      "sha256": "d49539d724ccfa41b5e3b5849f419d019c15335bb3e33b2d51a2f0d3d28a3789"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/05-build-release.log",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/05-build-release.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint10-capacity-recovery1.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint10-capacity-recovery1.json",
+      "bytes": 799,
+      "sha256": "03c25866a14e9b0f5688ea2f644d4608f14156f2c55316f6086dfef6b6bdf6a9"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint10-liveness1.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint10-liveness1.json",
+      "bytes": 1140,
+      "sha256": "87f5aa2a8c40c6e12ef5a996ba0071b822f3c6224749c8e31cea8243f576bb58"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint10-liveness2.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint10-liveness2.json",
+      "bytes": 971,
+      "sha256": "2aa8b7b26e8036d9efd1691b19c6c7726063850c70cd7407d0e02c7a8410429a"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint10-liveness3.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint10-liveness3.json",
+      "bytes": 971,
+      "sha256": "18b549291e98c359471953293119b4082a86856d52f235140ed08260beffa0dd"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint10-liveness4.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint10-liveness4.json",
+      "bytes": 981,
+      "sha256": "28066b2f910093779364f8fc1cc6f836535ab1f38fa3b2091da8c54614dd8ebe"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint10-liveness5.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint10-liveness5.json",
+      "bytes": 981,
+      "sha256": "e7fd4e81d8652210f763e61c0b1a6aea80e87fe4a7194359abb69614803c5928"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint10-liveness6.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint10-liveness6.json",
+      "bytes": 970,
+      "sha256": "b870c346019abe5e08fb508cb83f7e00e8c7e96b4082a7a22429100d878bbfb8"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint10-liveness7.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint10-liveness7.json",
+      "bytes": 990,
+      "sha256": "fdbd615f30f2caed2cb06b8a0539a0c74ac3e681836c0a2c52a8531a1ff58cec"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint10-liveness8.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint10-liveness8.json",
+      "bytes": 990,
+      "sha256": "9a180de7ff1af765015755a9b064b8df0600e498879d539eb490cdbc49343a88"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint10-liveness9.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint10-liveness9.json",
+      "bytes": 991,
+      "sha256": "a5ec5b9212ad6b8e24487223c1cbc5d31853b5958fe2a1f76c7bd570017a3bd4"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint10-r29-baseline.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint10-r29-baseline.json",
+      "bytes": 1352,
+      "sha256": "939cf975d6589302398d1fb07c1f0f4de9c8993ec5d84d91dc9f9b77485d9400"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint11-liveness1.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint11-liveness1.json",
+      "bytes": 801,
+      "sha256": "55476055e74a07e018d256549371e102d3a40e3752bd87bd944e76f58aa70522"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint11-liveness2.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint11-liveness2.json",
+      "bytes": 801,
+      "sha256": "e3f35a720cc3e9b7b4a4f901ed1e8d2c59183d875c7e7636d1da6fd38535c675"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint11-liveness3.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint11-liveness3.json",
+      "bytes": 801,
+      "sha256": "4a0c513a6128074c0c27b87f8a0f1f3d556eae4314a91117077e4f70e9ad20c3"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint11-liveness4.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint11-liveness4.json",
+      "bytes": 801,
+      "sha256": "e156955712014e14c559c8733d519a5f43f9433f3e6e219e60ecf1be0551f32d"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint11-liveness5.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint11-liveness5.json",
+      "bytes": 877,
+      "sha256": "265fec8539e0fce8429632e9a95a1558c4b309a40211a1b695a94ca8bfd9be00"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint11-liveness6.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint11-liveness6.json",
+      "bytes": 877,
+      "sha256": "60306195d0931dc8abd0bd86596f1bea5624c81d41e034f92ac18c2dab1aa87d"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint11-liveness7.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint11-liveness7.json",
+      "bytes": 877,
+      "sha256": "12be39d289945bb7d27b8348d94ae8a5f486e6f3a56dd14b39ce941cb1916a2b"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint12-launch.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint12-launch.json",
+      "bytes": 2869,
+      "sha256": "06e42e793d96b097f310591c2eb484c11071eaaecd58d31f6e7a1fb376b3affc"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint13-STOPPED.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint13-STOPPED.json",
+      "bytes": 1952,
+      "sha256": "abe8d811868ba6175f1698f3130ac5dac8b70c905dacc68f3b4a6b72f9ddf2b0"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint14-STOPPED.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint14-STOPPED.json",
+      "bytes": 2521,
+      "sha256": "9a95066316e41a9f569ac4ea755cfcef58cc4cfe1ee37206bf731ce64168e6a7"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint14-liveness1.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint14-liveness1.json",
+      "bytes": 736,
+      "sha256": "bc750ebbfa9e3001870ea8b48ce61b29f9c1960da41e4535a79c9550c880dfbc"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-launch.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-launch.json",
+      "bytes": 3339,
+      "sha256": "b88c6df615ec33b38280f6230364d35025bc6f0fcdb50b6fff3de66724bc402e"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness1.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness1.json",
+      "bytes": 1284,
+      "sha256": "019d9c4bee9d9176d54556fe8ec16cac1021c65eceac0331ca8ae3c1dab1618f"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness10.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness10.json",
+      "bytes": 974,
+      "sha256": "621e86db9882ab1905e727b0181f6bf6a4b898f8d0b8058fab5e7e0b876fa51b"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness11.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness11.json",
+      "bytes": 974,
+      "sha256": "d308c474b8088da21dae39849e972e30f0d796b0988fc9feb44745ecf00cf1dc"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness12.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness12.json",
+      "bytes": 974,
+      "sha256": "bb6221ecb4e7f5bda8d171e649b3a7044eebc380258ffcd3655c4b204bc9d1b6"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness13.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness13.json",
+      "bytes": 974,
+      "sha256": "4270ece06aefa1ed4ef3193838b6e3700de36ba884a241f14b901026295dbc88"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness14.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness14.json",
+      "bytes": 974,
+      "sha256": "cb1874a5c8c6487f2de7cae7266861b8e097c5797e096e5d37eb8854d26ee345"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness15.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness15.json",
+      "bytes": 974,
+      "sha256": "6684a02650d9e2662c93f06d7150ffbedf3588302727165146be3a1c21d4739c"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness16.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness16.json",
+      "bytes": 974,
+      "sha256": "73ba67119017b843633fd1d8305e74ba748c5631c5c0e2a1776da74e1a6ec56b"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness17.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness17.json",
+      "bytes": 974,
+      "sha256": "4c131e1993b3cf64ec8d0af3cad08740ef131d003d4bb11f85a7c70712ea0ff6"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness18.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness18.json",
+      "bytes": 974,
+      "sha256": "a153f18185b31e1034a336096e7484dde57ec4501d0121801bb2eb2883718ff8"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness19.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness19.json",
+      "bytes": 974,
+      "sha256": "3e709374630cff27831a4418dacf8a3979cdd8f2284eba005b19f5cde4726bca"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness2.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness2.json",
+      "bytes": 1374,
+      "sha256": "0b2d47266d9370d760b9ddaf829260577c9985d1d074fd45488b4b8c69d77771"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness20.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness20.json",
+      "bytes": 974,
+      "sha256": "066e451fefd240142effe575869b59e8efe90f1c1015b172896a7d9200ae1d36"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness21.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness21.json",
+      "bytes": 974,
+      "sha256": "972f840701741964b785902e6df18205045aa23cca49533a18786445651e10cc"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness22.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness22.json",
+      "bytes": 974,
+      "sha256": "22888867add9ddfa666db9f32b2155e2a1631e6024260562a8d88cd5ca43fa1b"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness23.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness23.json",
+      "bytes": 974,
+      "sha256": "ef3a864490e238bbf80fab6bb035db0e4c18dbd3a1ccc7f94f0949e372b9428d"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness24.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness24.json",
+      "bytes": 974,
+      "sha256": "cda53bdcf52049761a9db223f51ef0ede000c351d970bf23b832a3943f955728"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness25.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness25.json",
+      "bytes": 975,
+      "sha256": "b52b373c8e60231d5b9561b5eb9538d1cab79e33db316ee1a43ccc05d24117e6"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness26.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness26.json",
+      "bytes": 1065,
+      "sha256": "94148eebdeb523c4e820fb7bac63ab4ecf04ce8b70d52e5da3b6f47d902d1ce9"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness27.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness27.json",
+      "bytes": 1069,
+      "sha256": "4e66353a5aea10f15507d6a596be9f88e7914eeaff706a72759835f9fc40b337"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness28.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness28.json",
+      "bytes": 1156,
+      "sha256": "03df15abeb1dbb9a0f9afdd8b30de6ffe6ae9c1d5cc2624763fcd7755a6d732e"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness29.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness29.json",
+      "bytes": 1156,
+      "sha256": "9b76bd5a64d1f55e4152bebb3c17a66ed22709050b0f8077c43fb333eea8d756"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness3.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness3.json",
+      "bytes": 1461,
+      "sha256": "663c5b9c17f27fff7ae10ad56a5781c47fba283170a0bce2a08e510cc2f75564"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness4.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness4.json",
+      "bytes": 1509,
+      "sha256": "f04710278fcbd7d98ed4eef44f395adc7c24a435b2dcae7d70f5b5b454929e93"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness5.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness5.json",
+      "bytes": 1504,
+      "sha256": "6ec12f99e3077ad1fc29683fc72d7a3b6adabd6b5ee92ba8ae24841508952df0"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness6.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness6.json",
+      "bytes": 1551,
+      "sha256": "80090e0f7e7a85c0072d2fd1da48f0a8265259f5152f6bd7b8a1b85009ed39c8"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness7.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness7.json",
+      "bytes": 1283,
+      "sha256": "0b4a9e40c49f5e3bcb90831a7bb637c63414ceb367a15e685e90df20fe30d446"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness8.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness8.json",
+      "bytes": 1287,
+      "sha256": "bcea2c89192a3d372eab4fea4afdf14f8d86334226a049049035e9bb69e348f3"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-liveness9.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-liveness9.json",
+      "bytes": 974,
+      "sha256": "1a2a6941266190232ccf9ae725fc20ad44788a9841c4f9edc432be5ab862fc5b"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-m6-production-lengths.tsv",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-m6-production-lengths.tsv",
+      "bytes": 49793,
+      "sha256": "1ba1644b15e8ab25852c51475ff6d1d9aa5425b38e44dd41d217d502dfd32cf1"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/checkpoint15-m6-production-metrics.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/checkpoint15-m6-production-metrics.json",
+      "bytes": 1490,
+      "sha256": "f58896854b98a331fceb8e9358aad7c0807cdf20d97dcd3c1571bed752de8d69"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/gate-process-output.log",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/gate-process-output.log",
+      "bytes": 236,
+      "sha256": "ee7f8c2340e6733723395403ca0960ab640041187dba51cd33fe17ac47942ebd"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/gate-process.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/gate-process.json",
+      "bytes": 5523,
+      "sha256": "51cc137c942aab7c0955dbba9cd58321608274b6f53631b35465e01d45d99cb7"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/production-lengths-before.tsv",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/production-lengths-before.tsv",
+      "bytes": 49763,
+      "sha256": "6c3ec135cec4acb23ec3489e7324cfc760e12c6e0da6727fef8675901548d435"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/production-lengths.tsv",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/production-lengths.tsv",
+      "bytes": 49763,
+      "sha256": "6c3ec135cec4acb23ec3489e7324cfc760e12c6e0da6727fef8675901548d435"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/production-liveness1.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/production-liveness1.json",
+      "bytes": 343,
+      "sha256": "f487d30b24682c3de2c54cf5db5dc60cd7b99b2d8259a2b04a28c0be623acc69"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/production-liveness2.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/production-liveness2.json",
+      "bytes": 664,
+      "sha256": "4057d3d73491aab06282400a98b9d3d4f3a034611afeedfd66d9ed9a2b344de0"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/production-liveness3.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/production-liveness3.json",
+      "bytes": 316,
+      "sha256": "abd692ed6fe97abfb76e6b15c77d75b2595c777ee067849146c7347e6f49e8d6"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/production-liveness4.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/production-liveness4.json",
+      "bytes": 445,
+      "sha256": "7f732f0ac0fe64ccf7958110e1abb1c20930774abcfb82dbdcd589debe24f049"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/production-liveness5.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/production-liveness5.json",
+      "bytes": 448,
+      "sha256": "b834f93b726bda6db30b206b653f4ba7b93f95f67bad4acac274afae297ec4fb"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/production-liveness6.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/production-liveness6.json",
+      "bytes": 448,
+      "sha256": "8e080ae715a1e70f2c662c5db1a500b723716fec9de4c22b6c77adc2dd87392f"
+    },
+    {
+      "current": "docs/validation/ra2-parity/ra8/summary.txt",
+      "archive": "docs/validation/ra2-parity/ra8-attempt15/summary.txt",
+      "bytes": 236,
+      "sha256": "ee7f8c2340e6733723395403ca0960ab640041187dba51cd33fe17ac47942ebd"
+    }
+  ],
+  "file_count": 70,
+  "bytes_per_set": 1576140,
+  "copies_verified": 140,
+  "zero_mismatches": true,
+  "source_unique_files": 495,
+  "source_mismatches": [],
+  "note": "Every label file copied byte-identically. STOPPED.json and this manifest are additional archive records, not source-label copies."
+}

@@ -4713,3 +4713,45 @@ Checkpoint15 source chronology: final4 ran on the frozen working source before i
 Checkpoint15 evidence hygiene: first unfiltered stagedcheck exits2, NOTpassed. All42 exact diagnostics across41rawpaths are35native-log blankEOFs and7raw-patch-context trailing spaces. Every file/line/EOL/stagedblob SHA matches;zero source/data/test/prose errors. First stdout7737c0dc… is captured directly as JSON-escaped text. No raw bytes normalized; separate identical final check and a later deliberate evidence commit remain required.
 
 Checkpoint15 separate final unfiltered evidence check exits2 at05:53:22Z, identically7737c0dc…/42raw diagnostics; separate completed-result read05:53:37Z confirms NOTpassed/classified. Metadata is restaged before the last standalone identical check and later deliberate commit, with raw bytes unchanged.
+
+### RA8 checkpoint16 preparation (2026-10-20)
+
+R186–R188 correct optional reinforcement admission while preserving all original
+recovery assertions. Initial first-paid recruits alone no longer trigger another
+asset sale; stationary current observed-building engagement or an earlier admitted
+wave with no living owned member can finance the declared understrength force.
+Live membership is checked before ordinary later wave pruning, so a just-destroyed
+ID does not suppress rebuilding. No new state/RNG/source timing/stat/limit changes.
+R187 separately fixes a deterministic parallel fixture-path race with process-local
+unique names; all18 original RA5 crate tests and their assertions plus the new regression pass.
+
+[Checkpoint16](validation/ra2-parity/ra8-preflight/checkpoint16.json) binds final3's
+fresh495 source freeze and three earlier eleven-path exact receipts without rewriting
+their timing. Strict3/Demo10/grown3/ONE fullsim and the exact three all pass: nine
+commands,1084 Rust passes/0failed/0ignored across73 result targets. Fullsim1077/0/0
+includes all seven original attempt15 failures; both Crossroads directions finish
+62005/41738 and Riverlands33776 within72000. Demo Russia/LibyaEasy62722 and grown
+ten-player Crossroads45321/45322steps/9defeated remain current scoped outcomes.
+Static1124→1386 (+262), zero removed/renamed/ignored, is separate from execution.
+
+Attempt15 remains a failed full gate: fresh M6 all756Won and retained41 passed,
+then seven original recovery invariants failed. Its70 leaves/1576140B per set/140
+current/archive copies remain byte-identical; neither successful prefix is transferred
+to this runtime. All current failed candidates, passing-bypass/no-causality result,
+race/native observations and separate finally/later restoration receipts are retained.
+Source paths are only ai.rs, ra5_common/mod.rs and ra5_crates.rs. Coherent source
+and evidence commits, standalone unfiltered checks/classification and root release
+precede the next unchanged full13. Both fresh756 distributions are required; isolated
+all21/fixed3/example guards follow successful full13 on the same source before closure.
+RA9 and independent review remain held. No independent approval is claimed.
+
+No new external substantial directory or validation clone/worktree is created.
+Existing configured Cargo/parser/RA5 fixture caches and render scratch are remeasured
+in checkpoint16-storage.json and retained for reruns; they are unnecessary for release.
+Main and branch remain unchanged.
+
+Checkpoint16 source chronology: final3 ran on frozen working source, later committed as b411bed120ca05bfe909afc071d044e7928ecb78 at2026-10-20T08:27:08-04:00. Standalone unfiltered sourcecheck0 at12:25:31Z and separate completed-result read12:25:40Z precede that three-path commit; no postcommit native run is claimed. Evidence hygiene/commit and explicit full13 release remain pending.
+
+Checkpoint16 evidence first unfiltered cachedcheck exits2, NOTpassed, stdout46f573c71a033797f588ce7b7880286ee2de6d9b6d31eb0777daf1c0c53e7d7e. All18 diagnostics/18 raw paths are17 native-log blankEOFs plus1 raw-patch context space, with exact file/stagedblob/line/EOL hashes and zero source/data/test/prose errors. Native bytes are preserved. Metadata restage, separate identical final check and later deliberate evidence commit precede explicit full13 release.
+
+Checkpoint16 separate final evidence check exits2 at12:29:49Z, identical46f573c7…/18raw diagnostics, followed by completed-result/line-and-blob read12:30:03Z. Metadata restage and a last standalone identical unfiltered check precede the later deliberate evidence commit. Native bytes remain unchanged; full13 still requires coordinator clean-tip release.

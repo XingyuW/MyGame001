@@ -1,0 +1,515 @@
+{
+  "label": "attempt15-final3",
+  "head": "57595d274261a9d4859ab2d1d15b86b9d9bb071f",
+  "start_utc": "2026-10-20T12:04:19.034807+00:00",
+  "pid": 79455,
+  "pgid": 79455,
+  "runtime_paths": 344,
+  "additional_paths": 169,
+  "overlap": 18,
+  "unique": 495,
+  "commands": [
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start_utc": "2026-10-20T12:04:19.035437+00:00",
+      "end_utc": "2026-10-20T12:04:21.192926+00:00",
+      "elapsed_seconds": 2.1575057079899125,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-01-fmt.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "regenerate",
+      "command": [
+        "python3",
+        "scripts/generate_ra2_data.py",
+        "--check"
+      ],
+      "start_utc": "2026-10-20T12:04:21.274595+00:00",
+      "end_utc": "2026-10-20T12:04:21.428406+00:00",
+      "elapsed_seconds": 0.15382166701601818,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-02-regenerate.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "start_utc": "2026-10-20T12:04:21.503862+00:00",
+      "end_utc": "2026-10-20T12:04:35.593976+00:00",
+      "elapsed_seconds": 14.090053708001506,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-03-clippy.log",
+      "log_sha256": "f59e788a97737a2431269fd539c01af335f9e0c3b3a04a5ee4650ce198e70c2d",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "demo10",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_ai_matches",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T12:04:35.676825+00:00",
+      "end_utc": "2026-10-20T12:06:16.482852+00:00",
+      "elapsed_seconds": 100.80549345898908,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-04-demo10.log",
+      "log_sha256": "bfae6996231b173bca8d4cd5d9baf44edabbc9f3bca2e0b45f6d64f7a5d8890d",
+      "rust_results": [
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "grown3",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m13_grown_maps",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T12:06:16.563887+00:00",
+      "end_utc": "2026-10-20T12:07:08.144332+00:00",
+      "elapsed_seconds": 51.58017795794876,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-05-grown3.log",
+      "log_sha256": "faf1acb483f209e6d11c19db4a108598557ccb13de746a8a560fc0c514db621c",
+      "rust_results": [
+        [
+          3,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "full-sim",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim"
+      ],
+      "start_utc": "2026-10-20T12:07:08.226123+00:00",
+      "end_utc": "2026-10-20T12:22:47.133428+00:00",
+      "elapsed_seconds": 938.9010798329837,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-06-full-sim.log",
+      "log_sha256": "dfbd2c8532e85d5769bfa9b8c1c88ff8062f9b24ebbd2ceb86119c5aa9ebb604",
+      "rust_results": [
+        [
+          123,
+          0,
+          0
+        ],
+        [
+          12,
+          0,
+          0
+        ],
+        [
+          4,
+          0,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          33,
+          0,
+          0
+        ],
+        [
+          24,
+          0,
+          0
+        ],
+        [
+          14,
+          0,
+          0
+        ],
+        [
+          37,
+          0,
+          0
+        ],
+        [
+          11,
+          0,
+          0
+        ],
+        [
+          22,
+          0,
+          0
+        ],
+        [
+          10,
+          0,
+          0
+        ],
+        [
+          32,
+          0,
+          0
+        ],
+        [
+          16,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0
+        ],
+        [
+          11,
+          0,
+          0
+        ],
+        [
+          14,
+          0,
+          0
+        ],
+        [
+          15,
+          0,
+          0
+        ],
+        [
+          7,
+          0,
+          0
+        ],
+        [
+          24,
+          0,
+          0
+        ],
+        [
+          11,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          22,
+          0,
+          0
+        ],
+        [
+          36,
+          0,
+          0
+        ],
+        [
+          20,
+          0,
+          0
+        ],
+        [
+          8,
+          0,
+          0
+        ],
+        [
+          3,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0
+        ],
+        [
+          7,
+          0,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          15,
+          0,
+          0
+        ],
+        [
+          12,
+          0,
+          0
+        ],
+        [
+          8,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          22,
+          0,
+          0
+        ],
+        [
+          13,
+          0,
+          0
+        ],
+        [
+          14,
+          0,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          10,
+          0,
+          0
+        ],
+        [
+          17,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0
+        ],
+        [
+          18,
+          0,
+          0
+        ],
+        [
+          9,
+          0,
+          0
+        ],
+        [
+          10,
+          0,
+          0
+        ],
+        [
+          8,
+          0,
+          0
+        ],
+        [
+          17,
+          0,
+          0
+        ],
+        [
+          16,
+          0,
+          0
+        ],
+        [
+          22,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          19,
+          0,
+          0
+        ],
+        [
+          9,
+          0,
+          0
+        ],
+        [
+          19,
+          0,
+          0
+        ],
+        [
+          9,
+          0,
+          0
+        ],
+        [
+          23,
+          0,
+          0
+        ],
+        [
+          4,
+          0,
+          0
+        ],
+        [
+          30,
+          0,
+          0
+        ],
+        [
+          32,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          12,
+          0,
+          0
+        ],
+        [
+          10,
+          0,
+          0
+        ],
+        [
+          131,
+          0,
+          0
+        ],
+        [
+          4,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          5,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    }
+  ],
+  "reordered_acceptance": "No duplicate workspace, extra756 or standalone retained41 preflight. Required full13 after clean checkpoint/root release; all21/fixed3/3exampleguards after successful unchanged-source full13 before closure.",
+  "prior_exact_receipts": [
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-crossroads-after1.json",
+      "sha256": "d85c2b435e956641bf4a226beae55881cb5dc867d5d6413ef937080ad4cfc57e",
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-crossroads-after1.log",
+      "log_sha256": "dc6c37c42b3be295c988cf3554287ea369d877b88211d5aadf6d32c470ffb099",
+      "elapsed_seconds": 86.48866945802001,
+      "source_scope": 11,
+      "manifest_timing": "Eleven-path probe receipts precede this fresh discovered495 freeze; no retrospective495 claim."
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-crossroads-reverse-after1.json",
+      "sha256": "d2c0a1674b53465935f828dd908bad387dcaf17cebc323f73b62a392b0daf679",
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-crossroads-reverse-after1.log",
+      "log_sha256": "b9a4d5b4af20326c0f7a641b5c30f88f5d99c7cc2bccd9cc776b5088d11931ca",
+      "elapsed_seconds": 13.741086542024277,
+      "source_scope": 11,
+      "manifest_timing": "Eleven-path probe receipts precede this fresh discovered495 freeze; no retrospective495 claim."
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-riverlands-after1.json",
+      "sha256": "b4f8c6a93349e7237d30fb7fa163e1975660122d5de58e699f3388d96287ec88",
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-riverlands-after1.log",
+      "log_sha256": "7da056a5c2c8abd705dffb56abf7bc4888fc6b87c6213610f5a10664d6f22cf3",
+      "elapsed_seconds": 9.251985708018765,
+      "source_scope": 11,
+      "manifest_timing": "Eleven-path probe receipts precede this fresh discovered495 freeze; no retrospective495 claim."
+    }
+  ],
+  "elapsed_seconds": 1108.1912840410369,
+  "status": "COMPLETE all6 commands0 plus3 prior unchanged-source exact receipts; mandatory full13 and postgate isolated ending/performance/guards still pending",
+  "end_utc": "2026-10-20T12:22:47.234173+00:00"
+}

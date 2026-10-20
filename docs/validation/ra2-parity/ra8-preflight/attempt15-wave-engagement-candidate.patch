@@ -1,0 +1,48 @@
+diff --git a/crates/sim/src/ai.rs b/crates/sim/src/ai.rs
+index cf4056e..bf16e01 100644
+--- a/crates/sim/src/ai.rs
++++ b/crates/sim/src/ai.rs
+@@ -2480,6 +2480,16 @@ fn understrength_funding(view: &View<'_>, controller: &AiController) -> bool {
+             .own_units
+             .iter()
+             .any(|unit| view.fights(unit) && unit.harvest.is_none())
++        // Finance an established offensive engagement, not another purchase
++        // immediately after the first fully funded recruit leaves its producer.
++        || !view.own_units.iter().any(|unit| {
++            controller.wave.contains(&unit.id)
++                && unit.attacking
++                && unit.mobile.step.is_none()
++                && unit.combat_target.is_some_and(|target| {
++                    view.enemy_buildings.iter().any(|building| building.id == target)
++                })
++        })
+     {
+         return false;
+     }
+@@ -2545,11 +2555,22 @@ fn broke(view: &View<'_>, controller: &AiController) -> bool {
+ /// through a retained producer. Building-production and useful service assets stay protected
+ /// during this reinforcement investment; native sale and production apply all source costs.
+ fn sell_for_army(view: &View<'_>, controller: &AiController) -> Option<Command> {
+-    // The producers and prerequisites of the army: a building that produces one of its unit
+-    // types, a prerequisite of one, or a member of one of its prerequisite groups.
++    // Preserve producers/prerequisites of the declared army and all actual queued
++    // work, including completed heads and support outside the army composition.
+     let mut needed: BTreeSet<BuildingKind> = BTreeSet::new();
+-    for &kind in &view.ai.army {
+-        let item = ProductionItem::Unit(kind);
++    let work: BTreeSet<_> = view
++        .ai
++        .army
++        .iter()
++        .copied()
++        .map(ProductionItem::Unit)
++        .chain(
++            view.state
++                .queues()
++                .flat_map(|(_, queue)| queue.iter().map(|q| q.item)),
++        )
++        .collect();
++    for item in work {
+         if let Some(terms) = view.definitions.production(item) {
+             needed.insert(terms.producer);
+             needed.extend(terms.prerequisites.iter().copied());

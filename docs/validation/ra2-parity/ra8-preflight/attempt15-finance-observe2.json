@@ -1,0 +1,22 @@
+{
+  "start_utc": "2026-10-20T10:44:18.377571+00:00",
+  "purpose": "Observational sale context only; original finite-budget assertion unchanged",
+  "ai_before_sha256": "c5685cf95a86eaee69726b2bbbf76752ea3ee53803a02d3e5327b65f24187da7",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ra8_finite_unit_funding_is_not_spent_on_repairs_before_the_paid_recruit_can_finish",
+    "--",
+    "--nocapture"
+  ],
+  "ai_observational_sha256": "3c857819dc0c4549fca7ade1f26a3054f49c703cad1231cad86055417ffa9473",
+  "exit": 101,
+  "finally_utc": "2026-10-20T10:45:02.811109+00:00",
+  "ai_finally_sha256": "c5685cf95a86eaee69726b2bbbf76752ea3ee53803a02d3e5327b65f24187da7",
+  "elapsed_seconds": 44.43358779203845,
+  "log_sha256": "b50b864f6f18ab892b800892a7b4fe87d09ae837bec92f13baa68dda4c1532d2"
+}

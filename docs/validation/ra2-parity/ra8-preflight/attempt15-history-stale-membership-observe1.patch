@@ -1,0 +1,12 @@
+--- crates/sim/src/ai.rs
++++ crates/sim/src/ai.rs
+@@ -2450,6 +2450,9 @@
+ }
+ 
+ fn understrength_funding(view: &View<'_>, controller: &AiController) -> bool {
++    if view.tick == 50881 {
++        eprintln!("funding membership tick{} player{:?} next_wave{} wave{:?} living{:?}", view.tick, view.player, controller.next_wave, controller.wave, view.living_owned_ids);
++    }
+     if !view.ai.rules_difficulty
+         || strategy::service_income(view)
+         || !visible_ore(view).is_empty()

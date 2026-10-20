@@ -1,22 +1,36 @@
 # RA8 acceptance record
 
-Status: checkpoint15 completes the current targeted checks:12 commands exit0,
-160 Rust passes/0failed/0ignored across9 native target invocations. Final Crossroads
-Russia/AmericaEasy is P0Won61986, reverse America/RussiaEasy P0Won41738, and Riverlands
-France/GermanyEasy P0Won33776, all seed0 under the unchanged72000 bound. All10 default
-Demo matches and all3 grown-map tests pass; ten-player grown Crossroads is P1Won45321.
-R179's garrison-retention trial is rejected. R180/R182–R185 retain scoped ordinary combat
-and financing improvements with native causal failures, positives and separately verified
-restorations; compatibility failures and exact named setup migrations remain recorded.
-R181 changes only M6 non-Won reporting timing, preserving all756 jobs, bounds, rejection/I6
-checks and the universal-winner assertion before TSV publication. Attempt14's interrupted
-full gate preserves TWO observed failures and does not establish756 completed outcomes;
-commands05–13 are unrun and its production TSV is stale. Source/evidence staging, separate
-unfiltered checks/classification, clean commits and explicit coordinator full13 release
-remain pending. Full acceptance still needs one complete unchanged all0 full13, both fresh
-756 distributions, then same-source isolated all21/fixed256/three example guards. RA9,
-independent review and user quality verification remain pending; no historical performance
-or winning claim transfers to the new runtime.
+Status: checkpoint16 preparation follows R186–R188. Full attempt15 completed the
+required production sweep with756 actual Won and retained41/0/0, then failed seven
+original recovery invariants; its entire70-leaf label is preserved. Those successes
+belong to the old runtime and are not transferred to this correction. R186's initial
+stationary-only refinement passed the complete sim crate1077/0/0 after R187 fixed
+an independent parallel fixture-file race, but failed exact Crossroads. R188 now
+also permits rebuilding a previously admitted wave with no living owned members;
+it uses existing hashed history and own-actor membership before later wave pruning.
+
+Current source AIa219bfb7 passes unchanged recovery21/native financing4, both exact
+Crossroads directions (P0Won62005 and41738) and Riverlands France/GermanyEasy
+P0Won33776, all seed0 within the original72000 bound. Final3 strict checks, all10
+Demo matches, grown3 and the ONE complete sim command pass. Full sim reports
+1077/0/0 across68 target results; together with the three exact receipts, the
+frozen scope has1084/0/0 across73 target results and9 commands.
+Fresh495 source manifests bind that remaining batch, while the earlier exact
+receipts explicitly bind eleven source paths; their timing is not rewritten.
+The source was later committed as b411bed after source stagedcheck0 and a
+separate completed-result read. Evidence first unfiltered check exits2, NOTpassed:17 native-log EOF blanks and
+one preserved raw-patch context space, all exact staged/file/line/EOL hashes
+verified and zero source/data/test/prose errors. Raw bytes remain unchanged;
+a separate final check repeats exit2 with identical stdout and is read later.
+The later deliberate evidence commit preserves those raw bytes; full13 still
+requires coordinator clean-tip release.
+
+R181's strict M6 aggregate reporting, all original bounds/rejection/I6 checks and
+pre-publication universal-winner assertions remain unchanged. After clean checkpoint
+commits and coordinator release, the next required full13 runs first. Both fresh756
+distributions and all13exit0 are required; same-source isolated all21/fixed256/three
+example guards follow before RA8 closure. RA9, independent review and user quality
+verification remain pending. Historical performance/endings are not current acceptance.
 
 ## Acceptance checklist
 
