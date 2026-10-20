@@ -10400,3 +10400,191 @@ Exact file/line/EOL/staged-blob SHA bindings match; zero source/data/test/prose 
 Captured stdout is JSON-escaped directly (247c5eb2…), preserving every raw byte. A separate
 restaged unfiltered check must match before a later deliberate evidence commit; no raw
 normalization or broad whitespace suppression is used.
+
+
+### R175 — Armored workers do not exclude ordinary reinforcement financing (RA8)
+
+Attempt13's unchanged full13 command stopped on the actual seed0 Crossroads RussiaEasy /
+AmericaEasy match at its original72000 limit. The workspace command is interrupted partial,
+not a completed756 sweep: eight completed Rust targets248/0/0 and four visible M6 companions;
+commands05–13 remain unrun. The entire36-leaf label is preserved byte-identically by
+`ra8-attempt13/PRESERVED.json` (fb60ca0a…,152671bytes per set). Its old production TSV is
+explicitly stale. Root's reordered acceptance is cheap causal/exact/affected/Demo/grown
+checks, clean checkpoint and mandatory full13, then isolated all21/fixed256/example guards
+on the same successful runtime before closure. No validation requirement or limit is dropped.
+
+Actual native observations showed stopped armed War Miners fighting while the wallet was
+empty and ordinary production prerequisites/producers survived. `broke` previously excluded
+financing because any `View::fights` actor existed. A new pure `funding_force` predicate is
+shared by that admission and the existing liquidation-latch reset: for opted-in plans,
+stopped armed workers alone do not preclude optional ordinary asset financing when there is
+neither actual service income nor any currently observed ore. Other real combat forces,
+legacy plans, actual income and observed ore preserve the original protection. This is an
+investment policy, not a helplessness test, global ore-exhaustion oracle or R53 timer waiver.
+Ordinary SellBuilding, exact refunds, producers/prerequisites, paid queues and source prices
+remain responsible for the result. There is no new persistent state, RNG or hash input.
+
+Native `ra8_empty_armed_workers_keep_fighting_while_an_optional_asset_funds_a_paid_recruit`
+requires a real400 depot refund, Conscript sourceprice100, positive charged head, actual
+producer-bound UnitSpawned and both worker/recruit WeaponFired against the real building.
+The final old-funding-policy bypass fails its intended sale/paid-work assertion despite real
+worker fire (`attempt13-financing-final-bypass2`,4853c0bb…); finally and a separate later
+five-path binding receipt restore the source before any dependency. The earlier financing
+proofs remain historical, including the idle worker's auto-fire not proving wave membership.
+Real land-force, income and partly paid affordable-head controls conserve assets. The
+incumbent income control now explicitly uses public Stop to establish Idle, asserts no War
+Factory and an actually observed ore/refinery job, then requires native OreDelivered/no sale.
+Its before2 fails the intended sale prohibition (afa34457…), after1 passes(e9f67422…). The
+prospective `worker_job` helper requires a worker-producing factory and was insufficient for
+this incumbent; conservative currently observed ore is used for this added funding scope.
+The earlier unchanged-body after/before1 lacked that Idle/no-factory premise and is retained
+as preparation evidence only, not causal proof. A failed exact-context preparation command
+made no partial source change; the later corrected edit, formatting and probe were separate.
+
+Exact financing-only and subsequent property candidates still returnedNone72000. No ending
+success is attributed to this financing property alone. The proposed redundant-power gap
+was refuted: the normal controller already sold actual source power and paid/spawned a
+recruit in `attempt13-redundant-power-native-before1`(f2375809…); no power-sale policy was added.
+
+### R176 — No-observed-ore worker teams and preserved native economic roles (RA8)
+
+The same real Crossroads timeline showed repeated ordinary cohorts, genuine paid production
+and casualties; neither player was globally helpless. A worker can have a useful military
+role alongside a paid army when it is actually Idle and there is no observed economic
+opportunity. The existing R162 lone/incapable-companion fallback remains intact. An added
+opted-in View-only admission allows existing commandable armed Idle workers alongside troops
+only when actual `service_income` is false and `visible_ore` is empty. Any observed ore,
+including an unreachable field, conservatively blocks this additional admission. This is
+not a claim that every hidden field is exhausted or reachable; existing working harvesters,
+source first-wave/TeamDelay, assembly, defenses, reserves, caps and public validation remain.
+`last_resort`/`fights` comments describe the transient derived admission rather than implying
+that every admitted worker is necessarily the only armed actor. No new persistent/hash state.
+
+`ra8_zero_job_armed_workers_join_real_paid_infantry_through_ordinary_team_readiness` pauses
+and restores untouched controllers during actual public paid recruitment, observes positive
+charged production/live birth, then requires natural source readiness, no pre-first_wave
+worker-wave admission and actual paid-infantry plus worker-wave building fire. The initial
+before(c9d5da85…) fails worker admission/fire despite actual infantry fire. Final-body one-
+cause admission bypass(36614201…) independently fails the same native assertion; final
+positive controls(70e98fba…) pass8/0/0. Assertion wording is precisely 'approach and fire',
+not an unobserved infantry-first ordering claim. A legacy configured plan retains original
+worker roles while its actual paid infantry fires. Two independent fog-on setups differ only
+by genuinely unseen remote ore; events, controllers and issued intents stay identical through
+real paid-infantry and worker-wave fire. An all-ore leak mutation fails that twin(0dd62ac7…).
+All bounded mutations have finally plus separate later source-SHA restoration receipts.
+
+The existing exact function
+`ra8_a_capable_living_land_force_keeps_empty_miners_out_of_the_attack_wave` intentionally
+migrates its SETUP: its former empty-map exclusion is superseded by this play policy. It now
+has a real owned refinery/actually seen field and must demonstrate native OreDelivered,
+while retaining every original1000tick/tank-shot/no-miner-shot/no-miner-order/live-tank
+assertion. It is a real economic-role/land-defense control, not proof about first-wave joining.
+The named migration passes unchanged original assertions plus the stronger income premise
+(b277269b…). There is no hidden-ore exemption or change to neutral plan traversal.
+
+`ra8_paid_reinforcements_do_not_send_an_active_empty_worker_wave_home` separately proves
+natural original worker-wave membership, later ordinary sale/charged recruit birth, preserved
+membership/no home-gather redirection and real worker fire after that birth. Its late producer,
+refinery and asset are disclosed controlled test setup, not claimed native construction.
+A later public Harvest/actual delivery conserves the worker's economic role. An intermediate
+pure `serving_workers` set had meaningful membership-loss negatives/positives, but is
+SUPERSEDED and removed: final admission now naturally retains that same worker without a
+separate set/state/hash. Those historical set-bypass receipts are not transferred as final-
+body causal proof; the final admission-expression negative above binds the retained code.
+
+The changed exact replay confirms actual miners attacking, not idleness: windows54–60k
+include229WarMiner→PowerPlant shots;60–66k includes61WarMiner→Pillbox shots, with miner182/25
+native deaths60071/62045. Later native Flak/infantry fight the hostile occupied garrison.
+These are observed combat/attrition, not a mathematical inability to finish or permission to
+force a loss. Combined worker/financing source still returnedNone72000 before R178.
+
+### R177 — Rejected finite-wallet reserve-service/composition experiment (RA8)
+
+The real earlier production had a V3 by30–36k, firing at GI/Grizzly and later Dog/ChronoMiner/
+Grizzly, with actual IFV interception of V3 rockets. No 'absent/idle siege' claim is made.
+Late V3 financing was not assumed legal: source cost800 requires Radar, already destroyed
+in that late phase. The isolated native1800-wallet setup proved V3(800) and Rhino(900)
+legally buildable with normal source owners/prerequisites, but unchanged actual charged
+spawns were TeslaTank1200 + Flak500(61e7cbbc…), not the initially hypothesized two Rhinos.
+An advanced national reserve precedes the declared general cycle, so data ordering alone
+could not establish the intended opening. This refuted premise is retained explicitly.
+
+A bounded provisional service policy allowed one declared land-factory entry ahead of an
+otherwise affordable reserve only when the finite wallet could not fund both; rich wallets
+kept reserve-first order and all tier capacity/caps were retained. Added advanced/AA items
+were accounted for locally. Service-only paid spawns were Rhino+Rhino(0cf6fcb4…). A generator-
+owned Russia V3-first reorder preserved every member/multiplicity, national, quota, price,
+statistic and cadence; with both changes the native paid spawns were V3+Rhino(76d5d545…).
+This is a game-owned play experiment, not original RA2 ordering or an original invariant.
+The combined exact Crossroads A/B still returnedNone72000(7cbe3552…,41.979737s wrapper),
+so the ENTIRE service + data-order candidate is REJECTED, with no further composition trial.
+
+`attempt13-land-service-candidate-REJECTED.patch` preserves its exact runtime/data/generator
+and experimental native-test body. All production/generator/data bytes were restored to
+AI0c811992…/generator6a0477b0…/data42cf6509…; a separate later02:02:44Z hash read follows
+02:02:38Z restoration. The uncommitted candidate-only test was removed, with its full body
+preserved in that raw patch; no committed test was deleted/renamed/ignored. Root's additional
+unaffordable-first-entry fallback concern is an UNVALIDATED limitation of that rejected code,
+not a claimed fixed or remaining production behavior. There is no candidate service or data
+delta in the final source. Original raw logs and source bindings are not rewritten.
+
+### R178 — Preserve a healthy surface AttackMove before focus resumption (RA8)
+
+R169 proved a stationary ordinary AttackMove could remain pinned on a repaired off-mission
+building in the presence of a remote observed soldier. Its new resumption branch also
+replaced a genuinely moving AttackMove. New scheduled test
+`ra8_surface_focus_preserves_a_real_healthy_approach_before_native_building_fire` reaches its
+core objective/wave naturally, establishes an actual public AttackMove/native path, then
+executes the real due AI decision and FIFO application. Before(56aab8e3…) changes ownership
+from moving AttackMove to direct Attack/chases1 and fails the intended ownership assertion.
+Both before/after fine movement samples advance52→74: this does NOT prove an instantaneous
+physical stop. Positive additionally requires later actual building WeaponFired.
+
+The production correction is one derived guard in only R169's new surface-resumption branch:
+do not replace an existing AttackMove{moving:true}. Idle/stationary focus, an already matching
+Attack chase, incoming positive-damage Normal-weapon defender response, and artillery/air
+policies remain. No source weapon/timer, Army/TeamDelay, RNG, persistent state or outcome is
+changed. All16 native attrition controls pass(164accb6…), including the original stationary
+repaired-distraction property and native Temporal/Ivan effects. The final one-cause removal
+restores exactly old strategyec57866c… and fails the same native assertion(74da3585…). Finally
+restoration plus a separate later02:09:27Z six-file SHA read bind final strategyc4c72cba….
+Two original mutation receipt files accidentally have a literal backslash-n terminator;
+their exact bytes remain untouched, with supplemental valid `*-format-corrected.json` files
+binding the original SHA and removing only that terminator. No native raw bytes are normalized.
+
+The exact retained39th test is
+`ra8_gate13_crossroads_russia_america_easy_seed_zero_finishes`, with original options, seed0,
+72000 limit and all rejection/winner assertions. On combined final worker/funding + healthy-
+approach source it now yields AmericaP1Won67958(1/0/0,b02411c3…,41.391019s wrapper/10.11s
+native). This is combined ending evidence, separate from each causal property. No claim that
+a single overwrite alone caused the whole war. No garrison-retention expansion was pursued
+once this exact ending passed. Final cheap scoped checks/checkpoint and unchanged full13
+remain required; all21/fixed256/example guards are deferred until that successful full13,
+not omitted or transferred from checkpoint13. This is not independent review or RA8 closure.
+
+
+Checkpoint14 follow-up: all12 reordered scoped validation commands exit0,149 actual Rust
+passes/0failures/0ignored across7native target invocations. FullAI122 and nativeattrition16,
+exactCrossroads1,source-slot4,legacy2,Demo1Rust/10actualWins and grown3 are recorded separately.
+Grown seed7CrossroadsP1Won51137/51138steps/9defeated; DemoRussia/LibyaEasy61614. After those
+native checks, only the R177→R176 doc-comment reference changed; exact before/after binding
+and final fmt/strictClippy0 preserve that chronology instead of inventing post-comment native
+runs. Fresh495path snapshots/static1374(+250)/no removed or ignored tests and attempt13's
+72copy preservation checks are in checkpoint14. All21/fixed256/threeexampleguards are deferred
+until a successful unchanged full13, all still required for closure. No extra workspace or
+retained39 preflight is duplicated before that mandatory gate. Source/evidence commits and
+explicit full13 release remain required; no independent review or closure claim.
+
+
+Checkpoint14 source binding: the frozen working source, with the separately bound final
+doc-comment reference correction, was later committed as66d0def across exactlyfivepaths.
+Unfiltered source cachedcheck exits0 at02:20:19Z; the separate completed-result read at
+02:20:26Z precedes the later commit. No native run is claimed to have occurred postcommit.
+Evidence staging/raw-only classification and explicit full13 release remain required.
+
+
+Checkpoint14 evidence cachedcheck exits2, NOTpassed: exactly17 retained native-log blank
+EOF diagnostics,zero source/data/test/prose errors. File/line/EOL and actual staged-blob
+SHA bindings match; raw output is captured directly as JSON-escaped stdout(d0c4e178…).
+No byte normalization or whitespace suppression; separate final identical unfiltered
+check and a later deliberate evidence commit remain required.

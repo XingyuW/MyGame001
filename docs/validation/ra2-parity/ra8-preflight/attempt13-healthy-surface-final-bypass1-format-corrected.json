@@ -1,0 +1,32 @@
+{
+  "start_utc": "2026-10-20T02:08:50.462313+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_attrition_tests::ra8_surface_focus_preserves_a_real_healthy_approach_before_native_building_fire",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "elapsed_seconds": 18.05754304100992,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "0c811992001e72cf79b4946b6357b395bbe2de5b35840eec26c6c8b5f534f04b",
+    "crates/sim/src/ai/strategy.rs": "c4c72cbaa6dcbaf83ca949651e98a661845b4257be42b4f008d82eee153923c8",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "92a0fc584a2fe719fd9d7b505c0de9197161e1e491077ce6e7a5c0be837f0595",
+    "crates/sim/tests/ra8_ai.rs": "40c4ee8df1ba45367f2b0af6012affe59b9a9f1fc0aad0f830a36a138ac35a12",
+    "crates/game/tests/ra8_gate_matches.rs": "2adf6ddf6a41a3b57eccae63b96b274e7b52466dcf8798c3291640c2b1b7e33c"
+  },
+  "mutant_strategy_sha256": "ec57866cd73ffc7cbd6049fdd27587c544e850bd63b4048de2d49353a0ebac96",
+  "log_sha256": "74da35851aeb5c6fbc1ff6997643cbb1e93b1c41308383e4ada1096f294a04f5",
+  "metadata_terminator_correction": {
+    "original_path": "docs/validation/ra2-parity/ra8-preflight/attempt13-healthy-surface-final-bypass1.json",
+    "original_sha256": "5c55a90a5852ac48a13e6af7b7b10ab76867430de82629ed0ddbb43b238ef7bc",
+    "note": "Original JSON text has a literal backslash-n terminator from orchestration escaping. Preserve original bytes; this supplemental valid JSON removes only those two terminator bytes."
+  }
+}

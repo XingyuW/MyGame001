@@ -1,0 +1,10 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 22.37s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+Russian finite factory opening charged{Unit(UnitKind(0)), Unit(UnitKind(18)), Unit(UnitKind(22))} born[UnitKind(22), UnitKind(18)]
+test ra8_russian_declared_opening_funds_real_siege_without_losing_its_tank ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 122 filtered out; finished in 0.08s
+

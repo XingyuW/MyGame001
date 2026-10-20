@@ -1,16 +1,20 @@
 # RA8 acceptance record
 
-Status: checkpoint13 scoped final2 completes all19 commands with exit0: 325 Rust
-passes, zero failures/ignored across18 target invocations. Retained38 has38 explicit
-winners across37 distinct configurations; all21 actual-default ten-player maps win
-with ten builders, and all three fixed256 means meet the5ms budget. R173's shared
-staggered slot and R174's readiness-qualified spare detector discovery have native
-before/after and final-body causal bypass proofs. This is scoped validation, not full
-acceptance. Source2d720e9 contains four paths after a separate staged check0; the scoped
-commands ran earlier on the identical frozen working source. The failed attempt12
-full gate is preserved, with phases05–13 unrun and its production table stale. Evidence
-commit, one complete all0 full13, both fresh756-winner R29 distributions, RA9 and
-independent review remain pending. Historical metrics are not transferred.
+Status: checkpoint14 completes the reordered cheap scoped checks:12 validation commands
+exit0,149 Rust passes/0failed/0ignored across7 native target invocations. Exact Crossroads
+Russia/AmericaEasy now yields AmericaP1Won67958/72000; all10 default Demo matches and all3
+grown-map tests pass (ten-player CrossroadsP1Won51137). R175/R176's stopped armed-worker
+financing/admission and R178's healthy AttackMove ownership have native causal negatives,
+positive controls and separately verified restorations. R177's composition/service trial
+is rejected and fully restored. The sole final text-only change is independently bound
+R177→R176 in a doc comment; fmt and strict Clippy pass on that final text. This is scoped
+validation, not full acceptance. Attempt13's interrupted full gate is preserved, with
+phases05–13 unrun and its production table stale. Clean source/evidence commits and explicit
+coordinator full13 release remain pending. One complete unchanged all0 full13 and both
+fresh756 distributions are required; only after that success will the isolated all21,
+three fixed256 budgets and three example guards run on the same source before closure.
+RA9, independent review and user quality verification remain pending. Historical metrics
+are not transferred to the new runtime.
 
 ## Acceptance checklist
 
@@ -37,7 +41,7 @@ independent review remain pending. Historical metrics are not transferred.
 
 ## Policy and evidence
 
-R88–R174 in `docs/DECISIONS.md` record the implementation, exact existing-test migrations,
+R88–R178 in `docs/DECISIONS.md` record the implementation, exact existing-test migrations,
 game-owned AI assumptions, failure diagnoses, negative mutation and process deviations.
 R172 records the user's two-batch scheduling authorization for all five independent review
 slices and a fresh lead;review coverage and independence remain required.
@@ -54,6 +58,37 @@ No clone, worktree or validation environment was created. Configured Cargo/UV/PI
 preserved. New recreatable parser scratch is at configured Cargo target `tmp/ra8_definitions`
 (716 KiB measured after the slow-speed parser fixture;58 files/584038 file bytes), retained for reruns and unnecessary for release.
 Earlier RA5 render and RA7 parser evidence remain.
+
+## Fourteenth checkpoint: affected checks green, complete full13 pending
+
+[Checkpoint14](ra8-preflight/checkpoint14.json) binds final344 runtime+169 additional
+paths with18 overlap (495unique), static1124→1374(+250) with no removed/renamed/ignored
+functions,12 command receipts and149 actual Rust passes. The latest exact39th retained
+case is Crossroads Russia/AmericaEasy;39 tests represent38 distinct configurations. That
+whole retained target is next executed by mandatory workspace validation, as required by
+the reordered acceptance; its older38-winner run remains historical.
+
+The native worker controls preserve actual land forces, legacy behavior, charged partially
+paid heads, real incumbent Idle mining without a WarFactory, and independent unseen-ore
+intent/event/controller equivalence. New combined-arms admission remains gated by ordinary
+source readiness; currently observed but unreachable ore also conservatively prevents the
+additional worker admission. The exact named old tank/miner test now has real observed ore,
+refinery and native delivery while retaining every original assertion. No global resource
+oracle, timer/TeamDelay/statistic/outcome or persistent state was changed. R178 preserves
+moving AttackMove ownership while retaining stationary repaired-distraction recovery,
+incoming defenders and native Temporal/Ivan/artillery constraints. Its immediate native
+movement advances in both before/after; the proved difference is ownership, not a claim of
+an instantaneous physical halt.
+
+[Metrics](ra8-preflight/checkpoint14-metrics.json) retain all actual outcomes/timings. Demo
+Russia/LibyaEasy now ends61614/72000; the prior68806 near-limit result is historical.
+The real seed7 ten-player grown case ends51137 with9defeated and all original made-start
+assertions. Current-source means/tails are deliberately still pending the post-full13
+isolated measurement; no older performance figures certify this runtime. All35/36-file
+historical archives remain; attempt13 specifically preserves36files/152671bytes per set,
+72current/archive copies, zero mismatches. No new substantial external directory was made;
+configured RA5 render and RA7/RA8 parser caches are retained. No independent review or
+all-debt closure is claimed.
 
 ## Thirteenth checkpoint: completed scoped final2, mandatory full13 pending
 
@@ -1085,3 +1120,17 @@ Exact file/line/EOL/staged-blob SHA bindings match; zero source/data/test/prose 
 Captured stdout is JSON-escaped directly (247c5eb2…), preserving every raw byte. A separate
 restaged unfiltered check must match before a later deliberate evidence commit; no raw
 normalization or broad whitespace suppression is used.
+
+
+Checkpoint14 source binding: the frozen working source, with the separately bound final
+doc-comment reference correction, was later committed as66d0def across exactlyfivepaths.
+Unfiltered source cachedcheck exits0 at02:20:19Z; the separate completed-result read at
+02:20:26Z precedes the later commit. No native run is claimed to have occurred postcommit.
+Evidence staging/raw-only classification and explicit full13 release remain required.
+
+
+Checkpoint14 evidence cachedcheck exits2, NOTpassed: exactly17 retained native-log blank
+EOF diagnostics,zero source/data/test/prose errors. File/line/EOL and actual staged-blob
+SHA bindings match; raw output is captured directly as JSON-escaped stdout(d0c4e178…).
+No byte normalization or whitespace suppression; separate final identical unfiltered
+check and a later deliberate evidence commit remain required.

@@ -1,0 +1,8 @@
+    Finished `release` profile [optimized] target(s) in 0.06s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+test ra8_a_capable_living_land_force_keeps_empty_miners_out_of_the_attack_wave ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 121 filtered out; finished in 0.03s
+
