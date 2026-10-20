@@ -1,0 +1,17 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0308]: mismatched types
+    --> crates/sim/src/ai/strategy.rs:1370:40
+     |
+1370 |         .metadata(ProductionItem::Unit(kind))
+     |                   -------------------- ^^^^ expected `UnitKind`, found `BuildingKind`
+     |                   |
+     |                   arguments to this enum variant are incorrect
+     |
+note: tuple variant defined here
+    --> crates/sim/src/economy_defs.rs:98:5
+     |
+  98 |     Unit(UnitKind),
+     |     ^^^^
+
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `sim` (lib) due to 1 previous error

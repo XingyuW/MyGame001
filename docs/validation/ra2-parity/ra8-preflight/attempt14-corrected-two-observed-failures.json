@@ -1,0 +1,13 @@
+{
+  "utc": "2026-10-20T02:34:46.002141+00:00",
+  "preserved_manifest": "ra8-attempt14/PRESERVED.json",
+  "preserved_manifest_sha256": "2527a350f00d8db04d9b5dc0a758ad4a9b6048b8079da66c9fb850d02e4f6bb4",
+  "raw_sha256": "ecaf25765b06553564d560cc729cf3b4fa7104422f6a4d28a0edb917b962bbc3",
+  "corrected_observed_failure_count": 2,
+  "actual_unexpected_nonwinner_assertions": [
+    "crossroads: america (easy) against russia (easy): None",
+    "riverlands: france (easy) against germany (easy): None"
+  ],
+  "correction": "Initial STOPPED/first-observation record names only the first observed Crossroads failure. Full preserved raw also contains RiverlandsFranceEasy/GermanyEasyNone72000. Preserve original records/bytes; this is the explicit complete-reading correction,not a new completed gate outcome.",
+  "partial_and_unrun_truth_unchanged": true
+}

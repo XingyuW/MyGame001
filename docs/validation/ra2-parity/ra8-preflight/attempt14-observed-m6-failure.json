@@ -1,0 +1,18 @@
+{
+  "observed_utc": "2026-10-20T02:32:16.469916+00:00",
+  "freeze": "c1e84b39d8c533a665e01f759103950a40ee3be0",
+  "runtime": "66d0defb46c084a339d5602c74dc53526a68425d",
+  "failure": "crossroads: america (easy) against russia (easy): None",
+  "raw_prefix": "docs/validation/ra2-parity/ra8-preflight/attempt14-observed-m6-failure-prefix.log",
+  "raw_prefix_sha256": "ecaf25765b06553564d560cc729cf3b4fa7104422f6a4d28a0edb917b962bbc3",
+  "raw_prefix_bytes": 27555,
+  "owned_rows": [
+    "18345 18319 18345       07:25   0:00.01   0.0 Ss   sh scripts/validate_ra2_parity.sh ra8",
+    "18351 18345 18345       07:25   0:00.01   0.0 S    caffeinate -d -i -w 18345",
+    "18390 18345 18345       07:23   0:00.54   0.0 S    /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo test --workspace --release",
+    "21419 18390 18345       02:06  18:58.38 816.8 R    /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-fff13bc99bc7e9e6"
+  ],
+  "owned_pgid": 18345,
+  "action": "SIGTERM only verified owned gate group after preserving actual unexpected M6 assertion; partial command,not completed workspace/756",
+  "signal_sent_utc": "2026-10-20T02:32:16.470242+00:00"
+}

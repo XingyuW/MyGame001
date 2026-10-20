@@ -1,0 +1,23 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 7.29s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 4 tests
+test ra8_distant_unrelated_unit_chase_is_not_a_current_counterfire_job ... ok
+
+thread 'ra8_surface_counterfire_preserves_a_real_armed_building_engagement' (11003562) panicked at crates/sim/tests/ra8_ai.rs:11475:5:
+the preserved engagement must produce real native armed-building fire
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_surface_counterfire_preserves_a_real_armed_building_engagement ... FAILED
+building counterfire returnedtrue damagedtrue destroyedtrue resumedtrue distractionshots1 targetSome(Building(SimId(5))) orderSome(Weapon { kind: WeaponKind(27), secondary: Some(WeaponKind(28)), cooldown: 53, burst_left: 0, volley: WeaponKind(27), target: Some(SimId(5)), order: Some(Attack { target: SimId(5), chases: 0 }) })
+test ra8_surface_counterfire_leaves_an_unarmed_economy_building_to_fight_its_real_defender ... ok
+test ra8_surface_counterfire_prioritizes_a_real_defender_over_a_nearer_unarmed_miner ... ok
+
+failures:
+
+failures:
+    ra8_surface_counterfire_preserves_a_real_armed_building_engagement
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 124 filtered out; finished in 0.22s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

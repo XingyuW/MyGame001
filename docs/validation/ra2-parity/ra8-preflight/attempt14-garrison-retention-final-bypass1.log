@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 22.73s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+
+thread 'ra8_unfunded_idle_garrison_reinforces_a_living_offensive_force' (10898738) panicked at crates/sim/tests/ra8_ai.rs:10800:5:
+an unfunded idle garrison must use ordinary Deploy to reinforce the real offensive force
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_unfunded_idle_garrison_reinforces_a_living_offensive_force ... FAILED
+
+failures:
+
+failures:
+    ra8_unfunded_idle_garrison_reinforces_a_living_offensive_force
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 122 filtered out; finished in 0.19s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

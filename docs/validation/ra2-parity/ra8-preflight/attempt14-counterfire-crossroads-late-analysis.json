@@ -1,0 +1,784 @@
+{
+  "source_log": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-crossroads-america-russia-native-after1.log",
+  "snapshots": [
+    {
+      "tick": 54000,
+      "players": [
+        {
+          "id": 0,
+          "credits": 3,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "48600",
+          "next_wave": "51467",
+          "last_stand": "false, next_wave: 51467",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(27) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 14, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(142) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 13, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(164) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 12, y: 5 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(171) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 12, y: 15 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(35), secondary: Some(WeaponKind(36)), cooldown: 11, burst_left: 0, volley: Weapo",
+            "unit SimId(172) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 12, y: 15 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(35), secondary: Some(WeaponKind(36)), cooldown: 3, burst_left: 0, volley: Weapon",
+            "unit SimId(173) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 10, y: 15 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(35), secondary: Some(WeaponKind(36)), cooldown: 32, burst_left: 0, volley: Weapo"
+          ]
+        },
+        {
+          "id": 1,
+          "credits": 0,
+          "queues": "[]",
+          "wave": "{SimId(25), SimId(158)}, target: Some(Building(SimId(113)))",
+          "target": "Some(Building(SimId(113)))",
+          "patience_until": "49361",
+          "next_wave": "52228",
+          "last_stand": "false, next_wave: 52228",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(158) Owner(PlayerId(1)) flak_track Mobile { speed: 15, cell: CellPos { x: 14, y: 21 }, step: None } Health { hit_points: 180 } moveNone Some(Weapon { kind: WeaponKind(27), secondary: Some(WeaponKind(28)), cooldown: 15, burst_left: 0, volle",
+            "unit SimId(25) Owner(PlayerId(1)) war_miner Mobile { speed: 6, cell: CellPos { x: 12, y: 18 }, step: None } Health { hit_points: 89 } moveNone Some(Weapon { kind: WeaponKind(86), secondary: None, cooldown: 20, burst_left: 0, volley: WeaponKind(86), t"
+          ]
+        }
+      ]
+    },
+    {
+      "tick": 55000,
+      "players": [
+        {
+          "id": 0,
+          "credits": 3,
+          "queues": "[]",
+          "wave": "{SimId(171), SimId(172), SimId(173)}, target: Some(Building(SimId(76)))",
+          "target": "Some(Building(SimId(76)))",
+          "patience_until": "56440",
+          "next_wave": "59307",
+          "last_stand": "false, next_wave: 59307",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(27) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 14, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(142) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 13, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(164) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 12, y: 5 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(173) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 22, y: 28 }, step: Some(Step { to: CellPos { x: 23, y: 29 }, progress: 318, length: 362 }) } Health { hit_points: 125 } moveSome((CellPos { x: 34, y: 41 }, 12, Following)) S",
+            "unit SimId(171) Owner(PlayerId(0)) gi Mobile { speed: 13, cell: CellPos { x: 24, y: 30 }, step: Some(Step { to: CellPos { x: 25, y: 31 }, progress: 310, length: 362 }) } Health { hit_points: 125 } moveSome((CellPos { x: 34, y: 41 }, 10, Following)) S",
+            "unit SimId(172) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 22, y: 28 }, step: Some(Step { to: CellPos { x: 23, y: 29 }, progress: 318, length: 362 }) } Health { hit_points: 125 } moveSome((CellPos { x: 34, y: 41 }, 12, Following)) S"
+          ]
+        },
+        {
+          "id": 1,
+          "credits": 119,
+          "queues": "[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(0)), progress: 66, charged: 66, fraction: 0 }])]",
+          "wave": "{SimId(174)}, target: Some(Building(SimId(0)))",
+          "target": "Some(Building(SimId(0)))",
+          "patience_until": "56601",
+          "next_wave": "59468",
+          "last_stand": "false, next_wave: 59468",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(174) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 39, y: 39 }, step: Some(Step { to: CellPos { x: 38, y: 39 }, progress: 113, length: 256 }) } Health { hit_points: 125 } moveSome((CellPos { x: 14, y: 18 }, 24, Follow",
+            "unit SimId(175) Owner(PlayerId(1)) attack_dog Mobile { speed: 23, cell: CellPos { x: 42, y: 41 }, step: Some(Step { to: CellPos { x: 41, y: 40 }, progress: 49, length: 362 }) } Health { hit_points: 100 } moveSome((CellPos { x: 38, y: 38 }, 3, Followi"
+          ]
+        }
+      ]
+    },
+    {
+      "tick": 56000,
+      "players": [
+        {
+          "id": 0,
+          "credits": 1,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "56440",
+          "next_wave": "59307",
+          "last_stand": "false, next_wave: 59307",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(27) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 14, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(142) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 13, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(164) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 12, y: 5 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(177) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 12, y: 15 }, step: Some(Step { to: CellPos { x: 13, y: 14 }, progress: 55, length: 362 }) } Health { hit_points: 125 } moveSome((CellPos { x: 15, y: 15 }, 2, Following)) Som"
+          ]
+        },
+        {
+          "id": 1,
+          "credits": 82,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "56601",
+          "next_wave": "59468",
+          "last_stand": "false, next_wave: 59468",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(178) Owner(PlayerId(1)) flak_track Mobile { speed: 15, cell: CellPos { x: 43, y: 45 }, step: Some(Step { to: CellPos { x: 43, y: 44 }, progress: 11, length: 256 }) } Health { hit_points: 180 } moveSome((CellPos { x: 38, y: 38 }, 6, Followi"
+          ]
+        }
+      ]
+    },
+    {
+      "tick": 57000,
+      "players": [
+        {
+          "id": 0,
+          "credits": 1,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "56440",
+          "next_wave": "59307",
+          "last_stand": "false, next_wave: 59307",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(27) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 14, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(142) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 13, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(164) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 12, y: 5 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(177) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 15, y: 15 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(35), secondary: Some(WeaponKind(36)), cooldown: 0, burst_left: 0, volley: Weapon"
+          ]
+        },
+        {
+          "id": 1,
+          "credits": 82,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "56601",
+          "next_wave": "59468",
+          "last_stand": "false, next_wave: 59468",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(178) Owner(PlayerId(1)) flak_track Mobile { speed: 15, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 180 } moveNone Some(Weapon { kind: WeaponKind(27), secondary: Some(WeaponKind(28)), cooldown: 0, burst_left: 0, volley"
+          ]
+        }
+      ]
+    },
+    {
+      "tick": 58000,
+      "players": [
+        {
+          "id": 0,
+          "credits": 1,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "56440",
+          "next_wave": "59307",
+          "last_stand": "false, next_wave: 59307",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(27) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 14, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(142) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 13, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(164) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 12, y: 5 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(177) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 15, y: 15 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(35), secondary: Some(WeaponKind(36)), cooldown: 0, burst_left: 0, volley: Weapon"
+          ]
+        },
+        {
+          "id": 1,
+          "credits": 82,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "56601",
+          "next_wave": "59468",
+          "last_stand": "false, next_wave: 59468",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(178) Owner(PlayerId(1)) flak_track Mobile { speed: 15, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 180 } moveNone Some(Weapon { kind: WeaponKind(27), secondary: Some(WeaponKind(28)), cooldown: 0, burst_left: 0, volley"
+          ]
+        }
+      ]
+    },
+    {
+      "tick": 59000,
+      "players": [
+        {
+          "id": 0,
+          "credits": 1,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "56440",
+          "next_wave": "59307",
+          "last_stand": "false, next_wave: 59307",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(27) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 14, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(142) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 13, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(164) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 12, y: 5 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(177) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 15, y: 15 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(35), secondary: Some(WeaponKind(36)), cooldown: 0, burst_left: 0, volley: Weapon"
+          ]
+        },
+        {
+          "id": 1,
+          "credits": 82,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "56601",
+          "next_wave": "59468",
+          "last_stand": "false, next_wave: 59468",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(178) Owner(PlayerId(1)) flak_track Mobile { speed: 15, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 180 } moveNone Some(Weapon { kind: WeaponKind(27), secondary: Some(WeaponKind(28)), cooldown: 0, burst_left: 0, volley"
+          ]
+        }
+      ]
+    },
+    {
+      "tick": 60000,
+      "players": [
+        {
+          "id": 0,
+          "credits": 1,
+          "queues": "[]",
+          "wave": "{SimId(177)}, target: Some(Building(SimId(131)))",
+          "target": "Some(Building(SimId(131)))",
+          "patience_until": "61120",
+          "next_wave": "63987",
+          "last_stand": "false, next_wave: 63987",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(27) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 14, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(142) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 13, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(164) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 12, y: 5 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })"
+          ]
+        },
+        {
+          "id": 1,
+          "credits": 82,
+          "queues": "[]",
+          "wave": "{SimId(178)}, target: Some(Building(SimId(0)))",
+          "target": "Some(Building(SimId(0)))",
+          "patience_until": "61281",
+          "next_wave": "64148",
+          "last_stand": "false, next_wave: 64148",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(178) Owner(PlayerId(1)) flak_track Mobile { speed: 15, cell: CellPos { x: 28, y: 26 }, step: Some(Step { to: CellPos { x: 27, y: 25 }, progress: 13, length: 362 }) } Health { hit_points: 156 } moveSome((CellPos { x: 12, y: 11 }, 15, Follow"
+          ]
+        }
+      ]
+    },
+    {
+      "tick": 61000,
+      "players": [
+        {
+          "id": 0,
+          "credits": 3,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "61120",
+          "next_wave": "63987",
+          "last_stand": "false, next_wave: 63987",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(27) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 14, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(142) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 13, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(164) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 12, y: 5 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(179) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 13, y: 16 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(35), secondary: Some(WeaponKind(36)), cooldown: 20, burst_left: 0, volley: Weapo"
+          ]
+        },
+        {
+          "id": 1,
+          "credits": 82,
+          "queues": "[]",
+          "wave": "{SimId(178)}, target: Some(Building(SimId(0)))",
+          "target": "Some(Building(SimId(0)))",
+          "patience_until": "61281",
+          "next_wave": "64148",
+          "last_stand": "false, next_wave: 64148",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(178) Owner(PlayerId(1)) flak_track Mobile { speed: 15, cell: CellPos { x: 15, y: 19 }, step: None } Health { hit_points: 111 } moveNone Some(Weapon { kind: WeaponKind(27), secondary: Some(WeaponKind(28)), cooldown: 37, burst_left: 0, volle"
+          ]
+        }
+      ]
+    },
+    {
+      "tick": 62000,
+      "players": [
+        {
+          "id": 0,
+          "credits": 3,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "61120",
+          "next_wave": "63987",
+          "last_stand": "false, next_wave: 63987",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(27) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 14, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(142) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 13, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(164) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 12, y: 5 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(179) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 13, y: 16 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(35), secondary: Some(WeaponKind(36)), cooldown: 12, burst_left: 0, volley: Weapo"
+          ]
+        },
+        {
+          "id": 1,
+          "credits": 82,
+          "queues": "[]",
+          "wave": "{SimId(178)}, target: Some(Building(SimId(0)))",
+          "target": "Some(Building(SimId(0)))",
+          "patience_until": "61281",
+          "next_wave": "64148",
+          "last_stand": "false, next_wave: 64148",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(178) Owner(PlayerId(1)) flak_track Mobile { speed: 12, cell: CellPos { x: 15, y: 19 }, step: None } Health { hit_points: 18 } moveNone Some(Weapon { kind: WeaponKind(27), secondary: Some(WeaponKind(28)), cooldown: 45, burst_left: 0, volley"
+          ]
+        }
+      ]
+    },
+    {
+      "tick": 63000,
+      "players": [
+        {
+          "id": 0,
+          "credits": 3,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "61120",
+          "next_wave": "63987",
+          "last_stand": "false, next_wave: 63987",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(27) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 14, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(142) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 13, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(164) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 12, y: 5 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(179) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 13, y: 16 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(35), secondary: Some(WeaponKind(36)), cooldown: 0, burst_left: 0, volley: Weapon"
+          ]
+        },
+        {
+          "id": 1,
+          "credits": 82,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "61281",
+          "next_wave": "64148",
+          "last_stand": "false, next_wave: 64148",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(180) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(181) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(182) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(184) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 39, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(183) Owner(PlayerId(1)) attack_dog Mobile { speed: 23, cell: CellPos { x: 17, y: 15 }, step: Some(Step { to: CellPos { x: 16, y: 14 }, progress: 14, length: 362 }) } Health { hit_points: 10 } moveSome((CellPos { x: 9, y: 8 }, 8, Following)"
+          ]
+        }
+      ]
+    },
+    {
+      "tick": 64000,
+      "players": [
+        {
+          "id": 0,
+          "credits": 3,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "61120",
+          "next_wave": "63987",
+          "last_stand": "false, next_wave: 63987",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(27) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 14, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(142) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 13, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(164) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 12, y: 5 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(179) Owner(PlayerId(0)) gi Mobile { speed: 13, cell: CellPos { x: 14, y: 16 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(35), secondary: Some(WeaponKind(36)), cooldown: 0, burst_left: 0, volley: Weapon"
+          ]
+        },
+        {
+          "id": 1,
+          "credits": 82,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "61281",
+          "next_wave": "64148",
+          "last_stand": "false, next_wave: 64148",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(180) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(181) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(182) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(184) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 39, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),"
+          ]
+        }
+      ]
+    },
+    {
+      "tick": 65000,
+      "players": [
+        {
+          "id": 0,
+          "credits": 1,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "65800",
+          "next_wave": "68667",
+          "last_stand": "false, next_wave: 68667",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(27) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 14, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(142) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 13, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(164) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 12, y: 5 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(185) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 11, y: 14 }, step: Some(Step { to: CellPos { x: 12, y: 15 }, progress: 58, length: 362 }) } Health { hit_points: 125 } moveSome((CellPos { x: 15, y: 18 }, 3, Following)) Som"
+          ]
+        },
+        {
+          "id": 1,
+          "credits": 82,
+          "queues": "[]",
+          "wave": "{SimId(180), SimId(181), SimId(182), SimId(184)}, target: Some(Building(SimId(0)))",
+          "target": "Some(Building(SimId(0)))",
+          "patience_until": "65961",
+          "next_wave": "68828",
+          "last_stand": "false, next_wave: 68828",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(184) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 18, y: 20 }, step: Some(Step { to: CellPos { x: 17, y: 20 }, progress: 201, length: 256 }) } Health { hit_points: 125 } moveSome((CellPos { x: 13, y: 20 }, 4, Followi",
+            "unit SimId(180) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 16, y: 18 }, step: Some(Step { to: CellPos { x: 15, y: 18 }, progress: 201, length: 256 }) } Health { hit_points: 125 } moveSome((CellPos { x: 14, y: 18 }, 1, Followi",
+            "unit SimId(181) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 16, y: 18 }, step: Some(Step { to: CellPos { x: 15, y: 18 }, progress: 201, length: 256 }) } Health { hit_points: 125 } moveSome((CellPos { x: 14, y: 18 }, 1, Followi",
+            "unit SimId(182) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 16, y: 18 }, step: Some(Step { to: CellPos { x: 15, y: 18 }, progress: 201, length: 256 }) } Health { hit_points: 34 } moveSome((CellPos { x: 14, y: 18 }, 1, Followin"
+          ]
+        }
+      ]
+    },
+    {
+      "tick": 66000,
+      "players": [
+        {
+          "id": 0,
+          "credits": 1389,
+          "queues": "[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 59, charged: 59, fraction: 500 }]), (QueueKey { producer: BuildingKind(10), lane: Main }, [QueueItem { item: Unit(UnitKind(30)), progress: 59, charged: 59, fraction: 500 }])]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "65800",
+          "next_wave": "68667",
+          "last_stand": "false, next_wave: 68667",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(27) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 14, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(142) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 13, y: 15 }, step: None } Health { hit_points: 936 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(164) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 12, y: 5 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(189) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 9, y: 12 }, step: None } Health { hit_points: 81 } moveNone Some(Weapon { kind: WeaponKind(35), secondary: Some(WeaponKind(36)), cooldown: 10, burst_left: 0, volley: WeaponK",
+            "unit SimId(190) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 9, y: 12 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(35), secondary: Some(WeaponKind(36)), cooldown: 3, burst_left: 0, volley: WeaponK",
+            "unit SimId(191) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 9, y: 12 }, step: None } Health { hit_points: 59 } moveNone Some(Weapon { kind: WeaponKind(35), secondary: Some(WeaponKind(36)), cooldown: 28, burst_left: 0, volley: WeaponK"
+          ]
+        },
+        {
+          "id": 1,
+          "credits": 82,
+          "queues": "[]",
+          "wave": "{SimId(181), SimId(182), SimId(184)}, target: Some(Waypoint(0))",
+          "target": "Some(Waypoint(0))",
+          "patience_until": "65961",
+          "next_wave": "68828",
+          "last_stand": "false, next_wave: 68828",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(184) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 12, y: 18 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 13, burst_left: 0, volley: WeaponKind(14)",
+            "unit SimId(182) Owner(PlayerId(1)) conscript Mobile { speed: 13, cell: CellPos { x: 10, y: 15 }, step: None } Health { hit_points: 41 } moveNone Some(Weapon { kind: WeaponKind(15), secondary: None, cooldown: 11, burst_left: 0, volley: WeaponKind(15),",
+            "unit SimId(181) Owner(PlayerId(1)) conscript Mobile { speed: 13, cell: CellPos { x: 10, y: 15 }, step: None } Health { hit_points: 19 } moveNone Some(Weapon { kind: WeaponKind(15), secondary: None, cooldown: 12, burst_left: 0, volley: WeaponKind(15),"
+          ]
+        }
+      ]
+    },
+    {
+      "tick": 67000,
+      "players": [
+        {
+          "id": 0,
+          "credits": 748,
+          "queues": "[(QueueKey { producer: BuildingKind(10), lane: Main }, [QueueItem { item: Unit(UnitKind(30)), progress: 559, charged: 559, fraction: 500 }])]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "65800",
+          "next_wave": "68667",
+          "last_stand": "false, next_wave: 68667",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(27) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 14, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(142) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 13, y: 15 }, step: None } Health { hit_points: 974 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(164) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 12, y: 5 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(192) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 15, y: 15 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(35), secondary: Some(WeaponKind(36)), cooldown: 0, burst_left: 0, volley: Weapon",
+            "unit SimId(189) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 15, y: 15 }, step: None } Health { hit_points: 14 } moveNone Some(Weapon { kind: WeaponKind(35), secondary: Some(WeaponKind(36)), cooldown: 0, burst_left: 0, volley: WeaponK",
+            "unit SimId(190) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 15, y: 15 }, step: None } Health { hit_points: 81 } moveNone Some(Weapon { kind: WeaponKind(35), secondary: Some(WeaponKind(36)), cooldown: 0, burst_left: 0, volley: WeaponK"
+          ]
+        },
+        {
+          "id": 1,
+          "credits": 82,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "65961",
+          "next_wave": "68828",
+          "last_stand": "false, next_wave: 68828",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(193) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(194) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(195) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(196) Owner(PlayerId(1)) attack_dog Mobile { speed: 23, cell: CellPos { x: 25, y: 23 }, step: Some(Step { to: CellPos { x: 24, y: 22 }, progress: 150, length: 362 }) } Health { hit_points: 100 } moveSome((CellPos { x: 9, y: 9 }, 15, Followi"
+          ]
+        }
+      ]
+    },
+    {
+      "tick": 68000,
+      "players": [
+        {
+          "id": 0,
+          "credits": 107,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "65800",
+          "next_wave": "68667",
+          "last_stand": "false, next_wave: 68667",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(27) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 14, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(142) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 13, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(164) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 12, y: 5 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(192) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 15, y: 15 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(35), secondary: Some(WeaponKind(36)), cooldown: 0, burst_left: 0, volley: Weapon",
+            "unit SimId(189) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 15, y: 15 }, step: None } Health { hit_points: 14 } moveNone Some(Weapon { kind: WeaponKind(35), secondary: Some(WeaponKind(36)), cooldown: 0, burst_left: 0, volley: WeaponK",
+            "unit SimId(190) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 15, y: 15 }, step: None } Health { hit_points: 81 } moveNone Some(Weapon { kind: WeaponKind(35), secondary: Some(WeaponKind(36)), cooldown: 0, burst_left: 0, volley: WeaponK",
+            "unit SimId(197) Owner(PlayerId(0)) harrier Mobile { speed: 26, cell: CellPos { x: 13, y: 14 }, step: Some(Step { to: CellPos { x: 14, y: 15 }, progress: 170, length: 362 }) } Health { hit_points: 150 } moveSome((CellPos { x: 15, y: 15 }, 1, Following"
+          ]
+        },
+        {
+          "id": 1,
+          "credits": 82,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "65961",
+          "next_wave": "68828",
+          "last_stand": "false, next_wave: 68828",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(193) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(194) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(195) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),"
+          ]
+        }
+      ]
+    },
+    {
+      "tick": 69000,
+      "players": [
+        {
+          "id": 0,
+          "credits": 107,
+          "queues": "[]",
+          "wave": "{SimId(189), SimId(190), SimId(192), SimId(197)}, target: Some(Building(SimId(131)))",
+          "target": "Some(Building(SimId(131)))",
+          "patience_until": "70480",
+          "next_wave": "73347",
+          "last_stand": "false, next_wave: 73347",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(27) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 14, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(142) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 13, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(164) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 12, y: 5 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(192) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 23, y: 25 }, step: Some(Step { to: CellPos { x: 24, y: 26 }, progress: 90, length: 362 }) } Health { hit_points: 125 } moveSome((CellPos { x: 36, y: 38 }, 12, Following)) So",
+            "unit SimId(189) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 23, y: 25 }, step: Some(Step { to: CellPos { x: 24, y: 26 }, progress: 90, length: 362 }) } Health { hit_points: 14 } moveSome((CellPos { x: 36, y: 38 }, 12, Following)) Som",
+            "unit SimId(190) Owner(PlayerId(0)) gi Mobile { speed: 11, cell: CellPos { x: 23, y: 25 }, step: Some(Step { to: CellPos { x: 24, y: 26 }, progress: 90, length: 362 }) } Health { hit_points: 81 } moveSome((CellPos { x: 36, y: 38 }, 12, Following)) Som",
+            "unit SimId(197) Owner(PlayerId(0)) harrier Mobile { speed: 26, cell: CellPos { x: 34, y: 35 }, step: Some(Step { to: CellPos { x: 35, y: 36 }, progress: 192, length: 362 }) } Health { hit_points: 150 } moveSome((CellPos { x: 35, y: 36 }, 0, Following"
+          ]
+        },
+        {
+          "id": 1,
+          "credits": 82,
+          "queues": "[]",
+          "wave": "{SimId(193), SimId(194), SimId(195)}, target: Some(Waypoint(0))",
+          "target": "Some(Waypoint(0))",
+          "patience_until": "70641",
+          "next_wave": "73508",
+          "last_stand": "false, next_wave: 73508",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(193) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 35, y: 33 }, step: Some(Step { to: CellPos { x: 34, y: 32 }, progress: 140, length: 362 }) } Health { hit_points: 125 } moveSome((CellPos { x: 9, y: 9 }, 25, Followin",
+            "unit SimId(194) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 35, y: 33 }, step: Some(Step { to: CellPos { x: 34, y: 32 }, progress: 140, length: 362 }) } Health { hit_points: 125 } moveSome((CellPos { x: 9, y: 9 }, 25, Followin",
+            "unit SimId(195) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 35, y: 33 }, step: Some(Step { to: CellPos { x: 34, y: 32 }, progress: 140, length: 362 }) } Health { hit_points: 125 } moveSome((CellPos { x: 9, y: 9 }, 25, Followin"
+          ]
+        }
+      ]
+    },
+    {
+      "tick": 70000,
+      "players": [
+        {
+          "id": 0,
+          "credits": 107,
+          "queues": "[]",
+          "wave": "{SimId(197)}, target: Some(Building(SimId(3221227971)))",
+          "target": "Some(Building(SimId(3221227971)))",
+          "patience_until": "70480",
+          "next_wave": "73347",
+          "last_stand": "false, next_wave: 73347",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(27) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 14, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(142) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 13, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(164) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 12, y: 5 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(197) Owner(PlayerId(0)) harrier Mobile { speed: 26, cell: CellPos { x: 14, y: 15 }, step: Some(Step { to: CellPos { x: 15, y: 16 }, progress: 126, length: 362 }) } Health { hit_points: 150 } moveSome((CellPos { x: 33, y: 38 }, 22, Followin"
+          ]
+        },
+        {
+          "id": 1,
+          "credits": 170,
+          "queues": "[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(3)), progress: 74, charged: 74, fraction: 0 }])]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "70641",
+          "next_wave": "73508",
+          "last_stand": "false, next_wave: 73508",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(198) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 39 }, step: Some(Step { to: CellPos { x: 38, y: 38 }, progress: 246, length: 256 }) } Health { hit_points: 125 } moveSome((CellPos { x: 38, y: 38 }, 0, Followi",
+            "unit SimId(199) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 39 }, step: Some(Step { to: CellPos { x: 38, y: 38 }, progress: 246, length: 256 }) } Health { hit_points: 125 } moveSome((CellPos { x: 38, y: 38 }, 0, Followi",
+            "unit SimId(200) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 39 }, step: Some(Step { to: CellPos { x: 38, y: 38 }, progress: 246, length: 256 }) } Health { hit_points: 125 } moveSome((CellPos { x: 38, y: 38 }, 0, Followi",
+            "unit SimId(201) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 39, y: 39 }, step: None } Health { hit_points: 125 } moveSome((CellPos { x: 38, y: 37 }, 2, Following)) Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown:",
+            "unit SimId(202) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 45, y: 41 }, step: Some(Step { to: CellPos { x: 44, y: 40 }, progress: 101, length: 362 }) } Health { hit_points: 125 } moveSome((CellPos { x: 38, y: 38 }, 6, Followi"
+          ]
+        }
+      ]
+    },
+    {
+      "tick": 71000,
+      "players": [
+        {
+          "id": 0,
+          "credits": 107,
+          "queues": "[]",
+          "wave": "{SimId(197)}, target: Some(Building(SimId(41)))",
+          "target": "Some(Building(SimId(41)))",
+          "patience_until": "70480",
+          "next_wave": "73347",
+          "last_stand": "false, next_wave: 73347",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(27) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 14, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(142) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 13, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(164) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 12, y: 5 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(197) Owner(PlayerId(0)) harrier Mobile { speed: 26, cell: CellPos { x: 3, y: 4 }, step: None } Health { hit_points: 150 } moveNone Some(Weapon { kind: WeaponKind(46), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(46), tar"
+          ]
+        },
+        {
+          "id": 1,
+          "credits": 44,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "70641",
+          "next_wave": "73508",
+          "last_stand": "false, next_wave: 73508",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(198) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(199) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(200) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(201) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 37 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(202) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 39, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(15) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 37 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14), ",
+            "unit SimId(16) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 37 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14), ",
+            "unit SimId(17) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 39, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14), "
+          ]
+        }
+      ]
+    },
+    {
+      "tick": 72000,
+      "players": [
+        {
+          "id": 0,
+          "credits": 107,
+          "queues": "[]",
+          "wave": "{SimId(197)}, target: Some(Building(SimId(43)))",
+          "target": "Some(Building(SimId(43)))",
+          "patience_until": "70480",
+          "next_wave": "73347",
+          "last_stand": "false, next_wave: 73347",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(27) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 14, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(142) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 13, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(164) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 12, y: 5 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(197) Owner(PlayerId(0)) harrier Mobile { speed: 26, cell: CellPos { x: 19, y: 20 }, step: Some(Step { to: CellPos { x: 18, y: 19 }, progress: 306, length: 362 }) } Health { hit_points: 150 } moveSome((CellPos { x: 3, y: 4 }, 15, Following)"
+          ]
+        },
+        {
+          "id": 1,
+          "credits": 10,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "70641",
+          "next_wave": "73508",
+          "last_stand": "false, next_wave: 73508",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(198) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(199) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(200) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(201) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 37 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(202) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 39, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(15) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 37 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14), ",
+            "unit SimId(16) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 37 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14), ",
+            "unit SimId(17) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 39, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14), "
+          ]
+        }
+      ]
+    },
+    {
+      "tick": 72000,
+      "players": [
+        {
+          "id": 0,
+          "credits": 107,
+          "queues": "[]",
+          "wave": "{SimId(197)}, target: Some(Building(SimId(43)))",
+          "target": "Some(Building(SimId(43)))",
+          "patience_until": "70480",
+          "next_wave": "73347",
+          "last_stand": "false, next_wave: 73347",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(27) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 14, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(142) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 13, y: 15 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(164) Owner(PlayerId(0)) chrono_miner Mobile { speed: 8, cell: CellPos { x: 12, y: 5 }, step: None } Health { hit_points: 1000 } moveNone None Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })",
+            "unit SimId(197) Owner(PlayerId(0)) harrier Mobile { speed: 26, cell: CellPos { x: 19, y: 20 }, step: Some(Step { to: CellPos { x: 18, y: 19 }, progress: 306, length: 362 }) } Health { hit_points: 150 } moveSome((CellPos { x: 3, y: 4 }, 15, Following)"
+          ]
+        },
+        {
+          "id": 1,
+          "credits": 10,
+          "queues": "[]",
+          "wave": "{}, target: None",
+          "target": "None",
+          "patience_until": "70641",
+          "next_wave": "73508",
+          "last_stand": "false, next_wave: 73508",
+          "liquidating": "false",
+          "units": [
+            "unit SimId(198) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(199) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(200) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(201) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 37 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(202) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 39, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14),",
+            "unit SimId(15) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 37 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14), ",
+            "unit SimId(16) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 37 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14), ",
+            "unit SimId(17) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 39, y: 38 }, step: None } Health { hit_points: 125 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14), "
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,20 +1,22 @@
 # RA8 acceptance record
 
-Status: checkpoint14 completes the reordered cheap scoped checks:12 validation commands
-exit0,149 Rust passes/0failed/0ignored across7 native target invocations. Exact Crossroads
-Russia/AmericaEasy now yields AmericaP1Won67958/72000; all10 default Demo matches and all3
-grown-map tests pass (ten-player CrossroadsP1Won51137). R175/R176's stopped armed-worker
-financing/admission and R178's healthy AttackMove ownership have native causal negatives,
-positive controls and separately verified restorations. R177's composition/service trial
-is rejected and fully restored. The sole final text-only change is independently bound
-R177→R176 in a doc comment; fmt and strict Clippy pass on that final text. This is scoped
-validation, not full acceptance. Attempt13's interrupted full gate is preserved, with
-phases05–13 unrun and its production table stale. Clean source/evidence commits and explicit
-coordinator full13 release remain pending. One complete unchanged all0 full13 and both
-fresh756 distributions are required; only after that success will the isolated all21,
-three fixed256 budgets and three example guards run on the same source before closure.
-RA9, independent review and user quality verification remain pending. Historical metrics
-are not transferred to the new runtime.
+Status: checkpoint15 completes the current targeted checks:12 commands exit0,
+160 Rust passes/0failed/0ignored across9 native target invocations. Final Crossroads
+Russia/AmericaEasy is P0Won61986, reverse America/RussiaEasy P0Won41738, and Riverlands
+France/GermanyEasy P0Won33776, all seed0 under the unchanged72000 bound. All10 default
+Demo matches and all3 grown-map tests pass; ten-player grown Crossroads is P1Won45321.
+R179's garrison-retention trial is rejected. R180/R182–R185 retain scoped ordinary combat
+and financing improvements with native causal failures, positives and separately verified
+restorations; compatibility failures and exact named setup migrations remain recorded.
+R181 changes only M6 non-Won reporting timing, preserving all756 jobs, bounds, rejection/I6
+checks and the universal-winner assertion before TSV publication. Attempt14's interrupted
+full gate preserves TWO observed failures and does not establish756 completed outcomes;
+commands05–13 are unrun and its production TSV is stale. Source/evidence staging, separate
+unfiltered checks/classification, clean commits and explicit coordinator full13 release
+remain pending. Full acceptance still needs one complete unchanged all0 full13, both fresh
+756 distributions, then same-source isolated all21/fixed256/three example guards. RA9,
+independent review and user quality verification remain pending; no historical performance
+or winning claim transfers to the new runtime.
 
 ## Acceptance checklist
 
@@ -41,7 +43,7 @@ are not transferred to the new runtime.
 
 ## Policy and evidence
 
-R88–R178 in `docs/DECISIONS.md` record the implementation, exact existing-test migrations,
+R88–R185 in `docs/DECISIONS.md` record the implementation, exact existing-test migrations,
 game-owned AI assumptions, failure diagnoses, negative mutation and process deviations.
 R172 records the user's two-batch scheduling authorization for all five independent review
 slices and a fresh lead;review coverage and independence remain required.
@@ -58,6 +60,54 @@ No clone, worktree or validation environment was created. Configured Cargo/UV/PI
 preserved. New recreatable parser scratch is at configured Cargo target `tmp/ra8_definitions`
 (716 KiB measured after the slow-speed parser fixture;58 files/584038 file bytes), retained for reruns and unnecessary for release.
 Earlier RA5 render and RA7 parser evidence remain.
+
+## Fifteenth checkpoint: current targeted checks pass; complete full13 still pending
+
+[Checkpoint15](ra8-preflight/checkpoint15.json) binds344runtime+169additional paths with
+18overlap (495unique), static1124→1385(+261), zero removed/renamed/ignored, and all12 final4
+command receipts. Its [metrics](ra8-preflight/checkpoint15-metrics.json) separate160 actual
+Rust passes from10 match outcomes inside one Demo test and41 retained tests/40 distinct
+configurations. The full retained target next executes in the mandatory workspace gate;
+no redundant standalone41-case sweep is claimed. Current Demo Russia/LibyaEasy is62722/72000;
+the old fragile70234 and earlier results remain historical. Current grown ending is45321
+with45322 executed steps and9defeated. Final4 command sum203.532759s, wrapper monotonic
+204.128894s; all495 source hashes remain unchanged through every command.
+
+R180/R183 stationary counterfire selects an observed armed defender instead of a nearer
+unarmed worker/economic building; a healthy armed-building engagement and unrelated distant
+chase retain their own controls. R185 adds assistance from the SAME building-mission rear
+before that rear's own incoming contact, preserving the original R166 front response and
+healthy unrelated approaches. Its normal/base source weapon envelope is not an elite or
+specialist-hazard oracle. Baseline already eventually returned fire; earlier assistance is
+the proven property, and current whole-ending credit belongs to the combined source.
+
+R182/R184 finance ordinary reinforcements for a living depleted ground cohort through actual
+native optional sales. Only with empty queue lanes, exact full financing and retained legal
+source-reachable finishing production may a previously protected idle producer consolidate.
+Actual Air actors and any strategic-source capability conservatively retain their complete
+service/power paths outside the NEW investment scope. All older legacy/worker-only recovery,
+real income, known ore, paid heads, source timings and public commands remain. Named full-
+cohort and later-Refinery setup migrations are explicit; original meaningful assertions stay.
+The ground-only support control observes natural charge, actual native Chronoshift and
+retained Reactor power; bypassing protection fails a real sale assertion.
+
+The failed121/9 AI prefix, corrected130/0 compatibility run, source/observer premise failures,
+final131/0 AI run and strict Clippy identity-conversion failure are all preserved. No failed
+prefix is counted as a pass. The [corrections index](ra8-preflight/checkpoint15-corrections-evidence-index.json)
+binds81 metadata records/94 unique raw logs as provenance, not81 passes. The [attempt14 preservation](ra8-preflight/checkpoint15-attempt14-preservation.json)
+rechecks38 files/157388bytes per set across76 copies with zero mismatches. Configured render/
+parser scratch is remeasured and retained; no substantial new external directory is created.
+
+Clean source/evidence commits must follow separate unfiltered staged checks. Preserved native
+raw whitespace will be classified truthfully if nonzero; it will not be normalized or labeled
+passed. Only coordinator release starts the next exact13-command script. Its ONE required
+M6 sweep now collects all bounded non-Won outcomes before the unchanged all-winner failure,
+so it must finish all756 returned jobs rather than abort at the first stall. Fresh R29 tables
+publish only after all756Won. Both sweeps and postgate isolated acceptance remain unexecuted
+on this candidate. R172 review coverage, all inherited RA9 debts and quality verification remain.
+
+
+Checkpoint15 evidence hygiene: first unfiltered stagedcheck exits2, NOTpassed. All42 exact diagnostics across41rawpaths are35native-log blankEOFs and7raw-patch-context trailing spaces. Every file/line/EOL/stagedblob SHA matches;zero source/data/test/prose errors. First stdout7737c0dc… is captured directly as JSON-escaped text. No raw bytes normalized; separate identical final check and a later deliberate evidence commit remain required.
 
 ## Fourteenth checkpoint: affected checks green, complete full13 pending
 

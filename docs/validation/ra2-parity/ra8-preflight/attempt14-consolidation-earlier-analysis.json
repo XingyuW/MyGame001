@@ -1,0 +1,3930 @@
+{
+  "source_log": "docs/validation/ra2-parity/ra8-preflight/attempt14-consolidation-crossroads-russia-america-native-after1.log",
+  "source_log_sha256": "417bad7fa88c024af278cf2cfb411ce07a6e62ef2110b2614f5c621c146ace2d",
+  "snapshots": [
+    {
+      "tick": 42000,
+      "players": {
+        "0": {
+          "credits": 69,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "40520",
+          "next_wave": "43387",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              143,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              142,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              141,
+              "tesla_trooper",
+              15,
+              15,
+              130
+            ],
+            [
+              25,
+              "war_miner",
+              28,
+              26,
+              1000
+            ]
+          ]
+        },
+        "1": {
+          "credits": 0,
+          "queues": "[(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(4)), progress: 45, charged: 45, fraction: 0 }]), (QueueKey { producer: BuildingKind(0), lane: Defences }, [QueueItem { item: Building(BuildingKind(23)), progress: 40, charged: 40, fraction: 0 }]), (QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(7)), progress: 201, charged: 201, fraction: 0 }, QueueItem { item: Unit(UnitKind(6)), progress: 0, charged: 0, fraction: 0 }, QueueItem { item: Unit(UnitKind(3)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(25)), progress: 200, charged: 200, fraction: 0 }, QueueItem { item: Unit(UnitKind(25)), progress: 0, charged: 0, fraction: 0 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "42121",
+          "next_wave": "44988",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              28,
+              32,
+              968
+            ],
+            [
+              148,
+              "chrono_miner",
+              32,
+              28,
+              990
+            ],
+            [
+              149,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              146,
+              "ifv",
+              42,
+              40,
+              200
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 43000,
+      "players": {
+        "0": {
+          "credits": 69,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "40520",
+          "next_wave": "43387",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              143,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              142,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              141,
+              "tesla_trooper",
+              15,
+              15,
+              130
+            ],
+            [
+              25,
+              "war_miner",
+              28,
+              26,
+              1000
+            ]
+          ]
+        },
+        "1": {
+          "credits": 0,
+          "queues": "[(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(34)), progress: 109, charged: 109, fraction: 0 }]), (QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 61, charged: 61, fraction: 0 }, QueueItem { item: Unit(UnitKind(7)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(15)), progress: 108, charged: 108, fraction: 0 }, QueueItem { item: Unit(UnitKind(25)), progress: 0, charged: 0, fraction: 0 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "42121",
+          "next_wave": "44988",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              38,
+              40,
+              967
+            ],
+            [
+              148,
+              "chrono_miner",
+              29,
+              31,
+              995
+            ],
+            [
+              149,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              146,
+              "ifv",
+              42,
+              40,
+              200
+            ],
+            [
+              150,
+              "attack_dog",
+              38,
+              38,
+              100
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 44000,
+      "players": {
+        "0": {
+          "credits": 69,
+          "queues": "[]",
+          "wave": "{SimId(141), SimId(142), SimId(143)}",
+          "target": "Some(Building(SimId(63)))",
+          "patience_until": "45200",
+          "next_wave": "48067",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              143,
+              "conscript",
+              33,
+              31,
+              125
+            ],
+            [
+              142,
+              "conscript",
+              33,
+              31,
+              125
+            ],
+            [
+              141,
+              "tesla_trooper",
+              33,
+              31,
+              130
+            ],
+            [
+              25,
+              "war_miner",
+              28,
+              26,
+              1000
+            ]
+          ]
+        },
+        "1": {
+          "credits": 0,
+          "queues": "[(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(34)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 116, charged: 116, fraction: 0 }, QueueItem { item: Unit(UnitKind(7)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(15)), progress: 162, charged: 162, fraction: 0 }, QueueItem { item: Unit(UnitKind(25)), progress: 0, charged: 0, fraction: 0 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "42121",
+          "next_wave": "44988",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              33,
+              36,
+              971
+            ],
+            [
+              148,
+              "chrono_miner",
+              30,
+              32,
+              1000
+            ],
+            [
+              149,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              146,
+              "ifv",
+              42,
+              40,
+              200
+            ],
+            [
+              150,
+              "attack_dog",
+              38,
+              38,
+              100
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 45000,
+      "players": {
+        "0": {
+          "credits": 69,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "45200",
+          "next_wave": "48067",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              25,
+              "war_miner",
+              19,
+              17,
+              1000
+            ]
+          ]
+        },
+        "1": {
+          "credits": 446,
+          "queues": "[(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(34)), progress: 17, charged: 17, fraction: 0 }]), (QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 133, charged: 133, fraction: 0 }, QueueItem { item: Unit(UnitKind(7)), progress: 0, charged: 0, fraction: 0 }, QueueItem { item: Unit(UnitKind(3)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(15)), progress: 179, charged: 179, fraction: 0 }, QueueItem { item: Unit(UnitKind(25)), progress: 0, charged: 0, fraction: 0 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "42121",
+          "next_wave": "44988",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              29,
+              31,
+              1000
+            ],
+            [
+              146,
+              "ifv",
+              40,
+              40,
+              160
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 46000,
+      "players": {
+        "0": {
+          "credits": 69,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "45200",
+          "next_wave": "48067",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              25,
+              "war_miner",
+              15,
+              16,
+              1000
+            ]
+          ]
+        },
+        "1": {
+          "credits": 248,
+          "queues": "[(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(34)), progress: 401, charged: 401, fraction: 0 }]), (QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(7)), progress: 349, charged: 349, fraction: 0 }, QueueItem { item: Unit(UnitKind(3)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(15)), progress: 562, charged: 562, fraction: 0 }, QueueItem { item: Unit(UnitKind(25)), progress: 0, charged: 0, fraction: 0 }])]",
+          "wave": "{SimId(151)}",
+          "target": "Some(Building(SimId(0)))",
+          "patience_until": "46841",
+          "next_wave": "49708",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              41,
+              30,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              30,
+              28,
+              1000
+            ],
+            [
+              146,
+              "ifv",
+              40,
+              39,
+              200
+            ],
+            [
+              151,
+              "gi",
+              17,
+              19,
+              35
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 47000,
+      "players": {
+        "0": {
+          "credits": 68,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "45200",
+          "next_wave": "48067",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              25,
+              "war_miner",
+              15,
+              16,
+              1000
+            ]
+          ]
+        },
+        "1": {
+          "credits": 242,
+          "queues": "[(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(34)), progress: 737, charged: 737, fraction: 0 }]), (QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(7)), progress: 685, charged: 685, fraction: 0 }, QueueItem { item: Unit(UnitKind(3)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(15)), progress: 896, charged: 896, fraction: 0 }, QueueItem { item: Unit(UnitKind(25)), progress: 0, charged: 0, fraction: 0 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "46841",
+          "next_wave": "49708",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              41,
+              30,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              29,
+              28,
+              1000
+            ],
+            [
+              146,
+              "ifv",
+              40,
+              39,
+              200
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 48000,
+      "players": {
+        "0": {
+          "credits": 68,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "45200",
+          "next_wave": "48067",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              25,
+              "war_miner",
+              15,
+              16,
+              1000
+            ]
+          ]
+        },
+        "1": {
+          "credits": 456,
+          "queues": "[(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(4)), progress: 50, charged: 50, fraction: 0 }]), (QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(7)), progress: 897, charged: 897, fraction: 0 }, QueueItem { item: Unit(UnitKind(3)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(15)), progress: 1108, charged: 1108, fraction: 0 }, QueueItem { item: Unit(UnitKind(25)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(10), lane: Main }, [QueueItem { item: Unit(UnitKind(30)), progress: 49, charged: 49, fraction: 0 }, QueueItem { item: Unit(UnitKind(30)), progress: 0, charged: 0, fraction: 0 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "46841",
+          "next_wave": "49708",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              27,
+              26,
+              1000
+            ],
+            [
+              146,
+              "ifv",
+              40,
+              39,
+              200
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 49000,
+      "players": {
+        "0": {
+          "credits": 68,
+          "queues": "[]",
+          "wave": "{SimId(25)}",
+          "target": "Some(Building(SimId(63)))",
+          "patience_until": "49880",
+          "next_wave": "52747",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              25,
+              "war_miner",
+              33,
+              35,
+              972
+            ]
+          ]
+        },
+        "1": {
+          "credits": 764,
+          "queues": "[(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(4)), progress: 292, charged: 292, fraction: 0 }]), (QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(7)), progress: 1139, charged: 1139, fraction: 0 }, QueueItem { item: Unit(UnitKind(3)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(25)), progress: 174, charged: 174, fraction: 0 }, QueueItem { item: Unit(UnitKind(24)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(10), lane: Main }, [QueueItem { item: Unit(UnitKind(30)), progress: 291, charged: 291, fraction: 0 }, QueueItem { item: Unit(UnitKind(30)), progress: 0, charged: 0, fraction: 0 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "46841",
+          "next_wave": "49708",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              41,
+              30,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              41,
+              31,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              25,
+              30,
+              1000
+            ],
+            [
+              146,
+              "ifv",
+              36,
+              38,
+              155
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 50000,
+      "players": {
+        "0": {
+          "credits": 18,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "49880",
+          "next_wave": "52747",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              155,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              157,
+              "flak_track",
+              15,
+              14,
+              180
+            ],
+            [
+              156,
+              "attack_dog",
+              15,
+              15,
+              100
+            ],
+            [
+              25,
+              "war_miner",
+              33,
+              35,
+              993
+            ]
+          ]
+        },
+        "1": {
+          "credits": 0,
+          "queues": "[(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(4)), progress: 703, charged: 703, fraction: 0 }]), (QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 122, charged: 122, fraction: 0 }, QueueItem { item: Unit(UnitKind(7)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(25)), progress: 585, charged: 585, fraction: 0 }, QueueItem { item: Unit(UnitKind(24)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(10), lane: Main }, [QueueItem { item: Unit(UnitKind(30)), progress: 700, charged: 700, fraction: 0 }, QueueItem { item: Unit(UnitKind(30)), progress: 0, charged: 0, fraction: 0 }])]",
+          "wave": "{SimId(158)}",
+          "target": "Some(Building(SimId(0)))",
+          "patience_until": "51601",
+          "next_wave": "54468",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              27,
+              27,
+              1000
+            ],
+            [
+              146,
+              "ifv",
+              36,
+              38,
+              50
+            ],
+            [
+              154,
+              "chrono_legionnaire",
+              37,
+              35,
+              125
+            ],
+            [
+              158,
+              "attack_dog",
+              33,
+              31,
+              100
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 51000,
+      "players": {
+        "0": {
+          "credits": 147,
+          "queues": "[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(0)), progress: 71, charged: 71, fraction: 0 }, QueueItem { item: Unit(UnitKind(0)), progress: 0, charged: 0, fraction: 0 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "49880",
+          "next_wave": "52747",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              155,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              157,
+              "flak_track",
+              15,
+              14,
+              180
+            ],
+            [
+              161,
+              "flak_track",
+              14,
+              15,
+              180
+            ],
+            [
+              162,
+              "conscript",
+              9,
+              15,
+              125
+            ],
+            [
+              163,
+              "conscript",
+              9,
+              15,
+              125
+            ],
+            [
+              165,
+              "conscript",
+              13,
+              15,
+              125
+            ],
+            [
+              166,
+              "conscript",
+              10,
+              13,
+              125
+            ],
+            [
+              156,
+              "attack_dog",
+              16,
+              15,
+              100
+            ]
+          ]
+        },
+        "1": {
+          "credits": 799,
+          "queues": "[(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(1)), progress: 478, charged: 478, fraction: 0 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(24)), progress: 518, charged: 518, fraction: 0 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "51601",
+          "next_wave": "54468",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              146,
+              "ifv",
+              38,
+              40,
+              66
+            ],
+            [
+              154,
+              "chrono_legionnaire",
+              37,
+              35,
+              125
+            ],
+            [
+              159,
+              "gi",
+              35,
+              38,
+              125
+            ],
+            [
+              164,
+              "gi",
+              41,
+              40,
+              125
+            ],
+            [
+              160,
+              "attack_dog",
+              38,
+              38,
+              100
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 52000,
+      "players": {
+        "0": {
+          "credits": 18,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "49880",
+          "next_wave": "52747",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              155,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              157,
+              "flak_track",
+              15,
+              14,
+              180
+            ],
+            [
+              161,
+              "flak_track",
+              14,
+              15,
+              180
+            ],
+            [
+              162,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              163,
+              "conscript",
+              15,
+              16,
+              125
+            ],
+            [
+              165,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              166,
+              "conscript",
+              15,
+              16,
+              125
+            ],
+            [
+              167,
+              "conscript",
+              15,
+              16,
+              125
+            ],
+            [
+              168,
+              "conscript",
+              16,
+              15,
+              125
+            ],
+            [
+              156,
+              "attack_dog",
+              16,
+              15,
+              100
+            ]
+          ]
+        },
+        "1": {
+          "credits": 0,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "51601",
+          "next_wave": "54468",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              146,
+              "ifv",
+              38,
+              39,
+              200
+            ],
+            [
+              154,
+              "chrono_legionnaire",
+              37,
+              35,
+              125
+            ],
+            [
+              159,
+              "gi",
+              35,
+              38,
+              125
+            ],
+            [
+              164,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              170,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              171,
+              "grizzly",
+              40,
+              40,
+              300
+            ],
+            [
+              160,
+              "attack_dog",
+              38,
+              38,
+              100
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 53000,
+      "players": {
+        "0": {
+          "credits": 18,
+          "queues": "[]",
+          "wave": "{SimId(155), SimId(156), SimId(157), SimId(161), SimId(162), SimId(163), SimId(165), SimId(166), SimId(167), SimId(168)}",
+          "target": "Some(Building(SimId(169)))",
+          "patience_until": "54560",
+          "next_wave": "57427",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              155,
+              "conscript",
+              22,
+              20,
+              125
+            ],
+            [
+              157,
+              "flak_track",
+              22,
+              19,
+              180
+            ],
+            [
+              161,
+              "flak_track",
+              19,
+              21,
+              180
+            ],
+            [
+              162,
+              "conscript",
+              22,
+              20,
+              125
+            ],
+            [
+              163,
+              "conscript",
+              21,
+              23,
+              125
+            ],
+            [
+              165,
+              "conscript",
+              21,
+              19,
+              125
+            ],
+            [
+              166,
+              "conscript",
+              21,
+              23,
+              125
+            ],
+            [
+              167,
+              "conscript",
+              21,
+              23,
+              125
+            ],
+            [
+              168,
+              "conscript",
+              23,
+              21,
+              125
+            ],
+            [
+              156,
+              "attack_dog",
+              31,
+              29,
+              100
+            ]
+          ]
+        },
+        "1": {
+          "credits": 0,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "51601",
+          "next_wave": "54468",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              146,
+              "ifv",
+              38,
+              39,
+              200
+            ],
+            [
+              154,
+              "chrono_legionnaire",
+              37,
+              35,
+              125
+            ],
+            [
+              159,
+              "gi",
+              35,
+              38,
+              125
+            ],
+            [
+              164,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              170,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              171,
+              "grizzly",
+              38,
+              37,
+              300
+            ],
+            [
+              160,
+              "attack_dog",
+              38,
+              38,
+              100
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 54000,
+      "players": {
+        "0": {
+          "credits": 239,
+          "queues": "[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(0)), progress: 79, charged: 79, fraction: 0 }, QueueItem { item: Unit(UnitKind(0)), progress: 0, charged: 0, fraction: 0 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "54560",
+          "next_wave": "57427",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              155,
+              "conscript",
+              32,
+              30,
+              72
+            ],
+            [
+              161,
+              "flak_track",
+              34,
+              30,
+              44
+            ],
+            [
+              172,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              176,
+              "conscript",
+              6,
+              7,
+              125
+            ],
+            [
+              174,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              173,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              175,
+              "conscript",
+              6,
+              7,
+              125
+            ],
+            [
+              178,
+              "attack_dog",
+              14,
+              15,
+              100
+            ]
+          ]
+        },
+        "1": {
+          "credits": 322,
+          "queues": "[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 78, charged: 78, fraction: 0 }, QueueItem { item: Unit(UnitKind(3)), progress: 0, charged: 0, fraction: 0 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "51601",
+          "next_wave": "54468",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              146,
+              "ifv",
+              36,
+              39,
+              4
+            ],
+            [
+              171,
+              "grizzly",
+              36,
+              33,
+              152
+            ],
+            [
+              177,
+              "gi",
+              42,
+              39,
+              125
+            ],
+            [
+              159,
+              "gi",
+              32,
+              34,
+              103
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 55000,
+      "players": {
+        "0": {
+          "credits": 18,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "54560",
+          "next_wave": "57427",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              182,
+              "conscript",
+              14,
+              14,
+              125
+            ],
+            [
+              172,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              176,
+              "conscript",
+              15,
+              14,
+              125
+            ],
+            [
+              174,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              173,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              175,
+              "conscript",
+              14,
+              15,
+              125
+            ],
+            [
+              179,
+              "conscript",
+              15,
+              14,
+              125
+            ],
+            [
+              180,
+              "conscript",
+              15,
+              14,
+              125
+            ],
+            [
+              178,
+              "attack_dog",
+              14,
+              15,
+              100
+            ]
+          ]
+        },
+        "1": {
+          "credits": 92,
+          "queues": "[]",
+          "wave": "{SimId(171), SimId(177), SimId(181), SimId(183), SimId(184)}",
+          "target": "Some(Building(SimId(0)))",
+          "patience_until": "56281",
+          "next_wave": "59148",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              146,
+              "ifv",
+              38,
+              39,
+              200
+            ],
+            [
+              171,
+              "grizzly",
+              25,
+              23,
+              100
+            ],
+            [
+              183,
+              "gi",
+              25,
+              31,
+              125
+            ],
+            [
+              177,
+              "gi",
+              24,
+              21,
+              125
+            ],
+            [
+              181,
+              "gi",
+              22,
+              24,
+              125
+            ],
+            [
+              185,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              184,
+              "attack_dog",
+              27,
+              25,
+              100
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 56000,
+      "players": {
+        "0": {
+          "credits": 11,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "54560",
+          "next_wave": "57427",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              179,
+              "conscript",
+              14,
+              16,
+              125
+            ],
+            [
+              180,
+              "conscript",
+              15,
+              16,
+              73
+            ],
+            [
+              182,
+              "conscript",
+              16,
+              15,
+              125
+            ],
+            [
+              172,
+              "conscript",
+              16,
+              17,
+              125
+            ],
+            [
+              176,
+              "conscript",
+              15,
+              16,
+              125
+            ],
+            [
+              174,
+              "conscript",
+              16,
+              17,
+              101
+            ],
+            [
+              173,
+              "conscript",
+              14,
+              16,
+              125
+            ],
+            [
+              175,
+              "conscript",
+              16,
+              17,
+              93
+            ]
+          ]
+        },
+        "1": {
+          "credits": 430,
+          "queues": "[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 23, charged: 23, fraction: 0 }, QueueItem { item: Unit(UnitKind(1)), progress: 0, charged: 0, fraction: 0 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "56281",
+          "next_wave": "59148",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              146,
+              "ifv",
+              38,
+              39,
+              200
+            ],
+            [
+              186,
+              "gi",
+              40,
+              38,
+              125
+            ],
+            [
+              185,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              187,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              188,
+              "gi",
+              39,
+              41,
+              125
+            ],
+            [
+              189,
+              "attack_dog",
+              45,
+              41,
+              100
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 57000,
+      "players": {
+        "0": {
+          "credits": 11,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "54560",
+          "next_wave": "57427",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              179,
+              "conscript",
+              14,
+              16,
+              125
+            ],
+            [
+              180,
+              "conscript",
+              15,
+              16,
+              73
+            ],
+            [
+              182,
+              "conscript",
+              16,
+              15,
+              125
+            ],
+            [
+              172,
+              "conscript",
+              16,
+              17,
+              125
+            ],
+            [
+              176,
+              "conscript",
+              15,
+              16,
+              125
+            ],
+            [
+              174,
+              "conscript",
+              16,
+              17,
+              101
+            ],
+            [
+              173,
+              "conscript",
+              14,
+              16,
+              125
+            ],
+            [
+              175,
+              "conscript",
+              16,
+              17,
+              93
+            ]
+          ]
+        },
+        "1": {
+          "credits": 53,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "56281",
+          "next_wave": "59148",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              146,
+              "ifv",
+              38,
+              39,
+              200
+            ],
+            [
+              186,
+              "gi",
+              40,
+              38,
+              125
+            ],
+            [
+              185,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              187,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              188,
+              "gi",
+              39,
+              41,
+              125
+            ],
+            [
+              190,
+              "gi",
+              38,
+              37,
+              125
+            ],
+            [
+              191,
+              "gi",
+              38,
+              37,
+              125
+            ],
+            [
+              189,
+              "attack_dog",
+              38,
+              38,
+              100
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 58000,
+      "players": {
+        "0": {
+          "credits": 11,
+          "queues": "[]",
+          "wave": "{SimId(172), SimId(173), SimId(174), SimId(175), SimId(176), SimId(179), SimId(180), SimId(182)}",
+          "target": "Some(Building(SimId(40)))",
+          "patience_until": "59240",
+          "next_wave": "62107",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              179,
+              "conscript",
+              30,
+              32,
+              125
+            ],
+            [
+              180,
+              "conscript",
+              28,
+              30,
+              73
+            ],
+            [
+              182,
+              "conscript",
+              36,
+              34,
+              110
+            ],
+            [
+              172,
+              "conscript",
+              32,
+              34,
+              125
+            ],
+            [
+              176,
+              "conscript",
+              30,
+              32,
+              125
+            ],
+            [
+              174,
+              "conscript",
+              32,
+              34,
+              101
+            ],
+            [
+              173,
+              "conscript",
+              30,
+              32,
+              125
+            ],
+            [
+              175,
+              "conscript",
+              32,
+              34,
+              93
+            ]
+          ]
+        },
+        "1": {
+          "credits": 53,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "56281",
+          "next_wave": "59148",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              146,
+              "ifv",
+              38,
+              39,
+              200
+            ],
+            [
+              186,
+              "gi",
+              40,
+              38,
+              125
+            ],
+            [
+              185,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              187,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              188,
+              "gi",
+              39,
+              41,
+              125
+            ],
+            [
+              190,
+              "gi",
+              38,
+              37,
+              125
+            ],
+            [
+              191,
+              "gi",
+              38,
+              37,
+              125
+            ],
+            [
+              189,
+              "attack_dog",
+              38,
+              38,
+              100
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 59000,
+      "players": {
+        "0": {
+          "credits": 61,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "59240",
+          "next_wave": "62107",
+          "liquidating": "true",
+          "last_stand": "false",
+          "units": [
+            [
+              194,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              192,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              193,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              196,
+              "conscript",
+              15,
+              14,
+              125
+            ],
+            [
+              197,
+              "conscript",
+              9,
+              12,
+              125
+            ],
+            [
+              195,
+              "attack_dog",
+              15,
+              14,
+              100
+            ]
+          ]
+        },
+        "1": {
+          "credits": 53,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "56281",
+          "next_wave": "59148",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              146,
+              "ifv",
+              38,
+              39,
+              200
+            ],
+            [
+              186,
+              "gi",
+              38,
+              36,
+              33
+            ],
+            [
+              188,
+              "gi",
+              37,
+              35,
+              125
+            ],
+            [
+              185,
+              "gi",
+              37,
+              39,
+              125
+            ],
+            [
+              191,
+              "gi",
+              37,
+              35,
+              125
+            ],
+            [
+              187,
+              "gi",
+              37,
+              35,
+              125
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 60000,
+      "players": {
+        "0": {
+          "credits": 11,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "59240",
+          "next_wave": "62107",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              199,
+              "conscript",
+              15,
+              16,
+              125
+            ],
+            [
+              194,
+              "conscript",
+              16,
+              15,
+              125
+            ],
+            [
+              198,
+              "conscript",
+              15,
+              16,
+              125
+            ],
+            [
+              192,
+              "conscript",
+              17,
+              15,
+              125
+            ],
+            [
+              197,
+              "conscript",
+              16,
+              15,
+              125
+            ],
+            [
+              196,
+              "conscript",
+              17,
+              15,
+              125
+            ],
+            [
+              195,
+              "attack_dog",
+              17,
+              18,
+              70
+            ]
+          ]
+        },
+        "1": {
+          "credits": 314,
+          "queues": "[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 39, charged: 39, fraction: 0 }])]",
+          "wave": "{SimId(146), SimId(186)}",
+          "target": "Some(Building(SimId(0)))",
+          "patience_until": "60961",
+          "next_wave": "63828",
+          "liquidating": "true",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              146,
+              "ifv",
+              15,
+              18,
+              88
+            ],
+            [
+              186,
+              "gi",
+              19,
+              17,
+              3
+            ],
+            [
+              202,
+              "gi",
+              38,
+              42,
+              125
+            ],
+            [
+              201,
+              "gi",
+              38,
+              42,
+              125
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 61000,
+      "players": {
+        "0": {
+          "credits": 61,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "59240",
+          "next_wave": "62107",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              196,
+              "conscript",
+              17,
+              15,
+              125
+            ],
+            [
+              199,
+              "conscript",
+              15,
+              16,
+              125
+            ],
+            [
+              194,
+              "conscript",
+              16,
+              15,
+              125
+            ],
+            [
+              198,
+              "conscript",
+              15,
+              16,
+              125
+            ],
+            [
+              192,
+              "conscript",
+              17,
+              15,
+              113
+            ],
+            [
+              197,
+              "conscript",
+              16,
+              15,
+              125
+            ],
+            [
+              203,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              207,
+              "conscript",
+              15,
+              15,
+              125
+            ]
+          ]
+        },
+        "1": {
+          "credits": 53,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "60961",
+          "next_wave": "63828",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              201,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              202,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              204,
+              "gi",
+              39,
+              38,
+              125
+            ],
+            [
+              205,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              206,
+              "gi",
+              38,
+              37,
+              125
+            ],
+            [
+              208,
+              "gi",
+              38,
+              37,
+              125
+            ],
+            [
+              209,
+              "attack_dog",
+              47,
+              43,
+              100
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 62000,
+      "players": {
+        "0": {
+          "credits": 61,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "59240",
+          "next_wave": "62107",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              196,
+              "conscript",
+              17,
+              15,
+              125
+            ],
+            [
+              199,
+              "conscript",
+              15,
+              16,
+              125
+            ],
+            [
+              194,
+              "conscript",
+              16,
+              15,
+              125
+            ],
+            [
+              198,
+              "conscript",
+              15,
+              16,
+              125
+            ],
+            [
+              192,
+              "conscript",
+              17,
+              15,
+              113
+            ],
+            [
+              197,
+              "conscript",
+              16,
+              15,
+              125
+            ],
+            [
+              203,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              207,
+              "conscript",
+              15,
+              15,
+              125
+            ]
+          ]
+        },
+        "1": {
+          "credits": 53,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "60961",
+          "next_wave": "63828",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              201,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              202,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              204,
+              "gi",
+              39,
+              38,
+              125
+            ],
+            [
+              205,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              206,
+              "gi",
+              38,
+              37,
+              125
+            ],
+            [
+              208,
+              "gi",
+              38,
+              37,
+              125
+            ],
+            [
+              209,
+              "attack_dog",
+              38,
+              37,
+              100
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 63000,
+      "players": {
+        "0": {
+          "credits": 176,
+          "queues": "[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(3)), progress: 35, charged: 35, fraction: 500 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "63920",
+          "next_wave": "66787",
+          "liquidating": "true",
+          "last_stand": "false",
+          "units": [
+            [
+              203,
+              "conscript",
+              33,
+              31,
+              125
+            ],
+            [
+              210,
+              "conscript",
+              10,
+              13,
+              125
+            ]
+          ]
+        },
+        "1": {
+          "credits": 53,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "60961",
+          "next_wave": "63828",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              206,
+              "gi",
+              38,
+              37,
+              125
+            ],
+            [
+              201,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              204,
+              "gi",
+              39,
+              37,
+              125
+            ],
+            [
+              202,
+              "gi",
+              38,
+              37,
+              125
+            ],
+            [
+              205,
+              "gi",
+              38,
+              37,
+              50
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 64000,
+      "players": {
+        "0": {
+          "credits": 672,
+          "queues": "[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(10)), progress: 339, charged: 339, fraction: 500 }, QueueItem { item: Unit(UnitKind(0)), progress: 0, charged: 0, fraction: 0 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "63920",
+          "next_wave": "66787",
+          "liquidating": "true",
+          "last_stand": "false",
+          "units": [
+            [
+              203,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              210,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              212,
+              "conscript",
+              15,
+              14,
+              125
+            ],
+            [
+              213,
+              "conscript",
+              15,
+              14,
+              125
+            ],
+            [
+              214,
+              "conscript",
+              15,
+              14,
+              125
+            ],
+            [
+              215,
+              "conscript",
+              14,
+              15,
+              125
+            ],
+            [
+              211,
+              "attack_dog",
+              15,
+              15,
+              100
+            ]
+          ]
+        },
+        "1": {
+          "credits": 53,
+          "queues": "[]",
+          "wave": "{SimId(201), SimId(202), SimId(204), SimId(205), SimId(206)}",
+          "target": "Some(Building(SimId(0)))",
+          "patience_until": "65641",
+          "next_wave": "68508",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              206,
+              "gi",
+              36,
+              34,
+              125
+            ],
+            [
+              201,
+              "gi",
+              36,
+              34,
+              125
+            ],
+            [
+              204,
+              "gi",
+              35,
+              33,
+              125
+            ],
+            [
+              202,
+              "gi",
+              34,
+              32,
+              125
+            ],
+            [
+              205,
+              "gi",
+              34,
+              32,
+              50
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 65000,
+      "players": {
+        "0": {
+          "credits": 111,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "63920",
+          "next_wave": "66787",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              215,
+              "conscript",
+              16,
+              16,
+              125
+            ],
+            [
+              219,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              203,
+              "conscript",
+              16,
+              16,
+              89
+            ],
+            [
+              216,
+              "tesla_trooper",
+              17,
+              16,
+              50
+            ],
+            [
+              218,
+              "conscript",
+              14,
+              16,
+              125
+            ],
+            [
+              210,
+              "conscript",
+              16,
+              16,
+              125
+            ],
+            [
+              217,
+              "conscript",
+              16,
+              17,
+              125
+            ],
+            [
+              212,
+              "conscript",
+              17,
+              15,
+              125
+            ],
+            [
+              213,
+              "conscript",
+              16,
+              15,
+              125
+            ],
+            [
+              214,
+              "conscript",
+              16,
+              15,
+              125
+            ],
+            [
+              220,
+              "conscript",
+              13,
+              15,
+              125
+            ]
+          ]
+        },
+        "1": {
+          "credits": 353,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "65641",
+          "next_wave": "68508",
+          "liquidating": "true",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              221,
+              "gi",
+              46,
+              42,
+              125
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 66000,
+      "players": {
+        "0": {
+          "credits": 111,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "63920",
+          "next_wave": "66787",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              215,
+              "conscript",
+              16,
+              16,
+              125
+            ],
+            [
+              219,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              203,
+              "conscript",
+              16,
+              16,
+              89
+            ],
+            [
+              216,
+              "tesla_trooper",
+              17,
+              16,
+              50
+            ],
+            [
+              218,
+              "conscript",
+              14,
+              16,
+              125
+            ],
+            [
+              210,
+              "conscript",
+              16,
+              16,
+              125
+            ],
+            [
+              217,
+              "conscript",
+              16,
+              17,
+              125
+            ],
+            [
+              212,
+              "conscript",
+              17,
+              15,
+              125
+            ],
+            [
+              213,
+              "conscript",
+              16,
+              15,
+              125
+            ],
+            [
+              214,
+              "conscript",
+              16,
+              15,
+              125
+            ],
+            [
+              220,
+              "conscript",
+              15,
+              15,
+              125
+            ]
+          ]
+        },
+        "1": {
+          "credits": 72,
+          "queues": "[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(3)), progress: 131, charged: 131, fraction: 0 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "65641",
+          "next_wave": "68508",
+          "liquidating": "true",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              221,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              222,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              223,
+              "gi",
+              38,
+              38,
+              125
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 67000,
+      "players": {
+        "0": {
+          "credits": 111,
+          "queues": "[]",
+          "wave": "{SimId(203), SimId(210), SimId(212), SimId(213), SimId(214), SimId(215), SimId(216), SimId(217), SimId(218), SimId(219), SimId(220)}",
+          "target": "Some(Building(SimId(1)))",
+          "patience_until": "68600",
+          "next_wave": "71467",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              215,
+              "conscript",
+              21,
+              19,
+              125
+            ],
+            [
+              219,
+              "conscript",
+              20,
+              18,
+              125
+            ],
+            [
+              203,
+              "conscript",
+              20,
+              22,
+              89
+            ],
+            [
+              216,
+              "tesla_trooper",
+              23,
+              21,
+              50
+            ],
+            [
+              218,
+              "conscript",
+              19,
+              21,
+              125
+            ],
+            [
+              210,
+              "conscript",
+              21,
+              23,
+              125
+            ],
+            [
+              217,
+              "conscript",
+              21,
+              23,
+              125
+            ],
+            [
+              212,
+              "conscript",
+              23,
+              21,
+              125
+            ],
+            [
+              213,
+              "conscript",
+              22,
+              20,
+              125
+            ],
+            [
+              214,
+              "conscript",
+              21,
+              19,
+              125
+            ],
+            [
+              220,
+              "conscript",
+              19,
+              17,
+              125
+            ]
+          ]
+        },
+        "1": {
+          "credits": 364,
+          "queues": "[(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(1)), progress: 439, charged: 439, fraction: 0 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "65641",
+          "next_wave": "68508",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              221,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              222,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              223,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              225,
+              "gi",
+              38,
+              37,
+              125
+            ],
+            [
+              226,
+              "gi",
+              38,
+              37,
+              125
+            ],
+            [
+              227,
+              "gi",
+              39,
+              38,
+              125
+            ],
+            [
+              224,
+              "attack_dog",
+              38,
+              37,
+              100
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 68000,
+      "players": {
+        "0": {
+          "credits": 11,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "68600",
+          "next_wave": "71467",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              229,
+              "conscript",
+              15,
+              15,
+              125
+            ]
+          ]
+        },
+        "1": {
+          "credits": 304,
+          "queues": "[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 99, charged: 99, fraction: 0 }, QueueItem { item: Unit(UnitKind(3)), progress: 0, charged: 0, fraction: 0 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "65641",
+          "next_wave": "68508",
+          "liquidating": "true",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              223,
+              "gi",
+              38,
+              37,
+              50
+            ],
+            [
+              222,
+              "gi",
+              38,
+              37,
+              125
+            ],
+            [
+              230,
+              "gi",
+              39,
+              38,
+              125
+            ],
+            [
+              221,
+              "gi",
+              38,
+              37,
+              110
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 69000,
+      "players": {
+        "0": {
+          "credits": 11,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "68600",
+          "next_wave": "71467",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              229,
+              "conscript",
+              15,
+              15,
+              125
+            ]
+          ]
+        },
+        "1": {
+          "credits": 3,
+          "queues": "[]",
+          "wave": "{SimId(221), SimId(222), SimId(223), SimId(230), SimId(231), SimId(232)}",
+          "target": "Some(Building(SimId(0)))",
+          "patience_until": "70321",
+          "next_wave": "73188",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              223,
+              "gi",
+              25,
+              23,
+              50
+            ],
+            [
+              222,
+              "gi",
+              25,
+              23,
+              125
+            ],
+            [
+              230,
+              "gi",
+              27,
+              25,
+              125
+            ],
+            [
+              221,
+              "gi",
+              25,
+              23,
+              110
+            ],
+            [
+              231,
+              "gi",
+              27,
+              25,
+              125
+            ],
+            [
+              232,
+              "attack_dog",
+              14,
+              10,
+              70
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 70000,
+      "players": {
+        "0": {
+          "credits": 1192,
+          "queues": "[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(10)), progress: 319, charged: 319, fraction: 500 }, QueueItem { item: Unit(UnitKind(0)), progress: 0, charged: 0, fraction: 0 }, QueueItem { item: Unit(UnitKind(3)), progress: 0, charged: 0, fraction: 0 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "68600",
+          "next_wave": "71467",
+          "liquidating": "true",
+          "last_stand": "false",
+          "units": [
+            [
+              236,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              237,
+              "conscript",
+              15,
+              15,
+              41
+            ],
+            [
+              238,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              233,
+              "conscript",
+              11,
+              11,
+              5
+            ],
+            [
+              234,
+              "conscript",
+              11,
+              11,
+              125
+            ],
+            [
+              235,
+              "conscript",
+              11,
+              11,
+              125
+            ]
+          ]
+        },
+        "1": {
+          "credits": 524,
+          "queues": "[(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(1)), progress: 279, charged: 279, fraction: 0 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "70321",
+          "next_wave": "73188",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              239,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              240,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              241,
+              "gi",
+              40,
+              38,
+              125
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 71000,
+      "players": {
+        "0": {
+          "credits": 564,
+          "queues": "[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(10)), progress: 147, charged: 147, fraction: 500 }, QueueItem { item: Unit(UnitKind(0)), progress: 0, charged: 0, fraction: 0 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "68600",
+          "next_wave": "71467",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              236,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              237,
+              "conscript",
+              15,
+              15,
+              41
+            ],
+            [
+              238,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              233,
+              "conscript",
+              11,
+              11,
+              5
+            ],
+            [
+              234,
+              "conscript",
+              11,
+              11,
+              125
+            ],
+            [
+              235,
+              "conscript",
+              11,
+              11,
+              125
+            ],
+            [
+              242,
+              "tesla_trooper",
+              15,
+              14,
+              130
+            ],
+            [
+              243,
+              "conscript",
+              15,
+              14,
+              125
+            ],
+            [
+              244,
+              "attack_dog",
+              15,
+              14,
+              100
+            ]
+          ]
+        },
+        "1": {
+          "credits": 344,
+          "queues": "[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 59, charged: 59, fraction: 0 }, QueueItem { item: Unit(UnitKind(3)), progress: 0, charged: 0, fraction: 0 }])]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "70321",
+          "next_wave": "73188",
+          "liquidating": "true",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              239,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              240,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              241,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              246,
+              "gi",
+              38,
+              41,
+              125
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 72000,
+      "players": {
+        "0": {
+          "credits": 32,
+          "queues": "[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(0)), progress: 79, charged: 79, fraction: 500 }])]",
+          "wave": "{SimId(233), SimId(234), SimId(235), SimId(236), SimId(237), SimId(238), SimId(242), SimId(243)}",
+          "target": "Some(Building(SimId(152)))",
+          "patience_until": "73280",
+          "next_wave": "76147",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              236,
+              "conscript",
+              31,
+              29,
+              125
+            ],
+            [
+              237,
+              "conscript",
+              34,
+              32,
+              41
+            ],
+            [
+              238,
+              "conscript",
+              31,
+              29,
+              125
+            ],
+            [
+              233,
+              "conscript",
+              27,
+              25,
+              5
+            ],
+            [
+              234,
+              "conscript",
+              27,
+              25,
+              125
+            ],
+            [
+              235,
+              "conscript",
+              27,
+              25,
+              125
+            ],
+            [
+              242,
+              "tesla_trooper",
+              29,
+              27,
+              130
+            ],
+            [
+              243,
+              "conscript",
+              29,
+              27,
+              125
+            ],
+            [
+              250,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              248,
+              "tesla_trooper",
+              15,
+              15,
+              130
+            ]
+          ]
+        },
+        "1": {
+          "credits": 3,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "70321",
+          "next_wave": "73188",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              239,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              240,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              241,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              247,
+              "gi",
+              38,
+              37,
+              125
+            ],
+            [
+              249,
+              "attack_dog",
+              38,
+              37,
+              100
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "tick": 72000,
+      "players": {
+        "0": {
+          "credits": 32,
+          "queues": "[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(0)), progress: 79, charged: 79, fraction: 500 }])]",
+          "wave": "{SimId(233), SimId(234), SimId(235), SimId(236), SimId(237), SimId(238), SimId(242), SimId(243)}",
+          "target": "Some(Building(SimId(152)))",
+          "patience_until": "73280",
+          "next_wave": "76147",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              236,
+              "conscript",
+              31,
+              29,
+              125
+            ],
+            [
+              237,
+              "conscript",
+              34,
+              32,
+              41
+            ],
+            [
+              238,
+              "conscript",
+              31,
+              29,
+              125
+            ],
+            [
+              233,
+              "conscript",
+              27,
+              25,
+              5
+            ],
+            [
+              234,
+              "conscript",
+              27,
+              25,
+              125
+            ],
+            [
+              235,
+              "conscript",
+              27,
+              25,
+              125
+            ],
+            [
+              242,
+              "tesla_trooper",
+              29,
+              27,
+              130
+            ],
+            [
+              243,
+              "conscript",
+              29,
+              27,
+              125
+            ],
+            [
+              250,
+              "conscript",
+              15,
+              15,
+              125
+            ],
+            [
+              248,
+              "tesla_trooper",
+              15,
+              15,
+              130
+            ]
+          ]
+        },
+        "1": {
+          "credits": 3,
+          "queues": "[]",
+          "wave": "{}",
+          "target": "None",
+          "patience_until": "70321",
+          "next_wave": "73188",
+          "liquidating": "false",
+          "last_stand": "false",
+          "units": [
+            [
+              27,
+              "chrono_miner",
+              42,
+              31,
+              1000
+            ],
+            [
+              148,
+              "chrono_miner",
+              42,
+              32,
+              1000
+            ],
+            [
+              153,
+              "chrono_miner",
+              42,
+              33,
+              1000
+            ],
+            [
+              239,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              240,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              241,
+              "gi",
+              38,
+              38,
+              125
+            ],
+            [
+              247,
+              "gi",
+              38,
+              37,
+              125
+            ],
+            [
+              249,
+              "attack_dog",
+              38,
+              37,
+              100
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

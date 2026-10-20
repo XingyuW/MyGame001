@@ -1,0 +1,63 @@
+{
+  "command": [
+    "env",
+    "-u",
+    "RA2_DUEL_SEED",
+    "-u",
+    "RA2_DUEL_PAIR",
+    "RUST_TEST_NOCAPTURE=1",
+    "sh",
+    "scripts/validate_ra2_parity.sh",
+    "ra8"
+  ],
+  "freeze_commit": "c1e84b39d8c533a665e01f759103950a40ee3be0",
+  "runtime_commit": "66d0defb46c084a339d5602c74dc53526a68425d",
+  "runtime_manifest": "../ra8-preflight/checkpoint14-runtime-manifest.json",
+  "test_example_manifest": "../ra8-preflight/checkpoint14-test-example-manifest.json",
+  "start_utc": "2026-10-20T02:24:51.550983+00:00",
+  "phases": [
+    {
+      "phase": 1,
+      "exit": 0,
+      "script_seconds": 1,
+      "observed_monotonic_phase_seconds": 1.0914363330230117,
+      "summary_line": "01 exit 0  1 s  cargo fmt --all -- --check"
+    },
+    {
+      "phase": 2,
+      "exit": 0,
+      "script_seconds": 0,
+      "observed_monotonic_phase_seconds": 0.04451070900540799,
+      "summary_line": "02 exit 0  0 s  git diff --check"
+    },
+    {
+      "phase": 3,
+      "exit": 0,
+      "script_seconds": 1,
+      "observed_monotonic_phase_seconds": 0.4194800829864107,
+      "summary_line": "03 exit 0  1 s  cargo clippy --workspace --all-targets -- -D warnings"
+    }
+  ],
+  "prior_attempt13_preservation": "../ra8-preflight/checkpoint14-attempt13-preservation.json",
+  "preexisting_production_table": {
+    "sha256": "6c3ec135cec4acb23ec3489e7324cfc760e12c6e0da6727fef8675901548d435",
+    "mtime_ns": 1792155643228129596,
+    "bytes": 49763
+  },
+  "timing_note": "Script seconds are unchanged date-based values; observed monotonic phase intervals include transitions and wrapper hash/metadata overhead. Total monotonic elapsed is recorded independently.",
+  "owned_wrapper_pid": 18319,
+  "owned_script_pid": 18345,
+  "owned_script_pgid": 18345,
+  "elapsed_monotonic_seconds": 444.91888354200637,
+  "current_source_mismatches": {
+    "checkpoint14-runtime-manifest.json": [],
+    "checkpoint14-test-example-manifest.json": []
+  },
+  "process_exit": -15,
+  "end_utc": "2026-10-20T02:32:16.471248+00:00",
+  "final_source_mismatches": {
+    "checkpoint14-runtime-manifest.json": [],
+    "checkpoint14-test-example-manifest.json": []
+  },
+  "process_output_sha256": "27f1d73bbf17bf0a522eae7bb1a28ccf2bac36321b833d74874a4339e474ddd4"
+}

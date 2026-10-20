@@ -1,0 +1,11 @@
+--- crates/sim/src/ai/strategy.rs
++++ crates/sim/src/ai/strategy.rs
+@@ -610,7 +610,7 @@
+         }));
+         // A rear member of this same building mission may help an actually
+         // threatened front before entering the defender's own firing envelope.
+-        let assisting = matches!(unit.attack_order, Some(crate::AttackOrder::Attack {target,..})
++        let assisting = false && matches!(unit.attack_order, Some(crate::AttackOrder::Attack {target,..})
+             if controller.target == Some(WaveTarget::Building(target)) && controller.known.contains_key(&target));
+         if !distracted && !assisting {
+             continue;

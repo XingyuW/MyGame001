@@ -1,0 +1,11 @@
+--- crates/sim/src/ai/strategy.rs
++++ crates/sim/src/ai/strategy.rs
+@@ -466,7 +466,7 @@
+     // Reconsider the same investment when infantry are already inside. A
+     // surviving field soldier must not indefinitely strand an unaffordable,
+     // currently idle occupation while ordinary teams can use its passengers.
+-    if view.ai.rules_difficulty {
++    if false {
+         for &host in &view.recoverable_garrisons {
+             let Some((cell, prop)) = props.get(host) else {
+                 continue;

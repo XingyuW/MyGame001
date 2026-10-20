@@ -10588,3 +10588,448 @@ EOF diagnostics,zero source/data/test/prose errors. File/line/EOL and actual sta
 SHA bindings match; raw output is captured directly as JSON-escaped stdout(d0c4e178…).
 No byte normalization or whitespace suppression; separate final identical unfiltered
 check and a later deliberate evidence commit remain required.
+
+
+### R179 — Rejected existing-garrison retention play candidate (RA8)
+
+Checkpoint14/full attempt14 remains FAILED and incomplete. The first actual non-Won is
+Crossroads AmericaEasy/RussiaEasy seed0 at the original72000 limit. A second actual worker
+panic for Riverlands FranceEasy/GermanyEasy seed0 arrived during owned-group termination;
+the original first-only STOPPED/archive bytes are retained and an explicit two-observation
+correction supplements them. The archive binds38files/157388bytes per set,76 current/archive
+copies; phase4 is interrupted, not a completed756 result. Four visible companions and248
+completed workspace tests are separate partial evidence; phases5–13 are unrun and the
+production TSV remains stale. No acceptance or fresh756 claim follows from this attempt.
+
+The reverse Crossroads trace proves a slow real fight, not helplessness or zero net damage.
+GI171 fires on FlakTrack158 while that hull fires on ChronoMiner27. Fine native observation
+at60000–60500 records32 Combat HP loss and27 Economy healing for the Flak,37 Combat loss
+and27 healing for the miner, and no GI HP change. The Flak is elite with armour1500 and
+self-healing; bonus multipliers are all1000. This refutes both a zero-net and crate-stack
+explanation. Source healing, weapons, prices, match limits and actual force capability stay
+unchanged. Fine observer3 raw442b243d… binds the real native result; observer1 is only a
+Cargo-cache filesystem denial, observer2 only an instrumentation schedule-order failure.
+Each helper mutation restores in finally, followed by a separate later source SHA read.
+
+A distinct, controlled play-policy inconsistency is demonstrated by
+`ra8_unfunded_idle_garrison_reinforces_a_living_offensive_force`. Ordinary Interact puts a
+real Conscript inside a visible civilian host. An independently living field Conscript
+actually fires on the known enemy building, so the ordinary helplessness evacuation does
+not apply. Wallet62 is below the actual source Conscript cost100; there is no income or
+current host shot. Old source never issues Deploy/releases the occupant and fails the
+intended reinforcement assertion(raw74edcce8…). Controlled actor/building introduction and
+setup Cleanup are disclosed test setup; occupation, decisions, exit, team readiness and
+both infantry's later actual WeaponFired are native scheduled effects.
+
+The opted-in strategy now reuses the EXISTING garrison investment rule for existing hosts:
+retain an occupation when real service income, wallet covering an occupant's source cost,
+or an actually observed target eligible for the host's occupation weapon/range justifies it.
+Only an owned, non-evicting, live, currently visible recoverable host containing living source
+Occupier passengers is considered. If none of its passengers justifies that investment,
+issue at most one ordinary host Deploy per decision. Entry and retention share the same
+kind-based pure predicate; no new state/RNG/timer or hidden query exists. Wallet coverage is
+the deliberately conservative existing policy, not a whole-FIFO replacement-financing proof.
+Ordinary public validation, exit placement, source team readiness, actual army orders and
+legacy opt-out remain unchanged. This is reinforcement play, not declaring an active actor
+helpless or forcing an outcome.
+
+Final garrison controls(raw749bf218…) are6/0/0, preserving existing entry/quota/recovery
+assertions and extending the existing cash/income/actual occupation-fire control across
+80 later native ticks to prove retention, not merely initial entry. The new positive requires
+both real field and released-infantry building shots and forbids immediate regarrisoning.
+One after attempt is a preserved local UnitKind/BuildingKind shadowing compilation error;
+another positive observation loop initially stopped on the released shot before checking
+field fire. It is retained as a failed observation, and the final loop waits for BOTH without
+removing either assertion. Neither failed attempt receives positive causal credit.
+
+The final-body single-cause bypass disables only the new retention reconsideration and
+again fails the intended ordinary-exit assertion(raw2153ac45…), with the field-fire premise
+already satisfied. Finally restoration followed by a separate later source read binds
+all7 recorded paths and strategy73394b86…. Exact reverse/original Crossroads and Riverlands
+ending evidence remains pending here; a passing property alone cannot close the match or
+RA8. All rejected/source-instrumentation prefixes remain intact.
+
+
+R179 disposition: the property above is a genuine optional reinforcement opportunity,
+not an original required contract. All three exact checks on this candidate still return
+None72000: reverse Crossroads(e2c051c3…), original Crossroads(dd7b4a0a…), and Riverlands
+France/GermanyEasy(d2bc477e…). In particular it loses the earlier original-direction win.
+The terminal Riverlands145/146 actors are source-named ordinary GI, refuting the specialist
+funding-force hypothesis for that snapshot. The complete candidate is REJECTED; no ending
+benefit or accepted runtime correction is claimed. Its production/refactor/new-test/extended-
+control bytes are retained in `attempt14-garrison-retention-REJECTED.patch`, and BOTH strategy
+and ra8_ai test bytes return to checkpoint14 c4c72cba…/40c4ee8d… with a separate later SHA
+read before tactical work. No committed test is removed/renamed/ignored. The new actual
+40th/41st gate failure cases remain retained. The slow positive combat finding remains valid;
+no source healing/stat/limit or helplessness waiver is introduced.
+
+
+### R180 — Observed stationary counterfire, bounded by the current incoming threat (RA8)
+
+The restored checkpoint14 reverse Crossroads trace supplies a real target-priority lead:
+a stationary FlakTrack AttackMove repeatedly acquires an unarmed ChronoMiner while a GI
+actually damages it. R179's fine observations prove slow positive attrition, not zero damage,
+helplessness or permission to change healing. The separate native regression
+`ra8_surface_counterfire_prioritizes_a_real_defender_over_a_nearer_unarmed_miner` first reaches
+real building focus/fire with untouched native controller history, then temporarily saves
+AiPlayers while ordinary public AttackMove establishes actual stationary miner acquisition
+and native incoming GI fire. Restoring those same controllers must produce real counterfire,
+actual defender damage/destruction, preserved matching Attack across at least two source
+think intervals, and later real building fire after that destruction. No clock/history or
+source health/weapon stat is injected. Endpoint HP alone was an insufficient observation in
+before1; before2 records actual minimum HP and reaches the intended returned-fire failure
+with30 miner shots(ff331246…). This distinction is retained.
+
+The first provisional response-loop edit did not activate: the existing kind-wide maximum
+range includes Flak's AA10, above the game-owned artillery boundary8, while its normal ground
+gun range is5. Due-decision probe3 proves the actual wave member, legal stable building and
+observed GI/miner exist; there is no need to invent a visibility or lost-wave explanation.
+The first candidate and its read-only guard probes remain preserved. Every instrumentation
+change restores in finally with a separate later seven-path SHA read; the initial failed
+substitution assertion occurs before any source write/Cargo run and has its own preparation
+record. No speculative global AA/artillery-role rewrite is retained.
+
+The smaller policy is a separate opted-in surface-wave branch. Only stationary AttackMove
+currently targeting an OBSERVED unarmed harvester is reconsidered. An observed armed unit
+must qualify under the existing positive-damage incoming normal source-weapon envelope,
+and our kind's selected NORMAL source weapon against that unit must have positive damage
+and range below the existing sourced policy boundary. Select deterministically by current
+cell distance then SimId and issue ordinary explicit Attack. The normal/base kind weapons
+are an existing AI approximation, not an exact elite/bonus/readiness oracle; normal/elite
+Flak ground range5 supports this actual case. No hidden enemy order/bonus or raw hidden
+occupancy lookup is used. Existing moving AttackMove, artillery, air, team readiness,
+R166 handoff/route policy and all old hidden-world assertions remain unchanged.
+
+A matching direct counter-Attack retains its weapon/path history through the existing
+reservation mechanism. The initial derivation was TOO broad: it reserved any visible eligible
+short-weapon direct unit Attack, even outside the current incoming range. New native
+`ra8_distant_unrelated_unit_chase_is_not_a_current_counterfire_job` reaches its building mission
+naturally, establishes an observed distant unrelated GI/public Attack/native chase, and proves
+no incoming fire. Source4ed186bb… fails the intended mission-resumption assertion(0617df97…).
+Adding the SAME current `incoming_wave_threat_from` predicate bounds retention to a real
+counterfire situation; both native properties pass on531130d2…(fa2c07d5…,2/0/0). This is a
+proved candidate-scope correction; it does not establish a whole-match cause by itself.
+
+The six unchanged/strengthened surface controls pass on the earlier stationary source
+(56ce76b5…,6/0/0), including actual new-defender response, original long-range/artillery and
+hidden-Mirage/unseen-building route intent equivalence. Final-body admission bypass disables
+only the new stationary admission, preserves all original policies/history handling and
+fails the intended real counterfire assertion with30 miner shots(462fb154…). Finally and a
+separate later seven-path read restore the candidate exactly. No committed test/assertion
+is removed, renamed, ignored or weakened; old R166 setup/route assertions are unchanged.
+
+On the first smaller source4ed186bb…, Riverlands FranceEasy/GermanyEasy seed0 reaches
+P0Won33207/72000(e6ad99d4…,4.909764s wrapper). Both Crossroads directions still returnNone
+(67a89c31…/b1eda17a…). The reverse terminal is a CHANGED real trajectory, not the old Flak158
+trade: a real Harrier survives and Russia has eight living Conscripts, with a legitimate
+next-wave73508; no helplessness/forced-loss claim follows. Exact three-case results on the
+bounded531130d2… source remain pending here. All gate limits, source combat/timing/statistics,
+R53 signature/patience/outcome and RNG remain unchanged. No RA8 acceptance follows from
+native properties or one isolated ending.
+
+
+R180 bounded-source exact follow-up: current531130d2… still returnsNone72000 for reverse
+Crossroads(a207678f…,40.884306s wrapper) and opposite Crossroads(9d0bbf05…,10.906464s).
+Riverlands retains P0Won33207/72000(416482cf…,4.843823s). This coherent target-priority
+policy is provisional, supported by its real native property and one actual ending, while
+both changed Crossroads trajectories remain open. No checkpoint/full13 acceptance or
+claim that a native property suffices for all matches. In reverse terminal the Flak/GI
+trade is gone, Harrier197 has empty ammo and a real dock/return path, and eight Conscripts
+wait at home under source next-wave73508; snapshot timing alone does not justify waiver.
+Native flight::docks reload does NOT require power or cash, so the terminal low-power base
+does not prove this Harrier cannot reload. No reload/capability change is selected from it.
+
+### R181 — Collect bounded non-Won M6 outcomes without weakening universal winners (RA8)
+
+The coordinator authorizes a report-timing migration in existing
+`computer_players_finish_matches_with_the_shipped_data_on_every_shipped_map`, after the
+attempt14 archive is independently verified. Its same shared AtomicUsize job pool still
+runs every original map/side/difficulty pairing once with seed0, the same original72000-
+scaled limits, setup, rejection assertions and I6 checks. Only a returned non-Won outcome
+is immediately logged with exact tuple/seed/ticks/limit and collected rather than panicking
+that worker. This preserves worker capacity to reveal all bounded failures in ONE required
+sweep. There are no catches/exemptions for real run validation/invariant/setup panics; those
+remain fatal. Optional diagnostic progress every36 completed jobs reports completed and
+non-Won counts only, outside simulation state.
+
+After the workers join, the unchanged exact played==jobs.len() assertion precedes a strict
+failures.is_empty() universal winner assertion, followed by one Won-length per job. Current
+shipped definitions generate exactly756 jobs, with the original country-slot coverage and
+job-count assertions unchanged. The R29 TSV is written ONLY after every case actually Won;
+failed/partial attempts never publish a fresh table. Prior stale-table bytes remain explicitly
+stale evidence. The raw function suffix from run through every companion and the tick-limit
+function are byte-identical before/after, bound in `attempt14-m6-aggregation-binding.json`.
+This is a change of failure-report timing, not of the all-winner acceptance property or any
+match. No extra negative/full756 diagnostic sweep is run solely for this test harness edit;
+strict compilation and the next mandatory unchanged full13 provide execution evidence.
+
+### R182 — Optional reinforcement financing for a living understrength force (RA8)
+
+The bounded current-source Crossroads trace refutes both a reload/power incapability and an
+abnormal source cohort cadence. Real small cohorts continue fighting and dying; real Harrier
+reload requires neither cash nor power, and subsequent cohorts legitimately wait for sourced
+TeamDelay. The remaining singleton-force financial veto is a separate game-owned play choice:
+an ordinary living infantryman prevents optional asset financing even when no actual income or
+observed ore supports his reinforcement. The controller is NOT declared helpless, its combat
+orders/readiness/patience are NOT waived, and R53/outcomes are unchanged.
+
+New native `ra8_an_understrength_living_field_force_can_finance_a_paid_reinforcement` has a
+normal living Conscript firing at an enemy building, a legal source Barracks/Power chain, zero
+cash/income and one optional Depot. Before a79f5538… fails the intended sale-service assertion
+while the original fighter really fires. After 26a89574… observes exactly the ordinary400 refund,
+source Conscript cost100, charged head, ProductionComplete, real Barracks-spawned recruits and
+actual building fire by BOTH the original force and a paid recruit. This is controlled initial
+world setup followed by native financing/production/combat, not native construction of its
+setup buildings. First after c30928f6… is an E0061 compile failure at the shared sale helper's
+existing funded_army_recovery call; it is preserved and receives no property credit.
+
+For opted-in plans only, the shared funding-force/latch predicate allows the existing ordinary
+sale path while living field combat plus conservatively counted unavailable/stowed owned
+places is below the already declared difficulty.wave_size, with no service_income, observed
+ore or recoverable service occupant. Stowed places are conservative living passengers, NOT an
+exact combat-effectiveness oracle. The existing source-buildability, pending remaining cost,
+completed-head and ordinary price/refund arithmetic still decide whether financing is needed.
+The new optional understrength branch additionally preserves building producers, docks for
+actual owned airport-bound aircraft, and a relevant service building while an owned vehicle
+is actually damaged. Required declared army producers/prerequisites remain protected. No new
+state/RNG/tuning/hidden-world lookup, crew/cadence/stat/limit or public command changes exist.
+
+Named intentional SETUP migration: existing
+`ra8_real_forces_economic_jobs_and_financed_heads_preserve_optional_worker_assets` originally
+protects an optional asset merely because one Rhino exists. Its unchanged original body now
+fails the `force` no-sale assertion (dfda6fa5…). The `force` setup now supplies the full declared
+cohort; the paid-head setup starts one place short and its already partly paid, exactly funded
+head fills that place through a real spawn. All original2000-tick/no-sale/asset-presence/actual
+Rhino-fire/real-income-delivery/paid-spawn assertions remain. The native existing-worker Idle,
+seen ore/refinery and absent-WarFactory economic opportunity premises remain intact. This is
+an intentional replacement of presence-only financing policy, not an unchanged fixture claim.
+
+`ra8_understrength_financing_preserves_legacy_and_real_service_assets` observes native paid
+Depot repair before cash exhaustion, preserves that asset while its actual vehicle remains
+damaged, and preserves a controlled owned FOREIGN-TYPE dock representing captured capability
+through real aircraft fire, empty ammo, return/reload and a second sortie. There is no actual
+Engineer-capture receipt in this setup. The original service control demanded permanent Depot
+ownership after a real subsequent full heal (c242a62f…); it is retained as an observation-premise
+failure. Final useful-service assertion correctly permits an optional sale only AFTER actual
+maximum HP. Legacy singleton presence retains its old no-sale/real-fire policy. Controls5 is
+2 Rust passes (221456c7…); subsequent financial-controls6 is a DISTINCT5-pass/0-fail command
+(4e0a207f…), including the migrated old control and existing partly paid/repair/native-power
+financing controls. CLI argument failure f51f6c06… and cohort test conversion compile failure
+f34ef118… are preserved, not passes.
+
+Final-body one-cause bypass removes only the understrength exception from funding_force:
+6e49be98… fails the intended native400-sale/paid-recruit assertion while the original fighter
+still fires. Finally03:45:40.950881Z and a separate03:45:51.202828Z read restore all eight bound
+source paths exactly. Earlier AI34926e20 gives reverse Crossroads P1Won56343/72000
+(6494f51d…), Riverlands P0Won33207 (bb9f32eb…), but opposite Crossroads stillNone72000
+(aea3d669…). Those are historical candidate outcomes: later useful-service protection changes
+AI to e836aa5e and requires all three exact matches again on the final combined source. No
+whole-match ending, physical-unrecoverability or RA8 acceptance transfers from native proofs.
+
+### R183 — Counterfire while stationary acquisition attacks an observed unarmed building (RA8)
+
+The changed opposite Crossroads terminal shows real GI stationary AttackMove fire on an
+unarmed Barracks while observed Conscripts fire at those GI. It does not prove helplessness
+or zero-net damage. R180 only admits the corresponding unarmed MINER distraction; it excludes
+this independently testable building boundary. New
+`ra8_surface_counterfire_leaves_an_unarmed_economy_building_to_fight_its_real_defender`
+starts with the existing naturally acquired/fired Radar mission, then ordinarily establishes
+stationary AttackMove acquisition of an actually observed unarmed Barracks and actual incoming
+GI fire/damage. Before962f563e… fails the intended returned-fire assertion after30 economic
+building shots, with no control/history seeding.
+
+The only added tactical admission is a CURRENT observed economic building with no normal/base
+source weapons as the stationary AttackMove's actual combat target. It reuses the same current
+observed incoming unit envelope, own selected normal/base positive weapon eligibility and
+existing short-range threshold as R180; healthy moving approaches, armed-building engagements,
+artillery/air and old R166 remain outside this new branch. It does not read hidden occupancy,
+enemy orders/rank/bonuses, fabricate threat knowledge, promise every specialist-hazard safety,
+or reset an already matching healthy counter-Attack. All state is derived from the existing
+View; no persistent hash fields or policy constants are added.
+
+The initial new fixture after67a2a60d… returns fire, damages/destroys the real defender and
+preserves its matching counter-Attack, but still requires the ORIGINAL Radar to receive later
+fire. Observation5884e6e0… shows legitimate new Barracks5 selection, controller.targetBuilding5,
+direct Attack5 and28 later shots at that building. That failed AFTER is NOT credited as the
+final property. Only the NEW fixture's final witness is corrected to require actual post-defender
+WeaponFired at the CURRENT naturally selected, actually observed economic building mission,
+matching controller.target at that event (one of the two real admitted buildings). The old
+miner/original-Radar assertions remain untouched.
+
+New armed-building control establishes actual stationary Pillbox engagement and both native
+Pillbox/GI incoming fire, and proves continued actual Pillbox fire without issuing counter-Attack
+against the GI. Its first observation window of two think intervals is shorter than the live
+Flak's remaining reload (eec313f8…,3 passes/1 failed NEW control); final observation derives from
+that actual own cooldown plus two ordinary AI intervals, retaining all real-fire/no-retarget
+assertions. Final counterfire controls4 ebfcc904… is4/0/0, including corrected building mission,
+armed building, unchanged miner and distant healthy-ownership guards.
+
+Final new-building-only admission bypass668348f3… fails the intended returned-fire assertion
+with30 building distraction shots; unrelated R180 worker admission remains enabled. Its eight
+bound paths restore in finally03:46:49.413828Z and a SEPARATE03:47:07.129508Z read before any
+dependent work. Bypass1 PREPARATION failed JSON configuration parsing before any source write
+or subprocess and is explicitly insufficient. Final combined AIe836aa5e/strategya3c5bd94 is
+restored after the quota pause and separately rehashed04:54:16Z; old affected controls and all
+three exact matches are next. These scoped play properties are not full-gate acceptance.
+
+### R184 — consolidate idle production only for a fully financed retained finisher
+
+The final R182/R183 combined body wins reverse Crossroads (P0 62,755) and Riverlands
+(P0 33,207), but Russia/America Crossroads remains None at72,000. Its real surviving
+field force, queues and subsequent production refute helplessness. An observed late
+pair of otherwise protected producers with finite unspendable cash motivates a separate
+ordinary investment policy, not a last-stand/timer or source-cost change.
+
+`ra8_an_understrength_force_can_consolidate_a_producer_for_real_paid_infantry` supplies
+an actually firing Conscript, a real Barracks and War Factory, no income and no queued
+work. Removing the exact Factory retains native Conscript owner/prerequisite legality
+and source cost100, while losing Rhino buildability. BEFORE1 (4445f099…) encounters a
+separate Reactor sale before completing the desired counterexample; it is preserved as
+wrong-sale/setup evidence, not no-financing proof. The final declared setup omits that
+independent refund. This is legal low-power infantry production with the ordinary source
+slowdown, not an exemption from power rules. BEFORE2 5f858544… reaches the intended
+assertion with original fighter fire, no sale and no paid recruit. AFTER1 e8ce964e…
+observes exact native Factory refund1,000, a positive charged Conscript head, completion,
+real Barracks spawn and both original/recruit building shots. Setup buildings are controlled
+fixtures; sale, payment, spawn, combat and nondefeated/match-active witnesses are native.
+
+The opted-in understrength/no-income policy retains the ordinary optional-asset preference.
+Only when that returns none and ALL owned queue lanes are empty (including completed
+heads), an otherwise protected idle production/prerequisite asset may be sold if its exact
+refund plus cash fully funds at least one source-legal, building-damaging declared army
+unit through a retained producer. The counterfactual excludes the sold ID from both
+prerequisites and source-reachable producer starts; the existing observed/public-terrain
+finisher predicate remains bounded and honest. Builder and useful repair/reload service
+assets remain protected. The final bounded read-only command projection removes a later
+AI enqueue made illegal by an earlier same-decision sale; public rejection behavior is
+unchanged and hypothetical refunds are not fabricated as current cash. No new state,
+RNG, source timing, statistics, rules, limits or forced outcome is introduced.
+
+This is a game-owned consolidation choice, not a proof that every other unit or possible
+asset sale is physically incapable. Its first exact body still fails opposite Crossroads
+(e42ac4f3…), while winning reverse59,514 and Riverlands34,129. These are capability and
+trajectory observations, not acceptance. The subsequent observational replay417bad7f…
+is bound to the original retained helper112fccc4…; its test-only observer restores in
+finally05:07:46Z and a separate05:08:17Z eight-path read. It records genuine small cohorts,
+paid late production and casualties. The absence of late income does not make those
+living forces helpless. HP-increase counters are not exact paid repair debit attribution.
+
+### R185 — current same-wave assistance while preserving unrelated healthy approaches
+
+The bounded R184 timeline shows genuine return fire and enemy deaths, refuting blind
+walking, absolute detector-starvation and zero-net-damage explanations. Russia's cohort
+arrives over a spread formation; an observed defender can already harm its front while
+rear members retain a direct building mission. A general coordination policy is tested,
+without changing source TeamDelay, initial readiness, wave size, patience or source combat.
+
+`ra8_a_rear_wave_member_assists_its_actually_threatened_front_before_own_contact` naturally
+admits three Conscripts and first observes real building fire. Untouched saved controllers
+and public movement commands establish a controlled rear/front formation; a real observed
+GI damages the same-wave front. Source-selected positive GI weapon and actual Mobile fine
+positions prove the rear is initially outside incoming range. The retained witness requires
+an APPLIED direct defender Attack, a native movement step and existing wave membership
+while still outside that incoming range, then real rear fire, defender damage/death and
+return to the original real building mission. No controller or clock history is seeded.
+
+BEFORE1 ed0cabd4… already observes eventual rear fire, damage, death and mission resumption;
+its early queued-text witness is provisional. BEFORE2 4d39a023… unwraps an entity already
+removed by native death and is an observation failure, not causal evidence. Final BEFORE3
+ a13a9a8d… and the final assistance-only bypass0541644a… fail the applied early-assistance
+assertion, while all eventual combat/resumption witnesses remain true. Baseline first rear
+shot is5002; AFTER1 c288b13d… first shot4989. Both observed front HP65 at that first shot:
+this does NOT establish a saved front actor or absent baseline capability. It proves earlier
+coordination, not exclusive whole-ending causality. The final bypass restores all eight paths
+in finally05:26:49.992894Z and a separate05:26:59.134124Z read before dependent work.
+
+The new admission uses only currently observed enemy units actually within the normal/base
+positive-damage incoming envelope of an actual same-wave land/amphibious friend. A helper
+must have its own selected normal/base positive short-range weapon, honest source/public-
+terrain reach, and a direct Attack matching the current known building mission. Healthy
+matching counter-Attacks retain ownership while that actual cohort threat and route remain;
+unrelated distant chases do not. Existing stationary worker/economic-building counterfire,
+artillery exclusion, incoming defender handling, air policy and mission resumption remain.
+No hidden enemy order, veteran/bonus oracle, new persistent state or new tuning is used.
+This envelope is the declared ordinary weapon policy, not every specialist hazard or a
+future-safety guarantee. Cheap weapon eligibility is evaluated before route searches; this
+pure conjunction reordering has its own source binding and no assumed performance credit.
+
+On the reordered executable body, exact Russia/America Crossroads wins P1 44,130 (aba0c898…),
+reverse America/Russia wins P0 49,125 (2fd1c6fa…), and Riverlands France/Germany wins P0 34,257
+(628681a9…), all seed0 under the unchanged72,000 limit. These are combined ending results,
+not isolated credit to the13-tick native fixture difference. Two later comment-only changes
+correct stale consolidation documentation (attempt14-consolidation-comment-precision.json);
+no executable tokens change. Final compatibility/scoped checks, clean checkpoint and the
+mandatory full13 are still required. Isolated all21/fixed256/example guards are deliberately
+deferred until a successful unchanged-source full13; no acceptance check is dropped.
+
+R184 final-body causality follow-up: bypass150cdada… changes only the consolidation
+fallback gate, preserving ordinary optional-asset financing. It fails the intended native
+sale assertion with original fighter fire but soldNone/paidfalse, then restores all eight
+bound paths in finally05:27:32.404616Z and a SEPARATE05:28:13.781833Z read before the
+full affected AI target. This is a financing-property negative, not a whole-match counterfactual
+or proof of helplessness. Final positive/compatibility counts are recorded with the scoped
+checkpoint; no raw failure is relabeled as pass.
+
+R184/R185 compatibility follow-up (2026-10-20): first complete affected AI run
+attempt14-final1-ra8-ai is genuinely121 passed/9 failed/0 ignored (raw068d7087…), not
+acceptance. Seven failures involve actual air/support/paid-air recovery trajectories
+changed by new ground reinforcement financing; one is the new assistance branch taking
+a self-threatened front away from R166's existing route planner; one dereferences a
+no-ore Refinery that ordinary optional financing has genuinely sold. Dependent scoped
+phases were not run. No old failure or assertion is discarded.
+
+The NEW understrength investment now conservatively leaves any owned Air-domain actor
+outside its scope. This preserves existing sortie, reload and paid-air recovery capability,
+without classifying every such actor as a guaranteed finisher. It also opts out when any
+owned Nuke/Storm/Curtain/Chronosphere/Paradrop source exists, preserving the entire existing
+strategic power/recovery path rather than only the source's walls. This is deliberately
+conservative investment policy, not a readiness or future-capability oracle. Legacy and
+worker-only financing retain their old independent rules. The temporary source-building-
+only sale protection is superseded: the same optional sale could still remove sole power.
+
+The NEW assistance admission additionally requires the rear member to be outside its own
+current incoming unit threat, exactly the proven before-contact property. A self-threatened
+front continues through the old R166 handoff; its real AttackMove/detour/privacy witnesses
+are preserved, not migrated to a different command merely to pass. Matching actual
+counter-Attacks retain the existing current-threat ownership rules.
+
+Named SETUP migration: `ra8_paid_reinforcements_do_not_send_an_active_empty_worker_wave_home`
+now introduces its controlled Refinery alongside the later genuinely observed ore/Harvest
+phase. Previously it introduced an empty-field Refinery before the no-income combat phase
+and assumed that future, unobserved economic use would guarantee its survival. New optional
+understrength financing intentionally supersedes that assumption. All actual initial worker
+mission, native refund/charged recruit, membership/no-home-redirect, later worker fire,
+public Harvest and real OreDelivered assertions remain. This is an intentionally changed
+setup, not an unchanged old test or a hidden future-job policy.
+
+After those boundaries, complete affected target attempt14-final2-ra8-ai is130/0/0
+(raw2b72997f…), including original air, Chronoshift, slot, worker and route assertions.
+That precedes the final strategic power guard and is scoped compatibility only.
+
+New `ra8_understrength_financing_keeps_a_ground_support_sources_real_power_path` has zero
+cash, empty queues, no Air actors, a real ground cohort, a Chronosphere and sole Reactor.
+Untouched controllers pause while native source charge advances within a cooldown-derived
+bounded loop; the test asserts that charging premise. The source-only preservation body
+fails the native sale prohibition in before1 cad83da2…. AFTER1 985114f0… retains power but
+fails activation without a genuinely revealed objective. AFTER2 090e96b8… reveals the
+footprint but not its preferred landing; observe3 63278c53… establishes actual wave,
+full8400 charge and known Yard but no activation. These are failed control/setup windows,
+not successful support-use evidence. The final noncapturing Dog reveals BOTH the native
+footprint and derived preferred landing without injecting knowledge. AFTER4 589227b5…
+observes real Chronoshift atSimTick8412, charge8400→1, real wave and surviving powered
+Reactor. The final strategic-guard-only bypass d152a86a… fails the native sale prohibition;
+finally05:41:39.051266Z and a SEPARATE05:42:16.747890Z eight-path read restore all source
+before dependencies. No source charge/freeze/recharge or public launch rules change.
+
+Scoped final3 correctly stops after fmt/regeneration0 and strict Clippy101 (bf46aed3…):
+two new service-control comparisons redundantly convert an already-u32 burst. Removing
+only those identity conversions preserves both comparisons/assertions, with an explicit
+before/after source receipt. Nine dependent commands remain unrun in that failed prefix.
+Fresh final4 binds495 current files and reruns the full agreed cheap scoped sequence;
+all mandatory workspace/756 and post-gate isolated acceptance remain pending.
+
+Checkpoint15 final scoped follow-up: final4 completes12 commands all0/160 Rust passes/0failed/0ignored, with131AI,16attrition,4slots,2legacy,three exact matches,Demo1Rust/10Won and grown3. Current combined Crossroads Russia/AmericaP0Won61986,reverseP0Won41738,RiverlandsP0Won33776; DemoRussia/LibyaEasy62722 and grownP1Won45321/45322steps/9defeated. These are final source outcomes; earlier combined wins remain historical. The frozen working source was later committed as0d8f16daba2cc31edba5757d3b99fc2e3c094145 across exactlyfive paths, after unfiltered source stagedcheck0 at05:50:35Z and separate completed-result read05:50:46Z. No native run is claimed postcommit. Full13/both756 and postgate isolated acceptance remain pending.
+
+Checkpoint15 evidence hygiene: first unfiltered stagedcheck exits2, NOTpassed. All42 exact diagnostics across41rawpaths are35native-log blankEOFs and7raw-patch-context trailing spaces. Every file/line/EOL/stagedblob SHA matches;zero source/data/test/prose errors. First stdout7737c0dc… is captured directly as JSON-escaped text. No raw bytes normalized; separate identical final check and a later deliberate evidence commit remain required.
+
+Checkpoint15 separate final unfiltered evidence check exits2 at05:53:22Z, identically7737c0dc…/42raw diagnostics; separate completed-result read05:53:37Z confirms NOTpassed/classified. Metadata is restaged before the last standalone identical check and later deliberate commit, with raw bytes unchanged.

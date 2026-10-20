@@ -1,0 +1,2290 @@
+{
+  "utc": "2026-10-20T05:48:17.782871+00:00",
+  "scope": "Completed attempt14 probe/preflight provenance, not a pass count or acceptance. Failed/compiler/setup/observational/mutation logs remain preserved.",
+  "entries": [
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-building-counterfire-after1.json",
+      "metadata_sha256": "b5b00c3d4101b055232e14e5a96d2ba59cabba550a3365c2baf6c4524af10b0c",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-building-counterfire-after1.log",
+          "bytes": 961,
+          "sha256": "67a2a60da8b979155d882b95b8398e2bbca915546b5a3a3c031c4ca7b8453880",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_surface_counterfire_leaves_an_unarmed_economy_building_to_fight_its_real_defender",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-building-counterfire-after2-observation.json",
+      "metadata_sha256": "17e71d82367964e0492edf3ebecb744dea638db3fe089733f73e04a19b53e9bf",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-building-counterfire-after2-observation.log",
+          "bytes": 1288,
+          "sha256": "5884e6e0c36a39601ca2f7bfa50bdf143db2e77d52fbda738e0368cde8ff55d0",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_surface_counterfire_leaves_an_unarmed_economy_building_to_fight_its_real_defender",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-building-counterfire-before1.json",
+      "metadata_sha256": "cfc292f8965e409f2e0e829a9026ce765fdbbda9aaa3c53a72368dab26767007",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-building-counterfire-before1.log",
+          "bytes": 1000,
+          "sha256": "962f563ea719493fbceda6cfd00415c0497b849c05f3ebc5485f80b39965972f",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_surface_counterfire_leaves_an_unarmed_economy_building_to_fight_its_real_defender",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-building-counterfire-controls3.json",
+      "metadata_sha256": "146f63ae8b5dfefa9ab18a49de052a3a8800ab625b15cfbbab083c1be8bb8766",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-building-counterfire-controls3.log",
+          "bytes": 1491,
+          "sha256": "eec313f843aa28481d7e5336ae9011c1f060ec3e10a3fe9be18336dd6731c782",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "counterfire",
+            "--",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-building-counterfire-controls4.json",
+      "metadata_sha256": "ef95daa00a36d5f2fcba87f12d815df9ea9d9ae9e25a63d54c235173a5838e9e",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-building-counterfire-controls4.log",
+          "bytes": 1049,
+          "sha256": "ebfcc904a880981e41e05bb5ff679f68d589165411eec33b6d814230d868e5eb",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "counterfire",
+            "--",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-building-counterfire-final-bypass2.json",
+      "metadata_sha256": "639dce1a25a1c0d35318fd4882586b50f0ec2ce0818ece0b6e556a6db508a614",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-building-counterfire-final-bypass2.log",
+          "bytes": 1117,
+          "sha256": "668348f342f00da748c4ad73c1c17df2704f75c1286152f9e0f2a61176d66ed8",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_surface_counterfire_leaves_an_unarmed_economy_building_to_fight_its_real_defender",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ],
+      "patch": {
+        "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-building-counterfire-final-bypass2.patch",
+        "bytes": 493,
+        "sha256": "8743a1a2362469771cbe4135e9fbcbdacf4e6da295efd578640a6cf4ac00df0d"
+      }
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-building-counterfire-old-artillery-controls6.json",
+      "metadata_sha256": "e9981bbc9381ada492dfb2a63e171607a19887209526338a548f6edf44be7982",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-building-counterfire-old-artillery-controls6.log",
+          "bytes": 805,
+          "sha256": "812f820292678afa726ce8da22601f1cad88cd38f3efc3c4398b1fd353cf9d76",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "artillery",
+            "--",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-building-counterfire-old-surface-controls5.json",
+      "metadata_sha256": "83a67758866498c183bacd16719bfc74df532a6400ee3449c1dbddb28e4cb9ff",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-building-counterfire-old-surface-controls5.log",
+          "bytes": 1395,
+          "sha256": "0c62e776dc79f20c1736812216ea3f71e1334c707250e96ce2916c9cdb272ffc",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "surface",
+            "--",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-cohort-counterfire-after1.json",
+      "metadata_sha256": "ba90aa9eff0f1ed3d3689cb77a985e146b149d969a1d41f5865250b9b2dceb12",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-cohort-counterfire-after1.log",
+          "bytes": 580,
+          "sha256": "c288b13dd7b4a86cb4cffbff0bb5a46bb96a35270f545f354c15643d932b4e2f",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_a_rear_wave_member_assists_its_actually_threatened_front_before_own_contact",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-cohort-counterfire-before1.json",
+      "metadata_sha256": "ed7ecbd91876d28ca382610fdcc527c800d1460bde5767a5a9de3746b57d1b77",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-cohort-counterfire-before1.log",
+          "bytes": 1072,
+          "sha256": "ed0cabd4719f33d1828fdb1ec12ac4cf060ddaf5318b67fc328095340ecaf91c",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_a_rear_wave_member_assists_its_actually_threatened_front_before_own_contact",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-cohort-counterfire-before2.json",
+      "metadata_sha256": "dba0215788fc2661529cc34dd021e5c9fae335b23dcb3211138c579635881cad",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-cohort-counterfire-before2.log",
+          "bytes": 909,
+          "sha256": "4d39a0239a69f2acf0fa21a4f86288f610bfc70d0da1d325db1664e48f606deb",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_a_rear_wave_member_assists_its_actually_threatened_front_before_own_contact",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-cohort-counterfire-before3.json",
+      "metadata_sha256": "e740254ed148d8dcf6acb320a3ed9ca3a8b0134eb589cdd097d658748f620673",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-cohort-counterfire-before3.log",
+          "bytes": 1105,
+          "sha256": "a13a9a8db3a00d289004ac50ac9948f88e37bf3ccfdd7d4378f092be9b6137e5",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_a_rear_wave_member_assists_its_actually_threatened_front_before_own_contact",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-cohort-counterfire-crossroads-america-russia-after2.json",
+      "metadata_sha256": "69f7e9ac12651d90d380157b6c91964a6845598cb63bd8f81421f42aeb374d23",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-cohort-counterfire-crossroads-america-russia-after2.log",
+          "bytes": 651,
+          "sha256": "2fd1c6faf86712473415d965c8d80b129e004e490bcf3fb00b68b799660d1b8e",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-cohort-counterfire-crossroads-russia-america-after1.json",
+      "metadata_sha256": "91692a9f1fce4ab459f07625f2768d484aa60f3df82dcb7121d263c78bab609d",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-cohort-counterfire-crossroads-russia-america-after1.log",
+          "bytes": 651,
+          "sha256": "26b669876ede824d7e534cb7647c361bd8daaf69be8e1864f5e8f0968895b47f",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate13_crossroads_russia_america_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-cohort-counterfire-crossroads-russia-america-after2.json",
+      "metadata_sha256": "3df7700142c396fed2eb358620006be951430ff35c22d1de1d2e2966c17523a7",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-cohort-counterfire-crossroads-russia-america-after2.log",
+          "bytes": 492,
+          "sha256": "aba0c89897279de7e7ad666cfcfe35c1276a4f624685d6bc88df1620dc8cb11b",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate13_crossroads_russia_america_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-cohort-counterfire-final-bypass1.json",
+      "metadata_sha256": "67c8065aaadd1ad90feb9e21371a4a270fc5b52c0a0fe7d94098612f5a446f05",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-cohort-counterfire-final-bypass1.log",
+          "bytes": 1106,
+          "sha256": "0541644a06c18d8ce4f84f6638534d55a577bee159215c771c64668d469abccf",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_a_rear_wave_member_assists_its_actually_threatened_front_before_own_contact",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ],
+      "patch": {
+        "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-cohort-counterfire-final-bypass1.patch",
+        "bytes": 644,
+        "sha256": "ff06a97051bf40cfb495e16fdd8f7faaa81a29f2bae4ffab9c4b2fe9d5729302"
+      }
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-cohort-counterfire-riverlands-after2.json",
+      "metadata_sha256": "17af7b0607b108ec83f7cc71a58d4f8b0f40b9a0289aab5421ba8f226a86e886",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-cohort-counterfire-riverlands-after2.log",
+          "bytes": 492,
+          "sha256": "628681a984aeebf0cc56fb4d62e67a30d8e872518dc2ecf4991037002a3dd681",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_riverlands_france_germany_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-combined-crossroads-america-russia-after1.json",
+      "metadata_sha256": "c9e7b17c07a29ae5e3ffbb3392cd4e0d3ca4c60b1eb357456423cc4b46cccec9",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-combined-crossroads-america-russia-after1.log",
+          "bytes": 22266,
+          "sha256": "ad6358cb6dc1d0b07a743c55c9f87ec291b0d148cf45f5d0df934e3bec23ecd3",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-combined-crossroads-russia-america-after1.json",
+      "metadata_sha256": "3f973050328fd0317255583198edec8cb8600a16f9dcbb06e2ff4782f4f28f9b",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-combined-crossroads-russia-america-after1.log",
+          "bytes": 42248,
+          "sha256": "645e7dc29dfdd31d6f238c97aca04c998d145af944398cfae265548c99fd4874",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate13_crossroads_russia_america_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-combined-riverlands-france-germany-after1.json",
+      "metadata_sha256": "084284a0d23ad0272b255905568b21ae2eb4338586d58e21e7020840b509779b",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-combined-riverlands-france-germany-after1.log",
+          "bytes": 492,
+          "sha256": "58f12fca0a5a0a2f873af67cb5d84ec6b72a9cf6c78acb8e89dcfe080e57123b",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_riverlands_france_germany_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-consolidation-crossroads-america-russia-after1.json",
+      "metadata_sha256": "dac2b1e208c4ba3ae36199931d7be19f1500ce16e8b558cb2e1a9193cfcd130c",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-consolidation-crossroads-america-russia-after1.log",
+          "bytes": 492,
+          "sha256": "a41edfa9cc766a9b443dc052d1bc1470aebaddef9c09b8772317d4a6f5331118",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-consolidation-crossroads-russia-america-after1.json",
+      "metadata_sha256": "0a9629898f91ec9821b35a928d10b15ff378b97694293cf201620b2a26510a9e",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-consolidation-crossroads-russia-america-after1.log",
+          "bytes": 46604,
+          "sha256": "e42ac4f352dfd685a802fda0ba40cdd9583b611106dedebf6c90b73e1102dff0",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate13_crossroads_russia_america_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-consolidation-crossroads-russia-america-native-after1.json",
+      "metadata_sha256": "ed85839f50f6ade4394e44aa420d38fe2fb49bf6e54a36125f8840acbe9714c3",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-consolidation-crossroads-russia-america-native-after1.log",
+          "bytes": 1936179,
+          "sha256": "417bad7fa88c024af278cf2cfb411ce07a6e62ef2110b2614f5c621c146ace2d",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate13_crossroads_russia_america_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ],
+      "patch": {
+        "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-consolidation-crossroads-russia-america-native-after1.patch",
+        "bytes": 3923,
+        "sha256": "8bf9b199d1d1da06e360ada0c818c678884d61fcff435864345f1ab671140fc6"
+      }
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-consolidation-riverlands-france-germany-after1.json",
+      "metadata_sha256": "5fca9e8b6ef8b22351c88de82be3861ca9fb04f24589ed7c9041a2a87fa7ba8e",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-consolidation-riverlands-france-germany-after1.log",
+          "bytes": 492,
+          "sha256": "e6c71ba691abd7ab8d270fc0a59cd8b5726fea97fb9c453e9506b26bec3c0c75",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_riverlands_france_germany_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-crossroads-america-russia-after1.json",
+      "metadata_sha256": "b7152b5aa31b2b5689073e38a509b49c128a5d06e6bd12851e59836246968741",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-crossroads-america-russia-after1.log",
+          "bytes": 45000,
+          "sha256": "67a89c319d5d8f1c6befa6b76747cc8895a01fff8d0565e8f66424beb4e01e1e",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-crossroads-america-russia-after2.json",
+      "metadata_sha256": "32c684632062e16e3c27c17e2666758302a0af476d178a63baafbbe6f5a7582f",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-crossroads-america-russia-after2.log",
+          "bytes": 45000,
+          "sha256": "a207678fa9b4c6d0bbd0ba0a0a4e97d3942fee8b9f51a303e957f18237719ac2",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-crossroads-america-russia-native-after1.json",
+      "metadata_sha256": "b61df805843dbe479b778c37b6979cd3e4ecbabc0664d97cbfa62422c1d34f5e",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-crossroads-america-russia-native-after1.log",
+          "bytes": 929714,
+          "sha256": "100e12551d6a4f48fe1e3f2a64ea4d430db37f25e155b356057dbc23877bd215",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ],
+      "patch": {
+        "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-crossroads-america-russia-native-after1.patch",
+        "bytes": 3953,
+        "sha256": "401830f37d25be5c11ed08ee987166b7862a77cc9c796f1fc0b7aef50487442f"
+      }
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-crossroads-russia-america-after1.json",
+      "metadata_sha256": "335d64523b249112352efa8f9b96f96d22a65b68843ff0f2ceef069a48a9fa31",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-crossroads-russia-america-after1.log",
+          "bytes": 42189,
+          "sha256": "b1eda17a57a14f5c82a7c9b00aff97f2d549d5d8cf38dc540d38ca5a89a5a41b",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate13_crossroads_russia_america_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-crossroads-russia-america-after2.json",
+      "metadata_sha256": "5edc5788c3b5e16b241a096eccf04e3019c41e44dfe515b72c0c0b8b5ec4bf58",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-crossroads-russia-america-after2.log",
+          "bytes": 42189,
+          "sha256": "9d0bbf05136bd9ae5021860a286102f7d996b0b359174e52e671a88221c6c31b",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate13_crossroads_russia_america_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-decision-probe2.json",
+      "metadata_sha256": "655106aa495d48adbf1af3aac4a1598178797bfdd6ee72e60199e25ae53a477f",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-decision-probe2.log",
+          "bytes": 14924,
+          "sha256": "2677ad2abe41cf8032c54e677404475b45874bf9cddfc59c31109b9d8601a022",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_surface_counterfire_prioritizes_a_real_defender_over_a_nearer_unarmed_miner",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ],
+      "patch": {
+        "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-decision-probe2.patch",
+        "bytes": 817,
+        "sha256": "d6354f1659c0b66992fcc5d01c5c2bbc2541f0927174e3d9041e6f61f363cb89"
+      }
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-decision-probe3.json",
+      "metadata_sha256": "155385a000d13258cca09dc3c80bcdc9d3c91b99b45bfcd29b75a4c10be9bc3d",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-decision-probe3.log",
+          "bytes": 16000,
+          "sha256": "97317dbc478e4aec0ab992362cd9e1b24bcccd13aec6d80003e2cda1295b9405",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_surface_counterfire_prioritizes_a_real_defender_over_a_nearer_unarmed_miner",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ],
+      "patch": {
+        "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-decision-probe3.patch",
+        "bytes": 984,
+        "sha256": "c1eefe990850001531502a9cf2535903a66a2dab946f890151d76e867739d0eb"
+      }
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-final-bypass1.json",
+      "metadata_sha256": "e664cbb40b45ab23074e1e8bae630c62a255d3ca079f981a691773a7ce31b7b7",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-final-bypass1.log",
+          "bytes": 1388,
+          "sha256": "462fb15489506b3cd908e98dad8ca4fc27cda56eaf0f8f8e2b4f3ea0028fb107",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_surface_counterfire_prioritizes_a_real_defender_over_a_nearer_unarmed_miner",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ],
+      "patch": {
+        "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-final-bypass1.patch",
+        "bytes": 360,
+        "sha256": "9a9872735057e9aded0326fff34bd1e1baf4395bf96824b13d7b49563d46f7b0"
+      }
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-guard-probe1.json",
+      "metadata_sha256": "b2d4a36cae43b575965633442da58088411a96b80d6c13b2c862795e1f8842a5",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-guard-probe1.log",
+          "bytes": 14923,
+          "sha256": "023b41d2320efca392ccbf58f3741c15d19f21fbff643e2ee7d80b7d802f6a14",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_surface_counterfire_prioritizes_a_real_defender_over_a_nearer_unarmed_miner",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-ownership-after1.json",
+      "metadata_sha256": "0d4c683cc69c2f0272ca9acca827fb92688a3934f922a31c30f61cd3d0afe5c1",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-ownership-after1.log",
+          "bytes": 546,
+          "sha256": "fa2c07d56aa6b5abee379ba8718bfddbc66eee30762139437d3512c3d284328d",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "counterfire",
+            "--",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-ownership-before1.json",
+      "metadata_sha256": "8a9ebc41b01cfac55f5c424e496f072ce4138d278d4b49a545f94553f18f6503",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-ownership-before1.log",
+          "bytes": 919,
+          "sha256": "0617df97fdd5fecbf55b1816e98fa7f0226bf6b292a57fcee3b32a21437f76fe",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_distant_unrelated_unit_chase_is_not_a_current_counterfire_job",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-priority-after1.json",
+      "metadata_sha256": "f06f774adabf505142d3122cd8c1e3455be75e004b82670a3bf6ecb58a6b8387",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-priority-after1.log",
+          "bytes": 972,
+          "sha256": "17c67734f86f38a68c9e03e471d20b9fb7f100ef9fb501781cb39f3432cde3db",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_surface_counterfire_prioritizes_a_real_defender_over_a_nearer_unarmed_miner",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-priority-after2.json",
+      "metadata_sha256": "7b2c28fdfb27dbe019441548ef603197ee57852345747e2a633d3904b937665c",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-priority-after2.log",
+          "bytes": 467,
+          "sha256": "da8ecf4506cb142281203e2c1f57751646145beed2481e47c01301242fe05541",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_surface_counterfire_prioritizes_a_real_defender_over_a_nearer_unarmed_miner",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-priority-before1.json",
+      "metadata_sha256": "10973eb816904cf16497200a47f9d6b43677dd7d5de12e71434ae5c69cd19c16",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-priority-before1.log",
+          "bytes": 932,
+          "sha256": "bc40602bbe6c8f17ade2cdd6810bf82df6039c4f7df490b43c4433a71e2eb411",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_surface_counterfire_prioritizes_a_real_defender_over_a_nearer_unarmed_miner",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-priority-before2.json",
+      "metadata_sha256": "9c54f53660599da01a1c6533472ffaef9415b2194fb3a49a5146eae66b73ebf5",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-priority-before2.log",
+          "bytes": 971,
+          "sha256": "ff3312466933f3fedc89922961aa778fcf8648c8827ba29997719596c2eb9d23",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_surface_counterfire_prioritizes_a_real_defender_over_a_nearer_unarmed_miner",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-riverlands-france-germany-after1.json",
+      "metadata_sha256": "041893757759848839440e9a9ed416b8b6f278c2a573f76334c1e55a19c09810",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-riverlands-france-germany-after1.log",
+          "bytes": 492,
+          "sha256": "e6ad99d46e8279ade21f73c3560da7410a1c7d3cc70bdbaa461f8f36ab4d2cd3",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_riverlands_france_germany_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-riverlands-france-germany-after2.json",
+      "metadata_sha256": "34e87e067b33202174b823f53556a7ac6b3a958df46c9f39ae5dab8e6705fed7",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-riverlands-france-germany-after2.log",
+          "bytes": 492,
+          "sha256": "416482cf081f94f91d4c6b65a67cd59b87d0d87b909f3a040ac52aa34bfea121",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_riverlands_france_germany_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-surface-controls1.json",
+      "metadata_sha256": "c49cc45251d818ba9289c2473ea635f7ea9edf03fe0bb620c7348c5a1f73852a",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-counterfire-surface-controls1.log",
+          "bytes": 890,
+          "sha256": "56ce76b5368015748035bcaa53d2b0b42d68985e43910a8fc148e300307ba0e9",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "surface",
+            "--",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-crossroads-america-russia-after1.json",
+      "metadata_sha256": "beddac4449a3c371550ae725680659a5aea4ac1bdd3f3f7675d50e8fee082e07",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-crossroads-america-russia-after1.log",
+          "bytes": 41004,
+          "sha256": "e2c051c39f25c937e7dc2ccb2738e4f2d59a5839006db92a4a92d1b2c8053925",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-crossroads-america-russia-fine-damage1.json",
+      "metadata_sha256": "ba4c00d81f7e2d144fc4b8dd45353ea7115a68c88419cc675040e7a624e2a5af",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-crossroads-america-russia-fine-damage1.log",
+          "bytes": 152,
+          "sha256": "8d1195e4a1bae566139318e5fd2e565285412963ce300de0887b32e81b23b983",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ],
+      "patch": {
+        "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-crossroads-america-russia-fine-damage1.patch",
+        "bytes": 5918,
+        "sha256": "5d2f27d589671126389a85c8dfdfa3cbb0eb90446a9b8cbdae54297b007ecc3a"
+      }
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-crossroads-america-russia-fine-damage2.json",
+      "metadata_sha256": "78ce5762398cbda831a8744af09cf4c26406029b9e5f9ab791b426002fbdf887",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-crossroads-america-russia-fine-damage2.log",
+          "bytes": 1474,
+          "sha256": "f4aadbfab074717d728ca6eaab5dfb63ffe9f3c10cc96e6ceaa5270f3447128d",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ],
+      "patch": {
+        "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-crossroads-america-russia-fine-damage2.patch",
+        "bytes": 5918,
+        "sha256": "5d2f27d589671126389a85c8dfdfa3cbb0eb90446a9b8cbdae54297b007ecc3a"
+      }
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-crossroads-america-russia-fine-damage3.json",
+      "metadata_sha256": "b6fdecbc319777e1c65e4c1eca11cd4ad55113b99adc8655271e9a349831c849",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-crossroads-america-russia-fine-damage3.log",
+          "bytes": 954171,
+          "sha256": "442b243daa88c519c9fcf37fc42be83d497cc7bb0ffc8a298d481b03ee19c1d9",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ],
+      "patch": {
+        "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-crossroads-america-russia-fine-damage3.patch",
+        "bytes": 5974,
+        "sha256": "8011a552a1672a51c0bc886dae7d8a266fb68f86e58d622a2c0c37947bd63efe"
+      }
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-crossroads-america-russia-native-before1.json",
+      "metadata_sha256": "35ca4203e2398cedea11b1dc440b337fbb25dc5d686ccfde845d8679029eda3a",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-crossroads-america-russia-native-before1.log",
+          "bytes": 921702,
+          "sha256": "df24fd9b0930f4584871f59903448de78bd149012aa72e23f3cc411cdb1655f4",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ],
+      "patch": {
+        "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-crossroads-america-russia-native-before1.patch",
+        "bytes": 3953,
+        "sha256": "401830f37d25be5c11ed08ee987166b7862a77cc9c796f1fc0b7aef50487442f"
+      }
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-crossroads-russia-america-after1.json",
+      "metadata_sha256": "cb9539773b6c6e34dbe990efd9d21e1cffc455f7c3dfa9e775a95e9a1187cc60",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-crossroads-russia-america-after1.log",
+          "bytes": 41747,
+          "sha256": "dd7b4a0aa75a22219a5291aaa9b3d9a1932909ae3e3dad388ea53d2a2d1dade3",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate13_crossroads_russia_america_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-final1-ra8-ai.json",
+      "metadata_sha256": "78f349fcf70c3e1ef5f9c3174ad3bf0b64b13c052c82e17ded28b588a5a0161c",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-final1-ra8-ai.log",
+          "bytes": 80871,
+          "sha256": "068d7087eaaffa207c88dc43c52b501f1c4702add7ce781f1a62a96a44102f2f",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "--",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-final2-ra8-ai.json",
+      "metadata_sha256": "06d9908c5f64094b779d04b4fd479cda985e1390b121323fb438fc1c12441ce2",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-final2-ra8-ai.log",
+          "bytes": 46055,
+          "sha256": "2b72997fb8f8bca7356fd84194ff5711c40da1dca549313e85c97206c54009da",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "--",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-final3-summary.json",
+      "metadata_sha256": "7b79c2b75a49495456ca5b345bad4ad7a24a9e10ea35c1420fb1c5620aee68a5",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-final3-01-fmt.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "command": [
+            "cargo",
+            "fmt",
+            "--all",
+            "--",
+            "--check"
+          ],
+          "exit": 0
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-final3-02-regenerate.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "command": [
+            "python3",
+            "scripts/generate_ra2_data.py",
+            "--check"
+          ],
+          "exit": 0
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-final3-03-clippy.log",
+          "bytes": 1256,
+          "sha256": "bf46aed326cc976d80b3fcd32942f70b523ff748ea3144f4d8d3ef9c4b0faedf",
+          "command": [
+            "cargo",
+            "clippy",
+            "--workspace",
+            "--all-targets",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-summary.json",
+      "metadata_sha256": "97947f69f9fb2a6d9eead9e33e2fe91b5dbf80f34ca17425de42b9086740f65b",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-01-fmt.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "command": [
+            "cargo",
+            "fmt",
+            "--all",
+            "--",
+            "--check"
+          ],
+          "exit": 0
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-02-regenerate.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "command": [
+            "python3",
+            "scripts/generate_ra2_data.py",
+            "--check"
+          ],
+          "exit": 0
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-03-clippy.log",
+          "bytes": 230,
+          "sha256": "f468b7b63a32927e610df1f05494ed0a42f607e2921f65d0c164636f79da27c5",
+          "command": [
+            "cargo",
+            "clippy",
+            "--workspace",
+            "--all-targets",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exit": 0
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-04-crossroads-russia-america.log",
+          "bytes": 21344,
+          "sha256": "14fdaf9a06b7d5dbc7e6086092a4e5a8a2f2f8f2239aa115e87edd4567d5d050",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate13_crossroads_russia_america_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 0
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-05-crossroads-america-russia.log",
+          "bytes": 492,
+          "sha256": "b52c1745c7e49e3cc8e1b7144944f2c81960e2ad3a8f9957e4e668a0290a6807",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 0
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-06-riverlands-france-germany.log",
+          "bytes": 492,
+          "sha256": "9bbcc640d4f1a4f9d507fdea692007744ade60026979b019211482f35c06fbd7",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_riverlands_france_germany_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 0
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-07-ra8-ai.log",
+          "bytes": 46446,
+          "sha256": "fc93bf0639b20a72b0e45edfe5f141b4b55762b74d986852d9669d19fa422707",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "--",
+            "--nocapture"
+          ],
+          "exit": 0
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-08-attrition.log",
+          "bytes": 3387,
+          "sha256": "45b21f1c4791a839a6469eab1e4236a2709d9ad650dcaa602d5897eac9a51794",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--lib",
+            "ra8_attrition_tests",
+            "--",
+            "--nocapture"
+          ],
+          "exit": 0
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-09-slot.log",
+          "bytes": 685,
+          "sha256": "0328a5eec4881b8f16012b1d20c23339278fe2d7a81764faa555be34878efe6a",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--lib",
+            "last_stand",
+            "--",
+            "--nocapture"
+          ],
+          "exit": 0
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-10-legacy.log",
+          "bytes": 719,
+          "sha256": "aeb05528f645115fb42f27234c4433fec8eb57e4af66e8950f6c50d5661efec9",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra4_ai",
+            "--",
+            "--nocapture"
+          ],
+          "exit": 0
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-11-demo10.log",
+          "bytes": 9925,
+          "sha256": "724455119e5997e3feaaf01d5e53e15eba6ee38b39000a884ba0a9058e3e00bd",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_ai_matches",
+            "--",
+            "--nocapture"
+          ],
+          "exit": 0
+        },
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-12-grown3.log",
+          "bytes": 869,
+          "sha256": "d467b81aa28d7ca2fd69857b837f4d771ae18f8946b98688f75992af8b3ad6dc",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "m13_grown_maps",
+            "--",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-garrison-retention-after1.json",
+      "metadata_sha256": "8a5ddfe15d6bd2b8ca8f29b64c3dc7440f37b350e78889eb488d07d9f678b994",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-garrison-retention-after1.log",
+          "bytes": 669,
+          "sha256": "0c1aab17e277ab01fa1b6e6d46e351a0ec3ca196d74885d5d445d68cb71be56d",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_unfunded_idle_garrison_reinforces_a_living_offensive_force",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-garrison-retention-after2.json",
+      "metadata_sha256": "2b2ed3a9d8871913cb6fd4c42711751f2fdc57f1dc6f1240cb8c9eedf45af4e4",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-garrison-retention-after2.log",
+          "bytes": 1329,
+          "sha256": "e9974fc2a4767d0d3e35a70f8895dc1a32ac594f48abd03e88757049749da533",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "garrison",
+            "--",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-garrison-retention-after3.json",
+      "metadata_sha256": "ebe5b38c4afb337dea4d7a4f9b19b15df6743cdee9a4032a84a26ff3cbb6a26a",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-garrison-retention-after3.log",
+          "bytes": 880,
+          "sha256": "749bf21808647483a7274835f10157d13009be998c58cf769394525d323ab81b",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "garrison",
+            "--",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-garrison-retention-before1.json",
+      "metadata_sha256": "be699bf98b90c56b3b7f75174961565007d6a6a09ebf48235acf3ee7fcd92ce5",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-garrison-retention-before1.log",
+          "bytes": 903,
+          "sha256": "74edcce8a95ba4b85f570d078d3fc063a536b1c813c55ea3bd14007d21b7241c",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_unfunded_idle_garrison_reinforces_a_living_offensive_force",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-garrison-retention-final-bypass1.json",
+      "metadata_sha256": "3a1f0fcab0d152922aa9ecf853a73cc01c1c2ea14c1b70cb7e80e4d8ca88685d",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-garrison-retention-final-bypass1.log",
+          "bytes": 903,
+          "sha256": "2153ac457dad3e86daceac67626b9cc1b778db8c134ed566a77dc6e3d263e070",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_unfunded_idle_garrison_reinforces_a_living_offensive_force",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ],
+      "patch": {
+        "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-garrison-retention-final-bypass1.patch",
+        "bytes": 511,
+        "sha256": "4c20b65bbda9946933d39db4bc938c960ce2776b5941c0b2406beb4b40485227"
+      }
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-productive-consolidation-after1.json",
+      "metadata_sha256": "9bc09bf6c6167475b86d549e862e11c5bf6be16abb4c5cc4c3a74352cac61e27",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-productive-consolidation-after1.log",
+          "bytes": 599,
+          "sha256": "e8ce964ec7198f704e34b4b86c9473d139fbb5ce21e161f269131db25bb7d953",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_an_understrength_force_can_consolidate_a_producer_for_real_paid_infantry",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-productive-consolidation-before1.json",
+      "metadata_sha256": "acffc3454452830c1cd980f2b9a550b2ea771d2004362c8b92654d9ee621c7a8",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-productive-consolidation-before1.log",
+          "bytes": 974,
+          "sha256": "4445f0993e09776935d3ecc01080663e19158b396c39d960aa1e8a901249d3ae",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_an_understrength_force_can_consolidate_a_producer_for_real_paid_infantry",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-productive-consolidation-before2.json",
+      "metadata_sha256": "e8d8709f247a1c058a0ab4160ee876126914ef69e008c4d58f41211b61b9e36e",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-productive-consolidation-before2.log",
+          "bytes": 1154,
+          "sha256": "5f8585441aa5891f69883516f45bb6b460c69f9a954d003dccef758db0f9db4b",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_an_understrength_force_can_consolidate_a_producer_for_real_paid_infantry",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-productive-consolidation-final-bypass1.json",
+      "metadata_sha256": "58c790c4e47040c0cdffe32a195e0c2457e1e624d72c9920ff4aba1595e60baa",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-productive-consolidation-final-bypass1.log",
+          "bytes": 1155,
+          "sha256": "150cdada7ee3561b8eb195f9546e2a0f929875c36a936189e83727bb7fc3909f",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_an_understrength_force_can_consolidate_a_producer_for_real_paid_infantry",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ],
+      "patch": {
+        "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-productive-consolidation-final-bypass1.patch",
+        "bytes": 429,
+        "sha256": "f0200b0776400b508b34d30809c51595a96fd862183aebb88d5ed5f28e1e8e8c"
+      }
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-riverlands-france-germany-after1.json",
+      "metadata_sha256": "238a2073ebc17d827732e73f647504a98adffeffb03263298d9e5d4e76a220bc",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-riverlands-france-germany-after1.log",
+          "bytes": 35232,
+          "sha256": "d2bc477e3a746a39706e3b7768483dd1dd45ea6ab145e98b811a9772340542c7",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_riverlands_france_germany_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-strategic-power-preservation-after1.json",
+      "metadata_sha256": "daa3e1e52007f400b7cef8ca2535068e6a29b9f2f38a1142f0ada05972084528",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-strategic-power-preservation-after1.log",
+          "bytes": 948,
+          "sha256": "985114f0bd95a7483e19f957eedb316bb5bc458d1d723f94c371f494e0f74e26",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_understrength_financing_keeps_a_ground_support_sources_real_power_path",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-strategic-power-preservation-after2.json",
+      "metadata_sha256": "1aa0b52c047ffee2304691e4344cb154c240e543ab7bdf191b0aae93860591fd",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-strategic-power-preservation-after2.log",
+          "bytes": 947,
+          "sha256": "090e96b810440cace497d5d5a41cd97aa48d6fd5986cddcfd44d4bd66efbf597",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_understrength_financing_keeps_a_ground_support_sources_real_power_path",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-strategic-power-preservation-after4.json",
+      "metadata_sha256": "2f847a64e054bdf7a39fdeca77e4d8bfec6970139d367f24113119275caa7a27",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-strategic-power-preservation-after4.log",
+          "bytes": 765,
+          "sha256": "589227b59b14d30995bc0313298c00a05c55130dbc1f11777adec510a76ff9fa",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_understrength_financing_keeps_a_ground_support_sources_real_power_path",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-strategic-power-preservation-before1.json",
+      "metadata_sha256": "0807a785274996416316b13ce04481805f111ab868040b417528bbc849f0950c",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-strategic-power-preservation-before1.log",
+          "bytes": 949,
+          "sha256": "cad83da2d35a2aaec8b032574bfc2c1e5688a6525fe4c1e6072e9a728e356f19",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_understrength_financing_keeps_a_ground_support_sources_real_power_path",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-strategic-power-preservation-final-bypass1.json",
+      "metadata_sha256": "b6cc5773008013820a1e0fa0b1d4d9d3c3166408a3b7efd0825fc2e5f2768463",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-strategic-power-preservation-final-bypass1.log",
+          "bytes": 950,
+          "sha256": "d152a86aecdc5cf03b21e40531064a34afb9b2591d79756cdbe7845d97ac0e6e",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_understrength_financing_keeps_a_ground_support_sources_real_power_path",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ],
+      "patch": {
+        "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-strategic-power-preservation-final-bypass1.patch",
+        "bytes": 566,
+        "sha256": "a72d0d7a10e2c1dd9c57fd217c7978ed033906acf3aa3f895c60ee55dde9e418"
+      }
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-strategic-power-preservation-observe3.json",
+      "metadata_sha256": "ae5296053d03b8326b8ccd17abf366a7916b230485f2d39d64a9482414b53303",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-strategic-power-preservation-observe3.log",
+          "bytes": 1245,
+          "sha256": "63278c537a9701c6436d8159fd1a42756ca26c1a46f55a614643f30df25c9f4e",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_understrength_financing_keeps_a_ground_support_sources_real_power_path",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-crossroads-america-russia-after1.json",
+      "metadata_sha256": "7f1c578c5326df5e0f86d3eebc8ff2747bd951c2dea85167aafbecb83e10e3f0",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-crossroads-america-russia-after1.log",
+          "bytes": 651,
+          "sha256": "6494f51d2e5b5804576ce8ab843aff5bb1458dfbd589b875cc88302f2ec008e9",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-crossroads-russia-america-after1.json",
+      "metadata_sha256": "66929b91617d4fa0b7a3b514a9e343b5c9b38913c2e0f7772361045f604b325e",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-crossroads-russia-america-after1.log",
+          "bytes": 42735,
+          "sha256": "aea3d6691488624f503173776649e926959c2081d39d36dd2139407dd5d7025b",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate13_crossroads_russia_america_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-finance-after1.json",
+      "metadata_sha256": "45646358bf5b72a6eb1b5e267b7573b7f51bf5df6b325260978e4d612d0f1a01",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-finance-after1.log",
+          "bytes": 907,
+          "sha256": "c30928f65649badd1929f2a9a924a29f337c45728dbe7aef19239e07bfe5bfe2",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_an_understrength_living_field_force_can_finance_a_paid_reinforcement",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-finance-after2.json",
+      "metadata_sha256": "9210aedd61264dfaa76ba46384d92ae15f4bfdfb9abe41da099f161095e7742b",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-finance-after2.log",
+          "bytes": 612,
+          "sha256": "26a895749d2e3d7ad51e2f76b5a6bbae3940ae54837dc044885f34126117b83f",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_an_understrength_living_field_force_can_finance_a_paid_reinforcement",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-finance-before1.json",
+      "metadata_sha256": "3ec389396b5a9e09fd3516b17acd9d14345290d858daf3edf684749a9889560f",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-finance-before1.log",
+          "bytes": 1144,
+          "sha256": "a79f5538c42013886388872008ee4f46d59418f5cbc80f336ecb2d27339e0968",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_an_understrength_living_field_force_can_finance_a_paid_reinforcement",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-finance-controls2.json",
+      "metadata_sha256": "09e31ca626e935e96996700ac2a5d899a67559d46a33203bb10744e13f967151",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-finance-controls2.log",
+          "bytes": 306,
+          "sha256": "f51f6c06a11b33dc124a117641fb1b0413afad3b499b5cfa0de8d87556da8e0b",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "understrength",
+            "--nocapture"
+          ],
+          "exit": 1
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-finance-controls3.json",
+      "metadata_sha256": "88c98f5540e63c633912ee8864416872a8100e413a32b5bf5b17c2587a334955",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-finance-controls3.log",
+          "bytes": 1645,
+          "sha256": "f34ef1186491285849be08148b96e0ec1a465e88e4496e9211b1e4f1c3fdbaa4",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "understrength",
+            "--",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-finance-controls4.json",
+      "metadata_sha256": "45e62e54727085875fa79ea7267ed2820f4e9fb4b5a1594991aafd77fdf3982a",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-finance-controls4.log",
+          "bytes": 1153,
+          "sha256": "c242a62fb67001be2cbef0675f3c48ec5ca798a1b5702df1e3918f591c7e160a",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "understrength",
+            "--",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-finance-controls5.json",
+      "metadata_sha256": "11c499fc53944cac164c22cce3201b35b105f560a3ec839c4b810bd632d26b71",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-finance-controls5.log",
+          "bytes": 693,
+          "sha256": "221456c71c59339af494d73c78a77a8220581ebc65b51acb4e757eadf893bdf6",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "understrength",
+            "--",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-finance-final-bypass1.json",
+      "metadata_sha256": "01cd655cebca706f0d8c52ab18bf12dec8f9fe87f88229571b2143fb2aed827e",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-finance-final-bypass1.log",
+          "bytes": 1617,
+          "sha256": "6e49be989ec02c6c1a615efa53a4f2672aee8e97b32bf2bcc0542769386c8f0c",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_an_understrength_living_field_force_can_finance_a_paid_reinforcement",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ],
+      "patch": {
+        "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-finance-final-bypass1.patch",
+        "bytes": 374,
+        "sha256": "9d7b6f7e781998618e93c38be75b92bd6e2ebf750f47f07af0c76bf874da549c"
+      }
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-financial-controls6.json",
+      "metadata_sha256": "0ab2aa0e41c8c1cc0e7178e78411f7fb4a736113d3e9ae70285d59a5bd83efe0",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-financial-controls6.log",
+          "bytes": 985,
+          "sha256": "4e0a207f10c4dd7968f88dec1d25a76e3337183324cc0c7ddc27d9b19cd3c8b5",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "financ",
+            "--",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-old-finance-controls1.json",
+      "metadata_sha256": "d4931734e5667a5e949f52a6bfeccfbcb96e81acaa1e32f1889f191559d41c19",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-old-finance-controls1.log",
+          "bytes": 848,
+          "sha256": "dfda6fa5c58d4c43aec1ac4400783c17d71cb0ffab65e4814e6087c9ff667977",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "sim",
+            "--test",
+            "ra8_ai",
+            "ra8_real_forces_economic_jobs_and_financed_heads_preserve_optional_worker_assets",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 101
+        }
+      ]
+    },
+    {
+      "metadata": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-riverlands-france-germany-after1.json",
+      "metadata_sha256": "81e4ac56e449e0daf7b2e71d74ec8471a2ab87f05d81adcd1f2885469e8be65a",
+      "logs": [
+        {
+          "path": "docs/validation/ra2-parity/ra8-preflight/attempt14-understrength-riverlands-france-germany-after1.log",
+          "bytes": 492,
+          "sha256": "bb9f32eb0dd1f6723e9221e878f324daac4f83aa4b5a232a2232dfaa2d19fa89",
+          "command": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "game",
+            "--test",
+            "ra8_gate_matches",
+            "ra8_gate14_riverlands_france_germany_easy_seed_zero_finishes",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exit": 0
+        }
+      ]
+    }
+  ],
+  "parse_errors_preserved": [],
+  "metadata_records": 81,
+  "unique_raw_files": 94
+}
