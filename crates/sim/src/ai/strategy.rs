@@ -2538,24 +2538,39 @@ fn strike_target(
         .values()
         // Failed army cohorts do not establish failure of an independent,
         // normally charged strategic strike. Retain its source-weighted targets.
-        .filter(|b| stable(view, b.footprint.origin))
-        .map(|b| (b.footprint, weight(view, b.kind, weights)))
+        .filter_map(|b| {
+            // Public strategic commands require the selected cell to be visible,
+            // while a known building may be observed through any footprint cell.
+            b.footprint
+                .cells()
+                .find(|&cell| stable(view, cell))
+                .map(|cell| (b.footprint, weight(view, b.kind, weights), cell))
+        })
         .chain(
             view.enemy_units
                 .iter()
                 .filter(|u| stable(view, u.mobile.cell))
-                .map(|u| (cell_footprint(u.mobile.cell), unit_weight(view, u, weights))),
+                .map(|u| {
+                    (
+                        cell_footprint(u.mobile.cell),
+                        unit_weight(view, u, weights),
+                        u.mobile.cell,
+                    )
+                }),
         )
-        .filter(|(_, weight)| *weight > 0)
+        .filter(|(_, weight, _)| *weight > 0)
         .collect();
-    targets.iter().map(|(f, _)| f.origin).max_by_key(|&cell| {
-        let score: u64 = targets
-            .iter()
-            .filter(|(f, _)| f.distance_to_cell(cell) <= radius)
-            .map(|(_, weight)| u64::from(*weight))
-            .sum();
-        (score, std::cmp::Reverse(cell))
-    })
+    targets
+        .iter()
+        .map(|(_, _, cell)| *cell)
+        .max_by_key(|&cell| {
+            let score: u64 = targets
+                .iter()
+                .filter(|(f, _, _)| f.distance_to_cell(cell) <= radius)
+                .map(|(_, weight, _)| u64::from(*weight))
+                .sum();
+            (score, std::cmp::Reverse(cell))
+        })
 }
 
 // The source freeze prevents an arriving vehicle from immediately defending itself.
