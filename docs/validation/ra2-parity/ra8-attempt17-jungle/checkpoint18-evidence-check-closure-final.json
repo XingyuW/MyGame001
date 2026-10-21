@@ -1,0 +1,23 @@
+{
+  "utc": "2026-10-21T16:10:16.705269+00:00",
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit": 0,
+  "passed": true,
+  "stdout": "",
+  "stderr": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "staged_count": 26,
+  "diagnostics": 0,
+  "files": 0,
+  "classifications": {},
+  "source_data_test_prose_errors": 0,
+  "raw_bytes_unchanged": true,
+  "items": [],
+  "scope": "Nonzero check remains a failure; deliberate raw-evidence preservation is documented separately. No bytes were sanitized or ignored.",
+  "identical_to_first_unfiltered_check": true
+}

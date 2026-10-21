@@ -38,5 +38,51 @@
     "stdout_sha256": "6e4fc6c20742a6b5c1cd393586d71f37724907823c7d9e4dff8290249917803d",
     "final_identical_check_and_completed_result_read_required_before_commit": true,
     "raw_bytes_preserved": true
+  },
+  "closure": {
+    "utc": "2026-10-21T16:09:39.815143+00:00",
+    "status": "RA8 CLOSED; original pending fields above retain historical scope",
+    "fresh_all13_exits": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "same_source_isolated_exits": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "source_files": 495,
+    "source_mismatches": 0,
+    "metrics": {
+      "path": "docs/validation/ra2-parity/ra8/checkpoint18-closure-metrics.json",
+      "sha256": "f8c2e7f9219d0d8c9d5b3de2a846d3656b13cadc46a394f79448c9aadb4b2c0b"
+    },
+    "final_binding": {
+      "path": "docs/validation/ra2-parity/ra8-attempt17-jungle/checkpoint18-final-binding.json",
+      "sha256": "dbf49e8fb778b91d597e7f39aaf5a644b346ee8545a4f47309288b398507d12f"
+    },
+    "canonical_release": "After closure commit and clean verification by explicit handoff",
+    "ra9_and_fresh_final_review_pending": true,
+    "evidence_hygiene": {
+      "first_receipt": "checkpoint18-evidence-check-closure-first.json",
+      "unfiltered_exit": 0,
+      "diagnostics": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes_preserved": true,
+      "separate_identical_final_check_and_result_read_before_commit": true
+    }
   }
 }

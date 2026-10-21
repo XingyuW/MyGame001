@@ -71,6 +71,14 @@ counts = re.findall(r'^test result:.*? (\d+) passed; (\d+) failed; (\d+) ignored
 assert counts and all(failed == ignored == '0' for _, failed, ignored in counts)
 assert 'M6 production progress completed756/756 non_Won0' in workspace
 assert 'test computer_players_finish_matches_with_the_shipped_data_on_every_shipped_map ... ok' in workspace
+benchmark_path = OUT / '08-benchmark.log'
+benchmark = benchmark_path.read_text()
+benchmark_rows = re.findall(r'(?m)^(fixture|shipped): (\d+) units spawned; mean tick ([\d.]+) ms, longest tick ([\d.]+) ms; mean over the (\d+) ticks with at least 150 units alive ([\d.]+) ms;', benchmark)
+assert len(benchmark_rows) == 2 and {row[0] for row in benchmark_rows} == {'fixture', 'shipped'}
+assert all(row[1] == '200' and float(row[2]) <= 5 and float(row[3]) <= 50 for row in benchmark_rows)
+assert '2000 measured ticks per scenario' in benchmark and 'm7 benchmark: passed' in benchmark
+benchmark_heap = re.search(r'peak heap in use: ([\d.]+) MiB \(budget (\d+) MiB\)', benchmark)
+assert benchmark_heap and float(benchmark_heap[1]) < int(benchmark_heap[2]) == 1024
 soak_path = OUT / '09-soak.log'
 soak = soak_path.read_text()
 configurations = re.findall(r'(?m)^(.*): (\d+) ticks, (\d+) matches \((\d+) ended, the last (still running|ended)\), ([\d.]+) s for both runs$', soak)
@@ -90,6 +98,12 @@ record = {'utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
     'commands': process['completed_rows'],
     'workspace': {'raw': raw(workspace_path), 'result_targets': len(counts),
         'passed': sum(int(row[0]) for row in counts), 'failed': 0, 'ignored': 0},
+    'benchmark': {'raw': raw(benchmark_path), 'measured_ticks_each_scenario': 2000,
+        'original_mean_budget_ms': 5, 'original_longest_tick_budget_ms': 50,
+        'peak_heap_mib': float(benchmark_heap[1]), 'heap_budget_mib': int(benchmark_heap[2]),
+        'scenarios': [{'name': row[0], 'spawned_units': int(row[1]), 'mean_ms': float(row[2]),
+            'max_ms': float(row[3]), 'ticks_with_at_least_150_alive': int(row[4]),
+            'mean_with_at_least_150_alive_ms': float(row[5])} for row in benchmark_rows]},
     'production': current_production, 'production_baseline_ra7': baseline_production,
     'duels': duels(OUT / '10-duels.log'), 'duels_baseline_ra7': duels(BASE / 'ra7/10-duels.log'),
     'soak': {'raw': raw(soak_path), 'configurations': len(configurations), 'repeats': 2,
@@ -102,6 +116,14 @@ record = {'utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
     'length_scope': 'Median and nearest-rank p90; M6 table world tick can be one greater than Won event tick. Duel original-map normalization uses unchanged M6 limits; duel fixed cap remains300000. No claim that every tail improves.',
     'timing_scope': 'Only final-source canonical isolated acceptance is credited for ten-player performance; RA9 preliminary copy timing is excluded.'}
 destination = OUT / 'checkpoint18-closure-metrics.json'
+lease_path = OUT / 'checkpoint18-functional-overlap-lease.json'
+if lease_path.exists():
+    lease = json.loads(lease_path.read_text())
+    assert lease['status'] == 'CLOSED' and lease['confirmed_no_copy_native_cargo']
+    phase4 = next(row for row in process['completed_rows'] if row['number'] == 4)
+    assert datetime.datetime.fromisoformat(lease['closed_utc']) < datetime.datetime.fromisoformat(phase4['observed_utc'])
+    record['bounded_copy_functional_lease'] = raw(lease_path)
+    record['workspace']['elapsed_scope'] = 'Functional validation only: bounded RA9 copy checks overlapped part of phase04. All copy Cargo/native stopped before phase04 completed, before benchmark/soak/duels. No workspace/copy elapsed timing is performance evidence.'
 assert not destination.exists()
 destination.write_text(json.dumps(record, indent=2) + '\n')
 print(json.dumps({key: record[key] for key in ['runtime_commit', 'workspace', 'soak']}, indent=2))

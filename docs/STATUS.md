@@ -4832,3 +4832,45 @@ Checkpoint18 evidence hygiene remains unfiltered exit2, not passed: ten classifi
 raw-log diagnostics, zero source/data/test/prose errors. Exact staged-blob/line/EOL
 hashes preserve bytes; final identical check/read precede the deliberate evidence
 commit and clean-source full13.
+
+
+### RA8 closed at checkpoint18; RA9 handoff (2026-10-21)
+
+R191 closes RA8 on runtime4a103fa and launch HEADb9ed05e: fresh exact all13 exits0,
+workspace1392/0/0 across82 targets,495 inputs unchanged after every command and at
+completion. The already completed same-source isolated five commands remain valid:
+21 explicit ten-player Won/zero stalls at400000, fixed3 means.977735/.869383/.769983ms,
+three guards1/0/0 each. Worst all21 mean1.408ms passes5ms while individual355.967ms
+is retained. Static inventory1389, zero removed/renamed/ignored, is separate.
+
+Production756/756 Won: median29508,p9071172,max279129; own-budget ratios
+.1210503472/.3413444444/.9691979167, tight8871ticks/3.0802% worst headroom.
+Diagnostic duels756/756 Won: median29207,p9071170,max182492/300000; comparative
+production-budget ratios.1224392361/.3358174603/.991875. The latter budget is a
+reference normalization, not m14's enforced ceiling, and has only.8125% minimum
+reference headroom. RA7 comparisons and exact raw bindings are in R191 and
+[closure metrics](validation/ra2-parity/ra8/checkpoint18-closure-metrics.json).
+Medians improve while tails worsen; no limits are raised or comfortable buffer claimed.
+
+Soak260 unique configs×2×36000=18,720,000 ticks passes,245.1MiB/1024MiB;121 native
+ended matches per repeat, all260 final worlds still running. Benchmark mean.098/.213ms,
+max.992/1.555ms and1.2MiB pass original bounds. Both600-frame smokes, actual packaged
+600-frame smoke and remaining checks pass. Bounded RA9 copy functional overlap
+closed before phase04 ended; workspace/copy elapsed timing is not performance
+credit. Native benchmark/soak/duels and isolated five are isolated.
+
+Historical failed/interrupted invocations remain intact. Required RA9 canonical
+port/rebinding, its own full13/ending/performance evidence, fresh independent review
+and final merge remain pending. Canonical ownership is explicitly released after
+closure commit/clean verification; this author is ineligible for final review.
+No substantial external directory was created by this owner; existing configured
+Cargo/package cache and RA9 ordinary copy remain necessary. No Git directory was
+deleted, main8230a955 remains unchanged and no RA2 tag/push is made. User visual,
+audio and play-feel verification remains pending.
+
+
+Closure evidence first unfiltered staged check exits0 with zero diagnostics, empty
+stdout SHAe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.
+Raw logs remain exact; historical evidence checks with exit2 remain recorded as
+failed checks. A separate identical final check and completed-result read precede
+the closure commit.
