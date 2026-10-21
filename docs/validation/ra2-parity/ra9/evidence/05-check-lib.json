@@ -1,0 +1,17 @@
+{
+  "status": "ACTUAL PRELIMINARY compilation, not canonical/final acceptance",
+  "utc": "2026-10-20T21:57:38.743057+00:00",
+  "command": [
+    "cargo",
+    "check",
+    "-p",
+    "sim",
+    "--lib"
+  ],
+  "cwd": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation",
+  "exit_code": 0,
+  "seconds": 5.5720879579894245,
+  "CARGO_BUILD_JOBS": "1",
+  "CARGO_TARGET_DIR": "/Users/xingyuwang/Library/Caches/Codex/cargo-target",
+  "output": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/ra9-preliminary-logs/05-check-lib.log"
+}

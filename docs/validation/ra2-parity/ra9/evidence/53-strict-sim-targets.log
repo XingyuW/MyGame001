@@ -1,0 +1,26 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+error: used `assert_eq!` with a literal bool
+  --> crates/sim/tests/ra9_squid_punch.rs:43:5
+   |
+43 | /     assert_eq!(
+44 | |         d.metadata(ProductionItem::Unit(
+45 | |             d.unit_kind("dolphin").expect("Dolphin")
+46 | |         ))
+...  |
+49 | |         true
+50 | |     );
+   | |_____^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#bool_assert_comparison
+   = note: `-D clippy::bool-assert-comparison` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::bool_assert_comparison)]`
+help: replace it with `assert!(..)`
+   |
+43 ~     assert!(
+44 |         d.metadata(ProductionItem::Unit(
+...
+47 |         .expect("metadata")
+48 ~         .type_immune
+   |
+
+error: could not compile `sim` (test "ra9_squid_punch") due to 1 previous error

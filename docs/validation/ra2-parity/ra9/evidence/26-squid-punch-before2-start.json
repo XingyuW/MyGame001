@@ -1,0 +1,7 @@
+{
+  "utc": "2026-10-20T23:03:54.769644+00:00",
+  "start_monotonic": 438201.48119,
+  "runtime_resolve_sha256": "8f93d001d9af53d582531196add7a185486b4daf5784fcc6f3629c41a99de65a",
+  "test_sha256": "efe48b672915f0f4d4842dc806c73758765798bbcce639caa252d6ad63323c18",
+  "named_compiler_correction": "MoveOrder.destination actual public field; no runtime change or removed assertion"
+}

@@ -1,0 +1,30 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 21s
+     Running tests/ra7_orders.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra7_orders-e1afef8b3a373101)
+
+running 4 tests
+test ra7_force_move_crushes_without_acquiring_and_waypoints_run_in_order ... ok
+test ra7_guard_uses_explicit_reference_guard_range_instead_of_longer_weapon_range ... ok
+test ra7_new_orders_reject_empty_foreign_offmap_duplicates_and_waypoint_overflow_atomically ... ok
+test ra7_scatter_moves_members_apart_and_guard_fires_then_returns ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.57s
+
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra8_ai-55129ee60c603374)
+
+running 3 tests
+test ra8_a_locked_late_tech_item_leaves_its_lane_for_a_legal_early_defence ... unlocked=false: paid Building(BuildingKind(15)) with main at tick2
+unlocked=true: paid Building(BuildingKind(23)) with main at tick2
+ok
+test ra8_every_country_has_obtainable_full_tech_national_and_conditional_lists ... ok
+test ra9_difficulty_neutral_cost_ground_and_air_motion_use_actual_same_rules ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 129 filtered out; finished in 1.35s
+
+     Running tests/ra9_policy_acquisition.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_policy_acquisition-9c8ee6a19861fdea)
+
+running 1 test
+test ra9_c38_ordinary_capable_stock_idle_and_explicit_acquire_with_real_effects_and_move_controls ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 3.84s
+

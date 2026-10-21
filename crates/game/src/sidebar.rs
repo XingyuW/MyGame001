@@ -132,6 +132,7 @@ pub enum SidebarText {
     Power,
     Mode,
     Badge(ProductionItem),
+    Cost(ProductionItem),
     Volume(Channel),
     PauseLabel,
     MuteLabel,
@@ -347,6 +348,9 @@ pub fn availability_text(
         .collect();
     if !missing.is_empty() {
         return format!("Needs {}", missing.join(", "));
+    }
+    if factories == 0 {
+        return "Production paused: no working factory".into();
     }
     let rates = defs.rules().map(|rules| rules.production);
     if let Some(s) = state {
@@ -575,13 +579,18 @@ pub fn button_colour(
 
 /// The building types the human player owns.
 fn owned_kinds(host: &SimHost) -> BTreeSet<BuildingKind> {
-    let Some(mut buildings) = host.world().try_query::<(&Owner, &Building)>() else {
+    let Some(mut buildings) = host
+        .world()
+        .try_query::<(&Owner, &Building, Option<&sim::Health>)>()
+    else {
         return BTreeSet::new();
     };
     buildings
         .iter(host.world())
-        .filter(|(owner, _)| owner.0 == HUMAN)
-        .map(|(_, building)| building.kind)
+        .filter(|(owner, _, health)| {
+            owner.0 == HUMAN && !health.is_some_and(|health| health.hit_points <= 0)
+        })
+        .map(|(_, building, _)| building.kind)
         .collect()
 }
 
@@ -590,7 +599,8 @@ fn owned_kinds(host: &SimHost) -> BTreeSet<BuildingKind> {
 fn factories_of(host: &SimHost, item: ProductionItem) -> usize {
     let (Some(definitions), Some(mut buildings)) = (
         host.definitions(),
-        host.world().try_query::<(&Owner, &Building)>(),
+        host.world()
+            .try_query::<(&sim::SimId, &Owner, &Building, Option<&sim::Health>)>(),
     ) else {
         return 1;
     };
@@ -599,8 +609,14 @@ fn factories_of(host: &SimHost, item: ProductionItem) -> usize {
     };
     buildings
         .iter(host.world())
-        .filter(|(owner, building)| {
-            owner.0 == HUMAN && definitions.same_factory(building.kind, terms.producer)
+        .filter(|(id, owner, building, health)| {
+            owner.0 == HUMAN
+                && !health.is_some_and(|health| health.hit_points <= 0)
+                && !host
+                    .world()
+                    .get_resource::<sim::SpecialState>()
+                    .is_some_and(|special| special.disabled.contains_key(*id))
+                && definitions.same_factory(building.kind, terms.producer)
         })
         .count()
 }
@@ -1163,7 +1179,7 @@ fn populate_items(
                             ..default()
                         })
                         .with_children(|line| {
-                            line.spawn(text(cost, 11.0))
+                            line.spawn((SidebarText::Cost(item), text(cost, 11.0)))
                                 .insert(TextColor(Color::srgb(0.89, 0.78, 0.51)));
                             line.spawn((SidebarText::Badge(item), text("", 10.0)));
                         });
@@ -1387,6 +1403,15 @@ pub(crate) fn update_sidebar(
                     })
                 })
                 .unwrap_or_else(|| details_hint(state.is_none() || !owned.is_empty()).into()),
+            SidebarText::Cost(item) => defs
+                .and_then(|defs| defs.production(*item))
+                .map(|terms| {
+                    format!(
+                        "${}",
+                        state.map_or(terms.cost, |state| state.production_cost(terms.cost))
+                    )
+                })
+                .unwrap_or_default(),
             SidebarText::Credits => credits_text(state),
             SidebarText::Power => power_text(state),
             SidebarText::Mode => mode_text(*mode, paused, host.definitions()),
@@ -1409,6 +1434,7 @@ pub(crate) fn update_sidebar(
             text.0 = value;
         }
         let wanted = match kind {
+            SidebarText::Cost(_) => Color::srgb(0.89, 0.78, 0.51),
             SidebarText::Power if state.is_some_and(PlayerState::low_power) => {
                 Color::srgb(1.0, 0.36, 0.26)
             }
@@ -2455,5 +2481,347 @@ mod tests {
         app.world_mut().schedule_scope(Update, check);
         app.world_mut().schedule_scope(PostUpdate, check);
         app.world_mut().schedule_scope(Last, check);
+    }
+
+    // Append inside sidebar::tests. Actual persistent ItemList, teardown, install and systems.
+    fn ra9_boundary_sidebar_app(host: SimHost) -> App {
+        let mut app = App::new();
+        app.insert_resource(host)
+            .init_resource::<Assets<Image>>()
+            .init_resource::<CommandSink>()
+            .init_resource::<Tab>()
+            .init_resource::<BuildPage>()
+            .init_resource::<InterfaceMode>()
+            .init_resource::<VolumeSettings>()
+            .init_resource::<crate::game_speed::GameSpeed>()
+            .insert_resource(crate::skirmish::Screen::Match)
+            .add_systems(Update, (populate_items, update_sidebar).chain());
+        app.world_mut().spawn((ItemList, Node::default()));
+        app
+    }
+    fn ra9_boundary_card(world: &mut World, item: ProductionItem) -> (Entity, String, Color) {
+        let card = world
+            .query::<(Entity, &SidebarButton)>()
+            .iter(world)
+            .find_map(|(entity, button)| (*button == SidebarButton::Item(item)).then_some(entity))
+            .expect("actual card");
+        let mut todo = vec![card];
+        while let Some(entity) = todo.pop() {
+            if let (Some(text), Some(colour)) =
+                (world.get::<Text>(entity), world.get::<TextColor>(entity))
+                && text.0.starts_with('$')
+            {
+                return (card, text.0.clone(), colour.0);
+            }
+            if let Some(children) = world.get::<Children>(entity) {
+                todo.extend(children.iter());
+            }
+        }
+        panic!("native populated card missing cost text")
+    }
+    #[test]
+    fn ra9_cost_card_updates_across_real_teardown_and_successive_installs() {
+        let catalogue = crate::skirmish::tests::production_catalogue();
+        let item = ProductionItem::Building(
+            catalogue
+                .definitions
+                .building_kind("power_plant")
+                .expect("power"),
+        );
+        let base = catalogue.definitions.production(item).expect("terms").cost;
+        let mut app = ra9_boundary_sidebar_app(crate::sim_host::tests::demo_host());
+        let mut previous = None;
+        for super_me in [false, true, false] {
+            crate::skirmish::end_match(app.world_mut());
+            let selection = crate::skirmish::MenuSelection {
+                super_me,
+                ..crate::skirmish::MenuSelection::versus(&catalogue)
+            };
+            let (plan, _) =
+                crate::skirmish::match_plan(&catalogue, selection, 7).expect("real plan");
+            crate::sim_host::install_match(app.world_mut(), &plan).expect("real install");
+            app.world_mut().run_schedule(Update);
+            let (card, cost, colour) = ra9_boundary_card(app.world_mut(), item);
+            assert_eq!(cost, format!("${}", if super_me { 1 } else { base }));
+            assert_eq!(
+                colour,
+                Color::srgb(0.89, 0.78, 0.51),
+                "original gold cost styling"
+            );
+            if let Some(previous) = previous {
+                assert_eq!(
+                    card, previous,
+                    "actual persistent card, no reconstruction hides stale text"
+                );
+            }
+            previous = Some(card);
+        }
+    }
+
+    fn ra9_factory_boundary_host(disabled: usize, dead_second: bool) -> (SimHost, ProductionItem) {
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets/data");
+        let defs = sim::load_ruleset(root).expect("shipped rules");
+        let item = ProductionItem::Unit(defs.unit_kind("grizzly").expect("grizzly"));
+        let country = defs
+            .rules()
+            .expect("rules")
+            .country_id("america")
+            .expect("country");
+        let host = crate::sim_host::tests::fixture_host(|world| {
+            world.insert_resource(
+                sim::Grid::from_cells(
+                    32,
+                    32,
+                    vec![
+                        sim::Cell {
+                            passable: true,
+                            water: false,
+                            buildable: true,
+                            ore: 0
+                        };
+                        1024
+                    ],
+                )
+                .expect("grid"),
+            );
+            world.insert_resource(defs);
+            for player in [HUMAN, sim::PlayerId(1)] {
+                world
+                    .resource_mut::<sim::Players>()
+                    .add(player, 10_000)
+                    .expect("player");
+            }
+            assert!(
+                world
+                    .resource_mut::<sim::Players>()
+                    .set_country(HUMAN, Some(country))
+            );
+            for (kind, cell) in [
+                ("construction_yard", CellPos::new(8, 8)),
+                ("nuclear_reactor", CellPos::new(2, 2)),
+                ("barracks", CellPos::new(8, 12)),
+                ("refinery", CellPos::new(3, 12)),
+            ] {
+                sim::spawn_building(world, HUMAN, kind, cell).expect("scenario setup");
+            }
+            for (index, cell) in [CellPos::new(12, 12), CellPos::new(18, 12)]
+                .into_iter()
+                .enumerate()
+            {
+                let id = sim::spawn_building(world, HUMAN, "war_factory", cell).expect("factory");
+                if index < disabled {
+                    world
+                        .resource_mut::<sim::SpecialState>()
+                        .disabled
+                        .insert(id, 20);
+                }
+                if index == 1 && dead_second {
+                    let entity = world
+                        .query::<(Entity, &sim::SimId)>()
+                        .iter(world)
+                        .find_map(|(e, found)| (*found == id).then_some(e))
+                        .expect("factory entity");
+                    world
+                        .get_mut::<sim::Health>(entity)
+                        .expect("health")
+                        .hit_points = 0; // Setup at a real pre-Cleanup stage boundary.
+                }
+            }
+            sim::spawn_building(world, sim::PlayerId(1), "war_factory", CellPos::new(26, 24))
+                .expect("foreign factory control");
+        });
+        (host, item)
+    }
+    fn ra9_factory_boundary_ui(host: SimHost, item: ProductionItem) -> (App, Entity) {
+        let mut app = ra9_boundary_sidebar_app(host);
+        *app.world_mut().resource_mut::<Tab>() = Tab::Vehicles;
+        let details = app
+            .world_mut()
+            .spawn((SidebarText::Details, Text::new(""), TextColor::default()))
+            .id();
+        app.world_mut().spawn((
+            SidebarButton::Item(item),
+            Interaction::Hovered,
+            Node::default(),
+            BackgroundColor::default(),
+        ));
+        // Do not also populate a duplicate item card for this hover probe.
+        let lists = app
+            .world_mut()
+            .query_filtered::<Entity, With<ItemList>>()
+            .iter(app.world())
+            .collect::<Vec<_>>();
+        for list in lists {
+            app.world_mut().despawn(list);
+        }
+        (app, details)
+    }
+    fn ra9_factory_progress(host: &SimHost, item: ProductionItem) -> u32 {
+        let key = host
+            .definitions()
+            .expect("definitions")
+            .queue_of(item)
+            .expect("queue");
+        host.players()
+            .expect("players")
+            .get(HUMAN)
+            .expect("human")
+            .lane(key)
+            .first()
+            .expect("active queue")
+            .progress
+    }
+    #[test]
+    fn ra9_factory_hint_matches_actual_disabled_expiry_production_and_foreign_control() {
+        let (mut host, item) = ra9_factory_boundary_host(1, false);
+        crate::sim_host::tests::run(&mut host, vec![]); // Actual power update and disabled stage.
+        assert_eq!(factories_of(&host, item), 1);
+        let (mut app, details) = ra9_factory_boundary_ui(host, item);
+        app.world_mut().run_schedule(Update);
+        assert!(
+            app.world()
+                .get::<Text>(details)
+                .expect("details")
+                .0
+                .starts_with("30 seconds")
+        );
+        let mut host = app.world_mut().remove_resource::<SimHost>().expect("host");
+        let events =
+            crate::sim_host::tests::run(&mut host, vec![Command::QueueProduction { item }]);
+        assert!(
+            !events
+                .iter()
+                .any(|e| matches!(e, sim::SimEvent::CommandRejected { .. })),
+            "{events:?}"
+        );
+        for _ in 0..3 {
+            crate::sim_host::tests::run(&mut host, vec![]);
+        }
+        assert_eq!(
+            ra9_factory_progress(&host, item),
+            4,
+            "one actual working factory"
+        );
+        while host.tick() <= 20 {
+            crate::sim_host::tests::run(&mut host, vec![]);
+        }
+        assert_eq!(
+            factories_of(&host, item),
+            2,
+            "actual Economy disabled expiry, never foreign third factory"
+        );
+        let before = ra9_factory_progress(&host, item);
+        for _ in 0..4 {
+            crate::sim_host::tests::run(&mut host, vec![]);
+        }
+        assert_eq!(
+            ra9_factory_progress(&host, item) - before,
+            5,
+            "actual 1.25x progress over four ticks"
+        );
+        // Cancel the genuine queue to display the same item's unqueued estimate again.
+        let events =
+            crate::sim_host::tests::run(&mut host, vec![Command::CancelProduction { item }]);
+        assert!(
+            events
+                .iter()
+                .any(|e| matches!(e, sim::SimEvent::ProductionCancelled { .. }))
+        );
+        app.world_mut().insert_resource(host);
+        app.world_mut().run_schedule(Update);
+        assert!(
+            app.world()
+                .get::<Text>(details)
+                .expect("details")
+                .0
+                .starts_with("24 seconds")
+        );
+    }
+    #[test]
+    fn ra9_zero_working_factory_is_paused_and_dead_sources_cannot_supply_a_rate() {
+        let (mut host, item) = ra9_factory_boundary_host(2, false);
+        crate::sim_host::tests::run(&mut host, vec![]);
+        assert_eq!(factories_of(&host, item), 0);
+        let (mut app, details) = ra9_factory_boundary_ui(host, item);
+        app.world_mut().run_schedule(Update);
+        assert!(
+            app.world()
+                .get::<Text>(details)
+                .expect("details")
+                .0
+                .starts_with("Production paused: no working factory")
+        );
+        let mut host = app.world_mut().remove_resource::<SimHost>().expect("host");
+        let events =
+            crate::sim_host::tests::run(&mut host, vec![Command::QueueProduction { item }]);
+        assert!(
+            !events
+                .iter()
+                .any(|e| matches!(e, sim::SimEvent::CommandRejected { .. })),
+            "queue policy stays native: {events:?}"
+        );
+        assert_eq!(
+            ra9_factory_progress(&host, item),
+            0,
+            "accepted native queue makes no progress without an exit"
+        );
+        let (mut host, item) = ra9_factory_boundary_host(0, true);
+        assert_eq!(
+            factories_of(&host, item),
+            1,
+            "pre-Cleanup dead Health is not a UI source"
+        );
+        let events =
+            crate::sim_host::tests::run(&mut host, vec![Command::QueueProduction { item }]);
+        assert!(
+            !events
+                .iter()
+                .any(|e| matches!(e, sim::SimEvent::CommandRejected { .. })),
+            "{events:?}"
+        );
+        let key = host
+            .definitions()
+            .expect("definitions")
+            .queue_of(item)
+            .expect("queue");
+        assert_eq!(
+            host.players()
+                .expect("players")
+                .get(HUMAN)
+                .expect("human")
+                .lane(key)[0]
+                .fraction,
+            0,
+            "actual first-tick source liveness: no fractional 250 from the dead second factory before Cleanup"
+        );
+        for _ in 0..3 {
+            crate::sim_host::tests::run(&mut host, vec![]);
+        }
+        assert_eq!(
+            ra9_factory_progress(&host, item),
+            4,
+            "S alive-source Economy predicate required"
+        );
+        assert_eq!(factories_of(&host, item), 1);
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../sim/tests/fixtures/data");
+        let defs = sim::load_definitions(root.join("units_economy.ron"), root.join("economy.ron"))
+            .expect("health-less fixture");
+        let item = ProductionItem::Unit(defs.unit_kind("walker").expect("walker"));
+        let host = crate::sim_host::tests::fixture_host(|world| {
+            world.insert_resource(defs);
+            world
+                .resource_mut::<sim::Players>()
+                .add(HUMAN, 1000)
+                .expect("player");
+            sim::spawn_building(world, HUMAN, "barracks", CellPos::new(4, 4))
+                .expect("health-less first");
+            sim::spawn_building(world, HUMAN, "barracks", CellPos::new(8, 4))
+                .expect("health-less second");
+        });
+        assert_eq!(
+            factories_of(&host, item),
+            2,
+            "health-less legacy setups remain valid"
+        );
     }
 }

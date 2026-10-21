@@ -1,0 +1,23 @@
+{
+  "utc": "2026-10-20T23:15:38.072740+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--no-fail-fast",
+    "--test",
+    "ra9_refinery_repair_liveness",
+    "--test",
+    "ra9_guard75_readiness",
+    "--test",
+    "ra9_legacy904_last_five",
+    "--",
+    "--test-threads=1"
+  ],
+  "exit_code": 101,
+  "seconds": 62.459,
+  "lease": "RA8revocable functional phase jobs1",
+  "status": "actual preliminary corrected native fixtures",
+  "input_mismatches": []
+}

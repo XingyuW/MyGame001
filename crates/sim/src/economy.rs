@@ -933,14 +933,21 @@ pub(crate) fn advance_production(
     mut ids: ResMut<SimIdAllocator>,
     mut events: ResMut<Messages<SimEvent>>,
     mut buildings: BuildingQuery,
+    healths: Query<&crate::Health>,
     special: Res<crate::SpecialState>,
 ) {
     // The buildings each player owns of each type, in id order.
     let mut exits: BTreeMap<(PlayerId, BuildingKind), Vec<Exit>> = BTreeMap::new();
     let mut sorted: Vec<(SimId, Entity, PlayerId, BuildingKind, Exit)> = buildings
         .iter()
-        .map(|(entity, id, owner, building, producer)| {
-            (
+        .filter_map(|(entity, id, owner, building, producer)| {
+            if healths
+                .get(entity)
+                .is_ok_and(|health| health.hit_points <= 0)
+            {
+                return None;
+            }
+            Some((
                 *id,
                 entity,
                 owner.0,
@@ -950,7 +957,7 @@ pub(crate) fn advance_production(
                     footprint: building.footprint,
                     rally: producer.and_then(|producer| producer.rally),
                 },
-            )
+            ))
         })
         .collect();
     sorted.sort_unstable_by_key(|(id, ..)| *id);

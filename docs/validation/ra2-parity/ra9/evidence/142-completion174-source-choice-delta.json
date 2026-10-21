@@ -1,0 +1,153 @@
+{
+  "utc": "2026-10-21T03:52:06.246712+00:00",
+  "status": "ACTUAL_COPY_SOURCE_ONLY_IMPLEMENTATION_DELTA_NOT_ACCEPTANCE",
+  "prior_manifest": "134-actual-audit-repair-input-scope.json",
+  "changed_or_new_source_files": [
+    {
+      "path": "crates/sim/tests/ra9_audit/behavior87-acceptance.tsv",
+      "bytes": 559928,
+      "sha256": "d007ff093a4c65cf7b5823cd713dff562b2b5f284cac8ca4d42f4626dc9492bd",
+      "old_sha256": null
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/carry38-acceptance.tsv",
+      "bytes": 50994,
+      "sha256": "f923142ca9324c499ca18f9d21c52b33e7c938940eea23d20c152aa9daf6c1cd",
+      "old_sha256": null
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/completion-acceptance.tsv",
+      "bytes": 139,
+      "sha256": "d739f87598fd7c8602420577cf09e8bb9a00fcaa37d314558a1c65edfad4df9b",
+      "old_sha256": null
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/completion-local-code.tsv",
+      "bytes": 1324,
+      "sha256": "c74d03897c275a23b13bd64b0c63cd09d617865d47211b8a58439bacd9245c57",
+      "old_sha256": null
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/completion-local-contracts.tsv",
+      "bytes": 25772,
+      "sha256": "a5e90d069c09ab53a97bddb2ab54c5b7d377f31cbd8dab2783b80761681b47d2",
+      "old_sha256": null
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/completion-whole-contracts.tsv",
+      "bytes": 130567,
+      "sha256": "faab3926f92eb653ffe9ffa0e5d09af3ca8df6b5edfbdc29d4f576449063c690",
+      "old_sha256": null
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/completion-whole.rs",
+      "bytes": 16999,
+      "sha256": "0332985e6d31f75edd97966cba3137abc1d6e3621c904e76f4883e6972b2d95e",
+      "old_sha256": null
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/completion.rs",
+      "bytes": 21743,
+      "sha256": "4e2f1fbc0d1ab22ecca3a99f2d24a37ad53ba5794cd18ba0e165a91e47ce7cf4",
+      "old_sha256": null
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/consumer62-acceptance.tsv",
+      "bytes": 87697,
+      "sha256": "8e9e2be867acc1064bfe0d21bc1a3de549141e57f6ef42fa999c13011329c57d",
+      "old_sha256": null
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/guard75-acceptance.tsv",
+      "bytes": 73186,
+      "sha256": "f018263b6e7efffa198ae3d66ff5b8448325cad80025d11b7d8edaf4e829546e",
+      "old_sha256": null
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/mod.rs",
+      "bytes": 65440,
+      "sha256": "6785ed4adfd580c1152fb3994d63bc869f000aa3c66b3c63777101c76e249b45",
+      "old_sha256": "d2ac40f65fb63c2e354f03b06721d4a849ab47db293753196d10f91391aa3451"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-acceptance.tsv",
+      "bytes": 272993,
+      "sha256": "90305929914d656a2e970d92293eed084350980e5e7c588d68bd14f59803c102",
+      "old_sha256": null
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/own-policy-acceptance.tsv",
+      "bytes": 64814,
+      "sha256": "60f291c5a389fd947139cd754773b671bf17be80185f4032b295a7d7232ccf42",
+      "old_sha256": null
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/ra9-approved-model-census-sha256.txt",
+      "bytes": 65,
+      "sha256": "f871bc1874263c99ae808b08b5a9179d18fe4de2170c9fcab79f98a502748f87",
+      "old_sha256": null
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/ra9-approved-model-surface.txt",
+      "bytes": 921,
+      "sha256": "97cbecb23fefc2ca40d34698a21016c0da93bb972d6261bea12aa6177392a6eb",
+      "old_sha256": null
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/ra9-approved-static-evidence-sha256.txt",
+      "bytes": 65,
+      "sha256": "3475f51bb44e9b31e7c5e5255edb3168bcd2920db12a7fb1f5a3645e53bb7c89",
+      "old_sha256": null
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/root-policy-input-binding.txt",
+      "bytes": 65,
+      "sha256": "1ef03bca726d56df424824415b400a8894fc48b5a20213eaeec7ca3896c25c36",
+      "old_sha256": null
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-plans.rs",
+      "bytes": 11384,
+      "sha256": "8181cd2c798ff398aad8043b55b2680b9c9ec5e3dd17eb1c89a7d6338ea1a7e9",
+      "old_sha256": "a9256aeca6108902e6acd334710b285a38e8a4ecd90ef3dee144e212624905ce"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-policy-acceptance.tsv",
+      "bytes": 1548466,
+      "sha256": "e9f5feafd753de9f86f82dc2e7ee0dec67a2243e08db68ce08558aaac6bb1687",
+      "old_sha256": null
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-routes.rs",
+      "bytes": 16430,
+      "sha256": "8c3c9fc00d17dae2a1ff004fa0b7001300460502f13d0335bdb02ca1ca05aedc",
+      "old_sha256": "6c4419b62bf9270c2643551e6c3b21d0c2b857c712dc4f0500ea1ee074f12424"
+    },
+    {
+      "path": "crates/sim/tests/reference/ra9_source_dispositions.tsv",
+      "bytes": 1311736,
+      "sha256": "9f5790f234048f53ab2096fb7cc6821649b2c03c2caeadf78d7e3f7f1aec2937",
+      "old_sha256": "e7e749df9f358d38a48f834590949639bfe141243f4b2a2a6ba32855f285a3f0"
+    },
+    {
+      "path": "scripts/ra2_reference.py",
+      "bytes": 56880,
+      "sha256": "33e1f37fcdb6a970972e97ab92fa78dcd358f802141cd7041ea036c8aafc98a1",
+      "old_sha256": "3b1259684f3e7526ef5268bc938055c65ceae4ffd3c5b3a3d7f8e68ca85062d9"
+    }
+  ],
+  "P13": {
+    "document_path": "docs/DECISIONS.md",
+    "section_start": "### RA9-P13 \u2014 exact closure of the 174 atoms exposed by the complete audit",
+    "span_bytes": 3373,
+    "sha256": "3c25708dc416e6758fa4662e39cb08ca738323eea534249c77d5d6b4950ad418"
+  },
+  "prior_P12_prefix_preserved": true,
+  "declared_atoms": 1911,
+  "new_atoms": 174,
+  "classifications": {
+    "CURRENT_MODEL_NONREAD": 759,
+    "INTENTIONAL_DIFFERENCE": 1152
+  },
+  "remaining": "Actual export/loaded controls, final174records/root-input binding, full valid positive and accepted-baseline negatives, final canonical port/gates/review. Runtime/core97 unchanged."
+}

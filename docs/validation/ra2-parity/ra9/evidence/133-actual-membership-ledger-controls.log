@@ -1,0 +1,21 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+warning: field `actual` is never read
+   --> crates/sim/tests/ra9_audit/mod.rs:258:9
+    |
+257 |     GameOwned {
+    |     --------- field in this variant
+258 |         actual: String,
+    |         ^^^^^^
+    |
+    = note: `Witness` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `sim` (test "ra9_data_parity") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 07s
+     Running tests/ra9_data_parity.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_data_parity-f191adb6678c35d5)
+
+running 1 test
+test ra9_audit::ra9_actual_producer_membership_rejects_nonmember_duplicate_and_corrupt_set ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 174 filtered out; finished in 0.61s
+

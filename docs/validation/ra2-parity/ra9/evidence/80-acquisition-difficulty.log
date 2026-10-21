@@ -1,0 +1,44 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 29s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra8_ai-55129ee60c603374)
+
+running 3 tests
+test ra8_difficulty_start_credit_build_and_reload_use_real_house_rules ... ok
+test ra8_special_weapon_rof_scales_psi_eruption_parasite_repair_and_occupation_only ... ok
+test ra9_difficulty_neutral_cost_ground_and_air_motion_use_actual_same_rules ... 
+thread 'ra9_difficulty_neutral_cost_ground_and_air_motion_use_actual_same_rules' (13388464) panicked at crates/sim/tests/ra8_ai.rs:12181:13:
+assertion `left == right` failed: easy: exact single stock charge
+  left: 9999
+ right: 9200
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ra9_difficulty_neutral_cost_ground_and_air_motion_use_actual_same_rules
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 129 filtered out; finished in 3.24s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`
+     Running tests/ra9_policy_acquisition.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_policy_acquisition-9c8ee6a19861fdea)
+
+running 2 tests
+test ra9_c38_ordinary_capable_stock_idle_and_explicit_acquire_with_real_effects_and_move_controls ... 
+thread 'ra9_c38_ordinary_capable_stock_idle_and_explicit_acquire_with_real_effects_and_move_controls' (13388466) panicked at crates/sim/tests/ra9_policy_acquisition.rs:158:5:
+assertion failed: app.world().resource::<Players>().get(P0).unwrap().vision().is_visible(cell)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test ra9_c38_spy_ordinary_idle_never_shoots_but_public_refinery_interact_steals ... ok
+
+failures:
+
+failures:
+    ra9_c38_ordinary_capable_stock_idle_and_explicit_acquire_with_real_effects_and_move_controls
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.89s
+
+error: test failed, to rerun pass `-p sim --test ra9_policy_acquisition`
+error: 2 targets failed:
+    `-p sim --test ra8_ai`
+    `-p sim --test ra9_policy_acquisition`

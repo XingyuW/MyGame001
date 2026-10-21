@@ -1,0 +1,18 @@
+    Finished `release` profile [optimized] target(s) in 0.10s
+     Running tests/ra9_start_setup.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_start_setup-1bc3829d3356eda6)
+
+running 1 test
+
+thread 'ra9_shipped_yard_starts_for_all_maps_two_to_ten_players_have_legal_occupancy_and_public_exits' (14407241) panicked at crates/sim/tests/ra9_start_setup.rs:183:21:
+demo growtrue players6: SimId(51) CellPos { x: 32, y: 0 }->CellPos { x: 28, y: 0 }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra9_shipped_yard_starts_for_all_maps_two_to_ten_players_have_legal_occupancy_and_public_exits ... FAILED
+
+failures:
+
+failures:
+    ra9_shipped_yard_starts_for_all_maps_two_to_ten_players_have_legal_occupancy_and_public_exits
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+
+error: test failed, to rerun pass `-p sim --test ra9_start_setup`

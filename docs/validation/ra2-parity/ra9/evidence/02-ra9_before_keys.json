@@ -1,0 +1,20 @@
+{
+  "status": "ACTUAL PRELIMINARY untouched snapshot lib/data baseline; native failures are evidence to classify, not final acceptance",
+  "utc": "2026-10-20T21:52:03.735996+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_before_keys",
+    "--",
+    "--test-threads=1"
+  ],
+  "cwd": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation",
+  "exit_code": 101,
+  "seconds": 130.19886970799416,
+  "CARGO_BUILD_JOBS": "1",
+  "CARGO_TARGET_DIR": "/Users/xingyuwang/Library/Caches/Codex/cargo-target",
+  "output": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/ra9-preliminary-logs/02-ra9_before_keys.log"
+}

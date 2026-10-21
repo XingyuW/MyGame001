@@ -1,0 +1,20 @@
+{
+  "utc": "2026-10-21T00:30:07.858641+00:00",
+  "ended_utc": "2026-10-21T00:30:19.982564+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_native_keys",
+    "ra9_bombsight_known_non_c4_charges_ignore_same_allied_or_hostile_ivan_ownership",
+    "--",
+    "--exact",
+    "--test-threads=1"
+  ],
+  "exit_code": 0,
+  "seconds": 12.124,
+  "lease": "RA8 revocable functional phase jobs1; no heavy AI match",
+  "input_mismatches": []
+}

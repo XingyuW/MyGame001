@@ -1,0 +1,20 @@
+{
+  "utc": "2026-10-20T23:54:14.406293+00:00",
+  "ended_utc": "2026-10-21T00:23:50.702691+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "game",
+    "--bin",
+    "game",
+    "--no-fail-fast",
+    "ra9_",
+    "--",
+    "--test-threads=1"
+  ],
+  "exit_code": 101,
+  "seconds": 332.378,
+  "lease": "RA8 revocable functional phase jobs1; no heavy AI match",
+  "input_mismatches": []
+}

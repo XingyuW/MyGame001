@@ -1,0 +1,21 @@
+{
+  "utc": "2026-10-21T00:38:10.041316+00:00",
+  "ended_utc": "2026-10-21T00:38:57.013838+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "game",
+    "--bin",
+    "game",
+    "--no-fail-fast",
+    "--",
+    "real_cycle_type_combat",
+    "ra9_b87_all40_stock_aliases",
+    "--test-threads=1"
+  ],
+  "exit_code": 101,
+  "seconds": 46.972,
+  "lease": "RA8 revocable functional phase jobs1; no heavy AI match",
+  "input_mismatches": []
+}

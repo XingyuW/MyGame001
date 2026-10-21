@@ -1,0 +1,20 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 23s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra8_ai-55129ee60c603374)
+
+running 8 tests
+test ra8_air_observation_reserves_then_trains_an_anti_air_unit ... ok
+test ra8_aircraft_complete_real_ammo_return_and_reload_before_ai_retasks_them ... actual shots {SimId(6): 2, SimId(7): 3, SimId(8): 2}; sawempty true, uninterrupted reload true, special SpecialState { strategic: StrategicState { missiles: [], storm: None, flights: {}, announced: {} }, parasites: {}, deployed: {}, mirage_trees: {}, disguises: {SimId(5): UnitKind(1)}, erasures: {}, charges: {}, radiation_sites: [], coil_charge: {}, death_detonated: {}, eruption_next: {}, temporal_removed: {}, charge: {}, protected: {}, disabled: {}, cargo: {}, garrisons: {}, controlled: {}, bombs: {}, zones: [], rearming: {}, carrier_flights: {}, interactions: {}, auto_defuses: {}, auto_defuse_cancelled: {}, revealed_owners: {}, hidden: {(PlayerId(1), SimId(5))}, outages: {}, docked: {}, ammo: {SimId(7): 0}, reloading: {}, docks: {SimId(6): (SimId(3), 0), SimId(7): (SimId(3), 1), SimId(8): (SimId(3), 2)}, bays: {}, spawned: {}, missiles: {}, surfaced: {} }
+ok
+test ra8_an_actual_loss_to_an_unseen_mirage_requests_a_detector ... ok
+test ra8_land_defenders_use_reachable_firing_positions_and_leave_isolated_ships_to_the_fleet ... ok
+test ra8_lost_prerequisites_cancel_only_incomplete_paid_heads_then_rebuild_and_resume ... ok
+test ra8_opted_in_last_stand_services_a_native_remnant_within_one_existing_period ... native remnant start5 bound1496 shots24 soldSome(1282) outcomeSome(Won { winner: PlayerId(1), tick: 1281 })
+ok
+test ra8_ready_finite_cohorts_use_shorter_assembly_but_keep_the_source_team_delay ... finite first cohort sourcefirst3333 delay3333 joinedSome(5441)
+finite reinforcementSome(8781) outcomeNone
+ok
+test ra8_unseen_ore_does_not_change_real_worker_team_admission_or_intents ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 124 filtered out; finished in 25.21s
+

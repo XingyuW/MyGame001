@@ -1,0 +1,17 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 43.98s
+     Running tests/ra6_vehicles.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_vehicles-6e8e476b02377690)
+
+running 2 tests
+test ra9_behavior87_coordinate_move_admits_genuine_unexplored_destination ... ok
+test ra9_behavior87_real_base_elite_cloakable_shots_use_r51_surface_delay ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 37 filtered out; finished in 2.54s
+
+     Running tests/ra9_refinery_repair_liveness.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_refinery_repair_liveness-9209b1ead0e72b0d)
+
+running 1 test
+test ra9_command_destroyed_refinery_cannot_pay_a_delivery_later_in_economy ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.13s
+

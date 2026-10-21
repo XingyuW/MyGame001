@@ -1,0 +1,24 @@
+{
+  "utc": "2026-10-21T02:54:17.324623+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "game",
+    "--bin",
+    "game",
+    "--",
+    "every_speed_runs_the_simulation_that_many_times_faster_in_real_time",
+    "ra7_visible_disguise_is_not_an_enemy_cursor_target",
+    "cells_are_tinted_by_what_the_human_player_sees",
+    "enemies_are_shown_exactly_while_the_human_player_sees_them",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "scope": "actual runtime/game selected existing bodies/data; disjoint ra6 integration fixture excluded",
+  "ended_utc": "2026-10-21T02:54:55.953391+00:00",
+  "exit_code": 0,
+  "seconds": 38.628,
+  "lease": "RA8 phase9 serial functional lease, no performance claim",
+  "input_mismatches": []
+}

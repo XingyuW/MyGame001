@@ -1,0 +1,25 @@
+{
+  "original_sha256": "adc869ca037db5141f562f18092d022045e194de0d1204a46b9ec8372b2b826f",
+  "method": "Independent raw INI section/key parser, full incoming token scan, explicit EligibleForDelayKill universe; no expected facts used as observations",
+  "records": [
+    [
+      "F146",
+      "105",
+      "361",
+      "80ed3686dfeb0322e952ee873b714fe0125e228584fc32cfedcf2200e58339dc"
+    ],
+    [
+      "F147",
+      "105",
+      "361",
+      "80ed3686dfeb0322e952ee873b714fe0125e228584fc32cfedcf2200e58339dc"
+    ],
+    [
+      "F251",
+      "1",
+      "3",
+      "ade2004f26c10d47771bada01541066d5b56031c20bb60255a9f2802719d13a8"
+    ]
+  ],
+  "matches_actual_producer": true
+}

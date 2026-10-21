@@ -12,7 +12,10 @@
 //! above a cell of its footprint (the corners first). Such an aircraft has one dock: the one it
 //! was produced for, or the nearest free one of its owner if that building is lost, sold or
 //! captured. Whenever it has no order it flies there, and while it stands on its dock it
-//! regains one volley every `reload_interval` ticks of the rules. Without any dock it is lost
+//! regains one volley every `reload_interval` ticks of the rules. Once ammunition is full,
+//! a damaged aircraft regains `repair_step` health for the usual paid repair step cost at
+//! the same interval. This uses the UnitReload interpretation and bounded timing/power
+//! assumptions recorded in the RA9 selection/pad handoff. Without any dock it is lost
 //! as soon as it has no order (the ini's `AirportBound`): it is destroyed. An aircraft that is
 //! not `airport_bound` needs no dock. To the rest of the simulation a docked aircraft is in the
 //! air like every aircraft (an assumption recorded in R49).
@@ -58,7 +61,7 @@ use crate::hash::Fnv1a64;
 use crate::id::SimId;
 use crate::map::{CellPos, Grid, SubPos};
 use crate::special::{Actor, SpecialState, clear_orders, nearest_cell_of, release};
-use crate::unit::{Mobile, MoveOrder, Orders, Position};
+use crate::unit::{Mobile, MoveOrder, Orders, Owner, Position};
 
 /// Ticks between two launches of one spawner (the 20 frames the original engine waits; it is
 /// in no ini, docs/DECISIONS.md R50).
@@ -360,20 +363,90 @@ fn docks(world: &mut World, defs: &Definitions, index: &BTreeMap<SimId, Actor>, 
         {
             orders.current = Some(MoveOrder::new(cell, tick));
         }
-        let mut state = world.resource_mut::<SpecialState>();
-        if landed && ammo < entry.ammo {
-            let waited = state.reloading.entry(a.id).or_default();
-            *waited = waited.saturating_add(1);
-            if *waited >= interval {
-                state.reloading.remove(&a.id);
-                if ammo + 1 >= entry.ammo {
-                    state.ammo.remove(&a.id);
-                } else {
-                    state.ammo.insert(a.id, ammo + 1);
-                }
+        // Health follows full ammunition. Re-read entities: an interaction earlier in
+        // this Economy stage can capture a pad after `index` was built.
+        let service = (|| {
+            if !landed {
+                return None;
             }
-        } else {
-            state.reloading.remove(&a.id);
+            let ProductionItem::Unit(kind) = a.item else {
+                return None;
+            };
+            let max = defs.unit_combat(kind)?.hit_points;
+            let hp = world.get::<Health>(a.entity)?.hit_points;
+            if hp <= 0 || world.get::<Owner>(a.entity)?.0 != a.owner {
+                return None;
+            }
+            let (pad_id, _) = dock?;
+            let pad = index.get(&pad_id)?;
+            let ProductionItem::Building(pad_kind) = pad.item else {
+                return None;
+            };
+            if world.get::<Owner>(pad.entity)?.0 != a.owner
+                || world.get::<Health>(pad.entity)?.hit_points <= 0
+                || !world
+                    .resource::<Players>()
+                    .get(a.owner)?
+                    .powers(defs, pad_kind)
+            {
+                return None;
+            }
+            let state = world.resource::<SpecialState>();
+            if state.disabled.contains_key(&pad_id)
+                || state.erasures.contains_key(&pad_id)
+                || state.erasures.contains_key(&a.id)
+            {
+                return None;
+            }
+            let price = defs
+                .production(a.item)
+                .map_or(0, |production| production.cost);
+            Some((max, hp, price))
+        })();
+        let repair = service.filter(|(max, hp, _)| ammo >= entry.ammo && hp < max);
+        let due = {
+            let mut state = world.resource_mut::<SpecialState>();
+            if service.is_some() && (ammo < entry.ammo || repair.is_some()) {
+                let waited = state.reloading.entry(a.id).or_default();
+                *waited = waited.saturating_add(1);
+                if *waited >= interval {
+                    state.reloading.remove(&a.id);
+                    if ammo < entry.ammo {
+                        if ammo + 1 >= entry.ammo {
+                            state.ammo.remove(&a.id);
+                        } else {
+                            state.ammo.insert(a.id, ammo + 1);
+                        }
+                    }
+                    true
+                } else {
+                    false
+                }
+            } else {
+                state.reloading.remove(&a.id);
+                false
+            }
+        };
+        // The last ammunition round consumes this interval. Health starts a fresh one.
+        if due && let Some((max, hp, price)) = repair {
+            let paid = {
+                let mut players = world.resource_mut::<Players>();
+                if let Some(player) = players.get_mut(a.owner) {
+                    let cost = crate::repair_step_cost(&rules.economy, price, max, player.super_me);
+                    if player.credits >= cost {
+                        player.credits -= cost;
+                        true
+                    } else {
+                        false
+                    }
+                } else {
+                    false
+                }
+            };
+            if paid && let Some(mut health) = world.get_mut::<Health>(a.entity) {
+                let amount = rules.economy.repair_step.max(1).min(max.saturating_sub(hp));
+                health.hit_points = hp.saturating_add(amount).min(max);
+            }
         }
     }
     // How many aircraft that need a dock every player owns, and how many docks its buildings
@@ -470,6 +543,7 @@ fn spawned_units(world: &mut World, defs: &Definitions, index: &BTreeMap<SimId, 
                         direct: None,
                         firepower_pm: flight.firepower_pm,
                         source: Some(parent),
+                        identity: None,
                     },
                     true,
                 );

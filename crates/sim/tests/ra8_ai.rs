@@ -8226,7 +8226,7 @@ fn ra8_a_capable_living_land_force_keeps_empty_miners_out_of_the_attack_wave() {
         CellPos::new(14, 8),
     )
     .unwrap();
-    // R177: preserve useful worker roles with an actual known economic job,
+    // R176: preserve useful worker roles with an actual known economic job,
     // rather than the superseded assumption that an empty map requires idleness.
     put(&mut app, "soviet_refinery", 12, 14);
     let ore_at = CellPos::new(9, 18);
@@ -12092,6 +12092,167 @@ fn ra8_understrength_financing_keeps_a_ground_support_sources_real_power_path() 
         waved && activated,
         "the actual ground-only wave must receive native Chronoshift after natural source charge completes"
     );
+}
+
+// RA9: source Cost/Airspeed/Groundspeed are neutral1.0 in all three source sections.
+// Current house difficulty changes other explicit fields; it does not scale these consumers.
+#[test]
+fn ra9_difficulty_neutral_cost_ground_and_air_motion_use_actual_same_rules() {
+    fn position(app: &mut App, id: sim::SimId) -> sim::SubPos {
+        let entity = app
+            .world_mut()
+            .query::<(bevy_ecs::entity::Entity, &sim::SimId)>()
+            .iter(app.world())
+            .find(|(_, found)| **found == id)
+            .unwrap()
+            .0;
+        app.world().get::<sim::Position>(entity).unwrap().0
+    }
+    for difficulty in ["easy", "medium", "brutal"] {
+        let mut app = scenario("great_britain", difficulty, 10000, 0, true);
+        app.world_mut().insert_resource(sim::AiPlayers::default());
+        let definitions = app.world().resource::<sim::Definitions>().clone();
+        let power = definitions.building_kind("power_plant").unwrap();
+        assert_eq!(
+            definitions
+                .production(sim::ProductionItem::Building(power))
+                .unwrap()
+                .cost,
+            800
+        );
+        let terms = definitions
+            .production(sim::ProductionItem::Building(power))
+            .unwrap();
+        assert_eq!(terms.build_time, 672);
+        let house_build_pm = if difficulty == "brutal" { 800 } else { 1000 };
+        assert_eq!(
+            app.world()
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap()
+                .ai_build_time_pm(),
+            house_build_pm
+        );
+        let ground = spawn_unit(
+            app.world_mut(),
+            PlayerId(0),
+            "grizzly",
+            CellPos::new(20, 20),
+        )
+        .unwrap();
+        let air = spawn_unit(app.world_mut(), PlayerId(0), "kirov", CellPos::new(20, 23)).unwrap();
+        assert_eq!(
+            definitions
+                .unit(definitions.unit_kind("grizzly").unwrap())
+                .unwrap()
+                .speed,
+            13
+        );
+        assert_eq!(
+            definitions
+                .unit(definitions.unit_kind("kirov").unwrap())
+                .unwrap()
+                .speed,
+            4
+        );
+        let ground_start = position(&mut app, ground);
+        let air_start = position(&mut app, air);
+        let credits = app
+            .world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .credits();
+        issue(
+            &mut app,
+            Command::QueueProduction {
+                item: sim::ProductionItem::Building(power),
+            },
+        );
+        issue(
+            &mut app,
+            Command::Move {
+                units: vec![ground],
+                target: CellPos::new(26, 20),
+            },
+        );
+        issue(
+            &mut app,
+            Command::Move {
+                units: vec![air],
+                target: CellPos::new(26, 23),
+            },
+        );
+        for elapsed in 1i32..=10 {
+            let expected_progress = u32::try_from(elapsed).unwrap() * 1000 / house_build_pm;
+            step(&mut app);
+            assert!(
+                app.world()
+                    .resource::<sim::Players>()
+                    .iter()
+                    .all(|(_, p)| p.credits() >= 0)
+            );
+            assert_eq!(
+                app.world()
+                    .resource::<sim::Players>()
+                    .get(PlayerId(0))
+                    .unwrap()
+                    .credits(),
+                credits - i64::from(expected_progress) * (terms.cost / i64::from(terms.build_time)),
+                "{difficulty}: exact source cost charged per actual production progress, no house cost scale"
+            );
+            let player = app
+                .world()
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap();
+            let head = &player.queues().next().unwrap().1[0];
+            assert_eq!(head.progress, expected_progress);
+            assert_eq!(
+                head.charged,
+                i64::from(head.progress) * (terms.cost / i64::from(terms.build_time))
+            );
+            let g = position(&mut app, ground);
+            let a = position(&mut app, air);
+            assert_eq!(
+                (g.x - ground_start.x, g.y - ground_start.y),
+                (13 * elapsed, 0),
+                "{difficulty}: loaded ground speed, no house scale"
+            );
+            assert_eq!(
+                (a.x - air_start.x, a.y - air_start.y),
+                (4 * elapsed, 0),
+                "{difficulty}: loaded air speed, no house scale"
+            );
+        }
+        // Preserve the original full-cost proposition at the actual paid completion boundary.
+        // The source price is paid across progress, with its division remainder on the last unit.
+        let mut completed = false;
+        for _ in 10..=terms.build_time {
+            step(&mut app);
+            let player = app
+                .world()
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap();
+            assert!(player.credits() >= 0);
+            let head = &player.queues().next().unwrap().1[0];
+            if head.progress == terms.build_time {
+                assert_eq!(head.charged, 800);
+                assert_eq!(
+                    player.credits(),
+                    credits - 800,
+                    "{difficulty}: identical full stock price"
+                );
+                completed = true;
+                break;
+            }
+        }
+        assert!(
+            completed,
+            "{difficulty}: real paid production never reached source build time"
+        );
+    }
 }
 
 fn optional_reinforcement_with_independent_recovery(strategic: bool, observed_ore: bool) {

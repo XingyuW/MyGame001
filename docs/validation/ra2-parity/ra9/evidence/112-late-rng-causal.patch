@@ -1,0 +1,12 @@
+--- crates/game/tests/m6_production_matches.rs
++++ crates/game/tests/m6_production_matches.rs
+@@ -645,6 +645,9 @@
+             events(&right),
+             "ordered native events at step {completed}"
+         );
++        if native_tick == 36_001 {
++            let _ = right.world_mut().resource_mut::<sim::SimRng>().next_u32();
++        }
+         let hash = sim::state_hash(left.world_mut());
+         assert_eq!(
+             hash,

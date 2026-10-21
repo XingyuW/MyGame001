@@ -755,6 +755,9 @@ pub(crate) fn process_regular_commands(
                     }
                     if let Some(ids) = issued.command.units() {
                         for id in ids {
+                            if special.auto_defuses.remove(id).is_some() {
+                                special.auto_defuse_cancelled.insert(*id, tick.0);
+                            }
                             special.interactions.remove(id);
                             special.docked.remove(id);
                         }

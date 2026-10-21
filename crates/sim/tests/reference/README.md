@@ -77,3 +77,36 @@ neither is any text of them: the tables hold only numbers, percentages, yes/no f
 identifiers (section, weapon, warhead, projectile and type ids, house names; and, because a
 `[Powerups]` value is kept as the one list it is, the short identifier of each crate's
 animation, which the game does not read).
+
+## Proposed RA9 source dispositions
+
+The bounded compositor writes `ra9_source_dispositions.tsv`, the nine-column proposed
+source table consumed by `ra9_audit/source-routes.rs`:
+
+```
+python3 -B scripts/ra2_reference.py --ra9-dispositions
+python3 -B scripts/ra2_reference.py --ra9-dispositions --check
+```
+
+Both commands require the original INI cache with the recorded R2 hashes. They perform the
+existing extraction (including the seven Spark metadata premises), require the committed
+reference and its recorded hash to match it, and compare every proposed literal with that
+fresh extraction. Check mode compares the entire disposition file without rewriting it.
+
+Generation composes the installed static116, metadata147, residual117, consumer62, carry38,
+model162, guard75, behavior87, legacy361/543, masked19 and special10 contracts. It reads the
+installed Rust route census and typed class mappings (including all eleven residual
+categories), rejects duplicate owners or changed
+counts/values, verifies exact legacy family atom fingerprints, and requires the later
+packages to partition the original pending atoms. At this preliminary integration the
+result has 1,737 whole-source rows: the original 1,708, nineteen masked speed atoms and ten
+special metadata atoms (VHP, Tree, Mirage elite and seven Spark premises).
+
+These are proposed dispositions. The table records no source acceptance, native field
+consumption, original-engine nonuse, or passed behavior. The Rust declare/admit/finish
+plans still require independent real physical comparisons, loaded policy guards, original
+scope observations, individual recorded decisions, the final root input binding and actual
+scoped route receipts. All UNACCEPTED/UNRUN records remain unchanged. Static generator
+checks do not replace native regressions or the full validation gate. If a Rust interface
+or exact contract changes, regenerate only after reconciling that change; do not adjust a
+count or invent source getters to make this table pass.

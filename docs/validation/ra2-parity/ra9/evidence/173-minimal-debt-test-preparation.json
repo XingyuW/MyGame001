@@ -1,0 +1,29 @@
+{
+  "status": "PROPOSED_UNCOMPILED_UNRUN_NOT_APPLIED_TEST_ADDITIONS_ONLY",
+  "root_authorization": "Minimal concrete inherited-debt pass before canonical freeze; no native/Cargo until RA8 release",
+  "paths": [
+    {
+      "path": "ra9-preliminary-logs/173-proposed-ra9_start_setup.rs",
+      "bytes": 7212,
+      "sha256": "a5cc9ec48cf876ab381b8828c0a72bee2ee01445a88b2eb1a34553eddb539c91"
+    },
+    {
+      "path": "ra9-preliminary-logs/173-proposed-ra7_orders-attackmove-addition.rs",
+      "bytes": 1636,
+      "sha256": "61f18f0eb8e40b8d2d36e53064a71d76b467bc71177c65a0b9101416bd065971"
+    },
+    {
+      "path": "ra9-preliminary-logs/173-proposed-ra4_spawns-boundaries-addition.rs",
+      "bytes": 3435,
+      "sha256": "9d2803ad1b4d9590fcd1d8d0436e5f984b0cc4dd599e2624fe132791c76a7c22"
+    }
+  ],
+  "production_change": false,
+  "equivalent_existing_assertions_retained": "Existing exact SPAWN_LAUNCH_GAP=27 asserts are already meaningful and untouched; all broad flight/regen/return assertions remain. Current fixture timer boundaries do not claim original unsupported timing.",
+  "pending": [
+    "Actual compilation/native outcome after RA8 release.",
+    "AttackMove expected single completion may expose real duplicate; preserve before failure before smallest production fix.",
+    "Yard probe covers grow OFF supported counts and grow ON2..10 with actual public moves; final compile may require API/fixture corrections, never weakened assertions."
+  ],
+  "static_fixture_correction": "Stop permits ordinary idle acquisition, so exact timer-only controls end the durable fixture target after the actual missile impact/aircraft recovery; missile launches at a fresh actual replacement after Ready. Preimage retained. No native execution or runtime change."
+}

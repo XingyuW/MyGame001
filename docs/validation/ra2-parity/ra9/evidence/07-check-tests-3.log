@@ -1,0 +1,73 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+warning: unused variable: `rules`
+   --> crates/sim/tests/ra9_audit/rules.rs:254:9
+    |
+254 |     let rules=d.rules().ok_or_else(||"missing Rules".to_owned())?;
+    |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_rules`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `contains` is never used
+  --> crates/sim/tests/ra9_audit/masked-speed-admission.rs:30:15
+   |
+30 | pub(super) fn contains(key:&SourceKey)->bool{ROWS.lines().skip(1).map(|l|l.split('\t').collect::<Vec<_>>()).any(|r|r.len()==9&&Sourc...
+   |               ^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `contains` is never used
+   --> crates/sim/tests/ra9_audit/metadata-admission.rs:158:15
+    |
+158 | pub(super) fn contains(key:&SourceKey)->bool{key.file=="rules"&&specifications().iter().any(|s|s.section==key.section&&s.key==key.k...
+    |               ^^^^^^^^
+
+warning: constant `CENSUS_SHA256` is never used
+ --> crates/sim/tests/ra9_audit/residual-admission.rs:5:7
+  |
+5 | const CENSUS_SHA256:&str="c1eb5b85df0224f3a0dcc90e015bd4fda1f6bdc3d3ac45e38c5542a5458f58d0";
+  |       ^^^^^^^^^^^^^
+
+warning: function `contains` is never used
+  --> crates/sim/tests/ra9_audit/guard75-admission.rs:24:15
+   |
+24 | pub(super) fn contains(k:&SourceKey)->bool{catalogue().is_ok_and(|c|c.contains_key(k))}
+   |               ^^^^^^^^
+
+warning: function `command_surface` is never used
+  --> crates/sim/tests/ra9_audit/guard75-admission.rs:94:4
+   |
+94 | fn command_surface(c:&sim::Command)->&'static str{match c{sim::Command::Guard{..}=>"Guard",sim::Command::Scatter{..}=>"Scatter",sim:...
+   |    ^^^^^^^^^^^^^^^
+
+warning: function `domain_surface` is never used
+  --> crates/sim/tests/ra9_audit/guard75-admission.rs:95:4
+   |
+95 | fn domain_surface(d:sim::Domain)->&'static str{match d{sim::Domain::Land=>"Land",sim::Domain::Air=>"Air",sim::Domain::Naval=>"Naval"...
+   |    ^^^^^^^^^^^^^^
+
+warning: function `role_surface` is never used
+  --> crates/sim/tests/ra9_audit/guard75-admission.rs:96:4
+   |
+96 | fn role_surface(r:sim::Role)->&'static str{match r{sim::Role::Combat=>"Combat",sim::Role::Engineer=>"Engineer",sim::Role::Dog=>"Dog"...
+   |    ^^^^^^^^^^^^
+
+warning: function `match_rule_surface` is never used
+  --> crates/sim/tests/ra9_audit/guard75-admission.rs:97:4
+   |
+97 | fn match_rule_surface(r:sim::MatchRules){let sim::MatchRules{short_game:_,superweapons:_,mcv_repacks:_,crates:_,ore_grows:_,bridge_d...
+   |    ^^^^^^^^^^^^^^^^^^
+
+warning: function `option_surface` is never used
+  --> crates/sim/tests/ra9_audit/guard75-admission.rs:98:4
+   |
+98 | fn option_surface(o:sim::MatchOptions){let sim::MatchOptions{super_players:_,unlock_players:_,unit_speed_percent:_,free_for_all:_,ra...
+   |    ^^^^^^^^^^^^^^
+
+warning: function `owns` is never used
+  --> crates/sim/tests/ra9_audit/behavior87-admission.rs:99:15
+   |
+99 | pub(super) fn owns(plan:&Plan,key:&SourceKey)->bool{plan.rows.contains_key(key)}
+   |               ^^^^
+
+warning: `sim` (test "ra9_data_parity") generated 11 warnings (run `cargo fix --test "ra9_data_parity" -p sim` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 11.17s

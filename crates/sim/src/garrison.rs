@@ -134,6 +134,9 @@ pub(crate) fn advance(world: &mut World, defs: &Definitions, actors: &BTreeMap<S
             continue;
         }
         let Some(a) = actors.get(&unit) else { continue };
+        if crate::special::scenery::advance_interaction(world, defs, a, target) {
+            continue;
+        }
         let Ok(cell) = validate(world, defs, a, target) else {
             world
                 .resource_mut::<SpecialState>()
@@ -180,6 +183,9 @@ pub(crate) fn deploy(world: &mut World, owner: PlayerId, id: SimId) -> Result<()
             .is_none_or(|(_, p)| p.hit_points <= 0)
     {
         return Err(RejectReason::UnknownUnit(id));
+    }
+    if state.erasures.contains_key(&id) {
+        return Err(crate::special::unavailable("Target is being erased"));
     }
     if let Some(g) = world.resource_mut::<SpecialState>().garrisons.get_mut(&id) {
         g.evicting = true;
@@ -255,6 +261,7 @@ pub(crate) fn fire(world: &mut World) {
     let occupied = world.resource::<SpecialState>().garrisons.clone();
     for (id, g) in occupied {
         if g.evicting
+            || world.resource::<SpecialState>().erasures.contains_key(&id)
             || world
                 .resource::<Props>()
                 .get(id)
@@ -420,6 +427,7 @@ pub(crate) fn fire(world: &mut World) {
                 direct: Some(target),
                 firepower_pm: 1000,
                 source: Some(id),
+                identity: None,
             },
             false,
         );

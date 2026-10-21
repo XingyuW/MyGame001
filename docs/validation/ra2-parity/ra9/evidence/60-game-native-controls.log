@@ -1,0 +1,116 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+   Compiling game v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/game)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4m 39s
+     Running unittests src/main.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/game-5f08020bbb778566)
+
+running 50 tests
+test construction::tests::ra9_cancel_invalid_preview_and_no_longer_ready_transitions_need_no_sink_slot ... ok
+test construction::tests::ra9_partial_rally_accepts_only_available_slots_and_keeps_rally_mode ... ok
+test construction::tests::ra9_scheduled_economy_click_transitions_require_actual_sink_acceptance_and_execute ... ok
+test minimap::ra9_behavior87_routes::ra9_b87_asw_actual_marker_draw ... ok
+test minimap::ra9_behavior87_routes::ra9_b87_asw_real_mission_commands ... ok
+test minimap::ra9_behavior87_routes::ra9_b87_dmisl_actual_marker_draw ... ok
+test minimap::ra9_behavior87_routes::ra9_b87_dmisl_real_mission_commands ... ok
+test minimap::ra9_behavior87_routes::ra9_b87_gap_owner_allied_neutral_cloak_and_real_power_sales_reach_draw ... ok
+test minimap::ra9_behavior87_routes::ra9_b87_hornet_actual_marker_draw ... ok
+test minimap::ra9_behavior87_routes::ra9_b87_hornet_real_mission_commands ... ok
+test minimap::ra9_behavior87_routes::ra9_b87_normal_stock_squid_attachment_and_sonic_reappearance_use_real_host_and_draw ... ok
+test minimap::ra9_behavior87_routes::ra9_b87_pdplane_actual_marker_draw ... ok
+test minimap::ra9_behavior87_routes::ra9_b87_pdplane_real_mission_commands ... ok
+test minimap::ra9_behavior87_routes::ra9_b87_stock_sensors_four_five_cells_hide_and_show_squid_through_public_admission ... ok
+test minimap::ra9_behavior87_routes::ra9_b87_v3_actual_marker_draw ... ok
+test minimap::ra9_behavior87_routes::ra9_b87_v3_real_mission_commands ... ok
+test options::tests::ra9_settings_exclusive_creation_links_target_replacement_and_dangling_reads ... ok
+test options::tests::ra9_settings_failed_rename_cleans_owned_file_and_concurrent_writes_are_complete ... ok
+test options::tests::ra9_settings_fifos_are_bounded_and_fixed_temporary_nodes_are_never_opened ... 
+running 1 test
+test options::tests::ra9_settings_fifos_are_bounded_and_fixed_temporary_nodes_are_never_opened ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 266 filtered out; finished in 0.00s
+
+
+running 1 test
+test options::tests::ra9_settings_fifos_are_bounded_and_fixed_temporary_nodes_are_never_opened ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 266 filtered out; finished in 0.00s
+
+
+running 1 test
+test options::tests::ra9_settings_fifos_are_bounded_and_fixed_temporary_nodes_are_never_opened ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 266 filtered out; finished in 0.00s
+
+ok
+test options::tests::ra9_settings_target_fifo_is_replaced_atomically ... 
+running 1 test
+test options::tests::ra9_settings_target_fifo_is_replaced_atomically ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 266 filtered out; finished in 0.00s
+
+ok
+test selection::tests::ra9_c62_allied_wall_actual_selection_cycle_preview_sink ... ok
+test selection::tests::ra9_c62_bridge_hut_current_narrow_selection_cycle_preview_sink ... ok
+test selection::tests::ra9_c62_dmisl_real_click_box_preview_sink ... ok
+test selection::tests::ra9_c62_dmisl_real_cycle_type_combat ... FAILED
+test selection::tests::ra9_c62_pdplane_real_click_box_preview_sink ... ok
+test selection::tests::ra9_c62_pdplane_real_cycle_type_combat ... FAILED
+test selection::tests::ra9_c62_soviet_wall_actual_selection_cycle_preview_sink ... ok
+test selection::tests::ra9_c62_v3_real_click_box_preview_sink ... ok
+test selection::tests::ra9_c62_v3_real_cycle_type_combat ... FAILED
+test selection::tests::ra9_ctrl_tree_click_keeps_entity_force_fire_and_native_damage ... ok
+test selection::tests::ra9_mission_selection_boundary_agrees_with_real_command_rejection ... ok
+test selection::tests::ra9_non_tree_scenery_and_legacy_trees_keep_ordinary_attack_commands ... ok
+test selection::tests::ra9_own_bridge_hut_characterizes_narrower_selected_building_policy ... ok
+test selection::tests::ra9_ra2_tree_ordinary_preview_and_right_click_require_force_fire ... ok
+test selection::tests::ra9_strategic_plane_is_excluded_by_real_click_shift_and_box ... ok
+test selection::tests::ra9_tree_filter_preserves_valid_garrison_context_and_occupied_exclusion ... ok
+test selection::tests::ra9_tree_is_no_specialist_interaction_target ... ok
+test selection::tests::ra9_tree_removed_by_native_damage_and_cleanup_is_missing_to_cursor_and_commands ... ok
+test selection::tests::ra9_unexplored_tree_and_empty_cell_never_supply_an_entity_to_cursor_or_ctrl ... ok
+test sidebar::tests::ra9_cost_card_updates_across_real_teardown_and_successive_installs ... ok
+test sidebar::tests::ra9_factory_hint_matches_actual_disabled_expiry_production_and_foreign_control ... ok
+test sidebar::tests::ra9_zero_working_factory_is_paused_and_dead_sources_cannot_supply_a_rate ... ok
+test sim_host::tests::ra9_actual_tick_events_draw_only_the_public_coordinate_even_under_gap ... ok
+test sim_host::tests::ra9_menu_install_country_switch_and_old_buffered_messages_reset_public_notices ... ok
+test sim_host::tests::ra9_power_return_before_expiry_shows_the_remaining_public_notice ... ok
+test sim_host::tests::ra9_public_coordinate_notice_at_the_map_edge_never_colours_off_map_pixels ... ok
+test sim_host::tests::ra9_public_notice_expires_while_paused_and_redraws_at_the_unchanged_tick ... ok
+test sim_host::tests::ra9_receipt_never_powers_radar_and_power_recovery_does_not_replay_expired_notice ... ok
+test sim_host::tests::ra9_ticks_across_undrawn_client_frames_keep_every_actual_public_receipt ... ok
+test smoke::tests::ra9_both_native_asset_failure_handlers_emit_error_exit_only_for_a_failure ... ok
+
+failures:
+
+---- selection::tests::ra9_c62_dmisl_real_cycle_type_combat stdout ----
+
+thread 'selection::tests::ra9_c62_dmisl_real_cycle_type_combat' (13330588) panicked at crates/game/src/selection.rs:3222:9:
+assertion `left == right` failed
+  left: {}
+ right: {SimId(6)}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- selection::tests::ra9_c62_pdplane_real_cycle_type_combat stdout ----
+
+thread 'selection::tests::ra9_c62_pdplane_real_cycle_type_combat' (13330637) panicked at crates/game/src/selection.rs:3222:9:
+assertion `left == right` failed
+  left: {}
+ right: {SimId(5), SimId(6)}
+
+---- selection::tests::ra9_c62_v3_real_cycle_type_combat stdout ----
+
+thread 'selection::tests::ra9_c62_v3_real_cycle_type_combat' (13330668) panicked at crates/game/src/selection.rs:3222:9:
+assertion `left == right` failed
+  left: {}
+ right: {SimId(6)}
+
+
+failures:
+    selection::tests::ra9_c62_dmisl_real_cycle_type_combat
+    selection::tests::ra9_c62_pdplane_real_cycle_type_combat
+    selection::tests::ra9_c62_v3_real_cycle_type_combat
+
+test result: FAILED. 47 passed; 3 failed; 0 ignored; 0 measured; 217 filtered out; finished in 50.66s
+
+error: test failed, to rerun pass `-p game --bin game`
+error: 1 target failed:
+    `-p game --bin game`

@@ -34,9 +34,15 @@ pub(crate) fn advance(world: &mut World) {
             .retain(|id, t| index.contains_key(id) && *t > tick);
         state.charge.retain(|id, _| index.contains_key(id));
         let garrisons: BTreeSet<_> = state.garrisons.keys().copied().collect();
-        state
-            .cargo
-            .retain(|id, _| index.contains_key(id) || garrisons.contains(id));
+        // A carrier can itself be aboard another carrier. Retain descendants of actor and
+        // garrison roots, including dead actors until Cleanup handles their payload loss.
+        let mut cargo_hosts: BTreeSet<_> = index.keys().copied().collect();
+        cargo_hosts.extend(garrisons);
+        let roots: Vec<_> = cargo_hosts.iter().copied().collect();
+        for root in roots {
+            cargo_hosts.extend(state.cargo_descendants(root).iter().map(|p| p.id));
+        }
+        state.cargo.retain(|id, _| cargo_hosts.contains(id));
         state.rearming.retain(|id, _| index.contains_key(id));
         for actor in expired_interactions {
             state.interactions.remove(&actor);
@@ -277,6 +283,7 @@ pub(crate) fn advance(world: &mut World) {
             }
         }
     }
+    auto_defuse::advance(world, &defs, &index);
     let pending = world.resource::<SpecialState>().interactions.clone();
     for (id, target) in pending {
         let (Some(a), Some(b)) = (index.get(&id), index.get(&target)) else {

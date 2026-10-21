@@ -1,0 +1,125 @@
+{
+  "utc": "2026-10-21T11:30:42.671914+00:00",
+  "status": "COPY_OUTPUT_ONLY_ACTUAL_FUNCTIONAL_PROVENANCE_NOT_CANONICAL_ACCEPTANCE",
+  "records": [
+    {
+      "path": "README.md",
+      "before_sha256": "a30d025eae954a0870750560a3a3a8384394dadc366a84348f85b3b6d38250e7",
+      "after_sha256": "36a6a181cb5af1f711ddb2868d04c0e67fb4bd3906c12cd52a4e96d6246e9948",
+      "preimage": "ra9-preliminary-logs/189-before-README.md"
+    },
+    {
+      "path": "docs/HANDOFF.md",
+      "before_sha256": "f2724e3c7a3ec4ecaf42840c90c66c818788a961ec892b37ff38919ec90efef9",
+      "after_sha256": "e9764057e2ea622c920f0ad6f926836f3cd85050af5f7d7263f087630c967db9",
+      "preimage": "ra9-preliminary-logs/189-before-docs__HANDOFF.md"
+    },
+    {
+      "path": "docs/CONSTRUCTION_SYSTEM.md",
+      "before_sha256": "a1d3da95f0fd98eea63b1894da092771fa6be95e2f627cb24908282c95a5a7bd",
+      "after_sha256": "95af064a7d34d579ab4126a1ca7246c2182d5f427fd7d1c9d8135c9ad7d98e07",
+      "preimage": "ra9-preliminary-logs/189-before-docs__CONSTRUCTION_SYSTEM.md"
+    },
+    {
+      "path": "docs/RA2_GAP_ANALYSIS.md",
+      "before_sha256": "da9ccfaa0104f4b7405ee8fd15a2d85f29e8dd954b2334b9e40e1dbd079c2910",
+      "after_sha256": "84ba398bda1b1f3ed08126041413f210aeda17e41826fe5c3df5fd23168efe07",
+      "preimage": "ra9-preliminary-logs/189-before-docs__RA2_GAP_ANALYSIS.md"
+    },
+    {
+      "path": "docs/RA9_INTEGRATION_CHECKLIST.md",
+      "before_sha256": "72fe61d9558a17bbdfb96582efba85bed0239f22773731b2fa408798b66ea756",
+      "after_sha256": "5a32c93c56c3bf2912a87dbecc82b9e2a0bffeb8f9327c07b11a0098b10f3047",
+      "preimage": "ra9-preliminary-logs/189-before-docs__RA9_INTEGRATION_CHECKLIST.md"
+    },
+    {
+      "path": "docs/STATUS.md",
+      "before_sha256": "dd78df4057e594c5e0090c2d1b360093e90d16f9b55520269f23a72cd9dc5ecd",
+      "after_sha256": "1699fa028ac16026d9a6236aba3f7df874ceeb64a058d59ab08182ef82f4f76e",
+      "preimage": "ra9-preliminary-logs/189-before-docs__STATUS.md"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-review-requirements.md",
+      "before_sha256": "8203862acbf3f6aacf4387d25632a3a74a61906abac8f9a55ba5bf4649c25c4c",
+      "after_sha256": "4fc8dddbceddd124e3a2294300bbc06ccd70db9576eb44c4cc46dea16afc9059",
+      "preimage": "ra9-preliminary-logs/189-before-docs__reviews__RA2-parity-review-requirements.md"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-reviews-outstanding.md",
+      "before_sha256": "7354a0dac26ef1530fb19bc578acfc8147ee416fc21061973c278daeef43e087",
+      "after_sha256": "31ec1cf47c0991c73dc0790ce011f91011ead8c26d511f4d05ab6b846a630d72",
+      "preimage": "ra9-preliminary-logs/189-before-docs__reviews__RA2-parity-reviews-outstanding.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/README.md",
+      "before_sha256": "30d8a579a5dd7ef26f07ad281d580627988301706876b3bb743917f4224e7af3",
+      "after_sha256": "23e959ff21c3bcea52ac18f5304ed957e25be462cd640a295e0150efe3b4a36f",
+      "preimage": "ra9-preliminary-logs/189-before-docs__prompts__ra2-parity-review__README.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-sim1.md",
+      "before_sha256": "38c49d1682ff6aa9a99bb6fae7e7e459583a94252be0ab14dcd00a8e5237e17f",
+      "after_sha256": "21b85c7cac49f8dc63f76ad7533c057d7b676ba5e8d8155e9293b67c28de6bcc",
+      "preimage": "ra9-preliminary-logs/189-before-docs__prompts__ra2-parity-review__slice-sim1.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-sim2.md",
+      "before_sha256": "fed9ca1a99c7f4edec9145a0431e3ef36c5913586c06b1c3a89e94ecbaebbee3",
+      "after_sha256": "e7800d2365d690b2b13d78779828693e23a4cd27a5ec6a3fa0fa0f269b3fab58",
+      "preimage": "ra9-preliminary-logs/189-before-docs__prompts__ra2-parity-review__slice-sim2.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-data.md",
+      "before_sha256": "03b08a62d0728a9b44f794079e3a4e1b601183f8dad046cd962615828042dba9",
+      "after_sha256": "18f3225f75d138b4fcbff9d22fb1dea4b683235706e75f3af33fa9a90741f36c",
+      "preimage": "ra9-preliminary-logs/189-before-docs__prompts__ra2-parity-review__slice-data.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-tests.md",
+      "before_sha256": "4adcefd45725c2b5edad590bf50e90e24466ed42465923cbba7194448986058e",
+      "after_sha256": "e9ed026e71c1f9ea83a786d112c11f3e52c555c3f00c8b8ecd82e00f60ad18d2",
+      "preimage": "ra9-preliminary-logs/189-before-docs__prompts__ra2-parity-review__slice-tests.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-client.md",
+      "before_sha256": "74b49b793cfc1d60c9d3f7eeb5cc323f98f89563dc56190721a663c1ce0e0e71",
+      "after_sha256": "439f3fe6cd4087f2715013809b19beb4f3e1721aa9bfcc2c59c2327ae582adff",
+      "preimage": "ra9-preliminary-logs/189-before-docs__prompts__ra2-parity-review__slice-client.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/lead.md",
+      "before_sha256": "4213c54e9c40124324dd73b240debe7732b29e89dc7a8b6346a360a5f69a8c11",
+      "after_sha256": "edf0d3c03ab685c5e9d55d696b318d6e45d8c72a8168e05a2fb98ae5d10da4e2",
+      "preimage": "ra9-preliminary-logs/189-before-docs__prompts__ra2-parity-review__lead.md"
+    },
+    {
+      "path": "docs/RA9_LOADED_CATALOGUE.md",
+      "before_sha256": null,
+      "after_sha256": "df31f26a9294e8af1e63d68881cc5cca02807ec2df5fca5b4b61587116c02dd1",
+      "actual_receipt": "ra9-preliminary-logs/181-05.json",
+      "raw_sha256": "a9576fbcf4077c7630e879c24bfddf61752cb87aaf8a032868d522740cd41798",
+      "scope": "Actual Definitions/skirmish/AI/map loader values; source snapshot and non-native catalogue scope per181 receipt, no final canonical gate transfer."
+    },
+    {
+      "path": "docs/RA2_HISTORICAL_DEBT.tsv",
+      "before_sha256": "4813965d1ee7de2463cf913416c703b9a43b876fab7f77f7328f914bda1798ba",
+      "after_sha256": "cc994253f9d6adb2284d32aaf6ea8ba52436bc5ac6e8a6de8fc0625fd36473b9",
+      "preimage": "ra9-preliminary-logs/189-before-docs__RA2_HISTORICAL_DEBT.tsv"
+    }
+  ],
+  "debt_provenance_rows": [
+    "SPAWN-01",
+    "START-01",
+    "LATE-01",
+    "MOVE-DUP-01",
+    "R56-23",
+    "R56-38",
+    "R56-43",
+    "R56-63"
+  ],
+  "all183_debt_acceptance": "NOT_ACCEPTED_BY_DOCUMENTATION",
+  "authority64_drift": [],
+  "howtosee51_bytes": "unchanged",
+  "LICENSES_actual_input": "untouched since177; actual frozen input, never labeled output-only for later edits",
+  "native_processes": "No further native commands;188 final lease verifies all owned processes gone."
+}

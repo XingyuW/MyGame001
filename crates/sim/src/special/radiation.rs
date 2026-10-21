@@ -139,6 +139,7 @@ pub(crate) fn advance(world: &mut World) {
                 direct: Some(id),
                 firepower_pm: 1000,
                 source,
+                identity: None,
             },
             id,
         );

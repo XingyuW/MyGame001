@@ -7,6 +7,7 @@ pub struct Charge {
     pub due: u64,
     pub damage: i32,
     pub source: SimId,
+    pub(crate) identity: crate::combat::DamageIdentity,
     pub c4: bool,
 }
 #[derive(Clone, Debug)]
@@ -64,6 +65,7 @@ pub(crate) fn hash(s: &SpecialState, h: &mut Fnv1a64) {
         h.write_u64(c.due);
         h.write(&c.damage.to_le_bytes());
         h.write_u32(c.source.0);
+        c.identity.hash_into(h);
         h.write(&[u8::from(c.c4)]);
     }
     h.write_u64(s.radiation_sites.len() as u64);
@@ -113,10 +115,8 @@ pub(crate) fn refresh_limits(world: &mut World) {
         if let ProductionItem::Unit(k) = a.item {
             add(a.owner, k);
         }
-        if let Some(cargo) = world.resource::<SpecialState>().cargo.get(&a.id) {
-            for p in cargo {
-                add(a.owner, p.kind);
-            }
+        for p in world.resource::<SpecialState>().cargo_descendants(a.id) {
+            add(a.owner, p.kind);
         }
         if let Some(b) = world.get::<Building>(a.entity) {
             for &k in &b.pending_units {
@@ -125,10 +125,8 @@ pub(crate) fn refresh_limits(world: &mut World) {
         }
     }
     for (id, g) in &world.resource::<SpecialState>().garrisons {
-        if let Some(cargo) = world.resource::<SpecialState>().cargo.get(id) {
-            for p in cargo {
-                add(g.owner, p.kind);
-            }
+        for p in world.resource::<SpecialState>().cargo_descendants(*id) {
+            add(g.owner, p.kind);
         }
     }
     let players: Vec<_> = world.resource::<Players>().iter().map(|(p, _)| p).collect();
@@ -205,6 +203,7 @@ pub(crate) fn deploy(world: &mut World, a: &Actor, defs: &Definitions) -> Result
                         direct: None,
                         firepower_pm: 1000,
                         source: Some(a.id),
+                        identity: None,
                     },
                     true,
                 );
@@ -397,6 +396,16 @@ fn plant(
     c4: bool,
     weapon: Option<crate::WeaponKind>,
 ) {
+    plant_target(world, a, b.id, defs, c4, weapon);
+}
+pub(super) fn plant_target(
+    world: &mut World,
+    a: &Actor,
+    target: SimId,
+    defs: &Definitions,
+    c4: bool,
+    weapon: Option<crate::WeaponKind>,
+) {
     let Some(r) = defs.rules() else {
         return;
     };
@@ -425,7 +434,7 @@ fn plant(
     world
         .resource_mut::<SpecialState>()
         .charges
-        .entry(b.id)
+        .entry(target)
         .or_insert(Charge {
             due: tick.saturating_add(if c4 {
                 r.combat.c4_delay
@@ -434,6 +443,10 @@ fn plant(
             } as u64),
             damage,
             source: a.id,
+            identity: crate::combat::DamageIdentity {
+                owner: a.owner,
+                item: a.item,
+            },
             c4,
         });
     clear_orders(world, a.entity);
@@ -604,7 +617,7 @@ fn retain_beams(world: &mut World, defs: &Definitions, index: &BTreeMap<SimId, A
     let old = world.resource::<SpecialState>().erasures.clone();
     for (id, mut erase) in old {
         erase.beams.retain(|source, _| {
-            let (Some(a), Some(b)) = (index.get(source), index.get(&id)) else {
+            let Some(a) = index.get(source) else {
                 return false;
             };
             let Some(w) = world.get::<Weapon>(a.entity) else {
@@ -618,7 +631,17 @@ fn retain_beams(world: &mut World, defs: &Definitions, index: &BTreeMap<SimId, A
                     .map(|p| crate::combat::Extent::point(p.0))
                     .or_else(|| actor.foot.map(crate::combat::Extent::footprint))
             };
-            let (Some(from), Some(to)) = (extent(a), extent(b)) else {
+            let Some(from) = extent(a) else {
+                return false;
+            };
+            let (to, known) = if let Some(b) = index.get(&id) {
+                let Some(to) = extent(b) else {
+                    return false;
+                };
+                (to, known_to(world, defs, a.owner, b))
+            } else if let Some(to) = scenery::beam_extent(world, defs, a.owner, id) {
+                (to, true)
+            } else {
                 return false;
             };
             let (dx, dy) = from.gap(&to);
@@ -634,7 +657,7 @@ fn retain_beams(world: &mut World, defs: &Definitions, index: &BTreeMap<SimId, A
                     .resource::<SpecialState>()
                     .disabled
                     .contains_key(source)
-                && known_to(world, defs, a.owner, b)
+                && known
                 && defs.weapon(w.kind).is_some_and(|d| {
                     crate::combat::in_range(dx, dy, d.range)
                         && !crate::combat::inside_min_range(dx, dy, d.min_range)
@@ -772,6 +795,8 @@ pub(crate) fn resolve(world: &mut World, defs: &Definitions) {
                 if let Some(mut hp) = world.get_mut::<Health>(a.entity) {
                     hp.hit_points = 0;
                 }
+            } else {
+                scenery::erase(world, defs, id);
             }
             world.resource_mut::<SpecialState>().erasures.remove(&id);
         } else {
@@ -780,6 +805,9 @@ pub(crate) fn resolve(world: &mut World, defs: &Definitions) {
     }
     let charges = world.resource::<SpecialState>().charges.clone();
     for (id, c) in charges {
+        if scenery::resolve_charge(world, defs, id, &c, tick) {
+            continue;
+        }
         if !index.contains_key(&id) {
             world.resource_mut::<SpecialState>().charges.remove(&id);
             continue;
@@ -809,6 +837,7 @@ pub(crate) fn resolve(world: &mut World, defs: &Definitions) {
                     direct: Some(id),
                     firepower_pm: 1000,
                     source: Some(c.source),
+                    identity: Some(c.identity),
                 };
                 if c.c4 {
                     crate::combat::detonate_one(world, blast, id);
@@ -865,3 +894,6 @@ pub(crate) fn finish_deaths(world: &mut World, defs: &Definitions) {
     }
     refresh_limits(world);
 }
+
+#[cfg(test)]
+mod ra9_origin_tests;

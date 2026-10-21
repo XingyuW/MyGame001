@@ -1,0 +1,78 @@
+{
+  "utc": "2026-10-21T10:31:55.619315+00:00",
+  "status": "COPY_ONLY_EXACT_FROZEN_RA8_THREE_WAY_IMPORT_UNCOMPILED_UNRUN_NOT_CANONICAL_ACCEPTANCE",
+  "canonical_base": "99bcdf1913f3d74079ce2baa8b440b68a315223a",
+  "frozen_ra8_import": "4a103fa836f596af70a222f402fbea1f56bb0942",
+  "records": [
+    {
+      "path": "crates/sim/src/ai.rs",
+      "base_commit": "99bcdf1913f3d74079ce2baa8b440b68a315223a",
+      "base_sha256": "a219bfb73d6038cb56e5461120182350dce98585945bfbc50a525d36a1aaa17b",
+      "before_copy_sha256": "801abf7b8d6c5ee706b82c1bb5a1754602d6e310c6fb403338ee060be21344d4",
+      "frozen_ra8_commit": "4a103fa836f596af70a222f402fbea1f56bb0942",
+      "frozen_ra8_sha256": "f6aeb2093261adb8d0c34b4244f8ad905160bdd8ae564102683d4d8c9216ef5d",
+      "merged_copy_sha256": "e046518c5fa3eb41c11de8816d75750a496c3e0c14f88373a0ea07feeb8fd8f2",
+      "resolution": "Clean git merge-file --stdout --diff3 retained RA9 gathering documentation and embedded tests plus exact new RA8 financing logic.",
+      "preimages": {
+        "ours-before": "ra9-preliminary-logs/178-ours-before-crates__sim__src__ai.rs",
+        "r189-base": "ra9-preliminary-logs/178-r189-base-crates__sim__src__ai.rs",
+        "ra8-frozen": "ra9-preliminary-logs/178-ra8-frozen-crates__sim__src__ai.rs"
+      },
+      "same_as_frozen_ra8": false,
+      "retained_copy_delta_from_frozen_lines": 53
+    },
+    {
+      "path": "crates/sim/tests/ra8_ai.rs",
+      "base_commit": "99bcdf1913f3d74079ce2baa8b440b68a315223a",
+      "base_sha256": "27bbae268bbaf4b1bb324c4ce21b297904b2b7dc0993cf1d3423162c220c2e79",
+      "before_copy_sha256": "6f0bae19b180098e6d2cf2376a257c3ccec2c924c285a3c0d13ffc440bda42a8",
+      "frozen_ra8_commit": "4a103fa836f596af70a222f402fbea1f56bb0942",
+      "frozen_ra8_sha256": "bf0d2bc6dae6559cf6754d665c2dce18699598f01bc072683e57a65cad7deeb1",
+      "merged_copy_sha256": "c553a1a763312dc31c969c01686675f1dc1c6024c3b91efaae45bc4718388552",
+      "resolution": "Exact append/append EOF conflict: preserve copy R176 comment correction and161-line RA9 difficulty test; append byte-exact165-line new RA8 regression/helper block. Frozen RA8 existing base unchanged.",
+      "preimages": {
+        "ours-before": "ra9-preliminary-logs/178-ours-before-crates__sim__tests__ra8_ai.rs",
+        "r189-base": "ra9-preliminary-logs/178-r189-base-crates__sim__tests__ra8_ai.rs",
+        "ra8-frozen": "ra9-preliminary-logs/178-ra8-frozen-crates__sim__tests__ra8_ai.rs"
+      },
+      "same_as_frozen_ra8": false,
+      "retained_copy_delta_from_frozen_lines": 179
+    }
+  ],
+  "source_drift_from166": [
+    {
+      "path": "assets/LICENSES.md",
+      "before166_sha256": "da2bd99445dbf418b12d63d28353813fc3daad9c60ec53cb17c0eb0622d8042d",
+      "current_copy_sha256": "aa68e91df6e04901776dc8e956130739fa686c1c218118b6053b2ee7656a1421"
+    },
+    {
+      "path": "crates/sim/examples/ra9_catalogue.rs",
+      "before166_sha256": "edfe2935bc7a9d60658d471046fc813f40f7c3df4cafb1da00e06e1fa08a0489",
+      "current_copy_sha256": "9a078d05b3220f7685d3badb1055f6a64a1cb416aecdf9145c8181a9f0423743"
+    },
+    {
+      "path": "crates/sim/src/ai.rs",
+      "before166_sha256": "801abf7b8d6c5ee706b82c1bb5a1754602d6e310c6fb403338ee060be21344d4",
+      "current_copy_sha256": "e046518c5fa3eb41c11de8816d75750a496c3e0c14f88373a0ea07feeb8fd8f2"
+    },
+    {
+      "path": "crates/sim/tests/ra4_spawns.rs",
+      "before166_sha256": "adb80b4b40e15550b1cddc9437fc28386f67483be35c31f946c179c8076e4bc0",
+      "current_copy_sha256": "183644f61e2e65d31cfcc4ae0639d2791351608a189f5552a5808dd89779fdbc"
+    },
+    {
+      "path": "crates/sim/tests/ra7_orders.rs",
+      "before166_sha256": "81ef50b2170afc9ab3c5074bbaeaf983b3d86e009d557fc99ba352de741cba04",
+      "current_copy_sha256": "7ba378e9c223ba32738c6ad7d6e9ba3b5c104535f652a480115666e21468ec38"
+    },
+    {
+      "path": "crates/sim/tests/ra8_ai.rs",
+      "before166_sha256": "6f0bae19b180098e6d2cf2376a257c3ccec2c924c285a3c0d13ffc440bda42a8",
+      "current_copy_sha256": "c553a1a763312dc31c969c01686675f1dc1c6024c3b91efaae45bc4718388552"
+    }
+  ],
+  "new_source_path": "crates/sim/tests/ra9_start_setup.rs",
+  "authority64_drift": [],
+  "old166_168_171_proofs": "Preserved exact historical records; current runtime/source changed explicitly, never relabeled as current acceptance",
+  "remaining": "No Cargo/native process or canonical/Git mutation. RA8 owns all21/fixed3/guards then fresh13; any further source change requires exact delta import before final canonical root packet."
+}

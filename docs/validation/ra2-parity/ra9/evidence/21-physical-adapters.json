@@ -1,0 +1,18 @@
+{
+  "utc": "2026-10-20T22:47:40.546273+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "every_loaded_physical_adapter_reports_exact_failures_before_source_policy_admission",
+    "--",
+    "--nocapture"
+  ],
+  "exit_code": 101,
+  "seconds": 75.092,
+  "lease": "RA8 revocable phase lease jobs1 short copy-only functions",
+  "status": "actual preliminary physical adapters; no source classification/acceptance granted"
+}

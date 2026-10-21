@@ -1,0 +1,19 @@
+{
+  "utc": "2026-10-21T04:16:37.210088+00:00",
+  "path": "crates/sim/tests/ra9_audit/completion-whole-contracts.tsv",
+  "old_sha256": "faab3926f92eb653ffe9ffa0e5d09af3ca8df6b5edfbdc29d4f576449063c690",
+  "new_sha256": "26da856fe94b9c2d006acb6df9e8a138e60c1e412ff323b5cb4f46fdc18950b0",
+  "changes": [
+    {
+      "old": "american_airforce_command|building|buildings|land|combat|0|1000|600",
+      "new": "american_airforce_command|building|buildings|land|paradrop|0|1000|600",
+      "cells": 2
+    },
+    {
+      "old": "airport|building|buildings|land|combat|0|0|800",
+      "new": "airport|building|buildings|land|paradrop|0|0|800",
+      "cells": 2
+    }
+  ],
+  "scope": "145actualloaded guard exposed two incorrect static current-role projections. Actual91Definitions and generator1393 selectsParadrop for bothSuperWeapon types. Exactsource/classes/reasons/mappings/Cost/HP/category/domain/infantry/physical/sourceguards unchanged; no runtime fix/native acceptance."
+}

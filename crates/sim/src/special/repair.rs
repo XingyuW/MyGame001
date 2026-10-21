@@ -26,15 +26,20 @@ pub(super) fn repair_docked(
             let ProductionItem::Unit(kind) = a.item else {
                 return None;
             };
+            let hp = world.get::<Health>(a.entity)?.hit_points;
+            let host_hp = world.get::<Health>(b.entity)?.hit_points;
+            let owner = world.get::<Owner>(a.entity)?.0;
+            let host_owner = world.get::<Owner>(b.entity)?.0;
             let max = defs.unit_combat(kind)?.hit_points;
             let moving = world
                 .get::<Orders>(a.entity)
                 .is_none_or(|o| o.current.is_some());
-            if a.owner != b.owner
+            if owner != host_owner
                 || !repairs_units(defs, b)
                 || distance(a, b) > 1
                 || moving
-                || a.hp <= 0
+                || hp <= 0
+                || host_hp <= 0
             {
                 return None;
             }
@@ -48,7 +53,7 @@ pub(super) fn repair_docked(
             if !off {
                 vehicles::free(world, defs, id, true);
             }
-            if a.hp >= max && !world.resource::<SpecialState>().parasites.contains_key(&id) {
+            if hp >= max && !world.resource::<SpecialState>().parasites.contains_key(&id) {
                 // Whole: it makes room for the next vehicle.
                 let dest = {
                     let g = world.resource::<Grid>();
@@ -69,11 +74,11 @@ pub(super) fn repair_docked(
             if step_now && !off {
                 let price = defs.production(a.item).map_or(0, |terms| terms.cost);
                 let mut players = world.resource_mut::<Players>();
-                let state = players.get_mut(a.owner)?;
+                let state = players.get_mut(owner)?;
                 let cost = crate::repair_step_cost(&rules, price, max, state.super_me);
                 if state.credits >= cost {
                     state.credits -= cost;
-                    let heal = rules.repair_step.max(1).min(max.saturating_sub(a.hp));
+                    let heal = rules.repair_step.max(1).min(max.saturating_sub(hp));
                     if let Some(mut h) = world.get_mut::<Health>(a.entity) {
                         h.hit_points = h.hit_points.saturating_add(heal).min(max);
                     }

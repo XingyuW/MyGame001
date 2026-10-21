@@ -353,6 +353,10 @@ impl Context<'_> {
 }
 
 /// Advances every harvester's cycle by one tick, in ascending id order (invariant I4).
+#[allow(
+    clippy::too_many_arguments,
+    reason = "Bevy system parameters keep the independent live-health query explicit"
+)]
 pub(crate) fn harvest(
     mut grid: ResMut<Grid>,
     mut players: ResMut<Players>,
@@ -360,11 +364,20 @@ pub(crate) fn harvest(
     tick: Res<SimTick>,
     mut events: ResMut<Messages<SimEvent>>,
     mut harvesters: HarvesterQuery,
-    buildings: Query<(&SimId, &Owner, &Building)>,
+    buildings: Query<(Entity, &SimId, &Owner, &Building)>,
+    healths: Query<&crate::Health>,
 ) {
+    let alive = |entity| {
+        !healths
+            .get(entity)
+            .is_ok_and(|health| health.hit_points <= 0)
+    };
     let refineries: BTreeMap<SimId, Refinery> = buildings
         .iter()
-        .filter_map(|(id, owner, building)| {
+        .filter_map(|(entity, id, owner, building)| {
+            if !alive(entity) {
+                return None;
+            }
             let def = definitions.building(building.kind)?;
             let credits_per_ore = def.credits_per_ore?;
             Some((
@@ -380,6 +393,7 @@ pub(crate) fn harvest(
         .collect();
     let mut order: Vec<(SimId, Entity)> = harvesters
         .iter()
+        .filter(|(entity, ..)| alive(*entity))
         .map(|(entity, id, ..)| (*id, entity))
         .collect();
     if order.is_empty() {
@@ -389,6 +403,7 @@ pub(crate) fn harvest(
     let mut claimed = claimed_ore(
         harvesters
             .iter()
+            .filter(|(entity, ..)| alive(*entity))
             .map(|(_, id, .., harvester)| (*id, harvester)),
         None,
     );

@@ -1,0 +1,118 @@
+{
+  "created_utc": "2026-10-21T13:17:07.454983+00:00",
+  "status": "COPY_ONLY_OUTPUT_BODY_RECONCILIATION_NO_ACCEPTANCE",
+  "scope": "Actual copy outcomes through189 only; canonical writes, Cargo/native, source-policy binding and portable/port rebuild forbidden and not performed. Existing190/191 packets retained unchanged as historical preparation.",
+  "changed_outputs": [
+    {
+      "path": "README.md",
+      "before_sha256": "36a6a181cb5af1f711ddb2868d04c0e67fb4bd3906c12cd52a4e96d6246e9948",
+      "after_sha256": "c34d19f9b5c933f96b960712a8a9530584986ab79f8af96e83620ae2836c9144",
+      "preimage": "ra9-preliminary-logs/192-before-README.md"
+    },
+    {
+      "path": "docs/HANDOFF.md",
+      "before_sha256": "e9764057e2ea622c920f0ad6f926836f3cd85050af5f7d7263f087630c967db9",
+      "after_sha256": "0a43a2a7c6b52ee95a5144d5dc9a8bd9c2fe00e6f7e0126c34c7d06f75d9f6d0",
+      "preimage": "ra9-preliminary-logs/192-before-docs__HANDOFF.md"
+    },
+    {
+      "path": "docs/CONSTRUCTION_SYSTEM.md",
+      "before_sha256": "95af064a7d34d579ab4126a1ca7246c2182d5f427fd7d1c9d8135c9ad7d98e07",
+      "after_sha256": "18035854e69fe4c807f523c78aefeba822848cfd721580a467fc6b90cd034665",
+      "preimage": "ra9-preliminary-logs/192-before-docs__CONSTRUCTION_SYSTEM.md"
+    },
+    {
+      "path": "docs/RA2_GAP_ANALYSIS.md",
+      "before_sha256": "84ba398bda1b1f3ed08126041413f210aeda17e41826fe5c3df5fd23168efe07",
+      "after_sha256": "702016ab476ae5f6d0be9f35f2f1145a7031f29b03c794e7c836a1c24e3e4c77",
+      "preimage": "ra9-preliminary-logs/192-before-docs__RA2_GAP_ANALYSIS.md"
+    },
+    {
+      "path": "docs/RA9_INTEGRATION_CHECKLIST.md",
+      "before_sha256": "5a32c93c56c3bf2912a87dbecc82b9e2a0bffeb8f9327c07b11a0098b10f3047",
+      "after_sha256": "b3944189938fb3dcd687ee249bb6047085dd07e3ed7e42835be2c86daca1c115",
+      "preimage": "ra9-preliminary-logs/192-before-docs__RA9_INTEGRATION_CHECKLIST.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-sim1.md",
+      "before_sha256": "21b85c7cac49f8dc63f76ad7533c057d7b676ba5e8d8155e9293b67c28de6bcc",
+      "after_sha256": "4efa479bf3f27b16ee6a7242a2d73b5b9d33e7fa771a4b8c05c745b16fe8ca6b",
+      "preimage": "ra9-preliminary-logs/192-before-docs__prompts__ra2-parity-review__slice-sim1.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-sim2.md",
+      "before_sha256": "e7800d2365d690b2b13d78779828693e23a4cd27a5ec6a3fa0fa0f269b3fab58",
+      "after_sha256": "d6114840b937dcb9fec2708bb40628a50951d3fe78322628d600dc7cc057ff65",
+      "preimage": "ra9-preliminary-logs/192-before-docs__prompts__ra2-parity-review__slice-sim2.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-data.md",
+      "before_sha256": "18f3225f75d138b4fcbff9d22fb1dea4b683235706e75f3af33fa9a90741f36c",
+      "after_sha256": "f87a651636a630af485a50597cbdf18b78217b242b07a448a7bb1ba3a6a297ac",
+      "preimage": "ra9-preliminary-logs/192-before-docs__prompts__ra2-parity-review__slice-data.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-tests.md",
+      "before_sha256": "e9ed026e71c1f9ea83a786d112c11f3e52c555c3f00c8b8ecd82e00f60ad18d2",
+      "after_sha256": "279531fb0b3442ed3af5c6bb0cfc28a7452fa7f2ccb7dd89143c05062d1b92ce",
+      "preimage": "ra9-preliminary-logs/192-before-docs__prompts__ra2-parity-review__slice-tests.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-client.md",
+      "before_sha256": "439f3fe6cd4087f2715013809b19beb4f3e1721aa9bfcc2c59c2327ae582adff",
+      "after_sha256": "85b44b9f01130f4914f3887cd2a358b8a04f151eabab67dc87005f83f7a7da95",
+      "preimage": "ra9-preliminary-logs/192-before-docs__prompts__ra2-parity-review__slice-client.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/lead.md",
+      "before_sha256": "edf0d3c03ab685c5e9d55d696b318d6e45d8c72a8168e05a2fb98ae5d10da4e2",
+      "after_sha256": "e55026fcb1f66dd75ca30d97e61081176eca39e7be3a9c0070b3470e73f204d8",
+      "preimage": "ra9-preliminary-logs/192-before-docs__prompts__ra2-parity-review__lead.md"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-review-requirements.md",
+      "before_sha256": "4fc8dddbceddd124e3a2294300bbc06ccd70db9576eb44c4cc46dea16afc9059",
+      "after_sha256": "29fc78046b02ed15a1e075cd2012403b9821204f953f066155fb8de42d5569ec",
+      "preimage": "ra9-preliminary-logs/192-before-docs__reviews__RA2-parity-review-requirements.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/README.md",
+      "before_sha256": "23e959ff21c3bcea52ac18f5304ed957e25be462cd640a295e0150efe3b4a36f",
+      "after_sha256": "fd58e590b8657632c06f73a1ce1fdad1802dc5d49e47a200b53f8e33722defd8",
+      "preimage": "ra9-preliminary-logs/192-before-docs__prompts__ra2-parity-review__README.md"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-reviews-outstanding.md",
+      "before_sha256": "31ec1cf47c0991c73dc0790ce011f91011ead8c26d511f4d05ab6b846a630d72",
+      "after_sha256": "81a8dccd3d6074d0ffb9bc06db9c09940555d3df1ecf4b780f804873305b35e3",
+      "preimage": "ra9-preliminary-logs/192-before-docs__reviews__RA2-parity-reviews-outstanding.md"
+    }
+  ],
+  "protected_authority_spans": 64,
+  "howtosee_bytes": 13855,
+  "howtosee_sha256": "8ae4edfadf97fc68138d03c9a12d9c1217cf0c1fb65cf6dd6010c77b1c5bd6c1",
+  "frozen_files": {
+    "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/assets/LICENSES.md": "aa68e91df6e04901776dc8e956130739fa686c1c218118b6053b2ee7656a1421",
+    "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/docs/prompts/RA2_PARITY_PROMPT.md": "12b4a58cdb2548dba6d9e4ea61bed2ecb91f0b4ab77bf67024da8863dce88bed",
+    "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/docs/prompts/RA2_PARITY_CONTINUATION_PROMPT.md": "2d84fecf55e860a18b9bb8191250c51640ace32737f1009fdd460615e0681933",
+    "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/ra9-preliminary-logs/190-static-plan-fragment-correction.json": "a0eccfd43d5f8c133f92bedb1b719f2460bd8bb74e0f01d04331f8df86e68ddc",
+    "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/ra9-preliminary-logs/190-through189-portable-evidence-file-list.json": "558dfad3754a07b51b97345549a9fc1192dedde7c228de7d99365a6141988ba4",
+    "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/ra9-preliminary-logs/190-exact-observed-production-observer-source-preimage.rs": "132ca178a44b825be37ba86b84a276514bbb768053d7f28b053c287f0066ce0a",
+    "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/ra9-preliminary-logs/190-before-fragment-resolver-correction.py": "a6a9138bbcd39a7d942057ece8f820fe21665b11f13b3127476c26202ce0679f",
+    "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/ra9-preliminary-logs/190-exact-observed-rng-source-preimage.rs": "177c1e15b0dc4b67c891620de46f4e5231af52331bb98c10e6480a080a0c4c12",
+    "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/ra9-preliminary-logs/190-through189-portable-evidence-file-list.tsv": "6f4341062c57b7a7c74541db57b24c1e6be4c0848888dbe57a92c8008d9cc923",
+    "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/ra9-preliminary-logs/190-through189-portable-evidence-file-list-completion.json": "c4d915913ee59c84a2d6392b84ae60c0f7b17d7b4b79d26b0542afcb445287a0",
+    "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/ra9-preliminary-logs/190-extend-portable-plan-through189.py": "7c10733b9eff0c580e68ba1c4c2744fad4918689949734797068e2b8c8de0e38",
+    "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/ra9-preliminary-logs/191-prospective-canonical-port-manifest.json": "9da24fa875361ac033efb29b31fbf0c82f28738f56081523096a67c0161691e1",
+    "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/ra9-preliminary-logs/191-readonly-port-composition.log": "50f11bd061de85e624e1b03c0615a3cbde19398f9bd91d75af5cac4f6f25aacf",
+    "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/ra9-preliminary-logs/191-prospective-packet-readiness.json": "90192fde5b5a4fee75e59285ef1efdae624c44958d1370a887e9223589bba2d5",
+    "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/ra9-preliminary-logs/191-proposed-merged-DECISIONS.md": "077c0c09607b64cf3f44031cdaa74be7a7e5b5604df48be7538e62573e0d1b66",
+    "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/ra9-preliminary-logs/191-proposed-merged-STATUS.md": "8ef4315b516b7d2577fc45a94e825bed270e90d8d3b375fa336e040cf298eead",
+    "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/ra9-preliminary-logs/191-prospective-canonical-integration.patch": "3802d41587733e9834b8cdc64bd36c2f9ab9d9d2aff5486f58d6c9a8aed51156",
+    "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/ra9-preliminary-logs/191-compose-canonical-port.py": "c6e26978489085f4726c8a01b03c128ac69f156e394aae68008ca2b34983f4b1"
+  },
+  "canonical_final_gates": "PENDING",
+  "independent_review": "PENDING",
+  "user_visual_audio_feel": "PENDING_REQUIRES_USER_VERIFICATION",
+  "new_directories": []
+}

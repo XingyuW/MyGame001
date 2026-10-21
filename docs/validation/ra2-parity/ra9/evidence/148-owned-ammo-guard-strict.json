@@ -1,0 +1,18 @@
+{
+  "utc": "2026-10-21T04:20:19.459493+00:00",
+  "command": [
+    "cargo",
+    "clippy",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "exit_code": 0,
+  "seconds": 3.849,
+  "scope": "147realfailure showed actualbuilding ammo GameOwned sentinel, notCompared. Preserve real Cost/HP comparisons plus independently required existingGameOwned zero-field/dependency check; no source/native credit. Added realbaseline missing/corrupt/fakeCompared controls, stillUNRUN.",
+  "completion_rs_sha256": "7197d8497b7dca8c93593a2583ff4d1d6e347ff5ef143e1e712c3148e3b1fb4e"
+}

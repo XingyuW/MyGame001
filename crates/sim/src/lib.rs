@@ -23,6 +23,8 @@ mod economy;
 mod economy_commands;
 mod economy_defs;
 mod event;
+mod fileguard;
+pub use fileguard::{BoundedFileError, read_bounded_regular};
 mod flight;
 mod garrison;
 mod harvest;

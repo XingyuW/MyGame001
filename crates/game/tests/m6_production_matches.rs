@@ -495,3 +495,218 @@ fn ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes() {
     let outcome = duel("coral_archipelago", ["libya", "iraq"], ["brutal", "medium"]);
     assert!(matches!(outcome, Some(MatchOutcome::Won { .. })));
 }
+
+// Preliminary isolated-copy proof:110/114/119 pass the selected tuple;112/117 detect
+// the two intended late causal failures with exact finally/later-SHA restoration.
+// Canonical/final-source reruns remain required; no runtime edits or hooks.
+
+// Fresh setup on each call: no World/entity/resource-state clone, no fixture tuning.
+// This is the exact production harness setup_match path used by duel_with_length and
+// ra8_ai_matches, including its documented omission of host presentation scenery.
+// Selected preliminary tuple: actual native Won41738, late fire/production/positive ore
+// at36392/36609/36567; hashes/events/invariants matched. Rebind final canonical source;
+// never change the late thresholds, activity observers, requireWon or original tick_limit.
+fn ra9_late_twin_candidate() -> (&'static str, [&'static str; 2], [&'static str; 2], u64) {
+    ("crossroads", ["america", "russia"], ["easy", "easy"], 0)
+}
+
+fn late_twin_native_match() -> (bevy::app::App, u64) {
+    let (map_id, countries, difficulties, seed) = ra9_late_twin_candidate();
+    let data = assets().join("data");
+    let definitions = sim::load_ruleset(&data).unwrap();
+    let skirmish = sim::load_skirmish(data.join("skirmish.ron"), &definitions).unwrap();
+    let ai = sim::load_ai(data.join("ai.ron"), &definitions).unwrap();
+    let map = skirmish.maps.iter().position(|m| m.id == map_id).unwrap();
+    let grid = sim::load_map(assets().join(sim::map_asset_path(map_id)))
+        .unwrap()
+        .grid;
+    // Reuses the ORIGINAL M6 per-map limit, not the 300,000-tick duel limit.
+    let limit = tick_limit(&grid);
+    let players = [0, 1].map(|slot| PlayerSetup {
+        player: PlayerId(slot as u8),
+        start: slot,
+        faction: skirmish
+            .factions
+            .iter()
+            .position(|f| f.id == countries[slot])
+            .unwrap(),
+        controller: Controller::Ai {
+            difficulty: ai
+                .difficulties
+                .iter()
+                .position(|d| d.id == difficulties[slot])
+                .unwrap(),
+        },
+    });
+    let mut app = bevy::app::App::new();
+    app.add_plugins(SimPlugin { seed });
+    app.world_mut().insert_resource(grid);
+    app.world_mut().insert_resource(definitions);
+    sim::setup_match(app.world_mut(), &skirmish, &ai, map, &players).unwrap();
+    (app, limit)
+}
+
+fn late_twin_invariants(world: &mut World, completed: u64, twin: usize) {
+    let mut problems = sim::cell_invariant_violations(world);
+    // Every tick, including the final one: both unit/standing-point and grid directions.
+    problems.extend(sim::stray_claims(world));
+    assert!(
+        problems.is_empty(),
+        "twin {twin} step {completed}: {problems:?}"
+    );
+    let held = world
+        .query::<(&sim::SimId, &sim::Mobile)>()
+        .iter(world)
+        .map(|(id, mobile)| (*id, *mobile))
+        .collect::<Vec<_>>();
+    let grid = world.resource::<sim::Grid>();
+    for (id, mobile) in held {
+        for cell in std::iter::once(mobile.cell).chain(mobile.step.map(|step| step.to)) {
+            assert!(
+                grid.room_for(cell, id),
+                "room I6' {id:?} at {cell:?}, twin {twin} step {completed}"
+            );
+        }
+    }
+    assert!(world.resource::<CommandQueue>().len() <= 32);
+    let definitions = world.resource::<sim::Definitions>();
+    for (player, state) in world.resource::<sim::Players>().iter() {
+        assert!(
+            state.credits() >= 0,
+            "{player:?} twin {twin} step {completed}"
+        );
+        // Observable I7 checks. Completed units can already have left the queue;
+        // this does NOT claim to observe their final charge (see handoff).
+        for (_, queue) in state.queues() {
+            assert!(queue.len() <= sim::MAX_QUEUE_LENGTH);
+            for item in queue {
+                let terms = definitions
+                    .production(item.item)
+                    .expect("native production terms");
+                let time = terms.build_time.max(1);
+                assert!(item.progress <= time && item.fraction < 1000);
+                let expected = if state.super_me() {
+                    i64::from(item.progress == time)
+                } else {
+                    (terms.cost / i64::from(time)) * i64::from(item.progress)
+                        + if item.progress == time {
+                            terms.cost % i64::from(time)
+                        } else {
+                            0
+                        }
+                };
+                assert!(item.charged >= 0 && item.charged <= state.production_cost(terms.cost));
+                assert_eq!(
+                    item.charged, expected,
+                    "queue I7 {player:?} twin {twin} step {completed}: {item:?}"
+                );
+            }
+        }
+    }
+}
+
+#[test]
+fn ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner() {
+    const LATE: u64 = 36_000;
+    let (mut left, limit) = late_twin_native_match();
+    let (mut right, right_limit) = late_twin_native_match();
+    assert_eq!(limit, right_limit);
+    assert_eq!(
+        sim::state_hash(left.world_mut()),
+        sim::state_hash(right.world_mut())
+    );
+    let mut first_late = [None; 3]; // WeaponFired, ProductionComplete, positive OreDelivered
+    let mut late_counts = [0_u64; 3];
+    let mut trajectory = sim::Fnv1a64::new();
+    for completed in 1..=limit {
+        let native_tick = completed - 1;
+        assert_eq!(left.world().resource::<sim::SimTick>().0, native_tick);
+        assert_eq!(right.world().resource::<sim::SimTick>().0, native_tick);
+        // Both are genuinely unfinished before every step; no ticking a frozen winner.
+        assert!(left.world().resource::<MatchState>().outcome().is_none());
+        assert!(right.world().resource::<MatchState>().outcome().is_none());
+        // No external commands: each independent native AI builds the identical real FIFO.
+        left.world_mut().run_schedule(SimSchedule);
+        right.world_mut().run_schedule(SimSchedule);
+        for (twin, app) in [&mut left, &mut right].into_iter().enumerate() {
+            assert_eq!(app.world().resource::<sim::SimTick>().0, completed);
+            late_twin_invariants(app.world_mut(), completed, twin);
+        }
+        let events = |app: &bevy::app::App| {
+            app.world()
+                .resource::<Messages<SimEvent>>()
+                .iter_current_update_messages()
+                .cloned()
+                .collect::<Vec<_>>()
+        };
+        let left_events = events(&left);
+        assert_eq!(
+            left_events,
+            events(&right),
+            "ordered native events at step {completed}"
+        );
+        let hash = sim::state_hash(left.world_mut());
+        assert_eq!(
+            hash,
+            sim::state_hash(right.world_mut()),
+            "state hash at native tick {native_tick}, completed step {completed}"
+        );
+        trajectory.write_u64(hash);
+        if native_tick > LATE {
+            for event in &left_events {
+                let witness = match event {
+                    SimEvent::WeaponFired { .. } => Some(0),
+                    SimEvent::ProductionComplete { .. } => Some(1),
+                    SimEvent::OreDelivered { ore, credits, .. } if *ore > 0 && *credits > 0 => {
+                        Some(2)
+                    }
+                    _ => None,
+                };
+                if let Some(index) = witness {
+                    late_counts[index] += 1;
+                    first_late[index].get_or_insert(native_tick);
+                }
+            }
+        }
+        let outcome = left.world().resource::<MatchState>().outcome();
+        assert_eq!(
+            outcome,
+            right.world().resource::<MatchState>().outcome(),
+            "step {completed}"
+        );
+        if let Some(outcome) = outcome {
+            let MatchOutcome::Won { winner, tick } = outcome else {
+                panic!("native twins drew at {completed}: {outcome:?}");
+            };
+            assert!(
+                tick > LATE,
+                "selected case ended before active late gameplay: {outcome:?}"
+            );
+            assert_eq!(completed, tick + 1, "native outcome tick is zero-based");
+            assert!(left_events.iter().any(
+                |event| matches!(event, SimEvent::MatchEnded { winner: Some(p) } if *p == winner)
+            ));
+            eprintln!(
+                "RA9 late twins: winner={winner:?} outcome_tick={tick} steps={completed}/{limit} \
+                first_late_native_ticks={first_late:?} late_counts={late_counts:?} \
+                final_hash={hash:016x} trajectory_hash={:016x} candidate={:?}",
+                trajectory.finish(),
+                ra9_late_twin_candidate()
+            );
+            assert!(
+                late_counts[0] > 0,
+                "missing late WeaponFired after native tick36000"
+            );
+            assert!(
+                late_counts[1] > 0,
+                "missing late ProductionComplete after native tick36000"
+            );
+            assert!(
+                late_counts[2] > 0,
+                "missing late positive OreDelivered after native tick36000"
+            );
+            return;
+        }
+    }
+    panic!("native twins have no explicit winner within ORIGINAL {limit}-step limit");
+}

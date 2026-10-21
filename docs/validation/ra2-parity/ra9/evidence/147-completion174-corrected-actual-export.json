@@ -1,0 +1,21 @@
+{
+  "utc": "2026-10-21T04:16:37.260120+00:00",
+  "completed_utc": "2026-10-21T04:18:03.017959+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "ra9_export_actual_completion174_atom_proposals",
+    "--",
+    "--nocapture"
+  ],
+  "exit_code": 101,
+  "seconds": 85.757,
+  "input_count": 656,
+  "input_drift": [],
+  "scope": "Preliminary release actual174 proposal export only; adapters must succeed before printing;143plussole146contract source correction, no admission/native/fidelity/final gate"
+}

@@ -814,7 +814,8 @@ fn beside_a_building(grid: &sim::Grid, cell: sim::CellPos) -> bool {
 fn log_sim_events(mut events: MessageReader<SimEvent>) {
     for event in events.read() {
         match event {
-            SimEvent::SuperweaponBuilt { .. }
+            SimEvent::BuildingRevealed { .. }
+            | SimEvent::SuperweaponBuilt { .. }
             | SimEvent::SuperweaponLaunched { .. }
             | SimEvent::SuperweaponReady { .. } => {}
             SimEvent::PropDestroyed { cell, kind, .. } => {

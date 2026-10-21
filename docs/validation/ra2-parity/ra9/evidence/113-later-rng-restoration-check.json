@@ -1,0 +1,8 @@
+{
+  "utc": "2026-10-21T02:19:29.761202+00:00",
+  "scope": "SEPARATE LATER invocation after112 try/finally returned; exact baseline runtime/selectedtest/data/Cargo/map SHA comparison",
+  "selected_test_sha256": "d6374b445e91aa22c5325892203dbdec2d85f9363a0de435b117757ddf10af5a",
+  "expected": "d6374b445e91aa22c5325892203dbdec2d85f9363a0de435b117757ddf10af5a",
+  "input_count": 111,
+  "mismatches": []
+}

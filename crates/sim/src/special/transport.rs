@@ -56,6 +56,7 @@ pub(super) fn unload_ready(
             g.standing_point(c, p.id)
         };
         let mut e = world.spawn(unit_bundle(p.id, a.owner, p.kind, u.speed, c, point));
+        let restored_entity = e.id();
         if let Some(t) = defs.unit_combat(p.kind) {
             let (c, w) = combat_components(t);
             e.insert(c);
@@ -78,6 +79,18 @@ pub(super) fn unload_ready(
             // A spawner has the bay it went aboard with (RA4).
             world.resource_mut::<SpecialState>().bays.insert(p.id, bay);
         }
+        // Restoring a loaded IFV must recreate the actual passenger mode after base/rank
+        // weapons, including Engineer repair mode.
+        let restored = Actor {
+            entity: restored_entity,
+            id: p.id,
+            owner: a.owner,
+            item: ProductionItem::Unit(p.kind),
+            cell: c,
+            foot: None,
+            hp: p.hp,
+        };
+        vehicles::ifv_weapon(world, defs, &restored);
     }
     world
         .resource_mut::<SpecialState>()

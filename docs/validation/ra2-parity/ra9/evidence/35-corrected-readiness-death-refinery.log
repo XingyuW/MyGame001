@@ -1,0 +1,46 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 44.91s
+     Running tests/ra9_guard75_readiness.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_guard75_readiness-8a2d5a94ed2c964a)
+
+running 4 tests
+test ra9_guard75_aegis_base_medusa_191_actual_position_flight_countdown_and_impact ... ok
+test ra9_guard75_aegis_elite_medusa_e_191_actual_burst_flight_and_impact ... ok
+test ra9_guard75_america_natural_readiness_real_eight_gi_plane_in_power_and_low_power ... ok
+test ra9_guard75_stock_nuke_natural_power_readiness_and_actual_600_surviving_hit ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.33s
+
+     Running tests/ra9_legacy904_last_five.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_legacy904_last_five-48a3ee8fa569eb4c)
+
+running 5 tests
+test ra9_legacy904_actual_primary_death_fallback_is_distinct_from_missing_default ... ok
+test ra9_legacy904_death_selector_premise_enumerates_the_complete_current_loaded_set ... ok
+test ra9_legacy904_oil_shot_death_is_immediate_bounded_damage_without_later_execution ... ok
+test ra9_legacy904_unarmed_explodes_shipyards_have_no_payload_selector ... ok
+test ra9_legacy904_wall_between_shooter_and_seen_target_does_not_occlude_stock_shell ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.63s
+
+     Running tests/ra9_refinery_repair_liveness.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_refinery_repair_liveness-9209b1ead0e72b0d)
+
+running 2 tests
+test ra9_command_destroyed_refinery_cannot_pay_a_delivery_later_in_economy ... FAILED
+test ra9_native_command_killed_depot_cannot_heal_or_charge_but_one_hp_depot_can ... ok
+
+failures:
+
+---- ra9_command_destroyed_refinery_cannot_pay_a_delivery_later_in_economy stdout ----
+
+thread 'ra9_command_destroyed_refinery_cannot_pay_a_delivery_later_in_economy' (13241877) panicked at crates/sim/tests/ra9_refinery_repair_liveness.rs:69:5:
+real free miner never entered a final native step arriving for same-tick unload
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ra9_command_destroyed_refinery_cannot_pay_a_delivery_later_in_economy
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.68s
+
+error: test failed, to rerun pass `-p sim --test ra9_refinery_repair_liveness`
+error: 1 target failed:
+    `-p sim --test ra9_refinery_repair_liveness`

@@ -300,6 +300,9 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
             let a = own(world, &defs, &index, issued.player, *unit)?;
             commandable(world, *unit)?;
             if world.resource::<crate::Props>().get(*target).is_some() {
+                if let Some(result) = scenery::order(world, &defs, a, *target) {
+                    return result;
+                }
                 return crate::garrison::order(world, &defs, a, *target);
             }
             let b = index
@@ -318,6 +321,7 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
                 return Err(RejectReason::UnknownTarget(*target));
             }
             validate_interaction(world, a, b, &defs)?;
+            auto_defuse::cancel(world, a.id);
             // A new order ends a repair at a dock.
             world.resource_mut::<SpecialState>().docked.remove(&a.id);
             if distance(a, b) <= 1 {

@@ -583,9 +583,11 @@ impl AiController {
 /// for the eight-neighbour steps of equation 5, with no diagonal step between two blocked
 /// orthogonal neighbours, connects the same cells), those that no building covers, the one nearest
 /// to `toward` (octile distance, then row, then column). `None` if there is none, for example a
-/// start walled in by terrain under its own buildings. Its units can walk there unless buildings
-/// placed later block the way. The cells of `reserved` (the yard a base unit will deploy into)
-/// count as covered by a building.
+/// start walled in by terrain under its own buildings. The flood traverses passable terrain
+/// through existing and reserved building footprints; footprints exclude candidates only.
+/// Therefore it does not certify a path from actual unit cells on contrived own-building
+/// partitions. The cells of `reserved` (the yard a base unit will deploy into) are excluded as
+/// candidates too. See the retained M6-review-2 P2-1 limitation and RA9 preliminary record.
 fn gathering_point(
     grid: &Grid,
     start: CellPos,
@@ -4962,5 +4964,37 @@ mod tests {
         assert!(!army_commandable(&special, id));
         special.erasures.clear();
         assert!(army_commandable(&special, id));
+    }
+}
+
+#[cfg(test)]
+mod ra9_keys_tests;
+
+#[cfg(test)]
+mod ra9_gathering_limit_tests {
+    use super::*;
+    #[test]
+    fn ra9_terrain_gathering_flood_records_existing_building_partition_limitation() {
+        let cell = crate::Cell {
+            passable: true,
+            water: false,
+            buildable: true,
+            ore: 0,
+        };
+        let mut grid = Grid::from_cells(9, 3, vec![cell; 27]).expect("controlled grid");
+        for y in 0..3 {
+            grid.cover(CellPos::new(4, y), SimId(10));
+        }
+        let gather = gathering_point(&grid, CellPos::new(4, 1), CellPos::new(1, 1), None)
+            .expect("terrain-only candidate");
+        assert_eq!(gather, CellPos::new(1, 1));
+        assert!(grid.building(gather).is_none());
+        assert!(
+            crate::pathfinding::find_path(&grid, CellPos::new(6, 1), gather, |_| false).is_none()
+        );
+        assert!(
+            crate::pathfinding::find_path(&grid, CellPos::new(6, 1), CellPos::new(7, 1), |_| false)
+                .is_some()
+        );
     }
 }

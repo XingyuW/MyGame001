@@ -1,0 +1,27 @@
+{
+  "utc": "2026-10-21T02:32:35.676770+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "game",
+    "--test",
+    "m6_production_matches",
+    "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "baseline_start_sha256": "2eff81e37befbbc81c6dda7807fdca450ef125ff6c5f93320e337ecccf0983ab",
+  "expected_restored_test_sha256": "d6374b445e91aa22c5325892203dbdec2d85f9363a0de435b117757ddf10af5a",
+  "mutant_test_sha256": "59cb8b346e9d6c35a44be868a48690b9ef0d2f7d714b1f2ebed2e7c5a891dc1b",
+  "one_cause": "Only late ProductionComplete observerSome1->None; native events/state/hash/outcome untouched. Expect identicalWon41738/finalhash78c81bd069fca660/trajectory5a8adabd01d20b05/fire444/ore6 and specifically missing late production",
+  "pre_mutation_runtime_mismatches": [],
+  "ended_utc": "2026-10-21T02:39:54.400380+00:00",
+  "exit_code": 101,
+  "seconds": 438.699,
+  "finally_restored_test_sha256": "d6374b445e91aa22c5325892203dbdec2d85f9363a0de435b117757ddf10af5a",
+  "finally_runtime_mismatches": [],
+  "lease": "RA8 regranted exact required observer causal/finally+laterSHA+restoredpositive, jobs1 functional overlap"
+}

@@ -1,0 +1,21 @@
+{
+  "utc": "2026-10-21T04:34:21.467084+00:00",
+  "completed_utc": "2026-10-21T05:04:18.559251+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "--no-fail-fast",
+    "--",
+    "--nocapture"
+  ],
+  "exit_code": 101,
+  "seconds": 1797.083,
+  "input_count": 667,
+  "input_drift": [],
+  "scope": "Actualfull unfiltered ra9_data_parity target including accepted-baseline/component/membership/source/array negatives; preliminary release functional overlap only, no canonical/full13/performance/final panel acceptance"
+}

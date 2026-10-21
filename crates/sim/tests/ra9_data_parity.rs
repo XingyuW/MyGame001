@@ -450,6 +450,12 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
     let definitions = shipped();
     let rules = definitions.rules().expect("shipped rules");
     let mut differences = Differences::load();
+    let foundations: BTreeMap<String, String> =
+        table("ra2_reference.tsv", &["file", "section", "key", "value"])
+            .into_iter()
+            .filter(|r| r[0] == "art" && r[2] == "Foundation")
+            .map(|r| (r[1].clone(), r[3].clone()))
+            .collect();
     // The test of the weapons and warheads meets their differences.
     let foreign: Vec<usize> = differences
         .rows
@@ -518,6 +524,28 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
         let entry = definitions
             .metadata(item)
             .unwrap_or_else(|| panic!("{id} has no arsenal entry"));
+        if let ProductionItem::Building(kind) = item {
+            let actual = definitions.building(kind).expect("mapped building");
+            let image = value("Image").unwrap_or(&row.section);
+            let source = foundations
+                .get(image)
+                .unwrap_or_else(|| panic!("art[{image}] Foundation absent"));
+            let (width, height) = source
+                .split_once('x')
+                .expect("rectangular source Foundation");
+            for (field, game, native) in [
+                ("footprint.width", actual.width, width),
+                ("footprint.height", actual.height, height),
+            ] {
+                differences.check(
+                    id,
+                    field,
+                    &game.to_string(),
+                    &convert(Conversion::Int, native).to_string(),
+                    source,
+                );
+            }
+        }
         let mut number = |field: &str, game: i128, conversion: Conversion, key: &str| {
             let text = value(key).unwrap_or_else(|| match key {
                 "Cost" | "Sight" => "0",
@@ -622,6 +650,16 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
                 combat.weapons(true),
                 combat.weapons(false),
                 "{id}: without elite weapons in the ini a type keeps its weapons at elite rank"
+            );
+            // Preserve that assertion and additionally reconcile the same exact inherited
+            // source helper omissions at the real elite physical consumer.
+            let (expected, source) = listed(elite);
+            differences.check(
+                id,
+                "elite_weapons",
+                &carried(combat.weapons(true)),
+                &expected,
+                &source,
             );
         }
         for (field, game, key, conversion) in [
@@ -967,10 +1005,47 @@ fn every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_differenc
             let text = value(key).unwrap_or(default);
             (convert(Conversion::Flag, text), text)
         };
+        // RA9 schema10 values: retain the original named audit/field-census assertions.
+        // Each mapping (including merged twins) compares its real loaded metadata with
+        // an independent source conversion before the old completeness set is updated.
+        for (field, game, key, default, conversion) in [
+            (
+                "size_limit",
+                i128::from(entry.size_limit),
+                "SizeLimit",
+                "0",
+                Conversion::Int,
+            ),
+            (
+                "death_weapon_damage_pm",
+                i128::from(entry.death_weapon_damage_pm),
+                "DeathWeaponDamageModifier",
+                "1",
+                Conversion::Permille,
+            ),
+            (
+                "bomb_sight",
+                i128::from(entry.bomb_sight),
+                "BombSight",
+                "0",
+                Conversion::Int,
+            ),
+        ] {
+            let text = value(key).unwrap_or(default);
+            differences.check(
+                id,
+                field,
+                &game.to_string(),
+                &convert(conversion, text).to_string(),
+                text,
+            );
+        }
         // RA5: world-object traits, independently converted from reference keys/defaults.
         for (field, game, key) in [
             ("needs_engineer", entry.needs_engineer, "NeedsEngineer"),
             ("capturable", entry.capturable, "Capturable"),
+            ("type_immune", entry.type_immune, "TypeImmune"),
+            ("reveal_to_all", entry.reveal_to_all, "RevealToAll"),
             ("insignificant", entry.insignificant, "Insignificant"),
             ("immune", entry.immune, "Immune"),
             ("hospital", entry.hospital, "Hospital"),
@@ -1672,14 +1747,8 @@ const ITEM_FIELDS: &[ListFields] = &[
         &[
             ("id", Field::Key),
             ("sprite", Field::Own("art")),
-            (
-                "width",
-                Field::Own("footprints are the game's until a later milestone (R9)"),
-            ),
-            (
-                "height",
-                Field::Own("footprints are the game's until a later milestone (R9)"),
-            ),
+            ("width", Field::Audited("footprint.width")),
+            ("height", Field::Audited("footprint.height")),
             ("cost", Field::Audited("cost")),
             ("build_time", Field::Audited("build_time")),
             ("producer", Field::Audited("producer")),
@@ -1827,6 +1896,14 @@ const ITEM_FIELDS: &[ListFields] = &[
             ("crusher", Field::Audited("crusher")),
             ("crushable", Field::Audited("crushable")),
             ("size", Field::Audited("size")),
+            ("size_limit", Field::Audited("size_limit")),
+            (
+                "death_weapon_damage_pm",
+                Field::Audited("death_weapon_damage_pm"),
+            ),
+            ("type_immune", Field::Audited("type_immune")),
+            ("bomb_sight", Field::Audited("bomb_sight")),
+            ("reveal_to_all", Field::Audited("reveal_to_all")),
             ("infantry", Field::Audited("infantry")),
             ("trainable", Field::Audited("trainable")),
             ("veteran_abilities", Field::Audited("veteran_abilities")),
@@ -3554,3 +3631,5 @@ fn the_conversions_round_half_away_from_zero_in_integers() {
         191
     );
 }
+
+mod ra9_audit;

@@ -1,0 +1,44 @@
+{
+  "status": "AUTHORIZED_PRELIMINARY_COPY_SOURCE_ADDITIONS_APPLIED_UNCOMPILED_UNRUN_NO_NATIVE_ACCEPTANCE_NO_CANONICAL_WRITES",
+  "utc": "2026-10-21T10:28:23.131205+00:00",
+  "root_authorization": "Existing173drafts+174catalogue only; source freeze/factual binding remains after actual RA8 canonical release",
+  "records": [
+    {
+      "path": "crates/sim/tests/ra4_spawns.rs",
+      "before_sha256": "adb80b4b40e15550b1cddc9437fc28386f67483be35c31f946c179c8076e4bc0",
+      "preimage": "ra9-preliminary-logs/175-before-crates__sim__tests__ra4_spawns.rs",
+      "after_unformatted_sha256": "96e56ac6d28f84b9b66714d65621c63089546a496a620a5f30dc115a65ebd34a",
+      "bytes": 28883
+    },
+    {
+      "path": "crates/sim/tests/ra7_orders.rs",
+      "before_sha256": "81ef50b2170afc9ab3c5074bbaeaf983b3d86e009d557fc99ba352de741cba04",
+      "preimage": "ra9-preliminary-logs/175-before-crates__sim__tests__ra7_orders.rs",
+      "after_unformatted_sha256": "5c572365b610a0b2908796f9b33afe5d0de207bed59998828b7ada1b5ec4b5fa",
+      "bytes": 21661
+    },
+    {
+      "path": "crates/sim/examples/ra9_catalogue.rs",
+      "before_sha256": "edfe2935bc7a9d60658d471046fc813f40f7c3df4cafb1da00e06e1fa08a0489",
+      "preimage": "ra9-preliminary-logs/175-before-crates__sim__examples__ra9_catalogue.rs",
+      "after_unformatted_sha256": "6bb858b688cc21ca257d38a837112886ec0ba544e2b85fe6c216dd3a36b1f431",
+      "bytes": 7872
+    },
+    {
+      "path": "crates/sim/tests/ra9_start_setup.rs",
+      "before_sha256": null,
+      "preimage": null,
+      "after_unformatted_sha256": "e8251318f3666dc50378202d032db48bbb035443537b5325fdd62c7a4e1cd8c3",
+      "bytes": 7199
+    }
+  ],
+  "authority_fragments_checked": 64,
+  "authority_drift": [],
+  "runtime_core97_change": false,
+  "historical166_168_171_policy": "Preserved immutable; this receipt creates explicit newer scope, never transfers old full/source/native acceptance",
+  "pending": [
+    "Standalone rustfmt permitted next, no Cargo/native process.",
+    "Exact future RA8 frozen ai.rs/ra8_ai.rs delta import using actual preserved R189 three-way.",
+    "Focused native compilation/results after RA8 canonical ownership release; strict all21/fixed3/guards then required full13 on actual frozen source."
+  ]
+}

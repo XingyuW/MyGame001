@@ -375,8 +375,14 @@ fn building_owners(
 ) -> (BTreeMap<SimId, PlayerId>, Vec<SimId>) {
     let mut owners = BTreeMap::new();
     let mut producers = Vec::new();
-    if let Some(mut buildings) = host.world().try_query::<(&SimId, &Owner, &Building)>() {
-        for (id, owner, building) in buildings.iter(host.world()) {
+    if let Some(mut buildings) = host
+        .world()
+        .try_query::<(&SimId, &Owner, &Building, Option<&sim::Health>)>()
+    {
+        for (id, owner, building, health) in buildings.iter(host.world()) {
+            if health.is_some_and(|health| health.hit_points <= 0) {
+                continue;
+            }
             owners.insert(*id, owner.0);
             if owner.0 == HUMAN && definitions.produces_units(building.kind) {
                 producers.push(*id);
@@ -399,12 +405,17 @@ pub fn placement_preview(
     let def = definitions.building(kind)?;
     let footprint = footprint_at(cell, def.width, def.height);
     let mut owned = Vec::new();
-    if let Some(mut buildings) = host.world().try_query::<(&Owner, &Building)>() {
+    if let Some(mut buildings) = host
+        .world()
+        .try_query::<(&Owner, &Building, Option<&sim::Health>)>()
+    {
         owned.extend(
             buildings
                 .iter(host.world())
-                .filter(|(owner, _)| owner.0 == HUMAN)
-                .map(|(_, building)| (building.kind, building.footprint)),
+                .filter(|(owner, _, health)| {
+                    owner.0 == HUMAN && !health.is_some_and(|health| health.hit_points <= 0)
+                })
+                .map(|(_, building, _)| (building.kind, building.footprint)),
         );
     }
     let check = sim::check_placement(
@@ -453,6 +464,7 @@ fn issue_economy_commands(
             key => next = mode_after_key(next, key, ready),
         }
     }
+    sink.issue(commands);
     if next != InterfaceMode::Normal && buttons.just_pressed(MouseButton::Right) {
         next = InterfaceMode::Normal;
     } else if buttons.just_pressed(MouseButton::Left)
@@ -476,13 +488,14 @@ fn issue_economy_commands(
         if let Some(Err(reason)) = &placement {
             info!("the building cannot be placed there: {reason}");
         }
-        commands.extend(click);
-        next = after;
+        let expected = click.len();
+        if sink.issue(click) == expected {
+            next = after;
+        }
     }
     if *mode != next {
         *mode = next;
     }
-    sink.issue(commands);
 }
 
 /// Outlines the footprint the ready building would cover at the cursor, green if
@@ -1081,5 +1094,289 @@ mod tests {
             placement_preview(&host, power, CellPos::new(19, 38)).expect("preview");
         assert_eq!(footprint.origin, CellPos::new(19, 38));
         assert_eq!(check, Err(RejectReason::NotReady(power)));
+    }
+
+    // Append inside construction::tests. Requires Tree corrected test-only take_commands helper.
+    fn ra9_ready_boundary_host() -> (SimHost, BuildingKind, CellPos) {
+        let mut host = crate::sim_host::tests::fixture_host(|world| {
+            world
+                .resource_mut::<sim::Players>()
+                .add(HUMAN, 10_000)
+                .expect("player");
+            for (kind, cell) in [
+                ("yard", CellPos::new(5, 5)),
+                ("power", CellPos::new(9, 5)),
+                ("barracks", CellPos::new(5, 10)),
+                ("factory", CellPos::new(10, 10)),
+            ] {
+                sim::spawn_building(world, HUMAN, kind, cell).expect("scenario setup");
+            }
+        });
+        let kind = host
+            .definitions()
+            .expect("definitions")
+            .building_kind("power")
+            .expect("power");
+        let item = ProductionItem::Building(kind);
+        let budget = host
+            .definitions()
+            .expect("definitions")
+            .production(item)
+            .expect("terms")
+            .build_time
+            * 4;
+        let events =
+            crate::sim_host::tests::run(&mut host, vec![Command::QueueProduction { item }]);
+        assert!(
+            !events
+                .iter()
+                .any(|e| matches!(e, sim::SimEvent::CommandRejected { .. }))
+        );
+        for _ in 0..budget {
+            if human_ready_building(&host, InterfaceMode::Place(kind)) == Some(kind) {
+                break;
+            }
+            crate::sim_host::tests::run(&mut host, vec![]);
+        }
+        assert_eq!(
+            human_ready_building(&host, InterfaceMode::Place(kind)),
+            Some(kind)
+        );
+        let cell = (0..32)
+            .flat_map(|y| (0..32).map(move |x| CellPos::new(x, y)))
+            .find(|&cell| placement_preview(&host, kind, cell).is_some_and(|(_, r)| r.is_ok()))
+            .expect("actual valid preview");
+        (host, kind, cell)
+    }
+
+    fn ra9_construction_app(host: SimHost, mode: InterfaceMode, cell: Option<CellPos>) -> App {
+        let mut app = App::new();
+        app.insert_resource(host)
+            .init_resource::<CommandSink>()
+            .insert_resource(mode)
+            .insert_resource(HoveredCell(cell))
+            .init_resource::<ButtonInput<MouseButton>>()
+            .init_resource::<ButtonInput<KeyCode>>()
+            .add_systems(Update, issue_economy_commands);
+        app
+    }
+
+    #[test]
+    fn ra9_scheduled_economy_click_transitions_require_actual_sink_acceptance_and_execute() {
+        for placing in [false, true] {
+            for refusal in ["none", "paused", "full", "closed"] {
+                let (host, kind, cell) = ra9_ready_boundary_host();
+                let producers = building_owners(&host, host.definitions().expect("definitions")).1;
+                assert!(producers.len() >= 2, "real multi-producer rally setup");
+                let mode = if placing {
+                    InterfaceMode::Place(kind)
+                } else {
+                    InterfaceMode::Rally
+                };
+                let mut app = ra9_construction_app(host, mode, Some(cell));
+                if refusal == "paused" {
+                    app.world_mut().resource_mut::<CommandSink>().toggle_pause();
+                }
+                if refusal == "full" {
+                    for _ in 0..crate::sim_host::MAX_PENDING_COMMANDS {
+                        app.world_mut()
+                            .resource_mut::<CommandSink>()
+                            .push(Command::SetRallyPoint {
+                                building: producers[0],
+                                cell,
+                            })
+                            .expect("fill actual sink");
+                    }
+                }
+                if refusal == "closed" {
+                    let host = app
+                        .world_mut()
+                        .remove_resource::<SimHost>()
+                        .expect("scenario host");
+                    crate::sim_host::uninstall_match(app.world_mut()); // Real close path.
+                    app.world_mut().insert_resource(host); // Definitions retained only for this closed-sink scenario.
+                }
+                let before = app.world().resource::<CommandSink>().accepted();
+                app.world_mut()
+                    .resource_mut::<ButtonInput<MouseButton>>()
+                    .press(MouseButton::Left);
+                app.world_mut().run_schedule(Update);
+                let sink = app.world().resource::<CommandSink>();
+                let expected = if placing { 1 } else { producers.len() as u64 };
+                assert_eq!(
+                    sink.accepted() - before,
+                    if refusal == "none" { expected } else { 0 }
+                );
+                assert_eq!(
+                    *app.world().resource::<InterfaceMode>(),
+                    if refusal == "none" {
+                        InterfaceMode::Normal
+                    } else {
+                        mode
+                    }
+                );
+                if refusal != "none" {
+                    assert!(sink.refused() > 0);
+                    continue;
+                }
+                let commands = crate::sim_host::tests::take_commands(&mut app);
+                assert_eq!(
+                    commands.len(),
+                    expected as usize,
+                    "actual emitted batch, not just counters"
+                );
+                let mut host = app.world_mut().remove_resource::<SimHost>().expect("host");
+                let events = crate::sim_host::tests::run(&mut host, commands);
+                assert!(
+                    !events
+                        .iter()
+                        .any(|e| matches!(e, sim::SimEvent::CommandRejected { .. })),
+                    "{events:?}"
+                );
+                if placing {
+                    assert!(
+                        events.iter().any(
+                            |e| matches!(e,sim::SimEvent::BuildingPlaced{kind:k,..}if *k==kind)
+                        )
+                    );
+                } else {
+                    let mut query = host
+                        .world()
+                        .try_query::<(&sim::SimId, &sim::Producer)>()
+                        .expect("producers");
+                    assert!(
+                        query
+                            .iter(host.world())
+                            .filter(|(id, _)| producers.contains(id))
+                            .all(|(_, producer)| producer.rally == Some(cell))
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn ra9_partial_rally_accepts_only_available_slots_and_keeps_rally_mode() {
+        let (host, _, cell) = ra9_ready_boundary_host();
+        let producers = building_owners(&host, host.definitions().expect("definitions")).1;
+        assert_eq!(producers.len(), 2, "two genuine producers");
+        let old = CellPos::new(7, 8);
+        let mut app = ra9_construction_app(host, InterfaceMode::Rally, Some(cell));
+        for _ in 0..crate::sim_host::MAX_PENDING_COMMANDS - 1 {
+            app.world_mut()
+                .resource_mut::<CommandSink>()
+                .push(Command::SetRallyPoint {
+                    building: producers[0],
+                    cell: old,
+                })
+                .expect("fill");
+        }
+        let before = app.world().resource::<CommandSink>().accepted();
+        app.world_mut()
+            .resource_mut::<ButtonInput<MouseButton>>()
+            .press(MouseButton::Left);
+        app.world_mut().run_schedule(Update);
+        assert_eq!(
+            *app.world().resource::<InterfaceMode>(),
+            InterfaceMode::Rally
+        );
+        let sink = app.world().resource::<CommandSink>();
+        assert_eq!(sink.accepted() - before, 1);
+        assert_eq!(sink.refused(), 1);
+        let commands = crate::sim_host::tests::take_commands(&mut app);
+        let mut host = app.world_mut().remove_resource::<SimHost>().expect("host");
+        let events = crate::sim_host::tests::run(&mut host, commands);
+        assert!(
+            !events
+                .iter()
+                .any(|e| matches!(e, sim::SimEvent::CommandRejected { .. })),
+            "{events:?}"
+        );
+        let mut query = host
+            .world()
+            .try_query::<(&sim::SimId, &sim::Producer)>()
+            .expect("producers");
+        for (id, producer) in query.iter(host.world()) {
+            if *id == producers[0] {
+                assert_eq!(producer.rally, Some(cell));
+            }
+            if *id == producers[1] {
+                assert_eq!(producer.rally, None);
+            }
+        }
+    }
+
+    #[test]
+    fn ra9_cancel_invalid_preview_and_no_longer_ready_transitions_need_no_sink_slot() {
+        for paused in [false, true] {
+            for escape in [false, true] {
+                let (host, kind, cell) = ra9_ready_boundary_host();
+                let mut app = ra9_construction_app(host, InterfaceMode::Place(kind), Some(cell));
+                if paused {
+                    app.world_mut().resource_mut::<CommandSink>().toggle_pause();
+                } else {
+                    for _ in 0..crate::sim_host::MAX_PENDING_COMMANDS {
+                        app.world_mut()
+                            .resource_mut::<CommandSink>()
+                            .push(Command::Stop { units: vec![] })
+                            .expect("fill only; never executed");
+                    }
+                }
+                let before = app.world().resource::<CommandSink>().accepted();
+                if escape {
+                    app.world_mut()
+                        .resource_mut::<ButtonInput<KeyCode>>()
+                        .press(KeyCode::Escape);
+                } else {
+                    app.world_mut()
+                        .resource_mut::<ButtonInput<MouseButton>>()
+                        .press(MouseButton::Right);
+                }
+                app.world_mut().run_schedule(Update);
+                assert_eq!(
+                    *app.world().resource::<InterfaceMode>(),
+                    InterfaceMode::Normal
+                );
+                let sink = app.world().resource::<CommandSink>();
+                assert_eq!(sink.accepted(), before);
+                assert_eq!(sink.refused(), 0);
+            }
+        }
+        for hovered in [None, Some(CellPos::new(-1, -1)), Some(CellPos::new(5, 5))] {
+            let (host, kind, _) = ra9_ready_boundary_host();
+            if let Some(cell) = hovered {
+                assert!(placement_preview(&host, kind, cell).is_none_or(|(_, r)| r.is_err()));
+            }
+            let mut app = ra9_construction_app(host, InterfaceMode::Place(kind), hovered);
+            app.world_mut()
+                .resource_mut::<ButtonInput<MouseButton>>()
+                .press(MouseButton::Left);
+            app.world_mut().run_schedule(Update);
+            assert_eq!(
+                *app.world().resource::<InterfaceMode>(),
+                InterfaceMode::Place(kind)
+            );
+            let sink = app.world().resource::<CommandSink>();
+            assert_eq!((sink.accepted(), sink.refused()), (0, 0));
+        }
+        let (mut host, kind, cell) = ra9_ready_boundary_host();
+        let events = crate::sim_host::tests::run(
+            &mut host,
+            vec![Command::CancelProduction {
+                item: ProductionItem::Building(kind),
+            }],
+        );
+        assert!(
+            events
+                .iter()
+                .any(|e| matches!(e, sim::SimEvent::ProductionCancelled { .. }))
+        );
+        let mut app = ra9_construction_app(host, InterfaceMode::Place(kind), Some(cell));
+        app.world_mut().run_schedule(Update);
+        assert_eq!(
+            *app.world().resource::<InterfaceMode>(),
+            InterfaceMode::Normal
+        );
+        assert_eq!(app.world().resource::<CommandSink>().accepted(), 0);
     }
 }

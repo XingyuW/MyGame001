@@ -1,0 +1,18 @@
+{
+  "utc": "2026-10-21T01:24:30.600900+00:00",
+  "ended_utc": "2026-10-21T01:24:33.414559+00:00",
+  "command": [
+    "cargo",
+    "run",
+    "-p",
+    "sim",
+    "--example",
+    "ra9_catalogue"
+  ],
+  "exit_code": 0,
+  "seconds": 2.814,
+  "lease": "RA8 serial functional phase jobs1; actual Definitions loader catalogue, no simulation",
+  "input_mismatches": [],
+  "output_sha256": "dfdeb40c04f9a3f4fc18761c29d9fe5d60cad08215d52bdffe832659fa007326",
+  "output_bytes": 24306
+}

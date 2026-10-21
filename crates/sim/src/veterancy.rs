@@ -162,9 +162,10 @@ pub fn scaled_speed(speed: u16, speed_pm: u32) -> u16 {
 
 /// The experience a unit of a type that costs `cost` needs for `rank` with the rules'
 /// `veteran_ratio_pm`: `rank × cost × ratio / 1000`, rounded up, so that a unit with exactly
-/// this much has the rank.
+/// this much has at least the requested rank. Zero cost/ratio normalize to one, as in
+/// [`rank_of`], so explicit promotion's stored experience agrees with its computed threshold.
 pub fn experience_for(rank: u8, cost: i64, veteran_ratio_pm: i32) -> i64 {
-    let needed = i128::from(rank) * i128::from(cost.max(0)) * i128::from(veteran_ratio_pm.max(0));
+    let needed = i128::from(rank) * i128::from(cost.max(1)) * i128::from(veteran_ratio_pm.max(1));
     i64::try_from((needed + 999) / 1000).unwrap_or(i64::MAX)
 }
 

@@ -1,0 +1,21 @@
+{
+  "utc": "2026-10-21T04:26:44.365221+00:00",
+  "completed_utc": "2026-10-21T04:26:45.376872+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "ra9_completion_powerup_nonfirst",
+    "--",
+    "--nocapture"
+  ],
+  "exit_code": 0,
+  "seconds": 1.012,
+  "input_count": 656,
+  "input_drift": [],
+  "scope": "Actual loaded174 declaration + real successful adapters, exact nonfirst water component/reorder/zero-share activation/missing witness/fake read negatives; no complete admission/native flag/final acceptance"
+}

@@ -1,0 +1,29 @@
+COMMAND ["python3", "scripts/ra2_reference.py", "--ra9-dispositions"]
+ra2_reference: wrote 1911 proposed RA9 dispositions; all acceptance/receipt gates remain required
+COMMAND ["python3", "scripts/ra2_reference.py", "--ra9-dispositions", "--check"]
+ra2_reference: proposed RA9 dispositions match (1911 rows; no admission granted)
+COMMAND ["cargo", "clippy", "-p", "sim", "--test", "ra9_data_parity", "--", "-D", "warnings"]
+    Checking sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+error: this `if` statement can be collapsed
+   --> crates/sim/tests/ra9_audit/completion.rs:344:5
+    |
+344 | /     if s.atom.portion == Portion::Whole
+345 | |         && s.atom.key.section != "Powerups"
+346 | |         && !include_str!("completion-local-contracts.tsv")
+347 | |             .lines()
+...   |
+357 | |     }
+    | |_____^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#collapsible_if
+    = note: `-D clippy::collapsible-if` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+    |
+352 ~             })
+353 ~         && completion_whole::guard(i, d, a, s)? != s.binding {
+354 |             return Err("completion whole current guard changed".into());
+355 ~         }
+    |
+
+error: could not compile `sim` (test "ra9_data_parity") due to 1 previous error

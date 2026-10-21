@@ -1,0 +1,115 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 48s
+     Running tests/m1_map_subset.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m1_map_subset-f4084f161cf71e51)
+
+running 2 tests
+test ra9_every_csv_entry_is_a_u32_before_tiled_and_retains_full_context ... ok
+test ra9_native_map_and_referenced_tileset_fifo_reads_are_owned_and_bounded ... 
+running 1 test
+test ra9_native_map_and_referenced_tileset_fifo_reads_are_owned_and_bounded ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 25 filtered out; finished in 0.00s
+
+
+running 1 test
+test ra9_native_map_and_referenced_tileset_fifo_reads_are_owned_and_bounded ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 25 filtered out; finished in 0.00s
+
+
+running 1 test
+test ra9_native_map_and_referenced_tileset_fifo_reads_are_owned_and_bounded ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 25 filtered out; finished in 0.00s
+
+
+running 1 test
+test ra9_native_map_and_referenced_tileset_fifo_reads_are_owned_and_bounded ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 25 filtered out; finished in 0.00s
+
+ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 24 filtered out; finished in 0.05s
+
+     Running tests/m7_factions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m7_factions-cf86bff778f5808c)
+
+running 1 test
+test ra9_roster_exactly_sixty_four_loads_and_the_sixty_fifth_is_rejected ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.01s
+
+     Running tests/ra1_commands.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra1_commands-67942e0013ab5578)
+
+running 4 tests
+test ra9_prop_commands::ra9_ra1_a_real_pending_prop_approach_cannot_complete_after_native_commands_endpoint_death ... ok
+test ra9_prop_commands::ra9_ra1_each_actorless_interact_kind_has_known_unexplored_missing_and_controlled_hidden_boundaries ... ok
+test ra9_prop_commands::ra9_ra1_native_already_dead_sources_and_props_are_missing_for_all_added_interact_kinds ... ok
+test ra9_prop_commands::ra9_ra1_real_commands_death_precedes_same_tick_actorless_interact_and_economy_with_survival_twins ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 22 filtered out; finished in 25.43s
+
+     Running tests/ra5_shipped.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra5_shipped-95b6d7b4d44ca439)
+
+running 2 tests
+test ra9_legacy904_public_stock_harvest_18_19_and_move_resets_work ... ok
+test ra9_legacy904_public_stock_single_bail_delivery_keeps_real_ore_and_gem_value ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.74s
+
+     Running tests/ra6_vehicles.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_vehicles-6e8e476b02377690)
+
+running 7 tests
+test ra9_b87_infested_stock_destroyer_really_fires_and_damages_after_move_refusal ... ok
+test ra9_b87_real_v3_neighbor_impact_damages_hospital_but_not_independent_immune_hut ... ok
+test ra9_behavior87_coordinate_move_admits_genuine_unexplored_destination ... FAILED
+test ra9_behavior87_direct_hospital_and_hut_targets_keep_independent_damage_immunity ... ok
+test ra9_behavior87_real_base_elite_cloakable_shots_use_r51_surface_delay ... FAILED
+test ra9_behavior87_stock_parasite_targets_keep_actual_selected_weapon_and_layer_controls ... ok
+test ra9_behavior87_uniform_attackmove_admission_reaches_coordinate_for_exact_stock_types ... ok
+
+failures:
+
+---- ra9_behavior87_coordinate_move_admits_genuine_unexplored_destination stdout ----
+
+thread 'ra9_behavior87_coordinate_move_admits_genuine_unexplored_destination' (13257511) panicked at crates/sim/tests/ra6_vehicles.rs:1503:3:
+kirov: actual coordinate movement/chrono delay
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- ra9_behavior87_real_base_elite_cloakable_shots_use_r51_surface_delay stdout ----
+
+thread 'ra9_behavior87_real_base_elite_cloakable_shots_use_r51_surface_delay' (13257536) panicked at crates/sim/tests/ra6_vehicles.rs:1529:34:
+reload exceeds cloak delay
+
+
+failures:
+    ra9_behavior87_coordinate_move_admits_genuine_unexplored_destination
+    ra9_behavior87_real_base_elite_cloakable_shots_use_r51_surface_delay
+
+test result: FAILED. 5 passed; 2 failed; 0 ignored; 0 measured; 32 filtered out; finished in 5.61s
+
+error: test failed, to rerun pass `-p sim --test ra6_vehicles`
+     Running tests/ra9_refinery_repair_liveness.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_refinery_repair_liveness-9209b1ead0e72b0d)
+
+running 2 tests
+test ra9_command_destroyed_refinery_cannot_pay_a_delivery_later_in_economy ... FAILED
+test ra9_native_command_killed_depot_cannot_heal_or_charge_but_one_hp_depot_can ... ok
+
+failures:
+
+---- ra9_command_destroyed_refinery_cannot_pay_a_delivery_later_in_economy stdout ----
+
+thread 'ra9_command_destroyed_refinery_cannot_pay_a_delivery_later_in_economy' (13257598) panicked at crates/sim/tests/ra9_refinery_repair_liveness.rs:94:5:
+living twin must actually deliver this tick, not merely remain an eligible refinery
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ra9_command_destroyed_refinery_cannot_pay_a_delivery_later_in_economy
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+error: test failed, to rerun pass `-p sim --test ra9_refinery_repair_liveness`
+error: 2 targets failed:
+    `-p sim --test ra6_vehicles`
+    `-p sim --test ra9_refinery_repair_liveness`

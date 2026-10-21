@@ -24,7 +24,6 @@
 //! Anything outside the subset is a typed [`MapError`].
 
 use std::collections::BTreeSet;
-use std::io::Read;
 use std::path::{Path, PathBuf};
 
 use quick_xml::Reader;
@@ -45,17 +44,10 @@ pub(crate) struct CheckedTileset {
 
 /// Reads a map or tileset file without reading more than [`MAX_MAP_FILE_BYTES`] + 1 bytes.
 pub(crate) fn read_file(path: &Path) -> Result<Vec<u8>, MapErrorKind> {
-    let file = std::fs::File::open(path).map_err(|e| MapErrorKind::Read(e.to_string()))?;
-    let mut bytes = Vec::new();
-    file.take(MAX_MAP_FILE_BYTES + 1)
-        .read_to_end(&mut bytes)
-        .map_err(|e| MapErrorKind::Read(e.to_string()))?;
-    if u64::try_from(bytes.len()).map_or(true, |len| len > MAX_MAP_FILE_BYTES) {
-        return Err(MapErrorKind::FileTooLarge {
-            max_bytes: MAX_MAP_FILE_BYTES,
-        });
-    }
-    Ok(bytes)
+    crate::read_bounded_regular(path, MAX_MAP_FILE_BYTES).map_err(|error| match error {
+        crate::BoundedFileError::Read(error) => MapErrorKind::Read(error.to_string()),
+        crate::BoundedFileError::TooLarge { max_bytes } => MapErrorKind::FileTooLarge { max_bytes },
+    })
 }
 
 /// Checks a map file (`bytes`, read from `path`) and the external tileset it references, if any.
@@ -878,9 +870,20 @@ impl<'a> Checker<'a> {
                 }
             }
         }
-        let found = u64::try_from(text.unwrap_or_default().split(',').count()).unwrap_or(u64::MAX);
+        let text = text.unwrap_or_default();
+        let found = u64::try_from(text.split(',').count()).unwrap_or(u64::MAX);
         if found != expected {
             return Err(self.error(field, MapErrorKind::TileCountMismatch { expected, found }));
+        }
+        // Match tiled's trimmed u32 conversion for EVERY token before invoking its parser.
+        for (index, entry) in text.split(',').enumerate() {
+            if entry.trim().parse::<u32>().is_err() {
+                return Err(self.invalid(
+                    format!("{field}[{index}]"),
+                    entry.trim(),
+                    "an unsigned 32-bit tile id",
+                ));
+            }
         }
         Ok(())
     }

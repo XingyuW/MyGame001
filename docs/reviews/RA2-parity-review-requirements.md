@@ -1,4 +1,202 @@
+<!-- RA9_CURRENT_EVIDENCE_BEGIN -->
+## Current execution provenance — 2026-10-21 ordinary copy
+
+This supersedes earlier pending143/uncompiled175 prose below. The ordinary copy contains the
+exact frozen RA8 financing correction from4a103fa, its two new tests and all retained RA9
+changes.178 records the R189 three-way import; no stale AI source replaced newer canonical work.
+Canonical RA8 still owns its checkout and validation. No final review or acceptance is supplied.
+
+Preliminary151 exported the actual174 completion atoms;158 passed the whole audit1/0:
+16,211 physical=13,419Compared+2,792GameOwned;7,108 demanded/successful dependency pairs;
+5,022 source atoms=3,111Compared+1,911 typed dispositions.159 subsequently ran all181 audit
+cases unfiltered and failed175passed/6failed/0ignored/0filtered.166's five test/helper changes
+repaired those six diagnostics;165strict passed and168 exactly those six passed6/0/175filtered.
+There was no second preliminary full181 pass.131/136/159 and all compiler/fixture/causal failures
+remain retained with their exact source/receipt scopes. Root's166 factual655-source/64-authority/
+88-receipt check is historical; subsequent actual source deltas require canonical rebinding.
+
+Bounded180–188 functional overlap compiled the new targets and executed only the specifically
+authorized debt controls/catalogue and existing late-twin protocol.181's two exact scheduled
+missile/carrier timer controls each passed1/0, retaining all old broad timing tests and exact27
+launch spacing. They do not establish every original flight or lost-carrier regeneration boundary.
+181 reproduced a real duplicate MoveCompleted around actual combat/death;182's same test body
+passed1/0 after the smallest settled-destination correction in combat.rs.185's shipped yard test
+passed1/0 across21maps/344 supported map-growth/player-count scenarios, checking real setup,
+I6/occupancy and public Move exits with unchanged256bound. Earlier slow-detour and neutral-yard
+census fixture failures are preserved. These are separate exact snapshots, not a whole-suite pass.
+
+181's actual loader catalogue reports54units/46buildings/116weapons/61warheads/11armours,
+9countries/21maps/11rawAIplans/3difficulties. The generated RA9_LOADED_CATALOGUE.md retains
+that actual output; its receipt predates the narrow combat correction and establishes loaded
+catalogue values only. Final canonical source/data/route/execution binding remains required.
+174's read-only graph finds all48 audit Rust files reachable,79 include_str paths,0missing or
+unreached. The current directory census is48Rust/67TSV/4TXT,16referencefiles,28top-level RA9
+sim targets; plain files and inline/support/merge residues are not invented compiled-module counts.
+
+187 refreshed the selected late twins on actual changed AI+combat source: separate positive
+and restored-positive each passed1/0/6filtered, P0Won41738/72000,late444WeaponFired/
+8ProductionComplete/6positiveOreDelivered,final78c81bd069fca660/trajectory5a8adabd01d20b05.
+The exact existing extra-RNG36001 control failed statehash at36001; the observer-only production
+omission reached the identical winner/world then failed missing late production (444/0/6).
+Each intentional mutation was restored with immediate and separate later reads of the original
+source SHAe7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d.
+186 is an interrupted debug attempt after native launch, exit-15/no completed result; it is not
+unrun/compiler-only.188 records all17commands, source/raw/executable paths and empty owned process
+groups. All copy Cargo/native processes are gone. Functional overlap grants no performance credit
+or canonical acceptance; all raw failures/preimages/restorations remain available.
+
+Final canonical port/root factual rebinding, isolated all21 actualWon/fixed3/example guards and
+fresh required full13 remain pending, followed by the fresh five-slice3+2/lead panel. Full13
+includes the entire unfiltered audit target and debug600smoke; no extra copy181/debug sweep is
+implied. R56 decision6 retains36,000-tick deterministic soak windows, which can end with sampled
+worlds still Running; all-to-Won evidence comes from separately measured matches/late twins/all21.
+Completed soak outcomes still require Won. Timing limits and per-run performance scope remain exact.
+
+The1,911 specific source dispositions remain759 CURRENT_MODEL_NONREAD/1,152 INTENTIONAL_DIFFERENCE,
+zero ORIGINAL_ENGINE_UNUSED:1,869Whole+42components,including174newatoms across151keys. Specific
+current-model/static-absence choices do not prove original-engine nonuse or native consumption.
+All64 authority fragments, original prompts and historical166/168/171 packets remain byte-exact.
+183 stable debt IDs/aliases and every precise remaining scope are retained. All51 HOWTOSEE rows
+remain PENDING—requires user verification, including art/audio/readability/animation/pacing/feel,
+normal human victory/defeat and packaged/platform launch. Implementers/preparers cannot review
+this work; only the user approves quality and creates an approval tag.
+<!-- RA9_CURRENT_EVIDENCE_END -->
+
+# Current final-review ownership supplement — 2026-10-21
+
+This is a current-source dispatch map for the ordinary preliminary RA9 validation copy, not
+an independent review or approval. The complete cumulative RA0–RA9 implementation and retained
+baseline/regressions are in scope; the stopped-RA5 scope below is historical. No review has begun.
+Refresh the exact canonical TIP, reachable module catalogue, source/input hashes and execution
+receipts after integration before dispatch. Do not substitute this copy's preliminary receipts
+for final canonical validation, or assume that every required gameplay premise has passed.
+
+R172 remains binding: all five fresh independent slices in two batches (three, then two), followed
+by a fresh lead; the user permitted exceeding three hours. Implementers, remediators and preparers
+are ineligible. Scheduling does not drop a slice, reduce its coverage or make this supplement
+a review. The existing validation/review rules and independence requirements remain required;
+historical scope, timing, environment and validation totals are not current receipts.
+
+## Primary ownership and required interfaces
+
+Paths below are relative to the repository root. A primary owner traces the whole path and owns
+its findings; interface owners independently cross-check their side. Shared files are deliberate
+cross-checks, not permission to leave an interface unassigned.
+
+| Slice | Current production/audit ownership | Required connected evidence and interfaces |
+|---|---|---|
+| sim1 | `crates/sim/src/{command,economy_commands,economy,economy_defs,harvest,ore,movement,pathfinding,map,map_subset,map_scale,unit,building,flight,match_setup,skirmish_defs,tactics,fileguard}.rs`; `schedule.rs`, `hash.rs`, `id.rs` and `rng.rs` invariants across those paths | I6′ room/register/reservations/standing points, complete-command rejection/atomicity, exact nonnegative payment, accepted-only construction transition, live factories, capture/sale/dock service, nested cargo and allocator/64–65 boundaries. Read actual paid UnitReload health-after-ammo and queued same-Economy owner-change controls with sim2; power/disabled/dead/credit/leave/retry controls cannot be replaced by loaded field checks. |
+| sim2 | `crates/sim/src/{combat,combat_defs,veterancy,crew,visibility,props,bridges,world_objects,garrison,crates,special,ai,ai_defs,ra8_intents}.rs`; all actual `special/*.rs`, `special/infantry/*.rs`, `combat/*.rs` and `ai/*.rs` production/embedded-test modules | Real selectors/base+elite, parasite origin/host firing, launch/bay/mission/death payloads, neutral/prop interactions, actual power and concealed/known target gates; every new state hash. AI current-player information, exact countries/production gates, scenario outcome/activity/unchanged limits. Cross-check flight/service/economy with sim1 and real consumer privacy with client. |
+| data | All seven `assets/data/*.ron` files; `scripts/{generate_ra2_data,ra2_reference,ra9_scope,ra9_legacy_original}.py` and legacy target metadata; actual definition/subset loaders, all `crates/sim/tests/reference/*` and audit core/tables listed below | Independent physical demands and actual Compared dependency equality, whole-key/ordered-component closure, parsed vs unparsed/Own/default/masked/nonread distinctions; source scopes, dispositions and exact original extraction; authenticated external receipts/root input binding and per-atom decisions. Exported proposals or a static consumer artifact alone grant no acceptance. Inspect 33 presentation and 29 MODEL-ABSENCE migrations with exact unchanged literals/reasons/classes and still-required gameplay interfaces. |
+| tests | All existing and new native/client/embedded tests, helpers, fixtures, examples and validation/benchmark/soak/duel/package paths; primary ownership of audit negatives below | Preserve old assertions/named purposes; meaningful accepted baseline before controlled one-cause negatives, actual command/schedule/host paths, bounded setup and no detached FIFO work. Reconcile each actual named result, failed setup, fixture migration, source hash and receipt. A loaded guard or legacy RulesNone fixture is not shipped Rules-present gameplay evidence. No per-label fake native getter/body credit. |
+| client | `crates/game/src/{sim_host,construction,sidebar,selection,selection_pad_native,ra7_controls,special_controls,minimap,notices,fog,units,buildings,battlefield,audio,announcer,hover_info,hotkeys,skirmish,options,game_speed,checked_assets,cli,main,map,projection,camera,presentation,hd_art,health,tileset_image,weapon_fx,smoke,visual_review}.rs` and connected game tests | Actual App handlers/CommandSink/host event batches and install/uninstall/new-match lifecycle; real strategic missions/NotCommandable, all 40 type/group/cycle/T/P/preview controls, wall/tree contextual targets, powered-human radar and event-only public notices, Gap/privacy and sensor/Squid/Sniper/Spy controls; both asset failure handlers and settings/opened-handle boundaries. Distinguish controlled UnitView/HoveredCell input from real SimHost actor production and observed draw state from user quality judgments. |
+
+## Exact audit and native file census at this inspection
+
+The observed audit directory has 48 Rust files, 67 TSV files and 4 TXT bindings, plus three
+preserved `.orig/.rej` merge-history files. The reference directory has 16 files and there
+are 28 top-level `ra9*.rs` sim integration-test files. These are file counts, not 130 compiled
+modules, source atoms or completed controls. Recompute the final reachable module/data catalogue;
+support artifacts are not runtime or approval merely because they exist.
+
+Audit core primary owner **data**, with **tests** independently checking the integrity/admission
+boundary (`crates/sim/tests/ra9_audit/`):
+
+`actual.rs`, `array-plans.rs`, `arrays.rs`, `behavior87-admission.rs`, `carry38-admission.rs`, `combat.rs`, `completion-whole.rs`, `completion.rs`, `consumer62-admission.rs`, `contracts.rs`, `country-rosters.rs`, `fire-audit.rs`, `fire-keys.rs`, `guard75-admission.rs`, `items.rs`, `legacy-ai-policy.rs`, `legacy-model-policy.rs`, `legacy-source-admission.rs`, `legacy904-loaded.rs`, `legacy904-support.rs`, `masked-speed-admission.rs`, `metadata-admission.rs`, `mod.rs`, `model162-admission.rs`, `model162-loaded.rs`, `native.rs`, `nested-plans.rs`, `owned.rs`, `policy-admission.rs`, `raw.rs`, `residual-admission.rs`, `rules.rs`, `schema.rs`, `schema10-adapters.rs`, `scope-inputs.rs`, `source-disposition.rs`, `source-plans.rs`, `source-routes.rs`, `special-source-admission.rs`, `specialist.rs`
+
+Audit negative primary owner **tests**, with **data** checking independent source/default/demand
+premises:
+
+`array-negatives.rs`, `compositor-negatives.rs`, `guard75-negatives.rs`, `legacy-ai-negatives.rs`, `legacy-model-negatives.rs`, `legacy904-scope-negatives.rs`, `negatives.rs`, `nested-negatives.rs`
+
+All 67 audit TSV siblings and all 4 TXT bindings are **data** primary / **tests** integrity scope.
+This includes the exact families `behavior87-*`, `carry38-*`, `consumer62-*`,
+`guard75-*`, `legacy904-*`, `model162-*`, `own-policy-*`,
+`source-policy-*`, `special-*` and the standalone array/role/source/metadata/masked/
+residual/scope tables and root/approved hash bindings. They must be followed from the actual
+`mod.rs` includes/adapters, not credited from filenames or an unused master table.
+The 48-file Rust census includes nested admission helpers/negatives as well as directly declared
+modules; the historical merge residues are not active Rust modules. `ra9_data_parity.rs`
+and all 16 reference files are data primary/tests integrity scope; preserve its five original
+named audit tests alongside additions.
+
+Current native file primary owners (all jointly checked by **tests**):
+
+- **sim1:** `ra9_start_setup.rs`, `ra9_airdock_retry.rs`, `ra9_harvester_liveness.rs`, `ra9_liveness.rs`, `ra9_liveness_movement.rs`, `ra9_pad_health.rs`, `ra9_refinery_repair_liveness.rs`, `ra9_transport.rs`, `ra9_transport_buildlimit.rs`, `ra9_transport_lifecycle.rs`
+- **sim2:** `ra9_auto_defuse_geometry.rs`, `ra9_crew.rs`, `ra9_death_payload.rs`, `ra9_guard75_readiness.rs`, `ra9_legacy904_last_five.rs`, `ra9_legacy_model_boundaries.rs`, `ra9_native_keys.rs`, `ra9_parasite_origin.rs`, `ra9_policy_acquisition.rs`, `ra9_policy_fire.rs`, `ra9_policy_permissions.rs`, `ra9_remaining_props.rs`, `ra9_scenery_connected.rs`, `ra9_squid.rs`, `ra9_squid_punch.rs`, `ra9_veterancy.rs`, `ra9_vhp_scan.rs`
+- **data:** `ra9_data_parity.rs`.
+
+These new files supplement all RA1–RA8 native suites; they do not replace them. The tests slice
+also owns `crates/game/tests/m6_production_matches.rs` late-twin evidence with sim1/sim2:
+two independently constructed shipped-data AI worlds, equal actual every-tick hashes/events/
+outcomes and I6′/I7, actual Won after 36000, and late WeaponFired, ProductionComplete and positive
+OreDelivered. The selected config needs its execution receipt, not historical ending-only logs.
+Verify the separate extra-SimRng-draw and late-ProductionComplete-observer causal controls, their
+expected failures, restoration and later exact-source positive; do not assume them executed.
+
+## Current documents, provenance and proof handoff
+
+Use [current GAP](../RA2_GAP_ANALYSIS.md), [183-ID historical debt ledger](../RA2_HISTORICAL_DEBT.tsv),
+[construction](../CONSTRUCTION_SYSTEM.md), [current handoff](../HANDOFF.md) and the
+[integration checklist](../RA9_INTEGRATION_CHECKLIST.md); verify their claims against production
+and actual receipts. [The181 actual loader/type/map/plan catalogue](../RA9_LOADED_CATALOGUE.md)
+is generated (54 units/46 buildings/116 weapons/61 warheads/11 armours/9 countries/21 maps/11 raw
+AI plans/3 difficulties); final canonical source/input/route binding remains owed at dispatch. Historical R56 findings and R172 authority are retained; final
+STATUS/DECISIONS and the current complete validation script govern actual outstanding gates.
+
+The data/tests slices must follow whole-source census/observations, model surface and exact
+original/refinement/masked/special ownership into `source-routes.rs`,
+`source-plans.rs` and `policy-admission.rs`. Rehash real external source/static/loaded/
+native/client evidence at the frozen TIP, verify source-key/value/reason/class/route identity,
+per-atom decisions and full source closure. For intentionally absent original mechanisms, exact
+static parser/schema/state/command/current-consumer evidence establishes only that current model
+boundary; it is not an execution receipt or proof the original key is unused. For implemented
+gameplay, genuine physical comparisons and native premises stay required. No loaded/Own/fake
+constant getter may impersonate a source comparison.
+
+All final canonical gates, review and approval remain pending here. The fresh lead reconciles
+all five slices and actual final validation; no implementer/preparer can supply that review.
+Visual/audio quality, readability, animation and gameplay feel remain USER VERIFICATION items;
+source inspection, native App tests, historical screenshots or absence-policy migration do not
+provide fresh visual/audio approval. Preserve the complete HOWTOSEE/user-only lists.
+
+## Completion audit handoff — source inspection after failed audits 131/136
+
+New audit paths are `completion.rs` and `completion-whole.rs`, with `completion-local-contracts.tsv`, `completion-local-code.tsv`, `completion-whole-contracts.tsv` and `completion-acceptance.tsv`. Data owns exact source/mapping/typed policy and physical demands; tests independently owns integrity and accepted-baseline negatives. Sim1/sim2/client retain the actual production, effect and observer consumers.
+
+Trace `completion::{declare,specifications,admit,finish,export}`, `completion_whole::{specs,guard}`, `source-routes::Completion174` and `ra9_export_actual_completion174_atom_proposals`. The exact137 uncovered table contains **174 coverage atoms across151 SourceKeys**: **132 Whole**,19 zero-based Component(1) animation identifiers,19 Component(2) water flags and4 Component(3) zero-weight arguments. Powerups share0 and active argument comparisons retain independent demands. Plans, decisions, records and finish must use full Atom identity: no component may cover Whole, siblings or another alias.
+
+Installed provisional contracts distinguish81 active registry/ordinal nonreads (Building46/Vehicle28/Aircraft7),21 unit Soylent interface omissions,42 Powerups components and30 other Whole selector/flags. Their provisional split is143 CURRENT_MODEL_NONREAD/31 INTENTIONAL_DIFFERENCE, not acceptance or original-engine nonuse. ORCA/HORNET and other admitted kinds remain active; VehicleTypes includes actual Air ZEP/SHAD. Absent unit resale/Grinder is distinct from real building refund and Cost-based XP. Typed loaded snapshots and code pins never create fake Native/Compared source credit; actual neighboring witnesses must match independent physical dependencies.
+
+Retain actual failed receipts/raw logs `131-whole-key-positive.*` and `136-whole-key-positive.*`:131 rejected the BEAG producer membership witness;136 reached the exact uncovered atoms listed by `137-actual-uncovered-reference-atoms.tsv`. Both exited101 with one named failure and no input drift. Concrete repairs, populated records and focused positives do not replace the final canonical frozen-source audit and genuine accepted-baseline one-cause negatives/restoration. The preliminary chronology is now explicit:151 exported the174 completion atoms;158 passed the whole audit (16,211 physical entries,7,108 demanded/successful pairs and5,022 source atoms).159 ran the entire181-case target and recorded175 passes/6 failures, with no ignored or filtered cases.168 passed exactly the six repaired cases (175 filtered); it was not another full181-case run. Those receipts retain their actual source bindings and all earlier failures. Subsequent RA8 imports and the182 combat correction require fresh canonical source binding and the complete mandatory gates; no combined final-source copy pass or independent acceptance is claimed.
+
+At final freeze A must refresh canonical TIP/ROUND; reachable module/reference/native file counts; SourceKey/fullAtom/portion/class and physical/dependency/Own totals; completion decisions/routes/receipts and root/input/static SHA bindings; portable evidence destinations; complete whole-positive/valid-baseline-negative and actual final validator/performance results. Current inspection is48 Rust/67 TSV/4 TXT, reference16/native28. Index129 is a historical cutoff;190 prepared the exact portable plan through189 and191 the prospective port againstb9ed05e, both now historical preparation packets. The actual canonical port/archive destinations must be refreshed after release. These unfinished fields are obligations, never inferred passes. R172 independence/full-five3+2/fresh-lead and all user-only visual/audio/HOWTOSEE requirements remain unchanged.
+
+## Focused execution handoff through189
+
+The185 yard-start/MCV-off control passed all21 shipped maps and344 scenarios:map growth off at every file-supported player count, and growth on at2–10 players. It checked initial player-owned yards/occupancy/I6′ and actual public Move exits over initial path cost≤40 within the unchanged256-tick bound. Earlier compiler, long-detour and neutral-building census fixture failures remain preserved.181 passed the two exact Lost200/Reload100 scheduled launch/rearm boundaries; the existing27-tick spacing assertions remain. These scopes do not establish every flight or lost-carrier timing.182 reproduced and corrected duplicate MoveCompleted after actual AttackMove combat at its destination, then the same regression passed; the no-enemy control also passed.
+
+Packet187 refreshed the selected release-mode Crossroads America/Russia Easy/Easy seed0 twins on the imported AI and corrected combat source:both reached P0Won41,738 within the unchanged72,000 cap, with444 WeaponFired,8 ProductionComplete and6 positive OreDelivered events after36,000, equal every-tick hashes/events/outcomes and I6′/I7. The extra RNG draw at36,001 and observer-only late ProductionComplete suppression failed as intended; immediate and separate later restorations and a later positive matched the original source/hash.186 was interrupted after its debug native case launched, without a completed result.188 preserves every failed/interrupted scope. These are functional overlap proofs, with no isolated performance or canonical acceptance credit.
+
+R56 item6 retains36,000-tick deterministic soak windows, which can end with equal Running worlds.
+They are not all-to-Won evidence; completed outcomes must be Won. Separate canonical all21
+ending/performance and full13 validation remain required.
+
+## Historical requirements — 2026-10-13 (preserved verbatim)
+
+The following original instructions, chronology and earlier current-state preface are retained
+unchanged. Their stopped-RA5 scope, old environment and timing/counts are historical; the current
+supplement above includes the complete RA1–RA9 implementation without weakening its rules.
+
 # RA2 parity programme: requirements for the review that is still to be done
+
+Current scheduling authority is R172: the user authorized all five fresh independent slices in
+two batches (three, then two), followed by a fresh lead, with the round allowed to exceed three
+hours. Full scope and independence are unchanged. Implementers and preparers cannot serve on
+the panel. No review has begun in this preliminary validation copy; final TIP and canonical
+validation/source receipts must be supplied after integration. Historical stopped-state scope
+notes below do not remove RA5-B through RA9 from the final review.
+
 
 Written 2026-10-13 by the orchestrator of the run, at the user's instruction ("Stop where you are
 here, and write a comprehensive review requirement for later review"). The orchestrator is not a

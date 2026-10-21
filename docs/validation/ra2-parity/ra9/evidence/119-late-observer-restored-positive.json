@@ -1,0 +1,41 @@
+{
+  "utc": "2026-10-21T02:44:37.271553+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "game",
+    "--test",
+    "m6_production_matches",
+    "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "scope": "actual runtime+selected production match target+Cargo manifests/lock+shipped data+exact Crossroads map assets; unselected audit/sim integration tests/closing docs excluded",
+  "configuration": {
+    "map": "crossroads",
+    "countries": [
+      "america",
+      "russia"
+    ],
+    "difficulties": [
+      "easy",
+      "easy"
+    ],
+    "seed": 0,
+    "original_limit": 72000,
+    "worlds": 2,
+    "candidate_status": "UNSELECTED_UNTIL_ACTUAL_SUCCESS",
+    "checks": "everytick native hash/events/outcome/I6prime/I7; Won>36000;late WeaponFired/ProductionComplete/positiveOreDelivered"
+  },
+  "phase": "Restored positive after117 observeronecause+118 separate laterSHA",
+  "baseline_start_sha256": "2eff81e37befbbc81c6dda7807fdca450ef125ff6c5f93320e337ecccf0983ab",
+  "pre_run_mismatches": [],
+  "ended_utc": "2026-10-21T02:46:16.909585+00:00",
+  "exit_code": 0,
+  "seconds": 99.637,
+  "lease": "RA8 regranted exact observer-restoredpositive plus shortfunctionalcontrols; same two-world Crossroadsconfig/72000/jobs1, functional overlap only",
+  "input_mismatches": []
+}

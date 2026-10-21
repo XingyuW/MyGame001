@@ -1,0 +1,9 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+error[E0425]: cannot find function `rejected` in this scope
+   --> crates/sim/tests/ra7_orders.rs:706:17
+    |
+706 |         assert!(rejected(&events).is_empty(), "{events:?}");
+    |                 ^^^^^^^^ not found in this scope
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `sim` (test "ra7_orders") due to 1 previous error

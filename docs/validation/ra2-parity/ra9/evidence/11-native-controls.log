@@ -1,0 +1,127 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 05s
+     Running tests/ra9_auto_defuse_geometry.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_auto_defuse_geometry-a04f60756b8ac389)
+
+running 2 tests
+test ra9_bombsight_actual_adjacent_and_east_in_range_points_defuse_without_a_planned_move ... ok
+test ra9_bombsight_west_edge_spot_zero_must_approach_into_real_defusekit_range ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+     Running tests/ra9_legacy_model_boundaries.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_legacy_model_boundaries-a16e916e6f409e4a)
+
+running 7 tests
+test ra9_legacy_cellrange_adjacent_cells_use_actual_spot_circle_with_inside_control ... ok
+test ra9_legacy_distributed_omni_current_idle_retains_first_live_target_and_fires_behind ... ok
+test ra9_legacy_elite_tesla_tank_and_trooper_have_primary_damage_without_shrapnel ... ok
+test ra9_legacy_he_direct_and_wood_damage_have_no_later_secondary_fire_in_this_model ... ok
+test ra9_legacy_prism_base_and_elite_have_primary_damage_without_shrapnel ... ok
+test ra9_legacy_radiation_current_cell_model_ignores_subcell_spot_with_immune_and_edge_controls ... ok
+test ra9_legacy_sonic_base_and_elite_damage_endpoint_but_not_ambient_line ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.49s
+
+     Running tests/ra9_native_keys.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_native_keys-a34813b5e6fafaf3)
+
+running 18 tests
+test ra9_a_dolphin_shot_keeps_its_type_and_launch_owner_after_native_source_death ... ok
+test ra9_a_genuinely_capturable_fixture_broadcasts_each_real_capture_only_when_flagged ... ok
+test ra9_a_real_midflight_takeover_preserves_dolphin_launch_owner ... FAILED
+test ra9_automatic_bombsight_defuses_real_occupied_actorless_mapped_props ... ok
+test ra9_automatic_defuse_skips_real_c4_and_explicit_ivan_defuse_still_works ... ok
+test ra9_bombsight_does_not_know_an_enemy_spys_real_bomb ... ok
+test ra9_bombsight_four_detects_a_real_bomb_then_approaches_without_interact ... ok
+test ra9_bombsight_unrelated_missing_and_genuinely_killed_hosts_create_no_jobs ... ok
+test ra9_guard_and_replacement_move_keep_command_priority_over_automatic_defuse ... FAILED
+test ra9_key_fields_are_required_bounded_and_independently_hashed ... ok
+test ra9_neutral_major_superweapon_does_not_reveal_distant_cell ... ok
+test ra9_new_state_hashes_are_independent_helper_witnesses_not_runtime_proof ... ok
+test ra9_public_reveal_is_once_per_surviving_owner_and_gap_still_suppresses_sight ... ok
+test ra9_real_construction_reveals_only_sight_and_hidden_targets_remain_hidden ... FAILED
+test ra9_stale_automatic_defuse_cannot_capture_a_host_after_another_real_engineer_defuses ... ok
+test ra9_stock_uncapturable_major_superweapons_refuse_engineer_but_power_plant_captures ... ok
+test ra9_stock_yuri_immunity_is_masked_by_psionic_immunity_not_typeimmune_proof ... ok
+test ra9_typeimmune_dolphin_requires_same_kind_and_same_owner_but_allows_targeting ... ok
+
+failures:
+
+---- ra9_a_real_midflight_takeover_preserves_dolphin_launch_owner stdout ----
+
+thread 'ra9_a_real_midflight_takeover_preserves_dolphin_launch_owner' (13024516) panicked at crates/sim/tests/ra9_native_keys.rs:524:9:
+assertion `left == right` failed: real MindControl takeover before impact
+  left: Some(PlayerId(0))
+ right: Some(PlayerId(1))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- ra9_guard_and_replacement_move_keep_command_priority_over_automatic_defuse stdout ----
+
+thread 'ra9_guard_and_replacement_move_keep_command_priority_over_automatic_defuse' (13024554) panicked at crates/sim/tests/ra9_native_keys.rs:393:5:
+assertion `left == right` failed
+  left: CellPos { x: 9, y: 16 }
+ right: CellPos { x: 4, y: 16 }
+
+---- ra9_real_construction_reveals_only_sight_and_hidden_targets_remain_hidden stdout ----
+
+thread 'ra9_real_construction_reveals_only_sight_and_hidden_targets_remain_hidden' (13024562) panicked at crates/sim/tests/ra9_native_keys.rs:261:13:
+typed public location event
+
+
+failures:
+    ra9_a_real_midflight_takeover_preserves_dolphin_launch_owner
+    ra9_guard_and_replacement_move_keep_command_priority_over_automatic_defuse
+    ra9_real_construction_reveals_only_sight_and_hidden_targets_remain_hidden
+
+test result: FAILED. 15 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.67s
+
+error: test failed, to rerun pass `-p sim --test ra9_native_keys`
+     Running tests/ra9_pad_health.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_pad_health-6676113e1fbcc2e4)
+
+running 10 tests
+test ra9_pad_ammo_finishes_before_fresh_paid_health_interval_and_clamps ... ok
+test ra9_pad_capture_also_prevents_due_ammo_service_from_stale_owner ... FAILED
+test ra9_pad_capture_in_same_economy_stage_does_not_heal_from_stale_actor_owner ... FAILED
+test ra9_pad_health_has_healthy_nonairport_and_dead_pad_controls ... ok
+test ra9_pad_health_leaving_discards_elapsed_service_then_native_return_restarts ... ok
+test ra9_pad_health_waits_for_real_disabled_expiry ... ok
+test ra9_pad_health_zero_and_exact_step_credit_boundary ... ok
+test ra9_pad_paid_service_replays_with_identical_native_hashes_and_cell_claims ... ok
+test ra9_pad_sale_or_dead_aircraft_never_pays_or_revives ... ok
+test ra9_shipped_aircraft_use_committed_reload_and_paid_repair_values_even_when_radar_is_off ... ok
+
+failures:
+
+---- ra9_pad_capture_also_prevents_due_ammo_service_from_stale_owner stdout ----
+
+thread 'ra9_pad_capture_also_prevents_due_ammo_service_from_stale_owner' (13024581) panicked at crates/sim/tests/ra9_pad_health.rs:258:9:
+assertion `left == right` failed: no health on final ammo interval
+  left: None
+ right: Some(140)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- ra9_pad_capture_in_same_economy_stage_does_not_heal_from_stale_actor_owner stdout ----
+
+thread 'ra9_pad_capture_in_same_economy_stage_does_not_heal_from_stale_actor_owner' (13024583) panicked at crates/sim/tests/ra9_pad_health.rs:186:9:
+assertion `left == right` failed
+  left: None
+ right: Some(140)
+
+
+failures:
+    ra9_pad_capture_also_prevents_due_ammo_service_from_stale_owner
+    ra9_pad_capture_in_same_economy_stage_does_not_heal_from_stale_actor_owner
+
+test result: FAILED. 8 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.89s
+
+error: test failed, to rerun pass `-p sim --test ra9_pad_health`
+     Running tests/ra9_scenery_connected.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_scenery_connected-af1f536adf8fb01f)
+
+running 3 tests
+test ra9_prop_command_unknown_target_matrix_preserves_order_before_clear ... ok
+test ra9_prop_real_c4_plant_then_native_death_and_dead_target_rejection ... ok
+test ra9_prop_temporal_freezes_real_host_fire_and_deploy_then_releases_after_real_beam_break ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.79s
+
+error: 2 targets failed:
+    `-p sim --test ra9_native_keys`
+    `-p sim --test ra9_pad_health`

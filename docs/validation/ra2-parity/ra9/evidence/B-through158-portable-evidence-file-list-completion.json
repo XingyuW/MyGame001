@@ -1,0 +1,27 @@
+{
+  "status": "FACTUAL_THROUGH158_PORTABLE_PLAN_ONLY",
+  "cutoff": 158,
+  "command159_excluded": true,
+  "files": 328,
+  "aliases": 11,
+  "historic_hash_resolutions": 12,
+  "bytes": 12497474,
+  "authority_files_not_duplicated": 8,
+  "source_pin_refs": 884,
+  "unresolved_cache_only_proof_paths": 0,
+  "external_provenance_only": 0,
+  "outputs": [
+    {
+      "path": "B-through158-portable-evidence-file-list.json",
+      "sha256": "8a8bab3eb29e4969113dab3a19e9e1035781bb36731655ec16efca331b8bff24",
+      "bytes": 561552
+    },
+    {
+      "path": "B-through158-portable-evidence-file-list.tsv",
+      "sha256": "624bf94f97c7345ab247d97f0a10a4ae1b4847a99ec23d8c678d46145494c289",
+      "bytes": 205091
+    }
+  ],
+  "new_directories": 0,
+  "source_writes": false
+}

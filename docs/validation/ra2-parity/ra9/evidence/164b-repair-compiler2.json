@@ -1,0 +1,6 @@
+{
+  "utc": "2026-10-21T05:05:44.802848+00:00",
+  "cause": "164strictcompiler101: removed nowunused Atom import and private route access. Complete actual audit baseline already validates parsed typed row owner/class/route; retain direct exact key lookup, Whole/value checks and individual approval/require. No public API widening or guard weakening.",
+  "before": "3907e877cb8150d79c3d9be41e7c596e646a7377a0dbddd4ccdcdf7f80599524",
+  "after": "32af88679c06bb9d158230777cf5bcd99bfb61f95d7486e2d7a44e8aea6a7765"
+}

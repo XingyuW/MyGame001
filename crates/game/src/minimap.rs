@@ -47,6 +47,122 @@ pub const MINIMAP_SIZE: Vec2 = Vec2::new(224.0, 112.0);
 /// the shroud.
 pub const OFFLINE_COLOUR: [u8; 4] = [14, 20, 24, 255];
 
+/// A public coordinate notice, independent of terrain visibility and normal contacts.
+/// UI assumption: reuse the existing nine-real-second notice convention, including while
+/// paused/offline. A hollow amber diamond marks only the supplied origin; it grants no sight.
+#[derive(Resource, Default)]
+pub(crate) struct PublicBuildingNotices {
+    entries: Vec<PublicBuildingNotice>,
+    revision: u64,
+}
+
+struct PublicBuildingNotice {
+    building: sim::SimId,
+    origin: CellPos,
+    left: f32,
+}
+
+impl PublicBuildingNotices {
+    /// Called only on the exact event batch returned by SimHost's scheduled tick.
+    /// Never look up the building: an unseen death/move must not update this public notice.
+    pub(crate) fn receive(&mut self, events: &[sim::SimEvent]) {
+        for event in events {
+            let sim::SimEvent::BuildingRevealed {
+                building, origin, ..
+            } = event
+            else {
+                continue;
+            };
+            self.entries.retain(|notice| notice.building != *building);
+            if self.entries.len() >= crate::notices::MAX_NOTICES {
+                self.entries.remove(0);
+            }
+            self.entries.push(PublicBuildingNotice {
+                building: *building,
+                origin: *origin,
+                left: crate::notices::NOTICE_SECONDS,
+            });
+            self.revision = self.revision.saturating_add(1);
+        }
+    }
+}
+
+/// Synchronous host replacement reset: buffered old SimEvents cannot repopulate notices,
+/// because this consumer uses run_tick's batch rather than a later MessageReader.
+pub(crate) fn clear_public_building_notices(world: &mut World) {
+    if let Some(mut notices) = world.get_resource_mut::<PublicBuildingNotices>() {
+        notices.entries.clear();
+        notices.revision = notices.revision.saturating_add(1);
+    }
+}
+
+pub(crate) fn age_public_building_notices(
+    time: Res<Time<Real>>,
+    mut notices: ResMut<PublicBuildingNotices>,
+) {
+    let count = notices.entries.len();
+    for notice in &mut notices.entries {
+        notice.left -= time.delta_secs();
+    }
+    notices.entries.retain(|notice| notice.left > 0.0);
+    if notices.entries.len() != count {
+        notices.revision = notices.revision.saturating_add(1);
+    }
+}
+
+/// Original raster primitive over the existing projected minimap image. The centre stays
+/// intact, preserving an ordinary owned/known contact at the supplied coordinate.
+fn draw_public_building_notices(
+    layout: &MinimapLayout,
+    notices: &PublicBuildingNotices,
+    contacts: &[(CellPos, Marker, sim::PlayerId)],
+    pixels: &mut [u8],
+) {
+    let (width, height) = layout.size();
+    for notice in &notices.entries {
+        let cell = notice.origin;
+        if cell.x < 0
+            || cell.y < 0
+            || cell.x as u32 >= layout.map_width
+            || cell.y as u32 >= layout.map_height
+        {
+            continue;
+        }
+        let centre = layout.normalised(cell.x as f32 + 0.5, cell.y as f32 + 0.5);
+        let (cx, cy) = (
+            (centre.x * width as f32) as i64,
+            (centre.y * (width as f32 / 2.0)) as i64,
+        );
+        for dy in -3_i64..=3 {
+            for dx in -3_i64..=3 {
+                if dx.abs() + dy.abs() != 3 {
+                    continue;
+                }
+                let (x, y) = (cx + dx, cy + dy);
+                if x < 0
+                    || y < 0
+                    || x >= i64::from(width)
+                    || y >= i64::from(height)
+                    || layout.pixel_cell(x as u32, y as u32).is_none()
+                {
+                    continue;
+                }
+                // Ordinary known/owned contacts keep every pixel of their cell.
+                if layout
+                    .pixel_cell(x as u32, y as u32)
+                    .is_some_and(|cell| contacts.iter().any(|(contact, _, _)| *contact == cell))
+                {
+                    continue;
+                }
+                let offset = (y as usize * width as usize + x as usize) * 4;
+                if let Some(pixel) = pixels.get_mut(offset..offset + 4) {
+                    pixel.copy_from_slice(&[255, 232, 120, 255]);
+                }
+            }
+        }
+    }
+}
+
 pub struct MinimapPlugin;
 
 impl Plugin for MinimapPlugin {
@@ -65,7 +181,11 @@ impl Plugin for MinimapPlugin {
                     click_minimap
                         .after(crate::camera::zoom_camera)
                         .before(crate::camera::clamp_camera),
-                    (draw_minimap, place_camera_frame)
+                    (
+                        age_public_building_notices,
+                        draw_minimap,
+                        place_camera_frame,
+                    )
                         .chain()
                         .after(crate::camera::clamp_camera),
                 ),
@@ -449,6 +569,8 @@ pub struct MinimapFrame;
 /// When the minimap was drawn; read by the smoke test.
 #[derive(Resource, Debug, Default)]
 pub struct MinimapState {
+    /// Public-notice changes can require redrawing while the simulation is paused.
+    notice_revision: u64,
     /// The simulation tick of the last drawing.
     pub drawn_tick: Option<u64>,
     /// Drawings so far.
@@ -513,8 +635,10 @@ pub(crate) fn size_minimap(world: &mut World, width: u32, height: u32) {
 }
 
 /// Redraws the minimap after every simulation tick.
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn draw_minimap(
     teams: Option<Res<crate::presentation::TeamColors>>,
+    notices: Option<Res<PublicBuildingNotices>>,
     host: Res<SimHost>,
     terrain: Option<Res<MapTerrain>>,
     looks: Option<Res<crate::map::MapLooks>>,
@@ -526,7 +650,8 @@ pub(crate) fn draw_minimap(
         return;
     };
     let tick = host.tick();
-    if state.drawn_tick == Some(tick) {
+    let notice_revision = notices.as_deref().map_or(0, |notices| notices.revision);
+    if state.drawn_tick == Some(tick) && state.notice_revision == notice_revision {
         return;
     }
     // Without radar nothing of the map is drawn (RA2).
@@ -554,7 +679,11 @@ pub(crate) fn draw_minimap(
                 *pixel = [rgb[0], rgb[1], rgb[2], 255];
             }
         }
-        render(&minimap.layout, &colours)
+        let mut pixels = render(&minimap.layout, &colours);
+        if let Some(notices) = notices.as_deref() {
+            draw_public_building_notices(&minimap.layout, notices, &owned, &mut pixels);
+        }
+        pixels
     } else {
         offline_pixels(&minimap.layout)
     };
@@ -571,6 +700,7 @@ pub(crate) fn draw_minimap(
     {
         image.data = Some(pixels);
     }
+    state.notice_revision = notice_revision;
     state.drawn_tick = Some(tick);
     state.drawings = state.drawings.saturating_add(1);
 }
@@ -1057,5 +1187,1181 @@ mod tests {
             frame_rect(huge, &layout, TILE),
             Rect::new(0.0, 0.0, 1.0, 1.0)
         );
+    }
+}
+
+// UNCOMPILED / UNRUN / UNACCEPTED. Append this sibling module to game/src/minimap.rs.
+// Stock definitions throughout. Independent open geometry is test setup, not an engine/source
+// permission. The UI consumer still uses only production owned_markers -> draw_minimap.
+#[cfg(test)]
+pub(crate) mod ra9_behavior87_routes {
+    use super::*;
+    use bevy::ecs::system::RunSystemOnce;
+    use sim::{Command, IssuedCommand, PlayerId, RejectReason, SimEvent, SimId};
+    const P1: PlayerId = PlayerId(1);
+    #[derive(Clone, Copy, Debug)]
+    enum Mission {
+        Asw,
+        Dmisl,
+        Hornet,
+        V3,
+        Plane,
+    }
+    impl Mission {
+        fn section(self) -> &'static str {
+            match self {
+                Self::Asw => "ASW",
+                Self::Dmisl => "DMISL",
+                Self::Hornet => "HORNET",
+                Self::V3 => "V3ROCKET",
+                Self::Plane => "PDPLANE",
+            }
+        }
+        fn name(self) -> &'static str {
+            match self {
+                Self::Asw => "osprey",
+                Self::Dmisl => "dred_missile",
+                Self::Hornet => "hornet",
+                Self::V3 => "v3_rocket",
+                Self::Plane => "paradrop_plane",
+            }
+        }
+    }
+    fn issue(player: PlayerId, command: Command) -> IssuedCommand {
+        IssuedCommand { player, command }
+    }
+    fn tick(host: &mut SimHost, commands: Vec<IssuedCommand>) -> Vec<SimEvent> {
+        crate::sim_host::tests::run_issued(host, commands)
+    }
+    fn rejected(events: &[SimEvent]) -> Vec<RejectReason> {
+        events
+            .iter()
+            .filter_map(|e| {
+                if let SimEvent::CommandRejected { reason, .. } = e {
+                    Some(reason.clone())
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
+    fn entity(host: &SimHost, id: SimId) -> bevy::ecs::entity::Entity {
+        host.world()
+            .try_query::<(Entity, &SimId)>()
+            .unwrap()
+            .iter(host.world())
+            .find(|(_, found)| **found == id)
+            .map(|(e, _)| e)
+            .expect("real live actor")
+    }
+    fn mobile(host: &SimHost, id: SimId) -> sim::Mobile {
+        *host
+            .world()
+            .get::<sim::Mobile>(entity(host, id))
+            .expect("real mobile")
+    }
+    fn destination(host: &SimHost, id: SimId) -> Option<CellPos> {
+        host.world()
+            .get::<sim::Orders>(entity(host, id))
+            .unwrap()
+            .current
+            .as_ref()
+            .map(|o| o.destination)
+    }
+    fn unit(world: &mut World, p: PlayerId, name: &str, x: i32, y: i32) -> SimId {
+        sim::spawn_unit(world, p, name, CellPos::new(x, y)).unwrap()
+    }
+    fn building(world: &mut World, p: PlayerId, name: &str, x: i32, y: i32) -> SimId {
+        sim::spawn_building(world, p, name, CellPos::new(x, y)).unwrap()
+    }
+    fn stock_host(water_from: i32, setup: impl FnOnce(&mut World)) -> SimHost {
+        crate::sim_host::tests::fixture_host(|world| {
+            let d = sim::load_ruleset(
+                std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets/data"),
+            )
+            .unwrap();
+            let cells = (0..48)
+                .flat_map(|y| {
+                    (0..48).map(move |x| {
+                        let water = x >= water_from && !(x <= 8 && y <= 5);
+                        sim::Cell {
+                            passable: !water,
+                            water,
+                            buildable: !water,
+                            ore: 0,
+                        }
+                    })
+                })
+                .collect();
+            world.insert_resource(sim::Grid::from_cells(48, 48, cells).unwrap());
+            for (p, country) in [(HUMAN, "great_britain"), (P1, "russia")] {
+                world.resource_mut::<sim::Players>().add(p, 10_000).unwrap();
+                assert!(
+                    world
+                        .resource_mut::<sim::Players>()
+                        .set_country(p, Some(d.rules().unwrap().country_id(country).unwrap()))
+                );
+            }
+            world.insert_resource(d);
+            setup(world);
+        })
+    }
+    struct Launched {
+        host: SimHost,
+        id: SimId,
+        parent: SimId,
+        power: SimId,
+        owner: PlayerId,
+    }
+    fn launch(kind: Mission, owner: PlayerId, human_observer: bool) -> Launched {
+        launch_in(kind, owner, human_observer, false)
+    }
+    fn launch_in(kind: Mission, owner: PlayerId, human_observer: bool, running: bool) -> Launched {
+        let other = if owner == HUMAN { P1 } else { HUMAN };
+        let mut parent = None;
+        let mut target = None;
+        let mut power = None;
+        let water_from = match kind {
+            Mission::Asw => 0,
+            Mission::Dmisl | Mission::Hornet => 24,
+            _ => 48,
+        };
+        let setup = |w: &mut World| {
+            power = Some(building(w, HUMAN, "nuclear_reactor", 1, 1));
+            building(w, HUMAN, "airforce_command", 6, 1);
+            let (producer, px, py, victim, tx, ty, spotter, sx, sy) = match kind {
+                Mission::Asw => (
+                    "destroyer",
+                    10,
+                    10,
+                    "typhoon",
+                    18,
+                    10,
+                    "amphibious_transport",
+                    13,
+                    13,
+                ),
+                Mission::Dmisl => ("dreadnought", 36, 10, "grizzly", 22, 10, "engineer", 19, 10),
+                Mission::Hornet => (
+                    "aircraft_carrier",
+                    34,
+                    10,
+                    "grizzly",
+                    22,
+                    10,
+                    "engineer",
+                    19,
+                    10,
+                ),
+                Mission::V3 => ("v3_launcher", 10, 10, "grizzly", 26, 10, "engineer", 23, 10),
+                Mission::Plane => ("airport", 8, 8, "engineer", 20, 20, "engineer", 21, 20),
+            };
+            parent = Some(if matches!(kind, Mission::Plane) {
+                building(w, owner, producer, px, py)
+            } else {
+                unit(w, owner, producer, px, py)
+            });
+            // The strategic target is our own scout's actually observed cell; no enemy lookup.
+            target = Some(unit(
+                w,
+                if matches!(kind, Mission::Plane) {
+                    owner
+                } else {
+                    other
+                },
+                victim,
+                tx,
+                ty,
+            ));
+            unit(w, owner, spotter, sx, sy);
+            if human_observer && owner != HUMAN {
+                let (x, y) = match kind {
+                    Mission::Asw => (13, 14),
+                    Mission::Dmisl => (34, 14),
+                    Mission::Hornet => (32, 14),
+                    Mission::V3 => (14, 14),
+                    Mission::Plane => (20, 4),
+                };
+                unit(w, HUMAN, "amphibious_transport", x, y);
+            }
+        };
+        let mut host = if running {
+            c62_running_stock_host(water_from, setup)
+        } else {
+            stock_host(water_from, setup)
+        };
+        let parent = parent.unwrap();
+        let target = target.unwrap();
+        tick(&mut host, vec![]);
+        let mut events;
+        let id;
+        if matches!(kind, Mission::Plane) {
+            let k = host
+                .definitions()
+                .unwrap()
+                .building_kind("airport")
+                .unwrap();
+            let cooldown = host
+                .definitions()
+                .unwrap()
+                .metadata(sim::ProductionItem::Building(k))
+                .unwrap()
+                .cooldown;
+            assert!(cooldown > 0 && cooldown <= 10_000);
+            let mut full = false;
+            for _ in 0..=cooldown {
+                full = host
+                    .world()
+                    .resource::<sim::SpecialState>()
+                    .charge
+                    .get(&parent)
+                    == Some(&cooldown);
+                if full {
+                    break;
+                }
+                tick(&mut host, vec![]);
+            }
+            assert!(full, "natural charge after first-owner announcement");
+            events = tick(
+                &mut host,
+                vec![issue(
+                    owner,
+                    Command::Superweapon {
+                        building: parent,
+                        target: CellPos::new(20, 20),
+                        units: vec![],
+                    },
+                )],
+            );
+            assert!(rejected(&events).is_empty(), "{events:?}");
+            assert!(
+                events
+                    .iter()
+                    .any(|e| matches!(e,SimEvent::StrategicActivated{
+                player,building,..}if *player==owner&&*building==parent))
+            );
+            let state = host.world().resource::<sim::SpecialState>();
+            let flights: Vec<_> = state
+                .strategic
+                .flights
+                .iter()
+                .filter(|(_, f)| f.owner == owner)
+                .map(|(&id, _)| id)
+                .collect();
+            assert_eq!(
+                flights.len(),
+                1,
+                "created only by the real strategic command"
+            );
+            id = flights[0];
+        } else {
+            events = tick(
+                &mut host,
+                vec![issue(
+                    owner,
+                    Command::Attack {
+                        units: vec![parent],
+                        target,
+                    },
+                )],
+            );
+            assert!(
+                rejected(&events).is_empty(),
+                "{kind:?}: actual known launcher target: {events:?}"
+            );
+            let mut found = None;
+            for _ in 0..80 {
+                found = events.iter().find_map(|e| match e {
+                    SimEvent::UnitLaunched {
+                        player,
+                        parent: p,
+                        unit,
+                    } if *player == owner && *p == parent => Some(*unit),
+                    _ => None,
+                });
+                if found.is_some() {
+                    break;
+                }
+                events = tick(&mut host, vec![]);
+            }
+            id = found.expect("actual UnitLaunched within bounded stock launch latency");
+            assert_eq!(
+                host.world()
+                    .resource::<sim::SpecialState>()
+                    .spawned
+                    .get(&id),
+                Some(&parent)
+            );
+        }
+        let d = host.definitions().unwrap();
+        assert_eq!(
+            host.world()
+                .get::<sim::Unit>(entity(&host, id))
+                .unwrap()
+                .kind,
+            d.unit_kind(kind.name()).expect("stock mission name")
+        );
+        assert_eq!(
+            host.world().get::<sim::Owner>(entity(&host, id)).unwrap().0,
+            owner
+        );
+        let start = mobile(&host, id).cell;
+        let mut separate = false;
+        for _ in 0..64 {
+            if mobile(&host, id).cell != start {
+                separate = true;
+                break;
+            }
+            tick(&mut host, vec![]);
+        }
+        assert!(
+            separate,
+            "real internal flight moved away from launch/parent pixel"
+        );
+        assert!(
+            host.world()
+                .get::<sim::Health>(entity(&host, id))
+                .unwrap()
+                .hit_points
+                > 0
+        );
+        assert!(radar_online(&host));
+        Launched {
+            host,
+            id,
+            parent,
+            power: power.unwrap(),
+            owner,
+        }
+    }
+    fn public_route(kind: Mission) {
+        for observer in [false, true] {
+            let Launched {
+                mut host,
+                id,
+                parent,
+                owner,
+                ..
+            } = launch(kind, P1, observer);
+            let before = mobile(&host, id).sub_position();
+            let order = destination(&host, id);
+            let events = tick(
+                &mut host,
+                vec![issue(
+                    owner,
+                    Command::Move {
+                        units: vec![id],
+                        target: CellPos::new(40, 40),
+                    },
+                )],
+            );
+            assert_eq!(rejected(&events), vec![RejectReason::NotCommandable(id)]);
+            assert_eq!(
+                destination(&host, id),
+                order,
+                "refusal cannot replace the internal mission"
+            );
+            let known = host
+                .players()
+                .unwrap()
+                .get(HUMAN)
+                .unwrap()
+                .vision()
+                .sees_unit(&mobile(&host, id));
+            assert_eq!(
+                known,
+                observer,
+                "{}: stock early-flight observer geometry",
+                kind.section()
+            );
+            let missing = SimId(u32::MAX);
+            let events = tick(
+                &mut host,
+                vec![
+                    issue(
+                        HUMAN,
+                        Command::Move {
+                            units: vec![id],
+                            target: CellPos::new(40, 40),
+                        },
+                    ),
+                    issue(
+                        HUMAN,
+                        Command::Move {
+                            units: vec![missing],
+                            target: CellPos::new(40, 40),
+                        },
+                    ),
+                ],
+            );
+            assert_eq!(
+                rejected(&events),
+                vec![
+                    if known {
+                        RejectReason::NotOwned(id)
+                    } else {
+                        RejectReason::UnknownUnit(id)
+                    },
+                    RejectReason::UnknownUnit(missing)
+                ]
+            );
+            let mut progressed = mobile(&host, id).sub_position() != before;
+            for _ in 0..32 {
+                if progressed {
+                    break;
+                }
+                tick(&mut host, vec![]);
+                progressed = mobile(&host, id).sub_position() != before;
+            }
+            assert!(
+                progressed,
+                "public rejection does not stall the genuine mission"
+            );
+            assert_eq!(
+                host.world()
+                    .get::<sim::Owner>(entity(&host, parent))
+                    .unwrap()
+                    .0,
+                owner
+            );
+            // Dark here means dark to HUMAN, not permission to send issuer-controlled flight
+            // into issuer shroud. Its own Sight/internal mission can reveal its path.
+        }
+    }
+    fn draw_world(host: SimHost) -> World {
+        let grid = host.grid().unwrap().clone();
+        let layout = MinimapLayout::new(grid.width(), grid.height());
+        let mut world = World::new();
+        let mut images = Assets::<Image>::default();
+        let image = images.add(Image::default());
+        world.insert_resource(images);
+        world.insert_resource(MapTerrain(grid));
+        world.insert_resource(Minimap { image, layout });
+        world.insert_resource(MinimapState::default());
+        world.insert_resource(host);
+        world
+    }
+    fn draw(world: &mut World) {
+        world.run_system_once(draw_minimap).unwrap();
+        assert_eq!(
+            world.resource::<MinimapState>().drawn_tick,
+            Some(world.resource::<SimHost>().tick())
+        );
+    }
+    fn pixels(world: &World) -> &[u8] {
+        let minimap = world.resource::<Minimap>();
+        world
+            .resource::<Assets<Image>>()
+            .get(&minimap.image)
+            .unwrap()
+            .data
+            .as_ref()
+            .unwrap()
+    }
+    fn has_marker(host: &SimHost, cell: CellPos, owner: PlayerId) -> bool {
+        owned_markers(host).contains(&(
+            cell,
+            if owner == HUMAN {
+                Marker::OwnUnit
+            } else {
+                Marker::EnemyUnit
+            },
+            owner,
+        ))
+    }
+    fn assert_contact_pixels(world: &World, cell: CellPos, owner: PlayerId, present: bool) {
+        let rgb = crate::presentation::TeamColors(0).rgb_of(owner);
+        let colour = [rgb[0], rgb[1], rgb[2], 255];
+        let layout = world.resource::<Minimap>().layout;
+        let (width, height) = layout.size();
+        let mut count = 0;
+        for y in 0..height {
+            for x in 0..width {
+                if layout.pixel_cell(x, y) == Some(cell) {
+                    count += 1;
+                    let p = ((y * width + x) * 4) as usize;
+                    assert_eq!(
+                        &pixels(world)[p..p + 4] == colour.as_slice(),
+                        present,
+                        "actual projected subject pixel, not a synthetic marker"
+                    );
+                }
+            }
+        }
+        assert!(
+            count > 0,
+            "the actual minimap projection samples the subject cell"
+        );
+    }
+    fn marker_route(kind: Mission) {
+        for (owner, observer) in [(HUMAN, false), (P1, false), (P1, true)] {
+            let Launched {
+                host, id, power, ..
+            } = launch(kind, owner, observer);
+            let cell = mobile(&host, id).cell;
+            let present = owner == HUMAN || observer;
+            assert_eq!(has_marker(&host, cell, owner), present);
+            // Parent stayed at launch cell. There is no injected view/contact/marker and no
+            // overlapping marker at this early flight cell that could hide a missing subject.
+            assert_eq!(
+                owned_markers(&host)
+                    .iter()
+                    .filter(|(c, _, _)| *c == cell)
+                    .count(),
+                usize::from(present)
+            );
+            let mut world = draw_world(host);
+            draw(&mut world);
+            assert!(!world.resource::<MinimapState>().offline);
+            assert_contact_pixels(&world, cell, owner, present);
+            let events = world.resource_scope(|_, mut host: Mut<SimHost>| {
+                tick(
+                    &mut host,
+                    vec![issue(HUMAN, Command::SellBuilding { building: power })],
+                )
+            });
+            assert!(rejected(&events).is_empty(), "{events:?}");
+            draw(&mut world);
+            assert!(world.resource::<MinimapState>().offline);
+            assert_eq!(world.resource::<MinimapState>().map_pixels, 0);
+            assert_eq!(
+                pixels(&world),
+                offline_pixels(&world.resource::<Minimap>().layout)
+            );
+        }
+    }
+    #[test]
+    fn ra9_b87_asw_real_mission_commands() {
+        public_route(Mission::Asw);
+    }
+    #[test]
+    fn ra9_b87_dmisl_real_mission_commands() {
+        public_route(Mission::Dmisl);
+    }
+    #[test]
+    fn ra9_b87_hornet_real_mission_commands() {
+        public_route(Mission::Hornet);
+    }
+    #[test]
+    fn ra9_b87_v3_real_mission_commands() {
+        public_route(Mission::V3);
+    }
+    #[test]
+    fn ra9_b87_pdplane_real_mission_commands() {
+        public_route(Mission::Plane);
+    }
+    #[test]
+    fn ra9_b87_asw_actual_marker_draw() {
+        marker_route(Mission::Asw);
+    }
+    #[test]
+    fn ra9_b87_dmisl_actual_marker_draw() {
+        marker_route(Mission::Dmisl);
+    }
+    #[test]
+    fn ra9_b87_hornet_actual_marker_draw() {
+        marker_route(Mission::Hornet);
+    }
+    #[test]
+    fn ra9_b87_v3_actual_marker_draw() {
+        marker_route(Mission::V3);
+    }
+    #[test]
+    fn ra9_b87_pdplane_actual_marker_draw() {
+        marker_route(Mission::Plane);
+    }
+
+    fn tick_world(world: &mut World, commands: Vec<IssuedCommand>) -> Vec<SimEvent> {
+        world.resource_scope(|_, mut host: Mut<SimHost>| tick(&mut host, commands))
+    }
+    #[test]
+    fn ra9_b87_gap_owner_allied_neutral_cloak_and_real_power_sales_reach_draw() {
+        for owner in [HUMAN, P1, sim::NEUTRAL] {
+            for allied in [false, true] {
+                let mut human_power = None;
+                let mut gap_power = None;
+                let mut subject = None;
+                let mut scout = None;
+                let mut concealed = None;
+                let mut host = stock_host(48, |w| {
+                    for y in 20..35 {
+                        for x in 30..39 {
+                            w.resource_mut::<sim::Grid>().set_terrain(
+                                CellPos::new(x, y),
+                                sim::Cell {
+                                    passable: false,
+                                    water: true,
+                                    buildable: false,
+                                    ore: 0,
+                                },
+                            );
+                        }
+                    }
+                    if allied {
+                        assert!(w.resource_mut::<sim::Players>().set_team(HUMAN, 1));
+                        assert!(w.resource_mut::<sim::Players>().set_team(P1, 1));
+                    }
+                    human_power = Some(building(w, HUMAN, "nuclear_reactor", 1, 1));
+                    building(w, HUMAN, "airforce_command", 6, 1);
+                    building(w, HUMAN, "spy_satellite", 11, 1);
+                    gap_power = Some(building(w, P1, "nuclear_reactor", 42, 40));
+                    building(w, P1, "gap_generator", 24, 24);
+                    subject = Some(unit(w, owner, "amphibious_transport", 34, 24));
+                    // A real cloakable actor in visible terrain remains a separate concealment gate.
+                    concealed = Some(unit(w, P1, "giant_squid", 30, 25));
+                    scout = Some(unit(w, HUMAN, "amphibious_transport", 34, 28));
+                });
+                tick(&mut host, vec![]);
+                let subject = subject.unwrap();
+                let scout = scout.unwrap();
+                assert_eq!(
+                    mobile(&host, concealed.unwrap()).cell,
+                    CellPos::new(30, 25),
+                    "actual cloak fixture is at the coordinate queried by the marker checks"
+                );
+                assert!(
+                    host.players()
+                        .unwrap()
+                        .get(HUMAN)
+                        .unwrap()
+                        .vision()
+                        .is_visible(CellPos::new(34, 24)),
+                    "local sight counters powered Gap"
+                );
+                assert!(has_marker(&host, CellPos::new(34, 24), owner));
+                assert_eq!(
+                    has_marker(&host, CellPos::new(30, 25), P1),
+                    allied,
+                    "terrain sight alone does not detect hostile stock Squid"
+                );
+                let mut world = draw_world(host);
+                draw(&mut world);
+                assert_contact_pixels(&world, CellPos::new(34, 24), owner, true);
+                let events = tick_world(
+                    &mut world,
+                    vec![issue(
+                        HUMAN,
+                        Command::Move {
+                            units: vec![scout],
+                            target: CellPos::new(10, 28),
+                        },
+                    )],
+                );
+                assert!(rejected(&events).is_empty());
+                let mut arrived = false;
+                for _ in 0..1200 {
+                    if mobile(world.resource::<SimHost>(), scout).cell == CellPos::new(10, 28) {
+                        arrived = true;
+                        break;
+                    }
+                    tick_world(&mut world, vec![]);
+                }
+                assert!(arrived, "real scout left the Gap circle");
+                let host = world.resource::<SimHost>();
+                let visible = owner == HUMAN || allied;
+                assert_eq!(
+                    host.players()
+                        .unwrap()
+                        .get(HUMAN)
+                        .unwrap()
+                        .vision()
+                        .is_explored(CellPos::new(34, 24)),
+                    visible,
+                    "powered hostile Gap erases exploration after local sight actually leaves"
+                );
+                assert_eq!(has_marker(host, mobile(host, subject).cell, owner), visible);
+                assert_eq!(has_marker(host, CellPos::new(30, 25), P1), allied);
+                draw(&mut world);
+                assert_contact_pixels(&world, CellPos::new(34, 24), owner, visible);
+                // Enemy owner's genuine sale takes Gap offline while HUMAN keeps powered radar
+                // and satellite. No direct power/resource mutation or Gap-state forgery.
+                let events = tick_world(
+                    &mut world,
+                    vec![issue(
+                        P1,
+                        Command::SellBuilding {
+                            building: gap_power.unwrap(),
+                        },
+                    )],
+                );
+                assert!(rejected(&events).is_empty());
+                assert!(
+                    world
+                        .resource::<SimHost>()
+                        .players()
+                        .unwrap()
+                        .get(HUMAN)
+                        .unwrap()
+                        .vision()
+                        .is_visible(CellPos::new(34, 24))
+                );
+                assert!(has_marker(
+                    world.resource::<SimHost>(),
+                    CellPos::new(34, 24),
+                    owner
+                ));
+                assert_eq!(
+                    has_marker(world.resource::<SimHost>(), CellPos::new(30, 25), P1),
+                    allied,
+                    "satellite restoration is not a hostile-cloak detector"
+                );
+                draw(&mut world);
+                assert_contact_pixels(&world, CellPos::new(34, 24), owner, true);
+                let events = tick_world(
+                    &mut world,
+                    vec![issue(
+                        HUMAN,
+                        Command::SellBuilding {
+                            building: human_power.unwrap(),
+                        },
+                    )],
+                );
+                assert!(rejected(&events).is_empty());
+                draw(&mut world);
+                assert!(world.resource::<MinimapState>().offline);
+                assert_eq!(world.resource::<MinimapState>().map_pixels, 0);
+                assert_eq!(
+                    pixels(&world),
+                    offline_pixels(&world.resource::<Minimap>().layout)
+                );
+            }
+        }
+    }
+    #[test]
+    fn ra9_b87_stock_sensors_four_five_cells_hide_and_show_squid_through_public_admission() {
+        for detector_name in ["dolphin", "typhoon", "giant_squid"] {
+            let mut target = None;
+            let mut detector = None;
+            let mut armed = None;
+            let mut host = stock_host(0, |w| {
+                building(w, HUMAN, "nuclear_reactor", 1, 1);
+                building(w, HUMAN, "airforce_command", 6, 1);
+                target = Some(unit(w, P1, "giant_squid", 10, 10));
+                unit(w, HUMAN, "amphibious_transport", 13, 10); // Sight6, no Sensors, beyond grab1.5.
+                detector = Some(unit(w, HUMAN, detector_name, 20, 10));
+                armed = Some(unit(w, HUMAN, "destroyer", 30, 30)); // Sensor8 stays far away.
+            });
+            tick(&mut host, vec![]);
+            let target = target.unwrap();
+            let detector = detector.unwrap();
+            let armed = armed.unwrap();
+            assert_eq!(
+                host.definitions()
+                    .unwrap()
+                    .metadata(sim::ProductionItem::Unit(
+                        host.definitions()
+                            .unwrap()
+                            .unit_kind(detector_name)
+                            .unwrap()
+                    ))
+                    .unwrap()
+                    .sensors_sight,
+                4
+            );
+            assert!(
+                host.players()
+                    .unwrap()
+                    .get(HUMAN)
+                    .unwrap()
+                    .vision()
+                    .is_visible(CellPos::new(10, 10))
+            );
+            assert!(!has_marker(&host, CellPos::new(10, 10), P1));
+            let events = tick(
+                &mut host,
+                vec![issue(
+                    HUMAN,
+                    Command::Attack {
+                        units: vec![armed],
+                        target,
+                    },
+                )],
+            );
+            assert_eq!(rejected(&events), vec![RejectReason::UnknownTarget(target)]);
+            let mut world = draw_world(host);
+            draw(&mut world);
+            assert_contact_pixels(&world, CellPos::new(10, 10), P1, false);
+            // Destination lies beyond the detector boundary. Sampling at x14 occurs during
+            // a real continuing move, so this armed detector has not stopped to auto-fire.
+            let events = tick_world(
+                &mut world,
+                vec![issue(
+                    HUMAN,
+                    Command::Move {
+                        units: vec![detector],
+                        target: CellPos::new(6, 10),
+                    },
+                )],
+            );
+            assert!(rejected(&events).is_empty());
+            let mut at_four = false;
+            for _ in 0..500 {
+                if mobile(world.resource::<SimHost>(), detector).cell == CellPos::new(14, 10) {
+                    at_four = true;
+                    break;
+                }
+                let events = tick_world(&mut world, vec![]);
+                assert!(
+                    !events
+                        .iter()
+                        .any(|e| matches!(e,SimEvent::WeaponFired{attacker,..}
+                    if *attacker==detector)),
+                    "continuing move isolates sensors, not a shot surface hook"
+                );
+            }
+            assert!(at_four, "actual current-cell SensorsSight=4 boundary");
+            assert!(has_marker(
+                world.resource::<SimHost>(),
+                CellPos::new(10, 10),
+                P1
+            ));
+            draw(&mut world);
+            assert_contact_pixels(&world, CellPos::new(10, 10), P1, true);
+            let events = tick_world(
+                &mut world,
+                vec![
+                    issue(
+                        HUMAN,
+                        Command::Attack {
+                            units: vec![armed],
+                            target,
+                        },
+                    ),
+                    issue(
+                        HUMAN,
+                        Command::Move {
+                            units: vec![detector],
+                            target: CellPos::new(20, 10),
+                        },
+                    ),
+                ],
+            );
+            assert!(
+                rejected(&events).is_empty(),
+                "actual observed target admitted: {events:?}"
+            );
+            // Stop the distant attacker before it can contribute its own SensorsSight=8.
+            let events = tick_world(
+                &mut world,
+                vec![issue(HUMAN, Command::Stop { units: vec![armed] })],
+            );
+            assert!(rejected(&events).is_empty());
+            let mut at_five = false;
+            for _ in 0..300 {
+                if mobile(world.resource::<SimHost>(), detector).cell == CellPos::new(15, 10) {
+                    at_five = true;
+                    break;
+                }
+                tick_world(&mut world, vec![]);
+            }
+            assert!(at_five);
+            let host = world.resource::<SimHost>();
+            assert_eq!(
+                mobile(host, target).cell,
+                CellPos::new(10, 10),
+                "stock Squid stayed outside grab reach"
+            );
+            assert!(
+                host.players()
+                    .unwrap()
+                    .get(HUMAN)
+                    .unwrap()
+                    .vision()
+                    .is_visible(CellPos::new(10, 10))
+            );
+            assert!(
+                !has_marker(host, CellPos::new(10, 10), P1),
+                "visible terrain is insufficient at distance5"
+            );
+            let events = tick_world(
+                &mut world,
+                vec![issue(
+                    HUMAN,
+                    Command::Attack {
+                        units: vec![armed],
+                        target,
+                    },
+                )],
+            );
+            assert_eq!(rejected(&events), vec![RejectReason::UnknownTarget(target)]);
+            draw(&mut world);
+            assert_contact_pixels(&world, CellPos::new(10, 10), P1, false);
+        }
+    }
+    #[test]
+    fn ra9_b87_normal_stock_squid_attachment_and_sonic_reappearance_use_real_host_and_draw() {
+        let mut source = None;
+        let mut victim = None;
+        let mut dolphin = None;
+        let mut host = stock_host(0, |w| {
+            building(w, HUMAN, "nuclear_reactor", 1, 1);
+            building(w, HUMAN, "airforce_command", 6, 1);
+            source = Some(unit(w, HUMAN, "giant_squid", 8, 8));
+            victim = Some(unit(w, P1, "dreadnought", 9, 8));
+            unit(w, HUMAN, "amphibious_transport", 12, 10); // Continues honest target observation.
+            dolphin = Some(unit(w, HUMAN, "dolphin", 20, 8)); // Initially outside Sonic range8.
+        });
+        let source = source.unwrap();
+        let victim = victim.unwrap();
+        let dolphin = dolphin.unwrap();
+        for p in [HUMAN, P1] {
+            assert_eq!(
+                host.players()
+                    .unwrap()
+                    .get(p)
+                    .unwrap()
+                    .vision()
+                    .visible_cells(),
+                0
+            );
+        }
+        let primed = tick(
+            &mut host,
+            vec![
+                issue(
+                    HUMAN,
+                    Command::Guard {
+                        units: vec![source, dolphin],
+                    },
+                ),
+                issue(
+                    P1,
+                    Command::Guard {
+                        units: vec![victim],
+                    },
+                ),
+            ],
+        );
+        assert!(rejected(&primed).is_empty(), "{primed:?}");
+        assert!(
+            !primed
+                .iter()
+                .any(|e| matches!(e,SimEvent::WeaponFired{attacker,..}if *attacker==source))
+        );
+        assert!(
+            host.world()
+                .resource::<sim::SpecialState>()
+                .parasites
+                .is_empty()
+        );
+        entity(&host, source); // Native existence before intended public Attack.
+        let full = host
+            .world()
+            .get::<sim::Health>(entity(&host, source))
+            .unwrap()
+            .hit_points;
+        assert!(has_marker(&host, CellPos::new(8, 8), HUMAN));
+        let mut world = draw_world(host);
+        draw(&mut world);
+        assert_contact_pixels(&world, CellPos::new(8, 8), HUMAN, true);
+        let events = tick_world(
+            &mut world,
+            vec![issue(
+                HUMAN,
+                Command::Attack {
+                    units: vec![source],
+                    target: victim,
+                },
+            )],
+        );
+        assert!(rejected(&events).is_empty(), "{events:?}");
+        assert!(
+            events
+                .iter()
+                .any(|e| matches!(e,SimEvent::WeaponFired{attacker,target,..}
+            if *attacker==source&&*target==victim))
+        );
+        let host = world.resource::<SimHost>();
+        assert_eq!(
+            host.world()
+                .resource::<sim::SpecialState>()
+                .parasites
+                .get(&victim)
+                .map(|p| p.passenger.id),
+            Some(source)
+        );
+        assert!(
+            !host
+                .world()
+                .try_query::<&SimId>()
+                .unwrap()
+                .iter(host.world())
+                .any(|id| *id == source)
+        );
+        assert!(!has_marker(host, CellPos::new(8, 8), HUMAN));
+        draw(&mut world);
+        assert_contact_pixels(&world, CellPos::new(8, 8), HUMAN, false);
+        let events = tick_world(
+            &mut world,
+            vec![issue(
+                HUMAN,
+                Command::Move {
+                    units: vec![source],
+                    target: CellPos::new(5, 5),
+                },
+            )],
+        );
+        assert_eq!(rejected(&events), vec![RejectReason::UnknownUnit(source)]);
+        let mut events = tick_world(
+            &mut world,
+            vec![issue(
+                HUMAN,
+                Command::Attack {
+                    units: vec![dolphin],
+                    target: victim,
+                },
+            )],
+        );
+        assert!(rejected(&events).is_empty());
+        let mut freed = false;
+        let mut sonic_shot = false;
+        for _ in 0..240 {
+            sonic_shot |= events.iter().any(|e| {
+                matches!(e,SimEvent::WeaponFired{attacker,target,..}
+                if *attacker==dolphin&&*target==victim)
+            });
+            freed = !world
+                .resource::<SimHost>()
+                .world()
+                .resource::<sim::SpecialState>()
+                .parasites
+                .contains_key(&victim);
+            if freed {
+                break;
+            }
+            events = tick_world(&mut world, vec![]);
+        }
+        assert!(
+            freed && sonic_shot,
+            "real approach/sonic hit must release normal unprotected stock host"
+        );
+        let host = world.resource::<SimHost>();
+        let restored = entity(host, source);
+        assert_eq!(
+            host.world()
+                .get::<sim::Health>(restored)
+                .unwrap()
+                .hit_points,
+            full
+        );
+        assert_eq!(host.world().get::<sim::Owner>(restored).unwrap().0, HUMAN);
+        assert_eq!(
+            host.world().get::<sim::Unit>(restored).unwrap().kind,
+            host.definitions()
+                .unwrap()
+                .unit_kind("giant_squid")
+                .unwrap()
+        );
+        let restored_cell = mobile(host, source).cell;
+        assert!(has_marker(host, restored_cell, HUMAN));
+        draw(&mut world);
+        assert_contact_pixels(&world, restored_cell, HUMAN, true);
+    }
+    // Test-only running scenario constructor. Real setup_match_configured installs MatchState,
+    // countries and both bases; no fabricated running/viewer state or mutable-host API.
+    pub(crate) fn c62_running_stock_host(
+        water_from: i32,
+        setup: impl FnOnce(&mut World),
+    ) -> SimHost {
+        crate::sim_host::tests::fixture_host(|w| {
+            let dir =
+                std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets/data");
+            let d = sim::load_ruleset(&dir).unwrap();
+            let mut skirmish = sim::load_skirmish(dir.join("skirmish.ron"), &d).unwrap();
+            let ai = sim::load_ai(dir.join("ai.ron"), &d).unwrap();
+            // Independent test geometry only. Both real bases are far from the launch corridor.
+            let cells = (0..48)
+                .flat_map(|y| {
+                    (0..48).map(move |x| {
+                        let water = x >= water_from && !(x <= 8 && y <= 5) && !(x >= 40 && y >= 38);
+                        sim::Cell {
+                            passable: !water,
+                            water,
+                            buildable: !water,
+                            ore: 0,
+                        }
+                    })
+                })
+                .collect();
+            w.insert_resource(sim::Grid::from_cells(48, 48, cells).unwrap());
+            w.insert_resource(d);
+            skirmish.maps[0].starts = vec![CellPos::new(2, 40), CellPos::new(42, 40)];
+            let players = [("great_britain", HUMAN), ("russia", P1)]
+                .into_iter()
+                .enumerate()
+                .map(|(start, (country, player))| sim::PlayerSetup {
+                    player,
+                    start,
+                    controller: sim::Controller::Human,
+                    faction: skirmish
+                        .factions
+                        .iter()
+                        .position(|f| f.id == country)
+                        .unwrap(),
+                })
+                .collect::<Vec<_>>();
+            let options = sim::MatchOptions {
+                unit_count: Some(0),
+                mcv_start: false,
+                crates: false,
+                short_game: false,
+                free_for_all: true,
+                ..Default::default()
+            };
+            sim::setup_match_configured(w, &skirmish, &ai, 0, &players, &options).unwrap();
+            setup(w);
+        })
+    }
+    /// Actual command-created mission plus real current owned ordinary actors for input tests.
+    pub(crate) fn c62_mission(section: &str) -> (SimHost, SimId, SimId, Vec<SimId>) {
+        let kind = match section {
+            "DMISL" => Mission::Dmisl,
+            "V3ROCKET" => Mission::V3,
+            "PDPLANE" => Mission::Plane,
+            _ => panic!("test section"),
+        };
+        let Launched { host, id, .. } = launch_in(kind, HUMAN, false, true);
+        assert!(host.running());
+        let engineer = host.definitions().unwrap().unit_kind("engineer").unwrap();
+        let mut q = host
+            .world()
+            .try_query::<(&SimId, &sim::Owner, &sim::Unit, &sim::Health)>()
+            .unwrap();
+        let mut eligible = Vec::new();
+        let mut normal = None;
+        for (found, owner, u, hp) in q.iter(host.world()) {
+            if owner.0 == HUMAN && hp.hit_points > 0 && *found != id {
+                eligible.push(*found);
+                if u.kind == engineer && normal.is_none() {
+                    normal = Some(*found);
+                }
+            }
+        }
+        eligible.sort();
+        assert_eq!(eligible.len(), 2, "real zero-start-unit scenario actors");
+        (host, id, normal.unwrap(), eligible)
+    }
+    pub(crate) fn c62_wall(name: &str) -> (SimHost, SimId, SimId, SimId, Vec<SimId>) {
+        assert!(matches!(
+            name,
+            "fortress_walls" | "soviet_walls" | "bridge_hut"
+        ));
+        let mut wall = None;
+        let mut normal = None;
+        let mut factory = None;
+        let mut fighter = None;
+        let mut host = c62_running_stock_host(48, |w| {
+            building(w, HUMAN, "nuclear_reactor", 1, 1);
+            wall = Some(building(w, HUMAN, name, 18, 14));
+            normal = Some(unit(w, HUMAN, "engineer", 20, 20));
+            fighter = Some(unit(w, HUMAN, "grizzly", 21, 20));
+            factory = Some(building(w, HUMAN, "war_factory", 14, 14));
+        });
+        tick(&mut host, vec![]);
+        assert!(host.running());
+        let normal = normal.unwrap();
+        let mut eligible = vec![normal, fighter.unwrap()];
+        eligible.sort();
+        (host, wall.unwrap(), normal, factory.unwrap(), eligible)
     }
 }

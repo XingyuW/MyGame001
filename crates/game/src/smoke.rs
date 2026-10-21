@@ -2988,4 +2988,36 @@ mod tests {
         );
         assert!(smoke.flow_problems > 0);
     }
+
+    // Append inside smoke::tests. Real registered MessageReader handlers and valid native event.
+    #[test]
+    fn ra9_both_native_asset_failure_handlers_emit_error_exit_only_for_a_failure() {
+        use bevy::asset::{
+            AssetId, AssetLoadError, UntypedAssetLoadFailedEvent, io::AssetReaderError,
+        };
+        for smoke in [false, true] {
+            for failing in [false, true] {
+                let mut app = App::new();
+                app.add_plugins(MinimalPlugins)
+                    .add_message::<AppExit>()
+                    .add_message::<UntypedAssetLoadFailedEvent>();
+                if smoke {
+                    app.add_systems(Update, fail_on_asset_load_error);
+                } else {
+                    app.add_systems(Update, crate::map::exit_on_asset_load_failure);
+                }
+                if failing {
+                    app.world_mut().write_message(UntypedAssetLoadFailedEvent {
+                        id: AssetId::<Image>::default().untyped(),
+                        path: "ra9_missing_asset.png".into(),
+                        error: AssetLoadError::AssetReaderError(AssetReaderError::NotFound(
+                            std::path::PathBuf::from("ra9_missing_asset.png"),
+                        )),
+                    });
+                }
+                app.world_mut().run_schedule(Update);
+                assert_eq!(app.should_exit(), failing.then(AppExit::error));
+            }
+        }
+    }
 }

@@ -1,0 +1,141 @@
+{
+  "utc": "2026-10-21T16:20:32.003494+00:00",
+  "root_authorization": "ROOT_CANONICAL_195_FACTUAL_2026_10_21",
+  "root_independent_verification": {
+    "path": "docs/validation/ra2-parity/ra9/195-root-independent-verification.json",
+    "sha256": "a9dd802cb25ff332a6f8d3a9f49a34a593059f1c92f9b3b8218e6427d0bfcbc0"
+  },
+  "input_scope_sha256": "9c110cf4d961ac33b5025acb53d0f50eedfa3fe55fe76e9e2135789d388ba6b7",
+  "observed_model_census_sha256": "bc1bc3df97e937cc2a03a569b6a8897c41d4eda33e1342599a19834152eec811",
+  "status": "EXCLUDED_FACTUAL_HASH_ID_OUTPUTS_ONLY_NOT_POLICY_VALIDATION_OR_REVIEW_APPROVAL",
+  "files": [
+    {
+      "path": "crates/sim/tests/ra9_audit/root-policy-input-binding.txt",
+      "before_sha256": "df185c9ecae4235b49c60a5b627bf49506d018c6ca22d1aa15569d77ff502293",
+      "after_sha256": "7f6f32ee993271a4d67213f86e27acd8ff214732f3e4b94b0e378066247d8a50",
+      "preimage": "docs/validation/ra2-parity/ra9/196-before-crates__sim__tests__ra9_audit__root-policy-input-binding.txt",
+      "changed_fields": [
+        "actual root input SHA256"
+      ]
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-policy-acceptance.tsv",
+      "before_sha256": "eab06ec1e4d8a74a0ce3c21604b28f48009b762d1e90989887ddb59f9c62746d",
+      "after_sha256": "9fe08b2dc746148508a3f8054d9220c1cdcd181cacc80f04ab6b30c2a5e821d0",
+      "preimage": "docs/validation/ra2-parity/ra9/196-before-crates__sim__tests__ra9_audit__source-policy-acceptance.tsv",
+      "changed_fields": [
+        "final_input_sha256",
+        "consumer_bindings model-census factual pointer only"
+      ]
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/guard75-acceptance.tsv",
+      "before_sha256": "4e0fb52bcefe1f7e1bff46a5dba728e607e387d692ecad64593148548c48799f",
+      "after_sha256": "e61183deb12b2e86e8c6c19ce1c2dcb90b1d7d22763312011d86dbc97a9bbcac",
+      "preimage": "docs/validation/ra2-parity/ra9/196-before-crates__sim__tests__ra9_audit__guard75-acceptance.tsv",
+      "changed_fields": [
+        "final_input_sha256",
+        "consumer_bindings model-census factual pointer only"
+      ]
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/own-policy-acceptance.tsv",
+      "before_sha256": "b03c133a94443d744ac6919e07dd7573584213a45a10a5310a83171d4cdd2456",
+      "after_sha256": "e7976648b7dedff4de27acc304a47e59d075cb2a7238597eaf0eb646688a29dc",
+      "preimage": "docs/validation/ra2-parity/ra9/196-before-crates__sim__tests__ra9_audit__own-policy-acceptance.tsv",
+      "changed_fields": [
+        "final_input_sha256"
+      ]
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/consumer62-acceptance.tsv",
+      "before_sha256": "00d2f443cfea507206a5bfd080dc8bd322fe3d517e53a817d7a1f5e32d2222b4",
+      "after_sha256": "e41f08c3884c2acd9fd1d35947a8e850f38b7984622428968ff220127fd2e9d8",
+      "preimage": "docs/validation/ra2-parity/ra9/196-before-crates__sim__tests__ra9_audit__consumer62-acceptance.tsv",
+      "changed_fields": [
+        "final_input_sha256",
+        "consumer_bindings model-census factual pointer only"
+      ]
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/carry38-acceptance.tsv",
+      "before_sha256": "f5512a4344fdfce08ff9c18f8531a97a27421d64559f94fc913088f77e963c05",
+      "after_sha256": "e93212f2add318a5094b8a3e98b94cfb7126c9a02a61aad54f374db4b9e9913f",
+      "preimage": "docs/validation/ra2-parity/ra9/196-before-crates__sim__tests__ra9_audit__carry38-acceptance.tsv",
+      "changed_fields": [
+        "final_input_sha256",
+        "consumer_bindings model-census factual pointer only"
+      ]
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/behavior87-acceptance.tsv",
+      "before_sha256": "28f4720ed8f4115f226cc5d0c58669efe2b7e7ad127072ca6deb88c7a720bafb",
+      "after_sha256": "c5bbe4122ff868ab91a07b295e7464a9b77513a18f401c503e2244b254ee1299",
+      "preimage": "docs/validation/ra2-parity/ra9/196-before-crates__sim__tests__ra9_audit__behavior87-acceptance.tsv",
+      "changed_fields": [
+        "final_input_sha256",
+        "consumer_bindings model-census factual pointer only"
+      ]
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-acceptance.tsv",
+      "before_sha256": "b7faed7be22e6fc46a0cd3f3af5a90e4527d1159d6ff4d82886380b730a5647c",
+      "after_sha256": "ac3d423012a2dba20986363b26d19090c88e61597dc713becd891590e06a5ce1",
+      "preimage": "docs/validation/ra2-parity/ra9/196-before-crates__sim__tests__ra9_audit__model162-acceptance.tsv",
+      "changed_fields": [
+        "final_input_sha256",
+        "consumer_bindings model-census factual pointer only"
+      ]
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/completion-acceptance.tsv",
+      "before_sha256": "40bdae851b90a0eb555dfe3274a282e2fdd5f161ada493918e14f0452a08f2c8",
+      "after_sha256": "65e027d0df10c1dc6b6e5c2e6cf14d5e2f977878233b3d97cf87f2230afdfaf3",
+      "preimage": "docs/validation/ra2-parity/ra9/196-before-crates__sim__tests__ra9_audit__completion-acceptance.tsv",
+      "changed_fields": [
+        "final_input_sha256",
+        "consumer_bindings model-census factual pointer only"
+      ]
+    },
+    {
+      "path": "crates/sim/tests/reference/ra9_legacy_range_resolution.tsv",
+      "before_sha256": "d038eb81b2d7cf3fc93dcacf945acb5f4afeff5d79282e2cfa6767ff8bbd7715",
+      "after_sha256": "0489e63c4d96b6b68fb2e9767937cd0ac9c54ea87eae5d000d55caa204faf0cb",
+      "preimage": "docs/validation/ra2-parity/ra9/196-before-crates__sim__tests__reference__ra9_legacy_range_resolution.tsv",
+      "changed_fields": [
+        "final_input_sha256"
+      ]
+    },
+    {
+      "path": "crates/sim/tests/reference/ra9_return_fire_policy.tsv",
+      "before_sha256": "e9ab987aacd25c8e187c11f80fdf0b573a59d914f143c5fc6f0f5804bb69c39f",
+      "after_sha256": "df3071d069eb4e86807eb0c7854908bd7185cbb7d0594bd4120157d0a07783f6",
+      "preimage": "docs/validation/ra2-parity/ra9/196-before-crates__sim__tests__reference__ra9_return_fire_policy.tsv",
+      "changed_fields": [
+        "final_input_sha256"
+      ]
+    },
+    {
+      "path": "crates/sim/tests/reference/ra9_scope_approval.tsv",
+      "before_sha256": "413e316342a707ad881d5a3ac4f12ad76428d07f18ac1915447b74b233827a71",
+      "after_sha256": "09280b45e6aa0a435318111b2ee5e911c3a7917182551133f26418f683febe36",
+      "preimage": "docs/validation/ra2-parity/ra9/196-before-crates__sim__tests__reference__ra9_scope_approval.tsv",
+      "changed_fields": [
+        "final_input_sha256",
+        "observed scope SHA fields and explicit root factual verification id"
+      ]
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/ra9-approved-model-census-sha256.txt",
+      "before_sha256": "f871bc1874263c99ae808b08b5a9179d18fe4de2170c9fcab79f98a502748f87",
+      "after_sha256": "a82e3bdc8d1e48e6806f55c22016a20aca886da365ccd780c8661a906fa17696",
+      "preimage": "docs/validation/ra2-parity/ra9/196-before-crates__sim__tests__ra9_audit__ra9-approved-model-census-sha256.txt",
+      "changed_fields": [
+        "actual observed model census SHA256"
+      ]
+    }
+  ],
+  "source656_drift": [],
+  "authority64_drift": [],
+  "preserved": "Exact literal/class/reason/route/decision/qualifiedreceipt cells, priorindividualrecords/preimages/history; only current factual pointer cells refreshed."
+}

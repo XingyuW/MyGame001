@@ -663,3 +663,59 @@ fn computer_players_build_only_what_their_faction_offers_and_finish_the_match() 
     assert_eq!(ai.controller(P0).expect("red").plan(), &red_plan);
     assert_eq!(ai.controller(P1).expect("blue").plan(), &blue_plan);
 }
+
+#[test]
+fn ra9_roster_exactly_sixty_four_loads_and_the_sixty_fifth_is_rejected() {
+    assert_eq!(MAX_ROSTER_ENTRIES, 64);
+    // An independent runtime fixture has exactly 64 valid, distinct, producible buildings.
+    // No committed fixture/generated/source data is changed. MAX_BUILDING_TYPES is also64,
+    // so the 65th roster entry deliberately repeats valid b0: the preparse list-size error
+    // must win over semantic DuplicateId. This tests the actual native loader boundary.
+    let entries = (0..64)
+        .map(|index| {
+            format!(
+                r#"(
+        id: "b{index}", sprite: "b{index}", width: 1, height: 1,
+        cost: 10, build_time: 1, producer: "b0", prerequisites: [],
+        power_produced: 0, power_consumed: 0, sell_value: 5, free_units: [],
+    ),"#
+            )
+        })
+        .collect::<String>();
+    let economy = temp_file(
+        "ra9_roster_economy",
+        &format!(
+            r#"(
+        schema_version:2, placement_distance:3, buildings:[{entries}],
+        units:[], harvesters:[], refineries:[], refunds:[],
+    )"#
+        ),
+    );
+    let defs = sim::load_definitions(fixture("data/units_economy.ron"), economy)
+        .expect("64 valid building definitions");
+    assert_eq!(defs.buildings().len(), 64);
+    let ids = (0..64)
+        .map(|index| format!("\"b{index}\","))
+        .collect::<String>();
+    let text = |ids: &str| {
+        format!(
+            r#"(
+        schema_version:3,starting_credits:1500,sides:[],
+        factions:[(id:"limit",label:"Limit",side:"none",roster_buildings:[{ids}],
+            roster_units:[],buildings:[(building:"b0",x:0,y:0)],units:[])],
+        maps:[(id:"skirmish_40x40",starts:[(x:5,y:5),(x:32,y:32)])],
+    )"#
+        )
+    };
+    let path = temp_file("ra9_roster_exact64", &text(&ids));
+    let accepted = load_skirmish(&path, &defs).expect("exactly64");
+    assert_eq!(accepted.factions[0].roster.len(), 64);
+    let path = temp_file("ra9_roster_exact65", &text(&format!("{ids}\"b0\",")));
+    assert_rejected(
+        load_skirmish(&path, &defs),
+        "factions[0].roster_buildings",
+        DataErrorKind::TooManyEntries {
+            max: MAX_ROSTER_ENTRIES,
+        },
+    );
+}

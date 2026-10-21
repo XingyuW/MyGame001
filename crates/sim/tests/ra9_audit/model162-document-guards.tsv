@@ -1,0 +1,53 @@
+group_id	document_path	section_start	section_end	span_authority_id	required_case_insensitive_needle
+air-crash	docs/DECISIONS.md	### R80. RA6-B reference vehicles, strategic payloads, and explicit state	### R81. RA6-B exact existing-test expectation ledger	R80	ground crash blast
+air-model	docs/DECISIONS.md	### R49. RA4: aircraft ammunition and docks	### R50. RA4: spawned missiles and aircraft	R49	docked aircraft is in the air
+air-model	docs/DECISIONS.md	### R50. RA4: spawned missiles and aircraft	### R51. RA4: submerged units	R50	CanPassiveAquire=no
+allied-adjacency	docs/DECISIONS.md	### R25. RA2: placement by `adjacent` and `base_normal`; the reach of a shipyard	### R26. RA2: selling and repairing	R25	adjacent
+approach-mirage	docs/DECISIONS.md	### D29. Combat in the simulation (PLAN.md section 5, equations 1 and 2)	### D30. Visibility, shroud and fog, and hiding of unseen enemies (PLAN.md section 5, equation 6)	D29	plain move order
+approach-mirage	docs/DECISIONS.md	### R84. RA7 shroud-only matches, concealment timing and reconnaissance	### R85. RA7 orders, controls and original rate-limited announcements	R84	Gap uses
+chrono-controls	docs/DECISIONS.md	### R80. RA6-B reference vehicles, strategic payloads, and explicit state	### R81. RA6-B exact existing-test expectation ledger	R80	ground crash blast
+chrono-controls	docs/RA2_PARITY_PLAN.md	### 4.13 Specialists and superweapons (RA6)	### 4.14 Vision (RA7)	PLAN4.13	Chrono move
+cloak-stages	docs/DECISIONS.md	### R51. RA4: submerged units	### R52. RA4: the interface	R51	CloakingSpeed
+cloak-stages	docs/DECISIONS.md	### R84. RA7 shroud-only matches, concealment timing and reconnaissance	### R85. RA7 orders, controls and original rate-limited announcements	R84	Gap uses
+crates-material	docs/DECISIONS.md	### R60. RA5-A: crates	### R61. RA5-A: gems on the maps, and what the game shows	R60	shares of `powerups`
+crates-material	docs/RA2_PARITY_PLAN.md	#### 10. Crates	#### 11. Radar and vision	APPENDIX_CRATES	campaign only
+crew-fallback	docs/DECISIONS.md	### R48. RA4: crews and survivors	### R49. RA4: aircraft ammunition and docks	R48	technician is not modelled
+crew-fallback	docs/RA2_PARITY_PLAN.md	### 4.7 Crews and survivors (RA4)	### 4.8 Aircraft, spawns, submarines (RA4)	PLAN4.7	Technicians are not modelled
+crush-auto	docs/DECISIONS.md	### R42. RA3-B: crushing	### R43. RA3-B: the interface	R42	crush
+crush-auto	docs/DECISIONS.md	### R85. RA7 orders, controls and original rate-limited announcements	### R86. RA7 last-stand fixture preserves its explicit current-sight scenario	R85	At most32
+deploy-times	docs/DECISIONS.md	### R80. RA6-B reference vehicles, strategic payloads, and explicit state	### R81. RA6-B exact existing-test expectation ledger	R80	ground crash blast
+dock-unload	docs/DECISIONS.md	### R58. RA5-A: the economy file of schema version 2 and the rules file of schema version 2	### R59. RA5-A: ore that grows and spreads	R58	one bail
+fall-kinematics	docs/DECISIONS.md	### R80. RA6-B reference vehicles, strategic payloads, and explicit state	### R81. RA6-B exact existing-test expectation ledger	R80	ground crash blast
+fx-world	docs/DECISIONS.md	### R9. RA1: the data pipeline, the generated data files and their schemas	### R10. RA1: who may build what (assumption RA-A3)	R9	game specific values (labels
+fx-world	docs/DECISIONS.md	### R80. RA6-B reference vehicles, strategic payloads, and explicit state	### R81. RA6-B exact existing-test expectation ledger	R80	ground crash blast
+fx-world	docs/DECISIONS.md	### R84. RA7 shroud-only matches, concealment timing and reconnaissance	### R85. RA7 orders, controls and original rate-limited announcements	R84	Gap uses
+gap-boost	docs/DECISIONS.md	### R84. RA7 shroud-only matches, concealment timing and reconnaissance	### R85. RA7 orders, controls and original rate-limited announcements	R84	Gap uses
+harvest-routing	docs/DECISIONS.md	### R58. RA5-A: the economy file of schema version 2 and the rules file of schema version 2	### R59. RA5-A: ore that grows and spreads	R58	one bail
+harvest-routing	docs/DECISIONS.md	### R91. RA8 country plans, source difficulty and declared AI policy	### R92. RA8 honest specialist strategy and non-starving endings	R91	first-hit damage remains equal
+harvester-immunity	docs/DECISIONS.md	### D29. Combat in the simulation (PLAN.md section 5, equations 1 and 2)	### D30. Visibility, shroud and fog, and hiding of unseen enemies (PLAN.md section 5, equation 6)	D29	plain move order
+harvester-immunity	docs/DECISIONS.md	### R80. RA6-B reference vehicles, strategic payloads, and explicit state	### R81. RA6-B exact existing-test expectation ledger	R80	ground crash blast
+idle-area-guard	docs/DECISIONS.md	### D29. Combat in the simulation (PLAN.md section 5, equations 1 and 2)	### D30. Visibility, shroud and fog, and hiding of unseen enemies (PLAN.md section 5, equation 6)	D29	plain move order
+idle-area-guard	docs/DECISIONS.md	### R85. RA7 orders, controls and original rate-limited announcements	### R86. RA7 last-stand fixture preserves its explicit current-sight scenario	R85	At most32
+jumpjet-defaults	docs/DECISIONS.md	### R49. RA4: aircraft ammunition and docks	### R50. RA4: spawned missiles and aircraft	R49	docked aircraft is in the air
+lobby-defaults	docs/DECISIONS.md	### R85. RA7 orders, controls and original rate-limited announcements	### R86. RA7 last-stand fixture preserves its explicit current-sight scenario	R85	At most32
+lobby-defaults	docs/DECISIONS.md	### R91. RA8 country plans, source difficulty and declared AI policy	### R92. RA8 honest specialist strategy and non-starving endings	R91	first-hit damage remains equal
+lobby-modes	docs/DECISIONS.md	### R84. RA7 shroud-only matches, concealment timing and reconnaissance	### R85. RA7 orders, controls and original rate-limited announcements	R84	Gap uses
+lobby-modes	docs/DECISIONS.md	### R85. RA7 orders, controls and original rate-limited announcements	### R86. RA7 last-stand fixture preserves its explicit current-sight scenario	R85	At most32
+names	docs/DECISIONS.md	### R9. RA1: the data pipeline, the generated data files and their schemas	### R10. RA1: who may build what (assumption RA-A3)	R9	game specific values (labels
+nonhuman	docs/DECISIONS.md	### R48. RA4: crews and survivors	### R49. RA4: aircraft ammunition and docks	R48	technician is not modelled
+ore-combat	docs/DECISIONS.md	### R58. RA5-A: the economy file of schema version 2 and the rules file of schema version 2	### R59. RA5-A: ore that grows and spreads	R58	one bail
+ore-combat	docs/RA2_PARITY_PLAN.md	#### 6. Veterancy	#### 7. Crew and survivors	APPENDIX_HEAL	TiberiumHeal=.010
+radar-events	docs/DECISIONS.md	### R85. RA7 orders, controls and original rate-limited announcements	### R86. RA7 last-stand fixture preserves its explicit current-sight scenario	R85	At most32
+retaliation	docs/DECISIONS.md	### D29. Combat in the simulation (PLAN.md section 5, equations 1 and 2)	### D30. Visibility, shroud and fog, and hiding of unseen enemies (PLAN.md section 5, equation 6)	D29	plain move order
+reveal-fire	docs/DECISIONS.md	### R84. RA7 shroud-only matches, concealment timing and reconnaissance	### R85. RA7 orders, controls and original rate-limited announcements	R84	Gap uses
+reveal-fire	docs/RA2_PARITY_PLAN.md	### 4.13 Specialists and superweapons (RA6)	### 4.14 Vision (RA7)	PLAN4.13	Chrono move
+scatter-controls	docs/DECISIONS.md	### R47. RA4: veterancy	### R48. RA4: crews and survivors	R47	scatter
+scatter-controls	docs/DECISIONS.md	### R85. RA7 orders, controls and original rate-limited announcements	### R86. RA7 last-stand fixture preserves its explicit current-sight scenario	R85	At most32
+stupid-hunt	docs/DECISIONS.md	### R91. RA8 country plans, source difficulty and declared AI policy	### R92. RA8 honest specialist strategy and non-starving endings	R91	first-hit damage remains equal
+suppression	docs/DECISIONS.md	### R47. RA4: veterancy	### R48. RA4: crews and survivors	R47	scatter
+suppression	docs/DECISIONS.md	### R85. RA7 orders, controls and original rate-limited announcements	### R86. RA7 last-stand fixture preserves its explicit current-sight scenario	R85	At most32
+target-cadence	docs/DECISIONS.md	### D29. Combat in the simulation (PLAN.md section 5, equations 1 and 2)	### D30. Visibility, shroud and fog, and hiding of unseen enemies (PLAN.md section 5, equation 6)	D29	plain move order
+target-cadence	docs/DECISIONS.md	### R85. RA7 orders, controls and original rate-limited announcements	### R86. RA7 last-stand fixture preserves its explicit current-sight scenario	R85	At most32
+threat-score	docs/DECISIONS.md	### R84. RA7 shroud-only matches, concealment timing and reconnaissance	### R85. RA7 orders, controls and original rate-limited announcements	R84	Gap uses
+threat-score	docs/DECISIONS.md	### R91. RA8 country plans, source difficulty and declared AI policy	### R92. RA8 honest specialist strategy and non-starving endings	R91	first-hit damage remains equal
+waypoint-count	docs/DECISIONS.md	### R85. RA7 orders, controls and original rate-limited announcements	### R86. RA7 last-stand fixture preserves its explicit current-sight scenario	R85	At most32

@@ -1,0 +1,21 @@
+{
+  "utc": "2026-10-21T04:24:11.341767+00:00",
+  "completed_utc": "2026-10-21T04:25:37.697749+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "ra9_export_actual_completion174_atom_proposals",
+    "--",
+    "--nocapture"
+  ],
+  "exit_code": 0,
+  "seconds": 86.356,
+  "input_count": 656,
+  "input_drift": [],
+  "scope": "Preliminary release actual174proposal export only;143plussole146contract+150completion audit guard repairs; no admission/native/fidelity/finalgate"
+}

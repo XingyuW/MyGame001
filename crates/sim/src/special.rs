@@ -267,6 +267,7 @@ fn area(world: &mut World, effect: Effect, point: crate::SubPos, direct: Option<
             direct,
             firepower_pm: 1000,
             source: None,
+            identity: None,
         },
         // A radiation zone pulses on everything in it once a second: no event for each.
         effect != Effect::Radiation,
@@ -327,6 +328,7 @@ pub(crate) fn nearest_cell_of(foot: Footprint, from: CellPos) -> CellPos {
 }
 pub(crate) fn clear_orders(world: &mut World, e: Entity) {
     if let Some(id) = world.get::<SimId>(e).copied() {
+        auto_defuse::cancel(world, id);
         world.resource_mut::<crate::TacticalState>().clear(id);
     }
     if let Some(mut o) = world.get_mut::<Orders>(e) {
@@ -404,6 +406,7 @@ fn share_of(hp: i32, from: i32, to: i32) -> i32 {
 }
 
 mod advance;
+mod auto_defuse;
 mod carrier;
 mod commands;
 pub(crate) use commands::{bridge_goal_ready, service_intent_valid};
@@ -432,6 +435,7 @@ use transport::unload_ready;
 
 pub(crate) mod infantry;
 pub(crate) mod radiation;
+pub(crate) mod scenery;
 
 /// Context action the player's unit may perform on a known target. Runs the same read-only
 /// validator as Interact, so cursor hints cannot disclose hidden targets or promise invalid jobs.
@@ -474,6 +478,9 @@ pub fn interaction_label(
         return None;
     }
     if let Some((cell, _)) = world.resource::<crate::Props>().get(target) {
+        if let Some(label) = scenery::label(world, defs, &a, target) {
+            return label.ok();
+        }
         if !world
             .resource::<Players>()
             .get(player)?

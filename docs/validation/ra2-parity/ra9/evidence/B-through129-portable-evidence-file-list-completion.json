@@ -1,0 +1,26 @@
+{
+  "status": "FILE_LIST_ONLY_NO_ARCHIVE_OR_CANONICAL_COPY",
+  "source_scope": "a706429c38f15d4b1d51ed84130f261bb464dff7b95db4f2401469af96de019f",
+  "listed_unique_byte_files": 226,
+  "same_byte_aliases": 9,
+  "listed_bytes": 7932379,
+  "seven_direct_route_roots": 7,
+  "source_owned_authority_files_not_copied": 9,
+  "repository_pin_refs_not_copied": 219,
+  "unresolved_external_provenance_refs": [],
+  "outputs": [
+    {
+      "path": "B-through129-portable-evidence-file-list.json",
+      "bytes": 218862,
+      "sha256": "eb193148ffc774d1e8cc268c1f020e12fbc82fc7128ccb945b2e98d22df5cc13"
+    },
+    {
+      "path": "B-through129-portable-evidence-file-list.tsv",
+      "bytes": 101655,
+      "sha256": "5fdeddde3339199a7da3f32eb2c49dd8f62bcdc500c0e6b48793cc421be613b9"
+    }
+  ],
+  "scope": "Actual receipt/route/Scope/causal evidence graph only. Current source and acceptance masters referenced by path/hash and not duplicated; no sealed draft repository/build/media/originalINI imports. Active131 and future final-gate evidence excluded/pending.",
+  "all_B_writes_finished": true,
+  "no_new_directories": true
+}

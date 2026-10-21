@@ -1,0 +1,17 @@
+{
+  "utc": "2026-10-21T01:23:04.049328+00:00",
+  "ended_utc": "2026-10-21T01:23:11.878883+00:00",
+  "command": [
+    "cargo",
+    "clippy",
+    "--workspace",
+    "--all-targets",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "exit_code": 0,
+  "seconds": 7.829,
+  "lease": "RA8 serial functional phase jobs1; mandatory strict after exact two test expression correction",
+  "input_mismatches": []
+}

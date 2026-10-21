@@ -1,0 +1,224 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+warning: unused import: `CellPos`
+ --> crates/sim/tests/ra9_squid.rs:4:17
+  |
+4 | use sim::{Cell, CellPos, Command, Grid, SimEvent, SpecialState};
+  |                 ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `sim` (test "ra9_squid") generated 1 warning (run `cargo fix --test "ra9_squid" -p sim` to apply 1 suggestion)
+error: expected one of `...`, `..=`, `..`, `=>`, `if`, or `|`, found `depth`
+  --> crates/sim/tests/ra9_audit/array-negatives.rs:13:144
+   |
+13 | ...fixture nesting".into());}},','if depth==0=>{out.push(raw[begin..index].trim().into());begin=index+1;},_=>{}}
+   |                                      ^^^^^ expected one of `...`, `..=`, `..`, `=>`, `if`, or `|`
+
+error: character constant must be escaped: `\t`
+  --> crates/sim/tests/ra9_audit/source-routes.rs:10:172
+   |
+10 | ...=lines.next().ok_or("empty routing source catalogue")?.split('    ').collect::<Vec<_>>();if h.iter().copied().collect::<BTreeSet<...
+   |                                                                  ^^^^
+   |
+help: escape the character
+   |
+10 | fn table(text:&str,names:&[&str])->AuditResult<Vec<BTreeMap<String,String>>>{let mut lines=text.lines();let h=lines.next().ok_or("empty routing source catalogue")?.split('\t').collect::<Vec<_>>();if h.iter().copied().collect::<BTreeSet<_>>().len()!=h.len()||names.iter().any(|n|!h.contains(n)){return Err("routing catalogue required/duplicate columns".into());}lines.map(|line|{let r=line.split('    ').collect::<Vec<_>>();if r.len()!=h.len(){return Err("routing source catalogue row width".into());}Ok(h.iter().zip(r).map(|(k,v)|(k.to_string(),v.to_string())).collect())}).collect()}
+   |                                                                                                                                                                            ++
+
+error: character constant must be escaped: `\t`
+  --> crates/sim/tests/ra9_audit/source-routes.rs:10:396
+   |
+10 | ...uplicate columns".into());}lines.map(|line|{let r=line.split('    ').collect::<Vec<_>>();if r.len()!=h.len(){return Err("routing ...
+   |                                                                  ^^^^
+   |
+help: escape the character
+   |
+10 | fn table(text:&str,names:&[&str])->AuditResult<Vec<BTreeMap<String,String>>>{let mut lines=text.lines();let h=lines.next().ok_or("empty routing source catalogue")?.split('    ').collect::<Vec<_>>();if h.iter().copied().collect::<BTreeSet<_>>().len()!=h.len()||names.iter().any(|n|!h.contains(n)){return Err("routing catalogue required/duplicate columns".into());}lines.map(|line|{let r=line.split('\t').collect::<Vec<_>>();if r.len()!=h.len(){return Err("routing source catalogue row width".into());}Ok(h.iter().zip(r).map(|(k,v)|(k.to_string(),v.to_string())).collect())}).collect()}
+   |                                                                                                                                                                                                                                                                                                                                                                                                               ++
+
+error: couldn't read `crates/sim/tests/ra9_audit/legacy904-death-selectors.tsv`: No such file or directory (os error 2)
+  --> crates/sim/tests/ra9_audit/legacy904-support.rs:43:18
+   |
+43 |         if text!=include_str!("legacy904-death-selectors.tsv"){
+   |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0425]: cannot find value `MODEL_SHA` in this scope
+  --> crates/sim/tests/ra9_audit/guard75-negatives.rs:16:81
+   |
+16 |  Scope{observed_original:ORIGINAL,original_sha256:RULES_SHA,model_census_sha256:MODEL_SHA,
+   |                                                                                 ^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find value `MODEL_SCOPE` in this scope
+  --> crates/sim/tests/ra9_audit/guard75-negatives.rs:17:23
+   |
+17 |  observed_model_scope:MODEL_SCOPE,verified_final_binding:"0000000000000000000000000000000000000000000000000000000000000000"}
+   |                       ^^^^^^^^^^^ not found in this scope
+
+error[E0603]: module `rules` is private
+   --> crates/sim/tests/ra9_audit/array-plans.rs:110:29
+    |
+110 | fn difficulty_value(d:&sim::rules::DifficultyRules,field:usize)->AuditResult<String>{Ok(match field{
+    |                             ^^^^^  --------------- struct `DifficultyRules` is not publicly re-exported
+    |                             |
+    |                             private module
+    |
+note: the module `rules` is defined here
+   --> crates/sim/src/lib.rs:43:1
+    |
+ 43 | mod rules;
+    | ^^^^^^^^^
+
+warning: unused import: `scaled`
+ --> crates/sim/tests/ra9_audit/rules.rs:6:35
+  |
+6 | use super::actual::{rule,optional,scaled,check_int};
+  |                                   ^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `scaled`
+ --> crates/sim/tests/ra9_audit/items.rs:6:35
+  |
+6 | use super::actual::{rule,optional,scaled,positive_round,check_int};
+  |                                   ^^^^^^
+
+warning: unused imports: `Expected` and `WitnessId`
+ --> crates/sim/tests/ra9_audit/native.rs:4:31
+  |
+4 | use super::{Audit,AuditResult,Expected,Reference,SourceKey,WitnessId};
+  |                               ^^^^^^^^                     ^^^^^^^^^
+
+warning: unused import: `unit_id`
+ --> crates/sim/tests/ra9_audit/native.rs:7:36
+  |
+7 | use super::rules::{MappingRow,text,unit_id};
+  |                                    ^^^^^^^
+
+error[E0308]: mismatched types
+   --> crates/sim/tests/ra9_audit/rules.rs:274:35
+    |
+274 |         let houses=rule(r,"Sides",name)?.try_map(|v|csv(&v))?;
+    |                    ----           ^^^^ expected `&str`, found `Side`
+    |                    |
+    |                    arguments to this function are incorrect
+    |
+note: function defined here
+   --> crates/sim/tests/ra9_audit/actual.rs:36:15
+    |
+ 36 | pub(super) fn rule(r:&Reference,section:&str,key:&str)->AuditResult<Expected<String>> {
+    |               ^^^^                           --------
+
+error[E0308]: mismatched types
+   --> crates/sim/tests/ra9_audit/rules.rs:275:32
+    |
+275 |         let pool=skirmish.side(side).ok_or_else(||format!("missing side starting pool {side:?}"))?;
+    |                           ---- ^^^^ expected `Side`, found `&str`
+    |                           |
+    |                           arguments to this method are incorrect
+    |
+note: method defined here
+   --> crates/sim/src/skirmish_defs.rs:288:12
+    |
+288 |     pub fn side(&self, side: Side) -> Option<&SideStart> {
+    |            ^^^^
+
+error[E0599]: no method named `id` found for reference `&str` in the current scope
+    --> crates/sim/tests/ra9_audit/rules.rs:290:60
+     |
+ 290 | ...   check_int(a,&format!("start.{}.{}@{}",side.id(),row.game_id,row.section),&format!("skirmish.sides.{label}.membership"),"skir...
+     |                                                  ^^
+     |
+help: there is a method `find` with a similar name, but with different arguments
+    --> /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/str/mod.rs:1496:5
+     |
+1496 |     pub fn find<P: Pattern>(&self, pat: P) -> Option<usize> {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no method named `id` found for reference `&str` in the current scope
+    --> crates/sim/tests/ra9_audit/rules.rs:290:186
+     |
+ 290 | ...embership"),"skirmish",&format!("starting.{}.{label}.{}",side.id(),row.game_id),
+     |                                                                  ^^
+     |
+help: there is a method `find` with a similar name, but with different arguments
+    --> /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/str/mod.rs:1496:5
+     |
+1496 |     pub fn find<P: Pattern>(&self, pat: P) -> Option<usize> {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no method named `id` found for reference `&str` in the current scope
+    --> crates/sim/tests/ra9_audit/rules.rs:302:45
+     |
+ 302 | ...   text(a,&format!("start.{}",side.id()),&format!("skirmish.sides.{label}"),"skirmish",&format!("starting.{}.{label}",side.id()...
+     |                                       ^^
+     |
+help: there is a method `find` with a similar name, but with different arguments
+    --> /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/str/mod.rs:1496:5
+     |
+1496 |     pub fn find<P: Pattern>(&self, pat: P) -> Option<usize> {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no method named `id` found for reference `&str` in the current scope
+    --> crates/sim/tests/ra9_audit/rules.rs:302:133
+     |
+ 302 | ...ides.{label}"),"skirmish",&format!("starting.{}.{label}",side.id()),actual.join(","),expected,"eligible mapped starting types, ...
+     |                                                                  ^^
+     |
+help: there is a method `find` with a similar name, but with different arguments
+    --> /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/str/mod.rs:1496:5
+     |
+1496 |     pub fn find<P: Pattern>(&self, pat: P) -> Option<usize> {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0308]: mismatched types
+  --> crates/sim/tests/ra9_audit/carry38-admission.rs:19:251
+   |
+19 | ...let role=role_text(m.role)?;let base=slots(d,t,false)?;let elite=slots(d,t,true)?;if role!=r[3]||base!=r[4]||elite!=r[5]{return E...
+   |                                         -----   ^ expected `&CombatTerms`, found `CombatTerms`
+   |                                         |
+   |                                         arguments to this function are incorrect
+   |
+note: function defined here
+  --> crates/sim/tests/ra9_audit/carry38-admission.rs:17:4
+   |
+17 | fn slots(d:&Definitions,terms:&sim::CombatTerms,elite:bool)->AuditResult<String>{terms.weapons(elite).into_iter().flatten().map(|k|d...
+   |    ^^^^^                -----------------------
+help: consider borrowing here
+   |
+19 |  let k=d.unit_kind(r[2]).ok_or("carry38 real unit missing")?;let m=d.metadata(sim::ProductionItem::Unit(k)).ok_or("carry38 metadata missing")?;let t=d.unit_combat(k).ok_or("carry38 combat terms missing")?;let role=role_text(m.role)?;let base=slots(d,&t,false)?;let elite=slots(d,t,true)?;if role!=r[3]||base!=r[4]||elite!=r[5]{return Err(format!("carry38 actual role/weapon policy changed {}",r[2]));}
+   |                                                                                                                                                                                                                                                           +
+
+error[E0308]: mismatched types
+  --> crates/sim/tests/ra9_audit/carry38-admission.rs:19:279
+   |
+19 | ...let base=slots(d,t,false)?;let elite=slots(d,t,true)?;if role!=r[3]||base!=r[4]||elite!=r[5]{return Err(format!("carry38 actual r...
+   |                                         -----   ^ expected `&CombatTerms`, found `CombatTerms`
+   |                                         |
+   |                                         arguments to this function are incorrect
+   |
+note: function defined here
+  --> crates/sim/tests/ra9_audit/carry38-admission.rs:17:4
+   |
+17 | fn slots(d:&Definitions,terms:&sim::CombatTerms,elite:bool)->AuditResult<String>{terms.weapons(elite).into_iter().flatten().map(|k|d...
+   |    ^^^^^                -----------------------
+help: consider borrowing here
+   |
+19 |  let k=d.unit_kind(r[2]).ok_or("carry38 real unit missing")?;let m=d.metadata(sim::ProductionItem::Unit(k)).ok_or("carry38 metadata missing")?;let t=d.unit_combat(k).ok_or("carry38 combat terms missing")?;let role=role_text(m.role)?;let base=slots(d,t,false)?;let elite=slots(d,&t,true)?;if role!=r[3]||base!=r[4]||elite!=r[5]{return Err(format!("carry38 actual role/weapon policy changed {}",r[2]));}
+   |                                                                                                                                                                                                                                                                                       +
+
+error[E0433]: cannot find type `ProductionItem` in this scope
+  --> crates/sim/tests/ra9_audit/owned.rs:93:44
+   |
+93 | ...   let(f,l,identity,value)=match item{ProductionItem::Unit(k)=>("units.ron","units","id",d.unit(k).ok_or("unit")?.sprite.clone())...
+   |                                          ^^^^^^^^^^^^^^ use of undeclared type `ProductionItem`
+
+error[E0433]: cannot find type `ProductionItem` in this scope
+  --> crates/sim/tests/ra9_audit/owned.rs:93:136
+   |
+93 | ...it(k).ok_or("unit")?.sprite.clone()),ProductionItem::Building(k)=>("economy.ron","buildings","id",d.building(k).ok_or("building")...
+   |                                         ^^^^^^^^^^^^^^ use of undeclared type `ProductionItem`
+
+Some errors have detailed explanations: E0308, E0425, E0433, E0599, E0603.
+For more information about an error, try `rustc --explain E0308`.
+warning: `sim` (test "ra9_data_parity") generated 4 warnings
+error: could not compile `sim` (test "ra9_data_parity") due to 17 previous errors; 4 warnings emitted

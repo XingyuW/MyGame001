@@ -20,7 +20,7 @@
 //! ```
 //!
 //! * at most [`MAX_SETTINGS_BYTES`] bytes, read with that bound, from a regular file (a directory,
-//!   device, or named pipe is rejected before it is opened);
+//!   device, or named pipe is rejected using the nonblocking opened handle);
 //! * printable ASCII, space, tab, line feed, and carriage return only;
 //! * every line is empty, a comment starting with `#`, or `key = value` (spaces around `=`
 //!   optional); every key of [`KEYS`] exactly once, no other key (no silent defaults);
@@ -41,8 +41,9 @@
 //! directory and removes it, so that it never reads or changes the player's settings.
 
 use std::fmt;
-use std::io::Read;
+use std::io::Write;
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicU64, Ordering};
 
 use bevy::prelude::*;
 use bevy::ui::FocusPolicy;
@@ -309,40 +310,30 @@ pub fn read_settings(path: &Path) -> Result<Option<Settings>, SettingsError> {
         key,
         kind,
     };
-    let metadata = match std::fs::symlink_metadata(path) {
-        Ok(_) => std::fs::metadata(path)
-            .map_err(|e| error(0, String::new(), SettingsErrorKind::Read(e.to_string())))?,
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(None),
-        Err(e) => {
+    let bytes = match sim::read_bounded_regular(path, MAX_SETTINGS_BYTES) {
+        Ok(bytes) => bytes,
+        Err(sim::BoundedFileError::Read(cause)) => {
+            // Preserve missing-path defaults and rejection of an existing dangling symlink.
+            if cause.kind() == std::io::ErrorKind::NotFound
+                && std::fs::symlink_metadata(path)
+                    .is_err_and(|error| error.kind() == std::io::ErrorKind::NotFound)
+            {
+                return Ok(None);
+            }
             return Err(error(
                 0,
                 String::new(),
-                SettingsErrorKind::Read(e.to_string()),
+                SettingsErrorKind::Read(cause.to_string()),
+            ));
+        }
+        Err(sim::BoundedFileError::TooLarge { max_bytes }) => {
+            return Err(error(
+                0,
+                String::new(),
+                SettingsErrorKind::FileTooLarge { max_bytes },
             ));
         }
     };
-    if !metadata.is_file() {
-        return Err(error(
-            0,
-            String::new(),
-            SettingsErrorKind::Read("not a regular file".into()),
-        ));
-    }
-    let file = std::fs::File::open(path)
-        .map_err(|e| error(0, String::new(), SettingsErrorKind::Read(e.to_string())))?;
-    let mut bytes = Vec::new();
-    file.take(MAX_SETTINGS_BYTES + 1)
-        .read_to_end(&mut bytes)
-        .map_err(|e| error(0, String::new(), SettingsErrorKind::Read(e.to_string())))?;
-    if u64::try_from(bytes.len()).map_or(true, |len| len > MAX_SETTINGS_BYTES) {
-        return Err(error(
-            0,
-            String::new(),
-            SettingsErrorKind::FileTooLarge {
-                max_bytes: MAX_SETTINGS_BYTES,
-            },
-        ));
-    }
     parse_settings(&bytes)
         .map(Some)
         .map_err(|(line, key, kind)| error(line, key, kind))
@@ -350,13 +341,49 @@ pub fn read_settings(path: &Path) -> Result<Option<Settings>, SettingsError> {
 
 /// Writes `settings` to `path`: the directory is created if needed, and the text is written to a
 /// temporary file beside it that is then renamed over it.
+static SETTINGS_TEMP_SEQUENCE: AtomicU64 = AtomicU64::new(0);
+
+struct SettingsTemporary(PathBuf);
+impl Drop for SettingsTemporary {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_file(&self.0);
+    }
+}
+
+fn create_settings_temporary(path: &Path) -> std::io::Result<(std::fs::File, SettingsTemporary)> {
+    let file = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(path)?;
+    Ok((file, SettingsTemporary(path.to_owned())))
+}
+
 pub fn write_settings(path: &Path, settings: &Settings) -> std::io::Result<()> {
-    if let Some(dir) = path.parent() {
+    if let Some(dir) = path
+        .parent()
+        .filter(|parent| !parent.as_os_str().is_empty())
+    {
         std::fs::create_dir_all(dir)?;
     }
-    let temporary = path.with_extension("txt.tmp");
-    std::fs::write(&temporary, format_settings(settings))?;
-    std::fs::rename(&temporary, path)
+    // Exclusive creation does not follow a pre-existing link or open an existing FIFO.
+    for _ in 0..64 {
+        let sequence = SETTINGS_TEMP_SEQUENCE.fetch_add(1, Ordering::Relaxed);
+        let temporary = path.with_extension(format!("txt.tmp.{}.{sequence}", std::process::id()));
+        let (mut file, temporary) = match create_settings_temporary(&temporary) {
+            Ok(created) => created,
+            Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
+            Err(error) => return Err(error),
+        };
+        file.write_all(format_settings(settings).as_bytes())?;
+        file.flush()?;
+        drop(file);
+        std::fs::rename(&temporary.0, path)?;
+        return Ok(());
+    }
+    Err(std::io::Error::new(
+        std::io::ErrorKind::AlreadyExists,
+        "no unused settings temporary filename",
+    ))
 }
 
 /// `~/Library/Application Support/MyGame001/settings.txt`, or `None` without `HOME`.
@@ -769,14 +796,22 @@ mod tests {
         Settings::default()
     }
 
+    static TEST_DIRECTORY_SEQUENCE: AtomicU64 = AtomicU64::new(0);
+
     fn temp_dir(name: &str) -> PathBuf {
-        let dir = std::env::temp_dir().join(format!(
-            "mygame001_options_tests_{}_{name}",
-            std::process::id()
-        ));
-        let _ = std::fs::remove_dir_all(&dir);
-        std::fs::create_dir_all(&dir).expect("temporary directory");
-        dir
+        for _ in 0..128 {
+            let sequence = TEST_DIRECTORY_SEQUENCE.fetch_add(1, Ordering::Relaxed);
+            let dir = std::env::temp_dir().join(format!(
+                "mygame001_options_tests_{}_{name}_{sequence}",
+                std::process::id()
+            ));
+            match std::fs::create_dir(&dir) {
+                Ok(()) => return dir,
+                Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
+                Err(error) => panic!("create owned temporary directory: {error}"),
+            }
+        }
+        panic!("no exclusive settings-test directory within bounded attempts");
     }
 
     #[test]
@@ -1108,5 +1143,231 @@ mod tests {
             .sum::<usize>()
             + 1;
         assert_eq!(buttons, OPTIONS_BUTTONS);
+    }
+
+    #[cfg(unix)]
+    fn ra9_owned_child(test: &str, mode: &str, path: &std::path::Path) {
+        struct Owned(std::process::Child);
+        impl Drop for Owned {
+            fn drop(&mut self) {
+                let _ = self.0.kill();
+                let _ = self.0.wait();
+            }
+        }
+        let mut child = Owned(
+            std::process::Command::new(std::env::current_exe().expect("test executable"))
+                .args(["--exact", test, "--nocapture"])
+                .env("MYGAME_RA9_BOUNDARY_CHILD_MODE", mode)
+                .env("MYGAME_RA9_BOUNDARY_CHILD_PATH", path)
+                .spawn()
+                .expect("owned bounded child"),
+        );
+        let started = std::time::Instant::now();
+        loop {
+            if let Some(status) = child.0.try_wait().expect("child status") {
+                assert!(status.success(), "native child test failed: {status}");
+                return;
+            }
+            assert!(
+                started.elapsed() < std::time::Duration::from_secs(5),
+                "native child blocked; owned child is killed and waited during unwinding"
+            );
+            std::thread::sleep(std::time::Duration::from_millis(5));
+        }
+    }
+    // Append inside options::tests. Small short-lived input files use the existing temp helper.
+    #[test]
+    #[cfg(unix)]
+    fn ra9_settings_fifos_are_bounded_and_fixed_temporary_nodes_are_never_opened() {
+        if let Some(mode) = std::env::var_os("MYGAME_RA9_BOUNDARY_CHILD_MODE") {
+            let path =
+                PathBuf::from(std::env::var_os("MYGAME_RA9_BOUNDARY_CHILD_PATH").expect("path"));
+            match mode.to_str().expect("mode") {
+                "read" => assert_eq!(
+                    read_settings(&path).expect_err("FIFO").kind,
+                    SettingsErrorKind::Read("not a regular file".into())
+                ),
+                "write" => {
+                    write_settings(&path, &defaults()).expect("atomic write bypasses old FIFO");
+                }
+                mode => panic!("unknown child mode {mode}"),
+            }
+            return;
+        }
+        use std::os::unix::fs::{FileTypeExt, symlink};
+        let dir = temp_dir("ra9_owned_fifo");
+        let pipe = dir.join("pipe");
+        assert!(
+            std::process::Command::new("mkfifo")
+                .arg(&pipe)
+                .status()
+                .expect("mkfifo")
+                .success()
+        );
+        ra9_owned_child(
+            "options::tests::ra9_settings_fifos_are_bounded_and_fixed_temporary_nodes_are_never_opened",
+            "read",
+            &pipe,
+        );
+        let link = dir.join("pipe_link");
+        symlink(&pipe, &link).expect("FIFO symlink");
+        ra9_owned_child(
+            "options::tests::ra9_settings_fifos_are_bounded_and_fixed_temporary_nodes_are_never_opened",
+            "read",
+            &link,
+        );
+        let destination = dir.join("settings.txt");
+        let legacy = destination.with_extension("txt.tmp");
+        assert!(
+            std::process::Command::new("mkfifo")
+                .arg(&legacy)
+                .status()
+                .expect("mkfifo")
+                .success()
+        );
+        ra9_owned_child(
+            "options::tests::ra9_settings_fifos_are_bounded_and_fixed_temporary_nodes_are_never_opened",
+            "write",
+            &destination,
+        );
+        assert!(
+            std::fs::metadata(&legacy)
+                .expect("untouched FIFO")
+                .file_type()
+                .is_fifo()
+        );
+        assert_eq!(read_settings(&destination), Ok(Some(defaults())));
+        std::fs::remove_dir_all(dir).expect("own tiny fixtures");
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn ra9_settings_exclusive_creation_links_target_replacement_and_dangling_reads() {
+        use std::os::unix::fs::symlink;
+        let dir = temp_dir("ra9_exclusive");
+        let path = dir.join("settings.txt");
+        let victim = dir.join("victim");
+        std::fs::write(&victim, b"preserve victim").expect("victim");
+        let legacy = path.with_extension("txt.tmp");
+        symlink(&victim, &legacy).expect("legacy temporary link");
+        write_settings(&path, &defaults()).expect("actual complete writer");
+        assert_eq!(std::fs::read(&victim).expect("victim"), b"preserve victim");
+        assert!(
+            std::fs::symlink_metadata(&legacy)
+                .expect("legacy link")
+                .is_symlink()
+        );
+        assert_eq!(read_settings(&path), Ok(Some(defaults())));
+        // Exact creation collision on the actual production create_new helper is deterministic.
+        let candidate = dir.join("candidate");
+        symlink(&victim, &candidate).expect("candidate link");
+        let error = match create_settings_temporary(&candidate) {
+            Err(error) => error,
+            Ok(_) => panic!("exclusive creation followed an existing link"),
+        };
+        assert_eq!(error.kind(), std::io::ErrorKind::AlreadyExists);
+        assert_eq!(std::fs::read(&victim).expect("victim"), b"preserve victim");
+        std::fs::remove_file(&path).expect("destination");
+        symlink(&victim, &path).expect("target symlink");
+        write_settings(&path, &defaults()).expect("rename replaces target link");
+        assert!(
+            !std::fs::symlink_metadata(&path)
+                .expect("new regular file")
+                .is_symlink()
+        );
+        assert_eq!(std::fs::read(&victim).expect("victim"), b"preserve victim");
+        let dangling = dir.join("dangling");
+        symlink(dir.join("missing"), &dangling).expect("dangling link");
+        assert!(matches!(
+            read_settings(&dangling),
+            Err(SettingsError {
+                kind: SettingsErrorKind::Read(_),
+                ..
+            })
+        ));
+        assert_eq!(read_settings(&dir.join("absent")), Ok(None));
+        let good_link = dir.join("good_link");
+        symlink(&path, &good_link).expect("regular link");
+        assert_eq!(read_settings(&good_link), Ok(Some(defaults())));
+        std::fs::remove_dir_all(dir).expect("own tiny fixtures");
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn ra9_settings_target_fifo_is_replaced_atomically() {
+        if std::env::var_os("MYGAME_RA9_BOUNDARY_CHILD_MODE").is_some() {
+            let path =
+                PathBuf::from(std::env::var_os("MYGAME_RA9_BOUNDARY_CHILD_PATH").expect("path"));
+            write_settings(&path, &defaults()).expect("target FIFO replaced by rename");
+            assert_eq!(read_settings(&path), Ok(Some(defaults())));
+            return;
+        }
+        let dir = temp_dir("ra9_fifo_target");
+        let path = dir.join("settings.txt");
+        assert!(
+            std::process::Command::new("mkfifo")
+                .arg(&path)
+                .status()
+                .expect("mkfifo")
+                .success()
+        );
+        ra9_owned_child(
+            "options::tests::ra9_settings_target_fifo_is_replaced_atomically",
+            "replace",
+            &path,
+        );
+        assert!(
+            std::fs::metadata(&path)
+                .expect("new regular destination")
+                .is_file()
+        );
+        std::fs::remove_dir_all(dir).expect("own tiny fixtures");
+    }
+
+    #[test]
+    fn ra9_settings_failed_rename_cleans_owned_file_and_concurrent_writes_are_complete() {
+        let dir = temp_dir("ra9_rename");
+        let destination = dir.join("settings.txt");
+        std::fs::create_dir(&destination).expect("obstructing directory");
+        let unrelated = destination.with_extension("txt.tmp");
+        std::fs::write(&unrelated, b"old temporary").expect("unrelated");
+        assert!(write_settings(&destination, &defaults()).is_err());
+        assert!(destination.is_dir());
+        assert_eq!(
+            std::fs::read(&unrelated).expect("unrelated"),
+            b"old temporary"
+        );
+        assert_eq!(
+            std::fs::read_dir(&dir).expect("entries").count(),
+            2,
+            "owned temporary cleaned on failure"
+        );
+        std::fs::remove_dir(&destination).expect("obstruction");
+        let mut alternate = defaults();
+        alternate.volume.muted = !alternate.volume.muted;
+        let expected = [defaults(), alternate];
+        let threads: Vec<_> = expected
+            .iter()
+            .copied()
+            .map(|settings| {
+                let destination = destination.clone();
+                std::thread::spawn(move || write_settings(&destination, &settings))
+            })
+            .collect();
+        for thread in threads {
+            thread
+                .join()
+                .expect("writer did not panic")
+                .expect("writer");
+        }
+        let actual = read_settings(&destination)
+            .expect("whole parse")
+            .expect("exists");
+        assert!(
+            expected.contains(&actual),
+            "one complete write, never interleaved settings"
+        );
+        assert_eq!(std::fs::read_dir(&dir).expect("entries").count(), 2);
+        std::fs::remove_dir_all(dir).expect("own tiny fixtures");
     }
 }

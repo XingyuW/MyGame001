@@ -1,0 +1,20 @@
+{
+  "utc": "2026-10-20T23:20:58.166915+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "--",
+    "every_shipped",
+    "the_shipped",
+    "the_conversions",
+    "--test-threads=1"
+  ],
+  "exit_code": 0,
+  "seconds": 0.642,
+  "lease": "RA8revocable functional phase jobs1",
+  "status": "actual preserved five original parity assertions; preliminary"
+}

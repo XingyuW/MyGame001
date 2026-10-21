@@ -1,0 +1,39 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3m 16s
+     Running tests/m9_arsenal.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m9_arsenal-576bcc23ff17a2bb)
+
+running 24 tests
+test a_clone_goes_to_the_rally_point_of_the_cloning_vats ... ok
+test aircraft_fly_over_ground_units_and_ground_units_drive_under_them ... ok
+test aircraft_strike_returns_to_air_facility_and_rearms ... ok
+test anti_air_defence_ignores_ground_and_stops_without_power ... ok
+test carrier_launches_and_recovers_real_aircraft_without_airbase ... ok
+test cloning_produces_one_extra_infantry_without_recursive_clones ... ok
+test collectors_deliver_and_chrono_miner_teleports ... ok
+test deterministic_extended_state_includes_abilities ... ok
+test every_item_executes_queue_cost_completion_and_placement_or_spawn ... ok
+test exact_unified_roster_and_categories ... ok
+test gap_satellite_and_direct_vision_use_the_existing_fog_grid ... ok
+test lost_prerequisites_pause_queued_progress_and_refund_exactly ... ok
+test mcv_deploys_and_new_yard_produces ... ok
+test mind_control_reverts_when_controller_is_destroyed ... ok
+test ore_attack_orders_repeat_deliveries_remember_field_and_stop_on_override ... ok
+test power_loss_disables_defence_and_pauses_superweapon_charging ... ok
+test prerequisites_refunds_ready_cancellation_and_low_power ... ok
+test purifier_adds_income_and_radiation_spares_air_and_its_operator ... ok
+test shoreline_and_domain_navigation_are_enforced ... ok
+test spy_infiltration_steals_refinery_credits_and_dogs_reveal_spies ... ok
+test super_me_every_item_costs_one_and_finishes_in_tenth_time ... ok
+test superweapons_charge_activate_and_reset_without_resource_duplication ... ok
+test timed_explosives_radiation_and_vehicle_disable_have_effects ... ok
+test transport_ifv_and_engineer_commands_execute ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.78s
+
+     Running tests/ra9_airdock_retry.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_airdock_retry-3d349065cb9ab80a)
+
+running 1 test
+test ra9_airdock_occupied_cell_public_release_allows_native_return_and_rearm ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+

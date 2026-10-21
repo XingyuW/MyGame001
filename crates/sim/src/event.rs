@@ -20,6 +20,13 @@ use crate::map::{CellPos, SubPos};
 /// Something that happened during a tick.
 #[derive(Message, Clone, Debug, PartialEq, Eq)]
 pub enum SimEvent {
+    /// Public location notice; radar display still follows powered-radar policy.
+    BuildingRevealed {
+        player: PlayerId,
+        building: SimId,
+        kind: BuildingKind,
+        origin: CellPos,
+    },
     SuperweaponBuilt {
         player: PlayerId,
         role: crate::Role,

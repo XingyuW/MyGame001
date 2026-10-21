@@ -1,0 +1,279 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+error[E0425]: cannot find value `rules` in this scope
+  --> crates/sim/tests/ra9_audit/rules.rs:80:8
+   |
+80 |     if rules.difficulties.len()!=rows.len(){return Err("exact3 actual difficulty slots".into());}
+   |        ^^^^^
+   |
+  ::: crates/sim/tests/ra9_audit/actual.rs:36:1
+   |
+36 | pub(super) fn rule(r:&Reference,section:&str,key:&str)->AuditResult<Expected<String>> {
+   | ------------------------------------------------------------------------------------- similarly named function `rule` defined here
+   |
+help: a function with a similar name exists
+   |
+80 -     if rules.difficulties.len()!=rows.len(){return Err("exact3 actual difficulty slots".into());}
+80 +     if rule.difficulties.len()!=rows.len(){return Err("exact3 actual difficulty slots".into());}
+   |
+
+error[E0425]: cannot find value `rules` in this scope
+  --> crates/sim/tests/ra9_audit/rules.rs:83:19
+   |
+83 |         let game=&rules.difficulties[position];
+   |                   ^^^^^
+   |
+  ::: crates/sim/tests/ra9_audit/actual.rs:36:1
+   |
+36 | pub(super) fn rule(r:&Reference,section:&str,key:&str)->AuditResult<Expected<String>> {
+   | ------------------------------------------------------------------------------------- similarly named function `rule` defined here
+   |
+help: a function with a similar name exists
+   |
+83 -         let game=&rules.difficulties[position];
+83 +         let game=&rule.difficulties[position];
+   |
+
+error[E0425]: cannot find value `rules` in this scope
+   --> crates/sim/tests/ra9_audit/rules.rs:117:8
+    |
+117 |     if rules.countries.len()!=9{return Err("actual nine playable countries".into());}
+    |        ^^^^^
+    |
+   ::: crates/sim/tests/ra9_audit/actual.rs:36:1
+    |
+ 36 | pub(super) fn rule(r:&Reference,section:&str,key:&str)->AuditResult<Expected<String>> {
+    | ------------------------------------------------------------------------------------- similarly named function `rule` defined here
+    |
+help: a function with a similar name exists
+    |
+117 -     if rules.countries.len()!=9{return Err("actual nine playable countries".into());}
+117 +     if rule.countries.len()!=9{return Err("actual nine playable countries".into());}
+    |
+
+error[E0425]: cannot find value `rules` in this scope
+   --> crates/sim/tests/ra9_audit/rules.rs:119:19
+    |
+119 |         let game=&rules.countries[index];let consumer=format!("country[{index}]");
+    |                   ^^^^^
+    |
+   ::: crates/sim/tests/ra9_audit/actual.rs:36:1
+    |
+ 36 | pub(super) fn rule(r:&Reference,section:&str,key:&str)->AuditResult<Expected<String>> {
+    | ------------------------------------------------------------------------------------- similarly named function `rule` defined here
+    |
+help: a function with a similar name exists
+    |
+119 -         let game=&rules.countries[index];let consumer=format!("country[{index}]");
+119 +         let game=&rule.countries[index];let consumer=format!("country[{index}]");
+    |
+
+error[E0425]: cannot find value `rules` in this scope
+   --> crates/sim/tests/ra9_audit/rules.rs:130:24
+    |
+130 |             i128::from(rules.countries.iter().any(|c|c.id==id)),converted(raw,Conversion::Flag)?.because(&registry),display)?;
+    |                        ^^^^^
+    |
+   ::: crates/sim/tests/ra9_audit/actual.rs:36:1
+    |
+ 36 | pub(super) fn rule(r:&Reference,section:&str,key:&str)->AuditResult<Expected<String>> {
+    | ------------------------------------------------------------------------------------- similarly named function `rule` defined here
+    |
+help: a function with a similar name exists
+    |
+130 -             i128::from(rules.countries.iter().any(|c|c.id==id)),converted(raw,Conversion::Flag)?.because(&registry),display)?;
+130 +             i128::from(rule.countries.iter().any(|c|c.id==id)),converted(raw,Conversion::Flag)?.because(&registry),display)?;
+    |
+
+error[E0425]: cannot find value `rules` in this scope
+   --> crates/sim/tests/ra9_audit/rules.rs:138:31
+    |
+138 |         let actual=unique_set(rules.countries.iter().filter(|c|c.side==side).map(|c|c.id.clone()).collect(),"actual side countries")?;
+    |                               ^^^^^
+    |
+   ::: crates/sim/tests/ra9_audit/actual.rs:36:1
+    |
+ 36 | pub(super) fn rule(r:&Reference,section:&str,key:&str)->AuditResult<Expected<String>> {
+    | ------------------------------------------------------------------------------------- similarly named function `rule` defined here
+    |
+help: a function with a similar name exists
+    |
+138 -         let actual=unique_set(rules.countries.iter().filter(|c|c.side==side).map(|c|c.id.clone()).collect(),"actual side countries")?;
+138 +         let actual=unique_set(rule.countries.iter().filter(|c|c.side==side).map(|c|c.id.clone()).collect(),"actual side countries")?;
+    |
+
+error[E0425]: cannot find value `rules` in this scope
+   --> crates/sim/tests/ra9_audit/rules.rs:144:8
+    |
+144 |     if rules.prerequisite_groups.len()!=GROUPS.len(){return Err("exact6 prerequisite groups".into());}
+    |        ^^^^^
+    |
+   ::: crates/sim/tests/ra9_audit/actual.rs:36:1
+    |
+ 36 | pub(super) fn rule(r:&Reference,section:&str,key:&str)->AuditResult<Expected<String>> {
+    | ------------------------------------------------------------------------------------- similarly named function `rule` defined here
+    |
+help: a function with a similar name exists
+    |
+144 -     if rules.prerequisite_groups.len()!=GROUPS.len(){return Err("exact6 prerequisite groups".into());}
+144 +     if rule.prerequisite_groups.len()!=GROUPS.len(){return Err("exact6 prerequisite groups".into());}
+    |
+
+error[E0425]: cannot find value `rules` in this scope
+   --> crates/sim/tests/ra9_audit/rules.rs:146:19
+    |
+146 |         let group=rules.group_id(id).and_then(|k|rules.group(k)).ok_or_else(||format!("missing actual group {id}"))?;
+    |                   ^^^^^
+    |
+   ::: crates/sim/tests/ra9_audit/actual.rs:36:1
+    |
+ 36 | pub(super) fn rule(r:&Reference,section:&str,key:&str)->AuditResult<Expected<String>> {
+    | ------------------------------------------------------------------------------------- similarly named function `rule` defined here
+    |
+help: a function with a similar name exists
+    |
+146 -         let group=rules.group_id(id).and_then(|k|rules.group(k)).ok_or_else(||format!("missing actual group {id}"))?;
+146 +         let group=rule.group_id(id).and_then(|k|rules.group(k)).ok_or_else(||format!("missing actual group {id}"))?;
+    |
+
+error[E0425]: cannot find value `rules` in this scope
+   --> crates/sim/tests/ra9_audit/rules.rs:146:50
+    |
+146 |         let group=rules.group_id(id).and_then(|k|rules.group(k)).ok_or_else(||format!("missing actual group {id}"))?;
+    |                                                  ^^^^^
+    |
+   ::: crates/sim/tests/ra9_audit/actual.rs:36:1
+    |
+ 36 | pub(super) fn rule(r:&Reference,section:&str,key:&str)->AuditResult<Expected<String>> {
+    | ------------------------------------------------------------------------------------- similarly named function `rule` defined here
+    |
+help: a function with a similar name exists
+    |
+146 -         let group=rules.group_id(id).and_then(|k|rules.group(k)).ok_or_else(||format!("missing actual group {id}"))?;
+146 +         let group=rules.group_id(id).and_then(|k|rule.group(k)).ok_or_else(||format!("missing actual group {id}"))?;
+    |
+
+error[E0425]: cannot find value `rules` in this scope
+   --> crates/sim/tests/ra9_audit/rules.rs:153:8
+    |
+153 |     if rules.sides.len()!=2{return Err("exact2 actual sides".into());}
+    |        ^^^^^
+    |
+   ::: crates/sim/tests/ra9_audit/actual.rs:36:1
+    |
+ 36 | pub(super) fn rule(r:&Reference,section:&str,key:&str)->AuditResult<Expected<String>> {
+    | ------------------------------------------------------------------------------------- similarly named function `rule` defined here
+    |
+help: a function with a similar name exists
+    |
+153 -     if rules.sides.len()!=2{return Err("exact2 actual sides".into());}
+153 +     if rule.sides.len()!=2{return Err("exact2 actual sides".into());}
+    |
+
+error[E0425]: cannot find value `rules` in this scope
+   --> crates/sim/tests/ra9_audit/rules.rs:158:18
+    |
+158 |         let game=rules.side(side).ok_or_else(||format!("missing actual side {side:?}"))?;let consumer=format!("side.{}",side.id());
+    |                  ^^^^^
+    |
+   ::: crates/sim/tests/ra9_audit/actual.rs:36:1
+    |
+ 36 | pub(super) fn rule(r:&Reference,section:&str,key:&str)->AuditResult<Expected<String>> {
+    | ------------------------------------------------------------------------------------- similarly named function `rule` defined here
+    |
+help: a function with a similar name exists
+    |
+158 -         let game=rules.side(side).ok_or_else(||format!("missing actual side {side:?}"))?;let consumer=format!("side.{}",side.id());
+158 +         let game=rule.side(side).ok_or_else(||format!("missing actual side {side:?}"))?;let consumer=format!("side.{}",side.id());
+    |
+
+error[E0425]: cannot find value `rules` in this scope
+   --> crates/sim/tests/ra9_audit/rules.rs:355:48
+    |
+355 |     for(index,field,actual) in [(0,"ore_value",rules.economy.ore_value),(1,"gem_value",rules.economy.gem_value)] {
+    |                                                ^^^^^
+    |
+   ::: crates/sim/tests/ra9_audit/actual.rs:36:1
+    |
+ 36 | pub(super) fn rule(r:&Reference,section:&str,key:&str)->AuditResult<Expected<String>> {
+    | ------------------------------------------------------------------------------------- similarly named function `rule` defined here
+    |
+help: a function with a similar name exists
+    |
+355 -     for(index,field,actual) in [(0,"ore_value",rules.economy.ore_value),(1,"gem_value",rules.economy.gem_value)] {
+355 +     for(index,field,actual) in [(0,"ore_value",rule.economy.ore_value),(1,"gem_value",rules.economy.gem_value)] {
+    |
+
+error[E0425]: cannot find value `rules` in this scope
+   --> crates/sim/tests/ra9_audit/rules.rs:355:88
+    |
+355 |     for(index,field,actual) in [(0,"ore_value",rules.economy.ore_value),(1,"gem_value",rules.economy.gem_value)] {
+    |                                                                                        ^^^^^
+    |
+   ::: crates/sim/tests/ra9_audit/actual.rs:36:1
+    |
+ 36 | pub(super) fn rule(r:&Reference,section:&str,key:&str)->AuditResult<Expected<String>> {
+    | ------------------------------------------------------------------------------------- similarly named function `rule` defined here
+    |
+help: a function with a similar name exists
+    |
+355 -     for(index,field,actual) in [(0,"ore_value",rules.economy.ore_value),(1,"gem_value",rules.economy.gem_value)] {
+355 +     for(index,field,actual) in [(0,"ore_value",rules.economy.ore_value),(1,"gem_value",rule.economy.gem_value)] {
+    |
+
+error[E0425]: cannot find value `rules` in this scope
+   --> crates/sim/tests/ra9_audit/rules.rs:364:16
+    |
+364 |     let actual=rules.crate_units.iter().map(|&k|unit_id(d,k)).collect::<AuditResult<Vec<_>>>()?;
+    |                ^^^^^
+    |
+   ::: crates/sim/tests/ra9_audit/actual.rs:36:1
+    |
+ 36 | pub(super) fn rule(r:&Reference,section:&str,key:&str)->AuditResult<Expected<String>> {
+    | ------------------------------------------------------------------------------------- similarly named function `rule` defined here
+    |
+help: a function with a similar name exists
+    |
+364 -     let actual=rules.crate_units.iter().map(|&k|unit_id(d,k)).collect::<AuditResult<Vec<_>>>()?;
+364 +     let actual=rule.crate_units.iter().map(|&k|unit_id(d,k)).collect::<AuditResult<Vec<_>>>()?;
+    |
+
+error[E0425]: cannot find value `rules` in this scope
+   --> crates/sim/tests/ra9_audit/rules.rs:393:14
+    |
+393 |     let side=rules.side(Side::Allied).ok_or_else(||"missing allied side".to_owned())?;
+    |              ^^^^^
+    |
+   ::: crates/sim/tests/ra9_audit/actual.rs:36:1
+    |
+ 36 | pub(super) fn rule(r:&Reference,section:&str,key:&str)->AuditResult<Expected<String>> {
+    | ------------------------------------------------------------------------------------- similarly named function `rule` defined here
+    |
+help: a function with a similar name exists
+    |
+393 -     let side=rules.side(Side::Allied).ok_or_else(||"missing allied side".to_owned())?;
+393 +     let side=rule.side(Side::Allied).ok_or_else(||"missing allied side".to_owned())?;
+    |
+
+error[E0425]: cannot find value `CENSUS_SHA256` in this scope
+  --> crates/sim/tests/ra9_audit/residual-admission.rs:88:124
+   |
+88 | ...inal disposition accepted",live_census_sha256:CENSUS_SHA256,original_section_closure_record:"TEST fixture of actual independently...
+   |                                                  ^^^^^^^^^^^^^ not found in this scope
+   |
+note: constant `crate::ra9_audit::metadata_admission::CENSUS_SHA256` exists but is inaccessible
+  --> crates/sim/tests/ra9_audit/metadata-admission.rs:7:1
+   |
+ 7 | const CENSUS_SHA256:&str="208388578718c6ea68661ede60a09b8bd81324fe9b90c11272eeb1f33142fbdc";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not accessible
+
+warning: value assigned to `a` is never read
+  --> crates/sim/tests/ra9_audit/consumer62-admission.rs:65:134
+   |
+65 | ...,d,mut a)=baseline()?;let key=SourceKey::new("rules","SPY","PermaDisguise");input.reference.rows.insert(key.clone(),"no".into());let row=input.mappings.iter().find(|r|r.section=="SPY").ok_or("SPY mapping")?;a=su...
+   |       ^^^^^ this value is reassigned later and never used                                                                                                                                                         - `a` is overwritten here before the previous value is read
+   |
+   = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+For more information about this error, try `rustc --explain E0425`.
+warning: `sim` (test "ra9_data_parity") generated 1 warning
+error: could not compile `sim` (test "ra9_data_parity") due to 16 previous errors; 1 warning emitted

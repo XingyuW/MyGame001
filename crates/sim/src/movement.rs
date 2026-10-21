@@ -244,18 +244,28 @@ pub(crate) fn move_units(
     mut units: MoveQuery,
     healths: Query<&crate::combat::Health>,
 ) {
-    let mut order: Vec<(SimId, Entity)> =
-        units.iter().map(|(entity, id, ..)| (*id, entity)).collect();
+    let alive = |entity| {
+        !healths
+            .get(entity)
+            .is_ok_and(|health| health.hit_points <= 0)
+    };
+    let mut order: Vec<(SimId, Entity)> = units
+        .iter()
+        .filter(|(entity, ..)| alive(*entity))
+        .map(|(entity, id, ..)| (*id, entity))
+        .collect();
     order.sort_unstable();
     // What every unit is doing, kept up to date as the units move in id order.
     let mut activity: BTreeMap<SimId, Activity> = units
         .iter()
+        .filter(|(entity, ..)| alive(*entity))
         .map(|(_, id, mobile, _, _, orders, ..)| (*id, Activity::of(mobile, orders)))
         .collect();
     let crushable = Crushable::of(
         &definitions,
         units
             .iter()
+            .filter(|(entity, ..)| alive(*entity))
             .map(|(entity, id, .., owner, unit)| (entity, *id, owner.0, unit.kind)),
     );
     // The units crushed in this tick: they are gone, though their entities remain until the

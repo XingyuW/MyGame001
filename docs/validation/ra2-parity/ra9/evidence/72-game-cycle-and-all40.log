@@ -1,0 +1,29 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/game)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 39.91s
+     Running unittests src/main.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/game-5f08020bbb778566)
+
+running 4 tests
+test selection::tests::ra9_b87_all40_stock_aliases_use_real_group_cycle_type_combat_preview_and_sink ... FAILED
+test selection::tests::ra9_c62_dmisl_real_cycle_type_combat ... ok
+test selection::tests::ra9_c62_pdplane_real_cycle_type_combat ... ok
+test selection::tests::ra9_c62_v3_real_cycle_type_combat ... ok
+
+failures:
+
+---- selection::tests::ra9_b87_all40_stock_aliases_use_real_group_cycle_type_combat_preview_and_sink stdout ----
+
+thread 'selection::tests::ra9_b87_all40_stock_aliases_use_real_group_cycle_type_combat_preview_and_sink' (13353732) panicked at crates/game/src/selection.rs:3541:13:
+assertion `left == right` failed: CIVAN: real preview
+  left: Interact("INTERACT")
+ right: Move
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    selection::tests::ra9_b87_all40_stock_aliases_use_real_group_cycle_type_combat_preview_and_sink
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 264 filtered out; finished in 5.07s
+
+error: test failed, to rerun pass `-p game --bin game`
+error: 1 target failed:
+    `-p game --bin game`
