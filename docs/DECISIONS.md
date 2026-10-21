@@ -11505,3 +11505,96 @@ Cargo target/package and parser caches remain; package outputs were regenerated.
 The existing RA9 ordinary copy remains necessary for integration and evidence.
 No Git directory was deleted. Visual/audio/play-feel quality still requires user
 verification. Main remains8230a955b251e9341d349f99eaeb86f7f8253664; no programme tag is created.
+
+
+### R191 — RA8 checkpoint18 closes on unchanged source (2026-10-21)
+
+Fresh detached attempt18 passes all thirteen commands, each exit0, with495 exact
+source inputs and zero drift after every command and at completion. Runtime
+`4a103fa836f596af70a222f402fbea1f56bb0942` and launch HEAD
+`b9ed05ef2469c6a96079e040e402d106b8a03ce5` bind this invocation. Source manifest
+SHA5fa777e10b5959e4519093604ea95270ca76446f86cdcce09356d66923f75d3c and
+`ra8/checkpoint18-closure-metrics.json` bind every result below. The final static
+inventory remains1389, baseline1124, zero removed/renamed/ignored; execution
+counts are separate. No source/data/test/limit changes occur after the freeze.
+
+Formatting, unfiltered clean-tree diff check, strict workspace/all-target Clippy,
+release workspace, release build, release/debug600-frame smokes, benchmark,
+repeat soak, full duels, packaged600-frame smoke, generated-data and reference
+checks all pass. Workspace reports1392/0/0 across82 result targets. Release and
+debug smoke and regenerated app/ZIP are actual completions; benign native window
+warnings remain in raw logs. No incomplete component is credited.
+
+| Population (756 each) | Tick median | Nearest-rank p90 | Maximum | Median/p90/max over original per-map production budget |
+|---|---:|---:|---:|---|
+| RA7 production baseline |31540|64532|209163|.1314704861/.2807579365/.7824722222|
+| Final RA8 production |29508|71172|279129|.1210503472/.3413444444/.9691979167|
+| RA7 diagnostic duels |32782.5|69184|157564|.1386996528/.3236736111/.7664722222|
+| Final RA8 diagnostic duels |29207|71170|182492|.1224392361/.3358174603/.991875|
+
+All756 unique production cases end with Won before their own unchanged budget;
+limits remain72000 scaled by map span/128. Worst279129/288000 retains only8871
+ticks (3.0802%) headroom. Production world ticks may exceed event ticks by one.
+All756 unique diagnostic duels also explicitly Won, with no capped nonwinner;
+their enforced ceiling remains300000, maximum182492/300000=.6083066667.
+The duel table's per-map ratios are a COMPARATIVE production-budget normalization,
+not an enforced m14 ceiling: its .991875 maximum is only .8125% below that
+reference budget. Ratios are calculated per case then independently sorted.
+Medians improve against RA7 while p90/max tails worsen; no universal improvement
+or comfortable reference-budget buffer is claimed. Original bounds remain intact.
+
+Soak covers260 unique configurations, two repeats of36000 ticks,18,720,000 total;
+native5036.7s and peak245.1MiB against1024MiB. Each repeat records121 native ended
+matches while all260 final worlds remain running; fixed-duration determinism,
+invariants and strict winner guards for completed games pass. This does not claim
+all260 games end. Benchmark fixture/shipped scenarios each spawn200 units and
+measure2000 ticks: means.098/.213ms, maxima.992/1.555ms, peak1.2MiB; unchanged
+mean5ms/longest50ms/heap1024MiB bounds pass. At least150 alive persist for494/309
+measured ticks with means.313/.624ms, so this is not200 units alive throughout.
+
+The five required isolated commands already passed on the identical source before
+this fresh13, as coordinator-directed after the real earlier ending failure.
+All21 maps explicitly Won with ten builders at unchanged400000 cap: median85583,
+p90112794,max126754; ratios.2139575/.281985/.316885. Worst mean1.408ms is below5ms;
+individual355.967ms and busy1000 mean4.918ms remain visible. Fixed three256-square,
+ten-player probes each complete24000 ticks: means.977735/.869383/.769983ms,
+p996.763/6.160/12.682ms,max49.650/88.398/56.632ms; final worlds remain running.
+The three example guards each pass1/0/0. `ra8-early18/acceptance-summary.json`
+retains exact hashes/tails. No repeat is needed solely for ordering after495-input
+identity is maintained through all13; no earlier-source proof is transferred.
+
+During phase04 only, a coordinated bounded RA9 ordinary-copy functional lease
+runs selected debt/catalogue/causal controls and restores its selected source.
+Its preserved17 attempts comprise8 zero,8 code101 and one interrupted-15, not an
+all-pass aggregate. The byte-exact completion receipt SHA
+64b2d2a4a1e783f6a5bda27636f4c5fdfa0d88047081a1fad7bb2f995055211f and51 referenced
+command/start/raw files were independently rehashed. All eight recorded copy groups
+are absent, lease CLOSED before phase04 ended, canonical495 unchanged. Workspace
+elapsed time and all copy timings have functional-only scope. Benchmark, soak,
+duels and the earlier five acceptance commands are isolated. No RA9 acceptance or
+performance credit transfers from that lease. All owned gate/controller processes
+have also exited; final binding records their absence.
+
+R190's original attempt17 exit137 and503-frame package interruption retain their
+unknown external cause; no game defect was observed before that kill. Successful
+component recovery remains scoped to the old source. Its real20Won/one Jungle
+Delta stall, exact causal trace, before failures and general financing correction
+remain preserved. Fresh attempt18 plus the unchanged-source five commands now
+close RA8 only. RA9 must port/rebind the complete final runtime and earn its own
+all13 and ending/performance evidence, then fresh independent review and final
+merge remain required. This author is ineligible for final independent review.
+
+The closure commit releases canonical/source/Git/Cargo/native/process ownership
+by explicit handoff immediately after clean verification. Main remains
+8230a955b251e9341d349f99eaeb86f7f8253664, no RA2 tag or push. No substantial external
+directory was created by this owner. Existing configured Cargo target/package
+outputs and the RA9 ordinary copy under ~/Library/Caches/Codex/reviews/MyGame001
+remain necessary. No Git directory was deleted. Visual/audio/play-feel quality
+still awaits user verification; this is not programme completion.
+
+
+Closure evidence first unfiltered staged check exits0 with zero diagnostics, empty
+stdout SHAe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.
+Raw logs remain exact; historical evidence checks with exit2 remain recorded as
+failed checks. A separate identical final check and completed-result read precede
+the closure commit.

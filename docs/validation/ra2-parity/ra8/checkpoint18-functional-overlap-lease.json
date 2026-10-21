@@ -1,0 +1,61 @@
+{
+  "granted_utc": "2026-10-21T11:01:34.338348+00:00",
+  "gate_controller_pid": 59384,
+  "gate_phase": 4,
+  "source_manifest_sha256": "5fa777e10b5959e4519093604ea95270ca76446f86cdcce09356d66923f75d3c",
+  "runtime_commit": "4a103fa836f596af70a222f402fbea1f56bb0942",
+  "copy": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation",
+  "authorization": "Coordinator requested bounded copy-only functional lease to surface prepared RA9 integration/compiler issues during long workspace validation. Canonical owner granted phase04 only.",
+  "scope": "Four prepared focused debt cases plus existing catalogue actual-loader/compiler fixes only. No whole181/workspace/M6/soak/duel/all21/performance sweep, shared production-table writes or canonical/Git mutation. Configured Cargo target and caches preserved.",
+  "timing_scope": "Copy and overlapped workspace timings are functional evidence only. Earlier isolated canonical five acceptance commands finished before this lease and keep their isolated timing scope. Benchmark/soak/duels must have no competing RA9 native/Cargo workload.",
+  "end_condition": "Finish or stop at end of phase04; coordinator must confirm no copy Cargo/native remains.",
+  "status": "CLOSED",
+  "bounded_extension": {
+    "granted_utc": "2026-10-21T11:10:01.211895+00:00",
+    "after": "Current four focused cases/catalogue",
+    "scope": "Exactly existing selected late-positive plus two existing RNG/late-Production observer controls, then exact restoration and source-hash guard. No corpus/sweep/new framework or canonical mutation.",
+    "reason": "Corrected 4a AI plus copy combat correction can invalidate the selected late/activity receipt; targeted changed-runtime verification catches a concrete final-gate risk.",
+    "timing_scope": "Functional overlap only; no performance credit. Final RA9 canonical full13/unfiltered positive still required.",
+    "end_condition": "Finish or stop at phase04 end; coordinator confirms no copy Cargo/native remains."
+  },
+  "observed_distinct_artifacts": {
+    "reported_utc": "2026-10-21T11:25:04.547402+00:00",
+    "reporter": "root read-only Cargo-path inspection",
+    "canonical_m6": "release/deps/m6_production_matches-fff13bc99bc7e9e6",
+    "copy_m6": "release/deps/m6_production_matches-cf20e94e4f55d858",
+    "canonical_prior_ra4_spawns": "release/deps/ra4_spawns-f4c09bf307b365be",
+    "copy_ra4_spawns": "release/deps/ra4_spawns-cf8de36f92872323",
+    "canonical_prior_ra7_orders": "release/deps/ra7_orders-ada07eb350ed0620",
+    "copy_ra7_orders": "release/deps/ra7_orders-0c2ad18108b8efad",
+    "scope": "Observed executables differ in the shared configured target. Full copy command-to-artifact receipt and completion/restoration confirmation remain pending."
+  },
+  "closed_utc": "2026-10-21T11:29:28.236729+00:00",
+  "confirmed_no_copy_native_cargo": true,
+  "confirmation": "RA9 owner verified all its groups and exact selected native processes gone; completion receipt reports empty remaining lists. All51 command receipt/start/raw hashes and restored selected m6 source rechecked by RA8 owner.",
+  "completion_receipt": {
+    "path": "docs/validation/ra2-parity/ra8/checkpoint18-copy-functional-completion.json",
+    "bytes": 33246,
+    "sha256": "64b2d2a4a1e783f6a5bda27636f4c5fdfa0d88047081a1fad7bb2f995055211f"
+  },
+  "canonical_source_after_close": {
+    "files": 495,
+    "mismatches": []
+  },
+  "copy_reference_files_rehashed": 51,
+  "copy_source_restored_sha256": "e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d",
+  "coordinator_independent_confirmation": {
+    "reported_utc": "2026-10-21T11:30:20.659326+00:00",
+    "completion_sha256": "64b2d2a4a1e783f6a5bda27636f4c5fdfa0d88047081a1fad7bb2f995055211f",
+    "reference_files_rehashed": 51,
+    "mismatches": 0,
+    "restoration_sha256": "e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d",
+    "exit_census": {
+      "0": 8,
+      "101": 8,
+      "interrupted_-15": 1
+    },
+    "eight_owned_process_groups_absent": true,
+    "method": "Signal-zero existence probes of eight recorded owned groups; no global process listing or termination.",
+    "future_copy_native_authority": "None until a newly coordinated lease or canonical release."
+  }
+}

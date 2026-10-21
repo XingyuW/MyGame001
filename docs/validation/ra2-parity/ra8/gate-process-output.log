@@ -1,15 +1,14 @@
 01 exit 0  1 s  cargo fmt --all -- --check
 02 exit 0  0 s  git diff --check
 03 exit 0  1 s  cargo clippy --workspace --all-targets -- -D warnings
-04 exit 0  12845 s  cargo test --workspace --release  [1390 passed, 0 failed, 0 ignored]
-05 exit 0  1 s  cargo build --release -p game
-06 exit 0  17 s  cargo run --release -p game -- --smoke-test 600
-07 exit 0  157 s  cargo run -p game -- --smoke-test 600
-08 exit 0  1 s  cargo run --release -p sim --example m7_benchmark
-09 exit 0  6124 s  cargo run --release -p sim --example m7_soak
-scripts/validate_ra2_parity.sh: line 35: 17158 Killed: 9               "$@" > "$log" 2>&1
-10 exit 137  6179 s  cargo run --release -p sim --example m14_duels -- full
-11 exit 1  19 s  sh scripts/package_macos.sh
-12 exit 0  1 s  python3 scripts/generate_ra2_data.py --check
+04 exit 0  7818 s  cargo test --workspace --release  [1392 passed, 0 failed, 0 ignored]
+05 exit 0  0 s  cargo build --release -p game
+06 exit 0  16 s  cargo run --release -p game -- --smoke-test 600
+07 exit 0  127 s  cargo run -p game -- --smoke-test 600
+08 exit 0  3 s  cargo run --release -p sim --example m7_benchmark
+09 exit 0  5039 s  cargo run --release -p sim --example m7_soak
+10 exit 0  5254 s  cargo run --release -p sim --example m14_duels -- full
+11 exit 0  20 s  sh scripts/package_macos.sh
+12 exit 0  0 s  python3 scripts/generate_ra2_data.py --check
 13 exit 0  0 s  python3 scripts/ra2_reference.py --check
-validation ra8: FAILED
+validation ra8: PASSED

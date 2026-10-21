@@ -1,18 +1,31 @@
 # RA8 acceptance record
 
 
-Current checkpoint18 status (2026-10-21): source4a103fa fixes a demonstrated
-reinforcement-financing veto while preserving strategic support. New2 native
-regressions fail on old AI and pass on the identical fixture with the correction;
-six existing protective controls, fmt/strict Clippy and exact ten-player Jungle
-Delta P7Won76033 pass. Fresh495-input freeze and1389 static tests have no removal
-or ignore. Required isolated all21/fixed3/three guards complete five commands0
-with495 unchanged inputs per command:21 explicit Won/21 ten-builder maps/zero
-stalls at400000, median85583/p90112794/max126754; worst mean1.408ms.
-The three256² fixed probes complete24000 ticks each with10 builders and
-mean.977735/.869383/.769983ms; each remains running. Three guards each1/0/0.
-Individual/busy timing tails remain in `ra8-early18/acceptance-summary.json`.
-Freshall13 on the same source is still required; RA8 acceptance remains open.
+Current checkpoint18 status (2026-10-21): **RA8 CLOSED** on runtime
+`4a103fa836f596af70a222f402fbea1f56bb0942`. Fresh exact all13 passes on launch
+HEADb9ed05e, workspace1392/0/0 across82 targets; all495 frozen inputs remain exact
+after each command and at completion. The required isolated five commands also
+pass on that same source: all21 explicit Won/ten builders/zero stalls at400000,
+fixed3 means.977735/.869383/.769983ms, three guards1/0/0 each. Worst all21 mean
+1.408ms passes5ms; individual355.967ms remains visible. Static1389 tests have zero
+removal/rename/ignore and are separate from execution counts.
+
+All756 production cases Won: median29508/p9071172/max279129, per-case original
+budget ratios.1210503472/.3413444444/.9691979167; worst headroom8871ticks/3.0802%.
+All756 diagnostic duels explicitly Won: median29207/p9071170/max182492 under actual
+300000 ceiling. Comparative production-budget ratios.1224392361/.3358174603/.991875
+are reference normalization, not m14 enforcement; tightest reference headroom.8125%.
+RA7 comparisons retain improved medians and worse tails. Soak260×2×36000 totals
+18,720,000ticks,245.1MiB;121 native ended matches per repeat, not all games ended.
+Benchmark and all smokes/package checks pass their original bounds.
+
+See R191, [closure metrics](ra8/checkpoint18-closure-metrics.json) and
+[isolated acceptance](ra8-early18/acceptance-summary.json) for raw hashes, normalized
+distributions and timing tails. Workspace elapsed timing is functional-only due to
+a bounded RA9 copy lease closed before phase04 ended; acceptance five, benchmark,
+soak and duels are isolated. No RA9 timing or final acceptance credit transfers.
+RA9 integration, its own validation, fresh independent review and final merge
+remain pending; this author is ineligible for independent review.
 
 Original attempt17's interruption and successful component recovery are preserved,
 including original failed summary/stale RUNNING metadata. Its old-source isolated

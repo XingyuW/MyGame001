@@ -11,7 +11,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[4]
 OUT = Path(__file__).resolve().parent
 label = sys.argv[1]
-assert label in ['first', 'final']
+assert label in ['first', 'final', 'closure-first', 'closure-final']
 destination = OUT / ('checkpoint18-evidence-check-' + label + '.json')
 assert not destination.exists()
 result = subprocess.run(['git', 'diff', '--cached', '--check'], cwd=ROOT, capture_output=True)
@@ -44,8 +44,9 @@ record = {'utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
     'classifications': dict(collections.Counter(row['kind'] + ':' + row['message'] for row in diagnostics)),
     'source_data_test_prose_errors': 0, 'raw_bytes_unchanged': True, 'items': diagnostics,
     'scope': 'Nonzero check remains a failure; deliberate raw-evidence preservation is documented separately. No bytes were sanitized or ignored.'}
-if label == 'final':
-    first = json.loads((OUT / 'checkpoint18-evidence-check-first.json').read_text())
+if label.endswith('final'):
+    first_label = 'closure-first' if label.startswith('closure-') else 'first'
+    first = json.loads((OUT / ('checkpoint18-evidence-check-' + first_label + '.json')).read_text())
     assert record['exit'] == first['exit'] and record['stdout_sha256'] == first['stdout_sha256']
     record['identical_to_first_unfiltered_check'] = True
 destination.write_text(json.dumps(record, indent=2) + '\n')

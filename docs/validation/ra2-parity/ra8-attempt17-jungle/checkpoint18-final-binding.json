@@ -1,0 +1,28 @@
+{
+  "utc": "2026-10-21T16:08:31.469300+00:00",
+  "runtime_commit": "4a103fa836f596af70a222f402fbea1f56bb0942",
+  "source_files": 495,
+  "source_mismatches": [],
+  "source_discovery_exact": true,
+  "static_tests": 1389,
+  "static_inventory_exact": true,
+  "removed_or_renamed": 0,
+  "ignored_paths": [],
+  "branch": "ra2-parity",
+  "main": "8230a955b251e9341d349f99eaeb86f7f8253664",
+  "ra2_tags": [],
+  "runtime_delta_since_frozen_commit": "",
+  "owned_processes_absent": {
+    "controller_pid": 59384,
+    "script_pgid": 59405,
+    "verification": "Signal-zero existence checks completed after PASSED: both absent; no unrelated process listing or termination."
+  },
+  "storage": {
+    "substantial_external_directories_created_by_this_owner": [],
+    "retained_necessary": [
+      "/Users/xingyuwang/Library/Caches/Codex/cargo-target",
+      "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation"
+    ],
+    "git_directories_deleted": false
+  }
+}
