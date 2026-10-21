@@ -5046,3 +5046,14 @@ final coherent closing documents and independent five-slice/fresh-lead review re
 The all21/fixed3/example guards run first under the coordinator's ordering adjustment, with
 same-source guards carrying their actual proofs through full13. All original caps, tests,
 soak windows, storage/cache rules and user-only checks remain unchanged.
+
+## RA9 isolated acceptance complete; fresh full13 follows — 2026-10-21
+
+Actual198 required commands all exited0 on unchanged frozen RA9 inputs. All21 ten-player
+matches reached Won within the original400,000 cap; ticks min/median/p90/max are
+35520/85959/114969/147715. Maximum measured mean was
+3.161000ms (required<5ms). Fixed3 original24,000-schedule timing cases and all three example
+guards passed. Mean, busy-window, p99 and max timing remain distinct; sampled fixed/soak windows
+are not all-to-Won claims.198-isolated-acceptance-summary.json preserves every actual map, tail
+and command source/raw binding. Full13 remains mandatory and is now the next owned action;
+no previous RA8/copy execution transfers acceptance or performance credit.
