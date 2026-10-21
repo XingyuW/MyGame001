@@ -1,0 +1,25 @@
+{
+  "attempt": 17,
+  "head": "99bcdf1913f3d74079ce2baa8b440b68a315223a",
+  "runtime_commit": "eb308a231e302048c9dc8d1e8b9543b7c5f64ef7",
+  "recorded_utc": "2026-10-21T04:13:15.263319+00:00",
+  "phase": 9,
+  "exit": 0,
+  "raw": {
+    "path": "docs/validation/ra2-parity/ra8/09-soak.log",
+    "bytes": 55706,
+    "sha256": "7967425bbaaaeca5ca2bbadf7b2ba1d70a2f50ea24ceaddc30097d4558fc64f4"
+  },
+  "unique_completion_ids": 260,
+  "unique_configuration_summaries": 260,
+  "ticks_per_configuration_per_repeat": 36000,
+  "deterministic_repeats": 2,
+  "total_ticks": 18720000,
+  "native_elapsed_seconds": 6123.8,
+  "peak_heap_MiB": 244.8,
+  "heap_budget_MiB": 1024,
+  "ended_matches_per_repeat": 118,
+  "matches_including_restarts_per_repeat": 378,
+  "configurations_with_still_running_final_sample": 260,
+  "qualification": "Each configuration repeats deterministically under native assertions, and ended games can restart. All 260 final sampled worlds remain running at 36000 ticks; this does not prove they all reached a winner. Functional RA9 copy commands overlapped, so elapsed time is not isolated performance evidence. Full13 and postgate acceptance are still pending."
+}

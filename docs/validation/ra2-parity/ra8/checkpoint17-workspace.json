@@ -1,0 +1,22 @@
+{
+  "attempt": 17,
+  "head": "99bcdf1913f3d74079ce2baa8b440b68a315223a",
+  "runtime_commit": "eb308a231e302048c9dc8d1e8b9543b7c5f64ef7",
+  "recorded_utc": "2026-10-21T02:27:28.604306+00:00",
+  "phase": 4,
+  "exit": 0,
+  "raw": {
+    "path": "docs/validation/ra2-parity/ra8/04-test.log",
+    "bytes": 1779467,
+    "sha256": "7552e81e1fbb93624fbb3e2870e51a1b577fc7ded0bfffcf54f66d914bc86d21"
+  },
+  "rust_result_targets": 82,
+  "passed": 1390,
+  "failed": 0,
+  "ignored": 0,
+  "m6_receipt": "checkpoint17-m6-production.json",
+  "retained_result": [
+    "test result: ok. 41 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1002.37s"
+  ],
+  "scope": "Complete unchanged workspace release test command passed; full13/postgate acceptance still pending. Expected should_panic outputs remain raw."
+}

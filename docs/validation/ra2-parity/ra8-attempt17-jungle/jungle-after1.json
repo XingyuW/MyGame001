@@ -1,0 +1,31 @@
+{
+  "name": "jungle-after1",
+  "command": [
+    "cargo",
+    "run",
+    "--release",
+    "-p",
+    "sim",
+    "--example",
+    "m13_ten_players",
+    "--",
+    "to-the-end",
+    "jungle_delta"
+  ],
+  "source_manifest": "docs/validation/ra2-parity/ra8-attempt17-jungle/jungle-after1-manifest.json",
+  "manifest_sha256": "4126bc1f8321611c53244e9840a5d0d703f42a2dd1c77f9e2e12b3a1f3ebf877",
+  "start_utc": "2026-10-21T10:24:51.035612+00:00",
+  "head": "99bcdf1913f3d74079ce2baa8b440b68a315223a",
+  "status": "COMPLETED",
+  "source_files": 495,
+  "pid": 55035,
+  "exit": 0,
+  "seconds": 56.54182304197457,
+  "end_utc": "2026-10-21T10:25:47.583048+00:00",
+  "source_mismatches": [],
+  "raw": {
+    "path": "docs/validation/ra2-parity/ra8-attempt17-jungle/jungle-after1.log",
+    "bytes": 646,
+    "sha256": "710409c02a2da92f971f2b596754cfec12e5d17e66b038658513f0fd96405fe8"
+  }
+}

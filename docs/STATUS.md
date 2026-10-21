@@ -4778,3 +4778,57 @@ R189 final2 compatibility completes9commands0,1085/0/0 across73 targets; ONE ful
 Checkpoint17 source was later committed aseb308a231e302048c9dc8d1e8b9543b7c5f64ef7: exactly2validated paths,174insertions/13deletions. Standalone stagedcheck0 at22:49:49Z and separate completed-result read22:49:54Z precede commit; preflight is not represented as postcommit. Evidence raw-only hygiene and clean freeze precede immediate mandatory full13 under standing authorization.
 
 Checkpoint17 evidence unfiltered stagedcheck exits2, NOTpassed, stdoutef3cfea47e58b2917caf7df777bccd52c153b27424eb00468769af18859119ba. All144 diagnostics across18 exact raw evidence paths are classified with file/stagedblob/line/EOL hashes; zero source/data/test/prose errors. Raw bytes remain untouched. Final identical unfiltered check precedes deliberate evidence commit and immediate clean-source full13.
+
+
+### RA8 checkpoint18: recovered components, actual ten-player failure and bounded correction (2026-10-21)
+
+R190 preserves the original interrupted attempt17 (all138 leaves), successful
+same-source recovery10/11, and the subsequent real isolated Jungle Delta failure.
+The original invocation remains FAILED. Its successful1–9/12/13 and recovered10/11
+are thirteen successful command components on the old source, not a fresh full13
+or acceptance of the corrected runtime. The recovered756 duels all won, and the
+package passed600 frames. The old isolated sweep has20Won/one400000-tick stall;
+fixed3/three guards are unrun. Its8-leaf label is also preserved byte for byte.
+
+Source `4a103fa836f596af70a222f402fbea1f56bb0942` replaces global strategic/ore
+reinforcement vetoes with conservative own-worker and sale-candidate protections.
+It retains strategic sources and positive-power support while unrelated optional
+assets fund ordinary paid reinforcements. No source statistic, balance value,
+limit, legacy rule or existing assertion changes; no persistent field or RNG call
+is added.
+
+| Corrected-source scoped check | Result |
+|---|---|
+| New native financing regressions |2 passed/0 failed/0 ignored; old AI failed both intended missing-refund assertions|
+| Existing understrength/legacy/service/strategic-power controls |4/0/0|
+| Existing real economic jobs/financed heads |1/0/0|
+| Existing redundant-power native recruitment |1/0/0|
+| Formatting and strict workspace/all-target Clippy |Both exit0|
+| Exact ten-player Jungle Delta |P7Won76033/400000, all10 builders, mean0.706741ms|
+
+[Checkpoint18](validation/ra2-parity/ra8-attempt17-jungle/checkpoint18.json) binds
+495 freshly discovered inputs, exact receipts and static1124→1389(+265), with zero
+removed/renamed/ignored tests. Static and executed counts are separate. The before
+trace proves real missile interception and actual Nuke damage/paid repairs; neither
+player is declared helpless. The new policy can act earlier, so the ending is not
+attributed to only the late trace window.
+
+Required isolated all21/fixed3/three guards complete all five commands0 with495
+unchanged inputs per command. All21 maps have explicit Won and all10 builders,
+zero stalls at the original400000 cap; tick median85583/p90112794/max126754.
+Worst mean1.408ms passes, while raw individual355.967ms/busy1000 mean4.918ms
+remain visible. The three256² fixed probes each complete24000 ticks/10 builders,
+mean.977735/.869383/.769983ms; they remain running, not to-the-end wins.
+Three example guards each pass1/0/0. Exact raw hashes and tails are in
+[isolated acceptance](validation/ra2-parity/ra8-early18/acceptance-summary.json).
+Freshall13 remains required on these exact inputs; no duplicate isolated sequence
+is needed solely for ordering. No RA8 closure or canonical release is claimed.
+RA9 may import source into its existing ordinary copy without Cargo/native
+or canonical mutation. RA9, independent final review and user quality verification
+remain pending. No substantial new external directory, clone or worktree is created;
+configured Cargo/package/parser caches and the existing RA9 copy remain retained.
+
+Checkpoint18 evidence hygiene remains unfiltered exit2, not passed: ten classified
+raw-log diagnostics, zero source/data/test/prose errors. Exact staged-blob/line/EOL
+hashes preserve bytes; final identical check/read precede the deliberate evidence
+commit and clean-source full13.

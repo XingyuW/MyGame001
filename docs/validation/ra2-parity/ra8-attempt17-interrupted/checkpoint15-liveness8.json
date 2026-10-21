@@ -1,0 +1,27 @@
+{
+  "utc": "2026-10-20T07:16:31.719733+00:00",
+  "purpose": "Bounded owned-process metadata only; CPU establishes activity, not correctness/completion. No profiling/sampling/signal.",
+  "session_id": 75533,
+  "owned_pgid": 46889,
+  "ps_observed_utc": "2026-10-20T07:16:18Z",
+  "rows": [
+    "46861 7720 46861 01:20:07 0:01.37 0.0 Ss Python wrapper",
+    "46889 46861 46889 01:20:07 0:00.01 0.0 Ss sh scripts/validate_ra2_parity.sh ra8",
+    "46940 46889 46889 01:20:06 0:00.48 0.0 S cargo test --workspace --release",
+    "49352 46940 46889 01:15:30 379:35.37 259.6 R m6_production_matches-fff13bc99bc7e9e6"
+  ],
+  "m6_progress": [
+    "M6 production progress completed36/756 non_Won0",
+    "M6 production progress completed72/756 non_Won0",
+    "M6 production progress completed108/756 non_Won0",
+    "M6 production progress completed144/756 non_Won0",
+    "M6 production progress completed180/756 non_Won0",
+    "M6 production progress completed216/756 non_Won0",
+    "M6 production progress completed252/756 non_Won0",
+    "M6 production progress completed288/756 non_Won0",
+    "M6 production progress completed324/756 non_Won0"
+  ],
+  "returned_non_Won": [],
+  "raw_partial_bytes": 24287,
+  "raw_partial_sha256": "0d06e9d2afc8bd30f95c0de3ea11af9add477eed4119b6f71ed58241c3805f0d"
+}

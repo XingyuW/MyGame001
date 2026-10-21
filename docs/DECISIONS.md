@@ -11393,3 +11393,115 @@ and post-success same-source isolated acceptance remain owed.
 Checkpoint17 source was later committed aseb308a231e302048c9dc8d1e8b9543b7c5f64ef7: exactly2validated paths,174insertions/13deletions. Standalone stagedcheck0 at22:49:49Z and separate completed-result read22:49:54Z precede commit; preflight is not represented as postcommit. Evidence raw-only hygiene and clean freeze precede immediate mandatory full13 under standing authorization.
 
 Checkpoint17 evidence unfiltered stagedcheck exits2, NOTpassed, stdoutef3cfea47e58b2917caf7df777bccd52c153b27424eb00468769af18859119ba. All144 diagnostics across18 exact raw evidence paths are classified with file/stagedblob/line/EOL hashes; zero source/data/test/prose errors. Raw bytes remain untouched. Final identical unfiltered check precedes deliberate evidence commit and immediate clean-source full13.
+
+
+### R190 — Finance ordinary reinforcements without discarding independent strategic recovery (2026-10-21)
+
+Checkpoint17's original full invocation remains **FAILED**, not retroactively passed.
+Its source is `eb308a231e302048c9dc8d1e8b9543b7c5f64ef7` at evidence HEAD99bcdf1.
+Commands1–9/12/13 exited0; workspace1390/0/0 across82 result targets includes756
+actual production winners, and the260×2×36000-tick soak is deterministic. Command10
+was terminated with exit137 after692 explicit winners; command11 exited1 after the
+application stopped at503/600 smoke frames. No game failure preceded the termination.
+The stale RUNNING process snapshot remains historical. All138 label leaves/2647570B
+are preserved byte for byte in `ra8-attempt17-interrupted/PRESERVED.json`.
+
+A guarded, display-awake component recovery reruns only10/11 on the identical495
+inputs. The full756 duels all win (max182492/300000), exit0/4911 script seconds;
+package smoke600 exits0/19 seconds and produces the app/ZIP in the configured Cargo
+package cache. Original1–9/12/13 plus recovered10/11 provide thirteen successful
+command components, **not a new single all13 invocation**. None is transferred to
+subsequently changed source. Required isolated all21 then exits1/1741.874606s:
+20Won, all21 ten-builder results and means below5ms (worst Coral1.423ms), but Jungle
+Delta has two players left at400000. Its mean501.982µs is not a timing failure.
+Fixed3 and all three example guards are unrun after this failure. The completed
+recovery label's8 leaves/128003B are independently preserved in
+`ra8-recovery17-failed/PRESERVED.json`; the original failure and every successful
+component remain intact. Raw all21 SHA3bfaccbd6e896808ca624358d54c095b7399e294940a8d6fe765313ce9a57da7.
+
+One existing observational `m13_ten_players -- to-the-end trace jungle_delta`
+reproduces the exact seed13/ten normal Medium/default-setup stall, exit1/201.028462s,
+with495 before/after hashes unchanged. Raw351f82959288320593c90a23270ec4146120e9f0cff9e3bfd5761bdc2148747c
+shows real capabilities, not helplessness. Late P7 retains its factory, yard,
+Nuke/Curtain and a V3, but has zero cash, workers, income or queued production.
+V3(1229) stays at125,187 firing at P5 Flak Cannon(1622),130,204. The final event
+window records native V3 fire and six intercepted spawned projectiles. Periodic
+Nukes really damage the Flak Cannon;75 native paid eight-HP heals restore each
+600HP loss. P5 has real War Miner income and74220 final cash. Its otherwise idle
+navy and retained buildings are not proof of physical incapability. No forced
+loss, withheld income, weapon/stat change or raised bound is justified.
+
+The opted-in understrength investment query globally vetoed every strategic-role
+building and every visible ore cell. Those facts did not establish that an
+unrelated optional refund would harm strategic recovery or that a worker existed
+to earn from that ore. The correction keeps actual income, owned workers and
+conservatively stowed actors' economic opportunities, service/reload and air-force
+exclusions. Strategic protection instead applies to each proposed sale in BOTH
+optional and producer-consolidation paths: retain strategic-role buildings and
+positive-power support when such a source exists. Existing producer/prerequisite,
+useful-service and native exact-financing checks remain. Non-strategic redundant
+power financing and legacy policy retain their prior behavior. No persistent
+field, RNG call, policy constant, data value/schema or validation limit is added or changed.
+
+Two new native regressions separately exercise an independent Nuke/power source
+and observed ore with no worker. On unchanged AI both fail ONLY the intended
+missing optional refund (None versus1250); original infantry really fires and
+natural source charging is observed. The identical new fixture bytes pass with
+actual1250 sale, paid charging/completion/spawn and recruit fire; source and power
+remain alive. Six existing understrength, legacy, service/foreign-aircraft reload,
+economic-job/financed-head and redundant-power controls pass unchanged. Together
+these are8/0/0 across four targeted commands, not workspace execution. Strict fmt
+and workspace/all-target Clippy pass. Exact untraced Jungle AFTER exits0:
+P7Won76033 after76034 schedules, all10 builders, mean706.741µs, max77.544ms,
+measured53.736s/command56.541823s including2.42s compilation. The combined general
+investment policy can alter earlier decisions; the ending is not attributed solely
+to the late observed engagement. All495 command snapshots rehash without drift.
+
+Source commit `4a103fa836f596af70a222f402fbea1f56bb0942` changes only ai.rs and
+ra8_ai.rs (202insertions/18deletions). Separate staged-check0 and completed-result
+read precede the commit. Fresh Git discovery covers495 inputs; manifest SHA
+5fa777e10b5959e4519093604ea95270ca76446f86cdcce09356d66923f75d3c.
+Fresh static inventory1124→1389(+265) has zero removed/renamed/ignored tests; its
+counts are distinct from execution. The two added tests migrate no old assertion.
+Exact receipts, hashes and complete before/after source manifests are in
+`ra8-attempt17-jungle/`.
+
+After the genuine late acceptance failure, coordinator-directed ordering runs the
+required isolated all21/fixed3/three example guards BEFORE the expensive fresh13.
+This supersedes the earlier ordering-only postgate requirement, not any check:
+all thirteen commands remain mandatory on final source, and unchanged-source
+isolated proofs remain bound through that gate without a duplicate solely for
+ordering. Any later source change requires honestly rerunning affected proofs.
+Checkpoint18 freezes the committed source for that sequence; no broad duplicate
+workspace/sim preflight is inserted. RA8 closure, canonical release, RA9 validation
+and independent final review remain pending. RA9 may import this exact commit into
+its existing ordinary copy by read/write only, with no Cargo/native/canonical lease.
+
+The required isolated checkpoint18 sequence then completes all five commands0,
+with495 unchanged before/after inputs for each. All21 maps have explicit Won and
+all10 builders, no stall, original400000 cap; tick median85583/p90112794/max126754
+(normalized.2139575/.281985/.316885), command1477.536893s. Worst mean1.408ms,
+worst individual355.967ms and busy1000 mean4.918ms are retained; mean acceptance
+does not establish smooth tails. Fixed3 liberty_bay/continental_divide/pacific_atoll
+each measures24000 ticks on256² with10 builders; mean.977735/.869383/.769983ms,
+p996.763/6.160/12.682ms, max49.650/88.398/56.632ms, busy1.818/2.224/1.849ms,
+late0/6/1. Their final worlds remain running, as allowed for this fixed-duration
+probe; they are not three to-the-end wins. Each m13/m14/soak guard passes1/0/0.
+`ra8-early18/acceptance-summary.json` binds every raw hash and measurement.
+These five proofs remain conditional on exact source through the still-required
+fresh13. A detached/nohup controller with durable PID/session/source/status and
+owned process-group failure cancellation runs that gate; no old gate success is
+transferred to the corrected runtime.
+
+Checkpoint18 evidence's unfiltered staged check exits2, NOTpassed: ten exact raw
+log diagnostics (eight blank EOF/two preserved trailing-space lines), stdoutSHA
+6e4fc6c20742a6b5c1cd393586d71f37724907823c7d9e4dff8290249917803d.
+The capture binds file/staged-blob/line/EOL hashes and confirms zero source/data/
+test/prose errors. Raw bytes are deliberately retained. A separate identical final
+check and completed-result read precede the evidence commit and clean-source gate.
+
+No external validation directory, clone or worktree is created. Existing configured
+Cargo target/package and parser caches remain; package outputs were regenerated.
+The existing RA9 ordinary copy remains necessary for integration and evidence.
+No Git directory was deleted. Visual/audio/play-feel quality still requires user
+verification. Main remains8230a955b251e9341d349f99eaeb86f7f8253664; no programme tag is created.

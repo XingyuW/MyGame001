@@ -1,0 +1,32 @@
+{
+  "name": "finance-before1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_optional_reinforcement",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "source_manifest": "docs/validation/ra2-parity/ra8-attempt17-jungle/finance-before1-manifest.json",
+  "manifest_sha256": "836a5c032895aeceac2a54debbbb85bc68b3b9ed70c50ded769e58e771aa72f2",
+  "start_utc": "2026-10-21T10:20:56.201787+00:00",
+  "head": "99bcdf1913f3d74079ce2baa8b440b68a315223a",
+  "status": "COMPLETED",
+  "source_files": 495,
+  "pid": 54510,
+  "exit": 101,
+  "seconds": 8.65576933301054,
+  "end_utc": "2026-10-21T10:21:04.864724+00:00",
+  "source_mismatches": [],
+  "raw": {
+    "path": "docs/validation/ra2-parity/ra8-attempt17-jungle/finance-before1.log",
+    "bytes": 1677,
+    "sha256": "20f09349f6b999d80be9daed4d8be2b3e4357fe94aa23a3c13daeec6a3b88822"
+  }
+}

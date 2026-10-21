@@ -1,0 +1,26 @@
+{
+  "name": "strict-fmt1",
+  "command": [
+    "cargo",
+    "fmt",
+    "--all",
+    "--",
+    "--check"
+  ],
+  "source_manifest": "docs/validation/ra2-parity/ra8-attempt17-jungle/strict-fmt1-manifest.json",
+  "manifest_sha256": "4126bc1f8321611c53244e9840a5d0d703f42a2dd1c77f9e2e12b3a1f3ebf877",
+  "start_utc": "2026-10-21T10:27:58.235245+00:00",
+  "head": "99bcdf1913f3d74079ce2baa8b440b68a315223a",
+  "status": "COMPLETED",
+  "source_files": 495,
+  "pid": 55529,
+  "exit": 0,
+  "seconds": 1.0011634170077741,
+  "end_utc": "2026-10-21T10:27:59.241735+00:00",
+  "source_mismatches": [],
+  "raw": {
+    "path": "docs/validation/ra2-parity/ra8-attempt17-jungle/strict-fmt1.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

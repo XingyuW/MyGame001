@@ -1,0 +1,14 @@
+{
+  "utc": "2026-10-19T10:40:08.397832+00:00",
+  "session": 97904,
+  "owned_process_group": 96449,
+  "rows": [
+    "96449 96423 96449    01:12:49   0:00.01   0.0 Ss   sh scripts/validate_ra2_parity.sh ra8",
+    "96454 96449 96449    01:12:49   0:00.01   0.0 S    caffeinate -d -i -w 96449",
+    "96499 96449 96449    01:12:47   0:00.48   0.0 S    /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo test --workspace --release",
+    "98580 96499 96449    01:08:25 472:03.99 605.6 R    /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-fff13bc99bc7e9e6"
+  ],
+  "frozen_head": "ab4a17606fcd013a4d8cc6452aa8435fcd24e987",
+  "log_bytes": 23156,
+  "note": "Bounded metadata-only activity evidence, not case/winner success. Harness may capture worker failures until completion. No sample, signal or competing simulation."
+}
