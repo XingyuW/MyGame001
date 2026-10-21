@@ -1761,3 +1761,126 @@ fn ra5_bridge_repair_waits_for_standing_and_entering_ships_without_harming_compa
         );
     }
 }
+
+/// SHK/TANY source Assaulter=no is unparsed. Current Occupier permissions and Tanya's
+/// separate C4 action are measured through public Interact, not a source-flag getter.
+#[test]
+fn ra9_false_assaulter_current_garrison_permissions() {
+    for name in ["tesla_trooper", "tanya"] {
+        let mut app = world();
+        let host = house(&mut app, 10, 10);
+        let first = put(&mut app, P1, "gi", 11, 10);
+        let friendly = put(&mut app, P1, "gi", 11, 11);
+        let observer = put(&mut app, P0, "engineer", 9, 12);
+        tick(&mut app, vec![]);
+        for unit in [first, friendly] {
+            let events = tick(
+                &mut app,
+                vec![issue(P1, Command::Interact { unit, target: host })],
+            );
+            assert!(
+                rejected(&events).is_empty(),
+                "{name}: friendly GI: {events:?}"
+            );
+            assert!(
+                entity(&mut app, unit).is_none(),
+                "actual entry consumes the on-map GI"
+            );
+            assert!(sim::cell_invariant_violations(app.world_mut()).is_empty());
+            assert!(
+                app.world()
+                    .resource::<Players>()
+                    .iter()
+                    .all(|(_, p)| p.credits() >= 0)
+            );
+        }
+        let cargo_ids = |app: &App| {
+            app.world().resource::<sim::SpecialState>().cargo[&host]
+                .iter()
+                .map(|p| p.id)
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(cargo_ids(&app), vec![first, friendly]);
+        assert_eq!(
+            app.world().resource::<sim::SpecialState>().garrisons[&host].owner,
+            P1
+        );
+        assert!(
+            app.world()
+                .resource::<Players>()
+                .get(P0)
+                .unwrap()
+                .vision()
+                .is_visible(CellPos::new(10, 10))
+        );
+        assert_eq!(owner(&mut app, observer), Some(P0));
+        // Spawn only after genuine occupation, then command immediately; no hostile
+        // setup tick lets passive acquisition consume either intended participant.
+        let attacker = put(&mut app, P0, name, 9, 10);
+        let kind = defs(&app).unit_kind(name).unwrap();
+        let definitions = defs(&app);
+        let meta = definitions.metadata(ProductionItem::Unit(kind)).unwrap();
+        assert!(!meta.occupier);
+        assert_eq!(meta.c4, name == "tanya");
+        let before_hp = app
+            .world()
+            .resource::<sim::Props>()
+            .get(host)
+            .unwrap()
+            .1
+            .hit_points;
+        let events = tick(
+            &mut app,
+            vec![issue(
+                P0,
+                Command::Interact {
+                    unit: attacker,
+                    target: host,
+                },
+            )],
+        );
+        assert_eq!(
+            cargo_ids(&app),
+            vec![first, friendly],
+            "{name}: never enters hostile cargo"
+        );
+        assert_eq!(
+            app.world().resource::<sim::SpecialState>().garrisons[&host].owner,
+            P1
+        );
+        assert_eq!(owner(&mut app, attacker), Some(P0));
+        if name == "tesla_trooper" {
+            assert_eq!(rejected(&events).len(), 1, "{events:?}");
+            assert!(
+                !app.world()
+                    .resource::<sim::SpecialState>()
+                    .charges
+                    .contains_key(&host)
+            );
+        } else {
+            // Tanya's accepted C4 action is distinct from admission into a garrison.
+            assert!(rejected(&events).is_empty(), "{events:?}");
+            let charge = &app.world().resource::<sim::SpecialState>().charges[&host];
+            assert!(charge.c4);
+            assert_eq!(charge.source, attacker);
+            assert!(charge.due > app.world().resource::<sim::SimTick>().0);
+            assert_eq!(
+                app.world()
+                    .resource::<sim::Props>()
+                    .get(host)
+                    .unwrap()
+                    .1
+                    .hit_points,
+                before_hp,
+                "planting is delayed, not an immediate assault kill"
+            );
+        }
+        assert!(sim::cell_invariant_violations(app.world_mut()).is_empty());
+        assert!(
+            app.world()
+                .resource::<Players>()
+                .iter()
+                .all(|(_, p)| p.credits() >= 0)
+        );
+    }
+}

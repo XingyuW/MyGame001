@@ -1,0 +1,14 @@
+{
+  "status": "SOURCE_ONLY_UNCOMPILED_UNRUN",
+  "authority": "A/root exact per-family classification correction:81 active registry ordinal nonreads;21 positive Soylent unit interface omissions are IntentionalDifference.",
+  "source_class_counts": {
+    "CURRENT_MODEL_NONREAD": 81,
+    "INTENTIONAL_DIFFERENCE": 21
+  },
+  "preserved": "Initial implementation receipt+exact preimages preserved. Only classification21cells and corresponding failclosed classifier branches changed; all exact values/reasons/bindings/routes/loaded and physical guards retained.",
+  "outputs": {
+    "completion-whole.rs": "2c407be11026b7e802dafcc6df28bcda28f9bf0dff3c2c234676150db74947bd",
+    "completion-whole-contracts.tsv": "faab3926f92eb653ffe9ffa0e5d09af3ca8df6b5edfbdc29d4f576449063c690"
+  },
+  "no_execution": true
+}

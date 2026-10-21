@@ -1,0 +1,47 @@
+{
+  "end_utc": "2026-10-21T11:18:32.819885+00:00",
+  "results": [
+    {
+      "utc": "2026-10-21T11:14:35.743802+00:00",
+      "end_utc": "2026-10-21T11:18:32.818656+00:00",
+      "label": "positive",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": -15,
+      "seconds": 237.075,
+      "phase04_ended_cancellation": false,
+      "scope": "FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_OR_ORIGINAL_ENGINE_ACCEPTANCE",
+      "source_before": "ra9-preliminary-logs/186-00-positive-start.json",
+      "source_drift_during_command": [],
+      "selected_target_mutated_sha256": "e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d",
+      "restoration_immediate": {
+        "utc": "2026-10-21T11:18:32.758365+00:00",
+        "sha256": "e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d"
+      },
+      "restoration_separate_later_read": {
+        "utc": "2026-10-21T11:18:32.818454+00:00",
+        "sha256": "e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d"
+      },
+      "raw": {
+        "path": "ra9-preliminary-logs/186-00-positive.log",
+        "bytes": 841,
+        "sha256": "19925f1aaa19f7a4ddff593cb785ae34d79a04a9fa1f2513ae815e815250931d"
+      }
+    }
+  ],
+  "owned_child_processes": "ALL_WAITED_AND_EXITED",
+  "phase04_done": false,
+  "target_restored_sha256": "e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d",
+  "source_before_after_drift": []
+}

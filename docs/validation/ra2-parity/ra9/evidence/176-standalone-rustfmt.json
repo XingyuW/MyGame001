@@ -1,0 +1,40 @@
+{
+  "utc": "2026-10-21T10:28:39.949961+00:00",
+  "command": [
+    "/Users/xingyuwang/.cargo/bin/rustfmt",
+    "--edition",
+    "2024",
+    "crates/sim/tests/ra4_spawns.rs",
+    "crates/sim/tests/ra7_orders.rs",
+    "crates/sim/examples/ra9_catalogue.rs",
+    "crates/sim/tests/ra9_start_setup.rs"
+  ],
+  "exit_code": 0,
+  "status": "COPY_ONLY_FORMATTING_NOT_COMPILATION_NATIVE_EXECUTION_OR_ACCEPTANCE",
+  "records": [
+    {
+      "path": "crates/sim/tests/ra4_spawns.rs",
+      "before_sha256": "96e56ac6d28f84b9b66714d65621c63089546a496a620a5f30dc115a65ebd34a",
+      "preimage": "ra9-preliminary-logs/176-before-rustfmt-crates__sim__tests__ra4_spawns.rs",
+      "after_sha256": "183644f61e2e65d31cfcc4ae0639d2791351608a189f5552a5808dd89779fdbc"
+    },
+    {
+      "path": "crates/sim/tests/ra7_orders.rs",
+      "before_sha256": "5c572365b610a0b2908796f9b33afe5d0de207bed59998828b7ada1b5ec4b5fa",
+      "preimage": "ra9-preliminary-logs/176-before-rustfmt-crates__sim__tests__ra7_orders.rs",
+      "after_sha256": "7ba378e9c223ba32738c6ad7d6e9ba3b5c104535f652a480115666e21468ec38"
+    },
+    {
+      "path": "crates/sim/examples/ra9_catalogue.rs",
+      "before_sha256": "6bb858b688cc21ca257d38a837112886ec0ba544e2b85fe6c216dd3a36b1f431",
+      "preimage": "ra9-preliminary-logs/176-before-rustfmt-crates__sim__examples__ra9_catalogue.rs",
+      "after_sha256": "9a078d05b3220f7685d3badb1055f6a64a1cb416aecdf9145c8181a9f0423743"
+    },
+    {
+      "path": "crates/sim/tests/ra9_start_setup.rs",
+      "before_sha256": "e8251318f3666dc50378202d032db48bbb035443537b5325fdd62c7a4e1cd8c3",
+      "preimage": "ra9-preliminary-logs/176-before-rustfmt-crates__sim__tests__ra9_start_setup.rs",
+      "after_sha256": "5995c654485ac76ea86342d5e107c478e18f2ff2977ca44997857f1b35bd6ae5"
+    }
+  ]
+}

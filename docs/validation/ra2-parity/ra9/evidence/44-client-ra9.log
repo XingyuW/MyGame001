@@ -1,0 +1,42 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+   Compiling game v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/game)
+error[E0559]: variant `sim::Command::SetRallyPoint` has no field named `target`
+    --> crates/game/src/construction.rs:1133:43
+     |
+1133 |                     building:producers[0],target:cell}).expect("fill actual sink");
+     |                                           ^^^^^^ `sim::Command::SetRallyPoint` does not have this field
+     |
+     = note: available fields are: `cell`
+
+error[E0559]: variant `sim::Command::SetRallyPoint` has no field named `target`
+    --> crates/game/src/construction.rs:1171:105
+     |
+1171 |         app.world_mut().resource_mut::<CommandSink>().push(Command::SetRallyPoint{building:producers[0],target:old}).expect("fill");
+     |                                                                                                         ^^^^^^ `sim::Command::SetRallyPoint` does not have this field
+     |
+     = note: available fields are: `cell`
+
+error[E0004]: non-exhaustive patterns: `&sim::SimEvent::BuildingRevealed { .. }` not covered
+    --> crates/game/src/audio.rs:2132:11
+     |
+2132 |     match event {
+     |           ^^^^^ pattern `&sim::SimEvent::BuildingRevealed { .. }` not covered
+     |
+note: `sim::SimEvent` defined here
+    --> crates/sim/src/event.rs:22:1
+     |
+  22 | pub enum SimEvent {
+     | ^^^^^^^^^^^^^^^^^
+  23 |     /// Public location notice; radar display still follows powered-radar policy.
+  24 |     BuildingRevealed { player: PlayerId, building: SimId, kind: BuildingKind, origin: CellPos },
+     |     ---------------- not covered
+     = note: the matched value is of type `&sim::SimEvent`
+help: ensure that all possible cases are being handled by adding a match arm with a wildcard pattern or an explicit pattern as shown
+     |
+2186 ~         | SimEvent::MatchEnded { .. } => None,
+2187 ~         &sim::SimEvent::BuildingRevealed { .. } => todo!(),
+     |
+
+Some errors have detailed explanations: E0004, E0559.
+For more information about an error, try `rustc --explain E0004`.
+error: could not compile `game` (bin "game" test) due to 3 previous errors

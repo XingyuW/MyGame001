@@ -1,0 +1,20 @@
+{
+  "utc": "2026-10-21T00:39:38.039470+00:00",
+  "ended_utc": "2026-10-21T00:42:42.671112+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "ra9_actual_source_policy_consumer_premises_and_physical_dependencies_match",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit_code": 101,
+  "seconds": 184.631,
+  "lease": "RA8 revocable functional phase jobs1; actual static/loaded guards no native/final policy credit",
+  "input_mismatches": []
+}

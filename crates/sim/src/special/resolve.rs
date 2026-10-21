@@ -33,6 +33,9 @@ pub(crate) fn resolve(world: &mut World) {
             // RA4: ammunition, launchers and the surfacing of a cloaked unit, for every shot,
             // whatever it is fired at (scenery is no actor).
             crate::flight::fired(world, &defs, a, target, weapon, tick);
+            if defs.rules().is_some() && scenery::fired(world, &defs, a, target, weapon) {
+                continue;
+            }
             let Some(b) = index.get(&target) else {
                 continue;
             };
@@ -62,6 +65,9 @@ pub(crate) fn resolve(world: &mut World) {
                         clear_orders(world, b.entity);
                     }
                 }
+                // Native SquidGrab was handled by vehicles::fired. SquidPunch is ordinary
+                // combat damage; it must not acquire the no-Rules role-only disable effect.
+                Role::Squid if defs.rules().is_some() => {}
                 Role::Drone | Role::Squid | Role::Chrono => {
                     world
                         .resource_mut::<SpecialState>()
@@ -104,6 +110,7 @@ pub(crate) fn resolve(world: &mut World) {
                                 direct: None,
                                 firepower_pm: 1000,
                                 source: Some(a.id),
+                                identity: None,
                             },
                             true,
                         ),

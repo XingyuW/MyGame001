@@ -1,0 +1,18 @@
+{
+  "utc": "2026-10-20T22:58:42.624586+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "every_loaded_physical_adapter_reports_exact_failures_before_source_policy_admission",
+    "--",
+    "--nocapture"
+  ],
+  "exit_code": 101,
+  "seconds": 159.323,
+  "lease": "RA8revocable functional phase; jobs1 target unchanged",
+  "status": "preliminary actual adapters, no source admission credit"
+}

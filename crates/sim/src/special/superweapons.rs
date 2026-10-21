@@ -606,6 +606,7 @@ fn bolt(world: &mut World, defs: &Definitions, s: &Storm, c: CellPos) {
                 direct: None,
                 firepower_pm: 1000,
                 source: Some(s.source),
+                identity: None,
             },
             true,
         );

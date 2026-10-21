@@ -392,12 +392,14 @@ pub fn stop_command(selection: &BTreeSet<SimId>) -> Option<Command> {
 
 // --- Systems --------------------------------------------------------------------------------
 
-/// Whether the unit `id` was launched by another unit (RA4: a missile, a carrier's aircraft): it
-/// takes no commands, so it is never selected.
+/// Whether the unit takes no commands because it was launched by another unit (RA4) or
+/// is a strategic mission aircraft (RA6). Neither appears in ordinary unit selections.
 fn launched(host: &SimHost, id: SimId) -> bool {
     host.world()
         .get_resource::<sim::SpecialState>()
-        .is_some_and(|state| state.spawned.contains_key(&id))
+        .is_some_and(|state| {
+            state.spawned.contains_key(&id) || state.strategic.flights.contains_key(&id)
+        })
 }
 
 /// The player's own units that take commands, and their ground points in the world.
@@ -694,11 +696,21 @@ fn shown_enemy_building(host: &SimHost, cell: Option<CellPos>) -> Option<SimId> 
         .map(|(id, ..)| *id)
 }
 
-/// The scenery standing in `cell` (`sim::Props`: trees, houses, city blocks) that the human
-/// player has explored: a right click with armed units selected orders them to destroy it.
+/// Ordinary scenery targets on explored ground. RA2 trees require force fire;
+/// the legacy ruleset retains its ordinary tree targeting.
 fn shown_scenery(host: &SimHost, cell: Option<CellPos>) -> Option<SimId> {
     let cell = cell?;
-    let id = host.props()?.id_at(cell)?;
+    let props = host.props()?;
+    let id = props.id_at(cell)?;
+    // RA9: apply shipped RA2's disabled TreeTargeting to ordinary cursor targets.
+    // Ctrl force fire still finds trees independently through ra7_controls::known_at.
+    if props.at(cell)?.kind == sim::PropKind::Trees
+        && host
+            .definitions()
+            .is_some_and(|defs| defs.rules().is_some())
+    {
+        return None;
+    }
     if host
         .world()
         .get_resource::<sim::SpecialState>()
@@ -1430,6 +1442,7 @@ fn draw_order_preview(
 
 #[cfg(test)]
 mod tests {
+    include!("selection_pad_native.rs");
     use super::*;
 
     fn input_app() -> (App, Entity, SimId) {
@@ -1521,6 +1534,500 @@ mod tests {
         app.world_mut()
             .resource_mut::<ButtonInput<MouseButton>>()
             .reset_all();
+    }
+
+    // RA9 scenarios use shipped definitions for shipped targeting, and the independent
+    // legacy fixture only for the rules-less compatibility control. Every Prop is installed
+    // by the same world-object installer as an actual client/headless match.
+    fn ra9_prop_scene(
+        feature: u8,
+        legacy: bool,
+        explored: bool,
+        actor: &str,
+    ) -> (SimHost, SimId, SimId) {
+        let cell = CellPos::new(11, 16);
+        let mut selected = None;
+        let host = crate::sim_host::tests::fixture_host(|world| {
+            let root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+            let data = if legacy {
+                root.join("../sim/tests/fixtures/data/legacy")
+            } else {
+                root.join("../../assets/data")
+            };
+            let defs = if legacy {
+                sim::load_match_definitions(
+                    data.join("units.ron"),
+                    data.join("economy.ron"),
+                    data.join("combat.ron"),
+                )
+                .expect("legacy combat definitions")
+                .with_arsenal(data.join("arsenal.ron"))
+                .expect("legacy metadata")
+            } else {
+                sim::load_ruleset(&data).expect("shipped ruleset")
+            };
+            let mut skirmish =
+                sim::load_skirmish(data.join("skirmish.ron"), &defs).expect("skirmish definitions");
+            let ai = sim::load_ai(data.join("ai.ron"), &defs).expect("AI definitions");
+            // Tiny input scenario: no starting armies or AI controller can fight the Prop.
+            // Both real starting yards survive, so the client has a running match.
+            for faction in &mut skirmish.factions {
+                faction.units.clear();
+                if faction.side.is_none() {
+                    faction.buildings.truncate(1);
+                }
+            }
+            skirmish.maps[0].starts = vec![CellPos::new(2, 2), CellPos::new(26, 26)];
+            world.insert_resource(defs);
+            let open = sim::Cell {
+                passable: true,
+                water: false,
+                buildable: true,
+                ore: 0,
+            };
+            let mut grid = sim::Grid::from_cells(32, 32, vec![open; 32 * 32]).expect("grid");
+            grid.set_terrain(
+                cell,
+                sim::Cell {
+                    passable: feature == 8,
+                    buildable: false,
+                    ..open
+                },
+            );
+            let mut looks = vec![0; 32 * 32];
+            looks[16 * 32 + 11] = feature << 4;
+            grid.mark_world_features(&looks);
+            world.insert_resource(grid);
+            sim::setup_match_configured(
+                world,
+                &skirmish,
+                &ai,
+                0,
+                &[
+                    sim::PlayerSetup {
+                        player: HUMAN,
+                        faction: 0,
+                        start: 0,
+                        controller: sim::Controller::Human,
+                    },
+                    sim::PlayerSetup {
+                        player: sim::PlayerId(1),
+                        faction: 1,
+                        start: 1,
+                        controller: sim::Controller::Human,
+                    },
+                ],
+                &sim::MatchOptions {
+                    unit_count: Some(0),
+                    mcv_start: false,
+                    free_for_all: true,
+                    crates: false,
+                    ore_grows: false,
+                    ..default()
+                },
+            )
+            .expect("two human-controlled surviving yards and real world objects");
+            selected =
+                Some(sim::spawn_unit(world, HUMAN, actor, CellPos::new(10, 16)).expect("actor"));
+            if explored {
+                world.run_schedule(sim::SimSchedule);
+            }
+        });
+        assert!(host.running(), "preview_order requires a live client match");
+        let actor = selected.expect("selected actor");
+        let prop = host.props().expect("props").id_at(cell).expect("prop");
+        assert_eq!(
+            host.definitions().expect("definitions").rules().is_none(),
+            legacy
+        );
+        assert_eq!(
+            host.players()
+                .expect("players")
+                .get(HUMAN)
+                .expect("human")
+                .vision()
+                .is_explored(cell),
+            explored
+        );
+        assert!(host.world().iter_entities().any(|e| {
+            e.get::<SimId>() == Some(&actor)
+                && e.get::<sim::Health>().is_some_and(|h| h.hit_points > 0)
+        }));
+        (host, actor, prop)
+    }
+
+    fn ra9_prop_input(host: SimHost, actor: SimId) -> (App, Entity) {
+        let terrain = host.grid().expect("grid").clone();
+        let (mut app, window, selected) = input_app_on(host);
+        assert_eq!(selected, actor, "the only own actor supplies the view");
+        app.insert_resource(MapTerrain(terrain)).add_systems(
+            Update,
+            preview_order.before(issue_orders).after(select_units),
+        );
+        app.world_mut().resource_mut::<Selection>().0.insert(actor);
+        app.world_mut().resource_mut::<HoveredCell>().0 = Some(CellPos::new(11, 16));
+        cursor(&mut app, window, Some(Vec2::new(800.0, 400.0)));
+        (app, window)
+    }
+
+    fn ra9_right_click_commands(app: &mut App) -> Vec<Command> {
+        app.world_mut()
+            .resource_mut::<ButtonInput<MouseButton>>()
+            .press(MouseButton::Right);
+        app.update();
+        app.world_mut()
+            .resource_mut::<ButtonInput<MouseButton>>()
+            .reset_all();
+        crate::sim_host::tests::take_commands(app)
+    }
+
+    fn ra9_run_input(app: &mut App, commands: Vec<Command>) -> Vec<sim::SimEvent> {
+        crate::sim_host::tests::run(&mut app.world_mut().resource_mut::<SimHost>(), commands)
+    }
+
+    #[test]
+    fn ra9_ra2_tree_ordinary_preview_and_right_click_require_force_fire() {
+        let (host, actor, prop) = ra9_prop_scene(4, false, true, "grizzly");
+        assert!(own_units_with::<Weapon>(&host).contains(&actor));
+        assert_eq!(
+            host.props().unwrap().get(prop).unwrap().1.kind,
+            sim::PropKind::Trees
+        );
+        assert_eq!(shown_scenery(&host, Some(CellPos::new(11, 16))), None);
+        assert_eq!(
+            crate::ra7_controls::known_at(&host, Some(CellPos::new(11, 16))),
+            Some(prop)
+        );
+        let hp = host.props().unwrap().get(prop).unwrap().1.hit_points;
+        let (mut app, _) = ra9_prop_input(host, actor);
+        app.update();
+        let preview = *app.world().resource::<OrderPreview>();
+        assert_eq!(
+            preview.intent,
+            OrderIntent::Invalid,
+            "the visible tree blocks ground"
+        );
+        assert_eq!(preview.target, None);
+        assert_eq!(preview.intent.label(), "CANNOT GO");
+        assert_eq!(ra9_right_click_commands(&mut app), []);
+        assert_eq!(app.world().resource::<CommandSink>().accepted(), 0);
+        let events = ra9_run_input(&mut app, vec![]);
+        assert!(
+            !events
+                .iter()
+                .any(|e| matches!(e, sim::SimEvent::WeaponFired { .. }))
+        );
+        assert_eq!(
+            app.world()
+                .resource::<SimHost>()
+                .props()
+                .unwrap()
+                .get(prop)
+                .unwrap()
+                .1
+                .hit_points,
+            hp
+        );
+    }
+
+    #[test]
+    fn ra9_non_tree_scenery_and_legacy_trees_keep_ordinary_attack_commands() {
+        for (feature, legacy, kind) in [
+            (5, false, sim::PropKind::House),
+            (6, false, sim::PropKind::CityBlock),
+            (7, false, sim::PropKind::Tower),
+            (8, false, sim::PropKind::Bridge),
+            (4, true, sim::PropKind::Trees),
+        ] {
+            let actor_type = if legacy { "light_tank" } else { "grizzly" };
+            let (host, actor, prop) = ra9_prop_scene(feature, legacy, true, actor_type);
+            assert!(own_units_with::<Weapon>(&host).contains(&actor));
+            assert_eq!(host.props().unwrap().get(prop).unwrap().1.kind, kind);
+            assert_eq!(shown_scenery(&host, Some(CellPos::new(11, 16))), Some(prop));
+            let (mut app, _) = ra9_prop_input(host, actor);
+            app.update();
+            assert_eq!(
+                app.world().resource::<OrderPreview>().intent,
+                OrderIntent::Attack,
+                "{kind:?}"
+            );
+            assert_eq!(app.world().resource::<OrderPreview>().target, Some(prop));
+            let commands = ra9_right_click_commands(&mut app);
+            assert_eq!(
+                commands,
+                [Command::Attack {
+                    units: vec![actor],
+                    target: prop
+                }]
+            );
+            let events = ra9_run_input(&mut app, commands);
+            assert!(
+                !events
+                    .iter()
+                    .any(|e| matches!(e, sim::SimEvent::CommandRejected { .. })),
+                "{events:?}"
+            );
+            assert!(events.iter().any(|e| matches!(e,
+                sim::SimEvent::WeaponFired { attacker, target, .. } if *attacker == actor && *target == prop
+            )), "{kind:?}: {events:?}");
+        }
+    }
+
+    #[test]
+    fn ra9_ctrl_tree_click_keeps_entity_force_fire_and_native_damage() {
+        let (host, actor, prop) = ra9_prop_scene(4, false, true, "grizzly");
+        let hp = host.props().unwrap().get(prop).unwrap().1.hit_points;
+        let (mut app, _) = ra9_prop_input(host, actor);
+        app.world_mut()
+            .resource_mut::<ButtonInput<KeyCode>>()
+            .press(KeyCode::ControlLeft);
+        app.update();
+        assert_eq!(
+            app.world().resource::<OrderPreview>().intent,
+            OrderIntent::ForceFire
+        );
+        assert_eq!(app.world().resource::<OrderPreview>().target, Some(prop));
+        let commands = ra9_right_click_commands(&mut app);
+        assert_eq!(
+            commands,
+            [Command::ForceFire {
+                units: vec![actor],
+                target: sim::ForceTarget::Entity(prop),
+            }]
+        );
+        let events = ra9_run_input(&mut app, commands);
+        assert!(
+            !events
+                .iter()
+                .any(|e| matches!(e, sim::SimEvent::CommandRejected { .. })),
+            "{events:?}"
+        );
+        assert!(events.iter().any(|e| matches!(e,
+            sim::SimEvent::WeaponFired { attacker, target, .. } if *attacker == actor && *target == prop
+        )), "{events:?}");
+        // Shipped Grizzly projectiles take time to arrive; observe the real impact.
+        for _ in 0..16 {
+            ra9_run_input(&mut app, vec![]);
+        }
+        assert!(
+            app.world()
+                .resource::<SimHost>()
+                .props()
+                .unwrap()
+                .get(prop)
+                .is_none_or(|(_, tree)| tree.hit_points < hp)
+        );
+    }
+
+    #[test]
+    fn ra9_unexplored_tree_and_empty_cell_never_supply_an_entity_to_cursor_or_ctrl() {
+        for explored in [false, true] {
+            let (host, actor, _) = ra9_prop_scene(4, false, explored, "grizzly");
+            let cell = if explored {
+                CellPos::new(12, 16)
+            } else {
+                CellPos::new(11, 16)
+            };
+            assert_eq!(shown_scenery(&host, Some(cell)), None);
+            assert_eq!(crate::ra7_controls::known_at(&host, Some(cell)), None);
+            assert_eq!(shown_scenery(&host, None), None);
+            assert_eq!(crate::ra7_controls::known_at(&host, None), None);
+            let (mut app, _) = ra9_prop_input(host, actor);
+            app.world_mut().resource_mut::<HoveredCell>().0 = Some(cell);
+            app.update();
+            assert_eq!(
+                app.world().resource::<OrderPreview>().intent,
+                OrderIntent::Move
+            );
+            assert_eq!(app.world().resource::<OrderPreview>().target, None);
+            assert_eq!(
+                ra9_right_click_commands(&mut app),
+                [Command::Move {
+                    units: vec![actor],
+                    target: cell
+                }]
+            );
+            app.world_mut()
+                .resource_mut::<ButtonInput<KeyCode>>()
+                .press(KeyCode::ControlLeft);
+            app.update();
+            assert_eq!(
+                app.world().resource::<OrderPreview>().intent,
+                OrderIntent::ForceFire
+            );
+            assert_eq!(app.world().resource::<OrderPreview>().target, None);
+            assert_eq!(
+                ra9_right_click_commands(&mut app),
+                [Command::ForceFire {
+                    units: vec![actor],
+                    target: sim::ForceTarget::Cell(cell),
+                }]
+            );
+        }
+    }
+
+    #[test]
+    fn ra9_tree_removed_by_native_damage_and_cleanup_is_missing_to_cursor_and_commands() {
+        let (mut host, actor, prop) = ra9_prop_scene(4, false, true, "grizzly");
+        let mut events = crate::sim_host::tests::run(
+            &mut host,
+            vec![Command::ForceFire {
+                units: vec![actor],
+                target: sim::ForceTarget::Entity(prop),
+            }],
+        );
+        let mut destroyed = events.iter().any(|e| {
+            matches!(e,
+                sim::SimEvent::PropDestroyed { prop: id, .. } if *id == prop
+            )
+        });
+        for _ in 0..256 {
+            if destroyed {
+                break;
+            }
+            events = crate::sim_host::tests::run(&mut host, vec![]);
+            destroyed = events.iter().any(|e| {
+                matches!(e,
+                    sim::SimEvent::PropDestroyed { prop: id, .. } if *id == prop
+                )
+            });
+        }
+        assert!(destroyed, "native weapon damage must reach Cleanup");
+        let cell = CellPos::new(11, 16);
+        assert!(host.props().unwrap().get(prop).is_none());
+        assert!(host.grid().unwrap().cell(cell).unwrap().passable);
+        assert_eq!(shown_scenery(&host, Some(cell)), None);
+        assert_eq!(crate::ra7_controls::known_at(&host, Some(cell)), None);
+        let missing = SimId(u32::MAX - 1);
+        let commands: Vec<_> = [prop, missing]
+            .into_iter()
+            .flat_map(|target| {
+                [
+                    Command::Attack {
+                        units: vec![actor],
+                        target,
+                    },
+                    Command::ForceFire {
+                        units: vec![actor],
+                        target: sim::ForceTarget::Entity(target),
+                    },
+                ]
+            })
+            .collect();
+        let events = crate::sim_host::tests::run(&mut host, commands);
+        let rejected: Vec<_> = events
+            .iter()
+            .filter_map(|e| match e {
+                sim::SimEvent::CommandRejected { reason, .. } => Some(reason.clone()),
+                _ => None,
+            })
+            .collect();
+        assert_eq!(
+            rejected,
+            [
+                sim::RejectReason::UnknownTarget(prop),
+                sim::RejectReason::UnknownTarget(prop),
+                sim::RejectReason::UnknownTarget(missing),
+                sim::RejectReason::UnknownTarget(missing),
+            ]
+        );
+        assert!(
+            !events
+                .iter()
+                .any(|e| matches!(e, sim::SimEvent::WeaponFired { .. }))
+        );
+        // The input app is created after completed Cleanup, using the resulting open terrain.
+        let (mut app, _) = ra9_prop_input(host, actor);
+        app.update();
+        assert_eq!(
+            app.world().resource::<OrderPreview>().intent,
+            OrderIntent::Move
+        );
+        assert_eq!(app.world().resource::<OrderPreview>().target, None);
+        assert_eq!(
+            ra9_right_click_commands(&mut app),
+            [Command::Move {
+                units: vec![actor],
+                target: cell
+            }]
+        );
+        app.world_mut()
+            .resource_mut::<ButtonInput<KeyCode>>()
+            .press(KeyCode::ControlLeft);
+        app.update();
+        assert_eq!(app.world().resource::<OrderPreview>().target, None);
+        assert_eq!(
+            ra9_right_click_commands(&mut app),
+            [Command::ForceFire {
+                units: vec![actor],
+                target: sim::ForceTarget::Cell(cell),
+            }]
+        );
+    }
+
+    #[test]
+    fn ra9_tree_filter_preserves_valid_garrison_context_and_occupied_exclusion() {
+        let (host, gi, house) = ra9_prop_scene(5, false, true, "gi");
+        let cell = Some(CellPos::new(11, 16));
+        assert_eq!(crate::ra7_controls::known_at(&host, cell), Some(house));
+        assert_eq!(
+            sim::special::interaction_label(host.world(), HUMAN, gi, house),
+            Some("GARRISON")
+        );
+        let (mut app, _) = ra9_prop_input(host, gi);
+        app.update();
+        assert_eq!(
+            app.world().resource::<OrderPreview>().intent,
+            OrderIntent::Interact("GARRISON")
+        );
+        assert_eq!(app.world().resource::<OrderPreview>().target, Some(house));
+        let commands = ra9_right_click_commands(&mut app);
+        assert_eq!(
+            commands,
+            [Command::Interact {
+                unit: gi,
+                target: house
+            }]
+        );
+        let events = ra9_run_input(&mut app, commands);
+        assert!(
+            !events
+                .iter()
+                .any(|e| matches!(e, sim::SimEvent::CommandRejected { .. })),
+            "{events:?}"
+        );
+        let host = app.world().resource::<SimHost>();
+        assert!(
+            host.world()
+                .resource::<sim::SpecialState>()
+                .garrisons
+                .contains_key(&house)
+        );
+        assert_eq!(shown_scenery(host, cell), None);
+        assert_eq!(own_building(host, cell), Some(house));
+    }
+
+    #[test]
+    fn ra9_tree_is_no_specialist_interaction_target() {
+        for actor_type in ["engineer", "tanya"] {
+            let (host, actor, tree) = ra9_prop_scene(4, false, true, actor_type);
+            assert_eq!(
+                crate::ra7_controls::known_at(&host, Some(CellPos::new(11, 16))),
+                Some(tree)
+            );
+            assert_eq!(
+                sim::special::interaction_label(host.world(), HUMAN, actor, tree),
+                None
+            );
+            let (mut app, _) = ra9_prop_input(host, actor);
+            app.update();
+            assert_eq!(
+                app.world().resource::<OrderPreview>().intent,
+                OrderIntent::Invalid
+            );
+            assert_eq!(app.world().resource::<OrderPreview>().target, None);
+            assert_eq!(ra9_right_click_commands(&mut app), []);
+        }
     }
 
     #[test]
@@ -2461,5 +2968,798 @@ mod tests {
         assert_eq!(move_command(&selection, None), None);
         assert_eq!(move_command(&ids(&[]), Some(target)), None);
         assert_eq!(stop_command(&ids(&[])), None);
+    }
+    // UNCOMPILED / UNRUN / UNACCEPTED. Append INSIDE existing selection::tests.
+    // Actual command-created SimHost actors are independent of controlled UnitView layout.
+    // Transform/Visibility/ComputedCamera/HoveredCell below are input-fixture presentation only;
+    // they do not spawn actors, relations, command receipts, visibility or source flag readers.
+    fn c62_view_data(host: &SimHost, id: SimId) -> (Entity, sim::SubPos, sim::PlayerId) {
+        let mut q = host
+            .world()
+            .try_query::<(Entity, &SimId, &sim::Owner, &sim::Position)>()
+            .unwrap();
+        q.iter(host.world())
+            .find(|(_, found, ..)| **found == id)
+            .map(|(e, _, o, p)| (e, p.0, o.0))
+            .unwrap()
+    }
+    fn c62_input(host: SimHost, subject: Option<SimId>, normal: SimId) -> (App, Entity) {
+        assert!(
+            host.running(),
+            "real setup_match_configured, not a fabricated running state"
+        );
+        let grid = host.grid().unwrap().clone();
+        let mut data = vec![(normal, c62_view_data(&host, normal), 200.0)];
+        if let Some(id) = subject {
+            data.push((id, c62_view_data(&host, id), 0.0));
+        }
+        let (mut app, window, _) = input_app_on(host);
+        let old = app
+            .world_mut()
+            .query_filtered::<Entity, With<UnitView>>()
+            .iter(app.world())
+            .collect::<Vec<_>>();
+        for e in old {
+            app.world_mut().despawn(e);
+        }
+        for (id, (unit, pos, owner), x) in data {
+            app.world_mut().spawn((
+                UnitView {
+                    unit,
+                    id,
+                    owner,
+                    previous: pos,
+                    current: pos,
+                    altitude: 0.0,
+                    drawn: None,
+                    stride: 0.0,
+                },
+                Transform::from_xyz(x, 0.0, 10.0),
+                Visibility::Visible,
+            ));
+        }
+        app.init_resource::<ControlGroups>()
+            .insert_resource(crate::map::MapTerrain(grid))
+            .insert_resource(crate::map::MapView {
+                width: 48,
+                height: 48,
+                tile: crate::projection::TileSize::new(64, 32),
+            })
+            .add_message::<sim::SimEvent>()
+            .add_message::<AppExit>()
+            .add_systems(
+                Update,
+                preview_order.after(select_units).before(issue_orders),
+            );
+        (app, window)
+    }
+    fn c62_select_normal(app: &mut App, window: Entity) {
+        app.world_mut().resource_mut::<HoveredCell>().0 = None;
+        cursor(app, window, Some(Vec2::new(840.0, 400.0)));
+        click(app, MouseButton::Left);
+    }
+    fn c62_empty_subject_click(app: &mut App, window: Entity) {
+        app.world_mut().resource_mut::<HoveredCell>().0 = None;
+        cursor(app, window, Some(Vec2::new(640.0, 400.0)));
+        click(app, MouseButton::Left);
+    }
+    fn c62_hover(app: &mut App, window: Entity, cell: CellPos) {
+        app.world_mut().resource_mut::<HoveredCell>().0 = Some(cell);
+        cursor(app, window, Some(Vec2::new(800.0, 600.0)));
+        app.update();
+    }
+    fn c62_pending(app: &App) -> Vec<Command> {
+        crate::sim_host::tests::pending_commands_for_test(app.world().resource::<CommandSink>())
+    }
+    fn c62_key(app: &mut App, key: KeyCode) {
+        app.world_mut()
+            .resource_mut::<ButtonInput<KeyCode>>()
+            .press(key);
+        crate::ra7_controls::run_extended_keys_for_test(app.world_mut());
+        app.world_mut()
+            .resource_mut::<ButtonInput<KeyCode>>()
+            .reset_all();
+    }
+    fn c62_cycle_from_normal(
+        app: &mut App,
+        window: Entity,
+        normal: SimId,
+        excluded: SimId,
+        eligible: &[SimId],
+    ) {
+        c62_select_normal(app, window);
+        assert_eq!(
+            app.world().resource::<Selection>().0,
+            BTreeSet::from([normal])
+        );
+        let n = eligible.iter().position(|id| *id == normal).unwrap();
+        c62_key(app, KeyCode::KeyN);
+        assert_eq!(
+            app.world().resource::<Selection>().0,
+            BTreeSet::from([eligible[(n + 1) % eligible.len()]])
+        );
+        c62_key(app, KeyCode::KeyM);
+        assert_eq!(
+            app.world().resource::<Selection>().0,
+            BTreeSet::from([normal])
+        );
+        let mut seen = BTreeSet::new();
+        for _ in 0..eligible.len() {
+            c62_key(app, KeyCode::KeyN);
+            let selected = &app.world().resource::<Selection>().0;
+            assert_eq!(selected.len(), 1);
+            assert!(!selected.contains(&excluded));
+            seen.extend(selected.iter().copied());
+        }
+        assert_eq!(seen, eligible.iter().copied().collect());
+        assert_eq!(app.world().resource::<CommandSink>().accepted(), 0);
+        assert!(
+            c62_pending(app).is_empty(),
+            "selection/cycling must not issue gameplay commands"
+        );
+    }
+    fn c62_mission_selection_and_sink(section: &str) {
+        let (host, subject, normal, _) =
+            crate::minimap::ra9_behavior87_routes::c62_mission(section);
+        let mut q = host.world().try_query::<(&SimId, &sim::Mobile)>().unwrap();
+        let before = q
+            .iter(host.world())
+            .find(|(id, _)| **id == subject)
+            .unwrap()
+            .1
+            .sub_position();
+        let (mut app, window) = c62_input(host, Some(subject), normal);
+        c62_empty_subject_click(&mut app, window);
+        assert!(app.world().resource::<Selection>().0.is_empty());
+        c62_empty_subject_click(&mut app, window); // Second click cannot type-select a real mission.
+        assert!(app.world().resource::<Selection>().0.is_empty());
+        assert_eq!(app.world().resource::<SelectedBuilding>().0, None);
+        c62_select_normal(&mut app, window);
+        assert_eq!(
+            app.world().resource::<Selection>().0,
+            BTreeSet::from([normal])
+        );
+        app.world_mut()
+            .resource_mut::<ButtonInput<KeyCode>>()
+            .press(KeyCode::ShiftLeft);
+        c62_empty_subject_click(&mut app, window);
+        assert_eq!(
+            app.world().resource::<Selection>().0,
+            BTreeSet::from([normal])
+        );
+        app.world_mut()
+            .resource_mut::<ButtonInput<KeyCode>>()
+            .reset_all();
+        cursor(&mut app, window, Some(Vec2::new(600.0, 350.0)));
+        app.world_mut()
+            .resource_mut::<ButtonInput<MouseButton>>()
+            .press(MouseButton::Left);
+        app.update();
+        app.world_mut()
+            .resource_mut::<ButtonInput<MouseButton>>()
+            .clear();
+        cursor(&mut app, window, Some(Vec2::new(880.0, 450.0)));
+        app.update();
+        app.world_mut()
+            .resource_mut::<ButtonInput<MouseButton>>()
+            .release(MouseButton::Left);
+        app.update();
+        app.world_mut()
+            .resource_mut::<ButtonInput<MouseButton>>()
+            .reset_all();
+        assert_eq!(
+            app.world().resource::<Selection>().0,
+            BTreeSet::from([normal])
+        );
+        c62_empty_subject_click(&mut app, window);
+        let dest = CellPos::new(20, 14);
+        c62_hover(&mut app, window, dest);
+        assert_eq!(
+            app.world().resource::<OrderPreview>().intent,
+            OrderIntent::None
+        );
+        click(&mut app, MouseButton::Right);
+        assert_eq!(app.world().resource::<CommandSink>().accepted(), 0);
+        assert!(
+            c62_pending(&app).is_empty(),
+            "unselected mission cannot reach CommandSink"
+        );
+        c62_select_normal(&mut app, window);
+        c62_hover(&mut app, window, dest);
+        assert_eq!(
+            app.world().resource::<OrderPreview>().intent,
+            OrderIntent::Move
+        );
+        click(&mut app, MouseButton::Right);
+        let expected = Command::Move {
+            units: vec![normal],
+            target: dest,
+        };
+        assert_eq!(c62_pending(&app), vec![expected]);
+        assert_eq!(app.world().resource::<CommandSink>().accepted(), 1);
+        let tick = app.world().resource::<SimHost>().tick();
+        crate::sim_host::tests::run_sink_tick_for_test(app.world_mut());
+        let host = app.world().resource::<SimHost>();
+        assert_eq!(host.tick(), tick + 1);
+        let events = app
+            .world()
+            .resource::<bevy::ecs::message::Messages<sim::SimEvent>>();
+        assert!(
+            !events
+                .iter_current_update_messages()
+                .any(|e| matches!(e, sim::SimEvent::CommandRejected { .. }))
+        );
+        let mut q = host
+            .world()
+            .try_query::<(&SimId, &sim::Mobile, &sim::Orders)>()
+            .unwrap();
+        let (_, mobile, _) = q
+            .iter(host.world())
+            .find(|(id, ..)| **id == subject)
+            .unwrap();
+        assert_ne!(
+            mobile.sub_position(),
+            before,
+            "real internal mission continues during ordinary command"
+        );
+        let (_, _, orders) = q
+            .iter(host.world())
+            .find(|(id, ..)| **id == normal)
+            .unwrap();
+        assert_eq!(orders.current.as_ref().map(|o| o.destination), Some(dest));
+        assert!(
+            c62_pending(&app).is_empty(),
+            "actual run_tick consumed the real sink batch"
+        );
+    }
+    fn c62_mission_cycles(section: &str) {
+        let (host, subject, normal, eligible) =
+            crate::minimap::ra9_behavior87_routes::c62_mission(section);
+        let (mut app, window) = c62_input(host, Some(subject), normal);
+        c62_cycle_from_normal(&mut app, window, normal, subject, &eligible);
+        // A full native cycle returns to normal. A second immediate fixture click would
+        // instead exercise double-click/frustum selection (Time has not advanced).
+        assert_eq!(
+            app.world().resource::<Selection>().0,
+            BTreeSet::from([normal])
+        );
+        c62_key(&mut app, KeyCode::KeyT);
+        assert_eq!(
+            app.world().resource::<Selection>().0,
+            if section == "PDPLANE" {
+                eligible.iter().copied().collect()
+            } else {
+                BTreeSet::from([normal])
+            }
+        );
+        c62_key(&mut app, KeyCode::KeyP);
+        let combat = eligible
+            .iter()
+            .copied()
+            .filter(|id| *id != normal)
+            .collect::<BTreeSet<_>>();
+        assert_eq!(
+            app.world().resource::<Selection>().0,
+            if section == "PDPLANE" {
+                BTreeSet::new()
+            } else {
+                combat
+            }
+        );
+        assert!(!app.world().resource::<Selection>().0.contains(&subject));
+        assert_eq!(app.world().resource::<CommandSink>().accepted(), 0);
+    }
+    #[test]
+    fn ra9_c62_dmisl_real_click_box_preview_sink() {
+        c62_mission_selection_and_sink("DMISL");
+    }
+    #[test]
+    fn ra9_c62_v3_real_click_box_preview_sink() {
+        c62_mission_selection_and_sink("V3ROCKET");
+    }
+    #[test]
+    fn ra9_c62_pdplane_real_click_box_preview_sink() {
+        c62_mission_selection_and_sink("PDPLANE");
+    }
+    #[test]
+    fn ra9_c62_dmisl_real_cycle_type_combat() {
+        c62_mission_cycles("DMISL");
+    }
+    #[test]
+    fn ra9_c62_v3_real_cycle_type_combat() {
+        c62_mission_cycles("V3ROCKET");
+    }
+    #[test]
+    fn ra9_c62_pdplane_real_cycle_type_combat() {
+        c62_mission_cycles("PDPLANE");
+    }
+
+    /// Exact40 source aliases share one current-policy/input/native-route loop.
+    /// Manual native spawns are ordinary scenario actors, not production/mission proof.
+    /// UnitView x200 and HoveredCell are controlled mouse fixtures; cycle/T/P read real
+    /// SimHost components. The two source false Engineer rows still select/group/move.
+    #[test]
+    fn ra9_b87_all40_stock_aliases_use_real_group_cycle_type_combat_preview_and_sink() {
+        let cases: [(&str, &str, bool); 40] = [
+            ("ADOG", "attack_dog", true),
+            ("AEGIS", "aegis_cruiser", true),
+            ("APOC", "apocalypse", true),
+            ("BEAG", "black_eagle", true),
+            ("CARRIER", "aircraft_carrier", true),
+            ("CCOMAND", "chrono_commando", true),
+            ("CIVAN", "chrono_ivan", true),
+            ("CLEG", "chrono_legionnaire", true),
+            ("DESO", "desolator", true),
+            ("DEST", "destroyer", true),
+            ("DLPH", "dolphin", true),
+            ("DOG", "attack_dog", true),
+            ("DRED", "dreadnought", true),
+            ("DRON", "terror_drone", true),
+            ("E1", "gi", true),
+            ("E2", "conscript", true),
+            ("ENGINEER", "engineer", false),
+            ("FLAKT", "flak_trooper", true),
+            ("FV", "ifv", true),
+            ("HTK", "flak_track", true),
+            ("HTNK", "rhino", true),
+            ("HYD", "sea_scorpion", true),
+            ("IVAN", "crazy_ivan", true),
+            ("JUMPJET", "rocketeer", true),
+            ("MGTK", "mirage_tank", true),
+            ("MTNK", "grizzly", true),
+            ("ORCA", "harrier", true),
+            ("PTROOP", "psi_commando", true),
+            ("SENGINEER", "engineer", false),
+            ("SHK", "tesla_trooper", true),
+            ("SNIPE", "sniper", true),
+            ("SQD", "giant_squid", true),
+            ("SREF", "prism_tank", true),
+            ("TANY", "tanya", true),
+            ("TNKD", "tank_destroyer", true),
+            ("TTNK", "tesla_tank", true),
+            ("V3", "v3_launcher", true),
+            ("YURI", "yuri", true),
+            ("YURIPR", "yuri_prime", true),
+            ("ZEP", "kirov", true),
+        ];
+        let contracts = include_str!("../../sim/tests/ra9_audit/behavior87-contracts.tsv");
+        let expected_source: BTreeSet<_> = cases
+            .iter()
+            .map(|(section, _, combat)| (*section, if *combat { "yes" } else { "no" }))
+            .collect();
+        let actual_source: BTreeSet<_> = contracts
+            .lines()
+            .skip(1)
+            .filter_map(|line| {
+                let c: Vec<_> = line.split('\t').collect();
+                (c[4] == "combat-selection").then_some((c[1], c[3]))
+            })
+            .collect();
+        assert_eq!(
+            actual_source, expected_source,
+            "exact40 source identities/values; no runtime flag credit"
+        );
+        assert_eq!(expected_source.len(), 40);
+        let mapping = include_str!("../../sim/tests/reference/ra2_mapping.tsv");
+        for (section, name, _) in cases {
+            assert_eq!(
+                mapping
+                    .lines()
+                    .skip(1)
+                    .filter(|line| {
+                        let c: Vec<_> = line.split('\t').collect();
+                        c[0] == name && c[1] == "unit" && c[2] == section
+                    })
+                    .count(),
+                1,
+                "{section}: independent committed mapping"
+            );
+        }
+        let mut actors = Vec::new();
+        let mut foreign = None;
+        let host = crate::minimap::ra9_behavior87_routes::c62_running_stock_host(30, |w| {
+            sim::spawn_building(w, HUMAN, "airforce_command", CellPos::new(1, 1)).unwrap();
+            let d = w.resource::<sim::Definitions>().clone();
+            let mut land = 0;
+            let mut sea = 0;
+            let mut air = 0;
+            for (section, name, combat) in cases {
+                for _ in 0..2 {
+                    let kind = d.unit_kind(name).unwrap();
+                    let (x, y) = match d.domain(kind) {
+                        sim::Domain::Naval => {
+                            let n = sea;
+                            sea += 1;
+                            (34 + (n % 5) * 2, 8 + (n / 5) * 2)
+                        }
+                        sim::Domain::Air => {
+                            let n = air;
+                            air += 1;
+                            (8 + (n % 10) * 2, 8 + (n / 10) * 2)
+                        }
+                        _ => {
+                            let n = land;
+                            land += 1;
+                            (8 + (n % 10) * 2, 8 + (n / 10) * 2)
+                        }
+                    };
+                    let id = sim::spawn_unit(w, HUMAN, name, CellPos::new(x, y)).unwrap();
+                    actors.push((section, name, combat, id));
+                }
+            }
+            foreign = Some(
+                sim::spawn_unit(w, sim::PlayerId(1), "grizzly", CellPos::new(45, 46)).unwrap(),
+            );
+        });
+        assert!(host.running());
+        let foreign = foreign.unwrap();
+        assert_eq!(actors.len(), 80);
+        let own: BTreeSet<_> = actors.iter().map(|a| a.3).collect();
+        let combat: BTreeSet<_> = actors.iter().filter(|a| a.2).map(|a| a.3).collect();
+        assert_eq!(own.len(), 80);
+        assert_eq!(combat.len(), 76);
+        let first = actors[0].3;
+        let (mut app, window) = c62_input(host, None, first);
+        app.add_systems(Update, control_groups.before(select_units));
+        for (index, (section, name, _, id)) in actors.iter().step_by(2).enumerate() {
+            let (unit, pos, owner) = c62_view_data(app.world().resource::<SimHost>(), *id);
+            assert_eq!(owner, HUMAN, "{section}");
+            {
+                let mut q = app.world_mut().query::<&mut UnitView>();
+                let mut view = q.single_mut(app.world_mut()).unwrap();
+                *view = UnitView {
+                    unit,
+                    id: *id,
+                    owner,
+                    previous: pos,
+                    current: pos,
+                    altitude: 0.0,
+                    drawn: None,
+                    stride: 0.0,
+                };
+            }
+            // Independent single-click trials; do not accidentally invoke the separate
+            // double-click frustum branch of the controlled UnitView layout.
+            app.world_mut()
+                .resource_mut::<Time>()
+                .advance_by(std::time::Duration::from_secs(1));
+            c62_select_normal(&mut app, window);
+            assert_eq!(
+                app.world().resource::<Selection>().0,
+                BTreeSet::from([*id]),
+                "{section}: ordinary click, including false Engineer"
+            );
+            // Actual drag input, not a direct Selection assignment.
+            cursor(&mut app, window, Some(Vec2::new(800.0, 350.0)));
+            app.world_mut()
+                .resource_mut::<ButtonInput<MouseButton>>()
+                .press(MouseButton::Left);
+            app.update();
+            app.world_mut()
+                .resource_mut::<ButtonInput<MouseButton>>()
+                .clear();
+            cursor(&mut app, window, Some(Vec2::new(880.0, 450.0)));
+            app.update();
+            app.world_mut()
+                .resource_mut::<ButtonInput<MouseButton>>()
+                .release(MouseButton::Left);
+            app.update();
+            app.world_mut()
+                .resource_mut::<ButtonInput<MouseButton>>()
+                .reset_all();
+            assert_eq!(
+                app.world().resource::<Selection>().0,
+                BTreeSet::from([*id]),
+                "{section}: ordinary box"
+            );
+            app.world_mut()
+                .resource_mut::<ButtonInput<KeyCode>>()
+                .press(KeyCode::ControlLeft);
+            app.world_mut()
+                .resource_mut::<ButtonInput<KeyCode>>()
+                .press(KeyCode::Digit1);
+            app.update();
+            app.world_mut()
+                .resource_mut::<ButtonInput<KeyCode>>()
+                .reset_all();
+            assert_eq!(
+                app.world().resource::<ControlGroups>().0[1],
+                BTreeSet::from([*id])
+            );
+            c62_empty_subject_click(&mut app, window);
+            assert!(app.world().resource::<Selection>().0.is_empty());
+            app.world_mut()
+                .resource_mut::<ButtonInput<KeyCode>>()
+                .press(KeyCode::Digit1);
+            app.update();
+            app.world_mut()
+                .resource_mut::<ButtonInput<KeyCode>>()
+                .reset_all();
+            assert_eq!(
+                app.world().resource::<Selection>().0,
+                BTreeSet::from([*id]),
+                "{section}: real group recall"
+            );
+            c62_key(&mut app, KeyCode::KeyN);
+            let next = own
+                .range((std::ops::Bound::Excluded(*id), std::ops::Bound::Unbounded))
+                .next()
+                .or_else(|| own.first())
+                .unwrap();
+            assert_eq!(
+                app.world().resource::<Selection>().0,
+                BTreeSet::from([*next]),
+                "{section}: real next"
+            );
+            c62_key(&mut app, KeyCode::KeyM);
+            assert_eq!(
+                app.world().resource::<Selection>().0,
+                BTreeSet::from([*id]),
+                "{section}: real previous"
+            );
+            c62_key(&mut app, KeyCode::KeyT);
+            let same_kind = actors
+                .iter()
+                .filter(|a| a.1 == *name)
+                .map(|a| a.3)
+                .collect::<BTreeSet<_>>();
+            assert!(same_kind.len() >= 2);
+            assert_eq!(
+                app.world().resource::<Selection>().0,
+                same_kind,
+                "{section}: real type, including shared ADOG/DOG and ENGINEER/SENGINEER kinds"
+            );
+            c62_key(&mut app, KeyCode::KeyP);
+            assert_eq!(
+                app.world().resource::<Selection>().0,
+                combat,
+                "{section}: actual current combat policy"
+            );
+            assert!(!app.world().resource::<Selection>().0.contains(&foreign));
+            assert_eq!(
+                app.world().resource::<CommandSink>().accepted(),
+                index as u64,
+                "selection/group/type/combat must issue no gameplay commands"
+            );
+            assert!(c62_pending(&app).is_empty());
+            app.world_mut()
+                .resource_mut::<Time>()
+                .advance_by(std::time::Duration::from_secs(1));
+            c62_select_normal(&mut app, window);
+            let domain = app
+                .world()
+                .resource::<SimHost>()
+                .grid()
+                .unwrap()
+                .domain_of(*id);
+            // Earlier native Move trials may already occupy the former fixed destination.
+            // Pick empty legal fixture geometry; do not suppress a real specialist context
+            // interaction or teach the client a target through a hidden actor lookup.
+            let dest = {
+                let host = app.world().resource::<SimHost>();
+                let grid = host.grid().unwrap();
+                (6..30)
+                    .flat_map(|y| (4..45).map(move |x| CellPos::new(x, y)))
+                    .find(|cell| {
+                        grid.cell(*cell)
+                            .is_some_and(|c| terrain_enterable(c, domain))
+                            && grid.building(*cell).is_none()
+                            && [sim::Domain::Land, sim::Domain::Air]
+                                .into_iter()
+                                .all(|layer| {
+                                    grid.holders_for(*cell, layer).iter().all(Option::is_none)
+                                })
+                            && host
+                                .props()
+                                .is_none_or(|props| props.id_at(*cell).is_none())
+                    })
+                    .expect("genuinely empty legal destination in the controlled48x48 fixture")
+            };
+            assert!(
+                crate::ra7_controls::known_at(app.world().resource::<SimHost>(), Some(dest))
+                    .is_none(),
+                "{section}: empty fixture must offer no contextual actor"
+            );
+            c62_hover(&mut app, window, dest);
+            assert_eq!(
+                app.world().resource::<OrderPreview>().intent,
+                OrderIntent::Move,
+                "{section}: real preview"
+            );
+            click(&mut app, MouseButton::Right);
+            assert_eq!(
+                c62_pending(&app),
+                vec![Command::Move {
+                    units: vec![*id],
+                    target: dest
+                }],
+                "{section}: actual sink"
+            );
+            let before_tick = app.world().resource::<SimHost>().tick();
+            crate::sim_host::tests::run_sink_tick_for_test(app.world_mut());
+            assert_eq!(app.world().resource::<SimHost>().tick(), before_tick + 1);
+            let events = app
+                .world()
+                .resource::<bevy::ecs::message::Messages<sim::SimEvent>>();
+            assert!(
+                !events
+                    .iter_current_update_messages()
+                    .any(|e| matches!(e, sim::SimEvent::CommandRejected { .. })),
+                "{section}: native command acceptance"
+            );
+            assert!(c62_pending(&app).is_empty());
+            app.world_mut().resource_scope(|_, mut host: Mut<SimHost>| {
+                crate::sim_host::tests::assert_native_cells_for_test(&mut host);
+            });
+        }
+    }
+
+    fn c62_wall_inputs(name: &str) {
+        use bevy::ecs::system::RunSystemOnce;
+        let (host, wall, normal, factory, eligible) =
+            crate::minimap::ra9_behavior87_routes::c62_wall(name);
+        assert!(!own_producers(&host).contains(&wall));
+        assert!(!own_yards(&host).contains(&wall));
+        assert!(!own_garrisons(&host).contains(&wall));
+        assert_eq!(own_building(&host, Some(CellPos::new(18, 14))), Some(wall));
+        let (mut app, window) = c62_input(host, None, normal);
+        app.world_mut().resource_mut::<HoveredCell>().0 = Some(CellPos::new(18, 14));
+        cursor(&mut app, window, Some(Vec2::new(640.0, 400.0)));
+        click(&mut app, MouseButton::Left);
+        assert!(app.world().resource::<Selection>().0.is_empty());
+        assert_eq!(app.world().resource::<SelectedBuilding>().0, None);
+        click(&mut app, MouseButton::Left);
+        assert_eq!(app.world().resource::<SelectedBuilding>().0, None);
+        // Ordinary rectangle still selects only real UnitViews, never this native Building.
+        cursor(&mut app, window, Some(Vec2::new(600.0, 350.0)));
+        app.world_mut()
+            .resource_mut::<ButtonInput<MouseButton>>()
+            .press(MouseButton::Left);
+        app.update();
+        app.world_mut()
+            .resource_mut::<ButtonInput<MouseButton>>()
+            .clear();
+        cursor(&mut app, window, Some(Vec2::new(880.0, 450.0)));
+        app.update();
+        app.world_mut()
+            .resource_mut::<ButtonInput<MouseButton>>()
+            .release(MouseButton::Left);
+        app.update();
+        app.world_mut()
+            .resource_mut::<ButtonInput<MouseButton>>()
+            .reset_all();
+        assert_eq!(
+            app.world().resource::<Selection>().0,
+            BTreeSet::from([normal])
+        );
+        assert!(!app.world().resource::<Selection>().0.contains(&wall));
+        app.world_mut().resource_mut::<HoveredCell>().0 = Some(CellPos::new(18, 14));
+        cursor(&mut app, window, Some(Vec2::new(640.0, 400.0)));
+        click(&mut app, MouseButton::Left);
+        c62_hover(&mut app, window, CellPos::new(20, 14));
+        assert_eq!(
+            app.world().resource::<OrderPreview>().intent,
+            OrderIntent::None
+        );
+        click(&mut app, MouseButton::Right);
+        assert!(c62_pending(&app).is_empty());
+        assert_eq!(app.world().resource::<CommandSink>().accepted(), 0);
+        // Real pruning agrees with the ordinary-click building policy.
+        app.world_mut().resource_mut::<SelectedBuilding>().0 = Some(wall);
+        app.world_mut()
+            .run_system_once(prune_selected_building)
+            .unwrap();
+        assert_eq!(app.world().resource::<SelectedBuilding>().0, None);
+        c62_cycle_from_normal(&mut app, window, normal, wall, &eligible);
+        c62_key(&mut app, KeyCode::KeyT);
+        assert_eq!(
+            app.world().resource::<Selection>().0,
+            BTreeSet::from([normal])
+        );
+        c62_key(&mut app, KeyCode::KeyP);
+        assert_eq!(
+            app.world().resource::<Selection>().0,
+            eligible
+                .iter()
+                .copied()
+                .filter(|id| *id != normal)
+                .collect()
+        );
+        // Positive selectable factory: its native Producer, not a generic Selectable flag,
+        // supplies the actual Rally preview and exact sink command.
+        app.world_mut().resource_mut::<HoveredCell>().0 = Some(CellPos::new(14, 14));
+        cursor(&mut app, window, Some(Vec2::new(300.0, 200.0)));
+        click(&mut app, MouseButton::Left);
+        assert!(app.world().resource::<Selection>().0.is_empty());
+        assert_eq!(app.world().resource::<SelectedBuilding>().0, Some(factory));
+        c62_hover(&mut app, window, CellPos::new(20, 14));
+        assert_eq!(
+            app.world().resource::<OrderPreview>().intent,
+            OrderIntent::Rally
+        );
+        assert_eq!(app.world().resource::<OrderPreview>().target, Some(factory));
+        click(&mut app, MouseButton::Right);
+        assert_eq!(
+            c62_pending(&app),
+            vec![Command::SetRallyPoint {
+                building: factory,
+                cell: CellPos::new(20, 14)
+            }]
+        );
+        crate::sim_host::tests::run_sink_tick_for_test(app.world_mut());
+        {
+            let host = app.world().resource::<SimHost>();
+            let mut q = host
+                .world()
+                .try_query::<(&SimId, &sim::Producer)>()
+                .unwrap();
+            assert_eq!(
+                q.iter(host.world())
+                    .find(|(id, _)| **id == factory)
+                    .unwrap()
+                    .1
+                    .rally,
+                Some(CellPos::new(20, 14))
+            );
+        }
+        c62_select_normal(&mut app, window);
+        // Cycle from the Engineer to the actual Grizzly before the friendly-wall order.
+        // Engineer interaction_label legitimately offers REPAIR even for a full own building;
+        // this control must not invent an absent Engineer interaction.
+        let mover = *eligible.iter().find(|id| **id != normal).unwrap();
+        c62_key(&mut app, KeyCode::KeyN);
+        assert_eq!(
+            app.world().resource::<Selection>().0,
+            BTreeSet::from([mover])
+        );
+        c62_hover(&mut app, window, CellPos::new(18, 14));
+        assert_eq!(
+            app.world().resource::<OrderPreview>().intent,
+            OrderIntent::Friendly
+        );
+        assert_eq!(app.world().resource::<OrderPreview>().target, Some(wall));
+        click(&mut app, MouseButton::Right);
+        assert_eq!(
+            c62_pending(&app),
+            vec![Command::Move {
+                units: vec![mover],
+                target: CellPos::new(18, 14)
+            }]
+        );
+        crate::sim_host::tests::run_sink_tick_for_test(app.world_mut());
+        let host = app.world().resource::<SimHost>();
+        assert_eq!(
+            host.grid().unwrap().building(CellPos::new(18, 14)),
+            Some(wall)
+        );
+        let mut q = host.world().try_query::<(&SimId, &sim::Mobile)>().unwrap();
+        assert_ne!(
+            q.iter(host.world())
+                .find(|(id, _)| **id == mover)
+                .unwrap()
+                .1
+                .cell,
+            CellPos::new(18, 14)
+        );
+        assert!(
+            !app.world()
+                .resource::<bevy::ecs::message::Messages<sim::SimEvent>>()
+                .iter_current_update_messages()
+                .any(|e| matches!(e, sim::SimEvent::CommandRejected { .. }))
+        );
+        // No UnitView is forged for a Building. Walls remain valid friendly coordinate targets;
+        // absence from SelectedBuilding is not a blanket prohibition on legal unit orders.
+    }
+    #[test]
+    fn ra9_c62_allied_wall_actual_selection_cycle_preview_sink() {
+        c62_wall_inputs("fortress_walls");
+    }
+    #[test]
+    fn ra9_c62_soviet_wall_actual_selection_cycle_preview_sink() {
+        c62_wall_inputs("soviet_walls");
+    }
+    #[test]
+    fn ra9_c62_bridge_hut_current_narrow_selection_cycle_preview_sink() {
+        c62_wall_inputs("bridge_hut");
     }
 }

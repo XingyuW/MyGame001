@@ -2168,6 +2168,7 @@ pub fn event_sound(event: &SimEvent, context: &SoundContext) -> Option<Sfx> {
         SimEvent::MoveCompleted { .. }
         | SimEvent::MoveFailed { .. }
         | SimEvent::ProductionCancelled { .. }
+        | SimEvent::BuildingRevealed { .. }
         | SimEvent::UnitSpawned { .. }
         | SimEvent::HarvesterIdle { .. }
         | SimEvent::ProjectileExpired { .. }

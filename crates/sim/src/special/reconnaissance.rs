@@ -42,6 +42,61 @@ fn refresh_with_definitions(world: &mut World, defs: &Definitions, reveal: bool)
         .resource_mut::<SpecialState>()
         .mirage_trees
         .retain(|id, _| index.get(id).is_some_and(Actor::alive));
+    // Existing Visibility index, after normal visibility clear and before hostile Gap.
+    // Closest-model assumption: only surviving end-of-tick ownership is observed.
+    if reveal && defs.rules().is_some() {
+        world
+            .resource_mut::<SpecialState>()
+            .revealed_owners
+            .retain(|id, _| {
+                index.get(id).is_some_and(|a| {
+                    a.alive()
+                        && a.owner != crate::NEUTRAL
+                        && a.foot.is_some()
+                        && defs.metadata(a.item).is_some_and(|m| m.reveal_to_all)
+                })
+            });
+        for a in index
+            .values()
+            .filter(|a| a.alive() && a.owner != crate::NEUTRAL)
+        {
+            let (ProductionItem::Building(kind), Some(f)) = (a.item, a.foot) else {
+                continue;
+            };
+            if !defs.metadata(a.item).is_some_and(|m| m.reveal_to_all)
+                || world.resource::<SpecialState>().revealed_owners.get(&a.id) == Some(&a.owner)
+            {
+                continue;
+            }
+            let Some(t) = defs.building_combat(kind) else {
+                continue;
+            };
+            let (x, y) = (i64::from(f.origin.x), i64::from(f.origin.y));
+            for (_, p) in world.resource_mut::<Players>().iter_mut() {
+                p.vision.reveal(
+                    (
+                        x,
+                        y,
+                        x + i64::from(f.width.max(1)) - 1,
+                        y + i64::from(f.height.max(1)) - 1,
+                    ),
+                    t.sight,
+                );
+            }
+            world
+                .resource_mut::<SpecialState>()
+                .revealed_owners
+                .insert(a.id, a.owner);
+            world
+                .resource_mut::<Messages<SimEvent>>()
+                .write(SimEvent::BuildingRevealed {
+                    player: a.owner,
+                    building: a.id,
+                    kind,
+                    origin: f.origin,
+                });
+        }
+    }
     for a in index.values() {
         let Some(m) = defs.metadata(a.item) else {
             continue;

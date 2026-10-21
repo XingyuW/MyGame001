@@ -1,0 +1,10 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.30s
+     Running tests/ra9_before_scenery.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_before_scenery-f4756a2f7cf63e2f)
+
+running 2 tests
+test ra9_before_known_actorless_c4_interaction_is_rejected ... ok
+test ra9_before_real_temporal_shot_does_not_create_an_actorless_channel ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+

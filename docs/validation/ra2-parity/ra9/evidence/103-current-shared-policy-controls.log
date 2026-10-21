@@ -1,0 +1,52 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 01s
+     Running tests/ra2_production.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra2_production-f29b8705efc5be1c)
+
+running 1 test
+test low_power_slows_production_by_the_graded_factor ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 14 filtered out; finished in 0.09s
+
+     Running tests/ra2_shipped.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra2_shipped-610b7dfdb5bf89dc)
+
+running 3 tests
+test a_base_is_built_from_an_mcv_in_the_time_the_build_time_formula_gives ... ok
+test a_sale_refunds_half_the_cost_and_walls_are_neither_sold_nor_repaired ... ok
+test low_power_stops_the_powered_buildings_that_consume_power_and_no_others ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 1.33s
+
+     Running tests/ra4_spawns.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra4_spawns-9da791a0a1b28385)
+
+running 2 tests
+test a_missile_goes_off_where_its_target_was_and_outlives_its_launcher ... ok
+test the_aircraft_of_a_carrier_are_destroyed_with_it_and_their_kills_are_its_own ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 14 filtered out; finished in 0.08s
+
+     Running tests/ra5_ore.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra5_ore-c39c9605dcd753e6)
+
+running 2 tests
+test gems_neither_grow_nor_spread ... ok
+test ore_stands_still_when_the_match_rule_is_off_or_the_chance_is_none ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 17 filtered out; finished in 0.65s
+
+     Running tests/ra6_infantry.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_infantry-25553fff35365e86)
+
+running 1 test
+test ra6_tesla_charge_two_low_power_three_overpowered_one_with_power ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 29 filtered out; finished in 0.26s
+
+     Running tests/ra6_vehicles.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_vehicles-6e8e476b02377690)
+
+running 5 tests
+test ra6_chronosphere_square_moves_both_owners_kills_organic_and_preserves_offsets ... ok
+test ra6_prism_caps_eight_supporters_and_supports_again_at_tick_80 ... ok
+test ra6_storm_rejects_a_second_launch_and_preserves_its_charge ... ok
+test ra6_storm_warning_exclusivity_duration_and_cloud_separation_are_deterministic ... ok
+test ra6_strategic_recharges_power_option_and_readiness_edges ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 34 filtered out; finished in 1.20s
+

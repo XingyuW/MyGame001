@@ -1520,3 +1520,7 @@ fn ra7_new_command_actors_and_targets_destroyed_earlier_in_the_same_tick_are_mis
         assert!(destroyed(&events, dead));
     }
 }
+
+// RA9 added actorless Interact target-kind matrix; no existing assertion changes.
+#[path = "ra9_prop_commands/mod.rs"]
+mod ra9_prop_commands;

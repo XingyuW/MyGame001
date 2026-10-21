@@ -1,0 +1,32 @@
+{
+  "utc": "2026-10-21T01:08:43.508493+00:00",
+  "ended_utc": "2026-10-21T01:10:11.543869+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_policy_acquisition",
+    "--test",
+    "ra8_ai",
+    "--test",
+    "ra7_orders",
+    "--no-fail-fast",
+    "--",
+    "ra9_c38_ordinary_capable_stock",
+    "ra9_difficulty_neutral_cost_ground_and_air_motion",
+    "ra8_every_country_has_obtainable",
+    "ra8_a_locked_late_tech_item",
+    "ra7_scatter_moves",
+    "ra7_force_move_crushes",
+    "ra7_new_orders_reject",
+    "ra7_guard_uses_explicit",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit_code": 0,
+  "seconds": 88.034,
+  "lease": "RA8 revocable functional phase jobs1; corrected2 + loaded country census + short100tick locked-tech + four tactical command cases, no match sweep",
+  "input_mismatches": []
+}

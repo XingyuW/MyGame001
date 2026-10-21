@@ -1,0 +1,28 @@
+{
+  "utc": "2026-10-21T05:09:21.435296+00:00",
+  "completed_utc": "2026-10-21T05:12:58.526058+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "--no-fail-fast",
+    "--",
+    "--nocapture",
+    "--exact",
+    "ra9_audit::country_rosters::tests::ra9_raw_roster_nonempty_is_schema_rejection_not_fake_loaded_empty",
+    "ra9_audit::consumer62_admission::tests::ra9_consumer62_nonfirst_pad_dock_count_fails_real_dock_adapter",
+    "ra9_audit::model162_admission::tests::ra9_model162_actual_gap_radius_change_fails_native_comparison_and_no_boost_policy",
+    "ra9_audit::source_disposition::tests::ra9_static_speed_rejects_case_alias_after_actual_adapter_control",
+    "ra9_audit::source_disposition::tests::ra9_static_speed_rejects_changed_real_instant_selector",
+    "ra9_audit::source_disposition::tests::ra9_static_speed_rejects_demanded_actual_source_overlap"
+  ],
+  "exit_code": 0,
+  "seconds": 217.09,
+  "input_count": 667,
+  "input_drift": [],
+  "scope": "Exactly6actual159failed test/helper repairs;175otherbodies unchanged, full159175/6 retained; no fullcopy181PASS/performance/finalcanonical credit"
+}

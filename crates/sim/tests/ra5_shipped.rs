@@ -674,3 +674,234 @@ fn every_shipped_map_sets_up_with_ore_in_bails_and_a_crate() {
         assert!(units.iter(world).all(|mobile| mobile.cell != crates[0]));
     }
 }
+
+// UNCOMPILED / UNRUN / UNACCEPTED additions; retain every older shipped/fixture assertion.
+#[test]
+fn ra9_legacy904_public_stock_harvest_18_19_and_move_resets_work() {
+    for (owner, miner) in [(P0, "chrono_miner"), (P1, "war_miner")] {
+        let mut app = world();
+        ore(&mut app, 20, 20, 12, false);
+        let unit = put(&mut app, owner, miner, 20, 20);
+        let terms = defs(&app)
+            .harvester(defs(&app).unit_kind(miner).expect("kind"))
+            .expect("terms");
+        assert_eq!((terms.harvest_rate, terms.harvest_interval), (1, 19));
+        // R58 game policy, not a conversion/consumption of original Harvest.Rate=.016.
+        for worked in 1..=18 {
+            let commands = if worked == 1 {
+                vec![issue(
+                    owner,
+                    Command::Harvest {
+                        units: vec![unit],
+                        target: CellPos::new(20, 20),
+                    },
+                )]
+            } else {
+                vec![]
+            };
+            let events = tick(&mut app, commands);
+            assert!(rejected(&events).is_empty(), "{events:?}");
+            let h = harvester(&mut app, unit);
+            assert_eq!((h.work, h.load), (worked, 0), "{miner} worked={worked}");
+            assert_eq!(
+                app.world()
+                    .resource::<Grid>()
+                    .cell(CellPos::new(20, 20))
+                    .expect("ore")
+                    .ore,
+                12
+            );
+        }
+        tick(&mut app, vec![]);
+        assert_eq!(
+            (
+                harvester(&mut app, unit).work,
+                harvester(&mut app, unit).load
+            ),
+            (0, 1)
+        );
+        assert_eq!(
+            app.world()
+                .resource::<Grid>()
+                .cell(CellPos::new(20, 20))
+                .expect("ore")
+                .ore,
+            11
+        );
+        for worked in 1..=18 {
+            tick(&mut app, vec![]);
+            assert_eq!(
+                (
+                    harvester(&mut app, unit).work,
+                    harvester(&mut app, unit).load
+                ),
+                (worked, 1)
+            );
+        }
+        let events = tick(
+            &mut app,
+            vec![issue(
+                owner,
+                Command::Move {
+                    units: vec![unit],
+                    target: CellPos::new(20, 21),
+                },
+            )],
+        );
+        assert!(rejected(&events).is_empty(), "{events:?}");
+        assert_eq!(
+            (
+                harvester(&mut app, unit).work,
+                harvester(&mut app, unit).load
+            ),
+            (0, 1)
+        );
+        assert_eq!(
+            app.world()
+                .resource::<Grid>()
+                .cell(CellPos::new(20, 20))
+                .expect("ore")
+                .ore,
+            11
+        );
+        // Public return order; do not assume a moving unit teleports back to its standing point.
+        let mut events = tick(
+            &mut app,
+            vec![issue(
+                owner,
+                Command::Harvest {
+                    units: vec![unit],
+                    target: CellPos::new(20, 20),
+                },
+            )],
+        );
+        assert!(rejected(&events).is_empty(), "{events:?}");
+        let mut resumed = harvester(&mut app, unit).work == 1;
+        for _ in 0..128 {
+            if resumed {
+                break;
+            }
+            assert_eq!(
+                (
+                    harvester(&mut app, unit).load,
+                    harvester(&mut app, unit).work
+                ),
+                (1, 0)
+            );
+            events = tick(&mut app, vec![]);
+            assert!(rejected(&events).is_empty(), "{events:?}");
+            resumed = harvester(&mut app, unit).work == 1;
+        }
+        assert!(
+            resumed,
+            "legal one-cell return must resume work through native movement"
+        );
+        assert_eq!(harvester(&mut app, unit).load, 1);
+        for worked in 2..=18 {
+            tick(&mut app, vec![]);
+            assert_eq!(
+                (
+                    harvester(&mut app, unit).work,
+                    harvester(&mut app, unit).load
+                ),
+                (worked, 1)
+            );
+        }
+        tick(&mut app, vec![]);
+        assert_eq!(
+            (
+                harvester(&mut app, unit).work,
+                harvester(&mut app, unit).load
+            ),
+            (0, 2)
+        );
+        assert_eq!(
+            app.world()
+                .resource::<Grid>()
+                .cell(CellPos::new(20, 20))
+                .expect("ore")
+                .ore,
+            10
+        );
+        assert!(sim::cell_invariant_violations(app.world_mut()).is_empty());
+        assert!(sim::stray_claims(app.world_mut()).is_empty());
+    }
+}
+#[test]
+fn ra9_legacy904_public_stock_single_bail_delivery_keeps_real_ore_and_gem_value() {
+    for (owner, refinery, miner) in [
+        (P0, "refinery", "chrono_miner"),
+        (P1, "soviet_refinery", "war_miner"),
+    ] {
+        for (gem, value) in [(false, 25_i64), (true, 50_i64)] {
+            let mut app = world();
+            put(&mut app, owner, refinery, 10, 10);
+            ore(&mut app, 10, 14, 1, gem);
+            let unit = put(&mut app, owner, miner, 10, 14);
+            let d = defs(&app);
+            let k = d.unit_kind(miner).expect("miner");
+            assert_eq!(
+                d.production(ProductionItem::Unit(k))
+                    .expect("production")
+                    .cost,
+                1400
+            );
+            let before = credits(&app, owner);
+            let mut delivery = None;
+            for n in 0..256 {
+                let events = tick(
+                    &mut app,
+                    if n == 0 {
+                        vec![issue(
+                            owner,
+                            Command::Harvest {
+                                units: vec![unit],
+                                target: CellPos::new(10, 14),
+                            },
+                        )]
+                    } else {
+                        vec![]
+                    },
+                );
+                assert!(rejected(&events).is_empty(), "{events:?}");
+                delivery = events.iter().find_map(|e| match e {
+                    SimEvent::OreDelivered {
+                        harvester,
+                        ore,
+                        gems,
+                        credits,
+                        ..
+                    } if *harvester == unit => Some((*ore, *gems, *credits)),
+                    _ => None,
+                });
+                if delivery.is_some() {
+                    break;
+                }
+            }
+            assert_eq!(
+                delivery,
+                Some((1, u32::from(gem), value)),
+                "{miner} gems={gem}"
+            );
+            assert_eq!(credits(&app, owner) - before, value);
+            assert_eq!(
+                (
+                    harvester(&mut app, unit).load,
+                    harvester(&mut app, unit).gems
+                ),
+                (0, 0)
+            );
+            assert_eq!(
+                app.world()
+                    .resource::<Grid>()
+                    .cell(CellPos::new(10, 14))
+                    .expect("ore")
+                    .ore,
+                0
+            );
+            assert!(sim::cell_invariant_violations(app.world_mut()).is_empty());
+            assert!(credits(&app, owner) >= 0);
+            // Spawn is scenario setup: cost1400 above is a loaded premise, not native purchase proof.
+        }
+    }
+}

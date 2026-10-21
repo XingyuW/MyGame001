@@ -781,6 +781,9 @@ class Item:
         building = self.kind == "building"
         self.needs_engineer = flag("NeedsEngineer", "no")
         self.capturable = flag("Capturable", "no")
+        self.type_immune = flag("TypeImmune", "no")
+        self.bomb_sight = int(section.get("BombSight", "0"))
+        self.reveal_to_all = flag("RevealToAll", "no")
         self.insignificant = flag("Insignificant", "no")
         self.immune = flag("Immune", "no")
         self.hospital = flag("Hospital", "no")
@@ -821,6 +824,8 @@ class Item:
             flag("Crushable", "yes" if self.infantry else "no") if unit else 0
         )
         self.size = int(section.get("Size", "1")) if unit else 0
+        self.size_limit = int(section.get("SizeLimit", "0")) if unit else 0
+        self.death_weapon_damage_pm = convert("pm", section.get("DeathWeaponDamageModifier", "1"))
         # The traits of RA4 (docs/DECISIONS.md R46). `Trainable` is yes for a unit and no for
         # a building without the key (ModEnc); the abilities are the tokens of the two lists.
         self.trainable = flag("Trainable", "yes") if unit else 0
@@ -1324,7 +1329,7 @@ class Data:
 
     def arsenal_file(self):
         lines = [
-            "// The arsenal, schema version 9 (crates/sim/src/arsenal.rs; docs/DECISIONS.md R10, R11, R22, R6, R46): per",
+            "// The arsenal, schema version 10 (crates/sim/src/arsenal.rs; docs/DECISIONS.md R10, R11, R22, R6, R46): per",
             "// item its label, description, category, domain and role with the role's terms (durations in ticks,",
             "// 20 per second), the id of the item whose art it shows, its side, the factory group of a",
             "// building, and the terms of the ini's buildability rule: the sides whose factories build it",
@@ -1371,7 +1376,7 @@ class Data:
             "// cash_delay (ProduceCashDelay frames converted to ticks). Missing flags/numbers are 0.",
             "//",
             GENERATED,
-            "(schema_version: 9, entries: [",
+            "(schema_version: 10, entries: [",
         ]
         for table in (self.buildings, self.units):
             for game_id, values in table.items():
@@ -1388,9 +1393,9 @@ class Data:
                     if item.special in ("ParaDropSpecial","AmericanParaDropSpecial"): role="paradrop"; radius=4
                 keys = ["Owner", "RequiredHouses", "ForbiddenHouses", "TechLevel", "Prerequisite"]
                 keys += ["Factory", "Naval", "GapRadiusInCells", "GuardRange", "PsychicDetectionRadius", "SuperWeapon", "BalloonHover"] + list(STOLEN)
-                keys += ["Crewed", "Sensors", "SensorsSight", "NeedsEngineer", "Capturable", "Insignificant", "Immune", "Hospital", "BridgeRepairHut", "Occupier", "CanBeOccupied", "MaxNumberOccupants", "NumberOfDocks", "ProduceCashStartup", "ProduceCashAmount", "ProduceCashDelay"]
+                keys += ["DeathWeaponDamageModifier", "Crewed", "Sensors", "SensorsSight", "NeedsEngineer", "Capturable", "TypeImmune", "BombSight", "RevealToAll", "Insignificant", "Immune", "Hospital", "BridgeRepairHut", "Occupier", "CanBeOccupied", "MaxNumberOccupants", "NumberOfDocks", "ProduceCashStartup", "ProduceCashAmount", "ProduceCashDelay"]
                 if item.kind == "unit":
-                    keys += ["Crusher", "Crushable", "Size", "Trainable", "VeteranAbilities"]
+                    keys += ["Crusher", "Crushable", "Size", "SizeLimit", "Trainable", "VeteranAbilities"]
                     keys += ["EliteAbilities", "SelfHealing", "Ammo", "AirportBound", "Spawns"]
                     keys += ["SpawnsNumber", "SpawnRegenRate", "SpawnReloadRate", "Cloakable"]
                     # The game's categories and domains are its own tables: they must agree
@@ -1440,6 +1445,7 @@ class Data:
                     f"powered: {item.powered}, is_powered: {item.is_powered}, "
                     f"unit_repair: {item.unit_repair}, crusher: {item.crusher}, "
                     f"crushable: {item.crushable}, size: {item.size}, "
+                    f"size_limit: {item.size_limit}, death_weapon_damage_pm: {item.death_weapon_damage_pm}, "
                     f"infantry: {item.infantry}, trainable: {item.trainable}, "
                     f"veteran_abilities: {quoted(item.abilities['VeteranAbilities'])}, "
                     f"elite_abilities: {quoted(item.abilities['EliteAbilities'])}, "
@@ -1453,6 +1459,9 @@ class Data:
                     f"cloakable: {item.cloakable}, sensors_sight: {item.sensors_sight}, "
                     f"needs_engineer: {item.needs_engineer}, "
                     f"capturable: {item.capturable}, "
+                    f"type_immune: {item.type_immune}, "
+                    f"bomb_sight: {item.bomb_sight}, "
+                    f"reveal_to_all: {item.reveal_to_all}, "
                     f"insignificant: {item.insignificant}, "
                     f"immune: {item.immune}, "
                     f"hospital: {item.hospital}, "

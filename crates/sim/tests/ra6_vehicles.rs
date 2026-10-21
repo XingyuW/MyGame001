@@ -1334,13 +1334,153 @@ fn ra6_depot_and_repair_ifv_remove_drone_before_its_first_damage_tick() {
         assert_eq!(hp(&mut a, host), before);
     }
 }
+/// A single-field Rules-present parser fixture: a genuinely unannounced Chronosphere.
+/// All other arsenal bytes and the shipped rules/combat/economy definitions are retained.
+fn chronosphere_without_public_reveal(definitions: Definitions) -> Definitions {
+    use std::io::Write;
+    use std::sync::atomic::{AtomicU64, Ordering};
+    static NEXT: AtomicU64 = AtomicU64::new(0);
+    let original = std::fs::read_to_string(data_dir().join("arsenal.ron")).unwrap();
+    let rows: Vec<_> = original
+        .lines()
+        .filter(|line| line.contains(r#"id: "chronosphere""#))
+        .collect();
+    assert_eq!(rows.len(), 1);
+    let row = rows[0];
+    assert_eq!(row.matches("reveal_to_all: 1").count(), 1);
+    let replacement = row.replacen("reveal_to_all: 1", "reveal_to_all: 0", 1);
+    let altered = original.replacen(row, &replacement, 1);
+    assert_eq!(altered.replacen(&replacement, row, 1), original);
+    let path = std::env::temp_dir().join(format!(
+        "ra6-hidden-chronosphere-{}-{}.ron",
+        std::process::id(),
+        NEXT.fetch_add(1, Ordering::Relaxed)
+    ));
+    {
+        let mut file = std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&path)
+            .expect("exclusive per-invocation parser fixture");
+        file.write_all(altered.as_bytes()).unwrap();
+    }
+    let result = definitions.with_arsenal(&path);
+    std::fs::remove_file(path).expect("remove before load-result assertion");
+    result.unwrap_or_else(|error| panic!("{error}"))
+}
+
 #[test]
 fn ra6_hidden_strategic_sources_do_not_disclose_type_through_legacy_unit_arguments() {
+    // Stock RevealToAll makes this source genuinely known after Visibility. Keep that
+    // positive distinct from the hidden-source oracle instead of treating it as hidden.
+    let mut public = world();
+    let kind = defs(&public).building_kind("chronosphere").unwrap();
+    assert!(defs(&public).rules().is_some());
+    assert!(
+        defs(&public)
+            .metadata(ProductionItem::Building(kind))
+            .unwrap()
+            .reveal_to_all
+    );
+    let source = put(&mut public, P1, "chronosphere", 35, 35);
+    put(&mut public, P0, "gi", 3, 3);
+    let e = entity(&mut public, source).unwrap();
+    let footprint = public.world().get::<sim::Building>(e).unwrap().footprint;
+    let observed = tick(&mut public, vec![]);
+    assert_eq!(owner(&mut public, source), Some(P1));
+    // These are the actual special::known_to premises, not a fabricated Vision.
+    assert!(
+        public
+            .world()
+            .resource::<Players>()
+            .get(P0)
+            .unwrap()
+            .vision()
+            .sees_footprint(footprint)
+    );
+    assert!(
+        !public
+            .world()
+            .resource::<sim::SpecialState>()
+            .hidden
+            .contains(&(P0, source))
+    );
+    assert_eq!(
+        public
+            .world()
+            .resource::<sim::SpecialState>()
+            .revealed_owners
+            .get(&source),
+        Some(&P1)
+    );
+    assert!(observed.iter().any(|event| matches!(
+        event,
+        SimEvent::BuildingRevealed { player, building, kind: seen_kind, origin }
+            if *player == P1 && *building == source && *seen_kind == kind
+                && *origin == footprint.origin
+    )));
+    let ev = tick(
+        &mut public,
+        vec![issue(
+            P0,
+            Command::Superweapon {
+                building: source,
+                target: CellPos::new(3, 3),
+                units: vec![SimId(99998)],
+            },
+        )],
+    );
+    let denied = rejected(&ev);
+    assert_eq!(denied.len(), 1);
+    assert!(
+        matches!(denied[0], SimEvent::CommandRejected {
+            reason: sim::RejectReason::NotOwned(id), ..
+        } if *id == source),
+        "{ev:?}"
+    );
+
+    // Change only this source's announcement flag through the real parser. Retain the
+    // exact hidden/missing UnknownUnit oracle with the same malformed legacy units arg.
     let mut a = world();
+    let definitions = chronosphere_without_public_reveal(defs(&a));
+    assert!(definitions.rules().is_some());
+    assert!(
+        !definitions
+            .metadata(ProductionItem::Building(kind))
+            .unwrap()
+            .reveal_to_all
+    );
+    a.world_mut().insert_resource(definitions);
     let hidden = put(&mut a, P1, "chronosphere", 35, 35);
     put(&mut a, P0, "gi", 3, 3);
-    steps(&mut a, 1);
+    let e = entity(&mut a, hidden).unwrap();
+    let footprint = a.world().get::<sim::Building>(e).unwrap().footprint;
+    let observed = tick(&mut a, vec![]);
+    assert!(!observed.iter().any(|event| matches!(
+        event, SimEvent::BuildingRevealed { building, .. } if *building == hidden
+    )));
     for source in [hidden, SimId(99999)] {
+        assert_eq!(owner(&mut a, hidden), Some(P1));
+        assert!(
+            !a.world()
+                .resource::<Players>()
+                .get(P0)
+                .unwrap()
+                .vision()
+                .sees_footprint(footprint)
+        );
+        assert!(
+            !a.world()
+                .resource::<sim::SpecialState>()
+                .hidden
+                .contains(&(P0, hidden))
+        );
+        assert!(
+            !a.world()
+                .resource::<sim::SpecialState>()
+                .revealed_owners
+                .contains_key(&hidden)
+        );
         let ev = tick(
             &mut a,
             vec![issue(
@@ -1471,4 +1611,856 @@ fn ra6_gunner_area_fire_does_not_enable_yuri_automatic_deploy_pulse() {
         );
     }
     assert_eq!(hp(&mut app, immune), 100);
+}
+
+// UNCOMPILED/UNRUN. Append to existing ra6_vehicles.rs test module/file; reuse its real
+// world/sea/defs/put/entity/cell/hp/tick/issue/steps/rejected/attack helpers without editing them.
+// These are current-model receipts, not original-engine fidelity or source flag readers.
+#[test]
+fn ra9_behavior87_uniform_attackmove_admission_reaches_coordinate_for_exact_stock_types() {
+    for (section, name) in [
+        ("BEAG", "black_eagle"),
+        ("CCOMAND", "chrono_commando"),
+        ("CLEG", "chrono_legionnaire"),
+        ("ENGINEER", "engineer"),
+        ("ORCA", "harrier"),
+        ("SENGINEER", "engineer"),
+        ("SHAD", "nighthawk"),
+        ("SNIPE", "sniper"),
+        ("SPY", "spy"),
+    ] {
+        let mut app = world();
+        let u = put(&mut app, P0, name, 10, 10);
+        if defs(&app)
+            .metadata(ProductionItem::Unit(defs(&app).unit_kind(name).unwrap()))
+            .unwrap()
+            .airport_bound
+        {
+            put(&mut app, P0, "airforce_command", 8, 8);
+        }
+        steps(&mut app, 1);
+        let target = CellPos::new(25, 25);
+        let events = tick(
+            &mut app,
+            vec![issue(
+                P0,
+                Command::AttackMove {
+                    units: vec![u],
+                    target,
+                },
+            )],
+        );
+        assert!(rejected(&events).is_empty(), "{section}: {events:?}");
+        let mut arrived = cell(&mut app, u) == target;
+        for _ in 0..1000 {
+            if arrived {
+                break;
+            }
+            tick(&mut app, vec![]);
+            arrived = cell(&mut app, u) == target;
+        }
+        assert!(
+            arrived,
+            "{section}: actual admitted movement must reach the coordinate"
+        );
+        // ENGINEER/SENGINEER share the game's one physical kind; alias proof is separately mapped.
+        assert!(sim::cell_invariant_violations(app.world_mut()).is_empty());
+    }
+}
+#[test]
+fn ra9_behavior87_coordinate_move_admits_genuine_unexplored_destination() {
+    for name in [
+        "chrono_commando",
+        "chrono_ivan",
+        "chrono_legionnaire",
+        "black_eagle",
+        "harrier",
+        "amphibious_transport",
+        "soviet_amphibious_transport",
+        "kirov",
+    ] {
+        let mut app = world();
+        let u = put(&mut app, P0, name, 8, 8);
+        if defs(&app)
+            .metadata(ProductionItem::Unit(defs(&app).unit_kind(name).unwrap()))
+            .unwrap()
+            .airport_bound
+        {
+            put(&mut app, P0, "airforce_command", 5, 5);
+        }
+        steps(&mut app, 1);
+        let target = CellPos::new(18, 18);
+        assert!(
+            !app.world()
+                .resource::<Players>()
+                .get(P0)
+                .unwrap()
+                .vision()
+                .is_explored(target),
+            "{name}: real unexplored premise"
+        );
+        // Ten diagonal steps remain beyond actual sight and fit the original1000-tick bound
+        // even for loaded Kirov speed4; no runtime speed or deadline is retuned.
+        let loaded_speed = defs(&app)
+            .unit(defs(&app).unit_kind(name).unwrap())
+            .unwrap()
+            .speed;
+        assert!(u32::from(sim::DIAGONAL_STEP) * 10 / u32::from(loaded_speed) + 1 < 1000);
+        let events = tick(
+            &mut app,
+            vec![issue(
+                P0,
+                Command::Move {
+                    units: vec![u],
+                    target,
+                },
+            )],
+        );
+        assert!(rejected(&events).is_empty(), "{name}: {events:?}");
+        let mut arrived = cell(&mut app, u) == target;
+        for _ in 0..1000 {
+            if arrived {
+                break;
+            }
+            tick(&mut app, vec![]);
+            arrived = cell(&mut app, u) == target;
+        }
+        assert!(arrived, "{name}: actual coordinate movement/chrono delay");
+        assert!(
+            app.world()
+                .resource::<Players>()
+                .get(P0)
+                .unwrap()
+                .vision()
+                .is_explored(target)
+        );
+    }
+    // ASW/HORNET/DMISL/V3ROCKET/PDPLANE require genuine launch/internal mission bodies and remain
+    // explicit route obligations. Directly spawning one would not prove a real mission.
+}
+#[test]
+fn ra9_behavior87_real_base_elite_cloakable_shots_use_r51_surface_delay() {
+    for (name, base, elite) in [
+        ("dolphin", "sonic_zap", "sonic_zap_e"),
+        ("typhoon", "sub_torpedo", "sub_torpedo_e"),
+        ("giant_squid", "squid_grab", "squid_grab_e"),
+    ] {
+        for is_elite in [false, true] {
+            let mut app = sea();
+            let source = put(&mut app, P0, name, 10, 10);
+            let target = put(&mut app, P1, "dreadnought", 11, 10);
+            // Controlled initial host protection/disable isolates the firing hook and keeps Squid
+            // in the world for a live observer check; it is NOT native production of those effects.
+            app.world_mut()
+                .resource_mut::<sim::SpecialState>()
+                .protected
+                .insert(target, u64::MAX);
+            app.world_mut()
+                .resource_mut::<sim::SpecialState>()
+                .disabled
+                .insert(target, u64::MAX);
+            if is_elite {
+                assert!(sim::promote(app.world_mut(), source, 2), "real elite setup");
+            }
+            steps(&mut app, 1);
+            assert!(
+                app.world()
+                    .resource::<sim::SpecialState>()
+                    .hidden
+                    .contains(&(P1, source)),
+                "sensor-free observer before actual shot"
+            );
+            let firing_tick = app.world().resource::<sim::SimTick>().0;
+            let events = attack(&mut app, source, target);
+            assert!(rejected(&events).is_empty(), "{events:?}");
+            let expected = defs(&app)
+                .weapon_kind(if is_elite { elite } else { base })
+                .unwrap();
+            assert!(events.iter().any(|e|matches!(e,SimEvent::WeaponFired{attacker,weapon,..}if *attacker==source&&*weapon==expected)),"{name}/{is_elite}: {events:?}");
+            assert!(
+                entity(&mut app, source).is_some(),
+                "protected target keeps shooter available; normal attachment is separate"
+            );
+            assert_eq!(
+                app.world()
+                    .resource::<sim::SpecialState>()
+                    .surfaced
+                    .get(&source),
+                Some(&(firing_tick + 24))
+            );
+            assert!(
+                !app.world()
+                    .resource::<sim::SpecialState>()
+                    .hidden
+                    .contains(&(P1, source))
+            );
+            for offset in 1..=24 {
+                // Public movement cancels firing; elite reloads can legitimately be below24 ticks.
+                let ev = tick(
+                    &mut app,
+                    if offset == 1 {
+                        vec![issue(
+                            P0,
+                            Command::Move {
+                                units: vec![source],
+                                target: CellPos::new(2, 10),
+                            },
+                        )]
+                    } else {
+                        vec![]
+                    },
+                );
+                assert!(
+                    rejected(&ev).is_empty(),
+                    "actual post-shot Move must be admitted: {ev:?}"
+                );
+                assert!(
+                    !ev.iter().any(
+                        |e| matches!(e,SimEvent::WeaponFired{attacker,..}if *attacker==source)
+                    ),
+                    "public Move isolates last-shot24-tick surface interval"
+                );
+                assert_eq!(
+                    app.world()
+                        .resource::<sim::SpecialState>()
+                        .hidden
+                        .contains(&(P1, source)),
+                    offset >= 24,
+                    "{name}/{is_elite} offset{offset}"
+                );
+            }
+        }
+    }
+    // Actual detector control, normal Squid attachment/despawn/reappearance and all old
+    // R51/RA6 assertions remain additional route obligations, not credited by this fixture.
+}
+#[test]
+fn ra9_behavior87_stock_parasite_targets_keep_actual_selected_weapon_and_layer_controls() {
+    for elite in [false, true] {
+        // A stock Drone's zero-versus same-kind victim is distinct from S's HP2000/light fixture.
+        let mut app = world();
+        let a = put(&mut app, P0, "terror_drone", 10, 10);
+        let b = put(&mut app, P1, "terror_drone", 11, 10);
+        app.world_mut()
+            .resource_mut::<sim::SpecialState>()
+            .disabled
+            .insert(b, u64::MAX);
+        if elite {
+            assert!(
+                !sim::promote(app.world_mut(), a, 2),
+                "stock Drone is untrainable; no elite-Drone claim"
+            );
+        }
+        steps(&mut app, 1);
+        let before = hp(&mut app, b);
+        let events = attack(&mut app, a, b);
+        assert!(rejected(&events).is_empty(), "{events:?}");
+        let expected = defs(&app).weapon_kind("drone_jump").unwrap();
+        assert!(events.iter().any(|e|matches!(e,SimEvent::WeaponFired{attacker,weapon,..}if *attacker==a&&*weapon==expected)),"explicit zero-versus shot: {events:?}");
+        assert_eq!(
+            hp(&mut app, b),
+            before,
+            "zero-versus shot is not damage evidence"
+        );
+        assert_eq!(
+            app.world()
+                .resource::<sim::SpecialState>()
+                .parasites
+                .get(&b)
+                .map(|p| p.passenger.id),
+            Some(a),
+            "prospective current explicit-shot attachment, UNRUN"
+        );
+        // Stock Squid chooses punch for an Organic target on water, not grab.
+        let mut app = sea();
+        let a = put(&mut app, P0, "giant_squid", 10, 10);
+        let b = put(&mut app, P1, "giant_squid", 11, 10);
+        app.world_mut()
+            .resource_mut::<sim::SpecialState>()
+            .disabled
+            .insert(b, u64::MAX);
+        if elite {
+            assert!(sim::promote(app.world_mut(), a, 2), "real elite Squid");
+        }
+        steps(&mut app, 1);
+        let events = attack(&mut app, a, b);
+        assert!(rejected(&events).is_empty(), "{events:?}");
+        let expected = defs(&app)
+            .weapon_kind(if elite {
+                "squid_punch_e"
+            } else {
+                "squid_punch"
+            })
+            .unwrap();
+        assert!(events.iter().any(|e|matches!(e,SimEvent::WeaponFired{attacker,weapon,..}if *attacker==a&&*weapon==expected)),"{events:?}");
+        assert!(
+            app.world()
+                .resource::<sim::SpecialState>()
+                .parasites
+                .is_empty()
+        );
+        // Air ZEP is not a valid layer for Drone's non-AA parasite weapon.
+        let mut app = world();
+        let a = put(&mut app, P0, "terror_drone", 10, 10);
+        let b = put(&mut app, P1, "kirov", 11, 10);
+        app.world_mut()
+            .resource_mut::<sim::SpecialState>()
+            .disabled
+            .insert(b, u64::MAX);
+        if elite {
+            assert!(
+                !sim::promote(app.world_mut(), a, 2),
+                "stock Drone is untrainable"
+            );
+        }
+        steps(&mut app, 1);
+        let before = hp(&mut app, b);
+        let events = attack(&mut app, a, b);
+        assert!(
+            rejected(&events).is_empty(),
+            "target ownership/vision admission is not weapon-layer admission"
+        );
+        assert!(
+            !events
+                .iter()
+                .any(|e| matches!(e,SimEvent::WeaponFired{attacker,..}if *attacker==a))
+        );
+        assert_eq!(hp(&mut app, b), before);
+        assert!(
+            app.world()
+                .resource::<sim::SpecialState>()
+                .parasites
+                .is_empty()
+        );
+    }
+    // Normal tank/vessel positive attachment and host-can-still-fire/depot/release/death are
+    // existing actual native routes that still must run; these negatives do not waive them.
+}
+#[test]
+fn ra9_behavior87_direct_hospital_and_hut_targets_keep_independent_damage_immunity() {
+    for (name, immune) in [("hospital", false), ("bridge_hut", true)] {
+        let mut app = world();
+        let source = put(&mut app, P0, "grizzly", 10, 10);
+        let target = put(&mut app, P1, name, 13, 10);
+        steps(&mut app, 1);
+        let before = hp(&mut app, target);
+        let mut events = attack(&mut app, source, target);
+        assert!(rejected(&events).is_empty(), "{name}: {events:?}");
+        let mut shot=events.iter().any(|e|matches!(e,SimEvent::WeaponFired{attacker,target:t,..}if *attacker==source&&*t==target));
+        for _ in 0..80 {
+            if shot {
+                break;
+            }
+            let more = tick(&mut app, vec![]);
+            shot|=more.iter().any(|e|matches!(e,SimEvent::WeaponFired{attacker,target:t,..}if *attacker==source&&*t==target));
+            events.extend(more);
+        }
+        assert!(shot, "{name}: actual targeted shot");
+        steps(&mut app, 40);
+        if immune {
+            assert_eq!(hp(&mut app, target), before);
+        } else {
+            assert!(
+                hp(&mut app, target) < before,
+                "hospital LegalTarget=no is not a current admission flag"
+            );
+        }
+    }
+    // ForceFire/collateral, raw flag mutation and known/hidden/dead/owner controls remain explicit
+    // routes; no claim that Immune parsed LegalTarget or that direct fire proves collateral.
+}
+
+// UNCOMPILED / UNRUN / UNACCEPTED. Append to existing sim/tests/ra6_vehicles.rs.
+// Reuse unchanged real world/sea/put/defs/entity/cell/hp/issue/tick/attack/steps helpers.
+// No S provenance fixture is imported as stock targeting proof.
+#[test]
+fn ra9_b87_infested_stock_destroyer_really_fires_and_damages_after_move_refusal() {
+    let mut app = sea();
+    let squid = put(&mut app, P0, "giant_squid", 8, 8);
+    let host = put(&mut app, P1, "destroyer", 9, 8);
+    let target = put(&mut app, P0, "amphibious_transport", 15, 8);
+    for p in [P0, P1] {
+        assert_eq!(
+            app.world()
+                .resource::<Players>()
+                .get(p)
+                .unwrap()
+                .vision()
+                .visible_cells(),
+            0
+        );
+    }
+    let primed = tick(
+        &mut app,
+        vec![
+            issue(P0, Command::Guard { units: vec![squid] }),
+            issue(P1, Command::Guard { units: vec![host] }),
+        ],
+    );
+    assert!(rejected(&primed).is_empty(), "{primed:?}");
+    assert!(
+        !primed
+            .iter()
+            .any(|e| matches!(e,SimEvent::WeaponFired{attacker,..}if *attacker==squid))
+    );
+    assert!(entity(&mut app, squid).is_some());
+    assert!(
+        app.world()
+            .resource::<sim::SpecialState>()
+            .parasites
+            .is_empty()
+    );
+    let events = attack(&mut app, squid, host);
+    assert!(rejected(&events).is_empty(), "{events:?}");
+    assert!(
+        events
+            .iter()
+            .any(|e| matches!(e,SimEvent::WeaponFired{attacker,target:t,..}
+        if *attacker==squid&&*t==host))
+    );
+    assert!(entity(&mut app, squid).is_none());
+    assert_eq!(
+        app.world()
+            .resource::<sim::SpecialState>()
+            .parasites
+            .get(&host)
+            .map(|p| p.passenger.id),
+        Some(squid)
+    );
+    let before = cell(&mut app, host);
+    let host_entity = entity(&mut app, host).unwrap();
+    let before_point = app
+        .world()
+        .get::<sim::Mobile>(host_entity)
+        .unwrap()
+        .sub_position();
+    let events = tick(
+        &mut app,
+        vec![issue(
+            P1,
+            Command::Move {
+                units: vec![host],
+                target: CellPos::new(15, 12),
+            },
+        )],
+    );
+    assert!(
+        rejected(&events).is_empty(),
+        "immobilization is not public NotCommandable"
+    );
+    steps(&mut app, 10);
+    assert_eq!(cell(&mut app, host), before);
+    let victim_hp = hp(&mut app, target);
+    let primary = defs(&app).weapon_kind("gun_155mm").unwrap();
+    let mut events = tick(
+        &mut app,
+        vec![issue(
+            P1,
+            Command::Attack {
+                units: vec![host],
+                target,
+            },
+        )],
+    );
+    assert!(
+        rejected(&events).is_empty(),
+        "real host owner observes surface victim at distance6"
+    );
+    let mut fired = false;
+    let mut damaged = false;
+    for _ in 0..240 {
+        fired |= events.iter().any(|e| {
+            matches!(e,SimEvent::WeaponFired{attacker,target:t,weapon}
+            if *attacker==host&&*t==target&&*weapon==primary)
+        });
+        damaged = hp(&mut app, target) < victim_hp;
+        if fired && damaged {
+            break;
+        }
+        events = tick(&mut app, vec![]);
+    }
+    assert!(
+        fired && damaged,
+        "actual infested-host primary shot and independent target HP decrease"
+    );
+    assert_eq!(
+        cell(&mut app, host),
+        before,
+        "the host fired without escaping immobilization"
+    );
+    assert_eq!(
+        app.world()
+            .get::<sim::Mobile>(host_entity)
+            .unwrap()
+            .sub_position(),
+        before_point
+    );
+    assert!(
+        app.world()
+            .resource::<sim::SpecialState>()
+            .parasites
+            .contains_key(&host)
+    );
+    assert!(entity(&mut app, squid).is_none());
+    assert_eq!(owner(&mut app, host), Some(P1));
+    assert!(hp(&mut app, host) > 0);
+}
+
+#[test]
+fn ra9_b87_real_v3_neighbor_impact_damages_hospital_but_not_independent_immune_hut() {
+    let mut app = world();
+    let launcher = put(&mut app, P0, "v3_launcher", 10, 10);
+    put(&mut app, P0, "engineer", 18, 12);
+    // Both one-cell stock buildings are one cell from the unoccupied impact coordinate.
+    // Neither building is the direct target; no fake Blast/Impact/Health mutation is used.
+    let hospital = put(&mut app, P1, "hospital", 20, 11);
+    let hut = put(&mut app, P1, "bridge_hut", 20, 9);
+    let impact_cell = CellPos::new(20, 10);
+    steps(&mut app, 1);
+    assert!(
+        app.world()
+            .resource::<Players>()
+            .get(P0)
+            .unwrap()
+            .vision()
+            .is_visible(impact_cell)
+    );
+    let d = defs(&app);
+    let wh = d.warhead_kind("v3_wh").unwrap();
+    assert_eq!(d.warhead(wh).unwrap().cell_spread, 256);
+    let hospital_before = hp(&mut app, hospital);
+    let hut_before = hp(&mut app, hut);
+    let mut events = tick(
+        &mut app,
+        vec![issue(
+            P0,
+            Command::ForceFire {
+                units: vec![launcher],
+                target: sim::ForceTarget::Cell(impact_cell),
+            },
+        )],
+    );
+    assert!(rejected(&events).is_empty(), "{events:?}");
+    let mut missile = None;
+    let mut detonated = false;
+    let mut at = None;
+    let mut impact = false;
+    for _ in 0..240 {
+        for event in &events {
+            match event {
+                SimEvent::WeaponFired {
+                    attacker, target, ..
+                } if *attacker == launcher => {
+                    assert_ne!(*target, hospital, "Hospital never named as direct target")
+                }
+                SimEvent::UnitLaunched {
+                    player,
+                    parent,
+                    unit,
+                } if *player == P0 && *parent == launcher => {
+                    if missile.is_none() {
+                        missile = Some(*unit);
+                    }
+                }
+                SimEvent::MissileDetonated {
+                    parent,
+                    unit,
+                    at: point,
+                    ..
+                } if *parent == launcher && Some(*unit) == missile => {
+                    detonated = true;
+                    at = Some(*point);
+                }
+                SimEvent::Impact {
+                    warhead, at: point, ..
+                } if *warhead == wh && *point == sim::SubPos::centre_of(impact_cell) => {
+                    impact = true
+                }
+                _ => {}
+            }
+        }
+        if detonated && impact {
+            break;
+        }
+        events = tick(&mut app, vec![]);
+    }
+    assert!(
+        missile.is_some() && detonated && impact,
+        "real public launcher, flight and detonation"
+    );
+    assert_eq!(at, Some(sim::SubPos::centre_of(impact_cell)));
+    assert!(
+        hp(&mut app, hospital) < hospital_before,
+        "positive collateral at neighboring coordinate"
+    );
+    assert!(
+        hp(&mut app, hospital) > 0,
+        "stock Hospital survives this one neighboring impact"
+    );
+    assert_eq!(
+        hp(&mut app, hut),
+        hut_before,
+        "independent stock Immune hut at same distance"
+    );
+    assert!(sim::cell_invariant_violations(app.world_mut()).is_empty());
+}
+
+/// Controlled readiness is setup; launch/sale/flight/payload are genuine public/native paths.
+/// Stock major superweapons are uncapturable: this is a sale twin, never a forged capture.
+#[test]
+fn ra9_nuclear_public_sale_retains_launch_owner_and_exact_delayed_payload() {
+    let mut results = Vec::new();
+    for sell in [false, true] {
+        let mut app = world();
+        power(&mut app);
+        let source = put(&mut app, P0, "nuclear_silo", 3, 3);
+        put(&mut app, P0, "spy_satellite", 3, 8);
+        let witness = put(&mut app, P1, "apocalypse", 23, 20);
+        let e = entity(&mut app, witness).unwrap();
+        // The measuring target is explicitly passive, not a modified stock source.
+        app.world_mut().entity_mut(e).remove::<sim::Weapon>();
+        steps(&mut app, 2);
+        charge(&mut app, source);
+        let definitions = defs(&app);
+        let silo = definitions.building_kind("nuclear_silo").unwrap();
+        let weapon = definitions
+            .weapon(definitions.weapon_kind("nuke_payload").unwrap())
+            .unwrap();
+        let warhead = definitions.warhead(weapon.warhead).unwrap();
+        let armour = definitions
+            .unit_combat(definitions.unit_kind("apocalypse").unwrap())
+            .unwrap()
+            .armour;
+        let versus = warhead.versus[armour.0 as usize];
+        assert_eq!(
+            (
+                weapon.damage,
+                warhead.cell_spread,
+                warhead.percent_at_max,
+                versus
+            ),
+            (600, 2560, 2, 100)
+        );
+        assert_eq!(
+            definitions.rules().unwrap().superweapons.nuclear_flight,
+            200
+        );
+        // Independent integer attenuation at an actual vehicle centre three cells away.
+        let reach = i64::from(warhead.cell_spread);
+        let expected = i64::from(weapon.damage)
+            * i64::from(versus)
+            * (100 * reach - i64::from(100 - warhead.percent_at_max) * 768)
+            / (100 * 100 * reach);
+        assert_eq!(expected, 423);
+        let before_hp = hp(&mut app, witness);
+        let initial_credit = app.world().resource::<Players>().get(P0).unwrap().credits();
+        let launch_tick = app.world().resource::<sim::SimTick>().0;
+        let events = tick(
+            &mut app,
+            vec![issue(
+                P0,
+                Command::Superweapon {
+                    building: source,
+                    target: CellPos::new(20, 20),
+                    units: vec![],
+                },
+            )],
+        );
+        assert!(rejected(&events).is_empty(), "{events:?}");
+        assert!(events.iter().any(|e| matches!(e,
+            SimEvent::StrategicActivated { player, building, role: sim::Role::Nuke, .. }
+                if *player == P0 && *building == source)));
+        let missiles = &app
+            .world()
+            .resource::<sim::SpecialState>()
+            .strategic
+            .missiles;
+        assert_eq!(missiles.len(), 1);
+        let due = missiles[0].due;
+        assert_eq!(due - launch_tick, 200);
+        let refund = definitions.rule_refund(silo);
+        for elapsed in 1..=200 {
+            let events = tick(
+                &mut app,
+                if sell && elapsed == 1 {
+                    vec![issue(P0, Command::SellBuilding { building: source })]
+                } else {
+                    vec![]
+                },
+            );
+            assert!(rejected(&events).is_empty(), "{events:?}");
+            if sell && elapsed == 1 {
+                assert!(events.iter().any(|e| matches!(e,
+                    SimEvent::BuildingSold { player, building, refund: paid }
+                        if *player == P0 && *building == source && *paid == refund)));
+            }
+            assert_eq!(entity(&mut app, source).is_some(), !sell);
+            assert_eq!(
+                app.world().resource::<Players>().get(P0).unwrap().credits(),
+                initial_credit + if sell { refund } else { 0 }
+            );
+            if elapsed < 200 {
+                assert_eq!(
+                    hp(&mut app, witness),
+                    before_hp,
+                    "no early payload at {elapsed}"
+                );
+                let missiles = &app
+                    .world()
+                    .resource::<sim::SpecialState>()
+                    .strategic
+                    .missiles;
+                assert_eq!(missiles.len(), 1);
+                assert_eq!(
+                    (
+                        missiles[0].owner,
+                        missiles[0].source,
+                        missiles[0].target,
+                        missiles[0].due
+                    ),
+                    (P0, source, CellPos::new(20, 20), due)
+                );
+            } else {
+                assert!(
+                    app.world()
+                        .resource::<sim::SpecialState>()
+                        .strategic
+                        .missiles
+                        .is_empty()
+                );
+                assert!(events.iter().any(|e| matches!(e,
+                    SimEvent::Impact { warhead: kind, at, .. }
+                        if *kind == weapon.warhead && *at == sim::SubPos::centre_of(CellPos::new(20, 20)))));
+                assert_eq!(i64::from(before_hp - hp(&mut app, witness)), expected);
+                assert!(
+                    app.world()
+                        .resource::<sim::SpecialState>()
+                        .radiation_sites
+                        .iter()
+                        .any(|site| site.source == Some(source))
+                );
+            }
+            assert!(sim::cell_invariant_violations(app.world_mut()).is_empty());
+            assert!(
+                app.world()
+                    .resource::<Players>()
+                    .iter()
+                    .all(|(_, p)| p.credits() >= 0)
+            );
+        }
+        results.push(before_hp - hp(&mut app, witness));
+    }
+    assert_eq!(
+        results,
+        vec![423, 423],
+        "source existence cannot cancel/scale/reassign payload"
+    );
+}
+
+/// Current generic Attack chase, not a parsed CanApproachTarget permission.
+#[test]
+fn ra9_mirage_public_attack_approaches_visible_out_of_range_target_and_breaks_tree() {
+    let mut app = world();
+    let source = put(&mut app, P0, "mirage_tank", 16, 16);
+    tick(&mut app, vec![]);
+    assert!(sim::cell_invariant_violations(app.world_mut()).is_empty());
+    assert!(
+        app.world()
+            .resource::<Players>()
+            .iter()
+            .all(|(_, p)| p.credits() >= 0)
+    );
+    let definitions = defs(&app);
+    let kind = definitions.unit_kind("mirage_tank").unwrap();
+    let terms = definitions.unit_combat(kind).unwrap();
+    let primary = terms.weapon.unwrap();
+    let gun = definitions.weapon(primary).unwrap();
+    assert_eq!(primary, definitions.weapon_kind("mirage_gun").unwrap());
+    let distance = gun.range / 256 + 1;
+    assert!(
+        distance <= terms.sight,
+        "actual loaded range must leave a visible chase interval"
+    );
+    assert!(distance < 24);
+    let target_cell = CellPos::new(16 + distance as i32, 16);
+    // MCV is naturally unarmed; no HP/Owner/Orders/Position/source definition is injected.
+    let target = put(&mut app, P1, "mcv", target_cell.x, target_cell.y);
+    assert!(
+        app.world()
+            .resource::<Players>()
+            .get(P0)
+            .unwrap()
+            .vision()
+            .is_visible(target_cell)
+    );
+    assert!(
+        app.world()
+            .resource::<sim::SpecialState>()
+            .mirage_trees
+            .contains_key(&source)
+    );
+    let e = entity(&mut app, source).unwrap();
+    let before = app.world().get::<sim::Mobile>(e).unwrap().sub_position();
+    let target_e = entity(&mut app, target).unwrap();
+    let target_point = app
+        .world()
+        .get::<sim::Mobile>(target_e)
+        .unwrap()
+        .sub_position();
+    assert!(!sim::in_range(
+        i64::from(target_point.x) - i64::from(before.x),
+        i64::from(target_point.y) - i64::from(before.y),
+        gun.range
+    ));
+    let before_hp = hp(&mut app, target);
+    let mut events = tick(
+        &mut app,
+        vec![issue(
+            P0,
+            Command::Attack {
+                units: vec![source],
+                target,
+            },
+        )],
+    );
+    assert!(rejected(&events).is_empty(), "{events:?}");
+    assert!(
+        !app.world()
+            .resource::<sim::SpecialState>()
+            .mirage_trees
+            .contains_key(&source),
+        "real attack movement order removes stationary tree appearance"
+    );
+    let mut approached = false;
+    let mut fired = false;
+    for _ in 0..400 {
+        let e = entity(&mut app, source).unwrap();
+        let mobile = app.world().get::<sim::Mobile>(e).unwrap();
+        approached |= mobile.step.is_some() && mobile.sub_position() != before;
+        fired |= events.iter().any(|e| {
+            matches!(e,
+            SimEvent::WeaponFired { attacker, target: t, weapon }
+                if *attacker == source && *t == target && *weapon == primary)
+        });
+        assert!(sim::cell_invariant_violations(app.world_mut()).is_empty());
+        assert!(
+            app.world()
+                .resource::<Players>()
+                .iter()
+                .all(|(_, p)| p.credits() >= 0)
+        );
+        if fired && hp(&mut app, target) < before_hp {
+            break;
+        }
+        events = tick(&mut app, vec![]);
+        assert!(rejected(&events).is_empty(), "{events:?}");
+    }
+    assert!(
+        approached,
+        "actual native position/step must approach before the selected shot"
+    );
+    assert!(fired, "real public Attack must fire the loaded primary");
+    assert!(hp(&mut app, target) < before_hp);
+    assert_eq!(owner(&mut app, source), Some(P0));
+    assert_eq!(owner(&mut app, target), Some(P1));
 }

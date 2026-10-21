@@ -1,0 +1,21 @@
+{
+  "utc": "2026-10-21T02:18:12.594600+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "game",
+    "--test",
+    "m6_production_matches",
+    "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "baseline_start_sha256": "2eff81e37befbbc81c6dda7807fdca450ef125ff6c5f93320e337ecccf0983ab",
+  "expected_restored_test_sha256": "d6374b445e91aa22c5325892203dbdec2d85f9363a0de435b117757ddf10af5a",
+  "mutant_test_sha256": "36c56befb5e145fc077c771b722db55e20c9bc1e45aba04079683c238cb943cf",
+  "one_cause": "Only right native SimRng draw at36001 after ordered event comparison; expected exact hash assertion at36001/completed36002",
+  "pre_mutation_runtime_mismatches": []
+}

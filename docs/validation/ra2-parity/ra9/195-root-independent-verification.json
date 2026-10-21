@@ -1,0 +1,32 @@
+{
+  "created_utc": "2026-10-21 16:19:36 UTC",
+  "status": "ROOT_FACTUAL_VERIFICATION_ONLY_NOT_POLICY_OR_REVIEW_APPROVAL",
+  "author": "orchestrator /root",
+  "authorization_id": "ROOT_CANONICAL_195_FACTUAL_2026_10_21",
+  "canonical_predecessor": "8f1b1dcf399d23b89cbadce1cb1e322439ef85a8",
+  "packet": "docs/validation/ra2-parity/ra9/195-actual-canonical-input-scope.json",
+  "packet_sha256": "9c110cf4d961ac33b5025acb53d0f50eedfa3fe55fe76e9e2135789d388ba6b7",
+  "verified": {
+    "source_files": 656,
+    "fresh_core_rust_files": 97,
+    "exact_authority_spans": 64,
+    "archive_files": 580,
+    "archive_bytes": 33167644,
+    "first_pass_file_and_fragment_checks": 1407,
+    "fresh_candidate_files": 671,
+    "unaccounted_candidates": [],
+    "producer_and_preserved_preimage_files": 12,
+    "actual_scope_producer_exit": 0,
+    "source_metadata_changed_rows": 2,
+    "canonical_runtime_delta_files": 4,
+    "source_delta_from166_paths": 11,
+    "howtosee_rows": 51,
+    "howtosee_sha256": "8ae4edfadf97fc68138d03c9a12d9c1217cf0c1fb65cf6dd6010c77b1c5bd6c1",
+    "mismatches": []
+  },
+  "observed_model_census_digest": "bc1bc3df97e937cc2a03a569b6a8897c41d4eda33e1342599a19834152eec811",
+  "observed_model_census_file_sha256": "e46ee2cc47f95a0c80d78097e68fb77193c203674cdb67632da5f7fea4c29f7c",
+  "method": "Root independently rehashed all declared current source/core/output/prompt files and exact authority spans, compared all 580 archived files with original bytes, freshly enumerated all crates/scripts/assets/config inputs with zero unaccounted candidates, checked 166-plus-yard source membership and all eleven deltas, checked all four canonical runtime deltas, verified preserved canonical DECISIONS/STATUS line order, checked the HOWTOSEE block, verified all twelve actual-producer output/preimage files, recomputed both metadata rows including FNV-1a64/SHA-256, and checked the proposed approval is limited to observed/factual fields.",
+  "authorized_single_materialization": "Materialize only the excluded factual scope-approval/approved-census/source-consumer binding outputs to this verified packet hash and actual observed model digest, using this authorization id. Preserve literal, classification, reason, route and qualified-receipt cells. Record the actual changes and preserve preimages. Then continue strict compilation and the bounded fail-fast checks, required isolated five and fresh full13 on frozen final source.",
+  "limits": "This verifies factual source/evidence scope only. It does not approve model choices, prove original-engine nonuse, confer canonical validation/performance credit, or replace the five fresh independent slices and fresh lead. User visual/audio/feel verification remains pending."
+}

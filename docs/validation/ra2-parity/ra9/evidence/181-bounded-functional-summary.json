@@ -1,0 +1,173 @@
+{
+  "end_utc": "2026-10-21T11:05:29.885627+00:00",
+  "results": [
+    {
+      "utc": "2026-10-21T11:05:00.963768+00:00",
+      "end_utc": "2026-10-21T11:05:11.085260+00:00",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_start_setup",
+        "--test",
+        "ra4_spawns",
+        "--test",
+        "ra7_orders",
+        "--no-run"
+      ],
+      "exit_code": 0,
+      "seconds": 10.121,
+      "scope": "COPY_ONLY_FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_ACCEPTANCE",
+      "phase04_ended_cancellation": false,
+      "source_before": "ra9-preliminary-logs/181-00-start.json",
+      "source_drift": [],
+      "raw": {
+        "path": "ra9-preliminary-logs/181-00.log",
+        "bytes": 577,
+        "sha256": "7e02dcf6c59e31eab00cedd93d804184f07f2041f3ecdd436d4712a1526bf30c"
+      }
+    },
+    {
+      "utc": "2026-10-21T11:05:11.155446+00:00",
+      "end_utc": "2026-10-21T11:05:13.234920+00:00",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_start_setup",
+        "ra9_shipped_yard_starts_for_all_maps_two_to_ten_players_have_legal_occupancy_and_public_exits",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "seconds": 2.079,
+      "scope": "COPY_ONLY_FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_ACCEPTANCE",
+      "phase04_ended_cancellation": false,
+      "source_before": "ra9-preliminary-logs/181-01-start.json",
+      "source_drift": [],
+      "raw": {
+        "path": "ra9-preliminary-logs/181-01.log",
+        "bytes": 944,
+        "sha256": "d73db2818a8d6a9ca6d4a301401f57ecf2d4dc1b3b3626e16459e1767955a29b"
+      }
+    },
+    {
+      "utc": "2026-10-21T11:05:13.300798+00:00",
+      "end_utc": "2026-10-21T11:05:15.380239+00:00",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra4_spawns",
+        "ra9_missile_replacement_has_exact_ready_and_next_launch_boundaries",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 2.079,
+      "scope": "COPY_ONLY_FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_ACCEPTANCE",
+      "phase04_ended_cancellation": false,
+      "source_before": "ra9-preliminary-logs/181-02-start.json",
+      "source_drift": [],
+      "raw": {
+        "path": "ra9-preliminary-logs/181-02.log",
+        "bytes": 382,
+        "sha256": "c6b9a5b52e201061989c915461ac01e3837ca66a2cd4892342d5f249b5798eac"
+      }
+    },
+    {
+      "utc": "2026-10-21T11:05:15.450942+00:00",
+      "end_utc": "2026-10-21T11:05:17.528987+00:00",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra4_spawns",
+        "ra9_returned_carrier_aircraft_rearms_at_the_exact_scheduled_boundary",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 2.078,
+      "scope": "COPY_ONLY_FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_ACCEPTANCE",
+      "phase04_ended_cancellation": false,
+      "source_before": "ra9-preliminary-logs/181-03-start.json",
+      "source_drift": [],
+      "raw": {
+        "path": "ra9-preliminary-logs/181-03.log",
+        "bytes": 384,
+        "sha256": "57e8ec27ec2f69f8e05025e12aa57d5c022a0eebaa847371c613ad932c6e0f80"
+      }
+    },
+    {
+      "utc": "2026-10-21T11:05:17.608118+00:00",
+      "end_utc": "2026-10-21T11:05:19.690015+00:00",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra7_orders",
+        "ra9_attack_move_combat_at_destination_emits_only_one_completion_for_one_order",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "seconds": 2.082,
+      "scope": "COPY_ONLY_FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_ACCEPTANCE",
+      "phase04_ended_cancellation": false,
+      "source_before": "ra9-preliminary-logs/181-04-start.json",
+      "source_drift": [],
+      "raw": {
+        "path": "ra9-preliminary-logs/181-04.log",
+        "bytes": 1208,
+        "sha256": "ae4ea14cb3c885c84e34d400275cb0b9ea19e8bcd9e7e7fc241a9af07423c900"
+      }
+    },
+    {
+      "utc": "2026-10-21T11:05:19.761157+00:00",
+      "end_utc": "2026-10-21T11:05:29.885006+00:00",
+      "command": [
+        "cargo",
+        "run",
+        "--release",
+        "-p",
+        "sim",
+        "--example",
+        "ra9_catalogue"
+      ],
+      "exit_code": 0,
+      "seconds": 10.124,
+      "scope": "COPY_ONLY_FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_ACCEPTANCE",
+      "phase04_ended_cancellation": false,
+      "source_before": "ra9-preliminary-logs/181-05-start.json",
+      "source_drift": [],
+      "raw": {
+        "path": "ra9-preliminary-logs/181-05.log",
+        "bytes": 35767,
+        "sha256": "a9576fbcf4077c7630e879c24bfddf61752cb87aaf8a032868d522740cd41798"
+      }
+    }
+  ],
+  "owned_child_processes": "ALL_WAITED_AND_EXITED",
+  "phase04_done": false,
+  "source_before_after_drift": []
+}

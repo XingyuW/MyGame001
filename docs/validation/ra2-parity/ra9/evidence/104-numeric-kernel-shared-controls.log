@@ -1,0 +1,41 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 15s
+     Running tests/ra3_cells.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra3_cells-af276d7696d97289)
+
+running 3 tests
+test range_is_measured_from_the_spot_a_soldier_stands_at ... ok
+test splash_on_a_cell_with_three_soldiers_hits_each_by_its_own_distance ... ok
+test three_soldiers_share_a_cell_each_at_its_spot_and_nothing_else_fits ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 19 filtered out; finished in 0.13s
+
+     Running tests/ra3_crush.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra3_crush-3d5aa0b55acc9dbf)
+
+running 2 tests
+test a_crusher_commanded_to_move_drives_over_a_hostile_soldier ... ok
+test a_crusher_that_chases_its_target_does_not_crush ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.32s
+
+     Running tests/ra3_damage.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra3_damage-af6178e66c09af46)
+
+running 5 tests
+test a_building_takes_one_hit_for_every_cell_of_its_footprint_within_the_spread ... ok
+test a_shell_with_a_spread_damages_everything_within_it_by_its_distance ... ok
+test an_impact_in_the_air_spares_the_ground_and_one_on_the_ground_the_air ... ok
+test only_a_warhead_for_walls_damages_a_wall ... ok
+test only_a_warhead_for_wood_damages_trees ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.31s
+
+     Running tests/ra3_weapons.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra3_weapons-e9d8720842034f63)
+
+running 5 tests
+test a_damaged_vehicle_moves_at_three_quarters_of_its_speed ... ok
+test a_scattered_shell_lands_where_it_was_aimed_and_only_inaccurate_weapons_draw ... ok
+test an_inaccurate_weapon_lands_within_its_scatter_of_the_target ... ok
+test the_air_range_bonus_lengthens_only_the_shot_at_an_aircraft ... ok
+test the_secondary_weapon_engages_what_the_primary_cannot ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 1.19s
+

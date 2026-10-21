@@ -1187,9 +1187,9 @@ pub(crate) fn check_win_condition(
         for (id, owner, unit) in &units {
             if counts(unit.kind)
                 || special
-                    .cargo
-                    .get(id)
-                    .is_some_and(|cargo| cargo.iter().any(|passenger| counts(passenger.kind)))
+                    .cargo_descendants(*id)
+                    .iter()
+                    .any(|passenger| counts(passenger.kind))
             {
                 alive.insert(owner.0);
             }

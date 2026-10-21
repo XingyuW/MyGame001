@@ -53,7 +53,10 @@
 //!   drives over hostile crushable infantry in its way, which die. Only a unit of the category
 //!   `"vehicles"` that does not fly may have it;
 //! * `size`: the room the unit takes in a transport (the ini's `Size`), 0 to [`MAX_UNIT_SIZE`].
-//!   Nothing reads it yet; it is ported with the other three for the transports of RA4.
+//!   With a nonzero `size_limit`, passenger sizes consume the transport's capacity.
+//! * `size_limit` (schema 10): largest passenger size, 0 to [`MAX_UNIT_SIZE`]. Zero keeps
+//!   the legacy count/category contract; nonzero enables weighted RA2 transport capacity.
+//!   A zero passenger size counts as one for old fixture compatibility and bounded cargo.
 //!
 //! Unlike the traits of schema version 3 these are read in every world, with or without a rules
 //! file: a world whose arsenal gives no unit the `infantry` trait, like a world without an
@@ -107,7 +110,7 @@ use std::{collections::BTreeMap, path::Path};
 
 /// The schema version of the arsenal file this crate reads (2 since RA1, 3 since RA2, 4 since
 /// RA3, 5 since RA4).
-pub const ARSENAL_SCHEMA_VERSION: i64 = 9;
+pub const ARSENAL_SCHEMA_VERSION: i64 = 10;
 
 /// Largest `build_limit` of an arsenal entry.
 pub const MAX_BUILD_LIMIT: u32 = 255;
@@ -333,6 +336,8 @@ pub struct ArsenalEntry {
     pub crushable: bool,
     /// The room the unit takes in a transport.
     pub size: u32,
+    /// Largest passenger size; zero keeps the legacy count/category contract.
+    pub size_limit: u32,
     /// The unit is of the infantry type list: on foot unless it flies.
     pub infantry: bool,
     /// Units of the type gain experience and ranks (RA4).
@@ -370,6 +375,12 @@ pub struct ArsenalEntry {
     // RA5: neutral world objects, occupation and captured-building effects.
     pub needs_engineer: bool,
     pub capturable: bool,
+    /// TypeImmune; independent from targeting and psionic immunity.
+    pub type_immune: bool,
+    /// BombSight detection radius in cells, not the disarm range.
+    pub bomb_sight: u32,
+    /// Public local reveal on surviving first observation and owner transition.
+    pub reveal_to_all: bool,
     pub insignificant: bool,
     pub immune: bool,
     pub hospital: bool,
@@ -402,6 +413,8 @@ pub struct ArsenalEntry {
     pub disguise_when_still: bool,
     pub ifv_mode: u32,
     pub death_weapon: Option<crate::WeaponKind>,
+    /// The death payload damage multiplier in permille (DeathWeaponDamageModifier).
+    pub death_weapon_damage_pm: u32,
     pub ifv_weapons: Vec<crate::WeaponKind>,
 }
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -446,6 +459,7 @@ struct Entry {
     crusher: i64,
     crushable: i64,
     size: i64,
+    size_limit: i64,
     infantry: i64,
     trainable: i64,
     veteran_abilities: Vec<String>,
@@ -465,6 +479,9 @@ struct Entry {
     sensors_sight: i64,
     needs_engineer: i64,
     capturable: i64,
+    type_immune: i64,
+    bomb_sight: i64,
+    reveal_to_all: i64,
     insignificant: i64,
     immune: i64,
     hospital: i64,
@@ -497,6 +514,7 @@ struct Entry {
     disguise_when_still: i64,
     ifv_mode: i64,
     death_weapon: String,
+    death_weapon_damage_pm: i64,
     ifv_weapons: Vec<String>,
 }
 static ENTRY: Shape = Shape::Struct(&[
@@ -555,6 +573,7 @@ static ENTRY: Shape = Shape::Struct(&[
     ("crusher", Shape::Int),
     ("crushable", Shape::Int),
     ("size", Shape::Int),
+    ("size_limit", Shape::Int),
     ("infantry", Shape::Int),
     ("trainable", Shape::Int),
     (
@@ -586,6 +605,9 @@ static ENTRY: Shape = Shape::Struct(&[
     ("sensors_sight", Shape::Int),
     ("needs_engineer", Shape::Int),
     ("capturable", Shape::Int),
+    ("type_immune", Shape::Int),
+    ("bomb_sight", Shape::Int),
+    ("reveal_to_all", Shape::Int),
     ("insignificant", Shape::Int),
     ("immune", Shape::Int),
     ("hospital", Shape::Int),
@@ -618,6 +640,7 @@ static ENTRY: Shape = Shape::Struct(&[
     ("disguise_when_still", Shape::Int),
     ("ifv_mode", Shape::Int),
     ("death_weapon", Shape::Str),
+    ("death_weapon_damage_pm", Shape::Int),
     (
         "ifv_weapons",
         Shape::List {
@@ -732,6 +755,7 @@ impl Arsenal {
                 ("guard_range", e.guard_range, 64),
                 ("strength", e.strength, 10000),
                 ("capacity", e.capacity, 16),
+                ("death_weapon_damage_pm", e.death_weapon_damage_pm, 10000),
             ] {
                 if !(0..=max).contains(&n) {
                     return Err(bad(name, &n.to_string()));
@@ -879,6 +903,7 @@ impl Arsenal {
                 ("crusher", e.crusher, 1),
                 ("crushable", e.crushable, 1),
                 ("size", e.size, i64::from(MAX_UNIT_SIZE)),
+                ("size_limit", e.size_limit, i64::from(MAX_UNIT_SIZE)),
                 ("infantry", e.infantry, 1),
             ];
             for (name, value, max) in traits {
@@ -951,6 +976,8 @@ impl Arsenal {
                 ("overpowerable", e.overpowerable, true),
                 ("needs_engineer", e.needs_engineer, true),
                 ("capturable", e.capturable, true),
+                ("type_immune", e.type_immune, true),
+                ("reveal_to_all", e.reveal_to_all, true),
                 ("insignificant", e.insignificant, true),
                 ("immune", e.immune, true),
                 ("hospital", e.hospital, true),
@@ -1021,6 +1048,12 @@ impl Arsenal {
                     e.spawn_reload,
                     i64::from(MAX_SPAWN_TICKS),
                     false,
+                ),
+                (
+                    "bomb_sight",
+                    e.bomb_sight,
+                    i64::from(crate::MAX_SIGHT),
+                    true,
                 ),
                 (
                     "sensors_sight",
@@ -1155,6 +1188,7 @@ impl Arsenal {
                     crusher: e.crusher == 1,
                     crushable: e.crushable == 1,
                     size: e.size as u32,
+                    size_limit: e.size_limit as u32,
                     infantry: e.infantry == 1,
                     trainable: e.trainable == 1,
                     veteran_abilities,
@@ -1174,6 +1208,9 @@ impl Arsenal {
                     sensors_sight: e.sensors_sight as u32,
                     needs_engineer: e.needs_engineer == 1,
                     capturable: e.capturable == 1,
+                    type_immune: e.type_immune == 1,
+                    bomb_sight: e.bomb_sight as u32,
+                    reveal_to_all: e.reveal_to_all == 1,
                     insignificant: e.insignificant == 1,
                     immune: e.immune == 1,
                     hospital: e.hospital == 1,
@@ -1206,6 +1243,7 @@ impl Arsenal {
                     disguise_when_still: e.disguise_when_still == 1,
                     ifv_mode: e.ifv_mode as u32,
                     death_weapon,
+                    death_weapon_damage_pm: e.death_weapon_damage_pm as u32,
                     ifv_weapons,
                 },
             );
@@ -1319,8 +1357,10 @@ impl Arsenal {
                 u8::from(e.infantry),
             ]);
             h.write_u32(e.size);
+            h.write_u32(e.size_limit);
             h.write_u32(e.ifv_mode);
             h.write(&e.death_weapon.map_or(u16::MAX, |w| w.0).to_le_bytes());
+            h.write_u32(e.death_weapon_damage_pm);
             h.write_u64(e.ifv_weapons.len() as u64);
             for w in &e.ifv_weapons {
                 h.write(&w.0.to_le_bytes());
@@ -1362,6 +1402,8 @@ impl Arsenal {
                 u8::from(e.overpowerable),
                 u8::from(e.needs_engineer),
                 u8::from(e.capturable),
+                u8::from(e.type_immune),
+                u8::from(e.reveal_to_all),
                 u8::from(e.insignificant),
                 u8::from(e.immune),
                 u8::from(e.hospital),
@@ -1377,6 +1419,7 @@ impl Arsenal {
                 e.spawn_regen,
                 e.spawn_reload,
                 e.sensors_sight,
+                e.bomb_sight,
                 e.max_occupants,
                 e.vehicle_docks,
                 e.cash_startup,

@@ -1,0 +1,38 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3m 24s
+     Running tests/ra9_auto_defuse_geometry.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_auto_defuse_geometry-a04f60756b8ac389)
+
+running 2 tests
+test ra9_bombsight_actual_adjacent_and_east_in_range_points_defuse_without_a_planned_move ... ok
+test ra9_bombsight_west_edge_spot_zero_must_approach_into_real_defusekit_range ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+
+     Running tests/ra9_legacy_model_boundaries.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_legacy_model_boundaries-a16e916e6f409e4a)
+
+running 7 tests
+test ra9_legacy_cellrange_adjacent_cells_use_actual_spot_circle_with_inside_control ... ok
+test ra9_legacy_distributed_omni_current_idle_retains_first_live_target_and_fires_behind ... FAILED
+test ra9_legacy_elite_tesla_tank_and_trooper_have_primary_damage_without_shrapnel ... ok
+test ra9_legacy_he_direct_and_wood_damage_have_no_later_secondary_fire_in_this_model ... ok
+test ra9_legacy_prism_base_and_elite_have_primary_damage_without_shrapnel ... ok
+test ra9_legacy_radiation_current_cell_model_ignores_subcell_spot_with_immune_and_edge_controls ... ok
+test ra9_legacy_sonic_base_and_elite_damage_endpoint_but_not_ambient_line ... ok
+
+failures:
+
+---- ra9_legacy_distributed_omni_current_idle_retains_first_live_target_and_fires_behind stdout ----
+
+thread 'ra9_legacy_distributed_omni_current_idle_retains_first_live_target_and_fires_behind' (13000689) panicked at crates/sim/tests/ra9_legacy_model_boundaries.rs:36:39:
+assertion `left == right` failed: one actual100 impact before second missile
+  left: Some(1901)
+ right: Some(1900)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ra9_legacy_distributed_omni_current_idle_retains_first_live_target_and_fires_behind
+
+test result: FAILED. 6 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.89s
+
+error: test failed, to rerun pass `-p sim --test ra9_legacy_model_boundaries`

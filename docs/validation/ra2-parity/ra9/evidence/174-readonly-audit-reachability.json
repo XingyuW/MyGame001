@@ -1,0 +1,808 @@
+{
+  "status": "READ_ONLY_ACTUAL_MODULE_DECLARATION_AND_INCLUDE_CENSUS_NOT_COMPILATION_OR_APPROVAL",
+  "root": "crates/sim/tests/ra9_audit/mod.rs",
+  "file_counts": {
+    "rust_files": 48,
+    "reachable_external_rust_files": 48,
+    "reachable_include_str_files": 79
+  },
+  "edges": [
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "actual",
+      "to": "crates/sim/tests/ra9_audit/actual.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "array_negatives",
+      "to": "crates/sim/tests/ra9_audit/array-negatives.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "array_plans",
+      "to": "crates/sim/tests/ra9_audit/array-plans.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "arrays",
+      "to": "crates/sim/tests/ra9_audit/arrays.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "behavior87_admission",
+      "to": "crates/sim/tests/ra9_audit/behavior87-admission.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "carry38_admission",
+      "to": "crates/sim/tests/ra9_audit/carry38-admission.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "combat",
+      "to": "crates/sim/tests/ra9_audit/combat.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "completion",
+      "to": "crates/sim/tests/ra9_audit/completion.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "completion_whole",
+      "to": "crates/sim/tests/ra9_audit/completion-whole.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "consumer62_admission",
+      "to": "crates/sim/tests/ra9_audit/consumer62-admission.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "contracts",
+      "to": "crates/sim/tests/ra9_audit/contracts.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "country_rosters",
+      "to": "crates/sim/tests/ra9_audit/country-rosters.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "fire_audit",
+      "to": "crates/sim/tests/ra9_audit/fire-audit.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "fire_keys",
+      "to": "crates/sim/tests/ra9_audit/fire-keys.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "guard75_admission",
+      "to": "crates/sim/tests/ra9_audit/guard75-admission.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/guard75-admission.rs",
+      "module": "tests",
+      "to": "crates/sim/tests/ra9_audit/guard75-negatives.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "items",
+      "to": "crates/sim/tests/ra9_audit/items.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "legacy904_loaded",
+      "to": "crates/sim/tests/ra9_audit/legacy904-loaded.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "legacy904_scope_negatives",
+      "to": "crates/sim/tests/ra9_audit/legacy904-scope-negatives.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "legacy904_support",
+      "to": "crates/sim/tests/ra9_audit/legacy904-support.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "legacy_ai_policy",
+      "to": "crates/sim/tests/ra9_audit/legacy-ai-policy.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/legacy-ai-policy.rs",
+      "module": "tests",
+      "to": "crates/sim/tests/ra9_audit/legacy-ai-negatives.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "legacy_model_policy",
+      "to": "crates/sim/tests/ra9_audit/legacy-model-policy.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/legacy-model-policy.rs",
+      "module": "tests",
+      "to": "crates/sim/tests/ra9_audit/legacy-model-negatives.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "legacy_source_admission",
+      "to": "crates/sim/tests/ra9_audit/legacy-source-admission.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "masked_speed_admission",
+      "to": "crates/sim/tests/ra9_audit/masked-speed-admission.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "metadata_admission",
+      "to": "crates/sim/tests/ra9_audit/metadata-admission.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "model162_admission",
+      "to": "crates/sim/tests/ra9_audit/model162-admission.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/model162-admission.rs",
+      "module": "loaded",
+      "to": "crates/sim/tests/ra9_audit/model162-loaded.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "native",
+      "to": "crates/sim/tests/ra9_audit/native.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "negatives",
+      "to": "crates/sim/tests/ra9_audit/negatives.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "nested_negatives",
+      "to": "crates/sim/tests/ra9_audit/nested-negatives.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "nested_plans",
+      "to": "crates/sim/tests/ra9_audit/nested-plans.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "owned",
+      "to": "crates/sim/tests/ra9_audit/owned.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "policy_admission",
+      "to": "crates/sim/tests/ra9_audit/policy-admission.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "raw",
+      "to": "crates/sim/tests/ra9_audit/raw.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "residual_admission",
+      "to": "crates/sim/tests/ra9_audit/residual-admission.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "rules",
+      "to": "crates/sim/tests/ra9_audit/rules.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "schema",
+      "to": "crates/sim/tests/ra9_audit/schema.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "schema10_adapters",
+      "to": "crates/sim/tests/ra9_audit/schema10-adapters.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "scope_inputs",
+      "to": "crates/sim/tests/ra9_audit/scope-inputs.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "source_disposition",
+      "to": "crates/sim/tests/ra9_audit/source-disposition.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "source_plans",
+      "to": "crates/sim/tests/ra9_audit/source-plans.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "source_routes",
+      "to": "crates/sim/tests/ra9_audit/source-routes.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/source-routes.rs",
+      "module": "tests",
+      "to": "crates/sim/tests/ra9_audit/compositor-negatives.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "special_source_admission",
+      "to": "crates/sim/tests/ra9_audit/special-source-admission.rs",
+      "kind": "path_module"
+    },
+    {
+      "from": "crates/sim/tests/ra9_audit/mod.rs",
+      "module": "specialist",
+      "to": "crates/sim/tests/ra9_audit/specialist.rs",
+      "kind": "path_module"
+    }
+  ],
+  "reachable_rust": [
+    {
+      "path": "crates/sim/tests/ra9_audit/actual.rs",
+      "sha256": "d87d351ffdf6c1e105596bace831b8fec7afc961a5c6e3191835de93b16963d5"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/array-negatives.rs",
+      "sha256": "3a79202ccec618c04f50aef557135414e6b360727dc8abd9cf6da279c6d38e6a"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/array-plans.rs",
+      "sha256": "6170f27cd9f2b4687dcde285b79f58f98738afeacdf6c26f57a1e0bf14bc19db"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/arrays.rs",
+      "sha256": "c03af1d54596e329b5465e6536c586df8102a572d2206484b4df5b8313e6806f"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/behavior87-admission.rs",
+      "sha256": "1547a6bb9ced4504acd2f0d632e7a192e91bb220b3adeba1c015ea1591778f67"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/carry38-admission.rs",
+      "sha256": "e754c9f4fb32562edbe1f4af7fd5ab93ebac5ff5b375caaf18f2ad0422190c5a"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/combat.rs",
+      "sha256": "d89f4b80515ce8ea796524269afab34d179f6545df715bb1e6854badcc6ad105"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/completion-whole.rs",
+      "sha256": "0332985e6d31f75edd97966cba3137abc1d6e3621c904e76f4883e6972b2d95e"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/completion.rs",
+      "sha256": "8f48231309349821050b7d1529b9e3dd83986cac3bd296086bf2c1ad2a60203b"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/compositor-negatives.rs",
+      "sha256": "8c53a00072974015accd78951851ecbc4cdbb8bb6bb0cf7895394f1ab6b81617"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/consumer62-admission.rs",
+      "sha256": "b0c933fd4f0535ccb7ca236ddadb53344f5e8c79bfcdf689002b37d0da8397fc"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/contracts.rs",
+      "sha256": "f81447419731ccbb496e7fbd21e235cd2c3f83885aad2d5fb62146929750ea46"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/country-rosters.rs",
+      "sha256": "f16a4801c0f2fda09f2338bb786b588a8b50110bbcefde16d91010cc951e4c98"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/fire-audit.rs",
+      "sha256": "a03f889a1285cfdb6a6c85aca863522c8c6ae703ff2b62cac5457335620bba4c"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/fire-keys.rs",
+      "sha256": "c0f2e53c234edbebf5c35a570c73ec2afc85ed50b325fb052a376513a4a12acc"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/guard75-admission.rs",
+      "sha256": "818a55b668f40b31d72b39e4a15c61587650dcb88529948f2b8233bfa61fdb87"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/guard75-negatives.rs",
+      "sha256": "5d2676b84840763ef67125e4d8f924c1d27a297a27006d1cbd74e4529b138ca1"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/items.rs",
+      "sha256": "52f8ce4374db9d97cd8473abb5612b8349f48bf037531d05508204a00d221ab3"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy-ai-negatives.rs",
+      "sha256": "46d3b400c45ff8c2c10a8802a82d16fb292995f07554cce2bb598bc2b5ba4d5c"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy-ai-policy.rs",
+      "sha256": "250b853e04bb435a1068d735329490f153e41c8757e082893339294efb11b71b"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy-model-negatives.rs",
+      "sha256": "12df49b70c861afd6a1d86c38b5ecc27d4e5484448c9ea7650cd27104511dcbe"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy-model-policy.rs",
+      "sha256": "c4ff3a7e5125be450d39e79896a2bdde54dbb2e33ed74b1b356094b3b56210a2"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy-source-admission.rs",
+      "sha256": "4057e6935c1abea510dfe587c9bc05ec0f4d2d69eec1403b06646920b1c9ee6a"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-loaded.rs",
+      "sha256": "ba1bc97e03aee25a2e4e4532b6ed76fc34b6fed30b2a33b65da265baba465a03"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-scope-negatives.rs",
+      "sha256": "2f7110228b5bdf6729ec5b2d636fa50829b07999259cecf2a9aa350fe6e7c382"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-support.rs",
+      "sha256": "1c86be98e98c46f1586f3ec23f12e0b44cc993eaf51efd9f821b22802adab005"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/masked-speed-admission.rs",
+      "sha256": "e3c5c90a32593c2732a16ac36162ed1cb9cf48d32f2b6bf960a1f0d385fc39f6"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/metadata-admission.rs",
+      "sha256": "4552cc0450e8f7caa1c0d30690d406cd919ef999e860480d49763181bf445237"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/mod.rs",
+      "sha256": "644f6a42ca04d4afdf0c7a276482dbecad145954d11ceef640d63c1fdf915036"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-admission.rs",
+      "sha256": "00a0ce2f9de62d99205b068d5379cbacbc2dff65630f3f8c3561bbbfa569f8b7"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-loaded.rs",
+      "sha256": "cf0e034880f81ef3cca547e312cefc9e3e3e17501759017e7bbfd70b42d77ac2"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/native.rs",
+      "sha256": "eb61204023ba73b42f5d796c99acaa8a03f937ab863d2a2a500b703f42713b2c"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/negatives.rs",
+      "sha256": "ceac0d86594b7069138243307c2ba1ce69ee5299a57e9e7a57d2f0856e2da013"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/nested-negatives.rs",
+      "sha256": "1bd9252077618a6a60584b28e641f1197ed75ca312347befc5b02a0cfec80818"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/nested-plans.rs",
+      "sha256": "8386f5a5b57a2ef3ba008bcd88c83eab84a789568ddfb0f4d0c4d5e1ee1cd81d"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/owned.rs",
+      "sha256": "24f60a3b3729344e212965ced600fc64fe78c61a72989924d8e97daa1d84f117"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/policy-admission.rs",
+      "sha256": "e4dfaba8bf2c99b8ff2fd0225fd7f1999f127a50c265d941375b06f9e3de1a8f"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/raw.rs",
+      "sha256": "5d2427d74220c391cd1a1deacc8666595fbd8546bdc40051de42a148374a4a04"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/residual-admission.rs",
+      "sha256": "c66c86ac7baa68f4b0365b24f48e07004e1533dc159186c9eda4f2bbfa06cc73"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/rules.rs",
+      "sha256": "402d2637ffcc1a88c0ea5d3cfbec98925e90e9b6e5aa187adee95be530f4fb35"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/schema.rs",
+      "sha256": "47743117255fcab0ca357d41d23e33b9299308672f355a152feb94e36715c61f"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/schema10-adapters.rs",
+      "sha256": "caae2c58a4ac66363948560e17ffabc4f1989efc5fc7357ca6dfbc1cd4139dd4"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/scope-inputs.rs",
+      "sha256": "cff370352dc325c375baa4983ba60e5a0c35d14e798ec8b2e557b30df9b1e0e4"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-disposition.rs",
+      "sha256": "32af88679c06bb9d158230777cf5bcd99bfb61f95d7486e2d7a44e8aea6a7765"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-plans.rs",
+      "sha256": "8181cd2c798ff398aad8043b55b2680b9c9ec5e3dd17eb1c89a7d6338ea1a7e9"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-routes.rs",
+      "sha256": "8c3c9fc00d17dae2a1ff004fa0b7001300460502f13d0335bdb02ca1ca05aedc"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/special-source-admission.rs",
+      "sha256": "33718490e59f29cc7a1bb27235a4dab9408d6025f4bf5dacd3480ceaa21ec993"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/specialist.rs",
+      "sha256": "5c7733d621465927586797e67aed1d52e266bf6870b64e74360b0517713c7560"
+    }
+  ],
+  "included_text": [
+    {
+      "path": "crates/sim/src/arsenal.rs",
+      "sha256": "f4d5f0aa0ba47c575d7242c1a72a7e8a206fba53504dc0122ba0f2b6a06a89a5"
+    },
+    {
+      "path": "crates/sim/src/command.rs",
+      "sha256": "a98ad02236195a834d374326c933a507f3cf9d647f4c26b15761645cbaf7327e"
+    },
+    {
+      "path": "crates/sim/src/economy.rs",
+      "sha256": "9a47e1f74925711beb0359f28f7404aacf0726d5f442f9e3bc33cbb6f34e0249"
+    },
+    {
+      "path": "crates/sim/src/economy_defs.rs",
+      "sha256": "076ae99a442b552d00581df28add9da31131f7fe415f2bb6994af17ad65054d6"
+    },
+    {
+      "path": "crates/sim/src/flight.rs",
+      "sha256": "be2695a423f8f60789c38f20d20e87d071b198bead3a9ec660db24fac12fe80c"
+    },
+    {
+      "path": "crates/sim/src/special/interaction.rs",
+      "sha256": "b4e0ade7d3c3b5ecc7023e92cbc5607c077fc8b87cea3191c98cbe245d51cf86"
+    },
+    {
+      "path": "crates/sim/src/veterancy.rs",
+      "sha256": "38f07941bb7b1e0c56a983dc8f108a063bd98f86d53ae9f156ea8e55337efb42"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/behavior87-acceptance.tsv",
+      "sha256": "28f4720ed8f4115f226cc5d0c58669efe2b7e7ad127072ca6deb88c7a720bafb"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/behavior87-atoms.tsv",
+      "sha256": "9b693db1bf50f30505132b84d5ae540b72862ef5d13fd60d82b68a9b1fd068ca"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/behavior87-contracts.tsv",
+      "sha256": "574119f02fdc0a2f25b09827d4b5bf4d993e858c690b78898c56018419b14fa0"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/behavior87-loaded-gates.tsv",
+      "sha256": "e038f6026bd84caebac0d510fdb74f1a09f81d11cc5b854a9b4e581795fc1676"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/behavior87-mapping-guards.tsv",
+      "sha256": "447d2a1d4efada774bdd45a4e8e3b3db38ec8480a9200d79ad6a4321a1a766da"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/behavior87-physical-demands.tsv",
+      "sha256": "9f808a0c09779bfc812a1788bb6f86ea0c742c9ffa29616ec781d35d517c881d"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/behavior87-scope-anchors.tsv",
+      "sha256": "6c9c456b1fe476f976f59c2d9974c8574639684c2b23dc3b8b474694163c2a1e"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/carry38-acceptance.tsv",
+      "sha256": "f5512a4344fdfce08ff9c18f8531a97a27421d64559f94fc913088f77e963c05"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/carry38-contracts.tsv",
+      "sha256": "ee6b87f0df7ac2fc58c8a5c675bd1ac5f272fbff85334d653383ecf14d11966c"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/carry38-document-guards.tsv",
+      "sha256": "33e3b08452056e570209f807b758b4fe29898803b0bc18f4a5ffc5473f20df7c"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/carry38-physical-demands.tsv",
+      "sha256": "290d100a4bfa8e92755ee9bb6f01b0c5d7d83f1ac796ed071b505f5abbf1d105"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/carry38-unit-gates.tsv",
+      "sha256": "5c7244dec20dc9f40f72a27b729b57ed55a4d2b4aaac174e39a25d0c6ce8994e"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/completion-acceptance.tsv",
+      "sha256": "40bdae851b90a0eb555dfe3274a282e2fdd5f161ada493918e14f0452a08f2c8"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/completion-local-code.tsv",
+      "sha256": "c74d03897c275a23b13bd64b0c63cd09d617865d47211b8a58439bacd9245c57"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/completion-local-contracts.tsv",
+      "sha256": "a5e90d069c09ab53a97bddb2ab54c5b7d377f31cbd8dab2783b80761681b47d2"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/completion-whole-contracts.tsv",
+      "sha256": "26da856fe94b9c2d006acb6df9e8a138e60c1e412ff323b5cb4f46fdc18950b0"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/consumer62-acceptance.tsv",
+      "sha256": "00d2f443cfea507206a5bfd080dc8bd322fe3d517e53a817d7a1f5e32d2222b4"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/consumer62-contracts.tsv",
+      "sha256": "e261e9437ab12ea7d4b85ced7a225047e13880d34614087dd5c2485c9d50c615"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/consumer62-helper-graph.tsv",
+      "sha256": "578589fbf1819c318123f133f2bedfae7e13e3bba882a1e4d37523d84df6ba4b"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/consumer62-loaded-gates.tsv",
+      "sha256": "cc39d56addfb1357c2bf6bc13ea136c9b086a9c0f18f7b3661ba187992a911e6"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/consumer62-mapping-guards.tsv",
+      "sha256": "7c093e10500baeb9914577716654cc6b22a2017774a1954841cf801063ff5312"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/consumer62-physical-demands.tsv",
+      "sha256": "6cafd8a756bc29d847b13e905974dc27483e9800e876610bf8bc8d6ecbf37878"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/game-arrays.tsv",
+      "sha256": "89275b39cd8ee93d43aa17fea2cdc482abb5693d5e23fbc727f37ba4521bffb1"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/guard75-acceptance.tsv",
+      "sha256": "4e0fb52bcefe1f7e1bff46a5dba728e607e387d692ecad64593148548c48799f"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/guard75-contracts.tsv",
+      "sha256": "8a44132d2291533f319c183eb75a24dfa778ec3b7ddb22766bc82a1707bce807"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/guard75-loaded-gates.tsv",
+      "sha256": "689b3cc9b690a1d54cbdd5028200a3ca435a177af25f0c4504dcf670b68fcce5"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/guard75-loaded-roster.tsv",
+      "sha256": "511fbf2cf27da857eccf5694e88dc90f823f9df4984974fc56f5f1270633f633"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/guard75-original-scope.tsv",
+      "sha256": "3f993d84ec5ee9e77643209623121c60c4e241cb7bcc096486d846030439ead7"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/guard75-physical-demands.tsv",
+      "sha256": "9b93986ab77edd140e2296b99c412059cbb2509bd9d2c50dee0e76f713ea2a57"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/guard75-roots.tsv",
+      "sha256": "805a5f6c274172b4ac54201cc9e13df3af1dbeb5f95a1b139e5400ddb6346b03"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/guard75-selectors.tsv",
+      "sha256": "9abab690554d54818791ae227db2955afd72ff0cb97a3126b5af4e7986e13713"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-ai-loaded-expected.tsv",
+      "sha256": "ed3fd552e77e71a5dcd59f56af473025f0ebb799c2cb76be943a43b0bc02c902"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-branch-anchors.tsv",
+      "sha256": "5e98b513812887d20da4be982c1c052351d8c46f1086302395b212e66a007106"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-branch-files.tsv",
+      "sha256": "a364e461818287765c3975f6d494541518796df5f3b5fe22d8a4beb214d3bf80"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-class-contracts.tsv",
+      "sha256": "8a70e92de483c3b1bcf5f36c3e4cc5ef2ae270b0004bf5b6436b433cad5e4260"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-combat-mapping-expected.tsv",
+      "sha256": "4494131ef483c644f386a4ae81bb4cf81f388fcdc8aa91a9c284905bbf47ce8f"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-death-selectors.tsv",
+      "sha256": "2433b235893adc9defe76f15889cacdcde58f008c45a6fca8b5e2ee76a6a22ba"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-document-guards.tsv",
+      "sha256": "547dd0b981307617014b9e277cbcf98e76f4c240402c5587a738a76813e5e72e"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-family-contracts.tsv",
+      "sha256": "2fec05d4b5c5f14582563b6f214bf3b189d121fb6992e23350772142f251a746"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-loaded-gates.tsv",
+      "sha256": "49dc2a2d83c0cc562ab0f7819336512e51becbb696bcc8c3c69ae4141f2ba6d3"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-mapping-expected.tsv",
+      "sha256": "92ca1764cc5ba7ebb80d7da741ce14a6b91ce0ced373834c96374776df9f8073"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-original-expected.tsv",
+      "sha256": "d9990d874fd3bd2dafa5bfc112c07a6af23e24baf91ed66d03082bc9e16dddc1"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-physical-demands.tsv",
+      "sha256": "503996a48e6795e65fefd059ad8bd7bf9b2ec9c26d30f24d5bd2f3af70336b81"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-profile-items.tsv",
+      "sha256": "933b73b0f918e44a8807c4be87164df1fcd21b62e06b92e2ecb3630d13422858"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/list-families.tsv",
+      "sha256": "8157632fd51e2bc844cb91f2c4bbc848e5f3356f4c741e31ec95c3140966e099"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/masked-speed-atoms.tsv",
+      "sha256": "365a9169383c29860944a7f6a0aef7d11e807c04e19132f972844725b2ce7d61"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/metadata147-dispositions.tsv",
+      "sha256": "6a4c732379da34308f0c977098718d2f17c1bff6665b94d4e70e6bf416b48b29"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-acceptance.tsv",
+      "sha256": "b7faed7be22e6fc46a0cd3f3af5a90e4527d1159d6ff4d82886380b730a5647c"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-contracts.tsv",
+      "sha256": "90ae0e2234efd08861352d0debb045555628fba0b72c2504738e14a45fad7514"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-document-guards.tsv",
+      "sha256": "173be0c6469929f3d2b0da7d00194718ed8df56a8394269c875222b1cf78908b"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-jumpjet-premises.tsv",
+      "sha256": "de8ca7bcc8773d953ae7e7dcae4c18e2decf9b3a50ab4f62986605d0fc9bbccf"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-loaded-gates.tsv",
+      "sha256": "e6d24931b5fb1224abfc32320d317631d216d99a238d79d3afb480fbe9e65734"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-mapping-guards.tsv",
+      "sha256": "fa3313f9e6d4ac4c27dd152f6956446abd365c700309e1162a7fd28a48b9fd14"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-physical-demands.tsv",
+      "sha256": "4cd81bb0aa05863781611fad8d863c57163484b49f084e36d383cc05aa0e4144"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-source-shapes.tsv",
+      "sha256": "8ca43e64f89f9785f0591d45f5689e0ab0069903bf51ac2650406837784bfc91"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/own-policy-acceptance.tsv",
+      "sha256": "b03c133a94443d744ac6919e07dd7573584213a45a10a5310a83171d4cdd2456"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/own-policy-contracts.tsv",
+      "sha256": "ae57bf5786645cf1d0206612209a6ecb67d980811f46f74badacc542b73e0f9a"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/ra9-approved-model-census-sha256.txt",
+      "sha256": "f871bc1874263c99ae808b08b5a9179d18fe4de2170c9fcab79f98a502748f87"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/ra9-approved-model-surface.txt",
+      "sha256": "97cbecb23fefc2ca40d34698a21016c0da93bb972d6261bea12aa6177392a6eb"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/ra9-approved-static-evidence-sha256.txt",
+      "sha256": "3475f51bb44e9b31e7c5e5255edb3168bcd2920db12a7fb1f5a3645e53bb7c89"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/residual-disposition-20261019-v1.UNVALIDATED.bindings.tsv",
+      "sha256": "8a7754716bce884bb051378fc19bc2676a30abd7d90e4bd1f0ef32ea415b3993"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/residual-disposition-20261019-v1.UNVALIDATED.delta.tsv",
+      "sha256": "6064c0dafc003e0c915363e82c4354d64f9de7cb10adacf4af0eb98a467532d2"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/residual-disposition-20261019-v1.UNVALIDATED.guard-records.tsv",
+      "sha256": "3fd21b3dde8e465c13d4c3caf93a1445dbf72cd3eaf92cac5f7f9186d6ce55fd"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/role-policy.tsv",
+      "sha256": "c2382a51eb74b92b337f5655dfc6482dbe5e2fc2c35710eb3469e72c4a40cc7e"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/root-policy-input-binding.txt",
+      "sha256": "df185c9ecae4235b49c60a5b627bf49506d018c6ca22d1aa15569d77ff502293"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-candidates.proposed.tsv",
+      "sha256": "a2ed153628670f9854fda6c7c990f8eb0f8e66bca86639e3786af5d88976d629"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-policy-acceptance.tsv",
+      "sha256": "eab06ec1e4d8a74a0ce3c21604b28f48009b762d1e90989887ddb59f9c62746d"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-static116.tsv",
+      "sha256": "078288f7f4894d61d6d370e67aecaef6cae97464149a92fa28bbbb0819a5ce24"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/special-original-expected.tsv",
+      "sha256": "2bb1dc56e7f0729621fe625300a19665af24e823b7f026fa7cb2aa91e91469bb"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/special-physical-demands.tsv",
+      "sha256": "f0b3405a59e000d3b38d837d25ff48d2244666ba86530c93de9f29c9137a38b0"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/special-source-contracts.tsv",
+      "sha256": "c39ba8310ccb123ec645f62862554a4af7d2701ce92089bcd97a209209648d7e"
+    },
+    {
+      "path": "scripts/generate_ra2_data.py",
+      "sha256": "7ad36719acf71c12aaeac6fd28894018be60fd78912c1f89a3757724da167163"
+    }
+  ],
+  "missing": [],
+  "unreached_rust": [],
+  "limits": "Exact external path/conventional mod and include/include_str edges only; inline test modules and runtime file reads are substantive reviewer/source scope, not invented compiled-module counts. Refresh after canonical additions; plain files/merge residues are not execution coverage."
+}

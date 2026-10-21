@@ -1,0 +1,21 @@
+    Checking game v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/game)
+    Checking sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+error: this operation has no effect
+     --> crates/sim/tests/ra8_ai.rs:12201:27
+      |
+12201 |                 credits - i64::from(expected_progress) * (800 / 672),
+      |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: consider reducing it to: `i64::from(expected_progress)`
+      |
+      = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#identity_op
+      = note: `-D clippy::identity-op` implied by `-D warnings`
+      = help: to override `-D warnings` add `#[allow(clippy::identity_op)]`
+
+error: this operation has no effect
+     --> crates/sim/tests/ra8_ai.rs:12211:38
+      |
+12211 |             assert_eq!(head.charged, i64::from(head.progress) * (800 / 672));
+      |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: consider reducing it to: `i64::from(head.progress)`
+      |
+      = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#identity_op
+
+error: could not compile `sim` (test "ra8_ai") due to 2 previous errors

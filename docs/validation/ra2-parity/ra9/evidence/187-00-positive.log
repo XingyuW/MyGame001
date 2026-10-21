@@ -1,0 +1,11 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+   Compiling game v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/game)
+    Finished `release` profile [optimized] target(s) in 3m 43s
+     Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-cf20e94e4f55d858)
+
+running 1 test
+test ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner ... RA9 late twins: winner=PlayerId(0) outcome_tick=41738 steps=41739/72000 first_late_native_ticks=[Some(36392), Some(36609), Some(36567)] late_counts=[444, 8, 6] final_hash=78c81bd069fca660 trajectory_hash=5a8adabd01d20b05 candidate=("crossroads", ["america", "russia"], ["easy", "easy"], 0)
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 48.07s
+

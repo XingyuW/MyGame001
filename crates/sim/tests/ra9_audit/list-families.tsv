@@ -1,0 +1,54 @@
+family	semantics	exact_witness_route	native_coverage_granted
+ai.ron.difficulties	Ordered explicit original game policy	v3 nested_plans::declare_own/compare_own, actual AI loader or MapDef starts x/y origins	none
+ai.ron.plans	Ordered explicit original game policy	v3 nested_plans::declare_own/compare_own, actual AI loader or MapDef starts x/y origins	none
+ai.ron.plans[*].army	Ordered explicit original game policy	v3 nested_plans::declare_own/compare_own, actual AI loader or MapDef starts x/y origins	none
+ai.ron.plans[*].build_order	Ordered explicit original game policy	v3 nested_plans::declare_own/compare_own, actual AI loader or MapDef starts x/y origins	none
+ai.ron.plans[*].defences	Ordered explicit original game policy	v3 nested_plans::declare_own/compare_own, actual AI loader or MapDef starts x/y origins	none
+ai.ron.plans[*].support	Ordered explicit original game policy	v3 nested_plans::declare_own/compare_own, actual AI loader or MapDef starts x/y origins	none
+ai.ron.plans[*].tier_reserves	Ordered explicit original game policy	v3 nested_plans::declare_own/compare_own, actual AI loader or MapDef starts x/y origins	none
+arsenal.ron.entries	UniqueSet keyed record identities	v3 nested_plans::declare_registries/compare_registries actual loaded catalogue/membership; v1 fixed fields/per-consumer scalar adapters	none
+arsenal.ron.entries[*].elite_abilities	UniqueSet identities	v3 nested_plans::declare_native/compare_native exact source component associations per mapped consumer	none
+arsenal.ron.entries[*].forbidden_countries	UniqueSet identities	v3 nested_plans::declare_native/compare_native exact source component associations per mapped consumer	none
+arsenal.ron.entries[*].ifv_weapons	Ordered actual slots/list	v2 array_plans exact slot/fallback/length/component source map, IFV13 mixed origins	none
+arsenal.ron.entries[*].owner_sides	UniqueSet identities	v3 nested_plans::declare_native/compare_native exact source component associations per mapped consumer	none
+arsenal.ron.entries[*].prerequisite_groups	UniqueSet buildings or group tokens	v2 array_plans native Prerequisite CSV split, duplicate/missing members rejected	none
+arsenal.ron.entries[*].required_countries	UniqueSet identities	v3 nested_plans::declare_native/compare_native exact source component associations per mapped consumer	none
+arsenal.ron.entries[*].veteran_abilities	UniqueSet identities	v3 nested_plans::declare_native/compare_native exact source component associations per mapped consumer	none
+combat.ron.armour_classes	Ordered identity/ordinal catalogue	v2 array_plans actual difficulty3/country9/faction9/armour11 identity order plus v1 typed scalar adapters	none
+combat.ron.buildings	UniqueSet keyed record identities	v3 nested_plans::declare_registries/compare_registries actual loaded catalogue/membership; v1 fixed fields/per-consumer scalar adapters	none
+combat.ron.buildings[*].elite_weapons	Ordered actual slots/list	v2 array_plans exact slot/fallback/length/component source map, IFV13 mixed origins	none
+combat.ron.buildings[*].weapons	Ordered actual slots/list	v2 array_plans exact slot/fallback/length/component source map, IFV13 mixed origins	none
+combat.ron.effects	UniqueSet keyed record identities	v3 nested_plans::declare_registries/compare_registries actual loaded catalogue/membership; v1 fixed fields/per-consumer scalar adapters	none
+combat.ron.units	UniqueSet keyed record identities	v3 nested_plans::declare_registries/compare_registries actual loaded catalogue/membership; v1 fixed fields/per-consumer scalar adapters	none
+combat.ron.units[*].elite_weapons	Ordered actual slots/list	v2 array_plans exact slot/fallback/length/component source map, IFV13 mixed origins	none
+combat.ron.units[*].weapons	Ordered actual slots/list	v2 array_plans exact slot/fallback/length/component source map, IFV13 mixed origins	none
+combat.ron.warheads	UniqueSet keyed record identities	v3 nested_plans::declare_registries/compare_registries actual loaded catalogue/membership; v1 fixed fields/per-consumer scalar adapters	none
+combat.ron.warheads[*].versus	UniqueSet armour:percent records with ordered native11 mapping	v2 array_plans native Verses tuple index to fixed11Armour association	none
+combat.ron.weapons	UniqueSet keyed record identities	v3 nested_plans::declare_registries/compare_registries actual loaded catalogue/membership; v1 fixed fields/per-consumer scalar adapters	none
+economy.ron.buildings	UniqueSet keyed record identities	v3 nested_plans::declare_registries/compare_registries actual loaded catalogue/membership; v1 fixed fields/per-consumer scalar adapters	none
+economy.ron.buildings[*].free_units	Ordered actual slots/list	v2 array_plans exact slot/fallback/length/component source map, IFV13 mixed origins	none
+economy.ron.buildings[*].prerequisites	UniqueSet buildings or group tokens	v2 array_plans native Prerequisite CSV split, duplicate/missing members rejected	none
+economy.ron.harvesters	UniqueSet keyed record identities	v3 nested_plans::declare_registries/compare_registries actual loaded catalogue/membership; v1 fixed fields/per-consumer scalar adapters	none
+economy.ron.refineries	UniqueSet keyed record identities	v3 nested_plans::declare_registries/compare_registries actual loaded catalogue/membership; v1 fixed fields/per-consumer scalar adapters	none
+economy.ron.refunds	UniqueSet keyed record identities	v3 nested_plans::declare_registries/compare_registries actual loaded catalogue/membership; v1 fixed fields/per-consumer scalar adapters	none
+economy.ron.units	UniqueSet keyed record identities	v3 nested_plans::declare_registries/compare_registries actual loaded catalogue/membership; v1 fixed fields/per-consumer scalar adapters	none
+economy.ron.units[*].prerequisites	UniqueSet buildings or group tokens	v2 array_plans native Prerequisite CSV split, duplicate/missing members rejected	none
+rules.ron.countries	Ordered identity/ordinal catalogue	v2 array_plans actual difficulty3/country9/faction9/armour11 identity order plus v1 typed scalar adapters	none
+rules.ron.crate_units	Ordered canonical UnitKind catalogue policy	v3 nested_plans crate exact CrateGoodie predicates, v1 rules::crate_units actual per-consumer memberships	none
+rules.ron.difficulty	Ordered identity/ordinal catalogue	v2 array_plans actual difficulty3/country9/faction9/armour11 identity order plus v1 typed scalar adapters	none
+rules.ron.difficulty[*].target_weights	Ordered12 actual target class	v2 array_plans difficulty native3 components/17 source arrays, per-profile12 target order	none
+rules.ron.powerups	UniqueSet keyed record identities	v3 nested_plans::declare_registries/compare_registries actual loaded catalogue/membership; v1 fixed fields/per-consumer scalar adapters	none
+rules.ron.prerequisite_groups	UniqueSet keyed record identities	v3 nested_plans::declare_registries/compare_registries actual loaded catalogue/membership; v1 fixed fields/per-consumer scalar adapters	none
+rules.ron.prerequisite_groups[*].buildings	UniqueSet buildings	v3 nested_plans::declare_native/compare_native General native CSV component to actual BuildingKind	none
+rules.ron.sides	UniqueSet keyed record identities	v3 nested_plans::declare_registries/compare_registries actual loaded catalogue/membership; v1 fixed fields/per-consumer scalar adapters	none
+skirmish.ron.factions	Ordered identity/ordinal catalogue	v2 array_plans actual difficulty3/country9/faction9/armour11 identity order plus v1 typed scalar adapters	none
+skirmish.ron.factions[*].buildings	Ordered exact empty legacy array	v3 nested_plans::declare_own/compare_own actual FactionDef fields; native countries derive roster through buildability	none
+skirmish.ron.factions[*].roster_buildings	Ordered exact empty legacy array	v3 nested_plans::declare_own/compare_own actual FactionDef fields; native countries derive roster through buildability	none
+skirmish.ron.factions[*].roster_units	Ordered exact empty legacy array	v3 nested_plans::declare_own/compare_own actual FactionDef fields; native countries derive roster through buildability	none
+skirmish.ron.factions[*].units	Ordered exact empty legacy array	v3 nested_plans::declare_own/compare_own actual FactionDef fields; native countries derive roster through buildability	none
+skirmish.ron.maps	Ordered explicit original game policy	v3 nested_plans::declare_own/compare_own, actual AI loader or MapDef starts x/y origins	none
+skirmish.ron.maps[*].starts	Ordered explicit original game policy	v3 nested_plans::declare_own/compare_own, actual AI loader or MapDef starts x/y origins	none
+skirmish.ron.sides	UniqueSet keyed record identities	v3 nested_plans::declare_registries/compare_registries actual loaded catalogue/membership; v1 fixed fields/per-consumer scalar adapters	none
+skirmish.ron.sides[*].starting_infantry	Ordered mapping eligible sequence	v3 nested_plans independent eligible_demand versus rules::starting_eligible, actual per-component Cost chain	none
+skirmish.ron.sides[*].starting_vehicles	Ordered mapping eligible sequence	v3 nested_plans independent eligible_demand versus rules::starting_eligible, actual per-component Cost chain	none
+units.ron.units	UniqueSet keyed record identities	v3 nested_plans::declare_registries/compare_registries actual loaded catalogue/membership; v1 fixed fields/per-consumer scalar adapters	none

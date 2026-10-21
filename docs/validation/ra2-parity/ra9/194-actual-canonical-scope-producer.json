@@ -1,0 +1,64 @@
+{
+  "utc": "2026-10-21T16:13:44.361918+00:00",
+  "ended_utc": "2026-10-21T16:13:49.467083+00:00",
+  "command": [
+    "python3",
+    "scripts/ra2_reference.py",
+    "--ra9-scope"
+  ],
+  "exit_code": 0,
+  "seconds": 5.105153124954086,
+  "scope": "Actual canonical originalINI+wholeRust source metadata observations; no expected contract/native evidence fabricated.",
+  "before": {
+    "ra9_legacy_original.tsv": {
+      "bytes": 9827,
+      "sha256": "d20a52b768ad12557e58537b27f166d0b0a8b0c2904814cdc3c01ca4601255e7"
+    },
+    "ra9_model_surface.txt": {
+      "bytes": 921,
+      "sha256": "97cbecb23fefc2ca40d34698a21016c0da93bb972d6261bea12aa6177392a6eb"
+    },
+    "ra9_special_original.tsv": {
+      "bytes": 1280,
+      "sha256": "2bb1dc56e7f0729621fe625300a19665af24e823b7f026fa7cb2aa91e91469bb"
+    },
+    "ra9_model_census.tsv": {
+      "bytes": 11417,
+      "sha256": "ee701d23a5829a50f263aa51e19b845a02dac4ea7f866941d91535c7a898c727"
+    },
+    "ra9_scope75_original.tsv": {
+      "bytes": 10248,
+      "sha256": "3f993d84ec5ee9e77643209623121c60c4e241cb7bcc096486d846030439ead7"
+    },
+    "ra9_scope_observation.tsv": {
+      "bytes": 430,
+      "sha256": "7c01a40308b159b10b0ead926fe0ec7e76f6ed4bf0f858bcbcba2ff91e0cc5a6"
+    }
+  },
+  "outputs": {
+    "ra9_legacy_original.tsv": {
+      "bytes": 9827,
+      "sha256": "d20a52b768ad12557e58537b27f166d0b0a8b0c2904814cdc3c01ca4601255e7"
+    },
+    "ra9_model_surface.txt": {
+      "bytes": 921,
+      "sha256": "97cbecb23fefc2ca40d34698a21016c0da93bb972d6261bea12aa6177392a6eb"
+    },
+    "ra9_special_original.tsv": {
+      "bytes": 1280,
+      "sha256": "2bb1dc56e7f0729621fe625300a19665af24e823b7f026fa7cb2aa91e91469bb"
+    },
+    "ra9_model_census.tsv": {
+      "bytes": 11417,
+      "sha256": "e46ee2cc47f95a0c80d78097e68fb77193c203674cdb67632da5f7fea4c29f7c"
+    },
+    "ra9_scope75_original.tsv": {
+      "bytes": 10248,
+      "sha256": "3f993d84ec5ee9e77643209623121c60c4e241cb7bcc096486d846030439ead7"
+    },
+    "ra9_scope_observation.tsv": {
+      "bytes": 430,
+      "sha256": "2fc9ca167c35018342399d16405b650f87922f23e11c9646c7782f6b33eed480"
+    }
+  }
+}

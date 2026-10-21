@@ -1,0 +1,16 @@
+{
+  "utc": "2026-10-21T04:39:48.137336+00:00",
+  "actual_monotonic_elapsed": 326.601,
+  "owned_processes": [
+    {
+      "pid": "20509",
+      "ppid": "20506",
+      "elapsed": "05:27",
+      "cpu_time": "24:27.02",
+      "percent_cpu": "415.6",
+      "rss_kib": "1743792",
+      "command": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_data_parity-4bf9e87c254d4d01 --nocapture"
+    }
+  ],
+  "scope": "Single actual owned-process observation after5min. Functional overlap, no hang/performance inference; do not restart/kill."
+}

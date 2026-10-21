@@ -622,6 +622,12 @@ Evidence sources as for M5: the sources of the pinned crates in `~/.cargo/regist
 
 ### D43. The computer player (PLAN.md section 7, M6)
 
+**RA9-P4 qualification:** the gathering flood below uses terrain connectivity through existing
+and reserved building footprints; only candidate cells exclude footprints. It does not certify
+that units on the far side of a contrived own-building partition can reach the selected point.
+The retained limitation and controlled Grid/pathfinding regression are recorded in RA9-P4;
+this is a documentation qualification, not a claim of a shipped-map reachability fix.
+
 1. **Inside the simulation, through the command queue.** `sim::AiPlayers` holds the AI file and one `AiController` per computer player, created by match setup. `run_ai`, the only system of the `Ai` stage, lets each controller whose turn it is (`tick mod think_interval = player mod think_interval`, and not defeated, and no outcome yet) decide from a snapshot of the state and push `IssuedCommand`s into `CommandQueue`; the `Commands` stage of the next tick validates and applies them like the human player's (I5). The controller's own state (memory, waves, waypoints, counters) is part of `state_hash` (I3); iteration is in id order or over ordered collections (I4); its arithmetic is in `i64` or saturating (I12).
 2. **What it may know (the class of information leaks through fog of war).** `think` reads only a `View` built for its player: its own units and buildings, credits, power, and queues; other players' units and buildings only while its player's vision shows them (`Vision::sees_unit`, `Vision::sees_footprint`); a memory of the other players' buildings it has seen, from which a building is forgotten when a cell of its footprint is seen and it is not (it is gone); the ore of a cell, and the units and buildings in a cell, only while the cell is visible (placement and refinery search check visibility before they read a cell; `check_placement` itself checks visibility first, D33). As public match setup it knows the static terrain of the map (passable and buildable, as the map file defines them; the human player knows the map from the menu) and the start positions of the match (computed into the gathering point and the waypoints when the match is set up). It never reads another player's credits, queues, or unseen units or buildings. The outcomes of its accepted orders use the true state as for every player (D33 item 3). `m6_ai::the_ai_ignores_what_its_player_does_not_see` runs two matches that differ only in an unarmed enemy unit within the computer player's defence radius but out of its sight, and an enemy building in the shroud: its commands are identical tick by tick while it sees neither (all 2,000 ticks of the test; it requires at least 500), and it does not remember the building.
 3. **A turn**, in this order, each a bounded number of commands (at most 16 in the tests' bound): place a building that is ready (item 4); queue the next building of the build order that it owns fewer times than listed up to that entry, if its producer's queue is empty, or the power building first if the building would consume more power than is spare, or if the build order is complete and power is low (so lost buildings are rebuilt, `the_ai_rebuilds_a_building_it_lost`); queue harvesters up to `harvesters_per_refinery` per refinery (counting those queued and those waiting to leave a refinery) and army units of the composition up to `max_army`, at most `AI_UNIT_QUEUE` = 2 items per producing building type; set the rally point of each unit producer without one to the gathering point; send idle harvesters to work at its refinery nearest to its start, at most once every `HARVEST_RETRY_TICKS` = 200 ticks (an idle harvester found no ore or was blocked, and every order makes the simulation search the map; M3 review 1 P2-2's stopped harvesters now resume without the player); defend (item 6); attack (item 7).
@@ -656,6 +662,11 @@ Evidence sources as for M5: the sources of the pinned crates in `~/.cargo/regist
 Decisions taken in remediation of M6 review 1 (`docs/reviews/M6-review-1.md`, NO-GO: 0 P0, 1 P1, 4 P2). Evidence: the regression tests named in `docs/STATUS.md` ("M6 remediation round 1 report"), the probe tests run against the reviewed code before the fix (all five configurations were accepted), and the real binaries run against scratch asset roots (`BEVY_ASSET_ROOT`) in both profiles.
 
 ### D45. Start positions are cells of their map, and the computer player falls back to no unusable cell (M6 review 1 P1-1)
+
+**RA9-P4 qualification:** item 3's gathering reachability is over terrain, with footprints
+excluded as destinations only; it is not a units-rule path guarantee through building partitions.
+The historical correction remains valid for start/terrain fallbacks, while this precise remaining
+limitation is retained separately and is not the closed R97/R103 casualty debt.
 
 1. **Class of defect: cross-file references of the new data files that were not validated at load.** Every reference of the skirmish and AI files to another file was audited:
 
@@ -11598,3 +11609,334 @@ stdout SHAe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.
 Raw logs remain exact; historical evidence checks with exit2 remain recorded as
 failed checks. A separate identical final check and completed-result read precede
 the closure commit.
+
+
+### RA9-P1. Preliminary isolated integration and exact named migrations
+
+This record applies only to the ordinary validation copy of immutable26ad1e384ff17aff2a0075a08f39d510f28d0067. It is not a canonical RA9 release or final validation decision. RA8 exclusively owns canonical source; eventual integration must merge its final accepted delta, refresh every actual binding and rerun required final-source gates. R187's AtomicU64 fixture uniqueness is retained. R172 authorizes five fresh final review slices in two batches followed by a fresh lead; preparers cannot review their work and no final panel has begun.
+
+One coordinated Arsenal schema10 adds required size_limit, death_weapon_damage_pm, type_immune, bomb_sight and reveal_to_all. All six static fixture arsenals explicitly carry the fields; all seven shipped outputs are generated from committed numeric tables by the actual generator. Missing/invalid fields remain parser errors; no serde default or copied INI text is introduced. Existing schema guards in ra1/ra2/ra3/ra4_definitions intentionally advance9→10; earlier-version cases retain rejection and the former future10 case advances to11, with9 explicitly rejected. every_field_of_the_arsenal_file_is_required gains the five fields; every old field assertion remains.
+
+Exact fixture permission migrations preserve existing capture assertions: ra1 soviet_barracks capturable0→1 for a_captured_barracks_of_the_other_side_trains_its_infantry; ra4 soviet_yard capturable0→1 for the paired engineer arrival/same-tick death tests in ra1_commands; ra4 airfield capturable0→1 for ra4_aircraft capture/dock-retention controls. Stock four major superweapons keep source Capturable=false. ra6_ivan_normal_elite_and_engineer_defuse_on_due_tick now commands its already adjacent Engineer to Guard before Ivan plants; the explicit later Interact and due-tick damage/HP/survival assertions remain, while the automatic-defuse selector deliberately excludes Guard. These are intended scenario contracts, not weakened liveness/capture tests.
+
+The actual untouched-library/data baseline compiled and ran: keys5passed/4native failures (TypeImmune same-owner200→196; BombSight did not auto-defuse; distant completed construction did not reveal; Capturable=false Chronosphere accepted capture), scenery2passed describing the old rejection/no actorless temporal channel. Raw source/body/log/JSON receipts are retained under ra9-preliminary-logs/02-*. Those two newly introduced diagnostics move into the evidence directory before permanent AFTER tests are installed; no pre-existing canonical test is deleted or skipped. Their failures are BEFORE evidence, not a successful RA9 gate.
+
+Named prepared negative fixture migrations are deliberate: guard75_initial_records_cannot_admit_a_copied_reason_without_a_decision, ra9_consumer62_individual_source_acceptances_start_fail_closed and ra9_unaccepted_individual_policy_table_fails_closed first require the actual accepted full audit baseline, then mutate a real nonfirst acceptance record to UNACCEPTED through its real parser/common gate. They must not require shipped final tables permanently unaccepted. guard75_missing_actual_comparison_or_own_is_not_a_physical_receipt removes a real successful witness after actual adapters. Metadata/residual negative helpers use actual accepted source rows/scope and successful actual adapters instead of historical TEST ONLY approvals or stale census constants. Assertions retain their rejection purpose. Carry38 missing required end-anchor rejects rather than widening to EOF. Exact outputs remain UNACCEPTED until real decisions/native receipts and external live-input authentication exist.
+
+Named preliminary native-fixture corrections retain their original behavior assertions:
+`ra9_real_construction_reveals_only_sight_and_hidden_targets_remain_hidden` checks its typed
+announcement on the actual PlaceBuilding tick, then checks no repeat on later Follow;
+`ra9_guard_and_replacement_move_keep_command_priority_over_automatic_defuse` computes travel
+from shipped Engineer speed11 instead of an invalid120-tick deadline, with every-tick bomb/job
+controls; `ra9_a_real_midflight_takeover_preserves_dolphin_launch_owner` uses a one-field parsed
+Yuri NavalTargeting0→5 fixture and a pre-first-tick countdown to make actual underwater
+MindControl possible between stock SonicZap launch and impact. This last fixture proves stored
+launch identity under real takeover, not stock Yuri naval targeting fidelity. Both
+`ra9_pad_capture_in_same_economy_stage_does_not_heal_from_stale_actor_owner` and
+`ra9_pad_capture_also_prevents_due_ammo_service_from_stale_owner` retain all HP/ammo/payment
+assertions and now queue actual public Engineer approach, aligning a pre-first-tick service
+clock with native arrival and keeping an equal remote fallback pad so sole-pad loss cannot
+mask the ownership/service premise. Each correction's original failed output, preimage and
+exact reason is preserved separately; compilation and native pass status come only from the
+actual receipts, and these descriptions grant no coverage by themselves.
+
+### RA9-P2. CellRangefinding current-model boundary (preliminary choice)
+
+Narrowly supersede only appendixD4's unsupported whole-cell/Chebyshev assumption for the11 exact CellRangefinding atoms named F083. The appendix explicitly labels the formula an assumption with no source page; it is not research-backed engine fidelity. Main plan4.4/R34's positions/nearest building geometry and current exact integer-circle implementation stay unchanged. No original-engine-unused claim or native flag accessor is introduced. The chosen current model uses actual infantry standing points, nearest footprint positions and squared subcell range. Real outside/inside adjacent-cell Dog controls remain mandatory and unaccepted until executed; original engine semantics remain uncertain. A future supported mechanic must migrate actual consumed keys, dependencies and counts rather than retain a nonread disposition. This preliminary choice must receive a final numbered canonical record and actual final-source receipts before F083 admission can open.
+
+### RA9-P3. Paid dock health service and remaining model boundaries (preliminary)
+
+UnitReload's documented health-after-ammunition promise is implemented through existing reload cadence and exact paid repair cost: ammunition has priority; health starts a fresh interval after full ammunition; actual owner/liveness/power/disabled/temporal pad state gates service. No free heal, credits below zero or dead-owner work is intended. Focused paid/native timing and refusal controls remain required; compilation alone is not proof. Auto-defuse knows only actual revealed non-C4 charges and may choose same-owner, allied or hostile charge ownership; source evidence does not justify an enemy-only filter. Actorless House/CityBlock/Tower interactions keep hidden/missing/dead same-tick command privacy and actual standing-point reachability. Explicit control/causal receipts still gate final claims.
+
+The exact no-runtime-DefaultDeathWeapon-fallback correction for F146/F147 is retained: missing source Damage is an oracle premise, not a runtime zero-valued field/path. Current death selector uses actual explicit death weapon/Primary under Explodes and gunner rules; unarmed shipyards returnNone. F251 immediate-oil native scope does not prove original delayed timing: original EligibleForDelayKill names only unmapped CAMISC01/CAMISC02/AMMOCRAT. NUKE.wall=false remains exact. These are precise current selector/model boundaries, never a broad unused or presentation waiver. Whole source classification, exact physical/dependency/component witnesses and every real linked route remain fail closed pending actual execution and external root rebinding.
+
+
+### RA9-P4. Retained terrain-only gathering flood limitation
+
+Choose the explicit documented-limitation alternative of historical M6-review-2 P2-1, not a claimed units-rule flood fix. D43§6 and D45§3 are qualified here: gathering_point traverses passable terrain through existing/reserved footprints, excluding them only as candidate destinations; it does not certify reachability from actual unit cells under contrived own-building partitions. Existing stock-map impact was not established. A controlled9×3 grid/real pathfinding regression demonstrates a covered vertical partition, unreachable chosen destination from the east, and positive same-east path. It is a pure helper boundary test, not Native/shipped reachability proof. Runtime/setup seeds/state/cadence/balance do not change. Retain this precise nonblocking limitation subject to the fresh final panel; never report it fixed. The separate R97/R103 casualty debt remains closed on its actual evidence. The retained worker-policy test comment changes R177→R176 only, matching the real accepted policy; this is text-only equivalence.
+
+### RA9-P5. Exact current-model source dispositions and evidence boundaries (preliminary)
+
+The actual typed disposition table is generated from the installed exact contracts, not from
+an umbrella unused-key waiver. `CURRENT_MODEL_NONREAD` means the current implementation does
+not consume that exact source atom behind the named branch/consumer guards; it says nothing
+about semantic non-use in RA2. `INTENTIONAL_DIFFERENCE` preserves a specific behavior/model
+boundary, including omitted angular projectile steering, secondary fire/shrapnel/hazard models,
+closed-engine AI policies and range-model uncertainty. Exact source-false cases do not imply
+unsupported true/default behavior. Every source literal/value, active mapping, loaded neighbor,
+physical dependency and actual code scope must still match; changed consumption must migrate
+the atom into a real independently demanded comparison instead of preserving a fixed nonread
+count. No row becomes accepted merely by being generated or by repeating a contract reason.
+
+The retained Patriot model chooses/retains actual visible legal targets without virtual-health
+reservation, recovery or repair-reset state. Several batteries may oversaturate a living aircraft.
+That is an intentional difference from the documented Strong account, not a VHP field/getter or
+original-engine non-use. Four required native controls observe actual pending damage, real target
+death/reacquisition, real SelfHealing during delayed flight, and genuine source death before its
+missile lands. These are current-model receipts; they do not prove a missing projected-health
+mechanic. The actual installed bodies and results must be bound before admitting NASAM.Strong.
+
+MirageGun.DisguiseFireOnly=no is bounded to actual undisguised explicit firing. MirageGunE is
+masked only in this implementation under the exact current primary-first selector, fallback,
+equal layer/filter/shared-warhead premises; no E shot or original-engine unused claim follows.
+Original selector-model uncertainty remains separate and must be fixed if evidence disproves
+it. PlayerReturnFire=no uses the narrow explicit assumption that a real hostile hit does not
+override a human player's current Move. Idle/AttackMove acquisition and explicit Attack remain
+separate positive controls; no generic true/default retaliation semantics are invented. Exact
+source semantics remain uncertain beyond that tested premise.
+
+TreeTargeting=no is implemented as an RA2 ordinary Tree cursor/selection exclusion while known
+Ctrl ForceFire remains available. Current legacy selection is separately controlled. Client
+preview/sink/hidden/missing/dead and real native effects must pass before a source disposition
+is accepted. Pure appearance choices do not waive fire timing, turning, visibility, charge,
+stealth or lifecycle mechanics.
+
+These preliminary choices require canonical numbered records and externally verified actual
+final input/route bindings. All unexecuted or unbound acceptance records stay closed. The
+retained terrain-only gathering limitation is RA9-P4, separate from casualty debt already
+closed by R97/R103. The user alone verifies visual, audio and feel quality.
+
+### RA9-P6. Retained footprints and inherited elite helper omissions
+
+The actual generated building rectangles remain unchanged as required by the RA9 plan. The
+new audit compares both dimensions to each mapped source Image→art.Foundation rectangle and
+lists all47 differing dimensions across28 rectangles explicitly in ra2_differences.tsv. Source
+art.Height is presentation elevation and is never used as a Foundation dimension. The original
+named unit/building audit now performs those exact comparisons and its width/height field census
+uses Audited entries; no dimension is premarked or hidden behind a generic game-owned label.
+
+Five exact elite_weapons difference rows make the existing source helper omissions explicit at
+the elite physical consumer for merged Dogs, merged Engineers, Osprey and Terror Drone. Without
+any native elite selector, elite slots still retain base slots; that old assertion is preserved
+and an actual source comparison is added. VirtualScanner exclusion remains bound to its exact
+NeverUse premise, and ASWCollision to its exact source parent Spawns graph/current spawned-aircraft
+model. There is no generic discard of unknown weapon names, and changed elite selectors invalidate
+these specific rows. This extends existing R9/R50 model boundaries rather than pretending the
+omitted helper is a loaded weapon or that reading it grants native coverage.
+
+The specialist adapter's legacy Commando payload guard follows the actual Rules-present
+infantry::fired return: C4 OR Teleporter after excluding Suicide weapons. Chrono Commando has
+Teleporter=true/C4=false. If neither trait holds, selected weapons are missing, or Suicide makes
+that mask invalid, the adapter still rejects the legacy-strength ownership claim. No runtime
+payload, stats, movement or source balances change in this correction. The named old audit
+migration and actual failed/after receipts are preserved under preliminary logs22/23.
+
+
+### RA9-P7 — stock SquidPunch must not enter the legacy role-only disable branch (preliminary copy)
+
+Actual native BEFORE26 selected the shipped secondary SquidPunch, dealt the independently expected
+35 HE damage to an organic Dolphin, then failed because legacy Role::Squid inserted a100-tick
+stun. The Rules-present non-Parasite path now ends before that legacy fallback; no-Rules legacy
+behavior remains. The byte-identical test passed AFTER28, and the attached-host actual firing
+control passed. Logs26/28 preserve the real failed and positive receipts; this is a preliminary
+implementation correction, pending final canonical source binding and required review.
+
+### RA9-P8 — exact game-owned array choices in the preliminary copy
+
+Declare each of the80 individual values and specific policy reasons in
+`crates/sim/tests/ra9_audit/own-policy-contracts.tsv` as this copy's current authored model choices.
+Their matching `game-arrays.tsv` entries distinguish ordered plans/repeated composition, authored
+map coordinates and UnitKind catalogue order from source-derived arrays and derived country rosters.
+These are definitions of the current game model, not evidence of original-engine AI, source-key
+coverage, native execution or successful loaded-array comparison. Source-derived TeamDelays,
+difficulty values, country/prerequisite closure and actual array-component dependencies remain
+independent demanded comparisons. Admission may cite the factual static declaration receipt32 and
+its externally verified preliminary input scope. The subsequent actual adapter must still compare
+every loaded/raw value, length, order/set identity and dependency; a mismatch rejects the audit.
+Final canonical integration must refresh this input scope and recorded choices rather than reuse
+this preliminary binding as final acceptance.
+
+
+### RA9-P9 — evidence scope follows actual consumers, not draft route labels
+
+The implementation requires an exact source/value/consumer census and meaningful behavior and
+invariant controls. A draft route identifier does not require its own simulation when an actual
+parameterized body observes the same branch for its complete declared type census. Each alias
+still has one exact source owner and must link the qualified real evidence. Gameplay, privacy,
+fire timing, acquisition, hazard and lifecycle gaps remain blocked until proved or corrected.
+
+Named migration RA9-MODEL162-PRESENTATION-EVIDENCE-01 changes only the required evidence routes
+of33 exact name, nonhuman death-sequence, generated presentation and air-appearance contracts.
+Their exact source values, typed current-model differences, reasons and loaded/mapping guards
+remain unchanged. Current renderer/client consumer inspection and actual loaded comparisons
+establish the implementation boundary; they do not prove original-engine non-use, rendered
+quality, visual equivalence or native execution. Visual/audio/feel verification remains with
+the user. Observer-privacy and gameplay-hazard classifications are outside this migration.
+The original tables and exact33-row diff are preserved in preliminary receipt65.
+
+### RA9-P10 — precisely retained historical interface and physical-blocker limits
+
+AMMO-EVENT-01 remains an explicit P2 interface limitation: exhaustion can clear an attack or
+return an aircraft without emitting AttackEnd::NoAmmo. Existing ammo, return and rearm behavior
+controls do not close that event-reporting debt. FREEUNIT-01 likewise remains a P2 limitation:
+selling a producer can discard its still-blocked pending free units without a lost_units event
+payload. These are retained current interface choices for the fresh panel, not fixed issues,
+source-fidelity claims or permission to claim there are no silent paths. Preserve every ledger
+alias and the exact source and available coverage recorded in RA2_HISTORICAL_DEBT.tsv.
+
+AIRDOCK-01 is narrowed by an actual native reproduction/control in preliminary receipt62. A
+legitimate occupant remains on the assigned air cell during360 bounded ticks; an actual public
+Move releases it, after which the returning aircraft lands and completes its fresh360-tick
+rearm interval. Every tick checks registered occupancy, ownership/health and nonnegative credits.
+No occupant is removed or teleported and no runtime retry policy was changed. This establishes
+the measured stock scenario only; permanently blocked cells, other geometries and retry-cost
+limits remain explicit physical/model limitations rather than a universal liveness proof.
+Final source rebinding and the independent panel remain required.
+
+
+### RA9-P11 — bounded structural model-absence evidence
+
+Named migration RA9-MODEL162-ABSENCE-EVIDENCE-01 changes only required evidence routes for29
+exact contracts. Their source identities/values, classes, specific reasons, loaded/mapping guards
+and independently demanded physical dependencies remain unchanged. The original contracts are
+preserved in B-model-absence29-20261021-v1 preimages. The exact current parser/schema/state/
+command/consumer census establishes absence of the original mechanism in this implementation;
+it is not evidence that the original engine ignored the literal, nor a native flag read.
+
+The29 rows comprise three burning/collapse hazard/timing settings, two Gap boost-toggle settings,
+two aircraft Pilot/Technician choices, three campaign crate-material choices, four resource HP/
+explosion/ambient-heal choices, nine original target-scan/stray/suspend settings, two source
+scatter settings and four suppression settings. The static artifact records258 actual source
+anchors and hash-bound code inputs. Existing current combat, command, visibility, harvesting,
+placement and economy controls remain independently required where they establish implemented
+behavior. A new simulation is not required to impersonate an absent original hazard, timer,
+state, crew selector or campaign dispatcher. These are precise intentional current-model
+boundaries; they are not cosmetic waivers or full behavioral equivalence.
+
+This migration excludes exposed current lobby/configuration options, allied-owner building
+placement, actual damage/miner-bomb/harvest routing, all privacy and visibility boundaries,
+all three Chrono controls and the four default-Guard-area choices. Real current features must
+work and retain native proof. The native ownership and Sniper/Spy controls in preliminary
+receipt84 establish their exact current boundaries; no original RevealOnFire field or generic
+true semantics were introduced. All external source/receipt binding, full audit rejection
+controls, final canonical gates and fresh independent review remain mandatory.
+
+
+### RA9-P12 — final preliminary evidence scopes and public-source fixture migration
+
+This isolated integration retains the original engine uncertainties explicitly. The four
+source-false CTF/HarvesterTruce/MultiEngineer/ShadowGrow lobby-mode literals have no exposed
+current option or parser/dispatcher. Their exact source identities/reasons use bounded static
+model-absence evidence; the seven exposed current rules and real Engineer/fog behavior remain
+required. Three fixed-role power-selector rows use actual current paid-power controls plus
+the loaded country-plan census, with final canonical full13/all21/performance still pending.
+The nine ordinary marker aliases use the actual universal owner/mobile/visibility/minimap
+branch and qualified generic native draw controls, not nine claimed type-specific draw runs.
+
+The four Jumpjet source-physics/global-speed rows use the exact three admitted per-type speed
+overrides and current two-dimensional movement controls. Original acceleration, altitude,
+climb and turn-delay physics are absent; no compliance with those original numeric rates,
+universal constant trajectory timing, original-engine nonuse or appearance quality is claimed.
+The three threat/disguise-cursor and two fog/blink rows similarly compose bounded absence
+of original weighting/random-detection/blend/blink controls with actual current targeting,
+detector, privacy and client-consumer tests. Controlled UnitView and legacy fog fixtures retain
+that scope; they are not original-engine or rendered-Spy evidence. Exact per-row artifacts
+and real named results must remain linked, and a changed consumer invalidates the guard.
+
+Named fixture migration RA9-RA6-HIDDEN-SOURCE-01 preserves the original hidden/missing-source
+UnknownUnit privacy oracle with malformed legacy unit arguments. Stock Chronosphere now has
+source-driven RevealToAll, so a distant source is genuinely public after Visibility; the
+updated existing test first asserts actual known footprint/announcement and NotOwned denial.
+A real Rules-present parser fixture changes only that source's reveal_to_all from 1 to 0 for
+the genuine hidden/missing twin, asserting actual absence of sight/announcement. No Owner,
+Vision or command implementation is forged or weakened. The original failing121 log and
+fixture preimage are preserved; corrected123 passed both public and hidden cases. Temporary
+fixture naming uses process plus AtomicU64 invocation identity and exclusive creation.
+
+Preliminary implementation choices and observed scopes do not constitute canonical acceptance
+or independent review. The whole-key positive audit and valid-baseline rejection controls,
+final-source port/rebinding, unfiltered gates and fresh independent panel remain required.
+
+
+### RA9-P13 — exact closure of the 174 atoms exposed by the complete audit
+
+The first complete physical/source pass (136, preserved failure) exposed 174 additional
+atoms, rather than confirming the provisional 1737 census. The current typed disposition
+census is 1911 atoms: 759 current-model nonread and 1152 intentional differences. This
+includes 132 new whole-key atoms and 42 exact comma-index components; component policy
+never grants a sibling or whole-key comparison. All remaining real source/physical demands
+and successful dependencies must still agree exactly.
+
+The 81 BuildingTypes/VehicleTypes/AircraftTypes registry entries name active admitted types.
+Their original registration/ordinal metadata is not read by this generator, which selects
+explicit reviewed mappings. Exact source literals, complete mapping aliases, actual loaded
+ID/category/domain/role and genuine Cost/HP/infantry comparisons guard this limited policy.
+No active type is described as absent or engine-unused; no synthetic registry getter or
+source-read witness is created. The 21 infantry Soylent literals have no offered unit sale,
+salvage or Grinder interface. Building refunds and Cost-based experience remain separate
+implemented paths; this is a unit-resale model difference, not original refund/XP fidelity.
+
+Powerups have 19 animation components, 19 water-availability components and four additional
+arguments on exactly zero-weight unsupported effects. Animations are original presentation
+metadata not used by the current generated appearance. The water flags are not read: the
+current supported-content weights are drawn before water handling, and Unit/free-MCV water
+outcomes become money. The eight active water rows therefore retain an explicit distribution
+model difference; the eleven zero-weight rows and four arguments require their exact inactive
+share/handler premises. Real membership/share/effective-value comparisons remain mandatory,
+as do the existing land/water collection controls. No original water filtering, effect timing,
+rendered animation or unsupported damage/duration behavior is claimed.
+
+The other 30 whole literals retain individual contracts for legacy factory/base selectors,
+fixed Ivan/Spy/Nuke/Sensor roles, inactive building ammo/refinery docks, secondary starting
+aliases, refinery storage and one-weapon selection. Actual Factory/Naval/role/charge/ammo,
+ore capacity/unload and weapon comparisons are kept. Refinery credits have no original
+building-storage ceiling: the two Storage rows explicitly retain that economy difference.
+A changed active branch, alias, source value, loaded neighbor, handler or code scope invalidates
+the corresponding guard rather than silently receiving nonread coverage.
+
+The per-atom completion acceptance gate must bind actual exported declarations, successful
+real adapters and qualified existing source/static/loaded/native evidence. Declaration and
+source reads alone grant no coverage. Valid-baseline controls mutate nonfirst components,
+sibling/whole identity, exact values, zero-share premises, accepted records and real witnesses.
+The preserved 131 membership-representation failure and 136 uncovered-atom failure remain
+history; neither is a successful whole audit. Preliminary choices remain subject to the full
+audit/negative controls, canonical final-source validation and fresh independent panel.
+
+### R192 — RA9 canonical integration and frozen validation candidate (2026-10-21)
+
+RA8 released canonical ownership after closure `8f1b1dcf399d23b89cbadce1cb1e322439ef85a8`.
+The actual RA9 port preserves R189–R191, all four runtime/test deltas from the copy's origin,
+both historical prompts and all 64 exact authority fragments. The complete preliminary proof,
+failed-run, source-preimage and restoration history is archived under
+`docs/validation/ra2-parity/ra9/evidence/`; the ordinary copy and original packets remain preserved.
+The immutable through189 portable plan resolves historical original-path/hash identities and
+same-byte aliases. Historical `ra9-preliminary-logs/<name>` references resolve through that plan;
+they do not imply a new execution in this checkout.
+
+This candidate includes the prior RA9 source/audit/client integration, the exact RA8 financing
+and visible-building-edge fixes, bounded yard/timer regressions and the actual AttackMove
+at-destination correction. That last change prevents a settled unit from creating a second
+zero-length move/completion after actual combat. The failed before run and same-body passing
+after run are preserved; no balance, state-hash field, launch spacing or match cap was changed.
+The current catalogue records actual loader output; it is not original-engine fidelity or
+visual/audio acceptance. The 1,911 source dispositions remain 759 CURRENT_MODEL_NONREAD and
+1,152 INTENTIONAL_DIFFERENCE, zero ORIGINAL_ENGINE_UNUSED; all exact per-row choices remain
+subject to independent review.
+
+The actual canonical producer and two physical source metadata rows were refreshed from real
+bytes. Root independently verified packet195 (656 source files, 97 core Rust files, 64 authority
+spans and the exact source delta), then authorized only factual excluded hash/id outputs under
+`ROOT_CANONICAL_195_FACTUAL_2026_10_21`. The first whole-audit run caught stale derived branch
+hashes in those outputs;196b propagates only the verified actual branch-fnv tokens. Root separately
+verified every old/new family digest. This is factual binding, not source-policy or final approval.
+Every initial failure, permission error, correction and retry receipt remains available.
+
+Formatting and strict Clippy pass. The actual canonical whole audit passes1/0 with physical16,211
+=13,419 Compared+2,792 GameOwned, demanded/successful pairs7,108, source atoms5,022=3,111 Compared
++1,911 dispositions and75 numeric differences. The exact six repaired cases pass6/0/175filtered,
+and the new same-rules difficulty case passes1/0. These are bounded fail-fast checks, not a complete
+181-case or workspace pass. `197c-fail-fast-process.json` binds their raw results to unchanged
+656 source files,13 derived binding outputs and64 authority spans.
+
+The candidate now proceeds to its own isolated all21 to-the-end/fixed3/three example guards,
+then the unchanged mandatory thirteen-command validator with its entire unfiltered release
+workspace and debug600 smoke. Existing RA8 or copy results transfer no RA9 acceptance or
+performance credit. No cap increase, deleted/ignored test, extra copy181/debug sweep or altered
+soak duration is authorized. R56 item6 retains36,000-tick deterministic soak windows; equal
+sampled Running worlds are not all-to-Won evidence. Completed outcomes must be Won; late twins
+and all21 ending proofs retain their separate scopes.
+
+Final canonical gates, delivery measurements and the fresh five independent slices (3+2) plus
+fresh lead remain pending for this freeze. Implementers/preparers cannot review their work.
+All183 stable debt IDs and51 unchanged HOWTOSEE rows remain retained; user visual/audio/feel,
+normal human victory/defeat and external platform/package quality checks remain user-only.

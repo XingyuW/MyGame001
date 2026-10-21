@@ -1,0 +1,265 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+warning: unused import: `CellPos`
+ --> crates/sim/tests/ra9_vhp_scan.rs:6:11
+  |
+6 | use sim::{CellPos,Command,Definitions,Health,Projectiles,SimEvent,SimId,Weapon};
+  |           ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `sim` (test "ra9_vhp_scan") generated 1 warning (run `cargo fix --test "ra9_vhp_scan" -p sim` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 53s
+     Running tests/ra9_crew.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_crew-29bca87356211ba4)
+
+running 2 tests
+test ra9_genuine_engineer_capture_then_sale_uses_the_capturers_side_for_crew ... ok
+test ra9_sold_shipped_yard_uses_all_three_last_surface_spots_without_overlap ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+     Running tests/ra9_death_payload.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_death_payload-ae9e7e921488b264)
+
+running 2 tests
+test ra9_native_reactor_death_scales_only_payload_damage_keeps_source_radiation ... ok
+test ra9_native_strategic_missile_retains_full_six_hundred_base_damage ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+
+     Running tests/ra9_guard75_readiness.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_guard75_readiness-8a2d5a94ed2c964a)
+
+running 4 tests
+test ra9_guard75_aegis_base_medusa_191_actual_position_flight_countdown_and_impact ... ok
+test ra9_guard75_aegis_elite_medusa_e_191_actual_burst_flight_and_impact ... FAILED
+test ra9_guard75_america_natural_readiness_real_eight_gi_plane_in_power_and_low_power ... ok
+test ra9_guard75_stock_nuke_natural_power_readiness_and_actual_600_surviving_hit ... FAILED
+
+failures:
+
+---- ra9_guard75_aegis_elite_medusa_e_191_actual_burst_flight_and_impact stdout ----
+
+thread 'ra9_guard75_aegis_elite_medusa_e_191_actual_burst_flight_and_impact' (13205458) panicked at crates/sim/tests/ra9_guard75_readiness.rs:208:5:
+assertion `left == right` failed
+  left: 2
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- ra9_guard75_stock_nuke_natural_power_readiness_and_actual_600_surviving_hit stdout ----
+
+thread 'ra9_guard75_stock_nuke_natural_power_readiness_and_actual_600_surviving_hit' (13205585) panicked at crates/sim/tests/ra7_common/mod.rs:61:37:
+nuclear_reactor: cell (0, 0) is held by unit 2
+
+
+failures:
+    ra9_guard75_aegis_elite_medusa_e_191_actual_burst_flight_and_impact
+    ra9_guard75_stock_nuke_natural_power_readiness_and_actual_600_surviving_hit
+
+test result: FAILED. 2 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.45s
+
+error: test failed, to rerun pass `-p sim --test ra9_guard75_readiness`
+     Running tests/ra9_harvester_liveness.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_harvester_liveness-9ad50446fa006acd)
+
+running 1 test
+test ra9_native_command_killed_worker_does_not_remove_ore_in_later_economy ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+
+     Running tests/ra9_legacy904_last_five.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_legacy904_last_five-48a3ee8fa569eb4c)
+
+running 5 tests
+test ra9_legacy904_actual_primary_death_fallback_is_distinct_from_missing_default ... FAILED
+test ra9_legacy904_death_selector_premise_enumerates_the_complete_current_loaded_set ... FAILED
+test ra9_legacy904_oil_shot_death_is_immediate_bounded_damage_without_later_execution ... ok
+test ra9_legacy904_unarmed_explodes_shipyards_have_no_payload_selector ... FAILED
+test ra9_legacy904_wall_between_shooter_and_seen_target_does_not_occlude_stock_shell ... FAILED
+
+failures:
+
+---- ra9_legacy904_actual_primary_death_fallback_is_distinct_from_missing_default stdout ----
+
+thread 'ra9_legacy904_actual_primary_death_fallback_is_distinct_from_missing_default' (13205803) panicked at crates/sim/tests/ra9_legacy904_last_five.rs:191:9:
+assertion failed: events.iter().any(|e|
+        matches!(e, SimEvent::Impact { warhead, at, air } if *warhead == wh &&
+            *at == SubPos::centre_of(CellPos::new(12,8)) && !*air))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- ra9_legacy904_death_selector_premise_enumerates_the_complete_current_loaded_set stdout ----
+
+thread 'ra9_legacy904_death_selector_premise_enumerates_the_complete_current_loaded_set' (13205832) panicked at crates/sim/tests/ra9_legacy904_last_five.rs:212:5:
+assertion `left == right` failed
+  left: "apocalypse\ttrue\tfalse\tnone\tgun_120mmx\ncrazy_ivan\ttrue\tfalse\tnone\tivan_bomber\ndemolition_truck\ttrue\tfalse\tdemobomb\tdemobomb\nifv\tfalse\ttrue\tcr_nuke\thover_missile\nkirov\tfalse\tfalse\tblimp_bomb\tblimp_bomb\nnaval_shipyard\ttrue\tfalse\tnone\tnone\nnuclear_reactor\ttrue\tfalse\tnuke_payload\tnone\noil_derrick\ttrue\tfalse\toil_explosion\tnone\nrocketeer\tfalse\tfalse\tgun_20mm\tgun_20mm\nsoviet_naval_shipyard\ttrue\tfalse\tnone\tnone\nterrorist\ttrue\tfalse\tterror_bomb\tterror_bomb\n"
+ right: "apocalypse\ttrue\tfalse\tnone\tgun_120mmx\ncrazy_ivan\ttrue\tfalse\tnone\tivan_bomber\ndemolition_truck\ttrue\tfalse\tdemobomb\tdemobomb\nifv\tfalse\ttrue\tcr_nuke\thover_missile\nkirov\tfalse\tfalse\tblimp_bomb\tblimp_bomb\nnaval_shipyard\ttrue\tfalse\tnone\tnone\nnuclear_reactor\ttrue\tfalse\tnuke_payload\tnone\noil_derrick\ttrue\tfalse\toil_explosion\tnone\nsoviet_naval_shipyard\ttrue\tfalse\tnone\tnone\nterrorist\ttrue\tfalse\tterror_bomb\tterror_bomb\n"
+
+---- ra9_legacy904_unarmed_explodes_shipyards_have_no_payload_selector stdout ----
+
+thread 'ra9_legacy904_unarmed_explodes_shipyards_have_no_payload_selector' (13205839) panicked at crates/sim/tests/ra9_legacy904_last_five.rs:162:9:
+assertion `left == right` failed: only killing Comet impact; runtime has no DefaultDeathWeapon/DeathWH fallback
+  left: 0
+ right: 1
+
+---- ra9_legacy904_wall_between_shooter_and_seen_target_does_not_occlude_stock_shell stdout ----
+
+thread 'ra9_legacy904_wall_between_shooter_and_seen_target_does_not_occlude_stock_shell' (13205847) panicked at crates/sim/tests/ra9_legacy904_last_five.rs:131:5:
+assertion failed: events.iter().any(|e|
+        matches!(e, SimEvent::Impact { warhead, at, air } if *warhead ==
+            w.warhead && *at == to && !*air))
+
+
+failures:
+    ra9_legacy904_actual_primary_death_fallback_is_distinct_from_missing_default
+    ra9_legacy904_death_selector_premise_enumerates_the_complete_current_loaded_set
+    ra9_legacy904_unarmed_explodes_shipyards_have_no_payload_selector
+    ra9_legacy904_wall_between_shooter_and_seen_target_does_not_occlude_stock_shell
+
+test result: FAILED. 1 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.00s
+
+error: test failed, to rerun pass `-p sim --test ra9_legacy904_last_five`
+     Running tests/ra9_liveness.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_liveness-dd602565f1637a1d)
+
+running 1 test
+test ra9_real_command_strike_stops_dead_producer_progress_payment_and_spawn_at_exact_death_boundary ... FAILED
+
+failures:
+
+---- ra9_real_command_strike_stops_dead_producer_progress_payment_and_spawn_at_exact_death_boundary stdout ----
+
+thread 'ra9_real_command_strike_stops_dead_producer_progress_payment_and_spawn_at_exact_death_boundary' (13205850) panicked at crates/sim/tests/ra9_liveness.rs:37:9:
+assertion `left == right` failed: the native strike must establish the boundary
+  left: true
+ right: false
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ra9_real_command_strike_stops_dead_producer_progress_payment_and_spawn_at_exact_death_boundary
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+error: test failed, to rerun pass `-p sim --test ra9_liveness`
+     Running tests/ra9_liveness_movement.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_liveness_movement-82dcbe449fff5da6)
+
+running 1 test
+test ra9_shipped_command_killed_half_step_unit_cannot_move_before_cleanup ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+     Running tests/ra9_parasite_origin.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_parasite_origin-727a41634d19df5c)
+
+running 2 tests
+test ra9_parasite_origin_same_kind_owner_false_takes_real_periodic_damage ... ok
+test ra9_parasite_origin_same_kind_owner_type_immune_blocks_only_periodic_damage ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.53s
+
+     Running tests/ra9_refinery_repair_liveness.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_refinery_repair_liveness-9209b1ead0e72b0d)
+
+running 2 tests
+test ra9_command_destroyed_refinery_cannot_pay_a_delivery_later_in_economy ... FAILED
+test ra9_native_command_killed_depot_cannot_heal_or_charge_but_one_hp_depot_can ... FAILED
+
+failures:
+
+---- ra9_command_destroyed_refinery_cannot_pay_a_delivery_later_in_economy stdout ----
+
+thread 'ra9_command_destroyed_refinery_cannot_pay_a_delivery_later_in_economy' (13205905) panicked at crates/sim/tests/ra9_refinery_repair_liveness.rs:44:5:
+real free miner never stood ready to unload its actual harvested ore
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- ra9_native_command_killed_depot_cannot_heal_or_charge_but_one_hp_depot_can stdout ----
+
+thread 'ra9_native_command_killed_depot_cannot_heal_or_charge_but_one_hp_depot_can' (13205947) panicked at crates/sim/tests/ra9_refinery_repair_liveness.rs:92:9:
+assertion `left == right` failed
+  left: true
+ right: false
+
+
+failures:
+    ra9_command_destroyed_refinery_cannot_pay_a_delivery_later_in_economy
+    ra9_native_command_killed_depot_cannot_heal_or_charge_but_one_hp_depot_can
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.98s
+
+error: test failed, to rerun pass `-p sim --test ra9_refinery_repair_liveness`
+     Running tests/ra9_remaining_props.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_remaining_props-3e7cbb7a1820299d)
+
+running 7 tests
+test ra9_full_sustained_native_temporal_erases_each_real_occupied_prop_and_releases_terrain ... ok
+test ra9_real_beam_break_keeps_each_same_occupied_host_alive_for_the_full_uninterrupted_erase_window ... ok
+test ra9_real_bombsight_approaches_from_detection_range_and_never_falls_back_after_another_real_defuse ... ok
+test ra9_real_commands_source_or_prop_death_releases_a_genuine_temporal_channel_with_survival_twins ... FAILED
+test ra9_real_explicit_defusekit_traverses_long_native_path_and_prevents_the_later_ivan_explosion ... ok
+test ra9_real_ivan_charge_survives_native_commands_source_death_and_later_deals_the_same_damage ... ok
+test ra9_real_ivan_expiry_deals_four_hundred_base_damage_with_independent_armour_controls ... ok
+
+failures:
+
+---- ra9_real_commands_source_or_prop_death_releases_a_genuine_temporal_channel_with_survival_twins stdout ----
+
+thread 'ra9_real_commands_source_or_prop_death_releases_a_genuine_temporal_channel_with_survival_twins' (13206067) panicked at crates/sim/tests/ra9_remaining_props.rs:99:13:
+assertion failed: !app.world().resource::<SpecialState>().erasures.contains_key(&target)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ra9_real_commands_source_or_prop_death_releases_a_genuine_temporal_channel_with_survival_twins
+
+test result: FAILED. 6 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.95s
+
+error: test failed, to rerun pass `-p sim --test ra9_remaining_props`
+     Running tests/ra9_squid.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_squid-5da3f7a4c6c77206)
+
+running 1 test
+test ra9_attached_squid_host_actually_fires_at_another_hostile_target ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+     Running tests/ra9_transport.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_transport-db0dcba99a4f3192)
+
+running 5 tests
+test ra9_flak_track_uses_size_two_drones_and_exact_five_capacity ... ok
+test ra9_landing_craft_refuses_oversize_and_airborne_passengers ... ok
+test ra9_loaded_flak_track_keeps_five_passengers_identity_health_rank_and_direct_child_weight ... ok
+test ra9_loaded_ifv_recreates_its_engineer_weapon_when_restored ... ok
+test ra9_weighted_capacity_accepts_exact_twelve_and_refuses_thirteen_or_more_without_state_change ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.52s
+
+     Running tests/ra9_transport_buildlimit.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_transport_buildlimit-8270742172c26b8e)
+
+running 1 test
+test ra9_individual_limit_counts_grandchild_then_releases_it_after_real_root_death ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests/ra9_transport_lifecycle.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_transport_lifecycle-06bb506471d88a8b)
+
+running 4 tests
+test ra9_fully_blocked_unload_retains_payload_until_a_normal_move_frees_a_cell ... ok
+test ra9_off_map_descendant_cannot_be_named_to_create_a_transport_cycle ... ok
+test ra9_real_control_capture_and_nested_unloads_propagate_root_owner ... ok
+test ra9_real_invalid_chronoshift_kills_root_and_every_stored_descendant ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+
+     Running tests/ra9_veterancy.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_veterancy-c97a307b7c4df3bf)
+
+running 1 test
+test ra9_zero_cost_explicit_scheduled_promotion_is_consistent_with_rank_threshold ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/ra9_vhp_scan.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_vhp_scan-fa702ee3333c988f)
+
+running 4 tests
+test ra9_vhp_before_three_native_patriots_oversaturate_the_nearest_aircraft ... ok
+test ra9_vhp_current_target_death_releases_native_patriots_to_the_other_real_aircraft ... ok
+test ra9_vhp_native_source_death_does_not_cancel_its_existing_delayed_missile ... ok
+test ra9_vhp_real_self_repair_occurs_while_slow_fixture_missiles_still_fly ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.50s
+
+error: 5 targets failed:
+    `-p sim --test ra9_guard75_readiness`
+    `-p sim --test ra9_legacy904_last_five`
+    `-p sim --test ra9_liveness`
+    `-p sim --test ra9_refinery_repair_liveness`
+    `-p sim --test ra9_remaining_props`

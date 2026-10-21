@@ -1,0 +1,26 @@
+COMMAND ["cargo", "test", "-p", "game", "--bin", "game", "--", "every_on_off_row_sets_its_option_of_the_match_and_no_other", "--nocapture", "--test-threads=1"]
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.40s
+     Running unittests src/main.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/game-5f08020bbb778566)
+
+running 1 test
+test skirmish::tests::every_on_off_row_sets_its_option_of_the_match_and_no_other ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 267 filtered out; finished in 5.67s
+
+COMMAND ["cargo", "test", "-p", "sim", "--test", "ra6_infantry", "--test", "ra6_vehicles", "--no-fail-fast", "--", "ra6_curtain_covers_both_owners_kills_infantry_and_expires_at_1000", "ra6_spy_disguise_default_copy_and_dog_detection", "--nocapture", "--test-threads=1"]
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.34s
+     Running tests/ra6_infantry.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_infantry-25553fff35365e86)
+
+running 1 test
+test ra6_spy_disguise_default_copy_and_dog_detection ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 30 filtered out; finished in 0.09s
+
+     Running tests/ra6_vehicles.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_vehicles-6e8e476b02377690)
+
+running 1 test
+test ra6_curtain_covers_both_owners_kills_infantry_and_expires_at_1000 ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 40 filtered out; finished in 0.29s
+

@@ -1,0 +1,1138 @@
+{
+  "F001": [
+    "155mm",
+    "155mmE",
+    "BlimpBombP",
+    "GiantNukeDown",
+    "GiantNukeUp"
+  ],
+  "F003": [
+    "AAHeatSeeker",
+    "AAHeatSeeker2",
+    "ADOGJUMP",
+    "AirToGroundMissile",
+    "BlimpBombP",
+    "DOGJUMP",
+    "DepthCharge",
+    "FlakProj",
+    "GiantNukeDown",
+    "GiantNukeUp",
+    "JUMP",
+    "MedusaProjectile",
+    "NormalBomb",
+    "SQDJUMP",
+    "Torpedo"
+  ],
+  "F005": [
+    "AAHeatSeeker",
+    "AAHeatSeeker2",
+    "ADOGJUMP",
+    "ASWVirt",
+    "AirToGroundMissile",
+    "Ballistic",
+    "BlimpBombP",
+    "Cannon",
+    "DOGJUMP",
+    "Electricbounce",
+    "FlakProj",
+    "FlakTProj",
+    "GiantNukeDown",
+    "GiantNukeUp",
+    "GrandCannonBall",
+    "InvisibleHigh",
+    "InvisibleLow",
+    "JUMP",
+    "LargeCometP",
+    "MedusaProjectile",
+    "QuadShell",
+    "SQDJUMP",
+    "SmallCometP",
+    "SmallTeslaP",
+    "Sonic",
+    "SuperCometP",
+    "SuperSmallCometP",
+    "Torpedo"
+  ],
+  "F006": [
+    "AAHeatSeeker",
+    "AAHeatSeeker2",
+    "ADOGJUMP",
+    "ASWVirt",
+    "AirToGroundMissile",
+    "Ballistic",
+    "Cannon",
+    "DOGJUMP",
+    "Electricbounce",
+    "FlakProj",
+    "FlakTProj",
+    "GrandCannonBall",
+    "InvisibleLow",
+    "JUMP",
+    "LargeCometP",
+    "MedusaProjectile",
+    "QuadShell",
+    "SQDJUMP",
+    "SmallCometP",
+    "SmallTeslaP",
+    "SuperCometP",
+    "SuperSmallCometP"
+  ],
+  "F007": [
+    "ADOG",
+    "AEGIS",
+    "AMCV",
+    "APOC",
+    "ASW",
+    "BEAG",
+    "CARRIER",
+    "CCOMAND",
+    "CIVAN",
+    "CLEG",
+    "CMIN",
+    "DESO",
+    "DEST",
+    "DLPH",
+    "DMISL",
+    "DOG",
+    "DRED",
+    "DRON",
+    "DTRUCK",
+    "E1",
+    "E2",
+    "ENGINEER",
+    "FLAKT",
+    "FV",
+    "HARV",
+    "HORNET",
+    "HTK",
+    "HTNK",
+    "HYD",
+    "IVAN",
+    "JUMPJET",
+    "LCRF",
+    "MGTK",
+    "MTNK",
+    "ORCA",
+    "PDPLANE",
+    "PTROOP",
+    "SAPC",
+    "SENGINEER",
+    "SHAD",
+    "SHK",
+    "SMCV",
+    "SNIPE",
+    "SPY",
+    "SQD",
+    "SREF",
+    "SUB",
+    "TANY",
+    "TERROR",
+    "TNKD",
+    "TTNK",
+    "V3",
+    "V3ROCKET",
+    "YURI",
+    "YURIPR",
+    "ZEP"
+  ],
+  "F010": [
+    "ADOG",
+    "AEGIS",
+    "AMCV",
+    "AMRADR",
+    "APOC",
+    "ASW",
+    "ATESLA",
+    "BEAG",
+    "CABHUT",
+    "CARRIER",
+    "CCOMAND",
+    "CIVAN",
+    "CLEG",
+    "CMIN",
+    "DESO",
+    "DEST",
+    "DLPH",
+    "DMISL",
+    "DOG",
+    "DRED",
+    "DRON",
+    "DTRUCK",
+    "E1",
+    "E2",
+    "ENGINEER",
+    "FLAKT",
+    "FV",
+    "GAAIRC",
+    "GACNST",
+    "GACSPH",
+    "GADEPT",
+    "GAGAP",
+    "GAOREP",
+    "GAPILE",
+    "GAPILL",
+    "GAPOWR",
+    "GAREFN",
+    "GASPYSAT",
+    "GATECH",
+    "GAWALL",
+    "GAWEAP",
+    "GAWEAT",
+    "GAYARD",
+    "General",
+    "HARV",
+    "HORNET",
+    "HTK",
+    "HTNK",
+    "HYD",
+    "IVAN",
+    "JUMPJET",
+    "LCRF",
+    "MGTK",
+    "MTNK",
+    "NACLON",
+    "NACNST",
+    "NADEPT",
+    "NAFLAK",
+    "NAHAND",
+    "NAIRON",
+    "NALASR",
+    "NAMISL",
+    "NAPOWR",
+    "NAPSIS",
+    "NARADR",
+    "NAREFN",
+    "NASAM",
+    "NATECH",
+    "NAWALL",
+    "NAWEAP",
+    "NAYARD",
+    "ORCA",
+    "PDPLANE",
+    "PTROOP",
+    "SAPC",
+    "SENGINEER",
+    "SHAD",
+    "SHK",
+    "SMCV",
+    "SNIPE",
+    "SPY",
+    "SQD",
+    "SREF",
+    "SUB",
+    "TANY",
+    "TERROR",
+    "TESLA",
+    "TNKD",
+    "TTNK",
+    "V3",
+    "V3ROCKET",
+    "YURI",
+    "YURIPR",
+    "ZEP"
+  ],
+  "F012": [
+    "ADOG",
+    "CCOMAND",
+    "CIVAN",
+    "CLEG",
+    "DESO",
+    "DOG",
+    "E1",
+    "E2",
+    "ENGINEER",
+    "FLAKT",
+    "IVAN",
+    "JUMPJET",
+    "PTROOP",
+    "SENGINEER",
+    "SHK",
+    "SNIPE",
+    "SPY",
+    "TANY",
+    "TERROR",
+    "YURI",
+    "YURIPR"
+  ],
+  "F013": [
+    "AEGIS",
+    "ASWLauncher",
+    "BlackHawkCannon",
+    "BlackHawkCannonE",
+    "BlimpBomb",
+    "BlimpBombE",
+    "DefuseKit",
+    "DredLauncher",
+    "HornetLauncher",
+    "IvanBomber",
+    "IvanBomberE",
+    "MakeupKit",
+    "Medusa",
+    "MedusaE",
+    "MindControl",
+    "MindControlE",
+    "PsiWave",
+    "RadEruptionWeapon",
+    "SuperMindControl"
+  ],
+  "F014": [
+    "AEGIS",
+    "CARRIER",
+    "DEST",
+    "DLPH",
+    "DRED",
+    "HYD",
+    "JUMPJET",
+    "LCRF",
+    "SAPC",
+    "SHAD",
+    "SQD",
+    "SUB",
+    "TANY",
+    "ZEP"
+  ],
+  "F015": [
+    "AEGIS",
+    "AMRADR",
+    "ATESLA",
+    "CARRIER",
+    "CMIN",
+    "DEST",
+    "DRED",
+    "GAAIRC",
+    "GACNST",
+    "GACSPH",
+    "GADEPT",
+    "GAGAP",
+    "GAOREP",
+    "GAPILE",
+    "GAPILL",
+    "GAPOWR",
+    "GAREFN",
+    "GASPYSAT",
+    "GATECH",
+    "GAWALL",
+    "GAWEAP",
+    "GAWEAT",
+    "GAYARD",
+    "GTGCAN",
+    "HARV",
+    "HYD",
+    "NACLON",
+    "NACNST",
+    "NADEPT",
+    "NAFLAK",
+    "NAHAND",
+    "NAIRON",
+    "NALASR",
+    "NAMISL",
+    "NANRCT",
+    "NAPOWR",
+    "NAPSIS",
+    "NARADR",
+    "NAREFN",
+    "NASAM",
+    "NATECH",
+    "NAWALL",
+    "NAWEAP",
+    "NAYARD",
+    "TESLA"
+  ],
+  "F016": [
+    "AEGIS",
+    "CAOUTP",
+    "CARRIER",
+    "DEST",
+    "DRED",
+    "FV",
+    "GADEPT",
+    "GAREFN",
+    "GAYARD",
+    "HTNK",
+    "LCRF",
+    "MGTK",
+    "MTNK",
+    "NADEPT",
+    "NAREFN",
+    "NAYARD",
+    "SAPC",
+    "SHAD",
+    "SQD",
+    "SREF",
+    "SUB",
+    "TNKD",
+    "TTNK",
+    "V3"
+  ],
+  "F017": [
+    "AEGIS",
+    "AMCV",
+    "APOC",
+    "CARRIER",
+    "CMIN",
+    "DEST",
+    "DRED",
+    "DRON",
+    "DTRUCK",
+    "General",
+    "HARV",
+    "HTNK",
+    "HYD",
+    "LCRF",
+    "SAPC",
+    "SMCV",
+    "SQD",
+    "SREF",
+    "SUB",
+    "TTNK",
+    "V3"
+  ],
+  "F018": [
+    "AI"
+  ],
+  "F019": [
+    "AI"
+  ],
+  "F020": [
+    "AI"
+  ],
+  "F021": [
+    "AI"
+  ],
+  "F022": [
+    "AI"
+  ],
+  "F023": [
+    "AI"
+  ],
+  "F024": [
+    "AI"
+  ],
+  "F025": [
+    "AI"
+  ],
+  "F026": [
+    "AI"
+  ],
+  "F027": [
+    "AI"
+  ],
+  "F028": [
+    "AI"
+  ],
+  "F029": [
+    "AI"
+  ],
+  "F030": [
+    "AI"
+  ],
+  "F031": [
+    "AI"
+  ],
+  "F032": [
+    "AI"
+  ],
+  "F033": [
+    "AI"
+  ],
+  "F034": [
+    "AI"
+  ],
+  "F035": [
+    "AI"
+  ],
+  "F036": [
+    "AI"
+  ],
+  "F037": [
+    "AI"
+  ],
+  "F038": [
+    "AI"
+  ],
+  "F039": [
+    "AI"
+  ],
+  "F040": [
+    "AI"
+  ],
+  "F041": [
+    "AI"
+  ],
+  "F042": [
+    "AI"
+  ],
+  "F043": [
+    "AI"
+  ],
+  "F044": [
+    "AI"
+  ],
+  "F045": [
+    "AI"
+  ],
+  "F046": [
+    "AI"
+  ],
+  "F047": [
+    "AI"
+  ],
+  "F049": [
+    "AI"
+  ],
+  "F050": [
+    "AI"
+  ],
+  "F051": [
+    "AI"
+  ],
+  "F052": [
+    "AI"
+  ],
+  "F053": [
+    "AI"
+  ],
+  "F054": [
+    "AI"
+  ],
+  "F055": [
+    "AI"
+  ],
+  "F056": [
+    "AI"
+  ],
+  "F057": [
+    "AI"
+  ],
+  "F058": [
+    "AI"
+  ],
+  "F059": [
+    "AI"
+  ],
+  "F060": [
+    "AI"
+  ],
+  "F061": [
+    "AI"
+  ],
+  "F062": [
+    "AI"
+  ],
+  "F063": [
+    "AI"
+  ],
+  "F064": [
+    "AI"
+  ],
+  "F065": [
+    "AI"
+  ],
+  "F066": [
+    "AI"
+  ],
+  "F067": [
+    "AI"
+  ],
+  "F068": [
+    "AI"
+  ],
+  "F069": [
+    "AI"
+  ],
+  "F070": [
+    "AI"
+  ],
+  "F071": [
+    "AI"
+  ],
+  "F073": [
+    "AP",
+    "APSplash",
+    "ARTYHE",
+    "ApocAP",
+    "ApocAPE",
+    "BlimpHE",
+    "DMISLEWH",
+    "DMISLWH",
+    "FlakTWH",
+    "GRIZAPE",
+    "GrandCannonWH",
+    "HE",
+    "HowitzerWH",
+    "IonWH",
+    "KTSTLEXP",
+    "MaverickHE",
+    "ORCAAP",
+    "RHINAPE",
+    "UltraAP",
+    "UltraAPE",
+    "V3EWH",
+    "V3WH"
+  ],
+  "F074": [
+    "AP",
+    "APSplash",
+    "ARTYHE",
+    "ApocAP",
+    "ApocAPE",
+    "BlimpHE",
+    "DMISLEWH",
+    "DMISLWH",
+    "Fire",
+    "Fire2",
+    "GRIZAPE",
+    "GrandCannonWH",
+    "HARVWH",
+    "HE",
+    "HollowPoint",
+    "HollowPoint3",
+    "HollowPointNoBuilding",
+    "HowitzerWH",
+    "KTSTLEXP",
+    "MaverickHE",
+    "ORCAAP",
+    "RHINAPE",
+    "SA",
+    "SAMWH",
+    "SSA",
+    "SSAB",
+    "SonicWarhead",
+    "Super",
+    "UltraAP",
+    "UltraAPE",
+    "V3EWH",
+    "V3WH"
+  ],
+  "F075": [
+    "ARTYHE",
+    "BlimpHE",
+    "CRNUKEWH",
+    "DMISLEWH",
+    "DMISLWH",
+    "DemobombWH",
+    "HE",
+    "KTSTLEXP",
+    "MaverickHE",
+    "NUKE",
+    "Super",
+    "V3EWH",
+    "V3WH"
+  ],
+  "F080": [
+    "ASWCollision"
+  ],
+  "F083": [
+    "BadTeeth",
+    "BlimpBomb",
+    "BlimpBombE",
+    "DefuseKit",
+    "FakeC4",
+    "GoodTeeth",
+    "IvanBomber",
+    "IvanBomberE",
+    "Sapper",
+    "SquidGrab",
+    "SquidGrabE"
+  ],
+  "F084": [
+    "Beach",
+    "Clear",
+    "Ice",
+    "Railroad",
+    "Road",
+    "Rock",
+    "Rough",
+    "Tiberium",
+    "Tunnel",
+    "Wall",
+    "Water",
+    "Weeds"
+  ],
+  "F085": [
+    "Beach",
+    "Clear",
+    "Ice",
+    "Railroad",
+    "Road",
+    "Rock",
+    "Rough",
+    "Tiberium",
+    "Tunnel",
+    "Wall",
+    "Water",
+    "Weeds"
+  ],
+  "F086": [
+    "Beach",
+    "Clear",
+    "Ice",
+    "Railroad",
+    "Road",
+    "Rock",
+    "Rough",
+    "Tiberium",
+    "Tunnel",
+    "Wall",
+    "Water",
+    "Weeds"
+  ],
+  "F087": [
+    "Beach",
+    "Clear",
+    "Ice",
+    "Railroad",
+    "Road",
+    "Rock",
+    "Rough",
+    "Tiberium",
+    "Tunnel",
+    "Wall",
+    "Water",
+    "Weeds"
+  ],
+  "F088": [
+    "Beach",
+    "Clear",
+    "Ice",
+    "Railroad",
+    "Road",
+    "Rock",
+    "Rough",
+    "Tiberium",
+    "Tunnel",
+    "Wall",
+    "Water",
+    "Weeds"
+  ],
+  "F089": [
+    "Beach",
+    "Clear",
+    "Ice",
+    "Railroad",
+    "Road",
+    "Rock",
+    "Rough",
+    "Tiberium",
+    "Tunnel",
+    "Wall",
+    "Water",
+    "Weeds"
+  ],
+  "F090": [
+    "Beach",
+    "Clear",
+    "Ice",
+    "Railroad",
+    "Road",
+    "Rock",
+    "Rough",
+    "Tiberium",
+    "Tunnel",
+    "Wall",
+    "Water",
+    "Weeds"
+  ],
+  "F091": [
+    "Beach",
+    "Clear",
+    "Ice",
+    "Railroad",
+    "Road",
+    "Rock",
+    "Rough",
+    "Tiberium",
+    "Tunnel",
+    "Wall",
+    "Water",
+    "Weeds"
+  ],
+  "F092": [
+    "BlimpBombP",
+    "General",
+    "GiantNukeDown",
+    "GiantNukeUp"
+  ],
+  "F094": [
+    "CCOMAND",
+    "CIVAN",
+    "PTROOP",
+    "TANY",
+    "YURIPR"
+  ],
+  "F111": [
+    "CombatDamage"
+  ],
+  "F112": [
+    "CombatDamage"
+  ],
+  "F115": [
+    "CombatDamage"
+  ],
+  "F116": [
+    "CombatDamage"
+  ],
+  "F129": [
+    "CometFragment"
+  ],
+  "F141": [
+    "Cruentus",
+    "Riparius"
+  ],
+  "F146": [
+    "ADOG",
+    "AEGIS",
+    "AMCV",
+    "AMRADR",
+    "APOC",
+    "ASW",
+    "ATESLA",
+    "BEAG",
+    "CAAIRP",
+    "CABHUT",
+    "CACITY01",
+    "CAEUR1",
+    "CAOILD",
+    "CAOUTP",
+    "CARRIER",
+    "CATHOSP",
+    "CAWA2A",
+    "CCOMAND",
+    "CIVAN",
+    "CLEG",
+    "CMIN",
+    "CombatDamage",
+    "DESO",
+    "DEST",
+    "DLPH",
+    "DMISL",
+    "DOG",
+    "DRED",
+    "DRON",
+    "DTRUCK",
+    "DeathWH",
+    "DefaultDeathWeapon",
+    "E1",
+    "E2",
+    "ENGINEER",
+    "FLAKT",
+    "FV",
+    "GAAIRC",
+    "GACNST",
+    "GACSPH",
+    "GADEPT",
+    "GAGAP",
+    "GAOREP",
+    "GAPILE",
+    "GAPILL",
+    "GAPOWR",
+    "GAREFN",
+    "GASPYSAT",
+    "GATECH",
+    "GAWALL",
+    "GAWEAP",
+    "GAWEAT",
+    "GAYARD",
+    "GTGCAN",
+    "HARV",
+    "HORNET",
+    "HTK",
+    "HTNK",
+    "HYD",
+    "IVAN",
+    "JUMPJET",
+    "LCRF",
+    "MGTK",
+    "MTNK",
+    "NACLON",
+    "NACNST",
+    "NADEPT",
+    "NAFLAK",
+    "NAHAND",
+    "NAIRON",
+    "NALASR",
+    "NAMISL",
+    "NANRCT",
+    "NAPOWR",
+    "NAPSIS",
+    "NARADR",
+    "NAREFN",
+    "NASAM",
+    "NATECH",
+    "NAWALL",
+    "NAWEAP",
+    "NAYARD",
+    "ORCA",
+    "PDPLANE",
+    "PTROOP",
+    "SAPC",
+    "SENGINEER",
+    "SHAD",
+    "SHK",
+    "SMCV",
+    "SNIPE",
+    "SPY",
+    "SQD",
+    "SREF",
+    "SUB",
+    "TANY",
+    "TERROR",
+    "TESLA",
+    "TNKD",
+    "TTNK",
+    "V3",
+    "V3ROCKET",
+    "YURI",
+    "YURIPR",
+    "ZEP"
+  ],
+  "F147": [
+    "ADOG",
+    "AEGIS",
+    "AMCV",
+    "AMRADR",
+    "APOC",
+    "ASW",
+    "ATESLA",
+    "BEAG",
+    "CAAIRP",
+    "CABHUT",
+    "CACITY01",
+    "CAEUR1",
+    "CAOILD",
+    "CAOUTP",
+    "CARRIER",
+    "CATHOSP",
+    "CAWA2A",
+    "CCOMAND",
+    "CIVAN",
+    "CLEG",
+    "CMIN",
+    "CombatDamage",
+    "DESO",
+    "DEST",
+    "DLPH",
+    "DMISL",
+    "DOG",
+    "DRED",
+    "DRON",
+    "DTRUCK",
+    "DeathWH",
+    "DefaultDeathWeapon",
+    "E1",
+    "E2",
+    "ENGINEER",
+    "FLAKT",
+    "FV",
+    "GAAIRC",
+    "GACNST",
+    "GACSPH",
+    "GADEPT",
+    "GAGAP",
+    "GAOREP",
+    "GAPILE",
+    "GAPILL",
+    "GAPOWR",
+    "GAREFN",
+    "GASPYSAT",
+    "GATECH",
+    "GAWALL",
+    "GAWEAP",
+    "GAWEAT",
+    "GAYARD",
+    "GTGCAN",
+    "HARV",
+    "HORNET",
+    "HTK",
+    "HTNK",
+    "HYD",
+    "IVAN",
+    "JUMPJET",
+    "LCRF",
+    "MGTK",
+    "MTNK",
+    "NACLON",
+    "NACNST",
+    "NADEPT",
+    "NAFLAK",
+    "NAHAND",
+    "NAIRON",
+    "NALASR",
+    "NAMISL",
+    "NANRCT",
+    "NAPOWR",
+    "NAPSIS",
+    "NARADR",
+    "NAREFN",
+    "NASAM",
+    "NATECH",
+    "NAWALL",
+    "NAWEAP",
+    "NAYARD",
+    "ORCA",
+    "PDPLANE",
+    "PTROOP",
+    "SAPC",
+    "SENGINEER",
+    "SHAD",
+    "SHK",
+    "SMCV",
+    "SNIPE",
+    "SPY",
+    "SQD",
+    "SREF",
+    "SUB",
+    "TANY",
+    "TERROR",
+    "TESLA",
+    "TNKD",
+    "TTNK",
+    "V3",
+    "V3ROCKET",
+    "YURI",
+    "YURIPR",
+    "ZEP"
+  ],
+  "F153": [
+    "Difficult",
+    "Easy",
+    "Normal"
+  ],
+  "F155": [
+    "Difficult",
+    "Easy",
+    "Normal"
+  ],
+  "F158": [
+    "Electricbounce",
+    "LargeCometP",
+    "SuperCometP",
+    "SuperSmallCometP"
+  ],
+  "F161": [
+    "Fire"
+  ],
+  "F162": [
+    "Fire2"
+  ],
+  "F164": [
+    "FlakProj",
+    "FlakTProj"
+  ],
+  "F171": [
+    "General"
+  ],
+  "F172": [
+    "General"
+  ],
+  "F173": [
+    "General"
+  ],
+  "F177": [
+    "General",
+    "JUMPJET",
+    "SHAD",
+    "ZEP"
+  ],
+  "F180": [
+    "General"
+  ],
+  "F183": [
+    "General"
+  ],
+  "F184": [
+    "General"
+  ],
+  "F185": [
+    "General"
+  ],
+  "F193": [
+    "General"
+  ],
+  "F195": [
+    "General"
+  ],
+  "F197": [
+    "General"
+  ],
+  "F205": [
+    "General"
+  ],
+  "F206": [
+    "General"
+  ],
+  "F208": [
+    "Harvest"
+  ],
+  "F209": [
+    "HornetCollision"
+  ],
+  "F210": [
+    "IQ"
+  ],
+  "F211": [
+    "IQ"
+  ],
+  "F212": [
+    "IQ"
+  ],
+  "F213": [
+    "IQ"
+  ],
+  "F214": [
+    "IQ"
+  ],
+  "F215": [
+    "IQ"
+  ],
+  "F216": [
+    "IQ"
+  ],
+  "F217": [
+    "IQ"
+  ],
+  "F218": [
+    "IQ"
+  ],
+  "F219": [
+    "IQ"
+  ],
+  "F220": [
+    "IQ"
+  ],
+  "F248": [
+    "NUKE"
+  ],
+  "F249": [
+    "NukeCarrier"
+  ],
+  "F250": [
+    "NukeMaker"
+  ],
+  "F251": [
+    "OilExplosionWH"
+  ],
+  "F253": [
+    "RadEruptionWarhead",
+    "SonicZap",
+    "SonicZapE"
+  ],
+  "F263": [
+    "SonicWarhead"
+  ],
+  "F270": [
+    "SuperCometFragment"
+  ],
+  "F273": [
+    "TeslaFragment"
+  ],
+  "F274": [
+    "Tiberiums"
+  ],
+  "F275": [
+    "Tiberiums"
+  ],
+  "F277": [
+    "VirtualScanner"
+  ]
+}

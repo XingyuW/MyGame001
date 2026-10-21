@@ -1,0 +1,27 @@
+{
+  "status": "FACTUAL_THROUGH168_PORTABLE_PLAN_ONLY",
+  "cutoff": 168,
+  "commands_after168_excluded": true,
+  "files": 368,
+  "aliases": 11,
+  "historic_hash_resolutions": 16,
+  "bytes": 16611067,
+  "authority_files_not_duplicated": 8,
+  "source_pin_refs": 890,
+  "unresolved_cache_only_proof_paths": 0,
+  "external_provenance_only": 0,
+  "outputs": [
+    {
+      "path": "B-through168-portable-evidence-file-list.json",
+      "sha256": "7aed9c475a3d47b672ac5c0b049308fd08ca884942491a34a9f2297cea02d257",
+      "bytes": 644032
+    },
+    {
+      "path": "B-through168-portable-evidence-file-list.tsv",
+      "sha256": "0962d029e382bc0953901d3c357ac5f61b3237ebf8d6f0f6162808b8f907ed0c",
+      "bytes": 270393
+    }
+  ],
+  "new_directories": 0,
+  "source_writes": false
+}

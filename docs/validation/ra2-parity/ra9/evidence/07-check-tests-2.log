@@ -1,0 +1,9 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+error[E0616]: field `list` of struct `Projectiles` is private
+   --> crates/sim/tests/ra9_legacy904_last_five.rs:121:55
+    |
+121 |     let list = &app.world().resource::<Projectiles>().list;
+    |                                                       ^^^^ private field
+
+For more information about this error, try `rustc --explain E0616`.
+error: could not compile `sim` (test "ra9_legacy904_last_five") due to 1 previous error

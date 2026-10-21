@@ -273,6 +273,8 @@ impl Weapon {
 pub struct Projectile {
     pub owner: PlayerId,
     pub attacker: SimId,
+    /// Physical type at launch; never reassigned with kill credit.
+    pub source_item: Option<crate::ProductionItem>,
     pub target: SimId,
     pub weapon: WeaponKind,
     /// Where it was fired from (for drawing).
@@ -328,6 +330,7 @@ impl Projectiles {
         for projectile in &self.list {
             hasher.write(&[projectile.owner.0]);
             hasher.write_u32(projectile.attacker.0);
+            hash_source_item(hasher, projectile.source_item);
             hasher.write_u32(projectile.target.0);
             hasher.write(&projectile.weapon.0.to_le_bytes());
             hasher.write(&projectile.origin.x.to_le_bytes());
@@ -888,10 +891,49 @@ pub(crate) struct Blast {
     pub(crate) firepower_pm: u32,
     /// The unit or building that caused it: the killer of what it destroys.
     pub(crate) source: Option<SimId>,
+    /// Projectile launch identity, or actual current source for immediate external blasts.
+    pub(crate) identity: Option<DamageIdentity>,
 }
 
-/// One hit of an impact: what is hit, the damage, and who caused it.
-type Hit = (SimId, i32, Option<SimId>);
+/// Damage origin is separate from the mutable killer credit.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct DamageIdentity {
+    pub(crate) owner: PlayerId,
+    pub(crate) item: crate::ProductionItem,
+}
+impl DamageIdentity {
+    pub(crate) fn hash_into(self, h: &mut Fnv1a64) {
+        h.write(&[self.owner.0]);
+        hash_source_item(h, Some(self.item));
+    }
+}
+fn hash_source_item(h: &mut Fnv1a64, item: Option<crate::ProductionItem>) {
+    match item {
+        None => h.write(&[0]),
+        Some(crate::ProductionItem::Unit(k)) => {
+            h.write(&[1]);
+            h.write(&k.0.to_le_bytes());
+        }
+        Some(crate::ProductionItem::Building(k)) => {
+            h.write(&[2]);
+            h.write(&k.0.to_le_bytes());
+        }
+    }
+}
+fn type_immune(
+    defs: &Definitions,
+    owner: Option<PlayerId>,
+    item: Option<crate::ProductionItem>,
+    origin: Option<DamageIdentity>,
+) -> bool {
+    defs.rules().is_some()
+        && item
+            .and_then(|i| defs.metadata(i))
+            .is_some_and(|m| m.type_immune)
+        && origin.is_some_and(|s| Some(s.owner) == owner && Some(s.item) == item)
+}
+/// Preserve origin per hit until the immunity test, before aggregation and kill credit.
+type Hit = (SimId, i32, Option<SimId>, Option<DamageIdentity>);
 
 /// What an impact needs to know of an entity it may hit: its position (of a unit), its traits,
 /// and the divisor of the damage it takes in permille.
@@ -932,7 +974,7 @@ fn blast_hits(
         )
         .min(most);
         if damage > 0 {
-            hits.push((id, damage, blast.source));
+            hits.push((id, damage, blast.source, blast.identity));
         }
     };
     let prop_traits =
@@ -1380,6 +1422,12 @@ impl Field<'_> {
                 direct: None,
                 firepower_pm: arms.firepower_pm,
                 source: Some(id),
+                identity: self.targets.get(&id).and_then(|a| {
+                    Some(DamageIdentity {
+                        owner: a.owner?,
+                        item: a.item?,
+                    })
+                }),
             });
             return;
         }
@@ -1401,6 +1449,12 @@ impl Field<'_> {
                 direct: (!scattered && target_id != SimId(u32::MAX)).then_some(target_id),
                 firepower_pm: arms.firepower_pm,
                 source: Some(id),
+                identity: self.targets.get(&id).and_then(|a| {
+                    Some(DamageIdentity {
+                        owner: a.owner?,
+                        item: a.item?,
+                    })
+                }),
             });
             return;
         }
@@ -1410,6 +1464,7 @@ impl Field<'_> {
         shots.fired.push(Projectile {
             owner,
             attacker: id,
+            source_item: self.targets.get(&id).and_then(|a| a.item),
             target: target_id,
             weapon: choice.kind,
             origin: from.centre(),
@@ -1616,6 +1671,10 @@ pub(crate) fn combat(
                 direct: Some(projectile.target),
                 firepower_pm: projectile.firepower_pm,
                 source: Some(projectile.attacker),
+                identity: projectile.source_item.map(|item| DamageIdentity {
+                    owner: projectile.owner,
+                    item,
+                }),
             }),
             _ if projectile.scattered || spread > 0 => Some(Blast {
                 point: projectile.aim,
@@ -1625,6 +1684,10 @@ pub(crate) fn combat(
                 direct: None,
                 firepower_pm: projectile.firepower_pm,
                 source: Some(projectile.attacker),
+                identity: projectile.source_item.map(|item| DamageIdentity {
+                    owner: projectile.owner,
+                    item,
+                }),
             }),
             _ => None,
         };
@@ -1877,7 +1940,13 @@ pub(crate) fn combat(
         }
     }
     let mut damage: BTreeMap<SimId, Vec<(i64, Option<SimId>)>> = BTreeMap::new();
-    for (target, hit, source) in hits {
+    for (target, hit, source, origin) in hits {
+        if index
+            .get(&target)
+            .is_some_and(|t| type_immune(&definitions, t.owner, t.item, origin))
+        {
+            continue;
+        }
         damage
             .entry(target)
             .or_default()
@@ -1961,7 +2030,7 @@ pub(crate) fn detonate_one(world: &mut bevy_ecs::world::World, blast: Blast, id:
 }
 fn detonate_filtered(
     world: &mut bevy_ecs::world::World,
-    blast: Blast,
+    mut blast: Blast,
     report: bool,
     only: Option<SimId>,
 ) {
@@ -2023,6 +2092,12 @@ fn detonate_filtered(
             );
         }
     }
+    if blast.identity.is_none() {
+        blast.identity = blast
+            .source
+            .and_then(|id| found.get(&id))
+            .and_then(|&(_, _, _, _, owner, item)| Some(DamageIdentity { owner, item: item? }));
+    }
     let mut hits = Vec::new();
     {
         let traits = |id: SimId| {
@@ -2039,7 +2114,7 @@ fn detonate_filtered(
             &mut hits,
         );
     }
-    for (id, damage, source) in hits {
+    for (id, damage, source, origin) in hits {
         if only.is_some_and(|target| target != id) {
             continue;
         }
@@ -2051,7 +2126,9 @@ fn detonate_filtered(
         }
         match found.get(&id) {
             Some(&(entity, _, _, _, owner, item)) => {
-                if crate::world_objects::immune(&definitions, item) {
+                if crate::world_objects::immune(&definitions, item)
+                    || type_immune(&definitions, Some(owner), item, origin)
+                {
                     continue;
                 }
                 let mut killed = false;
@@ -2211,7 +2288,7 @@ fn act_unit(
             moving,
         }) = weapon.order
         {
-            continue_attack_move(field, id, weapon, orders, destination, moving);
+            continue_attack_move(field, id, mobile, weapon, orders, destination, moving);
         }
         return;
     }
@@ -2428,7 +2505,7 @@ fn act_unit(
                 fire_at_target(field, shots, rng, (id, owner, from), weapon, arms);
                 return;
             }
-            continue_attack_move(field, id, weapon, orders, destination, moving);
+            continue_attack_move(field, id, mobile, weapon, orders, destination, moving);
         }
         None => {
             if orders.current.is_some() {
@@ -2445,6 +2522,7 @@ fn act_unit(
 fn continue_attack_move(
     field: &Field<'_>,
     id: SimId,
+    mobile: &Mobile,
     weapon: &mut Weapon,
     orders: &mut Orders,
     destination: CellPos,
@@ -2453,8 +2531,9 @@ fn continue_attack_move(
     if orders.current.is_some() {
         return;
     }
-    if moving {
-        // The move to the destination ended; its event says how.
+    if moving || (mobile.cell == destination && mobile.step.is_none()) {
+        // The move ended, or combat interrupted it after arrival. Do not create another
+        // zero-length move and duplicate the completion already emitted at this destination.
         weapon.clear();
         return;
     }
@@ -2648,6 +2727,7 @@ mod tests {
         let shell = Projectile {
             owner: PlayerId(0),
             attacker: SimId(1),
+            source_item: None,
             target: SimId(2),
             weapon: WeaponKind(0),
             origin: SubPos::new(10, 20),
@@ -2728,3 +2808,6 @@ mod tests {
         assert_eq!(building.centre(), SubPos::new(1536, 1408));
     }
 }
+
+#[cfg(test)]
+mod ra9_origin_tests;

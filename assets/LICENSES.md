@@ -146,3 +146,34 @@ and snow layers; nothing is copied from a game or downloaded.
 used. The companion text and Psychic Sensor lines are authored by this repository; lines use
 ordinary client primitives. No new binary asset is distributed. Audio and presentation quality
 require user verification.
+
+
+### RA9 preliminary integration provenance — 2026-10-21
+
+The current ordinary RA9 validation-copy integration added or imported no image, model,
+texture, font, recording, music or other media asset. Its client notices and controls reuse the
+existing original drawing, sprite and synthesized-audio primitives described above; this note
+does not claim new authorship or licensing rights over third-party material.
+
+Numerical reference tables and generated gameplay definitions retain the existing provenance:
+`scripts/ra2_reference.py` reads the external original INI cache only after checking the
+recorded hashes; `scripts/generate_ra2_data.py` uses the committed reference tables and
+the repository's explicitly authored model tables. See the
+[reference README](../crates/sim/tests/reference/README.md) and
+[R2 and later decisions](../docs/DECISIONS.md). Original INI files and original game media are
+not bundled by this integration. The source-disposition table records proposed policy scopes;
+it grants neither native-consumption credit for unparsed keys nor acceptance of the original
+engine semantics.
+
+This is a provenance clarification for preliminary copy work, not a fresh media/licence audit,
+a final-source validation receipt or user approval of visual/audio quality. Existing copyright,
+licence and generator attributions above remain in force.
+
+
+### RA9 later copy preparation provenance — 2026-10-21
+
+The175/176 source additions and177 documentation refresh add no media asset. Catalogue output
+must come from the actual loader after authorized execution; an unrun documentation generator
+is not a native result.158 whole-audit success and159/168 failure/repair scopes do not replace
+reference/media provenance, complete dependency-notice review or user art/audio acceptance.
+Canonical source integration and final required validation remain pending.

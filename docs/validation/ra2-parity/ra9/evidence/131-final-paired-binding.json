@@ -1,0 +1,34 @@
+{
+  "utc": "2026-10-21T03:07:27.902463+00:00",
+  "source_scope_sha256": "a706429c38f15d4b1d51ed84130f261bb464dff7b95db4f2401469af96de019f",
+  "source_records": 1737,
+  "authored_arrays": 80,
+  "paired424": "all exact factual routes materialized; no native-per-source flag claim",
+  "B_stopped_before_mutation": true,
+  "files": [
+    {
+      "path": "crates/sim/tests/ra9_audit/consumer62-acceptance.tsv",
+      "before_sha256": "82376a4e0b0a13dcc9ba648bab92cbba33f37a7ad9aa32d50ea621d59ede4830",
+      "after_sha256": "fe07c0c74a9f15b74f9916ee87672e4e45f6b9d3f60a3a650aa09cfe73425212",
+      "binding_cells": 62
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/carry38-acceptance.tsv",
+      "before_sha256": "31f6a2e80c87309cc763fad49eeb214c0984eff50f3d3c548d31f6de42956e50",
+      "after_sha256": "54504e4d55791e29312096f4cf15359fa20b6fd4b8d6afb16acc96956eef2ed1",
+      "binding_cells": 38
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/behavior87-acceptance.tsv",
+      "before_sha256": "78574d4dbb1b652152a4aad967b55d7ff3ea0e755704c6d58da84b5408d790ae",
+      "after_sha256": "dfcd0cbdc9a06c4b034c1f726548fb8d47995b03860dc52099267664e8fb6088",
+      "binding_cells": 87
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-acceptance.tsv",
+      "before_sha256": "8134d1a83fbbc31f2e02f15fc7e74569b918b102d45ecaba4b43c0f19164ad17",
+      "after_sha256": "8dc9cdaba20a535793eb2a9538ef78968397830723b9814910e539949e820415",
+      "binding_cells": 162
+    }
+  ]
+}

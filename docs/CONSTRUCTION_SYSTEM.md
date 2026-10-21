@@ -1,3 +1,186 @@
+# Construction and production: current RA1–RA8 model and preliminary RA9 client integration
+
+<!-- RA9_CURRENT_EVIDENCE_BEGIN -->
+## Current execution provenance — 2026-10-21 ordinary copy
+
+This supersedes earlier pending143/uncompiled175 prose below. The ordinary copy contains the
+exact frozen RA8 financing correction from4a103fa, its two new tests and all retained RA9
+changes.178 records the R189 three-way import; no stale AI source replaced newer canonical work.
+Canonical RA8 still owns its checkout and validation. No final review or acceptance is supplied.
+
+Preliminary151 exported the actual174 completion atoms;158 passed the whole audit1/0:
+16,211 physical=13,419Compared+2,792GameOwned;7,108 demanded/successful dependency pairs;
+5,022 source atoms=3,111Compared+1,911 typed dispositions.159 subsequently ran all181 audit
+cases unfiltered and failed175passed/6failed/0ignored/0filtered.166's five test/helper changes
+repaired those six diagnostics;165strict passed and168 exactly those six passed6/0/175filtered.
+There was no second preliminary full181 pass.131/136/159 and all compiler/fixture/causal failures
+remain retained with their exact source/receipt scopes. Root's166 factual655-source/64-authority/
+88-receipt check is historical; subsequent actual source deltas require canonical rebinding.
+
+Bounded180–188 functional overlap compiled the new targets and executed only the specifically
+authorized debt controls/catalogue and existing late-twin protocol.181's two exact scheduled
+missile/carrier timer controls each passed1/0, retaining all old broad timing tests and exact27
+launch spacing. They do not establish every original flight or lost-carrier regeneration boundary.
+181 reproduced a real duplicate MoveCompleted around actual combat/death;182's same test body
+passed1/0 after the smallest settled-destination correction in combat.rs.185's shipped yard test
+passed1/0 across21maps/344 supported map-growth/player-count scenarios, checking real setup,
+I6/occupancy and public Move exits with unchanged256bound. Earlier slow-detour and neutral-yard
+census fixture failures are preserved. These are separate exact snapshots, not a whole-suite pass.
+
+181's actual loader catalogue reports54units/46buildings/116weapons/61warheads/11armours,
+9countries/21maps/11rawAIplans/3difficulties. The generated RA9_LOADED_CATALOGUE.md retains
+that actual output; its receipt predates the narrow combat correction and establishes loaded
+catalogue values only. Final canonical source/data/route/execution binding remains required.
+174's read-only graph finds all48 audit Rust files reachable,79 include_str paths,0missing or
+unreached. The current directory census is48Rust/67TSV/4TXT,16referencefiles,28top-level RA9
+sim targets; plain files and inline/support/merge residues are not invented compiled-module counts.
+
+187 refreshed the selected late twins on actual changed AI+combat source: separate positive
+and restored-positive each passed1/0/6filtered, P0Won41738/72000,late444WeaponFired/
+8ProductionComplete/6positiveOreDelivered,final78c81bd069fca660/trajectory5a8adabd01d20b05.
+The exact existing extra-RNG36001 control failed statehash at36001; the observer-only production
+omission reached the identical winner/world then failed missing late production (444/0/6).
+Each intentional mutation was restored with immediate and separate later reads of the original
+source SHAe7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d.
+186 is an interrupted debug attempt after native launch, exit-15/no completed result; it is not
+unrun/compiler-only.188 records all17commands, source/raw/executable paths and empty owned process
+groups. All copy Cargo/native processes are gone. Functional overlap grants no performance credit
+or canonical acceptance; all raw failures/preimages/restorations remain available.
+
+Final canonical port/root factual rebinding, isolated all21 actualWon/fixed3/example guards and
+fresh required full13 remain pending, followed by the fresh five-slice3+2/lead panel. Full13
+includes the entire unfiltered audit target and debug600smoke; no extra copy181/debug sweep is
+implied. R56 decision6 retains36,000-tick deterministic soak windows, which can end with sampled
+worlds still Running; all-to-Won evidence comes from separately measured matches/late twins/all21.
+Completed soak outcomes still require Won. Timing limits and per-run performance scope remain exact.
+
+The1,911 specific source dispositions remain759 CURRENT_MODEL_NONREAD/1,152 INTENTIONAL_DIFFERENCE,
+zero ORIGINAL_ENGINE_UNUSED:1,869Whole+42components,including174newatoms across151keys. Specific
+current-model/static-absence choices do not prove original-engine nonuse or native consumption.
+All64 authority fragments, original prompts and historical166/168/171 packets remain byte-exact.
+183 stable debt IDs/aliases and every precise remaining scope are retained. All51 HOWTOSEE rows
+remain PENDING—requires user verification, including art/audio/readability/animation/pacing/feel,
+normal human victory/defeat and packaged/platform launch. Implementers/preparers cannot review
+this work; only the user approves quality and creates an approval tag.
+<!-- RA9_CURRENT_EVIDENCE_END -->
+
+This describes current source behavior in the isolated RA9 validation copy. Focused native/client
+controls, late deterministic replay/causal controls and one Coral scenario have preliminary
+execution receipts, not a combined final-source pass. Complete audits 131 and 136 remain failed
+receipts. The preliminary chronology is now explicit:151 exported the174 completion atoms;158 passed the whole audit (16,211 physical entries,7,108 demanded/successful pairs and5,022 source atoms).159 ran the entire181-case target and recorded175 passes/6 failures, with no ignored or filtered cases.168 passed exactly the six repaired cases (175 filtered); it was not another full181-case run. Those receipts retain their actual source bindings and all earlier failures. Subsequent RA8 imports and the182 combat correction require fresh canonical source binding and the complete mandatory gates; no combined final-source copy pass or independent acceptance is claimed.
+Canonical integration and final gates remain pending. Historical M9 results below do not validate
+RA9. The plan and decision ledger retain authority over assumptions and actual execution status.
+
+## Lobby, technology and production
+
+The default ruleset separates Allied/Soviet factories and nine countries. Captured factories
+provide their actual side's production tree; country exclusions, prerequisites, build limits,
+tech level and queue capacity still apply. Legacy roster data survives in compatibility fixtures
+rather than the default army. The lobby exposes starting credits/units, game speed, difficulty,
+teams/free-for-all, short game, MCV repacking, crates, bridge destruction, fog/ore growth and
+the retained map-growth/Super Me extensions. Restart retains selected choices.
+
+The four sidebar tabs are Buildings, Armory, Infantry and Vehicles; aircraft/ships are in Vehicles.
+The Construction Yard has separate main-building and defence lanes. Unit producers have their
+bounded queues. Work charges exact credits as it advances; insufficient funds/power/prerequisites
+can stall progress, cancellation returns only the amount actually paid, and completed buildings
+wait for legal placement. Generated rules provide cost-based timing and factory/power multipliers.
+The current working-factory predicate excludes foreign, disabled and dead producers when estimating
+production; its matching simulation liveness changes and native progression tests must be checked
+together. Sidebar card costs refresh when match options change, including human-only Super Me.
+
+## Actual client command flow
+
+Input builds public commands in CommandSink. SimHost drains accepted commands into the simulation
+CommandQueue and runs SimSchedule; UI code has no mutable-world gameplay interface. A placement or
+rally click completes its interface transition only if the sink accepted the expected commands.
+Pausing, a full or closed sink, partially accepted rally batches, invalid/off-map previews and
+local cancellation retain their distinct behaviors. A successful enqueue is not itself a claim
+that simulation placement succeeded; the scheduled command still validates current conditions.
+
+Building placement uses the actual footprint, ownership, terrain, occupancy, fog and adjacent-base
+checks. Shipyards need water plus accessible shore. Walls do not extend the base and cannot be sold
+or repaired. Current shipyard placement reach31 is a retained map/model difference from original12.
+Repairs and production charge credits step by step; original-value assumptions and finite-credit
+rounding remain in the decision ledger. Settings writes use an exclusively created sibling file and
+atomic rename; opened-handle bounded reads are coordinated with the shared sim file reader.
+
+## Targeting, radar and lifecycle
+
+Ordinary tree hover/right-click does not issue Attack under the RA2 ruleset; explicit force fire
+still can target a tree. Civilian-building/garrison and actual specialist contexts are preserved.
+Carried aircraft, launched missiles and the strategic paradrop plane are excluded from ordinary
+selection/cycling. A bridge hut is not a producer, yard or garrison; its narrower current building
+selection behavior is documented as a model choice rather than original Selectable fidelity.
+
+Radar uses the actual human player's radar and power state. The public BuildingRevealed event adds
+only its supplied coordinate as an original amber minimap primitive; it creates no vision,
+nearby concealed contact, AI knowledge or radar power. Gap can erase terrain independently of this
+public notice. Existing known/owned contact pixels remain. The notice uses the existing nine-real-
+second convention, ages while paused/offline and resets on actual install/uninstall/new match.
+That duration is a UI assumption; no exact original lifetime is claimed.
+
+## Simulation model and retained limits
+
+Current combat uses integer armour/warheads, primary/secondary/elite weapons, range, burst, flight
+and splash; infantry use actual subcell occupancy. Aircraft/missile missions, veterancy/crews,
+ore/gems and delivery, civilian garrisons/tech buildings, specialists and strategic effects use
+simulation commands/state. The AI uses country/side plans and public commands with its visibility
+knowledge; this is a finite deterministic game policy rather than original RA2 AI policy fidelity.
+
+Explicit remaining differences include flat terrain and non-occluding walls for shots, the
+R58 one-bail/19-work-tick harvesting assumption, bounded strategic flight timing, the per-shot
+sonic approximation and current omitted flame/shrapnel/ambient/delayed-kill mechanics. Stock
+NUKE's parsed wall gate is false, so public nuke-wall characterization must not assume ordinary
+wall destruction or claim WallAbsoluteDestroyer parity. Current unarmed shipyards select no death
+payload: there is no runtime DefaultDeathWeapon fallback. Source missing Damage is a separate
+static premise, not an implemented zero-valued weapon. Original delayed-kill eligible barrel/crate
+types are currently unmapped; immediate oil damage cannot establish their original timing.
+
+The [1,911-atom source-policy index](RA2_GAP_ANALYSIS.md#exhaustive-source-policy-and-assumption-index)
+classifies 759 current nonreads and 1,152 intentional differences, including 174 completion atoms
+(132 whole and 42 comma components). Root-verified historical scopes143 and166 are factual
+bindings, not admission; later imports/combat changes await actual canonical rebinding.
+[RA9-P13](DECISIONS.md#ra9-p13--exact-closure-of-the-174-atoms-exposed-by-the-complete-audit)
+retains active mapped registry types while leaving original ordinal registration unread.
+Twenty-one infantry Soylent amounts have no unit-sale/Grinder/salvage interface; real building
+refunds and Cost-based kill XP are separate. Refinery Storage does not cap player credits;
+unit cargo capacity remains parsed. Ground refinery Dock lists/NumberOfDocks do not configure
+the computed unloading point; actual factory/naval/dock selectors and fixed specialist roles
+keep their own dependencies. CAAIRP Ammo=5 is not a five-use airport limit. Original crate pickup
+animations are not rendered, and original water flags do not filter the current weighted draw:
+supported contents are selected first, then Unit/free-MCV water outcomes become money.
+These are individually guarded current-model boundaries, not original feature-equivalence claims.
+
+## Verification and how to see it
+
+Actual preliminary client receipts cover placement/rally acceptance and rejection, sidebar cost
+and factory lifecycle, Tree/context controls, mission selection/preview/sink, both asset-failure
+handlers and public-notice image/power/pause/reset/expiry scopes. Preserve each receipt's exact
+input and fixture qualifications; these are not final canonical or visual checks. A test's
+existence does not satisfy an execution obligation.151/158/159/168 now supply the scoped export,
+whole-audit, full-target175/6 and six-repair outcomes described above; fresh canonical binding and
+final gates remain pending. Preserve old assertions and meaningful one-cause failures; restore
+changed source and obtain a separate subsequent hash before another run.
+
+The185 yard-start/MCV-off control passed all21 shipped maps and344 scenarios:map growth off at every file-supported player count, and growth on at2–10 players. It checked initial player-owned yards/occupancy/I6′ and actual public Move exits over initial path cost≤40 within the unchanged256-tick bound. Earlier compiler, long-detour and neutral-building census fixture failures remain preserved.181 passed the two exact Lost200/Reload100 scheduled launch/rearm boundaries; the existing27-tick spacing assertions remain. These scopes do not establish every flight or lost-carrier timing.182 reproduced and corrected duplicate MoveCompleted after actual AttackMove combat at its destination, then the same regression passed; the no-enemy control also passed.
+
+Packet187 refreshed the selected release-mode Crossroads America/Russia Easy/Easy seed0 twins on the imported AI and corrected combat source:both reached P0Won41,738 within the unchanged72,000 cap, with444 WeaponFired,8 ProductionComplete and6 positive OreDelivered events after36,000, equal every-tick hashes/events/outcomes and I6′/I7. The extra RNG draw at36,001 and observer-only late ProductionComplete suppression failed as intended; immediate and separate later restorations and a later positive matched the original source/hash.186 was interrupted after its debug native case launched, without a completed result.188 preserves every failed/interrupted scope. These are functional overlap proofs, with no isolated performance or canonical acceptance credit.
+
+[The181 actual loader catalogue](RA9_LOADED_CATALOGUE.md) records54 units,46 buildings,116 weapons,
+61 warheads,11 armours,9 countries,21 maps,11 raw AI plans and3 difficulties; final binding is still due.
+
+For user verification, start a normal match, deploy the MCV, inspect all four production tabs,
+place and cancel buildings, change power, and compare normal versus Super Me prices after restart/
+new match. Inspect strategic-building notices with powered/unpowered radar, paused expiry and Gap;
+check normal selection/context clicks, mission aircraft, camera/minimap navigation and team paint.
+Art, animation, cursor visibility, sound, UI readability, strategic balance and subjective feel
+remain user-only verification. The full original M9 how-to/acceptance and preservation lists follow
+unchanged as historical material; README documents renderer/menu capture modes and their limits.
+
+<details>
+<summary>Historical M9 report and catalogue — pre-parity behavior and old evidence, not current RA9 acceptance</summary>
+
 # Unified construction and production system — M9
 
 Implemented on 2026-10-05 in the existing deterministic Rust/Bevy game. The human player has all
@@ -281,3 +464,8 @@ Power values are output / consumption. These are live data values, not claims of
 | Sea Scorpion | 600 | 10 | Naval Shipyard | — | — |
 | Giant Squid | 1000 | 16.65 | Naval Shipyard | Battle Lab | — |
 | Dreadnought | 2000 | 33.3 | Naval Shipyard | Battle Lab | — |
+
+
+</details>
+
+Current source differences and individual retained debt are reconciled in [RA2_GAP_ANALYSIS.md](RA2_GAP_ANALYSIS.md) and [RA2_HISTORICAL_DEBT.tsv](RA2_HISTORICAL_DEBT.tsv). These distinguish implemented source from preliminary native results, final acceptance and open user verification.

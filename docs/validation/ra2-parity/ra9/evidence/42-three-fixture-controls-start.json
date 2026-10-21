@@ -1,0 +1,23 @@
+{
+  "utc": "2026-10-20T23:26:20.266523+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--no-fail-fast",
+    "--test",
+    "ra6_vehicles",
+    "--test",
+    "ra9_refinery_repair_liveness",
+    "--",
+    "ra9_behavior87_coordinate_move_admits_genuine_unexplored_destination",
+    "ra9_behavior87_real_base_elite_cloakable_shots_use_r51_surface_delay",
+    "ra9_command_destroyed_refinery_cannot_pay_a_delivery_later_in_economy",
+    "--test-threads=1"
+  ],
+  "test_sha256": {
+    "crates/sim/tests/ra6_vehicles.rs": "cae12c3f03d215243e9d7abcddaae6f263cba3c1132ab018147f9d05c8535e19",
+    "crates/sim/tests/ra9_refinery_repair_liveness.rs": "ddc685bea1cd8f6d9875b74ff3bc99aae5baab090ff3bdfcf6dee1c081abce61"
+  }
+}

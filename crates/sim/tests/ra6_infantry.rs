@@ -191,7 +191,15 @@ fn ra6_ivan_normal_elite_and_engineer_defuse_on_due_tick() {
         let ivan = put(&mut app, P0, "crazy_ivan", 8, 8);
         let target = put(&mut app, P0, "construction_yard", 9, 8);
         let engineer = put(&mut app, P0, "engineer", 8, 9);
-        tick(&mut app, vec![]);
+        tick(
+            &mut app,
+            vec![issue(
+                P0,
+                Command::Guard {
+                    units: vec![engineer],
+                },
+            )],
+        );
         if elite {
             // IVAN is Trainable=no. Scenario-injected elite state exercises the INI's
             // otherwise unreachable ElitePrimary without changing that training rule.
@@ -441,6 +449,53 @@ fn ra6_spy_disguise_default_copy_and_dog_detection() {
     );
     assert!(rejected(&interact(&mut app, spy, infantry)).is_empty());
     let conscript = defs(&app).unit_kind("conscript").unwrap();
+    assert_eq!(
+        app.world()
+            .resource::<sim::SpecialState>()
+            .disguise_for(P1, spy),
+        Some(conscript)
+    );
+    // Public movement preserves the copied disguise; it does not reset it to the
+    // default GI or clear it. Observe real cell arrival before adding the detector.
+    let before_move = cell(&mut app, spy);
+    let destination = CellPos::new(10, 12);
+    let events = tick(
+        &mut app,
+        vec![issue(
+            P0,
+            Command::Move {
+                units: vec![spy],
+                target: destination,
+            },
+        )],
+    );
+    assert!(rejected(&events).is_empty(), "{events:?}");
+    for _ in 0..400 {
+        assert_eq!(
+            app.world()
+                .resource::<sim::SpecialState>()
+                .disguise_for(P1, spy),
+            Some(conscript)
+        );
+        assert!(sim::cell_invariant_violations(app.world_mut()).is_empty());
+        assert!(
+            app.world()
+                .resource::<Players>()
+                .iter()
+                .all(|(_, p)| p.credits() >= 0)
+        );
+        let e = entity(&mut app, spy).unwrap();
+        let mobile = app.world().get::<sim::Mobile>(e).unwrap();
+        if mobile.cell == destination && mobile.step.is_none() {
+            break;
+        }
+        let events = tick(&mut app, vec![]);
+        assert!(rejected(&events).is_empty(), "{events:?}");
+    }
+    assert_ne!(cell(&mut app, spy), before_move);
+    assert_eq!(cell(&mut app, spy), destination);
+    let e = entity(&mut app, spy).unwrap();
+    assert!(app.world().get::<sim::Mobile>(e).unwrap().step.is_none());
     assert_eq!(
         app.world()
             .resource::<sim::SpecialState>()
@@ -1299,4 +1354,163 @@ fn ra6_elite_gi_uses_elite_para_and_elite_temporal_has_double_rate() {
         remaining - app.world().resource::<sim::SpecialState>().erasures[&target].remaining,
         12
     );
+}
+
+/// Exact HARV/CMIN current ordinary damage and Ivan eligibility. Original manual
+/// berserk/death/time-bomb controls are absent; Tanya has no land-unit C4 action here.
+#[test]
+fn ra9_stock_miners_take_real_shell_and_ivan_damage_but_refuse_land_c4_interact() {
+    for name in ["war_miner", "chrono_miner"] {
+        for route in ["shot", "ivan", "tanya"] {
+            let mut app = world();
+            let actor_name = match route {
+                "shot" => "grizzly",
+                "ivan" => "crazy_ivan",
+                _ => "tanya",
+            };
+            let actor = put(&mut app, P0, actor_name, 8, 8);
+            tick(&mut app, vec![]); // source alone naturally observes the later target cell
+            assert!(sim::cell_invariant_violations(app.world_mut()).is_empty());
+            assert!(
+                app.world()
+                    .resource::<Players>()
+                    .iter()
+                    .all(|(_, p)| p.credits() >= 0)
+            );
+            let target = put(&mut app, P1, name, 9, 8);
+            let e = entity(&mut app, target).unwrap();
+            // Only the measuring target is passive; actual source definitions/state stay stock.
+            app.world_mut().entity_mut(e).remove::<sim::Weapon>();
+            let definitions = defs(&app);
+            let kind = definitions.unit_kind(name).unwrap();
+            let terms = definitions.unit_combat(kind).unwrap();
+            let meta = definitions.metadata(ProductionItem::Unit(kind)).unwrap();
+            assert_eq!(terms.hit_points, 1000);
+            assert_eq!(terms.armour, definitions.armour_class("medium").unwrap());
+            assert!(meta.bombable && !meta.immune && meta.self_healing);
+            let before = hp(&mut app, target);
+            let command_tick = app.world().resource::<sim::SimTick>().0;
+            let events = tick(
+                &mut app,
+                vec![issue(
+                    P0,
+                    if route == "shot" {
+                        Command::Attack {
+                            units: vec![actor],
+                            target,
+                        }
+                    } else {
+                        Command::Interact {
+                            unit: actor,
+                            target,
+                        }
+                    },
+                )],
+            );
+            assert!(sim::cell_invariant_violations(app.world_mut()).is_empty());
+            assert!(
+                app.world()
+                    .resource::<Players>()
+                    .iter()
+                    .all(|(_, p)| p.credits() >= 0)
+            );
+            if route == "tanya" {
+                assert_eq!(rejected(&events).len(), 1, "{name}: {events:?}");
+                assert!(
+                    !app.world()
+                        .resource::<sim::SpecialState>()
+                        .charges
+                        .contains_key(&target)
+                );
+                assert!(
+                    !app.world()
+                        .resource::<sim::SpecialState>()
+                        .cargo
+                        .values()
+                        .flatten()
+                        .any(|p| p.id == actor || p.id == target)
+                );
+                assert_eq!(owner(&mut app, actor), Some(P0));
+                assert_eq!(owner(&mut app, target), Some(P1));
+            } else if route == "shot" {
+                assert!(rejected(&events).is_empty(), "{name}: {events:?}");
+                let primary = definitions
+                    .unit_combat(definitions.unit_kind("grizzly").unwrap())
+                    .unwrap()
+                    .weapon
+                    .unwrap();
+                let gun = definitions.weapon(primary).unwrap();
+                let warhead = definitions.warhead(gun.warhead).unwrap();
+                assert_eq!(
+                    (gun.damage, warhead.versus[terms.armour.0 as usize]),
+                    (65, 100)
+                );
+                assert!(events.iter().any(|e| matches!(e,
+                    SimEvent::WeaponFired { attacker, target: t, weapon }
+                        if *attacker == actor && *t == target && *weapon == primary)));
+                let mut hit = hp(&mut app, target) < before;
+                for _ in 0..20 {
+                    if hit {
+                        break;
+                    }
+                    tick(&mut app, vec![]);
+                    assert!(sim::cell_invariant_violations(app.world_mut()).is_empty());
+                    assert!(
+                        app.world()
+                            .resource::<Players>()
+                            .iter()
+                            .all(|(_, p)| p.credits() >= 0)
+                    );
+                    hit = hp(&mut app, target) < before;
+                }
+                assert!(hit, "{name}: real in-range shell must arrive");
+                assert_eq!(before - hp(&mut app, target), 65);
+            } else {
+                assert!(rejected(&events).is_empty(), "{name}: {events:?}");
+                let charge = app.world().resource::<sim::SpecialState>().charges[&target].clone();
+                assert!(!charge.c4);
+                assert_eq!((charge.source, charge.damage), (actor, 400));
+                let rules = definitions.rules().unwrap();
+                assert_eq!(
+                    (rules.combat.ivan_damage, rules.combat.ivan_delay),
+                    (400, 600)
+                );
+                assert_eq!(charge.due - command_tick, 600);
+                let effect = definitions.effect(sim::Effect::IvanBomb).unwrap();
+                let warhead = definitions.warhead(effect.warhead).unwrap();
+                assert_eq!(warhead.versus[terms.armour.0 as usize], 100);
+                while app.world().resource::<sim::SimTick>().0 < charge.due {
+                    assert_eq!(hp(&mut app, target), before, "no early charge at {name}");
+                    tick(&mut app, vec![]);
+                    assert!(sim::cell_invariant_violations(app.world_mut()).is_empty());
+                    assert!(
+                        app.world()
+                            .resource::<Players>()
+                            .iter()
+                            .all(|(_, p)| p.credits() >= 0)
+                    );
+                }
+                assert_eq!(hp(&mut app, target), before);
+                let events = tick(&mut app, vec![]);
+                assert!(events.iter().any(|e| matches!(e,
+                    SimEvent::Impact { warhead: h, at, .. }
+                        if *h == effect.warhead && *at == sim::SubPos::centre_of(CellPos::new(9, 8)))));
+                assert_eq!(before - hp(&mut app, target), 400);
+                assert!(
+                    !app.world()
+                        .resource::<sim::SpecialState>()
+                        .charges
+                        .contains_key(&target)
+                );
+                assert_eq!(owner(&mut app, target), Some(P1));
+            }
+            assert!(sim::cell_invariant_violations(app.world_mut()).is_empty());
+            assert!(
+                app.world()
+                    .resource::<Players>()
+                    .iter()
+                    .all(|(_, p)| p.credits() >= 0)
+            );
+        }
+    }
 }

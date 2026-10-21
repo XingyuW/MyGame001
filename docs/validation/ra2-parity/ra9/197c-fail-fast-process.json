@@ -1,0 +1,142 @@
+{
+  "start_utc": "2026-10-21T16:28:21.492205+00:00",
+  "pid": 14964,
+  "source_commit": "8f1b1dcf399d23b89cbadce1cb1e322439ef85a8",
+  "source_manifest": "docs/validation/ra2-parity/ra9/195-actual-canonical-input-scope.json",
+  "source_manifest_sha256": "9c110cf4d961ac33b5025acb53d0f50eedfa3fe55fe76e9e2135789d388ba6b7",
+  "runner_sha256": "debc8fe54f1c03e5b7d95655f99fd57d29e6866a33e3dfc4addff4ec43a66df3",
+  "source_before": {
+    "files": 669,
+    "authority_spans": 64,
+    "mismatches": []
+  },
+  "status": "PASSED",
+  "commands": [
+    {
+      "name": "whole-positive",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_data_parity",
+        "every_physical_consumer_and_reference_atom_has_an_exact_successful_disposition",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-21T16:28:21.577594+00:00",
+      "source_before": {
+        "files": 669,
+        "authority_spans": 64,
+        "mismatches": []
+      },
+      "status": "PASS",
+      "pgid": 14990,
+      "pid": 14990,
+      "exit": 0,
+      "end_utc": "2026-10-21T16:30:24.721024+00:00",
+      "seconds": 123.06559108302463,
+      "source_after": {
+        "files": 669,
+        "authority_spans": 64,
+        "mismatches": []
+      },
+      "raw": {
+        "path": "docs/validation/ra2-parity/ra9/197c-whole-positive.log",
+        "bytes": 814,
+        "sha256": "3776b442dadc043e7772c3e0f06246e87e85171a5120cb7902bc4e41abaf454c"
+      }
+    },
+    {
+      "name": "six-repaired",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_data_parity",
+        "--no-fail-fast",
+        "--",
+        "--nocapture",
+        "--exact",
+        "ra9_audit::country_rosters::tests::ra9_raw_roster_nonempty_is_schema_rejection_not_fake_loaded_empty",
+        "ra9_audit::consumer62_admission::tests::ra9_consumer62_nonfirst_pad_dock_count_fails_real_dock_adapter",
+        "ra9_audit::model162_admission::tests::ra9_model162_actual_gap_radius_change_fails_native_comparison_and_no_boost_policy",
+        "ra9_audit::source_disposition::tests::ra9_static_speed_rejects_case_alias_after_actual_adapter_control",
+        "ra9_audit::source_disposition::tests::ra9_static_speed_rejects_changed_real_instant_selector",
+        "ra9_audit::source_disposition::tests::ra9_static_speed_rejects_demanded_actual_source_overlap"
+      ],
+      "start_utc": "2026-10-21T16:30:24.812909+00:00",
+      "source_before": {
+        "files": 669,
+        "authority_spans": 64,
+        "mismatches": []
+      },
+      "status": "PASS",
+      "pgid": 15357,
+      "pid": 15357,
+      "exit": 0,
+      "end_utc": "2026-10-21T16:31:47.202000+00:00",
+      "seconds": 82.30187299998943,
+      "source_after": {
+        "files": 669,
+        "authority_spans": 64,
+        "mismatches": []
+      },
+      "raw": {
+        "path": "docs/validation/ra2-parity/ra9/197c-six-repaired.log",
+        "bytes": 2307,
+        "sha256": "477e4cc0a07700f0979a55d85dc7b467600a9e2f69b12106398cd348e4975c0f"
+      }
+    },
+    {
+      "name": "difficulty",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra9_difficulty_neutral_cost_ground_and_air_motion_use_actual_same_rules",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-21T16:31:47.284558+00:00",
+      "source_before": {
+        "files": 669,
+        "authority_spans": 64,
+        "mismatches": []
+      },
+      "status": "PASS",
+      "pgid": 15555,
+      "pid": 15555,
+      "exit": 0,
+      "end_utc": "2026-10-21T16:32:08.116177+00:00",
+      "seconds": 20.754168084007688,
+      "source_after": {
+        "files": 669,
+        "authority_spans": 64,
+        "mismatches": []
+      },
+      "raw": {
+        "path": "docs/validation/ra2-parity/ra9/197c-difficulty.log",
+        "bytes": 459,
+        "sha256": "200f08eac02a28cfa6f23a78861dcd44af98af7d7d9996e18998fec9b610fe66"
+      }
+    }
+  ],
+  "order": "Root-directed strict compilation, actual whole-positive, exactly six repaired cases, and the one unexecuted difficulty regression before isolated5 and mandatory fresh full13. No full181 target or debug/workspace native sweep.",
+  "end_utc": "2026-10-21T16:32:08.196377+00:00",
+  "source_after": {
+    "files": 669,
+    "authority_spans": 64,
+    "mismatches": []
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "utc": "2026-10-21T05:05:53.890611+00:00",
+  "completed_utc": "2026-10-21T05:05:58.370498+00:00",
+  "command": [
+    "cargo",
+    "clippy",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "exit_code": 0,
+  "seconds": 4.48,
+  "scope": "Focused test-only repair compiler; copy-only functional overlap"
+}

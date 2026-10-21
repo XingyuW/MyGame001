@@ -1,5 +1,69 @@
 # MyGame001
 
+<!-- RA9_CURRENT_EVIDENCE_BEGIN -->
+## Current execution provenance — 2026-10-21 ordinary copy
+
+This supersedes earlier pending143/uncompiled175 prose below. The ordinary copy contains the
+exact frozen RA8 financing correction from4a103fa, its two new tests and all retained RA9
+changes.178 records the R189 three-way import; no stale AI source replaced newer canonical work.
+Canonical RA8 still owns its checkout and validation. No final review or acceptance is supplied.
+
+Preliminary151 exported the actual174 completion atoms;158 passed the whole audit1/0:
+16,211 physical=13,419Compared+2,792GameOwned;7,108 demanded/successful dependency pairs;
+5,022 source atoms=3,111Compared+1,911 typed dispositions.159 subsequently ran all181 audit
+cases unfiltered and failed175passed/6failed/0ignored/0filtered.166's five test/helper changes
+repaired those six diagnostics;165strict passed and168 exactly those six passed6/0/175filtered.
+There was no second preliminary full181 pass.131/136/159 and all compiler/fixture/causal failures
+remain retained with their exact source/receipt scopes. Root's166 factual655-source/64-authority/
+88-receipt check is historical; subsequent actual source deltas require canonical rebinding.
+
+Bounded180–188 functional overlap compiled the new targets and executed only the specifically
+authorized debt controls/catalogue and existing late-twin protocol.181's two exact scheduled
+missile/carrier timer controls each passed1/0, retaining all old broad timing tests and exact27
+launch spacing. They do not establish every original flight or lost-carrier regeneration boundary.
+181 reproduced a real duplicate MoveCompleted around actual combat/death;182's same test body
+passed1/0 after the smallest settled-destination correction in combat.rs.185's shipped yard test
+passed1/0 across21maps/344 supported map-growth/player-count scenarios, checking real setup,
+I6/occupancy and public Move exits with unchanged256bound. Earlier slow-detour and neutral-yard
+census fixture failures are preserved. These are separate exact snapshots, not a whole-suite pass.
+
+181's actual loader catalogue reports54units/46buildings/116weapons/61warheads/11armours,
+9countries/21maps/11rawAIplans/3difficulties. The generated RA9_LOADED_CATALOGUE.md retains
+that actual output; its receipt predates the narrow combat correction and establishes loaded
+catalogue values only. Final canonical source/data/route/execution binding remains required.
+174's read-only graph finds all48 audit Rust files reachable,79 include_str paths,0missing or
+unreached. The current directory census is48Rust/67TSV/4TXT,16referencefiles,28top-level RA9
+sim targets; plain files and inline/support/merge residues are not invented compiled-module counts.
+
+187 refreshed the selected late twins on actual changed AI+combat source: separate positive
+and restored-positive each passed1/0/6filtered, P0Won41738/72000,late444WeaponFired/
+8ProductionComplete/6positiveOreDelivered,final78c81bd069fca660/trajectory5a8adabd01d20b05.
+The exact existing extra-RNG36001 control failed statehash at36001; the observer-only production
+omission reached the identical winner/world then failed missing late production (444/0/6).
+Each intentional mutation was restored with immediate and separate later reads of the original
+source SHAe7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d.
+186 is an interrupted debug attempt after native launch, exit-15/no completed result; it is not
+unrun/compiler-only.188 records all17commands, source/raw/executable paths and empty owned process
+groups. All copy Cargo/native processes are gone. Functional overlap grants no performance credit
+or canonical acceptance; all raw failures/preimages/restorations remain available.
+
+Final canonical port/root factual rebinding, isolated all21 actualWon/fixed3/example guards and
+fresh required full13 remain pending, followed by the fresh five-slice3+2/lead panel. Full13
+includes the entire unfiltered audit target and debug600smoke; no extra copy181/debug sweep is
+implied. R56 decision6 retains36,000-tick deterministic soak windows, which can end with sampled
+worlds still Running; all-to-Won evidence comes from separately measured matches/late twins/all21.
+Completed soak outcomes still require Won. Timing limits and per-run performance scope remain exact.
+
+The1,911 specific source dispositions remain759 CURRENT_MODEL_NONREAD/1,152 INTENTIONAL_DIFFERENCE,
+zero ORIGINAL_ENGINE_UNUSED:1,869Whole+42components,including174newatoms across151keys. Specific
+current-model/static-absence choices do not prove original-engine nonuse or native consumption.
+All64 authority fragments, original prompts and historical166/168/171 packets remain byte-exact.
+183 stable debt IDs/aliases and every precise remaining scope are retained. All51 HOWTOSEE rows
+remain PENDING—requires user verification, including art/audio/readability/animation/pacing/feel,
+normal human victory/defeat and packaged/platform launch. Implementers/preparers cannot review
+this work; only the user approves quality and creates an approval tag.
+<!-- RA9_CURRENT_EVIDENCE_END -->
+
 An original single-player real-time strategy game for Apple Silicon macOS, in the tradition of the classic
 isometric base-building RTS: deploy your base, harvest ore, produce an army, and defeat the computer
 opponents before they defeat you. It offers skirmish matches with the sides, countries and lobby
@@ -11,11 +75,57 @@ The game is written in Rust with [Bevy](https://bevyengine.org) 0.19. All rules 
 simulation and turns input into commands. `PLAN.md` is the project plan, `docs/DECISIONS.md` the
 decision log, and `docs/STATUS.md` the milestone reports.
 
+## Implementation status in this validation copy
+
+The RA1–RA8 implementation is the starting point for RA9 integration in this ordinary
+isolated validation copy. Focused native/client controls, the late deterministic replay and its
+two causal controls, and one Coral scenario have actual preliminary receipts. They are not a
+combined final-source suite. Failed complete audits 131 and 136 remain retained evidence.
+The preliminary chronology is now explicit:151 exported the174 completion atoms;158 passed the whole audit (16,211 physical entries,7,108 demanded/successful pairs and5,022 source atoms).159 ran the entire181-case target and recorded175 passes/6 failures, with no ignored or filtered cases.168 passed exactly the six repaired cases (175 filtered); it was not another full181-case run. Those receipts retain their actual source bindings and all earlier failures. Subsequent RA8 imports and the182 combat correction require fresh canonical source binding and the complete mandatory gates; no combined final-source copy pass or independent acceptance is claimed.
+Canonical integration, full final gates and independent review remain **pending**.
+The canonical RA8 checkout and sealed preparation packets remain separate. See
+[STATUS](docs/STATUS.md) and [decisions](docs/DECISIONS.md) for execution records.
+
+The current typed source-policy table declares **1,911 atoms**: 759 CURRENT_MODEL_NONREAD
+and 1,152 INTENTIONAL_DIFFERENCE, with no ORIGINAL_ENGINE_UNUSED classification. These are
+1,869 whole atoms and 42 comma-component atoms; component admission grants neither sibling nor
+whole-key coverage. The earlier 1,737 whole atoms remain, alongside 174 completion atoms
+(132 whole plus 42 components). [RA9-P13](docs/DECISIONS.md#ra9-p13--exact-closure-of-the-174-atoms-exposed-by-the-complete-audit)
+records their specific current-model boundaries, not original-engine fidelity.
+
+Root's checks of historical [input scope143](ra9-preliminary-logs/143-actual-completion174-input-scope.json)
+and [the166 test/helper repair scope](ra9-preliminary-logs/166-six-test-repairs-input-scope.json)
+establish their recorded factual bindings only. The later source imports/correction await actual canonical
+rebinding; none of these checks is source-policy or final review acceptance. The actual loader output is in
+[the loaded catalogue](docs/RA9_LOADED_CATALOGUE.md):54 units,46 buildings,116 weapons,61 warheads,11 armours,
+9 countries,21 maps,11 raw AI plans and3 difficulties (181 preliminary execution).
+
+The client integration adds an amber coordinate notice for a public strategic-building
+reveal event, through the existing minimap image and the human player's real powered-radar
+gate. The notice grants no sight, does not power radar, and does not inspect hidden actors
+to update its location. It expires after nine real seconds, including while paused or radar
+is offline; install/uninstall clears it. Nine seconds is a bounded UI-duration assumption,
+not an established original RA2 timing. Ordinary known and owned contacts keep their pixels.
+
+Ordinary tree targeting requires force fire; existing house/garrison and specialist contexts
+remain separate. Command-created carried aircraft, missiles and paradrop planes remain outside
+ordinary unit selection and cycling. Bridge repair huts retain the current narrower
+producer/yard/garrison building-selection contract. Neither rule claims that the unparsed
+original selection flags have been reproduced. Placement/rally clicks leave their mode only
+when the actual command sink accepts the expected commands; pause, full/closed sink and
+partial rally controls have preserved preliminary native receipts and remain in the final canonical gate. Sidebar prices update across
+match replacement, and factory estimates use the current live/working producer gates.
+
+The new native tests follow actual App handlers, CommandQueue/SimSchedule events, actor
+snapshots, selection/preview/sink and minimap image paths. Controlled input-layout fixtures
+are identified separately from real command-created actors. Pixel cursor appearance, art,
+animation, sound, readability, pacing and feel still **require user verification**; the
+existing visual-review instructions and feature lists below remain applicable.
+
 ## Sides and countries
 
 A match is fought between the two sides of Red Alert 2, each player with one of nine countries
-(`assets/data/rules.ron`, `skirmish.ron`; the values of every item are those of the original
-rules, generated by `scripts/generate_ra2_data.py` from the reference tables under
+(`assets/data/rules.ron`, `skirmish.ron`; reference-derived values and explicitly documented model choices are generated by `scripts/generate_ra2_data.py` from the reference tables under
 `crates/sim/tests/reference/`):
 
 | Side | Countries and what only they build |
@@ -24,8 +134,8 @@ rules, generated by `scripts/generate_ra2_data.py` from the reference tables und
 | Soviet | **Libya** (Demolition Truck), **Iraq** (Desolator), **Cuba** (Terrorist), **Russia** (Tesla Tank) |
 
 Each side has its own Construction Yard, Barracks, Refinery, War Factory, Naval Shipyard, Service
-Depot, Battle Lab and walls, and its own units; until the Soviet buildings and the new units have
-art of their own they show that of their Allied twins. What you may build is decided as in Red
+Depot, Battle Lab and walls, and its own units. Original artwork and documented sprite aliases
+provide their presentation. What you may build is decided as in Red
 Alert 2: you own a factory of the item's kind (Construction Yard, Barracks, War Factory, Naval
 Shipyard, Airforce Command) of a side that builds it, you own its prerequisites, and your country
 is not excluded. Because the rule looks at your buildings, **capturing** an enemy Barracks or War
@@ -65,8 +175,8 @@ These follow Red Alert 2 since milestone RA2 of the parity programme (times are 
   of what your buildings consume, down to 50 percent for half or more. Only buildings that are
   powered **and** consume power stop working: Prism Tower, Tesla Coil, Patriot, Flak Cannon,
   Grand Cannon, Gap Generator, Spy Satellite, Psychic Sensor and Ore Purifier. A Pillbox, a
-  Sentry Gun and the Cloning Vats keep working. Superweapons stop charging, and cannot be
-  fired, until the power is back.
+  Sentry Gun and the Cloning Vats keep working. Strategic abilities that require power stop charging and cannot fire until power is back;
+  the American paradrop follows its separate unpowered-ability rule.
 * **Radar.** The minimap is your radar: it needs an Airforce Command, a Radar Tower or a Spy
   Satellite Uplink, and enough power. Without one, under low power, and while an enemy spy has
   switched your power off, it shows **RADAR OFFLINE** with the reason, and clicks on it do
@@ -76,7 +186,7 @@ These follow Red Alert 2 since milestone RA2 of the parity programme (times are 
   are not base buildings: nothing can be placed from them alone. A Naval Shipyard may stand up
   to 31 free cells from your base (Red Alert 2 allows 12; on most shipped maps the water lies
   farther from the start than that, and the maps were not reshaped).
-* **Selling and repairing.** A sale refunds half the cost. A repair (`K`, or the Repair
+* **Selling and repairing.** A sale normally refunds half the cost, with explicit refinery/Purifier refund terms. A repair (`K`, or the Repair
   button) restores 8 hit points about once a second (every 19 ticks) and charges each step, so
   that a whole repair costs about 15 percent of the price; it waits while you cannot pay. Walls
   can be neither sold nor repaired.
@@ -146,12 +256,12 @@ warheads and weapons of Red Alert 2 (a range is in cells; a reload at game speed
   Terror Drone and a Demolition Truck crush nothing. A unit ordered to **attack** does not
   crush on its way to its target, and a miner at work does not either: move your tanks through
   the infantry to crush it, and move your infantry out of the way of theirs.
-* **Still the game's own until later milestones.** C4,
-  the Chrono Legionnaire's erasing, the dog's and the Terror Drone's instant kills, the Giant
-  Squid, mind control, the deployed GI, Desolator and Yuri, radiation after a nuclear strike,
-  and the timing of the superweapons keep the simpler mechanics they had (RA6).
-  `crates/sim/tests/reference/ra2_differences.tsv` lists every value that differs from Red
-  Alert 2's `rules.ini`, with its reason.
+* **Specialists and remaining model differences.** RA6 implements the specialist, parasite,
+  transport/IFV, radiation and strategic command paths; their timer, per-shot sonic and other
+  approximations remain named in the plan and decisions. RA9 liveness, identity and source-policy
+  refinements have individually scoped preliminary native receipts; complete current canonical validation remains due. Flat terrain, walls that
+  do not block shots, and specific omitted source options are not claims of original fidelity.
+  The exact differences belong to the scoped audit and reference differences table.
 
 ## Veterancy, crews, aircraft, missiles and submarines
 
@@ -189,9 +299,11 @@ As in Red Alert 2 (`docs/RA2_PARITY_PLAN.md`, RA4):
   submerged units within 4), or the unit fired in the last second or so. What you cannot see
   you cannot attack; the computer players cannot either.
 
-[Construction system report](docs/CONSTRUCTION_SYSTEM.md) documents the roster, mechanics,
-integration and tests as they were before the Red Alert 2 parity programme, which
-`docs/RA2_PARITY_PLAN.md` describes milestone by milestone (`docs/STATUS.md` says how far it is).
+[Construction system report](docs/CONSTRUCTION_SYSTEM.md) describes the current command,
+production and client model, followed by the preserved historical M9 report.
+The parity plan describes the programme milestone by milestone; STATUS distinguishes implemented
+source from actual validation.
+
 The artwork and the sounds are original; no file of Red Alert 2 is part of the game.
 
 ## High-resolution battlefield presentation
@@ -435,6 +547,8 @@ sound on or off, edge scrolling, and scroll speed; they are stored in
 
 ```sh
 sh scripts/package_macos.sh
+python3 scripts/generate_ra2_data.py --check
+python3 scripts/ra2_reference.py --check
 ```
 
 builds `$CARGO_TARGET_DIR/package/MyGame001.app` (or `target/package/MyGame001.app` when no custom target directory is configured) (the executable with the `assets/` directory beside it) and
@@ -610,9 +724,11 @@ cargo run --release -p sim --example m7_benchmark
 cargo run --release -p sim --example m7_soak
 cargo run --release -p sim --example m14_duels -- full
 sh scripts/package_macos.sh
+python3 scripts/generate_ra2_data.py --check
+python3 scripts/ra2_reference.py --check
 ```
 
-`sh scripts/validate_ra2_parity.sh <label>` runs all eleven in this order and keeps their logs
+`sh scripts/validate_ra2_parity.sh <label>` runs all thirteen in this order and keeps their logs
 under `docs/validation/ra2-parity/<label>/`.
 
 `--smoke-test <frames>` runs the real game for that many frames, plays the menu flow, and exits
@@ -674,3 +790,5 @@ The maps add connected roads, blocked woodland and civilian blocks, cliff terrac
 animation and broad ground-color variation. Bases retain clear building aprons and existing ore
 fields. The shared layout writes obstacles to TMX so visible obstacles and pathfinding agree.
 Cliffs are blocked terraces; this does not add traversable height levels or garrisonable civilians.
+
+Current source differences and individual retained debt are reconciled in [docs/RA2_GAP_ANALYSIS.md](docs/RA2_GAP_ANALYSIS.md) and [docs/RA2_HISTORICAL_DEBT.tsv](docs/RA2_HISTORICAL_DEBT.tsv). These distinguish implemented source from preliminary native results, final acceptance and open user verification.

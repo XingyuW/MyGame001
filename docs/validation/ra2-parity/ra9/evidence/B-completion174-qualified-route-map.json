@@ -1,0 +1,3531 @@
+{
+  "status": "FACTUAL_CURRENT_COMPLETION174_ROUTE_MAP_LOADED_PENDING_NO_ACCEPTANCE_EDITS",
+  "atoms": [
+    {
+      "file": "rules",
+      "section": "AMRADR",
+      "key": "Helipad",
+      "portion": "whole",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "factory-alias",
+      "routes": [
+        "loaded/completion/factory-alias",
+        "native/completion/current-paid-production",
+        "static/completion/factory-alias"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "CAAIRP",
+      "key": "Ammo",
+      "portion": "whole",
+      "exact_value": "5",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "building-ammo",
+      "routes": [
+        "loaded/completion/building-ammo",
+        "native/completion/current-natural-paradrop",
+        "static/completion/building-ammo"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "CAOUTP",
+      "key": "IsBase",
+      "portion": "whole",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "neutral-base",
+      "routes": [
+        "loaded/completion/neutral-base",
+        "native/completion/current-neutral-interaction",
+        "static/completion/neutral-base"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "CATHOSP",
+      "key": "IsBase",
+      "portion": "whole",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "neutral-base",
+      "routes": [
+        "loaded/completion/neutral-base",
+        "native/completion/current-neutral-interaction",
+        "static/completion/neutral-base"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "CIVAN",
+      "key": "Ivan",
+      "portion": "whole",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "ivan-role",
+      "routes": [
+        "loaded/completion/ivan-role",
+        "native/completion/current-ivan-charge",
+        "static/completion/ivan-role"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "CMIN",
+      "key": "Dock",
+      "portion": "whole",
+      "exact_value": "NAREFN,GAREFN",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "ground-dock",
+      "routes": [
+        "loaded/completion/ground-dock",
+        "native/completion/current-ore-delivery",
+        "static/completion/ground-dock"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "DOG",
+      "key": "AllowedToStartInMultiplayer",
+      "portion": "whole",
+      "exact_value": "no",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "starting-twin",
+      "routes": [
+        "loaded/completion/starting-twin",
+        "static/completion/starting-twin"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "GAAIRC",
+      "key": "Helipad",
+      "portion": "whole",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "factory-alias",
+      "routes": [
+        "loaded/completion/factory-alias",
+        "native/completion/current-paid-production",
+        "static/completion/factory-alias"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "GACNST",
+      "key": "ConstructionYard",
+      "portion": "whole",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "factory-alias",
+      "routes": [
+        "loaded/completion/factory-alias",
+        "native/completion/current-paid-production",
+        "static/completion/factory-alias"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "GAPILE",
+      "key": "GDIBarracks",
+      "portion": "whole",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "factory-alias",
+      "routes": [
+        "loaded/completion/factory-alias",
+        "native/completion/current-paid-production",
+        "static/completion/factory-alias"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "GAREFN",
+      "key": "NumberOfDocks",
+      "portion": "whole",
+      "exact_value": "1",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "refinery-docks",
+      "routes": [
+        "loaded/completion/refinery-docks",
+        "native/completion/current-ore-delivery",
+        "static/completion/refinery-docks"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "GAREFN",
+      "key": "Storage",
+      "portion": "whole",
+      "exact_value": "200",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "refinery-storage",
+      "routes": [
+        "loaded/completion/refinery-storage",
+        "native/completion/current-ore-delivery",
+        "static/completion/refinery-storage"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "GAWEAP",
+      "key": "WeaponsFactory",
+      "portion": "whole",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "factory-alias",
+      "routes": [
+        "loaded/completion/factory-alias",
+        "native/completion/current-paid-production",
+        "static/completion/factory-alias"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "GAYARD",
+      "key": "WeaponsFactory",
+      "portion": "whole",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "factory-alias",
+      "routes": [
+        "loaded/completion/factory-alias",
+        "native/completion/current-paid-production",
+        "static/completion/factory-alias"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "HARV",
+      "key": "Dock",
+      "portion": "whole",
+      "exact_value": "NAREFN,GAREFN",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "ground-dock",
+      "routes": [
+        "loaded/completion/ground-dock",
+        "native/completion/current-ore-delivery",
+        "static/completion/ground-dock"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "IVAN",
+      "key": "Ivan",
+      "portion": "whole",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "ivan-role",
+      "routes": [
+        "loaded/completion/ivan-role",
+        "native/completion/current-ivan-charge",
+        "static/completion/ivan-role"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "NACLON",
+      "key": "NODBarracks",
+      "portion": "whole",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "factory-alias",
+      "routes": [
+        "loaded/completion/factory-alias",
+        "native/completion/current-paid-production",
+        "static/completion/factory-alias"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "NACNST",
+      "key": "ConstructionYard",
+      "portion": "whole",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "factory-alias",
+      "routes": [
+        "loaded/completion/factory-alias",
+        "native/completion/current-paid-production",
+        "static/completion/factory-alias"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "NAHAND",
+      "key": "NODBarracks",
+      "portion": "whole",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "factory-alias",
+      "routes": [
+        "loaded/completion/factory-alias",
+        "native/completion/current-paid-production",
+        "static/completion/factory-alias"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "NAMISL",
+      "key": "NukeSilo",
+      "portion": "whole",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "nuke-role",
+      "routes": [
+        "loaded/completion/nuke-role",
+        "native/completion/current-nuclear-launch",
+        "static/completion/nuke-role"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "NAPSIS",
+      "key": "SensorArray",
+      "portion": "whole",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "sensor-mask",
+      "routes": [
+        "loaded/completion/sensor-mask",
+        "native/completion/current-powered-sensor",
+        "static/completion/sensor-mask"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "NAPSIS",
+      "key": "SensorsSight",
+      "portion": "whole",
+      "exact_value": "15",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "sensor-mask",
+      "routes": [
+        "loaded/completion/sensor-mask",
+        "native/completion/current-powered-sensor",
+        "static/completion/sensor-mask"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "NAREFN",
+      "key": "NumberOfDocks",
+      "portion": "whole",
+      "exact_value": "1",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "refinery-docks",
+      "routes": [
+        "loaded/completion/refinery-docks",
+        "native/completion/current-ore-delivery",
+        "static/completion/refinery-docks"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "NAREFN",
+      "key": "Storage",
+      "portion": "whole",
+      "exact_value": "200",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "refinery-storage",
+      "routes": [
+        "loaded/completion/refinery-storage",
+        "native/completion/current-ore-delivery",
+        "static/completion/refinery-storage"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "NAWEAP",
+      "key": "WeaponsFactory",
+      "portion": "whole",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "factory-alias",
+      "routes": [
+        "loaded/completion/factory-alias",
+        "native/completion/current-paid-production",
+        "static/completion/factory-alias"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "NAYARD",
+      "key": "WeaponsFactory",
+      "portion": "whole",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "factory-alias",
+      "routes": [
+        "loaded/completion/factory-alias",
+        "native/completion/current-paid-production",
+        "static/completion/factory-alias"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Armor",
+      "portion": "1",
+      "exact_value": "ARMOR",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-animation",
+      "routes": [
+        "loaded/completion/powerup-animation",
+        "static/completion/powerup-animation"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Armor",
+      "portion": "2",
+      "exact_value": "yes",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "powerup-water",
+      "routes": [
+        "loaded/completion/powerup-water",
+        "native/completion/crates-land-water",
+        "static/completion/powerup-water"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Cloak",
+      "portion": "1",
+      "exact_value": "CLOAK",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-animation",
+      "routes": [
+        "loaded/completion/powerup-animation",
+        "static/completion/powerup-animation"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Cloak",
+      "portion": "2",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-water",
+      "routes": [
+        "loaded/completion/powerup-water",
+        "static/completion/powerup-water"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Darkness",
+      "portion": "1",
+      "exact_value": "SHROUDX",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-animation",
+      "routes": [
+        "loaded/completion/powerup-animation",
+        "static/completion/powerup-animation"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Darkness",
+      "portion": "2",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-water",
+      "routes": [
+        "loaded/completion/powerup-water",
+        "static/completion/powerup-water"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Explosion",
+      "portion": "1",
+      "exact_value": "<none>",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-animation",
+      "routes": [
+        "loaded/completion/powerup-animation",
+        "static/completion/powerup-animation"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Explosion",
+      "portion": "2",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-water",
+      "routes": [
+        "loaded/completion/powerup-water",
+        "static/completion/powerup-water"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Explosion",
+      "portion": "3",
+      "exact_value": "500",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-inactive-argument",
+      "routes": [
+        "loaded/completion/powerup-inactive-argument",
+        "static/completion/powerup-inactive-argument"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Firepower",
+      "portion": "1",
+      "exact_value": "FIREPOWR",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-animation",
+      "routes": [
+        "loaded/completion/powerup-animation",
+        "static/completion/powerup-animation"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Firepower",
+      "portion": "2",
+      "exact_value": "yes",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "powerup-water",
+      "routes": [
+        "loaded/completion/powerup-water",
+        "native/completion/crates-land-water",
+        "static/completion/powerup-water"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Gas",
+      "portion": "1",
+      "exact_value": "<none>",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-animation",
+      "routes": [
+        "loaded/completion/powerup-animation",
+        "static/completion/powerup-animation"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Gas",
+      "portion": "2",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-water",
+      "routes": [
+        "loaded/completion/powerup-water",
+        "static/completion/powerup-water"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Gas",
+      "portion": "3",
+      "exact_value": "100",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-inactive-argument",
+      "routes": [
+        "loaded/completion/powerup-inactive-argument",
+        "static/completion/powerup-inactive-argument"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "HealBase",
+      "portion": "1",
+      "exact_value": "HEALALL",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-animation",
+      "routes": [
+        "loaded/completion/powerup-animation",
+        "static/completion/powerup-animation"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "HealBase",
+      "portion": "2",
+      "exact_value": "yes",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "powerup-water",
+      "routes": [
+        "loaded/completion/powerup-water",
+        "native/completion/crates-land-water",
+        "static/completion/powerup-water"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "ICBM",
+      "portion": "1",
+      "exact_value": "CHEMISLE",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-animation",
+      "routes": [
+        "loaded/completion/powerup-animation",
+        "static/completion/powerup-animation"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "ICBM",
+      "portion": "2",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-water",
+      "routes": [
+        "loaded/completion/powerup-water",
+        "static/completion/powerup-water"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Invulnerability",
+      "portion": "1",
+      "exact_value": "ARMOR",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-animation",
+      "routes": [
+        "loaded/completion/powerup-animation",
+        "static/completion/powerup-animation"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Invulnerability",
+      "portion": "2",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-water",
+      "routes": [
+        "loaded/completion/powerup-water",
+        "static/completion/powerup-water"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Invulnerability",
+      "portion": "3",
+      "exact_value": "1.0",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-inactive-argument",
+      "routes": [
+        "loaded/completion/powerup-inactive-argument",
+        "static/completion/powerup-inactive-argument"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "IonStorm",
+      "portion": "1",
+      "exact_value": "<none>",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-animation",
+      "routes": [
+        "loaded/completion/powerup-animation",
+        "static/completion/powerup-animation"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "IonStorm",
+      "portion": "2",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-water",
+      "routes": [
+        "loaded/completion/powerup-water",
+        "static/completion/powerup-water"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Money",
+      "portion": "1",
+      "exact_value": "MONEY",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-animation",
+      "routes": [
+        "loaded/completion/powerup-animation",
+        "static/completion/powerup-animation"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Money",
+      "portion": "2",
+      "exact_value": "yes",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "powerup-water",
+      "routes": [
+        "loaded/completion/powerup-water",
+        "native/completion/crates-land-water",
+        "static/completion/powerup-water"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Napalm",
+      "portion": "1",
+      "exact_value": "<none>",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-animation",
+      "routes": [
+        "loaded/completion/powerup-animation",
+        "static/completion/powerup-animation"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Napalm",
+      "portion": "2",
+      "exact_value": "no",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-water",
+      "routes": [
+        "loaded/completion/powerup-water",
+        "static/completion/powerup-water"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Napalm",
+      "portion": "3",
+      "exact_value": "600",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-inactive-argument",
+      "routes": [
+        "loaded/completion/powerup-inactive-argument",
+        "static/completion/powerup-inactive-argument"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Pod",
+      "portion": "1",
+      "exact_value": "<none>",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-animation",
+      "routes": [
+        "loaded/completion/powerup-animation",
+        "static/completion/powerup-animation"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Pod",
+      "portion": "2",
+      "exact_value": "no",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-water",
+      "routes": [
+        "loaded/completion/powerup-water",
+        "static/completion/powerup-water"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Reveal",
+      "portion": "1",
+      "exact_value": "REVEAL",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-animation",
+      "routes": [
+        "loaded/completion/powerup-animation",
+        "static/completion/powerup-animation"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Reveal",
+      "portion": "2",
+      "exact_value": "yes",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "powerup-water",
+      "routes": [
+        "loaded/completion/powerup-water",
+        "native/completion/crates-land-water",
+        "static/completion/powerup-water"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Speed",
+      "portion": "1",
+      "exact_value": "SPEED",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-animation",
+      "routes": [
+        "loaded/completion/powerup-animation",
+        "static/completion/powerup-animation"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Speed",
+      "portion": "2",
+      "exact_value": "yes",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "powerup-water",
+      "routes": [
+        "loaded/completion/powerup-water",
+        "native/completion/crates-land-water",
+        "static/completion/powerup-water"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Squad",
+      "portion": "1",
+      "exact_value": "<none>",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-animation",
+      "routes": [
+        "loaded/completion/powerup-animation",
+        "static/completion/powerup-animation"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Squad",
+      "portion": "2",
+      "exact_value": "no",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-water",
+      "routes": [
+        "loaded/completion/powerup-water",
+        "static/completion/powerup-water"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Tiberium",
+      "portion": "1",
+      "exact_value": "<none>",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-animation",
+      "routes": [
+        "loaded/completion/powerup-animation",
+        "static/completion/powerup-animation"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Tiberium",
+      "portion": "2",
+      "exact_value": "no",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-water",
+      "routes": [
+        "loaded/completion/powerup-water",
+        "static/completion/powerup-water"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Unit",
+      "portion": "1",
+      "exact_value": "<none>",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-animation",
+      "routes": [
+        "loaded/completion/powerup-animation",
+        "static/completion/powerup-animation"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Unit",
+      "portion": "2",
+      "exact_value": "no",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "powerup-water",
+      "routes": [
+        "loaded/completion/powerup-water",
+        "native/completion/crates-land-water",
+        "static/completion/powerup-water"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Veteran",
+      "portion": "1",
+      "exact_value": "VETERAN",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "powerup-animation",
+      "routes": [
+        "loaded/completion/powerup-animation",
+        "static/completion/powerup-animation"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "Powerups",
+      "key": "Veteran",
+      "portion": "2",
+      "exact_value": "yes",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "powerup-water",
+      "routes": [
+        "loaded/completion/powerup-water",
+        "native/completion/crates-land-water",
+        "static/completion/powerup-water"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "SENGINEER",
+      "key": "AllowedToStartInMultiplayer",
+      "portion": "whole",
+      "exact_value": "no",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "starting-twin",
+      "routes": [
+        "loaded/completion/starting-twin",
+        "static/completion/starting-twin"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "SPY",
+      "key": "Agent",
+      "portion": "whole",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "spy-role",
+      "routes": [
+        "loaded/completion/spy-role",
+        "native/completion/current-spy-copy-move",
+        "static/completion/spy-role"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "SPY",
+      "key": "Infiltrate",
+      "portion": "whole",
+      "exact_value": "yes",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "spy-role",
+      "routes": [
+        "loaded/completion/spy-role",
+        "native/completion/current-spy-copy-move",
+        "static/completion/spy-role"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "SREF",
+      "key": "WeaponCount",
+      "portion": "whole",
+      "exact_value": "1",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "prism-count",
+      "routes": [
+        "loaded/completion/prism-count",
+        "static/completion/prism-count"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "ADOG",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "50",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "AircraftTypes",
+      "key": "2",
+      "portion": "whole",
+      "exact_value": "ORCA",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-aircraft",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "AircraftTypes",
+      "key": "3",
+      "portion": "whole",
+      "exact_value": "HORNET",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-aircraft",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "AircraftTypes",
+      "key": "4",
+      "portion": "whole",
+      "exact_value": "V3ROCKET",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-aircraft",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "AircraftTypes",
+      "key": "5",
+      "portion": "whole",
+      "exact_value": "ASW",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-aircraft",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "AircraftTypes",
+      "key": "6",
+      "portion": "whole",
+      "exact_value": "DMISL",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-aircraft",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "AircraftTypes",
+      "key": "7",
+      "portion": "whole",
+      "exact_value": "PDPLANE",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-aircraft",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "AircraftTypes",
+      "key": "8",
+      "portion": "whole",
+      "exact_value": "BEAG",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-aircraft",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "1",
+      "portion": "whole",
+      "exact_value": "GAPOWR",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "10",
+      "portion": "whole",
+      "exact_value": "NAPOWR",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "106",
+      "portion": "whole",
+      "exact_value": "GAAIRC",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "11",
+      "portion": "whole",
+      "exact_value": "NATECH",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "12",
+      "portion": "whole",
+      "exact_value": "NAHAND",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "13",
+      "portion": "whole",
+      "exact_value": "GAWALL",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "132",
+      "portion": "whole",
+      "exact_value": "CAWA2A",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "136",
+      "portion": "whole",
+      "exact_value": "AMRADR",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "14",
+      "portion": "whole",
+      "exact_value": "NARADR",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "145",
+      "portion": "whole",
+      "exact_value": "CAEUR1",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "15",
+      "portion": "whole",
+      "exact_value": "NAWEAP",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "16",
+      "portion": "whole",
+      "exact_value": "NAREFN",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "17",
+      "portion": "whole",
+      "exact_value": "NAWALL",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "19",
+      "portion": "whole",
+      "exact_value": "NAPSIS",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "2",
+      "portion": "whole",
+      "exact_value": "GAREFN",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "21",
+      "portion": "whole",
+      "exact_value": "NALASR",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "22",
+      "portion": "whole",
+      "exact_value": "NASAM",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "24",
+      "portion": "whole",
+      "exact_value": "GAYARD",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "25",
+      "portion": "whole",
+      "exact_value": "NAIRON",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "26",
+      "portion": "whole",
+      "exact_value": "NACNST",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "27",
+      "portion": "whole",
+      "exact_value": "NADEPT",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "28",
+      "portion": "whole",
+      "exact_value": "GACSPH",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "3",
+      "portion": "whole",
+      "exact_value": "GACNST",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "30",
+      "portion": "whole",
+      "exact_value": "GAWEAT",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "31",
+      "portion": "whole",
+      "exact_value": "CABHUT",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "4",
+      "portion": "whole",
+      "exact_value": "GAPILE",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "54",
+      "portion": "whole",
+      "exact_value": "TESLA",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "55",
+      "portion": "whole",
+      "exact_value": "NAMISL",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "56",
+      "portion": "whole",
+      "exact_value": "ATESLA",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "6",
+      "portion": "whole",
+      "exact_value": "GADEPT",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "62",
+      "portion": "whole",
+      "exact_value": "NAYARD",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "63",
+      "portion": "whole",
+      "exact_value": "GASPYSAT",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "64",
+      "portion": "whole",
+      "exact_value": "GAGAP",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "65",
+      "portion": "whole",
+      "exact_value": "GTGCAN",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "66",
+      "portion": "whole",
+      "exact_value": "NANRCT",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "67",
+      "portion": "whole",
+      "exact_value": "GAPILL",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "68",
+      "portion": "whole",
+      "exact_value": "NAFLAK",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "69",
+      "portion": "whole",
+      "exact_value": "CAOUTP",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "7",
+      "portion": "whole",
+      "exact_value": "GATECH",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "70",
+      "portion": "whole",
+      "exact_value": "CATHOSP",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "71",
+      "portion": "whole",
+      "exact_value": "CAAIRP",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "72",
+      "portion": "whole",
+      "exact_value": "CAOILD",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "73",
+      "portion": "whole",
+      "exact_value": "NACLON",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "74",
+      "portion": "whole",
+      "exact_value": "GAOREP",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "75",
+      "portion": "whole",
+      "exact_value": "CACITY01",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "BuildingTypes",
+      "key": "8",
+      "portion": "whole",
+      "exact_value": "GAWEAP",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-building",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "CCOMAND",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "1000",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "CIVAN",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "250",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "CLEG",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "1200",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "DESO",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "300",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "DOG",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "50",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "E1",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "150",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "E2",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "20",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "ENGINEER",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "100",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "FLAKT",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "50",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "IVAN",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "150",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "JUMPJET",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "500",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "PTROOP",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "1000",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "SENGINEER",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "100",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "SHK",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "125",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "SNIPE",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "600",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "SPY",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "900",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "TANY",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "1000",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "TERROR",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "25",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "1",
+      "portion": "whole",
+      "exact_value": "AMCV",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "10",
+      "portion": "whole",
+      "exact_value": "MTNK",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "14",
+      "portion": "whole",
+      "exact_value": "CARRIER",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "15",
+      "portion": "whole",
+      "exact_value": "V3",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "16",
+      "portion": "whole",
+      "exact_value": "ZEP",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "17",
+      "portion": "whole",
+      "exact_value": "DRON",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "18",
+      "portion": "whole",
+      "exact_value": "HTK",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "19",
+      "portion": "whole",
+      "exact_value": "DEST",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "2",
+      "portion": "whole",
+      "exact_value": "HARV",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "20",
+      "portion": "whole",
+      "exact_value": "SUB",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "21",
+      "portion": "whole",
+      "exact_value": "AEGIS",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "22",
+      "portion": "whole",
+      "exact_value": "LCRF",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "23",
+      "portion": "whole",
+      "exact_value": "DRED",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "24",
+      "portion": "whole",
+      "exact_value": "SHAD",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "25",
+      "portion": "whole",
+      "exact_value": "SQD",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "26",
+      "portion": "whole",
+      "exact_value": "DLPH",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "27",
+      "portion": "whole",
+      "exact_value": "SMCV",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "28",
+      "portion": "whole",
+      "exact_value": "TNKD",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "3",
+      "portion": "whole",
+      "exact_value": "APOC",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "32",
+      "portion": "whole",
+      "exact_value": "TTNK",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "36",
+      "portion": "whole",
+      "exact_value": "CMIN",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "37",
+      "portion": "whole",
+      "exact_value": "SREF",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "39",
+      "portion": "whole",
+      "exact_value": "HYD",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "4",
+      "portion": "whole",
+      "exact_value": "HTNK",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "40",
+      "portion": "whole",
+      "exact_value": "MGTK",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "41",
+      "portion": "whole",
+      "exact_value": "FV",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "44",
+      "portion": "whole",
+      "exact_value": "DTRUCK",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "VehicleTypes",
+      "key": "5",
+      "portion": "whole",
+      "exact_value": "SAPC",
+      "classification": "CURRENT_MODEL_NONREAD",
+      "family": "registry-vehicle",
+      "routes": [
+        "loaded/completion/registry-neighbors",
+        "static/completion/registry-mapping"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "YURI",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "200",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    },
+    {
+      "file": "rules",
+      "section": "YURIPR",
+      "key": "Soylent",
+      "portion": "whole",
+      "exact_value": "250",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "family": "unit-soylent",
+      "routes": [
+        "loaded/completion/unit-cost-hp-neighbors",
+        "static/completion/unit-soylent-absence"
+      ]
+    }
+  ],
+  "routes": [
+    {
+      "route": "loaded/completion/building-ammo",
+      "kind": "loaded",
+      "exact_atoms": [
+        "rules:CAAIRP:Ammo[whole]"
+      ],
+      "atom_count": 1,
+      "status": "PENDING_ACTUAL_COMPLETION_EXPORT_OR_LOADED_CONTROL_RECEIPT",
+      "evidence": [],
+      "blocker": "A will supply actual new completion export/typed-loaded guard receipts. Older policy guards are not promoted to executing this new loaded route. No acceptance materialized here."
+    },
+    {
+      "route": "loaded/completion/factory-alias",
+      "kind": "loaded",
+      "exact_atoms": [
+        "rules:AMRADR:Helipad[whole]",
+        "rules:GAAIRC:Helipad[whole]",
+        "rules:GACNST:ConstructionYard[whole]",
+        "rules:GAPILE:GDIBarracks[whole]",
+        "rules:GAWEAP:WeaponsFactory[whole]",
+        "rules:GAYARD:WeaponsFactory[whole]",
+        "rules:NACLON:NODBarracks[whole]",
+        "rules:NACNST:ConstructionYard[whole]",
+        "rules:NAHAND:NODBarracks[whole]",
+        "rules:NAWEAP:WeaponsFactory[whole]",
+        "rules:NAYARD:WeaponsFactory[whole]"
+      ],
+      "atom_count": 11,
+      "status": "PENDING_ACTUAL_COMPLETION_EXPORT_OR_LOADED_CONTROL_RECEIPT",
+      "evidence": [],
+      "blocker": "A will supply actual new completion export/typed-loaded guard receipts. Older policy guards are not promoted to executing this new loaded route. No acceptance materialized here."
+    },
+    {
+      "route": "loaded/completion/ground-dock",
+      "kind": "loaded",
+      "exact_atoms": [
+        "rules:CMIN:Dock[whole]",
+        "rules:HARV:Dock[whole]"
+      ],
+      "atom_count": 2,
+      "status": "PENDING_ACTUAL_COMPLETION_EXPORT_OR_LOADED_CONTROL_RECEIPT",
+      "evidence": [],
+      "blocker": "A will supply actual new completion export/typed-loaded guard receipts. Older policy guards are not promoted to executing this new loaded route. No acceptance materialized here."
+    },
+    {
+      "route": "loaded/completion/ivan-role",
+      "kind": "loaded",
+      "exact_atoms": [
+        "rules:CIVAN:Ivan[whole]",
+        "rules:IVAN:Ivan[whole]"
+      ],
+      "atom_count": 2,
+      "status": "PENDING_ACTUAL_COMPLETION_EXPORT_OR_LOADED_CONTROL_RECEIPT",
+      "evidence": [],
+      "blocker": "A will supply actual new completion export/typed-loaded guard receipts. Older policy guards are not promoted to executing this new loaded route. No acceptance materialized here."
+    },
+    {
+      "route": "loaded/completion/neutral-base",
+      "kind": "loaded",
+      "exact_atoms": [
+        "rules:CAOUTP:IsBase[whole]",
+        "rules:CATHOSP:IsBase[whole]"
+      ],
+      "atom_count": 2,
+      "status": "PENDING_ACTUAL_COMPLETION_EXPORT_OR_LOADED_CONTROL_RECEIPT",
+      "evidence": [],
+      "blocker": "A will supply actual new completion export/typed-loaded guard receipts. Older policy guards are not promoted to executing this new loaded route. No acceptance materialized here."
+    },
+    {
+      "route": "loaded/completion/nuke-role",
+      "kind": "loaded",
+      "exact_atoms": [
+        "rules:NAMISL:NukeSilo[whole]"
+      ],
+      "atom_count": 1,
+      "status": "PENDING_ACTUAL_COMPLETION_EXPORT_OR_LOADED_CONTROL_RECEIPT",
+      "evidence": [],
+      "blocker": "A will supply actual new completion export/typed-loaded guard receipts. Older policy guards are not promoted to executing this new loaded route. No acceptance materialized here."
+    },
+    {
+      "route": "loaded/completion/powerup-animation",
+      "kind": "loaded",
+      "exact_atoms": [
+        "rules:Powerups:Armor[1]",
+        "rules:Powerups:Cloak[1]",
+        "rules:Powerups:Darkness[1]",
+        "rules:Powerups:Explosion[1]",
+        "rules:Powerups:Firepower[1]",
+        "rules:Powerups:Gas[1]",
+        "rules:Powerups:HealBase[1]",
+        "rules:Powerups:ICBM[1]",
+        "rules:Powerups:Invulnerability[1]",
+        "rules:Powerups:IonStorm[1]",
+        "rules:Powerups:Money[1]",
+        "rules:Powerups:Napalm[1]",
+        "rules:Powerups:Pod[1]",
+        "rules:Powerups:Reveal[1]",
+        "rules:Powerups:Speed[1]",
+        "rules:Powerups:Squad[1]",
+        "rules:Powerups:Tiberium[1]",
+        "rules:Powerups:Unit[1]",
+        "rules:Powerups:Veteran[1]"
+      ],
+      "atom_count": 19,
+      "status": "PENDING_ACTUAL_COMPLETION_EXPORT_OR_LOADED_CONTROL_RECEIPT",
+      "evidence": [],
+      "blocker": "A will supply actual new completion export/typed-loaded guard receipts. Older policy guards are not promoted to executing this new loaded route. No acceptance materialized here."
+    },
+    {
+      "route": "loaded/completion/powerup-inactive-argument",
+      "kind": "loaded",
+      "exact_atoms": [
+        "rules:Powerups:Explosion[3]",
+        "rules:Powerups:Gas[3]",
+        "rules:Powerups:Invulnerability[3]",
+        "rules:Powerups:Napalm[3]"
+      ],
+      "atom_count": 4,
+      "status": "PENDING_ACTUAL_COMPLETION_EXPORT_OR_LOADED_CONTROL_RECEIPT",
+      "evidence": [],
+      "blocker": "A will supply actual new completion export/typed-loaded guard receipts. Older policy guards are not promoted to executing this new loaded route. No acceptance materialized here."
+    },
+    {
+      "route": "loaded/completion/powerup-water",
+      "kind": "loaded",
+      "exact_atoms": [
+        "rules:Powerups:Armor[2]",
+        "rules:Powerups:Cloak[2]",
+        "rules:Powerups:Darkness[2]",
+        "rules:Powerups:Explosion[2]",
+        "rules:Powerups:Firepower[2]",
+        "rules:Powerups:Gas[2]",
+        "rules:Powerups:HealBase[2]",
+        "rules:Powerups:ICBM[2]",
+        "rules:Powerups:Invulnerability[2]",
+        "rules:Powerups:IonStorm[2]",
+        "rules:Powerups:Money[2]",
+        "rules:Powerups:Napalm[2]",
+        "rules:Powerups:Pod[2]",
+        "rules:Powerups:Reveal[2]",
+        "rules:Powerups:Speed[2]",
+        "rules:Powerups:Squad[2]",
+        "rules:Powerups:Tiberium[2]",
+        "rules:Powerups:Unit[2]",
+        "rules:Powerups:Veteran[2]"
+      ],
+      "atom_count": 19,
+      "status": "PENDING_ACTUAL_COMPLETION_EXPORT_OR_LOADED_CONTROL_RECEIPT",
+      "evidence": [],
+      "blocker": "A will supply actual new completion export/typed-loaded guard receipts. Older policy guards are not promoted to executing this new loaded route. No acceptance materialized here."
+    },
+    {
+      "route": "loaded/completion/prism-count",
+      "kind": "loaded",
+      "exact_atoms": [
+        "rules:SREF:WeaponCount[whole]"
+      ],
+      "atom_count": 1,
+      "status": "PENDING_ACTUAL_COMPLETION_EXPORT_OR_LOADED_CONTROL_RECEIPT",
+      "evidence": [],
+      "blocker": "A will supply actual new completion export/typed-loaded guard receipts. Older policy guards are not promoted to executing this new loaded route. No acceptance materialized here."
+    },
+    {
+      "route": "loaded/completion/refinery-docks",
+      "kind": "loaded",
+      "exact_atoms": [
+        "rules:GAREFN:NumberOfDocks[whole]",
+        "rules:NAREFN:NumberOfDocks[whole]"
+      ],
+      "atom_count": 2,
+      "status": "PENDING_ACTUAL_COMPLETION_EXPORT_OR_LOADED_CONTROL_RECEIPT",
+      "evidence": [],
+      "blocker": "A will supply actual new completion export/typed-loaded guard receipts. Older policy guards are not promoted to executing this new loaded route. No acceptance materialized here."
+    },
+    {
+      "route": "loaded/completion/refinery-storage",
+      "kind": "loaded",
+      "exact_atoms": [
+        "rules:GAREFN:Storage[whole]",
+        "rules:NAREFN:Storage[whole]"
+      ],
+      "atom_count": 2,
+      "status": "PENDING_ACTUAL_COMPLETION_EXPORT_OR_LOADED_CONTROL_RECEIPT",
+      "evidence": [],
+      "blocker": "A will supply actual new completion export/typed-loaded guard receipts. Older policy guards are not promoted to executing this new loaded route. No acceptance materialized here."
+    },
+    {
+      "route": "loaded/completion/registry-neighbors",
+      "kind": "loaded",
+      "exact_atoms": [
+        "rules:AircraftTypes:2[whole]",
+        "rules:AircraftTypes:3[whole]",
+        "rules:AircraftTypes:4[whole]",
+        "rules:AircraftTypes:5[whole]",
+        "rules:AircraftTypes:6[whole]",
+        "rules:AircraftTypes:7[whole]",
+        "rules:AircraftTypes:8[whole]",
+        "rules:BuildingTypes:106[whole]",
+        "rules:BuildingTypes:10[whole]",
+        "rules:BuildingTypes:11[whole]",
+        "rules:BuildingTypes:12[whole]",
+        "rules:BuildingTypes:132[whole]",
+        "rules:BuildingTypes:136[whole]",
+        "rules:BuildingTypes:13[whole]",
+        "rules:BuildingTypes:145[whole]",
+        "rules:BuildingTypes:14[whole]",
+        "rules:BuildingTypes:15[whole]",
+        "rules:BuildingTypes:16[whole]",
+        "rules:BuildingTypes:17[whole]",
+        "rules:BuildingTypes:19[whole]",
+        "rules:BuildingTypes:1[whole]",
+        "rules:BuildingTypes:21[whole]",
+        "rules:BuildingTypes:22[whole]",
+        "rules:BuildingTypes:24[whole]",
+        "rules:BuildingTypes:25[whole]",
+        "rules:BuildingTypes:26[whole]",
+        "rules:BuildingTypes:27[whole]",
+        "rules:BuildingTypes:28[whole]",
+        "rules:BuildingTypes:2[whole]",
+        "rules:BuildingTypes:30[whole]",
+        "rules:BuildingTypes:31[whole]",
+        "rules:BuildingTypes:3[whole]",
+        "rules:BuildingTypes:4[whole]",
+        "rules:BuildingTypes:54[whole]",
+        "rules:BuildingTypes:55[whole]",
+        "rules:BuildingTypes:56[whole]",
+        "rules:BuildingTypes:62[whole]",
+        "rules:BuildingTypes:63[whole]",
+        "rules:BuildingTypes:64[whole]",
+        "rules:BuildingTypes:65[whole]",
+        "rules:BuildingTypes:66[whole]",
+        "rules:BuildingTypes:67[whole]",
+        "rules:BuildingTypes:68[whole]",
+        "rules:BuildingTypes:69[whole]",
+        "rules:BuildingTypes:6[whole]",
+        "rules:BuildingTypes:70[whole]",
+        "rules:BuildingTypes:71[whole]",
+        "rules:BuildingTypes:72[whole]",
+        "rules:BuildingTypes:73[whole]",
+        "rules:BuildingTypes:74[whole]",
+        "rules:BuildingTypes:75[whole]",
+        "rules:BuildingTypes:7[whole]",
+        "rules:BuildingTypes:8[whole]",
+        "rules:VehicleTypes:10[whole]",
+        "rules:VehicleTypes:14[whole]",
+        "rules:VehicleTypes:15[whole]",
+        "rules:VehicleTypes:16[whole]",
+        "rules:VehicleTypes:17[whole]",
+        "rules:VehicleTypes:18[whole]",
+        "rules:VehicleTypes:19[whole]",
+        "rules:VehicleTypes:1[whole]",
+        "rules:VehicleTypes:20[whole]",
+        "rules:VehicleTypes:21[whole]",
+        "rules:VehicleTypes:22[whole]",
+        "rules:VehicleTypes:23[whole]",
+        "rules:VehicleTypes:24[whole]",
+        "rules:VehicleTypes:25[whole]",
+        "rules:VehicleTypes:26[whole]",
+        "rules:VehicleTypes:27[whole]",
+        "rules:VehicleTypes:28[whole]",
+        "rules:VehicleTypes:2[whole]",
+        "rules:VehicleTypes:32[whole]",
+        "rules:VehicleTypes:36[whole]",
+        "rules:VehicleTypes:37[whole]",
+        "rules:VehicleTypes:39[whole]",
+        "rules:VehicleTypes:3[whole]",
+        "rules:VehicleTypes:40[whole]",
+        "rules:VehicleTypes:41[whole]",
+        "rules:VehicleTypes:44[whole]",
+        "rules:VehicleTypes:4[whole]",
+        "rules:VehicleTypes:5[whole]"
+      ],
+      "atom_count": 81,
+      "status": "PENDING_ACTUAL_COMPLETION_EXPORT_OR_LOADED_CONTROL_RECEIPT",
+      "evidence": [],
+      "blocker": "A will supply actual new completion export/typed-loaded guard receipts. Older policy guards are not promoted to executing this new loaded route. No acceptance materialized here."
+    },
+    {
+      "route": "loaded/completion/sensor-mask",
+      "kind": "loaded",
+      "exact_atoms": [
+        "rules:NAPSIS:SensorArray[whole]",
+        "rules:NAPSIS:SensorsSight[whole]"
+      ],
+      "atom_count": 2,
+      "status": "PENDING_ACTUAL_COMPLETION_EXPORT_OR_LOADED_CONTROL_RECEIPT",
+      "evidence": [],
+      "blocker": "A will supply actual new completion export/typed-loaded guard receipts. Older policy guards are not promoted to executing this new loaded route. No acceptance materialized here."
+    },
+    {
+      "route": "loaded/completion/spy-role",
+      "kind": "loaded",
+      "exact_atoms": [
+        "rules:SPY:Agent[whole]",
+        "rules:SPY:Infiltrate[whole]"
+      ],
+      "atom_count": 2,
+      "status": "PENDING_ACTUAL_COMPLETION_EXPORT_OR_LOADED_CONTROL_RECEIPT",
+      "evidence": [],
+      "blocker": "A will supply actual new completion export/typed-loaded guard receipts. Older policy guards are not promoted to executing this new loaded route. No acceptance materialized here."
+    },
+    {
+      "route": "loaded/completion/starting-twin",
+      "kind": "loaded",
+      "exact_atoms": [
+        "rules:DOG:AllowedToStartInMultiplayer[whole]",
+        "rules:SENGINEER:AllowedToStartInMultiplayer[whole]"
+      ],
+      "atom_count": 2,
+      "status": "PENDING_ACTUAL_COMPLETION_EXPORT_OR_LOADED_CONTROL_RECEIPT",
+      "evidence": [],
+      "blocker": "A will supply actual new completion export/typed-loaded guard receipts. Older policy guards are not promoted to executing this new loaded route. No acceptance materialized here."
+    },
+    {
+      "route": "loaded/completion/unit-cost-hp-neighbors",
+      "kind": "loaded",
+      "exact_atoms": [
+        "rules:ADOG:Soylent[whole]",
+        "rules:CCOMAND:Soylent[whole]",
+        "rules:CIVAN:Soylent[whole]",
+        "rules:CLEG:Soylent[whole]",
+        "rules:DESO:Soylent[whole]",
+        "rules:DOG:Soylent[whole]",
+        "rules:E1:Soylent[whole]",
+        "rules:E2:Soylent[whole]",
+        "rules:ENGINEER:Soylent[whole]",
+        "rules:FLAKT:Soylent[whole]",
+        "rules:IVAN:Soylent[whole]",
+        "rules:JUMPJET:Soylent[whole]",
+        "rules:PTROOP:Soylent[whole]",
+        "rules:SENGINEER:Soylent[whole]",
+        "rules:SHK:Soylent[whole]",
+        "rules:SNIPE:Soylent[whole]",
+        "rules:SPY:Soylent[whole]",
+        "rules:TANY:Soylent[whole]",
+        "rules:TERROR:Soylent[whole]",
+        "rules:YURI:Soylent[whole]",
+        "rules:YURIPR:Soylent[whole]"
+      ],
+      "atom_count": 21,
+      "status": "PENDING_ACTUAL_COMPLETION_EXPORT_OR_LOADED_CONTROL_RECEIPT",
+      "evidence": [],
+      "blocker": "A will supply actual new completion export/typed-loaded guard receipts. Older policy guards are not promoted to executing this new loaded route. No acceptance materialized here."
+    },
+    {
+      "route": "native/completion/crates-land-water",
+      "kind": "native",
+      "exact_atoms": [
+        "rules:Powerups:Armor[2]",
+        "rules:Powerups:Firepower[2]",
+        "rules:Powerups:HealBase[2]",
+        "rules:Powerups:Money[2]",
+        "rules:Powerups:Reveal[2]",
+        "rules:Powerups:Speed[2]",
+        "rules:Powerups:Unit[2]",
+        "rules:Powerups:Veteran[2]"
+      ],
+      "atom_count": 8,
+      "status": "ACTUAL_PRELIMINARY_NAMED_SUCCESS_WITH_EXACT_COMMON_PATH_SCOPE",
+      "evidence": [
+        {
+          "target": "ra5_crates",
+          "test": "a_crate_of_a_unit_is_money_on_water_without_room_and_without_types",
+          "observed": "ok",
+          "raw_line": 22,
+          "command_exit": 0,
+          "receipt": "85-shared-options-crates-chrono-missions.json",
+          "receipt_sha256": "26ac4fb2cbdc1d4086a9db2b42cc520f0101987d4ec6031f3dda47aad39172a0",
+          "log": "85-shared-options-crates-chrono-missions.log",
+          "log_sha256": "181c3848c8cbf2a6e8fe8626a438187f728fd988a582df552934f638192251eb",
+          "input_mismatches": [],
+          "scope": "Rules-present controlled RA5 fixture: real boat water collection with selected Unit->Money postselection fallback, plus land no-room/no-types controls. Not shipped water distribution/weight/original Water flag reader or eight effects individually on water.",
+          "source_path": "crates/sim/tests/ra5_crates.rs",
+          "function_line_at_inspection": 303,
+          "source_sha256_at_command_start": "133743cc92638fbf53e3a4a97c0f7c6ac98483365d6527fb3551be29f1e36074",
+          "source_sha256_at_inspection": "133743cc92638fbf53e3a4a97c0f7c6ac98483365d6527fb3551be29f1e36074",
+          "source_qualification": "Actual retained run scope only; current source inspection/hash is separate and may include later formatting/test additions. No combined final-source suite, source-flag reader or original-engine fidelity claim."
+        },
+        {
+          "target": "ra5_shipped",
+          "test": "a_shipped_crate_gives_every_content_to_a_grizzly_over_many_seeds",
+          "observed": "ok",
+          "raw_line": 30,
+          "command_exit": 0,
+          "receipt": "85-shared-options-crates-chrono-missions.json",
+          "receipt_sha256": "26ac4fb2cbdc1d4086a9db2b42cc520f0101987d4ec6031f3dda47aad39172a0",
+          "log": "85-shared-options-crates-chrono-missions.log",
+          "log_sha256": "181c3848c8cbf2a6e8fe8626a438187f728fd988a582df552934f638192251eb",
+          "input_mismatches": [],
+          "scope": "Actual shipped LAND Grizzly collection over200seeds, current all8 contents/weights and effects. Paired with controlled fixture postselection water fallback and static universal selection branch; no original waterflag/distribution equivalence or separate shipped-water effect matrix.",
+          "source_path": "crates/sim/tests/ra5_shipped.rs",
+          "function_line_at_inspection": 471,
+          "source_sha256_at_command_start": "c902ec652fbc9f86c6b3f08a74f09e185b4c86f6359524bd64e6a7d9a11feb4a",
+          "source_sha256_at_inspection": "c902ec652fbc9f86c6b3f08a74f09e185b4c86f6359524bd64e6a7d9a11feb4a",
+          "source_qualification": "Actual retained run scope only; current source inspection/hash is separate and may include later formatting/test additions. No combined final-source suite, source-flag reader or original-engine fidelity claim."
+        }
+      ],
+      "qualification": "Current implemented branch only; caller/tuple/source atoms still need their exact new loaded/source guard execution and A-owned decision/binding. Never Native/source-key consumption, original fidelity or per-flag/type execution by fiat."
+    },
+    {
+      "route": "native/completion/current-ivan-charge",
+      "kind": "native",
+      "exact_atoms": [
+        "rules:CIVAN:Ivan[whole]",
+        "rules:IVAN:Ivan[whole]"
+      ],
+      "atom_count": 2,
+      "status": "ACTUAL_PRELIMINARY_NAMED_SUCCESS_WITH_EXACT_COMMON_PATH_SCOPE",
+      "evidence": [
+        {
+          "target": "ra6_infantry",
+          "test": "ra9_stock_miners_take_real_shell_and_ivan_damage_but_refuse_land_c4_interact",
+          "observed": "ok",
+          "raw_line": 16,
+          "command_exit": 101,
+          "receipt": "121-final-shared-permission-privacy-controls.json",
+          "receipt_sha256": "6ebf602faa045b308ab13855c14ae03835f1de45967e94215855723724dd6257",
+          "log": "121-final-shared-permission-privacy-controls.log",
+          "log_sha256": "52f57b10134e3a401083e274569c44b454eb6ded2d1805217e6cbbb1c8eedb55",
+          "input_mismatches": [],
+          "scope": "Stock IVAN actual public Interact/attached charge600 native delay400 damage on HARV/CMIN; target-only weapon removal isolates retaliation; no source Ivan role flag read. ChronoIvan shares independently loaded fixedDemolition/IvanBomb path but this body is not an individually observed CIVAN charge.",
+          "source_path": "crates/sim/tests/ra6_infantry.rs",
+          "function_line_at_inspection": 1362,
+          "source_sha256_at_command_start": "f2a17c49b08753f74a150926e1799b9f3714791c22bc58e6bc810c825ac61d7c",
+          "source_sha256_at_inspection": "6e578c484833ce37617a63d885163a45bde0892bb467c2309a58fd1e0ba7198f",
+          "source_qualification": "Actual retained run scope only; current source inspection/hash is separate and may include later formatting/test additions. No combined final-source suite, source-flag reader or original-engine fidelity claim."
+        },
+        {
+          "target": "ra6_infantry",
+          "test": "ra6_chrono_infantry_distance_delay_and_stolen_abilities_are_independent",
+          "observed": "ok",
+          "raw_line": 37,
+          "command_exit": 0,
+          "receipt": "85-shared-options-crates-chrono-missions.json",
+          "receipt_sha256": "26ac4fb2cbdc1d4086a9db2b42cc520f0101987d4ec6031f3dda47aad39172a0",
+          "log": "85-shared-options-crates-chrono-missions.log",
+          "log_sha256": "181c3848c8cbf2a6e8fe8626a438187f728fd988a582df552934f638192251eb",
+          "input_mismatches": [],
+          "scope": "Stock ChronoIvan included in actual publicMove distance/delay controls; separate alias motion premise, not a ChronoIvan charge observation.",
+          "source_path": "crates/sim/tests/ra6_infantry.rs",
+          "function_line_at_inspection": 1286,
+          "source_sha256_at_command_start": "dcee9af9dcf2e1a68a590c69065ce4fb15b97bbbfbcf43678303de1e7958c94a",
+          "source_sha256_at_inspection": "6e578c484833ce37617a63d885163a45bde0892bb467c2309a58fd1e0ba7198f",
+          "source_qualification": "Actual retained run scope only; current source inspection/hash is separate and may include later formatting/test additions. No combined final-source suite, source-flag reader or original-engine fidelity claim."
+        }
+      ],
+      "qualification": "Current implemented branch only; caller/tuple/source atoms still need their exact new loaded/source guard execution and A-owned decision/binding. Never Native/source-key consumption, original fidelity or per-flag/type execution by fiat."
+    },
+    {
+      "route": "native/completion/current-natural-paradrop",
+      "kind": "native",
+      "exact_atoms": [
+        "rules:CAAIRP:Ammo[whole]"
+      ],
+      "atom_count": 1,
+      "status": "ACTUAL_PRELIMINARY_NAMED_SUCCESS_WITH_EXACT_COMMON_PATH_SCOPE",
+      "evidence": [
+        {
+          "target": "ra9_guard75_readiness",
+          "test": "ra9_guard75_america_natural_readiness_real_eight_gi_plane_in_power_and_low_power",
+          "observed": "ok",
+          "raw_line": 8,
+          "command_exit": 101,
+          "receipt": "35-corrected-readiness-death-refinery.json",
+          "receipt_sha256": "57fa45dd2c9382b4819726a38aa04ba29f6387f1a061eff9ae9e53339f8df57d",
+          "log": "35-corrected-readiness-death-refinery.log",
+          "log_sha256": "234a145aa6958fb378096b313236e6cd8be74fc5d2b859f87556f75c7b925c3d",
+          "input_mismatches": [],
+          "scope": "Stock America AMRADR natural4800 readiness with actual8GI aircraft mission in real high/low power. No unit-only building Ammo counter or five-use cap; CAAIRP caller specifics remain loaded and separate next body.",
+          "source_path": "crates/sim/tests/ra9_guard75_readiness.rs",
+          "function_line_at_inspection": 292,
+          "source_sha256_at_command_start": "fc4c90f022be69abb415025a5d691f86f8c24c43dded674dcebbbb15293acd84",
+          "source_sha256_at_inspection": "020594542a04015664a86b1e095c1ece23d6aad996a87457c6b4171a8b0fb2e0",
+          "source_qualification": "Actual retained run scope only; current source inspection/hash is separate and may include later formatting/test additions. No combined final-source suite, source-flag reader or original-engine fidelity claim."
+        },
+        {
+          "target": "ra6_vehicles",
+          "test": "ra6_airport_paradrops_one_shootable_plane_and_full_side_payload",
+          "observed": "ok",
+          "raw_line": 44,
+          "command_exit": 0,
+          "receipt": "85-shared-options-crates-chrono-missions.json",
+          "receipt_sha256": "26ac4fb2cbdc1d4086a9db2b42cc520f0101987d4ec6031f3dda47aad39172a0",
+          "log": "85-shared-options-crates-chrono-missions.log",
+          "log_sha256": "181c3848c8cbf2a6e8fe8626a438187f728fd988a582df552934f638192251eb",
+          "input_mismatches": [],
+          "scope": "Stock airport actual public plane/side payload lifecycle with controlled-ready charge; NOT a natural CAAIRP charge proof. Shared role/lifecycle scope only.",
+          "source_path": "crates/sim/tests/ra6_vehicles.rs",
+          "function_line_at_inspection": 828,
+          "source_sha256_at_command_start": "ff8078a16a580eb516d2bd06cc00bf17dbf6b1fe801958c9e0131467a5e17fff",
+          "source_sha256_at_inspection": "ee8b118a7cf7072366d8bea275fb4ab317dc95722e1c5f45e21d7077d3411943",
+          "source_qualification": "Actual retained run scope only; current source inspection/hash is separate and may include later formatting/test additions. No combined final-source suite, source-flag reader or original-engine fidelity claim."
+        }
+      ],
+      "qualification": "Current implemented branch only; caller/tuple/source atoms still need their exact new loaded/source guard execution and A-owned decision/binding. Never Native/source-key consumption, original fidelity or per-flag/type execution by fiat."
+    },
+    {
+      "route": "native/completion/current-neutral-interaction",
+      "kind": "native",
+      "exact_atoms": [
+        "rules:CAOUTP:IsBase[whole]",
+        "rules:CATHOSP:IsBase[whole]"
+      ],
+      "atom_count": 2,
+      "status": "ACTUAL_PRELIMINARY_NAMED_SUCCESS_WITH_EXACT_COMMON_PATH_SCOPE",
+      "evidence": [
+        {
+          "target": "ra5_world",
+          "test": "ra5_engineer_captures_each_tech_and_is_consumed_but_the_hut_is_not_capturable",
+          "observed": "ok",
+          "raw_line": 8,
+          "command_exit": 0,
+          "receipt": "109-world-permissions-and-bridge-controls.json",
+          "receipt_sha256": "639fec84a11e6ff4a82c6df0d207ac46e70b46b2c08161bf453edbb3aa3fcd99",
+          "log": "109-world-permissions-and-bridge-controls.log",
+          "log_sha256": "e98c6445a6da2939d1d90f4460a6627d2585b91c0f36d1aafed4630dadfc21e1",
+          "input_mismatches": [],
+          "scope": "Shipped real Engineer capture of Hospital/Outpost/Airport/Oil and unsellable controls; proves actual neutral ownership interaction, not Hospital healing amount or original IsBase/victory semantics.",
+          "source_path": "crates/sim/tests/ra5_world.rs",
+          "function_line_at_inspection": 120,
+          "source_sha256_at_command_start": "fa60827a241b4dc877dd32e36089cfd89e1291dd0d3fa817276cddbb618ea4b5",
+          "source_sha256_at_inspection": "fa60827a241b4dc877dd32e36089cfd89e1291dd0d3fa817276cddbb618ea4b5",
+          "source_qualification": "Actual retained run scope only; current source inspection/hash is separate and may include later formatting/test additions. No combined final-source suite, source-flag reader or original-engine fidelity claim."
+        },
+        {
+          "target": "ra5_world",
+          "test": "ra5_outpost_repairs_one_vehicle_without_becoming_an_aircraft_pad",
+          "observed": "ok",
+          "raw_line": 9,
+          "command_exit": 0,
+          "receipt": "109-world-permissions-and-bridge-controls.json",
+          "receipt_sha256": "639fec84a11e6ff4a82c6df0d207ac46e70b46b2c08161bf453edbb3aa3fcd99",
+          "log": "109-world-permissions-and-bridge-controls.log",
+          "log_sha256": "e98c6445a6da2939d1d90f4460a6627d2585b91c0f36d1aafed4630dadfc21e1",
+          "input_mismatches": [],
+          "scope": "Actual shipped captured/current Outpost vehicle repair and aircraft-pad distinction; current neutral interaction only.",
+          "source_path": "crates/sim/tests/ra5_world.rs",
+          "function_line_at_inspection": 853,
+          "source_sha256_at_command_start": "fa60827a241b4dc877dd32e36089cfd89e1291dd0d3fa817276cddbb618ea4b5",
+          "source_sha256_at_inspection": "fa60827a241b4dc877dd32e36089cfd89e1291dd0d3fa817276cddbb618ea4b5",
+          "source_qualification": "Actual retained run scope only; current source inspection/hash is separate and may include later formatting/test additions. No combined final-source suite, source-flag reader or original-engine fidelity claim."
+        }
+      ],
+      "qualification": "Current implemented branch only; caller/tuple/source atoms still need their exact new loaded/source guard execution and A-owned decision/binding. Never Native/source-key consumption, original fidelity or per-flag/type execution by fiat."
+    },
+    {
+      "route": "native/completion/current-nuclear-launch",
+      "kind": "native",
+      "exact_atoms": [
+        "rules:NAMISL:NukeSilo[whole]"
+      ],
+      "atom_count": 1,
+      "status": "ACTUAL_PRELIMINARY_NAMED_SUCCESS_WITH_EXACT_COMMON_PATH_SCOPE",
+      "evidence": [
+        {
+          "target": "ra9_guard75_readiness",
+          "test": "ra9_guard75_stock_nuke_natural_power_readiness_and_actual_600_surviving_hit",
+          "observed": "ok",
+          "raw_line": 9,
+          "command_exit": 101,
+          "receipt": "35-corrected-readiness-death-refinery.json",
+          "receipt_sha256": "57fa45dd2c9382b4819726a38aa04ba29f6387f1a061eff9ae9e53339f8df57d",
+          "log": "35-corrected-readiness-death-refinery.log",
+          "log_sha256": "234a145aa6958fb378096b313236e6cd8be74fc5d2b859f87556f75c7b925c3d",
+          "input_mismatches": [],
+          "scope": "Stock natural12000 readiness, premature refusal, actual power transition and public nuclear launch200-flight with independent600 surviving hit; no NukeSilo role flag parser.",
+          "source_path": "crates/sim/tests/ra9_guard75_readiness.rs",
+          "function_line_at_inspection": 560,
+          "source_sha256_at_command_start": "fc4c90f022be69abb415025a5d691f86f8c24c43dded674dcebbbb15293acd84",
+          "source_sha256_at_inspection": "020594542a04015664a86b1e095c1ece23d6aad996a87457c6b4171a8b0fb2e0",
+          "source_qualification": "Actual retained run scope only; current source inspection/hash is separate and may include later formatting/test additions. No combined final-source suite, source-flag reader or original-engine fidelity claim."
+        },
+        {
+          "target": "ra6_vehicles",
+          "test": "ra9_nuclear_public_sale_retains_launch_owner_and_exact_delayed_payload",
+          "observed": "ok",
+          "raw_line": 31,
+          "command_exit": 101,
+          "receipt": "121-final-shared-permission-privacy-controls.json",
+          "receipt_sha256": "6ebf602faa045b308ab13855c14ae03835f1de45967e94215855723724dd6257",
+          "log": "121-final-shared-permission-privacy-controls.log",
+          "log_sha256": "52f57b10134e3a401083e274569c44b454eb6ded2d1805217e6cbbb1c8eedb55",
+          "input_mismatches": [],
+          "scope": "Controlled-ready stock nuke real launch/publicSale twin preserves due200/launch owner/credits/payload423/radiation. Controlled charge is disclosed; no capture fabrication.",
+          "source_path": "crates/sim/tests/ra6_vehicles.rs",
+          "function_line_at_inspection": 2211,
+          "source_sha256_at_command_start": "b52eefd49e18b9149e787481da583e89c5b1f262c2cdd0498ed0d6a03eda00b0",
+          "source_sha256_at_inspection": "ee8b118a7cf7072366d8bea275fb4ab317dc95722e1c5f45e21d7077d3411943",
+          "source_qualification": "Actual retained run scope only; current source inspection/hash is separate and may include later formatting/test additions. No combined final-source suite, source-flag reader or original-engine fidelity claim."
+        }
+      ],
+      "qualification": "Current implemented branch only; caller/tuple/source atoms still need their exact new loaded/source guard execution and A-owned decision/binding. Never Native/source-key consumption, original fidelity or per-flag/type execution by fiat."
+    },
+    {
+      "route": "native/completion/current-ore-delivery",
+      "kind": "native",
+      "exact_atoms": [
+        "rules:CMIN:Dock[whole]",
+        "rules:GAREFN:NumberOfDocks[whole]",
+        "rules:GAREFN:Storage[whole]",
+        "rules:HARV:Dock[whole]",
+        "rules:NAREFN:NumberOfDocks[whole]",
+        "rules:NAREFN:Storage[whole]"
+      ],
+      "atom_count": 6,
+      "status": "ACTUAL_PRELIMINARY_NAMED_SUCCESS_WITH_EXACT_COMMON_PATH_SCOPE",
+      "evidence": [
+        {
+          "target": "ra5_shipped",
+          "test": "ra9_legacy904_public_stock_harvest_18_19_and_move_resets_work",
+          "observed": "ok",
+          "raw_line": 55,
+          "command_exit": 101,
+          "receipt": "40-remaining-sim-native.json",
+          "receipt_sha256": "744c8761e33590d7210dd88a62dc353df0a82cdb44763ff24e273f47cfbe3082",
+          "log": "40-remaining-sim-native.log",
+          "log_sha256": "9a5bb02fc01fec8bd8c40e8ba805ed13353d67d974498afbd21d4200a890d655",
+          "input_mismatches": [],
+          "scope": "Actual shipped HARV/CMIN public Harvest stock18/19 extraction boundary and Move resets work; supports current harvesting, not original ground Dock list or unlimited Storage economics equivalence.",
+          "source_path": "crates/sim/tests/ra5_shipped.rs",
+          "function_line_at_inspection": 680,
+          "source_sha256_at_command_start": "bc4447361bac33dbb17c2cb18cfd92c96c27c04a173b9c6ab0fcae1b5b1a0fa3",
+          "source_sha256_at_inspection": "c902ec652fbc9f86c6b3f08a74f09e185b4c86f6359524bd64e6a7d9a11feb4a",
+          "source_qualification": "Actual retained run scope only; current source inspection/hash is separate and may include later formatting/test additions. No combined final-source suite, source-flag reader or original-engine fidelity claim."
+        },
+        {
+          "target": "ra5_shipped",
+          "test": "ra9_legacy904_public_stock_single_bail_delivery_keeps_real_ore_and_gem_value",
+          "observed": "ok",
+          "raw_line": 56,
+          "command_exit": 101,
+          "receipt": "40-remaining-sim-native.json",
+          "receipt_sha256": "744c8761e33590d7210dd88a62dc353df0a82cdb44763ff24e273f47cfbe3082",
+          "log": "40-remaining-sim-native.log",
+          "log_sha256": "9a5bb02fc01fec8bd8c40e8ba805ed13353d67d974498afbd21d4200a890d655",
+          "input_mismatches": [],
+          "scope": "Actual shipped single-bail delivery/referenced ore and gem values with real refinery choice/payment; not source refinery Storage credit capacity or source Dock allow-list consumption.",
+          "source_path": "crates/sim/tests/ra5_shipped.rs",
+          "function_line_at_inspection": 831,
+          "source_sha256_at_command_start": "bc4447361bac33dbb17c2cb18cfd92c96c27c04a173b9c6ab0fcae1b5b1a0fa3",
+          "source_sha256_at_inspection": "c902ec652fbc9f86c6b3f08a74f09e185b4c86f6359524bd64e6a7d9a11feb4a",
+          "source_qualification": "Actual retained run scope only; current source inspection/hash is separate and may include later formatting/test additions. No combined final-source suite, source-flag reader or original-engine fidelity claim."
+        },
+        {
+          "target": "ra8_ai",
+          "test": "ra8_real_armed_worker_income_keeps_native_paid_repairs_and_harvesting",
+          "observed": "ok",
+          "raw_line": 22,
+          "command_exit": 0,
+          "receipt": "83-shared-ai-policy-controls.json",
+          "receipt_sha256": "3e2065ecd6f34b4a54ddd86ac4ad58624310c181fadd73f76c1b1e385f3394d7",
+          "log": "83-shared-ai-policy-controls.log",
+          "log_sha256": "2997067e5dca6cfdf2fe7264975d045550670ac309ab55032495657908171fce",
+          "input_mismatches": [],
+          "scope": "Actual real worker income/paidrepair/harvest AI common route; no original Storage2000 cap compliance.",
+          "source_path": "crates/sim/tests/ra8_ai.rs",
+          "function_line_at_inspection": 8363,
+          "source_sha256_at_command_start": "5bc1c793df5c0c1be87155d56faec70fc59ca2dcfdc71e64cddc4cbce495a15a",
+          "source_sha256_at_inspection": "6f0bae19b180098e6d2cf2376a257c3ccec2c924c285a3c0d13ffc440bda42a8",
+          "source_qualification": "Actual retained run scope only; current source inspection/hash is separate and may include later formatting/test additions. No combined final-source suite, source-flag reader or original-engine fidelity claim."
+        }
+      ],
+      "qualification": "Current implemented branch only; caller/tuple/source atoms still need their exact new loaded/source guard execution and A-owned decision/binding. Never Native/source-key consumption, original fidelity or per-flag/type execution by fiat."
+    },
+    {
+      "route": "native/completion/current-paid-production",
+      "kind": "native",
+      "exact_atoms": [
+        "rules:AMRADR:Helipad[whole]",
+        "rules:GAAIRC:Helipad[whole]",
+        "rules:GACNST:ConstructionYard[whole]",
+        "rules:GAPILE:GDIBarracks[whole]",
+        "rules:GAWEAP:WeaponsFactory[whole]",
+        "rules:GAYARD:WeaponsFactory[whole]",
+        "rules:NACLON:NODBarracks[whole]",
+        "rules:NACNST:ConstructionYard[whole]",
+        "rules:NAHAND:NODBarracks[whole]",
+        "rules:NAWEAP:WeaponsFactory[whole]",
+        "rules:NAYARD:WeaponsFactory[whole]"
+      ],
+      "atom_count": 11,
+      "status": "ACTUAL_PRELIMINARY_NAMED_SUCCESS_WITH_EXACT_COMMON_PATH_SCOPE",
+      "evidence": [
+        {
+          "target": "ra2_shipped",
+          "test": "a_base_is_built_from_an_mcv_in_the_time_the_build_time_formula_gives",
+          "observed": "ok",
+          "raw_line": 13,
+          "command_exit": 0,
+          "receipt": "103-current-shared-policy-controls.json",
+          "receipt_sha256": "3037fa3a6c0d905581832bc44ff6f0ece373997a4f1edd919fe9d2c28195d17f",
+          "log": "103-current-shared-policy-controls.log",
+          "log_sha256": "c41fcdd0718a3ae02123b536dc49a1d8206ee5bc83d6782cf57654ad093c63b1",
+          "input_mismatches": [],
+          "scope": "Real shipped paid MCV/base/construction/production accounting common path. Does not claim individual GAAIRC/AMRADR aircraft production was observed; parsed Factory/aircraftDock/type premises remain new loaded guards pending.",
+          "source_path": "crates/sim/tests/ra2_shipped.rs",
+          "function_line_at_inspection": 354,
+          "source_sha256_at_command_start": "985dd0b308373a8e67fe3e11ad7d5e0abd48d6af48ab95275ea3534d9a163df8",
+          "source_sha256_at_inspection": "985dd0b308373a8e67fe3e11ad7d5e0abd48d6af48ab95275ea3534d9a163df8",
+          "source_qualification": "Actual retained run scope only; current source inspection/hash is separate and may include later formatting/test additions. No combined final-source suite, source-flag reader or original-engine fidelity claim."
+        },
+        {
+          "target": "ra8_ai",
+          "test": "ra8_lost_prerequisites_cancel_only_incomplete_paid_heads_then_rebuild_and_resume",
+          "observed": "ok",
+          "raw_line": 11,
+          "command_exit": 0,
+          "receipt": "105-qualified-ai-branch-controls.json",
+          "receipt_sha256": "7e82d686a2633eb13bf428bf502379994a7fb0e5053d07638c5d695278cb3871",
+          "log": "105-qualified-ai-branch-controls.log",
+          "log_sha256": "c60dff25d42b791b9b4815c10f4daf177ddc2103f422bce98c53ea6cbe2a6e6f",
+          "input_mismatches": [],
+          "scope": "Actual native paid prerequisite recovery/common queue path, scoped by retained body; not a Helipad flag consumer.",
+          "source_path": "crates/sim/tests/ra8_ai.rs",
+          "function_line_at_inspection": 5954,
+          "source_sha256_at_command_start": "6f0bae19b180098e6d2cf2376a257c3ccec2c924c285a3c0d13ffc440bda42a8",
+          "source_sha256_at_inspection": "6f0bae19b180098e6d2cf2376a257c3ccec2c924c285a3c0d13ffc440bda42a8",
+          "source_qualification": "Actual retained run scope only; current source inspection/hash is separate and may include later formatting/test additions. No combined final-source suite, source-flag reader or original-engine fidelity claim."
+        }
+      ],
+      "qualification": "Current implemented branch only; caller/tuple/source atoms still need their exact new loaded/source guard execution and A-owned decision/binding. Never Native/source-key consumption, original fidelity or per-flag/type execution by fiat."
+    },
+    {
+      "route": "native/completion/current-powered-sensor",
+      "kind": "native",
+      "exact_atoms": [
+        "rules:NAPSIS:SensorArray[whole]",
+        "rules:NAPSIS:SensorsSight[whole]"
+      ],
+      "atom_count": 2,
+      "status": "ACTUAL_PRELIMINARY_NAMED_SUCCESS_WITH_EXACT_COMMON_PATH_SCOPE",
+      "evidence": [
+        {
+          "target": "ra7_vision",
+          "test": "ra7_sensor_detects_spy_at_fifteen_but_not_sixteen_and_needs_power",
+          "observed": "ok",
+          "raw_line": 46,
+          "command_exit": 101,
+          "receipt": "121-final-shared-permission-privacy-controls.json",
+          "receipt_sha256": "6ebf602faa045b308ab13855c14ae03835f1de45967e94215855723724dd6257",
+          "log": "121-final-shared-permission-privacy-controls.log",
+          "log_sha256": "52f57b10134e3a401083e274569c44b454eb6ded2d1805217e6cbbb1c8eedb55",
+          "input_mismatches": [],
+          "scope": "Stock powered Sensor15/16 real Spy concealment and reactorHP0-controlled power loss. Does not imply inactive SensorsSight field drives the fixed Sensor role, or a command inflicted that HP0 setup.",
+          "source_path": "crates/sim/tests/ra7_vision.rs",
+          "function_line_at_inspection": 208,
+          "source_sha256_at_command_start": "94e278acc2712fa8602937a02a54ca1e1f3fd87950385179fc9afdc23f967b1f",
+          "source_sha256_at_inspection": "94e278acc2712fa8602937a02a54ca1e1f3fd87950385179fc9afdc23f967b1f",
+          "source_qualification": "Actual retained run scope only; current source inspection/hash is separate and may include later formatting/test additions. No combined final-source suite, source-flag reader or original-engine fidelity claim."
+        }
+      ],
+      "qualification": "Current implemented branch only; caller/tuple/source atoms still need their exact new loaded/source guard execution and A-owned decision/binding. Never Native/source-key consumption, original fidelity or per-flag/type execution by fiat."
+    },
+    {
+      "route": "native/completion/current-spy-copy-move",
+      "kind": "native",
+      "exact_atoms": [
+        "rules:SPY:Agent[whole]",
+        "rules:SPY:Infiltrate[whole]"
+      ],
+      "atom_count": 2,
+      "status": "ACTUAL_PRELIMINARY_NAMED_SUCCESS_WITH_EXACT_COMMON_PATH_SCOPE",
+      "evidence": [
+        {
+          "target": "ra6_infantry",
+          "test": "ra6_spy_disguise_default_copy_and_dog_detection",
+          "observed": "ok",
+          "raw_line": 16,
+          "command_exit": 0,
+          "receipt": "129-final-three-shared-controls.json",
+          "receipt_sha256": "587ccb53a908c452f96829ca9883e268a767a805508c2289bbba86047b54773b",
+          "log": "129-final-three-shared-controls.log",
+          "log_sha256": "52ec53b71cd6af567dcb7c882c49a2fdecf3eaf3823f87cd56fa6ee69399f392",
+          "input_mismatches": [],
+          "scope": "Stock real default/copied Conscript disguise, publicMove changed+arrived cell/no pendingstep, same copied disguise throughout, actual Dog detection. No original Agent flag parser or real Spy client render claim.",
+          "source_path": "crates/sim/tests/ra6_infantry.rs",
+          "function_line_at_inspection": 432,
+          "source_sha256_at_command_start": "6e578c484833ce37617a63d885163a45bde0892bb467c2309a58fd1e0ba7198f",
+          "source_sha256_at_inspection": "6e578c484833ce37617a63d885163a45bde0892bb467c2309a58fd1e0ba7198f",
+          "source_qualification": "Actual retained run scope only; current source inspection/hash is separate and may include later formatting/test additions. No combined final-source suite, source-flag reader or original-engine fidelity claim."
+        }
+      ],
+      "qualification": "Current implemented branch only; caller/tuple/source atoms still need their exact new loaded/source guard execution and A-owned decision/binding. Never Native/source-key consumption, original fidelity or per-flag/type execution by fiat."
+    },
+    {
+      "route": "static/completion/building-ammo",
+      "kind": "static",
+      "exact_atoms": [
+        "rules:CAAIRP:Ammo[whole]"
+      ],
+      "atom_count": 1,
+      "status": "CURRENT_SOURCE_INSPECTED_NOT_NATIVE_OR_LOADED_EXECUTION",
+      "evidence": {
+        "source": "completion.rs",
+        "source_scope": "Actual installed source contracts/branch code and pinned code guard construction inspected; source files/anchors below. This is not execution or original unused proof."
+      }
+    },
+    {
+      "route": "static/completion/factory-alias",
+      "kind": "static",
+      "exact_atoms": [
+        "rules:AMRADR:Helipad[whole]",
+        "rules:GAAIRC:Helipad[whole]",
+        "rules:GACNST:ConstructionYard[whole]",
+        "rules:GAPILE:GDIBarracks[whole]",
+        "rules:GAWEAP:WeaponsFactory[whole]",
+        "rules:GAYARD:WeaponsFactory[whole]",
+        "rules:NACLON:NODBarracks[whole]",
+        "rules:NACNST:ConstructionYard[whole]",
+        "rules:NAHAND:NODBarracks[whole]",
+        "rules:NAWEAP:WeaponsFactory[whole]",
+        "rules:NAYARD:WeaponsFactory[whole]"
+      ],
+      "atom_count": 11,
+      "status": "CURRENT_SOURCE_INSPECTED_NOT_NATIVE_OR_LOADED_EXECUTION",
+      "evidence": {
+        "source": "completion.rs",
+        "source_scope": "Actual installed source contracts/branch code and pinned code guard construction inspected; source files/anchors below. This is not execution or original unused proof."
+      }
+    },
+    {
+      "route": "static/completion/ground-dock",
+      "kind": "static",
+      "exact_atoms": [
+        "rules:CMIN:Dock[whole]",
+        "rules:HARV:Dock[whole]"
+      ],
+      "atom_count": 2,
+      "status": "CURRENT_SOURCE_INSPECTED_NOT_NATIVE_OR_LOADED_EXECUTION",
+      "evidence": {
+        "source": "completion.rs",
+        "source_scope": "Actual installed source contracts/branch code and pinned code guard construction inspected; source files/anchors below. This is not execution or original unused proof."
+      }
+    },
+    {
+      "route": "static/completion/ivan-role",
+      "kind": "static",
+      "exact_atoms": [
+        "rules:CIVAN:Ivan[whole]",
+        "rules:IVAN:Ivan[whole]"
+      ],
+      "atom_count": 2,
+      "status": "CURRENT_SOURCE_INSPECTED_NOT_NATIVE_OR_LOADED_EXECUTION",
+      "evidence": {
+        "source": "completion.rs",
+        "source_scope": "Actual installed source contracts/branch code and pinned code guard construction inspected; source files/anchors below. This is not execution or original unused proof."
+      }
+    },
+    {
+      "route": "static/completion/neutral-base",
+      "kind": "static",
+      "exact_atoms": [
+        "rules:CAOUTP:IsBase[whole]",
+        "rules:CATHOSP:IsBase[whole]"
+      ],
+      "atom_count": 2,
+      "status": "CURRENT_SOURCE_INSPECTED_NOT_NATIVE_OR_LOADED_EXECUTION",
+      "evidence": {
+        "source": "completion.rs",
+        "source_scope": "Actual installed source contracts/branch code and pinned code guard construction inspected; source files/anchors below. This is not execution or original unused proof."
+      }
+    },
+    {
+      "route": "static/completion/nuke-role",
+      "kind": "static",
+      "exact_atoms": [
+        "rules:NAMISL:NukeSilo[whole]"
+      ],
+      "atom_count": 1,
+      "status": "CURRENT_SOURCE_INSPECTED_NOT_NATIVE_OR_LOADED_EXECUTION",
+      "evidence": {
+        "source": "completion.rs",
+        "source_scope": "Actual installed source contracts/branch code and pinned code guard construction inspected; source files/anchors below. This is not execution or original unused proof."
+      }
+    },
+    {
+      "route": "static/completion/powerup-animation",
+      "kind": "static",
+      "exact_atoms": [
+        "rules:Powerups:Armor[1]",
+        "rules:Powerups:Cloak[1]",
+        "rules:Powerups:Darkness[1]",
+        "rules:Powerups:Explosion[1]",
+        "rules:Powerups:Firepower[1]",
+        "rules:Powerups:Gas[1]",
+        "rules:Powerups:HealBase[1]",
+        "rules:Powerups:ICBM[1]",
+        "rules:Powerups:Invulnerability[1]",
+        "rules:Powerups:IonStorm[1]",
+        "rules:Powerups:Money[1]",
+        "rules:Powerups:Napalm[1]",
+        "rules:Powerups:Pod[1]",
+        "rules:Powerups:Reveal[1]",
+        "rules:Powerups:Speed[1]",
+        "rules:Powerups:Squad[1]",
+        "rules:Powerups:Tiberium[1]",
+        "rules:Powerups:Unit[1]",
+        "rules:Powerups:Veteran[1]"
+      ],
+      "atom_count": 19,
+      "status": "CURRENT_SOURCE_INSPECTED_NOT_NATIVE_OR_LOADED_EXECUTION",
+      "evidence": {
+        "source": "completion.rs",
+        "source_scope": "Actual installed source contracts/branch code and pinned code guard construction inspected; source files/anchors below. This is not execution or original unused proof."
+      }
+    },
+    {
+      "route": "static/completion/powerup-inactive-argument",
+      "kind": "static",
+      "exact_atoms": [
+        "rules:Powerups:Explosion[3]",
+        "rules:Powerups:Gas[3]",
+        "rules:Powerups:Invulnerability[3]",
+        "rules:Powerups:Napalm[3]"
+      ],
+      "atom_count": 4,
+      "status": "CURRENT_SOURCE_INSPECTED_NOT_NATIVE_OR_LOADED_EXECUTION",
+      "evidence": {
+        "source": "completion.rs",
+        "source_scope": "Actual installed source contracts/branch code and pinned code guard construction inspected; source files/anchors below. This is not execution or original unused proof."
+      }
+    },
+    {
+      "route": "static/completion/powerup-water",
+      "kind": "static",
+      "exact_atoms": [
+        "rules:Powerups:Armor[2]",
+        "rules:Powerups:Cloak[2]",
+        "rules:Powerups:Darkness[2]",
+        "rules:Powerups:Explosion[2]",
+        "rules:Powerups:Firepower[2]",
+        "rules:Powerups:Gas[2]",
+        "rules:Powerups:HealBase[2]",
+        "rules:Powerups:ICBM[2]",
+        "rules:Powerups:Invulnerability[2]",
+        "rules:Powerups:IonStorm[2]",
+        "rules:Powerups:Money[2]",
+        "rules:Powerups:Napalm[2]",
+        "rules:Powerups:Pod[2]",
+        "rules:Powerups:Reveal[2]",
+        "rules:Powerups:Speed[2]",
+        "rules:Powerups:Squad[2]",
+        "rules:Powerups:Tiberium[2]",
+        "rules:Powerups:Unit[2]",
+        "rules:Powerups:Veteran[2]"
+      ],
+      "atom_count": 19,
+      "status": "CURRENT_SOURCE_INSPECTED_NOT_NATIVE_OR_LOADED_EXECUTION",
+      "evidence": {
+        "source": "completion.rs",
+        "source_scope": "Actual installed source contracts/branch code and pinned code guard construction inspected; source files/anchors below. This is not execution or original unused proof."
+      }
+    },
+    {
+      "route": "static/completion/prism-count",
+      "kind": "static",
+      "exact_atoms": [
+        "rules:SREF:WeaponCount[whole]"
+      ],
+      "atom_count": 1,
+      "status": "CURRENT_SOURCE_INSPECTED_NOT_NATIVE_OR_LOADED_EXECUTION",
+      "evidence": {
+        "source": "completion.rs",
+        "source_scope": "Actual installed source contracts/branch code and pinned code guard construction inspected; source files/anchors below. This is not execution or original unused proof."
+      }
+    },
+    {
+      "route": "static/completion/refinery-docks",
+      "kind": "static",
+      "exact_atoms": [
+        "rules:GAREFN:NumberOfDocks[whole]",
+        "rules:NAREFN:NumberOfDocks[whole]"
+      ],
+      "atom_count": 2,
+      "status": "CURRENT_SOURCE_INSPECTED_NOT_NATIVE_OR_LOADED_EXECUTION",
+      "evidence": {
+        "source": "completion.rs",
+        "source_scope": "Actual installed source contracts/branch code and pinned code guard construction inspected; source files/anchors below. This is not execution or original unused proof."
+      }
+    },
+    {
+      "route": "static/completion/refinery-storage",
+      "kind": "static",
+      "exact_atoms": [
+        "rules:GAREFN:Storage[whole]",
+        "rules:NAREFN:Storage[whole]"
+      ],
+      "atom_count": 2,
+      "status": "CURRENT_SOURCE_INSPECTED_NOT_NATIVE_OR_LOADED_EXECUTION",
+      "evidence": {
+        "source": "completion.rs",
+        "source_scope": "Actual installed source contracts/branch code and pinned code guard construction inspected; source files/anchors below. This is not execution or original unused proof."
+      }
+    },
+    {
+      "route": "static/completion/registry-mapping",
+      "kind": "static",
+      "exact_atoms": [
+        "rules:AircraftTypes:2[whole]",
+        "rules:AircraftTypes:3[whole]",
+        "rules:AircraftTypes:4[whole]",
+        "rules:AircraftTypes:5[whole]",
+        "rules:AircraftTypes:6[whole]",
+        "rules:AircraftTypes:7[whole]",
+        "rules:AircraftTypes:8[whole]",
+        "rules:BuildingTypes:106[whole]",
+        "rules:BuildingTypes:10[whole]",
+        "rules:BuildingTypes:11[whole]",
+        "rules:BuildingTypes:12[whole]",
+        "rules:BuildingTypes:132[whole]",
+        "rules:BuildingTypes:136[whole]",
+        "rules:BuildingTypes:13[whole]",
+        "rules:BuildingTypes:145[whole]",
+        "rules:BuildingTypes:14[whole]",
+        "rules:BuildingTypes:15[whole]",
+        "rules:BuildingTypes:16[whole]",
+        "rules:BuildingTypes:17[whole]",
+        "rules:BuildingTypes:19[whole]",
+        "rules:BuildingTypes:1[whole]",
+        "rules:BuildingTypes:21[whole]",
+        "rules:BuildingTypes:22[whole]",
+        "rules:BuildingTypes:24[whole]",
+        "rules:BuildingTypes:25[whole]",
+        "rules:BuildingTypes:26[whole]",
+        "rules:BuildingTypes:27[whole]",
+        "rules:BuildingTypes:28[whole]",
+        "rules:BuildingTypes:2[whole]",
+        "rules:BuildingTypes:30[whole]",
+        "rules:BuildingTypes:31[whole]",
+        "rules:BuildingTypes:3[whole]",
+        "rules:BuildingTypes:4[whole]",
+        "rules:BuildingTypes:54[whole]",
+        "rules:BuildingTypes:55[whole]",
+        "rules:BuildingTypes:56[whole]",
+        "rules:BuildingTypes:62[whole]",
+        "rules:BuildingTypes:63[whole]",
+        "rules:BuildingTypes:64[whole]",
+        "rules:BuildingTypes:65[whole]",
+        "rules:BuildingTypes:66[whole]",
+        "rules:BuildingTypes:67[whole]",
+        "rules:BuildingTypes:68[whole]",
+        "rules:BuildingTypes:69[whole]",
+        "rules:BuildingTypes:6[whole]",
+        "rules:BuildingTypes:70[whole]",
+        "rules:BuildingTypes:71[whole]",
+        "rules:BuildingTypes:72[whole]",
+        "rules:BuildingTypes:73[whole]",
+        "rules:BuildingTypes:74[whole]",
+        "rules:BuildingTypes:75[whole]",
+        "rules:BuildingTypes:7[whole]",
+        "rules:BuildingTypes:8[whole]",
+        "rules:VehicleTypes:10[whole]",
+        "rules:VehicleTypes:14[whole]",
+        "rules:VehicleTypes:15[whole]",
+        "rules:VehicleTypes:16[whole]",
+        "rules:VehicleTypes:17[whole]",
+        "rules:VehicleTypes:18[whole]",
+        "rules:VehicleTypes:19[whole]",
+        "rules:VehicleTypes:1[whole]",
+        "rules:VehicleTypes:20[whole]",
+        "rules:VehicleTypes:21[whole]",
+        "rules:VehicleTypes:22[whole]",
+        "rules:VehicleTypes:23[whole]",
+        "rules:VehicleTypes:24[whole]",
+        "rules:VehicleTypes:25[whole]",
+        "rules:VehicleTypes:26[whole]",
+        "rules:VehicleTypes:27[whole]",
+        "rules:VehicleTypes:28[whole]",
+        "rules:VehicleTypes:2[whole]",
+        "rules:VehicleTypes:32[whole]",
+        "rules:VehicleTypes:36[whole]",
+        "rules:VehicleTypes:37[whole]",
+        "rules:VehicleTypes:39[whole]",
+        "rules:VehicleTypes:3[whole]",
+        "rules:VehicleTypes:40[whole]",
+        "rules:VehicleTypes:41[whole]",
+        "rules:VehicleTypes:44[whole]",
+        "rules:VehicleTypes:4[whole]",
+        "rules:VehicleTypes:5[whole]"
+      ],
+      "atom_count": 81,
+      "status": "CURRENT_SOURCE_INSPECTED_NOT_NATIVE_OR_LOADED_EXECUTION",
+      "evidence": {
+        "source": "completion-whole.rs",
+        "source_scope": "Actual installed source contracts/branch code and pinned code guard construction inspected; source files/anchors below. This is not execution or original unused proof."
+      }
+    },
+    {
+      "route": "static/completion/sensor-mask",
+      "kind": "static",
+      "exact_atoms": [
+        "rules:NAPSIS:SensorArray[whole]",
+        "rules:NAPSIS:SensorsSight[whole]"
+      ],
+      "atom_count": 2,
+      "status": "CURRENT_SOURCE_INSPECTED_NOT_NATIVE_OR_LOADED_EXECUTION",
+      "evidence": {
+        "source": "completion.rs",
+        "source_scope": "Actual installed source contracts/branch code and pinned code guard construction inspected; source files/anchors below. This is not execution or original unused proof."
+      }
+    },
+    {
+      "route": "static/completion/spy-role",
+      "kind": "static",
+      "exact_atoms": [
+        "rules:SPY:Agent[whole]",
+        "rules:SPY:Infiltrate[whole]"
+      ],
+      "atom_count": 2,
+      "status": "CURRENT_SOURCE_INSPECTED_NOT_NATIVE_OR_LOADED_EXECUTION",
+      "evidence": {
+        "source": "completion.rs",
+        "source_scope": "Actual installed source contracts/branch code and pinned code guard construction inspected; source files/anchors below. This is not execution or original unused proof."
+      }
+    },
+    {
+      "route": "static/completion/starting-twin",
+      "kind": "static",
+      "exact_atoms": [
+        "rules:DOG:AllowedToStartInMultiplayer[whole]",
+        "rules:SENGINEER:AllowedToStartInMultiplayer[whole]"
+      ],
+      "atom_count": 2,
+      "status": "CURRENT_SOURCE_INSPECTED_NOT_NATIVE_OR_LOADED_EXECUTION",
+      "evidence": {
+        "source": "completion.rs",
+        "source_scope": "Actual installed source contracts/branch code and pinned code guard construction inspected; source files/anchors below. This is not execution or original unused proof."
+      }
+    },
+    {
+      "route": "static/completion/unit-soylent-absence",
+      "kind": "static",
+      "exact_atoms": [
+        "rules:ADOG:Soylent[whole]",
+        "rules:CCOMAND:Soylent[whole]",
+        "rules:CIVAN:Soylent[whole]",
+        "rules:CLEG:Soylent[whole]",
+        "rules:DESO:Soylent[whole]",
+        "rules:DOG:Soylent[whole]",
+        "rules:E1:Soylent[whole]",
+        "rules:E2:Soylent[whole]",
+        "rules:ENGINEER:Soylent[whole]",
+        "rules:FLAKT:Soylent[whole]",
+        "rules:IVAN:Soylent[whole]",
+        "rules:JUMPJET:Soylent[whole]",
+        "rules:PTROOP:Soylent[whole]",
+        "rules:SENGINEER:Soylent[whole]",
+        "rules:SHK:Soylent[whole]",
+        "rules:SNIPE:Soylent[whole]",
+        "rules:SPY:Soylent[whole]",
+        "rules:TANY:Soylent[whole]",
+        "rules:TERROR:Soylent[whole]",
+        "rules:YURI:Soylent[whole]",
+        "rules:YURIPR:Soylent[whole]"
+      ],
+      "atom_count": 21,
+      "status": "CURRENT_SOURCE_INSPECTED_NOT_NATIVE_OR_LOADED_EXECUTION",
+      "evidence": {
+        "source": "completion-whole.rs",
+        "source_scope": "Actual installed source contracts/branch code and pinned code guard construction inspected; source files/anchors below. This is not execution or original unused proof."
+      }
+    }
+  ],
+  "source_inputs": {
+    "crates/sim/tests/ra9_audit/completion.rs": "4e2f1fbc0d1ab22ecca3a99f2d24a37ad53ba5794cd18ba0e165a91e47ce7cf4",
+    "crates/sim/tests/ra9_audit/completion-whole.rs": "0332985e6d31f75edd97966cba3137abc1d6e3621c904e76f4883e6972b2d95e",
+    "crates/sim/tests/ra9_audit/completion-local-contracts.tsv": "a5e90d069c09ab53a97bddb2ab54c5b7d377f31cbd8dab2783b80761681b47d2",
+    "crates/sim/tests/ra9_audit/completion-local-code.tsv": "c74d03897c275a23b13bd64b0c63cd09d617865d47211b8a58439bacd9245c57",
+    "crates/sim/tests/ra9_audit/completion-whole-contracts.tsv": "faab3926f92eb653ffe9ffa0e5d09af3ca8df6b5edfbdc29d4f576449063c690",
+    "ra9-preliminary-logs/137-actual-uncovered-reference-atoms.tsv": "98748ccb54124532df0a4f2b322dc1bad1fe5c7af4a18461e82221ab56e86bc5"
+  },
+  "actual_source_pins": {
+    "crates/sim/tests/ra9_audit/completion.rs::fn local_specs(": {
+      "path": "crates/sim/tests/ra9_audit/completion.rs",
+      "line": 95,
+      "exact_anchor": "fn local_specs(",
+      "sha256": "4e2f1fbc0d1ab22ecca3a99f2d24a37ad53ba5794cd18ba0e165a91e47ce7cf4"
+    },
+    "crates/sim/tests/ra9_audit/completion-whole.rs::pub(super) fn specs(": {
+      "path": "crates/sim/tests/ra9_audit/completion-whole.rs",
+      "line": 336,
+      "exact_anchor": "pub(super) fn specs(",
+      "sha256": "0332985e6d31f75edd97966cba3137abc1d6e3621c904e76f4883e6972b2d95e"
+    },
+    "crates/sim/src/crates.rs::    let water = world": {
+      "path": "crates/sim/src/crates.rs",
+      "line": 396,
+      "exact_anchor": "    let water = world",
+      "sha256": "d67cee7f076e765dee6ce80bc6c9ac8e43e61ee5dd6113c5a3cdfda6c2ba5675"
+    },
+    "scripts/generate_ra2_data.py::        self.infantry_list = tables.listed": {
+      "path": "scripts/generate_ra2_data.py",
+      "line": 820,
+      "exact_anchor": "        self.infantry_list = tables.listed",
+      "sha256": "7ad36719acf71c12aaeac6fd28894018be60fd78912c1f89a3757724da167163"
+    },
+    "scripts/generate_ra2_data.py::        lines += [\"    ],\", \"    refunds: [\"]": {
+      "path": "scripts/generate_ra2_data.py",
+      "line": 1083,
+      "exact_anchor": "        lines += [\"    ],\", \"    refunds: [\"]",
+      "sha256": "7ad36719acf71c12aaeac6fd28894018be60fd78912c1f89a3757724da167163"
+    }
+  },
+  "source_binding": "Owned/refreshed by A; this artifact does not assert a new root binding or modify decisions/records.",
+  "scope": "Exactly9 current native route labels reuse17 genuinely observed existing named bodies within stated scope. Static/code and loaded routes are distinct; loaded new module receipts PENDING. Active mappings/current exposed branches remain obligations, with no per-flag new native body or original sourceflag/media fidelity. Retained raw failures/mixed101 commands/source drift qualifications preserved.",
+  "specifically_not_claimed": [
+    "Hospital healing rate from capture-only body",
+    "Individual GAAIRC/AMRADR aircraft paid production from generic production body",
+    "CIVAN charge from IVAN charge or CIVAN movement alone",
+    "Natural CAAIRP readiness from controlled-charge airport body",
+    "Shipped water-effect distribution/all8water effects or original Water flag consumption",
+    "Native credit from static/loaded getter/source policy metadata",
+    "Final same-source suite/canonical/review/user visual acceptance"
+  ],
+  "counts": {
+    "atoms": 174,
+    "routes": 43,
+    "native_routes": 9,
+    "static_routes": 17,
+    "loaded_pending_routes": 17,
+    "classified_atoms": {
+      "CURRENT_MODEL_NONREAD": 143,
+      "INTENTIONAL_DIFFERENCE": 31
+    }
+  },
+  "no_Cargo_native_execution": true,
+  "no_source_table_acceptance_doc_writes": true,
+  "no_new_directories": true
+}

@@ -1100,6 +1100,7 @@ rules	CombatDamage	Crush	1.8
 rules	CombatDamage	DMislEliteWarhead	DMISLEWH
 rules	CombatDamage	DMislWarhead	DMISLWH
 rules	CombatDamage	DeathWeapon	DefaultDeathWeapon
+rules	CombatDamage	DefaultSparkSystem	SparkSys
 rules	CombatDamage	DestroyableBridges	yes
 rules	CombatDamage	ExpSpread	.7
 rules	CombatDamage	FireSupress	1
@@ -4380,6 +4381,12 @@ rules	SovietOccupyW	ROF	20
 rules	SovietOccupyW	Range	7
 rules	SovietOccupyW	Speed	100
 rules	SovietOccupyW	Warhead	SSAB
+rules	Spark	BehavesLike	Spark
+rules	Spark	MaxEC	500
+rules	SparkSys	BehavesLike	Spark
+rules	SparkSys	HoldsWhat	Spark
+rules	SparkSys	ParticleCap	6
+rules	SparkSys	SparkSpawnFrames	1
 rules	SpecialWeapons	EMPulseProjectile	PulsPr
 rules	SpecialWeapons	EMPulseWarhead	EMPuls
 rules	SpecialWeapons	HSBuilding	GAPLUG,NATMPL

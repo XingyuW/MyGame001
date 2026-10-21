@@ -1,0 +1,22 @@
+{
+  "utc": "2026-10-21T00:51:10.154839+00:00",
+  "ended_utc": "2026-10-21T00:54:33.511008+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "--",
+    "ra9_actual_source_policy_consumer_premises",
+    "ra9_legacy_original_family_records",
+    "fire_keys::ra9_",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit_code": 0,
+  "seconds": 203.355,
+  "lease": "RA8 revocable functional phase jobs1; actual static/loaded guards and targeted real fire native controls, no final policy credit",
+  "input_mismatches": []
+}

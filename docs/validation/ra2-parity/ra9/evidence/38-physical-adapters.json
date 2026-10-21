@@ -1,0 +1,21 @@
+{
+  "utc": "2026-10-20T23:20:02.711651+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "every_loaded_physical_adapter_reports_exact_failures_before_source_policy_admission",
+    "--",
+    "--exact",
+    "ra9_audit::every_loaded_physical_adapter_reports_exact_failures_before_source_policy_admission",
+    "--test-threads=1"
+  ],
+  "exit_code": 0,
+  "seconds": 191.591,
+  "lease": "RA8revocable functional phase jobs1",
+  "status": "actual preliminary full physical adapters; no source-policy disposition acceptance",
+  "input_mismatches": []
+}

@@ -1,0 +1,24 @@
+{
+  "utc": "2026-10-20T23:27:07.578935+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--no-fail-fast",
+    "--test",
+    "ra6_vehicles",
+    "--test",
+    "ra9_refinery_repair_liveness",
+    "--",
+    "ra9_behavior87_coordinate_move_admits_genuine_unexplored_destination",
+    "ra9_behavior87_real_base_elite_cloakable_shots_use_r51_surface_delay",
+    "ra9_command_destroyed_refinery_cannot_pay_a_delivery_later_in_economy",
+    "--test-threads=1"
+  ],
+  "exit_code": 0,
+  "seconds": 47.312,
+  "lease": "RA8revocable functional phase jobs1",
+  "status": "actual three corrected native fixture controls, no runtime changes",
+  "test_input_mismatches": []
+}

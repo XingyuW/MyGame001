@@ -1,0 +1,17 @@
+{
+  "utc": "2026-10-21T03:15:00.945429+00:00",
+  "files": [
+    {
+      "path": "crates/sim/tests/ra9_audit/mod.rs",
+      "before_sha256": "e3ee5fc401fb5a5457045a06fbfdcd8b099db3f6b3cff95f385b9d6e4d09593f",
+      "after_sha256": "75cec7d6bde4f68e7c1a6fe9b5842bdd92dd1c76136968244440d059568380da"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/policy-admission.rs",
+      "before_sha256": "117350df74fdcbded4ec6534e0c6aae9a6a5e83659ab6c9f085037bad05e566c",
+      "after_sha256": "e4dfaba8bf2c99b8ff2fd0225fd7f1999f127a50c265d941375b06f9e3de1a8f"
+    }
+  ],
+  "semantics": "Typed independent membership retains actual+allowedVec+deps; finish revalidates nonempty unique contains and set display, same source/dependency equality as Compared; scalar equality/difference unchanged. Immutable compile-time acceptance parser indexedonce, no live guards cached.",
+  "actual_runtime_and_core97_changed": false
+}

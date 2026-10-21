@@ -1,0 +1,16 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `release` profile [optimized] target(s) in 1m 27s
+     Running tests/ra9_data_parity.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_data_parity-4bf9e87c254d4d01)
+
+running 1 test
+Error: "completion102 typed mapped identity/category/domain/role/Cost/HP changed SourceKey { file: \"rules\", section: \"BuildingTypes\", key: \"136\" }"
+test ra9_audit::ra9_export_actual_completion174_atom_proposals ... FAILED
+
+failures:
+
+failures:
+    ra9_audit::ra9_export_actual_completion174_atom_proposals
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 179 filtered out; finished in 0.11s
+
+error: test failed, to rerun pass `-p sim --test ra9_data_parity`

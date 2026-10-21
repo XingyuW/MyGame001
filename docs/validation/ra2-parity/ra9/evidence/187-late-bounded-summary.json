@@ -1,0 +1,165 @@
+{
+  "end_utc": "2026-10-21T11:26:47.209876+00:00",
+  "results": [
+    {
+      "utc": "2026-10-21T11:18:52.785087+00:00",
+      "end_utc": "2026-10-21T11:23:25.761798+00:00",
+      "label": "positive",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "seconds": 272.976,
+      "phase04_ended_cancellation": false,
+      "scope": "FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_OR_ORIGINAL_ENGINE_ACCEPTANCE",
+      "source_before": "ra9-preliminary-logs/187-00-positive-start.json",
+      "source_drift_during_command": [],
+      "selected_target_mutated_sha256": "e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d",
+      "restoration_immediate": {
+        "utc": "2026-10-21T11:23:25.701418+00:00",
+        "sha256": "e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d"
+      },
+      "restoration_separate_later_read": {
+        "utc": "2026-10-21T11:23:25.761619+00:00",
+        "sha256": "e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d"
+      },
+      "raw": {
+        "path": "ra9-preliminary-logs/187-00-positive.log",
+        "bytes": 941,
+        "sha256": "bb46d8479d4bb38ceb22178e312611adf3e537951389fb4976f1c4506158cafc"
+      }
+    },
+    {
+      "utc": "2026-10-21T11:23:25.841795+00:00",
+      "end_utc": "2026-10-21T11:24:26.215750+00:00",
+      "label": "rng-causal",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 101,
+      "seconds": 60.374,
+      "phase04_ended_cancellation": false,
+      "scope": "FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_OR_ORIGINAL_ENGINE_ACCEPTANCE",
+      "source_before": "ra9-preliminary-logs/187-01-rng-causal-start.json",
+      "source_drift_during_command": [],
+      "selected_target_mutated_sha256": "177c1e15b0dc4b67c891620de46f4e5231af52331bb98c10e6480a080a0c4c12",
+      "restoration_immediate": {
+        "utc": "2026-10-21T11:24:26.155323+00:00",
+        "sha256": "e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d"
+      },
+      "restoration_separate_later_read": {
+        "utc": "2026-10-21T11:24:26.215540+00:00",
+        "sha256": "e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d"
+      },
+      "raw": {
+        "path": "ra9-preliminary-logs/187-01-rng-causal.log",
+        "bytes": 1081,
+        "sha256": "06db6b850e3e87f9463eea78cf07cf2598bf4d897364c3c1261a277136008e14"
+      }
+    },
+    {
+      "utc": "2026-10-21T11:24:26.299362+00:00",
+      "end_utc": "2026-10-21T11:25:36.720540+00:00",
+      "label": "production-observer-causal",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 101,
+      "seconds": 70.421,
+      "phase04_ended_cancellation": false,
+      "scope": "FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_OR_ORIGINAL_ENGINE_ACCEPTANCE",
+      "source_before": "ra9-preliminary-logs/187-02-production-observer-causal-start.json",
+      "source_drift_during_command": [],
+      "selected_target_mutated_sha256": "132ca178a44b825be37ba86b84a276514bbb768053d7f28b053c287f0066ce0a",
+      "restoration_immediate": {
+        "utc": "2026-10-21T11:25:36.660186+00:00",
+        "sha256": "e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d"
+      },
+      "restoration_separate_later_read": {
+        "utc": "2026-10-21T11:25:36.720375+00:00",
+        "sha256": "e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d"
+      },
+      "raw": {
+        "path": "ra9-preliminary-logs/187-02-production-observer-causal.log",
+        "bytes": 1275,
+        "sha256": "810b45378a6b8ef21e78e548bd52994ee6c44e5296229a3521c948b40b2f7769"
+      }
+    },
+    {
+      "utc": "2026-10-21T11:25:36.799132+00:00",
+      "end_utc": "2026-10-21T11:26:47.208851+00:00",
+      "label": "restored-positive",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "seconds": 70.409,
+      "phase04_ended_cancellation": false,
+      "scope": "FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_OR_ORIGINAL_ENGINE_ACCEPTANCE",
+      "source_before": "ra9-preliminary-logs/187-03-restored-positive-start.json",
+      "source_drift_during_command": [],
+      "selected_target_mutated_sha256": "e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d",
+      "restoration_immediate": {
+        "utc": "2026-10-21T11:26:47.148489+00:00",
+        "sha256": "e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d"
+      },
+      "restoration_separate_later_read": {
+        "utc": "2026-10-21T11:26:47.208696+00:00",
+        "sha256": "e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d"
+      },
+      "raw": {
+        "path": "ra9-preliminary-logs/187-03-restored-positive.log",
+        "bytes": 820,
+        "sha256": "679a3ddf187a6e4a1aa559c06d1765085ad16ebe80e623d3e65abcc1f80bd746"
+      }
+    }
+  ],
+  "owned_child_processes": "ALL_WAITED_AND_EXITED",
+  "phase04_done": false,
+  "target_restored_sha256": "e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d",
+  "source_before_after_drift": []
+}

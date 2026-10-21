@@ -1,0 +1,20 @@
+    Finished `release` profile [optimized] target(s) in 0.08s
+     Running tests/ra7_orders.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra7_orders-0c2ad18108b8efad)
+
+running 1 test
+
+thread 'ra9_attack_move_combat_at_destination_emits_only_one_completion_for_one_order' (14407457) panicked at crates/sim/tests/ra7_orders.rs:719:9:
+assertion `left == right` failed: one accepted order has one completion; enemy=true: [MoveCompleted { unit: SimId(0), retargeted: false }, WeaponFired { attacker: SimId(0), target: SimId(1), weapon: WeaponKind(44) }, DamageStateChanged { player: PlayerId(1), id: SimId(1), state: Red }, UnitDestroyed { player: PlayerId(1), unit: SimId(1) }, MoveCompleted { unit: SimId(0), retargeted: false }]
+  left: 2
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra9_attack_move_combat_at_destination_emits_only_one_completion_for_one_order ... FAILED
+
+failures:
+
+failures:
+    ra9_attack_move_combat_at_destination_emits_only_one_completion_for_one_order
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.03s
+
+error: test failed, to rerun pass `-p sim --test ra7_orders`

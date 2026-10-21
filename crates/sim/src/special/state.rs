@@ -46,6 +46,12 @@ pub struct SpecialState {
     pub rearming: BTreeMap<SimId, u32>,
     pub carrier_flights: BTreeMap<SimId, SimId>,
     pub interactions: BTreeMap<SimId, SimId>,
+    /// DEFUSE-only jobs: actor -> (host, actor owner at selection).
+    pub auto_defuses: BTreeMap<SimId, (SimId, PlayerId)>,
+    /// Accepted replacements suppress re-selection for the current tick only.
+    pub auto_defuse_cancelled: BTreeMap<SimId, u64>,
+    /// Separate from strategic timer announcements, including generic fixture buildings.
+    pub revealed_owners: BTreeMap<SimId, PlayerId>,
     pub hidden: BTreeSet<(PlayerId, SimId)>,
     pub outages: BTreeMap<PlayerId, u64>,
     /// Vehicles docked at a building that repairs units, by vehicle (RA2: `unit_repair`, the
@@ -55,7 +61,7 @@ pub struct SpecialState {
     /// RA4 (`crate::flight`): the volleys an aircraft with ammunition has left, for every one
     /// that has fewer than its type's `ammo` (0: it must reload before it fires again).
     pub ammo: BTreeMap<SimId, u32>,
-    /// The ticks an aircraft has stood on its dock toward its next round.
+    /// The ticks an aircraft has stood on its dock toward its next ammunition or paid health step.
     pub reloading: BTreeMap<SimId, u32>,
     /// The dock of an airport bound aircraft: the building, and which of its docks.
     pub docks: BTreeMap<SimId, (SimId, u8)>,
@@ -69,6 +75,25 @@ pub struct SpecialState {
     pub surfaced: BTreeMap<SimId, u64>,
 }
 impl SpecialState {
+    /// Every nested passenger below `root`, once, in stable id order. Root ownership applies
+    /// to its off-map descendants. The visited set also bounds malformed cyclic state.
+    pub(crate) fn cargo_descendants(&self, root: SimId) -> Vec<&Passenger> {
+        let mut visited = BTreeSet::from([root]);
+        let mut pending = BTreeSet::from([root]);
+        let mut passengers = Vec::new();
+        while let Some(host) = pending.pop_first() {
+            if let Some(children) = self.cargo.get(&host) {
+                for passenger in children {
+                    if visited.insert(passenger.id) {
+                        pending.insert(passenger.id);
+                        passengers.push(passenger);
+                    }
+                }
+            }
+        }
+        passengers.sort_unstable_by_key(|passenger| passenger.id);
+        passengers
+    }
     /// The visible infantry appearance of an undetected spy, without exposing its true kind.
     pub fn disguise_for(&self, viewer: PlayerId, id: SimId) -> Option<UnitKind> {
         self.hidden
@@ -202,6 +227,28 @@ impl SpecialState {
         for (id, t) in &self.interactions {
             h.write_u32(id.0);
             h.write_u32(t.0);
+        }
+        if !self.auto_defuses.is_empty() || !self.auto_defuse_cancelled.is_empty() {
+            h.write(b"auto-defuse");
+            h.write_u64(self.auto_defuses.len() as u64);
+            for (actor, (host, owner)) in &self.auto_defuses {
+                h.write_u32(actor.0);
+                h.write_u32(host.0);
+                h.write(&[owner.0]);
+            }
+            h.write_u64(self.auto_defuse_cancelled.len() as u64);
+            for (actor, tick) in &self.auto_defuse_cancelled {
+                h.write_u32(actor.0);
+                h.write_u64(*tick);
+            }
+        }
+        if !self.revealed_owners.is_empty() {
+            h.write(b"public-building-reveals");
+            h.write_u64(self.revealed_owners.len() as u64);
+            for (id, owner) in &self.revealed_owners {
+                h.write_u32(id.0);
+                h.write(&[owner.0]);
+            }
         }
         h.write_u64(self.hidden.len() as u64);
         for (p, id) in &self.hidden {

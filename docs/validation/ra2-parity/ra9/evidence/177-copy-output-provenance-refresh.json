@@ -1,0 +1,126 @@
+{
+  "utc": "2026-10-21T10:30:30.335193+00:00",
+  "status": "COPY_ONLY_CURRENT_OUTCOME_PROVENANCE_REFRESH_NOT_FINAL_ACCEPTANCE_NO_CANONICAL_WRITES_OR_NATIVE_COMMANDS",
+  "records": [
+    {
+      "path": "README.md",
+      "before_sha256": "db339d0a6055476dedd1606dc4106a6553c5107a5dd613a6a139d762108a10ec",
+      "after_sha256": "5819863814cf6a4658138a5d495f7231012f024be8bbdc495f42e9765b975915",
+      "preimage": "ra9-preliminary-logs/177-before-README.md"
+    },
+    {
+      "path": "docs/HANDOFF.md",
+      "before_sha256": "b623882d9dc3b78ca9e85548c95eae24976ae4180067795380e365c512e174af",
+      "after_sha256": "70cef5258d1bdb179869fb773113ac2b8d3e80d089571a400f26ae2a7d018840",
+      "preimage": "ra9-preliminary-logs/177-before-docs__HANDOFF.md"
+    },
+    {
+      "path": "docs/CONSTRUCTION_SYSTEM.md",
+      "before_sha256": "dfa7ca3f73199794cada344efd8e78a6ae83dd78a2bbadc8b12a231f3f2ca9df",
+      "after_sha256": "38949a0fde6fa41e8d8fe45e0d427cb17849ad5661ca4e728e15c63a1ca092f2",
+      "preimage": "ra9-preliminary-logs/177-before-docs__CONSTRUCTION_SYSTEM.md"
+    },
+    {
+      "path": "docs/RA2_GAP_ANALYSIS.md",
+      "before_sha256": "a34e1be0d9d67bc598af872687b46a23f2b42fb9a641289587fcfd203e6db085",
+      "after_sha256": "c716adfec5442b01589734f1d0b9f3c17db097a3a7c7e6c28db473313352b382",
+      "preimage": "ra9-preliminary-logs/177-before-docs__RA2_GAP_ANALYSIS.md"
+    },
+    {
+      "path": "docs/RA2_HISTORICAL_DEBT.tsv",
+      "before_sha256": "62969e4b2d5836c6abe344bb785abed1de5805dcc63b9f22f9ffc4bdd5e0f9b7",
+      "after_sha256": "4813965d1ee7de2463cf913416c703b9a43b876fab7f77f7328f914bda1798ba",
+      "preimage": "ra9-preliminary-logs/177-before-docs__RA2_HISTORICAL_DEBT.tsv"
+    },
+    {
+      "path": "assets/LICENSES.md",
+      "before_sha256": "da2bd99445dbf418b12d63d28353813fc3daad9c60ec53cb17c0eb0622d8042d",
+      "after_sha256": "aa68e91df6e04901776dc8e956130739fa686c1c218118b6053b2ee7656a1421",
+      "preimage": "ra9-preliminary-logs/177-before-assets__LICENSES.md"
+    },
+    {
+      "path": "docs/RA9_INTEGRATION_CHECKLIST.md",
+      "before_sha256": "75ed2a7709754267b969b0f2790a2970b6bf44ba4e7cb0a2a35a614ebc2270ce",
+      "after_sha256": "735f78f8100e0683df327dee3196415ccfc063c49944190f58ba9a71c5932dc6",
+      "preimage": "ra9-preliminary-logs/177-before-docs__RA9_INTEGRATION_CHECKLIST.md"
+    },
+    {
+      "path": "docs/STATUS.md",
+      "before_sha256": "c53134cee304bf5130b964406665b88e1ae34ed172eeac105862c3540fb73576",
+      "after_sha256": "387456a26d677063f724ec8755e61860356725e1f0aaa5b74b7da29b3a7c0b6e",
+      "preimage": "ra9-preliminary-logs/177-before-docs__STATUS.md"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-review-requirements.md",
+      "before_sha256": "1681351f14434a8d93a29bacb7aadbe9de88f30d83e2864f237d11873881c033",
+      "after_sha256": "1557e19fec06e103d1b6c612500e84c801e1f3bd0ed1ad6ac30ff1f9b8c46740",
+      "preimage": "ra9-preliminary-logs/177-before-docs__reviews__RA2-parity-review-requirements.md"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-reviews-outstanding.md",
+      "before_sha256": "297ec0681690c3a0a46b699d0414b7c62ab8c8cf6cc3e277c58e4f25ab60b469",
+      "after_sha256": "cb202cf6897fca1db8cf4f06bd3bf8bbace1defe76db7b5b83776678633d5712",
+      "preimage": "ra9-preliminary-logs/177-before-docs__reviews__RA2-parity-reviews-outstanding.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/README.md",
+      "before_sha256": "6ae473ff0460238bdb4f1c130fb8b551ce3ad79d19d1ff5c60fffca4b6925c6b",
+      "after_sha256": "7b5ec0cb8a36e13adaa74d26c61f675232dbce6139f1cc5e494cf46cdf6a7f00",
+      "preimage": "ra9-preliminary-logs/177-before-docs__prompts__ra2-parity-review__README.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-sim1.md",
+      "before_sha256": "c34d5ff8c0569547670755650d8e08fb4825cfd756b2913da103a21cc0b752be",
+      "after_sha256": "d2f7833e92d1a4a6a539b5d8a21b5d293a6cab4493ffd103c99d21a80594ec66",
+      "preimage": "ra9-preliminary-logs/177-before-docs__prompts__ra2-parity-review__slice-sim1.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-sim2.md",
+      "before_sha256": "7b08fd360761d847147036e596f449f5a03f473b2ae62c53e632d7594fea1bbf",
+      "after_sha256": "4828b6eac188351018c81af88b2322779ec5e2f0c769a8e8116e6e1b0bb12d5c",
+      "preimage": "ra9-preliminary-logs/177-before-docs__prompts__ra2-parity-review__slice-sim2.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-data.md",
+      "before_sha256": "2001ad6d6ef9a4e1f2cada0a1d06364f53b727c137dd17521453f3236ee16e9b",
+      "after_sha256": "7cc49737185ec83537c84863007d6596b91f08b102b30d557fb4c71cf5f107fc",
+      "preimage": "ra9-preliminary-logs/177-before-docs__prompts__ra2-parity-review__slice-data.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-tests.md",
+      "before_sha256": "c8eabaeea887ec00ed344bc929a414b8f77b38bc192c6e536050d3a4f229e81a",
+      "after_sha256": "bf170dd9d1cbad0b4560ae3da39a1525de2a15afca415615b5c034da26e50d07",
+      "preimage": "ra9-preliminary-logs/177-before-docs__prompts__ra2-parity-review__slice-tests.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-client.md",
+      "before_sha256": "991f217125df56eccadf17453c274100e63be7e563aba25aeb2d06272ff016e7",
+      "after_sha256": "b4e17b96bd244e93f6591ab5bc8d6a313b8d966affa8490388d4c68676c8c09c",
+      "preimage": "ra9-preliminary-logs/177-before-docs__prompts__ra2-parity-review__slice-client.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/lead.md",
+      "before_sha256": "391cad7c89c94693acfc65858e9ef47774eed34f4d975e03609183f927054982",
+      "after_sha256": "0faf48126c291124dd61ba6526710c0a575d6e8ab4fa023583ff8b1a296be345",
+      "preimage": "ra9-preliminary-logs/177-before-docs__prompts__ra2-parity-review__lead.md"
+    }
+  ],
+  "debt_ids_retained": 183,
+  "debt_ids_provenance_refreshed": [
+    "SPAWN-01",
+    "START-01",
+    "LATE-01",
+    "MOVE-DUP-01",
+    "GENERATEDRULES-01",
+    "R56-11",
+    "R56-14",
+    "R56-23",
+    "R56-38",
+    "R56-43",
+    "R56-63"
+  ],
+  "authority64_drift": [],
+  "proofs166_168_171": "unchanged",
+  "all51_howtosee_status": "PENDING requires user verification",
+  "actual_added_source_status": "175/176 UNCOMPILED_UNRUN; forthcoming actual RA8 import and final canonical scope/gates required"
+}

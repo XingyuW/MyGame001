@@ -42,6 +42,8 @@
 #                                                 is stale; without the cache only the first
 #                                                 is checked, and the note says so (exit 0)
 #     python3 scripts/ra2_reference.py --stats    counts per category, dangling references
+#     python3 scripts/ra2_reference.py --ra9-dispositions [--check]
+#         compose/check exact proposed RA9 dispositions; never records acceptance or receipts
 # Exit code 2 reports an error (missing file, wrong hash, mapping that contradicts the ini).
 """Writes the committed RA2 reference table from the cached ini files."""
 
@@ -184,7 +186,7 @@ WHOLE_SECTIONS = {
     "CombatDamage": (
         "Scorches", "Scorches1", "Scorches2", "Scorches3", "Scorches4", "Craters",
         "SplashList", "DefaultFirestormExplosionSystem", "DefaultLargeGreySmokeSystem",
-        "DefaultSmallGreySmokeSystem", "DefaultSparkSystem", "DefaultLargeRedSmokeSystem",
+        "DefaultSmallGreySmokeSystem", "DefaultLargeRedSmokeSystem",
         "DefaultSmallRedSmokeSystem", "DefaultDebrisSmokeSystem", "DefaultFireStreamSystem",
         "DefaultTestParticleSystem", "DefaultRepairParticleSystem",
     ),
@@ -251,6 +253,7 @@ BUILDING_REGISTRIES = ("BuildingTypes",)
 CATEGORIES = (
     "unit", "building", "weapon", "warhead", "projectile", "superweapon", "global",
     "country", "land", "ore", "art", "list",
+    "presentation_premise",
 )
 
 
@@ -496,6 +499,25 @@ def extract(rules, art, mapping):
         table.add_whole("global", "rules", rules, section, excluded)
     for section, keys in sorted(PARTIAL_SECTIONS.items()):
         table.add_listed("global", "rules", rules, section, keys)
+    # RA9 exact presentation-premise metadata closure. No generic particle engine or
+    # copied assets/comments. The recorded original-source hash remains mandatory.
+    # These seven present metadata atoms are guard inputs, never native coverage.
+    if rules.get("CombatDamage", "DefaultSparkSystem") != "SparkSys":
+        raise ExtractionError("RA9 original default Spark premise changed")
+    spark_premises = {
+        "SparkSys": ("HoldsWhat", "BehavesLike", "ParticleCap", "SparkSpawnFrames"),
+        "Spark": ("BehavesLike", "MaxEC"),
+    }
+    for section, keys in sorted(spark_premises.items()):
+        if not table.add_listed("presentation_premise", "rules", rules, section, keys):
+            raise ExtractionError("RA9 source Spark premise section missing: " + section)
+    if rules.get("SparkSys", "HoldsWhat") != "Spark" or any(
+        rules.get(section, "BehavesLike") != "Spark" for section in spark_premises
+    ):
+        raise ExtractionError("RA9 default particle chain is not the exact Spark branch")
+    if any(rules.get("Spark", key) is not None for key in ("Damage", "Warhead", "NextParticle")):
+        raise ExtractionError("RA9 Spark non-damage/unchained absence premise changed")
+
     for section in LAND_SECTIONS:
         table.add_listed("land", "rules", rules, section, LAND_KEYS)
     for section in ORE_SECTIONS:
@@ -677,10 +699,366 @@ def stats(table, rules):
         print("  [%s] %s=%s (%s): %s" % (section, key, target, wanted, reason))
 
 
+
+RA9_DISPOSITION_HEADER = (
+    "file", "section", "key", "portion", "exact_value", "classification",
+    "route", "specific_semantic_reason", "code_evidence",
+)
+
+
+def _ra9_text(root, relative):
+    with open(os.path.join(root, relative), encoding="utf-8", newline="") as handle:
+        return handle.read()
+
+
+def _ra9_records(root, name, required):
+    """Strict installed TSV input, retaining exact contract reason/value bytes."""
+    path = "crates/sim/tests/ra9_audit/" + name
+    lines = _ra9_text(root, path).splitlines()
+    if not lines:
+        raise ExtractionError("RA9 empty contract: " + name)
+    header = lines[0].split("\t")
+    if len(set(header)) != len(header) or not set(required) <= set(header):
+        raise ExtractionError("RA9 missing/duplicate contract columns: " + name)
+    rows = []
+    for number, line in enumerate(lines[1:], 2):
+        fields = line.split("\t")
+        if len(fields) != len(header):
+            raise ExtractionError("RA9 contract row width: %s:%d" % (name, number))
+        rows.append(dict(zip(header, fields)))
+    return rows
+
+
+def _ra9_one(pattern, text, label):
+    matches = re.findall(pattern, text, re.DOTALL)
+    if len(matches) != 1:
+        raise ExtractionError("RA9 ambiguous/changed installed interface: " + label)
+    return matches[0]
+
+
+def _ra9_rust(root, relative):
+    """A lexical formatting view: preserve every literal token byte, normalize only
+    separators between Rust tokens. Reuse the real scope producer's conservative scanner;
+    comments/formatting are not contracts, while literal whitespace remains exact.
+    """
+    import ra9_scope
+    parts = ra9_scope.tokens(_ra9_text(root, relative))
+    out = []
+    previous = ""
+    word = re.compile(r"^[A-Za-z_0-9]+$")
+    for token in parts:
+        if word.fullmatch(previous) and word.fullmatch(token):
+            out.append(" ")
+        out.append(token)
+        previous = token
+    return "".join(out)
+
+
+def _ra9_fnv(text):
+    value = 0xcbf29ce484222325
+    for byte in text.encode("utf-8"):
+        value = ((value ^ byte) * 0x100000001b3) & 0xffffffffffffffff
+    return "%016x" % value
+
+
+def ra9_dispositions(root, reference):
+    """Compose proposals only; Rust still declares/admit/finishes every real source gate.
+
+    Counts and typed routes come from the installed Rust compositor and exact family/class
+    contracts. This is a bounded parser of those interfaces, not a source-policy evaluator.
+    A changed interface fails closed and needs an intentional generator update.
+    """
+    audit = "crates/sim/tests/ra9_audit/"
+    routes = _ra9_rust(root, audit + "source-routes.rs")
+    plans = _ra9_rust(root, audit + "source-plans.rs")
+    route_names = dict((variant, literal) for literal, variant in re.findall(
+        r'"([^"]+)"=>Ok\(Self::(\w+)\)', routes.split("impl Route", 1)[1].split(
+            "#[derive(Clone)]", 1)[0]))
+    class_names = dict((variant, literal) for literal, variant in re.findall(
+        r'"([^"]+)"=>Ok\(Self::(\w+)\)', routes.split("impl Class", 1)[1].split(
+            "#[derive(Clone,Copy", 1)[0]))
+    if len(route_names) != len(set(route_names.values())) or set(class_names.values()) != {
+        "ORIGINAL_ENGINE_UNUSED", "CURRENT_MODEL_NONREAD", "INTENTIONAL_DIFFERENCE"
+    }:
+        raise ExtractionError("RA9 changed/ambiguous typed route/class parser")
+    census, original_count = _ra9_one(
+        r'if counts!=\[(.*?)\]\.into_iter\(\)\.collect\(\)\|\|master.len\(\)!=(\d+)',
+        routes, "original master census")
+    expected_master = dict((name, int(count)) for name, count in re.findall(
+        r'\("([^"]+)"\.into\(\),(\d+),?\)', census))
+    master_rows = _ra9_records(root, "source-candidates.proposed.tsv",
+                               ("file", "section", "key", "portion", "exact_value", "disposition",
+                                "family_id", "primary_sha256"))
+    identity = lambda row: (row["file"], row["section"], row["key"])
+    master, actual_census = {}, {}
+    for row in master_rows:
+        key = identity(row)
+        if key in master or row["portion"] != "whole" or row["disposition"] not in expected_master:
+            raise ExtractionError("RA9 duplicate/foreign/non-whole original source: %r" % (key,))
+        if (reference.get(key) != row["exact_value"]
+                or row["primary_sha256"] != SHA256.get(row["file"])):
+            raise ExtractionError("RA9 original master literal/provenance changed: %r" % (key,))
+        master[key] = row
+        actual_census[row["disposition"]] = actual_census.get(row["disposition"], 0) + 1
+    if actual_census != expected_master or len(master) != int(original_count):
+        raise ExtractionError("RA9 original master census changed")
+    wanted, refinements = {}, set()
+
+    def insert(row, route, classification, reason, evidence):
+        source_key = identity(row)
+        part = row.get("portion", "whole")
+        key = (*source_key, part)
+        if (key in wanted or not reason.strip() or reason.startswith("PENDING")
+                or not evidence.strip() or route not in route_names.values()
+                or classification not in class_names.values()
+                or classification == "ORIGINAL_ENGINE_UNUSED"):
+            raise ExtractionError("RA9 ambiguous/unspecific source proposal: %r" % (key,))
+        raw = reference.get(source_key)
+        if part == "whole":
+            exact = raw
+        else:
+            if not part.isdigit() or raw is None or int(part) >= len(raw.split(",")):
+                raise ExtractionError("RA9 invalid exact component: %r" % (key,))
+            exact = raw.split(",")[int(part)]
+        if exact != row["exact_value"]:
+            raise ExtractionError("RA9 original/extracted exact atom changed: %r" % (key,))
+        wanted[key] = (*source_key, part, row["exact_value"], classification, route, reason, evidence)
+
+    # These three append_table calls are independently counted by source_routes::declare.
+    append_specs = re.findall(
+        r'append_table\(&mut wanted,include_str!\("([^"]+)"\),Route::(\w+),'
+        r'Class::(\w+),"([^"]+)","([^"]+)",(\d+),?\)', routes)
+    if len(append_specs) != 3:
+        raise ExtractionError("RA9 installed append-table routes changed")
+    for name, variant, cls, value, reason, count in append_specs:
+        rows = _ra9_records(root, name, ("file", "section", "key", value, reason))
+        if len(rows) != int(count):
+            raise ExtractionError("RA9 exact route census changed: " + name)
+        for line, row in enumerate(rows, 2):
+            row = dict(row, exact_value=row[value])
+            evidence = row.get("code_evidence", row.get("actual_code_evidence", ""))
+            insert(row, route_names[variant], class_names[cls], row[reason],
+                   audit + name + "#L%d; proposal only; " % line + (evidence or "guarded admission required"))
+            if variant not in ("Static116", "Masked19"):
+                refinements.add(identity(row))
+        if variant == "Static116" and {identity(row) for row in rows} != {
+            key for key, row in master.items() if row["disposition"] == "PROPOSED_STATIC_UNUSED"
+        }:
+            raise ExtractionError("RA9 static route does not own exact old static atoms")
+
+    # Residual classifications are per-contract, not flattened into a module default.
+    class_count, class_body = _ra9_one(
+        r"fn residual_classes\(\)->\[\(&'static str,Class,usize\);(\d+)\]\{\[(.*?)\]\}",
+        routes, "residual typed classes")
+    class_specs = re.findall(r'\("([^"]+)",Class::(\w+),(\d+),?\)', class_body)
+    residual_classes = {}
+    for label, variant, count in class_specs:
+        if label in residual_classes or variant not in class_names:
+            raise ExtractionError("RA9 duplicate/unknown residual typed class")
+        residual_classes[label] = (class_names[variant], int(count))
+    if len(residual_classes) != int(class_count):
+        raise ExtractionError("RA9 residual class table shape changed")
+    residual_name = _ra9_one(
+        r'fn append_residual.*?let rows=table\(include_str!\("([^"]+)"\)',
+        routes, "residual table")
+    residual_count = int(_ra9_one(r'if keys.len\(\)!=(\d+)\|\|counts!=classes',
+                                 routes, "residual class census"))
+    if not re.search(r"refinements\.extend\(append_residual\(&mut wanted,?\)\?,?\)", routes):
+        raise ExtractionError("RA9 residual owner route changed")
+    residual = _ra9_records(root, residual_name, ("file", "section", "key", "exact_value",
+                                                "proposed_classification", "specific_proposed_reason"))
+    seen_residual = {}
+    for line, row in enumerate(residual, 2):
+        label = row["proposed_classification"]
+        if label not in residual_classes:
+            raise ExtractionError("RA9 unknown exact residual classification: " + label)
+        seen_residual[label] = seen_residual.get(label, 0) + 1
+        insert(row, route_names["Residual117"], residual_classes[label][0],
+               row["specific_proposed_reason"], audit + residual_name + "#L%d; proposal only; " % line
+               + row.get("actual_code_evidence", "guarded admission required"))
+        refinements.add(identity(row))
+    if (len(residual) != residual_count
+            or seen_residual != {label: count for label, (_, count) in residual_classes.items()}):
+        raise ExtractionError("RA9 exact residual class census changed")
+
+    mappings = _ra9_records(root, "legacy904-class-contracts.tsv",
+                           ("module", "actual_contract_classification", "exact_atom_count", "typed_class"))
+    mapped = {}
+    for row in mappings:
+        key = (row["module"], row["actual_contract_classification"])
+        if key in mapped or row["typed_class"] not in class_names.values():
+            raise ExtractionError("RA9 duplicate/foreign exact class mapping")
+        mapped[key] = row
+    used_classes = set()
+    package_specs = re.findall(
+        r'\(Route::(\w+),"([^"]+)",include_str!\("([^"]+)"\),'
+        r'\w+::demanded_sources\(&p\.\w+,?\),(\d+),?\)', plans)
+    if len(package_specs) != 4:
+        raise ExtractionError("RA9 installed four exact class packages changed")
+    for variant, module, name, count in package_specs:
+        rows = _ra9_records(root, name, ("file", "section", "key", "exact_value",
+                                       "classification", "specific_reason"))
+        if len(rows) != int(count):
+            raise ExtractionError("RA9 exact package census changed: " + module)
+        seen_classes = {}
+        for line, row in enumerate(rows, 2):
+            class_key = (module, row["classification"])
+            if class_key not in mapped:
+                raise ExtractionError("RA9 uncontracted exact class: %r" % (class_key,))
+            cls = mapped[class_key]["typed_class"]
+            seen_classes[class_key] = seen_classes.get(class_key, 0) + 1
+            insert(row, route_names[variant], cls, row["specific_reason"],
+                   audit + name + "#L%d; proposal only; " % line + row.get("model_guard_id", ""))
+            refinements.add(identity(row))
+        for class_key, count in seen_classes.items():
+            if count != int(mapped[class_key]["exact_atom_count"]):
+                raise ExtractionError("RA9 exact per-class census changed: %r" % (class_key,))
+        used_classes.update(seen_classes)
+    if used_classes != set(mapped):
+        raise ExtractionError("RA9 missing/extra exact module class mappings")
+    carry_count = int(_ra9_one(r'carry38_admission::demanded_sources\(&p.c38,?\);'
+                              r'if rows.len\(\)!=(\d+)', plans, "carry38 census"))
+    if "Route::Carry38,Class::IntentionalDifference" not in plans:
+        raise ExtractionError("RA9 carry38 typed route changed")
+    carry = _ra9_records(root, "carry38-contracts.tsv",
+                         ("file", "section", "key", "exact_value", "specific_reason", "model_guard_id"))
+    if len(carry) != carry_count:
+        raise ExtractionError("RA9 carry38 exact census changed")
+    for line, row in enumerate(carry, 2):
+        insert(row, route_names["Carry38"], class_names["IntentionalDifference"], row["specific_reason"],
+               audit + "carry38-contracts.tsv#L%d; proposal only; " % line + row["model_guard_id"])
+        refinements.add(identity(row))
+    if refinements != {key for key, row in master.items()
+                       if row["disposition"] == "PENDING_SEMANTICS_OR_NATIVE"}:
+        raise ExtractionError("RA9 refinements do not partition exact original pending atoms")
+
+    # Legacy policies build reasons from original atoms plus independently owned families.
+    families = _ra9_records(root, "legacy904-family-contracts.tsv",
+                            ("route", "family_id", "atom_count", "profile", "typed_class",
+                             "specific_current_model_reason", "actual_paths", "independent_atom_fnv1a64"))
+    legacy_seen = set()
+    for route, disposition, filename in (
+        ("legacy-ai361", "PROPOSED_REPLACED_AI_POLICY", "legacy-ai-policy.rs"),
+        ("legacy-model543", "PROPOSED_SPECIFIC_MODEL_BOUNDARY", "legacy-model-policy.rs"),
+    ):
+        policy = _ra9_rust(root, audit + filename)
+        family_count, atom_count = map(int, _ra9_one(
+            r'if out.len\(\)!=(\d+)\|\|out.values\(\)\.map\(\|f\|f.count\)'
+            r'\.sum::<usize>\(\)!=(\d+)', policy, route + " family census"))
+        family_rows = [f for f in families if f["route"] == route]
+        if len(family_rows) != family_count or sum(int(f["atom_count"]) for f in family_rows) != atom_count:
+            raise ExtractionError("RA9 exact legacy family census changed: " + route)
+        # Parse precisely the installed mode's five return labels; fail on altered branching.
+        mode = _ra9_one(r'fn mode\(c:&Contract\)->&\x27static str\{(.*?)\}fn catalogue_from',
+                        policy, route + " mode")
+        pattern = (
+            r'if matches!\(c.value.to_ascii_lowercase\(\).as_str\(\),"no"\|"false"\|"0"\|"0.0"\)'
+            r'\{"([^"]+)"\}else if c.family.profile=="default-death"\{"([^"]+)"\}'
+            r'else if matches!\(c.family.profile.as_str\(\),'
+            r'"carrier-collision"\|"virtual-scanner"\|"nuke-up-carrier"\|"fire-helpers"\|"shrapnel"\)'
+            r'\{"([^"]+)"\}else if c.family.profile=="campaign-economy"\{"([^"]+)"\}'
+            r'else\{"([^"]+)"\}'
+        )
+        match = re.fullmatch(pattern, mode)
+        reason_constructor = re.search(
+            r'format!\("\[\{\}\] \{\}=\{\}; \{\}; \{\}",key\.section,key\.key,'
+            r'c\.value,c\.family\.reason,mode\(&c,?\),?\)', policy)
+        if match is None or reason_constructor is None:
+            raise ExtractionError("RA9 legacy reason/mode constructor changed: " + route)
+        labels = match.groups()
+        seen_families = set()
+        for family in family_rows:
+            fid = family["family_id"]
+            if fid in seen_families:
+                raise ExtractionError("RA9 duplicate legacy family: " + fid)
+            seen_families.add(fid)
+            atoms = [row for row in master.values() if row["family_id"] == fid
+                     and row["disposition"] == disposition]
+            atom_text = "".join("\t".join((*identity(row), "whole", row["exact_value"])) + "\n"
+                                for row in sorted(atoms, key=identity))
+            if (len(atoms) != int(family["atom_count"])
+                    or _ra9_fnv(atom_text) != family["independent_atom_fnv1a64"]):
+                raise ExtractionError("RA9 exact legacy family atom/value membership changed: " + fid)
+            for row in atoms:
+                if row["file"] != "rules" or row["primary_sha256"] != SHA256["rules"]:
+                    raise ExtractionError("RA9 foreign legacy original source")
+                profile = family["profile"]
+                index = (0 if row["exact_value"].lower() in ("no", "false", "0", "0.0") else
+                         1 if profile == "default-death" else
+                         2 if profile in ("carrier-collision", "virtual-scanner", "nuke-up-carrier",
+                                          "fire-helpers", "shrapnel") else
+                         3 if profile == "campaign-economy" else 4)
+                reason = "[%s] %s=%s; %s; %s" % (
+                    row["section"], row["key"], row["exact_value"],
+                    family["specific_current_model_reason"], labels[index])
+                insert(row, route, family["typed_class"], reason,
+                       audit + filename + "::catalogue_from; family=" + fid +
+                       "; proposal only; " + family["actual_paths"])
+                legacy_seen.add(identity(row))
+    if legacy_seen != {key for key, row in master.items() if row["disposition"] in (
+        "PROPOSED_REPLACED_AI_POLICY", "PROPOSED_SPECIFIC_MODEL_BOUNDARY"
+    )} or any(f["route"] not in ("legacy-ai361", "legacy-model543") for f in families):
+        raise ExtractionError("RA9 legacy refinements do not partition old904 atoms")
+
+    special_code = _ra9_rust(root, audit + "special-source-admission.rs")
+    special_count = int(_ra9_one(r'if v.len\(\)!=(\d+)', special_code, "special metadata census"))
+    special = _ra9_records(root, "special-source-contracts.tsv",
+                          ("file", "section", "key", "exact_value", "route",
+                           "classification", "specific_semantic_reason"))
+    if len(special) != special_count:
+        raise ExtractionError("RA9 special metadata census changed")
+    for line, row in enumerate(special, 2):
+        if row["route"] not in ("vhp", "tree", "mirage-elite", "spark"):
+            raise ExtractionError("RA9 foreign special source route")
+        insert(row, row["route"], row["classification"], row["specific_semantic_reason"],
+               audit + "special-source-contracts.tsv#L%d; proposal only; actual guarded source routes required" % line)
+    # Additional actual uncovered atoms: active registry policies, unit resale absence,
+    # concrete selector branches and exact Powerups component-only dispositions.
+    completion_local = _ra9_records(root, "completion-local-contracts.tsv",
+        ("file", "section", "key", "portion", "exact_value", "classification", "family", "specific_reason", "exact_whole_source"))
+    completion_whole = _ra9_records(root, "completion-whole-contracts.tsv",
+        ("file", "section", "key", "exact_value", "group_id", "classification", "specific_reason", "consumer_bindings", "model_guard_id", "required_evidence_routes", "mapping_rows", "loaded_rows"))
+    if len(completion_local) != 72 or len(completion_whole) != 102:
+        raise ExtractionError("RA9 exact additional completion72+102 census changed")
+    for name, rows in (("completion-local-contracts.tsv", completion_local), ("completion-whole-contracts.tsv", completion_whole)):
+        for line, row in enumerate(rows, 2):
+            if name == "completion-local-contracts.tsv" and reference.get(identity(row)) != row["exact_whole_source"]:
+                raise ExtractionError("RA9 exact full component branch premise changed")
+            insert(row, "completion174", row["classification"], row["specific_reason"], audit + name + "#L%d; actual exact atom/loaded/code/route guards required" % line)
+    total = int(_ra9_one(r'if wanted.len\(\)!=(\d+)', routes, "composed source census"))
+    if len(wanted) != total or not {(*key, "whole") for key in master} <= set(wanted):
+        raise ExtractionError("RA9 composed exact source census changed")
+    return "\t".join(RA9_DISPOSITION_HEADER) + "\n" + "".join(
+        "\t".join(wanted[key]) + "\n" for key in sorted(wanted))
+
+
+def write_ra9_dispositions(text, check_only):
+    """Check mode does not rewrite any table, acceptance, receipt or reference hash."""
+    path = os.path.join(REFERENCE_DIR, "ra9_source_dispositions.tsv")
+    if check_only:
+        with open(path, encoding="utf-8", newline="") as handle:
+            if handle.read() != text:
+                print("ra2_reference: proposed RA9 dispositions differ; regenerate with --ra9-dispositions")
+                return 1
+        print("ra2_reference: proposed RA9 dispositions match (%d rows; no admission granted)"
+              % (text.count("\n") - 1))
+    else:
+        with open(path, "w", encoding="utf-8", newline="\n") as handle:
+            handle.write(text)
+        print("ra2_reference: wrote %d proposed RA9 dispositions; all acceptance/receipt gates remain required"
+              % (text.count("\n") - 1))
+    return 0
+
+
 def main(argv):
-    mode = argv[1] if len(argv) == 2 else None
-    if len(argv) > 2 or mode not in (None, "--check", "--stats"):
-        sys.stderr.write("usage: ra2_reference.py [--check | --stats]\n")
+    dispositions = len(argv) >= 2 and argv[1] == "--ra9-dispositions"
+    disposition_check = dispositions and argv[2:] == ["--check"]
+    mode = "--ra9-dispositions" if dispositions else argv[1] if len(argv) == 2 else None
+    if ((dispositions and argv[2:] not in ([], ["--check"]))
+            or (not dispositions and (len(argv) > 2 or mode not in
+                                      (None, "--check", "--stats", "--ra9-scope")))):
+        sys.stderr.write("usage: ra2_reference.py [--check | --stats | --ra9-scope | "
+                         "--ra9-dispositions [--check]]\n")
         return 2
     if mode == "--check" and not check_recorded_hash():
         return 1
@@ -691,9 +1069,30 @@ def main(argv):
         return 0
     try:
         rules, art = load_reference()
+        if mode == "--ra9-scope":
+            # ra9_scope observes the actual complete original and actual Rust source files.
+            # It never reads expected tables or approval/native receipts as observations.
+            import ra9_scope
+            outputs = ra9_scope.produce(ROOT, rules, SHA256["rules"])
+            for name, text in sorted(outputs.items()):
+                with open(os.path.join(os.path.dirname(TABLE_PATH), name), "w",
+                          encoding="utf-8", newline="\n") as handle:
+                    handle.write(text)
+            return 0
         mapping = load_mapping()
         check_mapping(rules, mapping)
         table = extract(rules, art, mapping)
+        if dispositions:
+            if not check_recorded_hash():
+                return 1
+            with open(TABLE_PATH, encoding="utf-8", newline="") as handle:
+                if handle.read() != table.render():
+                    raise ExtractionError("RA9 needs the committed reference to match fresh original extraction")
+            try:
+                proposed = ra9_dispositions(ROOT, table.rows)
+            except (ValueError, KeyError) as error:
+                raise ExtractionError("RA9 malformed/changed installed contract: %s" % error) from error
+            return write_ra9_dispositions(proposed, disposition_check)
     except (ExtractionError, OSError) as error:
         sys.stderr.write("ra2_reference: %s\n" % error)
         return 2

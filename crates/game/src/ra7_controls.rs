@@ -260,6 +260,16 @@ fn psychic_lines(host: Res<SimHost>, map: Option<Res<MapView>>, mut gizmos: Gizm
     }
 }
 
+// Test-only execution of the actual private RA7 handler; no viewer/selection policy API.
+#[cfg(test)]
+pub(crate) fn run_extended_keys_for_test(world: &mut World) {
+    use bevy::ecs::system::RunSystemOnce;
+    world.init_resource::<Bookmarks>();
+    world
+        .run_system_once(extended_keys)
+        .expect("actual extended_keys system");
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -1,0 +1,10 @@
+authority_id	document_path	section_start	section_end	required_needle
+D29	docs/DECISIONS.md	### D29. Combat in the simulation	### D30.	A unit with a plain move order
+D32	docs/DECISIONS.md	### D32. No engagement	### D33.	Acquisition and keeping consider only visible enemies
+R49	docs/DECISIONS.md	### R49. RA4: aircraft ammunition and docks	### R50.	CanPassiveAquire=no
+R50	docs/DECISIONS.md	### R50. RA4: spawned missiles and aircraft	### R51.	CanPassiveAquire=no
+R23	docs/DECISIONS.md	### R23. RA2: production by rate	### R24.	shortage is `1 - produced / consumed`
+R91	docs/DECISIONS.md	### R91. RA8 country plans	### R92.	first-hit damage remains equal
+PLAN4.15	docs/RA2_PARITY_PLAN.md	### 4.15 Computer player difficulty	## 5.	only `ROF` and `BuildTime`
+APPENDIX_LOW_POWER	docs/RA2_PARITY_PLAN.md	#### 2. Low power	#### 3.	assumption: ignore
+APPENDIX_DIFFICULTY	docs/RA2_PARITY_PLAN.md	#### 17. AI difficulty	#### 18.	marked obsolete

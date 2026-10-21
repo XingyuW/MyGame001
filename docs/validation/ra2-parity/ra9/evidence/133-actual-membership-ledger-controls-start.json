@@ -1,0 +1,27 @@
+{
+  "utc": "2026-10-21T03:15:00.947522+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "--",
+    "ra9_actual_producer_membership_rejects_nonmember_duplicate_and_corrupt_set",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "scope": "Actual unchanged loadedBlackEagle producer independent multi-factory membership and four intentional corruptions; no source-policy admission/native/final acceptance",
+  "inputs": {
+    "crates/sim/tests/ra9_audit/mod.rs": "75cec7d6bde4f68e7c1a6fe9b5842bdd92dd1c76136968244440d059568380da",
+    "crates/sim/tests/ra9_audit/policy-admission.rs": "e4dfaba8bf2c99b8ff2fd0225fd7f1999f127a50c265d941375b06f9e3de1a8f",
+    "assets/data/combat.ron": "f8132a0b410bea2bcdf7e27aadda1e1c5147da5ffaa80d9aeba413819d32db3b",
+    "assets/data/arsenal.ron": "8d28adb1d5b49e699ae6190997d575117cd3c6fe32eab4c48b6fc85766268921",
+    "assets/data/rules.ron": "adffdb79d495bead0f22dd7485312fcb5fa15eb11d6c17b23c392e5000105311",
+    "assets/data/skirmish.ron": "884b448a7eab3584d5818d87069929046f876819cb7842e8100b21e42a0b8419",
+    "assets/data/economy.ron": "0a417efc04345fe3ebae0ae0029fa41bfc06fa5a01d9568558987b2e7a27adf3",
+    "assets/data/ai.ron": "42cf650956788f04f4520e7f5be1d617c416b83e6e2f555e8b7a417b4a1a5b2a",
+    "assets/data/units.ron": "15133fbe575551b541339af4420974f9563e66f2dc94f620a33929531749ff2d"
+  }
+}

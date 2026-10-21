@@ -1,0 +1,99 @@
+{
+  "utc": "2026-10-21T10:33:21.104140+00:00",
+  "status": "COPY_OUTPUT_ONLY_PREPARATION_PROVENANCE_NO_NEW_NATIVE_EXECUTION_ACCEPTANCE_OR_CANONICAL_WRITES",
+  "records": [
+    {
+      "path": "README.md",
+      "before_sha256": "5819863814cf6a4658138a5d495f7231012f024be8bbdc495f42e9765b975915",
+      "after_sha256": "a30d025eae954a0870750560a3a3a8384394dadc366a84348f85b3b6d38250e7",
+      "preimage": "ra9-preliminary-logs/179-before-README.md"
+    },
+    {
+      "path": "docs/HANDOFF.md",
+      "before_sha256": "70cef5258d1bdb179869fb773113ac2b8d3e80d089571a400f26ae2a7d018840",
+      "after_sha256": "f2724e3c7a3ec4ecaf42840c90c66c818788a961ec892b37ff38919ec90efef9",
+      "preimage": "ra9-preliminary-logs/179-before-docs__HANDOFF.md"
+    },
+    {
+      "path": "docs/CONSTRUCTION_SYSTEM.md",
+      "before_sha256": "38949a0fde6fa41e8d8fe45e0d427cb17849ad5661ca4e728e15c63a1ca092f2",
+      "after_sha256": "a1d3da95f0fd98eea63b1894da092771fa6be95e2f627cb24908282c95a5a7bd",
+      "preimage": "ra9-preliminary-logs/179-before-docs__CONSTRUCTION_SYSTEM.md"
+    },
+    {
+      "path": "docs/RA2_GAP_ANALYSIS.md",
+      "before_sha256": "c716adfec5442b01589734f1d0b9f3c17db097a3a7c7e6c28db473313352b382",
+      "after_sha256": "da9ccfaa0104f4b7405ee8fd15a2d85f29e8dd954b2334b9e40e1dbd079c2910",
+      "preimage": "ra9-preliminary-logs/179-before-docs__RA2_GAP_ANALYSIS.md"
+    },
+    {
+      "path": "docs/RA9_INTEGRATION_CHECKLIST.md",
+      "before_sha256": "735f78f8100e0683df327dee3196415ccfc063c49944190f58ba9a71c5932dc6",
+      "after_sha256": "72fe61d9558a17bbdfb96582efba85bed0239f22773731b2fa408798b66ea756",
+      "preimage": "ra9-preliminary-logs/179-before-docs__RA9_INTEGRATION_CHECKLIST.md"
+    },
+    {
+      "path": "docs/STATUS.md",
+      "before_sha256": "387456a26d677063f724ec8755e61860356725e1f0aaa5b74b7da29b3a7c0b6e",
+      "after_sha256": "dd78df4057e594c5e0090c2d1b360093e90d16f9b55520269f23a72cd9dc5ecd",
+      "preimage": "ra9-preliminary-logs/179-before-docs__STATUS.md"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-review-requirements.md",
+      "before_sha256": "1557e19fec06e103d1b6c612500e84c801e1f3bd0ed1ad6ac30ff1f9b8c46740",
+      "after_sha256": "8203862acbf3f6aacf4387d25632a3a74a61906abac8f9a55ba5bf4649c25c4c",
+      "preimage": "ra9-preliminary-logs/179-before-docs__reviews__RA2-parity-review-requirements.md"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-reviews-outstanding.md",
+      "before_sha256": "cb202cf6897fca1db8cf4f06bd3bf8bbace1defe76db7b5b83776678633d5712",
+      "after_sha256": "7354a0dac26ef1530fb19bc578acfc8147ee416fc21061973c278daeef43e087",
+      "preimage": "ra9-preliminary-logs/179-before-docs__reviews__RA2-parity-reviews-outstanding.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/README.md",
+      "before_sha256": "7b5ec0cb8a36e13adaa74d26c61f675232dbce6139f1cc5e494cf46cdf6a7f00",
+      "after_sha256": "30d8a579a5dd7ef26f07ad281d580627988301706876b3bb743917f4224e7af3",
+      "preimage": "ra9-preliminary-logs/179-before-docs__prompts__ra2-parity-review__README.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-sim1.md",
+      "before_sha256": "d2f7833e92d1a4a6a539b5d8a21b5d293a6cab4493ffd103c99d21a80594ec66",
+      "after_sha256": "38c49d1682ff6aa9a99bb6fae7e7e459583a94252be0ab14dcd00a8e5237e17f",
+      "preimage": "ra9-preliminary-logs/179-before-docs__prompts__ra2-parity-review__slice-sim1.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-sim2.md",
+      "before_sha256": "4828b6eac188351018c81af88b2322779ec5e2f0c769a8e8116e6e1b0bb12d5c",
+      "after_sha256": "fed9ca1a99c7f4edec9145a0431e3ef36c5913586c06b1c3a89e94ecbaebbee3",
+      "preimage": "ra9-preliminary-logs/179-before-docs__prompts__ra2-parity-review__slice-sim2.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-data.md",
+      "before_sha256": "7cc49737185ec83537c84863007d6596b91f08b102b30d557fb4c71cf5f107fc",
+      "after_sha256": "03b08a62d0728a9b44f794079e3a4e1b601183f8dad046cd962615828042dba9",
+      "preimage": "ra9-preliminary-logs/179-before-docs__prompts__ra2-parity-review__slice-data.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-tests.md",
+      "before_sha256": "bf170dd9d1cbad0b4560ae3da39a1525de2a15afca415615b5c034da26e50d07",
+      "after_sha256": "4adcefd45725c2b5edad590bf50e90e24466ed42465923cbba7194448986058e",
+      "preimage": "ra9-preliminary-logs/179-before-docs__prompts__ra2-parity-review__slice-tests.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-client.md",
+      "before_sha256": "b4e17b96bd244e93f6591ab5bc8d6a313b8d966affa8490388d4c68676c8c09c",
+      "after_sha256": "74b49b793cfc1d60c9d3f7eeb5cc323f98f89563dc56190721a663c1ce0e0e71",
+      "preimage": "ra9-preliminary-logs/179-before-docs__prompts__ra2-parity-review__slice-client.md"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/lead.md",
+      "before_sha256": "0faf48126c291124dd61ba6526710c0a575d6e8ab4fa023583ff8b1a296be345",
+      "after_sha256": "4213c54e9c40124324dd73b240debe7732b29e89dc7a8b6346a360a5f69a8c11",
+      "preimage": "ra9-preliminary-logs/179-before-docs__prompts__ra2-parity-review__lead.md"
+    }
+  ],
+  "authority64_drift": [],
+  "howtosee51_exact_bytes_preserved": "8ae4edfadf97fc68138d03c9a12d9c1217cf0c1fb65cf6dd6010c77b1c5bd6c1",
+  "future_integration_dependency": "Actual finalcanonical --ra9-scope producer and truthful legacy904-branch-files ai.rs metadata migration/root binding required after release; old166/168/171 remain exact historical proofs."
+}

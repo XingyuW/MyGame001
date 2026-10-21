@@ -293,6 +293,10 @@ pub(super) fn advance(world: &mut World, defs: &Definitions) {
                 direct: Some(host),
                 firepower_pm: 1000,
                 source: Some(p.passenger.id),
+                identity: Some(crate::combat::DamageIdentity {
+                    owner: p.owner,
+                    item: ProductionItem::Unit(p.passenger.kind),
+                }),
             },
             host,
         );
@@ -456,19 +460,30 @@ pub(super) fn payload(world: &mut World, defs: &Definitions, a: &Actor, kind: cr
     let Some(w) = defs.weapon(kind) else {
         return;
     };
-    detonate(
-        world,
-        Blast {
-            point: position_of(world, a),
-            air: false,
-            warhead: w.warhead,
-            damage: w.damage,
-            direct: None,
-            firepower_pm: 1000,
-            source: Some(a.id),
-        },
-        true,
-    );
+    // DeathWeaponDamageModifier belongs to the destroyed type, not to NukePayload itself.
+    // Preserve the shared strategic missile's Damage600 and all radius/warhead/radiation data.
+    let damage_pm = defs
+        .metadata(a.item)
+        .map_or(1000, |m| m.death_weapon_damage_pm);
+    if damage_pm > 0 {
+        detonate(
+            world,
+            Blast {
+                point: position_of(world, a),
+                air: false,
+                warhead: w.warhead,
+                damage: w.damage,
+                direct: None,
+                firepower_pm: damage_pm,
+                source: Some(a.id),
+                identity: Some(crate::combat::DamageIdentity {
+                    owner: a.owner,
+                    item: a.item,
+                }),
+            },
+            true,
+        );
+    }
     if w.rad_level > 0 {
         radiation::add(
             world,
@@ -502,6 +517,10 @@ pub(crate) fn cleanup(world: &mut World) {
         .collect();
     let mut s = world.resource_mut::<SpecialState>();
     for id in dead {
+        let descendants: Vec<_> = s.cargo_descendants(id).iter().map(|p| p.id).collect();
+        for passenger in descendants {
+            s.cargo.remove(&passenger);
+        }
         s.cargo.remove(&id);
         if s.parasites.get(&id).is_some_and(|p| p.escape.is_none()) {
             s.parasites.remove(&id);

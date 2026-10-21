@@ -1,0 +1,21 @@
+    Finished `release` profile [optimized] target(s) in 0.11s
+     Running tests/ra9_data_parity.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_data_parity-4bf9e87c254d4d01)
+
+running 6 tests
+test ra9_audit::country_rosters::tests::ra9_raw_roster_nonempty_is_schema_rejection_not_fake_loaded_empty ... ok
+test ra9_audit::model162_admission::tests::ra9_model162_actual_gap_radius_change_fails_native_comparison_and_no_boost_policy ... ok
+test ra9_audit::consumer62_admission::tests::ra9_consumer62_nonfirst_pad_dock_count_fails_real_dock_adapter has been running for over 60 seconds
+test ra9_audit::source_disposition::tests::ra9_static_speed_rejects_case_alias_after_actual_adapter_control has been running for over 60 seconds
+test ra9_audit::source_disposition::tests::ra9_static_speed_rejects_changed_real_instant_selector has been running for over 60 seconds
+test ra9_audit::source_disposition::tests::ra9_static_speed_rejects_demanded_actual_source_overlap has been running for over 60 seconds
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+test ra9_audit::source_disposition::tests::ra9_static_speed_rejects_case_alias_after_actual_adapter_control ... ok
+test ra9_audit::source_disposition::tests::ra9_static_speed_rejects_changed_real_instant_selector ... ok
+test ra9_audit::source_disposition::tests::ra9_static_speed_rejects_demanded_actual_source_overlap ... ok
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+test ra9_audit::consumer62_admission::tests::ra9_consumer62_nonfirst_pad_dock_count_fails_real_dock_adapter ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 175 filtered out; finished in 82.14s
+

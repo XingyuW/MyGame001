@@ -1,0 +1,26 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/game)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `game` (bin "game") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.17s
+     Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m6_production_matches-8ab180ddcd59ed04)
+
+running 1 test
+test ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner ... 
+thread 'ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner' (13531004) panicked at crates/game/tests/m6_production_matches.rs:652:9:
+assertion `left == right` failed: state hash at native tick 36001, completed step 36002
+  left: 6074914300896544366
+ right: 12387972213741681085
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 6 filtered out; finished in 54.33s
+
+error: test failed, to rerun pass `-p game --test m6_production_matches`

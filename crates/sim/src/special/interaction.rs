@@ -29,10 +29,11 @@ pub(super) fn validate_interaction_damage(
             if defs.metadata(b.item).is_some_and(|m| m.bridge_repair_hut) {
                 return crate::bridges::validate_repair(world, b.id);
             }
-            if defs
-                .metadata(b.item)
-                .is_some_and(|m| m.immune || (m.needs_engineer && !m.capturable))
-            {
+            if defs.metadata(b.item).is_some_and(|m| {
+                m.immune
+                    || (m.needs_engineer && !m.capturable)
+                    || (defs.rules().is_some() && a.owner != b.owner && !m.capturable)
+            }) {
                 return Err(unavailable("Target cannot be captured"));
             }
             Ok(())
@@ -82,25 +83,47 @@ pub(super) fn validate_interaction_damage(
                     .metadata(a.item)
                     .is_some_and(|m| m.domain == Domain::Air)
                 || a.foot.is_some()
-                || world
-                    .resource::<SpecialState>()
-                    .cargo
-                    .get(&a.id)
-                    .is_some_and(|v| !v.is_empty())
             {
                 return Err(unavailable("Choose a friendly transport"));
             }
-            if m.domain != Domain::Amphibious && defs.category(a.item) != Category::Infantry {
-                return Err(unavailable("This transport carries infantry only"));
-            }
-            if world
-                .resource::<SpecialState>()
-                .cargo
-                .get(&b.id)
-                .map_or(0, Vec::len)
-                >= m.capacity
-            {
-                return Err(unavailable("Transport is full"));
+            let cargo = world.resource::<SpecialState>();
+            if m.size_limit == 0 {
+                // Explicit compatibility mode for existing fixture arsenals.
+                if cargo.cargo.get(&a.id).is_some_and(|v| !v.is_empty()) {
+                    return Err(unavailable("Choose a friendly transport"));
+                }
+                if m.domain != Domain::Amphibious && defs.category(a.item) != Category::Infantry {
+                    return Err(unavailable("This transport carries infantry only"));
+                }
+                if cargo.cargo.get(&b.id).map_or(0, Vec::len) >= m.capacity {
+                    return Err(unavailable("Transport is full"));
+                }
+            } else {
+                // RA2 can load ground vehicles into vehicle transports, including a Drone
+                // into a Flak Track. The aircraft transport's hardcoded infantry condition
+                // remains separate from SizeLimit (ModEnc/Passengers).
+                if m.domain == Domain::Air && defs.category(a.item) != Category::Infantry {
+                    return Err(unavailable("This transport carries infantry only"));
+                }
+                if cargo.cargo_descendants(a.id).iter().any(|p| p.id == b.id) {
+                    return Err(unavailable("Transports cannot carry an ancestor"));
+                }
+                let weight = |item| defs.metadata(item).map_or(1, |meta| meta.size.max(1));
+                let size = weight(a.item);
+                if size > m.size_limit {
+                    return Err(unavailable("Passenger is too large"));
+                }
+                // Only direct children consume the outer carrier's room. Loaded Flak Tracks
+                // and IFVs retain their own payload at their normal outer size. This is the
+                // documented vanilla 1.006 single-source assumption (SRN Compendium).
+                let used = cargo.cargo.get(&b.id).map_or(0_u64, |passengers| {
+                    passengers.iter().fold(0_u64, |total, p| {
+                        total.saturating_add(u64::from(weight(ProductionItem::Unit(p.kind))))
+                    })
+                });
+                if used.saturating_add(u64::from(size)) > m.capacity as u64 {
+                    return Err(unavailable("Transport is full"));
+                }
             }
             Ok(())
         }
