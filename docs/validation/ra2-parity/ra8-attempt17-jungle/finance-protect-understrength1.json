@@ -1,0 +1,32 @@
+{
+  "name": "finance-protect-understrength1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "understrength",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "source_manifest": "docs/validation/ra2-parity/ra8-attempt17-jungle/finance-protect-understrength1-manifest.json",
+  "manifest_sha256": "4126bc1f8321611c53244e9840a5d0d703f42a2dd1c77f9e2e12b3a1f3ebf877",
+  "start_utc": "2026-10-21T10:24:34.923264+00:00",
+  "head": "99bcdf1913f3d74079ce2baa8b440b68a315223a",
+  "status": "COMPLETED",
+  "source_files": 495,
+  "pid": 54885,
+  "exit": 0,
+  "seconds": 0.6571233340073377,
+  "end_utc": "2026-10-21T10:24:35.585733+00:00",
+  "source_mismatches": [],
+  "raw": {
+    "path": "docs/validation/ra2-parity/ra8-attempt17-jungle/finance-protect-understrength1.log",
+    "bytes": 1230,
+    "sha256": "681e9036c1434616f4e13846564cd7e88bdd494f2d28e7a2eb1b2fc44036e0ee"
+  }
+}

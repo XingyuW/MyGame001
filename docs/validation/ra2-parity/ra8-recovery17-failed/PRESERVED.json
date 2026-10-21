@@ -1,0 +1,48 @@
+{
+  "utc": "2026-10-21T10:09:42.442382+00:00",
+  "source": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8-recovery17",
+  "files": [
+    {
+      "path": "10-duels.log",
+      "bytes": 103567,
+      "sha256": "fa698953bbc124f424f024304d3145fc8e1de0075db6f6dc230cfc336303207d"
+    },
+    {
+      "path": "11-package.log",
+      "bytes": 362,
+      "sha256": "37ce2ba725966de55772ba77c6647202d9f63a765ee4c1cd480bc8b868774bbc"
+    },
+    {
+      "path": "components-10-11.log",
+      "bytes": 153,
+      "sha256": "04117c3e4294eba136002f2bdfb01395b621f1730d5f48f3516c00e72dde3238"
+    },
+    {
+      "path": "postgate-all21.log",
+      "bytes": 8288,
+      "sha256": "3bfaccbd6e896808ca624358d54c095b7399e294940a8d6fe765313ce9a57da7"
+    },
+    {
+      "path": "recovery-process.json",
+      "bytes": 2165,
+      "sha256": "e0acad3a7c2281d4f9d73a2556726b468b9fc32d3868c31470666ddbbf8f23bd"
+    },
+    {
+      "path": "run_recovery.py",
+      "bytes": 3882,
+      "sha256": "e22edfd21382627765d7bdb3ee748247f6bca1bfd5245b32687676aee06f2d81"
+    },
+    {
+      "path": "summarize_recovery.py",
+      "bytes": 9433,
+      "sha256": "ff02a63648a68e1386d104f7c3511d45ba29f1ea3a3056f855284e5dbdf75026"
+    },
+    {
+      "path": "summary.txt",
+      "bytes": 153,
+      "sha256": "04117c3e4294eba136002f2bdfb01395b621f1730d5f48f3516c00e72dde3238"
+    }
+  ],
+  "total_bytes": 128003,
+  "scope": "Successful recovery10/11 followed by actual all21 ending failure. Fixed3 and three example guards unrun. No RA8 closure."
+}

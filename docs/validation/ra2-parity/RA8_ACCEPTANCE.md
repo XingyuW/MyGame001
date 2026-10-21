@@ -1,6 +1,32 @@
 # RA8 acceptance record
 
 
+Current checkpoint18 status (2026-10-21): source4a103fa fixes a demonstrated
+reinforcement-financing veto while preserving strategic support. New2 native
+regressions fail on old AI and pass on the identical fixture with the correction;
+six existing protective controls, fmt/strict Clippy and exact ten-player Jungle
+Delta P7Won76033 pass. Fresh495-input freeze and1389 static tests have no removal
+or ignore. Required isolated all21/fixed3/three guards complete five commands0
+with495 unchanged inputs per command:21 explicit Won/21 ten-builder maps/zero
+stalls at400000, median85583/p90112794/max126754; worst mean1.408ms.
+The three256² fixed probes complete24000 ticks each with10 builders and
+mean.977735/.869383/.769983ms; each remains running. Three guards each1/0/0.
+Individual/busy timing tails remain in `ra8-early18/acceptance-summary.json`.
+Freshall13 on the same source is still required; RA8 acceptance remains open.
+
+Original attempt17's interruption and successful component recovery are preserved,
+including original failed summary/stale RUNNING metadata. Its old-source isolated
+sweep then really failed Jungle Delta at400000:20Won/one stall. These outcomes
+are not relabeled as a fresh all13 or transferred to corrected source. See R190,
+`ra8-attempt17-interrupted/`, `ra8-recovery17-failed/`,
+`ra8-attempt17-jungle/checkpoint18.json` and the current `ra8-early18/` run.
+
+## Historical records
+
+The dated current-status statements below retain their historical scope; the
+checkpoint18 statement above supersedes their pending/current status only.
+
+
 Current status (2026-10-20): unchanged full attempt16 passed phases1–9, including
 1389 Rust tests, the actual756 production winners and repeat soak. Phase10 then
 completed755Won/one Coral IraqBrutal/CubaBrutal seed14 nonwinner at the original

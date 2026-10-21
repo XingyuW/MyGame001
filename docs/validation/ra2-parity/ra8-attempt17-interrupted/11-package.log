@@ -1,0 +1,5 @@
+    Finished `release` profile [optimized] target(s) in 0.74s
+2026-10-21T05:55:05.738506Z ERROR game::smoke: smoke test failed: the application exited after 503 of 600 frames
+2026-10-21T05:55:05.739210Z  WARN bevy_winit::state: Skipped event Destroyed for unknown winit Window Id WindowId(507706231296)
+2026-10-21T05:55:05.743257Z ERROR game::smoke: smoke test failed: the application exited after 503 of 600 frames
+2026-10-21T05:55:05.750574Z ERROR game::smoke: smoke test failed: the application exited after 503 of 600 frames

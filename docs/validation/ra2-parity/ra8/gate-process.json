@@ -1,9 +1,9 @@
 {
-  "attempt": 16,
-  "checkpoint": 16,
-  "start_utc": "2026-10-20T12:32:07.885020+00:00",
-  "head": "26ad1e384ff17aff2a0075a08f39d510f28d0067",
-  "runtime_commit": "b411bed120ca05bfe909afc071d044e7928ecb78",
+  "attempt": 17,
+  "checkpoint": 17,
+  "start_utc": "2026-10-20T22:52:25.222434+00:00",
+  "head": "99bcdf1913f3d74079ce2baa8b440b68a315223a",
+  "runtime_commit": "eb308a231e302048c9dc8d1e8b9543b7c5f64ef7",
   "main": "8230a955b251e9341d349f99eaeb86f7f8253664",
   "branch": "ra2-parity",
   "clean_before_launch": true,
@@ -18,39 +18,39 @@
     "scripts/validate_ra2_parity.sh",
     "ra8"
   ],
-  "wrapper_pid": 84658,
+  "wrapper_pid": 67549,
   "wrapper_ppid": 7720,
-  "wrapper_pgid": 84658,
+  "wrapper_pgid": 67549,
   "source_files": 495,
   "source_manifests": {
     "runtime": {
-      "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8-preflight/checkpoint16-runtime-manifest.json",
+      "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8-preflight/attempt16-final2-runtime-manifest.json",
       "exists": true,
-      "bytes": 38145,
-      "sha256": "c1a381ab4cedfe3690fe0262d874d65dc126f0dd223d2376506f341189856659",
-      "mtime_ns": 1792499014988345380
+      "bytes": 38110,
+      "sha256": "23dc30e9d22a1e6c23589eebb71d57e3e3e7138770c673ee4dd2b4cb5ca8fa0f",
+      "mtime_ns": 1792534815143198401
     },
     "test-example": {
-      "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8-preflight/checkpoint16-test-example-manifest.json",
+      "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8-preflight/attempt16-final2-test-example-manifest.json",
       "exists": true,
-      "bytes": 19498,
-      "sha256": "b4fe3911796016424aa6ca9c13e35cbb4651a8e886a64635e8a7dd30b1b001dd",
-      "mtime_ns": 1792499014988425547
+      "bytes": 19463,
+      "sha256": "3b3df482593e41d4399a5735c2b5da9ac236b044d631b59a110d6d1581d6960f",
+      "mtime_ns": 1792534815143354027
     }
   },
   "preservation": {
-    "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8-attempt15/PRESERVED.json",
+    "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8-attempt16/PRESERVED.json",
     "exists": true,
-    "bytes": 20378,
-    "sha256": "372fb053e748023ba1374ed7f4f156d68f9a59813cd79d3cadacaa71547a151e",
-    "mtime_ns": 1792492849349294182
+    "bytes": 21496,
+    "sha256": "cec5b5e5294ecc3b3c7481247b7b03e8736ce1fc5e5c66905c04783adb216116",
+    "mtime_ns": 1792532722000981577
   },
   "preservation_recheck": {
-    "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8-preflight/checkpoint16-attempt15-preservation.json",
+    "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8-preflight/checkpoint17-attempt16-preservation.json",
     "exists": true,
-    "bytes": 518,
-    "sha256": "2ff9dad092b9010244d973281463ce4cc3525aaf91fc5487ae05db505a3aa04c",
-    "mtime_ns": 1792498151861926611
+    "bytes": 81354,
+    "sha256": "4364c070c8e88388fbedbc498f366a088be53d6c0899445eaad603f5a0ce6070",
+    "mtime_ns": 1792535309578990380
   },
   "configured_caches": {
     "CARGO_TARGET_DIR": "/Users/xingyuwang/Library/Caches/Codex/cargo-target",
@@ -62,15 +62,15 @@
     "path": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/m6_production_matches_lengths.tsv",
     "exists": true,
     "bytes": 49793,
-    "sha256": "1ba1644b15e8ab25852c51475ff6d1d9aa5425b38e44dd41d217d502dfd32cf1",
-    "mtime_ns": 1792490736043966945
+    "sha256": "f896198edf4615e8c7ebe8e2742ea3b0e7e17bfdf85f0d87dd9afda384191ba0",
+    "mtime_ns": 1792506111018655498
   },
   "preexisting_label_production_table": {
     "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8/production-lengths.tsv",
     "exists": true,
-    "bytes": 49763,
-    "sha256": "6c3ec135cec4acb23ec3489e7324cfc760e12c6e0da6727fef8675901548d435",
-    "mtime_ns": 1792408455665559025
+    "bytes": 49793,
+    "sha256": "f896198edf4615e8c7ebe8e2742ea3b0e7e17bfdf85f0d87dd9afda384191ba0",
+    "mtime_ns": 1792509956179289805
   },
   "production_table_status": "Fresh native current phase4 publication copied only after phase4exit0; actual row/outcome distributions still require parsing.",
   "completed_rows": [
@@ -79,132 +79,105 @@
       "number": 1,
       "exit": 0,
       "script_date_seconds": 1,
-      "completion_observed_utc": "2026-10-20T12:32:09.897419+00:00",
-      "wrapper_elapsed_seconds": 2.00321354100015,
-      "observed_interval_seconds": 2.00321354100015
+      "completion_observed_utc": "2026-10-20T22:52:27.232854+00:00",
+      "wrapper_elapsed_seconds": 2.004861958033871,
+      "observed_interval_seconds": 2.004861958033871
     },
     {
       "line": "02 exit 0  0 s  git diff --check",
       "number": 2,
       "exit": 0,
       "script_date_seconds": 0,
-      "completion_observed_utc": "2026-10-20T12:32:09.947026+00:00",
-      "wrapper_elapsed_seconds": 2.0528898750199005,
-      "observed_interval_seconds": 0.04967633401975036
+      "completion_observed_utc": "2026-10-20T22:52:27.289107+00:00",
+      "wrapper_elapsed_seconds": 2.0611588330357336,
+      "observed_interval_seconds": 0.056296875001862645
     },
     {
       "line": "03 exit 0  1 s  cargo clippy --workspace --all-targets -- -D warnings",
       "number": 3,
       "exit": 0,
       "script_date_seconds": 1,
-      "completion_observed_utc": "2026-10-20T12:32:10.019075+00:00",
-      "wrapper_elapsed_seconds": 2.1249401660170406,
-      "observed_interval_seconds": 0.07205029099714011
+      "completion_observed_utc": "2026-10-20T22:52:28.347712+00:00",
+      "wrapper_elapsed_seconds": 3.1197597080026753,
+      "observed_interval_seconds": 1.0586008749669418
     },
     {
-      "line": "04 exit 0  10426 s  cargo test --workspace --release  [1389 passed, 0 failed, 0 ignored]",
+      "line": "04 exit 0  12845 s  cargo test --workspace --release  [1390 passed, 0 failed, 0 ignored]",
       "number": 4,
       "exit": 0,
-      "script_date_seconds": 10426,
-      "completion_observed_utc": "2026-10-20T15:25:56.073727+00:00",
-      "wrapper_elapsed_seconds": 8248.068310540984,
-      "observed_interval_seconds": 8245.943370374967
+      "script_date_seconds": 12845,
+      "completion_observed_utc": "2026-10-21T02:26:33.304668+00:00",
+      "wrapper_elapsed_seconds": 11404.104646791006,
+      "observed_interval_seconds": 11400.984887083003
     },
     {
       "line": "05 exit 0  1 s  cargo build --release -p game",
       "number": 5,
       "exit": 0,
       "script_date_seconds": 1,
-      "completion_observed_utc": "2026-10-20T15:25:57.180744+00:00",
-      "wrapper_elapsed_seconds": 8249.175334791013,
-      "observed_interval_seconds": 1.1070242500281893
+      "completion_observed_utc": "2026-10-21T02:26:33.412501+00:00",
+      "wrapper_elapsed_seconds": 11404.212491958053,
+      "observed_interval_seconds": 0.10784516704734415
     },
     {
-      "line": "06 exit 0  16 s  cargo run --release -p game -- --smoke-test 600",
+      "line": "06 exit 0  17 s  cargo run --release -p game -- --smoke-test 600",
       "number": 6,
       "exit": 0,
-      "script_date_seconds": 16,
-      "completion_observed_utc": "2026-10-20T15:26:18.253349+00:00",
-      "wrapper_elapsed_seconds": 8270.247856458009,
-      "observed_interval_seconds": 21.07252166699618
+      "script_date_seconds": 17,
+      "completion_observed_utc": "2026-10-21T02:26:55.482772+00:00",
+      "wrapper_elapsed_seconds": 11426.282597333018,
+      "observed_interval_seconds": 22.07010537496535
     },
     {
-      "line": "07 exit 0  131 s  cargo run -p game -- --smoke-test 600",
+      "line": "07 exit 0  157 s  cargo run -p game -- --smoke-test 600",
       "number": 7,
       "exit": 0,
-      "script_date_seconds": 131,
-      "completion_observed_utc": "2026-10-20T15:28:34.492911+00:00",
-      "wrapper_elapsed_seconds": 8406.486090541002,
-      "observed_interval_seconds": 136.23823408299359
+      "script_date_seconds": 157,
+      "completion_observed_utc": "2026-10-21T02:29:37.758633+00:00",
+      "wrapper_elapsed_seconds": 11588.55764850002,
+      "observed_interval_seconds": 162.27505116700195
     },
     {
       "line": "08 exit 0  1 s  cargo run --release -p sim --example m7_benchmark",
       "number": 8,
       "exit": 0,
       "script_date_seconds": 1,
-      "completion_observed_utc": "2026-10-20T15:28:35.590927+00:00",
-      "wrapper_elapsed_seconds": 8407.584098665975,
-      "observed_interval_seconds": 1.0980081249726936
+      "completion_observed_utc": "2026-10-21T02:29:38.870177+00:00",
+      "wrapper_elapsed_seconds": 11589.669189250038,
+      "observed_interval_seconds": 1.111540750018321
     },
     {
-      "line": "09 exit 0  9163 s  cargo run --release -p sim --example m7_soak",
+      "line": "09 exit 0  6124 s  cargo run --release -p sim --example m7_soak",
       "number": 9,
       "exit": 0,
-      "script_date_seconds": 9163,
-      "completion_observed_utc": "2026-10-20T18:01:19.217587+00:00",
-      "wrapper_elapsed_seconds": 17571.159575290978,
-      "observed_interval_seconds": 9163.575476625003
-    },
-    {
-      "line": "10 exit 1  13368 s  cargo run --release -p sim --example m14_duels -- full",
-      "number": 10,
-      "exit": 1,
-      "script_date_seconds": 13368,
-      "completion_observed_utc": "2026-10-20T21:44:07.146317+00:00",
-      "wrapper_elapsed_seconds": 30443.050675874983,
-      "observed_interval_seconds": 12871.891100584005
+      "script_date_seconds": 6124,
+      "completion_observed_utc": "2026-10-21T04:11:43.465632+00:00",
+      "wrapper_elapsed_seconds": 17714.227419416013,
+      "observed_interval_seconds": 6124.558230165974
     }
   ],
   "source_mismatches": [],
   "m6_reporting": "ONE required756 sweep collects all bounded returned non-Won cases; no abort on its diagnostic None alone. Invariant/rejection panics remain strict. No extra sweep or acceptance weakening.",
-  "script_pid": 84687,
-  "script_pgid": 84687,
-  "script_session": 84687,
-  "status": "STOPPED after completed failure/source mismatch",
+  "script_pid": 67577,
+  "script_pgid": 67577,
+  "script_session": 67577,
+  "status": "RUNNING",
   "fresh_production_table": {
     "native": {
       "path": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/m6_production_matches_lengths.tsv",
       "exists": true,
-      "bytes": 49793,
-      "sha256": "f896198edf4615e8c7ebe8e2742ea3b0e7e17bfdf85f0d87dd9afda384191ba0",
-      "mtime_ns": 1792506111018655498
+      "bytes": 49790,
+      "sha256": "c8f1db030126b6b14c0dd3723c4c4407055edd58656173241655cfd7f53f14dd",
+      "mtime_ns": 1792547580759103799
     },
     "preserved": {
       "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8/production-lengths.tsv",
       "exists": true,
-      "bytes": 49793,
-      "sha256": "f896198edf4615e8c7ebe8e2742ea3b0e7e17bfdf85f0d87dd9afda384191ba0",
-      "mtime_ns": 1792509956179289805
+      "bytes": 49790,
+      "sha256": "c8f1db030126b6b14c0dd3723c4c4407055edd58656173241655cfd7f53f14dd",
+      "mtime_ns": 1792549593412162930
     },
     "bound_after_successful_phase4": true,
     "native_mtime_after_launch": true
-  },
-  "stop_reason": "Completed phase failure or frozen-source mismatch",
-  "stop_signal_utc": "2026-10-20T21:44:07.284749+00:00",
-  "end_utc": "2026-10-20T21:44:07.285458+00:00",
-  "elapsed_seconds": 30443.18987570802,
-  "exit": -15,
-  "output_log": {
-    "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8/gate-process-output.log",
-    "exists": true,
-    "bytes": 607,
-    "sha256": "240b39dbe6a9e62a377e7283883274ab0cf964b6ea7ca2c32e1cdb1fcb5916b0",
-    "mtime_ns": 1792532646686123552
-  },
-  "uncompleted_phases": [
-    11,
-    12,
-    13
-  ],
-  "phase_timing_note": "Script dates are integer wall seconds; row observation intervals include up to1s polling/next-command handoff. Wrapper monotonic total is recorded separately."
+  }
 }

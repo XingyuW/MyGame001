@@ -1,0 +1,93 @@
+{
+  "attempt": 17,
+  "checkpoint": 17,
+  "observed_utc": "2026-10-21T01:54:21.509298+00:00",
+  "head": "99bcdf1913f3d74079ce2baa8b440b68a315223a",
+  "runtime_commit": "eb308a231e302048c9dc8d1e8b9543b7c5f64ef7",
+  "source_manifests": {
+    "runtime": {
+      "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8-preflight/attempt16-final2-runtime-manifest.json",
+      "exists": true,
+      "bytes": 38110,
+      "sha256": "23dc30e9d22a1e6c23589eebb71d57e3e3e7138770c673ee4dd2b4cb5ca8fa0f",
+      "mtime_ns": 1792534815143198401
+    },
+    "test-example": {
+      "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8-preflight/attempt16-final2-test-example-manifest.json",
+      "exists": true,
+      "bytes": 19463,
+      "sha256": "3b3df482593e41d4399a5735c2b5da9ac236b044d631b59a110d6d1581d6960f",
+      "mtime_ns": 1792534815143354027
+    }
+  },
+  "phase4_status": "M6 target passed; workspace/full13 still running. This is not full RA8 acceptance.",
+  "m6_rust_result": [
+    "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8955.72s"
+  ],
+  "completed": 756,
+  "non_Won": 0,
+  "unique_matches": 756,
+  "map_counts": {
+    "arctic_floes": 36,
+    "black_water": 36,
+    "continental_divide": 36,
+    "coral_archipelago": 36,
+    "crossroads": 36,
+    "demo": 36,
+    "ember_caldera": 36,
+    "frostline": 36,
+    "frozen_sound": 36,
+    "glacier_pass": 36,
+    "harvest_plains": 36,
+    "iron_isthmus": 36,
+    "jungle_delta": 36,
+    "liberty_bay": 36,
+    "oasis_gulf": 36,
+    "pacific_atoll": 36,
+    "red_canyon": 36,
+    "riverlands": 36,
+    "steel_harbor": 36,
+    "thousand_lakes": 36,
+    "wheel_of_worlds": 36
+  },
+  "native_table": {
+    "path": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/m6_production_matches_lengths.tsv",
+    "bytes": 49790,
+    "sha256": "c8f1db030126b6b14c0dd3723c4c4407055edd58656173241655cfd7f53f14dd",
+    "mtime_ns": 1792547580759103799,
+    "mtime_after_current_launch": true
+  },
+  "preserved_table": {
+    "path": "docs/validation/ra2-parity/ra8/checkpoint17-m6-production-lengths.tsv",
+    "bytes": 49790,
+    "sha256": "c8f1db030126b6b14c0dd3723c4c4407055edd58656173241655cfd7f53f14dd"
+  },
+  "section_sha256": "f0f9abf744c6b6d852449e7165076dd6bfc01faa09604f4a0e56aa35a15eedf6",
+  "ticks": {
+    "min": 6659,
+    "mean": 37622.112433862436,
+    "median": 29465.0,
+    "p90_nearest_rank": 71938,
+    "p99_nearest_rank": 141579,
+    "max": 279129
+  },
+  "normalized_ticks_over_original_map_limit": {
+    "min": 0.04167013888888889,
+    "mean": 0.16844230057249238,
+    "median": 0.1214449074074074,
+    "p90_nearest_rank": 0.33425,
+    "p99_nearest_rank": 0.7218194444444445,
+    "max": 0.9691979166666667
+  },
+  "max_tick_match": {
+    "match": "liberty_bay: korea (brutal) against france (brutal)",
+    "ticks": 279129,
+    "limit": 288000
+  },
+  "max_normalized_match": {
+    "match": "liberty_bay: korea (brutal) against france (brutal)",
+    "ticks": 279129,
+    "limit": 288000
+  },
+  "semantics": "Native table records SimTick after outcome; may be one above Won event tick. Actual original M6 per-map limits remain unchanged. Functional RA9 copy work overlapped; no isolated performance inference."
+}

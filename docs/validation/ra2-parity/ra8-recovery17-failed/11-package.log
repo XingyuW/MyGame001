@@ -1,0 +1,4 @@
+    Finished `release` profile [optimized] target(s) in 0.48s
+2026-10-21T09:40:06.632023Z  WARN bevy_winit::state: Skipped event Destroyed for unknown winit Window Id WindowId(505220516352)
+package: /Users/xingyuwang/Library/Caches/Codex/cargo-target/package/MyGame001.app
+archive: /Users/xingyuwang/Library/Caches/Codex/cargo-target/package/MyGame001-macos.zip

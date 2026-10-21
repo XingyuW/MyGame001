@@ -1,0 +1,28 @@
+{
+  "name": "strict-clippy1",
+  "command": [
+    "cargo",
+    "clippy",
+    "--workspace",
+    "--all-targets",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "source_manifest": "docs/validation/ra2-parity/ra8-attempt17-jungle/strict-clippy1-manifest.json",
+  "manifest_sha256": "4126bc1f8321611c53244e9840a5d0d703f42a2dd1c77f9e2e12b3a1f3ebf877",
+  "start_utc": "2026-10-21T10:27:59.346103+00:00",
+  "head": "99bcdf1913f3d74079ce2baa8b440b68a315223a",
+  "status": "COMPLETED",
+  "source_files": 495,
+  "pid": 55560,
+  "exit": 0,
+  "seconds": 6.297901333949994,
+  "end_utc": "2026-10-21T10:28:05.649142+00:00",
+  "source_mismatches": [],
+  "raw": {
+    "path": "docs/validation/ra2-parity/ra8-attempt17-jungle/strict-clippy1.log",
+    "bytes": 230,
+    "sha256": "21bae325cce5b9c6f3273f70629e1de5665e60ddd392708fe73dd98dbe1a4cb3"
+  }
+}

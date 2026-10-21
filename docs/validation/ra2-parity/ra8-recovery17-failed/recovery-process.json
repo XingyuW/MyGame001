@@ -1,0 +1,82 @@
+{
+  "start_utc": "2026-10-21T08:17:53.068351+00:00",
+  "pid": 41956,
+  "head": "99bcdf1913f3d74079ce2baa8b440b68a315223a",
+  "runtime_commit": "eb308a231e302048c9dc8d1e8b9543b7c5f64ef7",
+  "scope": "Component recovery10/11, then unchanged-source isolated postgate5. Original failed all13 invocation remains failed. No fresh all13 invocation claimed.",
+  "source_before": {
+    "files": 495,
+    "mismatches": []
+  },
+  "commands": [
+    {
+      "name": "components-10-11",
+      "command": [
+        "sh",
+        "scripts/validate_ra2_parity.sh",
+        "ra8-recovery17",
+        "10",
+        "11"
+      ],
+      "start_utc": "2026-10-21T08:17:53.159753+00:00",
+      "source_before": {
+        "files": 495,
+        "mismatches": []
+      },
+      "status": "PASS",
+      "pid": 41982,
+      "exit": 0,
+      "seconds": 4936.45190450002,
+      "end_utc": "2026-10-21T09:40:09.631758+00:00",
+      "source_after": {
+        "files": 495,
+        "mismatches": []
+      },
+      "raw": {
+        "path": "docs/validation/ra2-parity/ra8-recovery17/components-10-11.log",
+        "bytes": 153,
+        "sha256": "04117c3e4294eba136002f2bdfb01395b621f1730d5f48f3516c00e72dde3238"
+      }
+    },
+    {
+      "name": "postgate-all21",
+      "command": [
+        "cargo",
+        "run",
+        "--release",
+        "-p",
+        "sim",
+        "--example",
+        "m13_ten_players",
+        "--",
+        "to-the-end",
+        "all"
+      ],
+      "start_utc": "2026-10-21T09:40:09.754705+00:00",
+      "source_before": {
+        "files": 495,
+        "mismatches": []
+      },
+      "status": "FAIL",
+      "pid": 50509,
+      "exit": 1,
+      "seconds": 1741.8746062499704,
+      "end_utc": "2026-10-21T10:09:11.640290+00:00",
+      "source_after": {
+        "files": 495,
+        "mismatches": []
+      },
+      "raw": {
+        "path": "docs/validation/ra2-parity/ra8-recovery17/postgate-all21.log",
+        "bytes": 8288,
+        "sha256": "3bfaccbd6e896808ca624358d54c095b7399e294940a8d6fe765313ce9a57da7"
+      }
+    }
+  ],
+  "status": "FAILED",
+  "end_utc": "2026-10-21T10:09:11.686390+00:00",
+  "source_after": {
+    "files": 495,
+    "mismatches": []
+  }
+}
