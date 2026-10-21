@@ -2452,7 +2452,14 @@ fn funding_force(view: &View<'_>, controller: &AiController) -> bool {
 fn understrength_funding(view: &View<'_>, controller: &AiController) -> bool {
     if !view.ai.rules_difficulty
         || strategy::service_income(view)
-        || !visible_ore(view).is_empty()
+        // An observed field cannot earn without a worker. Retain existing
+        // workers (including unavailable or stowed actors conservatively),
+        // rather than letting bare ore veto financing a real replacement force.
+        || (!visible_ore(view).is_empty()
+            && (view.owned_units.iter().any(|unit| unit.harvest.is_some())
+                || view.living_owned_ids.iter().any(|id| {
+                    !view.owned_units.iter().any(|unit| unit.id == *id)
+                })))
         || !view.recoverable_service.is_empty()
         // The new finite ground-reinforcement investment must not spend the
         // support economy of an existing air force or its real reload lifecycle.
@@ -2460,22 +2467,6 @@ fn understrength_funding(view: &View<'_>, controller: &AiController) -> bool {
             .owned_units
             .iter()
             .any(|unit| view.definitions.domain(unit.kind) == Domain::Air)
-        // Preserve a strategic capability's complete power/recovery path, not
-        // just the source building, before optional ground reinforcement sales.
-        || view.own_buildings.iter().any(|building| {
-            view.definitions
-                .metadata(ProductionItem::Building(building.kind))
-                .is_some_and(|meta| {
-                    matches!(
-                        meta.role,
-                        Role::Nuke
-                            | Role::Storm
-                            | Role::Curtain
-                            | Role::Chronosphere
-                            | Role::Paradrop
-                    )
-                })
-        })
         || !view
             .own_units
             .iter()
@@ -2599,6 +2590,28 @@ fn sell_for_army(view: &View<'_>, controller: &AiController) -> Option<Command> 
                 .is_none_or(|entry| entry.sellable)
     };
     let reinforcing = understrength_funding(view, controller);
+    let strategic_role = |kind| {
+        view.definitions
+            .metadata(ProductionItem::Building(kind))
+            .is_some_and(|meta| {
+                matches!(
+                    meta.role,
+                    Role::Nuke | Role::Storm | Role::Curtain | Role::Chronosphere | Role::Paradrop
+                )
+            })
+    };
+    let strategic = reinforcing && view.own_buildings.iter().any(|b| strategic_role(b.kind));
+    // A strategic source retains itself and its actual power support while
+    // unrelated optional assets can fund ordinary ground reinforcements.
+    // The existing producer/prerequisite and useful-service guards still apply.
+    let preserves_strategic = |kind| {
+        !strategic
+            || (!strategic_role(kind)
+                && !view
+                    .definitions
+                    .building(kind)
+                    .is_some_and(|building| building.power_produced > 0))
+    };
     let useful_service = |kind: BuildingKind| {
         let Some(building) = view.definitions.metadata(ProductionItem::Building(kind)) else {
             return false;
@@ -2622,6 +2635,7 @@ fn sell_for_army(view: &View<'_>, controller: &AiController) -> Option<Command> 
         .own_buildings
         .iter()
         .filter(|building| !needed.contains(&building.kind) && sellable(building.kind))
+        .filter(|building| preserves_strategic(building.kind))
         // A living depleted cohort seeks optional reinforcement capital, not
         // liquidation of its building-production recovery capability.
         .filter(|building| {
@@ -2646,7 +2660,12 @@ fn sell_for_army(view: &View<'_>, controller: &AiController) -> Option<Command> 
     // producer may fund a real replacement through another retained producer.
     view.own_buildings
         .iter()
-        .filter(|b| sellable(b.kind) && !builds(b.kind) && !useful_service(b.kind))
+        .filter(|b| {
+            sellable(b.kind)
+                && !builds(b.kind)
+                && !useful_service(b.kind)
+                && preserves_strategic(b.kind)
+        })
         .filter(|building| {
             let remaining: Vec<_> = view
                 .own_buildings

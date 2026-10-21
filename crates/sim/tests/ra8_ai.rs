@@ -12093,3 +12093,168 @@ fn ra8_understrength_financing_keeps_a_ground_support_sources_real_power_path() 
         "the actual ground-only wave must receive native Chronoshift after natural source charge completes"
     );
 }
+
+fn optional_reinforcement_with_independent_recovery(strategic: bool, observed_ore: bool) {
+    let mut app = scenario("russia", "brutal", 0, 0, strategic);
+    let reactor = put(&mut app, "nuclear_reactor", 2, 2);
+    let barracks = put(&mut app, "soviet_barracks", 5, 12);
+    let source = strategic.then(|| put(&mut app, "nuclear_silo", 2, 18));
+    let asset = put(&mut app, "cloning_vats", 18, 5);
+    let ore = CellPos::new(7, 15);
+    if observed_ore {
+        app.world_mut().resource_mut::<Grid>().set_terrain(
+            ore,
+            Cell {
+                passable: true,
+                buildable: true,
+                water: false,
+                ore: 12,
+            },
+        );
+    }
+    let fighter = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "conscript",
+        CellPos::new(12, 13),
+    )
+    .unwrap();
+    let target = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "soviet_construction_yard",
+        CellPos::new(17, 13),
+    )
+    .unwrap();
+    let definitions = app.world().resource::<sim::Definitions>();
+    let item = sim::ProductionItem::Unit(definitions.unit_kind("conscript").unwrap());
+    let cost = definitions.production(item).unwrap().cost;
+    let refund = definitions.refund(definitions.building_kind("cloning_vats").unwrap());
+    assert!(refund >= cost && cost > 0);
+    let mut sold = None;
+    let mut charged = false;
+    let mut paid = false;
+    let mut recruits = std::collections::BTreeSet::new();
+    let mut fighter_shot = false;
+    let mut recruit_shot = false;
+    let mut source_charged = false;
+    for _ in 0..6000 {
+        let world = app.world_mut();
+        assert!(
+            world
+                .query::<(&sim::Owner, &sim::Harvester)>()
+                .iter(world)
+                .all(|(owner, _)| owner.0 != PlayerId(0)),
+            "observed ore alone is not actual income without an owned worker"
+        );
+        if observed_ore && world.resource::<SimTick>().0 > 0 {
+            assert!(
+                world
+                    .resource::<sim::Players>()
+                    .get(PlayerId(0))
+                    .unwrap()
+                    .vision()
+                    .is_visible(ore)
+                    && world.resource::<Grid>().cell(ore).unwrap().ore > 0,
+                "the ordinary field must actually be observed while no worker exists"
+            );
+        }
+        charged |= world
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .queues()
+            .flat_map(|(_, queue)| queue)
+            .any(|head| head.item == item && head.charged > 0);
+        source_charged |= source.is_some_and(|source| {
+            world
+                .resource::<sim::SpecialState>()
+                .charge
+                .get(&source)
+                .is_some_and(|charge| *charge > 0)
+        });
+        for event in step(&mut app) {
+            match event {
+                sim::SimEvent::BuildingSold {
+                    player: PlayerId(0),
+                    building,
+                    refund: amount,
+                } => {
+                    assert_eq!(building, asset, "retain source, power and real producers");
+                    assert_eq!(amount, refund, "ordinary exact refund only");
+                    assert!(sold.replace(amount).is_none());
+                }
+                sim::SimEvent::ProductionComplete {
+                    player: PlayerId(0),
+                    item: found,
+                } if found == item => paid = true,
+                sim::SimEvent::UnitSpawned {
+                    player: PlayerId(0),
+                    building,
+                    unit,
+                } if building == barracks => {
+                    recruits.insert(unit);
+                }
+                sim::SimEvent::WeaponFired {
+                    attacker,
+                    target: found,
+                    ..
+                } if found == target => {
+                    fighter_shot |= attacker == fighter;
+                    recruit_shot |= recruits.contains(&attacker);
+                }
+                sim::SimEvent::OreDelivered {
+                    player: PlayerId(0),
+                    ..
+                } => panic!("this declared no-worker scenario must have no income"),
+                _ => {}
+            }
+        }
+        if recruit_shot && fighter_shot {
+            break;
+        }
+    }
+    let reactor_entity = unit_entity(&mut app, reactor);
+    assert!(
+        app.world()
+            .get::<sim::Health>(reactor_entity)
+            .unwrap()
+            .hit_points
+            > 0
+    );
+    assert!(
+        !app.world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .low_power()
+    );
+    if let Some(source) = source {
+        let entity = unit_entity(&mut app, source);
+        assert!(app.world().get::<sim::Health>(entity).unwrap().hit_points > 0);
+        assert!(source_charged, "retain actual natural strategic charging");
+    }
+    eprintln!(
+        "independent recovery strategic{strategic} ore{observed_ore} sold{sold:?} charged{charged} paid{paid} fighter_shot{fighter_shot} recruit_shot{recruit_shot} source_charged{source_charged}"
+    );
+    assert!(
+        fighter_shot,
+        "the original living field force must actually engage"
+    );
+    assert_eq!(
+        sold,
+        Some(refund),
+        "independent recovery must not veto an unrelated optional reinforcement refund"
+    );
+    assert!(charged && paid && !recruits.is_empty() && recruit_shot);
+}
+
+#[test]
+fn ra8_optional_reinforcement_preserves_strategic_sources_and_power() {
+    optional_reinforcement_with_independent_recovery(true, false);
+}
+
+#[test]
+fn ra8_optional_reinforcement_is_not_vetoed_by_observed_ore_without_workers() {
+    optional_reinforcement_with_independent_recovery(false, true);
+}
