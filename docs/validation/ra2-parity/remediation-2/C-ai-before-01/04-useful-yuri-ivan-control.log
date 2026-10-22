@@ -1,0 +1,21 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0507]: cannot move out of `*definitions` which is behind a shared reference
+     --> crates/sim/tests/ra8_ai.rs:13269:19
+      |
+13269 |     let fixture = definitions.with_arsenal(&file).unwrap();
+      |                   ^^^^^^^^^^^ ------------------- `*definitions` moved due to this method call
+      |                   |
+      |                   move occurs because `*definitions` has type `Definitions`, which does not implement the `Copy` trait
+      |
+note: `arsenal::<impl Definitions>::with_arsenal` takes ownership of the receiver `self`, which moves `*definitions`
+     --> crates/sim/src/arsenal.rs:1436:29
+      |
+ 1436 |     pub fn with_arsenal(mut self, path: impl AsRef<Path>) -> Result<Self, DataError> {
+      |                             ^^^^
+help: consider cloning the value if the performance cost is acceptable
+      |
+13269 |     let fixture = definitions.clone().with_arsenal(&file).unwrap();
+      |                              ++++++++
+
+For more information about this error, try `rustc --explain E0507`.
+error: could not compile `sim` (test "ra8_ai") due to 1 previous error

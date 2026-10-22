@@ -1,0 +1,18 @@
+{
+  "status": "EXACT_CHANGED_AND_UNTRACKED_GUARDED_INPUT_PREIMAGES",
+  "files": [
+    {
+      "source": "crates/sim/tests/ra9_support_current.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-runtime-before-01/source-preimages/crates/sim/tests/ra9_support_current.rs",
+      "bytes": 12141,
+      "sha256": "20676eef27800f671f4ab3cd2d816cbeb7a5d8e15f697b0824b111da0981b5f8"
+    },
+    {
+      "source": "crates/sim/tests/ra9_temporal_pending.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-runtime-before-01/source-preimages/crates/sim/tests/ra9_temporal_pending.rs",
+      "bytes": 13072,
+      "sha256": "f5606213d9b6cddac51baabffd068fcf2bf04cc4d28f8109248da3535b93b307"
+    }
+  ],
+  "tracked_unchanged_source": "Available in recorded Git predecessor"
+}

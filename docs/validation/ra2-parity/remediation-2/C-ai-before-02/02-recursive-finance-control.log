@@ -1,0 +1,22 @@
+    Finished `release` profile [optimized] target(s) in 0.11s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-ee06563c18f69d10)
+
+running 3 tests
+
+thread 'ai::ra8_lifecycle_remediation_tests::ra9_nested_owned_cohort_nested_financing_preserves_real_asset' (17486802) panicked at crates/sim/src/ai/ra8_lifecycle_remediation_tests.rs:343:5:
+assertion `left == right` failed: only real loss below shipped cohort size may release reinforcement capital; nested=true
+  left: true
+ right: false
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ai::ra8_lifecycle_remediation_tests::ra9_nested_owned_cohort_nested_financing_preserves_real_asset ... FAILED
+test ai::ra8_lifecycle_remediation_tests::ra9_nested_owned_cohort_direct_financing_control ... ok
+test ai::ra8_lifecycle_remediation_tests::ra9_nested_owned_cohort_real_root_loss_releases_reinforcement_finance ... ok
+
+failures:
+
+failures:
+    ai::ra8_lifecycle_remediation_tests::ra9_nested_owned_cohort_nested_financing_preserves_real_asset
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 133 filtered out; finished in 0.28s
+
+error: test failed, to rerun pass `-p sim --lib`

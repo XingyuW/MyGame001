@@ -1,0 +1,118 @@
+{
+  "status": "VALIDATED_NOT_INDEPENDENTLY_REVIEWED",
+  "utc": "2026-10-22T21:05:05.513638+00:00",
+  "change": {
+    "path": "crates/sim/examples/m7_benchmark.rs",
+    "sha256": "de2f52f76cf3e7fd2e1d1d61f9e4c103953a877337e3fb43550fd9657bfbd3a2",
+    "guarded_delta_since_original_failed_preflight": [
+      "crates/sim/examples/m7_benchmark.rs"
+    ],
+    "scope": "Only shipped scenario AttackMove destinations: both original armies converge at arithmetic midpoint of original demo starts. All original roster membership, counts, source numerical gameplay, measurement, witness code, tests and budgets unchanged."
+  },
+  "cause": {
+    "observed": "Original five Chrono Legionnaires (46,50,51,53,54) destroyed during measured tick0 before any end-of-tick changed-position observation; Crazy Ivans142 and143 retain initial positions until their later destruction. Original command destinations are within opposing initial formation.",
+    "source_explanation": "special::infantry::maintain teleports non-miner teleporter actors to Orders destination during Economy, before Combat and Cleanup; combat AttackMove acquires a target and clears movement to fight. End-of-tick-only witness cannot see a transient teleport followed by death. Native diagnostic observed deaths/positions, not intermediate stage teleport coordinates. The inference from these facts is that immediate opposing-spawn teleport/contact makes the original scenario premise invalid for witnessing every actor. No production defect was established or changed.",
+    "correction": "AttackMove both unmodified200-actor armies to midfield, allowing genuine observed movement before opposing formation contact. No counted/fabricated witnesses, discarded participants, staging ticks, extra warmup or timing exclusion."
+  },
+  "evidence": {
+    "original_failed_preflight": "C-benchmark-preflight-01/process.json",
+    "original_exact_preimage": "C-benchmark-setup-01/m7_benchmark-original.rs",
+    "diagnostic_failed_original_plus_observations": "C-benchmark-diagnostic-01/process.json",
+    "candidate_actual_benchmark": "C-benchmark-candidate-01/process.json",
+    "final_fmt_diff_existing_tests_actual_benchmark": "C-benchmark-after-01/process.json",
+    "strict_workspace_all_target_clippy": "C-benchmark-strict-01/process.json"
+  },
+  "final_checks": {
+    "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+    "start": "2026-10-22T21:03:51.945156+00:00",
+    "pid": 26193,
+    "head": "aafd1794a84f88b9919b7e31c78768e08f66d70d",
+    "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/benchmark2-after-01-plan.json",
+    "plan_sha256": "7153ebd82e28a8adc470dea518d72187859039472e1882b33e323c8d766e79a8",
+    "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+    "snapshot_exclude": [],
+    "commands": [
+      {
+        "command": [
+          "cargo",
+          "fmt",
+          "--all",
+          "--",
+          "--check"
+        ],
+        "start": "2026-10-22T21:03:52.070402+00:00",
+        "raw": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/01-fmt-check.log",
+        "pid": 26201,
+        "pgid": 26201,
+        "exit": 0,
+        "end": "2026-10-22T21:03:57.080528+00:00",
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "source_unchanged": true
+      },
+      {
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "start": "2026-10-22T21:03:57.288481+00:00",
+        "raw": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/02-diff-check.log",
+        "pid": 26227,
+        "pgid": 26227,
+        "exit": 0,
+        "end": "2026-10-22T21:04:02.301173+00:00",
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "source_unchanged": true
+      },
+      {
+        "command": [
+          "cargo",
+          "test",
+          "--release",
+          "-p",
+          "sim",
+          "--example",
+          "m7_benchmark",
+          "--",
+          "--nocapture"
+        ],
+        "start": "2026-10-22T21:04:02.502627+00:00",
+        "raw": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/03-unchanged-example-regressions.log",
+        "pid": 26235,
+        "pgid": 26235,
+        "exit": 0,
+        "end": "2026-10-22T21:04:22.525568+00:00",
+        "raw_bytes": 599,
+        "raw_sha256": "db96b9e75def9612c685cf4f5e12234abd373d1d1dc6ed3e72c47d3830ac9ce7",
+        "source_unchanged": true
+      },
+      {
+        "command": [
+          "cargo",
+          "run",
+          "--release",
+          "-p",
+          "sim",
+          "--example",
+          "m7_benchmark"
+        ],
+        "start": "2026-10-22T21:04:22.736874+00:00",
+        "raw": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/04-original-release-benchmark.log",
+        "pid": 26341,
+        "pgid": 26341,
+        "exit": 0,
+        "end": "2026-10-22T21:04:27.752252+00:00",
+        "raw_bytes": 830,
+        "raw_sha256": "698f9b74500636146d2ea11e4319415ab3932527eda3e66acd8dc0e83c8a8b3c",
+        "source_unchanged": true
+      }
+    ],
+    "heartbeat": "2026-10-22T21:04:22.741588+00:00",
+    "end": "2026-10-22T21:04:27.860663+00:00",
+    "source_unchanged": true
+  },
+  "validation_limits": "Fresh factual rebind/full13/independent review still required. No approval or prior full validation transfer claimed. Existing RA8/RA9/remediation deltas preserved.",
+  "outside_repository_storage": "Only three small benchmark2 plan JSON files and detached launcher logs/receipts inside the already approved review cache were added. No new substantial outside-repository directory, clone, worktree, build override or temporary dataset was created. Configured Cargo target remains necessary."
+}

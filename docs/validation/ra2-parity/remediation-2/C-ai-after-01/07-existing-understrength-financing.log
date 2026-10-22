@@ -1,0 +1,10 @@
+    Finished `release` profile [optimized] target(s) in 0.12s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-b27027efb5a77317)
+
+running 2 tests
+ground support wavedtrue activatedtrue tickSimTick(8412) cooldown8400 chargeSome(1) known{SimId(1): KnownBuilding { owner: PlayerId(1), footprint: Footprint { origin: CellPos { x: 38, y: 38 }, width: 3, height: 3 }, kind: BuildingKind(29) }} wave{SimId(5), SimId(6)} commandsCommandQueue { pending: [] }
+test ra8_understrength_financing_keeps_a_ground_support_sources_real_power_path ... ok
+test ra8_understrength_financing_preserves_legacy_and_real_service_assets ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 137 filtered out; finished in 0.81s
+

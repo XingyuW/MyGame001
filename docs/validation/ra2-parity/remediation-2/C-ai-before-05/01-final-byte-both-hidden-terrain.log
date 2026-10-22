@@ -1,0 +1,27 @@
+    Finished `release` profile [optimized] target(s) in 0.13s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-b27027efb5a77317)
+
+running 2 tests
+
+thread 'ra9_privacy_remembered_bridge_approach_ignores_real_hidden_house_destruction' (17518555) panicked at crates/sim/tests/ra8_ai.rs:12815:5:
+assertion `left == right` failed: hidden physical terrain must not select an outgoing AI command
+  left: [Move { units: [SimId(2)], target: CellPos { x: 20, y: 21 } }]
+ right: [Move { units: [SimId(2)], target: CellPos { x: 20, y: 22 } }]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra9_privacy_remembered_bridge_approach_ignores_real_hidden_house_destruction ... FAILED
+
+thread 'ra9_privacy_remembered_bridge_approach_ignores_real_hidden_bridge_repair' (17518554) panicked at crates/sim/tests/ra8_ai.rs:12815:5:
+assertion `left == right` failed: hidden physical terrain must not select an outgoing AI command
+  left: [Move { units: [SimId(2)], target: CellPos { x: 20, y: 21 } }]
+ right: [Move { units: [SimId(2)], target: CellPos { x: 20, y: 22 } }]
+test ra9_privacy_remembered_bridge_approach_ignores_real_hidden_bridge_repair ... FAILED
+
+failures:
+
+failures:
+    ra9_privacy_remembered_bridge_approach_ignores_real_hidden_bridge_repair
+    ra9_privacy_remembered_bridge_approach_ignores_real_hidden_house_destruction
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 137 filtered out; finished in 0.92s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

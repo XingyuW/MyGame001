@@ -301,17 +301,28 @@ pub(crate) fn advance(world: &mut World) {
         let (Some(a), Some(b)) = (index.get(&id), index.get(&target)) else {
             continue;
         };
-        // Neither acts nor is acted on once its hit points are gone (a strike of this tick's
-        // commands): it is removed in `Cleanup`, and the order with it.
-        if !a.alive() || !b.alive() || validate_interaction(world, a, b, &defs).is_err() {
+        // Earlier interactions can consume, capture or injure an actor in this same pass.
+        let (Some(a), Some(b)) = (current_actor(world, a), current_actor(world, b)) else {
+            world
+                .resource_mut::<SpecialState>()
+                .interactions
+                .remove(&id);
+            continue;
+        };
+        if validate_interaction(world, &a, &b, &defs).is_err() {
             world
                 .resource_mut::<SpecialState>()
                 .interactions
                 .remove(&id);
             continue;
         }
-        if distance(a, b) <= 1 {
-            let _ = interact(world, a, b, &defs);
+        // A real channel can begin after the last approach step. Retain that temporary
+        // pending job; neither adjacency nor acceptance on an earlier tick permits action.
+        if commandable(world, id).is_err() {
+            continue;
+        }
+        if distance(&a, &b) <= 1 {
+            let _ = interact(world, &a, &b, &defs);
             world
                 .resource_mut::<SpecialState>()
                 .interactions
@@ -351,6 +362,18 @@ pub(crate) fn advance(world: &mut World) {
                 && a.owner != crate::NEUTRAL
                 && defs.metadata(a.item).is_some_and(|m| m.hospital)
         }) {
+            let Some(a) = current_actor(world, a) else {
+                continue;
+            };
+            if a.owner == crate::NEUTRAL
+                || !defs.metadata(a.item).is_some_and(|m| m.hospital)
+                || world
+                    .resource::<SpecialState>()
+                    .erasures
+                    .contains_key(&a.id)
+            {
+                continue;
+            }
             if let Some(patients) = world.resource_mut::<SpecialState>().cargo.get_mut(&a.id) {
                 for patient in patients {
                     if let Some(terms) = defs.unit_combat(patient.kind) {
@@ -361,7 +384,7 @@ pub(crate) fn advance(world: &mut World) {
                     }
                 }
             }
-            let _ = unload_ready(world, a, &defs, |p| {
+            let _ = unload_ready(world, &a, &defs, |p| {
                 defs.unit_combat(p.kind)
                     .is_some_and(|terms| p.hp >= terms.hit_points)
             });

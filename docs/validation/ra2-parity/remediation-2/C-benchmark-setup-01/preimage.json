@@ -1,0 +1,5 @@
+{
+  "source": "crates/sim/examples/m7_benchmark.rs",
+  "sha256": "d7e9042ac3a74cf87ed0ba0ce72626385cc03d4537298f16ed6105452999a6bc",
+  "purpose": "Exact original benchmark before temporary diagnostic observations"
+}

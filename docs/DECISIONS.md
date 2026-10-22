@@ -12150,3 +12150,86 @@ The user explicitly chose Keep both projects running. No unrelated process was p
 Review scratch/drafts remain in the existing approved cache; no clone/worktree or substantial
 /tmp artifact is created. Current reference README's1737→1911 factual correction may be made
 before the new source freeze, with independent DATA reinspection, never a changed policy class.
+
+
+### R200. Correct open-panel2 runtime/client/AI findings and freeze actual revised inputs
+
+Fresh implementers (ineligible for independent review) corrected current active Hospital service,
+pending actor/Prop Interact jobs and living non-red voluntary garrison exits under Temporal;
+current actor identity/HP/owner/type/position is reread at action boundaries. Dead actors remain
+available for provenance/death cleanup. Purifier/Cloner selection rereads live current owner/HP.
+Runtime BEFORE02 has4 controls pass/9 intended failures; exact final test bodies then pass all56
+cases across8 targets. Removed/red hosts retain forced cleanup, distinct from voluntary work.
+Passive unit self-heal, Oil cash, positive-HP Purifier bonuses and Cloner request admission are
+unchanged bounded choices, as are R195 power/radar/prerequisites/external paid repair. These
+specific source observations do not establish original-engine passive behavior or a universal
+freeze theorem; active Hospital/jobs/voluntary exits pause and already launched effects/necessary
+cleanup remain separate. No global removal of dead actors suppresses provenance or cleanup.
+
+Client shown_scenery gates current visibility before live Props/garrison access; bridge_states
+updates remembered MapTerrain only under the existing observed-cell gate. Three final native
+controls genuinely fail BEFORE and pass AFTER on identical bodies; all278 unit tests pass plus
+4 selected child probes. The broader debug Cargo command was stopped only after verified owned
+PID/PGID/argv14588/14588; its actual exit-15/interrupted integration tail is preserved and never
+counted passed. The final full13 retains complete release integration coverage. Original seven
+privacy and RA2/legacy Tree controls remain. Initial feature-only Auto-soil House fixture rendered
+Cliff; final Grass+House/Water+Bridge fixtures explicitly assert actual renderer tops, retain all
+assertions and exercise real damage/destruction/occupation/collapse/repair/re-observation.
+C-client-after-01's1pass/1 setup-premise failure and every earlier attempt remain preserved.
+
+AI retains private immutable public initial navigation flags with dimensions and a deterministic
+construction fingerprint; only sparse legitimately observed differences mutate and all enter
+state_hash. This avoids copying/scanning the full baseline on every hash; one byte/cell/controller,
+655360 baseline bytes for10 controllers on256x256,46 fixed hash bytes/controller plus5/override.
+Observation scans the visible-qualified map at due thought time; actual physical Grid remains
+movement authority. This is an implementation cost description, not a final performance pass.
+Building capability now carries real bombable/immune-radiation metadata into shared weapon
+selection; native Ivan and controlled-Ivan opportunities no longer falsely trigger liquidation.
+Recursive living-owned cargo preserves memory, detector-loss/attempt and finance bookkeeping;
+real root capture/death still removes eligibility. Final cargo5 cases pass; final terrain/Ivan6
+plus expanded useful-Yuri pass, as does the explicitly AFTER-only new-state hash invariant.
+BEFORE cargo diagnostics tracked=false/detector=true/outstanding=false/failures1 become
+true/false/true/0 AFTER. Native hidden House/bridge commands formerly differ20,21vs20,22 and
+now match under equal observer knowledge, with real re-observation positives still distinct.
+
+Named unchanged-assertion initial-geometry corrections: ra8_lone_yuri_preserves_only_seen_reachable_controllable_building_damaging_recruits moves its declared water barrier before controller setup and gains real Ivan cases. ra8_unseen_enemy_water_building_cannot_change_naval_planning and ra8_unseen_water_obstacle_before_the_edge_range_endpoint_cannot_change_naval_planning move their shared declared initial water corridor before controller setup. The complete release AI target actually137pass/2fail, followed by each exact1pass retry; no whole139pass is synthesized. Full13 must run all139 together. New-control bytes/transitive helpers remain exact across the unrelated latter fixture edit, with prefix/suffix proofs. Explicit outward hut and re-observation scout14,27 correct new map premises without weakening assertions. Every compiler/setup failure, prior source, native result and exact production rollback/restoration remains in remediation-2.
+
+The reference README now states actual1911 atoms/1888 keys:1869 whole+19 first+19 second+4 third
+components; completion174 contributes132 whole+42 component atoms across151 keys. The table's
+759 CURRENT_MODEL_NONREAD/1152 INTENTIONAL_DIFFERENCE classifications are unchanged, with zero
+original-engine-unused claims. This fixes DATA2-P2-01's factual prose, pending independent check.
+Strict fmt/diff/all-target Clippy and stable whole-audit controls pass. New late twins reach
+Won at41738/72000 (41739 schedules), late444/8/6, final39f875fa3379047a/trajectory67c1cf209f7e6c01.
+Both original late causal omissions fail with exact native exits, then exact restoration passes.
+The original m7 benchmark preflight actually failed exit1: seven original participants lacked
+observed motion; timing of the fixture scenario passed. Diagnostics directly observed five
+Chrono Legionnaires die during tick0 under opposing-spawn AttackMove and two stationary Ivans
+die later. Intermediate teleport coordinates are a source-qualified inference, not sampled
+native positions. A fresh implementer changed only the five-line shipped scenario destination
+to midfield convergence; rosters/counts/one warmup/2000 measured ticks/all original movement,
+shots, destruction, mean/busy5ms/max50ms/heap assertions remain. Existing example regressions
+pass2/0; the final actual benchmark passes both200-moving-original workloads and real combat,
+shipped mean0.682/busy1.417/max22.256ms, heap1.3MiB. Strict all-target Clippy passes. All original
+failure/diagnostic/candidate/final logs remain. No Sim production/data/helper changed. The
+C1 native audit/late/causal results retain explicit executed-closure qualification, supported
+by sole-example source delta and identical actual restored M6 executable/depinfo; new C2
+complete source reconciliation passes after fresh15-output factual binding. Full13 must
+execute its own benchmark and all185 audit cases. No priority/worker/cap or unrelated process
+changed; the preflight avoided discovering this real scenario failure after long gates.
+C-corrected-02 packet SHA43f4ae4d10f61996ff36aaf3c70e93362f1605a514cc2a2ffa3a787b918858d0, independent root factual verification,15-output
+C1 3290-cell and C2 1995-cell propagation and separate nonfactual-cell readback authenticate689
+inputs and64 protected spans. Classes/values/reasons/guards/routes/decisions/qualified receipts
+and token order are unchanged; factual hashes are not independent semantic acceptance.
+Literal test attributes:1824, zero ignore attributes; original modified-file test names
+remain. These are preservation counts, not native executions. All185 together remain required.
+
+R199 correction pass2 of3 remains open. All five nonimplementing reviewers must inspect the
+entire corrected cumulative8230a95..dispatchTIP candidate, authenticating unchanged portions
+against original reports and inspecting all revised paths/interfaces/policies/evidence. Fresh
+lead follows all current mandatory gates and decides independently. R172/R194 still govern3+2
+slices and one complete unchanged shared full13. No known-blocker run or old-source result is
+promoted. All21 original400000 caps, fixed3 windows, example guards, actual release/package
+failure/restoration, original command/worker/cap/performance/determinism/heap limits,183 debts
+and51 user-only HOWTOSEE bytes remain. Both projects continue; no unrelated process changed.
+No clone/worktree/substantial temporary artifact is created. Existing approved review cache,
+configured build/Python caches and historical ordinary validation copy remain needed evidence.

@@ -1,0 +1,105 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T20:14:39.258400+00:00",
+  "pid": 16685,
+  "head": "aafd1794a84f88b9919b7e31c78768e08f66d70d",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-before-01-plan.json",
+  "plan_sha256": "4d2d7442617e158e348ef9dbe682ed1b28d139f1c581551bc37c50a5ee7ff1e4",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ra9_recursive",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:14:39.363066+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-before-01/01-recursive-memory-attempt-controls.log",
+      "pid": 16714,
+      "pgid": 16714,
+      "exit": 101,
+      "end": "2026-10-22T20:16:34.507506+00:00",
+      "raw_bytes": 1188,
+      "raw_sha256": "d34db2c6e96fad5668dce37144163cdd42f3943daba93c686fc539a5d954e837",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ra9_nested_owned_cohort",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:16:34.701448+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-before-01/02-recursive-finance-control.log",
+      "pid": 17072,
+      "pgid": 17072,
+      "exit": 101,
+      "end": "2026-10-22T20:16:39.710993+00:00",
+      "raw_bytes": 1070,
+      "raw_sha256": "9b3039fd9eb4cfdb8a1125ab88fc8593e051e081f05dcfce7776417ccc4a1518",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra9_",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:16:39.965057+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-before-01/03-terrain-ivan-controls.log",
+      "pid": 17091,
+      "pgid": 17091,
+      "exit": 101,
+      "end": "2026-10-22T20:18:25.123865+00:00",
+      "raw_bytes": 1193,
+      "raw_sha256": "4b831fd02cb45399fc0536626490b6fd26ce864abf82d7650f3720557134427a",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra8_lone_yuri_preserves_only_seen_reachable_controllable_building_damaging_recruits",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:18:25.322614+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-before-01/04-useful-yuri-ivan-control.log",
+      "pid": 17405,
+      "pgid": 17405,
+      "exit": 101,
+      "end": "2026-10-22T20:18:30.334245+00:00",
+      "raw_bytes": 1193,
+      "raw_sha256": "4b831fd02cb45399fc0536626490b6fd26ce864abf82d7650f3720557134427a",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T20:18:25.327017+00:00",
+  "end": "2026-10-22T20:18:30.438578+00:00",
+  "source_unchanged": true
+}

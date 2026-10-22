@@ -1,0 +1,93 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `game` (bin "game") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 54.50s
+     Running unittests src/main.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/game-5f08020bbb778566)
+
+running 2 tests
+test selection::tests::ra9_privacy_native_scenery_orders_ignore_unseen_occupation_until_reobserved ... ok
+test selection::tests::ra9_privacy_native_scenery_orders_ignore_unseen_damage_and_missing_prop ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 276 filtered out; finished in 1.23s
+
+     Running tests/m0_spike.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m0_spike-c222999ec39c4ce5)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+     Running tests/m10_unlocks_and_enemies.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m10_unlocks_and_enemies-3b9e4c21053bb650)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/m13_grown_maps.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m13_grown_maps-2f718354a2513044)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/m1_demo_map.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m1_demo_map-7f7776d3def72562)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/m1_tileset_image.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m1_tileset_image-120fd156390a4c03)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+     Running tests/m2_unit_sprites.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m2_unit_sprites-01cbd02d4d1c333d)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/m3_building_sprites.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m3_building_sprites-750600fa1d771c98)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m6_production_matches-8ab180ddcd59ed04)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+
+     Running tests/m7_maps.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m7_maps-456f87b1392a3004)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/m8_team_paint.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m8_team_paint-2c7f50f4b5222ae4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.00s
+
+     Running tests/ra5_gem_maps.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra5_gem_maps-31e5aaabd1c66adb)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/ra8_ai_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra8_ai_matches-a1469a1efee3cdb6)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/ra8_gate_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra8_gate_matches-721d58a0c547ba5c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 41 filtered out; finished in 0.00s
+

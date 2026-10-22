@@ -1,0 +1,192 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 13.44s
+     Running `/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples/m7_benchmark`
+m7 benchmark (release build): 100 armed units per player, 2000 measured ticks per scenario; budget: mean <= 5ms, longest tick <= 50ms
+fixture: 200 units spawned; mean tick 0.156 ms, longest tick 0.904 ms; mean over the 494 ticks with at least 150 units alive 0.475 ms; units alive every 500 ticks [200, 147, 34, 28, 28]; 200 units moved, 2617 shots, 172 units destroyed
+UNMOVED shipped SimId(46) setup=Some(("chrono_legionnaire", Mobile { speed: 14, cell: CellPos { x: 11, y: 37 }, step: None }, Health { hit_points: 125 })) final=None
+UNMOVED shipped SimId(50) setup=Some(("chrono_legionnaire", Mobile { speed: 14, cell: CellPos { x: 18, y: 34 }, step: None }, Health { hit_points: 125 })) final=None
+UNMOVED shipped SimId(51) setup=Some(("chrono_legionnaire", Mobile { speed: 14, cell: CellPos { x: 12, y: 40 }, step: None }, Health { hit_points: 125 })) final=None
+UNMOVED shipped SimId(53) setup=Some(("chrono_legionnaire", Mobile { speed: 14, cell: CellPos { x: 14, y: 33 }, step: None }, Health { hit_points: 125 })) final=None
+UNMOVED shipped SimId(54) setup=Some(("chrono_legionnaire", Mobile { speed: 14, cell: CellPos { x: 16, y: 33 }, step: None }, Health { hit_points: 125 })) final=None
+UNMOVED shipped SimId(142) setup=Some(("crazy_ivan", Mobile { speed: 11, cell: CellPos { x: 55, y: 44 }, step: None }, Health { hit_points: 125 })) final=None
+UNMOVED shipped SimId(143) setup=Some(("crazy_ivan", Mobile { speed: 11, cell: CellPos { x: 50, y: 45 }, step: None }, Health { hit_points: 125 })) final=None
+DIAGNOSTIC shipped tick=0 unmoved-destruction id=SimId(46) setup=Some(("chrono_legionnaire", Mobile { speed: 14, cell: CellPos { x: 11, y: 37 }, step: None }, Health { hit_points: 125 }))
+DIAGNOSTIC shipped tick=0 unmoved-destruction id=SimId(50) setup=Some(("chrono_legionnaire", Mobile { speed: 14, cell: CellPos { x: 18, y: 34 }, step: None }, Health { hit_points: 125 }))
+DIAGNOSTIC shipped tick=0 unmoved-destruction id=SimId(51) setup=Some(("chrono_legionnaire", Mobile { speed: 14, cell: CellPos { x: 12, y: 40 }, step: None }, Health { hit_points: 125 }))
+DIAGNOSTIC shipped tick=0 unmoved-destruction id=SimId(53) setup=Some(("chrono_legionnaire", Mobile { speed: 14, cell: CellPos { x: 14, y: 33 }, step: None }, Health { hit_points: 125 }))
+DIAGNOSTIC shipped tick=0 unmoved-destruction id=SimId(54) setup=Some(("chrono_legionnaire", Mobile { speed: 14, cell: CellPos { x: 16, y: 33 }, step: None }, Health { hit_points: 125 }))
+DIAGNOSTIC shipped tick=0 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=0 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=0 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=0 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=0 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=0 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=0 id=SimId(143) position=Some(SubPos { x: 12864, y: 11584 })
+DIAGNOSTIC shipped tick=1 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=1 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=1 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=1 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=1 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=1 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=1 id=SimId(143) position=Some(SubPos { x: 12864, y: 11584 })
+DIAGNOSTIC shipped tick=2 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=2 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=2 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=2 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=2 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=2 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=2 id=SimId(143) position=Some(SubPos { x: 12864, y: 11584 })
+DIAGNOSTIC shipped tick=3 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=3 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=3 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=3 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=3 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=3 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=3 id=SimId(143) position=Some(SubPos { x: 12864, y: 11584 })
+DIAGNOSTIC shipped tick=4 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=4 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=4 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=4 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=4 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=4 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=4 id=SimId(143) position=Some(SubPos { x: 12864, y: 11584 })
+DIAGNOSTIC shipped tick=100 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=100 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=100 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=100 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=100 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=100 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=100 id=SimId(143) position=Some(SubPos { x: 12864, y: 11584 })
+DIAGNOSTIC shipped tick=200 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=200 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=200 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=200 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=200 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=200 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=200 id=SimId(143) position=Some(SubPos { x: 12864, y: 11584 })
+DIAGNOSTIC shipped tick=300 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=300 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=300 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=300 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=300 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=300 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=300 id=SimId(143) position=Some(SubPos { x: 12864, y: 11584 })
+DIAGNOSTIC shipped tick=340 unmoved-destruction id=SimId(205) setup=None
+DIAGNOSTIC shipped tick=400 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=400 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=400 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=400 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=400 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=400 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=400 id=SimId(143) position=Some(SubPos { x: 12864, y: 11584 })
+DIAGNOSTIC shipped tick=401 unmoved-destruction id=SimId(206) setup=None
+DIAGNOSTIC shipped tick=500 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=500 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=500 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=500 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=500 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=500 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=500 id=SimId(143) position=Some(SubPos { x: 12864, y: 11584 })
+DIAGNOSTIC shipped tick=600 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=600 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=600 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=600 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=600 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=600 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=600 id=SimId(143) position=Some(SubPos { x: 12864, y: 11584 })
+DIAGNOSTIC shipped tick=692 unmoved-destruction id=SimId(207) setup=None
+DIAGNOSTIC shipped tick=700 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=700 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=700 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=700 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=700 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=700 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=700 id=SimId(143) position=Some(SubPos { x: 12864, y: 11584 })
+DIAGNOSTIC shipped tick=800 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=800 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=800 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=800 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=800 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=800 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=800 id=SimId(143) position=Some(SubPos { x: 12864, y: 11584 })
+DIAGNOSTIC shipped tick=900 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=900 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=900 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=900 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=900 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=900 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=900 id=SimId(143) position=Some(SubPos { x: 12864, y: 11584 })
+DIAGNOSTIC shipped tick=1000 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=1000 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=1000 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=1000 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=1000 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=1000 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=1000 id=SimId(143) position=Some(SubPos { x: 12864, y: 11584 })
+DIAGNOSTIC shipped tick=1100 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=1100 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=1100 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=1100 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=1100 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=1100 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=1100 id=SimId(143) position=Some(SubPos { x: 12864, y: 11584 })
+DIAGNOSTIC shipped tick=1200 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=1200 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=1200 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=1200 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=1200 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=1200 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=1200 id=SimId(143) position=Some(SubPos { x: 12864, y: 11584 })
+DIAGNOSTIC shipped tick=1300 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=1300 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=1300 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=1300 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=1300 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=1300 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=1300 id=SimId(143) position=Some(SubPos { x: 12864, y: 11584 })
+DIAGNOSTIC shipped tick=1400 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=1400 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=1400 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=1400 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=1400 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=1400 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=1400 id=SimId(143) position=Some(SubPos { x: 12864, y: 11584 })
+DIAGNOSTIC shipped tick=1500 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=1500 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=1500 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=1500 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=1500 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=1500 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=1500 id=SimId(143) position=Some(SubPos { x: 12864, y: 11584 })
+DIAGNOSTIC shipped tick=1538 unmoved-destruction id=SimId(143) setup=Some(("crazy_ivan", Mobile { speed: 11, cell: CellPos { x: 50, y: 45 }, step: None }, Health { hit_points: 125 }))
+DIAGNOSTIC shipped tick=1600 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=1600 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=1600 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=1600 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=1600 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=1600 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=1600 id=SimId(143) position=None
+DIAGNOSTIC shipped tick=1700 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=1700 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=1700 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=1700 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=1700 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=1700 id=SimId(142) position=Some(SubPos { x: 14144, y: 11328 })
+DIAGNOSTIC shipped tick=1700 id=SimId(143) position=None
+DIAGNOSTIC shipped tick=1760 unmoved-destruction id=SimId(142) setup=Some(("crazy_ivan", Mobile { speed: 11, cell: CellPos { x: 55, y: 44 }, step: None }, Health { hit_points: 125 }))
+DIAGNOSTIC shipped tick=1800 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=1800 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=1800 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=1800 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=1800 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=1800 id=SimId(142) position=None
+DIAGNOSTIC shipped tick=1800 id=SimId(143) position=None
+DIAGNOSTIC shipped tick=1900 id=SimId(46) position=None
+DIAGNOSTIC shipped tick=1900 id=SimId(50) position=None
+DIAGNOSTIC shipped tick=1900 id=SimId(51) position=None
+DIAGNOSTIC shipped tick=1900 id=SimId(53) position=None
+DIAGNOSTIC shipped tick=1900 id=SimId(54) position=None
+DIAGNOSTIC shipped tick=1900 id=SimId(142) position=None
+DIAGNOSTIC shipped tick=1900 id=SimId(143) position=None
+peak heap in use: 1.3 MiB (budget 1024 MiB)
+m7 benchmark failed: shipped: original participants without observed movement: [SimId(46), SimId(50), SimId(51), SimId(53), SimId(54), SimId(142), SimId(143)]

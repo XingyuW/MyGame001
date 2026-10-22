@@ -133,11 +133,24 @@ pub(crate) fn advance(world: &mut World, defs: &Definitions, actors: &BTreeMap<S
         if world.resource::<Props>().get(target).is_none() {
             continue;
         }
-        let Some(a) = actors.get(&unit) else { continue };
-        if crate::special::scenery::advance_interaction(world, defs, a, target) {
+        let Some(a) = actors
+            .get(&unit)
+            .and_then(|a| crate::special::current_actor(world, a))
+        else {
+            world
+                .resource_mut::<SpecialState>()
+                .interactions
+                .remove(&unit);
+            continue;
+        };
+        // Both mapped-specialist and Occupier work wait for release of a real channel.
+        if crate::special::commandable(world, unit).is_err() {
             continue;
         }
-        let Ok(cell) = validate(world, defs, a, target) else {
+        if crate::special::scenery::advance_interaction(world, defs, &a, target) {
+            continue;
+        }
+        let Ok(cell) = validate(world, defs, &a, target) else {
             world
                 .resource_mut::<SpecialState>()
                 .interactions
@@ -145,7 +158,7 @@ pub(crate) fn advance(world: &mut World, defs: &Definitions, actors: &BTreeMap<S
             continue;
         };
         if a.cell.x.abs_diff(cell.x).max(a.cell.y.abs_diff(cell.y)) <= 1 {
-            let _ = enter(world, a, target, cell);
+            let _ = enter(world, &a, target, cell);
         } else if world
             .get::<crate::Orders>(a.entity)
             .is_some_and(|o| o.current.is_none())
@@ -200,12 +213,17 @@ pub(crate) fn cleanup(world: &mut World) {
     let defs = world.resource::<Definitions>().clone();
     let occupied = world.resource::<SpecialState>().garrisons.clone();
     for (id, mut g) in occupied {
-        if world
+        let forced = world
             .resource::<Props>()
             .get(id)
-            .is_none_or(|(_, prop)| red(&defs, prop))
-        {
+            .is_none_or(|(_, prop)| red(&defs, prop));
+        if forced {
             g.evicting = true;
+        }
+        // Voluntary blocked/partial exits remain active host work. Red-health or removed
+        // hosts keep the separate forced-eviction cleanup policy.
+        if !forced && world.resource::<SpecialState>().erasures.contains_key(&id) {
+            continue;
         }
         if !g.evicting {
             continue;

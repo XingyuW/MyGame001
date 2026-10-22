@@ -1,0 +1,97 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T20:43:42.096106+00:00",
+  "pid": 21749,
+  "head": "aafd1794a84f88b9919b7e31c78768e08f66d70d",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-fixture-01-plan.json",
+  "plan_sha256": "b11736920980530021eaee73e31c4007bb1901aeccd8ae7c04e4b1ab5351a703",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra8_unseen_enemy_water_building_cannot_change_naval_planning",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:43:42.173400+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-fixture-01/01-naval-fixture-1.log",
+      "pid": 21778,
+      "pgid": 21778,
+      "exit": 0,
+      "end": "2026-10-22T20:44:07.228727+00:00",
+      "raw_bytes": 448,
+      "raw_sha256": "8db55be099edd5bf17841f6f309a8bd9cdb2be0f72f7563324453971766feb53",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra8_unseen_water_obstacle_before_the_edge_range_endpoint_cannot_change_naval_planning",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:44:07.381476+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-fixture-01/02-naval-fixture-2.log",
+      "pid": 21857,
+      "pgid": 21857,
+      "exit": 0,
+      "end": "2026-10-22T20:44:12.395198+00:00",
+      "raw_bytes": 394,
+      "raw_sha256": "d391ab90d25f7cd74e3c6159239561a2e2910c900d089303c95de992de1b0fc5",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start": "2026-10-22T20:44:12.547450+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-fixture-01/03-fmt.log",
+      "pid": 21873,
+      "pgid": 21873,
+      "exit": 0,
+      "end": "2026-10-22T20:44:17.557485+00:00",
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "start": "2026-10-22T20:44:17.706034+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-fixture-01/04-diff.log",
+      "pid": 21911,
+      "pgid": 21911,
+      "exit": 0,
+      "end": "2026-10-22T20:44:22.719104+00:00",
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T20:44:17.709050+00:00",
+  "end": "2026-10-22T20:44:22.797646+00:00",
+  "source_unchanged": true
+}

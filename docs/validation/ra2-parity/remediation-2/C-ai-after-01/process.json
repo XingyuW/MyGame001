@@ -1,0 +1,206 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T20:25:24.680119+00:00",
+  "pid": 18524,
+  "head": "aafd1794a84f88b9919b7e31c78768e08f66d70d",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-after-01-plan.json",
+  "plan_sha256": "8a893a7f41c86ea093a522ea2473501c79321419898abc66224724436b9495d5",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ra9_recursive",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:25:24.800707+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-after-01/01-recursive-memory-attempt-controls.log",
+      "pid": 18557,
+      "pgid": 18557,
+      "exit": 0,
+      "end": "2026-10-22T20:27:19.954792+00:00",
+      "raw_bytes": 735,
+      "raw_sha256": "0b6e2d29295cd2c722e2287a7d95d45469b47498202817d82b326e58685c80c9",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ra9_nested_owned_cohort",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:27:20.152179+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-after-01/02-recursive-finance-control.log",
+      "pid": 18879,
+      "pgid": 18879,
+      "exit": 0,
+      "end": "2026-10-22T20:27:25.167686+00:00",
+      "raw_bytes": 627,
+      "raw_sha256": "a3e97a92add76ec9b11cf2ff7eaaff5073f2ba93c3711f3c4d8c2dbbb5ed105e",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra9_",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:27:25.352756+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-after-01/03-terrain-ivan-controls.log",
+      "pid": 18899,
+      "pgid": 18899,
+      "exit": 101,
+      "end": "2026-10-22T20:29:25.553821+00:00",
+      "raw_bytes": 81302,
+      "raw_sha256": "4957f59b92a5ae8fe9acdbd54e2a7fcf4945fd45b85e350c84959ea16aa35f11",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra8_lone_yuri_preserves_only_seen_reachable_controllable_building_damaging_recruits",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:29:25.767282+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-after-01/04-useful-yuri-ivan-control.log",
+      "pid": 19329,
+      "pgid": 19329,
+      "exit": 0,
+      "end": "2026-10-22T20:29:30.781948+00:00",
+      "raw_bytes": 392,
+      "raw_sha256": "c037703473dfeb8a39758a7bd882bb64777458fff02a9653cd5135b9315edcc7",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ra9_after_only_navigation_knowledge_hashes_public_baseline_and_each_observed_bit",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:29:30.987872+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-after-01/05-after-only-navigation-hash.log",
+      "pid": 19344,
+      "pgid": 19344,
+      "exit": 0,
+      "end": "2026-10-22T20:29:35.995857+00:00",
+      "raw_bytes": 402,
+      "raw_sha256": "821e42ad9b0d99dfa3f399d35f67e1a2fc4f6b190f028fa4045da6cadcaca2f8",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ra8_real_cargo_and_depot_entry_do_not_fabricate_building_attack_losses",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:29:36.196095+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-after-01/06-existing-direct-cargo-service-attempt.log",
+      "pid": 19362,
+      "pgid": 19362,
+      "exit": 0,
+      "end": "2026-10-22T20:29:41.207954+00:00",
+      "raw_bytes": 406,
+      "raw_sha256": "cc479338a00a2b364f4e099d70d894c30a4ef5d9a7764a11260ddfe5810070cb",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "understrength_financing",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:29:41.410570+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-after-01/07-existing-understrength-financing.log",
+      "pid": 19374,
+      "pgid": 19374,
+      "exit": 0,
+      "end": "2026-10-22T20:29:46.425248+00:00",
+      "raw_bytes": 769,
+      "raw_sha256": "e970b9ace6061060ec54b09d8aad8738396fb14cf09b275db8f6cb28396568ca",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start": "2026-10-22T20:29:46.634412+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-after-01/08-fmt.log",
+      "pid": 19393,
+      "pgid": 19393,
+      "exit": 0,
+      "end": "2026-10-22T20:29:51.642555+00:00",
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "start": "2026-10-22T20:29:51.844283+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-after-01/09-diff.log",
+      "pid": 19407,
+      "pgid": 19407,
+      "exit": 0,
+      "end": "2026-10-22T20:29:56.858498+00:00",
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T20:29:51.847914+00:00",
+  "end": "2026-10-22T20:29:56.964804+00:00",
+  "source_unchanged": true
+}

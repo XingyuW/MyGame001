@@ -1,0 +1,35 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T19:59:22.149847+00:00",
+  "pid": 13007,
+  "head": "aafd1794a84f88b9919b7e31c78768e08f66d70d",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/client2-after-plan-01.json",
+  "plan_sha256": "0a06403066402b2339c524039e9081ba6d566c802d0849485a84297ac8abce45",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "game",
+        "ra9_privacy_native_scenery_orders",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T19:59:22.285996+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-client-after-01/01-scenery-orders-after.log",
+      "pid": 13015,
+      "pgid": 13015,
+      "exit": 101,
+      "end": "2026-10-22T20:00:22.363722+00:00",
+      "raw_bytes": 1368,
+      "raw_sha256": "c3615e42aedab28db0cf3b47f0eeeeba5cccc6f5433d0a2a07fdaa06726ff93e",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T20:00:17.358176+00:00",
+  "end": "2026-10-22T20:00:22.493953+00:00",
+  "source_unchanged": true
+}
