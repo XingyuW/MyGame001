@@ -1,0 +1,8 @@
+{
+  "start_utc": "2026-10-21T16:44:58.738800+00:00",
+  "pid": 18070,
+  "status": "ISOLATED_PASSED_READY_FOR_COMMIT_AND_FULL13",
+  "scope": "Only the pre-authorized required sequence.198 failure stops here;198PASS parses actual metrics, commits owned evidence/STATUS, then runs unchanged mandatory199full13. No new tests, source changes, caps, approval or policy decisions.",
+  "isolated_summary_sha256": "68391d3a155be67533a5d19dd9322d49f92173c7a0ebd85456e3839273607655",
+  "isolated_complete_utc": "2026-10-21T17:29:37.722190+00:00"
+}

@@ -1,0 +1,606 @@
+{
+  "reviewer": "CLIENT independent round 1",
+  "tip": "23647de4220408d42eeef6522deb4d4541528452",
+  "base": "8230a955b251e9341d349f99eaeb86f7f8253664",
+  "observed_at_utc": "2026-10-22T01:04:00.209824+00:00",
+  "native_commands_launched": false,
+  "rust_census_rows": 97,
+  "rust_census_mismatches": [],
+  "rust_census": [
+    {
+      "path": "crates/game/src/announcer.rs",
+      "sha256": "ca2887eb4dd3d80f356f6f4e323d0c43b179a7aca97bba623b56a901e092b367",
+      "bytes": 11693,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/audio.rs",
+      "sha256": "00a8e197d652c0b740a4d1f2d839f68f1c4707992e4c66b252191486df0902a5",
+      "bytes": 106110,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/battlefield.rs",
+      "sha256": "7b960dc1a9b67f6b0a32c61a7dd7ad8316662d8cf6f49fd996ac689b2e7c5fc6",
+      "bytes": 52304,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/buildings.rs",
+      "sha256": "d5f7a71055169f39f9edcbfa63aa21ef7a417ad37b1d6c169134add9e29d16ab",
+      "bytes": 20526,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/camera.rs",
+      "sha256": "1e556f6278ae3f5ae2624bc194dbb18ed9a30360c520a7493c883c070a1b936c",
+      "bytes": 33220,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/checked_assets.rs",
+      "sha256": "932b6a1c358852227fc7935af4ed61160d2ac8a35b5468792cd395654ab7ff1a",
+      "bytes": 6320,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/cli.rs",
+      "sha256": "a88fe2aacbe3c8b10b3157611d1b3199cf9384fcd43d8fe0861a2144d91f1e69",
+      "bytes": 4293,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/construction.rs",
+      "sha256": "33dc99a15e371869cab334dd6f3cd7f3c163cb6d80dcef456bb703e0ab2c6d0e",
+      "bytes": 55825,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/fog.rs",
+      "sha256": "f69f562c0e91d02784e2070cbfb68db601825cd36ebbbd995fe56db8046ca2dc",
+      "bytes": 11161,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/game_speed.rs",
+      "sha256": "bb2da773624f8c50ed4efac8456a9e999f088f3404674e5fc443a7e7d6641f7f",
+      "bytes": 7835,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/hd_art.rs",
+      "sha256": "e1620021f9933420befdb776650757bc76a82e3899926d81d5e8181f25d6eddf",
+      "bytes": 13879,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/health.rs",
+      "sha256": "e45f79c138faa52e12922973310d3c0256288bf0d22a5a6e2928dbc4761a118a",
+      "bytes": 17962,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/hotkeys.rs",
+      "sha256": "07a7f915ad09ac7441b5aa5d82c5e8990198c8c611ee5376ea989634dfa93b5d",
+      "bytes": 11807,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/hover_info.rs",
+      "sha256": "93b6a6ed93553ac6cfd2623f6b7318ba7c5e4cc96c49a3ab8fb553090a064971",
+      "bytes": 17159,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/main.rs",
+      "sha256": "0d6130e30e86a12cd627dbff9a4c7227a76511bd4ba1f1faddf6e15b6e905ef3",
+      "bytes": 4348,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/map.rs",
+      "sha256": "6466ea8692c6e11f28bc100978de8d721197a0da3d95d023bc70cef514bd673a",
+      "bytes": 23342,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/minimap.rs",
+      "sha256": "a4d5e2209934b3cdb20090fb08092e63c5d3e6ccec12afb21f10417f35ecde2d",
+      "bytes": 90916,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/notices.rs",
+      "sha256": "41aaaf4977a9ae186b21780db35bc6f8d0782c25405699fca9a82554716058bc",
+      "bytes": 19693,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/options.rs",
+      "sha256": "47ee133ac9fd696ea8bf175dc72f9b04540633c315eba4c0e44ab105c89a0c8b",
+      "bytes": 49729,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/presentation.rs",
+      "sha256": "1a62ce435f8d13b62f50235676785467225120dfd8758b8a897a186033e4ba14",
+      "bytes": 18086,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/projection.rs",
+      "sha256": "61400af66288c0315f6a3bf8c7d72c04a35c804aafcddd1a8472351338646668",
+      "bytes": 13362,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/ra7_controls.rs",
+      "sha256": "6dc8e60e02e56762627d61c1b772e3452527c0c73505858cf53ec970b759e11a",
+      "bytes": 17226,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/selection.rs",
+      "sha256": "dcc1973933d78b5afca9bdcb5220a09b9a58707b0aee3829ad71ef782871e8d9",
+      "bytes": 144612,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/selection_pad_native.rs",
+      "sha256": "fbdf0707d52f1ea9857b3160a384a3d241e8fadddf25ce29d319e0a2c3792e98",
+      "bytes": 7866,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/sidebar.rs",
+      "sha256": "b4443f46365953c81bffe6938f411ac7f012995fb92766773544af0a593d7338",
+      "bytes": 115273,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/sim_host.rs",
+      "sha256": "9849843ae5ba2ab487a92333856cfa928d00ded64991a171df60d1c9aabd89a4",
+      "bytes": 67423,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/skirmish.rs",
+      "sha256": "0ef725d15d983c89aa4bd7154ac2c19b0ab661a8df4a96466a5e91418bd47c0c",
+      "bytes": 189558,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/smoke.rs",
+      "sha256": "5e12d3c278339a062e105bb1f2d332249195e0140e3740e43d5f4b3229ff6cf3",
+      "bytes": 119949,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/special_controls.rs",
+      "sha256": "2e981c57d2260495579a821caa05e61d728efad74be23676bf7bc6af94b05ff9",
+      "bytes": 24474,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/tileset_image.rs",
+      "sha256": "20533e48f2e33600fa2029ee12c6036110231bc8f48e3f32267459eff43d15c8",
+      "bytes": 15024,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/units.rs",
+      "sha256": "4d312c858a2e501d37b221c8fa12ce9c14063d3e4c9b1619eab09e9a17ae3c7b",
+      "bytes": 59044,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/visual_review.rs",
+      "sha256": "5444f52c723e59287876cec34a9844609159fd828489e9611ca44a701a1eb235",
+      "bytes": 45630,
+      "matches": true
+    },
+    {
+      "path": "crates/game/src/weapon_fx.rs",
+      "sha256": "d31ac1eab212429b88cddc2ba9f53ce30ae5bb6a6e5727a89a7ffb3be2be58b2",
+      "bytes": 79595,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/ai/ra8_attrition_tests.rs",
+      "sha256": "e5667a1feb68cb1b9a267460d6c4b4d48c8fde38409bcfb8fe34e42386961ac0",
+      "bytes": 61683,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/ai/ra8_composition_tests.rs",
+      "sha256": "4af6ac42abf8845477ba8cf1b0bb9c6e6787ba03f1c0e7455eca90e45d5ed70d",
+      "bytes": 43694,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/ai/ra8_recovery_tests.rs",
+      "sha256": "fa31396d27c0d353419712c4ee45dec347191d83cd3369d9bf879160c2e1fb40",
+      "bytes": 69211,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/ai/ra9_keys_tests.rs",
+      "sha256": "95e168ec0effc9faa22672e3c63e3754698689020be726d10a66ab941b1a9d37",
+      "bytes": 6356,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/ai/strategy.rs",
+      "sha256": "56c39f14fdeb614af58c2f5ce80b161ac7873bc65a608125f114c64286779cdd",
+      "bytes": 109312,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/ai.rs",
+      "sha256": "e046518c5fa3eb41c11de8816d75750a496c3e0c14f88373a0ea07feeb8fd8f2",
+      "bytes": 200355,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/ai_defs.rs",
+      "sha256": "0deba4437eed37eb9631c89883c52b574f16778b62a9d6a0b0a1ad82cec48500",
+      "bytes": 54367,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/arsenal.rs",
+      "sha256": "f4d5f0aa0ba47c575d7242c1a72a7e8a206fba53504dc0122ba0f2b6a06a89a5",
+      "bytes": 69288,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/bridges.rs",
+      "sha256": "2b5df9e2df967c32fa1aa4c735622f336ff756684d1ec350b3ade3f5ed2508b3",
+      "bytes": 13591,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/building.rs",
+      "sha256": "f6d563292f62fd780005c23ce2fae17f784eabcdaf8eb4229ad80820697a1bd9",
+      "bytes": 19760,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/combat/ra9_origin_tests.rs",
+      "sha256": "94a73cf1f8b40a46e08ee847fc761a63e086148831261db3a20e91c2b83353bb",
+      "bytes": 1364,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/combat.rs",
+      "sha256": "9601a8f87b07f569d3e18aa115fc6913e37c7c04f238d1d7afd22d9870b99dc6",
+      "bytes": 105748,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/combat_defs.rs",
+      "sha256": "2b98c534d58e29b70d30a5926d4e56a53243457300f22251e7dceb918913ec58",
+      "bytes": 42754,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/command.rs",
+      "sha256": "a98ad02236195a834d374326c933a507f3cf9d647f4c26b15761645cbaf7327e",
+      "bytes": 60822,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/crates.rs",
+      "sha256": "d67cee7f076e765dee6ce80bc6c9ac8e43e61ee5dd6113c5a3cdfda6c2ba5675",
+      "bytes": 23847,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/crew.rs",
+      "sha256": "afb20299c02cb56e8c1de3208949d4ff6f49663ea56729553faa406eede00dcf",
+      "bytes": 9128,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/data.rs",
+      "sha256": "9338488beabd64bdfeb9ad8301452f2fe6e347765dbb91cc35bade317a8eb298",
+      "bytes": 23674,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/definitions.rs",
+      "sha256": "e423c067ee04dbcd7d0b68b14c1d46bd958116cd54aa634cd3ef444061695343",
+      "bytes": 18121,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/economy.rs",
+      "sha256": "9a47e1f74925711beb0359f28f7404aacf0726d5f442f9e3bc33cbb6f34e0249",
+      "bytes": 54295,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/economy_commands.rs",
+      "sha256": "18034718fce1ea6d2e4467f74d308b25af0ba5c806e32ef228ac7f969a21afb9",
+      "bytes": 32301,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/economy_defs.rs",
+      "sha256": "076ae99a442b552d00581df28add9da31131f7fe415f2bb6994af17ad65054d6",
+      "bytes": 26155,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/event.rs",
+      "sha256": "0e38b1046332596f4195928ddd685574036f4dfd3fc1947a8eaad7ca31241eb0",
+      "bytes": 11846,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/fileguard.rs",
+      "sha256": "52a3acf513fd411b7658ff98c471cd7a95232539a6a1c452ba5cab90db827bf3",
+      "bytes": 6478,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/flight.rs",
+      "sha256": "be2695a423f8f60789c38f20d20e87d071b198bead3a9ec660db24fac12fe80c",
+      "bytes": 37219,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/garrison.rs",
+      "sha256": "4bc35825976917c6979890af100cf26474b11d82fbbbf946b54ed9dabf3b0d3b",
+      "bytes": 16331,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/harvest.rs",
+      "sha256": "ed7820d8134537670d6a3b44be3cb5853f36b1bcd859b9abad6fa88386b10b0b",
+      "bytes": 17541,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/hash.rs",
+      "sha256": "e5c7b3afb924ac1c67a493f166388f9c7131347fec7122441674c22bdcae12d6",
+      "bytes": 7271,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/id.rs",
+      "sha256": "6a6b35634955899da9b285c53ab6507bd6e4cd24d2cba9dd68f2f64004b06537",
+      "bytes": 7995,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/lib.rs",
+      "sha256": "5a81c4a339051dfd84426ec55f8798af53455cf1c55460b83943cb07027d1405",
+      "bytes": 7663,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/map.rs",
+      "sha256": "4f017c7549b04a05792ca378bc1c278d84b9d3beb04ccb325451577629958895",
+      "bytes": 73044,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/map_scale.rs",
+      "sha256": "e8af04f1d876da383c89a381c7796f37ff4535eec1fc03e77221b1aaa66f6b87",
+      "bytes": 63354,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/map_subset.rs",
+      "sha256": "57c63ba25a40e69217753e0720e81ea6ee381d6b6ce899158e4bf10cdbafaead",
+      "bytes": 40702,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/match_setup.rs",
+      "sha256": "72f1cc68d213322191f3887016072c73da3d88163e459f039f765e32ff4f965a",
+      "bytes": 51400,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/movement.rs",
+      "sha256": "8e8c97ed9354954b8ab2af31f0adf07433a671b4413d3ab2c198ad150b28bab3",
+      "bytes": 23728,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/ore.rs",
+      "sha256": "72255c923ccdd3dceac08d8017d6104bada286d2fe0b69e126549a5731bb92f2",
+      "bytes": 3953,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/pathfinding.rs",
+      "sha256": "df19b4af99b0b3645bf3294b8248f3a196c1e461d3f54c522808aa99e1cd5e95",
+      "bytes": 21718,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/props.rs",
+      "sha256": "fe9b0ba1c6538be2e875f291ca13a9be8834da2f972af65ae745466e1ce37987",
+      "bytes": 15409,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/ra8_intents.rs",
+      "sha256": "5b39c620df390799b9933113b9b11d863fc1fcb3eea88324df894e5bdfef5191",
+      "bytes": 64413,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/rng.rs",
+      "sha256": "b1cc4e871301e38781a6c340ed2e72c76cf5d176baba4a9effeb829c85c72b8d",
+      "bytes": 938,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/rules.rs",
+      "sha256": "c9c1251bf864a2e608c1db45024cc65ea746c9b436bf4c96bdf640b6ca125cea",
+      "bytes": 36779,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/schedule.rs",
+      "sha256": "179c6de848e8f463058e378e06fc56a0204cdac6e328b1f289b520f42dc89f7a",
+      "bytes": 9623,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/skirmish_defs.rs",
+      "sha256": "9e3fb001ec3ac176493ba77450fc2b8fc79f912ad2b8b9516e6ed861c3b8656f",
+      "bytes": 33353,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/special/advance.rs",
+      "sha256": "e5d830d3429546c5e668170c46b6825abb9f9a18b55e5149ed23448f56b84f53",
+      "bytes": 15190,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/special/auto_defuse.rs",
+      "sha256": "c7764e0cc2b9546cb29915ed6aacceaab1cd9098c75d5f3eef474d371326b99f",
+      "bytes": 7797,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/special/carrier.rs",
+      "sha256": "37df52d16900fe1c1b603445cfd276b297031f1770a07215f3860a932e824db9",
+      "bytes": 1959,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/special/commands.rs",
+      "sha256": "06e1480c3f1d8122b2824cbc2dc52d1e39281470178547940dd4609d21f4e9ff",
+      "bytes": 21616,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/special/infantry/ra9_origin_tests.rs",
+      "sha256": "fbe4acb9b767b1e61063690aa9b354c4664ff95abb3573dc3aa2bd43ca09c8c3",
+      "bytes": 1074,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/special/infantry.rs",
+      "sha256": "1cde49fe633d1689681fe06289453f568933e2e907a59f82e35645bd4ccf7ee9",
+      "bytes": 30693,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/special/interaction.rs",
+      "sha256": "b4e0ade7d3c3b5ecc7023e92cbc5607c077fc8b87cea3191c98cbe245d51cf86",
+      "bytes": 10775,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/special/radiation.rs",
+      "sha256": "fea5a19106da2e75c51ae097fac20f2f2a7fe9e4f70e83fa817252c692d655cf",
+      "bytes": 4950,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/special/reconnaissance.rs",
+      "sha256": "e4829306ac613d8c2b5563122eb47b07b84d3693ed5f0029c38fcec7f9e3ace2",
+      "bytes": 10973,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/special/repair.rs",
+      "sha256": "c0a37bfe23809c5ea069627743189a29432bdace13eb14335ad97b21a6e132d4",
+      "bytes": 4164,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/special/resolve.rs",
+      "sha256": "7004d570f0b398b901585d0d89c528d3a33195d3452b1bd0c69faeb63c778578",
+      "bytes": 10980,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/special/scenery.rs",
+      "sha256": "8d78b94465960301f76ab257103df3544756c3ff894bcd122c3481b452908d3a",
+      "bytes": 9496,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/special/state.rs",
+      "sha256": "12ccc91ad6fb0d662da8a093c4dbee385453948424fa53bb9dbb45d3ca638f15",
+      "bytes": 12851,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/special/superweapons.rs",
+      "sha256": "b878a5adfdfa138e286b09994637d1dd81a005ba364a650fb60823e14d077167",
+      "bytes": 24125,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/special/transport.rs",
+      "sha256": "67ce8b87f9e0a54edb93f48b16dab68741f8aff40f9ba9dfe4ea67a6970368db",
+      "bytes": 3692,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/special/vehicles.rs",
+      "sha256": "ff373f65ac5d73dfce709aa9bee0382b2c341a12299b92dec6554ac0cd62d4f2",
+      "bytes": 16893,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/special.rs",
+      "sha256": "485306a82f0abd10cacf9598c82db2150d37dfc4943b63f2bfa28a7efc8b3255",
+      "bytes": 19205,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/tactics.rs",
+      "sha256": "eaf8ef0443c50b023e198b259670e42da11382178a112dec202a37bf83a8978b",
+      "bytes": 12280,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/unit.rs",
+      "sha256": "050290ed178d4440b512a97769994d5c588ce7fc5e89d96d21631b46624dd9cb",
+      "bytes": 29991,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/veterancy.rs",
+      "sha256": "38f07941bb7b1e0c56a983dc8f108a063bd98f86d53ae9f156ea8e55337efb42",
+      "bytes": 22918,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/visibility.rs",
+      "sha256": "3e271e1d163eed0598bf9dc68fb2f268315ca2e4b006349d38230df191d8b66e",
+      "bytes": 13679,
+      "matches": true
+    },
+    {
+      "path": "crates/sim/src/world_objects.rs",
+      "sha256": "5d35159188ab286b2308994477ca9b78eb984697208c945f906f6fb1ccfc87fb",
+      "bytes": 6504,
+      "matches": true
+    }
+  ],
+  "external_reference_sha256": {
+    "rules.ini": "adc869ca037db5141f562f18092d022045e194de0d1204a46b9ec8372b2b826f",
+    "art.ini": "d732bfc8ffb6d52908342254c22731acb730ae6d2bbfb41983ef109e48a8f061"
+  },
+  "canonical_logs": {
+    "01-fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "02-diff-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "03-clippy.log": "5b906185cf2f60f27279fa2a148998fb75ba423c09023f8c27cfd84e479745c1",
+    "04-test.log": "f9abe18dcc6bc0548589061fa1a8083b1198270b1c898662bc96ba9336a419da",
+    "summary.txt": "6f4fc6df28368f25e55d4a8d0c7088da77c5ccad7a223bd44eb1a27f0c25443c"
+  },
+  "quality_checklist_rows": 51,
+  "quality_approval": false
+}

@@ -1,0 +1,20 @@
+{
+  "cumulative_objects": 6908,
+  "original_blobs_present": [
+    [
+      "rules.ini",
+      false
+    ],
+    [
+      "art.ini",
+      false
+    ]
+  ],
+  "forbidden_formats": [],
+  "long_source_comments": 504,
+  "text_blobs_scanned": 5209,
+  "bytes_scanned": 400262057,
+  "unscanned_large_text_blobs": [],
+  "verbatim_comment_hits": [],
+  "scope_limit": "This checks distinctive long original INI comments and whole original file identities/formats. It does not assert that every short generic unit/building name is copyrighted source prose, nor authenticate media pixels or all possible paraphrases."
+}
