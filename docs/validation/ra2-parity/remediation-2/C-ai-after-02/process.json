@@ -1,0 +1,95 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T20:36:21.758455+00:00",
+  "pid": 20533,
+  "head": "aafd1794a84f88b9919b7e31c78768e08f66d70d",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-after-02-plan.json",
+  "plan_sha256": "b2bf8b3fe9762b0ea73c92f20878f047e376ec9d6b7a01c6206863f1b8c03364",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra9_",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:36:21.871115+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-after-02/01-terrain-ivan-controls.log",
+      "pid": 20562,
+      "pgid": 20562,
+      "exit": 0,
+      "end": "2026-10-22T20:38:42.112239+00:00",
+      "raw_bytes": 80847,
+      "raw_sha256": "4e6871b77419ab4af18b0a353d619ced4937163e1f120045a8d388a7180ecd05",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra8_lone_yuri_preserves_only_seen_reachable_controllable_building_damaging_recruits",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:38:42.309521+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-after-02/02-useful-yuri-ivan-control.log",
+      "pid": 20974,
+      "pgid": 20974,
+      "exit": 0,
+      "end": "2026-10-22T20:38:47.321086+00:00",
+      "raw_bytes": 392,
+      "raw_sha256": "4f73b53598cdb6d252110363df37d26b84734ebf0b1ece82336ab74cc45b1e16",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start": "2026-10-22T20:38:47.515894+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-after-02/03-fmt.log",
+      "pid": 20991,
+      "pgid": 20991,
+      "exit": 0,
+      "end": "2026-10-22T20:38:52.529990+00:00",
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "start": "2026-10-22T20:38:52.727383+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-after-02/04-diff.log",
+      "pid": 21009,
+      "pgid": 21009,
+      "exit": 0,
+      "end": "2026-10-22T20:38:57.737443+00:00",
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T20:38:52.730675+00:00",
+  "end": "2026-10-22T20:38:57.839280+00:00",
+  "source_unchanged": true
+}

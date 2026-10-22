@@ -133,6 +133,7 @@ fn ra8_a_refund_outside_the_emitted_prefix_cannot_fund_repairs_of_a_real_paid_he
             players,
             players.get(PlayerId(0)).unwrap(),
             world.resource::<Grid>(),
+            TerrainKnowledge::new(world.resource::<Grid>()),
             world.resource::<Definitions>(),
             plan,
             false,

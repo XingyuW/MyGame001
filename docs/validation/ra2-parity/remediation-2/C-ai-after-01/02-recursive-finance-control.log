@@ -1,0 +1,10 @@
+    Finished `release` profile [optimized] target(s) in 0.20s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-ee06563c18f69d10)
+
+running 3 tests
+test ai::ra8_lifecycle_remediation_tests::ra9_nested_owned_cohort_nested_financing_preserves_real_asset ... ok
+test ai::ra8_lifecycle_remediation_tests::ra9_nested_owned_cohort_direct_financing_control ... ok
+test ai::ra8_lifecycle_remediation_tests::ra9_nested_owned_cohort_real_root_loss_releases_reinforcement_finance ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 134 filtered out; finished in 0.32s
+

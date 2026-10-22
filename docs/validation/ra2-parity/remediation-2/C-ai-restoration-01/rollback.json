@@ -1,0 +1,24 @@
+{
+  "fixed_positive_fixture": "Re-observation scout goes to(14,27): endpoint(20,22) distance sqrt61<8; original hut(21,22) and outward hut(19,20) each sqrt74>8. Existing assertions intact.",
+  "production": [
+    {
+      "path": "crates/sim/src/ai.rs",
+      "snapshot": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/ai2-after-01-production-0.snapshot",
+      "after_sha256": "e67953feca7feeb689c4d3c2db9eff250ae9befe015eda57e1f303dd89d27d34",
+      "old_sha256": "10123ea29ffc8222a922264dfe001b2188bd77a28476fd6f385719e1d4523222"
+    },
+    {
+      "path": "crates/sim/src/ai/strategy.rs",
+      "snapshot": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/ai2-after-01-production-1.snapshot",
+      "after_sha256": "cd73efbd113b1173f057b594fd9c1e622673dce3df1be9da8238a98fa1ae1d83",
+      "old_sha256": "56c39f14fdeb614af58c2f5ce80b161ac7873bc65a608125f114c64286779cdd"
+    },
+    {
+      "path": "crates/sim/src/ai/ra8_recovery_tests.rs",
+      "snapshot": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/ai2-after-01-production-2.snapshot",
+      "after_sha256": "cd41d6331f40bad460f67c4947e1118bc5b1aa69187b9a948d933b77e5cbbab3",
+      "old_sha256": "fa31396d27c0d353419712c4ee45dec347191d83cd3369d9bf879160c2e1fb40"
+    }
+  ],
+  "final_test_sha256": "3fd151003d60b2922e2f985df2580fc3a55a505150cea35037d344b2633de841"
+}

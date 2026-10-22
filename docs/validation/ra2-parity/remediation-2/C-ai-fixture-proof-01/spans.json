@@ -1,0 +1,35 @@
+{
+  "status": "EXACT_UNCHANGED_ALL_BYTES_OUTSIDE_EXISTING_FIXTURE_HELPER_AND_NEW_INITIAL_GEOMETRY_HELPER",
+  "source": "crates/sim/tests/ra8_ai.rs",
+  "before_sha256": "3fd151003d60b2922e2f985df2580fc3a55a505150cea35037d344b2633de841",
+  "after_sha256": "a90e6b9aade21c8f44322feee7ca650b22122e976ee6125688ade7cb3619fb93",
+  "same_before_after_preimages": {
+    "C-ai-before-05": {
+      "path": "docs/validation/ra2-parity/remediation-2/C-ai-before-05/source-preimages/crates/sim/tests/ra8_ai.rs",
+      "sha256": "3fd151003d60b2922e2f985df2580fc3a55a505150cea35037d344b2633de841"
+    },
+    "C-ai-after-02": {
+      "path": "docs/validation/ra2-parity/remediation-2/C-ai-after-02/source-preimages/crates/sim/tests/ra8_ai.rs",
+      "sha256": "3fd151003d60b2922e2f985df2580fc3a55a505150cea35037d344b2633de841"
+    },
+    "C-ai-target-01": {
+      "path": "docs/validation/ra2-parity/remediation-2/C-ai-target-01/source-preimages/crates/sim/tests/ra8_ai.rs",
+      "sha256": "3fd151003d60b2922e2f985df2580fc3a55a505150cea35037d344b2633de841"
+    }
+  },
+  "immutable_prefix": {
+    "bytes": 196329,
+    "sha256": "afcc3e02a921d499db1e66f1f3af4dc768ea47e18fdf13632cff9052f79a0482"
+  },
+  "immutable_suffix": {
+    "bytes": 250585,
+    "sha256": "2b8c0716a6b6c812deae9cbea89aa0f3cdf11c9813c6ab9dbe75c2c5c2760818"
+  },
+  "changed_existing_helper": "unseen_enemy_water_building",
+  "added_helper": "ra9_authored_naval_privacy_corridor",
+  "affected_tests": [
+    "ra8_unseen_enemy_water_building_cannot_change_naval_planning",
+    "ra8_unseen_water_obstacle_before_the_edge_range_endpoint_cannot_change_naval_planning"
+  ],
+  "reason": "Move exactly the declared initial x16..19/y0..48 water corridor before scenario/controller construction; all assertions and later hidden building operations unchanged. New causal regression bodies and transitive helpers are entirely in authenticated unchanged prefix/suffix. Full-target137pass2fail retained without replacement."
+}

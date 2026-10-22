@@ -91,6 +91,38 @@ fn living(world: &mut World) -> BTreeMap<SimId, Actor> {
     index.retain(|_, a| a.alive());
     index
 }
+/// Refresh an earlier census at an active action boundary. Dead bodies remain in `actors`
+/// for death/provenance consumers, but cannot supply a new action or support benefit.
+pub(crate) fn current_actor(world: &World, earlier: &Actor) -> Option<Actor> {
+    let hp = world.get::<Health>(earlier.entity)?.hit_points;
+    if hp <= 0 || world.get::<SimId>(earlier.entity) != Some(&earlier.id) {
+        return None;
+    }
+    let owner = world.get::<Owner>(earlier.entity)?.0;
+    let (item, cell, foot) = if let Some(unit) = world.get::<Unit>(earlier.entity) {
+        (
+            ProductionItem::Unit(unit.kind),
+            world.get::<Mobile>(earlier.entity)?.cell,
+            None,
+        )
+    } else {
+        let building = world.get::<Building>(earlier.entity)?;
+        (
+            ProductionItem::Building(building.kind),
+            building.footprint.origin,
+            Some(building.footprint),
+        )
+    };
+    Some(Actor {
+        entity: earlier.entity,
+        id: earlier.id,
+        owner,
+        item,
+        cell,
+        foot,
+        hp,
+    })
+}
 fn near(a: CellPos, b: CellPos, r: u32) -> bool {
     let dx = i64::from(a.x) - i64::from(b.x);
     let dy = i64::from(a.y) - i64::from(b.y);
@@ -376,7 +408,7 @@ fn known_to(world: &World, defs: &Definitions, p: PlayerId, a: &Actor) -> bool {
         && !world.resource::<SpecialState>().hidden.contains(&(p, a.id))
 }
 /// A launched missile or carried aircraft takes no commands (RA4).
-fn commandable(world: &World, id: SimId) -> Result<(), RejectReason> {
+pub(crate) fn commandable(world: &World, id: SimId) -> Result<(), RejectReason> {
     if world.resource::<SpecialState>().erasures.contains_key(&id) {
         return Err(unavailable("Target is being erased"));
     }

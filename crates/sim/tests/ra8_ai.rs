@@ -309,6 +309,7 @@ struct ScenarioMode {
     opponent: Option<&'static str>,
     legacy_ai: bool,
     fog: bool,
+    authored_terrain: Option<fn(&mut Grid)>,
 }
 
 fn scenario_mode(
@@ -429,6 +430,9 @@ fn scenario_mode(
         )
         .unwrap(),
     );
+    if let Some(author) = mode.authored_terrain {
+        author(&mut app.world_mut().resource_mut::<Grid>());
+    }
     app.world_mut().insert_resource(definitions);
     setup_match_configured(
         app.world_mut(),
@@ -2299,26 +2303,27 @@ fn ra8_lone_yuri_preserves_only_seen_reachable_controllable_building_damaging_re
     for (victim_kind, isolated, useful) in [
         ("conscript", false, true),
         ("gi", false, true),
+        ("crazy_ivan", false, true),
+        ("crazy_ivan", true, false),
         ("tanya", false, false),
         ("attack_dog", false, false),
         ("conscript", true, false),
     ] {
-        let mut app = scenario("russia", "easy", 0, 0, false);
-        if isolated {
-            for y in 0..48 {
-                for x in 17..=22 {
-                    app.world_mut().resource_mut::<Grid>().set_terrain(
-                        CellPos::new(x, y),
-                        Cell {
-                            passable: false,
-                            water: true,
-                            buildable: false,
-                            ore: 0,
-                        },
-                    );
-                }
-            }
-        }
+        let mut app = scenario_mode(
+            "russia",
+            "easy",
+            0,
+            0,
+            false,
+            ScenarioMode {
+                authored_terrain: if isolated {
+                    Some(ra9_authored_control_barrier)
+                } else {
+                    None
+                },
+                ..ScenarioMode::default()
+            },
+        );
         let yuri = spawn_unit(app.world_mut(), PlayerId(0), "yuri", CellPos::new(15, 8)).unwrap();
         let victim = spawn_unit(
             app.world_mut(),
@@ -2408,7 +2413,11 @@ fn ra8_lone_yuri_preserves_only_seen_reachable_controllable_building_damaging_re
                 },
             );
             let mut fired = false;
-            for _ in 0..100 {
+            for _ in 0..if victim_kind == "crazy_ivan" {
+                1000
+            } else {
+                100
+            } {
                 fired |= step(&mut app).iter().any(|event| matches!(event, sim::SimEvent::WeaponFired { attacker, target, .. } if *attacker == victim && *target == building));
             }
             assert!(
@@ -5767,27 +5776,40 @@ fn ra8_unseen_water_obstacle_before_the_edge_range_endpoint_cannot_change_naval_
     unseen_enemy_water_building(CellPos::new(16, 21));
 }
 
+fn ra9_authored_naval_privacy_corridor(grid: &mut Grid) {
+    for y in 0..48 {
+        for x in 16..19 {
+            grid.set_terrain(
+                CellPos::new(x, y),
+                Cell {
+                    passable: false,
+                    buildable: false,
+                    water: true,
+                    ore: 0,
+                },
+            );
+        }
+    }
+}
+
 fn unseen_enemy_water_building(cell: CellPos) {
     let make = || {
-        let mut app = scenario("great_britain", "brutal", 0, 0, false);
+        let mut app = scenario_mode(
+            "great_britain",
+            "brutal",
+            0,
+            0,
+            false,
+            ScenarioMode {
+                authored_terrain: Some(ra9_authored_naval_privacy_corridor),
+                ..Default::default()
+            },
+        );
         let mut rules = app.world().resource::<sim::MatchState>().rules();
         rules.fog_of_war = true;
         app.world_mut()
             .resource_mut::<sim::MatchState>()
             .set_rules(rules);
-        for y in 0..48 {
-            for x in 16..19 {
-                app.world_mut().resource_mut::<Grid>().set_terrain(
-                    CellPos::new(x, y),
-                    Cell {
-                        passable: false,
-                        buildable: false,
-                        water: true,
-                        ore: 0,
-                    },
-                );
-            }
-        }
         put(&mut app, "naval_shipyard", 16, 8);
         let carrier = spawn_unit(
             app.world_mut(),
@@ -12688,4 +12710,632 @@ fn ra8_optional_reinforcement_preserves_strategic_sources_and_power() {
 #[test]
 fn ra8_optional_reinforcement_is_not_vetoed_by_observed_ore_without_workers() {
     optional_reinforcement_with_independent_recovery(false, true);
+}
+
+// These are declared public scenario geometry, installed before controller construction.
+fn ra9_authored_control_barrier(grid: &mut Grid) {
+    for y in 0..48 {
+        for x in 17..=22 {
+            grid.set_terrain(
+                CellPos::new(x, y),
+                Cell {
+                    passable: false,
+                    water: true,
+                    buildable: false,
+                    ore: 0,
+                },
+            );
+        }
+    }
+}
+fn ra9_authored_ivan_island(grid: &mut Grid) {
+    for y in 32..48 {
+        for x in 32..48 {
+            if !(38..=40).contains(&x) || !(38..=40).contains(&y) {
+                grid.set_terrain(
+                    CellPos::new(x, y),
+                    Cell {
+                        passable: false,
+                        water: false,
+                        buildable: false,
+                        ore: 0,
+                    },
+                );
+            }
+        }
+    }
+}
+
+fn ra9_authored_terrain(grid: &mut Grid, bridge_endpoint: bool) {
+    let mut looks = vec![0; 48 * 48];
+    for y in 0..48 {
+        for x in 22..=24 {
+            grid.set_terrain(
+                CellPos::new(x, y),
+                Cell {
+                    passable: false,
+                    water: true,
+                    buildable: false,
+                    ore: 0,
+                },
+            );
+        }
+    }
+    let mut deck = vec![
+        CellPos::new(22, 24),
+        CellPos::new(23, 24),
+        CellPos::new(24, 24),
+    ];
+    if bridge_endpoint {
+        deck.extend([
+            CellPos::new(20, 22),
+            CellPos::new(20, 23),
+            CellPos::new(20, 24),
+            CellPos::new(21, 24),
+        ]);
+    }
+    for cell in deck {
+        grid.set_terrain(
+            cell,
+            Cell {
+                passable: true,
+                water: false,
+                buildable: false,
+                ore: 0,
+            },
+        );
+        looks[cell.y as usize * 48 + cell.x as usize] = 8 << 4;
+    }
+    if !bridge_endpoint {
+        grid.set_terrain(
+            CellPos::new(20, 22),
+            Cell {
+                passable: false,
+                water: false,
+                buildable: false,
+                ore: 0,
+            },
+        );
+        looks[22 * 48 + 20] = 5 << 4;
+    }
+    for (x, y) in [(21, 22), (25, 22)] {
+        looks[y * 48 + x] = 15 << 4;
+    }
+    if bridge_endpoint {
+        // The bent deck extends left of the remembered hut. Author its outward
+        // entrance outside the scout's sight so install does not add a nearer
+        // visible hut and silently change the actual repair objective.
+        looks[20 * 48 + 19] = 15 << 4;
+    }
+    grid.mark_world_features(&looks);
+}
+fn ra9_authored_house_endpoint(grid: &mut Grid) {
+    ra9_authored_terrain(grid, false);
+}
+fn ra9_authored_bridge_endpoint(grid: &mut Grid) {
+    ra9_authored_terrain(grid, true);
+}
+
+fn ra9_privacy_assert_mutable_terrain(bridge: bool) {
+    let kept = ra9_privacy_mutable_terrain_decision(bridge, false, false);
+    let changed = ra9_privacy_mutable_terrain_decision(bridge, true, false);
+    assert_eq!(kept.0, changed.0, "equal actual vision/exploration");
+    assert_eq!(
+        kept.1, changed.1,
+        "same public map and legitimate controller memory"
+    );
+    assert_eq!(kept.2, changed.2, "same own actors and positions");
+    assert_eq!(
+        kept.3, changed.3,
+        "hidden physical terrain must not select an outgoing AI command"
+    );
+    let seen_kept = ra9_privacy_mutable_terrain_decision(bridge, false, true);
+    let seen_changed = ra9_privacy_mutable_terrain_decision(bridge, true, true);
+    assert_ne!(
+        seen_kept.3, seen_changed.3,
+        "actual re-observation must update the native approach decision"
+    );
+}
+
+#[test]
+fn ra9_privacy_remembered_bridge_approach_ignores_real_hidden_house_destruction() {
+    ra9_privacy_assert_mutable_terrain(false);
+}
+
+#[test]
+fn ra9_privacy_remembered_bridge_approach_ignores_real_hidden_bridge_repair() {
+    ra9_privacy_assert_mutable_terrain(true);
+}
+
+fn ra9_privacy_mutable_terrain_decision(
+    bridge_change: bool,
+    mutate: bool,
+    reveal: bool,
+) -> BridgeDecisionObservation {
+    let mut app = scenario_mode(
+        "russia",
+        "medium",
+        0,
+        0,
+        false,
+        ScenarioMode {
+            fog: true,
+            authored_terrain: Some(if bridge_change {
+                ra9_authored_bridge_endpoint
+            } else {
+                ra9_authored_house_endpoint
+            }),
+            ..ScenarioMode::default()
+        },
+    );
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    let bridge = *app
+        .world()
+        .resource::<sim::Bridges>()
+        .bridges
+        .keys()
+        .next()
+        .unwrap();
+    let hut = app
+        .world()
+        .resource::<Grid>()
+        .building(CellPos::new(21, 22))
+        .unwrap();
+    let engineer = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "engineer",
+        CellPos::new(10, 22),
+    )
+    .unwrap();
+    let scout = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "rocketeer",
+        CellPos::new(27, 22),
+    )
+    .unwrap();
+    let tank = spawn_unit(
+        app.world_mut(),
+        PlayerId(1),
+        "grizzly",
+        CellPos::new(20, 26),
+    )
+    .unwrap();
+    let enemy_engineer = spawn_unit(
+        app.world_mut(),
+        PlayerId(1),
+        "engineer",
+        CellPos::new(20, 21),
+    )
+    .unwrap();
+    step(&mut app);
+    app.world_mut()
+        .resource_mut::<CommandQueue>()
+        .push(sim::IssuedCommand {
+            player: PlayerId(1),
+            command: Command::Attack {
+                units: vec![tank],
+                target: bridge,
+            },
+        });
+    for _ in 0..4000 {
+        step(&mut app);
+        if app.world().resource::<sim::Bridges>().bridges[&bridge].collapsed {
+            break;
+        }
+    }
+    assert!(
+        app.world().resource::<sim::Bridges>().bridges[&bridge].collapsed,
+        "actual public enemy attack must collapse the bridge"
+    );
+    let think = u64::from(
+        controllers
+            .controller(PlayerId(0))
+            .unwrap()
+            .difficulty()
+            .think_interval,
+    );
+    while !app.world().resource::<SimTick>().0.is_multiple_of(think) {
+        step(&mut app);
+    }
+    app.world_mut().insert_resource(controllers);
+    step(&mut app); // Genuine due AI observation of hut + collapsed deck.
+    assert!(
+        app.world()
+            .resource::<CommandQueue>()
+            .iter()
+            .any(|issued| issued.player == PlayerId(0)
+                && matches!(issued.command,
+            Command::Interact { unit, target } if unit == engineer && target == hut)),
+        "current observed hut must first produce its ordinary native repair intent"
+    );
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    // Let the real queued repair be admitted, then explicitly cancel it before moving the scout.
+    issue(
+        &mut app,
+        Command::Stop {
+            units: vec![engineer],
+        },
+    );
+    issue(
+        &mut app,
+        Command::Move {
+            units: vec![scout],
+            target: CellPos::new(36, 22),
+        },
+    );
+    app.world_mut()
+        .resource_mut::<CommandQueue>()
+        .push(sim::IssuedCommand {
+            player: PlayerId(1),
+            command: Command::Stop { units: vec![tank] },
+        });
+    for _ in 0..1200 {
+        step(&mut app);
+        let entity = unit_entity(&mut app, scout);
+        let mobile = app.world().get::<sim::Mobile>(entity).unwrap();
+        if mobile.cell == CellPos::new(36, 22) && mobile.step.is_none() {
+            break;
+        }
+    }
+    let scout_entity = unit_entity(&mut app, scout);
+    assert_eq!(
+        app.world().get::<sim::Mobile>(scout_entity).unwrap().cell,
+        CellPos::new(36, 22)
+    );
+    let vision = app
+        .world()
+        .resource::<sim::Players>()
+        .get(PlayerId(0))
+        .unwrap()
+        .vision();
+    assert!(
+        vision.is_explored(CellPos::new(21, 22)) && !vision.is_visible(CellPos::new(21, 22)),
+        "hut is genuinely remembered through optional fog"
+    );
+    let endpoint = CellPos::new(20, 22);
+    assert!(
+        !vision.is_visible(endpoint),
+        "native terrain mutation must be hidden"
+    );
+    let changed_target = if bridge_change {
+        bridge
+    } else {
+        app.world()
+            .resource::<sim::Props>()
+            .id_at(endpoint)
+            .unwrap()
+    };
+    app.world_mut()
+        .resource_mut::<CommandQueue>()
+        .push(sim::IssuedCommand {
+            player: PlayerId(1),
+            command: if mutate {
+                if bridge_change {
+                    Command::Interact {
+                        unit: enemy_engineer,
+                        target: hut,
+                    }
+                } else {
+                    Command::Attack {
+                        units: vec![tank],
+                        target: changed_target,
+                    }
+                }
+            } else {
+                Command::Stop {
+                    units: vec![tank, enemy_engineer],
+                }
+            },
+        });
+    for _ in 0..1600 {
+        step(&mut app);
+    }
+    assert!(
+        !app.world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .vision()
+            .is_visible(endpoint)
+    );
+    if bridge_change {
+        assert_eq!(
+            app.world().resource::<sim::Bridges>().bridges[&bridge].collapsed,
+            !mutate,
+            "public Engineer repair premise"
+        );
+    } else {
+        assert_eq!(
+            app.world()
+                .resource::<sim::Props>()
+                .id_at(endpoint)
+                .is_none(),
+            mutate,
+            "public enemy destruction premise"
+        );
+    }
+    app.world_mut()
+        .resource_mut::<CommandQueue>()
+        .push(sim::IssuedCommand {
+            player: PlayerId(1),
+            command: Command::Stop { units: vec![tank] },
+        });
+    step(&mut app);
+    if reveal {
+        issue(
+            &mut app,
+            Command::Move {
+                units: vec![scout],
+                target: CellPos::new(14, 27),
+            },
+        );
+        for _ in 0..1600 {
+            step(&mut app);
+            let e = unit_entity(&mut app, scout);
+            let m = app.world().get::<sim::Mobile>(e).unwrap();
+            if m.cell == CellPos::new(14, 27) && m.step.is_none() {
+                break;
+            }
+        }
+        let v = app
+            .world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .vision();
+        assert!(v.is_visible(endpoint));
+        assert!(
+            !v.is_visible(CellPos::new(21, 22)),
+            "re-observe changed terrain while remembered hut stays outside sight"
+        );
+    }
+    while !app.world().resource::<SimTick>().0.is_multiple_of(think) {
+        step(&mut app);
+    }
+    let vision = app
+        .world()
+        .resource::<sim::Players>()
+        .get(PlayerId(0))
+        .unwrap()
+        .vision()
+        .clone();
+    let knowledge = controllers.controller(PlayerId(0)).unwrap().clone();
+    let own = {
+        let world = app.world_mut();
+        let mut own: Vec<_> = world
+            .query::<(&sim::SimId, &sim::Mobile, &sim::Owner)>()
+            .iter(world)
+            .filter(|(_, _, owner)| owner.0 == PlayerId(0))
+            .map(|(id, mobile, owner)| (*id, mobile.cell, *owner))
+            .collect();
+        own.sort_by_key(|(id, ..)| *id);
+        own
+    };
+    app.world_mut().insert_resource(controllers);
+    step(&mut app); // Capture commands before their next Command admission/pathfinding.
+    let decisions: Vec<_> = app
+        .world()
+        .resource::<CommandQueue>()
+        .iter()
+        .filter(|issued| issued.player == PlayerId(0))
+        .filter_map(|issued| match &issued.command {
+            Command::Move { units, .. } if units.contains(&engineer) => {
+                Some(issued.command.clone())
+            }
+            _ => None,
+        })
+        .collect();
+    assert!(
+        (reveal && bridge_change && mutate)
+            || matches!(decisions.as_slice(), [Command::Move { .. }]),
+        "remembered bridge job must emit an actual queued Engineer approach: {decisions:?}"
+    );
+    (vision, knowledge, own, decisions)
+}
+
+#[test]
+fn ra9_lone_ivan_keeps_actual_no_income_last_stand_capability() {
+    let mut app = scenario_mode(
+        "russia",
+        "easy",
+        0,
+        0,
+        false,
+        ScenarioMode {
+            authored_terrain: Some(ra9_authored_ivan_island),
+            ..ScenarioMode::default()
+        },
+    );
+    let ivan = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "crazy_ivan",
+        CellPos::new(15, 8),
+    )
+    .unwrap();
+    let metadata = app.world().resource::<sim::Definitions>();
+    assert!(
+        metadata
+            .metadata(sim::ProductionItem::Building(
+                metadata.building_kind("power_plant").unwrap()
+            ))
+            .unwrap()
+            .bombable
+    );
+    for _ in 0..4200 {
+        let events = step(&mut app);
+        assert!(
+            !events.iter().any(|e| matches!(
+                e,
+                sim::SimEvent::BuildingSold {
+                    player: PlayerId(0),
+                    ..
+                }
+            )),
+            "a living no-income Ivan is a real building finisher"
+        );
+        assert_eq!(
+            app.world()
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap()
+                .credits(),
+            0,
+            "unfunded construction is not income or a paid replacement force"
+        );
+    }
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    *app.world_mut().resource_mut::<CommandQueue>() = CommandQueue::default();
+    issue(&mut app, Command::Stop { units: vec![ivan] });
+    step(&mut app);
+    let ivan_entity = unit_entity(&mut app, ivan);
+    let at = app.world().get::<sim::Mobile>(ivan_entity).unwrap().cell;
+    let mut target = None;
+    for (dx, dy) in [(-3, 0), (0, -3), (3, 0), (0, 3)] {
+        if let Ok(id) = sim::spawn_building(
+            app.world_mut(),
+            PlayerId(1),
+            "power_plant",
+            CellPos::new(at.x + dx, at.y + dy),
+        ) {
+            target = Some(id);
+            break;
+        }
+    }
+    let target = target.expect("an adjacent real bombable target on legal terrain");
+    step(&mut app); // Ordinary visibility sees this new adjacent building before Attack.
+    let target_entity = unit_entity(&mut app, target);
+    let initial = app
+        .world()
+        .get::<sim::Health>(target_entity)
+        .unwrap()
+        .hit_points;
+    issue(
+        &mut app,
+        Command::Attack {
+            units: vec![ivan],
+            target,
+        },
+    );
+    let mut charged = false;
+    for _ in 0..1200 {
+        step(&mut app);
+        charged |= app
+            .world()
+            .resource::<sim::SpecialState>()
+            .charges
+            .contains_key(&target);
+        if app
+            .world()
+            .get::<sim::Health>(target_entity)
+            .is_none_or(|h| h.hit_points < initial)
+        {
+            break;
+        }
+    }
+    assert!(charged, "same retained actor must place a real Ivan charge");
+    assert!(
+        app.world()
+            .get::<sim::Health>(target_entity)
+            .is_none_or(|h| h.hit_points < initial)
+    );
+    app.world_mut().insert_resource(controllers);
+}
+
+fn ra9_building_capability_metadata_fixture(app: &mut App, nonbombable: bool) {
+    let source = std::fs::read_to_string(data().join("arsenal.ron")).unwrap();
+    let definitions = app.world().resource::<sim::Definitions>();
+    let mut count = 0;
+    let altered = source
+        .lines()
+        .map(|line| {
+            let id = line
+                .trim_start()
+                .strip_prefix("(id: \"")
+                .and_then(|rest| rest.split('"').next());
+            if id.is_some_and(|id| definitions.building_kind(id).is_some()) {
+                count += 1;
+                if nonbombable {
+                    line.replace(",bombable: 1", ",bombable: 0")
+                } else {
+                    line.replace(",immune: 0", ",immune: 1")
+                }
+            } else {
+                line.to_owned()
+            }
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+    assert_eq!(
+        count,
+        definitions.buildings().len(),
+        "each actual target type is represented by the fixture"
+    );
+    use std::sync::atomic::{AtomicU64, Ordering};
+    static NEXT: AtomicU64 = AtomicU64::new(0);
+    let dir =
+        std::path::PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join("ra9-ai-selector-metadata");
+    std::fs::create_dir_all(&dir).unwrap();
+    let file = dir.join(format!(
+        "targets-{}-{}.ron",
+        std::process::id(),
+        NEXT.fetch_add(1, Ordering::Relaxed)
+    ));
+    use std::io::Write;
+    std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&file)
+        .unwrap()
+        .write_all(altered.as_bytes())
+        .unwrap();
+    let fixture = definitions.clone().with_arsenal(&file).unwrap();
+    std::fs::remove_file(file).unwrap();
+    app.world_mut().insert_resource(fixture);
+}
+
+#[test]
+fn ra9_lone_ivan_cannot_renew_last_stand_when_all_real_target_types_are_nonbombable_or_immune() {
+    for nonbombable in [true, false] {
+        let mut app = scenario_mode(
+            "russia",
+            "easy",
+            0,
+            0,
+            false,
+            ScenarioMode {
+                authored_terrain: Some(ra9_authored_ivan_island),
+                ..ScenarioMode::default()
+            },
+        );
+        ra9_building_capability_metadata_fixture(&mut app, nonbombable);
+        spawn_unit(
+            app.world_mut(),
+            PlayerId(0),
+            "crazy_ivan",
+            CellPos::new(15, 8),
+        )
+        .unwrap();
+        let mut sold = false;
+        for _ in 0..4200 {
+            sold |= step(&mut app).iter().any(|e| {
+                matches!(
+                    e,
+                    sim::SimEvent::BuildingSold {
+                        player: PlayerId(0),
+                        ..
+                    }
+                )
+            });
+            if sold {
+                break;
+            }
+        }
+        assert!(
+            sold,
+            "real selector-ineligible targets must preserve the helpless liquidation boundary; nonbombable={nonbombable}"
+        );
+    }
 }

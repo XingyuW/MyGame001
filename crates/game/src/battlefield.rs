@@ -485,12 +485,12 @@ fn bridge_states(
     let vision = crate::fog::human_vision(host.players());
     for bridge in bridges.bridges.values() {
         for &cell in &bridge.cells {
-            if let (Some(terrain), Some(value)) = (terrain.as_mut(), grid.cell(cell)) {
-                terrain.0.set_terrain(cell, *value);
-            }
-            // Fog keeps the last observed deck state; re-observation also catches changes that
-            // happened outside sight, so the minimap and the deck sprite agree.
+            // Fog keeps the last observed terrain and deck state. Both navigation previews
+            // and the minimap reconcile physical changes only when the cell is observed again.
             if vision.is_some_and(|v| v.is_visible(cell)) {
+                if let (Some(terrain), Some(value)) = (terrain.as_mut(), grid.cell(cell)) {
+                    terrain.0.set_terrain(cell, *value);
+                }
                 let index = cell.y as usize * grid.width() as usize + cell.x as usize;
                 if let Some(look) = looks.as_mut().and_then(|l| l.0.get_mut(index)) {
                     *look = if bridge.collapsed { 6 } else { 6 | (8 << 4) };
@@ -1208,6 +1208,40 @@ pub(crate) fn clear(world: &mut World) {
         world.despawn(entity);
     }
     world.insert_resource(AtmosphereClock::default());
+}
+
+#[cfg(test)]
+pub(crate) fn privacy_prepare_order_map(app: &mut App) {
+    use bevy::ecs::system::RunSystemOnce;
+    privacy_materials(app);
+    app.world_mut().run_system_once(terrain).unwrap();
+    let world = app.world_mut();
+    let props: Vec<_> = world
+        .resource::<SimHost>()
+        .props()
+        .unwrap()
+        .iter()
+        .map(|(cell, prop)| (cell, prop.kind))
+        .collect();
+    let mut ground = world.query::<&Ground>();
+    for (cell, kind) in props {
+        assert!(
+            ground.iter(world).any(|g| g.cell == cell
+                && if kind == sim::PropKind::Bridge {
+                    g.bridge
+                } else {
+                    g.scenery
+                }),
+            "renderer must create the actual scenery/deck top at {cell:?}"
+        );
+    }
+}
+
+#[cfg(test)]
+pub(crate) fn privacy_reconcile_order_map(app: &mut App) {
+    use bevy::ecs::system::RunSystemOnce;
+    app.world_mut().run_system_once(bridge_states).unwrap();
+    app.world_mut().run_system_once(raze_scenery).unwrap();
 }
 
 #[cfg(test)]

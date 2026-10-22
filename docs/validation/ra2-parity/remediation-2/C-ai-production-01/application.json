@@ -1,0 +1,186 @@
+{
+  "production_patch": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/ai2-production-knowledge-capability-cargo-v6.patch",
+  "production_patch_sha256": "822983ece2bb8f42a11f52ef36873c3aaf5894f010f7fc4c1536f63ae224adbb",
+  "test_files_unchanged": {
+    "crates/sim/tests/ra8_ai.rs": "49a172c0ab383b120a6525bed5ddefb46502975f018865cc2609f45ef7d59f32",
+    "crates/sim/src/ai/ra8_lifecycle_remediation_tests.rs": "dc40d64a28aa05469c4658976b36dd6768c4737dad6db9f2da0ff179b2069c28"
+  },
+  "foreign_runtime_client_unchanged": {
+    "crates/game/src/battlefield.rs": "1904d0341affebe319a3660bee385b2287984824296cff7ebe231780234453a2",
+    "crates/game/src/selection.rs": "d98b53a580e1ead231dce78380e23f6d73de6e812f9503d606448f82823b130c",
+    "crates/sim/src/garrison.rs": "2ba6b6b2e81efa3c82319b64988b3bc162e44e9fc3f20301c70c89631bda84a8",
+    "crates/sim/src/special.rs": "f1690707dbd67e91b0433da1e62de4273636c029dd19d2b94a22e6f291c6100c",
+    "crates/sim/src/special/advance.rs": "c1bb9dc248df48bacbf5411f7521264a025741ce0bf69c350ebaf386d3c510e5",
+    "crates/sim/src/special/resolve.rs": "22955d9f47e7e0819f8baf44985b5703ead0c1c9112c36b387c39419e9fbfff0"
+  },
+  "applied_hunks": [
+    [
+      "crates/sim/src/ai.rs",
+      160,
+      160
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      363,
+      367
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      477,
+      481
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      771,
+      775
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      780,
+      784
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      810,
+      814
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      818,
+      822
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      892,
+      896
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      947,
+      951
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      1268,
+      1272
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      1275,
+      1279
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      1483,
+      1487
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      2416,
+      2420
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      3953,
+      3957
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      4186,
+      4190
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      4216,
+      4220
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      4368,
+      4372
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      4474,
+      4478
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      4499,
+      4503
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      4515,
+      4519
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      4754,
+      4758
+    ],
+    [
+      "crates/sim/src/ai.rs",
+      4905,
+      4909
+    ],
+    [
+      "crates/sim/src/ai/strategy.rs",
+      11,
+      11
+    ],
+    [
+      "crates/sim/src/ai/strategy.rs",
+      1589,
+      1589
+    ],
+    [
+      "crates/sim/src/ai/strategy.rs",
+      1808,
+      1808
+    ],
+    [
+      "crates/sim/src/ai/strategy.rs",
+      1908,
+      1908
+    ],
+    [
+      "crates/sim/src/ai/strategy.rs",
+      2006,
+      2006
+    ],
+    [
+      "crates/sim/src/ai/strategy.rs",
+      2134,
+      2134
+    ],
+    [
+      "crates/sim/src/ai/strategy.rs",
+      2186,
+      2186
+    ],
+    [
+      "crates/sim/src/ai/strategy.rs",
+      2265,
+      2265
+    ],
+    [
+      "crates/sim/src/ai/strategy.rs",
+      2327,
+      2327
+    ],
+    [
+      "crates/sim/src/ai/ra8_recovery_tests.rs",
+      133,
+      133
+    ]
+  ],
+  "written_files": [
+    "crates/sim/src/ai.rs",
+    "crates/sim/src/ai/strategy.rs",
+    "crates/sim/src/ai/ra8_recovery_tests.rs"
+  ],
+  "before_lib_receipt": "C-ai-before-02",
+  "before_integration_receipt": "C-ai-before-03",
+  "after_only_hash_control": "ra9_after_only_navigation_knowledge_hashes_public_baseline_and_each_observed_bit"
+}

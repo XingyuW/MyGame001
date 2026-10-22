@@ -1,34 +1,40 @@
 # MyGame001
 
 <!-- RA9_REMEDIATION1_CURRENT_BEGIN -->
-## Current canonical checkpoint — 2026-10-22, open independent round2 revision
+## Current canonical checkpoint — corrected round2 candidate, 2026-10-22
 
-All five fresh initial round2 slices completed cumulative8230a95..1cedaee source/evidence review.
-Their exact reports are `docs/reviews/RA2-parity-review-2-initial-{sim1,sim2,client,data,tests}.md`.
-They found further active Temporal/dead-support and honest-vision/AI bookkeeping defects; the
-reports remain adverse recommendations. No binding lead decision has been made and no GO,
-merge/tag or visual/audio/feel approval is supplied. R199 records correction pass2 and keeps this
-panel open across fresh implementation. All five nonimplementing reviewers must independently
-review the entire revised frozen candidate before a fresh lead decides after every required gate.
-Initial reports are retained; authenticated unchanged coverage may be referenced, never waived.
+R200 records the fresh implementation and bounded native proofs for the initial panel2 findings.
+All initial reports remain preserved; this is validated implementation awaiting independent
+reinspection and the mandatory final gates, with no GO, merge/tag or quality approval yet.
+Runtime:56 passes across8 targets, after9 intended BEFORE failures/4 positive controls.
+Client:3 exact-body native regressions pass;278 game unit cases plus4 selected child probes
+pass. The optional debug integration tail was coordinator-stopped with actual exit-15; the whole
+Cargo command is interrupted, never passed. AI: final6 terrain/capability cases plus expanded
+Yuri pass; recursive memory/finance, AFTER-only hash and affected existing controls pass.
+The complete AI preflight was137pass/2fail; only initial-geometry timing changed for those two
+existing fixtures and each exact retry passed. No whole139pass is synthesized; full13 owes it.
+All setup/compiler failures, original assertions, rollbacks and restoration proofs remain.
 
-B-strict-04's43 runtime cases, B-focused-03's4 whole-audit controls (28 intended rejections,
-8 whole positives), corrected late twins41738/72000 with late444/8/6 and both causal failures plus
-restored positive retain their exact source scopes. The B-focused-02 complete audit actually
-failed184/1 and is not relabelled. B-isolated-five-01 completed naturally during the service
-interruption: all5 commands exit0, all21 ten-player matches Won within400000, median91158,
-p90137458,max147715; maximum map mean3.096ms<5. Fixed3 are24000-schedule timing windows,
-not ending evidence; all3 example guards pass1/0. Tails remain reported, not smoothed away.
-Those results authenticate the685-input/64-authority B2 candidate; revised Sim source requires
-new bound gates. Full13 has not started because blockers were found.
+Strict fmt/diff/all-target Clippy pass. C1 whole-audit controls and fresh C2 complete reconciliation
+pass with their recorded scopes; full unfiltered185
+remains required. Corrected native late twins reach Won at41738/72000 after41739 schedules,
+with late fire/production/positive-ore counts444/8/6 and final39f875fa3379047a/trajectory67c1cf209f7e6c01.
+The native36001 extra-RNG and observer-only late-production omissions each fail as intended,
+then exact-source restoration passes. C1 native proofs retain exact executed-closure qualification
+across the later benchmark-only five-line layout correction; actual executable/dependencies,
+all production/data/helpers and source inputs except that example remain byte-identical. C-corrected-02 authenticates689 inputs
+(674 source+15 factual derived outputs),64 authority spans and all51 HOWTOSEE bytes.
+Frozen manifest SHA256:0e2edf2bce2a8e41581c382a923dce7a5057ccf0231256903d314acb21261b99. No class/reason/route/guard/policy decision
+or qualified native receipt was changed by factual propagation. Source catalogue is
+65 sim/40 game Rust files,49 audit Rust/67 TSV/4 TXT siblings,
+36 top-level RA9 sim targets; file/declaration counts are not executions.
 
-R194 still authorizes ONE complete unchanged corrected-source thirteen-command run for RA9 and
-final review. Native/executable/package acceptance, all commands/workers/caps, all183 stable debt
-IDs and51 exact HOWTOSEE rows remain required; quality stays user-only pending. R172 retains
-five independent slices3+2 and a fresh lead. No lead NO-GO is bypassed: any eventual binding
-NO-GO invokes the continuation's fresh-round/three-remediation-limit procedure. Keep both other
-project and this task running as the user instructed; no unrelated process has been changed.
-Earlier checkpoint descriptions below retain their original historical scopes.
+R199 keeps all five independent slices open across this corrected cumulative candidate; R172
+retains3+2 batches and fresh lead. R194 permits ONE complete unchanged full13 for RA9/final.
+Current isolated all21/fixed3/threeguards, full13, real release/package missing-asset/restoration,
+all revised reports and fresh lead decision remain pending. Every command, worker, cap,5ms,
+heap/determinism/Won criterion remains. All183 debt IDs and51 user-only quality rows remain;
+visual/audio/feel/human-match/platform checks are pending. Earlier checkpoints below are historical.
 <!-- RA9_REMEDIATION1_CURRENT_END -->
 
 <!-- RA9_CURRENT_EVIDENCE_BEGIN -->

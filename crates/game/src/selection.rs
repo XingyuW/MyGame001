@@ -718,10 +718,15 @@ fn shown_enemy_building(host: &SimHost, cell: Option<CellPos>) -> Option<SimId> 
         .map(|(id, ..)| *id)
 }
 
-/// Ordinary scenery targets on explored ground. RA2 trees require force fire;
+/// Ordinary scenery targets on currently visible ground. RA2 trees require force fire;
 /// the legacy ruleset retains its ordinary tree targeting.
 fn shown_scenery(host: &SimHost, cell: Option<CellPos>) -> Option<SimId> {
     let cell = cell?;
+    // Target identities are current observations, not scenery-memory lookups. In particular,
+    // never resolve an explored-only cell through live Props or live garrison membership.
+    if !host.players()?.get(HUMAN)?.vision().is_visible(cell) {
+        return None;
+    }
     let props = host.props()?;
     let id = props.id_at(cell)?;
     // RA9: apply shipped RA2's disabled TreeTargeting to ordinary cursor targets.
@@ -740,11 +745,7 @@ fn shown_scenery(host: &SimHost, cell: Option<CellPos>) -> Option<SimId> {
     {
         return None;
     }
-    host.players()?
-        .get(HUMAN)?
-        .vision()
-        .is_explored(cell)
-        .then_some(id)
+    Some(id)
 }
 
 /// The ids of the human player's units that carry component `T`.
@@ -1477,6 +1478,7 @@ fn draw_order_preview(
 mod tests {
     include!("selection_pad_native.rs");
     include!("privacy_selection_tests.rs");
+    include!("privacy_order_tests.rs");
     use super::*;
 
     fn input_app() -> (App, Entity, SimId) {

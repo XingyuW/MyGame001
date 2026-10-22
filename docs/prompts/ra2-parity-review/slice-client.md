@@ -1,3 +1,20 @@
+<!-- RA9_REVISED_SCOPE_CURRENT_BEGIN -->
+## Finished module list and corrected candidate —2026-10-22
+
+This current supplement supersedes historical stopped/copy/module-count claims below.
+R200 corrected source has65 sim/40 game Rust source files; all actual paths/hashes
+are in `/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round2-revised-module-scope.json`. Exact complete primary/interface assignments
+are in `/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round2-revised-production-ownership.json`. These are the finished module lists,
+including new AI lifecycle/client order includes and two runtime targets; cover every file and
+the entire cumulative programme, not only a patch. Audit siblings:49 Rust/67 TSV/4 TXT;
+top-level RA9 sim targets:36. File counts are not compiled/native counts.
+Frozen input manifest:docs/validation/ra2-parity/remediation-2/C-corrected-02/frozen-validation-inputs.json, SHA2560e2edf2bce2a8e41581c382a923dce7a5057ccf0231256903d314acb21261b99.
+R199 keeps initial panel2 reports exact and requires all five independent corrected-candidate
+inspections before fresh lead. Dispatch supplies exact clean TIP and actual gate phase/results;
+pending acceptance cannot pass. R194 ONE complete shared full13 and every original criterion
+remain; all51 quality rows are user-only pending. Read current requirements and the new dispatch.
+<!-- RA9_REVISED_SCOPE_CURRENT_END -->
+
 <!-- RA9_CURRENT_EVIDENCE_BEGIN -->
 ## Current execution provenance — 2026-10-21 ordinary copy
 

@@ -1,0 +1,90 @@
+{
+  "status": "EXACT_CHANGED_AND_UNTRACKED_GUARDED_INPUT_PREIMAGES",
+  "files": [
+    {
+      "source": "crates/game/src/battlefield.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-ai-fixture-01/source-preimages/crates/game/src/battlefield.rs",
+      "bytes": 53734,
+      "sha256": "1904d0341affebe319a3660bee385b2287984824296cff7ebe231780234453a2"
+    },
+    {
+      "source": "crates/game/src/privacy_order_tests.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-ai-fixture-01/source-preimages/crates/game/src/privacy_order_tests.rs",
+      "bytes": 20173,
+      "sha256": "c65a169e0e82c03f0008ec7a6f13c24e349a4993d2f4789cb582ca3792c5f01a"
+    },
+    {
+      "source": "crates/game/src/selection.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-ai-fixture-01/source-preimages/crates/game/src/selection.rs",
+      "bytes": 146100,
+      "sha256": "d98b53a580e1ead231dce78380e23f6d73de6e812f9503d606448f82823b130c"
+    },
+    {
+      "source": "crates/sim/src/ai.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-ai-fixture-01/source-preimages/crates/sim/src/ai.rs",
+      "bytes": 207784,
+      "sha256": "e67953feca7feeb689c4d3c2db9eff250ae9befe015eda57e1f303dd89d27d34"
+    },
+    {
+      "source": "crates/sim/src/ai/ra8_lifecycle_remediation_tests.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-ai-fixture-01/source-preimages/crates/sim/src/ai/ra8_lifecycle_remediation_tests.rs",
+      "bytes": 12280,
+      "sha256": "dc40d64a28aa05469c4658976b36dd6768c4737dad6db9f2da0ff179b2069c28"
+    },
+    {
+      "source": "crates/sim/src/ai/ra8_recovery_tests.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-ai-fixture-01/source-preimages/crates/sim/src/ai/ra8_recovery_tests.rs",
+      "bytes": 69272,
+      "sha256": "cd41d6331f40bad460f67c4947e1118bc5b1aa69187b9a948d933b77e5cbbab3"
+    },
+    {
+      "source": "crates/sim/src/ai/strategy.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-ai-fixture-01/source-preimages/crates/sim/src/ai/strategy.rs",
+      "bytes": 109316,
+      "sha256": "cd73efbd113b1173f057b594fd9c1e622673dce3df1be9da8238a98fa1ae1d83"
+    },
+    {
+      "source": "crates/sim/src/garrison.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-ai-fixture-01/source-preimages/crates/sim/src/garrison.rs",
+      "bytes": 17048,
+      "sha256": "2ba6b6b2e81efa3c82319b64988b3bc162e44e9fc3f20301c70c89631bda84a8"
+    },
+    {
+      "source": "crates/sim/src/special.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-ai-fixture-01/source-preimages/crates/sim/src/special.rs",
+      "bytes": 20300,
+      "sha256": "f1690707dbd67e91b0433da1e62de4273636c029dd19d2b94a22e6f291c6100c"
+    },
+    {
+      "source": "crates/sim/src/special/advance.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-ai-fixture-01/source-preimages/crates/sim/src/special/advance.rs",
+      "bytes": 16386,
+      "sha256": "c1bb9dc248df48bacbf5411f7521264a025741ce0bf69c350ebaf386d3c510e5"
+    },
+    {
+      "source": "crates/sim/src/special/resolve.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-ai-fixture-01/source-preimages/crates/sim/src/special/resolve.rs",
+      "bytes": 11136,
+      "sha256": "22955d9f47e7e0819f8baf44985b5703ead0c1c9112c36b387c39419e9fbfff0"
+    },
+    {
+      "source": "crates/sim/tests/ra8_ai.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-ai-fixture-01/source-preimages/crates/sim/tests/ra8_ai.rs",
+      "bytes": 454402,
+      "sha256": "a90e6b9aade21c8f44322feee7ca650b22122e976ee6125688ade7cb3619fb93"
+    },
+    {
+      "source": "crates/sim/tests/ra9_support_current.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-ai-fixture-01/source-preimages/crates/sim/tests/ra9_support_current.rs",
+      "bytes": 12141,
+      "sha256": "64ae817d36ae3f2b66cf92e8679438ecec839951b97aca816d2a17cd6529faab"
+    },
+    {
+      "source": "crates/sim/tests/ra9_temporal_pending.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-ai-fixture-01/source-preimages/crates/sim/tests/ra9_temporal_pending.rs",
+      "bytes": 13502,
+      "sha256": "821f64ba99b88de64fa465f8423742e59206ae25a806d43a79423eb257a91e15"
+    }
+  ],
+  "tracked_unchanged_source": "Available in recorded Git predecessor"
+}

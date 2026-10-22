@@ -1,0 +1,195 @@
+{
+  "status": "COMPLETED_CORRECTED_PREFLIGHT_AND_EXACT_FREEZE_NOT_REVIEW_ACCEPTANCE",
+  "utc": "2026-10-22T21:10:45.700634+00:00",
+  "packet_sha256": "43f4ae4d10f61996ff36aaf3c70e93362f1605a514cc2a2ffa3a787b918858d0",
+  "freeze_sha256": "0e2edf2bce2a8e41581c382a923dce7a5057ccf0231256903d314acb21261b99",
+  "input_count": 689,
+  "authority_spans": 64,
+  "module_counts": {
+    "sim_source": 65,
+    "game_source": 40,
+    "audit_rust": 49,
+    "audit_tsv": 67,
+    "audit_txt": 4,
+    "ra9_top_level_sim_targets": 36
+  },
+  "literal_test_attributes": 1824,
+  "test_identity_preservation": [
+    {
+      "path": "crates/game/src/battlefield.rs",
+      "original_test_names_preserved": 3,
+      "added_names": []
+    },
+    {
+      "path": "crates/game/src/selection.rs",
+      "original_test_names_preserved": 36,
+      "added_names": []
+    },
+    {
+      "path": "crates/sim/examples/m7_benchmark.rs",
+      "original_test_names_preserved": 2,
+      "added_names": []
+    },
+    {
+      "path": "crates/sim/src/ai.rs",
+      "original_test_names_preserved": 16,
+      "added_names": [
+        "ra9_after_only_navigation_knowledge_hashes_public_baseline_and_each_observed_bit"
+      ]
+    },
+    {
+      "path": "crates/sim/src/ai/ra8_recovery_tests.rs",
+      "original_test_names_preserved": 21,
+      "added_names": []
+    },
+    {
+      "path": "crates/sim/src/ai/strategy.rs",
+      "original_test_names_preserved": 0,
+      "added_names": []
+    },
+    {
+      "path": "crates/sim/src/garrison.rs",
+      "original_test_names_preserved": 0,
+      "added_names": []
+    },
+    {
+      "path": "crates/sim/src/special.rs",
+      "original_test_names_preserved": 0,
+      "added_names": []
+    },
+    {
+      "path": "crates/sim/src/special/advance.rs",
+      "original_test_names_preserved": 0,
+      "added_names": []
+    },
+    {
+      "path": "crates/sim/src/special/resolve.rs",
+      "original_test_names_preserved": 0,
+      "added_names": []
+    },
+    {
+      "path": "crates/sim/tests/ra8_ai.rs",
+      "original_test_names_preserved": 135,
+      "added_names": [
+        "ra9_lone_ivan_cannot_renew_last_stand_when_all_real_target_types_are_nonbombable_or_immune",
+        "ra9_lone_ivan_keeps_actual_no_income_last_stand_capability",
+        "ra9_privacy_remembered_bridge_approach_ignores_real_hidden_bridge_repair",
+        "ra9_privacy_remembered_bridge_approach_ignores_real_hidden_house_destruction"
+      ]
+    }
+  ],
+  "receipts": [
+    {
+      "path": "C-strict-01/process.json",
+      "sha256": "3207efaf128bbf31bbfbfdc9569beea6f7a98858b130feebaadf342b67dbc496"
+    },
+    {
+      "path": "C-focused-01/process.json",
+      "sha256": "07d209b60c3e615c7c8a1fefac1b87d77e347be508818e204fb7b48696073d1f"
+    },
+    {
+      "path": "C-late-causal-01/process.json",
+      "sha256": "5aa546c82ccf4e10414fe3d995b17b48cd486833116194bd8f6d92192f62a9c4"
+    },
+    {
+      "path": "C-ai-handoff-01/handoff.json",
+      "sha256": "085ee26163845483615d8d861ab167257bf03e7b75614e479d51b9d987054465"
+    },
+    {
+      "path": "C-reference-readme-01/factual-count-correction.json",
+      "sha256": "43c63e7cb0af5ee1537501b4c4792fbe636a9e4737df31cd9f0a2d1aa197d254"
+    },
+    {
+      "path": "C-benchmark-after-01/process.json",
+      "sha256": "3253319be2ea8ff60968aa8498c2f8a18100dbdb279df78c5ac32604b5b809e5"
+    },
+    {
+      "path": "C-benchmark-strict-01/process.json",
+      "sha256": "a5f89125ef0cdb300e14ee44cffd9810b4dcab3af36c33ad90906615ebe431f0"
+    },
+    {
+      "path": "C-benchmark-handoff-01/handoff.json",
+      "sha256": "4a4d1969b04bdb818080db2e21869dd9fb497ea3c9d0b4bf4111108ac778af8e"
+    },
+    {
+      "path": "C-current-audit-01/process.json",
+      "sha256": "6c66001400de5fd75b5274296e64942beebb4ee80d7696495d6d3f78df22d425"
+    },
+    {
+      "path": "C-corrected-02/qualified-executed-closure.json",
+      "sha256": "2819b6bb29c398df94f84b8496215a200126ba7d280b67a6cac2efab2df19f2b"
+    }
+  ],
+  "metadata_changes": [
+    {
+      "path": "README.md",
+      "before_sha256": "d1b06f29c9557c368b31ab79fce5c1be9a7bc90c66cd119b096fe7c807e8804a",
+      "after_sha256": "7b175dd9bad02b01af6cda6fe0efd7d80582b871bd8b4a9df32603c2d0c40398"
+    },
+    {
+      "path": "docs/HANDOFF.md",
+      "before_sha256": "605af21b6f1f2406de6bb5487f67f983fe9c688566fbe9d6019ae4443fd2b696",
+      "after_sha256": "20ec5794a63aee8156d1ea7b967d5e8e5966f43930c60eec0fb068b4d7a6b10b"
+    },
+    {
+      "path": "docs/RA2_GAP_ANALYSIS.md",
+      "before_sha256": "131bdeeee8269af3222bdd5b97a444302d1ef7108ab32e7d1a126232aa336ec8",
+      "after_sha256": "e3d7c708d6e63c32195725dfd877a5042ab666d3ec9df9942302c84ba67c1051"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-review-requirements.md",
+      "before_sha256": "fae2ad6b48885857d30649c75719df0bbd3f097bf7f8dd0b871e19bb2a628732",
+      "after_sha256": "07df97187ef1e3652e6bab47cb4ae58f331170071d1bf6192a8a728ac24a4c61"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-reviews-outstanding.md",
+      "before_sha256": "2deb98d8fbdf6074ef463e02a6ca892192925c193bcb1da3295eb5a4b66076c0",
+      "after_sha256": "623dac2c4cb21b0d6d5e194ea6322e11f976056e17265ce03f41848a2080ea6b"
+    },
+    {
+      "path": "docs/DECISIONS.md",
+      "before_sha256": "d31dd8c6600d845f31f4f530d290bc0d1dfbf72f7d032bc76ec9cd1884bfb750",
+      "after_sha256": "4bdf08a18ce68f8e55706ab899cb9481e97cc30f1144588103e6ef1a745367cb"
+    },
+    {
+      "path": "docs/STATUS.md",
+      "before_sha256": "c0ebf440ec9912e7adc61ae438c3153ece6b0bca41aa05ef6ee2204f1c16411f",
+      "after_sha256": "02e01d2d0b261dee6215ed5bdd31b849cfb17aa2790e9d11eaf317776f41b468"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/README.md",
+      "before_sha256": "fd58e590b8657632c06f73a1ce1fdad1802dc5d49e47a200b53f8e33722defd8",
+      "after_sha256": "ef0ff547b37a904da32d71fdfe1bde95cadd5996ab460617c568deca37b8325d"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-sim1.md",
+      "before_sha256": "c26ab370e9c88cb75e8a3bc61fc0ed0b7b6924ccebfd4a65b318c71df8c331a2",
+      "after_sha256": "77ad4cc10d1e215a7d12e90bb392639d150d85a57467fa251f485129655d0090"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-sim2.md",
+      "before_sha256": "4ea875a48f090a01bc819872bef0f04bc73477b61c171f1df9454d067f248c20",
+      "after_sha256": "db58870ad115f9f2b35bc7828c31a6f1e4533b07831921ef18f23945ebe47c11"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-client.md",
+      "before_sha256": "ba1bc1452db138a0a07e8138ba694958764fcecda714aab090e17d8af3753ca1",
+      "after_sha256": "3b9910ea94311372cf05521f431a943d7e80620781cfa2a343cb742b74e79254"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-data.md",
+      "before_sha256": "4fa4ab8d7d9e584e74e1ad06e0980778fda5c5a414dda46ea32cb61467391a6a",
+      "after_sha256": "49e787cb0fc9b10704fe663a01baeb6e2f05c184eecc26d731ea9a9bdec261ef"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-tests.md",
+      "before_sha256": "67eec8b78d4448e7bfeee8ec5f945f806c8530b7effd2dfc4b87169f804f266d",
+      "after_sha256": "27459342cae8b87cb463e48f369ca19734bab158ffa6deae6bda36453762bc4f"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/lead.md",
+      "before_sha256": "7d19481a05ae789ea6fcd7a8051590a663d6c316316497c58484f96a936ee4b6",
+      "after_sha256": "9dda36e406303bf53749e709b12deb897d197074fed4a3ca1b997dacb48a1573"
+    }
+  ]
+}

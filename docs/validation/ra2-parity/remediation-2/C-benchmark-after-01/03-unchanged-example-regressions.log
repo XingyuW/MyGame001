@@ -1,0 +1,10 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 13.37s
+     Running unittests examples/m7_benchmark.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples/m7_benchmark-0e2ae62cd198c0e6)
+
+running 2 tests
+test ra9_boundary_tests::ra9_movement_is_monotonic_for_returned_units_and_casualties ... ok
+test ra9_boundary_tests::ra9_both_real_benchmark_scenarios_witness_all_original_commanded_actors ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.70s
+

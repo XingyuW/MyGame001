@@ -413,6 +413,9 @@ fn shipped_scenario() -> Result<Report, String> {
         return Err("a shipped faction has no armed unit type".into());
     }
     let (a, b) = (demo.starts[0], demo.starts[1]);
+    // Converge in the field: teleporting infantry otherwise arrive inside the opposing
+    // starting formation and can die before the first end-of-tick movement observation.
+    let meeting = CellPos::new((a.x + b.x) / 2, (a.y + b.y) / 2);
     run(
         "shipped",
         &definitions,
@@ -422,13 +425,13 @@ fn shipped_scenario() -> Result<Report, String> {
                 player: PlayerId(0),
                 units: first,
                 anchor: a,
-                target: b,
+                target: meeting,
             },
             Side {
                 player: PlayerId(1),
                 units: second,
                 anchor: b,
-                target: a,
+                target: meeting,
             },
         ],
     )

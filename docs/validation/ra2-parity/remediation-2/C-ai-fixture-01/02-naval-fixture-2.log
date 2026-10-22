@@ -1,0 +1,8 @@
+    Finished `release` profile [optimized] target(s) in 0.17s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-b27027efb5a77317)
+
+running 1 test
+test ra8_unseen_water_obstacle_before_the_edge_range_endpoint_cannot_change_naval_planning ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 138 filtered out; finished in 0.06s
+

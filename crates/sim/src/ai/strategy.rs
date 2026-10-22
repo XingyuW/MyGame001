@@ -11,19 +11,11 @@ pub(super) fn attack_job_eligible(controller: &AiController, target: SimId) -> b
 
 fn stowed_own_attacker(view: &View<'_>, special: &crate::SpecialState, id: SimId) -> bool {
     view.own_buildings.iter().any(|b| b.id == id)
-        || special.cargo.iter().any(|(host, passengers)| {
-            passengers.iter().any(|p| p.id == id)
-                && (view.owned_units.iter().any(|u| u.id == *host)
-                    || view.own_buildings.iter().any(|b| b.id == *host)
-                    || special
-                        .garrisons
-                        .get(host)
-                        .is_some_and(|g| g.owner == view.player))
-        })
+        || view.stowed_owned_ids.contains(&id)
         || special
             .parasites
             .values()
-            .any(|p| p.owner == view.player && p.passenger.id == id)
+            .any(|p| p.owner == view.player && p.passenger.id == id && p.passenger.hp > 0)
 }
 
 /// Complete only actual own loss/capture or a source-ammunition cycle, never slow travel
@@ -1589,7 +1581,7 @@ fn surface_response_cell(view: &View<'_>, unit: &UnitSnap, target: Footprint) ->
         }
         for (dx, dy) in [(0, -1), (-1, 0), (1, 0), (0, 1)] {
             let next = CellPos::new(cell.x.saturating_add(dx), cell.y.saturating_add(dy));
-            let passable = view.grid.cell(next).is_some_and(|c| {
+            let passable = view.terrain.cell(next).is_some_and(|c| {
                 c.passable || (view.definitions.domain(unit.kind) == Domain::Amphibious && c.water)
             });
             if passable
@@ -1808,7 +1800,7 @@ pub(super) fn production_finisher_without(
         })
         .flat_map(|b| b.footprint.ring())
         .filter(|&cell| {
-            view.grid.cell(cell).is_some_and(|c| {
+            view.terrain.cell(cell).is_some_and(|c| {
                 c.passable || (view.definitions.domain(kind) == Domain::Amphibious && c.water)
             })
         })
@@ -1908,7 +1900,7 @@ fn weapon_reachable(
         for (dx, dy) in [(0, -1), (-1, 0), (1, 0), (0, 1)] {
             let next = CellPos::new(cell.x.saturating_add(dx), cell.y.saturating_add(dy));
             let terrain =
-                view.grid
+                view.terrain
                     .cell(next)
                     .is_some_and(|cell| match view.definitions.domain(kind) {
                         Domain::Land => cell.passable,
@@ -2006,7 +1998,7 @@ fn naval_reach(
 }
 
 fn known_naval_water(view: &View<'_>, cell: CellPos) -> bool {
-    view.grid.cell(cell).is_some_and(|c| c.water)
+    view.terrain.cell(cell).is_some_and(|c| c.water)
         && !view
             .own_buildings
             .iter()
@@ -2134,7 +2126,10 @@ fn naval_targets(view: &View<'_>, controller: &AiController) -> Vec<(Footprint, 
                         wall: t.wall,
                         building: true,
                         immune_psionics: true,
-                        on_water: view.grid.cell(b.footprint.origin).is_some_and(|c| c.water),
+                        on_water: view
+                            .terrain
+                            .cell(b.footprint.origin)
+                            .is_some_and(|c| c.water),
                         ..crate::TargetTraits::default()
                     },
                 },
@@ -2186,14 +2181,19 @@ fn damages_buildings(view: &View<'_>, kind: UnitKind) -> bool {
             {
                 return None;
             }
-            view.definitions.building_combat(kind)
+            view.definitions
+                .building_combat(kind)
+                .map(|terms| (kind, terms))
         })
-        .any(|target| {
+        .any(|(kind, target)| {
+            let metadata = view.definitions.metadata(ProductionItem::Building(kind));
             let target = crate::TargetTraits {
                 armour: target.armour,
                 wall: target.wall,
                 building: true,
                 immune_psionics: true,
+                bombable: metadata.is_some_and(|m| m.bombable),
+                immune_radiation: metadata.is_some_and(|m| m.immune_radiation),
                 ..crate::TargetTraits::default()
             };
             crate::weapon_against(view.definitions, &terms, terms.weapons(false), &target)
@@ -2264,15 +2264,14 @@ fn useful_control_opportunity(
         }
         for (dx, dy) in [(0, -1), (-1, 0), (1, 0), (0, 1)] {
             let next = CellPos::new(cell.x.saturating_add(dx), cell.y.saturating_add(dy));
-            let terrain =
-                view.grid
-                    .cell(next)
-                    .is_some_and(|cell| match view.definitions.domain(unit.kind) {
-                        Domain::Land => cell.passable,
-                        Domain::Naval => cell.water,
-                        Domain::Amphibious => cell.passable || cell.water,
-                        Domain::Air => true,
-                    });
+            let terrain = view.terrain.cell(next).is_some_and(|cell| {
+                match view.definitions.domain(unit.kind) {
+                    Domain::Land => cell.passable,
+                    Domain::Naval => cell.water,
+                    Domain::Amphibious => cell.passable || cell.water,
+                    Domain::Air => true,
+                }
+            });
             if terrain && seen.insert(next) {
                 open.push_back(next);
             }
@@ -2327,7 +2326,7 @@ pub(super) fn can_finish(view: &View<'_>, controller: &AiController, unit: &Unit
         for (dx, dy) in [(0, -1), (-1, 0), (1, 0), (0, 1)] {
             let next = CellPos::new(cell.x.saturating_add(dx), cell.y.saturating_add(dy));
             // Temporary traffic and buildings cannot prove a permanently stranded fleet.
-            if view.grid.cell(next).is_some_and(|c| c.water) && seen.insert(next) {
+            if view.terrain.cell(next).is_some_and(|c| c.water) && seen.insert(next) {
                 open.push_back(next);
             }
         }

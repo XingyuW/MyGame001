@@ -1,0 +1,57 @@
+--- before-fixture-timing
++++ after-fixture-timing
+@@ -5776,27 +5776,40 @@
+     unseen_enemy_water_building(CellPos::new(16, 21));
+ }
+ 
++fn ra9_authored_naval_privacy_corridor(grid: &mut Grid) {
++    for y in 0..48 {
++        for x in 16..19 {
++            grid.set_terrain(
++                CellPos::new(x, y),
++                Cell {
++                    passable: false,
++                    buildable: false,
++                    water: true,
++                    ore: 0,
++                },
++            );
++        }
++    }
++}
++
+ fn unseen_enemy_water_building(cell: CellPos) {
+     let make = || {
+-        let mut app = scenario("great_britain", "brutal", 0, 0, false);
++        let mut app = scenario_mode(
++            "great_britain",
++            "brutal",
++            0,
++            0,
++            false,
++            ScenarioMode {
++                authored_terrain: Some(ra9_authored_naval_privacy_corridor),
++                ..Default::default()
++            },
++        );
+         let mut rules = app.world().resource::<sim::MatchState>().rules();
+         rules.fog_of_war = true;
+         app.world_mut()
+             .resource_mut::<sim::MatchState>()
+             .set_rules(rules);
+-        for y in 0..48 {
+-            for x in 16..19 {
+-                app.world_mut().resource_mut::<Grid>().set_terrain(
+-                    CellPos::new(x, y),
+-                    Cell {
+-                        passable: false,
+-                        buildable: false,
+-                        water: true,
+-                        ore: 0,
+-                    },
+-                );
+-            }
+-        }
+         put(&mut app, "naval_shipyard", 16, 8);
+         let carrier = spawn_unit(
+             app.world_mut(),

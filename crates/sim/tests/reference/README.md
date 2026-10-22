@@ -98,9 +98,12 @@ model162, guard75, behavior87, legacy361/543, masked19 and special10 contracts. 
 installed Rust route census and typed class mappings (including all eleven residual
 categories), rejects duplicate owners or changed
 counts/values, verifies exact legacy family atom fingerprints, and requires the later
-packages to partition the original pending atoms. At this preliminary integration the
-result has 1,737 whole-source rows: the original 1,708, nineteen masked speed atoms and ten
-special metadata atoms (VHP, Tree, Mirage elite and seven Spark premises).
+packages to partition the original pending atoms. The current compositor also includes the
+completion174 contracts: 132 whole atoms and 42 component atoms across 151 source keys,
+added to the earlier 1,737-atom preliminary output (1,708 plus nineteen masked speed atoms
+and ten special metadata atoms: VHP, Tree, Mirage elite and seven Spark premises).
+The result is 1,911 typed atoms across 1,888 source keys: 1,869 whole rows, nineteen first
+components, nineteen second components and four third components.
 
 These are proposed dispositions. The table records no source acceptance, native field
 consumption, original-engine nonuse, or passed behavior. The Rust declare/admit/finish

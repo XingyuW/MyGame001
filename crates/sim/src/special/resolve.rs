@@ -160,9 +160,12 @@ pub(crate) fn resolve(world: &mut World) {
                 .get(&source)
                 .is_none_or(|b| role(&defs, b) != Role::Cloner)
         {
-            let cloner = index.values().find(|b| {
-                b.owner == player && role(&defs, b) == Role::Cloner && powered(world, &defs, b)
-            });
+            let cloner = index
+                .values()
+                .filter_map(|b| current_actor(world, b))
+                .find(|b| {
+                    b.owner == player && role(&defs, b) == Role::Cloner && powered(world, &defs, b)
+                });
             if let Some(b) = cloner
                 && let ProductionItem::Unit(k) = a.item
                 && let Some(mut building) = world.get_mut::<Building>(b.entity)
@@ -179,6 +182,7 @@ pub(crate) fn resolve(world: &mut World) {
             // (RA5, section 4.10); a quarter without a rules file, the rule of M9.
             let purifiers = index
                 .values()
+                .filter_map(|b| current_actor(world, b))
                 .filter(|b| {
                     b.owner == player
                         && role(&defs, b) == Role::Purifier

@@ -1,0 +1,37 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T20:39:18.810217+00:00",
+  "pid": 21102,
+  "head": "aafd1794a84f88b9919b7e31c78768e08f66d70d",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-target-01-plan.json",
+  "plan_sha256": "bdb86bb320b3bb46c10718ba7c2ce46522fa39ccf8a5cb0894c480fe64b962e0",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:39:18.915241+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-target-01/01-complete-release-ra8-ai.log",
+      "pid": 21131,
+      "pgid": 21131,
+      "exit": 101,
+      "end": "2026-10-22T20:40:09.008551+00:00",
+      "raw_bytes": 142184,
+      "raw_sha256": "612418e18cc2e6b407e58add35345d9fce83cc9fa3050a76f62d6a188fb7b4a5",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T20:40:04.006722+00:00",
+  "end": "2026-10-22T20:40:09.114672+00:00",
+  "source_unchanged": true
+}

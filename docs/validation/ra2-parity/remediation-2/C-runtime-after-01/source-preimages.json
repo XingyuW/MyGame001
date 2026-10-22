@@ -1,0 +1,42 @@
+{
+  "status": "EXACT_CHANGED_AND_UNTRACKED_GUARDED_INPUT_PREIMAGES",
+  "files": [
+    {
+      "source": "crates/sim/src/garrison.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-runtime-after-01/source-preimages/crates/sim/src/garrison.rs",
+      "bytes": 17048,
+      "sha256": "2ba6b6b2e81efa3c82319b64988b3bc162e44e9fc3f20301c70c89631bda84a8"
+    },
+    {
+      "source": "crates/sim/src/special.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-runtime-after-01/source-preimages/crates/sim/src/special.rs",
+      "bytes": 20300,
+      "sha256": "f1690707dbd67e91b0433da1e62de4273636c029dd19d2b94a22e6f291c6100c"
+    },
+    {
+      "source": "crates/sim/src/special/advance.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-runtime-after-01/source-preimages/crates/sim/src/special/advance.rs",
+      "bytes": 16386,
+      "sha256": "c1bb9dc248df48bacbf5411f7521264a025741ce0bf69c350ebaf386d3c510e5"
+    },
+    {
+      "source": "crates/sim/src/special/resolve.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-runtime-after-01/source-preimages/crates/sim/src/special/resolve.rs",
+      "bytes": 11136,
+      "sha256": "22955d9f47e7e0819f8baf44985b5703ead0c1c9112c36b387c39419e9fbfff0"
+    },
+    {
+      "source": "crates/sim/tests/ra9_support_current.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-runtime-after-01/source-preimages/crates/sim/tests/ra9_support_current.rs",
+      "bytes": 12141,
+      "sha256": "64ae817d36ae3f2b66cf92e8679438ecec839951b97aca816d2a17cd6529faab"
+    },
+    {
+      "source": "crates/sim/tests/ra9_temporal_pending.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-runtime-after-01/source-preimages/crates/sim/tests/ra9_temporal_pending.rs",
+      "bytes": 13502,
+      "sha256": "821f64ba99b88de64fa465f8423742e59206ae25a806d43a79423eb257a91e15"
+    }
+  ],
+  "tracked_unchanged_source": "Available in recorded Git predecessor"
+}

@@ -1,0 +1,18 @@
+    Finished `release` profile [optimized] target(s) in 0.15s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-b27027efb5a77317)
+
+running 1 test
+
+thread 'ra8_lone_yuri_preserves_only_seen_reachable_controllable_building_damaging_recruits' (17492770) panicked at crates/sim/tests/ra8_ai.rs:2364:17:
+liquidated before a real crazy_ivan capture opportunity
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_lone_yuri_preserves_only_seen_reachable_controllable_building_damaging_recruits ... FAILED
+
+failures:
+
+failures:
+    ra8_lone_yuri_preserves_only_seen_reachable_controllable_building_damaging_recruits
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 138 filtered out; finished in 0.24s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

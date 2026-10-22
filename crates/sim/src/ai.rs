@@ -160,6 +160,8 @@ pub struct AiController {
     /// Huts and collapsed decks learned through current sight; retained while fog returns.
     repair_huts: BTreeMap<SimId, (SimId, CellPos)>,
     broken_bridges: BTreeSet<SimId>,
+    /// Public initial map, overwritten only by terrain actually observed at an AI turn.
+    known_terrain: TerrainKnowledge,
     wave: BTreeSet<SimId>,
     target: Option<WaveTarget>,
     failures: BTreeMap<SimId, u8>,
@@ -224,6 +226,10 @@ mod ra8_recovery_tests;
 #[cfg(test)]
 #[path = "ai/ra8_composition_tests.rs"]
 mod ra8_composition_tests;
+
+#[cfg(test)]
+#[path = "ai/ra8_lifecycle_remediation_tests.rs"]
+mod ra8_lifecycle_remediation_tests;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct AirScreenProgress {
@@ -363,6 +369,7 @@ impl AiController {
             known: BTreeMap::new(),
             repair_huts: BTreeMap::new(),
             broken_bridges: BTreeSet::new(),
+            known_terrain: TerrainKnowledge::new(grid),
             wave: BTreeSet::new(),
             target: None,
             failures: BTreeMap::new(),
@@ -477,6 +484,7 @@ impl AiController {
                 hasher.write_u32(id.0);
             }
         }
+        self.known_terrain.hash_into(hasher);
         hasher.write_u64(self.wave.len() as u64);
         for id in &self.wave {
             hasher.write_u32(id.0);
@@ -771,6 +779,102 @@ struct BuildingSnap {
     pending: Vec<UnitKind>,
 }
 
+/// Navigation knowledge never reads a hidden runtime terrain mutation. The baseline is
+/// immutable after public match setup; its fingerprint is computed from all dimensions/bits
+/// once. Only sparse observed differences can mutate, and every one enters the state hash.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct TerrainKnowledge {
+    width: u32,
+    height: u32,
+    baseline: std::sync::Arc<[u8]>,
+    baseline_hash: u64,
+    observed: BTreeMap<u32, u8>,
+}
+impl TerrainKnowledge {
+    fn flags(cell: crate::Cell) -> u8 {
+        u8::from(cell.passable) | (u8::from(cell.water) << 1) | (u8::from(cell.buildable) << 2)
+    }
+    fn new(grid: &Grid) -> Self {
+        let baseline: Vec<_> = (0..grid.height())
+            .flat_map(|y| {
+                (0..grid.width()).filter_map(move |x| {
+                    grid.cell(CellPos::new(x as i32, y as i32))
+                        .copied()
+                        .map(Self::flags)
+                })
+            })
+            .collect();
+        let mut hash = Fnv1a64::new();
+        hash.write_u32(grid.width());
+        hash.write_u32(grid.height());
+        hash.write(&baseline);
+        Self {
+            width: grid.width(),
+            height: grid.height(),
+            baseline: baseline.into(),
+            baseline_hash: hash.finish(),
+            observed: BTreeMap::new(),
+        }
+    }
+    fn cell(&self, cell: CellPos) -> Option<crate::Cell> {
+        let (x, y) = (u32::try_from(cell.x).ok()?, u32::try_from(cell.y).ok()?);
+        if x >= self.width || y >= self.height {
+            return None;
+        }
+        let index = y.checked_mul(self.width)?.checked_add(x)?;
+        let flags = self
+            .observed
+            .get(&index)
+            .copied()
+            .or_else(|| self.baseline.get(index as usize).copied())?;
+        Some(crate::Cell {
+            passable: flags & 1 != 0,
+            water: flags & 2 != 0,
+            buildable: flags & 4 != 0,
+            ore: 0,
+        })
+    }
+    fn observe(&mut self, grid: &Grid, vision: &Vision) {
+        for y in 0..self.height {
+            for x in 0..self.width {
+                let cell = CellPos::new(x as i32, y as i32);
+                if !vision.is_visible(cell) {
+                    continue;
+                }
+                let Some(current) = grid.cell(cell).copied() else {
+                    continue;
+                };
+                let index = y * self.width + x;
+                let flags = Self::flags(current);
+                if self.baseline.get(index as usize) == Some(&flags) {
+                    self.observed.remove(&index);
+                } else {
+                    self.observed.insert(index, flags);
+                }
+            }
+        }
+    }
+    fn planning_grid(&self) -> Option<Grid> {
+        let cells = (0..self.height)
+            .flat_map(|y| {
+                (0..self.width).filter_map(move |x| self.cell(CellPos::new(x as i32, y as i32)))
+            })
+            .collect();
+        Grid::from_cells(self.width, self.height, cells)
+    }
+    fn hash_into(&self, hash: &mut Fnv1a64) {
+        hash.write(b"ai_observed_navigation");
+        hash.write_u32(self.width);
+        hash.write_u32(self.height);
+        hash.write_u64(self.baseline_hash);
+        hash.write_u64(self.observed.len() as u64);
+        for (index, flags) in &self.observed {
+            hash.write_u32(*index);
+            hash.write(&[*flags]);
+        }
+    }
+}
+
 /// What one computer player may know (docs/DECISIONS.md D43). [`think`] reads nothing else.
 struct View<'a> {
     known_occupants: BTreeSet<SimId>,
@@ -780,11 +884,13 @@ struct View<'a> {
     recoverable_service: Vec<&'a UnitSnap>,
     seen_tech: Vec<&'a BuildingSnap>,
     living_owned_ids: BTreeSet<SimId>,
+    stowed_owned_ids: BTreeSet<SimId>,
     player: PlayerId,
     tick: u64,
     state: &'a PlayerState,
     vision: &'a Vision,
     grid: &'a Grid,
+    terrain: TerrainKnowledge,
     definitions: &'a Definitions,
     /// The computer player's plan (named `ai` as the AI file it is taken from).
     ai: &'a AiPlan,
@@ -810,6 +916,7 @@ impl<'a> View<'a> {
         players: &Players,
         state: &'a PlayerState,
         grid: &'a Grid,
+        terrain: TerrainKnowledge,
         definitions: &'a Definitions,
         ai: &'a AiPlan,
         superweapons: bool,
@@ -818,6 +925,22 @@ impl<'a> View<'a> {
         special: &crate::SpecialState,
     ) -> Self {
         let vision = state.vision();
+        // Only living on-map owned roots confer ownership on their recursive payload.
+        // Garrison snapshots are already backed by a living Prop in run_ai.
+        let stowed: Vec<_> = units
+            .iter()
+            .filter(|u| u.owner == player && u.hp > 0)
+            .map(|u| u.id)
+            .chain(
+                buildings
+                    .iter()
+                    .filter(|b| b.owner == player && b.hp > 0)
+                    .map(|b| b.id),
+            )
+            .filter(|root| special.cargo.contains_key(root))
+            .flat_map(|root| special.cargo_descendants(root))
+            .filter(|p| p.hp > 0)
+            .collect();
         // Allies (a team of computer players against the human) are never targets.
         let hostile = |owner: PlayerId| players.hostile(player, owner);
         // RA4: a missile or an aircraft that another unit launched is no unit of the player's
@@ -893,43 +1016,26 @@ impl<'a> View<'a> {
                 })
                 .map(|u| u.id)
                 .chain(
-                    special
-                        .cargo
+                    stowed
                         .iter()
-                        .filter(|(host, _)| {
-                            units.iter().any(|u| u.id == **host && u.owner == player)
-                                || buildings
-                                    .iter()
-                                    .any(|b| b.id == **host && b.owner == player)
-                                || special
-                                    .garrisons
-                                    .get(host)
-                                    .is_some_and(|g| g.owner == player)
-                        })
-                        .flat_map(|(_, cargo)| {
-                            cargo
-                                .iter()
-                                .filter(|passenger| {
-                                    definitions
-                                        .metadata(ProductionItem::Unit(passenger.kind))
-                                        .is_none_or(|meta| {
-                                            !matches!(
-                                                meta.role,
-                                                Role::Engineer | Role::Spy | Role::Mcv
-                                            )
-                                        })
+                        .filter(|p| {
+                            definitions
+                                .metadata(ProductionItem::Unit(p.kind))
+                                .is_none_or(|m| {
+                                    !matches!(m.role, Role::Engineer | Role::Spy | Role::Mcv)
                                 })
-                                .map(|p| p.id)
-                        }),
+                        })
+                        .map(|p| p.id),
                 )
                 .chain(
                     special
                         .parasites
                         .values()
-                        .filter(|p| p.owner == player)
+                        .filter(|p| p.owner == player && p.passenger.hp > 0)
                         .map(|p| p.passenger.id),
                 )
                 .collect(),
+            stowed_owned_ids: stowed.iter().map(|p| p.id).collect(),
             seen_tech: buildings
                 .iter()
                 .filter(|b| {
@@ -947,6 +1053,7 @@ impl<'a> View<'a> {
             state,
             vision,
             grid,
+            terrain,
             definitions,
             ai,
             superweapons,
@@ -1268,6 +1375,10 @@ pub(crate) fn run_ai(
         else {
             continue;
         };
+        controller
+            .known_terrain
+            .observe(&grid, player_state.vision());
+        let terrain = controller.known_terrain.clone();
         let plan = controller.plan.clone();
         let mut view = View::new(
             player,
@@ -1275,6 +1386,7 @@ pub(crate) fn run_ai(
             &players,
             player_state,
             &grid,
+            terrain,
             &definitions,
             &plan,
             state.rules().superweapons,
@@ -1483,14 +1595,7 @@ fn repair_bridge(
     // populated with legitimate building knowledge, rather than letting an unseen footprint
     // select either a different endpoint or a different route to that endpoint. Real movement
     // still resolves unknown physical obstacles after the ordinary Move is admitted.
-    let terrain = (0..view.grid.height())
-        .flat_map(|y| {
-            (0..view.grid.width())
-                .filter_map(move |x| view.grid.cell(CellPos::new(x as i32, y as i32)).copied())
-        })
-        .collect();
-    let Some(mut planning) = Grid::from_cells(view.grid.width(), view.grid.height(), terrain)
-    else {
+    let Some(mut planning) = view.terrain.planning_grid() else {
         return Vec::new();
     };
     for building in buildings.iter().filter(|building| {
@@ -2416,7 +2521,7 @@ fn worker_job(view: &View<'_>) -> bool {
         .flat_map(|b| b.footprint.cells())
         .collect();
     let passable = |cell: CellPos| {
-        view.grid.cell(cell).is_some_and(|c| match domain {
+        view.terrain.cell(cell).is_some_and(|c| match domain {
             Domain::Land => c.passable,
             Domain::Amphibious => c.passable || c.water,
             Domain::Naval => c.water,
@@ -3953,6 +4058,7 @@ mod tests {
                     &players,
                     state,
                     &grid,
+                    TerrainKnowledge::new(&grid),
                     &definitions,
                     &plan,
                     false,
@@ -4186,6 +4292,59 @@ mod tests {
     }
 
     #[test]
+    fn ra9_after_only_navigation_knowledge_hashes_public_baseline_and_each_observed_bit() {
+        let cell = CellPos::new(1, 1);
+        let initial = crate::Cell {
+            passable: true,
+            water: false,
+            buildable: true,
+            ore: 0,
+        };
+        let grid = Grid::from_cells(3, 3, vec![initial; 9]).unwrap();
+        let hash = |knowledge: &TerrainKnowledge| {
+            let mut h = Fnv1a64::new();
+            knowledge.hash_into(&mut h);
+            h.finish()
+        };
+        let baseline = TerrainKnowledge::new(&grid);
+        let before = hash(&baseline);
+        for bit in 0..3 {
+            let mut changed_grid = grid.clone();
+            let mut changed = initial;
+            match bit {
+                0 => changed.passable = false,
+                1 => changed.water = true,
+                _ => changed.buildable = false,
+            }
+            assert!(changed_grid.set_terrain(cell, changed));
+            assert_ne!(
+                before,
+                hash(&TerrainKnowledge::new(&changed_grid)),
+                "public initial navigation bit {bit}"
+            );
+            let mut knowledge = baseline.clone();
+            let hidden = Vision::default();
+            knowledge.observe(&changed_grid, &hidden);
+            assert_eq!(
+                before,
+                hash(&knowledge),
+                "unseen changes cannot enter memory"
+            );
+            let mut seen = Vision::default();
+            seen.reveal_for_test(&grid, cell, 1);
+            knowledge.observe(&changed_grid, &seen);
+            assert_ne!(before, hash(&knowledge), "observed navigation bit {bit}");
+            assert_eq!(knowledge.cell(cell), Some(changed));
+            knowledge.observe(&grid, &seen);
+            assert_eq!(
+                before,
+                hash(&knowledge),
+                "re-observed original terrain removes sparse override"
+            );
+        }
+    }
+
+    #[test]
     fn ra5_bridge_memory_hash_covers_hut_identity_location_and_observed_collapse() {
         let mut controller = AiController {
             plan: AiPlan {
@@ -4216,6 +4375,7 @@ mod tests {
             known: BTreeMap::new(),
             repair_huts: BTreeMap::new(),
             broken_bridges: BTreeSet::new(),
+            known_terrain: TerrainKnowledge::new(&Grid::default()),
             wave: BTreeSet::new(),
             target: None,
             failures: BTreeMap::new(),
@@ -4368,6 +4528,7 @@ mod tests {
                 &players,
                 state,
                 &grid,
+                TerrainKnowledge::new(&grid),
                 &definitions,
                 &plan,
                 false,
@@ -4474,6 +4635,7 @@ mod tests {
             &players,
             state,
             &grid,
+            TerrainKnowledge::new(&grid),
             &definitions,
             &plan,
             false,
@@ -4499,6 +4661,7 @@ mod tests {
             &players,
             state,
             &grid,
+            TerrainKnowledge::new(&grid),
             &definitions,
             &plan,
             false,
@@ -4515,6 +4678,7 @@ mod tests {
             &players,
             state,
             &grid,
+            TerrainKnowledge::new(&grid),
             &definitions,
             &plan,
             false,
@@ -4754,6 +4918,7 @@ mod tests {
                 &players,
                 state,
                 &grid,
+                TerrainKnowledge::new(&grid),
                 &definitions,
                 &plan,
                 false,
@@ -4905,6 +5070,7 @@ mod tests {
                 &players,
                 state,
                 &grid,
+                TerrainKnowledge::new(&grid),
                 &definitions,
                 &plan,
                 false,
