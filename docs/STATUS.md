@@ -5092,3 +5092,15 @@ the unfiltered185/workspace, all21/fixed3/threeguards, actual executable/package
 shared full13 and fresh five-slice/lead decision remain required. All183 debt IDs and51 user-only
 HOWTOSEE rows remain. Nothing visual, audible or felt is passed, and no merge is yet authorized
 by a review decision.
+
+
+## RA9 independent round2 initial findings; corrected candidate pending — 2026-10-22
+
+All five independent initial reports at1cedaee are preserved under reviews/RA2-parity-review-2-initial-*.
+They report real active-service/dead-support/privacy/AI omissions; no binding lead decision or GO
+has occurred. R199 keeps the panel open across fresh implementation (correction pass2 of3), then
+requires all five nonimplementing reviewers to inspect the entire revised frozen candidate and
+a fresh lead after every corrected-source gate. Initial adverse reports are not overwritten.
+B-isolated-five-01 actually passes all5/21Won/maxmean3.096ms on B2; revised-source gates are still
+required. Full13 has not begun. Preserve all prior failures/causal/restored/service receipts,
+all183 debt IDs and51 exact user-only HOWTOSEE rows. Both projects continue running per user.
