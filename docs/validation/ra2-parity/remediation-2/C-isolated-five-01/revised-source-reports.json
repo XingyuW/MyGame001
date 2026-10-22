@@ -1,0 +1,35 @@
+{
+  "status": "ALL_FIVE_SOURCE_INSPECTIONS_COMPLETE_NATIVE_FINAL_ACCEPTANCE_PENDING",
+  "reports": [
+    {
+      "role": "sim1",
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-revised-sim1.md",
+      "canonical": "docs/reviews/RA2-parity-review-2-revised-sim1.md",
+      "sha256": "94afa729f247a824acbb36cf2a6cb9f06d18095cd07ed7f7be83927e6bd3bd94"
+    },
+    {
+      "role": "sim2",
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-revised-sim2.md",
+      "canonical": "docs/reviews/RA2-parity-review-2-revised-sim2.md",
+      "sha256": "d0d3d6d5d2cefaa8e1938bffebbc54819964a53795041518ca117ebb7026b0ca"
+    },
+    {
+      "role": "client",
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-revised-client.md",
+      "canonical": "docs/reviews/RA2-parity-review-2-revised-client.md",
+      "sha256": "6cebea9087971fd7553e0782815ee68ef4644f4bfd17466375f78a7013b09a5c"
+    },
+    {
+      "role": "data",
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-revised-data.md",
+      "canonical": "docs/reviews/RA2-parity-review-2-revised-data.md",
+      "sha256": "7925fe85a973acb091affdbe17bc2a1db7e3dc3c2b04e75fdcdfa5058eaf7a3e"
+    },
+    {
+      "role": "tests",
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-revised-tests.md",
+      "canonical": "docs/reviews/RA2-parity-review-2-revised-tests.md",
+      "sha256": "17fd63364455fbac7927b087379e59750b70f066609a9bb50e5b34f6b7d35811"
+    }
+  ]
+}
