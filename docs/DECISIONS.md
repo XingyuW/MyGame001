@@ -12099,3 +12099,54 @@ observation, not a product diagnosis or performance acceptance. Any unrelated-jo
 separate explicit user authorization. Mandatory timing runs keep the original commands and
 report actual measured tails/busy windows. Five fresh slices3+2 and fresh lead follow R172/R196;
 R194 shares exactly one complete full13. Final merge/tag still requires independent GO.
+
+
+### R199. Keep independent round2 open across corrected-candidate revision; no acceptance waiver
+
+All five fresh independent initial slices reviewed cumulative8230a95..1cedaee and supplied the
+exact preserved RA2-parity-review-2-initial-* reports. They independently verify the earlier
+narrow corrections and source/evidence integrity, but identify further active Hospital service,
+pending Interact/garrison exit, dead Purifier/Cloner support, unseen scenery/bridge cursor/sink,
+AI live-terrain planning, metadata capability and nested-cargo bookkeeping defects. Test gaps
+are attached to their production obligations, not multiplied by aliases. DATA finds no new
+P0/P1 and one small current reference-README count P2. Recommendations are adverse; only a
+fresh lead may issue the binding overall decision. Full13 has intentionally not started on this
+known-blocked candidate. The runtime/client/AI findings require fresh implementers and genuine
+same-body failing-before/passing-after controls with positive/release/current-state premises.
+
+For the user's repeated shortest-path instruction, keep round2 open across this candidate
+revision rather than first issue a doomed lead decision/run and repeat unchanged source review.
+No binding lead decision has occurred. Fresh runtime, AI and client implementers are separate
+from all five reviewers and the future fresh lead; implementers/preparers remain ineligible.
+After all five initial reports are complete, make the corrections, freeze/rebind the actual new
+source, then all five original nonimplementing slices independently cover the ENTIRE revised
+cumulative candidate and new evidence. They may authenticate unchanged portions against their
+preserved full reports, but must inspect changed paths, affected interfaces, assertions, source
+policy/bindings and current results. Each revised report binds the actual new TIP and manifest,
+states limits and remaining findings, and is retained alongside the initial report. The120
+ACTIVE-minute slice bound remains; no minimum delay or artificial wait is required. Service
+outage/idle implementation time is not review work. This is scheduling within one open round,
+not reviewer self-approval or a partial/delta-only substitute for full cumulative coverage.
+
+Only after complete corrected-source acceptance will a FRESH lead examine all initial/revised
+slices, verify every P0/P1 and scope limitation, and decide under unchanged severities/criteria.
+Any eventual binding lead NO-GO still invokes the continuation's required fresh remediation and
+new panel. Count this correction conservatively as remediation pass2 of the permitted3; do not
+use an open panel to evade that limit. R172's five independent slices3+2/fresh lead and R194's
+explicitly authorized ONE complete unchanged full13 for BOTH RA9/final gates remain mandatory.
+All21/fixed3/threeguards, late causal/restoration, actual release/package missing-asset failure
+and restoration, all thirteen original commands, workers, caps,5ms/heap/determinism/Won criteria,
+64 protected authority spans,183 debt IDs and51 user-only HOWTOSEE bytes are unchanged.
+
+The initial B-isolated-five-01 all5 exit0 results completed naturally during the API usage
+interruption. Actual all21 Won ticks min35520,median91158,p90137458,max147715/400000;
+max map mean3.096ms. Fixed3 remain24000-schedule windows with9/6/5 players, and each example
+guard passes1/0. Preserve actual p99/max/busy tails and all original failures. These are B2
+source results, not acceptance for future Sim changes; repeat corrected-source gates. Root's
+attempted SIGTERM of this owned superseded run was NOT executed: automatic approval review
+could not complete because of account usage limit, not an unsafe-action determination. No stop
+receipt or direct-child exit is invented; the durable controller records five real zero exits.
+The user explicitly chose Keep both projects running. No unrelated process was paused/changed.
+Review scratch/drafts remain in the existing approved cache; no clone/worktree or substantial
+/tmp artifact is created. Current reference README's1737→1911 factual correction may be made
+before the new source freeze, with independent DATA reinspection, never a changed policy class.

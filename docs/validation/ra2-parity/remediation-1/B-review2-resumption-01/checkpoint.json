@@ -1,0 +1,77 @@
+{
+  "utc": "2026-10-22T19:18:55.944989+00:00",
+  "status": "RESUMED_AFTER_SERVICE_USAGE_INTERRUPTION_NOT_REVIEW_ACCEPTANCE",
+  "candidate_commit": "1cedaee83b9cb299869a581d13a25e2736c8c41f",
+  "current_source_changes": false,
+  "automatic_review_failure": {
+    "action": "Stop owned superseded isolated validation group",
+    "executed": false,
+    "reported_reason": "Automatic approval review could not complete because account usage limit was reached; this was a service/review failure, not an unsafe-action determination.",
+    "stop_receipt_created": false,
+    "resolution": "The owned five-command controller finished naturally during interruption; no stop retry is needed."
+  },
+  "user_cpu_preference": "Keep both projects running; no unrelated process has been stopped or changed.",
+  "isolated_process_sha256": "856b60f74aac33067ef7d1d12ae2ba72f41cf9fb52ae62e9aaee364f3992c3a6",
+  "isolated_summary_sha256": "4cf61cb88c7cb6e89259cff83fec2db89bb09c717cf397c2e9081bbf05fadadf",
+  "isolated_all21_won": 21,
+  "isolated_max_mean_ms": 3.096,
+  "five_commands_actual_exits": [
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "full13_started": false,
+  "fresh_panel2_status": "sim1/sim2/client resumed; no final reports or lead decision at this checkpoint; data/tests not dispatched yet.",
+  "source_findings_to_be_independently_consolidated": [
+    {
+      "source": "sim1 and sim2 independently",
+      "finding": "Erased Hospital continues active stored-patient healing and automatic unload",
+      "priority_claim": "P0",
+      "paths": [
+        "crates/sim/src/special/advance.rs",
+        "crates/sim/src/special/transport.rs"
+      ]
+    },
+    {
+      "source": "client",
+      "finding": "Ordinary explored-but-unseen scenery target cursor/sink reads live Props presence and garrison membership",
+      "priority_claim": "P1",
+      "paths": [
+        "crates/game/src/selection.rs"
+      ]
+    },
+    {
+      "source": "sim2",
+      "finding": "Pending actor and actorless interactions lack current erasure/commandable revalidation before execution",
+      "priority_claim": "P0",
+      "paths": [
+        "crates/sim/src/special/advance.rs",
+        "crates/sim/src/special/interaction.rs",
+        "crates/sim/src/garrison.rs",
+        "crates/sim/src/special/scenery.rs"
+      ]
+    },
+    {
+      "source": "client",
+      "finding": "Hidden bridge terrain is copied live into client MapTerrain before visibility check, changing cursor/Move sink",
+      "priority_claim": "P1",
+      "paths": [
+        "crates/game/src/battlefield.rs",
+        "crates/game/src/selection.rs"
+      ]
+    },
+    {
+      "source": "client, still checking counterexample",
+      "finding": "AI bridge terrain-only planning copy reads live mutable Props/bridge terrain rather than observed/static decision terrain",
+      "priority_claim": "Unresolved source lead, not yet a native reproduction",
+      "paths": [
+        "crates/sim/src/ai.rs",
+        "crates/sim/src/props.rs",
+        "crates/sim/src/bridges.rs"
+      ]
+    }
+  ],
+  "next": "Complete all five independent slices and fresh lead; confirmed blockers require fresh remediation and final corrected-source gates. No merge/tag while unresolved."
+}
