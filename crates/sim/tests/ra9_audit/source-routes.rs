@@ -1,4 +1,4 @@
-//! UNCOMPILED/UNRUN exact typed disposition routing. No record alone creates coverage.
+//! Historical preparation note: UNCOMPILED/UNRUN exact typed disposition routing. No record alone creates coverage.
 use super::*;
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(super) enum Class {

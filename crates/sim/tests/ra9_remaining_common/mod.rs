@@ -1,4 +1,4 @@
-//! UNCOMPILED / UNRUN. Fully provided test setup/receipt helpers; no simulation implementation.
+//! Historical preparation note: UNCOMPILED / UNRUN. Fully provided test setup/receipt helpers; no simulation implementation.
 //! Temporary RON variants are short-lived parser inputs; all edits are declared fixture values.
 #![allow(dead_code)]
 use bevy_app::App;

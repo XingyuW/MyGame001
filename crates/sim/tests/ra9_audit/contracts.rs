@@ -1,6 +1,6 @@
 //! Independent demanded-dependency contracts. No actual adapter result/deps are read here.
 //! New/default/branch obligations are declared BEFORE any comparisons. Missing source defaults
-//! create no invented source atom. This code is PENDING execution and exhaustive reconciliation.
+//! Historical preparation note: create no invented source atom. This code is PENDING execution and exhaustive reconciliation.
 use super::rules::MappingRow;
 use super::{Atom, Audit, AuditResult, Portion, Reference, SourceKey, WitnessId};
 use std::collections::BTreeSet;

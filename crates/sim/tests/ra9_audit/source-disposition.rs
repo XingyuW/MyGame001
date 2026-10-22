@@ -1,4 +1,4 @@
-//! UNVALIDATED/UNRUN static-unused proposal guard. Reading never grants source coverage.
+//! Historical preparation note: UNVALIDATED/UNRUN static-unused proposal guard. Reading never grants source coverage.
 //! Integrate only after root final source approval; no generic whitelist/default/Own escape.
 use super::{
     Audit, AuditResult, Definitions, Inputs, Portion, SourceKey, Unused, Witness, WitnessId,

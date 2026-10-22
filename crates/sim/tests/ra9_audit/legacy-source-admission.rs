@@ -1,4 +1,4 @@
-//! UNCOMPILED/UNRUN bridge to three existing exact guard implementations. No bulk approval.
+//! Historical preparation note: UNCOMPILED/UNRUN bridge to three existing exact guard implementations. No bulk approval.
 //! Legacy361/543 use independent declare/admit/finish plans in source-plans.
 use super::*;
 use source_routes::Route;
@@ -9,8 +9,9 @@ pub(super) fn require(
     row: &Unused,
     route: Route,
     s: &scope_inputs::ObservedScope,
+    acceptance: Option<&policy_admission::SourceAcceptance<'_>>,
 ) -> AuditResult<()> {
-    let accepted = s.accepted_source(row)?;
+    let accepted = s.accepted_source_from(row, acceptance)?;
     match route {
         Route::Static116 => source_disposition::require(
             a,

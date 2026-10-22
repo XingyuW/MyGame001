@@ -1,6 +1,6 @@
-//! Preliminary RA9 integration in an ordinary validation copy; canonical acceptance is pending.
-//! The typed modules compile in the recorded preliminary checks. Execution results, failures,
-//! source bindings and controlled fixture migrations live in ra9-preliminary-logs/.
+//! Canonical RA9 integration; final validation and independent acceptance remain pending.
+//! Historical preliminary execution and fixture records retain their original source scopes.
+//! Current remediation failures, results and bindings live in docs/validation/ra2-parity/.
 //! Actual source-policy decisions and native/client receipts remain fail-closed until bound.
 //! Reading a reference value grants no coverage: only an actual successful comparison does.
 //! Every old ra9_data_parity named test remains alongside these additional strict checks.
@@ -928,6 +928,8 @@ mod schema;
 mod schema10_adapters;
 #[path = "scope-inputs.rs"]
 mod scope_inputs;
+#[path = "single-source-acceptance-negatives.rs"]
+mod single_source_acceptance_negatives;
 #[path = "source-disposition.rs"]
 mod source_disposition;
 #[path = "source-plans.rs"]
@@ -1593,13 +1595,31 @@ fn load_exact_unused(
     route: &mut source_routes::Plan,
     scope: &scope_inputs::ObservedScope,
     fire: &fire_keys::Evidence,
+    replacement: Option<&policy_admission::SourceAcceptance<'_>>,
 ) -> AuditResult<()> {
     policy_admission::require_source_acceptance_census(&source_routes::single_table_keys(route)?)?;
     for classified in source_routes::load_typed(path)? {
         let spec = source_routes::validate_row(route, &classified)?;
         // Exactly one enum dispatch. No sequence of conditional callbacks can bless the same key
         // through two packages; callback success alone does not register source coverage.
-        source_plans::admit(plans, a, input, d, &classified.row, spec.route, scope, fire)?;
+        source_plans::admit(
+            plans,
+            a,
+            input,
+            d,
+            &classified.row,
+            spec.route,
+            scope,
+            fire,
+            replacement,
+        )
+        .map_err(|error| {
+            let key = &classified.row.atom.key;
+            format!(
+                "source admission {:?} {}:{}:{}: {error}",
+                spec.route, key.file, key.section, key.key
+            )
+        })?;
         a.add_unused(classified.row.clone())?;
         source_routes::record(route, &classified)?;
     }
@@ -1607,6 +1627,13 @@ fn load_exact_unused(
     source_routes::finish(route, a)
 }
 fn audit_at(data: &Path, references: &Path) -> AuditResult<()> {
+    audit_at_with_source_acceptance(data, references, None)
+}
+fn audit_at_with_source_acceptance(
+    data: &Path,
+    references: &Path,
+    replacement: Option<&policy_admission::SourceAcceptance<'_>>,
+) -> AuditResult<()> {
     let input = Inputs::load(data, references)?;
     let d = sim::load_ruleset(data).map_err(|e| e.to_string())?;
     let skirmish = sim::load_skirmish(data.join("skirmish.ron"), &d).map_err(|e| e.to_string())?;
@@ -1632,6 +1659,7 @@ fn audit_at(data: &Path, references: &Path) -> AuditResult<()> {
         &mut route,
         &scope,
         &fire,
+        replacement,
     )?;
     a.finish(&input.reference)?;
     if atom(

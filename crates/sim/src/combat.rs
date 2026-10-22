@@ -1188,6 +1188,161 @@ impl Arms {
     }
 }
 
+/// Weapon slots after deployment/coil state; elite and passenger changes already live in
+/// `Weapon`. Guard and Combat share this selector rather than treating Guard as force fire.
+fn effective_weapons(
+    ruled: bool,
+    special: &crate::SpecialState,
+    players: &Players,
+    id: SimId,
+    owner: PlayerId,
+    weapon: &Weapon,
+) -> [Option<WeaponKind>; 2] {
+    if ruled
+        && (special.deployed.contains_key(&id)
+            || special.coil_charge.get(&id).is_some_and(|&n| {
+                n >= 3 || (n >= 1 && players.get(owner).is_some_and(|p| !p.low_power()))
+            }))
+    {
+        [weapon.secondary, None]
+    } else {
+        [Some(weapon.kind), weapon.secondary]
+    }
+}
+
+/// Whether Guard may automatically acquire this candidate before distance/ID ranking.
+/// Cooldown is deliberately not eligibility: a legal engagement persists while reloading.
+pub(crate) fn guard_can_acquire(
+    world: &bevy_ecs::world::World,
+    source: Entity,
+    id: SimId,
+    target: Option<Entity>,
+    target_id: SimId,
+    body: &Body,
+) -> bool {
+    let definitions = world.resource::<Definitions>();
+    let special = world.resource::<crate::SpecialState>();
+    let players = world.resource::<Players>();
+    let grid = world.resource::<Grid>();
+    let Some(unit) = world.get::<crate::Unit>(source) else {
+        return false;
+    };
+    let Some(terms) = definitions.unit_combat(unit.kind) else {
+        return false;
+    };
+    let (Some(weapon), Some(owner), Some(mobile), Some(position)) = (
+        world.get::<Weapon>(source),
+        world.get::<Owner>(source),
+        world.get::<Mobile>(source),
+        world.get::<Position>(source),
+    ) else {
+        return false;
+    };
+    let (traits, extent) = if let Some(target) = target {
+        let item = world
+            .get::<crate::Unit>(target)
+            .map(|u| crate::ProductionItem::Unit(u.kind))
+            .or_else(|| {
+                world
+                    .get::<Building>(target)
+                    .map(|b| crate::ProductionItem::Building(b.kind))
+            });
+        let target_terms = match item {
+            Some(crate::ProductionItem::Unit(kind)) => definitions.unit_combat(kind),
+            Some(crate::ProductionItem::Building(kind)) => definitions.building_combat(kind),
+            None => None,
+        };
+        let Some(armour) = world.get::<Armour>(target) else {
+            return false;
+        };
+        let extent = world
+            .get::<Position>(target)
+            .map(|p| Extent::point(p.0))
+            .or_else(|| {
+                world
+                    .get::<Building>(target)
+                    .map(|b| Extent::footprint(b.footprint))
+            });
+        let Some(extent) = extent else {
+            return false;
+        };
+        (
+            specialist_traits(
+                traits_of(grid, target_id, armour.0, body, target_terms.as_ref()),
+                definitions,
+                item,
+            ),
+            extent,
+        )
+    } else {
+        if !special.garrisons.contains_key(&target_id) {
+            return false;
+        }
+        let props = world.resource::<crate::Props>();
+        let Some((cell, prop)) = props.get(target_id).filter(|(_, prop)| prop.hit_points > 0)
+        else {
+            return false;
+        };
+        (
+            scenery_target_traits(definitions, grid, props, target_id, cell, prop.kind),
+            Extent::footprint(Footprint {
+                origin: cell,
+                width: 1,
+                height: 1,
+            }),
+        )
+    };
+    let gunner = definitions
+        .metadata(crate::ProductionItem::Unit(unit.kind))
+        .is_some_and(|m| m.gunner);
+    let slots = effective_weapons(
+        definitions.rules().is_some(),
+        special,
+        players,
+        id,
+        owner.0,
+        weapon,
+    );
+    let Some((kind, versus)) = weapon_against_inner(definitions, &terms, slots, &traits, gunner)
+    else {
+        return false;
+    };
+    if versus <= i32::from(definitions.rules().is_some()) {
+        return false;
+    }
+    let Some(def) = definitions.weapon(kind) else {
+        return false;
+    };
+    let (dx, dy) = Extent::point(position.0).gap(&extent);
+    let reach = def
+        .range
+        .saturating_add(if traits.airborne && def.anti_air {
+            terms.air_range_bonus
+        } else {
+            0
+        });
+    if in_range(dx, dy, reach) && !inside_min_range(dx, dy, def.min_range) {
+        return true;
+    }
+    // Match ordinary Attack's legal firing-cell search, including every possible infantry
+    // spot, plain pursuit range, minimum range and the source's connected navigation layer.
+    let on_foot = grid.is_on_foot(id);
+    let fires_from = |point| {
+        let (dx, dy) = Extent::point(point).gap(&extent);
+        in_range(dx, dy, def.range) && !inside_min_range(dx, dy, def.min_range)
+    };
+    let view = grid.navigation_for(grid.domain_of(id));
+    nearest_cell(&view, mobile.next_centre(), |cell| {
+        view.room(cell, on_foot, |holder| holder != id) >= Grid::room_needed(on_foot)
+            && if on_foot {
+                (0..SPOTS_PER_CELL as u8).all(|spot| fires_from(SubPos::spot_of(cell, spot)))
+            } else {
+                fires_from(SubPos::centre_of(cell))
+            }
+    })
+    .is_some()
+}
+
 /// The weapon chosen against a target.
 #[derive(Clone, Copy)]
 struct Choice<'a> {
@@ -1769,15 +1924,7 @@ pub(crate) fn combat(
                 .and_then(|t| t.item)
                 .and_then(|item| definitions.metadata(item))
                 .is_some_and(|m| m.gunner),
-            weapons: if ruled
-                && (special.deployed.contains_key(&id)
-                    || special.coil_charge.get(&id).is_some_and(|&n| {
-                        n >= 3 || (n >= 1 && players.get(owner.0).is_some_and(|p| !p.low_power()))
-                    })) {
-                [weapon.secondary, None]
-            } else {
-                [Some(weapon.kind), weapon.secondary]
-            },
+            weapons: effective_weapons(ruled, &special, &players, id, owner.0, &weapon),
             terms: of_type,
             firepower_pm: experience.map_or(1000, crate::Experience::firepower_pm),
             reload_pm: ai_reload(

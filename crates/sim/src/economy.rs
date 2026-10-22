@@ -962,7 +962,9 @@ pub(crate) fn advance_production(
         .collect();
     sorted.sort_unstable_by_key(|(id, ..)| *id);
     for &(_, _, owner, kind, exit) in &sorted {
-        if !special.disabled.contains_key(&exit.building) {
+        if !special.disabled.contains_key(&exit.building)
+            && !special.erasures.contains_key(&exit.building)
+        {
             exits.entry((owner, kind)).or_default().push(exit);
         }
     }
@@ -991,6 +993,15 @@ pub(crate) fn advance_production(
             .filter(|((owner, _), _)| *owner == player)
             .flat_map(|((_, kind), list)| std::iter::repeat_n(*kind, list.len()))
             .collect();
+        // Erasure suspends active factories, not a living building's passive
+        // prerequisite contribution. Preserve the existing disabled-building policy.
+        let prerequisites: Vec<BuildingKind> = sorted
+            .iter()
+            .filter(|(_, _, owner, _, exit)| {
+                *owner == player && !special.disabled.contains_key(&exit.building)
+            })
+            .map(|(_, _, _, kind, _)| *kind)
+            .collect();
         for producer in producers {
             let credits = &mut state.credits;
             let Some(queue) = state.queues.get_mut(&producer) else {
@@ -1018,7 +1029,7 @@ pub(crate) fn advance_production(
             if head.progress < terms.build_time {
                 if owned.is_empty()
                     || !unlock_all
-                        && missing_prerequisite(&definitions, &kinds, head.item).is_some()
+                        && missing_prerequisite(&definitions, &prerequisites, head.item).is_some()
                 {
                     continue;
                 }
@@ -1108,6 +1119,9 @@ pub(crate) fn advance_production(
 
     // Free units of buildings placed during the match leave them, oldest first.
     for (_, entity, owner, _, exit) in sorted {
+        if special.erasures.contains_key(&exit.building) {
+            continue;
+        }
         let Ok((_, _, _, mut building, _)) = buildings.get_mut(entity) else {
             continue;
         };

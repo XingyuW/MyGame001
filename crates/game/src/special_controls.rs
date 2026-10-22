@@ -361,12 +361,7 @@ fn input(
             sink.issue([strategic_command(building, cell, &selection)])
         }
         InterfaceMode::Interact => {
-            let target = host.grid().and_then(|g| {
-                g.occupant(cell)
-                    .or_else(|| g.occupant_for(cell, sim::Domain::Air))
-                    .or_else(|| g.building(cell))
-                    .or_else(|| host.props().and_then(|p| p.id_at(cell)))
-            });
+            let target = crate::ra7_controls::known_at(&host, Some(cell));
             target.map_or(0, |t| sink.issue(interact_commands(&selection, t)))
         }
         _ => 0,
@@ -522,6 +517,7 @@ fn feedback_and_effects(
 
 #[cfg(test)]
 mod tests {
+    include!("privacy_interact_tests.rs");
     use std::collections::BTreeSet;
 
     use super::*;

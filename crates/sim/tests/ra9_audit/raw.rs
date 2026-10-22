@@ -1,4 +1,4 @@
-//! UNVALIDATED raw shipped schema/completeness draft.
+//! Historical preparation note: UNVALIDATED raw shipped schema/completeness draft.
 //! This walks every actual entry; it does not infer all instances from the first entry.
 //! Parse only the generated data subset, fail closed on unexpected syntax. Loaded sim data
 //! remains the source of actual gameplay values used in comparisons.

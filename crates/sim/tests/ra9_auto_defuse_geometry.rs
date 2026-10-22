@@ -1,4 +1,4 @@
-//! UNCOMPILED / UNRUN. Run this SAME test under base370471e before the small geometry delta.
+//! Historical preparation note: UNCOMPILED / UNRUN. Run this SAME test under base370471e before the small geometry delta.
 //! The west case is expected to fail actual approach/removal while all native premises pass.
 //! Requires the unchanged common module from the remaining-native package; no parser variant.
 mod ra9_remaining_common;

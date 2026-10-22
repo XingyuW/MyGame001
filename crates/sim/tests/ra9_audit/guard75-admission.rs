@@ -1,4 +1,4 @@
-//! UNCOMPILED/UNRUN exact75 implementation-model nonread admission. No coverage from reading,
+//! Historical preparation note: UNCOMPILED/UNRUN exact75 implementation-model nonread admission. No coverage from reading,
 //! reasons, aliases or defaults. This module introduces no simulation field/getter/state.
 //! Use with the actual v3 ledger + policy-admission.rs only after coordinated RA9 integration.
 use super::*;

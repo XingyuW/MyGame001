@@ -1,4 +1,4 @@
-//! UNVALIDATED / PENDING. Native immediate-command fixture, never injected zero health.
+//! Historical preparation note: UNVALIDATED / PENDING. Native immediate-command fixture, never injected zero health.
 mod ra4_common;
 use ra4_common::*;
 use sim::{

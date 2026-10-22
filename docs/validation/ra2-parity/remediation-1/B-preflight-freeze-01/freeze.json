@@ -1,0 +1,59 @@
+{
+  "utc": "2026-10-22T05:59:42.427894+00:00",
+  "status": "COMPLETED_PREFLIGHT_AND_EXACT_INPUT_FREEZE_NOT_REVIEW_ACCEPTANCE",
+  "freeze_path": "docs/validation/ra2-parity/remediation-1/B-corrected-02/frozen-validation-inputs.json",
+  "freeze_sha256": "b3959fd36a8367dbd6fbd2b516181c1141603bf0e5d4ab80128dc7132843dc8b",
+  "source_files": 685,
+  "authority_spans": 64,
+  "metadata_changes": [
+    {
+      "path": "README.md",
+      "before_sha256": "d6511daef38e1860a18c133fca9e8e6ba9e4070627cf44db58e959cbc278f944",
+      "after_sha256": "92611c831564f75b27425452b03149f34ff551610de4ba2c19be2a7cd79f4f09"
+    },
+    {
+      "path": "docs/HANDOFF.md",
+      "before_sha256": "567c711996f42d877663813df7775dcfb2e28fb71c52885a6cf67e1f086aceeb",
+      "after_sha256": "47ef7b3ec29c2bb0b60d7dacf24dd0711aaf58fa97036675efb5e0f3c683f299"
+    },
+    {
+      "path": "docs/RA2_GAP_ANALYSIS.md",
+      "before_sha256": "f6015f695ff722c8279fae908210a23e81bacecc5c474dd3a51d9e240da9cf13",
+      "after_sha256": "24c0f6c9621fafe0d77d901b7719674fd6ea1bec2519c27b674b4d59da1d3c98"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-review-requirements.md",
+      "before_sha256": "8d21becb602d8251423491bc7fe56d616c02bc6a0bd954e17b34c95db773af8c",
+      "after_sha256": "2d35ff9e0d693512fcaa492b9b13984d917417d5900fe2f8d592e9426d5ab247"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-reviews-outstanding.md",
+      "before_sha256": "fe9eb11c0ce0d304072d9d1e5c94b3fbd9928c81e1e41f218d3504937bc91bad",
+      "after_sha256": "9404c44592ae2bf4c567ecc17658e4080bb0ed634fab1feee1e53b6f12b5dc5c"
+    },
+    {
+      "path": "docs/DECISIONS.md",
+      "before_sha256": "7e2b2665bd162e2420816f56cff5b6a4f2ecb8813f767ed6b8221f15fa99105f",
+      "after_sha256": "535683e2aa03685a5b2759f6261506ae5722d15a33d6204dc8fe5a8914ba4bb5"
+    },
+    {
+      "path": "docs/STATUS.md",
+      "before_sha256": "385610cd09a242c5e73f99f8e2faaefa7b8772b4ade27873f2f242ea93ba1108",
+      "after_sha256": "2bd8e708c0c8c4ac0d5595fdafc627f33032badcfdc0706cd16b128ed2ccd3a5"
+    }
+  ],
+  "receipts": [
+    {
+      "path": "docs/validation/ra2-parity/remediation-1/B-focused-03/process.json",
+      "sha256": "3c02a56687e31cb43f917a918f1c24a2829bb3817a325f4ad9243dac8a4f5a0d"
+    },
+    {
+      "path": "docs/validation/ra2-parity/remediation-1/B-late-causal-01/process.json",
+      "sha256": "11d0b3983ecc8069a814ba2cadc9052dd97626553da10ab3dc34b2e0a99b118c"
+    },
+    {
+      "path": "docs/validation/ra2-parity/remediation-1/B-strict-04/process.json",
+      "sha256": "e2f8913c9f29cf0dea6531895f629fa130405c3719517b37f26b0d20b0cd59a4"
+    }
+  ]
+}

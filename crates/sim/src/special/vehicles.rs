@@ -291,7 +291,11 @@ pub(super) fn advance(world: &mut World, defs: &Definitions) {
                 warhead: w.warhead,
                 damage: w.damage,
                 direct: Some(host),
-                firepower_pm: 1000,
+                firepower_pm: p
+                    .passenger
+                    .experience
+                    .as_ref()
+                    .map_or(1000, crate::Experience::firepower_pm),
                 source: Some(p.passenger.id),
                 identity: Some(crate::combat::DamageIdentity {
                     owner: p.owner,
@@ -359,10 +363,13 @@ pub(super) fn advance(world: &mut World, defs: &Definitions) {
     }
     // IFV repair is a weapon-rate action; an Engineer passenger has the negative RepairBullet.
     for a in index.values().filter(|a| a.alive()) {
-        if world
-            .resource::<SpecialState>()
-            .erasures
-            .contains_key(&a.id)
+        if !world
+            .get::<Health>(a.entity)
+            .is_some_and(|h| h.hit_points > 0)
+            || world
+                .resource::<SpecialState>()
+                .erasures
+                .contains_key(&a.id)
             || world
                 .resource::<SpecialState>()
                 .disabled
@@ -387,7 +394,9 @@ pub(super) fn advance(world: &mut World, defs: &Definitions) {
         let b = index
             .values()
             .filter(|b| {
-                b.alive()
+                world
+                    .get::<Health>(b.entity)
+                    .is_some_and(|h| h.hit_points > 0)
                     && b.owner == a.owner
                     && b.id != a.id
                     && !world
@@ -409,11 +418,14 @@ pub(super) fn advance(world: &mut World, defs: &Definitions) {
             })
             .find(|b| match b.item {
                 ProductionItem::Unit(k) => {
-                    defs.unit_combat(k).is_some_and(|t| b.hp < t.hit_points)
-                        || world
-                            .resource::<SpecialState>()
-                            .parasites
-                            .contains_key(&b.id)
+                    defs.unit_combat(k).is_some_and(|t| {
+                        world
+                            .get::<Health>(b.entity)
+                            .is_some_and(|h| h.hit_points < t.hit_points)
+                    }) || world
+                        .resource::<SpecialState>()
+                        .parasites
+                        .contains_key(&b.id)
                 }
                 _ => false,
             });
@@ -422,8 +434,12 @@ pub(super) fn advance(world: &mut World, defs: &Definitions) {
                 ProductionItem::Unit(k) => defs.unit_combat(k).map_or(b.hp, |t| t.hit_points),
                 _ => b.hp,
             };
-            if let Some(mut hp) = world.get_mut::<Health>(b.entity) {
+            if let Some(mut hp) = world.get_mut::<Health>(b.entity)
+                && hp.hit_points > 0
+            {
                 hp.hit_points = hp.hit_points.saturating_sub(w.damage).min(max);
+            } else {
+                continue;
             }
             free(world, defs, b.id, true);
             let reload = weapon_reload(world, a, w.reload);

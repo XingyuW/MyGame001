@@ -1,0 +1,28 @@
+{
+  "utc": "2026-10-22T05:06:45.538941+00:00",
+  "status": "CONNECTED_GUARD_OCCUPIED_PROP_FIX_APPLIED_AFTER_GENUINE_FAILURE",
+  "before_raw_sha256": "163b3fcb813f9ea656169d451f335e2da422f1cdf161e5ec7bc6af91d476a954",
+  "preimages": [
+    {
+      "path": "crates/sim/src/tactics.rs",
+      "sha256": "139cf17f30d9847ead619e6777407364f1d140781cd6c305dac3252ead66acf4"
+    },
+    {
+      "path": "crates/sim/src/combat.rs",
+      "sha256": "3284db22cf5bf752e8488804de73c3bcbaac4c9d8684ec7e3de24429d0a0df58"
+    }
+  ],
+  "after": [
+    {
+      "path": "crates/sim/src/tactics.rs",
+      "sha256": "6ac19d346f2e9c20c240835b5c2a9ffcc8df9527905b1aebf6cf20ddfae270ed"
+    },
+    {
+      "path": "crates/sim/src/combat.rs",
+      "sha256": "27f5ed98d674fc86479a3455e2251c953048f6be2242d3388c84dec191bd2db7"
+    }
+  ],
+  "regression_source_sha256_unchanged": "7826d263b57bea787f3b7d1e27b3101951ec1618016cb06adcf5d8ed8e0a5542",
+  "persistent_state_added": false,
+  "native_after_pending": true
+}

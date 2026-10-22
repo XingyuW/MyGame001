@@ -1,4 +1,4 @@
-//! UNCOMPILED/UNRUN bounded38 documented-model source classifications. No coverage added.
+//! Historical preparation note: UNCOMPILED/UNRUN bounded38 documented-model source classifications. No coverage added.
 //! A document establishes chosen policy, not source-engine truth or native execution.
 use super::*;
 const TABLE: &str = include_str!("carry38-contracts.tsv");
@@ -411,7 +411,7 @@ pub(super) fn demanded_sources(p: &Plan) -> BTreeMap<SourceKey, (String, String)
 }
 
 // Installed actual prepared negative block: modelcarry38-integration-20261019-v1.UNVALIDATED.audit-negatives.rs.txt
-// UNCOMPILED/UNRUN. Append inside carry38_admission.rs. Final acceptance-record negatives
+// Historical preparation note: UNCOMPILED/UNRUN. Append inside carry38_admission.rs. Final acceptance-record negatives
 // require a genuine fully integrated accepted baseline. NEVER assert shipped records remain
 // UNACCEPTED, and NEVER fabricate accepted strings/logs simply to make these tests pass.
 #[cfg(test)]

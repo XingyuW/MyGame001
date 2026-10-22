@@ -1,0 +1,217 @@
+--- a/crates/sim/tests/ra9_audit/array-plans.rs
++++ b/crates/sim/tests/ra9_audit/array-plans.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED independently declared array contracts plus actual native loaded projections.
++//! Historical preparation note: UNVALIDATED independently declared array contracts plus actual native loaded projections.
+ //! Declaration never reads Definitions, successful adapter outputs, or actual raw lengths.
+ //! Comparison builds its own ExpectedElement provenance; exact dependency equality detects
+ //! omitted/foreign component associations. The separate ledger grants no global source credit.
+--- a/crates/sim/tests/ra9_audit/arrays.rs
++++ b/crates/sim/tests/ra9_audit/arrays.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED typed physical-array proof ledger. This ledger adds NO global reference
++//! Historical preparation note: UNVALIDATED typed physical-array proof ledger. This ledger adds NO global reference
+ //! coverage. Existing real aggregate comparisons remain mandatory. Independent demand
+ //! contracts and successful element/length comparisons must have exactly equal edges.
+ use super::{AuditResult, Reference, SourceKey};
+--- a/crates/sim/tests/ra9_audit/combat.rs
++++ b/crates/sim/tests/ra9_audit/combat.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED / PENDING actual-value adapters. NO compilation or test execution performed.
++//! Historical preparation note: UNVALIDATED / PENDING actual-value adapters. NO compilation or test execution performed.
+ //! Conversion rows copied from the independent existing audit, never from generator output.
+ //! Must integrate with registered actual-field requirements before root releases canonical RA9.
+ use super::actual::{check_int, optional, positive_round, rule, scaled};
+@@ -1112,7 +1112,7 @@
+     }
+     Ok(())
+ }
+-// PENDING integration: wrappers must enumerate actual complete arrays/mappings before calls;
++// Historical preparation note: PENDING integration: wrappers must enumerate actual complete arrays/mappings before calls;
+ // compare armour identities/order explicitly; audit effect9 damage/warhead; register physical
+ // requirements independently; port source_display exactly for23 current differences; don't
+ // pre-mark foreign differences or let component/whole row credit overlap.
+--- a/crates/sim/tests/ra9_audit/contracts.rs
++++ b/crates/sim/tests/ra9_audit/contracts.rs
+@@ -1,6 +1,6 @@
+ //! Independent demanded-dependency contracts. No actual adapter result/deps are read here.
+ //! New/default/branch obligations are declared BEFORE any comparisons. Missing source defaults
+-//! create no invented source atom. This code is PENDING execution and exhaustive reconciliation.
++//! Historical preparation note: create no invented source atom. This code is PENDING execution and exhaustive reconciliation.
+ use super::rules::MappingRow;
+ use super::{Atom, Audit, AuditResult, Portion, Reference, SourceKey, WitnessId};
+ use std::collections::BTreeSet;
+--- a/crates/sim/tests/ra9_audit/fire-audit.rs
++++ b/crates/sim/tests/ra9_audit/fire-audit.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED source/provenance contracts. Integrate inside ra9_audit only after native runs.
++//! Historical preparation note: UNVALIDATED source/provenance contracts. Integrate inside ra9_audit only after native runs.
+ //! No source retrieval, branch premise or recognized key by itself grants coverage.
+ use super::fire_keys::Evidence;
+ use super::*;
+--- a/crates/sim/tests/ra9_audit/items.rs
++++ b/crates/sim/tests/ra9_audit/items.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED cache-only unit/building adapter body draft. No compilation/execution.
++//! Historical preparation note: UNVALIDATED cache-only unit/building adapter body draft. No compilation/execution.
+ //! Uses actual public Definitions, Production, ArsenalEntry and CombatTerms accessors.
+ //! Shared physical path registration/difference identity normalization remains for integration.
+ use super::actual::{check_int, optional, positive_round, rule};
+--- a/crates/sim/tests/ra9_audit/native.rs
++++ b/crates/sim/tests/ra9_audit/native.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED/PENDING native-key comparison bodies. No compile/simulation executed.
++//! Historical preparation note: UNVALIDATED/PENDING native-key comparison bodies. No compile/simulation executed.
+ //! These inspect actual loaded public fields; behavior/timing proof is explicitly separate.
+ use super::actual::{check_int, optional, rule};
+ use super::combat::{Conversion, converted};
+--- a/crates/sim/tests/ra9_audit/nested-plans.rs
++++ b/crates/sim/tests/ra9_audit/nested-plans.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED v3 remaining typed native and explicit game-owned array/tuple witnesses.
++//! Historical preparation note: UNVALIDATED v3 remaining typed native and explicit game-owned array/tuple witnesses.
+ //! This supplemental ledger records NO global reference coverage or semantic non-use.
+ use super::arrays::{
+     Deps, Element, ExpectedElement, Ledger, PhysicalOrigin, Semantics, SourcePart, csv, merge,
+--- a/crates/sim/tests/ra9_audit/raw.rs
++++ b/crates/sim/tests/ra9_audit/raw.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED raw shipped schema/completeness draft.
++//! Historical preparation note: UNVALIDATED raw shipped schema/completeness draft.
+ //! This walks every actual entry; it does not infer all instances from the first entry.
+ //! Parse only the generated data subset, fail closed on unexpected syntax. Loaded sim data
+ //! remains the source of actual gameplay values used in comparisons.
+--- a/crates/sim/tests/ra9_audit/rules.rs
++++ b/crates/sim/tests/ra9_audit/rules.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED cache-only adapter body draft; never compiled/run. Current public APIs checked.
++//! Historical preparation note: UNVALIDATED cache-only adapter body draft; never compiled/run. Current public APIs checked.
+ //! Integrate aliases/visibility, independent required-field/dependency enumeration, source display
+ //! for existing difference identities, and wrapper scopes only after explicit canonical release.
+ use super::actual::{check_int, optional, rule};
+--- a/crates/sim/tests/ra9_audit/specialist.rs
++++ b/crates/sim/tests/ra9_audit/specialist.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED v2 metadata policy adapters. No generator/reference coverage is obtained by
++//! Historical preparation note: UNVALIDATED v2 metadata policy adapters. No generator/reference coverage is obtained by
+ //! recognizing a Role enum or a legacy numeric metadata value. Active native terms use
+ //! Expected provenance; legacy-only fields require actual loaded branch premises.
+ use super::actual::{check_int, optional, rule};
+--- a/crates/sim/tests/ra9_crew.rs
++++ b/crates/sim/tests/ra9_crew.rs
+@@ -1,5 +1,5 @@
+-//! UNVALIDATED / PENDING. Crew evidence draft on shipped rules and commands.
+-//! Proposed integration path crates/sim/tests/ra9_crew.rs.
++//! Historical preparation note: UNVALIDATED / PENDING. Crew evidence draft on shipped rules and commands.
++//! Historical preparation note: Proposed integration path crates/sim/tests/ra9_crew.rs.
+ mod ra9_soundness_common;
+ use ra9_soundness_common::*;
+ use sim::{Cell, CellPos, Command, Grid, Owner, SimEvent, SimId, Unit};
+--- a/crates/sim/tests/ra9_death_payload.rs
++++ b/crates/sim/tests/ra9_death_payload.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED / PENDING. Proposed crates/sim/tests/ra9_death_payload.rs.
++//! Historical preparation note: UNVALIDATED / PENDING. Proposed crates/sim/tests/ra9_death_payload.rs.
+ //! Exact source witness; no direct HP-zero destruction. The native C4 charge kills the reactor.
+ mod ra9_soundness_common;
+ use ra9_soundness_common::*;
+--- a/crates/sim/tests/ra9_harvester_liveness.rs
++++ b/crates/sim/tests/ra9_harvester_liveness.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED / PENDING. Shipped native pre-Economy worker death and positive living twin.
++//! Historical preparation note: UNVALIDATED / PENDING. Shipped native pre-Economy worker death and positive living twin.
+ mod ra9_soundness_common;
+ use ra9_soundness_common::*;
+ use sim::{Cell, CellPos, Command, Grid, Harvester};
+--- a/crates/sim/tests/ra9_liveness.rs
++++ b/crates/sim/tests/ra9_liveness.rs
+@@ -1,5 +1,5 @@
+-//! UNVALIDATED / PENDING. Native scheduled liveness regression draft.
+-//! Proposed integration path crates/sim/tests/ra9_liveness.rs.
++//! Historical preparation note: UNVALIDATED / PENDING. Native scheduled liveness regression draft.
++//! Historical preparation note: Proposed integration path crates/sim/tests/ra9_liveness.rs.
+ mod ra4_common;
+ use ra4_common::*;
+ use sim::{CellPos, Command, Players, ProductionItem, SimEvent};
+--- a/crates/sim/tests/ra9_liveness_movement.rs
++++ b/crates/sim/tests/ra9_liveness_movement.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED / PENDING. Append to native ra9_liveness test after initial draft compiles.
++//! Historical preparation note: UNVALIDATED / PENDING. Append to native ra9_liveness test after initial draft compiles.
+ mod ra9_soundness_common;
+ use bevy_ecs::{resource::Resource, schedule::IntoScheduleConfigs, world::World};
+ use ra9_soundness_common::*;
+--- a/crates/sim/tests/ra9_prop_commands/mod.rs
++++ b/crates/sim/tests/ra9_prop_commands/mod.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED / UNRUN. Child module of the actual ra1_commands regression target.
++//! Historical preparation note: UNCOMPILED / UNRUN. Child module of the actual ra1_commands regression target.
+ //! Admission privacy is exercised through actual CommandQueue/Commands/SimSchedule.
+ //! The hidden Prop premise is controlled setup; current code has no native producer for it.
+ #[path = "../ra9_remaining_common/mod.rs"]
+--- a/crates/sim/tests/ra9_refinery_repair_liveness.rs
++++ b/crates/sim/tests/ra9_refinery_repair_liveness.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED / PENDING. Native immediate-command fixture, never injected zero health.
++//! Historical preparation note: UNVALIDATED / PENDING. Native immediate-command fixture, never injected zero health.
+ mod ra4_common;
+ use ra4_common::*;
+ use sim::{
+--- a/crates/sim/tests/ra9_remaining_common/mod.rs
++++ b/crates/sim/tests/ra9_remaining_common/mod.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED / UNRUN. Fully provided test setup/receipt helpers; no simulation implementation.
++//! Historical preparation note: UNCOMPILED / UNRUN. Fully provided test setup/receipt helpers; no simulation implementation.
+ //! Temporary RON variants are short-lived parser inputs; all edits are declared fixture values.
+ #![allow(dead_code)]
+ use bevy_app::App;
+--- a/crates/sim/tests/ra9_soundness_common/mod.rs
++++ b/crates/sim/tests/ra9_soundness_common/mod.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED / PENDING. Draft native test helpers; final RA8 input refresh required.
++//! Historical preparation note: UNVALIDATED / PENDING. Draft native test helpers; final RA8 input refresh required.
+ #![allow(dead_code)]
+ //! RA6 vehicle and strategic acceptance on shipped data through commands and the simulation schedule.
+ use std::path::PathBuf;
+--- a/crates/sim/tests/ra9_squid.rs
++++ b/crates/sim/tests/ra9_squid.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED / PENDING. Native R83 attached-host firing witness.
++//! Historical preparation note: UNVALIDATED / PENDING. Native R83 attached-host firing witness.
+ mod ra9_soundness_common;
+ use ra9_soundness_common::*;
+ use sim::{Cell, Command, Grid, SimEvent, SpecialState};
+--- a/crates/sim/tests/ra9_transport.rs
++++ b/crates/sim/tests/ra9_transport.rs
+@@ -1,5 +1,5 @@
+-//! UNVALIDATED / PENDING. Native scheduled shipped transport regressions.
+-//! Proposed integration path: crates/sim/tests/ra9_transport.rs.
++//! Historical preparation note: UNVALIDATED / PENDING. Native scheduled shipped transport regressions.
++//! Historical preparation note: Proposed integration path: crates/sim/tests/ra9_transport.rs.
+ mod ra9_soundness_common;
+ use ra9_soundness_common::*;
+ use sim::{Command, ProductionItem, SimId, Weapon};
+--- a/crates/sim/tests/ra9_transport_buildlimit.rs
++++ b/crates/sim/tests/ra9_transport_buildlimit.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED / PENDING. Native nested individual BuildLimit rejection and death release.
++//! Historical preparation note: UNVALIDATED / PENDING. Native nested individual BuildLimit rejection and death release.
+ //! The temporary metadata variant is test fixture data, never a canonical generated RON edit.
+ mod ra9_soundness_common;
+ use ra9_soundness_common::*;
+--- a/crates/sim/tests/ra9_transport_lifecycle.rs
++++ b/crates/sim/tests/ra9_transport_lifecycle.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED / PENDING. Native lifecycle supplement for ra9_transport.rs.
++//! Historical preparation note: UNVALIDATED / PENDING. Native lifecycle supplement for ra9_transport.rs.
+ mod ra9_soundness_common;
+ use ra9_soundness_common::*;
+ use sim::{Cell, CellPos, Command, Grid, SpecialState};
+--- a/crates/sim/tests/ra9_veterancy.rs
++++ b/crates/sim/tests/ra9_veterancy.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED / PENDING. Proposed crates/sim/tests/ra9_veterancy.rs.
++//! Historical preparation note: UNVALIDATED / PENDING. Proposed crates/sim/tests/ra9_veterancy.rs.
+ mod ra4_common;
+ use bevy_ecs::{resource::Resource, schedule::IntoScheduleConfigs, world::World};
+ use ra4_common::*;

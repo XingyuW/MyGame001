@@ -24,7 +24,10 @@
 //! Bevy updates once per frame, so the game's readers see every event even when several ticks run
 //! in one frame (M2 implementation debt item 2).
 
-use std::fmt;
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    fmt,
+};
 
 use bevy::prelude::*;
 use sim::{
@@ -61,6 +64,16 @@ impl Plugin for SimHostPlugin {
 #[derive(Resource)]
 pub struct SimHost {
     world: World,
+    // Client observation state, outside the simulation World/hash. Candidate cells do not
+    // grant knowledge: an entry is recorded only when HUMAN actually sees that cell.
+    scenery_cells: BTreeSet<sim::CellPos>,
+    observed_scenery: BTreeMap<sim::CellPos, ObservedScenery>,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct ObservedScenery {
+    pub(crate) prop: Option<sim::Prop>,
+    pub(crate) garrison: Option<(sim::PlayerId, usize)>,
 }
 
 impl SimHost {
@@ -86,7 +99,11 @@ impl SimHost {
         world.register_component::<Armour>();
         world.register_component::<Sight>();
         world.register_component::<Weapon>();
-        Self { world }
+        Self {
+            world,
+            scenery_cells: BTreeSet::new(),
+            observed_scenery: BTreeMap::new(),
+        }
     }
 
     /// The simulation world, read-only.
@@ -116,6 +133,45 @@ impl SimHost {
     /// The destructible scenery still standing.
     pub fn props(&self) -> Option<&sim::Props> {
         self.world.get_resource::<sim::Props>()
+    }
+
+    pub(crate) fn observed_scenery(&self, cell: sim::CellPos) -> Option<&ObservedScenery> {
+        self.observed_scenery.get(&cell)
+    }
+
+    fn observe_scenery(&mut self) {
+        let (Some(props), Some(vision)) = (self.props(), crate::fog::human_vision(self.players()))
+        else {
+            return;
+        };
+        let cells: BTreeSet<_> = self
+            .scenery_cells
+            .iter()
+            .copied()
+            .chain(props.iter().map(|(cell, _)| cell))
+            .collect();
+        let special = self.world.get_resource::<sim::SpecialState>();
+        let seen: Vec<_> = cells
+            .iter()
+            .filter(|&&cell| vision.is_visible(cell))
+            .map(|&cell| {
+                let garrison = props.id_at(cell).and_then(|id| {
+                    let state = special?;
+                    let garrison = state.garrisons.get(&id)?;
+                    (garrison.owner == HUMAN || !state.hidden.contains(&(HUMAN, id)))
+                        .then(|| (garrison.owner, state.cargo.get(&id).map_or(0, Vec::len)))
+                });
+                (
+                    cell,
+                    ObservedScenery {
+                        prop: props.at(cell).copied(),
+                        garrison,
+                    },
+                )
+            })
+            .collect();
+        self.scenery_cells = cells;
+        self.observed_scenery.extend(seen);
     }
 
     pub fn projectiles(&self) -> Option<&Projectiles> {
@@ -167,7 +223,7 @@ impl SimHost {
                 .resource_mut::<Grid>()
                 .mark_world_features(&plan.looks);
         }
-        sim::setup_match_configured(
+        let start = sim::setup_match_configured(
             &mut self.world,
             &plan.skirmish,
             &plan.ai,
@@ -175,7 +231,13 @@ impl SimHost {
             &plan.players,
             &plan.options,
         )
-        .map_err(|error| error.to_string())
+        .map_err(|error| error.to_string())?;
+        self.scenery_cells = self.props().map_or_else(BTreeSet::new, |props| {
+            props.iter().map(|(cell, _)| cell).collect()
+        });
+        self.observed_scenery.clear();
+        self.observe_scenery();
+        Ok(start)
     }
 
     /// Runs one tick after moving `commands` (the human player's) into the simulation's command
@@ -193,7 +255,11 @@ impl SimHost {
                 });
             }
         }
+        // Observe both sides of each actual tick, including multi-tick client frames. Hidden
+        // damage/destruction/occupation cannot replace an earlier visible observation.
+        self.observe_scenery();
         self.world.run_schedule(SimSchedule);
+        self.observe_scenery();
         let events = self
             .world
             .get_resource::<Messages<SimEvent>>()
@@ -918,6 +984,26 @@ pub(crate) mod tests {
             .collect()
     }
 
+    /// Scenario setup only. Every subsequent privacy-control change uses issued commands and
+    /// the real schedule; no mutable simulation access leaves this test helper.
+    pub(crate) fn privacy_host(plan: &MatchPlan, setup: impl FnOnce(&mut World)) -> SimHost {
+        let mut host = SimHost::new(plan.seed);
+        host.install(plan).expect("privacy scenario match");
+        setup(&mut host.world);
+        host
+    }
+
+    pub(crate) fn privacy_plan(fog: bool) -> MatchPlan {
+        ra9_notice_plan(fog, "germany")
+    }
+
+    pub(crate) fn privacy_step(host: &mut SimHost, commands: Vec<IssuedCommand>) -> Vec<SimEvent> {
+        for command in commands {
+            host.world.resource_mut::<CommandQueue>().push(command);
+        }
+        host.step(Vec::new()).expect("actual host step")
+    }
+
     /// Test-only snapshots and actual game tick bridge, without exposing mutable Sim state.
     /// Bounded native input test assertion; no mutable host/viewer API is exposed.
     pub(crate) fn assert_native_cells_for_test(host: &mut SimHost) {
@@ -947,7 +1033,7 @@ pub(crate) mod tests {
     }
 
     use bevy::ecs::system::RunSystemOnce;
-    // UNCOMPILED / UNRUN. Append shared helpers inside sim_host.rs::tests.
+    // Historical preparation note: UNCOMPILED / UNRUN. Append shared helpers inside sim_host.rs::tests.
     // No simulation mutation after setup except via CommandSink -> run_tick -> SimSchedule.
     const RA9_PUBLIC_COLOUR: [u8; 4] = [255, 232, 120, 255];
     const RA9_PUBLIC_CELL: CellPos = CellPos::new(24, 12);
@@ -1111,7 +1197,7 @@ pub(crate) mod tests {
             .expect("real-time client expiry system");
     }
 
-    // UNCOMPILED / UNRUN AFTER tests. Append with common helpers inside sim_host::tests.
+    // Historical preparation note: UNCOMPILED / UNRUN AFTER tests. Append with common helpers inside sim_host::tests.
     // Requires K integrated event/schema + this client production patch. All actors/scenarios
     // are setup with real shipped definitions; dynamic changes below use actual commands.
     #[test]

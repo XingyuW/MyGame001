@@ -1190,7 +1190,7 @@ mod tests {
     }
 }
 
-// UNCOMPILED / UNRUN / UNACCEPTED. Append this sibling module to game/src/minimap.rs.
+// Historical preparation note: UNCOMPILED / UNRUN / UNACCEPTED. Append this sibling module to game/src/minimap.rs.
 // Stock definitions throughout. Independent open geometry is test setup, not an engine/source
 // permission. The UI consumer still uses only production owned_markers -> draw_minimap.
 #[cfg(test)]

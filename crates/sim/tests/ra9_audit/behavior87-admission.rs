@@ -1,4 +1,4 @@
-//! UNCOMPILED/UNRUN exact87 current-model classifications. No runtime feature or coverage.
+//! Historical preparation note: UNCOMPILED/UNRUN exact87 current-model classifications. No runtime feature or coverage.
 //! Real loaded policy premises are not source Expected values for the87 nonread literals.
 use super::*;
 const ATOMS: &str = include_str!("behavior87-atoms.tsv");
@@ -536,7 +536,7 @@ pub(super) fn owns(plan: &Plan, key: &SourceKey) -> bool {
 const _: fn(&Plan, &SourceKey) -> bool = owns;
 
 // Installed actual prepared negative block: behavior87-20261019-v1.UNVALIDATED.audit-negatives.rs.txt
-// UNCOMPILED/UNRUN. Append inside behavior87_admission.rs after actual final integration.
+// Historical preparation note: UNCOMPILED/UNRUN. Append inside behavior87_admission.rs after actual final integration.
 // Every negative FIRST requires the genuinely accepted installed final audit baseline.
 // Current UNACCEPTED tables are not a passing baseline, nor an expected test result.
 #[cfg(test)]

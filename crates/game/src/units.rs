@@ -790,6 +790,19 @@ fn place_unit_views(
     }
 }
 
+/// Runs the actual view creation/placement systems without loading a display or art files.
+/// Tests provide inert image handles only; actor identity and visibility come from SimHost.
+#[cfg(test)]
+pub(crate) fn privacy_place_views(app: &mut App) {
+    use bevy::ecs::system::RunSystemOnce;
+    app.world_mut()
+        .run_system_once(spawn_unit_views)
+        .expect("spawn views");
+    app.world_mut()
+        .run_system_once(place_unit_views)
+        .expect("place views");
+}
+
 /// Whether an aircraft whose dock is above `dock` (`None`: it has none) and that moves as
 /// `mobile` stands on its dock (RA4): it is drawn landed there.
 pub fn aircraft_landed(dock: Option<sim::CellPos>, mobile: &Mobile) -> bool {

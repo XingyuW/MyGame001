@@ -11950,3 +11950,152 @@ Actual199 completed01–03 exit0 and was deliberately stopped during04 on confir
 ### R194 — User authorizes one complete corrected-source full13 for both final gates (2026-10-22)
 
 The human explicitly answered "Share one full run (fastest)" to the current-chat scheduling question asking whether one unchanged complete13-command corrected-frozen-source run, orchestrator-run and checked by fresh independent reviewers, may satisfy both RA9 milestone and final review. Exact authorization is docs/validation/ra2-parity/review-1/user-shared-full13-authorization.json. This supersedes only the duplicate-run sequencing in continuation sections5–6. It does not reduce any command, test coverage, invariant, winner/performance/heap/timing requirement, cap/worker policy, fresh five-slice3+2/fresh-lead independence or severity/GO criteria. No pending/partial/failed/old-source result is promoted. No user quality or approval tag is granted. The actual complete corrected-source run and fresh independent decision remain owed.
+
+### R195 — Remediate independent panel1 with genuine native and audit controls (2026-10-22)
+
+Three fresh remediators handled runtime, client/honest-vision and audit findings. None may
+serve on the next independent panel. The production changes address all seven reported P0
+families: current IFV source/patient Health, recursive owned cargo MCV census, existing
+rank×crate specialist firepower, legal effective-weapon Guard ranking, current pending-launch
+source/target state, erased worker/Chrono return and erased building Sell/Undeploy. No balance,
+schema, persistent simulation state, cap or worker policy is changed. Connected active Temporal
+factory progress/spawning, depot host service, strategic charging and refinery unloading/payment
+are suspended. A living erased refinery retains the waiting miner's job/load for host release.
+
+The retained bounded model explicitly permits positive-HP erased owned buildings' passive
+power production/consumption, radar eligibility and prerequisites, and externally ordered paid
+RepairBuilding with normal interval/HP cap. Real-beam controls exercise these choices; they are
+current-model assumptions, not recovered original-engine fidelity. Active factory availability
+and passive prerequisite ownership use separate censuses. Existing disabled/power/ownership/
+liveness distinctions and already-launched flights remain; launch spacing stays27 ticks.
+
+Client changes use observer-qualified Spy hover identity, actual ownership/commandability for
+selection/groups/markers, actor concealment for new damage smoke, observer-known Interact
+lookup and observed scenery snapshots for fogged HP/destruction/occupation. Scenery observation
+is client state outside SimWorld/hash, updated around each actual step and reset with the match.
+AI bridge approach planning uses static terrain and genuinely known occupancy before native
+movement handles unknown blockers. Seven scheduled client controls and one AI command-equality
+control retain visible/owned/detector/lifecycle positives.
+
+The audit strengthens Static116/Metadata147/Residual117 with independently declared exact
+consumer/guard identity and all four families, including Masked19, with typed singleton receipt
+route/hash/duplicate validation. Four unchanged whole-audit controls exercise seven one-field variants each
+on nonfirst actual keys. A-audit-whole-before-02 actually exits101:4 intended failures,
+22 escapes/6 existing rejections/0 wrong failures, with4 initial and4 restored whole positives
+(30 whole-success markers including the22 escaped full reconciliations). Before01 failed setup
+on a stale inline command.rs FNV and gets no negative credit. Its factual refresh changes only
+the hash of the already reviewed &special forwarding call; original policy decisions stand.
+
+Runtime before02 records9pass/31fail, of which29 are intended and2 are setup failures;
+impact-before03 separately records1positive/1intended failure. These jointly cover40 scenarios,
+not a synthetic single40-case result. Initial corrected B-focused-01 is39pass/1later-positive
+fixture failure: the actual first missile killed its ordinary300HP target. The pending-volley
+fixture alone now gives that target10000HP, retaining source weapons, spacing and negative
+assertions; old receipts are not relabelled as executions of the changed full fixture. The
+additional real-beam refinery-host case fails genuinely before its tiny gate. The current six
+runtime targets contain41 cases; final corrected aggregate execution remains owed here.
+
+P2 current-status draft headers are marked historical, preserving original provenance and all
+runtime UNRUN sentinel strings. Current broad headless matches install retained map Props via
+load_map→setup_match→world_objects::install; the former omission claim is corrected in the
+harness, GAP and current ledger assessments/aliases, preserving historical claim fields.
+Shared installation establishes neither exhaustive scenery stress nor rendered coverage.
+All64 protected authority spans, both original prompts and51 HOWTOSEE bytes remain exact.
+
+Every failed/setup/corrected attempt and full changed-input preimage is retained under
+`docs/validation/ra2-parity/remediation-1/`. B-apply-01 records the controlled patch application;
+subsequent factual scope/binding, corrected native results, isolated five, one shared complete
+full13 under R194, fresh five-slice3+2/fresh lead and final merge/tag remain required. No review,
+user quality approval or acceptance is supplied by these implementation records.
+
+### R196 — Inspect corrected source during isolated gates, ahead of full13 (2026-10-22)
+
+The user's repeated instruction is to finish by the shortest path while retaining independent
+review and final merge. After the owned focused validation and exact late-game causal
+controls complete with restored source, commit the corrected freeze and start panel2's fresh
+cumulative source inspection alongside the required isolated all21/fixed3/threeguards, ahead of
+the expensive full13. This is the final independent round, not an extra advisory round. R172
+still requires all five slices3+2 and a fresh lead; R194 still requires one complete unchanged
+full13 for both final gates. This changes dispatch timing only. The exact corrected source,
+15 derived outputs and64 authority spans are bound in the latest B-corrected packet. B-focused-02's precommit
+HEAD describes its predecessor and preserved exact input snapshots; credit its results only
+after byte equality with frozen committed inputs is checked. Do not commit partial live logs
+as final. Reviewers write only outside the repository and run no native job. They report
+blocking source findings immediately so a doomed expensive full13 can be avoided. The same
+source runs isolated five and full13, with no native concurrency or performance credit from
+overlap. The fresh lead waits for actual complete results, executable/package failure-restoration
+acceptance and all five reports before deciding. Changed production/test inputs require renewed
+factual binding, affected controls and a fresh complete gate/panel scope; pending results or
+urgency waive no acceptance criterion.
+
+### R197 — Close connected Guard scenery omission; stabilize final audit input (2026-10-22)
+
+Before the expensive gates, root identified another concrete omission in the R85 Guard
+contract: its ECS actor-only candidate census omitted visible hostile occupied civilian Props,
+although ordinary Combat indexes and attacks them. The runtime remediator independently
+confirmed the complete path and prepared two append-only controls. Actual
+A-guard-prop-before-01 records1positive pass/1intended failure/6filtered: real Conscript
+occupation, visible living actorless House, Guard starvation for240ticks, then the same living
+Rhino's public Stop→ordinary idle WeaponFired and real host damage. Raw SHA256 is
+163b3fcb813f9ea656169d451f335e2da422f1cdf161e5ec7bc6af91d476a954.
+Only afterward the two-file extension adds living actually garrisoned Props to a deterministic
+Guard-only candidate union and reuses their real scenery traits/Combat extent in effective
+eligibility. Entity source liveness and Follow retain their actor census. Neutral unoccupied
+scenery is not acquired. No persistent state, rule, cap or balance is added. The two new test
+bodies remain exact through application. B-guard-prop-after-01 passes all43 runtime cases.
+
+Strict preflight then found one complex AI-test return tuple and two clone-on-Copy reads.
+A named observation tuple and direct Copy reads retain every assertion and value semantics.
+B-strict-04 again passes all43 native cases, fmt, diff-check and all-target strict Clippy
+(-D warnings; keep-going collects diagnostics only). The earlier strict failure, mistaken
+keep-going argument placement/setup error and corrected attempts all remain preserved. The
+mandatory full13 still uses its exact original Clippy command.
+
+B-focused-02's complete185-case audit is actually FAILED184passed/1failed/0ignored/0filtered,
+not a whole audit pass. Three new controls pass21 intended rejections/0escapes/0wrong failures;
+Static116 fails its initial whole baseline before its7variants with Model162's missing R84/R85
+policy anchor. This coincided with root's non-atomic DECISIONS.md rewrite at04:53:36UTC. Both
+unchanged guarded spans/needles authenticate afterward, and other identical whole baselines
+pass. No read-time bytes were captured; the transient read is an explicitly stated inference
+in B-policy-read-observation-01. This is not credited as an intended negative or production
+failure. Hold every policy document stable during native validation; metadata updates use
+atomic replacement only after native jobs finish. Preserve the failed complete run and source
+snapshots. Rerun all four controls after the final factual refresh, then require the complete
+unfiltered185 to pass together in the one R194 full13. Do not synthesize a185pass from retries.
+
+The connected Guard changes supersede B-corrected-01's proposed freeze. A new actual producer,
+independent root check, factual-only15-output propagation and full685-input manifest bind the
+final source before isolated gates and panel2 dispatch. Current runtime test count is43 across
+six targets (Guard now8); literal test declarations are1798, not executions. Earlier client275
+primary+4child and bridge2 results keep their precise B-focused-02 source scope; the final
+unfiltered workspace must execute their final-source versions. All old failures, assertions,
+183debt IDs,64 protected authority spans and51 HOWTOSEE bytes remain retained. The independent
+five-slice3+2/fresh lead, all required gates and user-only quality checks are unchanged.
+
+
+### R198. Corrected focused and causal preflight, exact freeze and owned scheduling observation
+
+B-focused-03 passes4 whole-audit controls with28 intended rejections/0escapes/0wrong failures
+and8 accepted whole-baseline reconciliations (4 initial+4 restored). This does not replace the
+failed B-focused-02 unfiltered185 run or the required final unfiltered185 run. The corrected
+native late twins reach Won Player0 at41738 (41739 schedules of72000), with444/8/6 late
+fire/production/positive-ore witnesses; final78c81bd069fca660 and trajectory5a8adabd01d20b05.
+B-late-causal-01 records the expected native36001/completed36002 state-hash failure from one
+extra right-world RNG call, then the observer-only missing-ProductionComplete failure with
+otherwise identical winner/ticks/fire/ore/hashes, then an exact-source restored positive.
+Actual child exits, raw hashes, per-phase source checks and two restoration reads are retained.
+
+B-corrected-02's actual670-source/15-derived/64-authority freeze supersedes the retained B1
+proposed freeze. Factual propagation changes no classification/reason/route/guard/decision or
+qualified receipt. The final B2 manifest authenticates all685 input files and64 protected spans.
+All source/assertions/test counts remain intact:1798 literal test attributes, zero ignore
+attributes; literal counts are not executions. No old-source result supplies current acceptance.
+
+During the positive, root observed unrelated CPU-heavy project processes sharing this10-core
+host and low owned-test CPU progress. Root used caffeinate and taskpolicy -B only on the three
+owned validation processes; no worker count, source, test, cap or unrelated process changed.
+A one-second owned-process sample is retained in review scratch. This is a scheduling
+observation, not a product diagnosis or performance acceptance. Any unrelated-job pause needs
+separate explicit user authorization. Mandatory timing runs keep the original commands and
+report actual measured tails/busy windows. Five fresh slices3+2 and fresh lead follow R172/R196;
+R194 shares exactly one complete full13. Final merge/tag still requires independent GO.

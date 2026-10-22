@@ -1696,6 +1696,13 @@ fn smoulder(
     let smoking: Vec<(SimId, f32, [f32; 4], f32)> = damaged
         .iter(host.world())
         .filter_map(|(id, condition, unit, building)| {
+            if host
+                .world()
+                .get_resource::<sim::SpecialState>()
+                .is_some_and(|state| state.hidden.contains(&(crate::units::HUMAN, *id)))
+            {
+                return None;
+            }
             let (interval, colour) = damage_smoke(condition.0)?;
             let infantry = unit.is_some_and(|unit| {
                 definitions.category(sim::ProductionItem::Unit(unit.kind))
@@ -2029,6 +2036,7 @@ fn animate(
 #[cfg(test)]
 mod tests {
     use super::*;
+    include!("privacy_smoke_tests.rs");
 
     #[test]
     fn every_shipped_weapon_has_the_class_its_name_promises() {

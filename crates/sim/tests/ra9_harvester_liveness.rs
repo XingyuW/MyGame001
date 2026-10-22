@@ -1,4 +1,4 @@
-//! UNVALIDATED / PENDING. Shipped native pre-Economy worker death and positive living twin.
+//! Historical preparation note: UNVALIDATED / PENDING. Shipped native pre-Economy worker death and positive living twin.
 mod ra9_soundness_common;
 use ra9_soundness_common::*;
 use sim::{Cell, CellPos, Command, Grid, Harvester};

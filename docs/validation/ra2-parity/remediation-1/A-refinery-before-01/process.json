@@ -1,0 +1,38 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T04:04:27.718001+00:00",
+  "pid": 39950,
+  "head": "af18ce22736ab98b516560d433384b5746774880",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/A-refinery-before-01-plan.json",
+  "plan_sha256": "89b837c615e4c02fa2808236da6a88d28f734ae214dd4ec4ccb7611f137148a0",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_temporal_sources",
+        "ra9_erased_refinery_host_preserves_live_loaded_waiter_until_release",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T04:04:27.873928+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-1/A-refinery-before-01/01-refinery-host-before.log",
+      "pid": 39960,
+      "pgid": 39960,
+      "exit": 101,
+      "end": "2026-10-22T04:04:37.934144+00:00",
+      "raw_bytes": 1201,
+      "raw_sha256": "93ecfe271e3dfc98ab2873b7d8cf78f43729f1d3c9d4753029fce8ca14dd1a82",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T04:04:32.930663+00:00",
+  "end": "2026-10-22T04:04:38.072520+00:00",
+  "source_unchanged": true
+}

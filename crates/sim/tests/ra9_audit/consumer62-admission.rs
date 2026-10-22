@@ -1,4 +1,4 @@
-//! UNCOMPILED/UNRUN exact62 current-model source admissions. No production/schema changes.
+//! Historical preparation note: UNCOMPILED/UNRUN exact62 current-model source admissions. No production/schema changes.
 //! This module NEVER creates a WitnessId for a nonread source flag, never records coverage,
 //! and never obtains Native proof from a constant getter. Actual typed metadata premises are
 //! policy checks. Physical comparisons retain independent v1-v3 demands and adapters.
@@ -660,7 +660,7 @@ pub(super) fn demanded_sources(p: &Plan) -> BTreeMap<SourceKey, (String, String)
 }
 
 // Installed actual prepared negative block: consumer62-integration-20261019-v1.UNVALIDATED.audit-negatives.rs.txt
-// UNCOMPILED/UNRUN. Append inside consumer62_admission.rs as child tests after v1->v2->v3
+// Historical preparation note: UNCOMPILED/UNRUN. Append inside consumer62_admission.rs as child tests after v1->v2->v3
 // and integration-blockers. Helpers are real adapters; tests do not assert acceptance success.
 #[cfg(test)]
 mod tests {

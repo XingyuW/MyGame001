@@ -366,6 +366,7 @@ pub(crate) fn harvest(
     mut harvesters: HarvesterQuery,
     buildings: Query<(Entity, &SimId, &Owner, &Building)>,
     healths: Query<&crate::Health>,
+    special: Res<crate::SpecialState>,
 ) {
     let alive = |entity| {
         !healths
@@ -416,6 +417,10 @@ pub(crate) fn harvest(
         tick: tick.0,
     };
     for (id, entity) in order {
+        // A temporarily frozen worker keeps its load, job and partial work unchanged.
+        if special.erasures.contains_key(&id) {
+            continue;
+        }
         let Ok((_, _, owner, unit, mobile, mut orders, mut harvester)) = harvesters.get_mut(entity)
         else {
             continue;
@@ -453,7 +458,13 @@ pub(crate) fn harvest(
         }
         match worker.harvester.state {
             HarvestState::Idle => {}
-            HarvestState::ToRefinery { refinery, .. } => context.unload(&mut worker, refinery),
+            HarvestState::ToRefinery { refinery, .. } => {
+                // A living erased host is temporarily unavailable, not lost. Keep the
+                // worker's existing dock, load and job for the same host's release.
+                if !special.erasures.contains_key(&refinery) {
+                    context.unload(&mut worker, refinery);
+                }
+            }
             HarvestState::Seeking | HarvestState::ToOre(_) => {
                 if let HarvestState::ToOre(cell) = worker.harvester.state {
                     context.claimed.remove(&cell);

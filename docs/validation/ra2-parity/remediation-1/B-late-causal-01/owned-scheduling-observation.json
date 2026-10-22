@@ -1,0 +1,29 @@
+{
+  "utc": "2026-10-22T05:50:28.630480+00:00",
+  "scope": "Owned validation scheduling observations only, not performance acceptance",
+  "owned_positive_pids": [
+    52337,
+    53059,
+    53602
+  ],
+  "positive_caffeinate_pid": 54250,
+  "positive_taskpolicy_B_exits": [
+    0,
+    0,
+    0
+  ],
+  "owned_causal_pids": [
+    55345,
+    55349,
+    55418
+  ],
+  "causal_taskpolicy_tier0_exits": [
+    0,
+    0,
+    0
+  ],
+  "unrelated_processes_changed": false,
+  "native_commands_workers_caps_unchanged": true,
+  "other_job_pause_authorization": "Pending optional question; no answer or permission inferred",
+  "sample": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/B-focused-03-scheduling-sample.txt"
+}

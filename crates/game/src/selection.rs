@@ -402,6 +402,20 @@ fn launched(host: &SimHost, id: SimId) -> bool {
         })
 }
 
+fn owned_commandable_unit(host: &SimHost, view: &UnitView) -> bool {
+    let world = host.world();
+    world.get::<SimId>(view.unit) == Some(&view.id)
+        && world
+            .get::<Owner>(view.unit)
+            .is_some_and(|owner| owner.0 == HUMAN)
+        && world
+            .get::<sim::Health>(view.unit)
+            .is_some_and(|health| health.hit_points > 0)
+        && world.get::<sim::Unit>(view.unit).is_some()
+        && world.get::<sim::Mobile>(view.unit).is_some()
+        && !launched(host, view.id)
+}
+
 /// The player's own units that take commands, and their ground points in the world.
 fn own_units(host: &SimHost, views: &Query<(&UnitView, &Transform)>) -> Vec<(SimId, Vec2)> {
     views
@@ -421,14 +435,22 @@ fn cursor_world(window: &Window, camera: &Camera, transform: &GlobalTransform) -
     camera.viewport_to_world_2d(transform, cursor).ok()
 }
 
-/// Units that no longer exist leave the selection and the control groups.
+/// Units that disappeared or lost ownership/commandability leave all selection memories.
 pub(crate) fn prune_selection(
+    host: Res<SimHost>,
     registry: Res<UnitViews>,
+    views: Query<&UnitView>,
     mut selection: ResMut<Selection>,
     mut groups: ResMut<ControlGroups>,
 ) {
-    selection.0.retain(|id| registry.0.contains_key(id));
-    groups.prune(|id| registry.0.contains_key(&id));
+    let commandable: BTreeSet<_> = views
+        .iter()
+        .filter(|view| owned_commandable_unit(&host, view))
+        .map(|view| view.id)
+        .filter(|id| registry.0.contains_key(id))
+        .collect();
+    selection.0.retain(|id| commandable.contains(id));
+    groups.prune(|id| commandable.contains(&id));
 }
 
 /// A selected building that was destroyed, sold or captured is no longer selected, and neither
@@ -1134,6 +1156,7 @@ pub(crate) fn draw_selection(
     map: Option<Res<MapView>>,
     camera: Single<(&Camera, &GlobalTransform)>,
     views: Query<(&UnitView, &Transform)>,
+    visible_views: Query<(&UnitView, &Visibility)>,
     mut gizmos: Gizmos,
 ) {
     let Some(map) = map else {
@@ -1158,7 +1181,17 @@ pub(crate) fn draw_selection(
                 camera.viewport_to_world_2d(camera_transform, b).ok()?,
             ))
         });
+    let shown_owned: BTreeSet<_> = visible_views
+        .iter()
+        .filter(|(view, visibility)| {
+            **visibility != Visibility::Hidden && owned_commandable_unit(&host, view)
+        })
+        .map(|(view, _)| view.id)
+        .collect();
     for (view, transform) in &views {
+        if !shown_owned.contains(&view.id) {
+            continue;
+        }
         if !selection.0.contains(&view.id)
             && !(view.owner == HUMAN
                 && preview.is_some_and(|r| r.contains(transform.translation.truncate())))
@@ -1443,6 +1476,7 @@ fn draw_order_preview(
 #[cfg(test)]
 mod tests {
     include!("selection_pad_native.rs");
+    include!("privacy_selection_tests.rs");
     use super::*;
 
     fn input_app() -> (App, Entity, SimId) {
@@ -2969,7 +3003,7 @@ mod tests {
         assert_eq!(move_command(&ids(&[]), Some(target)), None);
         assert_eq!(stop_command(&ids(&[])), None);
     }
-    // UNCOMPILED / UNRUN / UNACCEPTED. Append INSIDE existing selection::tests.
+    // Historical preparation note: UNCOMPILED / UNRUN / UNACCEPTED. Append INSIDE existing selection::tests.
     // Actual command-created SimHost actors are independent of controlled UnitView layout.
     // Transform/Visibility/ComputedCamera/HoveredCell below are input-fixture presentation only;
     // they do not spawn actors, relations, command receipts, visibility or source flag readers.

@@ -612,6 +612,62 @@ fn spawned_units(world: &mut World, defs: &Definitions, index: &BTreeMap<SimId, 
     }
 }
 
+/// Flight effects earlier in Economy can change Health, and specialist work can change
+/// ownership or position. Resolve a live body at the actual pending-launch boundary.
+fn current_actor(world: &World, earlier: &Actor) -> Option<Actor> {
+    let hp = world.get::<Health>(earlier.entity)?.hit_points;
+    if hp <= 0 || world.get::<SimId>(earlier.entity) != Some(&earlier.id) {
+        return None;
+    }
+    let owner = world.get::<Owner>(earlier.entity)?.0;
+    let (item, cell, foot) = if let Some(unit) = world.get::<crate::Unit>(earlier.entity) {
+        (
+            ProductionItem::Unit(unit.kind),
+            world.get::<Mobile>(earlier.entity)?.cell,
+            None,
+        )
+    } else {
+        let building = world.get::<crate::Building>(earlier.entity)?;
+        (
+            ProductionItem::Building(building.kind),
+            building.footprint.origin,
+            Some(building.footprint),
+        )
+    };
+    Some(Actor {
+        entity: earlier.entity,
+        id: earlier.id,
+        owner,
+        item,
+        cell,
+        foot,
+        hp,
+    })
+}
+
+fn launch_target_known(world: &World, source: &Actor, target: &Actor, forced: bool) -> bool {
+    let hostile = world
+        .resource::<Players>()
+        .hostile(source.owner, target.owner);
+    let own = source.owner == target.owner;
+    if !forced && !hostile && target.owner != crate::NEUTRAL {
+        return false;
+    }
+    let body = crate::combat::Body::of(
+        world.get::<Mobile>(target.entity),
+        world.get::<crate::Building>(target.entity),
+    );
+    (forced && own
+        || world
+            .resource::<Players>()
+            .get(source.owner)
+            .is_some_and(|p| body.is_some_and(|b| b.seen_by(p.vision()))))
+        && !world
+            .resource::<SpecialState>()
+            .hidden
+            .contains(&(source.owner, target.id))
+}
+
 /// The bays, in the order of their spawners' ids: the timers of what is aboard, and the next
 /// launch.
 fn bays(world: &mut World, defs: &Definitions, index: &BTreeMap<SimId, Actor>, tick: u64) {
@@ -622,7 +678,7 @@ fn bays(world: &mut World, defs: &Definitions, index: &BTreeMap<SimId, Actor>, t
         .copied()
         .collect();
     for id in spawners {
-        let Some(a) = index.get(&id).filter(|a| a.hp > 0) else {
+        let Some(a) = index.get(&id).and_then(|a| current_actor(world, a)) else {
             // The spawner is gone, and its aircraft with it (`spawned_units`); a missile in
             // flight flies on.
             world.resource_mut::<SpecialState>().bays.remove(&id);
@@ -659,7 +715,8 @@ fn bays(world: &mut World, defs: &Definitions, index: &BTreeMap<SimId, Actor>, t
             bay.target = None;
             bay.pending = 0;
         }
-        let stopped = world.resource::<SpecialState>().disabled.contains_key(&id);
+        let state = world.resource::<SpecialState>();
+        let stopped = state.disabled.contains_key(&id) || state.erasures.contains_key(&id);
         if let Some(target) = bay.target
             && bay.pending > 0
             && bay.wait == 0
@@ -668,11 +725,19 @@ fn bays(world: &mut World, defs: &Definitions, index: &BTreeMap<SimId, Actor>, t
         {
             // What it launches at: a unit or building that stands, or scenery, which is no
             // actor and is aimed at where it stands.
-            let aim = match index.get(&target).filter(|target| target.hp > 0) {
+            let forced = world
+                .get::<Weapon>(a.entity)
+                .is_some_and(|w| matches!(w.order, Some(AttackOrder::ForceFire { .. })));
+            let current_target = index.get(&target).and_then(|t| current_actor(world, t));
+            let aim = match current_target
+                .as_ref()
+                .filter(|t| launch_target_known(world, &a, t, forced))
+            {
                 Some(target) => Some(Aim::Actor(target)),
                 None => world
                     .resource::<crate::Props>()
                     .get(target)
+                    .filter(|(_, prop)| prop.hit_points > 0)
                     .map(|(cell, _)| Aim::Scenery(target, cell))
                     .or_else(|| ground.map(|c| Aim::Scenery(target, c))),
             };
@@ -682,7 +747,7 @@ fn bays(world: &mut World, defs: &Definitions, index: &BTreeMap<SimId, Actor>, t
                     bay.pending = 0;
                 }
                 Some(aim) => {
-                    if let Some(unit) = launch(world, defs, a, aim, tick) {
+                    if let Some(unit) = launch(world, defs, &a, aim, tick) {
                         bay.slots[place] = Slot::Out(unit);
                         bay.pending -= 1;
                         bay.wait = SPAWN_LAUNCH_GAP;
@@ -748,6 +813,23 @@ fn launch(
     target: Aim,
     tick: u64,
 ) -> Option<SimId> {
+    if !world
+        .get::<Health>(spawner.entity)
+        .is_some_and(|h| h.hit_points > 0)
+        || world
+            .get::<Owner>(spawner.entity)
+            .is_none_or(|o| o.0 != spawner.owner)
+        || world
+            .resource::<SpecialState>()
+            .erasures
+            .contains_key(&spawner.id)
+        || world
+            .resource::<SpecialState>()
+            .disabled
+            .contains_key(&spawner.id)
+    {
+        return None;
+    }
     let kind = defs.metadata(spawner.item)?.spawns?;
     let def = defs.unit(kind)?;
     let entry = defs.metadata(ProductionItem::Unit(kind))?;

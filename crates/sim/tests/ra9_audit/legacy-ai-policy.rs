@@ -1,4 +1,4 @@
-//! UNCOMPILED/UNRUN 361 exact old source classifications in 69 families.
+//! Historical preparation note: UNCOMPILED/UNRUN 361 exact old source classifications in 69 families.
 //! No original-engine unused claim, source literal getter, alias/Own/native read credit.
 use super::*;
 use legacy904_support as s;

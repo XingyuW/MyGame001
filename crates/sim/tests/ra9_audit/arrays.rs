@@ -1,4 +1,4 @@
-//! UNVALIDATED typed physical-array proof ledger. This ledger adds NO global reference
+//! Historical preparation note: UNVALIDATED typed physical-array proof ledger. This ledger adds NO global reference
 //! coverage. Existing real aggregate comparisons remain mandatory. Independent demand
 //! contracts and successful element/length comparisons must have exactly equal edges.
 use super::{AuditResult, Reference, SourceKey};

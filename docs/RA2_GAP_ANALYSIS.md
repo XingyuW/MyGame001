@@ -1,5 +1,49 @@
 # Remaining differences from vanilla Red Alert 2
 
+<!-- RA9_REMEDIATION1_CURRENT_BEGIN -->
+## Current canonical checkpoint — 2026-10-22, remediation round1 frozen candidate
+
+Independent panel1 returned **NO-GO**; its findings and interrupted gate remain preserved in
+`docs/reviews/RA2-parity-review-1.md` (R193). R195/R197 record the runtime, client/honest-vision
+and exact audit-admission corrections. This is implementation and bounded validation, not
+independent acceptance. B-strict-04 passes all43 runtime cases, fmt/diff-check and strict
+all-target Clippy. Earlier B-focused-02 client275 primary+4 child and bridge2 passes keep their
+precise source scopes. Its complete audit actually failed184/1 during a concurrent root policy
+rewrite; that raw failure is retained. Stable-input B-focused-03 passes all4 whole-audit controls:
+28 intended rejections, zero escaped/wrong failures,4 initial and4 restored whole positives.
+The complete unfiltered185-case audit remains required in the final workspace run.
+
+The corrected native late twins pass to Won at41738/72000, with matching per-tick ordered events,
+invariants and state hashes; after36000 they observe444 shots/8 production/6 positive ore events.
+B-late-causal-01 independently detects the native36001 extra-RNG change and the observer-only
+missing production change, then restores the exact source and passes the unchanged native test.
+All685 current input files and64 protected authority spans authenticate against B-corrected-02.
+All before/after, failure, setup and restoration logs remain in
+`docs/validation/ra2-parity/remediation-1/`. Historical results retain their original scopes.
+
+R194 authorizes one complete unchanged corrected-frozen-source thirteen-command run for RA9
+and final review. R172 retains five fresh independent slices in batches3+2 and a fresh lead;
+R196 overlaps source inspection with the isolated all21/fixed3/threeguards. These gates, actual
+executable/package missing-asset failure/restoration and every full13 command remain pending.
+Final local merge/tag follows only independent GO/GO WITH DOCUMENTED NON-BLOCKING DEBT.
+No approval tag or visual/audio/feel approval is supplied. All183 debt IDs and51 HOWTOSEE rows
+remain; current scope is64 sim/39 game source Rust files,49 audit Rust/67 TSV/4 TXT siblings
+and34 top-level RA9 sim targets. Counts are not native executions or compiled-module counts.
+Review the cumulative programme from8230a955b251e9341d349f99eaeb86f7f8253664 at the exact dispatch
+TIP and input manifest. Earlier checkpoint descriptions below retain their historical scopes.
+<!-- RA9_REMEDIATION1_CURRENT_END -->
+
+### Temporal building model retained in R195
+
+Actual erasure pauses own movement/work, destructive transformations, new bay births, active
+factory progress/spawning, depot service, strategic charging and refinery receiving/payment.
+A live erased refinery keeps its waiting miner's existing job/load for release. Positive-HP
+owned erased buildings retain passive power production/consumption, radar eligibility and
+prerequisites, and can receive external paid RepairBuilding with ordinary interval/HP cap.
+These are tested current-model choices, not recovered original-engine fidelity. Already-launched
+flights continue. The observed-scenery memory used to protect fogged HP/destruction/occupation
+is client state outside SimWorld/hash and resets with the match.
+
 <!-- RA9_CURRENT_EVIDENCE_BEGIN -->
 ## Current execution provenance — 2026-10-21 ordinary copy
 
@@ -344,7 +388,8 @@ WeaponFired control is mandatory. A controlled same-kind Drone provenance fixtur
 bypasses stock special1-versus0 eligibility and cannot prove stock Drone-on-Drone fidelity.
 
 Actorless occupied Props now have real specialist routes and command privacy controls; dedicated
-scenery3/0 is a preliminary observed target, while broad production/duel/soak worlds still omit Props.
+scenery3/0 is a preliminary observed target. Current broad production/duel/soak setup also installs
+retained map Props; shared installation does not establish every specialist/scenery interaction.
 C4/Sapper ordinary impact, Ivan placement/defuse and Temporal beams remain distinct routes.
 Engineer BombSight automatic known non-C4 detection/approach/defuse respects explicit action priorities;
 Guard is an intentional exemption, not a global ceasefire. Host visibility and charge ownership
@@ -432,8 +477,9 @@ the separate actual late twins/all21 ending checks retain their own scopes.
 
 Mean benchmark, busiest windows/max ticks, state/resource peaks, all21 default matches, full duels,
 soak and wall times are separate reporting scopes. Supported200-unit benchmark witnesses all original
-participants over time; that is not4000-unit performance or render smoothness. Broad matches still omit
-scenery; human pacing/balance/full victory/defeat remain user verification.
+participants over time; that is not4000-unit performance or render smoothness. Broad matches include
+retained map scenery through shared setup; this does not establish every scenery interaction or
+rendered coverage. Human pacing/balance/full victory/defeat remain user verification.
 
 ## Complete numerical difference inventory
 

@@ -1,4 +1,4 @@
-//! Exact80 current game-array contracts, UNCOMPILED/UNRUN. No native/source coverage.
+//! Historical preparation note: Exact80 current game-array contracts, UNCOMPILED/UNRUN. No native/source coverage.
 use super::*;
 const CONTRACTS: &str = include_str!("own-policy-contracts.tsv");
 const ACCEPTANCES: &str = include_str!("own-policy-acceptance.tsv");
@@ -233,7 +233,7 @@ pub(super) fn source_acceptance(key: &SourceKey) -> AuditResult<Option<SourceAcc
 }
 
 // Installed actual prepared negative block: integration-blockers-20261019-v1.UNVALIDATED.policy-negatives.rs.txt
-// UNCOMPILED/UNRUN; append to policy-admission.rs. No fake native witness or acceptance.
+// Historical preparation note: UNCOMPILED/UNRUN; append to policy-admission.rs. No fake native witness or acceptance.
 #[cfg(test)]
 mod tests {
     use super::*;

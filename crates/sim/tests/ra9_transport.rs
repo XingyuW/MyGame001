@@ -1,5 +1,5 @@
-//! UNVALIDATED / PENDING. Native scheduled shipped transport regressions.
-//! Proposed integration path: crates/sim/tests/ra9_transport.rs.
+//! Historical preparation note: UNVALIDATED / PENDING. Native scheduled shipped transport regressions.
+//! Historical preparation note: Proposed integration path: crates/sim/tests/ra9_transport.rs.
 mod ra9_soundness_common;
 use ra9_soundness_common::*;
 use sim::{Command, ProductionItem, SimId, Weapon};

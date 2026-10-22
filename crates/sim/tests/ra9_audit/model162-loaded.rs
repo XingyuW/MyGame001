@@ -1,4 +1,4 @@
-//! UNCOMPILED/UNRUN real typed policy observations. These are NOT source Expected/native
+//! Historical preparation note: UNCOMPILED/UNRUN real typed policy observations. These are NOT source Expected/native
 //! witnesses. No getter is invented for an unparsed source flag. No coverage is recorded.
 use super::*;
 fn item(d: &Definitions, id: &str) -> AuditResult<sim::ProductionItem> {

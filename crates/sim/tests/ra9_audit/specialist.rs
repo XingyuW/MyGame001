@@ -1,4 +1,4 @@
-//! UNVALIDATED v2 metadata policy adapters. No generator/reference coverage is obtained by
+//! Historical preparation note: UNVALIDATED v2 metadata policy adapters. No generator/reference coverage is obtained by
 //! recognizing a Role enum or a legacy numeric metadata value. Active native terms use
 //! Expected provenance; legacy-only fields require actual loaded branch premises.
 use super::actual::{check_int, optional, rule};

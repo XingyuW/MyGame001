@@ -1,4 +1,4 @@
-//! UNCOMPILED / UNRUN. Proposed crates/sim/tests/ra9_guard75_readiness.rs.
+//! Historical preparation note: UNCOMPILED / UNRUN. Proposed crates/sim/tests/ra9_guard75_readiness.rs.
 //! Four bodies, three missing routes. Install only after root releases RA8 and refreshes pins.
 //! Only shipped definitions, public commands and SimSchedule. promote is controlled elite setup.
 mod ra7_common;

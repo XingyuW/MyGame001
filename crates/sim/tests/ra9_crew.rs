@@ -1,5 +1,5 @@
-//! UNVALIDATED / PENDING. Crew evidence draft on shipped rules and commands.
-//! Proposed integration path crates/sim/tests/ra9_crew.rs.
+//! Historical preparation note: UNVALIDATED / PENDING. Crew evidence draft on shipped rules and commands.
+//! Historical preparation note: Proposed integration path crates/sim/tests/ra9_crew.rs.
 mod ra9_soundness_common;
 use ra9_soundness_common::*;
 use sim::{Cell, CellPos, Command, Grid, Owner, SimEvent, SimId, Unit};

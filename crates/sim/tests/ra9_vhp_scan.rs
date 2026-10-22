@@ -1,4 +1,4 @@
-// UNVALIDATED / UNCOMPILED / UNRUN: native current-API Patriot baseline and control bodies.
+// Historical preparation note: UNVALIDATED / UNCOMPILED / UNRUN: native current-API Patriot baseline and control bodies.
 // Proposed integration file crates/sim/tests/ra9_vhp_scan.rs, only after root releases RA8.
 mod ra7_common;
 use bevy_app::App;

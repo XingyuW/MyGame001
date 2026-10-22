@@ -12,6 +12,276 @@ fn data() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets/data")
 }
 
+/// One real controller learns the hut/deck from a scout on the opposite bank. An unseen
+/// hostile wall is initial scenario setup; no vision, hut memory or AI intent is seeded.
+type BridgeDecisionObservation = (
+    sim::Vision,
+    sim::AiController,
+    Vec<(sim::SimId, CellPos, sim::Owner)>,
+    Vec<Command>,
+);
+
+fn ra9_privacy_bridge_decision(blocker: Option<CellPos>) -> BridgeDecisionObservation {
+    let mut app = scenario_mode(
+        "russia",
+        "medium",
+        0,
+        0,
+        false,
+        ScenarioMode {
+            fog: true,
+            ..ScenarioMode::default()
+        },
+    );
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    let mut looks = vec![0; 48 * 48];
+    {
+        let mut grid = app.world_mut().resource_mut::<Grid>();
+        for y in 0..48 {
+            for x in 22..=24 {
+                grid.set_terrain(
+                    CellPos::new(x, y),
+                    Cell {
+                        passable: false,
+                        water: true,
+                        buildable: false,
+                        ore: 0,
+                    },
+                );
+            }
+        }
+        for x in 22..=24 {
+            grid.set_terrain(
+                CellPos::new(x, 24),
+                Cell {
+                    passable: true,
+                    water: false,
+                    buildable: false,
+                    ore: 0,
+                },
+            );
+            looks[24 * 48 + x as usize] = 8 << 4;
+        }
+        for (x, y) in [(21, 22), (25, 22)] {
+            looks[y * 48 + x] = 15 << 4;
+        }
+        grid.mark_world_features(&looks);
+    }
+    sim::install_world_objects(app.world_mut(), true);
+    let bridge = *app
+        .world()
+        .resource::<sim::Bridges>()
+        .bridges
+        .keys()
+        .next()
+        .unwrap();
+    let hut = app
+        .world()
+        .resource::<Grid>()
+        .building(CellPos::new(21, 22))
+        .unwrap();
+    let engineer = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "engineer",
+        CellPos::new(10, 22),
+    )
+    .unwrap();
+    let scout = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "conscript",
+        CellPos::new(26, 22),
+    )
+    .unwrap();
+    let tank = spawn_unit(
+        app.world_mut(),
+        PlayerId(1),
+        "grizzly",
+        CellPos::new(20, 26),
+    )
+    .unwrap();
+    let wall = blocker.map(|cell| {
+        sim::spawn_building(app.world_mut(), PlayerId(1), "soviet_walls", cell).unwrap()
+    });
+    step(&mut app);
+    if let Some(cell) = blocker {
+        assert!(
+            !app.world()
+                .resource::<sim::Players>()
+                .get(PlayerId(0))
+                .unwrap()
+                .vision()
+                .is_visible(cell),
+            "the initial wall must genuinely be outside both own units' sight"
+        );
+    }
+    app.world_mut()
+        .resource_mut::<CommandQueue>()
+        .push(sim::IssuedCommand {
+            player: PlayerId(1),
+            command: Command::Attack {
+                units: vec![tank],
+                target: bridge,
+            },
+        });
+    for _ in 0..4000 {
+        step(&mut app);
+        if app.world().resource::<sim::Bridges>().bridges[&bridge].collapsed {
+            break;
+        }
+    }
+    assert!(
+        app.world().resource::<sim::Bridges>().bridges[&bridge].collapsed,
+        "actual public enemy attack must collapse the bridge"
+    );
+    let think = u64::from(
+        controllers
+            .controller(PlayerId(0))
+            .unwrap()
+            .difficulty()
+            .think_interval,
+    );
+    while !app.world().resource::<SimTick>().0.is_multiple_of(think) {
+        step(&mut app);
+    }
+    app.world_mut().insert_resource(controllers);
+    step(&mut app); // Genuine due AI observation of hut + collapsed deck.
+    assert!(
+        app.world()
+            .resource::<CommandQueue>()
+            .iter()
+            .any(|issued| issued.player == PlayerId(0)
+                && matches!(issued.command,
+            Command::Interact { unit, target } if unit == engineer && target == hut)),
+        "current observed hut must first produce its ordinary native repair intent"
+    );
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    // Let the real queued repair be admitted, then explicitly cancel it before moving the scout.
+    issue(
+        &mut app,
+        Command::Stop {
+            units: vec![engineer],
+        },
+    );
+    issue(
+        &mut app,
+        Command::Move {
+            units: vec![scout],
+            target: CellPos::new(36, 22),
+        },
+    );
+    app.world_mut()
+        .resource_mut::<CommandQueue>()
+        .push(sim::IssuedCommand {
+            player: PlayerId(1),
+            command: Command::Stop { units: vec![tank] },
+        });
+    for _ in 0..1200 {
+        step(&mut app);
+        let entity = unit_entity(&mut app, scout);
+        let mobile = app.world().get::<sim::Mobile>(entity).unwrap();
+        if mobile.cell == CellPos::new(36, 22) && mobile.step.is_none() {
+            break;
+        }
+    }
+    let scout_entity = unit_entity(&mut app, scout);
+    assert_eq!(
+        app.world().get::<sim::Mobile>(scout_entity).unwrap().cell,
+        CellPos::new(36, 22)
+    );
+    let vision = app
+        .world()
+        .resource::<sim::Players>()
+        .get(PlayerId(0))
+        .unwrap()
+        .vision();
+    assert!(
+        vision.is_explored(CellPos::new(21, 22)) && !vision.is_visible(CellPos::new(21, 22)),
+        "hut is genuinely remembered through optional fog"
+    );
+    if let (Some(wall), Some(cell)) = (wall, blocker) {
+        assert!(!vision.is_visible(cell));
+        assert!(
+            !controllers
+                .controller(PlayerId(0))
+                .unwrap()
+                .known_buildings()
+                .contains_key(&wall),
+            "unseen wall must never enter controller memory"
+        );
+    }
+    while !app.world().resource::<SimTick>().0.is_multiple_of(think) {
+        step(&mut app);
+    }
+    let vision = app
+        .world()
+        .resource::<sim::Players>()
+        .get(PlayerId(0))
+        .unwrap()
+        .vision()
+        .clone();
+    let knowledge = controllers.controller(PlayerId(0)).unwrap().clone();
+    let own = {
+        let world = app.world_mut();
+        let mut own: Vec<_> = world
+            .query::<(&sim::SimId, &sim::Mobile, &sim::Owner)>()
+            .iter(world)
+            .filter(|(_, _, owner)| owner.0 == PlayerId(0))
+            .map(|(id, mobile, owner)| (*id, mobile.cell, *owner))
+            .collect();
+        own.sort_by_key(|(id, ..)| *id);
+        own
+    };
+    app.world_mut().insert_resource(controllers);
+    step(&mut app); // Capture commands before their next Command admission/pathfinding.
+    let decisions: Vec<_> = app
+        .world()
+        .resource::<CommandQueue>()
+        .iter()
+        .filter(|issued| issued.player == PlayerId(0))
+        .filter_map(|issued| match &issued.command {
+            Command::Move { units, .. } if units.contains(&engineer) => {
+                Some(issued.command.clone())
+            }
+            _ => None,
+        })
+        .collect();
+    assert!(
+        matches!(decisions.as_slice(), [Command::Move { .. }]),
+        "remembered bridge job must emit an actual queued Engineer approach: {decisions:?}"
+    );
+    (vision, knowledge, own, decisions)
+}
+
+#[test]
+fn ra9_privacy_remembered_bridge_approach_ignores_unseen_endpoint_and_corridor_buildings() {
+    let empty = ra9_privacy_bridge_decision(None);
+    let blocked: Vec<_> = [CellPos::new(20, 22), CellPos::new(17, 22)]
+        .into_iter()
+        .map(|cell| (cell, ra9_privacy_bridge_decision(Some(cell))))
+        .collect();
+    eprintln!("native bridge empty-world observation: {empty:?}");
+    for (cell, observation) in &blocked {
+        eprintln!("native bridge blocker-world observation at {cell:?}: {observation:?}");
+    }
+    for (cell, blocked) in blocked {
+        assert_eq!(
+            blocked.0, empty.0,
+            "same actual observer visibility/exploration"
+        );
+        assert_eq!(
+            blocked.1, empty.1,
+            "same actual controller memory/state before decision"
+        );
+        assert_eq!(blocked.2, empty.2, "same own native actors and positions");
+        assert_eq!(
+            blocked.3, empty.3,
+            "unseen building at {cell:?} must not select the AI's endpoint or traversal"
+        );
+    }
+}
+
 fn start(country: &str, difficulty: &str) -> App {
     scenario(country, difficulty, 10_000, 10, true)
 }

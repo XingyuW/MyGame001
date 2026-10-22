@@ -1,4 +1,4 @@
-// UNCOMPILED / UNRUN / UNACCEPTED. Proposed crates/sim/tests/ra9_legacy904_last_five.rs.
+// Historical preparation note: UNCOMPILED / UNRUN / UNACCEPTED. Proposed crates/sim/tests/ra9_legacy904_last_five.rs.
 // Existing ra7_common supplies shipped world/put/issue/tick/entity. No new runtime API.
 mod ra7_common;
 use bevy_app::App;

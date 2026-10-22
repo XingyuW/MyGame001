@@ -100,6 +100,10 @@ pub(crate) fn advance(world: &mut World) {
         if a.alive()
             && a.owner != crate::NEUTRAL
             && meta.role.superweapon()
+            && !world
+                .resource::<SpecialState>()
+                .erasures
+                .contains_key(&a.id)
             && charges(world, &defs, a)
             && !world
                 .resource::<SpecialState>()
@@ -187,7 +191,15 @@ pub(crate) fn advance(world: &mut World) {
                     .insert(a.id, tick.saturating_add(u64::from(meta.cooldown)));
             }
         }
-        if meta.role == Role::ChronoMiner {
+        if meta.role == Role::ChronoMiner
+            && world
+                .get::<Health>(a.entity)
+                .is_some_and(|h| h.hit_points > 0)
+            && !world
+                .resource::<SpecialState>()
+                .erasures
+                .contains_key(&a.id)
+        {
             let dock = world
                 .get::<crate::Harvester>(a.entity)
                 .and_then(|h| match h.state {

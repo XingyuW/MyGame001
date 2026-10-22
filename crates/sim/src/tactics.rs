@@ -95,6 +95,26 @@ pub(crate) fn advance(world: &mut World) {
             );
         }
     }
+    // Occupied scenery is an owned combat target without an ECS actor. Keep the actor
+    // census for source liveness/Follow, and extend only Guard's candidate census.
+    let mut guard_targets: BTreeMap<_, _> = actors
+        .iter()
+        .map(|(&id, &(entity, owner, cell, body))| (id, (Some(entity), owner, cell, body)))
+        .collect();
+    for (&id, garrison) in &world.resource::<SpecialState>().garrisons {
+        if let Some((cell, _)) = world
+            .resource::<crate::Props>()
+            .get(id)
+            .filter(|(_, prop)| prop.hit_points > 0)
+        {
+            let footprint = crate::Footprint {
+                origin: cell,
+                width: 1,
+                height: 1,
+            };
+            guard_targets.insert(id, (None, garrison.owner, cell, Body::Building(footprint)));
+        }
+    }
     let mut state = world.remove_resource::<TacticalState>().unwrap_or_default();
     state.orders.retain(|id, _| actors.contains_key(id));
     state.waypoints.retain(|id, _| actors.contains_key(id));
@@ -166,9 +186,9 @@ pub(crate) fn advance(world: &mut World) {
                         .and_then(|w| world.resource::<Definitions>().weapon(w.kind))
                         .map_or(0, |w| w.range)
                 };
-                let chosen = actors
+                let chosen = guard_targets
                     .iter()
-                    .filter(|(target, (_, o, c, body))| {
+                    .filter(|(target, (target_entity, o, c, body))| {
                         world.resource::<Players>().hostile(owner, *o)
                             && !world
                                 .resource::<SpecialState>()
@@ -182,6 +202,14 @@ pub(crate) fn advance(world: &mut World) {
                                 (i64::from(c.x) - i64::from(anchor.x)) * 256,
                                 (i64::from(c.y) - i64::from(anchor.y)) * 256,
                                 range,
+                            )
+                            && crate::combat::guard_can_acquire(
+                                world,
+                                e,
+                                id,
+                                *target_entity,
+                                **target,
+                                body,
                             )
                     })
                     .map(|(id, (_, _, c, _))| {

@@ -204,8 +204,10 @@ pub(crate) fn show_hover_label(
         .and_then(|cursor| {
             let definitions = host.definitions()?;
             let point = camera.viewport_to_world_2d(camera_transform, cursor).ok();
-            let (entity, item, owner) = hovered_entity(&host, point, hovered.0, &views)?;
+            let (entity, mut item, mut owner) = hovered_entity(&host, point, hovered.0, &views)?;
             let world = host.world();
+            // The visible bar already conveys a health ratio, not an absolute strength. Keep
+            // that same ratio while every identity-dependent field follows the rendered guise.
             let max = match item {
                 ProductionItem::Unit(kind) => definitions.unit_combat(kind),
                 ProductionItem::Building(kind) => definitions.building_combat(kind),
@@ -215,6 +217,15 @@ pub(crate) fn show_hover_label(
                 .get::<Health>(entity)
                 .map(|health| health.hit_points)
                 .zip(max);
+            let disguise = world.get::<SimId>(entity).and_then(|id| {
+                world
+                    .get_resource::<sim::SpecialState>()?
+                    .disguise_for(HUMAN, *id)
+            });
+            if let Some(kind) = disguise {
+                item = ProductionItem::Unit(kind);
+                owner = HUMAN;
+            }
             // Another player's are named by its team colour and the country it plays.
             let whose = (owner != HUMAN).then(|| {
                 let teams = teams.as_deref().copied().unwrap_or_default();
@@ -234,9 +245,10 @@ pub(crate) fn show_hover_label(
                 text.push_str(&armour);
             }
             // RA4: the rank of a veteran or elite unit.
-            if let Some(rank) = world
-                .get::<sim::Experience>(entity)
-                .and_then(|experience| rank_name(experience.rank))
+            if disguise.is_none()
+                && let Some(rank) = world
+                    .get::<sim::Experience>(entity)
+                    .and_then(|experience| rank_name(experience.rank))
             {
                 text.push('\n');
                 text.push_str(rank);
@@ -254,27 +266,19 @@ pub(crate) fn show_hover_label(
             ))
         })
         .or_else(|| {
-            // Scenery the player has explored: it belongs to nobody and can be destroyed.
+            // Unseen scenery uses one last-observed snapshot, including whether it was
+            // occupied. Never consult live hidden Props/garrisons even to choose label presence.
             let cursor = cursor.filter(|_| host.running() && *mode == InterfaceMode::Normal)?;
             let cell = hovered.0?;
             let explored = host.players()?.get(HUMAN)?.vision().is_explored(cell);
-            let prop = host.props()?.at(cell).filter(|_| explored)?;
-            let id = host.props()?.id_at(cell)?;
+            let observed = host.observed_scenery(cell).filter(|_| explored)?;
+            let prop = observed.prop?;
             let mut text = scenery_text(prop.kind, prop.hit_points);
-            if let Some(state) = host.world().get_resource::<sim::SpecialState>()
-                && let Some(g) = state.garrisons.get(&id)
-            {
-                if g.owner != HUMAN
-                    && (!host.players()?.get(HUMAN)?.vision().is_visible(cell)
-                        || state.hidden.contains(&(HUMAN, id)))
-                {
-                    return None;
-                }
-                let count = state.cargo.get(&id).map_or(0, Vec::len);
+            if let Some((owner, count)) = observed.garrison {
                 text.push_str(&format!(
                     "\n{} occupants · {}",
                     count,
-                    if g.owner == HUMAN {
+                    if owner == HUMAN {
                         "Yours · D to evacuate"
                     } else {
                         "Enemy"
@@ -304,8 +308,31 @@ pub(crate) fn show_hover_label(
 }
 
 #[cfg(test)]
+pub(crate) fn privacy_scenery_label(app: &mut App, cell: sim::CellPos) -> (String, Display) {
+    use bevy::ecs::system::RunSystemOnce;
+    let has_label = app
+        .world_mut()
+        .query_filtered::<Entity, With<HoverLabel>>()
+        .iter(app.world())
+        .next()
+        .is_some();
+    if !has_label {
+        app.world_mut().run_system_once(spawn_hover_label).unwrap();
+    }
+    crate::privacy_native::hover_cell(app, cell);
+    app.world_mut()
+        .run_system_once(show_hover_label)
+        .expect("actual scenery hover");
+    let world = app.world_mut();
+    let mut query = world.query_filtered::<(&Text, &Node), With<HoverLabel>>();
+    let (text, node) = query.single(world).unwrap();
+    (text.0.clone(), node.display)
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
+    include!("privacy_hover_tests.rs");
 
     #[test]
     fn ra5_neutral_ownership_is_named_without_an_enemy_team_label() {

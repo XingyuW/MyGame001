@@ -117,6 +117,17 @@ struct AtmosphereClock {
     time: f32,
     last_puff: f32,
 }
+
+#[cfg(test)]
+pub(crate) fn privacy_materials(app: &mut App) {
+    app.insert_resource(Materials {
+        terrain: vec![Handle::default(); ATLASES],
+        glow: Handle::default(),
+        smoke: Handle::default(),
+        ring: Handle::default(),
+        crate_image: Handle::default(),
+    });
+}
 impl Plugin for BattlefieldPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<AtmosphereClock>()
@@ -454,7 +465,7 @@ fn terrain(
         }
     }
 }
-/// Clears destroyed scenery ([`SimEvent::PropDestroyed`]) from the picture: its top goes, churned
+/// Clears observed destroyed scenery from the picture: its top goes, churned
 /// earth is left, and the map the interface reads (`MapTerrain`, `MapLooks`: picking, order
 /// preview, minimap) shows open ground there. The blast itself is drawn by [`effects`].
 fn bridge_states(
@@ -520,21 +531,22 @@ fn garrison_pips(host: Res<SimHost>, map: Option<Res<MapView>>, mut gizmos: Gizm
 
 fn raze_scenery(
     mut commands: Commands,
-    mut events: MessageReader<SimEvent>,
+    host: Res<SimHost>,
     map: Option<Res<MapView>>,
     materials: Option<Res<Materials>>,
     mut terrain: Option<ResMut<MapTerrain>>,
     mut looks: Option<ResMut<crate::map::MapLooks>>,
     ground: Query<(Entity, &Ground)>,
 ) {
-    let razed: Vec<CellPos> = events
-        .read()
-        .filter_map(|event| match event {
-            SimEvent::PropDestroyed { cell, kind, .. } if *kind != sim::PropKind::Bridge => {
-                Some(*cell)
-            }
-            _ => None,
+    let razed: std::collections::BTreeSet<CellPos> = ground
+        .iter()
+        .filter(|(_, tile)| {
+            tile.scenery
+                && host
+                    .observed_scenery(tile.cell)
+                    .is_some_and(|observed| observed.prop.is_none())
         })
+        .map(|(_, tile)| tile.cell)
         .collect();
     let (Some(map), Some(materials)) = (map, materials) else {
         return;
@@ -1200,6 +1212,7 @@ pub(crate) fn clear(world: &mut World) {
 
 #[cfg(test)]
 mod tests {
+    include!("privacy_scenery_tests.rs");
     use bevy::ecs::system::RunSystemOnce;
     use sim::{Command, Crates, Grid, Mobile, Owner, PlayerId};
 

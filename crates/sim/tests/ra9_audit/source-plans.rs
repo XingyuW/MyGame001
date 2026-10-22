@@ -1,4 +1,4 @@
-//! UNCOMPILED/UNRUN compositor only; each original module retains its own exact gates.
+//! Historical preparation note: UNCOMPILED/UNRUN compositor only; each original module retains its own exact gates.
 use super::*;
 use source_routes::{Class, Route};
 type Specification = (SourceKey, Route, Class, String, String);
@@ -248,6 +248,7 @@ pub(super) fn admit(
     route: Route,
     s: &scope_inputs::ObservedScope,
     fire: &fire_keys::Evidence,
+    replacement: Option<&policy_admission::SourceAcceptance<'_>>,
 ) -> AuditResult<()> {
     let binding = policy_admission::input_binding();
     match route {
@@ -261,8 +262,15 @@ pub(super) fn admit(
             if !p.masked.contains(&row.atom.key) {
                 return Err("masked source not independently demanded".into());
             }
-            let approval = policy_admission::source_acceptance(&row.atom.key)?;
+            let approval = selected_source_acceptance(&row.atom.key, replacement)?;
             masked_speed_admission::require(a, i, d, row, approval.as_ref(), binding)?;
+            let accepted = approval
+                .as_ref()
+                .ok_or("missing individual masked source acceptance")?;
+            s.require_routes(
+                accepted.native_receipts,
+                &BTreeSet::from(["static/exact-source-current-model/masked19"]),
+            )?;
             if !p.masked_done.insert(row.atom.key.clone()) {
                 return Err("duplicate masked source outcome".into());
             }
@@ -274,8 +282,41 @@ pub(super) fn admit(
         Route::LegacyAi361 => legacy_ai_policy::admit(&mut p.legacy_ai, a, i, d, row, s),
         Route::LegacyModel543 => legacy_model_policy::admit(&mut p.legacy_model, a, i, d, row, s),
         Route::Static116 | Route::Metadata147 | Route::Residual117 => {
-            legacy_source_admission::require(a, i, d, row, route, s)
+            let approval = selected_source_acceptance(&row.atom.key, replacement)?;
+            legacy_source_admission::require(a, i, d, row, route, s, approval.as_ref())?;
+            let accepted = approval
+                .as_ref()
+                .ok_or("missing individual exact source acceptance")?;
+            // Declare exact live identity from the route, source key and observed scope.
+            // The accepted identity and receipt text never supply their own expectations.
+            let (consumer, guard) = single_proposal_binding(p, row, route, s)?;
+            let proposal = policy_admission::SourceProposal {
+                key: row.atom.key.clone(),
+                exact: &row.exact_value,
+                reason: &row.reason,
+                consumer_bindings: &consumer,
+                model_guard_id: &guard,
+            };
+            policy_admission::source_reason(i, row, &proposal, Some(accepted), &consumer, binding)?;
+            let receipt_route = match route {
+                Route::Static116 => "static/exact-source-current-model/static116",
+                Route::Metadata147 => "static/exact-source-current-model/metadata147",
+                Route::Residual117 => "static/exact-source-current-model/residual117",
+                _ => return Err("foreign legacy source evidence route".into()),
+            };
+            s.require_routes(accepted.native_receipts, &BTreeSet::from([receipt_route]))
         }
+    }
+}
+fn selected_source_acceptance<'a>(
+    key: &SourceKey,
+    replacement: Option<&policy_admission::SourceAcceptance<'a>>,
+) -> AuditResult<Option<policy_admission::SourceAcceptance<'a>>> {
+    // The immutable replacement belongs only to this audit call and this exact source key.
+    // All other records use the installed index, including during parallel test execution.
+    match replacement.filter(|a| &a.key == key) {
+        Some(a) => Ok(Some(a.clone())),
+        None => policy_admission::source_acceptance(key),
     }
 }
 pub(super) fn finish(p: &Plans, a: &Audit) -> AuditResult<()> {

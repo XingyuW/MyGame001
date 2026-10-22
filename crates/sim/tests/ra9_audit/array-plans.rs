@@ -1,4 +1,4 @@
-//! UNVALIDATED independently declared array contracts plus actual native loaded projections.
+//! Historical preparation note: UNVALIDATED independently declared array contracts plus actual native loaded projections.
 //! Declaration never reads Definitions, successful adapter outputs, or actual raw lengths.
 //! Comparison builds its own ExpectedElement provenance; exact dependency equality detects
 //! omitted/foreign component associations. The separate ledger grants no global source credit.

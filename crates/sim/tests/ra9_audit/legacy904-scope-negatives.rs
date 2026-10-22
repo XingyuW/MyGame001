@@ -1,4 +1,4 @@
-//! UNCOMPILED/UNRUN actual final baseline first, no permanently unaccepted table assertion.
+//! Historical preparation note: UNCOMPILED/UNRUN actual final baseline first, no permanently unaccepted table assertion.
 use super::*;
 #[test]
 fn ra9_legacy_authority_missing_end_rejects_instead_of_widening_to_eof() -> AuditResult<()> {

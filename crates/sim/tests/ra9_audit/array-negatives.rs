@@ -1,4 +1,4 @@
-//! UNRUN actual loaded-array mutations. Positive calls invoke the unchanged native adapter
+//! Historical preparation note: UNRUN actual loaded-array mutations. Positive calls invoke the unchanged native adapter
 //! first; mutants must load successfully and fail the intended array component/length check.
 //! Keyed Verses and unique prerequisite reorders are separate expected-pass controls.
 use super::*;

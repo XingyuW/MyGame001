@@ -1,4 +1,4 @@
-//! UNVALIDATED source/provenance contracts. Integrate inside ra9_audit only after native runs.
+//! Historical preparation note: UNVALIDATED source/provenance contracts. Integrate inside ra9_audit only after native runs.
 //! No source retrieval, branch premise or recognized key by itself grants coverage.
 use super::fire_keys::Evidence;
 use super::*;

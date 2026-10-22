@@ -1,4 +1,4 @@
-//! UNVALIDATED/UNRUN metadata-only implementation non-use proposal. No production patch.
+//! Historical preparation note: UNVALIDATED/UNRUN metadata-only implementation non-use proposal. No production patch.
 //! Only real source-code absence/model approval admits these exact147 rows; never RA2 semantic
 //! non-use, constant native witnesses, Own coverage, default/read/alias credit or a reason wildcard.
 use super::{

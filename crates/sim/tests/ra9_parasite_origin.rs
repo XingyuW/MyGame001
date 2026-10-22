@@ -1,4 +1,4 @@
-//! UNCOMPILED / UNRUN. Install only after schema10 + integrated370471e + identity delta.
+//! Historical preparation note: UNCOMPILED / UNRUN. Install only after schema10 + integrated370471e + identity delta.
 //! Native current-model fixture, not stock Drone-on-Drone parity: common fixed HP2000/armour
 //! light gives stock Parasite a positive versus. The two arms differ ONLY in TypeImmune0/1.
 //! This proves ordinary periodic damage immunity, not refusal of parasite attachment.
