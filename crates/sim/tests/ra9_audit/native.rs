@@ -1,4 +1,4 @@
-//! UNVALIDATED/PENDING native-key comparison bodies. No compile/simulation executed.
+//! Historical preparation note: UNVALIDATED/PENDING native-key comparison bodies. No compile/simulation executed.
 //! These inspect actual loaded public fields; behavior/timing proof is explicitly separate.
 use super::actual::{check_int, optional, rule};
 use super::combat::{Conversion, converted};

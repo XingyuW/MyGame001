@@ -1,4 +1,4 @@
-//! UNCOMPILED/UNRUN small shared table/real-loader guards for two existing-style policies.
+//! Historical preparation note: UNCOMPILED/UNRUN small shared table/real-loader guards for two existing-style policies.
 //! Uses the existing common SourceProposal/SourceAcceptance/ObservedScope gates; no new receipts.
 use super::*;
 pub(super) fn records<'a>(text: &'a str, header: &str) -> AuditResult<Vec<Vec<&'a str>>> {
@@ -356,7 +356,7 @@ pub(super) fn checked_ai_snapshot(ai: &sim::AiDefinitions, d: &Definitions) -> A
     }
     Ok(got)
 }
-// UNCOMPILED/UNRUN. Append inside legacy904_support; typed current-policy guard only.
+// Historical preparation note: UNCOMPILED/UNRUN. Append inside legacy904_support; typed current-policy guard only.
 // This does not observe an unparsed source key, create Native credit or simulate a selector.
 pub(super) fn last_five_model_guard(
     i: &Inputs,

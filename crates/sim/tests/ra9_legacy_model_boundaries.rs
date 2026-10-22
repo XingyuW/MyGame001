@@ -1,4 +1,4 @@
-//! UNCOMPILED/UNRUN first5 legacy904 route proposals. Proposed integration test file.
+//! Historical preparation note: UNCOMPILED/UNRUN first5 legacy904 route proposals. Proposed integration test file.
 //! Uses existing ra7_common stock world/public spawns/tick helpers; no alternate simulation.
 //! Guard/Attack/Move/Deploy go through real CommandQueue and SimSchedule in common::tick.
 mod ra7_common;

@@ -1,4 +1,4 @@
-//! UNVALIDATED cache-only adapter body draft; never compiled/run. Current public APIs checked.
+//! Historical preparation note: UNVALIDATED cache-only adapter body draft; never compiled/run. Current public APIs checked.
 //! Integrate aliases/visibility, independent required-field/dependency enumeration, source display
 //! for existing difference identities, and wrapper scopes only after explicit canonical release.
 use super::actual::{check_int, optional, rule};

@@ -1,0 +1,51 @@
+{
+  "utc": "2026-10-22T05:08:37.213571+00:00",
+  "status": "OBSERVED_BASELINE_FAILURE_DURING_ORCHESTRATOR_DOCUMENT_REWRITE_RETRY_REQUIRED",
+  "actual_failed_target": {
+    "exit": 101,
+    "passed": 184,
+    "failed": 1,
+    "ignored": 0,
+    "filtered": 0,
+    "raw": "docs/validation/ra2-parity/remediation-1/B-focused-02/04-audit-entire-after.log",
+    "raw_sha256": "828327550a00bf3dd0d6e93063287b5912bcbf8279b434c72598d7fd1526e4e5",
+    "failed_case": "ra9_single_source_static116_nonfirst_acceptance_controls",
+    "error": "source admission Model162 rules:MultiplayerDialogSettings:CaptureTheFlag: model162 missing policy start anchor"
+  },
+  "concurrent_write": {
+    "owner": "root",
+    "operation": "Path.write_text replacing one R195 documentation sentence; truncate/write rather than atomic replace",
+    "document": "docs/DECISIONS.md",
+    "mtime_utc": "2026-10-22T04:53:36.590003+00:00",
+    "current_sha256": "7f04a6f2a21996260e1a00c825bbe0caa266913fb83277f2f2a37515b50148cc"
+  },
+  "stable_actual_guards": [
+    {
+      "guard": {
+        "group_id": "lobby-modes",
+        "document_path": "docs/DECISIONS.md",
+        "section_start": "### R84. RA7 shroud-only matches, concealment timing and reconnaissance",
+        "section_end": "### R85. RA7 orders, controls and original rate-limited announcements",
+        "span_authority_id": "R84",
+        "required_case_insensitive_needle": "Gap uses"
+      },
+      "current_span_sha256": "0e21cd4bd5679db80908404c73a75ea74cfb4ccd10d95ebdaf0eb9343a3a0fbf",
+      "matches_original_frozen_authority": true
+    },
+    {
+      "guard": {
+        "group_id": "lobby-modes",
+        "document_path": "docs/DECISIONS.md",
+        "section_start": "### R85. RA7 orders, controls and original rate-limited announcements",
+        "section_end": "### R86. RA7 last-stand fixture preserves its explicit current-sight scenario",
+        "span_authority_id": "R85",
+        "required_case_insensitive_needle": "At most32"
+      },
+      "current_span_sha256": "5b1d5ff0629ecd880d9dac885a3f9ed618dc6930cbd32a86d4386fc9203b0925",
+      "matches_original_frozen_authority": true
+    }
+  ],
+  "inference": "The missing anchor coincided with the orchestrator rewriting its live policy file. Both required unchanged R84/R85 spans and needles are present and authenticate now, and the other three same-whole-audit controls passed. No read-time bytes were captured, so the exact transient open/read is inferred, not directly traced. Hold all policy documents stable during native validation; use atomic metadata writes only after native jobs finish.",
+  "new_controls_scope": "Three complete controls pass21 designated rejections/0escapes/0wrong failures; Static116 failed its baseline before its7variants. Do not report4passingcontrols or a whole185pass. Repeat all4 on final corrected scope; mandatory full13 must run185 together successfully.",
+  "production_or_test_fix_for_this_setup_error": null
+}

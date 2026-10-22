@@ -25,6 +25,8 @@ mod minimap;
 mod notices;
 mod options;
 mod presentation;
+#[cfg(test)]
+mod privacy_native;
 mod projection;
 mod ra7_controls;
 mod selection;

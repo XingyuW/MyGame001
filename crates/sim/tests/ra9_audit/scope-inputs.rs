@@ -1,4 +1,4 @@
-//! UNCOMPILED/UNRUN reads actual metadata outputs of --ra9-scope; expected tables are not
+//! Historical preparation note: UNCOMPILED/UNRUN reads actual metadata outputs of --ra9-scope; expected tables are not
 //! observations. Root separately authenticates producer inputs, artifact SHA and decisions.
 //! Fresh actual file-set/byte-count/FNV checks detect ordinary source drift without new deps.
 //! FNV is not cryptographic authentication; root's actual SHA256 verification remains required.
@@ -167,7 +167,16 @@ impl ObservedScope {
         &self,
         row: &Unused,
     ) -> AuditResult<policy_admission::SourceAcceptance<'static>> {
-        let a = policy_admission::source_acceptance(&row.atom.key)?
+        let a = policy_admission::source_acceptance(&row.atom.key)?;
+        self.accepted_source_from(row, a.as_ref())
+    }
+    pub(super) fn accepted_source_from<'a>(
+        &self,
+        row: &Unused,
+        acceptance: Option<&policy_admission::SourceAcceptance<'a>>,
+    ) -> AuditResult<policy_admission::SourceAcceptance<'a>> {
+        let a = acceptance
+            .cloned()
             .ok_or("missing individual exact source acceptance")?;
         if a.key != row.atom.key
             || a.exact != row.exact_value

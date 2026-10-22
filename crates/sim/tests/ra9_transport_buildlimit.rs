@@ -1,4 +1,4 @@
-//! UNVALIDATED / PENDING. Native nested individual BuildLimit rejection and death release.
+//! Historical preparation note: UNVALIDATED / PENDING. Native nested individual BuildLimit rejection and death release.
 //! The temporary metadata variant is test fixture data, never a canonical generated RON edit.
 mod ra9_soundness_common;
 use ra9_soundness_common::*;

@@ -1,0 +1,10 @@
+{
+  "status": "ROOT_POSTPROPAGATION_SOURCE_AND_NONFACTUAL_CELL_READBACK_PASS",
+  "packet_sha256": "74301b64e3ac002ff085d1cf87d31218b57110476b4078253f1428c29cb8bafe",
+  "propagation_sha256": "411e66c0a928a6577034c23644041a4ef719866cf13ab9e0e5eaa23fb3a68bca",
+  "source_files": 670,
+  "derived_outputs": 15,
+  "authority_spans": 64,
+  "actual_cell_deltas": 3290,
+  "unchanged_policy_fields": "Every class/value/reason/guard/recorded policy decision/typed qualified receipt byte-equal; consumer token order/text exact except named factual tokens."
+}

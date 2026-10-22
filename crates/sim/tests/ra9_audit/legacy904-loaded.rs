@@ -1,4 +1,4 @@
-//! UNCOMPILED/UNRUN typed current-policy observations. NO source Expected/witness credit.
+//! Historical preparation note: UNCOMPILED/UNRUN typed current-policy observations. NO source Expected/witness credit.
 use super::*;
 pub(super) fn ai_snapshot(ai: &sim::AiDefinitions, d: &Definitions) -> AuditResult<String> {
     let mut out = BTreeMap::<String, String>::new();

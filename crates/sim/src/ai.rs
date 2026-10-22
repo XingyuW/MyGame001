@@ -1479,6 +1479,44 @@ fn repair_bridge(
     // The Engineer, or its home gathering point before it is trained, must reach the entrance.
     // An arbitrary army member may already be stranded on the other bank.
     let from = engineer.map_or(controller.gather, |u| u.mobile.cell);
+    // nearest_cell also tests passability during traversal. Use a terrain-only planning copy
+    // populated with legitimate building knowledge, rather than letting an unseen footprint
+    // select either a different endpoint or a different route to that endpoint. Real movement
+    // still resolves unknown physical obstacles after the ordinary Move is admitted.
+    let terrain = (0..view.grid.height())
+        .flat_map(|y| {
+            (0..view.grid.width())
+                .filter_map(move |x| view.grid.cell(CellPos::new(x as i32, y as i32)).copied())
+        })
+        .collect();
+    let Some(mut planning) = Grid::from_cells(view.grid.width(), view.grid.height(), terrain)
+    else {
+        return Vec::new();
+    };
+    for building in buildings.iter().filter(|building| {
+        building.owner == view.player || view.vision.sees_footprint(building.footprint)
+    }) {
+        for cell in building.footprint.cells() {
+            planning.cover(cell, building.id);
+        }
+    }
+    for (&id, known) in controller
+        .known
+        .iter()
+        .filter(|(_, known)| !view.vision.sees_footprint(known.footprint))
+    {
+        for cell in known.footprint.cells() {
+            planning.cover(cell, id);
+        }
+    }
+    // Neutral huts have their own observed memory, outside the hostile-building table.
+    for (&id, &(_, cell)) in controller
+        .repair_huts
+        .iter()
+        .filter(|(_, (_, cell))| !view.vision.is_visible(*cell))
+    {
+        planning.cover(cell, id);
+    }
     let hut = controller
         .repair_huts
         .iter()
@@ -1504,10 +1542,8 @@ fn repair_bridge(
             })
         })
         .filter_map(|(&id, &(bridge, cell))| {
-            crate::pathfinding::nearest_cell(view.grid, from, |p| {
-                view.grid.is_passable(p)
-                    && view.grid.building(p).is_none()
-                    && chebyshev(p, cell) == 1
+            crate::pathfinding::nearest_cell(&planning, from, |p| {
+                planning.is_passable(p) && chebyshev(p, cell) == 1
             })
             .map(|goal| (chebyshev(from, cell), id, bridge, cell, goal))
         })

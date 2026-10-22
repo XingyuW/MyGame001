@@ -1,4 +1,4 @@
-// UNCOMPILED/UNRUN. Child of source_routes.rs. Every negative starts with real final
+// Historical preparation note: UNCOMPILED/UNRUN. Child of source_routes.rs. Every negative starts with real final
 // audit_at success and actual native/loaded adapters. Missing decisions are not positive fixtures.
 use super::super::{
     Audit, Definitions, Inputs, audit_at, fire_audit, fire_keys, load_audit, run_adapters,
@@ -38,6 +38,7 @@ fn baseline() -> AuditResult<(
         &mut r,
         &s,
         &fire,
+        None,
     )?;
     a.finish(&i.reference)?;
     Ok((i, d, a, r, s, fire))

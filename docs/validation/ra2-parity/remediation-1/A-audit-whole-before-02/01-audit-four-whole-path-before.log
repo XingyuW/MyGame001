@@ -1,0 +1,114 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 3m 32s
+     Running tests/ra9_data_parity.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_data_parity-4bf9e87c254d4d01)
+
+running 4 tests
+test ra9_audit::single_source_acceptance_negatives::ra9_single_source_masked19_nonfirst_acceptance_controls has been running for over 60 seconds
+test ra9_audit::single_source_acceptance_negatives::ra9_single_source_metadata147_nonfirst_acceptance_controls has been running for over 60 seconds
+test ra9_audit::single_source_acceptance_negatives::ra9_single_source_residual117_nonfirst_acceptance_controls has been running for over 60 seconds
+test ra9_audit::single_source_acceptance_negatives::ra9_single_source_static116_nonfirst_acceptance_controls has been running for over 60 seconds
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL masked19 foreign-consumer REJECTED source admission Masked19 rules:105mmE:Speed: source acceptance does not bind exact current consumer/model/reason
+RA9_SINGLE_SOURCE_CONTROL masked19 foreign-guard REJECTED source admission Masked19 rules:105mmE:Speed: source acceptance does not bind exact current consumer/model/reason
+RA9_SINGLE_SOURCE_CONTROL masked19 missing-route REJECTED source admission Masked19 rules:105mmE:Speed: individual source model decision/final scope/native receipts missing
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL static116 foreign-consumer ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL residual117 foreign-consumer ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL metadata147 foreign-consumer ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL masked19 foreign-route ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL residual117 foreign-guard ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL static116 foreign-guard ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL metadata147 foreign-guard ESCAPED_FINAL_RECONCILIATION
+RA9_SINGLE_SOURCE_CONTROL static116 missing-route REJECTED source admission Static116 art:CABHUT:Height: individual exact source policy/consumer/final scope/real receipts missing
+RA9_SINGLE_SOURCE_CONTROL residual117 missing-route REJECTED source admission Residual117 rules:AAHeatSeeker2:ROT: individual exact source policy/consumer/final scope/real receipts missing
+RA9_SINGLE_SOURCE_CONTROL metadata147 missing-route REJECTED source admission Metadata147 rules:AEGIS:Points: individual exact source policy/consumer/final scope/real receipts missing
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL masked19 malformed-receipt ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL static116 foreign-route ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL residual117 foreign-route ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL metadata147 foreign-route ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL masked19 hashless-receipt ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL static116 malformed-receipt ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL residual117 malformed-receipt ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL metadata147 malformed-receipt ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL masked19 duplicate-route ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL static116 hashless-receipt ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL residual117 hashless-receipt ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL metadata147 hashless-receipt ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+
+thread 'ra9_audit::single_source_acceptance_negatives::ra9_single_source_masked19_nonfirst_acceptance_controls' (16368577) panicked at crates/sim/tests/ra9_audit/single-source-acceptance-negatives.rs:179:5:
+masked19: foreign-route: accepted through final reconciliation
+malformed-receipt: accepted through final reconciliation
+hashless-receipt: accepted through final reconciliation
+duplicate-route: accepted through final reconciliation
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra9_audit::single_source_acceptance_negatives::ra9_single_source_masked19_nonfirst_acceptance_controls ... FAILED
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL static116 duplicate-route ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL residual117 duplicate-route ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL metadata147 duplicate-route ESCAPED_FINAL_RECONCILIATION
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+
+thread 'ra9_audit::single_source_acceptance_negatives::ra9_single_source_static116_nonfirst_acceptance_controls' (16368580) panicked at crates/sim/tests/ra9_audit/single-source-acceptance-negatives.rs:179:5:
+static116: foreign-consumer: accepted through final reconciliation
+foreign-guard: accepted through final reconciliation
+foreign-route: accepted through final reconciliation
+malformed-receipt: accepted through final reconciliation
+hashless-receipt: accepted through final reconciliation
+duplicate-route: accepted through final reconciliation
+test ra9_audit::single_source_acceptance_negatives::ra9_single_source_static116_nonfirst_acceptance_controls ... FAILED
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+
+thread 'ra9_audit::single_source_acceptance_negatives::ra9_single_source_residual117_nonfirst_acceptance_controls' (16368579) panicked at crates/sim/tests/ra9_audit/single-source-acceptance-negatives.rs:179:5:
+residual117: foreign-consumer: accepted through final reconciliation
+foreign-guard: accepted through final reconciliation
+foreign-route: accepted through final reconciliation
+malformed-receipt: accepted through final reconciliation
+hashless-receipt: accepted through final reconciliation
+duplicate-route: accepted through final reconciliation
+test ra9_audit::single_source_acceptance_negatives::ra9_single_source_residual117_nonfirst_acceptance_controls ... FAILED
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+
+thread 'ra9_audit::single_source_acceptance_negatives::ra9_single_source_metadata147_nonfirst_acceptance_controls' (16368578) panicked at crates/sim/tests/ra9_audit/single-source-acceptance-negatives.rs:179:5:
+metadata147: foreign-consumer: accepted through final reconciliation
+foreign-guard: accepted through final reconciliation
+foreign-route: accepted through final reconciliation
+malformed-receipt: accepted through final reconciliation
+hashless-receipt: accepted through final reconciliation
+duplicate-route: accepted through final reconciliation
+test ra9_audit::single_source_acceptance_negatives::ra9_single_source_metadata147_nonfirst_acceptance_controls ... FAILED
+
+failures:
+
+failures:
+    ra9_audit::single_source_acceptance_negatives::ra9_single_source_masked19_nonfirst_acceptance_controls
+    ra9_audit::single_source_acceptance_negatives::ra9_single_source_metadata147_nonfirst_acceptance_controls
+    ra9_audit::single_source_acceptance_negatives::ra9_single_source_residual117_nonfirst_acceptance_controls
+    ra9_audit::single_source_acceptance_negatives::ra9_single_source_static116_nonfirst_acceptance_controls
+
+test result: FAILED. 0 passed; 4 failed; 0 ignored; 0 measured; 181 filtered out; finished in 805.47s
+
+error: test failed, to rerun pass `-p sim --test ra9_data_parity`

@@ -1,4 +1,4 @@
-//! UNVALIDATED cache-only unit/building adapter body draft. No compilation/execution.
+//! Historical preparation note: UNVALIDATED cache-only unit/building adapter body draft. No compilation/execution.
 //! Uses actual public Definitions, Production, ArsenalEntry and CombatTerms accessors.
 //! Shared physical path registration/difference identity normalization remains for integration.
 use super::actual::{check_int, optional, positive_round, rule};

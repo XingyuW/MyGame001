@@ -1,4 +1,4 @@
-//! UNVALIDATED / PENDING actual-value adapters. NO compilation or test execution performed.
+//! Historical preparation note: UNVALIDATED / PENDING actual-value adapters. NO compilation or test execution performed.
 //! Conversion rows copied from the independent existing audit, never from generator output.
 //! Must integrate with registered actual-field requirements before root releases canonical RA9.
 use super::actual::{check_int, optional, positive_round, rule, scaled};
@@ -1112,7 +1112,7 @@ pub(super) fn warhead(
     }
     Ok(())
 }
-// PENDING integration: wrappers must enumerate actual complete arrays/mappings before calls;
+// Historical preparation note: PENDING integration: wrappers must enumerate actual complete arrays/mappings before calls;
 // compare armour identities/order explicitly; audit effect9 damage/warhead; register physical
 // requirements independently; port source_display exactly for23 current differences; don't
 // pre-mark foreign differences or let component/whole row credit overlap.

@@ -775,7 +775,14 @@ pub(crate) fn process_regular_commands(
                 })
         } else {
             let buildings = buildings.get_or_insert_with(|| economy.building_index());
-            economy_commands::apply(&issued, &mut economy, buildings, &mut grid, &mut events)
+            economy_commands::apply(
+                &issued,
+                &mut economy,
+                buildings,
+                &mut grid,
+                &mut events,
+                &special,
+            )
         };
         if let Err(reason) = result
             && !ai_intent

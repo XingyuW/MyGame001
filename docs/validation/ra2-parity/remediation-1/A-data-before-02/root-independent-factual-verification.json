@@ -1,0 +1,42 @@
+{
+  "status": "ROOT_INDEPENDENT_FACTUAL_VERIFICATION_PASS_NOT_POLICY_OR_NATIVE_APPROVAL",
+  "utc": "2026-10-22T04:07:41.485485+00:00",
+  "root_factual_id": "ROOT_REMEDIATION1_A_DATA_BEFORE_02_FACTUAL_2026_10_22_040741",
+  "packet": {
+    "path": "docs/validation/ra2-parity/remediation-1/A-data-before-02/actual-input-scope.json",
+    "bytes": 187629,
+    "sha256": "6d7725c2028e040971525b7beeb4fd3055c4760f344af334a984070993fd2e1c"
+  },
+  "source_count": 670,
+  "core_count": 103,
+  "derived_count": 15,
+  "authority_count": 64,
+  "source_added": [
+    "crates/game/src/privacy_hover_tests.rs",
+    "crates/game/src/privacy_interact_tests.rs",
+    "crates/game/src/privacy_native.rs",
+    "crates/game/src/privacy_scenery_tests.rs",
+    "crates/game/src/privacy_selection_tests.rs",
+    "crates/game/src/privacy_smoke_tests.rs",
+    "crates/sim/tests/ra9_audit/single-source-acceptance-negatives.rs",
+    "crates/sim/tests/ra9_bay_current_state.rs",
+    "crates/sim/tests/ra9_crate_cargo_census.rs",
+    "crates/sim/tests/ra9_guard_effective_targets.rs",
+    "crates/sim/tests/ra9_runtime_common/mod.rs",
+    "crates/sim/tests/ra9_runtime_liveness.rs",
+    "crates/sim/tests/ra9_specialist_firepower.rs",
+    "crates/sim/tests/ra9_temporal_sources.rs"
+  ],
+  "source_changed_count": 34,
+  "verified_scope": {
+    "original_sha256": "adc869ca037db5141f562f18092d022045e194de0d1204a46b9ec8372b2b826f",
+    "model_census_sha256": "fd96e4ba785760c4b44642539f5ca68c932bcf1aac5732efb0bbbea05078cf0d",
+    "model_surface_sha256": "97cbecb23fefc2ca40d34698a21016c0da93bb972d6261bea12aa6177392a6eb",
+    "original_closure_sha256": "3f993d84ec5ee9e77643209623121c60c4e241cb7bcc096486d846030439ead7",
+    "special_original_sha256": "2bb1dc56e7f0729621fe625300a19665af24e823b7f026fa7cb2aa91e91469bb"
+  },
+  "physical_branch_rows": 29,
+  "physical_branch_changes": 1,
+  "howtosee_sha256": "8ae4edfadf97fc68138d03c9a12d9c1217cf0c1fb65cf6dd6010c77b1c5bd6c1",
+  "limits": "Authenticates actual bytes, discovered source scope, producer observations, protected spans and factual pointers only. Does not authorize model-policy changes or infer native pass/review."
+}

@@ -1,4 +1,4 @@
-//! UNVALIDATED/UNRUN native observations for three shipped false-only fire-key rows.
+//! Historical preparation note: UNVALIDATED/UNRUN native observations for three shipped false-only fire-key rows.
 //! Test instrumentation observes after Combat and before Visibility; it changes no simulation
 //! component, history, RNG, command or damage. It is never installed in production.
 use super::AuditResult;

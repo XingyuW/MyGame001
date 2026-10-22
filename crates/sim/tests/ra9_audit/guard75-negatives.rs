@@ -1,4 +1,4 @@
-//! UNCOMPILED/UNRUN. Install as child tests of guard75-admission.
+//! Historical preparation note: UNCOMPILED/UNRUN. Install as child tests of guard75-admission.
 //! Native gameplay acceptance is NOT granted here. Real Definitions/Inputs are loaded first;
 //! source/mapping/metadata mutations below test admission, not original engine behavior.
 use super::*;

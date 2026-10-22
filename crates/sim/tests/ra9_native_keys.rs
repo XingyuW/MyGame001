@@ -1,4 +1,4 @@
-// Preliminary native RA9 key controls; canonical acceptance is pending.
+// Native RA9 key controls; final validation and independent acceptance remain pending.
 // Real BEFORE failures and AFTER results/fixture corrections are preserved separately in
 // ra9-preliminary-logs/. Controlled fixture premises are stated at each scenario.
 mod ra7_common;

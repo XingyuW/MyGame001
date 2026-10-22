@@ -1,0 +1,8 @@
+{
+  "utc": "2026-10-22T05:11:35.632280+00:00",
+  "status": "TEST_HELPER_RETURN_TUPLE_NAMED_FOR_STRICT_CLIPPY",
+  "before_sha256": "66d5333498b8061041ec79627975c0a7125634c5c2658ee3b6e8aa22d3176696",
+  "after_sha256": "aec63f6e0ba6627eceacc45de5ef2097d6103b6c27f6cdac213516b8f5da30b9",
+  "test_assertions_or_execution_changed": false,
+  "original_failure": "B-guard-prop-after-01/04-strict-clippy.log:type_complexity"
+}

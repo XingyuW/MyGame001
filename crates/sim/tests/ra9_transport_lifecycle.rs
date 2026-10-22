@@ -1,4 +1,4 @@
-//! UNVALIDATED / PENDING. Native lifecycle supplement for ra9_transport.rs.
+//! Historical preparation note: UNVALIDATED / PENDING. Native lifecycle supplement for ra9_transport.rs.
 mod ra9_soundness_common;
 use ra9_soundness_common::*;
 use sim::{Cell, CellPos, Command, Grid, SpecialState};

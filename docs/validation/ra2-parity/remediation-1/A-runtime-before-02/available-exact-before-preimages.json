@@ -1,0 +1,103 @@
+{
+  "status": "EXACT_AVAILABLE_PREIMAGES_MATCH_EARLIER_BEFORE_HASHES",
+  "saved": [
+    {
+      "source": ".cargo/config.toml",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-runtime-before-02/available-exact-before-preimages/.cargo/config.toml",
+      "bytes": 252,
+      "sha256": "4e4bb8a187b37f615fcbbe98d26d703b3022757676f380272661aa0e14b61904"
+    },
+    {
+      "source": "Cargo.lock",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-runtime-before-02/available-exact-before-preimages/Cargo.lock",
+      "bytes": 154702,
+      "sha256": "1a65dd4b65d1f8d188b5cc0a2625a5161dd6e9fd741d41d8c017ed56411bff80"
+    },
+    {
+      "source": "Cargo.toml",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-runtime-before-02/available-exact-before-preimages/Cargo.toml",
+      "bytes": 489,
+      "sha256": "5a41f3be449fb7ca6aae8f1cbff2e563fc76e91c8e660ec940a07387a28ae54d"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/compositor-negatives.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-runtime-before-02/available-exact-before-preimages/crates/sim/tests/ra9_audit/compositor-negatives.rs",
+      "bytes": 5748,
+      "sha256": "4059a56201fb6fca4214b1f4629c6cc9b2d2f8f2da3eb065b4e6015227f94cca"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/legacy-source-admission.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-runtime-before-02/available-exact-before-preimages/crates/sim/tests/ra9_audit/legacy-source-admission.rs",
+      "bytes": 1693,
+      "sha256": "7e2d2ee3032fbbbf89235bb57f3190e5dce9d877ab0f75674c1e17ae2f9c453c"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/mod.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-runtime-before-02/available-exact-before-preimages/crates/sim/tests/ra9_audit/mod.rs",
+      "bytes": 66953,
+      "sha256": "6a5d77e912ec36e38aa1318f40915129574c8ef83af18ad8c969dd36e2089f7b"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/scope-inputs.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-runtime-before-02/available-exact-before-preimages/crates/sim/tests/ra9_audit/scope-inputs.rs",
+      "bytes": 9761,
+      "sha256": "f5ad1103bfb41077b5b96a822a13c29735daaafa59d91a4af9accc0d39af475b"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/single-source-acceptance-negatives.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-runtime-before-02/available-exact-before-preimages/crates/sim/tests/ra9_audit/single-source-acceptance-negatives.rs",
+      "bytes": 8144,
+      "sha256": "df7132cfe0b8ff8adb10d178e8b12c2b4d51ef13bd06b482a7d35e7a4b5dfe57"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/source-plans.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-runtime-before-02/available-exact-before-preimages/crates/sim/tests/ra9_audit/source-plans.rs",
+      "bytes": 12086,
+      "sha256": "dd0ef86d2583b39fbb646f1e3e9902963c78cb5578381899a852d3a939c42682"
+    },
+    {
+      "source": "crates/sim/tests/ra9_bay_current_state.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-runtime-before-02/available-exact-before-preimages/crates/sim/tests/ra9_bay_current_state.rs",
+      "bytes": 9771,
+      "sha256": "bc31ea3d945319dd760b41b5966e34e91dd95d36e4f268281860f0d243d1880f"
+    },
+    {
+      "source": "crates/sim/tests/ra9_crate_cargo_census.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-runtime-before-02/available-exact-before-preimages/crates/sim/tests/ra9_crate_cargo_census.rs",
+      "bytes": 7129,
+      "sha256": "4c277e6c929c40d4aad1f2f8142ec8c77f81fd50319cb685a7add655e73b9c81"
+    },
+    {
+      "source": "crates/sim/tests/ra9_guard_effective_targets.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-runtime-before-02/available-exact-before-preimages/crates/sim/tests/ra9_guard_effective_targets.rs",
+      "bytes": 7134,
+      "sha256": "e2195fda9ed218a7e2de9f5b9d265c57c877ae01b1b3bd360ba40ac5c84add29"
+    },
+    {
+      "source": "crates/sim/tests/ra9_runtime_common/mod.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-runtime-before-02/available-exact-before-preimages/crates/sim/tests/ra9_runtime_common/mod.rs",
+      "bytes": 7038,
+      "sha256": "4fa339409e85148493ef339c06c9dd474c16c4c67ce4500c78fd7630a4374a9f"
+    },
+    {
+      "source": "crates/sim/tests/ra9_runtime_liveness.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-runtime-before-02/available-exact-before-preimages/crates/sim/tests/ra9_runtime_liveness.rs",
+      "bytes": 7202,
+      "sha256": "5f95ade66eaf05494300dc90c78395ec2f7d506f98de76f3e6141850ad5f7336"
+    },
+    {
+      "source": "crates/sim/tests/ra9_specialist_firepower.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-runtime-before-02/available-exact-before-preimages/crates/sim/tests/ra9_specialist_firepower.rs",
+      "bytes": 8236,
+      "sha256": "6521654cf6ab67cbd15f5e092b909af3421729558698f6b3089679a559116058"
+    },
+    {
+      "source": "crates/sim/tests/ra9_temporal_sources.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-runtime-before-02/available-exact-before-preimages/crates/sim/tests/ra9_temporal_sources.rs",
+      "bytes": 21862,
+      "sha256": "25b7f97e08b9ebc5387bef10666b2b1f8b45af2df5240c8c5a06264257777f13"
+    }
+  ],
+  "unavailable_due_to_later_authorized_changes": [],
+  "limits": "Only listed saved paths match the original before hashes. Tracked baseline inputs remain available in the recorded Git predecessor. No reconstruction or completeness claim for later-changed harness versions."
+}

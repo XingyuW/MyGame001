@@ -1,0 +1,283 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 11.66s
+     Running tests/ra9_bay_current_state.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_bay_current_state-6886ee217ccfff6d)
+
+running 4 tests
+
+thread 'ra9_same_economy_one_hp_surviving_spawner_launches_positive' (16304550) panicked at crates/sim/tests/ra9_bay_current_state.rs:149:5:
+[CommandRejected { player: PlayerId(1), command: Attack { units: [SimId(1)], target: SimId(0) }, reason: UnknownTarget(SimId(0)) }]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'ra9_same_economy_incoming_missile_killed_spawner_cannot_launch' (16304549) panicked at crates/sim/tests/ra9_bay_current_state.rs:149:5:
+[CommandRejected { player: PlayerId(1), command: Attack { units: [SimId(1)], target: SimId(0) }, reason: UnknownTarget(SimId(0)) }]
+test ra9_same_economy_one_hp_surviving_spawner_launches_positive ... FAILED
+
+thread 'ra9_unfrozen_pending_dreadnought_retains_exact_27_launch_spacing' (16304552) panicked at crates/sim/tests/ra9_bay_current_state.rs:54:5:
+[CommandRejected { player: PlayerId(0), command: Attack { units: [SimId(0)], target: SimId(1) }, reason: UnknownTarget(SimId(1)) }]
+
+thread 'ra9_temporal_pending_dreadnought_cannot_launch_but_existing_missile_flies' (16304551) panicked at crates/sim/tests/ra9_bay_current_state.rs:54:5:
+[CommandRejected { player: PlayerId(0), command: Attack { units: [SimId(0)], target: SimId(1) }, reason: UnknownTarget(SimId(1)) }]
+test ra9_same_economy_incoming_missile_killed_spawner_cannot_launch ... FAILED
+test ra9_unfrozen_pending_dreadnought_retains_exact_27_launch_spacing ... FAILED
+test ra9_temporal_pending_dreadnought_cannot_launch_but_existing_missile_flies ... FAILED
+
+failures:
+
+failures:
+    ra9_same_economy_incoming_missile_killed_spawner_cannot_launch
+    ra9_same_economy_one_hp_surviving_spawner_launches_positive
+    ra9_temporal_pending_dreadnought_cannot_launch_but_existing_missile_flies
+    ra9_unfrozen_pending_dreadnought_retains_exact_27_launch_spacing
+
+test result: FAILED. 0 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p sim --test ra9_bay_current_state`
+     Running tests/ra9_crate_cargo_census.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_crate_cargo_census-dbff979393b1ff47)
+
+running 5 tests
+
+thread 'ra9_free_mcv_uses_current_root_owner_after_native_control' (16304558) panicked at crates/sim/tests/ra9_crate_cargo_census.rs:104:5:
+[CommandRejected { player: PlayerId(1), command: Attack { units: [SimId(3)], target: SimId(0) }, reason: UnknownTarget(SimId(0)) }]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra9_free_mcv_uses_current_root_owner_after_native_control ... FAILED
+
+thread 'ra9_free_mcv_counts_actual_direct_cargo_and_original_unload' (16304554) panicked at crates/sim/tests/ra9_crate_cargo_census.rs:60:5:
+assertion `left == right` failed: a live owned cargo MCV prevents guaranteed FreeMCV
+  left: (Unit, Some(SimId(3)))
+ right: (Reveal, None)
+test ra9_free_mcv_counts_actual_direct_cargo_and_original_unload ... FAILED
+
+thread 'ra9_free_mcv_counts_actual_nested_cargo_and_original_unload' (16304555) panicked at crates/sim/tests/ra9_crate_cargo_census.rs:24:14:
+called `Result::unwrap()` on an `Err` value: DataError { file: "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/runtime-fixtures/34938-5-arsenal.ron", field: "entries[80].capacity", kind: InvalidValue { found: "32", expected: "a supported arsenal value" } }
+test ra9_free_mcv_counts_actual_nested_cargo_and_original_unload ... FAILED
+test ra9_free_mcv_ignores_actual_destroyed_cargo_payload ... ok
+test ra9_free_mcv_on_map_base_and_truly_stranded_neighbors ... ok
+
+failures:
+
+failures:
+    ra9_free_mcv_counts_actual_direct_cargo_and_original_unload
+    ra9_free_mcv_counts_actual_nested_cargo_and_original_unload
+    ra9_free_mcv_uses_current_root_owner_after_native_control
+
+test result: FAILED. 2 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+error: test failed, to rerun pass `-p sim --test ra9_crate_cargo_census`
+     Running tests/ra9_guard_effective_targets.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_guard_effective_targets-d255aabcb20bc473)
+
+running 6 tests
+
+thread 'ra9_guard_preserves_loaded_gunner_area_fire_selector' (16304561) panicked at crates/sim/tests/ra9_guard_effective_targets.rs:19:5:
+Guard starved legal target or effective weapon produced no native damage; fired=false
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra9_guard_preserves_loaded_gunner_area_fire_selector ... FAILED
+
+thread 'ra9_guard_aa_only_ship_skips_nearer_ground_for_air' (16304560) panicked at crates/sim/tests/ra9_guard_effective_targets.rs:19:5:
+Guard starved legal target or effective weapon produced no native damage; fired=false
+test ra9_guard_aa_only_ship_skips_nearer_ground_for_air ... FAILED
+
+thread 'ra9_guard_skips_minimum_range_target_without_reachable_firing_cell' (16304562) panicked at crates/sim/tests/ra9_guard_effective_targets.rs:19:5:
+Guard starved legal target or effective weapon produced no native damage; fired=false
+test ra9_guard_skips_minimum_range_target_without_reachable_firing_cell ... FAILED
+
+thread 'ra9_guard_uses_elite_secondary_after_primary_target_is_ineligible' (16304565) panicked at crates/sim/tests/ra9_guard_effective_targets.rs:19:5:
+Guard starved legal target or effective weapon produced no native damage; fired=false
+
+thread 'ra9_guard_skips_one_verses_automatic_floor_nearer_target' (16304563) panicked at crates/sim/tests/ra9_guard_effective_targets.rs:19:5:
+Guard starved legal target or effective weapon produced no native damage; fired=false
+test ra9_guard_uses_elite_secondary_after_primary_target_is_ineligible ... FAILED
+test ra9_guard_skips_one_verses_automatic_floor_nearer_target ... FAILED
+
+thread 'ra9_guard_skips_zero_verses_nearer_target' (16304564) panicked at crates/sim/tests/ra9_guard_effective_targets.rs:19:5:
+Guard starved legal target or effective weapon produced no native damage; fired=false
+test ra9_guard_skips_zero_verses_nearer_target ... FAILED
+
+failures:
+
+failures:
+    ra9_guard_aa_only_ship_skips_nearer_ground_for_air
+    ra9_guard_preserves_loaded_gunner_area_fire_selector
+    ra9_guard_skips_minimum_range_target_without_reachable_firing_cell
+    ra9_guard_skips_one_verses_automatic_floor_nearer_target
+    ra9_guard_skips_zero_verses_nearer_target
+    ra9_guard_uses_elite_secondary_after_primary_target_is_ineligible
+
+test result: FAILED. 0 passed; 6 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+error: test failed, to rerun pass `-p sim --test ra9_guard_effective_targets`
+     Running tests/ra9_runtime_liveness.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_runtime_liveness-3337c652fc1497bc)
+
+running 5 tests
+
+thread 'ra9_due_drone_killed_ifv_cannot_repair_patient' (16304567) panicked at crates/sim/tests/ra9_runtime_liveness.rs:38:5:
+native attachment command rejected: [CommandRejected { player: PlayerId(1), command: Attack { units: [SimId(3)], target: SimId(0) }, reason: UnknownTarget(SimId(0)) }, DamageStateChanged { player: PlayerId(0), id: SimId(0), state: Red }, DamageStateChanged { player: PlayerId(0), id: SimId(1), state: Yellow }]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'ra9_due_drone_killed_patient_cannot_be_revived_by_ifv' (16304568) panicked at crates/sim/tests/ra9_runtime_liveness.rs:38:5:
+native attachment command rejected: [CommandRejected { player: PlayerId(1), command: Attack { units: [SimId(3)], target: SimId(1) }, reason: UnknownTarget(SimId(1)) }, DamageStateChanged { player: PlayerId(0), id: SimId(1), state: Red }]
+
+thread 'ra9_due_drone_repair_living_patient_positive_control' (16304570) panicked at crates/sim/tests/ra9_runtime_liveness.rs:38:5:
+native attachment command rejected: [CommandRejected { player: PlayerId(1), command: Attack { units: [SimId(3)], target: SimId(1) }, reason: UnknownTarget(SimId(1)) }, DamageStateChanged { player: PlayerId(0), id: SimId(1), state: Red }]
+
+thread 'ra9_due_drone_repair_living_healer_positive_control' (16304569) panicked at crates/sim/tests/ra9_runtime_liveness.rs:38:5:
+native attachment command rejected: [CommandRejected { player: PlayerId(1), command: Attack { units: [SimId(3)], target: SimId(0) }, reason: UnknownTarget(SimId(0)) }, DamageStateChanged { player: PlayerId(0), id: SimId(0), state: Yellow }, DamageStateChanged { player: PlayerId(0), id: SimId(1), state: Yellow }]
+test ra9_due_drone_repair_living_healer_positive_control ... FAILED
+test ra9_due_drone_repair_living_patient_positive_control ... FAILED
+test ra9_due_drone_killed_ifv_cannot_repair_patient ... FAILED
+test ra9_due_drone_killed_patient_cannot_be_revived_by_ifv ... FAILED
+
+thread 'ra9_guard_chooses_legal_ground_threat_behind_closer_aircraft' (16304571) panicked at crates/sim/tests/ra9_runtime_liveness.rs:200:5:
+closer unattackable aircraft starved an in-range legal Guard target
+test ra9_guard_chooses_legal_ground_threat_behind_closer_aircraft ... FAILED
+
+failures:
+
+failures:
+    ra9_due_drone_killed_ifv_cannot_repair_patient
+    ra9_due_drone_killed_patient_cannot_be_revived_by_ifv
+    ra9_due_drone_repair_living_healer_positive_control
+    ra9_due_drone_repair_living_patient_positive_control
+    ra9_guard_chooses_legal_ground_threat_behind_closer_aircraft
+
+test result: FAILED. 0 passed; 5 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p sim --test ra9_runtime_liveness`
+     Running tests/ra9_specialist_firepower.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_specialist_firepower-1d9b012028fac90f)
+
+running 10 tests
+
+thread 'ra9_squid_elite_periodic_damage_uses_rank_and_selected_weapon' (16304578) panicked at crates/sim/tests/ra9_specialist_firepower.rs:90:5:
+assertion `left == right` failed: stored source product must reach the real periodic hit exactly once
+  left: 560
+ right: 556
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra9_squid_elite_periodic_damage_uses_rank_and_selected_weapon ... FAILED
+
+thread 'ra9_squid_veteran_periodic_damage_uses_rank' (16304580) panicked at crates/sim/tests/ra9_specialist_firepower.rs:90:5:
+assertion `left == right` failed: stored source product must reach the real periodic hit exactly once
+  left: 585
+ right: 584
+
+thread 'ra9_yuri_elite_deploy_pulse_uses_rank' (16304584) panicked at crates/sim/tests/ra9_specialist_firepower.rs:190:5:
+assertion `left == right` failed: live Yuri product must reach native Deploy pulse exactly once
+  left: 1763
+ right: 1739
+
+thread 'ra9_yuri_veteran_deploy_pulse_uses_rank' (16304585) panicked at crates/sim/tests/ra9_specialist_firepower.rs:190:5:
+assertion `left == right` failed: live Yuri product must reach native Deploy pulse exactly once
+  left: 1763
+ right: 1739
+test ra9_squid_veteran_periodic_damage_uses_rank ... FAILED
+test ra9_yuri_elite_deploy_pulse_uses_rank ... FAILED
+test ra9_yuri_veteran_deploy_pulse_uses_rank ... FAILED
+test ra9_squid_base_periodic_damage_positive ... ok
+test ra9_yuri_base_deploy_pulse_positive ... ok
+
+thread 'ra9_squid_periodic_damage_uses_real_firepower_crate' (16304579) panicked at crates/sim/tests/ra9_specialist_firepower.rs:90:5:
+assertion `left == right` failed: stored source product must reach the real periodic hit exactly once
+  left: 585
+ right: 570
+test ra9_squid_periodic_damage_uses_real_firepower_crate ... FAILED
+
+thread 'ra9_squid_elite_periodic_damage_multiplies_rank_and_crate' (16304577) panicked at crates/sim/tests/ra9_specialist_firepower.rs:90:5:
+assertion `left == right` failed: stored source product must reach the real periodic hit exactly once
+  left: 560
+ right: 512
+test ra9_squid_elite_periodic_damage_multiplies_rank_and_crate ... FAILED
+
+thread 'ra9_yuri_elite_deploy_pulse_multiplies_rank_and_crate' (16304583) panicked at crates/sim/tests/ra9_specialist_firepower.rs:190:5:
+assertion `left == right` failed: live Yuri product must reach native Deploy pulse exactly once
+  left: 1763
+ right: 1478
+test ra9_yuri_elite_deploy_pulse_multiplies_rank_and_crate ... FAILED
+
+thread 'ra9_yuri_deploy_pulse_uses_real_firepower_crate' (16304582) panicked at crates/sim/tests/ra9_specialist_firepower.rs:190:5:
+assertion `left == right` failed: live Yuri product must reach native Deploy pulse exactly once
+  left: 1763
+ right: 1525
+test ra9_yuri_deploy_pulse_uses_real_firepower_crate ... FAILED
+
+failures:
+
+failures:
+    ra9_squid_elite_periodic_damage_multiplies_rank_and_crate
+    ra9_squid_elite_periodic_damage_uses_rank_and_selected_weapon
+    ra9_squid_periodic_damage_uses_real_firepower_crate
+    ra9_squid_veteran_periodic_damage_uses_rank
+    ra9_yuri_deploy_pulse_uses_real_firepower_crate
+    ra9_yuri_elite_deploy_pulse_multiplies_rank_and_crate
+    ra9_yuri_elite_deploy_pulse_uses_rank
+    ra9_yuri_veteran_deploy_pulse_uses_rank
+
+test result: FAILED. 2 passed; 8 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+error: test failed, to rerun pass `-p sim --test ra9_specialist_firepower`
+     Running tests/ra9_temporal_sources.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_temporal_sources-1525d6df27640acb)
+
+running 10 tests
+
+thread 'ra9_erased_building_sell_rejects_without_mutation_then_release' (16304593) panicked at crates/sim/tests/ra9_runtime_common/mod.rs:96:5:
+[CommandRejected { player: PlayerId(1), command: Attack { units: [SimId(1)], target: SimId(0) }, reason: UnknownTarget(SimId(0)) }]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra9_erased_building_sell_rejects_without_mutation_then_release ... FAILED
+
+thread 'ra9_erased_strategic_source_preserves_charge_then_resumes' (16304598) panicked at crates/sim/tests/ra9_runtime_common/mod.rs:96:5:
+[CommandRejected { player: PlayerId(1), command: Attack { units: [SimId(3)], target: SimId(2) }, reason: UnknownTarget(SimId(2)) }, SuperweaponBuilt { player: PlayerId(0), role: Chronosphere }, BuildingRevealed { player: PlayerId(0), building: SimId(2), kind: BuildingKind(25), origin: CellPos { x: 12, y: 12 } }]
+
+thread 'ra9_temporal_retained_passive_power_radar_prerequisite_and_external_repair_model' (16304599) panicked at crates/sim/tests/ra9_runtime_common/mod.rs:96:5:
+[CommandRejected { player: PlayerId(1), command: Attack { units: [SimId(3)], target: SimId(0) }, reason: UnknownTarget(SimId(0)) }]
+
+thread 'ra9_erased_miner_preserves_due_work_ore_load_and_resumes_after_release' (16304597) panicked at crates/sim/tests/ra9_runtime_common/mod.rs:96:5:
+[CommandRejected { player: PlayerId(1), command: Attack { units: [SimId(1)], target: SimId(0) }, reason: UnknownTarget(SimId(0)) }]
+test ra9_erased_strategic_source_preserves_charge_then_resumes ... FAILED
+test ra9_temporal_retained_passive_power_radar_prerequisite_and_external_repair_model ... FAILED
+test ra9_erased_miner_preserves_due_work_ore_load_and_resumes_after_release ... FAILED
+
+thread 'ra9_erased_depot_host_cannot_charge_or_heal_patient_then_resumes' (16304595) panicked at crates/sim/tests/ra9_runtime_common/mod.rs:96:5:
+[CommandRejected { player: PlayerId(1), command: Attack { units: [SimId(4)], target: SimId(2) }, reason: UnknownTarget(SimId(2)) }]
+test ra9_erased_depot_host_cannot_charge_or_heal_patient_then_resumes ... FAILED
+
+thread 'ra9_erased_building_repack_rejects_without_mutation_then_release' (16304592) panicked at crates/sim/tests/ra9_runtime_common/mod.rs:96:5:
+[CommandRejected { player: PlayerId(1), command: Attack { units: [SimId(1)], target: SimId(0) }, reason: UnknownTarget(SimId(0)) }]
+test ra9_erased_building_repack_rejects_without_mutation_then_release ... FAILED
+
+thread 'ra9_erased_active_factory_cannot_complete_charge_or_spawn_then_resumes' (16304590) panicked at crates/sim/tests/ra9_runtime_common/mod.rs:96:5:
+[CommandRejected { player: PlayerId(1), command: Attack { units: [SimId(4)], target: SimId(3) }, reason: UnknownTarget(SimId(3)) }]
+test ra9_erased_active_factory_cannot_complete_charge_or_spawn_then_resumes ... FAILED
+
+thread 'ra9_erased_chrono_miner_cannot_start_return_teleport' (16304594) panicked at crates/sim/tests/ra9_runtime_common/mod.rs:96:5:
+[CommandRejected { player: PlayerId(1), command: Attack { units: [SimId(2)], target: SimId(1) }, reason: UnknownTarget(SimId(1)) }]
+test ra9_erased_chrono_miner_cannot_start_return_teleport ... FAILED
+
+thread 'ra9_erased_already_returning_chrono_miner_cannot_teleport_to_newly_open_dock' (16304591) panicked at crates/sim/tests/ra9_runtime_common/mod.rs:96:5:
+[CommandRejected { player: PlayerId(1), command: Attack { units: [SimId(3)], target: SimId(2) }, reason: UnknownTarget(SimId(2)) }]
+test ra9_erased_already_returning_chrono_miner_cannot_teleport_to_newly_open_dock ... FAILED
+
+thread 'ra9_erased_loaded_miner_cannot_pay_until_native_release' (16304596) panicked at crates/sim/tests/ra9_runtime_common/mod.rs:96:5:
+[CommandRejected { player: PlayerId(1), command: Attack { units: [SimId(2)], target: SimId(1) }, reason: UnknownTarget(SimId(1)) }]
+test ra9_erased_loaded_miner_cannot_pay_until_native_release ... FAILED
+
+failures:
+
+failures:
+    ra9_erased_active_factory_cannot_complete_charge_or_spawn_then_resumes
+    ra9_erased_already_returning_chrono_miner_cannot_teleport_to_newly_open_dock
+    ra9_erased_building_repack_rejects_without_mutation_then_release
+    ra9_erased_building_sell_rejects_without_mutation_then_release
+    ra9_erased_chrono_miner_cannot_start_return_teleport
+    ra9_erased_depot_host_cannot_charge_or_heal_patient_then_resumes
+    ra9_erased_loaded_miner_cannot_pay_until_native_release
+    ra9_erased_miner_preserves_due_work_ore_load_and_resumes_after_release
+    ra9_erased_strategic_source_preserves_charge_then_resumes
+    ra9_temporal_retained_passive_power_radar_prerequisite_and_external_repair_model
+
+test result: FAILED. 0 passed; 10 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+error: test failed, to rerun pass `-p sim --test ra9_temporal_sources`
+error: 6 targets failed:
+    `-p sim --test ra9_bay_current_state`
+    `-p sim --test ra9_crate_cargo_census`
+    `-p sim --test ra9_guard_effective_targets`
+    `-p sim --test ra9_runtime_liveness`
+    `-p sim --test ra9_specialist_firepower`
+    `-p sim --test ra9_temporal_sources`

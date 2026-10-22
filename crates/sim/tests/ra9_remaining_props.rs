@@ -1,4 +1,4 @@
-//! UNCOMPILED / UNRUN. Native full erasure, Ivan expiry, and explicit/automatic DefuseKit paths.
+//! Historical preparation note: UNCOMPILED / UNRUN. Native full erasure, Ivan expiry, and explicit/automatic DefuseKit paths.
 mod ra9_remaining_common;
 use ra9_remaining_common::*;
 use std::collections::BTreeSet;

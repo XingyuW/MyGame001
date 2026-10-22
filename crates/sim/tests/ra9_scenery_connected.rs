@@ -1,4 +1,4 @@
-//! UNCOMPILED / UNRUN: proposed native actorless-target tests after schema10 integration.
+//! Historical preparation note: UNCOMPILED / UNRUN: proposed native actorless-target tests after schema10 integration.
 //! Runtime stimuli use CommandQueue/SimSchedule. Hidden injection is controlled admission setup,
 //! not an original/native concealment producer. No garrison cooldown or beam history is forged.
 mod ra9_soundness_common;

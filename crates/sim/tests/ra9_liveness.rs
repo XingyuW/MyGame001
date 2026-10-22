@@ -1,5 +1,5 @@
-//! UNVALIDATED / PENDING. Native scheduled liveness regression draft.
-//! Proposed integration path crates/sim/tests/ra9_liveness.rs.
+//! Historical preparation note: UNVALIDATED / PENDING. Native scheduled liveness regression draft.
+//! Historical preparation note: Proposed integration path crates/sim/tests/ra9_liveness.rs.
 mod ra4_common;
 use ra4_common::*;
 use sim::{CellPos, Command, Players, ProductionItem, SimEvent};

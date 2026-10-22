@@ -1,0 +1,11 @@
+--- before:crates/sim/tests/ra9_audit/completion-whole.rs
++++ after:crates/sim/tests/ra9_audit/completion-whole.rs
+@@ -96,7 +96,7 @@
+         (
+             "crates/sim/src/command.rs",
+             include_str!("../../src/command.rs"),
+-            0xfa6e7f66569e6b1fu64,
++            0x7db5befc95cc8e34u64,
+         ),
+         (
+             "crates/sim/src/arsenal.rs",

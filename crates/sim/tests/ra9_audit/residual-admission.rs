@@ -1,4 +1,4 @@
-//! Test-only proposed integration module. UNCOMPILED/UNRUN. No coverage mutation.
+//! Historical preparation note: Test-only proposed integration module. UNCOMPILED/UNRUN. No coverage mutation.
 //! Parent module is the v1 audit implementation after v2/v3 and source-policy corrections.
 //! Root independently verifies live census/original source before constructing Approval.
 use super::*;
@@ -274,7 +274,7 @@ pub(super) fn require(
 }
 
 // Installed actual prepared negative block: residual-disposition-20261019-v1.UNVALIDATED.adapter-negatives.rs.txt
-// UNCOMPILED/UNRUN; append inside residual_admission.rs, not production.
+// Historical preparation note: UNCOMPILED/UNRUN; append inside residual_admission.rs, not production.
 // Actual unchanged loaded adapters and source guards must pass before each mutation.
 // Electric control requires the real authorized metadata-extraction extension first.
 #[cfg(test)]

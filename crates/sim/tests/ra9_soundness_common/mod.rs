@@ -1,4 +1,4 @@
-//! UNVALIDATED / PENDING. Draft native test helpers; final RA8 input refresh required.
+//! Historical preparation note: UNVALIDATED / PENDING. Draft native test helpers; final RA8 input refresh required.
 #![allow(dead_code)]
 //! RA6 vehicle and strategic acceptance on shipped data through commands and the simulation schedule.
 use std::path::PathBuf;

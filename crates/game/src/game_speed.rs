@@ -63,6 +63,13 @@ pub struct GameClock {
 }
 
 impl GameClock {
+    #[cfg(test)]
+    pub(crate) fn privacy_frame(seconds: f32) -> Self {
+        Self {
+            clock: seconds,
+            delta: seconds,
+        }
+    }
     /// Game seconds elapsed (for animations that show gameplay).
     pub fn clock(&self) -> f32 {
         self.clock

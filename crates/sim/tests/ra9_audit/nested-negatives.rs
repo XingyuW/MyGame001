@@ -1,4 +1,4 @@
-//! UNRUN actual valid-loader nested component/length mutations and semantic reorder controls.
+//! Historical preparation note: UNRUN actual valid-loader nested component/length mutations and semantic reorder controls.
 //! A failing unchanged adapter or a mutant loader rejection cannot count as evidence.
 use super::array_negatives::DataCopy;
 use super::*;

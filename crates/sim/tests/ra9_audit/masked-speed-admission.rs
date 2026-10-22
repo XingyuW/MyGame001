@@ -1,4 +1,4 @@
-//! Exact19 speed-selector dispositions. UNCOMPILED/UNRUN, zero coverage mutation.
+//! Historical preparation note: Exact19 speed-selector dispositions. UNCOMPILED/UNRUN, zero coverage mutation.
 use super::*;
 const ROWS: &str = include_str!("masked-speed-atoms.tsv");
 fn cell<'a>(r: &'a Reference, s: &str, k: &str, default: &'a str) -> &'a str {
@@ -216,7 +216,7 @@ pub(super) fn contains(key: &SourceKey) -> bool {
 const _: fn(&SourceKey) -> bool = contains;
 
 // Installed actual prepared negative block: integration-blockers-20261019-v1.UNVALIDATED.speed-negatives.rs.txt
-// UNCOMPILED/UNRUN; add to masked-speed-admission.rs after speed-shortcircuit.patch.
+// Historical preparation note: UNCOMPILED/UNRUN; add to masked-speed-admission.rs after speed-shortcircuit.patch.
 #[cfg(test)]
 mod tests {
     use super::*;

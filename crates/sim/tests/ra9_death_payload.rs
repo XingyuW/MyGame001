@@ -1,4 +1,4 @@
-//! UNVALIDATED / PENDING. Proposed crates/sim/tests/ra9_death_payload.rs.
+//! Historical preparation note: UNVALIDATED / PENDING. Proposed crates/sim/tests/ra9_death_payload.rs.
 //! Exact source witness; no direct HP-zero destruction. The native C4 charge kills the reactor.
 mod ra9_soundness_common;
 use ra9_soundness_common::*;

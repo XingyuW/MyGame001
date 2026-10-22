@@ -1,6 +1,6 @@
-//! UNVALIDATED adapter draft. Uses actual sim::Definitions access patterns already present
-//! in ra9_data_parity.rs. Schema10 metadata.size_limit and death_weapon_damage_pm are intentionally pending integration.
-//! Do not compile/run until explicit RA8 closure and canonical RA9 release.
+//! Historical adapter-draft note: UNVALIDATED adapter draft. Uses actual sim::Definitions access patterns already present
+//! Historical adapter-draft note: in ra9_data_parity.rs. Schema10 metadata.size_limit and death_weapon_damage_pm are intentionally pending integration.
+//! Historical adapter-draft note: Do not compile/run until explicit RA8 closure and canonical RA9 release.
 use super::{Audit, AuditResult, Expected, Reference, SourceKey, WitnessId};
 use sim::{Definitions, ProductionItem};
 
@@ -292,4 +292,4 @@ pub(super) fn declare_powerup_shapes(r: &mut Reference) -> AuditResult<()> {
 //10. Existing named wrappers remain and use scoped reconciliation, not pre-marked foreign rows.
 //11. Runtime metadata strength/radius is not universally effective mechanic: Iron Curtain duration
 //    lives in Rules, Nuke damage/spread in native payload, radius6 active AI scoring stays distinct.
-//12. All tests/mutations remain UNRUN until explicit root release and coordinated source freeze.
+// Historical preparation note: 12. All tests/mutations remain UNRUN until explicit root release and coordinated source freeze.

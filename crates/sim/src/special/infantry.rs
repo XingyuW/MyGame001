@@ -201,7 +201,9 @@ pub(crate) fn deploy(world: &mut World, a: &Actor, defs: &Definitions) -> Result
                         warhead: w.warhead,
                         damage: w.damage,
                         direct: None,
-                        firepower_pm: 1000,
+                        firepower_pm: world
+                            .get::<crate::Experience>(a.entity)
+                            .map_or(1000, crate::Experience::firepower_pm),
                         source: Some(a.id),
                         identity: None,
                     },

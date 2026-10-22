@@ -43,7 +43,12 @@ pub(super) fn repair_docked(
             {
                 return None;
             }
-            if world.resource::<SpecialState>().erasures.contains_key(&id) {
+            if world.resource::<SpecialState>().erasures.contains_key(&id)
+                || world
+                    .resource::<SpecialState>()
+                    .erasures
+                    .contains_key(&building)
+            {
                 return Some(());
             }
             let off = world

@@ -1,4 +1,4 @@
-//! UNCOMPILED/UNRUN five real S schema10 fields only. All actual source defaults and
+//! Historical preparation note: UNCOMPILED/UNRUN five real S schema10 fields only. All actual source defaults and
 //! physical consumers remain independent; no native behavioral coverage is inferred here.
 use super::*;
 const FIELDS: [(&str, &str, &str); 5] = [

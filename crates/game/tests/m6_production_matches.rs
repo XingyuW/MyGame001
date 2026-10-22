@@ -16,10 +16,10 @@
 //! it is meant to fail it. Every match is bounded in time by the tick limit and in memory by the AI
 //! file's `max_army`.
 //!
-//! One difference from a match of the game: the scenery (`sim::Props`, the trees, houses and
-//! towers of a map's look, which take damage since RA3) is installed by the game's host from
-//! the map's presentation data and is not part of these matches, nor of `m14_duels`, `m7_soak`
-//! and `m13_ten_players` (advisory review 1, tests P2-14; docs/DECISIONS.md R56, debt).
+//! Historical advisory review 1 tests P2-14 and R56 described headless Props omission. Current
+//! load_map retains semantic world features, and shared setup_match installs their Props in
+//! these matches, m14_duels, m7_soak and m13_ten_players, as it does for the client. This shared
+//! installation does not establish every scenery interaction or rendered scenery coverage.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::PathBuf;
@@ -502,7 +502,7 @@ fn ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes() {
 
 // Fresh setup on each call: no World/entity/resource-state clone, no fixture tuning.
 // This is the exact production harness setup_match path used by duel_with_length and
-// ra8_ai_matches, including its documented omission of host presentation scenery.
+// ra8_ai_matches, including retained map features and shared world-object installation.
 // Selected preliminary tuple: actual native Won41738, late fire/production/positive ore
 // at36392/36609/36567; hashes/events/invariants matched. Rebind final canonical source;
 // never change the late thresholds, activity observers, requireWon or original tick_limit.

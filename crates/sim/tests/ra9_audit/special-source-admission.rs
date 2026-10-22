@@ -1,4 +1,4 @@
-//! UNCOMPILED/UNRUN special exact3 nonread keys +7 source-presentation premises.
+//! Historical preparation note: UNCOMPILED/UNRUN special exact3 nonread keys +7 source-presentation premises.
 //! Root records actual source/native/client decisions. No nonexistent source flag witness.
 use super::*;
 use source_routes::{Class, Route};

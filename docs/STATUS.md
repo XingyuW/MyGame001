@@ -5064,3 +5064,31 @@ guards passed. Mean, busy-window, p99 and max timing remain distinct; sampled fi
 are not all-to-Won claims.198-isolated-acceptance-summary.json preserves every actual map, tail
 and command source/raw binding. Full13 remains mandatory and is now the next owned action;
 no previous RA8/copy execution transfers acceptance or performance credit.
+
+## RA9 independent panel1 NO-GO and remediation round1 — 2026-10-22
+
+Panel1's seven P0/eight P1/five P2 decision is preserved in
+`docs/reviews/RA2-parity-review-1.md`; interrupted199 is stopped and satisfies neither gate.
+R194 authorizes one complete corrected-source full13 for RA9 and final review. R195 records
+fresh runtime/client/audit remediation,41 native runtime cases,7 client privacy cases,1 AI
+knowledge-equality case and4 whole-audit controls. No old-source result is promoted.
+
+Actual audit before02:4 intended failures,22 escaped variants/6 existing rejections, zero wrong
+failures; all4 initial and4 restored whole positives finish. Initial runtime after01 is39/40,
+followed by a narrowly durable target premise and a separately proven frozen-refinery defect.
+Corrected aggregate results, exact binding and full gates remain pending in this entry.
+Passive Temporal power/radar/prerequisite/external-repair behavior is an explicit tested bounded
+model; active production/service/charging/payment pauses. P2 stale headers and false headless
+Props omission prose are corrected without erasing historical records. All183 debt IDs and51
+HOWTOSEE rows remain; visual/audio/feel and human/platform acceptance remain user-only pending.
+
+
+## RA9 corrected-source preflight complete; isolated gates and panel2 pending — 2026-10-22
+
+R198 records43 native runtime passes and strict preflight,4 whole-audit controls with28/28
+intended rejections, and the corrected late-game positive/two causal failures/restored positive.
+All685 frozen inputs and64 authority spans authenticate. Preserve every failed and setup attempt;
+the unfiltered185/workspace, all21/fixed3/threeguards, actual executable/package acceptance,
+shared full13 and fresh five-slice/lead decision remain required. All183 debt IDs and51 user-only
+HOWTOSEE rows remain. Nothing visual, audible or felt is passed, and no merge is yet authorized
+by a review decision.

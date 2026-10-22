@@ -1,4 +1,4 @@
-//! Derived-country oracle, UNCOMPILED/UNRUN. No call to country_tree/check_buildable/
+//! Historical preparation note: Derived-country oracle, UNCOMPILED/UNRUN. No call to country_tree/check_buildable/
 //! produces/missing_prerequisite/same_factory or any generator implementation.
 //! All source configuration dependencies here are supplemental, zero global source coverage.
 use super::arrays::{Deps, SourcePart};
@@ -632,7 +632,7 @@ pub(super) fn raw_roster_schema(
 }
 
 // Installed actual prepared negative block: integration-blockers-20261019-v1.UNVALIDATED.roster-negatives.rs.txt
-// UNCOMPILED/UNRUN; append to country-rosters.rs. These use actual unchanged loaded data first.
+// Historical preparation note: UNCOMPILED/UNRUN; append to country-rosters.rs. These use actual unchanged loaded data first.
 #[cfg(test)]
 mod tests {
     use super::*;

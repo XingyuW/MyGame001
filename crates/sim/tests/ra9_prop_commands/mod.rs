@@ -1,4 +1,4 @@
-//! UNCOMPILED / UNRUN. Child module of the actual ra1_commands regression target.
+//! Historical preparation note: UNCOMPILED / UNRUN. Child module of the actual ra1_commands regression target.
 //! Admission privacy is exercised through actual CommandQueue/Commands/SimSchedule.
 //! The hidden Prop premise is controlled setup; current code has no native producer for it.
 #[path = "../ra9_remaining_common/mod.rs"]

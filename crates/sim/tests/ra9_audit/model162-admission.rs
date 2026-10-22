@@ -1,4 +1,4 @@
-//! UNCOMPILED/UNRUN exact162 current-model source classifications,32 families.
+//! Historical preparation note: UNCOMPILED/UNRUN exact162 current-model source classifications,32 families.
 //! No fake physical flag, constant NativeWitness, source read/alias credit or new mechanics.
 use super::*;
 #[path = "model162-loaded.rs"]
@@ -428,7 +428,7 @@ pub(super) fn demanded_sources(p: &Plan) -> BTreeMap<SourceKey, (String, String)
 }
 
 // Installed actual prepared negative block: model162-integration-20261019-v1.UNVALIDATED.audit-negatives.rs.txt
-// UNCOMPILED/UNRUN. Append to model162_admission.rs as child tests after all actual A/S
+// Historical preparation note: UNCOMPILED/UNRUN. Append to model162_admission.rs as child tests after all actual A/S
 // integration. Genuine accepted baselines are required for admission-record mutations.
 // No permanent assertion that installed final acceptances must stay UNACCEPTED.
 #[cfg(test)]

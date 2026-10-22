@@ -1,4 +1,4 @@
-//! UNVALIDATED / PENDING. Proposed crates/sim/tests/ra9_veterancy.rs.
+//! Historical preparation note: UNVALIDATED / PENDING. Proposed crates/sim/tests/ra9_veterancy.rs.
 mod ra4_common;
 use bevy_ecs::{resource::Resource, schedule::IntoScheduleConfigs, world::World};
 use ra4_common::*;

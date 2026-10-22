@@ -602,11 +602,16 @@ fn stranded(
         .resource::<Players>()
         .get(owner)
         .is_some_and(|player| player.credits() > FREE_MCV_CREDITS);
-    rich && !units
-        .values()
-        .any(|unit| unit.owner == owner && rules.is_base_unit(unit.kind))
-        && !world
-            .query::<(&Owner, &Building, &Health)>()
-            .iter(world)
-            .any(|(of, _, health)| of.0 == owner && health.hit_points > 0)
+    rich && !units.values().any(|unit| {
+        unit.owner == owner
+            && (rules.is_base_unit(unit.kind)
+                || world
+                    .resource::<crate::SpecialState>()
+                    .cargo_descendants(unit.id)
+                    .iter()
+                    .any(|passenger| passenger.hp > 0 && rules.is_base_unit(passenger.kind)))
+    }) && !world
+        .query::<(&Owner, &Building, &Health)>()
+        .iter(world)
+        .any(|(of, _, health)| of.0 == owner && health.hit_points > 0)
 }

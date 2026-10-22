@@ -1,4 +1,4 @@
-//! UNRUN causal audit negatives against actual loaded Definitions/adapters.
+//! Historical preparation note: UNRUN causal audit negatives against actual loaded Definitions/adapters.
 //! Every mutation first requires the same real adapter to succeed on unchanged shipped input.
 //! Loader/setup failures fail the test separately; they cannot count as the intended negative.
 use super::*;

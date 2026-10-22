@@ -1,0 +1,39 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T05:04:45.720393+00:00",
+  "pid": 50091,
+  "head": "af18ce22736ab98b516560d433384b5746774880",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/A-guard-prop-before-01-plan.json",
+  "plan_sha256": "1528a0faa26fdb5f0d0ba70ae7e6c062e593cbfa7da3052ed8e40badb3de300c",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_guard_effective_targets",
+        "actual_hostile_occupied_actorless_prop",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "start": "2026-10-22T05:04:45.872664+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-1/A-guard-prop-before-01/01-actual-occupied-prop-before.log",
+      "pid": 50097,
+      "pgid": 50097,
+      "exit": 101,
+      "end": "2026-10-22T05:04:55.930030+00:00",
+      "raw_bytes": 1096,
+      "raw_sha256": "163b3fcb813f9ea656169d451f335e2da422f1cdf161e5ec7bc6af91d476a954",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T05:04:50.926907+00:00",
+  "end": "2026-10-22T05:04:56.068679+00:00",
+  "source_unchanged": true
+}

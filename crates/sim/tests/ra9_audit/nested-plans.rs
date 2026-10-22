@@ -1,4 +1,4 @@
-//! UNVALIDATED v3 remaining typed native and explicit game-owned array/tuple witnesses.
+//! Historical preparation note: UNVALIDATED v3 remaining typed native and explicit game-owned array/tuple witnesses.
 //! This supplemental ledger records NO global reference coverage or semantic non-use.
 use super::arrays::{
     Deps, Element, ExpectedElement, Ledger, PhysicalOrigin, Semantics, SourcePart, csv, merge,

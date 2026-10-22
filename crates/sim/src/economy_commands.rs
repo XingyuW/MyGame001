@@ -469,6 +469,7 @@ pub(crate) fn apply(
     index: &mut BuildingIndex,
     grid: &mut Grid,
     events: &mut Messages<SimEvent>,
+    special: &crate::SpecialState,
 ) -> Result<(), RejectReason> {
     let player = issued.player;
     let definitions = &*params.definitions;
@@ -608,6 +609,9 @@ pub(crate) fn apply(
         }
         &Command::SellBuilding { building } => {
             let target = index.own(player, building, fog(definitions, state))?;
+            if special.erasures.contains_key(&building) {
+                return Err(RejectReason::AbilityUnavailable("Target is being erased"));
+            }
             let entry = definitions.metadata(ProductionItem::Building(target.kind));
             if definitions.rules().is_some() && entry.is_some_and(|entry| !entry.sellable) {
                 return Err(RejectReason::NotSellable(building));

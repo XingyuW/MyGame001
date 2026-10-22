@@ -1,4 +1,4 @@
-//! UNVALIDATED / PENDING. Append to native ra9_liveness test after initial draft compiles.
+//! Historical preparation note: UNVALIDATED / PENDING. Append to native ra9_liveness test after initial draft compiles.
 mod ra9_soundness_common;
 use bevy_ecs::{resource::Resource, schedule::IntoScheduleConfigs, world::World};
 use ra9_soundness_common::*;

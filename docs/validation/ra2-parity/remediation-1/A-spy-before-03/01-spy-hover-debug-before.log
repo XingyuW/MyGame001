@@ -1,0 +1,22 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 33.85s
+     Running unittests src/main.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/game-5f08020bbb778566)
+
+running 1 test
+native Spy hover: normal=("GI\nYours  80%\nNo armour", Flex, Srgba(Srgba { red: 0.72, green: 0.9, blue: 1.0, alpha: 1.0 })), disguised=("Spy\nRed Player  80%\nFlak armour", Flex, Srgba(Srgba { red: 1.0, green: 0.72, blue: 0.66, alpha: 1.0 })), detected=("Spy\nRed Player  80%\nFlak armour", Flex, Srgba(Srgba { red: 1.0, green: 0.72, blue: 0.66, alpha: 1.0 }))
+
+thread 'hover_info::tests::ra9_privacy_spy_hover_uses_native_disguise_then_real_detection' (16315206) panicked at crates/game/src/privacy_hover_tests.rs:126:5:
+assertion `left == right` failed: undiscovered friendly GI appearance must not expose real Spy type/owner/armour/rank
+  left: ("Spy\nRed Player  80%\nFlak armour", Flex, Srgba(Srgba { red: 1.0, green: 0.72, blue: 0.66, alpha: 1.0 }))
+ right: ("GI\nYours  80%\nNo armour", Flex, Srgba(Srgba { red: 0.72, green: 0.9, blue: 1.0, alpha: 1.0 }))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test hover_info::tests::ra9_privacy_spy_hover_uses_native_disguise_then_real_detection ... FAILED
+
+failures:
+
+failures:
+    hover_info::tests::ra9_privacy_spy_hover_uses_native_disguise_then_real_detection
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 274 filtered out; finished in 0.46s
+
+error: test failed, to rerun pass `-p game --bin game`

@@ -1,4 +1,4 @@
-//! UNVALIDATED / PENDING. Native R83 attached-host firing witness.
+//! Historical preparation note: UNVALIDATED / PENDING. Native R83 attached-host firing witness.
 mod ra9_soundness_common;
 use ra9_soundness_common::*;
 use sim::{Cell, Command, Grid, SimEvent, SpecialState};

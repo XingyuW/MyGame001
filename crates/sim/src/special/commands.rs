@@ -224,6 +224,7 @@ pub(crate) fn apply(world: &mut World, issued: &IssuedCommand) -> Result<(), Rej
                     RejectReason::UnknownBuilding(*building)
                 });
             }
+            commandable(world, *building)?;
             if !world.resource::<crate::MatchState>().rules().mcv_repacks {
                 return Err(RejectReason::DisabledByOptions);
             }
