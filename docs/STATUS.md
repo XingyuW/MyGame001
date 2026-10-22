@@ -1,5 +1,12 @@
 # Milestone status
 
+## Latest RA9 state — independent review1 NO-GO (2026-10-22)
+
+This current entry supersedes the older preliminary/current headlines below as historical snapshots.
+Fresh five slices and fresh lead completed full cumulative review at23647de; [decision](reviews/RA2-parity-review-1.md) confirms7P0/8P1/5P2. R193 records exact scope and preserved interruption evidence. Fresh remediation is next; no merge/reviewed tag/quality approval exists. Current199 stopped during04 after01–03exit0;05–13not reached. Stale controller RUNNING/WAITING records are preserved history, not active/pass status. All logs and prior changes remain intact.
+
+R194 records the user's explicit authorization for one complete corrected-source13-command run to serve both RA9 and review gates. Every command, coverage/cap/acceptance criterion, isolated proof and fresh five-slice3+2/fresh-lead decision remains required. All51 user-only HOWTOSEE rows stay PENDING. The183 debt IDs and1911 exact source dispositions remain individually assessed in the review1 evidence; no blanket nonblocking waiver applies.
+
 ## RA9 current preliminary integration — 2026-10-21
 
 This reports the ordinary validation copy only. Its immutable origin is

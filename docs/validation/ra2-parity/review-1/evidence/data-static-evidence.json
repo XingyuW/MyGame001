@@ -1,0 +1,169 @@
+{
+  "scope": {
+    "source_files": 656,
+    "core": 97,
+    "authority_spans": 64,
+    "errors": [],
+    "packet_sha256": "9c110cf4d961ac33b5025acb53d0f50eedfa3fe55fe76e9e2135789d388ba6b7",
+    "root_binding": "9c110cf4d961ac33b5025acb53d0f50eedfa3fe55fe76e9e2135789d388ba6b7"
+  },
+  "model_census": {
+    "count": 97,
+    "unrecorded": [],
+    "nonexistent": [],
+    "hash_errors": [],
+    "legacy_digest_match": true,
+    "surface_digest_match": true,
+    "scope75_file_hash_match": true,
+    "special_file_hash_match": true
+  },
+  "graph": {
+    "audit_rust": 48,
+    "reachable_audit_rust": 48,
+    "unreachable": [],
+    "include_paths": 79,
+    "missing": [],
+    "tsv": 67,
+    "txt": 4,
+    "reference_files": 16
+  },
+  "dispositions": {
+    "atoms": 1911,
+    "source_keys": 1888,
+    "whole": 1869,
+    "components": {
+      "1": 19,
+      "2": 19,
+      "3": 4
+    },
+    "classes": {
+      "CURRENT_MODEL_NONREAD": 759,
+      "INTENTIONAL_DIFFERENCE": 1152
+    },
+    "routes": {
+      "static116": 116,
+      "masked19": 19,
+      "legacy-model543": 543,
+      "residual117": 117,
+      "legacy-ai361": 361,
+      "model162": 162,
+      "behavior87": 87,
+      "metadata147": 147,
+      "completion174": 174,
+      "carry38": 38,
+      "guard75": 75,
+      "consumer62": 62,
+      "spark": 7,
+      "tree": 1,
+      "mirage-elite": 1,
+      "vhp": 1
+    },
+    "errors": [],
+    "reference_rows": 4941,
+    "expected_atoms": 4988
+  },
+  "receipt_hashes": {
+    "unique": 8,
+    "unresolved": [
+      "3aea0875050550021b2fa3495431d8a35b450cf6d8991d77252d7c5052bee39c"
+    ],
+    "resolved": {
+      "7dbcf5d2e889e166bdf84245d5f3143df0e185659ae638dd41aaa980e3198679": [
+        "docs/validation/ra2-parity/ra9/evidence/B-121-123-receipt-reconciliation.json"
+      ],
+      "8098d9a884f11e48df5955c7572292a4ace0a7cde5da82c65ba1be4114b8ce84": [
+        "docs/validation/ra2-parity/ra9/evidence/B-jumpjet4-current2d-scope.json"
+      ],
+      "b9dfe648d0647cb3b6e409d1e3c4933937e4afaf21823de342880a8feccc9445": [
+        "docs/validation/ra2-parity/ra9/evidence/B-129-final-consumer62-route-materialization.json"
+      ],
+      "febe512989be0b7373054d0cb6599efdafdc8d5ef870cf19515779094e4c234a": [
+        "docs/validation/ra2-parity/ra9/evidence/B-model162-materialization-routes.json"
+      ],
+      "22ddd1d25a9f189e437d2cb56cbe63e80f4f3d046a10c3c00e35bf1bd958d5b1": [
+        "docs/validation/ra2-parity/ra9/evidence/B-three-families-shared103-105-107-routes.json"
+      ],
+      "3aea0875050550021b2fa3495431d8a35b450cf6d8991d77252d7c5052bee39c": [],
+      "adc16dca069e5600e04c3e4700db9bac53ea49715ada57fb6ebe8fb8c6f57d7f": [
+        "docs/validation/ra2-parity/ra9/evidence/32-game-array-policy-declaration.json"
+      ],
+      "8d21cb2e0df7a27bfd4cd345cc149572282e83d2744c15c91d4dad861a67311d": [
+        "docs/validation/ra2-parity/ra9/evidence/155-completion174-actual-qualified-evidence.json"
+      ]
+    }
+  },
+  "historical_receipts": {
+    "commands": 88,
+    "hashed_files": 170,
+    "errors": [
+      [
+        "ra9-preliminary-logs/49-workspace-rustfmt.log",
+        "missing"
+      ],
+      [
+        "ra9-preliminary-logs/61-actual-source-scope.log",
+        "missing"
+      ],
+      [
+        "ra9-preliminary-logs/87-final-source-fmt.log",
+        "missing"
+      ],
+      [
+        "ra9-preliminary-logs/92-generator-check.log",
+        "missing"
+      ],
+      [
+        "ra9-preliminary-logs/93-reference-check.log",
+        "missing"
+      ],
+      [
+        "ra9-preliminary-logs/95-actual-scope-producer.log",
+        "missing"
+      ]
+    ],
+    "qualification": "Historical scopes only; immutable bytes do not turn old native source into frozen-source execution."
+  },
+  "bounded_results": [
+    {
+      "name": "197c-whole-positive",
+      "sha256": "3776b442dadc043e7772c3e0f06246e87e85171a5120cb7902bc4e41abaf454c",
+      "results": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 180 filtered out; finished in 68.16s"
+      ],
+      "audit_success": [
+        "RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75"
+      ]
+    },
+    {
+      "name": "197c-six-repaired",
+      "sha256": "477e4cc0a07700f0979a55d85dc7b467600a9e2f69b12106398cd348e4975c0f",
+      "results": [
+        "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 175 filtered out; finished in 82.14s"
+      ],
+      "audit_success": [
+        "RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75",
+        "RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75",
+        "RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75",
+        "RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75"
+      ]
+    },
+    {
+      "name": "197c-difficulty",
+      "sha256": "200f08eac02a28cfa6f23a78861dcd44af98af7d7d9996e18998fec9b610fe66",
+      "results": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 133 filtered out; finished in 0.08s"
+      ],
+      "audit_success": []
+    }
+  ],
+  "asset_inventory": {
+    "added": 176,
+    "not_literal_listed": []
+  },
+  "debt": {
+    "rows": 183,
+    "unique_ids": 183,
+    "empty_required": [],
+    "all_unaccepted": true
+  }
+}

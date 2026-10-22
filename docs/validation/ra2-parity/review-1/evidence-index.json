@@ -1,0 +1,257 @@
+{
+  "utc": "2026-10-22T01:18:59.412699+00:00",
+  "status": "INDEPENDENT_ROUND1_NO_GO",
+  "reviewed_tip": "23647de4220408d42eeef6522deb4d4541528452",
+  "base": "8230a955b251e9341d349f99eaeb86f7f8253664",
+  "decision": "NO-GO",
+  "unique_findings": {
+    "P0": 7,
+    "P1": 8,
+    "P2": 5
+  },
+  "source_files_and_binding_outputs": 669,
+  "authority_spans": 64,
+  "source_mismatches": [],
+  "artifacts": [
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-1-lead.md",
+      "repository_path": "docs/reviews/RA2-parity-review-1.md",
+      "bytes": 74859,
+      "sha256": "9710763b98ce7ca8062b813858f4b81871b4ded207e6d15bdb6046163de75a31"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-1-data.md",
+      "repository_path": "docs/reviews/RA2-parity-review-1-data.md",
+      "bytes": 27339,
+      "sha256": "de76f773d26991b46c3f1d0919bea52d73cd21a5f5bae595dc6e2c44063f0561"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-1-tests.md",
+      "repository_path": "docs/reviews/RA2-parity-review-1-tests.md",
+      "bytes": 27704,
+      "sha256": "221831d9fd2c5939ccb9e2838270a5462a0e85675e5265a38f28fdaa03eee7b6"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-1-sim1.md",
+      "repository_path": "docs/reviews/RA2-parity-review-1-sim1.md",
+      "bytes": 26642,
+      "sha256": "d13a78e825a588b72edba01b724af63992ecd4272faab52aa7f91b8244f59d02"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-1-sim2.md",
+      "repository_path": "docs/reviews/RA2-parity-review-1-sim2.md",
+      "bytes": 24684,
+      "sha256": "90cd21c1e51d00f7d055db45350414a3121dbc35bce5783926521af411720036"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-1-client.md",
+      "repository_path": "docs/reviews/RA2-parity-review-1-client.md",
+      "bytes": 26417,
+      "sha256": "bd22f15c9c7d243e6c951872534ab15926042871411ef1f684466cfea1f9c3eb"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/client-static-evidence.json",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/client-static-evidence.json",
+      "bytes": 19244,
+      "sha256": "40adfa155489648f657c565080bba226ba702bfcc8da570120f78b62673050c7"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/common-review-instructions.md",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/common-review-instructions.md",
+      "bytes": 4146,
+      "sha256": "b237cf33cc754741a0d7789628bc92b1ec55075f57dc79a695045e63ec4b952d"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/common-review-instructions.pre-shared-gate.md",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/common-review-instructions.pre-shared-gate.md",
+      "bytes": 3934,
+      "sha256": "1f1112e1a1a27bcaf6529889c560c496b580a1fe97b7a52da79707d3f53cb773"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/data-399-current-records.json",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/data-399-current-records.json",
+      "bytes": 412,
+      "sha256": "a2665f0be93d1dadea6b7bf1571dd07dc0178d1a56cfbc80cc327d97c6d2f3f2"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/data-debt-assessment.tsv",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/data-debt-assessment.tsv",
+      "bytes": 27465,
+      "sha256": "1e5c8e5da3d83548b855363045d5bb0380b3fc2dcf21e2373817f52e8a324fcb"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/data-disposition-assessment.tsv",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/data-disposition-assessment.tsv",
+      "bytes": 727866,
+      "sha256": "bba55855d4bc2668bf13b2ea372fa5d9949649bf5e9dc9ccc5f9b517c2707acd"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/data-independent-recompute-v2.json",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/data-independent-recompute-v2.json",
+      "bytes": 568136,
+      "sha256": "8cc7dec3f78e12423c581b9ab33e7402a96c50621c509286065395c6967755e1"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/data-independent-recompute-v3.json",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/data-independent-recompute-v3.json",
+      "bytes": 569898,
+      "sha256": "ee900389eee64652663a36195a700999bc0b8993458a360de652c275cc418163"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/data-independent-recompute.json",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/data-independent-recompute.json",
+      "bytes": 598752,
+      "sha256": "e4149d0dab7ba8aaf422ded0909611bee76757762ba61939177c873ab86b963b"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/data-independent-recompute.py",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/data-independent-recompute.py",
+      "bytes": 12029,
+      "sha256": "ed4325fdf3f1df18f3491716940e843cbaf169f8c3e1fcc403aeadb818fe9218"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/data-original-closures.json",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/data-original-closures.json",
+      "bytes": 703,
+      "sha256": "12b34bb015395d2eb0e0b38626f144e1d89d42c5873e043cca6a1344c7fcb540"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/data-original-closures.py",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/data-original-closures.py",
+      "bytes": 4635,
+      "sha256": "366e379a2432801e646d8ac5870159eb5df8b75b0f6b073dac630c6cdbe0528a"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/data-provenance-history-v2.json",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/data-provenance-history-v2.json",
+      "bytes": 604,
+      "sha256": "e9e2df76ac9ea4b986ac09a4f674732024b88a7932d069a63ad5f86bcb2ee977"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/data-provenance-history.json",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/data-provenance-history.json",
+      "bytes": 1247,
+      "sha256": "6bc080179e0e45635687f160a740279fa8f710cabbbb35aeeeafda75c44e33ba"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/data-provenance-history.py",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/data-provenance-history.py",
+      "bytes": 3065,
+      "sha256": "5d56541faf5b578c0f083052bf94b0905e1af085dfec6360a3124809ee6c13cb"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/data-static-evidence-v2.json",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/data-static-evidence-v2.json",
+      "bytes": 5253,
+      "sha256": "d79677c98a747544bbee9980654cb6986faae0769dd5d0ba0a847ea3be829333"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/data-static-evidence.json",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/data-static-evidence.json",
+      "bytes": 5794,
+      "sha256": "24e8ca8e4252c1a286e67b359027038b8f24301544ffe701591e6d059de8420b"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/data-static-evidence.py",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/data-static-evidence.py",
+      "bytes": 7945,
+      "sha256": "a9e83d1212bcf5e5ed8ed33cbeef8a29c929642c4c234b6940035bc9cf9c0e27"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/dispatch-round-1-client.md",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/dispatch-round-1-client.md",
+      "bytes": 21038,
+      "sha256": "90d57472360fc7f9ac6be485609c9293a2b590f56a478ca3ed09a1144ca58127"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/dispatch-round-1-data.md",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/dispatch-round-1-data.md",
+      "bytes": 24249,
+      "sha256": "e2e9069e22c05d97f1e04584b43022c76ad1a34efc70d79d6e29c8c464b1de82"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/dispatch-round-1-lead.md",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/dispatch-round-1-lead.md",
+      "bytes": 20491,
+      "sha256": "d0b9055dcb8e4e1bb3ab7de3d035e47519bb6e16daccba9b41bcdc89730dfc9d"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/dispatch-round-1-sim1.md",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/dispatch-round-1-sim1.md",
+      "bytes": 20791,
+      "sha256": "e8f32c157be10849c4bf222a01c897972c6dcba4f88dcbc85ad1eddab5696e29"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/dispatch-round-1-sim2.md",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/dispatch-round-1-sim2.md",
+      "bytes": 22469,
+      "sha256": "5dabff9c4fd7a04078b131922ea9d4c0a14eac89a5058f2e60819f3abafbf96c"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/dispatch-round-1-tests.md",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/dispatch-round-1-tests.md",
+      "bytes": 23742,
+      "sha256": "ddd7053c02a6fac808822abe5a93085d00a7fa196ee853c546e5acbf3ab0d46e"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/dispatch-round-1.json",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/dispatch-round-1.json",
+      "bytes": 3379,
+      "sha256": "4c9e38c19377c852691de203ef163f1192967fad78861c46f7dbda8ee14e5c88"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/render-dispatch-briefs.py",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/render-dispatch-briefs.py",
+      "bytes": 2217,
+      "sha256": "6f92275cbf8954979e4206538dfec8fd76834c3c85689974e011ff2974b99674"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-1-before-stop-198-to-199-continuation.json",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/round-1-before-stop-198-to-199-continuation.json",
+      "bytes": 536,
+      "sha256": "e6956ad02f9630f4f68129e4c65e3c661eca5392b5bb3a67de7b85a33b544f47"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-1-before-stop-203-postgate-closing-process.json",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/round-1-before-stop-203-postgate-closing-process.json",
+      "bytes": 662,
+      "sha256": "a97159ce332c23d331fc65ba4b08873a7eab51e745296699562860848e7630a9"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-1-before-stop-gate-process.json",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/round-1-before-stop-gate-process.json",
+      "bytes": 2342,
+      "sha256": "63639cb0da88de79008469968bb2d78971a37614572411223c07877aee49108a"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-1-before-stop-summary.txt",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/round-1-before-stop-summary.txt",
+      "bytes": 146,
+      "sha256": "6f4fc6df28368f25e55d4a8d0c7088da77c5ccad7a223bd44eb1a27f0c25443c"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-1-live-evidence.md",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/round-1-live-evidence.md",
+      "bytes": 2203,
+      "sha256": "fdc8c68167bbcb524bdae9c38c7e4c65918e0c05c4dc4ac05a4320c74a3fe090"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-1-source-after-stop.json",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/round-1-source-after-stop.json",
+      "bytes": 327,
+      "sha256": "39ef3252fcaaee4713ac11a685016d3840db1767a365bbc3f25c1c2944e15db6"
+    },
+    {
+      "original_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-1-validation-stop.json",
+      "repository_path": "docs/validation/ra2-parity/review-1/evidence/round-1-validation-stop.json",
+      "bytes": 3604,
+      "sha256": "924a49ab484eb9ec3b23ae7f3a945d00123c5f1f2eee7a21d084e923df24ac56"
+    }
+  ],
+  "authorization": {
+    "path": "docs/validation/ra2-parity/review-1/user-shared-full13-authorization.json",
+    "sha256": "18034e2e8365ead87d3e916f978398972615854675f8e81e524e1ecaa35ee4b9"
+  },
+  "native": "199 interrupted deliberately on confirmed P0;01\u201303exit0,04no observed final exit,05\u201313not reached. Original controller receipts stale; partial raws remain unchanged under ra9.",
+  "external_cache_retained": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021"
+}

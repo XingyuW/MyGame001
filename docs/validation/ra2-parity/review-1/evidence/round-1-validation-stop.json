@@ -1,0 +1,70 @@
+{
+  "utc": "2026-10-22T00:40:25.617927+00:00",
+  "source_commit": "23647de4220408d42eeef6522deb4d4541528452",
+  "reason": "Independent SIM2 confirmed P0: stale health snapshot permits IFV repair resurrect parasite-killed host in special/vehicles.rs; root independently read full path. Stop known-bad candidate gate, preserve logs, finish five-slice/lead review then fresh remediation.",
+  "scope": "No source edits, coverage/cap changes or pass credit for interrupted phase4. Current wrappers disappeared; native shell still alive orphaned.",
+  "pgid": 30304,
+  "controller_pids_missing": [
+    18070,
+    29649,
+    30278
+  ],
+  "preimages": [
+    {
+      "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra9/gate-process.json",
+      "archive": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-1-before-stop-gate-process.json",
+      "bytes": 2342,
+      "sha256": "63639cb0da88de79008469968bb2d78971a37614572411223c07877aee49108a"
+    },
+    {
+      "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra9/198-to-199-continuation.json",
+      "archive": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-1-before-stop-198-to-199-continuation.json",
+      "bytes": 536,
+      "sha256": "e6956ad02f9630f4f68129e4c65e3c661eca5392b5bb3a67de7b85a33b544f47"
+    },
+    {
+      "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra9/203-postgate-closing-process.json",
+      "archive": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-1-before-stop-203-postgate-closing-process.json",
+      "bytes": 662,
+      "sha256": "a97159ce332c23d331fc65ba4b08873a7eab51e745296699562860848e7630a9"
+    },
+    {
+      "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra9/summary.txt",
+      "archive": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-1-before-stop-summary.txt",
+      "bytes": 146,
+      "sha256": "6f4fc6df28368f25e55d4a8d0c7088da77c5ccad7a223bd44eb1a27f0c25443c"
+    }
+  ],
+  "owned_group_before": [
+    "30304     1 30304    07:10:47   0:00.02   0.0    752 Ss   sh scripts/validate_ra2_parity.sh ra9",
+    "30309 30304 30304    07:10:47   0:00.01   0.0   1680 S    caffeinate -d -i -w 30304",
+    "30436 30304 30304    07:10:38   0:00.95   0.0   9328 S    /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo test --workspace --release",
+    "45833 30436 30304    06:08:26 861:17.66 175.5 215328 R    /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-cf20e94e4f55d858"
+  ],
+  "owned_group_after": [],
+  "signal": "SIGTERM",
+  "end_utc": "2026-10-22T00:40:27.864433+00:00",
+  "raws_after": [
+    {
+      "path": "docs/validation/ra2-parity/ra9/01-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra9/02-diff-check.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra9/03-clippy.log",
+      "bytes": 150,
+      "sha256": "5b906185cf2f60f27279fa2a148998fb75ba423c09023f8c27cfd84e479745c1"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra9/04-test.log",
+      "bytes": 29255,
+      "sha256": "f9abe18dcc6bc0548589061fa1a8083b1198270b1c898662bc96ba9336a419da"
+    }
+  ],
+  "status": "INTERRUPTED_ON_CONFIRMED_REVIEW_P0_NO_FULL13_PASS"
+}
