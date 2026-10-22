@@ -1,5 +1,22 @@
 # Milestone status
 
+## Current RA9 validation blocker — 2026-10-22 23:17 UTC
+
+The corrected candidate's required `review-2` full validation found an actual non-Won:
+seed0 Liberty Bay, France Medium against Germany Medium reached288000/288000 ticks.
+The raw witness and complete interrupted attempt are preserved in
+[review-2](validation/ra2-parity/review-2/gate-process.json). Only commands01–03 completed
+with exit0; command04 was deliberately interrupted after the genuine failed match, and05–13
+were not reached. The direct validator shell exit was-15; its parent wrapper exited241.
+No native test grandchild exit is inferred. This attempt is neither a full pass nor acceptance.
+
+R201 records the failure and targeted correction. The previously completed all21 isolated wins,
+fixed three windows and example guards retain their narrower historical C-source scope.
+All five independent revised source reports and partial isolated-evidence addenda are preserved;
+final corrected-source validation, five updated slices and a fresh binding lead remain required.
+Panel2 is still open; no merge or programme tag exists. All51 user-only checks remain PENDING.
+Both projects keep running, with original match limits and assertions unchanged.
+
 ## Latest RA9 state — independent review1 NO-GO (2026-10-22)
 
 This current entry supersedes the older preliminary/current headlines below as historical snapshots.

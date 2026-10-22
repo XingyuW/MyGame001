@@ -12233,3 +12233,33 @@ failure/restoration, original command/worker/cap/performance/determinism/heap li
 and51 user-only HOWTOSEE bytes remain. Both projects continue; no unrelated process changed.
 No clone/worktree/substantial temporary artifact is created. Existing approved review cache,
 configured build/Python caches and historical ordinary validation copy remain needed evidence.
+
+
+### R201. Preserve actual corrected-source non-Won and isolate its cause before rerunning
+
+The full required review-2 attempt on6bba9d2 reached a real M6 failure: seed0 Liberty Bay,
+France Medium against Germany Medium, None at288000 of the unchanged288000 cap. The raw
+04-test.log witness is preserved (41128bytes, SHA256
+11a42ae9f5bf9ee738ab0cb192bf21d6832158baa89d1f297a9c1506f43b7565).
+The previous completed progress message reports144/756 Won; it is not a complete sweep.
+No fresh756 result table was produced and no stale cache table is promoted.
+
+After verifying owned validatorPID/PGID43684 and exact argv, root stopped this doomed attempt
+with SIGTERM at23:17:08.530435UTC. Actual direct shell exit-15 and parent wrapper exit241
+are separately preserved; native Cargo/test grandchild exit was not individually observed.
+Source689/64 remained exact. Commands01–03 exited0;04 did not complete,05–13 were not run.
+The durable pipeline stopped without assets, successful closing metadata, a lead decision,
+merge or tag. Its helpers/logs remain immutable historical evidence. The owned native group
+was verified empty before the implementer received the next exclusive diagnosis lease.
+
+The prior21-map ten-player wins, three fixed windows and three example guards remain genuine
+narrower C-source evidence, never proof of this distinct two-player match or final source.
+All five revised independent source reports and five partial isolated-native addenda are kept.
+Their shared final-acceptance blocker stays open; this actual failure is now also blocking.
+Targeted reproduction must use the existing match setup, seed and original cap, gain meaningful
+failing-before/passing-after coverage, and correct actual AI play without privileged terrain,
+forced winners, arbitrary retirement, cap increases or weakened assertions/rosters/workers.
+All new source requires a new factual freeze, complete required gate and full revised cumulative
+independent slice inspection before the fresh panel2 lead. R172/R194/R199 remain binding.
+Both projects continue unchanged; no unrelated process is paused or reprioritized. Existing
+approved review/configured build caches remain needed, with no clone/worktree or large/tmp.
