@@ -1,0 +1,318 @@
+{
+  "C-ai-temporal-after-01/00.json": {
+    "sha256": "095ac553ee4939ec8b32220b25271012fe3f2dd90f4048b5af584b8c0098f834",
+    "bytes": 448
+  },
+  "C-ai-temporal-after-01/00.log": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "C-ai-temporal-after-01/01.json": {
+    "sha256": "66e23bb9d2b402fe68f7935b2284d2e65878009bc12307985b831cb6d4672251",
+    "bytes": 562
+  },
+  "C-ai-temporal-after-01/01.log": {
+    "sha256": "0831283bd140fa25ae5882462622fbb653d4610f2d07c55417c6385814d8b591",
+    "bytes": 1358
+  },
+  "C-ai-temporal-after-01/tested-source/crates/game/tests/m6_production_matches.rs": {
+    "sha256": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2",
+    "bytes": 37470
+  },
+  "C-ai-temporal-after-01/tested-source/crates/sim/src/ai.rs": {
+    "sha256": "d0c37c697445e73c7cd1466c85a38de952812ad89a61d93c173acb605a0b679e",
+    "bytes": 208829
+  },
+  "C-ai-temporal-after-01/tested-source/crates/sim/tests/ra8_ai.rs": {
+    "sha256": "cce3082ef92343ab7d81ae997912918553142135eec00e8a49c32da500035065",
+    "bytes": 469839
+  },
+  "C-ai-temporal-after-02/00.json": {
+    "sha256": "bfcd4f41096608d6e905fc891bf61d693ccae9c23e6baa6cbbfbd995f3807226",
+    "bytes": 448
+  },
+  "C-ai-temporal-after-02/00.log": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "C-ai-temporal-after-02/01.json": {
+    "sha256": "979efbe1d7693a52800eb6eb95ead2b69d4b6f6e95b60028d821305d07ba7632",
+    "bytes": 560
+  },
+  "C-ai-temporal-after-02/01.log": {
+    "sha256": "9c4519bcc9f26474abd316a54f96272272aa7d42f919346c17dbd4ae14eb6ac7",
+    "bytes": 634
+  },
+  "C-ai-temporal-after-02/02.json": {
+    "sha256": "3977270dc21079a8a1e77be7179168a8418a62f176803abae7595f30548fffd6",
+    "bytes": 628
+  },
+  "C-ai-temporal-after-02/02.log": {
+    "sha256": "310589a94868459912da24f101ba1d91c1136bfb440813f93212a98fe1fc29f5",
+    "bytes": 1086
+  },
+  "C-ai-temporal-after-02/tested-source/crates/game/tests/m6_production_matches.rs": {
+    "sha256": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2",
+    "bytes": 37470
+  },
+  "C-ai-temporal-after-02/tested-source/crates/sim/src/ai.rs": {
+    "sha256": "fd37158f1feb40d9a9a392347e962f3ad3c7ed0b715284454e2be2c8c88dac15",
+    "bytes": 208865
+  },
+  "C-ai-temporal-after-02/tested-source/crates/sim/tests/ra8_ai.rs": {
+    "sha256": "8245dd35f21ce66616883565865590f0ed76d5d2f4b9402b8dd0f9e199b7ae6e",
+    "bytes": 471306
+  },
+  "C-ai-temporal-after-03/00.json": {
+    "sha256": "db6be560de02295d950ffb67d1a4a3ae074e46547e74a6d7cb66069223ff7a72",
+    "bytes": 499
+  },
+  "C-ai-temporal-after-03/00.log": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "C-ai-temporal-after-03/01.json": {
+    "sha256": "02b4cb482a16de7897877b619d96793464cc9039d35d1378d2dfb1d84b555c08",
+    "bytes": 605
+  },
+  "C-ai-temporal-after-03/01.log": {
+    "sha256": "504dedf886e81c7816bbe447859b5ad663eb63ecdd0461ab0c8cca5a30126991",
+    "bytes": 1502
+  },
+  "C-ai-temporal-after-03/tested-source/crates/game/tests/m6_production_matches.rs": {
+    "sha256": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2",
+    "bytes": 37470
+  },
+  "C-ai-temporal-after-03/tested-source/crates/sim/src/ai.rs": {
+    "sha256": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a",
+    "bytes": 209040
+  },
+  "C-ai-temporal-after-03/tested-source/crates/sim/tests/ra8_ai.rs": {
+    "sha256": "f2868b88683201abf1ed980a04fb5ce72357ca46d6e704b23889dcfeb1f9d178",
+    "bytes": 475619
+  },
+  "C-ai-temporal-after-04/00.json": {
+    "sha256": "8ae11b45efbbd039ed6aacaf556aac7343519c52bb034f18e98b0dbc7ca27bca",
+    "bytes": 499
+  },
+  "C-ai-temporal-after-04/00.log": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "C-ai-temporal-after-04/01.json": {
+    "sha256": "d720c4beccab4914f1d8f167eff9b6383fb8016cb7ef4de86b4d14936ff848eb",
+    "bytes": 603
+  },
+  "C-ai-temporal-after-04/01.log": {
+    "sha256": "e71856e4eeb0791ddf5d73e6b9c407486b648fafc1a238d19ab2f8e3db34181e",
+    "bytes": 778
+  },
+  "C-ai-temporal-after-04/02.json": {
+    "sha256": "d79c479e1f0e478312ac275f397fec17744b604077860d3df49b94d2243c0fdc",
+    "bytes": 677
+  },
+  "C-ai-temporal-after-04/02.log": {
+    "sha256": "cefc2e41f45ff115481892d2198347450c229dfd2eefc492881f63d6e57b9069",
+    "bytes": 626
+  },
+  "C-ai-temporal-after-04/tested-source/crates/game/tests/m6_production_matches.rs": {
+    "sha256": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2",
+    "bytes": 37470
+  },
+  "C-ai-temporal-after-04/tested-source/crates/sim/src/ai.rs": {
+    "sha256": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a",
+    "bytes": 209040
+  },
+  "C-ai-temporal-after-04/tested-source/crates/sim/tests/ra8_ai.rs": {
+    "sha256": "9fc94242182e30921c26ec7789a7f649a961e847666234406093bea8240d5f67",
+    "bytes": 475965
+  },
+  "C-ai-temporal-after-05/00.json": {
+    "sha256": "0b7b53bdf69ed11f3f6368de52e0f28a4da9141ad72a33f410b50cec37d5e020",
+    "bytes": 809
+  },
+  "C-ai-temporal-after-05/00.log": {
+    "sha256": "5cd6272cdeeaf5d9cf856f65e5c01d298b7cbd47178541057bcd2b333d496739",
+    "bytes": 779
+  },
+  "C-ai-temporal-after-05/01.json": {
+    "sha256": "b6f9b317f0c43f3aeb2609f6a7acfe0cc9c9f3abacead54798c33469f68a50ef",
+    "bytes": 760
+  },
+  "C-ai-temporal-after-05/01.log": {
+    "sha256": "69e93c1ee25241bedcc151d344f89aacacbc7479cd7777b5cfff7d6ab01169ea",
+    "bytes": 12840
+  },
+  "C-ai-temporal-after-05/02.json": {
+    "sha256": "42bbc82ae531edeec3ada5bd19149e2f383825508f56bcac7becb88aceacb189",
+    "bytes": 625
+  },
+  "C-ai-temporal-after-05/02.log": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "C-ai-temporal-after-05/03.json": {
+    "sha256": "705044c3662d1f69a25e042230af0e7abbbe4d86aadb278f64fa843d3e8a42b9",
+    "bytes": 601
+  },
+  "C-ai-temporal-after-05/03.log": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "C-ai-temporal-after-05/tested-source/crates/game/tests/m6_production_matches.rs": {
+    "sha256": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2",
+    "bytes": 37470
+  },
+  "C-ai-temporal-after-05/tested-source/crates/sim/src/ai.rs": {
+    "sha256": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a",
+    "bytes": 209040
+  },
+  "C-ai-temporal-after-05/tested-source/crates/sim/tests/ra8_ai.rs": {
+    "sha256": "9fc94242182e30921c26ec7789a7f649a961e847666234406093bea8240d5f67",
+    "bytes": 475965
+  },
+  "C-ai-temporal-before-01/00.json": {
+    "sha256": "a7b3876ee75fab345f346d0eb6bf655cf0b8bd96561c8436b562495e79007a77",
+    "bytes": 448
+  },
+  "C-ai-temporal-before-01/00.log": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "C-ai-temporal-before-01/01.json": {
+    "sha256": "a236677aa46571721dcae9889703ba7f6fe3a3735c029a736b089e12a1779717",
+    "bytes": 562
+  },
+  "C-ai-temporal-before-01/01.log": {
+    "sha256": "893a61c5a2e7b95bdee5fe9ab304f452ade80562436e6c8ce3294504131b8ad0",
+    "bytes": 1304
+  },
+  "C-ai-temporal-before-01/02-exact-tuple.json": {
+    "sha256": "e86c61fa4d4bdd7290e5264d927c7acf8b49f4257f3be63915d0a55dabe2c372",
+    "bytes": 628
+  },
+  "C-ai-temporal-before-01/02-exact-tuple.log": {
+    "sha256": "f21b638154a21f09988dcef4d27415025f8e6be8d939850da36a7fe2ac4be097",
+    "bytes": 1005
+  },
+  "C-ai-temporal-before-01/preimages.json": {
+    "sha256": "7a18e853a9ccd61e60850f3bd583d00d577bda945c8fdbf53e9cd3c58983eb1a",
+    "bytes": 680
+  },
+  "C-ai-temporal-before-01/source-preimages/crates/game/tests/m6_production_matches.rs": {
+    "sha256": "f9d3de4abf4fa787c189b03a32ee7a4436fe7b4e7e6338cc424b8e6abdb84b7b",
+    "bytes": 37217
+  },
+  "C-ai-temporal-before-01/source-preimages/crates/sim/src/ai.rs": {
+    "sha256": "32e2f224eb66136803ce40c27a886d7346b00026cda4b9f9c8c5aa02abdbd2f8",
+    "bytes": 208229
+  },
+  "C-ai-temporal-before-01/source-preimages/crates/sim/tests/ra8_ai.rs": {
+    "sha256": "2472e56bff3ff4ee6b048132619cc71d848dc4a281012930b4417358f69f851b",
+    "bytes": 462426
+  },
+  "C-ai-temporal-before-01/tested-source/crates/game/tests/m6_production_matches.rs": {
+    "sha256": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2",
+    "bytes": 37470
+  },
+  "C-ai-temporal-before-01/tested-source/crates/sim/src/ai.rs": {
+    "sha256": "32e2f224eb66136803ce40c27a886d7346b00026cda4b9f9c8c5aa02abdbd2f8",
+    "bytes": 208229
+  },
+  "C-ai-temporal-before-01/tested-source/crates/sim/tests/ra8_ai.rs": {
+    "sha256": "cce3082ef92343ab7d81ae997912918553142135eec00e8a49c32da500035065",
+    "bytes": 469839
+  },
+  "C-ai-temporal-before-02/00.json": {
+    "sha256": "0f52575775cb6a4f6dc211b10c64c3a5b6e7a99f3441604c0fee911d41eeef6e",
+    "bytes": 815
+  },
+  "C-ai-temporal-before-02/00.log": {
+    "sha256": "936b2fe719d354d290ae39385eb610550f79f55ffd6aa95c9afbcfc04be0da82",
+    "bytes": 2318
+  },
+  "C-ai-temporal-before-02/final-ai-to-restore.rs": {
+    "sha256": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a",
+    "bytes": 209040
+  },
+  "C-ai-temporal-before-02/restoration.json": {
+    "sha256": "7a90ec906529ee6142643620ed8353ab136edc6d6836a6ec0614ca429eb77acb",
+    "bytes": 424
+  },
+  "C-ai-temporal-before-02/tested-source/crates/game/tests/m6_production_matches.rs": {
+    "sha256": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2",
+    "bytes": 37470
+  },
+  "C-ai-temporal-before-02/tested-source/crates/sim/src/ai.rs": {
+    "sha256": "32e2f224eb66136803ce40c27a886d7346b00026cda4b9f9c8c5aa02abdbd2f8",
+    "bytes": 208229
+  },
+  "C-ai-temporal-before-02/tested-source/crates/sim/tests/ra8_ai.rs": {
+    "sha256": "9fc94242182e30921c26ec7789a7f649a961e847666234406093bea8240d5f67",
+    "bytes": 475965
+  },
+  "C-ai-temporal-fixture-01/00.json": {
+    "sha256": "843ad3aeab2ee49892932ce6940cf4d91a98dbb4098fe0d4fc1d69688e924504",
+    "bytes": 228
+  },
+  "C-ai-temporal-fixture-01/00.log": {
+    "sha256": "522a2f346261d2e15176b3cf3d9e5a68a2c10c7f96d94ad22cc1c05174dad987",
+    "bytes": 57847
+  },
+  "C-ai-temporal-fixture-01/tested-source/crates/game/tests/m6_production_matches.rs": {
+    "sha256": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2",
+    "bytes": 37470
+  },
+  "C-ai-temporal-fixture-01/tested-source/crates/sim/src/ai.rs": {
+    "sha256": "d0c37c697445e73c7cd1466c85a38de952812ad89a61d93c173acb605a0b679e",
+    "bytes": 208829
+  },
+  "C-ai-temporal-fixture-01/tested-source/crates/sim/tests/ra8_ai.rs": {
+    "sha256": "731402e49a91c5958fc6086751fe40dd357d4068e1f90e0470d77405c059c07d",
+    "bytes": 470024
+  },
+  "C-ai-temporal-fixture-02/00.json": {
+    "sha256": "1a5856aef5405233fb0c9ff1a32688b05e1829f3094c3798109ceb96b8eb5dfb",
+    "bytes": 448
+  },
+  "C-ai-temporal-fixture-02/00.log": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "C-ai-temporal-fixture-02/01.json": {
+    "sha256": "9a3baeeeae6525b53235e2482f0c6026a1b06d3ff4597ca6a35033c70dea9583",
+    "bytes": 560
+  },
+  "C-ai-temporal-fixture-02/01.log": {
+    "sha256": "7f5f1fccdd78e8a236c31cb325b2270dbc16d4d019d6d7711c4c04622a933950",
+    "bytes": 553
+  },
+  "C-ai-temporal-fixture-02/tested-source/crates/game/tests/m6_production_matches.rs": {
+    "sha256": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2",
+    "bytes": 37470
+  },
+  "C-ai-temporal-fixture-02/tested-source/crates/sim/src/ai.rs": {
+    "sha256": "fd37158f1feb40d9a9a392347e962f3ad3c7ed0b715284454e2be2c8c88dac15",
+    "bytes": 208865
+  },
+  "C-ai-temporal-fixture-02/tested-source/crates/sim/tests/ra8_ai.rs": {
+    "sha256": "152eab57071163d620df0ac663d95e1bbd2a63605e52a12e1c69b8825e60eebd",
+    "bytes": 470010
+  },
+  "C-ai-temporal-fixture-03/00.json": {
+    "sha256": "b34ef3e980e758bc37e1b3dcc27159c7e1853dd9c0ac49064bba41b73e52e90d",
+    "bytes": 233
+  },
+  "C-ai-temporal-fixture-03/00.log": {
+    "sha256": "bc9cc2ca18ce3a2e79385f5a2976e45b82bc023b056a49cf4f846b830a927556",
+    "bytes": 39515
+  },
+  "C-ai-temporal-fixture-03/tested-source/crates/sim/src/ai.rs": {
+    "sha256": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a",
+    "bytes": 209040
+  },
+  "C-ai-temporal-fixture-03/tested-source/crates/sim/tests/ra8_ai.rs": {
+    "sha256": "a5f5fa700c38a4fca79ac8108cce4d869cad1ed310a1dfd7b9e7c60ea8638975",
+    "bytes": 475894
+  }
+}

@@ -1,0 +1,21 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 9.81s
+     Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-cf20e94e4f55d858)
+
+running 1 test
+test ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner ... 
+thread 'ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner' (18382156) panicked at crates/game/tests/m6_production_matches.rs:761:9:
+assertion `left == right` failed: state hash at native tick 36001, completed step 36002
+  left: 12788518219155357490
+ right: 5782474623938001519
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 20.11s
+
+error: test failed, to rerun pass `-p game --test m6_production_matches`

@@ -1,0 +1,576 @@
+{
+  "utc": "2026-10-23T02:52:18.918132+00:00",
+  "status": "BYTE_EXACT_TARGETED_TEMPORAL_EVIDENCE_AND_PREINSPECTION_IMPORT_NOT_FULL_ACCEPTANCE",
+  "records": [
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-01/00.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-01/00.json",
+      "bytes": 448,
+      "sha256": "095ac553ee4939ec8b32220b25271012fe3f2dd90f4048b5af584b8c0098f834"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-01/00.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-01/00.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-01/01.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-01/01.json",
+      "bytes": 562,
+      "sha256": "66e23bb9d2b402fe68f7935b2284d2e65878009bc12307985b831cb6d4672251"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-01/01.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-01/01.log",
+      "bytes": 1358,
+      "sha256": "0831283bd140fa25ae5882462622fbb653d4610f2d07c55417c6385814d8b591"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-01/tested-source/crates/game/tests/m6_production_matches.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-01/tested-source/crates/game/tests/m6_production_matches.rs",
+      "bytes": 37470,
+      "sha256": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-01/tested-source/crates/sim/src/ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-01/tested-source/crates/sim/src/ai.rs",
+      "bytes": 208829,
+      "sha256": "d0c37c697445e73c7cd1466c85a38de952812ad89a61d93c173acb605a0b679e"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-01/tested-source/crates/sim/tests/ra8_ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-01/tested-source/crates/sim/tests/ra8_ai.rs",
+      "bytes": 469839,
+      "sha256": "cce3082ef92343ab7d81ae997912918553142135eec00e8a49c32da500035065"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-02/00.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-02/00.json",
+      "bytes": 448,
+      "sha256": "bfcd4f41096608d6e905fc891bf61d693ccae9c23e6baa6cbbfbd995f3807226"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-02/00.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-02/00.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-02/01.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-02/01.json",
+      "bytes": 560,
+      "sha256": "979efbe1d7693a52800eb6eb95ead2b69d4b6f6e95b60028d821305d07ba7632"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-02/01.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-02/01.log",
+      "bytes": 634,
+      "sha256": "9c4519bcc9f26474abd316a54f96272272aa7d42f919346c17dbd4ae14eb6ac7"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-02/02.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-02/02.json",
+      "bytes": 628,
+      "sha256": "3977270dc21079a8a1e77be7179168a8418a62f176803abae7595f30548fffd6"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-02/02.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-02/02.log",
+      "bytes": 1086,
+      "sha256": "310589a94868459912da24f101ba1d91c1136bfb440813f93212a98fe1fc29f5"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-02/tested-source/crates/game/tests/m6_production_matches.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-02/tested-source/crates/game/tests/m6_production_matches.rs",
+      "bytes": 37470,
+      "sha256": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-02/tested-source/crates/sim/src/ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-02/tested-source/crates/sim/src/ai.rs",
+      "bytes": 208865,
+      "sha256": "fd37158f1feb40d9a9a392347e962f3ad3c7ed0b715284454e2be2c8c88dac15"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-02/tested-source/crates/sim/tests/ra8_ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-02/tested-source/crates/sim/tests/ra8_ai.rs",
+      "bytes": 471306,
+      "sha256": "8245dd35f21ce66616883565865590f0ed76d5d2f4b9402b8dd0f9e199b7ae6e"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-03/00.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-03/00.json",
+      "bytes": 499,
+      "sha256": "db6be560de02295d950ffb67d1a4a3ae074e46547e74a6d7cb66069223ff7a72"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-03/00.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-03/00.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-03/01.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-03/01.json",
+      "bytes": 605,
+      "sha256": "02b4cb482a16de7897877b619d96793464cc9039d35d1378d2dfb1d84b555c08"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-03/01.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-03/01.log",
+      "bytes": 1502,
+      "sha256": "504dedf886e81c7816bbe447859b5ad663eb63ecdd0461ab0c8cca5a30126991"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-03/tested-source/crates/game/tests/m6_production_matches.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-03/tested-source/crates/game/tests/m6_production_matches.rs",
+      "bytes": 37470,
+      "sha256": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-03/tested-source/crates/sim/src/ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-03/tested-source/crates/sim/src/ai.rs",
+      "bytes": 209040,
+      "sha256": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-03/tested-source/crates/sim/tests/ra8_ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-03/tested-source/crates/sim/tests/ra8_ai.rs",
+      "bytes": 475619,
+      "sha256": "f2868b88683201abf1ed980a04fb5ce72357ca46d6e704b23889dcfeb1f9d178"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-04/00.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-04/00.json",
+      "bytes": 499,
+      "sha256": "8ae11b45efbbd039ed6aacaf556aac7343519c52bb034f18e98b0dbc7ca27bca"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-04/00.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-04/00.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-04/01.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-04/01.json",
+      "bytes": 603,
+      "sha256": "d720c4beccab4914f1d8f167eff9b6383fb8016cb7ef4de86b4d14936ff848eb"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-04/01.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-04/01.log",
+      "bytes": 778,
+      "sha256": "e71856e4eeb0791ddf5d73e6b9c407486b648fafc1a238d19ab2f8e3db34181e"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-04/02.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-04/02.json",
+      "bytes": 677,
+      "sha256": "d79c479e1f0e478312ac275f397fec17744b604077860d3df49b94d2243c0fdc"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-04/02.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-04/02.log",
+      "bytes": 626,
+      "sha256": "cefc2e41f45ff115481892d2198347450c229dfd2eefc492881f63d6e57b9069"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-04/tested-source/crates/game/tests/m6_production_matches.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-04/tested-source/crates/game/tests/m6_production_matches.rs",
+      "bytes": 37470,
+      "sha256": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-04/tested-source/crates/sim/src/ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-04/tested-source/crates/sim/src/ai.rs",
+      "bytes": 209040,
+      "sha256": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-04/tested-source/crates/sim/tests/ra8_ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-04/tested-source/crates/sim/tests/ra8_ai.rs",
+      "bytes": 475965,
+      "sha256": "9fc94242182e30921c26ec7789a7f649a961e847666234406093bea8240d5f67"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-05/00.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-05/00.json",
+      "bytes": 809,
+      "sha256": "0b7b53bdf69ed11f3f6368de52e0f28a4da9141ad72a33f410b50cec37d5e020"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-05/00.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-05/00.log",
+      "bytes": 779,
+      "sha256": "5cd6272cdeeaf5d9cf856f65e5c01d298b7cbd47178541057bcd2b333d496739"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-05/01.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-05/01.json",
+      "bytes": 760,
+      "sha256": "b6f9b317f0c43f3aeb2609f6a7acfe0cc9c9f3abacead54798c33469f68a50ef"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-05/01.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-05/01.log",
+      "bytes": 12840,
+      "sha256": "69e93c1ee25241bedcc151d344f89aacacbc7479cd7777b5cfff7d6ab01169ea"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-05/02.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-05/02.json",
+      "bytes": 625,
+      "sha256": "42bbc82ae531edeec3ada5bd19149e2f383825508f56bcac7becb88aceacb189"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-05/02.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-05/02.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-05/03.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-05/03.json",
+      "bytes": 601,
+      "sha256": "705044c3662d1f69a25e042230af0e7abbbe4d86aadb278f64fa843d3e8a42b9"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-05/03.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-05/03.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-05/tested-source/crates/game/tests/m6_production_matches.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-05/tested-source/crates/game/tests/m6_production_matches.rs",
+      "bytes": 37470,
+      "sha256": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-05/tested-source/crates/sim/src/ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-05/tested-source/crates/sim/src/ai.rs",
+      "bytes": 209040,
+      "sha256": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-05/tested-source/crates/sim/tests/ra8_ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-after-05/tested-source/crates/sim/tests/ra8_ai.rs",
+      "bytes": 475965,
+      "sha256": "9fc94242182e30921c26ec7789a7f649a961e847666234406093bea8240d5f67"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-01/00.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-before-01/00.json",
+      "bytes": 448,
+      "sha256": "a7b3876ee75fab345f346d0eb6bf655cf0b8bd96561c8436b562495e79007a77"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-01/00.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-before-01/00.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-01/01.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-before-01/01.json",
+      "bytes": 562,
+      "sha256": "a236677aa46571721dcae9889703ba7f6fe3a3735c029a736b089e12a1779717"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-01/01.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-before-01/01.log",
+      "bytes": 1304,
+      "sha256": "893a61c5a2e7b95bdee5fe9ab304f452ade80562436e6c8ce3294504131b8ad0"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-01/02-exact-tuple.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-before-01/02-exact-tuple.json",
+      "bytes": 628,
+      "sha256": "e86c61fa4d4bdd7290e5264d927c7acf8b49f4257f3be63915d0a55dabe2c372"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-01/02-exact-tuple.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-before-01/02-exact-tuple.log",
+      "bytes": 1005,
+      "sha256": "f21b638154a21f09988dcef4d27415025f8e6be8d939850da36a7fe2ac4be097"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-01/preimages.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-before-01/preimages.json",
+      "bytes": 680,
+      "sha256": "7a18e853a9ccd61e60850f3bd583d00d577bda945c8fdbf53e9cd3c58983eb1a"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-01/source-preimages/crates/game/tests/m6_production_matches.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-before-01/source-preimages/crates/game/tests/m6_production_matches.rs",
+      "bytes": 37217,
+      "sha256": "f9d3de4abf4fa787c189b03a32ee7a4436fe7b4e7e6338cc424b8e6abdb84b7b"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-01/source-preimages/crates/sim/src/ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-before-01/source-preimages/crates/sim/src/ai.rs",
+      "bytes": 208229,
+      "sha256": "32e2f224eb66136803ce40c27a886d7346b00026cda4b9f9c8c5aa02abdbd2f8"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-01/source-preimages/crates/sim/tests/ra8_ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-before-01/source-preimages/crates/sim/tests/ra8_ai.rs",
+      "bytes": 462426,
+      "sha256": "2472e56bff3ff4ee6b048132619cc71d848dc4a281012930b4417358f69f851b"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-01/tested-source/crates/game/tests/m6_production_matches.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-before-01/tested-source/crates/game/tests/m6_production_matches.rs",
+      "bytes": 37470,
+      "sha256": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-01/tested-source/crates/sim/src/ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-before-01/tested-source/crates/sim/src/ai.rs",
+      "bytes": 208229,
+      "sha256": "32e2f224eb66136803ce40c27a886d7346b00026cda4b9f9c8c5aa02abdbd2f8"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-01/tested-source/crates/sim/tests/ra8_ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-before-01/tested-source/crates/sim/tests/ra8_ai.rs",
+      "bytes": 469839,
+      "sha256": "cce3082ef92343ab7d81ae997912918553142135eec00e8a49c32da500035065"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-02/00.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-before-02/00.json",
+      "bytes": 815,
+      "sha256": "0f52575775cb6a4f6dc211b10c64c3a5b6e7a99f3441604c0fee911d41eeef6e"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-02/00.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-before-02/00.log",
+      "bytes": 2318,
+      "sha256": "936b2fe719d354d290ae39385eb610550f79f55ffd6aa95c9afbcfc04be0da82"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-02/final-ai-to-restore.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-before-02/final-ai-to-restore.rs",
+      "bytes": 209040,
+      "sha256": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-02/restoration.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-before-02/restoration.json",
+      "bytes": 424,
+      "sha256": "7a90ec906529ee6142643620ed8353ab136edc6d6836a6ec0614ca429eb77acb"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-02/tested-source/crates/game/tests/m6_production_matches.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-before-02/tested-source/crates/game/tests/m6_production_matches.rs",
+      "bytes": 37470,
+      "sha256": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-02/tested-source/crates/sim/src/ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-before-02/tested-source/crates/sim/src/ai.rs",
+      "bytes": 208229,
+      "sha256": "32e2f224eb66136803ce40c27a886d7346b00026cda4b9f9c8c5aa02abdbd2f8"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-02/tested-source/crates/sim/tests/ra8_ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-before-02/tested-source/crates/sim/tests/ra8_ai.rs",
+      "bytes": 475965,
+      "sha256": "9fc94242182e30921c26ec7789a7f649a961e847666234406093bea8240d5f67"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-fixture-01/00.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-fixture-01/00.json",
+      "bytes": 228,
+      "sha256": "843ad3aeab2ee49892932ce6940cf4d91a98dbb4098fe0d4fc1d69688e924504"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-fixture-01/00.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-fixture-01/00.log",
+      "bytes": 57847,
+      "sha256": "522a2f346261d2e15176b3cf3d9e5a68a2c10c7f96d94ad22cc1c05174dad987"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-fixture-01/tested-source/crates/game/tests/m6_production_matches.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-fixture-01/tested-source/crates/game/tests/m6_production_matches.rs",
+      "bytes": 37470,
+      "sha256": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-fixture-01/tested-source/crates/sim/src/ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-fixture-01/tested-source/crates/sim/src/ai.rs",
+      "bytes": 208829,
+      "sha256": "d0c37c697445e73c7cd1466c85a38de952812ad89a61d93c173acb605a0b679e"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-fixture-01/tested-source/crates/sim/tests/ra8_ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-fixture-01/tested-source/crates/sim/tests/ra8_ai.rs",
+      "bytes": 470024,
+      "sha256": "731402e49a91c5958fc6086751fe40dd357d4068e1f90e0470d77405c059c07d"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-fixture-02/00.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-fixture-02/00.json",
+      "bytes": 448,
+      "sha256": "1a5856aef5405233fb0c9ff1a32688b05e1829f3094c3798109ceb96b8eb5dfb"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-fixture-02/00.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-fixture-02/00.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-fixture-02/01.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-fixture-02/01.json",
+      "bytes": 560,
+      "sha256": "9a3baeeeae6525b53235e2482f0c6026a1b06d3ff4597ca6a35033c70dea9583"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-fixture-02/01.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-fixture-02/01.log",
+      "bytes": 553,
+      "sha256": "7f5f1fccdd78e8a236c31cb325b2270dbc16d4d019d6d7711c4c04622a933950"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-fixture-02/tested-source/crates/game/tests/m6_production_matches.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-fixture-02/tested-source/crates/game/tests/m6_production_matches.rs",
+      "bytes": 37470,
+      "sha256": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-fixture-02/tested-source/crates/sim/src/ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-fixture-02/tested-source/crates/sim/src/ai.rs",
+      "bytes": 208865,
+      "sha256": "fd37158f1feb40d9a9a392347e962f3ad3c7ed0b715284454e2be2c8c88dac15"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-fixture-02/tested-source/crates/sim/tests/ra8_ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-fixture-02/tested-source/crates/sim/tests/ra8_ai.rs",
+      "bytes": 470010,
+      "sha256": "152eab57071163d620df0ac663d95e1bbd2a63605e52a12e1c69b8825e60eebd"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-fixture-03/00.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-fixture-03/00.json",
+      "bytes": 233,
+      "sha256": "b34ef3e980e758bc37e1b3dcc27159c7e1853dd9c0ac49064bba41b73e52e90d"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-fixture-03/00.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-fixture-03/00.log",
+      "bytes": 39515,
+      "sha256": "bc9cc2ca18ce3a2e79385f5a2976e45b82bc023b056a49cf4f846b830a927556"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-fixture-03/tested-source/crates/sim/src/ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-fixture-03/tested-source/crates/sim/src/ai.rs",
+      "bytes": 209040,
+      "sha256": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-fixture-03/tested-source/crates/sim/tests/ra8_ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-fixture-03/tested-source/crates/sim/tests/ra8_ai.rs",
+      "bytes": 475894,
+      "sha256": "a5f5fa700c38a4fca79ac8108cce4d869cad1ed310a1dfd7b9e7c60ea8638975"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-handoff-01/artifact-manifest.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-handoff-01/artifact-manifest.json",
+      "bytes": 12550,
+      "sha256": "82df892fbd0af23dbabcf2d7339a7bb5030ac80c932748e2c91bd150dcb706ff"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-handoff-01/handoff.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-handoff-01/handoff.json",
+      "bytes": 20450,
+      "sha256": "8399726a48081de9ecea8d1b0396970d4e2a8ae6fc6879d94d5f85c72ad46a95"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-handoff-01/new-tests.patch",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-handoff-01/new-tests.patch",
+      "bytes": 15000,
+      "sha256": "7873bfcdd840c56b9141fe96007c6355cee89176207a0a51e604e0f5e6d6af97"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-handoff-01/production.patch",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-handoff-01/production.patch",
+      "bytes": 3114,
+      "sha256": "938527b598e7cc1ede01b7f06aca6ed7a5b0686217d326e1ca445e092b93b84d"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c4-building-temporal-preinspection-sim2.md",
+      "canonical": "docs/validation/ra2-parity/remediation-2/round-2-c4-building-temporal-preinspection-sim2.md",
+      "bytes": 7670,
+      "sha256": "d081de03ca13d3bddecddc1e0be538d8fd944aa490763df7022858f498c4fd04"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c4-helper-preinspection-tests.md",
+      "canonical": "docs/validation/ra2-parity/remediation-2/round-2-c4-helper-preinspection-tests.md",
+      "bytes": 10837,
+      "sha256": "c3bbb7b215abdce4ac2d3c96a46773b1eeaaf3d9e33d9b4c8100d646e0389726"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c4-temporal-command-oracle-tests.md",
+      "canonical": "docs/validation/ra2-parity/remediation-2/round-2-c4-temporal-command-oracle-tests.md",
+      "bytes": 16634,
+      "sha256": "4e4b1baa521136f1e69b6d0b2f0f525bbb79ad5f1e9ce6c8c981d9cea5c467c3"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c4-temporal-preinspection-sim2.md",
+      "canonical": "docs/validation/ra2-parity/remediation-2/round-2-c4-temporal-preinspection-sim2.md",
+      "bytes": 5984,
+      "sha256": "fe4a221e9085450d0ffc7908d55fffb6bcd6eac5dfff10a47bc9b39c7220cfe4"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/c4-helper-preparation-manifest.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/c4-helper-preparation-manifest.json",
+      "bytes": 2136,
+      "sha256": "3a7f74c6191da0bcd3f84e58f17f1143b304a44866f2c181a98e2714c4d0c05c"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/freeze-remediation2-inputs-c4.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/freeze-remediation2-inputs-c4.py",
+      "bytes": 4145,
+      "sha256": "a38863f4cd0f1d212ff6359a6603cd21a630c264f523976a8879d1f3706193b0"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/finalize-remediation2-c4-freeze.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/finalize-remediation2-c4-freeze.py",
+      "bytes": 7268,
+      "sha256": "43b1d12f4e3e4930c2bf103f753a80d3014581a8b9c4b2b81c8712bf98db73e9"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/prepare-final-evidence-metadata-c4.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/prepare-final-evidence-metadata-c4.py",
+      "bytes": 8967,
+      "sha256": "f86483dfe24b04ea3e99bf6b5a908c977a45730254dc37577c6681aa660bd3a5"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/summarize-remediation2-full13-c4-v1.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/summarize-remediation2-full13-c4-v1.py",
+      "bytes": 12368,
+      "sha256": "b6bb6a1f32883de8efead56f3e1e3aa493145084921cfbcbd5df83315902e6b7"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/continue-frozen-native-gates-c4-v1.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/continue-frozen-native-gates-c4-v1.py",
+      "bytes": 4680,
+      "sha256": "9a053cf7be1d59e4bfa300f30f2438d1e82d8bf61455747a8b9713abc6232f8a"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/render-corrected-lead-dispatch-c4-v1.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/render-corrected-lead-dispatch-c4-v1.py",
+      "bytes": 5909,
+      "sha256": "ef317b353ee6c61f5e7b75a419f261aaf9ef79306e5751035df2dab07cef7c1b"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/run-frozen-candidate-c4-v1.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/run-frozen-candidate-c4-v1.py",
+      "bytes": 9642,
+      "sha256": "7bc28a77162dcc1945f899f007880c71c22fa2a690f0f7c33bbb8b77761b1af8"
+    }
+  ]
+}
