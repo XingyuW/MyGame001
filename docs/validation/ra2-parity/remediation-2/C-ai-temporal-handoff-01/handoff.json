@@ -1,0 +1,535 @@
+{
+  "utc": "2026-10-23T02:50:34.511838+00:00",
+  "implementer_only": true,
+  "source_native_lease_released": true,
+  "head": "41c2dd72e181bca9498f4046a7b2b2908895029c",
+  "changed_paths": [
+    "crates/game/tests/m6_production_matches.rs",
+    "crates/sim/src/ai.rs",
+    "crates/sim/tests/ra8_ai.rs"
+  ],
+  "final_sha256": {
+    "crates/sim/src/ai.rs": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a",
+    "crates/sim/tests/ra8_ai.rs": "9fc94242182e30921c26ec7789a7f649a961e847666234406093bea8240d5f67",
+    "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+  },
+  "original_test_prefixes": {
+    "crates/sim/tests/ra8_ai.rs": {
+      "exact_original_prefix": true,
+      "original_bytes": 462426,
+      "original_prefix_sha256": "2472e56bff3ff4ee6b048132619cc71d848dc4a281012930b4417358f69f851b",
+      "final_sha256": "9fc94242182e30921c26ec7789a7f649a961e847666234406093bea8240d5f67"
+    },
+    "crates/game/tests/m6_production_matches.rs": {
+      "exact_original_prefix": true,
+      "original_bytes": 37217,
+      "original_prefix_sha256": "f9d3de4abf4fa787c189b03a32ee7a4436fe7b4e7e6338cc424b8e6abdb84b7b",
+      "final_sha256": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+    }
+  },
+  "production": {
+    "decision_only_set": "erased_buildings derived solely from current owned BuildingSnaps and SpecialState.erasures; no persistent simulation state",
+    "garrison": "Retain full recoverable list and all cargo; choose first nonerased host across list, allpaused waits before liquidation, including current last_stand=true",
+    "sales": "Filter erased candidates before ranking in both sell_for_army branches and last_stand; all capability/owned/buildable/provenance lists remain intact",
+    "related_paths": "RepairBuilding/SetRallyPoint intentionally legal under erasure; strategic and ordinary units already guard source availability; unchanged native validators and AiIntent races"
+  },
+  "final_native": {
+    "before_final_five": "C-ai-temporal-before-02/00.json: actual exit101,0passed5failed141filtered",
+    "restored_final_five": "C-ai-temporal-after-05/00.json: actual exit0,5passed0failed141filtered",
+    "whole_ai": "C-ai-temporal-after-05/01.json: actual exit0,146passed0failed0ignored0filtered",
+    "exact_original_tuple": "C-ai-temporal-before-01/02-exact-tuple.json reproduces original tick13002 Deploy SimId3221227968 Target being erased, exit101; C-ai-temporal-after-02/02.json exposes later tick14594 SellBuilding SimId60 erasure rejection, exit101; final C-ai-temporal-after-04/02.json actual exit0 Won15139 of72000,1passed8filtered",
+    "fmt_diff": "C-ai-temporal-after-05/02.json and03.json actual exit0"
+  },
+  "failed_fixture_notes": [
+    "AFTER01/FIXTURE01 recovered=true but no resumed fire: new house13,8 releases outside existing gather radius before unchanged Easy first-wave period; corrected only new fixture house13,12/source18,12 to ordinary home-defense position, no bound increase.",
+    "AFTER03/FIXTURE03 sale release Guard cancelled initial beam but native attacker reacquired before next256-tick sale slot; actual tick1639 last_stand=true+reappeared Erasure preserved. Corrected only new sale fixture to genuine public Move beyond range; no bound increase."
+  ],
+  "preserved_attempt_receipts": [
+    {
+      "receipt": "C-ai-temporal-after-01/00.json",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all"
+      ],
+      "exit": 0,
+      "utc": "2026-10-23T02:38:03.582536+00:00",
+      "hashes": {
+        "crates/sim/src/ai.rs": "d0c37c697445e73c7cd1466c85a38de952812ad89a61d93c173acb605a0b679e",
+        "crates/sim/tests/ra8_ai.rs": "cce3082ef92343ab7d81ae997912918553142135eec00e8a49c32da500035065",
+        "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+      }
+    },
+    {
+      "receipt": "C-ai-temporal-after-01/01.json",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra9_temporal_garrison",
+        "--",
+        "--nocapture"
+      ],
+      "exit": 101,
+      "utc": "2026-10-23T02:38:31.865784+00:00",
+      "hashes": {
+        "crates/sim/src/ai.rs": "d0c37c697445e73c7cd1466c85a38de952812ad89a61d93c173acb605a0b679e",
+        "crates/sim/tests/ra8_ai.rs": "cce3082ef92343ab7d81ae997912918553142135eec00e8a49c32da500035065",
+        "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+      }
+    },
+    {
+      "receipt": "C-ai-temporal-after-02/00.json",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all"
+      ],
+      "exit": 0,
+      "utc": "2026-10-23T02:41:54.688898+00:00",
+      "hashes": {
+        "crates/sim/src/ai.rs": "fd37158f1feb40d9a9a392347e962f3ad3c7ed0b715284454e2be2c8c88dac15",
+        "crates/sim/tests/ra8_ai.rs": "8245dd35f21ce66616883565865590f0ed76d5d2f4b9402b8dd0f9e199b7ae6e",
+        "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+      }
+    },
+    {
+      "receipt": "C-ai-temporal-after-02/01.json",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra9_temporal_garrison",
+        "--",
+        "--nocapture"
+      ],
+      "exit": 0,
+      "utc": "2026-10-23T02:42:03.441436+00:00",
+      "hashes": {
+        "crates/sim/src/ai.rs": "fd37158f1feb40d9a9a392347e962f3ad3c7ed0b715284454e2be2c8c88dac15",
+        "crates/sim/tests/ra8_ai.rs": "8245dd35f21ce66616883565865590f0ed76d5d2f4b9402b8dd0f9e199b7ae6e",
+        "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+      }
+    },
+    {
+      "receipt": "C-ai-temporal-after-02/02.json",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_crossroads_brutal_korea_easy_iraq_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit": 101,
+      "utc": "2026-10-23T02:42:36.773767+00:00",
+      "hashes": {
+        "crates/sim/src/ai.rs": "fd37158f1feb40d9a9a392347e962f3ad3c7ed0b715284454e2be2c8c88dac15",
+        "crates/sim/tests/ra8_ai.rs": "8245dd35f21ce66616883565865590f0ed76d5d2f4b9402b8dd0f9e199b7ae6e",
+        "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+      }
+    },
+    {
+      "receipt": "C-ai-temporal-after-03/00.json",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all"
+      ],
+      "exit": 0,
+      "pid_pgid": 89465,
+      "native_group_empty": true,
+      "utc": "2026-10-23T02:44:35.544016+00:00",
+      "hashes": {
+        "crates/sim/src/ai.rs": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a",
+        "crates/sim/tests/ra8_ai.rs": "101c74568c7883244cd2298180c35afbbde59ef528e428cf68e90b5fac5d52f1",
+        "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+      }
+    },
+    {
+      "receipt": "C-ai-temporal-after-03/01.json",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra9_temporal_",
+        "--",
+        "--nocapture"
+      ],
+      "exit": 101,
+      "pid_pgid": 89468,
+      "native_group_empty": true,
+      "utc": "2026-10-23T02:45:00.553602+00:00",
+      "hashes": {
+        "crates/sim/src/ai.rs": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a",
+        "crates/sim/tests/ra8_ai.rs": "f2868b88683201abf1ed980a04fb5ce72357ca46d6e704b23889dcfeb1f9d178",
+        "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+      }
+    },
+    {
+      "receipt": "C-ai-temporal-after-04/00.json",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all"
+      ],
+      "exit": 0,
+      "pid_pgid": 89764,
+      "native_group_empty": true,
+      "utc": "2026-10-23T02:46:35.746168+00:00",
+      "hashes": {
+        "crates/sim/src/ai.rs": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a",
+        "crates/sim/tests/ra8_ai.rs": "22ee928f01fe895965d837416096206510379bba3f73ce69ff9fb111757c3f09",
+        "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+      }
+    },
+    {
+      "receipt": "C-ai-temporal-after-04/01.json",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra9_temporal_",
+        "--",
+        "--nocapture"
+      ],
+      "exit": 0,
+      "pid_pgid": 89768,
+      "native_group_empty": true,
+      "utc": "2026-10-23T02:46:45.960824+00:00",
+      "hashes": {
+        "crates/sim/src/ai.rs": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a",
+        "crates/sim/tests/ra8_ai.rs": "9fc94242182e30921c26ec7789a7f649a961e847666234406093bea8240d5f67",
+        "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+      }
+    },
+    {
+      "receipt": "C-ai-temporal-after-04/02.json",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_crossroads_brutal_korea_easy_iraq_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit": 0,
+      "pid_pgid": 89825,
+      "native_group_empty": true,
+      "utc": "2026-10-23T02:47:22.110794+00:00",
+      "hashes": {
+        "crates/sim/src/ai.rs": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a",
+        "crates/sim/tests/ra8_ai.rs": "9fc94242182e30921c26ec7789a7f649a961e847666234406093bea8240d5f67",
+        "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+      }
+    },
+    {
+      "receipt": "C-ai-temporal-after-05/00.json",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra9_temporal_",
+        "--",
+        "--nocapture"
+      ],
+      "exit": 0,
+      "pid_pgid": 90003,
+      "native_group_empty": true,
+      "utc": "2026-10-23T02:48:46.695274+00:00",
+      "hashes": {
+        "crates/sim/src/ai.rs": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a",
+        "crates/sim/tests/ra8_ai.rs": "9fc94242182e30921c26ec7789a7f649a961e847666234406093bea8240d5f67",
+        "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+      },
+      "log_sha256": "5cd6272cdeeaf5d9cf856f65e5c01d298b7cbd47178541057bcd2b333d496739",
+      "results": [
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 141 filtered out; finished in 0.13s"
+      ]
+    },
+    {
+      "receipt": "C-ai-temporal-after-05/01.json",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai"
+      ],
+      "exit": 0,
+      "pid_pgid": 90039,
+      "native_group_empty": true,
+      "utc": "2026-10-23T02:49:13.167790+00:00",
+      "hashes": {
+        "crates/sim/src/ai.rs": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a",
+        "crates/sim/tests/ra8_ai.rs": "9fc94242182e30921c26ec7789a7f649a961e847666234406093bea8240d5f67",
+        "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+      },
+      "log_sha256": "69e93c1ee25241bedcc151d344f89aacacbc7479cd7777b5cfff7d6ab01169ea",
+      "results": [
+        "test result: ok. 146 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 26.37s"
+      ]
+    },
+    {
+      "receipt": "C-ai-temporal-after-05/02.json",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit": 0,
+      "pid_pgid": 90049,
+      "native_group_empty": true,
+      "utc": "2026-10-23T02:49:14.449112+00:00",
+      "hashes": {
+        "crates/sim/src/ai.rs": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a",
+        "crates/sim/tests/ra8_ai.rs": "9fc94242182e30921c26ec7789a7f649a961e847666234406093bea8240d5f67",
+        "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+      },
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "results": []
+    },
+    {
+      "receipt": "C-ai-temporal-after-05/03.json",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "pid_pgid": 90054,
+      "native_group_empty": true,
+      "utc": "2026-10-23T02:49:14.465072+00:00",
+      "hashes": {
+        "crates/sim/src/ai.rs": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a",
+        "crates/sim/tests/ra8_ai.rs": "9fc94242182e30921c26ec7789a7f649a961e847666234406093bea8240d5f67",
+        "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+      },
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "results": []
+    },
+    {
+      "receipt": "C-ai-temporal-before-01/00.json",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all"
+      ],
+      "exit": 0,
+      "utc": "2026-10-23T02:36:30.670866+00:00",
+      "hashes": {
+        "crates/sim/src/ai.rs": "32e2f224eb66136803ce40c27a886d7346b00026cda4b9f9c8c5aa02abdbd2f8",
+        "crates/sim/tests/ra8_ai.rs": "cce3082ef92343ab7d81ae997912918553142135eec00e8a49c32da500035065",
+        "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+      }
+    },
+    {
+      "receipt": "C-ai-temporal-before-01/01.json",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra9_temporal_garrison",
+        "--",
+        "--nocapture"
+      ],
+      "exit": 101,
+      "utc": "2026-10-23T02:36:49.222798+00:00",
+      "hashes": {
+        "crates/sim/src/ai.rs": "32e2f224eb66136803ce40c27a886d7346b00026cda4b9f9c8c5aa02abdbd2f8",
+        "crates/sim/tests/ra8_ai.rs": "cce3082ef92343ab7d81ae997912918553142135eec00e8a49c32da500035065",
+        "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+      }
+    },
+    {
+      "receipt": "C-ai-temporal-before-01/02-exact-tuple.json",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_crossroads_brutal_korea_easy_iraq_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit": 101,
+      "utc": "2026-10-23T02:37:14.776105+00:00",
+      "hashes": {
+        "crates/sim/src/ai.rs": "32e2f224eb66136803ce40c27a886d7346b00026cda4b9f9c8c5aa02abdbd2f8",
+        "crates/sim/tests/ra8_ai.rs": "cce3082ef92343ab7d81ae997912918553142135eec00e8a49c32da500035065",
+        "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+      }
+    },
+    {
+      "receipt": "C-ai-temporal-before-02/00.json",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra9_temporal_",
+        "--",
+        "--nocapture"
+      ],
+      "exit": 101,
+      "pid_pgid": 89953,
+      "native_group_empty": true,
+      "utc": "2026-10-23T02:48:21.071473+00:00",
+      "hashes": {
+        "crates/sim/src/ai.rs": "32e2f224eb66136803ce40c27a886d7346b00026cda4b9f9c8c5aa02abdbd2f8",
+        "crates/sim/tests/ra8_ai.rs": "9fc94242182e30921c26ec7789a7f649a961e847666234406093bea8240d5f67",
+        "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+      },
+      "log_sha256": "936b2fe719d354d290ae39385eb610550f79f55ffd6aa95c9afbcfc04be0da82",
+      "results": [
+        "test result: FAILED. 0 passed; 5 failed; 0 ignored; 0 measured; 141 filtered out; finished in 0.10s"
+      ]
+    },
+    {
+      "receipt": "C-ai-temporal-fixture-01/00.json",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra9_temporal_garrison",
+        "--",
+        "--nocapture"
+      ],
+      "exit": 101,
+      "utc": "2026-10-23T02:39:03.143523+00:00"
+    },
+    {
+      "receipt": "C-ai-temporal-fixture-02/00.json",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all"
+      ],
+      "exit": 0,
+      "utc": "2026-10-23T02:40:11.821815+00:00",
+      "hashes": {
+        "crates/sim/src/ai.rs": "fd37158f1feb40d9a9a392347e962f3ad3c7ed0b715284454e2be2c8c88dac15",
+        "crates/sim/tests/ra8_ai.rs": "152eab57071163d620df0ac663d95e1bbd2a63605e52a12e1c69b8825e60eebd",
+        "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+      }
+    },
+    {
+      "receipt": "C-ai-temporal-fixture-02/01.json",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra9_temporal_garrison",
+        "--",
+        "--nocapture"
+      ],
+      "exit": 0,
+      "utc": "2026-10-23T02:40:35.870716+00:00",
+      "hashes": {
+        "crates/sim/src/ai.rs": "fd37158f1feb40d9a9a392347e962f3ad3c7ed0b715284454e2be2c8c88dac15",
+        "crates/sim/tests/ra8_ai.rs": "152eab57071163d620df0ac663d95e1bbd2a63605e52a12e1c69b8825e60eebd",
+        "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+      }
+    },
+    {
+      "receipt": "C-ai-temporal-fixture-03/00.json",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra9_temporal_building_sale",
+        "--",
+        "--nocapture"
+      ],
+      "exit": 101,
+      "utc": "2026-10-23T02:45:57.207414+00:00"
+    }
+  ],
+  "owned_recorded_pgids": [
+    89465,
+    89468,
+    89764,
+    89768,
+    89825,
+    89953,
+    90003,
+    90039,
+    90049,
+    90054
+  ],
+  "remaining_owned_group_processes": [],
+  "scope_limits": "Narrow implementation validation only, not independent review or full756/full13 acceptance. Root retains final freeze/factual binding/gates/reviews/Git ownership.",
+  "storage": {
+    "new_directories": [
+      "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-01",
+      "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-02",
+      "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-03",
+      "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-04",
+      "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-after-05",
+      "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-01",
+      "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-before-02",
+      "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-fixture-01",
+      "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-fixture-02",
+      "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-fixture-03",
+      "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-temporal-handoff-01"
+    ],
+    "remain_necessary": "All retained immutable raw logs, failures, source preimages and proof receipts; configured shared Cargo target already existed and remains necessary. No clone/worktree/validation copy/substantial tmp artifact created."
+  }
+}

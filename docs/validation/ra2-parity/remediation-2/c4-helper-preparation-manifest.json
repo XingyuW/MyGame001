@@ -1,0 +1,40 @@
+{
+  "status": "UNUSED_PREPARED_LABEL_AND_EARLY_M6_FAILURE_DETECTION_FOLLOWUP_NOT_EXECUTION_OR_APPROVAL",
+  "helpers": [
+    {
+      "source": "freeze-remediation2-inputs-c3.py",
+      "path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/freeze-remediation2-inputs-c4.py",
+      "sha256": "a38863f4cd0f1d212ff6359a6603cd21a630c264f523976a8879d1f3706193b0"
+    },
+    {
+      "source": "finalize-remediation2-c3-freeze.py",
+      "path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/finalize-remediation2-c4-freeze.py",
+      "sha256": "43b1d12f4e3e4930c2bf103f753a80d3014581a8b9c4b2b81c8712bf98db73e9"
+    },
+    {
+      "source": "prepare-final-evidence-metadata-c3.py",
+      "path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/prepare-final-evidence-metadata-c4.py",
+      "sha256": "f86483dfe24b04ea3e99bf6b5a908c977a45730254dc37577c6681aa660bd3a5"
+    },
+    {
+      "source": "summarize-remediation2-full13-c3-v2.py",
+      "path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/summarize-remediation2-full13-c4-v1.py",
+      "sha256": "b6bb6a1f32883de8efead56f3e1e3aa493145084921cfbcbd5df83315902e6b7"
+    },
+    {
+      "source": "continue-frozen-native-gates-c3-v3.py",
+      "path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/continue-frozen-native-gates-c4-v1.py",
+      "sha256": "9a053cf7be1d59e4bfa300f30f2438d1e82d8bf61455747a8b9713abc6232f8a"
+    },
+    {
+      "source": "render-corrected-lead-dispatch-c3-v2.py",
+      "path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/render-corrected-lead-dispatch-c4-v1.py",
+      "sha256": "ef317b353ee6c61f5e7b75a419f261aaf9ef79306e5751035df2dab07cef7c1b"
+    },
+    {
+      "source": "run-frozen-candidate-c3-v2.py",
+      "path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/run-frozen-candidate-c4-v1.py",
+      "sha256": "7bc28a77162dcc1945f899f007880c71c22fa2a690f0f7c33bbb8b77761b1af8"
+    }
+  ]
+}

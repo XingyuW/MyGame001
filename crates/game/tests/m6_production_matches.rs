@@ -819,3 +819,12 @@ fn ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner() {
     }
     panic!("native twins have no explicit winner within ORIGINAL {limit}-step limit");
 }
+
+#[test]
+fn ra9_crossroads_brutal_korea_easy_iraq_seed_zero_finishes() {
+    let outcome = duel("crossroads", ["korea", "iraq"], ["brutal", "easy"]);
+    assert!(
+        matches!(outcome, Some(MatchOutcome::Won { .. })),
+        "{outcome:?}"
+    );
+}

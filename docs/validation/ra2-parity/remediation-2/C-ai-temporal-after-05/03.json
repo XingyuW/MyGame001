@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--check"
+  ],
+  "exit": 0,
+  "pid_pgid": 90054,
+  "native_group_empty": true,
+  "utc": "2026-10-23T02:49:14.465072+00:00",
+  "hashes": {
+    "crates/sim/src/ai.rs": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a",
+    "crates/sim/tests/ra8_ai.rs": "9fc94242182e30921c26ec7789a7f649a961e847666234406093bea8240d5f67",
+    "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+  },
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "results": []
+}

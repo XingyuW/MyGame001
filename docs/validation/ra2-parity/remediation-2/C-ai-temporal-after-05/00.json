@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra9_temporal_",
+    "--",
+    "--nocapture"
+  ],
+  "exit": 0,
+  "pid_pgid": 90003,
+  "native_group_empty": true,
+  "utc": "2026-10-23T02:48:46.695274+00:00",
+  "hashes": {
+    "crates/sim/src/ai.rs": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a",
+    "crates/sim/tests/ra8_ai.rs": "9fc94242182e30921c26ec7789a7f649a961e847666234406093bea8240d5f67",
+    "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+  },
+  "log_sha256": "5cd6272cdeeaf5d9cf856f65e5c01d298b7cbd47178541057bcd2b333d496739",
+  "results": [
+    "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 141 filtered out; finished in 0.13s"
+  ]
+}

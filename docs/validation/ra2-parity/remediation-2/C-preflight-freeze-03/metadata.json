@@ -1,0 +1,208 @@
+{
+  "status": "ACTUAL_NEW_FREEZE_FACTUAL_METADATA_FINAL_ACCEPTANCE_PENDING",
+  "utc": "2026-10-23T03:02:12.803613+00:00",
+  "packet_sha256": "34ebea4bb2f198568fd66b76573d76d7b7825c89f7f0f7e52141c11ba51531ea",
+  "freeze_sha256": "9df40e2ce6a42fdb0dadd8d20f1295842de69940429bea78e7b975ee854aec26",
+  "notes_sha256": "fd6047c2b36886af6e518e217932706338934df0d2c0e3734c794fa94ea686fd",
+  "input_count": 689,
+  "authority_count": 64,
+  "howtosee_sha256": "8ae4edfadf97fc68138d03c9a12d9c1217cf0c1fb65cf6dd6010c77b1c5bd6c1",
+  "module_counts": {
+    "sim_source": 65,
+    "game_source": 40,
+    "audit_rust": 49,
+    "audit_tsv": 67,
+    "audit_txt": 4,
+    "ra9_top_level_sim_targets": 36
+  },
+  "literal_test_attributes": 1833,
+  "test_identity_preservation": [
+    {
+      "path": "crates/game/src/battlefield.rs",
+      "original_test_names_preserved": 3,
+      "added_names": []
+    },
+    {
+      "path": "crates/game/src/selection.rs",
+      "original_test_names_preserved": 36,
+      "added_names": []
+    },
+    {
+      "path": "crates/game/tests/m6_production_matches.rs",
+      "original_test_names_preserved": 7,
+      "added_names": [
+        "ra9_crossroads_brutal_korea_easy_iraq_seed_zero_finishes",
+        "ra9_liberty_bay_medium_france_germany_seed_zero_finishes"
+      ]
+    },
+    {
+      "path": "crates/sim/examples/m7_benchmark.rs",
+      "original_test_names_preserved": 2,
+      "added_names": []
+    },
+    {
+      "path": "crates/sim/src/ai.rs",
+      "original_test_names_preserved": 16,
+      "added_names": [
+        "ra9_after_only_navigation_knowledge_hashes_public_baseline_and_each_observed_bit"
+      ]
+    },
+    {
+      "path": "crates/sim/src/ai/ra8_recovery_tests.rs",
+      "original_test_names_preserved": 21,
+      "added_names": []
+    },
+    {
+      "path": "crates/sim/src/ai/strategy.rs",
+      "original_test_names_preserved": 0,
+      "added_names": []
+    },
+    {
+      "path": "crates/sim/src/garrison.rs",
+      "original_test_names_preserved": 0,
+      "added_names": []
+    },
+    {
+      "path": "crates/sim/src/special.rs",
+      "original_test_names_preserved": 0,
+      "added_names": []
+    },
+    {
+      "path": "crates/sim/src/special/advance.rs",
+      "original_test_names_preserved": 0,
+      "added_names": []
+    },
+    {
+      "path": "crates/sim/src/special/resolve.rs",
+      "original_test_names_preserved": 0,
+      "added_names": []
+    },
+    {
+      "path": "crates/sim/tests/ra8_ai.rs",
+      "original_test_names_preserved": 135,
+      "added_names": [
+        "ra9_lone_ivan_cannot_renew_last_stand_when_all_real_target_types_are_nonbombable_or_immune",
+        "ra9_lone_ivan_keeps_actual_no_income_last_stand_capability",
+        "ra9_privacy_remembered_bridge_approach_ignores_real_hidden_bridge_repair",
+        "ra9_privacy_remembered_bridge_approach_ignores_real_hidden_house_destruction",
+        "ra9_temporal_building_sale_uses_an_unblocked_alternative_then_resumes",
+        "ra9_temporal_building_sale_waits_for_real_release",
+        "ra9_temporal_garrison_current_cargo_interrupts_an_existing_last_stand",
+        "ra9_temporal_garrison_does_not_starve_a_current_unblocked_recovery_host",
+        "ra9_temporal_garrison_waits_for_real_release_then_recovers_its_original_infantry",
+        "ra9_visible_ore_with_a_refinery_preserves_actual_worker_income",
+        "ra9_visible_ore_without_a_refinery_releases_actual_reinforcement_finance"
+      ]
+    }
+  ],
+  "receipts": [
+    {
+      "path": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-import-01.json",
+      "sha256": "7db2b2baed50eb414df5a3fefc88bd1a90c2370e7c0a60073d75d8ba9253c83f"
+    },
+    {
+      "path": "docs/validation/ra2-parity/remediation-2/C-ai-temporal-handoff-01/handoff.json",
+      "sha256": "8399726a48081de9ecea8d1b0396970d4e2a8ae6fc6879d94d5f85c72ad46a95"
+    },
+    {
+      "path": "docs/validation/ra2-parity/remediation-2/C-corrected-04/root-independent-factual-verification.json",
+      "sha256": "97bed971ed4dbf4b424c9d530f850faa64426a7f21e1f014a513b8aec07a9112"
+    },
+    {
+      "path": "docs/validation/ra2-parity/remediation-2/C-corrected-04/root-postpropagation-readback.json",
+      "sha256": "396d7b34b5beedba32ffdefc1e926f295025baca084785c2bf789d5b7857746c"
+    },
+    {
+      "path": "docs/validation/ra2-parity/remediation-2/round-2-c4-building-temporal-preinspection-sim2.md",
+      "sha256": "d081de03ca13d3bddecddc1e0be538d8fd944aa490763df7022858f498c4fd04"
+    },
+    {
+      "path": "docs/validation/ra2-parity/remediation-2/round-2-c4-temporal-command-oracle-tests.md",
+      "sha256": "4e4b1baa521136f1e69b6d0b2f0f525bbb79ad5f1e9ce6c8c981d9cea5c467c3"
+    },
+    {
+      "path": "docs/validation/ra2-parity/remediation-2/round-2-c4-helper-preinspection-tests.md",
+      "sha256": "c3bbb7b215abdce4ac2d3c96a46773b1eeaaf3d9e33d9b4c8100d646e0389726"
+    },
+    {
+      "path": "docs/validation/ra2-parity/remediation-2/C-strict-audit-late-03/process.json",
+      "sha256": "2fb8be4094ac16e15688e389289bcd0e11c4d8e483fd19b1d6241bd777926d40"
+    },
+    {
+      "path": "docs/validation/ra2-parity/remediation-2/C-late-causal-03/process.json",
+      "sha256": "f3b7a8e77ad49273d6f4346b0391128a6fed62453f8ba061f6231df393984b6c"
+    }
+  ],
+  "changes": [
+    {
+      "path": "README.md",
+      "before_sha256": "cb5dcbe4fc10e238d9e8815d916cfcdbd6ab7f57ae0e9d77f37ae653cc5cfc3b",
+      "after_sha256": "d9358aea3b16d3175a1bf07e25ade2cabf45888923db02b568fb30993ec09e89"
+    },
+    {
+      "path": "docs/HANDOFF.md",
+      "before_sha256": "aa6cf45ffe4fc8440dce574cfa1663c3ad4e9ff22a06c459a1f246add9bfcd59",
+      "after_sha256": "6b10e033304cedb48367bce07426d61b32ceae8d79e10f3ebc66785865cd8b18"
+    },
+    {
+      "path": "docs/RA2_GAP_ANALYSIS.md",
+      "before_sha256": "bf6948be260ec4c01739511eafc460f9d447f0cf575453f869c024426545f7c1",
+      "after_sha256": "dad42c3ac144f522658375c7665c277fca95e7125c553f356684528a85adb343"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-review-requirements.md",
+      "before_sha256": "47a1834329b40de3e40b3a5ef4e0a166943da09845bda1520c16dca864c1d8a7",
+      "after_sha256": "6070049976be0552dad25ea0b73e235293a1dad3125a4b26e367c002e3109b0e"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-reviews-outstanding.md",
+      "before_sha256": "7a658e7f41cca2da6e451c410315dbe3c8c56e9483ec70f9373c183f1dd9ce92",
+      "after_sha256": "c1a68e60dd491531d2ae435a1f53f80dd075fc00d15534058872675547a06663"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/README.md",
+      "before_sha256": "4d8875d745b734e29e164f0a8d3df9f84bf7faed164917f7ee7e9cdcd8dd0df5",
+      "after_sha256": "b0819b119b9067bd801bd6c57538bb610ec7506f80cd951365146ecd7987bcb3"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-sim1.md",
+      "before_sha256": "5e4470159916152a9be714743b2fafd851761bf7d0729a907d2e2a0ef9e6ef52",
+      "after_sha256": "5be7341ae36aeb1a76cb39ff0d38d6d9d2d6a37e1ed6f2cd026e3786b518b5b8"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-sim2.md",
+      "before_sha256": "fac7180a08cd92bee20ef36f8d19a62788329c9d8bd8083447bd6a5939cdb72b",
+      "after_sha256": "8ecf4ca8fa21b44e1ba221b992ef50db09f6c9fdb690a0e00c6269505078ed25"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-client.md",
+      "before_sha256": "f3780f83898c83d0a8ba0749310a83db385d97141aecb0d4a8f0a56bb86aa7c3",
+      "after_sha256": "2e098162c137d0b3b425d05f5c1279ff531cf74e97ea6d2a4003a69d82615063"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-data.md",
+      "before_sha256": "4cd10fe6e587944a3149d936a9923ba73b916753b6cea4ae6b58db3176f7a365",
+      "after_sha256": "a24a6a3549f212dc151dc013d362709007dec5bdd5c08919cf8bafbb0ca97336"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/slice-tests.md",
+      "before_sha256": "12b7bc3d77bd0858a2cfdabcb226c5479be571d6def3e08920103d9adfeaeaef",
+      "after_sha256": "d2b820cb93e47b496597b10e023d3ca39ab20482577001c3c9cb177c52739726"
+    },
+    {
+      "path": "docs/prompts/ra2-parity-review/lead.md",
+      "before_sha256": "6c48b8bfb2ea4aed0d12bbae9995d7ecf7ebaa8e2896d89ef3838c38a68cf8af",
+      "after_sha256": "5ce201d3399647da7224556d8cc7fa8003852d6cc294ee512d7dbd3365b438a8"
+    },
+    {
+      "path": "docs/DECISIONS.md",
+      "before_sha256": "8840b4fbe4f69b34066fc0b3cd8144a510efa7c1cd55aec82c1bc1a86d982634",
+      "after_sha256": "e3d15d7258b351fb6c825f59a91a15b652cca41190289c0f9e20d39102b78fed"
+    },
+    {
+      "path": "docs/STATUS.md",
+      "before_sha256": "c764d119c4a45816d580c819778b543c759ca38efd802f0cd158f0e2ab5e2bc5",
+      "after_sha256": "a0443237f2b99fe6a3286e415f1a2a79c8cfb1a21e8b20d7739f38ec06829b32"
+    }
+  ]
+}

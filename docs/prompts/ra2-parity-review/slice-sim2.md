@@ -1,13 +1,13 @@
 <!-- RA9_REVISED_SCOPE_CURRENT_BEGIN -->
-## Finished module list and revised source — 2026-10-23T00:43:24.653484+00:00
+## Finished module list and revised source — 2026-10-23T03:02:12.803613+00:00
 
-R202 source has65 sim/40 game Rust files. Entire path/hash census:
-`/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round2-c3-module-scope.json`; complete primary/interface assignments:
-`/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round2-c3-production-ownership.json`. Cover the entire cumulative programme and each revised
+R204 source has65 sim/40 game Rust files. Entire path/hash census:
+`/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round2-c4-module-scope.json`; complete primary/interface assignments:
+`/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round2-c4-production-ownership.json`. Cover the entire cumulative programme and each revised
 source/interface/policy/evidence path, authenticating byte-identical retained scope against all
 preserved initial and revised source reports. These file counts are not native test counts.
-Frozen manifest:`docs/validation/ra2-parity/remediation-2/C-corrected-03/frozen-validation-inputs.json`, SHA2564732181fabaa8f96456c8d6ceefcdf93479df648d938ca5d9e187addd880862b.
-R201 actual non-Won is corrected only to the scope of R202's real evidence; final complete
+Frozen manifest:`docs/validation/ra2-parity/remediation-2/C-corrected-04/frozen-validation-inputs.json`, SHA2569df40e2ce6a42fdb0dadd8d20f1295842de69940429bea78e7b975ee854aec26.
+R201 actual non-Won is corrected only to the scope of R204's real evidence; final complete
 mandatory acceptance remains pending until actually executed. R172/R194/R199 retain full3+2
 independent coverage and a fresh binding lead. All51 user-only quality rows stay pending.
 Dispatch supplies the actual clean TIP, native phase/results and all prior/final reports.

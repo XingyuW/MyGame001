@@ -1,0 +1,10 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 38.06s
+     Running tests/ra9_data_parity.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_data_parity-4bf9e87c254d4d01)
+
+running 1 test
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+test ra9_audit::every_physical_consumer_and_reference_atom_has_an_exact_successful_disposition ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 184 filtered out; finished in 40.13s
+

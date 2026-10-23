@@ -881,6 +881,7 @@ struct View<'a> {
     owned_units: Vec<&'a UnitSnap>,
     frozen_army: BTreeSet<SimId>,
     recoverable_garrisons: Vec<SimId>,
+    erased_buildings: BTreeSet<SimId>,
     recoverable_service: Vec<&'a UnitSnap>,
     seen_tech: Vec<&'a BuildingSnap>,
     living_owned_ids: BTreeSet<SimId>,
@@ -1001,6 +1002,11 @@ impl<'a> View<'a> {
                         && special.cargo.get(id).is_some_and(|cargo| !cargo.is_empty())
                 })
                 .map(|(&id, _)| id)
+                .collect(),
+            erased_buildings: buildings
+                .iter()
+                .filter(|b| b.owner == player && special.erasures.contains_key(&b.id))
+                .map(|b| b.id)
                 .collect(),
             living_owned_ids: units
                 .iter()
@@ -2787,6 +2793,7 @@ fn sell_for_army(view: &View<'_>, controller: &AiController) -> Option<Command> 
     let optional = view
         .own_buildings
         .iter()
+        .filter(|building| !view.erased_buildings.contains(&building.id))
         .filter(|building| !needed.contains(&building.kind) && sellable(building.kind))
         .filter(|building| preserves_strategic(building.kind))
         // A living depleted cohort seeks optional reinforcement capital, not
@@ -2813,6 +2820,7 @@ fn sell_for_army(view: &View<'_>, controller: &AiController) -> Option<Command> 
     // producer may fund a real replacement through another retained producer.
     view.own_buildings
         .iter()
+        .filter(|b| !view.erased_buildings.contains(&b.id))
         .filter(|b| {
             sellable(b.kind)
                 && !builds(b.kind)
@@ -2895,11 +2903,18 @@ fn last_stand(view: &View<'_>, controller: &mut AiController) -> Option<Command>
         if view.tick.saturating_sub(controller.stalled.1) < LAST_STAND_PATIENCE {
             return None;
         }
-        if let Some(&unit) = view.recoverable_garrisons.first() {
-            return Some(Command::Deploy { unit });
-        }
-        controller.last_stand = true;
     }
+    // Temporal suspension pauses command admission, not the living cargo's
+    // recovery capability. Try another unblocked host, or wait for native release;
+    // this also applies when a new garrison appears during an existing last stand.
+    if !view.recoverable_garrisons.is_empty() {
+        return view
+            .recoverable_garrisons
+            .iter()
+            .find(|id| !view.erased_buildings.contains(id))
+            .map(|&unit| Command::Deploy { unit });
+    }
+    controller.last_stand = true;
     if !last_stand_slot(view.player, controller.plan.rules_difficulty, view.tick) {
         return None;
     }
@@ -2912,6 +2927,7 @@ fn last_stand(view: &View<'_>, controller: &mut AiController) -> Option<Command>
     };
     view.own_buildings
         .iter()
+        .filter(|building| !view.erased_buildings.contains(&building.id))
         .filter(|building| sellable(building.kind))
         .max_by_key(|building| {
             (
