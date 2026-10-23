@@ -1,0 +1,95 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-23T00:16:27.179877+00:00",
+  "pid": 61419,
+  "head": "53a5225c272ff45b7d29d124befc6b1d26c5c832",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-02-plan.json",
+  "plan_sha256": "c9525357e4f96341b2ead59e9b5fac632dbec39710e5241fdf84f6dc6ba17563",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_liberty_bay_medium_france_germany_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "start": "2026-10-23T00:16:27.315503+00:00",
+      "raw": "../../Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-02/01-exact-original-liberty-match.log",
+      "pid": 61448,
+      "pgid": 61448,
+      "exit": 0,
+      "end": "2026-10-23T00:28:13.507573+00:00",
+      "raw_bytes": 736,
+      "raw_sha256": "d18f8c666ca463299445c4331f92717b1bf4abe78fea3f4050692669aa78ff4f",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-23T00:28:13.725020+00:00",
+      "raw": "../../Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-02/02-complete-ai-target.log",
+      "pid": 63965,
+      "pgid": 63965,
+      "exit": 0,
+      "end": "2026-10-23T00:29:13.826400+00:00",
+      "raw_bytes": 141841,
+      "raw_sha256": "a06d6c614654a771f5c91446fe42c40bb6c7bdb537bba6a9c0dec478cc390c55",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start": "2026-10-23T00:29:14.153981+00:00",
+      "raw": "../../Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-02/03-workspace-format.log",
+      "pid": 64038,
+      "pgid": 64038,
+      "exit": 0,
+      "end": "2026-10-23T00:29:19.159543+00:00",
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "start": "2026-10-23T00:29:19.373960+00:00",
+      "raw": "../../Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-02/04-diff-whitespace.log",
+      "pid": 64069,
+      "pgid": 64069,
+      "exit": 0,
+      "end": "2026-10-23T00:29:24.386608+00:00",
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-23T00:29:19.377751+00:00",
+  "end": "2026-10-23T00:29:24.495011+00:00",
+  "source_unchanged": true
+}

@@ -12263,3 +12263,48 @@ All new source requires a new factual freeze, complete required gate and full re
 independent slice inspection before the fresh panel2 lead. R172/R194/R199 remain binding.
 Both projects continue unchanged; no unrelated process is paused or reprioritized. Existing
 approved review/configured build caches remain needed, with no clone/worktree or large/tmp.
+
+
+### R202. Qualify visible-ore financing by an actual owned refinery; preserve exact Liberty failure and narrow native correction
+
+R201 exposed a real unchanged-cap non-Won rather than a receipt/accounting defect. Preserve review-2 and every attempted diagnosis. Add the smallest source correction in crates/sim/src/ai.rs: refinery_has_visible_ore requires an owned live building with credits_per_ore before visible ore can veto the existing recovery/financing decisions. own_kinds already comes from current positive-HP owned buildings. Three existing consumers share this pure premise. No original cap, deterministic mechanism, money value, AI difficulty factor, timer, work budget or roster changes.
+
+Add ra9_visible_ore_without_a_refinery_releases_actual_reinforcement_finance and ra9_visible_ore_with_a_refinery_preserves_actual_worker_income, using the same final native public-schedule body before/after. They prove actual full20-bail idle worker/visible remaining ore and the no-receiver sale400/charged paid recruit/original plus recruit shots, with the live-refinery actual OreDelivered/no sale control. Earlier8-vs20 fixture setup failures and E0277 are retained and are not credited as production negatives. All139 pre-existing AI test bytes and all seven original M6 test names/assertions remain. Add ra9_liberty_bay_medium_france_germany_seed_zero_finishes using the unchanged authored duel/map/seed/countries/difficulties and existing limit/I6/rejection checks plus Won. The failure-only and opt-in RA9_LIBERTY_TRACE diagnostics are observation-only; final acceptance does not set that trace variable.
+
+Actual BEFORE06 has1pass/1intendedfail; AFTER01 has2pass. AFTER02 has exact Liberty1pass/7filtered at286896 reported schedules of288000 and wholeAI141pass/0fail/0ignore/0filter. This leaves only1104 schedules of cap headroom and is not a promise that every other required match wins. A fresh frozen all21/fixed3/guards plus ONE complete unchanged13-command run with all756 production/all756 duels, deterministic soak, benchmark/heap, smoke/package/regeneration checks, actual missing-image/restoration, five full cumulative independent source/evidence slices and fresh lead are still binding. R194 authorizes sharing a successful complete run, never promoting a failed/interrupted attempt. R172/R199 preserve independent3+2 coverage; only an independent binding GO/GO WITH DEBT permits local main merge and reviewed tag. All183 stable debt IDs and51 user-only quality checks remain. No unrelated project process was paused or reprioritized.
+
+Fresh C3 strict fmt/diff/all-target Clippy all exit0. The current complete physical reconciliation case passes1/0/184filtered, reporting16211physical/7108successful pairs/5022reference atoms/1911dispositions/75differences. This is not the still-required whole185 target. Fresh actual late twins reach P0Won outcome_tick42056/72000,42057 schedules; late330WeaponFired/3ProductionComplete/7positiveOreDelivered, final991a7990712f9fe8/trajectorycf968dbee1b99dd4. The unchanged native36001 extra-RNG control fails exactly at36001, and observer-only production omission reaches the identical outcome/world/trajectory then fails missing late production330/0/7. Exact restored source passes again1/0/7filtered, with immediate and separate later restoration reads. Both expected negative exits101 and restored exit0 are preserved. The689-input/64-span freeze SHA4732181fabaa8f96456c8d6ceefcdf93479df648d938ca5d9e187addd880862b remains exact. Root independent factual propagation changed13of15outputs/3290cells/71branch families/72local rows, and separate readback verifies every nonfactual policy cell is unchanged. These preflight results establish their specific scopes only; full mandatory acceptance remains pending.
+
+## Current corrected round2 candidate — 2026-10-23T00:43:24.653484+00:00
+
+This current checkpoint supersedes the dated execution headlines below. R201 preserves the
+actual failed/interrupted review-2 attempt; none of that attempt is final acceptance.
+R202 records the subsequent observed-cause correction and exact bounded regression evidence.
+
+The prior review-2 required production sweep genuinely reported a non-Won seed0 Liberty Bay France/Germany Medium match at its original288000 cap. R201 preserves the failed/interrupted attempt, its exact owned-group stop and missing later commands; it does not satisfy RA9 or final acceptance.
+
+The narrow production correction qualifies the existing visible-ore economic opportunity by the presence of a living owned refinery. It applies only at the existing armed-worker admission, funding_force and understrength_funding consumers. Mere visible ore cannot finance replacement troops when no owned receiver remains. Existing service-income, worker/cohort/legacy conditions, all timers, thresholds, data, troop rosters, budgets, caps and difficulty rules remain. The live-refinery branch stays conservative about unavailable workers or unreachable visible ore; it is not a reachability/income guarantee. There is no new state/hash field or hidden-map read.
+
+Same final test bodies genuinely fail the no-refinery finance predicate before the production correction, with the live-refinery control passing; both pass afterward with actual public-schedule delivery/sale/charge/paid-recruit/shooting observations. All139 original AI tests remain an exact454402-byte prefix. The exact previously failing Liberty wrapper now passes its Won assertion, reporting286896 schedules of288000 (1104 remaining); the raw does not print a winner ID or MatchOutcome.tick, so neither is invented here. The complete current AI target actually passes141/0failed/0ignored/0filtered together in55.08s. These are targeted preflight results, not the shared full13 or all756 sweep.
+
+All genuine failures, compiler/setup failures, full diagnostic trace, before/after source preimages and actual exit receipts are retained byte-exact. No census-attrition, Harrier or stall-timer patch was implemented; the trace showed the final real unit death near the cap. The paired control establishes the false financing premise and the exact match now passes; neither establishes that it was the unique cause of every original late-state observation. Five independent full cumulative source preinspections found no new unique source P0/P1; their dated pending-gate observations remain immutable. Formal clean-freeze binding and final evidence inspection remain required.
+
+Fresh C3 strict fmt/diff/all-target Clippy all exit0. The current complete physical reconciliation case passes1/0/184filtered, reporting16211physical/7108successful pairs/5022reference atoms/1911dispositions/75differences. This is not the still-required whole185 target. Fresh actual late twins reach P0Won outcome_tick42056/72000,42057 schedules; late330WeaponFired/3ProductionComplete/7positiveOreDelivered, final991a7990712f9fe8/trajectorycf968dbee1b99dd4. The unchanged native36001 extra-RNG control fails exactly at36001, and observer-only production omission reaches the identical outcome/world/trajectory then fails missing late production330/0/7. Exact restored source passes again1/0/7filtered, with immediate and separate later restoration reads. Both expected negative exits101 and restored exit0 are preserved. The689-input/64-span freeze SHA4732181fabaa8f96456c8d6ceefcdf93479df648d938ca5d9e187addd880862b remains exact. Root independent factual propagation changed13of15outputs/3290cells/71branch families/72local rows, and separate readback verifies every nonfactual policy cell is unchanged. These preflight results establish their specific scopes only; full mandatory acceptance remains pending.
+
+The exact new source manifest is `docs/validation/ra2-parity/remediation-2/C-corrected-03/frozen-validation-inputs.json`,
+SHA256 4732181fabaa8f96456c8d6ceefcdf93479df648d938ca5d9e187addd880862b: 689 inputs (674 source plus15 factual
+outputs),64 protected authority spans and all51 HOWTOSEE bytes. Factual source/hash propagation
+changes no class, reason, route, guard, decision, source literal or qualified native receipt.
+The source census is 65 sim/40 game Rust files;
+49 audit Rust/67 TSV/4 TXT siblings and36 top-level RA9 sim targets.
+Literal test attributes:1827, zero ignore attributes; original modified-file test names
+remain. File/declaration counts are preservation observations, never native executions.
+
+The previous corrected C-source all21 wins/fixed3/guards remain historical scoped evidence.
+This revised source still requires actual all21-to-Won/fixed3/guards, ONE successful unchanged
+full13 shared under R194, release/package missing-image failure/restoration, all five full
+cumulative revised independent slices and a fresh binding lead. Every original scenario,
+native worker, cap, deterministic/heap/performance and winning predicate remains binding.
+All183 debt IDs/aliases and51 user-only quality checks remain; no GO, merge/tag or quality
+approval exists. Both projects keep running; no unrelated process is changed. R172/R199 govern
+3+2 slice batches and whole revised cumulative inspection. Earlier snapshots remain historical.

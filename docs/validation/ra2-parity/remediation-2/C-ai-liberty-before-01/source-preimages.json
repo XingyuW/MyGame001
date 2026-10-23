@@ -1,0 +1,12 @@
+{
+  "status": "EXACT_CHANGED_AND_UNTRACKED_GUARDED_INPUT_PREIMAGES",
+  "files": [
+    {
+      "source": "crates/game/tests/m6_production_matches.rs",
+      "preimage": "../../Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-01/source-preimages/crates/game/tests/m6_production_matches.rs",
+      "bytes": 34478,
+      "sha256": "d6e0d32a4e7e29c1d21c147d5a7401ec9d3d99bf8a0b861a3123e88aeddd0d8f"
+    }
+  ],
+  "tracked_unchanged_source": "Available in recorded Git predecessor"
+}

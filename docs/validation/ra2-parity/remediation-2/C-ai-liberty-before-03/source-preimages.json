@@ -1,0 +1,18 @@
+{
+  "status": "EXACT_CHANGED_AND_UNTRACKED_GUARDED_INPUT_PREIMAGES",
+  "files": [
+    {
+      "source": "crates/game/tests/m6_production_matches.rs",
+      "preimage": "../../Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-03/source-preimages/crates/game/tests/m6_production_matches.rs",
+      "bytes": 37217,
+      "sha256": "f9d3de4abf4fa787c189b03a32ee7a4436fe7b4e7e6338cc424b8e6abdb84b7b"
+    },
+    {
+      "source": "crates/sim/tests/ra8_ai.rs",
+      "preimage": "../../Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-03/source-preimages/crates/sim/tests/ra8_ai.rs",
+      "bytes": 461447,
+      "sha256": "f0e1a822f3399e45dc8d57ceb9a97a25e09872e44516868dec494ab431d8c99f"
+    }
+  ],
+  "tracked_unchanged_source": "Available in recorded Git predecessor"
+}

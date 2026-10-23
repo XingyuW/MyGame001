@@ -1,0 +1,125 @@
+{
+  "status": "EXACT_HELPER_AND_REVIEW_INVENTORY_SOURCES_NOT_EXECUTION_OR_APPROVAL",
+  "files": [
+    {
+      "cache_source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/prepare-remediation2-scope.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-corrected-03/controller-sources/prepare-remediation2-scope.py",
+      "bytes": 7274,
+      "sha256": "5c8e3426dbc59440d2fa62e78256da3b1e0c74060f5f0c18d1e0aa9128f83e19"
+    },
+    {
+      "cache_source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/verify-remediation2-scope.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-corrected-03/controller-sources/verify-remediation2-scope.py",
+      "bytes": 7106,
+      "sha256": "2ecf30b11a1d12d65103b438054b85caa915c1ff8b28bbefa9a30ceee7f561da"
+    },
+    {
+      "cache_source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/propagate-remediation2-pointers.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-corrected-03/controller-sources/propagate-remediation2-pointers.py",
+      "bytes": 15403,
+      "sha256": "b72033d02c2ed4c117af73ba54b25e7b98eec0b4d63f5192a02087fc319e47e5"
+    },
+    {
+      "cache_source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/root-readback-remediation2.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-corrected-03/controller-sources/root-readback-remediation2.py",
+      "bytes": 2814,
+      "sha256": "d6698a171344eefe5501be883158595391f5797b7afb38d1b75497df4bcef261"
+    },
+    {
+      "cache_source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/freeze-remediation2-inputs-c3.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-corrected-03/controller-sources/freeze-remediation2-inputs-c3.py",
+      "bytes": 4145,
+      "sha256": "a70c4e9755afb8e080d8dbbbe38a3593eb565344a76548f496c46dfc9efae968"
+    },
+    {
+      "cache_source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/finalize-remediation2-c3-freeze.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-corrected-03/controller-sources/finalize-remediation2-c3-freeze.py",
+      "bytes": 7246,
+      "sha256": "92b64b949efca6b6a6cfce49a6b22d7287d644c3cd770997cbcd63e499b40538"
+    },
+    {
+      "cache_source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/run-bounded-plan-v3.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-corrected-03/controller-sources/run-bounded-plan-v3.py",
+      "bytes": 3510,
+      "sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f"
+    },
+    {
+      "cache_source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/run-corrected-late-causal-v2.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-corrected-03/controller-sources/run-corrected-late-causal-v2.py",
+      "bytes": 5469,
+      "sha256": "cad59b37f2b4542fabf6847b7287de647c47eb7b22cd2e94052d936ea4b02b40"
+    },
+    {
+      "cache_source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/run-frozen-bounded-v4.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-corrected-03/controller-sources/run-frozen-bounded-v4.py",
+      "bytes": 5201,
+      "sha256": "dfecd0b723700a7726d6ac7acef982a8be0e28cdb0175354b95b405eb0a80d3a"
+    },
+    {
+      "cache_source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/summarize-remediation2-isolated-five.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-corrected-03/controller-sources/summarize-remediation2-isolated-five.py",
+      "bytes": 5545,
+      "sha256": "03acd24d66ffafa872b307f00bcb226e10ad2d3481a32ee3a3264a16257e212b"
+    },
+    {
+      "cache_source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/run-frozen-candidate-c3-v2.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-corrected-03/controller-sources/run-frozen-candidate-c3-v2.py",
+      "bytes": 9278,
+      "sha256": "4c08097f947c743c3716aef7940d074f9c2556ec330be5747c0b6981e37bc4ab"
+    },
+    {
+      "cache_source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/continue-frozen-native-gates-c3-v3.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-corrected-03/controller-sources/continue-frozen-native-gates-c3-v3.py",
+      "bytes": 4680,
+      "sha256": "bab3e2bc2189aa4af2ced796575cf8571c4fbdc4f0a08b6f8ba35fa208fb53b3"
+    },
+    {
+      "cache_source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/run-asset-failure-acceptance-v2.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-corrected-03/controller-sources/run-asset-failure-acceptance-v2.py",
+      "bytes": 4505,
+      "sha256": "24dd17e5494c9c61629fb22aec24c6d5bc81a13d12ccb93f41734e7130363e7e"
+    },
+    {
+      "cache_source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/summarize-remediation2-full13-c3-v2.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-corrected-03/controller-sources/summarize-remediation2-full13-c3-v2.py",
+      "bytes": 12368,
+      "sha256": "b6bb6a1f32883de8efead56f3e1e3aa493145084921cfbcbd5df83315902e6b7"
+    },
+    {
+      "cache_source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/prepare-final-evidence-metadata-c3.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-corrected-03/controller-sources/prepare-final-evidence-metadata-c3.py",
+      "bytes": 8967,
+      "sha256": "24e107f59835fb737a30f69740663540dd02db04e3547a5bb9ddca37ced2ffb0"
+    },
+    {
+      "cache_source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/render-corrected-lead-dispatch-c3-v2.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-corrected-03/controller-sources/render-corrected-lead-dispatch-c3-v2.py",
+      "bytes": 5899,
+      "sha256": "269ee910181c35d4e83b3669d9c752587fb5997f039f272a7684913b8a601313"
+    },
+    {
+      "cache_source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/ra9-result-accounting-draft.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-corrected-03/controller-sources/ra9-result-accounting-draft.py",
+      "bytes": 2649,
+      "sha256": "64d75e0361d2ec4a08f3c717ba4ba2106eb395924f449b8e3e036a804f134218"
+    },
+    {
+      "cache_source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/launch-detached.py",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-corrected-03/controller-sources/launch-detached.py",
+      "bytes": 1238,
+      "sha256": "da1f14a9f2cd8b81fe1a56749ecd913a5c5170dc4505e38fe0df7d36ab2608e9"
+    },
+    {
+      "cache_source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round2-c3-module-scope.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-corrected-03/controller-sources/round2-c3-module-scope.json",
+      "bytes": 42840,
+      "sha256": "924da283252b071ec71b9d7503b9163a7aa5fa178775053ba074dd2c2565c412"
+    },
+    {
+      "cache_source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round2-c3-production-ownership.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-corrected-03/controller-sources/round2-c3-production-ownership.json",
+      "bytes": 14201,
+      "sha256": "a09d3efe483d529effc255682109362588f78bf64256d138b815a9bea6ff9870"
+    }
+  ]
+}

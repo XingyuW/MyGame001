@@ -1,5 +1,39 @@
 # Milestone status
 
+## Current corrected round2 candidate — 2026-10-23T00:43:24.653484+00:00
+
+This current checkpoint supersedes the dated execution headlines below. R201 preserves the
+actual failed/interrupted review-2 attempt; none of that attempt is final acceptance.
+R202 records the subsequent observed-cause correction and exact bounded regression evidence.
+
+The prior review-2 required production sweep genuinely reported a non-Won seed0 Liberty Bay France/Germany Medium match at its original288000 cap. R201 preserves the failed/interrupted attempt, its exact owned-group stop and missing later commands; it does not satisfy RA9 or final acceptance.
+
+The narrow production correction qualifies the existing visible-ore economic opportunity by the presence of a living owned refinery. It applies only at the existing armed-worker admission, funding_force and understrength_funding consumers. Mere visible ore cannot finance replacement troops when no owned receiver remains. Existing service-income, worker/cohort/legacy conditions, all timers, thresholds, data, troop rosters, budgets, caps and difficulty rules remain. The live-refinery branch stays conservative about unavailable workers or unreachable visible ore; it is not a reachability/income guarantee. There is no new state/hash field or hidden-map read.
+
+Same final test bodies genuinely fail the no-refinery finance predicate before the production correction, with the live-refinery control passing; both pass afterward with actual public-schedule delivery/sale/charge/paid-recruit/shooting observations. All139 original AI tests remain an exact454402-byte prefix. The exact previously failing Liberty wrapper now passes its Won assertion, reporting286896 schedules of288000 (1104 remaining); the raw does not print a winner ID or MatchOutcome.tick, so neither is invented here. The complete current AI target actually passes141/0failed/0ignored/0filtered together in55.08s. These are targeted preflight results, not the shared full13 or all756 sweep.
+
+All genuine failures, compiler/setup failures, full diagnostic trace, before/after source preimages and actual exit receipts are retained byte-exact. No census-attrition, Harrier or stall-timer patch was implemented; the trace showed the final real unit death near the cap. The paired control establishes the false financing premise and the exact match now passes; neither establishes that it was the unique cause of every original late-state observation. Five independent full cumulative source preinspections found no new unique source P0/P1; their dated pending-gate observations remain immutable. Formal clean-freeze binding and final evidence inspection remain required.
+
+Fresh C3 strict fmt/diff/all-target Clippy all exit0. The current complete physical reconciliation case passes1/0/184filtered, reporting16211physical/7108successful pairs/5022reference atoms/1911dispositions/75differences. This is not the still-required whole185 target. Fresh actual late twins reach P0Won outcome_tick42056/72000,42057 schedules; late330WeaponFired/3ProductionComplete/7positiveOreDelivered, final991a7990712f9fe8/trajectorycf968dbee1b99dd4. The unchanged native36001 extra-RNG control fails exactly at36001, and observer-only production omission reaches the identical outcome/world/trajectory then fails missing late production330/0/7. Exact restored source passes again1/0/7filtered, with immediate and separate later restoration reads. Both expected negative exits101 and restored exit0 are preserved. The689-input/64-span freeze SHA4732181fabaa8f96456c8d6ceefcdf93479df648d938ca5d9e187addd880862b remains exact. Root independent factual propagation changed13of15outputs/3290cells/71branch families/72local rows, and separate readback verifies every nonfactual policy cell is unchanged. These preflight results establish their specific scopes only; full mandatory acceptance remains pending.
+
+The exact new source manifest is `docs/validation/ra2-parity/remediation-2/C-corrected-03/frozen-validation-inputs.json`,
+SHA256 4732181fabaa8f96456c8d6ceefcdf93479df648d938ca5d9e187addd880862b: 689 inputs (674 source plus15 factual
+outputs),64 protected authority spans and all51 HOWTOSEE bytes. Factual source/hash propagation
+changes no class, reason, route, guard, decision, source literal or qualified native receipt.
+The source census is 65 sim/40 game Rust files;
+49 audit Rust/67 TSV/4 TXT siblings and36 top-level RA9 sim targets.
+Literal test attributes:1827, zero ignore attributes; original modified-file test names
+remain. File/declaration counts are preservation observations, never native executions.
+
+The previous corrected C-source all21 wins/fixed3/guards remain historical scoped evidence.
+This revised source still requires actual all21-to-Won/fixed3/guards, ONE successful unchanged
+full13 shared under R194, release/package missing-image failure/restoration, all five full
+cumulative revised independent slices and a fresh binding lead. Every original scenario,
+native worker, cap, deterministic/heap/performance and winning predicate remains binding.
+All183 debt IDs/aliases and51 user-only quality checks remain; no GO, merge/tag or quality
+approval exists. Both projects keep running; no unrelated process is changed. R172/R199 govern
+3+2 slice batches and whole revised cumulative inspection. Earlier snapshots remain historical.
+
 ## Current RA9 validation blocker — 2026-10-22 23:17 UTC
 
 The corrected candidate's required `review-2` full validation found an actual non-Won:
