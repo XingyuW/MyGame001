@@ -1,0 +1,88 @@
+{
+  "output": "docs/validation/ra2-parity/remediation-2/C-isolated-five-02",
+  "frozen_tip": "73bdfe90ce2a3ef23bbc4c59c0b9eb5c67673c76",
+  "frozen_manifest": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/remediation-2/C-corrected-03/frozen-validation-inputs.json",
+  "commands": [
+    {
+      "name": "all21-to-won",
+      "args": [
+        "cargo",
+        "run",
+        "--release",
+        "-p",
+        "sim",
+        "--example",
+        "m13_ten_players",
+        "--",
+        "to-the-end",
+        "all"
+      ],
+      "stop_on_nonzero": true
+    },
+    {
+      "name": "fixed-three-windows",
+      "args": [
+        "cargo",
+        "run",
+        "--release",
+        "-p",
+        "sim",
+        "--example",
+        "m13_ten_players",
+        "--",
+        "liberty_bay",
+        "continental_divide",
+        "pacific_atoll"
+      ],
+      "stop_on_nonzero": true
+    },
+    {
+      "name": "m13_ten_players-guards",
+      "args": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--example",
+        "m13_ten_players",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "stop_on_nonzero": true
+    },
+    {
+      "name": "m14_duels-guards",
+      "args": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--example",
+        "m14_duels",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "stop_on_nonzero": true
+    },
+    {
+      "name": "m7_soak-guards",
+      "args": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--example",
+        "m7_soak",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "stop_on_nonzero": true
+    }
+  ]
+}

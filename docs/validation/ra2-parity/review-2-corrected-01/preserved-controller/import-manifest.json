@@ -1,0 +1,100 @@
+{
+  "status": "EXACT_FAILED_ATTEMPT_AND_FIVE_FORMAL_SOURCE_REPORT_PRESERVATION_NOT_ACCEPTANCE",
+  "utc": "2026-10-23T02:31:41.167160+00:00",
+  "records": [
+    {
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/corrected-c3-native-gates-plan.json",
+      "canonical": "docs/validation/ra2-parity/review-2-corrected-01/preserved-controller/corrected-c3-native-gates-plan.json",
+      "bytes": 688,
+      "sha256": "f5406e2d020148ecae05f86f989d6c15f71e15942431543962396e94676dbe09"
+    },
+    {
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/corrected-c3-native-gates-process.json",
+      "canonical": "docs/validation/ra2-parity/review-2-corrected-01/preserved-controller/corrected-c3-native-gates-process.json",
+      "bytes": 4997,
+      "sha256": "22c30c55ea8fc8a66dce84ae39b53d0909b84b0ba2070f064b2cd8e8cb174968"
+    },
+    {
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/remediation2-c3-isolated-five-02-plan.json",
+      "canonical": "docs/validation/ra2-parity/review-2-corrected-01/preserved-controller/remediation2-c3-isolated-five-02-plan.json",
+      "bytes": 1794,
+      "sha256": "cf2d6786481b35fdbefb527b5a5d76d3130d67a5b6c33b2e1868104f564aeaf4"
+    },
+    {
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round2-c3-five-formal-source-reports.json",
+      "canonical": "docs/validation/ra2-parity/review-2-corrected-01/preserved-controller/round2-c3-five-formal-source-reports.json",
+      "bytes": 1666,
+      "sha256": "6e5c4c29c5c3c56250c095d4f93c5b053a1cd9c23616964d1a9014533b044afb"
+    },
+    {
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/dispatch-round-2-c3-source-binding.md",
+      "canonical": "docs/validation/ra2-parity/review-2-corrected-01/preserved-controller/dispatch-round-2-c3-source-binding.md",
+      "bytes": 3122,
+      "sha256": "7d0cac14a07e4482b74cb03eabb6b077a76003798b95573512639c217ddbbc63"
+    },
+    {
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/corrected-c3-native-gates-isolated-summary.log",
+      "canonical": "docs/validation/ra2-parity/review-2-corrected-01/preserved-controller/corrected-c3-native-gates-isolated-summary.log",
+      "bytes": 1777,
+      "sha256": "ee25a5bea833300ee696664f36886522188bfbe8999303ab520cb08deb8d7a01"
+    },
+    {
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/corrected-c3-native-gates-full13.log",
+      "canonical": "docs/validation/ra2-parity/review-2-corrected-01/preserved-controller/corrected-c3-native-gates-full13.log",
+      "bytes": 157,
+      "sha256": "27d8d8a82e6036eaa43fa73c93a2cd9d15b4e99ccf102fdbc842370414fcb9ba"
+    },
+    {
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/corrected-c3-native-gates-isolated-five.log",
+      "canonical": "docs/validation/ra2-parity/review-2-corrected-01/preserved-controller/corrected-c3-native-gates-isolated-five.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/corrected-c3-native-gates-preserve-isolated.log",
+      "canonical": "docs/validation/ra2-parity/review-2-corrected-01/preserved-controller/corrected-c3-native-gates-preserve-isolated.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/corrected-c3-native-gates-commit-isolated.log",
+      "canonical": "docs/validation/ra2-parity/review-2-corrected-01/preserved-controller/corrected-c3-native-gates-commit-isolated.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c3-revised-sim1.md",
+      "canonical": "docs/reviews/RA2-parity-review-2-c3-revised-sim1.md",
+      "bytes": 26627,
+      "sha256": "dae913cd6d6a257ebd0021d19752ecfb64be50ad92b13f2d926205ef6e2738da"
+    },
+    {
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c3-revised-sim2.md",
+      "canonical": "docs/reviews/RA2-parity-review-2-c3-revised-sim2.md",
+      "bytes": 12575,
+      "sha256": "95fdaa6d14546d29994b9babeb2a1178c0d67cb5e563652d9cc6e195d7c131c2"
+    },
+    {
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c3-revised-tests.md",
+      "canonical": "docs/reviews/RA2-parity-review-2-c3-revised-tests.md",
+      "bytes": 24757,
+      "sha256": "f16c7107f239bff42b770051323db63f8912c379280ad413aa7a61b7728155fb"
+    },
+    {
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c3-revised-client.md",
+      "canonical": "docs/reviews/RA2-parity-review-2-c3-revised-client.md",
+      "bytes": 17225,
+      "sha256": "3d62108810a5ea993500d8fedf222e8bb3e35489bc27b4bbf4bd5b715a6a6eb2"
+    },
+    {
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c3-revised-data.md",
+      "canonical": "docs/reviews/RA2-parity-review-2-c3-revised-data.md",
+      "bytes": 22309,
+      "sha256": "40600b37891cad3e595bcbf60667e9b5a4e30516ed480b52ab80772381bed8ed"
+    }
+  ],
+  "final_test_raw": {
+    "bytes": 32622,
+    "sha256": "45e528fca2a4433e6e90ba99aafee5682851bd9d3913bec200c9a5414e6f5c64"
+  }
+}
