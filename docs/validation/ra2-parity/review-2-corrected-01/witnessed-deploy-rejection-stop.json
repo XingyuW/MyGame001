@@ -1,0 +1,15 @@
+{
+  "utc": "2026-10-23T02:28:51.194512+00:00",
+  "status": "ACTUAL_REQUIRED_AI_COMMAND_REJECTION_PANIC_STOP_NOT_ACCEPTANCE",
+  "witness": "crossroads: korea (brutal) against iraq (easy): tick 13002: Deploy { unit: SimId(3221227968) } rejected (Target is being erased) without a loss",
+  "last_completed_production_progress": "36/756 non_Won0 is partial, not complete acceptance",
+  "validator_pid": 78433,
+  "pgid": 78433,
+  "verified_process": "78433 78433 sh scripts/validate_ra2_parity.sh review-2-corrected-01",
+  "signal": "SIGTERM",
+  "raw_bytes_at_stop": 32622,
+  "raw_sha256_at_stop": "45e528fca2a4433e6e90ba99aafee5682851bd9d3913bec200c9a5414e6f5c64",
+  "source_files": 689,
+  "authority_spans": 64,
+  "native_grandchild_exit": "Not individually observed; do not invent101. Direct shell exit will be recorded by existing durable runner."
+}

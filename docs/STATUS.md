@@ -1,5 +1,9 @@
 # Milestone status
 
+## Current RA9 continuation — real Deploy admission failure, correction in progress
+
+R203 preserves the actual failed/interrupted `review-2-corrected-01` attempt. Its fresh C3 isolated five gates passed; full13 commands01-03 passed but command04 encountered an AI Deploy rejected because its actor was being erased. This is blocking, not a passed full validation. All original limits, assertions, source changes and raw logs are preserved; a fresh implementing agent is correcting the specific current-action admission path before a new freeze, final gates and independent decision. All183 debt IDs and51 user quality checks remain; no merge/tag or approval exists. The dated checkpoints below retain only their stated historical scope.
+
 ## Current corrected round2 candidate — 2026-10-23T00:43:24.653484+00:00
 
 This current checkpoint supersedes the dated execution headlines below. R201 preserves the

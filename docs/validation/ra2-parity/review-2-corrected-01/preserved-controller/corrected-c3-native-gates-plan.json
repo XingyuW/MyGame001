@@ -1,0 +1,11 @@
+{
+  "frozen_manifest": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/remediation-2/C-corrected-03/frozen-validation-inputs.json",
+  "frozen_tip": "73bdfe90ce2a3ef23bbc4c59c0b9eb5c67673c76",
+  "isolated_output": "docs/validation/ra2-parity/remediation-2/C-isolated-five-02",
+  "isolated_plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/remediation2-c3-isolated-five-02-plan.json",
+  "full13_label": "review-2-corrected-01",
+  "pipeline_receipt": "corrected-c3-native-gates-process.json",
+  "pipeline_log_prefix": "corrected-c3-native-gates-",
+  "full13_runner": "run-frozen-candidate-c3-v2.py",
+  "expected_ai_tests": 141
+}

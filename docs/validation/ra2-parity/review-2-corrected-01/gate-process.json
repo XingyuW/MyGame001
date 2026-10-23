@@ -1,0 +1,132 @@
+{
+  "start_utc": "2026-10-23T01:54:34.121931+00:00",
+  "pid": 78428,
+  "controller_pgid": 66652,
+  "source_commit": "809010ec545a5a51051ddce9ca89d936235f9cd2",
+  "label": "review-2-corrected-01",
+  "runner": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/run-frozen-candidate-c3-v2.py",
+  "runner_sha256": "4c08097f947c743c3716aef7940d074f9c2556ec330be5747c0b6981e37bc4ab",
+  "frozen_manifest": {
+    "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/remediation-2/C-corrected-03/frozen-validation-inputs.json",
+    "bytes": 148657,
+    "sha256": "4732181fabaa8f96456c8d6ceefcdf93479df648d938ca5d9e187addd880862b"
+  },
+  "status": "FAILED",
+  "source_before": {
+    "files": 689,
+    "authority_spans": 64,
+    "mismatches": [],
+    "tracked_diff_empty": true
+  },
+  "commands": [
+    {
+      "line": "01 exit 0  3 s  cargo fmt --all -- --check",
+      "number": 1,
+      "exit": 0,
+      "observed_utc": "2026-10-23T01:54:39.141935+00:00",
+      "elapsed_seconds": 5.0143883330747485,
+      "source_after": {
+        "files": 689,
+        "authority_spans": 64,
+        "mismatches": [],
+        "tracked_diff_empty": true
+      }
+    },
+    {
+      "line": "02 exit 0  0 s  git diff --check",
+      "number": 2,
+      "exit": 0,
+      "observed_utc": "2026-10-23T01:54:39.456235+00:00",
+      "elapsed_seconds": 5.328682000050321,
+      "source_after": {
+        "files": 689,
+        "authority_spans": 64,
+        "mismatches": [],
+        "tracked_diff_empty": true
+      }
+    },
+    {
+      "line": "03 exit 0  2 s  cargo clippy --workspace --all-targets -- -D warnings",
+      "number": 3,
+      "exit": 0,
+      "observed_utc": "2026-10-23T01:54:44.793143+00:00",
+      "elapsed_seconds": 10.665564542054199,
+      "source_after": {
+        "files": 689,
+        "authority_spans": 64,
+        "mismatches": [],
+        "tracked_diff_empty": true
+      }
+    }
+  ],
+  "scope": "Actual full13 execution only; no independent review or user quality approval. First failed command stops this failed attempt, preserving all completed raw results; only a new all13 successful attempt can pass.",
+  "diagnostics": "RUST_TEST_NOCAPTURE=1 changes output only. CARGO_BUILD_JOBS=2 controls compilation concurrency only (no configured build-job value was present); original commands, native test/match workers, scenarios, caps and acceptance unchanged. Both projects keep running; no priority changes.",
+  "configured_environment": {
+    "CARGO_TARGET_DIR": "/Users/xingyuwang/Library/Caches/Codex/cargo-target",
+    "UV_CACHE_DIR": "/Users/xingyuwang/Library/Caches/Codex/uv-cache",
+    "PIP_CACHE_DIR": "/Users/xingyuwang/Library/Caches/Codex/pip-cache",
+    "TMPDIR": "/Users/xingyuwang/Library/Caches/Codex/tmp",
+    "CARGO_BUILD_JOBS": "2",
+    "RUST_TEST_NOCAPTURE": "1"
+  },
+  "production_cache_before": {
+    "bytes": 49792,
+    "sha256": "fc100292d6a1787de03219616dfd11ed7759e89006c8889e92f2514e261fa383",
+    "mtime_ns": 1792586638085289653
+  },
+  "command": [
+    "sh",
+    "scripts/validate_ra2_parity.sh",
+    "review-2-corrected-01"
+  ],
+  "last_heartbeat_utc": "2026-10-23T02:28:54.083768+00:00",
+  "child_pid": 78433,
+  "child_pgid": 78433,
+  "owned_group_after_direct_exit": {
+    "pgid": 78433,
+    "empty": true,
+    "observations": [
+      {
+        "utc": "2026-10-23T02:28:53.701490+00:00",
+        "remaining": []
+      }
+    ]
+  },
+  "exit": -15,
+  "terminal_result_observed": false,
+  "source_after": {
+    "files": 689,
+    "authority_spans": 64,
+    "mismatches": [],
+    "tracked_diff_empty": true
+  },
+  "end_utc": "2026-10-23T02:28:54.075487+00:00",
+  "seconds": 2059.935976167093,
+  "raw_logs": [
+    {
+      "path": "docs/validation/ra2-parity/review-2-corrected-01/01-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-corrected-01/02-diff-check.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-corrected-01/03-clippy.log",
+      "bytes": 152,
+      "sha256": "7c819b2ec0c81673d26f23a6b784a84693b35e58b85209af01a5be1bc3c46d88"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-corrected-01/04-test.log",
+      "bytes": 32622,
+      "sha256": "45e528fca2a4433e6e90ba99aafee5682851bd9d3913bec200c9a5414e6f5c64"
+    }
+  ],
+  "summary": {
+    "path": "docs/validation/ra2-parity/review-2-corrected-01/summary.txt",
+    "bytes": 146,
+    "sha256": "f43df10f99fa709507bcb8e26ff187dbb0e14c0a4250abfe721afbc2cf61e0ed"
+  }
+}
