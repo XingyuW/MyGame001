@@ -1,0 +1,39 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T23:23:03.878992+00:00",
+  "pid": 57848,
+  "head": "6bba9d2cf1bb0e987d326238af9cfade96f5f0d8",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-01-plan.json",
+  "plan_sha256": "3e0ff7ea1c8c93ad03d497c3ae6c783a25ca67e0e2baace22d882d4c0dd4f6db",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_liberty_bay_medium_france_germany_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T23:23:03.980809+00:00",
+      "raw": "../../Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-01/01-exact-original-limit-liberty.log",
+      "pid": 57898,
+      "pgid": 57898,
+      "exit": 101,
+      "end": "2026-10-22T23:26:59.397230+00:00",
+      "raw_bytes": 79569,
+      "raw_sha256": "53b0b7d9712d84febcf769fde237a2a3f854c5d3d8f90b80f16b616567a90058",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T23:26:54.386536+00:00",
+  "end": "2026-10-22T23:26:59.470165+00:00",
+  "source_unchanged": true
+}

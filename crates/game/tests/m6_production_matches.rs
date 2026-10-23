@@ -214,8 +214,62 @@ fn computer_players_finish_matches_with_the_shipped_data_on_every_shipped_map() 
 fn run(world: &mut World, name: &str, limit: u64) -> Option<MatchOutcome> {
     let mut losses: BTreeMap<PlayerId, BTreeSet<SimId>> = BTreeMap::new();
     let trace_ra5 = std::env::var_os("RA5_TRACE").is_some() && name.contains("coral_archipelago");
+    let trace_liberty =
+        std::env::var_os("RA9_LIBERTY_TRACE").is_some() && name.starts_with("liberty_bay:");
     for at in 0..limit {
         world.run_schedule(SimSchedule);
+        if trace_liberty && at % 10_000 == 0 {
+            for (player, state) in world.resource::<sim::Players>().iter() {
+                eprintln!(
+                    "Liberty tick{at} economy {player:?} cash{} queues{:?}",
+                    state.credits(),
+                    state.queues().collect::<Vec<_>>()
+                );
+                if let Some(c) = world.resource::<sim::AiPlayers>().controller(player) {
+                    let raw = format!("{c:?}");
+                    let tail = raw.split_once(", wave: ").unwrap().1;
+                    eprintln!(
+                        "Liberty tick{at} controller {player:?} {}",
+                        tail.split_once(", air_screens: ").unwrap().0
+                    );
+                }
+            }
+            let defs = world.resource::<sim::Definitions>().clone();
+            for (id, owner, building, hp) in world
+                .query::<(&SimId, &sim::Owner, &sim::Building, &sim::Health)>()
+                .iter(world)
+                .filter(|(_, owner, _, _)| owner.0 == PlayerId(0))
+            {
+                eprintln!(
+                    "Liberty tick{at} P0building {id:?} {owner:?} {} hp{} at{:?}",
+                    defs.building(building.kind).unwrap().id,
+                    hp.hit_points,
+                    building.footprint.origin
+                );
+            }
+            let mut types = BTreeMap::<_, usize>::new();
+            for (id, owner, unit, mobile, hp, worker) in world
+                .query::<(
+                    &SimId,
+                    &sim::Owner,
+                    &sim::Unit,
+                    &sim::Mobile,
+                    &sim::Health,
+                    Option<&sim::Harvester>,
+                )>()
+                .iter(world)
+            {
+                let kind = defs.unit(unit.kind).unwrap().id.as_str();
+                *types.entry((owner.0, kind.to_owned())).or_default() += 1;
+                if owner.0 == PlayerId(0) {
+                    eprintln!(
+                        "Liberty tick{at} P0actor {id:?} {kind} hp{} at{:?} worker{worker:?}",
+                        hp.hit_points, mobile.cell
+                    );
+                }
+            }
+            eprintln!("Liberty tick{at} types{types:?}");
+        }
         if trace_ra5 && at % 10000 == 0 {
             let controllers = format!("{:?}", world.resource::<sim::AiPlayers>());
             let mut compact = String::new();
@@ -298,11 +352,17 @@ fn run(world: &mut World, name: &str, limit: u64) -> Option<MatchOutcome> {
                     );
                 }
                 SimEvent::UnitDestroyed { player, unit } => {
+                    if trace_liberty && player == PlayerId(0) {
+                        eprintln!("Liberty tick{at} actual P0 unit loss {unit:?}");
+                    }
                     losses.entry(player).or_default().insert(unit);
                 }
                 SimEvent::BuildingDestroyed {
                     player, building, ..
                 } => {
+                    if trace_liberty && player == PlayerId(0) {
+                        eprintln!("Liberty tick{at} actual P0 building loss {building:?}");
+                    }
                     losses.entry(player).or_default().insert(building);
                 }
                 _ => {}
@@ -359,7 +419,56 @@ fn run(world: &mut World, name: &str, limit: u64) -> Option<MatchOutcome> {
     {
         eprintln!("unit {id:?} {o:?} {:?} {h:?}", m.cell);
     }
+    for (player, state) in world.resource::<sim::Players>().iter() {
+        eprintln!(
+            "stalled economy {player:?}: queues {:?}",
+            state.queues().collect::<Vec<_>>()
+        );
+        if let Some(controller) = world.resource::<sim::AiPlayers>().controller(player) {
+            let raw = format!("{controller:?}");
+            let compact = raw
+                .split_once(", wave: ")
+                .map_or(raw.as_str(), |(_, tail)| tail);
+            eprintln!(
+                "stalled controller {player:?}: known {:?}; wave and recovery {compact}",
+                controller.known_buildings()
+            );
+        }
+    }
+    for (id, building) in world.query::<(&SimId, &sim::Building)>().iter(world) {
+        if !building.pending_units.is_empty() {
+            eprintln!("stalled pending {id:?}: {:?}", building.pending_units);
+        }
+    }
+    for (id, unit, health, orders, weapon) in world
+        .query::<(
+            &SimId,
+            &sim::Unit,
+            &sim::Health,
+            &sim::Orders,
+            Option<&sim::Weapon>,
+        )>()
+        .iter(world)
+    {
+        eprintln!(
+            "stalled actor {id:?}: kind {:?} health {health:?} orders {orders:?} weapon {weapon:?}",
+            unit.kind
+        );
+    }
+    eprintln!(
+        "stalled special {:?}",
+        world.resource::<sim::SpecialState>()
+    );
     None
+}
+
+#[test]
+fn ra9_liberty_bay_medium_france_germany_seed_zero_finishes() {
+    let outcome = duel("liberty_bay", ["france", "germany"], ["medium", "medium"]);
+    assert!(
+        matches!(outcome, Some(MatchOutcome::Won { .. })),
+        "{outcome:?}"
+    );
 }
 
 #[test]

@@ -1,0 +1,9 @@
+    Finished `release` profile [optimized] target(s) in 0.49s
+     Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-cf20e94e4f55d858)
+
+running 1 test
+test ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner ... RA9 late twins: winner=PlayerId(0) outcome_tick=42056 steps=42057/72000 first_late_native_ticks=[Some(36252), Some(38049), Some(36493)] late_counts=[330, 3, 7] final_hash=991a7990712f9fe8 trajectory_hash=cf968dbee1b99dd4 candidate=("crossroads", ["america", "russia"], ["easy", "easy"], 0)
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 47.01s
+

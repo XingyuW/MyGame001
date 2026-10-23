@@ -1,0 +1,12 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 4m 31s
+     Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-cf20e94e4f55d858)
+
+running 1 test
+test ra9_liberty_bay_medium_france_germany_seed_zero_finishes has been running for over 60 seconds
+liberty_bay: ["france", "germany"] at ["medium", "medium"]: 286896 ticks of 288000
+test ra9_liberty_bay_medium_france_germany_seed_zero_finishes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 431.47s
+

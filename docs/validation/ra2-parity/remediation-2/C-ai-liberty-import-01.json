@@ -1,0 +1,427 @@
+{
+  "utc": "2026-10-23T00:32:45.612567+00:00",
+  "status": "BYTE_EXACT_EVIDENCE_IMPORT_NOT_FULL_GATE_OR_REVIEW",
+  "original_receipt_paths_retained": true,
+  "records": [
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-01/01-exact-original-limit-liberty.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-01/01-exact-original-limit-liberty.log",
+      "bytes": 79569,
+      "sha256": "53b0b7d9712d84febcf769fde237a2a3f854c5d3d8f90b80f16b616567a90058"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-01/process.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-01/process.json",
+      "bytes": 1403,
+      "sha256": "99224d7f8b46f25744f09e6f1847dbb8541346b74c5d64834375317a012d4b3c"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-01/source-after.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-01/source-after.json",
+      "bytes": 76932,
+      "sha256": "0c1d1a0902c04708e22dd3d0279bae417c650aa65472788580901749230a3ca0"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-01/source-before.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-01/source-before.json",
+      "bytes": 76932,
+      "sha256": "0c1d1a0902c04708e22dd3d0279bae417c650aa65472788580901749230a3ca0"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-01/source-preimages/crates/game/tests/m6_production_matches.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-01/source-preimages/crates/game/tests/m6_production_matches.rs",
+      "bytes": 34478,
+      "sha256": "d6e0d32a4e7e29c1d21c147d5a7401ec9d3d99bf8a0b861a3123e88aeddd0d8f"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-01/source-preimages.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-01/source-preimages.json",
+      "bytes": 513,
+      "sha256": "0137a2096e48e138e67976db94c3b6a0871aca007a046212368acb8dc04d95d2"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-02/01-exact-original-limit-liberty.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-02/01-exact-original-limit-liberty.log",
+      "bytes": 376729,
+      "sha256": "a3c8a87e7955dde24f3f0edf6976fbb7c222a3a8e7eb8febdf50afdc22d5525c"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-02/process.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-02/process.json",
+      "bytes": 1404,
+      "sha256": "16a6a847a7b230f2f25d5b2331f54b441d6a4358f392e0fe962a5b36c192a076"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-02/source-after.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-02/source-after.json",
+      "bytes": 76932,
+      "sha256": "bdac0047b833fe71295f03c09bfbfa70f1a3bfc5049f34bebc54a60940429814"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-02/source-before.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-02/source-before.json",
+      "bytes": 76932,
+      "sha256": "bdac0047b833fe71295f03c09bfbfa70f1a3bfc5049f34bebc54a60940429814"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-02/source-preimages/crates/game/tests/m6_production_matches.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-02/source-preimages/crates/game/tests/m6_production_matches.rs",
+      "bytes": 37217,
+      "sha256": "f9d3de4abf4fa787c189b03a32ee7a4436fe7b4e7e6338cc424b8e6abdb84b7b"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-02/source-preimages.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-02/source-preimages.json",
+      "bytes": 513,
+      "sha256": "b53665341a107a8399d014e7d1fb1b79e7172eced02b33f3ad434a309476f262"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-03/01-visible-ore-real-finance-controls.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-03/01-visible-ore-real-finance-controls.log",
+      "bytes": 1309,
+      "sha256": "f78601ec53880b56a1b7ad19cf32b8f065475efdc5d67b15cbd4ac9ae0bddafe"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-03/process.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-03/process.json",
+      "bytes": 1332,
+      "sha256": "9e7aaf8bca01be3200e50eecd565423ba3d19317800e49e118383f4c48ad31c0"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-03/source-after.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-03/source-after.json",
+      "bytes": 76932,
+      "sha256": "952773e65ff55f8a21146ee4a476d6deff1f7e4a7821a02ff326538705ad973c"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-03/source-before.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-03/source-before.json",
+      "bytes": 76932,
+      "sha256": "952773e65ff55f8a21146ee4a476d6deff1f7e4a7821a02ff326538705ad973c"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-03/source-preimages/crates/game/tests/m6_production_matches.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-03/source-preimages/crates/game/tests/m6_production_matches.rs",
+      "bytes": 37217,
+      "sha256": "f9d3de4abf4fa787c189b03a32ee7a4436fe7b4e7e6338cc424b8e6abdb84b7b"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-03/source-preimages/crates/sim/tests/ra8_ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-03/source-preimages/crates/sim/tests/ra8_ai.rs",
+      "bytes": 461447,
+      "sha256": "f0e1a822f3399e45dc8d57ceb9a97a25e09872e44516868dec494ab431d8c99f"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-03/source-preimages.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-03/source-preimages.json",
+      "bytes": 837,
+      "sha256": "ed9df77db4bc186ecc46173821fd6421bbafd6939d954cbe493aed399ac5f3fd"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-04/01-visible-ore-real-finance-controls.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-04/01-visible-ore-real-finance-controls.log",
+      "bytes": 1309,
+      "sha256": "77b3340d3294857a4a166d33d24372e0477f1228c136132b3fc480050e290a8d"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-04/process.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-04/process.json",
+      "bytes": 1332,
+      "sha256": "a8fc96cad1c7cf83376e3a06067726b46dbfd7451d915585511412c0478699f2"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-04/source-after.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-04/source-after.json",
+      "bytes": 76932,
+      "sha256": "8740cd86022a85eda3b2d68aed55b6079ea2c6d65d5520085d342a37d3ba8f4e"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-04/source-before.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-04/source-before.json",
+      "bytes": 76932,
+      "sha256": "8740cd86022a85eda3b2d68aed55b6079ea2c6d65d5520085d342a37d3ba8f4e"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-04/source-preimages/crates/game/tests/m6_production_matches.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-04/source-preimages/crates/game/tests/m6_production_matches.rs",
+      "bytes": 37217,
+      "sha256": "f9d3de4abf4fa787c189b03a32ee7a4436fe7b4e7e6338cc424b8e6abdb84b7b"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-04/source-preimages/crates/sim/tests/ra8_ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-04/source-preimages/crates/sim/tests/ra8_ai.rs",
+      "bytes": 461625,
+      "sha256": "7fd601d4b98af4d6603948e361c243a5409f1abaaaa66b230ccfb6336772bffe"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-04/source-preimages.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-04/source-preimages.json",
+      "bytes": 837,
+      "sha256": "f5e37cc068f46f266d3800fd262588eea62fcd846900e0fe97eeedbf0c2f7053"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-05/01-visible-ore-real-finance-controls.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-05/01-visible-ore-real-finance-controls.log",
+      "bytes": 853,
+      "sha256": "edaf657fe721241eba586731eb4577499b6644ceebde1e37918ae4c5f3ad76eb"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-05/process.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-05/process.json",
+      "bytes": 1331,
+      "sha256": "9b1cbb43b6f54385c6974ef00058d49540a9ef410ee156f1be743c639deab881"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-05/source-after.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-05/source-after.json",
+      "bytes": 76932,
+      "sha256": "15144506c70b0134d39f61b28bd791b75648944646eebdbeb36eadab66303e95"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-05/source-before.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-05/source-before.json",
+      "bytes": 76932,
+      "sha256": "15144506c70b0134d39f61b28bd791b75648944646eebdbeb36eadab66303e95"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-05/source-preimages/crates/game/tests/m6_production_matches.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-05/source-preimages/crates/game/tests/m6_production_matches.rs",
+      "bytes": 37217,
+      "sha256": "f9d3de4abf4fa787c189b03a32ee7a4436fe7b4e7e6338cc424b8e6abdb84b7b"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-05/source-preimages/crates/sim/tests/ra8_ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-05/source-preimages/crates/sim/tests/ra8_ai.rs",
+      "bytes": 462313,
+      "sha256": "4cd77e8aec87029660daf2bb5904e428fd964882fe6825dd6b78f14964061791"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-05/source-preimages.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-05/source-preimages.json",
+      "bytes": 837,
+      "sha256": "d1e54b92085ec886b1112c2205f11d52d4a9566ae1ba8b9ccf1b58367f676060"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-06/01-visible-ore-real-finance-controls.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-06/01-visible-ore-real-finance-controls.log",
+      "bytes": 1323,
+      "sha256": "dbd6a42b4d881c388855fbece8151665023e02998ef884fc5ae76e10104fbee6"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-06/process.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-06/process.json",
+      "bytes": 1332,
+      "sha256": "97cd6fb90ecbaeced33b5adf6f77d1218b68771eb88eb3148f4b0b90b7fa9b3c"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-06/source-after.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-06/source-after.json",
+      "bytes": 76932,
+      "sha256": "635b05bb00f49c044383d4d3b08a7425bd4a96f6d40c3c0e30d6fc58477bb3b9"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-06/source-before.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-06/source-before.json",
+      "bytes": 76932,
+      "sha256": "635b05bb00f49c044383d4d3b08a7425bd4a96f6d40c3c0e30d6fc58477bb3b9"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-06/source-preimages/crates/game/tests/m6_production_matches.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-06/source-preimages/crates/game/tests/m6_production_matches.rs",
+      "bytes": 37217,
+      "sha256": "f9d3de4abf4fa787c189b03a32ee7a4436fe7b4e7e6338cc424b8e6abdb84b7b"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-06/source-preimages/crates/sim/tests/ra8_ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-06/source-preimages/crates/sim/tests/ra8_ai.rs",
+      "bytes": 462426,
+      "sha256": "2472e56bff3ff4ee6b048132619cc71d848dc4a281012930b4417358f69f851b"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-06/source-preimages.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-before-06/source-preimages.json",
+      "bytes": 837,
+      "sha256": "979ac90c16c7493130616c6d9efb6aa0a85dd77f8eed822ebf8775b257802936"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-01/01-visible-ore-real-finance-controls.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-after-01/01-visible-ore-real-finance-controls.log",
+      "bytes": 818,
+      "sha256": "d2f490f3e1aecd1626c7ebe353017efbb7b5672afb3a53fdc87e49f504909e83"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-01/process.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-after-01/process.json",
+      "bytes": 1327,
+      "sha256": "4302712aa9f46fcf7852094b1daa99a778dee3ef30cde1da045008ae882b236b"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-01/source-after.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-after-01/source-after.json",
+      "bytes": 76932,
+      "sha256": "3a8eb93893e12e32f2101be4b950b0f9799f821cab01d553295e2ae15405d970"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-01/source-before.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-after-01/source-before.json",
+      "bytes": 76932,
+      "sha256": "3a8eb93893e12e32f2101be4b950b0f9799f821cab01d553295e2ae15405d970"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-01/source-preimages/crates/game/tests/m6_production_matches.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-after-01/source-preimages/crates/game/tests/m6_production_matches.rs",
+      "bytes": 37217,
+      "sha256": "f9d3de4abf4fa787c189b03a32ee7a4436fe7b4e7e6338cc424b8e6abdb84b7b"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-01/source-preimages/crates/sim/src/ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-after-01/source-preimages/crates/sim/src/ai.rs",
+      "bytes": 208229,
+      "sha256": "32e2f224eb66136803ce40c27a886d7346b00026cda4b9f9c8c5aa02abdbd2f8"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-01/source-preimages/crates/sim/tests/ra8_ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-after-01/source-preimages/crates/sim/tests/ra8_ai.rs",
+      "bytes": 462426,
+      "sha256": "2472e56bff3ff4ee6b048132619cc71d848dc4a281012930b4417358f69f851b"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-01/source-preimages.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-after-01/source-preimages.json",
+      "bytes": 1146,
+      "sha256": "9196e0522cfb41f914b396897611418a9011be06bd5c691fd7e98b1d385214a6"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-02/01-exact-original-liberty-match.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-after-02/01-exact-original-liberty-match.log",
+      "bytes": 736,
+      "sha256": "d18f8c666ca463299445c4331f92717b1bf4abe78fea3f4050692669aa78ff4f"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-02/02-complete-ai-target.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-after-02/02-complete-ai-target.log",
+      "bytes": 141841,
+      "sha256": "a06d6c614654a771f5c91446fe42c40bb6c7bdb537bba6a9c0dec478cc390c55"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-02/03-workspace-format.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-after-02/03-workspace-format.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-02/04-diff-whitespace.log",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-after-02/04-diff-whitespace.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-02/process.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-after-02/process.json",
+      "bytes": 3107,
+      "sha256": "bf9614d40c0fcf0aa3fdc45ecba32095bf3f8e7da8b1f750da226c641c3486a5"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-02/source-after.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-after-02/source-after.json",
+      "bytes": 76932,
+      "sha256": "3a8eb93893e12e32f2101be4b950b0f9799f821cab01d553295e2ae15405d970"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-02/source-before.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-after-02/source-before.json",
+      "bytes": 76932,
+      "sha256": "3a8eb93893e12e32f2101be4b950b0f9799f821cab01d553295e2ae15405d970"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-02/source-preimages/crates/game/tests/m6_production_matches.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-after-02/source-preimages/crates/game/tests/m6_production_matches.rs",
+      "bytes": 37217,
+      "sha256": "f9d3de4abf4fa787c189b03a32ee7a4436fe7b4e7e6338cc424b8e6abdb84b7b"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-02/source-preimages/crates/sim/src/ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-after-02/source-preimages/crates/sim/src/ai.rs",
+      "bytes": 208229,
+      "sha256": "32e2f224eb66136803ce40c27a886d7346b00026cda4b9f9c8c5aa02abdbd2f8"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-02/source-preimages/crates/sim/tests/ra8_ai.rs",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-after-02/source-preimages/crates/sim/tests/ra8_ai.rs",
+      "bytes": 462426,
+      "sha256": "2472e56bff3ff4ee6b048132619cc71d848dc4a281012930b4417358f69f851b"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-after-02/source-preimages.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-after-02/source-preimages.json",
+      "bytes": 1146,
+      "sha256": "6fc9daf394e057d1016d58d490413bff9b19aa02b0c4e157d67f935b12592da7"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-handoff-01.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/C-ai-liberty-handoff-01.json",
+      "bytes": 17559,
+      "sha256": "756904bcbc104772458e9083c322be99f5cedfbf7a05548a52a9a9dad5a08f79"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/ai2-m6-liberty-final-production.patch",
+      "canonical": "docs/validation/ra2-parity/remediation-2/ai2-m6-liberty-final-production.patch",
+      "bytes": 3166,
+      "sha256": "5076dc678cfd1bbfeaaf790fe027f59bda5364e11b1c9abf1213dfbbff30115e"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c3-helper-count-addendum-tests.md",
+      "canonical": "docs/validation/ra2-parity/remediation-2/round-2-c3-helper-count-addendum-tests.md",
+      "bytes": 5426,
+      "sha256": "186305d99361a911c6b0a7483c48b824dd522689f736f121542d335983aa6e49"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c3-helper-guard-addendum-tests.md",
+      "canonical": "docs/validation/ra2-parity/remediation-2/round-2-c3-helper-guard-addendum-tests.md",
+      "bytes": 9715,
+      "sha256": "d1e4a3e61e525f3fab04c0369f9246e7511482dd1299389469cc16ca0db6b719"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c3-helper-preinspection-tests.md",
+      "canonical": "docs/validation/ra2-parity/remediation-2/round-2-c3-helper-preinspection-tests.md",
+      "bytes": 11406,
+      "sha256": "2a83d70ea2bb29ae316baa466618c0bfa962c680d2720eaa5cd25b153ac03def"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c3-preliminary-source-client.md",
+      "canonical": "docs/validation/ra2-parity/remediation-2/round-2-c3-preliminary-source-client.md",
+      "bytes": 14923,
+      "sha256": "24e3ed2490b091b1780a30068d3717ba43e5375f37cc1e463053233a2f7eab1d"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c3-preliminary-source-data.md",
+      "canonical": "docs/validation/ra2-parity/remediation-2/round-2-c3-preliminary-source-data.md",
+      "bytes": 17108,
+      "sha256": "4168f8d79563c8c91182031f269e503cffdd99aca98e6d16d8f91e6f3c3970d1"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c3-preliminary-source-sim1.md",
+      "canonical": "docs/validation/ra2-parity/remediation-2/round-2-c3-preliminary-source-sim1.md",
+      "bytes": 16447,
+      "sha256": "389b41a4d7ba362a0607d61a4aca0848fc4bfd8e13589e11dbc0c5035757f348"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c3-preliminary-source-sim2.md",
+      "canonical": "docs/validation/ra2-parity/remediation-2/round-2-c3-preliminary-source-sim2.md",
+      "bytes": 8939,
+      "sha256": "d0781dbda68892e4466dd3b0f368eeeadf3ccc657e0924cee5b99041a7931b11"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c3-preliminary-source-tests.md",
+      "canonical": "docs/validation/ra2-parity/remediation-2/round-2-c3-preliminary-source-tests.md",
+      "bytes": 18511,
+      "sha256": "1ebbd044728f1325394e214742396b51b82d6bfac1db97dc9385b5c94b8cef68"
+    },
+    {
+      "original": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round2-c3-preliminary-source.json",
+      "canonical": "docs/validation/ra2-parity/remediation-2/round2-c3-preliminary-source.json",
+      "bytes": 150149,
+      "sha256": "74bfdc0b942caa065f08a8f58ce8270cdbd8bcdf80c6e683728abac35c8b65f2"
+    }
+  ]
+}

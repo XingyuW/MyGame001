@@ -1417,8 +1417,8 @@ pub(crate) fn run_ai(
         // A stopped armed worker has no observed economic opportunity on an
         // exhausted known field. It may join ordinary teams alongside paid
         // troops; any actual income or observed ore conserves worker roles.
-        // This is conservative: visible but unreachable ore also prevents this
-        // additional admission. The existing lone-worker policy stays above.
+        // This is conservative: visible but unreachable ore at an owned refinery
+        // also prevents this admission. The existing lone-worker policy stays above.
         if view.ai.rules_difficulty
             && !view.last_resort
             && view
@@ -1426,7 +1426,7 @@ pub(crate) fn run_ai(
                 .iter()
                 .any(|u| u.armed && u.harvest == Some(HarvestState::Idle))
             && !strategy::service_income(&view)
-            && visible_ore(&view).is_empty()
+            && !refinery_has_visible_ore(&view)
         {
             view.last_resort = true;
         }
@@ -2505,6 +2505,16 @@ fn visible_ore(view: &View<'_>) -> Vec<CellPos> {
         .collect()
 }
 
+/// Visible ore cannot support income recovery without an owned refinery to receive it.
+/// Callers retain their existing worker, service and financing requirements.
+fn refinery_has_visible_ore(view: &View<'_>) -> bool {
+    view.own_kinds.iter().any(|&kind| {
+        view.definitions
+            .building(kind)
+            .is_some_and(|building| building.credits_per_ore.is_some())
+    }) && !visible_ore(view).is_empty()
+}
+
 /// A new worker needs an observed field in the same public-terrain component
 /// as an actual producer and refinery. Existing cargo, workers and queued heads
 /// are left alone. Temporary traffic and unseen building occupancy are not facts
@@ -2588,17 +2598,17 @@ fn funding_force(view: &View<'_>, controller: &AiController) -> bool {
         || (force().any(|unit| view.fights(unit) && unit.harvest.is_some())
             && (!view.ai.rules_difficulty
                 || strategy::service_income(view)
-                || !visible_ore(view).is_empty())))
+                || refinery_has_visible_ore(view))))
         && !understrength_funding(view, controller)
 }
 
 fn understrength_funding(view: &View<'_>, controller: &AiController) -> bool {
     if !view.ai.rules_difficulty
         || strategy::service_income(view)
-        // An observed field cannot earn without a worker. Retain existing
+        // Observed ore needs both a refinery and a worker. Retain existing
         // workers (including unavailable or stowed actors conservatively),
         // rather than letting bare ore veto financing a real replacement force.
-        || (!visible_ore(view).is_empty()
+        || (refinery_has_visible_ore(view)
             && (view.owned_units.iter().any(|unit| unit.harvest.is_some())
                 || view.living_owned_ids.iter().any(|id| {
                     !view.owned_units.iter().any(|unit| unit.id == *id)

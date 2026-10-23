@@ -13339,3 +13339,245 @@ fn ra9_lone_ivan_cannot_renew_last_stand_when_all_real_target_types_are_nonbomba
         );
     }
 }
+
+fn ra9_authored_stranded_worker_ore(grid: &mut Grid) {
+    for y in 17..20 {
+        for x in 9..12 {
+            grid.set_terrain(
+                CellPos::new(x, y),
+                Cell {
+                    passable: true,
+                    buildable: true,
+                    water: false,
+                    ore: 200,
+                },
+            );
+        }
+    }
+}
+
+fn ra9_visible_ore_finance(live_refinery: bool) {
+    let mut app = scenario_mode(
+        "russia",
+        "brutal",
+        0,
+        0,
+        false,
+        ScenarioMode {
+            authored_terrain: Some(ra9_authored_stranded_worker_ore),
+            ..Default::default()
+        },
+    );
+    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
+    let barracks = put(&mut app, "soviet_barracks", 5, 12);
+    put(&mut app, "tesla_reactor", 3, 5);
+    let asset = put(&mut app, "soviet_service_depot", 18, 5);
+    let worker = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "chrono_miner",
+        CellPos::new(10, 18),
+    )
+    .unwrap();
+    let worker_entity = unit_entity(&mut app, worker);
+    let harvesting = app
+        .world()
+        .resource::<sim::Definitions>()
+        .harvester(app.world().get::<sim::Unit>(worker_entity).unwrap().kind)
+        .unwrap();
+    let capacity = harvesting.capacity;
+    let speed = app.world().get::<sim::Mobile>(worker_entity).unwrap().speed;
+    let cell_ticks = (sim::SUBCELLS_PER_CELL as u64).div_ceil(u64::from(speed));
+    // Match setup converts authored credits to bails. This field has enough
+    // actual bails, including travel between its cells, without any fixture load grant.
+    let bails: u32 = (17..20)
+        .flat_map(|y| (9..12).map(move |x| CellPos::new(x, y)))
+        .map(|cell| app.world().resource::<Grid>().cell(cell).unwrap().ore)
+        .sum();
+    assert!(bails > capacity);
+    let fill_ticks = u64::from(capacity).div_ceil(u64::from(harvesting.harvest_rate))
+        * (u64::from(harvesting.harvest_interval) + 4 * cell_ticks + 2);
+    for _ in 0..fill_ticks {
+        for event in step(&mut app) {
+            assert!(
+                !matches!(
+                    event,
+                    sim::SimEvent::OreDelivered {
+                        player: PlayerId(0),
+                        ..
+                    }
+                ),
+                "no refinery can deliver fixture income"
+            );
+        }
+        let h = app.world().get::<sim::Harvester>(worker_entity).unwrap();
+        if h.load == capacity && h.state == sim::HarvestState::Idle {
+            break;
+        }
+    }
+    let h = app.world().get::<sim::Harvester>(worker_entity).unwrap();
+    assert_eq!(h.load, capacity, "real harvesting must fill this worker");
+    assert_eq!(
+        h.state,
+        sim::HarvestState::Idle,
+        "no refinery must stop real delivery"
+    );
+    assert!(
+        app.world()
+            .resource::<Grid>()
+            .cell(CellPos::new(11, 19))
+            .unwrap()
+            .ore
+            > 0
+    );
+    assert_eq!(
+        app.world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .credits(),
+        0
+    );
+    assert!(
+        app.world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .vision()
+            .is_visible(CellPos::new(11, 19)),
+        "the retained field must be genuinely visible"
+    );
+    if live_refinery {
+        put(&mut app, "refinery", 8, 23);
+    }
+    let fighter = spawn_unit(
+        app.world_mut(),
+        PlayerId(0),
+        "conscript",
+        CellPos::new(12, 13),
+    )
+    .unwrap();
+    let target = sim::spawn_building(
+        app.world_mut(),
+        PlayerId(1),
+        "soviet_construction_yard",
+        CellPos::new(17, 13),
+    )
+    .unwrap();
+    let definitions = app.world().resource::<sim::Definitions>();
+    let item = sim::ProductionItem::Unit(definitions.unit_kind("conscript").unwrap());
+    let cost = definitions.production(item).unwrap().cost;
+    let refund = definitions.refund(definitions.building_kind("soviet_service_depot").unwrap());
+    assert!(refund >= cost && cost > 0);
+    // Establish current visibility through the real schedule before public attack validation.
+    step(&mut app);
+    issue(
+        &mut app,
+        Command::Attack {
+            units: vec![fighter],
+            target,
+        },
+    );
+    step(&mut app);
+    app.world_mut().insert_resource(controllers);
+    let mut sale = None;
+    let mut delivered = 0_i64;
+    let mut charged = false;
+    let mut paid = false;
+    let mut recruits = std::collections::BTreeSet::new();
+    let mut fighter_shot = false;
+    let mut recruit_shot = false;
+    for _ in 0..6000 {
+        charged |= app
+            .world()
+            .resource::<sim::Players>()
+            .get(PlayerId(0))
+            .unwrap()
+            .queues()
+            .flat_map(|(_, q)| q)
+            .any(|q| q.item == item && q.charged > 0);
+        for event in step(&mut app) {
+            match event {
+                sim::SimEvent::BuildingSold {
+                    player: PlayerId(0),
+                    building,
+                    refund: amount,
+                } => {
+                    assert!(
+                        !live_refinery,
+                        "real worker/refinery income must retain the optional asset"
+                    );
+                    assert_eq!(building, asset);
+                    assert_eq!(amount, refund);
+                    assert!(sale.replace(amount).is_none(), "one real refund suffices");
+                }
+                sim::SimEvent::OreDelivered {
+                    player: PlayerId(0),
+                    ..
+                } => {
+                    assert!(
+                        live_refinery,
+                        "visible ore and a loaded worker cannot earn without a refinery"
+                    );
+                    delivered += 1;
+                }
+                sim::SimEvent::ProductionComplete {
+                    player: PlayerId(0),
+                    item: found,
+                } if found == item => paid = true,
+                sim::SimEvent::UnitSpawned {
+                    player: PlayerId(0),
+                    building,
+                    unit,
+                } if building == barracks => {
+                    recruits.insert(unit);
+                }
+                sim::SimEvent::WeaponFired {
+                    attacker,
+                    target: found,
+                    ..
+                } if found == target => {
+                    fighter_shot |= attacker == fighter;
+                    recruit_shot |= recruits.contains(&attacker);
+                }
+                _ => {}
+            }
+        }
+        if recruit_shot && fighter_shot {
+            break;
+        }
+    }
+    eprintln!(
+        "visible ore finance live_refinery{live_refinery} sale{sale:?} delivered{delivered} charged{charged} paid{paid} recruits{recruits:?} fighter_shot{fighter_shot} recruit_shot{recruit_shot}"
+    );
+    assert!(
+        fighter_shot,
+        "the living original force must actually fight"
+    );
+    assert_eq!(
+        sale,
+        (!live_refinery).then_some(refund),
+        "visible ore needs an actual refinery before it can veto reinforcement finance"
+    );
+    assert_eq!(delivered > 0, live_refinery);
+    assert!(
+        charged && paid && !recruits.is_empty() && recruit_shot,
+        "actual cash must fund a native recruit and building shot"
+    );
+    let fighter_entity = unit_entity(&mut app, fighter);
+    assert!(
+        app.world()
+            .get::<sim::Health>(fighter_entity)
+            .is_some_and(|h| h.hit_points > 0)
+    );
+}
+
+#[test]
+fn ra9_visible_ore_without_a_refinery_releases_actual_reinforcement_finance() {
+    ra9_visible_ore_finance(false);
+}
+
+#[test]
+fn ra9_visible_ore_with_a_refinery_preserves_actual_worker_income() {
+    ra9_visible_ore_finance(true);
+}
