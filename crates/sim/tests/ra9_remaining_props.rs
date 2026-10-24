@@ -6,10 +6,9 @@ fn occupied(feature: u8, name: &str) -> (bevy_app::App, SimId, SimId, SimId) {
     let mut app = world();
     let target = mapped(&mut app, feature, name);
     let occupant = put(&mut app, P1, "conscript", 19, 20);
-    let source = put(&mut app, P0, "chrono_legionnaire", 13, 20); // outside initial infantry range
     let bait = put(&mut app, P0, "apocalypse", 19, 21);
     passive_before_tick(&mut app, bait);
-    ok(&tick(&mut app, vec![guard(&[source])]));
+    ok(&tick(&mut app, vec![]));
     let mut events = tick(
         &mut app,
         vec![issue(
@@ -46,24 +45,22 @@ fn occupied(feature: u8, name: &str) -> (bevy_app::App, SimId, SimId, SimId) {
             .any(|e| matches!(e,SimEvent::WeaponFired {attacker,..} if *attacker==target));
     }
     assert!(host_fired, "native occupation/fire premise");
-    ok(&tick(
-        &mut app,
-        vec![issue(
-            P0,
-            Command::Move {
-                units: vec![source],
-                target: CellPos::new(16, 20),
-            },
-        )],
-    ));
-    ok(&tick(&mut app, vec![guard(&[source])]));
-    run(&mut app, 100); // real teleport disable/reload interval, never edited
+    // Add the Temporal source only after proving the occupied host's native fire. This keeps
+    // the source from auto-acquiring the hostile prop during that independent setup premise.
+    let source = put(&mut app, P0, "chrono_legionnaire", 16, 20);
     assert_eq!(cell(&mut app, source), CellPos::new(16, 20));
     assert!(hp(&mut app, bait).is_some_and(|h| h > 0));
     (app, target, source, occupant)
 }
 fn start_beam(app: &mut bevy_app::App, source: SimId, target: SimId) {
-    let events = tick(
+    assert!(
+        !app.world()
+            .resource::<SpecialState>()
+            .erasures
+            .contains_key(&target),
+        "the explicit Attack must start the native channel"
+    );
+    let mut events = tick(
         app,
         vec![issue(
             P0,
@@ -74,8 +71,17 @@ fn start_beam(app: &mut bevy_app::App, source: SimId, target: SimId) {
         )],
     );
     ok(&events);
+    let mut shot = fired(&events, source, target);
+    for _ in 0..16 {
+        if shot {
+            break;
+        }
+        events = tick(app, vec![]);
+        ok(&events);
+        shot = fired(&events, source, target);
+    }
     assert!(
-        fired(&events, source, target),
+        shot,
         "actual native Temporal shot"
     );
     let state = app.world().resource::<SpecialState>();
@@ -178,7 +184,16 @@ fn ra9_real_beam_break_keeps_each_same_occupied_host_alive_for_the_full_uninterr
         let before = prop_hp(&app, target).unwrap();
         start_beam(&mut app, source, target);
         run(&mut app, 10);
-        ok(&tick(&mut app, vec![guard(&[source])]));
+        ok(&tick(
+            &mut app,
+            vec![issue(
+                P0,
+                Command::Move {
+                    units: vec![source],
+                    target: CellPos::new(5, 20),
+                },
+            )],
+        ));
         assert!(
             !app.world()
                 .resource::<SpecialState>()

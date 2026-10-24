@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "path": "docs/validation/ra2-parity/remediation-2/C-corrected-06/01-full-remaining-props.log",
+  "bytes": 1050,
+  "sha256": "c2d5438d538c836c1ef0552b75e798c7068376e912c89871cade5a69e5f4eda3",
+  "scope": "All seven Temporal/Ivan occupied-prop regressions; complete full13 remains required."
+}

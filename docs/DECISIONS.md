@@ -12386,3 +12386,25 @@ in the tick cannot participate in movement or emit a second destruction event, a
 still gains nothing. The failed full run and exact isolated reproduction remain evidence; a new
 freeze, complete unchanged full13, all five independent revised slices and a fresh binding lead
 remain required before any merge or reviewed tag.
+
+
+### R206. Keep the occupied-prop Temporal fixture idle until its explicit native attack
+
+The complete C5 workspace run passed1781 tests, the756 production matrix and the whole RA9
+audit before two `ra9_remaining_props` cases failed their explicit first-shot assertion. Exact
+isolated reproduction failed the same two cases. Their shared fixture kept a Chrono Legionnaire
+on Guard while it waited up to100 ticks for the occupied host's independent native-fire premise,
+so the source could begin the hostile prop's beam before its own move/reload setup. Shipped-data
+attack acquisition also need not emit its first shot in the command-admission tick.
+
+Spawn the Temporal source in its final in-range cell only after the occupied host has proved its
+independent native fire, and let the explicit Attack observe up to16 native schedules for its
+real first `WeaponFired`. Assert before Attack that no erasure channel exists. Remove the
+unrelated teleport-move/reload setup that allowed automatic combat to pre-start the channel;
+retain the same final source/target cells, real weapon and every erasure/reload/cleanup/survival
+assertion. Move the source out of range for the separate beam-break control; idle units can
+auto-acquire hostiles, so an in-range Stop would restart the channel. This isolates the behavior
+under test and removes an immediate-stage assumption; it does not change production source,
+timing constants, acceptance caps or assertion meaning.
+The failed full run and focused failure remain preserved. A fresh source freeze, complete
+unchanged full13, five revised independent slices and a fresh binding lead remain mandatory.
