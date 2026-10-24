@@ -788,11 +788,10 @@ fn a_unit_that_became_elite_by_its_kills_fights_on_with_all_that_its_rank_gives(
 
 #[test]
 fn a_crusher_gains_nothing_for_driving_over_what_was_destroyed_already() {
-    // A unit whose hit points are gone stays on the grid until `Cleanup`. A crusher that drove
-    // over it in the `Movement` stage of that tick was recorded as its killer, so the victim's
-    // cost was gained for a unit it had not destroyed (and twice, by two units, when a missile
-    // had destroyed it). Here a nuclear strike, which has no killer, takes the recruit's last
-    // hit points in the tick in which the roller drives into its cell.
+    // A unit whose hit points are gone stays on the grid until `Cleanup`, but it is no longer a
+    // movement or crushing participant. Here a nuclear strike, which has no killer, takes the
+    // recruit's last hit points in the tick in which the roller would otherwise drive into its
+    // cell. The control below proves that a live recruit in the same position is still crushed.
     let scene = |strike: bool| {
         let mut app = world();
         let roller = spawn(&mut app, P0, "roller", 10, 10);
@@ -832,6 +831,6 @@ fn a_crusher_gains_nothing_for_driving_over_what_was_destroyed_already() {
     };
     // Control: the roller alone crushes it in the tick of its order and gains its 100.
     assert_eq!(scene(false), (true, 100));
-    // Struck first in the same tick, it is driven over all the same, for nothing.
-    assert_eq!(scene(true), (true, 0));
+    // Struck first in the same tick, it is neither crushed nor credited to the roller.
+    assert_eq!(scene(true), (false, 0));
 }

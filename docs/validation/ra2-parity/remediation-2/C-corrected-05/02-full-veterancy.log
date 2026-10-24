@@ -1,0 +1,29 @@
+    Finished `release` profile [optimized] target(s) in 0.06s
+     Running tests/ra4_veterancy.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra4_veterancy-279a35d080badf3a)
+
+running 22 tests
+test a_hit_of_one_point_on_stronger_armour_deals_nothing ... ok
+test a_destroyed_building_gives_its_cost ... ok
+test a_promotion_never_lowers_a_rank_and_stops_at_the_cap ... ok
+test a_bonus_multiplies_with_the_rank_and_is_set_through_the_api ... ok
+test a_rank_grants_each_ability_of_its_lists_once ... ok
+test a_passenger_keeps_its_rank_and_its_elite_weapon ... ok
+test an_untrainable_unit_and_a_building_gain_nothing ... ok
+test a_unit_is_a_veteran_at_three_times_its_cost_and_elite_at_six_times ... ok
+test sight_is_not_changed_by_a_rank ... ok
+test self_healing_restores_a_point_every_repair_interval_up_to_full_health ... ok
+test crushing_counts_for_the_crusher ... ok
+test an_elite_unit_fires_its_elite_weapon_with_its_multipliers ... ok
+test a_crusher_gains_nothing_for_driving_over_what_was_destroyed_already ... ok
+test splash_counts_for_the_unit_that_fired_and_only_enemies_count ... ok
+test firepower_and_rate_of_fire_are_measured_on_the_shots ... ok
+test without_a_rules_file_nobody_has_experience ... ok
+test stronger_armour_divides_the_damage_taken ... ok
+test faster_is_measured_on_the_way_and_comes_before_the_slowing_of_damage ... ok
+test the_thresholds_are_inclusive_and_one_credit_less_is_not_enough ... ok
+test the_state_hash_covers_the_experience ... ok
+test a_unit_that_became_elite_by_its_kills_fights_on_with_all_that_its_rank_gives ... ok
+test a_long_battle_promotes_units_and_runs_the_same_twice ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+

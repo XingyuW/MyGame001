@@ -12368,3 +12368,21 @@ native worker, cap, deterministic/heap/performance and winning predicate remains
 All183 debt IDs/aliases and51 user-only quality checks remain; no GO, merge/tag or quality
 approval exists. Both projects keep running; no unrelated process is changed. R172/R199 govern
 3+2 slice batches and whole revised cumulative inspection. Earlier snapshots remain historical.
+
+
+### R205. Align the veterancy regression with dead-unit movement exclusion
+
+The first complete C4 workspace test run passed1167 tests before exposing one deterministic
+stale expectation in `ra4_veterancy`: the same-tick nuclear-strike case observed no
+`UnitCrushed` event and zero crusher experience, while the test expected an obsolete crush
+event with zero experience. Current movement intentionally excludes nonpositive-HP units from
+movement ordering, activity and the crushable set before Cleanup. This is the same dead-unit
+action exclusion required by the corrected RA2 simulation semantics.
+
+Change only that case's event expectation from `(true, 0)` to `(false, 0)` and update its
+explanation. Keep the live-unit control `(true, 100)`, the zero-experience assertion and every
+fixture value unchanged. The correction strengthens the regression: a unit destroyed earlier
+in the tick cannot participate in movement or emit a second destruction event, and the crusher
+still gains nothing. The failed full run and exact isolated reproduction remain evidence; a new
+freeze, complete unchanged full13, all five independent revised slices and a fresh binding lead
+remain required before any merge or reviewed tag.
