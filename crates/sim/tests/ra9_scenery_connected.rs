@@ -66,19 +66,10 @@ fn ra9_prop_temporal_freezes_real_host_fire_and_deploy_then_releases_after_real_
         let mut app = world();
         let host = mapped(&mut app, feature, name);
         let occupant = put(&mut app, P1, "conscript", 19, 20);
-        let chrono = put(&mut app, P0, "chrono_legionnaire", 13, 20);
         let bait = put(&mut app, P0, "grizzly", 19, 21);
         let e = entity(&mut app, bait).expect("bait");
         app.world_mut().entity_mut(e).remove::<sim::Weapon>(); // passive pre-tick fixture
-        ok(&tick(
-            &mut app,
-            vec![issue(
-                P0,
-                Command::Guard {
-                    units: vec![chrono],
-                },
-            )],
-        ));
+        ok(&tick(&mut app, vec![])); // establish mapped-prop visibility before interaction
         let mut events = tick(
             &mut app,
             vec![issue(
@@ -105,27 +96,17 @@ fn ra9_prop_temporal_freezes_real_host_fire_and_deploy_then_releases_after_real_
             fired_before,
             "actual occupied-host WeaponFired is a required premise"
         );
-        ok(&tick(
-            &mut app,
-            vec![issue(
-                P0,
-                Command::Move {
-                    units: vec![chrono],
-                    target: CellPos::new(16, 20),
-                },
-            )],
-        ));
-        ok(&tick(
-            &mut app,
-            vec![issue(
-                P0,
-                Command::Guard {
-                    units: vec![chrono],
-                },
-            )],
-        ));
-        steps(&mut app, 100); // natural disabled interval expires under Guard before explicit launch
+        // Create the source only after proving the occupied host's native fire.
+        // This keeps setup ticks from auto-acquiring the prop before the explicit attack.
+        let chrono = put(&mut app, P0, "chrono_legionnaire", 16, 20);
         assert_eq!(cell(&mut app, chrono), CellPos::new(16, 20));
+        assert!(
+            !app.world()
+                .resource::<SpecialState>()
+                .erasures
+                .contains_key(&host),
+            "explicit attack must start the only Temporal channel"
+        );
         let before = prop_hp(&app, host).expect("host alive");
         events = tick(
             &mut app,
@@ -142,13 +123,8 @@ fn ra9_prop_temporal_freezes_real_host_fire_and_deploy_then_releases_after_real_
             matches!(e,SimEvent::WeaponFired {attacker,target,..}
             if *attacker==chrono && *target==host)
         });
-        for _ in 0..100 {
-            if app
-                .world()
-                .resource::<SpecialState>()
-                .erasures
-                .contains_key(&host)
-            {
+        for _ in 0..16 {
+            if source_fired {
                 break;
             }
             events = tick(&mut app, vec![]);
@@ -157,7 +133,7 @@ fn ra9_prop_temporal_freezes_real_host_fire_and_deploy_then_releases_after_real_
                 if *attacker==chrono && *target==host)
             });
         }
-        assert!(source_fired);
+        assert!(source_fired, "actual native Temporal shot");
         let initial = app
             .world()
             .resource::<SpecialState>()
@@ -200,8 +176,9 @@ fn ra9_prop_temporal_freezes_real_host_fire_and_deploy_then_releases_after_real_
             &mut app,
             vec![issue(
                 P0,
-                Command::Guard {
+                Command::Move {
                     units: vec![chrono],
+                    target: CellPos::new(5, 20),
                 },
             )],
         ));

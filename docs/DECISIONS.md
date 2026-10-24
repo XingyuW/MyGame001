@@ -12408,3 +12408,24 @@ under test and removes an immediate-stage assumption; it does not change product
 timing constants, acceptance caps or assertion meaning.
 The failed full run and focused failure remain preserved. A fresh source freeze, complete
 unchanged full13, five revised independent slices and a fresh binding lead remain mandatory.
+
+### R207. Keep the scenery Temporal source absent until its explicit native attack
+
+The complete C7 workspace run passed 1790 tests, the 756-production-match matrix, and the full
+RA9 audit before `ra9_scenery_connected` failed its required explicit Temporal first-shot
+assertion. The separate corrected `ra9_remaining_props` binary passed all seven cases in the same
+run. The scenery fixture still created its Chrono Legionnaire before waiting for the occupied
+host's independent native-fire premise and then left it in range during setup, allowing automatic
+combat to pre-start or restart the beam before the explicit Attack observation.
+
+Establish mapped-prop visibility with an empty schedule, prove the occupied host's native fire,
+and only then spawn the real Temporal source at the same final in-range cell. Assert that no
+channel exists before the public Attack, require its actual source-to-host `WeaponFired` within
+16 schedules, retain the exact 121-tick disabled/fire/deploy and Damage8 decrement assertions,
+and move the source out of range to break the channel without automatic reacquisition. This is
+the same test-fixture isolation recorded in R206, applied to the remaining independent scenery
+regression. It changes no production source, weapon data, timing constant, acceptance cap, or
+behavioral assertion. The full three-test scenery binary and the seven-test remaining-props
+binary pass together after the correction. The failed full run and its raw logs remain preserved;
+a new exact freeze, complete unchanged full13, five final evidence addenda, and fresh binding lead
+remain mandatory before merge or tag.
