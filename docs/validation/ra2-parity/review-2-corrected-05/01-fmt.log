@@ -1,0 +1,12 @@
+Diff in /Users/xingyuwang/GameProjects/MyGame001/crates/sim/tests/ra9_remaining_props.rs:80:
+         ok(&events);
+         shot = fired(&events, source, target);
+     }
+-    assert!(
+-        shot,
+-        "actual native Temporal shot"
+-    );
++    assert!(shot, "actual native Temporal shot");
+     let state = app.world().resource::<SpecialState>();
+     let beam = state
+         .erasures
