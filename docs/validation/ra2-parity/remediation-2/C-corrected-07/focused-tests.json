@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "path": "docs/validation/ra2-parity/remediation-2/C-corrected-07/01-full-remaining-props.log",
+  "bytes": 1128,
+  "sha256": "80ae2b3eb48629cd1c175a480a43c2b9b58d1fd18117ac4a8e6ae31893b4f4d1",
+  "scope": "All seven Temporal/Ivan occupied-prop regressions after rustfmt; complete full13 remains required."
+}

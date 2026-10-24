@@ -80,10 +80,7 @@ fn start_beam(app: &mut bevy_app::App, source: SimId, target: SimId) {
         ok(&events);
         shot = fired(&events, source, target);
     }
-    assert!(
-        shot,
-        "actual native Temporal shot"
-    );
+    assert!(shot, "actual native Temporal shot");
     let state = app.world().resource::<SpecialState>();
     let beam = state
         .erasures
