@@ -1,0 +1,37 @@
+owner	section	key	presence	value
+NASAM	AAHeatSeeker	AA	present	yes
+NASAM	AAHeatSeeker	AG	present	no
+NASAM	AAHeatSeeker	Arcing	absent	
+NASAM	AAHeatSeeker	Inaccurate	absent	
+NASAM	AAHeatSeeker	Inviso	absent	
+NASAM	AAHeatSeeker	ROT	present	80
+NASAM	NASAM	Armor	present	steel
+NASAM	NASAM	ElitePrimary	absent	
+NASAM	NASAM	EliteSecondary	absent	
+NASAM	NASAM	LandTargeting	present	1
+NASAM	NASAM	NavalTargeting	present	6
+NASAM	NASAM	Power	present	-50
+NASAM	NASAM	Powered	present	yes
+NASAM	NASAM	Primary	present	RedEye2
+NASAM	NASAM	Secondary	absent	
+NASAM	NASAM	Sight	present	10
+NASAM	NASAM	Strength	present	900
+NASAM	NASAM	VHPScan	present	Strong
+NASAM	RedEye2	Burst	absent	
+NASAM	RedEye2	Damage	present	75
+NASAM	RedEye2	MinimumRange	absent	
+NASAM	RedEye2	Projectile	present	AAHeatSeeker
+NASAM	RedEye2	ROF	present	55
+NASAM	RedEye2	Range	present	12
+NASAM	RedEye2	Speed	present	100
+NASAM	RedEye2	Warhead	present	SAMWH
+NASAM	SAMWH	CellSpread	present	.3
+NASAM	SAMWH	PercentAtMax	present	1
+NASAM	SAMWH	Verses	present	100%,100%,100%,100%,100%,100%,0%,0%,0%,100%,100%
+NASAM	ZEP	Armor	present	light
+NASAM	ZEP	SelfHealing	present	Yes
+NASAM	ZEP	Strength	present	2000
+Spark	Spark	Damage	absent	
+Spark	Spark	NextParticle	absent	
+Spark	Spark	Warhead	absent	
+vhp-key-census	NASAM	VHPScan	present	Strong
