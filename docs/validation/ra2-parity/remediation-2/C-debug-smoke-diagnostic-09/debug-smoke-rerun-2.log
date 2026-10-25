@@ -1,0 +1,9 @@
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `game` (bin "game") generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.29s
+     Running `/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/game --smoke-test 600`
+2026-10-25T01:24:28.832471Z ERROR game::smoke: smoke test failed: no unit moved within 8946 ticks of the order
+2026-10-25T01:24:28.844906Z  WARN bevy_winit::state: Skipped event Destroyed for unknown winit Window Id WindowId(527085323520)

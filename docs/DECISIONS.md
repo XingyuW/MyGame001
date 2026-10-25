@@ -12429,3 +12429,24 @@ behavioral assertion. The full three-test scenery binary and the seven-test rema
 binary pass together after the correction. The failed full run and its raw logs remain preserved;
 a new exact freeze, complete unchanged full13, five final evidence addenda, and fresh binding lead
 remain mandatory before merge or tag.
+
+### R208. Remember smoke-test movement after the moved unit leaves the final world
+
+The complete C8 workspace test passed 1,843 tests, including the 756 production matrix and
+the full RA9 audit, and the release build and release 600-frame smoke passed. The debug
+600-frame smoke then failed reproducibly because its final-frame movement check saw none of
+the units that had received the move order. Under the slower debug build, 8,946–8,947
+simulation ticks elapsed before frame 600, so a unit could move successfully and later be
+destroyed before the final world snapshot. The check incorrectly treated absence from that
+last snapshot as proof that movement never occurred. The failed full run and an exact focused
+reproduction are retained as evidence.
+
+Keep the smoke test's movement assertion and 40-tick threshold unchanged. Record the greatest
+number of ordered units observed away from their starting positions on any rendered frame and
+use that cumulative observation at the final check. Add a focused regression proving that an
+observed movement remains recorded after the unit is absent. The focused regression and the
+exact debug 600-frame smoke pass after the correction. This changes only the smoke evidence
+harness; it changes no simulation, game behavior, data, balance value, command, acceptance cap,
+or user-quality claim. A new exact freeze, one complete unchanged 13-command run, isolated five,
+asset failure/restoration checks, all five final evidence reports, and a fresh independent lead
+remain mandatory before merge or tag.

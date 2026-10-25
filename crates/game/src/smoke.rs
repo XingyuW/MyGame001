@@ -180,6 +180,12 @@ struct SmokeTest {
     rendered: u32,
     /// The tick at which the move was ordered, and the units' positions then.
     order: Option<(u64, BTreeMap<SimId, SubPos>)>,
+    /// The greatest number of ordered units observed away from their starting positions.
+    ///
+    /// This is cumulative because a unit can move and then be destroyed before the final
+    /// frame. Looking only at survivors on that frame makes a slow debug smoke run report that
+    /// no unit ever moved even though the movement check already succeeded.
+    moved: usize,
     /// The tick at which production was ordered, and the item (`None` if the player could
     /// queue nothing).
     production: Option<(u64, Option<ProductionItem>)>,
@@ -218,6 +224,7 @@ impl SmokeTest {
             frames,
             rendered: 0,
             order: None,
+            moved: 0,
             production: None,
             rejected: false,
             ai_rejected: 0,
@@ -1563,6 +1570,19 @@ fn node_inside(node: &ComputedNode, transform: &UiGlobalTransform, size: Vec2) -
     min.x >= -0.5 && min.y >= -0.5 && max.x <= size.x + 0.5 && max.y <= size.y + 0.5
 }
 
+fn cumulative_moved(
+    previous: usize,
+    start: &BTreeMap<SimId, SubPos>,
+    positions: impl IntoIterator<Item = (SimId, SubPos)>,
+) -> usize {
+    previous.max(
+        positions
+            .into_iter()
+            .filter(|(id, position)| start.get(id).is_some_and(|at| at != position))
+            .count(),
+    )
+}
+
 #[allow(clippy::too_many_arguments)]
 fn count_frames(
     mut smoke: ResMut<SmokeTest>,
@@ -1583,6 +1603,20 @@ fn count_frames(
     mut exit: MessageWriter<AppExit>,
 ) {
     smoke.rendered = smoke.rendered.saturating_add(1);
+    let moved = smoke.order.as_ref().map_or(smoke.moved, |(_, start)| {
+        host.world()
+            .try_query::<(&SimId, &Position)>()
+            .map_or(smoke.moved, |mut units| {
+                cumulative_moved(
+                    smoke.moved,
+                    start,
+                    units
+                        .iter(host.world())
+                        .map(|(id, position)| (*id, position.0)),
+                )
+            })
+    });
+    smoke.moved = moved;
     // The checks run once, at the last frame. The runner exits after it, but may update once more
     // first (`bevy_winit` checks for `AppExit` only when its event loop is about to wait); the
     // exit message of the last frame is still read then.
@@ -1612,24 +1646,8 @@ fn count_frames(
     let visible_cells = players
         .get(HUMAN)
         .map_or(0, |state| state.vision().visible_cells());
-    let positions: BTreeMap<SimId, SubPos> = host
-        .world()
-        .try_query::<(&SimId, &Position)>()
-        .map(|mut units| {
-            units
-                .iter(host.world())
-                .map(|(id, position)| (*id, position.0))
-                .collect()
-        })
-        .unwrap_or_default();
     let (ticks_since_order, moved) = match &smoke.order {
-        Some((ordered_at, start)) => (
-            tick.saturating_sub(*ordered_at),
-            positions
-                .iter()
-                .filter(|(id, position)| start.get(id).is_some_and(|at| at != *position))
-                .count(),
-        ),
+        Some((ordered_at, _)) => (tick.saturating_sub(*ordered_at), smoke.moved),
         None => (0, 0),
     };
     let (sidebar_buttons, sidebar_texts, music, window) = interface;
@@ -2125,6 +2143,16 @@ mod tests {
     use bevy::ecs::system::RunSystemOnce;
 
     use super::*;
+
+    #[test]
+    fn movement_observation_survives_the_unit_that_moved() {
+        let id = SimId(1);
+        let start = BTreeMap::from([(id, SubPos::new(10, 10))]);
+
+        let observed = cumulative_moved(0, &start, [(id, SubPos::new(11, 10))]);
+        assert_eq!(observed, 1);
+        assert_eq!(cumulative_moved(observed, &start, []), 1);
+    }
 
     const PASSING: SmokeOutcome = SmokeOutcome {
         frames: 600,
