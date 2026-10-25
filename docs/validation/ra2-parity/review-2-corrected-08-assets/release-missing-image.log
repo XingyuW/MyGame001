@@ -1,0 +1,3 @@
+2026-10-25T07:44:49.131693Z ERROR game::skirmish: data file /Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261023/review-2-corrected-08-assets-asset-root/assets/data/skirmish.ron: map "demo": tileset image /Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261023/review-2-corrected-08-assets-asset-root/assets/maps/demo/demo_tiles.png: file: cannot be read: No such file or directory (os error 2)
+2026-10-25T07:44:49.560041Z ERROR game::smoke: smoke test failed: the application exited after 1 of 600 frames
+2026-10-25T07:44:49.573542Z  WARN bevy_winit::state: Skipped event Destroyed for unknown winit Window Id WindowId(503450813696)
