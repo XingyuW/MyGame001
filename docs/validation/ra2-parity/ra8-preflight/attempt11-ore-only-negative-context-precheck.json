@@ -1,0 +1,8 @@
+{
+  "kind": "pre-mutation runner context mismatch; no test ran",
+  "failed_assertion": "multiline needle count == 1",
+  "mutation_reached": false,
+  "separate_later_ai_sha256": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+  "separate_later_strategy_sha256": "8362c19c3552d2375f4dd4e2a5142ed93b9108b1020f92b52ff35f3fdeadf854",
+  "correction": "read exact one-line predicate before next bounded negative"
+}

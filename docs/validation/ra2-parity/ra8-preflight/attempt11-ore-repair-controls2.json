@@ -1,0 +1,27 @@
+{
+  "label": "attempt11-ore-repair-controls2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "repair",
+    "--",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T13:06:40.858719+00:00",
+  "elapsed_seconds": 7.7447048330213875,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "8362c19c3552d2375f4dd4e2a5142ed93b9108b1020f92b52ff35f3fdeadf854"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "8362c19c3552d2375f4dd4e2a5142ed93b9108b1020f92b52ff35f3fdeadf854"
+  },
+  "log_sha256": "60d83e428ab39cc48bc430e110a346a4707d31f23c0cb4b8834f6d9b17387f90"
+}

@@ -1,0 +1,17 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 22.78s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 8 tests
+test ra8_surface_building_focus_responds_to_a_new_real_local_defender ... ok
+test ra8_surface_counterfire_preserves_a_real_armed_building_engagement ... ok
+building counterfire returnedtrue damagedtrue destroyedtrue resumedtrue distractionshots1 targetSome(Building(SimId(5))) orderSome(Weapon { kind: WeaponKind(27), secondary: Some(WeaponKind(28)), cooldown: 53, burst_left: 0, volley: WeaponKind(27), target: Some(SimId(5)), order: Some(Attack { target: SimId(5), chases: 0 }) })
+test ra8_surface_counterfire_leaves_an_unarmed_economy_building_to_fight_its_real_defender ... ok
+test ra8_surface_response_does_not_replace_the_existing_long_range_artillery_policy ... ok
+test ra8_surface_counterfire_prioritizes_a_real_defender_over_a_nearer_unarmed_miner ... ok
+test ra8_artillery_uses_the_surface_tank_line_when_aircraft_share_its_wave ... ok
+test ra8_a_first_stationary_hidden_mirage_cannot_change_surface_focus_intents ... ok
+test ra8_unseen_building_occupancy_cannot_change_a_surface_response_route_intent ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.41s
+

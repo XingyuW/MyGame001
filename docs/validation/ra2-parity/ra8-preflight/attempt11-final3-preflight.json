@@ -1,0 +1,52 @@
+{
+  "start_utc": "2026-10-19T12:29:21.762000+00:00",
+  "head": "ab4a17606fcd013a4d8cc6452aa8435fcd24e987",
+  "runtime_manifest": "attempt11-final3-runtime-manifest.json",
+  "additional_manifest": "attempt11-final3-test-example-manifest.json",
+  "hygiene_note": "No optional unfiltered diff preflight here; mandatory full13 and standalone staged checks retain their original unfiltered checks. Raw failed gate remains unstaged/preserved.",
+  "commands": [
+    {
+      "phase": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start_utc": "2026-10-19T12:29:21.762142+00:00",
+      "exit": 0,
+      "elapsed_seconds": 0.9761833339580335,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt11-final3-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_targets": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "source_mismatches": []
+    },
+    {
+      "phase": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "start_utc": "2026-10-19T12:29:22.738509+00:00",
+      "exit": 101,
+      "elapsed_seconds": 6.117342667013872,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt11-final3-clippy.log",
+      "sha256": "3c2a24c221fdead5762c5b7398dddea6f0a92366dee3c9449cb5f10eb45af957",
+      "test_targets": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "source_mismatches": []
+    }
+  ],
+  "elapsed_seconds": 7.0939880419755355
+}

@@ -27,3 +27,6 @@ rustc-ice-*.txt
 # Added by cargo
 
 /target
+
+# Python bytecode of the art and data scripts
+__pycache__/

@@ -1,0 +1,7 @@
+{
+  "utc": "2026-10-21T16:21:11.589816+00:00",
+  "scope": "197fmtPASS. Clippy terminated before compilation with configured CARGO_TARGET_DIR debug/.cargo-build-lock os1 Operation not permitted under workspace sandbox. Source/authority guards unchanged. Preserve raw; retry remaining exact commands with authorized cache-access escalation; no source fix or compiler-defect claim.",
+  "original_process": "197-fail-fast-process.json",
+  "retry_process": "197b-fail-fast-process.json",
+  "new_directories": []
+}

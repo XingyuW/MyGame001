@@ -1,0 +1,62 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Checking game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+error: call to `std::mem::drop` with a value that does not implement `Drop`. Dropping such a type only extends its contained lifetimes
+   --> crates/sim/tests/ra8_ai.rs:175:5
+    |
+175 |     drop(grid);
+    |     ^^^^^^^^^^
+    |
+note: argument has type `bevy_ecs::change_detection::Mut<'_, sim::Grid>`
+   --> crates/sim/tests/ra8_ai.rs:175:10
+    |
+175 |     drop(grid);
+    |          ^^^^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#drop_non_drop
+    = note: `-D clippy::drop-non-drop` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::drop_non_drop)]`
+
+error: this `if` statement can be collapsed
+   --> crates/sim/tests/ra8_ai.rs:887:17
+    |
+887 | /                 if let sim::SimEvent::StrategicActivated {
+888 | |                     building,
+889 | |                     target: cell,
+890 | |                     ..
+...   |
+896 | |                 }
+    | |_________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#collapsible_if
+    = note: `-D clippy::collapsible-if` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+    |
+891 ~                 } = event
+892 ~                     && building == source {
+893 |                         target = Some(cell);
+894 ~                     }
+    |
+
+error: this `if` statement can be collapsed
+    --> crates/sim/tests/ra8_ai.rs:1244:17
+     |
+1244 | /                 if let sim::SimEvent::StrategicActivated { player, role, .. } = e {
+1245 | |                     if player == PlayerId(0) {
+1246 | |                         major |= role.major_superweapon();
+1247 | |                         para |= role == sim::Role::Paradrop;
+1248 | |                     }
+1249 | |                 }
+     | |_________________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#collapsible_if
+help: collapse nested if block
+     |
+1244 ~                 if let sim::SimEvent::StrategicActivated { player, role, .. } = e
+1245 ~                     && player == PlayerId(0) {
+1246 |                         major |= role.major_superweapon();
+1247 |                         para |= role == sim::Role::Paradrop;
+1248 ~                     }
+     |
+
+error: could not compile `sim` (test "ra8_ai") due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...

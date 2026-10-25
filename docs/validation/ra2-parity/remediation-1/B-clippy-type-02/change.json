@@ -1,0 +1,17 @@
+{
+  "utc": "2026-10-22T05:16:10.478221+00:00",
+  "status": "COPY_VALUES_READ_WITHOUT_REDUNDANT_CLONE",
+  "before_sha256": "1fa35a634ddb7eefcd359c9e771efaa4b683ed582823eb4eba20ac6625818dc5",
+  "after_sha256": "8d112bcb0605d3c909bb05124eeba887142bc12d1ce71addfd72d420fbfe2de3",
+  "test_assertions_or_value_semantics_changed": false,
+  "exact_replacements": [
+    [
+      "let h = app.world().get::<Harvester>(e).unwrap().clone();",
+      "let h = *app.world().get::<Harvester>(e).unwrap();"
+    ],
+    [
+      "let before = app.world().resource::<Players>().get(P0).unwrap().lane(key)[0].clone();",
+      "let before = app.world().resource::<Players>().get(P0).unwrap().lane(key)[0];"
+    ]
+  ]
+}

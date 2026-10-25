@@ -1,0 +1,5 @@
+{
+  "candidate_sha256": "209bae94233ec222de20f83ef80f2c6bb1a8a0a12f081684e77ba02ebcc8a2cd",
+  "restored_sha256": "5c5fd561a4aa9d4184011128d092409ef9b0597dc23088c8515ba8a61fb88d34",
+  "reason": "Initial before2 was invalid because setup allowed a defeated P0; initial candidate not validated or credited. Restore before corrected schedule negative."
+}

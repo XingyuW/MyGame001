@@ -1,0 +1,8 @@
+{
+  "observed_utc": "2026-10-18T19:45:57.535506+00:00",
+  "path": "crates/sim/src/ai/strategy.rs",
+  "expected_sha256": "9e539b2a5509ea1bc462ee8f9324bbf08106ddd7d4939afd258878730530cae2",
+  "actual_sha256": "9e539b2a5509ea1bc462ee8f9324bbf08106ddd7d4939afd258878730530cae2",
+  "matches": true,
+  "purpose": "separate immediate source-integrity read after finally restoration, before any later build/test/commit"
+}

@@ -1,0 +1,19 @@
+{
+  "utc": "2026-10-21T03:18:37.559984+00:00",
+  "command": [
+    "cargo",
+    "clippy",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "scope": "strict onlychangedaudit target; actualwholeworkspace strict124 passed before these2 audit-only repairs",
+  "ended_utc": "2026-10-21T03:18:41.654253+00:00",
+  "exit_code": 0,
+  "seconds": 4.094,
+  "input_mismatches": []
+}

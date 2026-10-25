@@ -1,0 +1,26 @@
+{
+  "utc": "2026-10-21T02:56:56.115479+00:00",
+  "command": [
+    "cargo",
+    "run",
+    "--release",
+    "-p",
+    "sim",
+    "--example",
+    "m14_duels",
+    "--",
+    "full",
+    "coral_archipelago",
+    "trace"
+  ],
+  "env": {
+    "RA2_DUEL_SEED": "14",
+    "RA2_DUEL_PAIR": "iraq:brutal,cuba:brutal"
+  },
+  "original_limit": 300000,
+  "scope": "ONE exact previously stalled Coral14 integrated runtime/example/data/Cargo, unrelated audit/closing docs excluded; concurrent canonical phase9 functional overlap, no performance claim",
+  "ended_utc": "2026-10-21T03:02:28.392031+00:00",
+  "exit_code": 0,
+  "seconds": 332.274,
+  "input_mismatches": []
+}

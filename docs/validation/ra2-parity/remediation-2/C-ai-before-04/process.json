@@ -1,0 +1,38 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T20:31:47.286487+00:00",
+  "pid": 19661,
+  "head": "aafd1794a84f88b9919b7e31c78768e08f66d70d",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-before-04-plan.json",
+  "plan_sha256": "54218931994aa2a486e24c20ec554c46558c5f66d8521eeb4d01d95873c42fa0",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra9_privacy_remembered_bridge_approach_ignores_real_hidden_bridge_repair",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:31:47.395578+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-before-04/01-final-byte-bridge-repair.log",
+      "pid": 19690,
+      "pgid": 19690,
+      "exit": 101,
+      "end": "2026-10-22T20:34:07.588810+00:00",
+      "raw_bytes": 1083,
+      "raw_sha256": "22b0efedd2171af98180dd01c58b0ccb3f97253dc3a7b24d3ff8b04626c5c474",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T20:34:02.585749+00:00",
+  "end": "2026-10-22T20:34:07.695730+00:00",
+  "source_unchanged": true
+}

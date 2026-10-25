@@ -1,0 +1,11 @@
+--- crates/sim/src/ai.rs
++++ crates/sim/src/ai.rs
+@@ -2462,7 +2462,7 @@
+             .any(|unit| view.definitions.domain(unit.kind) == Domain::Air)
+         // Preserve a strategic capability's complete power/recovery path, not
+         // just the source building, before optional ground reinforcement sales.
+-        || view.own_buildings.iter().any(|building| {
++        || false && view.own_buildings.iter().any(|building| {
+             view.definitions
+                 .metadata(ProductionItem::Building(building.kind))
+                 .is_some_and(|meta| {

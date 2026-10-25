@@ -1,0 +1,21 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 5.20s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+test ra8_a_real_naval_edge_gap_shot_remains_an_eligible_paid_ai_shore_job ... edge-gap humantrue: paidtrue/firedtrue
+edge-gap humanfalse: paidfalse/firedfalse
+
+thread 'ra8_a_real_naval_edge_gap_shot_remains_an_eligible_paid_ai_shore_job' (8247518) panicked at crates/sim/tests/ra8_ai.rs:799:9:
+source-legal footprint-edge shot must remain a paid shore job: humanfalse/paidfalse/firedfalse
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ra8_a_real_naval_edge_gap_shot_remains_an_eligible_paid_ai_shore_job
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 80 filtered out; finished in 0.24s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

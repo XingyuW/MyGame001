@@ -1,0 +1,10 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 19.51s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 2 tests
+test command::ra8_intent_tests::ra8_strategic_visibility_certificate_is_value_hashed_and_never_certifies_hidden_cells ... ok
+test command::ra8_intent_tests::ra8_strategic_visible_cell_loss_cancels_only_fully_valid_internal_intents ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 60 filtered out; finished in 0.06s
+

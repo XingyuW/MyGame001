@@ -1,0 +1,13 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 31.50s
+     Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-fff13bc99bc7e9e6)
+
+running 2 tests
+coral_archipelago: ["libya", "iraq"] at ["brutal", "medium"]: 31367 ticks of 288000
+test ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes ... ok
+coral_archipelago: ["libya", "germany"] at ["brutal", "brutal"]: 33213 ticks of 288000
+test ra5_coral_archipelago_brutal_libya_germany_seed_zero_finishes ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 22.17s
+

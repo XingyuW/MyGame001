@@ -1,0 +1,48 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 20.57s
+     Running tests/m4_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m4_definitions-6d5656a5a13c01ac)
+
+running 16 tests
+
+thread 'every_field_of_schema_version_2_is_required' (1456307) panicked at crates/sim/tests/m4_definitions.rs:162:9:
+assertion `left == right` failed: v2_missing_0: fixture edit "                (armour: \"concrete\", percent: 0),\n            ],\n            cell_spread: 0,\n            percent_at_max: 100,\n            wall: 1,\n            wood: 1,\n"
+  left: 0
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test every_field_of_schema_version_2_is_required ... FAILED
+test an_economy_file_loaded_after_the_combat_file_removes_it ... ok
+
+thread 'the_fields_of_schema_version_2_accept_their_limits_and_reject_beyond' (1456337) panicked at crates/sim/tests/m4_definitions.rs:162:9:
+assertion `left == right` failed: v2_ok_warheads_0__cell_spread_0: fixture edit "                (armour: \"concrete\", percent: 0),\n            ],\n            cell_spread: 0,\n            percent_at_max: 100,\n            wall: 1,\n            wood: 1,\n"
+  left: 0
+ right: 1
+test the_fields_of_schema_version_2_accept_their_limits_and_reject_beyond ... FAILED
+test the_fixture_loads_with_every_field ... ok
+
+thread 'the_rules_between_the_fields_of_schema_version_2_are_checked' (1456351) panicked at crates/sim/tests/m4_definitions.rs:162:9:
+assertion `left == right` failed: v2_min_range_at_range: fixture edit "            projectile_speed: 0,\n            min_range: 0,\n            burst: 1,\n            anti_air: 1,\n            anti_ground: 1,\n            scatter: 0,\n            rad_level: 0,\n            area_fire: false,\n            suicide: false,\n"
+  left: 0
+ right: 1
+test the_rules_between_the_fields_of_schema_version_2_are_checked ... FAILED
+test schema_versions_other_than_4_are_rejected ... ok
+test names_are_checked ... ok
+test unreadable_oversized_and_special_files_are_rejected ... ok
+test references_must_name_defined_entries ... ok
+test every_type_and_armour_class_needs_exactly_one_entry ... ok
+test effects_name_known_effects_once_with_a_damage_and_a_warhead ... ok
+test list_lengths_are_bounded ... ok
+test every_field_is_required_and_unknown_fields_are_rejected ... ok
+test numeric_fields_accept_their_limits_and_reject_beyond ... ok
+test truncations_of_the_fixture_are_rejected_without_panic ... ok
+test seeded_mutations_of_the_fixture_load_or_return_a_typed_error ... ok
+
+failures:
+
+failures:
+    every_field_of_schema_version_2_is_required
+    the_fields_of_schema_version_2_accept_their_limits_and_reject_beyond
+    the_rules_between_the_fields_of_schema_version_2_are_checked
+
+test result: FAILED. 13 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.10s
+
+error: test failed, to rerun pass `-p sim --test m4_definitions`

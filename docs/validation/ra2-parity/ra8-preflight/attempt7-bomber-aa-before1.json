@@ -1,0 +1,20 @@
+{
+  "cmd": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_unlimited_ammo_bombers_wait_for_ground_to_clear_known_outranging_aa",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 101,
+  "seconds": 19.54450899999938,
+  "runtime_sha": "01c2d53a258ca4a91a841dd73a0466af9f39a405db9cb6dc181d9de11ee4601c",
+  "log_sha": "ff16a146fc63383efcb1cf134cf5aaf38388928259446d01c590165a7205eeb2"
+}

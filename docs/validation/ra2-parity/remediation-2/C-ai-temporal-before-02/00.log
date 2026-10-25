@@ -1,0 +1,39 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 24.38s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-b27027efb5a77317)
+
+running 5 tests
+
+thread 'ra9_temporal_garrison_waits_for_real_release_then_recovers_its_original_infantry' (18353241) panicked at crates/sim/tests/ra8_ai.rs:13766:9:
+a currently erased host must wait without invalid Deploy intents
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra9_temporal_garrison_waits_for_real_release_then_recovers_its_original_infantry ... FAILED
+
+thread 'ra9_temporal_building_sale_waits_for_real_release' (18353238) panicked at crates/sim/tests/ra8_ai.rs:13918:9:
+current Temporal suspension must exclude only the sale candidate
+test ra9_temporal_building_sale_waits_for_real_release ... FAILED
+
+thread 'ra9_temporal_garrison_does_not_starve_a_current_unblocked_recovery_host' (18353240) panicked at crates/sim/tests/ra8_ai.rs:13766:9:
+a currently erased host must wait without invalid Deploy intents
+test ra9_temporal_garrison_does_not_starve_a_current_unblocked_recovery_host ... FAILED
+
+thread 'ra9_temporal_building_sale_uses_an_unblocked_alternative_then_resumes' (18353237) panicked at crates/sim/tests/ra8_ai.rs:13918:9:
+current Temporal suspension must exclude only the sale candidate
+test ra9_temporal_building_sale_uses_an_unblocked_alternative_then_resumes ... FAILED
+
+thread 'ra9_temporal_garrison_current_cargo_interrupts_an_existing_last_stand' (18353239) panicked at crates/sim/tests/ra8_ai.rs:13758:9:
+paused cargo must preserve recovery capability
+test ra9_temporal_garrison_current_cargo_interrupts_an_existing_last_stand ... FAILED
+
+failures:
+
+failures:
+    ra9_temporal_building_sale_uses_an_unblocked_alternative_then_resumes
+    ra9_temporal_building_sale_waits_for_real_release
+    ra9_temporal_garrison_current_cargo_interrupts_an_existing_last_stand
+    ra9_temporal_garrison_does_not_starve_a_current_unblocked_recovery_host
+    ra9_temporal_garrison_waits_for_real_release_then_recovers_its_original_infantry
+
+test result: FAILED. 0 passed; 5 failed; 0 ignored; 0 measured; 141 filtered out; finished in 0.10s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

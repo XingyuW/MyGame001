@@ -1,0 +1,9 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0616]: field `known` of struct `AiController` is private
+   --> crates/sim/examples/m13_ten_players.rs:139:84
+    |
+139 | ...   let origin_visibility: Vec<_> = controller.into_iter().flat_map(|c| &c.known).map(|(id,b)| (*id, vision.is_visible(b.footprin...
+    |                                                                              ^^^^^ private field
+
+For more information about this error, try `rustc --explain E0616`.
+error: could not compile `sim` (example "m13_ten_players") due to 1 previous error

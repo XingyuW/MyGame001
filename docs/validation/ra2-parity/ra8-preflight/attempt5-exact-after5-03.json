@@ -1,0 +1,21 @@
+{
+  "name": "attempt5-exact-after5-03",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate_black_water_korea_france_brutal_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 0,
+  "started_utc": "2026-10-16T11:08:16.563667+00:00",
+  "elapsed_seconds": 51.019144209014485,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-exact-after5-03.log"
+}

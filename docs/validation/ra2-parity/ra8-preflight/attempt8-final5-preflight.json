@@ -1,0 +1,64 @@
+{
+  "start_utc": "2026-10-19T00:59:45.752228+00:00",
+  "runtime_manifest": "attempt8-final5-runtime-manifest.json",
+  "commands": [
+    {
+      "phase": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 1.0279033749829978,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt8-final5-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_targets": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "source_mismatches": []
+    },
+    {
+      "phase": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 0.023003374983090907,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt8-final5-diff.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_targets": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "source_mismatches": []
+    },
+    {
+      "phase": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 101,
+      "elapsed_seconds": 3.28129708400229,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt8-final5-clippy.log",
+      "sha256": "fd44c5eaa1117f136f70caf2a4c83bfcd28d6d4784b3c9fb7b1758edffd9f5ad",
+      "test_targets": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "source_mismatches": []
+    }
+  ],
+  "elapsed_seconds": 4.459909083030652
+}

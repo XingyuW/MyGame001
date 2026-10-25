@@ -1,0 +1,18 @@
+    Finished `release` profile [optimized] target(s) in 0.14s
+     Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-fff13bc99bc7e9e6)
+
+running 1 test
+
+thread 'crossroads_armies_finish_after_new_terrain_changes' (4982709) panicked at crates/game/tests/m6_production_matches.rs:270:21:
+crossroads regression: tick 10562: Interact { unit: SimId(47), target: SimId(60) } rejected (Repair dock is occupied) without a loss
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test crossroads_armies_finish_after_new_terrain_changes ... FAILED
+
+failures:
+
+failures:
+    crossroads_armies_finish_after_new_terrain_changes
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5 filtered out; finished in 1.38s
+
+error: test failed, to rerun pass `-p game --test m6_production_matches`

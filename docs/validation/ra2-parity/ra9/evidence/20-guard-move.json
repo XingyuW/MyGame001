@@ -1,0 +1,19 @@
+{
+  "utc": "2026-10-20T22:46:15.311052+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_native_keys",
+    "ra9_guard_and_replacement_move_keep_command_priority_over_automatic_defuse",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "exit_code": 0,
+  "seconds": 10.178,
+  "lease": "RA8 revocable phase lease jobs1 short copy-only functions",
+  "status": "actual preliminary native, no final acceptance"
+}

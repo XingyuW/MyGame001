@@ -1,0 +1,63 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T20:47:23.192665+00:00",
+  "pid": 22667,
+  "head": "aafd1794a84f88b9919b7e31c78768e08f66d70d",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/remediation2-focused-01-plan.json",
+  "plan_sha256": "c1f1de7a2bdadf64d6140cd643bf38c67515a51c9afae7bc74ed5722d0cf0a78",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_data_parity",
+        "ra9_single_source_",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:47:23.283115+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-focused-01/01-whole-audit-controls.log",
+      "pid": 22673,
+      "pgid": 22673,
+      "exit": 0,
+      "end": "2026-10-22T20:51:43.656642+00:00",
+      "raw_bytes": 7559,
+      "raw_sha256": "adedb3947d46cd6045a3a6d1da64c74d62a737364b91f83be027f1637d5c97ff",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "start": "2026-10-22T20:51:43.789535+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-focused-01/02-native-late-twins.log",
+      "pid": 23204,
+      "pgid": 23204,
+      "exit": 0,
+      "end": "2026-10-22T20:54:24.022203+00:00",
+      "raw_bytes": 855,
+      "raw_sha256": "d3baa8d9fa0ca7b6ff260984b2b57fafc0c5d1c941079ddbd7567c2d02babe87",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T20:54:19.016706+00:00",
+  "end": "2026-10-22T20:54:24.099813+00:00",
+  "source_unchanged": true
+}

@@ -1,0 +1,9 @@
+{
+  "service_base": "d1b484b",
+  "files": {
+    "crates/sim/src/ai.rs": "7eb7216acafd0fac59824d417f681a13da9284d197ecaabd7e7e15ec47ff6d80",
+    "crates/sim/src/ai/strategy.rs": "5d0efd6b71ba96d5759a637d15c4e872512ecdfdee75f6281b58eb3cefa831f0",
+    "crates/game/tests/ra8_gate_matches.rs": "aef9cc72f49b4353b7d637135a515b743d536f05ac13b49e9b2d0009f91917b2",
+    "crates/sim/tests/ra8_ai.rs": "d4ef6349703234c4982b555cbd9e3007113540c88c84ddc5c13017308cc3194c"
+  }
+}

@@ -1,7 +1,8 @@
-//! M7 skirmish maps (PLAN.md section 7, M7: "three maps"; docs/DECISIONS.md D50): the committed
-//! files are the generator's output, the maps pass the `sim` loader with the terrain the generator
-//! describes, the start positions of the shipped skirmish file are the generator's, the maps are
-//! point-symmetric, and each start has a base, ore, and a way to the other start.
+//! Generated skirmish maps (PLAN.md section 7, M7: "three maps"; docs/DECISIONS.md D50 and "Large
+//! maps with environments"): the committed files are the generator's output, the maps pass the
+//! `sim` loader with the terrain and looks the generator describes, the start positions of the
+//! shipped skirmish file are the generator's, the maps are point-symmetric, and each start has a
+//! base, ore, and a way to the other start.
 
 #[path = "../examples/gen_maps.rs"]
 #[allow(dead_code)]
@@ -14,8 +15,8 @@ mod tileset_image;
 use std::collections::VecDeque;
 use std::path::PathBuf;
 
-use gen_maps::{MAPS, MapSpec, ORE, TILES};
-use sim::{CellPos, Grid, LoadedMap, load_map, load_match_definitions, load_skirmish};
+use gen_maps::{MAPS, MapSpec, TILES};
+use sim::{CellPos, Grid, LoadedMap, load_map, load_ruleset, load_skirmish};
 
 fn load(spec: &MapSpec) -> LoadedMap {
     let path = spec.output_dir().join(format!("{}.tmx", spec.id));
@@ -65,11 +66,28 @@ fn the_maps_load_with_the_generators_terrain_and_their_tilesets_pass_the_png_sub
                     .cell(CellPos::new(x as i32, y as i32))
                     .expect("cell inside the map");
                 assert_eq!(
-                    (cell.passable, cell.buildable, i64::from(cell.ore)),
-                    (kind.passable, kind.buildable, i64::from(kind.ore)),
+                    (
+                        cell.passable,
+                        cell.buildable,
+                        i64::from(cell.ore),
+                        cell.water
+                    ),
+                    (
+                        kind.passable,
+                        kind.buildable,
+                        i64::from(kind.ore),
+                        kind.water
+                    ),
                     "{} cell ({x}, {y}), {}",
                     spec.id,
                     kind.name
+                );
+                let look = map.looks[(y * spec.width + x) as usize];
+                assert_eq!(look, kind.look, "{} cell ({x}, {y}) look", spec.id);
+                assert!(
+                    gen_maps::looks::decode(look).is_some(),
+                    "{} look {look}",
+                    spec.id
                 );
             }
         }
@@ -77,8 +95,9 @@ fn the_maps_load_with_the_generators_terrain_and_their_tilesets_pass_the_png_sub
         let path = spec.output_dir().join(format!("{}.tmx", spec.id));
         tileset_image::check_tileset_image(&path, &map.tileset_image)
             .unwrap_or_else(|error| panic!("{error}"));
-        // The minimap draws every cell (M5 review 1 P2-2 concerned W + H > 128).
-        assert!(spec.width + spec.height <= 256);
+        // The minimap draws every cell of a map of any size the loader accepts (M5 review 1
+        // P2-2 concerned W + H > 128; `minimap::tests` covers the largest).
+        assert!(spec.width <= sim::MAX_MAP_SIDE && spec.height <= sim::MAX_MAP_SIDE);
     }
 }
 
@@ -95,14 +114,19 @@ fn the_maps_are_point_symmetric_so_both_starts_are_equal() {
                 );
             }
         }
-        // The second start is the first's mirror for a 3 x 3 yard (its footprint's origin).
-        let (x, y) = spec.starts[0];
-        assert_eq!(
-            spec.starts[1],
-            (spec.width - 3 - x, spec.height - 3 - y),
-            "{}",
-            spec.id
-        );
+        // Each odd start is the previous one's mirror for a 3 x 3 yard (its footprint's origin),
+        // so every pair of bases is equal.
+        let starts = spec.starts();
+        assert!(starts.len().is_multiple_of(2), "{}", spec.id);
+        for pair in starts.chunks(2) {
+            let (x, y) = pair[0];
+            assert_eq!(
+                pair[1],
+                (spec.width - 3 - x, spec.height - 3 - y),
+                "{}",
+                spec.id
+            );
+        }
     }
 }
 
@@ -131,8 +155,12 @@ fn reachable(grid: &Grid, start: CellPos) -> Vec<CellPos> {
 fn each_start_has_a_base_site_ore_nearby_and_a_way_to_the_other_start() {
     for spec in &MAPS {
         let map = load(spec);
-        let starts = spec.starts.map(|(x, y)| CellPos::new(x as i32, y as i32));
-        for start in starts {
+        let starts: Vec<CellPos> = spec
+            .starts()
+            .iter()
+            .map(|&(x, y)| CellPos::new(x as i32, y as i32))
+            .collect();
+        for &start in &starts {
             // Buildable ground for the 3 x 3 yard and the cells around it.
             for y in start.y - 1..=start.y + 3 {
                 for x in start.x - 1..=start.x + 3 {
@@ -152,18 +180,29 @@ fn each_start_has_a_base_site_ore_nearby_and_a_way_to_the_other_start() {
             );
         }
         let from_first = reachable(&map.grid, starts[0]);
-        assert!(from_first.contains(&starts[1]), "{}", spec.id);
+        for start in &starts[1..] {
+            assert!(from_first.contains(start), "{} {start:?}", spec.id);
+        }
+        // Bases are apart: no two yards within 12 cells.
+        for (i, a) in starts.iter().enumerate() {
+            for b in &starts[i + 1..] {
+                assert!(
+                    (a.x - b.x).abs().max((a.y - b.y).abs()) >= 12,
+                    "{a:?} {b:?}"
+                );
+            }
+        }
         // Every passable cell is reachable: no part of the map is cut off.
         let passable = (0..spec.height)
             .flat_map(|y| (0..spec.width).map(move |x| (x, y)))
             .filter(|&(x, y)| TILES[spec.tile_at(x, y) as usize].passable)
             .count();
         assert_eq!(from_first.len(), passable, "{}", spec.id);
-        // The map has ore.
+        // The map has ore (on any ground: grass, desert or snow).
         assert!(
             (0..spec.height)
                 .flat_map(|y| (0..spec.width).map(move |x| (x, y)))
-                .any(|(x, y)| spec.tile_at(x, y) == ORE)
+                .any(|(x, y)| TILES[spec.tile_at(x, y) as usize].ore > 0)
         );
     }
 }
@@ -171,12 +210,9 @@ fn each_start_has_a_base_site_ore_nearby_and_a_way_to_the_other_start() {
 #[test]
 fn the_shipped_skirmish_file_lists_every_generated_map_with_its_starts() {
     let data = assets().join("data");
-    let definitions = load_match_definitions(
-        data.join("units.ron"),
-        data.join("economy.ron"),
-        data.join("combat.ron"),
-    )
-    .unwrap_or_else(|error| panic!("{error}"));
+    // The skirmish file names countries of the shipped rules (RA1), so it is loaded against
+    // the whole shipped ruleset.
+    let definitions = load_ruleset(&data).unwrap_or_else(|error| panic!("{error}"));
     let skirmish = load_skirmish(data.join("skirmish.ron"), &definitions)
         .unwrap_or_else(|error| panic!("{error}"));
     // The demo map of M1 and the two maps of M7: three maps (PLAN.md section 1).
@@ -189,7 +225,10 @@ fn the_shipped_skirmish_file_lists_every_generated_map_with_its_starts() {
             .unwrap_or_else(|| panic!("{} is not in the skirmish file", spec.id));
         assert_eq!(
             def.starts,
-            spec.starts.map(|(x, y)| CellPos::new(x as i32, y as i32)),
+            spec.starts()
+                .iter()
+                .map(|&(x, y)| CellPos::new(x as i32, y as i32))
+                .collect::<Vec<_>>(),
             "{}",
             spec.id
         );

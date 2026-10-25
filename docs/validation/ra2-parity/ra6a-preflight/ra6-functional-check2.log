@@ -1,0 +1,42 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+warning: unused imports: `Building` and `ProductionItem`
+ --> crates/sim/tests/ra6_infantry.rs:7:5
+  |
+7 |     Building, Cell, CellPos, Command, CommandQueue, Definitions, Grid, IssuedCommand, Owner,
+  |     ^^^^^^^^
+8 |     PlayerId, Players, ProductionItem, SimEvent, SimId, SimPlugin, SimSchedule, load_ruleset,
+  |                        ^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `sim` (test "ra6_infantry") generated 1 warning (run `cargo fix --test "ra6_infantry" -p sim` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.57s
+     Running tests/ra6_infantry.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_infantry-6103bae3c72d0aed)
+
+running 12 tests
+test ra6_temporal_sums_beams_freezes_and_releases_unharmed ... ok
+test ra6_terrorist_death_explodes_once_with_shipped_weapon ... ok
+test ra6_dog_bite_kills_infantry_even_above_nominal_weapon_damage ... ok
+test ra6_spy_disguise_default_copy_and_dog_detection ... ok
+test ra6_tanya_c4_is_delayed_and_does_not_kill_on_entry ... ok
+test ra6_desolator_emits_on_deploy_and_radiation_spares_buildings_and_immune_infantry ... ok
+test ra6_spy_refinery_steals_half_once_and_power_causes_only_blackout ... ok
+test ra6_gi_deploy_persists_uses_para_and_does_not_move_or_gain_armour ... ok
+test ra6_yuri_psi_pulse_and_undeploy_boundary ... ok
+test ra6_each_spy_factory_and_lab_entry_sets_only_its_own_unlock ... ok
+test ra6_yuri_releases_previous_and_releases_on_controller_death ... ok
+test ra6_ivan_normal_elite_and_engineer_defuse_on_due_tick ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.38s
+
+     Running tests/ra9_data_parity.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_data_parity-5b81c25f41d0ceee)
+
+running 5 tests
+test the_conversions_round_half_away_from_zero_in_integers ... ok
+test every_value_of_the_shipped_rules_equals_its_reference_or_is_a_listed_difference ... ok
+test every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_difference ... ok
+test the_shipped_skirmish_file_and_the_default_options_are_those_of_the_lobby ... ok
+test every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_difference ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+

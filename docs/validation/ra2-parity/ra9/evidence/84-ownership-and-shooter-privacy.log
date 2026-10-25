@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+warning: unused import: `SimId`
+ --> crates/sim/tests/ra9_policy_permissions.rs:7:63
+  |
+7 | use sim::{Command, Health, Players, ProductionItem, SimEvent, SimId, SpecialState, Weapon};
+  |                                                               ^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `sim` (test "ra9_policy_permissions") generated 1 warning (run `cargo fix --test "ra9_policy_permissions" -p sim` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.05s
+     Running tests/ra9_policy_permissions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_policy_permissions-ec0868812f81548e)
+
+running 2 tests
+test ra9_base_elite_sniper_shots_and_spy_interaction_do_not_add_shooter_reveal ... ok
+test ra9_paid_placement_uses_own_anchor_but_not_allied_or_hostile_owner ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.42s
+

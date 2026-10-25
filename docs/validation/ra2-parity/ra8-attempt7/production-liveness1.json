@@ -1,0 +1,8 @@
+{
+  "kind": "bounded read-only process metadata, no stack sample",
+  "raw_command": "ps -Ao pid,ppid,pgid,etime,time,pcpu,stat,comm | rg owned validation/production names",
+  "observed_utc": "2026-10-16T23:37:58Z",
+  "raw_stdout": "54111 54087 54111    01:20:26   0:00.02   0.0 Ss   sh\n56659 54168 54111       04:24  40:14.93 905.3 R    /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-fff13bc99bc7e9e6\n",
+  "corrected_initial_observation": "Initial message attributed wrapper elapsed to M10. This inference is unsupported: raw M10 finished201.56s, game44.11s, release compilation1m50s. Retain elapsed observation without causal attribution. Owned production child was runnable with substantial CPU usage.",
+  "measurement_overhead": "One metadata-only tool call, reported wall1.7s including approval/tool overhead; no competing simulation or native CPU stack sampling."
+}

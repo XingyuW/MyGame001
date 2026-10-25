@@ -1,0 +1,33 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+warning: fields `attack_order` and `combat_target` are never read
+   --> crates/sim/src/ai.rs:646:5
+    |
+633 | struct UnitSnap {
+    |        -------- fields in this struct
+...
+646 |     attack_order: Option<crate::AttackOrder>,
+    |     ^^^^^^^^^^^^
+647 |     combat_target: Option<SimId>,
+    |     ^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `sim` (lib) generated 1 warning
+    Finished `release` profile [optimized] target(s) in 26.13s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+test ra8_an_existing_aa_clearance_attack_keeps_its_chase_history ... 
+thread 'ra8_an_existing_aa_clearance_attack_keeps_its_chase_history' (5761726) panicked at crates/sim/tests/ra8_ai.rs:3540:17:
+a matching healthy clearance attack lost its bounded chase history: Weapon { kind: WeaponKind(58), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(58), target: Some(SimId(6)), order: Some(Attack { target: SimId(6), chases: 1 }) }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ra8_an_existing_aa_clearance_attack_keeps_its_chase_history
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 40 filtered out; finished in 0.21s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

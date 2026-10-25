@@ -12,24 +12,37 @@
 //! configuration starts in a new simulation, as the game's Restart does, so that all of the ticks
 //! are played. The configurations:
 //!
-//! * the shipped data: every shipped map, every pairing of the shipped factions, and each shipped
-//!   difficulty for both players;
+//! * the shipped data: every shipped map, every pairing of the two sides (each played by its
+//!   countries in turn, docs/DECISIONS.md R5), and each shipped difficulty for both players;
 //! * the fixture data of the simulation's tests on the fixture map: every pairing of the fixture
 //!   factions at each fixture difficulty (so that the soak does not depend on the shipped balance
 //!   alone, I10).
 //!
-//! On every tick it checks invariant I6 (each unit holds the cells it stands in and steps into, and
-//! none of them is covered by a building), I7 (no player's credits are negative), that every
+//! On every tick it checks invariant I6' (docs/DECISIONS.md R6, the amendment of I6 in RA3: a
+//! surface cell is held by at most one vehicle or at most three infantry and never both, a cell of
+//! the air layer by at most one aircraft, no unit of the surface holds a cell covered by a
+//! building, and the grid records every unit in the cells it stands in and steps into;
+//! `sim::cell_invariant_violations`, whose own test feeds it each kind of violation), every
+//! [`STRAY_CHECK_INTERVAL`] ticks that the grid records no unit in a cell it does not hold
+//! (`sim::stray_claims`, which looks at every cell of the map), I7 (no player's credits are
+//! negative), that every
 //! rejected command is explained by a loss in the tick before (D43 item 5), and that the state stays
 //! bounded: units, buildings, projectiles, and pending commands below fixed limits. Each
 //! configuration is played twice, and the state hash must be the same on every tick (I3). Heap use
 //! is bounded: the global allocator refuses allocations beyond [`MEMORY_BUDGET`] (the process then
 //! aborts, failing the run), and the peak is reported. Any failure exits with code 1.
+//!
+//! The configurations are independent simulations and are played on all cores (docs/DECISIONS.md
+//! R8); the two runs of a configuration are played one after the other on one thread, results are
+//! reported in the order of the configurations, and the heap budget and the reported peak cover
+//! all configurations that run at the same time.
 
 use std::alloc::{GlobalAlloc, Layout, System};
+use std::cell::Cell;
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::PathBuf;
 use std::process::ExitCode;
+use std::sync::Mutex;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::Instant;
 
@@ -39,8 +52,9 @@ use bevy_ecs::world::World;
 use sim::{
     AiDefinitions, Building, CommandQueue, Controller, Definitions, Grid, MatchOutcome, MatchState,
     Mobile, PlayerId, PlayerSetup, Players, Projectiles, RejectReason, SimEvent, SimId, SimPlugin,
-    SimSchedule, SkirmishDefinitions, check_ai_factions, load_ai, load_map, load_match_definitions,
-    load_skirmish, map_asset_path, setup_match, state_hash,
+    SimSchedule, SkirmishDefinitions, cell_invariant_violations, check_ai_factions, load_ai,
+    load_map, load_match_definitions, load_ruleset, load_skirmish, map_asset_path, setup_match,
+    state_hash, stray_claims,
 };
 
 /// Ticks played per configuration: 30 minutes of game time.
@@ -52,15 +66,46 @@ const MAX_BUILDINGS: usize = 300;
 const MAX_PROJECTILES: usize = 10_000;
 const MAX_PENDING_COMMANDS: usize = 64;
 
+/// Ticks between two looks at every cell of the map for a holder that holds nothing. A claim
+/// that is not released stays, so it is found at the next look.
+const STRAY_CHECK_INTERVAL: u64 = 256;
+
 /// Upper limit of heap bytes in use by the process.
 const MEMORY_BUDGET: usize = 1 << 30;
+
+fn completed_with_winner(outcome: MatchOutcome) -> bool {
+    matches!(outcome, MatchOutcome::Won { .. })
+}
+
+#[test]
+fn ra8_completed_soak_matches_require_winners_while_duration_stays_fixed() {
+    assert!(!completed_with_winner(MatchOutcome::Draw { tick: 1 }));
+    assert!(completed_with_winner(MatchOutcome::Won {
+        winner: PlayerId(0),
+        tick: 1
+    }));
+    assert_eq!(SOAK_TICKS, 36_000);
+}
 
 static IN_USE: AtomicUsize = AtomicUsize::new(0);
 static PEAK: AtomicUsize = AtomicUsize::new(0);
 
 struct BudgetAllocator;
 
-fn reserve(size: usize) -> bool {
+/// Bytes a thread takes from the shared counter at a time. The configurations run on all cores
+/// and allocate on every tick; updating the shared counter on every allocation made the threads
+/// wait for each other's cache line, so that ten threads played no faster than one (docs/
+/// DECISIONS.md R8). Each thread therefore keeps a credit of bytes it has already counted.
+const CREDIT_CHUNK: usize = 256 << 10;
+
+thread_local! {
+    /// Bytes this thread has counted in [`IN_USE`] and not handed out. At most
+    /// `2 * CREDIT_CHUNK` plus one allocation, so [`IN_USE`] and [`PEAK`] exceed the bytes really
+    /// in use by at most that per thread: the budget is enforced a little early, never late.
+    static CREDIT: Cell<usize> = const { Cell::new(0) };
+}
+
+fn reserve_shared(size: usize) -> bool {
     let reserved = IN_USE
         .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |in_use| {
             in_use
@@ -74,8 +119,46 @@ fn reserve(size: usize) -> bool {
     reserved
 }
 
+fn reserve(size: usize) -> bool {
+    CREDIT
+        .try_with(|credit| {
+            let have = credit.get();
+            if have >= size {
+                credit.set(have - size);
+                return true;
+            }
+            // Take a chunk more than is missing; near the budget, only what is missing.
+            let missing = size - have;
+            let Some(wanted) = missing.checked_add(CREDIT_CHUNK) else {
+                return false;
+            };
+            if reserve_shared(wanted) {
+                credit.set(CREDIT_CHUNK);
+                true
+            } else if reserve_shared(missing) {
+                credit.set(0);
+                true
+            } else {
+                false
+            }
+        })
+        // A thread that is ending has no credit any more.
+        .unwrap_or_else(|_| reserve_shared(size))
+}
+
 fn release(size: usize) {
-    IN_USE.fetch_sub(size, Ordering::SeqCst);
+    let kept = CREDIT.try_with(|credit| {
+        let have = credit.get().saturating_add(size);
+        if have > 2 * CREDIT_CHUNK {
+            IN_USE.fetch_sub(have - CREDIT_CHUNK, Ordering::SeqCst);
+            credit.set(CREDIT_CHUNK);
+        } else {
+            credit.set(have);
+        }
+    });
+    if kept.is_err() {
+        IN_USE.fetch_sub(size, Ordering::SeqCst);
+    }
 }
 
 // SAFETY: every call is forwarded to `System` unchanged; the counter only decides whether to
@@ -151,11 +234,16 @@ fn load(
     files: [&str; 5],
     maps: impl Fn(&str) -> PathBuf,
 ) -> Result<DataSet, String> {
-    let definitions = load_match_definitions(
-        data.join(files[0]),
-        data.join(files[1]),
-        data.join(files[2]),
-    )
+    // The shipped ruleset has a rules file and an arsenal (RA1); the fixture has neither.
+    let definitions = if name == "shipped" {
+        load_ruleset(&data)
+    } else {
+        load_match_definitions(
+            data.join(files[0]),
+            data.join(files[1]),
+            data.join(files[2]),
+        )
+    }
     .map_err(|error| error.to_string())?;
     let skirmish =
         load_skirmish(data.join(files[3]), &definitions).map_err(|error| error.to_string())?;
@@ -231,25 +319,14 @@ fn new_match(set: &DataSet, config: Config) -> Result<App, String> {
     Ok(app)
 }
 
-/// The invariants and limits of the state after a tick; the problems found.
-fn check_state(world: &mut World) -> Vec<String> {
-    let mut problems = Vec::new();
-    let mut units = world.query::<(&SimId, &Mobile)>();
-    let held: Vec<(SimId, Mobile)> = units.iter(world).map(|(id, m)| (*id, *m)).collect();
-    let grid = world.resource::<Grid>();
-    for (id, mobile) in &held {
-        for cell in [mobile.cell, mobile.next_centre()] {
-            if grid.occupant(cell) != Some(*id) {
-                problems.push(format!("I6: unit {} does not hold its cell {cell:?}", id.0));
-            }
-            if grid.building(cell).is_some() {
-                problems.push(format!(
-                    "I6: unit {} stands on a building at {cell:?}",
-                    id.0
-                ));
-            }
-        }
+/// The invariants and limits of the state after tick `at`; the problems found.
+fn check_state(world: &mut World, at: u64) -> Vec<String> {
+    // I6' (docs/DECISIONS.md R6): who holds which cell, from the units and from the grid.
+    let mut problems = cell_invariant_violations(world);
+    if at.is_multiple_of(STRAY_CHECK_INTERVAL) || at + 1 == SOAK_TICKS {
+        problems.extend(stray_claims(world));
     }
+    let units = world.query::<&Mobile>().iter(world).count();
     for (player, state) in world.resource::<Players>().iter() {
         if state.credits() < 0 {
             problems.push(format!(
@@ -262,15 +339,14 @@ fn check_state(world: &mut World) -> Vec<String> {
     let buildings = world.query::<&Building>().iter(world).count();
     let projectiles = world.resource::<Projectiles>().iter().count();
     let pending = world.resource::<CommandQueue>().len();
-    if held.len() > MAX_UNITS
+    if units > MAX_UNITS
         || buildings > MAX_BUILDINGS
         || projectiles > MAX_PROJECTILES
         || pending > MAX_PENDING_COMMANDS
     {
         problems.push(format!(
-            "state beyond its limits: {} units, {buildings} buildings, {projectiles} projectiles, \
-             {pending} pending commands",
-            held.len()
+            "state beyond its limits: {units} units, {buildings} buildings, {projectiles} \
+             projectiles, {pending} pending commands"
         ));
     }
     problems
@@ -311,6 +387,19 @@ fn soak(set: &DataSet, config: Config) -> Played {
                         RejectReason::UnknownUnit(id) | RejectReason::UnknownBuilding(id) => {
                             lost.is_some_and(|lost| lost.contains(&id))
                         }
+                        // A unit of another player that the placing player could not see
+                        // beside the footprint stepped into it (docs/DECISIONS.md D43 and
+                        // "Maps at the engine's largest size", item 8): on the large maps
+                        // armies reach a base that is still building, as the end to end tests
+                        // of the game crate already accept.
+                        RejectReason::Placement(sim::PlacementError::Occupied { unit, .. }) => {
+                            let world = app.world_mut();
+                            let mut owners = world.query::<(&SimId, &sim::Owner)>();
+                            lost.is_some_and(|lost| !lost.is_empty())
+                                || owners
+                                    .iter(world)
+                                    .any(|(id, owner)| *id == unit && owner.0 != player)
+                        }
                         RejectReason::MissingPrerequisite { .. }
                         | RejectReason::NoProducer { .. }
                         | RejectReason::Placement(_) => lost.is_some_and(|lost| !lost.is_empty()),
@@ -335,7 +424,7 @@ fn soak(set: &DataSet, config: Config) -> Played {
                 _ => {}
             }
         }
-        for problem in check_state(app.world_mut()) {
+        for problem in check_state(app.world_mut(), at) {
             played.failures.push(format!("tick {at}: {problem}"));
         }
         if played.failures.len() > 20 {
@@ -346,6 +435,11 @@ fn soak(set: &DataSet, config: Config) -> Played {
         }
         played.hashes.push(state_hash(app.world_mut()));
         if let Some(outcome) = app.world().resource::<MatchState>().outcome() {
+            if !completed_with_winner(outcome) {
+                played.failures.push(format!(
+                    "tick {at}: completed without a winner: {outcome:?}"
+                ));
+            }
             // The next match of the configuration, as the game's Restart starts it.
             played.outcomes.push(Some(outcome));
             losses.clear();
@@ -397,18 +491,34 @@ fn main() -> ExitCode {
     let mut failures = Vec::new();
     let mut total_ticks = 0u64;
     let started = Instant::now();
+    let mut sets = Vec::new();
     for set in [shipped, fixture] {
-        let set = match set {
-            Ok(set) => set,
-            Err(error) => {
-                failures.push(error);
-                continue;
-            }
-        };
-        let factions = set.skirmish.factions.len();
+        match set {
+            Ok(set) => sets.push(set),
+            Err(error) => failures.push(error),
+        }
+    }
+    // The configurations in the order they are reported in.
+    let mut jobs = Vec::new();
+    for (index, set) in sets.iter().enumerate() {
+        // Every pairing of the sides, each side played by its countries in turn, or without
+        // countries every pairing of the factions (docs/DECISIONS.md R5).
+        let groups = set.skirmish.pairing_groups();
         for map in 0..set.skirmish.maps.len() {
-            for first in 0..factions {
-                for second in 0..factions {
+            for (pairing, (first, second)) in (0..groups.len())
+                .flat_map(|first| (0..groups.len()).map(move |second| (first, second)))
+                .enumerate()
+            {
+                let turn = map + pairing;
+                let (Some(first), Some(second)) = (
+                    SkirmishDefinitions::rotating(&groups[first], turn),
+                    SkirmishDefinitions::rotating(&groups[second], turn + 1),
+                ) else {
+                    // A side without a country would be a configuration that is silently not
+                    // soaked (`pairing_groups` leaves empty groups out).
+                    panic!("a side of the shipped skirmish file has no country");
+                };
+                {
                     for difficulty in 0..set.ai.difficulties.len() {
                         let config = Config {
                             map,
@@ -423,47 +533,77 @@ fn main() -> ExitCode {
                             set.skirmish.factions[second].id,
                             set.ai.difficulties[difficulty].id
                         );
-                        let clock = Instant::now();
-                        let played = soak(&set, config);
-                        let again = soak(&set, config);
-                        total_ticks += played.hashes.len() as u64 + again.hashes.len() as u64;
-                        let ended = played.outcomes.iter().filter(|o| o.is_some()).count();
-                        println!(
-                            "{name}: {} ticks, {} matches ({ended} ended, the last {}), {:.2} s \
-                             for both runs",
-                            played.hashes.len(),
-                            played.outcomes.len(),
-                            if played.outcomes.last().is_some_and(Option::is_none) {
-                                "still running"
-                            } else {
-                                "ended"
-                            },
-                            clock.elapsed().as_secs_f64()
-                        );
-                        for failure in &played.failures {
-                            failures.push(format!("{name}: {failure}"));
-                        }
-                        if played.hashes.len() != SOAK_TICKS as usize && played.failures.is_empty()
-                        {
-                            failures.push(format!(
-                                "{name}: {} of {SOAK_TICKS} ticks played",
-                                played.hashes.len()
-                            ));
-                        }
-                        if played != again {
-                            let first_difference = played
-                                .hashes
-                                .iter()
-                                .zip(&again.hashes)
-                                .position(|(a, b)| a != b);
-                            failures.push(format!(
-                                "{name}: the two runs differ (first different tick: \
-                                 {first_difference:?})"
-                            ));
-                        }
+                        jobs.push((index, config, name));
                     }
                 }
             }
+        }
+    }
+    // Configurations are independent simulations, so they are played on all cores (docs/
+    // DECISIONS.md R8); both runs of a configuration stay on one thread, and the heap budget
+    // covers everything that runs at once.
+    let next = AtomicUsize::new(0);
+    let results: Mutex<Vec<Option<(Played, Played, f64)>>> =
+        Mutex::new((0..jobs.len()).map(|_| None).collect());
+    let workers = std::thread::available_parallelism().map_or(4, usize::from);
+    std::thread::scope(|scope| {
+        for _ in 0..workers.min(jobs.len()) {
+            scope.spawn(|| {
+                loop {
+                    let index = next.fetch_add(1, Ordering::Relaxed);
+                    let Some((set, config, name)) = jobs.get(index) else {
+                        break;
+                    };
+                    let clock = Instant::now();
+                    let played = soak(&sets[*set], *config);
+                    let again = soak(&sets[*set], *config);
+                    let seconds = clock.elapsed().as_secs_f64();
+                    // Progress, in the order the configurations finish; the report follows in
+                    // their own order once all are played.
+                    eprintln!("played {} of {}: {name}", index + 1, jobs.len());
+                    let mut results = results.lock().unwrap_or_else(|e| e.into_inner());
+                    results[index] = Some((played, again, seconds));
+                }
+            });
+        }
+    });
+    let results = results.into_inner().unwrap_or_else(|e| e.into_inner());
+    for ((_, _, name), result) in jobs.iter().zip(results) {
+        let Some((played, again, seconds)) = result else {
+            failures.push(format!("{name}: not played"));
+            continue;
+        };
+        total_ticks += played.hashes.len() as u64 + again.hashes.len() as u64;
+        let ended = played.outcomes.iter().filter(|o| o.is_some()).count();
+        println!(
+            "{name}: {} ticks, {} matches ({ended} ended, the last {}), {seconds:.2} s for both \
+             runs",
+            played.hashes.len(),
+            played.outcomes.len(),
+            if played.outcomes.last().is_some_and(Option::is_none) {
+                "still running"
+            } else {
+                "ended"
+            },
+        );
+        for failure in &played.failures {
+            failures.push(format!("{name}: {failure}"));
+        }
+        if played.hashes.len() != SOAK_TICKS as usize && played.failures.is_empty() {
+            failures.push(format!(
+                "{name}: {} of {SOAK_TICKS} ticks played",
+                played.hashes.len()
+            ));
+        }
+        if played != again {
+            let first_difference = played
+                .hashes
+                .iter()
+                .zip(&again.hashes)
+                .position(|(a, b)| a != b);
+            failures.push(format!(
+                "{name}: the two runs differ (first different tick: {first_difference:?})"
+            ));
         }
     }
     println!(

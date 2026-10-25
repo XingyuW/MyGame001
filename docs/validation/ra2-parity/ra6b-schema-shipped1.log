@@ -1,0 +1,272 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 1m 34s
+     Running tests/ra1_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra1_definitions-6f60fd0b4a270903)
+
+running 36 tests
+test a_plan_may_list_every_building_of_the_tree_of_its_side ... ok
+test a_faction_without_a_side_loads_with_its_roster_and_starting_lists ... ok
+test an_arsenal_that_names_countries_or_groups_needs_a_rules_file ... ok
+test every_field_of_the_ai_file_is_required ... ok
+test ai_plan_entries_can_be_obtained_through_the_build_order ... ok
+test arsenal_limits_are_accepted_at_both_ends ... ok
+test ai_plan_entries_are_built_by_every_country_of_the_side ... ok
+test every_field_of_the_rules_file_is_required ... FAILED
+test ai_references_and_difficulty_values_are_checked ... ok
+test ai_plans_are_checked_for_their_side ... ok
+test skirmish_and_ai_limits_are_accepted_at_both_ends ... ok
+test other_schema_versions_are_rejected_in_every_file ... ok
+test every_field_of_the_skirmish_file_is_required ... ok
+test skirmish_countries_are_checked ... ok
+test skirmish_factions_without_a_side_are_checked ... ok
+test the_ai_file_needs_a_plan_for_the_side_of_every_faction ... ok
+test skirmish_values_outside_their_ranges_are_rejected ... ok
+test rules_list_values_outside_their_ranges_are_rejected ... ok
+test the_ai_fixture_loads_with_a_plan_per_side ... ok
+test the_arsenal_fixture_loads_with_the_fields_of_schema_version_2 ... ok
+test rules_references_and_ids_are_checked ... ok
+test the_army_of_a_plan_can_damage_every_building_type ... ok
+test the_rules_fixture_loads_with_every_field ... FAILED
+test the_skirmish_fixture_loads_with_sides_and_countries ... ok
+test the_base_unit_of_every_side_has_the_role_mcv ... ok
+test the_cross_checks_of_the_rules_file_are_enforced ... ok
+test lists_longer_than_their_schema_allows_are_rejected ... ok
+test skirmish_sides_are_checked ... ok
+test unknown_and_duplicate_fields_are_rejected_in_every_file ... ok
+test arsenal_references_and_ids_are_checked ... ok
+test values_of_the_wrong_kind_are_syntax_errors_in_every_file ... ok
+test every_scalar_rule_is_rejected_one_step_outside_its_range ... FAILED
+test arsenal_values_outside_their_ranges_are_rejected ... ok
+test the_limits_of_every_scalar_rule_are_accepted ... FAILED
+test every_field_of_the_arsenal_file_is_required ... ok
+test truncations_of_the_fixtures_are_rejected_without_panic ... ok
+
+failures:
+
+---- every_field_of_the_rules_file_is_required stdout ----
+
+thread 'every_field_of_the_rules_file_is_required' (2361408) panicked at crates/sim/tests/ra1_definitions.rs:418:5:
+assertion `left == right` failed: data file /Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/ra1_definitions/rules_missing_superweapons.ron: nuclear_recharge: unknown field
+  left: ("nuclear_recharge", UnknownField)
+ right: ("superweapons", MissingField)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- the_rules_fixture_loads_with_every_field stdout ----
+
+thread 'the_rules_fixture_loads_with_every_field' (2361724) panicked at crates/sim/tests/ra1_definitions.rs:710:5:
+assertion `left == right` failed: group superweapons
+  left: 0
+ right: 1
+
+---- every_scalar_rule_is_rejected_one_step_outside_its_range stdout ----
+
+thread 'every_scalar_rule_is_rejected_one_step_outside_its_range' (2361434) panicked at crates/sim/tests/ra1_definitions.rs:710:5:
+assertion `left == right` failed: group superweapons
+  left: 0
+ right: 1
+
+---- the_limits_of_every_scalar_rule_are_accepted stdout ----
+
+thread 'the_limits_of_every_scalar_rule_are_accepted' (2361711) panicked at crates/sim/tests/ra1_definitions.rs:710:5:
+assertion `left == right` failed: group superweapons
+  left: 0
+ right: 1
+
+
+failures:
+    every_field_of_the_rules_file_is_required
+    every_scalar_rule_is_rejected_one_step_outside_its_range
+    the_limits_of_every_scalar_rule_are_accepted
+    the_rules_fixture_loads_with_every_field
+
+test result: FAILED. 32 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 23.08s
+
+error: test failed, to rerun pass `-p sim --test ra1_definitions`
+     Running tests/ra2_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra2_definitions-00ec2980e013bc80)
+
+running 7 tests
+test the_fixture_loads_with_the_traits_of_schema_version_3 ... ok
+test lanes_queues_refunds_and_reach_follow_the_traits_with_a_rules_file ... ok
+test without_a_rules_file_the_traits_are_not_read ... ok
+test the_limits_of_the_traits_are_accepted ... ok
+test building_only_traits_on_units_are_rejected_but_unit_build_limits_are_supported ... ok
+test traits_outside_their_ranges_are_rejected ... ok
+test every_trait_changes_the_state_hash ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/ra2_shipped.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra2_shipped-81303f38e56d4728)
+
+running 8 tests
+test low_power_stops_the_powered_buildings_that_consume_power_and_no_others ... ok
+test a_sale_refunds_half_the_cost_and_walls_are_neither_sold_nor_repaired ... ok
+test a_construction_yard_is_repaired_in_steps_of_eight_hit_points_for_three_credits ... ok
+test shipyard_water_lies_farther_from_the_starts_than_the_shipyards_adjacent_distance ... ok
+test a_damaged_tank_sent_to_the_service_depot_is_repaired_for_credits ... ok
+test radar_needs_a_radar_building_and_power_and_a_spy_in_a_power_plant_takes_it_away ... ok
+test a_computer_player_builds_in_both_lanes_of_its_yard ... ok
+test a_base_is_built_from_an_mcv_in_the_time_the_build_time_formula_gives ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.10s
+
+     Running tests/ra3_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra3_definitions-2e6e5746868fe057)
+
+running 6 tests
+test the_fixture_loads_with_the_traits_of_schema_version_4 ... ok
+test a_trait_of_a_unit_on_a_building_is_rejected ... ok
+test the_traits_load_at_the_ends_of_their_ranges ... ok
+test a_trait_on_a_unit_that_cannot_have_it_is_rejected ... ok
+test every_trait_of_a_unit_changes_the_state_hash ... ok
+test traits_of_a_unit_outside_their_ranges_are_rejected ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/ra3_shipped.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra3_shipped-482caa1c2c0ab3e9)
+
+running 10 tests
+test the_shipped_infantry_is_on_foot_and_the_shipped_crushers_are_those_of_red_alert_2 ... ok
+test three_gis_share_a_cell_and_a_fourth_soldier_or_a_tank_does_not_fit ... ok
+test the_armies_of_the_shipped_plans_can_destroy_every_shipped_building ... ok
+test every_shipped_weapon_deals_the_references_damage_to_every_armour_type ... ok
+test a_damaged_grizzly_is_yellow_then_red_and_drives_at_three_quarters_speed ... ok
+test shipped_ships_follow_their_naval_targeting ... FAILED
+test a_nuclear_strike_destroys_a_power_plant_and_not_a_construction_yard ... ok
+test shipped_weapons_deal_the_damage_worked_out_from_the_reference ... ok
+test shipped_types_fire_only_at_what_red_alert_2_lets_them ... ok
+test a_tank_crushes_conscripts_and_gis_and_what_is_not_crushable_stays ... ok
+
+failures:
+
+---- shipped_ships_follow_their_naval_targeting stdout ----
+
+thread 'shipped_ships_follow_their_naval_targeting' (2411107) panicked at crates/sim/tests/ra3_shipped.rs:407:9:
+assertion `left == right` failed: dolphin at typhoon
+  left: Some(("sonic_zap", 3))
+ right: Some(("sonic_zap", 80))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    shipped_ships_follow_their_naval_targeting
+
+test result: FAILED. 9 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.72s
+
+error: test failed, to rerun pass `-p sim --test ra3_shipped`
+     Running tests/ra4_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra4_definitions-f980beb11952cf5c)
+
+running 8 tests
+test the_effects_of_the_missiles_are_checked_like_every_effect ... ok
+test the_fixture_loads_with_the_traits_of_schema_version_5 ... ok
+test an_airport_bound_unit_is_an_aircraft_with_ammunition ... ok
+test abilities_must_be_known_and_listed_once ... ok
+test a_trait_of_a_unit_on_a_building_and_docks_on_a_unit_are_rejected ... ok
+test every_trait_of_schema_version_5_is_hashed ... ok
+test the_terms_of_a_spawner_must_fit_together ... ok
+test flags_outside_0_and_1_and_numbers_outside_their_ranges_are_rejected ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests/ra4_shipped.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra4_shipped-c70e8f17de435c78)
+
+running 17 tests
+test a_typhoon_is_unseen_at_five_cells_from_a_grizzly_and_seen_by_a_destroyer ... ok
+test a_typhoon_that_fires_is_seen_for_the_cloak_delay ... ok
+test a_veteran_grizzly_hits_harder_and_is_hit_less ... ok
+test a_v3_rocket_is_shot_down_by_a_patriot_and_deals_nothing ... ok
+test harriers_are_lost_with_their_last_airforce_command ... ok
+test the_chronosphere_does_not_move_a_launched_rocket ... FAILED
+test the_shipped_abilities_are_those_of_the_reference ... ok
+test an_apocalypse_heals_itself_at_the_repair_rate ... ok
+test a_dreadnought_launches_two_missiles_with_their_damage ... ok
+test a_destroyer_sends_its_osprey_against_a_typhoon_it_detects ... ok
+test a_harrier_fires_one_volley_and_reloads_it_on_its_dock ... ok
+test the_survivors_of_shipped_buildings_follow_the_refund_and_the_divisors ... ok
+test a_v3_rocket_is_a_unit_that_flies_to_its_target_and_deals_the_rockets_damage ... ok
+test a_grizzly_is_a_veteran_after_three_times_its_cost_and_elite_after_six ... ok
+test a_carrier_sends_its_three_hornets_and_regains_a_lost_one ... ok
+test a_fifth_harrier_is_refused_and_built_after_a_second_airforce_command_stands ... ok
+test only_the_base_units_have_a_crew_and_it_is_of_their_owners_side ... ok
+
+failures:
+
+---- the_chronosphere_does_not_move_a_launched_rocket stdout ----
+
+thread 'the_chronosphere_does_not_move_a_launched_rocket' (2411144) panicked at crates/sim/tests/ra4_shipped.rs:1053:5:
+assertion `left == right` failed
+  left: [AbilityUnavailable("Choose a Chronosphere source area and destination")]
+ right: [NotCommandable(SimId(9))]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    the_chronosphere_does_not_move_a_launched_rocket
+
+test result: FAILED. 16 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 23.85s
+
+error: test failed, to rerun pass `-p sim --test ra4_shipped`
+     Running tests/ra5_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra5_definitions-925bc25a8220b7e4)
+
+running 9 tests
+test files_of_schema_version_1_are_rejected ... ok
+test the_fixture_loads_with_bails_gems_the_pace_of_harvesting_and_a_fixed_refund ... ok
+test the_rules_fixture_loads_with_the_ore_limits_and_the_units_of_a_crate ... ok
+test the_new_fields_of_the_economy_file_are_required ... ok
+test the_new_values_of_the_economy_file_are_checked ... ok
+test a_crate_holds_from_no_unit_type_to_the_most_the_schema_allows ... ok
+test the_new_fields_and_values_of_the_rules_file_are_checked ... ok
+test the_limits_of_the_new_values_are_accepted ... ok
+test definitions_with_other_values_hash_differently ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/ra5_shipped.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra5_shipped-30e0af0d6cbb94ef)
+
+running 9 tests
+test the_value_of_a_bail_is_the_same_in_the_rules_and_at_every_refinery ... ok
+test the_shipped_crates_hold_the_references_contents_and_land_vehicles ... ok
+test a_shipped_miner_takes_a_bail_every_19_ticks ... ok
+test a_sold_refinery_returns_300_credits_and_as_many_survivors_as_before ... ok
+test the_ore_purifier_adds_a_quarter_and_the_spy_takes_half ... ok
+test every_shipped_map_sets_up_with_ore_in_bails_and_a_crate ... ok
+test a_full_war_miner_pays_1000_for_ore_and_2000_for_gems_and_a_chrono_miner_half ... ok
+test a_refinery_built_through_commands_gives_the_miner_of_its_side ... ok
+test a_shipped_crate_gives_every_content_to_a_grizzly_over_many_seeds ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.26s
+
+     Running tests/ra6_vehicles.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra6_vehicles-dcf06dc108fcbc82)
+
+running 27 tests
+test ra6_chronosphere_rejects_unseen_area_and_kills_bad_or_occupied_landings ... ok
+test ra6_dolphin_sonic_hit_releases_squid_without_killing_it ... ok
+test ra6_chronosphere_square_moves_both_owners_kills_organic_and_preserves_offsets ... ok
+test ra6_ifv_mode_twelve_uses_cow_shot_with_an_independent_mode_fixture ... ok
+test ra6_ivan_ifv_death_uses_crnuke_and_loses_its_passenger ... ok
+test ra6_drone_infantry_bite_and_protected_vehicle_negative ... ok
+test ra6_drone_blocked_escape_retries_with_identity_hp_and_experience ... ok
+test ra6_kirov_crash_and_demo_death_damage_nearby_allies ... ok
+test ra6_pending_parasite_and_strategic_state_changes_affect_replay_hash ... ok
+test ra6_anti_air_destroys_paradrop_plane_before_it_drops ... ok
+test ra6_public_timers_and_nuclear_marks_do_not_disclose_unseen_sources ... ok
+test ra6_drone_enters_then_ticks_and_exits_only_on_its_own_kill ... ok
+test ra6_prism_caps_eight_supporters_and_supports_again_at_tick_80 ... ok
+test ra6_shipped_curtain_death_prevents_later_same_tick_infantry_command ... ok
+test ra6_reactor_chain_radiation_and_temporal_suppression ... ok
+test ra6_squid_prevents_motion_but_ship_keeps_its_weapon ... ok
+test ra6_nuclear_missile_delays_200_ticks_and_radiates ... ok
+test ra6_storm_rejects_a_second_launch_and_preserves_its_charge ... ok
+test ra6_stationary_mirage_is_a_tree_to_adjacent_nondetectors ... ok
+test ra6_repair_ifv_reaches_diagonal_but_not_two_cells_and_obeys_reload ... ok
+test ra6_ifv_uses_reference_modes_and_restores_empty_missiles ... ok
+test ra6_airport_paradrops_one_shootable_plane_and_full_side_payload ... ok
+test ra6_strategic_recharges_power_option_and_readiness_edges ... ok
+test ra6_squid_culls_on_the_crossing_hit_and_cannot_cull_through_curtain ... ok
+test ra6_paradrop_blocked_landing_retains_payload_until_space_opens ... ok
+test ra6_curtain_covers_both_owners_kills_infantry_and_expires_at_1000 ... ok
+test ra6_storm_warning_exclusivity_duration_and_cloud_separation_are_deterministic ... ok
+
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.98s
+
+error: 3 targets failed:
+    `-p sim --test ra1_definitions`
+    `-p sim --test ra3_shipped`
+    `-p sim --test ra4_shipped`

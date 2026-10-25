@@ -1,0 +1,14 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit": 2,
+  "passed": false,
+  "stdout": "docs/validation/ra2-parity/ra8-preflight/attempt9-ai-final2.log:158: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt9-composition-after2.log:39: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt9-final1-default-demo10.log:49: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt9-final1-example-guard-m13_ten_players.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt9-final1-example-guard-m14_duels.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt9-final1-example-guard-m7_soak.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt9-final1-failed-smallest-ten-player-and-neighbors.log:12: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt9-final1-focused-attrition.log:18: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt9-final1-focused-composition.log:21: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt9-final1-focused-ra4.log:11: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt9-final1-focused-ra8-ai.log:100: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt9-final1-focused-recovery.log:27: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt9-global-patience-after2.log:11: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt9-grown-half-patience-after1.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt9-mixed-cursor-after1.log:18: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt9-mixed-cursor-before1.log:10: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt9-strategic-repair-after2.log:26: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt9-unpowered-repair-after3.log:12: new blank line at EOF.\n",
+  "stderr": "",
+  "stdout_sha256": "b5e283813107e573e1c77905fcb1e70d6a36fa43c2665d2d83ff608f8dc7030a",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

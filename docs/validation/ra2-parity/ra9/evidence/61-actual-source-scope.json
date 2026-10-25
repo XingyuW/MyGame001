@@ -1,0 +1,27 @@
+{
+  "utc": "2026-10-20T23:55:02.183721+00:00",
+  "command": [
+    "python3",
+    "scripts/ra2_reference.py",
+    "--ra9-scope"
+  ],
+  "exit_code": 0,
+  "seconds": 10.075,
+  "before": {
+    "ra9_legacy_original.tsv": "d20a52b768ad12557e58537b27f166d0b0a8b0c2904814cdc3c01ca4601255e7",
+    "ra9_scope75_original.tsv": "3f993d84ec5ee9e77643209623121c60c4e241cb7bcc096486d846030439ead7",
+    "ra9_special_original.tsv": "2bb1dc56e7f0729621fe625300a19665af24e823b7f026fa7cb2aa91e91469bb",
+    "ra9_model_census.tsv": "6a6eafbcb45279859c2992ac6dde60a251b7da2c4550efad598a13bf05d24f42",
+    "ra9_model_surface.txt": "97cbecb23fefc2ca40d34698a21016c0da93bb972d6261bea12aa6177392a6eb",
+    "ra9_scope_observation.tsv": "284cb3f9a4224375e53be132b426656782009ab5d96d90afa1369b96aae86c67"
+  },
+  "after": {
+    "ra9_legacy_original.tsv": "d20a52b768ad12557e58537b27f166d0b0a8b0c2904814cdc3c01ca4601255e7",
+    "ra9_scope75_original.tsv": "3f993d84ec5ee9e77643209623121c60c4e241cb7bcc096486d846030439ead7",
+    "ra9_special_original.tsv": "2bb1dc56e7f0729621fe625300a19665af24e823b7f026fa7cb2aa91e91469bb",
+    "ra9_model_census.tsv": "79a26fd620a5d32f170b0b9f8142a60fe608dfa04e4c84271fd10633372a7461",
+    "ra9_model_surface.txt": "97cbecb23fefc2ca40d34698a21016c0da93bb972d6261bea12aa6177392a6eb",
+    "ra9_scope_observation.tsv": "4779755c8c4111b84f5c16303bbef11b8bf172f35ffb2846932ef3970156fe2d"
+  },
+  "status": "Actual whole-original and model producer output, not external approval or native proof"
+}

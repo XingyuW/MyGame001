@@ -14,7 +14,8 @@
 //! 1. `fixture`: the fixture data and the 40 x 40 skirmish fixture map of the simulation's tests
 //!    (riflemen and tanks), so that the result does not depend on the shipped balance (I10);
 //! 2. `shipped`: the shipped data on the shipped demo map (64 x 64), each player with the armed
-//!    units of one faction's roster, so that the result is the shipped game's.
+//!    ground units of one side (the own tech tree of its first country), so that the result is
+//!    the shipped game's.
 //!
 //! After one warm-up tick (which builds the schedule), [`MEASURED_TICKS`] ticks are timed one by
 //! one with the clock (the harness reads the clock; the simulation never does, I4). The run fails
@@ -27,7 +28,7 @@
 //! is reported.
 
 use std::alloc::{GlobalAlloc, Layout, System};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::PathBuf;
 use std::process::ExitCode;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -148,6 +149,30 @@ struct Side {
     target: CellPos,
 }
 
+/// Ordered monotonic witnesses for the ORIGINAL commanded actors, never survivor counts.
+struct MovementWitness {
+    start: BTreeMap<SimId, SubPos>,
+    moved: BTreeSet<SimId>,
+}
+impl MovementWitness {
+    fn new(start: BTreeMap<SimId, SubPos>) -> Self {
+        Self {
+            start,
+            moved: BTreeSet::new(),
+        }
+    }
+    fn observe(&mut self, current: &BTreeMap<SimId, SubPos>) {
+        for (&id, position) in &self.start {
+            if current.get(&id).is_some_and(|now| now != position) {
+                self.moved.insert(id);
+            }
+        }
+    }
+    fn complete(&self) -> bool {
+        self.moved.len() == self.start.len()
+    }
+}
+
 /// What a scenario measured.
 struct Report {
     name: &'static str,
@@ -219,6 +244,14 @@ fn run(
         ids.entry(player).or_default().push(id);
     }
     let spawned = ids.values().map(Vec::len).sum();
+    let originals: BTreeSet<_> = ids.values().flatten().copied().collect();
+    let initial = units(&mut app);
+    if initial.keys().copied().collect::<BTreeSet<_>>() != originals || initial.len() != spawned {
+        return Err(format!(
+            "{name}: original participant snapshot differs from commanded ids"
+        ));
+    }
+    let mut motion = MovementWitness::new(initial);
     // The warm-up tick builds the schedule and computes the first vision.
     app.world_mut().run_schedule(SimSchedule);
     for side in sides {
@@ -232,13 +265,15 @@ fn run(
                 },
             });
     }
-    let start = units(&mut app);
+    motion.observe(&units(&mut app));
     let (mut total, mut max) = (Duration::ZERO, Duration::ZERO);
     let (mut busy_total, mut busy_ticks) = (Duration::ZERO, 0u64);
     let (mut shots, mut destroyed) = (0, 0);
     let mut alive = Vec::new();
     for at in 0..MEASURED_TICKS {
-        let count = units(&mut app).len();
+        let current = units(&mut app);
+        let count = current.len();
+        motion.observe(&current);
         if at % 500 == 0 {
             alive.push(count);
         }
@@ -268,10 +303,18 @@ fn run(
     }
     alive.push(units(&mut app).len());
     let end = units(&mut app);
-    let moved = start
-        .iter()
-        .filter(|(id, position)| end.get(id).is_some_and(|now| now != *position))
-        .count();
+    motion.observe(&end);
+    let moved = motion.moved.len();
+    if !motion.complete() {
+        let unmoved: Vec<_> = motion
+            .start
+            .keys()
+            .filter(|id| !motion.moved.contains(*id))
+            .collect();
+        return Err(format!(
+            "{name}: original participants without observed movement: {unmoved:?}"
+        ));
+    }
     Ok(Report {
         name,
         spawned,
@@ -321,12 +364,7 @@ fn fixture_scenario() -> Result<Report, String> {
 
 fn shipped_scenario() -> Result<Report, String> {
     let data = repository().join("assets/data");
-    let definitions = load_match_definitions(
-        data.join("units.ron"),
-        data.join("economy.ron"),
-        data.join("combat.ron"),
-    )
-    .map_err(|error| error.to_string())?;
+    let definitions = sim::load_ruleset(&data).map_err(|error| error.to_string())?;
     let skirmish = load_skirmish(data.join("skirmish.ron"), &definitions)
         .map_err(|error| error.to_string())?;
     let demo = skirmish
@@ -341,7 +379,13 @@ fn shipped_scenario() -> Result<Report, String> {
     )
     .map_err(|error| error.to_string())?
     .grid;
-    // Each player fields the armed units of one faction's roster.
+    // Each player fields the armed ground units of one side: those of the own tech tree of its
+    // first country (RA1; ships and aircraft do not stand on the ground the scenario uses).
+    let groups = skirmish.pairing_groups();
+    let country = |side: usize| groups.get(side).and_then(|group| group.first()).copied();
+    let (Some(allied), Some(soviet)) = (country(0), country(1)) else {
+        return Err("the shipped skirmish file has no two sides".into());
+    };
     let armed = |faction: usize| -> Vec<String> {
         skirmish
             .factions
@@ -355,19 +399,23 @@ fn shipped_scenario() -> Result<Report, String> {
                         ProductionItem::Building(_) => None,
                     })
                     .filter(|&kind| {
-                        definitions
-                            .unit_combat(kind)
-                            .is_some_and(|terms| terms.weapon.is_some())
+                        definitions.domain(kind) == sim::Domain::Land
+                            && definitions
+                                .unit_combat(kind)
+                                .is_some_and(|terms| terms.weapon.is_some())
                     })
                     .filter_map(|kind| definitions.unit(kind).map(|def| def.id.clone()))
                     .collect()
             })
     };
-    let (first, second) = (armed(0), armed(1));
+    let (first, second) = (armed(allied), armed(soviet));
     if first.is_empty() || second.is_empty() {
         return Err("a shipped faction has no armed unit type".into());
     }
-    let [a, b] = demo.starts;
+    let (a, b) = (demo.starts[0], demo.starts[1]);
+    // Converge in the field: teleporting infantry otherwise arrive inside the opposing
+    // starting formation and can die before the first end-of-tick movement observation.
+    let meeting = CellPos::new((a.x + b.x) / 2, (a.y + b.y) / 2);
     run(
         "shipped",
         &definitions,
@@ -377,13 +425,13 @@ fn shipped_scenario() -> Result<Report, String> {
                 player: PlayerId(0),
                 units: first,
                 anchor: a,
-                target: b,
+                target: meeting,
             },
             Side {
                 player: PlayerId(1),
                 units: second,
                 anchor: b,
-                target: a,
+                target: meeting,
             },
         ],
     )
@@ -428,7 +476,7 @@ fn main() -> ExitCode {
                         2 * UNITS_PER_PLAYER
                     ));
                 }
-                if report.moved == 0 || report.shots == 0 || report.destroyed == 0 {
+                if report.moved != report.spawned || report.shots == 0 || report.destroyed == 0 {
                     failures.push(format!(
                         "{}: the units did not move and fight (moved {}, shots {}, destroyed {})",
                         report.name, report.moved, report.shots, report.destroyed
@@ -469,5 +517,43 @@ fn main() -> ExitCode {
             eprintln!("m7 benchmark failed: {failure}");
         }
         ExitCode::FAILURE
+    }
+}
+
+// Append to m7_benchmark.rs; these checks preserve both native scenarios and all old budgets.
+#[cfg(test)]
+mod ra9_boundary_tests {
+    use super::*;
+    #[test]
+    fn ra9_movement_is_monotonic_for_returned_units_and_casualties() {
+        let (a, b) = (SimId(1), SimId(2));
+        let start = SubPos { x: 0, y: 0 };
+        let moved = SubPos { x: 1, y: 0 };
+        let mut w = MovementWitness::new(BTreeMap::from([(a, start), (b, start)]));
+        w.observe(&BTreeMap::from([(a, moved), (b, start)]));
+        assert!(!w.complete());
+        w.observe(&BTreeMap::from([(b, moved)]));
+        assert!(w.complete());
+        w.observe(&BTreeMap::from([(b, start)]));
+        assert!(w.complete());
+        let mut negative = MovementWitness::new(BTreeMap::from([(a, start), (b, start)]));
+        negative.observe(&BTreeMap::from([(b, moved)]));
+        assert!(!negative.complete());
+        assert_eq!(negative.moved.len(), 1);
+    }
+    #[test]
+    fn ra9_both_real_benchmark_scenarios_witness_all_original_commanded_actors() {
+        for scenario in [fixture_scenario, shipped_scenario] {
+            let report = scenario().expect("native scenario, no omitted participant");
+            assert_eq!(report.spawned, 2 * UNITS_PER_PLAYER);
+            assert_eq!(report.moved, report.spawned);
+            assert!(report.shots > 0 && report.destroyed > 0);
+            assert!(report.busy_ticks > 0);
+            assert!(
+                report.mean <= MEAN_BUDGET
+                    && report.busy_mean <= MEAN_BUDGET
+                    && report.max <= MAX_BUDGET
+            );
+        }
     }
 }

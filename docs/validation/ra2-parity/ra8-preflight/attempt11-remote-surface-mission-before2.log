@@ -1,0 +1,18 @@
+    Finished `release` profile [optimized] target(s) in 0.15s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+
+thread 'ai::ra8_attrition_tests::ra8_a_remote_armed_unit_does_not_pin_a_surface_mission_on_a_repaired_distraction' (9783935) panicked at crates/sim/src/ai/ra8_attrition_tests.rs:1269:5:
+a visible remote armed unit must not prevent the native wave from resuming and firing at its selected building mission
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ai::ra8_attrition_tests::ra8_a_remote_armed_unit_does_not_pin_a_surface_mission_on_a_repaired_distraction ... FAILED
+
+failures:
+
+failures:
+    ai::ra8_attrition_tests::ra8_a_remote_armed_unit_does_not_pin_a_surface_mission_on_a_repaired_distraction
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 116 filtered out; finished in 0.17s
+
+error: test failed, to rerun pass `-p sim --lib`

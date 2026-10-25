@@ -1,0 +1,8 @@
+{
+  "utc": "2026-10-20T21:49:21.009876+00:00",
+  "path": "crates/sim/examples/m14_duels.rs",
+  "sha256": "c2276424dd51b832df4391d740bab5dcba1f5caf49c9dc98980bba45d5ac9111",
+  "bytes": 15029,
+  "backup": "docs/validation/ra2-parity/ra8-preflight/attempt16-coral-trace-original.rs",
+  "note": "Exact original diagnostic example before one observational replay; runtime unchanged. Restore in finally plus separate later495hash verification before dependencies."
+}

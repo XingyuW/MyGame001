@@ -1,0 +1,61 @@
+diff --git a/crates/game/tests/ra8_gate_matches.rs b/crates/game/tests/ra8_gate_matches.rs
+index 80fb63e..2103e62 100644
+--- a/crates/game/tests/ra8_gate_matches.rs
++++ b/crates/game/tests/ra8_gate_matches.rs
+@@ -477,14 +477,14 @@ fn trace_economy_events(world: &mut bevy::ecs::world::World, events: &[SimEvent]
+                 attacker, target, ..
+             } => {
+                 let attacker = trace
+-                    .units
++                    .buildings
+                     .get(attacker)
+-                    .or_else(|| trace.buildings.get(attacker))
++                    .or_else(|| trace.units.get(attacker))
+                     .map_or("?", String::as_str);
+                 let target = trace
+-                    .units
++                    .buildings
+                     .get(target)
+-                    .or_else(|| trace.buildings.get(target))
++                    .or_else(|| trace.units.get(target))
+                     .map_or("?", String::as_str);
+                 (format!("shots {attacker}->{target}"), 1)
+             }
+@@ -635,8 +635,9 @@ fn trace_economy_events(world: &mut bevy::ecs::world::World, events: &[SimEvent]
+             *trace.counters.entry(key).or_default() += units.len() as u64;
+         }
+     }
+-    if at % 60000 == 59999 {
+-        eprintln!("economy window {}..{} {:?}", at - 59999, at, trace.counters);
++    let window = if std::env::var_os("RA8_NATIVE_TIMELINE_TRACE").is_some() {6000} else {60000};
++    if at % window == window - 1 {
++        eprintln!("economy window {}..{} {:?}", at - (window - 1), at, trace.counters);
+         trace.counters.clear();
+     }
+     world.insert_resource(trace);
+@@ -747,7 +748,7 @@ fn run_case_to(
+     for at in 0_u64..limit {
+         let world = app.world_mut();
+         world.run_schedule(SimSchedule);
+-        if at % 60000 == 59999 {
++        if at % 60000 == 59999 || (std::env::var_os("RA8_NATIVE_TIMELINE_TRACE").is_some() && at % 6000 == 5999) {
+             dump(world);
+         }
+         let before = std::mem::take(&mut losses);
+@@ -934,6 +935,7 @@ fn dump(world: &mut bevy::ecs::world::World) {
+             state.credits(),
+             state.queues().collect::<Vec<_>>()
+         );
++        if std::env::var_os("RA8_NATIVE_TIMELINE_TRACE").is_some() { eprintln!("native timeline {player:?} power{}/{} low{} repairing{:?}",state.power_produced(),state.power_consumed(),state.low_power(),state.repairing()); }
+     }
+     if std::env::var_os("RA8_NAVAL_TRACE").is_some() {
+         let ships: Vec<_> = world
+@@ -1305,3 +1307,8 @@ fn ra8_gate11_coral_iraq_cuba_brutal_seed_zero_finishes() {
+ fn ra8_gate11_frozen_russia_libya_easy_seed_zero_finishes() {
+     run_case("frozen_sound", ["russia", "libya"], ["easy", "easy"]);
+ }
++
++#[test]
++fn ra8_gate12_demo_great_britain_cuba_easy_seed_zero_finishes() {
++    run_case("demo", ["great_britain", "cuba"], ["easy", "easy"]);
++}

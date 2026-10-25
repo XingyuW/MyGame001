@@ -1,0 +1,13 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 2.45s
+     Running `/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples/m7_soak`
+played 7 of 260: shipped demo: cuba against germany, both easy
+played 9 of 260: shipped demo: cuba against germany, both brutal
+played 4 of 260: shipped demo: korea against cuba, both easy
+played 10 of 260: shipped demo: russia against libya, both easy
+played 6 of 260: shipped demo: korea against cuba, both brutal
+played 1 of 260: shipped demo: america against korea, both easy
+played 2 of 260: shipped demo: america against korea, both medium
+played 3 of 260: shipped demo: america against korea, both brutal
+played 5 of 260: shipped demo: korea against cuba, both medium
+played 8 of 260: shipped demo: cuba against germany, both medium

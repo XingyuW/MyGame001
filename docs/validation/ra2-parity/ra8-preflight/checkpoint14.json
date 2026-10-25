@@ -1,0 +1,69 @@
+{
+  "checkpoint": 14,
+  "utc": "2026-10-20T02:17:53.733197+00:00",
+  "head_before_commits": "785cba25011e92f5de9f15b410d8ee680b183f53",
+  "source_commit": "66d0defb46c084a339d5602c74dc53526a68425d",
+  "status": "SCOPED checks complete before the coherent five-path66d0def source commit; separate cachedsourcecheck0 and later result read preceded commit. Evidence staging/checks and explicit full13 release remain required; no final acceptance.",
+  "source_paths": [
+    "crates/game/tests/ra8_gate_matches.rs",
+    "crates/sim/src/ai.rs",
+    "crates/sim/src/ai/ra8_attrition_tests.rs",
+    "crates/sim/src/ai/strategy.rs",
+    "crates/sim/tests/ra8_ai.rs"
+  ],
+  "runtime_count": 344,
+  "additional_count": 169,
+  "overlap": 18,
+  "unique": 495,
+  "runtime_manifest": "checkpoint14-runtime-manifest.json",
+  "runtime_manifest_sha256": "ddd3599497bf2fd30855762112f40c65cc0abf29369a75a30771dce46031b758",
+  "additional_manifest": "checkpoint14-test-example-manifest.json",
+  "additional_manifest_sha256": "e8eb8f064e9ed3610f5aa64cf7bfeb81005e78acbfdd954b4e9691da8def4692",
+  "inventory": "checkpoint14-inventory.json",
+  "static_tests": 1374,
+  "baseline_tests": 1124,
+  "added": 250,
+  "removed_or_renamed": [],
+  "ignored": [],
+  "metrics": "checkpoint14-metrics.json",
+  "metrics_sha256": "81ea6684e7790e5cba4e0af86ba8d75817a595fe51e033fa0bad220053a32b83",
+  "rust_counts": [
+    149,
+    0,
+    0
+  ],
+  "validation_commands": 12,
+  "target_invocations": 7,
+  "decisions": [
+    "R175",
+    "R176",
+    "R177 rejected candidate",
+    "R178"
+  ],
+  "preservation": "checkpoint14-attempt13-preservation.json",
+  "storage": "checkpoint14-storage.json",
+  "postgate_isolated_checks": "all21/default10players400k, threeactual256means, threeexampleguards deferred until successful unchanged full13; all remain acceptance requirements.",
+  "assumptions": [
+    "Optional ordinary asset financing alongside only stopped armed workers is a game-owned policy.",
+    "No currently observed ore is conservative current-vision knowledge; no global exhaustion or no concealed-field claim.",
+    "Native healthyAttackMove ownership preserved by derived combat-state guard, no new persistent state.",
+    "Rejected composition/service trial has zero production/data delta.",
+    "Named old test setup migration has real native income; original assertions retained.",
+    "Final source text differs from tested native text only by independently bound R177-to-R176 doc-comment reference; final fmt/strictClippy0."
+  ],
+  "ra9_carryforward": "All prior R172 review protocol/debts remain, including R96Props, M6gatheringpartition, R83Squid/size and unproven R99 bombable boundary; no all-debt closure claim.",
+  "source_staged_check": "checkpoint14-source-staged-check.json",
+  "evidence_hygiene": {
+    "first_check_exit": 2,
+    "passed": false,
+    "diagnostics": 17,
+    "classification": "All17 preserved native log blank EOF,zero source/data/test/prose errors; exactfile/line/EOL/stagedblob hashes bound.",
+    "stdout_sha256": "d0c4e178562b83eb339791d57a9858752897d7e88027b6c214d15a04f39f45e4",
+    "record": "checkpoint14-evidence-hygiene.json",
+    "separate_final_identical_check_required": false,
+    "final_check": "checkpoint14-evidence-cached-check-final.json",
+    "final_exit": 2,
+    "final_identical": true,
+    "metadata_restaged_last_unfiltered_check_before_commit_required": true
+  }
+}

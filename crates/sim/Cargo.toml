@@ -23,3 +23,6 @@ tiled = { version = "=0.16.0", default-features = false }
 # passed the subset check of `data.rs` (invariant I11).
 ron = "=0.12.2"
 serde = { version = "=1.0.229", features = ["derive"] }
+
+[target.'cfg(unix)'.dependencies]
+libc = "=0.2.190"

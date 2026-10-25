@@ -1,0 +1,29 @@
+{
+  "label": "attempt8-finite-repair-reserve-before2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_recovery_tests::ra8_finite_unit_funding_is_not_spent_on_repairs_before_the_paid_recruit_can_finish",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "Same controlled ordinary damage/source-cost GI fixture; expose pre-sale actual credits/repair/paid head to verify repair caused ordinary broke-refund, not misclassify first diagnostic failure. Actual spawn kind required.",
+  "start_utc": "2026-10-18T21:56:35.541112+00:00",
+  "elapsed_seconds": 17.130951792001724,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e",
+    "crates/sim/src/ai/strategy.rs": "97bf9859f160d5f4d6e8a54f0b10a948f6c974ffb3ba3e83a8b9e88e9fa055e3"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e",
+    "crates/sim/src/ai/strategy.rs": "97bf9859f160d5f4d6e8a54f0b10a948f6c974ffb3ba3e83a8b9e88e9fa055e3"
+  },
+  "log_sha256": "dfad8f29a5d7e69c8525ef04bfcb018237db5601bcb926477a2932482a0f6e86"
+}

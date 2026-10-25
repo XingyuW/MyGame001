@@ -1,0 +1,22 @@
+{
+  "phase": "example-guard-m7_soak",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--example",
+    "m7_soak",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "wrapper_pid": 85965,
+  "start_utc": "2026-10-20T00:50:48.828177+00:00",
+  "head": "b7d6dc0522224a322a3eb05c45a9a27b7ecce117",
+  "active": false,
+  "child_pid": 94402,
+  "exit": 0,
+  "elapsed_seconds": 0.4865400000126101
+}

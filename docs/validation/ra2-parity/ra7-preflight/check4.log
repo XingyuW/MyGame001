@@ -1,0 +1,63 @@
+    Checking game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+warning: unused import: `ProductionItem`
+ --> crates/sim/tests/ra7_vision.rs:8:14
+  |
+8 |     Players, ProductionItem, SimEvent, SimId, SimPlugin, SimSchedule, load_ruleset, spawn_building,
+  |              ^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `credits` is never used
+  --> crates/sim/tests/ra7_vision.rs:84:4
+   |
+84 | fn credits(app: &App, player: PlayerId) -> i64 {
+   |    ^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `rejected` is never used
+  --> crates/sim/tests/ra7_vision.rs:92:4
+   |
+92 | fn rejected(events: &[SimEvent]) -> Vec<&SimEvent> {
+   |    ^^^^^^^^
+
+warning: function `entity` is never used
+  --> crates/sim/tests/ra7_vision.rs:99:4
+   |
+99 | fn entity(app: &mut App, id: SimId) -> Option<bevy_ecs::entity::Entity> {
+   |    ^^^^^^
+
+warning: function `owner` is never used
+   --> crates/sim/tests/ra7_vision.rs:107:4
+    |
+107 | fn owner(app: &mut App, id: SimId) -> Option<PlayerId> {
+    |    ^^^^^
+
+warning: function `hp` is never used
+   --> crates/sim/tests/ra7_vision.rs:111:4
+    |
+111 | fn hp(app: &mut App, id: SimId) -> i32 {
+    |    ^^
+
+warning: `sim` (test "ra7_vision") generated 6 warnings (run `cargo fix --test "ra7_vision" -p sim` to apply 1 suggestion)
+warning: variable does not need to be mutable
+  --> crates/game/src/ra7_controls.rs:26:6
+   |
+26 |  let mut ids=grid.holders(cell).into_iter().flatten().chain(grid.holders_for(cell,sim::Domain::Air).into_iter().flatten()).chain(gri...
+   |      ----^^^
+   |      |
+   |      help: remove this `mut`
+   |
+   = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `hotkey` is never used
+  --> crates/game/src/hotkeys.rs:78:8
+   |
+78 | pub fn hotkey(key: KeyCode, command: bool, shift: bool) -> Option<Hotkey> {
+   |        ^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `game` (bin "game") generated 2 warnings (run `cargo fix --bin "game" -p game` to apply 1 suggestion)
+warning: `game` (bin "game" test) generated 1 warning (1 duplicate)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.21s

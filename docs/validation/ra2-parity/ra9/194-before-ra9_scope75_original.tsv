@@ -1,0 +1,217 @@
+group	fact_kind	section_or_target	key	value
+atom-ammo	incoming	MultiSpecial	WeaponType	NukeCarrier
+atom-ammo	incoming	NANRCT	DeathWeapon	NukePayload
+atom-ammo	incoming	NukePayload	Projectile	GiantNukeDown
+atom-ammo	incoming	SpecialWeapons	NukeDown	NukeDown
+atom-ammo	incoming	SpecialWeapons	NukeProjectile	NukeUp
+atom-ammo	incoming	WEEDGUY	Primary	NukeCarrier
+atom-ammo	registry	GiantNukeDown	members	
+atom-ammo	registry	NukeCarrier	members	
+atom-ammo	registry	NukeDown	members	
+atom-ammo	registry	NukePayload	members	
+atom-ammo	registry	NukeUp	members	
+atom-ammo	section	GiantNukeDown	present	true
+atom-ammo	section	NukeCarrier	present	true
+atom-ammo	section	NukeDown	present	false
+atom-ammo	section	NukePayload	present	true
+atom-ammo	section	NukeUp	present	false
+atom-ammo	universe	rules	keys	17475
+atom-ammo	universe	rules	sections	1191
+gems	incoming	Tiberiums	1	Cruentus
+gems	ore-primary	Cruentus	Growth	10000
+gems	ore-primary	Cruentus	GrowthPercentage	0
+gems	ore-primary	Cruentus	Spread	10000
+gems	ore-primary	Cruentus	SpreadPercentage	0
+gems	ore-primary	Riparius	Growth	2200
+gems	ore-primary	Riparius	GrowthPercentage	.06
+gems	ore-primary	Riparius	Spread	2200
+gems	ore-primary	Riparius	SpreadPercentage	.06
+gems	registry	Cruentus	members	
+gems	section	Cruentus	present	true
+gems	universe	rules	keys	17475
+gems	universe	rules	sections	1191
+inactive-droppod	incoming	GAPILL	Primary	Vulcan2
+inactive-droppod	incoming	General	DropPodWeapon	Vulcan2
+inactive-droppod	registry	Vulcan2	members	
+inactive-droppod	section	Vulcan2	present	true
+inactive-droppod	universe	rules	keys	17475
+inactive-droppod	universe	rules	sections	1191
+inactive-firestorm	incoming	CombatDamage	FirestormWarhead	FirestormWH
+inactive-firestorm	incoming	General	GDIFirestormGenerator	GAFIRE
+inactive-firestorm	incoming	Warheads	13	FirestormWH
+inactive-firestorm	registry	FirestormWH	members	Warheads:13
+inactive-firestorm	registry	GAFIRE	members	
+inactive-firestorm	section	FirestormWH	present	true
+inactive-firestorm	section	GAFIRE	present	false
+inactive-firestorm	universe	rules	keys	17475
+inactive-firestorm	universe	rules	sections	1191
+inactive-gates	incoming	AI	EWGates	NAGATE_A,GAGATE_A
+inactive-gates	incoming	AI	EWGates	NAGATE_A,GAGATE_A
+inactive-gates	incoming	AI	NSGates	NAGATE_B,GAGATE_B
+inactive-gates	incoming	AI	NSGates	NAGATE_B,GAGATE_B
+inactive-gates	incoming	General	GDIGateOne	GAGATE_A
+inactive-gates	incoming	General	GDIGateTwo	GAGATE_B
+inactive-gates	incoming	General	NodGateOne	NAGATE_A
+inactive-gates	incoming	General	NodGateTwo	NAGATE_B
+inactive-gates	incoming	General	WallTower	GACTWR
+inactive-gates	incoming	OverlayTypes	206	GAGATE_A
+inactive-gates	registry	GACTWR	members	
+inactive-gates	registry	GAGATE_A	members	
+inactive-gates	registry	GAGATE_B	members	
+inactive-gates	registry	NAGATE_A	members	
+inactive-gates	registry	NAGATE_B	members	
+inactive-gates	section	GACTWR	present	false
+inactive-gates	section	GAGATE_A	present	true
+inactive-gates	section	GAGATE_B	present	false
+inactive-gates	section	NAGATE_A	present	false
+inactive-gates	section	NAGATE_B	present	false
+inactive-gates	universe	rules	keys	17475
+inactive-gates	universe	rules	sections	1191
+inactive-hunter	incoming	General	GDIHunterSeeker	GHUNTER
+inactive-hunter	incoming	General	NodHunterSeeker	NHUNTER
+inactive-hunter	incoming	SpecialWeapons	HSBuilding	GAPLUG,NATMPL
+inactive-hunter	incoming	SpecialWeapons	HSBuilding	GAPLUG,NATMPL
+inactive-hunter	registry	GAPLUG	members	
+inactive-hunter	registry	GHUNTER	members	
+inactive-hunter	registry	NATMPL	members	
+inactive-hunter	registry	NHUNTER	members	
+inactive-hunter	section	GAPLUG	present	false
+inactive-hunter	section	GHUNTER	present	false
+inactive-hunter	section	NATMPL	present	false
+inactive-hunter	section	NHUNTER	present	false
+inactive-hunter	universe	rules	keys	17475
+inactive-hunter	universe	rules	sections	1191
+inactive-ion-emp	incoming	CombatDamage	IonCannonWarhead	IonCannonWH
+inactive-ion-emp	incoming	EMPulseWeapon	Projectile	PulsPr
+inactive-ion-emp	incoming	EMPulseWeapon	Warhead	EMPuls
+inactive-ion-emp	incoming	SpecialWeapons	EMPulseProjectile	PulsPr
+inactive-ion-emp	incoming	SpecialWeapons	EMPulseWarhead	EMPuls
+inactive-ion-emp	incoming	Warheads	1	EMPuls
+inactive-ion-emp	incoming	Warheads	14	IonCannonWH
+inactive-ion-emp	registry	EMPuls	members	Warheads:1
+inactive-ion-emp	registry	IonCannonWH	members	Warheads:14
+inactive-ion-emp	registry	PulsPr	members	
+inactive-ion-emp	section	EMPuls	present	true
+inactive-ion-emp	section	IonCannonWH	present	true
+inactive-ion-emp	section	PulsPr	present	true
+inactive-ion-emp	universe	rules	keys	17475
+inactive-ion-emp	universe	rules	sections	1191
+inactive-powerup	incoming	General	GDIPowerTurbine	GAPOWRUP
+inactive-powerup	registry	GAPOWRUP	members	
+inactive-powerup	section	GAPOWRUP	present	false
+inactive-powerup	universe	rules	keys	17475
+inactive-powerup	universe	rules	sections	1191
+inactive-powerup	upgrade-universe	rules	participants	0
+inactive-trigger	universe	rules	keys	17475
+inactive-trigger	universe	rules	sections	1191
+inactive-tunnel	universe	rules	keys	17475
+inactive-tunnel	universe	rules	sections	1191
+inactive-veins	incoming	CombatDamage	VeinholeWarhead	VeinholeWH
+inactive-veins	incoming	General	VeinholeTypeClass	VEINTREE
+inactive-veins	incoming	TerrainTypes	49	VEINTREE
+inactive-veins	incoming	Warheads	17	VeinholeWH
+inactive-veins	registry	VEINTREE	members	TerrainTypes:49
+inactive-veins	registry	VeinholeWH	members	Warheads:17
+inactive-veins	section	VEINTREE	present	true
+inactive-veins	section	VeinholeWH	present	true
+inactive-veins	universe	rules	keys	17475
+inactive-veins	universe	rules	sections	1191
+inactive-visceroid	incoming	General	LargeVisceroid	VISC_LRG
+inactive-visceroid	incoming	General	SmallVisceroid	VISC_SML
+inactive-visceroid	registry	VISC_LRG	members	
+inactive-visceroid	registry	VISC_SML	members	
+inactive-visceroid	section	VISC_LRG	present	false
+inactive-visceroid	section	VISC_SML	present	false
+inactive-visceroid	universe	rules	keys	17475
+inactive-visceroid	universe	rules	sections	1191
+ore-growthrate	ore-primary	Cruentus	Growth	10000
+ore-growthrate	ore-primary	Cruentus	GrowthPercentage	0
+ore-growthrate	ore-primary	Cruentus	Spread	10000
+ore-growthrate	ore-primary	Cruentus	SpreadPercentage	0
+ore-growthrate	ore-primary	Riparius	Growth	2200
+ore-growthrate	ore-primary	Riparius	GrowthPercentage	.06
+ore-growthrate	ore-primary	Riparius	Spread	2200
+ore-growthrate	ore-primary	Riparius	SpreadPercentage	.06
+ore-growthrate	universe	rules	keys	17475
+ore-growthrate	universe	rules	sections	1191
+paratrooper-typo	incoming	General	AlliedCrew	E1
+paratrooper-typo	incoming	General	AlliedDisguise	E1
+paratrooper-typo	incoming	General	AllyParaDropInf	E1
+paratrooper-typo	incoming	General	AmerParaDropInf	E1
+paratrooper-typo	incoming	General	PParatrooper	E1
+paratrooper-typo	incoming	General	Pilot	E1
+paratrooper-typo	incoming	InfantryTypes	1	E1
+paratrooper-typo	registry	E1	members	InfantryTypes:1
+paratrooper-typo	section	E1	present	true
+paratrooper-typo	universe	rules	keys	17475
+paratrooper-typo	universe	rules	sections	1191
+prereq-override	incoming	BuildingTypes	161	CARUS03
+prereq-override	incoming	BuildingTypes	207	CAWASH16
+prereq-override	incoming	CLEG	PrerequisiteOverride	CAWASH16
+prereq-override	incoming	YURI	PrerequisiteOverride	CARUS03
+prereq-override	registry	CARUS03	members	BuildingTypes:161
+prereq-override	registry	CAWASH16	members	BuildingTypes:207
+prereq-override	section	CARUS03	present	true
+prereq-override	section	CAWASH16	present	true
+prereq-override	universe	rules	keys	17475
+prereq-override	universe	rules	sections	1191
+radiation-typo	correct-key	NANRCT	ImmuneToRadiation	<ABSENT>
+radiation-typo	incoming	BuildingTypes	66	NANRCT
+radiation-typo	incoming	General	NodAdvancedPower	NANRCT
+radiation-typo	incoming	General	PrerequisitePower	GAPOWR,NAPOWR,NANRCT
+radiation-typo	registry	NANRCT	members	BuildingTypes:66
+radiation-typo	section	NANRCT	present	true
+radiation-typo	universe	rules	keys	17475
+radiation-typo	universe	rules	sections	1191
+solo-crates	universe	rules	keys	17475
+solo-crates	universe	rules	sections	1191
+technical-countries	incoming	ASWLauncher	Warhead	Special
+technical-countries	incoming	Africans	Side	Nod
+technical-countries	incoming	Alliance	Side	GDI
+technical-countries	incoming	Americans	Side	GDI
+technical-countries	incoming	Arabs	Side	Nod
+technical-countries	incoming	British	Side	GDI
+technical-countries	incoming	Confederation	Side	Nod
+technical-countries	incoming	Countries	10	Nod
+technical-countries	incoming	Countries	11	Neutral
+technical-countries	incoming	Countries	12	Special
+technical-countries	incoming	Countries	9	GDI
+technical-countries	incoming	DredLauncher	Warhead	Special
+technical-countries	incoming	French	Side	GDI
+technical-countries	incoming	GDI	Name	GDI
+technical-countries	incoming	GDI	Side	GDI
+technical-countries	incoming	Germans	Side	GDI
+technical-countries	incoming	HornetLauncher	Warhead	Special
+technical-countries	incoming	Nod	Name	Nod
+technical-countries	incoming	Nod	Side	GDI
+technical-countries	incoming	Russians	Side	Nod
+technical-countries	incoming	Sides	Civilian	Neutral
+technical-countries	incoming	Sides	Mutant	Special
+technical-countries	incoming	V3Launcher	Warhead	Special
+technical-countries	registry	GDI	members	
+technical-countries	registry	Neutral	members	
+technical-countries	registry	Nod	members	
+technical-countries	registry	Special	members	
+technical-countries	section	GDI	present	true
+technical-countries	section	Neutral	present	true
+technical-countries	section	Nod	present	true
+technical-countries	section	Special	present	true
+technical-countries	universe	rules	keys	17475
+technical-countries	universe	rules	sections	1191
+turbo	incoming	AEGIS	ElitePrimary	MedusaE
+turbo	incoming	AEGIS	Primary	Medusa
+turbo	incoming	NASAM	Primary	RedEye2
+turbo	registry	Medusa	members	
+turbo	registry	MedusaE	members	
+turbo	registry	RedEye2	members	
+turbo	section	Medusa	present	true
+turbo	section	MedusaE	present	true
+turbo	section	RedEye2	present	true
+turbo	universe	rules	keys	17475
+turbo	universe	rules	sections	1191
+upgrades	incoming	General	GDIPowerTurbine	GAPOWRUP
+upgrades	registry	GAPOWRUP	members	
+upgrades	section	GAPOWRUP	present	false
+upgrades	universe	rules	keys	17475
+upgrades	universe	rules	sections	1191
+upgrades	upgrade-universe	rules	participants	0

@@ -1,0 +1,31 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 22.01s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/sim-84fd1faff8cf3358)
+
+running 4 tests
+test ai::ra8_composition_tests::ra8_legacy_composition_keeps_its_existing_paid_traversal ... ok
+test ai::ra8_composition_tests::ra8_opted_in_composition_pays_and_spawns_every_declared_entry_in_order_and_wraps ... actual paid traversal [UnitKind(17), UnitKind(24), UnitKind(17), UnitKind(25), UnitKind(24), UnitKind(17)]; expected [UnitKind(17), UnitKind(25), UnitKind(24), UnitKind(17), UnitKind(25), UnitKind(24)]
+
+thread 'ai::ra8_composition_tests::ra8_opted_in_composition_pays_and_spawns_every_declared_entry_in_order_and_wraps' (8067225) panicked at crates/sim/src/ai/ra8_composition_tests.rs:124:5:
+assertion `left == right` failed
+  left: [UnitKind(17), UnitKind(24), UnitKind(17), UnitKind(25), UnitKind(24), UnitKind(17)]
+ right: [UnitKind(17), UnitKind(25), UnitKind(24), UnitKind(17), UnitKind(25), UnitKind(24)]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test ai::ra8_composition_tests::ra8_opted_in_composition_skips_locked_and_unaffordable_entries_without_losing_legal_work ... ok
+test ai::ra8_composition_tests::ra8_opted_in_tier_reserves_share_real_queue_bounds_then_allow_declared_tanks ... 
+thread 'ai::ra8_composition_tests::ra8_opted_in_tier_reserves_share_real_queue_bounds_then_allow_declared_tanks' (8067237) panicked at crates/sim/src/ai/ra8_composition_tests.rs:192:5:
+assertion `left == right` failed
+  left: [UnitKind(30), UnitKind(25), UnitKind(24), UnitKind(30)]
+ right: [UnitKind(30), UnitKind(25), UnitKind(24)]
+FAILED
+
+failures:
+
+failures:
+    ai::ra8_composition_tests::ra8_opted_in_composition_pays_and_spawns_every_declared_entry_in_order_and_wraps
+    ai::ra8_composition_tests::ra8_opted_in_tier_reserves_share_real_queue_bounds_then_allow_declared_tanks
+
+test result: FAILED. 2 passed; 2 failed; 0 ignored; 0 measured; 91 filtered out; finished in 0.95s
+
+error: test failed, to rerun pass `-p sim --lib`

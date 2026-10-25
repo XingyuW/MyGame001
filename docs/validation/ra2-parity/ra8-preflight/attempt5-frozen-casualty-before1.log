@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 4.21s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+test ra8_an_all_frozen_casualty_wave_defers_its_nonempty_retreat_until_release ... 
+thread 'ra8_an_all_frozen_casualty_wave_defers_its_nonempty_retreat_until_release' (5930655) panicked at crates/sim/tests/ra8_ai.rs:4384:13:
+an all-frozen casualty wave forgot its deferred retreat
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ra8_an_all_frozen_casualty_wave_defers_its_nonempty_retreat_until_release
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 55 filtered out; finished in 0.14s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

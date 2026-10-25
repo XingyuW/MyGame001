@@ -1,0 +1,34 @@
+{
+  "label": "attempt11-oasis-combined-after1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate11_oasis_russia_france_brutal_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "env": {
+    "RA8_ECONOMY_TRACE": "1",
+    "RA8_SERVICE_TRACE": "1",
+    "RA8_TRACE_FROM": "240000",
+    "RA8_LATE_MISSION_TRACE": "1"
+  },
+  "start_utc": "2026-10-19T11:40:28.819761+00:00",
+  "elapsed_seconds": 80.64365583303152,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "8b57bcdfd20d7de715d2e5ec62f052408640127804f18d580e90090de6bad087"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "8b57bcdfd20d7de715d2e5ec62f052408640127804f18d580e90090de6bad087"
+  },
+  "log_sha256": "2a2ce5a1ae2fa73d4083c228e83d19edaeb47e81a7a9d94f6474a1ca8df31080"
+}

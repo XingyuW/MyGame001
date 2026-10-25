@@ -1,0 +1,28 @@
+{
+  "label": "attempt8-repair-aggregate-after4",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_recovery_tests",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "All actual finite-credit recovery controls including aggregate active repairs, full source cadence, source-funded surplus, actual income, ordinary real damage, no extra refunds, actual paid GI and building fire.",
+  "start_utc": "2026-10-18T22:04:55.249332+00:00",
+  "elapsed_seconds": 20.30441633297596,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "872c91082778ccc57da43e7f1caba4c2a0d0f45aa5d14284bf9b09765b4d4ccd",
+    "crates/sim/src/ai/strategy.rs": "97bf9859f160d5f4d6e8a54f0b10a948f6c974ffb3ba3e83a8b9e88e9fa055e3"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "872c91082778ccc57da43e7f1caba4c2a0d0f45aa5d14284bf9b09765b4d4ccd",
+    "crates/sim/src/ai/strategy.rs": "97bf9859f160d5f4d6e8a54f0b10a948f6c974ffb3ba3e83a8b9e88e9fa055e3"
+  },
+  "log_sha256": "bd96ebfaade3904ce2cf89cda5dabc795542691ca503387cfc9057a04e7b65a1"
+}

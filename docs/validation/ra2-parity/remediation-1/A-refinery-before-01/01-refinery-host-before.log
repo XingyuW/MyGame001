@@ -1,0 +1,21 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 6.24s
+     Running tests/ra9_temporal_sources.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_temporal_sources-1525d6df27640acb)
+
+running 1 test
+
+thread 'ra9_erased_refinery_host_preserves_live_loaded_waiter_until_release' (16354412) panicked at crates/sim/tests/ra9_temporal_sources.rs:678:5:
+assertion `left == right` failed: an erased refinery cannot actively accept/pay; keep the existing waiting job rather than retarget it
+  left: (0, 0, 0, 0, Seeking, CellPos { x: 13, y: 12 }, 11000)
+ right: (40, 0, 0, 1, ToRefinery { refinery: SimId(1), dock: CellPos { x: 13, y: 12 } }, CellPos { x: 13, y: 12 }, 10000)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra9_erased_refinery_host_preserves_live_loaded_waiter_until_release ... FAILED
+
+failures:
+
+failures:
+    ra9_erased_refinery_host_preserves_live_loaded_waiter_until_release
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.05s
+
+error: test failed, to rerun pass `-p sim --test ra9_temporal_sources`

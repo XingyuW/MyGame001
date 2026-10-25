@@ -1,0 +1,23 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate_thousand_lakes_france_germany_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "environment": {
+    "RA8_LATE_MISSION_TRACE": "1"
+  },
+  "exit": 101,
+  "elapsed_seconds": 277.6752130839741,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-lakes-france-germany-defence-trace1.log",
+  "sha256": "426659892898bb64bfdb672ed6d69968bdb9ed5ae05468f3f6859961f8997aec"
+}

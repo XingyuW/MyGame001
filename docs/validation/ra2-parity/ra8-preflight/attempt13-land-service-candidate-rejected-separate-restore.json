@@ -1,0 +1,11 @@
+{
+  "utc": "2026-10-20T02:02:44.677517+00:00",
+  "source_after": {
+    "crates/sim/src/ai.rs": "0c811992001e72cf79b4946b6357b395bbe2de5b35840eec26c6c8b5f534f04b",
+    "scripts/generate_ra2_data.py": "6a0477b0720c54971bd8b11ed5b8ba7fda00b23101516f349477dbca209057d9",
+    "assets/data/ai.ron": "42cf650956788f04f4520e7f5be1d617c416b83e6e2f555e8b7a417b4a1a5b2a",
+    "crates/sim/tests/ra8_ai.rs": "40c4ee8df1ba45367f2b0af6012affe59b9a9f1fc0aad0f830a36a138ac35a12"
+  },
+  "restoration_record": "attempt13-land-service-candidate-rejected-restored.json",
+  "all_match": true
+}

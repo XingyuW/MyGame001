@@ -1,0 +1,11 @@
+{
+  "utc": "2026-10-20T22:25:38.627065+00:00",
+  "command": [
+    "python3",
+    "scripts/generate_ra2_data.py",
+    "--check"
+  ],
+  "exit_code": 0,
+  "seconds": 0.17,
+  "status": "actual preliminary copy static regeneration check; no Cargo/native; no final acceptance"
+}

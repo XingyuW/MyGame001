@@ -1,0 +1,21 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 16.00s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+test ai::ra8_recovery_tests::ra8_finite_funds_preserve_paid_head_and_finance_source_cost_finisher_after_unpaid_tails ... 
+thread 'ai::ra8_recovery_tests::ra8_finite_funds_preserve_paid_head_and_finance_source_cost_finisher_after_unpaid_tails' (7291760) panicked at crates/sim/src/ai/ra8_recovery_tests.rs:370:5:
+assertion `left == right` failed
+  left: 1594
+ right: 1600
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ai::ra8_recovery_tests::ra8_finite_funds_preserve_paid_head_and_finance_source_cost_finisher_after_unpaid_tails
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 82 filtered out; finished in 0.15s
+
+error: test failed, to rerun pass `-p sim --lib`

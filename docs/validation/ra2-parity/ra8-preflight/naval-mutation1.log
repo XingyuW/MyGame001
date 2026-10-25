@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 41.00s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+
+thread 'ra8_unseen_enemy_water_building_cannot_change_naval_planning' (4492576) panicked at crates/sim/tests/ra8_ai.rs:1619:5:
+assertion failed: actual.world().resource::<sim::AiPlayers>().controller(PlayerId(0)).unwrap().naval_target().is_some()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_unseen_enemy_water_building_cannot_change_naval_planning ... FAILED
+
+failures:
+
+failures:
+    ra8_unseen_enemy_water_building_cannot_change_naval_planning
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 20 filtered out; finished in 0.09s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

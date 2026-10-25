@@ -1,0 +1,24 @@
+{
+  "utc": "2026-10-20T22:08:56.902258+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_native_keys",
+    "--test",
+    "ra9_scenery_connected",
+    "--test",
+    "ra9_auto_defuse_geometry",
+    "--test",
+    "ra9_pad_health",
+    "--test",
+    "ra9_legacy_model_boundaries",
+    "--",
+    "--test-threads=1"
+  ],
+  "exit_code": 101,
+  "seconds": 205.89879674999975,
+  "status": "ACTUAL AI-independent preliminary native controls; standing RA8 lease singlejob; no final acceptance"
+}

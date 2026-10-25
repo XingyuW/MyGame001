@@ -1,0 +1,25 @@
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `game` (bin "game") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.55s
+     Running unittests src/main.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/game-5f08020bbb778566)
+
+running 1 test
+
+thread 'selection::tests::ra9_privacy_native_bridge_orders_retain_seen_terrain_through_hidden_collapse_and_repair' (17430734) panicked at crates/game/src/privacy_order_tests.rs:234:5:
+assertion `left == right` failed: unseen native collapse must not change actual land cursor/marker/Move Sink
+  left: PrivacyOrderObservation { preview: OrderPreview { intent: Move, target: None, point: Some(Vec2(256.0, -784.0)) }, cursor: "System(Default)", label: "MOVE", display: Flex, markers: [Vec3(-320.0, -486.4, 0.0), Vec3(-300.8, -496.0, 0.0), Vec3(-320.0, -505.6, 0.0), Vec3(-339.2, -496.0, 0.0), Vec3(-320.0, -486.4, 0.0), Vec3(256.0, -778.0, 0.0), Vec3(268.0, -784.0, 0.0), Vec3(256.0, -790.0, 0.0), Vec3(244.0, -784.0, 0.0), Vec3(256.0, -778.0, 0.0)], commands: [Move { units: [SimId(3)], target: CellPos { x: 28, y: 20 } }], accepted: 1, mode: Normal, acknowledgements: 1, feedback: Some(CellPos { x: 28, y: 20 }) }
+ right: PrivacyOrderObservation { preview: OrderPreview { intent: Invalid, target: None, point: Some(Vec2(256.0, -784.0)) }, cursor: "System(NotAllowed)", label: "CANNOT GO", display: Flex, markers: [Vec3(-320.0, -486.4, 0.0), Vec3(-300.8, -496.0, 0.0), Vec3(-320.0, -505.6, 0.0), Vec3(-339.2, -496.0, 0.0), Vec3(-320.0, -486.4, 0.0), Vec3(256.0, -772.0, 0.0), Vec3(258.3411, -772.2306, 0.0), Vec3(260.5922, -772.91345, 0.0), Vec3(262.66684, -774.02234, 0.0), Vec3(264.4853, -775.5147, 0.0), Vec3(265.97763, -777.3331, 0.0), Vec3(267.08655, -779.4078, 0.0), Vec3(267.7694, -781.65894, 0.0), Vec3(268.0, -784.0, 0.0), Vec3(267.7694, -786.34106, 0.0), Vec3(267.08655, -788.5922, 0.0), Vec3(265.97763, -790.6669, 0.0), Vec3(264.4853, -792.4853, 0.0), Vec3(262.66684, -793.97766, 0.0), Vec3(260.5922, -795.08655, 0.0), Vec3(258.3411, -795.7694, 0.0), Vec3(256.0, -796.0, 0.0), Vec3(253.65892, -795.7694, 0.0), Vec3(251.4078, -795.08655, 0.0), Vec3(249.33316, -793.97766, 0.0), Vec3(247.51471, -792.4853, 0.0), Vec3(246.02237, -790.6669, 0.0), Vec3(244.91344, -788.5922, 0.0), Vec3(244.23058, -786.34106, 0.0), Vec3(244.0, -784.0, 0.0), Vec3(244.23058, -781.65894, 0.0), Vec3(244.91345, -779.4078, 0.0), Vec3(246.02237, -777.3331, 0.0), Vec3(247.51472, -775.5147, 0.0), Vec3(249.33316, -774.02234, 0.0), Vec3(251.4078, -772.91345, 0.0), Vec3(253.65892, -772.2306, 0.0), Vec3(256.0, -772.0, 0.0), Vec3(248.0, -792.0, 0.0), Vec3(264.0, -776.0, 0.0), Vec3(248.0, -776.0, 0.0), Vec3(264.0, -792.0, 0.0)], commands: [], accepted: 0, mode: Normal, acknowledgements: 0, feedback: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test selection::tests::ra9_privacy_native_bridge_orders_retain_seen_terrain_through_hidden_collapse_and_repair ... FAILED
+
+failures:
+
+failures:
+    selection::tests::ra9_privacy_native_bridge_orders_retain_seen_terrain_through_hidden_collapse_and_repair
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 277 filtered out; finished in 12.56s
+
+error: test failed, to rerun pass `-p game --bin game`

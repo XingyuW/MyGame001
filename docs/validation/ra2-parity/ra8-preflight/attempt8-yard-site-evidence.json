@@ -1,0 +1,434 @@
+{
+  "records": [
+    {
+      "label": "attempt8-steel-america-cuba-independent-strategic-before1",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate_steel_harbor_america_cuba_bridge_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "env": {
+        "RA8_ECONOMY_TRACE": "1",
+        "RA8_SERVICE_TRACE": "1",
+        "RA8_TRACE_FROM": "180000",
+        "RA8_LATE_MISSION_TRACE": "1"
+      },
+      "purpose": "Exact default Steel Harbor America/CubaBrutal seed0 None288000 diagnosis on9952 strategy; actual income/production/losses/SWtargets/damage/mission state before any further correction, original limit unchanged.",
+      "start_utc": "2026-10-19T03:00:19.064797+00:00",
+      "elapsed_seconds": 322.0999307500315,
+      "exit": 101,
+      "source_before": {
+        "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+        "crates/sim/src/ai/strategy.rs": "9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80"
+      },
+      "source_after": {
+        "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+        "crates/sim/src/ai/strategy.rs": "9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80"
+      },
+      "log_sha256": "8630586975dec00d66bd88ab3ef1f2fd75cfbe71e9e6e93c28b02edeeaa01fd9"
+    },
+    {
+      "label": "attempt8-yard-site-before1",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ra8_paid_shipyard_uses_an_available_same_sea_site_outside_observed_bombardment",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "env": {},
+      "purpose": "Controlled ordinary paid shipyard replacement versus actual observed source Dreadnought fire, before any placement policy change.",
+      "start_utc": "2026-10-19T03:15:05.646871+00:00",
+      "elapsed_seconds": 3.028259792015888,
+      "exit": 101,
+      "source_before": {
+        "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+        "crates/sim/src/ai/strategy.rs": "9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80"
+      },
+      "source_after": {
+        "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+        "crates/sim/src/ai/strategy.rs": "9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80"
+      },
+      "log_sha256": "709cb693a16ad11df23301fb1a16ba03dc9c6457e9ea23a9d4f06411a8aa1003"
+    },
+    {
+      "label": "attempt8-yard-site-before2",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ai::ra8_composition_tests::ra8_paid_shipyard_uses_an_available_same_sea_site_outside_observed_bombardment",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "env": {},
+      "purpose": "Corrected test event payload; actual source paid shipyard placement and source fire before any runtime change. Prior compile failure preserved.",
+      "start_utc": "2026-10-19T03:15:26.589886+00:00",
+      "elapsed_seconds": 18.686918916006107,
+      "exit": 101,
+      "source_before": {
+        "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+        "crates/sim/src/ai/strategy.rs": "9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80"
+      },
+      "source_after": {
+        "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+        "crates/sim/src/ai/strategy.rs": "9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80"
+      },
+      "log_sha256": "9b5968e3e51df73a5db20de8031032487d0702bb1a7c956ca850f4618e5b7093"
+    },
+    {
+      "label": "attempt8-yard-site-before3",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ai::ra8_composition_tests::ra8_paid_shipyard_uses_an_available_same_sea_site_outside_observed_bombardment",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "env": {},
+      "purpose": "Give the human bombardment owner ordinary powered satellite observation, preserving prior UnknownTarget premise failure; no production placement policy change.",
+      "start_utc": "2026-10-19T03:16:13.164606+00:00",
+      "elapsed_seconds": 17.609340082970448,
+      "exit": 101,
+      "source_before": {
+        "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+        "crates/sim/src/ai/strategy.rs": "9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80"
+      },
+      "source_after": {
+        "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+        "crates/sim/src/ai/strategy.rs": "9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80"
+      },
+      "log_sha256": "ebc21f0efde62f60be553e1f792c1676769033e5b0afed494ae04c2f87b136f6"
+    },
+    {
+      "label": "attempt8-yard-site-before4",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ai::ra8_composition_tests::ra8_paid_shipyard_uses_an_available_same_sea_site_outside_observed_bombardment",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "env": {},
+      "purpose": "Strengthen the same native paid-yard failure with exact initial source buildability and a shared normal-geometry legal safe same-sea alternative before any runtime policy change.",
+      "start_utc": "2026-10-19T03:17:00.324778+00:00",
+      "elapsed_seconds": 19.865732708014548,
+      "exit": 101,
+      "source_before": {
+        "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+        "crates/sim/src/ai/strategy.rs": "9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80"
+      },
+      "source_after": {
+        "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+        "crates/sim/src/ai/strategy.rs": "9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80"
+      },
+      "log_sha256": "efbdfc3646c261adab1ab06cf8da34ad42c18a21a46f416e5ac36e2418453bf4"
+    },
+    {
+      "label": "attempt8-yard-site-after1",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ai::ra8_composition_tests::ra8_paid_shipyard_uses_an_available_same_sea_site_outside_observed_bombardment",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "env": {},
+      "purpose": "Prefer ordinary qualified naval sites outside currently observed source unit min/max fire; real paid yard and counterforce production, unchanged source prices and component/placement rules.",
+      "start_utc": "2026-10-19T03:18:01.799481+00:00",
+      "elapsed_seconds": 18.180146583006717,
+      "exit": 101,
+      "source_before": {
+        "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+        "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+      },
+      "source_after": {
+        "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+        "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+      },
+      "log_sha256": "63032d79b3712d594c9ca349456cc83c659f08b2e71072cc978d88fe5fd373f8"
+    },
+    {
+      "label": "attempt8-yard-site-after2",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ai::ra8_composition_tests::ra8_paid_shipyard_uses_an_available_same_sea_site_outside_observed_bombardment",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "env": {},
+      "purpose": "Isolate snapshot endpoint preference with three actual occupied source firing cells exhausting their separate pond. Earlier after1 selected a safe current endpoint but mobile hulls later approached; not a future-safety guarantee.",
+      "start_utc": "2026-10-19T03:19:00.009578+00:00",
+      "elapsed_seconds": 20.398076082987245,
+      "exit": 0,
+      "source_before": {
+        "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+        "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+      },
+      "source_after": {
+        "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+        "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+      },
+      "log_sha256": "8436bf3e2982bf300686a0d2a88b6c5cf2a53b63f0d49246aa4f4427d1c2b1a7"
+    },
+    {
+      "label": "attempt8-yard-controls-after3",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ra8_naval_site_preference",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "env": {},
+      "purpose": "Actual scheduled hidden submarine intent/controller-hash twins and native min-range/ineligible Dog/exposed-only naval-site fallback controls, without source-stat changes.",
+      "start_utc": "2026-10-19T03:20:49.442986+00:00",
+      "elapsed_seconds": 2.795976499968674,
+      "exit": 101,
+      "source_before": {
+        "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+        "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+      },
+      "source_after": {
+        "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+        "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+      },
+      "log_sha256": "f0c51353a9bcb1ca06db72ed373c81bfee650f1020f8fcc5bf94e675c578277c"
+    },
+    {
+      "label": "attempt8-yard-controls-after4",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ra8_naval_site_preference",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "env": {},
+      "purpose": "Correct the observer-keyed hidden-state assertion; run scheduled hidden-unit intent/hash and source min/target/fallback controls. Prior test compile error preserved.",
+      "start_utc": "2026-10-19T03:21:27.385520+00:00",
+      "elapsed_seconds": 17.699154458008707,
+      "exit": 101,
+      "source_before": {
+        "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+        "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+      },
+      "source_after": {
+        "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+        "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+      },
+      "log_sha256": "8043c754c3b8faf9ed260d8153ba04d43cfb10c5b34d4990493fffc9799961d9"
+    },
+    {
+      "label": "attempt8-yard-controls-after5",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ra8_naval_site_preference",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "env": {},
+      "purpose": "Source eligibility controls use unarmed owned base anchors so Tech Outpost's real HoverMissile cannot kill the observed threat before placement; preserve prior actor-disappearance premise failure. Hidden twins and fallback unchanged assertions.",
+      "start_utc": "2026-10-19T03:22:21.321637+00:00",
+      "elapsed_seconds": 17.409403958008625,
+      "exit": 101,
+      "source_before": {
+        "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+        "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+      },
+      "source_after": {
+        "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+        "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+      },
+      "log_sha256": "ce43fa2de435a06fcbcbceae59d918e2a1402cd7f9e3b8812ef0112c76d0204f"
+    },
+    {
+      "label": "attempt8-yard-controls-after6",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ra8_naval_site_preference",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "env": {},
+      "purpose": "Preserve existing observed-unit one-cell placement ring: adjacent harmless Dog shifts nearest legal site by one cell, not by a weapon danger envelope. Dread min-range and exposed-only fallback assertions unchanged.",
+      "start_utc": "2026-10-19T03:23:01.760977+00:00",
+      "elapsed_seconds": 17.736972541955765,
+      "exit": 101,
+      "source_before": {
+        "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+        "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+      },
+      "source_after": {
+        "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+        "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+      },
+      "log_sha256": "a230e0edf5995404efee69dff55d4b9ca32b76e560dce83aa1122b75ee8a00de"
+    },
+    {
+      "label": "attempt8-yard-controls-after7",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ra8_",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "env": {},
+      "purpose": "Run all library RA8 controls including strengthened real Destroyer spawn/yard registration/stray-claim proof and an exposed-only pond with actual water exit cells. Prior sealed-pond qualification failure preserved.",
+      "start_utc": "2026-10-19T03:23:48.747081+00:00",
+      "elapsed_seconds": 25.555640540958848,
+      "exit": 0,
+      "source_before": {
+        "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+        "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+      },
+      "source_after": {
+        "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+        "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+      },
+      "log_sha256": "8e00c34fc787b271905bc5e2e3702ee1077ff0bffd65ad53441da0c22eade054"
+    },
+    {
+      "label": "attempt8-yard-site-final-negative",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ai::ra8_composition_tests::ra8_paid_shipyard_uses_an_available_same_sea_site_outside_observed_bombardment",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "purpose": "Reverse only the new endpoint preference against the final constrained-pond/live-spawn fixture, then restore original AI bytes in finally before any dependent action.",
+      "start_utc": "2026-10-19T03:24:46.676093+00:00",
+      "original_ai_sha256": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+      "mutated_ai_sha256": "5ee838c6592064c6f89c90b55e6737b54734928b96ae1a336298c0b4653d33cc",
+      "strategy_sha256": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d",
+      "exit": 101,
+      "restored_ai_sha256": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+      "restoration_matches": true,
+      "elapsed_seconds": 17.7720086670015,
+      "log_sha256": "978e706566b938f213d6cbe758f30c99d2847ac40abd10e83d6b5956749d53bf"
+    },
+    {
+      "label": "attempt8-steel-yard-site-after1",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate_steel_harbor_america_cuba_bridge_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "env": {},
+      "purpose": "One exact default Steel Harbor America/Cuba Brutal seed0 replay after the independently proved snapshot naval-site preference; unchanged R29 288000 limit and all rejection/winner/invariant assertions. R153 retained.",
+      "start_utc": "2026-10-19T03:25:23.553027+00:00",
+      "elapsed_seconds": 126.41086508298758,
+      "exit": 0,
+      "source_before": {
+        "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+        "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+      },
+      "source_after": {
+        "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+        "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+      },
+      "log_sha256": "3e264935a7d907ea805f439522e243ef008f3b3904b542ad8d05f39de85874ae"
+    }
+  ],
+  "qualifications": [
+    "No gathering trap, helplessness, zero-siege production or permanent fleet idleness was established.",
+    "Old actual Dread shots refute the idle-snapshot inference.",
+    "Before1 is a compile failure; before2 lacks human target observation.",
+    "After1 selects a current safe endpoint but mobile hostile pursuit defeats future-survival interpretation.",
+    "Final pond contains only the three already occupied hostile firing cells.",
+    "After3 hidden-key compile error; after4 armed Outpost kills an intended control actor; after5 preserves existing adjacent-Dog physical spacing; after6 sealed pond has no source water exit.",
+    "Final controls retain real hidden-unit intent/controller hash equality, normal weapon min/target eligibility and exposed fallback.",
+    "The new preference considers normal kind weapons against actual observed-unit positions, not elite/readiness knowledge or future/route safety.",
+    "Final negative reverses only the preference, restores in finally and is followed by a separate SHA read before dependent tests.",
+    "Exact Steel P1Won65860 on the combined corrected source; controlled opportunity and ending evidence remain distinct."
+  ]
+}

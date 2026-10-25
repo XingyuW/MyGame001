@@ -1,0 +1,28 @@
+{
+  "label": "attempt9-global-patience-after2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_ready_finite_cohorts_use_shorter_assembly_but_keep_the_source_team_delay",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T05:41:44.862545+00:00",
+  "elapsed_seconds": 5.708146542019676,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "1f5325e272804b7c34b95fbe73f67d73dcd72a86a157aee73bff81b5f3119d7c",
+    "crates/sim/src/ai/strategy.rs": "5c5fd561a4aa9d4184011128d092409ef9b0597dc23088c8515ba8a61fb88d34"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "1f5325e272804b7c34b95fbe73f67d73dcd72a86a157aee73bff81b5f3119d7c",
+    "crates/sim/src/ai/strategy.rs": "5c5fd561a4aa9d4184011128d092409ef9b0597dc23088c8515ba8a61fb88d34"
+  },
+  "log_sha256": "b19ab670382fc2ef0aae22c917c2fe3d29a407a05651fd08f2edc07fa796685f"
+}

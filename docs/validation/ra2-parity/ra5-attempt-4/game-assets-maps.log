@@ -1,0 +1,98 @@
+    Blocking waiting for file lock on build directory
+    Finished `release` profile [optimized] target(s) in 50.64s
+     Running tests/m0_spike.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m0_spike-2408ac835b30d356)
+
+running 6 tests
+test plan_projection_puts_cell_origin_at_top_corner ... ok
+test committed_tileset_matches_generator_output ... ok
+test plan_projection_matches_bevy_ecs_tilemap_diamond_for_every_cell ... ok
+test spike_map_is_an_isometric_diamond_map ... ok
+test spike_map_cells_use_tiled_coordinates ... ok
+test spike_map_exposes_custom_tile_properties ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/m13_grown_maps.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m13_grown_maps-ee40a9cea2db76e9)
+
+running 3 tests
+test every_shipped_map_grows_with_every_player_count ... ok
+test a_ten_player_match_on_the_smallest_map_is_played_to_its_end ... ok
+test ten_computer_players_build_bases_and_bring_in_ore_on_enlarged_maps ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 15.70s
+
+     Running tests/m1_demo_map.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m1_demo_map-23f9c416f676cd4d)
+
+running 3 tests
+test demo_map_has_markers_and_every_terrain_kind ... ok
+test committed_demo_files_match_generator_output ... ok
+test demo_map_loads_as_a_64_by_64_grid_matching_the_generator ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/m1_tileset_image.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m1_tileset_image-b416d7cbd7d9c04d)
+
+running 6 tests
+test image_data_the_decoder_rejects_is_rejected_before_the_hand_off ... ok
+test image_files_above_the_size_limit_are_rejected_without_being_read_whole ... ok
+test pixel_formats_other_than_8_bit_rgb_and_rgba_are_rejected ... ok
+test chunk_structure_outside_the_subset_is_rejected ... ok
+test images_inside_the_subset_pass_and_their_checked_bytes_are_returned ... ok
+test compressed_and_other_unlisted_chunks_are_rejected_before_any_decoding ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+     Running tests/m2_unit_sprites.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m2_unit_sprites-7eb10af477a8320f)
+
+running 5 tests
+test the_facing_order_is_the_order_of_sim_directions ... ok
+test sprite_sheets_pass_the_png_subset_with_their_declared_size ... ok
+test a_named_pipe_is_rejected_without_blocking ... ok
+test every_frame_points_in_the_screen_direction_of_its_facing ... ok
+test committed_sprite_sheets_match_generator_output ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/m3_building_sprites.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m3_building_sprites-37cc444c06ad7590)
+
+running 3 tests
+test building_sprites_pass_the_png_subset_at_their_footprints_size ... ok
+test a_sprite_covers_its_footprint_and_the_walls_above_it ... ok
+test committed_building_sprites_match_generator_output ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/m7_maps.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m7_maps-c015e64265859efb)
+
+running 5 tests
+test the_shipped_skirmish_file_lists_every_generated_map_with_its_starts ... ok
+test the_maps_are_point_symmetric_so_both_starts_are_equal ... ok
+test the_maps_load_with_the_generators_terrain_and_their_tilesets_pass_the_png_subset ... ok
+test each_start_has_a_base_site_ore_nearby_and_a_way_to_the_other_start ... ok
+test committed_map_files_match_generator_output ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+
+     Running tests/m8_team_paint.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m8_team_paint-c314d0f634b8f576)
+
+running 8 tests
+test presentation::tests::team_paint_preserves_materials_alpha_and_shading ... ok
+test presentation::tests::the_palette_has_a_distinct_colour_for_each_of_the_ten_players ... ok
+test presentation::tests::every_player_of_the_largest_match_has_its_own_colour_for_every_choice ... ok
+test presentation::tests::further_computer_players_get_their_own_copies_painted_on_first_use ... ok
+test presentation::tests::palette_restarts_repaint_from_source_and_preserve_neutral_materials ... ok
+test presentation::tests::ra5_neutral_paint_is_gray_then_capture_uses_the_new_owner_without_palette_indexing ... ok
+test every_shipped_unit_facing_has_visible_material_preserving_team_paint ... ok
+test every_hd_unit_facing_and_building_has_team_accents ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.43s
+
+     Running tests/ra5_gem_maps.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra5_gem_maps-7e866c5e45838bd4)
+
+running 3 tests
+test the_gem_tiles_are_ore_ground_of_the_densest_gems ... ok
+test every_large_map_has_mirrored_seams_of_gems_away_from_the_bases ... ok
+test the_loader_marks_exactly_the_gem_tiles_as_gems ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+

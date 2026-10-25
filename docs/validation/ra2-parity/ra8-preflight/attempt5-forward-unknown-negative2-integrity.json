@@ -1,0 +1,23 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1",
+    "ra8_an_unseen_air_unit_cannot_change_the_forward_wait_endpoint_or_commands",
+    "ra8_an_unseen_new_building_cannot_change_the_forward_wait_endpoint_or_commands"
+  ],
+  "exit": 101,
+  "elapsed_seconds": 26.557366291002836,
+  "before_sha256": "bfdbd9fbd6837e73d43ed88185dae5340de2dfeab9b44db17d14f280043f393c",
+  "mutated_sha256": "8f4baadc810fdc8dcd8ef62945e3dc946fa0992bf8a04ef6f53a3989d76dc5c4",
+  "restored_sha256": "bfdbd9fbd6837e73d43ed88185dae5340de2dfeab9b44db17d14f280043f393c",
+  "mutation": "Only consult all air occupants and raw unseen building occupancy; stationary Kirov twin; immediate exact restoration"
+}

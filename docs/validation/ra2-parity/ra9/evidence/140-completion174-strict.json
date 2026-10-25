@@ -1,0 +1,17 @@
+{
+  "utc": "2026-10-21T03:48:17.698068+00:00",
+  "command": [
+    "cargo",
+    "clippy",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "exit_code": 0,
+  "seconds": 3.909,
+  "scope": "Preliminary copy audit-only strict compile; no native/acceptance credit"
+}

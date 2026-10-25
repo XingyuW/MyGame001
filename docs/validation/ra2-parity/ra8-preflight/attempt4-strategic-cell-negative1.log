@@ -1,0 +1,21 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 20.24s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+
+thread 'command::ra8_intent_tests::ra8_strategic_visible_cell_loss_cancels_only_fully_valid_internal_intents' (5457857) panicked at crates/sim/src/ra8_intents.rs:968:9:
+assertion `left == right` failed: internal: [CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(5), target: CellPos { x: 28, y: 28 }, units: [] }, reason: AbilityUnavailable("Strategic target must be visible") }]
+  left: true
+ right: false
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test command::ra8_intent_tests::ra8_strategic_visible_cell_loss_cancels_only_fully_valid_internal_intents ... FAILED
+
+failures:
+
+failures:
+    command::ra8_intent_tests::ra8_strategic_visible_cell_loss_cancels_only_fully_valid_internal_intents
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 62 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p sim --lib`

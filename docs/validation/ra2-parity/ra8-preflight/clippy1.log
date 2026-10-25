@@ -1,0 +1,73 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error: this `if` statement can be collapsed
+    --> crates/sim/src/ai.rs:1779:9
+     |
+1779 | /         if let Some(meta) = view.definitions.metadata(ProductionItem::Building(kind)) {
+1780 | |             if (!view.superweapons && meta.role.major_superweapon())
+1781 | |                 || (meta.role == Role::Shipyard && controller.naval_goal.is_none())
+...    |
+1785 | |         }
+     | |_________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#collapsible_if
+     = note: `-D clippy::collapsible-if` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+     |
+1779 ~         if let Some(meta) = view.definitions.metadata(ProductionItem::Building(kind))
+1780 ~             && ((!view.superweapons && meta.role.major_superweapon())
+1781 ~                 || (meta.role == Role::Shipyard && controller.naval_goal.is_none()))
+1782 |             {
+1783 |                 continue;
+1784 ~             }
+     |
+
+error: this `if` statement can be collapsed
+    --> crates/sim/src/ai.rs:2007:16
+     |
+2007 |           } else if !view.own_units.iter().any(|u| anti_air(u.kind)) {
+     |  ________________^
+2008 | |             if let Some(&kind) = army
+2009 | |                 .iter()
+2010 | |                 .find(|&&k| anti_air(k) && view.queued(ProductionItem::Unit(k)) == 0)
+...    |
+2019 | |         }
+     | |_________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#collapsible_if
+help: collapse nested if block
+     |
+2007 ~         } else if !view.own_units.iter().any(|u| anti_air(u.kind))
+2008 ~             && let Some(&kind) = army
+2009 |                 .iter()
+ ...
+2017 |                 total += 1;
+2018 ~             }
+     |
+
+error: items after a test module
+   --> crates/sim/src/economy_commands.rs:461:1
+    |
+461 |   mod ra8_site_tests {
+    |   ^^^^^^^^^^^^^^^^^^
+...
+557 |   pub const SHIPYARD_PLACEMENT_DISTANCE: u32 = 32;
+    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+560 | / pub(crate) fn apply(
+561 | |     issued: &IssuedCommand,
+562 | |     params: &mut EconomyParams,
+563 | |     index: &mut BuildingIndex,
+564 | |     grid: &mut Grid,
+565 | |     events: &mut Messages<SimEvent>,
+566 | | ) -> Result<(), RejectReason> {
+    | |_____________________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#items_after_test_module
+    = note: `-D clippy::items-after-test-module` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::items_after_test_module)]`
+    = help: move the items to before the test module was defined
+
+error: could not compile `sim` (lib) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `sim` (lib test) due to 3 previous errors

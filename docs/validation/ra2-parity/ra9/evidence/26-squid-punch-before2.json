@@ -1,0 +1,17 @@
+{
+  "utc": "2026-10-20T23:04:11.214459+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_squid_punch",
+    "--",
+    "--nocapture"
+  ],
+  "exit_code": 101,
+  "seconds": 16.445,
+  "status": "actual prospective BEFORE on unchanged runtime; compiler correction history retained",
+  "lease": "RA8revocable functional phase jobs1"
+}

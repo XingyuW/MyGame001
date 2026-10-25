@@ -1,0 +1,41 @@
+{
+  "cumulative_objects": 6908,
+  "original_blobs_present": [
+    [
+      "rules.ini",
+      false
+    ],
+    [
+      "art.ini",
+      false
+    ]
+  ],
+  "forbidden_formats": [],
+  "long_source_comments": 504,
+  "text_blobs_scanned": 5205,
+  "bytes_scanned": 280380304,
+  "unscanned_large_text_blobs": [
+    [
+      "7dbfca6fe7b0903a8e8ca4a7881b4dfa23e727fb",
+      "docs/validation/ra2-parity/ra5-attempt-3/coral-seed0-before.log",
+      6088517
+    ],
+    [
+      "384dd6cf37cf48fa5ee68f39768944fa830bb26e",
+      "docs/validation/ra2-parity/ra8-preflight/attempt11-grown-current-native-trace1.log",
+      8529079
+    ],
+    [
+      "f4c65c2b6ec4bb6e7d375e15b48e0edd38f7c8d1",
+      "docs/validation/ra2-parity/ra8-preflight/attempt16-coral-native-trace1.log",
+      97552219
+    ],
+    [
+      "faa4626bf6d1bf2bff7377dbcf34499f17df7f33",
+      "docs/validation/ra2-parity/ra8-preflight/attempt9-grown-trace-before2.log",
+      7711938
+    ]
+  ],
+  "verbatim_comment_hits": [],
+  "scope_limit": "This checks distinctive long original INI comments and whole original file identities/formats. It does not assert that every short generic unit/building name is copyrighted source prose, nor authenticate media pixels or all possible paraphrases."
+}

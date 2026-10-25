@@ -1,0 +1,211 @@
+[
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate_demo_germany_great_britain_brutal_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 13.10323758298182,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-01-ra8_gate_demo_germany_great_britain_brutal_seed_zero_finishes.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate_demo_france_cuba_brutal_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 5.765648792003049,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-02-ra8_gate_demo_france_cuba_brutal_seed_zero_finishes.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate_liberty_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 47.359212250012206,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-03-ra8_gate_liberty_seed_zero_finishes.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate_red_canyon_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 11.078625499998452,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-04-ra8_gate_red_canyon_seed_zero_finishes.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate_steel_harbor_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 267.4711288329854,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-05-ra8_gate_steel_harbor_seed_zero_finishes.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate_continental_stall_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 10.493907666008454,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-06-ra8_gate_continental_stall_seed_zero_finishes.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate_ember_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 31.35252629200113,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-07-ra8_gate_ember_seed_zero_finishes.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate_wheel_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 166.12801058401237,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-08-ra8_gate_wheel_seed_zero_finishes.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate_continental_bridge_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 145.0739271659986,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-09-ra8_gate_continental_bridge_seed_zero_finishes.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate_glacier_bridge_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 80.7218243329844,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-10-ra8_gate_glacier_bridge_seed_zero_finishes.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate_harvest_bridge_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 101,
+    "seconds": 110.6228307079873,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-11-ra8_gate_harvest_bridge_seed_zero_finishes.log"
+  }
+]

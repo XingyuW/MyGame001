@@ -1,0 +1,13 @@
+--- crates/sim/src/ai/strategy.rs
++++ crates/sim/src/ai/strategy.rs
+@@ -754,6 +754,10 @@
+                     controller.reserved.insert(unit.id);
+                     continue;
+                 }
++                if view.player == PlayerId(0) && (5000..=5120).contains(&view.tick) {
++                    eprintln!("counterfire actual decision tick{} unit{:?} {:?} combat{:?} enemies{:?}", view.tick, unit.id, unit.attack_order, unit.combat_target,
++                        view.enemy_units.iter().map(|e| (e.id,e.kind,e.harvest,e.armed,incoming_wave_threat_from(view,unit,e),counterfire_eligible(view,unit,e))).collect::<Vec<_>>());
++                }
+                 let distracted = matches!(
+                     unit.attack_order,
+                     Some(crate::AttackOrder::AttackMove { moving: false, .. })

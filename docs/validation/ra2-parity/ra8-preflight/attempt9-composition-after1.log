@@ -1,0 +1,47 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 23.92s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 14 tests
+source site control dreadnought/tinyfalse
+mixed cycle tick1 queues[] intents[IssuedCommand { player: PlayerId(0), command: QueueProduction { item: Unit(UnitKind(22)) } }, IssuedCommand { player: PlayerId(0), command: QueueProduction { item: Unit(UnitKind(18)) } }, IssuedCommand { player: PlayerId(0), command: QueueProduction { item: Unit(UnitKind(0)) } }, IssuedCommand { player: PlayerId(0), command: QueueProduction { item: Unit(UnitKind(12)) } }]
+mixed cycle tick541 queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(12)), progress: 590, charged: 590, fraction: 0 }, QueueItem { item: Unit(UnitKind(0)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(18)), progress: 2, charged: 2, fraction: 500 }])] intents[IssuedCommand { player: PlayerId(0), command: QueueProduction { item: Unit(UnitKind(33)) } }]
+mixed cycle tick881 queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(0)), progress: 6, charged: 6, fraction: 250 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(18)), progress: 427, charged: 427, fraction: 500 }, QueueItem { item: Unit(UnitKind(33)), progress: 0, charged: 0, fraction: 0 }])] intents[IssuedCommand { player: PlayerId(0), command: QueueProduction { item: Unit(UnitKind(12)) } }]
+source site control attack_dog/tinyfalse
+test ai::ra8_composition_tests::ra8_naval_site_preference_preserves_hidden_unit_intents_and_controller_hash ... ok
+test ai::ra8_composition_tests::ra8_libya_siege_priority_keeps_the_normal_locked_tech_tank_opening ... ok
+test ai::ra8_composition_tests::ra8_opted_in_composition_skips_a_funded_locked_entry_and_pays_later_legal_units ... ok
+test ai::ra8_composition_tests::ra8_legacy_composition_keeps_its_existing_paid_traversal ... ok
+test ai::ra8_composition_tests::ra8_per_queue_composition_cursor_hash_covers_keys_indices_and_ordered_values ... ok
+test ai::ra8_composition_tests::ra8_opted_in_composition_skips_locked_and_unaffordable_entries_without_losing_legal_work ... ok
+mixed cycle tick1761 queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(0)), progress: 12, charged: 12, fraction: 500 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(33)), progress: 771, charged: 771, fraction: 250 }, QueueItem { item: Unit(UnitKind(22)), progress: 0, charged: 0, fraction: 0 }])] intents[IssuedCommand { player: PlayerId(0), command: QueueProduction { item: Unit(UnitKind(12)) } }]
+mixed cycle tick1821 queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(12)), progress: 2, charged: 2, fraction: 500 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(33)), progress: 846, charged: 846, fraction: 250 }, QueueItem { item: Unit(UnitKind(22)), progress: 0, charged: 0, fraction: 0 }])] intents[IssuedCommand { player: PlayerId(0), command: QueueProduction { item: Unit(UnitKind(0)) } }]
+source site control dreadnought/tinytrue
+test ai::ra8_composition_tests::ra8_opted_in_tier_reserves_share_real_queue_bounds_and_paid_capacity ... ok
+mixed cycle tick2701 queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(12)), progress: 8, charged: 8, fraction: 750 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(22)), progress: 266, charged: 266, fraction: 250 }, QueueItem { item: Unit(UnitKind(18)), progress: 0, charged: 0, fraction: 0 }])] intents[IssuedCommand { player: PlayerId(0), command: QueueProduction { item: Unit(UnitKind(0)) } }]
+test ai::ra8_composition_tests::ra8_naval_site_preference_retains_source_minimum_target_eligibility_and_exposed_fallback ... ok
+paid yard originCellPos { x: 36, y: 20 } exposedfalse native_shotfalse lostfalse destroyertrue
+test ai::ra8_composition_tests::ra8_paid_shipyard_uses_an_available_same_sea_site_outside_observed_bombardment ... ok
+actual paid traversal [UnitKind(17), UnitKind(25), UnitKind(24), UnitKind(17), UnitKind(25), UnitKind(24)]; expected [UnitKind(17), UnitKind(25), UnitKind(24), UnitKind(17), UnitKind(25), UnitKind(24)]
+test ai::ra8_composition_tests::ra8_opted_in_composition_pays_and_spawns_every_declared_entry_in_order_and_wraps ... ok
+mixed cycle tick3641 queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(12)), progress: 90, charged: 90, fraction: 0 }, QueueItem { item: Unit(UnitKind(0)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(33)), progress: 12, charged: 12, fraction: 500 }])] intents[IssuedCommand { player: PlayerId(0), command: QueueProduction { item: Unit(UnitKind(22)) } }]
+mixed cycle tick4381 queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(0)), progress: 6, charged: 6, fraction: 250 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(33)), progress: 937, charged: 937, fraction: 500 }, QueueItem { item: Unit(UnitKind(22)), progress: 0, charged: 0, fraction: 0 }])] intents[IssuedCommand { player: PlayerId(0), command: QueueProduction { item: Unit(UnitKind(12)) } }]
+Libya actual mixed-lane paid cycle [UnitKind(0), UnitKind(10), UnitKind(29), UnitKind(12), UnitKind(0), UnitKind(10), UnitKind(26), UnitKind(12), UnitKind(0), UnitKind(22), UnitKind(10), UnitKind(18), UnitKind(12), UnitKind(0), UnitKind(18), UnitKind(29)]
+test ai::ra8_composition_tests::ra8_libya_shipped_land_cycle_funds_and_spawns_siege_alongside_its_national_reserve ... ok
+mixed factory actual paid spawns [UnitKind(22), UnitKind(18), UnitKind(33), UnitKind(22), UnitKind(18), UnitKind(33)], infantry spawns 11
+test ai::ra8_composition_tests::ra8_mixed_producer_admissions_cannot_skip_the_busy_factorys_declared_cycle ... ok
+test ai::ra8_composition_tests::ra8_germany_pays_its_declared_siege_pair_and_national_unit_again_after_real_casualties ... ok
+
+thread 'ai::ra8_composition_tests::ra8_libya_replaces_its_national_with_paid_production_after_real_enemy_capture' (9013704) panicked at crates/sim/src/ai/ra8_composition_tests.rs:1249:5:
+source national replacement must actually be paid after the siege-priority retune
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ai::ra8_composition_tests::ra8_libya_replaces_its_national_with_paid_production_after_real_enemy_capture ... FAILED
+
+failures:
+
+failures:
+    ai::ra8_composition_tests::ra8_libya_replaces_its_national_with_paid_production_after_real_enemy_capture
+
+test result: FAILED. 13 passed; 1 failed; 0 ignored; 0 measured; 100 filtered out; finished in 1.03s
+
+error: test failed, to rerun pass `-p sim --lib`

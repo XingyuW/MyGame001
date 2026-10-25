@@ -1,0 +1,14 @@
+{
+  "utc": "2026-10-20T02:51:04.277212+00:00",
+  "reason": "Property is demonstrated, but general play candidate failed all3 exact checks and lost prior original-direction positive; fully rejected",
+  "patch_sha256": "b6f56119553c025278f4280159147e9ff853b51fa9cabb4b0a41163db11af50f",
+  "candidate": {
+    "crates/sim/src/ai/strategy.rs": "73394b863fa264319108f87469c9d628bc41d8b29e076953c2e8621a10a191ae",
+    "crates/sim/tests/ra8_ai.rs": "c428f168ea678cbc7be53186b24ae873b24922dce7c0a7fb7d944774a00c7152"
+  },
+  "restored": {
+    "crates/sim/src/ai/strategy.rs": "c4c72cbaa6dcbaf83ca949651e98a661845b4257be42b4f008d82eee153923c8",
+    "crates/sim/tests/ra8_ai.rs": "40c4ee8df1ba45367f2b0af6012affe59b9a9f1fc0aad0f830a36a138ac35a12"
+  },
+  "requires_separate_later_read": true
+}

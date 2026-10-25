@@ -1,0 +1,44 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+warning: variable `retained_heals` is assigned to, but never used
+    --> crates/sim/tests/ra8_ai.rs:8280:9
+     |
+8280 |     let mut retained_heals = 0;
+     |         ^^^^^^^^^^^^^^^^^^
+     |
+     = note: consider using `_retained_heals` instead
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: value assigned to `retained_heals` is never read
+    --> crates/sim/tests/ra8_ai.rs:8300:9
+     |
+8300 | /         retained_heals += usize::from(
+8301 | |             app.world().get::<sim::Health>(entity).unwrap().hit_points > hp
+8302 | |                 && app
+8303 | |                     .world()
+...    |
+8308 | |                     < cash,
+8309 | |         );
+     | |_________^
+     |
+     = help: maybe it is overwritten before being read?
+     = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: `sim` (test "ra8_ai") generated 2 warnings
+    Finished `release` profile [optimized] target(s) in 6.23s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+
+thread 'ra8_idle_detectors_discover_an_unseen_start_while_the_real_wave_fights' (9649454) panicked at crates/sim/tests/ra8_ai.rs:9148:5:
+an idle detector must physically reveal the unknown start while native building fire continues: scoutfalse/knownfalse/firetrue
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_idle_detectors_discover_an_unseen_start_while_the_real_wave_fights ... FAILED
+
+failures:
+
+failures:
+    ra8_idle_detectors_discover_an_unseen_start_while_the_real_wave_fights
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 109 filtered out; finished in 0.14s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

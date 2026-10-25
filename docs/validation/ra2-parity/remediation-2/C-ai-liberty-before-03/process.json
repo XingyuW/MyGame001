@@ -1,0 +1,38 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-23T00:04:52.784551+00:00",
+  "pid": 60391,
+  "head": "53a5225c272ff45b7d29d124befc6b1d26c5c832",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-03-plan.json",
+  "plan_sha256": "0c259c71a14f766ac38f98dc4f18e38f22b623f69c16cc8250e773823a3a71ff",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra9_visible_ore_",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-23T00:04:52.935012+00:00",
+      "raw": "../../Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-liberty-before-03/01-visible-ore-real-finance-controls.log",
+      "pid": 60420,
+      "pgid": 60420,
+      "exit": 101,
+      "end": "2026-10-23T00:05:38.048898+00:00",
+      "raw_bytes": 1309,
+      "raw_sha256": "f78601ec53880b56a1b7ad19cf32b8f065475efdc5d67b15cbd4ac9ae0bddafe",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-23T00:05:33.039069+00:00",
+  "end": "2026-10-23T00:05:38.312494+00:00",
+  "source_unchanged": true
+}

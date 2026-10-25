@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "commands": [
+    {
+      "path": "docs/validation/ra2-parity/remediation-2/C-corrected-08/01-full-scenery-connected.log",
+      "bytes": 584,
+      "sha256": "5015352c8aef313735f4ea5fe8a0441b243f429ce98a311e1d7a827a9caf7dc9",
+      "scope": "All three scenery-connected regressions after explicit Temporal source isolation."
+    },
+    {
+      "path": "docs/validation/ra2-parity/remediation-2/C-corrected-08/02-full-remaining-props.log",
+      "bytes": 1050,
+      "sha256": "9350501ece3244e8a4d82151fffcc1d0e0b799e3174aab25dda88ecf9f32c0d1",
+      "scope": "All seven Temporal/Ivan occupied-prop regressions retained."
+    }
+  ],
+  "scope": "Focused controls only; complete full13 remains required."
+}

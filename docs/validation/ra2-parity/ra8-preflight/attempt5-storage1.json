@@ -1,0 +1,11 @@
+{
+  "path": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/ra8_definitions",
+  "measured_utc": "2026-10-16T10:30:31.998509+00:00",
+  "files": 58,
+  "file_bytes": 584038,
+  "allocated_bytes": 733184,
+  "retained": "recreatable parser rejection and slow-speed fixture scratch for reruns; unnecessary for release",
+  "new_subdirectories_outside_repository": [
+    "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/ra8_definitions"
+  ]
+}

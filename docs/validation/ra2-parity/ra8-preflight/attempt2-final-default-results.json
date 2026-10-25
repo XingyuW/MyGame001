@@ -1,0 +1,59 @@
+[
+  {
+    "name": "attempt2-game-exact-final2",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "--test",
+      "ra8_ai_matches",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "runtime": "65fa8d669ac1e14adadc30b2745887071b580bec",
+    "exit": 0,
+    "elapsed_seconds": 394.50012545799837
+  },
+  {
+    "name": "ten-player-all-end5",
+    "command": [
+      "cargo",
+      "run",
+      "--release",
+      "-p",
+      "sim",
+      "--example",
+      "m13_ten_players",
+      "--",
+      "to-the-end",
+      "all"
+    ],
+    "runtime": "65fa8d669ac1e14adadc30b2745887071b580bec",
+    "exit": 0,
+    "elapsed_seconds": 726.1317168749811
+  },
+  {
+    "name": "ten-player256-benchmark5",
+    "command": [
+      "cargo",
+      "run",
+      "--release",
+      "-p",
+      "sim",
+      "--example",
+      "m13_ten_players",
+      "--",
+      "liberty_bay",
+      "continental_divide",
+      "pacific_atoll"
+    ],
+    "runtime": "65fa8d669ac1e14adadc30b2745887071b580bec",
+    "exit": 0,
+    "elapsed_seconds": 52.61783054101397
+  }
+]

@@ -33,18 +33,74 @@ pub(crate) static NO_VISION: Vision = Vision {
     width: 0,
     height: 0,
     cells: Vec::new(),
+    fog_of_war: true,
 };
 
 /// A player's view of the grid.
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Vision {
     width: u32,
     height: u32,
     /// Row-major, as the grid: [`VISIBLE`] and [`EXPLORED`] bits.
     cells: Vec<u8>,
+    fog_of_war: bool,
+}
+
+impl Default for Vision {
+    fn default() -> Self {
+        Self {
+            width: 0,
+            height: 0,
+            cells: Vec::new(),
+            fog_of_war: true,
+        }
+    }
 }
 
 impl Vision {
+    pub fn uses_fog(&self) -> bool {
+        self.fog_of_war
+    }
+    pub(crate) fn reset_shroud(&mut self) {
+        for bits in &mut self.cells {
+            *bits = if *bits & VISIBLE != 0 {
+                VISIBLE | EXPLORED
+            } else {
+                0
+            };
+        }
+    }
+    pub(crate) fn conceal(&mut self, centre: CellPos, radius: u32) {
+        for y in centre.y.saturating_sub(radius as i32)..=centre.y.saturating_add(radius as i32) {
+            for x in centre.x.saturating_sub(radius as i32)..=centre.x.saturating_add(radius as i32)
+            {
+                if let Some(i) = self.index(CellPos::new(x, y)) {
+                    self.cells[i] &= !VISIBLE;
+                }
+            }
+        }
+    }
+
+    /// RA7: a powered hostile gap restores circular shroud, including satellite exploration.
+    pub(crate) fn reshroud(&mut self, centre: CellPos, radius: u32) {
+        let r = i64::from(radius);
+        for y in (i64::from(centre.y) - r).max(0)
+            ..=(i64::from(centre.y) + r).min(i64::from(self.height) - 1)
+        {
+            for x in (i64::from(centre.x) - r).max(0)
+                ..=(i64::from(centre.x) + r).min(i64::from(self.width) - 1)
+            {
+                let dx = x - i64::from(centre.x);
+                let dy = y - i64::from(centre.y);
+                if dx * dx + dy * dy <= r * r
+                    && let Some(i) = self.index(CellPos::new(x as i32, y as i32))
+                {
+                    self.cells[i] = 0;
+                }
+            }
+        }
+    }
+
     fn index(&self, cell: CellPos) -> Option<usize> {
         let x = u32::try_from(cell.x).ok()?;
         let y = u32::try_from(cell.y).ok()?;
@@ -61,9 +117,10 @@ impl Vision {
             .unwrap_or(0)
     }
 
-    /// Whether `cell` is visible now (`false` outside the map).
+    /// Whether `cell` is visible to the player: current sight with fog on, explored ground
+    /// with fog off (`false` outside the map).
     pub fn is_visible(&self, cell: CellPos) -> bool {
-        self.bits(cell) & VISIBLE != 0
+        self.bits(cell) & VISIBLE != 0 || (!self.fog_of_war && self.is_explored(cell))
     }
 
     /// Whether `cell` has ever been visible: not shroud (`false` outside the map).
@@ -82,11 +139,11 @@ impl Vision {
         footprint.cells().any(|cell| self.is_visible(cell))
     }
 
-    /// The number of cells visible now.
+    /// The number of cells visible under the configured fog rule.
     pub fn visible_cells(&self) -> usize {
         self.cells
             .iter()
-            .filter(|&&bits| bits & VISIBLE != 0)
+            .filter(|&&bits| bits & VISIBLE != 0 || (!self.fog_of_war && bits & EXPLORED != 0))
             .count()
     }
 
@@ -108,6 +165,7 @@ impl Vision {
                 width: grid.width(),
                 height: grid.height(),
                 cells: vec![0; cells],
+                fog_of_war: self.fog_of_war,
             };
             return;
         }
@@ -116,10 +174,36 @@ impl Vision {
         }
     }
 
+    /// Marks every cell of a grid of `width` × `height` cells as explored (RA5: the crate that
+    /// reveals the map). What is visible now does not change.
+    pub(crate) fn explore_all(&mut self, width: u32, height: u32) {
+        if self.width != width || self.height != height {
+            let cells = usize::try_from(u64::from(width) * u64::from(height)).unwrap_or(0);
+            *self = Vision {
+                width,
+                height,
+                cells: vec![0; cells],
+                fog_of_war: self.fog_of_war,
+            };
+        }
+        for bits in &mut self.cells {
+            *bits |= EXPLORED;
+        }
+    }
+
+    /// A vision of `grid` in which the cells within `sight` of `cell` are visible (for unit
+    /// tests of what a player may know).
+    #[cfg(test)]
+    pub(crate) fn reveal_for_test(&mut self, grid: &Grid, cell: CellPos, sight: u32) {
+        self.begin(grid);
+        let (x, y) = (i64::from(cell.x), i64::from(cell.y));
+        self.reveal((x, y, x, y), sight);
+    }
+
     /// Reveals the cells within `sight` of the rectangle of cells `x0..=x1`, `y0..=y1`
     /// (equation 6, measured to the rectangle's nearest cell). Computed in `i64`, so no source
     /// position overflows (invariant I12).
-    fn reveal(&mut self, (x0, y0, x1, y1): (i64, i64, i64, i64), sight: u32) {
+    pub(crate) fn reveal(&mut self, (x0, y0, x1, y1): (i64, i64, i64, i64), sight: u32) {
         let s = i64::from(sight);
         let (width, height) = (i64::from(self.width), i64::from(self.height));
         // Only cells inside the map and within `sight` of the rectangle are visited, so every
@@ -156,6 +240,9 @@ impl Vision {
         hasher.write_u32(self.width);
         hasher.write_u32(self.height);
         hasher.write(&self.cells);
+        if !self.fog_of_war {
+            hasher.write(b"shroud only");
+        }
     }
 }
 
@@ -165,9 +252,26 @@ pub(crate) fn update_visibility(
     grid: Res<Grid>,
     mut players: ResMut<Players>,
     sources: Query<(&Owner, &Sight, Option<&Mobile>, Option<&Building>)>,
+    special: Res<crate::SpecialState>,
+    props: Res<crate::Props>,
+    defs: Res<crate::Definitions>,
+    state: Res<crate::MatchState>,
 ) {
-    for (_, state) in players.iter_mut() {
-        state.vision.begin(&grid);
+    let fog = defs.rules().is_none() || state.rules().fog_of_war;
+    for (_, player) in players.iter_mut() {
+        player.vision.begin(&grid);
+        player.vision.fog_of_war = fog;
+    }
+    for (id, g) in &special.garrisons {
+        if let Some((_, prop)) = props.get(*id)
+            && let Some(crate::ProductionItem::Building(kind)) =
+                crate::garrison::item(&defs, prop.kind)
+            && let Some(terms) = defs.building_combat(kind)
+            && let Some(state) = players.get_mut(g.owner)
+        {
+            let (x, y) = (i64::from(g.cell.x), i64::from(g.cell.y));
+            state.vision.reveal((x, y, x, y), terms.sight);
+        }
     }
     for (owner, sight, mobile, building) in &sources {
         let Some(state) = players.get_mut(owner.0) else {
@@ -203,6 +307,7 @@ mod tests {
             width,
             height,
             cells: vec![0; (width * height) as usize],
+            fog_of_war: true,
         }
     }
 

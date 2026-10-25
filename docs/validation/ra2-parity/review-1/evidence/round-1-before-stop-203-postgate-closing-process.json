@@ -1,0 +1,12 @@
+{
+  "start_utc": "2026-10-21T17:28:03.988069+00:00",
+  "pid": 29649,
+  "status": "WAITING_FOR_ACTUAL_FULL13",
+  "scripts": {
+    "200-summarize-final-validation.py": "46551c951600ea6f2863b03df742f6d74cdd40b3fd543c4f65ee40b05d866918",
+    "201-close-current-canonical-documents.py": "24df042e495126ca8d4cd426056238e69003737a52fbb29565ce594e7747ac74",
+    "202-prepare-clean-review-handoff.py": "120ae9c04169884401fd2966bd3d908d8cc1366856a116fe7281ffec6d07549f"
+  },
+  "steps": [],
+  "scope": "Only prepared required result/output reconciliation after actual199PASS. No Cargo/native, policy acceptance, review, user approval, Git mutation or ownership release."
+}

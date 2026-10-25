@@ -1,0 +1,45 @@
+{
+  "utc": "2026-10-22T23:23:04.055260+00:00",
+  "source_commit": "6bba9d2cf1bb0e987d326238af9cfade96f5f0d8",
+  "status": "FAILED_INTERRUPTED_AFTER_ACTUAL_NON_WON",
+  "source_after": {
+    "files": 689,
+    "authority_spans": 64,
+    "mismatches": [],
+    "tracked_diff_empty": true
+  },
+  "reviewer_partial_reports": [
+    {
+      "role": "sim1",
+      "path": "docs/reviews/RA2-parity-review-2-native-partial-sim1.md",
+      "bytes": 9505,
+      "sha256": "2cc18781810ad24942cf2ce0e4340b701202e6dbe1688d9d25fc3983ec4d4847"
+    },
+    {
+      "role": "sim2",
+      "path": "docs/reviews/RA2-parity-review-2-native-partial-sim2.md",
+      "bytes": 6154,
+      "sha256": "9eef4c52d1f099bacb06ea39797ae6cc1a4bb53606129bf90ef40a049f4eb596"
+    },
+    {
+      "role": "client",
+      "path": "docs/reviews/RA2-parity-review-2-native-partial-client.md",
+      "bytes": 7333,
+      "sha256": "65a435065104931ae21baf0831a875eb144f7628708691572cf5eca496d7a5c7"
+    },
+    {
+      "role": "data",
+      "path": "docs/reviews/RA2-parity-review-2-native-partial-data.md",
+      "bytes": 9154,
+      "sha256": "9e04c10cb11dae5cb4fdb60a9e660976de3d1631ba0a3ca9b8b31d5949f9b458"
+    },
+    {
+      "role": "tests",
+      "path": "docs/reviews/RA2-parity-review-2-native-partial-tests.md",
+      "bytes": 7611,
+      "sha256": "e69ae13b1235f6e900968e195e6dcc2511ef996d3abf436200d2a6e29746c39d"
+    }
+  ],
+  "owned_validator_group_verified_empty": 43684,
+  "scope": "Historical C corrected candidate partial acceptance only. All five source and partial reports preserved; actual final full13 and revised independent review remain required."
+}

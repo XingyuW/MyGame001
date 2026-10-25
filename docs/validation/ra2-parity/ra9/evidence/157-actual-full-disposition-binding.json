@@ -1,0 +1,79 @@
+{
+  "utc": "2026-10-21T04:30:11.340376+00:00",
+  "root_authorization": "Root156all655source/64authority/84receiptlogpairs exact;143plusknown146/150source2deltas;174records authorized151actualexport+155qualified43routeevidence; not final/nativefidelity acceptance",
+  "input_scope_sha256": "f0a16e77fc484956640724d81cdcf9f4c40b745aeec50c5fb3c7e5c1f0b65543",
+  "files": [
+    {
+      "path": "crates/sim/tests/ra9_audit/root-policy-input-binding.txt",
+      "old_sha256": "e99d2f78e7d3cebe40db9744497358a4a42e722bb2e073ad080923a89ce07bff",
+      "new_sha256": "5786bb6bcbc0e03214f4e0c8d6762cb8bff0ce77e64ff3e4dce3fd371534d00d",
+      "binding_cells": 1
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-policy-acceptance.tsv",
+      "old_sha256": "f56f2078bac031be21f603c99525cb16fd90a5478071c15875ed6c00d63c3254",
+      "new_sha256": "7ba0b5d9e7f29de4fd9ca0e65bb48951c3877a12cdb53c398571d4bbeb6064c7",
+      "binding_cells": 1313
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/guard75-acceptance.tsv",
+      "old_sha256": "7b8bb7fe8e1d4ee6fe09319e2b46318d744421ad1d3a1bee9e60c14cbbd578af",
+      "new_sha256": "73abe2ddfd7a8b0deedba64acddcb2ef603d12ce2ad0f861a320dcf568e9e830",
+      "binding_cells": 75
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/own-policy-acceptance.tsv",
+      "old_sha256": "28133378dac5f6baeb850e96f31fb081e38039b7e18283890e5b2f7c1c83b2a5",
+      "new_sha256": "4b45c78e030f106a1f62aa4dbd57f4b973a1684ccd23bb41109d73d3a160e7f6",
+      "binding_cells": 80
+    },
+    {
+      "path": "crates/sim/tests/reference/ra9_legacy_range_resolution.tsv",
+      "old_sha256": "f63db850d5aac0e7dc63876a0456af64ef6aa4399bfa81500594b4f9d4cbe8f4",
+      "new_sha256": "fd0f2e2bacf513d3f55555c97269b3b79866983916c4950fb78295f8533336a3",
+      "binding_cells": 1
+    },
+    {
+      "path": "crates/sim/tests/reference/ra9_return_fire_policy.tsv",
+      "old_sha256": "57bed42868b14a2d997ca4b0ddb49624a66688fc7cc2895c37872edccbb5dd84",
+      "new_sha256": "f443cd0aedcd3c2bb197933fc461cdf55a4cc90b1fca9897961aee327fc749ec",
+      "binding_cells": 1
+    },
+    {
+      "path": "crates/sim/tests/reference/ra9_scope_approval.tsv",
+      "old_sha256": "c0f8b8b7ebd1b5f762f1be2087e75bf1ae05d99b70b83d57a9e440904b95d1a3",
+      "new_sha256": "253c975e5abcd5bf5e365818c9b15bc8c4500dd886ad8007af8c5ed9672aec3f",
+      "binding_cells": 1
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/consumer62-acceptance.tsv",
+      "old_sha256": "bcf068ff403fec976d797fc5dad28fdba63e42d35e6a505677a3a2c0b5737c44",
+      "new_sha256": "0799814fde5416fb9d2e32cf2157b123503c122c4dcc87fb35a51ee75927aefd",
+      "binding_cells": 62
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/carry38-acceptance.tsv",
+      "old_sha256": "bae1dd68971c83d17435c95761fa7c6ded2429d797d90e5ce2975b23547ec2e7",
+      "new_sha256": "cdd25d6d702b7c7f03e3e48530dfa5ed1eb423e38b49cb61513715d705d1c23f",
+      "binding_cells": 38
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/behavior87-acceptance.tsv",
+      "old_sha256": "8cc8ed6dd7a6bc6dccbdb56e03462d47e830aa6c2b63d97b16aba3b0bba74481",
+      "new_sha256": "6b56f9fb5d01eb9f1a3f27c72bd32240c34cce939d0073fe1a13d1a58d112e49",
+      "binding_cells": 87
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-acceptance.tsv",
+      "old_sha256": "9c25910d96b9ec77091c2840b41750c4cb06c18e45d841c75e5fce03c5f80b82",
+      "new_sha256": "bc55e2d55ffdec31ec608aa6f040c728ba91c62bcfd8bc5ad4d5715c24f47192",
+      "binding_cells": 162
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/completion-acceptance.tsv",
+      "old_sha256": "d739f87598fd7c8602420577cf09e8bb9a00fcaa37d314558a1c65edfad4df9b",
+      "new_sha256": "a5c2a53573cf24158c9c2ac6f1504f9dd945261b42087fcde7f695649a74f9cb",
+      "binding_cells": 174
+    }
+  ]
+}

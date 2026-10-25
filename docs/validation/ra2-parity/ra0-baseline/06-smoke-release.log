@@ -1,0 +1,53 @@
+    Finished `release` profile [optimized] target(s) in 0.13s
+     Running `target/release/game --smoke-test 600`
+[2m2026-10-12T05:18:21.610439Z[0m [32m INFO[0m [2mbevy_diagnostic::system_information_diagnostics_plugin::internal[0m[2m:[0m SystemInfo { os: "macOS 27.0.1", kernel: "27.0.0", cpu: "Apple M5", core_count: "10", memory: "32.0 GiB" }
+[2m2026-10-12T05:18:21.657774Z[0m [32m INFO[0m [2mbevy_render::renderer[0m[2m:[0m AdapterInfo { name: "Apple M5", vendor: 0, device: 0, device_type: IntegratedGpu, device_pci_bus_id: "", driver: "", driver_info: "", backend: Metal, subgroup_min_size: 4, subgroup_max_size: 64, transient_saves_memory: true }
+[2m2026-10-12T05:18:21.792075Z[0m [32m INFO[0m [2mbevy_winit::system[0m[2m:[0m Creating new window MyGame001 (66v0)
+[2m2026-10-12T05:18:21.830354Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/demo/demo.tmx: 64x64 cells, tile 64x32 px
+[2m2026-10-12T05:18:21.830891Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/crossroads/crossroads.tmx: 56x56 cells, tile 64x32 px
+[2m2026-10-12T05:18:21.831333Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/riverlands/riverlands.tmx: 64x48 cells, tile 64x32 px
+[2m2026-10-12T05:18:21.832910Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/liberty_bay/liberty_bay.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T05:18:21.834320Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/frostline/frostline.tmx: 224x224 cells, tile 64x32 px
+[2m2026-10-12T05:18:21.835848Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/oasis_gulf/oasis_gulf.tmx: 256x192 cells, tile 64x32 px
+[2m2026-10-12T05:18:21.837454Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/coral_archipelago/coral_archipelago.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T05:18:21.839078Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/continental_divide/continental_divide.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T05:18:21.840766Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/steel_harbor/steel_harbor.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T05:18:21.842241Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/glacier_pass/glacier_pass.tmx: 240x240 cells, tile 64x32 px
+[2m2026-10-12T05:18:21.843419Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/red_canyon/red_canyon.tmx: 192x192 cells, tile 64x32 px
+[2m2026-10-12T05:18:21.844836Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/jungle_delta/jungle_delta.tmx: 256x224 cells, tile 64x32 px
+[2m2026-10-12T05:18:21.846345Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/pacific_atoll/pacific_atoll.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T05:18:21.847731Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/iron_isthmus/iron_isthmus.tmx: 256x224 cells, tile 64x32 px
+[2m2026-10-12T05:18:21.849142Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/arctic_floes/arctic_floes.tmx: 240x240 cells, tile 64x32 px
+[2m2026-10-12T05:18:21.850739Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/ember_caldera/ember_caldera.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T05:18:21.852445Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/frozen_sound/frozen_sound.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T05:18:21.854039Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/harvest_plains/harvest_plains.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T05:18:21.855936Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/black_water/black_water.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T05:18:21.857609Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/thousand_lakes/thousand_lakes.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T05:18:21.859363Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/wheel_of_worlds/wheel_of_worlds.tmx: 256x256 cells, tile 64x32 px
+[2m2026-10-12T05:18:23.554223Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m catalogue: 21 maps, 2 factions, 3 difficulties
+[2m2026-10-12T05:18:23.556762Z[0m [32m INFO[0m [2mgame::options[0m[2m:[0m no settings file at /var/folders/vr/n5klx5z92njgzmqc0_v_02vc0000gn/T/mygame001-smoke-54936/settings.txt; the defaults are used
+[2m2026-10-12T05:18:23.969232Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map liberty_bay (256 x 256 cells, seed 6): vanguard against 3 x vanguard (normal), Super Me, all unlocked: 4 buildings and 36 units spawned
+[2m2026-10-12T05:18:24.243698Z[0m [32m INFO[0m [2mgame::options[0m[2m:[0m settings written to /var/folders/vr/n5klx5z92njgzmqc0_v_02vc0000gn/T/mygame001-smoke-54936/settings.txt
+[2m2026-10-12T05:18:24.244598Z[0m [32m INFO[0m [2mbevy_render::batching::gpu_preprocessing[0m[2m:[0m GPU preprocessing is fully supported on this device.
+[2m2026-10-12T05:18:24.716763Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map liberty_bay (256 x 256 cells, seed 7): vanguard against 3 x vanguard (normal), Super Me, all unlocked: 4 buildings and 36 units spawned
+[2m2026-10-12T05:18:25.404712Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map liberty_bay (256 x 256 cells, seed 6): meridian against 3 x vanguard (normal): 4 buildings and 36 units spawned
+[2m2026-10-12T05:18:25.694542Z[0m [32m INFO[0m [2mbevy_ecs_tiled::tiled::map[0m[2m:[0m Map removed: AssetId<bevy_ecs_tiled::tiled::map::asset::TiledMapAsset>{ index: 0, generation: 0}
+[2m2026-10-12T05:18:27.956168Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Building(BuildingKind(1)) is complete
+[2m2026-10-12T05:18:27.972791Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Building(BuildingKind(1)) is complete
+[2m2026-10-12T05:18:27.987408Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Building(BuildingKind(1)) is complete
+[2m2026-10-12T05:18:28.222852Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: building 40 of type 1 placed
+[2m2026-10-12T05:18:28.239046Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: building 41 of type 1 placed
+[2m2026-10-12T05:18:28.256420Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: building 42 of type 1 placed
+[2m2026-10-12T05:18:30.522674Z[0m [32m INFO[0m [2mgame::smoke[0m[2m:[0m smoke test: paused at tick 407
+[2m2026-10-12T05:18:31.022679Z[0m [32m INFO[0m [2mgame::smoke[0m[2m:[0m smoke test: resumed at tick 407
+[2m2026-10-12T05:18:33.954875Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: Building(BuildingKind(2)) is complete
+[2m2026-10-12T05:18:33.972858Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: Building(BuildingKind(2)) is complete
+[2m2026-10-12T05:18:33.989498Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: Building(BuildingKind(2)) is complete
+[2m2026-10-12T05:18:34.223011Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: building 43 of type 2 placed
+[2m2026-10-12T05:18:34.223051Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: unit 44 left building 43
+[2m2026-10-12T05:18:34.239675Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: building 45 of type 2 placed
+[2m2026-10-12T05:18:34.239707Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 2: unit 46 left building 45
+[2m2026-10-12T05:18:34.255773Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: building 47 of type 2 placed
+[2m2026-10-12T05:18:34.255805Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 3: unit 48 left building 47
+[2m2026-10-12T05:18:35.511036Z[0m [32m INFO[0m [2mgame::smoke[0m[2m:[0m smoke test: 600 frames, 766 simulation ticks, map created: true, units spawned: 36, units moved: 9 in 766 ticks after the order, buildings spawned: 4, production charged 1532 credits in 766 ticks, visible cells: 319, enemy views shown: 0, view mismatches: 0, sidebar items: 84 of 84, sidebar buttons outside the window: 0, sidebar credits: Some("Credits  3468"), minimap drawings: 554, minimap pixels lit: 1888, sounds: 25, music players: 1, pause: Done { ticks_while_paused: 0, refused: true }, menu buttons: Some(23), matches started: 3, flow: Last, views: 39 of 39 units and 10 of 10 buildings, computer player's commands: 6 (0 rejected), items outside the roster shown: 0, options buttons: 11, settings saved: true
+[2m2026-10-12T05:18:35.511816Z[0m [33m WARN[0m [2mbevy_winit::state[0m[2m:[0m Skipped event Destroyed for unknown winit Window Id WindowId(506461553920)

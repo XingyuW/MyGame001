@@ -1,0 +1,33 @@
+{
+  "label": "attempt8-harvest-artillery-after1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate8_harvest_france_germany_easy_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "env": {
+    "RA8_ECONOMY_TRACE": "1"
+  },
+  "purpose": "Exact default Harvest after independently proved NEW rear-slot admission correction; unchanged source multipliers/defencecounts/weapons and288000 winner/rejection bounds.",
+  "start_utc": "2026-10-18T20:58:54.047661+00:00",
+  "elapsed_seconds": 148.32311145804124,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e",
+    "crates/sim/src/ai/strategy.rs": "97bf9859f160d5f4d6e8a54f0b10a948f6c974ffb3ba3e83a8b9e88e9fa055e3"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e",
+    "crates/sim/src/ai/strategy.rs": "97bf9859f160d5f4d6e8a54f0b10a948f6c974ffb3ba3e83a8b9e88e9fa055e3"
+  },
+  "log_sha256": "37605ea028f9cfed56ae103b474b25f4a9ea68deb1ef64fc7cc43a33eff84c61"
+}

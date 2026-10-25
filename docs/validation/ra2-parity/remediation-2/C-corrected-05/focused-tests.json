@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "tests": [
+    {
+      "path": "docs/validation/ra2-parity/remediation-2/C-corrected-05/01-focused-veterancy.log",
+      "bytes": 389,
+      "sha256": "f6f990826f98f11a12e13fe3722b4d2901cda087c3f90a4b1a21da3bb66fbb80"
+    },
+    {
+      "path": "docs/validation/ra2-parity/remediation-2/C-corrected-05/02-full-veterancy.log",
+      "bytes": 1740,
+      "sha256": "f8062c6fba4f4f664409fdbdf7e6e5212e337723abf302ddc55035f29d9b6926"
+    }
+  ],
+  "scope": "Focused correction evidence only; complete full13 remains required."
+}

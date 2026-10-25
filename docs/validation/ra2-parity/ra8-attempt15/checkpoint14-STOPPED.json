@@ -1,0 +1,80 @@
+{
+  "utc": "2026-10-20T02:33:10.759060+00:00",
+  "freeze_commit": "c1e84b39d8c533a665e01f759103950a40ee3be0",
+  "runtime_commit": "66d0defb46c084a339d5602c74dc53526a68425d",
+  "command": [
+    "env",
+    "-u",
+    "RA2_DUEL_SEED",
+    "-u",
+    "RA2_DUEL_PAIR",
+    "RUST_TEST_NOCAPTURE=1",
+    "sh",
+    "scripts/validate_ra2_parity.sh",
+    "ra8"
+  ],
+  "status": "FAILED assertion / INTERRUPTED partial workspace,not a completed756 sweep",
+  "failure": "crossroads AmericaEasy/RussiaEasy seed0 None at original72000limit",
+  "completed_phases": [
+    {
+      "phase": 1,
+      "exit": 0,
+      "script_seconds": 1,
+      "observed_monotonic_phase_seconds": 1.0914363330230117,
+      "summary_line": "01 exit 0  1 s  cargo fmt --all -- --check"
+    },
+    {
+      "phase": 2,
+      "exit": 0,
+      "script_seconds": 0,
+      "observed_monotonic_phase_seconds": 0.04451070900540799,
+      "summary_line": "02 exit 0  0 s  git diff --check"
+    },
+    {
+      "phase": 3,
+      "exit": 0,
+      "script_seconds": 1,
+      "observed_monotonic_phase_seconds": 0.4194800829864107,
+      "summary_line": "03 exit 0  1 s  cargo clippy --workspace --all-targets -- -D warnings"
+    }
+  ],
+  "workspace_phase4_partial_seconds": 443.36345641699154,
+  "total_monotonic_seconds": 444.91888354200637,
+  "script_process_exit": -15,
+  "workspace_completed_targets": 8,
+  "workspace_completed_rust_counts": [
+    248,
+    0,
+    0
+  ],
+  "visible_m6_companion_successes": [
+    "a_soviet_player_left_with_an_armed_miner_still_finishes_the_match",
+    "the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first",
+    "crossroads_armies_finish_after_new_terrain_changes",
+    "ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes"
+  ],
+  "m6_main756": "INCOMPLETE, actual job failure; no completed winner count or new production table",
+  "unrun_phases": [
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13
+  ],
+  "production_table": {
+    "sha256": "6c3ec135cec4acb23ec3489e7324cfc760e12c6e0da6727fef8675901548d435",
+    "bytes": 49763,
+    "mtime_ns": 1792155643228129596,
+    "stale": true
+  },
+  "source_unique": 495,
+  "source_mismatches": [],
+  "owned_group_after_signal": [],
+  "failure_raw_sha256": "ecaf25765b06553564d560cc729cf3b4fa7104422f6a4d28a0edb917b962bbc3",
+  "failure_raw_bytes": 27555,
+  "note": "Later phase log files,if present,are older labels and not execution evidence. Capture-wrapper shell returned0 only because it recorded the terminated script; not a gate pass."
+}

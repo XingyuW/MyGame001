@@ -1,0 +1,20 @@
+{
+  "utc": "2026-10-21T03:15:00.947522+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "--",
+    "ra9_actual_producer_membership_rejects_nonmember_duplicate_and_corrupt_set",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "scope": "Actual unchanged loadedBlackEagle producer independent multi-factory membership and four intentional corruptions; no source-policy admission/native/final acceptance",
+  "ended_utc": "2026-10-21T03:17:09.948349+00:00",
+  "exit_code": 0,
+  "seconds": 129.0,
+  "input_mismatches": []
+}

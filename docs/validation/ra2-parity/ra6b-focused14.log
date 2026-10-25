@@ -1,0 +1,100 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 44.90s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 49 tests
+test ai::tests::ra6_deployed_and_temporally_frozen_units_wait_for_release_before_army_orders ... ok
+test building::tests::footprint_cells_ring_and_distance ... ok
+test ai::tests::ra5_bridge_memory_hash_covers_hut_identity_location_and_observed_collapse ... ok
+test ai::tests::a_sweep_starts_at_the_waypoint_nearest_to_an_enemy_start ... ok
+test building::tests::footprints_at_the_extremes_of_i32_do_not_overflow ... ok
+test ai::tests::an_idle_wave_member_rejoins_while_its_comrades_keep_fighting ... ok
+test combat::tests::a_shot_at_a_building_is_aimed_at_its_nearest_cell ... ok
+test combat::tests::applied_damage_follows_equation_2_at_the_limits ... ok
+test bridges::tests::ra5_bridge_saved_decks_and_hut_associations_are_hashed ... ok
+test combat::tests::extents_measure_between_the_nearest_points ... ok
+test combat::tests::in_range_includes_exactly_the_range ... ok
+test combat::tests::the_hash_of_the_projectiles_covers_aim_scatter_and_layer ... ok
+test crew::tests::the_survivors_are_the_refund_over_the_divisor_rounded_up ... ok
+test flight::tests::a_bay_is_hashed_with_every_slot_its_target_and_its_wait ... ok
+test economy::tests::fractions_lanes_and_radar_are_hashed ... ok
+test hash::tests::fnv1a64_matches_reference_vectors ... ok
+test flight::tests::the_docks_of_a_building_are_its_corners_first_and_all_different ... ok
+test hash::tests::integer_writes_are_little_endian ... ok
+test map::tests::a_cell_takes_one_vehicle_or_three_units_on_foot_and_never_both ... ok
+test map::tests::gems_and_mined_ground_are_marked_kept_in_step_with_the_ore_and_hashed ... ok
+test map::tests::the_hash_covers_the_spots_and_is_unchanged_without_units_on_foot ... ok
+test economy::tests::the_charges_of_an_item_sum_to_its_cost_at_the_limits ... ok
+test map_scale::tests::a_pad_keeps_water_ore_and_bridges_beside_the_yard_and_clears_only_what_joins_it ... ok
+test map_scale::tests::a_map_with_water_under_every_site_has_it_filled_in_and_one_without_room_is_an_error ... ok
+test map_scale::tests::a_made_start_in_a_forest_is_cleared_ground_that_keeps_the_maps_looks ... ok
+test map_scale::tests::the_size_grows_by_an_eighth_per_player_beyond_the_second_up_to_the_largest_map ... ok
+test map_scale::tests::two_players_play_the_map_file_itself ... ok
+test map_scale::tests::made_starts_stay_on_dry_land_where_there_is_room ... ok
+test map_scale::tests::enlarged_terrain_keeps_every_piece_of_land_and_water_and_its_symmetry ... ok
+test map_scale::tests::every_column_of_the_file_is_shown_in_order_and_mirrored_columns_stay_mirrored ... ok
+test props::tests::damage_never_goes_below_zero_and_marks_the_prop ... ok
+test props::tests::ids_and_cells_round_trip_and_only_scenery_looks_are_props ... ok
+test props::tests::ra5_bridge_health_damage_is_hashed ... ok
+test unit::tests::a_unit_on_foot_is_placed_between_its_spots ... ok
+test unit::tests::the_hash_covers_whether_an_order_may_crush ... ok
+test veterancy::tests::multipliers_multiply_and_scale_reload_and_speed_rounded_down ... ok
+test veterancy::tests::the_hash_covers_every_field_of_the_experience ... ok
+test veterancy::tests::the_rank_follows_the_thresholds_inclusively ... ok
+test visibility::tests::reveal_follows_equation_6_and_stays_inside_the_map ... ok
+test visibility::tests::the_hash_covers_every_cell_of_a_vision ... ok
+test world_objects::tests::ra5_cash_deadline_and_host_identity_are_hashed ... ok
+test schedule::tests::tick_counter_wraps_instead_of_overflowing ... ok
+test ai::tests::a_player_that_can_neither_fight_nor_earn_makes_its_last_stand ... ok
+test ai::tests::a_hidden_enemy_is_not_seen_and_a_launched_unit_is_not_the_players_to_command ... ok
+test ai::tests::a_cell_lit_only_by_a_unit_that_teleports_is_not_counted_on ... ok
+test ai::tests::ra6_shipped_utility_weapons_do_not_recruit_specialists_into_the_army ... ok
+test economy::tests::an_item_is_charged_unit_by_unit_and_exactly_its_cost_at_every_rate ... ok
+test match_setup::ra6_parasite_tests::ra6_an_attached_drone_keeps_its_owner_alive_in_a_long_game ... ok
+test map_scale::tests::missing_starts_are_made_far_apart_in_mirrored_pairs_with_ground_and_ore ... ok
+
+test result: ok. 49 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/ra6_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra6_definitions-5f9348c6175f019a)
+
+running 4 tests
+test ra6_repair_negative_damage_is_narrow_and_gunner_requires_all_thirteen_modes ... ok
+test ra6_strategic_timing_fields_are_required_bounded_and_hashed ... ok
+test ra6_area_fire_one_cell_minimum_is_narrow_and_new_numbers_are_bounded ... ok
+test ra6_each_new_flag_is_required_bounded_and_hashed ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.30s
+
+     Running tests/ra6_vehicles.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra6_vehicles-dcf06dc108fcbc82)
+
+running 27 tests
+test ra6_dolphin_sonic_hit_releases_squid_without_killing_it ... ok
+test ra6_chronosphere_rejects_unseen_area_and_kills_bad_or_occupied_landings ... ok
+test ra6_ifv_mode_twelve_uses_cow_shot_with_an_independent_mode_fixture ... ok
+test ra6_chronosphere_square_moves_both_owners_kills_organic_and_preserves_offsets ... ok
+test ra6_ivan_ifv_death_uses_crnuke_and_loses_its_passenger ... ok
+test ra6_kirov_crash_and_demo_death_damage_nearby_allies ... ok
+test ra6_pending_parasite_and_strategic_state_changes_affect_replay_hash ... ok
+test ra6_drone_infantry_bite_and_protected_vehicle_negative ... ok
+test ra6_drone_blocked_escape_retries_with_identity_hp_and_experience ... ok
+test ra6_public_timers_and_nuclear_marks_do_not_disclose_unseen_sources ... ok
+test ra6_reactor_chain_radiation_and_temporal_suppression ... ok
+test ra6_anti_air_destroys_paradrop_plane_before_it_drops ... ok
+test ra6_prism_caps_eight_supporters_and_supports_again_at_tick_80 ... ok
+test ra6_shipped_curtain_death_prevents_later_same_tick_infantry_command ... ok
+test ra6_repair_ifv_reaches_diagonal_but_not_two_cells_and_obeys_reload ... ok
+test ra6_squid_prevents_motion_but_ship_keeps_its_weapon ... ok
+test ra6_stationary_mirage_is_a_tree_to_adjacent_nondetectors ... ok
+test ra6_drone_enters_then_ticks_and_exits_only_on_its_own_kill ... ok
+test ra6_nuclear_missile_delays_200_ticks_and_radiates ... ok
+test ra6_storm_rejects_a_second_launch_and_preserves_its_charge ... ok
+test ra6_squid_culls_on_the_crossing_hit_and_cannot_cull_through_curtain ... ok
+test ra6_strategic_recharges_power_option_and_readiness_edges ... ok
+test ra6_ifv_uses_reference_modes_and_restores_empty_missiles ... ok
+test ra6_airport_paradrops_one_shootable_plane_and_full_side_payload ... ok
+test ra6_paradrop_blocked_landing_retains_payload_until_space_opens ... ok
+test ra6_curtain_covers_both_owners_kills_infantry_and_expires_at_1000 ... ok
+test ra6_storm_warning_exclusivity_duration_and_cloud_separation_are_deterministic ... ok
+
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.72s
+

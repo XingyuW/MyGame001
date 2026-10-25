@@ -1,0 +1,46 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0063]: missing fields `naval_goal`, `next_naval_scan`, `next_wave` and 4 other fields in initializer of `ai::AiController`
+    --> crates/sim/src/ai.rs:2198:30
+     |
+2198 |         let mut controller = AiController {
+     |                              ^^^^^^^^^^^^ missing `naval_goal`, `next_naval_scan`, `next_wave` and 4 other fields
+
+error[E0063]: missing field `hp` in initializer of `ai::UnitSnap`
+    --> crates/sim/src/ai.rs:2311:35
+     |
+2311 |         let standing = |id: &str| UnitSnap {
+     |                                   ^^^^^^^^ missing `hp`
+
+error[E0063]: missing field `hp` in initializer of `ai::BuildingSnap`
+    --> crates/sim/src/ai.rs:2326:20
+     |
+2326 |         let yard = BuildingSnap {
+     |                    ^^^^^^^^^^^^ missing `hp`
+
+error[E0063]: missing field `hp` in initializer of `ai::UnitSnap`
+    --> crates/sim/src/ai.rs:2427:55
+     |
+2427 |         let mut units = [false, true].map(|attacking| UnitSnap {
+     |                                                       ^^^^^^^^ missing `hp`
+
+error[E0063]: missing field `hp` in initializer of `ai::BuildingSnap`
+    --> crates/sim/src/ai.rs:2656:62
+     |
+2656 |         let building = |id: u32, kind: BuildingKind, x: i32| BuildingSnap {
+     |                                                              ^^^^^^^^^^^^ missing `hp`
+
+error[E0063]: missing field `hp` in initializer of `ai::UnitSnap`
+    --> crates/sim/src/ai.rs:2670:55
+     |
+2670 |         let unit = |id: u32, kind: &str, armed: bool| UnitSnap {
+     |                                                       ^^^^^^^^ missing `hp`
+
+error[E0063]: missing field `hp` in initializer of `ai::UnitSnap`
+    --> crates/sim/src/ai.rs:2825:55
+     |
+2825 |         let unit = |id: u32, owner: PlayerId, x: i32| UnitSnap {
+     |                                                       ^^^^^^^^ missing `hp`
+
+For more information about this error, try `rustc --explain E0063`.
+error: could not compile `sim` (lib test) due to 7 previous errors
+warning: build failed, waiting for other jobs to finish...

@@ -1,0 +1,184 @@
+ledger_id	data_scope	independent_assessment
+LIVE-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+TRANS-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+TRANS-02	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+SQUID-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+PROP-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+CAP-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+GATHER-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+XP-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+CREW-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+SPAWN-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+CAPTURE-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+START-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+LATE-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+NEAR-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+AI-CASUALTY-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+CONCEAL-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+LASTSTAND-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+REFUND-01	PRIMARY_DATA	Actual building Soylent300/1250/300 independently recomputed; 21 unit Soylent atoms remain explicit omitted resale, separate from Cost kill XP.
+DRONE-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+FIFO-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+SETTINGS-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+CSV-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+ID-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+BENCH-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+ROSTER-01	PRIMARY_DATA	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+MODE-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+CARD-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+SIDEBAR-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+CREDITS-01	PRIMARY_DATA	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+SMOKE-FAIL-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+MOVE-DUP-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+DOCK-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+AIRDOCK-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+AMMO-EVENT-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+CAPTURE-DOCK-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+DRAG-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+SIDEBAR-CLICK-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+BUILDSELECT-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+QUEUE-UI-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+GROUPCENTER-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+LAYOUT-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+SMOKE-MAPS-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+SMOKE-INPUT-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+SCENERY-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+TICK-EVENT-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+GROUPOCC-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+CROWD-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+JAM-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+OVERTAKE-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+CONTINUOUS-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+PATHALLOC-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+FREEUNIT-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+HUMANWORK-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+ORETARGET-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+NOCHASE-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+TRUESTATE-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+EVENTAUDIENCE-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+PLACEVISION-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+HARMLESS-01	PRIMARY_DATA	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+MISSINGDEF-01	PRIMARY_DATA	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+LOADORDER-01	PRIMARY_DATA	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+PROJECTILEBOUND-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+PROJECTILEVIS-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+AUDIOCAP-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+RENDERPERF-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+SETUPAPI-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+AIDISCARD-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+AIPLACE-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+AIPOLICY-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+AICONTROL-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+AIHOTKEY-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+AINAMES-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+SETUPERROR-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+AIBALANCE-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+TESTTIME-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+PLATFORM-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+WINDOW-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+SMOKETIMING-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+INPUTVIS-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+DOUBLELOG-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+FLOATVALID-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+WEBGL-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+CHECKEDASSET-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+MAPWORDING-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+DRAWORDER-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+SCHEMASIZE-01	PRIMARY_DATA	Actual175050-byte arsenal fits192KiB bound; all51 fixture versions current including bridge_ai schema3. Required/range/xref/unknown rejection paths inspected; no larger budget needed.
+GENERATEDRULES-01	PRIMARY_DATA	DATA-P1-01: closure counts/current exact rows verified; 399 receipt-route and 380 accepted-identity guards remain missing. NO-GO until corrected and meaningful negatives pass.
+FOOTPRINT-01	PRIMARY_DATA	Every sampled Foundation mismatch has a precise listed width/height difference; accept as declared generated-grid geometry, never original footprint equality.
+DOCKCOUNTCACHE-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+ALIASART-01	CONNECTED_INTERFACE	All176 added assets individually listed; repository generator paths present. Requested/common names/source identifiers are distinct from copied original prose. No Blender/media byte regeneration or dependency-notice completeness approval.
+RA6ASSUME-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+CREWXPSOURCE-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+INFANTRYPATH-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+COMBATDIFF-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+SOAKPEAK-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+PACKAGE-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+PACKAGESIZE-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+VERSION-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+DISPLAY-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+LICENSE-01	CONNECTED_INTERFACE	All176 added assets individually listed; repository generator paths present. Requested/common names/source identifiers are distinct from copied original prose. No Blender/media byte regeneration or dependency-notice completeness approval.
+OLD-CLOSURES-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-02	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-03	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-04	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-05	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-06	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-07	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-08	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-09	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-10	PRIMARY_DATA	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-11	PRIMARY_DATA	DATA-P1-01: closure counts/current exact rows verified; 399 receipt-route and 380 accepted-identity guards remain missing. NO-GO until corrected and meaningful negatives pass.
+R56-12	PRIMARY_DATA	Actual building Soylent300/1250/300 independently recomputed; 21 unit Soylent atoms remain explicit omitted resale, separate from Cost kill XP.
+R56-13	PRIMARY_DATA	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-14	PRIMARY_DATA	DATA-P1-01: closure counts/current exact rows verified; 399 receipt-route and 380 accepted-identity guards remain missing. NO-GO until corrected and meaningful negatives pass.
+R56-15	PRIMARY_DATA	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-16	PRIMARY_DATA	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-17	PRIMARY_DATA	DATA-P2-01: stale UNCOMPILED/UNRUN banners contradict actual canonical bounded compilation/execution; do not change authority/literals to disguise this.
+R56-18	PRIMARY_DATA	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-19	PRIMARY_DATA	Every sampled Foundation mismatch has a precise listed width/height difference; accept as declared generated-grid geometry, never original footprint equality.
+R56-20	PRIMARY_DATA	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-21	PRIMARY_DATA	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-22	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-23	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-24	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-25	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-26	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-27	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-28	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-29	PRIMARY_DATA	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-30	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-31	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-32	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-33	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-34	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-35	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-36	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-37	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-38	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-39	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-40	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-41	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-42	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-43	CONNECTED_INTERFACE	Retain27-tick spacing; MissileSpawn belongs to spawnees. Source metadata does not prove launcher10-frame fidelity or every regeneration boundary.
+R56-44	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-45	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-46	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-47	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-48	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-49	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-50	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-51	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-52	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-53	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-54	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-55	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-56	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-57	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-58	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-59	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-60	PRIMARY_DATA	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-61	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-62	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-63	CONNECTED_INTERFACE	Retain27-tick spacing; MissileSpawn belongs to spawnees. Source metadata does not prove launcher10-frame fidelity or every regeneration boundary.
+R56-64	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-65	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-66	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-67	PRIMARY_DATA	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-68	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+R56-69	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+DEATH-MOD-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+SPAWN-SPACING-02	PRIMARY_DATA	Retain27-tick spacing; MissileSpawn belongs to spawnees. Source metadata does not prove launcher10-frame fidelity or every regeneration boundary.
+HARVEST-SOURCE-02	PRIMARY_DATA	One bail per19 work ticks is named model assumption; no source Harvest.Rate or absent HarvesterLoadRate proof invented. Native18/19 boundary remains separate.
+TYPE-IMMUNE-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+BOMBSIGHT-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+REVEAL-SW-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+VHP-01	PRIMARY_DATA	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+RETURN-FIRE-01	PRIMARY_DATA	Exact false-only current policy is explicit uncertainty; native move/idle/AttackMove/explicit Attack controls are different premises; no generic original true/default semantics accepted.
+TREE-CURSOR-01	CONNECTED_INTERFACE	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+MIRAGE-GATE-01	PRIMARY_DATA	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+EXP-SPREAD-01	PRIMARY_DATA	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+FIRE-ANIMATION-01	PRIMARY_DATA	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.
+DEFAULT-DEATH-01	PRIMARY_DATA	Retain exact individual limitation and alias; data/source presence is not final native/performance/user acceptance.

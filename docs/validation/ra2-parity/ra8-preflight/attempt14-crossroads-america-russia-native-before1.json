@@ -1,0 +1,31 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "env": {
+    "RA8_ECONOMY_TRACE": "1",
+    "RA8_NATIVE_TIMELINE_TRACE": "1"
+  },
+  "start_utc": "2026-10-20T02:34:06.939461+00:00",
+  "elapsed_seconds": 15.769839791988488,
+  "exit": 101,
+  "source_before_retained": {
+    "crates/sim/src/ai.rs": "88497b2dde9a95a704e2d6439f85e84ea172bd4d04b2aa92dc148cc254f1d860",
+    "crates/sim/src/ai/strategy.rs": "c4c72cbaa6dcbaf83ca949651e98a661845b4257be42b4f008d82eee153923c8",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/game/tests/ra8_gate_matches.rs": "8e3aec72b160b9f28df5d07401082815992d9309e5184eb0d600af3b2ba5338f"
+  },
+  "instrumented_helper_sha256": "534c991bf212a3746169a16e068bcef67f344967fa3488971b9949f1dba43b52",
+  "log_sha256": "df24fd9b0930f4584871f59903448de78bd149012aa72e23f3cc411cdb1655f4",
+  "diagnostic_scope": "Observational names,event windows,credit/queue/repairing/power/controller snapshots only;no gameplay state writes. HP increase is not exact repair-debit attribution."
+}

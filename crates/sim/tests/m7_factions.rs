@@ -132,7 +132,8 @@ fn skirmish_variant(name: &str, edits: &[(&str, &str)]) -> PathBuf {
 }
 
 /// The start of the first (red) faction's roster in the skirmish fixture.
-const RED_ROSTER: &str = "            id: \"red\",\n            roster_buildings: [\n";
+const RED_ROSTER: &str =
+    "            label: \"Red\",\n            side: \"none\",\n            roster_buildings: [\n";
 
 fn assert_rejected(
     result: Result<SkirmishDefinitions, DataError>,
@@ -443,7 +444,7 @@ fn the_ai_file_is_checked_against_the_roster_of_every_faction() {
     let mut neither = without(0, &[turret]);
     neither.factions[1].roster.remove(&turret);
     let (field, found) = invalid_found(check(&neither).expect_err("dead entry"));
-    assert_eq!(field, "build_order[5]");
+    assert_eq!(field, "plans[0].build_order[5]");
     assert_eq!(
         found,
         "\"turret\", which no faction of the skirmish file offers"
@@ -455,7 +456,7 @@ fn the_ai_file_is_checked_against_the_roster_of_every_faction() {
     assert_eq!(
         (field.as_str(), found.as_str()),
         (
-            "army[2]",
+            "plans[0].army[2]",
             "\"rifleman\", which no faction of the skirmish file offers"
         )
     );
@@ -464,21 +465,24 @@ fn the_ai_file_is_checked_against_the_roster_of_every_faction() {
         invalid_found(check(&without(1, &[building(&data, "power")])).expect_err("power"));
     assert_eq!(
         (field.as_str(), found.as_str()),
-        ("power", "\"power\", which faction \"blue\" does not offer")
+        (
+            "plans[0].power",
+            "\"power\", which faction \"blue\" does not offer"
+        )
     );
     let (field, found) =
         invalid_found(check(&without(1, &[unit(&data, "harvester")])).expect_err("harvester"));
     assert_eq!(
         (field.as_str(), found.as_str()),
         (
-            "harvester",
+            "plans[0].harvester",
             "\"harvester\", which faction \"blue\" does not offer"
         )
     );
     // A faction whose plan lacks a prerequisite: the factory needs the refinery.
     let (field, found) =
         invalid_found(check(&without(1, &[building(&data, "refinery")])).expect_err("refinery"));
-    assert_eq!(field, "build_order[3]");
+    assert_eq!(field, "plans[0].build_order[3]");
     assert_eq!(
         found,
         "\"factory\", whose prerequisite \"refinery\" is not listed before it in the plan of \
@@ -490,10 +494,13 @@ fn the_ai_file_is_checked_against_the_roster_of_every_faction() {
     let (field, found) = invalid_found(check(&without(1, &[tank, rifleman])).expect_err("no army"));
     assert_eq!(
         (field.as_str(), found.as_str()),
-        ("army", "no unit type in the plan of faction \"blue\"")
+        (
+            "plans[0].army",
+            "no unit type in the plan of faction \"blue\""
+        )
     );
     let error = check(&without(1, &[tank])).expect_err("riflemen only");
-    assert_eq!(error.field, "army");
+    assert_eq!(error.field, "plans[0].army");
     assert_eq!(
         error.kind,
         DataErrorKind::MissingEntry {
@@ -504,7 +511,7 @@ fn the_ai_file_is_checked_against_the_roster_of_every_faction() {
     // A faction that lacks the factory, which produces the harvester and the tank.
     let (field, found) =
         invalid_found(check(&without(1, &[building(&data, "factory")])).expect_err("factory"));
-    assert_eq!(field, "harvester");
+    assert_eq!(field, "plans[0].harvester");
     assert!(
         found.contains("whose producer \"factory\" is not listed in the build order")
             && found.ends_with("in the plan of faction \"blue\""),
@@ -532,7 +539,7 @@ fn match_setup_rejects_a_computer_player_of_a_faction_without_a_complete_plan() 
         }) => {
             assert_eq!(
                 (player, faction.as_str(), field.as_str()),
-                (P1, "blue", "power")
+                (P1, "blue", "plans[0].power")
             );
             assert!(problem.contains("does not offer"), "{problem}");
         }
@@ -547,13 +554,13 @@ fn match_setup_rejects_a_computer_player_of_a_faction_without_a_complete_plan() 
     let message = MatchSetupError::AiPlan {
         player: P1,
         faction: "blue".into(),
-        field: "power".into(),
+        field: "plans[0].power".into(),
         problem: "x".into(),
     }
     .to_string();
     assert_eq!(
         message,
-        "computer player 1 of faction \"blue\": the AI file's power: x"
+        "computer player 1 of faction \"blue\": the AI file's plans[0].power: x"
     );
     drop(app);
 }
@@ -617,15 +624,18 @@ fn computer_players_build_only_what_their_faction_offers_and_finish_the_match() 
     // need not be in the roster).
     skirmish.factions[0].roster.remove(&rifleman);
     skirmish.factions[1].roster.remove(&turret);
-    let red_plan = data.ai.plan_for(&skirmish.factions[0]);
-    let blue_plan = data.ai.plan_for(&skirmish.factions[1]);
+    let red_plan = data.ai.plan_for(&skirmish.factions[0]).expect("a plan");
+    let blue_plan = data.ai.plan_for(&skirmish.factions[1]).expect("a plan");
     let rifleman_kind = data.definitions.unit_kind("rifleman").expect("rifleman");
     let turret_kind = data.definitions.building_kind("turret").expect("turret");
     assert!(!red_plan.army.contains(&rifleman_kind));
     assert!(blue_plan.army.contains(&rifleman_kind));
     assert!(red_plan.build_order.contains(&turret_kind));
     assert!(!blue_plan.build_order.contains(&turret_kind));
-    assert_eq!(red_plan.build_order.len(), data.ai.build_order.len());
+    assert_eq!(
+        red_plan.build_order.len(),
+        data.ai.plans[0].build_order.len()
+    );
     let (outcome, queued, hashes) = play(&data, &skirmish, 36_000);
     assert!(
         matches!(outcome, Some(MatchOutcome::Won { .. })),
@@ -652,4 +662,60 @@ fn computer_players_build_only_what_their_faction_offers_and_finish_the_match() 
     let ai = app.world().resource::<sim::AiPlayers>();
     assert_eq!(ai.controller(P0).expect("red").plan(), &red_plan);
     assert_eq!(ai.controller(P1).expect("blue").plan(), &blue_plan);
+}
+
+#[test]
+fn ra9_roster_exactly_sixty_four_loads_and_the_sixty_fifth_is_rejected() {
+    assert_eq!(MAX_ROSTER_ENTRIES, 64);
+    // An independent runtime fixture has exactly 64 valid, distinct, producible buildings.
+    // No committed fixture/generated/source data is changed. MAX_BUILDING_TYPES is also64,
+    // so the 65th roster entry deliberately repeats valid b0: the preparse list-size error
+    // must win over semantic DuplicateId. This tests the actual native loader boundary.
+    let entries = (0..64)
+        .map(|index| {
+            format!(
+                r#"(
+        id: "b{index}", sprite: "b{index}", width: 1, height: 1,
+        cost: 10, build_time: 1, producer: "b0", prerequisites: [],
+        power_produced: 0, power_consumed: 0, sell_value: 5, free_units: [],
+    ),"#
+            )
+        })
+        .collect::<String>();
+    let economy = temp_file(
+        "ra9_roster_economy",
+        &format!(
+            r#"(
+        schema_version:2, placement_distance:3, buildings:[{entries}],
+        units:[], harvesters:[], refineries:[], refunds:[],
+    )"#
+        ),
+    );
+    let defs = sim::load_definitions(fixture("data/units_economy.ron"), economy)
+        .expect("64 valid building definitions");
+    assert_eq!(defs.buildings().len(), 64);
+    let ids = (0..64)
+        .map(|index| format!("\"b{index}\","))
+        .collect::<String>();
+    let text = |ids: &str| {
+        format!(
+            r#"(
+        schema_version:3,starting_credits:1500,sides:[],
+        factions:[(id:"limit",label:"Limit",side:"none",roster_buildings:[{ids}],
+            roster_units:[],buildings:[(building:"b0",x:0,y:0)],units:[])],
+        maps:[(id:"skirmish_40x40",starts:[(x:5,y:5),(x:32,y:32)])],
+    )"#
+        )
+    };
+    let path = temp_file("ra9_roster_exact64", &text(&ids));
+    let accepted = load_skirmish(&path, &defs).expect("exactly64");
+    assert_eq!(accepted.factions[0].roster.len(), 64);
+    let path = temp_file("ra9_roster_exact65", &text(&format!("{ids}\"b0\",")));
+    assert_rejected(
+        load_skirmish(&path, &defs),
+        "factions[0].roster_buildings",
+        DataErrorKind::TooManyEntries {
+            max: MAX_ROSTER_ENTRIES,
+        },
+    );
 }

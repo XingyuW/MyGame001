@@ -1,0 +1,22 @@
+{
+  "utc": "2026-10-21T11:07:17.309224+00:00",
+  "scope": "COPY_ONLY_MINIMAL_ACTUAL_DEFECT_CORRECTION_AND_FIXTURE_GEOMETRY_UNVALIDATED_UNTIL_RERUN",
+  "records": [
+    {
+      "path": "crates/sim/tests/ra9_start_setup.rs",
+      "before_sha256": "5995c654485ac76ea86342d5e107c478e18f2ff2977ca44997857f1b35bd6ae5",
+      "after_sha256": "170d31c288d3fb41348c1da1f089ae7941f132bf4b23dc72035baebdc5619ed3",
+      "preimage": "ra9-preliminary-logs/182-before-crates__sim__tests__ra9_start_setup.rs"
+    },
+    {
+      "path": "crates/sim/src/combat.rs",
+      "before_sha256": "fe3eeb59c3543ccaefb98f643fb50af67a4f061fb91d8136cc98af558cd26389",
+      "after_sha256": "9601a8f87b07f569d3e18aa115fc6913e37c7c04f238d1d7afd22d9870b99dc6",
+      "preimage": "ra9-preliminary-logs/182-before-crates__sim__src__combat.rs"
+    }
+  ],
+  "before_proof": "181-04 actual real WeaponFired+UnitDestroyed bracketed by two MoveCompleted for one accepted AttackMove; no-enemy control passed. D29item7 ends the order at completion, D32 retains that behavior.",
+  "runtime_fix": "Continue_attack_move receives the actual Mobile; after combat already at settled destination, clear rather than create a duplicate zero-length move. No new state, cap, weapon/range/acquisition policy or balance change.",
+  "yard_fixture_fix": "Candidate path now tests actual Grid::room against idle starting-unit holders, as well as building footprints; failed arbitrary blocked candidate is not proof of broken yard setup. Retain all maps/counts/occupancy/public-command assertions.",
+  "pending": "Only affected yard and AttackMove named cases rerun during phase04 lease; full source binding and mandatory canonical gates after release."
+}

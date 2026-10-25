@@ -1,0 +1,90 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 10.15s
+     Running tests/m6_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_ai-39cf04a6b4df1362)
+
+running 11 tests
+test a_broke_ai_without_army_sells_a_building_it_does_not_need_to_fund_units ... ok
+test the_ai_attacks_a_visible_enemy_near_its_base_with_its_army_at_home ... ok
+test an_ai_with_no_credits_and_no_harvester_neither_panics_nor_floods_the_queue ... ok
+test the_ai_completes_its_build_order_within_the_tick_budget ... ok
+test the_ai_rebuilds_a_building_it_lost ... ok
+test idle_harvesters_without_ore_are_sent_to_work_at_most_once_per_retry_interval ... ok
+test the_ai_ignores_what_its_player_does_not_see ... ok
+test the_ai_issues_no_rejected_command_in_the_standard_scenario ... ok
+test a_run_with_another_difficulty_takes_another_course ... ok
+test ai_against_ai_matches_on_the_fixture_map_end_with_a_winner ... ok
+test ai_against_ai_matches_on_every_shipped_map_end_with_a_winner has been running for over 60 seconds
+test ai_against_ai_matches_on_every_shipped_map_end_with_a_winner ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 460.33s
+
+     Running tests/m7_factions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m7_factions-76769632057fe56f)
+
+running 7 tests
+test a_player_added_without_a_faction_may_produce_every_item ... ok
+test the_rosters_of_the_skirmish_fixture_load_as_listed ... ok
+test the_ai_file_is_checked_against_the_roster_of_every_faction ... ok
+test match_setup_rejects_a_computer_player_of_a_faction_without_a_complete_plan ... ok
+test roster_entries_are_checked_against_the_definitions ... ok
+test production_outside_the_roster_is_rejected_without_changing_state ... ok
+test computer_players_build_only_what_their_faction_offers_and_finish_the_match ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+
+     Running tests/ra1_match.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra1_match-5b6e217a0a96055c)
+
+running 20 tests
+test a_random_country_needs_a_player_of_the_match_and_a_country_to_draw ... ok
+test computer_players_are_allied_against_the_human_unless_the_match_is_free_for_all ... ok
+test a_country_starts_with_its_base_unit_and_the_starting_units_of_its_side ... ok
+test a_captured_yard_undeploys_into_the_base_unit_of_its_own_side ... ok
+test a_player_with_buildings_lives_without_any_unit_in_both_games ... ok
+test a_base_unit_carried_by_a_transport_still_counts_for_its_owner ... ok
+test deploying_the_base_unit_in_place_puts_the_yard_where_a_yard_start_puts_it ... ok
+test starting_units_follow_the_budget_of_the_unit_count ... ok
+test the_options_of_a_match_are_part_of_its_state ... ok
+test the_starting_credits_are_checked_against_the_range_and_step_of_the_rules ... ok
+test the_unit_count_is_checked_against_the_range_of_the_rules ... ok
+test without_an_mcv_start_the_construction_yard_stands_at_the_start_position ... ok
+test undeploy_is_rejected_without_changing_state ... ok
+test in_a_short_game_a_player_without_buildings_and_base_unit_is_defeated ... ok
+test a_construction_yard_undeploys_into_its_base_unit_and_deploys_again ... ok
+test random_countries_are_drawn_from_the_generator_of_the_simulation ... ok
+test in_a_long_game_a_player_is_defeated_only_without_buildings_and_units ... ok
+test a_computer_player_deploys_its_base_unit_at_once_and_builds_its_plan ... ok
+test an_armed_miner_of_a_computer_player_mines_and_is_not_drafted_into_its_army ... ok
+test computer_players_of_every_pairing_of_sides_finish_the_fixture_match ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.03s
+
+     Running tests/ra2_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra2_ai-de3943e87c747659)
+
+running 3 tests
+test super_me_multiplies_the_rate_by_ten_and_pays_one_credit ... ok
+test a_computer_player_places_its_buildings_within_their_reach_of_a_base_building ... ok
+test computer_players_finish_their_matches_under_the_rules_of_ra2 ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.25s
+
+     Running tests/ra3_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra3_ai-81502e211463e370)
+
+running 1 test
+test an_armed_harvester_that_fights_as_a_last_resort_is_not_called_back_to_harvest ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/ra4_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra4_ai-4dcc50c27d5fddc2)
+
+running 2 tests
+test two_players_who_have_spent_each_other_make_their_last_stand_and_the_match_ends ... ok
+test computer_players_finish_their_matches_with_veterans_and_survivors ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.22s
+
+     Running tests/ra5_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra5_ai-703ef801eff29d3d)
+
+running 1 test
+test equal_brutal_armies_finish_thousand_lakes_with_regrowing_ore ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 38.44s
+

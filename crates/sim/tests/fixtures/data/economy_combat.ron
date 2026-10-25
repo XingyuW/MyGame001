@@ -3,7 +3,7 @@
 // values are fixture data, independent of the production balance in assets/data/economy.ron
 // (invariant I10).
 (
-    schema_version: 1,
+    schema_version: 2,
     placement_distance: 3,
     buildings: [
         (
@@ -159,6 +159,7 @@
     harvesters: [
         (
             unit: "harvester",
+            harvest_interval: 1,
             capacity: 20,
             harvest_rate: 3,
         ),
@@ -166,7 +167,9 @@
     refineries: [
         (
             building: "refinery",
+            credits_per_gem: 4,
             credits_per_ore: 2,
         ),
     ],
+    refunds: [],
 )

@@ -1,0 +1,9 @@
+    Finished `release` profile [optimized] target(s) in 0.31s
+     Running tests/m13_grown_maps.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m13_grown_maps-ee40a9cea2db76e9)
+
+running 1 test
+grown exact Some(Won { winner: PlayerId(1), tick: 68628 }) after 68629 ticks, defeated {PlayerId(0): 66332, PlayerId(2): 12823, PlayerId(3): 13027, PlayerId(4): 6805, PlayerId(5): 6534, PlayerId(6): 16594, PlayerId(7): 23291, PlayerId(8): 68628, PlayerId(9): 28092}
+test a_ten_player_match_on_the_smallest_map_is_played_to_its_end ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 23.39s
+

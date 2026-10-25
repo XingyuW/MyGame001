@@ -1,0 +1,115 @@
+--- crates/game/tests/ra8_gate_matches.rs
++++ crates/game/tests/ra8_gate_matches.rs
+@@ -477,14 +477,14 @@
+                 attacker, target, ..
+             } => {
+                 let attacker = trace
+-                    .units
++                    .buildings
+                     .get(attacker)
+-                    .or_else(|| trace.buildings.get(attacker))
++                    .or_else(|| trace.units.get(attacker))
+                     .map_or("?", String::as_str);
+                 let target = trace
+-                    .units
++                    .buildings
+                     .get(target)
+-                    .or_else(|| trace.buildings.get(target))
++                    .or_else(|| trace.units.get(target))
+                     .map_or("?", String::as_str);
+                 (format!("shots {attacker}->{target}"), 1)
+             }
+@@ -534,14 +534,14 @@
+             } = event
+             {
+                 let target_kind = trace
+-                    .units
++                    .buildings
+                     .get(target)
+-                    .or_else(|| trace.buildings.get(target))
++                    .or_else(|| trace.units.get(target))
+                     .map(String::as_str);
+                 let attacker_kind = trace
+-                    .units
++                    .buildings
+                     .get(attacker)
+-                    .or_else(|| trace.buildings.get(attacker))
++                    .or_else(|| trace.units.get(attacker))
+                     .map(String::as_str);
+                 eprintln!(
+                     "service shot tick{at} {attacker:?} {attacker_kind:?} -> {target:?} {target_kind:?}"
+@@ -635,8 +635,9 @@
+             *trace.counters.entry(key).or_default() += units.len() as u64;
+         }
+     }
+-    if at % 60000 == 59999 {
+-        eprintln!("economy window {}..{} {:?}", at - 59999, at, trace.counters);
++    let window = if std::env::var_os("RA8_NATIVE_TIMELINE_TRACE").is_some() {6000} else {60000};
++    if at % window == window - 1 {
++        eprintln!("economy window {}..{} {:?}", at - (window - 1), at, trace.counters);
+         trace.counters.clear();
+     }
+     world.insert_resource(trace);
+@@ -742,12 +743,17 @@
+                 .before(sim::SimCoreSet(sim::SimSet::Commands)),
+         );
+     }
++    app.init_resource::<FineDamageTrace>();
++    app.add_systems(SimSchedule,(|w:&mut bevy::ecs::world::World| fine_damage_trace(w,"before_economy")).in_set(sim::SimSet::Economy).before(trace_before_economy).before(sim::SimCoreSet(sim::SimSet::Economy)));
++    app.add_systems(SimSchedule,(|w:&mut bevy::ecs::world::World| fine_damage_trace(w,"after_economy")).in_set(sim::SimSet::Economy).after(trace_after_economy).after(sim::SimCoreSet(sim::SimSet::Economy)));
++    app.add_systems(SimSchedule,(|w:&mut bevy::ecs::world::World| fine_damage_trace(w,"before_combat")).in_set(sim::SimSet::Combat).before(sim::SimCoreSet(sim::SimSet::Combat)));
++    app.add_systems(SimSchedule,(|w:&mut bevy::ecs::world::World| fine_damage_trace(w,"after_combat")).in_set(sim::SimSet::Combat).after(sim::SimCoreSet(sim::SimSet::Combat)));
+     let mut losses: BTreeMap<PlayerId, BTreeSet<SimId>> = BTreeMap::new();
+     let mut outcome = None;
+     for at in 0_u64..limit {
+         let world = app.world_mut();
+         world.run_schedule(SimSchedule);
+-        if at % 60000 == 59999 {
++        if at % 60000 == 59999 || (std::env::var_os("RA8_NATIVE_TIMELINE_TRACE").is_some() && at % 6000 == 5999) || (std::env::var_os("RA8_NATIVE_TIMELINE_TRACE").is_some() && at >= 44000 && at % 1000 == 999) {
+             dump(world);
+         }
+         let before = std::mem::take(&mut losses);
+@@ -757,6 +763,16 @@
+             .cloned()
+             .collect();
+         trace_economy_events(world, &events, at);
++        if at >= 44000 {
++            for event in &events {
++                if matches!(event, SimEvent::UnitSpawned {..} | SimEvent::UnitDestroyed {..} | SimEvent::BuildingSold {..} | SimEvent::BuildingDestroyed {..} | SimEvent::ProductionCancelled {..}) {
++                    eprintln!("native late lifecycle tick{at} {event:?}");
++                }
++            }
++            if world.resource::<CommandQueue>().iter().any(|issued| matches!(issued.command, sim::Command::QueueProduction {..}|sim::Command::SellBuilding {..})) {
++                eprintln!("native late decisions tick{at} {:?}", world.resource::<CommandQueue>());
++            }
++        }
+         for event in events {
+             match event {
+                 SimEvent::CommandRejected {
+@@ -924,6 +940,18 @@
+     }
+ }
+ 
++#[derive(bevy::prelude::Resource, Default)]
++struct FineDamageTrace(BTreeMap<SimId,i32>);
++fn fine_damage_trace(world: &mut bevy::ecs::world::World, phase: &str) {
++ let tick=world.resource::<sim::SimTick>().0;
++ if !(60000..=60500).contains(&tick) { return; }
++ let rows:Vec<_>=world.query::<(&SimId,&sim::Health,Option<&sim::Experience>,Option<&sim::Position>,Option<&sim::Weapon>)>().iter(world)
++ .filter(|(id,_,_,_,_)| [27,158,171].contains(&id.0)).map(|(id,h,e,p,w)| (*id,h.hit_points,format!("{e:?} {p:?} {w:?}"))).collect();
++ for (id,h,detail) in rows {
++  let old=world.resource_mut::<FineDamageTrace>().0.insert(id,h);
++  if old!=Some(h) || (tick==60000 && phase=="before_economy") {eprintln!("fine damage tick{tick} phase{phase} {id:?} hp{old:?}->{h} {detail}");}
++ }
++}
+ fn dump(world: &mut bevy::ecs::world::World) {
+     let definitions = world.resource::<sim::Definitions>().clone();
+     eprintln!("snapshot tick {:?}", world.resource::<sim::SimTick>());
+@@ -934,6 +962,7 @@
+             state.credits(),
+             state.queues().collect::<Vec<_>>()
+         );
++        if std::env::var_os("RA8_NATIVE_TIMELINE_TRACE").is_some() {eprintln!("native timeline {player:?} power{}/{} low{} repairing{:?}",state.power_produced(),state.power_consumed(),state.low_power(),state.repairing());}
+     }
+     if std::env::var_os("RA8_NAVAL_TRACE").is_some() {
+         let ships: Vec<_> = world

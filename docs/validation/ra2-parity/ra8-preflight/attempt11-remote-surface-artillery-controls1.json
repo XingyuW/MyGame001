@@ -1,0 +1,27 @@
+{
+  "label": "attempt11-remote-surface-artillery-controls1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "artillery",
+    "--",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T16:44:22.920920+00:00",
+  "elapsed_seconds": 0.5004916660254821,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "f924449f19a2be8b89c7a1a4051217af6621d9f7033c355f52e3752479899911"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "f924449f19a2be8b89c7a1a4051217af6621d9f7033c355f52e3752479899911"
+  },
+  "log_sha256": "4ca10cefe068ea739558756c20e2b510913cda1922fa53176b3e8ffb70aa6efa"
+}

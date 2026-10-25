@@ -1,0 +1,21 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.40s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra8_ai-281c94436fee249f)
+
+running 1 test
+remote replacement healthytrue: queued[], artillery shots3, destroyedtrue, moving frontCellPos { x: 27, y: 13 }
+remote replacement healthyfalse: queued[CellPos { x: 36, y: 14 }, CellPos { x: 9, y: 14 }], artillery shots0, destroyedfalse, moving frontCellPos { x: 31, y: 14 }
+
+thread 'ra8_a_remote_replacement_tank_does_not_pull_advancing_artillery_back_home' (8100061) panicked at crates/sim/tests/ra8_ai.rs:1492:9:
+advanced artillery must retain a real offensive contribution instead of returning behind a remote newcomer
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_a_remote_replacement_tank_does_not_pull_advancing_artillery_back_home ... FAILED
+
+failures:
+
+failures:
+    ra8_a_remote_replacement_tank_does_not_pull_advancing_artillery_back_home
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 77 filtered out; finished in 1.85s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

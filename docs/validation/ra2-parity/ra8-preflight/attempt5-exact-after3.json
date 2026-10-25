@@ -1,0 +1,30 @@
+{
+  "source_sha256": {
+    "crates/sim/src/ai.rs": "32755e08cffe95e6ae632291c9b28dbeabc2c9a908269be0a33aba8989bff031",
+    "crates/sim/src/ai/strategy.rs": "98eac27829a29265681358763fbd8c085b05129e544a1eb8e18092030d1d7c68"
+  },
+  "cases": [
+    {
+      "name": "ra8_gate_liberty_iraq_america_brutal_seed_zero_finishes",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate_liberty_iraq_america_brutal_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "started_utc": "2026-10-16T09:39:03.379578+00:00",
+      "elapsed_seconds": 202.5937466250034,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-exact-after3-01.log"
+    }
+  ],
+  "policy": "serial stop at first failure; actual default setup/seed0 and unchanged rejection/invariant/R29 limits"
+}

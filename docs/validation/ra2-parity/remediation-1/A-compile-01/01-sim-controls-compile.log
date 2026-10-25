@@ -1,0 +1,17 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+warning: unused import: `CellPos`
+ --> crates/sim/tests/ra9_bay_current_state.rs:4:17
+  |
+4 | use sim::{Cell, CellPos, Command, Grid, Mobile, SimEvent, SimId, SimTick, SpecialState, Weapon};
+  |                 ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `sim` (test "ra9_bay_current_state") generated 1 warning (run `cargo fix --test "ra9_bay_current_state" -p sim` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 31.77s
+  Executable tests/ra9_bay_current_state.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_bay_current_state-6886ee217ccfff6d)
+  Executable tests/ra9_crate_cargo_census.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_crate_cargo_census-dbff979393b1ff47)
+  Executable tests/ra9_guard_effective_targets.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_guard_effective_targets-d255aabcb20bc473)
+  Executable tests/ra9_runtime_liveness.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_runtime_liveness-3337c652fc1497bc)
+  Executable tests/ra9_specialist_firepower.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_specialist_firepower-1d9b012028fac90f)
+  Executable tests/ra9_temporal_sources.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_temporal_sources-1525d6df27640acb)

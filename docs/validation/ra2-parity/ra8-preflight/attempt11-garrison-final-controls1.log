@@ -1,0 +1,13 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 20.33s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 5 tests
+test ra8_damaged_own_garrison_is_no_economy_building_and_depleted_base_recovers_its_infantry ... ok
+test ra8_garrison_admission_keeps_source_cost_cash_real_income_and_actual_defensive_fire ... ok
+test ra8_garrison_quota_and_capacity_include_known_incoming_occupiers ... ok
+test ra8_near_base_occupier_enters_a_real_civilian_garrison ... ok
+test ra8_unfunded_garrison_recovery_retains_its_released_infantry_for_real_offence ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 97 filtered out; finished in 0.28s
+

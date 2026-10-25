@@ -1,0 +1,44 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 16.13s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 15 tests
+test command::ra8_intent_tests::ra8_certified_strategic_intent_waits_after_real_between_stage_power_plant_destruction ... ok
+test command::ra8_intent_tests::ra8_internal_and_public_commands_keep_fifo_across_ordinary_and_ability_boundaries ... ok
+test command::ra8_intent_tests::ra8_internal_mixed_and_fully_stale_selections_prune_only_witnessed_lifecycle_changes ... ok
+test command::ra8_intent_tests::ra8_internal_targets_cancel_after_death_capture_or_real_detector_loss_but_public_stays_strict ... ok
+test command::ra8_intent_tests::ra8_intrinsically_invalid_internal_intents_still_reject_with_original_public_reasons ... ok
+test command::ra8_intent_tests::ra8_pending_intent_origin_witness_payload_and_order_are_value_hashed ... ok
+test command::ra8_intent_tests::ra8_power_lifecycle_keeps_public_intrinsic_duplicate_fifo_and_additional_errors_strict ... 
+thread 'command::ra8_intent_tests::ra8_power_lifecycle_keeps_public_intrinsic_duplicate_fifo_and_additional_errors_strict' (7341224) panicked at crates/sim/src/ra8_intents.rs:1807:13:
+intrinsic_power publicfalse: [true]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test command::ra8_intent_tests::ra8_private_bridge_goal_authorizes_before_readiness_and_hashes_its_distinct_action ... ok
+test command::ra8_intent_tests::ra8_private_bridge_goal_planning_and_pending_hash_ignore_unseen_naval_blockers ... ok
+test command::ra8_intent_tests::ra8_private_bridge_goal_preserves_fifo_and_rechecks_arrival_occupancy ... ok
+test command::ra8_intent_tests::ra8_private_bridge_goal_waits_for_hidden_occupancy_then_consumes_engineer_only_after_clear ... ok
+test command::ra8_intent_tests::ra8_service_healing_certificate_keeps_public_intrinsic_capacity_and_fifo_errors_strict ... ok
+test command::ra8_intent_tests::ra8_strategic_erasure_cancels_only_a_certified_later_actor_change ... erasure lifecycle internal: certified=true rejected=false []
+erasure lifecycle public: certified=false rejected=true [CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(4), target: CellPos { x: 28, y: 28 }, units: [] }, reason: AbilityUnavailable("Target is being erased") }]
+erasure lifecycle already_erased: certified=false rejected=true [CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(4), target: CellPos { x: 28, y: 28 }, units: [] }, reason: AbilityUnavailable("Target is being erased") }]
+erasure lifecycle became_unready: certified=true rejected=true [CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(4), target: CellPos { x: 28, y: 28 }, units: [] }, reason: AbilityUnavailable("Target is being erased") }]
+erasure lifecycle became_spawned: certified=true rejected=true [CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(4), target: CellPos { x: 28, y: 28 }, units: [] }, reason: AbilityUnavailable("Target is being erased") }]
+erasure lifecycle became_wrong_type: certified=true rejected=true [CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(4), target: CellPos { x: 28, y: 28 }, units: [] }, reason: AbilityUnavailable("No strategic ability") }]
+erasure lifecycle became_arguments: certified=true rejected=true [CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(4), target: CellPos { x: 28, y: 28 }, units: [SimId(999999)] }, reason: AbilityUnavailable("Target is being erased") }]
+erasure lifecycle wrong_type: certified=false rejected=true [CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(4), target: CellPos { x: 28, y: 28 }, units: [] }, reason: AbilityUnavailable("No strategic ability") }]
+erasure lifecycle wrong_form: certified=false rejected=true [CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(4), target: CellPos { x: 28, y: 28 }, units: [] }, reason: AbilityUnavailable("Target is being erased") }]
+erasure lifecycle outside: certified=false rejected=true [CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(4), target: CellPos { x: -1, y: -1 }, units: [] }, reason: AbilityUnavailable("Target is being erased") }]
+erasure lifecycle unit_arguments: certified=false rejected=true [CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(4), target: CellPos { x: 28, y: 28 }, units: [SimId(999999)] }, reason: AbilityUnavailable("Target is being erased") }]
+ok
+test command::ra8_intent_tests::ra8_strategic_visibility_certificate_is_value_hashed_and_never_certifies_hidden_cells ... ok
+test command::ra8_intent_tests::ra8_strategic_visible_cell_loss_cancels_only_fully_valid_internal_intents ... ok
+
+failures:
+
+failures:
+    command::ra8_intent_tests::ra8_power_lifecycle_keeps_public_intrinsic_duplicate_fifo_and_additional_errors_strict
+
+test result: FAILED. 14 passed; 1 failed; 0 ignored; 0 measured; 70 filtered out; finished in 0.52s
+
+error: test failed, to rerun pass `-p sim --lib`

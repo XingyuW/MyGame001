@@ -1,0 +1,26 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+error[E0609]: no field `hit_points` on type `(sim::CellPos, &Prop)`
+  --> crates/game/src/privacy_scenery_tests.rs:48:62
+   |
+48 |         if host.props().unwrap().get(prop).is_some_and(|p| p.hit_points < p.kind.hit_points()) {
+   |                                                              ^^^^^^^^^^ unknown field
+   |
+help: one of the expressions' fields has a field of the same name
+   |
+48 |         if host.props().unwrap().get(prop).is_some_and(|p| p.1.hit_points < p.kind.hit_points()) {
+   |                                                              ++
+
+error[E0609]: no field `kind` on type `(sim::CellPos, &Prop)`
+  --> crates/game/src/privacy_scenery_tests.rs:48:77
+   |
+48 |         if host.props().unwrap().get(prop).is_some_and(|p| p.hit_points < p.kind.hit_points()) {
+   |                                                                             ^^^^ unknown field
+   |
+help: one of the expressions' fields has a field of the same name
+   |
+48 |         if host.props().unwrap().get(prop).is_some_and(|p| p.hit_points < p.1.kind.hit_points()) {
+   |                                                                             ++
+
+For more information about this error, try `rustc --explain E0609`.
+error: could not compile `game` (bin "game" test) due to 2 previous errors

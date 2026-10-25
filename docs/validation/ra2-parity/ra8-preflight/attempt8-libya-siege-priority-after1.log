@@ -1,0 +1,9 @@
+    Finished `release` profile [optimized] target(s) in 0.15s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+test ai::ra8_composition_tests::ra8_libya_shipped_land_cycle_funds_and_spawns_siege_alongside_its_national_reserve ... Libya actual mixed-lane paid cycle [UnitKind(0), UnitKind(10), UnitKind(29), UnitKind(12), UnitKind(0), UnitKind(10), UnitKind(26), UnitKind(12), UnitKind(0), UnitKind(18), UnitKind(10), UnitKind(18), UnitKind(12), UnitKind(0), UnitKind(22), UnitKind(18)]
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 105 filtered out; finished in 0.18s
+

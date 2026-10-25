@@ -1,0 +1,8 @@
+{
+  "scope": "COPY_ONLY_FIXTURE_CORRECTION_NO_RUNTIME_CHANGE",
+  "before": "2333c654bdd4ade17dee96825a9c9ee96135495e85de991fc3598dc2d681560e",
+  "after": "ec44981e328f82447b41f985b00b2b8df6f142b36c6b00e8c3a02c5320c0b5b5",
+  "actual183": "Probe aliveHP400 at28,1, still following/recentprogress toward28,0; initial arbitrary detour did not complete within256. Not a dead unit/illegal setup proof.",
+  "change": "Keep same256 schedule bound; require initial actual room-legal pathcost<=40 (four orthogonal steps) rather than arbitrary detour. Preserve maps/counts/I6/public-exit assertions and diagnostics.",
+  "preimage": "ra9-preliminary-logs/184-before-bounded-path-fixture.rs"
+}

@@ -1,0 +1,21 @@
+{
+  "utc": "2026-10-21T04:30:11.402821+00:00",
+  "completed_utc": "2026-10-21T04:33:02.799434+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "every_physical_consumer_and_reference_atom_has_an_exact_successful_disposition",
+    "--",
+    "--nocapture"
+  ],
+  "exit_code": 0,
+  "seconds": 171.396,
+  "input_count": 667,
+  "input_drift": [],
+  "scope": "Actualcomplete1911 audit positive only if exact namedcasepasses; releasefunctional/no performance/canonical/finalgates/originalengine equivalence"
+}

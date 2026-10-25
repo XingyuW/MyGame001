@@ -1,0 +1,12 @@
+--- a/crates/sim/tests/ra9_start_setup.rs
++++ b/crates/sim/tests/ra9_start_setup.rs
+@@ -122,6 +122,9 @@
+                                 && !yards.iter().any(|(_, footprint)| footprint.contains(*to))
+                                 && find_path(&view, from, *to, |cell| {
+                                     yards.iter().any(|(_, footprint)| footprint.contains(cell))
++                                        || view.room(cell, definitions.on_foot(kind), |holder| {
++                                            holder != id
++                                        }) < Grid::room_needed(definitions.on_foot(kind))
+                                 })
+                                 .is_some()
+                         });

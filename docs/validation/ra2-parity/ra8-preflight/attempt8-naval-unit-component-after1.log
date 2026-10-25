@@ -1,0 +1,21 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 19.72s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 3 tests
+test ra8_naval_unit_movement_positions_and_observed_destinations_drive_jobs ... ok
+test ra8_naval_unit_points_at_source_maximum_support_real_paid_fire ... actual naval weapon WeaponKind(20) / range 2048
+actual unit-boundary fire SimId(5)->SimId(6) positions[(SimId(5), SubPos { x: 3712, y: 5248 }), (SimId(6), SubPos { x: 5760, y: 5248 })]
+unit maximum humantrue: paidtrue/firedtrue
+actual naval weapon WeaponKind(20) / range 2048
+actual unit-boundary fire SimId(9)->SimId(6) positions[(SimId(6), SubPos { x: 5760, y: 5248 }), (SimId(9), SubPos { x: 3712, y: 5248 })]
+unit maximum humanfalse: paidtrue/firedtrue
+ok
+test ra8_naval_unit_points_outside_source_maximum_are_not_footprint_edge_jobs ... actual naval weapon WeaponKind(20) / range 2048
+unit outside maximum humantrue: queuedfalse/paidfalse/firedfalse
+actual naval weapon WeaponKind(20) / range 2048
+unit outside maximum humanfalse: queuedfalse/paidfalse/firedfalse
+ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 83 filtered out; finished in 0.32s
+

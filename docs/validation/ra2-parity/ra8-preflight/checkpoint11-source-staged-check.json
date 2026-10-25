@@ -1,0 +1,28 @@
+{
+  "utc": "2026-10-19T09:16:48.533270+00:00",
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit": 0,
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "staged_paths": [
+    "crates/game/tests/ra8_gate_matches.rs",
+    "crates/sim/src/ai.rs",
+    "crates/sim/src/ai/ra8_recovery_tests.rs",
+    "crates/sim/src/ai/strategy.rs",
+    "crates/sim/tests/ra8_ai.rs",
+    "docs/DECISIONS.md"
+  ],
+  "staged_blobs": {
+    "crates/game/tests/ra8_gate_matches.rs": "d23fef8e919b5f39338587263f112a8d9366b27ef4b21eaeba302c2e5718cb6f",
+    "crates/sim/src/ai.rs": "9d47fb7efae4ed984a1f4fd6052ffc463bc023386144c5de580a0648bf31c367",
+    "crates/sim/src/ai/ra8_recovery_tests.rs": "fa31396d27c0d353419712c4ee45dec347191d83cd3369d9bf879160c2e1fb40",
+    "crates/sim/src/ai/strategy.rs": "e689d137e343eafcaa8345fc2d3bf4f2a8e641b413a97dd8ff2a7021a079b7b1",
+    "crates/sim/tests/ra8_ai.rs": "bd0ae728af2288ac9bcecb0944641bdc6d1c44b013c2933a93109992f42e343f",
+    "docs/DECISIONS.md": "38277faf0904865121f34be448d7881c0d4f94a162f865394c6f25f82aa91ec1"
+  },
+  "passed": true
+}

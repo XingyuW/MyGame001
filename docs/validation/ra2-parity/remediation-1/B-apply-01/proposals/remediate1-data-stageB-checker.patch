@@ -1,0 +1,53 @@
+--- a/crates/sim/tests/ra9_audit/source-plans.rs
++++ b/crates/sim/tests/ra9_audit/source-plans.rs
+@@ -264,6 +264,13 @@
+             }
+             let approval = selected_source_acceptance(&row.atom.key, replacement)?;
+             masked_speed_admission::require(a, i, d, row, approval.as_ref(), binding)?;
++            let accepted = approval
++                .as_ref()
++                .ok_or("missing individual masked source acceptance")?;
++            s.require_routes(
++                accepted.native_receipts,
++                &BTreeSet::from(["static/exact-source-current-model/masked19"]),
++            )?;
+             if !p.masked_done.insert(row.atom.key.clone()) {
+                 return Err("duplicate masked source outcome".into());
+             }
+@@ -276,7 +283,35 @@
+         Route::LegacyModel543 => legacy_model_policy::admit(&mut p.legacy_model, a, i, d, row, s),
+         Route::Static116 | Route::Metadata147 | Route::Residual117 => {
+             let approval = selected_source_acceptance(&row.atom.key, replacement)?;
+-            legacy_source_admission::require(a, i, d, row, route, s, approval.as_ref())
++            legacy_source_admission::require(a, i, d, row, route, s, approval.as_ref())?;
++            let accepted = approval
++                .as_ref()
++                .ok_or("missing individual exact source acceptance")?;
++            // Declare exact live identity from the route, source key and observed scope.
++            // The accepted identity and receipt text never supply their own expectations.
++            let (consumer, guard) = single_proposal_binding(p, row, route, s)?;
++            let proposal = policy_admission::SourceProposal {
++                key: row.atom.key.clone(),
++                exact: &row.exact_value,
++                reason: &row.reason,
++                consumer_bindings: &consumer,
++                model_guard_id: &guard,
++            };
++            policy_admission::source_reason(
++                i,
++                row,
++                &proposal,
++                Some(accepted),
++                &consumer,
++                binding,
++            )?;
++            let receipt_route = match route {
++                Route::Static116 => "static/exact-source-current-model/static116",
++                Route::Metadata147 => "static/exact-source-current-model/metadata147",
++                Route::Residual117 => "static/exact-source-current-model/residual117",
++                _ => return Err("foreign legacy source evidence route".into()),
++            };
++            s.require_routes(accepted.native_receipts, &BTreeSet::from([receipt_route]))
+         }
+     }
+ }

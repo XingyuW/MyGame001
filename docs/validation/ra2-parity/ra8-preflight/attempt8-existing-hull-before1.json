@@ -1,0 +1,30 @@
+{
+  "label": "attempt8-existing-hull-before1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_an_existing_hull_uses_its_reachable_shore_job_instead_of_a_prospective_yards_other_pond",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "scheduled existing-hull/other-pond counterexample before mission correction; Gap qualification already present",
+  "start_utc": "2026-10-18T19:47:56.940800+00:00",
+  "elapsed_seconds": 19.308822874969337,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7",
+    "crates/sim/src/ai/strategy.rs": "9e539b2a5509ea1bc462ee8f9324bbf08106ddd7d4939afd258878730530cae2"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7",
+    "crates/sim/src/ai/strategy.rs": "9e539b2a5509ea1bc462ee8f9324bbf08106ddd7d4939afd258878730530cae2"
+  },
+  "log_sha256": "65c3ba03ae8212f9cd22e0fc118a3cdc62e54247f730e73e66411b1e757391dd"
+}

@@ -1,0 +1,16 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 25s
+     Running tests/ra9_data_parity.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_data_parity-f191adb6678c35d5)
+
+running 1 test
+test ra9_audit::every_physical_consumer_and_reference_atom_has_an_exact_successful_disposition ... Error: "corrupt unequal unlisted witness WitnessId { consumer: \"black_eagle@rules:BEAG\", field: \"economy.ron.units.producer\" }"
+FAILED
+
+failures:
+
+failures:
+    ra9_audit::every_physical_consumer_and_reference_atom_has_an_exact_successful_disposition
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 173 filtered out; finished in 91.94s
+
+error: test failed, to rerun pass `-p sim --test ra9_data_parity`

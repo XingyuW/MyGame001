@@ -1,0 +1,20 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 30.08s
+     Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-cf20e94e4f55d858)
+
+running 1 test
+
+thread 'ra9_crossroads_brutal_korea_easy_iraq_seed_zero_finishes' (18340391) panicked at crates/game/tests/m6_production_matches.rs:349:21:
+crossroads: ["korea", "iraq"] at ["brutal", "easy"]: tick 14594: SellBuilding { building: SimId(60) } rejected (Target is being erased) without a loss
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra9_crossroads_brutal_korea_easy_iraq_seed_zero_finishes ... FAILED
+
+failures:
+
+failures:
+    ra9_crossroads_brutal_korea_easy_iraq_seed_zero_finishes
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 2.77s
+
+error: test failed, to rerun pass `-p game --test m6_production_matches`

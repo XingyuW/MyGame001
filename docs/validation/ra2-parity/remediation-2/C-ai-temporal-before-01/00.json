@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "cargo",
+    "fmt",
+    "--all"
+  ],
+  "exit": 0,
+  "utc": "2026-10-23T02:36:30.670866+00:00",
+  "hashes": {
+    "crates/sim/src/ai.rs": "32e2f224eb66136803ce40c27a886d7346b00026cda4b9f9c8c5aa02abdbd2f8",
+    "crates/sim/tests/ra8_ai.rs": "cce3082ef92343ab7d81ae997912918553142135eec00e8a49c32da500035065",
+    "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+  }
+}

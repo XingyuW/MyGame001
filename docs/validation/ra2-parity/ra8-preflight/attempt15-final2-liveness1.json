@@ -1,0 +1,15 @@
+{
+  "utc": "2026-10-20 11:31:56 UTC",
+  "purpose": "Bounded owned-group metadata only; CPU establishes activity, not correctness/completion/performance. No profiling or signal.",
+  "session_id": 27221,
+  "pgid": 76137,
+  "ps_stdout": "  PID  PPID  PGID     ELAPSED      TIME  %CPU STAT COMMAND\n76137  7720 76137       09:26   0:00.54   0.0 Ss   /opt/homebrew/Cellar/python@3.15/3.15.0/Frameworks/Python.framework/Versions/3.15/Resources/Python.app/Contents/MacOS/Python -\n76218 76137 76137       09:21   0:00.24   0.0 S    /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo test --release -p sim\n76661 76218 76137       00:08   1:07.66 859.7 R    /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra1_catalogue-e212392d3cdb297f\n",
+  "current_target": "sim tests/ra1_catalogue.rs (from owned ps snapshot)",
+  "completed_targets": 23,
+  "completed_counts": [
+    452,
+    0,
+    0
+  ],
+  "result_read_utc": "2026-10-20T11:32:12.306987+00:00"
+}

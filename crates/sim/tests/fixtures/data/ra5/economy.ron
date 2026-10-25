@@ -1,0 +1,89 @@
+// RA5 fixture: the economy of the RA4 fixture (below) with the ore of RA5: the miners carry 20
+// and 40 bails and take one from a cell after every 4 ticks of work, a refinery pays 25 for a
+// bail of ore and 50 for a bail of gems, and the sale of an Allied refinery returns 90 credits
+// whatever the refund rule gives (240). Fixture data (invariant I10).
+//
+// RA4 fixture (the RA3 fixture with the airfield and six more unit types): the economy of the
+// small two sided world of the RA1 fixture. The airfield is a factory of aircraft with two
+// docks, which produces the striker. The rocket, the drone and the hunter are spawned by the
+// launcher, the carrier and the boat; their tech level (arsenal.ron) keeps them out of every
+// queue. The sell values are half the cost, and the rules refund 40 percent. Fixture data
+// (invariant I10).
+(
+    schema_version: 2,
+    placement_distance: 6,
+    buildings: [
+        (id: "allied_yard", sprite: "yard", width: 3, height: 3, cost: 2000, build_time: 40, producer: "allied_yard", prerequisites: [], power_produced: 0, power_consumed: 0, sell_value: 1000, free_units: []),
+        (id: "soviet_yard", sprite: "yard", width: 3, height: 3, cost: 2000, build_time: 40, producer: "soviet_yard", prerequisites: [], power_produced: 0, power_consumed: 0, sell_value: 1000, free_units: []),
+        (id: "allied_power", sprite: "power", width: 2, height: 2, cost: 300, build_time: 20, producer: "allied_yard", prerequisites: ["allied_yard"], power_produced: 100, power_consumed: 0, sell_value: 150, free_units: []),
+        (id: "soviet_power", sprite: "power", width: 2, height: 2, cost: 300, build_time: 20, producer: "soviet_yard", prerequisites: ["soviet_yard"], power_produced: 100, power_consumed: 0, sell_value: 150, free_units: []),
+        (id: "allied_refinery", sprite: "refinery", width: 3, height: 2, cost: 600, build_time: 30, producer: "allied_yard", prerequisites: ["allied_yard"], power_produced: 0, power_consumed: 20, sell_value: 300, free_units: ["miner_a"]),
+        (id: "soviet_refinery", sprite: "refinery", width: 3, height: 2, cost: 600, build_time: 30, producer: "soviet_yard", prerequisites: ["soviet_yard"], power_produced: 0, power_consumed: 20, sell_value: 300, free_units: ["miner_s"]),
+        (id: "allied_barracks", sprite: "barracks", width: 2, height: 2, cost: 200, build_time: 20, producer: "allied_yard", prerequisites: ["allied_yard"], power_produced: 0, power_consumed: 10, sell_value: 100, free_units: []),
+        (id: "soviet_barracks", sprite: "barracks", width: 2, height: 2, cost: 200, build_time: 20, producer: "soviet_yard", prerequisites: ["soviet_yard"], power_produced: 0, power_consumed: 10, sell_value: 100, free_units: []),
+        (id: "allied_factory", sprite: "factory", width: 3, height: 2, cost: 500, build_time: 30, producer: "allied_yard", prerequisites: ["allied_barracks", "allied_yard"], power_produced: 0, power_consumed: 20, sell_value: 250, free_units: []),
+        (id: "soviet_factory", sprite: "factory", width: 3, height: 2, cost: 500, build_time: 30, producer: "soviet_yard", prerequisites: ["soviet_barracks", "soviet_yard"], power_produced: 0, power_consumed: 20, sell_value: 250, free_units: []),
+        (id: "allied_radar", sprite: "radar", width: 2, height: 2, cost: 400, build_time: 20, producer: "allied_yard", prerequisites: ["allied_yard"], power_produced: 0, power_consumed: 20, sell_value: 200, free_units: []),
+        (id: "soviet_radar", sprite: "radar", width: 2, height: 2, cost: 400, build_time: 20, producer: "soviet_yard", prerequisites: ["soviet_yard"], power_produced: 0, power_consumed: 20, sell_value: 200, free_units: []),
+        (id: "turret", sprite: "turret", width: 1, height: 1, cost: 250, build_time: 20, producer: "allied_yard", prerequisites: [], power_produced: 0, power_consumed: 5, sell_value: 125, free_units: []),
+        (id: "storm_device", sprite: "device", width: 2, height: 2, cost: 1000, build_time: 40, producer: "allied_yard", prerequisites: ["allied_radar", "allied_yard"], power_produced: 0, power_consumed: 30, sell_value: 500, free_units: []),
+        (id: "bunker", sprite: "turret", width: 1, height: 1, cost: 250, build_time: 20, producer: "allied_yard", prerequisites: [], power_produced: 0, power_consumed: 0, sell_value: 125, free_units: []),
+        (id: "sentry", sprite: "turret", width: 1, height: 1, cost: 250, build_time: 20, producer: "allied_yard", prerequisites: [], power_produced: 0, power_consumed: 0, sell_value: 125, free_units: []),
+        (id: "wall", sprite: "wall", width: 1, height: 1, cost: 100, build_time: 30, producer: "allied_yard", prerequisites: [], power_produced: 0, power_consumed: 0, sell_value: 50, free_units: []),
+        (id: "depot", sprite: "depot", width: 2, height: 2, cost: 400, build_time: 20, producer: "allied_yard", prerequisites: [], power_produced: 0, power_consumed: 10, sell_value: 200, free_units: []),
+        (id: "vault", sprite: "vault", width: 2, height: 2, cost: 1000, build_time: 25, producer: "allied_yard", prerequisites: [], power_produced: 0, power_consumed: 0, sell_value: 500, free_units: []),
+        (id: "silo", sprite: "silo", width: 2, height: 2, cost: 1000, build_time: 25, producer: "allied_yard", prerequisites: [], power_produced: 0, power_consumed: 0, sell_value: 500, free_units: []),
+        (id: "airfield", sprite: "airfield", width: 2, height: 2, cost: 400, build_time: 20, producer: "allied_yard", prerequisites: [], power_produced: 0, power_consumed: 0, sell_value: 200, free_units: []),
+    ],
+    units: [
+        (unit: "allied_mcv", cost: 2000, build_time: 40, producer: "allied_factory", prerequisites: ["allied_factory"]),
+        (unit: "soviet_mcv", cost: 2000, build_time: 40, producer: "soviet_factory", prerequisites: ["soviet_factory"]),
+        (unit: "rifleman", cost: 100, build_time: 10, producer: "allied_barracks", prerequisites: ["allied_barracks"]),
+        (unit: "conscript", cost: 50, build_time: 10, producer: "soviet_barracks", prerequisites: ["soviet_barracks"]),
+        (unit: "engineer", cost: 300, build_time: 10, producer: "allied_barracks", prerequisites: []),
+        (unit: "sniper", cost: 400, build_time: 10, producer: "allied_barracks", prerequisites: ["allied_barracks"]),
+        (unit: "raider", cost: 300, build_time: 10, producer: "allied_barracks", prerequisites: ["allied_barracks"]),
+        (unit: "militia", cost: 60, build_time: 10, producer: "soviet_barracks", prerequisites: []),
+        (unit: "prototype", cost: 900, build_time: 10, producer: "allied_barracks", prerequisites: []),
+        (unit: "advanced", cost: 900, build_time: 10, producer: "allied_barracks", prerequisites: []),
+        (unit: "tank", cost: 400, build_time: 20, producer: "allied_factory", prerequisites: ["allied_factory"]),
+        (unit: "heavy", cost: 650, build_time: 20, producer: "soviet_factory", prerequisites: ["soviet_factory"]),
+        (unit: "miner_a", cost: 500, build_time: 20, producer: "allied_factory", prerequisites: ["allied_factory"]),
+        (unit: "miner_s", cost: 500, build_time: 20, producer: "soviet_factory", prerequisites: ["soviet_factory"]),
+        (unit: "hovercraft", cost: 450, build_time: 20, producer: "allied_factory", prerequisites: ["allied_factory"]),
+        (unit: "gunship", cost: 300, build_time: 10, producer: "allied_factory", prerequisites: []),
+        (unit: "boat", cost: 300, build_time: 10, producer: "allied_factory", prerequisites: []),
+        (unit: "sub", cost: 300, build_time: 10, producer: "soviet_factory", prerequisites: []),
+        (unit: "squid", cost: 300, build_time: 10, producer: "soviet_factory", prerequisites: []),
+        (unit: "flak_car", cost: 300, build_time: 10, producer: "soviet_factory", prerequisites: []),
+        (unit: "mortar", cost: 300, build_time: 10, producer: "allied_barracks", prerequisites: []),
+        (unit: "sapper", cost: 300, build_time: 10, producer: "soviet_barracks", prerequisites: []),
+        (unit: "martyr", cost: 300, build_time: 10, producer: "soviet_barracks", prerequisites: []),
+        (unit: "commando", cost: 300, build_time: 10, producer: "allied_barracks", prerequisites: []),
+        (unit: "seer", cost: 300, build_time: 10, producer: "soviet_barracks", prerequisites: []),
+        (unit: "recruit", cost: 100, build_time: 10, producer: "allied_barracks", prerequisites: []),
+        (unit: "trooper", cost: 100, build_time: 10, producer: "allied_barracks", prerequisites: []),
+        (unit: "hazmat", cost: 100, build_time: 10, producer: "allied_barracks", prerequisites: []),
+        (unit: "jumper", cost: 100, build_time: 10, producer: "allied_barracks", prerequisites: []),
+        (unit: "truck", cost: 100, build_time: 10, producer: "allied_factory", prerequisites: []),
+        (unit: "roller", cost: 100, build_time: 10, producer: "allied_factory", prerequisites: []),
+        (unit: "brute", cost: 100, build_time: 10, producer: "allied_factory", prerequisites: []),
+        (unit: "launcher", cost: 400, build_time: 10, producer: "soviet_factory", prerequisites: []),
+        (unit: "rocket", cost: 50, build_time: 10, producer: "soviet_factory", prerequisites: []),
+        (unit: "carrier", cost: 800, build_time: 10, producer: "allied_factory", prerequisites: []),
+        (unit: "drone", cost: 50, build_time: 10, producer: "allied_factory", prerequisites: []),
+        (unit: "hunter", cost: 50, build_time: 10, producer: "allied_factory", prerequisites: []),
+        (unit: "striker", cost: 300, build_time: 10, producer: "airfield", prerequisites: []),
+    ],
+    harvesters: [
+        (unit: "miner_a", capacity: 20, harvest_rate: 1, harvest_interval: 4),
+        (unit: "miner_s", capacity: 40, harvest_rate: 1, harvest_interval: 4),
+    ],
+    refineries: [
+        (building: "allied_refinery", credits_per_ore: 25, credits_per_gem: 50),
+        (building: "soviet_refinery", credits_per_ore: 25, credits_per_gem: 50),
+    ],
+    refunds: [
+        (building: "allied_refinery", credits: 90),
+    ],
+)

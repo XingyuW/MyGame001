@@ -1,0 +1,11 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0560]: struct `MatchOptions` has no field named `initial_units`
+    --> crates/sim/tests/ra8_ai.rs:2810:38
+     |
+2810 |     ],&MatchOptions {mcv_start:false,initial_units:0,superweapons:false,..MatchOptions::default()}).unwrap();
+     |                                      ^^^^^^^^^^^^^ `MatchOptions` does not have this field
+     |
+     = note: available fields are: `super_players`, `unlock_players`, `unit_speed_percent`, `free_for_all`, `random_countries` ... and 8 others
+
+For more information about this error, try `rustc --explain E0560`.
+error: could not compile `sim` (test "ra8_ai") due to 1 previous error

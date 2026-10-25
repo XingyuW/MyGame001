@@ -1,0 +1,73 @@
+{
+  "output": "docs/validation/ra2-parity/remediation-2/C-strict-audit-late-03",
+  "commands": [
+    {
+      "name": "fmt-check",
+      "args": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "stop_on_nonzero": true
+    },
+    {
+      "name": "diff-check",
+      "args": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "stop_on_nonzero": true
+    },
+    {
+      "name": "strict-clippy",
+      "args": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "stop_on_nonzero": true
+    },
+    {
+      "name": "whole-current-reconciliation",
+      "args": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_data_parity",
+        "ra9_audit::every_physical_consumer_and_reference_atom_has_an_exact_successful_disposition",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "stop_on_nonzero": true
+    },
+    {
+      "name": "fresh-late-native-positive",
+      "args": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "stop_on_nonzero": true
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+# Round1 factual validation interruption
+
+Frozen reviewed source remains23647de4220408d42eeef6522deb4d4541528452; cumulative base8230a955b251e9341d349f99eaeb86f7f8253664. No source edits have occurred.
+
+At2026-10-22T00:40:25UTC the root deliberately sent SIGTERM only to owned native group30304 after SIM2 identified and root independently traced a P0 in special/vehicles.rs: parasite damage updates live Health, then the IFV loop selects/actions from the earlier actors snapshot and may revive a dead host or let a dead IFV act. The actual group was empty after termination. This is not a completed full13 pass, and it does not replace the panel decision. Finish all five independent scopes, then fresh lead decides on actual evidence/findings; any real defect requires fresh remediation and validation.
+
+The unchanged validator completed commands01–03 exit0. Command04 was interrupted in the756-configuration production sweep after six individual target cases passed. Later commands were not reached. All current raw logs are preserved. The original198/199/203 Python controllers were already missing; shell30304 was orphaned but still actively running Cargo/M6. Consequently canonical gate-process.json RUNNING and continuation/follower WAITING statuses are stale, not active or passing evidence. No direct terminal child exit was observed; the signal and empty owned-group audit are factual.
+
+Authoritative detailed stop evidence: round-1-validation-stop.json, with controller-receipt preimages, process audit and raw hashes. Independent post-stop check: round-1-source-after-stop.json,669 source/binding files and64 authority spans,zero mismatches,zero tracked diff. All earlier canonical isolated198 five commands passed at their exact earlier source scope; no new whole-gate credit is inferred.
+
+Prepared200/202 metadata scripts have not executed. Their raw test-result summation incorrectly expects zero filtered cases despite filtered child probes; final remediation/closure must distinguish primary/unfiltered rows from child execution results and preserve historical raw script totals. The final required gate will run on the corrected frozen source, with all coverage/caps/workers intact.

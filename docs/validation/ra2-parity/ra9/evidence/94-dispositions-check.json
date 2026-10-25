@@ -1,0 +1,13 @@
+{
+  "utc": "2026-10-21T01:26:01.952093+00:00",
+  "ended_utc": "2026-10-21T01:26:02.091728+00:00",
+  "command": [
+    "python3",
+    "scripts/ra2_reference.py",
+    "--ra9-dispositions",
+    "--check"
+  ],
+  "exit_code": 0,
+  "seconds": 0.14,
+  "scope": "actual preliminary copy source/data/reference, static validation only"
+}

@@ -1,0 +1,262 @@
+{
+  "start_utc": "2026-10-19T02:29:47.068675+00:00",
+  "runtime_manifest": "attempt8-final7-runtime-manifest.json",
+  "commands": [
+    {
+      "phase": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 1.0299820420332253,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_targets": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "source_mismatches": []
+    },
+    {
+      "phase": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 0.018110500008333474,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-diff.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_targets": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "source_mismatches": []
+    },
+    {
+      "phase": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 9.005690333025996,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-clippy.log",
+      "sha256": "3b3ce818be8dc8f4170426b98f721850b1c7407ca7f42ca9f5b1adbb5eadf50d",
+      "test_targets": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "source_mismatches": []
+    },
+    {
+      "phase": "generator",
+      "command": [
+        "python3",
+        "scripts/generate_ra2_data.py",
+        "--check"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 0.0849654579651542,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-generator.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_targets": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "source_mismatches": []
+    },
+    {
+      "phase": "reference",
+      "command": [
+        "python3",
+        "scripts/ra2_reference.py",
+        "--check"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 0.0870847079786472,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-reference.log",
+      "sha256": "5fa32e9687ef749dd76543b607f37bc835ddd9e7469e2b7b5874d233ee5cf964",
+      "test_targets": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "source_mismatches": []
+    },
+    {
+      "phase": "focused-ra8-ai",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 67.73226033296669,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-focused-ra8-ai.log",
+      "sha256": "57a6da08f6c1ca73d2cb4018ee7c352b7c332892f95c02a9e72050d5c798db77",
+      "test_targets": 1,
+      "passed": 86,
+      "failed": 0,
+      "ignored": 0,
+      "source_mismatches": []
+    },
+    {
+      "phase": "focused-attrition",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ai::ra8_attrition_tests::",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 3.12222695897799,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-focused-attrition.log",
+      "sha256": "88b2105928ed85a9146d23e77673e6e20bf20d5b7ff35ab4de7968247e7e716b",
+      "test_targets": 1,
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "source_mismatches": []
+    },
+    {
+      "phase": "focused-recovery",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ai::ra8_recovery_tests::",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 3.6957407500012778,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-focused-recovery.log",
+      "sha256": "6b8166ef39538a6def1582e6a42d9c805e2b451c53e7b2fecd4a11daed91fe7f",
+      "test_targets": 1,
+      "passed": 20,
+      "failed": 0,
+      "ignored": 0,
+      "source_mismatches": []
+    },
+    {
+      "phase": "focused-composition",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ai::ra8_composition_tests::",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 1.4628912920015864,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-focused-composition.log",
+      "sha256": "28858e5336710f895088993122fe8e4aaa64c1081c62640133c6c3aad189017c",
+      "test_targets": 1,
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "source_mismatches": []
+    },
+    {
+      "phase": "focused-ra4",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra4_ai",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 7.149293042020872,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-focused-ra4.log",
+      "sha256": "ea6a779d7b2d542d270dbb86cbdea967cac5ddf4b28a049a4f8dd592ba9914cd",
+      "test_targets": 1,
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "source_mismatches": []
+    },
+    {
+      "phase": "default-demo10",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_ai_matches",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 107.88452874997165,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-default-demo10.log",
+      "sha256": "682adb031be4346e5706d9426acfe6b6a2d75f7c2e2b8b2240d2ee031c92d988",
+      "test_targets": 1,
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "source_mismatches": []
+    },
+    {
+      "phase": "retained31-four-threads",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "--",
+        "--nocapture",
+        "--test-threads=4"
+      ],
+      "exit": 101,
+      "elapsed_seconds": 1533.2578754590359,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-retained31-four-threads.log",
+      "sha256": "88d09015dd08b5ff885498598086cd5b2fd3e5d087320fa0497819ca6b16d388",
+      "test_targets": 1,
+      "passed": 30,
+      "failed": 1,
+      "ignored": 0,
+      "source_mismatches": []
+    }
+  ],
+  "elapsed_seconds": 1735.1834597919951
+}

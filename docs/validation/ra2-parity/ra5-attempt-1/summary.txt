@@ -1,0 +1,4 @@
+01 exit 0  1 s  cargo fmt --all -- --check
+02 exit 0  0 s  git diff --check
+03 exit 0  5 s  cargo clippy --workspace --all-targets -- -D warnings
+Stopped during command04 production sweep after root found missing occupied-Prop target path in garrison firing; completed commands01–03 passed, completed test targets passed. Superseded by final ra5 gate.

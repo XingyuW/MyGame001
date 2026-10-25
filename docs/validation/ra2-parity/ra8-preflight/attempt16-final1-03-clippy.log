@@ -1,0 +1,28 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Checking game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+error: this `if` statement can be collapsed
+   --> crates/sim/src/ai/ra8_attrition_tests.rs:934:13
+    |
+934 | /             if let crate::SimEvent::StrategicActivated {
+935 | |                 building,
+936 | |                 target: cell,
+937 | |                 role: Role::Nuke,
+...   |
+954 | |             }
+    | |_____________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#collapsible_if
+    = note: `-D clippy::collapsible-if` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+    |
+939 ~             } = event
+940 ~                 && building == source {
+941 |                     assert!(footprint.contains(cell));
+...
+951 |                     launch_cell = Some(cell);
+952 ~                 }
+    |
+
+error: could not compile `sim` (lib test) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

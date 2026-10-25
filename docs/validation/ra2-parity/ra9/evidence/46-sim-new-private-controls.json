@@ -1,0 +1,18 @@
+{
+  "utc": "2026-10-20T23:40:58.090380+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--lib",
+    "ra9_",
+    "--",
+    "--test-threads=1"
+  ],
+  "exit_code": 101,
+  "seconds": 401.585,
+  "lease": "RA8revocable functional phase jobs1; no heavy AI match",
+  "status": "actual new private state-hash/bounded-input/ID-exhaustion/controlled-reveal/gathering controls",
+  "input_mismatches": []
+}

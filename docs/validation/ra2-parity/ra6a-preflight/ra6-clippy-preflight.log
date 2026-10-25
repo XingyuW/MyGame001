@@ -1,0 +1,95 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error: this `if` has identical blocks
+    --> crates/sim/src/combat.rs:1560:69
+     |
+1560 |               weapons: if ruled && special.deployed.contains_key(&id) {
+     |  _____________________________________________________________________^
+1561 | |                 [weapon.secondary, None]
+1562 | |             } else if ruled
+     | |_____________^
+     |
+note: same as this
+    --> crates/sim/src/combat.rs:1566:13
+     |
+1566 | /             {
+1567 | |                 [weapon.secondary, None]
+1568 | |             } else {
+     | |_____________^
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#if_same_then_else
+     = note: `-D clippy::if-same-then-else` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::if_same_then_else)]`
+
+error: this block may be rewritten with the `?` operator
+   --> crates/sim/src/special/infantry.rs:211:5
+    |
+211 | /     if defs.rules().is_none() {
+212 | |         return None;
+213 | |     }
+    | |_____^ help: replace it with: `defs.rules()?;`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#question_mark
+    = note: `-D clippy::question-mark` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::question_mark)]`
+
+error: this `if` statement can be collapsed
+   --> crates/sim/src/special/infantry.rs:357:12
+    |
+357 |       } else if r
+    |  ____________^
+358 | |         .prerequisite_groups
+359 | |         .iter()
+360 | |         .any(|g| g.id == "tech" && g.buildings.contains(&k))
+...   |
+365 | |     }
+    | |_____^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#collapsible_if
+    = note: `-D clippy::collapsible-if` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+    |
+360 ~         .any(|g| g.id == "tech" && g.buildings.contains(&k))
+361 ~         && let Some(p) = world.resource_mut::<Players>().get_mut(a.owner) {
+362 |             p.infiltration |= if m.side == Some(Side::Allied) { 4 } else { 8 };
+363 ~         }
+    |
+
+error: this `if` statement can be collapsed
+   --> crates/sim/src/special/infantry.rs:757:17
+    |
+757 | /                 if world
+758 | |                     .resource::<crate::MatchState>()
+759 | |                     .rules()
+760 | |                     .bridge_destruction
+...   |
+767 | |                 }
+    | |_________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+761 ~                     && let Some(bridge) = world.resource::<crate::Bridges>().huts.get(&id).copied()
+762 ~                     && let Some((cell, _)) = world.resource::<crate::Props>().get(bridge) {
+763 |                         let cell = cell;
+764 |                         world.resource_mut::<crate::Props>().hurt(cell, i64::MAX);
+765 ~                     }
+    |
+
+error: redundant redefinition of a binding `cell`
+   --> crates/sim/src/special/infantry.rs:764:25
+    |
+764 |                         let cell = cell;
+    |                         ^^^^^^^^^^^^^^^^
+    |
+help: `cell` is initially defined here
+   --> crates/sim/src/special/infantry.rs:763:34
+    |
+763 |                     if let Some((cell, _)) = world.resource::<crate::Props>().get(bridge) {
+    |                                  ^^^^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#redundant_locals
+    = note: `-D clippy::redundant-locals` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::redundant_locals)]`
+
+error: could not compile `sim` (lib) due to 5 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `sim` (lib test) due to 5 previous errors

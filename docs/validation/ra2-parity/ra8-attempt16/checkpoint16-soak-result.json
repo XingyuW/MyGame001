@@ -1,0 +1,27 @@
+{
+  "utc": "2026-10-20T18:02:12.765533+00:00",
+  "attempt": 16,
+  "head": "26ad1e384ff17aff2a0075a08f39d510f28d0067",
+  "runtime_commit": "b411bed120ca05bfe909afc071d044e7928ecb78",
+  "log": "docs/validation/ra2-parity/ra8/09-soak.log",
+  "bytes": 55729,
+  "sha256": "2ce032f1069eb9139e454c10af329aceada3cc8171147bb844316c67868c1fba",
+  "completed_configurations": 260,
+  "full_ticks_each_run": 36000,
+  "repeated_runs": 2,
+  "total_ticks": 18720000,
+  "summary": [
+    "m7 soak: 18720000 ticks in 9162.9 s; peak heap in use 245.7 MiB (budget 1024 MiB)",
+    "m7 soak: passed"
+  ],
+  "phase9": {
+    "line": "09 exit 0  9163 s  cargo run --release -p sim --example m7_soak",
+    "number": 9,
+    "exit": 0,
+    "script_date_seconds": 9163,
+    "completion_observed_utc": "2026-10-20T18:01:19.217587+00:00",
+    "wrapper_elapsed_seconds": 17571.159575290978,
+    "observed_interval_seconds": 9163.575476625003
+  },
+  "full13_status": "Phase10 running; full gate not accepted yet."
+}

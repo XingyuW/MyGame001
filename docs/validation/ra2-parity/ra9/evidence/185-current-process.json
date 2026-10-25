@@ -1,0 +1,1 @@
+{"pid": 63767, "pgid": 63767, "command": ["cargo", "test", "--release", "-p", "sim", "--test", "ra9_start_setup", "ra9_shipped_yard_starts_for_all_maps_two_to_ten_players_have_legal_occupancy_and_public_exits", "--", "--exact", "--nocapture"], "utc": "2026-10-21T11:12:42.222744+00:00"}

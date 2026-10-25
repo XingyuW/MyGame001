@@ -1,0 +1,87 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit": 2,
+  "stdout": "docs/validation/ra2-parity/ra8-preflight/attempt4-aa-screen-after2.log:10: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt4-companion-a_soviet_player_left_with_an_armed_miner_still_finishes_the_match.log:10: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt4-companion-crossroads_armies_finish_after_new_terrain_changes.log:8: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt4-companion-ra5_coral_archipelago_brutal_libya_germany_seed_zero_finishes.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt4-companion-ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt4-companion-the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt4-game-ai1.log:49: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt4-game-exact1.log:1937: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt4-game-units2.log:226: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt4-m10-final1.log:13: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt4-sim-final1.log:323: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt4-thousand-lakes-aa-after1.log:262: new blank line at EOF.\n",
+  "stderr": "",
+  "classification": [
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt4-aa-screen-after2.log",
+      "line": 10,
+      "kind": "intentional untouched captured blank EOF",
+      "sha256": "31c820357761af81cc04ce12e58078d5762a005613b0034b4accf5d1ec4e726b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt4-companion-a_soviet_player_left_with_an_armed_miner_still_finishes_the_match.log",
+      "line": 10,
+      "kind": "intentional untouched captured blank EOF",
+      "sha256": "3bf8baeb0cb5e7a487f89a9c19a73fbb1cc57be3e80efad34f77b40bd2fcef0e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt4-companion-crossroads_armies_finish_after_new_terrain_changes.log",
+      "line": 8,
+      "kind": "intentional untouched captured blank EOF",
+      "sha256": "a254e10677372da9cf7cbbb32b460f735fa1871e22b4b6d5a84538b5123e6704"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt4-companion-ra5_coral_archipelago_brutal_libya_germany_seed_zero_finishes.log",
+      "line": 9,
+      "kind": "intentional untouched captured blank EOF",
+      "sha256": "b38930eba21e3961b769e678b3bbb9545781035230d023533cd2aa7026fd1680"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt4-companion-ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes.log",
+      "line": 9,
+      "kind": "intentional untouched captured blank EOF",
+      "sha256": "99d94d6f1d4ee73ded3d5751f902663d25bc1133aca1e1a949640c738125a1ba"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt4-companion-the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first.log",
+      "line": 9,
+      "kind": "intentional untouched captured blank EOF",
+      "sha256": "c78b39fd595f8a26a58c956f853e4fd8e4c78b0fe759187336f9dff566caa76f"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt4-game-ai1.log",
+      "line": 49,
+      "kind": "intentional untouched captured blank EOF",
+      "sha256": "873f295f88054c73948d993f6c3ffa997cd9932a4587a672b65ce056c6d49aa0"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt4-game-exact1.log",
+      "line": 1937,
+      "kind": "intentional untouched captured blank EOF",
+      "sha256": "cb28265399f10297dfa6adb8648678b43b1902cb54a557af98235e0dfb0c462a"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt4-game-units2.log",
+      "line": 226,
+      "kind": "intentional untouched captured blank EOF",
+      "sha256": "6a3c62e7877e5fe587e2ff0829c1643621fe4370f243015cfd8cfff1162fddd9"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt4-m10-final1.log",
+      "line": 13,
+      "kind": "intentional untouched captured blank EOF",
+      "sha256": "24feef4b45a7a914a8f4e5f1c03ad198428dda5caa74ab02398078e948b8d2ea"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt4-sim-final1.log",
+      "line": 323,
+      "kind": "intentional untouched captured blank EOF",
+      "sha256": "e87f1c9227cf7b52fc4505f3f942bf725bf4efd8cc6a16e2f1ce9d9c9213f28e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt4-thousand-lakes-aa-after1.log",
+      "line": 262,
+      "kind": "intentional untouched captured blank EOF",
+      "sha256": "19b23601649b10b093890ce50ec6334a986dddaa254e08f70ce60dbe3c4fe608"
+    }
+  ],
+  "source_data_test_doc_diagnostics": 0,
+  "status": "exit2 classified solely as exact raw EOF evidence; not a passed check"
+}

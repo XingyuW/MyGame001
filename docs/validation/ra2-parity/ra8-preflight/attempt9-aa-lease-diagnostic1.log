@@ -1,0 +1,22 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 5.31s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+AA lease installedSome(6021) patience1200  {SimId(6): AirScreenProgress { remaining: 4294967295, distance: 22, hp: 900, last_progress: 6020 }}, building_jobs: {} }
+AA lease released tick7221  {SimId(6): AirScreenProgress { remaining: 4294967295, distance: 22, hp: 900, last_progress: 6020 }}, building_jobs: {SimId(5): BuildingJobProgress { hp: 1000000, failures: 0, actors: {SimId(8): 0, SimId(9): 0, SimId(10): 0, SimId(11): 0, SimId(12): 1, SimId(13): 1, SimId(14): 1}, founders: {SimId(8), SimId(9), SimId(10), SimId(11), SimId(12), SimId(13), SimId(14)}, approaching: false }} }
+reinforced AA job installed=true, replacement batches=15, released=true, AA HP=900
+
+thread 'ra8_reinforcements_without_aa_job_progress_cannot_renew_the_aircraft_hold' (9057147) panicked at crates/sim/tests/ra8_ai.rs:6514:5:
+fresh recruits renewed an unchanged failed AA clearance hold
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_reinforcements_without_aa_job_progress_cannot_renew_the_aircraft_hold ... FAILED
+
+failures:
+
+failures:
+    ra8_reinforcements_without_aa_job_progress_cannot_renew_the_aircraft_hold
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 91 filtered out; finished in 0.25s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

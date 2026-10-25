@@ -1,0 +1,83 @@
+--- a/crates/sim/tests/ra9_guard_effective_targets.rs
++++ b/crates/sim/tests/ra9_guard_effective_targets.rs
+@@ -187,3 +187,80 @@
+     }
+     require_shot(&mut app, guard, legal, None);
+ }
++
++fn occupied_prop_guard_world() -> (bevy_app::App, SimId, SimId, Vec<SimEvent>, i32) {
++    let mut app = world();
++    let at = CellPos::new(20, 20);
++    assert!(app.world_mut().resource_mut::<Grid>().set_terrain(at, Cell {
++        passable: false, water: false, buildable: false, ore: 0,
++    }));
++    let mut looks = vec![0; 48 * 48];
++    looks[20 * 48 + 20] = 5 << 4; // actual House semantic look, as existing Prop controls
++    let d = defs(&app);
++    let armour = d.building_combat(d.building_kind("civilian_house").unwrap()).unwrap().armour;
++    let props = sim::Props::from_looks(app.world().resource::<Grid>(), &looks, armour);
++    let host = props.id_at(at).expect("mapped actorless House");
++    let host_hp = props.get(host).unwrap().1.hit_points;
++    app.world_mut().insert_resource(props);
++    let guard = put(&mut app, P0, "rhino", 17, 20);
++    let occupant = put(&mut app, P1, "conscript", 19, 20);
++    let events = tick(&mut app, vec![issue(P0, Command::Guard { units: vec![guard] })]);
++    assert!(rejected(&events).is_empty(), "{events:?}");
++    let events = tick(&mut app, vec![issue(P1, Command::Interact { unit: occupant, target: host })]);
++    assert!(rejected(&events).is_empty(), "native occupation: {events:?}");
++    assert!(entity(&mut app, occupant).is_none());
++    assert!(entity(&mut app, host).is_none(), "host must truly be actorless");
++    assert_eq!(app.world().resource::<sim::SpecialState>().garrisons[&host].owner, P1);
++    assert_eq!(cargo(&app, host), [occupant]);
++    assert!(app.world().resource::<sim::Players>().get(P0).unwrap().vision().is_visible(at));
++    assert!(host_hp > 0 && hp(&mut app, guard) > 0);
++    (app, guard, host, events, host_hp)
++}
++
++fn prop_shot(events: &[SimEvent], source: SimId, host: SimId) -> bool {
++    events.iter().any(|event| matches!(event, SimEvent::WeaponFired { attacker, target, .. }
++        if *attacker == source && *target == host))
++}
++
++fn prop_damaged(app: &bevy_app::App, host: SimId, before: i32) -> bool {
++    app.world().resource::<sim::Props>().get(host).is_none_or(|(_, p)| p.hit_points < before)
++}
++
++#[test]
++fn ra9_idle_native_combat_targets_actual_hostile_occupied_actorless_prop() {
++    let (mut app, source, host, _, _) = occupied_prop_guard_world();
++    let before = app.world().resource::<sim::Props>().get(host).unwrap().1.hit_points;
++    let mut events = tick(&mut app, vec![issue(P0, Command::Stop { units: vec![source] })]);
++    assert!(rejected(&events).is_empty());
++    let mut fired = false;
++    for _ in 0..240 {
++        fired |= prop_shot(&events, source, host);
++        if fired && prop_damaged(&app, host, before) { cells(&mut app); return; }
++        events = tick(&mut app, vec![]);
++    }
++    panic!("SETUP: ordinary idle Combat never fired/damaged the actual hostile occupied Prop");
++}
++
++#[test]
++fn ra9_guard_targets_actual_hostile_occupied_actorless_prop() {
++    let (mut app, source, host, mut events, before) = occupied_prop_guard_world();
++    let mut fired = false;
++    for _ in 0..240 {
++        fired |= prop_shot(&events, source, host);
++        if fired && prop_damaged(&app, host, before) { cells(&mut app); return; }
++        assert!(hp(&mut app, source) > 0);
++        events = tick(&mut app, vec![]);
++    }
++    let still_full = app.world().resource::<sim::Props>().get(host).unwrap().1.hit_points;
++    events = tick(&mut app, vec![issue(P0, Command::Stop { units: vec![source] })]);
++    assert!(rejected(&events).is_empty());
++    let mut idle_fired = false;
++    for _ in 0..240 {
++        idle_fired |= prop_shot(&events, source, host);
++        if idle_fired && prop_damaged(&app, host, still_full) {
++            panic!("INTENDED: Guard ignored visible hostile occupied Prop for 240 ticks; same living source's ordinary idle Combat then fired and damaged it");
++        }
++        events = tick(&mut app, vec![]);
++    }
++    panic!("SETUP: post-Guard ordinary idle positive did not actually fire/damage");
++}

@@ -1,0 +1,10 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0425]: cannot find function `load_units` in crate `sim`
+  --> crates/sim/tests/ra8_definitions.rs:19:22
+   |
+19 |     let units = sim::load_units(unit_file).unwrap();
+   |                      ^^^^^^^^^^ not found in `sim`
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `sim` (test "ra8_definitions") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

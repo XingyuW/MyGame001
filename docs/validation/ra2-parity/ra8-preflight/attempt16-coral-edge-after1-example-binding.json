@@ -1,0 +1,8 @@
+{
+  "utc": "2026-10-20T22:18:06.758081+00:00",
+  "scope": "Separate adjacent post-run example read; not a rewritten source_before probe binding",
+  "example": "crates/sim/examples/m14_duels.rs",
+  "sha256": "c2276424dd51b832df4391d740bab5dcba1f5caf49c9dc98980bba45d5ac9111",
+  "prior_separate495_restoration": "attempt16-coral-native-trace1-restored-later.json",
+  "exact_receipt": "attempt16-coral-edge-after1.json"
+}

@@ -1,0 +1,20 @@
+{
+  "cmd": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_aircraft_same_decision_admission_counts_existing_queued_and_new_dock_commitments",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 0,
+  "seconds": 5.178783041978022,
+  "ai_source_sha": "19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7",
+  "log_sha": "92aa5a3b3330c52632e45a8e5951c5bf1923bf14a9944e731853ac0484f24ef9"
+}

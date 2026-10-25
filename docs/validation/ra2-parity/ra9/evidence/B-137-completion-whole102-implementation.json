@@ -1,0 +1,66 @@
+{
+  "status": "ACTUAL_NEW_MODULE_SOURCE_ONLY_UNCOMPILED_UNRUN",
+  "assigned_exact_atoms": 102,
+  "census": {
+    "BuildingTypes": 46,
+    "VehicleTypes": 28,
+    "AircraftTypes": 7,
+    "unit_Soylent": 21
+  },
+  "actual_hooks": [
+    "completion_whole::specs(input,d,a) -> Result<Vec<completion::Spec>> before adapters",
+    "completion_whole::guard(input,d,a,spec) -> Result<String> reobserves exact source/whole census/mapping/typed neighbors/code and requires actual successful Compared dependencies equal independently declared demands"
+  ],
+  "classification": "CURRENT_MODEL_NONREAD for all102; active mapped presence preserved, never OriginalEngineUnused/Expected read coverage; root individually authorized choices still require A common completion admission/binding/receipt materialization.",
+  "physical": "Only pre-existing independent economy.production.cost/combat.hit_points +unit arsenal.infantry IDs, a.physical normalized; Source Cost/Strength demands checked when present, false/default no source key invented. Category/domain/role are typed current-policy observations, no fake Native field witness.",
+  "source_findings": "Only generator tables.listed(InfantryTypes) is read; the three source registry ordinals are not generator inputs. Soylent generated only for building refunds. Actual Definitions refund(BuildingKind), SellBuilding and XP worth(production.cost) remain separate current behaviors.",
+  "source_pins": {
+    "scripts/generate_ra2_data.py": {
+      "sha256": "7ad36719acf71c12aaeac6fd28894018be60fd78912c1f89a3757724da167163",
+      "fnv1a64": "a7ce0c09a609cad9"
+    },
+    "crates/sim/src/command.rs": {
+      "sha256": "a98ad02236195a834d374326c933a507f3cf9d647f4c26b15761645cbaf7327e",
+      "fnv1a64": "fa6e7f66569e6b1f"
+    },
+    "crates/sim/src/arsenal.rs": {
+      "sha256": "f4d5f0aa0ba47c575d7242c1a72a7e8a206fba53504dc0122ba0f2b6a06a89a5",
+      "fnv1a64": "40d7f3082d74ff37"
+    },
+    "crates/sim/src/economy_defs.rs": {
+      "sha256": "076ae99a442b552d00581df28add9da31131f7fe415f2bb6994af17ad65054d6",
+      "fnv1a64": "72658060a6fb85c8"
+    },
+    "crates/sim/src/veterancy.rs": {
+      "sha256": "38f07941bb7b1e0c56a983dc8f108a063bd98f86d53ae9f156ea8e55337efb42",
+      "fnv1a64": "53186583ba89d820"
+    },
+    "crates/sim/src/special/interaction.rs": {
+      "sha256": "b4e0ade7d3c3b5ecc7023e92cbc5607c077fc8b87cea3191c98cbe245d51cf86",
+      "fnv1a64": "c80ce6fa4483e553"
+    }
+  },
+  "inputs": {
+    "ra9-preliminary-logs/137-actual-uncovered-reference-atoms.tsv": "98748ccb54124532df0a4f2b322dc1bad1fe5c7af4a18461e82221ab56e86bc5",
+    "crates/sim/tests/reference/ra2_mapping.tsv": "92ca1764cc5ba7ebb80d7da741ce14a6b91ce0ced373834c96374776df9f8073",
+    "crates/sim/tests/reference/ra2_reference.tsv": "0d4b6a110cffb7d43991ace2e404a0b896747d75cb215d04b5151f367f377265",
+    "crates/sim/tests/ra9_audit/completion.rs": "afc869f93dc4209d531fd13926c0a0a4e32fc0359ea410b559bd3e7c9072d995"
+  },
+  "outputs": {
+    "completion-whole.rs": {
+      "sha256": "5082d688192bb30dd087de415e5dda7186af6285aa70bd8a7544e05237be9aa4",
+      "bytes": 13548
+    },
+    "completion-whole-contracts.tsv": {
+      "sha256": "a23ba4c7a2c7d3aa3c6334c67e6da2db6dca69b83fea4b893ee75385ed8d7157",
+      "bytes": 130546
+    }
+  },
+  "named_tests": [
+    "ra9_completion_whole102_live_baseline_then_source_and_real_neighbor_negatives",
+    "ra9_completion_whole_registry_active_alias_and_fake_read_credit_negatives"
+  ],
+  "test_scope": "Loaded/native-field audit controls ONLY: actual adapters successful baseline, remove actual successful witness; change only ADOG.Soylent50->51; remove actual ORCA alias; inject forbidden read-demand. No command/native gameplay/perflag newbody or native source fidelity claim.",
+  "remaining": "A registers module/common174 portion-aware router/acceptance/evidence; actual compile+loaded/body/wholeaudit/negative execution and root source rebinding owed. No old files/tests/contracts modified by B.",
+  "no_new_directories": true
+}

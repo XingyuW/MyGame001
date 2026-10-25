@@ -7,6 +7,11 @@
 //!
 //! Requests are served by [`find_paths`] in the `Pathfinding` stage, at most
 //! [`PATH_REQUESTS_PER_TICK`] per tick, oldest first.
+//!
+//! Since RA3 (invariant I6', docs/DECISIONS.md R6) a cell held by units is closed to a unit if
+//! those that count as obstacles leave it no room there ([`Grid::blocked`]): any of them for a
+//! vehicle, a vehicle or all three spots for a unit on foot. Infantry that a unit whose order
+//! may crush would drive over is no obstacle to it.
 
 use std::cmp::Reverse;
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap};
@@ -16,10 +21,13 @@ use bevy_ecs::message::Messages;
 use bevy_ecs::query::With;
 use bevy_ecs::system::{Query, Res, ResMut};
 
+use crate::definitions::Definitions;
+use crate::economy::Players;
 use crate::event::{MoveFailure, SimEvent};
 use crate::id::SimId;
 use crate::map::{CellPos, Grid};
-use crate::unit::{Direction, Mobile, Orders, PathState, Unit};
+use crate::movement::Crushable;
+use crate::unit::{Direction, Mobile, Orders, Owner, PathState, Unit};
 
 /// Cost of an orthogonal step.
 pub const ORTHOGONAL_COST: u32 = 10;
@@ -215,8 +223,19 @@ pub(crate) fn nearest_cell(
         .copied()
 }
 
-type PathQuery<'w, 's> =
-    Query<'w, 's, (Entity, &'static SimId, &'static Mobile, &'static mut Orders), With<Unit>>;
+type PathQuery<'w, 's> = Query<
+    'w,
+    's,
+    (
+        Entity,
+        &'static SimId,
+        &'static Mobile,
+        &'static mut Orders,
+        &'static Owner,
+        &'static Unit,
+    ),
+    With<Unit>,
+>;
 
 /// A unit without an order standing at a cell centre. It stays where it is until it is given an
 /// order, so the cell it holds is a lasting obstacle.
@@ -263,12 +282,14 @@ fn is_waiting(mobile: &Mobile, orders: &Orders) -> bool {
 pub(crate) fn find_paths(
     grid: Res<Grid>,
     mut events: ResMut<Messages<SimEvent>>,
+    players: Res<Players>,
+    definitions: Res<Definitions>,
     mut units: PathQuery,
 ) {
     let mut requests: Vec<(u64, SimId, Entity)> = units
         .iter()
         .filter_map(
-            |(entity, id, _, orders)| match orders.current.as_ref()?.state {
+            |(entity, id, _, orders, ..)| match orders.current.as_ref()?.state {
                 PathState::Requested { since, .. } => Some((since, *id, entity)),
                 PathState::Following => None,
             },
@@ -282,7 +303,7 @@ pub(crate) fn find_paths(
     let collect = |filter: fn(&Mobile, &Orders) -> bool| -> BTreeSet<SimId> {
         units
             .iter()
-            .filter(|(_, _, mobile, orders)| filter(mobile, orders))
+            .filter(|(_, _, mobile, orders, ..)| filter(mobile, orders))
             .map(|(_, id, ..)| *id)
             .collect()
     };
@@ -292,8 +313,8 @@ pub(crate) fn find_paths(
     // and its destination.
     let wants: BTreeMap<SimId, Waiter> = units
         .iter()
-        .filter(|(_, _, mobile, orders)| is_waiting(mobile, orders))
-        .filter_map(|(_, id, mobile, orders)| {
+        .filter(|(_, _, mobile, orders, ..)| is_waiting(mobile, orders))
+        .filter_map(|(_, id, mobile, orders, ..)| {
             let order = orders.current.as_ref()?;
             Some((
                 *id,
@@ -305,9 +326,17 @@ pub(crate) fn find_paths(
             ))
         })
         .collect();
+    let crushable = Crushable::of(
+        &definitions,
+        units
+            .iter()
+            .map(|(entity, id, _, _, owner, unit)| (entity, *id, owner.0, unit.kind)),
+    );
 
     for (_, id, entity) in requests {
-        let Ok((_, _, mobile, mut orders)) = units.get_mut(entity) else {
+        let on_foot = grid.is_on_foot(id);
+        let grid = grid.navigation_for(grid.domain_of(id));
+        let Ok((_, _, mobile, mut orders, owner, _)) = units.get_mut(entity) else {
             continue;
         };
         let start = mobile.next_centre();
@@ -322,9 +351,13 @@ pub(crate) fn find_paths(
         else {
             continue;
         };
+        // Infantry the unit would drive over on this order is not in its way.
+        let crush = order.crush;
+        let crushes = |holder: SimId| crush && crushable.by(&players, owner.0, holder);
         let held_by = |obstacles: &BTreeSet<SimId>, cell: CellPos| {
-            grid.occupant(cell)
-                .is_some_and(|holder| holder != id && obstacles.contains(&holder))
+            grid.blocked(cell, id, on_foot, |holder| {
+                obstacles.contains(&holder) && !crushes(holder)
+            })
         };
         let around = |obstacles: &BTreeSet<SimId>| {
             find_path(&grid, start, order.destination, |cell| {
@@ -335,7 +368,9 @@ pub(crate) fn find_paths(
         let path = if avoid_units {
             around(&waiting).or_else(|| match wait_cycle(&grid, id, &wants, &waiting) {
                 Some(cycle) => match cycle.yielder {
-                    Some(yielder) if yielder == id => step_aside(&grid, start, order.destination),
+                    Some(yielder) if yielder == id => {
+                        step_aside(&grid, id, start, order.destination)
+                    }
                     Some(_) => around(&lasting),
                     None => {
                         lasting.extend(cycle.members);
@@ -404,7 +439,9 @@ struct WaitCycle {
 
 /// The wait-for cycle through `unit`, if following, from `unit`, the waiting unit that holds the
 /// cell each unit wants to enter leads back to `unit`. The chain visits each unit at most once,
-/// and every member of a cycle computes the same cycle and yielder from the same state.
+/// and every member of a cycle computes the same cycle and yielder from the same state. Of the
+/// units that keep a unit out of a cell (several, where infantry hold it) the chain follows the
+/// first.
 fn wait_cycle(
     grid: &Grid,
     unit: SimId,
@@ -414,16 +451,17 @@ fn wait_cycle(
     let mut members = BTreeSet::new();
     let mut at = unit;
     while members.insert(at) {
-        let holder = wants
-            .get(&at)
-            .and_then(|waiter| grid.occupant(waiter.next))?;
+        let holder = wants.get(&at).and_then(|waiter| {
+            let blockers = grid.blockers(waiter.next, at, grid.is_on_foot(at));
+            blockers.into_iter().flatten().next()
+        })?;
         if holder == unit {
             let yielder = members
                 .iter()
                 .copied()
                 .filter(|member| {
                     wants.get(member).is_some_and(|waiter| {
-                        step_aside(grid, waiter.cell, waiter.destination).is_some()
+                        step_aside(grid, *member, waiter.cell, waiter.destination).is_some()
                     })
                 })
                 .max();
@@ -437,12 +475,13 @@ fn wait_cycle(
     None
 }
 
-/// A one-step path to the free, passable neighbour of `start` nearest to `destination` (by
-/// octile distance, then row and column) that a step may reach under the diagonal rule of
-/// [`find_path`]; `None` if every neighbour is taken.
-fn step_aside(grid: &Grid, start: CellPos, destination: CellPos) -> Option<Path> {
+/// A one-step path for `unit` to the passable neighbour of `start` with room for it nearest to
+/// `destination` (by octile distance, then row and column) that a step may reach under the
+/// diagonal rule of [`find_path`]; `None` if every neighbour is taken.
+fn step_aside(grid: &Grid, unit: SimId, start: CellPos, destination: CellPos) -> Option<Path> {
+    let on_foot = grid.is_on_foot(unit);
     neighbours(grid, start, &|cell| {
-        grid.is_passable(cell) && grid.occupant(cell).is_none()
+        grid.is_passable(cell) && grid.has_room(cell, on_foot)
     })
     .min_by_key(|&(cell, _)| (octile_distance(cell, destination), cell.y, cell.x))
     .map(|(cell, cost)| Path {

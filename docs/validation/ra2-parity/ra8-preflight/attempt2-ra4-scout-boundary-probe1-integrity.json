@@ -1,0 +1,9 @@
+{
+  "purpose": "one exact RA4 diagnostic: restrict new observed-scout continuation to documented RA8 strategy opt-in, then immediately restore original source",
+  "before_sha256": "bf9d35970f1fe1e392ed37b7d6817df611cf4b248c5756155779b1ac62f1df7e",
+  "probe_sha256": "f89229c7093c614ec783d43a8f20a33cc0affe92bbcec1b67f70ce42863835b4",
+  "exit": 0,
+  "elapsed_seconds": 20.585106082988204,
+  "restored_sha256": "bf9d35970f1fe1e392ed37b7d6817df611cf4b248c5756155779b1ac62f1df7e",
+  "restored_identical": true
+}

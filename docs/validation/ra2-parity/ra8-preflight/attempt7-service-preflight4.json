@@ -1,0 +1,65 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all"
+    ],
+    "exit": 0,
+    "seconds": 0.8442964160058182,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-format3.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "command::ra8_intent_tests::ra8_service_healing_certificate_keeps_public_intrinsic_capacity_and_fifo_errors_strict",
+      "--",
+      "--exact",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "seconds": 16.093346291978378,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-security-after3.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "command::ra8_intent_tests",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 0.5754290000186302,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-intents-all2.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate7_lakes_russia_medium_libya_brutal_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 67.20667399998638,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-exact-after2.log"
+  }
+]

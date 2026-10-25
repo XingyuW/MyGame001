@@ -1,0 +1,21 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Checking game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+error: using `clone` on type `Harvester` which implements the `Copy` trait
+  --> crates/sim/tests/ra9_temporal_sources.rs:86:13
+   |
+86 |     let h = app.world().get::<Harvester>(e).unwrap().clone();
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try dereferencing it: `*app.world().get::<Harvester>(e).unwrap()`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#clone_on_copy
+   = note: `-D clippy::clone-on-copy` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::clone_on_copy)]`
+
+error: using `clone` on type `QueueItem` which implements the `Copy` trait
+   --> crates/sim/tests/ra9_temporal_sources.rs:354:18
+    |
+354 |     let before = app.world().resource::<Players>().get(P0).unwrap().lane(key)[0].clone();
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try removing the `clone` call: `app.world().resource::<Players>().get(P0).unwrap().lane(key)[0]`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#clone_on_copy
+
+error: could not compile `sim` (test "ra9_temporal_sources") due to 2 previous errors

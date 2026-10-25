@@ -1,0 +1,39 @@
+{
+  "guard75": {
+    "facts": 216,
+    "byte_equal": true
+  },
+  "special": {
+    "facts": 36,
+    "byte_equal": true
+  },
+  "F251_eligible": [
+    "AMMOCRAT",
+    "CAMISC01",
+    "CAMISC02"
+  ],
+  "legacy904": {
+    "families": 131,
+    "byte_equal": true,
+    "F146_F147_F251": [
+      [
+        "F146",
+        "105",
+        "361",
+        "80ed3686dfeb0322e952ee873b714fe0125e228584fc32cfedcf2200e58339dc"
+      ],
+      [
+        "F147",
+        "105",
+        "361",
+        "80ed3686dfeb0322e952ee873b714fe0125e228584fc32cfedcf2200e58339dc"
+      ],
+      [
+        "F251",
+        "1",
+        "3",
+        "ade2004f26c10d47771bada01541066d5b56031c20bb60255a9f2802719d13a8"
+      ]
+    ]
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "utc": "2026-10-20T19:33:20.202076+00:00",
+  "attempt": 16,
+  "head": "26ad1e384ff17aff2a0075a08f39d510f28d0067",
+  "wrapper_pid": 84658,
+  "script_pid": 84687,
+  "owned_pgid": 84687,
+  "completed_phase_count": 9,
+  "latest_reported_progress": "M6 production progress completed756/756 non_Won0",
+  "owned_descendants": [
+    {
+      "pid": 14459,
+      "ppid": 84687,
+      "pgid": 84687,
+      "elapsed": "01:32:01",
+      "cpu_time": "451:32.07",
+      "cpu_percent": "283.5",
+      "state": "R",
+      "command": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples/m14_duels"
+    },
+    {
+      "pid": 84658,
+      "ppid": 7720,
+      "pgid": 84658,
+      "elapsed": "07:01:12",
+      "cpu_time": "0:06.64",
+      "cpu_percent": "0.0",
+      "state": "Ss",
+      "command": "/opt/homebrew/Cellar/python@3.15/3.15.0/Frameworks/Python.framework/Versions/3.15/Resources/Python.app/Contents/MacOS/Python"
+    },
+    {
+      "pid": 84687,
+      "ppid": 84658,
+      "pgid": 84687,
+      "elapsed": "07:01:12",
+      "cpu_time": "0:00.02",
+      "cpu_percent": "0.0",
+      "state": "Ss",
+      "command": "sh"
+    },
+    {
+      "pid": 84692,
+      "ppid": 84687,
+      "pgid": 84687,
+      "elapsed": "07:01:12",
+      "cpu_time": "0:00.01",
+      "cpu_percent": "0.0",
+      "state": "S",
+      "command": "caffeinate"
+    }
+  ],
+  "source_files_verified": 495,
+  "source_mismatches": [],
+  "note": "Read-only bounded activity snapshot, no profiler/signal. CPU is activity only; pending cases may not be inferred successful.",
+  "duels_actual_Won_lines": 359,
+  "duels_nonwinner_lines": []
+}

@@ -1,0 +1,5 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 24.05s
+     Running `/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples/ra8_profile`
+20000 immutable definition copies: 628.800833ms
+5000 seeded ticks incl hash: 1.852973083s; digest 6696b039de9f6296

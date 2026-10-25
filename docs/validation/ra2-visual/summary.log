@@ -1,0 +1,4 @@
+fmt exit 0
+clippy exit 0
+test exit 0
+smoke exit 0

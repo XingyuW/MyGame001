@@ -1,0 +1,22 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 2.73s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+late Yuri SimId(3): Some(Health { hit_points: 78 }), Some(Weapon { kind: WeaponKind(61), secondary: Some(WeaponKind(97)), cooldown: 0, burst_left: 0, volley: WeaponKind(61), target: None, order: Some(AttackMove { destination: CellPos { x: 37, y: 30 }, moving: true }) }), wave={SimId(3), SimId(4), SimId(5), SimId(6), SimId(7), SimId(8)}, held={SimId(5): (SimId(3), PlayerId(1)), SimId(6): (SimId(4), PlayerId(1))}
+late Yuri SimId(4): Some(Health { hit_points: 78 }), Some(Weapon { kind: WeaponKind(61), secondary: Some(WeaponKind(97)), cooldown: 0, burst_left: 0, volley: WeaponKind(61), target: None, order: Some(AttackMove { destination: CellPos { x: 37, y: 30 }, moving: true }) }), wave={SimId(3), SimId(4), SimId(5), SimId(6), SimId(7), SimId(8)}, held={SimId(5): (SimId(3), PlayerId(1)), SimId(6): (SimId(4), PlayerId(1))}
+late target transitions: {"Waypoint(94)"}
+
+thread 'ra8_control_holding_specialists_do_not_pin_a_capable_ai_wave_to_one_waypoint' (4800660) panicked at crates/sim/tests/ra8_ai.rs:432:5:
+capable wave remained pinned by held-control markers: {"Waypoint(94)"}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_control_holding_specialists_do_not_pin_a_capable_ai_wave_to_one_waypoint ... FAILED
+
+failures:
+
+failures:
+    ra8_control_holding_specialists_do_not_pin_a_capable_ai_wave_to_one_waypoint
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 24 filtered out; finished in 0.39s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

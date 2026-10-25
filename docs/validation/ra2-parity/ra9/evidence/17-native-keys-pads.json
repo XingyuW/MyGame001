@@ -1,0 +1,20 @@
+{
+  "utc": "2026-10-20T22:41:26.882363+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_native_keys",
+    "--test",
+    "ra9_pad_health",
+    "--no-fail-fast",
+    "--",
+    "--test-threads=1"
+  ],
+  "exit_code": 101,
+  "seconds": 256.81,
+  "lease": "second of RA8 three-command bounded jobs1 window; target unchanged",
+  "status": "actual preliminary copy; no final acceptance"
+}

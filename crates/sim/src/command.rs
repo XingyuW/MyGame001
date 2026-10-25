@@ -28,23 +28,87 @@ pub struct PlayerId(pub u8);
 /// Largest number of units one command may name.
 pub const MAX_UNITS_PER_COMMAND: usize = 1024;
 
+/// A forced shot may name a known object (including an ally) or a ground cell.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ForceTarget {
+    Cell(CellPos),
+    Entity(SimId),
+}
+
 /// An order issued by a player (PLAN.md section 5).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Command {
+    Guard {
+        units: Vec<SimId>,
+    },
+    Scatter {
+        units: Vec<SimId>,
+    },
+    Follow {
+        units: Vec<SimId>,
+        target: SimId,
+    },
+    ForceFire {
+        units: Vec<SimId>,
+        target: ForceTarget,
+    },
+    ForceMove {
+        units: Vec<SimId>,
+        target: CellPos,
+    },
+    QueueMove {
+        units: Vec<SimId>,
+        target: CellPos,
+    },
+    Deploy {
+        unit: SimId,
+    },
+    /// Turn the player's Construction Yard back into the base unit of its side, standing in the
+    /// cell of the yard's footprint origin (RA1, the lobby's "MCV repacks"; `crate::special`).
+    /// Rejected with `DisabledByOptions` in a match that has the option switched off.
+    Undeploy {
+        building: SimId,
+    },
+    Interact {
+        unit: SimId,
+        target: SimId,
+    },
+    Chronoshift {
+        building: SimId,
+        source: CellPos,
+        target: CellPos,
+    },
+    Superweapon {
+        building: SimId,
+        target: CellPos,
+        units: Vec<SimId>,
+    },
     /// Move the units to `target`. A group receives distinct destination cells around the
     /// target (docs/DECISIONS.md D19). Harvesters among them stop their cycle.
-    Move { units: Vec<SimId>, target: CellPos },
+    Move {
+        units: Vec<SimId>,
+        target: CellPos,
+    },
     /// Cancel the units' orders; each stops at its next cell centre. Harvesters among them stop
     /// their cycle.
-    Stop { units: Vec<SimId> },
+    Stop {
+        units: Vec<SimId>,
+    },
     /// Start or resume the harvesting cycle of the harvesters, each at the cell with ore
     /// nearest to `target` that no other harvester has taken (docs/DECISIONS.md D26).
-    Harvest { units: Vec<SimId>, target: CellPos },
+    Harvest {
+        units: Vec<SimId>,
+        target: CellPos,
+    },
     /// Append `item` to the player's queue of its producing building type (docs/DECISIONS.md
     /// D25).
-    QueueProduction { item: ProductionItem },
+    QueueProduction {
+        item: ProductionItem,
+    },
     /// Remove the most recently queued `item` from its queue and refund what was charged for it.
-    CancelProduction { item: ProductionItem },
+    CancelProduction {
+        item: ProductionItem,
+    },
     /// Place the player's ready building of type `building` with its footprint's origin (the
     /// cell with the smallest coordinates) at `origin` (docs/DECISIONS.md D24).
     PlaceBuilding {
@@ -52,32 +116,78 @@ pub enum Command {
         origin: CellPos,
     },
     /// Sell the building: remove it, free its cells, and refund its sell value.
-    SellBuilding { building: SimId },
+    SellBuilding {
+        building: SimId,
+    },
+    /// Start repairing the player's building, or stop if it is being repaired. A repaired
+    /// building regains hit points in steps, each paid for from the player's credits, until it
+    /// is whole (`economy::repair_buildings`).
+    RepairBuilding {
+        building: SimId,
+    },
     /// Units produced by the building move to `cell` when they leave it.
-    SetRallyPoint { building: SimId, cell: CellPos },
+    SetRallyPoint {
+        building: SimId,
+        cell: CellPos,
+    },
     /// The armed units attack `target`, a unit or building of another player that the issuing
     /// player sees, moving into range if needed, until it is destroyed or no longer visible
     /// (docs/DECISIONS.md D29). Harvesters among them stop their cycle.
-    Attack { units: Vec<SimId>, target: SimId },
+    Attack {
+        units: Vec<SimId>,
+        target: SimId,
+    },
     /// Move the units to `target` as `Move` does; the armed ones stop to fight visible enemies in
     /// range on the way and then move on (docs/DECISIONS.md D29). Harvesters among them stop
     /// their cycle.
-    AttackMove { units: Vec<SimId>, target: CellPos },
+    AttackMove {
+        units: Vec<SimId>,
+        target: CellPos,
+    },
 }
 
 impl Command {
-    /// The units a unit command names; `None` for the economy commands.
-    fn units(&self) -> Option<&[SimId]> {
+    fn units_mut(&mut self) -> Option<&mut Vec<SimId>> {
         match self {
-            Command::Move { units, .. }
+            Self::Guard { units }
+            | Self::Scatter { units }
+            | Self::Follow { units, .. }
+            | Self::ForceFire { units, .. }
+            | Self::ForceMove { units, .. }
+            | Self::QueueMove { units, .. }
+            | Self::Move { units, .. }
+            | Self::Stop { units }
+            | Self::Harvest { units, .. }
+            | Self::Attack { units, .. }
+            | Self::AttackMove { units, .. } => Some(units),
+            _ => None,
+        }
+    }
+
+    /// The units a unit command names; `None` for the economy commands.
+    pub(crate) fn units(&self) -> Option<&[SimId]> {
+        match self {
+            Command::Guard { units }
+            | Command::Scatter { units }
+            | Command::Follow { units, .. }
+            | Command::ForceFire { units, .. }
+            | Command::ForceMove { units, .. }
+            | Command::QueueMove { units, .. }
+            | Command::Move { units, .. }
             | Command::Stop { units }
             | Command::Harvest { units, .. }
             | Command::Attack { units, .. }
             | Command::AttackMove { units, .. } => Some(units),
-            Command::QueueProduction { .. }
+            Command::Deploy { .. }
+            | Command::Undeploy { .. }
+            | Command::Interact { .. }
+            | Command::Chronoshift { .. }
+            | Command::Superweapon { .. }
+            | Command::QueueProduction { .. }
             | Command::CancelProduction { .. }
             | Command::PlaceBuilding { .. }
             | Command::SellBuilding { .. }
+            | Command::RepairBuilding { .. }
             | Command::SetRallyPoint { .. } => None,
         }
     }
@@ -86,6 +196,7 @@ impl Command {
 /// Why a command was rejected. A rejected command changes no state.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum RejectReason {
+    AbilityUnavailable(&'static str),
     NoUnits,
     TooManyUnits {
         count: usize,
@@ -117,11 +228,32 @@ pub enum RejectReason {
         item: ProductionItem,
         producer: BuildingKind,
     },
-    /// The queue of `producer` already holds `max` items.
+    /// The player owns factories of the kind that produces `item`, but none of a side that
+    /// builds it (RA1: an Allied Barracks does not train Conscripts).
+    NoFactoryOfSide(ProductionItem),
+    /// Only certain countries build `item`, and the player's is not one of them (RA1).
+    CountryRequired(ProductionItem),
+    /// The player's country may not build `item` (RA1).
+    CountryForbidden(ProductionItem),
+    /// The options of the match switch this off (RA1: a superweapon building with superweapons
+    /// off, `Undeploy` with "MCV repacks" off).
+    DisabledByOptions,
+    /// The queue of `producer` already holds `max` items (with a rules file, RA2: the lane of
+    /// the item's producer, which holds one building, or one unit and those queued behind it).
     QueueFull {
         producer: BuildingKind,
         max: usize,
     },
+    /// The player already owns or has queued `limit` buildings of this type, the most its type
+    /// allows (RA2, the ini's `BuildLimit`).
+    BuildLimitReached {
+        item: ProductionItem,
+        limit: u32,
+    },
+    /// The building's type cannot be sold (RA2: a wall).
+    NotSellable(SimId),
+    /// The building's type cannot be repaired (RA2: a wall).
+    NotRepairable(SimId),
     /// No such item is in the player's queues (`CancelProduction`).
     NotQueued(ProductionItem),
     /// The player has no complete building of this type at the head of its queue
@@ -139,6 +271,12 @@ pub enum RejectReason {
     NotArmed(SimId),
     /// The target belongs to the issuing player (`Attack`).
     OwnTarget(SimId),
+    /// The aircraft needs a dock, and every dock of the player's buildings is taken by an
+    /// aircraft it owns or has queued (`QueueProduction`; RA4).
+    NoFreeDock(ProductionItem),
+    /// The unit is a missile or an aircraft that another unit launched: it takes no commands
+    /// (RA4).
+    NotCommandable(SimId),
     /// No unit or building with this id is visible to the issuing player (`Attack`): it does not
     /// exist (any more), or it is an enemy the player does not see. The two cases are reported
     /// alike, so that commands reveal nothing about unseen enemies (docs/DECISIONS.md D30).
@@ -148,6 +286,11 @@ pub enum RejectReason {
 impl fmt::Display for RejectReason {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Self::AbilityUnavailable(reason) => write!(f, "{reason}"),
+            Self::NoFreeDock(item) => {
+                write!(f, "{item:?} needs a dock, and every dock is taken")
+            }
+            Self::NotCommandable(id) => write!(f, "unit {} takes no commands", id.0),
             Self::NoUnits => write!(f, "the command names no unit"),
             Self::TooManyUnits { count, max } => {
                 write!(
@@ -177,11 +320,28 @@ impl fmt::Display for RejectReason {
                 "{item:?} is produced by buildings of type {}, and the player owns none",
                 producer.0
             ),
+            Self::NoFactoryOfSide(item) => write!(
+                f,
+                "{item:?} is built by factories of another side, and the player owns none"
+            ),
+            Self::CountryRequired(item) => {
+                write!(f, "{item:?} is built only by other countries")
+            }
+            Self::CountryForbidden(item) => {
+                write!(f, "{item:?} may not be built by the player's country")
+            }
+            Self::DisabledByOptions => write!(f, "the options of the match switch this off"),
             Self::QueueFull { producer, max } => write!(
                 f,
                 "the queue of building type {} already holds {max} items",
                 producer.0
             ),
+            Self::BuildLimitReached { item, limit } => write!(
+                f,
+                "the player may have {limit} of {item:?}, and has or has queued as many"
+            ),
+            Self::NotSellable(id) => write!(f, "building {} cannot be sold", id.0),
+            Self::NotRepairable(id) => write!(f, "building {} cannot be repaired", id.0),
             Self::NotQueued(item) => write!(f, "{item:?} is not queued"),
             Self::NotReady(kind) => write!(f, "no building of type {} is ready", kind.0),
             Self::Placement(error) => error.fmt(f),
@@ -210,12 +370,68 @@ pub struct IssuedCommand {
 /// (invariant I5).
 #[derive(Resource, Debug, Default)]
 pub struct CommandQueue {
-    pending: Vec<IssuedCommand>,
+    pending: Vec<PendingCommand>,
+}
+
+#[derive(Debug)]
+struct PendingCommand {
+    issued: IssuedCommand,
+    // Only run_ai may create this origin; public push stays strictly atomic, even for an AI owner.
+    ai_intent: Option<AiIntent>,
+    action: PendingAction,
+}
+
+/// Private goals are distinct from ordinary public command attempts. A bridge goal
+/// authorizes a known Engineer/hut job, then dispatches Interact only when physically safe.
+#[derive(Debug, Default, PartialEq, Eq)]
+enum PendingAction {
+    #[default]
+    Command,
+    ConditionalBridgeRepair,
+}
+
+/// Facts established by the controller's honest decision snapshot, not validation exemptions.
+#[derive(Debug, Default)]
+pub(crate) struct AiIntent {
+    pub owned: BTreeSet<SimId>,
+    pub armed: BTreeSet<SimId>,
+    pub target: Option<SimId>,
+    pub strategic_valid: bool,
+    pub service_valid: bool,
 }
 
 impl CommandQueue {
     pub fn push(&mut self, issued: IssuedCommand) {
-        self.pending.push(issued);
+        self.pending.push(PendingCommand {
+            issued,
+            ai_intent: None,
+            action: PendingAction::Command,
+        });
+    }
+
+    pub(crate) fn push_ai(&mut self, issued: IssuedCommand, witness: AiIntent) {
+        self.pending.push(PendingCommand {
+            issued,
+            ai_intent: Some(witness),
+            action: PendingAction::Command,
+        });
+    }
+
+    pub(crate) fn push_bridge_goal(
+        &mut self,
+        player: PlayerId,
+        unit: SimId,
+        hut: SimId,
+        witness: AiIntent,
+    ) {
+        self.pending.push(PendingCommand {
+            issued: IssuedCommand {
+                player,
+                command: Command::Interact { unit, target: hut },
+            },
+            ai_intent: Some(witness),
+            action: PendingAction::ConditionalBridgeRepair,
+        });
     }
 
     pub fn len(&self) -> usize {
@@ -226,10 +442,191 @@ impl CommandQueue {
         self.pending.is_empty()
     }
 
-    /// The pending commands in push order. After a tick these are the commands the computer
+    /// The pending commands in push order; a private conditional bridge goal projects its
+    /// proposed Interact, without disclosing physical readiness. After a tick these are the commands the computer
     /// players pushed in its `Ai` stage (M6), since the `Commands` stage drained the queue first.
     pub fn iter(&self) -> impl Iterator<Item = &IssuedCommand> {
-        self.pending.iter()
+        self.pending.iter().map(|pending| &pending.issued)
+    }
+
+    pub(crate) fn hash_into(&self, h: &mut crate::Fnv1a64) {
+        if self.pending.is_empty() {
+            return;
+        }
+        h.write(b"queued_commands_ra8");
+        h.write_u64(self.pending.len() as u64);
+        for pending in &self.pending {
+            h.write(&[match pending.action {
+                PendingAction::Command => 0,
+                PendingAction::ConditionalBridgeRepair => 1,
+            }]);
+            h.write(&[
+                pending.issued.player.0,
+                u8::from(pending.ai_intent.is_some()),
+            ]);
+            if let Some(witness) = &pending.ai_intent {
+                for ids in [&witness.owned, &witness.armed] {
+                    h.write_u64(ids.len() as u64);
+                    for id in ids {
+                        h.write_u32(id.0);
+                    }
+                }
+                h.write(&[u8::from(witness.target.is_some())]);
+                if let Some(target) = witness.target {
+                    h.write_u32(target.0);
+                }
+                h.write(&[u8::from(witness.strategic_valid)]);
+                h.write(&[u8::from(witness.service_valid)]);
+            }
+            hash_command(&pending.issued.command, h);
+        }
+    }
+}
+
+fn hash_command(command: &Command, h: &mut crate::Fnv1a64) {
+    fn ids(h: &mut crate::Fnv1a64, values: &[SimId]) {
+        h.write_u64(values.len() as u64);
+        for id in values {
+            h.write_u32(id.0);
+        }
+    }
+    fn cell(h: &mut crate::Fnv1a64, p: CellPos) {
+        h.write(&p.x.to_le_bytes());
+        h.write(&p.y.to_le_bytes());
+    }
+    fn item(h: &mut crate::Fnv1a64, p: ProductionItem) {
+        match p {
+            ProductionItem::Unit(k) => {
+                h.write(&[0]);
+                h.write(&k.0.to_le_bytes());
+            }
+            ProductionItem::Building(k) => {
+                h.write(&[1]);
+                h.write(&k.0.to_le_bytes());
+            }
+        }
+    }
+    match command {
+        Command::Guard { units } => {
+            h.write(&[0]);
+            ids(h, units);
+        }
+        Command::Scatter { units } => {
+            h.write(&[1]);
+            ids(h, units);
+        }
+        Command::Follow { units, target } => {
+            h.write(&[2]);
+            ids(h, units);
+            h.write_u32(target.0);
+        }
+        Command::ForceFire { units, target } => {
+            h.write(&[3]);
+            ids(h, units);
+            match target {
+                ForceTarget::Cell(p) => {
+                    h.write(&[0]);
+                    cell(h, *p);
+                }
+                ForceTarget::Entity(id) => {
+                    h.write(&[1]);
+                    h.write_u32(id.0);
+                }
+            }
+        }
+        Command::ForceMove { units, target } => {
+            h.write(&[4]);
+            ids(h, units);
+            cell(h, *target);
+        }
+        Command::QueueMove { units, target } => {
+            h.write(&[5]);
+            ids(h, units);
+            cell(h, *target);
+        }
+        Command::Deploy { unit } => {
+            h.write(&[6]);
+            h.write_u32(unit.0);
+        }
+        Command::Undeploy { building } => {
+            h.write(&[7]);
+            h.write_u32(building.0);
+        }
+        Command::Interact { unit, target } => {
+            h.write(&[8]);
+            h.write_u32(unit.0);
+            h.write_u32(target.0);
+        }
+        Command::Chronoshift {
+            building,
+            source,
+            target,
+        } => {
+            h.write(&[9]);
+            h.write_u32(building.0);
+            cell(h, *source);
+            cell(h, *target);
+        }
+        Command::Superweapon {
+            building,
+            target,
+            units,
+        } => {
+            h.write(&[10]);
+            h.write_u32(building.0);
+            cell(h, *target);
+            ids(h, units);
+        }
+        Command::Move { units, target } => {
+            h.write(&[11]);
+            ids(h, units);
+            cell(h, *target);
+        }
+        Command::Stop { units } => {
+            h.write(&[12]);
+            ids(h, units);
+        }
+        Command::Harvest { units, target } => {
+            h.write(&[13]);
+            ids(h, units);
+            cell(h, *target);
+        }
+        Command::QueueProduction { item: p } => {
+            h.write(&[14]);
+            item(h, *p);
+        }
+        Command::CancelProduction { item: p } => {
+            h.write(&[15]);
+            item(h, *p);
+        }
+        Command::PlaceBuilding { building, origin } => {
+            h.write(&[16]);
+            h.write(&building.0.to_le_bytes());
+            cell(h, *origin);
+        }
+        Command::SellBuilding { building } => {
+            h.write(&[17]);
+            h.write_u32(building.0);
+        }
+        Command::RepairBuilding { building } => {
+            h.write(&[18]);
+            h.write_u32(building.0);
+        }
+        Command::SetRallyPoint { building, cell: p } => {
+            h.write(&[19]);
+            h.write_u32(building.0);
+            cell(h, *p);
+        }
+        Command::Attack { units, target } => {
+            h.write(&[20]);
+            ids(h, units);
+            h.write_u32(target.0);
+        }
+        Command::AttackMove { units, target } => {
+            h.write(&[21]);
+            ids(h, units);
+            cell(h, *target);
+        }
     }
 }
 
@@ -256,27 +653,115 @@ type UnitQuery<'w, 's> = Query<
 /// applies the deferred entity changes at the sync point before the `Economy` stage), but the
 /// grid, credits, and queues change at once, and later commands of the same tick see the
 /// change (docs/DECISIONS.md D25).
-pub(crate) fn process_commands(
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn process_regular_commands(
     mut queue: ResMut<CommandQueue>,
     mut grid: ResMut<Grid>,
     tick: Res<SimTick>,
     mut events: ResMut<Messages<SimEvent>>,
     mut units: UnitQuery,
     mut economy: EconomyParams,
+    mut special: ResMut<crate::SpecialState>,
+    mut tactics: ResMut<crate::TacticalState>,
 ) {
     if queue.pending.is_empty() {
         return;
     }
-    let index: BTreeMap<SimId, Entity> =
-        units.iter().map(|(entity, id, ..)| (*id, entity)).collect();
+    // The units a command may name: those with hit points left. One that an earlier command of
+    // the tick destroyed is removed in `Cleanup` and is gone for the commands after it
+    // (docs/DECISIONS.md R56); so is such a building (`EconomyParams::building_index`).
+    let index: BTreeMap<SimId, Entity> = units
+        .iter()
+        .filter(|(entity, ..)| economy.alive(*entity))
+        .map(|(entity, id, ..)| (*id, entity))
+        .collect();
     let mut buildings = None;
-    for issued in queue.pending.drain(..) {
+    for PendingCommand {
+        mut issued,
+        ai_intent,
+        action: _,
+    } in queue.pending.drain(..)
+    {
+        if let Some(witness) = &ai_intent
+            && let Some(ids) = issued.command.units_mut()
+        {
+            // A controller decided before the preceding tick's Economy/Combat stages.
+            // Keep only its still living, owned selections; public selections stay atomic.
+            let was_nonempty = !ids.is_empty();
+            ids.retain(|id| {
+                !witness.owned.contains(id)
+                    || index.get(id).and_then(|e| units.get(*e).ok()).is_some_and(
+                        |(entity, _, owner, ..)| owner.0 == issued.player && economy.alive(entity),
+                    )
+            });
+            if was_nonempty && ids.is_empty() {
+                continue;
+            }
+        }
         let result = if issued.command.units().is_some() {
             let buildings = buildings.get_or_insert_with(|| economy.building_index());
             validate_player(&issued, &economy)
-                .and_then(|()| validate(&issued, &grid, &economy, &index, &units))
-                .and_then(|()| validate_combat(&issued, &economy, buildings, &index, &units))
+                .and_then(|()| validate(&issued, &grid, &economy, &index, &units, &special.hidden))
+                .and_then(|()| {
+                    // A launched missile or carried aircraft takes no commands (RA4).
+                    match issued.command.units().and_then(|ids| {
+                        ids.iter().find(|id| {
+                            special.spawned.contains_key(id)
+                                || special.strategic.flights.contains_key(id)
+                                || special.erasures.contains_key(id)
+                                || (special.deployed.contains_key(id)
+                                    && matches!(
+                                        issued.command,
+                                        Command::Move { .. }
+                                            | Command::ForceMove { .. }
+                                            | Command::QueueMove { .. }
+                                            | Command::Follow { .. }
+                                            | Command::Scatter { .. }
+                                            | Command::AttackMove { .. }
+                                            | Command::Harvest { .. }
+                                    ))
+                        })
+                    }) {
+                        Some(&id) => Err(RejectReason::NotCommandable(id)),
+                        None => Ok(()),
+                    }
+                })
+                .and_then(|()| {
+                    validate_combat(&issued, &economy, buildings, &index, &units, &special)
+                })
+                .and_then(|()| {
+                    if let Command::QueueMove { units: ids, .. } = &issued.command {
+                        for id in ids {
+                            if tactics
+                                .waypoints
+                                .get(id)
+                                .is_some_and(|q| q.len() >= crate::MAX_WAYPOINTS)
+                            {
+                                return Err(RejectReason::AbilityUnavailable(
+                                    "Waypoint queue is full",
+                                ));
+                            }
+                        }
+                    }
+                    Ok(())
+                })
                 .map(|()| {
+                    if let Some(ids) = issued.command.units() {
+                        for id in ids {
+                            if !matches!(issued.command, Command::QueueMove { .. }) {
+                                tactics.clear(*id);
+                            }
+                        }
+                    }
+                    if let Some(ids) = issued.command.units() {
+                        for id in ids {
+                            if special.auto_defuses.remove(id).is_some() {
+                                special.auto_defuse_cancelled.insert(*id, tick.0);
+                            }
+                            special.interactions.remove(id);
+                            special.docked.remove(id);
+                        }
+                    }
                     apply_unit_command(
                         &issued.command,
                         tick.0,
@@ -285,13 +770,25 @@ pub(crate) fn process_commands(
                         &index,
                         &mut units,
                         &mut events,
+                        &mut tactics,
                     );
                 })
         } else {
             let buildings = buildings.get_or_insert_with(|| economy.building_index());
-            economy_commands::apply(&issued, &mut economy, buildings, &mut grid, &mut events)
+            economy_commands::apply(
+                &issued,
+                &mut economy,
+                buildings,
+                &mut grid,
+                &mut events,
+                &special,
+            )
         };
-        if let Err(reason) = result {
+        if let Err(reason) = result
+            && !ai_intent
+                .as_ref()
+                .is_some_and(|w| stale_ai_intent(&reason, w))
+        {
             events.write(SimEvent::CommandRejected {
                 player: issued.player,
                 command: issued.command,
@@ -302,6 +799,7 @@ pub(crate) fn process_commands(
 }
 
 /// Applies a valid unit command.
+#[allow(clippy::too_many_arguments)]
 fn apply_unit_command(
     command: &Command,
     tick: u64,
@@ -310,12 +808,86 @@ fn apply_unit_command(
     index: &BTreeMap<SimId, Entity>,
     units: &mut UnitQuery,
     events: &mut Messages<SimEvent>,
+    tactics: &mut crate::TacticalState,
 ) {
     match command {
-        Command::Move { units: ids, target } => {
+        Command::Guard { units: ids } | Command::Scatter { units: ids } => {
             stop_harvesting(ids, index, units);
             stop_fighting(ids, index, units);
-            apply_move(ids, *target, tick, grid, index, units, events);
+            let mut sorted = ids.clone();
+            sorted.sort_unstable();
+            for id in sorted {
+                if let Some(&e) = index.get(&id)
+                    && let Ok((_, _, _, _, m, mut o, ..)) = units.get_mut(e)
+                {
+                    o.current = None;
+                    if matches!(command, Command::Guard { .. }) {
+                        tactics
+                            .orders
+                            .insert(id, crate::TacticalOrder::Guard { anchor: m.cell });
+                    } else {
+                        // Ordered eight-direction scatter uses free navigation destinations.
+                        let directions = [
+                            (-2, -2),
+                            (0, -2),
+                            (2, -2),
+                            (2, 0),
+                            (2, 2),
+                            (0, 2),
+                            (-2, 2),
+                            (-2, 0),
+                        ];
+                        let d = directions[id.0 as usize % directions.len()];
+                        let target = CellPos::new(
+                            m.cell.x.saturating_add(d.0),
+                            m.cell.y.saturating_add(d.1),
+                        );
+                        let dest = destination_cells(
+                            &grid.navigation_for(grid.domain_of(id)),
+                            target,
+                            1,
+                            |c| !grid.room_for(c, id),
+                        )
+                        .first()
+                        .copied();
+                        o.current = dest.map(|c| MoveOrder::new(c, tick));
+                    }
+                }
+            }
+        }
+        Command::Follow { units: ids, target } => {
+            stop_harvesting(ids, index, units);
+            stop_fighting(ids, index, units);
+            for id in ids {
+                tactics
+                    .orders
+                    .insert(*id, crate::TacticalOrder::Follow { target: *target });
+            }
+        }
+        Command::ForceFire { units: ids, target } => {
+            stop_harvesting(ids, index, units);
+            stop_fighting(ids, index, units);
+            for id in ids {
+                if let Some(&e) = index.get(id)
+                    && let Ok((.., mut o, _, Some(mut w))) = units.get_mut(e)
+                {
+                    o.current = None;
+                    w.order = Some(AttackOrder::ForceFire { target: *target });
+                }
+            }
+        }
+        Command::QueueMove { units: ids, target } => {
+            stop_harvesting(ids, index, units);
+            stop_fighting(ids, index, units);
+            for id in ids {
+                tactics.orders.remove(id);
+                tactics.waypoints.entry(*id).or_default().push_back(*target);
+            }
+        }
+        Command::Move { units: ids, target } | Command::ForceMove { units: ids, target } => {
+            stop_harvesting(ids, index, units);
+            stop_fighting(ids, index, units);
+            apply_move(ids, *target, tick, grid, definitions, index, units, events);
         }
         Command::Stop { units: ids } => {
             stop_harvesting(ids, index, units);
@@ -349,9 +921,29 @@ fn apply_unit_command(
             }
         }
         Command::AttackMove { units: ids, target } => {
+            let miners: Vec<_> = ids
+                .iter()
+                .copied()
+                .filter(|id| {
+                    grid.cell(*target).is_some_and(|c| c.ore > 0)
+                        && index
+                            .get(id)
+                            .and_then(|e| units.get(*e).ok())
+                            .is_some_and(|u| u.6.is_some())
+                })
+                .collect();
+            let fighters: Vec<_> = ids
+                .iter()
+                .copied()
+                .filter(|id| !miners.contains(id))
+                .collect();
+            stop_fighting(&miners, index, units);
+            apply_harvest(&miners, *target, tick, grid, definitions, index, units);
+            let ids = &fighters;
             stop_harvesting(ids, index, units);
             stop_fighting(ids, index, units);
-            for (entity, destination) in apply_move(ids, *target, tick, grid, index, units, events)
+            for (entity, destination) in
+                apply_move(ids, *target, tick, grid, definitions, index, units, events)
             {
                 if let Ok((.., Some(mut weapon))) = units.get_mut(entity) {
                     weapon.order = Some(AttackOrder::AttackMove {
@@ -361,10 +953,16 @@ fn apply_unit_command(
                 }
             }
         }
-        Command::QueueProduction { .. }
+        Command::Deploy { .. }
+        | Command::Undeploy { .. }
+        | Command::Interact { .. }
+        | Command::Chronoshift { .. }
+        | Command::Superweapon { .. }
+        | Command::QueueProduction { .. }
         | Command::CancelProduction { .. }
         | Command::PlaceBuilding { .. }
         | Command::SellBuilding { .. }
+        | Command::RepairBuilding { .. }
         | Command::SetRallyPoint { .. } => {}
     }
 }
@@ -426,6 +1024,10 @@ fn apply_harvest(
             continue;
         };
         harvester.attempts = 0;
+        harvester.field = grid
+            .cell(target)
+            .filter(|c| c.passable && c.ore > 0)
+            .map(|_| target);
         let full = definitions
             .harvester(unit.kind)
             .is_some_and(|terms| harvester.load >= terms.capacity);
@@ -437,6 +1039,7 @@ fn apply_harvest(
         match nearest_ore(grid, target, id, &claimed) {
             Some(cell) => {
                 claimed.insert(cell);
+                harvester.field = Some(cell);
                 harvester.state = HarvestState::ToOre(cell);
                 orders.current = (cell != mobile.next_centre()).then(|| MoveOrder::new(cell, tick));
             }
@@ -449,14 +1052,16 @@ fn apply_harvest(
 }
 
 /// Ownership, existence, and bounds of a unit command. Under fog of war a named unit of another
-/// player that the issuing player does not see is `UnknownUnit` rather than `NotOwned`. The
-/// target of `Attack` is checked by [`validate_combat`] (docs/DECISIONS.md D30).
+/// player that the issuing player does not see, or that is hidden from it (`hidden`: a submerged
+/// unit, RA4), is `UnknownUnit` rather than `NotOwned`. The target of `Attack` is checked by
+/// [`validate_combat`] (docs/DECISIONS.md D30).
 fn validate(
     issued: &IssuedCommand,
     grid: &Grid,
     economy: &EconomyParams,
     index: &BTreeMap<SimId, Entity>,
     units: &UnitQuery,
+    hidden: &BTreeSet<(PlayerId, SimId)>,
 ) -> Result<(), RejectReason> {
     let Some(ids) = issued.command.units() else {
         return Ok(());
@@ -485,10 +1090,10 @@ fn validate(
         if owner != issued.player {
             // Under fog of war, another player's unit the player does not see is reported like
             // one that does not exist (docs/DECISIONS.md D30).
-            let hidden = player_fog(issued.player, economy).is_some_and(|vision| {
+            let unseen = player_fog(issued.player, economy).is_some_and(|vision| {
                 !Body::of(Some(&mobile), None).is_some_and(|body| body.seen_by(vision))
-            });
-            return Err(if hidden {
+            }) || hidden.contains(&(issued.player, id));
+            return Err(if unseen {
                 RejectReason::UnknownUnit(id)
             } else {
                 RejectReason::NotOwned(id)
@@ -498,7 +1103,13 @@ fn validate(
             return Err(RejectReason::NotAHarvester(id));
         }
     }
-    if let Command::Move { target, .. }
+    if let Command::ForceMove { target, .. }
+    | Command::QueueMove { target, .. }
+    | Command::ForceFire {
+        target: ForceTarget::Cell(target),
+        ..
+    }
+    | Command::Move { target, .. }
     | Command::Harvest { target, .. }
     | Command::AttackMove { target, .. } = issued.command
         && !grid.contains(target)
@@ -535,8 +1146,9 @@ fn validate_player(issued: &IssuedCommand, economy: &EconomyParams) -> Result<()
 
 /// The checks of `Attack` beyond [`validate`], in this order (docs/DECISIONS.md D29, D30): every
 /// named unit has a weapon (`NotArmed`), and the target is not the player's own (`OwnTarget`),
-/// and exists and is visible to the player (`UnknownTarget`, the same reason for both, so that an
-/// unseen enemy is reported like a missing one). Every unit and building has hit points whenever
+/// and exists and is visible to the player and not hidden from it (`UnknownTarget`, the same
+/// reason for all three, so that an unseen or hidden enemy is reported like a missing one, and
+/// only after the checks that a missing one meets: docs/DECISIONS.md R56). Every unit and building has hit points whenever
 /// any unit has a weapon (a combat file gives every type combat terms, docs/DECISIONS.md D28
 /// item 4), so no check for them is needed (M4 review 1 P2-2, D32).
 fn validate_combat(
@@ -545,11 +1157,22 @@ fn validate_combat(
     buildings: &BuildingIndex,
     index: &BTreeMap<SimId, Entity>,
     units: &UnitQuery,
+    special: &crate::SpecialState,
 ) -> Result<(), RejectReason> {
-    let Command::Attack { units: ids, target } = &issued.command else {
-        return Ok(());
+    let (ids, target, forced, follow) = match &issued.command {
+        Command::Attack { units, target } => (units, Some(*target), false, false),
+        Command::Follow { units, target } => (units, Some(*target), true, true),
+        Command::ForceFire { units, target } => (
+            units,
+            match target {
+                ForceTarget::Entity(id) => Some(*id),
+                ForceTarget::Cell(_) => None,
+            },
+            true,
+            false,
+        ),
+        _ => return Ok(()),
     };
-    let target = *target;
     let vision = economy
         .players()
         .get(issued.player)
@@ -560,10 +1183,13 @@ fn validate_combat(
             .get(&id)
             .and_then(|&entity| units.get(entity).ok())
             .is_some_and(|(.., weapon)| weapon.is_some());
-        if !armed {
+        if !follow && !armed {
             return Err(RejectReason::NotArmed(id));
         }
     }
+    let Some(target) = target else {
+        return Ok(());
+    };
     // The target as the player may know it: owner and body.
     let found = index
         .get(&target)
@@ -574,9 +1200,35 @@ fn validate_combat(
                 .get(target)
                 .map(|(owner, _, footprint)| (owner, Some(Body::Building(footprint))))
         });
+    if let Some(g) = special.garrisons.get(&target) {
+        return if !forced && g.owner == issued.player {
+            Err(RejectReason::OwnTarget(target))
+        } else if !vision.is_visible(g.cell) || special.hidden.contains(&(issued.player, target)) {
+            Err(RejectReason::UnknownTarget(target))
+        } else {
+            Ok(())
+        };
+    }
+    // Scenery (`crate::props`) may be attacked once the player has explored its cell.
+    if found.is_none()
+        && let Some((cell, _)) = economy.props().get(target)
+    {
+        return if Body::Prop(cell).seen_by(vision) {
+            Ok(())
+        } else {
+            Err(RejectReason::UnknownTarget(target))
+        };
+    }
     match found {
-        Some((owner, _)) if owner == issued.player => Err(RejectReason::OwnTarget(target)),
-        Some((_, Some(body))) if body.seen_by(vision) => Ok(()),
+        Some((owner, _)) if !forced && owner == issued.player => {
+            Err(RejectReason::OwnTarget(target))
+        }
+        Some((owner, Some(body)))
+            if (owner == issued.player || body.seen_by(vision))
+                && !special.hidden.contains(&(issued.player, target)) =>
+        {
+            Ok(())
+        }
         _ => Err(RejectReason::UnknownTarget(target)),
     }
 }
@@ -590,11 +1242,18 @@ fn validate_combat(
 /// cell remains stops, with [`MoveFailure::NoDestination`]. A unit that later finds its cell
 /// closed off by units that arrived first takes the nearest cell it can reach instead
 /// (`pathfinding::find_paths`). Returns each unit that got a destination, with its cell.
+///
+/// Since RA3 (invariant I6', docs/DECISIONS.md R6) a cell is handed to one vehicle or to as many
+/// units on foot as it has spots left beside the idle infantry outside the group that stands in
+/// it, at most three; the vehicles of a domain get their cells first, then its infantry. The
+/// move of a crusher may crush ([`MoveOrder::commanded`]).
+#[allow(clippy::too_many_arguments)]
 fn apply_move(
     ids: &[SimId],
     target: CellPos,
     tick: u64,
     grid: &Grid,
+    definitions: &Definitions,
     index: &BTreeMap<SimId, Entity>,
     units: &mut UnitQuery,
     events: &mut Messages<SimEvent>,
@@ -616,18 +1275,59 @@ fn apply_move(
         })
         .collect();
     order.sort_unstable();
-    let destinations = destination_cells(grid, target, order.len(), |cell| {
-        grid.occupant(cell)
-            .is_some_and(|holder| idle_outside_group.contains(&holder))
-    });
     let mut assigned = Vec::with_capacity(order.len());
-    for (position, (_, id, entity)) in order.into_iter().enumerate() {
-        let Ok((.., mut orders, _, _)) = units.get_mut(entity) else {
+    // The room of each cell that is promised to units of the group, in spots, per layer.
+    let mut reserved: BTreeMap<(bool, CellPos), u8> = BTreeMap::new();
+    // The units of the group by what they need of a cell: their domain, and whether they are on
+    // foot (the vehicles of a domain come first).
+    let class = |id: SimId| (grid.domain_of(id), grid.is_on_foot(id));
+    let mut counts: BTreeMap<(crate::Domain, bool), usize> = BTreeMap::new();
+    for (_, id, _) in &order {
+        *counts.entry(class(*id)).or_default() += 1;
+    }
+    let mut destinations: BTreeMap<(crate::Domain, bool), std::collections::VecDeque<CellPos>> =
+        BTreeMap::new();
+    for ((domain, on_foot), count) in counts {
+        // Aircraft and surface units hold cells in separate layers (`Grid::occupant`), so a
+        // cell handed to one may still be handed to the other.
+        let air = domain == crate::Domain::Air;
+        let view = grid.navigation_for(domain);
+        let needed = Grid::room_needed(on_foot);
+        // The room a cell has left for units of this class: what the idle units outside the
+        // group leave of it, less what is promised to the group.
+        let room = |reserved: &BTreeMap<(bool, CellPos), u8>, cell: CellPos| {
+            view.room(cell, on_foot, |holder| idle_outside_group.contains(&holder))
+                .saturating_sub(reserved.get(&(air, cell)).copied().unwrap_or(0))
+        };
+        let cells = destination_cells(&view, target, count, |cell| room(&reserved, cell) < needed);
+        let mut handed = std::collections::VecDeque::with_capacity(count);
+        for cell in cells {
+            // A cell is handed out as often as it has room: once to a vehicle, up to three
+            // times to units on foot.
+            let places = usize::from(room(&reserved, cell) / needed).min(count - handed.len());
+            if places == 0 {
+                break;
+            }
+            handed.extend(std::iter::repeat_n(cell, places));
+            let promised = u8::try_from(places)
+                .unwrap_or(u8::MAX)
+                .saturating_mul(needed);
+            let total = reserved.entry((air, cell)).or_default();
+            *total = total.saturating_add(promised);
+        }
+        destinations.insert((domain, on_foot), handed);
+    }
+    for (_, id, entity) in order {
+        let destination = destinations
+            .get_mut(&class(id))
+            .and_then(|cells| cells.pop_front());
+        let Ok((_, _, _, unit, _, mut orders, _, _)) = units.get_mut(entity) else {
             continue;
         };
-        match destinations.get(position) {
-            Some(&destination) => {
-                orders.current = Some(MoveOrder::new(destination, tick));
+        match destination {
+            Some(destination) => {
+                let crusher = definitions.crusher(unit.kind);
+                orders.current = Some(MoveOrder::commanded(destination, tick, crusher));
                 assigned.push((entity, destination));
             }
             None => {
@@ -641,3 +1341,229 @@ fn apply_move(
     }
     assigned
 }
+
+/// Flush each contiguous run of ordinary commands before an ability. This keeps ownership,
+/// resource and collision checks atomic even for mixed commands within one tick.
+pub(crate) fn process_commands(world: &mut bevy_ecs::world::World) {
+    if world.resource::<CommandQueue>().is_empty() {
+        // Raw scenario spawns may precede an AI turn without any intervening command.
+        // Its View must use the same living/powered concealment as command validation.
+        if world.resource::<crate::AiPlayers>().thinks_at(
+            world.resource::<SimTick>().0,
+            world.resource::<crate::MatchState>(),
+        ) {
+            refresh_command_vision(world);
+        }
+        return;
+    }
+    refresh_command_vision(world);
+    let mut mirages = concealment_movers(world);
+    let pending = std::mem::take(&mut world.resource_mut::<CommandQueue>().pending);
+    let strategic_source = |issued: &IssuedCommand| match issued.command {
+        Command::Superweapon { building, .. } | Command::Chronoshift { building, .. } => {
+            Some((issued.player, building))
+        }
+        _ => None,
+    };
+    let mut occurrences = BTreeMap::new();
+    for entry in &pending {
+        if let Some(key) = strategic_source(&entry.issued) {
+            let count = occurrences.entry(key).or_insert(0_usize);
+            *count = count.saturating_add(1);
+        }
+    }
+    let mut power_losses = BTreeMap::new();
+    for (at, entry) in pending.iter().enumerate() {
+        if entry.ai_intent.as_ref().is_some_and(|w| w.strategic_valid)
+            && strategic_source(&entry.issued).is_some_and(|key| occurrences.get(&key) == Some(&1))
+            && crate::special::strategic_intent_power_only(world, &entry.issued)
+            && let Some(player) = world.resource::<crate::Players>().get(entry.issued.player)
+        {
+            power_losses.insert(at, (player.power_produced(), player.power_consumed()));
+        }
+    }
+    for (
+        at,
+        PendingCommand {
+            issued,
+            ai_intent,
+            action,
+        },
+    ) in pending.into_iter().enumerate()
+    {
+        if matches!(
+            issued.command,
+            Command::Deploy { .. }
+                | Command::Undeploy { .. }
+                | Command::Interact { .. }
+                | Command::Chronoshift { .. }
+                | Command::Superweapon { .. }
+        ) {
+            if !world.resource::<CommandQueue>().pending.is_empty() {
+                crate::special::infantry::refresh_limits(world);
+                world
+                    .run_system_cached(process_regular_commands)
+                    .expect("registered command system");
+            }
+            let ability_actor = match &issued.command {
+                Command::Deploy { unit } | Command::Interact { unit, .. } => Some(*unit),
+                Command::Undeploy { building } => Some(*building),
+                _ => None,
+            };
+            let result = if action == PendingAction::ConditionalBridgeRepair {
+                match crate::special::bridge_goal_ready(world, &issued) {
+                    // Waiting is a goal outcome, not a failed ordinary Interact. No hidden
+                    // blocker information or changed order is returned to the controller.
+                    Ok(false) => continue,
+                    Ok(true) => crate::special::apply(world, &issued),
+                    Err(reason) => Err(reason),
+                }
+            } else {
+                crate::special::apply(world, &issued)
+            };
+            let accepted = result.is_ok();
+            let cell_visibility_lost = ai_intent.as_ref().is_some_and(|w| w.strategic_valid)
+                && result
+                    == Err(RejectReason::AbilityUnavailable(
+                        "Strategic target must be visible",
+                    ))
+                && crate::special::strategic_intent_valid(world, &issued, false);
+            let source_erasure_began = ai_intent.as_ref().is_some_and(|w| w.strategic_valid)
+                && result == Err(RejectReason::AbilityUnavailable("Target is being erased"))
+                && crate::special::strategic_intent_erasure_only(world, &issued);
+            let natural_power_lost = power_losses.get(&at).is_some_and(|entry| {
+                world
+                    .resource::<crate::Players>()
+                    .get(issued.player)
+                    .is_some_and(|player| {
+                        *entry == (player.power_produced(), player.power_consumed())
+                    })
+            }) && result
+                == Err(RejectReason::AbilityUnavailable(
+                    "Ability requires power and a full charge",
+                ))
+                && crate::special::strategic_intent_power_only(world, &issued);
+            let service_healed = ai_intent.as_ref().is_some_and(|w| w.service_valid)
+                && result == Err(RejectReason::AbilityUnavailable("This unit is not damaged"))
+                && crate::special::service_intent_valid(world, &issued, false);
+            if let Err(reason) = result
+                && !cell_visibility_lost
+                && !source_erasure_began
+                && !natural_power_lost
+                && !service_healed
+                && !ai_intent
+                    .as_ref()
+                    .is_some_and(|w| stale_ai_intent(&reason, w))
+            {
+                world
+                    .resource_mut::<Messages<SimEvent>>()
+                    .write(SimEvent::CommandRejected {
+                        player: issued.player,
+                        command: issued.command,
+                        reason,
+                    });
+            }
+            if accepted && let Some(id) = ability_actor {
+                world.resource_mut::<crate::TacticalState>().clear(id);
+            }
+            refresh_command_vision(world);
+            mirages = concealment_movers(world);
+        } else {
+            let boundary = matches!(
+                issued.command,
+                Command::SellBuilding { .. } | Command::PlaceBuilding { .. }
+            ) || issued
+                .command
+                .units()
+                .is_some_and(|ids| ids.iter().any(|id| mirages.contains(id)));
+            world
+                .resource_mut::<CommandQueue>()
+                .pending
+                .push(PendingCommand {
+                    issued,
+                    ai_intent,
+                    action,
+                });
+            if boundary {
+                crate::special::infantry::refresh_limits(world);
+                world
+                    .run_system_cached(process_regular_commands)
+                    .expect("registered command system");
+                refresh_command_vision(world);
+            }
+        }
+    }
+    if !world.resource::<CommandQueue>().pending.is_empty() {
+        crate::special::infantry::refresh_limits(world);
+        world
+            .run_system_cached(process_regular_commands)
+            .expect("registered command system");
+    }
+}
+
+/// Cancellation of an engine-created intent uses ordinary validation and reveals no reason
+/// to its controller. Invalid public commands still emit their original rejection unchanged.
+fn stale_ai_intent(reason: &RejectReason, witness: &AiIntent) -> bool {
+    match reason {
+        RejectReason::UnknownUnit(id)
+        | RejectReason::UnknownBuilding(id)
+        | RejectReason::NotOwned(id)
+        | RejectReason::NotCommandable(id) => witness.owned.contains(id),
+        RejectReason::NotArmed(id) => witness.armed.contains(id),
+        RejectReason::UnknownTarget(id) | RejectReason::OwnTarget(id) => {
+            witness.target == Some(*id)
+        }
+        _ => false,
+    }
+}
+
+/// Certify complete strategic/service decisions before later scheduled stages change
+/// their validity. Ordinary/public commands and intrinsically bad intents stay strict.
+pub(crate) fn certify_ai_strategic_intents(world: &mut bevy_ecs::world::World) {
+    if !world.resource::<CommandQueue>().pending.iter().any(|p| {
+        p.ai_intent.is_some()
+            && matches!(
+                p.issued.command,
+                Command::Superweapon { .. }
+                    | Command::Chronoshift { .. }
+                    | Command::Interact { .. }
+            )
+    }) {
+        return;
+    }
+    let mut pending = std::mem::take(&mut world.resource_mut::<CommandQueue>().pending);
+    for p in &mut pending {
+        if let Some(witness) = &mut p.ai_intent {
+            witness.strategic_valid =
+                crate::special::strategic_intent_valid(world, &p.issued, true);
+            witness.service_valid = crate::special::service_intent_valid(world, &p.issued, true);
+        }
+    }
+    world.resource_mut::<CommandQueue>().pending = pending;
+}
+
+/// Only sales/placement and actual Mirage orders split regular batches. Normal army orders
+/// retain contiguous processing, with no per-command Definitions clone or full unit scan.
+fn concealment_movers(world: &bevy_ecs::world::World) -> BTreeSet<SimId> {
+    let defs = world.resource::<Definitions>();
+    world
+        .iter_entities()
+        .filter_map(|e| {
+            let unit = e.get::<Unit>()?;
+            defs.metadata(crate::ProductionItem::Unit(unit.kind))
+                .is_some_and(|m| m.disguise_when_still || m.role == crate::Role::Mirage)
+                .then(|| e.get::<SimId>().copied())
+                .flatten()
+        })
+        .collect()
+}
+fn refresh_command_vision(world: &mut bevy_ecs::world::World) {
+    world
+        .run_system_cached(crate::economy::update_power)
+        .expect("registered power system");
+    crate::special::refresh_concealment(world);
+}
+
+#[cfg(test)]
+#[path = "ra8_intents.rs"]
+mod ra8_intent_tests;

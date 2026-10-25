@@ -1,0 +1,12 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.23s
+     Running tests/ra9_data_parity.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_data_parity-f191adb6678c35d5)
+
+running 5 tests
+test every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_difference ... ok
+test every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_difference ... ok
+test every_value_of_the_shipped_rules_equals_its_reference_or_is_a_listed_difference ... ok
+test the_conversions_round_half_away_from_zero_in_integers ... ok
+test the_shipped_skirmish_file_and_the_default_options_are_those_of_the_lobby ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 165 filtered out; finished in 0.32s
+

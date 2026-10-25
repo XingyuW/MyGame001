@@ -1,0 +1,118 @@
+{
+  "status": "PASSED",
+  "start": "2026-10-25T07:45:40.327094+00:00",
+  "tip": "525636dac32eb8bae4919a6dccdde1c0dbe815eb",
+  "runner_sha256": "5d43cfdb8f671aeea0ce0451f7ac4d99b2fa6f509c951fa8cadd822eff65ea85",
+  "overlay": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261023/review-2-corrected-08-assets-corrected-01-asset-root",
+  "overlay_scope": "Symlinks to original assets; only one owned demo image symlink is removed/restored. Canonical/package assets remain unchanged.",
+  "original_image": {
+    "path": "/Users/xingyuwang/GameProjects/MyGame001/assets/maps/demo/demo_tiles.png",
+    "sha256": "c838212a7ff7ea07c6a71bec51a1e5477f20ddfd54f2840310c6a618b9eca0a6"
+  },
+  "commands": [
+    {
+      "command": [
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/game",
+        "--smoke-test",
+        "600"
+      ],
+      "cwd": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261023",
+      "env": {
+        "BEVY_ASSET_ROOT": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261023/review-2-corrected-08-assets-corrected-01-asset-root",
+        "CARGO_MANIFEST_DIR": "UNSET"
+      },
+      "executable_sha256": "b802513239d9d14b50b0029d2979032e72e452965b2c2a9e768b642c1754dcc3",
+      "start": "2026-10-25T07:45:40.381045+00:00",
+      "expected_exit": 1,
+      "image_present": false,
+      "raw": "docs/validation/ra2-parity/review-2-corrected-08-assets-corrected-01/release-missing-image.log",
+      "pid": 90266,
+      "pgid": 90266,
+      "exit": 1,
+      "end": "2026-10-25T07:45:41.111277+00:00",
+      "raw_bytes": 717,
+      "raw_sha256": "9e2e84a8c0570c619f865147f358bdd065e66ccc64da3111b2a0ea4910acc571",
+      "missing_image_context": true,
+      "pass": true
+    },
+    {
+      "command": [
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/game",
+        "--smoke-test",
+        "600"
+      ],
+      "cwd": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261023",
+      "env": {
+        "BEVY_ASSET_ROOT": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261023/review-2-corrected-08-assets-corrected-01-asset-root",
+        "CARGO_MANIFEST_DIR": "UNSET"
+      },
+      "executable_sha256": "b802513239d9d14b50b0029d2979032e72e452965b2c2a9e768b642c1754dcc3",
+      "start": "2026-10-25T07:45:41.175363+00:00",
+      "expected_exit": 0,
+      "image_present": true,
+      "raw": "docs/validation/ra2-parity/review-2-corrected-08-assets-corrected-01/release-restored-image.log",
+      "pid": 90268,
+      "pgid": 90268,
+      "exit": 0,
+      "end": "2026-10-25T07:45:55.889966+00:00",
+      "raw_bytes": 128,
+      "raw_sha256": "e48a35436504a1fddfc696aa9f4fb16ca789fa1eb6d9447625cb55ea3d26a387",
+      "missing_image_context": false,
+      "pass": true
+    },
+    {
+      "command": [
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/package/MyGame001.app/Contents/MacOS/MyGame001",
+        "--smoke-test",
+        "600"
+      ],
+      "cwd": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261023",
+      "env": {
+        "BEVY_ASSET_ROOT": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261023/review-2-corrected-08-assets-corrected-01-asset-root",
+        "CARGO_MANIFEST_DIR": "UNSET"
+      },
+      "executable_sha256": "b802513239d9d14b50b0029d2979032e72e452965b2c2a9e768b642c1754dcc3",
+      "start": "2026-10-25T07:45:55.966377+00:00",
+      "expected_exit": 1,
+      "image_present": false,
+      "raw": "docs/validation/ra2-parity/review-2-corrected-08-assets-corrected-01/packaged-missing-image.log",
+      "pid": 90290,
+      "pgid": 90290,
+      "exit": 1,
+      "end": "2026-10-25T07:45:56.714231+00:00",
+      "raw_bytes": 717,
+      "raw_sha256": "3c97674feaf4116b04f8fc37309824c05587c0b04f7d86771cd821597f9e7dfa",
+      "missing_image_context": true,
+      "pass": true
+    },
+    {
+      "command": [
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/package/MyGame001.app/Contents/MacOS/MyGame001",
+        "--smoke-test",
+        "600"
+      ],
+      "cwd": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261023",
+      "env": {
+        "BEVY_ASSET_ROOT": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261023/review-2-corrected-08-assets-corrected-01-asset-root",
+        "CARGO_MANIFEST_DIR": "UNSET"
+      },
+      "executable_sha256": "b802513239d9d14b50b0029d2979032e72e452965b2c2a9e768b642c1754dcc3",
+      "start": "2026-10-25T07:45:56.778349+00:00",
+      "expected_exit": 0,
+      "image_present": true,
+      "raw": "docs/validation/ra2-parity/review-2-corrected-08-assets-corrected-01/packaged-restored-image.log",
+      "pid": 90294,
+      "pgid": 90294,
+      "exit": 0,
+      "end": "2026-10-25T07:46:11.663070+00:00",
+      "raw_bytes": 128,
+      "raw_sha256": "fd1b14502c12cdb89e3a54f858ffe09ca48012abea87116e2269fcb0ebad1d69",
+      "missing_image_context": false,
+      "pass": true
+    }
+  ],
+  "caffeinate_pid": 90264,
+  "end": "2026-10-25T07:46:11.663947+00:00",
+  "canonical_image_unchanged": true,
+  "overlay_restored": true
+}

@@ -1,0 +1,15 @@
+{
+  "cmd": [
+    "cargo",
+    "clippy",
+    "--workspace",
+    "--all-targets",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "exit": 0,
+  "seconds": 5.998423625016585,
+  "runtime_sha": "81f72a6bfdb8d198635ca3eab7bae09f595fb0680fc5f6347bf2bfc117b1dd45",
+  "log_sha": "d19454500173a26ab5cdf49fcda310e0d1be634415940c26cdcbbf4aacc7f630"
+}

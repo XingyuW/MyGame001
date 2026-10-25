@@ -1,0 +1,18 @@
+{
+  "cmd": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_recovery_tests::ra8_worker_admission_cannot_learn_hidden_ore_or_building_occupancy",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 0,
+  "seconds": 36.95678945799591,
+  "log_sha": "c567e9fcd074051807a59817b0a427bd39fbddc9bd284d3a9d3b5b97f3183ff2"
+}

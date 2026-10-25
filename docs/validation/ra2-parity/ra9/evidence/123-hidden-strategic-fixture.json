@@ -1,0 +1,20 @@
+{
+  "utc": "2026-10-21T02:55:19.968141+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra6_vehicles",
+    "--",
+    "ra6_hidden_strategic_sources_do_not_disclose_type_through_legacy_unit_arguments",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "scope": "runtime/data/exact legacy hidden-source body and helpers, current stock RevealToAll positive and controlled one-field hidden twin",
+  "ended_utc": "2026-10-21T02:55:34.738061+00:00",
+  "exit_code": 0,
+  "seconds": 14.77,
+  "input_mismatches": []
+}

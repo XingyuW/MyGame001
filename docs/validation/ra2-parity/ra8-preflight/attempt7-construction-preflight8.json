@@ -1,0 +1,76 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all"
+    ],
+    "exit": 0,
+    "seconds": 0.8809682089777198,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-format18.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "ai::ra8_recovery_tests",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 17.18035129099735,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-protected-after2.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra1_commands",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 1.7224408329930156,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-security-after2.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 0,
+    "seconds": 6.535753083007876,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-clippy2.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_ai_matches",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 85.9605761669809,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-demo-after7.log"
+  }
+]

@@ -1,0 +1,15 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 16.99s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+test ai::ra8_recovery_tests::ra8_borderline_repair_surplus_covers_every_source_step_between_ai_turns ... finite repair before tick0 cash201 repairing{} queues[]
+finite repair before tick20 cash200 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 1, charged: 1, fraction: 250 }])]
+finite repair before tick40 cash175 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 26, charged: 26, fraction: 250 }])]
+finite repair before tick60 cash150 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 51, charged: 51, fraction: 250 }])]
+finite repair before tick80 cash125 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 76, charged: 76, fraction: 250 }])]
+finite repair recruit{SimId(7)} cash0 queues[]
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 98 filtered out; finished in 0.14s
+

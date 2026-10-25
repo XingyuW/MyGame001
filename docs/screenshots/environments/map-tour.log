@@ -1,0 +1,49 @@
+[2m2026-10-06T03:09:01.769023Z[0m [32m INFO[0m [2mbevy_diagnostic::system_information_diagnostics_plugin::internal[0m[2m:[0m SystemInfo { os: "macOS 27.0.1", kernel: "27.0.0", cpu: "Apple M5", core_count: "10", memory: "32.0 GiB" }
+[2m2026-10-06T03:09:01.818564Z[0m [32m INFO[0m [2mbevy_render::renderer[0m[2m:[0m AdapterInfo { name: "Apple M5", vendor: 0, device: 0, device_type: IntegratedGpu, device_pci_bus_id: "", driver: "", driver_info: "", backend: Metal, subgroup_min_size: 4, subgroup_max_size: 64, transient_saves_memory: true }
+[2m2026-10-06T03:09:01.947682Z[0m [32m INFO[0m [2mbevy_winit::system[0m[2m:[0m Creating new window MyGame001 (66v0)
+[2m2026-10-06T03:09:02.024056Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/demo/demo.tmx: 64x64 cells, tile 64x32 px
+[2m2026-10-06T03:09:02.024415Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/crossroads/crossroads.tmx: 56x56 cells, tile 64x32 px
+[2m2026-10-06T03:09:02.024726Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/riverlands/riverlands.tmx: 64x48 cells, tile 64x32 px
+[2m2026-10-06T03:09:02.025324Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/liberty_bay/liberty_bay.tmx: 128x128 cells, tile 64x32 px
+[2m2026-10-06T03:09:02.025863Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/frostline/frostline.tmx: 112x112 cells, tile 64x32 px
+[2m2026-10-06T03:09:02.026383Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/oasis_gulf/oasis_gulf.tmx: 128x96 cells, tile 64x32 px
+[2m2026-10-06T03:09:02.026929Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/coral_archipelago/coral_archipelago.tmx: 128x128 cells, tile 64x32 px
+[2m2026-10-06T03:09:02.027498Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/continental_divide/continental_divide.tmx: 128x128 cells, tile 64x32 px
+[2m2026-10-06T03:09:02.520909Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m catalogue: 8 maps, 2 factions, 3 difficulties
+[2m2026-10-06T03:09:02.521028Z[0m [32m INFO[0m [2mgame::options[0m[2m:[0m settings read from /Users/xingyuwang/Library/Application Support/MyGame001/settings.txt
+[2m2026-10-06T03:09:02.722399Z[0m [32m INFO[0m [2mbevy_render::batching::gpu_preprocessing[0m[2m:[0m GPU preprocessing is fully supported on this device.
+[2m2026-10-06T03:09:03.189310Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map liberty_bay (seed 8): vanguard against 1 x vanguard (normal): 2 buildings and 18 units spawned
+[2m2026-10-06T03:09:03.966237Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-liberty_bay-flank.png
+[2m2026-10-06T03:09:05.004565Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-liberty_bay-centre.png
+[2m2026-10-06T03:09:06.061544Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-liberty_bay-overview.png
+[2m2026-10-06T03:09:07.159508Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-liberty_bay-base.png
+[2m2026-10-06T03:09:08.215565Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-liberty_bay-flank.png
+[2m2026-10-06T03:09:08.695002Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map frostline (seed 8): vanguard against 1 x vanguard (normal): 2 buildings and 18 units spawned
+[2m2026-10-06T03:09:08.896453Z[0m [32m INFO[0m [2mbevy_ecs_tiled::tiled::map[0m[2m:[0m Map removed: AssetId<bevy_ecs_tiled::tiled::map::asset::TiledMapAsset>{ index: 0, generation: 0}
+[2m2026-10-06T03:09:09.452777Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-frostline-flank.png
+[2m2026-10-06T03:09:10.501767Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-frostline-centre.png
+[2m2026-10-06T03:09:11.543282Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-frostline-overview.png
+[2m2026-10-06T03:09:12.635985Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-frostline-base.png
+[2m2026-10-06T03:09:13.701742Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-frostline-flank.png
+[2m2026-10-06T03:09:14.157446Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map oasis_gulf (seed 8): vanguard against 1 x vanguard (normal): 2 buildings and 18 units spawned
+[2m2026-10-06T03:09:14.332712Z[0m [32m INFO[0m [2mbevy_ecs_tiled::tiled::map[0m[2m:[0m Map removed: AssetId<bevy_ecs_tiled::tiled::map::asset::TiledMapAsset>{ index: 1, generation: 0}
+[2m2026-10-06T03:09:14.901570Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-oasis_gulf-flank.png
+[2m2026-10-06T03:09:16.000920Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-oasis_gulf-centre.png
+[2m2026-10-06T03:09:17.093424Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-oasis_gulf-overview.png
+[2m2026-10-06T03:09:18.187722Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-oasis_gulf-base.png
+[2m2026-10-06T03:09:19.188465Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-oasis_gulf-flank.png
+[2m2026-10-06T03:09:19.681863Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map coral_archipelago (seed 8): vanguard against 1 x vanguard (normal): 2 buildings and 18 units spawned
+[2m2026-10-06T03:09:19.852184Z[0m [32m INFO[0m [2mbevy_ecs_tiled::tiled::map[0m[2m:[0m Map removed: AssetId<bevy_ecs_tiled::tiled::map::asset::TiledMapAsset>{ index: 0, generation: 1}
+[2m2026-10-06T03:09:20.413992Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-coral_archipelago-flank.png
+[2m2026-10-06T03:09:21.485900Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-coral_archipelago-centre.png
+[2m2026-10-06T03:09:22.555736Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-coral_archipelago-overview.png
+[2m2026-10-06T03:09:23.635043Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-coral_archipelago-base.png
+[2m2026-10-06T03:09:24.734200Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-coral_archipelago-flank.png
+[2m2026-10-06T03:09:25.225335Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map continental_divide (seed 8): vanguard against 1 x vanguard (normal): 2 buildings and 18 units spawned
+[2m2026-10-06T03:09:25.430468Z[0m [32m INFO[0m [2mbevy_ecs_tiled::tiled::map[0m[2m:[0m Map removed: AssetId<bevy_ecs_tiled::tiled::map::asset::TiledMapAsset>{ index: 1, generation: 1}
+[2m2026-10-06T03:09:25.953917Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-continental_divide-flank.png
+[2m2026-10-06T03:09:27.020812Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-continental_divide-centre.png
+[2m2026-10-06T03:09:28.028553Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-continental_divide-overview.png
+[2m2026-10-06T03:09:29.121318Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-continental_divide-base.png
+[2m2026-10-06T03:09:30.139039Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/environments/map-continental_divide-flank.png
+[2m2026-10-06T03:09:30.571198Z[0m [33m WARN[0m [2mbevy_winit::state[0m[2m:[0m Skipped event Destroyed for unknown winit Window Id WindowId(524824921344)

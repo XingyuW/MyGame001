@@ -1,0 +1,12 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 2m 42s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-b27027efb5a77317)
+
+running 2 tests
+visible ore finance live_refinerytrue saleNone delivered1 chargedtrue paidtrue recruits{SimId(9)} fighter_shottrue recruit_shottrue
+test ra9_visible_ore_with_a_refinery_preserves_actual_worker_income ... ok
+visible ore finance live_refineryfalse saleSome(400) delivered0 chargedtrue paidtrue recruits{SimId(10), SimId(11)} fighter_shottrue recruit_shottrue
+test ra9_visible_ore_without_a_refinery_releases_actual_reinforcement_finance ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 139 filtered out; finished in 0.12s
+

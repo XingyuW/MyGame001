@@ -1,0 +1,55 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T20:02:56.515242+00:00",
+  "pid": 13817,
+  "head": "aafd1794a84f88b9919b7e31c78768e08f66d70d",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/client2-before-plan-02.json",
+  "plan_sha256": "10fcbb3abd8adf576f7c99fcd2012d8618e1e3984529fb79065e5a881fe48aa2",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "game",
+        "ra9_privacy_native_scenery_orders",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:02:56.660184+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-client-before-02/01-scenery-orders-before.log",
+      "pid": 13825,
+      "pgid": 13825,
+      "exit": 101,
+      "end": "2026-10-22T20:04:01.732589+00:00",
+      "raw_bytes": 30646,
+      "raw_sha256": "41026e14519afc9cdb0797267faa3e400f6f56a3a301876dba5223bc84ef55a3",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "game",
+        "ra9_privacy_native_bridge_orders",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:04:01.966099+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-client-before-02/02-bridge-orders-before.log",
+      "pid": 14106,
+      "pgid": 14106,
+      "exit": 101,
+      "end": "2026-10-22T20:04:12.006475+00:00",
+      "raw_bytes": 3470,
+      "raw_sha256": "9f52bde60b270eb8579c58ca64f928acee73e1b808d195cb74cae792764d3d22",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T20:04:07.000883+00:00",
+  "end": "2026-10-22T20:04:12.118726+00:00",
+  "source_unchanged": true
+}

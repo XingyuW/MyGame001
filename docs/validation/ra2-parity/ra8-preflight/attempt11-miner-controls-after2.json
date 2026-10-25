@@ -1,0 +1,29 @@
+{
+  "label": "attempt11-miner-controls-after2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "--",
+    "--nocapture",
+    "ra8_a_capable_living_land_force_keeps_empty_miners_out_of_the_attack_wave",
+    "ra8_a_real_reachable_ore_cycle_survives_an_incapable_naval_companion",
+    "ra8_an_incapable_naval_survivor_does_not_suppress_a_real_armed_miner_attack"
+  ],
+  "start_utc": "2026-10-19T11:24:32.036108+00:00",
+  "elapsed_seconds": 20.052787084016018,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "e689d137e343eafcaa8345fc2d3bf4f2a8e641b413a97dd8ff2a7021a079b7b1"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "e689d137e343eafcaa8345fc2d3bf4f2a8e641b413a97dd8ff2a7021a079b7b1"
+  },
+  "log_sha256": "781af4a5a6e31f48d2090e58aab453732ab6c25633a77ef483e863e0a172ac78"
+}

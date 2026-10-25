@@ -1,0 +1,26 @@
+{
+  "label": "attempt8-yard-site-final-negative",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_composition_tests::ra8_paid_shipyard_uses_an_available_same_sea_site_outside_observed_bombardment",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "Reverse only the new endpoint preference against the final constrained-pond/live-spawn fixture, then restore original AI bytes in finally before any dependent action.",
+  "start_utc": "2026-10-19T03:24:46.676093+00:00",
+  "original_ai_sha256": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+  "mutated_ai_sha256": "5ee838c6592064c6f89c90b55e6737b54734928b96ae1a336298c0b4653d33cc",
+  "strategy_sha256": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d",
+  "exit": 101,
+  "restored_ai_sha256": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+  "restoration_matches": true,
+  "elapsed_seconds": 17.7720086670015,
+  "log_sha256": "978e706566b938f213d6cbe758f30c99d2847ac40abd10e83d6b5956749d53bf"
+}

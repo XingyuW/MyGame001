@@ -1,0 +1,22 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 15.31s
+     Running unittests src/main.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/game-fe9efcf72dfbb190)
+
+running 1 test
+test selection::tests::ra7_visible_disguise_is_not_an_enemy_cursor_target ... FAILED
+
+failures:
+
+---- selection::tests::ra7_visible_disguise_is_not_an_enemy_cursor_target stdout ----
+
+thread 'selection::tests::ra7_visible_disguise_is_not_an_enemy_cursor_target' (3083957) panicked at crates/game/src/selection.rs:1495:9:
+assertion failed: !targets.iter().any(|(id, _)| *id == hidden_id)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    selection::tests::ra7_visible_disguise_is_not_an_enemy_cursor_target
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 215 filtered out; finished in 1.23s
+
+error: test failed, to rerun pass `-p game --bin game`

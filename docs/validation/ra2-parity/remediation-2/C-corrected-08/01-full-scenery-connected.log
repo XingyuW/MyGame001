@@ -1,0 +1,10 @@
+    Finished `release` profile [optimized] target(s) in 0.07s
+     Running tests/ra9_scenery_connected.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_scenery_connected-3a6102caee64f515)
+
+running 3 tests
+test ra9_prop_command_unknown_target_matrix_preserves_order_before_clear ... ok
+test ra9_prop_real_c4_plant_then_native_death_and_dead_target_rejection ... ok
+test ra9_prop_temporal_freezes_real_host_fire_and_deploy_then_releases_after_real_beam_break ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+

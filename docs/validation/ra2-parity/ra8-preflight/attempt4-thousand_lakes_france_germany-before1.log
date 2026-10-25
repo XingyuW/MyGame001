@@ -1,0 +1,17 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+error[E0502]: cannot borrow `*world` as mutable because it is also borrowed as immutable
+   --> crates/game/tests/ra8_gate_matches.rs:187:50
+    |
+174 |       let special = world.resource::<sim::SpecialState>();
+    |                     ----- immutable borrow occurs here
+...
+187 |           for (id, owner, unit, mobile, orders) in world
+    |  __________________________________________________^
+188 | |             .query::<(&SimId, &sim::Owner, &sim::Unit, &sim::Mobile, &sim::Orders)>()
+    | |_____________________________________________________________________________________^ mutable borrow occurs here
+...
+202 |                           && !special.hidden.contains(&(PlayerId(p), *id))
+    |                               -------------- immutable borrow later captured here by closure
+
+For more information about this error, try `rustc --explain E0502`.
+error: could not compile `game` (test "ra8_gate_matches") due to 1 previous error

@@ -1,0 +1,8 @@
+{
+  "scope": "COPY_ONLY_FIXTURE_CENSUS_CORRECTION",
+  "actual184": "Completed all demo short-path cases, then yards.len30 vs players2 on next world-object map: legitimate neutral tech/world buildings were counted as player yards.",
+  "change": "Filter initial building census to actual configured players; preserve every map, owned-yard count/origin, I6 and public-exit assertion. No world-object suppression or runtime change.",
+  "before_sha256": "ec44981e328f82447b41f985b00b2b8df6f142b36c6b00e8c3a02c5320c0b5b5",
+  "after_sha256": "19c04310a15738dca88685391be4de72365bea12c7420b810c0e85d4ee6a1dc8",
+  "preimage": "ra9-preliminary-logs/185-before-owned-yard-census.rs"
+}

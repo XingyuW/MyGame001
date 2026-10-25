@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra9_temporal_garrison",
+    "--",
+    "--nocapture"
+  ],
+  "exit": 101,
+  "utc": "2026-10-23T02:38:31.865784+00:00",
+  "hashes": {
+    "crates/sim/src/ai.rs": "d0c37c697445e73c7cd1466c85a38de952812ad89a61d93c173acb605a0b679e",
+    "crates/sim/tests/ra8_ai.rs": "cce3082ef92343ab7d81ae997912918553142135eec00e8a49c32da500035065",
+    "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+  }
+}

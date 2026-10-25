@@ -1,0 +1,204 @@
+--- crates/sim/tests/ra9_audit/mod.rs
++++ crates/sim/tests/ra9_audit/mod.rs
+@@ -241,12 +241,18 @@
+     code_evidence: String,
+ }
+ #[derive(Clone, Debug)]
++enum ComparisonRelation {
++    Exact,
++    MemberOf(Vec<String>),
++}
++#[derive(Clone, Debug)]
+ enum Witness {
+     Compared {
+         actual: String,
+         expected: String,
+         dependencies: BTreeSet<Atom>,
+         difference: Option<DifferenceId>,
++        relation: ComparisonRelation,
+     },
+     GameOwned {
+         actual: String,
+@@ -362,6 +368,7 @@
+                 expected: expected.value,
+                 dependencies: expected.deps,
+                 difference,
++                relation: ComparisonRelation::Exact,
+             },
+         );
+         Ok(())
+@@ -394,6 +401,7 @@
+                 expected: expected.value.join("|"),
+                 dependencies: expected.deps,
+                 difference: None,
++                relation: ComparisonRelation::MemberOf(expected.value),
+             },
+         );
+         Ok(())
+@@ -440,25 +448,16 @@
+         }
+         Ok(())
+     }
+-    fn finish(&self, reference: &Reference) -> AuditResult<()> {
+-        let found = self.witnesses.keys().cloned().collect::<BTreeSet<_>>();
+-        if found != self.required {
+-            return Err(format!(
+-                "missing/unexpected actual-field witnesses: missing {:?}, unexpected {:?}",
+-                self.required.difference(&found).collect::<Vec<_>>(),
+-                found.difference(&self.required).collect::<Vec<_>>()
+-            ));
+-        }
+-        let mut used = BTreeSet::new();
+-        let mut pairs = BTreeSet::new();
+-        for (id, witness) in &self.witnesses {
+-            match witness {
+-                Witness::Compared {
+-                    actual,
+-                    expected,
+-                    difference,
+-                    ..
+-                } => {
++    fn validate_witness(&self, id: &WitnessId, witness: &Witness) -> AuditResult<()> {
++        match witness {
++            Witness::Compared {
++                actual,
++                expected,
++                difference,
++                relation,
++                ..
++            } => match relation {
++                ComparisonRelation::Exact => {
+                     if difference.is_none() && actual != expected {
+                         return Err(format!("corrupt unequal unlisted witness {id:?}"));
+                     }
+@@ -468,17 +467,44 @@
+                         return Err(format!("corrupt listed witness {id:?}"));
+                     }
+                 }
+-                Witness::GameOwned {
+-                    actual,
+-                    reason,
+-                    code_evidence,
+-                } => {
+-                    let _physical_value = actual;
+-                    if reason.trim().is_empty() || code_evidence.trim().is_empty() {
+-                        return Err(format!("unexplained own witness {id:?}"));
++                ComparisonRelation::MemberOf(allowed) => {
++                    let unique = allowed.iter().collect::<BTreeSet<_>>();
++                    if difference.is_some()
++                        || allowed.is_empty()
++                        || unique.len() != allowed.len()
++                        || !allowed.contains(actual)
++                        || allowed.join("|") != *expected
++                    {
++                        return Err(format!("corrupt independent membership witness {id:?}"));
+                     }
+                 }
+-            }
++            },
++            Witness::GameOwned {
++                actual,
++                reason,
++                code_evidence,
++            } => {
++                let _physical_value = actual;
++                if reason.trim().is_empty() || code_evidence.trim().is_empty() {
++                    return Err(format!("unexplained own witness {id:?}"));
++                }
++            }
++        }
++        Ok(())
++    }
++    fn finish(&self, reference: &Reference) -> AuditResult<()> {
++        let found = self.witnesses.keys().cloned().collect::<BTreeSet<_>>();
++        if found != self.required {
++            return Err(format!(
++                "missing/unexpected actual-field witnesses: missing {:?}, unexpected {:?}",
++                self.required.difference(&found).collect::<Vec<_>>(),
++                found.difference(&self.required).collect::<Vec<_>>()
++            ));
++        }
++        let mut used = BTreeSet::new();
++        let mut pairs = BTreeSet::new();
++        for (id, witness) in &self.witnesses {
++            self.validate_witness(id, witness)?;
+             if let Witness::Compared { dependencies, .. } = witness {
+                 for atom in dependencies {
+                     used.insert(atom.clone());
+@@ -1761,3 +1787,76 @@
+     }
+     Ok(())
+ }
++
++// A real loaded Black Eagle producer may be one of multiple independent native-side factories.
++// Membership retains the full allowed set; it is not scalar equality or a listed difference.
++#[test]
++fn ra9_actual_producer_membership_rejects_nonmember_duplicate_and_corrupt_set() -> AuditResult<()> {
++    let input = Inputs::load(&super::data_dir(), &super::reference_dir())?;
++    let d = sim::load_ruleset(&input.data_dir).map_err(|e| e.to_string())?;
++    let sk =
++        sim::load_skirmish(input.data_dir.join("skirmish.ron"), &d).map_err(|e| e.to_string())?;
++    let mut a = load_audit(&input, &d)?;
++    let errors = run_adapters(&mut a, &input, &d, &sk);
++    if !errors.is_empty() {
++        return Err(errors.join("\n"));
++    }
++    let id = WitnessId::new("black_eagle@rules:BEAG", "economy.ron.units.producer");
++    let witness = a
++        .witnesses
++        .get(&id)
++        .ok_or("real producer witness missing")?;
++    a.validate_witness(&id, witness)?;
++    let Witness::Compared {
++        actual,
++        expected,
++        difference,
++        dependencies,
++        relation: ComparisonRelation::MemberOf(allowed),
++    } = witness
++    else {
++        return Err("real producer must retain independent membership relation".into());
++    };
++    assert!(allowed.len() > 1 && allowed.contains(actual));
++    assert_ne!(actual, expected);
++    assert!(difference.is_none());
++    assert!(!dependencies.is_empty());
++    assert_eq!(
++        dependencies,
++        &a.required_dependencies
++            .iter()
++            .filter(|(w, _)| w == &id)
++            .map(|(_, atom)| atom.clone())
++            .collect::<BTreeSet<_>>()
++    );
++    for mode in 0..4 {
++        let mut bad = witness.clone();
++        let Witness::Compared {
++            actual,
++            expected,
++            relation: ComparisonRelation::MemberOf(allowed),
++            ..
++        } = &mut bad
++        else {
++            unreachable!()
++        };
++        match mode {
++            0 => *actual = "not_a_native_producer".into(),
++            1 => {
++                allowed.push(allowed[0].clone());
++                *expected = allowed.join("|");
++            }
++            2 => {
++                allowed.clear();
++                expected.clear();
++            }
++            3 => *expected = actual.clone(),
++            _ => unreachable!(),
++        }
++        assert!(
++            a.validate_witness(&id, &bad).is_err(),
++            "corrupt membership mode {mode}"
++        );
++    }
++    Ok(())
++}

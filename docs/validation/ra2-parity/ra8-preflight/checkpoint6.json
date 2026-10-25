@@ -1,0 +1,98 @@
+{
+  "frozen_runtime": "d1aa0f09bb7b69cb3827c2a79acdbbb5cdac66a3",
+  "previous_checkpoint": "2343be15afa50a22a88aad07f28009f105fb449e",
+  "main_unchanged": "8230a955b251e9341d349f99eaeb86f7f8253664",
+  "gate_state": "Ready for parent committed milestone; no validator active; full13 not started",
+  "next_command": "env -u RA2_DUEL_SEED -u RA2_DUEL_PAIR sh scripts/validate_ra2_parity.sh ra8",
+  "acceptance": "docs/validation/ra2-parity/RA8_ACCEPTANCE.md",
+  "decisions": "docs/DECISIONS.md R88\u2013R123; latest concrete corrections R116\u2013R122",
+  "fixture_migration_ledger": "R94/R96/R102/R110 exact prior functions and reasons; R108 neutral strategy boundary; no existing migration/assertion/limit/rejection exemption added R116\u2013R122",
+  "static_tests": 1226,
+  "baseline_static_tests": 1124,
+  "added_tests": 102,
+  "removed_or_renamed_tests": 0,
+  "ignores": 0,
+  "test_inventory": "attempt5-test-inventory-final1.json",
+  "serial_preflight": {
+    "targets": 22,
+    "passed": 512,
+    "failed": 0,
+    "ignored": 0,
+    "sim_targets": 13,
+    "sim_passed": 265,
+    "game_units": 217,
+    "demo_functions": 1,
+    "demo_explicit_winners": 10,
+    "multiplayer_tests": 5,
+    "original_production_companions": 5,
+    "exact_functions": 19,
+    "exact_explicit_winners": 19,
+    "summary": "attempt5-final-preflight-summary.json",
+    "strict_checks": "attempt5-final-strict2.json"
+  },
+  "runtime_manifest": "attempt5-final-runtime-manifest.json",
+  "runtime_manifest_files": 339,
+  "m13_metrics": "attempt5-final-m13-metrics.json",
+  "m13_explicit_winners": 21,
+  "m13_limit_unchanged": 400000,
+  "m13_ending_median": 65538,
+  "m13_ending_p90": 90705,
+  "m13_ending_maximum": 99602,
+  "m13_command_seconds": 871.8827065830119,
+  "m13_measured_seconds": 866.706,
+  "m13_map_elapsed_seconds": 866.824,
+  "ten_player256_means_ms": [
+    0.9388500000000001,
+    0.783365,
+    0.770953
+  ],
+  "mean_budget_ms_unchanged": 5,
+  "storage": {
+    "path": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/ra8_definitions",
+    "measured_utc": "2026-10-16T12:03:58.887750+00:00",
+    "files": 58,
+    "file_bytes": 584038,
+    "allocated_bytes": 733184,
+    "retained": "Recreatable parser/slow-speed fixture scratch for reruns, unnecessary for release",
+    "other_external_directories": "No new clone/worktree/environment/cache; existing RA5 render and RA7 parser scratch retained; configured CARGO_TARGET_DIR/UV_CACHE_DIR/PIP_CACHE_DIR preserved"
+  },
+  "ra9_handoff": [
+    "R83 Size/SizeLimit/loaded boarding and actual attached-Squid host WeaponFired debt",
+    "R96 actorless occupied-Prop C4/Ivan/Temporal resolution boundaries: source-inspected, not ability-support claims",
+    "R99 source-only unproven hypothetical bombable=false capability lead; broader audit explicitly deferred"
+  ],
+  "R97_status": "Mechanism closed R103; not an open default-path defect",
+  "assumptions": "Prior R91/R92 and RA5/RA6 data/policy assumptions; R114/R116\u2013R118 observed-AA job progress/en-route priority/source-range endpoint coordination; R120 retains frozen missions and conservative known eligible-fire landing endpoints; R121 cancels only fully certified and currently revalidated erasure-only changes. No closed-source AI/global air-route guarantee claimed.",
+  "before_R29": {
+    "production": {
+      "source": "docs/validation/ra2-parity/ra7/production-lengths.tsv",
+      "count": 756,
+      "tick_median": 31540.0,
+      "tick_p90_nearest_rank": 64532,
+      "tick_maximum": 209163,
+      "R29_ratio_median": 0.13147048611111112,
+      "R29_ratio_p90_nearest_rank": 0.2807579365079365,
+      "R29_ratio_maximum": 0.7824722222222222
+    },
+    "duel": {
+      "source": "docs/validation/ra2-parity/ra7/duel-lengths.tsv",
+      "count": 756,
+      "tick_median": 32782.5,
+      "tick_p90_nearest_rank": 69184,
+      "tick_maximum": 157564,
+      "R29_ratio_median": 0.1386996527777778,
+      "R29_ratio_p90_nearest_rank": 0.3236736111111111,
+      "R29_ratio_maximum": 0.7664722222222222
+    }
+  },
+  "R29_comparison_pending": "Fresh final756-winner production and duels required under unchanged72000*max(128,width+height)/128; nearest-rank p90",
+  "verification_pending": [
+    "all13 frozen gates and both756-winner fresh R29 distributions",
+    "independent final review",
+    "user visual/audio/play-feel verification"
+  ],
+  "preserved_failures": "All ra8-attempt1..5, partial following-phase output, exact failed/failed-to-fail probes, immediate mutation restoration SHA evidence, CPU sample and corrected initial last-case-only observation retained",
+  "sampling_overhead": "Only fifth failed gate native sample:5s requested/5.241876s command, included there; final preflight/m13/fixed budget unprofiled",
+  "staged_hygiene_runtime": "Standalone git diff --cached --check exit0 inspected before separate runtime commit; no raw logs staged in runtime commit",
+  "staged_hygiene_evidence": "checkpoint6-staged-hygiene.json: standalone unfiltered exit2,71 exact retained raw-log-only EOF/trailing-space diagnostics,not passed; full outputSHA c03950fbbd54a2c8007dd2ca3da4f2ed8a8247a96e3b3b09d7ef28dd0bfaf53b; require identical final recheck before separate commit"
+}

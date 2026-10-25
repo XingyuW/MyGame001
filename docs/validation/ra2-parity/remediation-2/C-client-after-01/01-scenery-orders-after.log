@@ -1,0 +1,27 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `game` (bin "game") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 52.21s
+     Running unittests src/main.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/game-5f08020bbb778566)
+
+running 2 tests
+test selection::tests::ra9_privacy_native_scenery_orders_ignore_unseen_occupation_until_reobserved ... ok
+
+thread 'selection::tests::ra9_privacy_native_scenery_orders_ignore_unseen_damage_and_missing_prop' (17436055) panicked at crates/game/src/privacy_order_tests.rs:155:5:
+assertion `left == right` failed
+  left: Invalid
+ right: Move
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test selection::tests::ra9_privacy_native_scenery_orders_ignore_unseen_damage_and_missing_prop ... FAILED
+
+failures:
+
+failures:
+    selection::tests::ra9_privacy_native_scenery_orders_ignore_unseen_damage_and_missing_prop
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 276 filtered out; finished in 2.80s
+
+error: test failed, to rerun pass `-p game --bin game`

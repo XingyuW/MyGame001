@@ -1,0 +1,143 @@
+--- a/crates/sim/src/tactics.rs
++++ b/crates/sim/src/tactics.rs
+@@ -93,6 +93,26 @@
+                     body,
+                 ),
+             );
++        }
++    }
++    // Occupied scenery is an owned combat target without an ECS actor. Keep the actor
++    // census for source liveness/Follow, and extend only Guard's candidate census.
++    let mut guard_targets: BTreeMap<_, _> = actors
++        .iter()
++        .map(|(&id, &(entity, owner, cell, body))| (id, (Some(entity), owner, cell, body)))
++        .collect();
++    for (&id, garrison) in &world.resource::<SpecialState>().garrisons {
++        if let Some((cell, _)) = world
++            .resource::<crate::Props>()
++            .get(id)
++            .filter(|(_, prop)| prop.hit_points > 0)
++        {
++            let footprint = crate::Footprint {
++                origin: cell,
++                width: 1,
++                height: 1,
++            };
++            guard_targets.insert(id, (None, garrison.owner, cell, Body::Building(footprint)));
+         }
+     }
+     let mut state = world.remove_resource::<TacticalState>().unwrap_or_default();
+@@ -166,7 +186,7 @@
+                         .and_then(|w| world.resource::<Definitions>().weapon(w.kind))
+                         .map_or(0, |w| w.range)
+                 };
+-                let chosen = actors
++                let chosen = guard_targets
+                     .iter()
+                     .filter(|(target, (target_entity, o, c, body))| {
+                         world.resource::<Players>().hostile(owner, *o)
+--- a/crates/sim/src/combat.rs
++++ b/crates/sim/src/combat.rs
+@@ -1216,7 +1216,7 @@
+     world: &bevy_ecs::world::World,
+     source: Entity,
+     id: SimId,
+-    target: Entity,
++    target: Option<Entity>,
+     target_id: SimId,
+     body: &Body,
+ ) -> bool {
+@@ -1238,27 +1238,55 @@
+     ) else {
+         return false;
+     };
+-    let item = world
+-        .get::<crate::Unit>(target)
+-        .map(|u| crate::ProductionItem::Unit(u.kind))
+-        .or_else(|| {
+-            world
+-                .get::<Building>(target)
+-                .map(|b| crate::ProductionItem::Building(b.kind))
+-        });
+-    let target_terms = match item {
+-        Some(crate::ProductionItem::Unit(kind)) => definitions.unit_combat(kind),
+-        Some(crate::ProductionItem::Building(kind)) => definitions.building_combat(kind),
+-        None => None,
++    let (traits, extent) = if let Some(target) = target {
++        let item = world
++            .get::<crate::Unit>(target)
++            .map(|u| crate::ProductionItem::Unit(u.kind))
++            .or_else(|| {
++                world
++                    .get::<Building>(target)
++                    .map(|b| crate::ProductionItem::Building(b.kind))
++            });
++        let target_terms = match item {
++            Some(crate::ProductionItem::Unit(kind)) => definitions.unit_combat(kind),
++            Some(crate::ProductionItem::Building(kind)) => definitions.building_combat(kind),
++            None => None,
++        };
++        let Some(armour) = world.get::<Armour>(target) else {
++            return false;
++        };
++        let extent = world
++            .get::<Position>(target)
++            .map(|p| Extent::point(p.0))
++            .or_else(|| {
++                world
++                    .get::<Building>(target)
++                    .map(|b| Extent::footprint(b.footprint))
++            });
++        let Some(extent) = extent else {
++            return false;
++        };
++        (
++            specialist_traits(
++                traits_of(grid, target_id, armour.0, body, target_terms.as_ref()),
++                definitions,
++                item,
++            ),
++            extent,
++        )
++    } else {
++        if !special.garrisons.contains_key(&target_id) {
++            return false;
++        }
++        let props = world.resource::<crate::Props>();
++        let Some((cell, prop)) = props.get(target_id).filter(|(_, prop)| prop.hit_points > 0) else {
++            return false;
++        };
++        (
++            scenery_target_traits(definitions, grid, props, target_id, cell, prop.kind),
++            Extent::footprint(Footprint { origin: cell, width: 1, height: 1 }),
++        )
+     };
+-    let Some(armour) = world.get::<Armour>(target) else {
+-        return false;
+-    };
+-    let traits = specialist_traits(
+-        traits_of(grid, target_id, armour.0, body, target_terms.as_ref()),
+-        definitions,
+-        item,
+-    );
+     let gunner = definitions
+         .metadata(crate::ProductionItem::Unit(unit.kind))
+         .is_some_and(|m| m.gunner);
+@@ -1278,17 +1306,6 @@
+         return false;
+     }
+     let Some(def) = definitions.weapon(kind) else {
+-        return false;
+-    };
+-    let extent = world
+-        .get::<Position>(target)
+-        .map(|p| Extent::point(p.0))
+-        .or_else(|| {
+-            world
+-                .get::<Building>(target)
+-                .map(|b| Extent::footprint(b.footprint))
+-        });
+-    let Some(extent) = extent else {
+         return false;
+     };
+     let (dx, dy) = Extent::point(position.0).gap(&extent);

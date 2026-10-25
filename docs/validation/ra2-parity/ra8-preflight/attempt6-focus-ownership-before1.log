@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 22.71s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+test ra8_a_resumed_strike_focus_preserves_its_healthy_chase_across_controller_turns ... 
+thread 'ra8_a_resumed_strike_focus_preserves_its_healthy_chase_across_controller_turns' (6485418) panicked at crates/sim/tests/ra8_ai.rs:1710:17:
+a matching healthy strike received a conflicting/repeated core order
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ra8_a_resumed_strike_focus_preserves_its_healthy_chase_across_controller_turns
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 62 filtered out; finished in 0.22s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

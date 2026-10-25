@@ -1,0 +1,28 @@
+{
+  "label": "attempt11-frostline-focus-guard-probe2",
+  "command": [
+    "cargo",
+    "run",
+    "--release",
+    "-p",
+    "sim",
+    "--example",
+    "m13_ten_players",
+    "--",
+    "to-the-end",
+    "frostline",
+    "trace"
+  ],
+  "start_utc": "2026-10-19T16:39:08.248200+00:00",
+  "elapsed_seconds": 112.63725124998018,
+  "exit": 1,
+  "source_before": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "952827fe16b30aaa0e48b7b360872686a2891aab8c53b05abbe1aa88efa6bafa"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "952827fe16b30aaa0e48b7b360872686a2891aab8c53b05abbe1aa88efa6bafa"
+  },
+  "log_sha256": "079cd96ad98e22ce587f9f15e4b0527284e37fd51d32f701099031cb6d753022"
+}

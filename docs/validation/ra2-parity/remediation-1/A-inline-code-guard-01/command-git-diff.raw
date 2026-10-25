@@ -1,0 +1,20 @@
+diff --git a/crates/sim/src/command.rs b/crates/sim/src/command.rs
+index b867bd4..2b796f2 100644
+--- a/crates/sim/src/command.rs
++++ b/crates/sim/src/command.rs
+@@ -775,7 +775,14 @@ pub(crate) fn process_regular_commands(
+                 })
+         } else {
+             let buildings = buildings.get_or_insert_with(|| economy.building_index());
+-            economy_commands::apply(&issued, &mut economy, buildings, &mut grid, &mut events)
++            economy_commands::apply(
++                &issued,
++                &mut economy,
++                buildings,
++                &mut grid,
++                &mut events,
++                &special,
++            )
+         };
+         if let Err(reason) = result
+             && !ai_intent

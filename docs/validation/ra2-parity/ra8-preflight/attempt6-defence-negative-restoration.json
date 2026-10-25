@@ -1,0 +1,68 @@
+[
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "ra8_land_defenders_use_reachable_firing_positions_and_leave_isolated_ships_to_the_fleet",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "pre_sha256": {
+      "crates/sim/src/ai.rs": "bae77a8bd942ae149ef79577c17e576de5994328cd142d7f80a4b18f05b553b5",
+      "crates/sim/tests/ra8_ai.rs": "bc4f7719d822b67ca8822e60e66677501454ba12ca9bf874001eb89ea9540a18"
+    },
+    "probe_sha256": {
+      "crates/sim/src/ai.rs": "b52ddc556c54c7f5f0bf06585dc83e2c2534aa89f4e41a344f9bb6057b2e068c",
+      "crates/sim/tests/ra8_ai.rs": "5fe955469dccc2c65ae486b18db0e9529b86028230b83bdc8c390b790be3d036"
+    },
+    "exit": 101,
+    "elapsed_seconds": 26.028708333004033,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-defence-isolated-before2.log",
+    "sha256": "6822ccd7c67477de136b7b9cf951478c656f8f451cfcb03cd04e0676845827d6",
+    "restored_sha256": {
+      "crates/sim/src/ai.rs": "bae77a8bd942ae149ef79577c17e576de5994328cd142d7f80a4b18f05b553b5",
+      "crates/sim/tests/ra8_ai.rs": "bc4f7719d822b67ca8822e60e66677501454ba12ca9bf874001eb89ea9540a18"
+    },
+    "restored_exactly": true
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "ra8_a_specialist_repair_reservation_removes_the_overlapping_defence_attack",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "pre_sha256": {
+      "crates/sim/src/ai.rs": "bae77a8bd942ae149ef79577c17e576de5994328cd142d7f80a4b18f05b553b5",
+      "crates/sim/tests/ra8_ai.rs": "bc4f7719d822b67ca8822e60e66677501454ba12ca9bf874001eb89ea9540a18"
+    },
+    "probe_sha256": {
+      "crates/sim/src/ai.rs": "9a35878c0cd9e91503db72265a4158c1e8029bb9661d083349a7779d6a8ab890",
+      "crates/sim/tests/ra8_ai.rs": "bc4f7719d822b67ca8822e60e66677501454ba12ca9bf874001eb89ea9540a18"
+    },
+    "exit": 0,
+    "elapsed_seconds": 25.36011908299406,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-defence-reserved-before1.log",
+    "sha256": "61c2de36060ca85237b5036d760315eba295b2487813c0f13d2ecb6ea22b4f61",
+    "restored_sha256": {
+      "crates/sim/src/ai.rs": "bae77a8bd942ae149ef79577c17e576de5994328cd142d7f80a4b18f05b553b5",
+      "crates/sim/tests/ra8_ai.rs": "bc4f7719d822b67ca8822e60e66677501454ba12ca9bf874001eb89ea9540a18"
+    },
+    "restored_exactly": true
+  }
+]

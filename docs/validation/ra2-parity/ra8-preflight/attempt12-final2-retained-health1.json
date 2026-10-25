@@ -1,0 +1,36 @@
+{
+  "utc": "2026-10-20T00:07:39.363606+00:00",
+  "note": "Bounded read-only owned-tree liveness; CPU activity does not establish in-flight case success. No profiler or signal.",
+  "processes": [
+    {
+      "pid": 85965,
+      "ppid": 7720,
+      "pgid": 85965,
+      "elapsed": "02:27:35",
+      "cpu_time": "0:01.15",
+      "cpu_percent": "0.0",
+      "state": "Ss",
+      "command": "/opt/homebrew/Cellar/python@3.15/3.15.0/Frameworks/Python.framework/Versions/3.15/Resources/Python.app/Contents/MacOS/Python -"
+    },
+    {
+      "pid": 88248,
+      "ppid": 85965,
+      "pgid": 85965,
+      "elapsed": "02:20:48",
+      "cpu_time": "0:00.23",
+      "cpu_percent": "0.0",
+      "state": "S",
+      "command": "/Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo test --release -p game --test ra8_gate_matches -- --nocapture --test-threads=4"
+    },
+    {
+      "pid": 88251,
+      "ppid": 88248,
+      "pgid": 85965,
+      "elapsed": "02:20:47",
+      "cpu_time": "59:05.39",
+      "cpu_percent": "409.4",
+      "state": "R",
+      "command": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_gate_matches-556affa51f6ab831 --nocapture --test-threads=4"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all"
+    ],
+    "exit": 0,
+    "seconds": 0.8787197500059847,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-building-budget-format2.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "ai::ra8_recovery_tests",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 17.687971415987704,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-building-budget-after1.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 0,
+    "seconds": 5.822207165998407,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-building-budget-clippy1.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_ai_matches",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 86.0646257920016,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-building-budget-demo1.log"
+  }
+]

@@ -37,21 +37,40 @@
 //! units that are moving on lasts only while some unit is in a step, which, with no new command,
 //! happens in a bounded number of ticks because every unit's order takes a bounded number of
 //! steps. So every order ends.
+//!
+//! Since RA3 (invariant I6', docs/DECISIONS.md R6):
+//!
+//! * **Infantry on foot** hold one of the three spots of a cell instead of the cell
+//!   (`crate::map`). A soldier reserves a spot of the next cell before it leaves its own, keeps
+//!   the spot it had if that one is free there, and walks from spot to spot in the ticks a step
+//!   from centre to centre takes. It waits for a cell that a vehicle holds or whose three spots
+//!   are held, and a vehicle waits for a cell in which any soldier holds a spot; the rules
+//!   above are otherwise the same for both. A soldier that waits for a full cell waits behind
+//!   units that are moving on if one of the three is moving on; a vehicle, if all are.
+//! * **Crushing.** A unit whose move order may crush ([`MoveOrder::crush`]: the move of a `Move`
+//!   or `AttackMove` command to a crusher) does not wait for a cell held only by crushable
+//!   infantry of its enemies ([`Crushable`]): it drives in, and they die as it starts the step
+//!   ([`SimEvent::UnitCrushed`], then [`SimEvent::UnitDestroyed`]), so that the cell never holds
+//!   a vehicle and infantry together. Its own, an ally's, infantry that is not crushable, and
+//!   a cell that also holds any of these, block it like any other unit.
 
 use std::collections::{BTreeMap, BTreeSet};
 
 use bevy_ecs::entity::Entity;
 use bevy_ecs::message::Messages;
 use bevy_ecs::query::With;
-use bevy_ecs::system::{Query, Res, ResMut};
+use bevy_ecs::system::{Commands, Query, Res, ResMut};
 
+use crate::command::PlayerId;
+use crate::definitions::{Definitions, UnitKind};
+use crate::economy::Players;
 use crate::event::{MoveFailure, SimEvent};
 use crate::id::SimId;
-use crate::map::{CellPos, Grid};
+use crate::map::{CellPos, Grid, SPOTS_PER_CELL};
 use crate::pathfinding::{DIAGONAL_COST, ORTHOGONAL_COST};
 use crate::schedule::SimTick;
 use crate::unit::{
-    DIAGONAL_STEP, Direction, Facing, Mobile, MoveOrder, ORTHOGONAL_STEP, Orders, PathState,
+    DIAGONAL_STEP, Direction, Facing, Mobile, MoveOrder, ORTHOGONAL_STEP, Orders, Owner, PathState,
     Position, Step, Unit,
 };
 
@@ -84,9 +103,44 @@ type MoveQuery<'w, 's> = Query<
         &'static mut Position,
         &'static mut Facing,
         &'static mut Orders,
+        &'static Owner,
+        &'static Unit,
     ),
     With<Unit>,
 >;
+
+/// The infantry a crusher may drive over: every unit on foot of a crushable type, with its
+/// entity and owner (RA3). Empty in a world without crushers, where nothing is ever crushed.
+#[derive(Default)]
+pub(crate) struct Crushable {
+    units: BTreeMap<SimId, (Entity, PlayerId, UnitKind)>,
+}
+
+impl Crushable {
+    /// Of `units` (entity, id, owner, type) those a crusher may drive over.
+    pub(crate) fn of(
+        definitions: &Definitions,
+        units: impl Iterator<Item = (Entity, SimId, PlayerId, UnitKind)>,
+    ) -> Self {
+        if !definitions.has_crushers() {
+            return Self::default();
+        }
+        Self {
+            units: units
+                .filter(|&(.., kind)| definitions.crushable(kind))
+                .map(|(entity, id, owner, kind)| (id, (entity, owner, kind)))
+                .collect(),
+        }
+    }
+
+    /// Whether a crusher of `owner` may drive over `victim`: crushable infantry of an enemy
+    /// ([`Players::hostile`]), never its own or an ally's.
+    pub(crate) fn by(&self, players: &Players, owner: PlayerId, victim: SimId) -> bool {
+        self.units
+            .get(&victim)
+            .is_some_and(|&(_, other, _)| players.hostile(owner, other))
+    }
+}
 
 /// What a unit at a cell centre does next.
 enum AtCentre {
@@ -95,8 +149,12 @@ enum AtCentre {
     /// Stop moving this tick because units that are not moving on hold the way: a stalled
     /// tick.
     Blocked,
-    /// Start a step in this direction.
-    Step(Direction, CellPos),
+    /// Start a step in this direction; `crush`: over the infantry that hold the cell.
+    Step {
+        direction: Direction,
+        next: CellPos,
+        crush: bool,
+    },
 }
 
 /// What a unit is doing, as far as a unit that waits for a cell it holds needs to know.
@@ -124,57 +182,109 @@ impl Activity {
     }
 }
 
-/// Whether `blocker`, which holds a cell that `unit` waits for, is moving on: it is in a step,
-/// or it waits at a cell centre for a cell that is free or held by a unit that is moving on in
-/// turn (a queue whose head is in a step). A chain that comes back to a unit already visited is a
-/// wait-for cycle, and a chain that ends at a unit that stands (or wants a cell that has become
-/// impassable) is blocked: neither moves on.
+/// Whether `blocker`, which holds a cell that a unit waits for, is moving on: it is in a step,
+/// or it waits at a cell centre for a cell that has room for it or whose holders make room for
+/// it in turn ([`make_room`]: a queue whose head is in a step). A chain that comes back to a
+/// unit already `visited` (which starts as the unit that asks) is a wait-for cycle, and a chain
+/// that ends at a unit that stands (or wants a cell that has become impassable) is blocked:
+/// neither moves on.
 fn moving_on(
     grid: &Grid,
     activity: &BTreeMap<SimId, Activity>,
-    unit: SimId,
+    visited: &mut BTreeSet<SimId>,
     blocker: SimId,
 ) -> bool {
-    let mut visited = BTreeSet::from([unit]);
-    let mut at = blocker;
-    while visited.insert(at) {
-        match activity.get(&at) {
-            Some(Activity::Stepping) => return true,
-            Some(&Activity::Waiting { next }) => {
-                if !grid.is_passable(next) {
-                    return false;
-                }
-                match grid.occupant(next) {
-                    None => return true,
-                    Some(holder) => at = holder,
-                }
-            }
-            Some(Activity::Standing) | None => return false,
-        }
+    if !visited.insert(blocker) {
+        return false;
     }
-    false
+    match activity.get(&blocker) {
+        Some(Activity::Stepping) => true,
+        Some(&Activity::Waiting { next }) => {
+            if !grid.is_passable(next) {
+                return false;
+            }
+            let on_foot = grid.is_on_foot(blocker);
+            let blockers = grid.blockers(next, blocker, on_foot);
+            make_room(grid, activity, visited, on_foot, blockers)
+        }
+        Some(Activity::Standing) | None => false,
+    }
 }
 
+/// Whether the `blockers` of a cell (the units that keep a unit out of it, [`Grid::blockers`])
+/// make room for that unit by moving on: all of them for a unit that needs the whole cell; one
+/// of them for a unit on foot (`on_foot`), which needs one spot. No blockers: there is room.
+fn make_room(
+    grid: &Grid,
+    activity: &BTreeMap<SimId, Activity>,
+    visited: &mut BTreeSet<SimId>,
+    on_foot: bool,
+    blockers: [Option<SimId>; SPOTS_PER_CELL],
+) -> bool {
+    let mut blockers = blockers.into_iter().flatten().peekable();
+    if blockers.peek().is_none() {
+        return true;
+    }
+    if on_foot {
+        blockers.any(|blocker| moving_on(grid, activity, visited, blocker))
+    } else {
+        blockers.all(|blocker| moving_on(grid, activity, visited, blocker))
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn move_units(
+    mut commands: Commands,
     mut grid: ResMut<Grid>,
     tick: Res<SimTick>,
     mut events: ResMut<Messages<SimEvent>>,
+    players: Res<Players>,
+    definitions: Res<Definitions>,
+    mut kills: ResMut<crate::veterancy::Kills>,
     mut units: MoveQuery,
+    healths: Query<&crate::combat::Health>,
 ) {
-    let mut order: Vec<(SimId, Entity)> =
-        units.iter().map(|(entity, id, ..)| (*id, entity)).collect();
+    let alive = |entity| {
+        !healths
+            .get(entity)
+            .is_ok_and(|health| health.hit_points <= 0)
+    };
+    let mut order: Vec<(SimId, Entity)> = units
+        .iter()
+        .filter(|(entity, ..)| alive(*entity))
+        .map(|(entity, id, ..)| (*id, entity))
+        .collect();
     order.sort_unstable();
     // What every unit is doing, kept up to date as the units move in id order.
     let mut activity: BTreeMap<SimId, Activity> = units
         .iter()
-        .map(|(_, id, mobile, _, _, orders)| (*id, Activity::of(mobile, orders)))
+        .filter(|(entity, ..)| alive(*entity))
+        .map(|(_, id, mobile, _, _, orders, ..)| (*id, Activity::of(mobile, orders)))
         .collect();
+    let crushable = Crushable::of(
+        &definitions,
+        units
+            .iter()
+            .filter(|(entity, ..)| alive(*entity))
+            .map(|(entity, id, .., owner, unit)| (entity, *id, owner.0, unit.kind)),
+    );
+    // The units crushed in this tick: they are gone, though their entities remain until the
+    // commands of this system are applied.
+    let mut crushed: BTreeSet<SimId> = BTreeSet::new();
     for (id, entity) in order {
-        let Ok((_, _, mut mobile, mut position, mut facing, mut orders)) = units.get_mut(entity)
+        if crushed.contains(&id) {
+            continue;
+        }
+        grid.navigation = grid.domain_of(id);
+        let Ok((_, _, mut mobile, mut position, mut facing, mut orders, owner, _)) =
+            units.get_mut(entity)
         else {
             continue;
         };
-        let mut budget = u32::from(mobile.speed);
+        // The owner's unit speed option scales the distance covered per tick; a unit may then
+        // finish more than one step in a tick, which the loop below already allows.
+        let mut budget =
+            u32::from(mobile.speed).saturating_mul(players.unit_speed_percent(owner.0)) / 100;
         let mut stepped_toward = false;
         let mut stalled = false;
         loop {
@@ -202,15 +312,67 @@ pub(crate) fn move_units(
                 tick.0,
                 budget,
                 &mut events,
+                |victim| crushable.by(&players, owner.0, victim),
             ) {
                 AtCentre::Wait => break,
                 AtCentre::Blocked => {
                     stalled = true;
                     break;
                 }
-                AtCentre::Step(direction, next) => {
-                    // `at_centre` checked that the cell is passable and free.
-                    if !grid.claim(next, id) {
+                AtCentre::Step {
+                    direction,
+                    next,
+                    crush,
+                } => {
+                    if crush {
+                        // The infantry in the cell die as the crusher drives in: their spots
+                        // are freed before it claims the cell, so that the cell never holds
+                        // both (invariant I6').
+                        for victim in grid.blockers(next, id, false).into_iter().flatten() {
+                            let Some(&(victim_entity, victim_owner, victim_kind)) =
+                                crushable.units.get(&victim)
+                            else {
+                                continue;
+                            };
+                            // The crusher is the killer (RA4: its experience), unless the
+                            // victim's hit points were gone already: what destroyed it earlier
+                            // in the tick has its kill, or it has no killer.
+                            if !healths
+                                .get(victim_entity)
+                                .is_ok_and(|health| health.hit_points <= 0)
+                            {
+                                kills.record(
+                                    id,
+                                    victim_owner,
+                                    crate::veterancy::worth(
+                                        &definitions,
+                                        crate::ProductionItem::Unit(victim_kind),
+                                    ),
+                                );
+                            }
+                            let at = grid.standing_point(next, victim);
+                            grid.release_around(next, victim);
+                            grid.unregister(victim);
+                            crushed.insert(victim);
+                            activity.remove(&victim);
+                            commands.entity(victim_entity).despawn();
+                            events.write(SimEvent::UnitCrushed {
+                                player: victim_owner,
+                                unit: victim,
+                                crusher: id,
+                                by: owner.0,
+                                at,
+                            });
+                            events.write(SimEvent::UnitDestroyed {
+                                player: victim_owner,
+                                unit: victim,
+                            });
+                        }
+                    }
+                    // `at_centre` checked that the cell is passable and has room. A unit on
+                    // foot keeps the spot it has, if that one is free in the next cell.
+                    let spot = grid.spot(mobile.cell, id);
+                    if !grid.claim_spot(next, id, spot) {
                         break;
                     }
                     mobile.step = Some(Step {
@@ -248,7 +410,8 @@ pub(crate) fn move_units(
             }
         }
         activity.insert(id, Activity::of(&mobile, &orders));
-        let sub = mobile.sub_position();
+        grid.navigation = crate::Domain::Land;
+        let sub = mobile.position(&grid, id);
         if position.0 != sub {
             position.0 = sub;
         }
@@ -278,7 +441,9 @@ fn start_step(order: &mut MoveOrder, direction: Direction) -> bool {
     true
 }
 
-/// The decision of a unit standing at the centre of its cell with `budget` subcells left.
+/// The decision of a unit standing at the centre of its cell (on foot: at its spot) with
+/// `budget` subcells left. `crushes` says whether the unit, if its order may crush, may drive
+/// over a unit.
 #[allow(clippy::too_many_arguments)]
 fn at_centre(
     id: SimId,
@@ -289,6 +454,7 @@ fn at_centre(
     tick: u64,
     budget: u32,
     events: &mut Messages<SimEvent>,
+    crushes: impl Fn(SimId) -> bool,
 ) -> AtCentre {
     let Some(order) = orders.current.as_mut() else {
         return AtCentre::Wait;
@@ -342,17 +508,35 @@ fn at_centre(
         request(order, false, false);
         return AtCentre::Wait;
     }
-    // Another unit holds the next cell, or is crossing this diagonal step between the two
-    // cells beside it.
-    let holder = grid.occupant(next).filter(|&holder| holder != id);
-    let crosser = grid.occupant(beside_x).filter(|&holder| {
-        direction.is_diagonal() && holder != id && grid.occupant(beside_y) == Some(holder)
+    // Other units leave the unit no room in the next cell, or a unit is crossing this diagonal
+    // step between the two cells beside it (it holds both).
+    let on_foot = grid.is_on_foot(id);
+    let mut blockers = grid.blockers(next, id, on_foot);
+    let across = grid.holders(beside_y);
+    let crossers = grid.holders(beside_x).map(|holder| {
+        holder.filter(|holder| {
+            direction.is_diagonal() && *holder != id && across.contains(&Some(*holder))
+        })
     });
-    if holder.is_some() || crosser.is_some() {
-        let queued = holder
-            .into_iter()
-            .chain(crosser)
-            .all(|blocker| moving_on(grid, activity, id, blocker));
+    // A unit whose order may crush drives into a cell held only by infantry it may crush.
+    let crush = order.crush
+        && blockers.iter().any(Option::is_some)
+        && blockers.into_iter().flatten().all(&crushes);
+    if crush {
+        blockers = [None; SPOTS_PER_CELL];
+    }
+    if blockers.iter().chain(&crossers).any(Option::is_some) {
+        // Each unit in the way is followed on its own, as far as the units it waits for.
+        let moves_on =
+            |blocker: SimId| moving_on(grid, activity, &mut BTreeSet::from([id]), blocker);
+        let mut holders = blockers.into_iter().flatten().peekable();
+        let room_soon = holders.peek().is_none()
+            || if on_foot {
+                holders.any(moves_on)
+            } else {
+                holders.all(moves_on)
+            };
+        let queued = room_soon && crossers.into_iter().flatten().all(moves_on);
         order.blocked_ticks = order.blocked_ticks.saturating_add(1);
         if order.blocked_ticks >= REPATH_AFTER_BLOCKED_TICKS {
             request(order, true, queued);
@@ -363,5 +547,9 @@ fn at_centre(
             AtCentre::Blocked
         };
     }
-    AtCentre::Step(direction, next)
+    AtCentre::Step {
+        direction,
+        next,
+        crush,
+    }
 }

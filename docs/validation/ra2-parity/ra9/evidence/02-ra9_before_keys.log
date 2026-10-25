@@ -1,0 +1,50 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 08s
+     Running tests/ra9_before_keys.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_before_keys-7527fc91c924c44f)
+
+running 9 tests
+test ra9_automatic_defuse_skips_real_c4_and_explicit_ivan_defuse_still_works ... ok
+test ra9_bombsight_does_not_know_an_enemy_spys_real_bomb ... ok
+test ra9_bombsight_four_detects_a_real_bomb_then_approaches_without_interact ... FAILED
+test ra9_bombsight_unrelated_missing_and_genuinely_killed_hosts_create_no_jobs ... ok
+test ra9_neutral_major_superweapon_does_not_reveal_distant_cell ... ok
+test ra9_real_construction_reveals_only_sight_and_hidden_targets_remain_hidden ... FAILED
+test ra9_stock_uncapturable_major_superweapons_refuse_engineer_but_power_plant_captures ... FAILED
+test ra9_stock_yuri_immunity_is_masked_by_psionic_immunity_not_typeimmune_proof ... ok
+test ra9_typeimmune_dolphin_requires_same_kind_and_same_owner_but_allows_targeting ... FAILED
+
+failures:
+
+---- ra9_bombsight_four_detects_a_real_bomb_then_approaches_without_interact stdout ----
+
+thread 'ra9_bombsight_four_detects_a_real_bomb_then_approaches_without_interact' (12960670) panicked at crates/sim/tests/ra9_before_keys.rs:113:9:
+entered radius four but never attempted an automatic defuse
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- ra9_real_construction_reveals_only_sight_and_hidden_targets_remain_hidden stdout ----
+
+thread 'ra9_real_construction_reveals_only_sight_and_hidden_targets_remain_hidden' (12960674) panicked at crates/sim/tests/ra9_before_keys.rs:249:13:
+real construction must reveal to distant opponent
+
+---- ra9_stock_uncapturable_major_superweapons_refuse_engineer_but_power_plant_captures stdout ----
+
+thread 'ra9_stock_uncapturable_major_superweapons_refuse_engineer_but_power_plant_captures' (12960689) panicked at crates/sim/tests/ra9_before_keys.rs:280:13:
+reference Capturable=false must refuse capture: chronosphere: [SuperweaponBuilt { player: PlayerId(0), role: Chronosphere }]
+
+---- ra9_typeimmune_dolphin_requires_same_kind_and_same_owner_but_allows_targeting stdout ----
+
+thread 'ra9_typeimmune_dolphin_requires_same_kind_and_same_owner_but_allows_targeting' (12960692) panicked at crates/sim/tests/ra9_before_keys.rs:62:21:
+assertion `left == right` failed: same type AND same owner
+  left: 196
+ right: 200
+
+
+failures:
+    ra9_bombsight_four_detects_a_real_bomb_then_approaches_without_interact
+    ra9_real_construction_reveals_only_sight_and_hidden_targets_remain_hidden
+    ra9_stock_uncapturable_major_superweapons_refuse_engineer_but_power_plant_captures
+    ra9_typeimmune_dolphin_requires_same_kind_and_same_owner_but_allows_targeting
+
+test result: FAILED. 5 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.21s
+
+error: test failed, to rerun pass `-p sim --test ra9_before_keys`

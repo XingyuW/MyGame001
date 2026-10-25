@@ -1,0 +1,44 @@
+{
+  "label": "attempt16-edge-strike-before2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ra8_a_naturally_charged_strike_uses_an_observed_building_edge",
+    "--",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-20T22:10:54.836283+00:00",
+  "elapsed_seconds": 30.74460908403853,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "a219bfb73d6038cb56e5461120182350dce98585945bfbc50a525d36a1aaa17b",
+    "crates/sim/src/ai/strategy.rs": "8c5b44a7c6bcf8e306994614619741572738843e39358771e8a4b08797341eee",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "c8bf152af3f2c26a670640b584209aa5274210b330da61c6aa4ba8000bf948dd",
+    "crates/game/tests/ra8_gate_matches.rs": "112fccc43a99547c3d1a0d66c407756a8832de222868771b6cb2ee04a0b10b35",
+    "crates/sim/tests/ra8_ai.rs": "27bbae268bbaf4b1bb324c4ce21b297904b2b7dc0993cf1d3423162c220c2e79",
+    "crates/game/tests/m6_production_matches.rs": "ae394550771394e7082bd9c6027d67b5e7ab2beff3b3c2b4008804246e32ac92",
+    "crates/sim/src/ai/ra8_recovery_tests.rs": "fa31396d27c0d353419712c4ee45dec347191d83cd3369d9bf879160c2e1fb40",
+    "crates/sim/tests/ra5_common/mod.rs": "0a3d57fe1c6e01a5dc00f672bdbe8e3fa6753e80ea79ef72044af6cf342c1c95",
+    "crates/sim/tests/ra5_crates.rs": "133743cc92638fbf53e3a4a97c0f7c6ac98483365d6527fb3551be29f1e36074"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "a219bfb73d6038cb56e5461120182350dce98585945bfbc50a525d36a1aaa17b",
+    "crates/sim/src/ai/strategy.rs": "8c5b44a7c6bcf8e306994614619741572738843e39358771e8a4b08797341eee",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "c8bf152af3f2c26a670640b584209aa5274210b330da61c6aa4ba8000bf948dd",
+    "crates/game/tests/ra8_gate_matches.rs": "112fccc43a99547c3d1a0d66c407756a8832de222868771b6cb2ee04a0b10b35",
+    "crates/sim/tests/ra8_ai.rs": "27bbae268bbaf4b1bb324c4ce21b297904b2b7dc0993cf1d3423162c220c2e79",
+    "crates/game/tests/m6_production_matches.rs": "ae394550771394e7082bd9c6027d67b5e7ab2beff3b3c2b4008804246e32ac92",
+    "crates/sim/src/ai/ra8_recovery_tests.rs": "fa31396d27c0d353419712c4ee45dec347191d83cd3369d9bf879160c2e1fb40",
+    "crates/sim/tests/ra5_common/mod.rs": "0a3d57fe1c6e01a5dc00f672bdbe8e3fa6753e80ea79ef72044af6cf342c1c95",
+    "crates/sim/tests/ra5_crates.rs": "133743cc92638fbf53e3a4a97c0f7c6ac98483365d6527fb3551be29f1e36074"
+  },
+  "log_sha256": "7f22d6ba9262f0899f06d55995131862d4b13550406216108ba7eee9d999c418"
+}

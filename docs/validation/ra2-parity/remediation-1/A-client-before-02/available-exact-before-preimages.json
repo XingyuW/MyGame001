@@ -1,0 +1,148 @@
+{
+  "status": "EXACT_AVAILABLE_PREIMAGES_MATCH_EARLIER_BEFORE_HASHES",
+  "saved": [
+    {
+      "source": ".cargo/config.toml",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/.cargo/config.toml",
+      "bytes": 252,
+      "sha256": "4e4bb8a187b37f615fcbbe98d26d703b3022757676f380272661aa0e14b61904"
+    },
+    {
+      "source": "Cargo.lock",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/Cargo.lock",
+      "bytes": 154702,
+      "sha256": "1a65dd4b65d1f8d188b5cc0a2625a5161dd6e9fd741d41d8c017ed56411bff80"
+    },
+    {
+      "source": "Cargo.toml",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/Cargo.toml",
+      "bytes": 489,
+      "sha256": "5a41f3be449fb7ca6aae8f1cbff2e563fc76e91c8e660ec940a07387a28ae54d"
+    },
+    {
+      "source": "crates/game/src/battlefield.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/crates/game/src/battlefield.rs",
+      "bytes": 52646,
+      "sha256": "6e199bd44decae0fb01bda25d1fe96102d654cdffffc88838e00ef438f4f240b"
+    },
+    {
+      "source": "crates/game/src/game_speed.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/crates/game/src/game_speed.rs",
+      "bytes": 7995,
+      "sha256": "ce4f842558c4531a42c7513ac1c3e9d4459198c533d93e27e6fefaff0193bdd0"
+    },
+    {
+      "source": "crates/game/src/hover_info.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/crates/game/src/hover_info.rs",
+      "bytes": 17963,
+      "sha256": "f43d23e8b89a2af6b79a720ff0a5f3b8b37ebca1e2e5526daf807e6f8fd2624b"
+    },
+    {
+      "source": "crates/game/src/main.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/crates/game/src/main.rs",
+      "bytes": 4381,
+      "sha256": "ada8ec39ca481bc6b37c30d9c466c417288a7543a45ca73e59c41ad77182da8a"
+    },
+    {
+      "source": "crates/game/src/privacy_interact_tests.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/crates/game/src/privacy_interact_tests.rs",
+      "bytes": 6233,
+      "sha256": "2e5e8f8137a2676356f38d2adbfa345aff25bfc1271103b2eabf04afbf01747c"
+    },
+    {
+      "source": "crates/game/src/privacy_native.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/crates/game/src/privacy_native.rs",
+      "bytes": 6421,
+      "sha256": "58e6233c97cd21dc0dc83809ded3d0c2b5be9dc2a9624aec3ed1ef97d30650b9"
+    },
+    {
+      "source": "crates/game/src/privacy_selection_tests.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/crates/game/src/privacy_selection_tests.rs",
+      "bytes": 6761,
+      "sha256": "ea071bc06bcdadc093ea32dda6092e33e8ee7f33c8e166134c60aaf8a0356c19"
+    },
+    {
+      "source": "crates/game/src/privacy_smoke_tests.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/crates/game/src/privacy_smoke_tests.rs",
+      "bytes": 7110,
+      "sha256": "c4ac603f50edeaeedcbdaed1b19c84023d553d05dd2830c09311793137bd68dc"
+    },
+    {
+      "source": "crates/game/src/selection.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/crates/game/src/selection.rs",
+      "bytes": 144656,
+      "sha256": "480c4bfab15c7bd86bf96e9b5ecccadde219a4adf2b1312652585a6e0e84dcc9"
+    },
+    {
+      "source": "crates/game/src/sim_host.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/crates/game/src/sim_host.rs",
+      "bytes": 68234,
+      "sha256": "fab0c650862b5872aa262ec1632ec3c8a4b60704863a45e33949baa45725cd35"
+    },
+    {
+      "source": "crates/game/src/special_controls.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/crates/game/src/special_controls.rs",
+      "bytes": 24517,
+      "sha256": "b1919128b1f4c06487b3884ba497a306eda5b59b28392906a420dcaed2e43b9d"
+    },
+    {
+      "source": "crates/game/src/units.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/crates/game/src/units.rs",
+      "bytes": 59528,
+      "sha256": "721e8c51f55b2b883d7de606a0567c6227160564412be011b8b200cfe5451aa7"
+    },
+    {
+      "source": "crates/game/src/weapon_fx.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/crates/game/src/weapon_fx.rs",
+      "bytes": 79635,
+      "sha256": "94d4fd24f9d14537d26bee3a06c6d9266a4d855b4695333e446f9e56f73af024"
+    },
+    {
+      "source": "crates/sim/tests/ra8_ai.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/crates/sim/tests/ra8_ai.rs",
+      "bytes": 435066,
+      "sha256": "12b19374bd6ce647af49c99a2a93c347ba32cd1f8da29fdb83041406abb5933b"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/compositor-negatives.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/crates/sim/tests/ra9_audit/compositor-negatives.rs",
+      "bytes": 5748,
+      "sha256": "4059a56201fb6fca4214b1f4629c6cc9b2d2f8f2da3eb065b4e6015227f94cca"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/legacy-source-admission.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/crates/sim/tests/ra9_audit/legacy-source-admission.rs",
+      "bytes": 1693,
+      "sha256": "7e2d2ee3032fbbbf89235bb57f3190e5dce9d877ab0f75674c1e17ae2f9c453c"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/mod.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/crates/sim/tests/ra9_audit/mod.rs",
+      "bytes": 66953,
+      "sha256": "6a5d77e912ec36e38aa1318f40915129574c8ef83af18ad8c969dd36e2089f7b"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/scope-inputs.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/crates/sim/tests/ra9_audit/scope-inputs.rs",
+      "bytes": 9761,
+      "sha256": "f5ad1103bfb41077b5b96a822a13c29735daaafa59d91a4af9accc0d39af475b"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/single-source-acceptance-negatives.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/crates/sim/tests/ra9_audit/single-source-acceptance-negatives.rs",
+      "bytes": 8144,
+      "sha256": "df7132cfe0b8ff8adb10d178e8b12c2b4d51ef13bd06b482a7d35e7a4b5dfe57"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/source-plans.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-1/A-client-before-02/available-exact-before-preimages/crates/sim/tests/ra9_audit/source-plans.rs",
+      "bytes": 12086,
+      "sha256": "dd0ef86d2583b39fbb646f1e3e9902963c78cb5578381899a852d3a939c42682"
+    }
+  ],
+  "unavailable_due_to_later_authorized_changes": [
+    "crates/game/src/privacy_hover_tests.rs",
+    "crates/game/src/privacy_scenery_tests.rs"
+  ],
+  "limits": "Only listed saved paths match the original before hashes. Tracked baseline inputs remain available in the recorded Git predecessor. No reconstruction or completeness claim for later-changed harness versions."
+}

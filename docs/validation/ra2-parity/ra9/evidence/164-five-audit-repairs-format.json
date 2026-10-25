@@ -1,0 +1,35 @@
+{
+  "command": [
+    "rustfmt",
+    "--edition",
+    "2024",
+    "crates/sim/tests/ra9_audit/array-negatives.rs",
+    "crates/sim/tests/ra9_audit/country-rosters.rs",
+    "crates/sim/tests/ra9_audit/consumer62-admission.rs",
+    "crates/sim/tests/ra9_audit/model162-admission.rs",
+    "crates/sim/tests/ra9_audit/source-disposition.rs"
+  ],
+  "exit_code": 0,
+  "files": [
+    {
+      "path": "crates/sim/tests/ra9_audit/array-negatives.rs",
+      "sha256": "3a79202ccec618c04f50aef557135414e6b360727dc8abd9cf6da279c6d38e6a"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/country-rosters.rs",
+      "sha256": "f16a4801c0f2fda09f2338bb786b588a8b50110bbcefde16d91010cc951e4c98"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/consumer62-admission.rs",
+      "sha256": "b0c933fd4f0535ccb7ca236ddadb53344f5e8c79bfcdf689002b37d0da8397fc"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-admission.rs",
+      "sha256": "00a0ce2f9de62d99205b068d5379cbacbc2dff65630f3f8c3561bbbfa569f8b7"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-disposition.rs",
+      "sha256": "3907e877cb8150d79c3d9be41e7c596e646a7377a0dbddd4ccdcdf7f80599524"
+    }
+  ]
+}

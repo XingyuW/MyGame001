@@ -4802,6 +4802,7 @@ version = "0.1.0"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
+ "libc",
  "quick-xml 0.31.0",
  "rand_chacha",
  "ron",

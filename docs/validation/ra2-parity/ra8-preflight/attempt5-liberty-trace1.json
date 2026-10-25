@@ -1,0 +1,25 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate_liberty_iraq_america_brutal_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "env": {
+    "RA8_ECONOMY_TRACE": "1"
+  },
+  "exit": 101,
+  "elapsed_seconds": 160.2166355420195,
+  "source_sha256": {
+    "crates/sim/src/ai.rs": "32755e08cffe95e6ae632291c9b28dbeabc2c9a908269be0a33aba8989bff031",
+    "crates/sim/src/ai/strategy.rs": "86ae95223f142b24eac71876ff0f00a479d0efd68d475559d5a89058a3186d7f"
+  }
+}

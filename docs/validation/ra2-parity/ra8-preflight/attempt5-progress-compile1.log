@@ -1,0 +1,52 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0369]: binary operation `==` cannot be applied to type `std::collections::BTreeMap<id::SimId, ai::AirScreenProgress>`
+   --> crates/sim/src/ai.rs:197:5
+    |
+149 | #[derive(Clone, Debug, PartialEq, Eq)]
+    |                        --------- in this derive macro expansion
+...
+197 |     air_screens: BTreeMap<SimId, AirScreenProgress>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+note: an implementation of `PartialEq` might be missing for `ai::AirScreenProgress`
+   --> crates/sim/src/ai.rs:201:1
+    |
+201 | struct AirScreenProgress {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^ must implement `PartialEq`
+help: consider annotating `ai::AirScreenProgress` with `#[derive(PartialEq)]`
+    |
+201 + #[derive(PartialEq)]
+202 | struct AirScreenProgress {
+    |
+
+error[E0277]: the trait bound `ai::AirScreenProgress: Eq` is not satisfied
+    --> crates/sim/src/ai.rs:197:5
+     |
+ 149 | #[derive(Clone, Debug, PartialEq, Eq)]
+     |                                   -- in this derive macro expansion
+...
+ 197 |     air_screens: BTreeMap<SimId, AirScreenProgress>,
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ the trait `Eq` is not implemented for `ai::AirScreenProgress`
+     |
+help: the trait `Eq` is conditionally implemented for `std::collections::BTreeMap<K, V, A>`
+    --> /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/src/rust/library/alloc/src/collections/btree/map.rs:2613:1
+     |
+2613 | impl<K: Eq, V: Eq, A: Allocator + Clone> Eq for BTreeMap<K, V, A> {}
+     | ^^^^^^^^^^^^^^^--^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |                |
+     |                unsatisfied requirement introduced here: `ai::AirScreenProgress: Eq`
+     = note: required for `std::collections::BTreeMap<id::SimId, ai::AirScreenProgress>` to implement `Eq`
+note: required by a bound in `std::cmp::AssertParamIsEq`
+    --> /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/cmp.rs:380:31
+     |
+ 380 | pub struct AssertParamIsEq<T: Eq + PointeeSized> {
+     |                               ^^ required by this bound in `AssertParamIsEq`
+help: consider annotating `ai::AirScreenProgress` with `#[derive(Eq)]`
+     |
+ 201 + #[derive(Eq)]
+ 202 | struct AirScreenProgress {
+     |
+
+Some errors have detailed explanations: E0277, E0369.
+For more information about an error, try `rustc --explain E0277`.
+error: could not compile `sim` (lib) due to 2 previous errors

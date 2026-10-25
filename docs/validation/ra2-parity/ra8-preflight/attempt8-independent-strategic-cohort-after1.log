@@ -1,0 +1,10 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 24.31s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+test ai::ra8_attrition_tests::ra8_failed_real_sorties_do_not_blacklist_a_naturally_charged_strategic_strike ... failed-sortie strategic: shots14, paid_heals227, oldBuildingJobProgress { hp: 450, failures: 3, actors: {}, founders: {}, approaching: false }, naturally_readytrue, launchedtrue, damagetrue
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 108 filtered out; finished in 0.99s
+

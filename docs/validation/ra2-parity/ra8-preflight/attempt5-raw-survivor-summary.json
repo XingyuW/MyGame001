@@ -1,0 +1,334 @@
+{
+  "parser_diagnostic": "Initial inspection parser split units also matched free_units, causing IndexError before writing output. Corrected to anchored section; raw/source unchanged. Additional dynamically appended type indexes retained unresolved until actual loader trace.",
+  "cases": [
+    {
+      "case": "liberty_bay: iraq (brutal) against america (brutal) stalled: players [(PlayerId(0), 0), (PlayerId(1), 0)]",
+      "buildings": {
+        "0": {
+          "soviet_war_factory": 1,
+          "soviet_barracks": 1,
+          "tesla_coil": 6,
+          "flak_cannon": 8,
+          "sentry_gun": 6,
+          "soviet_refinery": 2,
+          "iron_curtain": 1,
+          "soviet_construction_yard": 1,
+          "nuclear_reactor": 1,
+          "nuclear_silo": 1,
+          "radar_tower": 1,
+          "tesla_reactor": 1,
+          "soviet_service_depot": 1
+        },
+        "1": {
+          "war_factory": 2,
+          "naval_shipyard": 1,
+          "barracks": 1,
+          "american_airforce_command": 1,
+          "pillbox": 8,
+          "tech_outpost": 1,
+          "prism_tower": 9,
+          "patriot": 8,
+          "spy_satellite": 1,
+          "power_plant": 12,
+          "weather_control": 1,
+          "construction_yard": 1,
+          "refinery": 2,
+          "chronosphere": 1,
+          "gap_generator": 1,
+          "service_depot": 1,
+          "ore_purifier": 1,
+          "tech_center": 1
+        }
+      },
+      "mobile_counts": {
+        "0": 33,
+        "1": 21
+      },
+      "harvesters": {
+        "0": 6,
+        "1": 4
+      }
+    },
+    {
+      "case": "oasis_gulf: germany (brutal) against great_britain (brutal) stalled: players [(PlayerId(0), 0), (PlayerId(1), 0)]",
+      "buildings": {
+        "0": {
+          "airforce_command": 1,
+          "war_factory": 2,
+          "barracks": 1,
+          "patriot": 8,
+          "prism_tower": 9,
+          "pillbox": 8,
+          "chronosphere": 1,
+          "power_plant": 12,
+          "weather_control": 1,
+          "construction_yard": 1,
+          "refinery": 2,
+          "service_depot": 1,
+          "tech_center": 1,
+          "spy_satellite": 1,
+          "gap_generator": 1,
+          "ore_purifier": 1
+        },
+        "1": {
+          "war_factory": 1,
+          "airforce_command": 1,
+          "barracks": 1,
+          "pillbox": 7,
+          "prism_tower": 9,
+          "patriot": 6,
+          "chronosphere": 1,
+          "construction_yard": 1,
+          "power_plant": 11,
+          "refinery": 2,
+          "weather_control": 1,
+          "service_depot": 1,
+          "gap_generator": 1,
+          "tech_center": 1,
+          "ore_purifier": 1
+        }
+      },
+      "mobile_counts": {
+        "0": 14,
+        "1": 23
+      },
+      "harvesters": {
+        "0": 5,
+        "1": 5
+      }
+    },
+    {
+      "case": "steel_harbor: france (medium) against germany (medium) stalled: players [(PlayerId(0), 29), (PlayerId(1), 0)]",
+      "buildings": {
+        "0": {
+          "war_factory": 2,
+          "barracks": 1,
+          "airforce_command": 1,
+          "grand_cannon": 3,
+          "patriot": 3,
+          "prism_tower": 3,
+          "pillbox": 3,
+          "gap_generator": 1,
+          "chronosphere": 1,
+          "power_plant": 10,
+          "refinery": 2,
+          "construction_yard": 1,
+          "weather_control": 1,
+          "ore_purifier": 1,
+          "service_depot": 1,
+          "spy_satellite": 1,
+          "tech_center": 1
+        },
+        "1": {
+          "airforce_command": 1,
+          "war_factory": 1,
+          "patriot": 3,
+          "prism_tower": 3,
+          "pillbox": 1,
+          "power_plant": 8,
+          "service_depot": 1,
+          "construction_yard": 1,
+          "chronosphere": 1,
+          "tech_center": 1,
+          "spy_satellite": 1,
+          "gap_generator": 1
+        }
+      },
+      "mobile_counts": {
+        "0": 11,
+        "1": 9
+      },
+      "harvesters": {
+        "0": 8,
+        "1": 7
+      }
+    },
+    {
+      "case": "frozen_sound: cuba (brutal) against germany (brutal) stalled: players [(PlayerId(0), 0), (PlayerId(1), 446)]",
+      "buildings": {
+        "0": {
+          "cloning_vats": 1,
+          "soviet_war_factory": 1,
+          "tesla_coil": 7,
+          "sentry_gun": 6,
+          "flak_cannon": 7,
+          "soviet_refinery": 1,
+          "soviet_construction_yard": 1,
+          "radar_tower": 1,
+          "iron_curtain": 1,
+          "nuclear_reactor": 1,
+          "psychic_sensor": 1,
+          "nuclear_silo": 1,
+          "soviet_service_depot": 1,
+          "soviet_battle_lab": 1
+        },
+        "1": {
+          "war_factory": 1,
+          "barracks": 1,
+          "prism_tower": 8,
+          "pillbox": 7,
+          "patriot": 7,
+          "power_plant": 11,
+          "hospital": 1,
+          "construction_yard": 1,
+          "spy_satellite": 1,
+          "refinery": 2,
+          "ore_purifier": 1,
+          "tech_center": 1,
+          "weather_control": 1,
+          "gap_generator": 1
+        }
+      },
+      "mobile_counts": {
+        "0": 20,
+        "1": 8
+      },
+      "harvesters": {
+        "0": 5,
+        "1": 5
+      }
+    },
+    {
+      "case": "black_water: libya (brutal) against america (brutal) stalled: players [(PlayerId(0), 0), (PlayerId(1), 0)]",
+      "buildings": {
+        "0": {
+          "soviet_barracks": 1,
+          "soviet_war_factory": 1,
+          "sentry_gun": 3,
+          "flak_cannon": 2,
+          "tesla_coil": 1,
+          "soviet_refinery": 2,
+          "psychic_sensor": 1,
+          "soviet_construction_yard": 1,
+          "nuclear_silo": 1,
+          "radar_tower": 1,
+          "tesla_reactor": 5,
+          "soviet_service_depot": 1
+        },
+        "1": {
+          "war_factory": 2,
+          "barracks": 1,
+          "american_airforce_command": 1,
+          "prism_tower": 9,
+          "patriot": 8,
+          "pillbox": 8,
+          "power_plant": 12,
+          "hospital": 1,
+          "weather_control": 1,
+          "construction_yard": 1,
+          "refinery": 2,
+          "tech_center": 1,
+          "chronosphere": 1,
+          "service_depot": 1,
+          "gap_generator": 1,
+          "spy_satellite": 1,
+          "ore_purifier": 1
+        }
+      },
+      "mobile_counts": {
+        "0": 9,
+        "1": 24
+      },
+      "harvesters": {
+        "0": 4,
+        "1": 4
+      }
+    },
+    {
+      "case": "black_water: korea (brutal) against france (brutal) stalled: players [(PlayerId(0), 0), (PlayerId(1), 0)]",
+      "buildings": {
+        "0": {
+          "barracks": 1,
+          "airforce_command": 1,
+          "war_factory": 2,
+          "prism_tower": 4,
+          "patriot": 4,
+          "pillbox": 2,
+          "power_plant": 7,
+          "service_depot": 1,
+          "construction_yard": 1,
+          "chronosphere": 1,
+          "weather_control": 1,
+          "refinery": 2,
+          "gap_generator": 1
+        },
+        "1": {
+          "barracks": 1,
+          "naval_shipyard": 1,
+          "airforce_command": 1,
+          "war_factory": 2,
+          "patriot": 6,
+          "grand_cannon": 7,
+          "pillbox": 6,
+          "prism_tower": 6,
+          "power_plant": 14,
+          "weather_control": 1,
+          "construction_yard": 1,
+          "ore_purifier": 1,
+          "spy_satellite": 1,
+          "gap_generator": 1,
+          "tech_center": 1,
+          "refinery": 2,
+          "chronosphere": 1,
+          "service_depot": 1
+        }
+      },
+      "mobile_counts": {
+        "0": 16,
+        "1": 21
+      },
+      "harvesters": {
+        "0": 4,
+        "1": 8
+      }
+    },
+    {
+      "case": "wheel_of_worlds: germany (brutal) against great_britain (brutal) stalled: players [(PlayerId(0), 136729), (PlayerId(1), 0)]",
+      "buildings": {
+        "0": {
+          "barracks": 1,
+          "airforce_command": 1,
+          "war_factory": 2,
+          "patriot": 8,
+          "pillbox": 8,
+          "prism_tower": 9,
+          "power_plant": 12,
+          "construction_yard": 1,
+          "refinery": 2,
+          "service_depot": 1,
+          "chronosphere": 1,
+          "gap_generator": 1,
+          "spy_satellite": 1,
+          "ore_purifier": 1,
+          "weather_control": 1,
+          "tech_center": 1
+        },
+        "1": {
+          "war_factory": 1,
+          "airforce_command": 1,
+          "barracks": 1,
+          "pillbox": 7,
+          "prism_tower": 8,
+          "patriot": 6,
+          "power_plant": 12,
+          "weather_control": 1,
+          "construction_yard": 1,
+          "spy_satellite": 1,
+          "chronosphere": 1,
+          "gap_generator": 1,
+          "refinery": 1,
+          "ore_purifier": 1,
+          "service_depot": 1
+        }
+      },
+      "mobile_counts": {
+        "0": 78,
+        "1": 21
+      },
+      "harvesters": {
+        "0": 9,
+        "1": 2
+      }
+    }
+  ]
+}

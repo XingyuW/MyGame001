@@ -1,0 +1,20 @@
+[
+  {
+    "test": "ra8_gate_steel_harbor_america_cuba_bridge_seed_zero_finishes",
+    "exit": 0,
+    "elapsed_seconds": 86.49224441699334,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt4-steel_harbor_america_cuba_bridge-lifecycle1.log"
+  },
+  {
+    "test": "ra8_gate_thousand_lakes_great_britain_america_seed_zero_finishes",
+    "exit": 0,
+    "elapsed_seconds": 35.11052645801101,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt4-thousand_lakes_great_britain_america-lifecycle1.log"
+  },
+  {
+    "test": "ra8_gate_thousand_lakes_france_germany_seed_zero_finishes",
+    "exit": 101,
+    "elapsed_seconds": 194.04635950000375,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt4-thousand_lakes_france_germany-lifecycle1.log"
+  }
+]

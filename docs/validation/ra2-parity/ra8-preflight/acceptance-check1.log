@@ -1,0 +1,23 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0308]: mismatched types
+  --> crates/sim/tests/ra8_ai.rs:80:25
+   |
+80 |             unit_count: units,
+   |                         ^^^^^ expected `Option<u32>`, found `u32`
+   |
+   = note: expected enum `Option<u32>`
+              found type `u32`
+help: try wrapping the expression in `Some`
+   |
+80 |             unit_count: Some(units),
+   |                         +++++     +
+
+error[E0026]: variant `UnitSpawned` does not have a field named `kind`
+   --> crates/sim/tests/ra8_ai.rs:193:78
+    |
+193 |         trained|=events.iter().any(|e|matches!(e,sim::SimEvent::UnitSpawned {kind,..} if *kind==engineer));
+    |                                                                              ^^^^ variant `UnitSpawned` does not have this field
+
+Some errors have detailed explanations: E0026, E0308.
+For more information about an error, try `rustc --explain E0026`.
+error: could not compile `sim` (test "ra8_ai") due to 2 previous errors

@@ -1,0 +1,14 @@
+{
+  "utc": "2026-10-20T00:09:13.830841+00:00",
+  "command": [
+    "pmset",
+    "-g",
+    "log"
+  ],
+  "filter": "Local2026-10-19 17:40:00..20:04:59 inclusive; split field[3] in Sleep/Wake/DarkWake and field[4]!=Requests. Selected native lines preserved verbatim; no settings changed.",
+  "raw_stdout_sha256": "a0c1b27d2bcb91aa9fae1f563919bec17c7652918c39ff27d2df38dc62023fa8",
+  "extract_sha256": "f5ec3e0fa62c333b6974a6b3a3edef5a20450605630b286d836d85738e59c81a",
+  "extract_bytes": 6625,
+  "lines": 38,
+  "clock_caveat": "Host clamshell sleep/deep-idle wake overlaps the retained38 command. Do not retroactively subtract it from recorded wrapper time.monotonic durations or infer completed cases from CPU. Keep UTC, OS elapsed and final wrapper measurement distinct."
+}

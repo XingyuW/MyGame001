@@ -1,0 +1,72 @@
+{
+  "utc": "2026-10-20T10:40:49.348615+00:00",
+  "attempt": 15,
+  "head": "57595d274261a9d4859ab2d1d15b86b9d9bb071f",
+  "runtime": "0d8f16daba2cc31edba5757d3b99fc2e3c094145",
+  "completed_rows": [
+    {
+      "line": "01 exit 0  1 s  cargo fmt --all -- --check",
+      "number": 1,
+      "exit": 0,
+      "script_date_seconds": 1,
+      "completion_observed_utc": "2026-10-20T05:56:13.311277+00:00",
+      "wrapper_elapsed_seconds": 2.0041858330368996,
+      "observed_interval_seconds": 2.0041858330368996
+    },
+    {
+      "line": "02 exit 0  0 s  git diff --check",
+      "number": 2,
+      "exit": 0,
+      "script_date_seconds": 0,
+      "completion_observed_utc": "2026-10-20T05:56:13.378267+00:00",
+      "wrapper_elapsed_seconds": 2.0712092910544015,
+      "observed_interval_seconds": 0.06702345801750198
+    },
+    {
+      "line": "03 exit 0  0 s  cargo clippy --workspace --all-targets -- -D warnings",
+      "number": 3,
+      "exit": 0,
+      "script_date_seconds": 0,
+      "completion_observed_utc": "2026-10-20T05:56:13.442076+00:00",
+      "wrapper_elapsed_seconds": 2.1350180830340832,
+      "observed_interval_seconds": 0.0638087919796817
+    },
+    {
+      "line": "04 exit 101  17010 s  cargo test --workspace --release  [428 passed, 7 failed, 0 ignored]",
+      "number": 4,
+      "exit": 101,
+      "script_date_seconds": 17010,
+      "completion_observed_utc": "2026-10-20T10:39:42.724829+00:00",
+      "wrapper_elapsed_seconds": 17011.31604933302,
+      "observed_interval_seconds": 17009.181031249987
+    }
+  ],
+  "wrapper_end_utc": "2026-10-20T10:39:42.857594+00:00",
+  "wrapper_elapsed_seconds": 17011.448855708004,
+  "script_exit": -15,
+  "owned_group": 46889,
+  "owned_session": 75533,
+  "owned_group_empty_verified_utc": "2026-10-20T10:41Z approximately; bounded ps returned header only",
+  "rust_counts": {
+    "passed": 428,
+    "failed": 7,
+    "ignored": 0
+  },
+  "failed_test_lines": [
+    "test ai::ra8_recovery_tests::ra8_borderline_repair_surplus_covers_every_source_step_between_ai_turns ... FAILED",
+    "test ai::ra8_recovery_tests::ra8_completed_paid_unit_heads_and_duplicate_tails_keep_normal_exit_and_fifo ... FAILED",
+    "test ai::ra8_recovery_tests::ra8_finite_unit_funding_is_not_spent_on_repairs_before_the_paid_recruit_can_finish ... FAILED",
+    "test ai::ra8_recovery_tests::ra8_multiple_active_repairs_cannot_each_claim_the_same_finite_recruit_surplus ... FAILED",
+    "test ai::ra8_recovery_tests::ra8_source_funded_surplus_keeps_multiple_repairs_and_actual_paid_recruitment ... FAILED",
+    "test ai::ra8_recovery_tests::ra8_unit_reallocation_preserves_actual_income_harvesters_and_unreachable_alternatives ... FAILED",
+    "test ai::ra8_recovery_tests::ra8_unfundable_duplicate_unit_heads_refund_exactly_and_produce_a_real_cheaper_finisher ... FAILED"
+  ],
+  "m6": "756/756 non_Won0 and target6/0/0; fresh table separately preserved under checkpoint15-m6-production-*",
+  "retained": "41/0/0; native1709.34s",
+  "sim_lib": "116passed/7failed/0ignored; native39.39s",
+  "phase5": "No completed row; possible partial build-release log preserved byte-for-byte. Not passed.",
+  "phases6_13": "unrun in attempt15; existing label files are historical if present.",
+  "label_production_lengths": "Historical6c3ec135 table retained unchanged; fresh nativeM6 table1ba1644b separately preserved. Workspacefailure does not erase M6 success or imply full13 pass.",
+  "source_unique_files": 495,
+  "source_mismatches": []
+}

@@ -1,0 +1,22 @@
+{
+  "utc": "2026-10-22T20:12:37.408355+00:00",
+  "authorization": "Root coordinator shortest-path correction: stop only verified owned optional debug integration tail; final full13 retains complete workspace release integration coverage and unchanged caps. Completed278 unit and4 child passes remain evidence; interrupted whole cargo command is not a pass.",
+  "receipt_command": {
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "game",
+      "--",
+      "--nocapture"
+    ],
+    "start": "2026-10-22T20:06:22.879863+00:00",
+    "raw": "docs/validation/ra2-parity/remediation-2/C-client-after-02/03-game-all-after.log",
+    "pid": 14588,
+    "pgid": 14588
+  },
+  "verified_live_ps": "14588 14588 /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo test -p game -- --nocapture",
+  "signal": "SIGTERM",
+  "pid": 14588,
+  "pgid": 14588
+}

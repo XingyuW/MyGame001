@@ -1,0 +1,30 @@
+{
+  "label": "attempt8-frozen-sound-ten-player-details-before2",
+  "command": [
+    "cargo",
+    "run",
+    "--release",
+    "-p",
+    "sim",
+    "--example",
+    "m13_ten_players",
+    "--",
+    "to-the-end",
+    "frozen_sound",
+    "trace"
+  ],
+  "env": {},
+  "purpose": "Narrow exact Frozen Sound read-only late controller history, actual known visibility, source charges/power and harvester state; no simulation/planning changes.",
+  "start_utc": "2026-10-19T02:12:32.329240+00:00",
+  "elapsed_seconds": 382.34955270797946,
+  "exit": 1,
+  "source_before": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591"
+  },
+  "log_sha256": "e7665096205de6c61089de45fdeb70b4a21c1ab6465bca0bff7da527257a934f"
+}

@@ -1,0 +1,11 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 19.22s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 3 tests
+test command::ra8_intent_tests::ra8_private_bridge_goal_waits_for_hidden_occupancy_then_consumes_engineer_only_after_clear ... ok
+test command::ra8_intent_tests::ra8_private_bridge_goal_preserves_fifo_and_rechecks_arrival_occupancy ... ok
+test command::ra8_intent_tests::ra8_private_bridge_goal_authorizes_before_readiness_and_hashes_its_distinct_action ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 57 filtered out; finished in 0.12s
+

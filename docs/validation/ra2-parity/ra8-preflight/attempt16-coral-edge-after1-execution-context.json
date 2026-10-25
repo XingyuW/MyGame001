@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-20T22:18:43.788718+00:00",
+  "receipt": "attempt16-coral-edge-after1.json",
+  "owned_unified_session": 96286,
+  "observed_native_pid": 55908,
+  "observed_ppid": 55884,
+  "observed_pgid": 55884,
+  "liveness_observation": "Read-only ps at22:14Z showed01:27 elapsed/50.88CPU seconds/99% R, native exact release binary. Activity is not an outcome claim.",
+  "copy_overlap": "Revocable short serial jobs1 copy-only RA9 compile/native lease regranted after binary loaded; revoked after exact outcome and before next canonical build. Functional correctness evidence, not isolated performance.",
+  "native_outcome": "P1Won79081/300000; actual native reported169.8s; wrapper205.36171641701367 includes32.36s compile.",
+  "source_scope": "11 paths in probe; prior495 restoration and separate adjacent example binding are distinct receipts, no retrospective scope rewrite."
+}

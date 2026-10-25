@@ -1,0 +1,16 @@
+{
+  "utc": "2026-10-22T06:00:32.363637+00:00",
+  "status": "PRELAUNCH_CONTROLLER_PATHSET_CORRECTED_ALL685_HASHES_AND_PATHS_MATCH",
+  "initial_enumeration_count": 682,
+  "frozen_input_count": 685,
+  "missing_from_controller_query": [
+    "PLAN.md",
+    "docs/RA2_PARITY_PLAN.md",
+    "docs/prompts/RA2_PARITY_CONTINUATION_PROMPT.md"
+  ],
+  "source_files_changed": false,
+  "native_gate_launched": false,
+  "runner_before_sha256": "f94ff246a1b4898a7cb35853fdd901cec3672576c5f7617aec530cfac1b1f023",
+  "runner_after_sha256": "dfecd0b723700a7726d6ac7acef982a8be0e28cdb0175354b95b405eb0a80d3a",
+  "scope": "Add all three already-frozen plan documents to external controller enumeration; do not remove any frozen input or guard."
+}

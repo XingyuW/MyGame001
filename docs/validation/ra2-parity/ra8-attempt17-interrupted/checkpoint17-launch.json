@@ -1,0 +1,83 @@
+{
+  "attempt": 17,
+  "checkpoint": 17,
+  "start_utc": "2026-10-20T22:52:25.222434+00:00",
+  "head": "99bcdf1913f3d74079ce2baa8b440b68a315223a",
+  "runtime_commit": "eb308a231e302048c9dc8d1e8b9543b7c5f64ef7",
+  "main": "8230a955b251e9341d349f99eaeb86f7f8253664",
+  "branch": "ra2-parity",
+  "clean_before_launch": true,
+  "command": [
+    "env",
+    "-u",
+    "RA2_DUEL_SEED",
+    "-u",
+    "RA2_DUEL_PAIR",
+    "RUST_TEST_NOCAPTURE=1",
+    "sh",
+    "scripts/validate_ra2_parity.sh",
+    "ra8"
+  ],
+  "wrapper_pid": 67549,
+  "wrapper_ppid": 7720,
+  "wrapper_pgid": 67549,
+  "source_files": 495,
+  "source_manifests": {
+    "runtime": {
+      "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8-preflight/attempt16-final2-runtime-manifest.json",
+      "exists": true,
+      "bytes": 38110,
+      "sha256": "23dc30e9d22a1e6c23589eebb71d57e3e3e7138770c673ee4dd2b4cb5ca8fa0f",
+      "mtime_ns": 1792534815143198401
+    },
+    "test-example": {
+      "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8-preflight/attempt16-final2-test-example-manifest.json",
+      "exists": true,
+      "bytes": 19463,
+      "sha256": "3b3df482593e41d4399a5735c2b5da9ac236b044d631b59a110d6d1581d6960f",
+      "mtime_ns": 1792534815143354027
+    }
+  },
+  "preservation": {
+    "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8-attempt16/PRESERVED.json",
+    "exists": true,
+    "bytes": 21496,
+    "sha256": "cec5b5e5294ecc3b3c7481247b7b03e8736ce1fc5e5c66905c04783adb216116",
+    "mtime_ns": 1792532722000981577
+  },
+  "preservation_recheck": {
+    "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8-preflight/checkpoint17-attempt16-preservation.json",
+    "exists": true,
+    "bytes": 81354,
+    "sha256": "4364c070c8e88388fbedbc498f366a088be53d6c0899445eaad603f5a0ce6070",
+    "mtime_ns": 1792535309578990380
+  },
+  "configured_caches": {
+    "CARGO_TARGET_DIR": "/Users/xingyuwang/Library/Caches/Codex/cargo-target",
+    "UV_CACHE_DIR": "/Users/xingyuwang/Library/Caches/Codex/uv-cache",
+    "PIP_CACHE_DIR": "/Users/xingyuwang/Library/Caches/Codex/pip-cache",
+    "TMPDIR": "/Users/xingyuwang/Library/Caches/Codex/tmp"
+  },
+  "preexisting_native_production_table": {
+    "path": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/m6_production_matches_lengths.tsv",
+    "exists": true,
+    "bytes": 49793,
+    "sha256": "f896198edf4615e8c7ebe8e2742ea3b0e7e17bfdf85f0d87dd9afda384191ba0",
+    "mtime_ns": 1792506111018655498
+  },
+  "preexisting_label_production_table": {
+    "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8/production-lengths.tsv",
+    "exists": true,
+    "bytes": 49793,
+    "sha256": "f896198edf4615e8c7ebe8e2742ea3b0e7e17bfdf85f0d87dd9afda384191ba0",
+    "mtime_ns": 1792509956179289805
+  },
+  "production_table_status": "Preexisting tables are historical/stale until a fresh successful current phase4 native publication is bound.",
+  "completed_rows": [],
+  "source_mismatches": [],
+  "m6_reporting": "ONE required756 sweep collects all bounded returned non-Won cases; no abort on its diagnostic None alone. Invariant/rejection panics remain strict. No extra sweep or acceptance weakening.",
+  "script_pid": 67577,
+  "script_pgid": 67577,
+  "script_session": 67577,
+  "status": "RUNNING"
+}

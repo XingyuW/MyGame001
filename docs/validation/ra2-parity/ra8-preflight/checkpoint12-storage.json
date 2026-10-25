@@ -1,0 +1,34 @@
+{
+  "verified_utc": "2026-10-19T20:28:21.837967+00:00",
+  "directories": [
+    {
+      "path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra5b-render",
+      "files": 10,
+      "logical_bytes": 875468,
+      "allocated_bytes": 901120,
+      "retained": "Recreatable validation evidence/scratch; useful for reruns and unnecessary for release. No deletion."
+    },
+    {
+      "path": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/ra7_definitions",
+      "files": 70,
+      "logical_bytes": 11615632,
+      "allocated_bytes": 11755520,
+      "retained": "Recreatable validation evidence/scratch; useful for reruns and unnecessary for release. No deletion."
+    },
+    {
+      "path": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/ra8_definitions",
+      "files": 58,
+      "logical_bytes": 584038,
+      "allocated_bytes": 733184,
+      "retained": "Recreatable validation evidence/scratch; useful for reruns and unnecessary for release. No deletion."
+    }
+  ],
+  "new_substantial_external_directories_since_checkpoint11": [],
+  "configured_caches": {
+    "CARGO_TARGET_DIR": "/Users/xingyuwang/Library/Caches/Codex/cargo-target",
+    "UV_CACHE_DIR": "/Users/xingyuwang/Library/Caches/Codex/uv-cache",
+    "PIP_CACHE_DIR": "/Users/xingyuwang/Library/Caches/Codex/pip-cache",
+    "TMPDIR": "/Users/xingyuwang/Library/Caches/Codex/tmp"
+  },
+  "temporary_temporal_fixtures": "Only small one-file RON fixtures in configured TMPDIR, removed before handling parse result; no new substantial external directory."
+}

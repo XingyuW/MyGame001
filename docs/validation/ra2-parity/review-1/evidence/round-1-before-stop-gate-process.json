@@ -1,0 +1,70 @@
+{
+  "start_utc": "2026-10-21T17:29:38.272568+00:00",
+  "pid": 30278,
+  "source_commit": "23647de4220408d42eeef6522deb4d4541528452",
+  "runner_sha256": "682fb4430de127779697a98ba8925168d792762767296d75e028e7059cc9076a",
+  "status": "RUNNING",
+  "source_before": {
+    "files": 669,
+    "authority_spans": 64,
+    "mismatches": []
+  },
+  "commands": [
+    {
+      "line": "01 exit 0  3 s  cargo fmt --all -- --check",
+      "observed_utc": "2026-10-21T17:29:42.484256+00:00",
+      "wrapper_elapsed_seconds": 4.025261833972763,
+      "source_after": {
+        "files": 669,
+        "authority_spans": 64,
+        "mismatches": []
+      }
+    },
+    {
+      "line": "02 exit 0  0 s  git diff --check",
+      "observed_utc": "2026-10-21T17:29:42.618781+00:00",
+      "wrapper_elapsed_seconds": 4.159781374968588,
+      "source_after": {
+        "files": 669,
+        "authority_spans": 64,
+        "mismatches": []
+      }
+    },
+    {
+      "line": "03 exit 0  6 s  cargo clippy --workspace --all-targets -- -D warnings",
+      "observed_utc": "2026-10-21T17:29:47.775832+00:00",
+      "wrapper_elapsed_seconds": 9.316801833978388,
+      "source_after": {
+        "files": 669,
+        "authority_spans": 64,
+        "mismatches": []
+      }
+    }
+  ],
+  "performance_scope": "Sole canonical Cargo/native/process owner, no copy/reviewer native overlap; required workspace internal parallel collections retain original policy. Isolated198same-sourceproofs precede full13 under explicit coordinator ordering authorization.",
+  "production_cache_before": {
+    "path": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/m6_production_matches_lengths.tsv",
+    "bytes": 49792,
+    "sha256": "fc100292d6a1787de03219616dfd11ed7759e89006c8889e92f2514e261fa383",
+    "mtime_ns": 1792586638085289653
+  },
+  "command": [
+    "env",
+    "-u",
+    "RA2_DUEL_SEED",
+    "-u",
+    "RA2_DUEL_PAIR",
+    "sh",
+    "scripts/validate_ra2_parity.sh",
+    "ra9"
+  ],
+  "configured_environment": {
+    "CARGO_TARGET_DIR": "/Users/xingyuwang/Library/Caches/Codex/cargo-target",
+    "UV_CACHE_DIR": "/Users/xingyuwang/Library/Caches/Codex/uv-cache",
+    "PIP_CACHE_DIR": "/Users/xingyuwang/Library/Caches/Codex/pip-cache",
+    "TMPDIR": "/Users/xingyuwang/Library/Caches/Codex/tmp",
+    "CARGO_BUILD_JOBS": "1"
+  },
+  "child_pid": 30304,
+  "child_pgid": 30304
+}

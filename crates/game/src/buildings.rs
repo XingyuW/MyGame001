@@ -198,6 +198,7 @@ pub(crate) fn spawn_building_views(
     map: Option<Res<MapView>>,
     sprites: Option<Res<BuildingSprites>>,
     host: Res<SimHost>,
+    mut paint: crate::presentation::TeamPaint,
 ) {
     let (Some(map), Some(sprites)) = (map, sprites) else {
         return;
@@ -212,20 +213,23 @@ pub(crate) fn spawn_building_views(
         if views.0.contains_key(id) {
             continue;
         }
-        let team = if owner.0 == HUMAN {
-            &sprites.0
-        } else {
-            &sprites.1
-        };
-        let Some(image) = team.get(&component.kind) else {
+        let (Some(human), Some(enemy)) = (
+            sprites.0.get(&component.kind),
+            sprites.1.get(&component.kind),
+        ) else {
             continue;
         };
-        let position = sprite_position(component.footprint, map.tile);
+        let image = &paint.sprite(owner.0, human, enemy);
+        let position = crate::hd_art::building_position(component.footprint, map.tile);
         let view = commands
             .spawn((
                 BuildingView { building, id: *id },
                 Sprite {
                     image: image.clone(),
+                    custom_size: Some(crate::hd_art::building_size(
+                        component.footprint.width,
+                        component.footprint.height,
+                    )),
                     color: Color::WHITE,
                     ..default()
                 },
@@ -256,17 +260,22 @@ pub fn building_shown(owner: PlayerId, footprint: Footprint, players: &Players) 
 /// Removes the views of buildings that no longer exist (sold or destroyed), and hides the views
 /// of other players' buildings while the human player does not see them.
 fn update_building_views(
+    sprites: Option<Res<BuildingSprites>>,
+    mut paint: crate::presentation::TeamPaint,
     mut commands: Commands,
     mut registry: ResMut<BuildingViews>,
     host: Res<SimHost>,
     // Disjoint from the unit views' query (`crate::units`), which also writes `Visibility`.
-    mut views: Query<(Entity, &BuildingView, &mut Visibility), Without<crate::units::UnitView>>,
+    mut views: Query<
+        (Entity, &BuildingView, &mut Visibility, &mut Sprite),
+        Without<crate::units::UnitView>,
+    >,
 ) {
     let Some(players) = host.players() else {
         return;
     };
     let world = host.world();
-    for (entity, view, mut visibility) in &mut views {
+    for (entity, view, mut visibility, mut sprite) in &mut views {
         let (Some(owner), Some(building)) = (
             world.get::<Owner>(view.building),
             world.get::<Building>(view.building),
@@ -275,6 +284,15 @@ fn update_building_views(
             commands.entity(entity).despawn();
             continue;
         };
+        if let Some(sprites) = sprites.as_ref()
+            && let (Some(human), Some(enemy)) =
+                (sprites.0.get(&building.kind), sprites.1.get(&building.kind))
+        {
+            let image = paint.sprite(owner.0, human, enemy);
+            if sprite.image != image {
+                sprite.image = image;
+            }
+        }
         let shown = if building_shown(owner.0, building.footprint, players) {
             Visibility::Inherited
         } else {
@@ -377,20 +395,31 @@ mod tests {
             let bytes = std::fs::read(assets_root().join(&sprite.asset_path)).expect("sprite");
             assert_eq!(sprite.bytes, bytes);
         }
-        // The starting buildings of every faction of the skirmish file (M6: data, D40) name
-        // defined building types.
+        // What every faction of the skirmish file starts with (M6: data, D40) names defined
+        // building types: its starting buildings, or for a country (RA1) the Construction Yard
+        // that the base unit of its side deploys into.
         let catalogue = crate::skirmish::tests::production_catalogue();
+        let rules = catalogue.definitions.rules().expect("rules");
         for faction in &catalogue.skirmish.factions {
-            assert!(!faction.buildings.is_empty());
-            for building in &faction.buildings {
+            let starting: Vec<sim::BuildingKind> = faction
+                .buildings
+                .iter()
+                .map(|building| building.kind)
+                .chain(
+                    faction
+                        .side
+                        .and_then(|side| rules.side(side))
+                        .map(|side| side.construction_yard),
+                )
+                .collect();
+            assert!(!starting.is_empty(), "{}", faction.id);
+            for kind in starting {
                 assert_eq!(
-                    definitions.building(building.kind),
-                    catalogue.definitions.building(building.kind)
+                    definitions.building(kind),
+                    catalogue.definitions.building(kind)
                 );
-                assert!(
-                    definitions.building(building.kind).is_some(),
-                    "{building:?}"
-                );
+                assert!(definitions.building(kind).is_some(), "{kind:?}");
+                assert!(faction.starts_with(&catalogue.definitions, kind));
             }
         }
     }
@@ -473,22 +502,23 @@ mod tests {
     #[test]
     fn the_demo_map_holds_the_starting_buildings_and_units() {
         // Match setup on the demo map (M6: `sim::setup_match` with the skirmish file, D40): every
-        // starting building of both factions fits, every starting unit still finds a free cell
-        // around its anchor and none stands on a building, and both players start with the
-        // skirmish file's credits.
+        // starting building of both factions fits (none since RA1: a country starts with its
+        // base unit), every starting unit still finds a free cell around its anchor and none
+        // stands on a building, and both players start with the skirmish file's credits.
         let catalogue = crate::skirmish::tests::production_catalogue();
-        let selection = crate::skirmish::MenuSelection::initial(&catalogue);
+        let selection = crate::skirmish::MenuSelection {
+            mcv_start: false,
+            ..crate::skirmish::MenuSelection::versus(&catalogue)
+        };
         let host = crate::sim_host::tests::demo_host();
         let world = host.world();
         let grid = host.grid().expect("grid");
-        let expected_buildings: usize = selection
-            .players()
-            .iter()
-            .map(|setup| catalogue.skirmish.factions[setup.faction].buildings.len())
-            .sum();
+        let (expected_units, expected_buildings) =
+            crate::skirmish::selection_totals(&catalogue, selection).expect("fixed countries");
         let mut buildings = world.try_query::<&Building>().expect("registered");
         assert_eq!(buildings.iter(world).count(), expected_buildings);
         let mut units = world.try_query::<&sim::Mobile>().expect("registered");
+        assert_eq!(units.iter(world).count(), expected_units);
         for mobile in units.iter(world) {
             assert_eq!(grid.building(mobile.cell), None);
         }

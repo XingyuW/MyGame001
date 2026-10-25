@@ -1,0 +1,20 @@
+{
+  "utc": "2026-10-20T23:11:09.903279+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--no-fail-fast",
+    "--test",
+    "ra9_squid_punch",
+    "--test",
+    "ra9_squid",
+    "--",
+    "--test-threads=1"
+  ],
+  "exit_code": 0,
+  "seconds": 351.488,
+  "status": "actual same-body AFTER plus attached-host firing control, preliminary only",
+  "lease": "RA8revocable functional phase jobs1"
+}

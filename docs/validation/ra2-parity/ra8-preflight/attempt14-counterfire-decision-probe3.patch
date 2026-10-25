@@ -1,0 +1,15 @@
+--- crates/sim/src/ai/strategy.rs
++++ crates/sim/src/ai/strategy.rs
+@@ -560,6 +560,12 @@
+     let combat_support = strategic(view, controller, special, &ground_wave);
+     screen_strike_aircraft(view, controller, special, &ground_wave, &mut commands);
+     ground_wave.retain(|unit| !controller.reserved.contains(&unit.id));
++    if view.player == PlayerId(0) && (5000..=5120).contains(&view.tick) {
++        eprintln!("counterfire outer tick{} wave{:?} ground{:?} reserved{:?} known{:?} enemy{:?}",
++          view.tick,controller.wave,ground_wave.iter().map(|u|u.id).collect::<Vec<_>>(),controller.reserved,
++          controller.known.iter().map(|(id,b)|(*id,attack_job_eligible(controller,*id),stable(view,b.footprint.origin))).collect::<Vec<_>>(),
++          view.enemy_units.iter().map(|e|(e.id,e.kind,e.armed,e.harvest)).collect::<Vec<_>>());
++    }
+     let current_building = match controller.target {
+         Some(WaveTarget::Building(id)) => Some(id),
+         _ => None,

@@ -1,0 +1,8 @@
+    Finished `release` profile [optimized] target(s) in 0.07s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+test ra8_a_specialist_repair_reservation_removes_the_overlapping_defence_attack ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 58 filtered out; finished in 0.01s
+

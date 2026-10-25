@@ -1,0 +1,34 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6m 40s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/sim-25e79ea3b16f7b71)
+
+running 7 tests
+test ai::ra9_gathering_limit_tests::ra9_terrain_gathering_flood_records_existing_building_partition_limitation ... ok
+test ai::ra9_keys_tests::ra9_public_reveal_obeys_actual_fog_gap_and_ai_turn_alignment ... FAILED
+test combat::ra9_origin_tests::ra9_projectile_source_item_is_hashed_separately_from_credit_and_launch_owner ... ok
+test fileguard::tests::ra9_native_data_loader_fifo_read_is_owned_and_contextual ... 
+running 1 test
+test fileguard::tests::ra9_native_data_loader_fifo_read_is_owned_and_contextual ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 130 filtered out; finished in 0.00s
+
+ok
+test fileguard::tests::ra9_opened_handle_survives_path_replacement_and_has_exact_bounds ... ok
+test id::ra9_boundary_tests::ra9_last_native_allocation_and_exhausted_command_preserve_ready_state ... ok
+test special::infantry::ra9_origin_tests::ra9_charge_origin_owner_and_type_are_independently_hashed ... ok
+
+failures:
+
+---- ai::ra9_keys_tests::ra9_public_reveal_obeys_actual_fog_gap_and_ai_turn_alignment stdout ----
+
+thread 'ai::ra9_keys_tests::ra9_public_reveal_obeys_actual_fog_gap_and_ai_turn_alignment' (13292535) panicked at crates/sim/src/ai/ra9_keys_tests.rs:28:85:
+actor: Impassable(CellPos { x: 8, y: 8 })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ai::ra9_keys_tests::ra9_public_reveal_obeys_actual_fog_gap_and_ai_turn_alignment
+
+test result: FAILED. 6 passed; 1 failed; 0 ignored; 0 measured; 124 filtered out; finished in 0.21s
+
+error: test failed, to rerun pass `-p sim --lib`

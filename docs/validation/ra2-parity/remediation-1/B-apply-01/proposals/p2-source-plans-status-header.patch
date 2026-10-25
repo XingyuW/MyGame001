@@ -1,0 +1,8 @@
+--- a/crates/sim/tests/ra9_audit/source-plans.rs
++++ b/crates/sim/tests/ra9_audit/source-plans.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN compositor only; each original module retains its own exact gates.
++//! Historical preparation note: UNCOMPILED/UNRUN compositor only; each original module retains its own exact gates.
+ use super::*;
+ use source_routes::{Class, Route};
+ type Specification = (SourceKey, Route, Class, String, String);

@@ -1,0 +1,13 @@
+    Finished `release` profile [optimized] target(s) in 0.06s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 5 tests
+test ra8_chronoshift_freeze_preserves_the_wave_and_resumes_offensive_combat ... ok
+test ra8_chronoshift_frozen_membership_still_discards_death_and_ownership_loss ... ok
+test ra8_chronoshift_keeps_the_whole_translated_group_out_of_known_ground_fire ... known ground-fire probe fromCellPos { x: 15, y: 15 } toCellPos { x: 36, y: 38 }
+ok
+test ra8_chronoshift_landing_commands_ignore_unseen_ground_threats ... ok
+test ra8_curtain_and_explicit_chronoshift_support_actual_tank_attack_waves ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 51 filtered out; finished in 1.37s
+

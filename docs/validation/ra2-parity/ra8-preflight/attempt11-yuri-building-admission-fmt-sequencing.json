@@ -1,0 +1,10 @@
+{
+  "checked_utc": "2026-10-19T17:37:02.221117+00:00",
+  "note": "cargo fmt unexpectedly yielded session66709 rather than completed status; dependent attrition control session67514 was launched before separate format-exit inspection. Immediate poll now confirms fmt exit0. No source writes occur during the running control. Source semantics unchanged by formatting; this is a procedural sequencing deviation, not a claimed prelaunch fmt check.",
+  "fmt_exit": 0,
+  "current_sha256": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "323f97d83614232db3d1d619d54847b885c1f0635d55382bc8804d95bb998ef9",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "e652470c28a500f2714e22596fc35259ec69f18d51da06b2201557952ae6cbd1"
+  }
+}

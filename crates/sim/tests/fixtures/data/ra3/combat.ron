@@ -1,0 +1,130 @@
+// RA3 fixture: the combat terms of the RA3 fixture world, for the tests of armour, warheads and
+// weapons (ra3_*.rs; docs/RA2_PARITY_PLAN.md sections 4.3 and 4.4). Fixture data, independent of
+// the shipped balance (invariant I10).
+//
+// Warheads: the bullet harms flesh and does not damage walls or trees; the shell harms
+// everything; the blast has a spread of 2 cells with 25 percent at its edge; the flak has a
+// spread of 1 cell with 50 percent at its edge and does nothing to concrete; the needle deals 1
+// percent to plate and hull (attacked only on order) and nothing to concrete; the torpedo harms
+// hulls only; the fallout harms no building; the megaton has a spread of 4 cells with 10 percent
+// at its edge.
+//
+// Weapons: the rifle, the long rifle and the cannons engage the ground only; the mortar bomb
+// has a minimum range of 2 cells and flies; the autocannon fires bursts of 3; the sam and the
+// flak burst engage aircraft only, the latter scattering up to 2 cells at full range; the flak
+// shell flies and scatters up to 1 cell; the rockets engage both layers.
+//
+// Types: the heavy tank carries the big cannon and the sam, and at elite rank the autocannon
+// and the sam; the boat uses its depth charge (secondary) against what is underwater; the sub is
+// underwater and attacks nothing on land; the squid is underwater and organic, and uses its
+// second weapon against organic targets; the flak car carries the flak shell and the flak burst
+// with an air range bonus of 2 cells; the sniper never attacks what is on water; the wall is a
+// wall. The seven types of the tests of sub cells and crushing: the recruit, the hazmat, the
+// jumper, the truck and the roller are unarmed, the trooper carries the rifle, and the brute
+// the sam, which engages aircraft only.
+(
+    schema_version: 5,
+    armour_classes: ["flesh", "plate", "concrete", "hull"],
+    warheads: [
+        (id: "bullet", cell_spread: 0, percent_at_max: 100, wall: 0, wood: 0, temporal: 0, mind_control: 0, psychic_damage: 0, radiation: 0, parasite: 0, ivan_bomb: 0, bomb_disarm: 0, electric_assault: 0, paralyzes: 0, culling: 0, makes_disguise: 0, versus: [(armour: "flesh", percent: 100), (armour: "plate", percent: 20), (armour: "concrete", percent: 10), (armour: "hull", percent: 20)]),
+        (id: "shell", cell_spread: 0, percent_at_max: 100, wall: 1, wood: 1,
+            temporal: 0, mind_control: 0, psychic_damage: 0, radiation: 0, parasite: 0, ivan_bomb: 0, bomb_disarm: 0, electric_assault: 0, paralyzes: 0, culling: 0, makes_disguise: 0, versus: [(armour: "flesh", percent: 50), (armour: "plate", percent: 100), (armour: "concrete", percent: 100), (armour: "hull", percent: 100)]),
+        (id: "blast", cell_spread: 512, percent_at_max: 25, wall: 1, wood: 1,
+            temporal: 0, mind_control: 0, psychic_damage: 0, radiation: 0, parasite: 0, ivan_bomb: 0, bomb_disarm: 0, electric_assault: 0, paralyzes: 0, culling: 0, makes_disguise: 0, versus: [(armour: "flesh", percent: 100), (armour: "plate", percent: 50), (armour: "concrete", percent: 100), (armour: "hull", percent: 50)]),
+        (id: "flak", cell_spread: 256, percent_at_max: 50, wall: 0, wood: 0, temporal: 0, mind_control: 0, psychic_damage: 0, radiation: 0, parasite: 0, ivan_bomb: 0, bomb_disarm: 0, electric_assault: 0, paralyzes: 0, culling: 0, makes_disguise: 0, versus: [(armour: "flesh", percent: 100), (armour: "plate", percent: 100), (armour: "concrete", percent: 0), (armour: "hull", percent: 100)]),
+        (id: "needle", cell_spread: 0, percent_at_max: 100, wall: 0, wood: 0, temporal: 0, mind_control: 0, psychic_damage: 0, radiation: 0, parasite: 0, ivan_bomb: 0, bomb_disarm: 0, electric_assault: 0, paralyzes: 0, culling: 0, makes_disguise: 0, versus: [(armour: "flesh", percent: 200), (armour: "plate", percent: 1), (armour: "concrete", percent: 0), (armour: "hull", percent: 1)]),
+        (id: "torpedo", cell_spread: 0, percent_at_max: 100, wall: 0, wood: 0, temporal: 0, mind_control: 0, psychic_damage: 0, radiation: 0, parasite: 0, ivan_bomb: 0, bomb_disarm: 0, electric_assault: 0, paralyzes: 0, culling: 0, makes_disguise: 0, versus: [(armour: "flesh", percent: 0), (armour: "plate", percent: 0), (armour: "concrete", percent: 0), (armour: "hull", percent: 100)]),
+        (id: "fallout", cell_spread: 0, percent_at_max: 100, wall: 0, wood: 0, temporal: 0, mind_control: 0, psychic_damage: 0, radiation: 0, parasite: 0, ivan_bomb: 0, bomb_disarm: 0, electric_assault: 0, paralyzes: 0, culling: 0, makes_disguise: 0, versus: [(armour: "flesh", percent: 100), (armour: "plate", percent: 10), (armour: "concrete", percent: 0), (armour: "hull", percent: 10)]),
+        (id: "megaton", cell_spread: 1024, percent_at_max: 10, wall: 1, wood: 1,
+            temporal: 0, mind_control: 0, psychic_damage: 0, radiation: 0, parasite: 0, ivan_bomb: 0, bomb_disarm: 0, electric_assault: 0, paralyzes: 0, culling: 0, makes_disguise: 0, versus: [(armour: "flesh", percent: 100), (armour: "plate", percent: 40), (armour: "concrete", percent: 10), (armour: "hull", percent: 40)]),
+    ],
+    weapons: [
+        (id: "rifle", damage: 10, range: 1024, min_range: 0, reload: 10, burst: 1, warhead: "bullet", projectile_speed: 0, anti_air: 0, anti_ground: 1, scatter: 0,
+            rad_level: 0, area_fire: 0, naval_only: 0, sonic: 0, repair: 0, suicide: 0),
+        (id: "long_rifle", damage: 60, range: 2048, min_range: 0, reload: 40, burst: 1, warhead: "needle", projectile_speed: 0, anti_air: 0, anti_ground: 1, scatter: 0,
+            rad_level: 0, area_fire: 0, naval_only: 0, sonic: 0, repair: 0, suicide: 0),
+        (id: "cannon", damage: 40, range: 1280, min_range: 0, reload: 25, burst: 1, warhead: "shell", projectile_speed: 0, anti_air: 0, anti_ground: 1, scatter: 0,
+            rad_level: 0, area_fire: 0, naval_only: 0, sonic: 0, repair: 0, suicide: 0),
+        (id: "big_cannon", damage: 60, range: 1280, min_range: 0, reload: 30, burst: 1, warhead: "shell", projectile_speed: 0, anti_air: 0, anti_ground: 1, scatter: 0,
+            rad_level: 0, area_fire: 0, naval_only: 0, sonic: 0, repair: 0, suicide: 0),
+        (id: "autocannon", damage: 20, range: 1280, min_range: 0, reload: 30, burst: 3, warhead: "shell", projectile_speed: 0, anti_air: 0, anti_ground: 1, scatter: 0,
+            rad_level: 0, area_fire: 0, naval_only: 0, sonic: 0, repair: 0, suicide: 0),
+        (id: "mortar_bomb", damage: 80, range: 1536, min_range: 512, reload: 40, burst: 1, warhead: "blast", projectile_speed: 128, anti_air: 0, anti_ground: 1, scatter: 0,
+            rad_level: 0, area_fire: 0, naval_only: 0, sonic: 0, repair: 0, suicide: 0),
+        (id: "sam", damage: 30, range: 1280, min_range: 0, reload: 20, burst: 1, warhead: "flak", projectile_speed: 0, anti_air: 1, anti_ground: 0, scatter: 0,
+            rad_level: 0, area_fire: 0, naval_only: 0, sonic: 0, repair: 0, suicide: 0),
+        (id: "flak_burst", damage: 30, range: 1536, min_range: 0, reload: 20, burst: 1, warhead: "flak", projectile_speed: 0, anti_air: 1, anti_ground: 0, scatter: 512, rad_level: 0, area_fire: 0, naval_only: 0, sonic: 0, repair: 0, suicide: 0),
+        (id: "flak_shell", damage: 30, range: 1280, min_range: 0, reload: 20, burst: 1, warhead: "flak", projectile_speed: 128, anti_air: 0, anti_ground: 1, scatter: 256, rad_level: 0, area_fire: 0, naval_only: 0, sonic: 0, repair: 0, suicide: 0),
+        (id: "rockets", damage: 30, range: 1280, min_range: 0, reload: 20, burst: 1, warhead: "shell", projectile_speed: 0, anti_air: 1, anti_ground: 1, scatter: 0,
+            rad_level: 0, area_fire: 0, naval_only: 0, sonic: 0, repair: 0, suicide: 0),
+        (id: "torp", damage: 50, range: 1280, min_range: 0, reload: 30, burst: 1, warhead: "torpedo", projectile_speed: 128, anti_air: 0, anti_ground: 1, scatter: 0,
+            rad_level: 0, area_fire: 0, naval_only: 0, sonic: 0, repair: 0, suicide: 0),
+        (id: "depth_charge", damage: 40, range: 1280, min_range: 0, reload: 30, burst: 1, warhead: "torpedo", projectile_speed: 0, anti_air: 0, anti_ground: 1, scatter: 0,
+            rad_level: 0, area_fire: 0, naval_only: 0, sonic: 0, repair: 0, suicide: 0),
+        (id: "bomb", damage: 100, range: 384, min_range: 0, reload: 50, burst: 1, warhead: "blast", projectile_speed: 0, anti_air: 0, anti_ground: 1, scatter: 0,
+            rad_level: 0, area_fire: 0, naval_only: 0, sonic: 0, repair: 0, suicide: 0),
+    ],
+    units: [
+        (unit: "allied_mcv", hit_points: 600, armour: "plate", sight: 6, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "soviet_mcv", hit_points: 600, armour: "plate", sight: 6, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "rifleman", hit_points: 100, armour: "flesh", sight: 6, weapons: ["rifle"], elite_weapons: ["rifle"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "conscript", hit_points: 90, armour: "flesh", sight: 6, weapons: ["rifle"], elite_weapons: ["rifle"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "engineer", hit_points: 60, armour: "flesh", sight: 5, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "sniper", hit_points: 80, armour: "flesh", sight: 9, weapons: ["long_rifle"], elite_weapons: ["long_rifle"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 6, underwater: 0, organic: 0),
+        (unit: "raider", hit_points: 120, armour: "flesh", sight: 7, weapons: ["rifle"], elite_weapons: ["rifle"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "militia", hit_points: 70, armour: "flesh", sight: 5, weapons: ["rifle"], elite_weapons: ["rifle"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "prototype", hit_points: 100, armour: "flesh", sight: 5, weapons: ["rifle"], elite_weapons: ["rifle"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "advanced", hit_points: 100, armour: "flesh", sight: 5, weapons: ["rifle"], elite_weapons: ["rifle"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "tank", hit_points: 300, armour: "plate", sight: 7, weapons: ["cannon"], elite_weapons: ["cannon"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "heavy", hit_points: 400, armour: "plate", sight: 7, weapons: ["big_cannon", "sam"], elite_weapons: ["autocannon", "sam"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "miner_a", hit_points: 400, armour: "plate", sight: 4, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "miner_s", hit_points: 400, armour: "plate", sight: 4, weapons: ["rifle"], elite_weapons: ["rifle"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "hovercraft", hit_points: 200, armour: "hull", sight: 5, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "gunship", hit_points: 200, armour: "plate", sight: 7, weapons: ["rockets"], elite_weapons: ["rockets"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "boat", hit_points: 300, armour: "hull", sight: 7, weapons: ["cannon", "depth_charge"], elite_weapons: ["cannon", "depth_charge"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 1, underwater: 0, organic: 0),
+        (unit: "sub", hit_points: 300, armour: "hull", sight: 7, weapons: ["torp"], elite_weapons: ["torp"], air_range_bonus: 0, land_targeting: 1, naval_targeting: 5, underwater: 1, organic: 0),
+        (unit: "squid", hit_points: 200, armour: "hull", sight: 7, weapons: ["torp", "depth_charge"], elite_weapons: ["torp", "depth_charge"], air_range_bonus: 0, land_targeting: 1, naval_targeting: 3, underwater: 1, organic: 1),
+        (unit: "flak_car", hit_points: 200, armour: "plate", sight: 8, weapons: ["flak_shell", "flak_burst"], elite_weapons: ["flak_shell", "flak_burst"], air_range_bonus: 512, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "mortar", hit_points: 100, armour: "flesh", sight: 8, weapons: ["mortar_bomb"], elite_weapons: ["mortar_bomb"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "sapper", hit_points: 100, armour: "flesh", sight: 6, weapons: ["bomb"], elite_weapons: ["bomb"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "martyr", hit_points: 100, armour: "flesh", sight: 6, weapons: ["bomb"], elite_weapons: ["bomb"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "commando", hit_points: 100, armour: "flesh", sight: 6, weapons: ["rifle"], elite_weapons: ["rifle"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "seer", hit_points: 100, armour: "flesh", sight: 6, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "recruit", hit_points: 100, armour: "flesh", sight: 6, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "trooper", hit_points: 100, armour: "flesh", sight: 6, weapons: ["rifle"], elite_weapons: ["rifle"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "hazmat", hit_points: 100, armour: "flesh", sight: 6, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "jumper", hit_points: 100, armour: "flesh", sight: 6, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "truck", hit_points: 300, armour: "plate", sight: 6, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "roller", hit_points: 300, armour: "plate", sight: 6, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+        (unit: "brute", hit_points: 400, armour: "plate", sight: 7, weapons: ["sam"], elite_weapons: ["sam"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, underwater: 0, organic: 0),
+    ],
+    buildings: [
+        (building: "allied_yard", hit_points: 1000, armour: "concrete", sight: 8, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, wall: 0),
+        (building: "soviet_yard", hit_points: 1000, armour: "concrete", sight: 8, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, wall: 0),
+        (building: "allied_power", hit_points: 400, armour: "concrete", sight: 4, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, wall: 0),
+        (building: "soviet_power", hit_points: 400, armour: "concrete", sight: 4, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, wall: 0),
+        (building: "allied_refinery", hit_points: 600, armour: "concrete", sight: 5, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, wall: 0),
+        (building: "soviet_refinery", hit_points: 600, armour: "concrete", sight: 5, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, wall: 0),
+        (building: "allied_barracks", hit_points: 400, armour: "concrete", sight: 5, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, wall: 0),
+        (building: "soviet_barracks", hit_points: 400, armour: "concrete", sight: 5, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, wall: 0),
+        (building: "allied_factory", hit_points: 600, armour: "concrete", sight: 5, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, wall: 0),
+        (building: "soviet_factory", hit_points: 600, armour: "concrete", sight: 5, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, wall: 0),
+        (building: "allied_radar", hit_points: 400, armour: "concrete", sight: 8, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, wall: 0),
+        (building: "soviet_radar", hit_points: 400, armour: "concrete", sight: 8, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, wall: 0),
+        (building: "turret", hit_points: 300, armour: "concrete", sight: 6, weapons: ["cannon"], elite_weapons: ["cannon"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, wall: 0),
+        (building: "storm_device", hit_points: 500, armour: "concrete", sight: 5, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, wall: 0),
+        (building: "bunker", hit_points: 300, armour: "concrete", sight: 6, weapons: ["cannon"], elite_weapons: ["cannon"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, wall: 0),
+        (building: "sentry", hit_points: 300, armour: "concrete", sight: 6, weapons: ["sam"], elite_weapons: ["sam"], air_range_bonus: 0, land_targeting: 1, naval_targeting: 6, wall: 0),
+        (building: "wall", hit_points: 200, armour: "concrete", sight: 1, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, wall: 1),
+        (building: "depot", hit_points: 500, armour: "concrete", sight: 5, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, wall: 0),
+        (building: "vault", hit_points: 500, armour: "concrete", sight: 5, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, wall: 0),
+        (building: "silo", hit_points: 500, armour: "concrete", sight: 5, weapons: [], elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 0, wall: 0),
+    ],
+    effects: [
+        (id: "nuke", damage: 300, warhead: "megaton"),
+        (id: "lightning", damage: 100, warhead: "blast"),
+        (id: "ivan_bomb", damage: 120, warhead: "blast"),
+        (id: "c4", damage: 150, warhead: "shell"),
+        (id: "radiation", damage: 15, warhead: "fallout"),
+    ],
+)

@@ -1,0 +1,14 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0624]: method `set_world_feature` is private
+   --> crates/sim/tests/m1_map.rs:301:23
+    |
+301 |         expected_grid.set_world_feature(cell, 15);
+    |                       ^^^^^^^^^^^^^^^^^ private method
+    |
+   ::: crates/sim/src/map.rs:257:5
+    |
+257 |     pub(crate) fn set_world_feature(&mut self, cell: CellPos, feature: u8) {
+    |     ---------------------------------------------------------------------- private method defined here
+
+For more information about this error, try `rustc --explain E0624`.
+error: could not compile `sim` (test "m1_map") due to 1 previous error

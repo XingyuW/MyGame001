@@ -1,0 +1,19 @@
+{
+  "phase": "clippy",
+  "command": [
+    "cargo",
+    "clippy",
+    "--workspace",
+    "--all-targets",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "wrapper_pid": 9035,
+  "child_pid": 9063,
+  "start_utc": "2026-10-19T12:29:22.738509+00:00",
+  "head": "ab4a17606fcd013a4d8cc6452aa8435fcd24e987",
+  "active": false,
+  "exit": 101,
+  "elapsed_seconds": 6.117342667013872
+}

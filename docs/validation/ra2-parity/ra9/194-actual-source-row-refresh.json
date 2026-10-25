@@ -1,0 +1,18 @@
+{
+  "utc": "2026-10-21T16:15:03.049220+00:00",
+  "scope": "Only actual ai.rs/combat.rs byte count/FNV/SHA metadata refreshed; no literal/class/reason/route policy changes.",
+  "before_sha256": "a364e461818287765c3975f6d494541518796df5f3b5fe22d8a4beb214d3bf80",
+  "after_sha256": "d78bb12afdb655531bb487a8bc11fa6ff6715e127ef0c58dd5fd580f81ae2200",
+  "rows": [
+    {
+      "path": "crates/sim/src/ai.rs",
+      "before": "crates/sim/src/ai.rs\t199470\t3d794e5c505cabe8\t801abf7b8d6c5ee706b82c1bb5a1754602d6e310c6fb403338ee060be21344d4",
+      "after": "crates/sim/src/ai.rs\t200355\te59f86f0b7bc2225\te046518c5fa3eb41c11de8816d75750a496c3e0c14f88373a0ea07feeb8fd8f2"
+    },
+    {
+      "path": "crates/sim/src/combat.rs",
+      "before": "crates/sim/src/combat.rs\t105537\ta16577cdbb625e2e\tfe3eeb59c3543ccaefb98f643fb50af67a4f061fb91d8136cc98af558cd26389",
+      "after": "crates/sim/src/combat.rs\t105748\t80febbef27fc1d74\t9601a8f87b07f569d3e18aa115fc6913e37c7c04f238d1d7afd22d9870b99dc6"
+    }
+  ]
+}

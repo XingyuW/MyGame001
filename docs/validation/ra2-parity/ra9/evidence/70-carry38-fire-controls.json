@@ -1,0 +1,19 @@
+{
+  "utc": "2026-10-21T00:37:14.437587+00:00",
+  "ended_utc": "2026-10-21T00:37:26.767225+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_policy_fire",
+    "ra9_c38_",
+    "--",
+    "--test-threads=1"
+  ],
+  "exit_code": 0,
+  "seconds": 12.33,
+  "lease": "RA8 revocable functional phase jobs1; no heavy AI match",
+  "input_mismatches": []
+}

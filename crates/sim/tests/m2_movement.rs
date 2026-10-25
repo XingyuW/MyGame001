@@ -25,6 +25,7 @@ const HUMAN: PlayerId = PlayerId(0);
 const ENEMY: PlayerId = PlayerId(1);
 
 const ROCK: Cell = Cell {
+    water: false,
     passable: false,
     buildable: false,
     ore: 0,
@@ -460,8 +461,11 @@ fn assert_rejected_without_state_change(
     let ids = setup(&mut app);
     assert_eq!(setup(&mut control), ids);
     let command = command(&ids);
-    issue(&mut app, player, command.clone());
     assert_eq!(hash(&mut app), hash(&mut control));
+    issue(&mut app, player, command.clone());
+    // Pending commands are value-hashed, including a command that will reject.
+    // Equality must resume once Commands consumes it without changing the world.
+    assert_ne!(hash(&mut app), hash(&mut control));
     let events = tick(&mut app);
     assert!(tick(&mut control).is_empty());
     assert_eq!(

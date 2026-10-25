@@ -1,0 +1,51 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 44s
+     Running tests/ra1_match.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra1_match-120780d10666c184)
+
+running 3 tests
+test computer_players_are_allied_against_the_human_unless_the_match_is_free_for_all ... ok
+test the_options_of_a_match_are_part_of_its_state ... ok
+test without_an_mcv_start_the_construction_yard_stands_at_the_start_position ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 17 filtered out; finished in 0.07s
+
+     Running tests/ra1_shipped.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra1_shipped-11f67f3085656188)
+
+running 1 test
+test the_default_match_is_that_of_red_alert_2s_lobby ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.08s
+
+     Running tests/ra5_crates.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra5_crates-c0e05308c9e9552a)
+
+running 2 tests
+test a_crate_of_a_unit_is_money_on_water_without_room_and_without_types ... ok
+test no_crate_appears_with_the_option_off_or_without_a_match ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 17 filtered out; finished in 1.03s
+
+     Running tests/ra5_shipped.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra5_shipped-95b6d7b4d44ca439)
+
+running 1 test
+test a_shipped_crate_gives_every_content_to_a_grizzly_over_many_seeds ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 18.42s
+
+     Running tests/ra6_infantry.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_infantry-25553fff35365e86)
+
+running 1 test
+test ra6_chrono_infantry_distance_delay_and_stolen_abilities_are_independent ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 29 filtered out; finished in 0.66s
+
+     Running tests/ra6_vehicles.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_vehicles-6e8e476b02377690)
+
+running 5 tests
+test ra6_airport_paradrops_one_shootable_plane_and_full_side_payload ... ok
+test ra6_anti_air_destroys_paradrop_plane_before_it_drops ... ok
+test ra6_chronosphere_rejects_unseen_area_and_kills_bad_or_occupied_landings ... ok
+test ra6_kirov_crash_and_demo_death_damage_nearby_allies ... ok
+test ra6_paradrop_blocked_landing_retains_payload_until_space_opens ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 34 filtered out; finished in 0.87s
+

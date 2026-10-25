@@ -1,0 +1,25 @@
+{
+  "utc": "2026-10-20T22:17:14.464178+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--no-fail-fast",
+    "--test",
+    "ra9_native_keys",
+    "--test",
+    "ra9_scenery_connected",
+    "--test",
+    "ra9_auto_defuse_geometry",
+    "--test",
+    "ra9_pad_health",
+    "--test",
+    "ra9_legacy_model_boundaries",
+    "--",
+    "--test-threads=1"
+  ],
+  "exit_code": 101,
+  "seconds": 132.49645224999404,
+  "status": "ACTUAL preliminary native, standing lease regranted; nofailfast preserves all failures, no final acceptance"
+}

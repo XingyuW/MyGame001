@@ -1,0 +1,26 @@
+{
+  "utc": "2026-10-21T01:39:58.866762+00:00",
+  "ended_utc": "2026-10-21T01:42:45.377529+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "--",
+    "ra9_export_actual_single_table_proposals",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit_code": 0,
+  "seconds": 166.51,
+  "lease": "RA8 serial functional phase jobs1; actual source proposal export after independently verified count-only source expectation correction",
+  "input_mismatches": [],
+  "actual_emitted_proposals": 1313,
+  "proposal_output": {
+    "path": "ra9-preliminary-logs/100-actual-single-table-proposals.tsv",
+    "sha256": "92b295528bc6574e85604fb4cef2fbb71345de872b42bbeb209bf8ec0656ac29",
+    "bytes": 851894
+  }
+}

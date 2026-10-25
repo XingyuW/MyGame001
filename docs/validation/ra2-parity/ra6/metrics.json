@@ -1,0 +1,22 @@
+{
+  "frozen_source": "f9b1e55",
+  "ratio_basis": "ticks / (72000 * max(128, width + height) / 128); p90 nearest-rank",
+  "production": {
+    "count": 756,
+    "median": 0.13232291666666668,
+    "p90": 0.31869444444444445,
+    "maximum": 0.7095694444444445,
+    "worst_match": "riverlands: france (easy) against germany (easy)",
+    "worst_ticks": 51089,
+    "worst_limit": 72000
+  },
+  "duels": {
+    "count": 756,
+    "median": 0.13909375000000002,
+    "p90": 0.3121031746031746,
+    "maximum": 0.8229027777777778,
+    "worst_match": "demo: america (easy) against korea (easy)",
+    "worst_ticks": 59249,
+    "worst_limit": 72000
+  }
+}

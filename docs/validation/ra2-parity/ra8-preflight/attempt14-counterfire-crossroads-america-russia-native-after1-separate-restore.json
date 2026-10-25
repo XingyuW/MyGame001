@@ -1,0 +1,15 @@
+{
+  "utc": "2026-10-20T03:19:54.298597+00:00",
+  "source": {
+    "crates/sim/src/ai.rs": "88497b2dde9a95a704e2d6439f85e84ea172bd4d04b2aa92dc148cc254f1d860",
+    "crates/sim/src/ai/strategy.rs": "531130d25d7ca4b2ebcb2bacde85d74e430712aa19d845b0d61cc54c21aa2493",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/game/tests/ra8_gate_matches.rs": "112fccc43a99547c3d1a0d66c407756a8832de222868771b6cb2ee04a0b10b35",
+    "crates/game/tests/m6_production_matches.rs": "ae394550771394e7082bd9c6027d67b5e7ab2beff3b3c2b4008804246e32ac92",
+    "crates/sim/tests/ra8_ai.rs": "2e802c8c80ffac371eb57a937d67cc24f0cb7612c3df5584cabb0cc1b46a723c",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "92a0fc584a2fe719fd9d7b505c0de9197161e1e491077ce6e7a5c0be837f0595",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553"
+  },
+  "matches_finally": true,
+  "expected_retained_helper_sha256": "112fccc43a99547c3d1a0d66c407756a8832de222868771b6cb2ee04a0b10b35"
+}

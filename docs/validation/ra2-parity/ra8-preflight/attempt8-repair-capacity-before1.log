@@ -1,0 +1,23 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 17.35s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+test ai::ra8_recovery_tests::ra8_a_full_bounded_ai_fifo_still_pauses_repairs_before_the_paid_recruit ... finite repair before tick0 cash200 repairing{SimId(4)} queues[]
+actual saturated decision [IssuedCommand { player: PlayerId(0), command: QueueProduction { item: Unit(UnitKind(1)) } }, IssuedCommand { player: PlayerId(0), command: SetRallyPoint { building: SimId(4), cell: CellPos { x: 14, y: 14 } } }, IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(7), SimId(8), SimId(9), SimId(10), SimId(11), SimId(13), SimId(14), SimId(15), SimId(16), SimId(17), SimId(18), SimId(19), SimId(20), SimId(21), SimId(22), SimId(23), SimId(24), SimId(25), SimId(26), SimId(27), SimId(28), SimId(29), SimId(30), SimId(31), SimId(32), SimId(33), SimId(34), SimId(35), SimId(36)], target: CellPos { x: 25, y: 20 } } }, IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(4) } }]
+
+thread 'ai::ra8_recovery_tests::ra8_a_full_bounded_ai_fifo_still_pauses_repairs_before_the_paid_recruit' (8223814) panicked at crates/sim/src/ai/ra8_recovery_tests.rs:286:13:
+assertion `left == right` failed
+  left: 4
+ right: 32
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ai::ra8_recovery_tests::ra8_a_full_bounded_ai_fifo_still_pauses_repairs_before_the_paid_recruit
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 103 filtered out; finished in 0.05s
+
+error: test failed, to rerun pass `-p sim --lib`

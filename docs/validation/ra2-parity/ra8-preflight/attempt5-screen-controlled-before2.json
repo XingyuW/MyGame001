@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1",
+    "ra8_distant_aa_clearance_fights_an_observed_interceptor_en_route",
+    "ra8_an_unreachable_ground_screen_does_not_hold_strike_aircraft_forever"
+  ],
+  "runtime": "bbb09fe",
+  "exit": 101,
+  "elapsed_seconds": 5.63001229200745,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-screen-controlled-before2.log",
+  "probe_correction": "before1 passed before AI wave actors were given an offensive turn; real6000-tick initialization precedes spawning, interceptor moved outside idle artillery range"
+}

@@ -1,0 +1,26 @@
+{
+  "label": "attempt9-ai-final2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "--",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T05:48:33.342529+00:00",
+  "elapsed_seconds": 25.824299375002738,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "1f5325e272804b7c34b95fbe73f67d73dcd72a86a157aee73bff81b5f3119d7c",
+    "crates/sim/src/ai/strategy.rs": "5c5fd561a4aa9d4184011128d092409ef9b0597dc23088c8515ba8a61fb88d34"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "1f5325e272804b7c34b95fbe73f67d73dcd72a86a157aee73bff81b5f3119d7c",
+    "crates/sim/src/ai/strategy.rs": "5c5fd561a4aa9d4184011128d092409ef9b0597dc23088c8515ba8a61fb88d34"
+  },
+  "log_sha256": "4cc4d796f8d6ca29350e371d3d1abd1e81d9fe85cd382bf70c642563bfecb847"
+}

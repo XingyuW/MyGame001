@@ -1,0 +1,25 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 18.52s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 3 tests
+
+thread 'command::ra8_intent_tests::ra8_private_bridge_goal_preserves_fifo_and_rechecks_arrival_occupancy' (5427678) panicked at crates/sim/src/ra8_intents.rs:624:9:
+[CommandRejected { player: PlayerId(0), command: Interact { unit: SimId(2), target: SimId(2684355637) }, reason: UnknownTarget(SimId(2684355637)) }]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test command::ra8_intent_tests::ra8_private_bridge_goal_preserves_fifo_and_rechecks_arrival_occupancy ... FAILED
+test command::ra8_intent_tests::ra8_private_bridge_goal_waits_for_hidden_occupancy_then_consumes_engineer_only_after_clear ... ok
+
+thread 'command::ra8_intent_tests::ra8_private_bridge_goal_authorizes_before_readiness_and_hashes_its_distinct_action' (5427677) panicked at crates/sim/src/ra8_intents.rs:736:86:
+called `Result::unwrap_err()` on an `Ok` value: true
+test command::ra8_intent_tests::ra8_private_bridge_goal_authorizes_before_readiness_and_hashes_its_distinct_action ... FAILED
+
+failures:
+
+failures:
+    command::ra8_intent_tests::ra8_private_bridge_goal_authorizes_before_readiness_and_hashes_its_distinct_action
+    command::ra8_intent_tests::ra8_private_bridge_goal_preserves_fifo_and_rechecks_arrival_occupancy
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 57 filtered out; finished in 0.06s
+
+error: test failed, to rerun pass `-p sim --lib`

@@ -1,0 +1,51 @@
+{
+  "utc": "2026-10-22T04:39:34.000403+00:00",
+  "status": "CURRENT_CHECKPOINT_DOCUMENTATION_ONLY_NOT_FINAL_ACCEPTANCE",
+  "before": [
+    {
+      "path": "README.md",
+      "sha256": "c34d19f9b5c933f96b960712a8a9530584986ab79f8af96e83620ae2836c9144"
+    },
+    {
+      "path": "docs/HANDOFF.md",
+      "sha256": "0a43a2a7c6b52ee95a5144d5dc9a8bd9c2fe00e6f7e0126c34c7d06f75d9f6d0"
+    },
+    {
+      "path": "docs/RA2_GAP_ANALYSIS.md",
+      "sha256": "f98841a84eb9b36009fc15cb154d4010cbc063087cc7465b01c8f9b049037450"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-review-requirements.md",
+      "sha256": "29fc78046b02ed15a1e075cd2012403b9821204f953f066155fb8de42d5569ec"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-reviews-outstanding.md",
+      "sha256": "81a8dccd3d6074d0ffb9bc06db9c09940555d3df1ecf4b780f804873305b35e3"
+    }
+  ],
+  "after": [
+    {
+      "path": "README.md",
+      "sha256": "2141ae8cef304c7d1806bac920e8c45b4a0c621c3629067344ef99895c249c21"
+    },
+    {
+      "path": "docs/HANDOFF.md",
+      "sha256": "fd2941a60a66ae85243767a06229b84780793aa517aa2cfd3c359f5518d992d9"
+    },
+    {
+      "path": "docs/RA2_GAP_ANALYSIS.md",
+      "sha256": "01b676611f3bc8d751cb18a10797645a7662fd7ece049d526ff7967f411d8b34"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-review-requirements.md",
+      "sha256": "0c793edd22684f75e5ee08867ca60a1f7ac68f486f124b916eace8db9f9d261d"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-reviews-outstanding.md",
+      "sha256": "f3d66ebb2dee25c0d20d82fa21fbd3d0bf307365a36d79b098b755f1a388b455"
+    }
+  ],
+  "protected_spans": 64,
+  "howtosee_sha256": "8ae4edfadf97fc68138d03c9a12d9c1217cf0c1fb65cf6dd6010c77b1c5bd6c1",
+  "compiled_input_delta": []
+}

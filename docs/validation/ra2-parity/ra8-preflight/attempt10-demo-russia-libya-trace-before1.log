@@ -1,0 +1,861 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 3.54s
+     Running tests/ra8_gate_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_gate_matches-556affa51f6ab831)
+
+running 1 test
+test ra8_gate10_demo_russia_libya_easy_seed_zero_finishes ... snapshot tick SimTick(60000)
+queued CommandQueue { pending: [] }
+player PlayerId(0) credits 234 queues []
+player PlayerId(1) credits 0 queues [(QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(29)), progress: 23, charged: 23, fraction: 0 }])]
+AiPlayers { definitions: Some(AiDefinitions { policy: AiPolicy { garrison_quota: 3, garrison_radius: 12, depot_radius: 16, naval_rescan: 600, naval_detector_quota: 1, artillery_min_range: 8, artillery_standoff: 3, paradrop_offset: 4, chrono_min_offset: 3, chrono_max_offset: 8 }, rules_difficulty: true, plans: [SidePlan { side: Some(Allied), country: None, defences: [], support: [], tier_reserves: [0, 0, 0], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(15), BuildingKind(1), BuildingKind(2), BuildingKind(15), BuildingKind(4), BuildingKind(3), BuildingKind(1), BuildingKind(15)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(19)] }, SidePlan { side: Some(Soviet), country: None, defences: [], support: [], tier_reserves: [0, 0, 0], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(16), BuildingKind(6), BuildingKind(30), BuildingKind(16), BuildingKind(32), BuildingKind(31), BuildingKind(6), BuildingKind(16)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(10), UnitKind(18), UnitKind(0)] }, SidePlan { side: Some(Allied), country: Some(CountryId(0)), defences: [BuildingKind(15), BuildingKind(19), BuildingKind(17)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(34), BuildingKind(11), BuildingKind(5), BuildingKind(2), BuildingKind(4), BuildingKind(7), BuildingKind(23), BuildingKind(22), BuildingKind(26), BuildingKind(25), BuildingKind(9)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(25), UnitKind(25), UnitKind(24), UnitKind(19), UnitKind(7), UnitKind(6), UnitKind(30), UnitKind(35), UnitKind(38), UnitKind(37)] }, SidePlan { side: Some(Allied), country: Some(CountryId(1)), defences: [BuildingKind(15), BuildingKind(19), BuildingKind(17)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(10), BuildingKind(11), BuildingKind(5), BuildingKind(2), BuildingKind(4), BuildingKind(7), BuildingKind(23), BuildingKind(22), BuildingKind(26), BuildingKind(25), BuildingKind(9)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(25), UnitKind(25), UnitKind(24), UnitKind(19), UnitKind(7), UnitKind(6), UnitKind(31), UnitKind(35), UnitKind(38), UnitKind(37)] }, SidePlan { side: Some(Allied), country: Some(CountryId(2)), defences: [BuildingKind(21), BuildingKind(15), BuildingKind(19), BuildingKind(17)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(10), BuildingKind(11), BuildingKind(5), BuildingKind(2), BuildingKind(4), BuildingKind(7), BuildingKind(23), BuildingKind(22), BuildingKind(26), BuildingKind(25), BuildingKind(9)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(25), UnitKind(25), UnitKind(24), UnitKind(19), UnitKind(7), UnitKind(6), UnitKind(30), UnitKind(35), UnitKind(38), UnitKind(37)] }, SidePlan { side: Some(Allied), country: Some(CountryId(3)), defences: [BuildingKind(15), BuildingKind(19), BuildingKind(17)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(10), BuildingKind(11), BuildingKind(5), BuildingKind(2), BuildingKind(4), BuildingKind(7), BuildingKind(23), BuildingKind(22), BuildingKind(26), BuildingKind(25), BuildingKind(9)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(25), UnitKind(25), UnitKind(27), UnitKind(24), UnitKind(19), UnitKind(7), UnitKind(6), UnitKind(30), UnitKind(35), UnitKind(38), UnitKind(37)] }, SidePlan { side: Some(Allied), country: Some(CountryId(4)), defences: [BuildingKind(15), BuildingKind(19), BuildingKind(17)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(10), BuildingKind(11), BuildingKind(5), BuildingKind(2), BuildingKind(4), BuildingKind(7), BuildingKind(23), BuildingKind(22), BuildingKind(26), BuildingKind(25), BuildingKind(9)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(8), UnitKind(25), UnitKind(25), UnitKind(24), UnitKind(19), UnitKind(7), UnitKind(6), UnitKind(30), UnitKind(35), UnitKind(38), UnitKind(37)] }, SidePlan { side: Some(Soviet), country: Some(CountryId(8)), defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(28), UnitKind(22), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }, SidePlan { side: Some(Soviet), country: Some(CountryId(6)), defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(13), UnitKind(22), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }, SidePlan { side: Some(Soviet), country: Some(CountryId(7)), defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(14), UnitKind(22), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }, SidePlan { side: Some(Soviet), country: Some(CountryId(5)), defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(22), UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(29), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }], difficulties: [Difficulty { id: "easy", think_interval: 40, harvesters_per_refinery: 1, max_army: 16, wave_size: 8, first_wave: 6000, wave_patience: 1800, defence_radius: 8 }, Difficulty { id: "medium", think_interval: 20, harvesters_per_refinery: 2, max_army: 24, wave_size: 12, first_wave: 3600, wave_patience: 1200, defence_radius: 10 }, Difficulty { id: "brutal", think_interval: 10, harvesters_per_refinery: 2, max_army: 36, wave_size: 16, first_wave: 2400, wave_patience: 900, defence_radius: 12 }] }), controllers: {PlayerId(0): AiController { plan: AiPlan { policy: AiPolicy { garrison_quota: 3, garrison_radius: 12, depot_radius: 16, naval_rescan: 600, naval_detector_quota: 1, artillery_min_range: 8, artillery_standoff: 3, paradrop_offset: 4, chrono_min_offset: 3, chrono_max_offset: 8 }, rules_difficulty: true, defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(28), UnitKind(22), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }, difficulty: Difficulty { id: "easy", think_interval: 40, harvesters_per_refinery: 1, max_army: 16, wave_size: 8, first_wave: 4667, wave_patience: 1800, defence_radius: 8 }, start: CellPos { x: 15, y: 37 }, gather: CellPos { x: 21, y: 36 }, waypoints: <omitted>
+known: {SimId(26): KnownBuilding { owner: PlayerId(1), footprint: Footprint { origin: CellPos { x: 52, y: 46 }, width: 3, height: 3 }, kind: BuildingKind(30) }, SimId(32): KnownBuilding { owner: PlayerId(1), footprint: Footprint { origin: CellPos { x: 50, y: 39 }, width: 1, height: 1 }, kind: BuildingKind(16) }, SimId(40): KnownBuilding { owner: PlayerId(1), footprint: Footprint { origin: CellPos { x: 50, y: 42 }, width: 1, height: 1 }, kind: BuildingKind(16) }, SimId(50): KnownBuilding { owner: PlayerId(1), footprint: Footprint { origin: CellPos { x: 49, y: 47 }, width: 2, height: 2 }, kind: BuildingKind(6) }, SimId(62): KnownBuilding { owner: PlayerId(1), footprint: Footprint { origin: CellPos { x: 48, y: 41 }, width: 1, height: 1 }, kind: BuildingKind(20) }, SimId(117): KnownBuilding { owner: PlayerId(1), footprint: Footprint { origin: CellPos { x: 49, y: 36 }, width: 2, height: 2 }, kind: BuildingKind(36) }, SimId(3221228905): KnownBuilding { owner: PlayerId(1), footprint: Footprint { origin: CellPos { x: 41, y: 53 }, width: 1, height: 1 }, kind: BuildingKind(43) }}, repair_huts: {}, broken_bridges: {}, wave: {}, target: None, failures: {}, next_army: 0, army_cursors: {QueueKey { producer: BuildingKind(3), lane: Main }: 2, QueueKey { producer: BuildingKind(4), lane: Main }: 8}, patience_until: 58440, next_harvest: 0, fall_back_exempt: true, liquidating: false, issued: 389, flank: false, staging: None, waves_sent: 0, stalled: (0, 59960), last_stand: false, next_wave: 61307, seen_air: false, unseen_loss: true, observed_units: {SimId(138): CellPos { x: 19, y: 33 }}, reserved: {}, naval_goal: Some(CellPos { x: 40, y: 27 }), naval_site: Some(CellPos { x: 36, y: 24 }), next_naval_scan: 60000, air_screens: {}, building_jobs: {SimId(62): BuildingJobProgress { hp: 458, failures: 0, actors: {}, founders: {}, approaching: false }, SimId(3221228905): BuildingJobProgress { hp: 212, failures: 0, actors: {}, founders: {}, approaching: false }} }, PlayerId(1): AiController { plan: AiPlan { policy: AiPolicy { garrison_quota: 3, garrison_radius: 12, depot_radius: 16, naval_rescan: 600, naval_detector_quota: 1, artillery_min_range: 8, artillery_standoff: 3, paradrop_offset: 4, chrono_min_offset: 3, chrono_max_offset: 8 }, rules_difficulty: true, defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(22), UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(29), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }, difficulty: Difficulty { id: "easy", think_interval: 40, harvesters_per_refinery: 1, max_army: 16, wave_size: 8, first_wave: 4667, wave_patience: 1800, defence_radius: 8 }, start: CellPos { x: 52, y: 42 }, gather: CellPos { x: 46, y: 39 }, waypoints: <omitted>
+known: {SimId(45): KnownBuilding { owner: PlayerId(0), footprint: Footprint { origin: CellPos { x: 15, y: 31 }, width: 2, height: 2 }, kind: BuildingKind(12) }}, repair_huts: {}, broken_bridges: {}, wave: {SimId(27)}, target: Some(Building(SimId(45))), failures: {}, next_army: 0, army_cursors: {QueueKey { producer: BuildingKind(3), lane: Main }: 7, QueueKey { producer: BuildingKind(4), lane: Main }: 5}, patience_until: 58881, next_harvest: 57121, fall_back_exempt: true, liquidating: false, issued: 197, flank: false, staging: None, waves_sent: 0, stalled: (0, 59961), last_stand: false, next_wave: 61748, seen_air: false, unseen_loss: true, observed_units: {SimId(27): CellPos { x: 21, y: 30 }, SimId(121): CellPos { x: 47, y: 39 }}, reserved: {}, naval_goal: Some(CellPos { x: 34, y: 22 }), naval_site: Some(CellPos { x: 38, y: 25 }), next_naval_scan: 60001, air_screens: {}, building_jobs: {} }} }
+unit SimId(138) Owner(PlayerId(0)) tesla_tank Mobile { speed: 11, cell: CellPos { x: 19, y: 33 }, step: None } Health { hit_points: 300 } moveNone Some(Weapon { kind: WeaponKind(79), secondary: None, cooldown: 17, burst_left: 0, volley: WeaponKind(79), target: Some(SimId(27)), order: Some(Attack { target: SimId(27), chases: 0 }) }) None
+unit SimId(27) Owner(PlayerId(1)) war_miner Mobile { speed: 6, cell: CellPos { x: 21, y: 30 }, step: None } Health { hit_points: 285 } moveNone Some(Weapon { kind: WeaponKind(86), secondary: None, cooldown: 6, burst_left: 0, volley: WeaponKind(86), target: Some(SimId(45)), order: Some(AttackMove { destination: CellPos { x: 16, y: 30 }, moving: false }) }) Some(Harvester { field: None, load: 0, state: Idle, attempts: 0, gems: 0, work: 0 })
+building SimId(30) Owner(PlayerId(1)) soviet_barracks CellPos { x: 56, y: 42 } Health { hit_points: 500 }
+building SimId(39) Owner(PlayerId(0)) soviet_war_factory CellPos { x: 11, y: 41 } Health { hit_points: 1000 }
+building SimId(38) Owner(PlayerId(1)) soviet_war_factory CellPos { x: 56, y: 46 } Health { hit_points: 1000 }
+building SimId(1) Owner(PlayerId(1)) soviet_construction_yard CellPos { x: 52, y: 42 } Health { hit_points: 1000 }
+building SimId(117) Owner(PlayerId(1)) soviet_battle_lab CellPos { x: 49, y: 36 } Health { hit_points: 500 }
+building SimId(24) Owner(PlayerId(1)) tesla_reactor CellPos { x: 52, y: 39 } Health { hit_points: 750 }
+building SimId(68) Owner(PlayerId(1)) tesla_reactor CellPos { x: 57, y: 38 } Health { hit_points: 750 }
+building SimId(26) Owner(PlayerId(1)) soviet_refinery CellPos { x: 52, y: 46 } Health { hit_points: 1000 }
+building SimId(50) Owner(PlayerId(1)) tesla_reactor CellPos { x: 49, y: 47 } Health { hit_points: 750 }
+building SimId(44) Owner(PlayerId(1)) radar_tower CellPos { x: 52, y: 36 } Health { hit_points: 1000 }
+building SimId(45) Owner(PlayerId(0)) radar_tower CellPos { x: 15, y: 31 } Health { hit_points: 994 }
+building SimId(32) Owner(PlayerId(1)) sentry_gun CellPos { x: 50, y: 39 } Health { hit_points: 400 }
+building SimId(62) Owner(PlayerId(1)) tesla_coil CellPos { x: 48, y: 41 } Health { hit_points: 458 }
+building SimId(34) Owner(PlayerId(1)) sentry_gun CellPos { x: 50, y: 45 } Health { hit_points: 400 }
+building SimId(40) Owner(PlayerId(1)) sentry_gun CellPos { x: 50, y: 42 } Health { hit_points: 400 }
+building SimId(36) Owner(PlayerId(1)) sentry_gun CellPos { x: 55, y: 39 } Health { hit_points: 400 }
+special SpecialState { strategic: StrategicState { missiles: [], storm: None, flights: {}, announced: {} }, parasites: {}, deployed: {}, mirage_trees: {}, disguises: {}, erasures: {}, charges: {}, radiation_sites: [], coil_charge: {}, death_detonated: {}, eruption_next: {}, temporal_removed: {}, charge: {}, protected: {}, disabled: {}, cargo: {SimId(3221228905): [Passenger { id: SimId(121), kind: UnitKind(0), hp: 125, harvester: None, experience: Some(Experience { value: 0, rank: 0, ranked: Multipliers { firepower_pm: 1000, armour_pm: 1000, reload_pm: 1000, speed_pm: 1000 }, bonus: Multipliers { firepower_pm: 1000, armour_pm: 1000, reload_pm: 1000, speed_pm: 1000 }, self_heal: false }), bay: None }]}, garrisons: {SimId(3221228905): Garrison { owner: PlayerId(1), cell: CellPos { x: 41, y: 53 }, cooldown: 0, evicting: false }}, controlled: {}, bombs: {}, zones: [], rearming: {}, carrier_flights: {}, interactions: {}, hidden: {}, outages: {}, docked: {}, ammo: {}, reloading: {}, docks: {}, bays: {}, spawned: {}, missiles: {}, surfaced: {} }
+economy window 0..59999 {"P0 cancelled Unit(UnitKind(0)) refund0": 1, "P0 cancelled Unit(UnitKind(28)) refund0": 1, "P0 cancelled Unit(UnitKind(28)) refund598": 1, "P0 lost attack_dog": 2, "P0 lost conscript": 55, "P0 lost flak_track": 1, "P0 lost rhino": 6, "P0 lost tesla_trooper": 4, "P0 lost war_miner": 1, "P0 lost_building soviet_barracks": 1, "P0 ore_credits": 6000, "P0 placed radar_tower": 1, "P0 placed sentry_gun": 4, "P0 placed soviet_barracks": 1, "P0 placed soviet_construction_yard": 1, "P0 placed soviet_refinery": 1, "P0 placed soviet_service_depot": 1, "P0 placed soviet_war_factory": 1, "P0 placed tesla_coil": 1, "P0 placed tesla_reactor": 3, "P0 produced Building(BuildingKind(12))": 1, "P0 produced Building(BuildingKind(16))": 4, "P0 produced Building(BuildingKind(20))": 1, "P0 produced Building(BuildingKind(30))": 1, "P0 produced Building(BuildingKind(31))": 1, "P0 produced Building(BuildingKind(32))": 1, "P0 produced Building(BuildingKind(35))": 1, "P0 produced Building(BuildingKind(6))": 3, "P0 produced Unit(UnitKind(0))": 29, "P0 produced Unit(UnitKind(10))": 4, "P0 produced Unit(UnitKind(18))": 2, "P0 produced Unit(UnitKind(20))": 1, "P0 produced Unit(UnitKind(28))": 1, "P0 produced Unit(UnitKind(3))": 2, "P0 queued_attack SimId(101) ?": 7, "P0 queued_attack SimId(103) ?": 7, "P0 queued_attack SimId(106) ?": 5, "P0 queued_attack SimId(107) ?": 2, "P0 queued_attack SimId(120) ?": 2, "P0 queued_attack SimId(124) ?": 1, "P0 queued_attack SimId(125) ?": 2, "P0 queued_attack SimId(126) ?": 2, "P0 queued_attack SimId(14) ?": 6, "P0 queued_attack SimId(16) ?": 5, "P0 queued_attack SimId(19) ?": 6, "P0 queued_attack SimId(20) ?": 6, "P0 queued_attack SimId(22) ?": 7, "P0 queued_attack SimId(27) ?": 30, "P0 queued_attack SimId(3221228713) ?": 23, "P0 queued_attack SimId(3221228841) ?": 13, "P0 queued_attack SimId(3221228905) ?": 16, "P0 queued_attack SimId(60) soviet_service_depot": 44, "P0 queued_attack SimId(62) tesla_coil": 38, "P0 queued_attack SimId(88) ?": 4, "P0 queued_attack SimId(89) ?": 5, "P0 queued_attack SimId(96) ?": 5, "P0 queued_attack_actors SimId(101)": 7, "P0 queued_attack_actors SimId(103)": 7, "P0 queued_attack_actors SimId(106)": 5, "P0 queued_attack_actors SimId(107)": 2, "P0 queued_attack_actors SimId(120)": 2, "P0 queued_attack_actors SimId(124)": 1, "P0 queued_attack_actors SimId(125)": 2, "P0 queued_attack_actors SimId(126)": 2, "P0 queued_attack_actors SimId(14)": 6, "P0 queued_attack_actors SimId(16)": 5, "P0 queued_attack_actors SimId(19)": 6, "P0 queued_attack_actors SimId(20)": 6, "P0 queued_attack_actors SimId(22)": 7, "P0 queued_attack_actors SimId(27)": 30, "P0 queued_attack_actors SimId(3221228713)": 64, "P0 queued_attack_actors SimId(3221228841)": 69, "P0 queued_attack_actors SimId(3221228905)": 16, "P0 queued_attack_actors SimId(60)": 122, "P0 queued_attack_actors SimId(62)": 92, "P0 queued_attack_actors SimId(88)": 4, "P0 queued_attack_actors SimId(89)": 5, "P0 queued_attack_actors SimId(96)": 5, "P0 repaired_hp radar_tower": 493, "P0 repaired_hp sentry_gun": 314, "P0 repaired_hp soviet_construction_yard": 167, "P0 repaired_hp soviet_war_factory": 105, "P0 repaired_hp tesla_reactor": 72, "P0 sales_refund": 4850, "P1 cancelled Building(BuildingKind(24)) refund360": 1, "P1 cancelled Building(BuildingKind(35)) refund320": 1, "P1 cancelled Building(BuildingKind(36)) refund307": 1, "P1 cancelled Unit(UnitKind(29)) refund0": 1, "P1 cancelled Unit(UnitKind(29)) refund895": 1, "P1 lost attack_dog": 3, "P1 lost conscript": 17, "P1 lost demolition_truck": 2, "P1 lost flak_track": 1, "P1 lost rhino": 6, "P1 lost tesla_trooper": 9, "P1 lost_building soviet_service_depot": 1, "P1 ore_credits": 14925, "P1 placed radar_tower": 1, "P1 placed sentry_gun": 4, "P1 placed soviet_barracks": 1, "P1 placed soviet_battle_lab": 1, "P1 placed soviet_construction_yard": 1, "P1 placed soviet_refinery": 1, "P1 placed soviet_service_depot": 1, "P1 placed soviet_war_factory": 1, "P1 placed tesla_coil": 1, "P1 placed tesla_reactor": 3, "P1 produced Building(BuildingKind(12))": 1, "P1 produced Building(BuildingKind(16))": 4, "P1 produced Building(BuildingKind(20))": 1, "P1 produced Building(BuildingKind(30))": 1, "P1 produced Building(BuildingKind(31))": 1, "P1 produced Building(BuildingKind(32))": 1, "P1 produced Building(BuildingKind(35))": 1, "P1 produced Building(BuildingKind(36))": 1, "P1 produced Building(BuildingKind(6))": 3, "P1 produced Unit(UnitKind(0))": 9, "P1 produced Unit(UnitKind(10))": 9, "P1 produced Unit(UnitKind(18))": 2, "P1 produced Unit(UnitKind(20))": 1, "P1 produced Unit(UnitKind(29))": 2, "P1 produced Unit(UnitKind(3))": 3, "P1 queued_attack SimId(0) soviet_construction_yard": 6, "P1 queued_attack SimId(118) ?": 1, "P1 queued_attack SimId(128) ?": 2, "P1 queued_attack SimId(29) ?": 8, "P1 queued_attack SimId(41) sentry_gun": 12, "P1 queued_attack SimId(42) ?": 2, "P1 queued_attack SimId(52) tesla_reactor": 4, "P1 queued_attack SimId(75) tesla_reactor": 1, "P1 queued_attack SimId(80) ?": 1, "P1 queued_attack SimId(82) ?": 1, "P1 queued_attack SimId(83) ?": 1, "P1 queued_attack SimId(84) ?": 1, "P1 queued_attack SimId(85) ?": 2, "P1 queued_attack SimId(87) ?": 2, "P1 queued_attack SimId(93) ?": 1, "P1 queued_attack SimId(97) ?": 2, "P1 queued_attack SimId(98) ?": 1, "P1 queued_attack SimId(99) ?": 4, "P1 queued_attack_actors SimId(0)": 12, "P1 queued_attack_actors SimId(118)": 1, "P1 queued_attack_actors SimId(128)": 2, "P1 queued_attack_actors SimId(29)": 8, "P1 queued_attack_actors SimId(41)": 12, "P1 queued_attack_actors SimId(42)": 2, "P1 queued_attack_actors SimId(52)": 8, "P1 queued_attack_actors SimId(75)": 3, "P1 queued_attack_actors SimId(80)": 1, "P1 queued_attack_actors SimId(82)": 1, "P1 queued_attack_actors SimId(83)": 1, "P1 queued_attack_actors SimId(84)": 1, "P1 queued_attack_actors SimId(85)": 2, "P1 queued_attack_actors SimId(87)": 2, "P1 queued_attack_actors SimId(93)": 1, "P1 queued_attack_actors SimId(97)": 2, "P1 queued_attack_actors SimId(98)": 1, "P1 queued_attack_actors SimId(99)": 4, "ended SimId(100)->SimId(101) TargetGone": 1, "ended SimId(100)->SimId(103) TargetGone": 1, "ended SimId(100)->SimId(27) OutOfReach": 1, "ended SimId(100)->SimId(3221228841) TargetGone": 1, "ended SimId(102)->SimId(101) TargetGone": 1, "ended SimId(102)->SimId(103) TargetGone": 1, "ended SimId(104)->SimId(101) TargetGone": 1, "ended SimId(104)->SimId(103) TargetGone": 1, "ended SimId(104)->SimId(27) OutOfReach": 1, "ended SimId(105)->SimId(101) TargetGone": 1, "ended SimId(105)->SimId(103) TargetGone": 1, "ended SimId(105)->SimId(27) OutOfReach": 1, "ended SimId(105)->SimId(3221228841) TargetGone": 1, "ended SimId(106)->SimId(97) TargetGone": 1, "ended SimId(106)->SimId(98) OutOfReach": 1, "ended SimId(106)->SimId(99) TargetGone": 1, "ended SimId(107)->SimId(97) TargetGone": 1, "ended SimId(107)->SimId(99) TargetGone": 1, "ended SimId(108)->SimId(107) TargetGone": 1, "ended SimId(108)->SimId(96) TargetGone": 1, "ended SimId(109)->SimId(107) TargetGone": 1, "ended SimId(109)->SimId(96) TargetGone": 1, "ended SimId(110)->SimId(96) TargetGone": 1, "ended SimId(111)->SimId(96) TargetGone": 1, "ended SimId(112)->SimId(96) TargetGone": 1, "ended SimId(121)->SimId(118) TargetGone": 1, "ended SimId(122)->SimId(120) TargetGone": 1, "ended SimId(123)->SimId(120) TargetGone": 1, "ended SimId(125)->SimId(128) TargetGone": 1, "ended SimId(126)->SimId(128) TargetGone": 1, "ended SimId(127)->SimId(124) TargetGone": 1, "ended SimId(129)->SimId(125) TargetGone": 1, "ended SimId(130)->SimId(125) TargetGone": 1, "ended SimId(42)->SimId(14) TargetGone": 1, "ended SimId(42)->SimId(16) TargetGone": 1, "ended SimId(42)->SimId(19) TargetGone": 1, "ended SimId(42)->SimId(20) TargetGone": 1, "ended SimId(42)->SimId(22) TargetGone": 1, "ended SimId(46)->SimId(19) TargetGone": 1, "ended SimId(46)->SimId(20) TargetGone": 1, "ended SimId(47)->SimId(14) TargetGone": 1, "ended SimId(47)->SimId(16) TargetGone": 1, "ended SimId(47)->SimId(19) TargetGone": 1, "ended SimId(47)->SimId(20) TargetGone": 1, "ended SimId(47)->SimId(22) TargetGone": 1, "ended SimId(48)->SimId(14) TargetGone": 1, "ended SimId(48)->SimId(16) TargetGone": 1, "ended SimId(48)->SimId(19) TargetGone": 1, "ended SimId(48)->SimId(20) TargetGone": 1, "ended SimId(48)->SimId(22) TargetGone": 1, "ended SimId(54)->SimId(19) TargetGone": 1, "ended SimId(54)->SimId(20) TargetGone": 1, "ended SimId(54)->SimId(22) TargetGone": 1, "ended SimId(55)->SimId(14) TargetGone": 1, "ended SimId(55)->SimId(16) TargetGone": 1, "ended SimId(55)->SimId(19) TargetGone": 1, "ended SimId(55)->SimId(20) TargetGone": 1, "ended SimId(55)->SimId(22) TargetGone": 1, "ended SimId(57)->SimId(14) TargetGone": 1, "ended SimId(57)->SimId(16) TargetGone": 1, "ended SimId(57)->SimId(22) TargetGone": 1, "ended SimId(69)->SimId(29) OutOfReach": 2, "ended SimId(70)->SimId(29) TargetGone": 1, "ended SimId(72)->SimId(29) OutOfReach": 2, "ended SimId(72)->SimId(29) TargetGone": 1, "ended SimId(72)->SimId(42) TargetGone": 1, "ended SimId(74)->SimId(27) OutOfReach": 1, "ended SimId(76)->SimId(27) OutOfReach": 1, "ended SimId(81)->SimId(80) TargetGone": 1, "ended SimId(81)->SimId(84) TargetGone": 1, "ended SimId(88)->SimId(52) NoDamage": 1, "ended SimId(88)->SimId(83) TargetGone": 1, "ended SimId(88)->SimId(85) TargetGone": 1, "ended SimId(88)->SimId(87) TargetGone": 1, "ended SimId(89)->SimId(87) TargetGone": 1, "ended SimId(90)->SimId(88) TargetGone": 1, "ended SimId(90)->SimId(89) TargetGone": 1, "ended SimId(91)->SimId(88) TargetGone": 1, "ended SimId(91)->SimId(89) TargetGone": 1, "ended SimId(92)->SimId(88) TargetGone": 1, "ended SimId(92)->SimId(89) TargetGone": 1, "ended SimId(93)->SimId(60) TargetGone": 1, "ended SimId(93)->SimId(88) TargetGone": 1, "ended SimId(93)->SimId(89) TargetGone": 1, "ended SimId(94)->SimId(27) OutOfReach": 1, "ended SimId(94)->SimId(60) TargetGone": 1, "ended SimId(94)->SimId(89) TargetGone": 1, "ended SimId(95)->SimId(99) TargetGone": 1, "ended SimId(96)->SimId(93) TargetGone": 1, "ended SimId(96)->SimId(99) TargetGone": 1, "ended SimId(97)->SimId(101) TargetGone": 1, "ended SimId(97)->SimId(103) TargetGone": 1, "ended SimId(97)->SimId(27) OutOfReach": 1, "ended SimId(98)->SimId(101) TargetGone": 1, "ended SimId(98)->SimId(103) TargetGone": 1, "ended SimId(98)->SimId(27) OutOfReach": 1, "ended SimId(99)->SimId(101) TargetGone": 1, "ended SimId(99)->SimId(103) TargetGone": 1, "ended SimId(99)->SimId(27) OutOfReach": 1, "ended SimId(99)->SimId(3221228841) TargetGone": 1, "shots ?->attack_dog": 5, "shots ?->conscript": 46, "shots ?->flak_track": 4, "shots attack_dog->conscript": 4, "shots attack_dog->tesla_reactor": 1, "shots conscript->?": 54, "shots conscript->attack_dog": 8, "shots conscript->conscript": 214, "shots conscript->demolition_truck": 23, "shots conscript->flak_track": 14, "shots conscript->rhino": 189, "shots conscript->soviet_service_depot": 73, "shots conscript->tesla_coil": 18, "shots conscript->tesla_reactor": 2, "shots conscript->tesla_trooper": 86, "shots conscript->war_miner": 280, "shots demolition_truck->soviet_mcv": 1, "shots flak_track->?": 10, "shots flak_track->conscript": 5, "shots flak_track->soviet_service_depot": 11, "shots flak_track->war_miner": 8, "shots rhino->conscript": 54, "shots rhino->flak_track": 2, "shots rhino->rhino": 44, "shots rhino->soviet_service_depot": 3, "shots rhino->tesla_trooper": 16, "shots rhino->war_miner": 2, "shots sentry_gun->attack_dog": 6, "shots sentry_gun->conscript": 19, "shots sentry_gun->demolition_truck": 2, "shots sentry_gun->tesla_trooper": 7, "shots sentry_gun->war_miner": 7, "shots tesla_coil->attack_dog": 1, "shots tesla_coil->conscript": 16, "shots tesla_coil->rhino": 4, "shots tesla_coil->war_miner": 2, "shots tesla_tank->war_miner": 4, "shots tesla_trooper->conscript": 10, "shots tesla_trooper->flak_track": 3, "shots tesla_trooper->rhino": 7, "shots tesla_trooper->soviet_mcv": 2, "shots tesla_trooper->tesla_reactor": 2, "shots tesla_trooper->tesla_trooper": 3, "shots tesla_trooper->war_miner": 20, "shots war_miner->conscript": 40, "shots war_miner->radar_tower": 29, "shots war_miner->tesla_trooper": 7, "shots war_miner->war_miner": 7}
+service tick60000 P0 SimId(138) tesla_tank cellCellPos { x: 19, y: 33 } moveNone weaponSome(Weapon { kind: WeaponKind(79), secondary: None, cooldown: 16, burst_left: 0, volley: WeaponKind(79), target: Some(SimId(27)), order: Some(Attack { target: SimId(27), chases: 0 }) }) dockNone wavefalse
+service tick60000 P1 SimId(27) war_miner cellCellPos { x: 21, y: 30 } moveNone weaponSome(Weapon { kind: WeaponKind(86), secondary: None, cooldown: 5, burst_left: 0, volley: WeaponKind(86), target: Some(SimId(45)), order: Some(AttackMove { destination: CellPos { x: 16, y: 30 }, moving: false }) }) dockNone wavetrue
+service decision tick60000 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick60005 SimId(27) Some("war_miner") -> SimId(45) Some("radar_tower")
+service shot tick60016 SimId(138) Some("tesla_tank") -> SimId(27) Some("war_miner")
+service tick60016 DamageStateChanged { player: PlayerId(1), id: SimId(27), state: Red }
+service shot tick60037 SimId(27) Some("war_miner") -> SimId(45) Some("radar_tower")
+service decision tick60040 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick60069 SimId(27) Some("war_miner") -> SimId(45) Some("radar_tower")
+service shot tick60101 SimId(27) Some("war_miner") -> SimId(45) Some("radar_tower")
+service decision tick60120 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick60133 SimId(27) Some("war_miner") -> SimId(45) Some("radar_tower")
+service shot tick60136 SimId(138) Some("tesla_tank") -> SimId(27) Some("war_miner")
+service shot tick60165 SimId(27) Some("war_miner") -> SimId(45) Some("radar_tower")
+service shot tick60197 SimId(27) Some("war_miner") -> SimId(45) Some("radar_tower")
+service decision tick60200 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick60229 SimId(27) Some("war_miner") -> SimId(45) Some("radar_tower")
+service shot tick60256 SimId(138) Some("tesla_tank") -> SimId(27) Some("war_miner")
+service tick60256 UnitDestroyed { player: PlayerId(1), unit: SimId(27) }
+service decision tick60281 IssuedCommand { player: PlayerId(1), command: SellBuilding { building: SimId(62) } }
+service tick60282 BuildingSold { player: PlayerId(1), building: SimId(62), refund: 750 }
+service decision tick60321 IssuedCommand { player: PlayerId(1), command: CancelProduction { item: Unit(UnitKind(29)) } }
+service decision tick60321 IssuedCommand { player: PlayerId(1), command: QueueProduction { item: Unit(UnitKind(20)) } }
+service decision tick60321 IssuedCommand { player: PlayerId(1), command: QueueProduction { item: Unit(UnitKind(3)) } }
+service birth tick60489 SimId(139) Owner(PlayerId(1)) attack_dog cellCellPos { x: 55, y: 41 }
+service tick60489 ProductionComplete { player: PlayerId(1), item: Unit(UnitKind(3)) }
+service tick60489 UnitSpawned { player: PlayerId(1), unit: SimId(139), building: SimId(30) }
+service birth tick60741 SimId(140) Owner(PlayerId(1)) flak_track cellCellPos { x: 55, y: 45 }
+service tick60741 ProductionComplete { player: PlayerId(1), item: Unit(UnitKind(20)) }
+service tick60741 UnitSpawned { player: PlayerId(1), unit: SimId(140), building: SimId(38) }
+service decision tick61320 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(138)], target: CellPos { x: 41, y: 53 } } }
+service decision tick61761 IssuedCommand { player: PlayerId(1), command: AttackMove { units: [SimId(139), SimId(140)], target: CellPos { x: 16, y: 31 } } }
+service shot tick61880 SimId(3221228905) None -> SimId(138) Some("tesla_tank")
+service shot tick61908 SimId(138) Some("tesla_tank") -> SimId(3221228905) None
+service shot tick61912 SimId(3221228905) None -> SimId(138) Some("tesla_tank")
+service shot tick61944 SimId(3221228905) None -> SimId(138) Some("tesla_tank")
+service shot tick61976 SimId(3221228905) None -> SimId(138) Some("tesla_tank")
+service shot tick62008 SimId(3221228905) None -> SimId(138) Some("tesla_tank")
+service shot tick62028 SimId(138) Some("tesla_tank") -> SimId(3221228905) None
+service shot tick62040 SimId(3221228905) None -> SimId(138) Some("tesla_tank")
+service shot tick62072 SimId(3221228905) None -> SimId(138) Some("tesla_tank")
+service shot tick62104 SimId(3221228905) None -> SimId(138) Some("tesla_tank")
+service shot tick62136 SimId(3221228905) None -> SimId(138) Some("tesla_tank")
+service shot tick62148 SimId(138) Some("tesla_tank") -> SimId(3221228905) None
+service shot tick62149 SimId(121) Some("conscript") -> SimId(138) Some("tesla_tank")
+service decision tick62160 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(138)], target: CellPos { x: 49, y: 47 } } }
+service decision tick62161 IssuedCommand { player: PlayerId(1), command: Interact { unit: SimId(121), target: SimId(3221228907) } }
+service shot tick62186 SimId(3221228907) None -> SimId(138) Some("tesla_tank")
+service shot tick62218 SimId(3221228907) None -> SimId(138) Some("tesla_tank")
+service shot tick62237 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service shot tick62250 SimId(3221228907) None -> SimId(138) Some("tesla_tank")
+service tick62255 Impact { warhead: WarheadKind(17), at: SubPos { x: 4307, y: 7940 }, air: false }
+service shot tick62268 SimId(138) Some("tesla_tank") -> SimId(3221228907) None
+service decision tick62280 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick62282 SimId(3221228907) None -> SimId(138) Some("tesla_tank")
+service shot tick62300 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service shot tick62314 SimId(3221228907) None -> SimId(138) Some("tesla_tank")
+service tick62317 Impact { warhead: WarheadKind(17), at: SubPos { x: 4211, y: 8068 }, air: false }
+service decision tick62320 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick62346 SimId(3221228907) None -> SimId(138) Some("tesla_tank")
+service shot tick62363 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service shot tick62378 SimId(3221228907) None -> SimId(138) Some("tesla_tank")
+service tick62380 Impact { warhead: WarheadKind(17), at: SubPos { x: 4224, y: 8064 }, air: false }
+service shot tick62388 SimId(138) Some("tesla_tank") -> SimId(3221228907) None
+service decision tick62400 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick62410 SimId(3221228907) None -> SimId(138) Some("tesla_tank")
+service shot tick62426 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service shot tick62442 SimId(3221228907) None -> SimId(138) Some("tesla_tank")
+service tick62443 Impact { warhead: WarheadKind(17), at: SubPos { x: 4272, y: 8060 }, air: false }
+service tick62443 DamageStateChanged { player: PlayerId(1), id: SimId(139), state: Yellow }
+service shot tick62474 SimId(3221228907) None -> SimId(138) Some("tesla_tank")
+service decision tick62480 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick62489 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick62506 Impact { warhead: WarheadKind(17), at: SubPos { x: 4291, y: 7983 }, air: false }
+service shot tick62506 SimId(3221228907) None -> SimId(138) Some("tesla_tank")
+service tick62506 DamageStateChanged { player: PlayerId(1), id: SimId(139), state: Red }
+service shot tick62508 SimId(138) Some("tesla_tank") -> SimId(3221228907) None
+service decision tick62520 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick62538 SimId(3221228907) None -> SimId(138) Some("tesla_tank")
+service shot tick62552 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick62569 Impact { warhead: WarheadKind(17), at: SubPos { x: 4228, y: 8085 }, air: false }
+service tick62569 UnitDestroyed { player: PlayerId(1), unit: SimId(139) }
+service shot tick62570 SimId(3221228907) None -> SimId(138) Some("tesla_tank")
+service decision tick62600 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick62602 SimId(3221228907) None -> SimId(138) Some("tesla_tank")
+service shot tick62615 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service shot tick62628 SimId(138) Some("tesla_tank") -> SimId(3221228907) None
+service shot tick62629 SimId(121) Some("conscript") -> SimId(138) Some("tesla_tank")
+service tick62632 Impact { warhead: WarheadKind(17), at: SubPos { x: 4198, y: 8196 }, air: false }
+service decision tick62640 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick62641 IssuedCommand { player: PlayerId(1), command: Interact { unit: SimId(121), target: SimId(3221228712) } }
+service shot tick62674 SimId(121) Some("conscript") -> SimId(138) Some("tesla_tank")
+service shot tick62675 SimId(3221228712) None -> SimId(138) Some("tesla_tank")
+service shot tick62678 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick62695 Impact { warhead: WarheadKind(17), at: SubPos { x: 4269, y: 7955 }, air: false }
+service shot tick62707 SimId(3221228712) None -> SimId(138) Some("tesla_tank")
+service decision tick62720 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick62739 SimId(3221228712) None -> SimId(138) Some("tesla_tank")
+service shot tick62741 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service shot tick62748 SimId(138) Some("tesla_tank") -> SimId(3221228712) None
+service tick62758 Impact { warhead: WarheadKind(17), at: SubPos { x: 4102, y: 8164 }, air: false }
+service decision tick62760 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick62771 SimId(3221228712) None -> SimId(138) Some("tesla_tank")
+service shot tick62803 SimId(3221228712) None -> SimId(138) Some("tesla_tank")
+service shot tick62804 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick62821 Impact { warhead: WarheadKind(17), at: SubPos { x: 4220, y: 8023 }, air: false }
+service shot tick62835 SimId(3221228712) None -> SimId(138) Some("tesla_tank")
+service tick62835 DamageStateChanged { player: PlayerId(0), id: SimId(138), state: Yellow }
+service decision tick62840 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick62867 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service shot tick62867 SimId(3221228712) None -> SimId(138) Some("tesla_tank")
+service shot tick62868 SimId(138) Some("tesla_tank") -> SimId(3221228712) None
+service tick62884 Impact { warhead: WarheadKind(17), at: SubPos { x: 4037, y: 8008 }, air: false }
+service shot tick62899 SimId(3221228712) None -> SimId(138) Some("tesla_tank")
+service decision tick62920 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick62930 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service shot tick62931 SimId(3221228712) None -> SimId(138) Some("tesla_tank")
+service tick62947 Impact { warhead: WarheadKind(17), at: SubPos { x: 4054, y: 8115 }, air: false }
+service decision tick62960 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick62963 SimId(3221228712) None -> SimId(138) Some("tesla_tank")
+service shot tick62988 SimId(138) Some("tesla_tank") -> SimId(3221228712) None
+service shot tick62993 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service shot tick62995 SimId(3221228712) None -> SimId(138) Some("tesla_tank")
+service tick63000 P0 SimId(138) tesla_tank cellCellPos { x: 39, y: 51 } moveNone weaponSome(Weapon { kind: WeaponKind(79), secondary: None, cooldown: 108, burst_left: 0, volley: WeaponKind(79), target: Some(SimId(3221228712)), order: Some(AttackMove { destination: CellPos { x: 49, y: 46 }, moving: false }) }) dockNone wavetrue
+service tick63000 P1 SimId(140) flak_track cellCellPos { x: 21, y: 30 } moveNone weaponSome(Weapon { kind: WeaponKind(27), secondary: Some(WeaponKind(28)), cooldown: 56, burst_left: 0, volley: WeaponKind(27), target: Some(SimId(45)), order: Some(AttackMove { destination: CellPos { x: 16, y: 30 }, moving: false }) }) dockNone wavetrue
+service tick63010 Impact { warhead: WarheadKind(17), at: SubPos { x: 4242, y: 7877 }, air: false }
+service shot tick63027 SimId(3221228712) None -> SimId(138) Some("tesla_tank")
+service decision tick63040 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick63056 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service shot tick63059 SimId(3221228712) None -> SimId(138) Some("tesla_tank")
+service tick63073 Impact { warhead: WarheadKind(17), at: SubPos { x: 4362, y: 8233 }, air: false }
+service decision tick63080 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick63091 SimId(3221228712) None -> SimId(138) Some("tesla_tank")
+service shot tick63108 SimId(138) Some("tesla_tank") -> SimId(3221228712) None
+service shot tick63109 SimId(121) Some("conscript") -> SimId(138) Some("tesla_tank")
+service shot tick63119 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick63121 IssuedCommand { player: PlayerId(1), command: Interact { unit: SimId(121), target: SimId(3221228840) } }
+service tick63136 Impact { warhead: WarheadKind(17), at: SubPos { x: 4194, y: 8109 }, air: false }
+service decision tick63160 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick63178 SimId(121) Some("conscript") -> SimId(138) Some("tesla_tank")
+service shot tick63179 SimId(3221228840) None -> SimId(138) Some("tesla_tank")
+service shot tick63182 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick63199 Impact { warhead: WarheadKind(17), at: SubPos { x: 4208, y: 8233 }, air: false }
+service decision tick63200 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick63211 SimId(3221228840) None -> SimId(138) Some("tesla_tank")
+service shot tick63228 SimId(138) Some("tesla_tank") -> SimId(3221228840) None
+service shot tick63243 SimId(3221228840) None -> SimId(138) Some("tesla_tank")
+service shot tick63245 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick63262 Impact { warhead: WarheadKind(17), at: SubPos { x: 4339, y: 8042 }, air: false }
+service shot tick63275 SimId(3221228840) None -> SimId(138) Some("tesla_tank")
+service decision tick63280 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick63307 SimId(3221228840) None -> SimId(138) Some("tesla_tank")
+service tick63307 DamageStateChanged { player: PlayerId(0), id: SimId(138), state: Red }
+service shot tick63308 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick63325 Impact { warhead: WarheadKind(17), at: SubPos { x: 4302, y: 7875 }, air: false }
+service shot tick63339 SimId(3221228840) None -> SimId(138) Some("tesla_tank")
+service shot tick63348 SimId(138) Some("tesla_tank") -> SimId(3221228840) None
+service decision tick63360 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick63371 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service shot tick63371 SimId(3221228840) None -> SimId(138) Some("tesla_tank")
+service tick63388 Impact { warhead: WarheadKind(17), at: SubPos { x: 4176, y: 8083 }, air: false }
+service decision tick63400 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick63403 SimId(3221228840) None -> SimId(138) Some("tesla_tank")
+service shot tick63434 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service shot tick63435 SimId(3221228840) None -> SimId(138) Some("tesla_tank")
+service tick63451 Impact { warhead: WarheadKind(17), at: SubPos { x: 4127, y: 8115 }, air: false }
+service shot tick63467 SimId(3221228840) None -> SimId(138) Some("tesla_tank")
+service shot tick63468 SimId(138) Some("tesla_tank") -> SimId(3221228840) None
+service decision tick63480 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick63497 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service shot tick63499 SimId(3221228840) None -> SimId(138) Some("tesla_tank")
+service tick63514 Impact { warhead: WarheadKind(17), at: SubPos { x: 4374, y: 7964 }, air: false }
+service shot tick63531 SimId(3221228840) None -> SimId(138) Some("tesla_tank")
+service shot tick63560 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service shot tick63563 SimId(3221228840) None -> SimId(138) Some("tesla_tank")
+service tick63577 Impact { warhead: WarheadKind(17), at: SubPos { x: 4351, y: 8026 }, air: false }
+service shot tick63588 SimId(138) Some("tesla_tank") -> SimId(3221228840) None
+service shot tick63589 SimId(121) Some("conscript") -> SimId(138) Some("tesla_tank")
+service decision tick63600 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick63601 IssuedCommand { player: PlayerId(1), command: Interact { unit: SimId(121), target: SimId(3221228904) } }
+service shot tick63623 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service shot tick63634 SimId(121) Some("conscript") -> SimId(138) Some("tesla_tank")
+service shot tick63635 SimId(3221228904) None -> SimId(138) Some("tesla_tank")
+service tick63640 Impact { warhead: WarheadKind(17), at: SubPos { x: 4209, y: 8063 }, air: false }
+service shot tick63667 SimId(3221228904) None -> SimId(138) Some("tesla_tank")
+service decision tick63680 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick63686 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service shot tick63699 SimId(3221228904) None -> SimId(138) Some("tesla_tank")
+service tick63703 Impact { warhead: WarheadKind(17), at: SubPos { x: 4207, y: 8150 }, air: false }
+service shot tick63708 SimId(138) Some("tesla_tank") -> SimId(3221228904) None
+service decision tick63720 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service shot tick63731 SimId(3221228904) None -> SimId(138) Some("tesla_tank")
+service shot tick63749 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service shot tick63763 SimId(3221228904) None -> SimId(138) Some("tesla_tank")
+service tick63766 Impact { warhead: WarheadKind(17), at: SubPos { x: 4142, y: 7941 }, air: false }
+service shot tick63795 SimId(3221228904) None -> SimId(138) Some("tesla_tank")
+service tick63795 UnitDestroyed { player: PlayerId(0), unit: SimId(138) }
+service decision tick63800 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick63801 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick63812 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick63829 Impact { warhead: WarheadKind(17), at: SubPos { x: 4193, y: 8018 }, air: false }
+service decision tick63840 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick63841 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick63875 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick63881 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick63892 Impact { warhead: WarheadKind(17), at: SubPos { x: 4224, y: 8125 }, air: false }
+service decision tick63920 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick63921 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick63938 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick63955 Impact { warhead: WarheadKind(17), at: SubPos { x: 4283, y: 8075 }, air: false }
+service decision tick63960 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick63961 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick64001 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick64001 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick64018 Impact { warhead: WarheadKind(17), at: SubPos { x: 4087, y: 8201 }, air: false }
+service decision tick64040 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick64041 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick64064 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick64081 Impact { warhead: WarheadKind(17), at: SubPos { x: 4191, y: 8097 }, air: false }
+service decision tick64081 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service decision tick64120 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick64121 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick64127 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick64144 Impact { warhead: WarheadKind(17), at: SubPos { x: 4142, y: 8021 }, air: false }
+service decision tick64160 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick64161 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick64190 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick64201 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick64207 Impact { warhead: WarheadKind(17), at: SubPos { x: 4330, y: 8170 }, air: false }
+service decision tick64240 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick64241 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick64253 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick64270 Impact { warhead: WarheadKind(17), at: SubPos { x: 4427, y: 8044 }, air: false }
+service decision tick64280 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick64281 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick64316 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick64321 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick64333 Impact { warhead: WarheadKind(17), at: SubPos { x: 4146, y: 8128 }, air: false }
+service decision tick64360 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick64361 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick64379 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick64396 Impact { warhead: WarheadKind(17), at: SubPos { x: 4233, y: 8087 }, air: false }
+service decision tick64400 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick64401 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service decision tick64441 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick64442 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick64459 Impact { warhead: WarheadKind(17), at: SubPos { x: 4231, y: 8065 }, air: false }
+service decision tick64480 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick64481 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick64505 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick64521 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick64522 Impact { warhead: WarheadKind(17), at: SubPos { x: 4290, y: 7847 }, air: false }
+service decision tick64560 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick64561 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick64568 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick64585 Impact { warhead: WarheadKind(17), at: SubPos { x: 4203, y: 8171 }, air: false }
+service decision tick64600 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick64601 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick64631 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick64641 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick64648 Impact { warhead: WarheadKind(17), at: SubPos { x: 4370, y: 8184 }, air: false }
+service decision tick64680 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick64681 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick64694 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick64711 Impact { warhead: WarheadKind(17), at: SubPos { x: 4361, y: 8023 }, air: false }
+service decision tick64720 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick64721 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick64757 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick64761 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick64774 Impact { warhead: WarheadKind(17), at: SubPos { x: 4423, y: 8045 }, air: false }
+service decision tick64800 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick64801 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick64820 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick64837 Impact { warhead: WarheadKind(17), at: SubPos { x: 4262, y: 8075 }, air: false }
+service decision tick64840 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick64841 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service decision tick64881 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick64883 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick64900 Impact { warhead: WarheadKind(17), at: SubPos { x: 4047, y: 8011 }, air: false }
+service decision tick64920 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick64921 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick64946 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick64961 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick64963 Impact { warhead: WarheadKind(17), at: SubPos { x: 4208, y: 8104 }, air: false }
+service decision tick65000 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick65001 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick65009 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick65026 Impact { warhead: WarheadKind(17), at: SubPos { x: 4195, y: 8045 }, air: false }
+service decision tick65041 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick65072 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick65081 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick65089 Impact { warhead: WarheadKind(17), at: SubPos { x: 4222, y: 8037 }, air: false }
+service decision tick65120 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick65121 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick65135 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick65152 Impact { warhead: WarheadKind(17), at: SubPos { x: 4231, y: 8089 }, air: false }
+service decision tick65160 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick65161 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick65198 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick65201 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick65215 Impact { warhead: WarheadKind(17), at: SubPos { x: 4224, y: 7851 }, air: false }
+service decision tick65240 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick65241 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick65261 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick65278 Impact { warhead: WarheadKind(17), at: SubPos { x: 4053, y: 8178 }, air: false }
+service decision tick65280 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick65281 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service decision tick65321 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick65324 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick65341 Impact { warhead: WarheadKind(17), at: SubPos { x: 4281, y: 8203 }, air: false }
+service decision tick65360 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick65361 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick65387 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick65401 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick65404 Impact { warhead: WarheadKind(17), at: SubPos { x: 4439, y: 8085 }, air: false }
+service decision tick65440 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick65441 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick65450 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick65467 Impact { warhead: WarheadKind(17), at: SubPos { x: 4428, y: 7980 }, air: false }
+service decision tick65480 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick65481 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick65513 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick65521 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick65530 Impact { warhead: WarheadKind(17), at: SubPos { x: 4169, y: 8086 }, air: false }
+service decision tick65560 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick65561 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick65576 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick65593 Impact { warhead: WarheadKind(17), at: SubPos { x: 4236, y: 8060 }, air: false }
+service decision tick65600 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick65601 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick65639 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick65641 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick65656 Impact { warhead: WarheadKind(17), at: SubPos { x: 4318, y: 8014 }, air: false }
+service decision tick65680 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick65681 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick65702 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick65719 Impact { warhead: WarheadKind(17), at: SubPos { x: 4205, y: 8079 }, air: false }
+service decision tick65720 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick65721 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service decision tick65761 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick65765 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick65782 Impact { warhead: WarheadKind(17), at: SubPos { x: 4118, y: 8263 }, air: false }
+service decision tick65800 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick65801 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick65828 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick65841 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick65845 Impact { warhead: WarheadKind(17), at: SubPos { x: 4326, y: 8044 }, air: false }
+service decision tick65880 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick65881 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick65891 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick65908 Impact { warhead: WarheadKind(17), at: SubPos { x: 4191, y: 8024 }, air: false }
+service decision tick65920 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick65921 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick65954 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick65961 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick65971 Impact { warhead: WarheadKind(17), at: SubPos { x: 4203, y: 7850 }, air: false }
+service tick66000 P1 SimId(140) flak_track cellCellPos { x: 21, y: 30 } moveNone weaponSome(Weapon { kind: WeaponKind(27), secondary: Some(WeaponKind(28)), cooldown: 17, burst_left: 0, volley: WeaponKind(27), target: Some(SimId(45)), order: Some(Attack { target: SimId(45), chases: 0 }) }) dockNone wavetrue
+service decision tick66000 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick66001 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick66017 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick66034 Impact { warhead: WarheadKind(17), at: SubPos { x: 4188, y: 8249 }, air: false }
+service decision tick66040 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick66041 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick66080 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick66081 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick66097 Impact { warhead: WarheadKind(17), at: SubPos { x: 4229, y: 8047 }, air: false }
+service decision tick66120 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick66121 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick66143 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick66160 Impact { warhead: WarheadKind(17), at: SubPos { x: 4372, y: 8050 }, air: false }
+service decision tick66161 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service decision tick66200 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick66201 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick66206 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick66223 Impact { warhead: WarheadKind(17), at: SubPos { x: 4177, y: 8152 }, air: false }
+service decision tick66240 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick66241 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick66269 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick66281 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick66286 Impact { warhead: WarheadKind(17), at: SubPos { x: 4266, y: 8203 }, air: false }
+service decision tick66320 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick66321 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick66332 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick66349 Impact { warhead: WarheadKind(17), at: SubPos { x: 4197, y: 7927 }, air: false }
+service decision tick66360 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick66361 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick66395 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick66401 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick66412 Impact { warhead: WarheadKind(17), at: SubPos { x: 4149, y: 7881 }, air: false }
+service decision tick66440 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick66441 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick66458 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick66475 Impact { warhead: WarheadKind(17), at: SubPos { x: 4161, y: 8218 }, air: false }
+service decision tick66480 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick66481 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick66521 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick66521 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick66538 Impact { warhead: WarheadKind(17), at: SubPos { x: 4402, y: 7991 }, air: false }
+service decision tick66560 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick66561 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick66584 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick66601 Impact { warhead: WarheadKind(17), at: SubPos { x: 4264, y: 8032 }, air: false }
+service decision tick66601 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service decision tick66640 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick66641 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick66647 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick66664 Impact { warhead: WarheadKind(17), at: SubPos { x: 4230, y: 8132 }, air: false }
+service decision tick66680 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick66681 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick66710 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick66721 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick66727 Impact { warhead: WarheadKind(17), at: SubPos { x: 4245, y: 7847 }, air: false }
+service decision tick66760 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick66761 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick66773 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick66790 Impact { warhead: WarheadKind(17), at: SubPos { x: 4023, y: 8003 }, air: false }
+service decision tick66800 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick66801 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick66836 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick66841 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick66853 Impact { warhead: WarheadKind(17), at: SubPos { x: 4214, y: 8044 }, air: false }
+service decision tick66880 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick66881 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick66899 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick66916 Impact { warhead: WarheadKind(17), at: SubPos { x: 4402, y: 8029 }, air: false }
+service decision tick66920 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick66921 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service decision tick66961 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick66962 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick66979 Impact { warhead: WarheadKind(17), at: SubPos { x: 4333, y: 8006 }, air: false }
+service decision tick67000 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick67001 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick67025 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick67041 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick67042 Impact { warhead: WarheadKind(17), at: SubPos { x: 4096, y: 8076 }, air: false }
+service decision tick67080 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick67081 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick67088 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick67105 Impact { warhead: WarheadKind(17), at: SubPos { x: 4200, y: 8044 }, air: false }
+service decision tick67120 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick67121 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick67151 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick67161 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick67168 Impact { warhead: WarheadKind(17), at: SubPos { x: 4224, y: 8064 }, air: false }
+service decision tick67200 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick67201 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick67214 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick67231 Impact { warhead: WarheadKind(17), at: SubPos { x: 4253, y: 8079 }, air: false }
+service decision tick67240 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick67241 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick67277 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick67281 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick67294 Impact { warhead: WarheadKind(17), at: SubPos { x: 4382, y: 7959 }, air: false }
+service decision tick67320 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick67321 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick67340 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick67357 Impact { warhead: WarheadKind(17), at: SubPos { x: 4272, y: 8182 }, air: false }
+service decision tick67360 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick67361 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service decision tick67401 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick67403 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick67420 Impact { warhead: WarheadKind(17), at: SubPos { x: 4237, y: 7931 }, air: false }
+service decision tick67440 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick67441 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick67466 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick67481 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick67483 Impact { warhead: WarheadKind(17), at: SubPos { x: 4277, y: 8239 }, air: false }
+service decision tick67520 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick67521 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick67529 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick67546 Impact { warhead: WarheadKind(17), at: SubPos { x: 4352, y: 8149 }, air: false }
+service decision tick67560 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick67561 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick67592 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick67601 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick67609 Impact { warhead: WarheadKind(17), at: SubPos { x: 4284, y: 7990 }, air: false }
+service decision tick67640 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick67641 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick67655 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick67672 Impact { warhead: WarheadKind(17), at: SubPos { x: 4228, y: 8050 }, air: false }
+service decision tick67680 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick67681 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick67718 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick67721 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick67735 Impact { warhead: WarheadKind(17), at: SubPos { x: 4229, y: 8045 }, air: false }
+service decision tick67760 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick67761 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick67781 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick67798 Impact { warhead: WarheadKind(17), at: SubPos { x: 4224, y: 7857 }, air: false }
+service decision tick67800 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick67801 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service decision tick67841 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick67844 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick67861 Impact { warhead: WarheadKind(17), at: SubPos { x: 4338, y: 7950 }, air: false }
+service decision tick67880 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick67881 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick67907 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick67921 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick67924 Impact { warhead: WarheadKind(17), at: SubPos { x: 4350, y: 8148 }, air: false }
+service decision tick67960 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick67961 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick67970 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick67987 Impact { warhead: WarheadKind(17), at: SubPos { x: 4227, y: 8079 }, air: false }
+service decision tick68000 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick68001 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick68033 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick68041 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick68050 Impact { warhead: WarheadKind(17), at: SubPos { x: 4098, y: 8012 }, air: false }
+service decision tick68080 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick68081 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick68096 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick68113 Impact { warhead: WarheadKind(17), at: SubPos { x: 4202, y: 8294 }, air: false }
+service decision tick68120 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick68121 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick68159 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick68161 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick68176 Impact { warhead: WarheadKind(17), at: SubPos { x: 4322, y: 8055 }, air: false }
+service decision tick68200 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick68201 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick68222 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick68239 Impact { warhead: WarheadKind(17), at: SubPos { x: 4274, y: 8186 }, air: false }
+service decision tick68240 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick68241 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service decision tick68281 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick68285 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick68302 Impact { warhead: WarheadKind(17), at: SubPos { x: 4234, y: 8057 }, air: false }
+service decision tick68320 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick68321 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick68348 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick68361 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick68365 Impact { warhead: WarheadKind(17), at: SubPos { x: 4080, y: 8092 }, air: false }
+service decision tick68400 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick68401 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick68411 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick68428 Impact { warhead: WarheadKind(17), at: SubPos { x: 4106, y: 8160 }, air: false }
+service decision tick68441 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick68474 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick68481 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick68491 Impact { warhead: WarheadKind(17), at: SubPos { x: 4393, y: 8177 }, air: false }
+service decision tick68520 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick68521 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick68537 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick68554 Impact { warhead: WarheadKind(17), at: SubPos { x: 4189, y: 7948 }, air: false }
+service decision tick68560 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick68561 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick68600 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick68601 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick68617 Impact { warhead: WarheadKind(17), at: SubPos { x: 4302, y: 7947 }, air: false }
+service decision tick68640 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick68641 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick68663 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick68680 Impact { warhead: WarheadKind(17), at: SubPos { x: 4224, y: 8208 }, air: false }
+service decision tick68681 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service decision tick68720 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick68721 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick68726 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick68743 Impact { warhead: WarheadKind(17), at: SubPos { x: 4312, y: 8056 }, air: false }
+service decision tick68760 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick68761 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick68789 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick68801 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick68806 Impact { warhead: WarheadKind(17), at: SubPos { x: 4263, y: 8264 }, air: false }
+service decision tick68840 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick68841 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick68852 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick68869 Impact { warhead: WarheadKind(17), at: SubPos { x: 4388, y: 8015 }, air: false }
+service decision tick68880 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick68881 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick68915 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick68921 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick68932 Impact { warhead: WarheadKind(17), at: SubPos { x: 4179, y: 8064 }, air: false }
+service decision tick68960 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick68961 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick68978 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick68995 Impact { warhead: WarheadKind(17), at: SubPos { x: 4221, y: 8058 }, air: false }
+service tick69000 P1 SimId(140) flak_track cellCellPos { x: 21, y: 30 } moveNone weaponSome(Weapon { kind: WeaponKind(27), secondary: Some(WeaponKind(28)), cooldown: 41, burst_left: 0, volley: WeaponKind(27), target: Some(SimId(45)), order: Some(Attack { target: SimId(45), chases: 0 }) }) dockNone wavetrue
+service decision tick69000 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick69001 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick69041 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick69041 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick69058 Impact { warhead: WarheadKind(17), at: SubPos { x: 4006, y: 8130 }, air: false }
+service decision tick69080 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick69081 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick69104 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick69121 Impact { warhead: WarheadKind(17), at: SubPos { x: 4308, y: 8048 }, air: false }
+service decision tick69121 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service decision tick69160 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick69161 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick69167 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick69184 Impact { warhead: WarheadKind(17), at: SubPos { x: 4151, y: 8241 }, air: false }
+service decision tick69200 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick69201 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick69230 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick69241 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick69247 Impact { warhead: WarheadKind(17), at: SubPos { x: 3996, y: 8086 }, air: false }
+service decision tick69280 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick69281 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick69293 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick69310 Impact { warhead: WarheadKind(17), at: SubPos { x: 4224, y: 7957 }, air: false }
+service decision tick69321 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick69356 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick69361 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick69373 Impact { warhead: WarheadKind(17), at: SubPos { x: 4255, y: 8089 }, air: false }
+service decision tick69400 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick69401 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick69419 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick69436 Impact { warhead: WarheadKind(17), at: SubPos { x: 4206, y: 7876 }, air: false }
+service decision tick69440 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick69441 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service decision tick69481 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick69482 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick69499 Impact { warhead: WarheadKind(17), at: SubPos { x: 4177, y: 8055 }, air: false }
+service decision tick69520 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick69521 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick69545 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick69561 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick69562 Impact { warhead: WarheadKind(17), at: SubPos { x: 4259, y: 7887 }, air: false }
+service decision tick69600 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick69601 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick69608 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick69625 Impact { warhead: WarheadKind(17), at: SubPos { x: 4113, y: 8005 }, air: false }
+service decision tick69640 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick69641 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick69671 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick69681 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick69688 Impact { warhead: WarheadKind(17), at: SubPos { x: 4207, y: 8053 }, air: false }
+service decision tick69720 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick69721 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick69734 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick69751 Impact { warhead: WarheadKind(17), at: SubPos { x: 4305, y: 7868 }, air: false }
+service decision tick69760 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick69761 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick69797 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick69801 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick69814 Impact { warhead: WarheadKind(17), at: SubPos { x: 4394, y: 8115 }, air: false }
+service decision tick69840 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick69841 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick69860 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick69877 Impact { warhead: WarheadKind(17), at: SubPos { x: 4243, y: 7870 }, air: false }
+service decision tick69880 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick69881 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service decision tick69921 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick69923 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick69940 Impact { warhead: WarheadKind(17), at: SubPos { x: 4292, y: 7996 }, air: false }
+service decision tick69960 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick69961 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick69986 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick70001 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick70003 Impact { warhead: WarheadKind(17), at: SubPos { x: 4089, y: 8154 }, air: false }
+service decision tick70040 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick70041 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick70049 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick70066 Impact { warhead: WarheadKind(17), at: SubPos { x: 4193, y: 8139 }, air: false }
+service decision tick70081 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick70112 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick70121 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick70129 Impact { warhead: WarheadKind(17), at: SubPos { x: 4215, y: 8114 }, air: false }
+service decision tick70160 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick70161 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick70175 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick70192 Impact { warhead: WarheadKind(17), at: SubPos { x: 4424, y: 8064 }, air: false }
+service decision tick70200 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick70201 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick70238 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick70241 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick70255 Impact { warhead: WarheadKind(17), at: SubPos { x: 4220, y: 8021 }, air: false }
+service decision tick70280 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick70281 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick70301 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick70318 Impact { warhead: WarheadKind(17), at: SubPos { x: 4209, y: 8049 }, air: false }
+service decision tick70320 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick70321 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service decision tick70361 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick70364 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick70381 Impact { warhead: WarheadKind(17), at: SubPos { x: 4235, y: 8063 }, air: false }
+service decision tick70400 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick70401 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick70427 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick70441 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick70444 Impact { warhead: WarheadKind(17), at: SubPos { x: 4241, y: 8106 }, air: false }
+service decision tick70480 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick70481 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick70490 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick70507 Impact { warhead: WarheadKind(17), at: SubPos { x: 4203, y: 8078 }, air: false }
+service decision tick70520 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick70521 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick70553 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick70561 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick70570 Impact { warhead: WarheadKind(17), at: SubPos { x: 4237, y: 8107 }, air: false }
+service decision tick70600 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick70601 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick70616 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick70633 Impact { warhead: WarheadKind(17), at: SubPos { x: 4217, y: 8143 }, air: false }
+service decision tick70640 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick70641 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick70679 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick70681 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick70696 Impact { warhead: WarheadKind(17), at: SubPos { x: 4134, y: 7895 }, air: false }
+service decision tick70720 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick70721 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick70742 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick70759 Impact { warhead: WarheadKind(17), at: SubPos { x: 4246, y: 8082 }, air: false }
+service decision tick70760 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick70761 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service decision tick70801 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick70805 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick70822 Impact { warhead: WarheadKind(17), at: SubPos { x: 4112, y: 8138 }, air: false }
+service decision tick70840 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick70841 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick70868 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick70881 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick70885 Impact { warhead: WarheadKind(17), at: SubPos { x: 4015, y: 8105 }, air: false }
+service decision tick70920 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick70921 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick70931 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick70948 Impact { warhead: WarheadKind(17), at: SubPos { x: 4036, y: 7939 }, air: false }
+service decision tick70960 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick70961 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick70994 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick71001 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick71011 Impact { warhead: WarheadKind(17), at: SubPos { x: 4115, y: 8031 }, air: false }
+service decision tick71040 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick71041 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick71057 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick71074 Impact { warhead: WarheadKind(17), at: SubPos { x: 4224, y: 8066 }, air: false }
+service decision tick71080 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick71081 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick71120 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick71121 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick71137 Impact { warhead: WarheadKind(17), at: SubPos { x: 4092, y: 7955 }, air: false }
+service decision tick71160 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick71161 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick71183 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick71200 Impact { warhead: WarheadKind(17), at: SubPos { x: 4224, y: 8064 }, air: false }
+service decision tick71201 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service decision tick71240 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick71241 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick71246 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick71263 Impact { warhead: WarheadKind(17), at: SubPos { x: 4334, y: 8019 }, air: false }
+service decision tick71281 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick71309 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick71321 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick71326 Impact { warhead: WarheadKind(17), at: SubPos { x: 4165, y: 7953 }, air: false }
+service decision tick71360 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick71361 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick71372 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick71389 Impact { warhead: WarheadKind(17), at: SubPos { x: 4148, y: 7950 }, air: false }
+service decision tick71400 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick71401 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick71435 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick71441 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick71452 Impact { warhead: WarheadKind(17), at: SubPos { x: 4149, y: 8071 }, air: false }
+service decision tick71480 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick71481 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick71498 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick71515 Impact { warhead: WarheadKind(17), at: SubPos { x: 4446, y: 8020 }, air: false }
+service decision tick71520 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick71521 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick71561 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick71561 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick71578 Impact { warhead: WarheadKind(17), at: SubPos { x: 4438, y: 8043 }, air: false }
+service decision tick71600 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick71601 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick71624 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick71641 Impact { warhead: WarheadKind(17), at: SubPos { x: 4180, y: 8051 }, air: false }
+service decision tick71641 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service decision tick71680 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick71681 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick71687 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick71704 Impact { warhead: WarheadKind(17), at: SubPos { x: 4200, y: 8144 }, air: false }
+service decision tick71720 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick71721 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick71750 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick71761 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick71767 Impact { warhead: WarheadKind(17), at: SubPos { x: 4434, y: 8064 }, air: false }
+service decision tick71800 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick71801 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick71813 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick71830 Impact { warhead: WarheadKind(17), at: SubPos { x: 4393, y: 8080 }, air: false }
+service decision tick71840 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick71841 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick71876 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service decision tick71881 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service tick71893 Impact { warhead: WarheadKind(17), at: SubPos { x: 4419, y: 7960 }, air: false }
+service decision tick71920 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick71921 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+service shot tick71939 SimId(140) Some("flak_track") -> SimId(45) Some("radar_tower")
+service tick71956 Impact { warhead: WarheadKind(17), at: SubPos { x: 4425, y: 8003 }, air: false }
+service decision tick71960 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(45) } }
+service decision tick71961 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(140)], target: SimId(45) } }
+snapshot tick SimTick(72000)
+queued CommandQueue { pending: [] }
+player PlayerId(0) credits 42 queues []
+player PlayerId(1) credits 73 queues []
+AiPlayers { definitions: Some(AiDefinitions { policy: AiPolicy { garrison_quota: 3, garrison_radius: 12, depot_radius: 16, naval_rescan: 600, naval_detector_quota: 1, artillery_min_range: 8, artillery_standoff: 3, paradrop_offset: 4, chrono_min_offset: 3, chrono_max_offset: 8 }, rules_difficulty: true, plans: [SidePlan { side: Some(Allied), country: None, defences: [], support: [], tier_reserves: [0, 0, 0], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(15), BuildingKind(1), BuildingKind(2), BuildingKind(15), BuildingKind(4), BuildingKind(3), BuildingKind(1), BuildingKind(15)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(19)] }, SidePlan { side: Some(Soviet), country: None, defences: [], support: [], tier_reserves: [0, 0, 0], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(16), BuildingKind(6), BuildingKind(30), BuildingKind(16), BuildingKind(32), BuildingKind(31), BuildingKind(6), BuildingKind(16)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(10), UnitKind(18), UnitKind(0)] }, SidePlan { side: Some(Allied), country: Some(CountryId(0)), defences: [BuildingKind(15), BuildingKind(19), BuildingKind(17)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(34), BuildingKind(11), BuildingKind(5), BuildingKind(2), BuildingKind(4), BuildingKind(7), BuildingKind(23), BuildingKind(22), BuildingKind(26), BuildingKind(25), BuildingKind(9)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(25), UnitKind(25), UnitKind(24), UnitKind(19), UnitKind(7), UnitKind(6), UnitKind(30), UnitKind(35), UnitKind(38), UnitKind(37)] }, SidePlan { side: Some(Allied), country: Some(CountryId(1)), defences: [BuildingKind(15), BuildingKind(19), BuildingKind(17)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(10), BuildingKind(11), BuildingKind(5), BuildingKind(2), BuildingKind(4), BuildingKind(7), BuildingKind(23), BuildingKind(22), BuildingKind(26), BuildingKind(25), BuildingKind(9)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(25), UnitKind(25), UnitKind(24), UnitKind(19), UnitKind(7), UnitKind(6), UnitKind(31), UnitKind(35), UnitKind(38), UnitKind(37)] }, SidePlan { side: Some(Allied), country: Some(CountryId(2)), defences: [BuildingKind(21), BuildingKind(15), BuildingKind(19), BuildingKind(17)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(10), BuildingKind(11), BuildingKind(5), BuildingKind(2), BuildingKind(4), BuildingKind(7), BuildingKind(23), BuildingKind(22), BuildingKind(26), BuildingKind(25), BuildingKind(9)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(25), UnitKind(25), UnitKind(24), UnitKind(19), UnitKind(7), UnitKind(6), UnitKind(30), UnitKind(35), UnitKind(38), UnitKind(37)] }, SidePlan { side: Some(Allied), country: Some(CountryId(3)), defences: [BuildingKind(15), BuildingKind(19), BuildingKind(17)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(10), BuildingKind(11), BuildingKind(5), BuildingKind(2), BuildingKind(4), BuildingKind(7), BuildingKind(23), BuildingKind(22), BuildingKind(26), BuildingKind(25), BuildingKind(9)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(25), UnitKind(25), UnitKind(27), UnitKind(24), UnitKind(19), UnitKind(7), UnitKind(6), UnitKind(30), UnitKind(35), UnitKind(38), UnitKind(37)] }, SidePlan { side: Some(Allied), country: Some(CountryId(4)), defences: [BuildingKind(15), BuildingKind(19), BuildingKind(17)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(10), BuildingKind(11), BuildingKind(5), BuildingKind(2), BuildingKind(4), BuildingKind(7), BuildingKind(23), BuildingKind(22), BuildingKind(26), BuildingKind(25), BuildingKind(9)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(8), UnitKind(25), UnitKind(25), UnitKind(24), UnitKind(19), UnitKind(7), UnitKind(6), UnitKind(30), UnitKind(35), UnitKind(38), UnitKind(37)] }, SidePlan { side: Some(Soviet), country: Some(CountryId(8)), defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(28), UnitKind(22), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }, SidePlan { side: Some(Soviet), country: Some(CountryId(6)), defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(13), UnitKind(22), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }, SidePlan { side: Some(Soviet), country: Some(CountryId(7)), defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(14), UnitKind(22), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }, SidePlan { side: Some(Soviet), country: Some(CountryId(5)), defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(22), UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(29), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }], difficulties: [Difficulty { id: "easy", think_interval: 40, harvesters_per_refinery: 1, max_army: 16, wave_size: 8, first_wave: 6000, wave_patience: 1800, defence_radius: 8 }, Difficulty { id: "medium", think_interval: 20, harvesters_per_refinery: 2, max_army: 24, wave_size: 12, first_wave: 3600, wave_patience: 1200, defence_radius: 10 }, Difficulty { id: "brutal", think_interval: 10, harvesters_per_refinery: 2, max_army: 36, wave_size: 16, first_wave: 2400, wave_patience: 900, defence_radius: 12 }] }), controllers: {PlayerId(0): AiController { plan: AiPlan { policy: AiPolicy { garrison_quota: 3, garrison_radius: 12, depot_radius: 16, naval_rescan: 600, naval_detector_quota: 1, artillery_min_range: 8, artillery_standoff: 3, paradrop_offset: 4, chrono_min_offset: 3, chrono_max_offset: 8 }, rules_difficulty: true, defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(28), UnitKind(22), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }, difficulty: Difficulty { id: "easy", think_interval: 40, harvesters_per_refinery: 1, max_army: 16, wave_size: 8, first_wave: 4667, wave_patience: 1800, defence_radius: 8 }, start: CellPos { x: 15, y: 37 }, gather: CellPos { x: 21, y: 36 }, waypoints: <omitted>
+known: {SimId(26): KnownBuilding { owner: PlayerId(1), footprint: Footprint { origin: CellPos { x: 52, y: 46 }, width: 3, height: 3 }, kind: BuildingKind(30) }, SimId(32): KnownBuilding { owner: PlayerId(1), footprint: Footprint { origin: CellPos { x: 50, y: 39 }, width: 1, height: 1 }, kind: BuildingKind(16) }, SimId(40): KnownBuilding { owner: PlayerId(1), footprint: Footprint { origin: CellPos { x: 50, y: 42 }, width: 1, height: 1 }, kind: BuildingKind(16) }, SimId(50): KnownBuilding { owner: PlayerId(1), footprint: Footprint { origin: CellPos { x: 49, y: 47 }, width: 2, height: 2 }, kind: BuildingKind(6) }, SimId(117): KnownBuilding { owner: PlayerId(1), footprint: Footprint { origin: CellPos { x: 49, y: 36 }, width: 2, height: 2 }, kind: BuildingKind(36) }, SimId(3221228904): KnownBuilding { owner: PlayerId(1), footprint: Footprint { origin: CellPos { x: 40, y: 53 }, width: 1, height: 1 }, kind: BuildingKind(43) }}, repair_huts: {}, broken_bridges: {}, wave: {}, target: None, failures: {}, next_army: 0, army_cursors: {QueueKey { producer: BuildingKind(3), lane: Main }: 2, QueueKey { producer: BuildingKind(4), lane: Main }: 8}, patience_until: 63120, next_harvest: 0, fall_back_exempt: true, liquidating: false, issued: 544, flank: false, staging: None, waves_sent: 0, stalled: (14613192771806789644, 71960), last_stand: false, next_wave: 65987, seen_air: false, unseen_loss: true, observed_units: {}, reserved: {}, naval_goal: Some(CellPos { x: 40, y: 27 }), naval_site: Some(CellPos { x: 36, y: 24 }), next_naval_scan: 72000, air_screens: {}, building_jobs: {} }, PlayerId(1): AiController { plan: AiPlan { policy: AiPolicy { garrison_quota: 3, garrison_radius: 12, depot_radius: 16, naval_rescan: 600, naval_detector_quota: 1, artillery_min_range: 8, artillery_standoff: 3, paradrop_offset: 4, chrono_min_offset: 3, chrono_max_offset: 8 }, rules_difficulty: true, defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(22), UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(29), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }, difficulty: Difficulty { id: "easy", think_interval: 40, harvesters_per_refinery: 1, max_army: 16, wave_size: 8, first_wave: 4667, wave_patience: 1800, defence_radius: 8 }, start: CellPos { x: 52, y: 42 }, gather: CellPos { x: 46, y: 39 }, waypoints: <omitted>
+known: {SimId(45): KnownBuilding { owner: PlayerId(0), footprint: Footprint { origin: CellPos { x: 15, y: 31 }, width: 2, height: 2 }, kind: BuildingKind(12) }}, repair_huts: {}, broken_bridges: {}, wave: {SimId(140)}, target: Some(Building(SimId(45))), failures: {}, next_army: 0, army_cursors: {QueueKey { producer: BuildingKind(3), lane: Main }: 7, QueueKey { producer: BuildingKind(4), lane: Main }: 5}, patience_until: 63561, next_harvest: 57121, fall_back_exempt: true, liquidating: false, issued: 411, flank: false, staging: None, waves_sent: 0, stalled: (0, 71961), last_stand: false, next_wave: 66428, seen_air: false, unseen_loss: true, observed_units: {SimId(121): CellPos { x: 40, y: 51 }, SimId(140): CellPos { x: 21, y: 30 }}, reserved: {}, naval_goal: Some(CellPos { x: 34, y: 22 }), naval_site: Some(CellPos { x: 41, y: 25 }), next_naval_scan: 72001, air_screens: {}, building_jobs: {SimId(45): BuildingJobProgress { hp: 989, failures: 0, actors: {SimId(140): 0}, founders: {SimId(140)}, approaching: false }} }} }
+unit SimId(140) Owner(PlayerId(1)) flak_track Mobile { speed: 15, cell: CellPos { x: 21, y: 30 }, step: None } Health { hit_points: 180 } moveNone Some(Weapon { kind: WeaponKind(27), secondary: Some(WeaponKind(28)), cooldown: 3, burst_left: 0, volley: WeaponKind(27), target: Some(SimId(45)), order: Some(Attack { target: SimId(45), chases: 0 }) }) None
+building SimId(30) Owner(PlayerId(1)) soviet_barracks CellPos { x: 56, y: 42 } Health { hit_points: 500 }
+building SimId(39) Owner(PlayerId(0)) soviet_war_factory CellPos { x: 11, y: 41 } Health { hit_points: 1000 }
+building SimId(38) Owner(PlayerId(1)) soviet_war_factory CellPos { x: 56, y: 46 } Health { hit_points: 1000 }
+building SimId(1) Owner(PlayerId(1)) soviet_construction_yard CellPos { x: 52, y: 42 } Health { hit_points: 1000 }
+building SimId(117) Owner(PlayerId(1)) soviet_battle_lab CellPos { x: 49, y: 36 } Health { hit_points: 500 }
+building SimId(24) Owner(PlayerId(1)) tesla_reactor CellPos { x: 52, y: 39 } Health { hit_points: 750 }
+building SimId(68) Owner(PlayerId(1)) tesla_reactor CellPos { x: 57, y: 38 } Health { hit_points: 750 }
+building SimId(26) Owner(PlayerId(1)) soviet_refinery CellPos { x: 52, y: 46 } Health { hit_points: 1000 }
+building SimId(50) Owner(PlayerId(1)) tesla_reactor CellPos { x: 49, y: 47 } Health { hit_points: 750 }
+building SimId(44) Owner(PlayerId(1)) radar_tower CellPos { x: 52, y: 36 } Health { hit_points: 1000 }
+building SimId(45) Owner(PlayerId(0)) radar_tower CellPos { x: 15, y: 31 } Health { hit_points: 1000 }
+building SimId(32) Owner(PlayerId(1)) sentry_gun CellPos { x: 50, y: 39 } Health { hit_points: 400 }
+building SimId(36) Owner(PlayerId(1)) sentry_gun CellPos { x: 55, y: 39 } Health { hit_points: 400 }
+building SimId(34) Owner(PlayerId(1)) sentry_gun CellPos { x: 50, y: 45 } Health { hit_points: 400 }
+building SimId(40) Owner(PlayerId(1)) sentry_gun CellPos { x: 50, y: 42 } Health { hit_points: 400 }
+special SpecialState { strategic: StrategicState { missiles: [], storm: None, flights: {}, announced: {} }, parasites: {}, deployed: {}, mirage_trees: {}, disguises: {}, erasures: {}, charges: {}, radiation_sites: [], coil_charge: {}, death_detonated: {}, eruption_next: {}, temporal_removed: {}, charge: {}, protected: {}, disabled: {}, cargo: {SimId(3221228904): [Passenger { id: SimId(121), kind: UnitKind(0), hp: 125, harvester: None, experience: Some(Experience { value: 0, rank: 0, ranked: Multipliers { firepower_pm: 1000, armour_pm: 1000, reload_pm: 1000, speed_pm: 1000 }, bonus: Multipliers { firepower_pm: 1000, armour_pm: 1000, reload_pm: 1000, speed_pm: 1000 }, self_heal: false }), bay: None }]}, garrisons: {SimId(3221228904): Garrison { owner: PlayerId(1), cell: CellPos { x: 40, y: 53 }, cooldown: 0, evicting: false }}, controlled: {}, bombs: {}, zones: [], rearming: {}, carrier_flights: {}, interactions: {}, hidden: {}, outages: {}, docked: {}, ammo: {}, reloading: {}, docks: {}, bays: {}, spawned: {}, missiles: {}, surfaced: {} }
+economy final partial window {"P0 lost tesla_tank": 1, "P0 repaired_hp radar_tower": 1046, "P1 cancelled Unit(UnitKind(29)) refund63": 1, "P1 lost attack_dog": 1, "P1 lost war_miner": 1, "P1 produced Unit(UnitKind(20))": 1, "P1 produced Unit(UnitKind(3))": 1, "P1 queued_attack SimId(45) radar_tower": 205, "P1 queued_attack_actors SimId(45)": 205, "P1 sales_refund": 750, "ended SimId(138)->SimId(27) TargetGone": 1, "shots ?->tesla_tank": 56, "shots conscript->tesla_tank": 7, "shots flak_track->radar_tower": 155, "shots tesla_tank->?": 16, "shots tesla_tank->war_miner": 3, "shots war_miner->radar_tower": 8}
+
+thread 'ra8_gate10_demo_russia_libya_easy_seed_zero_finishes' (9264435) panicked at crates/game/tests/ra8_gate_matches.rs:834:5:
+demo seed0 ["russia", "libya"] ["easy", "easy"]: None after72000
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ra8_gate10_demo_russia_libya_easy_seed_zero_finishes
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 32 filtered out; finished in 10.43s
+
+error: test failed, to rerun pass `-p game --test ra8_gate_matches`

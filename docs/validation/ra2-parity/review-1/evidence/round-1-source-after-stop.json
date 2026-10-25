@@ -1,0 +1,9 @@
+{
+  "utc": "2026-10-22T00:41:05.965524+00:00",
+  "head": "23647de4220408d42eeef6522deb4d4541528452",
+  "source_and_binding_files": 669,
+  "authority_spans": 64,
+  "mismatches": [],
+  "tracked_diff": [],
+  "scope": "Factual immutable-source guard after intentional review-P0 interruption; no validation or policy acceptance."
+}

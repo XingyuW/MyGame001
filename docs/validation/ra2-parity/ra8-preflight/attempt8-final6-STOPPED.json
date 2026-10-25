@@ -1,0 +1,181 @@
+{
+  "utc": "2026-10-19T02:06:15.592436+00:00",
+  "head": "618e9b4f2890a9cb5e95d920dcd94fedbca3955f",
+  "reason": "Completed Frozen Sound None400000 ending failure, not a mean-budget failure. Owned all-map process intentionally terminated after this observation; no full all-map exit/result is claimed.",
+  "owned_session": 66699,
+  "terminated_pid": 47206,
+  "parent_pid": 40058,
+  "pretermination_metadata": "47206 40058 42:06 40:35.10 /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples/m13_ten_players to-the-end all",
+  "process_returncode": -15,
+  "command_elapsed_seconds": 2532.6689295829856,
+  "owned_process_remaining": false,
+  "raw_log": "docs/validation/ra2-parity/ra8-preflight/attempt8-final6-m13-all.log",
+  "raw_sha256": "f2327ce1cd299f6a7baa342afde64d8e2ffe97999e445f62874e6a9f893dd2be",
+  "completed_maps": [
+    {
+      "map": "demo",
+      "winner": 7,
+      "ending_tick": 45761,
+      "completed_failure": false,
+      "ten_builders": true,
+      "raw_block": "demo: 128 x 128 cells for 10 players (file 64 x 64), enlarged in 820.1\u00b5s, set up in 2.2ms\n  45762 ticks: mean 324.628\u00b5s, 99th centile 2.127ms, longest 15.603ms, busiest 1000 ticks mean 1.275ms, 0 ticks over 50ms; measured total 14.856s, elapsed 14.860s\n  at most 244 units and 112 buildings; 10 players built; ended in tick 45761: Won { winner: PlayerId(7), tick: 45761 }\n"
+    },
+    {
+      "map": "crossroads",
+      "winner": 1,
+      "ending_tick": 46846,
+      "completed_failure": false,
+      "ten_builders": true,
+      "raw_block": "crossroads: 112 x 112 cells for 10 players (file 56 x 56), enlarged in 782.8\u00b5s, set up in 2.2ms\n  46847 ticks: mean 417.691\u00b5s, 99th centile 1.795ms, longest 44.646ms, busiest 1000 ticks mean 1.590ms, 0 ticks over 50ms; measured total 19.568s, elapsed 19.572s\n  at most 234 units and 110 buildings; 10 players built; ended in tick 46846: Won { winner: PlayerId(1), tick: 46846 }\n"
+    },
+    {
+      "map": "riverlands",
+      "winner": 3,
+      "ending_tick": 63346,
+      "completed_failure": false,
+      "ten_builders": true,
+      "raw_block": "riverlands: 128 x 96 cells for 10 players (file 64 x 48), enlarged in 1.9ms, set up in 3.5ms\n  63347 ticks: mean 774.481\u00b5s, 99th centile 4.099ms, longest 74.505ms, busiest 1000 ticks mean 2.447ms, 1 ticks over 50ms; measured total 49.061s, elapsed 49.080s\n  at most 229 units and 114 buildings; 10 players built; ended in tick 63346: Won { winner: PlayerId(3), tick: 63346 }\n"
+    },
+    {
+      "map": "liberty_bay",
+      "winner": 1,
+      "ending_tick": 66890,
+      "completed_failure": false,
+      "ten_builders": true,
+      "raw_block": "liberty_bay: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 290.4\u00b5s, set up in 20.6ms\n  66891 ticks: mean 2.715ms, 99th centile 16.119ms, longest 345.643ms, busiest 1000 ticks mean 11.626ms, 274 ticks over 50ms; measured total 181.593s, elapsed 181.626s\n  at most 291 units and 177 buildings; 10 players built; ended in tick 66890: Won { winner: PlayerId(1), tick: 66890 }\n"
+    },
+    {
+      "map": "frostline",
+      "winner": 1,
+      "ending_tick": 152216,
+      "completed_failure": false,
+      "ten_builders": true,
+      "raw_block": "frostline: 252 x 252 cells for 10 players (file 224 x 224), enlarged in 2.6ms, set up in 15.7ms\n  152217 ticks: mean 1.721ms, 99th centile 11.429ms, longest 299.265ms, busiest 1000 ticks mean 5.627ms, 53 ticks over 50ms; measured total 261.934s, elapsed 261.965s\n  at most 268 units and 222 buildings; 10 players built; ended in tick 152216: Won { winner: PlayerId(1), tick: 152216 }\n"
+    },
+    {
+      "map": "oasis_gulf",
+      "winner": 0,
+      "ending_tick": 123565,
+      "completed_failure": false,
+      "ten_builders": true,
+      "raw_block": "oasis_gulf: 256 x 192 cells for 10 players (file 256 x 192), enlarged in 49.4\u00b5s, set up in 5.3ms\n  123566 ticks: mean 1.378ms, 99th centile 8.907ms, longest 202.230ms, busiest 1000 ticks mean 7.164ms, 184 ticks over 50ms; measured total 170.214s, elapsed 170.232s\n  at most 272 units and 178 buildings; 10 players built; ended in tick 123565: Won { winner: PlayerId(0), tick: 123565 }\n"
+    },
+    {
+      "map": "coral_archipelago",
+      "winner": 1,
+      "ending_tick": 107569,
+      "completed_failure": false,
+      "ten_builders": true,
+      "raw_block": "coral_archipelago: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 115.6\u00b5s, set up in 10.0ms\n  107570 ticks: mean 3.208ms, 99th centile 31.441ms, longest 239.583ms, busiest 1000 ticks mean 10.137ms, 398 ticks over 50ms; measured total 345.118s, elapsed 345.144s\n  at most 277 units and 263 buildings; 10 players built; ended in tick 107569: Won { winner: PlayerId(1), tick: 107569 }\n"
+    },
+    {
+      "map": "continental_divide",
+      "winner": 3,
+      "ending_tick": 83435,
+      "completed_failure": false,
+      "ten_builders": true,
+      "raw_block": "continental_divide: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 125.8\u00b5s, set up in 15.8ms\n  83436 ticks: mean 1.388ms, 99th centile 10.831ms, longest 131.514ms, busiest 1000 ticks mean 5.005ms, 65 ticks over 50ms; measured total 115.771s, elapsed 115.781s\n  at most 289 units and 185 buildings; 10 players built; ended in tick 83435: Won { winner: PlayerId(3), tick: 83435 }\n"
+    },
+    {
+      "map": "steel_harbor",
+      "winner": 3,
+      "ending_tick": 123393,
+      "completed_failure": false,
+      "ten_builders": true,
+      "raw_block": "steel_harbor: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 117.8\u00b5s, set up in 9.1ms\n  123394 ticks: mean 1.848ms, 99th centile 13.154ms, longest 317.471ms, busiest 1000 ticks mean 10.016ms, 296 ticks over 50ms; measured total 228.013s, elapsed 228.037s\n  at most 282 units and 176 buildings; 10 players built; ended in tick 123393: Won { winner: PlayerId(3), tick: 123393 }\n"
+    },
+    {
+      "map": "glacier_pass",
+      "winner": 1,
+      "ending_tick": 84446,
+      "completed_failure": false,
+      "ten_builders": true,
+      "raw_block": "glacier_pass: 240 x 240 cells for 10 players (file 240 x 240), enlarged in 2.1ms, set up in 7.5ms\n  84447 ticks: mean 1.477ms, 99th centile 12.987ms, longest 99.513ms, busiest 1000 ticks mean 4.230ms, 124 ticks over 50ms; measured total 124.741s, elapsed 124.749s\n  at most 270 units and 238 buildings; 10 players built; ended in tick 84446: Won { winner: PlayerId(1), tick: 84446 }\n"
+    },
+    {
+      "map": "red_canyon",
+      "winner": 0,
+      "ending_tick": 101272,
+      "completed_failure": false,
+      "ten_builders": true,
+      "raw_block": "red_canyon: 240 x 240 cells for 10 players (file 192 x 192), enlarged in 1.3ms, set up in 6.6ms\n  101273 ticks: mean 1.461ms, 99th centile 15.799ms, longest 226.910ms, busiest 1000 ticks mean 7.553ms, 202 ticks over 50ms; measured total 147.965s, elapsed 147.975s\n  at most 281 units and 195 buildings; 10 players built; ended in tick 101272: Won { winner: PlayerId(0), tick: 101272 }\n"
+    },
+    {
+      "map": "jungle_delta",
+      "winner": 7,
+      "ending_tick": 86486,
+      "completed_failure": false,
+      "ten_builders": true,
+      "raw_block": "jungle_delta: 256 x 224 cells for 10 players (file 256 x 224), enlarged in 2.4ms, set up in 8.5ms\n  86487 ticks: mean 852.775\u00b5s, 99th centile 6.340ms, longest 104.453ms, busiest 1000 ticks mean 2.420ms, 11 ticks over 50ms; measured total 73.754s, elapsed 73.763s\n  at most 275 units and 183 buildings; 10 players built; ended in tick 86486: Won { winner: PlayerId(7), tick: 86486 }\n"
+    },
+    {
+      "map": "pacific_atoll",
+      "winner": 5,
+      "ending_tick": 87454,
+      "completed_failure": false,
+      "ten_builders": true,
+      "raw_block": "pacific_atoll: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 2.0ms, set up in 3.9ms\n  87455 ticks: mean 1.988ms, 99th centile 23.910ms, longest 230.363ms, busiest 1000 ticks mean 9.078ms, 358 ticks over 50ms; measured total 173.898s, elapsed 173.917s\n  at most 277 units and 145 buildings; 10 players built; ended in tick 87454: Won { winner: PlayerId(5), tick: 87454 }\n"
+    },
+    {
+      "map": "iron_isthmus",
+      "winner": 0,
+      "ending_tick": 67539,
+      "completed_failure": false,
+      "ten_builders": true,
+      "raw_block": "iron_isthmus: 256 x 224 cells for 10 players (file 256 x 224), enlarged in 4.0ms, set up in 7.5ms\n  67540 ticks: mean 1.461ms, 99th centile 20.194ms, longest 242.170ms, busiest 1000 ticks mean 5.309ms, 31 ticks over 50ms; measured total 98.709s, elapsed 98.718s\n  at most 276 units and 143 buildings; 10 players built; ended in tick 67539: Won { winner: PlayerId(0), tick: 67539 }\n"
+    },
+    {
+      "map": "arctic_floes",
+      "winner": 0,
+      "ending_tick": 143353,
+      "completed_failure": false,
+      "ten_builders": true,
+      "raw_block": "arctic_floes: 240 x 240 cells for 10 players (file 240 x 240), enlarged in 1.7ms, set up in 3.8ms\n  143354 ticks: mean 931.701\u00b5s, 99th centile 15.763ms, longest 94.636ms, busiest 1000 ticks mean 3.665ms, 34 ticks over 50ms; measured total 133.563s, elapsed 133.576s\n  at most 266 units and 149 buildings; 10 players built; ended in tick 143353: Won { winner: PlayerId(0), tick: 143353 }\n"
+    },
+    {
+      "map": "ember_caldera",
+      "winner": 5,
+      "ending_tick": 145565,
+      "completed_failure": false,
+      "ten_builders": true,
+      "raw_block": "ember_caldera: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 1.8ms, set up in 6.3ms\n  145566 ticks: mean 496.542\u00b5s, 99th centile 6.075ms, longest 86.350ms, busiest 1000 ticks mean 2.188ms, 2 ticks over 50ms; measured total 72.280s, elapsed 72.292s\n  at most 296 units and 173 buildings; 10 players built; ended in tick 145565: Won { winner: PlayerId(5), tick: 145565 }\n"
+    },
+    {
+      "map": "frozen_sound",
+      "winner": null,
+      "ending_tick": null,
+      "completed_failure": true,
+      "ten_builders": true,
+      "raw_block": "frozen_sound: 256 x 256 cells for 10 players (file 256 x 256), enlarged in 62.5\u00b5s, set up in 9.0ms\n  400000 ticks: mean 596.419\u00b5s, 99th centile 2.622ms, longest 90.229ms, busiest 1000 ticks mean 3.226ms, 9 ticks over 50ms; measured total 238.568s, elapsed 238.601s\n  at most 275 units and 152 buildings; 10 players built; 2 players left after 400000 ticks\nfrozen_sound: the match had no winner within 400000 ticks\n"
+    }
+  ],
+  "explicit_winners": 16,
+  "completed_ending_failures": 1,
+  "remaining_maps": "Four remaining maps have no completed output. A subsequent map may have executed partially before owned SIGTERM; it has no match/assertion result.",
+  "dependent_unrun": [
+    "fixed three256 benchmark",
+    "three example guard test targets requested after timings",
+    "separate broad sim/game/M10/companions preflight (superseded by mandatory full13 command4)",
+    "full13"
+  ],
+  "source_checks": {
+    "runtime": {
+      "manifest": "docs/validation/ra2-parity/ra8-preflight/attempt8-final6-runtime-manifest.json",
+      "manifest_sha256": "3a5ec9ff6dacf4d47f1c055ed5b90fc0e7273dcf9e413b8ceabc837497e0126f",
+      "files": 342,
+      "mismatches": []
+    },
+    "test-example": {
+      "manifest": "docs/validation/ra2-parity/ra8-preflight/attempt8-final6-test-example-manifest.json",
+      "manifest_sha256": "2c2bb1e38f9e83261e0e122ba75e7691efff470f9585a6430ade8a2396f08bab",
+      "files": 101,
+      "mismatches": []
+    }
+  },
+  "completed_test_commands": {
+    "passed": 149,
+    "failed": 0,
+    "ignored": 0
+  },
+  "process_inspection_note": "Initial ps requested a broad process list and the tool truncated it; no PID selection relied on that output. Exact anchored pgrep then exact ps verified only the owned PID before SIGTERM. No unrelated process was stopped."
+}

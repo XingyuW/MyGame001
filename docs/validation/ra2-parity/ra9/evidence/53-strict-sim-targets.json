@@ -1,0 +1,17 @@
+{
+  "utc": "2026-10-20T23:48:16.515504+00:00",
+  "command": [
+    "cargo",
+    "clippy",
+    "-p",
+    "sim",
+    "--all-targets",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "exit_code": 101,
+  "seconds": 28.337,
+  "lease": "RA8revocable functional phase jobs1 compiler-only",
+  "status": "actual remaining sim alltarget strict diagnostics; B fixes two disjoint game-test style errors"
+}

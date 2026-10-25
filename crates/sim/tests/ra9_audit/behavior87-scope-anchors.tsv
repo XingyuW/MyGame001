@@ -1,0 +1,8 @@
+group_id	path	section_start	section_end	required_case_insensitive_needle
+attackmove-gate	docs/DECISIONS.md	### D29. Combat in the simulation (PLAN.md section 5, equations 1 and 2)	### D30. Visibility, shroud and fog, and hiding of unseen enemies (PLAN.md section 5, equation 6)	Unarmed units simply move
+move-shroud	docs/DECISIONS.md	### D30. Visibility, shroud and fog, and hiding of unseen enemies (PLAN.md section 5, equation 6)	### D31. Combat and fog in the game	ordering units into the shroud
+combat-selection	docs/RA2_PARITY_PLAN.md	### RA7. Vision, interface and controls	### RA8. Computer opponent	P all combat units
+radar-visibility	docs/RA2_PARITY_PLAN.md	### 4.14 Vision (RA7)	### 4.15 Computer player difficulty (RA8)	Gap
+decloak-fire	docs/DECISIONS.md	### R51. RA4: submerged units	### R52. RA4: the interface	fired within the last
+parasite	crates/sim/src/special/vehicles.rs	pub(super) fn fired(	/// A repair removes a drone;	meta.domain == Domain::Air
+legal-target	crates/sim/src/command.rs	fn validate_combat(	fn apply_move(	UnknownTarget

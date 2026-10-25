@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-22T05:36:45.192094+00:00",
+  "command": [
+    "caffeinate",
+    "-i",
+    "-w",
+    "52337"
+  ],
+  "pid": 54250,
+  "controller": 52337,
+  "scope": "Prevent idle system sleep until owned focused controller exits; no source, test, worker or limit change. Timing is functional evidence only."
+}

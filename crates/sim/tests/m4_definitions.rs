@@ -19,10 +19,12 @@ use std::sync::mpsc::{self, RecvTimeoutError};
 use std::time::Duration;
 
 use sim::{
-    ArmourClass, CombatTerms, DataError, DataErrorKind, Definitions, MAX_ARMOUR_CLASSES,
-    MAX_DAMAGE, MAX_DATA_FILE_BYTES, MAX_HIT_POINTS, MAX_PROJECTILE_SPEED, MAX_RELOAD, MAX_SIGHT,
-    MAX_VERSUS_PERCENT, MAX_WARHEADS, MAX_WEAPON_RANGE, MAX_WEAPONS, MAX_WEAPONS_PER_TYPE,
-    MIN_PROJECTILE_SPEED, MIN_WEAPON_RANGE, WarheadKind, WeaponDef, WeaponKind, load_definitions,
+    ArmourClass, CombatTerms, DataError, DataErrorKind, Definitions, Effect, EffectDef,
+    MAX_AIR_RANGE_BONUS, MAX_ARMOUR_CLASSES, MAX_BURST, MAX_CELL_SPREAD, MAX_DAMAGE,
+    MAX_DATA_FILE_BYTES, MAX_HIT_POINTS, MAX_LAND_TARGETING, MAX_NAVAL_TARGETING,
+    MAX_PROJECTILE_SPEED, MAX_RELOAD, MAX_SCATTER, MAX_SIGHT, MAX_VERSUS_PERCENT, MAX_WARHEADS,
+    MAX_WEAPON_RANGE, MAX_WEAPONS, MAX_WEAPONS_PER_TYPE, MIN_PROJECTILE_SPEED, MIN_WEAPON_RANGE,
+    WarheadKind, WeaponDef, WeaponKind, load_definitions,
 };
 
 /// Upper limit of heap bytes in use by this test process.
@@ -249,9 +251,20 @@ fn the_fixture_loads_with_every_field() {
             id: "cannon".into(),
             damage: 25,
             range: 1024,
+            min_range: 0,
             reload: 20,
+            burst: 1,
             warhead: WarheadKind(1),
             projectile_speed: 128,
+            anti_air: true,
+            anti_ground: true,
+            scatter: 0,
+            rad_level: 0,
+            area_fire: false,
+            naval_only: false,
+            sonic: false,
+            repair: false,
+            suicide: false,
         }
     );
     assert_eq!(definitions.weapon_kind("howitzer"), Some(WeaponKind(2)));
@@ -264,6 +277,14 @@ fn the_fixture_loads_with_every_field() {
             armour: class("plate"),
             sight: 6,
             weapon: Some(WeaponKind(1)),
+            secondary: None,
+            elite: [Some(WeaponKind(1)), None],
+            air_range_bonus: 0,
+            land_targeting: 0,
+            naval_targeting: 5,
+            underwater: false,
+            organic: false,
+            wall: false,
         })
     );
     assert_eq!(
@@ -280,6 +301,14 @@ fn the_fixture_loads_with_every_field() {
             armour: class("concrete"),
             sight: 3,
             weapon: Some(WeaponKind(2)),
+            secondary: None,
+            elite: [Some(WeaponKind(2)), None],
+            air_range_bonus: 0,
+            land_targeting: 0,
+            naval_targeting: 5,
+            underwater: false,
+            organic: false,
+            wall: false,
         })
     );
     assert_eq!(
@@ -354,28 +383,28 @@ fn every_field_is_required_and_unknown_fields_are_rejected() {
             "weapons[0].projectile_speed",
         ),
         (
-            "(unit: \"tank\", hit_points: 300, armour: \"plate\", sight: 6, weapons: [\"cannon\"])",
-            "(unit: \"tank\", hit_points: 300, armour: \"plate\", weapons: [\"cannon\"])",
+            "(unit: \"tank\", hit_points: 300, armour: \"plate\", sight: 6, weapons: [\"cannon\"],",
+            "(unit: \"tank\", hit_points: 300, armour: \"plate\", weapons: [\"cannon\"],",
             "units[1].sight",
         ),
         (
-            "(unit: \"tank\", hit_points: 300, armour: \"plate\", sight: 6, weapons: [\"cannon\"])",
-            "(unit: \"tank\", armour: \"plate\", sight: 6, weapons: [\"cannon\"])",
+            "(unit: \"tank\", hit_points: 300, armour: \"plate\", sight: 6, weapons: [\"cannon\"],",
+            "(unit: \"tank\", armour: \"plate\", sight: 6, weapons: [\"cannon\"],",
             "units[1].hit_points",
         ),
         (
-            "(unit: \"tank\", hit_points: 300, armour: \"plate\", sight: 6, weapons: [\"cannon\"])",
-            "(unit: \"tank\", hit_points: 300, armour: \"plate\", sight: 6)",
+            "(unit: \"tank\", hit_points: 300, armour: \"plate\", sight: 6, weapons: [\"cannon\"],",
+            "(unit: \"tank\", hit_points: 300, armour: \"plate\", sight: 6,",
             "units[1].weapons",
         ),
         (
-            "(building: \"power\", hit_points: 200, armour: \"concrete\", sight: 3, weapons: [])",
-            "(building: \"power\", hit_points: 200, sight: 3, weapons: [])",
+            "(building: \"power\", hit_points: 200, armour: \"concrete\", sight: 3, weapons: [],",
+            "(building: \"power\", hit_points: 200, sight: 3, weapons: [],",
             "buildings[1].armour",
         ),
         (
-            "(building: \"power\", hit_points: 200, armour: \"concrete\", sight: 3, weapons: [])",
-            "(hit_points: 200, armour: \"concrete\", sight: 3, weapons: [])",
+            "(building: \"power\", hit_points: 200, armour: \"concrete\", sight: 3, weapons: [],",
+            "(hit_points: 200, armour: \"concrete\", sight: 3, weapons: [],",
             "buildings[1].building",
         ),
     ];
@@ -404,8 +433,8 @@ fn every_field_is_required_and_unknown_fields_are_rejected() {
         (
             "unknown_weapon_field",
             "            reload: 10,\n",
-            "            reload: 10,\n            burst: 3,\n",
-            "weapons[0].burst",
+            "            reload: 10,\n            salvo: 3,\n",
+            "weapons[0].salvo",
         ),
         (
             "unknown_versus_field",
@@ -447,8 +476,8 @@ fn every_field_is_required_and_unknown_fields_are_rejected() {
         ),
         (
             "weapons_string",
-            "weapons: [\"howitzer\"]",
-            "weapons: \"howitzer\"",
+            "sight: 3, weapons: [\"howitzer\"]",
+            "sight: 3, weapons: \"howitzer\"",
             "buildings[6].weapons",
         ),
         (
@@ -468,17 +497,17 @@ fn every_field_is_required_and_unknown_fields_are_rejected() {
 }
 
 #[test]
-fn schema_versions_other_than_1_are_rejected() {
-    for version in [0, 2, -1, i64::MIN, i64::MAX] {
+fn schema_versions_other_than_5_are_rejected() {
+    for version in [0, 1, 2, 3, 4, 6, -1, i64::MIN, i64::MAX] {
         assert_rejected(
             &variant(
                 &format!("version_{version}"),
-                &[("schema_version: 1,", &format!("schema_version: {version},"))],
+                &[("schema_version: 5,", &format!("schema_version: {version},"))],
             ),
             "schema_version",
             DataErrorKind::UnsupportedSchemaVersion {
                 found: version,
-                expected: 1,
+                expected: 5,
             },
         );
     }
@@ -596,6 +625,14 @@ fn numeric_fields_accept_their_limits_and_reject_beyond() {
     assert_eq!(error.field, "weapons[0].damage");
 }
 
+/// The fields of an entry of `units` or `buildings` since schema version 2, with the values that
+/// change nothing: the targeting of a type, with no elite weapons for an unarmed one, and the
+/// traits of a unit type.
+const TARGETING: &str = "air_range_bonus: 0, land_targeting: 0, naval_targeting: 5";
+const UNARMED: &str =
+    "elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 5";
+const UNIT_TRAITS: &str = "underwater: 0, organic: 0";
+
 /// A combat file with `classes` armour classes, `warheads` warheads (each listing every class),
 /// `weapons` weapons, and the fixture's unit and building types, the tank with `per_type`
 /// weapons and `extra_units` further unit entries.
@@ -612,37 +649,57 @@ fn generated(
         .map(|c| format!("(armour: \"a{c}\", percent: 100)"))
         .collect();
     let warhead_list: Vec<String> = (0..warheads)
-        .map(|w| format!("(id: \"w{w}\", versus: [{}])", versus.join(", ")))
+        .map(|w| {
+            format!(
+                "(id: \"w{w}\", cell_spread: 0, percent_at_max: 100, wall: 1, wood: 1, \
+                 temporal: 0, mind_control: 0, psychic_damage: 0, radiation: 0, parasite: 0, paralyzes: 0, culling: 0, ivan_bomb: 0, bomb_disarm: 0, electric_assault: 0, makes_disguise: 0, versus: [{}])",
+                versus.join(", ")
+            )
+        })
         .collect();
     let weapon_list: Vec<String> = (0..weapons)
         .map(|k| {
             format!(
-                "(id: \"k{k}\", damage: 1, range: 384, reload: 1, warhead: \"w0\", \
-                 projectile_speed: 0)"
+                "(id: \"k{k}\", damage: 1, range: 384, min_range: 0, reload: 1, burst: 1, \
+                 warhead: \"w0\", projectile_speed: 0, anti_air: 1, anti_ground: 1, scatter: 0, rad_level: 0, area_fire: 0, naval_only: 0, suicide: 0, sonic: 0, repair: 0)"
             )
         })
         .collect();
     let tank_weapons: Vec<String> = (0..per_type).map(|k| format!("\"k{k}\"")).collect();
     let mut units: Vec<String> = ["rifleman", "crawler", "harvester"]
         .iter()
-        .map(|id| format!("(unit: \"{id}\", hit_points: 1, armour: \"a0\", sight: 0, weapons: [])"))
+        .map(|id| {
+            format!(
+                "(unit: \"{id}\", hit_points: 1, armour: \"a0\", sight: 0, weapons: [], {UNARMED}, \
+                 {UNIT_TRAITS})"
+            )
+        })
         .collect();
     units.push(format!(
-        "(unit: \"tank\", hit_points: 1, armour: \"a0\", sight: 0, weapons: [{}])",
+        "(unit: \"tank\", hit_points: 1, armour: \"a0\", sight: 0, weapons: [{0}], \
+         elite_weapons: [{0}], {TARGETING}, {UNIT_TRAITS})",
         tank_weapons.join(", ")
     ));
     for _ in 0..extra_units {
-        units.push("(unit: \"tank\", hit_points: 1, armour: \"a0\", sight: 0, weapons: [])".into());
+        units.push(format!(
+            "(unit: \"tank\", hit_points: 1, armour: \"a0\", sight: 0, weapons: [], {UNARMED}, \
+             {UNIT_TRAITS})"
+        ));
     }
     let buildings: Vec<String> = [
         "yard", "power", "refinery", "barracks", "factory", "fence", "turret", "beacon", "flag",
     ]
     .iter()
-    .map(|id| format!("(building: \"{id}\", hit_points: 1, armour: \"a0\", sight: 0, weapons: [])"))
+    .map(|id| {
+        format!(
+            "(building: \"{id}\", hit_points: 1, armour: \"a0\", sight: 0, weapons: [], {UNARMED}, \
+             wall: 0)"
+        )
+    })
     .collect();
     let text = format!(
-        "(schema_version: 1, armour_classes: [{}], warheads: [{}], weapons: [{}], units: [{}], \
-         buildings: [{}])",
+        "(schema_version: 5, armour_classes: [{}], warheads: [{}], weapons: [{}], units: [{}], \
+         buildings: [{}], effects: [])",
         class_names.join(", "),
         warhead_list.join(",\n"),
         weapon_list.join(",\n"),
@@ -758,8 +815,8 @@ fn references_must_name_defined_entries() {
             unknown("warhead", "apds"),
         ),
         (
-            "weapons: [\"rifle\"]",
-            "weapons: [\"bayonet\"]",
+            "sight: 5, weapons: [\"rifle\"]",
+            "sight: 5, weapons: [\"bayonet\"]",
             "units[0].weapons[0]",
             unknown("weapon", "bayonet"),
         ),
@@ -782,8 +839,8 @@ fn references_must_name_defined_entries() {
             unknown("building", "lighthouse"),
         ),
         (
-            "weapons: [\"howitzer\"]",
-            "weapons: [\"mortar\"]",
+            "sight: 3, weapons: [\"howitzer\"]",
+            "sight: 3, weapons: [\"mortar\"]",
             "buildings[6].weapons[0]",
             unknown("weapon", "mortar"),
         ),
@@ -804,7 +861,9 @@ fn every_type_and_armour_class_needs_exactly_one_entry() {
         &variant(
             "no_crawler",
             &[(
-                "        (unit: \"crawler\", hit_points: 50, armour: \"soft\", sight: 2, weapons: []),\n",
+                "        (unit: \"crawler\", hit_points: 50, armour: \"soft\", sight: 2, weapons: [],\n         \
+                 elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 5, \
+                 underwater: 0, organic: 0),\n",
                 "",
             )],
         ),
@@ -815,7 +874,9 @@ fn every_type_and_armour_class_needs_exactly_one_entry() {
         &variant(
             "no_flag",
             &[(
-                "        (building: \"flag\", hit_points: 1, armour: \"concrete\", sight: 0, weapons: []),\n",
+                "        (building: \"flag\", hit_points: 1, armour: \"concrete\", sight: 0, weapons: [],\n         \
+                 elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 5, \
+                 wall: 0),\n",
                 "",
             )],
         ),
@@ -926,7 +987,12 @@ fn unreadable_oversized_and_special_files_are_rejected() {
         (missing_file.as_path(), "file")
     );
     let mut text = fixture_text().into_bytes();
-    text.resize(MAX_DATA_FILE_BYTES as usize + 1, b' ');
+    text.resize(MAX_DATA_FILE_BYTES as usize, b' ');
+    assert!(
+        load(&temp_file("exact_limit.ron", &text)).is_ok(),
+        "exact byte limit accepts valid padded data"
+    );
+    text.push(b' ');
     assert_rejected(
         &temp_file("too_large.ron", &text),
         "file",
@@ -1088,4 +1154,534 @@ fn seeded_mutations_of_the_fixture_load_or_return_a_typed_error() {
         }
     }
     assert!(loaded > 0, "no mutation stayed valid");
+}
+
+// --- Schema version 2 (RA3): spread, burst, layers, scatter, elite weapons, targeting ----------
+
+/// The rifle's fields of schema version 2 in the fixture (the only weapon with projectile speed
+/// 0), the bullet's (the only warhead with a percentage of 0), the second line of the tank's
+/// entry and the whole of the power plant's.
+const RIFLE_V2: &str = "            projectile_speed: 0,\n            min_range: 0,\n            burst: 1,\n            anti_air: 1,\n            anti_ground: 1,\n            scatter: 0,\n";
+const BULLET_V2: &str = "                (armour: \"concrete\", percent: 0),\n            ],\n            cell_spread: 0,\n            percent_at_max: 100,\n            wall: 1,\n            wood: 1,\n";
+const TANK_V2: &str = "weapons: [\"cannon\"],\n         elite_weapons: [\"cannon\"], air_range_bonus: 0, land_targeting: 0, naval_targeting: 5, underwater: 0, organic: 0),";
+const POWER_V2: &str = "(building: \"power\", hit_points: 200, armour: \"concrete\", sight: 3, weapons: [],\n         elite_weapons: [], air_range_bonus: 0, land_targeting: 0, naval_targeting: 5, wall: 0),";
+
+/// The fixture with `from` replaced by `to` inside the block `block` of it.
+fn variant_in(name: &str, block: &str, from: &str, to: &str) -> PathBuf {
+    assert_eq!(
+        block.matches(from).count(),
+        1,
+        "{name}: {from:?} in {block:?}"
+    );
+    variant(name, &[(block, &block.replacen(from, to, 1))])
+}
+
+#[test]
+fn every_field_of_schema_version_2_is_required() {
+    let cases = [
+        (
+            BULLET_V2,
+            "            cell_spread: 0,\n",
+            "warheads[0].cell_spread",
+        ),
+        (
+            BULLET_V2,
+            "            percent_at_max: 100,\n",
+            "warheads[0].percent_at_max",
+        ),
+        (BULLET_V2, "            wall: 1,\n", "warheads[0].wall"),
+        (BULLET_V2, "            wood: 1,\n", "warheads[0].wood"),
+        (
+            RIFLE_V2,
+            "            min_range: 0,\n",
+            "weapons[0].min_range",
+        ),
+        (RIFLE_V2, "            burst: 1,\n", "weapons[0].burst"),
+        (
+            RIFLE_V2,
+            "            anti_air: 1,\n",
+            "weapons[0].anti_air",
+        ),
+        (
+            RIFLE_V2,
+            "            anti_ground: 1,\n",
+            "weapons[0].anti_ground",
+        ),
+        (RIFLE_V2, "            scatter: 0,\n", "weapons[0].scatter"),
+        (
+            TANK_V2,
+            "elite_weapons: [\"cannon\"], ",
+            "units[1].elite_weapons",
+        ),
+        (TANK_V2, "air_range_bonus: 0, ", "units[1].air_range_bonus"),
+        (TANK_V2, "land_targeting: 0, ", "units[1].land_targeting"),
+        (TANK_V2, "naval_targeting: 5, ", "units[1].naval_targeting"),
+        (TANK_V2, "underwater: 0, ", "units[1].underwater"),
+        (TANK_V2, ", organic: 0", "units[1].organic"),
+        (
+            POWER_V2,
+            "elite_weapons: [], ",
+            "buildings[1].elite_weapons",
+        ),
+        (
+            POWER_V2,
+            "air_range_bonus: 0, ",
+            "buildings[1].air_range_bonus",
+        ),
+        (
+            POWER_V2,
+            "land_targeting: 0, ",
+            "buildings[1].land_targeting",
+        ),
+        (
+            POWER_V2,
+            "naval_targeting: 5, ",
+            "buildings[1].naval_targeting",
+        ),
+        (POWER_V2, ", wall: 0", "buildings[1].wall"),
+    ];
+    for (index, (block, field_text, field)) in cases.into_iter().enumerate() {
+        let path = variant_in(&format!("v2_missing_{index}"), block, field_text, "");
+        assert_rejected(&path, field, DataErrorKind::MissingField);
+    }
+    assert_rejected(
+        &variant("v2_missing_effects", &[("    effects: [],\n", "")]),
+        "effects",
+        DataErrorKind::MissingField,
+    );
+    // A trait of the other kind of entry is an unknown field.
+    assert_rejected(
+        &variant_in(
+            "v2_wall_on_a_unit",
+            TANK_V2,
+            "organic: 0",
+            "organic: 0, wall: 0",
+        ),
+        "units[1].wall",
+        DataErrorKind::UnknownField,
+    );
+    assert_rejected(
+        &variant_in(
+            "v2_organic_building",
+            POWER_V2,
+            "wall: 0",
+            "wall: 0, organic: 0",
+        ),
+        "buildings[1].organic",
+        DataErrorKind::UnknownField,
+    );
+}
+
+#[test]
+fn the_fields_of_schema_version_2_accept_their_limits_and_reject_beyond() {
+    // (block, the field's text in it, field, the replacement with `{}`, smallest, largest)
+    let cases: [(&str, &str, &str, &str, i64, i64); 15] = [
+        (
+            BULLET_V2,
+            "cell_spread: 0,",
+            "warheads[0].cell_spread",
+            "cell_spread: {},",
+            0,
+            i64::from(MAX_CELL_SPREAD),
+        ),
+        (
+            BULLET_V2,
+            "percent_at_max: 100,",
+            "warheads[0].percent_at_max",
+            "percent_at_max: {},",
+            0,
+            100,
+        ),
+        (BULLET_V2, "wall: 1,", "warheads[0].wall", "wall: {},", 0, 1),
+        (BULLET_V2, "wood: 1,", "warheads[0].wood", "wood: {},", 0, 1),
+        (
+            RIFLE_V2,
+            "min_range: 0,",
+            "weapons[0].min_range",
+            "min_range: {},",
+            0,
+            // Below the rifle's range of 768.
+            767,
+        ),
+        (
+            RIFLE_V2,
+            "burst: 1,",
+            "weapons[0].burst",
+            "burst: {},",
+            1,
+            i64::from(MAX_BURST),
+        ),
+        (
+            RIFLE_V2,
+            "scatter: 0,",
+            "weapons[0].scatter",
+            "scatter: {},",
+            0,
+            i64::from(MAX_SCATTER),
+        ),
+        (
+            TANK_V2,
+            "air_range_bonus: 0,",
+            "units[1].air_range_bonus",
+            "air_range_bonus: {},",
+            0,
+            i64::from(MAX_AIR_RANGE_BONUS),
+        ),
+        (
+            TANK_V2,
+            "land_targeting: 0,",
+            "units[1].land_targeting",
+            "land_targeting: {},",
+            0,
+            i64::from(MAX_LAND_TARGETING),
+        ),
+        (
+            TANK_V2,
+            "naval_targeting: 5,",
+            "units[1].naval_targeting",
+            "naval_targeting: {},",
+            0,
+            i64::from(MAX_NAVAL_TARGETING),
+        ),
+        (
+            TANK_V2,
+            "underwater: 0,",
+            "units[1].underwater",
+            "underwater: {},",
+            0,
+            1,
+        ),
+        (
+            TANK_V2,
+            "organic: 0)",
+            "units[1].organic",
+            "organic: {})",
+            0,
+            1,
+        ),
+        (
+            POWER_V2,
+            "air_range_bonus: 0,",
+            "buildings[1].air_range_bonus",
+            "air_range_bonus: {},",
+            0,
+            i64::from(MAX_AIR_RANGE_BONUS),
+        ),
+        (
+            POWER_V2,
+            "naval_targeting: 5,",
+            "buildings[1].naval_targeting",
+            "naval_targeting: {},",
+            0,
+            i64::from(MAX_NAVAL_TARGETING),
+        ),
+        (POWER_V2, "wall: 0)", "buildings[1].wall", "wall: {})", 0, 1),
+    ];
+    for (block, from, field, template, min, max) in cases {
+        let name = field.replace(['[', ']', '.'], "_");
+        for value in [min, max] {
+            load_ok(&variant_in(
+                &format!("v2_ok_{name}_{value}"),
+                block,
+                from,
+                &template.replace("{}", &value.to_string()),
+            ));
+        }
+        for value in [min - 1, max + 1, i64::MIN, i64::MAX] {
+            assert_out_of_range(
+                &variant_in(
+                    &format!("v2_bad_{name}_{value}"),
+                    block,
+                    from,
+                    &template.replace("{}", &value.to_string()),
+                ),
+                field,
+                &value.to_string(),
+            );
+        }
+    }
+    // The values are stored as the file gives them.
+    let definitions = load_ok(&variant(
+        "v2_values",
+        &[
+            (
+                BULLET_V2,
+                &BULLET_V2
+                    .replacen("cell_spread: 0,", "cell_spread: 384,", 1)
+                    .replacen("percent_at_max: 100,", "percent_at_max: 25,", 1)
+                    .replacen("wall: 1,", "wall: 0,", 1),
+            ),
+            (
+                RIFLE_V2,
+                &RIFLE_V2
+                    .replacen("min_range: 0,", "min_range: 256,", 1)
+                    .replacen("burst: 1,", "burst: 3,", 1)
+                    .replacen("anti_ground: 1,", "anti_ground: 0,", 1)
+                    .replacen("scatter: 0,", "scatter: 512,", 1),
+            ),
+            (
+                TANK_V2,
+                "weapons: [\"cannon\", \"rifle\"],\n         elite_weapons: [\"howitzer\"], \
+                 air_range_bonus: 1024, land_targeting: 2, naval_targeting: 1, underwater: 1, \
+                 organic: 1),",
+            ),
+            (POWER_V2, &POWER_V2.replacen("wall: 0", "wall: 1", 1)),
+        ],
+    ));
+    let bullet = &definitions.warheads()[0];
+    assert_eq!(
+        (
+            bullet.cell_spread,
+            bullet.percent_at_max,
+            bullet.wall,
+            bullet.wood
+        ),
+        (384, 25, false, true)
+    );
+    let rifle = &definitions.weapons()[0];
+    assert_eq!(
+        (
+            rifle.min_range,
+            rifle.burst,
+            rifle.anti_air,
+            rifle.anti_ground,
+            rifle.scatter
+        ),
+        (256, 3, true, false, 512)
+    );
+    let tank = definitions
+        .unit_combat(definitions.unit_kind("tank").expect("tank"))
+        .expect("terms");
+    assert_eq!(
+        (tank.weapon, tank.secondary, tank.elite),
+        (
+            Some(WeaponKind(1)),
+            Some(WeaponKind(0)),
+            [Some(WeaponKind(2)), None]
+        )
+    );
+    assert_eq!(
+        tank.weapons(false),
+        [Some(WeaponKind(1)), Some(WeaponKind(0))]
+    );
+    assert_eq!(tank.weapons(true), [Some(WeaponKind(2)), None]);
+    assert_eq!(
+        (
+            tank.air_range_bonus,
+            tank.land_targeting,
+            tank.naval_targeting,
+            tank.underwater,
+            tank.organic,
+            tank.wall
+        ),
+        (1024, 2, 1, true, true, false)
+    );
+    let power = definitions
+        .building_combat(definitions.building_kind("power").expect("power"))
+        .expect("terms");
+    assert!(power.wall && !power.underwater && !power.organic);
+}
+
+#[test]
+fn the_rules_between_the_fields_of_schema_version_2_are_checked() {
+    // A minimum range must lie below the range (the rifle's is 768).
+    assert_out_of_range(
+        &variant_in(
+            "v2_min_range_at_range",
+            RIFLE_V2,
+            "min_range: 0,",
+            "min_range: 768,",
+        ),
+        "weapons[0].min_range",
+        "768",
+    );
+    // A weapon engages aircraft, the ground, or both.
+    let neither = RIFLE_V2
+        .replacen("anti_air: 1,", "anti_air: 0,", 1)
+        .replacen("anti_ground: 1,", "anti_ground: 0,", 1);
+    assert_out_of_range(
+        &variant("v2_no_layer", &[(RIFLE_V2, &neither)]),
+        "weapons[0].anti_ground",
+        "0",
+    );
+    for (name, from, to) in [
+        ("v2_air_only", "anti_ground: 1,", "anti_ground: 0,"),
+        ("v2_ground_only", "anti_air: 1,", "anti_air: 0,"),
+    ] {
+        load_ok(&variant_in(name, RIFLE_V2, from, to));
+    }
+    // An armed type names its weapons at elite rank, and an unarmed one has none.
+    assert_out_of_range(
+        &variant_in(
+            "v2_armed_without_elite",
+            TANK_V2,
+            "elite_weapons: [\"cannon\"]",
+            "elite_weapons: []",
+        ),
+        "units[1].elite_weapons",
+        "an empty list",
+    );
+    assert_out_of_range(
+        &variant_in(
+            "v2_unarmed_with_elite",
+            POWER_V2,
+            "elite_weapons: []",
+            "elite_weapons: [\"howitzer\"]",
+        ),
+        "buildings[1].elite_weapons",
+        "1 weapons",
+    );
+    // At most a primary and a secondary weapon, below and at elite rank.
+    for (name, from, to, field) in [
+        (
+            "v2_three_weapons",
+            "weapons: [\"cannon\"],\n",
+            "weapons: [\"cannon\", \"rifle\", \"howitzer\"],\n",
+            "units[1].weapons",
+        ),
+        (
+            "v2_three_elite_weapons",
+            "elite_weapons: [\"cannon\"]",
+            "elite_weapons: [\"cannon\", \"rifle\", \"howitzer\"]",
+            "units[1].elite_weapons",
+        ),
+    ] {
+        assert_rejected(
+            &variant_in(name, TANK_V2, from, to),
+            field,
+            DataErrorKind::TooManyEntries {
+                max: MAX_WEAPONS_PER_TYPE,
+            },
+        );
+    }
+    // References.
+    assert_rejected(
+        &variant_in(
+            "v2_unknown_elite_weapon",
+            TANK_V2,
+            "elite_weapons: [\"cannon\"]",
+            "elite_weapons: [\"cannon\", \"lance\"]",
+        ),
+        "units[1].elite_weapons[1]",
+        unknown("weapon", "lance"),
+    );
+    assert_rejected(
+        &variant_in(
+            "v2_unknown_secondary",
+            TANK_V2,
+            "weapons: [\"cannon\"],\n",
+            "weapons: [\"cannon\", \"lance\"],\n",
+        ),
+        "units[1].weapons[1]",
+        unknown("weapon", "lance"),
+    );
+}
+
+#[test]
+fn effects_name_known_effects_once_with_a_damage_and_a_warhead() {
+    let effects = |name: &str, list: &str| {
+        variant(
+            name,
+            &[("    effects: [],\n", &format!("    effects: [{list}],\n"))],
+        )
+    };
+    let definitions = load_ok(&effects(
+        "effects_ok",
+        "(id: \"nuke\", damage: 600, warhead: \"he\"), (id: \"radiation\", damage: 1, warhead: \"bullet\")",
+    ));
+    assert_eq!(
+        definitions.effect(Effect::Nuke),
+        Some(EffectDef {
+            damage: 600,
+            warhead: WarheadKind(2),
+        })
+    );
+    assert_eq!(
+        definitions
+            .effect(Effect::Radiation)
+            .map(|effect| effect.damage),
+        Some(1)
+    );
+    for effect in [Effect::Lightning, Effect::IvanBomb, Effect::C4] {
+        assert_eq!(definitions.effect(effect), None, "{effect:?} is not listed");
+    }
+    assert_eq!(load_ok(&fixture()).effect(Effect::Nuke), None);
+    // Every effect at once is the longest list.
+    let all: Vec<String> = Effect::ALL
+        .iter()
+        .map(|effect| {
+            format!(
+                "(id: \"{}\", damage: {MAX_DAMAGE}, warhead: \"ap\")",
+                effect.id()
+            )
+        })
+        .collect();
+    let most = load_ok(&effects("effects_all", &all.join(", ")));
+    assert!(
+        Effect::ALL
+            .iter()
+            .all(|&effect| most.effect(effect).is_some())
+    );
+    assert_rejected(
+        &effects(
+            "effects_too_many",
+            &format!(
+                "{}, (id: \"nuke\", damage: 1, warhead: \"ap\")",
+                all.join(", ")
+            ),
+        ),
+        "effects",
+        DataErrorKind::TooManyEntries {
+            max: Effect::ALL.len(),
+        },
+    );
+    // Negative: an unknown effect, a repeated one, an unknown warhead, a damage out of range,
+    // and a missing or unknown field.
+    assert_out_of_range(
+        &effects(
+            "effects_unknown",
+            "(id: \"meteor\", damage: 1, warhead: \"ap\")",
+        ),
+        "effects[0].id",
+        "\"meteor\"",
+    );
+    assert_rejected(
+        &effects(
+            "effects_twice",
+            "(id: \"c4\", damage: 1, warhead: \"ap\"), (id: \"c4\", damage: 2, warhead: \"he\")",
+        ),
+        "effects[1].id",
+        DataErrorKind::DuplicateId("c4".into()),
+    );
+    assert_rejected(
+        &effects(
+            "effects_warhead",
+            "(id: \"c4\", damage: 1, warhead: \"plasma\")",
+        ),
+        "effects[0].warhead",
+        unknown("warhead", "plasma"),
+    );
+    for damage in [0, i64::from(MAX_DAMAGE) + 1, -1, i64::MAX] {
+        assert_out_of_range(
+            &effects(
+                &format!("effects_damage_{damage}"),
+                &format!("(id: \"ivan_bomb\", damage: {damage}, warhead: \"ap\")"),
+            ),
+            "effects[0].damage",
+            &damage.to_string(),
+        );
+    }
+    assert_rejected(
+        &effects("effects_no_damage", "(id: \"lightning\", warhead: \"ap\")"),
+        "effects[0].damage",
+        DataErrorKind::MissingField,
+    );
+    assert_rejected(
+        &effects(
+            "effects_radius",
+            "(id: \"lightning\", damage: 1, warhead: \"ap\", radius: 3)",
+        ),
+        "effects[0].radius",
+        DataErrorKind::UnknownField,
+    );
 }

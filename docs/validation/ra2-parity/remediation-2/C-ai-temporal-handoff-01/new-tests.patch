@@ -1,0 +1,419 @@
+diff --git a/crates/game/tests/m6_production_matches.rs b/crates/game/tests/m6_production_matches.rs
+index d68d6ff..e2d57e3 100644
+--- a/crates/game/tests/m6_production_matches.rs
++++ b/crates/game/tests/m6_production_matches.rs
+@@ -819,3 +819,12 @@ fn ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner() {
+     }
+     panic!("native twins have no explicit winner within ORIGINAL {limit}-step limit");
+ }
++
++#[test]
++fn ra9_crossroads_brutal_korea_easy_iraq_seed_zero_finishes() {
++    let outcome = duel("crossroads", ["korea", "iraq"], ["brutal", "easy"]);
++    assert!(
++        matches!(outcome, Some(MatchOutcome::Won { .. })),
++        "{outcome:?}"
++    );
++}
+diff --git a/crates/sim/tests/ra8_ai.rs b/crates/sim/tests/ra8_ai.rs
+index c80b2be..fa728e6 100644
+--- a/crates/sim/tests/ra8_ai.rs
++++ b/crates/sim/tests/ra8_ai.rs
+@@ -13581,3 +13581,397 @@ fn ra9_visible_ore_without_a_refinery_releases_actual_reinforcement_finance() {
+ fn ra9_visible_ore_with_a_refinery_preserves_actual_worker_income() {
+     ra9_visible_ore_finance(true);
+ }
++
++// A real occupied Prop remains recovery capability throughout Temporal suspension.
++// Only command admission pauses; another current unblocked host must remain usable.
++fn ra9_temporal_garrison_recovery(second_host: bool, already_standing: bool) {
++    let mut app = scenario("russia", "easy", 62, 0, false);
++    let mut controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
++    let remnant = put(&mut app, "radar_tower", 15, 8);
++    for _ in 0..2 {
++        let world = app.world_mut();
++        for (id, owner, mut hp) in world
++            .query::<(&sim::SimId, &sim::Owner, &mut sim::Health)>()
++            .iter_mut(world)
++        {
++            if owner.0 == PlayerId(0) && *id != remnant {
++                hp.hit_points = 0;
++            }
++        }
++        step(&mut app);
++    }
++    if already_standing {
++        app.world_mut().insert_resource(controllers);
++        let mut standing = false;
++        for _ in 0..sim::LAST_STAND_PATIENCE + 100 {
++            let events = step(&mut app);
++            assert!(!events.iter().any(|e| matches!(e, sim::SimEvent::BuildingSold { player, .. } if *player == PlayerId(0))));
++            standing = format!(
++                "{:?}",
++                app.world()
++                    .resource::<sim::AiPlayers>()
++                    .controller(PlayerId(0))
++                    .unwrap()
++            )
++            .contains("last_stand: true");
++            if standing {
++                break;
++            }
++        }
++        assert!(
++            standing,
++            "ordinary patience must really enter last stand before the new cargo exists"
++        );
++        controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
++    }
++    let cells = if second_host {
++        vec![CellPos::new(13, 12), CellPos::new(13, 18)]
++    } else {
++        vec![CellPos::new(13, 12)]
++    };
++    let mut looks = vec![0; 48 * 48];
++    for cell in &cells {
++        app.world_mut().resource_mut::<Grid>().set_terrain(
++            *cell,
++            Cell {
++                passable: false,
++                buildable: false,
++                water: false,
++                ore: 0,
++            },
++        );
++        looks[(cell.y * 48 + cell.x) as usize] = 5 << 4;
++    }
++    let defs = app.world().resource::<sim::Definitions>();
++    let armour = defs
++        .building_combat(defs.building_kind("civilian_house").unwrap())
++        .unwrap()
++        .armour;
++    let props = sim::Props::from_looks(app.world().resource::<Grid>(), &looks, armour);
++    let hosts: Vec<_> = cells
++        .iter()
++        .map(|cell| props.id_at(*cell).unwrap())
++        .collect();
++    app.world_mut().insert_resource(props);
++    let infantry: Vec<_> = cells
++        .iter()
++        .map(|cell| {
++            spawn_unit(
++                app.world_mut(),
++                PlayerId(0),
++                "conscript",
++                CellPos::new(cell.x - 1, cell.y),
++            )
++            .unwrap()
++        })
++        .collect();
++    step(&mut app);
++    for (&unit, &target) in infantry.iter().zip(&hosts) {
++        issue(&mut app, Command::Interact { unit, target });
++    }
++    step(&mut app);
++    for (&host, &unit) in hosts.iter().zip(&infantry) {
++        assert!(
++            app.world().resource::<sim::SpecialState>().cargo[&host]
++                .iter()
++                .any(|p| p.id == unit && p.hp > 0)
++        );
++    }
++    app.world_mut().insert_resource(controllers);
++    let began = app.world().resource::<SimTick>().0;
++    for _ in 0..if already_standing {
++        0
++    } else {
++        sim::LAST_STAND_PATIENCE - 200
++    } {
++        step(&mut app);
++        assert!(
++            app.world()
++                .resource::<sim::SpecialState>()
++                .cargo
++                .contains_key(&hosts[0])
++        );
++    }
++    let source = spawn_unit(
++        app.world_mut(),
++        PlayerId(1),
++        "chrono_legionnaire",
++        CellPos::new(18, 12),
++    )
++    .unwrap();
++    // Setup strength prevents the occupied host's defensive fire killing its attacker
++    // before the existing 1200-tick recovery boundary; no erasure state is seeded.
++    let source_entity = unit_entity(&mut app, source);
++    app.world_mut()
++        .get_mut::<sim::Health>(source_entity)
++        .unwrap()
++        .hit_points = 100_000;
++    app.world_mut()
++        .resource_mut::<CommandQueue>()
++        .push(sim::IssuedCommand {
++            player: PlayerId(1),
++            command: Command::Guard {
++                units: vec![source],
++            },
++        });
++    step(&mut app); // The actual observer establishes sight before targeted Attack.
++    app.world_mut()
++        .resource_mut::<CommandQueue>()
++        .push(sim::IssuedCommand {
++            player: PlayerId(1),
++            command: Command::Attack {
++                units: vec![source],
++                target: hosts[0],
++            },
++        });
++    let mut fired = false;
++    for _ in 0..200 {
++        let events = step(&mut app);
++        fired |= events.iter().any(|e| matches!(e, sim::SimEvent::WeaponFired { attacker, target, .. } if *attacker == source && *target == hosts[0]));
++        if app
++            .world()
++            .resource::<sim::SpecialState>()
++            .erasures
++            .contains_key(&hosts[0])
++        {
++            break;
++        }
++    }
++    assert!(
++        fired
++            && app
++                .world()
++                .resource::<sim::SpecialState>()
++                .erasures
++                .contains_key(&hosts[0]),
++        "native Temporal shot must freeze the occupied host before recovery"
++    );
++    let mut other_released = false;
++    let frozen_until = began
++        + if already_standing {
++            sim::LAST_STAND_TURN + 80
++        } else {
++            sim::LAST_STAND_PATIENCE + 100
++        };
++    while app.world().resource::<SimTick>().0 < frozen_until {
++        let events = step(&mut app);
++        assert!(!events.iter().any(|e| matches!(e, sim::SimEvent::BuildingSold { player, .. } if *player == PlayerId(0))), "paused cargo must preserve recovery capability");
++        let special = app.world().resource::<sim::SpecialState>();
++        assert!(special.erasures.contains_key(&hosts[0]));
++        assert!(
++            special.cargo[&hosts[0]]
++                .iter()
++                .any(|p| p.id == infantry[0] && p.hp > 0)
++        );
++        assert!(
++            !app.world()
++                .resource::<CommandQueue>()
++                .iter()
++                .any(|c| matches!(c.command, Command::Deploy { unit } if unit == hosts[0])),
++            "a currently erased host must wait without invalid Deploy intents"
++        );
++        if second_host {
++            let world = app.world_mut();
++            other_released |= world
++                .query::<(&sim::SimId, &sim::Owner, &sim::Unit)>()
++                .iter(world)
++                .any(|(id, owner, _)| *id == infantry[1] && owner.0 == PlayerId(0));
++        }
++    }
++    if second_host {
++        assert!(
++            other_released,
++            "the lower-id paused host must not starve an ordinary live unblocked host"
++        );
++    }
++    app.world_mut()
++        .resource_mut::<CommandQueue>()
++        .push(sim::IssuedCommand {
++            player: PlayerId(1),
++            command: Command::Guard {
++                units: vec![source],
++            },
++        });
++    step(&mut app);
++    assert!(
++        !app.world()
++            .resource::<sim::SpecialState>()
++            .erasures
++            .contains_key(&hosts[0]),
++        "public Guard must genuinely release the native beam"
++    );
++    let mut recovered = false;
++    let mut resumed_fire = false;
++    for _ in 0..3000 {
++        let events = step(&mut app);
++        let world = app.world_mut();
++        recovered |= world
++            .query::<(&sim::SimId, &sim::Owner, &sim::Unit)>()
++            .iter(world)
++            .any(|(id, owner, _)| *id == infantry[0] && owner.0 == PlayerId(0));
++        resumed_fire |= events.iter().any(|e| matches!(e, sim::SimEvent::WeaponFired { attacker, target, .. } if *attacker == infantry[0] && *target == source));
++        if recovered && resumed_fire {
++            break;
++        }
++    }
++    assert!(
++        recovered && resumed_fire,
++        "after actual release the original living cargo must return through Deploy and fire normally; recovered={recovered} resumed_fire={resumed_fire}; controller={:?}",
++        app.world()
++            .resource::<sim::AiPlayers>()
++            .controller(PlayerId(0))
++    );
++}
++
++#[test]
++fn ra9_temporal_garrison_waits_for_real_release_then_recovers_its_original_infantry() {
++    ra9_temporal_garrison_recovery(false, false);
++}
++
++#[test]
++fn ra9_temporal_garrison_does_not_starve_a_current_unblocked_recovery_host() {
++    ra9_temporal_garrison_recovery(true, false);
++}
++
++#[test]
++fn ra9_temporal_garrison_current_cargo_interrupts_an_existing_last_stand() {
++    ra9_temporal_garrison_recovery(false, true);
++}
++
++fn ra9_temporal_building_sale(other_live: bool) {
++    let mut app = scenario("russia", "easy", 0, 0, false);
++    let controllers = std::mem::take(&mut *app.world_mut().resource_mut::<sim::AiPlayers>());
++    let paused = put(&mut app, "gap_generator", 13, 12);
++    let other = other_live.then(|| put(&mut app, "sentry_gun", 3, 3));
++    for _ in 0..2 {
++        let world = app.world_mut();
++        for (id, owner, mut hp) in world
++            .query::<(&sim::SimId, &sim::Owner, &mut sim::Health)>()
++            .iter_mut(world)
++        {
++            if owner.0 == PlayerId(0) && *id != paused && Some(*id) != other {
++                hp.hit_points = 0;
++            }
++        }
++        step(&mut app);
++    }
++    app.world_mut().insert_resource(controllers);
++    let began = app.world().resource::<SimTick>().0;
++    for _ in 0..sim::LAST_STAND_PATIENCE - 200 {
++        step(&mut app);
++    }
++    let source = spawn_unit(
++        app.world_mut(),
++        PlayerId(1),
++        "chrono_legionnaire",
++        CellPos::new(18, 12),
++    )
++    .unwrap();
++    app.world_mut()
++        .resource_mut::<CommandQueue>()
++        .push(sim::IssuedCommand {
++            player: PlayerId(1),
++            command: Command::Guard {
++                units: vec![source],
++            },
++        });
++    step(&mut app);
++    app.world_mut()
++        .resource_mut::<CommandQueue>()
++        .push(sim::IssuedCommand {
++            player: PlayerId(1),
++            command: Command::Attack {
++                units: vec![source],
++                target: paused,
++            },
++        });
++    let mut native_shot = false;
++    for _ in 0..200 {
++        let events = step(&mut app);
++        native_shot |= events.iter().any(|e| matches!(e, sim::SimEvent::WeaponFired { attacker, target, .. } if *attacker == source && *target == paused));
++        if app
++            .world()
++            .resource::<sim::SpecialState>()
++            .erasures
++            .contains_key(&paused)
++        {
++            break;
++        }
++    }
++    assert!(
++        native_shot
++            && app
++                .world()
++                .resource::<sim::SpecialState>()
++                .erasures
++                .contains_key(&paused)
++    );
++    let mut other_sold = false;
++    while app.world().resource::<SimTick>().0 < began + sim::LAST_STAND_PATIENCE + 100 {
++        let events = step(&mut app);
++        assert!(
++            app.world()
++                .resource::<sim::SpecialState>()
++                .erasures
++                .contains_key(&paused)
++        );
++        assert!(
++            !app.world().resource::<CommandQueue>().iter().any(
++                |c| matches!(c.command, Command::SellBuilding { building } if building == paused)
++            ),
++            "current Temporal suspension must exclude only the sale candidate"
++        );
++        assert!(!events.iter().any(
++            |e| matches!(e, sim::SimEvent::BuildingSold { building, .. } if *building == paused)
++        ));
++        other_sold |= events.iter().any(|e| matches!(e, sim::SimEvent::BuildingSold { building, .. } if Some(*building) == other));
++    }
++    assert_eq!(
++        other_sold, other_live,
++        "a current live cheaper alternative must not be starved by the erased expensive building"
++    );
++    app.world_mut()
++        .resource_mut::<CommandQueue>()
++        .push(sim::IssuedCommand {
++            player: PlayerId(1),
++            command: Command::Move {
++                units: vec![source],
++                target: CellPos::new(30, 12),
++            },
++        });
++    step(&mut app);
++    assert!(
++        !app.world()
++            .resource::<sim::SpecialState>()
++            .erasures
++            .contains_key(&paused)
++    );
++    let mut resumed = false;
++    for _ in 0..sim::LAST_STAND_TURN + 80 {
++        let events = step(&mut app);
++        resumed |= events.iter().any(|e| matches!(e, sim::SimEvent::BuildingSold { player, building, .. } if *player == PlayerId(0) && *building == paused));
++        if resumed {
++            break;
++        }
++    }
++    assert!(
++        resumed,
++        "the genuine original building must resume ordinary sale after public native release; tick{} controller{:?} queue{:?} erasures{:?}",
++        app.world().resource::<SimTick>().0,
++        app.world()
++            .resource::<sim::AiPlayers>()
++            .controller(PlayerId(0)),
++        app.world().resource::<CommandQueue>(),
++        app.world().resource::<sim::SpecialState>().erasures
++    );
++}
++
++#[test]
++fn ra9_temporal_building_sale_waits_for_real_release() {
++    ra9_temporal_building_sale(false);
++}
++
++#[test]
++fn ra9_temporal_building_sale_uses_an_unblocked_alternative_then_resumes() {
++    ra9_temporal_building_sale(true);
++}

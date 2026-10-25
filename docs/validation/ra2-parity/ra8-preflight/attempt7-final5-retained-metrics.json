@@ -1,0 +1,193 @@
+{
+  "runtime_commit": "f431d122d1c147fdc948d21b55156aa0a7477cc1",
+  "scope": "retained exact regression cases, not either required R29 sweep",
+  "count": 26,
+  "median": 70289.0,
+  "p90_nearest_rank": 130029,
+  "max": 178737,
+  "command_seconds": 2038.0203182909754,
+  "cases": [
+    {
+      "phase": "exact-01-ra8_gate_demo_germany_great_britain_brutal_seed_zero_finishes",
+      "winner": 1,
+      "tick": 48090,
+      "command_seconds": 41.555767000012565,
+      "raw_sha": "16aa487a2320eebe09dbd104e4a31431c2ed0e6d088b947481f4f1b50282313c"
+    },
+    {
+      "phase": "exact-02-ra8_gate_demo_france_cuba_brutal_seed_zero_finishes",
+      "winner": 1,
+      "tick": 21472,
+      "command_seconds": 5.300554457993712,
+      "raw_sha": "cfd9acf025633133f151ec424c28d2046d716e6690f7eeeb14acc54cbf21b6c7"
+    },
+    {
+      "phase": "exact-03-ra8_gate_liberty_seed_zero_finishes",
+      "winner": 1,
+      "tick": 93123,
+      "command_seconds": 69.85548404199653,
+      "raw_sha": "2937f7e571698ce4b71b259cc948c4cddddedf45f336e48cbd3b63ea41d739cd"
+    },
+    {
+      "phase": "exact-04-ra8_gate_red_canyon_seed_zero_finishes",
+      "winner": 0,
+      "tick": 30796,
+      "command_seconds": 11.28105829199194,
+      "raw_sha": "e50aca9ce5dc25898ca10cf9fdef1d89320de6ac5852847d4a531bac888936f3"
+    },
+    {
+      "phase": "exact-05-ra8_gate_steel_harbor_seed_zero_finishes",
+      "winner": 0,
+      "tick": 82978,
+      "command_seconds": 153.9597312079859,
+      "raw_sha": "c5ba4bc925aee9a22055ab12ca0c1d04821ac3cb235971eb9ff589263b1b47e1"
+    },
+    {
+      "phase": "exact-06-ra8_gate_continental_stall_seed_zero_finishes",
+      "winner": 1,
+      "tick": 24703,
+      "command_seconds": 10.45485050001298,
+      "raw_sha": "ae8a6a501738d2d41538f8f663d240dafb4dd96bf697009e259c9236fa2cd85b"
+    },
+    {
+      "phase": "exact-07-ra8_gate_ember_seed_zero_finishes",
+      "winner": 0,
+      "tick": 31866,
+      "command_seconds": 29.51153529199655,
+      "raw_sha": "959f8aa88ff3efe04dedba7874b650e0d1e14564877278ee2e290323b3e93875"
+    },
+    {
+      "phase": "exact-08-ra8_gate_wheel_seed_zero_finishes",
+      "winner": 1,
+      "tick": 89011,
+      "command_seconds": 87.38324841600843,
+      "raw_sha": "f0c4f687deb9fda65fbd0f9328ae6dbd23974b1f3db96fce9aaaa975f2b5af54"
+    },
+    {
+      "phase": "exact-09-ra8_gate_continental_bridge_seed_zero_finishes",
+      "winner": 0,
+      "tick": 85402,
+      "command_seconds": 186.38372770798742,
+      "raw_sha": "1141915467eef629406396d829f530e2319ab802105c0dc216865e82fef2a0b9"
+    },
+    {
+      "phase": "exact-10-ra8_gate_glacier_bridge_seed_zero_finishes",
+      "winner": 0,
+      "tick": 64569,
+      "command_seconds": 73.77226908298326,
+      "raw_sha": "6107aae9ca801c088ba2b2ee163bb2f34d666577fe25564b7f8db91bdef421ea"
+    },
+    {
+      "phase": "exact-11-ra8_gate_harvest_bridge_seed_zero_finishes",
+      "winner": 0,
+      "tick": 36040,
+      "command_seconds": 112.46583375000046,
+      "raw_sha": "14858ac2ab8894d714a616f097ceca35ec2bb127771a8fb92f89fada089a59f9"
+    },
+    {
+      "phase": "exact-12-ra8_gate_steel_harbor_america_cuba_bridge_seed_zero_finishes",
+      "winner": 1,
+      "tick": 95282,
+      "command_seconds": 101.5903157920111,
+      "raw_sha": "9e86d92db680b0347f7c6b1c98f5eb5556e8ede7f455e96db6a0466708e59827"
+    },
+    {
+      "phase": "exact-13-ra8_gate_thousand_lakes_great_britain_america_seed_zero_finishes",
+      "winner": 1,
+      "tick": 129721,
+      "command_seconds": 54.12434254100663,
+      "raw_sha": "1b7179dfaca67193160cd12180c4c803a87b4dd5f1543e329213a13f936cdd3c"
+    },
+    {
+      "phase": "exact-14-ra8_gate_thousand_lakes_france_germany_seed_zero_finishes",
+      "winner": 0,
+      "tick": 70945,
+      "command_seconds": 62.13601991700125,
+      "raw_sha": "cb739b1d2e2d599f32d6c5611164f93376463d7313a40d449f9b2090e959a78e"
+    },
+    {
+      "phase": "exact-15-ra8_gate_liberty_iraq_america_brutal_seed_zero_finishes",
+      "winner": 0,
+      "tick": 150265,
+      "command_seconds": 219.37343416601652,
+      "raw_sha": "1be11c456e9b3ab4a70e0b6729a9d98adfbd91e58fce5b87a048ae6000832235"
+    },
+    {
+      "phase": "exact-16-ra8_gate_oasis_germany_great_britain_brutal_seed_zero_finishes",
+      "winner": 0,
+      "tick": 94465,
+      "command_seconds": 72.76344220800092,
+      "raw_sha": "2d58c86d46cf0a7e4c4e9047eee1df1f488643a0cb67ea53e37c5cd04ba7d91a"
+    },
+    {
+      "phase": "exact-17-ra8_gate_steel_france_germany_medium_seed_zero_finishes",
+      "winner": 0,
+      "tick": 47548,
+      "command_seconds": 31.23326279199682,
+      "raw_sha": "bb486547ee4e4e44d86c0d196abeb8c94dc58b01cf6fefc73799df87ad5928c4"
+    },
+    {
+      "phase": "exact-18-ra8_gate_frozen_cuba_germany_brutal_seed_zero_finishes",
+      "winner": 0,
+      "tick": 52151,
+      "command_seconds": 119.04427954097628,
+      "raw_sha": "113de87040b97a5021e2e292189b7af4b82a041f58f5575db05eda393a682d47"
+    },
+    {
+      "phase": "exact-19-ra8_gate_black_water_libya_america_brutal_seed_zero_finishes",
+      "winner": 0,
+      "tick": 49887,
+      "command_seconds": 85.00896504201228,
+      "raw_sha": "0fe19367227dd494992b475200ca7df8cc977124635f1c53a75b9a9ea685e8dc"
+    },
+    {
+      "phase": "exact-20-ra8_gate_black_water_korea_france_brutal_seed_zero_finishes",
+      "winner": 0,
+      "tick": 71867,
+      "command_seconds": 93.56262695899932,
+      "raw_sha": "ac68d1582b048c9e7de3431cfa1518e4abcfd08d4350e8bd7670414de2b37355"
+    },
+    {
+      "phase": "exact-21-ra8_gate_wheel_germany_great_britain_brutal_seed_zero_finishes",
+      "winner": 1,
+      "tick": 130029,
+      "command_seconds": 124.45984466699883,
+      "raw_sha": "9b9ece9a95a6d47b3b7f5a8a0a6f03c407f855b07370e302511431e7327c9095"
+    },
+    {
+      "phase": "exact-22-ra8_gate7_riverlands_iraq_cuba_easy_seed_zero_finishes",
+      "winner": 0,
+      "tick": 57601,
+      "command_seconds": 8.231479291978758,
+      "raw_sha": "bbde1868fa608993f4b0287f428dceb4510410d5d7908e1920194093c17685f2"
+    },
+    {
+      "phase": "exact-23-ra8_gate7_jungle_cuba_russia_easy_seed_zero_finishes",
+      "winner": 1,
+      "tick": 178737,
+      "command_seconds": 41.75421616699896,
+      "raw_sha": "485a7d807533b4de41e613416f7091b1f4708135d2a45823f43f73a90a6415c0"
+    },
+    {
+      "phase": "exact-24-ra8_gate7_pacific_cuba_great_britain_brutal_seed_zero_finishes",
+      "winner": 0,
+      "tick": 91199,
+      "command_seconds": 197.82022808300098,
+      "raw_sha": "af30388e75a482a14156a7329c4cf14f6c51a40308920e4d2f2903a5ff98e7a4"
+    },
+    {
+      "phase": "exact-25-ra8_gate7_lakes_russia_medium_libya_brutal_seed_zero_finishes",
+      "winner": 1,
+      "tick": 28392,
+      "command_seconds": 35.57214600002044,
+      "raw_sha": "fa11ff5e758adfca94c42b181018c2bb7c33d534d4f21336ad9f91f5c9fac308"
+    },
+    {
+      "phase": "exact-26-ra8_gate7_demo_russia_libya_easy_seed_zero_finishes",
+      "winner": 1,
+      "tick": 69633,
+      "command_seconds": 9.421655374986585,
+      "raw_sha": "b634696d1e0a255a094aac1b3ba342c00ba28ec7b8e6cf58f7e4e884d276bc7e"
+    }
+  ]
+}

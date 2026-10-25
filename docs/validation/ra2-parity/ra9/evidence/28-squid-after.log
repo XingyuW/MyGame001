@@ -1,0 +1,16 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5m 50s
+     Running tests/ra9_squid.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_squid-5da3f7a4c6c77206)
+
+running 1 test
+test ra9_attached_squid_host_actually_fires_at_another_hostile_target ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+     Running tests/ra9_squid_punch.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_squid_punch-171c010dd96ea689)
+
+running 1 test
+test ra9_stock_squid_punch_keeps_organic_targets_movement_and_has_no_legacy_stun ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+

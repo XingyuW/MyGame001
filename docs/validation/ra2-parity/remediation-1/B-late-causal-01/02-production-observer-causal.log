@@ -1,0 +1,20 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 21.26s
+     Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-cf20e94e4f55d858)
+
+running 1 test
+test ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner ... RA9 late twins: winner=PlayerId(0) outcome_tick=41738 steps=41739/72000 first_late_native_ticks=[Some(36392), None, Some(36567)] late_counts=[444, 0, 6] final_hash=78c81bd069fca660 trajectory_hash=5a8adabd01d20b05 candidate=("crossroads", ["america", "russia"], ["easy", "easy"], 0)
+
+thread 'ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner' (16570378) panicked at crates/game/tests/m6_production_matches.rs:700:13:
+missing late ProductionComplete after native tick36000
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 6 filtered out; finished in 227.97s
+
+error: test failed, to rerun pass `-p game --test m6_production_matches`

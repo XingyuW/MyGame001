@@ -3,6 +3,7 @@
 #[allow(dead_code)]
 mod gen_unit_sprites;
 #[path = "../src/presentation.rs"]
+#[allow(dead_code)]
 mod presentation;
 #[path = "../src/tileset_image.rs"]
 #[allow(dead_code)]
@@ -54,4 +55,47 @@ fn every_shipped_unit_facing_has_visible_material_preserving_team_paint() {
         }
     }
     assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+#[test]
+fn every_hd_unit_facing_and_building_has_team_accents() {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../assets/sprites/hd");
+    let mut world = World::new();
+    world.init_resource::<Assets<Image>>();
+    for category in ["units", "buildings"] {
+        for path in std::fs::read_dir(root.join(category)).unwrap() {
+            let path = path.unwrap().path();
+            let bytes = std::fs::read(&path).unwrap();
+            let (human, enemy) =
+                presentation::sprite_pair(&bytes, &mut world.resource_mut::<Assets<Image>>())
+                    .unwrap();
+            presentation::apply_team_colors(&mut world, 1, vec![(human.clone(), enemy.clone())]);
+            let images = world.resource::<Assets<Image>>();
+            let a = images.get(&human).unwrap();
+            let b = images.get(&enemy).unwrap();
+            let width = a.texture_descriptor.size.width as usize;
+            let frames = if category == "units" { 8 } else { 1 };
+            let mut accents = vec![0; frames];
+            for (index, (a, b)) in a
+                .data
+                .as_ref()
+                .unwrap()
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .zip(b.data.as_ref().unwrap().as_chunks::<4>().0.iter())
+                .enumerate()
+            {
+                assert_eq!(a[3], b[3], "alpha: {}", path.display());
+                if a[3] > 200 && a[..3] != b[..3] {
+                    accents[(index % width) / (width / frames)] += 1;
+                }
+            }
+            assert!(
+                accents.iter().all(|&n| n >= 32),
+                "{} lacks visible ownership: {accents:?}",
+                path.display()
+            );
+        }
+    }
 }

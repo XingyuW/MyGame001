@@ -1,0 +1,907 @@
+{
+  "utc": "2026-10-21T11:28:27.411204+00:00",
+  "status": "BOUNDED_COPY_FUNCTIONAL_LEASE_COMPLETED_ALL_OWNED_CARGO_NATIVE_GONE_CANONICAL_STILL_RA8_OWNED",
+  "scope": "FUNCTIONAL_OVERLAP_ONLY_NO_PERFORMANCE_CREDIT_NO_CANONICAL_FULL13_OR_FINAL_ACCEPTANCE",
+  "commands": [
+    {
+      "receipt": {
+        "path": "ra9-preliminary-logs/180-00.json",
+        "bytes": 114790,
+        "sha256": "49cb2b84a9939cafa3f9a244d2f3090a6306da268960759fb1ce59dca5e0d7cc"
+      },
+      "source_before_record": {
+        "path": "ra9-preliminary-logs/180-00-start.json",
+        "bytes": 114668,
+        "sha256": "13652abea12900e9763df50cdcd3af3d6ed74926729b5c4d3ae4a2e8c9b5c17f"
+      },
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_start_setup",
+        "--test",
+        "ra4_spawns",
+        "--test",
+        "ra7_orders",
+        "--no-run"
+      ],
+      "exit_code": 101,
+      "utc": "2026-10-21T11:02:48.141659+00:00",
+      "end_utc": "2026-10-21T11:04:02.466902+00:00",
+      "raw": {
+        "path": "ra9-preliminary-logs/180-00.log",
+        "bytes": 498,
+        "sha256": "3d1700c3b385b3f07d8352ae3ee94579c76ca0bf3af48609c326d5ecd3870873"
+      },
+      "actual_cargo_reported_executables": [],
+      "source_drift_during_command": [],
+      "scope": "COPY_ONLY_FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_ACCEPTANCE"
+    },
+    {
+      "receipt": {
+        "path": "ra9-preliminary-logs/181-00.json",
+        "bytes": 114788,
+        "sha256": "aef7a45fa306c20a5d63b2c668e800aa6de04077522e301de9194bb2ba8e5cef"
+      },
+      "source_before_record": {
+        "path": "ra9-preliminary-logs/181-00-start.json",
+        "bytes": 114668,
+        "sha256": "5b554091dfb026a83fc42a9f4b849d3eeaac2714d507bf0daa2a686623a0ab43"
+      },
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_start_setup",
+        "--test",
+        "ra4_spawns",
+        "--test",
+        "ra7_orders",
+        "--no-run"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-21T11:05:00.963768+00:00",
+      "end_utc": "2026-10-21T11:05:11.085260+00:00",
+      "raw": {
+        "path": "ra9-preliminary-logs/181-00.log",
+        "bytes": 577,
+        "sha256": "7e02dcf6c59e31eab00cedd93d804184f07f2041f3ecdd436d4712a1526bf30c"
+      },
+      "actual_cargo_reported_executables": [
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra4_spawns-cf8de36f92872323",
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra7_orders-0c2ad18108b8efad",
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_start_setup-1bc3829d3356eda6"
+      ],
+      "source_drift_during_command": [],
+      "scope": "COPY_ONLY_FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_ACCEPTANCE"
+    },
+    {
+      "receipt": {
+        "path": "ra9-preliminary-logs/181-01.json",
+        "bytes": 114854,
+        "sha256": "47809f0f0f5514aae6618b8959fdad25aa1cfdedfb46c5b18d4d5aa941292df3"
+      },
+      "source_before_record": {
+        "path": "ra9-preliminary-logs/181-01-start.json",
+        "bytes": 114733,
+        "sha256": "e67c48fa9aaf63f5a7ae13c0a0035e1fd91d6abde91a180e487d83b71f30b224"
+      },
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_start_setup",
+        "ra9_shipped_yard_starts_for_all_maps_two_to_ten_players_have_legal_occupancy_and_public_exits",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "utc": "2026-10-21T11:05:11.155446+00:00",
+      "end_utc": "2026-10-21T11:05:13.234920+00:00",
+      "raw": {
+        "path": "ra9-preliminary-logs/181-01.log",
+        "bytes": 944,
+        "sha256": "d73db2818a8d6a9ca6d4a301401f57ecf2d4dc1b3b3626e16459e1767955a29b"
+      },
+      "actual_cargo_reported_executables": [
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_start_setup-1bc3829d3356eda6"
+      ],
+      "source_drift_during_command": [],
+      "scope": "COPY_ONLY_FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_ACCEPTANCE"
+    },
+    {
+      "receipt": {
+        "path": "ra9-preliminary-logs/181-02.json",
+        "bytes": 114820,
+        "sha256": "2e255631ecbfad7f0cc826b08e2515bd5e89dbeea43f54ba6928592f62ca4bc3"
+      },
+      "source_before_record": {
+        "path": "ra9-preliminary-logs/181-02-start.json",
+        "bytes": 114701,
+        "sha256": "10200ead4e0dc32fae9d50d92fc5def588c6463b333c6419f1b8a249624eb9d1"
+      },
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra4_spawns",
+        "ra9_missile_replacement_has_exact_ready_and_next_launch_boundaries",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-21T11:05:13.300798+00:00",
+      "end_utc": "2026-10-21T11:05:15.380239+00:00",
+      "raw": {
+        "path": "ra9-preliminary-logs/181-02.log",
+        "bytes": 382,
+        "sha256": "c6b9a5b52e201061989c915461ac01e3837ca66a2cd4892342d5f249b5798eac"
+      },
+      "actual_cargo_reported_executables": [
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra4_spawns-cf8de36f92872323"
+      ],
+      "source_drift_during_command": [],
+      "scope": "COPY_ONLY_FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_ACCEPTANCE"
+    },
+    {
+      "receipt": {
+        "path": "ra9-preliminary-logs/181-03.json",
+        "bytes": 114822,
+        "sha256": "e83c3a5239c2c75c0d964eb6020c5c16471a36ee6496a49a4af295e0bd3ef2c4"
+      },
+      "source_before_record": {
+        "path": "ra9-preliminary-logs/181-03-start.json",
+        "bytes": 114703,
+        "sha256": "8948b301621b835b7aa7b0805c6aae71da0897db6e1b62356e3fd52eaa0a37f2"
+      },
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra4_spawns",
+        "ra9_returned_carrier_aircraft_rearms_at_the_exact_scheduled_boundary",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-21T11:05:15.450942+00:00",
+      "end_utc": "2026-10-21T11:05:17.528987+00:00",
+      "raw": {
+        "path": "ra9-preliminary-logs/181-03.log",
+        "bytes": 384,
+        "sha256": "57e8ec27ec2f69f8e05025e12aa57d5c022a0eebaa847371c613ad932c6e0f80"
+      },
+      "actual_cargo_reported_executables": [
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra4_spawns-cf8de36f92872323"
+      ],
+      "source_drift_during_command": [],
+      "scope": "COPY_ONLY_FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_ACCEPTANCE"
+    },
+    {
+      "receipt": {
+        "path": "ra9-preliminary-logs/181-04.json",
+        "bytes": 114834,
+        "sha256": "a4e5a56b250a12550d0d85d742efb1893fb01cb2f2b6807362b548fca0f02c27"
+      },
+      "source_before_record": {
+        "path": "ra9-preliminary-logs/181-04-start.json",
+        "bytes": 114712,
+        "sha256": "1e71bdf7ba10b2dd9a217071340b08e93ce310d851856b1306d861b4bd6cba8c"
+      },
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra7_orders",
+        "ra9_attack_move_combat_at_destination_emits_only_one_completion_for_one_order",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "utc": "2026-10-21T11:05:17.608118+00:00",
+      "end_utc": "2026-10-21T11:05:19.690015+00:00",
+      "raw": {
+        "path": "ra9-preliminary-logs/181-04.log",
+        "bytes": 1208,
+        "sha256": "ae4ea14cb3c885c84e34d400275cb0b9ea19e8bcd9e7e7fc241a9af07423c900"
+      },
+      "actual_cargo_reported_executables": [
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra7_orders-0c2ad18108b8efad"
+      ],
+      "source_drift_during_command": [],
+      "scope": "COPY_ONLY_FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_ACCEPTANCE"
+    },
+    {
+      "receipt": {
+        "path": "ra9-preliminary-logs/181-05.json",
+        "bytes": 114710,
+        "sha256": "56d340137330425c391ca558e6472cb0c42f7008925cc9c957e07e075f30c52a"
+      },
+      "source_before_record": {
+        "path": "ra9-preliminary-logs/181-05-start.json",
+        "bytes": 114588,
+        "sha256": "15d6dd7ce1eebb34af5cd90ff2138684ab9f0d1cab6442e512f7755d59f15a69"
+      },
+      "command": [
+        "cargo",
+        "run",
+        "--release",
+        "-p",
+        "sim",
+        "--example",
+        "ra9_catalogue"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-21T11:05:19.761157+00:00",
+      "end_utc": "2026-10-21T11:05:29.885006+00:00",
+      "raw": {
+        "path": "ra9-preliminary-logs/181-05.log",
+        "bytes": 35767,
+        "sha256": "a9576fbcf4077c7630e879c24bfddf61752cb87aaf8a032868d522740cd41798"
+      },
+      "actual_cargo_reported_executables": [
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples/ra9_catalogue"
+      ],
+      "source_drift_during_command": [],
+      "scope": "COPY_ONLY_FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_ACCEPTANCE"
+    },
+    {
+      "receipt": {
+        "path": "ra9-preliminary-logs/182-00.json",
+        "bytes": 114857,
+        "sha256": "e7711e9c9ac276812a314725988192ba4fd6daff02be8485d2900d0061f0c4f2"
+      },
+      "source_before_record": {
+        "path": "ra9-preliminary-logs/182-00-start.json",
+        "bytes": 114733,
+        "sha256": "171e0a541b4488e101180aead50deaa59eb9dbe8409741c1a0a0c1ba3c034f95"
+      },
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_start_setup",
+        "ra9_shipped_yard_starts_for_all_maps_two_to_ten_players_have_legal_occupancy_and_public_exits",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "utc": "2026-10-21T11:07:23.346230+00:00",
+      "end_utc": "2026-10-21T11:09:11.776001+00:00",
+      "raw": {
+        "path": "ra9-preliminary-logs/182-00.log",
+        "bytes": 1066,
+        "sha256": "3db39a9665e6427cb743ff417cd1cbc89ced69e1509c59a838c51dca661b0a7c"
+      },
+      "actual_cargo_reported_executables": [
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_start_setup-1bc3829d3356eda6"
+      ],
+      "source_drift_during_command": [],
+      "scope": "COPY_ONLY_FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_ACCEPTANCE"
+    },
+    {
+      "receipt": {
+        "path": "ra9-preliminary-logs/182-01.json",
+        "bytes": 114831,
+        "sha256": "3d6e1d7c9a426e19869fa3aaa73136205ca3bed70d559ba00a9f840ab40fdac0"
+      },
+      "source_before_record": {
+        "path": "ra9-preliminary-logs/182-01-start.json",
+        "bytes": 114712,
+        "sha256": "17901c36fe01689d7ce071da7f331f632c3b432aa4768e50da2167abda6f9e73"
+      },
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra7_orders",
+        "ra9_attack_move_combat_at_destination_emits_only_one_completion_for_one_order",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-21T11:09:11.845364+00:00",
+      "end_utc": "2026-10-21T11:09:17.978312+00:00",
+      "raw": {
+        "path": "ra9-preliminary-logs/182-01.log",
+        "bytes": 514,
+        "sha256": "7a2505a05d13bd3961b471f7e4aaa8040a72e9b5c8de4a2c921f0b1837e04ed0"
+      },
+      "actual_cargo_reported_executables": [
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra7_orders-0c2ad18108b8efad"
+      ],
+      "source_drift_during_command": [],
+      "scope": "COPY_ONLY_FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_ACCEPTANCE"
+    },
+    {
+      "receipt": {
+        "path": "ra9-preliminary-logs/183-00.json",
+        "bytes": 114857,
+        "sha256": "1fd7c97b7659af6b06216def62578b6169a7da8a179cca0161a727bcadda9c61"
+      },
+      "source_before_record": {
+        "path": "ra9-preliminary-logs/183-00-start.json",
+        "bytes": 114734,
+        "sha256": "caa8dae6035b627918a27c7767db95f835550c909f554f52594817d709dfa357"
+      },
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_start_setup",
+        "ra9_shipped_yard_starts_for_all_maps_two_to_ten_players_have_legal_occupancy_and_public_exits",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "utc": "2026-10-21T11:10:37.138260+00:00",
+      "end_utc": "2026-10-21T11:10:49.262106+00:00",
+      "raw": {
+        "path": "ra9-preliminary-logs/183-00.log",
+        "bytes": 1446,
+        "sha256": "44e0e61a07c376034b11773e10fcccc8b295422e9ccaee4d7ae9f187475e5e6b"
+      },
+      "actual_cargo_reported_executables": [
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_start_setup-1bc3829d3356eda6"
+      ],
+      "source_drift_during_command": [],
+      "scope": "COPY_ONLY_FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_ACCEPTANCE"
+    },
+    {
+      "receipt": {
+        "path": "ra9-preliminary-logs/184-00.json",
+        "bytes": 114857,
+        "sha256": "06595b9c602d337ae16b03443317c6bf0da5ad658caf406bb9cc51653858e946"
+      },
+      "source_before_record": {
+        "path": "ra9-preliminary-logs/184-00-start.json",
+        "bytes": 114734,
+        "sha256": "9f3bb2bd94dafbe952618e25cb935d6aeeefd315939085d1f76488f064906bd2"
+      },
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_start_setup",
+        "ra9_shipped_yard_starts_for_all_maps_two_to_ten_players_have_legal_occupancy_and_public_exits",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "utc": "2026-10-21T11:11:49.640165+00:00",
+      "end_utc": "2026-10-21T11:12:03.786254+00:00",
+      "raw": {
+        "path": "ra9-preliminary-logs/184-00.log",
+        "bytes": 1036,
+        "sha256": "27d9063d1b3e2f70b66b4199089cf4aa8dce59765189bb6543b110ba23658bac"
+      },
+      "actual_cargo_reported_executables": [
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_start_setup-1bc3829d3356eda6"
+      ],
+      "source_drift_during_command": [],
+      "scope": "COPY_ONLY_FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_ACCEPTANCE"
+    },
+    {
+      "receipt": {
+        "path": "ra9-preliminary-logs/185-00.json",
+        "bytes": 114854,
+        "sha256": "0690121fced6d6896728153d67cafab5e19b6735a9d213ce3d652d570afb2d78"
+      },
+      "source_before_record": {
+        "path": "ra9-preliminary-logs/185-00-start.json",
+        "bytes": 114734,
+        "sha256": "6cbdf2da8f964887f1f95ad3e6c5776ab6858bac4b52443d7d6e2418b731f9e0"
+      },
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_start_setup",
+        "ra9_shipped_yard_starts_for_all_maps_two_to_ten_players_have_legal_occupancy_and_public_exits",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-21T11:12:42.222744+00:00",
+      "end_utc": "2026-10-21T11:13:16.427210+00:00",
+      "raw": {
+        "path": "ra9-preliminary-logs/185-00.log",
+        "bytes": 617,
+        "sha256": "9d39ada88a741c075a31025a77e1313521e528f3ac8179ca6e1599ec21288c3b"
+      },
+      "actual_cargo_reported_executables": [
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_start_setup-1bc3829d3356eda6"
+      ],
+      "source_drift_during_command": [],
+      "scope": "COPY_ONLY_FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_ACCEPTANCE"
+    },
+    {
+      "receipt": {
+        "path": "ra9-preliminary-logs/186-00-positive.json",
+        "bytes": 115349,
+        "sha256": "7881ff8ce3a9608a7b68aa99d9246aea77f17bf6f6b76cf78504702deec4f1e1"
+      },
+      "source_before_record": {
+        "path": "ra9-preliminary-logs/186-00-positive-start.json",
+        "bytes": 114858,
+        "sha256": "efced834bce6d483453d03273a7bfbc6a16052fcc6eb5a5522bcd6f58f4890a2"
+      },
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": -15,
+      "utc": "2026-10-21T11:14:35.743802+00:00",
+      "end_utc": "2026-10-21T11:18:32.818656+00:00",
+      "raw": {
+        "path": "ra9-preliminary-logs/186-00-positive.log",
+        "bytes": 841,
+        "sha256": "19925f1aaa19f7a4ddff593cb785ae34d79a04a9fa1f2513ae815e815250931d"
+      },
+      "actual_cargo_reported_executables": [
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m6_production_matches-8ab180ddcd59ed04"
+      ],
+      "source_drift_during_command": [],
+      "scope": "FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_OR_ORIGINAL_ENGINE_ACCEPTANCE"
+    },
+    {
+      "receipt": {
+        "path": "ra9-preliminary-logs/187-00-positive.json",
+        "bytes": 115364,
+        "sha256": "c7e4f8b3ed474f1f61f1a7a2903a32092d883ff05d1a76ae3ba13a1d4727393c"
+      },
+      "source_before_record": {
+        "path": "ra9-preliminary-logs/187-00-positive-start.json",
+        "bytes": 114875,
+        "sha256": "8789968f858739ece8abd8c235468b703af64229f4abfe962123ad23a9ca3e44"
+      },
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-21T11:18:52.785087+00:00",
+      "end_utc": "2026-10-21T11:23:25.761798+00:00",
+      "raw": {
+        "path": "ra9-preliminary-logs/187-00-positive.log",
+        "bytes": 941,
+        "sha256": "bb46d8479d4bb38ceb22178e312611adf3e537951389fb4976f1c4506158cafc"
+      },
+      "actual_cargo_reported_executables": [
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-cf20e94e4f55d858"
+      ],
+      "source_drift_during_command": [],
+      "scope": "FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_OR_ORIGINAL_ENGINE_ACCEPTANCE"
+    },
+    {
+      "receipt": {
+        "path": "ra9-preliminary-logs/187-01-rng-causal.json",
+        "bytes": 115372,
+        "sha256": "7905213791011cec62e5b5888b6c23b440f9f9f8a563da53e68754e45c7c7bbb"
+      },
+      "source_before_record": {
+        "path": "ra9-preliminary-logs/187-01-rng-causal-start.json",
+        "bytes": 114877,
+        "sha256": "816315ca2869a2580749631dbd6c916e7e40a3108e13f5a90c91ef0f7e4007f8"
+      },
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 101,
+      "utc": "2026-10-21T11:23:25.841795+00:00",
+      "end_utc": "2026-10-21T11:24:26.215750+00:00",
+      "raw": {
+        "path": "ra9-preliminary-logs/187-01-rng-causal.log",
+        "bytes": 1081,
+        "sha256": "06db6b850e3e87f9463eea78cf07cf2598bf4d897364c3c1261a277136008e14"
+      },
+      "actual_cargo_reported_executables": [
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-cf20e94e4f55d858"
+      ],
+      "source_drift_during_command": [],
+      "scope": "FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_OR_ORIGINAL_ENGINE_ACCEPTANCE"
+    },
+    {
+      "receipt": {
+        "path": "ra9-preliminary-logs/187-02-production-observer-causal.json",
+        "bytes": 115420,
+        "sha256": "f2ad17147e5a44b12eab606be3e54f2886292e1c807a77b19cf2c003c5b1e339"
+      },
+      "source_before_record": {
+        "path": "ra9-preliminary-logs/187-02-production-observer-causal-start.json",
+        "bytes": 114893,
+        "sha256": "2cb34a451590d6fdd37bd7d8304cecb36ade7b8b652ca4eeeebcca0cbea3f2ea"
+      },
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 101,
+      "utc": "2026-10-21T11:24:26.299362+00:00",
+      "end_utc": "2026-10-21T11:25:36.720540+00:00",
+      "raw": {
+        "path": "ra9-preliminary-logs/187-02-production-observer-causal.log",
+        "bytes": 1275,
+        "sha256": "810b45378a6b8ef21e78e548bd52994ee6c44e5296229a3521c948b40b2f7769"
+      },
+      "actual_cargo_reported_executables": [
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-cf20e94e4f55d858"
+      ],
+      "source_drift_during_command": [],
+      "scope": "FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_OR_ORIGINAL_ENGINE_ACCEPTANCE"
+    },
+    {
+      "receipt": {
+        "path": "ra9-preliminary-logs/187-03-restored-positive.json",
+        "bytes": 115390,
+        "sha256": "7f9d93fd74752dd9857cfc9c07feb62a4a6edb22728bf08bfa04ef78762a4342"
+      },
+      "source_before_record": {
+        "path": "ra9-preliminary-logs/187-03-restored-positive-start.json",
+        "bytes": 114884,
+        "sha256": "d1f571fe23f7937c1df7bfc8f4b1753ef525ebd8208f4f03c4d213c1cca91fe7"
+      },
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-21T11:25:36.799132+00:00",
+      "end_utc": "2026-10-21T11:26:47.208851+00:00",
+      "raw": {
+        "path": "ra9-preliminary-logs/187-03-restored-positive.log",
+        "bytes": 820,
+        "sha256": "679a3ddf187a6e4a1aa559c06d1765085ad16ebe80e623d3e65abcc1f80bd746"
+      },
+      "actual_cargo_reported_executables": [
+        "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-cf20e94e4f55d858"
+      ],
+      "source_drift_during_command": [],
+      "scope": "FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_OR_ORIGINAL_ENGINE_ACCEPTANCE"
+    }
+  ],
+  "command_exit_census": {
+    "101": 8,
+    "0": 8,
+    "-15": 1
+  },
+  "actual_cargo_reported_executable_paths": {
+    "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra4_spawns-cf8de36f92872323": [
+      {
+        "receipt": "ra9-preliminary-logs/181-00.json",
+        "cargo_line": "Executable tests/ra4_spawns.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra4_spawns-cf8de36f92872323)"
+      },
+      {
+        "receipt": "ra9-preliminary-logs/181-02.json",
+        "cargo_line": "Running tests/ra4_spawns.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra4_spawns-cf8de36f92872323)"
+      },
+      {
+        "receipt": "ra9-preliminary-logs/181-03.json",
+        "cargo_line": "Running tests/ra4_spawns.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra4_spawns-cf8de36f92872323)"
+      }
+    ],
+    "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra7_orders-0c2ad18108b8efad": [
+      {
+        "receipt": "ra9-preliminary-logs/181-00.json",
+        "cargo_line": "Executable tests/ra7_orders.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra7_orders-0c2ad18108b8efad)"
+      },
+      {
+        "receipt": "ra9-preliminary-logs/181-04.json",
+        "cargo_line": "Running tests/ra7_orders.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra7_orders-0c2ad18108b8efad)"
+      },
+      {
+        "receipt": "ra9-preliminary-logs/182-01.json",
+        "cargo_line": "Running tests/ra7_orders.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra7_orders-0c2ad18108b8efad)"
+      }
+    ],
+    "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_start_setup-1bc3829d3356eda6": [
+      {
+        "receipt": "ra9-preliminary-logs/181-00.json",
+        "cargo_line": "Executable tests/ra9_start_setup.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_start_setup-1bc3829d3356eda6)"
+      },
+      {
+        "receipt": "ra9-preliminary-logs/181-01.json",
+        "cargo_line": "Running tests/ra9_start_setup.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_start_setup-1bc3829d3356eda6)"
+      },
+      {
+        "receipt": "ra9-preliminary-logs/182-00.json",
+        "cargo_line": "Running tests/ra9_start_setup.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_start_setup-1bc3829d3356eda6)"
+      },
+      {
+        "receipt": "ra9-preliminary-logs/183-00.json",
+        "cargo_line": "Running tests/ra9_start_setup.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_start_setup-1bc3829d3356eda6)"
+      },
+      {
+        "receipt": "ra9-preliminary-logs/184-00.json",
+        "cargo_line": "Running tests/ra9_start_setup.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_start_setup-1bc3829d3356eda6)"
+      },
+      {
+        "receipt": "ra9-preliminary-logs/185-00.json",
+        "cargo_line": "Running tests/ra9_start_setup.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_start_setup-1bc3829d3356eda6)"
+      }
+    ],
+    "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples/ra9_catalogue": [
+      {
+        "receipt": "ra9-preliminary-logs/181-05.json",
+        "cargo_line": "Running `/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples/ra9_catalogue`"
+      }
+    ],
+    "/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m6_production_matches-8ab180ddcd59ed04": [
+      {
+        "receipt": "ra9-preliminary-logs/186-00-positive.json",
+        "cargo_line": "Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m6_production_matches-8ab180ddcd59ed04)"
+      }
+    ],
+    "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-cf20e94e4f55d858": [
+      {
+        "receipt": "ra9-preliminary-logs/187-00-positive.json",
+        "cargo_line": "Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-cf20e94e4f55d858)"
+      },
+      {
+        "receipt": "ra9-preliminary-logs/187-01-rng-causal.json",
+        "cargo_line": "Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-cf20e94e4f55d858)"
+      },
+      {
+        "receipt": "ra9-preliminary-logs/187-02-production-observer-causal.json",
+        "cargo_line": "Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-cf20e94e4f55d858)"
+      },
+      {
+        "receipt": "ra9-preliminary-logs/187-03-restored-positive.json",
+        "cargo_line": "Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-cf20e94e4f55d858)"
+      }
+    ]
+  },
+  "shared_target_qualification": "Paths come from exact Cargo raw output for each actual command. They identify the copy executable path at that run, not an immutable identity of mutable shared Cargo artifacts or canonical gate binaries. No unrelated/canonical process was stopped.",
+  "186_correction": "Interrupted debug attempt after native selected case launch (raw contains Running); exit-15/no completed test result. Earlier compilation-only/unrun shorthand is superseded. Original raw/receipt/profile-stop preserved.",
+  "focused_results": {
+    "timers": "181 exact missile and real returned-carrier rearm eachPASS1/0; broad old tests and documented27spacing retained. Not all original flight/lost-carrier timing fidelity.",
+    "attackmove": "181 real duplicate FAIL2completions vs1 around actual shot/death;182 samebodyPASS1/0 after minimal settled-destination correction in combat.rs.",
+    "yard": "181/182/183 arbitrary detour diagnostics and184neutral-building census failure preserved;185PASS1/0 actual21maps/344supportedsetting/countscenarios with occupancy/real public exits and unchanged256bound.",
+    "catalogue": "181 actual loaderPASS,54units/46buildings/116weapons/61warheads/11armours/9countries/21maps/11rawplans/3difficulties.",
+    "late": "187positivePASS1/0 and restoredpositivePASS1/0 bothP0Won41738/72000 late444/8/6 final78c81bd069fca660 trajectory5a8adabd01d20b05. RNG36001 and observer-only production omission each intendedFAIL101 with exact diagnostic. No fabricated all-pass total."
+  },
+  "late_final_restoration_sha256": "e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d",
+  "immediate_and_separate_later_restoration_reads": "See each187 individual receipt; all original e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d",
+  "source_guard_unplanned_drift": [],
+  "authority64_drift": [],
+  "recorded_last_owned_process_groups": [
+    {
+      "record": "ra9-preliminary-logs/180-current-process.json",
+      "pid": 62386,
+      "pgid": 62386,
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_start_setup",
+        "--test",
+        "ra4_spawns",
+        "--test",
+        "ra7_orders",
+        "--no-run"
+      ]
+    },
+    {
+      "record": "ra9-preliminary-logs/181-current-process.json",
+      "pid": 62772,
+      "pgid": 62772,
+      "command": [
+        "cargo",
+        "run",
+        "--release",
+        "-p",
+        "sim",
+        "--example",
+        "ra9_catalogue"
+      ]
+    },
+    {
+      "record": "ra9-preliminary-logs/182-current-process.json",
+      "pid": 63256,
+      "pgid": 63256,
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra7_orders",
+        "ra9_attack_move_combat_at_destination_emits_only_one_completion_for_one_order",
+        "--",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "record": "ra9-preliminary-logs/183-current-process.json",
+      "pid": 63466,
+      "pgid": 63466,
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_start_setup",
+        "ra9_shipped_yard_starts_for_all_maps_two_to_ten_players_have_legal_occupancy_and_public_exits",
+        "--",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "record": "ra9-preliminary-logs/184-current-process.json",
+      "pid": 63616,
+      "pgid": 63616,
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_start_setup",
+        "ra9_shipped_yard_starts_for_all_maps_two_to_ten_players_have_legal_occupancy_and_public_exits",
+        "--",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "record": "ra9-preliminary-logs/185-current-process.json",
+      "pid": 63767,
+      "pgid": 63767,
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_start_setup",
+        "ra9_shipped_yard_starts_for_all_maps_two_to_ten_players_have_legal_occupancy_and_public_exits",
+        "--",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "record": "ra9-preliminary-logs/186-current-process.json",
+      "pid": 64010,
+      "pgid": 64010,
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ]
+    },
+    {
+      "record": "ra9-preliminary-logs/187-current-process.json",
+      "pid": 65184,
+      "pgid": 65184,
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ]
+    }
+  ],
+  "remaining_known_owned_group_entries": [],
+  "remaining_exact_selected_cargo_native_processes": [],
+  "canonical_phase04_still_open": true,
+  "next": "STOP_COPY_NATIVE. Canonical actual release/import/root factual metadata binding/freeze and mandatory isolated5+full13 remain owed. Existing ordinary copy/preimages/logs and configured caches retained; no new substantial external directory."
+}

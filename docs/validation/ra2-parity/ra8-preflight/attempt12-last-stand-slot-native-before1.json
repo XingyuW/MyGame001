@@ -1,0 +1,39 @@
+{
+  "label": "attempt12-last-stand-slot-native-before1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_opted_in_last_stand_services_a_native_remnant_within_one_existing_period",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "start_utc": "2026-10-19T20:59:57.276278+00:00",
+  "elapsed_seconds": 8.702594625006896,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "323f97d83614232db3d1d619d54847b885c1f0635d55382bc8804d95bb998ef9",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "bc5e2c071410f3f9f64a2bdc44f64db7d2bc8a59b25c726b0d297f04779ac1e8",
+    "crates/game/tests/ra8_gate_matches.rs": "743c78d3ba344d0690cbb595c720c0910be78e69b276197799bbfc99e41af6c0",
+    "crates/sim/tests/ra8_ai.rs": "2d526c088c0b9ceb6ebcf99578162e37cdf06b2c024ca0b19d64103d15ee58b0"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "323f97d83614232db3d1d619d54847b885c1f0635d55382bc8804d95bb998ef9",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "bc5e2c071410f3f9f64a2bdc44f64db7d2bc8a59b25c726b0d297f04779ac1e8",
+    "crates/game/tests/ra8_gate_matches.rs": "743c78d3ba344d0690cbb595c720c0910be78e69b276197799bbfc99e41af6c0",
+    "crates/sim/tests/ra8_ai.rs": "2d526c088c0b9ceb6ebcf99578162e37cdf06b2c024ca0b19d64103d15ee58b0"
+  },
+  "log_sha256": "2a777b386a989a0d72ce4b7b7b7b9c7b894b0dba4d074acdd86d4d6463bd2d5f"
+}

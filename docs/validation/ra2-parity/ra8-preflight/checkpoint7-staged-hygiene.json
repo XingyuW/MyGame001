@@ -1,0 +1,737 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit": 2,
+  "stdout": "docs/validation/ra2-parity/ra8-preflight/attempt6-air-bonus-after1.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-air-bonus-after2.log:8: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-air-bonus-before1.log:6: trailing whitespace.\n+test ra8_a_defender_already_inside_its_source_air_bonus_range_remains_eligible ... \ndocs/validation/ra2-parity/ra8-preflight/attempt6-artillery-focus1.log:5: trailing whitespace.\n+test ra8_artillery_uses_the_surface_tank_line_when_aircraft_share_its_wave ... \ndocs/validation/ra2-parity/ra8-preflight/attempt6-artillery-focus2.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-artillery-subset1.log:8: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-defence-isolated-before2.log:15: trailing whitespace.\n+test ra8_land_defenders_use_reachable_firing_positions_and_leave_isolated_ships_to_the_fleet ... \ndocs/validation/ra2-parity/ra8-preflight/attempt6-defence-isolated-before3.log:15: trailing whitespace.\n+test ra8_land_defenders_use_reachable_firing_positions_and_leave_isolated_ships_to_the_fleet ... \ndocs/validation/ra2-parity/ra8-preflight/attempt6-defence-reserved-after1.log:8: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-defence-reserved-after3.log:8: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-defence-reserved-before1.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-defence-reserved-before2.log:6: trailing whitespace.\n+test ra8_a_specialist_repair_reservation_removes_the_overlapping_defence_attack ... \ndocs/validation/ra2-parity/ra8-preflight/attempt6-defence-shore-after1.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-defence-shore-after2.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-defence-shore-after4.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-defence-shore-before1.log:6: trailing whitespace.\n+test ra8_land_defenders_use_reachable_firing_positions_and_leave_isolated_ships_to_the_fleet ... \ndocs/validation/ra2-parity/ra8-preflight/attempt6-demo-france-cuba-defence2.log:11: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-demo-france-cuba-focus1.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-demo-germany-britain-repair1.log:11: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-demo-subset-all1.log:50: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-escorted-strike-after1.log:10: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-01.log:225: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-02.log:49: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-03.log:13: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-04.log:10: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-05.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-06.log:8: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-07.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-08.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-focus-ownership-after1.log:8: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-focus-ownership-after2.log:8: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-focus-ownership-before1.log:6: trailing whitespace.\n+test ra8_a_resumed_strike_focus_preserves_its_healthy_chase_across_controller_turns ... \ndocs/validation/ra2-parity/ra8-preflight/attempt6-fulltree-sw-after2.log:11: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-futile-repair-after1.log:10: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-futile-repair-before1.log:6: trailing whitespace.\n+test ra8_futile_paid_building_repairs_do_not_renew_a_helpless_last_stand_forever ... \ndocs/validation/ra2-parity/ra8-preflight/attempt6-game-units2.log:226: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-game-units3.log:225: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-game4-01.log:225: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-game4-03.log:13: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-game4-04.log:10: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-game4-05.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-game4-06.log:8: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-game4-07.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-game4-08.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-lakes-france-germany-focus1.log:289: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-last-stand-repair1.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-liberty-iraq-america-final-snapshot.txt:131: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-liberty-iraq-america-subset1.log:179: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-local-strike-after2.log:8: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-local-strike-after3.log:8: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-local-strike-after4.log:8: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-local-strike-before1.log:6: trailing whitespace.\n+test ra8_a_local_eligible_air_threat_keeps_real_en_route_strike_combat ... \ndocs/validation/ra2-parity/ra8-preflight/attempt6-local-strike-before2.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-local-subset1.log:8: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-locked-lane-after1.log:6: trailing whitespace.\n+test ra8_a_locked_late_tech_item_leaves_its_lane_for_a_legal_early_defence ... \ndocs/validation/ra2-parity/ra8-preflight/attempt6-locked-lane-after2.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-locked-lane-before1.log:6: trailing whitespace.\n+test ra8_a_locked_late_tech_item_leaves_its_lane_for_a_legal_early_defence ... \ndocs/validation/ra2-parity/ra8-preflight/attempt6-locked-lane3.log:11: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-m0-after1.log:6: trailing whitespace.\n+test conflicting_unordered_systems_are_a_schedule_build_error - should panic ... \ndocs/validation/ra2-parity/ra8-preflight/attempt6-m0-after1.log:27: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-m2-after1.log:45: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-original-lanes-after2.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-ownership-subset1.log:8: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-paid-repairs-after1.log:8: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-ra4-repair1.log:10: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-reload-strengthened1.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-reload-strengthened2.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-reload-subset1.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-remote-strike-after2.log:10: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-remote-strike-after3.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-remote-strike-after4.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-remote-subset1.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-retained-all7.log:2151: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-shipped-lanes3.log:17: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-sim-all3.log:1377: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-sim-all5.log:1383: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-sim-all6.log:1385: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-sim-all7.log:1386: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/attempt6-useful-repair-after1.log:5: trailing whitespace.\n+test ra8_income_production_and_a_usable_force_keep_useful_building_repairs ... \ndocs/validation/ra2-parity/ra8-preflight/attempt6-useful-repair-after2.log:9: new blank line at EOF.\n",
+  "stderr": "",
+  "stdout_sha256": "be046cb06220eec38ad474775eee4e91d2d8a401551e8b2b38297137f071d1b5",
+  "diagnostics": [
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-air-bonus-after1.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "0aa34b75c922619df96cda3fe94623809cddca5ae9044f2655dc1a2fb71efbf7",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-air-bonus-after2.log",
+      "line": 8,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "b17ea3a90dc44da592e5496663b96c3a6429e9d63720230a176aa0879e3a27a8",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-air-bonus-before1.log",
+      "line": 6,
+      "reason": "trailing whitespace.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "be85ad0e173a4439d4fd7ae3728f78967c85ccc0d8d254d4515577a539a761a9",
+      "line_sha256": "5e8a5298826e9cf2f323de26a799de2979ead38d7bc7ee8bdc45a966dc786926",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-artillery-focus1.log",
+      "line": 5,
+      "reason": "trailing whitespace.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "1369dc38fce94803ab109cc5608be0718838e197f1a0f2d10360db05dbeaa810",
+      "line_sha256": "5769d8855796c07185a68614f91bbd770df8a9d2494e62a9ab2b694709eca071",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-artillery-focus2.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "73e815126f9fa6fcf9073c813a2c19ca737f9fcd150f51e76f7ef65c60840139",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-artillery-subset1.log",
+      "line": 8,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "49ccbf9cac6271b5159028b091f2b8e9c5427f2e9dd79079060a009234dd8f19",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-defence-isolated-before2.log",
+      "line": 15,
+      "reason": "trailing whitespace.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "6822ccd7c67477de136b7b9cf951478c656f8f451cfcb03cd04e0676845827d6",
+      "line_sha256": "10a757471fb1b10d42a446fa07f224694722e2f9fbe63604fac5428479b96f62",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-defence-isolated-before3.log",
+      "line": 15,
+      "reason": "trailing whitespace.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "5b04b3fe8bd766c9dfb297a07ff30ca0bd7611fd73656a4efecb03aa62d99751",
+      "line_sha256": "10a757471fb1b10d42a446fa07f224694722e2f9fbe63604fac5428479b96f62",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-defence-reserved-after1.log",
+      "line": 8,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "cccae72273b793e73421d1b54fbbd9386e7bb94d8d1911f7b09aab44393622d5",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-defence-reserved-after3.log",
+      "line": 8,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "39c12b7fde3c9b95cff03039d3cfc5a02c3c82b401c630d6670aeadff15e3e9c",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-defence-reserved-before1.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "61c2de36060ca85237b5036d760315eba295b2487813c0f13d2ecb6ea22b4f61",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-defence-reserved-before2.log",
+      "line": 6,
+      "reason": "trailing whitespace.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "e1354389402f154722b509e018d331cf1ed2e6f7e78d1c0fcb995b70aebf6290",
+      "line_sha256": "545e14f6cec0be50717b32fec2de615abdbb0c7fbd88c7629942a1e590b9aafa",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-defence-shore-after1.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "679c7a4177b40d692013ad58d9e50ba98b4e4df0de6c19e8c5c6528770dfe823",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-defence-shore-after2.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "d81020a9b591b8bea59dac495172e21f001b1daf1a2704f04b6c18609f8a60b7",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-defence-shore-after4.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "1e49dc244170657b5936c59df707d1fab4baa93247203f0cfc769299066eeb6a",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-defence-shore-before1.log",
+      "line": 6,
+      "reason": "trailing whitespace.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "1fae55509f435fbdbc16077b6a7edcd77edd912e2e7db6a2a239dc3d935b295d",
+      "line_sha256": "10a757471fb1b10d42a446fa07f224694722e2f9fbe63604fac5428479b96f62",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-demo-france-cuba-defence2.log",
+      "line": 11,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "43aac5972458553b1e9ec8493702d66891d16b331a25004cae23c53ee1aa48b7",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-demo-france-cuba-focus1.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "99a4773130c1e0466ad81da9254fadedd8e7cbf020a6a5f92f7d53d4c7b88e2a",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-demo-germany-britain-repair1.log",
+      "line": 11,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "5a8882d0fc22005160a4bac929961711620515f76e930ba75a493c91eb34f068",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-demo-subset-all1.log",
+      "line": 50,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "48d289bab4e1ef3c3552d9b727c791ffbe250ede67d639ec70739bf4e86def52",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-escorted-strike-after1.log",
+      "line": 10,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "f261820049ee44547e4393fb8605f7f306bf327b5dc885bbf352558ccd6a5734",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-01.log",
+      "line": 225,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "e41668f01d9f3dec381cf7e6f7b1dd917ce3ae97c19e0519ee36016bfedf6dde",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-02.log",
+      "line": 49,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "06fc5f86166a39d7f8d1fa3c5e2fcb961d5b1e2a6f5d58fafe5802ab03ade35f",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-03.log",
+      "line": 13,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "25143933ef8f110ebaca9c54aab42ec259c0258762283f37457cd4d42bfe790c",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-04.log",
+      "line": 10,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "6cc03d9c8e09952952f271b9ba1277b9338623eecc7f676938e3ce1324ec1fda",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-05.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "72c5531415ad8fd4a06265e0391552f7029b905a4ca36b3c110727a7f5b86026",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-06.log",
+      "line": 8,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "b3ae99b7ca25e3a2f039df6654bf9b6a33810f077130199d47ca358612f1b591",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-07.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "952a64230a242755b2c376e78e41406a928933fe208b18f8af12619f88607e12",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-08.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "e8b4377ce03da3c0f850e636fbdd4c4974982d7b61df056ffc9863a2ec7f3c6b",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-focus-ownership-after1.log",
+      "line": 8,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "2d1f6bcebdd674f6597433e71039597ed80da04aaf526c31509d2ffc3aa434b2",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-focus-ownership-after2.log",
+      "line": 8,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "9e146f02ec492b47abb44193aa1d244c1a8aef94395c5cfed78bd8d5e36775e8",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-focus-ownership-before1.log",
+      "line": 6,
+      "reason": "trailing whitespace.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "d6384730f12b0494f9257e5ad1abc78a11b6904374cd50792b76664e5176dd2b",
+      "line_sha256": "5f3a274190bb4eae8fa1553a2a2caed59b91299f7b07ebad2c020fbb3f5b2a43",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-fulltree-sw-after2.log",
+      "line": 11,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "6d8edef763a62fecd87b7bcf0bc27669ac5207f410cb15016a755c162bb4c552",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-futile-repair-after1.log",
+      "line": 10,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "8b37c97fcc08f60029cf50707d52ee7db4baa1c3665659da66db4fa97f64a409",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-futile-repair-before1.log",
+      "line": 6,
+      "reason": "trailing whitespace.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "eae3c2edc96430826b423815f7915461ab34fee4504de39bc050440108ec69d7",
+      "line_sha256": "c4e4433326a9e846088a3f590522f6ebbf4629339c94499cdc5484392078b416",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-game-units2.log",
+      "line": 226,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "7dc6a99590821e26fb10534dde27cebfdec870c85a1ef60f50623a21b03606bd",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-game-units3.log",
+      "line": 225,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "f60c18a4f0e95d9076dc38cfccd304a1a624dbd12bf8feb8e4e810caa023ec9d",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-game4-01.log",
+      "line": 225,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "a13a58272807e702f2a47876d88685b27e64c7fe330b8727d152ab6d6ca106cb",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-game4-03.log",
+      "line": 13,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "1d66e446bb61dc6ed09c373b7a3a8bc31bdcb54159a79578c25b7f1164dd0227",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-game4-04.log",
+      "line": 10,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "ddac387d2a354c21ccc11e659377c60126c63eb21cca4a91af1fd5889c82da0d",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-game4-05.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "e2a7d10ee323d0d8dd9aa1978bbdc2e52f1584663fb134e91c0f56ee17252ddd",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-game4-06.log",
+      "line": 8,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "fcb1e7e651edac1aa956d3744e517f047be06312c64de3590072338c9beb3074",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-game4-07.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "b28fa202000887dbd70531600bd2158fa7a4b43c8a2bb0296900936e60a5cbe7",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-game4-08.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "5447e8c144b6d702c52745b5f1f942a2c2063fdec2afae49643786a10e3b6fb3",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-lakes-france-germany-focus1.log",
+      "line": 289,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "e3c7ef0cea2afcb32eff55f2d2cd1c10963a072aa87c90de1de4f0ad084aac14",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-last-stand-repair1.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "16f12b18fad8a80cf60adc232f3a1ed1bd45811664f5a6bc9f07c6ed2fd9ddcc",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-liberty-iraq-america-final-snapshot.txt",
+      "line": 131,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "a5a0f337e6130ad51e34efe5bfaa27981c02dc81cb531793f7486fe7285f841a",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-liberty-iraq-america-subset1.log",
+      "line": 179,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "7b9b628f3f1bf35c7e4b158b4637b918a743db2587c461071ca848b6006ce25e",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-local-strike-after2.log",
+      "line": 8,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "94063b65ee219cb24560431de1041d1090ac6da3c17b86a88547c62cd0aa4baa",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-local-strike-after3.log",
+      "line": 8,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "b600eec2e0bc549df5798f86d8e16580723171280ab897dd013dec68992ba807",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-local-strike-after4.log",
+      "line": 8,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "b600eec2e0bc549df5798f86d8e16580723171280ab897dd013dec68992ba807",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-local-strike-before1.log",
+      "line": 6,
+      "reason": "trailing whitespace.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "7a8936eb96d3a38b43f08fe0f7ae72564827fcebb1a0731abb8ddc698356d4cb",
+      "line_sha256": "3736f6df00f9e273c119e915bae25972e2af47cca85676e841d08681f7724e9e",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-local-strike-before2.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "06d5fe431831b84c97fd5be4976dd66abf574dd9ae47bfa94f9204dff339e3ba",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-local-subset1.log",
+      "line": 8,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "a3671004b373a3b980fc7e90f8f60bdf15369c305235103b82d5cdcaa4073828",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-locked-lane-after1.log",
+      "line": 6,
+      "reason": "trailing whitespace.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "b3821afb2a598a65df1e76facb8c3a50bce56371e83f127466af9db496222c6d",
+      "line_sha256": "96c9666dfb7f24e5a4cd674833f5a4f792810517f3aef696f024e397b17e10f3",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-locked-lane-after2.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "615d8f13ae03c933a7d19f7e30259cd5c92e01b56613550077d48c0352d84595",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-locked-lane-before1.log",
+      "line": 6,
+      "reason": "trailing whitespace.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "e8e56e2e31d8f913b7f76404b0a5a33d5353ad9f632f44c70cbf9590684746c4",
+      "line_sha256": "96c9666dfb7f24e5a4cd674833f5a4f792810517f3aef696f024e397b17e10f3",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-locked-lane3.log",
+      "line": 11,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "40660855ae97d56ca9b1b671eaf0c8bb29e2ee5929903af72f2f3b66e2940a0e",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-m0-after1.log",
+      "line": 6,
+      "reason": "trailing whitespace.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "104b53209eeb6f73c6241d9f3bb38334bfa1b4413d0603858d5e494195f98932",
+      "line_sha256": "3e0c7928a26274ec77de0d107fbec939a86842669f8c6c865af7e209a7ccb76c",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-m0-after1.log",
+      "line": 27,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "104b53209eeb6f73c6241d9f3bb38334bfa1b4413d0603858d5e494195f98932",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-m2-after1.log",
+      "line": 45,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "a68a9caa390007a979f2eccb6fc1264ef8408f9d6bd4a78ee558fc8d260099e1",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-original-lanes-after2.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "79afb978f7ccab193a3f35547ce3a037cdcd64302e73da6ef2c322ad299fd1ea",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-ownership-subset1.log",
+      "line": 8,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "2e74d8a6d9a17e2710e3637ef132c8b48c537a05972262705ab1bb9003634505",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-paid-repairs-after1.log",
+      "line": 8,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "2323380e0328cc2c44169370bcfa25d64a23e2df37cf4cb4fb295c42f1606452",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-ra4-repair1.log",
+      "line": 10,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "7d22897a6629b8de331d38240af19cbee8ead608d6065b0241db31c664db7a36",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-reload-strengthened1.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "2981b2e535bd9c7ea6a277fd4d60dcbce0bf9387af49ab2d1f9f98845fec1d8c",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-reload-strengthened2.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "2981b2e535bd9c7ea6a277fd4d60dcbce0bf9387af49ab2d1f9f98845fec1d8c",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-reload-subset1.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "ef852963b2be8dc50d819e545a60cfa988852f4a7e1dc9ffc9d2f6f0cdb5f46d",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-remote-strike-after2.log",
+      "line": 10,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "ed9fd210f622f70e440488425adf523112c7b1f8231a3f387942761c0a9bf501",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-remote-strike-after3.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "cc68561284b2a4e4b7c27481e91679ec04b25548005ef28d0c5cb6eadc0f44bf",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-remote-strike-after4.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "8080591055bfab3ac408a371431fbe0d063374889d4eaf9e04d4a185b3abe115",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-remote-subset1.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "32ce54828a560cb98934e592feafa8457bdd89ff18a0d0c3d74cf54f10068b5a",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-retained-all7.log",
+      "line": 2151,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "44b8b88cba79795d64a56713edaea533122747e1b5e7421d9de9fd749939bf94",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-shipped-lanes3.log",
+      "line": 17,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "340919575af3ab830bc94df85e684ede2b028589af48c078be7a2c7cb895bad1",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-sim-all3.log",
+      "line": 1377,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "a7fc310eea98641ae76f9cf77819e9676e9fd33f02fd32ed6e914c3a525984e2",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-sim-all5.log",
+      "line": 1383,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "e9a47ac19893d5adc0735942a4b6f5e1c5bf0b6a5618497ccc82caedd534c721",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-sim-all6.log",
+      "line": 1385,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "3aa0f7695e2a9c5406595bc341d0696493eff2a6ad739f88ef86fe23f5030edf",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-sim-all7.log",
+      "line": 1386,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "35b60447bea23a082dc56358138b87d9980c06b96a4254976b08d069c68f04f6",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-useful-repair-after1.log",
+      "line": 5,
+      "reason": "trailing whitespace.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "d4dfffc38c2613047c97a1d074c92269b35708c57dd0b76ec746cdf6efb8653a",
+      "line_sha256": "17ea5bdc1c592d9044726d8b73ccdc3990693893a69e81b9cca7433247501005",
+      "allowed_raw_evidence": true
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt6-useful-repair-after2.log",
+      "line": 9,
+      "reason": "new blank line at EOF.",
+      "classification": "intentional byte-preserved raw validation evidence or exact captured snapshot",
+      "raw_file_sha256": "0159b9627e4c3913164321d9e5aed34c3fc415a80d8e82a2b46db01dab1253c5",
+      "line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "allowed_raw_evidence": true
+    }
+  ],
+  "all_diagnostics_raw_only": true,
+  "classification": "not passed; exact intentional raw evidence diagnostics retained without edits",
+  "policy": "Separate check inspected before any commit; no suppression or raw changes; any source/test/data/document hygiene must be corrected. Final recheck must reproduce exact stdout/stderr/exit before a separate commit."
+}

@@ -1,0 +1,36 @@
+{
+  "owned_production_pid": 65937,
+  "command": [
+    "/usr/bin/sample",
+    "65937",
+    "5",
+    "1",
+    "-file",
+    "docs/validation/ra2-parity/ra8/production-native-sample.txt"
+  ],
+  "started_utc": "2026-10-16T08:12:30.777002+00:00",
+  "elapsed_seconds": 5.241875999985496,
+  "exit": 0,
+  "stdout": "",
+  "stderr": "Sampling process 65937 for 5 seconds with 1 millisecond of run time between samples\nSampling completed, processing symbols...\nSample analysis of process 65937 written to file docs/validation/ra2-parity/ra8/production-native-sample.txt\n",
+  "semantics": "bounded read-only native CPU stack sample; no debugger writes, source change or competing simulation; command timing includes sampling overhead",
+  "raw_sha256": "dbd25959af6aa34ed3e7118c7a15ed3899da45c0c791752ab959a425c309db5b",
+  "interpretation": {
+    "dominant_non_wait_path": "combat::act_unit -> pathfinding::nearest_cell -> destination_cells / BinaryHeap::pop",
+    "collapsed_top_samples": {
+      "nearest_cell": 1787,
+      "nearest_cell_heap_pop": 1233
+    },
+    "bounds": "nearest_cell requests count=1; destination_cells closes each cell once, only relaxes strictly lower costs to unclosed cells, enumerates eight neighbours inside width*height<=65536, ends on first accepted cell or finite heap exhaustion. Attack branch additionally caps MAX_CHASES. Other scheduled systems appear in the sample.",
+    "source": [
+      "crates/sim/src/pathfinding.rs:67",
+      "crates/sim/src/pathfinding.rs:169",
+      "crates/sim/src/pathfinding.rs:216",
+      "crates/sim/src/combat.rs:2299",
+      "crates/sim/src/combat.rs:2394",
+      "crates/sim/src/map.rs:26"
+    ],
+    "conclusion": "source-bounded firing-position searches dominate this sample; no accidental infinite-loop evidence. This is a bounded sample, not proof of overall match progress/endings or a timing correction. No optimization or interruption performed.",
+    "overhead": "5.241876s native sample command; raw gate timings include sampling perturbation, not subtracted"
+  }
+}

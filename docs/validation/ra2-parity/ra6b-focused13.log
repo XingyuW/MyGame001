@@ -1,0 +1,166 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 37.08s
+     Running tests/ra1_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra1_definitions-6f60fd0b4a270903)
+
+running 36 tests
+test an_arsenal_that_names_countries_or_groups_needs_a_rules_file ... ok
+test a_plan_may_list_every_building_of_the_tree_of_its_side ... ok
+test a_faction_without_a_side_loads_with_its_roster_and_starting_lists ... ok
+test ai_plan_entries_are_built_by_every_country_of_the_side ... ok
+test every_field_of_the_ai_file_is_required ... ok
+test arsenal_limits_are_accepted_at_both_ends ... ok
+test ai_plan_entries_can_be_obtained_through_the_build_order ... ok
+test ai_references_and_difficulty_values_are_checked ... ok
+test other_schema_versions_are_rejected_in_every_file ... ok
+test every_field_of_the_skirmish_file_is_required ... ok
+test skirmish_and_ai_limits_are_accepted_at_both_ends ... ok
+test skirmish_countries_are_checked ... ok
+test rules_list_values_outside_their_ranges_are_rejected ... ok
+test skirmish_factions_without_a_side_are_checked ... ok
+test rules_references_and_ids_are_checked ... ok
+test the_ai_file_needs_a_plan_for_the_side_of_every_faction ... ok
+test the_ai_fixture_loads_with_a_plan_per_side ... ok
+test skirmish_values_outside_their_ranges_are_rejected ... ok
+test arsenal_references_and_ids_are_checked ... ok
+test the_arsenal_fixture_loads_with_the_fields_of_schema_version_2 ... ok
+test the_army_of_a_plan_can_damage_every_building_type ... ok
+test the_base_unit_of_every_side_has_the_role_mcv ... ok
+test the_rules_fixture_loads_with_every_field ... ok
+test the_skirmish_fixture_loads_with_sides_and_countries ... ok
+test the_cross_checks_of_the_rules_file_are_enforced ... ok
+test ai_plans_are_checked_for_their_side ... ok
+test lists_longer_than_their_schema_allows_are_rejected ... ok
+test unknown_and_duplicate_fields_are_rejected_in_every_file ... ok
+test values_of_the_wrong_kind_are_syntax_errors_in_every_file ... ok
+test skirmish_sides_are_checked ... ok
+test arsenal_values_outside_their_ranges_are_rejected ... ok
+test every_field_of_the_rules_file_is_required ... ok
+test every_field_of_the_arsenal_file_is_required ... ok
+test every_scalar_rule_is_rejected_one_step_outside_its_range ... ok
+test the_limits_of_every_scalar_rule_are_accepted ... ok
+test truncations_of_the_fixtures_are_rejected_without_panic ... ok
+
+test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 18.04s
+
+     Running tests/ra3_shipped.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra3_shipped-482caa1c2c0ab3e9)
+
+running 10 tests
+test the_shipped_infantry_is_on_foot_and_the_shipped_crushers_are_those_of_red_alert_2 ... ok
+test three_gis_share_a_cell_and_a_fourth_soldier_or_a_tank_does_not_fit ... ok
+test every_shipped_weapon_deals_the_references_damage_to_every_armour_type ... ok
+test the_armies_of_the_shipped_plans_can_destroy_every_shipped_building ... ok
+test a_damaged_grizzly_is_yellow_then_red_and_drives_at_three_quarters_speed ... ok
+test a_nuclear_strike_destroys_a_power_plant_and_not_a_construction_yard ... ok
+test shipped_weapons_deal_the_damage_worked_out_from_the_reference ... ok
+test shipped_ships_follow_their_naval_targeting ... ok
+test shipped_types_fire_only_at_what_red_alert_2_lets_them ... ok
+test a_tank_crushes_conscripts_and_gis_and_what_is_not_crushable_stays ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.56s
+
+     Running tests/ra4_shipped.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra4_shipped-c70e8f17de435c78)
+
+running 17 tests
+test a_typhoon_is_unseen_at_five_cells_from_a_grizzly_and_seen_by_a_destroyer ... ok
+test a_typhoon_that_fires_is_seen_for_the_cloak_delay ... ok
+test a_v3_rocket_is_shot_down_by_a_patriot_and_deals_nothing ... ok
+test harriers_are_lost_with_their_last_airforce_command ... ok
+test a_veteran_grizzly_hits_harder_and_is_hit_less ... ok
+test a_destroyer_sends_its_osprey_against_a_typhoon_it_detects ... ok
+test the_shipped_abilities_are_those_of_the_reference ... ok
+test the_chronosphere_does_not_move_a_launched_rocket ... ok
+test a_dreadnought_launches_two_missiles_with_their_damage ... ok
+test an_apocalypse_heals_itself_at_the_repair_rate ... ok
+test a_harrier_fires_one_volley_and_reloads_it_on_its_dock ... ok
+test the_survivors_of_shipped_buildings_follow_the_refund_and_the_divisors ... ok
+test a_v3_rocket_is_a_unit_that_flies_to_its_target_and_deals_the_rockets_damage ... ok
+test a_grizzly_is_a_veteran_after_three_times_its_cost_and_elite_after_six ... ok
+test a_carrier_sends_its_three_hornets_and_regains_a_lost_one ... ok
+test a_fifth_harrier_is_refused_and_built_after_a_second_airforce_command_stands ... ok
+test only_the_base_units_have_a_crew_and_it_is_of_their_owners_side ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.95s
+
+     Running tests/ra6_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra6_definitions-5f9348c6175f019a)
+
+running 4 tests
+test ra6_strategic_timing_fields_are_required_bounded_and_hashed ... FAILED
+test ra6_repair_negative_damage_is_narrow_and_gunner_requires_all_thirteen_modes ... ok
+test ra6_area_fire_one_cell_minimum_is_narrow_and_new_numbers_are_bounded ... ok
+test ra6_each_new_flag_is_required_bounded_and_hashed ... ok
+
+failures:
+
+---- ra6_strategic_timing_fields_are_required_bounded_and_hashed stdout ----
+
+thread 'ra6_strategic_timing_fields_are_required_bounded_and_hashed' (2464656) panicked at crates/sim/tests/ra6_definitions.rs:261:14:
+called `Result::unwrap()` on an `Err` value: DataError { file: "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/ra6_definitions/87978-4bbc9d13cd2fe2ee-rules.ron", field: "superweapons.nuclear_flight", kind: InvalidValue { found: "1000000", expected: "1 to 72000" } }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ra6_strategic_timing_fields_are_required_bounded_and_hashed
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.29s
+
+error: test failed, to rerun pass `-p sim --test ra6_definitions`
+     Running tests/ra6_vehicles.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra6_vehicles-dcf06dc108fcbc82)
+
+running 27 tests
+test ra6_chronosphere_rejects_unseen_area_and_kills_bad_or_occupied_landings ... ok
+test ra6_dolphin_sonic_hit_releases_squid_without_killing_it ... ok
+test ra6_ifv_mode_twelve_uses_cow_shot_with_an_independent_mode_fixture ... ok
+test ra6_chronosphere_square_moves_both_owners_kills_organic_and_preserves_offsets ... ok
+test ra6_drone_infantry_bite_and_protected_vehicle_negative ... ok
+test ra6_ivan_ifv_death_uses_crnuke_and_loses_its_passenger ... ok
+test ra6_kirov_crash_and_demo_death_damage_nearby_allies ... ok
+test ra6_drone_blocked_escape_retries_with_identity_hp_and_experience ... FAILED
+test ra6_pending_parasite_and_strategic_state_changes_affect_replay_hash ... ok
+test ra6_anti_air_destroys_paradrop_plane_before_it_drops ... ok
+test ra6_public_timers_and_nuclear_marks_do_not_disclose_unseen_sources ... ok
+test ra6_drone_enters_then_ticks_and_exits_only_on_its_own_kill ... ok
+test ra6_reactor_chain_radiation_and_temporal_suppression ... ok
+test ra6_shipped_curtain_death_prevents_later_same_tick_infantry_command ... ok
+test ra6_prism_caps_eight_supporters_and_supports_again_at_tick_80 ... ok
+test ra6_squid_prevents_motion_but_ship_keeps_its_weapon ... ok
+test ra6_stationary_mirage_is_a_tree_to_adjacent_nondetectors ... ok
+test ra6_storm_rejects_a_second_launch_and_preserves_its_charge ... ok
+test ra6_repair_ifv_reaches_diagonal_but_not_two_cells_and_obeys_reload ... ok
+test ra6_nuclear_missile_delays_200_ticks_and_radiates ... ok
+test ra6_airport_paradrops_one_shootable_plane_and_full_side_payload ... ok
+test ra6_strategic_recharges_power_option_and_readiness_edges ... ok
+test ra6_ifv_uses_reference_modes_and_restores_empty_missiles ... ok
+test ra6_squid_culls_on_the_crossing_hit_and_cannot_cull_through_curtain ... ok
+test ra6_paradrop_blocked_landing_retains_payload_until_space_opens ... ok
+test ra6_curtain_covers_both_owners_kills_infantry_and_expires_at_1000 ... ok
+test ra6_storm_warning_exclusivity_duration_and_cloud_separation_are_deterministic ... ok
+
+failures:
+
+---- ra6_drone_blocked_escape_retries_with_identity_hp_and_experience stdout ----
+
+thread 'ra6_drone_blocked_escape_retries_with_identity_hp_and_experience' (2464669) panicked at crates/sim/tests/ra6_vehicles.rs:104:34:
+object exists
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ra6_drone_blocked_escape_retries_with_identity_hp_and_experience
+
+test result: FAILED. 26 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.49s
+
+error: test failed, to rerun pass `-p sim --test ra6_vehicles`
+     Running tests/ra9_data_parity.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_data_parity-9d41d76c463c7df7)
+
+running 5 tests
+test the_conversions_round_half_away_from_zero_in_integers ... ok
+test the_shipped_skirmish_file_and_the_default_options_are_those_of_the_lobby ... ok
+test every_value_of_the_shipped_rules_equals_its_reference_or_is_a_listed_difference ... ok
+test every_shipped_weapon_warhead_and_effect_equals_its_reference_or_is_a_listed_difference ... ok
+test every_shipped_unit_and_building_equals_its_reference_or_is_a_listed_difference ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+error: 2 targets failed:
+    `-p sim --test ra6_definitions`
+    `-p sim --test ra6_vehicles`

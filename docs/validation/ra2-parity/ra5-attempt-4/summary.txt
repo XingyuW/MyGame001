@@ -1,0 +1,7 @@
+01 exit 0  0 s  cargo fmt --all -- --check
+02 exit 0  0 s  git diff --check
+03 exit 0  0 s  cargo clippy --workspace --all-targets -- -D warnings
+04 exit 101  4644 s  cargo test --workspace --release  [256 passed, 1 failed, 0 ignored]
+05 exit 0  1 s  cargo build --release -p game
+06 exit 0  15 s  cargo run --release -p game -- --smoke-test 600
+Stopped during command07 after command04 found bridge_hut ownership-mask art omission. Production 756/756 passed. Commands08–13 not run. Source7bc5911; superseded only by final all13 gate.

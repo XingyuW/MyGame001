@@ -1,0 +1,29 @@
+{
+  "label": "attempt8-yard-controls-after7",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ra8_",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "env": {},
+  "purpose": "Run all library RA8 controls including strengthened real Destroyer spawn/yard registration/stray-claim proof and an exposed-only pond with actual water exit cells. Prior sealed-pond qualification failure preserved.",
+  "start_utc": "2026-10-19T03:23:48.747081+00:00",
+  "elapsed_seconds": 25.555640540958848,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d"
+  },
+  "log_sha256": "8e00c34fc787b271905bc5e2e3702ee1077ff0bffd65ad53441da0c22eade054"
+}

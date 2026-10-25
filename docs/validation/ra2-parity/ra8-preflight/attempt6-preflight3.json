@@ -1,0 +1,117 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.9776695829932578,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-fmt3.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.01678370899753645,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-diff3.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 8.672355416987557,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-clippy3.log",
+    "sha256": "9ac218c1509506901579368bc1c8ad763751b7100949b76cf2a47f2bfc53af3b"
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/generate_ra2_data.py",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.09430425000027753,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-generated3.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/ra2_reference.py",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.09610266701201908,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-reference3.log",
+    "sha256": "5fa32e9687ef749dd76543b607f37bc835ddd9e7469e2b7b5874d233ee5cf964"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra2_shipped",
+      "--",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 4.421247165999375,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-shipped-lanes3.log",
+    "sha256": "340919575af3ab830bc94df85e684ede2b028589af48c078be7a2c7cb895bad1"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "ra8_a_locked_late_tech_item_leaves_its_lane_for_a_legal_early_defence",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 5.453789749997668,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-locked-lane3.log",
+    "sha256": "40660855ae97d56ca9b1b671eaf0c8bb29e2ee5929903af72f2f3b66e2940a0e"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--all-targets",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 873.5823474169883,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-sim-all3.log",
+    "sha256": "a7fc310eea98641ae76f9cf77819e9676e9fd33f02fd32ed6e914c3a525984e2"
+  }
+]

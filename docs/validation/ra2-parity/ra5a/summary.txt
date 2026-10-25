@@ -1,0 +1,2 @@
+10 exit 0  2007 s  cargo run --release -p sim --example m14_duels -- full
+validation ra5a: PASSED

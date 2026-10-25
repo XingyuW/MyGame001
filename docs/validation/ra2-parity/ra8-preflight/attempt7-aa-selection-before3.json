@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_attrition_tests::ra8_an_expired_aa_job_cannot_starve_a_fresh_observed_barrier",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "before_source_sha256": "a8fbfc44e95073851fcf97bbbd57ed6607c20382d5c0fe4e8e74e25b267a5418",
+  "mutated_source_sha256": "fbf0cf580327af5d7f0cda04307f16127fda08e0c3f2a513a7189d15889d9fe6",
+  "exit": 101,
+  "seconds": 16.851962458982598,
+  "restored_source_sha256": "a8fbfc44e95073851fcf97bbbd57ed6607c20382d5c0fe4e8e74e25b267a5418",
+  "restored_identical": true,
+  "log_sha256": "0bbfea4ad27c54d100a94666578e6afe9e76432b52ceed66fed221a335a8abbf"
+}

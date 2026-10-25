@@ -1,0 +1,91 @@
+diff --git a/crates/sim/src/hash.rs b/crates/sim/src/hash.rs
+index 8bb8246..05a2768 100644
+--- a/crates/sim/src/hash.rs
++++ b/crates/sim/src/hash.rs
+@@ -72,6 +72,11 @@ impl Default for Fnv1a64 {
+ ///
+ /// If the world was not set up by [`SimPlugin`](crate::SimPlugin).
+ pub fn state_hash(world: &mut World) -> u64 {
++    hash_state(world, true)
++}
++
++/// TRACE-INSTRUMENTATION (scratch, never committed).
++pub(crate) fn hash_state(world: &mut World, with_definitions: bool) -> u64 {
+     let mut hasher = Fnv1a64::new();
+ 
+     hasher.write_u64(world.resource::<SimTick>().0);
+@@ -130,7 +135,9 @@ pub fn state_hash(world: &mut World) -> u64 {
+         }
+     }
+     world.resource::<Grid>().hash_into(&mut hasher);
+-    world.resource::<Definitions>().hash_into(&mut hasher);
++    if with_definitions {
++        world.resource::<Definitions>().hash_into(&mut hasher);
++    }
+     world.resource::<Players>().hash_into(&mut hasher);
+     world.resource::<Projectiles>().hash_into(&mut hasher);
+     world.resource::<MatchState>().hash_into(&mut hasher);
+diff --git a/crates/sim/src/schedule.rs b/crates/sim/src/schedule.rs
+index 212366a..c5f578e 100644
+--- a/crates/sim/src/schedule.rs
++++ b/crates/sim/src/schedule.rs
+@@ -156,7 +156,8 @@ impl Plugin for SimPlugin {
+             check_win_condition
+                 .in_set(SimCoreSet(SimSet::WinCondition))
+                 .in_set(SimSet::WinCondition),
+-            advance_tick
++            (trace_hash, advance_tick)
++                .chain()
+                 .in_set(SimCoreSet(SimSet::EndOfTick))
+                 .in_set(SimSet::EndOfTick),
+         ));
+@@ -205,3 +206,49 @@ mod tests {
+         assert_eq!(app.world().resource::<SimTick>().0, 0);
+     }
+ }
++
++// TRACE-INSTRUMENTATION (scratch, never committed).
++struct Trace {
++    ticks: u64,
++    sum: u64,
++    plain: u64,
++}
++impl Drop for Trace {
++    fn drop(&mut self) {
++        use std::io::Write;
++        if self.ticks == 0 {
++            return;
++        }
++        let Some(path) = std::env::var_os("SIM_HASH_TRACE") else {
++            return;
++        };
++        let name = std::thread::current()
++            .name()
++            .unwrap_or("<unnamed>")
++            .to_owned();
++        let line = format!("{name}\t{}\t{:016x}\t{}\n", self.ticks, self.sum, self.plain);
++        if let Ok(mut file) = std::fs::OpenOptions::new()
++            .create(true)
++            .append(true)
++            .open(path)
++        {
++            let _ = file.write_all(line.as_bytes());
++        }
++    }
++}
++thread_local! {
++    static TRACE: std::cell::RefCell<Trace> = const { std::cell::RefCell::new(Trace { ticks: 0, sum: 0, plain: 0 }) };
++}
++fn trace_hash(world: &mut bevy_ecs::world::World) {
++    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
++    if !*ON.get_or_init(|| std::env::var_os("SIM_HASH_TRACE").is_some()) {
++        return;
++    }
++    let hash = crate::hash::hash_state(world, false);
++    TRACE.with(|trace| {
++        let mut trace = trace.borrow_mut();
++        trace.ticks += 1;
++        trace.sum = trace.sum.wrapping_mul(31).wrapping_add(hash);
++        trace.plain = trace.plain.wrapping_add(hash);
++    });
++}

@@ -1,0 +1,13 @@
+{
+  "utc": "2026-10-20T22:05:04.036473+00:00",
+  "command": [
+    "cargo",
+    "check",
+    "-p",
+    "sim",
+    "--tests"
+  ],
+  "exit_code": 0,
+  "seconds": 2.9541274580406025,
+  "status": "ACTUAL preliminary compile; new revocable standing lease, singlejob"
+}

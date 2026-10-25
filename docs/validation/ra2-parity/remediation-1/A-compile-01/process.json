@@ -1,0 +1,85 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T03:20:25.728189+00:00",
+  "pid": 32248,
+  "head": "af18ce22736ab98b516560d433384b5746774880",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/A-compile-01-plan.json",
+  "plan_sha256": "dbe1beba089f5f71c97a45834aeeac07a07052557b6848b30d2a777e8a565f85",
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_runtime_liveness",
+        "--test",
+        "ra9_temporal_sources",
+        "--test",
+        "ra9_specialist_firepower",
+        "--test",
+        "ra9_crate_cargo_census",
+        "--test",
+        "ra9_bay_current_state",
+        "--test",
+        "ra9_guard_effective_targets",
+        "--no-run"
+      ],
+      "start": "2026-10-22T03:20:25.855792+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-1/A-compile-01/01-sim-controls-compile.log",
+      "pid": 32252,
+      "pgid": 32252,
+      "exit": 0,
+      "end": "2026-10-22T03:21:00.916446+00:00",
+      "raw_bytes": 1503,
+      "raw_sha256": "ea4ffb4f52e873e2cd4543fc0880cca8458d290beb007f13d38938934b3e134e",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "game",
+        "--bin",
+        "game",
+        "--no-run"
+      ],
+      "start": "2026-10-22T03:21:01.147105+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-1/A-compile-01/02-game-controls-debug-compile.log",
+      "pid": 32492,
+      "pgid": 32492,
+      "exit": 101,
+      "end": "2026-10-22T03:23:51.477695+00:00",
+      "raw_bytes": 1457,
+      "raw_sha256": "7e63f25e410eaae34e63d364fbfa27bf6370cd38f63a01667ca77ec0a45c837e",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_data_parity",
+        "--no-run"
+      ],
+      "start": "2026-10-22T03:23:51.727809+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-1/A-compile-01/03-audit-controls-compile.log",
+      "pid": 33031,
+      "pgid": 33031,
+      "exit": 0,
+      "end": "2026-10-22T03:25:21.912750+00:00",
+      "raw_bytes": 279,
+      "raw_sha256": "934daa05ac17cfbc9f5070686f3f2f7f7c96c362efd4ea1a39781022495ba9db",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T03:25:16.906810+00:00",
+  "end": "2026-10-22T03:25:22.044287+00:00",
+  "source_unchanged": true
+}

@@ -1,0 +1,394 @@
+{
+  "created_utc": "2026-10-19T12:38:54.456486+00:00",
+  "purpose": "Declared retained-match coverage; not execution/outcome evidence. Both identical Demo aliases remain under the no-deletion rule.",
+  "source_sha256": "7bc635b8a0bf2fd7a1f44893658af2b23d3ffa11e485e0c93cf9c5acf4bf6b05",
+  "functions": 37,
+  "distinct_configurations": 36,
+  "duplicate_configurations": [
+    {
+      "configuration": [
+        "demo",
+        "russia",
+        "libya",
+        "easy",
+        "easy"
+      ],
+      "functions": [
+        "ra8_gate10_demo_russia_libya_easy_seed_zero_finishes",
+        "ra8_gate7_demo_russia_libya_easy_seed_zero_finishes"
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "name": "ra8_gate_demo_germany_great_britain_brutal_seed_zero_finishes",
+      "configuration": [
+        "demo",
+        "germany",
+        "great_britain",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate_demo_france_cuba_brutal_seed_zero_finishes",
+      "configuration": [
+        "demo",
+        "france",
+        "cuba",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate_liberty_seed_zero_finishes",
+      "configuration": [
+        "liberty_bay",
+        "iraq",
+        "korea",
+        "medium",
+        "medium"
+      ]
+    },
+    {
+      "name": "ra8_gate_red_canyon_seed_zero_finishes",
+      "configuration": [
+        "red_canyon",
+        "france",
+        "russia",
+        "medium",
+        "easy"
+      ]
+    },
+    {
+      "name": "ra8_gate_steel_harbor_seed_zero_finishes",
+      "configuration": [
+        "steel_harbor",
+        "cuba",
+        "america",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate_continental_stall_seed_zero_finishes",
+      "configuration": [
+        "continental_divide",
+        "france",
+        "cuba",
+        "easy",
+        "medium"
+      ]
+    },
+    {
+      "name": "ra8_gate_ember_seed_zero_finishes",
+      "configuration": [
+        "ember_caldera",
+        "libya",
+        "korea",
+        "brutal",
+        "medium"
+      ]
+    },
+    {
+      "name": "ra8_gate_wheel_seed_zero_finishes",
+      "configuration": [
+        "wheel_of_worlds",
+        "cuba",
+        "france",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate_continental_bridge_seed_zero_finishes",
+      "configuration": [
+        "continental_divide",
+        "iraq",
+        "great_britain",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate_glacier_bridge_seed_zero_finishes",
+      "configuration": [
+        "glacier_pass",
+        "korea",
+        "russia",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate_harvest_bridge_seed_zero_finishes",
+      "configuration": [
+        "harvest_plains",
+        "america",
+        "korea",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate_steel_harbor_america_cuba_bridge_seed_zero_finishes",
+      "configuration": [
+        "steel_harbor",
+        "america",
+        "cuba",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate_thousand_lakes_great_britain_america_seed_zero_finishes",
+      "configuration": [
+        "thousand_lakes",
+        "great_britain",
+        "america",
+        "easy",
+        "easy"
+      ]
+    },
+    {
+      "name": "ra8_gate_thousand_lakes_france_germany_seed_zero_finishes",
+      "configuration": [
+        "thousand_lakes",
+        "france",
+        "germany",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate_liberty_iraq_america_brutal_seed_zero_finishes",
+      "configuration": [
+        "liberty_bay",
+        "iraq",
+        "america",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate_oasis_germany_great_britain_brutal_seed_zero_finishes",
+      "configuration": [
+        "oasis_gulf",
+        "germany",
+        "great_britain",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate_steel_france_germany_medium_seed_zero_finishes",
+      "configuration": [
+        "steel_harbor",
+        "france",
+        "germany",
+        "medium",
+        "medium"
+      ]
+    },
+    {
+      "name": "ra8_gate_frozen_cuba_germany_brutal_seed_zero_finishes",
+      "configuration": [
+        "frozen_sound",
+        "cuba",
+        "germany",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate10_lakes_cuba_russia_brutal_seed_zero_finishes",
+      "configuration": [
+        "thousand_lakes",
+        "cuba",
+        "russia",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate10_demo_russia_libya_easy_seed_zero_finishes",
+      "configuration": [
+        "demo",
+        "russia",
+        "libya",
+        "easy",
+        "easy"
+      ]
+    },
+    {
+      "name": "ra8_gate_black_water_libya_america_brutal_seed_zero_finishes",
+      "configuration": [
+        "black_water",
+        "libya",
+        "america",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate_black_water_korea_france_brutal_seed_zero_finishes",
+      "configuration": [
+        "black_water",
+        "korea",
+        "france",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate_wheel_germany_great_britain_brutal_seed_zero_finishes",
+      "configuration": [
+        "wheel_of_worlds",
+        "germany",
+        "great_britain",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate7_riverlands_iraq_cuba_easy_seed_zero_finishes",
+      "configuration": [
+        "riverlands",
+        "iraq",
+        "cuba",
+        "easy",
+        "easy"
+      ]
+    },
+    {
+      "name": "ra8_gate7_jungle_cuba_russia_easy_seed_zero_finishes",
+      "configuration": [
+        "jungle_delta",
+        "cuba",
+        "russia",
+        "easy",
+        "easy"
+      ]
+    },
+    {
+      "name": "ra8_gate7_pacific_cuba_great_britain_brutal_seed_zero_finishes",
+      "configuration": [
+        "pacific_atoll",
+        "cuba",
+        "great_britain",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate7_lakes_russia_medium_libya_brutal_seed_zero_finishes",
+      "configuration": [
+        "thousand_lakes",
+        "russia",
+        "libya",
+        "medium",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate7_demo_russia_libya_easy_seed_zero_finishes",
+      "configuration": [
+        "demo",
+        "russia",
+        "libya",
+        "easy",
+        "easy"
+      ]
+    },
+    {
+      "name": "ra8_gate8_crossroads_great_britain_america_brutal_seed_zero_finishes",
+      "configuration": [
+        "crossroads",
+        "great_britain",
+        "america",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate8_liberty_france_germany_medium_seed_zero_finishes",
+      "configuration": [
+        "liberty_bay",
+        "france",
+        "germany",
+        "medium",
+        "medium"
+      ]
+    },
+    {
+      "name": "ra8_gate8_oasis_libya_iraq_brutal_seed_zero_finishes",
+      "configuration": [
+        "oasis_gulf",
+        "libya",
+        "iraq",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate8_oasis_france_russia_brutal_seed_zero_finishes",
+      "configuration": [
+        "oasis_gulf",
+        "france",
+        "russia",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate8_harvest_france_germany_easy_seed_zero_finishes",
+      "configuration": [
+        "harvest_plains",
+        "france",
+        "germany",
+        "easy",
+        "easy"
+      ]
+    },
+    {
+      "name": "ra8_gate11_riverlands_iraq_cuba_brutal_seed_zero_finishes",
+      "configuration": [
+        "riverlands",
+        "iraq",
+        "cuba",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate11_oasis_russia_france_brutal_seed_zero_finishes",
+      "configuration": [
+        "oasis_gulf",
+        "russia",
+        "france",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate11_coral_iraq_cuba_brutal_seed_zero_finishes",
+      "configuration": [
+        "coral_archipelago",
+        "iraq",
+        "cuba",
+        "brutal",
+        "brutal"
+      ]
+    },
+    {
+      "name": "ra8_gate11_frozen_russia_libya_easy_seed_zero_finishes",
+      "configuration": [
+        "frozen_sound",
+        "russia",
+        "libya",
+        "easy",
+        "easy"
+      ]
+    }
+  ]
+}

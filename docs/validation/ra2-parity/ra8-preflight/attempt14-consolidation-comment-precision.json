@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-20T05:26:15.224543+00:00",
+  "change": "Comment-only R184 consolidation documentation; no executable tokens changed.",
+  "before": {
+    "crates/sim/src/ai.rs": "a36c5576733dae0dc6f4792e369d64acab8e2863eca638ca42a455ad9d07dcfd",
+    "crates/sim/src/ai/strategy.rs": "e8138ab270fca780cdcb19b4eba0019578ae9261a1b9366ea11b04d745f90a6b"
+  },
+  "after": {
+    "crates/sim/src/ai.rs": "7ae5272510471d242770a8fcd620bbd258d647ddfb76a1a94f9de9f1ebaba042",
+    "crates/sim/src/ai/strategy.rs": "d3be904b03e102f6c9fe905708d809f126938e54d66c2d7a8db5f736f84aabdb"
+  }
+}

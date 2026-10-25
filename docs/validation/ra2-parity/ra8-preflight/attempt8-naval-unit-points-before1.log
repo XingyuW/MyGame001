@@ -1,0 +1,31 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0061]: this method takes 1 argument but 2 arguments were supplied
+    --> crates/sim/tests/ra8_ai.rs:1093:56
+     |
+1093 |           app.world_mut().resource_mut::<CommandQueue>().push(
+     |                                                          ^^^^
+1094 |               PlayerId(1),
+     |               ----------- expected `IssuedCommand`, found `PlayerId`
+1095 | /             Command::Move {
+1096 | |                 units: vec![target],
+1097 | |                 target: CellPos::new(start.x - 1, start.y),
+1098 | |             },
+     | |_____________- unexpected argument #2 of type `sim::Command`
+     |
+note: method defined here
+    --> crates/sim/src/command.rs:404:12
+     |
+ 404 |     pub fn push(&mut self, issued: IssuedCommand) {
+     |            ^^^^
+help: remove the extra argument
+     |
+1094 -             PlayerId(1),
+1095 -             Command::Move {
+1096 -                 units: vec![target],
+1097 -                 target: CellPos::new(start.x - 1, start.y),
+1098 -             },
+1094 +             /* IssuedCommand */,
+     |
+
+For more information about this error, try `rustc --explain E0061`.
+error: could not compile `sim` (test "ra8_ai") due to 1 previous error

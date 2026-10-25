@@ -1,0 +1,30 @@
+{
+  "source_sha256": {
+    "crates/sim/src/ai.rs": "e7b406c3d27a6bd955d3ce6e2ad05845a0ac537aca724ea314ef6446e0a3c79c",
+    "crates/sim/src/ai/strategy.rs": "512541a8fd7abe84a8061709ce40215008c774acdababf5fe1ed24c118a887be"
+  },
+  "cases": [
+    {
+      "name": "ra8_gate_steel_france_germany_medium_seed_zero_finishes",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate_steel_france_germany_medium_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "started_utc": "2026-10-16T09:07:53.350957+00:00",
+      "elapsed_seconds": 192.6136278329941,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-exact-after1-01.log"
+    }
+  ],
+  "policy": "serial; stop at first failure; actual default setup/seed0 and unchanged rejection/invariant/R29 checks"
+}

@@ -1,0 +1,99 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit_code": 2,
+  "check_passed": false,
+  "stdout_unfiltered": "docs/validation/ra2-parity/ra8-preflight/admission-ai-after2.log:39: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/aircraft-admission-after3.log:9: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/coral-lifecycle-after1.log:13: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/crossroads-depot-after1.log:10: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/crossroads-wave-after2.log:11: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/demo-lifecycle-after2.log:49: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/intent-schedule-after2.log:13: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/plan-defence-controller-after3.log:20: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/plan-defence-game-after1.log:75: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/refreeze-boundaries2.log:147: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/refreeze-compatibility2.log:154: new blank line at EOF.\ndocs/validation/ra2-parity/ra8-preflight/refreeze-data-audit2.log:13: new blank line at EOF.\n",
+  "stderr_unfiltered": "",
+  "classified_raw_evidence": [
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/admission-ai-after2.log",
+      "line": 39,
+      "diagnostic": "new blank line at EOF.",
+      "raw_line": "",
+      "classification": "intentional preserved raw capture; no source/data/test exemption"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/aircraft-admission-after3.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "raw_line": "",
+      "classification": "intentional preserved raw capture; no source/data/test exemption"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/coral-lifecycle-after1.log",
+      "line": 13,
+      "diagnostic": "new blank line at EOF.",
+      "raw_line": "",
+      "classification": "intentional preserved raw capture; no source/data/test exemption"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/crossroads-depot-after1.log",
+      "line": 10,
+      "diagnostic": "new blank line at EOF.",
+      "raw_line": "",
+      "classification": "intentional preserved raw capture; no source/data/test exemption"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/crossroads-wave-after2.log",
+      "line": 11,
+      "diagnostic": "new blank line at EOF.",
+      "raw_line": "",
+      "classification": "intentional preserved raw capture; no source/data/test exemption"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/demo-lifecycle-after2.log",
+      "line": 49,
+      "diagnostic": "new blank line at EOF.",
+      "raw_line": "",
+      "classification": "intentional preserved raw capture; no source/data/test exemption"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/intent-schedule-after2.log",
+      "line": 13,
+      "diagnostic": "new blank line at EOF.",
+      "raw_line": "",
+      "classification": "intentional preserved raw capture; no source/data/test exemption"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/plan-defence-controller-after3.log",
+      "line": 20,
+      "diagnostic": "new blank line at EOF.",
+      "raw_line": "",
+      "classification": "intentional preserved raw capture; no source/data/test exemption"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/plan-defence-game-after1.log",
+      "line": 75,
+      "diagnostic": "new blank line at EOF.",
+      "raw_line": "",
+      "classification": "intentional preserved raw capture; no source/data/test exemption"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/refreeze-boundaries2.log",
+      "line": 147,
+      "diagnostic": "new blank line at EOF.",
+      "raw_line": "",
+      "classification": "intentional preserved raw capture; no source/data/test exemption"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/refreeze-compatibility2.log",
+      "line": 154,
+      "diagnostic": "new blank line at EOF.",
+      "raw_line": "",
+      "classification": "intentional preserved raw capture; no source/data/test exemption"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/refreeze-data-audit2.log",
+      "line": 13,
+      "diagnostic": "new blank line at EOF.",
+      "raw_line": "",
+      "classification": "intentional preserved raw capture; no source/data/test exemption"
+    }
+  ],
+  "unexpected": []
+}

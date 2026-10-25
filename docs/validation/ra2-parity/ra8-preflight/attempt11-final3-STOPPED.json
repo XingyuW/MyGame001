@@ -1,0 +1,43 @@
+{
+  "completed_failed_phase": {
+    "phase": "clippy",
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "start_utc": "2026-10-19T12:29:22.738509+00:00",
+    "exit": 101,
+    "elapsed_seconds": 6.117342667013872,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt11-final3-clippy.log",
+    "sha256": "3c2a24c221fdead5762c5b7398dddea6f0a92366dee3c9449cb5f10eb45af957",
+    "test_targets": 0,
+    "passed": 0,
+    "failed": 0,
+    "ignored": 0,
+    "source_mismatches": []
+  },
+  "remaining_unrun": [
+    "generator",
+    "reference",
+    "focused-ra8-ai",
+    "focused-attrition",
+    "focused-recovery",
+    "focused-composition",
+    "focused-ra4",
+    "default-demo10",
+    "retained37",
+    "failed-smallest-ten-player-and-neighbors",
+    "m13-all",
+    "m13-256",
+    "example-guard-m13_ten_players",
+    "example-guard-m14_duels",
+    "example-guard-m7_soak"
+  ],
+  "runtime_mismatches": [],
+  "elapsed_seconds": 7.0939880419755355
+}

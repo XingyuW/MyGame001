@@ -1,0 +1,38 @@
+{
+  "utc": "2026-10-23T00:56:16.843659+00:00",
+  "status": "ALL_FIVE_FULL_CUMULATIVE_SOURCE_FOLLOWUPS_COMPLETE_FINAL_NATIVE_ACCEPTANCE_AND_FRESH_LEAD_PENDING",
+  "code_tip": "73bdfe90ce2a3ef23bbc4c59c0b9eb5c67673c76",
+  "freeze_sha256": "4732181fabaa8f96456c8d6ceefcdf93479df648d938ca5d9e187addd880862b",
+  "reports": [
+    {
+      "role": "sim1",
+      "path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c3-revised-sim1.md",
+      "bytes": 26627,
+      "sha256": "dae913cd6d6a257ebd0021d19752ecfb64be50ad92b13f2d926205ef6e2738da"
+    },
+    {
+      "role": "sim2",
+      "path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c3-revised-sim2.md",
+      "bytes": 12575,
+      "sha256": "95fdaa6d14546d29994b9babeb2a1178c0d67cb5e563652d9cc6e195d7c131c2"
+    },
+    {
+      "role": "tests",
+      "path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c3-revised-tests.md",
+      "bytes": 24757,
+      "sha256": "f16c7107f239bff42b770051323db63f8912c379280ad413aa7a61b7728155fb"
+    },
+    {
+      "role": "client",
+      "path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c3-revised-client.md",
+      "bytes": 17225,
+      "sha256": "3d62108810a5ea993500d8fedf222e8bb3e35489bc27b4bbf4bd5b715a6a6eb2"
+    },
+    {
+      "role": "data",
+      "path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-c3-revised-data.md",
+      "bytes": 22309,
+      "sha256": "40600b37891cad3e595bcbf60667e9b5a4e30516ed480b52ab80772381bed8ed"
+    }
+  ]
+}

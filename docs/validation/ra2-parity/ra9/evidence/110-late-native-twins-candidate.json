@@ -1,0 +1,38 @@
+{
+  "utc": "2026-10-21T02:13:58.497080+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "game",
+    "--test",
+    "m6_production_matches",
+    "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "scope": "actual runtime+selected production match target+Cargo manifests/lock+shipped data+exact Crossroads map assets; unselected audit/sim integration tests/closing docs excluded",
+  "configuration": {
+    "map": "crossroads",
+    "countries": [
+      "america",
+      "russia"
+    ],
+    "difficulties": [
+      "easy",
+      "easy"
+    ],
+    "seed": 0,
+    "original_limit": 72000,
+    "worlds": 2,
+    "candidate_status": "UNSELECTED_UNTIL_ACTUAL_SUCCESS",
+    "checks": "everytick native hash/events/outcome/I6prime/I7; Won>36000;late WeaponFired/ProductionComplete/positiveOreDelivered"
+  },
+  "ended_utc": "2026-10-21T02:16:13.879418+00:00",
+  "exit_code": 0,
+  "seconds": 135.381,
+  "lease": "RA8 explicitly authorized one Crossroads Easy/Easyseed0 twins72000 functional command, jobs1; overlaps canonical functional gate, no performance claim",
+  "input_mismatches": []
+}

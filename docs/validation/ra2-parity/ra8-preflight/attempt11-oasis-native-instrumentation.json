@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-10-19T18:27:30.909063+00:00",
+  "purpose": "Exact Oasis diagnostic only: source names, wallet/whole queues, actual repair status, live controller mission, actor fine positions/path, native Temporal shots/channel observations. No production code, simulation state, commands, limits or assertions changed. Post-schedule fine positions are labelled observational, not silently assumed pre-shot positions.",
+  "path": "crates/game/tests/ra8_gate_matches.rs",
+  "before_sha256": "7bc635b8a0bf2fd7a1f44893658af2b23d3ffa11e485e0c93cf9c5acf4bf6b05",
+  "after_unformatted_sha256": "febb76d36a6221720de8f943089b63b5389d2bce0696737ef943e2a029fc0c14",
+  "ai_sha256": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+  "strategy_sha256": "323f97d83614232db3d1d619d54847b885c1f0635d55382bc8804d95bb998ef9",
+  "formatted_utc": "2026-10-19T18:29:16.336430+00:00",
+  "formatted_sha256": "38cd3bf9494a74100a9cd35ce5ba3eebd480985978e8ec0f992f2ccff428e2cd",
+  "format_exit": 0,
+  "note": "Actual queued kinds/names and remaining native costs, exact SimTick versus external loop index, shared repair_step_cost and HP increase during Economy, post-schedule fine positions/Temporal channel observations. All counters/logs remain outside sim state; no command writes. Initial uncompiled draft used a guessed mechanism symbol; source read corrected it to actual warhead.temporal before any validation."
+}

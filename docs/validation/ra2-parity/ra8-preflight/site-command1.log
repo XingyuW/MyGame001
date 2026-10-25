@@ -1,0 +1,9 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 0.61s
+     Running tests/ra8_placement.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_placement-5e70742b35658f1d)
+
+running 1 test
+test ra8_place_without_a_completed_item_rejects_without_state_mutation ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

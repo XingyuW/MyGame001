@@ -1,0 +1,28 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 40.62s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-b27027efb5a77317)
+
+running 2 tests
+
+thread 'ra9_visible_ore_without_a_refinery_releases_actual_reinforcement_finance' (17989549) panicked at crates/sim/tests/ra8_ai.rs:13404:5:
+assertion `left == right` failed: real harvesting must fill this worker
+  left: 8
+ right: 20
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra9_visible_ore_without_a_refinery_releases_actual_reinforcement_finance ... FAILED
+
+thread 'ra9_visible_ore_with_a_refinery_preserves_actual_worker_income' (17989548) panicked at crates/sim/tests/ra8_ai.rs:13404:5:
+assertion `left == right` failed: real harvesting must fill this worker
+  left: 8
+ right: 20
+test ra9_visible_ore_with_a_refinery_preserves_actual_worker_income ... FAILED
+
+failures:
+
+failures:
+    ra9_visible_ore_with_a_refinery_preserves_actual_worker_income
+    ra9_visible_ore_without_a_refinery_releases_actual_reinforcement_finance
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 139 filtered out; finished in 0.22s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

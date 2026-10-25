@@ -1,0 +1,74 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T20:05:02.196401+00:00",
+  "pid": 14288,
+  "head": "aafd1794a84f88b9919b7e31c78768e08f66d70d",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/client2-after-plan-02.json",
+  "plan_sha256": "ee3fadca78cac828a9c4f91a187172791e11de520f65d3ccc695b36f31c40c33",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "game",
+        "ra9_privacy_native_scenery_orders",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:05:02.343623+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-client-after-02/01-scenery-orders-after.log",
+      "pid": 14294,
+      "pgid": 14294,
+      "exit": 0,
+      "end": "2026-10-22T20:06:17.446333+00:00",
+      "raw_bytes": 4106,
+      "raw_sha256": "99488101e5df764688dad864f6d6e2c68ee7a8053468dc1999df57e65f9361a4",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "game",
+        "ra9_privacy_native_bridge_orders",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:06:17.655956+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-client-after-02/02-bridge-orders-after.log",
+      "pid": 14552,
+      "pgid": 14552,
+      "exit": 0,
+      "end": "2026-10-22T20:06:22.673378+00:00",
+      "raw_bytes": 3934,
+      "raw_sha256": "aa52e26d40ed9e654e8205c48567793e94f38d5afcf4d5466568533af164ae2f",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "game",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:06:22.879863+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-client-after-02/03-game-all-after.log",
+      "pid": 14588,
+      "pgid": 14588,
+      "exit": -15,
+      "end": "2026-10-22T20:12:38.529210+00:00",
+      "raw_bytes": 28326,
+      "raw_sha256": "bf7138df15d256c5b279b652e7a85183717191ca25828fbf8db656fc8c423f92",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T20:12:33.523583+00:00",
+  "end": "2026-10-22T20:12:38.640198+00:00",
+  "source_unchanged": true
+}

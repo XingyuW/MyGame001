@@ -1,0 +1,56 @@
+[
+  {
+    "name": "attempt4-sim-final1",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "--test",
+      "ra1_commands",
+      "--test",
+      "ra8_ai",
+      "--test",
+      "ra8_definitions",
+      "--test",
+      "ra8_placement",
+      "--test",
+      "ra4_ai",
+      "--test",
+      "ra5_world",
+      "--test",
+      "ra6_infantry",
+      "--test",
+      "ra6_vehicles",
+      "--test",
+      "ra7_context",
+      "--test",
+      "ra7_orders",
+      "--test",
+      "ra7_vision",
+      "--test",
+      "ra9_data_parity",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 107.99664920801297
+  },
+  {
+    "name": "attempt4-game-units1",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--lib",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 101,
+    "elapsed_seconds": 0.136832415999379
+  }
+]

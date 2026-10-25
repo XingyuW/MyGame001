@@ -14,16 +14,19 @@ use sim::{
 };
 
 const GRASS: Cell = Cell {
+    water: false,
     passable: true,
     buildable: true,
     ore: 0,
 };
 const ORE: Cell = Cell {
+    water: false,
     passable: true,
     buildable: false,
     ore: 750,
 };
 const ROCK: Cell = Cell {
+    water: false,
     passable: false,
     buildable: false,
     ore: 0,
@@ -258,6 +261,86 @@ fn ore_amount_limits() {
     );
 }
 
+#[test]
+fn the_optional_look_property_preserves_terrain_and_retains_world_objects() {
+    // Without the property every cell's look is 0, and the terrain is unaffected by it.
+    let plain = load_ok(&fixture("valid_4x3.tmx"));
+    assert_eq!(plain.looks, vec![0; 12]);
+    let with_look = |name: &str, property: &str| {
+        variant(
+            name,
+            &[(
+                r#"<property name="ore" type="int" value="750"/>"#,
+                &format!(r#"<property name="ore" type="int" value="750"/>{property}"#),
+            )],
+        )
+    };
+    let looked = load_ok(&with_look(
+        "look_ok",
+        r#"<property name="look" type="int" value="15"/>"#,
+    ));
+    assert_eq!(looked.grid, plain.grid);
+    // Tile 1 (gid 2) is the ore tile: cells (2, 0), (1, 1) and (2, 1).
+    let expected: Vec<u8> = VALID_DATA
+        .split(',')
+        .map(|gid| if gid.trim() == "2" { 15 } else { 0 })
+        .collect();
+    assert_eq!(looked.looks, expected);
+    // RA5 allocates high nibble 15 to a repair hut; the maximum byte remains valid,
+    // but now carries semantic metadata as well as the unchanged terrain cells.
+    let world_objects = load_ok(&with_look(
+        "look_world_objects",
+        r#"<property name="look" type="int" value="255"/>"#,
+    ));
+    assert_eq!(
+        world_objects
+            .grid
+            .world_features()
+            .collect::<std::collections::BTreeMap<_, _>>(),
+        [
+            (CellPos::new(2, 0), 15),
+            (CellPos::new(1, 1), 15),
+            (CellPos::new(2, 1), 15)
+        ]
+        .into_iter()
+        .collect()
+    );
+    let mut terrain_only = world_objects.grid.clone();
+    terrain_only.mark_world_features(&[0; 12]);
+    assert_eq!(terrain_only, plain.grid);
+    assert_eq!(
+        world_objects.looks,
+        expected
+            .iter()
+            .map(|&look| if look == 15 { 255 } else { 0 })
+            .collect::<Vec<_>>()
+    );
+    for (name, value) in [("look_negative", "-1"), ("look_large", "256")] {
+        assert_rejected(
+            &with_look(
+                name,
+                &format!(r#"<property name="look" type="int" value="{value}"/>"#),
+            ),
+            r#"tileset "fixture" tile 1 property "look""#,
+            MapErrorKind::InvalidValue {
+                found: value.into(),
+                expected: "an integer from 0 to 255".into(),
+            },
+        );
+    }
+    assert_rejected(
+        &with_look(
+            "look_string",
+            r#"<property name="look" type="string" value="forest"/>"#,
+        ),
+        r#"tileset "fixture" tile 1 property "look""#,
+        MapErrorKind::WrongPropertyType {
+            expected: "int",
+            found: "string",
+        },
+    );
+}
+
 // --- Negative: the cases named by PLAN.md section 7, M1 ---------------------------------------
 
 #[test]
@@ -358,7 +441,7 @@ fn zero_tile_size_is_rejected() {
 
 // --- Negative: properties -------------------------------------------------------------------
 
-const SCHEMA_PROPERTY: &str = r#"<property name="schema_version" type="int" value="1"/>"#;
+const SCHEMA_PROPERTY: &str = r#"<property name="schema_version" type="int" value="2"/>"#;
 
 #[test]
 fn schema_version_is_required_and_checked() {
@@ -372,13 +455,13 @@ fn schema_version_is_required_and_checked() {
         "schema_newer",
         &[(
             SCHEMA_PROPERTY,
-            r#"<property name="schema_version" type="int" value="2"/>"#,
+            r#"<property name="schema_version" type="int" value="3"/>"#,
         )],
     );
     assert_rejected(
         &newer,
         r#"map property "schema_version""#,
-        MapErrorKind::UnsupportedSchemaVersion(2),
+        MapErrorKind::UnsupportedSchemaVersion(3),
     );
     let text = variant(
         "schema_string",

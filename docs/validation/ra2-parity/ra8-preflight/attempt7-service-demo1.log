@@ -1,0 +1,9 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 3.19s
+     Running tests/ra8_ai_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai_matches-f4b147b14025da0d)
+
+running 1 test
+test ra8_demo_admission_and_target_lifecycle_regressions_finish_with_original_rejection_rules ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 52.08s
+

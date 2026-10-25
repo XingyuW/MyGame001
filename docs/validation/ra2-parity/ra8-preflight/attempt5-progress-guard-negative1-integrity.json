@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_reinforcements_without_aa_job_progress_cannot_renew_the_aircraft_hold",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 101,
+  "elapsed_seconds": 27.33594412499224,
+  "before_sha256": "86ae95223f142b24eac71876ff0f00a479d0efd68d475559d5a89058a3186d7f",
+  "mutated_sha256": "7a38531f6320103ca3718837a0de149d51bf0251d0e9cd95e0c52e39bc787acd",
+  "restored_sha256": "86ae95223f142b24eac71876ff0f00a479d0efd68d475559d5a89058a3186d7f",
+  "mutation": "Only disable same-AA no-progress deadline; immediate byte restoration before any next action"
+}

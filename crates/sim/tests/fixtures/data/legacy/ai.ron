@@ -1,0 +1,105 @@
+// The computer player's definitions, schema version 1 (PLAN.md section 7, M6; docs/DECISIONS.md
+// D42, D49).
+//
+// build_order:  building types in the order the computer player builds them; a type listed n
+//               times is kept at n buildings, so lost buildings are rebuilt. A power building is
+//               built first whenever the next building would leave the player short of power.
+//               Prerequisites come before the buildings that need them, and the producer of
+//               each building is a starting building of every faction or comes before it.
+// power:        the building type built for power (no prerequisites; its producer is a
+//               starting building of every faction)
+// harvester:    the harvester unit type (its producer and prerequisites are in build_order)
+// army:         armed unit types, produced in this order, cyclically (their producers and
+//               prerequisites are in build_order)
+// difficulties: id; think_interval (ticks between two decisions, 20 per second);
+//               harvesters_per_refinery; max_army (armed units it builds up to); wave_size (armed
+//               units at home that start an attack wave); first_wave (the tick from which waves
+//               may start); wave_patience (ticks after first_wave or the last wave after which
+//               the units at home attack even if fewer than wave_size); defence_radius (visible
+//               enemies this many cells from its buildings are attacked by its army at home)
+//
+// Factions (M7): a computer player builds the entries of build_order and army that its faction's
+// roster in skirmish.ron offers, in this order, and skips the others; power and harvester are
+// offered by every faction. The Vanguard's plan builds gun turrets and an army of light tanks,
+// riflemen, rocket soldiers, artillery, and scouts; the Meridian's rocket towers and heavy tanks,
+// conscripts, grenadiers, raiders, and rocket launchers. Balance data (docs/DECISIONS.md D51).
+(
+    schema_version: 3,
+    rules_difficulty: 0,
+    policy: (garrison_quota: 0, garrison_radius: 0, depot_radius: 0, naval_rescan: 1, naval_detector_quota: 0, artillery_min_range: 0, artillery_standoff: 0, paradrop_offset: 0, chrono_min_offset: 0, chrono_max_offset: 0),
+    plans: [
+        (
+            side: "none",
+            country: "",
+            defences: [],
+            support: [],
+            tier_reserves: [0,0,0],
+            advanced_tech_level: 0,
+            build_order: [
+                "power_plant",
+                "refinery",
+                "barracks",
+                "war_factory",
+                "gun_turret",
+                "rocket_tower",
+                "power_plant",
+                "tech_center",
+                "refinery",
+                "power_plant",
+                "war_factory",
+                "barracks",
+                "gun_turret",
+                "rocket_tower",
+                "power_plant",
+            ],
+            power: "power_plant",
+            harvester: "harvester",
+            army: [
+                "light_tank",
+                "heavy_tank",
+                "rifleman",
+                "conscript",
+                "rocket_soldier",
+                "grenadier",
+                "light_tank",
+                "heavy_tank",
+                "artillery",
+                "rocket_launcher",
+                "scout",
+                "raider",
+            ],
+        ),
+    ],
+    difficulties: [
+        (
+            id: "easy",
+            think_interval: 40,
+            harvesters_per_refinery: 1,
+            max_army: 8,
+            wave_size: 6,
+            first_wave: 6000,
+            wave_patience: 3600,
+            defence_radius: 8,
+        ),
+        (
+            id: "normal",
+            think_interval: 20,
+            harvesters_per_refinery: 2,
+            max_army: 16,
+            wave_size: 8,
+            first_wave: 3600,
+            wave_patience: 2400,
+            defence_radius: 10,
+        ),
+        (
+            id: "hard",
+            think_interval: 10,
+            harvesters_per_refinery: 2,
+            max_army: 30,
+            wave_size: 10,
+            first_wave: 2400,
+            wave_patience: 1800,
+            defence_radius: 12,
+        ),
+    ],
+)

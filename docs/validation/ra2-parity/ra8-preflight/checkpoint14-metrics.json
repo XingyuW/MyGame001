@@ -1,0 +1,356 @@
+{
+  "utc": "2026-10-20T02:17:53.733197+00:00",
+  "validation_commands": 12,
+  "test_target_invocations": 7,
+  "rust_counts": [
+    149,
+    0,
+    0
+  ],
+  "all_exits_zero": true,
+  "command_seconds_sum": 260.43402441596845,
+  "rows": [
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start_utc": "2026-10-20T02:12:09.365677+00:00",
+      "end_utc": "2026-10-20T02:12:10.388368+00:00",
+      "elapsed_seconds": 1.0227098329924047,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt13-final1-01-fmt.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "regenerate",
+      "command": [
+        "python3",
+        "scripts/generate_ra2_data.py",
+        "--check"
+      ],
+      "start_utc": "2026-10-20T02:12:10.388637+00:00",
+      "end_utc": "2026-10-20T02:12:10.503151+00:00",
+      "elapsed_seconds": 0.11453637498198077,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt13-final1-02-regenerate.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "start_utc": "2026-10-20T02:12:10.503405+00:00",
+      "end_utc": "2026-10-20T02:12:17.558814+00:00",
+      "elapsed_seconds": 7.055413374968339,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt13-final1-03-clippy.log",
+      "log_sha256": "2967859bcb1cee0aecb30b051af4883cfba739d4974bf54b49a226bf9b3863b0",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "slot",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "last_stand",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T02:12:17.559066+00:00",
+      "end_utc": "2026-10-20T02:12:36.114490+00:00",
+      "elapsed_seconds": 18.555395832983777,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt13-final1-04-slot.log",
+      "log_sha256": "0e42a9ff8cf8ab443ea2abf27b1d81b336e6a492812fea2b953ad801f2b13a83",
+      "rust_results": [
+        [
+          4,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "legacy",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra4_ai",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T02:12:36.114756+00:00",
+      "end_utc": "2026-10-20T02:12:41.741364+00:00",
+      "elapsed_seconds": 5.626619333052076,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt13-final1-05-legacy.log",
+      "log_sha256": "c1d1c5a7821c749a625412e694083eb345d6e3d436409edb075c99e7fc92fecd",
+      "rust_results": [
+        [
+          2,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "demo10",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_ai_matches",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T02:12:41.741649+00:00",
+      "end_utc": "2026-10-20T02:14:11.902142+00:00",
+      "elapsed_seconds": 90.16023891698569,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt13-final1-06-demo10.log",
+      "log_sha256": "abe347dd72600e87c0fe9b6bc646787572bbdebd328b0a3123b0097e8ebe0def",
+      "rust_results": [
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "grown3",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m13_grown_maps",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T02:14:11.902416+00:00",
+      "end_utc": "2026-10-20T02:14:37.070332+00:00",
+      "elapsed_seconds": 25.16786358394893,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt13-final1-07-grown3.log",
+      "log_sha256": "d9d1723aec67ef015bde7ad25cad9c5841ec85fc6c7cc14b600ace0329f68484",
+      "rust_results": [
+        [
+          3,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "attempt13-final1-ai",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "--",
+        "--nocapture"
+      ],
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt13-final1-ai.log",
+      "log_sha256": "c14890acaf9a603f3d83c7b66126fbbec15c66333fe5988179bd688eabe023d9",
+      "rust_results": [
+        [
+          122,
+          0,
+          0
+        ]
+      ],
+      "elapsed_seconds": 45.44833050004672,
+      "source_bindings": {
+        "crates/sim/src/ai.rs": "0c811992001e72cf79b4946b6357b395bbe2de5b35840eec26c6c8b5f534f04b",
+        "crates/sim/src/ai/strategy.rs": "c4c72cbaa6dcbaf83ca949651e98a661845b4257be42b4f008d82eee153923c8",
+        "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+        "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+        "crates/sim/src/ai/ra8_attrition_tests.rs": "92a0fc584a2fe719fd9d7b505c0de9197161e1e491077ce6e7a5c0be837f0595",
+        "crates/game/tests/ra8_gate_matches.rs": "2adf6ddf6a41a3b57eccae63b96b274e7b52466dcf8798c3291640c2b1b7e33c",
+        "crates/sim/tests/ra8_ai.rs": "40c4ee8df1ba45367f2b0af6012affe59b9a9f1fc0aad0f830a36a138ac35a12"
+      }
+    },
+    {
+      "name": "attempt13-healthy-surface-approach-native-after1",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ai::ra8_attrition_tests",
+        "--",
+        "--nocapture"
+      ],
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt13-healthy-surface-approach-native-after1.log",
+      "log_sha256": "164accb6ae7f5918a2b8bb49ec94049666223097fe064c5f6b96ceee799107df",
+      "rust_results": [
+        [
+          16,
+          0,
+          0
+        ]
+      ],
+      "elapsed_seconds": 18.674823708017357,
+      "source_bindings": {
+        "crates/sim/src/ai.rs": "0c811992001e72cf79b4946b6357b395bbe2de5b35840eec26c6c8b5f534f04b",
+        "crates/sim/src/ai/strategy.rs": "c4c72cbaa6dcbaf83ca949651e98a661845b4257be42b4f008d82eee153923c8",
+        "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+        "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+        "crates/sim/src/ai/ra8_attrition_tests.rs": "92a0fc584a2fe719fd9d7b505c0de9197161e1e491077ce6e7a5c0be837f0595",
+        "crates/game/tests/ra8_gate_matches.rs": "2adf6ddf6a41a3b57eccae63b96b274e7b52466dcf8798c3291640c2b1b7e33c",
+        "crates/sim/tests/ra8_ai.rs": "40c4ee8df1ba45367f2b0af6012affe59b9a9f1fc0aad0f830a36a138ac35a12"
+      }
+    },
+    {
+      "name": "attempt13-crossroads-russia-america-healthy-approach-after1",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate13_crossroads_russia_america_easy_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt13-crossroads-russia-america-healthy-approach-after1.log",
+      "log_sha256": "b02411c34021d23435a0106f04fee167497b9f946d77aeee76749caa7dbfe121",
+      "rust_results": [
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "elapsed_seconds": 41.39101904199924,
+      "source_bindings": {
+        "crates/sim/src/ai.rs": "0c811992001e72cf79b4946b6357b395bbe2de5b35840eec26c6c8b5f534f04b",
+        "crates/sim/src/ai/strategy.rs": "c4c72cbaa6dcbaf83ca949651e98a661845b4257be42b4f008d82eee153923c8",
+        "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+        "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+        "crates/sim/src/ai/ra8_attrition_tests.rs": "92a0fc584a2fe719fd9d7b505c0de9197161e1e491077ce6e7a5c0be837f0595",
+        "crates/game/tests/ra8_gate_matches.rs": "2adf6ddf6a41a3b57eccae63b96b274e7b52466dcf8798c3291640c2b1b7e33c",
+        "crates/sim/tests/ra8_ai.rs": "40c4ee8df1ba45367f2b0af6012affe59b9a9f1fc0aad0f830a36a138ac35a12"
+      }
+    },
+    {
+      "name": "attempt13-final-comment-fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt13-final-comment-fmt.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rust_results": [],
+      "elapsed_seconds": 0.9958932499866933,
+      "source_bindings": {
+        "crates/sim/src/ai.rs": "88497b2dde9a95a704e2d6439f85e84ea172bd4d04b2aa92dc148cc254f1d860",
+        "crates/sim/src/ai/strategy.rs": "c4c72cbaa6dcbaf83ca949651e98a661845b4257be42b4f008d82eee153923c8",
+        "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+        "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+        "crates/sim/src/ai/ra8_attrition_tests.rs": "92a0fc584a2fe719fd9d7b505c0de9197161e1e491077ce6e7a5c0be837f0595",
+        "crates/game/tests/ra8_gate_matches.rs": "2adf6ddf6a41a3b57eccae63b96b274e7b52466dcf8798c3291640c2b1b7e33c",
+        "crates/sim/tests/ra8_ai.rs": "40c4ee8df1ba45367f2b0af6012affe59b9a9f1fc0aad0f830a36a138ac35a12"
+      }
+    },
+    {
+      "name": "attempt13-final-comment-clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt13-final-comment-clippy.log",
+      "log_sha256": "52d07ad2243151c5087c39fc9155ecc0e4206b097553583c7044d84beda456fb",
+      "rust_results": [],
+      "elapsed_seconds": 6.221180666005239,
+      "source_bindings": {
+        "crates/sim/src/ai.rs": "88497b2dde9a95a704e2d6439f85e84ea172bd4d04b2aa92dc148cc254f1d860",
+        "crates/sim/src/ai/strategy.rs": "c4c72cbaa6dcbaf83ca949651e98a661845b4257be42b4f008d82eee153923c8",
+        "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+        "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+        "crates/sim/src/ai/ra8_attrition_tests.rs": "92a0fc584a2fe719fd9d7b505c0de9197161e1e491077ce6e7a5c0be837f0595",
+        "crates/game/tests/ra8_gate_matches.rs": "2adf6ddf6a41a3b57eccae63b96b274e7b52466dcf8798c3291640c2b1b7e33c",
+        "crates/sim/tests/ra8_ai.rs": "40c4ee8df1ba45367f2b0af6012affe59b9a9f1fc0aad0f830a36a138ac35a12"
+      }
+    }
+  ],
+  "exact_crossroads": "America P1Won67958 /72000; combined final policy evidence, not isolated sole-cause attribution.",
+  "grown_exact": "P1Won51137 /72000,51138steps,9defeated and all existing made-start assertions retained",
+  "demo10_winners": [
+    "demo seed0 [\"germany\", \"great_britain\"] [\"medium\", \"easy\"]: Some(Won { winner: PlayerId(0), tick: 31490 })",
+    "demo seed0 [\"germany\", \"great_britain\"] [\"brutal\", \"brutal\"]: Some(Won { winner: PlayerId(1), tick: 53078 })",
+    "demo seed0 [\"france\", \"iraq\"] [\"medium\", \"easy\"]: Some(Won { winner: PlayerId(1), tick: 36388 })",
+    "demo seed0 [\"france\", \"cuba\"] [\"brutal\", \"brutal\"]: Some(Won { winner: PlayerId(1), tick: 18155 })",
+    "demo seed0 [\"russia\", \"libya\"] [\"easy\", \"easy\"]: Some(Won { winner: PlayerId(1), tick: 61614 })",
+    "demo seed0 [\"cuba\", \"germany\"] [\"medium\", \"medium\"]: Some(Won { winner: PlayerId(1), tick: 28795 })",
+    "demo seed0 [\"cuba\", \"russia\"] [\"medium\", \"easy\"]: Some(Won { winner: PlayerId(1), tick: 42990 })",
+    "demo seed0 [\"russia\", \"libya\"] [\"medium\", \"medium\"]: Some(Won { winner: PlayerId(1), tick: 53548 })",
+    "demo seed0 [\"cuba\", \"russia\"] [\"brutal\", \"medium\"]: Some(Won { winner: PlayerId(0), tick: 20098 })",
+    "demo seed0 [\"russia\", \"libya\"] [\"brutal\", \"brutal\"]: Some(Won { winner: PlayerId(0), tick: 18995 })"
+  ],
+  "comment_only_equivalence": "attempt13-final-comment-binding.json",
+  "mandatory_pending": [
+    "one complete unchanged all13 all0",
+    "both fresh756 R29 distributions",
+    "post-success isolatedall21 + actualfixed256 + threeexampleguards",
+    "RA9 + independent review + user quality verification"
+  ],
+  "retained_target": "39 tests /38 distinct configurations retained; only new exact replay rerun before full13 per reordered acceptance; full39 runs in mandatory workspace gate."
+}

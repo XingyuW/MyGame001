@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 19.66s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+
+thread 'ai::ra8_attrition_tests::ra8_original_surface_approach_keeps_its_native_temporal_building_channel' (10015118) panicked at crates/sim/src/ai/ra8_attrition_tests.rs:1515:5:
+original native approach must actually focus/fire/progress/erase: focusedtrue firedtrue progressedfalse first_remainingNone first_pointSome(SubPos { x: 7488, y: 3648 })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ai::ra8_attrition_tests::ra8_original_surface_approach_keeps_its_native_temporal_building_channel ... FAILED
+
+failures:
+
+failures:
+    ai::ra8_attrition_tests::ra8_original_surface_approach_keeps_its_native_temporal_building_channel
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 119 filtered out; finished in 0.29s
+
+error: test failed, to rerun pass `-p sim --lib`

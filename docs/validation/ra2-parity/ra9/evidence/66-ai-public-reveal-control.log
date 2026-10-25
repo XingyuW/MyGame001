@@ -1,0 +1,9 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4m 24s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/sim-25e79ea3b16f7b71)
+
+running 1 test
+test ai::ra9_keys_tests::ra9_public_reveal_obeys_actual_fog_gap_and_ai_turn_alignment ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 130 filtered out; finished in 0.34s
+

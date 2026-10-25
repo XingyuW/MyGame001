@@ -1,0 +1,15 @@
+[workspace]
+resolver = "3"
+members = ["crates/sim", "crates/game"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.98.1"
+publish = false
+
+# The simulation is optimised in the dev profile too (docs/DECISIONS.md D53): its tests play long
+# computer-player matches, which took minutes unoptimised. Debug assertions and overflow checks
+# stay on (they are separate profile settings), so debug builds still trap overflow (I12).
+[profile.dev.package.sim]
+opt-level = 3

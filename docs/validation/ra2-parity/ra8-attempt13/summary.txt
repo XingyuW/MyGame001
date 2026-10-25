@@ -1,0 +1,3 @@
+01 exit 0  1 s  cargo fmt --all -- --check
+02 exit 0  0 s  git diff --check
+03 exit 0  1 s  cargo clippy --workspace --all-targets -- -D warnings

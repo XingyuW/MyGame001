@@ -1,0 +1,403 @@
+--- a/crates/sim/tests/ra9_audit/actual.rs
++++ b/crates/sim/tests/ra9_audit/actual.rs
+@@ -1,6 +1,6 @@
+-//! UNVALIDATED adapter draft. Uses actual sim::Definitions access patterns already present
+-//! in ra9_data_parity.rs. Schema10 metadata.size_limit and death_weapon_damage_pm are intentionally pending integration.
+-//! Do not compile/run until explicit RA8 closure and canonical RA9 release.
++//! Historical adapter-draft note: UNVALIDATED adapter draft. Uses actual sim::Definitions access patterns already present
++//! Historical adapter-draft note: in ra9_data_parity.rs. Schema10 metadata.size_limit and death_weapon_damage_pm are intentionally pending integration.
++//! Historical adapter-draft note: Do not compile/run until explicit RA8 closure and canonical RA9 release.
+ use super::{Audit, AuditResult, Expected, Reference, SourceKey, WitnessId};
+ use sim::{Definitions, ProductionItem};
+ 
+@@ -292,4 +292,4 @@
+ //10. Existing named wrappers remain and use scoped reconciliation, not pre-marked foreign rows.
+ //11. Runtime metadata strength/radius is not universally effective mechanic: Iron Curtain duration
+ //    lives in Rules, Nuke damage/spread in native payload, radius6 active AI scoring stays distinct.
+-//12. All tests/mutations remain UNRUN until explicit root release and coordinated source freeze.
++// Historical preparation note: 12. All tests/mutations remain UNRUN until explicit root release and coordinated source freeze.
+--- a/crates/sim/tests/ra9_audit/array-negatives.rs
++++ b/crates/sim/tests/ra9_audit/array-negatives.rs
+@@ -1,4 +1,4 @@
+-//! UNRUN actual loaded-array mutations. Positive calls invoke the unchanged native adapter
++//! Historical preparation note: UNRUN actual loaded-array mutations. Positive calls invoke the unchanged native adapter
+ //! first; mutants must load successfully and fail the intended array component/length check.
+ //! Keyed Verses and unique prerequisite reorders are separate expected-pass controls.
+ use super::*;
+--- a/crates/sim/tests/ra9_audit/behavior87-admission.rs
++++ b/crates/sim/tests/ra9_audit/behavior87-admission.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN exact87 current-model classifications. No runtime feature or coverage.
++//! Historical preparation note: UNCOMPILED/UNRUN exact87 current-model classifications. No runtime feature or coverage.
+ //! Real loaded policy premises are not source Expected values for the87 nonread literals.
+ use super::*;
+ const ATOMS: &str = include_str!("behavior87-atoms.tsv");
+@@ -536,7 +536,7 @@
+ const _: fn(&Plan, &SourceKey) -> bool = owns;
+ 
+ // Installed actual prepared negative block: behavior87-20261019-v1.UNVALIDATED.audit-negatives.rs.txt
+-// UNCOMPILED/UNRUN. Append inside behavior87_admission.rs after actual final integration.
++// Historical preparation note: UNCOMPILED/UNRUN. Append inside behavior87_admission.rs after actual final integration.
+ // Every negative FIRST requires the genuinely accepted installed final audit baseline.
+ // Current UNACCEPTED tables are not a passing baseline, nor an expected test result.
+ #[cfg(test)]
+--- a/crates/sim/tests/ra9_audit/carry38-admission.rs
++++ b/crates/sim/tests/ra9_audit/carry38-admission.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN bounded38 documented-model source classifications. No coverage added.
++//! Historical preparation note: UNCOMPILED/UNRUN bounded38 documented-model source classifications. No coverage added.
+ //! A document establishes chosen policy, not source-engine truth or native execution.
+ use super::*;
+ const TABLE: &str = include_str!("carry38-contracts.tsv");
+@@ -411,7 +411,7 @@
+ }
+ 
+ // Installed actual prepared negative block: modelcarry38-integration-20261019-v1.UNVALIDATED.audit-negatives.rs.txt
+-// UNCOMPILED/UNRUN. Append inside carry38_admission.rs. Final acceptance-record negatives
++// Historical preparation note: UNCOMPILED/UNRUN. Append inside carry38_admission.rs. Final acceptance-record negatives
+ // require a genuine fully integrated accepted baseline. NEVER assert shipped records remain
+ // UNACCEPTED, and NEVER fabricate accepted strings/logs simply to make these tests pass.
+ #[cfg(test)]
+--- a/crates/sim/tests/ra9_audit/compositor-negatives.rs
++++ b/crates/sim/tests/ra9_audit/compositor-negatives.rs
+@@ -1,4 +1,4 @@
+-// UNCOMPILED/UNRUN. Child of source_routes.rs. Every negative starts with real final
++// Historical preparation note: UNCOMPILED/UNRUN. Child of source_routes.rs. Every negative starts with real final
+ // audit_at success and actual native/loaded adapters. Missing decisions are not positive fixtures.
+ use super::super::{
+     Audit, Definitions, Inputs, audit_at, fire_audit, fire_keys, load_audit, run_adapters,
+--- a/crates/sim/tests/ra9_audit/consumer62-admission.rs
++++ b/crates/sim/tests/ra9_audit/consumer62-admission.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN exact62 current-model source admissions. No production/schema changes.
++//! Historical preparation note: UNCOMPILED/UNRUN exact62 current-model source admissions. No production/schema changes.
+ //! This module NEVER creates a WitnessId for a nonread source flag, never records coverage,
+ //! and never obtains Native proof from a constant getter. Actual typed metadata premises are
+ //! policy checks. Physical comparisons retain independent v1-v3 demands and adapters.
+@@ -660,7 +660,7 @@
+ }
+ 
+ // Installed actual prepared negative block: consumer62-integration-20261019-v1.UNVALIDATED.audit-negatives.rs.txt
+-// UNCOMPILED/UNRUN. Append inside consumer62_admission.rs as child tests after v1->v2->v3
++// Historical preparation note: UNCOMPILED/UNRUN. Append inside consumer62_admission.rs as child tests after v1->v2->v3
+ // and integration-blockers. Helpers are real adapters; tests do not assert acceptance success.
+ #[cfg(test)]
+ mod tests {
+--- a/crates/sim/tests/ra9_audit/country-rosters.rs
++++ b/crates/sim/tests/ra9_audit/country-rosters.rs
+@@ -1,4 +1,4 @@
+-//! Derived-country oracle, UNCOMPILED/UNRUN. No call to country_tree/check_buildable/
++//! Historical preparation note: Derived-country oracle, UNCOMPILED/UNRUN. No call to country_tree/check_buildable/
+ //! produces/missing_prerequisite/same_factory or any generator implementation.
+ //! All source configuration dependencies here are supplemental, zero global source coverage.
+ use super::arrays::{Deps, SourcePart};
+@@ -632,7 +632,7 @@
+ }
+ 
+ // Installed actual prepared negative block: integration-blockers-20261019-v1.UNVALIDATED.roster-negatives.rs.txt
+-// UNCOMPILED/UNRUN; append to country-rosters.rs. These use actual unchanged loaded data first.
++// Historical preparation note: UNCOMPILED/UNRUN; append to country-rosters.rs. These use actual unchanged loaded data first.
+ #[cfg(test)]
+ mod tests {
+     use super::*;
+--- a/crates/sim/tests/ra9_audit/fire-keys.rs
++++ b/crates/sim/tests/ra9_audit/fire-keys.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED/UNRUN native observations for three shipped false-only fire-key rows.
++//! Historical preparation note: UNVALIDATED/UNRUN native observations for three shipped false-only fire-key rows.
+ //! Test instrumentation observes after Combat and before Visibility; it changes no simulation
+ //! component, history, RNG, command or damage. It is never installed in production.
+ use super::AuditResult;
+--- a/crates/sim/tests/ra9_audit/guard75-admission.rs
++++ b/crates/sim/tests/ra9_audit/guard75-admission.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN exact75 implementation-model nonread admission. No coverage from reading,
++//! Historical preparation note: UNCOMPILED/UNRUN exact75 implementation-model nonread admission. No coverage from reading,
+ //! reasons, aliases or defaults. This module introduces no simulation field/getter/state.
+ //! Use with the actual v3 ledger + policy-admission.rs only after coordinated RA9 integration.
+ use super::*;
+--- a/crates/sim/tests/ra9_audit/guard75-negatives.rs
++++ b/crates/sim/tests/ra9_audit/guard75-negatives.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN. Install as child tests of guard75-admission.
++//! Historical preparation note: UNCOMPILED/UNRUN. Install as child tests of guard75-admission.
+ //! Native gameplay acceptance is NOT granted here. Real Definitions/Inputs are loaded first;
+ //! source/mapping/metadata mutations below test admission, not original engine behavior.
+ use super::*;
+--- a/crates/sim/tests/ra9_audit/legacy-ai-negatives.rs
++++ b/crates/sim/tests/ra9_audit/legacy-ai-negatives.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN negative bodies. Install under the owning policy module.
++//! Historical preparation note: UNCOMPILED/UNRUN negative bodies. Install under the owning policy module.
+ use super::*;
+ struct Context {
+     input: Inputs,
+--- a/crates/sim/tests/ra9_audit/legacy-ai-policy.rs
++++ b/crates/sim/tests/ra9_audit/legacy-ai-policy.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN 361 exact old source classifications in 69 families.
++//! Historical preparation note: UNCOMPILED/UNRUN 361 exact old source classifications in 69 families.
+ //! No original-engine unused claim, source literal getter, alias/Own/native read credit.
+ use super::*;
+ use legacy904_support as s;
+--- a/crates/sim/tests/ra9_audit/legacy-model-negatives.rs
++++ b/crates/sim/tests/ra9_audit/legacy-model-negatives.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN negative bodies. Install under the owning policy module.
++//! Historical preparation note: UNCOMPILED/UNRUN negative bodies. Install under the owning policy module.
+ use super::*;
+ struct Context {
+     input: Inputs,
+--- a/crates/sim/tests/ra9_audit/legacy-model-policy.rs
++++ b/crates/sim/tests/ra9_audit/legacy-model-policy.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN 543 exact old source classifications in 62 families.
++//! Historical preparation note: UNCOMPILED/UNRUN 543 exact old source classifications in 62 families.
+ //! No original-engine unused claim, source literal getter, alias/Own/native read credit.
+ use super::*;
+ use legacy904_support as s;
+--- a/crates/sim/tests/ra9_audit/legacy-source-admission.rs
++++ b/crates/sim/tests/ra9_audit/legacy-source-admission.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN bridge to three existing exact guard implementations. No bulk approval.
++//! Historical preparation note: UNCOMPILED/UNRUN bridge to three existing exact guard implementations. No bulk approval.
+ //! Legacy361/543 use independent declare/admit/finish plans in source-plans.
+ use super::*;
+ use source_routes::Route;
+--- a/crates/sim/tests/ra9_audit/legacy904-loaded.rs
++++ b/crates/sim/tests/ra9_audit/legacy904-loaded.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN typed current-policy observations. NO source Expected/witness credit.
++//! Historical preparation note: UNCOMPILED/UNRUN typed current-policy observations. NO source Expected/witness credit.
+ use super::*;
+ pub(super) fn ai_snapshot(ai: &sim::AiDefinitions, d: &Definitions) -> AuditResult<String> {
+     let mut out = BTreeMap::<String, String>::new();
+--- a/crates/sim/tests/ra9_audit/legacy904-scope-negatives.rs
++++ b/crates/sim/tests/ra9_audit/legacy904-scope-negatives.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN actual final baseline first, no permanently unaccepted table assertion.
++//! Historical preparation note: UNCOMPILED/UNRUN actual final baseline first, no permanently unaccepted table assertion.
+ use super::*;
+ #[test]
+ fn ra9_legacy_authority_missing_end_rejects_instead_of_widening_to_eof() -> AuditResult<()> {
+--- a/crates/sim/tests/ra9_audit/legacy904-support.rs
++++ b/crates/sim/tests/ra9_audit/legacy904-support.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN small shared table/real-loader guards for two existing-style policies.
++//! Historical preparation note: UNCOMPILED/UNRUN small shared table/real-loader guards for two existing-style policies.
+ //! Uses the existing common SourceProposal/SourceAcceptance/ObservedScope gates; no new receipts.
+ use super::*;
+ pub(super) fn records<'a>(text: &'a str, header: &str) -> AuditResult<Vec<Vec<&'a str>>> {
+@@ -356,7 +356,7 @@
+     }
+     Ok(got)
+ }
+-// UNCOMPILED/UNRUN. Append inside legacy904_support; typed current-policy guard only.
++// Historical preparation note: UNCOMPILED/UNRUN. Append inside legacy904_support; typed current-policy guard only.
+ // This does not observe an unparsed source key, create Native credit or simulate a selector.
+ pub(super) fn last_five_model_guard(
+     i: &Inputs,
+--- a/crates/sim/tests/ra9_audit/masked-speed-admission.rs
++++ b/crates/sim/tests/ra9_audit/masked-speed-admission.rs
+@@ -1,4 +1,4 @@
+-//! Exact19 speed-selector dispositions. UNCOMPILED/UNRUN, zero coverage mutation.
++//! Historical preparation note: Exact19 speed-selector dispositions. UNCOMPILED/UNRUN, zero coverage mutation.
+ use super::*;
+ const ROWS: &str = include_str!("masked-speed-atoms.tsv");
+ fn cell<'a>(r: &'a Reference, s: &str, k: &str, default: &'a str) -> &'a str {
+@@ -216,7 +216,7 @@
+ const _: fn(&SourceKey) -> bool = contains;
+ 
+ // Installed actual prepared negative block: integration-blockers-20261019-v1.UNVALIDATED.speed-negatives.rs.txt
+-// UNCOMPILED/UNRUN; add to masked-speed-admission.rs after speed-shortcircuit.patch.
++// Historical preparation note: UNCOMPILED/UNRUN; add to masked-speed-admission.rs after speed-shortcircuit.patch.
+ #[cfg(test)]
+ mod tests {
+     use super::*;
+--- a/crates/sim/tests/ra9_audit/metadata-admission.rs
++++ b/crates/sim/tests/ra9_audit/metadata-admission.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED/UNRUN metadata-only implementation non-use proposal. No production patch.
++//! Historical preparation note: UNVALIDATED/UNRUN metadata-only implementation non-use proposal. No production patch.
+ //! Only real source-code absence/model approval admits these exact147 rows; never RA2 semantic
+ //! non-use, constant native witnesses, Own coverage, default/read/alias credit or a reason wildcard.
+ use super::{
+--- a/crates/sim/tests/ra9_audit/model162-admission.rs
++++ b/crates/sim/tests/ra9_audit/model162-admission.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN exact162 current-model source classifications,32 families.
++//! Historical preparation note: UNCOMPILED/UNRUN exact162 current-model source classifications,32 families.
+ //! No fake physical flag, constant NativeWitness, source read/alias credit or new mechanics.
+ use super::*;
+ #[path = "model162-loaded.rs"]
+@@ -428,7 +428,7 @@
+ }
+ 
+ // Installed actual prepared negative block: model162-integration-20261019-v1.UNVALIDATED.audit-negatives.rs.txt
+-// UNCOMPILED/UNRUN. Append to model162_admission.rs as child tests after all actual A/S
++// Historical preparation note: UNCOMPILED/UNRUN. Append to model162_admission.rs as child tests after all actual A/S
+ // integration. Genuine accepted baselines are required for admission-record mutations.
+ // No permanent assertion that installed final acceptances must stay UNACCEPTED.
+ #[cfg(test)]
+--- a/crates/sim/tests/ra9_audit/model162-loaded.rs
++++ b/crates/sim/tests/ra9_audit/model162-loaded.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN real typed policy observations. These are NOT source Expected/native
++//! Historical preparation note: UNCOMPILED/UNRUN real typed policy observations. These are NOT source Expected/native
+ //! witnesses. No getter is invented for an unparsed source flag. No coverage is recorded.
+ use super::*;
+ fn item(d: &Definitions, id: &str) -> AuditResult<sim::ProductionItem> {
+--- a/crates/sim/tests/ra9_audit/negatives.rs
++++ b/crates/sim/tests/ra9_audit/negatives.rs
+@@ -1,4 +1,4 @@
+-//! UNRUN causal audit negatives against actual loaded Definitions/adapters.
++//! Historical preparation note: UNRUN causal audit negatives against actual loaded Definitions/adapters.
+ //! Every mutation first requires the same real adapter to succeed on unchanged shipped input.
+ //! Loader/setup failures fail the test separately; they cannot count as the intended negative.
+ use super::*;
+--- a/crates/sim/tests/ra9_audit/nested-negatives.rs
++++ b/crates/sim/tests/ra9_audit/nested-negatives.rs
+@@ -1,4 +1,4 @@
+-//! UNRUN actual valid-loader nested component/length mutations and semantic reorder controls.
++//! Historical preparation note: UNRUN actual valid-loader nested component/length mutations and semantic reorder controls.
+ //! A failing unchanged adapter or a mutant loader rejection cannot count as evidence.
+ use super::array_negatives::DataCopy;
+ use super::*;
+--- a/crates/sim/tests/ra9_audit/policy-admission.rs
++++ b/crates/sim/tests/ra9_audit/policy-admission.rs
+@@ -1,4 +1,4 @@
+-//! Exact80 current game-array contracts, UNCOMPILED/UNRUN. No native/source coverage.
++//! Historical preparation note: Exact80 current game-array contracts, UNCOMPILED/UNRUN. No native/source coverage.
+ use super::*;
+ const CONTRACTS: &str = include_str!("own-policy-contracts.tsv");
+ const ACCEPTANCES: &str = include_str!("own-policy-acceptance.tsv");
+@@ -233,7 +233,7 @@
+ }
+ 
+ // Installed actual prepared negative block: integration-blockers-20261019-v1.UNVALIDATED.policy-negatives.rs.txt
+-// UNCOMPILED/UNRUN; append to policy-admission.rs. No fake native witness or acceptance.
++// Historical preparation note: UNCOMPILED/UNRUN; append to policy-admission.rs. No fake native witness or acceptance.
+ #[cfg(test)]
+ mod tests {
+     use super::*;
+--- a/crates/sim/tests/ra9_audit/residual-admission.rs
++++ b/crates/sim/tests/ra9_audit/residual-admission.rs
+@@ -1,4 +1,4 @@
+-//! Test-only proposed integration module. UNCOMPILED/UNRUN. No coverage mutation.
++//! Historical preparation note: Test-only proposed integration module. UNCOMPILED/UNRUN. No coverage mutation.
+ //! Parent module is the v1 audit implementation after v2/v3 and source-policy corrections.
+ //! Root independently verifies live census/original source before constructing Approval.
+ use super::*;
+@@ -274,7 +274,7 @@
+ }
+ 
+ // Installed actual prepared negative block: residual-disposition-20261019-v1.UNVALIDATED.adapter-negatives.rs.txt
+-// UNCOMPILED/UNRUN; append inside residual_admission.rs, not production.
++// Historical preparation note: UNCOMPILED/UNRUN; append inside residual_admission.rs, not production.
+ // Actual unchanged loaded adapters and source guards must pass before each mutation.
+ // Electric control requires the real authorized metadata-extraction extension first.
+ #[cfg(test)]
+--- a/crates/sim/tests/ra9_audit/schema10-adapters.rs
++++ b/crates/sim/tests/ra9_audit/schema10-adapters.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN five real S schema10 fields only. All actual source defaults and
++//! Historical preparation note: UNCOMPILED/UNRUN five real S schema10 fields only. All actual source defaults and
+ //! physical consumers remain independent; no native behavioral coverage is inferred here.
+ use super::*;
+ const FIELDS: [(&str, &str, &str); 5] = [
+--- a/crates/sim/tests/ra9_audit/scope-inputs.rs
++++ b/crates/sim/tests/ra9_audit/scope-inputs.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN reads actual metadata outputs of --ra9-scope; expected tables are not
++//! Historical preparation note: UNCOMPILED/UNRUN reads actual metadata outputs of --ra9-scope; expected tables are not
+ //! observations. Root separately authenticates producer inputs, artifact SHA and decisions.
+ //! Fresh actual file-set/byte-count/FNV checks detect ordinary source drift without new deps.
+ //! FNV is not cryptographic authentication; root's actual SHA256 verification remains required.
+--- a/crates/sim/tests/ra9_audit/source-disposition.rs
++++ b/crates/sim/tests/ra9_audit/source-disposition.rs
+@@ -1,4 +1,4 @@
+-//! UNVALIDATED/UNRUN static-unused proposal guard. Reading never grants source coverage.
++//! Historical preparation note: UNVALIDATED/UNRUN static-unused proposal guard. Reading never grants source coverage.
+ //! Integrate only after root final source approval; no generic whitelist/default/Own escape.
+ use super::{
+     Audit, AuditResult, Definitions, Inputs, Portion, SourceKey, Unused, Witness, WitnessId,
+--- a/crates/sim/tests/ra9_audit/source-routes.rs
++++ b/crates/sim/tests/ra9_audit/source-routes.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN exact typed disposition routing. No record alone creates coverage.
++//! Historical preparation note: UNCOMPILED/UNRUN exact typed disposition routing. No record alone creates coverage.
+ use super::*;
+ #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+ pub(super) enum Class {
+--- a/crates/sim/tests/ra9_audit/special-source-admission.rs
++++ b/crates/sim/tests/ra9_audit/special-source-admission.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN special exact3 nonread keys +7 source-presentation premises.
++//! Historical preparation note: UNCOMPILED/UNRUN special exact3 nonread keys +7 source-presentation premises.
+ //! Root records actual source/native/client decisions. No nonexistent source flag witness.
+ use super::*;
+ use source_routes::{Class, Route};
+--- a/crates/sim/tests/ra9_auto_defuse_geometry.rs
++++ b/crates/sim/tests/ra9_auto_defuse_geometry.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED / UNRUN. Run this SAME test under base370471e before the small geometry delta.
++//! Historical preparation note: UNCOMPILED / UNRUN. Run this SAME test under base370471e before the small geometry delta.
+ //! The west case is expected to fail actual approach/removal while all native premises pass.
+ //! Requires the unchanged common module from the remaining-native package; no parser variant.
+ mod ra9_remaining_common;
+--- a/crates/sim/tests/ra9_guard75_readiness.rs
++++ b/crates/sim/tests/ra9_guard75_readiness.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED / UNRUN. Proposed crates/sim/tests/ra9_guard75_readiness.rs.
++//! Historical preparation note: UNCOMPILED / UNRUN. Proposed crates/sim/tests/ra9_guard75_readiness.rs.
+ //! Four bodies, three missing routes. Install only after root releases RA8 and refreshes pins.
+ //! Only shipped definitions, public commands and SimSchedule. promote is controlled elite setup.
+ mod ra7_common;
+--- a/crates/sim/tests/ra9_legacy904_last_five.rs
++++ b/crates/sim/tests/ra9_legacy904_last_five.rs
+@@ -1,4 +1,4 @@
+-// UNCOMPILED / UNRUN / UNACCEPTED. Proposed crates/sim/tests/ra9_legacy904_last_five.rs.
++// Historical preparation note: UNCOMPILED / UNRUN / UNACCEPTED. Proposed crates/sim/tests/ra9_legacy904_last_five.rs.
+ // Existing ra7_common supplies shipped world/put/issue/tick/entity. No new runtime API.
+ mod ra7_common;
+ use bevy_app::App;
+--- a/crates/sim/tests/ra9_legacy_model_boundaries.rs
++++ b/crates/sim/tests/ra9_legacy_model_boundaries.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED/UNRUN first5 legacy904 route proposals. Proposed integration test file.
++//! Historical preparation note: UNCOMPILED/UNRUN first5 legacy904 route proposals. Proposed integration test file.
+ //! Uses existing ra7_common stock world/public spawns/tick helpers; no alternate simulation.
+ //! Guard/Attack/Move/Deploy go through real CommandQueue and SimSchedule in common::tick.
+ mod ra7_common;
+--- a/crates/sim/tests/ra9_parasite_origin.rs
++++ b/crates/sim/tests/ra9_parasite_origin.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED / UNRUN. Install only after schema10 + integrated370471e + identity delta.
++//! Historical preparation note: UNCOMPILED / UNRUN. Install only after schema10 + integrated370471e + identity delta.
+ //! Native current-model fixture, not stock Drone-on-Drone parity: common fixed HP2000/armour
+ //! light gives stock Parasite a positive versus. The two arms differ ONLY in TypeImmune0/1.
+ //! This proves ordinary periodic damage immunity, not refusal of parasite attachment.
+--- a/crates/sim/tests/ra9_remaining_props.rs
++++ b/crates/sim/tests/ra9_remaining_props.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED / UNRUN. Native full erasure, Ivan expiry, and explicit/automatic DefuseKit paths.
++//! Historical preparation note: UNCOMPILED / UNRUN. Native full erasure, Ivan expiry, and explicit/automatic DefuseKit paths.
+ mod ra9_remaining_common;
+ use ra9_remaining_common::*;
+ use std::collections::BTreeSet;
+--- a/crates/sim/tests/ra9_scenery_connected.rs
++++ b/crates/sim/tests/ra9_scenery_connected.rs
+@@ -1,4 +1,4 @@
+-//! UNCOMPILED / UNRUN: proposed native actorless-target tests after schema10 integration.
++//! Historical preparation note: UNCOMPILED / UNRUN: proposed native actorless-target tests after schema10 integration.
+ //! Runtime stimuli use CommandQueue/SimSchedule. Hidden injection is controlled admission setup,
+ //! not an original/native concealment producer. No garrison cooldown or beam history is forged.
+ mod ra9_soundness_common;
+--- a/crates/sim/tests/ra9_vhp_scan.rs
++++ b/crates/sim/tests/ra9_vhp_scan.rs
+@@ -1,4 +1,4 @@
+-// UNVALIDATED / UNCOMPILED / UNRUN: native current-API Patriot baseline and control bodies.
++// Historical preparation note: UNVALIDATED / UNCOMPILED / UNRUN: native current-API Patriot baseline and control bodies.
+ // Proposed integration file crates/sim/tests/ra9_vhp_scan.rs, only after root releases RA8.
+ mod ra7_common;
+ use bevy_app::App;

@@ -1,0 +1,30 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_surface_counterfire_prioritizes_a_real_defender_over_a_nearer_unarmed_miner",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-20T02:59:36.217621+00:00",
+  "elapsed_seconds": 21.508946749963798,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "88497b2dde9a95a704e2d6439f85e84ea172bd4d04b2aa92dc148cc254f1d860",
+    "crates/sim/src/ai/strategy.rs": "11f9dde2286a9927183c815c1288ea7fcea56d88abc729d9b9425c87d92b9817",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "92a0fc584a2fe719fd9d7b505c0de9197161e1e491077ce6e7a5c0be837f0595",
+    "crates/game/tests/ra8_gate_matches.rs": "112fccc43a99547c3d1a0d66c407756a8832de222868771b6cb2ee04a0b10b35",
+    "crates/sim/tests/ra8_ai.rs": "c227cd858eaf87b31875fb8bf7e207567939ed0c3b7cf7467f04bcf0b0c82295"
+  },
+  "mutant_strategy_sha256": "c569cc44b72fce5e9dee6612bbe6a0b2df45e0765434a36b416a4cb87e3f78f7",
+  "diagnostic_scope": "Read-only prints of actual due View/current target/eligible observed threats; no gameplay state writes",
+  "log_sha256": "2677ad2abe41cf8032c54e677404475b45874bf9cddfc59c31109b9d8601a022"
+}

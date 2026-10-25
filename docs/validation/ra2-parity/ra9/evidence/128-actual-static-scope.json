@@ -1,0 +1,78 @@
+{
+  "status": "ACTUAL_STATIC_CURRENT_CONSUMER_SCOPE_WITH_QUALIFIED_OBSERVED_LINKS_NOT_FINAL_ACCEPTANCE",
+  "utc": "2026-10-21T03:03:28.261216+00:00",
+  "original_rules_sha256": "adc869ca037db5141f562f18092d022045e194de0d1204a46b9ec8372b2b826f",
+  "observations": [
+    {
+      "path": "ra9-preliminary-logs/B-presentation33-20261021-v1-static-evidence.tsv",
+      "bytes": 56992,
+      "sha256": "122a866fa05ff62cd3989a9139d57040a8c84cdd78f7b4927989fd8d350a9fd2"
+    },
+    {
+      "path": "ra9-preliminary-logs/B-presentation33-20261021-v1-inputs.json",
+      "bytes": 2739,
+      "sha256": "e461450928b085b806a248625f1107957f45218e262a83e0e515ac1572c10d23"
+    },
+    {
+      "path": "ra9-preliminary-logs/B-model-absence29-20261021-v1-static-evidence.tsv",
+      "bytes": 70907,
+      "sha256": "fa7b21d5a62dee7b7f8f440a2649fde83df715537814a4e50dc41e47f51faab7"
+    },
+    {
+      "path": "ra9-preliminary-logs/B-model-absence29-20261021-v1-inputs.json",
+      "bytes": 23826,
+      "sha256": "cf09d0588f43242cc92551aef976ca0d17f37e99fafcc647f7b6dac8e2ab28b1"
+    },
+    {
+      "path": "ra9-preliminary-logs/78-policy-guards-and-fire.json",
+      "bytes": 578,
+      "sha256": "e31d4d654b3f372555c4ee6b3512c65b46cd670459507c07fdda1d3c794dfc81"
+    },
+    {
+      "path": "ra9-preliminary-logs/78-policy-guards-and-fire.log",
+      "bytes": 48709,
+      "sha256": "93bc8d3b991b6fcc25063e1023a3cd539149a0640b8bc4c679d413026a86ef54"
+    },
+    {
+      "path": "ra9-preliminary-logs/74-independent-original-closure-check.json",
+      "bytes": 680,
+      "sha256": "4967a47bf0d369eaeac9fbd30bce105ae208e977cd8014baec2734a7bb5ee940"
+    },
+    {
+      "path": "ra9-preliminary-logs/75-verified-pin-migrations.json",
+      "bytes": 1256,
+      "sha256": "49701e4fef73599697b06e9425b13b749ea66eb6553dd97c8cda4112a8c96762"
+    },
+    {
+      "path": "ra9-preliminary-logs/B-power3-lobby4-marker9-scope.json",
+      "bytes": 23133,
+      "sha256": "bffa2ee21124d8112ca14bfe874fa8c0df88081a138ab3b504821024e601845c"
+    },
+    {
+      "path": "ra9-preliminary-logs/B-jumpjet4-current2d-scope.json",
+      "bytes": 11511,
+      "sha256": "8098d9a884f11e48df5955c7572292a4ace0a7cde5da82c65ba1be4114b8ce84"
+    },
+    {
+      "path": "ra9-preliminary-logs/B-threat3-fogblink2-consumer-scope.json",
+      "bytes": 23154,
+      "sha256": "b6c7075d134f4fa7571fa1db6537c64439ea6d3f8c7c253b188d28fc3e1f06f6"
+    },
+    {
+      "path": "ra9-preliminary-logs/111-exact-source-route-evidence.json",
+      "bytes": 2048550,
+      "sha256": "3aea0875050550021b2fa3495431d8a35b450cf6d8991d77252d7c5052bee39c"
+    },
+    {
+      "path": "ra9-preliminary-logs/B-121-123-receipt-reconciliation.json",
+      "bytes": 525650,
+      "sha256": "7dbcf5d2e889e166bdf84245d5f3143df0e185659ae638dd41aaa980e3198679"
+    }
+  ],
+  "required_scope": "Per-row exact source/consumer/model absence and actual physical adapter guards; table reasons alone grant no credit; native logs remain separately qualified.",
+  "predecessor": {
+    "path": "ra9-preliminary-logs/96-actual-static-scope.json",
+    "bytes": 1987,
+    "sha256": "eacf142a11a935a4689787895b86a4ef671f58d9a0dd654fb9410283fa73ebd7"
+  }
+}

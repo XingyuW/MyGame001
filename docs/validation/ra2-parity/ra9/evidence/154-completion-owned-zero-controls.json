@@ -1,0 +1,21 @@
+{
+  "utc": "2026-10-21T04:27:01.420881+00:00",
+  "completed_utc": "2026-10-21T04:27:02.341602+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "ra9_completion_building_ammo",
+    "--",
+    "--nocapture"
+  ],
+  "exit_code": 0,
+  "seconds": 0.921,
+  "input_count": 656,
+  "input_drift": [],
+  "scope": "Actual loaded GameOwned ammo0 and3argumentless zero sentinels with missing/corrupt/fakeCompared negatives, genuine Cost/HP neighbors retained/no sourcecredit; not complete admission/native fidelity/final acceptance"
+}

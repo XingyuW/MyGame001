@@ -1,0 +1,21 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 35.83s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-b27027efb5a77317)
+
+running 1 test
+
+thread 'ra9_privacy_remembered_bridge_approach_ignores_unseen_endpoint_and_corridor_buildings' (16298201) panicked at crates/sim/tests/ra8_ai.rs:271:9:
+assertion `left == right` failed: unseen building at CellPos { x: 20, y: 22 } must not select the AI's endpoint or traversal
+  left: [Move { units: [SimId(2)], target: CellPos { x: 20, y: 21 } }]
+ right: [Move { units: [SimId(2)], target: CellPos { x: 20, y: 22 } }]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra9_privacy_remembered_bridge_approach_ignores_unseen_endpoint_and_corridor_buildings ... FAILED
+
+failures:
+
+failures:
+    ra9_privacy_remembered_bridge_approach_ignores_unseen_endpoint_and_corridor_buildings
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 134 filtered out; finished in 0.41s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

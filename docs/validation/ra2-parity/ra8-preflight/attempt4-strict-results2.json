@@ -1,0 +1,48 @@
+[
+  {
+    "name": "attempt4-clippy2",
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 7.195817291998537
+  },
+  {
+    "name": "attempt4-fmt2",
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.9669720420206431
+  },
+  {
+    "name": "attempt4-generated1",
+    "command": [
+      "python3",
+      "scripts/generate_ra2_data.py",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.08180849999189377
+  },
+  {
+    "name": "attempt4-reference1",
+    "command": [
+      "python3",
+      "scripts/ra2_reference.py",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.08658825000748038
+  }
+]

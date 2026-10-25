@@ -1,0 +1,29 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all"
+    ],
+    "exit": 0,
+    "seconds": 0.8637000829912722,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-format6.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "ai::ra8_recovery_tests",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 101,
+    "seconds": 16.766989083000226,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-after5.log"
+  }
+]

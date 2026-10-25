@@ -1,0 +1,17 @@
+{
+  "utc": "2026-10-21T10:29:31.502669+00:00",
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit": 0,
+  "passed": true,
+  "stdout": "",
+  "stderr": "",
+  "paths": [
+    "crates/sim/src/ai.rs",
+    "crates/sim/tests/ra8_ai.rs"
+  ]
+}

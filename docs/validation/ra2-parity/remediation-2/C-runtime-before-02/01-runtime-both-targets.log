@@ -1,0 +1,86 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 13.53s
+     Running tests/ra9_support_current.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_support_current-a4854771f18e6224)
+
+running 6 tests
+
+thread 'ra9_command_dead_older_cloner_cannot_shadow_captured_living_vat' (17398586) panicked at crates/sim/tests/ra9_support_current.rs:302:9:
+assertion `left == right` failed: a dead older vat must not shadow the actual captured living vat
+  left: []
+ right: [UnitKind(2)]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra9_no_cloner_production_has_no_extra_copy ... ok
+test ra9_command_one_hp_older_cloner_still_produces_exactly_one_copy ... ok
+test ra9_command_dead_older_cloner_cannot_shadow_captured_living_vat ... FAILED
+
+thread 'ra9_command_dead_purifier_cannot_credit_same_tick_delivery' (17398587) panicked at crates/sim/tests/ra9_support_current.rs:161:5:
+assertion `left == right` failed: only a living eligible support credits its exact bonus
+  left: 625
+ right: 500
+test ra9_no_purifier_delivery_keeps_exact_base_credit ... ok
+test ra9_command_one_hp_purifier_still_credits_exact_bonus ... ok
+test ra9_command_dead_purifier_cannot_credit_same_tick_delivery ... FAILED
+
+failures:
+
+failures:
+    ra9_command_dead_older_cloner_cannot_shadow_captured_living_vat
+    ra9_command_dead_purifier_cannot_credit_same_tick_delivery
+
+test result: FAILED. 4 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p sim --test ra9_support_current`
+     Running tests/ra9_temporal_pending.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_temporal_pending-9daa295f53e8908d)
+
+running 7 tests
+
+thread 'ra9_erased_captured_hospital_preserves_near_full_patient_and_blocked_release' (17398598) panicked at crates/sim/tests/ra9_temporal_pending.rs:78:5:
+frozen Hospital cannot heal and rematerialize an admitted near-full patient
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'ra9_erased_captured_hospital_holds_due_healing_and_exit_then_resumes' (17398597) panicked at crates/sim/tests/ra9_temporal_pending.rs:82:5:
+assertion `left == right` failed: frozen Hospital must not heal at admission tick's due service
+  left: 25
+ right: 5
+test ra9_erased_captured_hospital_preserves_near_full_patient_and_blocked_release ... FAILED
+test ra9_erased_captured_hospital_holds_due_healing_and_exit_then_resumes ... FAILED
+
+thread 'ra9_blocked_garrison_eviction_cannot_birth_occupant_while_host_erased' (17398596) panicked at crates/sim/tests/ra9_temporal_pending.rs:372:9:
+assertion `left == right` failed: a persisted voluntary exit is frozen host work
+  left: []
+ right: [SimId(0)]
+test ra9_blocked_garrison_eviction_cannot_birth_occupant_while_host_erased ... FAILED
+
+thread 'ra9_pending_prop_ivan_action_waits_for_real_temporal_release' (17398602) panicked at crates/sim/tests/ra9_temporal_pending.rs:277:9:
+assertion failed: !app.world().resource::<SpecialState>().charges.contains_key(&target)
+test ra9_pending_prop_ivan_action_waits_for_real_temporal_release ... FAILED
+
+thread 'ra9_pending_occupier_entry_waits_for_real_temporal_release' (17398601) panicked at crates/sim/tests/ra9_temporal_pending.rs:272:9:
+a frozen pending actor must not be consumed by its accepted interaction: [AttackEnded { unit: SimId(1), target: SimId(0), reason: TargetGone }, WeaponFired { attacker: SimId(3221226452), target: SimId(1), weapon: WeaponKind(92) }]
+test ra9_pending_occupier_entry_waits_for_real_temporal_release ... FAILED
+
+thread 'ra9_pending_engineer_boarding_waits_for_real_temporal_release' (17398599) panicked at crates/sim/tests/ra9_temporal_pending.rs:224:9:
+a frozen pending actor must not be consumed by its accepted interaction: [AttackEnded { unit: SimId(2), target: SimId(1), reason: TargetGone }]
+test ra9_pending_engineer_boarding_waits_for_real_temporal_release ... FAILED
+
+thread 'ra9_pending_engineer_capture_waits_for_real_temporal_release' (17398600) panicked at crates/sim/tests/ra9_temporal_pending.rs:224:9:
+a frozen pending actor must not be consumed by its accepted interaction: [AttackEnded { unit: SimId(2), target: SimId(1), reason: TargetGone }]
+test ra9_pending_engineer_capture_waits_for_real_temporal_release ... FAILED
+
+failures:
+
+failures:
+    ra9_blocked_garrison_eviction_cannot_birth_occupant_while_host_erased
+    ra9_erased_captured_hospital_holds_due_healing_and_exit_then_resumes
+    ra9_erased_captured_hospital_preserves_near_full_patient_and_blocked_release
+    ra9_pending_engineer_boarding_waits_for_real_temporal_release
+    ra9_pending_engineer_capture_waits_for_real_temporal_release
+    ra9_pending_occupier_entry_waits_for_real_temporal_release
+    ra9_pending_prop_ivan_action_waits_for_real_temporal_release
+
+test result: FAILED. 0 passed; 7 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p sim --test ra9_temporal_pending`
+error: 2 targets failed:
+    `-p sim --test ra9_support_current`
+    `-p sim --test ra9_temporal_pending`

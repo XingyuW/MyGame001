@@ -1,0 +1,28 @@
+{
+  "label": "attempt11-passive-income-repair-after1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_passive_income_without_actors_or_production_does_not_fund_an_endless_repair_duel",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T11:46:49.715687+00:00",
+  "elapsed_seconds": 20.691605083004106,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "e344244c93d906c31ea816e57597b8b1cd84ce220c507698dcc252f4cbdfa720"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "e344244c93d906c31ea816e57597b8b1cd84ce220c507698dcc252f4cbdfa720"
+  },
+  "log_sha256": "7a3afb28382eb9d13dd4a621068c5a04a86fcd0be16f6bc9761664e66a588c9c"
+}

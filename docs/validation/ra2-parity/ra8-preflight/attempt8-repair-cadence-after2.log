@@ -1,0 +1,122 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0631]: type mismatch in closure arguments
+    --> crates/sim/src/ai.rs:1854:25
+     |
+1833 |     let repair_step = |building: &BuildingSnap| {
+     |                       ------------------------- found signature defined here
+...
+1854 |             .filter_map(repair_step)
+     |              ---------- ^^^^^^^^^^^ expected due to this
+     |              |
+     |              required by a bound introduced by this call
+     |
+     = note: expected closure signature `fn(&&ai::BuildingSnap) -> _`
+                found closure signature `fn(&ai::BuildingSnap) -> _`
+note: required by a bound in `filter_map`
+    --> /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/iter/traits/iterator.rs:1000:33
+     |
+ 997 |     fn filter_map<B, F>(self, f: F) -> FilterMap<Self, F>
+     |        ---------- required by a bound in this associated function
+...
+1000 |         F: FnMut(Self::Item) -> Option<B>,
+     |                                 ^^^^^^^^^ required by this bound in `Iterator::filter_map`
+help: consider wrapping the function in a closure
+     |
+1854 |             .filter_map(|arg0: &&ai::BuildingSnap| repair_step(*arg0))
+     |                         ++++++++++++++++++++++++++            +++++++
+help: consider adjusting the signature so it borrows its argument
+     |
+1833 |     let repair_step = |building: &&BuildingSnap| {
+     |                                  +
+
+error[E0599]: the method `fold` exists for struct `FilterMap<Filter<Iter<'_, &BuildingSnap>, {closure@...}>, ...>`, but its trait bounds were not satisfied
+    --> crates/sim/src/ai.rs:1855:14
+     |
+1833 |       let repair_step = |building: &BuildingSnap| {
+     |                         ------------------------- doesn't satisfy `<_ as FnOnce<(&&BuildingSnap,)>>::Output = Option<_>`
+...
+1851 | /         view.own_buildings
+1852 | |             .iter()
+1853 | |             .filter(|b| view.state.repairing().contains(&b.id))
+1854 | |             .filter_map(repair_step)
+1855 | |             .fold(0_i64, i64::saturating_add)
+     | |             -^^^^ method cannot be called due to unsatisfied trait bounds
+     | |_____________|
+     |
+     |
+    ::: /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/iter/adapters/filter_map.rs:18:1
+     |
+  18 |   pub struct FilterMap<I, F> {
+     |   -------------------------- doesn't satisfy `_: Iterator`
+     |
+     = note: the following trait bounds were not satisfied:
+             `<{closure@crates/sim/src/ai.rs:1833:23: 1833:48} as FnOnce<(&&ai::BuildingSnap,)>>::Output = std::option::Option<_>`
+             which is required by `FilterMap<Filter<std::slice::Iter<'_, &ai::BuildingSnap>, {closure@crates/sim/src/ai.rs:1853:21: 1853:24}>, {closure@crates/sim/src/ai.rs:1833:23: 1833:48}>: Iterator`
+             `FilterMap<Filter<std::slice::Iter<'_, &ai::BuildingSnap>, {closure@crates/sim/src/ai.rs:1853:21: 1853:24}>, {closure@crates/sim/src/ai.rs:1833:23: 1833:48}>: Iterator`
+             which is required by `&mut FilterMap<Filter<std::slice::Iter<'_, &ai::BuildingSnap>, {closure@crates/sim/src/ai.rs:1853:21: 1853:24}>, {closure@crates/sim/src/ai.rs:1833:23: 1833:48}>: Iterator`
+     = note: the full name for the type has been written to '/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385.long-type-7358592460945550294.txt'
+     = note: consider using `--verbose` to print the full type name to the console
+
+error[E0631]: type mismatch in closure arguments
+    --> crates/sim/src/ai.rs:1919:21
+     |
+1833 |     let repair_step = |building: &BuildingSnap| {
+     |                       ------------------------- found signature defined here
+...
+1919 |         .filter_map(repair_step)
+     |          ---------- ^^^^^^^^^^^ expected due to this
+     |          |
+     |          required by a bound introduced by this call
+     |
+     = note: expected closure signature `fn(&&ai::BuildingSnap) -> _`
+                found closure signature `fn(&ai::BuildingSnap) -> _`
+note: required by a bound in `filter_map`
+    --> /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/iter/traits/iterator.rs:1000:33
+     |
+ 997 |     fn filter_map<B, F>(self, f: F) -> FilterMap<Self, F>
+     |        ---------- required by a bound in this associated function
+...
+1000 |         F: FnMut(Self::Item) -> Option<B>,
+     |                                 ^^^^^^^^^ required by this bound in `Iterator::filter_map`
+help: consider wrapping the function in a closure
+     |
+1919 |         .filter_map(|arg0: &&ai::BuildingSnap| repair_step(*arg0))
+     |                     ++++++++++++++++++++++++++            +++++++
+help: consider adjusting the signature so it borrows its argument
+     |
+1833 |     let repair_step = |building: &&BuildingSnap| {
+     |                                  +
+
+error[E0599]: the method `fold` exists for struct `FilterMap<Filter<Iter<'_, &BuildingSnap>, {closure@...}>, ...>`, but its trait bounds were not satisfied
+    --> crates/sim/src/ai.rs:1920:10
+     |
+1833 |       let repair_step = |building: &BuildingSnap| {
+     |                         ------------------------- doesn't satisfy `<_ as FnOnce<(&&BuildingSnap,)>>::Output = Option<_>`
+...
+1915 |       let repair_cost = view
+     |  _______________________-
+1916 | |         .own_buildings
+1917 | |         .iter()
+1918 | |         .filter(|b| repairing.contains(&b.id))
+1919 | |         .filter_map(repair_step)
+1920 | |         .fold(0_i64, i64::saturating_add);
+     | |         -^^^^ method cannot be called due to unsatisfied trait bounds
+     | |_________|
+     |
+     |
+    ::: /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/iter/adapters/filter_map.rs:18:1
+     |
+  18 |   pub struct FilterMap<I, F> {
+     |   -------------------------- doesn't satisfy `_: Iterator`
+     |
+     = note: the following trait bounds were not satisfied:
+             `<{closure@crates/sim/src/ai.rs:1833:23: 1833:48} as FnOnce<(&&ai::BuildingSnap,)>>::Output = std::option::Option<_>`
+             which is required by `FilterMap<Filter<std::slice::Iter<'_, &ai::BuildingSnap>, {closure@crates/sim/src/ai.rs:1918:17: 1918:20}>, {closure@crates/sim/src/ai.rs:1833:23: 1833:48}>: Iterator`
+             `FilterMap<Filter<std::slice::Iter<'_, &ai::BuildingSnap>, {closure@crates/sim/src/ai.rs:1918:17: 1918:20}>, {closure@crates/sim/src/ai.rs:1833:23: 1833:48}>: Iterator`
+             which is required by `&mut FilterMap<Filter<std::slice::Iter<'_, &ai::BuildingSnap>, {closure@crates/sim/src/ai.rs:1918:17: 1918:20}>, {closure@crates/sim/src/ai.rs:1833:23: 1833:48}>: Iterator`
+     = note: the full name for the type has been written to '/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385.long-type-2966494673653974019.txt'
+     = note: consider using `--verbose` to print the full type name to the console
+
+Some errors have detailed explanations: E0599, E0631.
+For more information about an error, try `rustc --explain E0599`.
+error: could not compile `sim` (lib test) due to 4 previous errors

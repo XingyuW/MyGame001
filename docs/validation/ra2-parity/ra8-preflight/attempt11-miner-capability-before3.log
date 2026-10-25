@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 5.47s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+
+thread 'ra8_an_incapable_naval_survivor_does_not_suppress_a_real_armed_miner_attack' (9451127) panicked at crates/sim/tests/ra8_ai.rs:7828:5:
+the useful empty miner must physically fire at the seen land building despite the incapable pond submarine
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_an_incapable_naval_survivor_does_not_suppress_a_real_armed_miner_attack ... FAILED
+
+failures:
+
+failures:
+    ra8_an_incapable_naval_survivor_does_not_suppress_a_real_armed_miner_attack
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 95 filtered out; finished in 0.12s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

@@ -16,14 +16,14 @@
 //! 1 to [`MAX_UNIT_SPEED`]. `sprite` names a sprite of the game; `sim` checks only its form, and the
 //! game checks that the sprite exists before the match starts (cross validation).
 
-use std::path::Path;
+use std::{path::Path, sync::Arc};
 
 use bevy_ecs::resource::Resource;
 use serde::Deserialize;
 
 use crate::combat_defs::{
-    self, ArmourClass, CombatDefinitions, CombatTerms, WarheadDef, WarheadKind, WeaponDef,
-    WeaponKind,
+    self, ArmourClass, CombatDefinitions, CombatTerms, Effect, EffectDef, WarheadDef, WarheadKind,
+    WeaponDef, WeaponKind,
 };
 use crate::data::{self, DataError, DataErrorKind, MAX_DATA_FILE_BYTES, Shape};
 use crate::economy_defs::{
@@ -58,17 +58,23 @@ pub struct UnitDef {
 }
 
 /// Immutable definitions of the current match (PLAN.md section 5).
+/// Clones share immutable tables; consuming loader methods replace only their own handles.
 ///
 /// [`SimPlugin`](crate::SimPlugin) starts with no definitions; match setup installs the loaded
 /// ones before units are spawned.
 #[derive(Resource, Clone, Debug, Default, PartialEq, Eq)]
 pub struct Definitions {
-    units: Vec<UnitDef>,
+    units: Arc<Vec<UnitDef>>,
+    pub(crate) arsenal: Arc<crate::arsenal::Arsenal>,
     /// Empty unless the definitions were loaded with an economy file ([`load_definitions`]).
-    economy: EconomyDefinitions,
+    economy: Arc<EconomyDefinitions>,
     /// Empty unless a combat file was loaded ([`Definitions::with_combat`]); then every unit and
     /// building type has combat terms.
-    combat: CombatDefinitions,
+    combat: Arc<CombatDefinitions>,
+    /// `None` unless a rules file was loaded ([`Definitions::with_rules`], RA1): the global
+    /// values, sides and countries of the Red Alert 2 ruleset. Without it every rule that reads
+    /// it keeps its behaviour of M2 to M9.
+    rules: Option<Arc<crate::rules::Rules>>,
 }
 
 impl Definitions {
@@ -129,14 +135,19 @@ impl Definitions {
             .flatten()
     }
 
-    /// Whether some unit type is produced by buildings of type `kind` (such buildings have a
-    /// rally point).
+    /// Whether units leave buildings of type `kind`, which therefore have a rally point: some
+    /// unit type is produced by them (or, with factory groups, by a factory of their group:
+    /// `Definitions::same_factory`), or they duplicate trained infantry (the arsenal's cloner,
+    /// whose copies would otherwise all stand around it).
     pub fn produces_units(&self, kind: BuildingKind) -> bool {
         self.economy
             .unit_production
             .iter()
             .flatten()
-            .any(|production| production.producer == kind)
+            .any(|production| self.same_factory(kind, production.producer))
+            || self
+                .metadata(ProductionItem::Building(kind))
+                .is_some_and(|entry| entry.role == crate::Role::Cloner)
     }
 
     /// Largest distance in cells between a new building and a building of its owner
@@ -183,6 +194,24 @@ impl Definitions {
             .map(WeaponKind)
     }
 
+    /// The kind of the warhead with this id.
+    pub fn warhead_kind(&self, id: &str) -> Option<WarheadKind> {
+        self.combat
+            .warheads
+            .iter()
+            .position(|warhead| warhead.id == id)
+            .and_then(|index| u16::try_from(index).ok())
+            .map(WarheadKind)
+    }
+
+    /// The impact of the area effect `effect`, if the combat file lists it.
+    pub fn effect(&self, effect: Effect) -> Option<EffectDef> {
+        Effect::ALL
+            .iter()
+            .position(|&listed| listed == effect)
+            .and_then(|index| self.combat.effects.get(index).copied().flatten())
+    }
+
     /// The kind of the armour class with this name.
     pub fn armour_class(&self, name: &str) -> Option<ArmourClass> {
         self.combat
@@ -220,17 +249,30 @@ impl Definitions {
             .flatten()
     }
 
+    /// The rules file, or `None` for definitions loaded without one.
+    pub fn rules(&self) -> Option<&crate::rules::Rules> {
+        self.rules.as_deref()
+    }
+
     pub(crate) fn hash_into(&self, hasher: &mut Fnv1a64) {
         hasher.write_u64(self.units.len() as u64);
-        for unit in &self.units {
+        for unit in self.units.iter() {
             for text in [&unit.id, &unit.sprite] {
                 hasher.write_u64(text.len() as u64);
                 hasher.write(text.as_bytes());
             }
             hasher.write(&unit.speed.to_le_bytes());
         }
+        self.arsenal.hash_into(hasher);
         self.economy.hash_into(hasher);
         self.combat.hash_into(hasher);
+        match &self.rules {
+            None => hasher.write(&[0]),
+            Some(rules) => {
+                hasher.write(&[1]);
+                rules.hash_into(hasher);
+            }
+        }
     }
 }
 
@@ -303,11 +345,24 @@ impl Definitions {
     ///
     /// Combat definitions refer to the building types of the economy file, so loading an economy
     /// file removes any combat definitions loaded before; load the combat file afterwards
-    /// ([`Definitions::with_combat`]).
+    /// ([`Definitions::with_combat`]). The same holds for the rules and the arsenal.
     pub fn with_economy(mut self, economy_file: impl AsRef<Path>) -> Result<Self, DataError> {
         let ids: Vec<String> = self.units.iter().map(|unit| unit.id.clone()).collect();
-        self.economy = economy_defs::load(economy_file.as_ref(), &ids)?;
-        self.combat = CombatDefinitions::default();
+        self.economy = Arc::new(economy_defs::load(economy_file.as_ref(), &ids)?);
+        self.combat = Arc::default();
+        self.rules = None;
+        self.arsenal = Arc::default();
+        Ok(self)
+    }
+
+    /// These definitions together with the rules file at `rules_file` (RA1, `crate::rules`),
+    /// whose references to unit and building types are resolved against them. The arsenal names
+    /// the countries and prerequisite groups of the rules, so loading a rules file removes an
+    /// arsenal loaded before; load the arsenal afterwards ([`Definitions::with_arsenal`]). Every
+    /// problem is a [`DataError`] naming the file, the field, and the reason.
+    pub fn with_rules(mut self, rules_file: impl AsRef<Path>) -> Result<Self, DataError> {
+        self.rules = Some(Arc::new(crate::rules::load(rules_file.as_ref(), &self)?));
+        self.arsenal = Arc::default();
         Ok(self)
     }
 
@@ -323,7 +378,7 @@ impl Definitions {
             .iter()
             .map(|building| building.id.clone())
             .collect();
-        self.combat = combat_defs::load(combat_file.as_ref(), &units, &buildings)?;
+        self.combat = Arc::new(combat_defs::load(combat_file.as_ref(), &units, &buildings)?);
         Ok(self)
     }
 }
@@ -336,6 +391,21 @@ pub fn load_match_definitions(
     combat_file: impl AsRef<Path>,
 ) -> Result<Definitions, DataError> {
     load_definitions(units_file, economy_file)?.with_combat(combat_file)
+}
+
+/// Loads the definitions of the ruleset in the directory `dir` (RA1): its `units.ron`,
+/// `economy.ron` and `combat.ron` ([`load_match_definitions`]), then its `rules.ron`
+/// ([`Definitions::with_rules`]) and its `arsenal.ron` ([`Definitions::with_arsenal`]), which is
+/// how the shipped data in `assets/data` is loaded.
+pub fn load_ruleset(dir: impl AsRef<Path>) -> Result<Definitions, DataError> {
+    let dir = dir.as_ref();
+    load_match_definitions(
+        dir.join("units.ron"),
+        dir.join("economy.ron"),
+        dir.join("combat.ron"),
+    )?
+    .with_rules(dir.join("rules.ron"))?
+    .with_arsenal(dir.join("arsenal.ron"))
 }
 
 fn validate(path: &Path, file: UnitsFile) -> Result<Definitions, DataError> {
@@ -389,9 +459,11 @@ fn validate(path: &Path, file: UnitsFile) -> Result<Definitions, DataError> {
         });
     }
     Ok(Definitions {
-        units,
-        economy: EconomyDefinitions::default(),
-        combat: CombatDefinitions::default(),
+        units: Arc::new(units),
+        economy: Arc::default(),
+        combat: Arc::default(),
+        arsenal: Arc::default(),
+        rules: None,
     })
 }
 

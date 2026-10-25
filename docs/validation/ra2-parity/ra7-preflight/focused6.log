@@ -1,0 +1,104 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 1.12s
+     Running tests/ra1_commands.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra1_commands-f40f329f2af0ad14)
+
+running 22 tests
+test a_weak_yard_dies_in_the_strike ... ok
+test a_building_destroyed_by_a_strike_is_not_sold_repaired_or_given_a_rally_point ... ok
+test a_base_unit_destroyed_by_a_strike_is_not_deployed_in_the_same_tick ... ok
+test a_silo_destroyed_by_a_strike_does_not_fire_in_the_same_tick ... ok
+test a_building_destroyed_by_a_strike_is_not_captured_by_an_engineer_who_arrives_in_that_tick ... ok
+test a_seen_enemy_is_reported_as_not_owned ... ok
+test an_engineer_who_arrives_captures_a_building_that_stands ... ok
+test a_unit_destroyed_by_a_strike_takes_no_order_and_is_no_target_in_the_same_tick ... ok
+test a_unit_destroyed_by_a_strike_does_not_embark_and_a_destroyed_transport_takes_nobody ... ok
+test deploying_names_nothing_in_a_footprint_the_player_does_not_see ... ok
+test a_destroyed_building_is_no_prerequisite_and_no_anchor_in_the_same_tick ... ok
+test every_command_answers_for_a_submerged_enemy_as_for_an_id_that_names_nothing ... ok
+test a_yard_destroyed_by_a_strike_is_not_undeployed_in_the_same_tick ... ok
+test the_chronosphere_answers_for_an_unseen_enemy_vehicle_as_for_an_id_that_names_nothing ... ok
+test ra5_garrison_destroyed_earlier_in_the_command_tick_cannot_deploy ... ok
+test a_vehicle_destroyed_by_a_strike_is_not_repaired_back_to_life_in_the_same_tick ... ok
+test every_command_answers_for_an_unseen_enemy_as_for_an_id_that_names_nothing ... ok
+test ra7_new_command_actors_and_targets_destroyed_earlier_in_the_same_tick_are_missing ... ok
+test ra5_unseen_neutral_tech_and_enemy_garrison_ids_answer_exactly_as_missing_targets ... ok
+test ra5_same_tick_dead_actors_cannot_capture_repair_enter_hospital_or_occupy ... ok
+test ra6_shipped_interaction_targets_hidden_unseen_and_missing_have_identical_answers ... ok
+test ra6_trait_injected_specialists_and_transport_passengers_cannot_act_after_same_tick_death ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests/ra5_world.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra5_world-109ae10017d56467)
+
+running 23 tests
+test ra5_derrick_pays_neutral_capture_startup_then_exactly_every_133_ticks ... ok
+test ra5_enemy_capture_does_not_repeat_the_derricks_neutral_startup_grant ... ok
+test ra5_city_and_tower_take_ten_conscripts_and_use_the_soviet_occupation_weapon ... ok
+test ra5_garrison_owner_location_reload_and_eviction_each_change_the_state_hash ... ok
+test ra5_enemy_garrisons_exchange_occupation_fire_but_hidden_garrisons_are_not_targets ... ok
+test ra5_bridge_destruction_off_and_immune_hut_ignore_explicit_fire ... ok
+test ra5_hospital_heals_entered_infantry_20_per_tick_and_returns_the_same_unit ... ok
+test ra5_house_accepts_three_occupiers_refuses_tank_and_fourth_then_deploy_evicts ... ok
+test ra5_engineer_captures_each_tech_and_is_consumed_but_the_hut_is_not_capturable ... ok
+test ra5_neutral_and_captured_insignificant_buildings_never_keep_a_defeated_player_alive ... ok
+test ra5_bridge_collapse_and_hospital_cargo_change_hash_and_replay_deterministically ... ok
+test ra5_neutral_is_not_hostile_or_a_competing_player_and_outpost_stays_inert ... ok
+test ra5_scaled_adjacent_tech_anchors_keep_identity_without_duplicates_or_ghost_obstacles ... ok
+test ra5_outpost_repairs_one_vehicle_without_becoming_an_aircraft_pad ... ok
+test ra5_one_area_blast_hits_a_connected_bridge_once_at_its_strongest_deck_cell ... ok
+test ra5_two_gis_fire_occupation_weapon_every_ten_ticks_from_the_house ... ok
+test ra5_garrison_red_health_evicts_and_refuses_reentry_then_remains_destructible ... ok
+test ra5_bridge_collapses_as_one_run_and_consumes_engineer_to_restore_the_only_land_route ... ok
+test ra5_all_large_maps_have_symmetric_tech_and_real_objects_after_two_to_ten_player_scaling ... ok
+test ra5_bridge_repair_waits_for_standing_and_entering_ships_without_harming_compatible_units ... ok
+test ra5_seaward_pier_hut_adds_no_land_route_and_shore_engineer_repairs_after_collapse ... ok
+test ra5_ai_remembers_a_seen_collapse_and_approaches_its_hut_after_losing_sight ... ok
+test ra5_ai_repairs_the_only_land_route_with_a_consumed_engineer_and_wins ... ok
+
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.52s
+
+     Running tests/ra7_context.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra7_context-76085dceb8d06899)
+
+running 1 test
+test ra7_context_actions_validate_engineer_spy_boarding_depot_garrison_and_tanya ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/ra7_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra7_definitions-17af1ddf226edb3f)
+
+running 1 test
+test ra7_guard_range_is_required_bounded_and_hashed ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/ra7_orders.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra7_orders-c6503842f997d56d)
+
+running 11 tests
+test ra7_follow_forgets_concealed_target_without_tracking_new_position_and_interact_clears_waypoints ... ok
+test ra7_new_orders_reject_empty_foreign_offmap_duplicates_and_waypoint_overflow_atomically ... ok
+test ra7_force_fire_kill_credits_the_actual_attacker ... ok
+test ra7_guard_uses_explicit_reference_guard_range_instead_of_longer_weapon_range ... ok
+test ra7_ground_and_allied_force_fire_use_damage_reload_and_source_credit ... ok
+test ra7_new_order_state_and_fog_affect_hash_and_replay_is_deterministic ... ok
+test ra7_force_fire_backs_out_of_reference_minimum_range_before_launching ... FAILED
+test ra7_scatter_moves_members_apart_and_guard_fires_then_returns ... ok
+test ra7_force_ground_fire_spends_air_ammo_and_launches_a_missile_with_fixed_aim ... ok
+test ra7_follow_tracks_a_moving_friendly_then_stop_cancels_every_order ... ok
+test ra7_force_move_crushes_without_acquiring_and_waypoints_run_in_order ... ok
+
+failures:
+
+---- ra7_force_fire_backs_out_of_reference_minimum_range_before_launching stdout ----
+
+thread 'ra7_force_fire_backs_out_of_reference_minimum_range_before_launching' (3075080) panicked at crates/sim/tests/ra7_orders.rs:510:5:
+assertion failed: events.iter().any(|e|
+        matches!(e,SimEvent::UnitLaunched{parent,..}if *parent==launcher))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ra7_force_fire_backs_out_of_reference_minimum_range_before_launching
+
+test result: FAILED. 10 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+error: test failed, to rerun pass `-p sim --test ra7_orders`

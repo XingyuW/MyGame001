@@ -1,0 +1,22 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 15.82s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 4 tests
+test ai::ra8_attrition_tests::ra8_actual_chronoshift_and_temporal_disable_keep_attack_attempts_alive ... ok
+test ai::ra8_attrition_tests::ra8_actual_death_and_mind_control_complete_only_the_lost_owned_attempt ... ok
+test ai::ra8_attrition_tests::ra8_each_building_job_field_is_value_hashed_in_canonical_order ... ok
+test ai::ra8_attrition_tests::ra8_real_cargo_and_depot_entry_do_not_fabricate_building_attack_losses ... 
+thread 'ai::ra8_attrition_tests::ra8_real_cargo_and_depot_entry_do_not_fabricate_building_attack_losses' (7229190) panicked at crates/sim/src/ai/ra8_attrition_tests.rs:274:9:
+assertion failed: progress(&app, target).actors.contains_key(&tank)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ai::ra8_attrition_tests::ra8_real_cargo_and_depot_entry_do_not_fabricate_building_attack_losses
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 68 filtered out; finished in 0.72s
+
+error: test failed, to rerun pass `-p sim --lib`

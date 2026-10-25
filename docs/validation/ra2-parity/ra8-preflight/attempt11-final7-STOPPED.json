@@ -1,0 +1,36 @@
+{
+  "completed_failed_phase": {
+    "phase": "retained37",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "--",
+      "--nocapture",
+      "--test-threads=4"
+    ],
+    "start_utc": "2026-10-19T17:59:42.908942+00:00",
+    "exit": 101,
+    "elapsed_seconds": 1529.961550665961,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt11-final7-retained37.log",
+    "sha256": "35792ff087ee913d6efd00b543f24dd1ebf171d8ae38e4bf9f79d319fe81e9b6",
+    "test_targets": 1,
+    "passed": 36,
+    "failed": 1,
+    "ignored": 0,
+    "source_mismatches": []
+  },
+  "remaining_unrun": [
+    "m13-all",
+    "m13-256",
+    "example-guard-m13_ten_players",
+    "example-guard-m14_duels",
+    "example-guard-m7_soak"
+  ],
+  "runtime_mismatches": [],
+  "elapsed_seconds": 1771.7910723339883
+}

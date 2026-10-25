@@ -1,0 +1,27 @@
+{
+  "utc": "2026-10-21T01:11:07.945256+00:00",
+  "ended_utc": "2026-10-21T01:14:07.543051+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "--",
+    "ra8_every_shipped_plan_places_a_paid",
+    "ra8_medium_country_defence_counts",
+    "ra8_navy_requires_reachable",
+    "ra8_unseen_enemy_water_building",
+    "ra8_paid_naval_detector",
+    "ra8_real_armed_worker_income",
+    "ra8_building_and_depot_repairs",
+    "ra8_an_unpowered_strategic_source_keeps",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit_code": 0,
+  "seconds": 179.595,
+  "lease": "RA8 revocable functional phase jobs1; selected existing bounded controlled policy bodies, not matches/sweep/performance",
+  "input_mismatches": []
+}

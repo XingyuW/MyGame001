@@ -1,0 +1,38 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T20:35:34.751550+00:00",
+  "pid": 20289,
+  "head": "aafd1794a84f88b9919b7e31c78768e08f66d70d",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-before-05-plan.json",
+  "plan_sha256": "b1ab20318951db8be42a2d4e5bb21d6416ec0742f24cae4ff957d0fe7f19d67c",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra9_privacy_remembered_bridge_approach_ignores_real_hidden",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:35:34.863502+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-before-05/01-final-byte-both-hidden-terrain.log",
+      "pid": 20318,
+      "pgid": 20318,
+      "exit": 101,
+      "end": "2026-10-22T20:35:39.871734+00:00",
+      "raw_bytes": 1564,
+      "raw_sha256": "473a173ef923107f3cd6da49dcb132c2956ee636e3431452ee74a902f2926454",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T20:35:34.868612+00:00",
+  "end": "2026-10-22T20:35:39.984176+00:00",
+  "source_unchanged": true
+}

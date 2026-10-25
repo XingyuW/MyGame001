@@ -1,0 +1,24 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate_demo_germany_great_britain_brutal_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "environment": {
+    "RA8_ECONOMY_TRACE": "1",
+    "RA8_DEMO_LATE_TRACE": "1"
+  },
+  "exit": 101,
+  "elapsed_seconds": 16.25769100000616,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-demo-germany-britain-trace1.log",
+  "sha256": "6c93b59472f4621537bf40a44230d57d02b2b42a570f001768a0b86330f0c4da"
+}

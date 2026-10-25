@@ -1,0 +1,108 @@
+[
+  {
+    "name": "fmt",
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.9094750419899356,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-final-fmt2.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "diff",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.013784459006274119,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-final-diff2.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "clippy",
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 6.802327749988763,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-final-clippy2.log",
+    "sha256": "3fd7a02892b713f7b603929e14dd8ae9e2c89ec7779411fec623220a14dc9675"
+  },
+  {
+    "name": "generated",
+    "command": [
+      "python3",
+      "scripts/generate_ra2_data.py",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.07814570897608064,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-final-generated2.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "reference",
+    "command": [
+      "python3",
+      "scripts/ra2_reference.py",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.0838890419981908,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-final-reference2.log",
+    "sha256": "5fa32e9687ef749dd76543b607f37bc835ddd9e7469e2b7b5874d233ee5cf964"
+  },
+  {
+    "name": "frozen",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "frozen",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.5702825000043958,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-final-frozen2.log",
+    "sha256": "676b4dae9bde6e8d217fcd8eef8d8c7ed0d549026e76bd16360c858df94e4d01"
+  },
+  {
+    "name": "chronoshift",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "chronoshift",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 1.4604013329953887,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-final-chronoshift2.log",
+    "sha256": "349f644a370878316fe4e5037c4db382ff2d94b473e31ef4d89f29e095289763"
+  }
+]

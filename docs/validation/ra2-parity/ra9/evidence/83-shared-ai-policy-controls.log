@@ -1,0 +1,26 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.23s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra8_ai-55129ee60c603374)
+
+running 8 tests
+test ra8_an_unpowered_strategic_source_keeps_repairs_during_real_paid_power_recovery ... ok
+test ra8_building_and_depot_repairs_use_paid_production_paths ... ok
+test ra8_every_shipped_plan_places_a_paid_armed_defence_from_its_complete_plan ... great_britain fallback=true: paid defence BuildingKind(15) at tick 3402
+russia fallback=true: paid defence BuildingKind(16) at tick 3242
+america fallback=false: paid defence BuildingKind(15) at tick 3402
+korea fallback=false: paid defence BuildingKind(15) at tick 3402
+france fallback=false: paid defence BuildingKind(15) at tick 3402
+germany fallback=false: paid defence BuildingKind(15) at tick 3402
+great_britain fallback=false: paid defence BuildingKind(15) at tick 3402
+russia fallback=false: paid defence BuildingKind(16) at tick 3242
+iraq fallback=false: paid defence BuildingKind(16) at tick 3242
+cuba fallback=false: paid defence BuildingKind(16) at tick 3242
+libya fallback=false: paid defence BuildingKind(16) at tick 3242
+ok
+test ra8_medium_country_defence_counts_national_and_later_army_tiers_are_produced ... ok
+test ra8_navy_requires_reachable_placement_water_and_an_enemy_hurtable_from_that_sea ... ok
+test ra8_paid_naval_detector_escorts_the_fleet_toward_a_known_shore_target ... ok
+test ra8_real_armed_worker_income_keeps_native_paid_repairs_and_harvesting ... ok
+test ra8_unseen_enemy_water_building_cannot_change_naval_planning ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 124 filtered out; finished in 179.30s
+

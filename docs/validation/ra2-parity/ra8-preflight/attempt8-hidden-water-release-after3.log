@@ -1,0 +1,29 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0308]: mismatched types
+    --> crates/sim/tests/ra8_ai.rs:3737:54
+     |
+3737 |         if actual.world().resource::<SimTick>().0 == rescan - interval {
+     |            --------------------------------------    ^^^^^^^^^^^^^^^^^ expected `u64`, found `u32`
+     |            |
+     |            expected because this is `u64`
+     |
+help: you can convert a `u32` to a `u64`
+     |
+3737 |         if actual.world().resource::<SimTick>().0 == (rescan - interval).into() {
+     |                                                      +                 ++++++++
+
+error[E0308]: mismatched types
+    --> crates/sim/tests/ra8_ai.rs:3751:54
+     |
+3751 |         if actual.world().resource::<SimTick>().0 == rescan {
+     |            --------------------------------------    ^^^^^^ expected `u64`, found `u32`
+     |            |
+     |            expected because this is `u64`
+     |
+help: you can convert a `u32` to a `u64`
+     |
+3751 |         if actual.world().resource::<SimTick>().0 == rescan.into() {
+     |                                                            +++++++
+
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `sim` (test "ra8_ai") due to 2 previous errors

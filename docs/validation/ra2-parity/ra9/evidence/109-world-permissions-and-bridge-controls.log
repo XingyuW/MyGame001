@@ -1,0 +1,14 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 21.44s
+     Running tests/ra5_world.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra5_world-5c3a67a1ad2dcc1b)
+
+running 6 tests
+test ra5_ai_repairs_the_only_land_route_with_a_consumed_engineer_and_wins ... ok
+test ra5_bridge_collapses_as_one_run_and_consumes_engineer_to_restore_the_only_land_route ... ok
+test ra5_engineer_captures_each_tech_and_is_consumed_but_the_hut_is_not_capturable ... ok
+test ra5_outpost_repairs_one_vehicle_without_becoming_an_aircraft_pad ... ok
+test ra5_seaward_pier_hut_adds_no_land_route_and_shore_engineer_repairs_after_collapse ... ok
+test ra9_false_assaulter_current_garrison_permissions ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 7.42s
+

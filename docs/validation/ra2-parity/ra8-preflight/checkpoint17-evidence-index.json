@@ -1,0 +1,201 @@
+{
+  "utc": "2026-10-20T22:49:36.015969+00:00",
+  "scope": "New R189 preserved provenance only, not passed-test count; earlier checkpoint16 evidence remains referenced unchanged",
+  "files": [
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-coral-edge-after1-example-binding.json",
+      "bytes": 419,
+      "sha256": "69a32ddf99c8c76e753520e83693f7aea4fb8002c228f429d58126831449363d"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-coral-edge-after1-execution-context.json",
+      "bytes": 885,
+      "sha256": "4f7f78b4bbf0b75d63c7ccbda3c3673d8fe1cb30d147b497cb51e9335effbf3f"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-coral-edge-after1.json",
+      "bytes": 2946,
+      "sha256": "0d6ff82acd276dd2521283740c56f4e66b237f8c3622a54273fdfdf7296d3755"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-coral-edge-after1.log",
+      "bytes": 175820,
+      "sha256": "71f5c99d6fc3726f2bd04cab8679e53cf6a1d947d4b759cde9a6d99d7086b86f"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-coral-native-trace1-restored-later.json",
+      "bytes": 55306,
+      "sha256": "0fb1bb60b84c274d0260bdd5cc7e7489c2f9d40fdbef648334a3b7bc78575dbd"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-coral-native-trace1.json",
+      "bytes": 166937,
+      "sha256": "f25fe461a03e783929800ee0ce02024cc00fd3fcb314ea16811d7e88a2b6d9bb"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-coral-native-trace1.log",
+      "bytes": 97552219,
+      "sha256": "1e0352a314aa6877f8f75a1e306777f1c65f74a292e3052f879c11e9b79682ae"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-coral-trace-conclusion1.json",
+      "bytes": 3828,
+      "sha256": "39566a846abe5810cadcc2db028a15352198a147f02a0ab40d1cc0dab72b456f"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-coral-trace-instrumentation1.patch",
+      "bytes": 11800,
+      "sha256": "26385d85a66112a7dc020c0e715c9014a769ccb8164fd5bbaf53b6d2fc499edd"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-coral-trace-instrumented1.rs",
+      "bytes": 25346,
+      "sha256": "1f99bd36c74b294d0a83d322ce6f59ccecfc34ba5d4abe4020dc5a76c6127ae5"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-coral-trace-original.rs",
+      "bytes": 15029,
+      "sha256": "c2276424dd51b832df4391d740bab5dcba1f5caf49c9dc98980bba45d5ac9111"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-coral-trace-original.rs.json",
+      "bytes": 461,
+      "sha256": "e7933970b40bcc8592764423397ef67cb9cca7aa9f4a4c3ffc2bf4793b439cb6"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-edge-strike-after1.json",
+      "bytes": 2874,
+      "sha256": "f78e21196e92e654c7a3bfae761cf2617e9092988f02c0b68611f7a17fc328b6"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-edge-strike-after1.log",
+      "bytes": 636,
+      "sha256": "54446243f537a0b2ac11ee7389e4aa6c1256ca12f365a0d831fdfb8c5a068d71"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-edge-strike-before1.json",
+      "bytes": 2877,
+      "sha256": "16d399ccc036ace90aa2673567ab20a24ad8cc5e15aeed244c2bc47cc170f92c"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-edge-strike-before1.log",
+      "bytes": 705,
+      "sha256": "ed98e7554e841d38aadb3c0ed912faf5676d4cf55d6d92d5e3e4f40827ac7686"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-edge-strike-before2.json",
+      "bytes": 2877,
+      "sha256": "315d8473be4dbe46fd2396fd31d58c0b7acb08831710ca5f90c6a00a04b0599f"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-edge-strike-before2.log",
+      "bytes": 1102,
+      "sha256": "7f22d6ba9262f0899f06d55995131862d4b13550406216108ba7eee9d999c418"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-edge-strike-clippy-correction.json",
+      "bytes": 1623,
+      "sha256": "1623162c48b9e41dd885dc6c1ec7726d270b1694233f47a0a673b11e094e2924"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-final1-01-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-final1-02-regenerate.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-final1-03-clippy.log",
+      "bytes": 1146,
+      "sha256": "24f5ebe3be27e70b884856e4ca96385351fe55e2fecad885da26b3b579ee97ff"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-final1-runtime-manifest.json",
+      "bytes": 38110,
+      "sha256": "740dc928681cfaedbdd8a40432bded58d12fd9d6e2b86a06fca2570dd04bafcc"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-final1-summary.json",
+      "bytes": 2522,
+      "sha256": "edf4555bfe756c0d25822e3fc26da7a555a1acef46e1587d1713dad0d68f3955"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-final1-test-example-manifest.json",
+      "bytes": 19463,
+      "sha256": "8d234fd3d3619d9b6fc99db643aeaceac8692a83545f1057a85be9bf5aca1c32"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-01-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-02-regenerate.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-03-clippy.log",
+      "bytes": 230,
+      "sha256": "d64b0a5da267429f2b3de6d32f9326006f3cec1ab3f21d43d3456da56aed36ef"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-04-crossroads.log",
+      "bytes": 22972,
+      "sha256": "7cdfb702c5e6203c20b0f03de5dd796b9726f94f123d5d8b51adfe720264f80f"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-05-crossroads-reverse.log",
+      "bytes": 492,
+      "sha256": "f467089a03f0f0098d4dfbd904b797d979995b1ea4048fd0bb05b0329b4b5492"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-06-riverlands.log",
+      "bytes": 492,
+      "sha256": "eef8300319bb7d1d7a2f9b0e7d144ebbc55f269ad86aead8d7ac428def2c9514"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-07-demo10.log",
+      "bytes": 10054,
+      "sha256": "ea2ffa5c4c10eaab5acc7a2266dee9f7646fac907676a10980de5bbf01d07236"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-08-grown3.log",
+      "bytes": 869,
+      "sha256": "d7d9347c12f40cb02f89798161448ac72656a1e0aa6d9c2c573d613c16bb9e58"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-09-full-sim.log",
+      "bytes": 98132,
+      "sha256": "e502acac306c46d2f9a83d24c5b671b26a5a28c8cdefc2cb088cd5596945ed21"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-liveness1.json",
+      "bytes": 17729,
+      "sha256": "608786e2231b752b8cc70ba20a850131e4a5dc5cb910e6f7a6cbe75dc105dcd5"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-liveness2.json",
+      "bytes": 1112,
+      "sha256": "54cb6bc5bea62273c36739a003c48e60e5d46da6a39f8cf8acbaf3be7252533c"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-runtime-manifest.json",
+      "bytes": 38110,
+      "sha256": "23dc30e9d22a1e6c23589eebb71d57e3e3e7138770c673ee4dd2b4cb5ca8fa0f"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-summary.json",
+      "bytes": 13008,
+      "sha256": "2b93145409a32e85c60302589cfce8bd608fae1f45a412f84b102a76475f06bd"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-test-example-manifest.json",
+      "bytes": 19463,
+      "sha256": "3b3df482593e41d4399a5735c2b5da9ac236b044d631b59a110d6d1581d6960f"
+    }
+  ]
+}
